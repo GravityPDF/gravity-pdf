@@ -31,7 +31,7 @@
   */
   /*$gf_pdf_config[] = array(
   	'form_id' => 1, 
-	'notifications' => true 
+  
   );*/
   
  /*
@@ -50,28 +50,28 @@
   
   /*$gf_pdf_config[] = array(
   	'form_id' => 1, 
-	'template' => 'default-template.php',		
-	'default-show-html' => true
+  	'template' => 'default-template.php',		
+  	'default-show-html' => true
   );*/  
   
   /*$gf_pdf_config[] = array(
   	'form_id' => 1, 
-	'template' => 'default-template.php',	
-	'default-show-empty' => true
+  	'template' => 'default-template.php',	
+  	'default-show-empty' => true
   );*/ 
   
   /*$gf_pdf_config[] = array(
   	'form_id' => 1, 
-	'template' => 'default-template.php',		
-	'default-show-page-names' => true
+  	'template' => 'default-template.php',		
+  	'default-show-page-names' => true
   );*/     
   
   /*$gf_pdf_config[] = array(
   	'form_id' => 1, 
-	'template' => 'default-template.php',		
-	'default-show-html' => true,
-	'default-show-empty' => true,
-	'default-show-page-names' => true
+  	'template' => 'default-template.php',		
+  	'default-show-html' => true,
+  	'default-show-empty' => true,
+  	'default-show-page-names' => true
   );*/   
   
  /*
@@ -82,12 +82,12 @@
   */
   /*$gf_pdf_config[] = array(
   	'form_id' => 1, 
-	'notifications' => 'Admin Notification' 
+	  'notifications' => 'Admin Notification' 
   );*/ 
   
   /*$gf_pdf_config[] = array(
   	'form_id' => '1', 
-	'notifications' => array('Admin Notification', 'User Notification') 
+	  'notifications' => array('Admin Notification', 'User Notification') 
   );*/  
   
  /*
@@ -99,30 +99,15 @@
   */
   /*$gf_pdf_config[] = array(
   	'form_id' => 1, 
-	'notifications' => 'User Notification',
-		
-	'template' => 'example-float-and-positioning05.php' 
+  	'notifications' => 'User Notification', 		
+  	'template' => 'example-float-and-positioning05.php' 
   );*/  
   
   /*$gf_pdf_config[] = array(
   	'form_id' => 2, 
-	'notifications' => 'User Notification',
-	
-	'template' => 'example-basic-html01.php' 
+  	'notifications' => 'User Notification',
+  	'template' => 'example-basic-html01.php' 
   );*/    
-  
- /*
-  * ------------------------------------------------------------ 
-  * Multiple Forms
-  * If you have multiple forms that use the same PDF template then you can pass the form_id through as an array.
-  * WARNING: If using a custom template with this option your secondary forms should be a duplicate of the original and you shouldn't delete the fields
-  *          otherwise the custom template won't show correctly. 
-  * WARNING: The previous warning also applies to custom PDF names with MERGETAGS
-  */
-  /*$gf_pdf_config[] = array(
-  	'form_id' => array(1,5,6), 
-	'notifications' => true 
-  );*/
     
  /*
   * ------------------------------------------------------------ 
@@ -132,15 +117,15 @@
   * filename String. Default form-{form_id}-entry-{entry_id}.pdf
   */    
   /*$gf_pdf_config[] = array(
-	'form_id' => 1, 
-	'notifications' => true, 
-	'filename' => 'New PDF Name.pdf' 
+  	'form_id' => 1, 
+  	'notifications' => true, 
+  	'filename' => 'New PDF Name.pdf' 
   );*/ 
  
   /*$gf_pdf_config[] = array(
-	'form_id' => '1', 
-	'notifications' => true, 
-	'filename' => 'User {Name:1}.pdf' 
+  	'form_id' => '1', 
+  	'notifications' => true, 
+  	'filename' => 'User {Name:1}.pdf' 
   );*/ 
  
  /*
@@ -161,27 +146,27 @@
   
   /* Letter-sized Document */
   /*$gf_pdf_config[] = array(
-	'form_id' => 1,  
-	'notifications' => true, 
-		
-	'pdf_size' => 'letter'
+  	'form_id' => 1,  
+  	'notifications' => true, 
+  		
+  	'pdf_size' => 'letter'
   );*/
   
   /* Custom PDF Size */
  /* $gf_pdf_config[] = array(
-	'form_id' => 1, 
-	'notifications' => true,
-	
-	'pdf_size' => array(50, 200)
-  );*/  
-  
-  /* Change orientation */
- /* $gf_pdf_config[] = array(
-	'form_id' => 1, 
-	'notifications' => true,
-	
-	'pdf_size' => 'letter',
-	'orientation' => 'landscape'
+  	'form_id' => 1, 
+  	'notifications' => true,
+  	
+  	'pdf_size' => array(50, 200)
+    );*/  
+    
+    /* Change orientation */
+   /* $gf_pdf_config[] = array(
+  	'form_id' => 1, 
+  	'notifications' => true,
+  	
+  	'pdf_size' => 'letter',
+  	'orientation' => 'landscape'
   );*/  
 
  /*
@@ -205,13 +190,13 @@
   * Setting security settings with all values
   */  
   /*$gf_pdf_config[] = array(
- 	'form_id' => 1,
-	'notifications' => true,	 
-	 
-	'security' => true, 
-	'pdf_password' => 'myPDFpass', 	
-	'pdf_privileges' => array('copy', 'print', 'modify', 'annot-forms', 'fill-forms', 'extract', 'assemble', 'print-highres'), 	
-	'pdf_master_password' => 'admin password' 
+   	'form_id' => 1,
+  	'notifications' => true,	 
+  	 
+  	'security' => true, 
+  	'pdf_password' => 'myPDFpass', 	
+  	'pdf_privileges' => array('copy', 'print', 'modify', 'annot-forms', 'fill-forms', 'extract', 'assemble', 'print-highres'), 	
+  	'pdf_master_password' => 'admin password' 
   );*/
  
   /*
@@ -220,11 +205,11 @@
    * Random master password will be generated 
    */
    /*$gf_pdf_config[] = array(
- 	'form_id' => 1,
-	'notifications' => true,	 
-	 
-	'security' => true, 
-	'pdf_password' => 'myPDFpass'
+   	'form_id' => 1,
+  	'notifications' => true,	 
+  	 
+  	'security' => true, 
+  	'pdf_password' => 'myPDFpass'
    );*/
   
   /*
@@ -233,11 +218,11 @@
    * Master password set
    */  
    /*$gf_pdf_config[] = array(
- 	'form_id' => 1,
-	'notifications' => true,	 
-	 
-	'security' => true, 
-	'pdf_master_password' => 'admin password' 
+   	'form_id' => 1,
+  	'notifications' => true,	 
+  	 
+  	'security' => true, 
+  	'pdf_master_password' => 'admin password' 
    );*/   
   
   /*
@@ -266,6 +251,20 @@
 	
 	  'rtl' => true
    );*/
+
+  
+ /*
+  * ------------------------------------------------------------ 
+  * Multiple Forms
+  * If you have multiple forms that use the same PDF template then you can pass the form_id through as an array.
+  * WARNING: If using a custom template with this option your secondary forms should be a duplicate of the original and you shouldn't delete the fields
+  *          otherwise the custom template won't show correctly. 
+  * WARNING: The previous warning also applies to custom PDF names with MERGETAGS
+  */
+  /*$gf_pdf_config[] = array(
+    'form_id' => array(1,5,6), 
+    'notifications' => true 
+  );*/
     
   /*
   * ------------------------------------------------------------ 
@@ -277,6 +276,94 @@
 	  'form_id' => 1, 
 	  'template' => 'example-template.php'		
    );*/    
+
+  /*
+  * ------------------------------------------------------------ 
+  * Save PDF to disk
+  * Added in v3.4.0 
+  * 
+  * If you don't want the PDF sent via email but want it saved on the server 
+  * use the 'save' option. The default save location is /wp-content/themes/ActiveTheme/PDF_EXTENDED_TEMPLATE/output/
+  * Note: you can use 'save' in conjunction with 'notification' without any ill effects
+  */  
+   /*$gf_pdf_config[] = array(
+    'form_id' => 1, 
+    'template' => 'example-template.php',
+    'save' => true,  
+   );*/    
+
+  /*
+  * ------------------------------------------------------------ 
+  * Set the PDF DPI
+  * Added in v3.4.0 
+  * 
+  * For when you need to change the document's DPI. Usually set to 300 when used in professional printing.
+  * The default DPI used in the PDFs are 96.
+  * Use the 'dpi' option
+  */  
+ 
+   /*$gf_pdf_config[] = array(
+    'form_id' => 1, 
+    'template' => 'example-template.php',
+    'dpi' => 300,  
+   );*/    
+
+  /*
+  * ------------------------------------------------------------  
+  * Set PDF to PDF/A-1b format
+  * Added in v3.4.0 
+  * 
+  * PDF/A1-b is a file format for the long-term archiving of electronic documents.
+  * A key element to this reproducibility is the requirement for PDF/A documents to be 100% self-contained.
+  *
+  * Important: The software is not guaranteed to produce fully PDF/A1-b compliant files in all circumstances. It is the users responsibility to check compliance if this is essential.
+  *
+  * Usage:
+  * We've added the configuration options 'pdfa1b'. 
+  *
+  * The software will automatically make appropriate changes to your document to ensure it generates a valid PDF/A-1b document however the following items cannot be automatically fixed and are disallowed:
+  *
+  * 1. Watermarks - text or image - are not permitted (transparency is disallowed so will make text unreadable)  
+  * 2. PNG images with alpha channel transparency ('masks' not allowed)
+  * 3. Encryption is enabled (the system will automatically remove any security settings)
+  *
+  */  
+ 
+   /*$gf_pdf_config[] = array(
+    'form_id' => 1, 
+    'template' => 'example-template.php',
+    'pdfa1b' => true,
+   );*/    
+
+  /*
+  * ------------------------------------------------------------  
+  * Set PDF to PDF/X-1a format
+  * Added in v3.4.0 
+  * 
+  * PDF/X-1a is a file format to facilitate printing of electronic documents.
+  * Two key elements to this function are the requirement for PDF/X documents to be 100% self-contained, and all images need to be CMYK or spot colors.
+  *
+  * Important: The software is not guaranteed to produce fully PDF/A1-b compliant files in all circumstances. It is the users responsibility to check compliance if this is essential.
+  *
+  * Usage:
+  * We've added a new configuration options: 'pdfx1a' to turn documents into PDF/X-1a format. 
+  *
+  * The software will automatically make appropriate changes to your document to ensure it generates a valid PDF/X-1a document however the following items cannot be automatically fixed and are disallowed:
+  *
+  * 1. Watermarks - text or image - are not permitted (transparency is disallowed so will make text unreadable)  
+  * 2. PNG images with alpha channel transparency ('masks' not allowed)
+  * 3. Encryption is enabled (the system will automatically remove any security settings)
+  *
+  * For more details about generating a PDF/X-1a document see http://mpdf1.com/manual/index.php?tid=481&searchstring=pdf/a1-b
+  * 
+  */  
+ 
+   /*$gf_pdf_config[] = array(
+    'form_id' => 1, 
+    'template' => 'example-template.php',
+    'pdfx1a' => true,    
+   );*/    
+
 
  /* --------------------------------------------------------------- 
   * CUSTOM PDF SETUP BELOW. 
@@ -294,7 +381,9 @@
   * MEMORY ISSUES?
   * Try setting the options below to true to help reduce the memory footprint of the package.
   */ 
- define('PDF_ENABLE_MPDF_LITE', false); /* strip out advanced features like advanced table borders, terms and conditions, columns, index, bookmarks and barcodes. */
+ define('PDF_ENABLE_MPDF_LITE', false); /* strip out advanced features like advanced table borders, terms and conditions, index, bookmarks and barcodes. */
  define('PDF_ENABLE_MPDF_TINY', false); /* if your tried the lite version and are still having trouble the tiny version includes the bare minimum features. There's no positioning, float, watermark or form support */
  define('PDF_DISABLE_FONT_SUBSTITUTION', false); /* reduced memory by stopping font substitution */
  define('PDF_ENABLE_SIMPLE_TABLES', false); /* disable the advanced table feature and forces all cells to have the same border, background etc. */
+
+ define('PDF_REPACK_FONT', false); /* If enabled, when embedding full TTF font files it will be remade with only core font tables which may improve function with some PostScript printers (GhostScript/GSView) */

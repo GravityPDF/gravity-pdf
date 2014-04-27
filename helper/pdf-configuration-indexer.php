@@ -63,10 +63,38 @@
 				  * $gf_pdf_config included from configuration.php file
 				  */				 
 				 $this->configuration = (isset($gf_pdf_config)) ? $gf_pdf_config : array();
-		  }
+
+				 /*
+				  * Merge down the default configuration options
+				  */
+				 foreach($this->configuration as &$node)
+				 {
+				 	$node = $this->merge_defaults($node);
+				 }				
+		  }		 
 		  
 		  $this->pdf_config();
 	}
+
+	/**
+	 * Merge the configuration node with the default options, ensuring the config node takes precendent
+	 * @param  array $config the configuration node from $gfpdf->configuration()
+	 * @return array         Merged default/node configuration options 
+	 */
+	private function merge_defaults($config)
+	{
+		global $gf_pdf_default_configuration;
+
+		/*
+		 * If the default settings are set we'll merge them into the configuration index
+		 */
+		if(is_array($gf_pdf_default_configuration) && sizeof($gf_pdf_default_configuration) > 0)
+		{
+			$config = array_replace_recursive($gf_pdf_default_configuration, $config);
+		}
+
+		return $config;		
+	}	
 	
 	/*
 	 * Run through user configuration and set PDF options
@@ -158,6 +186,59 @@
 		  */
 		 return $this->configuration[$index[0]];
 	}	
+
+	/**
+	 * Replaced get_config_data in default tempaltes to only return the default-only configuration options
+	 * @param  integer $form_id form ID
+	 * @return array          Default template configuration options
+	 */
+	public function get_default_config_data($form_id)
+	{
+		$config = $this->pull_config_data($form_id);
+
+		/* get the default template values and return in array */
+		$show_html_fields  = (isset($config['default-show-html']) 		&& $config['default-show-html'] == 1) 			? true : false;
+		$show_empty_fields = (isset($config['default-show-empty']) 		&& $config['default-show-empty']  == 1) 		? true : false; 
+		$show_page_names   = (isset($config['default-show-page-names']) && $config['default-show-page-names']  == 1) 	? true : false;  		
+
+		return array(
+			'html_field'  => $show_html_fields,
+			'empty_field' => $show_empty_fields,
+			'page_names'  => $show_page_names,
+		);
+	}	
+
+	/**
+	 * Get the configuration information based on the form ID
+	 * If multiple nodes assigned to form look for $_GET['aid']
+	 * @param  integer $form_id ID of the form
+	 * @return array          configuration node
+	 */
+	private function pull_config_data($form_id)
+	{
+		if(!isset($this->index[$form_id]))
+		{
+			return false;	
+		}
+
+		$index = $this->index[$form_id];
+		/* 
+		 * Because we now allow multiple PDF templates per form we need a way to get the correct PDF settings
+		 * To do this we use the $_GET variable 'aid'
+		 * If 'aid' is not found we will pull the first entry
+		 * Note: 'aid' has been incremented by 1 so 'aid' === 0 is never found
+		 */
+		 if(isset($_GET['aid']) && (int) $_GET['aid'] > 0)
+		 {
+			$aid = (int) $_GET['aid'] - 1;
+			return $this->configuration[$index[$aid]]; 
+		 }
+		 
+		 /*
+		  * No valid configuration file found so pull the default
+		  */
+		 return $this->configuration[$index[0]];		
+	}
 	
 	/*
 	 * Search for the template from a given form id
@@ -165,11 +246,21 @@
 	 */ 
 	public function get_template($form_id, $return_all = false)
 	{
+		global $gf_pdf_default_configuration;
+
 		$template = '';
+
+		/* Set the default template based on if the default is set */
+		$default_template = self::$default['template'];
+
+		if(is_array($gf_pdf_default_configuration) && sizeof($gf_pdf_default_configuration) > 0 && isset($gf_pdf_default_configuration['template']) )
+		{
+			$default_template = $gf_pdf_default_configuration['template'];
+		}
 		
 		if(isset($this->index[$form_id]))
-		{
-			/* 
+		
+{			/* 
 			 * Show all PDF nodes
 			 */	
 			 if($return_all === true && sizeof($this->index[$form_id]) > 1)
@@ -179,7 +270,7 @@
 				foreach($this->index[$form_id] as $id)
 				{					
 					$templates[$id] =	array(
-											'template' => (isset($this->configuration[$id]['template'])) ? $this->configuration[$id]['template'] : self::$default['template'],
+											'template' => (isset($this->configuration[$id]['template'])) ? $this->configuration[$id]['template'] : $default_template,
 											'filename' => (isset($this->configuration[$id]['filename'])) ? $this->configuration[$id]['filename'] : PDF_Common::get_pdf_filename($form_id, '{entry_id}')
 										);
 				}
@@ -207,31 +298,18 @@
 			
 			 if(strlen($template) == 0)
 			 {
-				$template = PDFGenerator::$default['template'];
+				$template = $default_template;
 			 }
 			 return $template;
 		}
 		
 		if( (strlen($template) == 0) && (GFPDF_SET_DEFAULT_TEMPLATE === true))
 		{			
-			/*
-			 * If no PDF template exists then we will use $gf_pdf_default_configuration if it exists.
-			 * If not, we will set the default			 
-			 */ 
-			 global $gf_pdf_default_configuration;
 			 
 			/*
 			 * Check if a default configuration is defined
 			 */			
-			 
-			 if(is_array($gf_pdf_default_configuration) && sizeof($gf_pdf_default_configuration) > 0 && isset($gf_pdf_default_configuration['template']))			 
-			 {
-				return $gf_pdf_default_configuration['template'];	 
-			 }
-			 else
-			 {			 
-				return PDFGenerator::$default['template'];
-			 }
+			return $default_template;
 		}			
 		else
 		{

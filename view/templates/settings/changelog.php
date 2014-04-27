@@ -20,6 +20,43 @@
     
     <p><strong>Current Version: <?php echo PDF_EXTENDED_VERSION; ?></strong></p>
     
+    <h3>3.4.0</h3>
+    <ul>
+        <li>Feature - Added auto-print prompt ability when you add &amp;print=1 to the PDF URL</li>
+    <li>Feature - Added ability to rotate absolute positioned text 180 degrees (previously only 90 and -90). Note: feature in beta</li>
+    <li>Feature - Backup all template files that are overridden when initialising to a folder inside PDF_EXTENDED_TEMPLATE</li>
+    <li>Feature - Added SSH initialisation support</li>
+    <li>Feature - Allow MERGETAGS to be used in all PDF template, including default template but only in the HTML field.</li>
+    <li>Feature - Updated mPDF to 3.7.1</li>
+    <li>Feature - Enable text/image watermark support. Added new example template example-watermark09.php showing off its usage</li>
+    <li>Feature - Added Quiz support to $form_data array</li>
+    <li>Feature - Shortcodes will now be processed in all templates, including default template but only in the HTML field.</li>
+    <li>Feature - Added 'save' configuration option so PDFs are saved to the local disk when 'notifications' aren't enabled</li>
+    <li>Feature - Added 'dpi' configuration option to modify the PDF image DPI. Default 96dpi. Use 300dpi for printing.</li>
+    <li>Feature - Added PDF/A1-b compliance option. Enable with 'pdfa1b' => true. See <a href="http://mpdf1.com/manual/index.php?tid=420&searchstring=pdf/a1-b">http://mpdf1.com/manual/index.php?tid=420&amp;searchstring=pdf/a1-b</a> for more details.</li>
+    <li>Feature - Added PDF/X1-a compliance option. Enable with 'pdfx1a' => true. See <a href="http://mpdf1.com/manual/index.php?tid=481&searchstring=pdf/x-1a">http://mpdf1.com/manual/index.php?tid=481&amp;searchstring=pdf/x-1a</a> for more details</li>
+    <li>Feature - Added new constant option 'PDF_REPACK_FONT' which when enabled may improve function with some PostScript printers (disabled by default)</li>
+
+    <li>Housekeeping - Modified mPDF functions Image() and purify_utf8_text() to validate the input data so we don't have to do it every time through the template.</li>
+    <li>Housekeeping - Added ability to not re-deploy every update (not enabled this release as template files were all updated)</li>
+    <li>Housekeeping - Additional checks on load to see if any of the required file/folder structure is missing. If so, re-initilise.</li>
+    <li>Housekeeping - Save resources and turn off automatic rtl identification. Users must set the RTL option when configuring form</li>
+    <li>Housekeeping - Turn off mPDFs packTableData setting, decreasing processing time when working with large tables.</li>
+    <li>Housekeeping - $gf_pdf_default_configuration options now merge down into existing PDF nodes, instead of applying to only unassigned forms</li>
+    <li>Housekeeping - Center aligned Survey Likery field results</li>
+    <li>Housekeeping - Partially refactored the pdf-entry-detail.php code</li>
+    <li>Housekeeping - All default and example templates have been tidied. This won't affect custom templates.</li>
+
+    <li>Bug - Fixed issue with PDF not attaching to notification using Paypal's delayed notification feature</li>
+    <li>Bug - Fixed strict standard warning about calling GFPDF_Settings::settings_page();</li>
+    <li>Bug - Fixed strict standard warning about calling GFPDFEntryDetail::pdf_get_lead_field_display();</li>
+    <li>Bug - Fixed issue with Gravity Form Post Category field causing fatal error generating PDF</li>
+    <li>Bug - Fixed number field formatting issue when displaying on PDF.</li>
+    <li>Bug - Do additional check for PHP's MB_String regex functions before initialising</li>
+    <li>Bug - Fixed problem with multiple nodes assigned to a form using the same template</li>
+    <li>Bug - Fixed path to fallback templates when not found</li>
+    </ul> 
+
     <h3>3.3.4</h3>
     <ul>
     	<li>Bug - Fixed issue linking to PDF from front end</li>
