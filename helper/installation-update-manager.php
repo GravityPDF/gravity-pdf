@@ -47,7 +47,7 @@ class GFPDF_InstallUpdater
 		 * Unlike the direct method, the root of the FTP directory isn't the ABSPATH
 		 * Usually FTP is restricted to the public_html directory, or just above it.
 		 */
-		if($wp_filesystem->method === 'ftpext' || $wp_filesystem->method === 'ftpsockets')
+		if($wp_filesystem->method === 'ftpext' || $wp_filesystem->method === 'ftpsockets' || $wp_filesystem->method === 'ssh2')
 		{
 			/*
 			 * Get the base directory
@@ -65,14 +65,30 @@ class GFPDF_InstallUpdater
 		 * If PDF_TEMPLATE_LOCATION already exists then we will remove the old template files so we can redeploy the new ones
 		 */
 
-		 if(PDF_DEPLOY === true && $wp_filesystem->exists($template_directory))
+		 if($wp_filesystem->exists($template_directory))
 		 {
+			 /*
+			  * Create a backup folder and move all the files there
+			  */
+			  $backup_folder = 'INIT_BACKUP_' . date('Y-m-d_G-i') . '/';
+			  $do_backup = false;
+			  if($wp_filesystem->mkdir($template_directory . $backup_folder ))
+			  {
+					$do_backup = true;  
+			  }
+			  
+			 
 			 /* read all file names into array and unlink from active theme template folder */
-			 foreach(glob($directory.'initialisation/templates/*.php') as $file) {
+			 foreach(glob($directory.'initialisation/templates/*') as $file) {
 				 	$path_parts = pathinfo($file);					
 						if($wp_filesystem->exists($template_directory.$path_parts['basename']))
 						{
-							$wp_filesystem->delete($template_directory.$path_parts['basename']);
+							if(!$do_backup)
+							{
+								$wp_filesystem->delete($template_directory.$path_parts['basename']);
+								continue;		
+							}
+							$wp_filesystem->move($template_directory.$path_parts['basename'], $template_directory . $backup_folder . $path_parts['basename']);
 						}
 			 }			
 		 }
@@ -193,7 +209,7 @@ class GFPDF_InstallUpdater
 		$template_font_directory = PDF_FONT_LOCATION;
 		
 		
-		if($wp_filesystem->method === 'ftpext' || $wp_filesystem->method === 'ftpsockets')
+		if($wp_filesystem->method === 'ftpext' || $wp_filesystem->method === 'ftpsockets' || $wp_filesystem->method === 'ssh2')
 		{
 			/*
 			 * Assume FTP is rooted to the Wordpress install
@@ -277,7 +293,7 @@ class GFPDF_InstallUpdater
 	public function gf_pdf_font_install_success()
 	{
 		echo '<div id="message" class="updated"><p>';
-		echo __('The font files have been successfully installed. A font can be used by adding it\'s file name (without .ttf and in lower case) in a CSS font-family declaration.', 'pdfextended');
+		echo __('The font files have been successfully installed. A font can be used by adding its file name (without .ttf and in lower case) in a CSS font-family declaration.', 'pdfextended');
 		echo '</p></div>';
 	}	
 
@@ -311,7 +327,7 @@ class GFPDF_InstallUpdater
 	 */
 	public function gf_pdf_not_deployed()
 	{		
-		if( (PDF_DEPLOY === true) && !rgpost('update') )
+		if( !rgpost('update') )
 		{
 			if(rgget("page") == 'gf_settings' && rgget('addon') == 'PDF')
 			{
@@ -327,14 +343,38 @@ class GFPDF_InstallUpdater
 				echo '</p></div>';
 			}
 		}
-	}	
-	
+	}
+
+	/**
+	 * The software has detected a problem (no configuration.php file or no PDF_EXTENDED_TEMPLATE folder
+	 * The user will need to reinitialise
+	 */
+	public function gf_pdf_problem_detected()
+	{
+		if( !rgpost('update') )
+		{
+			if(rgget("page") == 'gf_settings' && rgget('addon') == 'PDF')
+			{
+				echo '<div id="message" class="error"><p>';
+				echo __('Gravity Forms PDF Extended detected a configuration problem. Please re-initialise the plugin.', 'pdfextended');
+				echo '</p></div>';
+
+			}
+			else
+			{
+				echo '<div id="message" class="error"><p>';
+				echo sprintf(__('Gravity Forms PDF Extended detected a configuration problem. Please go to the %splugin\'s settings page%s to re-initialise.', 'pdfextended'), '<a href="'.PDF_SETTINGS_URL.'">', '</a>');
+				echo '</p></div>';
+			}
+		}
+	}
+
 	/**
 	 * PDF Extended has been freshly installed
 	 */
 	public function gf_pdf_not_deployed_fresh()
 	{		
-		if( (PDF_DEPLOY === true) && !rgpost('update') )
+		if( !rgpost('update') )
 		{
 			if(rgget("page") == 'gf_settings' && rgget('addon') == 'PDF')
 			{
@@ -501,7 +541,7 @@ class GFPDF_InstallUpdater
 		 * Most notably is the FTP options, but SSH may be effected too
 		 */
 		
-		if($wp_filesystem->method === 'ftpext' || $wp_filesystem->method === 'ftpsockets')
+		if($wp_filesystem->method === 'ftpext' || $wp_filesystem->method === 'ftpsockets' || $wp_filesystem->method === 'ssh2')
 		{
 			/*
 			 * Assume FTP is rooted to the Wordpress install
@@ -577,18 +617,19 @@ class GFPDF_InstallUpdater
 	private static function check_access_path($directory, $file_path, $directory_list)
 	{
 		global $wp_filesystem;	
-		
-			//$directory = false;
+
 			foreach($directory_list as $name => $data)
 			{
 				/*
 				 * Check if one of the file/folder names matches what is in $file_path, make sure it is a directory and 
 				 * the name has a value
 				 */
+
 				$match = array_search($name, $file_path);
-				if((strlen($name) > 0) && ($match !== false) && ((int) $data['isdir'] === 1) )
-				{
 				
+				if((strlen($name) > 0) && ($match !== false) && ((int) $data['isdir'] === 1 || $data['type'] === 'd') )
+				{
+
 					/* 
 					 * We have a match but it could be fake
 					 * Look inside the target folder and see if the next folder in $file_path can be found
@@ -600,7 +641,7 @@ class GFPDF_InstallUpdater
 						$next_match = $file_path[$match+1];
 						$directory_list2 = $wp_filesystem->dirlist('/'.$name.'/');
 
-						if(isset($directory_list2[$next_match]) && (int) $directory_list2[$next_match]['isdir'] === 1)
+						if(isset($directory_list2[$next_match]) && ((int) $directory_list2[$next_match]['isdir'] === 1 || $directory_list2[$next_match]['type'] === 'd'))
 						{
 							 return self::merge_path($file_path, $match);				 
 						}
@@ -612,6 +653,7 @@ class GFPDF_InstallUpdater
 					 }
 				}
 			}	
+			
 			return $directory;	
 	}
 	
@@ -649,7 +691,7 @@ class GFPDF_InstallUpdater
 		/*
 		 * Rekey the array
 		 */
-		$file_path = array_values($file_path);		
+		$file_path = array_values($file_path);	
 		
 		return self::check_access_path($directory, $file_path, $directory_list); 
 			 		

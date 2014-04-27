@@ -55,7 +55,7 @@
             <span class="<?php echo ($gfpdfe_data->mb_string_installed === true) ? 'icon-ok-sign' : 'icon-remove-sign'; ?>"></span>
             <?php if($gfpdfe_data->mb_string_installed === false): ?>
             <br />
-            <span class="details"><?php _e('The PHP extension MB String is required to use this plugin. Contact your web host to have it enabled.', 'pdfextended'); ?></span>
+            <span class="details"><?php _e('The PHP extension MB String and MB String Regex functions are required to use this plugin. Contact your web host to have it enabled.', 'pdfextended'); ?></span>
             <?php endif; ?>
             </p>   
             
@@ -110,7 +110,7 @@
                     <p><label><?php _e('mPDF Temporary Directory Writable?', 'pdfextended'); ?></label> <strong><?php ($gfpdfe_data->can_write_pdf_temp_dir  === true) ? _e('Yes', 'pdfextended') : _e('No', 'pdfextended'); ?></strong><span class="<?php echo ($gfpdfe_data->can_write_pdf_temp_dir === true) ? 'icon-ok-sign' : 'icon-warning-sign'; ?>"></span>
                     <?php if($gfpdfe_data->can_write_pdf_temp_dir === false): ?>
                     <br />
-                    <span class="details"><?php _e('mPDF temporary directory not writable. Disabling table cache. Note: memory usage will be increased.', 'pdfextended'); ?></span>
+                    <span class="details"><?php _e('mPDF temporary directory not writable (mPDF/tmp/). Memory and image processing time will increase.', 'pdfextended'); ?></span>
                     <?php endif; ?>
                     </p>                             
                     

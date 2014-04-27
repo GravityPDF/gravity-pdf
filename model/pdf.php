@@ -88,30 +88,30 @@ class GFPDF_Core_Model
 	  */
 	 public static function is_fully_installed()
 	 {
-		 global $gfpdfe_data;
-		 
+		 global $gfpdfe_data;		 
+
 		if( (get_option('gf_pdf_extended_installed') != 'installed') || (!is_dir(PDF_TEMPLATE_LOCATION)) )
-		{		
+		{						
 			return false;
 		}
 		
 		if(get_option('gf_pdf_extended_version') != PDF_EXTENDED_VERSION)
-		{
+		{					
 			return false;
 		}
 		
 		 if(get_option('gf_pdf_extended_deploy') == 'no' && !rgpost('upgrade') && PDF_DEPLOY === true)		
-		 {
+		 {		 		
 			return false; 
 		 }
 		 
 		 if(file_exists(PDF_PLUGIN_DIR .'mPDF.zip'))
-		 {
+		 {		 				
 			return false; 
 		 }
 		 
 		 if($gfpdfe_data->allow_initilisation === false)
-		 {
+		 {		 			
 			return false; 
 		 }
 
@@ -137,6 +137,12 @@ class GFPDF_Core_Model
 		 * File: pdf-configuration-indexer.php
 		 */
 		$templates = $gfpdf->get_template($form_id, true);
+
+		/* exit early if templates not found */
+		if($templates === false)
+		{
+			return;
+		}		
 
 		if(is_array($templates))
 		{
@@ -173,7 +179,7 @@ class GFPDF_Core_Model
 	
 	public static function pdf_link($form_id, $field_id, $value, $lead) {
 		global $gfpdf;
-		
+
 		/*
 		 * Check if a user can view the PDF, otherwise exit early.
 		 */		
@@ -190,6 +196,12 @@ class GFPDF_Core_Model
 		 * File: pdf-configuration-indexer.php
 		 */
 		$templates = $gfpdf->get_template($form_id, true);
+
+		/* exit early if templates not found */
+		if($templates === false)
+		{
+			return;
+		}
 
 		if(is_array($templates))
 		{
@@ -329,7 +341,7 @@ class GFPDF_Core_Model
 		 }		
 		 
 
-		$pdf_arguments = self::generate_pdf_parameters($index, $form_id, $lead_id, $template);
+		$pdf_arguments = self::generate_pdf_parameters($index, $form_id, $lead_id, $template);		
 		
 		/*
 		 * Add output to arguments 
@@ -345,6 +357,58 @@ class GFPDF_Core_Model
 		$gfpdf->render->PDF_Generator($form_id, $lead_id, $pdf_arguments);
 		
 	  exit();
+	}
+
+	/**
+	 * Hooked to the gform_after_submission action hook, this function will save the PDF
+	 * if the 'notification' option isn't present
+	 * @param  array $entry The user entry array
+	 * @param  array $form  The form data array	 
+	 */
+	public static function gfpdfe_save_pdf($entry, $form)
+	{
+		global $gfpdf;
+
+		$form_id = $entry['form_id'];
+		$lead_id = $entry['id'];
+
+		/*
+		 * Before setting up PDF options we will check if a configuration is found
+		 * If not, we will set up defaults defined in configuration.php
+		 */
+		self::check_configuration($form_id);		
+
+		/*
+		 * Check if form is in configuration
+		 */			
+
+		 if(!$config = $gfpdf->get_config($form_id))
+		 {
+			 return $notification;
+		 }	
+
+		/* 
+		 * To have our configuration indexes so loop through the PDF template configuration
+		 * and generate and attach PDF files.
+		 */		
+		 foreach($config as $index)
+		 {
+
+		 		/*
+		 		 * Check if the save option is selected		 		 
+		 		 */
+			 	if(isset($gfpdf->configuration[$index]['save']) && $gfpdf->configuration[$index]['save'] === true )
+			 	{
+			 		$template = (isset($gfpdf->configuration[$index]['template'])) ? $gfpdf->configuration[$index]['template'] : '';
+
+					/* only generate the PDF is attaching to notification */
+					$pdf_arguments = self::generate_pdf_parameters($index, $form_id, $lead_id, $template);
+
+					/* generate and save default PDF */
+					$gfpdf->render->PDF_Generator($form_id, $lead_id, $pdf_arguments);				 		
+				}
+		 }			 
+
 	}
 	
 	public static function gfpdfe_create_and_attach_pdf($notification, $form, $entry)
@@ -372,7 +436,6 @@ class GFPDF_Core_Model
 		$form_title        = $form['title'];
 		$form_id           = $entry['form_id']; 
 		$lead_id           = apply_filters('gfpdfe_lead_id', $entry['id'], $form, $entry, $gfpdf); /* allow premium plugins to override the lead ID */
-		$folder_id 		   = $form_id.$lead_id.'/';		
 
 		/*
 		 * Before setting up PDF options we will check if a configuration is found
@@ -521,37 +584,68 @@ class GFPDF_Core_Model
 	public static function generate_pdf_parameters($index, $form_id, $lead_id, $template = '')
 	{
 		global $gfpdf;
+
+		$config = $gfpdf->configuration[$index];
 		
-		$pdf_name = (isset($gfpdf->configuration[$index]['filename']) && strlen($gfpdf->configuration[$index]['filename']) > 0) ? $gfpdf->get_pdf_name($index, $form_id, $lead_id) : PDF_Common::get_pdf_filename($form_id, $lead_id);	
+		
+		$pdf_name = (isset($config['filename']) && strlen($config['filename']) > 0) ? $gfpdf->get_pdf_name($index, $form_id, $lead_id) : PDF_Common::get_pdf_filename($form_id, $lead_id);	
 		$template = (isset($template) && strlen($template) > 0) ? $template : $gfpdf->get_template($index);	 
 		
-		$pdf_size = (isset($gfpdf->configuration[$index]['pdf_size']) && (is_array($gfpdf->configuration[$index]['pdf_size']) || strlen($gfpdf->configuration[$index]['pdf_size']) > 0)) ? $gfpdf->configuration[$index]['pdf_size'] : PDFGenerator::$default['pdf_size'];
-		$orientation = (isset($gfpdf->configuration[$index]['orientation']) && strlen($gfpdf->configuration[$index]['orientation']) > 0) ? $gfpdf->configuration[$index]['orientation'] : PDFGenerator::$default['orientation'];
-		$security = (isset($gfpdf->configuration[$index]['security']) && $gfpdf->configuration[$index]['security']) ? $gfpdf->configuration[$index]['security'] : PDFGenerator::$default['security'];			
-		$premium = (isset($gfpdf->configuration[$index]['premium']) && $gfpdf->configuration[$index]['premium'] === true) ? true: false;
+		$pdf_size = (isset($config['pdf_size']) && (is_array($config['pdf_size']) || strlen($config['pdf_size']) > 0)) ? $config['pdf_size'] : PDFGenerator::$default['pdf_size'];
+		$orientation = (isset($config['orientation']) && strlen($config['orientation']) > 0) ? $config['orientation'] : PDFGenerator::$default['orientation'];
+		$security = (isset($config['security']) && $config['security']) ? $config['security'] : PDFGenerator::$default['security'];			
+		$premium = (isset($config['premium']) && $config['premium'] === true) ? true: false;
+
+		/* added in v3.4.0 */
+		$dpi = (isset($config['dpi']) && (int) $config['dpi'] > 0) ? (int) $config['dpi'] : false;
+		
+		/* added in v3.4.0 */
+		$pdfa1b = (isset($config['pdfa1b']) && $config['pdfa1b'] === true) ? true : false;		
+
+		/* added in v3.4.0 */
+		$pdfx1a = (isset($config['pdfx1a']) && $config['pdfx1a'] === true) ? true : false;		
 
 		/*
 		 * Validate privileges 
 		 * If blank and security is true then set privileges to all
 		 */ 
-		$privileges = (isset($gfpdf->configuration[$index]['pdf_privileges'])) ? $gfpdf->validate_privileges($gfpdf->configuration[$index]['pdf_privileges']) : $gfpdf->validate_privileges('');	
+		$privileges = (isset($config['pdf_privileges'])) ? $gfpdf->validate_privileges($config['pdf_privileges']) : $gfpdf->validate_privileges('');	
 		
-		$pdf_password = (isset($gfpdf->configuration[$index]['pdf_password'])) ? $gfpdf->configuration[$index]['pdf_password'] : '';
-		$master_password = (isset($gfpdf->configuration[$index]['pdf_master_password'])) ? $gfpdf->configuration[$index]['pdf_master_password'] : '';
-		$rtl = (isset($gfpdf->configuration[$index]['rtl'])) ? $gfpdf->configuration[$index]['rtl'] : false;		
+		$pdf_password = (isset($config['pdf_password'])) ? $config['pdf_password'] : '';
+		$master_password = (isset($config['pdf_master_password'])) ? $config['pdf_master_password'] : '';
+		$rtl = (isset($config['rtl'])) ? $config['rtl'] : false;		
+
+
+		$form = RGFormsModel::get_form_meta($form_id);
+		$lead = RGFormsModel::get_lead($lead_id);
+		/*
+		 * Run the options through filters
+		 */
+		$pdf_name        = apply_filters('gfpdfe_pdf_name', 		$pdf_name, 			$form, $lead);
+		$template        = apply_filters('gfpdfe_template', 		$template, 			$form, $lead);
+		$orientation     = apply_filters('gfpdf_orientation', 		$orientation, 		$form, $lead);
+		$security        = apply_filters('gfpdf_security', 			$security, 			$form, $lead);
+		$privileges      = apply_filters('gfpdf_privilages', 		$privileges, 		$form, $lead);
+		$pdf_password    = apply_filters('gfpdf_password', 			$pdf_password, 		$form, $lead);
+		$master_password = apply_filters('gfpdf_master_password', 	$master_password, 	$form, $lead);
+		$rtl             = apply_filters('gfpdf_rtl', 				$rtl, 				$form, $lead);
 
 		$pdf_arguments = array(
-			'pdfname' => apply_filters('gfpdfe_pdf_name', $pdf_name, RGFormsModel::get_form_meta($form_id), RGFormsModel::get_lead($lead_id)),
-			'template' =>  apply_filters('gfpdfe_template', $template, RGFormsModel::get_form_meta($form_id), RGFormsModel::get_lead($lead_id)),					
-			'pdf_size' => $pdf_size, /* set to one of the following, or array - in millimeters */
-			'orientation' => $orientation, /* landscape or portrait */
+			'pdfname'             => $pdf_name,
+			'template'            => $template,				
+			'pdf_size'            => $pdf_size, /* set to one of the following, or array - in millimeters */
+			'orientation'         => $orientation, /* landscape or portrait */
 			
-			'security' => $security, /* true or false. if true the security settings below will be applied. Default false. */
-			'pdf_password' => $pdf_password, /* set a password to view the PDF */
-			'pdf_privileges' => $privileges, /* assign user privliages to the PDF */
+			'security'            => $security, /* true or false. if true the security settings below will be applied. Default false. */
+			'pdf_password'        => $pdf_password, /* set a password to view the PDF */
+			'pdf_privileges'      => $privileges, /* assign user privliages to the PDF */
 			'pdf_master_password' => $master_password, /* set a master password to the PDF can't be modified without it */	
-			'rtl' => $rtl,
-			'premium' => $premium		 
+			'rtl'                 => $rtl,
+			'premium'             => $premium,
+			'dpi'                 => $dpi,	
+
+			'pdfa1b'			  => $pdfa1b,			
+			'pdfx1a'			  => $pdfx1a, 			
 		);	
 	
 		return $pdf_arguments;	
@@ -599,26 +693,39 @@ class GFPDF_Core_Model
 		}
 		else
 		{
+			/* if there are multiple indexes for a form we will look for the one with the matching template */
 			if(sizeof($gfpdf->index[$form_id]) > 1 && strlen($template) > 0 )
 			{
+
+				/*
+				 * Check if $_GET['aid'] present which will give us the index when multi templates assigned
+				 */
+				 if(isset($_GET['aid']) && (int) $_GET['aid'] > 0)
+				 {
+					$aid = (int) $_GET['aid'] - 1;
+					if(isset($gfpdf->index[$form_id][$aid]))
+					{
+						return $gfpdf->index[$form_id][$aid];
+					}					
+				 }				
+
+				/*
+				 * If aid not present we'll match against the template
+				 * This is usually the case when using a user-generated link
+				 */
 				$index = false;
 				foreach($gfpdf->index[$form_id] as $i)
 				{
 					if(isset($gfpdf->configuration[$i]['template']) && $gfpdf->configuration[$i]['template'] == $template)
 					{
-						$index = $i;	
+						/* matched by template */
+						return $i;	
 					}
-				}
-				
-				if($index === false)
-				{
-					$index = $gfpdf->index[$form_id][0];	
-				}
+				}				
 			}
-			else
-			{
-				$index = $gfpdf->index[$form_id][0];	
-			}
+			
+			/* there aren't multiples so just return first node */
+			return $gfpdf->index[$form_id][0];	
 		}
 		return $index;	
 	}		 	   

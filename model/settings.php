@@ -156,8 +156,11 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 		 		 
 		 if(extension_loaded('mbstring'))
 		 {
-			$gfpdfe_data->mb_string_installed = true; 
-			return;
+		 	if(function_exists('mb_regex_encoding'))
+		 	{
+				$gfpdfe_data->mb_string_installed = true; 
+				return;
+			}
 		 }
 		 $gfpdfe_data->mb_string_installed = false; 
 		 $gfpdfe_data->allow_initilisation = false;

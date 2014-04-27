@@ -4,7 +4,7 @@
 Plugin Name: Gravity Forms PDF Extended
 Plugin URI: http://www.gravityformspdfextended.com
 Description: Gravity Forms PDF Extended allows you to save/view/download a PDF from the front- and back-end, and automate PDF creation on form submission. Our Business Plus package also allows you to overlay field onto an existing PDF.
-Version: 3.3.4
+Version: 3.4.0
 Author: Blue Liquid Designs
 Author URI: http://www.blueliquiddesigns.com.au
 
@@ -22,7 +22,7 @@ GNU General Public License for more details.
 */
 
 /*
- * As PDFs can't be generated if notices are displaying turn off error reporting to the screen.
+ * As PDFs can't be generated if notices are displaying, turn off error reporting to the screen if not in debug mode.
  * Production servers should already have this done.
  */
  if(WP_DEBUG !== true)
@@ -33,7 +33,7 @@ GNU General Public License for more details.
 /*
  * Define our constants 
  */
- if(!defined('PDF_EXTENDED_VERSION')) { define('PDF_EXTENDED_VERSION', '3.3.4'); }
+ if(!defined('PDF_EXTENDED_VERSION')) { define('PDF_EXTENDED_VERSION', '3.4.0'); }
  if(!defined('GF_PDF_EXTENDED_SUPPORTED_VERSION')) { define('GF_PDF_EXTENDED_SUPPORTED_VERSION', '1.7'); } 
  if(!defined('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION')) { define('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION', '3.5'); } 
  if(!defined('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION')) { define('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION', '5'); }
@@ -51,7 +51,7 @@ GNU General Public License for more details.
  /*
   * Do we need to deploy template files this edition? If yes set to true. 
   */
-  if(!defined('PDF_DEPLOY')) { define('PDF_DEPLOY', true); } 
+  if(!defined('PDF_DEPLOY')) { define('PDF_DEPLOY', false); }
 
 /* 
  * Include the core helper files
@@ -139,9 +139,11 @@ class GFPDF_Core extends PDFGenerator
 		 *  - Load on Gravity Forms Admin pages
 		 *  - Load if requesting PDF file
 		 *  - Load if on Gravity Form page on the front end
+		 *  - Load if receiving Paypal IPN
 		 */		 		
 		 if( ( is_admin() && isset($_GET['page']) && (substr($_GET['page'], 0, 3) === 'gf_') ) ||
 		 	  ( isset($_GET['gf_pdf']) ) ||
+			  ( RGForms::get("page") == "gf_paypal_ipn") ||
 			  ( isset($_POST["gform_submit"]) && GFPDF_Core_Model::valid_gravity_forms() || 
 			  	(  defined( 'DOING_AJAX' ) && DOING_AJAX && isset($_POST['action']) && isset($_POST['gf_resend_notifications'])) )
 			)
@@ -177,19 +179,30 @@ class GFPDF_Core extends PDFGenerator
 		* Add our installation/file handling hooks
 		*/				
 		add_action('admin_init',  array($this, 'gfe_admin_init'), 9);															
-		
+				
 		/*
-		* Add our main hooks if the system is installed correctly
-		*/
+		 * Ensure the system is fully insatlled		 
+		 */
 		if(GFPDF_Core_Model::is_fully_installed() === false)
 		{
 			return; 
 		}		
 		
+		/*
+		* Add our main hooks
+		*/		
 		add_action('gform_entries_first_column_actions', array('GFPDF_Core_Model', 'pdf_link'), 10, 4);
 		add_action("gform_entry_info", array('GFPDF_Core_Model', 'detail_pdf_link'), 10, 2);
 		add_action('wp', array('GFPDF_Core_Model', 'process_exterior_pages'));		
 		
+
+		/*
+		* Apply default filters
+		*/  
+		add_filter('gfpdfe_pdf_template', array('PDF_Common', 'do_mergetags'), 10, 3); /* convert mergetags in PDF template automatically */
+		add_filter('gfpdfe_pdf_template', 'do_shortcode', 10, 1); /* convert shortcodes in PDF template automatically */ 		
+
+
 		/* Check if on the entries page and output javascript */
 		if(is_admin() && rgget('page') == 'gf_entries')
 		{
@@ -202,11 +215,12 @@ class GFPDF_Core extends PDFGenerator
 		$this->render = new PDFRender();
 		
 		/*
-		* Run the notifications filter if the web server can write to the output folder
+		* Run the notifications filter / save action hook if the web server can write to the output folder
 		*/
 		if($gfpdfe_data->can_write_output_dir === true)
 		{
-			add_filter('gform_notification', array('GFPDF_Core_Model', 'gfpdfe_create_and_attach_pdf'), 10, 3);  	  		  
+			add_action('gform_after_submission', array('GFPDF_Core_Model', 'gfpdfe_save_pdf'), 10, 2);
+			add_filter('gform_notification', array('GFPDF_Core_Model', 'gfpdfe_create_and_attach_pdf'), 100, 3);  /* ensure it's called later than standard so the attachment array isn't overridden */	  		  
 		}
 		
 	}
@@ -235,25 +249,57 @@ class GFPDF_Core extends PDFGenerator
 			/* 
 			 * Check if database plugin version matches current plugin version and updates if needed
 			 */
-			if(PDF_DEPLOY === true && get_option('gf_pdf_extended_version') != PDF_EXTENDED_VERSION && 
-			  (((isset($_GET['page']) && $_GET['page'] != 'gf_settings') && (isset($_GET['addon']) && $_GET['addon'] != 'PDF')) 
-			  || empty($_GET['page'])) )
+			if( PDF_DEPLOY === true
+				&& get_option('gf_pdf_extended_version') != PDF_EXTENDED_VERSION
+				&& (
+					(
+						(isset($_GET['page']) && $_GET['page'] != 'gf_settings') &&
+						(isset($_GET['addon']) && $_GET['addon'] != 'PDF')
+					)
+					 || empty($_GET['page'])
+					)
+			)
 			{
+				/* update the deploy option*/
 				update_option('gf_pdf_extended_deploy', 'no');
-				/* redirect */
+			}
+			elseif(PDF_DEPLOY === false && get_option('gf_pdf_extended_version') != PDF_EXTENDED_VERSION)
+			{
+				/* bring the version inline */
+				update_option('gf_pdf_extended_version', PDF_EXTENDED_VERSION);
 			}
 			
 			/*
 			 * Check if GF PDF Extended is correctly installed. If not we'll run the installer.
 			 */	
 			$theme_switch = get_option('gfpdfe_switch_theme'); 
-			 
-			if( ( (get_option('gf_pdf_extended_installed') != 'installed') || (!is_dir(PDF_TEMPLATE_LOCATION)) ) && (!rgpost('upgrade') && (empty($theme_switch['old']) ) ) )
-			{		
+
+			if( (
+					(get_option('gf_pdf_extended_installed') != 'installed')
+				) && (!rgpost('upgrade') )
+				  && (empty($theme_switch['old']) )
+			  )
+			{
 				/*
 				 * Prompt user to initialise plugin
 				 */
 				 add_action('admin_notices', array("GFPDF_InstallUpdater", "gf_pdf_not_deployed_fresh")); 	
+			}
+			elseif( (
+						( !is_dir(PDF_TEMPLATE_LOCATION))  ||
+						( !file_exists(PDF_TEMPLATE_LOCATION . 'configuration.php') ) ||
+						( !is_dir(PDF_SAVE_LOCATION) ) ||
+						( file_exists(PDF_PLUGIN_DIR .'mPDF.zip') )
+					)
+					&& (!rgpost('upgrade'))
+					&& (empty($theme_switch['old']) )
+
+				  )
+			{
+				/*
+				 * Prompt user that a problem was detected and they need to redeploy
+				 */
+				add_action('admin_notices', array("GFPDF_InstallUpdater", "gf_pdf_problem_detected"));
 			}
 			else
 			{				
@@ -261,7 +307,7 @@ class GFPDF_Core extends PDFGenerator
 				/**
 				 * Check if deployed new template files after update
 				 */ 
-				 if( (get_option('gf_pdf_extended_deploy') == 'no' && !rgpost('upgrade') ) || (file_exists(PDF_PLUGIN_DIR .'mPDF.zip') && !rgpost('upgrade') ) ) {
+				 if( (get_option('gf_pdf_extended_deploy') == 'no' && !rgpost('upgrade') )  && !rgpost('upgrade') ) {
 					/*show warning message */
 					add_action('admin_notices', array("GFPDF_InstallUpdater", "gf_pdf_not_deployed")); 	
 				 }	

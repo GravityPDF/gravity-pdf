@@ -4,7 +4,7 @@ Donate link: http://www.gravityformspdfextended.com
 Tags: gravity, forms, pdf, automation, attachment
 Requires at least: 3.5
 Tested up to: 3.8
-Stable tag: 3.3.4
+Stable tag: 3.4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -77,6 +77,50 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 2. View or download the PDF from a Gravity Forms entry.
 
 == Changelog ==
+
+= 3.4.0 =
+* Feature - Added auto-print prompt ability when you add &print=1 to the PDF URL
+* Feature - Added ability to rotate absolute positioned text 180 degrees (previously only 90 and -90). Note: feature in beta
+* Feature - Backup all template files that are overridden when initialising to a folder inside PDF_EXTENDED_TEMPLATE 
+* Feature - Added SSH initialisation support
+* Feature - Allow MERGETAGS to be used in all PDF template, including default template but only in the HTML field.
+* Feature - Updated mPDF to 3.7.1
+* Feature - Enable text/image watermark support. Added new example template example-watermark09.php showing off its usage
+* Feature - Added Quiz support to $form_data array (see $form_data['quiz_config'] and $form_data['quiz_results'])
+* Feature - Added Survey support to $form_data array ()
+* Feature - Shortcodes will now be processed in all templates, including default template but only in the HTML field. 
+* Feature - Added 'save' configuration option so PDFs are saved to the local disk when 'notifications' aren't enabled
+* Feature - Added 'dpi' configuration option to modify the PDF image DPI. Default 96dpi. Use 300dpi for printing.
+* Feature - Added PDF/A1-b compliance option. Enable with 'pdfa1b' => true. See http://mpdf1.com/manual/index.php?tid=420&searchstring=pdf/a1-b for more details.
+* Feature - Added PDF/X1-a compliance option. Enable with 'pdfx1a' => true. See http://mpdf1.com/manual/index.php?tid=481&searchstring=pdf/x-1a for more details.
+* Feature - Added new constant option 'PDF_REPACK_FONT' which when enabled may improve function with some PostScript printers (disabled by default)
+* Feature - Added new filters to PDF configuration
+
+* Housekeeping - Modified mPDF functions Image() and purify_utf8_text() to validate the input data so we don't have to do it every time through the template.
+* Housekeeping - Added ability to not re-deploy every update (not enabled this release as template files were all updated)</li>
+* Housekeeping - Additional checks on load to see if any of the required file/folder structure is missing. If so, re-initilise.
+* Housekeeping - Save resources and turn off automatic rtl identification. Users must set the RTL option when configuring form
+* Housekeeping - Turn off mPDFs packTableData setting, decreasing processing time when working with large tables.
+* Housekeeping - $gf_pdf_default_configuration options now merge down into existing PDF nodes, instead of applying to only unassigned forms
+* Housekeeping - Center aligned Survey Likery field results
+* Housekeeping - Partially refactored the pdf-entry-detail.php code
+* Housekeeping - All default and example templates have been tidied. This won't affect custom templates.
+* Housekeeping - Set the gform_notification order number to 100 which will prevent other functions (example snippets from Gravity Forms, for instance) from overridding the attached PDF.
+* Housekeeping - Fix spelling mistake on initialising fonts
+* Housekeeping - Remove wpautop() function from Gravity Form HTML output, which was applied before rendering and was messing up the HTML markup.
+* Housekeeping - Remove empty list rows from the $form_data['list'] array in single and multi-column lists.
+* Housekeeping - Apply same CSS styles (padding, border and line height) to HTML fields as done to form values in default templates
+* Housekeeping - Replaced arbitrary wrapper IDs in the default templates with the actual field ID
+
+* Bug - Fixed issue with PDF not attaching to notification using Paypal's delayed notification feature
+* Bug - Fixed strict standard warning about calling GFPDF_Settings::settings_page();
+* Bug - Fixed strict standard warning about calling GFPDFEntryDetail::pdf_get_lead_field_display();
+* Bug - Fixed issue with Gravity Form Post Category field causing fatal error generating PDF
+* Bug - Fixed number field formatting issue when displaying on PDF.
+* Bug - Do additional check for PHP's MB_String regex functions before initialising
+* Bug - Fixed problem with multiple nodes assigned to a form using the same template
+* Bug - Fixed path to fallback templates when not found
+* Bug - Fixed problem with master password setting to user password
 
 = 3.3.4 =
 * Bug - Fixed issue linking to PDF from front end 
@@ -235,7 +279,7 @@ For more details [view the 3.x.x online documentation](http://gravityformspdfext
 * Feature - Product subtotal, shipping and total have been added to $form_data['field'] array to make it easier to work with product details in the custom template.
 * Feature - Added two new default template files. One displays field and name in two rows (like you see when viewing an entry in the admin area) and the other removes all styling. See documentation on use.
 * Security - Tightened PDF template security so that custom templates couldn't be automatically generated by just anyone. Now only logged in users with the correct privileges and the user who submitted the form (matched against IP) can auto generate a PDF. See documentation on usage.
-* Depreciated - Removed form data that was added directly to the $form_data array instead of $form_data['field'] array. Users upgrading will need to update their custom templates if not using field data from the $form_data[‘field'] array. If using $form_data['field'] in your custom template this won't affect you.
+* Depreciated - Removed form data that was added directly to the $form_data array instead of $form_data['field'] array. Users upgrading will need to update their custom templates if not using field data from the $form_data[ï¿½field'] array. If using $form_data['field'] in your custom template this won't affect you.
 * Bug - Fixed problem with default template not showing and displaying a timeout error. Removed table tags and replaced with divs that are styled appropriately.
 * Bug - The new plugin theme folder will successfully create when upgrading. You won't have to deactivate and reactivate to get it working.
 * Bug - some installs had plugins that included the function mb_string which is also included in DOMPDF. DOMPDF will now check if the function exists before creating it.
