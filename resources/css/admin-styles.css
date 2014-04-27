@@ -1,0 +1,193 @@
+#pdfextended-settings {
+margin-top: 20px;	
+}
+
+#pdfextended-settings .leftcolumn {
+	width: 65%;
+	float: left;
+}
+
+#pdfextended-settings .rightcolumn {
+	margin-left: 70%;
+}
+
+#pdfextended-settings ol, #pdfextended-settings ul {
+margin-left: 25px;	
+}
+#pdfextended-settings ul > li {
+list-style: disc;	
+}
+
+#pdfextended-settings ol > li {
+list-style: decimal;	
+}
+
+#pdfextended-settings ol li > ul, #pdfextended-settings ul li > ul {
+margin: 5px 0 0 20px;
+}
+
+#pdfextended-settings ul ul > li {
+	list-style: circle;
+}
+
+#pdfextended-settings ol ul > li {
+list-style: disc;	
+}
+
+#gform_tab_group #icon-gf_edit_forms {
+display: none;	
+}
+
+.detailed_pdf {
+ clear: left;
+ margin-bottom: 3px;	
+}
+
+.detailed_pdf span {
+float: left; 
+width: 8em; 
+margin-right: 10px;
+
+-ms-word-break: break-all;
+     word-break: break-all;
+
+     /* Non standard for webkit */
+     word-break: break-word;
+
+-webkit-hyphens: auto;
+   -moz-hyphens: auto;
+        hyphens: auto;
+}
+
+.detailed_pdf:after {
+clear: both;
+display: block;
+content: '';	
+}
+
+ #support-request label  {
+	display: block;
+	font-weight: bold; 	
+ }
+
+#pdf-system-status label, label.inline-label {
+float: left;
+width: 15em;	
+}
+
+#pdf-system-status strong {
+ /*text-align: center;*/
+ display: inline-block;
+ float: left;	
+}
+
+#pdf-system-status span.details, #support-request span.details  {
+font-size: 95%;
+color: #444;	
+padding-top: 7px;
+width: 95%;
+display: block;
+}
+
+#support-request span.details.tabbed {
+ margin-left: 16em;	
+}
+
+#pdf-system-status .icon-ok-sign, #pdf-system-status .icon-warning-sign, .icon-remove-sign {
+ font-size: 14px;	
+ margin-left: 5px;
+}
+
+.icon-ok-sign {
+ color: #008000;
+ font-size: 15px;
+}
+
+.icon-warning-sign {
+ color: #ff8a00;
+}
+
+.icon-remove-sign {
+ color: #d10b0b;	
+}
+
+#support-request input, #support-request select {
+ width: 20em;	
+}
+
+#support-request input[type="submit"] {
+width: auto;	
+}
+
+#support-request textarea {
+ width: 65%;
+ height: 150px;	
+}
+
+#support-request input, #support-request textarea {
+padding: 5px 4px;	
+}
+
+#support-request #support-request-button {
+padding: 5px 8px;	
+}
+
+#support-request textarea {
+	border: 1px solid #999;
+	color: #444;
+}
+
+#support-request :disabled, #support-request textarea:disabled {
+color: #CCC;
+border: 1px solid #CCC;
+}
+
+#support-request input.error, #support-request textarea.error, #support-request select.error {
+ color: #d10b0b;
+ border: 1px solid #d10b0b;	
+}
+
+#support-request .icon-remove-sign {
+vertical-align: middle;	
+}
+
+.icon-spinner {
+font-size: 18px;
+margin-left: 5px;	
+}
+
+#support-request span.msg {
+  margin-left: 5px;
+  color:  #008000;	
+}
+
+#support-request span.error {
+   margin-left: 5px;	
+   color: #d10b0b;
+}
+
+#pdfextended-settings #changelog h3 {
+margin-top: 20px;	
+}
+
+
+#pdfextended-settings div.notice {
+    margin: 5px 15px 2px;
+    padding: 0 0.6em;
+}
+
+#pdfextended-settings div.notice {
+    background-color: #FFFFFF;
+    border-left: 4px solid #7AD03A;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);
+}
+
+.wrap #pdfextended-settings div.notice {
+    margin: 5px 0 15px;
+	padding: 1px 12px;
+}
+
+div.notice p {
+    margin: 0.5em 0;
+    padding: 2px;
+}
