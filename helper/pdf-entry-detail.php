@@ -848,16 +848,18 @@ if(!class_exists('GFPDFEntryDetail'))
 				$products = GFCommon::get_product_fields($form, $lead, true);
 
 				/* check that there are actual product fields */
-				if(!empty($products['products'])){
+				if(sizeof($products['products']) > 0 ) 
+				{
 
 					/*
 					 * Set up our variables
 					 */
-					$products = array();
 					$total = 0;
 					$subtotal = 0;
 
-					foreach($products['products'] as $product) {
+
+					foreach($products['products'] as $id => $product) {
+
 						$price = GFCommon::to_number($product['price']);
 
 						/* add all options to total price */
@@ -880,7 +882,7 @@ if(!class_exists('GFPDFEntryDetail'))
 						/*
 						 * Store product in $form_array array
 						 */
-						$form_array['products'][] = array(
+						$form_array['products'][$id] = array(
 								'name' => esc_html($product['name']),
 								'price' => esc_html($product['price']),
 								'options' => $options,
