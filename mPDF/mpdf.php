@@ -7329,7 +7329,7 @@ function Output($name='',$dest='')
 {
 	//Output PDF to some destination
 	if ($this->showStats) {
-		file_put_contents('mPDF_performance_log.txt', date('Y-m-d h:i:s') . ' Generated in '.sprintf('%.2F',(microtime(true) - $this->time0))." seconds\r\n", FILE_APPEND);
+		file_put_contents(PDF_SAVE_LOCATION . 'mPDF_performance_log.txt', date('Y-m-d h:i:s') . ' Generated in '.sprintf('%.2F',(microtime(true) - $this->time0))." seconds\r\n", FILE_APPEND);
 	}
 	//Finish document if necessary
 	if ($this->progressBar) { $this->UpdateProgressBar(1,'100','Finished'); }	// *PROGRESS-BAR*
@@ -7346,7 +7346,6 @@ function Output($name='',$dest='')
 		exit; 
 	   }
 	}
-
 
 	if (($this->PDFA || $this->PDFX) && $this->encrypted) { $this->Error("PDFA1-b or PDFX/1-a does not permit encryption of documents."); }
 	if (count($this->PDFAXwarnings) && (($this->PDFA && !$this->PDFAauto) || ($this->PDFX && !$this->PDFXauto))) {
@@ -7376,8 +7375,7 @@ function Output($name='',$dest='')
 			$log .= 'Peak Memory usage '.number_format((memory_get_peak_usage(true)/(1024*1024)),2)." MB\n";
 			$log .= 'PDF file size '.number_format((strlen($this->buffer)/1024))." kB\n";
 			$log .= 'Number of fonts '.count($this->fonts)."\n";
-			file_put_contents('mPDF_performance_log.txt', $log, FILE_APPEND);
-		exit;
+			file_put_contents(PDF_SAVE_LOCATION . 'mPDF_performance_log.txt', $log, FILE_APPEND);
 	}
 
 

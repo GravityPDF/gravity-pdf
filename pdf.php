@@ -4,7 +4,7 @@
 Plugin Name: Gravity Forms PDF Extended
 Plugin URI: http://www.gravityformspdfextended.com
 Description: Gravity Forms PDF Extended allows you to save/view/download a PDF from the front- and back-end, and automate PDF creation on form submission. Our Business Plus package also allows you to overlay field onto an existing PDF.
-Version: 3.4.0
+Version: 3.4.0 Beta 2
 Author: Blue Liquid Designs
 Author URI: http://www.blueliquiddesigns.com.au
 
@@ -40,7 +40,7 @@ GNU General Public License for more details.
   
  if(!defined('PDF_PLUGIN_DIR')) { define('PDF_PLUGIN_DIR', plugin_dir_path( __FILE__ )); } 
  if(!defined('PDF_PLUGIN_URL')) { define('PDF_PLUGIN_URL', plugin_dir_url( __FILE__ )); } 
- if(!defined('PDF_SETTINGS_URL')) { define("PDF_SETTINGS_URL", site_url() .'/wp-admin/admin.php?page=gf_settings&addon=PDF'); }
+ if(!defined('PDF_SETTINGS_URL')) { define("PDF_SETTINGS_URL", site_url() .'/wp-admin/admin.php?page=gf_settings&subview=PDF'); }
  if(!defined('PDF_SAVE_FOLDER')) { define('PDF_SAVE_FOLDER', 'PDF_EXTENDED_TEMPLATES'); }
  if(!defined('PDF_SAVE_LOCATION')) { define('PDF_SAVE_LOCATION', get_stylesheet_directory().'/'.PDF_SAVE_FOLDER.'/output/'); }
  if(!defined('PDF_FONT_LOCATION')) { define('PDF_FONT_LOCATION', get_stylesheet_directory().'/'.PDF_SAVE_FOLDER.'/fonts/'); }
@@ -51,7 +51,7 @@ GNU General Public License for more details.
  /*
   * Do we need to deploy template files this edition? If yes set to true. 
   */
-  if(!defined('PDF_DEPLOY')) { define('PDF_DEPLOY', false); }
+  if(!defined('PDF_DEPLOY')) { define('PDF_DEPLOY', true); }
 
 /* 
  * Include the core helper files
@@ -251,17 +251,11 @@ class GFPDF_Core extends PDFGenerator
 			 */
 			if( PDF_DEPLOY === true
 				&& get_option('gf_pdf_extended_version') != PDF_EXTENDED_VERSION
-				&& (
-					(
-						(isset($_GET['page']) && $_GET['page'] != 'gf_settings') &&
-						(isset($_GET['addon']) && $_GET['addon'] != 'PDF')
-					)
-					 || empty($_GET['page'])
-					)
+				&& get_option('gf_pdf_extended_installed') == 'installed'
 			)
 			{
-				/* update the deploy option*/
-				update_option('gf_pdf_extended_deploy', 'no');
+				/* show message about redeployment */
+				add_action('admin_notices', array("GFPDF_InstallUpdater", "gf_pdf_not_deployed")); 					
 			}
 			elseif(PDF_DEPLOY === false && get_option('gf_pdf_extended_version') != PDF_EXTENDED_VERSION)
 			{

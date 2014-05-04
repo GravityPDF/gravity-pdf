@@ -31,6 +31,7 @@ if(!class_exists('GFPDFEntryDetail'))
 					$page_number = 0;
 					foreach($form['fields'] as $field) {
 
+
 						/*
 						 * Check if this field has been excluded from the list
 						 */
@@ -120,8 +121,15 @@ if(!class_exists('GFPDFEntryDetail'))
 							case 'signature':
 								$value = RGFormsModel::get_lead_field_value($lead, $field);
 								$public_folder = RGFormsModel::get_upload_url_root() . 'signatures/';
-								$server_folder = RGFormsModel::get_upload_root() . 'signatures/';
-								$display_value = '<img src="'. $server_folder.$value .'" alt="Signature" width="100" height="60" />';
+								$server_folder = RGFormsModel::get_upload_root() . 'signatures/';		
+
+								$image_size = getimagesize($server_folder.$value);
+								$width = $image_size[0] / 4;
+								$height = $image_size[1] / 4;
+
+								$display_value = '<img src="'. $server_folder.$value .'" alt="Signature" width=" '. $width .'" height="'. $height .'" />';
+
+
 								$is_last = $count >= $field_count ? true : false;
 								$last_row = $is_last ? ' lastrow' : '';
 
@@ -313,6 +321,31 @@ if(!class_exists('GFPDFEntryDetail'))
 			}
 		}
 
+		/*
+		 * Public method for outputting likert (survey addon field)
+		 */
+		public static function get_likert($form, $lead, $field_id)
+		{
+			$field = '';
+			foreach($form['fields'] as $fields)
+			{
+				if($fields['id'] === $field_id)
+				{
+					$field = $fields;
+					break;
+				}
+			}	
+
+			$value = RGFormsModel::get_lead_field_value($lead, $field);
+
+			$display_value = apply_filters('gform_entry_field_value', self::pdf_get_lead_field_display($field, $value, ''), $field, $lead, $form);	
+			$content = $display_value;
+			
+			$results = apply_filters('gform_field_content', $content, $field, $value, $lead['id'], $form['id']);
+			
+			return $results;
+		}
+
 		public static function format_date($date, $usa = false)
 		{
 			$timestamp = strtotime($date);
@@ -331,14 +364,20 @@ if(!class_exists('GFPDFEntryDetail'))
 
 					foreach($form['fields'] as $field) {
 
-						switch(RGFormsModel::get_input_type($field)){
+
+						/*
+						 * Add field descriptions to the $form_data array 
+						 */
+						$form_array['field_descriptions'][$field['id']] = $field['description'];
+
+						switch(RGFormsModel::get_input_type($field)) {
 							case 'section' :
 							case 'html':
 								$form_array = self::get_html($field, $form_array);
 							break;
 
 							case 'captcha':
-							case 'password':
+							case 'password':	
 							case 'page':
 								//ignore captcha, password and page
 							break;
@@ -359,9 +398,14 @@ if(!class_exists('GFPDFEntryDetail'))
 							case 'select':
 							case 'multiselect':
 							case 'radio':
+
 								if($field['type'] == 'quiz')
 								{
 									$form_array = self::get_quiz_radios($form, $lead, $field, $form_array);									
+								}
+								elseif($field['type'] == 'poll' || $field['type'] == 'survey')
+								{
+									$form_array = self::get_poll_radios($form, $lead, $field, $form_array);										
 								}
 								else
 								{
@@ -378,7 +422,13 @@ if(!class_exists('GFPDFEntryDetail'))
 								$form_array['survey']['rank'][$field['id']] = self::get_the_rank($form, $lead, $field, $form_array);
 							break;
 
+							case 'rating':
+								$form_array['survey']['rating'][$field['id']] = self::get_the_rank($form, $lead, $field, $form_array);
+							break;
+
 							default:
+
+
 								//ignore product fields as they will be grouped together at the end of the grid
 								if(GFCommon::is_product_field($field['type'])){
 									$has_product_fields = true;
@@ -418,12 +468,53 @@ if(!class_exists('GFPDFEntryDetail'))
 			/* add ID incase want to use template on multiple duplicate forms with different field names */
 			$form_array['field'][$field['id']] = $return;
 
-			/* keep backwards compatibility */
-			$form_array['field'][$field['label']] = $return;
-
 			return $form_array;
 	
 		}		
+
+		private static function get_poll_radios($form, $lead, $field, $form_array)
+		{
+
+			$id = $field['id'];
+			$results = $lead[$id]; 
+			$return = array();
+
+			$return = self::get_poll_data($results, $field['choices']);
+
+			/* add data to field tag correctly */
+			$form_array['field'][$field['id'].'.'.$field['label'].'_name'] = $return;
+
+			/* add ID incase want to use template on multiple duplicate forms with different field names */
+			$form_array['field'][$field['id']] = $return;
+
+			return $form_array;
+	
+		}	
+
+		private static function get_poll_checkbox($field, $values)
+		{
+			foreach($values as $id => $item)
+			{
+				$values[$id] = self::get_poll_data($item, $field['choices']);
+			}
+			return $values;
+		}	
+
+		private static function get_poll_data($lookup, $options)
+		{
+			$return = '';
+
+			foreach($options as $choice)
+			{
+				if(trim($choice['value']) == trim($lookup))
+				{
+					$return = $choice['text'];
+					break;
+				}				
+			}
+
+			return $return;
+		}	
 
 		private static function get_the_rank($form, $lead, $field, $form_array)
 		{
@@ -447,10 +538,16 @@ if(!class_exists('GFPDFEntryDetail'))
 		}
 
 		private static function get_the_likert($form, $lead, $field, $form_array)
-		{
+		{			
 			$id 		   = $field['id'];
-			$results       = $lead[$id];
-			$multiple_rows = rgar($field, "gsurveyLikertEnableMultipleRows") ? true : false;		
+			$multiple_rows = rgar($field, "gsurveyLikertEnableMultipleRows");
+
+			if(!$multiple_rows)
+			{
+				$results       = $lead[$id];
+			}
+
+	
 			$likert = array();
 
 			/* store the column names */
@@ -549,6 +646,9 @@ if(!class_exists('GFPDFEntryDetail'))
 			 $form_array['misc']['user_agent'] = $lead['user_agent'];
 			 $form_array['misc']['status'] = $lead['status'];
 
+			 $form_array['form']['title'] = $form['title'];
+			 $form_array['form']['description'] = $form['description'];
+
 			/*
 			 * Add quiz results
 			 */
@@ -591,7 +691,7 @@ if(!class_exists('GFPDFEntryDetail'))
 			$fields            = GFCommon::get_fields_by_type($form, array('survey'));
 	        $count_survey_fields = count($fields);
 
-	        if ($count_survey_fields > 0)
+	        if ($count_survey_fields > 0 && isset($lead['gsurvey_score']))
 	        {
 	        	$form_array['survey']['score'] = $lead['gsurvey_score'];
 	        }
@@ -614,7 +714,7 @@ if(!class_exists('GFPDFEntryDetail'))
 	        {
 				$form_array['quiz']['config']['grading']     = $form['gravityformsquiz']['grading'];
 				$form_array['quiz']['config']['passPercent'] = $form['gravityformsquiz']['passPercent'];
-				$form_array['quiz']['config']['grades']      = json_decode($form['gravityformsquiz']['grades']);
+				$form_array['quiz']['config']['grades']      = $form['gravityformsquiz']['grades'];
 				
 				$form_array['quiz']['results']['score']      = rgar($lead, 'gquiz_score');
 				$form_array['quiz']['results']['percent']    = rgar($lead, 'gquiz_percent');
@@ -699,19 +799,26 @@ if(!class_exists('GFPDFEntryDetail'))
 
 			if(file_exists($folder.$value) !== false && is_dir($folder.$value) !== true)
 			{
-				$sig_html = '<img src="'. $folder.$value .'" alt="Signature" width="100" height="60" />';
+				$width = $image_size[0] / 4;
+				$height = $image_size[1] / 4;
+
+				$sig_html = '<img src="'. $server_folder.$value .'" alt="Signature" width=" '. $width .'" height="'. $height .'" />';								
 
 				$form_array['signature'][] 			= $sig_html;
 				$form_array['signature_details'][] 	= array(
 																	'img'  => $sig_html,
 																	'path' => $folder.$value,
-																	'url'  => $http_folder.$value
+																	'url'  => $http_folder.$value,
+																	'width' => $width,
+																	'height' => $height,
 												   			);
 
 				$form_array['signature_details_id'][$field['id']] = array(
 																			'img'  => $sig_html,
 																			'path' => $folder.$value,
-																			'url'  => $http_folder.$value
+																			'url'  => $http_folder.$value,
+																			'width' => $width,
+																			'height' => $height,
 																		  );
 			}
 
@@ -977,7 +1084,16 @@ if(!class_exists('GFPDFEntryDetail'))
 						$items = array();
 
 						foreach($value as $key => $item){
-							if(!empty($item)){
+							if(!empty($item)) {
+								if($field['type'] == 'poll' || $field['type'] == 'survey')
+								{
+									/*
+									 * Convert our poll type
+									 */
+									$items[] = self::get_poll_checkbox($field, $value);	
+									return $items;	
+								}
+
 								switch($format){
 									case 'text' :
 										$items[] = GFCommon::selection_display($item, $field, $currency, $use_text);

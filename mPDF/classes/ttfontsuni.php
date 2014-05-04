@@ -124,7 +124,7 @@ var $kerninfo;
 	}
 
 
-	function readTableDirectory($debug=false) {
+	function readTableDirectory($debug=false) {		
 	    $this->numTables = $this->read_ushort();
             $this->searchRange = $this->read_ushort();
             $this->entrySelector = $this->read_ushort();
@@ -138,7 +138,7 @@ var $kerninfo;
                 $record['length'] = $this->read_ulong();
                 $this->tables[$record['tag']] = $record;
 		}
-		if ($debug) $this->checksumTables();
+		//if ($debug) $this->checksumTables();
 	}
 
 	function checksumTables() {
@@ -154,6 +154,7 @@ var $kerninfo;
             		$checksum = $this->sub32($checksum, $adjustment);
 			}
             	$xchecksum = $t['checksum'];
+          
             	if ($xchecksum != $checksum) 
             	    die(sprintf('TTF file "%s": invalid checksum %s table: %s (expected %s)', $this->filename,dechex($checksum[0]).dechex($checksum[1]),$t['tag'],dechex($xchecksum[0]).dechex($xchecksum[1])));
 		  }
@@ -333,8 +334,8 @@ var $kerninfo;
 			$this->seek($this->TTCFonts[$TTCfontID]['offset']);
 			$this->version = $version = $this->read_ulong();	// TTFont version again now
 		}
-		$this->readTableDirectory($debug);
 
+		$this->readTableDirectory($debug);
 
 		// cmap - Character to glyph index mapping table
 		$cmap_offset = $this->seek_table("cmap");

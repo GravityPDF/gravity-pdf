@@ -143,7 +143,7 @@ if(WP_DEBUG === true)
 	$this->debug = true;
 	$this->debugfonts = true;	// Checks and reports on errors when parsing TTF files - adds significantly to processing time
 	$this->showImageErrors = false;
-	$this->table_error_report = true;		// Die and report error if table is too wide to contain whole words
+	//$this->table_error_report = true;		// Die and report error if table is too wide to contain whole words
 	$this->table_error_report_param = '';	// Parameter which can be passed to show in error report i.e. chapter number being processed//	
 }
 else

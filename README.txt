@@ -78,7 +78,34 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 
 == Changelog ==
 
-= 3.4.0 =
+= 3.4.0 Beta 2 =
+
+* Feature - Update $form_data['products'] array key to field ID 
+* Feature - Added survey Likert output function for custom templates (much like the product table function). It can be used with the following command 'echo GFPDFEntryDetails::get_likert($form, $lead, $field_id);' where $field_id is substituted for the form field ID. 
+* Feature - Added form title and description to the $form_data array under the $form_data['form'] key. 
+* Feature - Added field descriptions to the $form_data array under the $form_data['field_descriptions'] key.
+* Feature - Added pre and post PDF generation filters and actions to pdf-render.php. These include gfpdfe_pre_render_pdf, gfpdfe_pdf_output_type, gfpdfe_pdf_filename and gfpdf_post_pdf_save.
+* Feature: Added configuration filters to /settings/pdf.php so all the PDF settings can be modified at runtime. 
+* Feature: $form_data['signature'] et al. keys now contain the signature width and height attributes 
+* Feature: TODO: if filesystem API is 'direct' and PDF_DEPLOY is false, automatically do deployment. If errors, show deployment message instead of error.
+
+* Housekeeping - Update settings page link to match new Gravity Forms URL structure 
+* Housekeeping - Check if $lead['gfsurvey_score'] exists before assigning to $form_data array 
+* Housekeeping - Removed table and font checksum debugging from mPDF when WP_DEBUG enabled as they produced inaccurate results.
+* Housekeeping - Fixed up mPDF logging location when WP_DEBUG enabled. Files now stored in wp-content/themes/Active_Theme_Folder/PDF_EXTENDED_TEMPLATE/output/ folder.
+* Housekeeping - Removed API logging locally when WP_DEBUG is enabled.
+* Housekeeping - Increase API timeout interval as some overseas users reported timeout issues
+
+* Bug - Fixed poll entry results in $form_data array
+* Bug - Fixed survey Likert results in $form_data array 
+* Bug - Fixed survey results in $form_data array 
+* Bug - Fixed signature rendering issue when custom signature size was being used 
+* Bug - Fixed static error types in helper/install-update-manager.php file.
+* Bug - Fixed redeployment error message which wasn't showing correctly 
+* Bug - TODO: Fix reployment so that it doens't redeploy template files if PDF_DEPLOY is false. 
+
+
+= 3.4.0 Beta 1 =
 * Feature - Added auto-print prompt ability when you add &print=1 to the PDF URL
 * Feature - Added ability to rotate absolute positioned text 180 degrees (previously only 90 and -90). Note: feature in beta
 * Feature - Backup all template files that are overridden when initialising to a folder inside PDF_EXTENDED_TEMPLATE 
@@ -121,6 +148,7 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 * Bug - Fixed problem with multiple nodes assigned to a form using the same template
 * Bug - Fixed path to fallback templates when not found
 * Bug - Fixed problem with master password setting to user password
+
 
 = 3.3.4 =
 * Bug - Fixed issue linking to PDF from front end 

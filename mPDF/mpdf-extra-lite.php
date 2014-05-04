@@ -5919,11 +5919,9 @@ function Output($name='',$dest='')
 {
 	//Output PDF to some destination
 	if ($this->showStats) {
-		/*BLUE LIQUID DESIGNS EDIT
-		  Write to file instead */
-		  
-		file_put_contents('performance_log.txt', date('Y-m-d h:i:s') . ' Generated in '.sprintf('%.2F',(microtime(true) - $this->time0))." seconds\r\n", FILE_APPEND);
+		file_put_contents(PDF_SAVE_LOCATION . 'mPDF_performance_log.txt', date('Y-m-d h:i:s') . ' Generated in '.sprintf('%.2F',(microtime(true) - $this->time0))." seconds\r\n", FILE_APPEND);
 	}
+	
 	//Finish document if necessary
 	if($this->state < 3) $this->Close();
 	// fn. error_get_last is only in PHP>=5.2
@@ -5961,13 +5959,13 @@ function Output($name='',$dest='')
 	}
 
 	if ($this->showStats) {
-		/* Blue Liquid Designs Edit
-		   Log to File instead */
-		$log = date('Y-m-d h:i:s') . ' Compiled in '.sprintf('%.2F',(microtime(true) - $this->time0))." seconds (total)\n\r";
-		$log .= 'Peak Memory usage '.number_format((memory_get_peak_usage(true)/(1024*1024)),2)." MB\n";
-		$log .= 'PDF file size '.number_format((strlen($this->buffer)/1024))." kB\n";
-		$log .= 'Number of fonts '.count($this->fonts)."\n";
-		file_put_contents('performance_log.txt', $log, FILE_APPEND);
+			/* Blue Liquid Designs Edit
+			   Log to File instead */
+			$log = date('Y-m-d h:i:s') . ' Compiled in '.sprintf('%.2F',(microtime(true) - $this->time0))." seconds (total)\n\r";
+			$log .= 'Peak Memory usage '.number_format((memory_get_peak_usage(true)/(1024*1024)),2)." MB\n";
+			$log .= 'PDF file size '.number_format((strlen($this->buffer)/1024))." kB\n";
+			$log .= 'Number of fonts '.count($this->fonts)."\n";
+			file_put_contents(PDF_SAVE_LOCATION . 'mPDF_performance_log.txt', $log, FILE_APPEND);
 	}
 
 
