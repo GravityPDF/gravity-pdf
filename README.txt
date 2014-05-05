@@ -101,7 +101,7 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 * Bug - Fixed signature rendering issue when custom signature size was being used 
 * Bug - Fixed static error types in helper/install-update-manager.php file.
 * Bug - Fixed redeployment error message which wasn't showing correctly 
-* Bug - Fix reployment so that it doens't redeploy template files if PDF_DEPLOY is false (won't happen this release as PDF_DEPLOY is true for 3.4.0). 
+* Bug - Fix redeployment so that it doesn't redeploy template files if PDF_DEPLOY is false (won't happen this release as PDF_DEPLOY is true for 3.4.0). 
 
 
 = 3.4.0 Beta 1 =

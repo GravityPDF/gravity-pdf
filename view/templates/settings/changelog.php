@@ -47,7 +47,7 @@
       <li>Bug - Fixed signature rendering issue when custom signature size was being used</li> 
       <li>Bug - Fixed static error types in helper/install-update-manager.php file.</li>
       <li>Bug - Fixed redeployment error message which wasn't showing correctly</li> 
-      <li>Bug - Fix reployment so that it doens't redeploy template files if PDF_DEPLOY is false (won't happen this release as PDF_DEPLOY is true for 3.4.0).</li>       
+      <li>Bug - Fix redeployment so that it doesn't redeploy template files if PDF_DEPLOY is false (won't happen this release as PDF_DEPLOY is true for 3.4.0). </li>       
     </ul>
     
     <h3>3.4.0 Beta 1</h3>
