@@ -353,7 +353,7 @@ class GFPDF_InstallUpdater
 	{
 		if( !rgpost('update') )
 		{
-			if(rgget("page") == 'gf_settings' && rgget('addon') == 'PDF')
+			if(rgget("page") == 'gf_settings' && rgget('subview') == 'PDF')
 			{
 				echo '<div id="message" class="error"><p>';
 				echo __('Gravity Forms PDF Extended detected a configuration problem. Please re-initialise the plugin.', 'pdfextended');
@@ -376,7 +376,7 @@ class GFPDF_InstallUpdater
 	{		
 		if( !rgpost('update') )
 		{
-			if(rgget("page") == 'gf_settings' && rgget('addon') == 'PDF')
+			if(rgget("page") == 'gf_settings' && rgget('subview') == 'PDF')
 			{
 				echo '<div id="message" class="updated"><p>';
 				echo __('Welcome to Gravity Forms PDF Extended. Before you can use the plugin correctly you need to initilise it.', 'pdfextended');
