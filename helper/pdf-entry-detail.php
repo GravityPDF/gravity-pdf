@@ -797,11 +797,14 @@ if(!class_exists('GFPDFEntryDetail'))
 		private static function get_signature($form, $lead, $field, $form_array)
 		{
 			$value = RGFormsModel::get_lead_field_value($lead, $field);
+			
 			$http_folder = RGFormsModel::get_upload_url_root(). 'signatures/';
-			$folder = RGFormsModel::get_upload_root() . 'signatures/';
+			$server_folder = RGFormsModel::get_upload_root() . 'signatures/';		
 
-			if(file_exists($folder.$value) !== false && is_dir($folder.$value) !== true)
+
+			if(file_exists($server_folder.$value) !== false && is_dir($server_folder.$value) !== true)
 			{
+				$image_size = getimagesize($server_folder.$value);
 				$width = $image_size[0] / 4;
 				$height = $image_size[1] / 4;
 
