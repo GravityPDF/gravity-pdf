@@ -209,7 +209,7 @@ class PDFRender
 		 if($arguments['security'] === true && $arguments['pdfa1b'] === false && $arguments['pdfx1a'] === false  )
 		 {
 				$password = (strlen($arguments['pdf_password']) > 0) ? $arguments['pdf_password'] : '';
-				$master_password = (strlen($arguments['pdf_password']) > 0) ? $arguments['pdf_password'] : null;
+				$master_password = (strlen($arguments['pdf_master_password']) > 0) ? $arguments['pdf_master_password'] : null;
 				$pdf_privileges = (is_array($arguments['pdf_privileges'])) ? $arguments['pdf_privileges'] : array();	
 				
 				$mpdf->SetProtection($pdf_privileges, $password, $master_password, 128);											
@@ -237,7 +237,14 @@ class PDFRender
 		 	 
 		 
 		/* load HTML block */
-		$mpdf->WriteHTML($html);			
+		$mpdf->WriteHTML($html);		
+
+		/*
+		 * Add pre-render/save filter so PDF can be manipulated further
+		 */	
+		$mpdf     = apply_filters('gfpdfe_pre_render_pdf', $mpdf, $id, $arguments, $output, $filename);
+		$output   = apply_filters('gfpdfe_pdf_output_type', $output);
+		$filename = apply_filters('gfpdfe_pdf_filename', $filename);
 		
 		switch($output)
 		{
@@ -256,8 +263,12 @@ class PDFRender
 				 * PDF wasn't writing to file with the F method - http://mpdf1.com/manual/index.php?tid=125
 				 * Return as a string and write to file manually
 				 */					
-				$pdf = $mpdf->Output('', 'S');
-				return $this->savePDF($pdf, $filename, $id);				 
+				$pdf      = $mpdf->Output('', 'S');
+				$filename = $this->savePDF($pdf, $filename, $id);				 
+
+				do_action('gfpdf_post_pdf_save', $id, $arguments, $output, $filename);
+
+				return $filename;
 			break;
 		}
 	}
@@ -285,7 +296,8 @@ class PDFRender
 		{
 			trigger_error('Could not save PDF to '. $pdf_save, E_USER_WARNING);
 			return;
-		}
+		}		
+
 		return $pdf_save;
 	}
 }

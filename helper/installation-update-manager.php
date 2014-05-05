@@ -17,7 +17,7 @@ class GFPDF_InstallUpdater
 	/**
 	 * Install everything required
 	 */
-	public function pdf_extended_activate()
+	public static function pdf_extended_activate()
 	{			
 	    /*
 		 * Initialise the Wordpress Filesystem API
@@ -36,8 +36,8 @@ class GFPDF_InstallUpdater
 		 * We need to set up some filesystem compatibility checkes to work with the different server file management types
 		 * Most notably is the FTP options, but SSH may be effected too
 		 */
-		$directory = PDF_PLUGIN_DIR;
-		$template_directory = PDF_TEMPLATE_LOCATION;
+		$directory               = PDF_PLUGIN_DIR;
+		$template_directory      = PDF_TEMPLATE_LOCATION;
 		$template_save_directory = PDF_SAVE_LOCATION;
 		$template_font_directory = PDF_FONT_LOCATION;
 		
@@ -65,7 +65,7 @@ class GFPDF_InstallUpdater
 		 * If PDF_TEMPLATE_LOCATION already exists then we will remove the old template files so we can redeploy the new ones
 		 */
 
-		 if($wp_filesystem->exists($template_directory))
+		 if($wp_filesystem->exists($template_directory) && PDF_DEPLOY === true)
 		 {
 			 /*
 			  * Create a backup folder and move all the files there
@@ -290,21 +290,21 @@ class GFPDF_InstallUpdater
 		 return true;
 	}
 	
-	public function gf_pdf_font_install_success()
+	public static function gf_pdf_font_install_success()
 	{
 		echo '<div id="message" class="updated"><p>';
-		echo __('The font files have been successfully installed. A font can be used by adding it\'s file name (without .ttf and in lower case) in a CSS font-family declaration.', 'pdfextended');
+		echo __('The font files have been successfully installed. A font can be used by adding its file name (without .ttf and in lower case) in a CSS font-family declaration.', 'pdfextended');
 		echo '</p></div>';
 	}	
 
-	public function gf_pdf_font_err()
+	public static function gf_pdf_font_err()
 	{
 		echo '<div id="message" class="error"><p>';
 		echo __('There was a problem installing the font files. Manually copy your fonts to the mPDF/ttfonts/ folder.', 'pdfextended');
 		echo '</p></div>';
 	}	
 	
-	public function gf_pdf_font_config_err()
+	public static function gf_pdf_font_config_err()
 	{
 		echo '<div id="message" class="error"><p>';
 		echo __('Could not create font configuration file. Try initialise again.', 'pdfextended');
@@ -315,7 +315,7 @@ class GFPDF_InstallUpdater
 	 * Gravity Forms hasn't been installed so throw error.
 	 * We make sure the user hasn't already dismissed the error
 	 */
-	public function gf_pdf_not_installed()
+	public static function gf_pdf_not_installed()
 	{
 		echo '<div id="message" class="error"><p>';
 		echo sprintf(__('You need to install/update %sGravity Forms%s to use the Gravity Forms PDF Extended Plugin.', 'pdfextended'), '<a href="https://www.e-junkie.com/ecom/gb.php?cl=54585&c=ib&aff=235154" target="ejejcsingle">', '</a>');
@@ -325,14 +325,14 @@ class GFPDF_InstallUpdater
 	/**
 	 * PDF Extended has been updated but the new template files haven't been deployed yet
 	 */
-	public function gf_pdf_not_deployed()
+	public static function gf_pdf_not_deployed()
 	{		
 		if( !rgpost('update') )
 		{
-			if(rgget("page") == 'gf_settings' && rgget('addon') == 'PDF')
+			if(rgget("page") == 'gf_settings' && rgget('subview') == 'PDF')
 			{
 				echo '<div id="message" class="error"><p>';
-				echo __('You\'ve updated Gravity Forms PDF Extended but are yet to re-initialise the plugin. After initialising, please review the latest updates to ensure your custom templates remain compatible with the latest version.', 'pdfextended');
+				echo __('You\'ve updated Gravity Forms PDF Extended but are yet to re-initialise the plugin. Please use the "Initialise Plugin" button below to complete the upgrade.', 'pdfextended');
 				echo '</p></div>';
 				
 			}
@@ -349,7 +349,7 @@ class GFPDF_InstallUpdater
 	 * The software has detected a problem (no configuration.php file or no PDF_EXTENDED_TEMPLATE folder
 	 * The user will need to reinitialise
 	 */
-	public function gf_pdf_problem_detected()
+	public static function gf_pdf_problem_detected()
 	{
 		if( !rgpost('update') )
 		{
@@ -372,7 +372,7 @@ class GFPDF_InstallUpdater
 	/**
 	 * PDF Extended has been freshly installed
 	 */
-	public function gf_pdf_not_deployed_fresh()
+	public static function gf_pdf_not_deployed_fresh()
 	{		
 		if( !rgpost('update') )
 		{
@@ -395,7 +395,7 @@ class GFPDF_InstallUpdater
 	/**
 	 * The Gravity Forms version isn't compatible. Prompt user to upgrade
 	 */
-	public function gf_pdf_not_supported()
+	public static function gf_pdf_not_supported()
 	{
 			echo '<div id="message" class="error"><p>';
 			echo sprintf(__('Gravity Forms PDF Extended only works with Gravity Forms version '.GF_PDF_EXTENDED_SUPPORTED_VERSION.' and higher. Please %supgrade your copy of Gravity Forms%s to use this plugin.', 'pdfextended'), '<a href="https://www.e-junkie.com/ecom/gb.php?cl=54585&c=ib&aff=235154" target="ejejcsingle">', '</a>');
@@ -406,7 +406,7 @@ class GFPDF_InstallUpdater
 	/**
 	 * Cannot create new template folder in active theme directory
 	 */
-	public function gf_pdf_template_dir_err()
+	public static function gf_pdf_template_dir_err()
 	{
 			echo '<div id="message" class="error"><p>';
 			echo __('We could not create a template folder in your active theme\'s directory. Please created a folder called <strong>\''. PDF_SAVE_FOLDER .'\'</strong> in '.get_stylesheet_directory().'/. Then copy the contents of '.PDF_PLUGIN_DIR.'templates/ to your newly-created PDF_EXTENDED_TEMPLATES folder, as well as styles/template.css. You should also make this directory writable.', 'pdfextended');
@@ -424,7 +424,7 @@ class GFPDF_InstallUpdater
 	/**
 	 * Cannot remove old default template files
 	 */
-	public function gf_pdf_deployment_unlink_error()
+	public static function gf_pdf_deployment_unlink_error()
 	{
 			echo '<div id="message" class="error"><p>';
 			echo __('We could not remove the default template files from the Gravity Forms PDF Extended folder in your active theme\'s directory. Please manually remove all files starting with \'default-\' and the template.css file.', 'pdfextended');
@@ -435,7 +435,7 @@ class GFPDF_InstallUpdater
 	/**
 	 * Cannot create new template folder in active theme directory
 	 */
-	public function gf_pdf_template_move_err()
+	public static function gf_pdf_template_move_err()
 	{
 			echo '<div id="message" class="error"><p>';
 			echo __('We could not copy the contents of '.PDF_PLUGIN_DIR.'templates/ to your newly-created PDF_EXTENDED_TEMPLATES folder. Please manually copy the files to the aforementioned directory.', 'pdfextended');
@@ -446,7 +446,7 @@ class GFPDF_InstallUpdater
 	/*
 	 * When switching themes copy over current active theme's PDF_EXTENDED_TEMPLATES (if it exists) to new theme folder
 	 */
-	public function gf_pdf_on_switch_theme($old_theme_name, $old_theme_object) {
+	public static function gf_pdf_on_switch_theme($old_theme_name, $old_theme_object) {
 		
 		/*
 		 * We will store the old pdf dir and new pdf directory and prompt the user to copy the PDF_EXTENDED_TEMPLATES folder
@@ -514,7 +514,7 @@ class GFPDF_InstallUpdater
 	 * The after_switch_theme hook is too early in the initialisation to use request_filesystem_credentials()
 	 * so we have to call this function at a later inteval
 	 */
-	public function do_theme_switch($previous_pdf_path, $current_pdf_path)
+	public static function do_theme_switch($previous_pdf_path, $current_pdf_path)
 	{
 		/*
 		 * Prepare for calling the WP Filesystem
@@ -574,7 +574,7 @@ class GFPDF_InstallUpdater
 	 * Allows you to copy entire folder structures to new location
 	 */
 	
-	public function pdf_extended_copy_directory( $source, $destination, $copy_base = true, $delete_destination = false ) 
+	public static function pdf_extended_copy_directory( $source, $destination, $copy_base = true, $delete_destination = false ) 
 	{
 		global $wp_filesystem;		
 		

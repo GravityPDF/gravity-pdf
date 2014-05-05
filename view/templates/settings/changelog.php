@@ -19,10 +19,40 @@
     <h2><?php _e('Changelog'); ?></h2>
     
     <p><strong>Current Version: <?php echo PDF_EXTENDED_VERSION; ?></strong></p>
-    
-    <h3>3.4.0</h3>
+
+    <h3>3.4.0 Beta 2</h3>
     <ul>
-        <li>Feature - Added auto-print prompt ability when you add &amp;print=1 to the PDF URL</li>
+      <li>Feature - Update $form_data['products'] array key to field ID</li>
+      <li>Feature - Added survey Likert output function for custom templates (much like the product table function). It can be used with the following command 'echo GFPDFEntryDetails::get_likert($form, $lead, $field_id);' where $field_id is substituted for the form field ID. </li>
+      <li>Feature - Added form title and description to the $form_data array under the $form_data['form'] key.</li> 
+      <li>Feature - Added field descriptions to the $form_data array under the $form_data['field_descriptions'] key.</li>
+      <li>Feature - Added pre and post PDF generation filters and actions to pdf-render.php. These include gfpdfe_pre_render_pdf, gfpdfe_pdf_output_type, gfpdfe_pdf_filename and gfpdf_post_pdf_save.</li>
+      <li>Feature: Added configuration filters to /settings/pdf.php so all the PDF settings can be modified at runtime.</li> 
+      <li>Feature: $form_data['signature'] et al. keys now contain the signature width and height attributes</li> 
+    </ul><br>
+    
+    <ul>
+      <li>Housekeeping - Update settings page link to match new Gravity Forms URL structure</li> 
+      <li>Housekeeping - Check if $lead['gfsurvey_score'] exists before assigning to $form_data array</li> 
+      <li>Housekeeping - Removed table and font checksum debugging from mPDF when WP_DEBUG enabled as they produced inaccurate results.</li>
+      <li>Housekeeping - Fixed up mPDF logging location when WP_DEBUG enabled. Files now stored in wp-content/themes/Active_Theme_Folder/PDF_EXTENDED_TEMPLATE/output/ folder.</li>
+      <li>Housekeeping - Removed API logging locally when WP_DEBUG is enabled.</li>
+      <li>Housekeeping - Increase API timeout interval as some overseas users reported timeout issues</li>
+    </ul><br>
+
+    <ul>
+      <li>Bug - Fixed poll entry results in $form_data array</li>
+      <li>Bug - Fixed survey Likert results in $form_data array</li> 
+      <li>Bug - Fixed survey results in $form_data array</li> 
+      <li>Bug - Fixed signature rendering issue when custom signature size was being used</li> 
+      <li>Bug - Fixed static error types in helper/install-update-manager.php file.</li>
+      <li>Bug - Fixed redeployment error message which wasn't showing correctly</li> 
+      <li>Bug - Fix reployment so that it doens't redeploy template files if PDF_DEPLOY is false (won't happen this release as PDF_DEPLOY is true for 3.4.0).</li>       
+    </ul>
+    
+    <h3>3.4.0 Beta 1</h3>
+    <ul>
+    <li>Feature - Added auto-print prompt ability when you add &amp;print=1 to the PDF URL</li>
     <li>Feature - Added ability to rotate absolute positioned text 180 degrees (previously only 90 and -90). Note: feature in beta</li>
     <li>Feature - Backup all template files that are overridden when initialising to a folder inside PDF_EXTENDED_TEMPLATE</li>
     <li>Feature - Added SSH initialisation support</li>
@@ -36,7 +66,9 @@
     <li>Feature - Added PDF/A1-b compliance option. Enable with 'pdfa1b' => true. See <a href="http://mpdf1.com/manual/index.php?tid=420&searchstring=pdf/a1-b">http://mpdf1.com/manual/index.php?tid=420&amp;searchstring=pdf/a1-b</a> for more details.</li>
     <li>Feature - Added PDF/X1-a compliance option. Enable with 'pdfx1a' => true. See <a href="http://mpdf1.com/manual/index.php?tid=481&searchstring=pdf/x-1a">http://mpdf1.com/manual/index.php?tid=481&amp;searchstring=pdf/x-1a</a> for more details</li>
     <li>Feature - Added new constant option 'PDF_REPACK_FONT' which when enabled may improve function with some PostScript printers (disabled by default)</li>
+    </ul><br>
 
+    <ul>
     <li>Housekeeping - Modified mPDF functions Image() and purify_utf8_text() to validate the input data so we don't have to do it every time through the template.</li>
     <li>Housekeeping - Added ability to not re-deploy every update (not enabled this release as template files were all updated)</li>
     <li>Housekeeping - Additional checks on load to see if any of the required file/folder structure is missing. If so, re-initilise.</li>
@@ -46,7 +78,11 @@
     <li>Housekeeping - Center aligned Survey Likery field results</li>
     <li>Housekeeping - Partially refactored the pdf-entry-detail.php code</li>
     <li>Housekeeping - All default and example templates have been tidied. This won't affect custom templates.</li>
+    <li>Housekeeping - Set the gform_notification order number to 100 which will prevent other functions (example snippets from Gravity Forms, for instance) from overridding the attached PDF.</li>
+    <li>Housekeeping - Fix spelling mistake on initialising fonts</li>
+    </ul><br>
 
+    <ul>
     <li>Bug - Fixed issue with PDF not attaching to notification using Paypal's delayed notification feature</li>
     <li>Bug - Fixed strict standard warning about calling GFPDF_Settings::settings_page();</li>
     <li>Bug - Fixed strict standard warning about calling GFPDFEntryDetail::pdf_get_lead_field_display();</li>

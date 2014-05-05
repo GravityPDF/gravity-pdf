@@ -615,9 +615,24 @@ class GFPDF_Core_Model
 		$master_password = (isset($config['pdf_master_password'])) ? $config['pdf_master_password'] : '';
 		$rtl = (isset($config['rtl'])) ? $config['rtl'] : false;		
 
+
+		$form = RGFormsModel::get_form_meta($form_id);
+		$lead = RGFormsModel::get_lead($lead_id);
+		/*
+		 * Run the options through filters
+		 */
+		$pdf_name        = apply_filters('gfpdfe_pdf_name', 		$pdf_name, 			$form, $lead);
+		$template        = apply_filters('gfpdfe_template', 		$template, 			$form, $lead);
+		$orientation     = apply_filters('gfpdf_orientation', 		$orientation, 		$form, $lead);
+		$security        = apply_filters('gfpdf_security', 			$security, 			$form, $lead);
+		$privileges      = apply_filters('gfpdf_privilages', 		$privileges, 		$form, $lead);
+		$pdf_password    = apply_filters('gfpdf_password', 			$pdf_password, 		$form, $lead);
+		$master_password = apply_filters('gfpdf_master_password', 	$master_password, 	$form, $lead);
+		$rtl             = apply_filters('gfpdf_rtl', 				$rtl, 				$form, $lead);
+
 		$pdf_arguments = array(
-			'pdfname'             => apply_filters('gfpdfe_pdf_name', $pdf_name, RGFormsModel::get_form_meta($form_id), RGFormsModel::get_lead($lead_id)),
-			'template'            => apply_filters('gfpdfe_template', $template, RGFormsModel::get_form_meta($form_id), RGFormsModel::get_lead($lead_id)),					
+			'pdfname'             => $pdf_name,
+			'template'            => $template,				
 			'pdf_size'            => $pdf_size, /* set to one of the following, or array - in millimeters */
 			'orientation'         => $orientation, /* landscape or portrait */
 			

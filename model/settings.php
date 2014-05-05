@@ -512,7 +512,7 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 	}
 	
 	
-	public function gf_pdf_deploy_success() {
+	public static function gf_pdf_deploy_success() {
 			echo '<div id="message" class="updated"><p>';
 			echo __('You\'ve successfully initialised Gravity Forms PDF Extended.', 'pdfextended');
 			echo '</p></div>';		
