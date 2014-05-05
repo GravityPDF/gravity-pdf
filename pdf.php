@@ -255,7 +255,8 @@ class GFPDF_Core extends PDFGenerator
 			)
 			{
 				/* show message about redeployment */
-				add_action('admin_notices', array("GFPDF_InstallUpdater", "gf_pdf_not_deployed")); 					
+				add_action('admin_notices', array("GFPDF_InstallUpdater", "gf_pdf_not_deployed")); 	
+				return false;				
 			}
 			
 			/*

@@ -191,7 +191,8 @@ class PDFRender
 		 */
 		if($arguments['dpi'] !== false)
 		{
-			$mpdf->dpi     = $arguments['dpi'];
+			/* TEXT DPI dramatically decreases the text size. As text is a vector element of the document we will only be concerned with the image DPI for the moment */
+			/*$mpdf->dpi     = $arguments['dpi'];*/
 			$mpdf->img_dpi = $arguments['dpi'];
 		}
 
