@@ -813,7 +813,7 @@ if(!class_exists('GFPDFEntryDetail'))
 				$form_array['signature'][] 			= $sig_html;
 				$form_array['signature_details'][] 	= array(
 																	'img'  => $sig_html,
-																	'path' => $folder.$value,
+																	'path' => $server_folder.$value,
 																	'url'  => $http_folder.$value,
 																	'width' => $width,
 																	'height' => $height,
@@ -821,7 +821,7 @@ if(!class_exists('GFPDFEntryDetail'))
 
 				$form_array['signature_details_id'][$field['id']] = array(
 																			'img'  => $sig_html,
-																			'path' => $folder.$value,
+																			'path' => $server_folder.$value,
 																			'url'  => $http_folder.$value,
 																			'width' => $width,
 																			'height' => $height,
