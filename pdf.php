@@ -33,7 +33,7 @@ GNU General Public License for more details.
 /*
  * Define our constants 
  */
- if(!defined('PDF_EXTENDED_VERSION')) { define('PDF_EXTENDED_VERSION', '3.4.0'); }
+ if(!defined('PDF_EXTENDED_VERSION')) { define('PDF_EXTENDED_VERSION', '3.4.0 B2'); }
  if(!defined('GF_PDF_EXTENDED_SUPPORTED_VERSION')) { define('GF_PDF_EXTENDED_SUPPORTED_VERSION', '1.7'); } 
  if(!defined('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION')) { define('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION', '3.5'); } 
  if(!defined('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION')) { define('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION', '5'); }
@@ -249,18 +249,13 @@ class GFPDF_Core extends PDFGenerator
 			/* 
 			 * Check if database plugin version matches current plugin version and updates if needed
 			 */
-			if( PDF_DEPLOY === true
-				&& get_option('gf_pdf_extended_version') != PDF_EXTENDED_VERSION
-				&& get_option('gf_pdf_extended_installed') == 'installed'
+			if(     get_option('gf_pdf_extended_version') != PDF_EXTENDED_VERSION
+				&& get_option('gf_pdf_extended_installed') == 'installed' 
+				&& !rgpost('upgrade')
 			)
 			{
 				/* show message about redeployment */
 				add_action('admin_notices', array("GFPDF_InstallUpdater", "gf_pdf_not_deployed")); 					
-			}
-			elseif(PDF_DEPLOY === false && get_option('gf_pdf_extended_version') != PDF_EXTENDED_VERSION)
-			{
-				/* bring the version inline */
-				update_option('gf_pdf_extended_version', PDF_EXTENDED_VERSION);
 			}
 			
 			/*

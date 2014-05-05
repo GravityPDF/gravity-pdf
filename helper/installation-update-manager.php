@@ -36,8 +36,8 @@ class GFPDF_InstallUpdater
 		 * We need to set up some filesystem compatibility checkes to work with the different server file management types
 		 * Most notably is the FTP options, but SSH may be effected too
 		 */
-		$directory = PDF_PLUGIN_DIR;
-		$template_directory = PDF_TEMPLATE_LOCATION;
+		$directory               = PDF_PLUGIN_DIR;
+		$template_directory      = PDF_TEMPLATE_LOCATION;
 		$template_save_directory = PDF_SAVE_LOCATION;
 		$template_font_directory = PDF_FONT_LOCATION;
 		
@@ -65,7 +65,7 @@ class GFPDF_InstallUpdater
 		 * If PDF_TEMPLATE_LOCATION already exists then we will remove the old template files so we can redeploy the new ones
 		 */
 
-		 if($wp_filesystem->exists($template_directory))
+		 if($wp_filesystem->exists($template_directory) && PDF_DEPLOY === true)
 		 {
 			 /*
 			  * Create a backup folder and move all the files there

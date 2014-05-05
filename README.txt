@@ -87,7 +87,6 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 * Feature - Added pre and post PDF generation filters and actions to pdf-render.php. These include gfpdfe_pre_render_pdf, gfpdfe_pdf_output_type, gfpdfe_pdf_filename and gfpdf_post_pdf_save.
 * Feature: Added configuration filters to /settings/pdf.php so all the PDF settings can be modified at runtime. 
 * Feature: $form_data['signature'] et al. keys now contain the signature width and height attributes 
-* Feature: TODO: if filesystem API is 'direct' and PDF_DEPLOY is false, automatically do deployment. If errors, show deployment message instead of error.
 
 * Housekeeping - Update settings page link to match new Gravity Forms URL structure 
 * Housekeeping - Check if $lead['gfsurvey_score'] exists before assigning to $form_data array 
@@ -102,7 +101,7 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 * Bug - Fixed signature rendering issue when custom signature size was being used 
 * Bug - Fixed static error types in helper/install-update-manager.php file.
 * Bug - Fixed redeployment error message which wasn't showing correctly 
-* Bug - TODO: Fix reployment so that it doens't redeploy template files if PDF_DEPLOY is false. 
+* Bug - Fix reployment so that it doens't redeploy template files if PDF_DEPLOY is false (won't happen this release as PDF_DEPLOY is true for 3.4.0). 
 
 
 = 3.4.0 Beta 1 =

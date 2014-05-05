@@ -85,8 +85,8 @@ class gfpdfe_API
 	private function add_headers($request)
 	{
 
-		/* change the timeout from 5 seconds to 40 */
-		$request['timeout'] = 40;
+		/* change the timeout from 5 seconds to 20 */
+		$request['timeout'] = 20;
 
 		$request['headers'] = array(
 			'API' 			=> (string) $this->api_version,
