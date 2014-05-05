@@ -368,7 +368,10 @@ if(!class_exists('GFPDFEntryDetail'))
 						/*
 						 * Add field descriptions to the $form_data array 
 						 */
-						$form_array['field_descriptions'][$field['id']] = $field['description'];
+						if(isset($field['description']))
+						{
+							$form_array['field_descriptions'][$field['id']] = $field['description'];
+						}
 
 						switch(RGFormsModel::get_input_type($field)) {
 							case 'section' :
@@ -794,7 +797,7 @@ if(!class_exists('GFPDFEntryDetail'))
 		private static function get_signature($form, $lead, $field, $form_array)
 		{
 			$value = RGFormsModel::get_lead_field_value($lead, $field);
-			$http_folder = RGFormsModel::get_upload_url_root(). 'signatures/';;
+			$http_folder = RGFormsModel::get_upload_url_root(). 'signatures/';
 			$folder = RGFormsModel::get_upload_root() . 'signatures/';
 
 			if(file_exists($folder.$value) !== false && is_dir($folder.$value) !== true)
