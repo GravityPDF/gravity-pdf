@@ -582,7 +582,7 @@ if(!class_exists('GFPDFEntryDetail'))
 						$output = ($comparison == $results) ? 'selected' : '';										
 
 						/* assign our results to the array */
-						$likert['rows'][$row['label']][] = $output;
+						$likert['rows'][$row['label']][$col_id] = $output;
 
 					}
 				}
@@ -596,7 +596,7 @@ if(!class_exists('GFPDFEntryDetail'))
 					/* do our comparison and update the output */
 					$output = ($col_id == $results) ? 'selected' : '';										
 
-					$likert['row'][] = $output;
+					$likert['row'][$col_id] = $output;
 
 				}									
 			}
