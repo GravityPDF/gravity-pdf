@@ -679,7 +679,7 @@ if(!class_exists('GFPDFEntryDetail'))
 		{
 			if(self::is_poll($form))
 			{
-				$form_array['poll'] = self::get_addon_global_data($form, array());
+				$form_array['poll']['global'] = self::get_addon_global_data($form, array());
 			}
 
 			return $form_array;
@@ -698,6 +698,8 @@ if(!class_exists('GFPDFEntryDetail'))
 	        {
 	        	$form_array['survey']['score'] = $lead['gsurvey_score'];
 	        }
+
+	        $form_array['survey']['global'] = self::get_addon_global_data($form, array());
 
 	        return $form_array;
 
@@ -753,7 +755,7 @@ if(!class_exists('GFPDFEntryDetail'))
 					'status'        => 'active'
 				);			
 
-				/* get the quiz results */
+				/* get the results */
 				$data = $gf_results->get_results_data($form, $fields, $search);	
 
 				/* unset some array keys we don't need */
@@ -782,7 +784,7 @@ if(!class_exists('GFPDFEntryDetail'))
 			}
 
 			return array(__('Activate Gravity Forms Quiz Add On to see global quiz statistics for this form', 'pdfextended'));
-		}
+		}		
 
 		private static function get_html($field, $form_array)
 		{
