@@ -669,7 +669,7 @@ class GFPDF_Core_Model
 			/*
 			 * Check if a default configuration is defined
 			 */			
-			if(is_array($gf_pdf_default_configuration) && sizeof($gf_pdf_default_configuration) > 0)
+			if(is_array($gf_pdf_default_configuration) && sizeof($gf_pdf_default_configuration) > 0 && GFPDF_SET_DEFAULT_TEMPLATE === true)
 			{
 
 				/*
