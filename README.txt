@@ -82,6 +82,8 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 * Removed $form_data['form'] key and add $form_data['form_description'] key.
 * Fixed issue with global survey, poll or quiz data being added to $form_data key when none of those field types avaliable 
 * Modified survey, poll and quiz fields to use the 'text' value as the key instead of the ID.
+* Ensure the form and lead IDs are correctly passed throughout the render functions.
+* Finalise quiz, survey and poll $form_data fields.
 
 = 3.4.0 Beta 2 =
 
