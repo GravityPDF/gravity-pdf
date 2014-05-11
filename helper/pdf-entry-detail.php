@@ -107,6 +107,7 @@ if(!class_exists('GFPDFEntryDetail'))
 									$even = ($count%2) ? ' odd' : ' even';
 
 									$display_value = $field['content'];
+									$value = '';
 
 									$content = '<div id="field-'. $field['id'] .'" class="entry-view-html-value' . $last_row . $even . '"><div class="value">' . $display_value . '</div></div>';
 									$content = apply_filters('gform_field_content', $content, $field, $value, $lead['id'], $form['id']);
@@ -701,14 +702,18 @@ if(!class_exists('GFPDFEntryDetail'))
 			$poll_results = self::get_addon_global_data($form, array());
 
 			$form_fields = self::$fields;
+
 			/*
 			 * Convert the array keys into their text counterparts
-			 * Loop through the global quiz data
+			 * Loop through the global poll data
 			 */
 			foreach($poll_results['field_data'] as $id => &$choices)
 			{
 				/* get the $field */
 				$field = $form_fields[$id];
+
+				/* add the field name to the ['misc'] key */
+				$choices['misc']['label'] = $field['label'];	
 
 				/* loop through the field choices */
 				foreach($field['choices'] as $choice)
@@ -751,7 +756,7 @@ if(!class_exists('GFPDFEntryDetail'))
 
 			/*
 			 * Convert the array keys into their text counterparts
-			 * Loop through the global quiz data
+			 * Loop through the global survey data
 			 */
 			foreach($results['field_data'] as $id => &$choices)
 			{
@@ -844,10 +849,23 @@ if(!class_exists('GFPDFEntryDetail'))
 					/* get the $field */
 					$field = $form_fields[$id];
 
+					/* replace ['totals'] key with ['misc'] key */
+					$choices = self::replace_key($choices, 'totals', 'misc');	
+
+					/* add the field name to the ['misc'] key */
+					$choices['misc']['label'] = $field['label'];
+
 					/* loop through the field choices */
 					foreach($field['choices'] as $choice)
 					{
-						$choices = self::replace_key($choices, $choice['value'], $choice['text']);						
+						$choices = self::replace_key($choices, $choice['value'], $choice['text']);	
+
+						/* check if this is the correct field */
+						if($choice['gquizIsCorrect'] == 1)
+						{
+							$choices['misc']['correct_option_name'] = $choice['text'];
+						}
+
 					}
 				}
 
