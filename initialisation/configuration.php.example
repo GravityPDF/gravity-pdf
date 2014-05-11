@@ -326,7 +326,8 @@
   * 1. Watermarks - text or image - are not permitted (transparency is disallowed so will make text unreadable)  
   * 2. PNG images with alpha channel transparency ('masks' not allowed)
   * 3. Encryption is enabled (the system will automatically remove any security settings)
-  *
+  *  
+  * For more details about generating a PDF/X-1a document see http://mpdf1.com/manual/index.php?tid=420
   */  
  
    /*$gf_pdf_config[] = array(
@@ -354,7 +355,7 @@
   * 2. PNG images with alpha channel transparency ('masks' not allowed)
   * 3. Encryption is enabled (the system will automatically remove any security settings)
   *
-  * For more details about generating a PDF/X-1a document see http://mpdf1.com/manual/index.php?tid=481&searchstring=pdf/a1-b
+  * For more details about generating a PDF/X-1a document see http://mpdf1.com/manual/index.php?tid=481
   * 
   */  
  

@@ -5,6 +5,9 @@ if(!class_exists('GFPDFEntryDetail'))
 	add_filter('gform_field_content', array('GFPDFEntryDetail', 'encode_tags'), 10, 2); /* encode shortcodes in user's response so they aren't converted later by do_shortcode */
 	class GFPDFEntryDetail {
 
+		/* holds the form fields, stored by field ID */
+		static $fields;
+
 		/* NEED THIS FUNCTION - BLD */
 		public static function lead_detail_grid($form, $lead, $allow_display_empty_fields=false, $show_html=false, $show_page_name=false, $return=false, $show_section_breaks=false){
 			$form_id = $form['id'];
@@ -326,16 +329,8 @@ if(!class_exists('GFPDFEntryDetail'))
 		 */
 		public static function get_likert($form, $lead, $field_id)
 		{
-			$field = '';
-			foreach($form['fields'] as $fields)
-			{
-				if($fields['id'] === $field_id)
-				{
-					$field = $fields;
-					break;
-				}
-			}	
-
+			$fields = self::$fields;
+			$field = $fields[$field_id];
 			$value = RGFormsModel::get_lead_field_value($lead, $field);
 
 			$display_value = apply_filters('gform_entry_field_value', self::pdf_get_lead_field_display($field, $value, ''), $field, $lead, $form);	
@@ -460,7 +455,7 @@ if(!class_exists('GFPDFEntryDetail'))
 			{
 				if(trim($choice['value']) == trim($results))
 				{
-					$return[] = array('text' => $choice['text'], 'isCorrect' => $choice['gquizIsCorrect']);
+					$return = array('text' => $choice['text'], 'isCorrect' => $choice['gquizIsCorrect']);
 					break;
 				}
 			}
@@ -549,13 +544,13 @@ if(!class_exists('GFPDFEntryDetail'))
 			{
 				$results       = $lead[$id];
 			}
-
 	
 			$likert = array();
 
+
 			/* store the column names */
 			foreach($field['choices'] as $col)
-			{
+			{				
 				$likert['col'][$col['value']] = $col['text'];
 			}
 
@@ -582,7 +577,7 @@ if(!class_exists('GFPDFEntryDetail'))
 						$output = ($comparison == $results) ? 'selected' : '';										
 
 						/* assign our results to the array */
-						$likert['rows'][$row['label']][$col_id] = $output;
+						$likert['rows'][$row['label']][$text] = $output;
 
 					}
 				}
@@ -596,7 +591,7 @@ if(!class_exists('GFPDFEntryDetail'))
 					/* do our comparison and update the output */
 					$output = ($col_id == $results) ? 'selected' : '';										
 
-					$likert['row'][$col_id] = $output;
+					$likert['row'][$text] = $output;
 
 				}									
 			}
@@ -605,8 +600,24 @@ if(!class_exists('GFPDFEntryDetail'))
 
 		}
 
+		private static function get_form_fields($form)
+		{
+			$fields = array();
+			foreach($form['fields'] as $field)
+			{
+				$fields[$field['id']] = $field;
+			}
+
+			self::$fields = $fields;
+		}
+
 		private static function set_form_array_common($form, $lead, $form_id)
 		{
+			/*
+			 * Reorder the $form array as we can access the info by Field ID 
+			 */
+			self::get_form_fields($form);
+
 			$form_array = array();
 
 			/*
@@ -619,6 +630,7 @@ if(!class_exists('GFPDFEntryDetail'))
 			 * Set title and dates (both US and international)
 			 */
 			$form_array['form_title'] = $form['title'];
+			$form_array['form_description'] = $form['description'];
 			$form_array['date_created'] = self::format_date($lead['date_created']);
 			$form_array['date_created_usa'] = self::format_date($lead['date_created'], true);
 
@@ -649,25 +661,29 @@ if(!class_exists('GFPDFEntryDetail'))
 			 $form_array['misc']['user_agent'] = $lead['user_agent'];
 			 $form_array['misc']['status'] = $lead['status'];
 
-			 $form_array['form']['title'] = $form['title'];
-			 $form_array['form']['description'] = $form['description'];
+			
 
 			/*
 			 * Add quiz results
 			 */
-			$form_array = self::get_quiz_results($form, $form_array, $lead);
-			$form_array = self::get_survey_results($form, $form_array, $lead);
-			$form_array = self::get_poll_results($form, $form_array, $lead);
+			$form_array = self::get_quiz_results($form_array, $form, $lead);
+			$form_array = self::get_survey_results($form_array, $form, $lead);
+			$form_array = self::get_poll_results($form_array, $form, $lead);
 
 			return $form_array;
 		}
 
-		/* check if there is a poll field in the form */
-		private static function is_poll($form)
-		{					
+		/**
+		 * Sniff the form fields and determine if there are any of the $type avaluable
+		 * @param  string $type the field type we are looking for
+		 * @param  array $form the form array 
+		 * @return boolean       Whether there is a match or not
+		 */
+		private static function check_for_fields($type, $form)
+		{
 			foreach($form['fields'] as $field)
 			{
-				if($field['type'] == 'poll')
+				if($field['type'] == $type)
 				{
 					return true;
 				}
@@ -675,18 +691,44 @@ if(!class_exists('GFPDFEntryDetail'))
 			return false;
 		}
 
-		private static function get_poll_results($form, $form_array, $lead)
+		private static function get_poll_results($form_array, $form, $lead)
 		{
-			if(self::is_poll($form))
+			if(self::check_for_fields('poll', $form) === false)
 			{
-				$form_array['poll']['global'] = self::get_addon_global_data($form, array());
+				return $form_array;
 			}
+
+			$poll_results = self::get_addon_global_data($form, array());
+
+			$form_fields = self::$fields;
+			/*
+			 * Convert the array keys into their text counterparts
+			 * Loop through the global quiz data
+			 */
+			foreach($poll_results['field_data'] as $id => &$choices)
+			{
+				/* get the $field */
+				$field = $form_fields[$id];
+
+				/* loop through the field choices */
+				foreach($field['choices'] as $choice)
+				{
+					$choices = self::replace_key($choices, $choice['value'], $choice['text']);					
+				}
+			}
+			
+			$form_array['poll']['global'] = $poll_results;
 
 			return $form_array;
 		}
 
-		private static function get_survey_results($form, $form_array, $lead)
+		private static function get_survey_results($form_array, $form, $lead)
 		{
+			if(self::check_for_fields('survey', $form) === false)
+			{
+				return $form_array;
+			}
+
 			 /*
 			  * If there are any survey results
 			  * add them to the 'survey' key
@@ -701,12 +743,73 @@ if(!class_exists('GFPDFEntryDetail'))
 
 	        $form_array['survey']['global'] = self::get_addon_global_data($form, array());
 
+
+
+			$results = self::get_addon_global_data($form, array());
+
+			$form_fields = self::$fields;
+
+			/*
+			 * Convert the array keys into their text counterparts
+			 * Loop through the global quiz data
+			 */
+			foreach($results['field_data'] as $id => &$choices)
+			{
+				/* get the $field */
+				$field = $form_fields[$id];
+
+				/*
+				 * Check if we have a multifield likert and replace the row key
+				 */
+				if(isset($field['gsurveyLikertEnableMultipleRows']) && $field['gsurveyLikertEnableMultipleRows'] == 1) 
+				{
+					foreach($field['gsurveyLikertRows'] as $row)
+					{
+						$choices = self::replace_key($choices, $row['value'], $row['text']);
+					}
+
+					foreach($choices as $multi_id => &$multi_choices)
+					{
+						foreach($field['choices'] as $choice)
+						{
+							$multi_choices = self::replace_key($multi_choices, $choice['value'], $choice['text']);	
+						}
+					}
+				}
+
+				/* replace the standard row data */
+				foreach($field['choices'] as $choice)
+				{
+					$choices = self::replace_key($choices, $choice['value'], $choice['text']);
+				}
+			}
+			
+			$form_array['survey']['global'] = $results;
+
+
+
 	        return $form_array;
 
 		}
 
-		private static function get_quiz_results($form, $form_array, $lead)
+		private static function replace_key($array, $key, $text)
 		{
+			if(isset($array[$key]))
+			{
+				/* replace the array key with the actual field name */
+				$array[$text] = $array[$key];
+				unset($array[$key]);
+			}	
+			return $array;			
+		}
+
+		private static function get_quiz_results($form_array, $form, $lead)
+		{
+
+			if(self::check_for_fields('quiz', $form) === false)
+			{
+				return $form_array;
+			}
 
 			 /*
 			  * If there are any quiz results
@@ -729,7 +832,27 @@ if(!class_exists('GFPDFEntryDetail'))
 				/*
 				 * Get the overall results
 				 */
-				$form_array['quiz']['global'] = self::get_quiz_overalls($form);
+				$quiz_global = self::get_quiz_overalls($form);
+
+				$form_fields = self::$fields;
+				/*
+				 * Convert the array keys into their text counterparts
+				 * Loop through the global quiz data
+				 */
+				foreach($quiz_global['field_data'] as $id => &$choices)
+				{
+					/* get the $field */
+					$field = $form_fields[$id];
+
+					/* loop through the field choices */
+					foreach($field['choices'] as $choice)
+					{
+						$choices = self::replace_key($choices, $choice['value'], $choice['text']);						
+					}
+				}
+
+				$form_array['quiz']['global'] = $quiz_global;
+				//$form_array['quiz']['global'] = self::get_quiz_overalls($form);
 				
 	        }
 
