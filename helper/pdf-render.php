@@ -85,7 +85,7 @@ class PDFRender
 			 */
 			if(strlen($entry) > 0)
 			{
-				return $this->PDF_processing($entry, $filename, $id, $output, $arguments);
+				return $this->PDF_processing($entry, $filename, $id, $output, $arguments, $form_id, $lead_id);
 			}
 	
 			return false;
@@ -129,7 +129,7 @@ class PDFRender
 	/**
 	 * Creates the PDF and does a specific output (see PDF_Generator function above for $output variable types)
 	 */
-	public function PDF_processing($html, $filename, $id, $output = 'view', $arguments)
+	public function PDF_processing($html, $filename, $id, $output = 'view', $arguments, $form_id, $lead_id)
 	{
 		/* 
 		 * DOMPDF replaced with mPDF in v3.0.0 
@@ -243,7 +243,7 @@ class PDFRender
 		/*
 		 * Add pre-render/save filter so PDF can be manipulated further
 		 */	
-		$mpdf     = apply_filters('gfpdfe_pre_render_pdf', $mpdf, $id, $arguments, $output, $filename);
+		$mpdf     = apply_filters('gfpdfe_pre_render_pdf', $mpdf, $form_id, $lead_id, $arguments, $output, $filename);
 		$output   = apply_filters('gfpdfe_pdf_output_type', $output);
 		$filename = apply_filters('gfpdfe_pdf_filename', $filename);
 		
@@ -267,7 +267,7 @@ class PDFRender
 				$pdf      = $mpdf->Output('', 'S');
 				$filename = $this->savePDF($pdf, $filename, $id);				 
 
-				do_action('gfpdf_post_pdf_save', $id, $arguments, $output, $filename);
+				do_action('gfpdf_post_pdf_save', $form_id, $lead_id, $arguments, $filename);
 
 				return $filename;
 			break;
