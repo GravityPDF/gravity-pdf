@@ -1025,7 +1025,7 @@ if(!class_exists('GFPDFEntryDetail'))
 			return $list;
 		}
 
-		private static function remove_empty_multi_col_list($gfield_list)
+		private static function remove_empty_multi_col_list($list)
 		{
 			foreach($list as $id => $row)			
 			{
