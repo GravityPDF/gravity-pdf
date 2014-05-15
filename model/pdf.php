@@ -158,8 +158,8 @@ class GFPDF_Core_Model
 									echo $name; 									
 									$url = home_url() .'/?gf_pdf=1&aid='. $aid .'&fid=' . $form_id . '&lid=' . $lead_id . '&template=' . $val['template']; 								
 								?></span> 
-                                <a href="<?php echo $url; ?>" target="_blank" class="button">View</a> 
-				 				<a href="<?php echo $url.'&download=1'; ?>" target="_blank" class="button">Download</a></div>
+                                <a href="<?php echo $url; ?>" target="_blank" class="button"><?php _e('View', 'pdfextended'); ?></a> 
+				 				<a href="<?php echo $url.'&download=1'; ?>" target="_blank" class="button"><?php _e('Download', 'pdfextended'); ?></a></div>
                                   
                             <?php endforeach; ?>
 
@@ -171,8 +171,8 @@ class GFPDF_Core_Model
 			$url = home_url() .'/?gf_pdf=1&fid=' . $form_id . '&lid=' . $lead_id . '&template=' . $templates; 
 
 			?>
-			PDF: <a href="<?php echo $url; ?>" target="_blank" class="button">View</a> 
-				 <a href="<?php echo $url.'&download=1'; ?>" target="_blank" class="button">Download</a>
+			<?php _e('PDF', 'pdfextended'); ?>: <a href="<?php echo $url; ?>" target="_blank" class="button"><?php _e('View', 'pdfextended'); ?></a> 
+				 <a href="<?php echo $url.'&download=1'; ?>" target="_blank" class="button"><?php _e('Download', 'pdfextended'); ?></a>
 			<?php
 		}
 	}
@@ -207,7 +207,7 @@ class GFPDF_Core_Model
 		{
 			?>
                 <span class="gf_form_toolbar_settings gf_form_action_has_submenu">
-                   | <a href="#" title="View PDF configured for this form" onclick="return false" class="">View PDFs</a>
+                   | <a href="#" title="View PDF configured for this form" onclick="return false" class=""><?php _e('View PDFs', 'pdfextended'); ?></a>
                     
                     <div class="gf_submenu">
                         <ul>
@@ -238,7 +238,7 @@ class GFPDF_Core_Model
 			$url = home_url() . '/?gf_pdf=1&fid=' . $form_id .'&lid=' . $lead_id . '&template=' . $templates; 
 			
 			?>
-			| <a href="<?php echo $url; ?>" target="_blank">View PDF</a> 
+			| <a href="<?php echo $url; ?>" target="_blank"><?php _e('View PDF', 'pdfextended'); ?></a> 
 			<?php
 		}
 	}

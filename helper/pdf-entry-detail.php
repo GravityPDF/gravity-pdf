@@ -2,7 +2,7 @@
 if(!class_exists('GFPDFEntryDetail'))
 {
 
-	add_filter('gform_field_content', array('GFPDFEntryDetail', 'encode_tags'), 10, 2); /* encode shortcodes in user's response so they aren't converted later by do_shortcode */
+	add_filter('gfpdf_field_content', array('GFPDFEntryDetail', 'encode_tags'), 10, 2); /* encode shortcodes in user's response so they aren't converted later by do_shortcode */
 	class GFPDFEntryDetail {
 
 		/* holds the form fields, stored by field ID */
@@ -110,7 +110,7 @@ if(!class_exists('GFPDFEntryDetail'))
 									$value = '';
 
 									$content = '<div id="field-'. $field['id'] .'" class="entry-view-html-value' . $last_row . $even . '"><div class="value">' . $display_value . '</div></div>';
-									$content = apply_filters('gform_field_content', $content, $field, $value, $lead['id'], $form['id']);
+									$content = apply_filters('gfpdf_field_content', $content, $field, $value, $lead['id'], $form['id']);
 
 									if($return === true)
 									{
@@ -188,7 +188,7 @@ if(!class_exists('GFPDFEntryDetail'))
 
 									$content = '<div id="field-'. $field['id'] .'" class="entry-view-field-value' . $last_row . $even . '"><div class="strong">' .  esc_html(GFCommon::get_label($field)) . '</div> <div class="value">' . $display_value . '</div></div>';
 
-									$content = apply_filters('gform_field_content', $content, $field, $value, $lead['id'], $form['id']);
+									$content = apply_filters('gfpdf_field_content', $content, $field, $value, $lead['id'], $form['id']);
 
 									if($return === true)
 									{
@@ -337,7 +337,7 @@ if(!class_exists('GFPDFEntryDetail'))
 			$display_value = apply_filters('gform_entry_field_value', self::pdf_get_lead_field_display($field, $value, ''), $field, $lead, $form);	
 			$content = $display_value;
 			
-			$results = apply_filters('gform_field_content', $content, $field, $value, $lead['id'], $form['id']);
+			$results = apply_filters('gfpdf_field_content', $content, $field, $value, $lead['id'], $form['id']);
 			
 			return $results;
 		}
@@ -1897,7 +1897,7 @@ if(!class_exists('GFPDFEntryDetail'))
 
 	    public static function encode_tags($content, $field)
 	    {
-	    	if(RGFormsModel::get_input_type($field) != 'html')
+	    	if(RGFormsModel::get_input_type($field) != 'html' || RGFormsModel::get_input_type($field) != 'signature')
 	    	{
 	    		$content = str_replace('[', '&#91;', $content);
 	    		$content = str_replace(']', '&#93;', $content);
