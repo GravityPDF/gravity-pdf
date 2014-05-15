@@ -2,11 +2,6 @@
 
 define('PDF_DEBUG', false);
 
-/*
- * Change the timeout to 15 seconds
- */
- add_filter( 'http_response_timeout', array('gfpdfe_API', 'http_response_timeout') );
-
 class gfpdfe_API
 {
 	private $api_url = 'http://gravityformspdfextended.com/api/';
@@ -56,7 +51,7 @@ class gfpdfe_API
 		 */
 		if ( is_wp_error($response) )		 
 		{
-			print json_encode(array('error' => array('msg' =>$response->get_error_message())));	
+			print json_encode(array('error' => array('msg' => $response->get_error_message())));	
 			exit;
 		}
 
@@ -89,11 +84,15 @@ class gfpdfe_API
 	
 	private function add_headers($request)
 	{
+
+		/* change the timeout from 5 seconds to 20 */
+		$request['timeout'] = 20;
+
 		$request['headers'] = array(
 			'API' 			=> (string) $this->api_version,
 			'API_STAMP' 	=> (string) time(),
 			'API_URL' 		=> (string) site_url(),
-		);	
+		);			
 		
 		if(strlen($this->username) > 0)
 		{
@@ -186,9 +185,17 @@ class gfpdfe_API
 			{
 				file_put_contents( ABSPATH . 'pdf-api.log',  date('d/m/Y h:m:s') . ' Hash'  ."\n", FILE_APPEND);				
 				file_put_contents( ABSPATH . 'pdf-api.log',  serialize($request) . $secret_key. "\n", FILE_APPEND);		
-			}		 
+			}
+		
+		/*
+		 * Remove any items not needed in the hash
+		 */			 
+		$hash_request = array();
+		$hash_request['body'] = $request['body'];
+		$hash_request['headers'] = $request['headers'];
+
 		 
-		$hashed = hash ('sha256', serialize($request) . $secret_key );		
+		$hashed = hash ('sha256', serialize($hash_request) . $secret_key );		
 		$request['headers']['hash'] = $hashed;
 		return $request;			
 	}
@@ -214,7 +221,7 @@ class gfpdfe_API
 		 */
 		if ( is_wp_error($response) )		 
 		{
-			print json_encode(array('error' => array('msg' =>$response->get_error_message())));	
+			print json_encode(array('error' => array('msg' => $response->get_error_message())));	
 			exit;
 		}
 
@@ -243,14 +250,5 @@ class gfpdfe_API
 			 }
 
 		 }		
-	}
-	
-	public static function http_response_timeout($timeout)
-	{
-			return 15;
-	}
-	
-	public function __destruct() {
-		remove_filter('http_response_timeout', array('gfpdfe_API', 'http_response_timeout') );
-	}
+	}	
 }

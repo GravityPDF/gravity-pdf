@@ -27,7 +27,7 @@ class GFPDF_Settings
 	/* 
 	 * Check if we're on the settings page 
 	 */ 
-	public function settings_page() {			 		
+	public static function settings_page() {			 		
 		if(RGForms::get("page") == "gf_settings") {		 										
 			/* 
 			 * Tell Gravity Forms to initiate our settings page

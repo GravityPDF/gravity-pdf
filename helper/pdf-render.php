@@ -10,7 +10,7 @@ class PDFRender
 	 * var $output string: either view, save or download
 	 * save will save a copy of the PDF to the server using the PDF_SAVE_LOCATION constant
 	 * var $return boolean: if set to true 
-	 it will return the path of the saved PDF
+	 * it will return the path of the saved PDF
 	 * var $template string: if you want to use multiple PDF templates - name of the template file
 	 * var $pdfname string: allows you to pass a custom PDF name to the generator e.g. 'Application Form.pdf' (ensure .pdf is appended to the filename)
 	 * var $fpdf boolean: custom hook to allow the FPDF engine to generate PDFs instead of DOMPDF. Premium Paid Feature.
@@ -43,7 +43,7 @@ class PDFRender
 		 * Check if the PDF exists and if this function has already run this season 
 		 */	
 		if(in_array($lead_id, $pdf_creator) && file_exists(PDF_SAVE_LOCATION.$id.'/'. $filename))
-		{			
+		{					
 			/* 
 			 * Don't generate a new PDF, use the existing one 
 			 */
@@ -60,14 +60,16 @@ class PDFRender
 		 * Used in premium plugins
 		 * return true to cancel, otherwise run.
 		 */	 
-		 $return = apply_filters('gfpdfe_pre_load_template', $form_id, $lead_id, $template, $id, $output, $filename, $arguments);
+		 $return = apply_filters("gfpdfe_pre_load_template", $form_id, $lead_id, $template, $id, $output, $filename, $arguments);
 
 		if($return !== true)
 		{
 			/*
-			 * Get the tempalte HTML file
+			 * Get the template HTML file
+			 * v3.4.0 allows mergetags to be used in PDF templates
 			 */
-			$entry = $this->load_entry_data($form_id, $lead_id, $template);					
+			$raw_entry = $this->load_entry_data($form_id, $lead_id, $template);
+			$entry = apply_filters("gfpdfe_pdf_template_{$form_id}", apply_filters('gfpdfe_pdf_template', $raw_entry, $form_id, $lead_id, $arguments), $lead_id, $arguments);					
 
 			/*
 			 * Output HTML version and return if user requested a HTML version
@@ -83,7 +85,7 @@ class PDFRender
 			 */
 			if(strlen($entry) > 0)
 			{
-				return $this->PDF_processing($entry, $filename, $id, $output, $arguments);
+				return $this->PDF_processing($entry, $filename, $id, $output, $arguments, $form_id, $lead_id);
 			}
 	
 			return false;
@@ -111,14 +113,14 @@ class PDFRender
 			 */
 			if(file_exists(PDF_PLUGIN_DIR."templates/" . $template))
 			{
-				return PDF_Common::get_html_template(PDF_PLUGIN_DIR."templates/" . $template);
+				return PDF_Common::get_html_template(PDF_PLUGIN_DIR."initialisation/templates/" . $template);
 			}
 			/*
 			 * If template not found then we will resort to the default template.
 			 */			
 			else
-			{
-				return PDF_Common::get_html_template(PDF_PLUGIN_DIR."templates/" . PDFGenerator::$default['template']);
+			{				
+				return PDF_Common::get_html_template(PDF_PLUGIN_DIR."initialisation/templates/" . PDFGenerator::$default['template']);
 			}
 		}		
 	}
@@ -127,7 +129,7 @@ class PDFRender
 	/**
 	 * Creates the PDF and does a specific output (see PDF_Generator function above for $output variable types)
 	 */
-	public function PDF_processing($html, $filename, $id, $output = 'view', $arguments)
+	public function PDF_processing($html, $filename, $id, $output = 'view', $arguments, $form_id, $lead_id)
 	{
 		/* 
 		 * DOMPDF replaced with mPDF in v3.0.0 
@@ -136,11 +138,11 @@ class PDFRender
 		 */
 		 if(!class_exists('mPDF'))
 		 {
-			 if(PDF_ENABLE_MPDF_TINY === true)
+			 if(defined('PDF_ENABLE_MPDF_TINY') && PDF_ENABLE_MPDF_TINY === true)
 			 {
 					include PDF_PLUGIN_DIR .'/mPDF/mpdf-extra-lite.php';			 
 			 }
-			 elseif(PDF_ENABLE_MPDF_LITE === true)
+			 elseif(defined('PDF_ENABLE_MPDF_LITE') && PDF_ENABLE_MPDF_LITE === true)
 			 {
 					include PDF_PLUGIN_DIR .'/mPDF/mpdf-lite.php';			 
 			 }
@@ -177,13 +179,22 @@ class PDFRender
 		 * Automatically detect fonts and substitue as needed
 		 */
 		$mpdf->SetAutoFont(AUTOFONT_ALL);
-		$mpdf->useSubstitutions = true;
+		(defined('PDF_DISABLE_FONT_SUBSTITUTION') && PDF_DISABLE_FONT_SUBSTITUTION === false) ? $mpdf->useSubstitutions = true : $mpdf->useSubstitutions = false;
 		
 		/*
 		 * Set Creator Meta Data
-		 */
-		
+		 */		
 		$mpdf->SetCreator('Gravity Forms PDF Extended v'. PDF_EXTENDED_VERSION.'. http://gravityformspdfextended.com');	
+
+		/*
+		 * Set PDF DPI if added to configuration node
+		 */
+		if($arguments['dpi'] !== false)
+		{
+			/* TEXT DPI dramatically decreases the text size. As text is a vector element of the document we will only be concerned with the image DPI for the moment */
+			/*$mpdf->dpi     = $arguments['dpi'];*/
+			$mpdf->img_dpi = $arguments['dpi'];
+		}
 
 		/*
 		 * Set RTL languages at user request
@@ -196,18 +207,45 @@ class PDFRender
 		/*
 		 * Set up security if user requested
 		 */ 
-		 if($arguments['security'] === true)
+		 if($arguments['security'] === true && $arguments['pdfa1b'] === false && $arguments['pdfx1a'] === false  )
 		 {
 				$password = (strlen($arguments['pdf_password']) > 0) ? $arguments['pdf_password'] : '';
-				$master_password = (strlen($arguments['pdf_password']) > 0) ? $arguments['pdf_password'] : null;
+				$master_password = (strlen($arguments['pdf_master_password']) > 0) ? $arguments['pdf_master_password'] : null;
 				$pdf_privileges = (is_array($arguments['pdf_privileges'])) ? $arguments['pdf_privileges'] : array();	
 				
 				$mpdf->SetProtection($pdf_privileges, $password, $master_password, 128);											
 		 }
+
+		 /* PDF/A1-b support added in v3.4.0 */
+		 if($arguments['pdfa1b'] === true)
+		 {
+		 		$mpdf->PDFA = true;
+		 		$mpdf->PDFAauto = true;
+		 }
+		 else if($arguments['pdfx1a'] === true)  /* PDF/X-1a support added in v3.4.0 */
+		 {
+		 		$mpdf->PDFX = true;
+			 	$mpdf->PDFXauto = true;
+		 }
+		 
+		 /*
+		  * Check if we should auto prompt to print the document on open
+		  */
+		  if(isset($_GET['print']))
+		  {
+				$mpdf->SetJS('this.print();');  
+		  }
 		 	 
 		 
 		/* load HTML block */
-		$mpdf->WriteHTML($html);			
+		$mpdf->WriteHTML($html);		
+
+		/*
+		 * Add pre-render/save filter so PDF can be manipulated further
+		 */	
+		$mpdf     = apply_filters('gfpdfe_pre_render_pdf', $mpdf, $form_id, $lead_id, $arguments, $output, $filename);
+		$output   = apply_filters('gfpdfe_pdf_output_type', $output);
+		$filename = apply_filters('gfpdfe_pdf_filename', $filename);
 		
 		switch($output)
 		{
@@ -226,8 +264,12 @@ class PDFRender
 				 * PDF wasn't writing to file with the F method - http://mpdf1.com/manual/index.php?tid=125
 				 * Return as a string and write to file manually
 				 */					
-				$pdf = $mpdf->Output('', 'S');
-				return $this->savePDF($pdf, $filename, $id);				 
+				$pdf      = $mpdf->Output('', 'S');
+				$filename = $this->savePDF($pdf, $filename, $id);				 
+
+				do_action('gfpdf_post_pdf_save', $form_id, $lead_id, $arguments, $filename);
+
+				return $filename;
 			break;
 		}
 	}
@@ -255,7 +297,8 @@ class PDFRender
 		{
 			trigger_error('Could not save PDF to '. $pdf_save, E_USER_WARNING);
 			return;
-		}
+		}		
+
 		return $pdf_save;
 	}
 }

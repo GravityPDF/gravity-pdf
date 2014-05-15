@@ -156,8 +156,11 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 		 		 
 		 if(extension_loaded('mbstring'))
 		 {
-			$gfpdfe_data->mb_string_installed = true; 
-			return;
+		 	if(function_exists('mb_regex_encoding'))
+		 	{
+				$gfpdfe_data->mb_string_installed = true; 
+				return;
+			}
 		 }
 		 $gfpdfe_data->mb_string_installed = false; 
 		 $gfpdfe_data->allow_initilisation = false;
@@ -509,7 +512,7 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 	}
 	
 	
-	public function gf_pdf_deploy_success() {
+	public static function gf_pdf_deploy_success() {
 			echo '<div id="message" class="updated"><p>';
 			echo __('You\'ve successfully initialised Gravity Forms PDF Extended.', 'pdfextended');
 			echo '</p></div>';		

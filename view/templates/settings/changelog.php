@@ -1,13 +1,13 @@
 <?php
 
  /*
-  * Template: Changelog
-  * Module: Settings Page
+  <li>Template: Changelog
+  <li>Module: Settings Page
   *
   */
   
   /*
-   * Don't run if the correct class isn't present
+   <li>Don't run if the correct class isn't present
    */
   if(!class_exists('GFPDF_Settings_Model'))
   {
@@ -19,6 +19,73 @@
     <h2><?php _e('Changelog'); ?></h2>
     
     <p><strong>Current Version: <?php echo PDF_EXTENDED_VERSION; ?></strong></p>
+    <ul>
+      <li>Housekeeping - Add commas on the last line of every config node in the configuration.php file</li>
+      <li>Housekeeping - Fix up initialisation error messages</li>
+      <li>Bug - Fix up mPDF bugs - soft hyphens, watermarks over SVG images, inline CSS bug</li>
+    </ul>
+
+
+    <h3>3.4.0</h3>
+    <ul>
+      <li>Feature - Added auto-print prompt ability when you add &amp;print=1 to the PDF URL (see https://gravityformspdfextended.com/documentation-v3-x-x/display-pdf-in-browser/ for details)</li>
+      <li>Feature - Added ability to rotate absolute positioned text 180 degrees (previously only 90 and -90). Note: feature in beta</li>
+      <li>Feature - Backup all template files that are overridden when initialising to a folder inside PDF_EXTENDED_TEMPLATE</li>
+      <li>Feature - Added SSH initialisation support</li>
+      <li>Feature - Allow MERGETAGS to be used in all PDF templates, including default template (but only in the HTML field).</li>
+      <li>Feature - Updated mPDF to 3.7.1</li>
+      <li>Feature - Enable text/image watermark support. Added new example template example-watermark09.php showing off its usage (see http://gravityformspdfextended.com/documentation-v3-x-x/templates/watermarks/)</li>
+      <li>Feature - Added full survey, poll and quiz support to both the default template and $form_data (see http://gravityformspdfextended.com/documentation-v3-x-x/accessing-survey-poll-quiz-data/)</li>
+      <li>Feature - Shortcodes will now be processed in all templates, including default template (but only in the HTML field).</li>
+      <li>Feature - Added 'save' configuration option so PDFs are saved to the local disk when 'notifications' aren't enabled.</li>
+      <li>Feature - Added 'dpi' configuration option to modify the PDF image DPI. Default 96dpi. Use 300dpi for printing.</li>
+      <li>Feature - Added PDF/A1-b compliance option. Enable with 'pdfa1b' => true. See http://mpdf1.com/manual/index.php?tid=420&searchstring=pdf/a1-b for more details.</li>
+      <li>Feature - Added PDF/X1-a compliance option. Enable with 'pdfx1a' => true. See http://mpdf1.com/manual/index.php?tid=481&searchstring=pdf/x-1a for more details.</li>
+      <li>Feature - Added new constant option 'PDF_REPACK_FONT' which when enabled may improve function with some PostScript printers (disabled by default). Existing sites will need to add  define('PDF_REPACK_FONT', true); to the bottom of their configuration.php file.</li>
+      <li>Feature - Added a sleuth of new hooks and filters for developers. See https://gravityformspdfextended.com/documentation-v3-x-x/filters-and-hooks/ for examples.</li>
+      <li>Feature - Added $form_data['form_description'] key to $form_data array</li>
+      <li>Feature - Update $form_data['products'] array key to field ID</li>
+      <li>Feature - Added survey Likert output function for custom templates (much like the product table function). It can be used with the following command 'echo GFPDFEntryDetails::get_likert($form, $lead, $field_id);' where $field_id is substituted for the form field ID.</li>
+      <li>Feature - Added field descriptions to the $form_data array under the $form_data['field_descriptions'] key.</li>
+      <li>Feature - Added pre and post PDF generation filters and actions to pdf-render.php. These include gfpdfe_pre_render_pdf, gfpdfe_pdf_output_type, gfpdfe_pdf_filename and gfpdf_post_pdf_save.</li>
+      <li>Feature: $form_data['signature'] et al. keys now contain the signature width and height attributes</li>
+
+      <li>Housekeeping - Ensure the form and lead IDs are correctly passed throughout the render functions.</li>
+      <li>Housekeeping - Update settings page link to match new Gravity Forms URL structure</li>
+      <li>Housekeeping - Check if $lead['gfsurvey_score'] exists before assigning to $form_data array</li>
+      <li>Housekeeping - Removed table and font checksum debugging from mPDF when WP_DEBUG enabled as they produced inaccurate results.</li>
+      <li>Housekeeping - Fixed up mPDF logging location when WP_DEBUG enabled. Files now stored in wp-content/themes/Active_Theme_Folder/PDF_EXTENDED_TEMPLATE/output/ folder.</li>
+      <li>Housekeeping - Removed API logging locally when WP_DEBUG is enabled.</li>
+      <li>Housekeeping - Increase API timeout interval as some overseas users reported timeout issues</li>
+      <li>Housekeeping - Modified mPDF functions Image() and purify_utf8_text() to validate the input data so we don't have to do it every time through the template.</li>
+      <li>Housekeeping - Added ability to not re-deploy every update (not enabled this release as template files were all updated)</li>
+      <li>Housekeeping - Additional checks on load to see if any of the required file/folder structure is missing. If so, re-initilise.</li>
+      <li>Housekeeping - Save resources and turn off automatic rtl identification. Users must set the RTL option when configuring form</li>
+      <li>Housekeeping - Turn off mPDFs packTableData setting, decreasing processing time when working with large tables.</li>
+      <li>Housekeeping - $gf_pdf_default_configuration options now merge down into existing PDF nodes, instead of applying to only unassigned forms. $gf_pdf_config settings override any in $gf_pdf_default_configuration</li>
+      <li>Housekeeping - Center aligned Survey Likery field results</li>
+      <li>Housekeeping - Partially refactored the pdf-entry-detail.php code</li>
+      <li>Housekeeping - All default and example templates have been tidied. This won't affect custom templates.</li>
+      <li>Housekeeping - Set the gform_notification order number to 100 which will prevent other functions (example snippets from Gravity Forms, for instance) from overridding the attached PDF.</li>
+      <li>Housekeeping - Fix spelling mistake on initialising fonts</li>
+      <li>Housekeeping - Remove wpautop() function from Gravity Form HTML output, which was applied before rendering and was messing up the HTML markup.</li>
+      <li>Housekeeping - Remove empty list rows from the $form_data['list'] array in single and multi-column lists.</li>
+      <li>Housekeeping - Apply same CSS styles (padding, border and line height) to HTML fields as done to form values in default templates</li>
+      <li>Housekeeping - Replaced arbitrary wrapper IDs in the default templates with the actual field ID</li>
+
+      <li>Bug - Fixed signature rendering issue when custom signature size was being used</li>
+      <li>Bug - Fixed static error types in helper/install-update-manager.php file.</li>
+      <li>Bug - Fixed redeployment error message which wasn't showing correctly</li>
+      <li>Bug - Fixed issue with PDF not attaching to notification using Paypal's delayed notification feature</li>
+      <li>Bug - Fixed strict standard warning about calling GFPDF_Settings::settings_page();</li>
+      <li>Bug - Fixed strict standard warning about calling GFPDFEntryDetail::pdf_get_lead_field_display();</li>
+      <li>Bug - Fixed issue with Gravity Form Post Category field causing fatal error generating PDF</li>
+      <li>Bug - Fixed number field formatting issue when displaying on PDF.</li>
+      <li>Bug - Do additional check for PHP's MB_String regex functions before initialising ti prevent errors after initialising</li>
+      <li>Bug - Fixed problem with multiple nodes assigned to a form using the same template</li>
+      <li>Bug - Fixed path to fallback templates when not found</li>
+      <li>Bug - Fixed problem with master password setting to user password</li>
+    </ul>
     
     <h3>3.3.4</h3>
     <ul>
@@ -165,8 +232,8 @@
     <p>A new HTML to PDF package wasn't the only change to this edition of the software. We have rewritten the entire configuration system and made it super easy to get the software up and running.</p>
     <p>Users will no longer place code in their active theme's functions.php file. Instead, configuration will happen in a new file called configuration.php, inside the PDF_EXTENDED_TEMPLATES folder (in your active theme).</p>
     <p>Other changes include
-      * Improved security - further restrictions were placed on non-administrators viewing template files.
-      * $form_data array tidied up - images won't be wrapped in anchor tags.</p>
+      <li>Improved security - further restrictions were placed on non-administrators viewing template files.
+      <li>$form_data array tidied up - images won't be wrapped in anchor tags.</p>
     <p>For more details <a rel="nofollow" href="http://gravityformspdfextended.com/documentation-v3-x-x/introduction/">view the 3.x.x online documentation</a>.</p>
     <h3>2.2.3</h3>
     <ul>
