@@ -384,7 +384,7 @@ class GFPDF_Core_Model
 
 		 if(!$config = $gfpdf->get_config($form_id))
 		 {
-			 return $notification;
+			 return false;
 		 }	
 
 		/* 
@@ -687,7 +687,9 @@ class GFPDF_Core_Model
 				 $index = key($gfpdf->configuration);
 				 
 				 /* now add to the index */
-				 $gfpdf->assign_index($form_id, $index);				  
+				 $gfpdf->assign_index($form_id, $index);	
+
+				 return $index;			  
 				 
 			}
 		}
@@ -727,6 +729,6 @@ class GFPDF_Core_Model
 			/* there aren't multiples so just return first node */
 			return $gfpdf->index[$form_id][0];	
 		}
-		return $index;	
+		return false;	
 	}		 	   
 }
