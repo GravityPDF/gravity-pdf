@@ -20,6 +20,8 @@
     
     <p><strong>Current Version: <?php echo PDF_EXTENDED_VERSION; ?></strong></p>
     <ul>
+      <li>Housekeeping - Add commas on the last line of every config node in the configuration.php file</li>
+      <li>Housekeeping - Fix up initialisation error messages</li>
       <li>Bug - Fix up mPDF bugs - soft hyphens, watermarks over SVG images, inline CSS bug</li>
     </ul>
 

@@ -31,7 +31,7 @@
   */
   /*$gf_pdf_config[] = array(
   	'form_id' => 1, 
-  
+    'notifications' => true,
   );*/
   
  /*
@@ -51,19 +51,19 @@
   /*$gf_pdf_config[] = array(
   	'form_id' => 1, 
   	'template' => 'default-template.php',		
-  	'default-show-html' => true
+  	'default-show-html' => true,
   );*/  
   
   /*$gf_pdf_config[] = array(
   	'form_id' => 1, 
   	'template' => 'default-template.php',	
-  	'default-show-empty' => true
+  	'default-show-empty' => true,
   );*/ 
   
   /*$gf_pdf_config[] = array(
   	'form_id' => 1, 
   	'template' => 'default-template.php',		
-  	'default-show-page-names' => true
+  	'default-show-page-names' => true,
   );*/     
   
   /*$gf_pdf_config[] = array(
@@ -71,7 +71,7 @@
   	'template' => 'default-template.php',		
   	'default-show-html' => true,
   	'default-show-empty' => true,
-  	'default-show-page-names' => true
+  	'default-show-page-names' => true,
   );*/   
   
  /*
@@ -82,12 +82,12 @@
   */
   /*$gf_pdf_config[] = array(
   	'form_id' => 1, 
-	  'notifications' => 'Admin Notification' 
+	  'notifications' => 'Admin Notification', 
   );*/ 
   
   /*$gf_pdf_config[] = array(
   	'form_id' => '1', 
-	  'notifications' => array('Admin Notification', 'User Notification') 
+	  'notifications' => array('Admin Notification', 'User Notification'), 
   );*/  
   
  /*
@@ -100,13 +100,13 @@
   /*$gf_pdf_config[] = array(
   	'form_id' => 1, 
   	'notifications' => 'User Notification', 		
-  	'template' => 'example-float-and-positioning05.php' 
+  	'template' => 'example-float-and-positioning05.php', 
   );*/  
   
   /*$gf_pdf_config[] = array(
   	'form_id' => 2, 
   	'notifications' => 'User Notification',
-  	'template' => 'example-basic-html01.php' 
+  	'template' => 'example-basic-html01.php', 
   );*/    
     
  /*
@@ -119,13 +119,13 @@
   /*$gf_pdf_config[] = array(
   	'form_id' => 1, 
   	'notifications' => true, 
-  	'filename' => 'New PDF Name.pdf' 
+  	'filename' => 'New PDF Name.pdf', 
   );*/ 
  
   /*$gf_pdf_config[] = array(
   	'form_id' => '1', 
   	'notifications' => true, 
-  	'filename' => 'User {Name:1}.pdf' 
+  	'filename' => 'User {Name:1}.pdf', 
   );*/ 
  
  /*
@@ -149,7 +149,7 @@
   	'form_id' => 1,  
   	'notifications' => true, 
   		
-  	'pdf_size' => 'letter'
+  	'pdf_size' => 'letter',
   );*/
   
   /* Custom PDF Size */
@@ -157,7 +157,7 @@
   	'form_id' => 1, 
   	'notifications' => true,
   	
-  	'pdf_size' => array(50, 200)
+  	'pdf_size' => array(50, 200),
     );*/  
     
     /* Change orientation */
@@ -166,7 +166,7 @@
   	'notifications' => true,
   	
   	'pdf_size' => 'letter',
-  	'orientation' => 'landscape'
+  	'orientation' => 'landscape',
   );*/  
 
  /*
@@ -196,7 +196,7 @@
   	'security' => true, 
   	'pdf_password' => 'myPDFpass', 	
   	'pdf_privileges' => array('copy', 'print', 'modify', 'annot-forms', 'fill-forms', 'extract', 'assemble', 'print-highres'), 	
-  	'pdf_master_password' => 'admin password' 
+  	'pdf_master_password' => 'admin password', 
   );*/
  
   /*
@@ -209,7 +209,7 @@
   	'notifications' => true,	 
   	 
   	'security' => true, 
-  	'pdf_password' => 'myPDFpass'
+  	'pdf_password' => 'myPDFpass',
    );*/
   
   /*
@@ -222,7 +222,7 @@
   	'notifications' => true,	 
   	 
   	'security' => true, 
-  	'pdf_master_password' => 'admin password' 
+  	'pdf_master_password' => 'admin password', 
    );*/   
   
   /*
@@ -236,7 +236,7 @@
 	'notifications' => true,	 
 	 
 	'security' => true, 
-	'pdf_privileges' => array('copy', 'print', 'modify', 'print-highres')
+	'pdf_privileges' => array('copy', 'print', 'modify', 'print-highres'),
    );*/   
    
   /*
@@ -249,7 +249,7 @@
 	  'form_id' => 1, 
 	  'notifications' => true,
 	
-	  'rtl' => true
+	  'rtl' => true,
    );*/
 
   
@@ -263,7 +263,7 @@
   */
   /*$gf_pdf_config[] = array(
     'form_id' => array(1,5,6), 
-    'notifications' => true 
+    'notifications' => true,
   );*/
     
   /*
@@ -274,7 +274,7 @@
   */  
    /*$gf_pdf_config[] = array(
 	  'form_id' => 1, 
-	  'template' => 'example-template.php'		
+	  'template' => 'example-template.php',		
    );*/    
 
   /*

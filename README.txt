@@ -79,7 +79,9 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 == Changelog ==
 
 = 3.4.0.1 =
-* Fix up mPDF bugs - soft hyphens, watermarks over SVG images, inline CSS bug
+* Housekeeping - Add commas on the last line of every config node in the configuration.php file 
+* Housekeeping - Fix up initialisation error messages 
+* Bug - Fix up mPDF bugs - soft hyphens, watermarks over SVG images, inline CSS bug
 
 = 3.4.0 =
 * Feature - Added auto-print prompt ability when you add &print=1 to the PDF URL (see https://gravityformspdfextended.com/documentation-v3-x-x/display-pdf-in-browser/ for details)

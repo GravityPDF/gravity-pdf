@@ -300,7 +300,7 @@ class GFPDF_InstallUpdater
 	public static function gf_pdf_font_err()
 	{
 		echo '<div id="message" class="error"><p>';
-		echo __('There was a problem installing the font files. Manually copy your fonts to the mPDF/ttfonts/ folder.', 'pdfextended');
+		echo __('There was a problem installing the font files. Manually copy your fonts to the plugin\'s mPDF/ttfonts/ folder.', 'pdfextended');
 		echo '</p></div>';
 	}	
 	
@@ -409,7 +409,7 @@ class GFPDF_InstallUpdater
 	public static function gf_pdf_template_dir_err()
 	{
 			echo '<div id="message" class="error"><p>';
-			echo __('We could not create a template folder in your active theme\'s directory. Please created a folder called <strong>\''. PDF_SAVE_FOLDER .'\'</strong> in '.get_stylesheet_directory().'/. Then copy the contents of '.PDF_PLUGIN_DIR.'templates/ to your newly-created PDF_EXTENDED_TEMPLATES folder, as well as styles/template.css. You should also make this directory writable.', 'pdfextended');
+			echo __('We could not create a template folder in your active theme\'s directory. Please ensure your active theme directory is writable by your web server and try again.', 'pdfextended');
 			echo '</p></div>';
 			
 	}
@@ -427,7 +427,7 @@ class GFPDF_InstallUpdater
 	public static function gf_pdf_deployment_unlink_error()
 	{
 			echo '<div id="message" class="error"><p>';
-			echo __('We could not remove the default template files from the Gravity Forms PDF Extended folder in your active theme\'s directory. Please manually remove all files starting with \'default-\' and the template.css file.', 'pdfextended');
+			echo __('We could not remove the default template files from the Gravity Forms PDF Extended folder in your active theme\'s directory. Please ensure '. PDF_SAVE_LOCATION.' is wriable by your web server and try again.', 'pdfextended');
 			echo '</p></div>';
 	
 	}		
@@ -438,7 +438,7 @@ class GFPDF_InstallUpdater
 	public static function gf_pdf_template_move_err()
 	{
 			echo '<div id="message" class="error"><p>';
-			echo __('We could not copy the contents of '.PDF_PLUGIN_DIR.'templates/ to your newly-created PDF_EXTENDED_TEMPLATES folder. Please manually copy the files to the aforementioned directory.', 'pdfextended');
+			echo __('We could not move the template files to the PDF_EXTENDED_TEMPLATES folder.  Please ensure '. PDF_SAVE_LOCATION.' is wriable by your web server and try again.', 'pdfextended');
 			echo '</p></div>';
 	
 	}
