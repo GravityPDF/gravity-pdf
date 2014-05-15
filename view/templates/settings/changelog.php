@@ -19,6 +19,14 @@
     <h2><?php _e('Changelog'); ?></h2>
     
     <p><strong>Current Version: <?php echo PDF_EXTENDED_VERSION; ?></strong></p>
+    
+    <ul>
+      <li>Housekeeping - Wrapped the View PDF and Download buttons in correct language functions - _e()</li>
+      <li>Bug - Fix problem displaying the signature field</li>
+      <li>Bug - Fix notice errors with new 'save' PDF hook</li>
+    </ul>
+
+    <h3>3.4.0.1</h3>
     <ul>
       <li>Housekeeping - Add commas on the last line of every config node in the configuration.php file</li>
       <li>Housekeeping - Fix up initialisation error messages</li>
