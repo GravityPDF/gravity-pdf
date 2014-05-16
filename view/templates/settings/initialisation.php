@@ -28,7 +28,7 @@
                             <strong><?php _e('Upgrading', 'pdfextended'); ?></strong>: <?php _e('Copies the latest default and example templates, as well as the template.css file to the PDF_EXTENDED_TEMPLATE folder.', 'pdfextended'); ?> <strong><?php _e('If you modified these files please back them up before re-initialising as they will be removed', 'pdfextneded'); ?></strong>.
                         </li>
                         <li><?php _e('Unzips the mPDF package', 'pdfextended'); ?></li>
-                        <li><?php _e('Installs any fonts found in the PDF_EXTENDED_TEMPLATE/fonts/ folder', 'pdfexnteded'); ?></li>                
+                        <li><?php _e('Installs any fonts found in the PDF_EXTENDED_TEMPLATES/fonts/ folder', 'pdfextended'); ?></li>                
                    </ol>		  	
             <?php endif; ?>
 			<form method="post">
