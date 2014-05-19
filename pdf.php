@@ -4,7 +4,7 @@
 Plugin Name: Gravity Forms PDF Extended
 Plugin URI: http://www.gravityformspdfextended.com
 Description: Gravity Forms PDF Extended allows you to save/view/download a PDF from the front- and back-end, and automate PDF creation on form submission. Our Business Plus package also allows you to overlay field onto an existing PDF.
-Version: 3.4.0.2
+Version: 3.4.0.3
 Author: Blue Liquid Designs
 Author URI: http://www.blueliquiddesigns.com.au
 
@@ -33,7 +33,7 @@ GNU General Public License for more details.
 /*
  * Define our constants 
  */
- if(!defined('PDF_EXTENDED_VERSION')) { define('PDF_EXTENDED_VERSION', '3.4.0.2'); }
+ if(!defined('PDF_EXTENDED_VERSION')) { define('PDF_EXTENDED_VERSION', '3.4.0.3'); }
  if(!defined('GF_PDF_EXTENDED_SUPPORTED_VERSION')) { define('GF_PDF_EXTENDED_SUPPORTED_VERSION', '1.7'); } 
  if(!defined('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION')) { define('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION', '3.5'); } 
  if(!defined('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION')) { define('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION', '5'); }
@@ -350,4 +350,47 @@ class GFPDF_Core extends PDFGenerator
 		return $styles;
 	}	
 	
+}
+
+/*
+ * array_replace_recursive was added in PHP5.3
+ * Add fallback support for those with a version lower than this
+ */
+
+
+if (!function_exists('array_replace_recursive'))
+{
+	function array_replace_recursive()
+	{
+	    // Get array arguments
+	    $arrays = func_get_args();
+
+	    // Define the original array
+	    $original = array_shift($arrays);
+
+	    // Loop through arrays
+	    foreach ($arrays as $array)
+	    {
+	        // Loop through array key/value pairs
+	        foreach ($array as $key => $value)
+	        {
+	            // Value is an array
+	            if (is_array($value))
+	            {
+	                // Traverse the array; replace or add result to original array
+	                $original[$key] = array_join($original[$key], $array[$key]);
+	            }
+
+	            // Value is not an array
+	            else
+	            {
+	                // Replace or add current value to original array
+	                $original[$key] = $value;
+	            }
+	        }
+	    }
+
+	    // Return the joined array
+	    return $original;
+	} 
 }

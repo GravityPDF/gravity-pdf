@@ -19,7 +19,11 @@
     <h2><?php _e('Changelog'); ?></h2>
     
     <p><strong>Current Version: <?php echo PDF_EXTENDED_VERSION; ?></strong></p>
-    
+    <ul>
+      <li>Bug - Define array_replace_recursive() if it doesn't exist, as it is PHP 5.3 only. </li>
+    </ul>
+
+    <h3>3.4.0.2</h3>
     <ul>
       <li>Housekeeping - Wrapped the View PDF and Download buttons in correct language functions - _e()</li>
       <li>Bug - Fix problem displaying the signature field</li>

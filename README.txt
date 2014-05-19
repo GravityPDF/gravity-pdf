@@ -4,7 +4,7 @@ Donate link: http://www.gravityformspdfextended.com
 Tags: gravity, forms, pdf, automation, attachment
 Requires at least: 3.5
 Tested up to: 3.9
-Stable tag: 3.4.0.2
+Stable tag: 3.4.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -77,6 +77,9 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 2. View or download the PDF from a Gravity Forms entry.
 
 == Changelog ==
+
+= 3.4.0.3 =
+* Bug - Define array_replace_recursive() if it doesn't exist, as it is PHP 5.3 only. 
 
 = 3.4.0.2 =
 * Housekeeping - Wrapped the View PDF and Download buttons in correct language functions - _e()
