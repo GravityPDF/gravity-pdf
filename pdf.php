@@ -358,9 +358,9 @@ class GFPDF_Core extends PDFGenerator
  */
 
 
-if (!function_exists('array_replace_recursive'))
+if (!function_exists('array_replace_recursive1'))
 {
-	function array_replace_recursive()
+	function array_replace_recursive1()
 	{
 	    // Get array arguments
 	    $arrays = func_get_args();
@@ -378,7 +378,7 @@ if (!function_exists('array_replace_recursive'))
 	            if (is_array($value))
 	            {
 	                // Traverse the array; replace or add result to original array
-	                $original[$key] = array_join($original[$key], $array[$key]);
+	                $original[$key] = array_replace_recursive1($original[$key], $array[$key]);
 	            }
 
 	            // Value is not an array

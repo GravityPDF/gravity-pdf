@@ -90,7 +90,7 @@
 		 */
 		if(is_array($gf_pdf_default_configuration) && sizeof($gf_pdf_default_configuration) > 0)
 		{
-			$config = array_replace_recursive($gf_pdf_default_configuration, $config);
+			$config = array_replace_recursive1($gf_pdf_default_configuration, $config);
 		}
 
 		return $config;		
