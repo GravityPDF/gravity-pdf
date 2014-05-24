@@ -19,6 +19,12 @@
     <h2><?php _e('Changelog'); ?></h2>
     
     <p><strong>Current Version: <?php echo PDF_EXTENDED_VERSION; ?></strong></p>
+
+    <ul>
+      <li>Bug - Fix typo that effected sites running PHP5.2 or below.</li>
+    </ul>
+
+    <h3>3.4.0.3</h3>
     <ul>
       <li>Bug - Define array_replace_recursive() if it doesn't exist, as it is PHP 5.3 only. </li>
     </ul>
