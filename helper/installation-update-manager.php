@@ -13,7 +13,38 @@
  
 class GFPDF_InstallUpdater
 {
+
+	/*
+	 * Will control if the error notices need to reflect an automated install, or a static 'initialise' install
+	 */
+	private static $automated = false;
 	
+	/*
+	 * Check if we can automatically deploy the software 
+	 * We use WP Filesystem API to initialise. 
+	 * Check if we have direct write control to the filesystem. If so, automatically deploy 
+	 * without asking the user. This will make upgrades much simplier.	 
+	 */
+	public static function maybe_deploy()
+	{
+		$access_type = get_filesystem_method();
+
+		/*
+		 * Check if we have a 'direct' method, that the software isn't fully installed and we aren't trying to manually initialise
+		 */
+		if($access_type === 'direct' && GFPDF_Core_Model::is_fully_installed() === false && !rgpost('upgrade'))
+		{
+			self::$automated = true;
+			self::pdf_extended_activate();
+		}
+	}
+
+	private static function get_base_dir($path)
+	{
+		global $wp_filesystem;
+		return str_replace(ABSPATH, $wp_filesystem->abspath(), $path);
+	}
+
 	/**
 	 * Install everything required
 	 */
@@ -24,8 +55,10 @@ class GFPDF_InstallUpdater
 		 */
 		if(PDF_Common::initialise_WP_filesystem_API(array('gfpdf_deploy'), 'pdf-extended-filesystem') === false)
 		{
-			return false;	
+			return 'false';	
 		}	
+
+		$notice_type = (PDF_Common::is_settings()) ? 'gfpdfe_notices' : 'admin_notices';
 		
 		/*
 		 * If we got here we should have $wp_filesystem available
@@ -33,38 +66,18 @@ class GFPDF_InstallUpdater
 		global $wp_filesystem, $gfpdfe_data;	
 		
 		/*
-		 * We need to set up some filesystem compatibility checkes to work with the different server file management types
-		 * Most notably is the FTP options, but SSH may be effected too
+		 * Set the correct paths 
+		 * FTP and SSH could be rooted to the wordpress base directory 
+		 * use $wp_filesystem->abspath(); function to fix any issues
 		 */
-		$directory               = PDF_PLUGIN_DIR;
-		$template_directory      = PDF_TEMPLATE_LOCATION;
-		$template_save_directory = PDF_SAVE_LOCATION;
-		$template_font_directory = PDF_FONT_LOCATION;
-		
-		
-		/*
-		 * If using FTP we need to make modifications to the file paths
-		 * Unlike the direct method, the root of the FTP directory isn't the ABSPATH
-		 * Usually FTP is restricted to the public_html directory, or just above it.
-		 */
-		if($wp_filesystem->method === 'ftpext' || $wp_filesystem->method === 'ftpsockets' || $wp_filesystem->method === 'ssh2')
-		{
-			/*
-			 * Get the base directory
-			 */ 			 
-			 $base_directory = self::get_base_directory();
-			 
-			 $directory = str_replace(ABSPATH, $base_directory, $directory);
-			 $template_directory = str_replace(ABSPATH, $base_directory, $template_directory);			 		
-			 $template_save_directory = str_replace(ABSPATH, $base_directory, $template_save_directory);			 		
-			 $template_font_directory = str_replace(ABSPATH, $base_directory, $template_font_directory);			 					 
-
-		}
+		$directory               = self::get_base_dir(PDF_PLUGIN_DIR);
+		$template_directory      = self::get_base_dir(PDF_TEMPLATE_LOCATION);
+		$template_save_directory = self::get_base_dir(PDF_SAVE_LOCATION);
+		$template_font_directory = self::get_base_dir(PDF_FONT_LOCATION);		
 
 		/**
 		 * If PDF_TEMPLATE_LOCATION already exists then we will remove the old template files so we can redeploy the new ones
 		 */
-
 		 if($wp_filesystem->exists($template_directory) && PDF_DEPLOY === true)
 		 {
 			 /*
@@ -98,14 +111,15 @@ class GFPDF_InstallUpdater
 		if($wp_filesystem->exists($directory . 'mPDF.zip'))
 		{
 			/*
-			 * The only function that requires the input to be the full path and the export to be the directory used in $wp_filesystem
+			 *	unzip_file() is only function in the file-manipulators that requires the absolute 'direct' path and 
+			 *	the 'save' directory to be relative to the method in the $wp_filesystem
 			 */
 			$results = unzip_file( PDF_PLUGIN_DIR . 'mPDF.zip', $directory );
 		
 			if($results !== true)
 			{						
-				add_action('gfpdfe_notices', array('GFPDF_InstallUpdater', 'gf_pdf_unzip_mpdf_err')); 	
-				return 'fail';				
+				add_action($notice_type, array('GFPDF_InstallUpdater', 'gf_pdf_unzip_mpdf_err')); 	
+				return false;				
 			}			
 
 			/*
@@ -119,8 +133,8 @@ class GFPDF_InstallUpdater
 		{
 			if($wp_filesystem->mkdir($template_directory) === false)
 			{
-				add_action('gfpdfe_notices', array('GFPDF_InstallUpdater', 'gf_pdf_template_dir_err')); 	
-				return 'fail';
+				add_action($notice_type, array('GFPDF_InstallUpdater', 'gf_pdf_template_dir_err')); 	
+				return false;
 			}
 		}
 	
@@ -129,8 +143,8 @@ class GFPDF_InstallUpdater
 			/* create new directory in active themes folder*/	
 			if($wp_filesystem->mkdir($template_save_directory) === false)
 			{
-				add_action('gfpdfe_notices', array('GFPDF_InstallUpdater', 'gf_pdf_template_dir_err')); 	
-				return 'fail';
+				add_action($notice_type, array('GFPDF_InstallUpdater', 'gf_pdf_template_dir_err')); 	
+				return false;
 			}
 		}
 		
@@ -139,8 +153,8 @@ class GFPDF_InstallUpdater
 			/* create new directory in active themes folder*/	
 			if($wp_filesystem->mkdir($template_font_directory) === false)
 			{
-				add_action('gfpdfe_notices', array('GFPDF_InstallUpdater', 'gf_pdf_template_dir_err')); 	
-				return 'fail';
+				add_action($notice_type, array('GFPDF_InstallUpdater', 'gf_pdf_template_dir_err')); 	
+				return false;
 			}
 		}	
 		
@@ -154,8 +168,8 @@ class GFPDF_InstallUpdater
 			/* copy template files to new directory */
 			if(!$wp_filesystem->copy($directory .'initialisation/configuration.php.example', $template_directory.'configuration.php'))
 			{ 
-				add_action('gfpdfe_notices', array('GFPDF_InstallUpdater', 'gf_pdf_template_dir_err')); 	
-				return 'fail';
+				add_action($notice_type, array('GFPDF_InstallUpdater', 'gf_pdf_template_dir_err')); 	
+				return false;
 			}
 		}
 		
@@ -163,14 +177,14 @@ class GFPDF_InstallUpdater
 		{		
 			if(!$wp_filesystem->put_contents($template_save_directory.'.htaccess', 'deny from all'))
 			{
-				add_action('gfpdfe_notices', array('GFPDF_InstallUpdater', 'gf_pdf_template_dir_err')); 	
-				return 'fail';
+				add_action($notice_type, array('GFPDF_InstallUpdater', 'gf_pdf_template_dir_err')); 	
+				return false;
 			}	
 		}	
 
 		if(self::install_fonts($directory, $template_directory, $template_font_directory) !== true)
 		{
-			return 'fail';
+			return false;
 		}				 
 		
 		/* 
@@ -198,33 +212,24 @@ class GFPDF_InstallUpdater
 		/*
 		 * If we got here we should have $wp_filesystem available
 		 */
-		global $wp_filesystem;			
+		global $wp_filesystem;
+
+		/*
+		 * Set out notice type 
+		 */
+		$notice_type = (PDF_Common::is_settings()) ? 'gfpdfe_notices' : 'admin_notices';			
 		
 		/*
 		 * We need to set up some filesystem compatibility checkes to work with the different server file management types
 		 * Most notably is the FTP options, but SSH may be effected too
 		 */
-		$directory = PDF_PLUGIN_DIR;
-		$template_directory = PDF_TEMPLATE_LOCATION;
-		$template_font_directory = PDF_FONT_LOCATION;
-		
-		
-		if($wp_filesystem->method === 'ftpext' || $wp_filesystem->method === 'ftpsockets' || $wp_filesystem->method === 'ssh2')
-		{
-			/*
-			 * Assume FTP is rooted to the Wordpress install
-			 */ 			 
-			 $base_directory = self::get_base_directory();
-			 
-			 $directory = str_replace(ABSPATH, $base_directory, $directory);
-			 $template_directory = str_replace(ABSPATH, $base_directory, $template_directory);			 				 		
-			 $template_font_directory = str_replace(ABSPATH, $base_directory, $template_font_directory);			 					 
-
-		}
+		$directory               = self::get_base_dir(PDF_PLUGIN_DIR);
+		$template_directory      = self::get_base_dir(PDF_TEMPLATE_LOCATION);
+		$template_font_directory = self::get_base_dir(PDF_FONT_LOCATION);
 		
 		if(self::install_fonts($directory, $template_directory, $template_font_directory) === true)
 		{
-			add_action('gfpdfe_notices', array('GFPDF_InstallUpdater', 'gf_pdf_font_install_success')); 
+			add_action($notice_type, array('GFPDF_InstallUpdater', 'gf_pdf_font_install_success')); 
 		}		
 		return true;
 	}
@@ -262,7 +267,7 @@ class GFPDF_InstallUpdater
 					 */
 					if($wp_filesystem->copy($file, $directory . 'mPDF/ttfonts/' . $path_parts['basename']) === false)
 					{ 
-						add_action('gfpdfe_notices', array('GFPDF_InstallUpdater', 'gf_pdf_font_err')); 	
+						add_action($notice_type, array('GFPDF_InstallUpdater', 'gf_pdf_font_err')); 	
 						return false;
 					}	
 				 }
@@ -283,7 +288,7 @@ class GFPDF_InstallUpdater
 		  $wp_filesystem->delete($template_directory.'fonts/config.php');
 		  if($wp_filesystem->put_contents($template_directory.'fonts/config.php', $write_to_file) === false)
 		  {
-			  	add_action('gfpdfe_notices', array('GFPDF_InstallUpdater', 'gf_pdf_font_config_err')); 	
+			  	add_action($notice_type, array('GFPDF_InstallUpdater', 'gf_pdf_font_config_err')); 	
 				return false;  
 		  }			
 		 
@@ -292,22 +297,31 @@ class GFPDF_InstallUpdater
 	
 	public static function gf_pdf_font_install_success()
 	{
+		$preface = (self::$automated === true) ? sprintf(__('%sGravity Forms PDF Extended Automated Installer%s: ', 'pdfextended'), '<strong>', '</strong>') : '';
+		$suffix = (self::$automated === true) ? sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>') : '';
+
 		echo '<div id="message" class="updated"><p>';
-		echo __('The font files have been successfully installed. A font can be used by adding its file name (without .ttf and in lower case) in a CSS font-family declaration.', 'pdfextended');
+		echo $preface . __('The font files have been successfully installed. A font can be used by adding its file name (without .ttf and in lower case) in a CSS font-family declaration.', 'pdfextended') . $suffix;
 		echo '</p></div>';
 	}	
 
 	public static function gf_pdf_font_err()
 	{
+		$preface = (self::$automated === true) ? sprintf(__('%sGravity Forms PDF Extended Automated Installer%s: ', 'pdfextended'), '<strong>', '</strong>') : '';
+		$suffix = (self::$automated === true) ? sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>') : '';
+
 		echo '<div id="message" class="error"><p>';
-		echo __('There was a problem installing the font files. Manually copy your fonts to the plugin\'s mPDF/ttfonts/ folder.', 'pdfextended');
+		echo $preface . __('There was a problem installing the font files. Check the file permissions in the plugin folder and try again.', 'pdfextended') . $suffix;
 		echo '</p></div>';
 	}	
 	
 	public static function gf_pdf_font_config_err()
 	{
+		$preface = (self::$automated === true) ? sprintf(__('%sGravity Forms PDF Extended Automated Installer%s: ', 'pdfextended'), '<strong>', '</strong>') : '';
+		$suffix = (self::$automated === true) ? sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>') : '';
+
 		echo '<div id="message" class="error"><p>';
-		echo __('Could not create font configuration file. Try initialise again.', 'pdfextended');
+		echo $preface . __('Could not create font configuration file. Try initialise again.', 'pdfextended') . $suffix;
 		echo '</p></div>';
 	}		
 	
@@ -408,16 +422,22 @@ class GFPDF_InstallUpdater
 	 */
 	public static function gf_pdf_template_dir_err()
 	{
+			$preface = (self::$automated === true) ? sprintf(__('%sGravity Forms PDF Extended Automated Installer%s: ', 'pdfextended'), '<strong>', '</strong>') : '';
+			$suffix = (self::$automated === true) ? sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>') : '';
+
 			echo '<div id="message" class="error"><p>';
-			echo __('We could not create a template folder in your active theme\'s directory. Please ensure your active theme directory is writable by your web server and try again.', 'pdfextended');
+			echo $preface . __('We could not create a template folder in your active theme\'s directory. Please ensure your active theme directory is writable by your web server and try again.', 'pdfextended')  . $suffix;
 			echo '</p></div>';
 			
 	}
 	
 	public static function gf_pdf_unzip_mpdf_err()
 	{
+			$preface = (self::$automated === true) ? sprintf(__('%sGravity Forms PDF Extended Automated Installer%s: ', 'pdfextended'), '<strong>', '</strong>') : '';
+			$suffix = (self::$automated === true) ? sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>') : '';
+
 			echo '<div id="message" class="error"><p>';
-			echo __('Could not unzip mPDF.zip (located in the plugin folder). Unzip the file manually, place the extracted mPDF folder in the plugin folder and run the initialisation again.', 'pdfextended');
+			echo $preface . __('Could not unzip mPDF.zip (located in the plugin folder). Try initialise the plugin again.', 'pdfextended')  . $suffix;
 			echo '</p></div>';		
 	}
 	
@@ -426,9 +446,11 @@ class GFPDF_InstallUpdater
 	 */
 	public static function gf_pdf_deployment_unlink_error()
 	{
+			$preface = (self::$automated === true) ? sprintf(__('%sGravity Forms PDF Extended Automated Installer%s: ', 'pdfextended'), '<strong>', '</strong>') : '';
+			$suffix = (self::$automated === true) ? sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>') : '';
+
 			echo '<div id="message" class="error"><p>';
-			echo __('We could not remove the default template files from the Gravity Forms PDF Extended folder in your active theme\'s directory. Please ensure '. PDF_SAVE_LOCATION.' is wriable by your web server and try again.', 'pdfextended');
-			echo '</p></div>';
+			echo preface . __('We could not remove the default template files from the Gravity Forms PDF Extended folder in your active theme\'s directory. Please ensure '. PDF_SAVE_LOCATION.' is wriable by your web server and try again.', 'pdfextended') . $suffix;			echo '</p></div>';
 	
 	}		
 	
@@ -437,8 +459,11 @@ class GFPDF_InstallUpdater
 	 */
 	public static function gf_pdf_template_move_err()
 	{
+			$preface = (self::$automated === true) ? sprintf(__('%sGravity Forms PDF Extended Automated Installer%s: ', 'pdfextended'), '<strong>', '</strong>') : '';
+			$suffix = (self::$automated === true) ? sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>') : '';
+
 			echo '<div id="message" class="error"><p>';
-			echo __('We could not move the template files to the PDF_EXTENDED_TEMPLATES folder.  Please ensure '. PDF_SAVE_LOCATION.' is wriable by your web server and try again.', 'pdfextended');
+			echo $preface . __('We could not move the template files to the PDF_EXTENDED_TEMPLATES folder.  Please ensure '. PDF_SAVE_LOCATION.' is wriable by your web server and try again.', 'pdfextended') . $suffix;
 			echo '</p></div>';
 	
 	}
@@ -613,88 +638,4 @@ class GFPDF_InstallUpdater
 			$wp_filesystem->copy( $source, $destination );
 		}	
 	}
-	
-	private static function check_access_path($directory, $file_path, $directory_list)
-	{
-		global $wp_filesystem;	
-
-			foreach($directory_list as $name => $data)
-			{
-				/*
-				 * Check if one of the file/folder names matches what is in $file_path, make sure it is a directory and 
-				 * the name has a value
-				 */
-
-				$match = array_search($name, $file_path);
-				
-				if((strlen($name) > 0) && ($match !== false) && ((int) $data['isdir'] === 1 || $data['type'] === 'd') )
-				{
-
-					/* 
-					 * We have a match but it could be fake
-					 * Look inside the target folder and see if the next folder in $file_path can be found
-					 * If it can we will assume it is the correct path
-					 */
-					 if(isset($file_path[$match+1]))
-					 {
-
-						$next_match = $file_path[$match+1];
-						$directory_list2 = $wp_filesystem->dirlist('/'.$name.'/');
-
-						if(isset($directory_list2[$next_match]) && ((int) $directory_list2[$next_match]['isdir'] === 1 || $directory_list2[$next_match]['type'] === 'd'))
-						{
-							 return self::merge_path($file_path, $match);				 
-						}
-						
-					 }
-					 else
-					 {
-							 return self::merge_path($file_path, $match);					 
-					 }
-				}
-			}	
-			
-			return $directory;	
-	}
-	
-	/*
-	 * Merge the path array back together from the matched key
-	 */	
-	private static function merge_path($file_path, $key)
-	{
-		return '/' .  implode('/', array_slice($file_path, $key)) . '/';
-	}
-	
-	/*
-	 * Get the base directory for the current filemanagement type
-	 * In this case it is FTP but may be SSH
-	 */
-	 private static function get_base_directory()
-	 {
-		global $wp_filesystem; 
-		
-		/*
-		 * Assume FTP is rooted to the Wordpress install
-		 */ 
-		 $directory = '/';
-		 
-		 /*
-		  * Test if the FTP is below the Wordpress base by sniffing the base directory 
-		  */
-		$directory_list = $wp_filesystem->dirlist('/');		
-		
-		/*
-		 * Use the ABSPATH to compare the directory structure
-		 */
-		$file_path = array_filter(explode('/', ABSPATH ));
-
-		/*
-		 * Rekey the array
-		 */
-		$file_path = array_values($file_path);	
-		
-		return self::check_access_path($directory, $file_path, $directory_list); 
-			 		
-	 }	
-
 }

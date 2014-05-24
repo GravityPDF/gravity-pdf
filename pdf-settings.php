@@ -47,7 +47,7 @@ class GFPDF_Settings
 		 * Check if we need to redeploy default PDF templates/styles to the theme folder 
 		 */
 		if( rgpost("gfpdf_deploy") && 
-		( wp_verify_nonce($_POST['gfpdf_deploy_nonce'],'gfpdf_deploy_nonce_action') || wp_verify_nonce($_GET['_wpnonce'],'pdf-extended-filesystem') ) ) 
+		( wp_verify_nonce(PDF_Common::post('gfpdf_deploy_nonce'),'gfpdf_deploy_nonce_action') || wp_verify_nonce(PDF_Common::get('_wpnonce'),'pdf-extended-filesystem') ) ) 
 		{		
 			/*
 			 * Check if the user wants to upgrade the system or only initialise the fonts
@@ -59,12 +59,12 @@ class GFPDF_Settings
 				 * If we get false returned Wordpress is trying to get 
 				 * access details to update files so don't display anything.
 				 */
-				if(self::deploy() === false)
+				if(self::deploy() === 'false')
 				{
 					return true;
 				}
 			}
-			elseif(rgpost('font-initialise'))
+			elseif(PDF_Common::post('font-initialise'))
 			{
 				/*
 				 * We only want to reinitialise the font files and configuration
@@ -85,7 +85,7 @@ class GFPDF_Settings
 			 /*
 			  * Check if we want to copy the theme files
 			  */
-			 if(wp_verify_nonce($_GET['_wpnonce'], 'gfpdfe_sync_now') )
+			 if(wp_verify_nonce(PDF_Common::get('_wpnonce'), 'gfpdfe_sync_now') )
 			 {
 				 $themes = get_option('gfpdfe_switch_theme');
 				 

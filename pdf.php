@@ -33,7 +33,7 @@ GNU General Public License for more details.
 /*
  * Define our constants 
  */
- if(!defined('PDF_EXTENDED_VERSION')) { define('PDF_EXTENDED_VERSION', '3.4.1'); }
+ if(!defined('PDF_EXTENDED_VERSION')) { define('PDF_EXTENDED_VERSION', '3.5.2'); }
  if(!defined('GF_PDF_EXTENDED_SUPPORTED_VERSION')) { define('GF_PDF_EXTENDED_SUPPORTED_VERSION', '1.7'); } 
  if(!defined('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION')) { define('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION', '3.5'); } 
  if(!defined('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION')) { define('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION', '5'); }
@@ -51,7 +51,7 @@ GNU General Public License for more details.
  /*
   * Do we need to deploy template files this edition? If yes set to true. 
   */
-  if(!defined('PDF_DEPLOY')) { define('PDF_DEPLOY', true); }
+  if(!defined('PDF_DEPLOY')) { define('PDF_DEPLOY', false); }
 
 /* 
  * Include the core helper files
@@ -129,10 +129,10 @@ class GFPDF_Core extends PDFGenerator
 		/*
 		 * Check if we need to deploy the software
 		 */
-		 if( is_admin() )
-		 {
-			self::check_deployment();
-		 }
+		 //if( is_admin() )
+		 //{
+		 //self::check_deployment();
+		 //}
 		
 		/*
 		 * Only load the plugin if the following requirements are met:
@@ -230,7 +230,14 @@ class GFPDF_Core extends PDFGenerator
 	 */
 	 public static function fully_loaded_admin()
 	 {
-		 
+		
+		/*
+		 * Check if we can automatically deploy the software. 
+		 * 90% of sites should be able to do this as they will have 'direct' write abilities 
+		 * to their server files.
+		 */
+		GFPDF_InstallUpdater::maybe_deploy();	
+
 		 /*
 		  * Check if the user has switched themes and they haven't yet prompt user to copy over directory structure
 		  * If the plugin has just initialised we won't check for a theme swap as initialisation will reset this value
@@ -246,6 +253,8 @@ class GFPDF_Core extends PDFGenerator
 	  */
 	  public static function check_deployment()
 	  {
+
+	  		
 			/* 
 			 * Check if database plugin version matches current plugin version and updates if needed
 			 */
@@ -309,7 +318,8 @@ class GFPDF_Core extends PDFGenerator
 	 */
 	function gfe_admin_init()
 	{					
-									
+			
+							
 		/* 
 		 * Configure the settings page
 		 */

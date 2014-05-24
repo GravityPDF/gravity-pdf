@@ -219,13 +219,41 @@ class PDF_Common
 		 * Check if the credentials are no good and display an error
 		 */
 		if ( ! WP_Filesystem($creds) ) {
-			request_filesystem_credentials($url, '', true, false, $post_credentials);
+			request_filesystem_credentials($url, '', true, false, $post);
 			return false;
 		}		
 		
 		return true;
 				
 	}
+
+	/*
+	 * Check if we are on the PDF settings page 
+	 */
+	public static function is_settings()
+	{
+		if(isset($_GET['page']) && isset($_GET['subview']) && $_GET['page'] === 'gf_settings' && strtolower($_GET['subview']) === 'pdf')
+		{
+			return true;
+		}
+		return false;
+	}
+
+	public static function post($name)
+	{
+		if(isset($_POST[$name]))	
+			return $_POST[$name];
+
+		return '';
+	}
 	
+
+	public static function get($name)
+	{
+		if(isset($_GET[$name]))	
+			return $_GET[$name];
+
+		return '';
+	}	
 }
 
