@@ -89,7 +89,7 @@ class GFPDF_Settings
 			 {
 				 $themes = get_option('gfpdfe_switch_theme');
 				 
-				 if(isset($themes['old']) && isset($themes['new']) && GFPDF_InstallUpdater::do_theme_switch($themes['old'], $themes['new']) === false)
+				 if(isset($themes['old']) && isset($themes['new']) && GFPDF_InstallUpdater::do_theme_switch($themes['old'], $themes['new']) === 'false')
 				 {
 					return true; 
 				 }

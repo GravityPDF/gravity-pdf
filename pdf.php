@@ -33,7 +33,7 @@ GNU General Public License for more details.
 /*
  * Define our constants 
  */
- if(!defined('PDF_EXTENDED_VERSION')) { define('PDF_EXTENDED_VERSION', '3.5.2'); }
+ if(!defined('PDF_EXTENDED_VERSION')) { define('PDF_EXTENDED_VERSION', '3.5.1'); }
  if(!defined('GF_PDF_EXTENDED_SUPPORTED_VERSION')) { define('GF_PDF_EXTENDED_SUPPORTED_VERSION', '1.7'); } 
  if(!defined('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION')) { define('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION', '3.5'); } 
  if(!defined('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION')) { define('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION', '5'); }
@@ -123,16 +123,8 @@ class GFPDF_Core extends PDFGenerator
 		* Some functions are required to monitor changes in the admin area
 		* and ensure the plugin functions smoothly
 		*/
-		add_action('admin_init', array('GFPDF_Core', 'fully_loaded_admin'));	
+		add_action('admin_init', array('GFPDF_Core', 'fully_loaded_admin'), 9999);	
 		add_action('after_switch_theme', array('GFPDF_InstallUpdater', 'gf_pdf_on_switch_theme'), 10, 2);				 		 		
-		
-		/*
-		 * Check if we need to deploy the software
-		 */
-		 //if( is_admin() )
-		 //{
-		 //self::check_deployment();
-		 //}
 		
 		/*
 		 * Only load the plugin if the following requirements are met:
@@ -161,8 +153,8 @@ class GFPDF_Core extends PDFGenerator
 	
 	public function __construct()
 	{
-		global $gfpdfe_data;
-		
+		global $gfpdfe_data;	
+
 	    /* 
 		 * Include the core files
 		 */ 
@@ -173,20 +165,21 @@ class GFPDF_Core extends PDFGenerator
 		* Set up the PDF configuration and indexer
 		* Accessed through $this->configuration and $this->index.
 		*/
-		parent::__construct();
-			
+		parent::__construct();				
+
 		/*
-		* Add our installation/file handling hooks
+		* Run our scripts and add the settings page to the admin area 
 		*/				
-		add_action('admin_init',  array($this, 'gfe_admin_init'), 9);															
+		add_action('admin_init',  array($this, 'gfe_admin_init'), 9);																				
 				
 		/*
-		 * Ensure the system is fully insatlled		 
+		 * Ensure the system is fully installed		 
+		 * We run this after the 'settings' page has been set up (above)		 
 		 */
 		if(GFPDF_Core_Model::is_fully_installed() === false)
 		{
 			return; 
-		}		
+		}	
 		
 		/*
 		* Add our main hooks
@@ -232,11 +225,21 @@ class GFPDF_Core extends PDFGenerator
 	 {
 		
 		/*
+		 * Check if we have direct write access to the server 
+		 */
+		GFPDF_InstallUpdater::check_filesystem_api();
+
+		/*
 		 * Check if we can automatically deploy the software. 
 		 * 90% of sites should be able to do this as they will have 'direct' write abilities 
 		 * to their server files.
 		 */
 		GFPDF_InstallUpdater::maybe_deploy();	
+
+		/*
+		 * Check if we need to deploy the software
+		 */
+		 self::check_deployment();
 
 		 /*
 		  * Check if the user has switched themes and they haven't yet prompt user to copy over directory structure
@@ -254,7 +257,16 @@ class GFPDF_Core extends PDFGenerator
 	  public static function check_deployment()
 	  {
 
-	  		
+	  		/*
+	  		 * Check if client is using the automated installer 
+	  		 * If installer has issues or client cannot use auto installer (using FTP/SSH ect) then run the usual 
+	  		 * initialisation messages. 
+	  		 */
+	  		if(GFPDF_InstallUpdater::$automated === true && get_option('gfpdfe_automated_install') != 'installing')
+	  		{
+	  			return;
+	  		}
+
 			/* 
 			 * Check if database plugin version matches current plugin version and updates if needed
 			 */
@@ -314,12 +326,11 @@ class GFPDF_Core extends PDFGenerator
 	  }
 	
 	/**
-	 * Check to see if Gravity Forms is actually installed
+	 * Add our scripts and settings page to the admin area 
 	 */
 	function gfe_admin_init()
 	{					
-			
-							
+									
 		/* 
 		 * Configure the settings page
 		 */

@@ -17,7 +17,17 @@ class GFPDF_InstallUpdater
 	/*
 	 * Will control if the error notices need to reflect an automated install, or a static 'initialise' install
 	 */
-	private static $automated = false;
+	public static $automated = false;
+
+	public static function check_filesystem_api()
+	{
+		$access_type = get_filesystem_method();
+
+		if($access_type === 'direct')
+		{
+			self::$automated = true;
+		}		
+	}
 	
 	/*
 	 * Check if we can automatically deploy the software 
@@ -27,14 +37,12 @@ class GFPDF_InstallUpdater
 	 */
 	public static function maybe_deploy()
 	{
-		$access_type = get_filesystem_method();
-
 		/*
 		 * Check if we have a 'direct' method, that the software isn't fully installed and we aren't trying to manually initialise
 		 */
-		if($access_type === 'direct' && GFPDF_Core_Model::is_fully_installed() === false && !rgpost('upgrade'))
+		if(self::$automated === true && GFPDF_Core_Model::is_fully_installed() === false && !rgpost('upgrade') && get_option('gfpdfe_automated_install') != 'installing')
 		{
-			self::$automated = true;
+			update_option('gfpdfe_automated_install', 'installing');
 			self::pdf_extended_activate();
 		}
 	}
@@ -195,6 +203,7 @@ class GFPDF_InstallUpdater
 		update_option('gf_pdf_extended_deploy', 'yes');
 		update_option('gf_pdf_extended_version', PDF_EXTENDED_VERSION);
 		delete_option('gfpdfe_switch_theme');
+		delete_option('gfpdfe_automated_install');
 		
 		return true;	
 	}
@@ -297,8 +306,8 @@ class GFPDF_InstallUpdater
 	
 	public static function gf_pdf_font_install_success()
 	{
-		$preface = (self::$automated === true) ? sprintf(__('%sGravity Forms PDF Extended Automated Installer%s: ', 'pdfextended'), '<strong>', '</strong>') : '';
-		$suffix = (self::$automated === true) ? sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>') : '';
+		$preface = (self::$automated === true && !rgpost('upgrade') && !rgpost('font-initialise')) ? sprintf(__('%sGravity Forms PDF Extended Automated Installer%s: ', 'pdfextended'), '<strong>', '</strong>') : '';
+		$suffix = (self::$automated === true && !rgpost('upgrade') && !rgpost('font-initialise')) ? sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>') : '';
 
 		echo '<div id="message" class="updated"><p>';
 		echo $preface . __('The font files have been successfully installed. A font can be used by adding its file name (without .ttf and in lower case) in a CSS font-family declaration.', 'pdfextended') . $suffix;
@@ -307,8 +316,8 @@ class GFPDF_InstallUpdater
 
 	public static function gf_pdf_font_err()
 	{
-		$preface = (self::$automated === true) ? sprintf(__('%sGravity Forms PDF Extended Automated Installer%s: ', 'pdfextended'), '<strong>', '</strong>') : '';
-		$suffix = (self::$automated === true) ? sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>') : '';
+		$preface = (self::$automated === true && !rgpost('upgrade') && !rgpost('font-initialise')) ? sprintf(__('%sGravity Forms PDF Extended Automated Installer%s: ', 'pdfextended'), '<strong>', '</strong>') : '';
+		$suffix = (self::$automated === true && !rgpost('upgrade') && !rgpost('font-initialise')) ? sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>') : '';
 
 		echo '<div id="message" class="error"><p>';
 		echo $preface . __('There was a problem installing the font files. Check the file permissions in the plugin folder and try again.', 'pdfextended') . $suffix;
@@ -317,8 +326,8 @@ class GFPDF_InstallUpdater
 	
 	public static function gf_pdf_font_config_err()
 	{
-		$preface = (self::$automated === true) ? sprintf(__('%sGravity Forms PDF Extended Automated Installer%s: ', 'pdfextended'), '<strong>', '</strong>') : '';
-		$suffix = (self::$automated === true) ? sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>') : '';
+		$preface = (self::$automated === true && !rgpost('upgrade') && !rgpost('font-initialise')) ? sprintf(__('%sGravity Forms PDF Extended Automated Installer%s: ', 'pdfextended'), '<strong>', '</strong>') : '';
+		$suffix = (self::$automated === true && !rgpost('upgrade') && !rgpost('font-initialise')) ? sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>') : '';
 
 		echo '<div id="message" class="error"><p>';
 		echo $preface . __('Could not create font configuration file. Try initialise again.', 'pdfextended') . $suffix;
@@ -422,8 +431,8 @@ class GFPDF_InstallUpdater
 	 */
 	public static function gf_pdf_template_dir_err()
 	{
-			$preface = (self::$automated === true) ? sprintf(__('%sGravity Forms PDF Extended Automated Installer%s: ', 'pdfextended'), '<strong>', '</strong>') : '';
-			$suffix = (self::$automated === true) ? sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>') : '';
+			$preface = (self::$automated === true && !rgpost('upgrade')) ? sprintf(__('%sGravity Forms PDF Extended Automated Installer%s: ', 'pdfextended'), '<strong>', '</strong>') : '';
+			$suffix = (self::$automated === true && !rgpost('upgrade')) ? sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>') : '';
 
 			echo '<div id="message" class="error"><p>';
 			echo $preface . __('We could not create a template folder in your active theme\'s directory. Please ensure your active theme directory is writable by your web server and try again.', 'pdfextended')  . $suffix;
@@ -433,8 +442,8 @@ class GFPDF_InstallUpdater
 	
 	public static function gf_pdf_unzip_mpdf_err()
 	{
-			$preface = (self::$automated === true) ? sprintf(__('%sGravity Forms PDF Extended Automated Installer%s: ', 'pdfextended'), '<strong>', '</strong>') : '';
-			$suffix = (self::$automated === true) ? sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>') : '';
+			$preface = (self::$automated === true && !rgpost('upgrade')) ? sprintf(__('%sGravity Forms PDF Extended Automated Installer%s: ', 'pdfextended'), '<strong>', '</strong>') : '';
+			$suffix = (self::$automated === true && !rgpost('upgrade')) ? sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>') : '';
 
 			echo '<div id="message" class="error"><p>';
 			echo $preface . __('Could not unzip mPDF.zip (located in the plugin folder). Try initialise the plugin again.', 'pdfextended')  . $suffix;
@@ -446,8 +455,8 @@ class GFPDF_InstallUpdater
 	 */
 	public static function gf_pdf_deployment_unlink_error()
 	{
-			$preface = (self::$automated === true) ? sprintf(__('%sGravity Forms PDF Extended Automated Installer%s: ', 'pdfextended'), '<strong>', '</strong>') : '';
-			$suffix = (self::$automated === true) ? sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>') : '';
+			$preface = (self::$automated === true && !rgpost('upgrade')) ? sprintf(__('%sGravity Forms PDF Extended Automated Installer%s: ', 'pdfextended'), '<strong>', '</strong>') : '';
+			$suffix = (self::$automated === true && !rgpost('upgrade')) ? sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>') : '';
 
 			echo '<div id="message" class="error"><p>';
 			echo preface . __('We could not remove the default template files from the Gravity Forms PDF Extended folder in your active theme\'s directory. Please ensure '. PDF_SAVE_LOCATION.' is wriable by your web server and try again.', 'pdfextended') . $suffix;			echo '</p></div>';
@@ -459,8 +468,8 @@ class GFPDF_InstallUpdater
 	 */
 	public static function gf_pdf_template_move_err()
 	{
-			$preface = (self::$automated === true) ? sprintf(__('%sGravity Forms PDF Extended Automated Installer%s: ', 'pdfextended'), '<strong>', '</strong>') : '';
-			$suffix = (self::$automated === true) ? sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>') : '';
+			$preface = (self::$automated === true && !rgpost('upgrade')) ? sprintf(__('%sGravity Forms PDF Extended Automated Installer%s: ', 'pdfextended'), '<strong>', '</strong>') : '';
+			$suffix = (self::$automated === true && !rgpost('upgrade')) ? sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>') : '';
 
 			echo '<div id="message" class="error"><p>';
 			echo $preface . __('We could not move the template files to the PDF_EXTENDED_TEMPLATES folder.  Please ensure '. PDF_SAVE_LOCATION.' is wriable by your web server and try again.', 'pdfextended') . $suffix;
@@ -485,9 +494,24 @@ class GFPDF_InstallUpdater
 			  * Add the save folder name to the end of the paths
 			  */ 
 			 $old_pdf_path = $previous_theme_directory . '/' . PDF_SAVE_FOLDER;
-			 $new_pdf_path = $current_theme_directory . '/' . PDF_SAVE_FOLDER;
+			 $new_pdf_path = $current_theme_directory . '/' . PDF_SAVE_FOLDER;		 
 		 	
 			 update_option('gfpdfe_switch_theme', array('old' => $old_pdf_path, 'new' => $new_pdf_path));
+
+			 /* add action to check if we can auto sync */
+			 /* filesystem API isn't avaliable during this action (too early) */
+			 add_action('admin_init', array('GFPDF_InstallUpdater', 'maybe_autosync'));
+	}
+
+	public static function maybe_autosync()
+	{
+		self::check_filesystem_api();
+
+		if(self::$automated === true)
+		{	
+			$theme_switch = get_option('gfpdfe_switch_theme');
+			self::do_theme_switch($theme_switch['old'], $theme_switch['new']);
+		}		
 	}
 	
 	/*
@@ -497,13 +521,13 @@ class GFPDF_InstallUpdater
 	public static function check_theme_switch()
 	{
 		$theme_switch = get_option('gfpdfe_switch_theme');
-		
+
 		if(isset($theme_switch['old']) && isset($theme_switch['new']))
 		{
 			/*
 			 * Add admin notification hook to move the files
 			 */	
-			 add_action('admin_notices', array("GFPDF_InstallUpdater", "do_theme_switch_notice")); 	
+			 add_action('admin_notices', array('GFPDF_InstallUpdater', 'do_theme_switch_notice')); 	
 			 return true;
 		}
 		return false;		
@@ -523,15 +547,16 @@ class GFPDF_InstallUpdater
 		 }
 		 
 			echo '<div id="message" class="error"><p>';
-			echo sprintf(__('Gravity Forms PDF Extended needs to keep your configuration and template folder in sync with your current active theme. %sSync Now%s', 'pdfextended'), '<a href="'. wp_nonce_url(PDF_SETTINGS_URL, 'gfpdfe_sync_now') . '" class="button">', '</a>');
+			echo sprintf(__('Gravity Forms PDF Extended needs to keep your configuration and templates folder in sync with your current active theme. %sSync Now%s', 'pdfextended'), '<a href="'. wp_nonce_url(PDF_SETTINGS_URL, 'gfpdfe_sync_now') . '" class="button">', '</a>');
 			echo '</p></div>';		
 		 
 	}
 	
 	public static function gf_pdf_theme_sync_success()
 	{
+			$preface = (self::$automated === true && !rgpost('upgrade')) ? sprintf(__('%sGravity Forms PDF Extended Automated Theme Sync%s: ', 'pdfextended'), '<strong>', '</strong>') : '';		
 			echo '<div id="message" class="updated"><p>';
-			echo __('Your configuration and template folder was successfully synced.', 'pdfextended');
+			echo $preface . __('Your PDF configuration and template folder was successfully synced to your new theme.', 'pdfextended');
 			echo '</p></div>';			
 	}
 	
@@ -546,59 +571,50 @@ class GFPDF_InstallUpdater
 		 * It only allows post data to be added so we have to manually assign them
 		 */
 		$_POST['previous_pdf_path'] = $previous_pdf_path;
-		$_POST['current_pdf_path'] = $current_pdf_path;
+		$_POST['current_pdf_path']  = $current_pdf_path;
 		
 	    /*
 		 * Initialise the Wordpress Filesystem API
 		 */
 		if(PDF_Common::initialise_WP_filesystem_API(array('previous_pdf_path', 'current_pdf_path'), 'gfpdfe_sync_now') === false)
 		{
-			return false;	
+			return 'false';	
 		}				
 		
 		/*
 		 * If we got here we should have $wp_filesystem available
 		 */
 		global $wp_filesystem;	
-		
-		/*
-		 * We need to set up some filesystem compatibility checkes to work with the different server file management types
-		 * Most notably is the FTP options, but SSH may be effected too
-		 */
-		
-		if($wp_filesystem->method === 'ftpext' || $wp_filesystem->method === 'ftpsockets' || $wp_filesystem->method === 'ssh2')
-		{
-			/*
-			 * Assume FTP is rooted to the Wordpress install
-			 */ 			 
-			 $base_directory = self::get_base_directory();
-			 
-			 $previous_pdf_path = str_replace(ABSPATH, $base_directory, $previous_pdf_path);
-			 $current_pdf_path = str_replace(ABSPATH, $base_directory, $current_pdf_path);			 			 					 
 
-		}						 
-		 
-		 if($wp_filesystem->is_dir($previous_pdf_path))
-		 {
-			 self::pdf_extended_copy_directory( $previous_pdf_path, $current_pdf_path, true, true );
-		 }		
-		 
+		$notice_type = (PDF_Common::is_settings()) ? 'gfpdfe_notices' : 'admin_notices';
+			 
 		/*
-		 * Remove the options key that triggers the switch theme function
-		 */ 
-		 delete_option('gfpdfe_switch_theme');
-		 add_action('gfpdfe_notices', array('GFPDF_InstallUpdater', 'gf_pdf_theme_sync_success')); 	
-		 
-		 /*
-		  * Show success message to user
-		  */
-		 return true;
+		 * Convert paths for SSH/FTP users who are rooted to a directory along the server absolute path 
+		 */	 
+		$previous_pdf_path = self::get_base_dir($previous_pdf_path);
+		$current_pdf_path  = self::get_base_dir($current_pdf_path);			 			 					 
+
+		if($wp_filesystem->is_dir($previous_pdf_path))
+		{
+			self::pdf_extended_copy_directory( $previous_pdf_path, $current_pdf_path, true, true );
+
+			/*
+			 * Remove the options key that triggers the switch theme function
+			 */ 
+			 delete_option('gfpdfe_switch_theme');
+			 add_action($notice_type, array('GFPDF_InstallUpdater', 'gf_pdf_theme_sync_success')); 	
+			 
+			 /*
+			  * Show success message to user
+			  */
+			 return true;			
+		}		
+		return false; 
 	}
 	
 	/*
 	 * Allows you to copy entire folder structures to new location
 	 */
-	
 	public static function pdf_extended_copy_directory( $source, $destination, $copy_base = true, $delete_destination = false ) 
 	{
 		global $wp_filesystem;		
