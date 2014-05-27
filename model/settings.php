@@ -291,7 +291,7 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 			if(file_exists($path . '.pdf_extended_temp'))
 			{
 				/* clean up */
-				unlink($path . '.pdf_extended_temp');
+				@unlink($path . '.pdf_extended_temp');
 				return true;	
 			}
 		}

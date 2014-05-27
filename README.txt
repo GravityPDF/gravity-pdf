@@ -78,6 +78,16 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 
 == Changelog ==
 
+= 3.5.0 =
+* Feature - Add auto-initialiser for sites that have direct write access to their server files
+* Feature - Add auto-PDF_EXTENDED_TEMPLATE theme syncer for sites that have direct write access to their server files
+* Housekeeping - Create responsive PDF settings page
+* Housekeeping - Minify CSS and Javascript files 
+* Housekeeping - Remove FontAwesome fonts from package and use Wordpress' build-in 'dashicons'
+* Housekeeping - Refine action and error messages 
+* Housekeeping - Update initialisation tab copy for both pre- and post- initialisation
+* Bug - When testing write permissions, file_exist() is throwing false positives for some users which would generate a warning when unlink() is called. Hide warning using '@'.
+
 = 3.4.1 =
 * Bug - Fix typo that effected sites running PHP5.2 or below. 
 

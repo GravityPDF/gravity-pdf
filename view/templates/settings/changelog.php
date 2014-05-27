@@ -20,6 +20,7 @@
     
     <p><strong>Current Version: <?php echo PDF_EXTENDED_VERSION; ?></strong></p>
 
+    <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
     <ul>
       <li>Bug - Fix typo that effected sites running PHP5.2 or below.</li>
     </ul>

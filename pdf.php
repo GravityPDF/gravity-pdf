@@ -4,7 +4,7 @@
 Plugin Name: Gravity Forms PDF Extended
 Plugin URI: http://www.gravityformspdfextended.com
 Description: Gravity Forms PDF Extended allows you to save/view/download a PDF from the front- and back-end, and automate PDF creation on form submission. Our Business Plus package also allows you to overlay field onto an existing PDF.
-Version: 3.4.1
+Version: 3.5.0
 Author: Blue Liquid Designs
 Author URI: http://www.blueliquiddesigns.com.au
 
@@ -33,7 +33,7 @@ GNU General Public License for more details.
 /*
  * Define our constants 
  */
- if(!defined('PDF_EXTENDED_VERSION')) { define('PDF_EXTENDED_VERSION', '3.5.1'); }
+ if(!defined('PDF_EXTENDED_VERSION')) { define('PDF_EXTENDED_VERSION', '3.5.0'); }
  if(!defined('GF_PDF_EXTENDED_SUPPORTED_VERSION')) { define('GF_PDF_EXTENDED_SUPPORTED_VERSION', '1.7'); } 
  if(!defined('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION')) { define('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION', '3.5'); } 
  if(!defined('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION')) { define('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION', '5'); }
@@ -199,7 +199,7 @@ class GFPDF_Core extends PDFGenerator
 		/* Check if on the entries page and output javascript */
 		if(is_admin() && rgget('page') == 'gf_entries')
 		{
-			wp_enqueue_script( 'gfpdfeentries', PDF_PLUGIN_URL . 'resources/javascript/entries-admin.js', array('jquery') );		
+			wp_enqueue_script( 'gfpdfeentries', PDF_PLUGIN_URL . 'resources/javascript/entries-admin.min.js', array('jquery') );		
 		}		
 		
 		/*
@@ -334,15 +334,8 @@ class GFPDF_Core extends PDFGenerator
 		/* 
 		 * Configure the settings page
 		 */
-		 
-		  wp_enqueue_style( 'pdfextended-admin-styles', PDF_PLUGIN_URL . 'resources/css/admin-styles.css' );		
-		  wp_enqueue_style( 'pdfextended-font-styles', PDF_PLUGIN_URL . 'resources/css/font-awesome.min.css' );	
-		  
-		  global $wp_styles;
-		  wp_enqueue_style( 'pdfextended-font-styles-ie', PDF_PLUGIN_URL . 'resources/css/font-awesome-ie7.min.css' );		
-		  $wp_styles->add_data( 'pdfextended-font-styles-ie', 'conditional', 'IE 7' ); 
-		  
-		  wp_enqueue_script( 'pdfextended-settings-script', PDF_PLUGIN_URL . 'resources/javascript/admin.js' );	
+		  wp_enqueue_style( 'pdfextended-admin-styles', PDF_PLUGIN_URL . 'resources/css/admin-styles.min.css', array('dashicons'), '1.1' );		
+		  wp_enqueue_script( 'pdfextended-settings-script', PDF_PLUGIN_URL . 'resources/javascript/admin.min.js' );	
 		 
 		 /*
 		  * Register our scripts/styles with Gravity Forms to prevent them being removed in no conflict mode
@@ -364,9 +357,7 @@ class GFPDF_Core extends PDFGenerator
 	
 	public static function register_gravityform_styles($styles)
 	{
-		$styles[] = 'pdfextended-admin-styles';
-		$styles[] = 'pdfextended-font-styles';
-		$styles[] = 'pdfextended-font-styles-ie';						
+		$styles[] = 'pdfextended-admin-styles';					
 		
 		return $styles;
 	}	

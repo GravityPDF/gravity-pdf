@@ -2,15 +2,6 @@
 margin-top: 20px;	
 }
 
-#pdfextended-settings .leftcolumn {
-	width: 65%;
-	float: left;
-}
-
-#pdfextended-settings .rightcolumn {
-	margin-left: 70%;
-}
-
 #pdfextended-settings ol, #pdfextended-settings ul {
 margin-left: 25px;	
 }
@@ -70,45 +61,11 @@ content: '';
 	font-weight: bold; 	
  }
 
-#pdf-system-status label, label.inline-label {
-float: left;
-width: 15em;	
-}
-
-#pdf-system-status strong {
- /*text-align: center;*/
- display: inline-block;
- float: left;	
-}
-
 #pdf-system-status span.details, #support-request span.details  {
 font-size: 95%;
 color: #444;	
 padding-top: 7px;
-width: 95%;
 display: block;
-}
-
-#support-request span.details.tabbed {
- margin-left: 16em;	
-}
-
-#pdf-system-status .icon-ok-sign, #pdf-system-status .icon-warning-sign, .icon-remove-sign {
- font-size: 14px;	
- margin-left: 5px;
-}
-
-.icon-ok-sign {
- color: #008000;
- font-size: 15px;
-}
-
-.icon-warning-sign {
- color: #ff8a00;
-}
-
-.icon-remove-sign {
- color: #d10b0b;	
 }
 
 #support-request input, #support-request select {
@@ -190,4 +147,124 @@ margin-top: 20px;
 div.notice p {
     margin: 0.5em 0;
     padding: 2px;
+}
+
+
+/*
+ * Icon Styles 
+ */
+[class^="icon-"]:before, [class*=" icon-"]:before {
+  display: inline-block;
+  text-decoration: inherit;
+  -webkit-font-smoothing: antialiased;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+    background-image: none;
+    background-position: 0 0;
+    background-repeat: repeat;
+    display: inline;
+    height: auto;
+    line-height: normal;
+    margin-top: 0;
+    vertical-align: baseline;
+    width: auto;
+    -webkit-font-smoothing: antialiased;
+}
+[class^="icon-"], [class*=" icon-"] {
+    font-family: "dashicons";
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+}
+
+.icon-ok-sign, .icon-remove-sign, .icon-warning-sign {
+  border-radius: 50%;
+  font-size: 13px;
+  margin-left: 5px;
+  color: #FFF;
+  
+}
+
+.icon-ok-sign {
+  background: #008000;
+}
+
+.icon-remove-sign {
+  background: #d10b0b;  
+}
+
+.icon-warning-sign {
+ background: #ff8a00;
+}
+
+.icon-ok-sign:before {
+ content: "\f147";
+ padding: 0 1px 0 0;
+}
+
+.icon-remove-sign:before {
+  content: "\f335";
+  padding: 0 1px 0 0;
+}
+
+.icon-warning-sign:before {
+  content: "\f107";
+}
+
+#pdf-system-status label, label.inline-label {
+  float: left;
+  width: 15em;  
+}
+
+#pdf-system-status strong {
+ display: inline-block;
+ float: left; 
+}  
+
+
+/* Add media queries */
+@media only screen and (min-width: 1000px) {
+  #pdfextended-settings .leftcolumn {
+    width: 65%;
+    float: left;
+  }
+
+  #pdfextended-settings .rightcolumn {
+    margin-left: 70%;
+  }
+
+  #pdf-system-status label, label.inline-label {
+    float: none;
+    width: auto;  
+  }
+
+  #pdf-system-status strong {   
+   display: inline;
+   float: none; 
+   vertical-align: middle;
+  }   
+
+  [class^="icon-"], [class*=" icon-"] {
+    vertical-align: middle;
+  }
+}
+
+
+@media only screen and (min-width: 1250px) {
+  #pdf-system-status label, label.inline-label {
+    float: left;
+    width: 15em;  
+  }
+
+  #pdf-system-status strong {
+   /*text-align: center;*/
+   display: inline-block;
+   float: left; 
+  }  
+
+  #support-request span.details.tabbed {
+   margin-left: 16em; 
+  }    
+
 }

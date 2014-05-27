@@ -43,7 +43,14 @@ class GFPDF_InstallUpdater
 		if(self::$automated === true && GFPDF_Core_Model::is_fully_installed() === false && !rgpost('upgrade') && get_option('gfpdfe_automated_install') != 'installing')
 		{
 			update_option('gfpdfe_automated_install', 'installing');
-			self::pdf_extended_activate();
+			if(self::pdf_extended_activate())
+			{
+				/*
+				 * Output successfull automated installation message 
+				 */
+				$notice_type = (PDF_Common::is_settings()) ? 'gfpdfe_notices' : 'admin_notices';
+				add_action($notice_type, array('GFPDF_InstallUpdater', 'gf_pdf_auto_deploy_success'));
+			}
 		}
 	}
 
@@ -557,6 +564,17 @@ class GFPDF_InstallUpdater
 			$preface = (self::$automated === true && !rgpost('upgrade')) ? sprintf(__('%sGravity Forms PDF Extended Automated Theme Sync%s: ', 'pdfextended'), '<strong>', '</strong>') : '';		
 			echo '<div id="message" class="updated"><p>';
 			echo $preface . __('Your PDF configuration and template folder was successfully synced to your new theme.', 'pdfextended');
+			echo '</p></div>';			
+	}
+
+	public static function gf_pdf_auto_deploy_success()
+	{		$msg = __('Gravity Forms PDF Extended Auto Initialisation Complete.', 'pdfextended');
+			if(get_option('gf_pdf_extended_installed') != 'installed')
+			{
+				$msg .= ' ' . sprintf( __('%sLearn how to configuring the plugin%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>');
+			}
+			echo '<div id="message" class="updated"><p>';
+			echo $msg;
 			echo '</p></div>';			
 	}
 	
