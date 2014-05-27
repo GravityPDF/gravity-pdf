@@ -181,7 +181,7 @@ class PDF_Common
 	
 	public static function display_documentation_details()
 	{
-		 $message = sprintf(__("Please review the %sGravity Forms PDF Extended documentation%s for comprehensive installation instructions. %sUpgraded from v2.x.x? Review our migration guide%s.%s", 'pdfextended'), "<a href='http://gravityformspdfextended.com/documentation-v3-x-x/installation-and-configuration/'>", "</a>", '<a style="color: red;" href="http://gravityformspdfextended.com/documentation-v3-x-x/v3-0-0-migration-guide/">', '</a>', '</span>'); 
+		 $message = sprintf(__("Please review the %sGravity Forms PDF Extended documentation%s for comprehensive installation instructions.%s", 'pdfextended'), "<a href='http://gravityformspdfextended.com/documentation-v3-x-x/installation-and-configuration/'>", "</a>", '</span>'); 
 		 PDF_Common::display_plugin_message($message);						
 	}	
 	

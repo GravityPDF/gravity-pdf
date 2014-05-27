@@ -27,4 +27,4 @@
     	<li><a href="http://gravityformspdfextended.com/faq/how-large-a-pdf-are-you-able-to-createprocess/"><?php _e('How large a PDF are you able to create/process?', 'pdfextended'); ?></a></li>                                        
     </ul>
     
-    <p><?php printf( __('Got a question that isn\'t answered above? %1$sHead to our support forum%2$s and let us know.', 'pdfextended'), '<a href="http://gravityformspdfextended.com/support/gravity-forms-pdf-extended/">', '</a>' ); ?></p>
+    <p><?php echo sprintf( __('Got a question that isn\'t answered above? %sHead to our support forum%s and let us know.', 'pdfextended'), '<a href="http://gravityformspdfextended.com/support/gravity-forms-pdf-extended/">', '</a>' ); ?></p>

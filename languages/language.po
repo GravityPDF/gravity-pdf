@@ -1,0 +1,855 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Gravity Forms PDF Extended\n"
+"POT-Creation-Date: 2014-05-27 17:59+1000\n"
+"PO-Revision-Date: 2014-05-27 18:14+1000\n"
+"Last-Translator: Blue Liquid Designs <enquire@blueliquiddesigns.com.au>\n"
+"Language-Team:  <enquire@blueliquiddesigns.com.au>\n"
+"Language: English\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.7\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-Basepath: /\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-SearchPath-0: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12) FTP/"
+"domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/"
+"wp-content/plugins/gravity-forms-pdf-extended\n"
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/api.php:123
+msgid "Bad Request."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/api.php:131
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/api.php:238
+msgid "Unauthorized Access."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/api.php:153
+msgid "Method not allowed."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/api.php:161
+msgid "Internal API Error."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/api.php:169
+msgid "API Unavailable."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:316
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:326
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:336
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:441
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:452
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:465
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:479
+#, php-format
+msgid "%sGravity Forms PDF Extended Automated Installer%s: "
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:317
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:327
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:337
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:442
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:453
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:466
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:480
+#, php-format
+msgid " %sGo to installer%s."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:320
+msgid ""
+"The font files have been successfully installed. A font can be used by "
+"adding its file name (without .ttf and in lower case) in a CSS font-family "
+"declaration."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:330
+msgid ""
+"There was a problem installing the font files. Check the file permissions in "
+"the plugin folder and try again."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:340
+msgid "Could not create font configuration file. Try initialise again."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:351
+#, php-format
+msgid ""
+"You need to install/update %sGravity Forms%s to use the Gravity Forms PDF "
+"Extended Plugin."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:365
+msgid ""
+"You've updated Gravity Forms PDF Extended but are yet to re-initialise the "
+"plugin. Please use the \"Initialise Plugin\" button below to complete the "
+"upgrade."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:372
+#, php-format
+msgid ""
+"You've updated Gravity Forms PDF Extended but are yet to re-initialise the "
+"plugin. Please go to the %splugin's settings page%s to initialise."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:389
+msgid ""
+"Gravity Forms PDF Extended detected a configuration problem. Please re-"
+"initialise the plugin."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:396
+#, php-format
+msgid ""
+"Gravity Forms PDF Extended detected a configuration problem. Please go to "
+"the %splugin's settings page%s to re-initialise."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:412
+msgid ""
+"Welcome to Gravity Forms PDF Extended. Before you can use the plugin "
+"correctly you need to initilise it."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:419
+#, php-format
+msgid ""
+"Welcome to Gravity Forms PDF Extended. Before you can use the plugin "
+"correctly you need to initilise it. Please go to the %splugin's settings page"
+"%s to initialise."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:431
+#, php-format
+msgid ""
+"Gravity Forms PDF Extended only works with Gravity Forms version %s and "
+"higher. Please %supgrade your copy of Gravity Forms%s to use this plugin."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:445
+msgid ""
+"We could not create a template folder in your active theme's directory. "
+"Please ensure your active theme directory is writable by your web server and "
+"try again."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:456
+msgid ""
+"Could not unzip mPDF.zip (located in the plugin folder). Try initialise the "
+"plugin again."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:469
+#, php-format
+msgid ""
+"We could not remove the default template files from the Gravity Forms PDF "
+"Extended folder in your active theme's directory. Please ensure %s is "
+"wriable by your web server and try again."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:483
+#, php-format
+msgid ""
+"We could not move the template files to the PDF_EXTENDED_TEMPLATES folder.  "
+"Please ensure %s is wriable by your web server and try again."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:558
+#, php-format
+msgid ""
+"Gravity Forms PDF Extended needs to keep your configuration and templates "
+"folder in sync with your current active theme. %sSync Now%s"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:565
+#, php-format
+msgid "%sGravity Forms PDF Extended Automated Theme Sync%s: "
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:567
+msgid ""
+"Your PDF configuration and template folder was successfully synced to your "
+"new theme."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:572
+msgid "Gravity Forms PDF Extended Auto Initialisation Complete."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/installation-update-manager.php:575
+#, php-format
+msgid "%sLearn how to configuring the plugin%s."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/pdf-common.php:172
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:34
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:41
+msgid "Gravity Forms "
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/pdf-common.php:178
+msgid "Wordpress "
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/pdf-common.php:184
+#, php-format
+msgid ""
+"Please review the %sGravity Forms PDF Extended documentation%s for "
+"comprehensive installation instructions.%s"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/pdf-common.php:190
+msgid "PHP "
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/pdf-entry-detail.php:240
+msgid "Order"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/pdf-entry-detail.php:251
+msgid "Product"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/pdf-entry-detail.php:252
+msgid "Qty"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/pdf-entry-detail.php:253
+msgid "Unit Price"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/pdf-entry-detail.php:254
+msgid "Price"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/pdf-entry-detail.php:317
+msgid "Total"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/pdf-entry-detail.php:927
+msgid ""
+"Activate Gravity Forms Quiz Add On to see global quiz statistics for this "
+"form"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/pdf-entry-detail.php:1340
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/pdf-entry-detail.php:1705
+msgid "Qty: "
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/pdf-entry-detail.php:1340
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/pdf-entry-detail.php:1705
+msgid "Price: "
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/pdf-entry-detail.php:1639
+msgid "Title"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/pdf-entry-detail.php:1640
+msgid "Caption"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/pdf-entry-detail.php:1641
+msgid "Description"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/pdf-entry-detail.php:1646
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/helper/pdf-entry-detail.php:1665
+msgid "Click to view"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/model/pdf.php:161
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/model/pdf.php:174
+msgid "View"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/model/pdf.php:162
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/model/pdf.php:175
+msgid "Download"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/model/pdf.php:174
+msgid "PDF"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/model/pdf.php:210
+msgid "View PDFs"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/model/pdf.php:241
+msgid "View PDF"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/model/settings.php:346
+msgid "Plugin not yet initialised"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/model/settings.php:401
+msgid ""
+"There was a problem with your submission. Please reload the page and try "
+"again"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/model/settings.php:418
+msgid "Please enter a valid email address"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/model/settings.php:421
+msgid "Problem"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/model/settings.php:421
+msgid "Question"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/model/settings.php:421
+msgid "Suggestion"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/model/settings.php:425
+msgid "Please select a valid support type."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/model/settings.php:430
+msgid ""
+"Please enter information about your support query so we can aid you more "
+"easily."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/model/settings.php:435
+msgid ""
+"There is a problem with your support request. Please correct the marked "
+"issues above."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/model/settings.php:445
+msgid ""
+"Thank you for your support request. We'll respond to your request in the "
+"next 24-48 hours."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/model/settings.php:503
+msgid "Support request received. We will responed in 24 to 48 hours."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/model/settings.php:517
+msgid "You've successfully initialised Gravity Forms PDF Extended."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/changelog.php:19
+msgid "Changelog"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation-tab.php:41
+msgid "Gravity Forms PDF Extended"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation-tab.php:42
+msgid ""
+"Your web server isn't compatible with Gravity Forms PDF Extended. Please see "
+"the problem areas below."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:19
+msgid "Welcome to Gravity Forms PDF Extended"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:19
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:79
+msgid "Initialise Plugin"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:23
+msgid ""
+"The plugin has successfully installed and is ready to start automating your "
+"documents."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:25
+msgid "What's next?"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:26
+msgid ""
+"The next step is to correctly configured the plugin so that you can generate "
+"PDF documents."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:27
+msgid ""
+"To help you get started, we've put together a five-part video series with "
+"the most common plugin configurations."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:29
+msgid "The Basics: Only Download PDF through the Admin Area"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:30
+msgid "The Email: Send Completed PDF via Email"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:31
+msgid ""
+"The Download: User Downloads PDF after Submitting Form (using a link or auto "
+"redirecting)"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:32
+msgid "The Email Advanced: Manually Review User Submission before Emailing PDF"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:33
+msgid "The Payment: Send PDF after Capturing Payment using Paypal Standard"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:36
+#, php-format
+msgid ""
+"If you know little about PHP we recommend starting with %sPart 1:The Basics"
+"%s and then watching the tutorial you’re interested in. It will give you the "
+"foundational skills you need to configure the software."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:38
+msgid "Custom Templates"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:39
+#, php-format
+msgid ""
+"Creating a custom template gives you ultimate control of the look and feel "
+"of your documents using only HTML and CSS. %sWe recommend you review our "
+"online documentation%s to create and customise your template files."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:41
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:63
+msgid "Note"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:41
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:63
+msgid ""
+"During some plugin updates we will update the default and example template "
+"files. If you plan to customise them you should make a copy."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:43
+msgid "Reinitialise or install a new font?"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:44
+#, php-format
+msgid ""
+"Did you switch themes and something went wrong syncing the template folder? "
+"Or want to %suse a custom font%s in your template? Try reinitialise the "
+"software, or just initialise the fonts."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:51
+msgid ""
+"To complete the installation, Gravity Forms PDF Extended needs to be "
+"initialised."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:53
+msgid "Initialisation does a number of important things, including:"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:56
+msgid "Unzips the mPDF package"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:58
+msgid "Install the template files"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:58
+msgid ""
+"We create a folder called PDF_EXTENDED_TEMPLATE in your active theme "
+"directory and move over all the templates and configuration files. This "
+"folder is where you'll look to configure the software and create your PDF "
+"templates."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:60
+msgid "Install fonts"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:60
+msgid ""
+"You can use custom fonts in your PDFs. During initialisation we install any "
+"fonts found in the PDF_EXTENDED_TEMPLATES/fonts/ folder"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:65
+msgid "Having trouble initialising?"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:65
+msgid "Follow these instructions to manually initialise the plugin"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/initialisation.php:79
+msgid "Re-Initialise Plugin"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/support-form.php:26
+msgid ""
+"Gravity Forms PDF Extended's support hours are from 9:00am-5:00pm Monday to "
+"Friday, Sydney Australia time."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/support-form.php:29
+#, php-format
+msgid "The current time in Sydney Australia is %s."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/support-form.php:55
+msgid "Enter the email address you want us to contact you on."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/support-form.php:56
+msgid ""
+"Note: To ensure the best support possible, please use the above email to "
+"respond to all support communications."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/support-form.php:92
+msgid "Enter as much detail about the problem as you can."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/support-form.php:93
+msgid "Please enter as much detail about the problem as you can."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/support-form.php:94
+msgid "Note: Our support representatives can only communicate in English."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/support-form.php:97
+msgid "Request Support"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/support-sidebar.php:20
+msgid "Frequently Asked Questions"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/support-sidebar.php:22
+msgid "Can I exclude a field from showing up in the PDF?"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/support-sidebar.php:23
+msgid ""
+"I want to have multiple PDF template files generated on one form. How do I "
+"do it?"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/support-sidebar.php:24
+msgid "I want users to be able to download the PDF from the server."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/support-sidebar.php:25
+msgid "How do I change the PDF size or create a landscape PDF?"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/support-sidebar.php:26
+msgid ""
+"I am created a custom template. How do I know the names of my fields in the "
+"$form_data array?"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/support-sidebar.php:27
+msgid "How large a PDF are you able to create/process?"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/support-sidebar.php:30
+#, php-format
+msgid ""
+"Got a question that isn't answered above? %sHead to our support forum%s and "
+"let us know."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/support.php:20
+msgid "Support"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:19
+msgid "System Status"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:22
+msgid "Wordpress Version"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:25
+msgid "Wordpress Version "
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:30
+msgid "Gravity Forms"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:32
+msgid "Not Installed"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:47
+msgid "PHP Version"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:50
+msgid "PHP Version "
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:54
+msgid "MB String"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:54
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:62
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:80
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:87
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:96
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:103
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:110
+msgid "Yes"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:54
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:62
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:80
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:87
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:96
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:103
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:110
+msgid "No"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:58
+msgid ""
+"The PHP extension MB String and MB String Regex functions are required to "
+"use this plugin. Contact your web host to have it enabled."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:62
+msgid "GD Library"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:66
+msgid ""
+"The PHP extension GD Library is required to use this plugin. Contact your "
+"web host to have it enabled."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:70
+msgid "Available RAM"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:73
+#, php-format
+msgid ""
+"We recommend you have 128MB of available RAM to run this plugin. %sNote: If "
+"you chose to continue, you risk PHP suffering a fatal error which will stop "
+"your website from running."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:80
+msgid "Plugin Directory Writable?"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:83
+#, php-format
+msgid ""
+"The plugin folder is not writable by your web server. Check the directory "
+"\"%s\" is writable by your web server otherwise we will attempt to use the "
+"FTP installer to initialise."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:87
+msgid "Theme Directory Writable?"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:90
+#, php-format
+msgid ""
+"Your active theme folder is not writable by your web server. Check that \"%s"
+"\" is writable by your web server otherwise we will attempt to use the FTP "
+"installer to initialise."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:96
+msgid "PDF Output Directory Writable?"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:99
+#, php-format
+msgid ""
+"The plugin's output folder is not writable by your web server. PDFs will not "
+"be attached to notifications until this problem is fixed. Check that \"%s\" "
+"is writable by your web server."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:103
+msgid "PDF Font Directory Writable?"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:106
+#, php-format
+msgid ""
+"The plugin's font folder is not writable by your web server. Check that \"%s"
+"\" is writable by your web server otherwise we will attempt to use the FTP "
+"installer to initialise."
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:110
+msgid "mPDF Temporary Directory Writable?"
+msgstr ""
+
+#: G:/Blue Liquid Designs/4) BLUE LIQUID DESIGNS/12)
+#: FTP/domains/clients.blueliquiddesigns.com.au/public_html/gfpdf3/gf1_7/wordpress/wp-content/plugins/gravity-forms-pdf-extended/view/templates/settings/system-status.php:113
+msgid ""
+"mPDF temporary directory not writable (mPDF/tmp/). Memory and image "
+"processing time will increase."
+msgstr ""

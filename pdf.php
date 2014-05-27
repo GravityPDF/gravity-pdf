@@ -94,7 +94,7 @@ class GFPDF_Core extends PDFGenerator
 	   /*
 	    * Add localisation support
 	    */ 
-	    load_plugin_textdomain('pdfextended', false, PDF_PLUGIN_DIR . 'resources/languages' );
+	    load_plugin_textdomain(GF_PDF_EXTENDED_PLUGIN_BASENAME, false, PDF_PLUGIN_DIR . 'resources/languages/' );
 
 		/*
 		 * Call our Settings class which will do our compatibility processing

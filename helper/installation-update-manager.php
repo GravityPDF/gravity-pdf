@@ -428,7 +428,7 @@ class GFPDF_InstallUpdater
 	public static function gf_pdf_not_supported()
 	{
 			echo '<div id="message" class="error"><p>';
-			echo sprintf(__('Gravity Forms PDF Extended only works with Gravity Forms version '.GF_PDF_EXTENDED_SUPPORTED_VERSION.' and higher. Please %supgrade your copy of Gravity Forms%s to use this plugin.', 'pdfextended'), '<a href="https://www.e-junkie.com/ecom/gb.php?cl=54585&c=ib&aff=235154" target="ejejcsingle">', '</a>');
+			echo sprintf(__('Gravity Forms PDF Extended only works with Gravity Forms version %s and higher. Please %supgrade your copy of Gravity Forms%s to use this plugin.', 'pdfextended'), GF_PDF_EXTENDED_SUPPORTED_VERSION, '<a href="https://www.e-junkie.com/ecom/gb.php?cl=54585&c=ib&aff=235154" target="ejejcsingle">', '</a>');
 			echo '</p></div>';	
 	}
 								
@@ -466,7 +466,8 @@ class GFPDF_InstallUpdater
 			$suffix = (self::$automated === true && !rgpost('upgrade')) ? sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>') : '';
 
 			echo '<div id="message" class="error"><p>';
-			echo preface . __('We could not remove the default template files from the Gravity Forms PDF Extended folder in your active theme\'s directory. Please ensure '. PDF_SAVE_LOCATION.' is wriable by your web server and try again.', 'pdfextended') . $suffix;			echo '</p></div>';
+			echo $preface . sprintf(__('We could not remove the default template files from the Gravity Forms PDF Extended folder in your active theme\'s directory. Please ensure %s is wriable by your web server and try again.', 'pdfextended'), PDF_SAVE_LOCATION) . $suffix;			
+			echo '</p></div>';
 	
 	}		
 	
@@ -479,7 +480,7 @@ class GFPDF_InstallUpdater
 			$suffix = (self::$automated === true && !rgpost('upgrade')) ? sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>') : '';
 
 			echo '<div id="message" class="error"><p>';
-			echo $preface . __('We could not move the template files to the PDF_EXTENDED_TEMPLATES folder.  Please ensure '. PDF_SAVE_LOCATION.' is wriable by your web server and try again.', 'pdfextended') . $suffix;
+			echo $preface . sprintf(__('We could not move the template files to the PDF_EXTENDED_TEMPLATES folder.  Please ensure %s is wriable by your web server and try again.', 'pdfextended'), PDF_SAVE_LOCATION) . $suffix;
 			echo '</p></div>';
 	
 	}
