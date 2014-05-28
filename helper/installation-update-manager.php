@@ -42,16 +42,95 @@ class GFPDF_InstallUpdater
 		 */
 		if(self::$automated === true && GFPDF_Core_Model::is_fully_installed() === false && !rgpost('upgrade') && get_option('gfpdfe_automated_install') != 'installing')
 		{
-			update_option('gfpdfe_automated_install', 'installing');
-			if(self::pdf_extended_activate())
+			/*
+			 * Initialise all multisites if a super admin is logged in
+			 */
+			if(is_multisite() && is_super_admin())
 			{
-				/*
-				 * Output successfull automated installation message 
-				 */
-				$notice_type = (PDF_Common::is_settings()) ? 'gfpdfe_notices' : 'admin_notices';
-				add_action($notice_type, array('GFPDF_InstallUpdater', 'gf_pdf_auto_deploy_success'));
+				self::run_multisite_deployment();
+			}
+			else
+			{
+				if(self::do_deploy())
+				{
+					/*
+					 * Output successfull automated installation message 
+					 */
+					$notice_type = (PDF_Common::is_settings()) ? 'gfpdfe_notices' : 'admin_notices';
+					add_action($notice_type, array('GFPDF_InstallUpdater', 'gf_pdf_auto_deploy_success'));					
+				}
 			}
 		}
+	}
+
+	public static function run_multisite_deployment()
+	{
+		global $gfpdfe_data;
+
+		/* add additional check incase someone doesn't call this correctly */
+		if(!is_multisite())
+			return false;
+
+		/*
+		 * Don't do anything if over 10,000 sites 
+		 */
+		if(!wp_is_large_network())
+		{
+			/*
+			 * Get multisites which aren't deleted 
+			 */
+			$sites = wp_get_sites(array('deleted' => 0));
+
+			$success = true;
+			$problem = array();
+			foreach($sites as $site)
+			{
+				 switch_to_blog( (int) $site['blog_id'] );
+
+				 /*
+				  * Test if the blog has gravity forms and PDF Extended active
+				  * If so, we can initialise 
+				  */				 
+				 $gravityforms = 'gravityforms/gravityforms.php'; /* have to hardcode the folder name is they don't set it in a constant or variable */
+				 $pdfextended = GF_PDF_EXTENDED_PLUGIN_BASENAME; /* no need to hardcode the basename here */
+
+				 if( (is_plugin_active_for_network($gravityforms) && is_plugin_active_for_network($pdfextended)) ||
+				 	 (is_plugin_active($gravityforms) && is_plugin_active($pdfextended))
+				 	)
+				 {
+				 	/* run our deployment and output any problems */
+				 	if(!self::do_deploy())
+				 	{
+				 		$success = false;
+				 		$problem[] = $site;
+				 	}
+				 }
+				 restore_current_blog();
+			}
+
+			if(!$success)
+			{	
+					$gfpdfe_data->network_error = $problem;
+					$notice_type = (PDF_Common::is_settings()) ? 'gfpdfe_notices' : (is_network_admin()) ? 'network_admin_notices' : 'admin_notices';
+					add_action($notice_type, array('GFPDF_InstallUpdater', 'gf_pdf_auto_deploy_network_failure'));		
+			}
+			else
+			{
+					$notice_type = (PDF_Common::is_settings()) ? 'gfpdfe_notices' : (is_network_admin()) ? 'network_admin_notices' : 'admin_notices';
+					add_action($notice_type, array('GFPDF_InstallUpdater', 'gf_pdf_auto_deploy_success'));			
+			}
+
+		}
+	}
+
+	private static function do_deploy()
+	{
+		update_option('gfpdfe_automated_install', 'installing');
+		if(self::pdf_extended_activate())
+		{
+			return true;
+		}		
+		return false;
 	}
 
 	private static function get_base_dir($path)
@@ -569,7 +648,9 @@ class GFPDF_InstallUpdater
 	}
 
 	public static function gf_pdf_auto_deploy_success()
-	{		$msg = __('Gravity Forms PDF Extended Auto Initialisation Complete.', 'pdfextended');
+	{		
+			$multisite_msg = (is_multisite() && self::$automated === true && !rgpost('upgrade') && !rgpost('font-initialise')) ? __(' across entire network', 'pdfextended') : '';
+			$msg = sprintf(__('Gravity Forms PDF Extended Auto Initialisation Complete%s.', 'pdfextended'), $multisite_msg);
 			if(get_option('gf_pdf_extended_installed') != 'installed')
 			{
 				$msg .= ' ' . sprintf( __('%sLearn how to configuring the plugin%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>');
@@ -578,6 +659,38 @@ class GFPDF_InstallUpdater
 			echo $msg;
 			echo '</p></div>';			
 	}
+
+	public static function gf_pdf_auto_deploy_network_failure()
+	{		
+			global $gfpdfe_data;
+
+			$prefix = (self::$automated === true && !rgpost('upgrade') && !rgpost('font-initialise')) ? sprintf(__('%sGravity Forms PDF Extended Automated Installer%s: ', 'pdfextended'), '<strong>', '</strong>') : '';
+			$errors = (array) $gfpdfe_data->network_error;
+			echo '<div id="message" class="error"><p>';
+			if(sizeof($errors) > 0)
+			{
+				echo $prefix . __('There was a network initialisation issue on the following sites;', 'pdfextended');
+				echo '<ul>';
+
+				$base_site_url = site_url();
+				foreach($errors as $site)
+				{
+					switch_to_blog( (int) $site['blog_id'] );
+					$url = str_replace($base_site_url, site_url(), PDF_SETTINGS_URL );
+					echo "<li><a href='$url'>{$site['domain']}{$site['path']}</a></li>";
+					restore_current_blog();
+				}
+				echo '</ul>';
+
+				echo __('Please try manually initialise the software', 'pdfextended');
+			}
+			else
+			{
+				echo $prefix . __('An unknown network initialisation error occured. Please try initialise again.', 'pdfextended');
+			}
+
+			echo '</p></div>';				
+	}	
 	
 	/*
 	 * The after_switch_theme hook is too early in the initialisation to use request_filesystem_credentials()
