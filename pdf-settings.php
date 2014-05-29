@@ -125,7 +125,7 @@ class GFPDF_Settings
 			{
 				return $results;	
 			}
-			add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_deploy_success')); 				
+			add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_deploy_success')); 	
 		}		
 	}
 
