@@ -102,12 +102,27 @@ class GFPDF_Settings
 	 */
 	private function deploy()
 	{
-		$return = GFPDF_InstallUpdater::pdf_extended_activate();
-		if($return !== true)
+		global $gfpdfe_data;
+
+		/*
+		 * Initialise all multisites if a super admin is logged in
+		 */		
+		if(is_multisite() && is_super_admin())
 		{
-			return $return;	
+			GFPDF_InstallUpdater::run_multisite_deployment();
 		}
-		add_action('gfpdfe_notices', array('GFPDF_Settings_Model', 'gf_pdf_deploy_success')); 	
+		else
+		{
+			/*
+			 * Run the updater
+			 */
+			$results = GFPDF_InstallUpdater::pdf_extended_activate();
+			if($results === 'false')
+			{
+				return $results;	
+			}
+			add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_deploy_success')); 				
+		}		
 	}
 
 }

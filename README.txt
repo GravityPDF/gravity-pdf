@@ -80,7 +80,10 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 
 = 3.5.0 =
 * Feature - Add auto-initialiser for sites that have direct write access to their server files
+* Feature - Add auto-initialiser across entire multisite network for sites who have direct write access to their server files. 
 * Feature - Add auto-PDF_EXTENDED_TEMPLATE theme syncer for sites that have direct write access to their server files
+
+* Housekeeping - Refractor the admin notices code
 * Housekeeping - Create responsive PDF settings page
 * Housekeeping - Minify CSS and Javascript files 
 * Housekeeping - Remove FontAwesome fonts from package and use Wordpress' build-in 'dashicons'

@@ -287,11 +287,11 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 		 		 
 		if(is_writable($path))
 		{
-			file_put_contents($path . '.pdf_extended_temp', '');
-			if(file_exists($path . '.pdf_extended_temp'))
+			file_put_contents($path . 'pdf_extended_temp', '');
+			if(file_exists($path . 'pdf_extended_temp'))
 			{
 				/* clean up */
-				@unlink($path . '.pdf_extended_temp');
+				@unlink($path . 'pdf_extended_temp');
 				return true;	
 			}
 		}
@@ -510,11 +510,4 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 		  */
 		 exit;
 	}
-	
-	
-	public static function gf_pdf_deploy_success() {
-			echo '<div id="message" class="updated"><p>';
-			echo __('You\'ve successfully initialised Gravity Forms PDF Extended.', 'pdfextended');
-			echo '</p></div>';		
-	}	
 }

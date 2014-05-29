@@ -38,50 +38,28 @@ class GFPDF_Core_Model
    {
 	   	global $gfpdfe_data;
 		
+
 		if($gfpdfe_data->wp_is_compatible === false)
 		{
-		 	add_action('after_plugin_row_' . GF_PDF_EXTENDED_PLUGIN_BASENAME, array('GFPDF_Core_Model', 'add_wp_compatibility_error')); 
+		 	add_action('after_plugin_row_' . GF_PDF_EXTENDED_PLUGIN_BASENAME, array('GFPDF_Notices', 'display_wp_compatibility_error')); 
 		 	return false;  
-		}	   		
+		}	
+
+		if($gfpdfe_data->php_version_compatible === false)   		
+		{
+		 	add_action('after_plugin_row_' . GF_PDF_EXTENDED_PLUGIN_BASENAME, array('GFPDF_Notices', 'display_pdf_compatibility_error')); 
+		 	return false;  			
+		}
    
 		if($gfpdfe_data->gf_is_compatible === false)
 		{
-		 	add_action('after_plugin_row_' . GF_PDF_EXTENDED_PLUGIN_BASENAME, array('GFPDF_Core_Model', 'add_compatibility_error')); 
+		 	add_action('after_plugin_row_' . GF_PDF_EXTENDED_PLUGIN_BASENAME, array('GFPDF_Notices', 'display_compatibility_error')); 
 		 	return false;  
 		}					
 		
 		return true;
    }	
-   
-	
-	/*
-	 * Display compatibility error about Gravity Forms on the plugins page
-	 */
-	public static function add_compatibility_error()
-	{
-		 PDF_Common::display_compatibility_error();	 
-	}
-	
-	/*
-	 * Display compatibility error about Gravity Forms on the plugins page
-	 */
-	public static function add_wp_compatibility_error()
-	{
-		 PDF_Common::display_wp_compatibility_error();	 
-	}	
-	
-	/*
-	 * Display note about documentation
-	 */ 
-	public static function add_documentation_byline()
-	{
-		 PDF_Common::display_documentation_details();	 
-	}	
-	
-	public static function add_php_compatibility_error()
-	{
-		 PDF_Common::display_pdf_compatibility_error();	 		
-	}
+
 	
 	 /*
 	  * Check if the system is fully installed and return the correct values

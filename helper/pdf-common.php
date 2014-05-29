@@ -167,30 +167,6 @@ class PDF_Common
 		}
 	}
 	
-	public static function display_compatibility_error()
-	{
-		 $message = sprintf(__("Gravity Forms " . GF_PDF_EXTENDED_SUPPORTED_VERSION . " is required to use this plugin. Activate it now or %spurchase it today!%s", 'pdfextended'), "<a href='https://www.e-junkie.com/ecom/gb.php?cl=54585&c=ib&aff=235154'>", "</a>"); 
-		 PDF_Common::display_plugin_message($message, true);			
-	}
-	
-	public static function display_wp_compatibility_error()
-	{
-		 $message = __("Wordpress " . GF_PDF_EXTENDED_WP_SUPPORTED_VERSION . " or higher is required to use this plugin.", 'pdfextended'); 
-		 PDF_Common::display_plugin_message($message, true);			
-	}	
-	
-	public static function display_documentation_details()
-	{
-		 $message = sprintf(__("Please review the %sGravity Forms PDF Extended documentation%s for comprehensive installation instructions.%s", 'pdfextended'), "<a href='http://gravityformspdfextended.com/documentation-v3-x-x/installation-and-configuration/'>", "</a>", '</span>'); 
-		 PDF_Common::display_plugin_message($message);						
-	}	
-	
-	public static function display_pdf_compatibility_error()
-	{
-		 $message = __("PHP " . GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION . " or higher is required to use this plugin.", 'pdfextended'); 
-		 PDF_Common::display_plugin_message($message, true);			
-	}
-	
 	public static function display_plugin_message($message, $is_error = false){
 
         $style = $is_error ? 'style="background-color: #ffebe8;"' : "";

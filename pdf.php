@@ -33,7 +33,7 @@ GNU General Public License for more details.
 /*
  * Define our constants 
  */
- if(!defined('PDF_EXTENDED_VERSION')) { define('PDF_EXTENDED_VERSION', '3.5.0'); }
+ if(!defined('PDF_EXTENDED_VERSION')) { define('PDF_EXTENDED_VERSION', '3.5.2'); }
  if(!defined('GF_PDF_EXTENDED_SUPPORTED_VERSION')) { define('GF_PDF_EXTENDED_SUPPORTED_VERSION', '1.7'); } 
  if(!defined('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION')) { define('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION', '3.5'); } 
  if(!defined('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION')) { define('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION', '5'); }
@@ -58,6 +58,7 @@ GNU General Public License for more details.
  */
  include PDF_PLUGIN_DIR . 'helper/api.php';
  include PDF_PLUGIN_DIR . 'helper/data.php'; 
+ include PDF_PLUGIN_DIR . 'helper/notices.php'; 
  include PDF_PLUGIN_DIR . 'helper/pdf-configuration-indexer.php'; 	
  include PDF_PLUGIN_DIR . 'helper/installation-update-manager.php'; 				
  
@@ -223,7 +224,11 @@ class GFPDF_Core extends PDFGenerator
 	 */
 	 public static function fully_loaded_admin()
 	 {
-		
+
+		/*
+		 * Set the notice type 
+		 */
+		self::set_notice_type();
 		/*
 		 * Check if we have direct write access to the server 
 		 */
@@ -251,18 +256,36 @@ class GFPDF_Core extends PDFGenerator
 		  }
 	 }
 	 
+	 private static function set_notice_type()
+	 {
+	 	global $gfpdfe_data;
+
+	 	if(PDF_Common::is_settings())
+	 	{
+	 		$gfpdfe_data->notice_type = 'gfpdfe_notices';
+	 	}
+	 	else if (is_multisite() && is_network_admin())
+	 	{
+	 		$gfpdfe_data->notice_type = 'network_admin_notices';
+	 	}
+	 	else
+	 	{
+	 		$gfpdfe_data->notice_type = 'admin_notices';
+	 	}
+	 }
+
 	 /*
 	  * Check if the software needs to be deployed/redeployed
 	  */
 	  public static function check_deployment()
 	  {
-
+	  		global $gfpdfe_data;
 	  		/*
 	  		 * Check if client is using the automated installer 
 	  		 * If installer has issues or client cannot use auto installer (using FTP/SSH ect) then run the usual 
 	  		 * initialisation messages. 
 	  		 */
-	  		if(GFPDF_InstallUpdater::$automated === true && get_option('gfpdfe_automated_install') != 'installing')
+	  		if($gfpdfe_data->automated === true && get_option('gfpdfe_automated_install') != 'installing')
 	  		{
 	  			return;
 	  		}
@@ -276,7 +299,7 @@ class GFPDF_Core extends PDFGenerator
 			)
 			{
 				/* show message about redeployment */
-				add_action('admin_notices', array("GFPDF_InstallUpdater", "gf_pdf_not_deployed")); 	
+				add_action($gfpdfe_data->notice_type, array("GFPDF_Notices", "gf_pdf_not_deployed")); 	
 				return false;				
 			}
 			
@@ -294,7 +317,7 @@ class GFPDF_Core extends PDFGenerator
 				/*
 				 * Prompt user to initialise plugin
 				 */
-				 add_action('admin_notices', array("GFPDF_InstallUpdater", "gf_pdf_not_deployed_fresh")); 	
+				 add_action($gfpdfe_data->notice_type, array("GFPDF_Notices", "gf_pdf_not_deployed_fresh")); 	
 			}
 			elseif( (
 						( !is_dir(PDF_TEMPLATE_LOCATION))  ||
@@ -310,7 +333,7 @@ class GFPDF_Core extends PDFGenerator
 				/*
 				 * Prompt user that a problem was detected and they need to redeploy
 				 */
-				add_action('admin_notices', array("GFPDF_InstallUpdater", "gf_pdf_problem_detected"));
+				add_action($gfpdfe_data->notice_type, array("GFPDF_Notices", "gf_pdf_problem_detected"));
 			}
 			else
 			{				
@@ -320,7 +343,7 @@ class GFPDF_Core extends PDFGenerator
 				 */ 
 				 if( (get_option('gf_pdf_extended_deploy') == 'no' && !rgpost('upgrade') )  && !rgpost('upgrade') ) {
 					/*show warning message */
-					add_action('admin_notices', array("GFPDF_InstallUpdater", "gf_pdf_not_deployed")); 	
+					add_action($gfpdfe_data->notice_type, array("GFPDF_Notices", "gf_pdf_not_deployed")); 	
 				 }	
 			}		  
 	  }
@@ -367,9 +390,8 @@ class GFPDF_Core extends PDFGenerator
 /*
  * array_replace_recursive was added in PHP5.3
  * Add fallback support for those with a version lower than this
+ * and Wordpress still supports PHP5.0 to PHP5.2
  */
-
-
 if (!function_exists('array_replace_recursive'))
 {
 	function array_replace_recursive()
