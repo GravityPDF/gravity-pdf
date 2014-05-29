@@ -22,6 +22,24 @@
 
     <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
     <ul>
+      <li>Feature - Add auto-initialiser for sites that have direct write access to their server files</li>
+      <li>Feature - Add auto-initialiser across entire multisite network for sites who have direct write access to their server files.</li>
+      <li>Feature - Add auto-PDF_EXTENDED_TEMPLATE theme syncer for sites that have direct write access to their server files</li>
+
+      <li>Housekeeping - Refractor the admin notices code</li>
+      <li>Housekeeping - Create responsive PDF settings page</li>
+      <li>Housekeeping - Minify CSS and Javascript files </li>
+      <li>Housekeeping - Remove FontAwesome fonts from package and use Wordpress' build-in 'dashicons'</li>
+      <li>Housekeeping - Refine action and error messages </li>
+      <li>Housekeeping - Update initialisation tab copy for both pre- and post- initialisation</li>
+      <li>Housekeeping - Use Gravity Forms get_ip() function instead of custom function</li>
+      <li>Housekeeping - The in-built support form uses SSL once again (disabled in the past due to some servers being unable to verify the certificate). </li>
+      <li>Bug - When testing write permissions, file_exist() is throwing false positives for some users which would generate a warning when unlink() is called. Hide warning using '@'. </li>     
+    </ul>
+
+
+    <h3>3.4.1</h3>
+    <ul>
       <li>Bug - Fix typo that effected sites running PHP5.2 or below.</li>
     </ul>
 

@@ -4,7 +4,7 @@ define('PDF_DEBUG', false);
 
 class gfpdfe_API
 {
-	private $api_url = 'http://gravityformspdfextended.com/api/';
+	private $api_url = 'https://gravityformspdfextended.com/api/';
 	private $api_version = '1.0';
 	
 	private $username;
@@ -28,6 +28,10 @@ class gfpdfe_API
 		
 	}
 	
+	/*
+	 * This is a public API so users need to request credentials initially 
+	 * so our server knowns who is talking to it (and authenticate the message). 
+	 */
 	private function get_api_access_details()
 	{
 		/*
@@ -65,6 +69,9 @@ class gfpdfe_API
 			  */
 			  $r_data = json_decode($response['body']);
 			 
+			  /*
+			   * We will use this username and secret for future communication
+			   */
 			  update_option('gfpdfe_api_username', $r_data->username);
 			  update_option('gfpdfe_api_secret', $r_data->secretkey);		  
 			  
@@ -81,12 +88,21 @@ class gfpdfe_API
 		 }
 	
 	}
-	
+
+
+	/*
+	 * Add headers to all API calls 
+	 */
 	private function add_headers($request)
 	{
 
 		/* change the timeout from 5 seconds to 20 */
 		$request['timeout'] = 20;
+
+		/*
+		 * Disable SSL verify as some hosts are having trouble verifying our SSL certificate (even though it isn't self signed).
+		 */		
+		$request['sslverify'] = false;
 
 		$request['headers'] = array(
 			'API' 			=> (string) $this->api_version,
@@ -104,6 +120,9 @@ class gfpdfe_API
 		return $this->create_hash($request);										
 	}
 	
+	/*
+	 * Check the response code sent by our API server 
+	 */
 	private function check_response_code($response)
 	{
 	
@@ -197,9 +216,13 @@ class gfpdfe_API
 		 
 		$hashed = hash ('sha256', serialize($hash_request) . $secret_key );		
 		$request['headers']['hash'] = $hashed;
+		
 		return $request;			
 	}
 	
+	/*
+	 * Make our actual support request call to the API
+	 */
 	public function support_request($body)
 	{
 		static $retry = false;

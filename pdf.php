@@ -119,7 +119,7 @@ class GFPDF_Core extends PDFGenerator
 		if(self::$model->check_major_compatibility() === false)
 		{
 			/*
-			 * Major compatibility errors (WP version or Gravity Forms)
+			 * Major compatibility errors (WP version, Gravity Forms or PHP errors)
 			 * Exit to prevent conflicts
 			 */
 			return;  
@@ -129,8 +129,8 @@ class GFPDF_Core extends PDFGenerator
 		* Some functions are required to monitor changes in the admin area
 		* and ensure the plugin functions smoothly
 		*/
-		add_action('admin_init', array('GFPDF_Core', 'fully_loaded_admin'), 9999);	
-		add_action('after_switch_theme', array('GFPDF_InstallUpdater', 'gf_pdf_on_switch_theme'), 10, 2);				 		 		
+		add_action('admin_init', array('GFPDF_Core', 'fully_loaded_admin'), 9999); /* run later than usual to give our auto initialiser a chance to fire */
+		add_action('after_switch_theme', array('GFPDF_InstallUpdater', 'gf_pdf_on_switch_theme'), 10, 2); /* listen for a theme chance and sync our PDF_EXTENDED_TEMPLATE folder */				 		 		
 		
 		/*
 		 * Only load the plugin if the following requirements are met:
@@ -257,6 +257,10 @@ class GFPDF_Core extends PDFGenerator
 		  }
 	 }
 	 
+	 /*
+	  * Depending on what page we are on, we need to fire different notices 
+	  * We've added our own custom notice to the settings page as some functions fire later than the normal 'admin_notices' action 	  
+	  */
 	 private static function set_notice_type()
 	 {
 	 	global $gfpdfe_data;
@@ -371,6 +375,9 @@ class GFPDF_Core extends PDFGenerator
 		  
 	}
 	
+	/*
+	 * Register our scripts with Gravity Forms so they aren't removed when no conflict mode is active
+	 */
 	public static function register_gravityform_scripts($scripts)
 	{
 		$scripts[] = 'pdfextended-settings-script';
@@ -378,7 +385,10 @@ class GFPDF_Core extends PDFGenerator
 		
 		return $scripts;
 	}
-	
+
+	/*
+	 * Register our styles with Gravity Forms so they aren't removed when no conflict mode is active
+	 */	
 	public static function register_gravityform_styles($styles)
 	{
 		$styles[] = 'pdfextended-admin-styles';					

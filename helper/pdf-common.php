@@ -1,7 +1,16 @@
 <?php
 
+/**
+ * Plugin: Gravity Forms PDF Extended
+ * File: pdf-common.php
+ * 
+ * This file holds a number of common functions used throughout the plugin
+ */
+
 class PDF_Common
 {
+
+
 	public static function setup_ids()
 	{
 		global $form_id, $lead_id, $lead_ids;
@@ -40,30 +49,6 @@ class PDF_Common
 	public static function get_pdf_filename($form_id, $lead_id)
 	{
 		return "form-$form_id-entry-$lead_id.pdf";
-	}
-	
-	/*
-	* Check if mPDF folder exists.
-	* If so, unzip and delete
-	* Helps reduce the package file size
-	*/		
-	public static function unpack_mPDF()
-	{
-		$file = PDF_PLUGIN_DIR .'mPDF.zip';
-		$path = pathinfo(realpath($file), PATHINFO_DIRNAME);
-		
-		if(file_exists($file))
-		{
-			/* unzip folder and delete */
-			$zip = new ZipArchive;
-			$res = $zip->open($file);
-			
-			if ($res === TRUE) {
-  				$zip->extractTo($path);
-			    $zip->close();	
-				unlink($file);
-			}
-		}
 	}	
 	
 	/*
@@ -144,13 +129,6 @@ class PDF_Common
 			exit;
 		}
 	}
-	
-	public static function display_plugin_message($message, $is_error = false){
-
-        $style = $is_error ? 'style="background-color: #ffebe8;"' : "";
-
-        echo '</tr><tr class="plugin-update-tr"><td colspan="5" class="plugin-update"><div class="update-message" ' . $style . '>' . $message . '</div></td>';
-    }
 	
 	/* 
 	 * New to 3.0.2 we will use WP_Filesystem API to manipulate files instead of using in-built PHP functions	

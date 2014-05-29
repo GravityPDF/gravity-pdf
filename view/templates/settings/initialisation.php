@@ -57,12 +57,11 @@
                         <?php if(get_option('gf_pdf_extended_installed') != 'installed'): ?>
                         <li><strong><?php _e('Install the template files', 'pdfextended'); ?></strong>: <?php _e("We create a folder called PDF_EXTENDED_TEMPLATE in your active theme directory and move over all the templates and configuration files. This folder is where you'll look to configure the software and create your PDF templates.", 'pdfextended'); ?></li>                        
                         <?php endif; ?>                  
-                        <li><strong><?php _e('Install fonts', 'pdfextended'); ?>: </strong><?php _e('You can use custom fonts in your PDFs. During initialisation we install any fonts found in the PDF_EXTENDED_TEMPLATES/fonts/ folder', 'pdfextended'); ?></li>                
+                        <li><strong><?php _e('Install fonts', 'pdfextended'); ?>: </strong><?php echo sprintf(__('You can use custom fonts in your PDFs. During initialisation we install any fonts found in the PDF_EXTENDED_TEMPLATES/fonts/ folder', 'pdfextended'), '<a href="http://gravityformspdfextended.com/documentation-v3-x-x/language-support/">', '</a>'); ?></li>                
                    </ol>		  	
                   
                    <p><strong><?php _e('Note', 'pdfextended'); ?>: <?php _e("During some plugin updates we will update the default and example template files. If you plan to customise them you should make a copy.", 'pdfextended'); ?></strong></p>
-
-                   <p><strong><?php _e('Having trouble initialising?', 'pdfextended'); ?></strong> <a href="#"><?php _e('Follow these instructions to manually initialise the plugin', 'pdfextended'); ?></a>.</p>
+                   
             <?php endif; ?>
 			<form method="post">
                 <?php wp_nonce_field('gfpdf_deploy_nonce_action','gfpdf_deploy_nonce'); ?>

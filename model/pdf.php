@@ -96,6 +96,9 @@ class GFPDF_Core_Model
 		 return true;
 	 }	
 	 
+	/*
+	 * Display a view and download button on the entry detailed page
+	 */ 
 	public static function detail_pdf_link($form_id, $lead) {  
 		global $gfpdf;
 		
@@ -137,7 +140,8 @@ class GFPDF_Core_Model
 									$url = home_url() .'/?gf_pdf=1&aid='. $aid .'&fid=' . $form_id . '&lid=' . $lead_id . '&template=' . $val['template']; 								
 								?></span> 
                                 <a href="<?php echo $url; ?>" target="_blank" class="button"><?php _e('View', 'pdfextended'); ?></a> 
-				 				<a href="<?php echo $url.'&download=1'; ?>" target="_blank" class="button"><?php _e('Download', 'pdfextended'); ?></a></div>
+				 				<a href="<?php echo $url.'&download=1'; ?>" target="_blank" class="button"><?php _e('Download', 'pdfextended'); ?></a>
+				 			</div>
                                   
                             <?php endforeach; ?>
 
@@ -149,12 +153,17 @@ class GFPDF_Core_Model
 			$url = home_url() .'/?gf_pdf=1&fid=' . $form_id . '&lid=' . $lead_id . '&template=' . $templates; 
 
 			?>
-			<?php _e('PDF', 'pdfextended'); ?>: <a href="<?php echo $url; ?>" target="_blank" class="button"><?php _e('View', 'pdfextended'); ?></a> 
+			<div class="detailed_pdf">
+				<?php _e('PDF', 'pdfextended'); ?>: <a href="<?php echo $url; ?>" target="_blank" class="button"><?php _e('View', 'pdfextended'); ?></a> 
 				 <a href="<?php echo $url.'&download=1'; ?>" target="_blank" class="button"><?php _e('Download', 'pdfextended'); ?></a>
+			</div>
 			<?php
 		}
 	}
 	
+	/*
+	 * Display the view PDF(s) link on the entry list page 
+	 */
 	public static function pdf_link($form_id, $field_id, $value, $lead) {
 		global $gfpdf;
 
@@ -224,6 +233,11 @@ class GFPDF_Core_Model
 	/*
 	 * Handle incoming routes
 	 * Look for $_GET['gf_pdf'] variable, authenticate user and generate/display PDF
+	 * TODO - slated for v3.9.0: move to a proper permalink structure 
+	 * /pdf/id/
+	 * /pdf/id/template/
+	 * /pdf/id/template/action/
+	 * where action is 'html', 'data', or 'print'
 	 */ 
 	public static function process_exterior_pages() {	 	 
 	  global $wpdb, $gfpdf;
@@ -389,6 +403,9 @@ class GFPDF_Core_Model
 
 	}
 	
+	/*
+	 * Filter to return the PDFs that should be attached to the notification (if configured)
+	 */
 	public static function gfpdfe_create_and_attach_pdf($notification, $form, $entry)
 	{								
 		$notification = self::do_notification($notification, $form, $entry);		
@@ -489,6 +506,9 @@ class GFPDF_Core_Model
 		return false;
 	}
 	
+	/*
+	 * Get all the notifications assigned to a form so we can determine if a PDF should be attached
+	 */
     public static function get_notifications_name($action, $form){
         if(rgempty("notifications", $form))
             return array();
@@ -502,6 +522,9 @@ class GFPDF_Core_Model
         return $notifications;
     }	
 	
+	/*
+	 * Compare the assigned configuration notifications to the avaliable form notifications
+	 */
 	public static function get_form_notifications($form, $index)
 	{
 		global $gfpdf;
@@ -515,7 +538,7 @@ class GFPDF_Core_Model
 		 }
 		
 		/*
-		 * Get all form_submission notifications and 
+		 * Get all form_submission notifications and use to check if any are configured to attach a PDF
 		 */  			 
 		$notifications = self::get_notifications_name('form_submission', $form);			
 
@@ -566,32 +589,32 @@ class GFPDF_Core_Model
 		$config = $gfpdf->configuration[$index];
 		
 		
-		$pdf_name = (isset($config['filename']) && strlen($config['filename']) > 0) ? $gfpdf->get_pdf_name($index, $form_id, $lead_id) : PDF_Common::get_pdf_filename($form_id, $lead_id);	
-		$template = (isset($template) && strlen($template) > 0) ? $template : $gfpdf->get_template($index);	 
+		$pdf_name    = (isset($config['filename']) && strlen($config['filename']) > 0) ? $gfpdf->get_pdf_name($index, $form_id, $lead_id) : PDF_Common::get_pdf_filename($form_id, $lead_id);	
+		$template    = (isset($template) && strlen($template) > 0) ? $template : $gfpdf->get_template($index);	 
 		
-		$pdf_size = (isset($config['pdf_size']) && (is_array($config['pdf_size']) || strlen($config['pdf_size']) > 0)) ? $config['pdf_size'] : PDFGenerator::$default['pdf_size'];
+		$pdf_size    = (isset($config['pdf_size']) && (is_array($config['pdf_size']) || strlen($config['pdf_size']) > 0)) ? $config['pdf_size'] : PDFGenerator::$default['pdf_size'];
 		$orientation = (isset($config['orientation']) && strlen($config['orientation']) > 0) ? $config['orientation'] : PDFGenerator::$default['orientation'];
-		$security = (isset($config['security']) && $config['security']) ? $config['security'] : PDFGenerator::$default['security'];			
-		$premium = (isset($config['premium']) && $config['premium'] === true) ? true: false;
+		$security    = (isset($config['security']) && $config['security']) ? $config['security'] : PDFGenerator::$default['security'];			
+		$premium     = (isset($config['premium']) && $config['premium'] === true) ? true: false;
 
 		/* added in v3.4.0 */
-		$dpi = (isset($config['dpi']) && (int) $config['dpi'] > 0) ? (int) $config['dpi'] : false;
+		$dpi    	= (isset($config['dpi']) && (int) $config['dpi'] > 0) ? (int) $config['dpi'] : false;
 		
 		/* added in v3.4.0 */
-		$pdfa1b = (isset($config['pdfa1b']) && $config['pdfa1b'] === true) ? true : false;		
-
+		$pdfa1b 	= (isset($config['pdfa1b']) && $config['pdfa1b'] === true) ? true : false;		
+		
 		/* added in v3.4.0 */
-		$pdfx1a = (isset($config['pdfx1a']) && $config['pdfx1a'] === true) ? true : false;		
+		$pdfx1a 	= (isset($config['pdfx1a']) && $config['pdfx1a'] === true) ? true : false;		
 
 		/*
 		 * Validate privileges 
 		 * If blank and security is true then set privileges to all
 		 */ 
-		$privileges = (isset($config['pdf_privileges'])) ? $gfpdf->validate_privileges($config['pdf_privileges']) : $gfpdf->validate_privileges('');	
+		$privileges      = (isset($config['pdf_privileges'])) ? $gfpdf->validate_privileges($config['pdf_privileges']) : $gfpdf->validate_privileges('');	
 		
-		$pdf_password = (isset($config['pdf_password'])) ? $config['pdf_password'] : '';
+		$pdf_password    = (isset($config['pdf_password'])) ? $config['pdf_password'] : '';
 		$master_password = (isset($config['pdf_master_password'])) ? $config['pdf_master_password'] : '';
-		$rtl = (isset($config['rtl'])) ? $config['rtl'] : false;		
+		$rtl             = (isset($config['rtl'])) ? $config['rtl'] : false;		
 
 
 		$form = RGFormsModel::get_form_meta($form_id);

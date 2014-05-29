@@ -90,6 +90,8 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 * Housekeeping - Refine action and error messages 
 * Housekeeping - Update initialisation tab copy for both pre- and post- initialisation
 * Housekeeping - Use Gravity Forms get_ip() function instead of custom function
+* Housekeeping - The in-built support form uses SSL once again (disabled in the past due to some servers being unable to verify the certificate). 
+
 * Bug - When testing write permissions, file_exist() is throwing false positives for some users which would generate a warning when unlink() is called. Hide warning using '@'.
 
 = 3.4.1 =

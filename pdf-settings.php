@@ -6,8 +6,6 @@
  * 
  * The controller that handles the Gravity Forms Settings page in Wordpress
  */
- 
- 
 
 class GFPDF_Settings
 {		
