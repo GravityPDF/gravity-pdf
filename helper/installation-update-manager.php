@@ -97,10 +97,19 @@ class GFPDF_InstallUpdater
 					 	)
 					 {
 					 	/* run our deployment and output any problems */
-					 	if(!self::do_deploy())
+					 	$deploy = self::do_deploy();
+					 	if($deploy === false)
 					 	{
 					 		$success = false;
 					 		$problem[] = $site;
+					 	}
+					 	else if ($deploy === 'false')
+					 	{
+					 		/* 
+					 		 * Asking for the access details so we can write to the server 
+					 		 * Exit early
+					 		 */
+					 		return $deploy;
 					 	}
 					 }
 					 restore_current_blog();
@@ -113,7 +122,7 @@ class GFPDF_InstallUpdater
 				}
 				else
 				{
-						add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_auto_deploy_success'));			
+						add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_network_deploy_success'));			
 				}
 			}
 	}
@@ -125,11 +134,7 @@ class GFPDF_InstallUpdater
 	private static function do_deploy()
 	{
 		update_option('gfpdfe_automated_install', 'installing');
-		if(self::pdf_extended_activate() === true)
-		{
-			return true;
-		}		
-		return false;
+		return self::pdf_extended_activate();
 	}
 
 	/*
@@ -296,11 +301,14 @@ class GFPDF_InstallUpdater
 	 */
 	public static function db_init()
 	{
+		global $gfpdfe_data;
+		
 		update_option('gf_pdf_extended_installed', 'installed');			
 		update_option('gf_pdf_extended_deploy', 'yes');
 		update_option('gf_pdf_extended_version', PDF_EXTENDED_VERSION);
 		delete_option('gfpdfe_switch_theme');
-		delete_option('gfpdfe_automated_install');		
+		delete_option('gfpdfe_automated_install');	
+		$gfpdfe_data->is_initialised = true;	
 	}
 	
 	public static function initialise_fonts()

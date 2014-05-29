@@ -237,20 +237,36 @@ class GFPDF_Notices
 						
 	}
 
-	public static function gf_pdf_auto_deploy_success()
+	public static function gf_pdf_network_deploy_success()
 	{		
 		global $gfpdfe_data;
-		$multisite_msg = (is_multisite() && $gfpdfe_data->automated === true && !rgpost('upgrade') && !rgpost('font-initialise')) ? __(' across entire network', 'pdfextended') : '';
 
-		$msg = sprintf(__('Gravity Forms PDF Extended Auto Initialisation Complete%s.', 'pdfextended'), $multisite_msg);
+		if($gfpdfe_data->automated === true && !rgpost('upgrade') && !rgpost('font-initialise'))
+		{
+			$msg = __('Gravity Forms PDF Extended Auto Initialisation Complete across the entire network.', 'pdfextended');
+		}
+		else
+		{
+			$msg = __('Gravity Forms PDF Extended Initialisation Complete across the entire network.', 'pdfextended');
+		}
 
 		if(get_option('gf_pdf_extended_installed') != 'installed')
 		{
 			$msg .= ' ' . sprintf( __('%sLearn how to configuring the plugin%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>');
 		}
+		self::notice($msg);				
+	}	
 
-		self::notice($msg);
-						
+	public static function gf_pdf_auto_deploy_success()
+	{		
+		global $gfpdfe_data;
+		$msg = __('Gravity Forms PDF Extended Auto Initialisation Complete.', 'pdfextended');
+
+		if(get_option('gf_pdf_extended_installed') != 'installed')
+		{
+			$msg .= ' ' . sprintf( __('%sLearn how to configuring the plugin%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>');
+		}
+		self::notice($msg);				
 	}
 
 	public static function gf_pdf_auto_deploy_network_failure()

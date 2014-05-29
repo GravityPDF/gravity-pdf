@@ -109,7 +109,11 @@ class GFPDF_Settings
 		 */		
 		if(is_multisite() && is_super_admin())
 		{
-			GFPDF_InstallUpdater::run_multisite_deployment();
+			$results = GFPDF_InstallUpdater::run_multisite_deployment();
+			if($results === 'false')
+			{
+				return $results;	
+			}			
 		}
 		else
 		{
