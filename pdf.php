@@ -92,6 +92,11 @@ class GFPDF_Core extends PDFGenerator
 	{
 		global $gfpdfe_data;
    
+		/*
+		 * Set the notice type 
+		 */
+		self::set_notice_type();
+   
 	   /*
 	    * Add localisation support
 	    */ 
@@ -225,10 +230,6 @@ class GFPDF_Core extends PDFGenerator
 	 public static function fully_loaded_admin()
 	 {
 
-		/*
-		 * Set the notice type 
-		 */
-		self::set_notice_type();
 		/*
 		 * Check if we have direct write access to the server 
 		 */
