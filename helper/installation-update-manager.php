@@ -302,13 +302,13 @@ class GFPDF_InstallUpdater
 	public static function db_init()
 	{
 		global $gfpdfe_data;
-		
+
 		update_option('gf_pdf_extended_installed', 'installed');			
 		update_option('gf_pdf_extended_deploy', 'yes');
 		update_option('gf_pdf_extended_version', PDF_EXTENDED_VERSION);
 		delete_option('gfpdfe_switch_theme');
 		delete_option('gfpdfe_automated_install');	
-		$gfpdfe_data->is_initialised = true;	
+		GFPDF_Settings::$model->check_compatibility();
 	}
 	
 	public static function initialise_fonts()
