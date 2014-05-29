@@ -238,7 +238,7 @@ class GFPDF_Core_Model
 		
 		$form_id = (int) $_GET['fid'];
 		$lead_id = (int) $_GET['lid'];		
-		$ip = PDF_Common::getRealIpAddr(); 
+		$ip = GFFormsModel::get_ip(); 
 		
 		/*
 		 * Get the template name

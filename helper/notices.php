@@ -9,6 +9,9 @@
 
 class GFPDF_Notices 
 {
+	/*
+	 * Admin notice template 
+	 */
 	private static function message($text, $type = 'updated')
 	{
 		?>
@@ -20,11 +23,17 @@ class GFPDF_Notices
 		<?php
 	}
 
+	/*
+	 * Output the update notice 
+	 */
 	private static function notice($text)
 	{
 		self::message($text);
 	}	
 
+	/*
+	 * Output the error notice
+	 */
 	private static function error($text)
 	{
 		self::message($text, 'error');

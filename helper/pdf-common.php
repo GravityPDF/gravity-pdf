@@ -19,28 +19,6 @@ class PDF_Common
 	}		
 	
 	/*
-	 * Sniff the $_SERVER array for the real user IP address
-	 * Sometimes users are behind proxies, or different servers will set different keys
-	 * so we will look at the most common keys
-	 */
-	public static function getRealIpAddr()
-	{
-		if (!empty($_SERVER['HTTP_CLIENT_IP']))   //check ip from share internet
-		{
-		  $ip = $_SERVER['HTTP_CLIENT_IP'];
-		}
-		else if (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))   //to check ip is pass from proxy
-		{
-		  $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		}
-		else
-		{
-		  $ip = $_SERVER['REMOTE_ADDR'];
-		}
-		return $ip;
-	}
-	
-	/*
 	 * We will use the output buffer to get the HTML template
 	 */
 	public static function get_html_template($filename) 
