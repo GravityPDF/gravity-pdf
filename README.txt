@@ -48,6 +48,8 @@ Along with the above, the PDF software includes powerful feature such as:
 3. GD Library
 4. RAM:	Recommended: 128MB. Minimum: 64MB.
 
+*Note:* We've had clients report slow PDF generation times and problems meeting the RAM requirements on cheap shared web hosting. [We recommend you look into WP Engine's managed hosting platform](http://www.shareasale.com/r.cfm?u=955815&m=41388&b=394686) as our software works correctly out of the box.
+
 **Software Requirements**
 
 1. [Purchase and install Gravity Forms](https://www.e-junkie.com/ecom/gb.php?cl=54585&c=ib&aff=235154)
