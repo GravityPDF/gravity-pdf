@@ -25,6 +25,7 @@
       <li>Feature - Add auto-initialiser for sites that have direct write access to their server files</li>
       <li>Feature - Add auto-initialiser across entire multisite network for sites who have direct write access to their server files.</li>
       <li>Feature - Add auto-PDF_EXTENDED_TEMPLATE theme syncer for sites that have direct write access to their server files</li>
+      <li>Feature - Correctly added language support. The .PO file is located in the /language/ folder if anyone would like to do a translation.</li>
 
       <li>Housekeeping - Refractor the admin notices code</li>
       <li>Housekeeping - Create responsive PDF settings page</li>

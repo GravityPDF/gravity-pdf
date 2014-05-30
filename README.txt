@@ -84,6 +84,7 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 * Feature - Add auto-initialiser for sites that have direct write access to their server files
 * Feature - Add auto-initialiser across entire multisite network for sites who have direct write access to their server files. 
 * Feature - Add auto-PDF_EXTENDED_TEMPLATE theme syncer for sites that have direct write access to their server files
+* Feature - Correctly added language support. The .PO file is located in the /language/ folder if anyone would like to do a translation.
 
 * Housekeeping - Refractor the admin notices code
 * Housekeeping - Create responsive PDF settings page
