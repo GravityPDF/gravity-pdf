@@ -1,15 +1,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Gravity Forms PDF Extended\n"
-"POT-Creation-Date: 2014-05-30 14:09+1000\n"
-"PO-Revision-Date: 2014-05-30 14:09+1000\n"
+"POT-Creation-Date: 2014-05-31 13:56+1000\n"
+"PO-Revision-Date: 2014-05-31 13:56+1000\n"
 "Last-Translator: Blue Liquid Designs <enquire@blueliquiddesigns.com.au>\n"
 "Language-Team:  <enquire@blueliquiddesigns.com.au>\n"
-"Language: English\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.5.7\n"
+"X-Generator: Poedit 1.6.5\n"
 "X-Poedit-KeywordsList: __;_e\n"
 "X-Poedit-Basepath: /\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -343,65 +343,65 @@ msgid "View PDF"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/settings.php:346
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/settings.php:355
 msgid "Plugin not yet initialised"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/settings.php:401
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/settings.php:410
 msgid ""
 "There was a problem with your submission. Please reload the page and try "
 "again"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/settings.php:418
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/settings.php:427
 msgid "Please enter a valid email address"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/settings.php:421
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/settings.php:430
 msgid "Problem"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/settings.php:421
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/settings.php:430
 msgid "Question"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/settings.php:421
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/settings.php:430
 msgid "Suggestion"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/settings.php:425
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/settings.php:434
 msgid "Please select a valid support type."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/settings.php:430
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/settings.php:439
 msgid ""
 "Please enter information about your support query so we can aid you more "
 "easily."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/settings.php:435
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/settings.php:444
 msgid ""
 "There is a problem with your support request. Please correct the marked "
 "issues above."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/settings.php:445
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/settings.php:454
 msgid ""
 "Thank you for your support request. We'll respond to your request in the "
 "next 24-48 hours."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/settings.php:503
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/settings.php:512
 msgid "Support request received. We will responed in 24 to 48 hours."
 msgstr ""
 
@@ -423,6 +423,22 @@ msgstr ""
 msgid ""
 "Your web server isn't compatible with Gravity Forms PDF Extended. Please see "
 "the problem areas below."
+msgstr ""
+
+#: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
+#: EXTENDED\2) WP SVN
+#: repository\tags\3.5.0/view/templates/settings/initialisation-tab.php:52
+msgid "Can't Resolve the Issue?"
+msgstr ""
+
+#: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
+#: EXTENDED\2) WP SVN
+#: repository\tags\3.5.0/view/templates/settings/initialisation-tab.php:53
+#, php-format
+msgid ""
+"Does Gravity Forms PDF Extended detect a problem that your web host won't "
+"fix? %sWe recommend you move to a quality web hosting service like WP Engine"
+"%s which runs our software straight out of the box."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
@@ -780,11 +796,11 @@ msgstr ""
 #: EXTENDED\2) WP SVN
 #: repository\tags\3.5.0/view/templates/settings/system-status.php:54
 #: repository\tags\3.5.0/view/templates/settings/system-status.php:62
-#: repository\tags\3.5.0/view/templates/settings/system-status.php:80
-#: repository\tags\3.5.0/view/templates/settings/system-status.php:87
-#: repository\tags\3.5.0/view/templates/settings/system-status.php:96
-#: repository\tags\3.5.0/view/templates/settings/system-status.php:103
+#: repository\tags\3.5.0/view/templates/settings/system-status.php:94
+#: repository\tags\3.5.0/view/templates/settings/system-status.php:101
 #: repository\tags\3.5.0/view/templates/settings/system-status.php:110
+#: repository\tags\3.5.0/view/templates/settings/system-status.php:117
+#: repository\tags\3.5.0/view/templates/settings/system-status.php:124
 msgid "Yes"
 msgstr ""
 
@@ -792,11 +808,11 @@ msgstr ""
 #: EXTENDED\2) WP SVN
 #: repository\tags\3.5.0/view/templates/settings/system-status.php:54
 #: repository\tags\3.5.0/view/templates/settings/system-status.php:62
-#: repository\tags\3.5.0/view/templates/settings/system-status.php:80
-#: repository\tags\3.5.0/view/templates/settings/system-status.php:87
-#: repository\tags\3.5.0/view/templates/settings/system-status.php:96
-#: repository\tags\3.5.0/view/templates/settings/system-status.php:103
+#: repository\tags\3.5.0/view/templates/settings/system-status.php:94
+#: repository\tags\3.5.0/view/templates/settings/system-status.php:101
 #: repository\tags\3.5.0/view/templates/settings/system-status.php:110
+#: repository\tags\3.5.0/view/templates/settings/system-status.php:117
+#: repository\tags\3.5.0/view/templates/settings/system-status.php:124
 msgid "No"
 msgstr ""
 
@@ -824,29 +840,31 @@ msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\2) WP SVN
-#: repository\tags\3.5.0/view/templates/settings/system-status.php:70
+#: repository\tags\3.5.0/view/templates/settings/system-status.php:84
 msgid "Available RAM"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\2) WP SVN
-#: repository\tags\3.5.0/view/templates/settings/system-status.php:73
+#: repository\tags\3.5.0/view/templates/settings/system-status.php:87
 #, php-format
 msgid ""
-"We recommend you have 128MB of available RAM to run this plugin. %sNote: If "
-"you chose to continue, you risk PHP suffering a fatal error which will stop "
-"your website from running."
+"We recommend you have 128MB of available RAM to run this plugin. The minimum "
+"system requirement is 64MB. %sNot sure what this means? Contact your web "
+"host and ask them to fix the issue. %sNote: If you run less than 128MB, you "
+"risk PHP suffering a fatal error which will stop your website from running "
+"on Gravity Form pages."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\2) WP SVN
-#: repository\tags\3.5.0/view/templates/settings/system-status.php:80
+#: repository\tags\3.5.0/view/templates/settings/system-status.php:94
 msgid "Plugin Directory Writable?"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\2) WP SVN
-#: repository\tags\3.5.0/view/templates/settings/system-status.php:83
+#: repository\tags\3.5.0/view/templates/settings/system-status.php:97
 #, php-format
 msgid ""
 "The plugin folder is not writable by your web server. Check the directory "
@@ -856,13 +874,13 @@ msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\2) WP SVN
-#: repository\tags\3.5.0/view/templates/settings/system-status.php:87
+#: repository\tags\3.5.0/view/templates/settings/system-status.php:101
 msgid "Theme Directory Writable?"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\2) WP SVN
-#: repository\tags\3.5.0/view/templates/settings/system-status.php:90
+#: repository\tags\3.5.0/view/templates/settings/system-status.php:104
 #, php-format
 msgid ""
 "Your active theme folder is not writable by your web server. Check that \"%s"
@@ -872,13 +890,13 @@ msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\2) WP SVN
-#: repository\tags\3.5.0/view/templates/settings/system-status.php:96
+#: repository\tags\3.5.0/view/templates/settings/system-status.php:110
 msgid "PDF Output Directory Writable?"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\2) WP SVN
-#: repository\tags\3.5.0/view/templates/settings/system-status.php:99
+#: repository\tags\3.5.0/view/templates/settings/system-status.php:113
 #, php-format
 msgid ""
 "The plugin's output folder is not writable by your web server. PDFs will not "
@@ -888,13 +906,13 @@ msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\2) WP SVN
-#: repository\tags\3.5.0/view/templates/settings/system-status.php:103
+#: repository\tags\3.5.0/view/templates/settings/system-status.php:117
 msgid "PDF Font Directory Writable?"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\2) WP SVN
-#: repository\tags\3.5.0/view/templates/settings/system-status.php:106
+#: repository\tags\3.5.0/view/templates/settings/system-status.php:120
 #, php-format
 msgid ""
 "The plugin's font folder is not writable by your web server. Check that \"%s"
@@ -904,13 +922,13 @@ msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\2) WP SVN
-#: repository\tags\3.5.0/view/templates/settings/system-status.php:110
+#: repository\tags\3.5.0/view/templates/settings/system-status.php:124
 msgid "mPDF Temporary Directory Writable?"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\2) WP SVN
-#: repository\tags\3.5.0/view/templates/settings/system-status.php:113
+#: repository\tags\3.5.0/view/templates/settings/system-status.php:127
 msgid ""
 "mPDF temporary directory not writable (mPDF/tmp/). Memory and image "
 "processing time will increase."
