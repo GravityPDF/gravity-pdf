@@ -230,6 +230,16 @@ class GFPDF_Core extends PDFGenerator
 	 public static function fully_loaded_admin()
 	 {
 
+	 	global $gfpdfe_data;
+	
+	 	/*
+	 	 * Don't run initialiser if we cannot...
+	 	 */
+		if($gfpdfe_data->allow_initilisation === false)
+		{		 			
+			return false; 
+		}	 	
+
 		/*
 		 * Check if we have direct write access to the server 
 		 */

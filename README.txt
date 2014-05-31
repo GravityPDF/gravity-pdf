@@ -86,6 +86,7 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 * Feature - Add auto-PDF_EXTENDED_TEMPLATE theme syncer for sites that have direct write access to their server files
 * Feature - Correctly added language support. The .PO file is located in the /language/ folder if anyone would like to do a translation.
 
+* Housekeeping - Restrict initialation process to 64MB or greater to counter problems with users reporting a 'white screen' when running in a low-RAM environment.
 * Housekeeping - Refractor the admin notices code
 * Housekeeping - Create responsive PDF settings page
 * Housekeeping - Minify CSS and Javascript files 

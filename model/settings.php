@@ -202,16 +202,25 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 	 {
 	 	 global $gfpdfe_data;
 		 		 
-		 /*
-		  * Get ram available in bytes and convert it to megabytes
-		  */
-		  $memory_limit = $this->convert_ini_memory(ini_get('memory_limit'));
+		/*
+		 * Get ram available in bytes and convert it to megabytes
+		 */
+		 $memory_limit = $this->convert_ini_memory(ini_get('memory_limit'));
 		  
 		 $gfpdfe_data->ram_available = floor($memory_limit / 1024 / 1024); /* convert to MB */
+
 		 $gfpdfe_data->ram_compatible = true;
 		 if($gfpdfe_data->ram_available < 128)
 		 {
 			$gfpdfe_data->ram_compatible = false; 
+		 }
+
+		 /*
+		  * If under 64MB of ram assigned to the server do not run the software
+		  */
+		 if($gfpdfe_data->ram_available < 64)
+		 {
+		 	$gfpdfe_data->allow_initilisation = false;
 		 }
 	 }	
  

@@ -67,10 +67,24 @@
             <?php endif; ?>
             </p>      
             
-            <p><label><?php _e('Available RAM', 'pdfextended'); ?>:</label> <strong><?php echo $gfpdfe_data->ram_available; ?>MB</strong> <span class="<?php echo ($gfpdfe_data->ram_compatible === true) ? 'icon-ok-sign' : 'icon-warning-sign'; ?>"></span>
+            <?php
+            $ram_icon = 'icon-ok-sign';
+            if($gfpdfe_data->ram_compatible === false)
+            {
+                $ram_icon = 'icon-warning-sign';
+                if($gfpdfe_data->ram_available < 64)
+                {
+                    $ram_icon = 'icon-remove-sign';
+                }
+            }
+
+
+            ?>
+
+            <p><label><?php _e('Available RAM', 'pdfextended'); ?>:</label> <strong><?php echo $gfpdfe_data->ram_available; ?>MB</strong> <span class="<?php echo $ram_icon; ?>"></span>
             <?php if($gfpdfe_data->ram_compatible === false): ?>
             <br />
-            <span class="details"><?php sprintf(_e('We recommend you have 128MB of available RAM to run this plugin. %sNote: If you chose to continue, you risk PHP suffering a fatal error which will stop your website from running.', 'pdfextended'), '<br />'); ?></span>
+            <span class="details"><?php echo sprintf(__('We recommend you have 128MB of available RAM to run this plugin. The minimum system requirement is 64MB. %sNot sure what this means? Contact your web host and ask them to fix the issue. %sNote: If you run less than 128MB, you risk PHP suffering a fatal error which will stop your website from running on Gravity Form pages.', 'pdfextended'), '<br />', '<br />'); ?></span>
             <?php endif; ?>
             </p>       
             
