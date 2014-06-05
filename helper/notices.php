@@ -235,7 +235,7 @@ class GFPDF_Notices
 			$msg = __('Gravity Forms PDF Extended Initialisation Complete across the entire network.', 'pdfextended');
 		}
 
-		if(get_option('gf_pdf_extended_installed') != 'installed')
+		if($gfpdfe_data->fresh_install === true)
 		{
 			$msg .= ' ' . sprintf( __('%sLearn how to configuring the plugin%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>');
 		}
@@ -247,7 +247,7 @@ class GFPDF_Notices
 		global $gfpdfe_data;
 		$msg = __('Gravity Forms PDF Extended Auto Initialisation Complete.', 'pdfextended');
 
-		if(get_option('gf_pdf_extended_installed') != 'installed')
+		if($gfpdfe_data->fresh_install === true)
 		{
 			$msg .= ' ' . sprintf( __('%sLearn how to configuring the plugin%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>');
 		}

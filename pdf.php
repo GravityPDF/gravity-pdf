@@ -296,7 +296,7 @@ class GFPDF_Core extends PDFGenerator
 	  		 * If installer has issues or client cannot use auto installer (using FTP/SSH ect) then run the usual 
 	  		 * initialisation messages. 
 	  		 */
-	  		if($gfpdfe_data->automated === true && get_option('gf_pdf_extended_installed') != 'installed' & get_option('gfpdfe_automated_install') != 'installing')
+	  		if($gfpdfe_data->automated === true && $gfpdfe_data->fresh_install === true & get_option('gfpdfe_automated_install') != 'installing')
 	  		{
 	  			return;
 	  		}

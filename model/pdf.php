@@ -68,7 +68,7 @@ class GFPDF_Core_Model
 	 {
 		 global $gfpdfe_data;		 
 
-		if( (get_option('gf_pdf_extended_installed') != 'installed') || (!is_dir(PDF_TEMPLATE_LOCATION)) )
+		if( ($gfpdfe_data->fresh_install === true) || (!is_dir(PDF_TEMPLATE_LOCATION)) )
 		{						
 			return false;
 		}

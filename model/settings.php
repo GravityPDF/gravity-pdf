@@ -52,9 +52,9 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 	 }
 	 
 	 public function check_compatibility()
-	 {
-		 $this->is_initialised();
+	 {		 
 		 $this->fresh_install();
+		 $this->is_initialised();
 		 
 		 $this->check_wp_compatibility();
 	 	 $this->check_gf_compatibility();
@@ -95,7 +95,7 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 		  * Sniff the options to see if it exists
 		  */
 		  $gfpdfe_data->is_initialised = false;
-		  if( get_option('gf_pdf_extended_installed') == 'installed' )
+		  if( $gfpdfe_data->fresh_install === true )
 		  {
 		 		$gfpdfe_data->is_initialised = true;
 		  }
