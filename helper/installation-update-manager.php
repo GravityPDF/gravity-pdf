@@ -39,7 +39,7 @@ class GFPDF_InstallUpdater
 		 * Check if we have a 'direct' method, that the software isn't fully installed and we aren't trying to manually initialise
 		 */
 		if($gfpdfe_data->automated === true && $gfpdfe_data->is_initialised === false && !rgpost('upgrade') && get_option('gfpdfe_automated_install') != 'installing')
-		{
+		{			
 			/*
 			 * Initialise all multisites if a super admin is logged in
 			 */
@@ -156,7 +156,7 @@ class GFPDF_InstallUpdater
 	    /*
 		 * Initialise the Wordpress Filesystem API
 		 */
-		if(PDF_Common::initialise_WP_filesystem_API(array('gfpdf_deploy'), 'pdf-extended-filesystem') === false)
+		if(PDF_Common::initialise_WP_filesystem_API(array('gfpdf_deploy', 'overwrite'), 'pdf-extended-filesystem') === false)
 		{
 			return 'false';	
 		}	

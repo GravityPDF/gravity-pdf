@@ -109,11 +109,11 @@ class GFPDF_Notices
 		{
 			if(rgget("page") == 'gf_settings' && rgget('subview') == 'PDF')
 			{	
-				$msg =  __('Gravity Forms PDF Extended detected a configuration problem. Please re-initialise the plugin.', 'pdfextended');
+				$msg =  __('Gravity Forms PDF Extended detected a configuration problem. Please reinitialise the plugin.', 'pdfextended');
 			}
 			else
 			{	
-				$msg =  sprintf(__('Gravity Forms PDF Extended detected a configuration problem. Please go to the %splugin\'s settings page%s to re-initialise.', 'pdfextended'), '<a href="'.PDF_SETTINGS_URL.'">', '</a>');	
+				$msg =  sprintf(__('Gravity Forms PDF Extended detected a configuration problem. Please go to the %splugin\'s settings page%s to reinitialise.', 'pdfextended'), '<a href="'.PDF_SETTINGS_URL.'">', '</a>');	
 			}
 
 			self::error($msg);

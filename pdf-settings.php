@@ -103,9 +103,9 @@ class GFPDF_Settings
 		global $gfpdfe_data;
 
 		/*
-		 * Initialise all multisites if a super admin is logged in
+		 * Initialise all multisites if a super admin is logged in and the software hasn't been installed before
 		 */		
-		if(is_multisite() && is_super_admin())
+		if(is_multisite() && is_super_admin() && (get_option('gf_pdf_extended_installed') != 'installed') )
 		{
 			$results = GFPDF_InstallUpdater::run_multisite_deployment();
 			if($results === 'false')
