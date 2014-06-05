@@ -72,21 +72,6 @@ class GFPDF_Core_Model
 		{						
 			return false;
 		}
-		
-		if(get_option('gf_pdf_extended_version') != PDF_EXTENDED_VERSION)
-		{					
-			return false;
-		}
-		
-		 if(get_option('gf_pdf_extended_deploy') == 'no' && !rgpost('upgrade') && PDF_DEPLOY === true)		
-		 {		 		
-			return false; 
-		 }
-		 
-		 if(file_exists(PDF_PLUGIN_DIR .'mPDF.zip'))
-		 {		 				
-			return false; 
-		 }
 		 
 		 if($gfpdfe_data->allow_initilisation === false)
 		 {		 			

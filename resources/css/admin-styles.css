@@ -222,6 +222,10 @@ div.notice p {
  float: left; 
 }  
 
+#initialisation label {
+  line-height: 26px;
+}
+
 
 /* Add media queries */
 @media only screen and (min-width: 1000px) {

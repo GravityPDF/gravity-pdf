@@ -33,25 +33,20 @@ GNU General Public License for more details.
 /*
  * Define our constants 
  */
- if(!defined('PDF_EXTENDED_VERSION')) { define('PDF_EXTENDED_VERSION', '3.5.0'); }
- if(!defined('GF_PDF_EXTENDED_SUPPORTED_VERSION')) { define('GF_PDF_EXTENDED_SUPPORTED_VERSION', '1.7'); } 
- if(!defined('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION')) { define('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION', '3.5'); } 
- if(!defined('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION')) { define('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION', '5'); }
+define('PDF_EXTENDED_VERSION', '3.5.0'); 
+define('GF_PDF_EXTENDED_SUPPORTED_VERSION', '1.7'); 
+define('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION', '3.5'); 
+define('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION', '5'); 
   
- if(!defined('PDF_PLUGIN_DIR')) { define('PDF_PLUGIN_DIR', plugin_dir_path( __FILE__ )); } 
- if(!defined('PDF_PLUGIN_URL')) { define('PDF_PLUGIN_URL', plugin_dir_url( __FILE__ )); } 
- if(!defined('PDF_SETTINGS_URL')) { define("PDF_SETTINGS_URL", site_url() .'/wp-admin/admin.php?page=gf_settings&subview=PDF'); }
- if(!defined('PDF_SAVE_FOLDER')) { define('PDF_SAVE_FOLDER', 'PDF_EXTENDED_TEMPLATES'); }
- if(!defined('PDF_SAVE_LOCATION')) { define('PDF_SAVE_LOCATION', get_stylesheet_directory().'/'.PDF_SAVE_FOLDER.'/output/'); }
- if(!defined('PDF_FONT_LOCATION')) { define('PDF_FONT_LOCATION', get_stylesheet_directory().'/'.PDF_SAVE_FOLDER.'/fonts/'); }
- if(!defined('PDF_TEMPLATE_LOCATION')) { define('PDF_TEMPLATE_LOCATION', get_stylesheet_directory().'/'.PDF_SAVE_FOLDER.'/'); }
- if(!defined('PDF_TEMPLATE_URL_LOCATION')) { define('PDF_TEMPLATE_URL_LOCATION', get_stylesheet_directory_uri().'/'. PDF_SAVE_FOLDER .'/'); }  
- if(!defined('GF_PDF_EXTENDED_PLUGIN_BASENAME')) { define('GF_PDF_EXTENDED_PLUGIN_BASENAME', plugin_basename(__FILE__)); } 
-
- /*
-  * Do we need to deploy template files this edition? If yes set to true. 
-  */
-  if(!defined('PDF_DEPLOY')) { define('PDF_DEPLOY', false); }
+define('PDF_PLUGIN_DIR', plugin_dir_path( __FILE__ ));  
+define('PDF_PLUGIN_URL', plugin_dir_url( __FILE__ )); 
+define("PDF_SETTINGS_URL", site_url() .'/wp-admin/admin.php?page=gf_settings&subview=PDF'); 
+define('PDF_SAVE_FOLDER', 'PDF_EXTENDED_TEMPLATES'); 
+define('PDF_SAVE_LOCATION', get_stylesheet_directory().'/'.PDF_SAVE_FOLDER.'/output/'); 
+define('PDF_FONT_LOCATION', get_stylesheet_directory().'/'.PDF_SAVE_FOLDER.'/fonts/'); 
+define('PDF_TEMPLATE_LOCATION', get_stylesheet_directory().'/'.PDF_SAVE_FOLDER.'/'); 
+define('PDF_TEMPLATE_URL_LOCATION', get_stylesheet_directory_uri().'/'. PDF_SAVE_FOLDER .'/'); 
+define('GF_PDF_EXTENDED_PLUGIN_BASENAME', plugin_basename(__FILE__)); 
 
 /* 
  * Include the core helper files
@@ -294,29 +289,17 @@ class GFPDF_Core extends PDFGenerator
 	  */
 	  public static function check_deployment()
 	  {
+
 	  		global $gfpdfe_data;
 	  		/*
 	  		 * Check if client is using the automated installer 
 	  		 * If installer has issues or client cannot use auto installer (using FTP/SSH ect) then run the usual 
 	  		 * initialisation messages. 
 	  		 */
-	  		if($gfpdfe_data->automated === true && get_option('gfpdfe_automated_install') != 'installing')
+	  		if($gfpdfe_data->automated === true && get_option('gf_pdf_extended_installed') != 'installed' & get_option('gfpdfe_automated_install') != 'installing')
 	  		{
 	  			return;
 	  		}
-
-			/* 
-			 * Check if database plugin version matches current plugin version and updates if needed
-			 */
-			if(     get_option('gf_pdf_extended_version') != PDF_EXTENDED_VERSION
-				&& get_option('gf_pdf_extended_installed') == 'installed' 
-				&& !rgpost('upgrade')
-			)
-			{
-				/* show message about redeployment */
-				add_action($gfpdfe_data->notice_type, array("GFPDF_Notices", "gf_pdf_not_deployed")); 	
-				return false;				
-			}
 			
 			/*
 			 * Check if GF PDF Extended is correctly installed. If not we'll run the installer.
@@ -337,30 +320,19 @@ class GFPDF_Core extends PDFGenerator
 			elseif( (
 						( !is_dir(PDF_TEMPLATE_LOCATION))  ||
 						( !file_exists(PDF_TEMPLATE_LOCATION . 'configuration.php') ) ||
-						( !is_dir(PDF_SAVE_LOCATION) ) ||
-						( file_exists(PDF_PLUGIN_DIR .'mPDF.zip') )
+						( !is_dir(PDF_SAVE_LOCATION) )  						
 					)
 					&& (!rgpost('upgrade'))
 					&& (empty($theme_switch['old']) )
 
 				  )
 			{
+
 				/*
 				 * Prompt user that a problem was detected and they need to redeploy
 				 */
 				add_action($gfpdfe_data->notice_type, array("GFPDF_Notices", "gf_pdf_problem_detected"));
-			}
-			else
-			{				
-			
-				/**
-				 * Check if deployed new template files after update
-				 */ 
-				 if( (get_option('gf_pdf_extended_deploy') == 'no' && !rgpost('upgrade') )  && !rgpost('upgrade') ) {
-					/*show warning message */
-					add_action($gfpdfe_data->notice_type, array("GFPDF_Notices", "gf_pdf_not_deployed")); 	
-				 }	
-			}		  
+			}	  
 	  }
 	
 	/**
@@ -379,7 +351,9 @@ class GFPDF_Core extends PDFGenerator
 		  * Register our scripts/styles with Gravity Forms to prevent them being removed in no conflict mode
 		  */
 		  add_filter('gform_noconflict_scripts', array('GFPDF_Core', 'register_gravityform_scripts')); 
-		  add_filter('gform_noconflict_styles', array('GFPDF_Core', 'register_gravityform_styles')); 		  
+		  add_filter('gform_noconflict_styles', array('GFPDF_Core', 'register_gravityform_styles')); 
+
+		  add_filter('gform_tooltips', array('GFPDF_Notices', 'add_tooltips'));	 	  
 		 
     	 GFPDF_Settings::settings_page();	
 		  

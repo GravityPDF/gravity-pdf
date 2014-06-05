@@ -81,8 +81,9 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 == Changelog ==
 
 = 3.5.0 =
-* Feature - Add auto-initialiser for sites that have direct write access to their server files
-* Feature - Add auto-initialiser across entire multisite network for sites who have direct write access to their server files. 
+* Feature - No longer need to reinitialise every time the software is updated. 
+* Feature - Add auto-initialiser on initial installation for sites that have direct write access to their server files
+* Feature - Add auto-initialiser on initial installation across entire multisite network for sites who have direct write access to their server files. 
 * Feature - Add auto-PDF_EXTENDED_TEMPLATE theme syncer for sites that have direct write access to their server files
 * Feature - Correctly added language support. The .PO file is located in the /language/ folder if anyone would like to do a translation.
 

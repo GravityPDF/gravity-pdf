@@ -38,7 +38,7 @@ class GFPDF_InstallUpdater
 		/*
 		 * Check if we have a 'direct' method, that the software isn't fully installed and we aren't trying to manually initialise
 		 */
-		if($gfpdfe_data->automated === true && GFPDF_Core_Model::is_fully_installed() === false && !rgpost('upgrade') && get_option('gfpdfe_automated_install') != 'installing')
+		if($gfpdfe_data->automated === true && $gfpdfe_data->is_initialised === false && !rgpost('upgrade') && get_option('gfpdfe_automated_install') != 'installing')
 		{
 			/*
 			 * Initialise all multisites if a super admin is logged in
@@ -179,7 +179,7 @@ class GFPDF_InstallUpdater
 		/**
 		 * If PDF_TEMPLATE_LOCATION already exists then we will remove the old template files so we can redeploy the new ones
 		 */
-		 if($wp_filesystem->exists($template_directory) && PDF_DEPLOY === true)
+		 if($wp_filesystem->exists($template_directory) && isset($_POST['overwrite']))
 		 {
 			 /*
 			  * Create a backup folder and move all the files there
@@ -205,29 +205,7 @@ class GFPDF_InstallUpdater
 							$wp_filesystem->move($template_directory.$path_parts['basename'], $template_directory . $backup_folder . $path_parts['basename']);
 						}
 			 }			
-		 }
-		 
-
-		/* unzip the mPDF file */
-		if($wp_filesystem->exists($directory . 'mPDF.zip'))
-		{
-			/*
-			 *	unzip_file() is only function in the file-manipulators that requires the absolute 'direct' path and 
-			 *	the 'save' directory to be relative to the method in the $wp_filesystem
-			 */
-			$results = unzip_file( PDF_PLUGIN_DIR . 'mPDF.zip', $directory );
-		
-			if($results !== true)
-			{						
-				add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_unzip_mpdf_err')); 	
-				return false;				
-			}			
-
-			/*
-			 * Remove the original archive
-			 */
-			 $wp_filesystem->delete($directory . 'mPDF.zip');
-		}	
+		 }		 
 
 		/* create new directory in active themes folder*/	
 		if(!$wp_filesystem->is_dir($template_directory))
@@ -304,8 +282,6 @@ class GFPDF_InstallUpdater
 		global $gfpdfe_data;
 
 		update_option('gf_pdf_extended_installed', 'installed');			
-		update_option('gf_pdf_extended_deploy', 'yes');
-		update_option('gf_pdf_extended_version', PDF_EXTENDED_VERSION);
 		delete_option('gfpdfe_switch_theme');
 		delete_option('gfpdfe_automated_install');	
 		GFPDF_Settings::$model->check_compatibility();

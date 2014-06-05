@@ -98,26 +98,6 @@ class GFPDF_Notices
 		self::error($msg);
 		
 	}		
-	
-	/**
-	 * PDF Extended has been updated but the new template files haven't been deployed yet
-	 */
-	public static function gf_pdf_not_deployed()
-	{		
-		if( !rgpost('update') )
-		{
-			if(rgget("page") == 'gf_settings' && rgget('subview') == 'PDF')
-			{
-				$msg =  __('You\'ve updated Gravity Forms PDF Extended but are yet to re-initialise the plugin. Please use the "Initialise Plugin" button below to complete the upgrade.', 'pdfextended');
-			}
-			else
-			{	
-				$msg =  sprintf(__('You\'ve updated Gravity Forms PDF Extended but are yet to re-initialise the plugin. Please go to the %splugin\'s settings page%s to initialise.', 'pdfextended'), '<a href="'.PDF_SETTINGS_URL.'">', '</a>');
-			}
-
-			self::notice($msg);
-		}
-	}
 
 	/**
 	 * The software has detected a problem (no configuration.php file or no PDF_EXTENDED_TEMPLATE folder
@@ -184,17 +164,6 @@ class GFPDF_Notices
 		self::error($msg);
 			
 			
-	}
-	
-	public static function gf_pdf_unzip_mpdf_err()
-	{
-		$prefix = self::autoprefix();
-		$suffix = self::autosuffix();
-	
-		$msg = $prefix . __('Could not unzip mPDF.zip (located in the plugin folder). Try initialise the plugin again.', 'pdfextended')  . $suffix;
-
-		self::error($msg);
-					
 	}
 	
 	/**
@@ -345,5 +314,12 @@ class GFPDF_Notices
 	{
 		 $message = __("PHP " . GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION . " or higher is required to use this plugin.", 'pdfextended'); 
 		 self::display_plugin_message($message, true);			
+	}	
+
+	public static function add_tooltips($tooltips)
+	{
+		$tooltips['pdf_overwrite'] = sprintf(__('If you reinitialise and enable this option %syou will overwrite%s the default and example template files in your active theme directory.', 'pdfextended'), '<strong>', '</strong>');
+
+		return $tooltips;
 	}					
 }

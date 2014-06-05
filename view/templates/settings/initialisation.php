@@ -36,13 +36,7 @@
                 <p><?php echo sprintf(__('If you know little about PHP we recommend starting with %sPart 1:The Basics%s and then watching the tutorial you’re interested in. It will give you the foundational skills you need to configure the software.', 'pdfextended'), '<i>', '</i>'); ?></p>
 
                 <h3><?php _e('Custom Templates', 'pdfextended'); ?></h3>
-                <p><?php echo sprintf(__('Creating a custom template gives you ultimate control of the look and feel of your documents using only HTML and CSS. %sWe recommend you review our online documentation%s to create and customise your template files.', 'pdfextended'), '<a href="http://gravityformspdfextended.com/documentation-v3-x-x/templates/">', '</a>'); ?></p>
-
-                <p><strong><?php _e('Note', 'pdfextended'); ?>: <?php _e("During some plugin updates we will update the default and example template files. If you plan to customise them you should make a copy.", 'pdfextended'); ?></strong></p>
-
-                <h3><?php _e('Reinitialise or install a new font?', 'pdfextended'); ?></h3>
-                <p><?php echo sprintf(__('Did you switch themes and something went wrong syncing the template folder? Or want to %suse a custom font%s in your template? Try reinitialise the software, or just initialise the fonts.', 'pdfextended'), '<a href="http://gravityformspdfextended.com/documentation-v3-x-x/language-support/">', '</a>'); ?> 
-      
+                <p><?php echo sprintf(__('Creating a custom template gives you ultimate control of the look and feel of your documents using only HTML and CSS. %sWe recommend you review our online documentation%s to create and customise your template files.', 'pdfextended'), '<a href="http://gravityformspdfextended.com/documentation-v3-x-x/templates/">', '</a>'); ?></p>                    
 
 
 
@@ -50,33 +44,40 @@
 
                    <p><?php _e('To complete the installation, Gravity Forms PDF Extended needs to be initialised.', 'pdfextended'); ?>
 
-                   <p><?php _e('Initialisation does a number of important things, including:', 'pdfextended'); ?></p>
+                   <p><strong><?php _e('Does does initialisation do?', 'pdfextended'); ?></strong></p>
                    
-                   <ol>
-                        <li><strong><?php _e('Unzips the mPDF package', 'pdfextended'); ?>: </strong>The software used to convert HTML/CSS to PDFs is very large. To keep the plugin size small we ship it zipped up.</li>
-                        <?php if(get_option('gf_pdf_extended_installed') != 'installed'): ?>
-                        <li><strong><?php _e('Install the template files', 'pdfextended'); ?></strong>: <?php _e("We create a folder called PDF_EXTENDED_TEMPLATE in your active theme directory and move over all the templates and configuration files. This folder is where you'll look to configure the software and create your PDF templates.", 'pdfextended'); ?></li>                        
-                        <?php endif; ?>                  
-                        <li><strong><?php _e('Install fonts', 'pdfextended'); ?>: </strong><?php echo sprintf(__('You can use custom fonts in your PDFs. During initialisation we install any fonts found in the PDF_EXTENDED_TEMPLATES/fonts/ folder', 'pdfextended'), '<a href="http://gravityformspdfextended.com/documentation-v3-x-x/language-support/">', '</a>'); ?></li>                
+                   <ol>                       
+                        <li><strong><?php _e('Install the template files', 'pdfextended'); ?></strong>: <?php _e("We create a folder called PDF_EXTENDED_TEMPLATE in your active theme directory and move over all the templates and configuration files. This folder is where you'll look to configure the software and create your PDF templates.", 'pdfextended'); ?></li>                                                              
                    </ol>		  	
-                  
-                   <p><strong><?php _e('Note', 'pdfextended'); ?>: <?php _e("During some plugin updates we will update the default and example template files. If you plan to customise them you should make a copy.", 'pdfextended'); ?></strong></p>
+                
                    
             <?php endif; ?>
-			<form method="post">
+			
+
+      <form method="post">
                 <?php wp_nonce_field('gfpdf_deploy_nonce_action','gfpdf_deploy_nonce'); ?>
                 <input type="hidden" name="gfpdf_deploy" value="1">
-                <?php 
-				
-				/*
-				 * Remove the cancel feature for the moment
-				 *
-				
-				if(get_option('gf_pdf_extended_deploy') == 'no') { ?>				
-                <input type="submit" value="Cancel Deployment" class="button" id="cancelupgrade" name="cancel">                
-				<?php } */ ?>                                                
-                <input type="submit" value="<?php ($gfpdfe_data->is_initialised) ? _e('Re-Initialise Plugin', 'pdfextended') : _e('Initialise Plugin', 'pdfextended'); ?>" class="button" id="upgrade" name="upgrade">
+
+                <?php if($gfpdfe_data->is_initialised): ?>
+                <h3><?php _e('Have a problem with the software?', 'pdfextended'); ?></h3>
+                <p><?php echo __('Did you switch themes and something went wrong syncing the template folder? Try reinitialise the software.', 'pdfextended'); ?></p>                 
+                <?php endif; ?>
                 
-                <input type="submit" value="Initialise Fonts Only" class="button" id="font-initialise" name="font-initialise">                
+                <input type="submit" value="<?php ($gfpdfe_data->is_initialised) ? _e('Reinitialise Plugin', 'pdfextended') : _e('Initialise Plugin', 'pdfextended'); ?>" class="button" id="upgrade" name="upgrade">
+                <?php if($gfpdfe_data->is_initialised): ?>
+                  <label><input type="checkbox" value="1" name="overwrite"> <?php echo __('Reinstall Default and Example Templates', 'pdfextended'); ?> <?php gform_tooltip('pdf_overwrite'); ?></label>
+                  <br><br>
+                <?php endif; ?>   
+
+
+                <?php if($gfpdfe_data->is_initialised): ?>
+                   <h3><?php _e('Install a new font?', 'pdfextended'); ?></h3>
+                   <p><?php echo sprintf(__('Do you want to use a custom font in your template? %sSee our documentation on how to correctly install and use a custom font%s before initialising below.', 'pdfextended'), '<a href="http://gravityformspdfextended.com/documentation-v3-x-x/language-support/">', '</a>'); ?></p>
+                  <input type="submit" value="Initialise Fonts" class="button" id="font-initialise" name="font-initialise">                                           
+                <?php endif; ?>                
+
+
+                
+                                
           </form>   
      

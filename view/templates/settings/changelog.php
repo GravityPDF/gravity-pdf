@@ -22,8 +22,9 @@
 
     <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
     <ul>
-      <li>Feature - Add auto-initialiser for sites that have direct write access to their server files</li>
-      <li>Feature - Add auto-initialiser across entire multisite network for sites who have direct write access to their server files.</li>
+      <li>Feature - No longer need to reinitialise every time the software is updated. </li>
+      <li>Feature - Add auto-initialiser on initial installation for sites that have direct write access to their server files</li>
+      <li>Feature - Add auto-initialiser on initial installation across entire multisite network for sites who have direct write access to their server files. </li>
       <li>Feature - Add auto-PDF_EXTENDED_TEMPLATE theme syncer for sites that have direct write access to their server files</li>
       <li>Feature - Correctly added language support. The .PO file is located in the /language/ folder if anyone would like to do a translation.</li>
 
