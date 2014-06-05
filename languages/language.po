@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Gravity Forms PDF Extended\n"
-"POT-Creation-Date: 2014-05-31 13:56+1000\n"
-"PO-Revision-Date: 2014-05-31 13:56+1000\n"
+"POT-Creation-Date: 2014-06-05 13:39+1000\n"
+"PO-Revision-Date: 2014-06-05 13:39+1000\n"
 "Last-Translator: Blue Liquid Designs <enquire@blueliquiddesigns.com.au>\n"
 "Language-Team:  <enquire@blueliquiddesigns.com.au>\n"
 "Language: en\n"
@@ -75,45 +75,46 @@ msgid "Could not create font configuration file. Try initialise again."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:111
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:112
 msgid ""
-"You've updated Gravity Forms PDF Extended but are yet to re-initialise the "
-"plugin. Please use the \"Initialise Plugin\" button below to complete the "
-"upgrade."
+"Gravity Forms PDF Extended detected a configuration problem. Please "
+"reinitialise the plugin."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:115
-#, php-format
-msgid ""
-"You've updated Gravity Forms PDF Extended but are yet to re-initialise the "
-"plugin. Please go to the %splugin's settings page%s to initialise."
-msgstr ""
-
-#: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:132
-msgid ""
-"Gravity Forms PDF Extended detected a configuration problem. Please re-"
-"initialise the plugin."
-msgstr ""
-
-#: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:136
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:116
 #, php-format
 msgid ""
 "Gravity Forms PDF Extended detected a configuration problem. Please go to "
-"the %splugin's settings page%s to re-initialise."
+"the %splugin's settings page%s to reinitialise."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:152
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:133
+msgid ""
+"Gravity Forms PDF Extended detected a server compatibility problem which "
+"prevented the software from running. See the System Status section below for "
+"details."
+msgstr ""
+
+#: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:137
+#, php-format
+msgid ""
+"Gravity Forms PDF Extended detected a server compatibility problem which "
+"prevented the software from running. Please go to the %splugin's settings "
+"page%s to view the issue."
+msgstr ""
+
+#: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:153
 msgid ""
 "Welcome to Gravity Forms PDF Extended. Before you can use the plugin "
 "correctly you need to initilise it."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:156
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:157
 #, php-format
 msgid ""
 "Welcome to Gravity Forms PDF Extended. Before you can use the plugin "
@@ -122,7 +123,7 @@ msgid ""
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:168
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:169
 #, php-format
 msgid ""
 "Gravity Forms PDF Extended only works with Gravity Forms version %s and "
@@ -130,7 +131,7 @@ msgid ""
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:182
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:183
 msgid ""
 "We could not create a template folder in your active theme's directory. "
 "Please ensure your active theme directory is writable by your web server and "
@@ -138,14 +139,7 @@ msgid ""
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:194
-msgid ""
-"Could not unzip mPDF.zip (located in the plugin folder). Try initialise the "
-"plugin again."
-msgstr ""
-
-#: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:208
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:198
 #, php-format
 msgid ""
 "We could not remove the default template files from the Gravity Forms PDF "
@@ -154,7 +148,7 @@ msgid ""
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:221
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:211
 #, php-format
 msgid ""
 "We could not move the template files to the PDF_EXTENDED_TEMPLATES folder.  "
@@ -162,7 +156,7 @@ msgid ""
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:239
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:229
 #, php-format
 msgid ""
 "Gravity Forms PDF Extended needs to keep your configuration and templates "
@@ -170,79 +164,87 @@ msgid ""
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:248
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:238
 #, php-format
 msgid "%sGravity Forms PDF Extended Automated Theme Sync%s: "
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:250
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:240
 msgid ""
 "Your PDF configuration and template folder was successfully synced to your "
 "new theme."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:262
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:252
 msgid ""
 "Gravity Forms PDF Extended Auto Initialisation Complete across the entire "
 "network."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:266
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:256
 msgid ""
 "Gravity Forms PDF Extended Initialisation Complete across the entire network."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:271
-#: repository\tags\3.5.0/helper/notices.php:283
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:261
+#: repository\tags\3.5.0/helper/notices.php:273
 #, php-format
 msgid "%sLearn how to configuring the plugin%s."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:279
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:269
 msgid "Gravity Forms PDF Extended Auto Initialisation Complete."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:297
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:287
 msgid "There was a network initialisation issue on the following sites;"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:310
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:300
 msgid "Please try manually initialise the software"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:314
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:304
 msgid ""
 "An unknown network initialisation error occured. Please try initialise again."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:321
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:311
 msgid "You've successfully initialised Gravity Forms PDF Extended."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:328
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:318
 #: repository\tags\3.5.0/view/templates/settings/system-status.php:34
 #: repository\tags\3.5.0/view/templates/settings/system-status.php:41
 msgid "Gravity Forms "
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:334
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:324
 msgid "Wordpress "
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:346
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:336
 msgid "PHP "
+msgstr ""
+
+#: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/helper/notices.php:342
+#, php-format
+msgid ""
+"If you reinitialise and enable this option %syou will overwrite%s the "
+"default and example template files in your active theme directory."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
@@ -316,29 +318,29 @@ msgid "Click to view"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/pdf.php:142
-#: repository\tags\3.5.0/model/pdf.php:157
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/pdf.php:127
+#: repository\tags\3.5.0/model/pdf.php:142
 msgid "View"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/pdf.php:143
-#: repository\tags\3.5.0/model/pdf.php:158
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/pdf.php:128
+#: repository\tags\3.5.0/model/pdf.php:143
 msgid "Download"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/pdf.php:157
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/pdf.php:142
 msgid "PDF"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/pdf.php:197
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/pdf.php:182
 msgid "View PDFs"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/pdf.php:228
+#: EXTENDED\2) WP SVN repository\tags\3.5.0/model/pdf.php:213
 msgid "View PDF"
 msgstr ""
 
@@ -450,7 +452,7 @@ msgstr ""
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\2) WP SVN
 #: repository\tags\3.5.0/view/templates/settings/initialisation.php:19
-#: repository\tags\3.5.0/view/templates/settings/initialisation.php:78
+#: repository\tags\3.5.0/view/templates/settings/initialisation.php:66
 msgid "Initialise Plugin"
 msgstr ""
 
@@ -544,39 +546,7 @@ msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\2) WP SVN
-#: repository\tags\3.5.0/view/templates/settings/initialisation.php:41
-#: repository\tags\3.5.0/view/templates/settings/initialisation.php:63
-msgid "Note"
-msgstr ""
-
-#: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN
-#: repository\tags\3.5.0/view/templates/settings/initialisation.php:41
-#: repository\tags\3.5.0/view/templates/settings/initialisation.php:63
-msgid ""
-"During some plugin updates we will update the default and example template "
-"files. If you plan to customise them you should make a copy."
-msgstr ""
-
-#: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN
-#: repository\tags\3.5.0/view/templates/settings/initialisation.php:43
-msgid "Reinitialise or install a new font?"
-msgstr ""
-
-#: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN
-#: repository\tags\3.5.0/view/templates/settings/initialisation.php:44
-#, php-format
-msgid ""
-"Did you switch themes and something went wrong syncing the template folder? "
-"Or want to %suse a custom font%s in your template? Try reinitialise the "
-"software, or just initialise the fonts."
-msgstr ""
-
-#: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN
-#: repository\tags\3.5.0/view/templates/settings/initialisation.php:51
+#: repository\tags\3.5.0/view/templates/settings/initialisation.php:45
 msgid ""
 "To complete the installation, Gravity Forms PDF Extended needs to be "
 "initialised."
@@ -584,25 +554,19 @@ msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\2) WP SVN
-#: repository\tags\3.5.0/view/templates/settings/initialisation.php:53
-msgid "Initialisation does a number of important things, including:"
+#: repository\tags\3.5.0/view/templates/settings/initialisation.php:47
+msgid "Does does initialisation do?"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\2) WP SVN
-#: repository\tags\3.5.0/view/templates/settings/initialisation.php:56
-msgid "Unzips the mPDF package"
-msgstr ""
-
-#: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
-#: EXTENDED\2) WP SVN
-#: repository\tags\3.5.0/view/templates/settings/initialisation.php:58
+#: repository\tags\3.5.0/view/templates/settings/initialisation.php:50
 msgid "Install the template files"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\2) WP SVN
-#: repository\tags\3.5.0/view/templates/settings/initialisation.php:58
+#: repository\tags\3.5.0/view/templates/settings/initialisation.php:50
 msgid ""
 "We create a folder called PDF_EXTENDED_TEMPLATE in your active theme "
 "directory and move over all the templates and configuration files. This "
@@ -612,22 +576,44 @@ msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\2) WP SVN
-#: repository\tags\3.5.0/view/templates/settings/initialisation.php:60
-msgid "Install fonts"
+#: repository\tags\3.5.0/view/templates/settings/initialisation.php:62
+msgid "Have a problem with the software?"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\2) WP SVN
-#: repository\tags\3.5.0/view/templates/settings/initialisation.php:60
+#: repository\tags\3.5.0/view/templates/settings/initialisation.php:63
 msgid ""
-"You can use custom fonts in your PDFs. During initialisation we install any "
-"fonts found in the PDF_EXTENDED_TEMPLATES/fonts/ folder"
+"Did you switch themes and something went wrong syncing the template folder? "
+"Try reinitialise the software."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\2) WP SVN
-#: repository\tags\3.5.0/view/templates/settings/initialisation.php:78
-msgid "Re-Initialise Plugin"
+#: repository\tags\3.5.0/view/templates/settings/initialisation.php:66
+msgid "Reinitialise Plugin"
+msgstr ""
+
+#: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
+#: EXTENDED\2) WP SVN
+#: repository\tags\3.5.0/view/templates/settings/initialisation.php:68
+msgid "Reinstall Default and Example Templates"
+msgstr ""
+
+#: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
+#: EXTENDED\2) WP SVN
+#: repository\tags\3.5.0/view/templates/settings/initialisation.php:74
+msgid "Install a new font?"
+msgstr ""
+
+#: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
+#: EXTENDED\2) WP SVN
+#: repository\tags\3.5.0/view/templates/settings/initialisation.php:75
+#, php-format
+msgid ""
+"Do you want to use a custom font in your template? %sSee our documentation "
+"on how to correctly install and use a custom font%s before initialising "
+"below."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
