@@ -78,7 +78,7 @@ $form = RGFormsModel::get_form_meta($form_id);
 				</p>
 
 				<p class="body_text">Now you've got an understanding on configuring the software, let's take a look at custom templates. 
-				To start with, you'll want to copy and rename one of the <em>example-</em> template files in your active theme's PDF_EXTENDED_TEMPLATES directory. <strong>Note: Some releases will push template updates for the default-, example- template files and template.css and these files are replaced (but backed up as of 3.4.0) when the software is reinitalised. Don’t modify them directly.</strong> </p>				
+				To start with, you'll want to copy and rename one of the <em>example-</em> template files in your active theme's PDF_EXTENDED_TEMPLATES directory. </p>				
 
 				<p class="body_text">Once copied, go to your Wordpress Dashboard and navigate to Forms -> Entries and click the View PDF button on one of your entries. If you haven't assigned a custom template to the form, the default-template.php should open. 
 				 If you change <em>default-template.php</em> in the URL to the new template you just made it will generate a PDF based off that file.</p>

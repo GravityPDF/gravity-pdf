@@ -28,7 +28,7 @@
       <li>Feature - Add auto-PDF_EXTENDED_TEMPLATE theme syncer for sites that have direct write access to their server files</li>
       <li>Feature - Correctly added language support. The .PO file is located in the /language/ folder if anyone would like to do a translation.</li>
 
-      <li>Housekeeping - Restrict initialation process to 64MB or greater to counter problems with users reporting a 'white screen' when running in a low-RAM environment.</li>
+      <li>Housekeeping - Restrict initialisation process to 64MB or greater to counter problems with users reporting a 'white screen' when running in a low-RAM environment.</li>
       <li>Housekeeping - Refractor the admin notices code</li>
       <li>Housekeeping - Create responsive PDF settings page</li>
       <li>Housekeeping - Minify CSS and Javascript files </li>
