@@ -231,7 +231,11 @@ class GFPDF_Core extends PDFGenerator
 	 	 * Don't run initialiser if we cannot...
 	 	 */
 		if($gfpdfe_data->allow_initilisation === false)
-		{		 			
+		{		 	
+			/*
+			 * Prompt user about a server configuration problem
+			 */
+			add_action($gfpdfe_data->notice_type, array("GFPDF_Notices", "gf_pdf_server_problem_detected"));		
 			return false; 
 		}	 	
 
@@ -291,6 +295,7 @@ class GFPDF_Core extends PDFGenerator
 	  {
 
 	  		global $gfpdfe_data;
+
 	  		/*
 	  		 * Check if client is using the automated installer 
 	  		 * If installer has issues or client cannot use auto installer (using FTP/SSH ect) then run the usual 

@@ -120,6 +120,27 @@ class GFPDF_Notices
 		}
 	}
 
+	/*
+	 * The $gfpdfe_data->allow_initilisation function is false 
+	 * meaning there is a server configuration problem detected
+	 */
+	public static function gf_pdf_server_problem_detected()
+	{
+		if( !rgpost('update') )
+		{
+			if(rgget("page") == 'gf_settings' && rgget('subview') == 'PDF')
+			{	
+				$msg =  __('Gravity Forms PDF Extended detected a server compatibility problem which prevented the software from running. See the System Status section below for details.', 'pdfextended');
+			}
+			else
+			{	
+				$msg =  sprintf(__('Gravity Forms PDF Extended detected a server compatibility problem which prevented the software from running. Please go to the %splugin\'s settings page%s to view the issue.', 'pdfextended'), '<a href="'.PDF_SETTINGS_URL.'">', '</a>');	
+			}
+
+			self::error($msg);
+		}
+	}
+
 	/**
 	 * PDF Extended has been freshly installed
 	 */

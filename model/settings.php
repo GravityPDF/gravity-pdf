@@ -95,7 +95,7 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 		  * Sniff the options to see if it exists
 		  */
 		  $gfpdfe_data->is_initialised = false;
-		  if( $gfpdfe_data->fresh_install === true )
+		  if( $gfpdfe_data->fresh_install === false )
 		  {
 		 		$gfpdfe_data->is_initialised = true;
 		  }
