@@ -26,7 +26,7 @@ class GFPDF_Notices
 	/*
 	 * Output the update notice 
 	 */
-	private static function notice($text)
+	public static function notice($text)
 	{
 		self::message($text);
 	}	
@@ -34,7 +34,7 @@ class GFPDF_Notices
 	/*
 	 * Output the error notice
 	 */
-	private static function error($text)
+	public static function error($text)
 	{
 		self::message($text, 'error');
 	}	
