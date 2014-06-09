@@ -77,6 +77,12 @@ class GFPDF_Core extends PDFGenerator
 {
 	public $render;
 	static $model;
+
+	/**
+	 * Contains our registered add on information
+	 * @var array
+	 */
+	public $addon = array();
 		
 	/*
 	 * Main Controller 
@@ -220,7 +226,6 @@ class GFPDF_Core extends PDFGenerator
 		/*
 		 * Give our addons something to hook into once the software is fully initialised
 		 */
-		$gfpdfe_data->addon = array();
 		do_action('gfpdfe_addons');
 		
 	}
