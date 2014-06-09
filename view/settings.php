@@ -25,35 +25,52 @@ class settingsView
 			  */
 			  ksort($this->model->navigation);
             
+              $tab = PDF_Common::get('tab');
+              if(strlen($tab) == 0)
+              {
+                $tab = 'initialisation';
+              }
+
             ?>
             
             <h2 class="nav-tab-wrapper">  
-                <?php 
-                $active = 'nav-tab-active';
+                <?php                 
                 foreach($this->model->navigation as $id => $page): ?>
-                    <a href="<?php echo $page['id']; ?>" class="nav-tab <?php echo $active; ?>"><?php _e($page['name'], 'pdf_extended'); ?></a>      
-                <?php 
-                    $active = '';
+                    <?php $active = ($page['id'] == $tab) ? 'nav-tab-active' : '' ?>
+                    <a href="<?php echo PDF_SETTINGS_URL; ?>&amp;tab=<?php echo $page['id']; ?>" class="nav-tab <?php echo $active; ?>"><?php _e($page['name'], 'pdfextended'); ?></a>      
+                <?php                     
                 endforeach; ?>
             </h2> 
                     
                     
             <div id="pdfextended-settings">    
-            
+
             	<?php 
-					foreach($this->model->navigation as $id => $page)
-					{
-						?>
-                        	<div id="<?php echo substr($page['id'], 1); ?>" class="nav-tab-contents">
-                            	<?php include $page['template']; ?>
+ 
+
+                    foreach($this->model->navigation as $item)
+                    {
+                        if($item['id'] == $tab)
+                        {
+                            $page = $item;
+                            break;
+                        }
+                    }
+
+                    if(isset($page))
+                    {
+                        
+                        ?>
+                            <div id="<?php echo $page['id']; ?>" class="nav-tab-contents">
+                                <?php include $page['template']; ?>
                             </div>
                         <?php
-					}                                        
+                        do_action('pdf-extended-settings-' . $page['id']);
+                    }
+
+				    do_action('pdf-extended-settings');	                                        
 				?>                           
                  
-                 <?php
-                    do_action('pdf-extended-settings');
-                 ?> 
             </div>
         
         <?php

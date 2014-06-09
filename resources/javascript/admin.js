@@ -1,19 +1,5 @@
 (function($) {
 	jQuery(document).ready(function($) {
-		jQuery('.nav-tab-contents:not(:first)').hide();
-
-		jQuery('.nav-tab').click(function() {
-			switch_tabs($(this));
-			return false;
-		});
-
-
-		/*
-		 * Check if a #hash exists and pass it to switch_tabs
-		 */
-		if (window.location.hash) {
-			switch_tabs($('.nav-tab[href="' + window.location.hash + '"]'));
-		}
 
 		/*
 		 * Validate Support Form
@@ -73,26 +59,6 @@
 					$('#support-request-button').after('<span class="msg">' + results.msg + '</span>');
 				}
 			});
-	};
-
-	function switch_tabs(obj) {
-		//  Test to see if the menu tab is already active
-		//  Only process the click if the tab is inactive
-		if (!obj.hasClass('nav-tab-active')) {
-			//  Hide the active menu tab and all the contents panels
-			jQuery('.nav-tab-active').removeClass('nav-tab-active');
-			jQuery('.nav-tab-contents').hide();
-
-			//  Get the value of the ‘rel’ attribute of the selected element object
-			//  Translate the value into the id reference of the target panel
-			var id = obj.attr('href');
-
-			//  Set the selected menu tab to active
-			//  Show the associated contents panel with the ID
-			//  that matches the object ‘rel’ identifier
-			obj.addClass('nav-tab-active');
-			jQuery(id).show();
-		}
 	};
 
 	function validate_form() {

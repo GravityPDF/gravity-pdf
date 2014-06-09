@@ -80,6 +80,10 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 
 == Changelog ==
 
+= 3.6.0 =
+* Housekeeping - Settings page tabs now on seperate pages (previously javascript tabs)
+* Housekeeping - Added new action hooks: settings page and addon action hooks
+
 = 3.5.0 =
 * Feature - No longer need to reinitialise every time the software is updated. 
 * Feature - Add auto-initialiser on initial installation for sites that have direct write access to their server files
