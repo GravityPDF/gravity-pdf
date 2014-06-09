@@ -26,19 +26,19 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 	 {		 
 			$this->navigation = array(
 				10 => array(
-					'name' => 'Initialisation',
+					'name' => __('Initialisation', 'pdfextended'),
 					'id' => 'initialisation',
 					'template' => PDF_PLUGIN_DIR . 'view/templates/settings/initialisation-tab.php',
 				),
 				
 				20 => array(
-					'name' => 'Support',
+					'name' => __('Support', 'pdfextended'),
 					'id' => 'support',
 					'template' => PDF_PLUGIN_DIR . 'view/templates/settings/support.php' ,
 				),	
 				
 				30 => array(
-					'name' => 'Changelog',
+					'name' => __('Changelog', 'pdfextended'),
 					'id' => 'changelog',
 					'template' => PDF_PLUGIN_DIR . 'view/templates/settings/changelog.php',
 				),							
