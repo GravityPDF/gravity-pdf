@@ -39,7 +39,7 @@ class GFPDF_Notices
 		self::message($text, 'error');
 	}	
 
-	private static function display_plugin_message($message, $is_error = false){
+	public static function display_plugin_message($message, $is_error = false){
 
         $style = $is_error ? 'style="background-color: #ffebe8;"' : "";
 
