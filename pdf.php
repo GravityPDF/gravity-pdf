@@ -82,7 +82,7 @@ class GFPDF_Core extends PDFGenerator
 	 * Contains our registered add on information
 	 * @var array
 	 */
-	public $addon = array();
+	static $addon = array();
 		
 	/*
 	 * Main Controller 
