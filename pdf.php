@@ -112,7 +112,9 @@ class GFPDF_Core extends PDFGenerator
 		 * We'll initialise our model which will do any function checks ect
 		 */
 		 include PDF_PLUGIN_DIR . 'model/pdf.php';			 
-		 self::$model = new GFPDF_Core_Model();					 
+		 self::$model = new GFPDF_Core_Model();	
+
+		 do_action('gfpdfe_pre_compatibility_checks');				 
 		 			 	
 		/*
 		* Check for any major compatibility issues early
