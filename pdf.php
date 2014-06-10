@@ -56,6 +56,8 @@ define('GF_PDF_EXTENDED_PLUGIN_BASENAME', plugin_basename(__FILE__));
  include PDF_PLUGIN_DIR . 'helper/notices.php'; 
  include PDF_PLUGIN_DIR . 'helper/pdf-configuration-indexer.php'; 	
  include PDF_PLUGIN_DIR . 'helper/installation-update-manager.php'; 				
+ include PDF_PLUGIN_DIR . 'helper/addons/framework.php'; 
+ include PDF_PLUGIN_DIR . 'model/licensing.php'; 
  
  /*
   * Initialise our data helper class
@@ -92,6 +94,8 @@ class GFPDF_Core extends PDFGenerator
 	public static function pdf_init() 
 	{
 		global $gfpdfe_data;
+
+		$gfpdfe_data->store_url = 'http://staging.gravityformspdfextended.com/developer/';
    
 		/*
 		 * Set the notice type 
@@ -165,10 +169,10 @@ class GFPDF_Core extends PDFGenerator
 		global $gfpdfe_data;	
 
 	    /* 
-		 * Include the core files
+		 * Include additional core files
 		 */ 
 		 include PDF_PLUGIN_DIR . 'helper/pdf-render.php'; 
-		 include PDF_PLUGIN_DIR . 'helper/pdf-entry-detail.php';  
+		 include PDF_PLUGIN_DIR . 'helper/pdf-entry-detail.php';  		 
 		
 		/*
 		* Set up the PDF configuration and indexer
@@ -362,7 +366,7 @@ class GFPDF_Core extends PDFGenerator
 		/* 
 		 * Configure the settings page
 		 */
-		  wp_enqueue_style( 'pdfextended-admin-styles', PDF_PLUGIN_URL . 'resources/css/admin-styles.min.css', array('dashicons'), '1.1' );		
+		  wp_enqueue_style( 'pdfextended-admin-styles', PDF_PLUGIN_URL . 'resources/css/admin-styles.css', array('dashicons'), '1.1' );		
 		  wp_enqueue_script( 'pdfextended-settings-script', PDF_PLUGIN_URL . 'resources/javascript/admin.min.js' );	
 		 
 		 /*
