@@ -1,4 +1,4 @@
-=== Plugin Name ===
+﻿=== Plugin Name ===
 Contributors: blueliquiddesigns
 Donate link: http://www.gravityformspdfextended.com
 Tags: gravity, forms, pdf, automation, attachment
@@ -84,6 +84,7 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 * Feature - Add Addons Framework 
 * Housekeeping - Settings page tabs now on seperate pages (previously javascript tabs)
 * Housekeeping - Added new action hooks: settings page and addon action hooks
+* Housekeeping - Cleaned up the checks to see if the plugin should run. Will now correctly run on pages with [gravityform] shortcode
 
 = 3.5.0 =
 * Feature - No longer need to reinitialise every time the software is updated. 
