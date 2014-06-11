@@ -73,6 +73,7 @@ define('GF_PDF_EXTENDED_PLUGIN_BASENAME', plugin_basename(__FILE__));
   */
    add_action('init', array('GFPDF_Core', 'pdf_init'));
    add_action('wp_ajax_support_request', array('GFPDF_Settings_Model', 'gfpdf_support_request'));
+   add_action('gform_enqueue_scripts', array('GFPDF_Core', 'init_class'));
    
 
 class GFPDF_Core extends PDFGenerator
@@ -146,23 +147,26 @@ class GFPDF_Core extends PDFGenerator
 		 *  - Load if on Gravity Form page on the front end
 		 *  - Load if receiving Paypal IPN
 		 */		 		
-		 if( ( is_admin() && isset($_GET['page']) && (substr($_GET['page'], 0, 3) === 'gf_') ) ||
-		 	  ( isset($_GET['gf_pdf']) ) ||
-			  ( RGForms::get("page") == "gf_paypal_ipn") ||
-			  ( isset($_POST["gform_submit"]) && GFPDF_Core_Model::valid_gravity_forms() || 
-			  	(  defined( 'DOING_AJAX' ) && DOING_AJAX && isset($_POST['action']) && isset($_POST['gf_resend_notifications'])) )
+		
+		 if( ( is_admin() && (RGForms::is_gravity_page() || RGForms::is_gravity_ajax_action()) ) ||
+		 	  ( isset($_GET['gf_pdf']) || RGForms::get("page") == "gf_paypal_ipn" ) 
 			)
 		 {			
 			/*
 			 * Initialise the core class which will load the __construct() function
 			 */
-			global $gfpdf;
-			$gfpdf = new GFPDF_Core();  		 	
-		 }
-		 
-		 return;
-				  
+			self::init_class();		 	
+		 }		 				  
    }	
+
+   public static function init_class()
+   {
+   		global $gfpdf;
+   		if(empty($gfpdf))
+   		{
+   			$gfpdf = new GFPDF_Core();
+   		}
+   }
 	
 	public function __construct()
 	{
