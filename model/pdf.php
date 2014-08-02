@@ -110,40 +110,31 @@ class GFPDF_Core_Model
 			return;
 		}		
 
-		if(is_array($templates))
+		if(!is_array($templates))
 		{
-			?>
-				<strong>PDFs</strong><br />
-
-                        	<?php foreach($templates as $id => $val):
-							$name = $gfpdf->get_pdf_name($id, $form_id, $lead['id']);
-							$aid = (int) $id + 1;
-							 ?>	
-                            <div class="detailed_pdf">						
-								<span><?php 
-									echo $name; 									
-									$url = home_url() .'/?gf_pdf=1&aid='. $aid .'&fid=' . $form_id . '&lid=' . $lead_id . '&template=' . $val['template']; 								
-								?></span> 
-                                <a href="<?php echo $url; ?>" target="_blank" class="button"><?php _e('View', 'pdfextended'); ?></a> 
-				 				<a href="<?php echo $url.'&download=1'; ?>" target="_blank" class="button"><?php _e('Download', 'pdfextended'); ?></a>
-				 			</div>
-                                  
-                            <?php endforeach; ?>
-
-                
-            <?php
+			$templates = array(array('template' => $templates));
 		}
-		elseif($templates !== false)
-		{
-			$url = home_url() .'/?gf_pdf=1&fid=' . $form_id . '&lid=' . $lead_id . '&template=' . $templates; 
 
-			?>
-			<div class="detailed_pdf">
-				<?php _e('PDF', 'pdfextended'); ?>: <a href="<?php echo $url; ?>" target="_blank" class="button"><?php _e('View', 'pdfextended'); ?></a> 
-				 <a href="<?php echo $url.'&download=1'; ?>" target="_blank" class="button"><?php _e('Download', 'pdfextended'); ?></a>
-			</div>
-			<?php
-		}
+		?>
+			<strong>PDFs</strong><br />
+
+        	<?php foreach($templates as $id => $val):
+			$name = $gfpdf->get_pdf_name($id, $form_id, $lead['id']);
+			$aid = (int) $id + 1;
+			 ?>	
+            <div class="detailed_pdf">						
+				<span><?php 
+					echo $name; 									
+					$url = home_url() .'/?gf_pdf=1&aid='. $aid .'&fid=' . $form_id . '&lid=' . $lead_id . '&template=' . $val['template']; 								
+				?></span> 
+                <a href="<?php echo $url; ?>" target="_blank" class="button"><?php _e('View', 'pdfextended'); ?></a> 
+ 				<a href="<?php echo $url.'&download=1'; ?>" target="_blank" class="button"><?php _e('Download', 'pdfextended'); ?></a>
+ 			</div>
+                  
+            <?php endforeach; ?>
+
+            
+        <?php	
 	}
 	
 	/*

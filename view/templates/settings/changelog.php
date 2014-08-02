@@ -21,6 +21,17 @@
     <p><strong>Current Version: <?php echo PDF_EXTENDED_VERSION; ?></strong></p>
 
     <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
+
+<ul>
+  <li>Bug - Fixed issue using core fonts Arial/Helvetica, Times/Times New Roman and Courier.</li>
+  <li>Bug - Fixed display issues for multiple PDFs on the details admin entry page</li>
+  <li>Housekeeping - Made the details entry page PDF view consistent for single or multiple PDFs</li>
+  <li>Housekeeping - Ensured all javascript files are minified and are correctly being used</li>
+  <li>Housekeeping - Remove legacy notices from mPDF package</li>
+</ul>
+
+<h3>3.5.0</h3>
+
     <ul>
       <li>Feature - No longer need to reinitialise every time the software is updated. </li>
       <li>Feature - Add auto-initialiser on initial installation for sites that have direct write access to their server files</li>

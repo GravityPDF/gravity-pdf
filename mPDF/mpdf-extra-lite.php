@@ -5941,12 +5941,10 @@ function Output($name='',$dest='')
 	if (count($this->PDFAXwarnings) && (($this->PDFA && !$this->PDFAauto) || ($this->PDFX && !$this->PDFXauto))) {
 		if ($this->PDFA) {
 			echo '<div>WARNING - This file could not be generated as it stands as a PDFA1-b compliant file.</div>';
-			echo '<div>These issues can be automatically fixed by setting <i>"pdfa1b_force" => true</i> in the Gravity Forms PDF Extended configuration.php file</div>';
 			echo '<div>Action that mPDF will take to automatically force PDFA1-b compliance are shown in brackets.</div>';
 		}
 		else {
 			echo '<div>WARNING - This file could not be generated as it stands as a PDFX/1-a compliant file.</div>';
-			echo '<div>These issues can be automatically fixed by setting <i>"pdfx1a_force" => true</i> in the Gravity Forms PDF Extended configuration.php file</div>';
 			echo '<div>Action that mPDF will take to automatically force PDFX/1-a compliance are shown in brackets.</div>';
 		}
 		echo '<div>Warning(s) generated:</div><ul>';

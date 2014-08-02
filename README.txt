@@ -4,7 +4,7 @@ Donate link: http://www.gravityformspdfextended.com
 Tags: gravity, forms, pdf, automation, attachment
 Requires at least: 3.5
 Tested up to: 3.9
-Stable tag: 3.5.0
+Stable tag: 3.5.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -48,7 +48,7 @@ Along with the above, the PDF software includes powerful feature such as:
 3. GD Library
 4. RAM:	Recommended: 128MB. Minimum: 64MB.
 
-*Note:* We've had clients report slow PDF generation times and problems meeting the RAM requirements on cheap shared web hosting. If you experience these problems [we recommend you look into WP Engine's managed hosting platform](http://www.shareasale.com/r.cfm?u=955815&m=41388&b=394686) as our software works correctly out of the box.
+*Note:* We've had clients report slow PDF generation times and problems meeting the RAM requirements on cheap shared web hosting. If you experience these problems [we recommend you look into WP Engine's managed hosting platform](http://www.shareasale.com/r.cfm?B=398776&U=955815&M=41388&urllink=) as our software works correctly out of the box.
 
 **Software Requirements**
 
@@ -79,6 +79,13 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 2. View or download the PDF from a Gravity Forms entry.
 
 == Changelog ==
+
+= 3.5.1 =
+* Bug - Fixed issue with core fonts Arial/Helvetica, Times/Times New Roman and Courier not displaying in the PDF.
+* Bug - Fixed display issues for multiple PDFs on the details admin entry page
+* Housekeeping - Made the details entry page PDF view consistent for single or multiple PDFs
+* Housekeeping - Ensured all javascript files are minified and are correctly being used
+* Housekeeping - Remove legacy notices from mPDF package
 
 = 3.5.0 =
 * Feature - No longer need to reinitialise every time the software is updated. 
