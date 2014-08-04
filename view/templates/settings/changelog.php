@@ -23,6 +23,12 @@
     <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
 
 <ul>
+  <li>Bug - Initialisation folder .htaccess file was preventing template.css from being loaded by the default templates.</li>
+</ul>
+
+<h3>3.5.1</h3>
+
+<ul>
   <li>Bug - Fixed issue using core fonts Arial/Helvetica, Times/Times New Roman and Courier.</li>
   <li>Bug - Fixed display issues for multiple PDFs on the details admin entry page</li>
   <li>Housekeeping - Made the details entry page PDF view consistent for single or multiple PDFs</li>
