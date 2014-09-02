@@ -80,6 +80,9 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 
 == Changelog ==
 
+= 3.5.3 =
+* Bug - Mergetags braces ({}) were being encoded before conversion
+
 = 3.5.2 =
 * Bug - Initialisation folder .htaccess file was preventing template.css from being loaded by the default templates.
 

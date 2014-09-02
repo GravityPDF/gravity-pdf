@@ -107,12 +107,19 @@ class PDF_Common
 	 */
 	public static function do_mergetags($string, $form_id, $lead_id)
 	{		
+
 		$form = RGFormsModel::get_form_meta($form_id);
 		$lead = RGFormsModel::get_lead($lead_id);
-		
+
+		/*
+		 * Unconvert { and } symbols from HTML entities 
+		 */
+		$string = str_replace('&#123;', '{', $string);		
+		$string = str_replace('&#125;', '}', $string);
+
 		/* strip {all_fields} merge tag from $string */
 		$string = str_replace('{all_fields}', '', $string);		
-		
+
 		return trim(GFCommon::replace_variables($string, $form, $lead, false, false, false));		
 	}
 	
