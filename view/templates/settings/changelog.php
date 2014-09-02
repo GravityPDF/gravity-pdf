@@ -22,6 +22,15 @@
 
     <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
 
+
+<ul>
+  <li>Bug - Mergetags braces ({}) were being encoded before conversion</li>
+  <li>Bug - Fixed issue with empty string being passed to array filter</li>
+  <li>Housekeeping - Enabled mergetag usage in the pdf_password and pdf_master_password configuration options</li>
+  <li>Housekeeping - Correctly call $wpdb->prepare so the variables in are in the second argument</li>
+</ul>
+
+<h3>3.5.2</h3>
 <ul>
   <li>Bug - Initialisation folder .htaccess file was preventing template.css from being loaded by the default templates.</li>
 </ul>

@@ -193,6 +193,6 @@ class PDF_Common
 			return $_GET[$name];
 
 		return '';
-	}	
+	}
 }
 

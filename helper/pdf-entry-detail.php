@@ -1004,11 +1004,10 @@ if(!class_exists('GFPDFEntryDetail'))
 			/*
 			 * Check if there are any values in the list 
 			 */
-			if(sizeof($list) == 0)
+			if(!is_array($list) || sizeof($list) == 0)
 			{
 				return $list;
 			}
-
 
 			/*
 			 * Check if it's a multi column list

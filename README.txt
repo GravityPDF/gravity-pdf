@@ -82,6 +82,9 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 
 = 3.5.3 =
 * Bug - Mergetags braces ({}) were being encoded before conversion
+* Bug - Fixed issue with empty string being passed to array filter
+* Housekeeping - Enabled mergetag usage in the pdf_password and pdf_master_password configuration options 
+* Housekeeping - Correctly call $wpdb->prepare so the variables in are in the second argument
 
 = 3.5.2 =
 * Bug - Initialisation folder .htaccess file was preventing template.css from being loaded by the default templates.

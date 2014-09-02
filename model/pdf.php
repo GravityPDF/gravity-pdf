@@ -251,7 +251,7 @@ class GFPDF_Core_Model
 			/* 
 			 * Check the lead is in the database and the IP address matches (little security booster) 
 			 */
-			$form_entries = $wpdb->get_var( $wpdb->prepare("SELECT count(*) FROM `".$wpdb->prefix."rg_lead` WHERE form_id = ".$form_id." AND status = 'active' AND id = ".$lead_id." AND ip = '".$ip."'", array() ) );	
+			$form_entries = $wpdb->get_var( $wpdb->prepare("SELECT count(*) FROM `".$wpdb->prefix."rg_lead` WHERE form_id = %d AND status = 'active' AND id = %d AND ip = %s", array($form_id, $lead_id, $ip) ) );	
 			
 			if($form_entries == 0 && $gfpdf->configuration[$index]['access'] !== 'all')
 			{
@@ -272,7 +272,7 @@ class GFPDF_Core_Model
 				   * User doesn't have the correct access privilages 
 				   * Let's check if they are assigned to the form
 				   */
-					$user_logged_entries = $wpdb->get_var( $wpdb->prepare("SELECT count(*) FROM `".$wpdb->prefix."rg_lead` WHERE form_id = ".$form_id." AND status = 'active' AND id = ".$lead_id." AND created_by = '". get_current_user_id() ."'", array() ) );					   
+					$user_logged_entries = $wpdb->get_var( $wpdb->prepare("SELECT count(*) FROM `".$wpdb->prefix."rg_lead` WHERE form_id = %d AND status = 'active' AND id = %d AND created_by = %d", array($form_id, $lead_id, get_current_user_id()) ) );					   
 					
 					/*
 					 * Failed again.
@@ -281,7 +281,7 @@ class GFPDF_Core_Model
 					 */
 					if($user_logged_entries == 0)
 					{				   
-						$form_entries = $wpdb->get_var( $wpdb->prepare("SELECT count(*) FROM `".$wpdb->prefix."rg_lead` WHERE form_id = ".$form_id." AND status = 'active' AND id = ".$lead_id." AND ip = '".$ip."'", array() ) );	
+						$form_entries = $wpdb->get_var( $wpdb->prepare("SELECT count(*) FROM `".$wpdb->prefix."rg_lead` WHERE form_id = %d AND status = 'active' AND id = %d AND ip = %s", array($form_id, $lead_id, $ip) ) );	
 						
 						if($form_entries == 0)
 						{
@@ -588,13 +588,14 @@ class GFPDF_Core_Model
 		 */ 
 		$privileges      = (isset($config['pdf_privileges'])) ? $gfpdf->validate_privileges($config['pdf_privileges']) : $gfpdf->validate_privileges('');	
 		
-		$pdf_password    = (isset($config['pdf_password'])) ? $config['pdf_password'] : '';
-		$master_password = (isset($config['pdf_master_password'])) ? $config['pdf_master_password'] : '';
+		$pdf_password    = (isset($config['pdf_password'])) ? PDF_Common::do_mergetags($config['pdf_password'], $form_id, $lead_id) : '';
+		$master_password = (isset($config['pdf_master_password'])) ? PDF_Common::do_mergetags($config['pdf_master_password'], $form_id, $lead_id) : '';
 		$rtl             = (isset($config['rtl'])) ? $config['rtl'] : false;		
 
 
 		$form = RGFormsModel::get_form_meta($form_id);
 		$lead = RGFormsModel::get_lead($lead_id);
+		
 		/*
 		 * Run the options through filters
 		 */
