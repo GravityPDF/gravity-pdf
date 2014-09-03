@@ -84,6 +84,7 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 = 3.5.4 =
 * Bug - Fixed issue with incorrect PDF name showing on the entry details page
 * Bug - Fixed issue with custom fonts being inaccessible without manually reinstalling after upgrading. 
+* Housekeeping - Added in two new filters to modify the $mpdf object. 'gfpdfe_mpdf_class' and 'gfpdfe_mpdf_class_pre_render' (replaces the gfpdfe_pre_render_pdf filter).
 
 = 3.5.3 =
 * Bug - Mergetags braces ({}) were being encoded before conversion

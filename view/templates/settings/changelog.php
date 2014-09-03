@@ -1,8 +1,8 @@
 <?php
 
  /*
-  <li>Template: Changelog
-  <li>Module: Settings Page
+  Template: Changelog
+  Module: Settings Page
   *
   */
   
@@ -21,7 +21,14 @@
     <p><strong>Current Version: <?php echo PDF_EXTENDED_VERSION; ?></strong></p>
 
     <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
+  <ul>
+    <li>Bug - Fixed issue with incorrect PDF name showing on the entry details page</li>
+    <li>Bug - Fixed issue with custom fonts being inaccessible without manually reinstalling after upgrading.</li>
+    <li>Housekeeping - Added in two new filters to modify the $mpdf object. 'gfpdfe_mpdf_class' and 'gfpdfe_mpdf_class_pre_render' (replaces the gfpdfe_pre_render_pdf filter).</li>
+  </ul>
 
+
+<h3>3.5.3</h3>
 
 <ul>
   <li>Bug - Mergetags braces ({}) were being encoded before conversion</li>
