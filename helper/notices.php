@@ -75,18 +75,7 @@ class GFPDF_Notices
 
 		self::notice($msg);
 		
-	}	
-
-	public static function gf_pdf_font_err()
-	{
-		$prefix = self::autoprefix();
-		$suffix = self::autosuffix();
-	
-		$msg =  $prefix . __('There was a problem installing the font files. Check the file permissions in the plugin folder and try again.', 'pdfextended') . $suffix;
-
-		self::error($msg);
-		
-	}	
+	}		
 	
 	public static function gf_pdf_font_config_err()
 	{

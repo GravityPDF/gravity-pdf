@@ -2393,7 +2393,16 @@ function AddFont($family,$style='') {
 	}
 	if (!$ttffile) {
 		$ttffile = _MPDF_TTFONTPATH.$this->fontdata[$family][$stylekey];
-		if (!file_exists($ttffile)) { die("mPDF Error - cannot find TTF TrueType font file - ".$ttffile); }
+		if (!file_exists($ttffile)) { 
+			/*
+			 * Try load in the font file from the PDF_TEMPLATE
+			 */
+			$ttffile = PDF_TEMPLATE_LOCATION . 'fonts/' . $this->fontdata[$family][$stylekey];			
+			if(!file_exists($ttffile))
+			{
+				die("mPDF Error - cannot find TTF TrueType font file - ".$ttffile); 
+			}
+		}
 	}
 	$ttfstat = stat($ttffile);
 

@@ -83,6 +83,7 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 
 = 3.5.4 =
 * Bug - Fixed issue with incorrect PDF name showing on the entry details page
+* Bug - Fixed issue with custom fonts being inaccessible without manually reinstalling after upgrading. 
 
 = 3.5.3 =
 * Bug - Mergetags braces ({}) were being encoded before conversion

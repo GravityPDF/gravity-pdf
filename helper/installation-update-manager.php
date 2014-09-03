@@ -340,22 +340,7 @@ class GFPDF_InstallUpdater
 		 /* read all file names into array and unlink from active theme template folder */
 		 foreach(glob($fonts_location.'/*.[tT][tT][fF]') as $file) {
 
-			 	$path_parts = pathinfo($file);	
-				
-				/*
-				 * Check if the files already exist in the mPDF font folder
-				 */					
-				 if(!$wp_filesystem->exists($directory . 'mPDF/ttfonts/' . $path_parts['basename']))
-				 {
-					/*
-					 * copy ttf file to the mPDF font folder
-					 */
-					if($wp_filesystem->copy($file, $directory . 'mPDF/ttfonts/' . $path_parts['basename']) === false)
-					{ 
-						add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_font_err')); 	
-						return false;
-					}	
-				 }
+			 	$path_parts = pathinfo($file);			
 				
 				/*
 				 * Generate configuration information in preparation to write to file
