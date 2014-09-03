@@ -112,7 +112,8 @@ class GFPDF_Core_Model
 
 		if(!is_array($templates))
 		{
-			$templates = array(array('template' => $templates));
+			$index = $gfpdf->index[$form_id];
+			$templates = array($index[0] => array('template' => $templates));			
 		}
 
 		?>
