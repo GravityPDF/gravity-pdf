@@ -167,7 +167,13 @@ class PDFRender
 		 	$orientation = ($arguments['orientation'] == 'landscape') ? 'L' : 'P';			 			
 		 }
 		 
-		 $mpdf = new mPDF('', $paper_size, 0, '', 15, 15, 16, 16, 9, 9, $orientation);
+		 $mpdf = new mPDF('', $paper_size, 0, '', 15, 15, 16, 16, 9, 9, $orientation);		 
+
+		 /* 
+		  * Add filter to allow the $mpdf object to be modified right after the class is created.
+		  * Because $mpdf is a class it is automatically passed by reference and doesn't need to be assigned
+		  */ 
+		 apply_filters('gfpdfe_mpdf_class', $mpdf, $form_id, $lead_id, $arguments, $output, $filename);
 		
 		/*
 		 * Display PDF is full-page mode which allows the entire PDF page to be viewed
@@ -241,9 +247,14 @@ class PDFRender
 		$mpdf->WriteHTML($html);		
 
 		/*
+		 * Allow the $mpdf object to be modified now all the settings have been applied
+		 */		
+		apply_filters('gfpdfe_mpdf_class_pre_render', $mpdf, $form_id, $lead_id, $arguments, $output, $filename);
+		apply_filters('gfpdfe_pre_render_pdf', $mpdf, $form_id, $lead_id, $arguments, $output, $filename); /* left in for backwards compatiblity */
+
+		/*
 		 * Add pre-render/save filter so PDF can be manipulated further
-		 */	
-		$mpdf     = apply_filters('gfpdfe_pre_render_pdf', $mpdf, $form_id, $lead_id, $arguments, $output, $filename);
+		 */			
 		$output   = apply_filters('gfpdfe_pdf_output_type', $output);
 		$filename = apply_filters('gfpdfe_pdf_filename', $filename);
 		
