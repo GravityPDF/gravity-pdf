@@ -58,7 +58,7 @@
 				/*
 				 * Include the configuration file and set up the configuration variable.
 				 */  
-				 require(PDF_TEMPLATE_LOCATION.'configuration.php');				
+				 require_once(PDF_TEMPLATE_LOCATION.'configuration.php');				
 				 /*
 				  * $gf_pdf_config included from configuration.php file
 				  */				 
@@ -156,36 +156,30 @@
 	{	
 		return (isset($this->index[$id])) ? $this->index[$id] : false;
 	}
-	
-	/*
-	 * Searches the index for the configuration key and once found return the real configuration
-	 * Return: form PDF configuration
-	 */ 
-	public function get_config_data($form_id, $return_all = false)
+
+	/**
+	 * Pull all config nodes for a single form 
+	 * @param  Integer $form_id The form ID a user is looking for
+	 * @return Array          The configuration nodes for a particular form
+	 */
+	public function get_form_configuration($form_id)
 	{
 		if(!isset($this->index[$form_id]))
 		{
 			return false;	
+		}	
+		
+		$indexes = $this->index[$form_id];
+
+		$config_nodes = array();
+
+		foreach($indexes as $index)	
+		{
+			$config_nodes[] = $this->configuration[$index];
 		}
 
-		$index = $this->index[$form_id];
-		/* 
-		 * Because we now allow multiple PDF templates per form we need a way to get the correct PDF settings
-		 * To do this we use the $_GET variable 'aid'
-		 * If 'aid' is not found we will pull the first entry
-		 * Note: 'aid' has been incremented by 1 so 'aid' === 0 is never found
-		 */
-		 if(isset($_GET['aid']) && (int) $_GET['aid'] > 0)
-		 {
-			$aid = (int) $_GET['aid'] - 1;
-			return $this->configuration[$index[$aid]]; 
-		 }
-		 
-		 /*
-		  * No valid configuration file found so pull the default
-		  */
-		 return $this->configuration[$index[0]];
-	}	
+		return $config_nodes;
+	}
 
 	/**
 	 * Replaced get_config_data in default tempaltes to only return the default-only configuration options
@@ -259,8 +253,8 @@
 		}
 		
 		if(isset($this->index[$form_id]))
-		
-{			/* 
+		{
+			/* 
 			 * Show all PDF nodes
 			 */	
 			 if($return_all === true && sizeof($this->index[$form_id]) > 1)

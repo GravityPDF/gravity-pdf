@@ -153,14 +153,14 @@ class GFPDF_Core extends PDFGenerator
    }	
 	
 	public function __construct()
-	{
-		global $gfpdfe_data;	
+	{		
+		global $gfpdfe_data;			
 
 	    /* 
 		 * Include the core files
 		 */ 
-		 include PDF_PLUGIN_DIR . 'helper/pdf-render.php'; 
-		 include PDF_PLUGIN_DIR . 'helper/pdf-entry-detail.php';  
+		 include_once PDF_PLUGIN_DIR . 'helper/pdf-render.php'; 
+		 include_once PDF_PLUGIN_DIR . 'helper/pdf-entry-detail.php';  
 		
 		/*
 		* Set up the PDF configuration and indexer
@@ -171,7 +171,7 @@ class GFPDF_Core extends PDFGenerator
 		/*
 		* Run our scripts and add the settings page to the admin area 
 		*/				
-		add_action('admin_init',  array($this, 'gfe_admin_init'), 9);																				
+		add_action('admin_init',  array('GFPDF_Core', 'gfe_admin_init'), 9);																		
 				
 		/*
 		 * Ensure the system is fully installed		 
@@ -189,7 +189,6 @@ class GFPDF_Core extends PDFGenerator
 		add_action("gform_entry_info", array('GFPDF_Core_Model', 'detail_pdf_link'), 10, 2);
 		add_action('wp', array('GFPDF_Core_Model', 'process_exterior_pages'));		
 		
-
 		/*
 		* Apply default filters
 		*/  
