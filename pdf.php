@@ -134,9 +134,8 @@ class GFPDF_Core extends PDFGenerator
 		 *  - Load if on Gravity Form page on the front end
 		 *  - Load if receiving Paypal IPN
 		 */		 		
-		 if( ( is_admin() && isset($_GET['page']) && (substr($_GET['page'], 0, 3) === 'gf_') ) ||
-		 	  ( isset($_GET['gf_pdf']) ) ||
-			  ( RGForms::get("page") == "gf_paypal_ipn") ||
+		 if( ( isset($_GET['page']) && (substr($_GET['page'], 0, 3) === 'gf_') ) ||
+			  ( substr(RGForms::get("page"), 0, 3) == "gf_") ||
 			  ( isset($_POST["gform_submit"]) && GFPDF_Core_Model::valid_gravity_forms() || 
 			  	(  defined( 'DOING_AJAX' ) && DOING_AJAX && isset($_POST['action']) && isset($_POST['gf_resend_notifications'])) )
 			)
