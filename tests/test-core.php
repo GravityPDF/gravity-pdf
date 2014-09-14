@@ -1,11 +1,13 @@
 <?php
 
-class PDFCore extends WP_UnitTestCase {
+class Test_PDFCore extends WP_UnitTestCase {
 	public function setUp() {
 		parent::setUp();		
 
 		/* Load our plugin functions */
 		GFPDF_Core::fully_loaded_admin();	
+
+		touch(PDF_TEMPLATE_LOCATION . 'configuration.php');
 
 		global $gfpdf;
 		$gfpdf = new GFPDF_Core();  		
@@ -32,48 +34,48 @@ class PDFCore extends WP_UnitTestCase {
 	}	
 
 	public function test_gravityforms_exists() {		
-		$this->assertEquals(class_exists('GFForms'), true);
+		$this->assertTrue(class_exists('GFForms'), true);
 	}
 
 	public function test_pdfextended_exists() {
-		$this->assertEquals(class_exists('GFPDF_Core'), true);
-		$this->assertEquals(class_exists('PDFGenerator'), true);
-		$this->assertEquals(class_exists('PDF_Common'), true);	
+		$this->assertTrue(class_exists('GFPDF_Core'));
+		$this->assertTrue(class_exists('PDFGenerator'));
+		$this->assertTrue(class_exists('PDF_Common'));	
 
-		$this->assertEquals(class_exists('PDFRender'), true);
-		$this->assertEquals(class_exists('GFPDFEntryDetail'), true);
+		$this->assertTrue(class_exists('PDFRender'));
+		$this->assertTrue(class_exists('GFPDFEntryDetail'));
 	}
 
 	public function test_gravityform_compatible() {
 		global $gfpdfe_data;
-		$this->assertEquals($gfpdfe_data->gf_is_compatible, true);
+		$this->assertTrue($gfpdfe_data->gf_is_compatible);
 	}
 
 	public function test_wp_compatible() {
 		global $gfpdfe_data;
-		$this->assertEquals($gfpdfe_data->wp_is_compatible, true);
+		$this->assertTrue($gfpdfe_data->wp_is_compatible);
 	}
 
 	public function test_mb_string_installed() {
 		global $gfpdfe_data;
-		$this->assertEquals($gfpdfe_data->mb_string_installed, true);
+		$this->assertTrue($gfpdfe_data->mb_string_installed);
 	}		
 
 	public function test_gd_installed() {
 		global $gfpdfe_data;
-		$this->assertEquals($gfpdfe_data->gd_installed, true);
+		$this->assertTrue($gfpdfe_data->gd_installed);
 	}	
 
 	public function test_ram_compatible() {
 		global $gfpdfe_data;		
 		
-		$this->assertEquals($gfpdfe_data->ram_compatible, true);		
+		$this->assertTrue($gfpdfe_data->ram_compatible);		
 	}	
 
 	public function test_major_compatibility() {
 		$model = GFPDF_Core::$model;
 
-		$this->assertEquals($model->check_major_compatibility(), true);
+		$this->assertTrue($model->check_major_compatibility());
 	}
 
 	public function test_write_access() {
@@ -82,12 +84,20 @@ class PDFCore extends WP_UnitTestCase {
 		$this->assertEquals($access_type, 'direct');
 
 		global $gfpdfe_data;
-		$this->assertEquals($gfpdfe_data->automated, true);
+		$this->assertTrue($gfpdfe_data->automated);
 	}
 
 	public function test_fully_installed() {
-		$this->assertEquals(GFPDF_Core_Model::is_fully_installed(), true);
+		$this->assertTrue(GFPDF_Core_Model::is_fully_installed());
 	}
+
+	public function test_configuration_file() {
+		$this->assertEquals(file_exists(PDF_TEMPLATE_LOCATION . 'configuration.php'), true);				
+
+		global $gfpdf;			
+		$this->assertEquals($gfpdf->disabled, false);				
+		
+	}	
 			
 	
 }

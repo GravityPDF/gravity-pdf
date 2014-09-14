@@ -134,8 +134,9 @@ class GFPDF_Core extends PDFGenerator
 		 *  - Load if on Gravity Form page on the front end
 		 *  - Load if receiving Paypal IPN
 		 */		 		
-		 if( ( isset($_GET['page']) && (substr($_GET['page'], 0, 3) === 'gf_') ) ||
-			  ( substr(RGForms::get("page"), 0, 3) == "gf_") ||
+		 if( ( is_admin() && isset($_GET['page']) && (substr($_GET['page'], 0, 3) === 'gf_') ) ||
+		 	  ( isset($_GET['gf_pdf']) ) ||
+			  ( RGForms::get("page") == "gf_paypal_ipn") ||
 			  ( isset($_POST["gform_submit"]) && GFPDF_Core_Model::valid_gravity_forms() || 
 			  	(  defined( 'DOING_AJAX' ) && DOING_AJAX && isset($_POST['action']) && isset($_POST['gf_resend_notifications'])) )
 			)
@@ -340,9 +341,8 @@ class GFPDF_Core extends PDFGenerator
 	/**
 	 * Add our scripts and settings page to the admin area 
 	 */
-	function gfe_admin_init()
-	{					
-									
+	public static function gfe_admin_init()
+	{													
 		/* 
 		 * Configure the settings page
 		 */
@@ -357,8 +357,7 @@ class GFPDF_Core extends PDFGenerator
 
 		  add_filter('gform_tooltips', array('GFPDF_Notices', 'add_tooltips'));	 	  
 		 
-    	 GFPDF_Settings::settings_page();	
-		  
+    	 GFPDF_Settings::settings_page();			  
 	}
 	
 	/*
@@ -387,7 +386,7 @@ class GFPDF_Core extends PDFGenerator
 /*
  * array_replace_recursive was added in PHP5.3
  * Add fallback support for those with a version lower than this
- * and Wordpress still supports PHP5.0 to PHP5.2
+ * as Wordpress still supports PHP5.0 to PHP5.2
  */
 if (!function_exists('array_replace_recursive'))
 {

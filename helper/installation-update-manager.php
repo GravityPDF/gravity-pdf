@@ -91,7 +91,7 @@ class GFPDF_InstallUpdater
 					  * Test if the blog has gravity forms and PDF Extended active
 					  * If so, we can initialise 
 					  */				 
-					 $gravityforms = 'gravityforms/gravityforms.php'; /* have to hardcode the folder name is they don't set it in a constant or variable */
+					 $gravityforms = 'gravityforms/gravityforms.php'; /* have to hardcode the folder name as they don't set it in a constant or variable */
 					 $pdfextended = GF_PDF_EXTENDED_PLUGIN_BASENAME; /* no need to hardcode the basename here */
 
 					 if( (is_plugin_active_for_network($gravityforms) && is_plugin_active_for_network($pdfextended)) ||

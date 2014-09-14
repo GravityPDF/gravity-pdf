@@ -208,7 +208,7 @@
 	 * @param  integer $form_id ID of the form
 	 * @return array          configuration node
 	 */
-	private function pull_config_data($form_id)
+	public function pull_config_data($form_id)
 	{
 		if(!isset($this->index[$form_id]))
 		{
