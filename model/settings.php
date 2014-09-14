@@ -123,7 +123,7 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 		 if(class_exists('GFCommon'))
 		 {
 			 $gfpdfe_data->gf_installed = true;
-			 $gfpdfe_data->gf_version = GFCommon::$version;
+			 $gfpdfe_data->gf_version = GFForms::$version;
 			  			 
 			 if(version_compare($gfpdfe_data->gf_version, GF_PDF_EXTENDED_SUPPORTED_VERSION, '>=') === true)
 			 {
@@ -204,7 +204,7 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 
 	 	 /*
 	 	  * Our unit tests fail because PHP is being run from the CLI
-	 	  * Se we are overriding the RAM check if running from the CLI
+	 	  * Overriding the RAM check if running from the CLI
 	 	  */
 	 	 if(PHP_SAPI === 'cli')
 	 	 {
