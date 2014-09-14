@@ -107,10 +107,6 @@ class PDF_Common
 	 */
 	public static function do_mergetags($string, $form_id, $lead_id)
 	{		
-
-		$form = RGFormsModel::get_form_meta($form_id);
-		$lead = RGFormsModel::get_lead($lead_id);
-
 		/*
 		 * Unconvert { and } symbols from HTML entities 
 		 */
@@ -119,6 +115,17 @@ class PDF_Common
 
 		/* strip {all_fields} merge tag from $string */
 		$string = str_replace('{all_fields}', '', $string);		
+
+		/*
+		 * Get form and lead data
+		 */
+		$form = GFAPI::get_form($form_id);
+		$lead = GFAPI::get_entry($lead_id);
+
+		if(is_wp_error($form) || is_wp_error($lead))
+		{
+			return $string;
+		}		
 
 		return trim(GFCommon::replace_variables($string, $form, $lead, false, false, false));		
 	}
