@@ -19,7 +19,7 @@ class GFPDF_Core_Model
 	    $form_id = isset($_POST["gform_submit"]) ? $_POST["gform_submit"] : 0;
         if($form_id)
 		{
-            $form_info = RGFormsModel::get_form($form_id);
+            $form_info = GFAPI::get_form($form_id);
             $is_valid_form = $form_info && $form_info->is_active;
 
             if($is_valid_form)
@@ -594,8 +594,8 @@ class GFPDF_Core_Model
 		$rtl             = (isset($config['rtl'])) ? $config['rtl'] : false;		
 
 
-		$form = RGFormsModel::get_form_meta($form_id);
-		$lead = RGFormsModel::get_lead($lead_id);
+		$form = GFAPI::get_form($form_id);
+		$lead = GFAPI::get_entry($lead_id);
 		
 		/*
 		 * Run the options through filters
