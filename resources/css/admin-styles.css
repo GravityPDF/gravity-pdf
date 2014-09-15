@@ -44,6 +44,14 @@ padding: 2px 0 2px 2px;
 	font-weight: bold; 	
  }
 
+#pdf-system-status {
+  overflow: hidden;
+}
+
+#pdf-system-status p {
+  clear: left;
+}
+
 #pdf-system-status span.details, #support-request span.details  {
 font-size: 95%;
 color: #444;	
@@ -203,6 +211,8 @@ div.notice p {
 #pdf-system-status strong {
  display: inline-block;
  float: left; 
+ padding-left: 15px;
+ line-height: 27px;
 }  
 
 #initialisation label {

@@ -94,8 +94,8 @@ class GFPDF_Core extends PDFGenerator
    
 	   /*
 	    * Add localisation support
-	    */ 
-	    load_plugin_textdomain('pdfextended', false, PDF_PLUGIN_DIR . 'languages/' );
+	    */
+	    load_plugin_textdomain('pdfextended', false,  dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 
 		/*
 		 * Call our Settings class which will do our compatibility processing
@@ -347,7 +347,7 @@ class GFPDF_Core extends PDFGenerator
 		/* 
 		 * Configure the settings page
 		 */
-		  wp_enqueue_style( 'pdfextended-admin-styles', PDF_PLUGIN_URL . 'resources/css/admin-styles.min.css', array('dashicons'), '1.1' );		
+		  wp_enqueue_style( 'pdfextended-admin-styles', PDF_PLUGIN_URL . 'resources/css/admin-styles.min.css', array('dashicons'), '1.2' );		
 		  wp_enqueue_script( 'pdfextended-settings-script', PDF_PLUGIN_URL . 'resources/javascript/admin.min.js' );	
 		 
 		 /*
