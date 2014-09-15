@@ -34,10 +34,9 @@ class GFPDF_Core_Model
     * Function to check if the major compatibility functionality is met
 	* This includes Wordpress and Gravity Forms
 	*/
-   public function check_major_compatibility()
+   public static function check_major_compatibility()
    {
-	   	global $gfpdfe_data;
-		
+	   	global $gfpdfe_data;		
 
 		if($gfpdfe_data->wp_is_compatible === false)
 		{
@@ -64,11 +63,11 @@ class GFPDF_Core_Model
 	 /*
 	  * Check if the system is fully installed and return the correct values
 	  */
-	 public function is_fully_installed()
+	 public static function is_fully_installed()
 	 {
-		 global $gfpdfe_data;	
+		 global $gfpdfe_data;			 
 
-		if($this->check_major_compatibility() === false)
+		if(self::check_major_compatibility() === false)
 		{
 			return false;
 		}

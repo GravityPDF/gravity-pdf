@@ -106,12 +106,12 @@ class GFPDF_Core extends PDFGenerator
 		 * We'll initialise our model which will do any function checks ect
 		 */
 		 include PDF_PLUGIN_DIR . 'model/pdf.php';			 
-		 self::$model = new GFPDF_Core_Model();					 
+		 $model = self::$model = new GFPDF_Core_Model();					 
 		 			 	
 		/*
 		* Check for any major compatibility issues early
 		*/
-		if(self::$model->check_major_compatibility() === false)
+		if($model->check_major_compatibility() === false)
 		{
 			/*
 			 * Major compatibility errors (WP version, Gravity Forms or PHP errors)
@@ -154,12 +154,13 @@ class GFPDF_Core extends PDFGenerator
 	
 	public function __construct()
 	{		
-
+		
 		/*
 		 * Ensure the system is fully installed		 
 		 * We run this after the 'settings' page has been set up (above)		 
 		 */
-		if(self::$model->is_fully_installed() === false)
+		$model = self::$model;
+		if($model::is_fully_installed() === false)
 		{
 			return; 
 		}	
