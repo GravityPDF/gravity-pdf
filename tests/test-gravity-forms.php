@@ -75,7 +75,7 @@ class Test_GravityForms extends WP_UnitTestCase {
 	 */ 
 	public function test_gf_privs()
 	{
-
+		/* create user using WP Unit Factory functions */
 	}
 
 	/**

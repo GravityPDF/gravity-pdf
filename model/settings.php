@@ -118,6 +118,7 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 	 
 	 private function check_gf_compatibility()
 	 { 
+
 	 	 global $gfpdfe_data;
 		 
 		 if(class_exists('GFCommon'))

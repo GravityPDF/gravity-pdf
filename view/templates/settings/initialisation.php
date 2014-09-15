@@ -73,7 +73,7 @@
                 <?php if($gfpdfe_data->is_initialised): ?>
                    <h3><?php _e('Install a new font?', 'pdfextended'); ?></h3>
                    <p><?php echo sprintf(__('Do you want to use a custom font in your template? %sSee our documentation on how to correctly install and use a custom font%s before initialising below.', 'pdfextended'), '<a href="http://gravityformspdfextended.com/documentation-v3-x-x/language-support/">', '</a>'); ?></p>
-                  <input type="submit" value="Initialise Fonts" class="button" id="font-initialise" name="font-initialise">                                           
+                  <input type="submit" value="<?php _e('Initialise Fonts', 'pdfextended') ; ?>" class="button" id="font-initialise" name="font-initialise">                                           
                 <?php endif; ?>                
 
 

@@ -81,6 +81,12 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 
 == Changelog ==
 
+= 3.5.5 =
+* Housekeeping - Include French translation (thanks to Marie-Aude Koiransky-Ballouk)
+* Housekeeping - Wrap 'Initialise Fonts' text in translation ready _e() function
+* Bug - Fixed load_plugin_textdomain which was incorrectly called.
+* Bug - Correctly check if the plugin is fully loaded before letting the PDF class fully load
+
 = 3.5.4 =
 * Bug - Fixed issue with incorrect PDF name showing on the entry details page
 * Bug - Fixed issue with custom fonts being inaccessible without manually reinstalling after upgrading. 

@@ -49,7 +49,7 @@ class GFPDF_Core_Model
 		{
 		 	add_action('after_plugin_row_' . GF_PDF_EXTENDED_PLUGIN_BASENAME, array('GFPDF_Notices', 'display_pdf_compatibility_error')); 
 		 	return false;  			
-		}
+		}		
    
 		if($gfpdfe_data->gf_is_compatible === false)
 		{
@@ -66,7 +66,12 @@ class GFPDF_Core_Model
 	  */
 	 public static function is_fully_installed()
 	 {
-		 global $gfpdfe_data;		 
+		 global $gfpdfe_data;	
+
+		if(self::check_major_compatibility() === false)
+		{
+			return false;
+		}
 
 		if( ($gfpdfe_data->fresh_install === true) || (!is_dir(PDF_TEMPLATE_LOCATION)) )
 		{						

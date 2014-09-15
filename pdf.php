@@ -95,7 +95,7 @@ class GFPDF_Core extends PDFGenerator
 	   /*
 	    * Add localisation support
 	    */ 
-	    load_plugin_textdomain(GF_PDF_EXTENDED_PLUGIN_BASENAME, false, PDF_PLUGIN_DIR . 'resources/languages/' );
+	    load_plugin_textdomain('pdfextended', false, PDF_PLUGIN_DIR . 'languages/' );
 
 		/*
 		 * Call our Settings class which will do our compatibility processing
@@ -154,6 +154,16 @@ class GFPDF_Core extends PDFGenerator
 	
 	public function __construct()
 	{		
+
+		/*
+		 * Ensure the system is fully installed		 
+		 * We run this after the 'settings' page has been set up (above)		 
+		 */
+		if(GFPDF_Core_Model::is_fully_installed() === false)
+		{
+			return; 
+		}	
+
 		global $gfpdfe_data;			
 
 	    /* 
@@ -171,16 +181,7 @@ class GFPDF_Core extends PDFGenerator
 		/*
 		* Run our scripts and add the settings page to the admin area 
 		*/				
-		add_action('admin_init',  array('GFPDF_Core', 'gfe_admin_init'), 9);																		
-				
-		/*
-		 * Ensure the system is fully installed		 
-		 * We run this after the 'settings' page has been set up (above)		 
-		 */
-		if(GFPDF_Core_Model::is_fully_installed() === false)
-		{
-			return; 
-		}	
+		add_action('admin_init',  array('GFPDF_Core', 'gfe_admin_init'), 9);																					
 		
 		/*
 		* Add our main hooks
