@@ -85,6 +85,7 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 * Housekeeping - Include French translation (thanks to Marie-Aude Koiransky-Ballouk)
 * Housekeeping - Wrap 'Initialise Fonts' text in translation ready _e() function
 * Housekeeping - Tidy up System Status CSS styles to accomidate translation text lengths
+* Housekeeping - Fix E_NOTICE when viewing entry details page when form has no PDF configuration
 * Bug - Fixed load_plugin_textdomain which was incorrectly called.
 * Bug - Correctly check if the plugin is loaded correctly before letting the PDF class fully load
 

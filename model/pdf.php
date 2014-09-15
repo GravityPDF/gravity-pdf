@@ -117,7 +117,7 @@ class GFPDF_Core_Model
 
 		if(!is_array($templates))
 		{
-			$index = $gfpdf->index[$form_id];
+			$index = (isset($gfpdf->index[$form_id])) ? $gfpdf->index[$form_id] : array(-1); /* if no index (no actual configuration) we use the default name - bypassing the naming function below */
 			$templates = array($index[0] => array('template' => $templates));	
 		}
 

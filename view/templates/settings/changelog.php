@@ -25,6 +25,7 @@
     <li>Housekeeping - Include French translation (thanks to Marie-Aude Koiransky-Ballouk)</li>
     <li>Housekeeping - Wrap 'Initialise Fonts' text in translation ready _e() function</li>
     <li>Housekeeping - Tidy up System Status CSS styles to accomidate translation text lengths</li>
+    <li>Housekeeping - Fix E_NOTICE when viewing entry details page when form has no PDF configuration</li>
     <li>Bug - Fixed load_plugin_textdomain which was incorrectly called.</li>
     <li>Bug - Correctly check if the plugin is loaded correctly before letting the PDF class fully load</li>
   </ul>
