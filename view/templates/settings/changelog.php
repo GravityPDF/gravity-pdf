@@ -20,7 +20,16 @@
     
     <p><strong>Current Version: <?php echo PDF_EXTENDED_VERSION; ?></strong></p>
 
-    <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
+  <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
+  <ul>
+    <li>Housekeeping - Include French translation (thanks to Marie-Aude Koiransky-Ballouk)</li>
+    <li>Housekeeping - Wrap 'Initialise Fonts' text in translation ready _e() function</li>
+    <li>Housekeeping - Tidy up System Status CSS styles to accomidate translation text lengths</li>
+    <li>Bug - Fixed load_plugin_textdomain which was incorrectly called.</li>
+    <li>Bug - Correctly check if the plugin is loaded correctly before letting the PDF class fully load</li>
+  </ul>
+
+  <h3>3.5.4</h3> 
   <ul>
     <li>Bug - Fixed issue with incorrect PDF name showing on the entry details page</li>
     <li>Bug - Fixed issue with custom fonts being inaccessible without manually reinstalling after upgrading.</li>

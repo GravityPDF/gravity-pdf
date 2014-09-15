@@ -4,7 +4,7 @@ Donate link: http://www.gravityformspdfextended.com
 Tags: gravity, forms, pdf, automation, attachment
 Requires at least: 3.5
 Tested up to: 3.9
-Stable tag: 3.5.4
+Stable tag: 3.5.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -84,8 +84,9 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 = 3.5.5 =
 * Housekeeping - Include French translation (thanks to Marie-Aude Koiransky-Ballouk)
 * Housekeeping - Wrap 'Initialise Fonts' text in translation ready _e() function
+* Housekeeping - Tidy up System Status CSS styles to accomidate translation text lengths
 * Bug - Fixed load_plugin_textdomain which was incorrectly called.
-* Bug - Correctly check if the plugin is fully loaded before letting the PDF class fully load
+* Bug - Correctly check if the plugin is loaded correctly before letting the PDF class fully load
 
 = 3.5.4 =
 * Bug - Fixed issue with incorrect PDF name showing on the entry details page

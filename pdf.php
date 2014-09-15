@@ -33,7 +33,7 @@ GNU General Public License for more details.
 /*
  * Define our constants 
  */
-define('PDF_EXTENDED_VERSION', '3.5.4'); 
+define('PDF_EXTENDED_VERSION', '3.5.5'); 
 define('GF_PDF_EXTENDED_SUPPORTED_VERSION', '1.7'); 
 define('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION', '3.5'); 
 define('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION', '5'); 
