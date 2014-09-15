@@ -159,7 +159,7 @@ class GFPDF_Core extends PDFGenerator
 		 * Ensure the system is fully installed		 
 		 * We run this after the 'settings' page has been set up (above)		 
 		 */
-		if(GFPDF_Core_Model::is_fully_installed() === false)
+		if(self::$model->is_fully_installed() === false)
 		{
 			return; 
 		}	

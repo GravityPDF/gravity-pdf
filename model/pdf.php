@@ -64,11 +64,11 @@ class GFPDF_Core_Model
 	 /*
 	  * Check if the system is fully installed and return the correct values
 	  */
-	 public static function is_fully_installed()
+	 public function is_fully_installed()
 	 {
 		 global $gfpdfe_data;	
 
-		if(self::check_major_compatibility() === false)
+		if($this->check_major_compatibility() === false)
 		{
 			return false;
 		}
