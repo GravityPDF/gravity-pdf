@@ -17,10 +17,11 @@ class GFPDF_Core_Model
    public static function valid_gravity_forms()
    {
 	    $form_id = isset($_POST["gform_submit"]) ? $_POST["gform_submit"] : 0;
+
         if($form_id)
 		{
-            $form_info = GFAPI::get_form($form_id);
-            $is_valid_form = $form_info && $form_info->is_active;
+            $form_info = GFAPI::get_form($form_id);            
+            $is_valid_form = $form_info && $form_info['is_active'];
 
             if($is_valid_form)
 			{	   
