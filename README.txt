@@ -83,6 +83,9 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 
 = 3.5.6 =
 * Bug - Fixed issue with last release that affected checks to see if Gravity Forms has submitting
+* Bug - Fixed fatal error with servers using PHP5.2 or lower
+* Bug - Fixed E_NOTICE for replacement array_replace_recursive() function in PHP5.2 or lower
+* Bug - Fixed issue with AJAX spinner showing when submitting support request
 
 = 3.5.5 =
 * Housekeeping - Include French translation (thanks to Marie-Aude Koiransky-Ballouk)

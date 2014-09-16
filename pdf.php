@@ -76,7 +76,6 @@ define('GF_PDF_EXTENDED_PLUGIN_BASENAME', plugin_basename(__FILE__));
 class GFPDF_Core extends PDFGenerator
 {
 	public $render;
-	static $model;
 		
 	/*
 	 * Main Controller 
@@ -105,13 +104,12 @@ class GFPDF_Core extends PDFGenerator
 		/*
 		 * We'll initialise our model which will do any function checks ect
 		 */
-		 include PDF_PLUGIN_DIR . 'model/pdf.php';			 
-		 $model = self::$model = new GFPDF_Core_Model();					 
+		 include PDF_PLUGIN_DIR . 'model/pdf.php';			 		 
 		 			 	
 		/*
 		* Check for any major compatibility issues early
 		*/
-		if($model->check_major_compatibility() === false)
+		if(GFPDF_Core_Model::check_major_compatibility() === false)
 		{
 			/*
 			 * Major compatibility errors (WP version, Gravity Forms or PHP errors)
@@ -158,8 +156,7 @@ class GFPDF_Core extends PDFGenerator
 		 * Ensure the system is fully installed		 
 		 * We run this after the 'settings' page has been set up (above)		 
 		 */
-		$model = self::$model;
-		if($model::is_fully_installed() === false)
+		if(GFPDF_Core_Model::is_fully_installed() === false)
 		{
 			return; 
 		}	
@@ -347,8 +344,17 @@ class GFPDF_Core extends PDFGenerator
 		/* 
 		 * Configure the settings page
 		 */
-		  wp_enqueue_style( 'pdfextended-admin-styles', PDF_PLUGIN_URL . 'resources/css/admin-styles.min.css', array('dashicons'), '1.2' );		
-		  wp_enqueue_script( 'pdfextended-settings-script', PDF_PLUGIN_URL . 'resources/javascript/admin.min.js' );	
+		  wp_enqueue_style( 'pdfextended-admin-styles', PDF_PLUGIN_URL . 'resources/css/admin-styles.min.css', array('dashicons'), '1.3' );		
+		  wp_enqueue_script( 'pdfextended-settings-script', PDF_PLUGIN_URL . 'resources/javascript/admin.min.js', array(), '1.3' );	
+
+		  /*
+		   * Localise admin script
+		   */
+		  $localise_script = array(
+		  	'GFbaseUrl' => GFCommon::get_base_url(),
+		  );
+
+		  wp_localize_script( 'pdfextended-settings-script', 'GFPDF', $localise_script );
 		 
 		 /*
 		  * Register our scripts/styles with Gravity Forms to prevent them being removed in no conflict mode
@@ -405,6 +411,9 @@ if (!function_exists('array_replace_recursive'))
 	        // Loop through array key/value pairs
 	        foreach ($array as $key => $value)
 	        {
+	        	if(!isset($original[$key]))
+	        		$original[$key] = array();
+
 	            // Value is an array
 	            if (is_array($value))
 	            {

@@ -21,6 +21,15 @@
     <p><strong>Current Version: <?php echo PDF_EXTENDED_VERSION; ?></strong></p>
 
   <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
+
+  <ul>
+    <li>Bug - Fixed issue with last release that affected checks to see if Gravity Forms has submitting</li>
+    <li>Bug - Fixed fatal error with servers using PHP5.2 or lower</li>
+    <li>Bug - Fixed E_NOTICE for replacement array_replace_recursive() function in PHP5.2 or lower</li>
+    <li>Bug - Fixed issue with AJAX spinner showing when submitting support request</li>
+  </ul>
+
+  <h3>3.5.5</h3>
   <ul>
     <li>Housekeeping - Include French translation (thanks to Marie-Aude Koiransky-Ballouk)</li>
     <li>Housekeeping - Wrap 'Initialise Fonts' text in translation ready _e() function</li>

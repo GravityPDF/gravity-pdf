@@ -77,7 +77,12 @@ padding: 5px 4px;
 }
 
 #support-request #support-request-button {
-padding: 5px 8px;	
+padding: 0 8px;	
+}
+
+#support-request .gfspinner {
+  vertical-align: middle;
+  margin-left: 5px;
 }
 
 #support-request textarea {

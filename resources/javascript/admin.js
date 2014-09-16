@@ -1,4 +1,5 @@
-(function($) {
+(function($) {	
+
 	jQuery(document).ready(function($) {
 		jQuery('.nav-tab-contents:not(:first)').hide();
 
@@ -32,8 +33,10 @@
 	function ajax_request() {
 		/*
 		 * Create an AJAX Request
-		 */
-		$('#support-request-button').after('<span class="icon-spinner icon-spin">');
+		 */		
+		var spinner = $('<img alt="Loading" class="gfspinner" src="' + GFPDF.GFbaseUrl + '/images/spinner.gif" />');
+		$('#support-request-button').after(spinner);
+
 		$('span.msg').remove();
 		$('span.error').remove();
 
@@ -48,9 +51,8 @@
 				supportType: $('#support-type').val(),
 				comments: $('#comments').val()
 			}
-		})
-			.done(function(results) {
-				$('.icon-spinner').remove();
+		}).done(function(results) {
+				$('.gfspinner').remove();
 
 				if (results.error) {
 					if (results.error.email) {
