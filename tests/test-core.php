@@ -73,9 +73,7 @@ class Test_PDFCore extends WP_UnitTestCase {
 	}	
 
 	public function test_major_compatibility() {
-		$model = GFPDF_Core::$model;
-
-		$this->assertTrue($model::check_major_compatibility());
+		$this->assertTrue(GFPDF_Core_Model::check_major_compatibility());
 	}
 
 	public function test_write_access() {

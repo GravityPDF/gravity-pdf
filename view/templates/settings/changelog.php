@@ -21,7 +21,12 @@
     <p><strong>Current Version: <?php echo PDF_EXTENDED_VERSION; ?></strong></p>
 
   <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
+  <ul>
+    <li>Bug - Fixed issue where the PDF settings page was blank for some users</li>
+  </ul>
 
+
+  <h3>3.5.6</h3>
   <ul>
     <li>Bug - Fixed issue with last release that affected checks to see if Gravity Forms has submitting</li>
     <li>Bug - Fixed fatal error with servers using PHP5.2 or lower</li>

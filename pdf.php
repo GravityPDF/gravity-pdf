@@ -4,7 +4,7 @@
 Plugin Name: Gravity Forms PDF Extended
 Plugin URI: http://www.gravityformspdfextended.com
 Description: Gravity Forms PDF Extended allows you to save/view/download a PDF from the front- and back-end, and automate PDF creation on form submission. Our Business Plus package also allows you to overlay field onto an existing PDF.
-Version: 3.5.6
+Version: 3.5.7
 Author: Blue Liquid Designs
 Author URI: http://www.blueliquiddesigns.com.au
 
@@ -33,7 +33,7 @@ GNU General Public License for more details.
 /*
  * Define our constants 
  */
-define('PDF_EXTENDED_VERSION', '3.5.6'); 
+define('PDF_EXTENDED_VERSION', '3.5.7'); 
 define('GF_PDF_EXTENDED_SUPPORTED_VERSION', '1.7'); 
 define('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION', '3.5'); 
 define('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION', '5'); 
@@ -123,7 +123,12 @@ class GFPDF_Core extends PDFGenerator
 		* and ensure the plugin functions smoothly
 		*/
 		add_action('admin_init', array('GFPDF_Core', 'fully_loaded_admin'), 9999); /* run later than usual to give our auto initialiser a chance to fire */
-		add_action('after_switch_theme', array('GFPDF_InstallUpdater', 'gf_pdf_on_switch_theme'), 10, 2); /* listen for a theme chance and sync our PDF_EXTENDED_TEMPLATE folder */				 		 		
+		add_action('after_switch_theme', array('GFPDF_InstallUpdater', 'gf_pdf_on_switch_theme'), 10, 2); /* listen for a theme chance and sync our PDF_EXTENDED_TEMPLATE folder */	
+
+		/*
+		* Run our scripts and add the settings page to the admin area 
+		*/				
+		add_action('admin_init',  array('GFPDF_Core', 'gfe_admin_init'), 9);						 		 		
 		
 		/*
 		 * Only load the plugin if the following requirements are met:
@@ -173,12 +178,7 @@ class GFPDF_Core extends PDFGenerator
 		* Set up the PDF configuration and indexer
 		* Accessed through $this->configuration and $this->index.
 		*/
-		parent::__construct();				
-
-		/*
-		* Run our scripts and add the settings page to the admin area 
-		*/				
-		add_action('admin_init',  array('GFPDF_Core', 'gfe_admin_init'), 9);																					
+		parent::__construct();																								
 		
 		/*
 		* Add our main hooks

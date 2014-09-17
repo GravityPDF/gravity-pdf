@@ -57,6 +57,7 @@ font-size: 95%;
 color: #444;	
 padding-top: 7px;
 display: block;
+clear: left;
 }
 
 #support-request input, #support-request select {
