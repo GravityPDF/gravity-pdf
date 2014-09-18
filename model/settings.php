@@ -124,7 +124,7 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 		 if(class_exists('GFCommon'))
 		 {
 			 $gfpdfe_data->gf_installed = true;
-			 $gfpdfe_data->gf_version = GFForms::$version;
+			 $gfpdfe_data->gf_version = GFCommon::$version;
 			  			 
 			 if(version_compare($gfpdfe_data->gf_version, GF_PDF_EXTENDED_SUPPORTED_VERSION, '>=') === true)
 			 {

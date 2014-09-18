@@ -119,13 +119,8 @@ class PDF_Common
 		/*
 		 * Get form and lead data
 		 */
-		$form = GFAPI::get_form($form_id);
-		$lead = GFAPI::get_entry($lead_id);
-
-		if(is_wp_error($form) || is_wp_error($lead))
-		{
-			return $string;
-		}		
+		$form = RGFormsModel::get_form_meta($form_id);
+		$lead = RGFormsModel::get_lead($lead_id);	
 
 		return trim(GFCommon::replace_variables($string, $form, $lead, false, false, false));		
 	}
