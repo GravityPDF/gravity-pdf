@@ -22,6 +22,11 @@
 
   <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
   <ul>
+    <li>Fixed issue affected some users where a depreciated function was causing a fatal error </li>
+  </ul>
+  
+  <h3>3.5.7</h3>
+  <ul>
     <li>Bug - Fixed issue where the PDF settings page was blank for some users</li>
   </ul>
 
