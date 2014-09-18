@@ -22,6 +22,11 @@
 
   <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
   <ul>
+    <li>Bug - Rollback recent changes that introduced the GFAPI as introduces errors for older versions of Gravity Forms. Will reintroduce in next major release and increase the minimum Gravity Forms version.</li>
+  </ul>
+
+  <h3>3.5.8</h3>
+  <ul>
     <li>Bug - Fixed issue affected some users where a depreciated function was causing a fatal error </li>
   </ul>
   
