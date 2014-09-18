@@ -182,6 +182,15 @@
 	}
 
 	/**
+	 * Depreciated 
+	 * See get_default_config_data()
+	 */
+	public function get_config_data($form_id)
+	{
+		return $this->get_default_config_data($form_id);
+	}
+
+	/**
 	 * Replaced get_config_data in default tempaltes to only return the default-only configuration options
 	 * @param  integer $form_id form ID
 	 * @return array          Default template configuration options
