@@ -548,13 +548,11 @@ if(!class_exists('GFPDFEntryDetail'))
 	
 			$likert = array();
 
-
 			/* store the column names */
 			foreach($field['choices'] as $col)
 			{				
 				$likert['col'][$col['value']] = $col['text'];
 			}
-
 			
 			if(sizeof($field['inputs']) > 0)
 			{
@@ -595,6 +593,15 @@ if(!class_exists('GFPDFEntryDetail'))
 					$likert['row'][$text] = $output;
 
 				}									
+			}
+
+			/*
+			 * Check if scoring is enabled and calculate 
+			 */
+			if($field['gsurveyLikertEnableScoring'] && class_exists('GFSurvey'))
+			{
+				$survey = GFSurvey::get_instance();
+				$likert['score'] = $survey->get_field_score($field, $lead);
 			}
 
 			return $likert;
