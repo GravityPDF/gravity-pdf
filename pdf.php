@@ -100,6 +100,11 @@ class GFPDF_Core extends PDFGenerator
 		 * Call our Settings class which will do our compatibility processing
 		 */
 		$gfpdfe_data->settingsClass = new GFPDF_Settings();		
+
+		/*
+		* Run our scripts and add the settings page to the admin area 
+		*/				
+		add_action('admin_init',  array('GFPDF_Core', 'gfe_admin_init'), 9);				
 		 
 		/*
 		 * We'll initialise our model which will do any function checks ect
@@ -123,12 +128,7 @@ class GFPDF_Core extends PDFGenerator
 		* and ensure the plugin functions smoothly
 		*/
 		add_action('admin_init', array('GFPDF_Core', 'fully_loaded_admin'), 9999); /* run later than usual to give our auto initialiser a chance to fire */
-		add_action('after_switch_theme', array('GFPDF_InstallUpdater', 'gf_pdf_on_switch_theme'), 10, 2); /* listen for a theme chance and sync our PDF_EXTENDED_TEMPLATE folder */	
-
-		/*
-		* Run our scripts and add the settings page to the admin area 
-		*/				
-		add_action('admin_init',  array('GFPDF_Core', 'gfe_admin_init'), 9);						 		 		
+		add_action('after_switch_theme', array('GFPDF_InstallUpdater', 'gf_pdf_on_switch_theme'), 10, 2); /* listen for a theme chance and sync our PDF_EXTENDED_TEMPLATE folder */					 		 		
 		
 		/*
 		 * Only load the plugin if the following requirements are met:
