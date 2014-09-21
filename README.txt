@@ -82,6 +82,7 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 == Changelog ==
 
 = 3.5.10 =
+* Housekeeping - Include individual scoring for Gravity Form Survey Likert field in the $form_data['survey'] array
 * Bug - Fix fatal error when Gravity Forms isn't activated, but PDF Extended is. 
 
 = 3.5.9 =

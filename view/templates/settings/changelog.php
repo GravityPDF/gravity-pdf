@@ -23,6 +23,7 @@
   <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
 
   <ul>
+    <li>Housekeeping - Include individual scoring for Gravity Form Survey Likert field in the $form_data['survey'] array</li>
     <li>Bug - Fix fatal error when Gravity Forms isn't activated, but PDF Extended is.</li>
   </ul>
   <ul>
