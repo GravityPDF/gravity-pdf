@@ -4,7 +4,7 @@ Donate link: http://www.gravityformspdfextended.com
 Tags: gravity, forms, pdf, automation, attachment
 Requires at least: 3.5
 Tested up to: 4.0
-Stable tag: 3.5.9
+Stable tag: 3.5.10
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -80,6 +80,9 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 3. The configuration.php file allows you to easily assign PDFs to Gravity Forms
 
 == Changelog ==
+
+= 3.5.10 =
+* Bug - Fix fatal error when Gravity Forms isn't activated, but PDF Extended is. 
 
 = 3.5.9 =
 * Bug - Rollback recent changes that introduced the GFAPI as introduces errors for older versions of Gravity Forms. Will reintroduce in next major release and increase the minimum Gravity Forms version.

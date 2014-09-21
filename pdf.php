@@ -4,7 +4,7 @@
 Plugin Name: Gravity Forms PDF Extended
 Plugin URI: http://www.gravityformspdfextended.com
 Description: Gravity Forms PDF Extended allows you to save/view/download a PDF from the front- and back-end, and automate PDF creation on form submission. Our Business Plus package also allows you to overlay field onto an existing PDF.
-Version: 3.5.9
+Version: 3.5.10
 Author: Blue Liquid Designs
 Author URI: http://www.blueliquiddesigns.com.au
 
@@ -33,7 +33,7 @@ GNU General Public License for more details.
 /*
  * Define our constants 
  */
-define('PDF_EXTENDED_VERSION', '3.5.9'); 
+define('PDF_EXTENDED_VERSION', '3.5.10'); 
 define('GF_PDF_EXTENDED_SUPPORTED_VERSION', '1.7'); 
 define('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION', '3.5'); 
 define('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION', '5'); 
@@ -102,9 +102,17 @@ class GFPDF_Core extends PDFGenerator
 		$gfpdfe_data->settingsClass = new GFPDF_Settings();		
 
 		/*
-		* Run our scripts and add the settings page to the admin area 
-		*/				
-		add_action('admin_init',  array('GFPDF_Core', 'gfe_admin_init'), 9);				
+		 * Only run settings page if Gravity Forms version is installed and compatible 
+		 * Needs to be run before major compatibility checks so it can prompt user 
+		 * about issues with WP version or PHP 
+		 */
+		if($gfpdfe_data->gf_is_compatible === true)
+		{
+			/*
+			* Run our scripts and add the settings page to the admin area 
+			*/				
+			add_action('admin_init',  array('GFPDF_Core', 'gfe_admin_init'), 9);				
+		}
 		 
 		/*
 		 * We'll initialise our model which will do any function checks ect
