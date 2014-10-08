@@ -21,6 +21,11 @@
     <p><strong>Current Version: <?php echo PDF_EXTENDED_VERSION; ?></strong></p>
 
   <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
+  <ul>
+    <li>Feature - Added support for Gravity Form's sub-field 'middle' name  (1.9Beta)</li>
+    <li>Housekeeping - Refined when admin resources are loaded</li>
+    <li>Bug - Fixed JS namespace issue with WordPress Leads plugin</li> 
+  </ul>
 
   <ul>
     <li>Housekeeping - Include individual scoring for Gravity Form Survey Likert field in the $form_data['survey'] array</li>

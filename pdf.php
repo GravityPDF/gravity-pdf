@@ -4,7 +4,7 @@
 Plugin Name: Gravity Forms PDF Extended
 Plugin URI: http://www.gravityformspdfextended.com
 Description: Gravity Forms PDF Extended allows you to save/view/download a PDF from the front- and back-end, and automate PDF creation on form submission. Our Business Plus package also allows you to overlay field onto an existing PDF.
-Version: 3.5.10
+Version: 3.6.0
 Author: Blue Liquid Designs
 Author URI: http://www.blueliquiddesigns.com.au
 
@@ -33,9 +33,9 @@ GNU General Public License for more details.
 /*
  * Define our constants 
  */
-define('PDF_EXTENDED_VERSION', '3.5.10'); 
-define('GF_PDF_EXTENDED_SUPPORTED_VERSION', '1.7'); 
-define('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION', '3.5'); 
+define('PDF_EXTENDED_VERSION', '3.6.0'); 
+define('GF_PDF_EXTENDED_SUPPORTED_VERSION', '1.8'); 
+define('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION', '3.9'); 
 define('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION', '5'); 
   
 define('PDF_PLUGIN_DIR', plugin_dir_path( __FILE__ ));  
@@ -106,12 +106,26 @@ class GFPDF_Core extends PDFGenerator
 		 * Needs to be run before major compatibility checks so it can prompt user 
 		 * about issues with WP version or PHP 
 		 */
-		if($gfpdfe_data->gf_is_compatible === true)
+		if($gfpdfe_data->gf_is_compatible === true && is_admin())
 		{
-			/*
-			* Run our scripts and add the settings page to the admin area 
-			*/				
-			add_action('admin_init',  array('GFPDF_Core', 'gfe_admin_init'), 9);				
+			if(is_admin())
+			{
+				/*
+				 * Run our settings page
+				 */
+				GFPDF_Settings::settings_page();				
+
+				/*
+				 * Only load our scripts if on a Gravity Forms admin page
+				 */
+				if( isset($_GET['page']) && (substr($_GET['page'], 0, 3) === 'gf_') )
+				{
+					/*
+					* Run our scripts and add the settings page to the admin area 
+					*/				
+					add_action('admin_init',  array('GFPDF_Core', 'gfe_admin_init'), 9);
+				}
+			}
 		}
 		 
 		/*
@@ -371,8 +385,7 @@ class GFPDF_Core extends PDFGenerator
 		  add_filter('gform_noconflict_styles', array('GFPDF_Core', 'register_gravityform_styles')); 
 
 		  add_filter('gform_tooltips', array('GFPDF_Notices', 'add_tooltips'));	 	  
-		 
-    	 GFPDF_Settings::settings_page();			  
+		  
 	}
 	
 	/*

@@ -4,7 +4,7 @@ Donate link: http://www.gravityformspdfextended.com
 Tags: gravity, forms, pdf, automation, attachment
 Requires at least: 3.5
 Tested up to: 4.0
-Stable tag: 3.5.10
+Stable tag: 3.6.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -80,6 +80,11 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 3. The configuration.php file allows you to easily assign PDFs to Gravity Forms
 
 == Changelog ==
+
+= 3.6.0 =
+* Feature - Added support for Gravity Form's sub-field 'middle' name  (1.9Beta)
+* Housekeeping - Refined when admin resources are loaded
+* Bug - Fixed JS namespace issue with WordPress Leads plugin
 
 = 3.5.10 =
 * Housekeeping - Include individual scoring for Gravity Form Survey Likert field in the $form_data['survey'] array
@@ -435,5 +440,5 @@ For more details [view the 3.x.x online documentation](http://gravityformspdfext
 
 == Upgrade Notice ==
 
-= 3.4.0.1 =
-mPDF upgrade. Full Survey, Poll and Quiz support. Paypal Delayed notifications support. Enhanced $form_data array. More filters and hooks for developers.
+= 3.6.0 =
+WARNING: Minimum WordPress and Gravity Forms versions have been bumped to WordPress 3.9+ and Gravity Forms 1.8+. If you aren't running either version of this software DO NOT UPGRADE.

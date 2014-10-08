@@ -1176,10 +1176,11 @@ if(!class_exists('GFPDFEntryDetail'))
 					if(is_array($value)){
 						$prefix = trim(rgget($field['id'] . '.2', $value));
 						$first  = trim(rgget($field['id'] . '.3', $value));
+						$middle = trim(rgget($field['id'] . '.4', $value));
 						$last   = trim(rgget($field['id'] . '.6', $value));
 						$suffix = trim(rgget($field['id'] . '.8', $value));
 
-						return array('prefix' => $prefix, 'first' => $first, 'last' => $last, 'suffix' => $suffix);
+						return array('prefix' => $prefix, 'first' => $first, 'middle' => $middle, 'last' => $last, 'suffix' => $suffix);
 					}
 					else{
 						return $value;
@@ -1507,11 +1508,13 @@ if(!class_exists('GFPDFEntryDetail'))
 						if(is_array($value)){
 							$prefix = trim(rgget($field['id'] . '.2', $value));
 							$first  = trim(rgget($field['id'] . '.3', $value));
+							$middle = trim(rgget($field['id'] . '.4', $value));
 							$last   = trim(rgget($field['id'] . '.6', $value));
 							$suffix = trim(rgget($field['id'] . '.8', $value));
 
 							$name   = $prefix;
 							$name   .= !empty($name) && !empty($first) ? " $first" : $first;
+							$name   .= !empty($name) && !empty($middle) ? " $middle" : $middle;
 							$name   .= !empty($name) && !empty($last) ? " $last" : $last;
 							$name   .= !empty($name) && !empty($suffix) ? " $suffix" : $suffix;
 

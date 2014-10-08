@@ -1,9 +1,9 @@
 (function($) {	
 
 	jQuery(document).ready(function($) {
-		jQuery('.nav-tab-contents:not(:first)').hide();
+		jQuery('#tab_PDF .nav-tab-contents:not(:first)').hide();
 
-		jQuery('.nav-tab').click(function() {
+		jQuery('#tab_PDF .nav-tab').click(function() {
 			switch_tabs($(this));
 			return false;
 		});
@@ -13,7 +13,7 @@
 		 * Check if a #hash exists and pass it to switch_tabs
 		 */
 		if (window.location.hash) {
-			switch_tabs($('.nav-tab[href="' + window.location.hash + '"]'));
+			switch_tabs($('#tab_PDF .nav-tab[href="' + window.location.hash + '"]'));
 		}
 
 		/*
