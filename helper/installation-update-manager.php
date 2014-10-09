@@ -294,7 +294,7 @@ class GFPDF_InstallUpdater
 	    /*
 		 * Initialise the Wordpress Filesystem API
 		 */
-		if(PDF_Common::initialise_WP_filesystem_API(array('gfpdf_deploy'), 'pdf-extended-fonts') === false)
+		if(PDF_Common::initialise_WP_filesystem_API(array('gfpdf_deploy', 'font-initialise', 'gfpdf_deploy_nonce'), 'pdf-extended-fonts') === false)
 		{
 			return false;	
 		}	
@@ -338,7 +338,7 @@ class GFPDF_InstallUpdater
 		 */
 
 		 /* read all file names into array and unlink from active theme template folder */
-		 foreach(glob($fonts_location.'/*.[tT][tT][fF]') as $file) {
+		 foreach(glob(PDF_FONT_LOCATION.'/*.[tT][tT][fF]') as $file) {
 
 			 	$path_parts = pathinfo($file);			
 				

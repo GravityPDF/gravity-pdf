@@ -49,8 +49,18 @@ class GFPDF_Settings
 		{		
 			/*
 			 * Check if the user wants to upgrade the system or only initialise the fonts
-			 */		
-			if(rgpost('upgrade'))
+			 */	
+			if(PDF_Common::post('font-initialise'))
+			{
+				/*
+				 * We only want to reinitialise the font files and configuration
+				 */	
+				 if(GFPDF_InstallUpdater::initialise_fonts() === false)
+				 {
+					 return true;
+				 }
+			}
+			else if(rgpost('upgrade'))
 			{
 				/* 
 				 * Deploy new template styles 
@@ -61,16 +71,6 @@ class GFPDF_Settings
 				{
 					return true;
 				}
-			}
-			elseif(PDF_Common::post('font-initialise'))
-			{
-				/*
-				 * We only want to reinitialise the font files and configuration
-				 */	
-				 if(GFPDF_InstallUpdater::initialise_fonts() === false)
-				 {
-					 return true;
-				 }
 			}
 		}
 		
