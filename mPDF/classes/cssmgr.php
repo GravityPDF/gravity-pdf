@@ -221,9 +221,8 @@ function ReadCSS($html) {
 		}
 	}
 
-	// mPDF 5.5.13
 	// Replace any background: url(data:image... with temporary image file reference
-	preg_match_all("/(url\(data:image\/(jpeg|gif|png);base64,(.*)\))/siU", $CSSstr, $idata);
+	preg_match_all("/(url\(data:image\/(jpeg|gif|png);base64,(.*?)\))/si", $CSSstr, $idata);	// mPDF 5.7.2
 	if (count($idata[0])) { 
 		for($i=0;$i<count($idata[0]);$i++) {
 			$file = _MPDF_TEMP_PATH.'_tempCSSidata'.RAND(1,10000).'_'.$i.'.'.$idata[2][$i];
@@ -262,6 +261,10 @@ function ReadCSS($html) {
 			$tagarr = explode(',',$tagstr);
 			$pageselectors = false;	// used to turn on $this->mpdf->mirrorMargins
 			foreach($tagarr AS $tg) {
+				// mPDF 5.7.4
+				if (preg_match('/NTH-CHILD\((\s*(([\-+]?\d*)N(\s*[\-+]\s*\d+)?|[\-+]?\d+|ODD|EVEN)\s*)\)/',$tg,$m) ) {
+					$tg = preg_replace('/NTH-CHILD\(.*\)/', 'NTH-CHILD('.str_replace(' ','',$m[1]).')', $tg);
+				}
 				$tags = preg_split('/\s+/',trim($tg));
 				$level = count($tags);
 				$t = '';
@@ -287,7 +290,7 @@ function ReadCSS($html) {
 				}
 
 				else if ($level == 1) {		// e.g. p or .class or #id or p.class or p#id
-				if (isset($tags[0])) { $t = trim($tags[0]); }
+					if (isset($tags[0])) { $t = trim($tags[0]); }
 					if ($t) {
 						$tag = '';
 						if (preg_match('/^[.](.*)$/',$t,$m)) { $tag = 'CLASS>>'.$m[1]; }
@@ -699,6 +702,13 @@ function fixCSS($prop) {
 			}
 			else { $newprop[$k] = $v; }
 		}
+		else if ($k == 'LIST-STYLE') {	// mPDF 5.7.2
+			if (preg_match('/(lower-roman|upper-roman|lower-latin|lower-alpha|upper-latin|upper-alpha|none|decimal|disc|circle|square|arabic-indic|bengali|devanagari|gujarati|gurmukhi|kannada|malayalam|oriya|persian|tamil|telugu|thai|urdu|cambodian|khmer|lao)/i',$v,$m)
+			|| preg_match('/U\+([a-fA-F0-9]+)/i',$v,$m)) { 
+				$newprop['LIST-STYLE-TYPE'] = strtolower(trim($m[1]));
+			}
+		}
+
 
 		else { 
 			$newprop[$k] = $v; 
@@ -979,17 +989,13 @@ function _mergeFullCSS($p, &$t, $tag, $classes, $id) {
 						$tfnr = (isset($this->mpdf->table[$this->mpdf->tableLevel][$this->mpdf->tbctr[$this->mpdf->tableLevel]]['is_tfoot']) ? count($this->mpdf->table[$this->mpdf->tableLevel][$this->mpdf->tbctr[$this->mpdf->tableLevel]]['is_tfoot']) : 0);
 						if ($this->mpdf->tabletfoot) { $row -= $thnr; }
 						else if (!$this->mpdf->tablethead) { $row -= ($thnr + $tfnr); }
-						if ($m[1]=='ODD' && ($row % 2) == 0) { $select = true; }
-						else if ($m[1]=='EVEN' && ($row % 2) == 1) { $select = true; }
-						else if (preg_match('/(\d+)N\+(\d+)/',$m[1],$a)) {
-							if ((($row + 1) % $a[1]) == $a[2]) { $select = true; }
+						if (preg_match('/(([\-+]?\d*)?N([\-+]\d+)?|[\-+]?\d+|ODD|EVEN)/',$m[1],$a)) {	// mPDF 5.7.4
+							$select = $this->_nthchild($a, $row);
 						}
 					}
 					else if ($tag=='TD' || $tag=='TH')  {
-						if ($m[1]=='ODD' && ($this->mpdf->col % 2) == 0) { $select = true; }
-						else if ($m[1]=='EVEN' && ($this->mpdf->col % 2) == 1) { $select = true; }
-						else if (preg_match('/(\d+)N\+(\d+)/',$m[1],$a)) {
-							if ((($this->mpdf->col + 1) % $a[1]) == $a[2]) { $select = true; }
+						if (preg_match('/(([\-+]?\d*)?N([\-+]\d+)?|[\-+]?\d+|ODD|EVEN)/',$m[1],$a)) {	// mPDF 5.7.4
+							$select = $this->_nthchild($a, $this->mpdf->col);
 						}
 					}
 					if ($select) {
@@ -1241,8 +1247,13 @@ function MergeCSS($inherit,$tag,$attr) {
 	}
 	//===============================================
 /*-- TABLES --*/
+	// mPDF 5.7.3
+	// cellSpacing overwrites TABLE default but not specific CSS set on table
+	if ($tag=='TABLE' && isset($attr['CELLSPACING'])) {
+		$p['BORDER-SPACING-H'] = $p['BORDER-SPACING-V'] = $attr['CELLSPACING'];
+	}
 	// cellPadding overwrites TD/TH default but not specific CSS set on cell
-	if (($tag=='TD' || $tag=='TH') && isset($this->mpdf->table[$this->mpdf->tableLevel][$this->mpdf->tbctr[$this->mpdf->tableLevel]]['cell_padding']) && ($this->mpdf->table[$this->mpdf->tableLevel][$this->mpdf->tbctr[$this->mpdf->tableLevel]]['cell_padding'] || $this->mpdf->table[$this->mpdf->tableLevel][$this->mpdf->tbctr[$this->mpdf->tableLevel]]['cell_padding']===0)) { 
+	if (($tag=='TD' || $tag=='TH') && isset($this->mpdf->table[$this->mpdf->tableLevel][$this->mpdf->tbctr[$this->mpdf->tableLevel]]['cell_padding']) && ($this->mpdf->table[$this->mpdf->tableLevel][$this->mpdf->tbctr[$this->mpdf->tableLevel]]['cell_padding'] || $this->mpdf->table[$this->mpdf->tableLevel][$this->mpdf->tbctr[$this->mpdf->tableLevel]]['cell_padding']==='0')) { 	// mPDF 5.7.3
 		$p['PADDING-LEFT'] = $this->mpdf->table[$this->mpdf->tableLevel][$this->mpdf->tbctr[$this->mpdf->tableLevel]]['cell_padding'];
 		$p['PADDING-RIGHT'] = $this->mpdf->table[$this->mpdf->tableLevel][$this->mpdf->tbctr[$this->mpdf->tableLevel]]['cell_padding'];
 		$p['PADDING-TOP'] = $this->mpdf->table[$this->mpdf->tableLevel][$this->mpdf->tbctr[$this->mpdf->tableLevel]]['cell_padding'];
@@ -1283,17 +1294,13 @@ function MergeCSS($inherit,$tag,$attr) {
 					$tfnr = (isset($this->mpdf->table[$this->mpdf->tableLevel][$this->mpdf->tbctr[$this->mpdf->tableLevel]]['is_tfoot']) ? count($this->mpdf->table[$this->mpdf->tableLevel][$this->mpdf->tbctr[$this->mpdf->tableLevel]]['is_tfoot']) : 0);
 					if ($this->mpdf->tabletfoot) { $row -= $thnr; }
 					else if (!$this->mpdf->tablethead) { $row -= ($thnr + $tfnr); }
-					if ($m[1]=='ODD' && ($row % 2) == 0) { $select = true; }
-					else if ($m[1]=='EVEN' && ($row % 2) == 1) { $select = true; }
-					else if (preg_match('/(\d+)N\+(\d+)/',$m[1],$a)) {
-						if ((($row + 1) % $a[1]) == $a[2]) { $select = true; }
+					if (preg_match('/(([\-+]?\d*)?N([\-+]\d+)?|[\-+]?\d+|ODD|EVEN)/',$m[1],$a)) {	// mPDF 5.7.4
+						$select = $this->_nthchild($a, $row);
 					}
 				}
 				else  if ($tag=='TD' || $tag=='TH')  {
-					if ($m[1]=='ODD' && ($this->mpdf->col % 2) == 0) { $select = true; }
-					else if ($m[1]=='EVEN' && ($this->mpdf->col % 2) == 1) { $select = true; }
-					else if (preg_match('/(\d+)N\+(\d+)/',$m[1],$a)) {
-						if ((($this->mpdf->col+1) % $a[1]) == $a[2]) { $select = true; }
+					if (preg_match('/(([\-+]?\d*)?N([\-+]\d+)?|[\-+]?\d+|ODD|EVEN)/',$m[1],$a)) {	// mPDF 5.7.4
+						$select = $this->_nthchild($a, $this->mpdf->col);
 					}
 				}
 				if ($select) {
@@ -1381,17 +1388,13 @@ function MergeCSS($inherit,$tag,$attr) {
 						$tfnr = (isset($this->mpdf->table[$this->mpdf->tableLevel][$this->mpdf->tbctr[$this->mpdf->tableLevel]]['is_tfoot']) ? count($this->mpdf->table[$this->mpdf->tableLevel][$this->mpdf->tbctr[$this->mpdf->tableLevel]]['is_tfoot']) : 0);
 						if ($this->mpdf->tabletfoot) { $row -= $thnr; }
 						else if (!$this->mpdf->tablethead) { $row -= ($thnr + $tfnr); }
-						if ($m[1]=='ODD' && ($row % 2) == 0) { $select = true; }
-						else if ($m[1]=='EVEN' && ($row % 2) == 1) { $select = true; }
-						else if (preg_match('/(\d+)N\+(\d+)/',$m[1],$a)) {
-							if ((($row + 1) % $a[1]) == $a[2]) { $select = true; }
+						if (preg_match('/(([\-+]?\d*)?N([\-+]\d+)?|[\-+]?\d+|ODD|EVEN)/',$m[1],$a)) {	// mPDF 5.7.4
+							$select = $this->_nthchild($a, $row);
 						}
 					}
 					else if ($tag=='TD' || $tag=='TH')  {
-						if ($m[1]=='ODD' && ($this->mpdf->col % 2) == 0) { $select = true; }
-						else if ($m[1]=='EVEN' && ($this->mpdf->col % 2) == 1) { $select = true; }
-						else if (preg_match('/(\d+)N\+(\d+)/',$m[1],$a)) {
-							if ((($this->mpdf->col + 1) % $a[1]) == $a[2]) { $select = true; }
+						if (preg_match('/(([\-+]?\d*)?N([\-+]\d+)?|[\-+]?\d+|ODD|EVEN)/',$m[1],$a)) {	// mPDF 5.7.4
+							$select = $this->_nthchild($a, $this->mpdf->col);
 						}
 					}
 					if ($select) {
@@ -1557,7 +1560,40 @@ function PreviewBlockCSS($tag,$attr) {
 	return $p;
 }
 
-
+// mPDF 5.7.4   nth-child
+function _nthchild($f, $c) {
+	// $f is formual e.g. 2N+1 spilt into a preg_match array
+	// $c is the comparator value e.g row or column number
+	$c += 1;
+	$select = false;
+	$a=1;  $b=1;
+	if ($f[0]=='ODD') { $a=2; $b=1; }
+	else if ($f[0]=='EVEN') { $a=2; $b=0; }
+	else if (count($f)==2) { $a=0; $b=$f[1]+0; }		// e.g. (+6) 
+	else if (count($f)==3) {		// e.g. (2N)
+		if ($f[2]=='') { $a=1; }
+		else if ($f[2]=='-') { $a=-1; }
+		else { $a=$f[2]+0; }
+		$b=0; 
+	}
+	else if (count($f)==4) { 	// e.g. (2N+6)
+		if ($f[2]=='') { $a=1; }
+		else if ($f[2]=='-') { $a=-1; }
+		else { $a=$f[2]+0; }
+		$b=$f[3]+0; 
+	}
+	else { return false; }
+	if ($a>0) { 
+		if (((($c % $a) - $b) % $a) == 0  && $c >= $b) { $select = true; }
+	}
+	else if ($a==0) { 
+		if ($c == $b) { $select = true; }
+	}
+	else { 	// if ($a<0) 
+		if (((($c % $a) - $b) % $a) == 0  && $c <= $b) { $select = true; }
+	}
+	return $select;
+}
 
 
 
