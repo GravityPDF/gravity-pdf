@@ -1157,6 +1157,7 @@ if(!class_exists('GFPDFEntryDetail'))
 
 					/* add totals to form data */
 					$form_array['products_totals'] = array(
+							'subtotal' => $total - floatval($products['shipping']['price']),
 							'shipping' => $products['shipping']['price'],
 							'total'	   => $total
 					);

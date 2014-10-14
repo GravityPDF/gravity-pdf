@@ -83,6 +83,8 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 
 = 3.6.0 =
 * Feature - Added support for Gravity Form's sub-field 'middle' name  (1.9Beta)
+* Feature - Patch mPDF with full :nth-child support on TD and TR table cells
+* Feature - Added $form_data['products_totals']['subtotal'] key (total price without shipping costs added)
 * Housekeeping - Refined when admin resources are loaded
 * Bug - Fixed JS namespace issue with WordPress Leads plugin
 
