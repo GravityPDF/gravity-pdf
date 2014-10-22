@@ -354,13 +354,18 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 		if(isset($gfpdfe_data->configuration_file))
 		{
 			return $gfpdfe_data->configuration_file;	
-		}				
+		}			
+
+		$upload_dir = wp_upload_dir();
+		//$site_name = (is_ssl()) ? str_replace('https://', '', site_url()) : str_replace('http://', '', site_url());			
+			$site_name = 'bld';		
+
 			/*
 			 * Include the current configuration, if available
 			 */
-			 if(file_exists(PDF_TEMPLATE_LOCATION . 'configuration.php'))
+			 if(file_exists($upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/' . 'configuration.php'))
 			 {
-				 return esc_html(file_get_contents(PDF_TEMPLATE_LOCATION . 'configuration.php'));   
+				 return esc_html(file_get_contents($upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/configuration.php'));   
 			 }
 			 else
 			 {

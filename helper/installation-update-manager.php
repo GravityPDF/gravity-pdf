@@ -144,7 +144,7 @@ class GFPDF_InstallUpdater
 	 * due to being rooted to a specific folder. 
 	 * The $wp_filesystem->abspath() corrects this behaviour. 
 	 */
-	private static function get_base_dir($path)
+	private static function get_basedir($path)
 	{
 		global $wp_filesystem;
 		return str_replace(ABSPATH, $wp_filesystem->abspath(), $path);
@@ -173,10 +173,17 @@ class GFPDF_InstallUpdater
 		 * FTP and SSH could be rooted to the wordpress base directory 
 		 * use $wp_filesystem->abspath(); function to fix any issues
 		 */
-		$directory               = self::get_base_dir(PDF_PLUGIN_DIR);
-		$template_directory      = self::get_base_dir(PDF_TEMPLATE_LOCATION);
-		$template_save_directory = self::get_base_dir(PDF_SAVE_LOCATION);
-		$template_font_directory = self::get_base_dir(PDF_FONT_LOCATION);		
+		$upload_dir = wp_upload_dir();
+		//$site_name = (is_ssl()) ? str_replace('https://', '', site_url()) : str_replace('http://', '', site_url());
+		//
+		$site_name = 'bld';
+
+		$directory               = self::get_basedir(PDF_PLUGIN_DIR);
+		$base_template_directory = self::get_basedir($upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER  );
+		$template_directory      = self::get_basedir($upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/' );
+		$template_save_directory = self::get_basedir($upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/' . PDF_SAVE_LOCATION);
+		$template_font_directory = self::get_basedir($upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/' . PDF_FONT_LOCATION);		
+
 
 		/**
 		 * If PDF_TEMPLATE_LOCATION already exists then we will remove the old template files so we can redeploy the new ones
@@ -209,7 +216,19 @@ class GFPDF_InstallUpdater
 			 }			
 		 }		 
 
-		/* create new directory in active themes folder*/	
+		/* create new directory in uploads folder*/	
+		if(!$wp_filesystem->is_dir($base_template_directory))
+		{
+			if($wp_filesystem->mkdir($base_template_directory) === false)
+			{
+				/* 
+				 * TODO: add correct notices
+				 */ 
+				add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_template_dir_err')); 	
+				return false;
+			}			
+		}
+
 		if(!$wp_filesystem->is_dir($template_directory))
 		{
 			if($wp_filesystem->mkdir($template_directory) === false)
@@ -308,9 +327,9 @@ class GFPDF_InstallUpdater
 		 * We need to set up some filesystem compatibility checkes to work with the different server file management types
 		 * Most notably is the FTP options, but SSH may be effected too
 		 */
-		$directory               = self::get_base_dir(PDF_PLUGIN_DIR);
-		$template_directory      = self::get_base_dir(PDF_TEMPLATE_LOCATION);
-		$template_font_directory = self::get_base_dir(PDF_FONT_LOCATION);
+		$directory               = self::get_basedir(PDF_PLUGIN_DIR);
+		$template_directory      = self::get_basedir(PDF_TEMPLATE_LOCATION);
+		$template_font_directory = self::get_basedir(PDF_FONT_LOCATION);
 		
 		if(self::install_fonts($directory, $template_directory, $template_font_directory) === true)
 		{
@@ -454,8 +473,8 @@ class GFPDF_InstallUpdater
 		/*
 		 * Convert paths for SSH/FTP users who are rooted to a directory along the server absolute path 
 		 */	 
-		$previous_pdf_path = self::get_base_dir($previous_pdf_path);
-		$current_pdf_path  = self::get_base_dir($current_pdf_path);			 			 					 
+		$previous_pdf_path = self::get_basedir($previous_pdf_path);
+		$current_pdf_path  = self::get_basedir($current_pdf_path);			 			 					 
 
 		if($wp_filesystem->is_dir($previous_pdf_path))
 		{
