@@ -215,7 +215,7 @@ class GFPDF_Notices
 			return; 
 		 } 
 			
-		$msg = sprintf(__('Gravity Forms PDF Extended %sdirectory structure has been changed%s. %sMigrate Now%s', 'pdfextended'), '<a href="#">', '</a>', '<a href="'. wp_nonce_url(PDF_SETTINGS_URL, 'gfpdfe_migrate') . '" class="button">', '</a>');
+		$msg = sprintf(__('Gravity Forms PDF Extended directory structure has been changed. %sMigrate Now%s %sUnsure what this means?%s', 'pdfextended'), '<a href="'. wp_nonce_url(PDF_SETTINGS_URL, 'gfpdfe_migrate') . '" class="button">', '</a>', '<a href="#">', '</a>' );
 
 		self::notice($msg);
 					 
@@ -224,9 +224,9 @@ class GFPDF_Notices
 	public static function gf_pdf_migration_success()
 	{
 		global $gfpdfe_data;
-		$prefix = ($gfpdfe_data->automated === true && !rgpost('upgrade')) ? sprintf(__('%sGravity Forms PDF Extended Automated Template Migration%s:', 'pdfextended'), '<strong>', '</strong>') : '';		
+		$prefix = ($gfpdfe_data->automated === true && !rgpost('upgrade')) ? sprintf(__('%sGravity Forms PDF Extended Automated Template Migration%s:', 'pdfextended'), '<strong>', '</strong><br>') : '';		
 		
-		$msg = $prefix . '<br>' . __(sprintf('Your template folder structure was successfully migrated to %s. %sUnsure what this means?%s', $gfpdfe_data->upload_dir, '<br><a href="#">', '</a>'), 'pdfextended');
+		$msg = $prefix . __(sprintf('Your template folder structure was successfully migrated to %s. %sUnsure what this means?%s', $gfpdfe_data->upload_dir, '<br><a href="#">', '</a>'), 'pdfextended');
 
 		self::notice($msg);
 						

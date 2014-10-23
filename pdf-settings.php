@@ -84,7 +84,8 @@ class GFPDF_Settings
 			  * Check if we want to copy the theme files
 			  */
 			 if(wp_verify_nonce(PDF_Common::get('_wpnonce'), 'gfpdfe_migrate') )
-			 {	 
+			 {	
+
 				 if(GFPDF_InstallUpdater::do_template_migration() === 'false')
 				 {
 					return true; 

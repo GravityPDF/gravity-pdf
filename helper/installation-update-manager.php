@@ -348,6 +348,12 @@ class GFPDF_InstallUpdater
 		return true;			
 	}
 
+	/**
+	 * Copy configuration file to template folder
+	 * @param  String $directory The $wp_filesystem path to the plugin folder 
+	 * @param  String $template_directory The $wp_filesystem path to the template folder 
+	 * @return Boolean                    Success on true (or not run at all). false on fail
+	 */
 	public static function create_configuration_file($directory, $template_directory)
 	{
 		global $wp_filesystem, $gfpdfe_data;
@@ -365,6 +371,11 @@ class GFPDF_InstallUpdater
 		return true;	
 	}
 
+	/**
+	 * Create htaccess file to prevent direct access to PDFs
+	 * @param  String $template_save_directory The $wp_filesystem path to the save directory
+	 * @return Boolean                          success on true (or not run at all). false on fail
+	 */
 	public static function create_htaccess_file($template_save_directory)
 	{
 		global $wp_filesystem, $gfpdfe_data;
@@ -376,7 +387,9 @@ class GFPDF_InstallUpdater
 				add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_template_dir_err')); 	
 				return false;
 			}	
-		}			
+		}	
+
+		return true;		
 	}
 
 	/*
@@ -503,7 +516,6 @@ class GFPDF_InstallUpdater
 		return false;		
 	}
 	
-	
 	/*
 	 * The after_switch_theme hook is too early in the initialisation to use request_filesystem_credentials()
 	 * so we have to call this function at a later inteval
@@ -522,7 +534,6 @@ class GFPDF_InstallUpdater
 		 * If we got here we should have $wp_filesystem available
 		 */
 		global $wp_filesystem, $gfpdfe_data;
-
 
 		/*
 		 * Convert paths for SSH/FTP users who are rooted to a directory along the server absolute path 
