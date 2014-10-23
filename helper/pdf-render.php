@@ -101,13 +101,12 @@ class PDFRender
 	 */
 	private function load_entry_data($form_id, $lead_id, $template)
 	{
+		global $gfpdfe_data;
+
 		/* set up contstants for gravity forms to use so we can override the security on the printed version */		
 		if(file_exists(PDF_TEMPLATE_LOCATION.$template))
-		{	
-			$upload_dir = wp_upload_dir();
-			//$site_name = (is_ssl()) ? str_replace('https://', '', site_url()) : str_replace('http://', '', site_url());			
-			$site_name = 'bld';			
-			return PDF_Common::get_html_template($upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/' . $template);
+		{		
+			return PDF_Common::get_html_template($gfpdfe_data->template_site_location . $template);
 		}
 		else
 		{

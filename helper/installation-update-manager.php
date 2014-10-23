@@ -88,6 +88,11 @@ class GFPDF_InstallUpdater
 					 switch_to_blog( (int) $site['blog_id'] );
 
 					 /*
+					  * Reset the directory structure 
+					  */
+					 $gfpdfe_data->set_directory_structure();  
+
+					 /*
 					  * Test if the blog has gravity forms and PDF Extended active
 					  * If so, we can initialise 
 					  */				 
@@ -115,6 +120,11 @@ class GFPDF_InstallUpdater
 					 	}
 					 }
 					 restore_current_blog();
+
+					 /*
+					  * Reset the directory structure 
+					  */
+					 $gfpdfe_data->set_directory_structure();  					 
 				}
 
 				if(!$success)
@@ -173,16 +183,11 @@ class GFPDF_InstallUpdater
 		 * FTP and SSH could be rooted to the wordpress base directory 
 		 * use $wp_filesystem->abspath(); function to fix any issues
 		 */
-		$upload_dir = wp_upload_dir();
-		//$site_name = (is_ssl()) ? str_replace('https://', '', site_url()) : str_replace('http://', '', site_url());
-		//
-		$site_name = 'bld';
-
 		$directory               = self::get_basedir(PDF_PLUGIN_DIR);
-		$base_template_directory = self::get_basedir($upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER  );
-		$template_directory      = self::get_basedir($upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/' );
-		$template_save_directory = self::get_basedir($upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/' . PDF_SAVE_LOCATION);
-		$template_font_directory = self::get_basedir($upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/' . PDF_FONT_LOCATION);		
+		$base_template_directory = self::get_basedir( $gfpdfe_data->template_location );
+		$template_directory      = self::get_basedir( $gfpdfe_data->template_site_location );
+		$template_save_directory = self::get_basedir( $gfpdfe_data->template_save_location );
+		$template_font_directory = self::get_basedir( $gfpdfe_data->template_font_location );		
 
 
 		/**
@@ -330,6 +335,10 @@ class GFPDF_InstallUpdater
 		$directory               = self::get_basedir(PDF_PLUGIN_DIR);
 		$template_directory      = self::get_basedir(PDF_TEMPLATE_LOCATION);
 		$template_font_directory = self::get_basedir(PDF_FONT_LOCATION);
+
+		$directory               = self::get_basedir(PDF_PLUGIN_DIR);
+		$template_directory      = self::get_basedir( $gfpdfe_data->template_site_location );
+		$template_font_directory = self::get_basedir( $gfpdfe_data->template_font_location );		
 		
 		if(self::install_fonts($directory, $template_directory, $template_font_directory) === true)
 		{

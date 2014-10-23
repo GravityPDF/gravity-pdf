@@ -41,16 +41,22 @@ define('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION', '5');
 define('PDF_PLUGIN_DIR', plugin_dir_path( __FILE__ ));  
 define('PDF_PLUGIN_URL', plugin_dir_url( __FILE__ )); 
 define("PDF_SETTINGS_URL", site_url() .'/wp-admin/admin.php?page=gf_settings&subview=PDF'); 
+
+
 define('PDF_SAVE_FOLDER', 'PDF_EXTENDED_TEMPLATES'); 
-define('PDF_SAVE_LOCATION', 'output'); 
-define('PDF_FONT_LOCATION', 'fonts'); 
+
+//define('PDF_SAVE_LOCATION', 'output'); 
+//define('PDF_FONT_LOCATION', 'fonts'); 
 //define('PDF_TEMPLATE_LOCATION', get_stylesheet_directory().'/'.PDF_SAVE_FOLDER.'/'); 
 //define('PDF_TEMPLATE_URL_LOCATION', get_stylesheet_directory_uri().'/'. PDF_SAVE_FOLDER .'/'); 
+
+
 define('GF_PDF_EXTENDED_PLUGIN_BASENAME', plugin_basename(__FILE__)); 
 
 /* 
- * Include the core helper files
+ * Include the core files
  */
+ include PDF_PLUGIN_DIR . 'depreciated.php';
  include PDF_PLUGIN_DIR . 'helper/api.php';
  include PDF_PLUGIN_DIR . 'helper/data.php'; 
  include PDF_PLUGIN_DIR . 'helper/notices.php'; 
@@ -61,10 +67,13 @@ define('GF_PDF_EXTENDED_PLUGIN_BASENAME', plugin_basename(__FILE__));
   * Initialise our data helper class
   */
  global $gfpdfe_data;
- $gfpdfe_data = new GFPDFE_DATA();    
+ $gfpdfe_data = new GFPDFE_DATA();   
  
  include PDF_PLUGIN_DIR . 'pdf-settings.php';
  include PDF_PLUGIN_DIR . 'helper/pdf-common.php';
+
+ /* set our PDF folder storage */
+ $gfpdfe_data->set_directory_structure();  
 
  /* 
   * Initiate the class after Gravity Forms has been loaded using the init hook.
@@ -329,10 +338,6 @@ class GFPDF_Core extends PDFGenerator
 			 */	
 			$theme_switch = get_option('gfpdfe_switch_theme'); 
 
-			$upload_dir = wp_upload_dir();
-			//$site_name = (is_ssl()) ? str_replace('https://', '', site_url()) : str_replace('http://', '', site_url());			
-			$site_name = 'bld';
-
 			if( (
 					(get_option('gf_pdf_extended_installed') != 'installed')
 				) && (!rgpost('upgrade') )
@@ -345,9 +350,9 @@ class GFPDF_Core extends PDFGenerator
 				 add_action($gfpdfe_data->notice_type, array("GFPDF_Notices", "gf_pdf_not_deployed_fresh")); 	
 			}
 			elseif( (
-						( !is_dir($upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/'))  ||
-						( !file_exists($upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/' . 'configuration.php') ) ||
-						( !is_dir($upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/' . PDF_SAVE_LOCATION) )  						
+						( !is_dir($gfpdfe_data->template_site_location))  ||
+						( !file_exists($gfpdfe_data->template_site_location . 'configuration.php') ) ||
+						( !is_dir($gfpdfe_data->template_save_location) )  						
 					)
 					&& (!rgpost('upgrade'))
 					&& (empty($theme_switch['old']) )

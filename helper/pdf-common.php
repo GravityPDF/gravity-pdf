@@ -85,20 +85,29 @@ class PDF_Common
 		/*
 		 * Remove any invalid (mostly Windows) characters from filename
 		 */
-		 $pdf_name = str_replace('/', '-', $pdf_name);
-		 $pdf_name = str_replace('\\', '-', $pdf_name);		
-		 $pdf_name = str_replace('"', '-', $pdf_name);				 
-		 $pdf_name = str_replace('*', '-', $pdf_name);				 
-		 $pdf_name = str_replace('?', '-', $pdf_name);				 		 
-		 $pdf_name = str_replace('|', '-', $pdf_name);				 		 		 
-		 $pdf_name = str_replace(':', '-', $pdf_name);				 		 		 		 
-		 $pdf_name = str_replace('<', '-', $pdf_name);				 		 		 		 
-		 $pdf_name = str_replace('>', '-', $pdf_name);				 		 		 		 		 		 
-		 $pdf_name = str_replace('.', '_', $pdf_name);				 		 		 		 		 		 		 
-		
+		 $pdf_name = self::remove_invalid_characters($name);			 		 		 		 		 		 		 		
 		 $pdf_name = $pdf_name . '.pdf';
 		
 		return $pdf_name;
+	}
+
+	public static function remove_invalid_characters($name)
+	{
+		/*
+		 * Remove any invalid (mostly Windows) characters from filename
+		 */
+		 $name = str_replace('/', '-', $name);
+		 $name = str_replace('\\', '-', $name);		
+		 $name = str_replace('"', '-', $name);				 
+		 $name = str_replace('*', '-', $name);				 
+		 $name = str_replace('?', '-', $name);				 		 
+		 $name = str_replace('|', '-', $name);				 		 		 
+		 $name = str_replace(':', '-', $name);				 		 		 		 
+		 $name = str_replace('<', '-', $name);				 		 		 		 
+		 $name = str_replace('>', '-', $name);				 		 		 		 		 		 
+		 $name = str_replace('.', '_', $name);	
+
+		 return $name;		
 	}
 	
 	/*
@@ -195,6 +204,16 @@ class PDF_Common
 			return $_GET[$name];
 
 		return '';
+	}
+
+	/**
+	 * Gets the site name for use as a directory name
+	 * @return String Returns the current 'safe' directory site name
+	 */
+	public static function get_site_name()
+	{
+		$name = (is_ssl()) ? str_replace('https://', '', site_url()) : str_replace('http://', '', site_url());
+		return self::remove_invalid_characters($name);
 	}
 }
 

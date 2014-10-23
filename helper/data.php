@@ -5,6 +5,7 @@
  * File: data.php
  * 
  * This is a data overloading class which holds important variables shared throughout the plugin
+ * In some circumstances it will also provide functions to get data from itself
  */
 
 class GFPDFE_DATA
@@ -42,5 +43,20 @@ class GFPDFE_DATA
     public function __unset($name)
     {
         unset($this->data[$name]);
+    }
+
+    /**
+     * Used to set up our PDF template folder, 
+     * save folder and font folder
+     */
+    public function set_directory_structure()
+    {
+        $upload_dir = wp_upload_dir();
+        $site_name = PDF_Common::get_site_name();
+        
+        $this->template_location      = $upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/';
+        $this->template_site_location = $upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/';
+        $this->template_save_location = $upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/output/';
+        $this->template_font_location = $upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/fonts/';
     }
 }

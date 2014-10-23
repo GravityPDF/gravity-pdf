@@ -73,11 +73,7 @@ class GFPDF_Core_Model
 			return false;
 		}
 
-		$upload_dir = wp_upload_dir();
-		//$site_name = (is_ssl()) ? str_replace('https://', '', site_url()) : str_replace('http://', '', site_url());			
-		$site_name = 'bld';
-
-		if( ($gfpdfe_data->fresh_install === true) || (!is_dir($upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/')) )
+		if( ($gfpdfe_data->fresh_install === true) || (!is_dir($gfpdfe_data->template_site_location)) )
 		{						
 			return false;
 		}
