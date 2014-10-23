@@ -48,8 +48,8 @@
 		  /*
 		   * Check if user configuration file exists
 		   * If not disable $configuration and $index.
-		   */ 		   
-		  if(!file_exists( $gfpdfe_data->template_location . 'configuration.php') )
+		   */ 		   		  
+		  if(!file_exists( $gfpdfe_data->template_site_location . 'configuration.php') )
 		  {
 			  $this->disabled = true;
 			  return;
@@ -59,7 +59,7 @@
 				/*
 				 * Include the configuration file and set up the configuration variable.
 				 */  
-				 require_once( $gfpdfe_data->template_location . 'configuration.php' );				
+				 require_once( $gfpdfe_data->template_site_location . 'configuration.php' );				
 				 /*
 				  * $gf_pdf_config included from configuration.php file
 				  */				 

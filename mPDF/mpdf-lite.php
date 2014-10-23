@@ -2723,7 +2723,7 @@ function AddFont($family,$style='') {
 			/*
 			 * Try load in the font file from the PDF_TEMPLATE
 			 */
-			$ttffile = $gfpdfe_data->template_location . 'fonts/' . $this->fontdata[$family][$stylekey];			
+			$ttffile = $gfpdfe_data->template_site_location . 'fonts/' . $this->fontdata[$family][$stylekey];			
 			if(!file_exists($ttffile))
 			{
 				die("mPDF Error - cannot find TTF TrueType font file - ".$ttffile); 

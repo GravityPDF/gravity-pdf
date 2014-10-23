@@ -104,7 +104,7 @@ class PDFRender
 		global $gfpdfe_data;
 
 		/* set up contstants for gravity forms to use so we can override the security on the printed version */		
-		if(file_exists( $gfpdfe_data->template_location . $template))
+		if(file_exists( $gfpdfe_data->template_site_location . $template))
 		{		
 			return PDF_Common::get_html_template($gfpdfe_data->template_site_location . $template);
 		}

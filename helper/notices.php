@@ -199,7 +199,7 @@ class GFPDF_Notices
 		$prefix = self::autoprefix();
 		$suffix = self::autosuffix();
 			
-		$msg = $prefix . sprintf(__('We could not remove the default template files from %s in your uploads directory. Please ensure %s is wriable by your web server and try again.', 'pdfextended'), PDF_SAVE_FOLDER, str_replace(ABSPATH, '', $gfpdfe_data->template_location)) . $suffix;			
+		$msg = $prefix . sprintf(__('We could not remove the default template files from %s in your uploads directory. Please ensure %s is wriable by your web server and try again.', 'pdfextended'), PDF_SAVE_FOLDER, str_replace(ABSPATH, '', $gfpdfe_data->template_site_location)) . $suffix;			
 		
 		self::error($msg);			
 	}		
@@ -212,7 +212,7 @@ class GFPDF_Notices
 		$prefix = self::autoprefix();
 		$suffix = self::autosuffix();
 	
-		$msg = $prefix . sprintf(__('We could not move the template files to the %s folder.  Please ensure %s is wriable by your web server and try again.', 'pdfextended'), PDF_SAVE_FOLDER, str_replace(ABSPATH, '', $gfpdfe_data->template_location) ) . $suffix;
+		$msg = $prefix . sprintf(__('We could not move the template files to the %s folder.  Please ensure %s is wriable by your web server and try again.', 'pdfextended'), PDF_SAVE_FOLDER, str_replace(ABSPATH, '', $gfpdfe_data->template_site_location) ) . $suffix;
 			
 		self::error($msg);
 	}
