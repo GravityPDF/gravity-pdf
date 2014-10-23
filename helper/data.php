@@ -54,9 +54,13 @@ class GFPDFE_DATA
         $upload_dir = wp_upload_dir();
         $site_name = PDF_Common::get_site_name();
         
+
         $this->template_location      = $upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/';
         $this->template_site_location = $upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/';
         $this->template_save_location = $upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/output/';
         $this->template_font_location = $upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/fonts/';
+        
+        $this->old_template_location  = get_stylesheet_directory().'/'.PDF_SAVE_FOLDER.'/';
+        $this->upload_dir             = $upload_dir['basedir'];
     }
 }

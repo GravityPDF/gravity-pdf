@@ -205,28 +205,28 @@ class GFPDF_Notices
 	/*
 	 * Prompt user to keep the plugin working
 	 */
-	public static function do_theme_switch_notice()
+	public static function do_template_switch_notice()
 	{		
 		/*
 		 * Check we aren't in the middle of doing the sync
 		 */
-		 if(isset($_GET['_wpnonce']) && wp_verify_nonce($_GET['_wpnonce'], 'gfpdfe_sync_now'))
+		 if(isset($_GET['_wpnonce']) && wp_verify_nonce($_GET['_wpnonce'], 'gfpdfe_migrate'))
 		 {
 			return; 
 		 } 
 			
-		$msg = sprintf(__('Gravity Forms PDF Extended needs to keep your configuration and templates folder in sync with your current active theme. %sSync Now%s', 'pdfextended'), '<a href="'. wp_nonce_url(PDF_SETTINGS_URL, 'gfpdfe_sync_now') . '" class="button">', '</a>');
+		$msg = sprintf(__('Gravity Forms PDF Extended %sdirectory structure has been changed%s. %sMigrate Now%s', 'pdfextended'), '<a href="#">', '</a>', '<a href="'. wp_nonce_url(PDF_SETTINGS_URL, 'gfpdfe_migrate') . '" class="button">', '</a>');
 
 		self::notice($msg);
 					 
 	}
 	
-	public static function gf_pdf_theme_sync_success()
+	public static function gf_pdf_migration_success()
 	{
 		global $gfpdfe_data;
-		$prefix = ($gfpdfe_data->automated === true && !rgpost('upgrade')) ? sprintf(__('%sGravity Forms PDF Extended Automated Theme Sync%s: ', 'pdfextended'), '<strong>', '</strong>') : '';		
+		$prefix = ($gfpdfe_data->automated === true && !rgpost('upgrade')) ? sprintf(__('%sGravity Forms PDF Extended Automated Template Migration%s:', 'pdfextended'), '<strong>', '</strong>') : '';		
 		
-		$msg = $prefix . __('Your PDF configuration and template folder was successfully synced to your new theme.', 'pdfextended');
+		$msg = $prefix . '<br>' . __(sprintf('Your template folder structure was successfully migrated to %s. %sUnsure what this means?%s', $gfpdfe_data->upload_dir, '<br><a href="#">', '</a>'), 'pdfextended');
 
 		self::notice($msg);
 						
