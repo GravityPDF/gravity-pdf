@@ -41,6 +41,8 @@ class GFPDF_Settings
 	 */
 	protected function run_setting_routing()
 	{
+		global $gfpdfe_data;
+		
 		/* 
 		 * Check if we need to redeploy default PDF templates/styles to the theme folder 
 		 */
@@ -83,7 +85,7 @@ class GFPDF_Settings
 			 /*
 			  * Check if we want to copy the theme files
 			  */
-			 if(wp_verify_nonce(PDF_Common::get('_wpnonce'), 'gfpdfe_migrate') )
+			 if(is_dir($gfpdfe_data->old_template_location) && wp_verify_nonce(PDF_Common::get('_wpnonce'), 'gfpdfe_migrate') )
 			 {	
 
 				 if(GFPDF_InstallUpdater::do_template_migration() === 'false')

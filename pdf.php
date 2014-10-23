@@ -327,11 +327,7 @@ class GFPDF_Core extends PDFGenerator
 			 */	
 			$theme_switch = get_option('gfpdfe_switch_theme'); 
 
-			if( (
-					(get_option('gf_pdf_extended_installed') != 'installed')
-				) && (!rgpost('upgrade') )
-				  && (empty($theme_switch['old']) )
-			  )
+			if( get_option('gf_pdf_extended_installed') != 'installed' && !rgpost('upgrade') )
 			{
 				/*
 				 * Prompt user to initialise plugin
@@ -345,7 +341,6 @@ class GFPDF_Core extends PDFGenerator
 					)
 					&& (!rgpost('upgrade'))
 					&& (!is_dir($gfpdfe_data->old_template_location) )
-
 				  )
 			{
 
@@ -364,7 +359,7 @@ class GFPDF_Core extends PDFGenerator
 		/* 
 		 * Configure the settings page
 		 */
-		  wp_enqueue_style( 'pdfextended-admin-styles', PDF_PLUGIN_URL . 'resources/css/admin-styles.min.css', array('dashicons'), '1.3' );		
+		  wp_enqueue_style( 'pdfextended-admin-styles', PDF_PLUGIN_URL . 'resources/css/admin-styles.min.css', array(), '1.3' );		
 		  wp_enqueue_script( 'pdfextended-settings-script', PDF_PLUGIN_URL . 'resources/javascript/admin.min.js', array(), '1.3' );	
 
 		  /*

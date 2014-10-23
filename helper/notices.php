@@ -166,14 +166,29 @@ class GFPDF_Notices
 	 */
 	public static function gf_pdf_template_dir_err()
 	{
+		global $gfpdfe_data;
+
 		$prefix = self::autoprefix();
 		$suffix = self::autosuffix();
 
-		$msg = $prefix . __('We could not create a template folder in your active theme\'s directory. Please ensure your active theme directory is writable by your web server and try again.', 'pdfextended')  . $suffix;
+		$msg = $prefix . sprintf(__('We could not create a template folder in your uploads directory. Please ensure %s is writable by your web server and try again.', 'pdfextended'), str_replace(ABSPATH, '', $gfpdfe_data->upload_dir)) . $suffix;
 
-		self::error($msg);
-			
-			
+		self::error($msg);					
+	}
+
+	/**
+	 * Cannot create site directory in template folder 	 
+	 */
+	public static function gf_pdf_template_site_dir_err()
+	{
+		global $gfpdfe_data;
+
+		$prefix = self::autoprefix();
+		$suffix = self::autosuffix();
+
+		$msg = $prefix . sprintf(__('We could not create a site folder in your uploads/%s directory. Please ensure %s is writable by your web server and try again.'), PDF_SAVE_FOLDER, str_replace(ABSPATH, '', $gfpdfe_data->template_location), 'pdfextended')  . $suffix;
+
+		self::error($msg);				
 	}
 	
 	/**
@@ -184,20 +199,20 @@ class GFPDF_Notices
 		$prefix = self::autoprefix();
 		$suffix = self::autosuffix();
 			
-		$msg = $prefix . sprintf(__('We could not remove the default template files from the Gravity Forms PDF Extended folder in your active theme\'s directory. Please ensure %s is wriable by your web server and try again.', 'pdfextended'), PDF_SAVE_LOCATION) . $suffix;			
+		$msg = $prefix . sprintf(__('We could not remove the default template files from %s in your uploads directory. Please ensure %s is wriable by your web server and try again.', 'pdfextended'), PDF_SAVE_FOLDER, str_replace(ABSPATH, '', $gfpdfe_data->template_location)) . $suffix;			
 		
 		self::error($msg);			
 	}		
 	
 	/**
-	 * Cannot create new template folder in active theme directory
+	 * Cannot create new template folder 
 	 */
 	public static function gf_pdf_template_move_err()
 	{
 		$prefix = self::autoprefix();
 		$suffix = self::autosuffix();
 	
-		$msg = $prefix . sprintf(__('We could not move the template files to the PDF_EXTENDED_TEMPLATES folder.  Please ensure %s is wriable by your web server and try again.', 'pdfextended'), PDF_SAVE_LOCATION) . $suffix;
+		$msg = $prefix . sprintf(__('We could not move the template files to the %s folder.  Please ensure %s is wriable by your web server and try again.', 'pdfextended'), PDF_SAVE_FOLDER, str_replace(ABSPATH, '', $gfpdfe_data->template_location) ) . $suffix;
 			
 		self::error($msg);
 	}
@@ -226,7 +241,7 @@ class GFPDF_Notices
 		global $gfpdfe_data;
 		$prefix = ($gfpdfe_data->automated === true && !rgpost('upgrade')) ? sprintf(__('%sGravity Forms PDF Extended Automated Template Migration%s:', 'pdfextended'), '<strong>', '</strong><br>') : '';		
 		
-		$msg = $prefix . __(sprintf('Your template folder structure was successfully migrated to %s. %sUnsure what this means?%s', $gfpdfe_data->upload_dir, '<br><a href="#">', '</a>'), 'pdfextended');
+		$msg = $prefix .sprintf( __('Your template folder structure was successfully migrated to %s. %sUnsure what this means?%s', 'pdfextended'), $gfpdfe_data->upload_dir, '<br><a href="#">', '</a>');
 
 		self::notice($msg);
 						
@@ -313,12 +328,6 @@ class GFPDF_Notices
 		 $message = __("Wordpress " . GF_PDF_EXTENDED_WP_SUPPORTED_VERSION . " or higher is required to use this plugin.", 'pdfextended'); 
 		 self::display_plugin_message($message, true);			
 	}	
-	
-	/*public static function display_documentation_details()
-	{
-		 $message = sprintf(__("Please review the %sGravity Forms PDF Extended documentation%s for comprehensive installation instructions.%s", 'pdfextended'), "<a href='http://gravityformspdfextended.com/documentation-v3-x-x/installation-and-configuration/'>", "</a>", '</span>'); 
-		 PDF_Common::display_plugin_message($message);						
-	}*/	
 	
 	public static function display_pdf_compatibility_error()
 	{

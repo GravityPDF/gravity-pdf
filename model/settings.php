@@ -253,24 +253,15 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 			  /*
 			   * Default our values
 			   */
-			   $gfpdfe_data->can_write_plugin_dir = false;	
-			   $gfpdfe_data->can_write_theme_dir = false;		  
+			   $gfpdfe_data->can_write_upload_dir = false;	 
 			   
 			  /*
-			   * Test the plugin folder so we can unzip mPDF
+			   * Test the upload folder where our templates are stored
 			   */
-			  if($this->test_write_permissions(PDF_PLUGIN_DIR) === true)
+			  if($this->test_write_permissions($gfpdfe_data->upload_dir) === true)
 			  {
-				  $gfpdfe_data->can_write_plugin_dir = true;
-			  }	
-			  		   
-			  /*
-			   * Check if we can write in the user's active theme directory
-			   */			  			   
-			   if($this->test_write_permissions(get_stylesheet_directory() . '/') === true)
-			   {
-				   $gfpdfe_data->can_write_theme_dir = true;
-			   }
+				  $gfpdfe_data->can_write_upload_dir = true;
+			  }				  		   
 		  }
 		  else
 		  {
@@ -284,12 +275,12 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 			  /*
 			   * The PDF_EXTENDED_TEMPLATE folder is created so lets check our permissions
 			   */
-			  if($this->test_write_permissions(PDF_SAVE_LOCATION) === true)
+			  if($this->test_write_permissions($gfpdfe_data->template_save_location) === true)
 			  {
   		  			$gfpdfe_data->can_write_output_dir = true;	  
 			  }
 			  
-			  if($this->test_write_permissions(PDF_FONT_LOCATION) === true)
+			  if($this->test_write_permissions($gfpdfe_data->template_font_location) === true)
 			  {
   		  			$gfpdfe_data->can_write_font_dir = true;	  
 			  }		

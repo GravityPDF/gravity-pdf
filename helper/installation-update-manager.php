@@ -281,7 +281,7 @@ class GFPDF_InstallUpdater
 	public static function create_base_template_dir($base_template_directory)
 	{
 		global $wp_filesystem, $gfpdfe_data;
-
+		
 		/* create new directory in uploads folder*/	
 		if(!$wp_filesystem->is_dir($base_template_directory))
 		{
@@ -306,7 +306,7 @@ class GFPDF_InstallUpdater
 		{
 			if($wp_filesystem->mkdir($template_directory) === false)
 			{
-				add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_template_dir_err')); 	
+				add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_template_site_dir_err')); 	
 				return false;
 			}			
 		}	
@@ -545,18 +545,12 @@ class GFPDF_InstallUpdater
 		/* create the base template directory */
 		if(self::create_base_template_dir($base_template_directory) === false)
 		{
-			/*
-			 * TODO: throw errors
-			 */
 			return false;
 		}
 
 		/* create the site template directory */
 		if(self::create_site_template_dir($base_template_directory) === false)
-		{
-			/*
-			 * TODO: throw errors
-			 */			
+		{		
 			return false;
 		}		
  			 					 
