@@ -190,7 +190,7 @@ class GFPDF_InstallUpdater
 
 
 		/**
-		 * If PDF_TEMPLATE_LOCATION already exists then we will remove the old template files so we can redeploy the new ones
+		 * If template directory already exists then we will remove the old template files so we can redeploy the new ones
 		 */
 		self::reinitialise_templates($template_directory);
 
@@ -218,7 +218,7 @@ class GFPDF_InstallUpdater
 			return false;
 		}
 	
-		/* copy entire template folder over to PDF_TEMPLATE_LOCATION */		
+		/* copy entire template folder over to the template directory */		
 		self::pdf_extended_copy_directory( $directory . 'initialisation/templates', $template_directory, false );
 
 		/* copy configuration file over to new directory */		 
@@ -453,7 +453,7 @@ class GFPDF_InstallUpdater
 		 */
 
 		 /* read all file names into array and unlink from active theme template folder */
-		 foreach(glob(PDF_FONT_LOCATION.'/*.[tT][tT][fF]') as $file) {
+		 foreach(glob( $gfpdfe_data->template_font_location . '/*.[tT][tT][fF]') as $file) {
 
 			 	$path_parts = pathinfo($file);			
 				

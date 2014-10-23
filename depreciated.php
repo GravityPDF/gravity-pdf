@@ -18,7 +18,7 @@
  * $gfpdfe_data->template_font_location
  * 
  */
-define('PDF_SAVE_LOCATION', get_stylesheet_directory().'/'.PDF_SAVE_FOLDER.'/output/'); 
-define('PDF_FONT_LOCATION', get_stylesheet_directory().'/'.PDF_SAVE_FOLDER.'/fonts/'); 
-define('PDF_TEMPLATE_LOCATION', get_stylesheet_directory().'/'.PDF_SAVE_FOLDER.'/'); 
-define('PDF_TEMPLATE_URL_LOCATION', get_stylesheet_directory_uri().'/'. PDF_SAVE_FOLDER .'/'); 
+define('PDF_SAVE_LOCATION', $gfpdfe_data->template_save_location); 
+define('PDF_FONT_LOCATION', $gfpdfe_data->template_font_location); 
+define('PDF_TEMPLATE_LOCATION', $gfpdfe_data->template_location); 
+define('PDF_TEMPLATE_URL_LOCATION', $gfpdfe_data->template_location_url); 

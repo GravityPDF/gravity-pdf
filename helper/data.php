@@ -60,6 +60,11 @@ class GFPDFE_DATA
         $this->template_save_location = $upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/output/';
         $this->template_font_location = $upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/fonts/';
         
+        $this->template_location_url      = $upload_dir['baseurl'] . '/' . PDF_SAVE_FOLDER . '/';
+        $this->template_site_location_url = $upload_dir['baseurl'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/';
+        $this->template_save_location_url = $upload_dir['baseurl'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/output/';
+        $this->template_font_location_url = $upload_dir['baseurl'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/fonts/';
+
         $this->old_template_location  = get_stylesheet_directory().'/'.PDF_SAVE_FOLDER.'/';
         $this->upload_dir             = $upload_dir['basedir'];
     }
