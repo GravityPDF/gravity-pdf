@@ -9,7 +9,7 @@ if(!class_exists('GFPDFEntryDetail'))
 		static $fields;
 
 		/* NEED THIS FUNCTION - BLD */
-		public static function lead_detail_grid($form, $lead, $allow_display_empty_fields=false, $show_html=false, $show_page_name=false, $return=false, $show_section_breaks=false){
+		public static function lead_detail_grid($form, $lead, $allow_display_empty_fields=false, $show_html=false, $show_page_name=false, $return=false, $show_section_breaks=false) {
 			$form_id = $form['id'];
 			$results = array();
 
