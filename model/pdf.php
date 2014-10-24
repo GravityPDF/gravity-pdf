@@ -294,7 +294,7 @@ class GFPDF_Core_Model
 							/*
 							 * Don't show the PDF
 							 */
-							 break;
+							 exit(__('Access Denied', 'pdfextended'));
 						}
 						
 					}				   

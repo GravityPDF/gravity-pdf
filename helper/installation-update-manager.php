@@ -268,17 +268,17 @@ class GFPDF_InstallUpdater
 			  
 			 
 			 /* read all file names into array and unlink from active theme template folder */
-			 foreach(glob($directory.'initialisation/templates/*') as $file) {
-				 	$path_parts = pathinfo($file);					
-						if($wp_filesystem->exists($template_directory.$path_parts['basename']))
-						{
-							if(!$do_backup)
-							{
-								$wp_filesystem->delete($template_directory.$path_parts['basename']);
-								continue;		
-							}
-							$wp_filesystem->move($template_directory.$path_parts['basename'], $template_directory . $backup_folder . $path_parts['basename']);
-						}
+			 foreach(glob( PDF_PLUGIN_DIR . 'initialisation/templates/*') as $file) {
+			 	$path_parts = pathinfo($file);					
+				if($wp_filesystem->exists($template_directory.$path_parts['basename']))
+				{
+					if(!$do_backup)
+					{
+						$wp_filesystem->delete($template_directory.$path_parts['basename']);
+						continue;		
+					}
+					$wp_filesystem->move($template_directory.$path_parts['basename'], $template_directory . $backup_folder . $path_parts['basename']);
+				}
 			 }			
 		}		
 	}

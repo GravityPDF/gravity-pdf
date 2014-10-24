@@ -1370,7 +1370,7 @@ if(!class_exists('GFPDFEntryDetail'))
 
 					$has_columns = is_array($value[0]);
 
-					if(!$has_columns){
+					if(!$has_columns){						
 						$items = array();
 						foreach($value as $key => $item){
 							if(!empty($item)){
@@ -1407,8 +1407,15 @@ if(!class_exists('GFPDFEntryDetail'))
 						else if($media == 'email'){
 							return $items;
 						}
-						else{
-							return $items;
+						else {
+							$list = '<table autosize="1" class="gfield_list" style="border-top: 1px solid #DFDFDF; border-left: 1px solid #DFDFDF; border-spacing: 0; padding: 0; margin: 2px 0 6px; width: 100%">';
+							foreach($items as $i)
+							{
+								$list .= '<tr><td>' . $i .'</td></tr>';
+							}
+							$list .= '</table>';
+
+							return $list;
 						}
 					}
 					else if(is_array($value)){
@@ -1437,6 +1444,7 @@ if(!class_exists('GFPDFEntryDetail'))
 							break;
 
 							default :
+
 								if($media == 'email'){
 									$list = '<table autosize="1" class="gfield_list" style="border-top: 1px solid #DFDFDF; border-left: 1px solid #DFDFDF; border-spacing: 0; padding: 0; margin: 2px 0 6px; width: 100%"><thead><tr>';
 

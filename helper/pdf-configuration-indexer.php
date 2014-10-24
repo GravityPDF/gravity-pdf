@@ -93,7 +93,7 @@
 		{
 			$config = array_replace_recursive($gf_pdf_default_configuration, $config);
 		}
-
+		
 		return $config;		
 	}	
 	

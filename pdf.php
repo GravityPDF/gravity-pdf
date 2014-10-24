@@ -414,40 +414,31 @@ class GFPDF_Core extends PDFGenerator
  */
 if (!function_exists('array_replace_recursive'))
 {
-	function array_replace_recursive()
-	{
-	    // Get array arguments
-	    $arrays = func_get_args();
+    function array_replace_recursive($base, $replacements)
+    {
+        foreach (array_slice(func_get_args(), 1) as $replacements) {
+            $bref_stack = array(&$base);
+            $head_stack = array($replacements);
 
-	    // Define the original array
-	    $original = array_shift($arrays);
+            do {
+                end($bref_stack);
 
-	    // Loop through arrays
-	    foreach ($arrays as $array)
-	    {
-	        // Loop through array key/value pairs
-	        foreach ($array as $key => $value)
-	        {
-	        	if(!isset($original[$key]))
-	        		$original[$key] = array();
+                $bref = &$bref_stack[key($bref_stack)];
+                $head = array_pop($head_stack);
 
-	            // Value is an array
-	            if (is_array($value))
-	            {
-	                // Traverse the array; replace or add result to original array
-	                $original[$key] = array_replace_recursive($original[$key], $array[$key]);
-	            }
+                unset($bref_stack[key($bref_stack)]);
 
-	            // Value is not an array
-	            else
-	            {
-	                // Replace or add current value to original array
-	                $original[$key] = $value;
-	            }
-	        }
-	    }
+                foreach (array_keys($head) as $key) {
+                    if (isset($key, $bref) && isset($bref[$key]) && is_array($bref[$key]) && is_array($head[$key])) {
+                        $bref_stack[] = &$bref[$key];
+                        $head_stack[] = $head[$key];
+                    } else {
+                        $bref[$key] = $head[$key];
+                    }
+                }
+            } while(count($head_stack));
+        }
 
-	    // Return the joined array
-	    return $original;
-	} 
+        return $base;
+    } 
 }
