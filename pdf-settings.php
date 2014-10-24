@@ -88,7 +88,7 @@ class GFPDF_Settings
 			 if(is_dir($gfpdfe_data->old_template_location) && wp_verify_nonce(PDF_Common::get('_wpnonce'), 'gfpdfe_migrate') )
 			 {	
 
-				 if(GFPDF_InstallUpdater::do_template_migration() === 'false')
+				 if(GFPDF_InstallUpdater::run_template_migration() === 'false')
 				 {
 					return true; 
 				 }
@@ -108,11 +108,17 @@ class GFPDF_Settings
 		 */		
 		if(is_multisite() && is_super_admin() && ($gfpdfe_data->fresh_install === true) )
 		{
-			$results = GFPDF_InstallUpdater::run_multisite_deployment();
-			if($results === 'false')
+			$results = GFPDF_InstallUpdater::run_multisite_deployment(array('GFPDF_InstallUpdater', 'do_deploy'));
+
+			if($results === true)
 			{
-				return $results;	
-			}			
+				add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_network_deploy_success'));	
+			}
+			elseif($results === false)
+			{
+				add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_auto_deploy_network_failure'));						
+			}	
+			return $results;				
 		}
 		else
 		{

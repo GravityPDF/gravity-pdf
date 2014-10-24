@@ -46,7 +46,17 @@ class GFPDF_InstallUpdater
 			 */
 			if(is_multisite() && is_super_admin())
 			{
-				self::run_multisite_deployment();
+				$results = GFPDF_InstallUpdater::run_multisite_deployment(array('GFPDF_InstallUpdater', 'do_deploy'));
+
+				if($results === true)
+				{
+					add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_network_deploy_success'));	
+				}
+				elseif($results === false)
+				{
+					add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_auto_deploy_network_failure'));						
+				}	
+				return $results;	
 			}
 			else
 			{
@@ -64,12 +74,12 @@ class GFPDF_InstallUpdater
 	/*
 	 * Initialise all multsites in one fowl swoop 
 	 */
-	public static function run_multisite_deployment()
+	public static function run_multisite_deployment($action)
 	{
 		global $gfpdfe_data;
 
 		/* add additional check incase someone doesn't call this correctly */
-		if(!is_multisite())
+		if(!is_multisite() || !is_super_admin())
 			return false;
 
 			/*
@@ -80,7 +90,6 @@ class GFPDF_InstallUpdater
 			if(sizeof($sites) > 0)
 			{
 
-				$success = true;
 				$problem = array();
 				foreach($sites as $site)
 				{
@@ -103,10 +112,9 @@ class GFPDF_InstallUpdater
 					 	)
 					 {
 					 	/* run our deployment and output any problems */
-					 	$deploy = self::do_deploy();
+					 	$deploy = call_user_func($action); 
 					 	if($deploy === false)
 					 	{
-					 		$success = false;
 					 		$problem[] = $site;
 					 	}
 					 	else if ($deploy === 'false')
@@ -126,15 +134,12 @@ class GFPDF_InstallUpdater
 					 $gfpdfe_data->set_directory_structure();  					 
 				}
 
-				if(!$success)
+				if(sizeof($problem) > 0)
 				{	
 						$gfpdfe_data->network_error = $problem;
-						add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_auto_deploy_network_failure'));		
+						return false;						
 				}
-				else
-				{
-						add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_network_deploy_success'));			
-				}
+				return true;	
 			}
 	}
 
@@ -142,7 +147,7 @@ class GFPDF_InstallUpdater
 	 * Used to automatically deploy the software 
 	 * Regular initialisation (via the settings page) will call pdf_extended_activate() directly.
 	 */
-	private static function do_deploy()
+	public static function do_deploy()
 	{
 		update_option('gfpdfe_automated_install', 'installing');
 		return self::pdf_extended_activate();
@@ -488,7 +493,7 @@ class GFPDF_InstallUpdater
 		if($gfpdfe_data->automated === true)
 		{	
 			update_option('gfpdfe_automated_install', 'installing');
-			self::do_template_migration();
+			self::run_template_migration();
 			return true;
 		}		
 		return false;
@@ -515,6 +520,41 @@ class GFPDF_InstallUpdater
 		}
 		return false;		
 	}
+
+	public static function run_template_migration()
+	{
+		global $gfpdfe_data;
+
+		if(is_multisite() && is_super_admin())
+		{		
+			$return = self::run_multisite_deployment(array('GFPDF_InstallUpdater','do_template_migration'));
+			GFPDF_Settings::$model->check_compatibility();
+
+			/* multisite mode */
+			if($return === true)
+			{
+				add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_migration_success')); 					
+			}
+			elseif($return === false)
+			{
+				add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_merge_network_failure'));										
+			}
+			return $return;
+		}
+		else
+		{
+			$return = self::do_template_migration();
+			GFPDF_Settings::$model->check_compatibility();
+
+			/* single site mode */
+			if($return === true)
+			{
+				add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_migration_success')); 	
+				return $return;
+			}
+			return $return;
+		}
+	}
 	
 	/*
 	 * The after_switch_theme hook is too early in the initialisation to use request_filesystem_credentials()
@@ -538,7 +578,7 @@ class GFPDF_InstallUpdater
 		/*
 		 * Convert paths for SSH/FTP users who are rooted to a directory along the server absolute path 
 		 */	 
-		$base_template_directory = self::get_basedir( $gfpdfe_data->template_location );
+		$base_template_directory = self::get_basedir($gfpdfe_data->template_location );
 		$previous_pdf_path       = self::get_basedir($gfpdfe_data->old_template_location);
 		$current_pdf_path        = self::get_basedir($gfpdfe_data->template_site_location);		
 
@@ -549,20 +589,14 @@ class GFPDF_InstallUpdater
 		}
 
 		/* create the site template directory */
-		if(self::create_site_template_dir($base_template_directory) === false)
+		if(self::create_site_template_dir($current_pdf_path) === false)
 		{		
 			return false;
 		}		
  			 					 
-
 		if($wp_filesystem->is_dir($previous_pdf_path))
 		{
-			self::pdf_extended_copy_directory( $previous_pdf_path, $current_pdf_path, true, false ); /* swap back to TRUE to delete the theme folder */
-
-			/*
-			 * Remove the options key that triggers the switch theme function
-			 */ 
-			 add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_migration_success')); 	
+			 self::pdf_extended_copy_directory( $previous_pdf_path, $current_pdf_path, true, true, true ); /* swap back to TRUE to delete the theme folder */
 			 
 			 /*
 			  * Clean up the DB 
@@ -577,7 +611,7 @@ class GFPDF_InstallUpdater
 	/*
 	 * Allows you to copy entire folder structures to new location
 	 */
-	public static function pdf_extended_copy_directory( $source, $destination, $copy_base = true, $delete_destination = false ) 
+	public static function pdf_extended_copy_directory( $source, $destination, $copy_base = true, $delete_destination = false, $delete_source = false ) 
 	{
 		global $wp_filesystem;		
 		
@@ -615,5 +649,10 @@ class GFPDF_InstallUpdater
 		{
 			$wp_filesystem->copy( $source, $destination );
 		}	
+
+		if($delete_source)
+		{
+			$wp_filesystem->delete($source, true);
+		}
 	}
 }

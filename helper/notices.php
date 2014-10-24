@@ -239,9 +239,9 @@ class GFPDF_Notices
 	public static function gf_pdf_migration_success()
 	{
 		global $gfpdfe_data;
-		$prefix = ($gfpdfe_data->automated === true && !rgpost('upgrade')) ? sprintf(__('%sGravity Forms PDF Extended Automated Template Migration%s:', 'pdfextended'), '<strong>', '</strong><br>') : '';		
+		$prefix = ($gfpdfe_data->automated === true && !rgpost('upgrade')) ? sprintf(__('%sGravity Forms PDF Extended Automated Template Migration:%s', 'pdfextended'), '<strong>', '</strong><br>') : '';		
 		
-		$msg = $prefix .sprintf( __('Your template folder structure was successfully migrated to %s. %sUnsure what this means?%s', 'pdfextended'), $gfpdfe_data->upload_dir, '<br><a href="#">', '</a>');
+		$msg = $prefix . sprintf( __('Your template folder structure was successfully migrated to %s. %sUnsure what this means?%s', 'pdfextended'), str_replace(ABSPATH, '', $gfpdfe_data->upload_dir), '<br><a href="#">', '</a>');
 
 		self::notice($msg);
 						
@@ -278,6 +278,38 @@ class GFPDF_Notices
 		}
 		self::notice($msg);				
 	}
+
+	public static function gf_pdf_merge_network_failure()
+	{		
+		global $gfpdfe_data;
+
+		$prefix = self::autoprefix();		
+		$errors = (array) $gfpdfe_data->network_error;
+		
+		if(sizeof($errors) > 0)
+		{
+			$msg = $prefix . __('There was a problem merging the PDF templates folder on the following sites;', 'pdfextended');
+			$msg .= '<ul>';
+
+			$base_site_url = site_url();
+			foreach($errors as $site)
+			{
+				switch_to_blog( (int) $site['blog_id'] );
+				$url = str_replace($base_site_url, site_url(), PDF_SETTINGS_URL );
+				$msg .= "<li><a href='$url'>{$site['domain']}{$site['path']}</a></li>";
+				restore_current_blog();
+			}
+			$msg .= '</ul>';
+
+			$msg .= __('Follow the site links above and try run the PDF template merging function again, or reinitialise the software.', 'pdfextended');
+		}
+		else
+		{
+			$msg = $prefix . __('An unknown error occured while merging the PDF template folders. Please try again.', 'pdfextended');
+		}	
+
+		self::error($msg);				
+	}	
 
 	public static function gf_pdf_auto_deploy_network_failure()
 	{		
