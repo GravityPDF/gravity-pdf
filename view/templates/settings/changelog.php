@@ -26,7 +26,7 @@
 <li>Feature - Patch mPDF with full :nth-child support on TD and TR table cells</li>
 <li>Feature - Added $form_data['products_totals']['subtotal'] key (total price without shipping costs added)</li>
 <li>Feature - Added formated money to all product fields in the $form_data array</li>
-<li>Feature - Default templats: only show fields who's conditional logic is true. Perfect when used with 'default-show-html'</li>
+<li>Feature - Default templates: only show fields who's conditional logic is true. Perfect when used with 'default-show-html'</li>
 <li>Housekeeping - Move PDF_EXTENDED_TEMPLATES folder to the /wp-content/upload/ directory. Get more info about the move (http://)</li>
 <li>Housekeeping - Refined when admin resources are loaded</li>
 <li>Housekeeping - Fixed typo during initial initialisation</li>
