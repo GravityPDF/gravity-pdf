@@ -1104,7 +1104,7 @@ if(!class_exists('GFPDFEntryDetail'))
 
 		private static function get_product_array($form, $lead, $has_product_fields, $form_array)
 		{
-
+			$currency_format = GFCommon::is_currency_decimal_dot() ? 'decimal_dot' : 'decimal_comma';
 
 			if($has_product_fields) {
 				$products = GFCommon::get_product_fields($form, $lead, true);
@@ -1142,24 +1142,41 @@ if(!class_exists('GFPDFEntryDetail'))
 						$options = isset($product['options']) ? $product['options'] : '';
 
 						/*
+						 * Add formated price for each product option 
+						 */
+						foreach($options as &$o)
+						{
+							if(is_numeric($o['price']))
+							{
+								$o['price_formatted'] = GFCommon::format_number($o['price'], 'currency');
+							}
+						}
+
+						/*
 						 * Store product in $form_array array
 						 */
 						$form_array['products'][$id] = array(
-								'name' => esc_html($product['name']),
-								'price' => esc_html($product['price']),
-								'options' => $options,
-								'quantity' => $product['quantity'],
-								'subtotal' => $subtotal);
+								'name'               => esc_html($product['name']),
+								'price'              => esc_html($product['price']),
+								'price_unformatted'  => GFCommon::clean_number($product['price'], $currency_format),
+								'options'            => $options,
+								'quantity'           => $product['quantity'],
+								'subtotal'           => $subtotal,
+								'subtotal_formatted' => GFCommon::format_number($subtotal, 'currency'));
 					}
 
 					/* Increment total */
 					$total += floatval($products['shipping']['price']);
+					$subtotal = $total - floatval($products['shipping']['price']);
 
 					/* add totals to form data */
 					$form_array['products_totals'] = array(
-							'subtotal' => $total - floatval($products['shipping']['price']),
-							'shipping' => $products['shipping']['price'],
-							'total'	   => $total
+							'subtotal'           => $subtotal,							
+							'shipping'           => $products['shipping']['price'],							
+							'total'              => $total,
+							'shipping_formatted' => GFCommon::format_number($products['shipping']['price'], 'currency'), 
+							'subtotal_formatted' => GFCommon::format_number($subtotal, 'currency'),
+							'total_formatted'    => GFCommon::format_number($total, 'currency'),
 					);
 				}
 			}
@@ -1355,7 +1372,7 @@ if(!class_exists('GFPDFEntryDetail'))
 				break;
 
 				case 'number' :
-					return self::format_number($value, rgar($field, 'numberFormat'));
+					return GFCommon::format_number($value, rgar($field, 'numberFormat'));
 				break;
 
 				case 'singleshipping' :
@@ -1729,7 +1746,7 @@ if(!class_exists('GFPDFEntryDetail'))
 					break;
 
 					case 'number' :
-						return self::format_number($value, rgar($field, 'numberFormat'));
+						return GFCommon::format_number($value, rgar($field, 'numberFormat'));
 					break;
 
 					case 'singleshipping' :
@@ -1868,50 +1885,6 @@ if(!class_exists('GFPDFEntryDetail'))
 				}
 			}
 
-		/**
-		 * Format Gravity Form's three number types
-		 * @param  float $number        The number field value to process
-		 * @param  string $number_format The number type a user selects in the form editor
-		 * @return float                Correctly formated number
-		 */
-	    private static function format_number($number, $number_format){
-	        if(!is_numeric($number))
-	            return $number;
-
-	        //replacing commas with dots and dots with commas
-	        switch($number_format)
-	        {
-	        	case 'decimal_comma':
-	        		$number = self::reformat_number(number_format($number, '2', ',', '.'));
-	        	break;
-
-	        	case 'decimal_dot':
-	        		$number = self::reformat_number(number_format($number, '2'));
-
-	        	break;
-
-	        	case 'currency':
-	        		/* get the GF currency and convert number to money */
-	        		$number = GFCommon::to_money($number);
-	        	break;
-	        }
-
-	        return $number;
-	    }
-
-	    /**
-	     * Remove the .00 or ,00 decimal from the end of the number format
-	     * @param  float $number number to manipulate
-	     * @return float         processed number
-	     */
-	    private static function reformat_number($number)
-	    {
-	    	if(substr($number, -2) == '00')
-	    	{
-	    		return substr($number, 0, -3);
-	    	}
-	    	return $number;
-	    }
 
 	    public static function encode_tags($content, $field)
 	    {

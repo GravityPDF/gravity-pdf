@@ -66,11 +66,11 @@ class PDF_Common
 		}
 		
 		/*
-		 * Limit the size of the filename to 100 characters
+		 * Limit the size of the filename to 120 characters
 		 */
-		 if(strlen($pdf_name) > 150)
+		 if(strlen($pdf_name) > 120)
 		 {
-			$pdf_name = substr($pdf_name, 0, 150); 
+			$pdf_name = substr($pdf_name, 0, 120); 
 		 }
 		 
 		/*
@@ -85,7 +85,7 @@ class PDF_Common
 		/*
 		 * Remove any invalid (mostly Windows) characters from filename
 		 */
-		 $pdf_name = self::remove_invalid_characters($name);			 		 		 		 		 		 		 		
+		 $pdf_name = self::remove_invalid_characters($pdf_name);			 		 		 		 		 		 		 		
 		 $pdf_name = $pdf_name . '.pdf';
 		
 		return $pdf_name;

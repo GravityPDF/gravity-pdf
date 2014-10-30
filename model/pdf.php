@@ -328,6 +328,16 @@ class GFPDF_Core_Model
 		
 		$pdf_arguments['output'] = $output;					
 
+		/*
+		 * While the security above will prevent the PDF being read by non-authorised users, 
+		 * a user can disable that security with the 'access' => 'all' method (THIS IS NOT RECOMMENDED)
+		 * To prevent those PDFs showing up in search engines we will tell them not to index the documents 
+		 */
+		if (!headers_sent()) 
+		{
+			header("X-Robots-Tag: noindex, nofollow", true);
+		}
+
 		$gfpdf->render->PDF_Generator($form_id, $lead_id, $pdf_arguments);
 		
 	  exit();

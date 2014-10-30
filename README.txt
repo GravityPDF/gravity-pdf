@@ -83,10 +83,12 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 
 = 3.6.0 =
 * Feature - Added support for Gravity Form's sub-field 'middle' name  (1.9Beta)
-* Housekeeping - Move PDF_EXTENDED_TEMPLATES folder to the /wp-content/upload/ directory. Get more info about the move (http://)
 * Feature - Patch mPDF with full :nth-child support on TD and TR table cells
 * Feature - Added $form_data['products_totals']['subtotal'] key (total price without shipping costs added)
+* Feature - Added formated money to all product fields in the $form_data array
+* Housekeeping - Move PDF_EXTENDED_TEMPLATES folder to the /wp-content/upload/ directory. Get more info about the move (http://)
 * Housekeeping - Refined when admin resources are loaded
+* Bug - Fixed number field formatting issue which always rounded to two decimal places
 * Bug - Fixed JS namespace issue with WordPress Leads plugin
 * Bug - Fixed error initialising fonts / backing up PDF_EXTENDED_TEMPLATES directory when using the glob() function
 * Bug - Fix issue with PHP 5.0 and 5.1 array_replace_recursive function when used with an array inside the $gf_pdf_config array
