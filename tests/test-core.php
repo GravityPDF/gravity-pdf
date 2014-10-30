@@ -7,7 +7,8 @@ class Test_PDFCore extends WP_UnitTestCase {
 		/* Load our plugin functions */
 		GFPDF_Core::fully_loaded_admin();	
 
-		touch(PDF_TEMPLATE_LOCATION . 'configuration.php');
+		global $gfpdfe_data;
+		touch($gfpdfe_data->template_site_location . 'configuration.php');
 
 		global $gfpdf;
 		$gfpdf = new GFPDF_Core();  		
@@ -90,9 +91,9 @@ class Test_PDFCore extends WP_UnitTestCase {
 	}
 
 	public function test_configuration_file() {
-		$this->assertEquals(file_exists(PDF_TEMPLATE_LOCATION . 'configuration.php'), true);				
-
-		global $gfpdf;			
+		global $gfpdfe_data, $gfpdf;
+		$this->assertEquals(file_exists($gfpdfe_data->template_site_location . 'configuration.php'), true);				
+		
 		$this->assertEquals($gfpdf->disabled, false);				
 		
 	}	

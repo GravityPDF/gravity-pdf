@@ -1,12 +1,24 @@
 <?php 
 
+class stubCurrentScreen
+{
+	function in_admin()
+	{
+		return true;
+	}
+}
+
 class PDF_Actions_And_Filters extends WP_UnitTestCase {
 	public function setUp() {
-		parent::setUp();		
+
+		parent::setUp();	
 
 		/* Load our plugin functions */
 		GFPDF_Core::fully_loaded_admin();	
 
+		/*
+		 * Admin init was restricted to Gravity Form-only pages 
+		 */		
 		global $gfpdf;
 		$gfpdf = new GFPDF_Core();  		
 	}
@@ -21,10 +33,7 @@ class PDF_Actions_And_Filters extends WP_UnitTestCase {
 		$this->assertEquals(10,   has_action('init', array('GFPDF_Core', 'pdf_init')));
 		$this->assertEquals(9999, has_action('admin_init', array('GFPDF_Core', 'fully_loaded_admin')));
 
-		$this->assertEquals(10, has_action('after_switch_theme', array('GFPDF_InstallUpdater', 'gf_pdf_on_switch_theme')));
-		$this->assertEquals(10, has_action('wp_ajax_support_request', array('GFPDF_Settings_Model', 'gfpdf_support_request')));									
-
-		$this->assertEquals(9, has_action('admin_init', array('GFPDF_Core', 'gfe_admin_init')));		
+		$this->assertEquals(10, has_action('wp_ajax_support_request', array('GFPDF_Settings_Model', 'gfpdf_support_request')));		
 
 		$this->assertEquals(10, has_action('gform_entries_first_column_actions', array('GFPDF_Core_Model', 'pdf_link')));
 		$this->assertEquals(10, has_action('gform_entry_info', array('GFPDF_Core_Model', 'detail_pdf_link')));

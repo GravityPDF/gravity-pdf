@@ -26,8 +26,9 @@ class Test_GravityForms extends WP_UnitTestCase {
 		/* Load our plugin functions */
 		GFPDF_Core::fully_loaded_admin();			
 
+		global $gfpdfe_data;
 		/* ensure our config file is present */
-		touch(PDF_TEMPLATE_LOCATION . 'configuration.php');
+		touch($gfpdfe_data->template_site_location . 'configuration.php');
 
 		/* initialise PDF plugin */
 		global $gfpdf;
