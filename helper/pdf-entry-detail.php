@@ -52,6 +52,14 @@ if(!class_exists('GFPDFEntryDetail'))
 						}
 
 						/*
+						 * Skip over hidden fields 
+						 */
+						if(GFFormsModel::is_field_hidden( $form, $field, array(), $lead ))
+						{
+							continue;
+						}
+
+						/*
 						 * Check if we are to show the page names
 						 */
 						 if($show_page_name === true)
