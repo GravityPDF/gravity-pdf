@@ -646,8 +646,8 @@ msgstr ""
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\2) WP SVN
 #: repository\tags\3.5.0/view/templates/settings/initialisation.php:47
-msgid "Does does initialisation do?"
-msgstr "Que fait l'initialisation ?"
+msgid "What does initialisation do?"
+msgstr "Qu'est-ce que l'initialisation ne?"
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\2) WP SVN

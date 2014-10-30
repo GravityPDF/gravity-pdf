@@ -518,7 +518,7 @@ msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\1) github/view/templates/settings/initialisation.php:47
-msgid "Does does initialisation do?"
+msgid "What does initialisation do?"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF

@@ -44,7 +44,7 @@
 
                    <p><?php _e('To complete the installation, Gravity Forms PDF Extended needs to be initialised.', 'pdfextended'); ?>
 
-                   <p><strong><?php _e('Does does initialisation do?', 'pdfextended'); ?></strong></p>
+                   <p><strong><?php _e('What does initialisation do?', 'pdfextended'); ?></strong></p>
                    
                    <ol>                       
                         <li><strong><?php _e('Install the template files', 'pdfextended'); ?></strong>: <?php _e("We create a folder called PDF_EXTENDED_TEMPLATE in your active theme directory and move over all the templates and configuration files. This folder is where you'll look to configure the software and create your PDF templates.", 'pdfextended'); ?></li>                                                              
