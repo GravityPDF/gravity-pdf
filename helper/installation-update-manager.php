@@ -41,13 +41,22 @@ class GFPDF_InstallUpdater
 		
 		if($gfpdfe_data->automated === true && $gfpdfe_data->is_initialised === false && !rgpost('upgrade') && get_option('gfpdfe_automated_install') != 'installing')
 		{		
-
 			/*
 			 * Initialise all multisites if a super admin is logged in
 			 */
 			if(is_multisite() && is_super_admin())
 			{
-				self::run_multisite_deployment();
+				$results = GFPDF_InstallUpdater::run_multisite_deployment(array('GFPDF_InstallUpdater', 'do_deploy'));
+
+				if($results === true)
+				{
+					add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_network_deploy_success'));	
+				}
+				elseif($results === false)
+				{
+					add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_auto_deploy_network_failure'));						
+				}	
+				return $results;	
 			}
 			else
 			{
@@ -65,12 +74,12 @@ class GFPDF_InstallUpdater
 	/*
 	 * Initialise all multsites in one fowl swoop 
 	 */
-	public static function run_multisite_deployment()
+	public static function run_multisite_deployment($action)
 	{
 		global $gfpdfe_data;
 
 		/* add additional check incase someone doesn't call this correctly */
-		if(!is_multisite())
+		if(!is_multisite() || !is_super_admin())
 			return false;
 
 			/*
@@ -81,11 +90,15 @@ class GFPDF_InstallUpdater
 			if(sizeof($sites) > 0)
 			{
 
-				$success = true;
 				$problem = array();
 				foreach($sites as $site)
 				{
 					 switch_to_blog( (int) $site['blog_id'] );
+
+					 /*
+					  * Reset the directory structure 
+					  */
+					 $gfpdfe_data->set_directory_structure();  
 
 					 /*
 					  * Test if the blog has gravity forms and PDF Extended active
@@ -99,10 +112,9 @@ class GFPDF_InstallUpdater
 					 	)
 					 {
 					 	/* run our deployment and output any problems */
-					 	$deploy = self::do_deploy();
+					 	$deploy = call_user_func($action); 
 					 	if($deploy === false)
 					 	{
-					 		$success = false;
 					 		$problem[] = $site;
 					 	}
 					 	else if ($deploy === 'false')
@@ -115,17 +127,19 @@ class GFPDF_InstallUpdater
 					 	}
 					 }
 					 restore_current_blog();
+
+					 /*
+					  * Reset the directory structure 
+					  */
+					 $gfpdfe_data->set_directory_structure();  					 
 				}
 
-				if(!$success)
+				if(sizeof($problem) > 0)
 				{	
 						$gfpdfe_data->network_error = $problem;
-						add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_auto_deploy_network_failure'));		
+						return false;						
 				}
-				else
-				{
-						add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_network_deploy_success'));			
-				}
+				return true;	
 			}
 	}
 
@@ -133,7 +147,7 @@ class GFPDF_InstallUpdater
 	 * Used to automatically deploy the software 
 	 * Regular initialisation (via the settings page) will call pdf_extended_activate() directly.
 	 */
-	private static function do_deploy()
+	public static function do_deploy()
 	{
 		update_option('gfpdfe_automated_install', 'installing');
 		return self::pdf_extended_activate();
@@ -144,7 +158,7 @@ class GFPDF_InstallUpdater
 	 * due to being rooted to a specific folder. 
 	 * The $wp_filesystem->abspath() corrects this behaviour. 
 	 */
-	private static function get_base_dir($path)
+	private static function get_basedir($path)
 	{
 		global $wp_filesystem;
 		return str_replace(ABSPATH, $wp_filesystem->abspath(), $path);
@@ -173,16 +187,75 @@ class GFPDF_InstallUpdater
 		 * FTP and SSH could be rooted to the wordpress base directory 
 		 * use $wp_filesystem->abspath(); function to fix any issues
 		 */
-		$directory               = self::get_base_dir(PDF_PLUGIN_DIR);
-		$template_directory      = self::get_base_dir(PDF_TEMPLATE_LOCATION);
-		$template_save_directory = self::get_base_dir(PDF_SAVE_LOCATION);
-		$template_font_directory = self::get_base_dir(PDF_FONT_LOCATION);		
+		$directory               = self::get_basedir(PDF_PLUGIN_DIR);
+		$base_template_directory = self::get_basedir( $gfpdfe_data->template_location );
+		$template_directory      = self::get_basedir( $gfpdfe_data->template_site_location );
+		$template_save_directory = self::get_basedir( $gfpdfe_data->template_save_location );
+		$template_font_directory = self::get_basedir( $gfpdfe_data->template_font_location );		
+
 
 		/**
-		 * If PDF_TEMPLATE_LOCATION already exists then we will remove the old template files so we can redeploy the new ones
+		 * If template directory already exists then we will remove the old template files so we can redeploy the new ones
 		 */
-		 if($wp_filesystem->exists($template_directory) && isset($_POST['overwrite']))
-		 {
+		self::reinitialise_templates($template_directory);
+
+		/* create new directory in uploads folder*/	
+		if(self::create_base_template_dir($base_template_directory) === false)
+		{
+			return false;
+		}
+
+		/* create site directory in base template directory */
+		if(self::create_site_template_dir($template_directory) === false)
+		{
+			return false;
+		}
+
+		/* create 'save' output folder */
+		if(self::create_save_dir($template_save_directory) === false)
+		{
+			return false;
+		}
+
+		/* create 'font' folder */
+		if(self::create_font_dir($template_font_directory) === false)
+		{
+			return false;
+		}
+	
+		/* copy entire template folder over to the template directory */		
+		self::pdf_extended_copy_directory( $directory . 'initialisation/templates', $template_directory, false );
+
+		/* copy configuration file over to new directory */		 
+		if(self::create_configuration_file($directory, $template_directory) === false)
+		{
+			return false;
+		}
+		
+		/* create .htaccess file */
+		if(self::create_htaccess_file($template_save_directory) === false)
+		{
+			return false;
+		}
+
+		/* initialise font directory */
+		if(self::install_fonts($directory, $template_directory, $template_font_directory) !== true)
+		{
+			return false;
+		}				 
+		
+		/* update db to ensure everything is installed correctly. */		 
+		self::db_init();
+		
+		return true;	
+	}
+
+	public static function reinitialise_templates($template_directory)
+	{
+		global $wp_filesystem, $gfpdfe_data;
+
+		if($wp_filesystem->exists($template_directory) && isset($_POST['overwrite']))
+		{
 			 /*
 			  * Create a backup folder and move all the files there
 			  */
@@ -195,30 +268,61 @@ class GFPDF_InstallUpdater
 			  
 			 
 			 /* read all file names into array and unlink from active theme template folder */
-			 foreach(glob($directory.'initialisation/templates/*') as $file) {
-				 	$path_parts = pathinfo($file);					
-						if($wp_filesystem->exists($template_directory.$path_parts['basename']))
-						{
-							if(!$do_backup)
-							{
-								$wp_filesystem->delete($template_directory.$path_parts['basename']);
-								continue;		
-							}
-							$wp_filesystem->move($template_directory.$path_parts['basename'], $template_directory . $backup_folder . $path_parts['basename']);
-						}
+			 foreach(glob( PDF_PLUGIN_DIR . 'initialisation/templates/*') as $file) {
+			 	$path_parts = pathinfo($file);					
+				if($wp_filesystem->exists($template_directory.$path_parts['basename']))
+				{
+					if(!$do_backup)
+					{
+						$wp_filesystem->delete($template_directory.$path_parts['basename']);
+						continue;		
+					}
+					$wp_filesystem->move($template_directory.$path_parts['basename'], $template_directory . $backup_folder . $path_parts['basename']);
+				}
 			 }			
-		 }		 
+		}		
+	}
 
-		/* create new directory in active themes folder*/	
+	public static function create_base_template_dir($base_template_directory)
+	{
+		global $wp_filesystem, $gfpdfe_data;
+		
+		/* create new directory in uploads folder*/	
+		if(!$wp_filesystem->is_dir($base_template_directory))
+		{
+			if($wp_filesystem->mkdir($base_template_directory) === false)
+			{
+				/* 
+				 * TODO: add correct notices
+				 */ 
+				add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_template_dir_err')); 	
+				return false;
+			}			
+		}	
+
+		return true;		
+	}
+
+	public static function create_site_template_dir($template_directory)
+	{
+		global $wp_filesystem, $gfpdfe_data;
+
 		if(!$wp_filesystem->is_dir($template_directory))
 		{
 			if($wp_filesystem->mkdir($template_directory) === false)
 			{
-				add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_template_dir_err')); 	
+				add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_template_site_dir_err')); 	
 				return false;
-			}
-		}
-	
+			}			
+		}	
+
+		return true;	
+	}
+
+	public static function create_save_dir($template_save_directory)
+	{
+		global $wp_filesystem, $gfpdfe_data;
+
 		if(!$wp_filesystem->is_dir($template_save_directory))
 		{
 			/* create new directory in active themes folder*/	
@@ -227,8 +331,15 @@ class GFPDF_InstallUpdater
 				add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_template_dir_err')); 	
 				return false;
 			}
-		}
+		}	
 		
+		return true;	
+	}
+
+	public static function create_font_dir($template_font_directory)
+	{
+		global $wp_filesystem, $gfpdfe_data;
+
 		if(!$wp_filesystem->is_dir($template_font_directory))
 		{
 			/* create new directory in active themes folder*/	
@@ -237,43 +348,53 @@ class GFPDF_InstallUpdater
 				add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_template_dir_err')); 	
 				return false;
 			}
-		}	
-		
-		/*
-		 * Copy entire template folder over to PDF_TEMPLATE_LOCATION
-		 */
-		 self::pdf_extended_copy_directory( $directory . 'initialisation/templates', $template_directory, false );
+		}
+
+		return true;			
+	}
+
+	/**
+	 * Copy configuration file to template folder
+	 * @param  String $directory The $wp_filesystem path to the plugin folder 
+	 * @param  String $template_directory The $wp_filesystem path to the template folder 
+	 * @return Boolean                    Success on true (or not run at all). false on fail
+	 */
+	public static function create_configuration_file($directory, $template_directory)
+	{
+		global $wp_filesystem, $gfpdfe_data;
 
 		if(!$wp_filesystem->exists($template_directory .'configuration.php'))
 		{ 
 			/* copy template files to new directory */
-			if(!$wp_filesystem->copy($directory .'initialisation/configuration.php.example', $template_directory.'configuration.php'))
+			if(!$wp_filesystem->copy($directory . 'initialisation/configuration.php.example', $template_directory . 'configuration.php'))
 			{ 
 				add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_template_dir_err')); 	
 				return false;
 			}
-		}
-		
-		if(!$wp_filesystem->exists($template_save_directory.'.htaccess'))
+		}	
+
+		return true;	
+	}
+
+	/**
+	 * Create htaccess file to prevent direct access to PDFs
+	 * @param  String $template_save_directory The $wp_filesystem path to the save directory
+	 * @return Boolean                          success on true (or not run at all). false on fail
+	 */
+	public static function create_htaccess_file($template_save_directory)
+	{
+		global $wp_filesystem, $gfpdfe_data;
+
+		if(!$wp_filesystem->exists($template_save_directory . '.htaccess'))
 		{		
-			if(!$wp_filesystem->put_contents($template_save_directory.'.htaccess', 'deny from all'))
+			if(!$wp_filesystem->put_contents($template_save_directory . '.htaccess', 'deny from all'))
 			{
 				add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_template_dir_err')); 	
 				return false;
 			}	
 		}	
 
-		if(self::install_fonts($directory, $template_directory, $template_font_directory) !== true)
-		{
-			return false;
-		}				 
-		
-		/* 
-		 * Update system to ensure everything is installed correctly.
-		 */
-		self::db_init();
-		
-		return true;	
+		return true;		
 	}
 
 	/*
@@ -284,7 +405,6 @@ class GFPDF_InstallUpdater
 		global $gfpdfe_data;
 
 		update_option('gf_pdf_extended_installed', 'installed');			
-		delete_option('gfpdfe_switch_theme');
 		delete_option('gfpdfe_automated_install');	
 		GFPDF_Settings::$model->check_compatibility();
 	}
@@ -308,9 +428,9 @@ class GFPDF_InstallUpdater
 		 * We need to set up some filesystem compatibility checkes to work with the different server file management types
 		 * Most notably is the FTP options, but SSH may be effected too
 		 */
-		$directory               = self::get_base_dir(PDF_PLUGIN_DIR);
-		$template_directory      = self::get_base_dir(PDF_TEMPLATE_LOCATION);
-		$template_font_directory = self::get_base_dir(PDF_FONT_LOCATION);
+		$directory               = self::get_basedir(PDF_PLUGIN_DIR);
+		$template_directory      = self::get_basedir( $gfpdfe_data->template_site_location );
+		$template_font_directory = self::get_basedir( $gfpdfe_data->template_font_location );		
 		
 		if(self::install_fonts($directory, $template_directory, $template_font_directory) === true)
 		{
@@ -338,7 +458,7 @@ class GFPDF_InstallUpdater
 		 */
 
 		 /* read all file names into array and unlink from active theme template folder */
-		 foreach(glob(PDF_FONT_LOCATION.'/*.[tT][tT][fF]') as $file) {
+		 foreach(glob( $gfpdfe_data->template_font_location . '/*.[tT][tT][fF]') as $file) {
 
 			 	$path_parts = pathinfo($file);			
 				
@@ -364,84 +484,88 @@ class GFPDF_InstallUpdater
 		 
 		 return true;
 	}
-	
-	/*
-	 * When switching themes copy over current active theme's PDF_EXTENDED_TEMPLATES (if it exists) to new theme folder
-	 */
-	public static function gf_pdf_on_switch_theme($old_theme_name, $old_theme_object) {
-		
-		/*
-		 * We will store the old pdf dir and new pdf directory and prompt the user to copy the PDF_EXTENDED_TEMPLATES folder
-		 */		
-		 	 $previous_theme_directory = $old_theme_object->get_stylesheet_directory();
-		 			 			
-			 $current_theme_array = wp_get_theme(); 
-			 $current_theme_directory = $current_theme_array->get_stylesheet_directory();
 
-			 /*
-			  * Add the save folder name to the end of the paths
-			  */ 
-			 $old_pdf_path = $previous_theme_directory . '/' . PDF_SAVE_FOLDER;
-			 $new_pdf_path = $current_theme_directory . '/' . PDF_SAVE_FOLDER;		 
-		 	
-			 update_option('gfpdfe_switch_theme', array('old' => $old_pdf_path, 'new' => $new_pdf_path));
-
-			 /* add action to check if we can auto sync */
-			 /* filesystem API isn't avaliable during this action (too early) */
-			 add_action('admin_init', array('GFPDF_InstallUpdater', 'maybe_autosync'));
-	}
-
-	public static function maybe_autosync()
+	public static function maybe_automigrate()
 	{
 		global $gfpdfe_data;
 		self::check_filesystem_api();
 
 		if($gfpdfe_data->automated === true)
 		{	
-			$theme_switch = get_option('gfpdfe_switch_theme');
-			self::do_theme_switch($theme_switch['old'], $theme_switch['new']);
+			update_option('gfpdfe_automated_install', 'installing');
+			self::run_template_migration();
+			return true;
 		}		
+		return false;
 	}
 	
 	/*
-	 * Check if a theme switch has been made recently 
+	 * Check if the new PDF_TEMPLATE_LOCATION (v.3.6 mod) has been made switched
 	 * If it has then prompt the user to move the files
 	 */
-	public static function check_theme_switch()
+	public static function check_template_migration()
 	{
 		global $gfpdfe_data;
 
-		$theme_switch = get_option('gfpdfe_switch_theme');
-
-		if(isset($theme_switch['old']) && isset($theme_switch['new']))
+		if(is_dir($gfpdfe_data->old_template_location))
 		{
-			/*
-			 * Add admin notification hook to move the files
-			 */	
-			 add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'do_theme_switch_notice')); 	
-			 return true;
+			if(!self::maybe_automigrate())
+			{
+				/*
+				 * Add admin notification hook to move the files
+				 */	
+				 add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'do_template_switch_notice')); 	
+				 return true;
+			}
 		}
 		return false;		
 	}
-	
+
+	public static function run_template_migration()
+	{
+		global $gfpdfe_data;
+
+		if(is_multisite() && is_super_admin())
+		{		
+			$return = self::run_multisite_deployment(array('GFPDF_InstallUpdater','do_template_migration'));
+			GFPDF_Settings::$model->check_compatibility();
+
+			/* multisite mode */
+			if($return === true)
+			{
+				add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_migration_success')); 					
+			}
+			elseif($return === false)
+			{
+				add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_merge_network_failure'));										
+			}
+			return $return;
+		}
+		else
+		{
+			$return = self::do_template_migration();
+			GFPDF_Settings::$model->check_compatibility();
+
+			/* single site mode */
+			if($return === true)
+			{
+				add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_migration_success')); 	
+				return $return;
+			}
+			return $return;
+		}
+	}
 	
 	/*
 	 * The after_switch_theme hook is too early in the initialisation to use request_filesystem_credentials()
 	 * so we have to call this function at a later inteval
 	 */
-	public static function do_theme_switch($previous_pdf_path, $current_pdf_path)
+	public static function do_template_migration()
 	{
-		/*
-		 * Prepare for calling the WP Filesystem
-		 * It only allows post data to be added so we have to manually assign them
-		 */
-		$_POST['previous_pdf_path'] = $previous_pdf_path;
-		$_POST['current_pdf_path']  = $current_pdf_path;
-		
 	    /*
 		 * Initialise the Wordpress Filesystem API
 		 */
-		if(PDF_Common::initialise_WP_filesystem_API(array('previous_pdf_path', 'current_pdf_path'), 'gfpdfe_sync_now') === false)
+		if(PDF_Common::initialise_WP_filesystem_API(array(), 'gfpdfe_migrate') === false)
 		{
 			return 'false';	
 		}				
@@ -449,27 +573,36 @@ class GFPDF_InstallUpdater
 		/*
 		 * If we got here we should have $wp_filesystem available
 		 */
-		global $wp_filesystem, $gfpdfe_data;	
-			 
+		global $wp_filesystem, $gfpdfe_data;
+
 		/*
 		 * Convert paths for SSH/FTP users who are rooted to a directory along the server absolute path 
 		 */	 
-		$previous_pdf_path = self::get_base_dir($previous_pdf_path);
-		$current_pdf_path  = self::get_base_dir($current_pdf_path);			 			 					 
+		$base_template_directory = self::get_basedir($gfpdfe_data->template_location );
+		$previous_pdf_path       = self::get_basedir($gfpdfe_data->old_template_location);
+		$current_pdf_path        = self::get_basedir($gfpdfe_data->template_site_location);		
 
+		/* create the base template directory */
+		if(self::create_base_template_dir($base_template_directory) === false)
+		{
+			return false;
+		}
+
+		/* create the site template directory */
+		if(self::create_site_template_dir($current_pdf_path) === false)
+		{		
+			return false;
+		}		
+ 			 					 
 		if($wp_filesystem->is_dir($previous_pdf_path))
 		{
-			self::pdf_extended_copy_directory( $previous_pdf_path, $current_pdf_path, true, true );
-
-			/*
-			 * Remove the options key that triggers the switch theme function
-			 */ 
-			 delete_option('gfpdfe_switch_theme');
-			 add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_theme_sync_success')); 	
+			 self::pdf_extended_copy_directory( $previous_pdf_path, $current_pdf_path, true, true, true ); /* swap back to TRUE to delete the theme folder */
 			 
 			 /*
-			  * Show success message to user
+			  * Clean up the DB 
 			  */
+			 delete_option('gfpdfe_automated_install');
+			 
 			 return true;			
 		}		
 		return false; 
@@ -478,7 +611,7 @@ class GFPDF_InstallUpdater
 	/*
 	 * Allows you to copy entire folder structures to new location
 	 */
-	public static function pdf_extended_copy_directory( $source, $destination, $copy_base = true, $delete_destination = false ) 
+	public static function pdf_extended_copy_directory( $source, $destination, $copy_base = true, $delete_destination = false, $delete_source = false ) 
 	{
 		global $wp_filesystem;		
 		
@@ -516,5 +649,10 @@ class GFPDF_InstallUpdater
 		{
 			$wp_filesystem->copy( $source, $destination );
 		}	
+
+		if($delete_source)
+		{
+			$wp_filesystem->delete($source, true);
+		}
 	}
 }

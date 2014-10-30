@@ -85,20 +85,29 @@ class PDF_Common
 		/*
 		 * Remove any invalid (mostly Windows) characters from filename
 		 */
-		 $pdf_name = str_replace('/', '-', $pdf_name);
-		 $pdf_name = str_replace('\\', '-', $pdf_name);		
-		 $pdf_name = str_replace('"', '-', $pdf_name);				 
-		 $pdf_name = str_replace('*', '-', $pdf_name);				 
-		 $pdf_name = str_replace('?', '-', $pdf_name);				 		 
-		 $pdf_name = str_replace('|', '-', $pdf_name);				 		 		 
-		 $pdf_name = str_replace(':', '-', $pdf_name);				 		 		 		 
-		 $pdf_name = str_replace('<', '-', $pdf_name);				 		 		 		 
-		 $pdf_name = str_replace('>', '-', $pdf_name);				 		 		 		 		 		 
-		 $pdf_name = str_replace('.', '_', $pdf_name);				 		 		 		 		 		 		 
-		
+		 $pdf_name = self::remove_invalid_characters($name);			 		 		 		 		 		 		 		
 		 $pdf_name = $pdf_name . '.pdf';
 		
 		return $pdf_name;
+	}
+
+	public static function remove_invalid_characters($name)
+	{
+		/*
+		 * Remove any invalid (mostly Windows) characters from filename
+		 */
+		 $name = str_replace('/', '-', $name);
+		 $name = str_replace('\\', '-', $name);		
+		 $name = str_replace('"', '-', $name);				 
+		 $name = str_replace('*', '-', $name);				 
+		 $name = str_replace('?', '-', $name);				 		 
+		 $name = str_replace('|', '-', $name);				 		 		 
+		 $name = str_replace(':', '-', $name);				 		 		 		 
+		 $name = str_replace('<', '-', $name);				 		 		 		 
+		 $name = str_replace('>', '-', $name);				 		 		 		 		 		 
+		 $name = str_replace('.', '_', $name);	
+
+		 return $name;		
 	}
 	
 	/*
@@ -195,6 +204,61 @@ class PDF_Common
 			return $_GET[$name];
 
 		return '';
+	}
+
+	/**
+	 * Gets the site name for use as a directory name
+	 * @return String Returns the current 'safe' directory site name
+	 */
+	public static function get_site_name()
+	{
+		$name = (is_ssl()) ? str_replace('https://', '', site_url()) : str_replace('http://', '', site_url());
+		return self::remove_invalid_characters($name);
+	}
+
+	/**
+	 * Modified version of get_upload_dir() which just focuses on the base directory
+	 * no matter if single or multisite installation 
+	 * We also only needed the basedir and baseurl so stripped out all the extras
+	 * @return Array Base dir and url for the upload directory
+	 */
+	public static function get_upload_dir()
+	{
+	        $siteurl = get_option( 'siteurl' );
+	        $upload_path = trim( get_option( 'upload_path' ) );
+	
+	        if ( empty( $upload_path ) || 'wp-content/uploads' == $upload_path ) {
+	                $dir = WP_CONTENT_DIR . '/uploads';
+	        } elseif ( 0 !== strpos( $upload_path, ABSPATH ) ) {
+	                // $dir is absolute, $upload_path is (maybe) relative to ABSPATH
+	                $dir = path_join( ABSPATH, $upload_path );
+	        } else {
+	                $dir = $upload_path;
+	        }
+	
+	        if ( !$url = get_option( 'upload_url_path' ) ) {
+	                if ( empty($upload_path) || ( 'wp-content/uploads' == $upload_path ) || ( $upload_path == $dir ) )
+	                        $url = WP_CONTENT_URL . '/uploads';
+	                else
+	                        $url = trailingslashit( $siteurl ) . $upload_path;
+	        }
+	
+	        /*
+	         * Honor the value of UPLOADS. This happens as long as ms-files rewriting is disabled.
+	         * We also sometimes obey UPLOADS when rewriting is enabled -- see the next block.
+	         */
+	        if ( defined( 'UPLOADS' ) && ! ( is_multisite() && get_site_option( 'ms_files_rewriting' ) ) ) {
+	                $dir = ABSPATH . UPLOADS;
+	                $url = trailingslashit( $siteurl ) . UPLOADS;
+	        }		
+
+	        $basedir = $dir;
+	        $baseurl = $url;	
+
+        return array(
+	        'basedir' => $basedir,
+	        'baseurl' => $baseurl,
+ 		);	                
 	}
 }
 

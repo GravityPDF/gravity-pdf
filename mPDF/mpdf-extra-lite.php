@@ -2397,7 +2397,7 @@ function AddFont($family,$style='') {
 			/*
 			 * Try load in the font file from the PDF_TEMPLATE
 			 */
-			$ttffile = PDF_TEMPLATE_LOCATION . 'fonts/' . $this->fontdata[$family][$stylekey];			
+			$ttffile = $gfpdfe_data->template_site_location . 'fonts/' . $this->fontdata[$family][$stylekey];			
 			if(!file_exists($ttffile))
 			{
 				die("mPDF Error - cannot find TTF TrueType font file - ".$ttffile); 
@@ -5928,7 +5928,7 @@ function Output($name='',$dest='')
 {
 	//Output PDF to some destination
 	if ($this->showStats) {
-		file_put_contents(PDF_SAVE_LOCATION . 'mPDF_performance_log.txt', date('Y-m-d h:i:s') . ' Generated in '.sprintf('%.2F',(microtime(true) - $this->time0))." seconds\r\n", FILE_APPEND);
+		file_put_contents($gfpdfe_data->template_save_location . 'mPDF_performance_log.txt', date('Y-m-d h:i:s') . ' Generated in '.sprintf('%.2F',(microtime(true) - $this->time0))." seconds\r\n", FILE_APPEND);
 	}
 	
 	//Finish document if necessary
@@ -5972,7 +5972,7 @@ function Output($name='',$dest='')
 			$log .= 'Peak Memory usage '.number_format((memory_get_peak_usage(true)/(1024*1024)),2)." MB\n";
 			$log .= 'PDF file size '.number_format((strlen($this->buffer)/1024))." kB\n";
 			$log .= 'Number of fonts '.count($this->fonts)."\n";
-			file_put_contents(PDF_SAVE_LOCATION . 'mPDF_performance_log.txt', $log, FILE_APPEND);
+			file_put_contents($gfpdfe_data->template_save_location . 'mPDF_performance_log.txt', $log, FILE_APPEND);
 	}
 
 

@@ -101,7 +101,7 @@ border: 1px solid #CCC;
  border: 1px solid #d10b0b;	
 }
 
-#support-request .icon-remove-sign {
+#support-request .fa-times-circle {
 vertical-align: middle;	
 }
 
@@ -150,63 +150,40 @@ div.notice p {
 /*
  * Icon Styles 
  */
-[class^="icon-"]:before, [class*=" icon-"]:before {
+/*[class^="icon-"]:before, [class*=" icon-"]:before {
   display: inline-block;
   text-decoration: inherit;
   -webkit-font-smoothing: antialiased;
 }
 
 [class^="icon-"], [class*=" icon-"] {
-    background-image: none;
-    background-position: 0 0;
-    background-repeat: repeat;
-    display: inline;
-    height: auto;
-    line-height: normal;
-    margin-top: 0;
-    vertical-align: baseline;
-    width: auto;
-    -webkit-font-smoothing: antialiased;
-}
-[class^="icon-"], [class*=" icon-"] {
-    font-family: "dashicons";
-    font-style: normal;
-    font-weight: normal;
-    text-decoration: inherit;
+  display: inline-block;
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}*/
+
+
+#pdf-system-status .fa-check-circle, #pdf-system-status .fa-exclamation-triangle, .fa-times-circle {
+ font-size: 17px; 
+ margin-left: 5px;
+ vertical-align: bottom;
+ margin-bottom: -2px;
 }
 
-.icon-ok-sign, .icon-remove-sign, .icon-warning-sign {
-  border-radius: 50%;
-  font-size: 13px;
-  margin-left: 5px;
-  color: #FFF;
-  
+.fa-check-circle {
+ color: #008000;
 }
 
-.icon-ok-sign {
-  background: #008000;
+.fa-exclamation-triangle {
+ color: #ff8a00;
 }
 
-.icon-remove-sign {
-  background: #d10b0b;  
-}
-
-.icon-warning-sign {
- background: #ff8a00;
-}
-
-.icon-ok-sign:before {
- content: "\f147";
- padding: 0 1px 0 0;
-}
-
-.icon-remove-sign:before {
-  content: "\f335";
-  padding: 0 1px 0 0;
-}
-
-.icon-warning-sign:before {
-  content: "\f107";
+.fa-times-circle {
+ color: #d10b0b;  
 }
 
 #pdf-system-status label, label.inline-label {

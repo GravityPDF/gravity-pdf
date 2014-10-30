@@ -270,9 +270,9 @@ $this->fontdata = array(
  * Blue Liquid Designs Edit
  * Include the font configuration file defined by the plugin 
  */
- if(file_exists(PDF_TEMPLATE_LOCATION.'fonts/config.php'))
+ if(file_exists($gfpdfe_data->template_save_location . 'fonts/config.php'))
  {
-	 include PDF_TEMPLATE_LOCATION.'fonts/config.php';
+	 include $gfpdfe_data->template_save_location . 'fonts/config.php';
  }
 
 

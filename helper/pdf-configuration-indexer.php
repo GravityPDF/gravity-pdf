@@ -39,7 +39,8 @@
 	
 	public function __construct()
 	{
-		 
+		 global $gfpdfe_data;
+
 		 /* 
 		  * Do configuration pre-processing
 		  */
@@ -47,8 +48,8 @@
 		  /*
 		   * Check if user configuration file exists
 		   * If not disable $configuration and $index.
-		   */ 		   
-		  if(!file_exists(PDF_TEMPLATE_LOCATION.'configuration.php'))
+		   */ 		   		  
+		  if(!file_exists( $gfpdfe_data->template_site_location . 'configuration.php') )
 		  {
 			  $this->disabled = true;
 			  return;
@@ -58,7 +59,7 @@
 				/*
 				 * Include the configuration file and set up the configuration variable.
 				 */  
-				 require_once(PDF_TEMPLATE_LOCATION.'configuration.php');				
+				 require_once( $gfpdfe_data->template_site_location . 'configuration.php' );				
 				 /*
 				  * $gf_pdf_config included from configuration.php file
 				  */				 
@@ -92,7 +93,7 @@
 		{
 			$config = array_replace_recursive($gf_pdf_default_configuration, $config);
 		}
-
+		
 		return $config;		
 	}	
 	

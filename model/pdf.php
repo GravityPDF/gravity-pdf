@@ -73,7 +73,7 @@ class GFPDF_Core_Model
 			return false;
 		}
 
-		if( ($gfpdfe_data->fresh_install === true) || (!is_dir(PDF_TEMPLATE_LOCATION)) )
+		if( ($gfpdfe_data->fresh_install === true) || (!is_dir($gfpdfe_data->template_site_location)) )
 		{						
 			return false;
 		}
@@ -294,7 +294,7 @@ class GFPDF_Core_Model
 							/*
 							 * Don't show the PDF
 							 */
-							 break;
+							 exit(__('Access Denied', 'pdfextended'));
 						}
 						
 					}				   

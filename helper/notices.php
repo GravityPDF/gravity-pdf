@@ -166,14 +166,29 @@ class GFPDF_Notices
 	 */
 	public static function gf_pdf_template_dir_err()
 	{
+		global $gfpdfe_data;
+
 		$prefix = self::autoprefix();
 		$suffix = self::autosuffix();
 
-		$msg = $prefix . __('We could not create a template folder in your active theme\'s directory. Please ensure your active theme directory is writable by your web server and try again.', 'pdfextended')  . $suffix;
+		$msg = $prefix . sprintf(__('We could not create a template folder in your uploads directory. Please ensure %s is writable by your web server and try again.', 'pdfextended'), str_replace(ABSPATH, '', $gfpdfe_data->upload_dir)) . $suffix;
 
-		self::error($msg);
-			
-			
+		self::error($msg);					
+	}
+
+	/**
+	 * Cannot create site directory in template folder 	 
+	 */
+	public static function gf_pdf_template_site_dir_err()
+	{
+		global $gfpdfe_data;
+
+		$prefix = self::autoprefix();
+		$suffix = self::autosuffix();
+
+		$msg = $prefix . sprintf(__('We could not create a site folder in your uploads/%s directory. Please ensure %s is writable by your web server and try again.'), PDF_SAVE_FOLDER, str_replace(ABSPATH, '', $gfpdfe_data->template_location), 'pdfextended')  . $suffix;
+
+		self::error($msg);				
 	}
 	
 	/**
@@ -184,20 +199,20 @@ class GFPDF_Notices
 		$prefix = self::autoprefix();
 		$suffix = self::autosuffix();
 			
-		$msg = $prefix . sprintf(__('We could not remove the default template files from the Gravity Forms PDF Extended folder in your active theme\'s directory. Please ensure %s is wriable by your web server and try again.', 'pdfextended'), PDF_SAVE_LOCATION) . $suffix;			
+		$msg = $prefix . sprintf(__('We could not remove the default template files from %s in your uploads directory. Please ensure %s is wriable by your web server and try again.', 'pdfextended'), PDF_SAVE_FOLDER, str_replace(ABSPATH, '', $gfpdfe_data->template_site_location)) . $suffix;			
 		
 		self::error($msg);			
 	}		
 	
 	/**
-	 * Cannot create new template folder in active theme directory
+	 * Cannot create new template folder 
 	 */
 	public static function gf_pdf_template_move_err()
 	{
 		$prefix = self::autoprefix();
 		$suffix = self::autosuffix();
 	
-		$msg = $prefix . sprintf(__('We could not move the template files to the PDF_EXTENDED_TEMPLATES folder.  Please ensure %s is wriable by your web server and try again.', 'pdfextended'), PDF_SAVE_LOCATION) . $suffix;
+		$msg = $prefix . sprintf(__('We could not move the template files to the %s folder.  Please ensure %s is wriable by your web server and try again.', 'pdfextended'), PDF_SAVE_FOLDER, str_replace(ABSPATH, '', $gfpdfe_data->template_site_location) ) . $suffix;
 			
 		self::error($msg);
 	}
@@ -205,28 +220,28 @@ class GFPDF_Notices
 	/*
 	 * Prompt user to keep the plugin working
 	 */
-	public static function do_theme_switch_notice()
+	public static function do_template_switch_notice()
 	{		
 		/*
 		 * Check we aren't in the middle of doing the sync
 		 */
-		 if(isset($_GET['_wpnonce']) && wp_verify_nonce($_GET['_wpnonce'], 'gfpdfe_sync_now'))
+		 if(isset($_GET['_wpnonce']) && wp_verify_nonce($_GET['_wpnonce'], 'gfpdfe_migrate'))
 		 {
 			return; 
 		 } 
 			
-		$msg = sprintf(__('Gravity Forms PDF Extended needs to keep your configuration and templates folder in sync with your current active theme. %sSync Now%s', 'pdfextended'), '<a href="'. wp_nonce_url(PDF_SETTINGS_URL, 'gfpdfe_sync_now') . '" class="button">', '</a>');
+		$msg = sprintf(__('Gravity Forms PDF Extended directory structure has been changed. %sMigrate Now%s %sUnsure what this means?%s', 'pdfextended'), '<a href="'. wp_nonce_url(PDF_SETTINGS_URL, 'gfpdfe_migrate') . '" class="button">', '</a>', '<a href="#">', '</a>' );
 
 		self::notice($msg);
 					 
 	}
 	
-	public static function gf_pdf_theme_sync_success()
+	public static function gf_pdf_migration_success()
 	{
 		global $gfpdfe_data;
-		$prefix = ($gfpdfe_data->automated === true && !rgpost('upgrade')) ? sprintf(__('%sGravity Forms PDF Extended Automated Theme Sync%s: ', 'pdfextended'), '<strong>', '</strong>') : '';		
+		$prefix = ($gfpdfe_data->automated === true && !rgpost('upgrade')) ? sprintf(__('%sGravity Forms PDF Extended Automated Template Migration:%s', 'pdfextended'), '<strong>', '</strong><br>') : '';		
 		
-		$msg = $prefix . __('Your PDF configuration and template folder was successfully synced to your new theme.', 'pdfextended');
+		$msg = $prefix . sprintf( __('Your template folder structure was successfully migrated to %s. %sUnsure what this means?%s', 'pdfextended'), str_replace(ABSPATH, '', $gfpdfe_data->upload_dir), '<br><a href="#">', '</a>');
 
 		self::notice($msg);
 						
@@ -263,6 +278,38 @@ class GFPDF_Notices
 		}
 		self::notice($msg);				
 	}
+
+	public static function gf_pdf_merge_network_failure()
+	{		
+		global $gfpdfe_data;
+
+		$prefix = self::autoprefix();		
+		$errors = (array) $gfpdfe_data->network_error;
+		
+		if(sizeof($errors) > 0)
+		{
+			$msg = $prefix . __('There was a problem merging the PDF templates folder on the following sites;', 'pdfextended');
+			$msg .= '<ul>';
+
+			$base_site_url = site_url();
+			foreach($errors as $site)
+			{
+				switch_to_blog( (int) $site['blog_id'] );
+				$url = str_replace($base_site_url, site_url(), PDF_SETTINGS_URL );
+				$msg .= "<li><a href='$url'>{$site['domain']}{$site['path']}</a></li>";
+				restore_current_blog();
+			}
+			$msg .= '</ul>';
+
+			$msg .= __('Follow the site links above and try run the PDF template merging function again, or reinitialise the software.', 'pdfextended');
+		}
+		else
+		{
+			$msg = $prefix . __('An unknown error occured while merging the PDF template folders. Please try again.', 'pdfextended');
+		}	
+
+		self::error($msg);				
+	}	
 
 	public static function gf_pdf_auto_deploy_network_failure()
 	{		
@@ -313,12 +360,6 @@ class GFPDF_Notices
 		 $message = __("Wordpress " . GF_PDF_EXTENDED_WP_SUPPORTED_VERSION . " or higher is required to use this plugin.", 'pdfextended'); 
 		 self::display_plugin_message($message, true);			
 	}	
-	
-	/*public static function display_documentation_details()
-	{
-		 $message = sprintf(__("Please review the %sGravity Forms PDF Extended documentation%s for comprehensive installation instructions.%s", 'pdfextended'), "<a href='http://gravityformspdfextended.com/documentation-v3-x-x/installation-and-configuration/'>", "</a>", '</span>'); 
-		 PDF_Common::display_plugin_message($message);						
-	}*/	
 	
 	public static function display_pdf_compatibility_error()
 	{
