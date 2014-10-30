@@ -34,8 +34,8 @@ GNU General Public License for more details.
  * Define our constants 
  */
 define('PDF_EXTENDED_VERSION', '3.6.0'); 
-define('GF_PDF_EXTENDED_SUPPORTED_VERSION', '1.8'); 
-define('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION', '3.9'); 
+define('GF_PDF_EXTENDED_SUPPORTED_VERSION', '1.7'); 
+define('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION', '3.8'); 
 define('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION', '5'); 
   
 define('PDF_PLUGIN_DIR', plugin_dir_path( __FILE__ ));  

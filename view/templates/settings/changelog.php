@@ -21,16 +21,34 @@
     <p><strong>Current Version: <?php echo PDF_EXTENDED_VERSION; ?></strong></p>
 
   <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
-  <ul>
-    <li>Feature - Added support for Gravity Form's sub-field 'middle' name  (1.9Beta)</li>
-    <li>Housekeeping - Refined when admin resources are loaded</li>
-    <li>Bug - Fixed JS namespace issue with WordPress Leads plugin</li> 
-  </ul>
+<ul>
+<li>Feature - Added support for Gravity Form's sub-field 'middle' name  (1.9Beta)</li>
+<li>Feature - Patch mPDF with full :nth-child support on TD and TR table cells</li>
+<li>Feature - Added $form_data['products_totals']['subtotal'] key (total price without shipping costs added)</li>
+<li>Feature - Added formated money to all product fields in the $form_data array</li>
+<li>Feature - Default templats: only show fields who's conditional logic is true. Perfect when used with 'default-show-html'</li>
+<li>Housekeeping - Move PDF_EXTENDED_TEMPLATES folder to the /wp-content/upload/ directory. Get more info about the move (http://)</li>
+<li>Housekeeping - Refined when admin resources are loaded</li>
+<li>Housekeeping - Fixed typo during initial initialisation</li>
+<li>Housekeeping - Switched icons back to FontAwesome which is shipped by default with Gravity Forms</li>
+<li>Housekeeping - Display full path to mPDF tmp directory when there are issues writing to it</li>
+<li>Bug - Fixed issue pulling the correct configuration when multiple nodes were assigned to multiple forms</li>
+<li>Bug - Fixed number field formatting issue which always rounded to two decimal places</li>
+<li>Bug - Fixed JS namespace issue with WordPress Leads plugin</li>
+<li>Bug - Fixed error initialising fonts / backing up PDF_EXTENDED_TEMPLATES directory when using the glob() function</li>
+<li>Bug - Fix issue with PHP 5.0 and 5.1 array_replace_recursive function when used with an array inside the $gf_pdf_config array</li>
+<li>Bug - Fixed fatal error when logged in user attempts to view PDF they don't have access to</li>
+<li>Bug - Fixed issue in $form_data array where single-column list items where being returned as an array and not a HTML list.
+</ul>
 
+
+  <h3>3.5.10</h3>
   <ul>
     <li>Housekeeping - Include individual scoring for Gravity Form Survey Likert field in the $form_data['survey'] array</li>
     <li>Bug - Fix fatal error when Gravity Forms isn't activated, but PDF Extended is.</li>
   </ul>
+
+  <h3>3.5.9</h3>
   <ul>
     <li>Bug - Rollback recent changes that introduced the GFAPI as introduces errors for older versions of Gravity Forms. Will reintroduce in next major release and increase the minimum Gravity Forms version.</li>
   </ul>

@@ -456,4 +456,4 @@ For more details [view the 3.x.x online documentation](http://gravityformspdfext
 == Upgrade Notice ==
 
 = 3.6.0 =
-WARNING: Minimum WordPress and Gravity Forms versions have been bumped to WordPress 3.9+ and Gravity Forms 1.8+. If you aren't running either version of this software DO NOT UPGRADE.
+WARNING: Minimum WordPress and Gravity Forms versions have been bumped to WordPress 3.8+ and Gravity Forms 1.7+. If you aren't running either version of this software DO NOT UPGRADE.
