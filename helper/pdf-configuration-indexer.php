@@ -271,9 +271,9 @@
 			 {
 
 				$templates = array();
-				foreach($this->index[$form_id] as $id)
+				foreach($this->index[$form_id] as $key => $id)
 				{					
-					$templates[$id] =	array(
+					$templates[$key] =	array(
 											'template' => (isset($this->configuration[$id]['template'])) ? $this->configuration[$id]['template'] : $default_template,
 											'filename' => (isset($this->configuration[$id]['filename'])) ? $this->configuration[$id]['filename'] : PDF_Common::get_pdf_filename($form_id, '{entry_id}')
 										);
@@ -322,8 +322,10 @@
 
 	}	
 	
-	public function get_pdf_name($index, $form_id = false, $lead_id = false)
-	{
+	public function get_pdf_name($id, $form_id = false, $lead_id = false)
+	{			
+		$index = $this->index[$form_id][$id];
+
 		if(isset($this->configuration[$index]['filename']))
 		{
 			return PDF_Common::validate_pdf_name($this->configuration[$index]['filename'], $form_id, $lead_id);		

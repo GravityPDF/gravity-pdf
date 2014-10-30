@@ -2,6 +2,13 @@
 if(!class_exists('GFPDFEntryDetail'))
 {
 
+	/*
+	 * Include Gravity Forms Currency class (it not already included)
+	 */
+	if ( false === class_exists( 'RGCurrency' ) ) {
+		require_once( GFCommon::get_base_path() . '/currency.php' );
+	}
+	
 	add_filter('gfpdf_field_content', array('GFPDFEntryDetail', 'encode_tags'), 10, 2); /* encode shortcodes in user's response so they aren't converted later by do_shortcode */
 	class GFPDFEntryDetail {
 

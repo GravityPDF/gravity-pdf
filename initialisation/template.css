@@ -40,7 +40,7 @@ h2.default {
 .entry-view-field-value div.strong {
     font-weight: bold;
 }
-.no-style .entry-view-field-value, .no-style #container, .no-style h2 {
+.no-style .entry-view-field-value, .no-style #container, .no-style h2, .no-style .entry-view-html-value {
     background: none;
     border: none;
 }

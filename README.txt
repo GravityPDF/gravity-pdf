@@ -90,6 +90,8 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 * Housekeeping - Refined when admin resources are loaded
 * Housekeeping - Fixed typo during initial initialisation
 * Housekeeping - Switched icons back to FontAwesome which is shipped by default with Gravity Forms
+* Housekeeping - Display full path to mPDF tmp directory when there are issues writing to it
+* Bug - Fixed issue pulling the correct configuration when multiple nodes were assigned to multiple forms
 * Bug - Fixed number field formatting issue which always rounded to two decimal places
 * Bug - Fixed JS namespace issue with WordPress Leads plugin
 * Bug - Fixed error initialising fonts / backing up PDF_EXTENDED_TEMPLATES directory when using the glob() function

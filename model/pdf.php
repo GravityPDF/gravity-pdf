@@ -125,7 +125,7 @@ class GFPDF_Core_Model
 			<strong>PDFs</strong><br />
 
         	<?php foreach($templates as $id => $val):
-			$name = $gfpdf->get_pdf_name($id, $form_id, $lead['id']);
+			$name = $gfpdf->get_pdf_name($gfpdf->index[$form_id][$id], $form_id, $lead['id']);
 			$aid = (int) $id + 1;
 			 ?>	
             <div class="detailed_pdf">						
@@ -184,7 +184,7 @@ class GFPDF_Core_Model
 							/*
 							 * Replace MergeTags in filename
 							 */
-							 $name = $gfpdf->get_pdf_name($id, $form_id, $lead['id']);
+							 $name = $gfpdf->get_pdf_name($gfpdf->index[$form_id][$id], $form_id, $lead['id']);
 							 $aid = (int) $id + 1;
 							?>							
                             <li class="">
@@ -437,7 +437,8 @@ class GFPDF_Core_Model
 		 if(!$config = $gfpdf->get_config($form_id))
 		 {
 			 return $notification;
-		 }						  		
+		 }		
+
 		/* 
 		 * To have our configuration indexes so loop through the PDF template configuration
 		 * and generate and attach PDF files.
@@ -446,6 +447,7 @@ class GFPDF_Core_Model
 		 {
 				$template = (isset($gfpdf->configuration[$index]['template'])) ? $gfpdf->configuration[$index]['template'] : '';					
 	
+
 				/* Get notifications user wants PDF attached to and check if the correct notifications hook is running */				
 				$notifications = self::get_form_notifications($form, $index);				
 														
@@ -520,7 +522,7 @@ class GFPDF_Core_Model
 	public static function get_form_notifications($form, $index)
 	{
 		global $gfpdf;
-			
+
 		/*
 		 * Check if notification field even exists
 		 */
@@ -539,6 +541,7 @@ class GFPDF_Core_Model
 		/*
 		 * If notifications is true the user wants to attach the PDF to all notifications
 		 */ 
+
 		if($gfpdf->configuration[$index]['notifications'] === true)
 		{					
 			$new_notifications = $notifications;
@@ -578,8 +581,7 @@ class GFPDF_Core_Model
 	{
 		global $gfpdf;
 
-		$config = $gfpdf->configuration[$index];
-		
+		$config = $gfpdf->configuration[$index];		
 		
 		$pdf_name    = (isset($config['filename']) && strlen($config['filename']) > 0) ? $gfpdf->get_pdf_name($index, $form_id, $lead_id) : PDF_Common::get_pdf_filename($form_id, $lead_id);	
 		$template    = (isset($template) && strlen($template) > 0) ? $template : $gfpdf->get_template($index);	 
