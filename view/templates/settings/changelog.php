@@ -27,7 +27,7 @@
 <li>Feature - Added $form_data['products_totals']['subtotal'] key (total price without shipping costs added)</li>
 <li>Feature - Added formated money to all product fields in the $form_data array</li>
 <li>Feature - Default templates: only show fields who's conditional logic is true. Perfect when used with 'default-show-html'</li>
-<li>Housekeeping - Move PDF_EXTENDED_TEMPLATES folder to the /wp-content/upload/ directory. Get more info about the move (http://)</li>
+<li>Housekeeping - Move PDF_EXTENDED_TEMPLATES folder to the /wp-content/upload/ directory. Get more info about the move (see <a href="http://gravityformspdfextended.com/migrating-template-directory-means/">http://gravityformspdfextended.com/migrating-template-directory-means/</a>)</li>
 <li>Housekeeping - Refined when admin resources are loaded</li>
 <li>Housekeeping - Fixed typo during initial initialisation</li>
 <li>Housekeeping - Switched icons back to FontAwesome which is shipped by default with Gravity Forms</li>
@@ -38,7 +38,8 @@
 <li>Bug - Fixed error initialising fonts / backing up PDF_EXTENDED_TEMPLATES directory when using the glob() function</li>
 <li>Bug - Fix issue with PHP 5.0 and 5.1 array_replace_recursive function when used with an array inside the $gf_pdf_config array</li>
 <li>Bug - Fixed fatal error when logged in user attempts to view PDF they don't have access to</li>
-<li>Bug - Fixed issue in $form_data array where single-column list items where being returned as an array and not a HTML list.
+<li>Bug - Fixed issue in $form_data array where single-column list items where being returned as an array and not a HTML list.</li>
+<li>Bug - Prevent unauthorised users auto-initialising the software or migrating the templates folder</li>
 </ul>
 
 
