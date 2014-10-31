@@ -99,6 +99,7 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 * Bug - Fix issue with PHP 5.0 and 5.1 array_replace_recursive function when used with an array inside the $gf_pdf_config array
 * Bug - Fixed fatal error when logged in user attempts to view PDF they don't have access to
 * Bug - Fixed issue in $form_data array where single-column list items where being returned as an array and not a HTML list.
+* Bug - Prevent unauthorised users auto-initialising the software or migrating the templates folder
 
 
 = 3.5.10 =

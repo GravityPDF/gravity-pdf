@@ -34,8 +34,8 @@ GNU General Public License for more details.
  * Define our constants 
  */
 define('PDF_EXTENDED_VERSION', '3.6.0'); 
-define('GF_PDF_EXTENDED_SUPPORTED_VERSION', '1.7'); 
-define('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION', '3.8'); 
+define('GF_PDF_EXTENDED_SUPPORTED_VERSION', '1.8'); 
+define('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION', '3.9'); 
 define('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION', '5'); 
   
 define('PDF_PLUGIN_DIR', plugin_dir_path( __FILE__ ));  
@@ -109,25 +109,23 @@ class GFPDF_Core extends PDFGenerator
 		 * Needs to be run before major compatibility checks so it can prompt user 
 		 * about issues with WP version or PHP 
 		 */
+
 		if($gfpdfe_data->gf_is_compatible === true && is_admin())
-		{
-			if(is_admin())
+		{			
+			/*
+			 * Run our settings page
+			 */
+			GFPDF_Settings::settings_page();				
+
+			/*
+			 * Only load our scripts if on a Gravity Forms admin page
+			 */
+			if( isset($_GET['page']) && (substr($_GET['page'], 0, 3) === 'gf_') )
 			{
 				/*
-				 * Run our settings page
-				 */
-				GFPDF_Settings::settings_page();				
-
-				/*
-				 * Only load our scripts if on a Gravity Forms admin page
-				 */
-				if( isset($_GET['page']) && (substr($_GET['page'], 0, 3) === 'gf_') )
-				{
-					/*
-					* Run our scripts and add the settings page to the admin area 
-					*/				
-					add_action('admin_init',  array('GFPDF_Core', 'gfe_admin_init'), 9);
-				}
+				* Run our scripts and add the settings page to the admin area 
+				*/				
+				add_action('admin_init',  array('GFPDF_Core', 'gfe_admin_init'), 9);
 			}
 		}
 		 
@@ -244,6 +242,14 @@ class GFPDF_Core extends PDFGenerator
 	 */
 	 public static function fully_loaded_admin()
 	 {
+
+	 	/*
+	 	 * Check user has the correct permissions to deploy the software 
+	 	 */
+	 	if(!current_user_can( 'manage_options' ))
+	 	{
+	 		return;
+	 	}
 
 	 	global $gfpdfe_data;
 	
