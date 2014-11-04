@@ -770,17 +770,13 @@ if(!class_exists('GFPDFEntryDetail'))
 
 	        $form_array['survey']['global'] = self::get_addon_global_data($form, array());
 
-
-
-			$results = self::get_addon_global_data($form, array());
-
 			$form_fields = self::$fields;
 
 			/*
 			 * Convert the array keys into their text counterparts
 			 * Loop through the global survey data
 			 */
-			foreach($results['field_data'] as $id => &$choices)
+			foreach($form_array['survey']['global'] as $id => &$choices)
 			{
 				/* get the $field */
 				$field = $form_fields[$id];
@@ -809,11 +805,7 @@ if(!class_exists('GFPDFEntryDetail'))
 				{
 					$choices = self::replace_key($choices, $choice['value'], $choice['text']);
 				}
-			}
-			
-			$form_array['survey']['global'] = $results;
-
-
+			}			
 
 	        return $form_array;
 
