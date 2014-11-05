@@ -270,11 +270,10 @@ $this->fontdata = array(
  * Blue Liquid Designs Edit
  * Include the font configuration file defined by the plugin 
  */
- if(file_exists($gfpdfe_data->template_save_location . 'fonts/config.php'))
+ if(file_exists($gfpdfe_data->template_font_location . 'config.php'))
  {
-	 include $gfpdfe_data->template_save_location . 'fonts/config.php';
+	 include $gfpdfe_data->template_font_location . 'config.php';
  }
-
 
 // Add fonts to this array if they contain characters in the SIP or SMP Unicode planes
 // but you do not require them. This allows a more efficient form of subsetting to be used.
