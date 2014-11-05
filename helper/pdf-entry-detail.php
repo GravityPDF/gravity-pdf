@@ -569,7 +569,7 @@ if(!class_exists('GFPDFEntryDetail'))
 				$likert['col'][$col['value']] = $col['text'];
 			}
 			
-			if(sizeof($field['inputs']) > 0)
+			if(is_array($field['inputs']) && sizeof($field['inputs']) > 0)
 			{
 				/* do our multi-row likert */
 				foreach($field['inputs'] as $row)
@@ -769,14 +769,13 @@ if(!class_exists('GFPDFEntryDetail'))
 	        }
 
 	        $form_array['survey']['global'] = self::get_addon_global_data($form, array());
-
 			$form_fields = self::$fields;
 
 			/*
 			 * Convert the array keys into their text counterparts
 			 * Loop through the global survey data
 			 */
-			foreach($form_array['survey']['global'] as $id => &$choices)
+			foreach($form_array['survey']['global']['field_data'] as $id => &$choices) 
 			{
 				/* get the $field */
 				$field = $form_fields[$id];
@@ -813,7 +812,7 @@ if(!class_exists('GFPDFEntryDetail'))
 
 		private static function replace_key($array, $key, $text)
 		{
-			if(isset($array[$key]))
+			if($key != $text && isset($array[$key]))
 			{
 				/* replace the array key with the actual field name */
 				$array[$text] = $array[$key];
@@ -839,9 +838,9 @@ if(!class_exists('GFPDFEntryDetail'))
 
 	        if ($count_quiz_fields > 0)
 	        {
-				$form_array['quiz']['config']['grading']     = $form['gravityformsquiz']['grading'];
-				$form_array['quiz']['config']['passPercent'] = $form['gravityformsquiz']['passPercent'];
-				$form_array['quiz']['config']['grades']      = $form['gravityformsquiz']['grades'];
+				$form_array['quiz']['config']['grading']     = (isset($form['gravityformsquiz']['grading'])) ? $form['gravityformsquiz']['grading'] : '';
+				$form_array['quiz']['config']['passPercent'] = (isset($form['gravityformsquiz']['passPercent'])) ? $form['gravityformsquiz']['passPercent'] : '';
+				$form_array['quiz']['config']['grades']      = (isset($form['gravityformsquiz']['grades'])) ? $form['gravityformsquiz']['grades'] : '';
 				
 				$form_array['quiz']['results']['score']      = rgar($lead, 'gquiz_score');
 				$form_array['quiz']['results']['percent']    = rgar($lead, 'gquiz_percent');
