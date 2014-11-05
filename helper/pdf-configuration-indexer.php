@@ -176,7 +176,7 @@
 
 		foreach($indexes as $index)	
 		{
-			$config_nodes[] = $this->configuration[$index];
+			$config_nodes[$index] = $this->configuration[$index];
 		}
 
 		return $config_nodes;
@@ -243,12 +243,89 @@
 		  */
 		 return $this->configuration[$index[0]];		
 	}
+
+	/**
+	 * Gets the aid (a temporary ID assigned to config node clusters on a single form ) from the $config ID
+	 * @param  Integer $config_id The $this->configuration ID of the node
+	 * @param  Integer $form_id The Gravity Form ID
+	 * @return Integer            The configuration nodes aid (a temporary ID assigned to config node clusters on a single form )
+	 */
+	public function get_aid($config_id, $form_id)
+	{
+		$index = self::index_lookup($config_id, $form_id);
+
+		if($index !== false)
+		{
+			return $index + 1;
+		}
+	}
+
+	/**
+	 * Does a reverse look up on the $this->index using the $this->configuration ID
+	 * @param  Integer $config_id The $this->configuration ID of the node
+	 * @return Integer            The index ID
+	 * @return Array            If $form_id isn't passed an array of index IDs will always be returns
+	 */
+	public function index_lookup($config_id, $form_id = false)
+	{
+		$config = $this->configuration[$config_id];
+
+		/*
+		 * Check the configuration node actually exists
+		 */
+		if(!is_array($config))
+		{
+			return false;
+		}
+
+		/* get the form ID */
+		$config_form_id = (!is_array($config['form_id'])) ? array($config['form_id']) : $config['form_id'];
+
+
+		/*
+		 * If $form_id is set and inside the config node array we will do a search on it
+		 */
+		if($form_id && in_array($form_id, $config_form_id) && isset($this->index[$form_id]))
+		{
+			/* return the array key, or false */
+			return array_search($config_id, $this->index[$form_id]);			
+		}
+
+		/*
+		 * Loop through the form IDs and return all indexes associated with it
+		 */
+		$index_keys = array();
+		foreach($config_form_id as $f_id)
+		{
+			if(isset($this->index[$f_id]))
+			{
+				/*
+				 * Search for the config ID in each form's index
+				 */
+				$index_search = array_search($config_id, $this->index[$f_id]);
+				if($index_search !== false)
+				{
+					$index_keys[] = $index_search;
+				}
+			}
+		}
+
+		/*
+		 * We have results so return them 
+		 */
+		if(sizeof($index_keys) > 0)
+		{
+			return $index_keys;
+		}
+
+		return false;
+	}
 	
 	/*
 	 * Search for the template from a given form id
 	 * Return: the first template found for the form
 	 */ 
-	public function get_template($form_id, $return_all = false)
+	public function get_template($form_id)
 	{
 		global $gf_pdf_default_configuration;
 
@@ -264,23 +341,6 @@
 		
 		if(isset($this->index[$form_id]))
 		{
-			/* 
-			 * Show all PDF nodes
-			 */	
-			 if($return_all === true && sizeof($this->index[$form_id]) > 1)
-			 {
-
-				$templates = array();
-				foreach($this->index[$form_id] as $key => $id)
-				{					
-					$templates[$key] =	array(
-											'template' => (isset($this->configuration[$id]['template'])) ? $this->configuration[$id]['template'] : $default_template,
-											'filename' => (isset($this->configuration[$id]['filename'])) ? $this->configuration[$id]['filename'] : PDF_Common::get_pdf_filename($form_id, '{entry_id}')
-										);
-				}
-				return $templates;
-			 }			
-			
 			/*
 			 * Check if PDF template is avaliable
 			 */ 
@@ -308,8 +368,7 @@
 		}
 		
 		if( (strlen($template) == 0) && (GFPDF_SET_DEFAULT_TEMPLATE === true))
-		{			
-			 
+		{						 
 			/*
 			 * Check if a default configuration is defined
 			 */			
@@ -324,11 +383,9 @@
 	
 	public function get_pdf_name($id, $form_id = false, $lead_id = false)
 	{			
-		$index = $this->index[$form_id][$id];
-
-		if(isset($this->configuration[$index]['filename']))
+		if(isset($this->configuration[$id]['filename']))
 		{
-			return PDF_Common::validate_pdf_name($this->configuration[$index]['filename'], $form_id, $lead_id);		
+			return PDF_Common::validate_pdf_name($this->configuration[$id]['filename'], $form_id, $lead_id);		
 		}
 		else
 		{
