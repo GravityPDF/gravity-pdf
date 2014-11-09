@@ -1145,7 +1145,7 @@ if(!class_exists('GFPDFEntryDetail'))
 						/*
 						 * Check if we should include options
 						 */
-						$options = isset($product['options']) ? $product['options'] : '';
+						$options = isset($product['options']) ? $product['options'] : array();
 
 						/*
 						 * Add formated price for each product option 
