@@ -3022,19 +3022,24 @@ function AddFont($family,$style='') {
 		$ttffile = _MPDF_SYSTEM_TTFONTS.$this->fontdata[$family][$stylekey];
 		if (!file_exists($ttffile)) { $ttffile = ''; }
 	}
+
 	if (!$ttffile) {
 		$ttffile = _MPDF_TTFONTPATH.$this->fontdata[$family][$stylekey];
+
 		if (!file_exists($ttffile)) { 
 			/*
 			 * Try load in the font file from the PDF_TEMPLATE
 			 */
+			global $gfpdfe_data;
 			$ttffile = $gfpdfe_data->template_site_location . 'fonts/' . $this->fontdata[$family][$stylekey];			
+
 			if(!file_exists($ttffile))
 			{
 				die("mPDF Error - cannot find TTF TrueType font file - ".$ttffile); 
 			}
 		}
 	}
+
 	$ttfstat = stat($ttffile);
 
 	if (isset($this->fontdata[$family]['TTCfontID'][$stylekey])) { $TTCfontID = $this->fontdata[$family]['TTCfontID'][$stylekey]; }
@@ -7336,6 +7341,8 @@ function SetXY($x,$y)
 
 function Output($name='',$dest='')
 {
+	global $gfpdfe_data;
+	
 	//Output PDF to some destination
 	if ($this->showStats) {
 		file_put_contents($gfpdfe_data->template_save_location . 'mPDF_performance_log.txt', date('Y-m-d h:i:s') . ' Generated in '.sprintf('%.2F',(microtime(true) - $this->time0))." seconds\r\n", FILE_APPEND);

@@ -241,7 +241,7 @@ class GFPDF_Notices
 		global $gfpdfe_data;
 		$prefix = ($gfpdfe_data->automated === true && !rgpost('upgrade')) ? sprintf(__('%sGravity Forms PDF Extended Automated Template Migration:%s', 'pdfextended'), '<strong>', '</strong><br>') : '';		
 		
-		$msg = $prefix . sprintf( __('Your template folder structure was successfully migrated to %s. %sUnsure what this means?%s', 'pdfextended'), str_replace(ABSPATH, '', $gfpdfe_data->upload_dir), '<br><a href="http://gravityformspdfextended.com/migrating-template-directory-means/">', '</a>');
+		$msg = $prefix . sprintf( __('Your PDF template folder structure was successfully migrated to %s. %sUnsure what this means?%s', 'pdfextended'), str_replace(ABSPATH, '', $gfpdfe_data->upload_dir), '<br><a href="http://gravityformspdfextended.com/migrating-template-directory-means/">', '</a>');
 
 		self::notice($msg);
 						
