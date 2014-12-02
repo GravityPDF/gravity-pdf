@@ -1,25 +1,26 @@
 (function($) {	
 
-	jQuery(document).ready(function($) {
-		jQuery('#tab_PDF .nav-tab-contents:not(:first)').hide();
+	$(document).ready(function($) {
+		var tab = $('#tab_PDF');
 
-		jQuery('#tab_PDF .nav-tab').click(function() {
+		tab.find('.nav-tab-contents:not(:first)').hide();
+
+		tab.find('.nav-tab').click(function() {
 			switch_tabs($(this));
 			return false;
 		});
-
 
 		/*
 		 * Check if a #hash exists and pass it to switch_tabs
 		 */
 		if (window.location.hash) {
-			switch_tabs($('#tab_PDF .nav-tab[href="' + window.location.hash + '"]'));
+			switch_tabs(tab.find('.nav-tab[href="' + window.location.hash + '"]'));
 		}
 
 		/*
 		 * Validate Support Form
 		 */
-		jQuery('#support-request-button').click(function() {
+		$('#support-request-button').click(function() {
 			if (validate_form() === true) {
 				return false;
 			} else {
@@ -75,15 +76,17 @@
 					$('#support-request-button').after('<span class="msg">' + results.msg + '</span>');
 				}
 			});
-	};
+	}
 
 	function switch_tabs(obj) {
 		//  Test to see if the menu tab is already active
 		//  Only process the click if the tab is inactive
 		if (!obj.hasClass('nav-tab-active')) {
+			var tab = $('#tab_PDF');
+
 			//  Hide the active menu tab and all the contents panels
-			jQuery('.nav-tab-active').removeClass('nav-tab-active');
-			jQuery('.nav-tab-contents').hide();
+			tab.find('.nav-tab-active').removeClass('nav-tab-active');
+			tab.find('.nav-tab-contents').hide();
 
 			//  Get the value of the ‘rel’ attribute of the selected element object
 			//  Translate the value into the id reference of the target panel
@@ -93,9 +96,9 @@
 			//  Show the associated contents panel with the ID
 			//  that matches the object ‘rel’ identifier
 			obj.addClass('nav-tab-active');
-			jQuery(id).show();
+			$(id).show();
 		}
-	};
+	}
 
 	function validate_form() {
 		var error = false;
@@ -122,5 +125,5 @@
 			error = true;
 		}
 		return error;
-	};
+	}
 })(jQuery);
