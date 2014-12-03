@@ -43,19 +43,19 @@ by including the font-family in $this->sans_fonts below
 To aid backwards compatability some are included:
 */
 $this->fonttrans = array(
-	'helvetica' => 'chelvetica',
-	'arial' => 'chelvetica',
-	'times' => 'ctimesnewroman',
-	'timesnewroman' => 'ctimesnewroman',
-	'courier' => 'ccourier',
-	'trebuchet' => 'trebuchetms',
-	'comic' => 'comicsansms',
-	'franklin' => 'franklingothicbook',
-	'albertus' => 'albertusmedium',
-	'arialuni' => 'arialunicodems',
-	'zn_hannom_a' => 'hannoma',
-	'ocr-b' => 'ocrb',
-	'ocr-b10bt' => 'ocrb',
+	'helvetica'     => 'chelvetica',
+	'arial'         => 'chelvetica',
+	'timesnewroman' => 'ctimes',
+	'times'         => 'ctimes',
+	'courier'       => 'ccourier',
+	'trebuchet'     => 'trebuchetms',
+	'comic'         => 'comicsansms',
+	'franklin'      => 'franklingothicbook',
+	'albertus'      => 'albertusmedium',
+	'arialuni'      => 'arialunicodems',
+	'zn_hannom_a'   => 'hannoma',
+	'ocr-b'         => 'ocrb',
+	'ocr-b10bt'     => 'ocrb',
 );
 
 /*
@@ -270,10 +270,11 @@ $this->fontdata = array(
  * Blue Liquid Designs Edit
  * Include the font configuration file defined by the plugin 
  */
- if(file_exists($gfpdfe_data->template_font_location . 'config.php'))
+ if(file_exists($gfpdfe_data->template_save_location . 'fonts/config.php'))
  {
-	 include $gfpdfe_data->template_font_location . 'config.php';
+	 include $gfpdfe_data->template_save_location . 'fonts/config.php';
  }
+
 
 // Add fonts to this array if they contain characters in the SIP or SMP Unicode planes
 // but you do not require them. This allows a more efficient form of subsetting to be used.
