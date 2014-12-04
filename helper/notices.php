@@ -71,7 +71,7 @@ class GFPDF_Notices
 		$prefix = self::autoprefix();
 		$suffix = self::autosuffix();
 		
-		$msg = $prefix . __('The font files have been successfully installed. A font can be used by adding its file name (without .ttf and in lower case) in a CSS font-family declaration.', 'pdfextended') . $suffix;
+		$msg = $prefix . __('The font files have been successfully installed. A font can be used by adding its file name (without .ttf) in a CSS font-family declaration.', 'pdfextended') . $suffix;
 
 		self::notice($msg);
 		
