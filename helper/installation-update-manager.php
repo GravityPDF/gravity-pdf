@@ -466,7 +466,7 @@ class GFPDF_InstallUpdater
 				 * Generate configuration information in preparation to write to file
 				 */ 							
 				$write_to_file .= '
-					$this->fontdata[\''.strtolower($path_parts['filename']).'\'] = array(
+					$this->fontdata[\''.mb_strtolower(str_replace(' ', '', $path_parts['filename']), 'UTF-8').'\'] = array(
 								\'R\' => \''.$path_parts['basename'].'\'
 					);';
 					
