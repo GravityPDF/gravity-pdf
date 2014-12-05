@@ -222,7 +222,7 @@ class GFPDF_Core_Model
 	 * where action is 'html', 'data', or 'print'
 	 */ 
 	public static function process_exterior_pages() {	 	 
-	  global $wpdb, $gfpdf;
+	  global $wpdb, $gfpdf, $form_id, $lead_ids;
 	  	
 	  /*
 	   * If $_GET variable isn't set then stop function
@@ -232,8 +232,9 @@ class GFPDF_Core_Model
 		return;
 	  }
 		
-		$form_id = (int) $_GET['fid'];
-		$lead_id = (int) $_GET['lid'];		
+
+		PDF_Common::get_ids();
+
 		$ip = GFFormsModel::get_ip(); 
 		
 		/*
@@ -247,31 +248,97 @@ class GFPDF_Core_Model
 		 * Before setting up PDF options we will check if a configuration is found
 		 * If not, we will set up defaults defined in configuration.php
 		 */		
-		$index = self::check_configuration($form_id, $template);			
+		$index = self::check_configuration($form_id, $template);	
+
+		/* 
+		 * Authenticate all lead Ids
+		 */ 
+		if(empty($gfpdf->configuration[$index]['access']) || $gfpdf->configuration[$index]['access'] !== 'all') /* unpublicised feature to give FULL access to ALL PDFs in this configuration - RECOMMENDATION: DO NOT USE */
+		{
+			foreach($lead_ids as $key => $lead_id)
+			{
+				if(self::authenticate_user($form_id, $lead_id, $ip) === false)
+				{
+					unset($lead_ids[$key]);
+				}
+				/* resequence so there are no loop issues later */
+			}	$lead_ids = array_values($lead_ids);	
+		}	
+
+		if(sizeof($lead_ids) == 0)	
+		{
+			if(!is_user_logged_in())
+			{
+				/* give the user a chance to authenticate */
+				auth_redirect();
+			}
+			else
+			{
+				die(__('Access Denied', 'pdfextended'));
+			}
+		}
+
+		/*
+		 * Give user with correct privilages the option to change the PDF template via the URL
+		 */
+		if(is_user_logged_in() && GFCommon::current_user_can_any('gravityforms_view_entries'))
+		{
+		  /*
+		   * Because this user is logged in with the correct access 
+		   * we will allow a template to be shown by setting the template variable
+		   */	 
+		   if( ($template != $_GET['template']) && (substr($_GET['template'], -4) == '.php') )
+		   {			
+				$template = $_GET['template'];
+		   }		
+		}	
+		 
+
+		$pdf_arguments = self::generate_pdf_parameters($index, $form_id, $lead_ids[0], $template);		
 		
+		/*
+		 * Add output to arguments 
+		 */
+		$output = 'view';
+		if(isset($_GET['download']))
+		{
+			$output = 'download';	
+		}	
+		
+		$pdf_arguments['output'] = $output;					
+
+		/*
+		 * While the security above will prevent the PDF being read by non-authorised users, 
+		 * a user can disable that security with the 'access' => 'all' method (THIS IS NOT RECOMMENDED)
+		 * To prevent those PDFs showing up in search engines we will tell them not to index the documents 
+		 */
+		if (!headers_sent()) 
+		{
+			header("X-Robots-Tag: noindex, nofollow", true);
+		}
+
+		$gfpdf->render->PDF_Generator($form_id, $lead_ids[0], $pdf_arguments);
+		
+	  exit();
+	}
+
+	private static function authenticate_user($form_id, $lead_id, $ip)
+	{
+		global $wpdb;
+
 		/*
 		 * Run if user is not logged in
 		 */ 
 		 if(!is_user_logged_in())
 		 {
-			/* 
-			 * Check the lead is in the database and the IP address matches (little security booster) 
-			 */
-			$form_entries = $wpdb->get_var( $wpdb->prepare("SELECT count(*) FROM `".$wpdb->prefix."rg_lead` WHERE form_id = %d AND status = 'active' AND id = %d AND ip = %s", array($form_id, $lead_id, $ip) ) );	
-			
-			if($form_entries == 0 && $gfpdf->configuration[$index]['access'] !== 'all')
-			{
-				auth_redirect();		
-			}
-			
+			return self::check_logged_out_user($form_id, $lead_id, $ip);
 		 }
 		 else
 		 {
 			  /*
 			   * Ensure logged in users have the correct privilages 
 			   */
-			   
-			   
+			   		   
 			  if(!GFCommon::current_user_can_any("gravityforms_view_entries"))
 			  {
 				  /*
@@ -287,50 +354,26 @@ class GFPDF_Core_Model
 					 */
 					if($user_logged_entries == 0)
 					{				   
-						$form_entries = $wpdb->get_var( $wpdb->prepare("SELECT count(*) FROM `".$wpdb->prefix."rg_lead` WHERE form_id = %d AND status = 'active' AND id = %d AND ip = %s", array($form_id, $lead_id, $ip) ) );	
-						
-						if($form_entries == 0)
-						{
-							/*
-							 * Don't show the PDF
-							 */
-							 break;
-						}
-						
+						return self::check_logged_out_user($form_id, $lead_id, $ip);
 					}				   
-			  }	
-			  else
-			  {				  
-				  /*
-				   * Because this user is logged in with the correct access 
-				   * we will allow a template to be shown by setting the template variable
-				   */	 
-				   
-				   if( ($template != $_GET['template']) && (substr($_GET['template'], -4) == '.php') )
-				   {			
-						$template = $_GET['template'];
-				   }
-			  }
-			   
-		 }		
-		 
+			  }		   
+		 }			
+	}
 
-		$pdf_arguments = self::generate_pdf_parameters($index, $form_id, $lead_id, $template);		
+	private static function check_logged_out_user($form_id, $lead_id, $ip)
+	{
+		global $wpdb;
 		
-		/*
-		 * Add output to arguments 
+		/* 
+		 * Check the lead is in the database and the IP address matches (little security booster) 
 		 */
-		$output = 'view';
-		if(isset($_GET['download']))
+		$form_entries = $wpdb->get_var( $wpdb->prepare("SELECT count(*) FROM `".$wpdb->prefix."rg_lead` WHERE form_id = %d AND status = 'active' AND id = %d AND ip = %s", array($form_id, $lead_id, $ip) ) );	
+		
+		if($form_entries == 0)
 		{
-			$output = 'download';	
-		}	
-		
-		$pdf_arguments['output'] = $output;					
-
-		$gfpdf->render->PDF_Generator($form_id, $lead_id, $pdf_arguments);
-		
-	  exit();
+			return false;		
+		}		
+		return true;
 	}
 
 	/**
@@ -427,7 +470,8 @@ class GFPDF_Core_Model
 		 if(!$config = $gfpdf->get_config($form_id))
 		 {
 			 return $notification;
-		 }						  		
+		 }		
+
 		/* 
 		 * To have our configuration indexes so loop through the PDF template configuration
 		 * and generate and attach PDF files.
