@@ -10,8 +10,16 @@
 class PDF_Common
 {
 
+	/**
+	 * Depreciated function 
+	 */
+	public static function setup_ids() { }	
 
-	public static function setup_ids()
+	/**
+	 * Takes over for setup_ids() but is now called much earlier in the process 
+	 * @return Boolean whether settings the ids was successful or not
+	 */
+	public static function get_ids()
 	{
 		global $form_id, $lead_id, $lead_ids;
 		
@@ -23,9 +31,10 @@ class PDF_Common
 		 */
 		if(empty($form_id) || empty($lead_ids))
 		{
-			return;
+			return false;
 		}				
-	}		
+		return true;
+	}			
 	
 	/*
 	 * We will use the output buffer to get the HTML template
