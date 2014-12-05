@@ -7,12 +7,6 @@ if(!class_exists("RGForms")){
 	return;
 }
 
-/** 
- * Set up the form ID and lead ID
- * Form ID and Lead ID can be set by passing it to the URL - ?fid=1&lid=10
- */
- PDF_Common::setup_ids();
-
 /**
  * Load the form data to pass to our PDF generating function 
  */

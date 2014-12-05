@@ -7,12 +7,6 @@ if(!class_exists("RGForms")){
    return;
 }
 
-/** 
- * Set up the form ID and lead ID
- * Form ID and Lead ID can be set by passing it to the URL - ?fid=1&lid=10
- */
- PDF_Common::setup_ids();
- 
  global $gfpdf;
 
  $config_data = $gfpdf->get_default_config_data($form_id);
