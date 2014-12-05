@@ -21,6 +21,11 @@
     <p><strong>Current Version: <?php echo PDF_EXTENDED_VERSION; ?></strong></p>
 
   <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
+
+  <ul>
+    <li>Bug - Fix issue saving and sending blank PDFs due to security fix</li>
+  </ul>
+  <h3>3.5.11</h3>
   <ul>
     <li>Bug - Fix security issue which gave unauthorised users access to Gravity Form entires</li>
   </ul>
