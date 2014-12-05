@@ -68,7 +68,7 @@ class PDFRender
 			 * Get the template HTML file
 			 * v3.4.0 allows mergetags to be used in PDF templates
 			 */
-			$raw_entry = $this->load_entry_data($form_id, $lead_id, $template);
+			$raw_entry = $this->load_entry_data($template);
 			$entry = apply_filters("gfpdfe_pdf_template_{$form_id}", apply_filters('gfpdfe_pdf_template', $raw_entry, $form_id, $lead_id, $arguments), $lead_id, $arguments);					
 
 			/*
@@ -99,7 +99,7 @@ class PDFRender
 	/**
 	 * Loads the Gravity Form output script (actually the print preview)
 	 */
-	private function load_entry_data($form_id, $lead_id, $template)
+	private function load_entry_data($template)
 	{
 		/* set up contstants for gravity forms to use so we can override the security on the printed version */		
 		if(file_exists(PDF_TEMPLATE_LOCATION.$template))
