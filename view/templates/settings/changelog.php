@@ -21,11 +21,17 @@
     <p><strong>Current Version: <?php echo PDF_EXTENDED_VERSION; ?></strong></p>
 
   <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
+  <ul>
+    <li>Bug - Fix security issue which gave unauthorised users access to Gravity Form entires</li>
+  </ul>
 
+  <h3>3.5.10</h3>
   <ul>
     <li>Housekeeping - Include individual scoring for Gravity Form Survey Likert field in the $form_data['survey'] array</li>
     <li>Bug - Fix fatal error when Gravity Forms isn't activated, but PDF Extended is.</li>
   </ul>
+
+  <h3>3.5.9</h3>
   <ul>
     <li>Bug - Rollback recent changes that introduced the GFAPI as introduces errors for older versions of Gravity Forms. Will reintroduce in next major release and increase the minimum Gravity Forms version.</li>
   </ul>
