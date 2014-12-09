@@ -81,6 +81,9 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 
 == Changelog ==
 
+= 3.5.11.1 =
+* Bug - Fix issue saving and sending blank PDFs due to security fix
+
 = 3.6.0 =
 * Feature - Added support for Gravity Form's sub-field 'middle' name  (1.9Beta)
 * Feature - Patch mPDF with full :nth-child support on TD and TR table cells
@@ -101,6 +104,8 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 * Bug - Fixed issue in $form_data array where single-column list items where being returned as an array and not a HTML list.
 * Bug - Prevent unauthorised users auto-initialising the software or migrating the templates folder
 
+= 3.5.11 =
+* Bug - Fix security issue which gave unauthorised users access to Gravity Form entires
 
 = 3.5.10 =
 * Housekeeping - Include individual scoring for Gravity Form Survey Likert field in the $form_data['survey'] array

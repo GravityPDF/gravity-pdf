@@ -258,7 +258,6 @@ class GFPDF_Core_Model
 		
 
 		PDF_Common::get_ids();
-
 		$ip = GFFormsModel::get_ip(); 
 		
 		/*
@@ -408,7 +407,7 @@ class GFPDF_Core_Model
 	 */
 	public static function gfpdfe_save_pdf($entry, $form)
 	{
-		global $gfpdf;
+		global $gfpdf, $form_id, $lead_id;
 
 		$form_id = $entry['form_id'];
 		$lead_id = $entry['id'];
@@ -427,6 +426,9 @@ class GFPDF_Core_Model
 		 {
 			 return false;
 		 }	
+
+		 /* set up the correct lead IDs */
+		 PDF_Common::get_ids();
 
 		/* 
 		 * To have our configuration indexes so loop through the PDF template configuration
@@ -481,6 +483,7 @@ class GFPDF_Core_Model
 		$form_id           = $entry['form_id']; 
 		$lead_id           = apply_filters('gfpdfe_lead_id', $entry['id'], $form, $entry, $gfpdf); /* allow premium plugins to override the lead ID */
 
+
 		/*
 		 * Before setting up PDF options we will check if a configuration is found
 		 * If not, we will set up defaults defined in configuration.php
@@ -494,7 +497,10 @@ class GFPDF_Core_Model
 		 if(!$config = $gfpdf->get_config($form_id))
 		 {
 			 return $notification;
-		 }		
+		 }	
+
+		 /* set up the correct lead IDs */
+		 PDF_Common::get_ids();			 
 
 		/* 
 		 * To have our configuration indexes so loop through the PDF template configuration
