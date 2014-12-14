@@ -81,9 +81,6 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 
 == Changelog ==
 
-= 3.5.11.1 =
-* Bug - Fix issue saving and sending blank PDFs due to security fix
-
 = 3.6.0 =
 * Feature - Added support for Gravity Form's sub-field 'middle' name  (1.9Beta)
 * Feature - Patch mPDF with full :nth-child support on TD and TR table cells
@@ -95,6 +92,7 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 * Housekeeping - Fixed typo during initial initialisation
 * Housekeeping - Switched icons back to FontAwesome which is shipped by default with Gravity Forms
 * Housekeeping - Display full path to mPDF tmp directory when there are issues writing to it
+* Housekeeping - Modified font installation message.
 * Bug - Fixed issue pulling the correct configuration when multiple nodes were assigned to multiple forms
 * Bug - Fixed number field formatting issue which always rounded to two decimal places
 * Bug - Fixed JS namespace issue with WordPress Leads plugin
@@ -103,6 +101,11 @@ All FAQs can be [viewed on the Gravity Forms PDF Extended website](http://gravit
 * Bug - Fixed fatal error when logged in user attempts to view PDF they don't have access to
 * Bug - Fixed issue in $form_data array where single-column list items where being returned as an array and not a HTML list.
 * Bug - Prevent unauthorised users auto-initialising the software or migrating the templates folder
+* Bug - Fixed up incorrect formatting issue when using custom font name
+* Bug - Fixed issue displaying Times New Roman in PDF templates
+
+= 3.5.11.1 =
+* Bug - Fix issue saving and sending blank PDFs due to security fix
 
 = 3.5.11 =
 * Bug - Fix security issue which gave unauthorised users access to Gravity Form entires
