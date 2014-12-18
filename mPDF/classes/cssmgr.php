@@ -198,7 +198,7 @@ function ReadCSS($html) {
 		   for ($i=0;$i<count($cxtem[0]);$i++) {
 			$embedded = $cxtem[2][$i];
 			if (!preg_match('/^data:image/i', $embedded)) {	// mPDF 5.5.13
-				$this->mpdf->GetFullPath($embedded);
+				//$this->mpdf->GetFullPath($embedded); /* Blue Liquid Designs Removed to allow both URL and PATHs to images */
 				$tmpCSSstr = preg_replace('/'.preg_quote($cxtem[0][$i],'/').'/', ($cxtem[1][$i].$embedded.$cxtem[3][$i]), $tmpCSSstr );
 			}
 		   }
