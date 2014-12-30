@@ -26480,9 +26480,6 @@ function purify_utf8_text($txt) {
 
 	$txt = preg_replace("/\r/", "", $txt );
 
-	/* decode html entities */	
-	$txt = html_entity_decode($txt, ENT_NOQUOTES, 'UTF-8');		
-
 	return ($txt);
 }
 function all_entities_to_utf8($txt) {
