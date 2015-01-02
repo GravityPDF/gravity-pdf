@@ -47,7 +47,6 @@ define('GF_PDF_EXTENDED_PLUGIN_BASENAME', plugin_basename(__FILE__));
 /* 
  * Include the core files
  */ 
- include PDF_PLUGIN_DIR . 'helper/api.php';
  include PDF_PLUGIN_DIR . 'helper/data.php'; 
  include PDF_PLUGIN_DIR . 'helper/notices.php'; 
  include PDF_PLUGIN_DIR . 'helper/pdf-configuration-indexer.php'; 	

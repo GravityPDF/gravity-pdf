@@ -360,20 +360,23 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 			 }		
 	}
 	
-	private static function get_system_status_html()
+	private static function get_system_status_html($strip_html = false)
 	{
 		global $gfpdfe_data;
-		
-		if(isset($gfpdfe_data->system_status))
-		{
-			return $gfpdfe_data->system_status;	
-		}
 		
 		 ob_start();
 		 include PDF_PLUGIN_DIR . 'view/templates/settings/system-status.php';                         
 		 $content = ob_get_contents();
 		 ob_end_clean();
-		 return esc_html($content);			
+
+		 if($strip_html)
+		 {
+			return wp_strip_all_tags($content);			
+		 }
+		 else
+		 {
+		 	return esc_html($content);			
+		 }
 	}
 	
 	private static function get_active_plugins()
@@ -463,43 +466,23 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 	public static function send_support_request($email, $countType, $comments)
 	{
 		global $gfpdfe_data;
-		/*
-		 * Include our API class
-		 */			 
-		 $api = new gfpdfe_API();
-		 
+	 
 		 /*
 		  * Build our support request array
 		  */
 		  
 		  $active_plugins   = self::get_active_plugins();
-		  $system_status 	= self::get_system_status_html();
-		  $configuration	= self::get_configuration_file();
+		  $system_status 	= self::get_system_status_html(true);
+		  $configuration	= self::get_configuration_file() ;
 		  $website			= site_url('/');
-		  $comments 		= stripslashes($comments);
-		  
-		  $body = array(
-		  	'support_type' 			=> $countType,
-			'email'					=> $email,
-			'website' 				=> $website,
-			'active_plugins' 		=> $active_plugins,
-			'system_status'			=> $system_status,
-			'configuration' 		=> $configuration,			
-			'comments' 				=> $comments,
-		  );  
+		  $comments 		= stripslashes($comments);		
 		 		 
-		 if($api->support_request($body) === false)
-		 {
-			/*
-			 * API could not send
-			 * Draft a plain text email and send to support
-			 */ 
 			 $configuration = htmlspecialchars_decode($configuration, ENT_QUOTES);
 			 
-			 $subject = 'Gravity PDF Support Request';
-			 $to	  = 'support@gravitypdf.com';
+			 $subject = $countType . ': Automated Ticket for "'. get_bloginfo('name') . '"';
+			 $to	  = 'support-ticket@gravitypdf.com';
 			 $from	  = $email;			 
-			 $message = "Support Type: $countType\r\nWebsite: $website\r\n\r\nComments\r\n\r\n$comments\r\n\r\n\r\nActive Plugins\r\n\r\n$active_plugins\r\n\r\n\r\nConfiguration\r\n\r\n$configuration";
+			 $message = "**Support Type**: $countType\r\n\r\n**Website**: $website\r\n\r\n$comments\r\n\r\n$system_status\r\n\r\n\r\n**Active Plugins**\r\n\r\n$active_plugins\r\n\r\n\r\n**Configuration**\r\n\r\n$configuration";
 			 
 			 $headers[] = 'From: '. $email;
 
@@ -516,7 +499,6 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 				 print json_encode(array('msg' => __('Support request received. We will responed in 24 to 48 hours.', 'pdfextended')));
 				 exit;					 
 			 }
-		 }
 		 
 		 /*
 		  * Create our 

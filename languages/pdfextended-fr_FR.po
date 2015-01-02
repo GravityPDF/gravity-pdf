@@ -176,7 +176,7 @@ msgid ""
 "directory. Please ensure %s is wriable by your web server and try again."
 msgstr ""
 "Nous n'avons pas pu supprimer les modèles par défaut du répertoire Gravity "
-"Forms PDF Extended dans le répertoire de votre thème actif. Merci de "
+"PDF dans le répertoire de votre thème actif. Merci de "
 "vérifier qu'%s est accessible en écriture pour le serveur et de réessayer."
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF

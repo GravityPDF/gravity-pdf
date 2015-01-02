@@ -112,7 +112,7 @@ All FAQs can be [viewed on the Gravity PDF website](https://gravitypdf.com/#faqs
 
 = 3.5.10 =
 * Housekeeping - Include individual scoring for Gravity Form Survey Likert field in the $form_data['survey'] array
-* Bug - Fix fatal error when Gravity Forms isn't activated, but PDF Extended is. 
+* Bug - Fix fatal error when Gravity Forms isn't activated, but Gravity PDF is. 
 
 = 3.5.9 =
 * Bug - Rollback recent changes that introduced the GFAPI as introduces errors for older versions of Gravity Forms. Will reintroduce in next major release and increase the minimum Gravity Forms version.

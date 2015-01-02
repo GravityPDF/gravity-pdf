@@ -27,7 +27,7 @@
 <li>Feature - Added $form_data['products_totals']['subtotal'] key (total price without shipping costs added)</li>
 <li>Feature - Added formated money to all product fields in the $form_data array</li>
 <li>Feature - Default templates: only show fields who's conditional logic is true. Perfect when used with 'default-show-html'</li>
-<li>Housekeeping - Move PDF_EXTENDED_TEMPLATES folder to the /wp-content/upload/ directory. Get more info about the move (see <a href="https://developer.gravitypdf.com/news/migrating-template-directory-means/">http://gravitypdf.com/migrating-template-directory-means/</a>)</li>
+<li>Housekeeping - Move PDF_EXTENDED_TEMPLATES folder to the /wp-content/upload/ directory. Get more info about the move (see <a href="https://developer.gravitypdf.com/news/migrating-template-directory-means/">https://developer.gravitypdf.com/news/migrating-template-directory-means/</a>)</li>
 <li>Housekeeping - Refined when admin resources are loaded</li>
 <li>Housekeeping - Fixed typo during initial initialisation</li>
 <li>Housekeeping - Switched icons back to FontAwesome which is shipped by default with Gravity Forms</li>
@@ -46,7 +46,7 @@
   <h3>3.5.10</h3>
   <ul>
     <li>Housekeeping - Include individual scoring for Gravity Form Survey Likert field in the $form_data['survey'] array</li>
-    <li>Bug - Fix fatal error when Gravity Forms isn't activated, but PDF Extended is.</li>
+    <li>Bug - Fix fatal error when Gravity Forms isn't activated, but Gravity PDF is.</li>
   </ul>
 
   <h3>3.5.9</h3>
@@ -255,7 +255,7 @@
     <ul>
       <li>Feature - Overhauled  the initialisation process so that the software better reviews the host for  potential problems before initialisation. This should help debug issues and  make users aware there could be a problem <strong>before</strong> they begin using the software.</li>
       <li>Feature - Overhauled the settings page to make it easier to access features of the software</li>
-      <li>Feature - Added a Support tab to the settings page which allows users to securely (over HTTPS) submit a support ticket to the Gravity Form PDF Extended support desk</li>
+      <li>Feature - Added a Support tab to the settings page which allows users to securely (over HTTPS) submit a support ticket to the Gravity PDF support desk</li>
       <li>Feature - Changed select, multiselect and radio fields so that the default templates use the name rather than the value. $form_data now also includes the name and values for all these fields.</li>
       <li>Feature - $form_data now includes all miscellaneous lead information in the $form_data['misc'] array.</li>
       <li>Feature - $form_data now contains 24 and 12 hour time of entry submission.</li>      
@@ -323,8 +323,8 @@
     <h3>3.1.0</h3>
     <ul>
       <li>Feature - Added defaults to configuration.php which allows users to define the default PDF settings for all Gravity Forms. See the <a rel="nofollow" href="https://developer.gravitypdf.com/documentation/getting-started-with-gravity-pdf-configuration/">installation and configuration documentation</a> for more details. </li>
-      <li>Feature - Added three new configuration options 'default-show-html', 'default-show-empty' and 'default-show-page-names' which allow different display options to the three default templates. See the <a rel="nofollow" href="http://gravitypdf.com/documentation-v3-x-x/installation-and-configuration/#default-template">installation and configuration documentation</a> for more details.</li>
-      <li>Feature - Added filter hooks 'gfpdfe_pdf_name' and 'gfpdfe_template' which allows developers to further modify a PDF name and template file, respectively, outside of the configuration.php. This is useful if you have a special case naming convention based on user input. See <a rel="nofollow" href="https://developer.gravitypdf.com/documentation/filters-and-hooks/">http://gravitypdf.com/filters-and-hooks/</a> for more details about using these filters.</li>
+      <li>Feature - Added three new configuration options 'default-show-html', 'default-show-empty' and 'default-show-page-names' which allow different display options to the three default templates. See the <a rel="nofollow" href="https://developer.gravitypdf.com/documentation/configuration-options-examples/#default-template">installation and configuration documentation</a> for more details.</li>
+      <li>Feature - Added filter hooks 'gfpdfe_pdf_name' and 'gfpdfe_template' which allows developers to further modify a PDF name and template file, respectively, outside of the configuration.php. This is useful if you have a special case naming convention based on user input. See <a rel="nofollow" href="https://developer.gravitypdf.com/documentation/filters-and-hooks/">https://developer.gravitypdf.com/documentation/filters-and-hooks/</a> for more details about using these filters.</li>
       <li>Feature - Custom font support. Any .ttf font file added to the PDF_EXTENDED_TEMPLATE/fonts/ folder will be automatically installed once the plugin has been initialised. Users also have the option to just initialise the fonts via the settings page. See the <a rel="nofollow" href="https://developer.gravitypdf.com/documentation/language-support/#install-custom-fonts">font/language documentation </a> for details.</li>
       <li>Compatability - Use Gravity Forms get_upload_root() and get_upload_url_root() instead of hard coding the signature upload directory in pdf-entry-detail.php</li>
       <li>Compatability - Changed depreciated functions get_themes() and get_theme() to wp_get_theme() (added in WordPress v3.4). </li>
