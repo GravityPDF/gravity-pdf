@@ -2,7 +2,7 @@
 
 /**
  * Class: PDFGenerator
- * Plugin: Gravity Forms PDF Extended
+ * Plugin: Gravity PDF
  * Usage: assign options from user configuration file, automatically attach PDFs to specified Gravity Forms, and view PDF from admin area.
  */
  

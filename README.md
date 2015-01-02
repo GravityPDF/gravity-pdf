@@ -1,20 +1,20 @@
-Gravity Forms PDF Extended
+Gravity PDF
 ==========================
 
-Gravity Forms PDF Extended is a Wordpress plugin that allows you to save/view/download a PDF from the front- and back-end, and automate PDF creation on form submission. 
+Gravity PDF is a Wordpress plugin that allows you to save/view/download a PDF from the front- and back-end, and automate PDF creation on form submission. 
 
-Find out more at [http://gravityformspdfextended.com](http://gravityformspdfextended.com/).
+Find out more at [https://gravitypdf.com](http://gravitypdf.com/).
 
 
 # Documentation
 
-All documentation can be found at [http://gravityformspdfextended.com](http://gravityformspdfextended.com/documentation/).
+All documentation can be found at [https://gravitypdf.com](http://gravitypdf.com/documentation/).
 
 # Branches
 
 ## master
 
-The master branch contains the latest stable release of the software. It's the same version [avaliable in the Wordpress repository](http://wordpress.org/plugins/gravity-forms-pdf-extended/).
+The master branch contains the latest stable release of the software. It's the same version [avaliable in the Wordpress repository](https://wordpress.org/plugins/gravity-forms-pdf-extended/).
 
 ## beta
 

@@ -16,7 +16,7 @@
   
   ?>
   
- <h2><?php ($gfpdfe_data->is_initialised) ? _e('Welcome to Gravity Forms PDF Extended', 'pdfextended') : _e('Initialise Plugin', 'pdfextended'); ?></h2>
+ <h2><?php ($gfpdfe_data->is_initialised) ? _e('Welcome to Gravity PDF', 'pdfextended') : _e('Initialise Plugin', 'pdfextended'); ?></h2>
           
 			<?php if($gfpdfe_data->is_initialised): ?>
 
@@ -26,23 +26,23 @@
                 <p><?php _e('The next step is to correctly configured the plugin so that you can generate PDF documents.', 'pdfextended'); ?> 
                 <?php _e("To help you get started, we've put together a five-part video series with the most common plugin configurations.", 'pdfextended'); ?></p>
                 <ol>
-                  <li><a href="http://gravityformspdfextended.com/documentation-v3-x-x/standard-configuration/basics/"><?php _e('The Basics: Only Download PDF through the Admin Area', 'pdfextended'); ?></a></li>
-                  <li><a href="http://gravityformspdfextended.com/documentation-v3-x-x/standard-configuration/email/"><?php _e('The Email: Send Completed PDF via Email', 'pdfextended'); ?></a></li>
-                  <li><a href="http://gravityformspdfextended.com/documentation-v3-x-x/standard-configuration/the-download/"><?php _e('The Download: User Downloads PDF after Submitting Form (using a link or auto redirecting)', 'pdfextended'); ?></a></li>
-                  <li><a href="http://gravityformspdfextended.com/documentation-v3-x-x/standard-configuration/the-email-advanced/"><?php _e('The Email Advanced: Manually Review User Submission before Emailing PDF', 'pdfextended'); ?></a></li>
-                  <li><a href="http://gravityformspdfextended.com/documentation-v3-x-x/standard-configuration/the-payment/"><?php _e('The Payment: Send PDF after Capturing Payment using Paypal Standard', 'pdfextended'); ?></a></li>
+                  <li><a href="https://developer.gravitypdf.com/documentation/basic-configuration-video-part-one/"><?php _e('The Basics: Only Download PDF through the Admin Area', 'pdfextended'); ?></a></li>
+                  <li><a href="https://developer.gravitypdf.com/documentation/how-to-automated-pdf-email-part-two/"><?php _e('The Email: Send Completed PDF via Email', 'pdfextended'); ?></a></li>
+                  <li><a href="https://developer.gravitypdf.com/documentation/how-to-allow-user-pdf-downloads-video-part-three/"><?php _e('The Download: User Downloads PDF after Submitting Form (using a link or auto redirecting)', 'pdfextended'); ?></a></li>
+                  <li><a href="https://developer.gravitypdf.com/documentation/how-to-manual-review-before-pdf-email-part-four/"><?php _e('The Email Advanced: Manually Review User Submission before Emailing PDF', 'pdfextended'); ?></a></li>
+                  <li><a href="https://developer.gravitypdf.com/documentation/send-pdf-after-accepting-payment-video-part-five/"><?php _e('The Payment: Send PDF after Capturing Payment using Paypal Standard', 'pdfextended'); ?></a></li>
                 </ol>
 
                 <p><?php echo sprintf(__('If you know little about PHP we recommend starting with %sPart 1:The Basics%s and then watching the tutorial you’re interested in. It will give you the foundational skills you need to configure the software.', 'pdfextended'), '<i>', '</i>'); ?></p>
 
                 <h3><?php _e('Custom Templates', 'pdfextended'); ?></h3>
-                <p><?php echo sprintf(__('Creating a custom template gives you ultimate control of the look and feel of your documents using only HTML and CSS. %sWe recommend you review our online documentation%s to create and customise your template files.', 'pdfextended'), '<a href="http://gravityformspdfextended.com/documentation-v3-x-x/templates/">', '</a>'); ?></p>                    
+                <p><?php echo sprintf(__('Creating a custom template gives you ultimate control of the look and feel of your documents using only HTML and CSS. %sWe recommend you review our online documentation%s to create and customise your template files.', 'pdfextended'), '<a href="http://developer.gravitypdf.com/documentation/custom-templates-introduction/">', '</a>'); ?></p>                    
 
 
 
       <?php else: ?>
 
-                   <p><?php _e('To complete the installation, Gravity Forms PDF Extended needs to be initialised.', 'pdfextended'); ?>
+                   <p><?php _e('To complete the installation, Gravity PDF needs to be initialised.', 'pdfextended'); ?>
 
                    <p><strong><?php _e('What does initialisation do?', 'pdfextended'); ?></strong></p>
                    
@@ -72,7 +72,7 @@
 
                 <?php if($gfpdfe_data->is_initialised): ?>
                    <h3><?php _e('Install a new font?', 'pdfextended'); ?></h3>
-                   <p><?php echo sprintf(__('Do you want to use a custom font in your template? %sSee our documentation on how to correctly install and use a custom font%s before initialising below.', 'pdfextended'), '<a href="http://gravityformspdfextended.com/documentation-v3-x-x/language-support/">', '</a>'); ?></p>
+                   <p><?php echo sprintf(__('Do you want to use a custom font in your template? %sSee our documentation on how to correctly install and use a custom font%s before initialising below.', 'pdfextended'), '<a href="https://developer.gravitypdf.com/documentation/language-support/">', '</a>'); ?></p>
                   <input type="submit" value="<?php _e('Initialise Fonts', 'pdfextended') ; ?>" class="button" id="font-initialise" name="font-initialise">                                           
                 <?php endif; ?>                
 

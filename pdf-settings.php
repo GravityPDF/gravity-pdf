@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Plugin: Gravity Forms PDF Extended
+ * Plugin: Gravity PDF
  * File: pdf-settings.php
  * 
  * The controller that handles the Gravity Forms Settings page in Wordpress

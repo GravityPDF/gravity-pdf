@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Plugin: Gravity Forms PDF Extended
+ * Plugin: Gravity PDF
  * File: pdf-common.php
  * 
  * This file holds a number of common functions used throughout the plugin

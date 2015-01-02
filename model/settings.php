@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Plugin: Gravity Forms PDF Extended
+ * Plugin: Gravity PDF
  * File: mode/settings.php
  * 
  * The model that does all the processing and interacts with our controller and view
@@ -451,7 +451,7 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 		  }
 		  
 		  /*
-		   * Do our POST request to the Gravity Forms PDF Extended API
+		   * Do our POST request to the Gravity PDF API
 		   */
 		   self::send_support_request($email, $countType, $comments);
 		 
@@ -496,8 +496,8 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 			 */ 
 			 $configuration = htmlspecialchars_decode($configuration, ENT_QUOTES);
 			 
-			 $subject = 'Gravity Forms PDF Extended Support Request';
-			 $to	  = 'support@gravityformspdfextended.com';
+			 $subject = 'Gravity PDF Support Request';
+			 $to	  = 'support@gravitypdf.com';
 			 $from	  = $email;			 
 			 $message = "Support Type: $countType\r\nWebsite: $website\r\n\r\nComments\r\n\r\n$comments\r\n\r\n\r\nActive Plugins\r\n\r\n$active_plugins\r\n\r\n\r\nConfiguration\r\n\r\n$configuration";
 			 

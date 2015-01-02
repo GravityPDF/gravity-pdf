@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Gravity Forms PDF Extended\n"
+"Project-Id-Version: Gravity PDF\n"
 "POT-Creation-Date: 2014-12-04 13:00+1000\n"
 "PO-Revision-Date: 2014-12-04 13:00+1000\n"
 "Last-Translator: Blue Liquid Designs <enquire@blueliquiddesigns.com.au>\n"
@@ -14,7 +14,7 @@ msgstr ""
 "X-Poedit-Basepath: /\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-SearchPath-0: G:\\Blue Liquid Designs\\4) BLUE LIQUID DESIGNS\\19) "
-"GRAVITY FORMS PDF EXTENDED\\1) github\n"
+"Gravity PDF\\1) github\n"
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\1) github/helper/api.php:142
@@ -44,7 +44,7 @@ msgstr ""
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\1) github/helper/notices.php:54
 #, php-format
-msgid "%sGravity Forms PDF Extended Automated Installer%s: "
+msgid "%sGravity PDF Automated Installer%s: "
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
@@ -68,7 +68,7 @@ msgstr ""
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\1) github/helper/notices.php:101
 msgid ""
-"Gravity Forms PDF Extended detected a configuration problem. Please "
+"Gravity PDF detected a configuration problem. Please "
 "reinitialise the plugin."
 msgstr ""
 
@@ -76,14 +76,14 @@ msgstr ""
 #: EXTENDED\1) github/helper/notices.php:105
 #, php-format
 msgid ""
-"Gravity Forms PDF Extended detected a configuration problem. Please go to "
+"Gravity PDF detected a configuration problem. Please go to "
 "the %splugin's settings page%s to reinitialise."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\1) github/helper/notices.php:122
 msgid ""
-"Gravity Forms PDF Extended detected a server compatibility problem which "
+"Gravity PDF detected a server compatibility problem which "
 "prevented the software from running. See the System Status section below for "
 "details."
 msgstr ""
@@ -92,7 +92,7 @@ msgstr ""
 #: EXTENDED\1) github/helper/notices.php:126
 #, php-format
 msgid ""
-"Gravity Forms PDF Extended detected a server compatibility problem which "
+"Gravity PDF detected a server compatibility problem which "
 "prevented the software from running. Please go to the %splugin's settings "
 "page%s to view the issue."
 msgstr ""
@@ -100,7 +100,7 @@ msgstr ""
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\1) github/helper/notices.php:142
 msgid ""
-"Welcome to Gravity Forms PDF Extended. Before you can use the plugin "
+"Welcome to Gravity PDF. Before you can use the plugin "
 "correctly you need to initilise it."
 msgstr ""
 
@@ -108,7 +108,7 @@ msgstr ""
 #: EXTENDED\1) github/helper/notices.php:146
 #, php-format
 msgid ""
-"Welcome to Gravity Forms PDF Extended. Before you can use the plugin "
+"Welcome to Gravity PDF. Before you can use the plugin "
 "correctly you need to initilise it. Please go to the %splugin's settings page"
 "%s to initialise."
 msgstr ""
@@ -117,7 +117,7 @@ msgstr ""
 #: EXTENDED\1) github/helper/notices.php:158
 #, php-format
 msgid ""
-"Gravity Forms PDF Extended only works with Gravity Forms version %s and "
+"Gravity PDF only works with Gravity Forms version %s and "
 "higher. Please %supgrade your copy of Gravity Forms%s to use this plugin."
 msgstr ""
 
@@ -157,14 +157,14 @@ msgstr ""
 #: EXTENDED\1) github/helper/notices.php:233
 #, php-format
 msgid ""
-"Gravity Forms PDF Extended directory structure has been changed. %sMigrate "
+"Gravity PDF directory structure has been changed. %sMigrate "
 "Now%s %sUnsure what this means?%s"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\1) github/helper/notices.php:242
 #, php-format
-msgid "%sGravity Forms PDF Extended Automated Template Migration:%s"
+msgid "%sGravity PDF Automated Template Migration:%s"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
@@ -178,14 +178,14 @@ msgstr ""
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\1) github/helper/notices.php:256
 msgid ""
-"Gravity Forms PDF Extended Auto Initialisation Complete across the entire "
+"Gravity PDF Auto Initialisation Complete across the entire "
 "network."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\1) github/helper/notices.php:260
 msgid ""
-"Gravity Forms PDF Extended Initialisation Complete across the entire network."
+"Gravity PDF Initialisation Complete across the entire network."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
@@ -196,7 +196,7 @@ msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\1) github/helper/notices.php:273
-msgid "Gravity Forms PDF Extended Auto Initialisation Complete."
+msgid "Gravity PDF Auto Initialisation Complete."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
@@ -237,7 +237,7 @@ msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\1) github/helper/notices.php:347
-msgid "You've successfully initialised Gravity Forms PDF Extended."
+msgid "You've successfully initialised Gravity PDF."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
@@ -430,13 +430,13 @@ msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\1) github/view/templates/settings/initialisation-tab.php:41
-msgid "Gravity Forms PDF Extended"
+msgid "Gravity PDF"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\1) github/view/templates/settings/initialisation-tab.php:42
 msgid ""
-"Your web server isn't compatible with Gravity Forms PDF Extended. Please see "
+"Your web server isn't compatible with Gravity PDF. Please see "
 "the problem areas below."
 msgstr ""
 
@@ -449,14 +449,14 @@ msgstr ""
 #: EXTENDED\1) github/view/templates/settings/initialisation-tab.php:53
 #, php-format
 msgid ""
-"Does Gravity Forms PDF Extended detect a problem that your web host won't "
+"Does Gravity PDF detect a problem that your web host won't "
 "fix? %sWe recommend you move to a quality web hosting service like WP Engine"
 "%s which runs our software straight out of the box."
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\1) github/view/templates/settings/initialisation.php:19
-msgid "Welcome to Gravity Forms PDF Extended"
+msgid "Welcome to Gravity PDF"
 msgstr ""
 
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
@@ -544,7 +544,7 @@ msgstr ""
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\1) github/view/templates/settings/initialisation.php:45
 msgid ""
-"To complete the installation, Gravity Forms PDF Extended needs to be "
+"To complete the installation, Gravity PDF needs to be "
 "initialised."
 msgstr ""
 
@@ -611,7 +611,7 @@ msgstr ""
 #: G:\Blue Liquid Designs\4) BLUE LIQUID DESIGNS\19) GRAVITY FORMS PDF
 #: EXTENDED\1) github/view/templates/settings/support-form.php:26
 msgid ""
-"Gravity Forms PDF Extended's support hours are from 9:00am-5:00pm Monday to "
+"Gravity PDF's support hours are from 9:00am-5:00pm Monday to "
 "Friday, Sydney Australia time."
 msgstr ""
 

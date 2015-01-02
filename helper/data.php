@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Plugin: Gravity Forms PDF Extended
+ * Plugin: Gravity PDF 
  * File: data.php
  * 
  * This is a data overloading class which holds important variables shared throughout the plugin

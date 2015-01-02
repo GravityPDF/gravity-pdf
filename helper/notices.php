@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Plugin: Gravity Forms PDF Extended
+ * Plugin: Gravity PDF
  * File: notices.php
  * 
  * This file handles the output of all notices to the admin area 
@@ -51,7 +51,7 @@ class GFPDF_Notices
 		global $gfpdfe_data;
 		if($gfpdfe_data->automated === true && !rgpost('upgrade') && !rgpost('font-initialise'))
 		{
-			return sprintf(__('%sGravity Forms PDF Extended Automated Installer%s: ', 'pdfextended'), '<strong>', '</strong>');
+			return sprintf(__('%sGravity PDF Automated Installer%s: ', 'pdfextended'), '<strong>', '</strong>');
 		}
 		return '';
 	}
@@ -98,11 +98,11 @@ class GFPDF_Notices
 		{
 			if(rgget("page") == 'gf_settings' && rgget('subview') == 'PDF')
 			{	
-				$msg =  __('Gravity Forms PDF Extended detected a configuration problem. Please reinitialise the plugin.', 'pdfextended');
+				$msg =  __('Gravity PDF detected a configuration problem. Please reinitialise the plugin.', 'pdfextended');
 			}
 			else
 			{	
-				$msg =  sprintf(__('Gravity Forms PDF Extended detected a configuration problem. Please go to the %splugin\'s settings page%s to reinitialise.', 'pdfextended'), '<a href="'.PDF_SETTINGS_URL.'">', '</a>');	
+				$msg =  sprintf(__('Gravity PDF detected a configuration problem. Please go to the %splugin\'s settings page%s to reinitialise.', 'pdfextended'), '<a href="'.PDF_SETTINGS_URL.'">', '</a>');	
 			}
 
 			self::error($msg);
@@ -119,11 +119,11 @@ class GFPDF_Notices
 		{
 			if(rgget("page") == 'gf_settings' && rgget('subview') == 'PDF')
 			{	
-				$msg =  __('Gravity Forms PDF Extended detected a server compatibility problem which prevented the software from running. See the System Status section below for details.', 'pdfextended');
+				$msg =  __('Gravity PDF detected a server compatibility problem which prevented the software from running. See the System Status section below for details.', 'pdfextended');
 			}
 			else
 			{	
-				$msg =  sprintf(__('Gravity Forms PDF Extended detected a server compatibility problem which prevented the software from running. Please go to the %splugin\'s settings page%s to view the issue.', 'pdfextended'), '<a href="'.PDF_SETTINGS_URL.'">', '</a>');	
+				$msg =  sprintf(__('Gravity PDF detected a server compatibility problem which prevented the software from running. Please go to the %splugin\'s settings page%s to view the issue.', 'pdfextended'), '<a href="'.PDF_SETTINGS_URL.'">', '</a>');	
 			}
 
 			self::error($msg);
@@ -139,11 +139,11 @@ class GFPDF_Notices
 		{
 			if(rgget("page") == 'gf_settings' && rgget('subview') == 'PDF')
 			{	
-				$msg =  __('Welcome to Gravity Forms PDF Extended. Before you can use the plugin correctly you need to initilise it.', 'pdfextended');
+				$msg =  __('Welcome to Gravity PDF. Before you can use the plugin correctly you need to initilise it.', 'pdfextended');
 			}
 			else
 			{
-				$msg =  sprintf(__('Welcome to Gravity Forms PDF Extended. Before you can use the plugin correctly you need to initilise it. Please go to the %splugin\'s settings page%s to initialise.', 'pdfextended'), '<a href="'.PDF_SETTINGS_URL.'">', '</a>');
+				$msg =  sprintf(__('Welcome to Gravity PDF. Before you can use the plugin correctly you need to initilise it. Please go to the %splugin\'s settings page%s to initialise.', 'pdfextended'), '<a href="'.PDF_SETTINGS_URL.'">', '</a>');
 			}
 
 			self::notice($msg);
@@ -155,7 +155,7 @@ class GFPDF_Notices
 	 */
 	public static function gf_pdf_not_supported()
 	{
-		$msg =  sprintf(__('Gravity Forms PDF Extended only works with Gravity Forms version %s and higher. Please %supgrade your copy of Gravity Forms%s to use this plugin.', 'pdfextended'), GF_PDF_EXTENDED_SUPPORTED_VERSION, '<a href="https://www.e-junkie.com/ecom/gb.php?cl=54585&c=ib&aff=235154" target="ejejcsingle">', '</a>');		
+		$msg =  sprintf(__('Gravity PDF only works with Gravity Forms version %s and higher. Please %supgrade your copy of Gravity Forms%s to use this plugin.', 'pdfextended'), GF_PDF_EXTENDED_SUPPORTED_VERSION, '<a href="https://www.e-junkie.com/ecom/gb.php?cl=54585&c=ib&aff=235154" target="ejejcsingle">', '</a>');		
 
 		self::error($msg);
 	}
@@ -230,7 +230,7 @@ class GFPDF_Notices
 			return; 
 		 } 
 			
-		$msg = sprintf(__('Gravity Forms PDF Extended directory structure has been changed. %sMigrate Now%s %sUnsure what this means?%s', 'pdfextended'), '<a href="'. wp_nonce_url(PDF_SETTINGS_URL, 'gfpdfe_migrate') . '" class="button">', '</a>', '<a href="http://gravityformspdfextended.com/migrating-template-directory-means/">', '</a>' );
+		$msg = sprintf(__('Gravity PDF directory structure has been changed. %sMigrate Now%s %sUnsure what this means?%s', 'pdfextended'), '<a href="'. wp_nonce_url(PDF_SETTINGS_URL, 'gfpdfe_migrate') . '" class="button">', '</a>', '<a href="https://developer.gravitypdf.com/news/migrating-template-directory-means/">', '</a>' );
 
 		self::notice($msg);
 					 
@@ -239,9 +239,9 @@ class GFPDF_Notices
 	public static function gf_pdf_migration_success()
 	{
 		global $gfpdfe_data;
-		$prefix = ($gfpdfe_data->automated === true && !rgpost('upgrade')) ? sprintf(__('%sGravity Forms PDF Extended Automated Template Migration:%s', 'pdfextended'), '<strong>', '</strong><br>') : '';		
+		$prefix = ($gfpdfe_data->automated === true && !rgpost('upgrade')) ? sprintf(__('%sGravity PDF Automated Template Migration:%s', 'pdfextended'), '<strong>', '</strong><br>') : '';		
 		
-		$msg = $prefix . sprintf( __('Your PDF template folder structure was successfully migrated to %s. %sUnsure what this means?%s', 'pdfextended'), str_replace(ABSPATH, '', $gfpdfe_data->upload_dir), '<br><a href="http://gravityformspdfextended.com/migrating-template-directory-means/">', '</a>');
+		$msg = $prefix . sprintf( __('Your PDF template folder structure was successfully migrated to %s. %sUnsure what this means?%s', 'pdfextended'), str_replace(ABSPATH, '', $gfpdfe_data->upload_dir), '<br><a href="https://developer.gravitypdf.com/news/migrating-template-directory-means/">', '</a>');
 
 		self::notice($msg);
 						
@@ -253,11 +253,11 @@ class GFPDF_Notices
 
 		if($gfpdfe_data->automated === true && !rgpost('upgrade') && !rgpost('font-initialise'))
 		{
-			$msg = __('Gravity Forms PDF Extended Auto Initialisation Complete across the entire network.', 'pdfextended');
+			$msg = __('Gravity PDF Auto Initialisation Complete across the entire network.', 'pdfextended');
 		}
 		else
 		{
-			$msg = __('Gravity Forms PDF Extended Initialisation Complete across the entire network.', 'pdfextended');
+			$msg = __('Gravity PDF Initialisation Complete across the entire network.', 'pdfextended');
 		}
 
 		if($gfpdfe_data->fresh_install === true)
@@ -270,7 +270,7 @@ class GFPDF_Notices
 	public static function gf_pdf_auto_deploy_success()
 	{		
 		global $gfpdfe_data;
-		$msg = __('Gravity Forms PDF Extended Auto Initialisation Complete.', 'pdfextended');
+		$msg = __('Gravity PDF Auto Initialisation Complete.', 'pdfextended');
 
 		if($gfpdfe_data->fresh_install === true)
 		{
@@ -344,7 +344,7 @@ class GFPDF_Notices
 	}
 
 	public static function gf_pdf_deploy_success() {		
-		$msg = __('You\'ve successfully initialised Gravity Forms PDF Extended.', 'pdfextended');
+		$msg = __('You\'ve successfully initialised Gravity PDF.', 'pdfextended');
 
 		self::notice($msg);		
 	}

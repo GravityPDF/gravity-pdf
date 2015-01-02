@@ -192,7 +192,7 @@ class PDFRender
 		/*
 		 * Set Creator Meta Data
 		 */		
-		$mpdf->SetCreator('Gravity Forms PDF Extended v' . PDF_EXTENDED_VERSION . '. http://gravityformspdfextended.com');	
+		$mpdf->SetCreator('Gravity PDF v' . PDF_EXTENDED_VERSION . '. https://gravitypdf.com');	
 
 		/*
 		 * Set PDF DPI if added to configuration node

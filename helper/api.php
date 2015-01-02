@@ -4,7 +4,7 @@ define('PDF_DEBUG', false);
 
 class gfpdfe_API
 {
-	private $api_url = 'https://gravityformspdfextended.com/api/';
+	private $api_url = 'https://gravitypdf.com/api/';
 	private $api_version = '1.0';
 	
 	private $username;

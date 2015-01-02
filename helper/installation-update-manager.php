@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Plugin: Gravity Forms PDF Extended
+ * Plugin: Gravity PDF
  * File: install-update-manager.php
  * 
  * This file handles the installation and update code that ensures the plugin will be supported.

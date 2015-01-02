@@ -31,7 +31,7 @@ $form = RGFormsModel::get_form_meta($form_id);
 		 * The plugin stylesheet is overridden every update		 
 		 */
 	?>
-    <title>Gravity Forms PDF Extended</title>
+    <title>Gravity PDF</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 </head>
 	<body>
@@ -52,7 +52,7 @@ $form = RGFormsModel::get_form_meta($form_id);
 			 * Store your form fields from the $form_data array into variables here
 			 * To see your entire $form_data array, view your PDF via the admin area and add &data=1 to the url
 			 * 
-			 * For an example of accessing $form_data fields see http://gravityformspdfextended.com/documentation-v3-x-x/templates/getting-started/
+			 * For an example of accessing $form_data fields see https://developer.gravitypdf.com/documentation/custom-templates-introduction/
 			 *
 			 * Alternatively, as of v3.4.0 you can use merge tags (except {allfields}) in your templates. 
 			 * Just add merge tags to your HTML and they'll be parsed before generating the PDF.	
@@ -81,7 +81,7 @@ $form = RGFormsModel::get_form_meta($form_id);
 						Vestibulum elit. Vestibulum et arcu at diam mattis commodo. Nam ipsum sem, 
 						ultricies at, rutrum sit amet, posuere nec, velit. Sed molestie mollis dui.</pre>
 			<div><a href="#top">Hyperlink (&lt;a&gt;)</a></div>
-			<div><a href="http://www.gravityformspdfextended.com">Hyperlink (&lt;a&gt;)</a></div>
+			<div><a href="https://gravitypdf.com">Hyperlink (&lt;a&gt;)</a></div>
 			<div>Styles - <tt>tt(teletype)</tt> <i>italic</i> <b>bold</b> <big>big</big> <small>small</small> <em>emphasis</em> <strong>strong</strong> <br />new lines<br>
 				<code>code</code> <samp>sample</samp> <kbd>keyboard</kbd> <var>variable</var> <cite>citation</cite> <abbr>abbr.</abbr> <acronym>ACRONYM</acronym> <sup>sup</sup> <sub>sub</sub> <strike>strike</strike> <s>strike-s</s> <u>underline</u> <del>delete</del> <ins>insert</ins> <q>To be or not to be</q> <font face="sans-serif" color="#880000" size="5">font changing face, size and color</font>
 			</div>

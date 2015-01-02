@@ -30,7 +30,7 @@ $form = RGFormsModel::get_form_meta($form_id);
 <head>
     <link rel="stylesheet" href="<?php echo GFCommon::get_base_url(); ?>/css/print.css" type="text/css" />
     <link rel='stylesheet' href='<?php echo PDF_PLUGIN_URL .'initialisation/template.css'; ?>' type='text/css' />
-    <title>Gravity Forms PDF Extended</title>
+    <title>Gravity PDF</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 </head>
 	<body>

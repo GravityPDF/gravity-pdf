@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Plugin: Gravity Forms PDF Extended
+ * Plugin: Gravity PDF
  * File: model/pdf.php
  * 
  * The model that does all the processing and interacts with our controller and view (if necisarry) 
