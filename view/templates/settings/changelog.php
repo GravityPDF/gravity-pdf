@@ -32,6 +32,7 @@
 <li>Housekeeping - Fixed typo during initial initialisation</li>
 <li>Housekeeping - Switched icons back to FontAwesome which is shipped by default with Gravity Forms</li>
 <li>Housekeeping - Display full path to mPDF tmp directory when there are issues writing to it</li>
+<li>Housekeeping - Update example-header-and-footer_06.php and example-advanced-headers_07.php to better reflect current mPDF features</li>
 <li>Bug - Fixed issue pulling the correct configuration when multiple nodes were assigned to multiple forms</li>
 <li>Bug - Fixed number field formatting issue which always rounded to two decimal places</li>
 <li>Bug - Fixed JS namespace issue with WordPress Leads plugin</li>

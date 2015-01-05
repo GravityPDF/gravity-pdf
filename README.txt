@@ -93,6 +93,7 @@ All FAQs can be [viewed on the Gravity PDF website](https://gravitypdf.com/#faqs
 * Housekeeping - Switched icons back to FontAwesome which is shipped by default with Gravity Forms
 * Housekeeping - Display full path to mPDF tmp directory when there are issues writing to it
 * Housekeeping - Modified font installation message.
+* Housekeeping - Update example-header-and-footer_06.php and example-advanced-headers_07.php to better reflect current mPDF features
 * Bug - Fixed issue pulling the correct configuration when multiple nodes were assigned to multiple forms
 * Bug - Fixed number field formatting issue which always rounded to two decimal places
 * Bug - Fixed JS namespace issue with WordPress Leads plugin
