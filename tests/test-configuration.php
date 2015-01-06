@@ -9,8 +9,10 @@ class Test_PDFConfiguration extends WP_UnitTestCase {
 		GFPDF_Core::fully_loaded_admin();	
 
 		/* remove the configuration file */		
-		if(file_exists(PDF_TEMPLATE_LOCATION . 'configuration.php'))			
-			unlink(PDF_TEMPLATE_LOCATION . 'configuration.php');
+		global $gfpdfe_data;
+
+		if(file_exists($gfpdfe_data->template_site_location . 'configuration.php'))			
+			unlink($gfpdfe_data->template_site_location . 'configuration.php');
 
 		global $gfpdf;
 		$gfpdf = new GFPDF_Core();  

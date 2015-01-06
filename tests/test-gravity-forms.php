@@ -12,25 +12,54 @@ class Test_GravityForms extends WP_UnitTestCase {
 	private $form_id = false;
 	private $entries = array();
 
-	public function setUp() {
-		parent::setUp();	
+	public function setUp() {		
+        
+		/*
+		 * Replace set up with cut down version 
+		 * so we don't use 'temporary' tables in MySQL
+		 */
+		$this->cut_down_setup();
 
-		GFForms::setup();	
+		/* initialise GF tables */
+		GFForms::setup(true);			
 
 		/* Load our plugin functions */
-		GFPDF_Core::fully_loaded_admin();	
+		GFPDF_Core::fully_loaded_admin();			
 
-		touch(PDF_TEMPLATE_LOCATION . 'configuration.php');
+		global $gfpdfe_data;
+		/* ensure our config file is present */
+		touch($gfpdfe_data->template_site_location . 'configuration.php');
 
+		/* initialise PDF plugin */
 		global $gfpdf;
 		$gfpdf = new GFPDF_Core();  	
 
+		/* create GF data */
 		$this->create_form_and_entries();
 	}
 
-	public function tearDown() {
-		parent::tearDown();
+	public function cut_down_setup()
+	{
+        global $wpdb;
+
+        /*
+         * Do DB logic 
+         */
+        $wpdb->suppress_errors = false;
+        $wpdb->show_errors = true;
+        $wpdb->db_connect();
+        $wpdb->query( 'SET autocommit = 0;' );
+        $wpdb->query( 'START TRANSACTION;' );		
 	}
+
+	public function tearDown() {		
+		parent::tearDown();		
+
+        /*
+         * Uninstall Gravity Forms
+         */
+        RGFormsModel::drop_tables();		
+	}	
 
 	public function create_form_and_entries() {
 		$this->create_forms();
@@ -48,6 +77,7 @@ class Test_GravityForms extends WP_UnitTestCase {
 		$this->form_id = $results;		
 	}
 
+
 	public function create_entries()
 	{
 		$entries = json_decode('[{"id":"453","form_id":"47","date_created":"2014-09-14 02:47:14","is_starred":0,"is_read":0,"ip":"144.131.91.23","source_url":"http:\/\/clients.blueliquiddesigns.com.au\/gfpdf3\/gf1_7\/wordpress\/?gf_page=preview&id=47","post_id":null,"currency":"USD","payment_status":null,"payment_date":null,"transaction_id":null,"payment_amount":null,"payment_method":null,"is_fulfilled":null,"created_by":"1","transaction_type":null,"user_agent":"Mozilla\/5.0 (Windows NT 6.1; WOW64; rv:32.0) Gecko\/20100101 Firefox\/32.0","status":"active","1.3":"My","1.6":"Name","5":"First Choice","2.1":"","2.2":"","2.3":"","2.4":"","2.5":"","2.6":"","3":"","4":"","6":"","7":""},{"id":"452","form_id":"47","date_created":"2014-09-14 02:47:06","is_starred":0,"is_read":0,"ip":"144.131.91.23","source_url":"http:\/\/clients.blueliquiddesigns.com.au\/gfpdf3\/gf1_7\/wordpress\/?gf_page=preview&id=47","post_id":null,"currency":"USD","payment_status":null,"payment_date":null,"transaction_id":null,"payment_amount":null,"payment_method":null,"is_fulfilled":null,"created_by":"1","transaction_type":null,"user_agent":"Mozilla\/5.0 (Windows NT 6.1; WOW64; rv:32.0) Gecko\/20100101 Firefox\/32.0","status":"active","1.3":"First","1.6":"Last","2.1":"12 Alister St","2.3":"Ali","2.4":"State","2.5":"2678","2.6":"Barbados","3":"my@test.com","4":"(345)445-4566","5":"Second Choice","6":"First Choice,Second Choice,Third Choice","2.2":"","7":""},{"id":"451","form_id":"47","date_created":"2014-09-14 02:46:35","is_starred":0,"is_read":0,"ip":"144.131.91.23","source_url":"http:\/\/clients.blueliquiddesigns.com.au\/gfpdf3\/gf1_7\/wordpress\/?gf_page=preview&id=47","post_id":null,"currency":"USD","payment_status":null,"payment_date":null,"transaction_id":null,"payment_amount":null,"payment_method":null,"is_fulfilled":null,"created_by":"1","transaction_type":null,"user_agent":"Mozilla\/5.0 (Windows NT 6.1; WOW64; rv:32.0) Gecko\/20100101 Firefox\/32.0","status":"active","1.3":"Jake","1.6":"Jackson","2.1":"123 Fake St","2.2":"Line 2","2.3":"City","2.4":"State","2.5":"2441","2.6":"Albania","3":"test@test.com","4":"(123)123-1234","5":"Third Choice","6":"Second Choice,Third Choice","7":"This is paragraph test!"}]', true);
@@ -58,6 +88,88 @@ class Test_GravityForms extends WP_UnitTestCase {
 		$this->assertEquals(true, is_array($results));
 
 		$this->entries = $results;
+	}
+
+	/*
+	 * Check that GFAPI::get_form(); outputs correctly 
+	 */
+	public function test_get_forms()
+	{
+		$form = GFAPI::get_form($this->form_id);
+
+		/*
+		 * Check the basics 
+		 * Title is there, field number is correct
+		 */
+		$this->assertEquals('Simple Form Testing', $form['title']);
+		$this->assertEquals(true, is_array($form['fields']));
+		$this->assertEquals(7, sizeof($form['fields']));
+		$this->assertEquals(1, $form['is_active']);
+
+		/*
+		 * Run through each field type and ensure the correct data is present 
+		 */
+		foreach($form['fields'] as $field)
+		{
+			switch($field['type'])
+			{
+				case 'name':
+					$this->assertEquals($field['inputs'][0]['id'], $field['id'] . '.3');
+					$this->assertEquals($field['inputs'][1]['id'], $field['id'] . '.6');
+				break;
+
+				case 'address':
+					$this->assertEquals($field['inputs'][0]['id'], $field['id'] . '.1');
+					$this->assertEquals($field['inputs'][1]['id'], $field['id'] . '.2');
+					$this->assertEquals($field['inputs'][2]['id'], $field['id'] . '.3');
+					$this->assertEquals($field['inputs'][3]['id'], $field['id'] . '.4');
+					$this->assertEquals($field['inputs'][4]['id'], $field['id'] . '.5');
+					$this->assertEquals($field['inputs'][5]['id'], $field['id'] . '.6');
+				break;
+
+				case 'email':
+					$this->assertEquals(3, $field['id']);
+				break;
+
+				case 'phone':
+					$this->assertEquals(4, $field['id']);
+					$this->assertEquals('standard', $field['phoneFormat']);
+				break;
+
+				case 'select':
+				case 'multiselect':
+					$this->assertEquals(3, sizeof($field['choices']));
+				break;
+
+				case 'textarea':
+					$this->assertEquals(7, $field['id']);
+				break;
+			}
+		}
+
+		/*
+		 * Run through the notifications 
+		 */
+		$this->assertEquals(2, sizeof($form['notifications']));
+		
+		$form['notifications'] = array_values($form['notifications']);
+
+		$this->assertEquals('Admin Notification', $form['notifications'][0]['name']);
+		$this->assertEquals('User Notification', $form['notifications'][1]['name']);
+		
+	}
+
+	/*
+	 * Test that GFAPI::get_entry() outputs correctly 
+	 */
+	public function test_get_entry()
+	{
+		$entry = GFAPI::get_entry($this->entries[0]);
+		//print_r($entry); exit;
+		//$entry = GFAPI::get_entry($this->entries[1]);
+		//$entry = GFAPI::get_entry($this->entries[2]);
+
+		
 	}
 
 	/*
@@ -108,12 +220,12 @@ class Test_GravityForms extends WP_UnitTestCase {
 	}	
 
 	/* 
-	 * Test that GFForms::$version will produce 
+	 * Test that GFCommon::$version will produce 
 	 * the expected result. 
 	 */
 	public function test_gf_version()
 	{
-		$version = GFForms::$version;
+		$version = GFCommon::$version;
 
 		/* which the version number is a string before we try to match it */
 		$this->assertEquals(true, is_string($version));

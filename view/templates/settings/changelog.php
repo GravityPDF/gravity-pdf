@@ -21,7 +21,30 @@
     <p><strong>Current Version: <?php echo PDF_EXTENDED_VERSION; ?></strong></p>
 
   <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
+<ul>
+<li>Feature - Added support for Gravity Form's sub-field 'middle' name  (1.9Beta)</li>
+<li>Feature - Patch mPDF with full :nth-child support on TD and TR table cells</li>
+<li>Feature - Added $form_data['products_totals']['subtotal'] key (total price without shipping costs added)</li>
+<li>Feature - Added formated money to all product fields in the $form_data array</li>
+<li>Feature - Default templates: only show fields who's conditional logic is true. Perfect when used with 'default-show-html'</li>
+<li>Housekeeping - Move PDF_EXTENDED_TEMPLATES folder to the /wp-content/upload/ directory. Get more info about the move (see <a href="https://developer.gravitypdf.com/news/migrating-template-directory-means/">https://developer.gravitypdf.com/news/migrating-template-directory-means/</a>)</li>
+<li>Housekeeping - Refined when admin resources are loaded</li>
+<li>Housekeeping - Fixed typo during initial initialisation</li>
+<li>Housekeeping - Switched icons back to FontAwesome which is shipped by default with Gravity Forms</li>
+<li>Housekeeping - Display full path to mPDF tmp directory when there are issues writing to it</li>
+<li>Housekeeping - Update example-header-and-footer_06.php and example-advanced-headers_07.php to better reflect current mPDF features</li>
+<li>Bug - Fixed issue pulling the correct configuration when multiple nodes were assigned to multiple forms</li>
+<li>Bug - Fixed number field formatting issue which always rounded to two decimal places</li>
+<li>Bug - Fixed JS namespace issue with WordPress Leads plugin</li>
+<li>Bug - Fixed error initialising fonts / backing up PDF_EXTENDED_TEMPLATES directory when using the glob() function</li>
+<li>Bug - Fix issue with PHP 5.0 and 5.1 array_replace_recursive function when used with an array inside the $gf_pdf_config array</li>
+<li>Bug - Fixed fatal error when logged in user attempts to view PDF they don't have access to</li>
+<li>Bug - Fixed issue in $form_data array where single-column list items where being returned as an array and not a HTML list.</li>
+<li>Bug - Prevent unauthorised users auto-initialising the software or migrating the templates folder</li>
+</ul>
 
+
+  <h3>3.5.10</h3>
   <ul>
     <li>Bug - Fix issue saving and sending blank PDFs due to security fix</li>
   </ul>
@@ -33,7 +56,7 @@
   <h3>3.5.10</h3>
   <ul>
     <li>Housekeeping - Include individual scoring for Gravity Form Survey Likert field in the $form_data['survey'] array</li>
-    <li>Bug - Fix fatal error when Gravity Forms isn't activated, but PDF Extended is.</li>
+    <li>Bug - Fix fatal error when Gravity Forms isn't activated, but Gravity PDF is.</li>
   </ul>
 
   <h3>3.5.9</h3>
@@ -108,7 +131,7 @@
       <li>Feature - No longer need to reinitialise every time the software is updated. </li>
       <li>Feature - Add auto-initialiser on initial installation for sites that have direct write access to their server files</li>
       <li>Feature - Add auto-initialiser on initial installation across entire multisite network for sites who have direct write access to their server files. </li>
-      <li>Feature - Add auto-PDF_EXTENDED_TEMPLATE theme syncer for sites that have direct write access to their server files</li>
+      <li>Feature - Add auto-PDF_EXTENDED_TEMPLATES theme syncer for sites that have direct write access to their server files</li>
       <li>Feature - Correctly added language support. The .PO file is located in the /language/ folder if anyone would like to do a translation.</li>
 
       <li>Housekeeping - Restrict initialisation process to 64MB or greater to counter problems with users reporting a 'white screen' when running in a low-RAM environment.</li>
@@ -151,21 +174,21 @@
 
     <h3>3.4.0</h3>
     <ul>
-      <li>Feature - Added auto-print prompt ability when you add &amp;print=1 to the PDF URL (see https://gravityformspdfextended.com/documentation-v3-x-x/display-pdf-in-browser/ for details)</li>
+      <li>Feature - Added auto-print prompt ability when you add &amp;print=1 to the PDF URL (see https://developer.gravitypdf.com/documentation/display-pdf-in-browser/ for details)</li>
       <li>Feature - Added ability to rotate absolute positioned text 180 degrees (previously only 90 and -90). Note: feature in beta</li>
-      <li>Feature - Backup all template files that are overridden when initialising to a folder inside PDF_EXTENDED_TEMPLATE</li>
+      <li>Feature - Backup all template files that are overridden when initialising to a folder inside PDF_EXTENDED_TEMPLATES</li>
       <li>Feature - Added SSH initialisation support</li>
       <li>Feature - Allow MERGETAGS to be used in all PDF templates, including default template (but only in the HTML field).</li>
       <li>Feature - Updated mPDF to 3.7.1</li>
-      <li>Feature - Enable text/image watermark support. Added new example template example-watermark09.php showing off its usage (see http://gravityformspdfextended.com/documentation-v3-x-x/templates/watermarks/)</li>
-      <li>Feature - Added full survey, poll and quiz support to both the default template and $form_data (see http://gravityformspdfextended.com/documentation-v3-x-x/accessing-survey-poll-quiz-data/)</li>
+      <li>Feature - Enable text/image watermark support. Added new example template example-watermark09.php showing off its usage (see https://developer.gravitypdf.com/documentation/watermarks-pdf-template-example/)</li>
+      <li>Feature - Added full survey, poll and quiz support to both the default template and $form_data (see https://developer.gravitypdf.com/documentation/accessing-survey-poll-quiz-data/)</li>
       <li>Feature - Shortcodes will now be processed in all templates, including default template (but only in the HTML field).</li>
       <li>Feature - Added 'save' configuration option so PDFs are saved to the local disk when 'notifications' aren't enabled.</li>
       <li>Feature - Added 'dpi' configuration option to modify the PDF image DPI. Default 96dpi. Use 300dpi for printing.</li>
       <li>Feature - Added PDF/A1-b compliance option. Enable with 'pdfa1b' => true. See http://mpdf1.com/manual/index.php?tid=420&searchstring=pdf/a1-b for more details.</li>
       <li>Feature - Added PDF/X1-a compliance option. Enable with 'pdfx1a' => true. See http://mpdf1.com/manual/index.php?tid=481&searchstring=pdf/x-1a for more details.</li>
       <li>Feature - Added new constant option 'PDF_REPACK_FONT' which when enabled may improve function with some PostScript printers (disabled by default). Existing sites will need to add  define('PDF_REPACK_FONT', true); to the bottom of their configuration.php file.</li>
-      <li>Feature - Added a sleuth of new hooks and filters for developers. See https://gravityformspdfextended.com/documentation-v3-x-x/filters-and-hooks/ for examples.</li>
+      <li>Feature - Added a sleuth of new hooks and filters for developers. See https://developer.gravitypdf.com/documentation/filters-and-hooks/ for examples.</li>
       <li>Feature - Added $form_data['form_description'] key to $form_data array</li>
       <li>Feature - Update $form_data['products'] array key to field ID</li>
       <li>Feature - Added survey Likert output function for custom templates (much like the product table function). It can be used with the following command 'echo GFPDFEntryDetails::get_likert($form, $lead, $field_id);' where $field_id is substituted for the form field ID.</li>
@@ -177,7 +200,7 @@
       <li>Housekeeping - Update settings page link to match new Gravity Forms URL structure</li>
       <li>Housekeeping - Check if $lead['gfsurvey_score'] exists before assigning to $form_data array</li>
       <li>Housekeeping - Removed table and font checksum debugging from mPDF when WP_DEBUG enabled as they produced inaccurate results.</li>
-      <li>Housekeeping - Fixed up mPDF logging location when WP_DEBUG enabled. Files now stored in wp-content/themes/Active_Theme_Folder/PDF_EXTENDED_TEMPLATE/output/ folder.</li>
+      <li>Housekeeping - Fixed up mPDF logging location when WP_DEBUG enabled. Files now stored in wp-content/themes/Active_Theme_Folder/PDF_EXTENDED_TEMPLATES/output/ folder.</li>
       <li>Housekeeping - Removed API logging locally when WP_DEBUG is enabled.</li>
       <li>Housekeeping - Increase API timeout interval as some overseas users reported timeout issues</li>
       <li>Housekeeping - Modified mPDF functions Image() and purify_utf8_text() to validate the input data so we don't have to do it every time through the template.</li>
@@ -242,7 +265,7 @@
     <ul>
       <li>Feature - Overhauled  the initialisation process so that the software better reviews the host for  potential problems before initialisation. This should help debug issues and  make users aware there could be a problem <strong>before</strong> they begin using the software.</li>
       <li>Feature - Overhauled the settings page to make it easier to access features of the software</li>
-      <li>Feature - Added a Support tab to the settings page which allows users to securely (over HTTPS) submit a support ticket to the Gravity Form PDF Extended support desk</li>
+      <li>Feature - Added a Support tab to the settings page which allows users to securely (over HTTPS) submit a support ticket to the Gravity PDF support desk</li>
       <li>Feature - Changed select, multiselect and radio fields so that the default templates use the name rather than the value. $form_data now also includes the name and values for all these fields.</li>
       <li>Feature - $form_data now includes all miscellaneous lead information in the $form_data['misc'] array.</li>
       <li>Feature - $form_data now contains 24 and 12 hour time of entry submission.</li>      
@@ -252,7 +275,7 @@
       <li>Bug - Fixed issue when Gravity Forms in No Conflict Mode</li>
       <li>Bug - Font config.php's array keys now in lower case</li>
       <li>Housekeeping - Moved all initialisation files to a folder called 'initialisation'.</li>
-      <li>Housekeeping - Renamed the configuration.php file in the plugin folder to configuration.php.example to alleviate confusion for developers who unwittingly modify the plugin configuration file instead of the file in their active theme's PDF_EXTENDED_TEMPLATE folder.</li>
+      <li>Housekeeping - Renamed the configuration.php file in the plugin folder to configuration.php.example to alleviate confusion for developers who unwittingly modify the plugin configuration file instead of the file in their active theme's PDF_EXTENDED_TEMPLATES folder.</li>
       <li>Housekeeping - Updated the plugin file system to a more MVC-style approach, with model and view folders.</li>
       <li>Housekeeping - Removed ability to directly access default and example template files.</li>
       <li>Housekeeping - Fixed PHP notices in default templates related to the default template-only configuration options</li>
@@ -264,14 +287,14 @@
     <h3>3.2.0</h3>
     <ul>
       <li>Feature - Can now view multiple PDFs assigned to a single form via the admin area. Note: You must provide a unique 'filename' parameter in configuration.php for multiple PDFs assigned to a single form. </li>
-      <li>Feature - You can exclude a field from the default templates using the class name 'exclude'. See our <a rel="nofollow" href="http://gravityformspdfextended.com/faq/can-exclude-field-showing-pdf/">FAQ topic</a> for more details.</li>
+      <li>Feature - You can exclude a field from the default templates using the class name 'exclude'. See our <a rel="nofollow" href="https://gravitypdf.com/#faqs">FAQ topic</a> for more details.</li>
       <li>Bug - Fixed issue viewing own PDF entry when logged in as anything lower than editor.</li>
       <li>Bug - Fixed data return bug in pdf-entry-details.php that was preventing all data returning correctly.</li>
       <li>Bug - Fixed PHP Warning when using products with no options</li>
       <li>Bug - Fixed issue with invalid characters being added to the PDF filename. Most notably the date mergetag.</li>
       <li>Bug - Limit filename length to 150 characters which should work on the majority of web servers.</li>
       <li>Bug - Fixed problem sending duplicate PDF when using mass resend notification feature</li>
-      <li>Depreciated - Removed GF_FORM_ID and GF_LEAD_ID constants which were used in v2.x.x of the software. Ensure you follow <a rel="nofollow" href="http://gravityformspdfextended.com/documentation-v3-x-x/v3-0-0-migration-guide/">v2.x.x upgrade guide</a> to your templates before upgrading.</li>
+      <li>Depreciated - Removed GF_FORM_ID and GF_LEAD_ID constants which were used in v2.x.x of the software. Ensure you follow <a rel="nofollow" href="https://developer.gravitypdf.com/news/version-2-3-migration-guide/">v2.x.x upgrade guide</a> to your templates before upgrading.</li>
     </ul>
     
     <h3>3.1.4</h3>
@@ -309,14 +332,14 @@
     </ul>
     <h3>3.1.0</h3>
     <ul>
-      <li>Feature - Added defaults to configuration.php which allows users to define the default PDF settings for all Gravity Forms. See the <a rel="nofollow" href="http://gravityformspdfextended.com/documentation-v3-x-x/installation-and-configuration/#default-configuration-options">installation and configuration documentation</a> for more details. </li>
-      <li>Feature - Added three new configuration options 'default-show-html', 'default-show-empty' and 'default-show-page-names' which allow different display options to the three default templates. See the <a rel="nofollow" href="http://gravityformspdfextended.com/documentation-v3-x-x/installation-and-configuration/#default-template-only">installation and configuration documentation</a> for more details.</li>
-      <li>Feature - Added filter hooks 'gfpdfe_pdf_name' and 'gfpdfe_template' which allows developers to further modify a PDF name and template file, respectively, outside of the configuration.php. This is useful if you have a special case naming convention based on user input. See <a rel="nofollow" href="http://gravityformspdfextended.com/filters-and-hooks/">http://gravityformspdfextended.com/filters-and-hooks/</a> for more details about using these filters.</li>
-      <li>Feature - Custom font support. Any .ttf font file added to the PDF_EXTENDED_TEMPLATE/fonts/ folder will be automatically installed once the plugin has been initialised. Users also have the option to just initialise the fonts via the settings page. See the <a rel="nofollow" href="http://gravityformspdfextended.com/documentation-v3-x-x/language-support/#installing-fonts">font/language documentation </a> for details.</li>
+      <li>Feature - Added defaults to configuration.php which allows users to define the default PDF settings for all Gravity Forms. See the <a rel="nofollow" href="https://developer.gravitypdf.com/documentation/getting-started-with-gravity-pdf-configuration/">installation and configuration documentation</a> for more details. </li>
+      <li>Feature - Added three new configuration options 'default-show-html', 'default-show-empty' and 'default-show-page-names' which allow different display options to the three default templates. See the <a rel="nofollow" href="https://developer.gravitypdf.com/documentation/configuration-options-examples/#default-template">installation and configuration documentation</a> for more details.</li>
+      <li>Feature - Added filter hooks 'gfpdfe_pdf_name' and 'gfpdfe_template' which allows developers to further modify a PDF name and template file, respectively, outside of the configuration.php. This is useful if you have a special case naming convention based on user input. See <a rel="nofollow" href="https://developer.gravitypdf.com/documentation/filters-and-hooks/">https://developer.gravitypdf.com/documentation/filters-and-hooks/</a> for more details about using these filters.</li>
+      <li>Feature - Custom font support. Any .ttf font file added to the PDF_EXTENDED_TEMPLATES/fonts/ folder will be automatically installed once the plugin has been initialised. Users also have the option to just initialise the fonts via the settings page. See the <a rel="nofollow" href="https://developer.gravitypdf.com/documentation/language-support/#install-custom-fonts">font/language documentation </a> for details.</li>
       <li>Compatability - Use Gravity Forms get_upload_root() and get_upload_url_root() instead of hard coding the signature upload directory in pdf-entry-detail.php</li>
       <li>Compatability - Changed depreciated functions get_themes() and get_theme() to wp_get_theme() (added in WordPress v3.4). </li>
       <li>Compatability - The plugin now needs to be initialised on fresh installation and upgrade. This allows us to use the WP_Filesystem API for file manipulation.</li>
-      <li>Compatability - Automatic copying of PDF_EXTENDED_TEMPLATE folder on a theme change was removed in favour of a user prompt. This allows us to take advantage of the WP_Filesystem API.</li>
+      <li>Compatability - Automatic copying of PDF_EXTENDED_TEMPLATES folder on a theme change was removed in favour of a user prompt. This allows us to take advantage of the WP_Filesystem API.</li>
       <li>Compatability - Added WordPress compatibility checker (minimum now 3.4 or higher).</li>
       <li>Bug - Removed ZipArchive in favour of WordPress's WP_Filesystem API unzip_file() command. Some users reported the plugin would stop their entire website working if this extension wasn't installed.</li>
       <li>Bug - Fixed Gravity Forms compatibility checker which wouldn't return the correct response.</li>
@@ -336,7 +359,7 @@
       <li>Feature - Options for default templates to disable HTML fields or empty fields (or both)</li>
     </ul>
     <h3>3.0.0</h3>
-    <p>As of Gravity Forms PDF Extended v3.0.0 we have removed the DOMPDF package from our plugin and integrated the more advanced mPDF system. Along with a new HTML to PDF generator, we've rewritten the entire plugin's base code to make it more user friendly to both hobbyists and rock star web developers. Configuration time is cut in half and advanced features like adding security features is now accessible to users who have little experience with PHP.</p>
+    <p>As of Gravity PDF v3.0.0 we have removed the DOMPDF package from our plugin and integrated the more advanced mPDF system. Along with a new HTML to PDF generator, we've rewritten the entire plugin's base code to make it more user friendly to both hobbyists and rock star web developers. Configuration time is cut in half and advanced features like adding security features is now accessible to users who have little experience with PHP.</p>
     <p>New Features include:</p>
     <ul>
       <li>Language Support - almost all languages are supported including RTL (right to left) languages like Arabic and Hebrew and CJK languages - Chinese, Japanese and Korean.</li>
@@ -357,7 +380,7 @@
     <p>Other changes include
       <li>Improved security - further restrictions were placed on non-administrators viewing template files.
       <li>$form_data array tidied up - images won't be wrapped in anchor tags.</p>
-    <p>For more details <a rel="nofollow" href="http://gravityformspdfextended.com/documentation-v3-x-x/introduction/">view the 3.x.x online documentation</a>.</p>
+    <p>For more details <a rel="nofollow" href="https://developer.gravitypdf.info/">view the 3.x.x online documentation</a>.</p>
     <h3>2.2.3</h3>
     <ul>
       <li>Bug - Fixed mb_string error in the updated DOMPDF package.</li>

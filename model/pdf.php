@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Plugin: Gravity Forms PDF Extended
+ * Plugin: Gravity PDF
  * File: model/pdf.php
  * 
  * The model that does all the processing and interacts with our controller and view (if necisarry) 
@@ -73,7 +73,7 @@ class GFPDF_Core_Model
 			return false;
 		}
 
-		if( ($gfpdfe_data->fresh_install === true) || (!is_dir(PDF_TEMPLATE_LOCATION)) )
+		if( ($gfpdfe_data->fresh_install === true) || (!is_dir($gfpdfe_data->template_site_location)) )
 		{						
 			return false;
 		}
@@ -107,31 +107,37 @@ class GFPDF_Core_Model
 		 * Class: PDFGenerator
 		 * File: pdf-configuration-indexer.php
 		 */
-		$templates = $gfpdf->get_template($form_id, true);
+		$template = $gfpdf->get_template($form_id);				
+		
+		/*
+		 * Before setting up PDF options we will check if a configuration is found
+		 * If not, we will set up defaults defined in configuration.php
+		 */		
+		$index = self::check_configuration($form_id, $template);				
+		
+		/*
+		 * Now all the correct configuration and indexes are in place lets get our configuration nodes
+		 */
+		$templates = $gfpdf->get_form_configuration($form_id);
 
 		/* exit early if templates not found */
-		if($templates === false)
+		if($templates === false || sizeof($templates) === 0)
 		{
 			return;
 		}		
 
-		if(!is_array($templates))
-		{
-			$index = (isset($gfpdf->index[$form_id])) ? $gfpdf->index[$form_id] : array(-1); /* if no index (no actual configuration) we use the default name - bypassing the naming function below */
-			$templates = array($index[0] => array('template' => $templates));	
-		}
 
 		?>
 			<strong>PDFs</strong><br />
 
-        	<?php foreach($templates as $id => $val):
+        	<?php foreach($templates as $id => $template):
 			$name = $gfpdf->get_pdf_name($id, $form_id, $lead['id']);
-			$aid = (int) $id + 1;
+			$aid  = $gfpdf->get_aid($id, $form_id);
 			 ?>	
             <div class="detailed_pdf">						
 				<span><?php 
 					echo $name; 									
-					$url = home_url() .'/?gf_pdf=1&aid='. $aid .'&fid=' . $form_id . '&lid=' . $lead_id . '&template=' . $val['template']; 								
+					$url = home_url() .'/?gf_pdf=1&aid='. $aid .'&fid=' . $form_id . '&lid=' . $lead_id . '&template=' . $template['template']; 								
 				?></span> 
                 <a href="<?php echo $url; ?>" target="_blank" class="button"><?php _e('View', 'pdfextended'); ?></a> 
  				<a href="<?php echo $url.'&download=1'; ?>" target="_blank" class="button"><?php _e('Download', 'pdfextended'); ?></a>
@@ -155,24 +161,38 @@ class GFPDF_Core_Model
 		if(!GFCommon::current_user_can_any("gravityforms_view_entries"))
 		{
 			return;	
-		}		 
+		}			 
 		
-		$lead_id = $lead['id'];		
-		
+		$lead_id = $lead['id'];	
+
 		/*
 		 * Get the template name
 		 * Class: PDFGenerator
 		 * File: pdf-configuration-indexer.php
 		 */
-		$templates = $gfpdf->get_template($form_id, true);
+		$template = $gfpdf->get_template($form_id);				
+		
+		/*
+		 * Before setting up PDF options we will check if a configuration is found
+		 * If not, we will set up defaults defined in configuration.php
+		 */		
+		$index = self::check_configuration($form_id, $template);				
+		
+		/*
+		 * Now all the correct configuration and indexes are in place lets get our configuration nodes
+		 */
+		$templates = $gfpdf->get_form_configuration($form_id);
 
 		/* exit early if templates not found */
-		if($templates === false)
+		if($templates === false || sizeof($templates) === 0)
 		{
 			return;
 		}
 
-		if(is_array($templates))
+		/*
+		 * Show if multiple PDFs assigned to single form
+		 */
+		if(sizeof($templates) > 1)
 		{
 			?>
                 <span class="gf_form_toolbar_settings gf_form_action_has_submenu">
@@ -184,8 +204,8 @@ class GFPDF_Core_Model
 							/*
 							 * Replace MergeTags in filename
 							 */
-							 $name = $gfpdf->get_pdf_name($id, $form_id, $lead['id']);
-							 $aid = (int) $id + 1;
+								$name = $gfpdf->get_pdf_name($id, $form_id, $lead['id']);
+								$aid  = $gfpdf->get_aid($id, $form_id);
 							?>							
                             <li class="">
                             	<?php
@@ -204,7 +224,11 @@ class GFPDF_Core_Model
 		else
 		{			
 			
-			$url = home_url() . '/?gf_pdf=1&fid=' . $form_id .'&lid=' . $lead_id . '&template=' . $templates; 
+			/*
+			 * Get the first and only item in the array
+			 */
+			$template = array_shift($templates);
+			$url = home_url() . '/?gf_pdf=1&fid=' . $form_id .'&lid=' . $lead_id . '&template=' . $template['template']; 
 			
 			?>
 			| <a href="<?php echo $url; ?>" target="_blank"><?php _e('View PDF', 'pdfextended'); ?></a> 
@@ -486,6 +510,7 @@ class GFPDF_Core_Model
 		 {
 				$template = (isset($gfpdf->configuration[$index]['template'])) ? $gfpdf->configuration[$index]['template'] : '';					
 	
+
 				/* Get notifications user wants PDF attached to and check if the correct notifications hook is running */				
 				$notifications = self::get_form_notifications($form, $index);				
 														
@@ -560,7 +585,7 @@ class GFPDF_Core_Model
 	public static function get_form_notifications($form, $index)
 	{
 		global $gfpdf;
-			
+
 		/*
 		 * Check if notification field even exists
 		 */
@@ -579,6 +604,7 @@ class GFPDF_Core_Model
 		/*
 		 * If notifications is true the user wants to attach the PDF to all notifications
 		 */ 
+
 		if($gfpdf->configuration[$index]['notifications'] === true)
 		{					
 			$new_notifications = $notifications;
@@ -618,8 +644,7 @@ class GFPDF_Core_Model
 	{
 		global $gfpdf;
 
-		$config = $gfpdf->configuration[$index];
-		
+		$config = $gfpdf->configuration[$index];		
 		
 		$pdf_name    = (isset($config['filename']) && strlen($config['filename']) > 0) ? $gfpdf->get_pdf_name($index, $form_id, $lead_id) : PDF_Common::get_pdf_filename($form_id, $lead_id);	
 		$template    = (isset($template) && strlen($template) > 0) ? $template : $gfpdf->get_template($index);	 

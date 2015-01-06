@@ -1,9 +1,9 @@
 <?php
 
 /* 
- * Gravity Forms PDF Extended Configuration
+ * Gravity PDF Configuration
  * New from v3.0.0. No longer is theme functions.php code required.
- * Important documentation on the configuration found at http://gravityformspdfextended.com/documentation-v3-x-x/installation-and-configuration/
+ * Important documentation on the configuration found at https://developer.gravitypdf.com/documentation/getting-started-with-gravity-pdf-configuration/
  */
  
 /*
@@ -95,7 +95,7 @@
   * Custom Template
   * Don't want to use a custom template? Just pass the custom template name to the configuration.
   * template String. Default default-template.php. The name of your custom template that's placed in your active theme's PDF_EXTENDED_TEMPLATES folder. 
-  * For more information about creating custom templates please see http://gravityformspdfextended.com/documentation-v3-x-x/templates/
+  * For more information about creating custom templates please see https://developer.gravitypdf.com/documentation/custom-templates-introduction/
   */
   /*$gf_pdf_config[] = array(
   	'form_id' => 1, 
@@ -368,7 +368,7 @@
 
  /* --------------------------------------------------------------- 
   * CUSTOM PDF SETUP BELOW. 
-  * See http://gravityformspdfextended.com/documentation-v3-x-x/installation-and-configuration/#constants for more details
+  * See https://developer.gravitypdf.com/documentation/configuration-options-examples/#constants for more details
   */
  
  /*

@@ -2,6 +2,13 @@
 if(!class_exists('GFPDFEntryDetail'))
 {
 
+	/*
+	 * Include Gravity Forms Currency class (it not already included)
+	 */
+	if ( false === class_exists( 'RGCurrency' ) ) {
+		require_once( GFCommon::get_base_path() . '/currency.php' );
+	}
+	
 	add_filter('gfpdf_field_content', array('GFPDFEntryDetail', 'encode_tags'), 10, 2); /* encode shortcodes in user's response so they aren't converted later by do_shortcode */
 	class GFPDFEntryDetail {
 
@@ -9,7 +16,7 @@ if(!class_exists('GFPDFEntryDetail'))
 		static $fields;
 
 		/* NEED THIS FUNCTION - BLD */
-		public static function lead_detail_grid($form, $lead, $allow_display_empty_fields=false, $show_html=false, $show_page_name=false, $return=false, $show_section_breaks=false){
+		public static function lead_detail_grid($form, $lead, $allow_display_empty_fields=false, $show_html=false, $show_page_name=false, $return=false, $show_section_breaks=false) {
 			$form_id = $form['id'];
 			$results = array();
 
@@ -41,6 +48,14 @@ if(!class_exists('GFPDFEntryDetail'))
 						if(isset($field['cssClass']) && strpos($field['cssClass'], 'exclude') !== false)
 						{
 							/* skip this field */
+							continue;
+						}
+
+						/*
+						 * Skip over hidden fields 
+						 */
+						if(GFFormsModel::is_field_hidden( $form, $field, array(), $lead ))
+						{
 							continue;
 						}
 
@@ -554,7 +569,7 @@ if(!class_exists('GFPDFEntryDetail'))
 				$likert['col'][$col['value']] = $col['text'];
 			}
 			
-			if(sizeof($field['inputs']) > 0)
+			if(is_array($field['inputs']) && sizeof($field['inputs']) > 0)
 			{
 				/* do our multi-row likert */
 				foreach($field['inputs'] as $row)
@@ -754,18 +769,13 @@ if(!class_exists('GFPDFEntryDetail'))
 	        }
 
 	        $form_array['survey']['global'] = self::get_addon_global_data($form, array());
-
-
-
-			$results = self::get_addon_global_data($form, array());
-
 			$form_fields = self::$fields;
 
 			/*
 			 * Convert the array keys into their text counterparts
 			 * Loop through the global survey data
 			 */
-			foreach($results['field_data'] as $id => &$choices)
+			foreach($form_array['survey']['global']['field_data'] as $id => &$choices) 
 			{
 				/* get the $field */
 				$field = $form_fields[$id];
@@ -794,11 +804,7 @@ if(!class_exists('GFPDFEntryDetail'))
 				{
 					$choices = self::replace_key($choices, $choice['value'], $choice['text']);
 				}
-			}
-			
-			$form_array['survey']['global'] = $results;
-
-
+			}			
 
 	        return $form_array;
 
@@ -806,7 +812,7 @@ if(!class_exists('GFPDFEntryDetail'))
 
 		private static function replace_key($array, $key, $text)
 		{
-			if(isset($array[$key]))
+			if($key != $text && isset($array[$key]))
 			{
 				/* replace the array key with the actual field name */
 				$array[$text] = $array[$key];
@@ -832,9 +838,9 @@ if(!class_exists('GFPDFEntryDetail'))
 
 	        if ($count_quiz_fields > 0)
 	        {
-				$form_array['quiz']['config']['grading']     = $form['gravityformsquiz']['grading'];
-				$form_array['quiz']['config']['passPercent'] = $form['gravityformsquiz']['passPercent'];
-				$form_array['quiz']['config']['grades']      = $form['gravityformsquiz']['grades'];
+				$form_array['quiz']['config']['grading']     = (isset($form['gravityformsquiz']['grading'])) ? $form['gravityformsquiz']['grading'] : '';
+				$form_array['quiz']['config']['passPercent'] = (isset($form['gravityformsquiz']['passPercent'])) ? $form['gravityformsquiz']['passPercent'] : '';
+				$form_array['quiz']['config']['grades']      = (isset($form['gravityformsquiz']['grades'])) ? $form['gravityformsquiz']['grades'] : '';
 				
 				$form_array['quiz']['results']['score']      = rgar($lead, 'gquiz_score');
 				$form_array['quiz']['results']['percent']    = rgar($lead, 'gquiz_percent');
@@ -1104,7 +1110,7 @@ if(!class_exists('GFPDFEntryDetail'))
 
 		private static function get_product_array($form, $lead, $has_product_fields, $form_array)
 		{
-
+			$currency_format = GFCommon::is_currency_decimal_dot() ? 'decimal_dot' : 'decimal_comma';
 
 			if($has_product_fields) {
 				$products = GFCommon::get_product_fields($form, $lead, true);
@@ -1139,26 +1145,44 @@ if(!class_exists('GFPDFEntryDetail'))
 						/*
 						 * Check if we should include options
 						 */
-						$options = isset($product['options']) ? $product['options'] : '';
+						$options = isset($product['options']) ? $product['options'] : array();
+
+						/*
+						 * Add formated price for each product option 
+						 */
+						foreach($options as &$o)
+						{
+							if(is_numeric($o['price']))
+							{
+								$o['price_formatted'] = GFCommon::format_number($o['price'], 'currency');
+							}
+						}
 
 						/*
 						 * Store product in $form_array array
 						 */
 						$form_array['products'][$id] = array(
-								'name' => esc_html($product['name']),
-								'price' => esc_html($product['price']),
-								'options' => $options,
-								'quantity' => $product['quantity'],
-								'subtotal' => $subtotal);
+								'name'               => esc_html($product['name']),
+								'price'              => esc_html($product['price']),
+								'price_unformatted'  => GFCommon::clean_number($product['price'], $currency_format),
+								'options'            => $options,
+								'quantity'           => $product['quantity'],
+								'subtotal'           => $subtotal,
+								'subtotal_formatted' => GFCommon::format_number($subtotal, 'currency'));
 					}
 
 					/* Increment total */
 					$total += floatval($products['shipping']['price']);
+					$subtotal = $total - floatval($products['shipping']['price']);
 
 					/* add totals to form data */
 					$form_array['products_totals'] = array(
-							'shipping' => $products['shipping']['price'],
-							'total'	   => $total
+							'subtotal'           => $subtotal,							
+							'shipping'           => $products['shipping']['price'],							
+							'total'              => $total,
+							'shipping_formatted' => GFCommon::format_number($products['shipping']['price'], 'currency'), 
+							'subtotal_formatted' => GFCommon::format_number($subtotal, 'currency'),
+							'total_formatted'    => GFCommon::format_number($total, 'currency'),
 					);
 				}
 			}
@@ -1176,10 +1200,11 @@ if(!class_exists('GFPDFEntryDetail'))
 					if(is_array($value)){
 						$prefix = trim(rgget($field['id'] . '.2', $value));
 						$first  = trim(rgget($field['id'] . '.3', $value));
+						$middle = trim(rgget($field['id'] . '.4', $value));
 						$last   = trim(rgget($field['id'] . '.6', $value));
 						$suffix = trim(rgget($field['id'] . '.8', $value));
 
-						return array('prefix' => $prefix, 'first' => $first, 'last' => $last, 'suffix' => $suffix);
+						return array('prefix' => $prefix, 'first' => $first, 'middle' => $middle, 'last' => $last, 'suffix' => $suffix);
 					}
 					else{
 						return $value;
@@ -1353,7 +1378,7 @@ if(!class_exists('GFPDFEntryDetail'))
 				break;
 
 				case 'number' :
-					return self::format_number($value, rgar($field, 'numberFormat'));
+					return GFCommon::format_number($value, rgar($field, 'numberFormat'));
 				break;
 
 				case 'singleshipping' :
@@ -1369,7 +1394,7 @@ if(!class_exists('GFPDFEntryDetail'))
 
 					$has_columns = is_array($value[0]);
 
-					if(!$has_columns){
+					if(!$has_columns){						
 						$items = array();
 						foreach($value as $key => $item){
 							if(!empty($item)){
@@ -1406,8 +1431,15 @@ if(!class_exists('GFPDFEntryDetail'))
 						else if($media == 'email'){
 							return $items;
 						}
-						else{
-							return $items;
+						else {
+							$list = '<table autosize="1" class="gfield_list" style="border-top: 1px solid #DFDFDF; border-left: 1px solid #DFDFDF; border-spacing: 0; padding: 0; margin: 2px 0 6px; width: 100%">';
+							foreach($items as $i)
+							{
+								$list .= '<tr><td>' . $i .'</td></tr>';
+							}
+							$list .= '</table>';
+
+							return $list;
 						}
 					}
 					else if(is_array($value)){
@@ -1436,6 +1468,7 @@ if(!class_exists('GFPDFEntryDetail'))
 							break;
 
 							default :
+
 								if($media == 'email'){
 									$list = '<table autosize="1" class="gfield_list" style="border-top: 1px solid #DFDFDF; border-left: 1px solid #DFDFDF; border-spacing: 0; padding: 0; margin: 2px 0 6px; width: 100%"><thead><tr>';
 
@@ -1507,11 +1540,13 @@ if(!class_exists('GFPDFEntryDetail'))
 						if(is_array($value)){
 							$prefix = trim(rgget($field['id'] . '.2', $value));
 							$first  = trim(rgget($field['id'] . '.3', $value));
+							$middle = trim(rgget($field['id'] . '.4', $value));
 							$last   = trim(rgget($field['id'] . '.6', $value));
 							$suffix = trim(rgget($field['id'] . '.8', $value));
 
 							$name   = $prefix;
 							$name   .= !empty($name) && !empty($first) ? " $first" : $first;
+							$name   .= !empty($name) && !empty($middle) ? " $middle" : $middle;
 							$name   .= !empty($name) && !empty($last) ? " $last" : $last;
 							$name   .= !empty($name) && !empty($suffix) ? " $suffix" : $suffix;
 
@@ -1717,7 +1752,7 @@ if(!class_exists('GFPDFEntryDetail'))
 					break;
 
 					case 'number' :
-						return self::format_number($value, rgar($field, 'numberFormat'));
+						return GFCommon::format_number($value, rgar($field, 'numberFormat'));
 					break;
 
 					case 'singleshipping' :
@@ -1856,50 +1891,6 @@ if(!class_exists('GFPDFEntryDetail'))
 				}
 			}
 
-		/**
-		 * Format Gravity Form's three number types
-		 * @param  float $number        The number field value to process
-		 * @param  string $number_format The number type a user selects in the form editor
-		 * @return float                Correctly formated number
-		 */
-	    private static function format_number($number, $number_format){
-	        if(!is_numeric($number))
-	            return $number;
-
-	        //replacing commas with dots and dots with commas
-	        switch($number_format)
-	        {
-	        	case 'decimal_comma':
-	        		$number = self::reformat_number(number_format($number, '2', ',', '.'));
-	        	break;
-
-	        	case 'decimal_dot':
-	        		$number = self::reformat_number(number_format($number, '2'));
-
-	        	break;
-
-	        	case 'currency':
-	        		/* get the GF currency and convert number to money */
-	        		$number = GFCommon::to_money($number);
-	        	break;
-	        }
-
-	        return $number;
-	    }
-
-	    /**
-	     * Remove the .00 or ,00 decimal from the end of the number format
-	     * @param  float $number number to manipulate
-	     * @return float         processed number
-	     */
-	    private static function reformat_number($number)
-	    {
-	    	if(substr($number, -2) == '00')
-	    	{
-	    		return substr($number, 0, -3);
-	    	}
-	    	return $number;
-	    }
 
 	    public static function encode_tags($content, $field)
 	    {

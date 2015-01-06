@@ -22,8 +22,8 @@
 		$temp_timezone = date_default_timezone_get();
 		date_default_timezone_set('Australia/Sydney');
 		?>
-  		<div class="notice"><p>
-			<?php _e('Gravity Forms PDF Extended\'s support hours are from 9:00am-5:00pm Monday to Friday, Sydney Australia time.', 'pdfextended'); ?> <br />
+  		<div class="pdf-notice"><p>
+			<?php _e('Gravity PDF\'s support hours are from 9:00am-5:00pm Monday to Friday, Sydney Australia time.', 'pdfextended'); ?> <br />
             <strong>
 				<?php printf(
 							__('The current time in Sydney Australia is %s.', 'pdfextended'), 

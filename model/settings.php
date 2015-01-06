@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Plugin: Gravity Forms PDF Extended
+ * Plugin: Gravity PDF
  * File: mode/settings.php
  * 
  * The model that does all the processing and interacts with our controller and view
@@ -253,24 +253,15 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 			  /*
 			   * Default our values
 			   */
-			   $gfpdfe_data->can_write_plugin_dir = false;	
-			   $gfpdfe_data->can_write_theme_dir = false;		  
+			   $gfpdfe_data->can_write_upload_dir = false;	 
 			   
 			  /*
-			   * Test the plugin folder so we can unzip mPDF
+			   * Test the upload folder where our templates are stored
 			   */
-			  if($this->test_write_permissions(PDF_PLUGIN_DIR) === true)
+			  if($this->test_write_permissions($gfpdfe_data->upload_dir) === true)
 			  {
-				  $gfpdfe_data->can_write_plugin_dir = true;
-			  }	
-			  		   
-			  /*
-			   * Check if we can write in the user's active theme directory
-			   */			  			   
-			   if($this->test_write_permissions(get_stylesheet_directory() . '/') === true)
-			   {
-				   $gfpdfe_data->can_write_theme_dir = true;
-			   }
+				  $gfpdfe_data->can_write_upload_dir = true;
+			  }				  		   
 		  }
 		  else
 		  {
@@ -284,12 +275,12 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 			  /*
 			   * The PDF_EXTENDED_TEMPLATE folder is created so lets check our permissions
 			   */
-			  if($this->test_write_permissions(PDF_SAVE_LOCATION) === true)
+			  if($this->test_write_permissions($gfpdfe_data->template_save_location) === true)
 			  {
   		  			$gfpdfe_data->can_write_output_dir = true;	  
 			  }
 			  
-			  if($this->test_write_permissions(PDF_FONT_LOCATION) === true)
+			  if($this->test_write_permissions($gfpdfe_data->template_font_location) === true)
 			  {
   		  			$gfpdfe_data->can_write_font_dir = true;	  
 			  }		
@@ -354,13 +345,14 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 		if(isset($gfpdfe_data->configuration_file))
 		{
 			return $gfpdfe_data->configuration_file;	
-		}				
+		}			
+	
 			/*
 			 * Include the current configuration, if available
 			 */
-			 if(file_exists(PDF_TEMPLATE_LOCATION . 'configuration.php'))
+			 if(file_exists($gfpdfe_data->template_site_location . 'configuration.php'))
 			 {
-				 return esc_html(file_get_contents(PDF_TEMPLATE_LOCATION . 'configuration.php'));   
+				 return esc_html(file_get_contents($gfpdfe_data->template_site_location . '/configuration.php'));   
 			 }
 			 else
 			 {
@@ -368,20 +360,23 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 			 }		
 	}
 	
-	private static function get_system_status_html()
+	private static function get_system_status_html($strip_html = false)
 	{
 		global $gfpdfe_data;
-		
-		if(isset($gfpdfe_data->system_status))
-		{
-			return $gfpdfe_data->system_status;	
-		}
 		
 		 ob_start();
 		 include PDF_PLUGIN_DIR . 'view/templates/settings/system-status.php';                         
 		 $content = ob_get_contents();
 		 ob_end_clean();
-		 return esc_html($content);			
+
+		 if($strip_html)
+		 {
+			return wp_strip_all_tags($content, true);			
+		 }
+		 else
+		 {
+		 	return esc_html($content);			
+		 }
 	}
 	
 	private static function get_active_plugins()
@@ -459,7 +454,7 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 		  }
 		  
 		  /*
-		   * Do our POST request to the Gravity Forms PDF Extended API
+		   * Do our POST request to the Gravity PDF API
 		   */
 		   self::send_support_request($email, $countType, $comments);
 		 
@@ -471,43 +466,23 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 	public static function send_support_request($email, $countType, $comments)
 	{
 		global $gfpdfe_data;
-		/*
-		 * Include our API class
-		 */			 
-		 $api = new gfpdfe_API();
-		 
+	 
 		 /*
 		  * Build our support request array
 		  */
 		  
 		  $active_plugins   = self::get_active_plugins();
-		  $system_status 	= self::get_system_status_html();
-		  $configuration	= self::get_configuration_file();
+		  $system_status 	= self::get_system_status_html(true);
+		  $configuration	= self::get_configuration_file() ;
 		  $website			= site_url('/');
-		  $comments 		= stripslashes($comments);
-		  
-		  $body = array(
-		  	'support_type' 			=> $countType,
-			'email'					=> $email,
-			'website' 				=> $website,
-			'active_plugins' 		=> $active_plugins,
-			'system_status'			=> $system_status,
-			'configuration' 		=> $configuration,			
-			'comments' 				=> $comments,
-		  );  
+		  $comments 		= stripslashes($comments);		
 		 		 
-		 if($api->support_request($body) === false)
-		 {
-			/*
-			 * API could not send
-			 * Draft a plain text email and send to support
-			 */ 
 			 $configuration = htmlspecialchars_decode($configuration, ENT_QUOTES);
 			 
-			 $subject = 'Gravity Forms PDF Extended Support Request';
-			 $to	  = 'support@gravityformspdfextended.com';
+			 $subject = $countType . ': Automated Ticket for "'. get_bloginfo('name') . '"';
+			 $to	  = 'support@gravitypdf.com';
 			 $from	  = $email;			 
-			 $message = "Support Type: $countType\r\nWebsite: $website\r\n\r\nComments\r\n\r\n$comments\r\n\r\n\r\nActive Plugins\r\n\r\n$active_plugins\r\n\r\n\r\nConfiguration\r\n\r\n$configuration";
+			 $message = "Support Type: $countType\r\n\r\nWebsite: $website\r\n\r\n----------------\r\n\r\n$comments\r\n\r\n----------------\r\n\r\n$system_status\r\n\r\n\r\nActive Plugins\r\n\r\n$active_plugins\r\n\r\n\r\n**Configuration**\r\n\r\n$configuration";
 			 
 			 $headers[] = 'From: '. $email;
 
@@ -524,7 +499,6 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 				 print json_encode(array('msg' => __('Support request received. We will responed in 24 to 48 hours.', 'pdfextended')));
 				 exit;					 
 			 }
-		 }
 		 
 		 /*
 		  * Create our 
