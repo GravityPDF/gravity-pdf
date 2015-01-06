@@ -67,7 +67,7 @@ $form = RGFormsModel::get_form_meta($form_id);
 	            <p class="whom_concern_intro">Dear User,</p>
 
 				<p class="body_text">Gravity PDF allows you to directly access Gravity Form field data so you can create custom PDFs like this one.
-				If you haven't reviewed our five part installation and configuration guide yet, we recommend <a target="_blank" href="https://developergravitypdf.com/documentation/getting-started-with-gravity-pdf-configuration/">taking a look</a>.
+				If you haven't reviewed our five part installation and configuration guide yet, we recommend <a target="_blank" href="https://developer.gravitypdf.com/documentation/getting-started-with-gravity-pdf-configuration/">taking a look</a>.
 				There's also a <a target="_blank" href="https://developer.gravitypdf.com/documentation/configuration-options-examples/">large number of configuration options</a> that can be applied to any PDF.</p>
 				</p>
 
