@@ -125,18 +125,18 @@ margin-top: 20px;
 }
 
 
-#pdfextended-settings div.notice {
+#pdfextended-settings div.notice, .pdf-notice {
     margin: 5px 15px 2px;
     padding: 0 0.6em;
 }
 
-#pdfextended-settings div.notice {
+#pdfextended-settings div.notice, .pdf-notice {
     background-color: #FFFFFF;
     border-left: 4px solid #7AD03A;
     box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);
 }
 
-.wrap #pdfextended-settings div.notice {
+.wrap #pdfextended-settings div.notice, .pdf-notice {
     margin: 5px 0 15px;
 	padding: 1px 12px;
 }
@@ -145,27 +145,6 @@ div.notice p {
     margin: 0.5em 0;
     padding: 2px;
 }
-
-
-/*
- * Icon Styles 
- */
-/*[class^="icon-"]:before, [class*=" icon-"]:before {
-  display: inline-block;
-  text-decoration: inherit;
-  -webkit-font-smoothing: antialiased;
-}
-
-[class^="icon-"], [class*=" icon-"] {
-  display: inline-block;
-  font-family: FontAwesome;
-  font-style: normal;
-  font-weight: normal;
-  line-height: 1;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}*/
-
 
 #pdf-system-status .fa-check-circle, #pdf-system-status .fa-exclamation-triangle, .fa-times-circle {
  font-size: 17px; 

@@ -371,7 +371,7 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 
 		 if($strip_html)
 		 {
-			return wp_strip_all_tags($content);			
+			return wp_strip_all_tags($content, true);			
 		 }
 		 else
 		 {
@@ -480,9 +480,9 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 			 $configuration = htmlspecialchars_decode($configuration, ENT_QUOTES);
 			 
 			 $subject = $countType . ': Automated Ticket for "'. get_bloginfo('name') . '"';
-			 $to	  = 'support-ticket@gravitypdf.com';
+			 $to	  = 'support@gravitypdf.com';
 			 $from	  = $email;			 
-			 $message = "**Support Type**: $countType\r\n\r\n**Website**: $website\r\n\r\n$comments\r\n\r\n$system_status\r\n\r\n\r\n**Active Plugins**\r\n\r\n$active_plugins\r\n\r\n\r\n**Configuration**\r\n\r\n$configuration";
+			 $message = "Support Type: $countType\r\n\r\nWebsite: $website\r\n\r\n----------------\r\n\r\n$comments\r\n\r\n----------------\r\n\r\n$system_status\r\n\r\n\r\nActive Plugins\r\n\r\n$active_plugins\r\n\r\n\r\n**Configuration**\r\n\r\n$configuration";
 			 
 			 $headers[] = 'From: '. $email;
 

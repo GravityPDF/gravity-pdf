@@ -4,7 +4,7 @@
 Plugin Name: Gravity PDF
 Plugin URI: https://gravitypdf.com
 Description: Gravity PDF allows you to save/view/download a PDF from the front- and back-end, and automate PDF creation on form submission. Our Business Plus package also allows you to overlay field onto an existing PDF.
-Version: 3.6.0Beta2
+Version: 3.6.0
 Author: Blue Liquid Designs
 Author URI: http://www.blueliquiddesigns.com.au
 
