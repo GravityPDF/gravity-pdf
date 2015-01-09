@@ -15,12 +15,38 @@ if(!class_exists('GFPDFEntryDetail'))
 		/* holds the form fields, stored by field ID */
 		static $fields;
 
-		/* NEED THIS FUNCTION - BLD */
-		public static function lead_detail_grid($form, $lead, $allow_display_empty_fields=false, $show_html=false, $show_page_name=false, $return=false, $show_section_breaks=false) {
+		/* depreciated function which we will replace with a better config passing method */
+		public static function lead_detail_grid($form, $lead, $allow_display_empty_fields=false, $show_html=false, $show_page_name=false, $return=false) {
+			
+			$config = array(
+				'empty_field' => $allow_display_empty_fields,
+				'html_field'  => $show_html, 
+				'page_names'  => $show_page_name, 
+				'return'      => $return,
+			);
+
+			return self::do_lead_detail_grid($form, $lead, $config);
+		}
+
+		
+		public static function do_lead_detail_grid($form, $lead, $config) {
 			$form_id = $form['id'];
 			$results = array();
 
-			if($return === true)
+			/*
+			 * Set up our defaults and merge down the user config
+			 */
+			$defaults = array(
+				'empty_field'     => false,
+				'html_field'      => false, 
+				'page_names'      => false, 
+				'return'          => false,
+				'section_content' => false,
+			);
+
+			$config = array_merge($defaults, $config);
+
+			if($config['return'] === true)
 			{
 				$results['title'] = '<h2 id="details" class="default">'. $form['title'] .'</h2>';
 			}
@@ -62,14 +88,14 @@ if(!class_exists('GFPDFEntryDetail'))
 						/*
 						 * Check if we are to show the page names
 						 */
-						 if($show_page_name === true)
+						 if($config['page_names'] === true)
 						 {
 							if((int) $field['pageNumber'] !== $page_number)
 							{
 								/*
 								 * Display the page number
 								 */
-								 if($return === true)
+								 if($config['return'] === true)
 								 {
 									$results['field'][] = '<h2 id="field-'. $field['id'].'" class="default entry-view-page-break">'. $form['pagination']['pages'][$page_number] .'</h2>';
 								 }
@@ -91,17 +117,27 @@ if(!class_exists('GFPDFEntryDetail'))
 						switch(RGFormsModel::get_input_type($field)){
 						   case 'section' :
 
-								if(!GFCommon::is_section_empty($field, $form, $lead) || $allow_display_empty_fields){
+								if(!GFCommon::is_section_empty($field, $form, $lead) || $config['empty_field']){
 									$count++;
 
-									if($return === true)
+									if($config['return'] === true)
 									{
 										$results['field'][] = '<h2 id="field-'.$field['id'].'" class="default entry-view-section-break">'. esc_html(GFCommon::get_label($field)) .'</h2>';
+
+										if($config['section_content'])
+										{
+											$results['field'][] = '<div class="default entry-view-section-break entry-view-section-break-content">' . $field['description'] . '</div>';
+										}
+										
 									}
 									else
 									{
 									?>
 										<h2 id="field-<?php echo $field['id']; ?>" class="default entry-view-section-break"><?php echo esc_html(GFCommon::get_label($field))?></h2>
+
+										<?php if($config['section_content']): ?>
+											<div class="default entry-view-section-break entry-view-section-break-content"><?php echo $field['description']; ?></div>
+										<?php endif; ?>
 									<?php
 									}
 								}
@@ -113,7 +149,7 @@ if(!class_exists('GFPDFEntryDetail'))
 								//ignore captcha, html, password, page field
 							break;
 							case 'html':
-								if($show_html == true)
+								if($config['html_field'] == true)
 								{
 
 									$count++;
@@ -127,7 +163,7 @@ if(!class_exists('GFPDFEntryDetail'))
 									$content = '<div id="field-'. $field['id'] .'" class="entry-view-html-value' . $last_row . $even . '"><div class="value">' . $display_value . '</div></div>';
 									$content = apply_filters('gfpdf_field_content', $content, $field, $value, $lead['id'], $form['id']);
 
-									if($return === true)
+									if($config['return'] === true)
 									{
 										$results['field'][] = $content;
 									}
@@ -156,7 +192,7 @@ if(!class_exists('GFPDFEntryDetail'))
 								{
 									 $content = '<div id="field-'. $field['id'] .'" class="entry-view-field-value' . $last_row . $even . '"><div class="strong">' .  esc_html(GFCommon::get_label($field)) . '</div> <div class="value">' . $display_value . '</div></div>	';
 
-									if($return === true)
+									if($config['return'] === true)
 									{
 										$results['field'][] = $content;
 									}
@@ -165,9 +201,9 @@ if(!class_exists('GFPDFEntryDetail'))
 										echo $content;
 									}
 								}
-								elseif($allow_display_empty_fields)
+								elseif($config['empty_field'])
 								{
-									if($return === true)
+									if($config['return'] === true)
 									{
 										$results['field'][] = '<div id="field-'. $field['id'] .'" class="entry-view-field-value' . $last_row . $even . '"><div class="strong">' .  esc_html(GFCommon::get_label($field)) . '</div></div>';
 									}
@@ -193,7 +229,7 @@ if(!class_exists('GFPDFEntryDetail'))
 
 								$display_value = apply_filters('gform_entry_field_value', $display_value, $field, $lead, $form);
 
-								if( !empty($display_value) || $display_value === '0' || $allow_display_empty_fields){
+								if( !empty($display_value) || $display_value === '0' || $config['empty_field']){
 									$count++;
 									$is_last = $count >= $field_count && !$has_product_fields ? true : false;
 									$last_row = $is_last ? ' lastrow' : '';
@@ -205,7 +241,7 @@ if(!class_exists('GFPDFEntryDetail'))
 
 									$content = apply_filters('gfpdf_field_content', $content, $field, $value, $lead['id'], $form['id']);
 
-									if($return === true)
+									if($config['return'] === true)
 									{
 										$results['field'][] = $content;
 									}
@@ -221,7 +257,7 @@ if(!class_exists('GFPDFEntryDetail'))
 					}
 					$products = array();
 					if($has_product_fields){
-						if($return === true)
+						if($config['return'] === true)
 						{
 							ob_start();
 							self::product_table($form, $lead);
@@ -235,7 +271,7 @@ if(!class_exists('GFPDFEntryDetail'))
 
 					}
 
-					if($return === true)
+					if($config['return'] === true)
 					{
 						return $results;
 					}
@@ -366,7 +402,7 @@ if(!class_exists('GFPDFEntryDetail'))
 
 
 		/* returns the form values as an array instead of pre-formated html */
-		public static function lead_detail_grid_array($form, $lead, $allow_display_empty_fields=false){
+		public static function lead_detail_grid_array($form, $lead){
 
 			$form_id = $form['id'];
 			$form_array = self::set_form_array_common($form, $lead, $form_id);

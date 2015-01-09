@@ -201,14 +201,16 @@
 		$config = $this->pull_config_data($form_id);
 
 		/* get the default template values and return in array */
-		$show_html_fields  = (isset($config['default-show-html']) 		&& $config['default-show-html'] == 1) 			? true : false;
-		$show_empty_fields = (isset($config['default-show-empty']) 		&& $config['default-show-empty']  == 1) 		? true : false; 
-		$show_page_names   = (isset($config['default-show-page-names']) && $config['default-show-page-names']  == 1) 	? true : false;  		
+		$show_html_fields     = (isset($config['default-show-html']) 			&& $config['default-show-html'] == 1) 				? true : false;
+		$show_empty_fields    = (isset($config['default-show-empty']) 			&& $config['default-show-empty']  == 1) 			? true : false; 
+		$show_page_names      = (isset($config['default-show-page-names']) 		&& $config['default-show-page-names']  == 1) 		? true : false;  		
+		$show_section_content = (isset($config['default-show-section-content']) && $config['default-show-section-content'] == 1) 	? true : false;
 
 		return array(
-			'html_field'  => $show_html_fields,
-			'empty_field' => $show_empty_fields,
-			'page_names'  => $show_page_names,
+			'html_field'      => $show_html_fields,
+			'empty_field'     => $show_empty_fields,
+			'page_names'      => $show_page_names,
+			'section_content' => $show_section_content,
 		);
 	}	
 
