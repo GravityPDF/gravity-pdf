@@ -45,7 +45,7 @@ class GFPDF_InstallUpdater
 			 * Initialise all multisites if a super admin is logged in
 			 */
 			if(is_multisite() && is_super_admin())
-			{
+			{				
 				$results = GFPDF_InstallUpdater::run_multisite_deployment(array('GFPDF_InstallUpdater', 'do_deploy'));
 
 				if($results === true)
@@ -601,11 +601,9 @@ class GFPDF_InstallUpdater
 			 /*
 			  * Clean up the DB 
 			  */
-			 delete_option('gfpdfe_automated_install');
-			 
-			 return true;			
+			 delete_option('gfpdfe_automated_install');			 			 
 		}		
-		return false; 
+		return true;			
 	}
 	
 	/*
