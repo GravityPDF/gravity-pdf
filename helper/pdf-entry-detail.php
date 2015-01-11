@@ -117,7 +117,7 @@ if(!class_exists('GFPDFEntryDetail'))
 						switch(RGFormsModel::get_input_type($field)){
 						   case 'section' :
 
-								if(!GFCommon::is_section_empty($field, $form, $lead) || $config['empty_field']){
+								if(!GFCommon::is_section_empty($field, $form, $lead) || $config['empty_field'] || $config['section_content']){
 									$count++;
 
 									if($config['return'] === true)
