@@ -228,6 +228,7 @@
 		}
 
 		$index = $this->index[$form_id];
+
 		/* 
 		 * Because we now allow multiple PDF templates per form we need a way to get the correct PDF settings
 		 * To do this we use the $_GET variable 'aid'

@@ -5,50 +5,75 @@ class Test_PDFConfiguration extends WP_UnitTestCase {
 	public function setUp() {
 		parent::setUp();		
 
-		/* Load our plugin functions */
-		GFPDF_Core::fully_loaded_admin();	
-
-		/* remove the configuration file */		
-		global $gfpdfe_data;
-
-		if(file_exists($gfpdfe_data->template_site_location . 'configuration.php'))			
-			unlink($gfpdfe_data->template_site_location . 'configuration.php');
+		GFPDF_InstallUpdater::check_filesystem_api();
+		GFPDF_InstallUpdater::maybe_deploy();	
 
 		global $gfpdf;
 		$gfpdf = new GFPDF_Core();  
 
 		$gfpdf->configuration = array(
-			array( 
-				'form_id' => 1, 
-				'template' => 'example-template.php',
-				'filename' => 'testform.pdf',
-			),
+				array( 
+				'form_id'                      => 1, 
+				'template'                     => 'example-template.php',
+				'filename'                     => 'testform.pdf',
+				),
+				
+				array( 
+				'form_id'                      => 1, 
+				'template'                     => 'example-template-2.php',
+				'filename'                     => 'seconddoc.pdf',
+				),			
+				
+				array( 
+				'form_id'                      => 2, 
+				'template'                     => 'default-template.php',
+				'filename'					   => 'third-pdf.pdf',
+				),	
 
-			array( 
-				'form_id' => 1, 
-				'template' => 'example-template-2.php',
-				'filename' => 'seconddoc.pdf',
-			),			
+				array( 
+				'form_id'                      => 2, 
+				'template'                     => 'default-template.php',
+				'filename'					   => 'fourth-pdf.pdf',
+				),			
 
-			array( 
-				'form_id' => 2, 
-				'template' => 'default-template.php',
-			),			
+				array( 
+				'form_id'                      => 2, 
+				'template'                     => 'default-template.php',
+				'filename'					   => 'fifth-pdf.pdf',
+				),								
+				
+				array( 
+				'form_id'                      => 4, 
+				'template'                     => 'my-custom-template.php',
+				'security'                     => true, 
+				'pdf_master_password'          => 'admin password', 				
+				),				
+				
+				array( 
+				'form_id'                      => 5, 
+				'template'                     => 'default-template-no-style.php',
+				'default-show-html'            => true,
+				'default-show-empty'           => false,
+				'default-show-page-names'      => true,			
+				),		
+				
+				array( 
+				'form_id'                      => 6, 
+				'template'                     => 'default-template-no-style.php',
+				'default-show-html'            => true,
+				'default-show-empty'           => true,
+				'default-show-page-names'      => true,			
+				'default-show-section-content' => true,
+				),		
 
-			array( 
-				'form_id' => 4, 
-				'template' => 'my-custom-template.php',
-			  	'security' => true, 
-			  	'pdf_master_password' => 'admin password', 				
-			),				
-
-			array( 
-				'form_id' => 5, 
-				'template' => 'default-template-no-style.php',
-			  	'default-show-html' => true,
-			  	'default-show-empty' => false,
-			  	'default-show-page-names' => true,			
-			),							
+				array( 
+				'form_id'                      => array(7,8,9,10),
+				'template'                     => 'default-template-no-style.php',
+				'default-show-html'            => true,
+				'default-show-empty'           => true,
+				'default-show-page-names'      => true,			
+				'default-show-section-content' => true,
+				),											
 		);
 
 		/* reenable the configuration */
@@ -98,25 +123,48 @@ class Test_PDFConfiguration extends WP_UnitTestCase {
 		$form3_config_nodes = $gfpdf->get_form_configuration(3);
 		$form4_config_nodes = $gfpdf->get_form_configuration(4);
 		$form5_config_nodes = $gfpdf->get_form_configuration(5);
+		$form6_config_nodes = $gfpdf->get_form_configuration(6);
 
 		/* Check the config array sizes are correct */
 		$this->assertEquals(sizeof($form1_config_nodes), 2);
-		$this->assertEquals(sizeof($form2_config_nodes), 1);
+		$this->assertEquals(sizeof($form2_config_nodes), 3);
 		$this->assertEquals($form3_config_nodes, false);
 
 		/* Check that our configuration data matches */
-		$this->assertEquals($form1_config_nodes[0]['template'], 'example-template.php');
-		$this->assertEquals($form1_config_nodes[0]['filename'], 'testform.pdf');
-		$this->assertEquals($form1_config_nodes[1]['filename'], 'seconddoc.pdf');
 
-		$this->assertEquals($form2_config_nodes[0]['template'], 'default-template.php');
+		/*
+		 * Review form 1 
+		 */
+		$this->assertEquals(current($form1_config_nodes)['template'], 'example-template.php');
+		$this->assertEquals(current($form1_config_nodes)['filename'], 'testform.pdf');
+		next($form1_config_nodes);
+		$this->assertEquals(current($form1_config_nodes)['filename'], 'seconddoc.pdf');
 
-		$this->assertTrue($form4_config_nodes[0]['security']);
-		$this->assertEquals($form4_config_nodes[0]['pdf_master_password'], 'admin password');
+		/*
+		 * Review form 2
+		 */
+		$this->assertEquals(current($form2_config_nodes)['template'], 'default-template.php');
 
-		$this->assertTrue($form5_config_nodes[0]['default-show-html']);
-		$this->assertFalse($form5_config_nodes[0]['default-show-empty']);
-		$this->assertTrue($form5_config_nodes[0]['default-show-page-names']);	
+		/*
+		 * Review form 4
+		 */
+		$this->assertTrue(current($form4_config_nodes)['security']);
+		$this->assertEquals(current($form4_config_nodes)['pdf_master_password'], 'admin password');
+
+		/*
+		 * Review form 5
+		 */
+		$this->assertTrue(current($form5_config_nodes)['default-show-html']);
+		$this->assertFalse(current($form5_config_nodes)['default-show-empty']);
+		$this->assertTrue(current($form5_config_nodes)['default-show-page-names']);	
+
+		/*
+		 * Review form 6
+		 */
+		$this->assertTrue(current($form6_config_nodes)['default-show-html']);	
+		$this->assertTrue(current($form6_config_nodes)['default-show-empty']);	
+		$this->assertTrue(current($form6_config_nodes)['default-show-page-names']);	
+		$this->assertTrue(current($form6_config_nodes)['default-show-section-content']);	
 	}
 
 	/*
@@ -127,8 +175,10 @@ class Test_PDFConfiguration extends WP_UnitTestCase {
 		global $gfpdf;
 
 		$this->assertEquals(sizeof($gfpdf->get_config(1)), 2);
-		$this->assertEquals(sizeof($gfpdf->get_config(2)), 1);
+		$this->assertEquals(sizeof($gfpdf->get_config(2)), 3);		
 		$this->assertFalse($gfpdf->get_config(3));
+		$this->assertEquals(sizeof($gfpdf->get_config(4)), 1);
+		$this->assertEquals(sizeof($gfpdf->get_config(6)), 1);
 	}
 
 	/*
@@ -138,21 +188,30 @@ class Test_PDFConfiguration extends WP_UnitTestCase {
 	{
 		global $gfpdf;
 
-		$form1 = $gfpdf->get_default_config_data(1);
-		$form2 = $gfpdf->get_default_config_data(2);
-		$form5 = $gfpdf->get_default_config_data(5);
+		$form1 = $gfpdf->get_config_data(1);
+		$form2 = $gfpdf->get_config_data(2);
+		$form5 = $gfpdf->get_config_data(5);
+		$form6 = $gfpdf->get_config_data(6);
 
-		$this->assertFalse($form1['html_field'], false);
-		$this->assertFalse($form1['empty_field'], false);
-		$this->assertFalse($form1['page_names'], false);
+		$this->assertEquals($form1['html_field'], false);
+		$this->assertEquals($form1['empty_field'], false);
+		$this->assertEquals($form1['page_names'], false);
+		$this->assertEquals($form1['section_content'], false);	
 
-		$this->assertFalse($form2['html_field'], false);
-		$this->assertFalse($form2['empty_field'], false);
-		$this->assertFalse($form2['page_names'], false);	
+		$this->assertEquals($form2['html_field'], false);
+		$this->assertEquals($form2['empty_field'], false);
+		$this->assertEquals($form2['page_names'], false);	
+		$this->assertEquals($form2['section_content'], false);	
 
-		$this->assertTrue($form5['html_field'], true);
-		$this->assertFalse($form5['empty_field'], false);
-		$this->assertTrue($form5['page_names'], true);			
+		$this->assertEquals($form5['html_field'], true);
+		$this->assertEquals($form5['empty_field'], false);
+		$this->assertEquals($form5['page_names'], true);			
+		$this->assertEquals($form5['section_content'], false);	
+
+		$this->assertEquals($form6['html_field'], true);
+		$this->assertEquals($form6['empty_field'], true);
+		$this->assertEquals($form6['page_names'], true);			
+		$this->assertEquals($form6['section_content'], true);	
 	}
 
 	/*
@@ -170,6 +229,14 @@ class Test_PDFConfiguration extends WP_UnitTestCase {
 		$form1 = $gfpdf->pull_config_data(1);		
 		$this->assertEquals($form1['filename'], 'seconddoc.pdf');
 
+		$_GET['aid'] = 1;
+		$form2 = $gfpdf->pull_config_data(2);
+		$this->assertEquals($form2['filename'], 'third-pdf.pdf');
+
+		$_GET['aid'] = 2;
+		$form2 = $gfpdf->pull_config_data(2);
+		$this->assertEquals($form2['filename'], 'fourth-pdf.pdf');		
+
 		unset($_GET['aid']);
 		$form3 = $gfpdf->pull_config_data(3);
 		$this->assertFalse($form3);
@@ -185,26 +252,41 @@ class Test_PDFConfiguration extends WP_UnitTestCase {
 	{
 		global $gfpdf;
 
-		/*
-		 * Test that if the defaults template is disabled that no template is returned
-		 */
-		define('GFPDF_SET_DEFAULT_TEMPLATE', false);
-		$this->assertFalse($gfpdf->get_template(10));
 
-		$this->assertEquals($gfpdf->get_template(1), 'example-template.php');
+		$this->assertEquals($gfpdf->get_template(1), 'example-template.php');				
+		
+		$_GET['template'] = 'example-template-2.php';
+		$this->assertEquals($gfpdf->get_template(1), 'example-template-2.php');
+	}
 
-		$form1_results = $gfpdf->get_template(1,true);
-		$this->assertEquals(sizeof($form1_results), 2);
-		$this->assertEquals($form1_results[1]['template'], 'example-template-2.php');
-		$this->assertEquals($form1_results[1]['filename'], 'seconddoc.pdf');		
+	/*
+	 * Test the get_aid($config_id, $form_id) property
+	 */
+	public function test_get_aid()
+	{
+		global $gfpdf;
+
+		$this->assertEquals($gfpdf->get_aid(0, 1), 1);
+		$this->assertEquals($gfpdf->get_aid(1, 1), 2);
+
+		$this->assertEquals($gfpdf->get_aid(2, 2), 1);
+		$this->assertEquals($gfpdf->get_aid(3, 2), 2);
+		$this->assertEquals($gfpdf->get_aid(4, 2), 3);		
 	}	
 
-	/**
-	 * TODO 	 
+	/*
+	 * Test the index_lookup($config_id, $form_id = false) property 
 	 */
-	public function test_get_pdf_name()
+	public function test_index_lookup()
 	{
+		global $gfpdf;
 
+		$this->assertEquals(sizeof($gfpdf->index_lookup(1)), 1);
+		$this->assertEquals(sizeof($gfpdf->index_lookup(3)), 1);
+		$this->assertEquals(sizeof($gfpdf->index_lookup(8)), 4);
+
+		$this->assertEquals($gfpdf->index_lookup(2,2), 0);
+		$this->assertEquals($gfpdf->index_lookup(3,2), 1);
 	}
 
 	/**
@@ -257,6 +339,7 @@ class Test_PDFConfiguration extends WP_UnitTestCase {
 			array(true, array()),
 		);
 	}
+
 	
 }
 

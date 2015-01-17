@@ -5,26 +5,22 @@ class Test_PDFCore extends WP_UnitTestCase {
 		parent::setUp();		
 
 		/* Load our plugin functions */
-		GFPDF_Core::fully_loaded_admin();	
-
-		global $gfpdfe_data;
-		touch($gfpdfe_data->template_site_location . 'configuration.php');
-
-		global $gfpdf;
-		$gfpdf = new GFPDF_Core();  		
+		GFPDF_InstallUpdater::check_filesystem_api();
+		GFPDF_InstallUpdater::maybe_deploy();		
 	}
 
 	public function tearDown() {
 		parent::tearDown();
 	}
 
-	public function test_helperFiles() {
-		$this->assertFileExists( PDF_PLUGIN_DIR . 'helper/api.php' );
+	public function test_helperFiles() {		
 		$this->assertFileExists( PDF_PLUGIN_DIR . 'helper/data.php' );
 		$this->assertFileExists( PDF_PLUGIN_DIR . 'helper/notices.php' );
 		$this->assertFileExists( PDF_PLUGIN_DIR . 'helper/pdf-configuration-indexer.php' );
 		$this->assertFileExists( PDF_PLUGIN_DIR . 'helper/installation-update-manager.php' );
 		$this->assertFileExists( PDF_PLUGIN_DIR . 'helper/pdf-common.php' );
+		$this->assertFileExists( PDF_PLUGIN_DIR . 'helper/pdf-render.php' );
+		$this->assertFileExists( PDF_PLUGIN_DIR . 'helper/pdf-entry-detail.php' );
 
 	}
 

@@ -24,15 +24,8 @@ class Test_GravityForms extends WP_UnitTestCase {
 		GFForms::setup(true);			
 
 		/* Load our plugin functions */
-		GFPDF_Core::fully_loaded_admin();			
-
-		global $gfpdfe_data;
-		/* ensure our config file is present */
-		touch($gfpdfe_data->template_site_location . 'configuration.php');
-
-		/* initialise PDF plugin */
-		global $gfpdf;
-		$gfpdf = new GFPDF_Core();  	
+		GFPDF_InstallUpdater::check_filesystem_api();
+		GFPDF_InstallUpdater::maybe_deploy();				
 
 		/* create GF data */
 		$this->create_form_and_entries();
@@ -165,9 +158,49 @@ class Test_GravityForms extends WP_UnitTestCase {
 	public function test_get_entry()
 	{
 		$entry = GFAPI::get_entry($this->entries[0]);
-		//print_r($entry); exit;
-		//$entry = GFAPI::get_entry($this->entries[1]);
-		//$entry = GFAPI::get_entry($this->entries[2]);
+
+		$valid_entries = array(
+			'id', 'form_id', 'date_created', 'is_starred', 'is_read', 'ip', 'source_url', 'post_id', 'currency', 'payment_status', 'payment_date', 'transaction_id', 'payment_amount', 'payment_method', 'is_fulfilled', 'created_by', 'transaction_type', 'user_agent', 'status'
+		);
+
+		foreach($valid_entries as $v)
+		{
+			$this->assertEquals(array_key_exists($v, $entry), true);	
+		}
+		
+		$this->assertEquals($entry['1.3'], 'My');
+		$this->assertEquals($entry['1.6'], 'Name');
+		$this->assertEquals($entry[5], 'First Choice');
+		
+		$entry = GFAPI::get_entry($this->entries[1]);
+
+		$this->assertEquals($entry['1.3'], 'First');
+		$this->assertEquals($entry['1.6'], 'Last');
+		$this->assertEquals($entry['2.1'], '12 Alister St');
+		$this->assertEquals($entry['2.3'], 'Ali');
+		$this->assertEquals($entry['2.4'], 'State');
+		$this->assertEquals($entry['2.5'], '2678');
+		$this->assertEquals($entry['2.6'], 'Barbados');
+		$this->assertEquals($entry['3'], 'my@test.com');
+		$this->assertEquals($entry['4'], '(345)445-4566');
+		$this->assertEquals($entry['5'], 'Second Choice');
+		$this->assertEquals($entry['6'], 'First Choice,Second Choice,Third Choice');
+
+		$entry = GFAPI::get_entry($this->entries[2]);
+
+		$this->assertEquals($entry['1.3'], 'Jake');
+		$this->assertEquals($entry['1.6'], 'Jackson');
+		$this->assertEquals($entry['2.1'], '123 Fake St');
+		$this->assertEquals($entry['2.2'], 'Line 2');
+		$this->assertEquals($entry['2.3'], 'City');
+		$this->assertEquals($entry['2.4'], 'State');
+		$this->assertEquals($entry['2.5'], '2441');
+		$this->assertEquals($entry['2.6'], 'Albania');
+		$this->assertEquals($entry['3'], 'test@test.com');
+		$this->assertEquals($entry['4'], '(123)123-1234');
+		$this->assertEquals($entry['5'], 'Third Choice');
+		$this->assertEquals($entry['6'], 'Second Choice,Third Choice');		
+		$this->assertEquals($entry['7'], 'This is paragraph test!');		
 
 		
 	}

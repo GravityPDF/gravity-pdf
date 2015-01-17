@@ -5,13 +5,8 @@ class Test_PDFModel extends WP_UnitTestCase {
 		parent::setUp();		
 
 		/* Load our plugin functions */
-		GFPDF_Core::fully_loaded_admin();	
-
-		global $gfpdfe_data;
-		touch($gfpdfe_data->template_site_location . 'configuration.php');
-
-		global $gfpdf;
-		$gfpdf = new GFPDF_Core();  		
+		GFPDF_InstallUpdater::check_filesystem_api();
+		GFPDF_InstallUpdater::maybe_deploy();				
 	}
 
 	public function tearDown() {

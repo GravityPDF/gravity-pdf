@@ -51,7 +51,9 @@ define('GF_PDF_EXTENDED_PLUGIN_BASENAME', plugin_basename(__FILE__));
  include PDF_PLUGIN_DIR . 'helper/notices.php'; 
  include PDF_PLUGIN_DIR . 'helper/pdf-configuration-indexer.php'; 	
  include PDF_PLUGIN_DIR . 'helper/installation-update-manager.php'; 
- include PDF_PLUGIN_DIR . 'helper/pdf-common.php';				
+ include PDF_PLUGIN_DIR . 'helper/pdf-common.php';	
+ include PDF_PLUGIN_DIR . 'helper/pdf-render.php'; 
+ include PDF_PLUGIN_DIR . 'helper/pdf-entry-detail.php';  			
  
  /*
   * Initialise our data helper class
@@ -188,12 +190,6 @@ class GFPDF_Core extends PDFGenerator
 		}	
 
 		global $gfpdfe_data;			
-
-	    /* 
-		 * Include the core files
-		 */ 
-		 include_once PDF_PLUGIN_DIR . 'helper/pdf-render.php'; 
-		 include_once PDF_PLUGIN_DIR . 'helper/pdf-entry-detail.php';  
 		
 		/*
 		* Set up the PDF configuration and indexer
