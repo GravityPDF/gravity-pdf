@@ -1,13 +1,5 @@
 <?php 
 
-class stubCurrentScreen
-{
-	function in_admin()
-	{
-		return true;
-	}
-}
-
 class PDF_Actions_And_Filters extends WP_UnitTestCase {
 	public function setUp() {
 
@@ -27,9 +19,7 @@ class PDF_Actions_And_Filters extends WP_UnitTestCase {
 		parent::tearDown();
 	}				
 
-	public function test_actions_hook() {
-		
-
+	public function test_actions_hook() {		
 		$this->assertEquals(10,   has_action('init', array('GFPDF_Core', 'pdf_init')));
 		$this->assertEquals(9999, has_action('admin_init', array('GFPDF_Core', 'fully_loaded_admin')));
 

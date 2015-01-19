@@ -66,7 +66,7 @@ class Test_GravityForms extends WP_UnitTestCase {
 		$results = GFAPI::add_form($form);
 
 		/* test the form was correctly added to the database */
-		$this->assertInternalType("int", $results);		
+		$this->assertInternalType('int', $results);		
 		$this->form_id = $results;		
 	}
 
@@ -81,6 +81,14 @@ class Test_GravityForms extends WP_UnitTestCase {
 		$this->assertEquals(true, is_array($results));
 
 		$this->entries = $results;
+	}
+
+	public function test_core_classes()
+	{
+		$this->assertTrue(true, class_exists('GFCommon'));
+		$this->assertTrue(true, class_exists('GFFormsModel'));
+		$this->assertTrue(true, class_exists('GFEntryDetail'));
+		$this->assertTrue(true, class_exists('GFFormDisplay'));		
 	}
 
 	/*
@@ -168,39 +176,39 @@ class Test_GravityForms extends WP_UnitTestCase {
 			$this->assertEquals(array_key_exists($v, $entry), true);	
 		}
 		
-		$this->assertEquals($entry['1.3'], 'My');
-		$this->assertEquals($entry['1.6'], 'Name');
-		$this->assertEquals($entry[5], 'First Choice');
+		$this->assertEquals('My', $entry['1.3']);
+		$this->assertEquals('Name', $entry['1.6']);
+		$this->assertEquals('First Choice', $entry[5]);
 		
 		$entry = GFAPI::get_entry($this->entries[1]);
 
-		$this->assertEquals($entry['1.3'], 'First');
-		$this->assertEquals($entry['1.6'], 'Last');
-		$this->assertEquals($entry['2.1'], '12 Alister St');
-		$this->assertEquals($entry['2.3'], 'Ali');
-		$this->assertEquals($entry['2.4'], 'State');
-		$this->assertEquals($entry['2.5'], '2678');
-		$this->assertEquals($entry['2.6'], 'Barbados');
-		$this->assertEquals($entry['3'], 'my@test.com');
-		$this->assertEquals($entry['4'], '(345)445-4566');
-		$this->assertEquals($entry['5'], 'Second Choice');
-		$this->assertEquals($entry['6'], 'First Choice,Second Choice,Third Choice');
+		$this->assertEquals('First', $entry['1.3']);
+		$this->assertEquals('Last', $entry['1.6']);
+		$this->assertEquals('12 Alister St', $entry['2.1']);
+		$this->assertEquals('Ali', $entry['2.3']);
+		$this->assertEquals('State', $entry['2.4']);
+		$this->assertEquals('2678', $entry['2.5']);
+		$this->assertEquals('Barbados', $entry['2.6']);
+		$this->assertEquals('my@test.com', $entry['3']);
+		$this->assertEquals('(345)445-4566', $entry['4']);
+		$this->assertEquals('Second Choice', $entry['5']);
+		$this->assertEquals('First Choice,Second Choice,Third Choice', $entry['6']);
 
 		$entry = GFAPI::get_entry($this->entries[2]);
 
-		$this->assertEquals($entry['1.3'], 'Jake');
-		$this->assertEquals($entry['1.6'], 'Jackson');
-		$this->assertEquals($entry['2.1'], '123 Fake St');
-		$this->assertEquals($entry['2.2'], 'Line 2');
-		$this->assertEquals($entry['2.3'], 'City');
-		$this->assertEquals($entry['2.4'], 'State');
-		$this->assertEquals($entry['2.5'], '2441');
-		$this->assertEquals($entry['2.6'], 'Albania');
-		$this->assertEquals($entry['3'], 'test@test.com');
-		$this->assertEquals($entry['4'], '(123)123-1234');
-		$this->assertEquals($entry['5'], 'Third Choice');
-		$this->assertEquals($entry['6'], 'Second Choice,Third Choice');		
-		$this->assertEquals($entry['7'], 'This is paragraph test!');		
+		$this->assertEquals('Jake', $entry['1.3']);
+		$this->assertEquals('Jackson', $entry['1.6']);
+		$this->assertEquals('123 Fake St', $entry['2.1']);
+		$this->assertEquals('Line 2', $entry['2.2']);
+		$this->assertEquals('City', $entry['2.3']);
+		$this->assertEquals('State', $entry['2.4']);
+		$this->assertEquals('2441', $entry['2.5']);
+		$this->assertEquals('Albania', $entry['2.6']);
+		$this->assertEquals('test@test.com', $entry['3']);
+		$this->assertEquals('(123)123-1234', $entry['4']);
+		$this->assertEquals('Third Choice', $entry['5']);
+		$this->assertEquals('Second Choice,Third Choice', $entry['6']);		
+		$this->assertEquals('This is paragraph test!', $entry['7']);		
 
 		
 	}
@@ -265,21 +273,5 @@ class Test_GravityForms extends WP_UnitTestCase {
 
 		/* do a final test to match the version number according to a set standard */
 		$this->assertRegExp('/^(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)$/', $version);
-	}
-
-	/* 
-	 * Test Gravity Form actions and filter 
-	 */ 
-	
-	/* 'gform_after_submission' */
-	public function test_after_submission()
-	{
-
-	}
-
-	/* 'gform_notification' */
-	public function test_notifications()
-	{
-
-	}			
+	}		
 }

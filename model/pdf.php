@@ -276,17 +276,8 @@ class GFPDF_Core_Model
 		/* 
 		 * Authenticate all lead Ids
 		 */ 
-		if(empty($gfpdf->configuration[$index]['access']) || $gfpdf->configuration[$index]['access'] !== 'all') /* unpublicised feature to give FULL access to ALL PDFs in this configuration - RECOMMENDATION: DO NOT USE */
-		{
-			foreach($lead_ids as $key => $lead_id)
-			{
-				if(self::authenticate_user($form_id, $lead_id, $ip) === false)
-				{
-					unset($lead_ids[$key]);
-				}
-				/* resequence so there are no loop issues later */
-			}	$lead_ids = array_values($lead_ids);	
-		}	
+		$lead_ids = self::validate_entry_ids($lead_ids, $form_id, $ip, $index);
+
 
 		if(sizeof($lead_ids) == 0)	
 		{
@@ -345,6 +336,25 @@ class GFPDF_Core_Model
 	  exit();
 	}
 
+	public static function validate_entry_ids($lead_ids, $form_id, $ip, $index)
+	{
+		global $gfpdf;
+
+		if(empty($gfpdf->configuration[$index]['access']) || $gfpdf->configuration[$index]['access'] !== 'all') /* unpublicised feature to give FULL access to ALL PDFs in this configuration - RECOMMENDATION: DO NOT USE */
+		{
+			foreach($lead_ids as $key => $lead_id)
+			{
+				if(self::authenticate_user($form_id, $lead_id, $ip) === false)
+				{
+					unset($lead_ids[$key]);
+				}
+				/* resequence so there are no loop issues later */
+			}	$lead_ids = array_values($lead_ids);	
+		}	
+
+		return $lead_ids;		
+	}
+
 	private static function authenticate_user($form_id, $lead_id, $ip)
 	{
 		global $wpdb;
@@ -385,13 +395,13 @@ class GFPDF_Core_Model
 
 	private static function check_logged_out_user($form_id, $lead_id, $ip)
 	{
-		global $wpdb;
-		
+		global $wpdb;	
+
 		/* 
 		 * Check the lead is in the database and the IP address matches (little security booster) 
 		 */
 		$form_entries = $wpdb->get_var( $wpdb->prepare("SELECT count(*) FROM `".$wpdb->prefix."rg_lead` WHERE form_id = %d AND status = 'active' AND id = %d AND ip = %s", array($form_id, $lead_id, $ip) ) );	
-		
+
 		if($form_entries == 0)
 		{
 			return false;		
