@@ -52,8 +52,7 @@ define('GF_PDF_EXTENDED_PLUGIN_BASENAME', plugin_basename(__FILE__));
  include PDF_PLUGIN_DIR . 'helper/pdf-configuration-indexer.php'; 	
  include PDF_PLUGIN_DIR . 'helper/installation-update-manager.php'; 
  include PDF_PLUGIN_DIR . 'helper/pdf-common.php';	
- include PDF_PLUGIN_DIR . 'helper/pdf-render.php'; 
- include PDF_PLUGIN_DIR . 'helper/pdf-entry-detail.php';  			
+ include PDF_PLUGIN_DIR . 'helper/pdf-render.php'; 		
  
  /*
   * Initialise our data helper class
@@ -89,6 +88,11 @@ class GFPDF_Core extends PDFGenerator
 	public static function pdf_init() 
 	{
 		global $gfpdfe_data;
+
+		/*
+		 * Include any dependancy-based files
+		 */		 
+		 include_once PDF_PLUGIN_DIR . 'helper/pdf-entry-detail.php';  			
    
 		/*
 		 * Set the notice type 
@@ -156,15 +160,12 @@ class GFPDF_Core extends PDFGenerator
 		/*
 		 * Only load the plugin if the following requirements are met:
 		 *  - Load on Gravity Forms Admin pages
-		 *  - Load if requesting PDF file
-		 *  - Load if on Gravity Form page on the front end
-		 *  - Load if receiving Paypal IPN
+		 *  - Load if on any front-end admin page
+		 *  - Load if doing AJAX request (which natively is called from the /wp-admin/ backend)
 		 */		 		
-		 if( ( isset($_GET['page']) && (substr($_GET['page'], 0, 3) === 'gf_') ) ||
-		 	  ( isset($_GET['gf_pdf']) ) ||
-			  ( isset($_POST["gform_submit"]) && GFPDF_Core_Model::valid_gravity_forms() || 
-			  	(  defined( 'DOING_AJAX' ) && DOING_AJAX && isset($_POST['action']) && isset($_POST['gf_resend_notifications'])) )
-			)
+		 if( (is_admin() && isset($_GET['page']) && (substr($_GET['page'], 0, 3) === 'gf_')) ||
+		 	  !is_admin() ||
+		 	  defined( 'DOING_AJAX' ) && DOING_AJAX )
 		 {			
 			/*
 			 * Initialise the core class which will load the __construct() function
