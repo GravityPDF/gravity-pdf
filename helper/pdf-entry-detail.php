@@ -5,7 +5,7 @@ if(!class_exists('GFPDFEntryDetail'))
 	/*
 	 * Include Gravity Forms Currency class (it not already included)
 	 */
-	if ( false === class_exists( 'RGCurrency' ) ) {
+	if ( false === class_exists( 'RGCurrency' ) && class_exists('GFCommon') ) {
 		require_once( GFCommon::get_base_path() . '/currency.php' );
 	}
 	
@@ -723,11 +723,23 @@ if(!class_exists('GFPDFEntryDetail'))
 			
 
 			/*
-			 * Add quiz results
+			 * Add quiz/survey/poll results
 			 */
-			$form_array = self::get_quiz_results($form_array, $form, $lead);
-			$form_array = self::get_survey_results($form_array, $form, $lead);
-			$form_array = self::get_poll_results($form_array, $form, $lead);
+			
+			if(class_exists('GFQuiz'))
+			{
+				$form_array = self::get_quiz_results($form_array, $form, $lead);
+			}
+
+			if(class_exists('GFSurvey'))
+			{
+				$form_array = self::get_survey_results($form_array, $form, $lead);
+			}
+
+			if(class_exists('GFPolls'))
+			{
+				$form_array = self::get_poll_results($form_array, $form, $lead);
+			}
 
 			return $form_array;
 		}
@@ -769,7 +781,7 @@ if(!class_exists('GFPDFEntryDetail'))
 			{
 				/* get the $field */
 				$field = $form_fields[$id];
-
+				
 				/* add the field name to the ['misc'] key */
 				$choices['misc']['label'] = $field['label'];	
 
@@ -796,7 +808,7 @@ if(!class_exists('GFPDFEntryDetail'))
 			  * If there are any survey results
 			  * add them to the 'survey' key
 			  */
-			$fields            = GFCommon::get_fields_by_type($form, array('survey'));
+			$fields              = GFCommon::get_fields_by_type($form, array('survey'));
 	        $count_survey_fields = count($fields);
 
 	        if ($count_survey_fields > 0 && isset($lead['gsurvey_score']))
@@ -835,10 +847,14 @@ if(!class_exists('GFPDFEntryDetail'))
 					}
 				}
 
+
 				/* replace the standard row data */
-				foreach($field['choices'] as $choice)
+				if(isset($field['choices']) && is_array($field['choices']))
 				{
-					$choices = self::replace_key($choices, $choice['value'], $choice['text']);
+					foreach($field['choices'] as $choice)
+					{
+						$choices = self::replace_key($choices, $choice['value'], $choice['text']);
+					}
 				}
 			}			
 
@@ -893,6 +909,11 @@ if(!class_exists('GFPDFEntryDetail'))
 				 * Convert the array keys into their text counterparts
 				 * Loop through the global quiz data
 				 */
+				if(empty($quiz_global['field_data']))
+				{
+					$quiz_global['field_data'] = array();
+				}
+
 				foreach($quiz_global['field_data'] as $id => &$choices)
 				{
 					/* get the $field */
@@ -988,37 +1009,48 @@ if(!class_exists('GFPDFEntryDetail'))
 
 		private static function get_signature($form, $lead, $field, $form_array)
 		{
-			$value = RGFormsModel::get_lead_field_value($lead, $field);
-			
-			$http_folder = RGFormsModel::get_upload_url_root(). 'signatures/';
+			$value         = RGFormsModel::get_lead_field_value($lead, $field);			
+			$http_folder   = RGFormsModel::get_upload_url_root(). 'signatures/';
 			$server_folder = RGFormsModel::get_upload_root() . 'signatures/';		
 
+			/*
+			 * Set defaults is we cannot find the images 
+			 */
+			$width  = 75;
+			$height = 45;
 
+			/*
+			 * Only get sane defaults specific to the image if we can find it.
+			 */
 			if(file_exists($server_folder.$value) !== false && is_dir($server_folder.$value) !== true)
 			{
 				$image_size = getimagesize($server_folder.$value);
-				$width = $image_size[0] / 4;
-				$height = $image_size[1] / 4;
-
-				$sig_html = '<img src="'. $server_folder.$value .'" alt="Signature" width=" '. $width .'" height="'. $height .'" />';								
-
-				$form_array['signature'][] 			= $sig_html;
-				$form_array['signature_details'][] 	= array(
-																	'img'  => $sig_html,
-																	'path' => $server_folder.$value,
-																	'url'  => $http_folder.$value,
-																	'width' => $width,
-																	'height' => $height,
-												   			);
-
-				$form_array['signature_details_id'][$field['id']] = array(
-																			'img'  => $sig_html,
-																			'path' => $server_folder.$value,
-																			'url'  => $http_folder.$value,
-																			'width' => $width,
-																			'height' => $height,
-																		  );
+				$width      = $image_size[0] / 4;
+				$height     = $image_size[1] / 4;
 			}
+
+			/*
+			 * Include the image details
+			 */
+			$sig_html   = '<img src="'. $server_folder.$value .'" alt="Signature" width="'. $width .'" height="'. $height .'" />';								
+
+			$form_array['signature'][]                        = $sig_html;
+			$form_array['signature_details'][]                = array(
+																	'img'    => $sig_html,
+																	'path'   => $server_folder.$value,
+																	'url'    => $http_folder.$value,
+																	'width'  => $width,
+																	'height' => $height,
+			);
+			
+			$form_array['signature_details_id'][$field['id']] = array(
+																	'img'    => $sig_html,
+																	'path'   => $server_folder.$value,
+																	'url'    => $http_folder.$value,
+																	'width'  => $width,
+																	'height' => $height,
+			);
+			
 
 			return $form_array;
 		}
@@ -1381,7 +1413,10 @@ if(!class_exists('GFPDFEntryDetail'))
 					if(empty($value) || $format == 'text')
 						return $value;
 
-					$value = explode(',', $value);
+					if(!is_array($value))
+					{
+						$value = explode(',', $value);
+					}
 
 					$items = '';
 					foreach($value as $item){
@@ -1761,7 +1796,10 @@ if(!class_exists('GFPDFEntryDetail'))
 						if(empty($value) || $format == 'text')
 							return $value;
 
-						$value = explode(',', $value);
+						if(!is_array($value))
+						{
+							$value = explode(',', $value);
+						}
 
 						$items = '';
 						foreach($value as $item){

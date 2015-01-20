@@ -31,7 +31,7 @@ class Test_PDFCore extends WP_UnitTestCase {
 	}	
 
 	public function test_gravityforms_exists() {		
-		$this->assertTrue(class_exists('GFForms'), true);
+		$this->assertTrue(class_exists('GFForms'));
 	}
 
 	public function test_pdfextended_exists() {
@@ -76,7 +76,7 @@ class Test_PDFCore extends WP_UnitTestCase {
 	public function test_write_access() {
 		$access_type = get_filesystem_method();		
 
-		$this->assertEquals($access_type, 'direct');
+		$this->assertEquals('direct', $access_type);
 
 		global $gfpdfe_data;
 		$this->assertTrue($gfpdfe_data->automated);
@@ -88,11 +88,31 @@ class Test_PDFCore extends WP_UnitTestCase {
 
 	public function test_configuration_file() {
 		global $gfpdfe_data, $gfpdf;
-		$this->assertEquals(file_exists($gfpdfe_data->template_site_location . 'configuration.php'), true);				
+		$this->assertFileExists($gfpdfe_data->template_site_location . 'configuration.php');				
 		
-		$this->assertEquals($gfpdf->disabled, false);				
-		
+		$this->assertEquals($gfpdf->disabled, false);						
 	}	
+
+	public function test_template_directory() {
+		global $gfpdfe_data;
+
+		$this->assertFileExists($gfpdfe_data->template_site_location . 'default-template.php');			
+		$this->assertFileExists($gfpdfe_data->template_site_location . 'default-template-no-style.php');			
+		$this->assertFileExists($gfpdfe_data->template_site_location . 'default-template-two-rows.php');			
+		$this->assertFileExists($gfpdfe_data->template_site_location . 'example-template.php');			
+		$this->assertFileExists($gfpdfe_data->template_site_location . 'example-basic-html01.php');			
+		$this->assertFileExists($gfpdfe_data->template_site_location . 'example-backgrounds-and-borders02.php');			
+		$this->assertFileExists($gfpdfe_data->template_site_location . 'example-images03.php');			
+		$this->assertFileExists($gfpdfe_data->template_site_location . 'example-tables04.php');			
+		$this->assertFileExists($gfpdfe_data->template_site_location . 'example-float-and-positioning05.php');			
+		$this->assertFileExists($gfpdfe_data->template_site_location . 'example-header-and-footer_06.php');			
+		$this->assertFileExists($gfpdfe_data->template_site_location . 'example-advanced-headers_07.php');			
+		$this->assertFileExists($gfpdfe_data->template_site_location . 'example-different-page-size_08.php');			
+		$this->assertFileExists($gfpdfe_data->template_site_location . 'example-watermark09.php');			
+
+		$this->assertFileExists($gfpdfe_data->template_site_location . 'output');			
+		$this->assertFileExists($gfpdfe_data->template_site_location . 'fonts');			
+	}
 			
 	
 }
