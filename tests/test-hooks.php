@@ -19,6 +19,10 @@ class PDF_Actions_And_Filters extends WP_UnitTestCase {
 		parent::tearDown();
 	}				
 
+	/**
+	 * Test the hooks used to execute plugin 
+	 * @group hooks
+	 */
 	public function test_actions_hook() {		
 		$this->assertEquals(10,   has_action('init', array('GFPDF_Core', 'pdf_init')));
 		$this->assertEquals(9999, has_action('admin_init', array('GFPDF_Core', 'fully_loaded_admin')));
@@ -32,6 +36,10 @@ class PDF_Actions_And_Filters extends WP_UnitTestCase {
 		
 	}
 
+	/**
+	 * Test the filters used to execute plugin 
+	 * @group hooks
+	 */
 	public function test_filter_hooks() {	
 
 		$this->assertEquals(10, has_filter('gfpdfe_pdf_template', array('PDF_Common', 'do_mergetags')));

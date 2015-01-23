@@ -113,6 +113,7 @@ class Test_PDFConfiguration extends WP_UnitTestCase {
 
 	/**
 	 * Check if the configuration nodes are being stored correctly 	 
+	 * @group configuration
 	 */
 	public function test_get_config()
 	{
@@ -167,8 +168,9 @@ class Test_PDFConfiguration extends WP_UnitTestCase {
 		$this->assertTrue(current($form6_config_nodes)['default-show-section-content']);	
 	}
 
-	/*
+	/**
 	 * Check that the config index (stored by form ID) is being correctly populated 
+	 * @group configuration
 	 */
 	public function test_config_index()
 	{
@@ -181,8 +183,9 @@ class Test_PDFConfiguration extends WP_UnitTestCase {
 		$this->assertEquals(sizeof($gfpdf->get_config(6)), 1);
 	}
 
-	/*
+	/**
 	 * Check that the template default values are being stored correctly 
+	 * @group configuration
 	 */
 	public function test_default_config_data()
 	{
@@ -214,8 +217,9 @@ class Test_PDFConfiguration extends WP_UnitTestCase {
 		$this->assertEquals($form6['section_content'], true);	
 	}
 
-	/*
+	/**
 	 * Check that our configuration data is being pulled correctly when referenced by an ID
+	 * @group configuration
 	 */
 	public function test_pull_config_data()
 	{
@@ -245,8 +249,9 @@ class Test_PDFConfiguration extends WP_UnitTestCase {
 		$this->assertEquals($form4['pdf_master_password'], 'admin password');
 	}
 
-	/*
+	/**
 	 * Test that the correct template is being pulled from the configuration
+	 * @group configuration
 	 */
 	public function test_get_template()
 	{
@@ -259,8 +264,9 @@ class Test_PDFConfiguration extends WP_UnitTestCase {
 		$this->assertEquals($gfpdf->get_template(1), 'example-template-2.php');
 	}
 
-	/*
+	/**
 	 * Test the get_aid($config_id, $form_id) property
+	 * @group configuration
 	 */
 	public function test_get_aid()
 	{
@@ -274,8 +280,9 @@ class Test_PDFConfiguration extends WP_UnitTestCase {
 		$this->assertEquals($gfpdf->get_aid(4, 2), 3);		
 	}	
 
-	/*
+	/**
 	 * Test the index_lookup($config_id, $form_id = false) property 
+	 * @group configuration
 	 */
 	public function test_index_lookup()
 	{
@@ -294,6 +301,7 @@ class Test_PDFConfiguration extends WP_UnitTestCase {
 	 * We won't be testing form or lead merge tag data at this stage 
 	 * Just the basic naming convention (see common functions tests for full naming tests)
 	 *
+	 * @group configuration
 	 * @dataProvider provider_test_pdf_name
 	 */
 	public function test_pdf_name($test, $result)
@@ -317,6 +325,7 @@ class Test_PDFConfiguration extends WP_UnitTestCase {
 	/**
 	 * Test if an array of test data will pass or fail
 	 *
+	 * @group configuration
 	 * @dataProvider provider_test_privileges
 	 */
 	public function test_validate_privileges($test, $expectedResults)

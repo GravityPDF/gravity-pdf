@@ -13,6 +13,10 @@ class Test_PDFCore extends WP_UnitTestCase {
 		parent::tearDown();
 	}
 
+	/**
+	 * [test_helperFiles description]
+	 * @group core
+	 */
 	public function test_helperFiles() {		
 		$this->assertFileExists( PDF_PLUGIN_DIR . 'helper/data.php' );
 		$this->assertFileExists( PDF_PLUGIN_DIR . 'helper/notices.php' );
@@ -24,16 +28,28 @@ class Test_PDFCore extends WP_UnitTestCase {
 
 	}
 
+	/**
+	 * [test_coreFiles description]
+	 * @group core
+	 */
 	public function test_coreFiles() {
 		$this->assertFileExists( PDF_PLUGIN_DIR . 'pdf-settings.php' );
 		$this->assertFileExists( PDF_PLUGIN_DIR . 'model/pdf.php' );
 		$this->assertFileExists( PDF_PLUGIN_DIR . 'model/settings.php' );
 	}	
 
+	/**
+	 * [test_gravityforms_exists description]
+	 * @group core
+	 */
 	public function test_gravityforms_exists() {		
 		$this->assertTrue(class_exists('GFForms'));
 	}
 
+	/**
+	 * [test_pdfextended_exists description]
+	 * @group core
+	 */
 	public function test_pdfextended_exists() {
 		$this->assertTrue(class_exists('GFPDF_Core'));
 		$this->assertTrue(class_exists('PDFGenerator'));
@@ -43,36 +59,64 @@ class Test_PDFCore extends WP_UnitTestCase {
 		$this->assertTrue(class_exists('GFPDFEntryDetail'));
 	}
 
+	/**
+	 * [test_gravityform_compatible description]
+	 * @group core
+	 */
 	public function test_gravityform_compatible() {
 		global $gfpdfe_data;
 		$this->assertTrue($gfpdfe_data->gf_is_compatible);
 	}
 
+	/**
+	 * [test_wp_compatible description]
+	 * @group core
+	 */
 	public function test_wp_compatible() {
 		global $gfpdfe_data;
 		$this->assertTrue($gfpdfe_data->wp_is_compatible);
 	}
 
+	/**
+	 * [test_mb_string_installed description]
+	 * @group core
+	 */
 	public function test_mb_string_installed() {
 		global $gfpdfe_data;
 		$this->assertTrue($gfpdfe_data->mb_string_installed);
 	}		
 
+	/**
+	 * [test_gd_installed description]
+	 * @group core
+	 */
 	public function test_gd_installed() {
 		global $gfpdfe_data;
 		$this->assertTrue($gfpdfe_data->gd_installed);
 	}	
 
+	/**
+	 * [test_ram_compatible description]
+	 * @group core
+	 */
 	public function test_ram_compatible() {
 		global $gfpdfe_data;		
 		
 		$this->assertTrue($gfpdfe_data->ram_compatible);		
 	}	
 
+	/**
+	 * [test_major_compatibility description]
+	 * @group core
+	 */
 	public function test_major_compatibility() {
 		$this->assertTrue(GFPDF_Core_Model::check_major_compatibility());
 	}
 
+	/**
+	 * [test_write_access description]
+	 * @group core
+	 */
 	public function test_write_access() {
 		$access_type = get_filesystem_method();		
 
@@ -82,10 +126,18 @@ class Test_PDFCore extends WP_UnitTestCase {
 		$this->assertTrue($gfpdfe_data->automated);
 	}
 
+	/**
+	 * [test_fully_installed description]
+	 * @group core
+	 */
 	public function test_fully_installed() {
 		$this->assertTrue(GFPDF_Core_Model::is_fully_installed());
 	}
 
+	/**
+	 * [test_configuration_file description]
+	 * @group core
+	 */
 	public function test_configuration_file() {
 		global $gfpdfe_data, $gfpdf;
 		$this->assertFileExists($gfpdfe_data->template_site_location . 'configuration.php');				
@@ -93,6 +145,10 @@ class Test_PDFCore extends WP_UnitTestCase {
 		$this->assertEquals($gfpdf->disabled, false);						
 	}	
 
+	/**
+	 * [test_template_directory description]
+	 * @group core
+	 */
 	public function test_template_directory() {
 		global $gfpdfe_data;
 
@@ -112,8 +168,6 @@ class Test_PDFCore extends WP_UnitTestCase {
 
 		$this->assertFileExists($gfpdfe_data->template_site_location . 'output');			
 		$this->assertFileExists($gfpdfe_data->template_site_location . 'fonts');			
-	}
-			
-	
+	}			
 }
 

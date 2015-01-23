@@ -202,6 +202,10 @@ class Test_PDFModel extends WP_UnitTestCase {
 	 * Begin Unit Tests 
 	 */
 
+	/**
+	 * 
+	 * @group pdf-model
+	 */
 	public function test_check_major_compatibility()
 	{
 		global $gfpdfe_data;
@@ -236,6 +240,10 @@ class Test_PDFModel extends WP_UnitTestCase {
 		$this->assertEquals(10,   has_action('after_plugin_row_' . GF_PDF_EXTENDED_PLUGIN_BASENAME, array('GFPDF_Notices', 'display_compatibility_error')));		
 	}
 
+	/**
+	 * 
+	 * @group pdf-model
+	 */
 	private function reset_major_comp_test()
 	{
 		global $gfpdfe_data;
@@ -245,6 +253,10 @@ class Test_PDFModel extends WP_UnitTestCase {
 		$gfpdfe_data->gf_is_compatible       = true;		
 	}
 
+	/**
+	 * 
+	 * @group pdf-model
+	 */
 	public function test_is_fully_installed()
 	{
 		 global $gfpdfe_data;
@@ -282,6 +294,10 @@ class Test_PDFModel extends WP_UnitTestCase {
 
 	}
 
+	/**
+	 * 
+	 * @group pdf-model
+	 */ 
 	private function reset_fully_installed()
 	{
 		global $gfpdfe_data;
@@ -291,6 +307,10 @@ class Test_PDFModel extends WP_UnitTestCase {
 		$gfpdfe_data->allow_initialisation = true;
 	}
 
+	/**
+	 * 
+	 * @group pdf-model
+	 */
 	public function test_validate_entry_ids()
 	{
 		/*
@@ -334,8 +354,10 @@ class Test_PDFModel extends WP_UnitTestCase {
 
 	}
 
-	/*
+	/**
 	 * Test our notification function 
+	 * @group pdf
+	 * @group pdf-model
 	 */
 	public function test_gfpdfe_create_and_attach_pdf()
 	{
@@ -382,11 +404,13 @@ class Test_PDFModel extends WP_UnitTestCase {
 
 	}
 
+
 	/**
 	 * Test that the correct IP is returned by the function 
 	 * @param  String $ip  The test IP address 
 	 * @param  String $var The $_SERVER array key 
-	 * 
+	 *
+	 * @group pdf-model
 	 * @dataProvider provider_notifications_list
 	 */
 	public function test_check_notification($notification_name, $notifications, $expected)
@@ -444,6 +468,10 @@ class Test_PDFModel extends WP_UnitTestCase {
 		);
 	}		
 
+	/**
+	 * 
+	 * @group pdf-model
+	 */
 	public function test_get_notifications_name()
 	{
 		$form = GFAPI::get_form($this->form_id[0]);
@@ -459,6 +487,10 @@ class Test_PDFModel extends WP_UnitTestCase {
 		$this->AssertEquals(false, in_array('Notification', $notifications));
 	}
 
+	/**
+	 * 
+	 * @group pdf-model
+	 */
 	public function test_get_form_notifications()
 	{
 		global $gfpdf;
@@ -504,6 +536,10 @@ class Test_PDFModel extends WP_UnitTestCase {
 
 	}
 
+	/**
+	 * 
+	 * @group pdf-model
+	 */
 	public function test_generate_pdf_parameters()
 	{
 		global $gfpdf;
@@ -595,6 +631,10 @@ class Test_PDFModel extends WP_UnitTestCase {
 		$this->AssertEquals(false, $arg['pdfx1a']);		
 	}
 
+	/**
+	 * 
+	 * @group pdf-model
+	 */
 	public function test_valid_gravity_forms()
 	{
 		$this->AssertEquals(false, GFPDF_Core_Model::valid_gravity_forms());

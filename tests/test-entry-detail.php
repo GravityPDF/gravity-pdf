@@ -17,7 +17,7 @@ class Test_EntryDetails extends WP_UnitTestCase {
 		 * Replace set up with cut down version 
 		 * so we don't use 'temporary' tables in MySQL
 		 */
-		$this->cut_down_setup();
+		$this->cut_down_setup();	
 
 		/* initialise GF tables */
 		GFForms::setup(true);			
@@ -82,6 +82,10 @@ EOD;
 		$this->entries = $results;
 	}
 
+	/**
+	 * [test_form_and_entry description]
+	 * @group entry-detail
+	 */
 	public function test_form_and_entry()
 	{
 		/* test the form was correctly added to the database */
@@ -93,6 +97,10 @@ EOD;
 		$this->assertEquals(true, is_array($this->entries));
 	}
 
+	/**
+	 * [setup_form_data description]
+	 * @group entry-detail	 
+	 */
 	private function setup_form_data()
 	{
 		$form            = RGFormsModel::get_form_meta($this->form_id[0]);
@@ -100,6 +108,10 @@ EOD;
 		$this->form_data = GFPDFEntryDetail::lead_detail_grid_array($form, $entry);
 	}
 
+	/**
+	 * [test_basic_form_data description]
+	 * @group entry-detail
+	 */
 	public function test_basic_form_data()
 	{
 		$data = $this->form_data;
@@ -111,13 +123,17 @@ EOD;
 		$this->assertEquals('This is the form description...', $data['form_description']);
 		$this->assertEquals(true, array_key_exists('pages', $data));
 
-		$date_dmy = date('j/n/Y');
-		$date_mdy = date('n/j/Y');
+		$date_dmy = '20/1/2015';
+		$date_mdy = '1/20/2015';
 
 		$this->assertEquals($date_dmy, $data['date_created']);
 		$this->assertEquals($date_mdy, $data['date_created_usa']);
 	}
 
+	/**
+	 * [test_misc_form_data description]
+	 * @group entry-detail
+	 */
 	public function test_misc_form_data()
 	{
 		$data = $this->form_data;
@@ -156,6 +172,10 @@ EOD;
 		$this->assertEquals('1', $data['misc']['created_by']);		
 	}
 
+	/**
+	 * [test_field_descriptions description]
+	 * @group entry-detail
+	 */
 	public function test_field_descriptions()
 	{
 		$data = $this->form_data;
@@ -168,6 +188,10 @@ EOD;
 		$this->assertEquals('Name Description', $data['field_descriptions'][11]);
 	}
 
+	/**
+	 * [test_field description]
+	 * @group entry-detail
+	 */
 	public function test_field()
 	{
 		$data = $this->form_data;
@@ -176,6 +200,10 @@ EOD;
 		$this->assertEquals(true, is_array($data['field']));		
 	}
 
+	/**
+	 * [test_field_single description]
+	 * @group entry-detail
+	 */
 	public function test_field_single()
 	{
 		$field = $this->form_data['field'];	
@@ -189,6 +217,10 @@ EOD;
 		$this->assertEquals($response, $field['Single Line Text']);
 	}	
 
+	/**
+	 * [test_field_paragraph description]
+	 * @group entry-detail
+	 */
 	public function test_field_paragraph()
 	{
 		$field = $this->form_data['field'];	
@@ -202,6 +234,10 @@ EOD;
 		$this->assertEquals($response, $field['Paragraph Text']);
 	}	
 
+	/**
+	 * [test_dropdown description]
+	 * @group entry-detail
+	 */
 	public function test_dropdown()
 	{
 		$field = $this->form_data['field'];	
@@ -220,6 +256,10 @@ EOD;
 		$this->assertEquals($response, $field['Drop Down_name']);
 	}	
 
+	/**
+	 * [test_multiselect description]
+	 * @group entry-detail
+	 */
 	public function test_multiselect()
 	{
 		$field = $this->form_data['field'];	
@@ -241,6 +281,10 @@ EOD;
 		$this->assertEquals(2, sizeof($field['4_name']));
 	}	
 
+	/**
+	 * [test_field_number description]
+	 * @group entry-detail
+	 */
 	public function test_field_number()
 	{
 		$field = $this->form_data['field'];	
@@ -254,6 +298,10 @@ EOD;
 		$this->assertEquals($response, $field['Number']);
 	}		
 
+	/**
+	 * [test_checkbox description]
+	 * @group entry-detail
+	 */
 	public function test_checkbox()
 	{
 		$field = $this->form_data['field'];	
@@ -274,6 +322,10 @@ EOD;
 		$this->assertEquals(2, sizeof($field[6]));
 	}	
 
+	/**
+	 * [test_radio_button description]
+	 * @group entry-detail
+	 */
 	public function test_radio_button()
 	{
 		$field = $this->form_data['field'];	
@@ -292,6 +344,10 @@ EOD;
 		$this->assertEquals($response, $field['Radio Button_name']);
 	}		
 
+	/**
+	 * [test_hidden_field description]
+	 * @group entry-detail
+	 */
 	public function test_hidden_field()
 	{
 		$field = $this->form_data['field'];	
@@ -305,6 +361,10 @@ EOD;
 		$this->assertEquals($response, $field['Hidden Field']);
 	}
 
+	/**
+	 * [test_name_field description]
+	 * @group entry-detail
+	 */
 	public function test_name_field()
 	{
 		$field = $this->form_data['field'];	
@@ -331,6 +391,10 @@ EOD;
 		$this->assertEquals('MD', $field['Name']['suffix']);					
 	}		
 
+	/**
+	 * [test_date_field description]
+	 * @group entry-detail
+	 */
 	public function test_date_field()
 	{
 		$field = $this->form_data['field'];	
@@ -344,6 +408,10 @@ EOD;
 		$this->assertEquals($response, $field['Date']);				
 	}
 
+	/**
+	 * [test_time_field description]
+	 * @group entry-detail
+	 */
 	public function test_time_field()
 	{
 		$field = $this->form_data['field'];	
@@ -362,6 +430,10 @@ EOD;
         );						
 	}	
 
+	/**
+	 * [test_phone_field description]
+	 * @group entry-detail
+	 */
 	public function test_phone_field()
 	{
 		$field = $this->form_data['field'];	
@@ -375,6 +447,10 @@ EOD;
 		$this->assertEquals($response, $field['Phone']);				
 	}	
 
+	/**
+	 * [test_address_field description]
+	 * @group entry-detail
+	 */
 	public function test_address_field()
 	{
 		$field = $this->form_data['field'];	
@@ -404,6 +480,10 @@ EOD;
 		$this->assertEquals('Chad', $field['Address']['country']);							
 	}
 
+	/**
+	 * [test_website_field description]
+	 * @group entry-detail
+	 */
 	public function test_website_field()
 	{
 		$field = $this->form_data['field'];	
@@ -417,6 +497,10 @@ EOD;
 		$this->assertEquals($response, $field['Website']);				
 	}	
 
+	/**
+	 * [test_email_field description]
+	 * @group entry-detail
+	 */
 	public function test_email_field()
 	{
 		$field = $this->form_data['field'];	
@@ -430,6 +514,10 @@ EOD;
 		$this->assertEquals($response, $field['Email']);				
 	}	
 
+	/**
+	 * [test_upload_field description]
+	 * @group entry-detail
+	 */
 	public function test_upload_field()
 	{
 		$field = $this->form_data['field'];	
@@ -462,6 +550,10 @@ EOD;
 		$this->assertEquals('/', substr($field['19.File_path'][1], 0, 1));			
 	}	
 
+	/**
+	 * [test_list_field description]
+	 * @group entry-detail
+	 */
 	public function test_list_field()
 	{
 		$field = $this->form_data['field'];	
@@ -480,6 +572,10 @@ EOD;
 		$this->assertEquals($response, $field['Extended List']);					
 	}
 	
+	/**
+	 * [test_poll_field description]
+	 * @group entry-detail
+	 */
 	public function test_poll_field()
 	{
 		$field = $this->form_data['field'];	
@@ -512,6 +608,10 @@ EOD;
 
 	}
 
+	/**
+	 * [test_quiz_field description]
+	 * @group entry-detail
+	 */
 	public function test_quiz_field()
 	{
 		$field = $this->form_data['field'];	
@@ -527,6 +627,10 @@ EOD;
 		$this->assertEquals(true, array_key_exists('text', $field['24.Quiz Dropdown_name']));
 	}
 
+	/**
+	 * [test_survey_basic_field description]
+	 * @group entry-detail
+	 */
 	public function test_survey_basic_field()
 	{
 		$field = $this->form_data['field'];	
@@ -579,6 +683,10 @@ EOD;
 		$this->assertEquals($response, $field['50.DropDown Survey Field_name']);						
 	}
 
+	/**
+	 * [test_post_fields description]
+	 * @group entry-detail
+	 */
 	public function test_post_fields()
 	{
 		$field = $this->form_data['field'];	
@@ -649,6 +757,10 @@ EOD;
 		$this->assertEquals($response, $field['Post Custom Field']);
 	}
 
+	/**
+	 * [test_basic_product_fields description]
+	 * @group entry-detail
+	 */
 	public function test_basic_product_fields()
 	{
 		$field = $this->form_data['field'];	
@@ -699,6 +811,10 @@ EOD;
 		$this->assertEquals($response, $field['Shipping_name']);			
 	}
 
+	/**
+	 * [test_html_block description]
+	 * @group entry-detail
+	 */
 	public function test_html_block()
 	{
 		$data = $this->form_data;
@@ -717,6 +833,10 @@ EOD;
         );				
 	}
 
+	/**
+	 * [test_list_field_block description]
+	 * @group entry-detail
+	 */
 	public function test_list_field_block()
 	{
 		$lists = $this->form_data['list'];
@@ -749,6 +869,10 @@ EOD;
 		$this->assertEquals('List Response #2 Col 3', $lists[21][1]['Column 3']);				
 	}
 
+	/**
+	 * [test_signature_blocks description]
+	 * @group entry-detail
+	 */
 	public function test_signature_blocks()
 	{
 		$data = $this->form_data;
@@ -781,6 +905,10 @@ EOD;
 		$this->assertEquals($response, $data['signature'][0]);
 	}
 
+	/**
+	 * [test_survey_likert_fields description]
+	 * @group entry-detail
+	 */
 	public function test_survey_likert_fields()
 	{
 		$likert = $this->form_data['survey']['likert'];
@@ -834,6 +962,10 @@ EOD;
 		$this->assertEquals('selected', $likert[27]['rows']['Fifth row']['Strongly agree']);
 	}
 
+	/**
+	 * [test_survey_rank_fields description]
+	 * @group entry-detail
+	 */
 	public function test_survey_rank_fields()
 	{
 		$rank = $this->form_data['survey']['rank'];
@@ -848,6 +980,10 @@ EOD;
 		$this->assertEquals('Rank Third Choice', $rank[44][4]);
     }	
 
+    /**
+     * [test_survey_rating_fields description]
+     * @group entry-detail
+     */
 	public function test_survey_rating_fields()
 	{
 		$rating = $this->form_data['survey']['rating'];
@@ -858,6 +994,10 @@ EOD;
 		$this->assertEquals('Pretty good', $rating[45][0]);
     }	
 
+    /**
+     * [test_product_data description]
+     * @group entry-detail
+     */
 	public function test_product_data()
 	{
 		$products = $this->form_data['products'];
@@ -946,6 +1086,10 @@ EOD;
 						
 	}
 
+	/**
+	 * [test_product_totals description]
+	 * @group entry-detail
+	 */
 	public function test_product_totals()
 	{
 		$totals = $this->form_data['products_totals'];
@@ -957,8 +1101,5 @@ EOD;
 		$this->assertEquals('$830.25', $totals['subtotal_formatted']);	
 		$this->assertEquals('$860.25', $totals['total_formatted']);	
 	}
-
-
-
 }
 

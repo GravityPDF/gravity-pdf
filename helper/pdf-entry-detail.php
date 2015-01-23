@@ -901,7 +901,8 @@ if(!class_exists('GFPDFEntryDetail'))
 
 				/*
 				 * Get the overall results
-				 */
+				 */				
+
 				$quiz_global = self::get_quiz_overalls($form);
 
 				$form_fields = self::$fields;
@@ -931,7 +932,7 @@ if(!class_exists('GFPDFEntryDetail'))
 						$choices = self::replace_key($choices, $choice['value'], $choice['text']);	
 
 						/* check if this is the correct field */
-						if($choice['gquizIsCorrect'] == 1)
+						if(isset($choice['gquizIsCorrect']) && $choice['gquizIsCorrect'] == 1)
 						{
 							$choices['misc']['correct_option_name'] = $choice['text'];
 						}
@@ -955,8 +956,13 @@ if(!class_exists('GFPDFEntryDetail'))
 				    require_once(GFCommon::get_base_path() . "/includes/addon/class-gf-results.php");
 				}
 
-				$fields = $form["fields"];
-	            
+				$form_id = $form['id'];
+
+				/* add form filter to keep in line with GF standard */
+				$form = apply_filters( "gform_form_pre_results_$form_id", apply_filters( 'gform_form_pre_results', $form ) );
+
+				$fields = self::fix_gf_notice($form["fields"]);
+
 	            /* initiat the results class */
 				$gf_results = new GFResults('', $options);				
 				
@@ -964,7 +970,7 @@ if(!class_exists('GFPDFEntryDetail'))
 				$search = array(
 					'field_filters' => array('mode' => ''),
 					'status'        => 'active'
-				);			
+				);		
 
 				/* get the results */
 				$data = $gf_results->get_results_data($form, $fields, $search);	
@@ -975,6 +981,26 @@ if(!class_exists('GFPDFEntryDetail'))
 
 				return $data;
 
+		}
+
+		/**
+		 * Gravity Forms is throwing notices when accessing get_results_data() 
+		 * due to poor validation. To fix this we'll unset the 'choices' array key 
+		 * if it is not an array (the expected input for this function)
+		 * @param  Array $fields The fields array
+		 * @return Array         The processed fields array
+		 */
+		private static function fix_gf_notice($fields)
+		{ 
+			foreach($fields as &$field)
+			{
+				if(!is_array($field['choices']))
+				{
+					$field['choices'] = array();
+				}				
+			}
+
+			return $fields;
 		}
 
 		private static function get_quiz_overalls($form)
