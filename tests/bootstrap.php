@@ -9,6 +9,8 @@ require_once $_tests_dir . '/includes/functions.php';
 
 function _manually_load_plugin() {
 	require dirname( __FILE__ ) . '/../../gravityforms/gravityforms.php';	
+
+	GFForms::setup(true);	
 	require dirname( __FILE__ ) . '/../../gravityformssurvey/survey.php';	
 	require dirname( __FILE__ ) . '/../../gravityformsquiz/quiz.php';	
 	require dirname( __FILE__ ) . '/../../gravityformspolls/polls.php';	

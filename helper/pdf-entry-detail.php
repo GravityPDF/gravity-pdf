@@ -769,7 +769,8 @@ if(!class_exists('GFPDFEntryDetail'))
 				return $form_array;
 			}
 
-			$poll_results = self::get_addon_global_data($form, array());
+			$fields = self::get_related_fields($form["fields"], 'poll');
+			$poll_results = self::get_addon_global_data($form, array(), $fields);
 
 			$form_fields = self::$fields;
 
@@ -816,7 +817,8 @@ if(!class_exists('GFPDFEntryDetail'))
 	        	$form_array['survey']['score'] = $lead['gsurvey_score'];
 	        }
 
-	        $form_array['survey']['global'] = self::get_addon_global_data($form, array());
+	        $fields = self::get_related_fields($form["fields"], 'survey');
+	        $form_array['survey']['global'] = self::get_addon_global_data($form, array(), $fields);
 			$form_fields = self::$fields;
 
 			/*
@@ -934,7 +936,7 @@ if(!class_exists('GFPDFEntryDetail'))
 						/* check if this is the correct field */
 						if(isset($choice['gquizIsCorrect']) && $choice['gquizIsCorrect'] == 1)
 						{
-							$choices['misc']['correct_option_name'] = $choice['text'];
+							$choices['misc']['correct_option_name'][] = $choice['text'];
 						}
 
 					}
@@ -948,7 +950,7 @@ if(!class_exists('GFPDFEntryDetail'))
 	        return $form_array;
 		}
 
-		private static function get_addon_global_data($form, $options)
+		private static function get_addon_global_data($form, $options, $fields)
 		{
 				/* if the results class isn't loaded, load it */
 				if (!class_exists("GFResults"))
@@ -960,8 +962,6 @@ if(!class_exists('GFPDFEntryDetail'))
 
 				/* add form filter to keep in line with GF standard */
 				$form = apply_filters( "gform_form_pre_results_$form_id", apply_filters( 'gform_form_pre_results', $form ) );
-
-				$fields = self::fix_gf_notice($form["fields"]);
 
 	            /* initiat the results class */
 				$gf_results = new GFResults('', $options);				
@@ -990,14 +990,15 @@ if(!class_exists('GFPDFEntryDetail'))
 		 * @param  Array $fields The fields array
 		 * @return Array         The processed fields array
 		 */
-		private static function fix_gf_notice($fields)
+		private static function get_related_fields($fields, $type)
 		{ 
-			foreach($fields as &$field)
+			foreach($fields as $id => $field)
 			{
-				if(!is_array($field['choices']))
+				if($field['type'] !== $type)
 				{
-					$field['choices'] = array();
-				}				
+					unset($fields[$id]);
+					continue;
+				}	
 			}
 
 			return $fields;
@@ -1017,7 +1018,11 @@ if(!class_exists('GFPDFEntryDetail'))
 	            		'results_calculation'
 	            );
 
-				return self::get_addon_global_data($form, $options);		
+	            $fields = self::get_related_fields($form["fields"], 'quiz');
+
+	            $quiz_results = self::get_addon_global_data($form, $options, $fields);	
+
+				return $quiz_results;
 			}
 
 			return array(__('Activate Gravity Forms Quiz Add On to see global quiz statistics for this form', 'pdfextended'));
