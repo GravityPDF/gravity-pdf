@@ -682,15 +682,15 @@ if(!class_exists('GFPDFEntryDetail'))
 			/*
 			 * Add form_id and lead_id
 			 */
-			$form_array['form_id'] = $form_id;
+			$form_array['form_id']  = $form_id;
 			$form_array['entry_id'] = $lead['id'];
 
 			/*
 			 * Set title and dates (both US and international)
 			 */
-			$form_array['form_title'] = $form['title'];
-			$form_array['form_description'] = $form['description'];
-			$form_array['date_created'] = self::format_date($lead['date_created']);
+			$form_array['form_title']       = $form['title'];
+			$form_array['form_description'] = (isset($form['description'])) ? $form['description'] : '';
+			$form_array['date_created']     = self::format_date($lead['date_created']);
 			$form_array['date_created_usa'] = self::format_date($lead['date_created'], true);
 
 			/*
@@ -701,24 +701,24 @@ if(!class_exists('GFPDFEntryDetail'))
 			/*
 			 * Add misc fields
 			 */
-			 $form_array['misc']['date_time'] = $lead['date_created'];
-			 $form_array['misc']['time_24hr'] = date('H:i', strtotime($lead['date_created']));
-			 $form_array['misc']['time_12hr'] = date('g:ia', strtotime($lead['date_created']));
-			 $form_array['misc']['is_starred'] = $lead['is_starred'];
-			 $form_array['misc']['is_read'] = $lead['is_read'];
-			 $form_array['misc']['ip'] = $lead['ip'];
-			 $form_array['misc']['source_url'] = $lead['source_url'];
-			 $form_array['misc']['post_id'] = $lead['post_id'];
-			 $form_array['misc']['currency'] = $lead['currency'];
-			 $form_array['misc']['payment_status'] = $lead['payment_status'];
-			 $form_array['misc']['payment_date'] = $lead['payment_date'];
-			 $form_array['misc']['transaction_id'] = $lead['transaction_id'];
-			 $form_array['misc']['payment_amount'] = $lead['payment_amount'];
-			 $form_array['misc']['is_fulfilled'] = $lead['is_fulfilled'];
-			 $form_array['misc']['created_by'] = $lead['created_by'];
-			 $form_array['misc']['transaction_type'] = $lead['transaction_type'];
-			 $form_array['misc']['user_agent'] = $lead['user_agent'];
-			 $form_array['misc']['status'] = $lead['status'];
+			$form_array['misc']['date_time']        = $lead['date_created'];
+			$form_array['misc']['time_24hr']        = date('H:i', strtotime($lead['date_created']));
+			$form_array['misc']['time_12hr']        = date('g:ia', strtotime($lead['date_created']));
+			$form_array['misc']['is_starred']       = $lead['is_starred'];
+			$form_array['misc']['is_read']          = $lead['is_read'];
+			$form_array['misc']['ip']               = $lead['ip'];
+			$form_array['misc']['source_url']       = $lead['source_url'];
+			$form_array['misc']['post_id']          = $lead['post_id'];
+			$form_array['misc']['currency']         = $lead['currency'];
+			$form_array['misc']['payment_status']   = $lead['payment_status'];
+			$form_array['misc']['payment_date']     = $lead['payment_date'];
+			$form_array['misc']['transaction_id']   = $lead['transaction_id'];
+			$form_array['misc']['payment_amount']   = $lead['payment_amount'];
+			$form_array['misc']['is_fulfilled']     = $lead['is_fulfilled'];
+			$form_array['misc']['created_by']       = $lead['created_by'];
+			$form_array['misc']['transaction_type'] = $lead['transaction_type'];
+			$form_array['misc']['user_agent']       = $lead['user_agent'];
+			$form_array['misc']['status']           = $lead['status'];
 
 			
 
