@@ -85,7 +85,7 @@ class GFPDF_Settings
 			 /*
 			  * Check if we want to copy the theme files
 			  */
-			 if(is_dir($gfpdfe_data->old_template_location) && wp_verify_nonce(PDF_Common::get('_wpnonce'), 'gfpdfe_migrate') )
+			 if( (is_dir($gfpdfe_data->old_template_location) || (is_dir($gfpdfe_data->old_3_6_template_site_location)) ) && wp_verify_nonce(PDF_Common::get('_wpnonce'), 'gfpdfe_migrate') ) /* add in 3.6 directory change */
 			 {	
 
 				 if(GFPDF_InstallUpdater::run_template_migration() === 'false')

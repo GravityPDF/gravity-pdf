@@ -53,17 +53,42 @@ class GFPDFE_DATA
     {
         $upload_dir = PDF_Common::get_upload_dir();
         $site_name  = PDF_Common::get_site_name();
+        
+        /*
+         * As of Gravity PDF 3.7 we'll be dropping the 'site_name' folder for single installs 
+         * And changing multisite installs to their site ID         
+         */
+       
+        $this->template_location              = $upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/';
+        $this->template_site_location         = $this->template_location;
+        $this->template_save_location         = $this->template_location . 'output/';
+        $this->template_font_location         = $this->template_location . 'fonts/';
+        
+        $this->template_location_url          = $upload_dir['baseurl'] . '/' . PDF_SAVE_FOLDER . '/';
+        $this->template_site_location_url     = $this->template_location_url;
+        $this->template_save_location_url     = $this->template_location_url . 'output/';
+        $this->template_font_location_url     = $this->template_location_url . 'fonts/';        
+        
+        $this->old_3_6_template_site_location = $this->template_location . $site_name . '/';
 
-        $this->template_location          = $upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/';
-        $this->template_site_location     = $upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/';
-        $this->template_save_location     = $upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/output/';
-        $this->template_font_location     = $upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/fonts/';
-        
-        $this->template_location_url      = $upload_dir['baseurl'] . '/' . PDF_SAVE_FOLDER . '/';
-        $this->template_site_location_url = $upload_dir['baseurl'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/';
-        $this->template_save_location_url = $upload_dir['baseurl'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/output/';
-        $this->template_font_location_url = $upload_dir['baseurl'] . '/' . PDF_SAVE_FOLDER . '/' . $site_name . '/fonts/';
-        
+        /*
+         * Use the network ID for multisite installs 
+         */
+        if(is_multisite())
+        {
+            $blog_id = get_current_blog_id();
+            
+            $this->template_site_location     = $this->template_location . $blog_id . '/';
+            $this->template_save_location     = $this->template_site_location . 'output/';
+            $this->template_font_location     = $this->template_site_location . 'fonts/';
+            
+            $this->template_site_location_url = $this->template_location_url . $blog_id . '/';
+            $this->template_save_location_url = $this->template_site_location_url . 'output/';
+            $this->template_font_location_url = $this->template_site_location_url . 'fonts/';   
+
+            $this->old_3_6_template_site_location = $this->template_location . $site_name . '/';
+        }    
+
         $this->old_template_location      = get_stylesheet_directory().'/'.PDF_SAVE_FOLDER.'/';
         $this->upload_dir                 = $upload_dir['basedir'];
     }

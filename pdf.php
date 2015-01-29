@@ -345,7 +345,8 @@ class GFPDF_Core extends PDFGenerator
 						( !is_dir($gfpdfe_data->template_save_location) )  						
 					)
 					&& (!rgpost('upgrade'))
-					&& (!is_dir($gfpdfe_data->old_template_location) )
+					&& (!is_dir($gfpdfe_data->old_template_location) 
+					&& (!is_dir($gfpdfe_data->old_3_6_template_site_location)) ) /* add in 3.6 directory change */
 				  )
 			{
 
