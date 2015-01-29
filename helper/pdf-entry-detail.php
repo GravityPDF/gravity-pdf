@@ -1033,6 +1033,7 @@ if(!class_exists('GFPDFEntryDetail'))
 			if(isset($field['content']))
 			{
 				$form_array['html'][] = wpautop($field['content']);
+				$form_array['html_id'][$field['id']] = wpautop($field['content']);
 			}
 
 			return $form_array;

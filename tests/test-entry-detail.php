@@ -447,6 +447,7 @@ EOD;
          * Run our tests...
          */
         $response = "10:30 am";
+
         /*$this->assertEquals($response, $field[13]);
         $this->assertEquals($response, $field['13.Time']);
         $this->assertEquals($response, $field['Time']);	*/
@@ -848,14 +849,10 @@ EOD;
          * Run our tests...
          */
         $response = '<p>This is a HTML block</p>';
-        $this->assertEquals($response, trim($data['html'][0]));
 
-        /*
-         * Why does the HTML block use indexes instead of IDs??
-         */
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $this->assertEquals($response, trim($data['html'][0]));
+        $this->assertEquals($response, trim($data['html_id'][9]));
+
     }
 
     /**
