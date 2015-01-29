@@ -28,6 +28,7 @@ class Test_EntryDetails extends WP_UnitTestCase
         $this->cut_down_setup();
 
         /* initialise GF tables */
+        RGFormsModel::drop_tables();
         GFForms::setup(true);
 
         /* Load our plugin functions */
