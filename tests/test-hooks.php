@@ -6,7 +6,8 @@ class PDF_Actions_And_Filters extends WP_UnitTestCase {
 		parent::setUp();	
 
 		/* Load our plugin functions */
-		GFPDF_Core::fully_loaded_admin();	
+		GFPDF_InstallUpdater::check_filesystem_api();
+		GFPDF_InstallUpdater::maybe_deploy();	
 
 		/*
 		 * Admin init was restricted to Gravity Form-only pages 

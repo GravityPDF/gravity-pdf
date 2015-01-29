@@ -90,7 +90,7 @@ if(!class_exists('GFPDFEntryDetail'))
 						 */
 						 if($config['page_names'] === true)
 						 {
-							if((int) $field['pageNumber'] !== $page_number)
+							if((int) $field['pageNumber'] !== $page_number && isset($form['pagination']['pages'][$page_number]))
 							{
 								/*
 								 * Display the page number
