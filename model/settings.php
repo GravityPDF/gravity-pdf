@@ -183,6 +183,7 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 	 /* convert ini memory limit to bytes */
 	 private function convert_ini_memory($size_str)
 	 {
+
 		$convert = array('mb' => 'm', 'kb' => 'k', 'gb' => 'g');
 		
 		foreach($convert as $k => $v)
@@ -202,27 +203,16 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 	 private function check_available_ram()
 	 {
 	 	 global $gfpdfe_data;
-
-	 	 /*
-	 	  * Our unit tests fail because PHP is being run from the CLI
-	 	  * Overriding the RAM check if running from the CLI
-	 	  */
-	 	 if(PHP_SAPI === 'cli')
-	 	 {
-			$gfpdfe_data->ram_compatible      = true;
-			$gfpdfe_data->allow_initilisation = true;
-	 	 	return;
-	 	 }
 		 		 
 		/*
 		 * Get ram available in bytes and convert it to megabytes
 		 */
 		 $memory_limit = $this->convert_ini_memory(ini_get('memory_limit'));
 		  
-		 $gfpdfe_data->ram_available = floor($memory_limit / 1024 / 1024); /* convert to MB */
+		 $gfpdfe_data->ram_available = ($memory_limit === '-1') ? -1 : floor($memory_limit / 1024 / 1024); /* convert to MB */
 
 		 $gfpdfe_data->ram_compatible = true;
-		 if($gfpdfe_data->ram_available < 128)
+		 if($gfpdfe_data->ram_available < 128 && $gfpdfe_data->ram_available !== -1)
 		 {
 			$gfpdfe_data->ram_compatible = false; 
 		 }
@@ -230,7 +220,7 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 		 /*
 		  * If under 64MB of ram assigned to the server do not run the software
 		  */
-		 if($gfpdfe_data->ram_available < 64)
+		 if($gfpdfe_data->ram_available < 64 && $gfpdfe_data->ram_available !== -1)
 		 {
 		 	$gfpdfe_data->allow_initilisation = false;
 		 }
