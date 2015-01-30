@@ -39,7 +39,7 @@ $form = RGFormsModel::get_form_meta($form_id);
                     $lead = RGFormsModel::get_lead($lead_id);
 
                     /* generate the entry HTML */
-                    GFPDFEntryDetail::lead_detail_grid($form, $lead, $config_data['empty_field'], $config_data['html_field'], $config_data['page_names']);
+                    GFPDFEntryDetail::do_lead_detail_grid($form, $lead, $config_data);
                 }
             ?>
         </div>

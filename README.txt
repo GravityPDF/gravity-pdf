@@ -82,7 +82,7 @@ All FAQs can be [viewed on the Gravity PDF website](https://gravitypdf.com/#faqs
 == Changelog ==
 
 = 3.7.0 =
-* Feature - Added 'default-show-section-content' configuration option. You can now display the section break content in the default template. Note: if this option is enabled and the section break is empty it will still be displayed on the PDF. 
+* Feature - Added 'default-show-section-content' configuration option. You can now display the section break content in the default template. If this option is enabled and the section break is empty it will still be displayed on the PDF. Note: Existing installations will have to reinitialise their templates with the 'Reinstall Default and Example Templates' option enabled.
 * Housekeeping - Migrate your template and configuration files. As of Gravity PDF 3.7 we'll be dropping the 'site_name' folder for single WordPress installs and changing the multisite install directory to the site ID. 
 * Housekeeping - Added $form_data['html_id'] key which has the HTML fields added by their ID (much like the signature_details_id key).
 * Housekeeping - Add large number of unit tests 
