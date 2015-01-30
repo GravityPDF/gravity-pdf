@@ -260,8 +260,8 @@ EOT;
     		array('{:1.6}', 'Jackson'),
     		array('{:5}', 'Third Choice'),
     		array('{:7}', 'This is paragraph test!'),
-    		array('{date_dmy}', '29/01/2015'),
-    		array('{date_mdy}', '01/29/2015'),
+            array('{date_dmy}', date('d/m/Y')),
+            array('{date_mdy}', date('m/d/Y')),
     		array('{form_title}', 'Simple Form Testing'),
     	);
     }
