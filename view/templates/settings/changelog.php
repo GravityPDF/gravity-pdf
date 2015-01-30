@@ -21,6 +21,24 @@
     <p><strong>Current Version: <?php echo PDF_EXTENDED_VERSION; ?></strong></p>
 
   <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
+
+<ul>
+<li>Feature - Added 'default-show-section-content' configuration option. You can now display the section break content in the default template. Note: if this option is enabled and the section break is empty it will still be displayed on the PDF.</li> 
+<li>Housekeeping - Migrate your template and configuration files. As of Gravity PDF 3.7 we'll be dropping the 'site_name' folder for single WordPress installs and changing the multisite install directory to the site ID.</li> 
+<li>Housekeeping - Added $form_data['html_id'] key which has the HTML fields added by their ID (much like the signature_details_id key).</li>
+<li>Housekeeping - Add large number of unit tests </li>
+<li>Housekeeping - Derestrict certain pages software loads on.</li>
+<li>Housekeeping - Split up PDF viewing security components into smaller chunks (easier to unit test)</li>
+<li>Housekeeping - Remove CLI-checking override in RAM settings</li>
+<li>Bug - Fixed issue initialising plugin when memory limit was set to -1 (unlimited)</li>
+<li>Bug - Fix Multisite migration problem where if an error was thrown for one of the sub sites it caused all of the sites to show an error (even if they were successful)</li>
+<li>Bug - Fix typo in example-template.php file</li>
+<li>Bug - Fix up notices in custom templates when using poll/survey/quiz add ons.</li>
+<li>Bug - Fix up notice in custom template when the form description is empty</li>
+<li>Bug - Fix up notices in mPDF template when using headers/footers</li>
+</ul>
+
+  <h3>3.6.0</h3>
 <ul>
 <li>Feature - Added support for Gravity Form's sub-field 'middle' name  (1.9Beta)</li>
 <li>Feature - Patch mPDF with full :nth-child support on TD and TR table cells</li>
