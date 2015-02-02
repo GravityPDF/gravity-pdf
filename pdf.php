@@ -41,7 +41,7 @@
 /*
  * Define our constants 
  */
-define('PDF_EXTENDED_VERSION', '3.6.0'); 
+define('PDF_EXTENDED_VERSION', '3.7.0Beta1'); 
 define('GF_PDF_EXTENDED_SUPPORTED_VERSION', '1.8'); 
 define('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION', '3.9'); 
 define('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION', '5'); 
