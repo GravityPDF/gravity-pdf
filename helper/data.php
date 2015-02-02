@@ -8,6 +8,23 @@
  * In some circumstances it will also provide functions to get data from itself
  */
 
+/*
+    This file is part of Gravity PDF.
+
+    Gravity PDF is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Gravity PDF is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Gravity PDF. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 class GFPDFE_DATA
 {
     /**  Location for overloaded data.  */
@@ -76,20 +93,30 @@ class GFPDFE_DATA
          */
         if(is_multisite())
         {
-            $blog_id = get_current_blog_id();
+            $blog_id                              = get_current_blog_id();
             
-            $this->template_site_location     = $this->template_location . $blog_id . '/';
-            $this->template_save_location     = $this->template_site_location . 'output/';
-            $this->template_font_location     = $this->template_site_location . 'fonts/';
+            $this->template_site_location         = $this->template_location . $blog_id . '/';
+            $this->template_save_location         = $this->template_site_location . 'output/';
+            $this->template_font_location         = $this->template_site_location . 'fonts/';
             
-            $this->template_site_location_url = $this->template_location_url . $blog_id . '/';
-            $this->template_save_location_url = $this->template_site_location_url . 'output/';
-            $this->template_font_location_url = $this->template_site_location_url . 'fonts/';   
-
+            $this->template_site_location_url     = $this->template_location_url . $blog_id . '/';
+            $this->template_save_location_url     = $this->template_site_location_url . 'output/';
+            $this->template_font_location_url     = $this->template_site_location_url . 'fonts/';   
+            
             $this->old_3_6_template_site_location = $this->template_location . $site_name . '/';
         }    
 
+        /*
+         * Include old template locations to help with migrations 
+         */
         $this->old_template_location      = get_stylesheet_directory().'/'.PDF_SAVE_FOLDER.'/';
         $this->upload_dir                 = $upload_dir['basedir'];
+
+        /*
+         * Include relative paths for display on the support pages 
+         */
+        $this->relative_output_location = str_replace(ABSPATH, '/', $this->template_save_location);
+        $this->relative_font_location   = str_replace(ABSPATH, '/', $this->template_font_location);
+        $this->relative_mpdf_tmp        = str_replace(ABSPATH, '/', PDF_PLUGIN_DIR) . 'mPDF/tmp/';        
     }
 }

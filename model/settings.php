@@ -7,6 +7,23 @@
  * The model that does all the processing and interacts with our controller and view
  */
 
+/*
+    This file is part of Gravity PDF.
+
+    Gravity PDF is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Gravity PDF is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Gravity PDF. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 class GFPDF_Settings_Model extends GFPDF_Settings
 {
 	public $navigation = array();
@@ -320,11 +337,11 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 		  
 		 /*
 		  * Pass any additional variables to the view templates
-		  */
-		  $gfpdfe_data->active_plugins 			= $this->get_active_plugins();
-		  $gfpdfe_data->system_status 			= $this->get_system_status_html();
-		  $gfpdfe_data->configuration_file 		= $this->get_configuration_file();				 
-		 
+		  */	 			  								 
+		$gfpdfe_data->active_plugins           = $this->get_active_plugins();
+		$gfpdfe_data->system_status            = $this->get_system_status_html(false);
+		$gfpdfe_data->configuration_file       = $this->get_configuration_file();			
+
 		 new settingsView($this);
 	}
 	

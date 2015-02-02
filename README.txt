@@ -5,8 +5,8 @@ Tags: gravity, forms, pdf, automation, attachment
 Requires at least: 3.5
 Tested up to: 4.1
 Stable tag: 3.7.0Beta1
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+License: GPLv3 or later
+License URI: http://www.gnu.org/licenses/gpl.txt
 
 Gravity PDF allows you to save/view/download a PDF from the front- and back-end, and automate PDF creation on form submission. 
 
@@ -82,13 +82,15 @@ All FAQs can be [viewed on the Gravity PDF website](https://gravitypdf.com/#faqs
 == Changelog ==
 
 = 3.7.0 =
-* Feature - Added 'default-show-section-content' configuration option. You can now display the section break content in the default template. If this option is enabled and the section break is empty it will still be displayed on the PDF. Note: Existing installations will have to reinitialise their templates with the 'Reinstall Default and Example Templates' option enabled.
+* Feature - Added 'default-show-section-content' configuration option. You can now display the section break content in the default template. Note: if this option is enabled and the section break is empty it will still be displayed on the PDF. 
 * Housekeeping - Migrate your template and configuration files. As of Gravity PDF 3.7 we'll be dropping the 'site_name' folder for single WordPress installs and changing the multisite install directory to the site ID. 
 * Housekeeping - Added $form_data['html_id'] key which has the HTML fields added by their ID (much like the signature_details_id key).
 * Housekeeping - Add large number of unit tests 
 * Housekeeping - Derestrict certain pages software loads on.
 * Housekeeping - Split up PDF viewing security components into smaller chunks (easier to unit test)
 * Housekeeping - Remove CLI-checking override in RAM settings
+* Housekeeping - Move from 'GPLv2 or later' license type to 'GPLv3 or later'.
+* Housekeeping - Included directory paths by default on the system status page
 * Bug - Fixed issue initialising plugin when memory limit was set to -1 (unlimited)
 * Bug - Fix Multisite migration problem where if an error was thrown for one of the sub sites it caused all of the sites to show an error (even if they were successful)
 * Bug - Fix typo in example-template.php file

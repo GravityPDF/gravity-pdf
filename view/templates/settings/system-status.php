@@ -3,8 +3,24 @@
  /*
   * Template: System Status
   * Module: Settings Page
-  *
   */
+ 
+/*
+    This file is part of Gravity PDF.
+
+    Gravity PDF is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Gravity PDF is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Gravity PDF. If not, see <http://www.gnu.org/licenses/>.
+*/ 
   
   /*
    * Don't run if the correct class isn't present
@@ -21,7 +37,7 @@
 <div id="pdf-system-status">
            <p><label><?php _e('Wordpress Version', 'pdfextended'); ?>:</label> <strong><?php echo $gfpdfe_data->wp_version; ?></strong> <span class="<?php echo ($gfpdfe_data->wp_is_compatible === true) ? 'fa fa-check-circle' : 'fa fa-times-circle'; ?>"></span>
             <?php if($gfpdfe_data->wp_is_compatible === false): ?>
-            <br />
+
             <span class="details"><?php _e('Wordpress Version '. GF_PDF_EXTENDED_WP_SUPPORTED_VERSION . ' is required to use this plugin.', 'pdfextended'); ?>
             <?php endif; ?>
             </p>
@@ -30,14 +46,14 @@
             <p><label><?php _e('Gravity Forms', 'pdfextended'); ?>:</label> <strong>
 			<?php if($gfpdfe_data->gf_installed === false): ?>
             <?php _e('Not Installed', 'pdfextended'); ?></strong> <span class="fa fa-times-circle"></span>
-            <br />
+
             <span class="details"><?php _e('Gravity Forms '. GF_PDF_EXTENDED_SUPPORTED_VERSION . ' is required to use this plugin. <a href="https://www.e-junkie.com/ecom/gb.php?cl=54585&c=ib&aff=235154" target="ejejcsingle">Upgrade today</a>.', 'pdfextended'); ?></span>
                         
             <?php else: 
             echo $gfpdfe_data->gf_version; ?> </strong>			           
             <span class="<?php echo ($gfpdfe_data->gf_is_compatible === true) ? 'fa fa-check-circle' : 'fa fa-times-circle'; ?>"></span>
 				<?php if($gfpdfe_data->gf_is_compatible === false): ?>
-                <br />
+
                 <span class="details"><?php _e('Gravity Forms '. GF_PDF_EXTENDED_SUPPORTED_VERSION . ' is required to use this plugin. <a href="https://www.e-junkie.com/ecom/gb.php?cl=54585&c=ib&aff=235154" target="ejejcsingle">Upgrade today</a>.', 'pdfextended'); ?></span>
                 <?php endif; ?>
             <?php endif; ?>
@@ -46,7 +62,7 @@
                    
             <p><label><?php _e('PHP Version', 'pdfextended'); ?>:</label> <strong><?php echo $gfpdfe_data->php_version; ?></strong> <span class="<?php echo ($gfpdfe_data->php_version_compatible === true) ? 'fa fa-check-circle' : 'fa fa-times-circle'; ?>"></span>
             <?php if($gfpdfe_data->php_version_compatible === false): ?>
-            <br />
+
             <span class="details"><?php _e('PHP Version '. GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION . ' is required to use this plugin.', 'pdfextended'); ?></span>
             <?php endif; ?>
             </p>
@@ -54,7 +70,7 @@
             <p><label><?php _e('MB String', 'pdfextended'); ?>:</label> <strong><?php ($gfpdfe_data->mb_string_installed === true) ? _e('Yes', 'pdfextended') : _e('No', 'pdfextended'); ?></strong>
             <span class="<?php echo ($gfpdfe_data->mb_string_installed === true) ? 'fa fa-check-circle' : 'fa fa-times-circle'; ?>"></span>
             <?php if($gfpdfe_data->mb_string_installed === false): ?>
-            <br />
+
             <span class="details"><?php _e('The PHP extension MB String and MB String Regex functions are required to use this plugin. Contact your web host to have it enabled.', 'pdfextended'); ?></span>
             <?php endif; ?>
             </p>   
@@ -62,7 +78,7 @@
             <p><label><?php _e('GD Library', 'pdfextended'); ?>:</label> <strong><?php ($gfpdfe_data->gd_installed  === true) ? _e('Yes', 'pdfextended') : _e('No', 'pdfextended'); ?></strong>
             <span class="<?php echo ($gfpdfe_data->gd_installed === true) ? 'fa fa-check-circle' : 'fa fa-times-circle'; ?>"></span>
             <?php if($gfpdfe_data->gd_installed === false): ?>
-            <br />
+
             <span class="details"><?php _e('The PHP extension GD Library is required to use this plugin. Contact your web host to have it enabled.', 'pdfextended'); ?></span>
             <?php endif; ?>
             </p>      
@@ -106,8 +122,8 @@
                     
                     <p><label><?php _e('Uploads Directory Writable?', 'pdfextended'); ?></label> <strong><?php ($gfpdfe_data->can_write_upload_dir  === true) ? _e('Yes', 'pdfextended') : _e('No', 'pdfextended'); ?></strong> <span class="<?php echo ($gfpdfe_data->can_write_upload_dir === true) ? 'fa fa-check-circle' : 'fa fa-exclamation-triangle'; ?>"></span>
                     <?php if($gfpdfe_data->can_write_theme_dir === false): ?>
-                    <br />
-                    <span class="details"><?php echo sprintf(__('Your upload folder is not writable by your web server. Check that "%s" is writable by your web server otherwise we will attempt to use the FTP installer to initialise.', 'pdfextended'), str_replace(ABSPATH, '', $gfpdfe_data->upload_dir) ); ?></span>
+
+                    <span class="details"><?php echo __('Your upload folder is not writable by your web server. Check that it\'s writable by your web server otherwise we will attempt to use the FTP installer to initialise.', 'pdfextended'); ?></span>
                     <?php endif; ?>
                     </p>              
             
@@ -116,22 +132,28 @@
                      <p><label><?php _e('PDF Output Directory Writable?', 'pdfextended'); ?></label> <strong><?php ($gfpdfe_data->can_write_output_dir  === true) ? _e('Yes', 'pdfextended') : _e('No', 'pdfextended'); ?></strong> <span class="<?php echo ($gfpdfe_data->can_write_output_dir === true) ? 'fa fa-check-circle' : 'fa fa-times-circle'; ?>"></span>
                     <?php if($gfpdfe_data->can_write_output_dir === false): ?>
                     <br />
-                    <span class="details"><?php echo sprintf(__('The plugin\'s output folder is not writable by your web server. PDFs will not be attached to notifications until this problem is fixed. Check that "%s" is writable by your web server.', 'pdfextended'), str_replace(ABSPATH, '', $gfpdfe_data->template_location) ); ?></span>
+                    <span class="details"><?php echo __('The plugin\'s output folder is not writable by your web server. PDFs will not be attached to notifications until this problem is fixed.', 'pdfextended'); ?></span>
                     <?php endif; ?>
+
+                    <span class="details path"><?php echo $gfpdfe_data->relative_output_location; ?></span>
                     </p>  
                     
                     <p><label><?php _e('PDF Font Directory Writable?', 'pdfextended'); ?></label> <strong><?php ($gfpdfe_data->can_write_font_dir  === true) ? _e('Yes', 'pdfextended') : _e('No', 'pdfextended'); ?></strong> <span class="<?php echo ($gfpdfe_data->can_write_font_dir === true) ? 'fa fa-check-circle' : 'fa fa-exclamation-triangle'; ?>"></span>
                     <?php if($gfpdfe_data->can_write_font_dir === false): ?>
-                    <br />
+
                     <span class="details"><?php echo sprintf(__('The plugin\'s font folder is not writable by your web server. Check that "%s" is writable by your web server otherwise we will attempt to use the FTP installer to initialise.', 'pdfextended'),  str_replace(ABSPATH, '', $gfpdfe_data->template_font_location)  ); ?></span>
                     <?php endif; ?>
+
+                    <span class="details path"><?php echo $gfpdfe_data->relative_font_location; ?></span>
                     </p>   
                     
                     <p><label><?php _e('mPDF Temporary Directory Writable?', 'pdfextended'); ?></label> <strong><?php ($gfpdfe_data->can_write_pdf_temp_dir  === true) ? _e('Yes', 'pdfextended') : _e('No', 'pdfextended'); ?></strong> <span class="<?php echo ($gfpdfe_data->can_write_pdf_temp_dir === true) ? 'fa fa-check-circle' : 'fa fa-exclamation-triangle'; ?>"></span>
                     <?php if($gfpdfe_data->can_write_pdf_temp_dir === false): ?>
-                    <br />
-                    <span class="details"><?php echo sprintf(__('mPDF temporary directory not writable (%s). Memory and image processing time will increase.', 'pdfextended'), str_replace(ABSPATH, '', PDF_PLUGIN_DIR) . 'mPDF/tmp/'); ?></span>
+
+                    <span class="details"><?php echo __('mPDF temporary directory not writable. Memory and image processing time will increase.', 'pdfextended'); ?></span>                    
                     <?php endif; ?>
+
+                    <span class="details path"><?php echo $gfpdfe_data->relative_mpdf_tmp; ?></span>
                     </p>                             
                     
           <?php endif; ?>        
