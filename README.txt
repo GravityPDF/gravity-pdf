@@ -5,7 +5,7 @@ Tags: gravity, forms, pdf, automation, attachment
 Requires at least: 3.5
 Tested up to: 4.1
 Stable tag: 3.7.0Beta1
-License: GPLv3 or later
+License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
 
 Gravity PDF allows you to save/view/download a PDF from the front- and back-end, and automate PDF creation on form submission. 
@@ -89,7 +89,6 @@ All FAQs can be [viewed on the Gravity PDF website](https://gravitypdf.com/#faqs
 * Housekeeping - Derestrict certain pages software loads on.
 * Housekeeping - Split up PDF viewing security components into smaller chunks (easier to unit test)
 * Housekeeping - Remove CLI-checking override in RAM settings
-* Housekeeping - Move from 'GPLv2 or later' license type to 'GPLv3 or later'.
 * Housekeeping - Included directory paths by default on the system status page
 * Bug - Fixed issue initialising plugin when memory limit was set to -1 (unlimited)
 * Bug - Fix Multisite migration problem where if an error was thrown for one of the sub sites it caused all of the sites to show an error (even if they were successful)

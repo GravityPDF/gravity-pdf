@@ -8,18 +8,21 @@
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF is free software: you can redistribute it and/or modify
+    Gravity PDF Copyright (C) 2015 Blue Liquid Designs
+
+    This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
+    the Free Software Foundation; either version 2 of the License, or
     (at your option) any later version.
 
-    Gravity PDF is distributed in the hope that it will be useful,
+    This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Gravity PDF. If not, see <http://www.gnu.org/licenses/>.
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */ 
   
   /*
@@ -46,7 +49,6 @@
 <li>Housekeeping - Derestrict certain pages software loads on.</li>
 <li>Housekeeping - Split up PDF viewing security components into smaller chunks (easier to unit test)</li>
 <li>Housekeeping - Remove CLI-checking override in RAM settings</li>
-<li>Housekeeping - Move from 'GPLv2 or later' license type to 'GPLv3 or later'.</li>
 <li>Housekeeping - Included directory paths by default on the system status page</li>
 <li>Bug - Fixed issue initialising plugin when memory limit was set to -1 (unlimited)</li>
 <li>Bug - Fix Multisite migration problem where if an error was thrown for one of the sub sites it caused all of the sites to show an error (even if they were successful)</li>

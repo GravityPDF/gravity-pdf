@@ -55,9 +55,14 @@ padding: 2px 0 2px 2px;
 #pdf-system-status span.details, #support-request span.details  {
 font-size: 95%;
 color: #444;	
-padding-top: 7px;
-display: block;
+margin-top: 7px;
+display: inline-block;
 clear: left;
+}
+
+#pdf-system-status span.details.path, #support-request span.details.path {
+  padding: 2px;
+  background: #f2f2f2;
 }
 
 #support-request input, #support-request select {
