@@ -195,21 +195,25 @@ if(!class_exists('GFPDFEntryDetail'))
 								}
 							break;
 							case 'signature':
-								$value = RGFormsModel::get_lead_field_value($lead, $field);
+								$value         = RGFormsModel::get_lead_field_value($lead, $field);
 								$public_folder = RGFormsModel::get_upload_url_root() . 'signatures/';
 								$server_folder = RGFormsModel::get_upload_root() . 'signatures/';		
+								$file          = $server_folder.$value;
+								$display_value = false;
 
-								$image_size = getimagesize($server_folder.$value);
-								$width = $image_size[0] / 4;
-								$height = $image_size[1] / 4;
+								$is_last       = $count >= $field_count ? true : false;
+								$last_row      = $is_last ? ' lastrow' : '';								
+								
+								if(file_exists($file) && !is_dir($file))
+								{
+									$image_size    = getimagesize($file);
+									$width         = $image_size[0] / 4;
+									$height        = $image_size[1] / 4;
 
-								$display_value = '<img src="'. $server_folder.$value .'" alt="Signature" width=" '. $width .'" height="'. $height .'" />';
+									$display_value = '<img src="'. $file .'" alt="Signature" width=" '. $width .'" height="'. $height .'" />';
+								}
 
-
-								$is_last = $count >= $field_count ? true : false;
-								$last_row = $is_last ? ' lastrow' : '';
-
-								if(strlen($value) > 0 && (file_exists($server_folder.$value)) && (is_dir($server_folder.$value) !== true) )
+								if($display_value)
 								{
 									 $content = '<div id="field-'. $field['id'] .'" class="entry-view-field-value' . $last_row . $even . '"><div class="strong">' .  esc_html(GFCommon::get_label($field)) . '</div> <div class="value">' . $display_value . '</div></div>	';
 
@@ -226,11 +230,11 @@ if(!class_exists('GFPDFEntryDetail'))
 								{
 									if($config['return'] === true)
 									{
-										$results['field'][] = '<div id="field-'. $field['id'] .'" class="entry-view-field-value' . $last_row . $even . '"><div class="strong">' .  esc_html(GFCommon::get_label($field)) . '</div></div>';
+										$results['field'][] = '<div id="field-'. $field['id'] .'" class="entry-view-field-value' . $last_row . $even . '"><div class="strong">' .  esc_html(GFCommon::get_label($field)) . '</div> <div class="value">&nbsp;</div></div>';
 									}
 									else
 									{
-										print '<div id="field-'. $field['id'] .'" class="entry-view-field-value' . $last_row . $even . '"><div class="strong">' .  esc_html(GFCommon::get_label($field)) . '</div></div>';
+										print '<div id="field-'. $field['id'] .'" class="entry-view-field-value' . $last_row . $even . '"><div class="strong">' .  esc_html(GFCommon::get_label($field)) . '</div><div class="value">&nbsp;</div></div>';
 									}
 
 								}
@@ -1064,7 +1068,9 @@ if(!class_exists('GFPDFEntryDetail'))
 		{
 			$value         = RGFormsModel::get_lead_field_value($lead, $field);			
 			$http_folder   = RGFormsModel::get_upload_url_root(). 'signatures/';
-			$server_folder = RGFormsModel::get_upload_root() . 'signatures/';		
+			$server_folder = RGFormsModel::get_upload_root() . 'signatures/';	
+			$file          = $server_folder.$value;
+			$sig_html      = '';
 
 			/*
 			 * Set defaults is we cannot find the images 
@@ -1075,22 +1081,23 @@ if(!class_exists('GFPDFEntryDetail'))
 			/*
 			 * Only get sane defaults specific to the image if we can find it.
 			 */
-			if(file_exists($server_folder.$value) !== false && is_dir($server_folder.$value) !== true)
+			if(file_exists($file) !== false && is_dir($file) !== true)
 			{
-				$image_size = getimagesize($server_folder.$value);
+				$image_size = getimagesize($file);
 				$width      = $image_size[0] / 4;
 				$height     = $image_size[1] / 4;
+				$sig_html   = '<img src="'. $server_folder.$value .'" alt="Signature" width="'. $width .'" height="'. $height .'" />';	
 			}
 
 			/*
 			 * Include the image details
 			 */
-			$sig_html   = '<img src="'. $server_folder.$value .'" alt="Signature" width="'. $width .'" height="'. $height .'" />';								
+										
 
 			$form_array['signature'][]                        = $sig_html;
 			$form_array['signature_details'][]                = array(
 																	'img'    => $sig_html,
-																	'path'   => $server_folder.$value,
+																	'path'   => $file,
 																	'url'    => $http_folder.$value,
 																	'width'  => $width,
 																	'height' => $height,
@@ -1098,7 +1105,7 @@ if(!class_exists('GFPDFEntryDetail'))
 			
 			$form_array['signature_details_id'][$field['id']] = array(
 																	'img'    => $sig_html,
-																	'path'   => $server_folder.$value,
+																	'path'   => $file,
 																	'url'    => $http_folder.$value,
 																	'width'  => $width,
 																	'height' => $height,

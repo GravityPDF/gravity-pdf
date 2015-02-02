@@ -56,6 +56,7 @@
 <li>Bug - Fix up notices in custom templates when using poll/survey/quiz add ons.</li>
 <li>Bug - Fix up notice in custom template when the form description is empty</li>
 <li>Bug - Fix up notices in mPDF template when using headers/footers</li>
+<li>Bug - Fix up error in PDF when signature field wasn't filled in</li>
 </ul>
 
   <h3>3.6.0</h3>

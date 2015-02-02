@@ -96,6 +96,7 @@ All FAQs can be [viewed on the Gravity PDF website](https://gravitypdf.com/#faqs
 * Bug - Fix up notices in custom templates when using poll/survey/quiz add ons.
 * Bug - Fix up notice in custom template when the form description is empty
 * Bug - Fix up notices in mPDF template when using headers/footers
+* Bug - Fix up error in PDF when signature field wasn't filled in
 
 
 = 3.6.0 =
