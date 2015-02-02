@@ -920,7 +920,7 @@ EOD;
     {
         $data = $this->form_data;
 
-        $response = '<img src="/tmp/wordpress/wp-content/uploads/gravity_forms/signatures/54bdac4ed24af5.01502579.png" alt="Signature" width="75" height="45" />';
+        $response = '';
 
         /*
          * Standard Signature Array
