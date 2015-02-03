@@ -1343,8 +1343,7 @@ if(!class_exists('GFPDFEntryDetail'))
 					if(is_array($value)){
 						$card_number = trim(rgget($field['id'] . '.1', $value));
 						$card_type   = trim(rgget($field['id'] . '.4', $value));
-						$separator   = $format == 'html' ? '<br/>' : '\n';
-						return empty($card_number) ? '' : $card_type . $separator . $card_number;
+						return array('card_number' => $card_number, 'card_type' => $card_type);
 					}
 					else{
 						return '';
