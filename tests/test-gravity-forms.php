@@ -376,7 +376,10 @@ EOT;
         /* which the version number is a string before we try to match it */
         $this->assertEquals(true, is_string($version));
 
-        /* do a final test to match the version number according to a set standard */
-        $this->assertRegExp('/^(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)$/', $version);
+        /* 
+         * Do a final test to match the version number according to a set standard
+         * This will validate up to a four digit version x.x.x.x
+         */
+        $this->assertRegExp('/^(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)$/', $version);
     }
 }
