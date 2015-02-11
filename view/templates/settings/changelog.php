@@ -43,6 +43,7 @@
 
 <ul>
 <li>Feature - Added 'default-show-section-content' configuration option. You can now display the section break content in the default template. If this option is enabled and the section break is empty it will still be displayed on the PDF. Note: Existing installations will have to reinitialise their templates with the 'Reinstall Default and Example Templates' option enabled.</li> 
+<li>Feature - Added hooks 'gfpdfe_template_location' and 'gfpdfe_template_location_uri' to change PDF template location</li>
 <li>Housekeeping - Migrate your template and configuration files. As of Gravity PDF 3.7 we'll be dropping the 'site_name' folder for single WordPress installs and changing the multisite install directory to the site ID.</li> 
 <li>Housekeeping - Added $form_data['html_id'] key which has the HTML fields added by their ID (much like the signature_details_id key).</li>
 <li>Housekeeping - Add large number of unit tests </li>
@@ -50,6 +51,7 @@
 <li>Housekeeping - Split up PDF viewing security components into smaller chunks (easier to unit test)</li>
 <li>Housekeeping - Remove CLI-checking override in RAM settings</li>
 <li>Housekeeping - Included directory paths by default on the system status page</li>
+<li>Housekeeping - Updated configuration.php examples to include new default config option and refined the copy</li>
 <li>Bug - Fixed issue initialising plugin when memory limit was set to -1 (unlimited)</li>
 <li>Bug - Fix Multisite migration problem where if an error was thrown for one of the sub sites it caused all of the sites to show an error (even if they were successful)</li>
 <li>Bug - Fix typo in example-template.php file</li>

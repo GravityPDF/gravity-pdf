@@ -4,7 +4,7 @@ Donate link: https://gravitypdf.com
 Tags: gravity, forms, pdf, automation, attachment
 Requires at least: 3.5
 Tested up to: 4.1
-Stable tag: 3.7.0Beta1
+Stable tag: 3.7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
 
@@ -83,6 +83,7 @@ All FAQs can be [viewed on the Gravity PDF website](https://gravitypdf.com/#faqs
 
 = 3.7.0 =
 * Feature - Added 'default-show-section-content' configuration option. You can now display the section break content in the default template. Note: if this option is enabled and the section break is empty it will still be displayed on the PDF. 
+* Feature - Added hooks 'gfpdfe_template_location' and 'gfpdfe_template_location_uri' to change PDF template location
 * Housekeeping - Migrate your template and configuration files. As of Gravity PDF 3.7 we'll be dropping the 'site_name' folder for single WordPress installs and changing the multisite install directory to the site ID. 
 * Housekeeping - Added $form_data['html_id'] key which has the HTML fields added by their ID (much like the signature_details_id key).
 * Housekeeping - Add large number of unit tests 
@@ -90,6 +91,7 @@ All FAQs can be [viewed on the Gravity PDF website](https://gravitypdf.com/#faqs
 * Housekeeping - Split up PDF viewing security components into smaller chunks (easier to unit test)
 * Housekeeping - Remove CLI-checking override in RAM settings
 * Housekeeping - Included directory paths by default on the system status page
+* Housekeeping - Updated configuration.php examples to include new default config option and refined the copy
 * Bug - Fixed issue initialising plugin when memory limit was set to -1 (unlimited)
 * Bug - Fix Multisite migration problem where if an error was thrown for one of the sub sites it caused all of the sites to show an error (even if they were successful)
 * Bug - Fix typo in example-template.php file
