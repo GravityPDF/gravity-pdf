@@ -138,7 +138,7 @@
                     <span class="details"><?php echo __('The plugin\'s output folder is not writable by your web server. PDFs will not be attached to notifications until this problem is fixed.', 'pdfextended'); ?></span>
                     <?php endif; ?>
 
-                    <span class="details path"><?php echo $gfpdfe_data->relative_output_location; ?></span>
+                    <div class="clear"><span class="details path"><?php echo $gfpdfe_data->relative_output_location; ?></span></div>
                     </p>  
                     
                     <p><label><?php _e('PDF Font Directory Writable?', 'pdfextended'); ?></label> <strong><?php ($gfpdfe_data->can_write_font_dir  === true) ? _e('Yes', 'pdfextended') : _e('No', 'pdfextended'); ?></strong> <span class="<?php echo ($gfpdfe_data->can_write_font_dir === true) ? 'fa fa-check-circle' : 'fa fa-exclamation-triangle'; ?>"></span>
@@ -147,7 +147,7 @@
                     <span class="details"><?php echo sprintf(__('The plugin\'s font folder is not writable by your web server. Check that "%s" is writable by your web server otherwise we will attempt to use the FTP installer to initialise.', 'pdfextended'),  str_replace(ABSPATH, '', $gfpdfe_data->template_font_location)  ); ?></span>
                     <?php endif; ?>
 
-                    <span class="details path"><?php echo $gfpdfe_data->relative_font_location; ?></span>
+                    <div class="clear"><span class="details path"><?php echo $gfpdfe_data->relative_font_location; ?></span></div>
                     </p>   
                     
                     <p><label><?php _e('mPDF Temporary Directory Writable?', 'pdfextended'); ?></label> <strong><?php ($gfpdfe_data->can_write_pdf_temp_dir  === true) ? _e('Yes', 'pdfextended') : _e('No', 'pdfextended'); ?></strong> <span class="<?php echo ($gfpdfe_data->can_write_pdf_temp_dir === true) ? 'fa fa-check-circle' : 'fa fa-exclamation-triangle'; ?>"></span>
@@ -156,7 +156,7 @@
                     <span class="details"><?php echo __('mPDF temporary directory not writable. Memory and image processing time will increase.', 'pdfextended'); ?></span>                    
                     <?php endif; ?>
 
-                    <span class="details path"><?php echo $gfpdfe_data->relative_mpdf_tmp; ?></span>
+                    <div class="clear"><span class="details path"><?php echo $gfpdfe_data->relative_mpdf_tmp; ?></span></div>
                     </p>                             
                     
           <?php endif; ?>        
