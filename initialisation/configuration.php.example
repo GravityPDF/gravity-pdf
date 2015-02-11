@@ -2,8 +2,8 @@
 
 /* 
  * Gravity PDF Configuration
- * New from v3.0.0. No longer is theme functions.php code required.
- * Important documentation on the configuration found at https://developer.gravitypdf.com/documentation/getting-started-with-gravity-pdf-configuration/
+ * Each option is explained in detail in this file but you can also find a more user-friendly option online:
+ * https://developer.gravitypdf.com/documentation/configuration-options-examples/
  */
  
 /*
@@ -37,13 +37,13 @@
  /*
   * ------------------------------------------------------------ 
   * Default template specific configuration code
-  * As of 3.1.0 uses can now add default-show-html, default-show-empty and default-show-page-names when using any
-  * of the default template files (any template prepended with default-)
+  * These options only work on templates prepended with 'default-' in their name
   * 
   * Usage:
   * 'default-show-html' - This option will display HTMl blocks in your default tempalte. 
   * 'default-show-empty' - All form fields will be displayed in the PDF, regardless of what the user input is.
   * 'default-show-page-names' - If you are using page breaks you can display the page names in the PDF.
+  * 'default-show-section-content' - By default only the section break title is displayed in the PDF. Enabling this option will also show the section break content.
   *
   * Remove the comments around the code blocks below to use (/*) 
   */
@@ -65,6 +65,12 @@
   	'template' => 'default-template.php',		
   	'default-show-page-names' => true,
   );*/     
+
+  /*$gf_pdf_config[] = array(
+    'form_id' => 1, 
+    'template' => 'default-template.php',   
+    'default-show-section-content' => true,
+  );*/   
   
   /*$gf_pdf_config[] = array(
   	'form_id' => 1, 
@@ -72,6 +78,7 @@
   	'default-show-html' => true,
   	'default-show-empty' => true,
   	'default-show-page-names' => true,
+    'default-show-section-content' => true,
   );*/   
   
  /*
@@ -282,9 +289,8 @@
   * Save PDF to disk
   * Added in v3.4.0 
   * 
-  * If you don't want the PDF sent via email but want it saved on the server 
-  * use the 'save' option. The default save location is /wp-content/themes/ActiveTheme/PDF_EXTENDED_TEMPLATE/output/
-  * Note: you can use 'save' in conjunction with 'notification' without any ill effects
+  * Use this option if you want to save the PDF to your server when an entry is submitted. 
+  * This is useful if you aren’t sending PDF notifications (which need to save the PDFs so they can be attached to emails) and would still like the PDFs generated.
   */  
    /*$gf_pdf_config[] = array(
     'form_id' => 1, 
@@ -373,7 +379,7 @@
  
  /*
   * By default, forms that don't have PDFs assigned through the above configuration
-  * will automatically use the default template in the admin area.
+  * will automatically use the settings applied in the $gf_pdf_default_configuration node.
   * Set to false to disable this feature.
   */ 
  define('GFPDF_SET_DEFAULT_TEMPLATE', true); 
