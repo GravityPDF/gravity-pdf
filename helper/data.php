@@ -79,12 +79,12 @@ class GFPDFE_DATA
          * And changing multisite installs to their site ID         
          */
        
-        $this->template_location              = apply_filters('gfpdfe_template_location', $upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/', PDF_SAVE_FOLDER);
+        $this->template_location              = apply_filters('gfpdfe_template_location', $upload_dir['basedir'] . '/' . PDF_SAVE_FOLDER . '/', $upload_dir['basedir'], PDF_SAVE_FOLDER);
         $this->template_site_location         = $this->template_location;
         $this->template_save_location         = $this->template_location . 'output/';
         $this->template_font_location         = $this->template_location . 'fonts/';
         
-        $this->template_location_url          = $upload_dir['baseurl'] . '/' . PDF_SAVE_FOLDER . '/';
+        $this->template_location_url          = apply_filters('gfpdfe_template_location_uri', $upload_dir['baseurl'] . '/' . PDF_SAVE_FOLDER . '/', $upload_dir['baseurl'], PDF_SAVE_FOLDER);
         $this->template_site_location_url     = $this->template_location_url;
         $this->template_save_location_url     = $this->template_location_url . 'output/';
         $this->template_font_location_url     = $this->template_location_url . 'fonts/';        

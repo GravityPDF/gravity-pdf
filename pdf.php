@@ -61,21 +61,6 @@ define('GF_PDF_EXTENDED_PLUGIN_BASENAME', plugin_basename(__FILE__));
  include PDF_PLUGIN_DIR . 'helper/installation-update-manager.php'; 
  include PDF_PLUGIN_DIR . 'helper/pdf-common.php';	
  include PDF_PLUGIN_DIR . 'helper/pdf-render.php'; 		
- 
- /*
-  * Initialise our data helper class
-  */
- global $gfpdfe_data;
- $gfpdfe_data = new GFPDFE_DATA();   
-
-  /* set our PDF folder storage */
- $gfpdfe_data->set_directory_structure();  
-
- /* include our regular files */
- include PDF_PLUGIN_DIR . 'pdf-settings.php';
- include PDF_PLUGIN_DIR . 'depreciated.php';
-
-
 
  /* 
   * Initiate the class after Gravity Forms has been loaded using the init hook.
@@ -95,11 +80,20 @@ class GFPDF_Core extends PDFGenerator
 	 */
 	public static function pdf_init() 
 	{
-		global $gfpdfe_data;
+		 /*
+		  * Initialise our data helper class
+		  */
+		 global $gfpdfe_data;
+		 $gfpdfe_data = new GFPDFE_DATA();   
+
+		  /* set our PDF folder storage */
+		 $gfpdfe_data->set_directory_structure();  
 
 		/*
 		 * Include any dependancy-based files
 		 */		 
+		 include_once PDF_PLUGIN_DIR . 'pdf-settings.php';
+		 include_once PDF_PLUGIN_DIR . 'depreciated.php';
 		 include_once PDF_PLUGIN_DIR . 'helper/pdf-entry-detail.php';  			
    
 		/*
