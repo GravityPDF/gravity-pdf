@@ -8,25 +8,29 @@ Stable tag: 3.7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
 
-Gravity PDF allows you to save/view/download a PDF from the front- and back-end, and automate PDF creation on form submission. 
+Automatically generate, email and download PDF documents with Gravity Forms and Gravity PDF.
 
 == Description ==
 
-Gravity PDF is a powerful developer tool for creating PDF documents using form data captured from Gravity Forms. While the software is targeted at web developers, we've attempted to make it user friendly for hobbyists and DIY business owners. The basic setup can be done in minutes, and there is a huge array of options to configure the PDF as you see fit. 
 
-**Gravity Form Features**
+If you have ever used Gravity Forms you’ll know just how powerful it is to build forms and capture information with WordPress. But what it lacks is an easy way to display that information as a document. That’s where our plugin comes into the picture. The software allows you to generate a PDF document, that includes data captured through Gravity Forms, by using HTML/CSS templates. Use the tools you know and love to easily create PDFs. 
 
-* Save PDF File on user submission of a Gravity Form so it can be attached to a notification
-* Customise the PDF template without affecting the core Gravity Form Plugin
-* Multiple PDF Templates
-* Custom PDF Name
-* Output individual form fields in the template - like MERGETAGS.
-* View and download a PDF via the administrator interface or after a user submits their form
-* Works with Gravity Forms Signature Add-On
+Note: The software is a [developer toolkit](https://developer.gravitypdf.com/) with limited UX controls. To create custom PDF templates you need to be familiar with PHP, HTML and CSS. [Alternativly we offer development services](https://gravitypdf.com/) and can create and install the PDF templates for you.
+
+**Benefits**
+
+* Save Hours in Data Entry - You’ll never have to fill out documents by hand. The software automates the entire process for you.
+* Completely Digitise Your Paperwork - Go completely paperless, saving on printing costs, reduce waste and help the environment at the same time.
+* Never Lose a Document - As long as the original entry is available you will have access to the entry’s PDFs from your website.
+* Better Client Management - Your clients can complete one form and have multiple documents automatically generated, which means you’ll never forget to complete a document.
+* Password Protected Documents - Worried about security? You can easily password protect the PDFs with a 128-bit encryption and even let the user select a password when filling out a form.
+* Automatic Email PDFs - Automatically email the PDF when a user completes the form. Have it emailed to people in your organisation, the user, or both.
+* Paywall Your Document - Using Gravity Forms payment add-ons – like PayPal, Authorize.net or Stripe – you can restrict access to the PDF until after the payment is verified.
+* Conditional Content - Gravity Forms allows you to show fields based on conditions you define in your form, and so does our software. You can even have completely different PDFs generated based on the user responses.
 
 **PDF Features**
 
-Along with the above, the PDF software includes powerful feature such as:
+The PDF software includes powerful feature that allow you to control the look and feel of your document. It includes:
 
 * Language Support - almost all languages are supported including RTL (right to left) languages like Arabic, Hebrew and CJK languages - Chinese, Japanese and Korean.
 * HTML Page Numbering
@@ -39,12 +43,15 @@ Along with the above, the PDF software includes powerful feature such as:
 * Watermarks
 * Password protection
 * UTF-8 encoded HTML
-* Better system resource handling
+
+**Demos**
+
+We put together five demos showcasing how powerful the PDF software can be. [Take a look](https://gravitypdf.com/#GFdemo).
 
 **Server Requirements**
 
-1. PHP 5+
-2. MB String
+1. PHP 5.2+ (5.4+ recommended)
+2. MB String with Regex enabled (--enable-mbregex)
 3. GD Library
 4. RAM:	Recommended: 128MB. Minimum: 64MB.
 
@@ -53,8 +60,8 @@ Along with the above, the PDF software includes powerful feature such as:
 **Software Requirements**
 
 1. [Purchase and install Gravity Forms](https://www.e-junkie.com/ecom/gb.php?cl=54585&c=ib&aff=235154)
-2. Wordpress 3.5+
-3. Gravity Forms 1.7+
+2. Wordpress 3.9+
+3. Gravity Forms 1.8+
 
 **Documentation and Support**
 
