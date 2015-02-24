@@ -4,7 +4,7 @@ Donate link: https://gravitypdf.com
 Tags: gravity, forms, pdf, automation, attachment
 Requires at least: 3.9
 Tested up to: 4.1
-Stable tag: 3.7.0
+Stable tag: 3.7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
 
@@ -87,6 +87,10 @@ All FAQs can be [viewed on the Gravity PDF website](https://gravitypdf.com/#faqs
 3. The configuration.php file allows you to easily assign PDFs to Gravity Forms
 
 == Changelog ==
+
+= 3.7.1 =
+* Housekeeping - Add better error checking when migrating PDF template folder
+* Housekeeping - Add unit testing to the directory migration function
 
 = 3.7.0 =
 * Feature - Added 'default-show-section-content' configuration option. You can now display the section break content in the default template. Note: if this option is enabled and the section break is empty it will still be displayed on the PDF. 
@@ -492,5 +496,5 @@ For more details [view the 3.x.x online documentation](https://developer.gravity
 
 == Upgrade Notice ==
 
-= 3.6.0 =
+= 3.7.0 =
 WARNING: Minimum WordPress and Gravity Forms versions have been bumped to WordPress 3.9+ and Gravity Forms 1.8+. If you aren't running either version of this software DO NOT UPGRADE.

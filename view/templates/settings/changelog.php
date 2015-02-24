@@ -40,7 +40,12 @@
     <p><strong>Current Version: <?php echo PDF_EXTENDED_VERSION; ?></strong></p>
 
   <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
+  <ul>
+    <li>Housekeeping - Add better error checking when migrating PDF template folder</li>
+    <li>Housekeeping - Add unit testing to the directory migration function</li>
+  </ul>
 
+  <h3>3.7.0</h3>
 <ul>
 <li>Feature - Added 'default-show-section-content' configuration option. You can now display the section break content in the default template. If this option is enabled and the section break is empty it will still be displayed on the PDF. Note: Existing installations will have to reinitialise their templates with the 'Reinstall Default and Example Templates' option enabled.</li> 
 <li>Feature - Added hooks 'gfpdfe_template_location' and 'gfpdfe_template_location_uri' to change PDF template location</li>
