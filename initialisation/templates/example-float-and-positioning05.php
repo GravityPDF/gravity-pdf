@@ -7,12 +7,6 @@ if(!class_exists("RGForms")){
       return;
 }
 
-/** 
- * Set up the form ID and lead ID
- * Form ID and Lead ID can be set by passing it to the URL - ?fid=1&lid=10
- */
- PDF_Common::setup_ids();
-
 /**
  * Load the form data to pass to our PDF generating function 
  */
@@ -31,7 +25,7 @@ $form = RGFormsModel::get_form_meta($form_id);
              * The plugin stylesheet is overridden every update          
              */
       ?>
-      <title>Gravity Forms PDF Extended</title>
+      <title>Gravity PDF</title>
       <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
      <style>
 		.gradient {
@@ -97,7 +91,7 @@ $form = RGFormsModel::get_form_meta($form_id);
                    * Store your form fields from the $form_data array into variables here
                    * To see your entire $form_data array, view your PDF via the admin area and add &data=1 to the url
                    * 
-                   * For an example of accessing $form_data fields see http://gravityformspdfextended.com/documentation-v3-x-x/templates/getting-started/
+                   * For an example of accessing $form_data fields see https://developer.gravitypdf.com/documentation/custom-templates-introduction/
                    *
                    * Alternatively, as of v3.4.0 you can use merge tags (except {allfields}) in your templates. 
                    * Just add merge tags to your HTML and they'll be parsed before generating the PDF.      

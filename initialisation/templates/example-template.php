@@ -7,12 +7,6 @@ if(!class_exists("RGForms")){
 	return;
 }
 
-/** 
- * Set up the form ID and lead ID
- * Form ID and Lead ID can be set by passing it to the URL - ?fid=1&lid=10
- */
- PDF_Common::setup_ids();
-
 /**
  * Load the form data to pass to our PDF generating function 
  */
@@ -31,7 +25,7 @@ $form = RGFormsModel::get_form_meta($form_id);
 		 * The plugin stylesheet is overridden every update		 
 		 */
 	?>
-    <title>Gravity Forms PDF Extended</title>
+    <title>Gravity PDF</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 </head>
 	<body>
@@ -51,7 +45,7 @@ $form = RGFormsModel::get_form_meta($form_id);
 			 * Store your form fields from the $form_data array into variables here
 			 * To see your entire $form_data array, view your PDF via the admin area and add &data=1 to the url
 			 * 
-			 * For an example of accessing $form_data fields see http://gravityformspdfextended.com/documentation-v3-x-x/templates/getting-started/
+			 * For an example of accessing $form_data fields see https://developer.gravitypdf.com/documentation/custom-templates-introduction/
 			 *
 			 * Alternatively, as of v3.4.0 you can use merge tags (except {allfields}) in your templates. 
 			 * Just add merge tags to your HTML and they'll be parsed before generating the PDF.	
@@ -72,9 +66,9 @@ $form = RGFormsModel::get_form_meta($form_id);
             
 	            <p class="whom_concern_intro">Dear User,</p>
 
-				<p class="body_text">Gravity Forms PDF Extended allows you to directly access Gravity Form field data so you can create custom PDFs like this one.
-				If you haven't reviewed our five part installation and configuration guide yet, we recommend <a target="_blank" href="http://gravityformspdfextended.com/documentation-v3-x-x/standard-configuration/">taking a look</a>.
-				There's also a <a target="_blank" href="http://gravityformspdfextended.com/documentation-v3-x-x/configuration-options-examples/">large number of configuration options</a> that can be applied to any PDF.</p>
+				<p class="body_text">Gravity PDF allows you to directly access Gravity Form field data so you can create custom PDFs like this one.
+				If you haven't reviewed our five part installation and configuration guide yet, we recommend <a target="_blank" href="https://developer.gravitypdf.com/documentation/getting-started-with-gravity-pdf-configuration/">taking a look</a>.
+				There's also a <a target="_blank" href="https://developer.gravitypdf.com/documentation/configuration-options-examples/">large number of configuration options</a> that can be applied to any PDF.</p>
 				</p>
 
 				<p class="body_text">Now you've got an understanding on configuring the software, let's take a look at custom templates. 
@@ -85,13 +79,13 @@ $form = RGFormsModel::get_form_meta($form_id);
 				<p class="body_text">Once you have your new template file open in your browser window you can access the $form_data array (which contains all the Gravity Form entry data) by appending the URL with &amp;data=1. <strong>Note: this only works if you copied a template file with example- in the name.</strong></p>
 				<p><strong>Example:</strong> http://www.yourdomain.com/?gf_pdf=1&amp;fid=2&amp;lid=6&amp;template=new-example-template.php&amp;data=1             </p>
 				
-				<p>For more information about custom templates  <a target="_blank" href="http://gravityformspdfextended.com/documentation-v3-x-x/templates/getting-started/">review the plugin's documentation</a><br /><br />
+				<p>For more information about custom templates  <a target="_blank" href="https://developer.gravitypdf.com/documentation/custom-templates-introduction/">review the plugin's documentation</a><br /><br />
 	            </p>
 				<p class="signature">
 	                Jake Jackson<br />
 	                <img src="<?php echo PDF_PLUGIN_DIR ?>resources/images/signature.png" alt="Signature" width="100" height="60" /><br />
-	                Developer, Gravity Forms PDF Extended<br />
-	                <a target="_blank" href="http://www.gravityformspdfextended.com">www.gravityformspdfextended.com</a>
+	                Developer, Gravity PDF<br />
+	                <a target="_blank" href="http://gravitypdf.com">gravitypdf.com</a>
 	            </p>
            
            </div>          

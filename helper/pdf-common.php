@@ -1,17 +1,45 @@
 <?php
 
 /**
- * Plugin: Gravity Forms PDF Extended
+ * Plugin: Gravity PDF
  * File: pdf-common.php
  * 
  * This file holds a number of common functions used throughout the plugin
  */
 
+/*
+    This file is part of Gravity PDF.
+
+    Gravity PDF Copyright (C) 2015 Blue Liquid Designs
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
+
 class PDF_Common
 {
 
+	/**
+	 * Depreciated function 
+	 */
+	public static function setup_ids() { }	
 
-	public static function setup_ids()
+	/**
+	 * Takes over for setup_ids() but is now called much earlier in the process 
+	 * @return Boolean whether settings the ids was successful or not
+	 */
+	public static function get_ids()
 	{
 		global $form_id, $lead_id, $lead_ids;
 		
@@ -23,9 +51,10 @@ class PDF_Common
 		 */
 		if(empty($form_id) || empty($lead_ids))
 		{
-			return;
+			return false;
 		}				
-	}		
+		return true;
+	}			
 	
 	/*
 	 * We will use the output buffer to get the HTML template
@@ -66,11 +95,11 @@ class PDF_Common
 		}
 		
 		/*
-		 * Limit the size of the filename to 100 characters
+		 * Limit the size of the filename to 120 characters
 		 */
-		 if(strlen($pdf_name) > 150)
+		 if(strlen($pdf_name) > 120)
 		 {
-			$pdf_name = substr($pdf_name, 0, 150); 
+			$pdf_name = substr($pdf_name, 0, 120); 
 		 }
 		 
 		/*
@@ -85,20 +114,29 @@ class PDF_Common
 		/*
 		 * Remove any invalid (mostly Windows) characters from filename
 		 */
-		 $pdf_name = str_replace('/', '-', $pdf_name);
-		 $pdf_name = str_replace('\\', '-', $pdf_name);		
-		 $pdf_name = str_replace('"', '-', $pdf_name);				 
-		 $pdf_name = str_replace('*', '-', $pdf_name);				 
-		 $pdf_name = str_replace('?', '-', $pdf_name);				 		 
-		 $pdf_name = str_replace('|', '-', $pdf_name);				 		 		 
-		 $pdf_name = str_replace(':', '-', $pdf_name);				 		 		 		 
-		 $pdf_name = str_replace('<', '-', $pdf_name);				 		 		 		 
-		 $pdf_name = str_replace('>', '-', $pdf_name);				 		 		 		 		 		 
-		 $pdf_name = str_replace('.', '_', $pdf_name);				 		 		 		 		 		 		 
-		
+		 $pdf_name = self::remove_invalid_characters($pdf_name);			 		 		 		 		 		 		 		
 		 $pdf_name = $pdf_name . '.pdf';
 		
 		return $pdf_name;
+	}
+
+	public static function remove_invalid_characters($name)
+	{
+		/*
+		 * Remove any invalid (mostly Windows) characters from filename
+		 */
+		 $name = str_replace('/', '-', $name);
+		 $name = str_replace('\\', '-', $name);		
+		 $name = str_replace('"', '-', $name);				 
+		 $name = str_replace('*', '-', $name);				 
+		 $name = str_replace('?', '-', $name);				 		 
+		 $name = str_replace('|', '-', $name);				 		 		 
+		 $name = str_replace(':', '-', $name);				 		 		 		 
+		 $name = str_replace('<', '-', $name);				 		 		 		 
+		 $name = str_replace('>', '-', $name);				 		 		 		 		 		 
+		 $name = str_replace('.', '_', $name);	
+
+		 return $name;		
 	}
 	
 	/*
@@ -107,12 +145,21 @@ class PDF_Common
 	 */
 	public static function do_mergetags($string, $form_id, $lead_id)
 	{		
-		$form = RGFormsModel::get_form_meta($form_id);
-		$lead = RGFormsModel::get_lead($lead_id);
-		
+		/*
+		 * Unconvert { and } symbols from HTML entities 
+		 */
+		$string = str_replace('&#123;', '{', $string);		
+		$string = str_replace('&#125;', '}', $string);
+
 		/* strip {all_fields} merge tag from $string */
 		$string = str_replace('{all_fields}', '', $string);		
-		
+
+		/*
+		 * Get form and lead data
+		 */
+		$form = RGFormsModel::get_form_meta($form_id);
+		$lead = RGFormsModel::get_lead($lead_id);	
+
 		return trim(GFCommon::replace_variables($string, $form, $lead, false, false, false));		
 	}
 	
@@ -186,6 +233,61 @@ class PDF_Common
 			return $_GET[$name];
 
 		return '';
-	}	
+	}
+
+	/**
+	 * Gets the site name for use as a directory name
+	 * @return String Returns the current 'safe' directory site name
+	 */
+	public static function get_site_name()
+	{
+		$name = (is_ssl()) ? str_replace('https://', '', site_url()) : str_replace('http://', '', site_url());
+		return self::remove_invalid_characters($name);
+	}
+
+	/**
+	 * Modified version of get_upload_dir() which just focuses on the base directory
+	 * no matter if single or multisite installation 
+	 * We also only needed the basedir and baseurl so stripped out all the extras
+	 * @return Array Base dir and url for the upload directory
+	 */
+	public static function get_upload_dir()
+	{
+	        $siteurl = get_option( 'siteurl' );
+	        $upload_path = trim( get_option( 'upload_path' ) );
+	
+	        if ( empty( $upload_path ) || 'wp-content/uploads' == $upload_path ) {
+	                $dir = WP_CONTENT_DIR . '/uploads';
+	        } elseif ( 0 !== strpos( $upload_path, ABSPATH ) ) {
+	                // $dir is absolute, $upload_path is (maybe) relative to ABSPATH
+	                $dir = path_join( ABSPATH, $upload_path );
+	        } else {
+	                $dir = $upload_path;
+	        }
+	
+	        if ( !$url = get_option( 'upload_url_path' ) ) {
+	                if ( empty($upload_path) || ( 'wp-content/uploads' == $upload_path ) || ( $upload_path == $dir ) )
+	                        $url = WP_CONTENT_URL . '/uploads';
+	                else
+	                        $url = trailingslashit( $siteurl ) . $upload_path;
+	        }
+	
+	        /*
+	         * Honor the value of UPLOADS. This happens as long as ms-files rewriting is disabled.
+	         * We also sometimes obey UPLOADS when rewriting is enabled -- see the next block.
+	         */
+	        if ( defined( 'UPLOADS' ) && ! ( is_multisite() && get_site_option( 'ms_files_rewriting' ) ) ) {
+	                $dir = ABSPATH . UPLOADS;
+	                $url = trailingslashit( $siteurl ) . UPLOADS;
+	        }		
+
+	        $basedir = $dir;
+	        $baseurl = $url;	
+
+        return array(
+	        'basedir' => $basedir,
+	        'baseurl' => $baseurl,
+ 		);	                
+	}
 }
 

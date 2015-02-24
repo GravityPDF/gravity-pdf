@@ -1,11 +1,31 @@
 <?php
 
 /**
- * Plugin: Gravity Forms PDF Extended
+ * Plugin: Gravity PDF
  * File: mode/settings.php
  * 
  * The model that does all the processing and interacts with our controller and view
  */
+
+/*
+    This file is part of Gravity PDF.
+
+    Gravity PDF Copyright (C) 2015 Blue Liquid Designs
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
 
 class GFPDF_Settings_Model extends GFPDF_Settings
 {
@@ -118,6 +138,7 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 	 
 	 private function check_gf_compatibility()
 	 { 
+
 	 	 global $gfpdfe_data;
 		 
 		 if(class_exists('GFCommon'))
@@ -182,6 +203,7 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 	 /* convert ini memory limit to bytes */
 	 private function convert_ini_memory($size_str)
 	 {
+
 		$convert = array('mb' => 'm', 'kb' => 'k', 'gb' => 'g');
 		
 		foreach($convert as $k => $v)
@@ -205,12 +227,12 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 		/*
 		 * Get ram available in bytes and convert it to megabytes
 		 */
-		 $memory_limit = $this->convert_ini_memory(ini_get('memory_limit'));
-		  
-		 $gfpdfe_data->ram_available = floor($memory_limit / 1024 / 1024); /* convert to MB */
+		 $memory_limit = $this->convert_ini_memory(ini_get('memory_limit'));		  
+		 $gfpdfe_data->ram_available = ($memory_limit === '-1') ? -1 : floor($memory_limit / 1024 / 1024); /* convert to MB */
 
 		 $gfpdfe_data->ram_compatible = true;
-		 if($gfpdfe_data->ram_available < 128)
+
+		 if($gfpdfe_data->ram_available < 128 && $gfpdfe_data->ram_available !== -1)
 		 {
 			$gfpdfe_data->ram_compatible = false; 
 		 }
@@ -218,7 +240,7 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 		 /*
 		  * If under 64MB of ram assigned to the server do not run the software
 		  */
-		 if($gfpdfe_data->ram_available < 64)
+		 if($gfpdfe_data->ram_available < 64 && $gfpdfe_data->ram_available !== -1)
 		 {
 		 	$gfpdfe_data->allow_initilisation = false;
 		 }
@@ -241,24 +263,15 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 			  /*
 			   * Default our values
 			   */
-			   $gfpdfe_data->can_write_plugin_dir = false;	
-			   $gfpdfe_data->can_write_theme_dir = false;		  
+			   $gfpdfe_data->can_write_upload_dir = false;	 
 			   
 			  /*
-			   * Test the plugin folder so we can unzip mPDF
+			   * Test the upload folder where our templates are stored
 			   */
-			  if($this->test_write_permissions(PDF_PLUGIN_DIR) === true)
+			  if($this->test_write_permissions($gfpdfe_data->upload_dir) === true)
 			  {
-				  $gfpdfe_data->can_write_plugin_dir = true;
-			  }	
-			  		   
-			  /*
-			   * Check if we can write in the user's active theme directory
-			   */			  			   
-			   if($this->test_write_permissions(get_stylesheet_directory() . '/') === true)
-			   {
-				   $gfpdfe_data->can_write_theme_dir = true;
-			   }
+				  $gfpdfe_data->can_write_upload_dir = true;
+			  }				  		   
 		  }
 		  else
 		  {
@@ -272,12 +285,12 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 			  /*
 			   * The PDF_EXTENDED_TEMPLATE folder is created so lets check our permissions
 			   */
-			  if($this->test_write_permissions(PDF_SAVE_LOCATION) === true)
+			  if($this->test_write_permissions($gfpdfe_data->template_save_location) === true)
 			  {
   		  			$gfpdfe_data->can_write_output_dir = true;	  
 			  }
 			  
-			  if($this->test_write_permissions(PDF_FONT_LOCATION) === true)
+			  if($this->test_write_permissions($gfpdfe_data->template_font_location) === true)
 			  {
   		  			$gfpdfe_data->can_write_font_dir = true;	  
 			  }		
@@ -327,11 +340,11 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 		  
 		 /*
 		  * Pass any additional variables to the view templates
-		  */
-		  $gfpdfe_data->active_plugins 			= $this->get_active_plugins();
-		  $gfpdfe_data->system_status 			= $this->get_system_status_html();
-		  $gfpdfe_data->configuration_file 		= $this->get_configuration_file();				 
-		 
+		  */	 			  								 
+		$gfpdfe_data->active_plugins           = $this->get_active_plugins();
+		$gfpdfe_data->system_status            = $this->get_system_status_html(false);
+		$gfpdfe_data->configuration_file       = $this->get_configuration_file();			
+
 		 new settingsView($this);
 	}
 	
@@ -342,13 +355,14 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 		if(isset($gfpdfe_data->configuration_file))
 		{
 			return $gfpdfe_data->configuration_file;	
-		}				
+		}			
+	
 			/*
 			 * Include the current configuration, if available
 			 */
-			 if(file_exists(PDF_TEMPLATE_LOCATION . 'configuration.php'))
+			 if(file_exists($gfpdfe_data->template_site_location . 'configuration.php'))
 			 {
-				 return esc_html(file_get_contents(PDF_TEMPLATE_LOCATION . 'configuration.php'));   
+				 return esc_html(file_get_contents($gfpdfe_data->template_site_location . '/configuration.php'));   
 			 }
 			 else
 			 {
@@ -356,20 +370,23 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 			 }		
 	}
 	
-	private static function get_system_status_html()
+	private static function get_system_status_html($strip_html = false)
 	{
 		global $gfpdfe_data;
-		
-		if(isset($gfpdfe_data->system_status))
-		{
-			return $gfpdfe_data->system_status;	
-		}
 		
 		 ob_start();
 		 include PDF_PLUGIN_DIR . 'view/templates/settings/system-status.php';                         
 		 $content = ob_get_contents();
 		 ob_end_clean();
-		 return esc_html($content);			
+
+		 if($strip_html)
+		 {
+			return wp_strip_all_tags($content, true);			
+		 }
+		 else
+		 {
+		 	return esc_html($content);			
+		 }
 	}
 	
 	private static function get_active_plugins()
@@ -447,7 +464,7 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 		  }
 		  
 		  /*
-		   * Do our POST request to the Gravity Forms PDF Extended API
+		   * Do our POST request to the Gravity PDF API
 		   */
 		   self::send_support_request($email, $countType, $comments);
 		 
@@ -459,43 +476,23 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 	public static function send_support_request($email, $countType, $comments)
 	{
 		global $gfpdfe_data;
-		/*
-		 * Include our API class
-		 */			 
-		 $api = new gfpdfe_API();
-		 
+	 
 		 /*
 		  * Build our support request array
 		  */
 		  
 		  $active_plugins   = self::get_active_plugins();
-		  $system_status 	= self::get_system_status_html();
-		  $configuration	= self::get_configuration_file();
+		  $system_status 	= self::get_system_status_html(true);
+		  $configuration	= self::get_configuration_file() ;
 		  $website			= site_url('/');
-		  $comments 		= stripslashes($comments);
-		  
-		  $body = array(
-		  	'support_type' 			=> $countType,
-			'email'					=> $email,
-			'website' 				=> $website,
-			'active_plugins' 		=> $active_plugins,
-			'system_status'			=> $system_status,
-			'configuration' 		=> $configuration,			
-			'comments' 				=> $comments,
-		  );  
+		  $comments 		= stripslashes($comments);		
 		 		 
-		 if($api->support_request($body) === false)
-		 {
-			/*
-			 * API could not send
-			 * Draft a plain text email and send to support
-			 */ 
 			 $configuration = htmlspecialchars_decode($configuration, ENT_QUOTES);
 			 
-			 $subject = 'Gravity Forms PDF Extended Support Request';
-			 $to	  = 'support@gravityformspdfextended.com';
+			 $subject = $countType . ': Automated Ticket for "'. get_bloginfo('name') . '"';
+			 $to	  = 'support@gravitypdf.com';
 			 $from	  = $email;			 
-			 $message = "Support Type: $countType\r\nWebsite: $website\r\n\r\nComments\r\n\r\n$comments\r\n\r\n\r\nActive Plugins\r\n\r\n$active_plugins\r\n\r\n\r\nConfiguration\r\n\r\n$configuration";
+			 $message = "Support Type: $countType\r\n\r\nWebsite: $website\r\n\r\n----------------\r\n\r\n$comments\r\n\r\n----------------\r\n\r\n$system_status\r\n\r\n\r\nActive Plugins\r\n\r\n$active_plugins\r\n\r\n\r\n**Configuration**\r\n\r\n$configuration";
 			 
 			 $headers[] = 'From: '. $email;
 
@@ -512,7 +509,6 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 				 print json_encode(array('msg' => __('Support request received. We will responed in 24 to 48 hours.', 'pdfextended')));
 				 exit;					 
 			 }
-		 }
 		 
 		 /*
 		  * Create our 

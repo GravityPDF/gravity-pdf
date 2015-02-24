@@ -1,10 +1,14 @@
-(function($) {
-	jQuery(document).ready(function($) {
+(function($) {	
+		var tab = $('#tab_PDF');
+
+		tab.find('.nav-tab-contents:not(:first)').hide();
+
+		tab.find('.nav-tab').click(function() {
 
 		/*
 		 * Validate Support Form
 		 */
-		jQuery('#support-request-button').click(function() {
+		$('#support-request-button').click(function() {
 			if (validate_form() === true) {
 				return false;
 			} else {
@@ -18,8 +22,10 @@
 	function ajax_request() {
 		/*
 		 * Create an AJAX Request
-		 */
-		$('#support-request-button').after('<span class="icon-spinner icon-spin">');
+		 */		
+		var spinner = $('<img alt="Loading" class="gfspinner" src="' + GFPDF.GFbaseUrl + '/images/spinner.gif" />');
+		$('#support-request-button').after(spinner);
+
 		$('span.msg').remove();
 		$('span.error').remove();
 
@@ -34,9 +40,8 @@
 				supportType: $('#support-type').val(),
 				comments: $('#comments').val()
 			}
-		})
-			.done(function(results) {
-				$('.icon-spinner').remove();
+		}).done(function(results) {
+				$('.gfspinner').remove();
 
 				if (results.error) {
 					if (results.error.email) {
@@ -59,7 +64,9 @@
 					$('#support-request-button').after('<span class="msg">' + results.msg + '</span>');
 				}
 			});
-	};
+			var tab = $('#tab_PDF');
+
+		}
 
 	function validate_form() {
 		var error = false;
@@ -86,5 +93,5 @@
 			error = true;
 		}
 		return error;
-	};
+	}
 })(jQuery);

@@ -1,24 +1,32 @@
 <?php
 
-/*
-Plugin Name: Gravity Forms PDF Extended
-Plugin URI: http://www.gravityformspdfextended.com
-Description: Gravity Forms PDF Extended allows you to save/view/download a PDF from the front- and back-end, and automate PDF creation on form submission. Our Business Plus package also allows you to overlay field onto an existing PDF.
-Version: 3.5.0
-Author: Blue Liquid Designs
-Author URI: http://www.blueliquiddesigns.com.au
+/**
+ * Plugin Name: Gravity PDF
+ * Plugin URI: https://gravitypdf.com
+ * Description: Gravity PDF allows you to save/view/download a PDF from the front- and back-end, and automate PDF creation on form submission. Our Business Plus package also allows you to overlay field onto an existing PDF.
+ * Version: 3.7.1
+ * Author: Blue Liquid Designs
+ * Author URI: http://www.blueliquiddesigns.com.au
+ */
 
-------------------------------------------------------------------------
+/*   
+    This file is part of Gravity PDF.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+    Gravity PDF Copyright (C) 2015 Blue Liquid Designs
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /*
@@ -33,40 +41,28 @@ GNU General Public License for more details.
 /*
  * Define our constants 
  */
-define('PDF_EXTENDED_VERSION', '3.5.0'); 
-define('GF_PDF_EXTENDED_SUPPORTED_VERSION', '1.7'); 
-define('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION', '3.5'); 
+define('PDF_EXTENDED_VERSION', '3.7.1'); 
+define('GF_PDF_EXTENDED_SUPPORTED_VERSION', '1.8'); 
+define('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION', '3.9'); 
 define('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION', '5'); 
   
 define('PDF_PLUGIN_DIR', plugin_dir_path( __FILE__ ));  
 define('PDF_PLUGIN_URL', plugin_dir_url( __FILE__ )); 
 define("PDF_SETTINGS_URL", site_url() .'/wp-admin/admin.php?page=gf_settings&subview=PDF'); 
 define('PDF_SAVE_FOLDER', 'PDF_EXTENDED_TEMPLATES'); 
-define('PDF_SAVE_LOCATION', get_stylesheet_directory().'/'.PDF_SAVE_FOLDER.'/output/'); 
-define('PDF_FONT_LOCATION', get_stylesheet_directory().'/'.PDF_SAVE_FOLDER.'/fonts/'); 
-define('PDF_TEMPLATE_LOCATION', get_stylesheet_directory().'/'.PDF_SAVE_FOLDER.'/'); 
-define('PDF_TEMPLATE_URL_LOCATION', get_stylesheet_directory_uri().'/'. PDF_SAVE_FOLDER .'/'); 
 define('GF_PDF_EXTENDED_PLUGIN_BASENAME', plugin_basename(__FILE__)); 
 
 /* 
- * Include the core helper files
- */
- include PDF_PLUGIN_DIR . 'helper/api.php';
+ * Include the core files
+ */ 
  include PDF_PLUGIN_DIR . 'helper/data.php'; 
  include PDF_PLUGIN_DIR . 'helper/notices.php'; 
  include PDF_PLUGIN_DIR . 'helper/pdf-configuration-indexer.php'; 	
- include PDF_PLUGIN_DIR . 'helper/installation-update-manager.php'; 				
+ include PDF_PLUGIN_DIR . 'helper/installation-update-manager.php'; 
  include PDF_PLUGIN_DIR . 'helper/addons/framework.php'; 
  include PDF_PLUGIN_DIR . 'model/licensing.php'; 
- 
- /*
-  * Initialise our data helper class
-  */
- global $gfpdfe_data;
- $gfpdfe_data = new GFPDFE_DATA();    
- 
- include PDF_PLUGIN_DIR . 'pdf-settings.php';
- include PDF_PLUGIN_DIR . 'helper/pdf-common.php';
+ include PDF_PLUGIN_DIR . 'helper/pdf-common.php';	
+ include PDF_PLUGIN_DIR . 'helper/pdf-render.php'; 		
 
  /* 
   * Initiate the class after Gravity Forms has been loaded using the init hook.
@@ -78,7 +74,6 @@ define('GF_PDF_EXTENDED_PLUGIN_BASENAME', plugin_basename(__FILE__));
 class GFPDF_Core extends PDFGenerator
 {
 	public $render;
-	static $model;
 
 	/**
 	 * Contains our registered add on information
@@ -93,7 +88,21 @@ class GFPDF_Core extends PDFGenerator
 	 */
 	public static function pdf_init() 
 	{
-		global $gfpdfe_data;
+		 /*
+		  * Initialise our data helper class
+		  */
+		 global $gfpdfe_data;
+		 $gfpdfe_data = new GFPDFE_DATA();   
+
+		  /* set our PDF folder storage */
+		 $gfpdfe_data->set_directory_structure();  
+
+		/*
+		 * Include any dependancy-based files
+		 */		 
+		 include_once PDF_PLUGIN_DIR . 'pdf-settings.php';
+		 include_once PDF_PLUGIN_DIR . 'depreciated.php';
+		 include_once PDF_PLUGIN_DIR . 'helper/pdf-entry-detail.php';  			
 
 		$gfpdfe_data->store_url = 'http://staging.gravityformspdfextended.com/developer/';
    
@@ -104,26 +113,50 @@ class GFPDF_Core extends PDFGenerator
    
 	   /*
 	    * Add localisation support
-	    */ 
-	    load_plugin_textdomain(GF_PDF_EXTENDED_PLUGIN_BASENAME, false, PDF_PLUGIN_DIR . 'resources/languages/' );
+	    */
+	    load_plugin_textdomain('pdfextended', false,  dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 
 		/*
 		 * Call our Settings class which will do our compatibility processing
 		 */
 		$gfpdfe_data->settingsClass = new GFPDF_Settings();		
+
+		/*
+		 * Only run settings page if Gravity Forms version is installed and compatible 
+		 * Needs to be run before major compatibility checks so it can prompt user 
+		 * about issues with WP version or PHP 
+		 */
+
+		if($gfpdfe_data->gf_is_compatible === true && is_admin())
+		{			
+			/*
+			 * Run our settings page
+			 */
+			GFPDF_Settings::settings_page();				
+
+			/*
+			 * Only load our scripts if on a Gravity Forms admin page
+			 */
+			if( isset($_GET['page']) && (substr($_GET['page'], 0, 3) === 'gf_') )
+			{
+				/*
+				* Run our scripts and add the settings page to the admin area 
+				*/				
+				add_action('admin_init',  array('GFPDF_Core', 'gfe_admin_init'), 9);
+			}
+		}
 		 
 		/*
 		 * We'll initialise our model which will do any function checks ect
 		 */
-		 include PDF_PLUGIN_DIR . 'model/pdf.php';			 
-		 self::$model = new GFPDF_Core_Model();	
+		 include PDF_PLUGIN_DIR . 'model/pdf.php';			 		 
 
 		 do_action('gfpdfe_pre_compatibility_checks');				 
 		 			 	
 		/*
 		* Check for any major compatibility issues early
 		*/
-		if(self::$model->check_major_compatibility() === false)
+		if(GFPDF_Core_Model::check_major_compatibility() === false)
 		{
 			/*
 			 * Major compatibility errors (WP version, Gravity Forms or PHP errors)
@@ -136,22 +169,17 @@ class GFPDF_Core extends PDFGenerator
 		* Some functions are required to monitor changes in the admin area
 		* and ensure the plugin functions smoothly
 		*/
-		add_action('admin_init', array('GFPDF_Core', 'fully_loaded_admin'), 9999); /* run later than usual to give our auto initialiser a chance to fire */
-		add_action('after_switch_theme', array('GFPDF_InstallUpdater', 'gf_pdf_on_switch_theme'), 10, 2); /* listen for a theme chance and sync our PDF_EXTENDED_TEMPLATE folder */				 		 		
+		add_action('admin_init', array('GFPDF_Core', 'fully_loaded_admin'), 9999); /* run later than usual to give our auto initialiser a chance to fire */		
 		
 		/*
 		 * Only load the plugin if the following requirements are met:
 		 *  - Load on Gravity Forms Admin pages
-		 *  - Load if requesting PDF file
-		 *  - Load if on Gravity Form page on the front end
-		 *  - Load if receiving Paypal IPN
+		 *  - Load if on any front-end admin page
+		 *  - Load if doing AJAX request (which natively is called from the /wp-admin/ backend)
 		 */		 		
-		 if( ( is_admin() && isset($_GET['page']) && (substr($_GET['page'], 0, 3) === 'gf_') ) ||
-		 	  ( isset($_GET['gf_pdf']) ) ||
-			  ( RGForms::get("page") == "gf_paypal_ipn") ||
-			  ( isset($_POST["gform_submit"]) && GFPDF_Core_Model::valid_gravity_forms() || 
-			  	(  defined( 'DOING_AJAX' ) && DOING_AJAX && isset($_POST['action']) && isset($_POST['gf_resend_notifications'])) )
-			)
+		 if( (is_admin() && isset($_GET['page']) && (substr($_GET['page'], 0, 3) === 'gf_')) ||
+		 	  !is_admin() ||
+		 	  defined( 'DOING_AJAX' ) && DOING_AJAX )
 		 {			
 			/*
 			 * Initialise the core class which will load the __construct() function
@@ -165,26 +193,8 @@ class GFPDF_Core extends PDFGenerator
    }	
 	
 	public function __construct()
-	{
-		global $gfpdfe_data;	
-
-	    /* 
-		 * Include additional core files
-		 */ 
-		 include PDF_PLUGIN_DIR . 'helper/pdf-render.php'; 
-		 include PDF_PLUGIN_DIR . 'helper/pdf-entry-detail.php';  		 
+	{		
 		
-		/*
-		* Set up the PDF configuration and indexer
-		* Accessed through $this->configuration and $this->index.
-		*/
-		parent::__construct();				
-
-		/*
-		* Run our scripts and add the settings page to the admin area 
-		*/				
-		add_action('admin_init',  array($this, 'gfe_admin_init'), 9);																				
-				
 		/*
 		 * Ensure the system is fully installed		 
 		 * We run this after the 'settings' page has been set up (above)		 
@@ -193,6 +203,14 @@ class GFPDF_Core extends PDFGenerator
 		{
 			return; 
 		}	
+
+		global $gfpdfe_data;			
+		
+		/*
+		* Set up the PDF configuration and indexer
+		* Accessed through $this->configuration and $this->index.
+		*/
+		parent::__construct();																								
 		
 		/*
 		* Add our main hooks
@@ -201,13 +219,11 @@ class GFPDF_Core extends PDFGenerator
 		add_action("gform_entry_info", array('GFPDF_Core_Model', 'detail_pdf_link'), 10, 2);
 		add_action('wp', array('GFPDF_Core_Model', 'process_exterior_pages'));		
 		
-
 		/*
 		* Apply default filters
 		*/  
 		add_filter('gfpdfe_pdf_template', array('PDF_Common', 'do_mergetags'), 10, 3); /* convert mergetags in PDF template automatically */
 		add_filter('gfpdfe_pdf_template', 'do_shortcode', 10, 1); /* convert shortcodes in PDF template automatically */ 		
-
 
 		/* Check if on the entries page and output javascript */
 		if(is_admin() && rgget('page') == 'gf_entries')
@@ -242,6 +258,14 @@ class GFPDF_Core extends PDFGenerator
 	 public static function fully_loaded_admin()
 	 {
 
+	 	/*
+	 	 * Check user has the correct permissions to deploy the software 
+	 	 */
+	 	if(!current_user_can( 'manage_options' ))
+	 	{
+	 		return;
+	 	}
+
 	 	global $gfpdfe_data;
 	
 	 	/*
@@ -257,30 +281,29 @@ class GFPDF_Core extends PDFGenerator
 		}	 	
 
 		/*
-		 * Check if we have direct write access to the server 
-		 */
+		* Check if we have direct write access to the server 
+		*/
 		GFPDF_InstallUpdater::check_filesystem_api();
-
+		
 		/*
-		 * Check if we can automatically deploy the software. 
-		 * 90% of sites should be able to do this as they will have 'direct' write abilities 
-		 * to their server files.
-		 */
+		* Check if we can automatically deploy the software. 
+		* 90% of sites should be able to do this as they will have 'direct' write abilities 
+		* to their server files.
+		*/
 		GFPDF_InstallUpdater::maybe_deploy();	
-
+		
 		/*
-		 * Check if we need to deploy the software
-		 */
-		 self::check_deployment();
-
-		 /*
-		  * Check if the user has switched themes and they haven't yet prompt user to copy over directory structure
-		  * If the plugin has just initialised we won't check for a theme swap as initialisation will reset this value
-		  */ 
-		  if(!rgpost('upgrade'))
-		  {
-		  	GFPDF_InstallUpdater::check_theme_switch();		 
-		  }
+		* Check if we need to deploy the software
+		*/
+		self::check_deployment();
+		
+		/*
+		* Check if the template folder location needs to be migrated
+		*/ 
+		if(!rgpost('upgrade'))
+		{
+			GFPDF_InstallUpdater::check_template_migration();		 
+		}
 	 }
 	 
 	 /*
@@ -328,11 +351,7 @@ class GFPDF_Core extends PDFGenerator
 			 */	
 			$theme_switch = get_option('gfpdfe_switch_theme'); 
 
-			if( (
-					(get_option('gf_pdf_extended_installed') != 'installed')
-				) && (!rgpost('upgrade') )
-				  && (empty($theme_switch['old']) )
-			  )
+			if( get_option('gf_pdf_extended_installed') != 'installed' && !rgpost('upgrade') )
 			{
 				/*
 				 * Prompt user to initialise plugin
@@ -340,13 +359,13 @@ class GFPDF_Core extends PDFGenerator
 				 add_action($gfpdfe_data->notice_type, array("GFPDF_Notices", "gf_pdf_not_deployed_fresh")); 	
 			}
 			elseif( (
-						( !is_dir(PDF_TEMPLATE_LOCATION))  ||
-						( !file_exists(PDF_TEMPLATE_LOCATION . 'configuration.php') ) ||
-						( !is_dir(PDF_SAVE_LOCATION) )  						
+						( !is_dir($gfpdfe_data->template_site_location))  ||
+						( !file_exists($gfpdfe_data->template_site_location . 'configuration.php') ) ||
+						( !is_dir($gfpdfe_data->template_save_location) )  						
 					)
 					&& (!rgpost('upgrade'))
-					&& (empty($theme_switch['old']) )
-
+					&& (!is_dir($gfpdfe_data->old_template_location) 
+					&& (!is_dir($gfpdfe_data->old_3_6_template_site_location)) ) /* add in 3.6 directory change */
 				  )
 			{
 
@@ -360,14 +379,22 @@ class GFPDF_Core extends PDFGenerator
 	/**
 	 * Add our scripts and settings page to the admin area 
 	 */
-	function gfe_admin_init()
-	{					
-									
+	public static function gfe_admin_init()
+	{													
 		/* 
 		 * Configure the settings page
 		 */
-		  wp_enqueue_style( 'pdfextended-admin-styles', PDF_PLUGIN_URL . 'resources/css/admin-styles.css', array('dashicons'), '1.1' );		
-		  wp_enqueue_script( 'pdfextended-settings-script', PDF_PLUGIN_URL . 'resources/javascript/admin.min.js' );	
+		  wp_enqueue_style( 'pdfextended-admin-styles', PDF_PLUGIN_URL . 'resources/css/admin-styles.min.css', array(), '1.3' );		
+		  wp_enqueue_script( 'pdfextended-settings-script', PDF_PLUGIN_URL . 'resources/javascript/admin.min.js', array(), '1.3' );	
+
+		  /*
+		   * Localise admin script
+		   */
+		  $localise_script = array(
+		  	'GFbaseUrl' => GFCommon::get_base_url(),
+		  );
+
+		  wp_localize_script( 'pdfextended-settings-script', 'GFPDF', $localise_script );
 		 
 		 /*
 		  * Register our scripts/styles with Gravity Forms to prevent them being removed in no conflict mode
@@ -376,8 +403,6 @@ class GFPDF_Core extends PDFGenerator
 		  add_filter('gform_noconflict_styles', array('GFPDF_Core', 'register_gravityform_styles')); 
 
 		  add_filter('gform_tooltips', array('GFPDF_Notices', 'add_tooltips'));	 	  
-		 
-    	 GFPDF_Settings::settings_page();	
 		  
 	}
 	
@@ -407,41 +432,35 @@ class GFPDF_Core extends PDFGenerator
 /*
  * array_replace_recursive was added in PHP5.3
  * Add fallback support for those with a version lower than this
- * and Wordpress still supports PHP5.0 to PHP5.2
+ * as Wordpress still supports PHP5.0 to PHP5.2
  */
 if (!function_exists('array_replace_recursive'))
 {
-	function array_replace_recursive()
-	{
-	    // Get array arguments
-	    $arrays = func_get_args();
+    function array_replace_recursive($base, $replacements)
+    {
+        foreach (array_slice(func_get_args(), 1) as $replacements) {
+            $bref_stack = array(&$base);
+            $head_stack = array($replacements);
 
-	    // Define the original array
-	    $original = array_shift($arrays);
+            do {
+                end($bref_stack);
 
-	    // Loop through arrays
-	    foreach ($arrays as $array)
-	    {
-	        // Loop through array key/value pairs
-	        foreach ($array as $key => $value)
-	        {
-	            // Value is an array
-	            if (is_array($value))
-	            {
-	                // Traverse the array; replace or add result to original array
-	                $original[$key] = array_replace_recursive($original[$key], $array[$key]);
-	            }
+                $bref = &$bref_stack[key($bref_stack)];
+                $head = array_pop($head_stack);
 
-	            // Value is not an array
-	            else
-	            {
-	                // Replace or add current value to original array
-	                $original[$key] = $value;
-	            }
-	        }
-	    }
+                unset($bref_stack[key($bref_stack)]);
 
-	    // Return the joined array
-	    return $original;
-	} 
+                foreach (array_keys($head) as $key) {
+                    if (isset($key, $bref) && isset($bref[$key]) && is_array($bref[$key]) && is_array($head[$key])) {
+                        $bref_stack[] = &$bref[$key];
+                        $head_stack[] = $head[$key];
+                    } else {
+                        $bref[$key] = $head[$key];
+                    }
+                }
+            } while(count($head_stack));
+        }
+
+        return $base;
+    } 
 }

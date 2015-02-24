@@ -1,10 +1,11 @@
-<?php
+<?php 
 
- /*
-  * Template: Changelog
-  * Module: Settings Page
-  */
- 
+/**
+ * Filename: depreciated.php 
+ * This file contains any depreciated functionality to help preserve backwards compatibility 
+ * with either Gravity Forms, or our template files.
+ */
+
 /*
     This file is part of Gravity PDF.
 
@@ -23,19 +24,20 @@
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/ 
-  
-  /*
-   * Don't run if the correct class isn't present
-   */
-  if(!class_exists('GFPDF_Settings_Model'))
-  {
-	 exit;  
-  }
-  
-  ?>
-  
-    <h2><?php _e('Frequently Asked Questions', 'pdfextended'); ?></h2>
-    <p><?php echo sprintf(__('See our %scomprehensive FAQ section%s for more information about Gravity PDF.', 'pdfextended'), '<a href="https://gravitypdf.com/#faqs">', '</a>'); ?></p>
-    
-    <p><?php echo sprintf( __('Got a question that isn\'t answered above? %sHead to our support forum%s and let us know.', 'pdfextended'), '<a href="https://support.gravitypdf.com/">', '</a>' ); ?></p>
+*/
+
+/*
+ * Since v3.6
+ * Moved to the $gfpdfe_data class.
+ * Can now be accessed using the following:
+ *
+ * $gfpdfe_data->template_location
+ * $gfpdfe_data->template_site_location
+ * $gfpdfe_data->template_save_location
+ * $gfpdfe_data->template_font_location
+ * 
+ */
+define('PDF_SAVE_LOCATION', $gfpdfe_data->template_save_location); 
+define('PDF_FONT_LOCATION', $gfpdfe_data->template_font_location); 
+define('PDF_TEMPLATE_LOCATION', $gfpdfe_data->template_site_location); 
+define('PDF_TEMPLATE_URL_LOCATION', $gfpdfe_data->template_site_location_url); 

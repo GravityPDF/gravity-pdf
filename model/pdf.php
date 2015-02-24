@@ -1,11 +1,31 @@
 <?php
 
 /**
- * Plugin: Gravity Forms PDF Extended
+ * Plugin: Gravity PDF
  * File: model/pdf.php
  * 
  * The model that does all the processing and interacts with our controller and view (if necisarry) 
  */
+
+/*
+    This file is part of Gravity PDF.
+
+    Gravity PDF Copyright (C) 2015 Blue Liquid Designs
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
 
 class GFPDF_Core_Model
 {
@@ -17,9 +37,10 @@ class GFPDF_Core_Model
    public static function valid_gravity_forms()
    {
 	    $form_id = isset($_POST["gform_submit"]) ? $_POST["gform_submit"] : 0;
+
         if($form_id)
 		{
-            $form_info = RGFormsModel::get_form($form_id);
+            $form_info = RGFormsModel::get_form($form_id);       
             $is_valid_form = $form_info && $form_info->is_active;
 
             if($is_valid_form)
@@ -34,10 +55,9 @@ class GFPDF_Core_Model
     * Function to check if the major compatibility functionality is met
 	* This includes Wordpress and Gravity Forms
 	*/
-   public function check_major_compatibility()
+   public static function check_major_compatibility()
    {
-	   	global $gfpdfe_data;
-		
+	   	global $gfpdfe_data;		
 
 		if($gfpdfe_data->wp_is_compatible === false)
 		{
@@ -49,7 +69,7 @@ class GFPDF_Core_Model
 		{
 		 	add_action('after_plugin_row_' . GF_PDF_EXTENDED_PLUGIN_BASENAME, array('GFPDF_Notices', 'display_pdf_compatibility_error')); 
 		 	return false;  			
-		}
+		}		
    
 		if($gfpdfe_data->gf_is_compatible === false)
 		{
@@ -66,9 +86,14 @@ class GFPDF_Core_Model
 	  */
 	 public static function is_fully_installed()
 	 {
-		 global $gfpdfe_data;		 
+		 global $gfpdfe_data;			 
 
-		if( ($gfpdfe_data->fresh_install === true) || (!is_dir(PDF_TEMPLATE_LOCATION)) )
+		if(self::check_major_compatibility() === false)
+		{
+			return false;
+		}
+
+		if( ($gfpdfe_data->fresh_install === true) || (!is_dir($gfpdfe_data->template_site_location)) )
 		{						
 			return false;
 		}
@@ -102,48 +127,46 @@ class GFPDF_Core_Model
 		 * Class: PDFGenerator
 		 * File: pdf-configuration-indexer.php
 		 */
-		$templates = $gfpdf->get_template($form_id, true);
+		$template = $gfpdf->get_template($form_id);				
+		
+		/*
+		 * Before setting up PDF options we will check if a configuration is found
+		 * If not, we will set up defaults defined in configuration.php
+		 */		
+		$index = self::check_configuration($form_id, $template);				
+		
+		/*
+		 * Now all the correct configuration and indexes are in place lets get our configuration nodes
+		 */
+		$templates = $gfpdf->get_form_configuration($form_id);
 
 		/* exit early if templates not found */
-		if($templates === false)
+		if($templates === false || sizeof($templates) === 0)
 		{
 			return;
 		}		
 
-		if(is_array($templates))
-		{
-			?>
-				<strong>PDFs</strong><br />
 
-                        	<?php foreach($templates as $id => $val):
-							$name = $gfpdf->get_pdf_name($id, $form_id, $lead['id']);
-							$aid = (int) $id + 1;
-							 ?>	
-                            <div class="detailed_pdf">						
-								<span><?php 
-									echo $name; 									
-									$url = home_url() .'/?gf_pdf=1&aid='. $aid .'&fid=' . $form_id . '&lid=' . $lead_id . '&template=' . $val['template']; 								
-								?></span> 
-                                <a href="<?php echo $url; ?>" target="_blank" class="button"><?php _e('View', 'pdfextended'); ?></a> 
-				 				<a href="<?php echo $url.'&download=1'; ?>" target="_blank" class="button"><?php _e('Download', 'pdfextended'); ?></a>
-				 			</div>
-                                  
-                            <?php endforeach; ?>
+		?>
+			<strong>PDFs</strong><br />
 
-                
-            <?php
-		}
-		elseif($templates !== false)
-		{
-			$url = home_url() .'/?gf_pdf=1&fid=' . $form_id . '&lid=' . $lead_id . '&template=' . $templates; 
+        	<?php foreach($templates as $id => $template):
+			$name = $gfpdf->get_pdf_name($id, $form_id, $lead['id']);
+			$aid  = $gfpdf->get_aid($id, $form_id);
+			 ?>	
+            <div class="detailed_pdf">						
+				<span><?php 
+					echo $name; 									
+					$url = home_url() .'/?gf_pdf=1&aid='. $aid .'&fid=' . $form_id . '&lid=' . $lead_id . '&template=' . $template['template']; 								
+				?></span> 
+                <a href="<?php echo $url; ?>" target="_blank" class="button"><?php _e('View', 'pdfextended'); ?></a> 
+ 				<a href="<?php echo $url.'&download=1'; ?>" target="_blank" class="button"><?php _e('Download', 'pdfextended'); ?></a>
+ 			</div>
+                  
+            <?php endforeach; ?>
 
-			?>
-			<div class="detailed_pdf">
-				<?php _e('PDF', 'pdfextended'); ?>: <a href="<?php echo $url; ?>" target="_blank" class="button"><?php _e('View', 'pdfextended'); ?></a> 
-				 <a href="<?php echo $url.'&download=1'; ?>" target="_blank" class="button"><?php _e('Download', 'pdfextended'); ?></a>
-			</div>
-			<?php
-		}
+            
+        <?php	
 	}
 	
 	/*
@@ -158,24 +181,38 @@ class GFPDF_Core_Model
 		if(!GFCommon::current_user_can_any("gravityforms_view_entries"))
 		{
 			return;	
-		}		 
+		}			 
 		
-		$lead_id = $lead['id'];		
-		
+		$lead_id = $lead['id'];	
+
 		/*
 		 * Get the template name
 		 * Class: PDFGenerator
 		 * File: pdf-configuration-indexer.php
 		 */
-		$templates = $gfpdf->get_template($form_id, true);
+		$template = $gfpdf->get_template($form_id);				
+		
+		/*
+		 * Before setting up PDF options we will check if a configuration is found
+		 * If not, we will set up defaults defined in configuration.php
+		 */		
+		$index = self::check_configuration($form_id, $template);				
+		
+		/*
+		 * Now all the correct configuration and indexes are in place lets get our configuration nodes
+		 */
+		$templates = $gfpdf->get_form_configuration($form_id);
 
 		/* exit early if templates not found */
-		if($templates === false)
+		if($templates === false || sizeof($templates) === 0)
 		{
 			return;
 		}
 
-		if(is_array($templates))
+		/*
+		 * Show if multiple PDFs assigned to single form
+		 */
+		if(sizeof($templates) > 1)
 		{
 			?>
                 <span class="gf_form_toolbar_settings gf_form_action_has_submenu">
@@ -187,8 +224,8 @@ class GFPDF_Core_Model
 							/*
 							 * Replace MergeTags in filename
 							 */
-							 $name = $gfpdf->get_pdf_name($id, $form_id, $lead['id']);
-							 $aid = (int) $id + 1;
+								$name = $gfpdf->get_pdf_name($id, $form_id, $lead['id']);
+								$aid  = $gfpdf->get_aid($id, $form_id);
 							?>							
                             <li class="">
                             	<?php
@@ -207,7 +244,11 @@ class GFPDF_Core_Model
 		else
 		{			
 			
-			$url = home_url() . '/?gf_pdf=1&fid=' . $form_id .'&lid=' . $lead_id . '&template=' . $templates; 
+			/*
+			 * Get the first and only item in the array
+			 */
+			$template = array_shift($templates);
+			$url = home_url() . '/?gf_pdf=1&fid=' . $form_id .'&lid=' . $lead_id . '&template=' . $template['template']; 
 			
 			?>
 			| <a href="<?php echo $url; ?>" target="_blank"><?php _e('View PDF', 'pdfextended'); ?></a> 
@@ -225,7 +266,7 @@ class GFPDF_Core_Model
 	 * where action is 'html', 'data', or 'print'
 	 */ 
 	public static function process_exterior_pages() {	 	 
-	  global $wpdb, $gfpdf;
+	  global $wpdb, $gfpdf, $form_id, $lead_ids;
 	  	
 	  /*
 	   * If $_GET variable isn't set then stop function
@@ -235,8 +276,8 @@ class GFPDF_Core_Model
 		return;
 	  }
 		
-		$form_id = (int) $_GET['fid'];
-		$lead_id = (int) $_GET['lid'];		
+
+		PDF_Common::get_ids();
 		$ip = GFFormsModel::get_ip(); 
 		
 		/*
@@ -250,75 +291,44 @@ class GFPDF_Core_Model
 		 * Before setting up PDF options we will check if a configuration is found
 		 * If not, we will set up defaults defined in configuration.php
 		 */		
-		$index = self::check_configuration($form_id, $template);			
-		
-		/*
-		 * Run if user is not logged in
+		$index = self::check_configuration($form_id, $template);	
+
+		/* 
+		 * Authenticate all lead Ids
 		 */ 
-		 if(!is_user_logged_in())
-		 {
-			/* 
-			 * Check the lead is in the database and the IP address matches (little security booster) 
-			 */
-			$form_entries = $wpdb->get_var( $wpdb->prepare("SELECT count(*) FROM `".$wpdb->prefix."rg_lead` WHERE form_id = ".$form_id." AND status = 'active' AND id = ".$lead_id." AND ip = '".$ip."'", array() ) );	
-			
-			if($form_entries == 0 && $gfpdf->configuration[$index]['access'] !== 'all')
+		$lead_ids = self::validate_entry_ids($lead_ids, $form_id, $ip, $index);
+
+
+		if(sizeof($lead_ids) == 0)	
+		{
+			if(!is_user_logged_in())
 			{
-				auth_redirect();		
+				/* give the user a chance to authenticate */
+				auth_redirect();
 			}
-			
-		 }
-		 else
-		 {
-			  /*
-			   * Ensure logged in users have the correct privilages 
-			   */
-			   
-			   
-			  if(!GFCommon::current_user_can_any("gravityforms_view_entries"))
-			  {
-				  /*
-				   * User doesn't have the correct access privilages 
-				   * Let's check if they are assigned to the form
-				   */
-					$user_logged_entries = $wpdb->get_var( $wpdb->prepare("SELECT count(*) FROM `".$wpdb->prefix."rg_lead` WHERE form_id = ".$form_id." AND status = 'active' AND id = ".$lead_id." AND created_by = '". get_current_user_id() ."'", array() ) );					   
-					
-					/*
-					 * Failed again.
-					 * One last check against the IP 
-					 * If it matches the record then we will show the PDF
-					 */
-					if($user_logged_entries == 0)
-					{				   
-						$form_entries = $wpdb->get_var( $wpdb->prepare("SELECT count(*) FROM `".$wpdb->prefix."rg_lead` WHERE form_id = ".$form_id." AND status = 'active' AND id = ".$lead_id." AND ip = '".$ip."'", array() ) );	
-						
-						if($form_entries == 0)
-						{
-							/*
-							 * Don't show the PDF
-							 */
-							 break;
-						}
-						
-					}				   
-			  }	
-			  else
-			  {				  
-				  /*
-				   * Because this user is logged in with the correct access 
-				   * we will allow a template to be shown by setting the template variable
-				   */	 
-				   
-				   if( ($template != $_GET['template']) && (substr($_GET['template'], -4) == '.php') )
-				   {			
-						$template = $_GET['template'];
-				   }
-			  }
-			   
-		 }		
+			else
+			{
+				die(__('Access Denied', 'pdfextended'));
+			}
+		}
+
+		/*
+		 * Give user with correct privilages the option to change the PDF template via the URL
+		 */
+		if(is_user_logged_in() && GFCommon::current_user_can_any('gravityforms_view_entries'))
+		{
+		  /*
+		   * Because this user is logged in with the correct access 
+		   * we will allow a template to be shown by setting the template variable
+		   */	 
+		   if( ($template != $_GET['template']) && (substr($_GET['template'], -4) == '.php') )
+		   {			
+				$template = $_GET['template'];
+		   }		
+		}	
 		 
 
-		$pdf_arguments = self::generate_pdf_parameters($index, $form_id, $lead_id, $template);		
+		$pdf_arguments = self::generate_pdf_parameters($index, $form_id, $lead_ids[0], $template);		
 		
 		/*
 		 * Add output to arguments 
@@ -331,9 +341,92 @@ class GFPDF_Core_Model
 		
 		$pdf_arguments['output'] = $output;					
 
-		$gfpdf->render->PDF_Generator($form_id, $lead_id, $pdf_arguments);
+		/*
+		 * While the security above will prevent the PDF being read by non-authorised users, 
+		 * a user can disable that security with the 'access' => 'all' method (THIS IS NOT RECOMMENDED)
+		 * To prevent those PDFs showing up in search engines we will tell them not to index the documents 
+		 */
+		if (!headers_sent()) 
+		{
+			header("X-Robots-Tag: noindex, nofollow", true);
+		}
+
+		$gfpdf->render->PDF_Generator($form_id, $lead_ids[0], $pdf_arguments);
 		
 	  exit();
+	}
+
+	public static function validate_entry_ids($lead_ids, $form_id, $ip, $index)
+	{
+		global $gfpdf;
+
+		if(empty($gfpdf->configuration[$index]['access']) || $gfpdf->configuration[$index]['access'] !== 'all') /* unpublicised feature to give FULL access to ALL PDFs in this configuration - RECOMMENDATION: DO NOT USE */
+		{
+			foreach($lead_ids as $key => $lead_id)
+			{
+				if(self::authenticate_user($form_id, $lead_id, $ip) === false)
+				{
+					unset($lead_ids[$key]);
+				}
+				/* resequence so there are no loop issues later */
+			}	$lead_ids = array_values($lead_ids);	
+		}	
+
+		return $lead_ids;		
+	}
+
+	private static function authenticate_user($form_id, $lead_id, $ip)
+	{
+		global $wpdb;
+
+		/*
+		 * Run if user is not logged in
+		 */ 
+		 if(!is_user_logged_in())
+		 {
+			return self::check_logged_out_user($form_id, $lead_id, $ip);
+		 }
+		 else
+		 {
+			  /*
+			   * Ensure logged in users have the correct privilages 
+			   */
+			   		   
+			  if(!GFCommon::current_user_can_any("gravityforms_view_entries"))
+			  {
+				  /*
+				   * User doesn't have the correct access privilages 
+				   * Let's check if they are assigned to the form
+				   */
+					$user_logged_entries = $wpdb->get_var( $wpdb->prepare("SELECT count(*) FROM `".$wpdb->prefix."rg_lead` WHERE form_id = %d AND status = 'active' AND id = %d AND created_by = %d", array($form_id, $lead_id, get_current_user_id()) ) );					   
+					
+					/*
+					 * Failed again.
+					 * One last check against the IP 
+					 * If it matches the record then we will show the PDF
+					 */
+					if($user_logged_entries == 0)
+					{				   
+						return self::check_logged_out_user($form_id, $lead_id, $ip);
+					}				   
+			  }		   
+		 }			
+	}
+
+	private static function check_logged_out_user($form_id, $lead_id, $ip)
+	{
+		global $wpdb;	
+
+		/* 
+		 * Check the lead is in the database and the IP address matches (little security booster) 
+		 */
+		$form_entries = $wpdb->get_var( $wpdb->prepare("SELECT count(*) FROM `".$wpdb->prefix."rg_lead` WHERE form_id = %d AND status = 'active' AND id = %d AND ip = %s", array($form_id, $lead_id, $ip) ) );	
+
+		if($form_entries == 0)
+		{
+			return false;		
+		}		
+		return true;
 	}
 
 	/**
@@ -344,7 +437,7 @@ class GFPDF_Core_Model
 	 */
 	public static function gfpdfe_save_pdf($entry, $form)
 	{
-		global $gfpdf;
+		global $gfpdf, $form_id, $lead_id;
 
 		$form_id = $entry['form_id'];
 		$lead_id = $entry['id'];
@@ -363,6 +456,9 @@ class GFPDF_Core_Model
 		 {
 			 return false;
 		 }	
+
+		 /* set up the correct lead IDs */
+		 PDF_Common::get_ids();
 
 		/* 
 		 * To have our configuration indexes so loop through the PDF template configuration
@@ -417,6 +513,7 @@ class GFPDF_Core_Model
 		$form_id           = $entry['form_id']; 
 		$lead_id           = apply_filters('gfpdfe_lead_id', $entry['id'], $form, $entry, $gfpdf); /* allow premium plugins to override the lead ID */
 
+
 		/*
 		 * Before setting up PDF options we will check if a configuration is found
 		 * If not, we will set up defaults defined in configuration.php
@@ -430,7 +527,11 @@ class GFPDF_Core_Model
 		 if(!$config = $gfpdf->get_config($form_id))
 		 {
 			 return $notification;
-		 }						  		
+		 }	
+
+		 /* set up the correct lead IDs */
+		 PDF_Common::get_ids();			 
+
 		/* 
 		 * To have our configuration indexes so loop through the PDF template configuration
 		 * and generate and attach PDF files.
@@ -439,6 +540,7 @@ class GFPDF_Core_Model
 		 {
 				$template = (isset($gfpdf->configuration[$index]['template'])) ? $gfpdf->configuration[$index]['template'] : '';					
 	
+
 				/* Get notifications user wants PDF attached to and check if the correct notifications hook is running */				
 				$notifications = self::get_form_notifications($form, $index);				
 														
@@ -513,7 +615,7 @@ class GFPDF_Core_Model
 	public static function get_form_notifications($form, $index)
 	{
 		global $gfpdf;
-			
+
 		/*
 		 * Check if notification field even exists
 		 */
@@ -532,6 +634,7 @@ class GFPDF_Core_Model
 		/*
 		 * If notifications is true the user wants to attach the PDF to all notifications
 		 */ 
+
 		if($gfpdf->configuration[$index]['notifications'] === true)
 		{					
 			$new_notifications = $notifications;
@@ -571,8 +674,7 @@ class GFPDF_Core_Model
 	{
 		global $gfpdf;
 
-		$config = $gfpdf->configuration[$index];
-		
+		$config = $gfpdf->configuration[$index];		
 		
 		$pdf_name    = (isset($config['filename']) && strlen($config['filename']) > 0) ? $gfpdf->get_pdf_name($index, $form_id, $lead_id) : PDF_Common::get_pdf_filename($form_id, $lead_id);	
 		$template    = (isset($template) && strlen($template) > 0) ? $template : $gfpdf->get_template($index);	 
@@ -597,13 +699,14 @@ class GFPDF_Core_Model
 		 */ 
 		$privileges      = (isset($config['pdf_privileges'])) ? $gfpdf->validate_privileges($config['pdf_privileges']) : $gfpdf->validate_privileges('');	
 		
-		$pdf_password    = (isset($config['pdf_password'])) ? $config['pdf_password'] : '';
-		$master_password = (isset($config['pdf_master_password'])) ? $config['pdf_master_password'] : '';
+		$pdf_password    = (isset($config['pdf_password'])) ? PDF_Common::do_mergetags($config['pdf_password'], $form_id, $lead_id) : '';
+		$master_password = (isset($config['pdf_master_password'])) ? PDF_Common::do_mergetags($config['pdf_master_password'], $form_id, $lead_id) : '';
 		$rtl             = (isset($config['rtl'])) ? $config['rtl'] : false;		
 
 
 		$form = RGFormsModel::get_form_meta($form_id);
 		$lead = RGFormsModel::get_lead($lead_id);
+		
 		/*
 		 * Run the options through filters
 		 */

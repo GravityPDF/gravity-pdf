@@ -1,11 +1,31 @@
 <?php
 
 /**
- * Plugin: Gravity Forms PDF Extended
+ * Plugin: Gravity PDF
  * File: pdf-settings.php
  * 
  * The controller that handles the Gravity Forms Settings page in Wordpress
  */
+
+/*
+    This file is part of Gravity PDF.
+
+    Gravity PDF Copyright (C) 2015 Blue Liquid Designs
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
 
 class GFPDF_Settings
 {		
@@ -26,7 +46,7 @@ class GFPDF_Settings
 	 * Check if we're on the settings page 
 	 */ 
 	public static function settings_page() {			 		
-		if(RGForms::get("page") == "gf_settings") {		 										
+		if(class_exists('RGForms') && RGForms::get("page") == "gf_settings") {		 										
 			/* 
 			 * Tell Gravity Forms to initiate our settings page
 			 * Using the following Class/Model
@@ -41,6 +61,8 @@ class GFPDF_Settings
 	 */
 	protected function run_setting_routing()
 	{
+		global $gfpdfe_data;
+		
 		/* 
 		 * Check if we need to redeploy default PDF templates/styles to the theme folder 
 		 */
@@ -49,8 +71,18 @@ class GFPDF_Settings
 		{		
 			/*
 			 * Check if the user wants to upgrade the system or only initialise the fonts
-			 */		
-			if(rgpost('upgrade'))
+			 */	
+			if(PDF_Common::post('font-initialise'))
+			{
+				/*
+				 * We only want to reinitialise the font files and configuration
+				 */	
+				 if(GFPDF_InstallUpdater::initialise_fonts() === false)
+				 {
+					 return true;
+				 }
+			}
+			else if(rgpost('upgrade'))
 			{
 				/* 
 				 * Deploy new template styles 
@@ -61,16 +93,6 @@ class GFPDF_Settings
 				{
 					return true;
 				}
-			}
-			elseif(PDF_Common::post('font-initialise'))
-			{
-				/*
-				 * We only want to reinitialise the font files and configuration
-				 */	
-				 if(GFPDF_InstallUpdater::initialise_fonts() === false)
-				 {
-					 return true;
-				 }
 			}
 		}
 		
@@ -83,11 +105,10 @@ class GFPDF_Settings
 			 /*
 			  * Check if we want to copy the theme files
 			  */
-			 if(wp_verify_nonce(PDF_Common::get('_wpnonce'), 'gfpdfe_sync_now') )
-			 {
-				 $themes = get_option('gfpdfe_switch_theme');
-				 
-				 if(isset($themes['old']) && isset($themes['new']) && GFPDF_InstallUpdater::do_theme_switch($themes['old'], $themes['new']) === 'false')
+			 if( (is_dir($gfpdfe_data->old_template_location) || (is_dir($gfpdfe_data->old_3_6_template_site_location)) ) && wp_verify_nonce(PDF_Common::get('_wpnonce'), 'gfpdfe_migrate') ) /* add in 3.6 directory change */
+			 {	
+
+				 if(GFPDF_InstallUpdater::run_template_migration() === 'false')
 				 {
 					return true; 
 				 }
@@ -107,11 +128,17 @@ class GFPDF_Settings
 		 */		
 		if(is_multisite() && is_super_admin() && ($gfpdfe_data->fresh_install === true) )
 		{
-			$results = GFPDF_InstallUpdater::run_multisite_deployment();
-			if($results === 'false')
+			$results = GFPDF_InstallUpdater::run_multisite_deployment(array('GFPDF_InstallUpdater', 'do_deploy'));
+
+			if($results === true)
 			{
-				return $results;	
-			}			
+				add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_network_deploy_success'));	
+			}
+			elseif($results === false)
+			{
+				add_action($gfpdfe_data->notice_type, array('GFPDF_Notices', 'gf_pdf_auto_deploy_network_failure'));						
+			}	
+			return $results;				
 		}
 		else
 		{

@@ -1,5 +1,24 @@
 <?php
 
+/*
+    This file is part of Gravity PDF.
+
+    Gravity PDF Copyright (C) 2015 Blue Liquid Designs
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
 
 class PDFRender
 	{
@@ -8,7 +27,7 @@ class PDFRender
 	 * var $form_id integer: The form id
 	 * var $lead_id integer: The entry id
 	 * var $output string: either view, save or download
-	 * save will save a copy of the PDF to the server using the PDF_SAVE_LOCATION constant
+	 * save will save a copy of the PDF to the server using the $gfpdfe_data->template_save_location variable
 	 * var $return boolean: if set to true 
 	 * it will return the path of the saved PDF
 	 * var $template string: if you want to use multiple PDF templates - name of the template file
@@ -42,12 +61,12 @@ class PDFRender
 		/* 
 		 * Check if the PDF exists and if this function has already run this season 
 		 */	
-		if(in_array($lead_id, $pdf_creator) && file_exists(PDF_SAVE_LOCATION.$id.'/'. $filename))
+		if(in_array($lead_id, $pdf_creator) && file_exists($gfpdfe_data->template_save_location . $id . '/' . $filename))
 		{					
 			/* 
 			 * Don't generate a new PDF, use the existing one 
 			 */
-			return PDF_SAVE_LOCATION.$id.'/'. $filename;	
+			return $gfpdfe_data->template_save_location . $id . '/' . $filename;	
 		}
 		
 		/*
@@ -68,7 +87,7 @@ class PDFRender
 			 * Get the template HTML file
 			 * v3.4.0 allows mergetags to be used in PDF templates
 			 */
-			$raw_entry = $this->load_entry_data($form_id, $lead_id, $template);
+			$raw_entry = $this->load_entry_data($template);
 			$entry = apply_filters("gfpdfe_pdf_template_{$form_id}", apply_filters('gfpdfe_pdf_template', $raw_entry, $form_id, $lead_id, $arguments), $lead_id, $arguments);					
 
 			/*
@@ -99,28 +118,30 @@ class PDFRender
 	/**
 	 * Loads the Gravity Form output script (actually the print preview)
 	 */
-	private function load_entry_data($form_id, $lead_id, $template)
+	private function load_entry_data($template)
 	{
+		global $gfpdfe_data;
+
 		/* set up contstants for gravity forms to use so we can override the security on the printed version */		
-		if(file_exists(PDF_TEMPLATE_LOCATION.$template))
-		{	
-			return PDF_Common::get_html_template(PDF_TEMPLATE_LOCATION.$template);
+		if(file_exists( $gfpdfe_data->template_site_location . $template))
+		{		
+			return PDF_Common::get_html_template($gfpdfe_data->template_site_location . $template);
 		}
 		else
 		{
 			/*
 			 * Check if template file exists in the plugin's core template folder
 			 */
-			if(file_exists(PDF_PLUGIN_DIR."templates/" . $template))
+			if(file_exists( PDF_PLUGIN_DIR . 'templates/' . $template))
 			{
-				return PDF_Common::get_html_template(PDF_PLUGIN_DIR."initialisation/templates/" . $template);
+				return PDF_Common::get_html_template( PDF_PLUGIN_DIR . 'initialisation/templates/' . $template);
 			}
 			/*
 			 * If template not found then we will resort to the default template.
 			 */			
 			else
 			{				
-				return PDF_Common::get_html_template(PDF_PLUGIN_DIR."initialisation/templates/" . PDFGenerator::$default['template']);
+				return PDF_Common::get_html_template(PDF_PLUGIN_DIR . 'initialisation/templates/' . PDFGenerator::$default['template']);
 			}
 		}		
 	}
@@ -167,7 +188,13 @@ class PDFRender
 		 	$orientation = ($arguments['orientation'] == 'landscape') ? 'L' : 'P';			 			
 		 }
 		 
-		 $mpdf = new mPDF('', $paper_size, 0, '', 15, 15, 16, 16, 9, 9, $orientation);
+		 $mpdf = new mPDF('', $paper_size, 0, '', 15, 15, 16, 16, 9, 9, $orientation);		 
+
+		 /* 
+		  * Add filter to allow the $mpdf object to be modified right after the class is created.
+		  * Because $mpdf is a class it is automatically passed by reference and doesn't need to be assigned
+		  */ 
+		 apply_filters('gfpdfe_mpdf_class', $mpdf, $form_id, $lead_id, $arguments, $output, $filename);
 		
 		/*
 		 * Display PDF is full-page mode which allows the entire PDF page to be viewed
@@ -184,7 +211,7 @@ class PDFRender
 		/*
 		 * Set Creator Meta Data
 		 */		
-		$mpdf->SetCreator('Gravity Forms PDF Extended v'. PDF_EXTENDED_VERSION.'. http://gravityformspdfextended.com');	
+		$mpdf->SetCreator('Gravity PDF v' . PDF_EXTENDED_VERSION . '. https://gravitypdf.com');	
 
 		/*
 		 * Set PDF DPI if added to configuration node
@@ -209,9 +236,9 @@ class PDFRender
 		 */ 
 		 if($arguments['security'] === true && $arguments['pdfa1b'] === false && $arguments['pdfx1a'] === false  )
 		 {
-				$password = (strlen($arguments['pdf_password']) > 0) ? $arguments['pdf_password'] : '';
+				$password        = (strlen($arguments['pdf_password']) > 0) ? $arguments['pdf_password'] : '';
 				$master_password = (strlen($arguments['pdf_master_password']) > 0) ? $arguments['pdf_master_password'] : null;
-				$pdf_privileges = (is_array($arguments['pdf_privileges'])) ? $arguments['pdf_privileges'] : array();	
+				$pdf_privileges  = (is_array($arguments['pdf_privileges'])) ? $arguments['pdf_privileges'] : array();	
 				
 				$mpdf->SetProtection($pdf_privileges, $password, $master_password, 128);											
 		 }
@@ -219,13 +246,13 @@ class PDFRender
 		 /* PDF/A1-b support added in v3.4.0 */
 		 if($arguments['pdfa1b'] === true)
 		 {
-		 		$mpdf->PDFA = true;
-		 		$mpdf->PDFAauto = true;
+				$mpdf->PDFA     = true;
+				$mpdf->PDFAauto = true;
 		 }
 		 else if($arguments['pdfx1a'] === true)  /* PDF/X-1a support added in v3.4.0 */
 		 {
-		 		$mpdf->PDFX = true;
-			 	$mpdf->PDFXauto = true;
+				$mpdf->PDFX     = true;
+				$mpdf->PDFXauto = true;
 		 }
 		 
 		 /*
@@ -241,9 +268,14 @@ class PDFRender
 		$mpdf->WriteHTML($html);		
 
 		/*
+		 * Allow the $mpdf object to be modified now all the settings have been applied
+		 */		
+		apply_filters('gfpdfe_mpdf_class_pre_render', $mpdf, $form_id, $lead_id, $arguments, $output, $filename);
+		apply_filters('gfpdfe_pre_render_pdf', $mpdf, $form_id, $lead_id, $arguments, $output, $filename); /* left in for backwards compatiblity */
+
+		/*
 		 * Add pre-render/save filter so PDF can be manipulated further
-		 */	
-		$mpdf     = apply_filters('gfpdfe_pre_render_pdf', $mpdf, $form_id, $lead_id, $arguments, $output, $filename);
+		 */			
 		$output   = apply_filters('gfpdfe_pdf_output_type', $output);
 		$filename = apply_filters('gfpdfe_pdf_filename', $filename);
 		
@@ -281,17 +313,19 @@ class PDFRender
 	 */
 	 public function savePDF($pdf, $filename, $id) 
 	 {			
+	 	global $gfpdfe_data;
+
 		/* create unique folder for PDFs */
-		if(!is_dir(PDF_SAVE_LOCATION.$id))
+		if(!is_dir( $gfpdfe_data->template_save_location . $id))
 		{
-			if(!mkdir(PDF_SAVE_LOCATION.$id))
+			if(!mkdir( $gfpdfe_data->template_save_location . $id))
 			{
-				trigger_error('Could not create PDF folder in '. PDF_SAVE_LOCATION.$id, E_USER_WARNING);				
+				trigger_error('Could not create PDF folder in '. $gfpdfe_data->template_save_location . $id, E_USER_WARNING);				
 				return;
 			}
 		}	
 		
-		$pdf_save = PDF_SAVE_LOCATION.$id.'/'. $filename;			
+		$pdf_save = $gfpdfe_data->template_save_location . $id . '/' . $filename;			
 				
 		if(!file_put_contents($pdf_save, $pdf))
 		{

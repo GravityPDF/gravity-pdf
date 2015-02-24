@@ -6,12 +6,6 @@
 if(!class_exists("RGForms")){
    return;
 }
-
-/** 
- * Set up the form ID and lead ID
- * Form ID and Lead ID can be set by passing it to the URL - ?fid=1&lid=10
- */
- PDF_Common::setup_ids();
  
  global $gfpdf;
 
@@ -30,7 +24,7 @@ $form = RGFormsModel::get_form_meta($form_id);
 <head>
     <link rel="stylesheet" href="<?php echo GFCommon::get_base_url(); ?>/css/print.css" type="text/css" />
     <link rel='stylesheet' href='<?php echo PDF_PLUGIN_URL .'initialisation/template.css'; ?>' type='text/css' />
-    <title>Gravity Forms PDF Extended</title>
+    <title>Gravity PDF</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 </head>
     <body>
@@ -45,7 +39,7 @@ $form = RGFormsModel::get_form_meta($form_id);
                     $lead = RGFormsModel::get_lead($lead_id);
 
                     /* generate the entry HTML */
-                    GFPDFEntryDetail::lead_detail_grid($form, $lead, $config_data['empty_field'], $config_data['html_field'], $config_data['page_names']);
+                    GFPDFEntryDetail::do_lead_detail_grid($form, $lead, $config_data);
                 }
             ?>
         </div>

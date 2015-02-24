@@ -99,7 +99,7 @@ $this->dpi = 96;					// To interpret "px" pixel values in HTML/CSS (see img_dpi 
 $this->allow_html_optional_endtags = true;
 
 $this->ignore_invalid_utf8 = true;
-$this->text_input_as_HTML = false; 		// Converts all entities in Text inputs to UTF-8 before encoding
+$this->text_input_as_HTML = true; 		// Converts all entities in Text inputs to UTF-8 before encoding
 $this->useGraphs = false;
 
 

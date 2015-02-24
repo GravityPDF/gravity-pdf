@@ -26,7 +26,7 @@ h2.default {
     margin: 0;
     padding: 7px;
 }
-.entry-view-field-value, .entry-view-html-value {
+.entry-view-field-value, .entry-view-html-value, .entry-view-section-break-content {
     border-bottom: 1px solid #dfdfdf;
     line-height: 150%;
     padding: 6px 6px 6px 7px;
@@ -40,7 +40,7 @@ h2.default {
 .entry-view-field-value div.strong {
     font-weight: bold;
 }
-.no-style .entry-view-field-value, .no-style #container, .no-style h2 {
+.no-style .entry-view-field-value, .no-style #container, .no-style h2, .no-style .entry-view-html-value, .no-style .entry-view-section-break-content {
     background: none;
     border: none;
 }

@@ -3022,10 +3022,24 @@ function AddFont($family,$style='') {
 		$ttffile = _MPDF_SYSTEM_TTFONTS.$this->fontdata[$family][$stylekey];
 		if (!file_exists($ttffile)) { $ttffile = ''; }
 	}
+
 	if (!$ttffile) {
 		$ttffile = _MPDF_TTFONTPATH.$this->fontdata[$family][$stylekey];
-		if (!file_exists($ttffile)) { die("mPDF Error - cannot find TTF TrueType font file - ".$ttffile); }
+
+		if (!file_exists($ttffile)) { 
+			/*
+			 * Try load in the font file from the PDF_TEMPLATE
+			 */
+			global $gfpdfe_data;
+			$ttffile = $gfpdfe_data->template_site_location . 'fonts/' . $this->fontdata[$family][$stylekey];			
+
+			if(!file_exists($ttffile))
+			{
+				die("mPDF Error - cannot find TTF TrueType font file - ".$ttffile); 
+			}
+		}
 	}
+
 	$ttfstat = stat($ttffile);
 
 	if (isset($this->fontdata[$family]['TTCfontID'][$stylekey])) { $TTCfontID = $this->fontdata[$family]['TTCfontID'][$stylekey]; }
@@ -7327,9 +7341,11 @@ function SetXY($x,$y)
 
 function Output($name='',$dest='')
 {
+	global $gfpdfe_data;
+	
 	//Output PDF to some destination
 	if ($this->showStats) {
-		file_put_contents(PDF_SAVE_LOCATION . 'mPDF_performance_log.txt', date('Y-m-d h:i:s') . ' Generated in '.sprintf('%.2F',(microtime(true) - $this->time0))." seconds\r\n", FILE_APPEND);
+		file_put_contents($gfpdfe_data->template_save_location . 'mPDF_performance_log.txt', date('Y-m-d h:i:s') . ' Generated in '.sprintf('%.2F',(microtime(true) - $this->time0))." seconds\r\n", FILE_APPEND);
 	}
 	//Finish document if necessary
 	if ($this->progressBar) { $this->UpdateProgressBar(1,'100','Finished'); }	// *PROGRESS-BAR*
@@ -7351,12 +7367,10 @@ function Output($name='',$dest='')
 	if (count($this->PDFAXwarnings) && (($this->PDFA && !$this->PDFAauto) || ($this->PDFX && !$this->PDFXauto))) {
 		if ($this->PDFA) {
 			echo '<div>WARNING - This file could not be generated as it stands as a PDFA1-b compliant file.</div>';
-			echo '<div>These issues can be automatically fixed by setting <i>"pdfa1b_force" => true</i> in the Gravity Forms PDF Extended configuration.php file</div>';
 			echo '<div>Action that mPDF will take to automatically force PDFA1-b compliance are shown in brackets.</div>';
 		}
 		else {
 			echo '<div>WARNING - This file could not be generated as it stands as a PDFX/1-a compliant file.</div>';
-			echo '<div>These issues can be automatically fixed by setting <i>"pdfx1a_force" => true</i> in the Gravity Forms PDF Extended configuration.php file</div>';
 			echo '<div>Action that mPDF will take to automatically force PDFX/1-a compliance are shown in brackets.</div>';
 		}
 		echo '<div>Warning(s) generated:</div><ul>';
@@ -7375,7 +7389,7 @@ function Output($name='',$dest='')
 			$log .= 'Peak Memory usage '.number_format((memory_get_peak_usage(true)/(1024*1024)),2)." MB\n";
 			$log .= 'PDF file size '.number_format((strlen($this->buffer)/1024))." kB\n";
 			$log .= 'Number of fonts '.count($this->fonts)."\n";
-			file_put_contents(PDF_SAVE_LOCATION . 'mPDF_performance_log.txt', $log, FILE_APPEND);
+			file_put_contents($gfpdfe_data->template_save_location . 'mPDF_performance_log.txt', $log, FILE_APPEND);
 	}
 
 
@@ -9569,16 +9583,19 @@ function _beginpage($orientation,$mgl='',$mgr='',$mgt='',$mgb='',$mgh='',$mgf=''
 }
 
 
-
+/* 
+ * Blue Liquid Designs Edit 
+ * Add isset() to if statement as it throws errors 
+ */ 
 function _setAutoHeaderHeight(&$det, &$htmlh) {
   if ($this->setAutoTopMargin=='pad') {
-	if ($htmlh['h']) { $h = $htmlh['h']; }
+	if (isset($htmlh['h']) && $htmlh['h']) { $h = $htmlh['h']; }
 	else if ($det) { $h = $this->_getHFHeight($det,'H'); }
 	else { $h = 0; }
 	$this->tMargin = $this->margin_header + $h + $this->orig_tMargin;
   }
   else if ($this->setAutoTopMargin=='stretch') {
-	if ($htmlh['h']) { $h = $htmlh['h']; }
+	if (isset($htmlh['h']) && $htmlh['h']) { $h = $htmlh['h']; }
 	else if ($det) { $h = $this->_getHFHeight($det,'H'); }
 	else { $h = 0; }
 	$this->tMargin = max($this->orig_tMargin, $this->margin_header + $h + $this->autoMarginPadding);
@@ -9586,16 +9603,20 @@ function _setAutoHeaderHeight(&$det, &$htmlh) {
 }
 
 
+/* 
+ * Blue Liquid Designs Edit 
+ * Add isset() to if statement as it throws errors 
+ */
 function _setAutoFooterHeight(&$det, &$htmlf) {
   if ($this->setAutoBottomMargin=='pad') {
-	if ($htmlf['h']) { $h = $htmlf['h']; }
+	if (isset($htmlf['h']) && $htmlf['h']) { $h = $htmlf['h']; }
 	else if ($det) { $h = $this->_getHFHeight($det,'F'); }
 	else { $h = 0; }
 	$this->bMargin = $this->margin_footer + $h + $this->orig_bMargin;
 	$this->PageBreakTrigger=$this->h-$this->bMargin ;
   }
   else if ($this->setAutoBottomMargin=='stretch') {
-	if ($htmlf['h']) { $h = $htmlf['h']; }
+	if (isset($htmlf['h']) && $htmlf['h']) { $h = $htmlf['h']; }
 	else if ($det) { $h = $this->_getHFHeight($det,'F'); }
 	else { $h = 0; }
 	$this->bMargin = max($this->orig_bMargin, $this->margin_footer + $h + $this->autoMarginPadding);

@@ -1,19 +1,73 @@
 <?php
+
+/*
+    This file is part of Gravity PDF.
+
+    Gravity PDF Copyright (C) 2015 Blue Liquid Designs
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
+
 if(!class_exists('GFPDFEntryDetail'))
 {
 
+	/*
+	 * Include Gravity Forms Currency class (it not already included)
+	 */
+	if ( false === class_exists( 'RGCurrency' ) && class_exists('GFCommon') ) {
+		require_once( GFCommon::get_base_path() . '/currency.php' );
+	}
+	
 	add_filter('gfpdf_field_content', array('GFPDFEntryDetail', 'encode_tags'), 10, 2); /* encode shortcodes in user's response so they aren't converted later by do_shortcode */
 	class GFPDFEntryDetail {
 
 		/* holds the form fields, stored by field ID */
 		static $fields;
 
-		/* NEED THIS FUNCTION - BLD */
-		public static function lead_detail_grid($form, $lead, $allow_display_empty_fields=false, $show_html=false, $show_page_name=false, $return=false, $show_section_breaks=false){
+		/* depreciated function which we will replace with a better config passing method */
+		public static function lead_detail_grid($form, $lead, $allow_display_empty_fields=false, $show_html=false, $show_page_name=false, $return=false) {
+			
+			$config = array(
+				'empty_field' => $allow_display_empty_fields,
+				'html_field'  => $show_html, 
+				'page_names'  => $show_page_name, 
+				'return'      => $return,
+			);
+
+			return self::do_lead_detail_grid($form, $lead, $config);
+		}
+
+		
+		public static function do_lead_detail_grid($form, $lead, $config) {
 			$form_id = $form['id'];
 			$results = array();
 
-			if($return === true)
+			/*
+			 * Set up our defaults and merge down the user config
+			 */
+			$defaults = array(
+				'empty_field'     => false,
+				'html_field'      => false, 
+				'page_names'      => false, 
+				'return'          => false,
+				'section_content' => false,
+			);
+
+			$config = array_merge($defaults, $config);
+
+			if($config['return'] === true)
 			{
 				$results['title'] = '<h2 id="details" class="default">'. $form['title'] .'</h2>';
 			}
@@ -45,16 +99,24 @@ if(!class_exists('GFPDFEntryDetail'))
 						}
 
 						/*
+						 * Skip over hidden fields 
+						 */
+						if(GFFormsModel::is_field_hidden( $form, $field, array(), $lead ))
+						{
+							continue;
+						}
+
+						/*
 						 * Check if we are to show the page names
 						 */
-						 if($show_page_name === true)
+						 if($config['page_names'] === true)
 						 {
-							if((int) $field['pageNumber'] !== $page_number)
+							if((int) $field['pageNumber'] !== $page_number && isset($form['pagination']['pages'][$page_number]))
 							{
 								/*
 								 * Display the page number
 								 */
-								 if($return === true)
+								 if($config['return'] === true)
 								 {
 									$results['field'][] = '<h2 id="field-'. $field['id'].'" class="default entry-view-page-break">'. $form['pagination']['pages'][$page_number] .'</h2>';
 								 }
@@ -76,17 +138,27 @@ if(!class_exists('GFPDFEntryDetail'))
 						switch(RGFormsModel::get_input_type($field)){
 						   case 'section' :
 
-								if(!GFCommon::is_section_empty($field, $form, $lead) || $allow_display_empty_fields){
+								if(!GFCommon::is_section_empty($field, $form, $lead) || $config['empty_field'] || $config['section_content']){
 									$count++;
 
-									if($return === true)
+									if($config['return'] === true)
 									{
 										$results['field'][] = '<h2 id="field-'.$field['id'].'" class="default entry-view-section-break">'. esc_html(GFCommon::get_label($field)) .'</h2>';
+
+										if($config['section_content'])
+										{
+											$results['field'][] = '<div class="default entry-view-section-break entry-view-section-break-content">' . $field['description'] . '</div>';
+										}
+										
 									}
 									else
 									{
 									?>
 										<h2 id="field-<?php echo $field['id']; ?>" class="default entry-view-section-break"><?php echo esc_html(GFCommon::get_label($field))?></h2>
+
+										<?php if($config['section_content']): ?>
+											<div class="default entry-view-section-break entry-view-section-break-content"><?php echo $field['description']; ?></div>
+										<?php endif; ?>
 									<?php
 									}
 								}
@@ -98,7 +170,7 @@ if(!class_exists('GFPDFEntryDetail'))
 								//ignore captcha, html, password, page field
 							break;
 							case 'html':
-								if($show_html == true)
+								if($config['html_field'] == true)
 								{
 
 									$count++;
@@ -112,7 +184,7 @@ if(!class_exists('GFPDFEntryDetail'))
 									$content = '<div id="field-'. $field['id'] .'" class="entry-view-html-value' . $last_row . $even . '"><div class="value">' . $display_value . '</div></div>';
 									$content = apply_filters('gfpdf_field_content', $content, $field, $value, $lead['id'], $form['id']);
 
-									if($return === true)
+									if($config['return'] === true)
 									{
 										$results['field'][] = $content;
 									}
@@ -123,25 +195,29 @@ if(!class_exists('GFPDFEntryDetail'))
 								}
 							break;
 							case 'signature':
-								$value = RGFormsModel::get_lead_field_value($lead, $field);
+								$value         = RGFormsModel::get_lead_field_value($lead, $field);
 								$public_folder = RGFormsModel::get_upload_url_root() . 'signatures/';
 								$server_folder = RGFormsModel::get_upload_root() . 'signatures/';		
+								$file          = $server_folder.$value;
+								$display_value = false;
 
-								$image_size = getimagesize($server_folder.$value);
-								$width = $image_size[0] / 4;
-								$height = $image_size[1] / 4;
+								$is_last       = $count >= $field_count ? true : false;
+								$last_row      = $is_last ? ' lastrow' : '';								
+								
+								if(file_exists($file) && !is_dir($file))
+								{
+									$image_size    = getimagesize($file);
+									$width         = $image_size[0] / 4;
+									$height        = $image_size[1] / 4;
 
-								$display_value = '<img src="'. $server_folder.$value .'" alt="Signature" width=" '. $width .'" height="'. $height .'" />';
+									$display_value = '<img src="'. $file .'" alt="Signature" width=" '. $width .'" height="'. $height .'" />';
+								}
 
-
-								$is_last = $count >= $field_count ? true : false;
-								$last_row = $is_last ? ' lastrow' : '';
-
-								if(strlen($value) > 0 && (file_exists($server_folder.$value)) && (is_dir($server_folder.$value) !== true) )
+								if($display_value)
 								{
 									 $content = '<div id="field-'. $field['id'] .'" class="entry-view-field-value' . $last_row . $even . '"><div class="strong">' .  esc_html(GFCommon::get_label($field)) . '</div> <div class="value">' . $display_value . '</div></div>	';
 
-									if($return === true)
+									if($config['return'] === true)
 									{
 										$results['field'][] = $content;
 									}
@@ -150,15 +226,15 @@ if(!class_exists('GFPDFEntryDetail'))
 										echo $content;
 									}
 								}
-								elseif($allow_display_empty_fields)
+								elseif($config['empty_field'])
 								{
-									if($return === true)
+									if($config['return'] === true)
 									{
-										$results['field'][] = '<div id="field-'. $field['id'] .'" class="entry-view-field-value' . $last_row . $even . '"><div class="strong">' .  esc_html(GFCommon::get_label($field)) . '</div></div>';
+										$results['field'][] = '<div id="field-'. $field['id'] .'" class="entry-view-field-value' . $last_row . $even . '"><div class="strong">' .  esc_html(GFCommon::get_label($field)) . '</div> <div class="value">&nbsp;</div></div>';
 									}
 									else
 									{
-										print '<div id="field-'. $field['id'] .'" class="entry-view-field-value' . $last_row . $even . '"><div class="strong">' .  esc_html(GFCommon::get_label($field)) . '</div></div>';
+										print '<div id="field-'. $field['id'] .'" class="entry-view-field-value' . $last_row . $even . '"><div class="strong">' .  esc_html(GFCommon::get_label($field)) . '</div><div class="value">&nbsp;</div></div>';
 									}
 
 								}
@@ -178,7 +254,7 @@ if(!class_exists('GFPDFEntryDetail'))
 
 								$display_value = apply_filters('gform_entry_field_value', $display_value, $field, $lead, $form);
 
-								if( !empty($display_value) || $display_value === '0' || $allow_display_empty_fields){
+								if( !empty($display_value) || $display_value === '0' || $config['empty_field']){
 									$count++;
 									$is_last = $count >= $field_count && !$has_product_fields ? true : false;
 									$last_row = $is_last ? ' lastrow' : '';
@@ -190,7 +266,7 @@ if(!class_exists('GFPDFEntryDetail'))
 
 									$content = apply_filters('gfpdf_field_content', $content, $field, $value, $lead['id'], $form['id']);
 
-									if($return === true)
+									if($config['return'] === true)
 									{
 										$results['field'][] = $content;
 									}
@@ -206,7 +282,7 @@ if(!class_exists('GFPDFEntryDetail'))
 					}
 					$products = array();
 					if($has_product_fields){
-						if($return === true)
+						if($config['return'] === true)
 						{
 							ob_start();
 							self::product_table($form, $lead);
@@ -220,7 +296,7 @@ if(!class_exists('GFPDFEntryDetail'))
 
 					}
 
-					if($return === true)
+					if($config['return'] === true)
 					{
 						return $results;
 					}
@@ -351,7 +427,7 @@ if(!class_exists('GFPDFEntryDetail'))
 
 
 		/* returns the form values as an array instead of pre-formated html */
-		public static function lead_detail_grid_array($form, $lead, $allow_display_empty_fields=false){
+		public static function lead_detail_grid_array($form, $lead){
 
 			$form_id = $form['id'];
 			$form_array = self::set_form_array_common($form, $lead, $form_id);
@@ -548,15 +624,13 @@ if(!class_exists('GFPDFEntryDetail'))
 	
 			$likert = array();
 
-
 			/* store the column names */
 			foreach($field['choices'] as $col)
 			{				
 				$likert['col'][$col['value']] = $col['text'];
 			}
-
 			
-			if(sizeof($field['inputs']) > 0)
+			if(is_array($field['inputs']) && sizeof($field['inputs']) > 0)
 			{
 				/* do our multi-row likert */
 				foreach($field['inputs'] as $row)
@@ -597,6 +671,15 @@ if(!class_exists('GFPDFEntryDetail'))
 				}									
 			}
 
+			/*
+			 * Check if scoring is enabled and calculate 
+			 */
+			if($field['gsurveyLikertEnableScoring'] && class_exists('GFSurvey'))
+			{
+				$survey = GFSurvey::get_instance();
+				$likert['score'] = $survey->get_field_score($field, $lead);
+			}
+
 			return $likert;
 
 		}
@@ -624,15 +707,15 @@ if(!class_exists('GFPDFEntryDetail'))
 			/*
 			 * Add form_id and lead_id
 			 */
-			$form_array['form_id'] = $form_id;
+			$form_array['form_id']  = $form_id;
 			$form_array['entry_id'] = $lead['id'];
 
 			/*
 			 * Set title and dates (both US and international)
 			 */
-			$form_array['form_title'] = $form['title'];
-			$form_array['form_description'] = $form['description'];
-			$form_array['date_created'] = self::format_date($lead['date_created']);
+			$form_array['form_title']       = $form['title'];
+			$form_array['form_description'] = (isset($form['description'])) ? $form['description'] : '';
+			$form_array['date_created']     = self::format_date($lead['date_created']);
 			$form_array['date_created_usa'] = self::format_date($lead['date_created'], true);
 
 			/*
@@ -643,33 +726,45 @@ if(!class_exists('GFPDFEntryDetail'))
 			/*
 			 * Add misc fields
 			 */
-			 $form_array['misc']['date_time'] = $lead['date_created'];
-			 $form_array['misc']['time_24hr'] = date('H:i', strtotime($lead['date_created']));
-			 $form_array['misc']['time_12hr'] = date('g:ia', strtotime($lead['date_created']));
-			 $form_array['misc']['is_starred'] = $lead['is_starred'];
-			 $form_array['misc']['is_read'] = $lead['is_read'];
-			 $form_array['misc']['ip'] = $lead['ip'];
-			 $form_array['misc']['source_url'] = $lead['source_url'];
-			 $form_array['misc']['post_id'] = $lead['post_id'];
-			 $form_array['misc']['currency'] = $lead['currency'];
-			 $form_array['misc']['payment_status'] = $lead['payment_status'];
-			 $form_array['misc']['payment_date'] = $lead['payment_date'];
-			 $form_array['misc']['transaction_id'] = $lead['transaction_id'];
-			 $form_array['misc']['payment_amount'] = $lead['payment_amount'];
-			 $form_array['misc']['is_fulfilled'] = $lead['is_fulfilled'];
-			 $form_array['misc']['created_by'] = $lead['created_by'];
-			 $form_array['misc']['transaction_type'] = $lead['transaction_type'];
-			 $form_array['misc']['user_agent'] = $lead['user_agent'];
-			 $form_array['misc']['status'] = $lead['status'];
+			$form_array['misc']['date_time']        = $lead['date_created'];
+			$form_array['misc']['time_24hr']        = date('H:i', strtotime($lead['date_created']));
+			$form_array['misc']['time_12hr']        = date('g:ia', strtotime($lead['date_created']));
+			$form_array['misc']['is_starred']       = $lead['is_starred'];
+			$form_array['misc']['is_read']          = $lead['is_read'];
+			$form_array['misc']['ip']               = $lead['ip'];
+			$form_array['misc']['source_url']       = $lead['source_url'];
+			$form_array['misc']['post_id']          = $lead['post_id'];
+			$form_array['misc']['currency']         = $lead['currency'];
+			$form_array['misc']['payment_status']   = $lead['payment_status'];
+			$form_array['misc']['payment_date']     = $lead['payment_date'];
+			$form_array['misc']['transaction_id']   = $lead['transaction_id'];
+			$form_array['misc']['payment_amount']   = $lead['payment_amount'];
+			$form_array['misc']['is_fulfilled']     = $lead['is_fulfilled'];
+			$form_array['misc']['created_by']       = $lead['created_by'];
+			$form_array['misc']['transaction_type'] = $lead['transaction_type'];
+			$form_array['misc']['user_agent']       = $lead['user_agent'];
+			$form_array['misc']['status']           = $lead['status'];
 
 			
 
 			/*
-			 * Add quiz results
+			 * Add quiz/survey/poll results
 			 */
-			$form_array = self::get_quiz_results($form_array, $form, $lead);
-			$form_array = self::get_survey_results($form_array, $form, $lead);
-			$form_array = self::get_poll_results($form_array, $form, $lead);
+			
+			if(class_exists('GFQuiz'))
+			{
+				$form_array = self::get_quiz_results($form_array, $form, $lead);
+			}
+
+			if(class_exists('GFSurvey'))
+			{
+				$form_array = self::get_survey_results($form_array, $form, $lead);
+			}
+
+			if(class_exists('GFPolls'))
+			{
+				$form_array = self::get_poll_results($form_array, $form, $lead);
+			}
 
 			return $form_array;
 		}
@@ -699,7 +794,8 @@ if(!class_exists('GFPDFEntryDetail'))
 				return $form_array;
 			}
 
-			$poll_results = self::get_addon_global_data($form, array());
+			$fields = self::get_related_fields($form["fields"], 'poll');
+			$poll_results = self::get_addon_global_data($form, array(), $fields);
 
 			$form_fields = self::$fields;
 
@@ -711,7 +807,7 @@ if(!class_exists('GFPDFEntryDetail'))
 			{
 				/* get the $field */
 				$field = $form_fields[$id];
-
+				
 				/* add the field name to the ['misc'] key */
 				$choices['misc']['label'] = $field['label'];	
 
@@ -738,7 +834,7 @@ if(!class_exists('GFPDFEntryDetail'))
 			  * If there are any survey results
 			  * add them to the 'survey' key
 			  */
-			$fields            = GFCommon::get_fields_by_type($form, array('survey'));
+			$fields              = GFCommon::get_fields_by_type($form, array('survey'));
 	        $count_survey_fields = count($fields);
 
 	        if ($count_survey_fields > 0 && isset($lead['gsurvey_score']))
@@ -746,19 +842,15 @@ if(!class_exists('GFPDFEntryDetail'))
 	        	$form_array['survey']['score'] = $lead['gsurvey_score'];
 	        }
 
-	        $form_array['survey']['global'] = self::get_addon_global_data($form, array());
-
-
-
-			$results = self::get_addon_global_data($form, array());
-
+	        $fields = self::get_related_fields($form["fields"], 'survey');
+	        $form_array['survey']['global'] = self::get_addon_global_data($form, array(), $fields);
 			$form_fields = self::$fields;
 
 			/*
 			 * Convert the array keys into their text counterparts
 			 * Loop through the global survey data
 			 */
-			foreach($results['field_data'] as $id => &$choices)
+			foreach($form_array['survey']['global']['field_data'] as $id => &$choices) 
 			{
 				/* get the $field */
 				$field = $form_fields[$id];
@@ -782,16 +874,16 @@ if(!class_exists('GFPDFEntryDetail'))
 					}
 				}
 
+
 				/* replace the standard row data */
-				foreach($field['choices'] as $choice)
+				if(isset($field['choices']) && is_array($field['choices']))
 				{
-					$choices = self::replace_key($choices, $choice['value'], $choice['text']);
+					foreach($field['choices'] as $choice)
+					{
+						$choices = self::replace_key($choices, $choice['value'], $choice['text']);
+					}
 				}
-			}
-			
-			$form_array['survey']['global'] = $results;
-
-
+			}			
 
 	        return $form_array;
 
@@ -799,7 +891,7 @@ if(!class_exists('GFPDFEntryDetail'))
 
 		private static function replace_key($array, $key, $text)
 		{
-			if(isset($array[$key]))
+			if($key != $text && isset($array[$key]))
 			{
 				/* replace the array key with the actual field name */
 				$array[$text] = $array[$key];
@@ -825,9 +917,9 @@ if(!class_exists('GFPDFEntryDetail'))
 
 	        if ($count_quiz_fields > 0)
 	        {
-				$form_array['quiz']['config']['grading']     = $form['gravityformsquiz']['grading'];
-				$form_array['quiz']['config']['passPercent'] = $form['gravityformsquiz']['passPercent'];
-				$form_array['quiz']['config']['grades']      = $form['gravityformsquiz']['grades'];
+				$form_array['quiz']['config']['grading']     = (isset($form['gravityformsquiz']['grading'])) ? $form['gravityformsquiz']['grading'] : '';
+				$form_array['quiz']['config']['passPercent'] = (isset($form['gravityformsquiz']['passPercent'])) ? $form['gravityformsquiz']['passPercent'] : '';
+				$form_array['quiz']['config']['grades']      = (isset($form['gravityformsquiz']['grades'])) ? $form['gravityformsquiz']['grades'] : '';
 				
 				$form_array['quiz']['results']['score']      = rgar($lead, 'gquiz_score');
 				$form_array['quiz']['results']['percent']    = rgar($lead, 'gquiz_percent');
@@ -836,7 +928,8 @@ if(!class_exists('GFPDFEntryDetail'))
 
 				/*
 				 * Get the overall results
-				 */
+				 */				
+
 				$quiz_global = self::get_quiz_overalls($form);
 
 				$form_fields = self::$fields;
@@ -844,6 +937,11 @@ if(!class_exists('GFPDFEntryDetail'))
 				 * Convert the array keys into their text counterparts
 				 * Loop through the global quiz data
 				 */
+				if(empty($quiz_global['field_data']))
+				{
+					$quiz_global['field_data'] = array();
+				}
+
 				foreach($quiz_global['field_data'] as $id => &$choices)
 				{
 					/* get the $field */
@@ -861,9 +959,9 @@ if(!class_exists('GFPDFEntryDetail'))
 						$choices = self::replace_key($choices, $choice['value'], $choice['text']);	
 
 						/* check if this is the correct field */
-						if($choice['gquizIsCorrect'] == 1)
+						if(isset($choice['gquizIsCorrect']) && $choice['gquizIsCorrect'] == 1)
 						{
-							$choices['misc']['correct_option_name'] = $choice['text'];
+							$choices['misc']['correct_option_name'][] = $choice['text'];
 						}
 
 					}
@@ -877,7 +975,7 @@ if(!class_exists('GFPDFEntryDetail'))
 	        return $form_array;
 		}
 
-		private static function get_addon_global_data($form, $options)
+		private static function get_addon_global_data($form, $options, $fields)
 		{
 				/* if the results class isn't loaded, load it */
 				if (!class_exists("GFResults"))
@@ -885,8 +983,11 @@ if(!class_exists('GFPDFEntryDetail'))
 				    require_once(GFCommon::get_base_path() . "/includes/addon/class-gf-results.php");
 				}
 
-				$fields = $form["fields"];
-	            
+				$form_id = $form['id'];
+
+				/* add form filter to keep in line with GF standard */
+				$form = apply_filters( "gform_form_pre_results_$form_id", apply_filters( 'gform_form_pre_results', $form ) );
+
 	            /* initiat the results class */
 				$gf_results = new GFResults('', $options);				
 				
@@ -894,7 +995,7 @@ if(!class_exists('GFPDFEntryDetail'))
 				$search = array(
 					'field_filters' => array('mode' => ''),
 					'status'        => 'active'
-				);			
+				);		
 
 				/* get the results */
 				$data = $gf_results->get_results_data($form, $fields, $search);	
@@ -905,6 +1006,27 @@ if(!class_exists('GFPDFEntryDetail'))
 
 				return $data;
 
+		}
+
+		/**
+		 * Gravity Forms is throwing notices when accessing get_results_data() 
+		 * due to poor validation. To fix this we'll unset the 'choices' array key 
+		 * if it is not an array (the expected input for this function)
+		 * @param  Array $fields The fields array
+		 * @return Array         The processed fields array
+		 */
+		private static function get_related_fields($fields, $type)
+		{ 
+			foreach($fields as $id => $field)
+			{
+				if($field['type'] !== $type)
+				{
+					unset($fields[$id]);
+					continue;
+				}	
+			}
+
+			return $fields;
 		}
 
 		private static function get_quiz_overalls($form)
@@ -921,7 +1043,11 @@ if(!class_exists('GFPDFEntryDetail'))
 	            		'results_calculation'
 	            );
 
-				return self::get_addon_global_data($form, $options);		
+	            $fields = self::get_related_fields($form["fields"], 'quiz');
+
+	            $quiz_results = self::get_addon_global_data($form, $options, $fields);	
+
+				return $quiz_results;
 			}
 
 			return array(__('Activate Gravity Forms Quiz Add On to see global quiz statistics for this form', 'pdfextended'));
@@ -932,6 +1058,7 @@ if(!class_exists('GFPDFEntryDetail'))
 			if(isset($field['content']))
 			{
 				$form_array['html'][] = wpautop($field['content']);
+				$form_array['html_id'][$field['id']] = wpautop($field['content']);
 			}
 
 			return $form_array;
@@ -939,37 +1066,51 @@ if(!class_exists('GFPDFEntryDetail'))
 
 		private static function get_signature($form, $lead, $field, $form_array)
 		{
-			$value = RGFormsModel::get_lead_field_value($lead, $field);
-			
-			$http_folder = RGFormsModel::get_upload_url_root(). 'signatures/';
-			$server_folder = RGFormsModel::get_upload_root() . 'signatures/';		
+			$value         = RGFormsModel::get_lead_field_value($lead, $field);			
+			$http_folder   = RGFormsModel::get_upload_url_root(). 'signatures/';
+			$server_folder = RGFormsModel::get_upload_root() . 'signatures/';	
+			$file          = $server_folder.$value;
+			$sig_html      = '';
 
+			/*
+			 * Set defaults is we cannot find the images 
+			 */
+			$width  = 75;
+			$height = 45;
 
-			if(file_exists($server_folder.$value) !== false && is_dir($server_folder.$value) !== true)
+			/*
+			 * Only get sane defaults specific to the image if we can find it.
+			 */
+			if(file_exists($file) !== false && is_dir($file) !== true)
 			{
-				$image_size = getimagesize($server_folder.$value);
-				$width = $image_size[0] / 4;
-				$height = $image_size[1] / 4;
-
-				$sig_html = '<img src="'. $server_folder.$value .'" alt="Signature" width=" '. $width .'" height="'. $height .'" />';								
-
-				$form_array['signature'][] 			= $sig_html;
-				$form_array['signature_details'][] 	= array(
-																	'img'  => $sig_html,
-																	'path' => $server_folder.$value,
-																	'url'  => $http_folder.$value,
-																	'width' => $width,
-																	'height' => $height,
-												   			);
-
-				$form_array['signature_details_id'][$field['id']] = array(
-																			'img'  => $sig_html,
-																			'path' => $server_folder.$value,
-																			'url'  => $http_folder.$value,
-																			'width' => $width,
-																			'height' => $height,
-																		  );
+				$image_size = getimagesize($file);
+				$width      = $image_size[0] / 4;
+				$height     = $image_size[1] / 4;
+				$sig_html   = '<img src="'. $server_folder.$value .'" alt="Signature" width="'. $width .'" height="'. $height .'" />';	
 			}
+
+			/*
+			 * Include the image details
+			 */
+										
+
+			$form_array['signature'][]                        = $sig_html;
+			$form_array['signature_details'][]                = array(
+																	'img'    => $sig_html,
+																	'path'   => $file,
+																	'url'    => $http_folder.$value,
+																	'width'  => $width,
+																	'height' => $height,
+			);
+			
+			$form_array['signature_details_id'][$field['id']] = array(
+																	'img'    => $sig_html,
+																	'path'   => $file,
+																	'url'    => $http_folder.$value,
+																	'width'  => $width,
+																	'height' => $height,
+			);
+			
 
 			return $form_array;
 		}
@@ -1004,11 +1145,10 @@ if(!class_exists('GFPDFEntryDetail'))
 			/*
 			 * Check if there are any values in the list 
 			 */
-			if(sizeof($list) == 0)
+			if(!is_array($list) || sizeof($list) == 0)
 			{
 				return $list;
 			}
-
 
 			/*
 			 * Check if it's a multi column list
@@ -1098,7 +1238,7 @@ if(!class_exists('GFPDFEntryDetail'))
 
 		private static function get_product_array($form, $lead, $has_product_fields, $form_array)
 		{
-
+			$currency_format = GFCommon::is_currency_decimal_dot() ? 'decimal_dot' : 'decimal_comma';
 
 			if($has_product_fields) {
 				$products = GFCommon::get_product_fields($form, $lead, true);
@@ -1133,26 +1273,44 @@ if(!class_exists('GFPDFEntryDetail'))
 						/*
 						 * Check if we should include options
 						 */
-						$options = isset($product['options']) ? $product['options'] : '';
+						$options = isset($product['options']) ? $product['options'] : array();
+
+						/*
+						 * Add formated price for each product option 
+						 */
+						foreach($options as &$o)
+						{
+							if(is_numeric($o['price']))
+							{
+								$o['price_formatted'] = GFCommon::format_number($o['price'], 'currency');
+							}
+						}
 
 						/*
 						 * Store product in $form_array array
 						 */
 						$form_array['products'][$id] = array(
-								'name' => esc_html($product['name']),
-								'price' => esc_html($product['price']),
-								'options' => $options,
-								'quantity' => $product['quantity'],
-								'subtotal' => $subtotal);
+								'name'               => esc_html($product['name']),
+								'price'              => esc_html($product['price']),
+								'price_unformatted'  => GFCommon::clean_number($product['price'], $currency_format),
+								'options'            => $options,
+								'quantity'           => $product['quantity'],
+								'subtotal'           => $subtotal,
+								'subtotal_formatted' => GFCommon::format_number($subtotal, 'currency'));
 					}
 
 					/* Increment total */
 					$total += floatval($products['shipping']['price']);
+					$subtotal = $total - floatval($products['shipping']['price']);
 
 					/* add totals to form data */
 					$form_array['products_totals'] = array(
-							'shipping' => $products['shipping']['price'],
-							'total'	   => $total
+							'subtotal'           => $subtotal,							
+							'shipping'           => $products['shipping']['price'],							
+							'total'              => $total,
+							'shipping_formatted' => GFCommon::format_number($products['shipping']['price'], 'currency'), 
+							'subtotal_formatted' => GFCommon::format_number($subtotal, 'currency'),
+							'total_formatted'    => GFCommon::format_number($total, 'currency'),
 					);
 				}
 			}
@@ -1170,10 +1328,11 @@ if(!class_exists('GFPDFEntryDetail'))
 					if(is_array($value)){
 						$prefix = trim(rgget($field['id'] . '.2', $value));
 						$first  = trim(rgget($field['id'] . '.3', $value));
+						$middle = trim(rgget($field['id'] . '.4', $value));
 						$last   = trim(rgget($field['id'] . '.6', $value));
 						$suffix = trim(rgget($field['id'] . '.8', $value));
 
-						return array('prefix' => $prefix, 'first' => $first, 'last' => $last, 'suffix' => $suffix);
+						return array('prefix' => $prefix, 'first' => $first, 'middle' => $middle, 'last' => $last, 'suffix' => $suffix);
 					}
 					else{
 						return $value;
@@ -1184,8 +1343,7 @@ if(!class_exists('GFPDFEntryDetail'))
 					if(is_array($value)){
 						$card_number = trim(rgget($field['id'] . '.1', $value));
 						$card_type   = trim(rgget($field['id'] . '.4', $value));
-						$separator   = $format == 'html' ? '<br/>' : '\n';
-						return empty($card_number) ? '' : $card_type . $separator . $card_number;
+						return array('card_number' => $card_number, 'card_type' => $card_type);
 					}
 					else{
 						return '';
@@ -1314,7 +1472,10 @@ if(!class_exists('GFPDFEntryDetail'))
 					if(empty($value) || $format == 'text')
 						return $value;
 
-					$value = explode(',', $value);
+					if(!is_array($value))
+					{
+						$value = explode(',', $value);
+					}
 
 					$items = '';
 					foreach($value as $item){
@@ -1347,7 +1508,7 @@ if(!class_exists('GFPDFEntryDetail'))
 				break;
 
 				case 'number' :
-					return self::format_number($value, rgar($field, 'numberFormat'));
+					return GFCommon::format_number($value, rgar($field, 'numberFormat'));
 				break;
 
 				case 'singleshipping' :
@@ -1363,7 +1524,7 @@ if(!class_exists('GFPDFEntryDetail'))
 
 					$has_columns = is_array($value[0]);
 
-					if(!$has_columns){
+					if(!$has_columns){						
 						$items = array();
 						foreach($value as $key => $item){
 							if(!empty($item)){
@@ -1400,8 +1561,15 @@ if(!class_exists('GFPDFEntryDetail'))
 						else if($media == 'email'){
 							return $items;
 						}
-						else{
-							return $items;
+						else {
+							$list = '<table autosize="1" class="gfield_list" style="border-top: 1px solid #DFDFDF; border-left: 1px solid #DFDFDF; border-spacing: 0; padding: 0; margin: 2px 0 6px; width: 100%">';
+							foreach($items as $i)
+							{
+								$list .= '<tr><td>' . $i .'</td></tr>';
+							}
+							$list .= '</table>';
+
+							return $list;
 						}
 					}
 					else if(is_array($value)){
@@ -1430,6 +1598,7 @@ if(!class_exists('GFPDFEntryDetail'))
 							break;
 
 							default :
+
 								if($media == 'email'){
 									$list = '<table autosize="1" class="gfield_list" style="border-top: 1px solid #DFDFDF; border-left: 1px solid #DFDFDF; border-spacing: 0; padding: 0; margin: 2px 0 6px; width: 100%"><thead><tr>';
 
@@ -1501,11 +1670,13 @@ if(!class_exists('GFPDFEntryDetail'))
 						if(is_array($value)){
 							$prefix = trim(rgget($field['id'] . '.2', $value));
 							$first  = trim(rgget($field['id'] . '.3', $value));
+							$middle = trim(rgget($field['id'] . '.4', $value));
 							$last   = trim(rgget($field['id'] . '.6', $value));
 							$suffix = trim(rgget($field['id'] . '.8', $value));
 
 							$name   = $prefix;
 							$name   .= !empty($name) && !empty($first) ? " $first" : $first;
+							$name   .= !empty($name) && !empty($middle) ? " $middle" : $middle;
 							$name   .= !empty($name) && !empty($last) ? " $last" : $last;
 							$name   .= !empty($name) && !empty($suffix) ? " $suffix" : $suffix;
 
@@ -1684,7 +1855,10 @@ if(!class_exists('GFPDFEntryDetail'))
 						if(empty($value) || $format == 'text')
 							return $value;
 
-						$value = explode(',', $value);
+						if(!is_array($value))
+						{
+							$value = explode(',', $value);
+						}
 
 						$items = '';
 						foreach($value as $item){
@@ -1711,7 +1885,7 @@ if(!class_exists('GFPDFEntryDetail'))
 					break;
 
 					case 'number' :
-						return self::format_number($value, rgar($field, 'numberFormat'));
+						return GFCommon::format_number($value, rgar($field, 'numberFormat'));
 					break;
 
 					case 'singleshipping' :
@@ -1850,50 +2024,6 @@ if(!class_exists('GFPDFEntryDetail'))
 				}
 			}
 
-		/**
-		 * Format Gravity Form's three number types
-		 * @param  float $number        The number field value to process
-		 * @param  string $number_format The number type a user selects in the form editor
-		 * @return float                Correctly formated number
-		 */
-	    private static function format_number($number, $number_format){
-	        if(!is_numeric($number))
-	            return $number;
-
-	        //replacing commas with dots and dots with commas
-	        switch($number_format)
-	        {
-	        	case 'decimal_comma':
-	        		$number = self::reformat_number(number_format($number, '2', ',', '.'));
-	        	break;
-
-	        	case 'decimal_dot':
-	        		$number = self::reformat_number(number_format($number, '2'));
-
-	        	break;
-
-	        	case 'currency':
-	        		/* get the GF currency and convert number to money */
-	        		$number = GFCommon::to_money($number);
-	        	break;
-	        }
-
-	        return $number;
-	    }
-
-	    /**
-	     * Remove the .00 or ,00 decimal from the end of the number format
-	     * @param  float $number number to manipulate
-	     * @return float         processed number
-	     */
-	    private static function reformat_number($number)
-	    {
-	    	if(substr($number, -2) == '00')
-	    	{
-	    		return substr($number, 0, -3);
-	    	}
-	    	return $number;
-	    }
 
 	    public static function encode_tags($content, $field)
 	    {
