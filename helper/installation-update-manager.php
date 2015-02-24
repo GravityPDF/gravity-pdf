@@ -223,7 +223,9 @@ class GFPDF_InstallUpdater
         }
 
         /* copy entire template folder over to the template directory */
-        self::pdf_extended_copy_directory($directory.'initialisation/templates', $template_directory, false);
+        if(!self::pdf_extended_copy_directory($directory.'initialisation/templates', $template_directory, false)) {
+            return false;
+        }
 
         /* copy configuration file over to new directory */
         if (self::create_configuration_file($directory, $template_directory) === false) {
@@ -575,10 +577,17 @@ class GFPDF_InstallUpdater
         }
 
         if ($wp_filesystem->is_dir($previous_pdf_path)) {
-            if (is_dir($gfpdfe_data->old_template_location)) {
-                self::pdf_extended_copy_directory($previous_pdf_path, $current_pdf_path, true, true, true); /* swap back to TRUE to delete the theme folder */
+            if (is_dir($gfpdfe_data->old_template_location)) {         
+                /* swap back to TRUE to delete the theme folder */       
+                if(!self::pdf_extended_copy_directory($previous_pdf_path, $current_pdf_path, true, true, true)) {
+                    return false;
+                }
+
             } elseif (is_dir($gfpdfe_data->old_3_6_template_site_location)) {
-                self::pdf_extended_copy_directory($previous_pdf_path, $current_pdf_path, true, false, true); /* swap back to TRUE to delete the theme folder */
+                /* swap back to TRUE to delete the theme folder */
+                if(!self::pdf_extended_copy_directory($previous_pdf_path, $current_pdf_path, true, false, true)) {
+                    return false;
+                }
             }
 
              /*
@@ -590,23 +599,35 @@ class GFPDF_InstallUpdater
         return true;
     }
 
-    /*
+    /**
      * Allows you to copy entire folder structures to new location
+     * @param  String  $source             The source path that should be copied
+     * @param  String  $destination        The destination path where the files should be copied to
+     * @param  boolean $copy_base          Whether to create the base directory at the destination
+     * @param  boolean $delete_destination Whether to want to remove the destination before copying the files
+     * @param  boolean $delete_source      Once finished copying should we remove the source folder
      */
     public static function pdf_extended_copy_directory($source, $destination, $copy_base = true, $delete_destination = false, $delete_source = false)
     {
         global $wp_filesystem;
 
+        if($wp_filesystem->is_dir($destination) && !$wp_filesystem->is_writable($destination))
+        {
+            return false;
+        }
+
         if ($wp_filesystem->is_dir($source)) {
-            if ($delete_destination === true) {
+            if ($delete_destination === true && $wp_filesystem->exists($destination)) {
                 /*
                  * To ensure everything stays in sync we will remove the destination file structure
                  */
                  $wp_filesystem->delete($destination, true);
             }
 
-            if ($copy_base === true) {
-                $wp_filesystem->mkdir($destination);
+            if ($copy_base === true && !$wp_filesystem->exists($destination)) {
+                if(!$wp_filesystem->mkdir($destination)) {
+                    return false;
+                }
             }
             $directory = $wp_filesystem->dirlist($source);
 
@@ -614,17 +635,32 @@ class GFPDF_InstallUpdater
                 $PathDir = $source.'/'.$name;
 
                 if ($wp_filesystem->is_dir($PathDir)) {
-                    self::pdf_extended_copy_directory($PathDir, $destination.'/'.$name);
+                    if(!self::pdf_extended_copy_directory($PathDir, $destination.'/'.$name)) {
+                        return false;
+                    }
                     continue;
                 }
                 $wp_filesystem->copy($PathDir, $destination.'/'.$name);
+
+                /* verify the file copied correctly */
+                if(!$wp_filesystem->is_file($destination.'/'.$name) || $wp_filesystem->size($PathDir) != $wp_filesystem->size($destination.'/'.$name)) {
+                    return false;
+                }                
             }
         } else {
             $wp_filesystem->copy($source, $destination);
+            /* verify the file copied correctly */
+            if(!$wp_filesystem->is_file($destination) || $wp_filesystem->size($source) != $wp_filesystem->size($destination)) {
+                return false;
+            }
         }
 
         if ($delete_source) {
-            $wp_filesystem->delete($source, true);
+            if($wp_filesystem->delete($source, true) === false) {
+                return false;
+            }
         }
+
+        return true;
     }
 }
