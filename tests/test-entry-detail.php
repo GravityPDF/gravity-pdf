@@ -456,8 +456,6 @@ EOD;
 
     /**
      * Check the time field outputs the correct information
-     * TODO: for some reasons the time isn't loaded using the add_entry() function we used to import the JSON string
-     * Must be a bug with GF. Will check again once 1.9 is offically released.
      * @group entry-detail
      */
     public function test_time_field()
@@ -469,14 +467,9 @@ EOD;
          */
         $response = "10:30 am";
 
-        /*$this->assertEquals($response, $field[13]);
+        $this->assertEquals($response, $field[13]);
         $this->assertEquals($response, $field['13.Time']);
-        $this->assertEquals($response, $field['Time']);	*/
-
-        /* error with the JSON data... */
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $this->assertEquals($response, $field['Time']);	
     }
 
     /**

@@ -43,6 +43,7 @@
   <ul>
     <li>Housekeeping - Add better error checking when migrating PDF template folder</li>
     <li>Housekeeping - Add unit testing to the directory migration function</li>
+    <li>Bug - Fixed backwards-compatiiblity PHP error when viewing custom PDF templates on Gravity Forms 1.8.3 or below.</li>
   </ul>
 
   <h3>3.7.0</h3>

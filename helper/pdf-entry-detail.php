@@ -1238,7 +1238,8 @@ if(!class_exists('GFPDFEntryDetail'))
 
 		private static function get_product_array($form, $lead, $has_product_fields, $form_array)
 		{
-			$currency_format = GFCommon::is_currency_decimal_dot() ? 'decimal_dot' : 'decimal_comma';
+			$currency_type = (method_exists('GFCommon', 'is_currency_decimal_dot')) ? GFCommon::is_currency_decimal_dot() : PDF_Common::is_currency_decimal_dot();
+			$currency_format = $currency_type ? 'decimal_dot' : 'decimal_comma';
 
 			if($has_product_fields) {
 				$products = GFCommon::get_product_fields($form, $lead, true);

@@ -91,6 +91,7 @@ All FAQs can be [viewed on the Gravity PDF website](https://gravitypdf.com/#faqs
 = 3.7.1 =
 * Housekeeping - Add better error checking when migrating PDF template folder
 * Housekeeping - Add unit testing to the directory migration function
+* Bug - Fixed backwards-compatiiblity PHP error when viewing custom PDF templates on Gravity Forms 1.8.3 or below. 
 
 = 3.7.0 =
 * Feature - Added 'default-show-section-content' configuration option. You can now display the section break content in the default template. Note: if this option is enabled and the section break is empty it will still be displayed on the PDF. 
