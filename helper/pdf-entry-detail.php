@@ -501,6 +501,13 @@ if(!class_exists('GFPDFEntryDetail'))
 								$form_array['survey']['rating'][$field['id']] = self::get_the_rank($form, $lead, $field, $form_array);
 							break;
 
+							case 'checkbox':
+								/* Only process non-survey checkbox fields */
+								if($field['type'] == 'checkbox') {
+									$form_array = self::get_the_list($lead, $field, $form_array);
+									break;	
+								}							
+
 							default:
 
 
@@ -1254,9 +1261,7 @@ if(!class_exists('GFPDFEntryDetail'))
 					$total = 0;
 					$subtotal = 0;
 
-
 					foreach($products['products'] as $id => $product) {
-
 						$price = GFCommon::to_number($product['price']);
 
 						/* add all options to total price */
