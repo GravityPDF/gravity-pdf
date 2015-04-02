@@ -207,10 +207,9 @@ if(!class_exists('GFPDFEntryDetail'))
 								if(file_exists($file) && !is_dir($file))
 								{
 									$image_size    = getimagesize($file);
-									$width         = $image_size[0] / 4;
-									$height        = $image_size[1] / 4;
+									$width         = apply_filters('gfpdfe_signature_width', $image_size[0] / 4, $image_size[0]);
 
-									$display_value = '<img src="'. $file .'" alt="Signature" width=" '. $width .'" height="'. $height .'" />';
+									$display_value = '<img src="'. $file .'" alt="Signature" width=" '. $width .'" />';
 								}
 
 								if($display_value)
