@@ -41,9 +41,11 @@
 
   <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
   <ul>
+    <li>Housekeeping - Allow control over signature width in default template using the 'gfpdfe_signature_width' filter</li>
     <li>Housekeeping - Add better error checking when migrating PDF template folder</li>
     <li>Housekeeping - Add unit testing to the directory migration function</li>
     <li>Bug - Fixed backwards-compatiiblity PHP error when viewing custom PDF templates on Gravity Forms 1.8.3 or below.</li>
+    <li>Bug - Ensure checkbox field names are included in the $form_data array</li>
   </ul>
 
   <h3>3.7.0</h3>
