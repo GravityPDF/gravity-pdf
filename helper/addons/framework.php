@@ -1,270 +1,293 @@
 <?php
 
-require_once('licensing.php');
+/**
+ * Plugin: Gravity PDF
+ * File: framework.php
+ *
+ * This class provides an upgrade framework for our premium add ons
+ */
 
 /*
- * Add our cron action hook
+    This file is part of Gravity PDF.
+
+    Gravity PDF Copyright (C) 2015 Blue Liquid Designs
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
+
+/* Include the core licensing class */
+require_once 'licensing.php';
+
+/* Add our cron action hook */
+add_action('gfpdf_check_license_key_status', array('GFPDF_License_Model', 'check_license_key_status'));
+
+/**
+ *
+ * @since 3.8
  */
-add_action( 'gfpdfechecklicensekeystatus', array('GFPDFE_license_model', 'check_license_key_status') );
-
-abstract class gfpdfeAddonFramework
+abstract class GFPDFAddonFramework
 {
-	private $addon = array();
+    /**
+     * [$addon description]
+     * @var array
+     * @since  3.8
+     */
+    private $addon = array();
 
-	public function __construct()
-	{	
-		/*
-		 * Set up the addon details 
-		 */
-		$this->addon['name'] = $this->setName();	
-		$this->addon['version_number'] = $this->setVersionNumber();	
-		$this->addon['author'] = $this->setAuthorName();
-		$this->addon['min_version'] = $this->setMinVersion();
-		$this->addon['path'] = $this->setPluginPath();
-		$this->addon['url'] = $this->setPluginUrl();
-		$this->addon['file'] = $this->setFile();
+    /**
+     * [__construct description]
+     * @since 3.8
+     */
+    public function __construct()
+    {
+        /*
+         * Set up the addon details
+         */
+		$this->addon['name']     = $this->setName();
+		$this->addon['version']  = $this->setVersionNumber();
+		$this->addon['author']   = $this->setAuthorName();
+		$this->addon['path']     = $this->setPluginPath();
+		$this->addon['url']      = $this->setPluginUrl();
+		$this->addon['file']     = $this->setFile();
 		$this->addon['basename'] = $this->setPluginBasename();
-		$this->addon['license'] = $this->setLicense();
+		$this->addon['license']  = $this->setLicense();
 		$this->addon['settings'] = $this->setSettings();
 
-		$this->setID();
-		$this->setLicenseKey();
+        $this->setID();
+        $this->setLicenseKey();
 
-		/*
-		 * Set up our hooks and filters which the base plugin fires
-		 */
-		add_action('gfpdfe_pre_compatibility_checks', array($this, 'check_compatibility'));
-		add_action('gfpdfe_addons', array($this, 'init'));
+        /*
+         * Set up our hooks and filters which the base plugin fires
+         */
+        add_action('gfpdfe_pre_compatibility_checks', array($this, 'check_compatibility'));
+        add_action('gfpdfe_addons', array($this, 'init'));
 
-		add_filter('pdf_extended_settings_navigation', array($this, 'add_license_page'));
-	}
+        add_filter('pdf_extended_settings_navigation', array($this, 'add_license_page'));
+    }
 
-	/*
-	 * Convert our plugin name to a ID we can more easily use for post and get requests
-	 */
-	final private function setID()
-	{
-		$name = $this->addon['name'];
-		$name = strtolower($name);
-		$name = str_replace(' ', '_', $name);
+    /**
+     * Convert our plugin name to an ID so we can more easily use for post and get requests
+     * @since 3.8
+     */
+    final private function setID()
+    {
+        $name = $this->addon['name'];
+        $name = strtolower($name);
+        $name = str_replace(' ', '_', $name);
 
-		$this->addon['id'] = $name;
-	}
+        $this->addon['id'] = $name;
+    }
 
-	/**
-	 * If a premium plugin we will pull the license key from the database
-	 */
-	final private function setLicenseKey()
-	{
-		if($this->addon['license'] === true)
-		{
-			/*
-			 * Pull license keys from database and store in our addon
-			 */
-			$this->addon['license_key']     = get_option('gfpdfe_addon_' . $this->addon['id']. '_license');			
-			$this->addon['license_expires'] = get_option('gfpdfe_addon_' . $this->addon['id']. '_license_expires');			
-			$this->addon['license_status']  = get_option( 'gfpdfe_addon_' . $this->addon['id']. '_license_status' );
-			$this->addon['download_id']     = get_option( 'gfpdfe_addon_' . $this->addon['id']. '_download_id' );
-			
-			/*
-			 * Run our plugin update checker
-			 */
-			add_action( 'admin_init', array($this, 'plugin_updater') );	
+    /**
+     * If a premium plugin we will pull the license key from the database
+     * @since 3.8
+     */
+    final private function setLicenseKey()
+    {
+        if ($this->addon['license'] === true) {
+            /*
+             * Pull license keys from database and store in our addon
+             */
+            $this->addon['license_key']     = get_option('gfpdfe_addon_'.$this->addon['id'].'_license');
+            $this->addon['license_expires'] = get_option('gfpdfe_addon_'.$this->addon['id'].'_license_expires');
+            $this->addon['license_status']  = get_option('gfpdfe_addon_'.$this->addon['id'].'_license_status');
 
-		}
-		return false;
-	}
+            /*
+             * Run our plugin update checker
+             */
+            add_action('admin_init', array($this, 'plugin_updater'));
+        }
 
-	final public static function add_cron_license_event()
-	{		
-		if ( ! wp_next_scheduled( 'gfpdfe_check_license' ) ) {
-			/* run daily at midnight */						
-			wp_schedule_event( mktime(0,0,0), 'daily', 'gfpdfechecklicensekeystatus');
-		}		
-	}
+        return false;
+    }
 
-	final public function plugin_updater() {
-		
-		global $gfpdfe_data;
+    /**
+     * [add_cron_license_event description]
+     * @since 3.8
+     */
+    final public static function add_cron_license_event()
+    {
+        if (! wp_next_scheduled('gfpdfe_check_license')) {
+            /* run daily at midnight */
+            wp_schedule_event(mktime(0, 0, 0), 'daily', 'gfpdf_check_license_key_status');
+        }
+    }
 
-		// retrieve our license key from the DB
-		$license_key = trim( $this->addon['license_key'] );
+    /**
+     * [plugin_updater description]
+     * @return [type] [description]
+     * @since 3.8
+     */
+    final public function plugin_updater()
+    {
+        global $gfpdfe_data;
 
-		// setup the updater
-		$updater = new GFPDFE_Plugin_Updater( $gfpdfe_data->store_url, $this->addon['file'], $this->addon, array( 
-				'version' 	=> $this->addon['version_number'], 				
-				'license' 	=> $license_key, 		
-				'item_name' => $this->addon['name'], 	
-				'author' 	=> $this->addon['author']  
-			)
-		);
+        // retrieve our license key from the DB
+        $license_key = trim($this->addon['license_key']);
 
-	}
+        // setup the updater
+        $updater = new GFPDF_Plugin_Updater($gfpdfe_data->store_url, $this->addon['file'], $this->addon, array(
+				'version'   => $this->addon['version'],
+				'license'   => $license_key,
+				'item_name' => $this->addon['name'],
+				'author'    => $this->addon['author'],
+            )
+        );
+    }
 
+    /**
+     * [check_compatibility description]
+     * @return [type] [description]
+     * @since 3.8
+     */
+    final public function check_compatibility()
+    {
+        global $gfpdf, $gfpdfe_data;
 
-	final public function check_compatibility()
-	{
-		global $gfpdf, $gfpdfe_data;
+        /*
+         * Tell the base plugin about our addon
+         */
+        GFPDF_Core::$addon[] = $this->addon;
 
-		/*
-		 * Tell the base plugin about our addon
-		 */
-		GFPDF_Core::$addon[] = $this->addon;
-
-		/*
-		 * Check the compatibility
-		 */
-		 if(version_compare(PDF_EXTENDED_VERSION, $this->addon['min_version'], '>=') !== true)
-		 {
-		 	add_action($gfpdfe_data->notice_type, array($this, 'base_plugin_not_supported'));							
-			return;
-		 }	
-
-
-		/*
-		 * Assign a cron even to run every day to check the validity of the license 
-		 */
-		self::add_cron_license_event();		 		
-	}
-
-	/**
-	 * Helper function to easily display messages below the plugin screen
-	 * @param  string  $message  The error to output
-	 * @param  boolean $is_error Whether it is a message or an error that should be displayed
-	 */
-	final private static function display_plugin_message($message, $is_error = false){
-
-        $style = $is_error ? 'style="background-color: #ffebe8;"' : "";
-
-        echo '</tr><tr class="plugin-update-tr"><td colspan="5" class="plugin-update"><div class="update-message" ' . $style . '>' . $message . '</div></td>';
-    }	
+        /*
+         * Assign a cron even to run every day to check the validity of the license
+         */
+        self::add_cron_license_event();
+    }
 
     /**
      * Add our license page to the settings navigation, if it doesn't already exist
      * @param array $navigation order => array('name', 'id', 'template')
+     * @since 3.8
      */
     final public function add_license_page($navigation)
     {
-    	/* If the plugin is licensed we will add a new settings page */
-    	if($this->addon['license'] === true)
-    	{
-    		if(!$this->check_settings_page_exists($navigation, 'license'))
-    		{
-				$navigation[50] = array(
-					'name' => __('License', 'pdfextended'),
-					'id' => 'license',
-					'template' => PDF_PLUGIN_DIR . 'view/templates/settings/license.php',
-				);
-    		}
-    	}
+        /* If the plugin is licensed we will add a new settings page */
+        if ($this->addon['license'] === true) {
+            if (!$this->check_settings_page_exists($navigation, 'license')) {
+                $navigation[50] = array(
+					'name'     => __('License', 'pdfextended'),
+					'id'       => 'license',
+					'template' => PDF_PLUGIN_DIR.'view/templates/settings/license.php',
+                );
+            }
+        }
 
-    	if($this->addon['settings'] === true)
-    	{
-    		if(!$this->check_settings_page_exists($navigation, 'addon'))
-    		{
-				$navigation[40] = array(
-					'name' => __('Addon', 'pdfextended'),
-					'id' => 'addon',
-					'template' => PDF_PLUGIN_DIR . 'view/templates/settings/addon.php',
-				);
-    		}    		
-    	}
-    	return $navigation;
+        if ($this->addon['settings'] === true) {
+            if (!$this->check_settings_page_exists($navigation, 'addon')) {
+                $navigation[40] = array(
+					'name'     => __('Addon', 'pdfextended'),
+					'id'       => 'addon',
+					'template' => PDF_PLUGIN_DIR.'view/templates/settings/addon.php',
+                );
+            }
+        }
+
+        return $navigation;
     }
 
+    /**
+     * [check_settings_page_exists description]
+     * @param  [type] $navigation [description]
+     * @param  [type] $id         [description]
+     * @return [type] [description]
+     * @since 3.8
+     */
     final private function check_settings_page_exists($navigation, $id)
     {
-   		/* check if page already exists */
-		foreach($navigation as $item)
-		{
-			if($item['id'] == $id)
-			{
-				return true;
-			}
-		}    	
-		return false;
+        /* check if page already exists */
+        foreach ($navigation as $item) {
+            if ($item['id'] == $id) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
-	/**
-	 * Generate an error message about the base plugin not being supported
-	 */
-	final public function base_plugin_not_supported()
-	{
-		$msg = sprintf(__('%s requires version %s of Gravity Forms PDF Extended installed to run. Please upgrade the plugin.', 'pdfextended'), $this->addon['name'], $this->addon['min_version']);
-		GFPDF_Notices::error($msg);
-	}    
+    /**
+     * Automatically triggered to run on GFPDFE's 'gfpdfe_addons' hook which fires after the plugin is successfully installed (right after WP 'init' hook)
+     * Add core plugin logic here
+     * @since 3.8
+     */
+    abstract public function init();
 
-	/**
-	 * Automatically triggered to run on GFPDFE's 'gfpdfe_addons' hook which fires after the plugin is successfully installed (right after WP 'init' hook)
-	 * Add core plugin logic here 	 
-	 */
-	abstract public function init();
+    /**
+     * Set the plugin name
+     * This should be the name in EDD which we'll use for upgrades
+     * @return string the name of the plugin. If using licensing software, must be the exact name in EDD
+     * @since 3.8
+     */
+    abstract protected function setName();
 
-	/**
-	 * Set the plugin name 
-	 * This should be the name in EDD which we'll use for upgrades
-	 * @return string the name of the plugin. If using licensing software, must be the exact name in EDD
-	 */
-	abstract protected function setName();
+    /**
+     * Set the current version number of the addon
+     * @return string The current version number. Used for licensing updates
+     * @since 3.8
+     */
+    abstract protected function setVersionNumber();
 
-	/**
-	 * Set the current version number of the addon
-	 * @return string The current version number. Used for licensing updates
-	 */
-	abstract protected function setVersionNumber();
+    /**
+     * Set the author name of the add on
+     * @return Name of plugin developer/company
+     * @since 3.8
+     */
+    abstract protected function setAuthorName();
 
-	/**
-	 * Set the author name of the add on
-	 * @return Name of plugin developer/company
-	 */
-	abstract protected function setAuthorName();
+    /**
+     * Set the plugin path using the inbuilt plugin_dir_path() function
+     * This can't be included in the abstract class as it is in the GFPDFE folder.
+     * @return string should always return plugin_dir_path( __FILE__ );
+     * @since 3.8
+     */
+    abstract protected function setPluginPath();
 
-	/**
-	 * Set the minimum version of Gravity Forms PDF Extended 
-	 * needed to run the add on
-	 * @return set the minimum version of GFPDFE required to run
-	 */
-	abstract protected function setMinVersion();
+    /**
+     * Set the plugin path using the inbuilt plugin_dir_path() function
+     * This can't be included in the abstract class as it is in the GFPDFE folder.
+     * @return string should always return plugin_dir_url( __FILE__ );
+     * @since 3.8
+     */
+    abstract protected function setPluginUrl();
 
-	/**
-	 * Set the plugin path using the inbuilt plugin_dir_path() function 
-	 * This can't be included in the abstract class as it is in the GFPDFE folder.
-	 * @return string should always return plugin_dir_path( __FILE__ );
-	 */
-	abstract protected function setPluginPath();
+    /**
+     * Set the plugin path using the inbuilt plugin_dir_path() function
+     * This can't be included in the abstract class as it is in the GFPDFE folder.
+     * @return string should always return plugin_basename(__FILE__);
+     * @since 3.8
+     */
+    abstract protected function setPluginBasename();
 
-	/**
-	 * Set the plugin path using the inbuilt plugin_dir_path() function 
-	 * This can't be included in the abstract class as it is in the GFPDFE folder.
-	 * @return string should always return plugin_dir_url( __FILE__ );
-	 */
-	abstract protected function setPluginUrl();
+    /**
+     * Whether the plugin is a premium addon and should have a license key
+     * @return boolean Whether the software is tied to our license key system
+     * @since 3.8
+     */
+    abstract protected function setLicense();
 
+    /**
+     * Whether the plugin has any settings that should be added to the 'AddOn' page
+     * @return boolean Whether the addon adds any settings to the addon page
+     * @since 3.8
+     */
+    abstract protected function setSettings();
 
-	/**
-	 * Set the plugin path using the inbuilt plugin_dir_path() function 
-	 * This can't be included in the abstract class as it is in the GFPDFE folder.
-	 * @return string should always return plugin_basename(__FILE__);
-	 */
-	abstract protected function setPluginBasename();
-
-	/**
-	 * Whether the plugin is a premium addon and should have a license key
-	 * @return boolean Whether the software is tied to our license key system
-	 */
-	abstract protected function setLicense();
-
-	/**
-	 * Whether the plugin has any settings that should be added to the 'AddOn' page
-	 * @return boolean Whether the addon adds any settings to the addon page
-	 */
-	abstract protected function setSettings();
-
-	/**
-	 * Set the current file plugin is running from
-	 * @return string must always return __FILE__
-	 */
-	abstract protected function setFile();
-
+    /**
+     * Set the current file plugin is running from
+     * @return string must always return __FILE__
+     * @since 3.8
+     */
+    abstract protected function setFile();
 }
-

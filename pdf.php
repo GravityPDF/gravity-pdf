@@ -104,7 +104,7 @@ class GFPDF_Core extends PDFGenerator
 		 include_once PDF_PLUGIN_DIR . 'depreciated.php';
 		 include_once PDF_PLUGIN_DIR . 'helper/pdf-entry-detail.php';  			
 
-		$gfpdfe_data->store_url = 'http://staging.gravityformspdfextended.com/developer/';
+		$gfpdfe_data->store_url = 'http://clients.blueliquiddesigns.com.au/gfpdf3/gf1_7/';
    
 		/*
 		 * Set the notice type 
@@ -151,6 +151,10 @@ class GFPDF_Core extends PDFGenerator
 		 */
 		 include PDF_PLUGIN_DIR . 'model/pdf.php';			 		 
 
+		 /**
+		  * Give addons somewhere to hook into before the major compatibiltiy checks are run 
+		  * @since 3.8
+		  */
 		 do_action('gfpdfe_pre_compatibility_checks');				 
 		 			 	
 		/*
@@ -169,13 +173,17 @@ class GFPDF_Core extends PDFGenerator
 		* Some functions are required to monitor changes in the admin area
 		* and ensure the plugin functions smoothly
 		*/
-		add_action('admin_init', array('GFPDF_Core', 'fully_loaded_admin'), 9999); /* run later than usual to give our auto initialiser a chance to fire */			
-		
-		/*
-		 * Initialise the core class which will load the __construct() function
+		add_action('admin_init', array('GFPDF_Core', 'fully_loaded_admin'), 9999); /* run later than usual to give our auto initialiser a chance to fire */		
+				
+		/**
+		 * Initialise the core
+		 * Load software on all page requests
+		 * @since 3.8
+		 * 
 		 */
 		global $gfpdf;
-		$gfpdf = new GFPDF_Core();  		 			  
+		$gfpdf = new GFPDF_Core();  		 	
+				 					  
    }	
 	
 	public function __construct()
@@ -231,8 +239,9 @@ class GFPDF_Core extends PDFGenerator
 			add_filter('gform_notification', array('GFPDF_Core_Model', 'gfpdfe_create_and_attach_pdf'), 100, 3);  /* ensure it's called later than standard so the attachment array isn't overridden */	  		  
 		}
 
-		/*
+		/**
 		 * Give our addons something to hook into once the software is fully initialised
+		 * @since 3.8
 		 */
 		do_action('gfpdfe_addons');
 		

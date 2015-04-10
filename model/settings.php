@@ -64,8 +64,9 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 				),							
 			); 
 			
-			/*
+			/**
 			 * Allow additional navigation to be added to the settings page
+			 * @since 3.8
 			 */
 			$this->navigation = apply_filters( 'pdf_extended_settings_navigation', $this->navigation );
 			
