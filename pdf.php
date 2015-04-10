@@ -4,7 +4,7 @@
  * Plugin Name: Gravity PDF
  * Plugin URI: https://gravitypdf.com
  * Description: Gravity PDF allows you to save/view/download a PDF from the front- and back-end, and automate PDF creation on form submission. Our Business Plus package also allows you to overlay field onto an existing PDF.
- * Version: 3.7.1
+ * Version: 3.8
  * Author: Blue Liquid Designs
  * Author URI: http://www.blueliquiddesigns.com.au
  */
@@ -41,7 +41,7 @@
 /*
  * Define our constants 
  */
-define('PDF_EXTENDED_VERSION', '3.7.1'); 
+define('PDF_EXTENDED_VERSION', '3.8'); 
 define('GF_PDF_EXTENDED_SUPPORTED_VERSION', '1.8'); 
 define('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION', '3.9'); 
 define('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION', '5'); 
@@ -74,12 +74,6 @@ define('GF_PDF_EXTENDED_PLUGIN_BASENAME', plugin_basename(__FILE__));
 class GFPDF_Core extends PDFGenerator
 {
 	public $render;
-
-	/**
-	 * Contains our registered add on information
-	 * @var array
-	 */
-	static $addon = array();
 		
 	/*
 	 * Main Controller 
@@ -96,6 +90,9 @@ class GFPDF_Core extends PDFGenerator
 
 		  /* set our PDF folder storage */
 		 $gfpdfe_data->set_directory_structure();  
+
+		 /* initialise our addon system */
+		 $gfpdfe_data->set_addon_details();
 
 		/*
 		 * Include any dependancy-based files

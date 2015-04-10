@@ -38,7 +38,7 @@ class GFPDFE_DATA
         $this->data[$name] = $value;
     }
 
-    public function __get($name)
+    public function &__get($name)
     {
         if (array_key_exists($name, $this->data)) {
             return $this->data[$name];
@@ -63,6 +63,14 @@ class GFPDFE_DATA
     public function __unset($name)
     {
         unset($this->data[$name]);
+    }
+
+    /**
+     * Prepare the addon framework
+     * @since  3.8
+     */
+    public function set_addon_details() {
+        $this->addon = array();
     }
 
     /**

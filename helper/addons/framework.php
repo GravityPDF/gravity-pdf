@@ -40,14 +40,15 @@ add_action('gfpdf_check_license_key_status', array('GFPDF_License_Model', 'check
 abstract class GFPDFAddonFramework
 {
     /**
-     * [$addon description]
+     * Holds our addon information
      * @var array
      * @since  3.8
      */
-    private $addon = array();
+    protected $addon = array();
 
     /**
-     * [__construct description]
+     * Set our addon information based on the abstract functions set in the child class 
+     * Also apply any filters needed
      * @since 3.8
      */
     public function __construct()
@@ -71,10 +72,19 @@ abstract class GFPDFAddonFramework
         /*
          * Set up our hooks and filters which the base plugin fires
          */
-        add_action('gfpdfe_pre_compatibility_checks', array($this, 'check_compatibility'));
+        add_action('gfpdfe_addons', array($this, 'setup'));
         add_action('gfpdfe_addons', array($this, 'init'));
 
         add_filter('pdf_extended_settings_navigation', array($this, 'add_license_page'));
+    }
+
+    /**
+     * Make the 'addon' variable accessible to outside classes
+     * @return array The $this->addon information
+     * @since  3.8
+     */
+    final public function get_addon_details() {
+        return $this->addon;
     }
 
     /**
@@ -114,19 +124,19 @@ abstract class GFPDFAddonFramework
     }
 
     /**
-     * [add_cron_license_event description]
+     * Set up a daily license scheduler to check for updates
      * @since 3.8
      */
-    final public static function add_cron_license_event()
+    final private static function add_cron_license_event()
     {
-        if (! wp_next_scheduled('gfpdfe_check_license')) {
+        if (! wp_next_scheduled('gfpdf_check_license_key_status')) {
             /* run daily at midnight */
             wp_schedule_event(mktime(0, 0, 0), 'daily', 'gfpdf_check_license_key_status');
         }
     }
 
     /**
-     * [plugin_updater description]
+     * Check if updates / valid license
      * @return [type] [description]
      * @since 3.8
      */
@@ -148,18 +158,17 @@ abstract class GFPDFAddonFramework
     }
 
     /**
-     * [check_compatibility description]
-     * @return [type] [description]
+     * Tell base plugin about add on and set up any additional details
      * @since 3.8
      */
-    final public function check_compatibility()
+    final public function setup()
     {
-        global $gfpdf, $gfpdfe_data;
+        global $gfpdfe_data;
 
         /*
          * Tell the base plugin about our addon
          */
-        GFPDF_Core::$addon[] = $this->addon;
+        $gfpdfe_data->addon[] = $this->addon;
 
         /*
          * Assign a cron even to run every day to check the validity of the license
@@ -199,10 +208,10 @@ abstract class GFPDFAddonFramework
     }
 
     /**
-     * [check_settings_page_exists description]
-     * @param  [type] $navigation [description]
-     * @param  [type] $id         [description]
-     * @return [type] [description]
+     * See if a settings page already exists
+     * @param  array $navigation The navigation array
+     * @param  string $id The navigation item to look for
+     * @return boolean Whether nav item found or not
      * @since 3.8
      */
     final private function check_settings_page_exists($navigation, $id)

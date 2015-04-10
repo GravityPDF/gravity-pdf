@@ -25,7 +25,7 @@
   <?php
 
   global $gfpdfe_data;
-  $addons = GFPDF_Core::$addon;
+  $addons = $gfpdfe_data->addon;
 
   if (sizeof($addons) > 0): ?>
     <form method="post" action="<?php echo PDF_SETTINGS_URL; ?>&amp;tab=<?php echo PDF_Common::get('tab'); ?>">

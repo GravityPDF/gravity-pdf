@@ -81,9 +81,9 @@ class GFPDF_License_Model
         /*
          * Loop through all active add ons and process the licenses
          */
-        global $gfpdf;
+        global $gfpdf, $gfpdfe_data;
 
-        foreach (GFPDF_Core::$addon as &$addon) {
+        foreach ($gfpdfe_data->addon as &$addon) {
             $license = '';
             if ($addon['license'] === true) {
                 /*
@@ -199,6 +199,8 @@ class GFPDF_License_Model
      */
     public function deactivate_license_key()
     {
+        global $gfpdfe_data;
+        
         $addon_id = PDF_Common::get('deactivate');
         $addon = false;
 
@@ -209,7 +211,7 @@ class GFPDF_License_Model
             return;
         }
 
-        foreach (GFPDF_Core::$addon as &$plugin) {
+        foreach ($gfpdfe_data->addon as &$plugin) {
             if ($plugin['id'] == $addon_id) {
                 $addon = &$plugin;
                 break;
@@ -273,7 +275,8 @@ class GFPDF_License_Model
      */
     public static function check_license_key_status()
     {
-        foreach (GFPDF_Core::$addon as &$plugin) {
+        global $gfpdfe_data;
+        foreach ($gfpdfe_data->addon as &$plugin) {
             self::do_license_key_status_check($plugin);
         }
     }
