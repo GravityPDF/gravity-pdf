@@ -169,27 +169,13 @@ class GFPDF_Core extends PDFGenerator
 		* Some functions are required to monitor changes in the admin area
 		* and ensure the plugin functions smoothly
 		*/
-		add_action('admin_init', array('GFPDF_Core', 'fully_loaded_admin'), 9999); /* run later than usual to give our auto initialiser a chance to fire */		
+		add_action('admin_init', array('GFPDF_Core', 'fully_loaded_admin'), 9999); /* run later than usual to give our auto initialiser a chance to fire */			
 		
 		/*
-		 * Only load the plugin if the following requirements are met:
-		 *  - Load on Gravity Forms Admin pages
-		 *  - Load if on any front-end admin page
-		 *  - Load if doing AJAX request (which natively is called from the /wp-admin/ backend)
-		 */		 		
-		 if( (is_admin() && isset($_GET['page']) && (substr($_GET['page'], 0, 3) === 'gf_')) ||
-		 	  !is_admin() ||
-		 	  defined( 'DOING_AJAX' ) && DOING_AJAX )
-		 {			
-			/*
-			 * Initialise the core class which will load the __construct() function
-			 */
-			global $gfpdf;
-			$gfpdf = new GFPDF_Core();  		 	
-		 }
-		 
-		 return;
-				  
+		 * Initialise the core class which will load the __construct() function
+		 */
+		global $gfpdf;
+		$gfpdf = new GFPDF_Core();  		 			  
    }	
 	
 	public function __construct()
