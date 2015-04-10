@@ -94,6 +94,9 @@ class GFPDF_Core extends PDFGenerator
 		 /* initialise our addon system */
 		 $gfpdfe_data->set_addon_details();
 
+		 /* Set up our licensing */
+		 $gfpdfe_data->license_model = new GFPDF_License_Model();
+
 		/*
 		 * Include any dependancy-based files
 		 */		 

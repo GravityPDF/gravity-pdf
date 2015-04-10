@@ -22,18 +22,11 @@
 
 class PDF_Actions_And_Filters extends WP_UnitTestCase {
 	public function setUp() {
-
 		parent::setUp();	
 
 		/* Load our plugin functions */
 		GFPDF_InstallUpdater::check_filesystem_api();
-		GFPDF_InstallUpdater::maybe_deploy();	
-
-		/*
-		 * Admin init was restricted to Gravity Form-only pages 
-		 */		
-		global $gfpdf;
-		$gfpdf = new GFPDF_Core();  		
+		GFPDF_InstallUpdater::maybe_deploy();		
 	}
 
 	public function tearDown() {

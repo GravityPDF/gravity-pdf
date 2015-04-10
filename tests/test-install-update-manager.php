@@ -32,12 +32,6 @@ class PDF_Install_Update_Manager_Tests extends WP_UnitTestCase
         GFPDF_InstallUpdater::check_filesystem_api();
         GFPDF_InstallUpdater::maybe_deploy();
 
-        /*
-         * Admin init was restricted to Gravity Form-only pages
-         */
-        global $gfpdf;
-        $gfpdf = new GFPDF_Core();
-
         /* set up tmp variable */
         $this->tmp = ABSPATH . 'tmp/';
     }
