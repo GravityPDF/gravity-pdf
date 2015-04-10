@@ -289,5 +289,25 @@ class PDF_Common
 	        'baseurl' => $baseurl,
  		);	                
 	}
+
+	/**
+	 * Add backwards compatibility to users running Gravity Forms 1.8.3 or below 
+	 * which don't have this function built in.
+	 * Once support is dropped for Gravity Forms 1.8.x this function can be removed.
+	 * Added in v3.7.1
+	 * @param  Array  $currency A currency type
+	 * @return String           Whether currency should be displayed as 'decimal_dot' or 'decimal_comma'
+	 */
+	public static function is_currency_decimal_dot($currency = null) {    
+        if($currency == null){
+            $code = GFCommon::get_currency();
+            if(empty($code))
+                $code = "USD";
+
+            $currency = RGCurrency::get_currency($code);
+        }
+
+        return rgar($currency, "decimal_separator") == ".";    	
+	}
 }
 

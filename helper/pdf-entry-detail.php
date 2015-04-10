@@ -207,10 +207,9 @@ if(!class_exists('GFPDFEntryDetail'))
 								if(file_exists($file) && !is_dir($file))
 								{
 									$image_size    = getimagesize($file);
-									$width         = $image_size[0] / 4;
-									$height        = $image_size[1] / 4;
+									$width         = apply_filters('gfpdfe_signature_width', $image_size[0] / 4, $image_size[0]);
 
-									$display_value = '<img src="'. $file .'" alt="Signature" width=" '. $width .'" height="'. $height .'" />';
+									$display_value = '<img src="'. $file .'" alt="Signature" width=" '. $width .'" />';
 								}
 
 								if($display_value)
@@ -500,6 +499,13 @@ if(!class_exists('GFPDFEntryDetail'))
 							case 'rating':
 								$form_array['survey']['rating'][$field['id']] = self::get_the_rank($form, $lead, $field, $form_array);
 							break;
+
+							case 'checkbox':
+								/* Only process non-survey checkbox fields */
+								if($field['type'] == 'checkbox') {
+									$form_array = self::get_the_list($lead, $field, $form_array);
+									break;	
+								}							
 
 							default:
 
@@ -1238,7 +1244,8 @@ if(!class_exists('GFPDFEntryDetail'))
 
 		private static function get_product_array($form, $lead, $has_product_fields, $form_array)
 		{
-			$currency_format = GFCommon::is_currency_decimal_dot() ? 'decimal_dot' : 'decimal_comma';
+			$currency_type = (method_exists('GFCommon', 'is_currency_decimal_dot')) ? GFCommon::is_currency_decimal_dot() : PDF_Common::is_currency_decimal_dot();
+			$currency_format = $currency_type ? 'decimal_dot' : 'decimal_comma';
 
 			if($has_product_fields) {
 				$products = GFCommon::get_product_fields($form, $lead, true);
@@ -1253,9 +1260,7 @@ if(!class_exists('GFPDFEntryDetail'))
 					$total = 0;
 					$subtotal = 0;
 
-
 					foreach($products['products'] as $id => $product) {
-
 						$price = GFCommon::to_number($product['price']);
 
 						/* add all options to total price */

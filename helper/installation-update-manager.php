@@ -69,7 +69,7 @@ class GFPDF_InstallUpdater
 
                 return $results;
             } else {
-                if (self::do_deploy()) {
+                if (self::do_deploy()) {                   
                     /*
                      * Output successfull automated installation message
                      */
@@ -202,18 +202,18 @@ class GFPDF_InstallUpdater
          */
         self::reinitialise_templates($template_directory);
 
-        /* create new directory in uploads folder*/
-        if (self::create_base_template_dir($base_template_directory) === false) {
+        /* create new directory in uploads folder*/        
+        if (self::create_base_template_dir($base_template_directory) === false) {            
             return false;
         }
 
         /* create site directory in base template directory */
-        if (self::create_site_template_dir($template_directory) === false) {
+        if (self::create_site_template_dir($template_directory) === false) {            
             return false;
         }
 
         /* create 'save' output folder */
-        if (self::create_save_dir($template_save_directory) === false) {
+        if (self::create_save_dir($template_save_directory) === false) {            
             return false;
         }
 
@@ -223,12 +223,12 @@ class GFPDF_InstallUpdater
         }
 
         /* copy entire template folder over to the template directory */
-        if(!self::pdf_extended_copy_directory($directory.'initialisation/templates', $template_directory, false)) {
+        if(!self::pdf_extended_copy_directory($directory . 'initialisation/templates/', $template_directory, false)) {            
             return false;
         }
 
         /* copy configuration file over to new directory */
-        if (self::create_configuration_file($directory, $template_directory) === false) {
+        if (self::create_configuration_file($directory, $template_directory) === false) {            
             return false;
         }
 
@@ -611,20 +611,29 @@ class GFPDF_InstallUpdater
     {
         global $wp_filesystem;
 
-        if($wp_filesystem->is_dir($destination) && !$wp_filesystem->is_writable($destination))
+        /* ensure source and destination end in a forward slash */
+        if(substr($source, -1) != '/') {
+            $source .= '/';
+        }
+
+        if(substr($destination, -1) != '/') {
+            $destination .= '/';
+        }
+
+        if($wp_filesystem->is_dir($destination) && $wp_filesystem->is_writable($destination) === false)
         {
             return false;
         }
 
         if ($wp_filesystem->is_dir($source)) {
-            if ($delete_destination === true && $wp_filesystem->exists($destination)) {
+            if ($delete_destination === true && $wp_filesystem->exists($destination) === true) {
                 /*
                  * To ensure everything stays in sync we will remove the destination file structure
                  */
                  $wp_filesystem->delete($destination, true);
             }
 
-            if ($copy_base === true && !$wp_filesystem->exists($destination)) {
+            if ($copy_base === true && $wp_filesystem->exists($destination) === false) {
                 if(!$wp_filesystem->mkdir($destination)) {
                     return false;
                 }
@@ -632,25 +641,25 @@ class GFPDF_InstallUpdater
             $directory = $wp_filesystem->dirlist($source);
 
             foreach ($directory as $name => $data) {
-                $PathDir = $source.'/'.$name;
+                $PathDir = $source.$name;
 
-                if ($wp_filesystem->is_dir($PathDir)) {
-                    if(!self::pdf_extended_copy_directory($PathDir, $destination.'/'.$name)) {
+                if ($wp_filesystem->is_dir($PathDir) === true) {
+                    if(!self::pdf_extended_copy_directory($PathDir, $destination.$name)) {
                         return false;
                     }
                     continue;
                 }
-                $wp_filesystem->copy($PathDir, $destination.'/'.$name);
-
+                $wp_filesystem->copy($PathDir, $destination.$name);
+                
                 /* verify the file copied correctly */
-                if(!$wp_filesystem->is_file($destination.'/'.$name) || $wp_filesystem->size($PathDir) != $wp_filesystem->size($destination.'/'.$name)) {
+                if($wp_filesystem->is_file($destination.$name) === false || $wp_filesystem->size($PathDir) != $wp_filesystem->size($destination.$name)) {
                     return false;
                 }                
             }
         } else {
             $wp_filesystem->copy($source, $destination);
             /* verify the file copied correctly */
-            if(!$wp_filesystem->is_file($destination) || $wp_filesystem->size($source) != $wp_filesystem->size($destination)) {
+            if($wp_filesystem->is_file($destination) === false || $wp_filesystem->size($source) != $wp_filesystem->size($destination)) {
                 return false;
             }
         }
