@@ -50,7 +50,9 @@ class GFPDFE_DATA
             ' in ' . $trace[0]['file'] .
             ' on line ' . $trace[0]['line'],
             E_USER_NOTICE);
-        return null;
+
+        $value = null;
+        return $value;
     }
 
     /**  As of PHP 5.1.0  */
