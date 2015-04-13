@@ -95,11 +95,10 @@ class GFPDF_License_Model
          * Loop through all active addons and process the licenses
          */
         global $gfpdfe_data;
-
         foreach ($gfpdfe_data->addon as &$addon) {
             /* if the addon marks itself as requiring a license key... */
             if ($addon['license'] === true) {
-                $this->update_license_key($addon);
+                $this->do_update_license_key($addon);
             }
         }
     }
@@ -110,7 +109,7 @@ class GFPDF_License_Model
      * @param boolean/string $license_key License key passed in
      * @since 3.8
      */
-    public function update_license_key(&$addon, $license_key = false)
+    public function do_update_license_key(&$addon, $license_key = false)
     {
         $license = ($license_key === false) ? trim(PDF_Common::post($addon['id'])) : trim($license_key);
 
@@ -150,15 +149,15 @@ class GFPDF_License_Model
         /* check if use is removing a license key completely (but isn't current activated) */
         if (strlen($updated_license_key) == 0) {
             if ($current_license_key !== $updated_license_key && $license_status != 'active') {
-                $this->remove_license_from_db($addon);
+                $this->remove_license_information($addon);
             }
 
-            return false;
+            return true;
         }
 
         /* check if $updated_license_key differs from $current_license_key */
         if ($license_status != 'active') {
-            $this->remove_license_from_db($addon, false);
+            $this->remove_license_information($addon, false);
 
             return true;
         }
@@ -172,7 +171,7 @@ class GFPDF_License_Model
      * @param boolean $license Whether to delete the licese expiry from the database or the expiry and the actual license key
      * @since 3.8
      */
-    public function remove_license_from_db(&$addon, $license = true)
+    public function remove_license_information(&$addon, $license = true)
     {
         /* prepare license details */
         $new_license_details = array();
@@ -213,19 +212,21 @@ class GFPDF_License_Model
         /* decode the license data */
         $license_data = self::call_api($api_params);
 
-        $status = ($license_data->license === 'valid') ? $license_data->license : $license_data->error;
+        if($license_data !== false) {
+            $status = ($license_data->license === 'valid') ? $license_data->license : $license_data->error;
 
-        /* prepare license details */
-        $license = array(
-            'expires' => $license_data->expires,
-            'status'  => $license_data->license,
-        );
+            /* prepare license details */
+            $license = array(
+                'expires' => $license_data->expires,
+                'status'  => $license_data->license,
+            );
 
-        /* update license details */
-        self::update_license_information($license, $addon);
+            /* update license details */
+            self::update_license_information($license, $addon);
 
-        /* show update or error messages */
-        self::show_api_message($license_data);
+            /* show update or error messages */
+            self::show_api_message($license_data);
+        }
     }
 
     /**
@@ -240,7 +241,7 @@ class GFPDF_License_Model
         $addon_id = PDF_Common::get('deactivate');
         $addon    = false;
 
-        if (!wp_verify_nonce(PDF_Common::get('nonce'), 'gfpdfe_deactive_license')) {
+        if (!wp_verify_nonce(PDF_Common::get('nonce'), 'gfpdfe_deactivate_license')) {
             $error = __('There was a problem processing your request. Please try again.', 'pdfextended');
             PDF_Common::add_message($error, 'error');
 
@@ -257,7 +258,7 @@ class GFPDF_License_Model
 
         if ($addon) {
             /* deactivate license key */
-            $this->do_deactive_license_key($addon);
+            $this->do_deactivate_license_key($addon);
         }
     }
 
@@ -267,7 +268,7 @@ class GFPDF_License_Model
      * @return Boolean
      * @since 3.8
      */
-    public function do_deactive_license_key(&$addon)
+    public function do_deactivate_license_key(&$addon)
     {
         global $gfpdfe_data;
 
@@ -287,7 +288,7 @@ class GFPDF_License_Model
 
         if ($license_data !== false && $license_data->license == 'deactivated') {
             /* completely remove license details from database */
-            $this->remove_license_from_db($addon);
+            $this->remove_license_information($addon);
 
             $license = array(
                 'status' => $license_data->license,
@@ -352,25 +353,21 @@ class GFPDF_License_Model
         );
 
         /* Call the custom API. */
-        $response = wp_remote_get(add_query_arg($api_params, $gfpdfe_data->store_url), array( 'timeout' => 15, 'sslverify' => false ));
+        $license_data = $this->call_api($api_params);
 
-        if (is_wp_error($response)) {
-            continue;
+        if($license_data !== false) {        
+
+            $license_status = (isset($license_data->license)) ? $license_data->license : $license_data->error;
+
+            /* prepare license details */
+            $license = array(
+                'expires' => $license_data->expires,
+                'status'  => $license_status,
+            );
+
+            /* update license details */
+            self::update_license_information($license, $addon);
         }
-
-        /* decode the license data */
-        $license_data = json_decode(wp_remote_retrieve_body($response));
-
-        $license_status = (isset($license_data->license)) ? $license_data->license : $license_data->error;
-
-        /* prepare license details */
-        $license = array(
-            'expires' => $license_data->expires,
-            'status'  => $license_status,
-        );
-
-        /* update license details */
-        self::update_license_information($license, $addon);
     }
 
     /**
@@ -404,7 +401,7 @@ class GFPDF_License_Model
      * @param array &$addon  The addon information to keep in sync
      * @since 3.8
      */
-    private static function update_license_information($license, &$addon)
+    public static function update_license_information($license, &$addon)
     {
         /* update license in the database and locally */
         if (isset($license['key'])) {
@@ -484,7 +481,7 @@ class GFPDF_License_Model
                 break;
 
                 case 'no_activations_left':
-                    $error = sprintf(__("You've reached the maximum activation limit for %s. Try deactive your license on another website or %scontact us to upgrade your plan%s.", 'pdfextended'), $addon_name, '<a href="#">', '</a>');
+                    $error = sprintf(__("You've reached the maximum activation limit for %s. Try deactivate your license on another website or %scontact us to upgrade your plan%s.", 'pdfextended'), $addon_name, '<a href="#">', '</a>');
                 break;
 
                 case 'expired':
