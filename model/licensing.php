@@ -28,7 +28,10 @@
 */
 
 /**
- *
+ * This class handles all our user-interacting licensing functionality
+ * Including all the licensing views
+ * The core licensing integrating happens in /helper/addons/framework.php && /helper/addons/licensing.php
+ * @since 3.8
  */
 class GFPDF_License_Model
 {
@@ -46,9 +49,10 @@ class GFPDF_License_Model
      */
     public function init()
     {
+        if (!current_user_can('gravityforms_edit_settings')) {
+            $error = __('Access Denied. You require the Gravity Forms Edit Settings capability to view this page.', 'pdfextended');
+            PDF_Common::add_message($error, 'error');
 
-        if( !current_user_can('gravityforms_edit_settings') ) {
-            /* TODO - display error */
             return false;
         }
 
@@ -67,48 +71,61 @@ class GFPDF_License_Model
         }
 
         /*
-         * TODO - add renewal link to license page and notice on the plugin page
+         * add renewal link to license page and notice on the plugin page
          */
+        $this->show_renewal_notice_on_plugin_page();
     }
 
     /**
      * User has saved the add ons license page
      * Update all license keys in database if needed, then verify the new key's validity
      * @since 3.8
-     * TODO - refractor
      */
     private function update_license_keys()
     {
         /* check if nonce is valid */
         if (! wp_verify_nonce(PDF_Common::post('gfpdfe_license_nonce_field'), 'gfpdfe_license_nonce')) {
-            /* TODO: show error message */
+            $error = __('There was a problem processing your request. Please try again.', 'pdfextended');
+            PDF_Common::add_message($error, 'error');
+
             return;
         }
 
         /*
          * Loop through all active addons and process the licenses
          */
-        global $gfpdf, $gfpdfe_data;
+        global $gfpdfe_data;
 
         foreach ($gfpdfe_data->addon as &$addon) {
-            $license = '';
+            /* if the addon marks itself as requiring a license key... */
             if ($addon['license'] === true) {
-                /*
-                 * Check for a $_POST key with the addon ID
-                 */
-                if (isset($_POST[$addon['id']])) {
-                    $license = trim(PDF_Common::post($addon['id']));
-
-                    if (strlen($license) > 0 && $this->is_new_license($license, $addon)) {
-                        /* update our license state */
-                        $addon['license_key'] = $license;
-                        update_option('gfpdfe_addon_'.$addon['id'].'_license', $license);
-
-                        /* check if the license is valid */
-                        $this->check_license($license, $addon);
-                    }
-                }
+                $this->update_license_key($addon);
             }
+        }
+    }
+
+    /**
+     * Update the addon's license key if needed. License key can either be passed directly or passed via _POST.
+     * @param Array          &$addon      The addon details, passed by reference
+     * @param boolean/string $license_key License key passed in
+     * @since 3.8
+     */
+    public function update_license_key(&$addon, $license_key = false)
+    {
+        $license = ($license_key === false) ? trim(PDF_Common::post($addon['id'])) : trim($license_key);
+
+        if ($this->is_new_license($license, $addon)) {
+
+            /* prepare license details */
+            $new_license_details = array(
+                'key' => $license,
+            );
+
+            /* update our license details */
+            self::update_license_information($new_license_details, $addon);
+
+            /* check if the license is valid */
+            $this->check_license($license, $addon);
         }
     }
 
@@ -118,18 +135,30 @@ class GFPDF_License_Model
      * @param  Array   &$addon The addon details, passed by reference
      * @return boolean Whether license is new or not
      * @since 3.8
-     * TODO - refractor
      */
-    public function is_new_license($new, &$addon)
+    public function is_new_license($updated_license_key, &$addon)
     {
-        $expires = get_option('gfpdfe_addon_'.$addon['id'].'_license_expires');
-        $old     = get_option('gfpdfe_addon_'.$addon['id'].'_license');
+        /* get license details for add on */
+        $current_license_key = $addon['license_key'];
+        $license_status      = $addon['license_status'];
 
-        if (!$expires) {
+        /* check if there is no current license key */
+        if (!$current_license_key) {
             return true;
-        } elseif (!$old || $old != $new || $addon['license_status'] == 'inactive') {
+        }
+
+        /* check if use is removing a license key completely (but isn't current activated) */
+        if (strlen($updated_license_key) == 0) {
+            if ($current_license_key !== $updated_license_key && $license_status != 'active') {
+                $this->remove_license_from_db($addon);
+            }
+
+            return false;
+        }
+
+        /* check if $updated_license_key differs from $current_license_key */
+        if ($license_status != 'active') {
             $this->remove_license_from_db($addon, false);
-            $addon['valid_license'] = false;
 
             return true;
         }
@@ -142,18 +171,21 @@ class GFPDF_License_Model
      * @param Array   &$addon  The addon details, passed by reference
      * @param boolean $license Whether to delete the licese expiry from the database or the expiry and the actual license key
      * @since 3.8
-     * TODO - refractor
      */
     public function remove_license_from_db(&$addon, $license = true)
     {
+        /* prepare license details */
+        $new_license_details = array();
+
         if ($license) {
-            delete_option('gfpdfe_addon_'.$addon['id'].'_license'); // new license has been entered, so must reactivate
-            $addon['license_key'] = '';
+            $new_license_details['key'] = '';
         }
 
-        delete_option('gfpdfe_addon_'.$addon['id'].'_license_expires');
-        $addon['license_expires'] = false;
-        $addon['valid_license']   = false;
+        $new_license_details['expires'] = '';
+        $new_license_details['status']  = '';
+
+        /* update our license details */
+        self::update_license_information($new_license_details, $addon);
     }
 
     /**
@@ -181,8 +213,6 @@ class GFPDF_License_Model
         /* decode the license data */
         $license_data = self::call_api($api_params);
 
-        print_r($license_data);
-
         $status = ($license_data->license === 'valid') ? $license_data->license : $license_data->error;
 
         /* prepare license details */
@@ -193,6 +223,9 @@ class GFPDF_License_Model
 
         /* update license details */
         self::update_license_information($license, $addon);
+
+        /* show update or error messages */
+        self::show_api_message($license_data);
     }
 
     /**
@@ -205,19 +238,19 @@ class GFPDF_License_Model
         global $gfpdfe_data;
 
         $addon_id = PDF_Common::get('deactivate');
-        $addon = false;
+        $addon    = false;
 
         if (!wp_verify_nonce(PDF_Common::get('nonce'), 'gfpdfe_deactive_license')) {
-            /*
-             * Show error message
-             */
+            $error = __('There was a problem processing your request. Please try again.', 'pdfextended');
+            PDF_Common::add_message($error, 'error');
+
             return false;
         }
 
         /* check if user wasn't to disable an active add on */
         foreach ($gfpdfe_data->addon as &$plugin) {
             if ($plugin['id'] == $addon_id) {
-                $addon = $plugin;
+                $addon = & $plugin;
                 break;
             }
         }
@@ -232,6 +265,7 @@ class GFPDF_License_Model
      * Contact API endpoint and deactivate license
      * @param  Array   &$addon The addon details, passed by reference
      * @return Boolean
+     * @since 3.8
      */
     public function do_deactive_license_key(&$addon)
     {
@@ -249,8 +283,6 @@ class GFPDF_License_Model
             'item_name'  => urlencode($addon['name']), // the name of our product in EDD
         );
 
-        print_r($license_data);
-
         $license_data = self::call_api($api_params);
 
         if ($license_data !== false && $license_data->license == 'deactivated') {
@@ -261,15 +293,35 @@ class GFPDF_License_Model
                 'status' => $license_data->license,
             );
 
-            /* update license details */
+            /* update license status */
             self::update_license_information($license, $addon);
+
+            /* show update or error messages */
+            self::show_api_message($license_data);
         }
 
         return true;
     }
 
     /**
+     * Check if the license will expire in last than a month and mark plugin to prompt renewal notice
+     * @since  3.8
+     */
+    private function show_renewal_notice_on_plugin_page()
+    {
+        global $gfpdfe_data;
+        foreach ($gfpdfe_data->addon as $addon) {
+            /* check if license is about to expire, or will expire soon */
+            if (strtotime($addon['license_expires']) < strtotime('+1 Month')) {
+                add_action('after_plugin_row_'.$addon['basename'], array('GFPDF_Notices', 'display_plugin_renewal_notice'), 10, 1);
+            }
+        }
+    }
+
+    /**
      * Check our current license status
+     * This is called via a scheduled task on a daily basis
+     * @since 3.8
      */
     public static function check_license_key_status()
     {
@@ -280,9 +332,9 @@ class GFPDF_License_Model
     }
 
     /**
-     * [do_license_key_status_check description]
-     * @param  [type] &$addon [description]
-     * @return [type] [description]
+     * Poll API and update the status of the addon's license
+     * @param Array &$addon The addon details, passed by reference
+     * @since 3.8
      */
     public static function do_license_key_status_check(&$addon)
     {
@@ -309,9 +361,7 @@ class GFPDF_License_Model
         /* decode the license data */
         $license_data = json_decode(wp_remote_retrieve_body($response));
 
-        $valid_license_terms = array('valid', 'inactive');
-
-        $license_status = (isset($license_data->license) && in_array($valid_license_terms)) ? $license_data->license : $license_data->error;
+        $license_status = (isset($license_data->license)) ? $license_data->license : $license_data->error;
 
         /* prepare license details */
         $license = array(
@@ -323,6 +373,12 @@ class GFPDF_License_Model
         self::update_license_information($license, $addon);
     }
 
+    /**
+     * Class our EDD API
+     * @param  array          $api_params The api parameters/arguments to pass
+     * @return boolean/object The API response
+     * @since  3.8
+     */
     private static function call_api($api_params)
     {
         global $gfpdfe_data;
@@ -332,7 +388,9 @@ class GFPDF_License_Model
 
         /* make sure the response came back okay */
         if (is_wp_error($response)) {
-            /* TODO - custom error message */
+            $error = __('There was a problem contacting the Gravity PDF server. Please try again shortly.', 'pdfextended');
+            PDF_Common::add_message($error, 'error');
+
             return false;
         }
 
@@ -340,25 +398,106 @@ class GFPDF_License_Model
         return json_decode(wp_remote_retrieve_body($response));
     }
 
+    /**
+     * Update and kee our database and $addon object in sync
+     * @param array $license The license information to update
+     * @param array &$addon  The addon information to keep in sync
+     * @since 3.8
+     */
     private static function update_license_information($license, &$addon)
     {
-
         /* update license in the database and locally */
         if (isset($license['key'])) {
-            update_option(sprintf('gfpdfe_addon_%s_license', $addon['id']), $license['key']);
-            $addon['license_key'] = $license['key'];
+            if (strlen($license['key']) > 0) {
+                update_option(sprintf('gfpdfe_addon_%s_license', $addon['id']), $license['key']);
+                $addon['license_key'] = $license['key'];
+            } else {
+                delete_option(sprintf('gfpdfe_addon_%s_license', $addon['id']));
+                $addon['license_key'] = false;
+            }
         }
 
         /* update license status in the database and locally */
         if (isset($license['status'])) {
-            update_option(sprintf('gfpdfe_addon_%s_license_expires', $addon['id']), $license['status']);
-            $addon['license_status'] = $license['status'];
+            if (strlen($license['status']) > 0) {
+                update_option(sprintf('gfpdfe_addon_%s_license_status', $addon['id']), $license['status']);
+                $addon['license_status'] = $license['status'];
+            } else {
+                delete_option(sprintf('gfpdfe_addon_%s_license_status', $addon['id']));
+                $addon['license_status'] = false;
+            }
         }
 
         /* update license expiry in the database and locally */
         if (isset($license['expires'])) {
-            update_option(sprintf('gfpdfe_addon_%s_license_expires', $addon['id']), $license['expires']);
-            $addon['license_expires'] = $license['expires'];
+            if (strlen($license['expires']) > 0) {
+                update_option(sprintf('gfpdfe_addon_%s_license_expires', $addon['id']), $license['expires']);
+                $addon['license_expires'] = $license['expires'];
+            } else {
+                delete_option(sprintf('gfpdfe_addon_%s_license_expires', $addon['id']));
+                $addon['license_expires'] = false;
+            }
+        }
+    }
+
+    /**
+     * Display appropriate error / notice response when attempting to verify license type
+     * @param Array $response The API response
+     * @since  3.8
+     * @todo  Add correct links to get in touch...
+     */
+    private static function show_api_message($response)
+    {
+        /* set the add on name */
+        $addon_name = $response->item_name;
+
+        /* success message */
+        if (isset($response->license) && !isset($response->error)) {
+            $success = '';
+
+            switch ($response->license) {
+                case 'valid':
+                    $success = sprintf(__('Your license key for %s has been activated.', 'pdfextended'), $addon_name);
+                break;
+
+                case 'inactive':
+                    /* Not sure if/when this should be thrown. Leave blank for now */
+                break;
+
+                case 'deactivated':
+                    $success = sprintf(__('Your license key for %s has been deactivated.', 'pdfextended'), $addon_name);
+                break;
+            }
+
+            /* store sucess message so we can display a notice */
+            PDF_Common::add_message($success);
+        } else {
+            /* display error message */
+            $error = '';
+            switch ($response->error) {
+                case 'missing':
+                    $error = sprintf(__('Your license key for %s is invalid.', 'pdfextended'), $addon_name);
+                break;
+
+                case 'revoked':
+                    $error = sprintf(__('Your license key for %s has been revoked. If you feel this was done in error %splease contact us directly%s.', 'pdfextended'), $addon_name, '<a href="#">', '</a>');
+                break;
+
+                case 'no_activations_left':
+                    $error = sprintf(__("You've reached the maximum activation limit for %s. Try deactive your license on another website or %scontact us to upgrade your plan%s.", 'pdfextended'), $addon_name, '<a href="#">', '</a>');
+                break;
+
+                case 'expired':
+                    $error = sprintf(__('Your license for %s has expired. %sRenew your license now%s and get a 20% discount off the standard price.', 'pdfextended'), $addon_name, '<a href="#">', '</a>');
+                break;
+
+                default:
+                    $error = sprintf(__('There was a problem validating your license key for %s. Reload the page and try again %sor get in touch with our support team%s for further assistance.', 'pdfextended'), $addon_name, '<a href="#">', '</a>');
+                break;
+            }
+
+            /* store error message so we can display a notice */
+            PDF_Common::add_message($error, 'error');
         }
     }
 }

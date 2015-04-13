@@ -61,7 +61,7 @@ class GFPDF_Notices
 
 	public static function display_plugin_message($message, $is_error = false){
 
-        $style = $is_error ? 'style="background-color: #ffebe8;"' : "";
+        $style = $is_error ? 'style="background-color: #ffebe8;"' : '';
 
         echo '</tr><tr class="plugin-update-tr"><td colspan="5" class="plugin-update"><div class="update-message" ' . $style . '>' . $message . '</div></td>';
     }	
@@ -84,6 +84,28 @@ class GFPDF_Notices
 			return sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>');
 		}
 		return '';
+	}
+
+	/**
+	 * Display the queued messages 
+	 * @since 3.8
+	 */
+	public static function display_queued_messages() {
+		global $gfpdfe_data;
+		
+		/* check if notice/error exists */
+		$message = (isset($gfpdfe_data->notice)) ? $gfpdfe_data->notice : array();
+		$error   = (isset($gfpdfe_data->error)) ? $gfpdfe_data->error : array();	
+
+		/* display message (if any) */
+		if(is_array($message) && sizeof($message) > 0) {
+			self::notice(implode('<br>', $message));
+		}
+
+		/* display error (if any) */
+		if(is_array($error) && sizeof($error) > 0) {
+			self::error(implode('<br>', $error));
+		}		
 	}
 
 	public static function gf_pdf_font_install_success()
@@ -392,5 +414,31 @@ class GFPDF_Notices
 		$tooltips['pdf_overwrite'] = sprintf(__('If you reinitialise and enable this option %syou will overwrite%s the default and example template files in your active theme directory.', 'pdfextended'), '<strong>', '</strong>');
 
 		return $tooltips;
+	}
+
+	/**
+	 * Create a notice on the plugins page letting users know their license will expire shortly (or already has)
+	 * @param  String $plugin_basename The plugin basename
+	 * @since  3.8
+	 */
+	public static function display_plugin_renewal_notice($plugin_basename) {
+ 		global $gfpdfe_data;
+ 		/* loop through active addons and look for a matching basename */
+        foreach ($gfpdfe_data->addon as $addon) {
+            /* check if license is about to expire, or will expire soon */
+            if ($addon['basename'] === $plugin_basename) {
+            	/* check if already expired */
+            	if(strtotime($addon['license_expires']) < time()) {
+            		$msg = __('Your license has expired.', 'pdfextended') . ' ';            		
+            	} else {
+            		/* will expire in a month */
+            		$msg = sprintf(__('Your license expires on %s.', 'pdfextended'), date('F j, Y', strtotime($addon['license_expires']))) . ' ';            		
+            	}
+
+            	$msg .= sprintf(__('%sRenew now and get a 20%% discount%s.', 'pdfextended'), '<a href="'.$gfpdfe_data->store_url.'add-ons/checkout/?edd_license_key='.$addon['license_key'].'">', '</a>');
+            	self::display_plugin_message($msg, false);
+            	return;                
+            }
+        }       				
 	}					
 }

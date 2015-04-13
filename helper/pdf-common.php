@@ -293,10 +293,10 @@ class PDF_Common
 	/**
 	 * Add backwards compatibility to users running Gravity Forms 1.8.3 or below 
 	 * which don't have this function built in.
-	 * Once support is dropped for Gravity Forms 1.8.x this function can be removed.
-	 * Added in v3.7.1
+	 * Once support is dropped for Gravity Forms 1.8.x this function can be removed.	 
 	 * @param  Array  $currency A currency type
 	 * @return String           Whether currency should be displayed as 'decimal_dot' or 'decimal_comma'
+	 * @since  3.7.1
 	 */
 	public static function is_currency_decimal_dot($currency = null) {    
         if($currency == null){
@@ -308,6 +308,38 @@ class PDF_Common
         }
 
         return rgar($currency, "decimal_separator") == ".";    	
+	}
+
+	/**
+	 * Queue an message/error for display when $gfpdfe_data->notice_type is run 
+	 * @param String $message The message to queue
+	 * @param string $type    Whether a notice/error message
+	 * @since  3.8
+	 */
+	public static function add_message($message, $type = 'notice') {
+		global $gfpdfe_data;
+
+		/* setup our notice array */
+		if(!isset($gfpdfe_data->notice)) {
+			$gfpdfe_data->notice = array();
+		}
+
+		/* setup our error array */
+		if(!isset($gfpdfe_data->error)) {
+			$gfpdfe_data->error = array();
+		}		
+
+		/* assign different array keys to $api_key variable (by refernece) */
+		if($type === 'notice') {
+			$api_key =& $gfpdfe_data->notice;
+		} else {
+			$api_key =& $gfpdfe_data->error;
+		} 
+
+		/* assign our message to the correct notice/error */
+		if(strlen($message) > 0) {            
+            array_push($api_key, $message);            
+        }	
 	}
 }
 
