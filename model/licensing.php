@@ -420,7 +420,8 @@ class GFPDF_License_Model
         global $gfpdfe_data;
 
         /* Call the custom API */
-        $response = wp_remote_get(add_query_arg($api_params, $gfpdfe_data->store_url), array( 'timeout' => 15, 'sslverify' => false ));        
+        $url      = esc_url_raw(add_query_arg($api_params, $gfpdfe_data->store_url)); /* prevent potential XSS vulnerability */
+        $response = wp_remote_get($url, array( 'timeout' => 15, 'sslverify' => false ));        
         /* make sure the response came back okay */
         if (is_wp_error($response)) {
             $error = __('There was a problem contacting the Gravity PDF server. Please try again shortly.', 'pdfextended');
