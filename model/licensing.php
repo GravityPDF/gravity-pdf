@@ -121,10 +121,10 @@ class GFPDF_License_Model
             );
 
             /* update our license details */
-            self::update_license_information($new_license_details, $addon);
+            $this->update_license_information($new_license_details, $addon);
 
             /* check if the license is valid */
-            $this->check_license($license, $addon);
+            $this->activate_license($license, $addon);
         }
     }
 
@@ -184,17 +184,17 @@ class GFPDF_License_Model
         $new_license_details['status']  = '';
 
         /* update our license details */
-        self::update_license_information($new_license_details, $addon);
+        $this->update_license_information($new_license_details, $addon);
     }
 
     /**
-     * Call remote API and update license key accordingly
+     * Call remote API to activate the license key
      * @param  String       $license The addon license key
      * @param  Array        &$addon  The addon details, passed by reference
      * @return Boolean/Null
      * @since 3.8
      */
-    public function check_license($license, &$addon)
+    public function activate_license($license, &$addon)
     {
         global $gfpdfe_data;
 
@@ -210,23 +210,33 @@ class GFPDF_License_Model
         );
 
         /* decode the license data */
-        $license_data = self::call_api($api_params);
+        $license_data = $this->call_api($api_params);
 
-        if($license_data !== false) {
+        if(!is_wp_error($license_data)) {
             $status = ($license_data->license === 'valid') ? $license_data->license : $license_data->error;
 
             /* prepare license details */
             $license = array(
                 'expires' => $license_data->expires,
-                'status'  => $license_data->license,
+                'status'  => $status,
             );
 
             /* update license details */
-            self::update_license_information($license, $addon);
+            $this->update_license_information($license, $addon);
 
             /* show update or error messages */
-            self::show_api_message($license_data);
+            $results = $this->show_api_message($license_data);            
+
+            if(is_wp_error($results)) {
+                return $results;
+            }
+            /* success */
+            return true;
+            
         }
+
+        /* throw error */
+        return $license_data;
     }
 
     /**
@@ -272,7 +282,7 @@ class GFPDF_License_Model
     {
         global $gfpdfe_data;
 
-        if (strlen(trim($addon['license_key'])) === 0) {
+        if (!isset($addon['license_key']) || strlen(trim($addon['license_key'])) === 0) {
             /* display error message here */
             return false;
         }
@@ -284,28 +294,43 @@ class GFPDF_License_Model
             'item_name'  => urlencode($addon['name']), // the name of our product in EDD
         );
 
-        $license_data = self::call_api($api_params);
+        $license_data = $this->call_api($api_params);
 
-        if ($license_data !== false && $license_data->license == 'deactivated') {
+
+        if(!is_wp_error($license_data)) {
+            /* ensure license data was correctly deactivated */
+            if($license_data->license != 'deactivated') {
+                return new WP_Error('edd_api_deactivation_error', __('There was a problem deactivating your license key. Please try again.', 'pdfextended'));
+            }
+
             /* completely remove license details from database */
             $this->remove_license_information($addon);
 
+            /* prepare new license details */
             $license = array(
                 'status' => $license_data->license,
             );
 
             /* update license status */
-            self::update_license_information($license, $addon);
+            $this->update_license_information($license, $addon);
 
             /* show update or error messages */
-            self::show_api_message($license_data);
+            $results = $this->show_api_message($license_data);
+
+            if(is_wp_error($results)) {
+                return $results;
+            } 
+            
+            /* success */
+            return true;                        
         }
 
-        return true;
+        /* return error */
+        return $license_data;
     }
 
     /**
-     * Check if the license will expire in last than a month and mark plugin to prompt renewal notice
+     * Check if the license will expire in less than a month and mark plugin to prompt renewal notice
      * @since  3.8
      */
     private function show_renewal_notice_on_plugin_page()
@@ -313,7 +338,7 @@ class GFPDF_License_Model
         global $gfpdfe_data;
         foreach ($gfpdfe_data->addon as $addon) {
             /* check if license is about to expire, or will expire soon */
-            if (strtotime($addon['license_expires']) < strtotime('+1 Month')) {
+            if (strtotime('+1 Month') > strtotime($addon['license_expires']) ) {
                 add_action('after_plugin_row_'.$addon['basename'], array('GFPDF_Notices', 'display_plugin_renewal_notice'), 10, 1);
             }
         }
@@ -324,11 +349,11 @@ class GFPDF_License_Model
      * This is called via a scheduled task on a daily basis
      * @since 3.8
      */
-    public static function check_license_key_status()
+    public function check_license_key_status()
     {
         global $gfpdfe_data;
         foreach ($gfpdfe_data->addon as &$plugin) {
-            self::do_license_key_status_check($plugin);
+            $this->do_license_key_status_check($plugin);
         }
     }
 
@@ -337,12 +362,12 @@ class GFPDF_License_Model
      * @param Array &$addon The addon details, passed by reference
      * @since 3.8
      */
-    public static function do_license_key_status_check(&$addon)
+    public function do_license_key_status_check(&$addon)
     {
         global $gfpdfe_data;
 
-        if (strlen(trim($addon['license_key'])) === 0) {
-            return;
+        if (!isset($addon['license_key']) || strlen(trim($addon['license_key'])) === 0) {
+            return false;
         }
 
         /* data to send in our API request */
@@ -355,19 +380,33 @@ class GFPDF_License_Model
         /* Call the custom API. */
         $license_data = $this->call_api($api_params);
 
-        if($license_data !== false) {        
+        if(!is_wp_error($license_data)) {        
 
-            $license_status = (isset($license_data->license)) ? $license_data->license : $license_data->error;
+            $status = (isset($license_data->license)) ? $license_data->license : $license_data->error;
 
             /* prepare license details */
             $license = array(
                 'expires' => $license_data->expires,
-                'status'  => $license_status,
+                'status'  => $status,
             );
 
             /* update license details */
-            self::update_license_information($license, $addon);
+            $this->update_license_information($license, $addon);  
+
+            /* check for any errors */
+            /* show update or error messages */
+            $results = $this->show_api_message($license_data, true);
+
+            if(is_wp_error($results)) {
+                return $results;
+            }  
+
+            /* no issues */
+            return true;                      
         }
+
+        /* return error */
+        return $license_data;
     }
 
     /**
@@ -376,19 +415,18 @@ class GFPDF_License_Model
      * @return boolean/object The API response
      * @since  3.8
      */
-    private static function call_api($api_params)
+    public function call_api($api_params)
     {
         global $gfpdfe_data;
 
         /* Call the custom API */
-        $response = wp_remote_get(add_query_arg($api_params, $gfpdfe_data->store_url), array( 'timeout' => 15, 'sslverify' => false ));
-
+        $response = wp_remote_get(add_query_arg($api_params, $gfpdfe_data->store_url), array( 'timeout' => 15, 'sslverify' => false ));        
         /* make sure the response came back okay */
         if (is_wp_error($response)) {
             $error = __('There was a problem contacting the Gravity PDF server. Please try again shortly.', 'pdfextended');
             PDF_Common::add_message($error, 'error');
 
-            return false;
+            return new WP_Error('edd_api_contact', $error);
         }
 
         /* decode the license data */
@@ -401,7 +439,7 @@ class GFPDF_License_Model
      * @param array &$addon  The addon information to keep in sync
      * @since 3.8
      */
-    public static function update_license_information($license, &$addon)
+    public function update_license_information($license, &$addon)
     {
         /* update license in the database and locally */
         if (isset($license['key'])) {
@@ -440,10 +478,11 @@ class GFPDF_License_Model
     /**
      * Display appropriate error / notice response when attempting to verify license type
      * @param Array $response The API response
+     * @param Boolean $disable_message Disable any error messages 
      * @since  3.8
      * @todo  Add correct links to get in touch...
      */
-    private static function show_api_message($response)
+    private function show_api_message($response, $disable_message = false)
     {
         /* set the add on name */
         $addon_name = $response->item_name;
@@ -467,7 +506,10 @@ class GFPDF_License_Model
             }
 
             /* store sucess message so we can display a notice */
-            PDF_Common::add_message($success);
+            if(!$disable_message) {
+                PDF_Common::add_message($success);
+            }
+            return true;
         } else {
             /* display error message */
             $error = '';
@@ -493,8 +535,12 @@ class GFPDF_License_Model
                 break;
             }
 
-            /* store error message so we can display a notice */
-            PDF_Common::add_message($error, 'error');
+            if(!$disable_message) {
+                /* store error message so we can display a notice */
+                PDF_Common::add_message($error, 'error');
+            }
+
+            return new WP_Error('license_validation_error', $error);
         }
     }
 }
