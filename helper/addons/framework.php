@@ -30,9 +30,6 @@
 /* Include the core licensing class */
 require_once 'licensing.php';
 
-/* Add our cron action hook */
-add_action('gfpdf_check_license_key_status', array('GFPDF_License_Model', 'check_license_key_status'));
-
 /**
  *
  * @since 3.8

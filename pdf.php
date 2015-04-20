@@ -219,6 +219,9 @@ class GFPDF_Core extends PDFGenerator
 		add_filter('gfpdfe_pdf_template', array('PDF_Common', 'do_mergetags'), 10, 3); /* convert mergetags in PDF template automatically */
 		add_filter('gfpdfe_pdf_template', 'do_shortcode', 10, 1); /* convert shortcodes in PDF template automatically */ 		
 
+		/* Add our cron action hook */
+		add_action('gfpdf_check_license_key_status', array($gfpdfe_data->license_model, 'check_license_key_status'));
+
 		/* Check if on the entries page and output javascript */
 		if(is_admin() && rgget('page') == 'gf_entries')
 		{
