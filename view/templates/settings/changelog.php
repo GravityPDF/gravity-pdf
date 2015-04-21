@@ -41,6 +41,12 @@
 
   <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
   <ul>
+    <li>Bug - Updated $form_data['date_created'], $form_data['date_created_usa'], $form_data['misc']['date_time'], $form_data['misc']['time_24hr'] and $form_data['misc']['time_12hr'] to factor in the website's timezone settings. </li>
+  </ul>
+  
+
+  <h3>3.7.1</h3>
+  <ul>
     <li>Housekeeping - Allow control over signature width in default template using the 'gfpdfe_signature_width' filter</li>
     <li>Housekeeping - Add better error checking when migrating PDF template folder</li>
     <li>Housekeeping - Add unit testing to the directory migration function</li>

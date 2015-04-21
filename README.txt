@@ -4,7 +4,7 @@ Donate link: https://gravitypdf.com
 Tags: gravity, forms, pdf, automation, attachment
 Requires at least: 3.9
 Tested up to: 4.2
-Stable tag: 3.7.1
+Stable tag: 3.7.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
 
@@ -87,6 +87,9 @@ All FAQs can be [viewed on the Gravity PDF website](https://gravitypdf.com/#faqs
 3. The configuration.php file allows you to easily assign PDFs to Gravity Forms
 
 == Changelog ==
+
+= 3.7.2 =
+* Bug - Updated $form_data['date_created'], $form_data['date_created_usa'], $form_data['misc']['date_time'], $form_data['misc']['time_24hr'] and $form_data['misc']['time_12hr'] to factor in the website's timezone settings.  
 
 = 3.7.1 =
 * Housekeeping - Allow control over signature width in default template using the 'gfpdfe_signature_width' filter
