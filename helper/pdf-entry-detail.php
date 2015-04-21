@@ -417,14 +417,6 @@ if(!class_exists('GFPDFEntryDetail'))
 			return $results;
 		}
 
-		public static function format_date($date, $usa = false)
-		{
-			$timestamp = strtotime($date);
-			$new_date = (!$usa) ? date('j/n/Y', $timestamp) : date('n/j/Y', $timestamp);
-			return $new_date;
-		}
-
-
 		/* returns the form values as an array instead of pre-formated html */
 		public static function lead_detail_grid_array($form, $lead){
 
@@ -714,15 +706,15 @@ if(!class_exists('GFPDFEntryDetail'))
 			 * Add form_id and lead_id
 			 */
 			$form_array['form_id']  = $form_id;
-			$form_array['entry_id'] = $lead['id'];
+			$form_array['entry_id'] = $lead['id'];			
 
 			/*
 			 * Set title and dates (both US and international)
 			 */
 			$form_array['form_title']       = $form['title'];
 			$form_array['form_description'] = (isset($form['description'])) ? $form['description'] : '';
-			$form_array['date_created']     = self::format_date($lead['date_created']);
-			$form_array['date_created_usa'] = self::format_date($lead['date_created'], true);
+			$form_array['date_created']     = GFCommon::format_date( $lead['date_created'], false, 'j/n/Y', false);
+			$form_array['date_created_usa'] = GFCommon::format_date( $lead['date_created'], false, 'n/j/Y', false);
 
 			/*
 			 * Include page names
@@ -731,10 +723,10 @@ if(!class_exists('GFPDFEntryDetail'))
 
 			/*
 			 * Add misc fields
-			 */
-			$form_array['misc']['date_time']        = $lead['date_created'];
-			$form_array['misc']['time_24hr']        = date('H:i', strtotime($lead['date_created']));
-			$form_array['misc']['time_12hr']        = date('g:ia', strtotime($lead['date_created']));
+			 */			
+			$form_array['misc']['date_time']        = GFCommon::format_date( $lead['date_created'], false, 'Y-m-d H:i:s', false);
+			$form_array['misc']['time_24hr']        = GFCommon::format_date( $lead['date_created'], false, 'H:i', false);
+			$form_array['misc']['time_12hr']        = GFCommon::format_date( $lead['date_created'], false, 'g:ia', false); 
 			$form_array['misc']['is_starred']       = $lead['is_starred'];
 			$form_array['misc']['is_read']          = $lead['is_read'];
 			$form_array['misc']['ip']               = $lead['ip'];
