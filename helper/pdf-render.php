@@ -36,6 +36,8 @@ class PDFRender
 	 */
 	public function PDF_Generator($form_id, $lead_id, $arguments = array())
 	{
+		global $gfpdfe_data;
+
 		/* 
 		 * Because we merged the create and attach functions we need a measure to only run this function once per session per lead id. 
 		 */
