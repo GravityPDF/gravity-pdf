@@ -194,9 +194,9 @@ abstract class GFPDFAddonFramework
         if ($this->addon['settings'] === true) {
             if (!$this->check_settings_page_exists($navigation, 'addon')) {
                 $navigation[40] = array(
-					'name'     => __('Addon', 'pdfextended'),
-					'id'       => 'addon',
-					'template' => PDF_PLUGIN_DIR.'view/templates/settings/addon.php',
+					'name'     => __('Extensions', 'pdfextended'),
+					'id'       => 'extensions',
+					'template' => PDF_PLUGIN_DIR.'view/templates/settings/extensions.php',
                 );
             }
         }

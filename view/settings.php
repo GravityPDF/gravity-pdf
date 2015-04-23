@@ -47,9 +47,8 @@ class settingsView
 			  ksort($this->model->navigation);
             
               $tab = PDF_Common::get('tab');
-              if(strlen($tab) == 0)
-              {
-                $tab = 'initialisation';
+              if(strlen($tab) == 0) {              
+                    $tab = 'general';
               }
 
             ?>
@@ -68,28 +67,27 @@ class settingsView
 
             	<?php 
  
-
-                    foreach($this->model->navigation as $item)
-                    {
-                        if($item['id'] == $tab)
-                        {
+                    /**
+                     * Loop through our nav and look for a match 
+                     */
+                    foreach($this->model->navigation as $item) {                    
+                        if($item['id'] == $tab) {                        
                             $page = $item;
                             break;
                         }
                     }
 
-                    if(isset($page))
-                    {
-                        
+                    /**
+                     * Load page is found 
+                     */
+                    if(isset($page) && is_file($page['template'])) {                                            
                         ?>
-                            <div id="<?php echo $page['id']; ?>" class="nav-tab-contents">
+                            <div id="<?php echo $page['id']; ?>" class="pdf-settings">
                                 <?php include $page['template']; ?>
                             </div>
                         <?php
-                        do_action('pdf-extended-settings-' . $page['id']);
-                    }
-
-				    do_action('pdf-extended-settings');	                                        
+                        do_action('pdf-settings-' . $page['id']);
+                    }				            
 				?>                           
                  
             </div>

@@ -63,6 +63,8 @@ define('GF_PDF_EXTENDED_PLUGIN_BASENAME', plugin_basename(__FILE__));
  include PDF_PLUGIN_DIR . 'model/licensing.php'; 
  include PDF_PLUGIN_DIR . 'helper/pdf-common.php';	
  include PDF_PLUGIN_DIR . 'helper/pdf-render.php'; 		
+ include PDF_PLUGIN_DIR . 'helper/system-status.php';
+ include PDF_PLUGIN_DIR . 'helper/settings-api.php';
 
  /* 
   * Initiate the class after Gravity Forms has been loaded using the init hook.
@@ -91,6 +93,9 @@ class GFPDF_Core extends PDFGenerator
 		  /* set our PDF folder storage */
 		 $gfpdfe_data->set_directory_structure();  
 
+		 /* get our plugin settings from db */
+		 $gfpdfe_data->set_plugin_settings();
+		 
 		 /* initialise our addon system */
 		 $gfpdfe_data->set_addon_details();
 
@@ -119,7 +124,7 @@ class GFPDF_Core extends PDFGenerator
 		/*
 		 * Call our Settings class which will do our compatibility processing
 		 */
-		$gfpdfe_data->settingsClass = new GFPDF_Settings();		
+		$gfpdfe_data->settingsClass = new GFPDF_Settings();	
 
 		/*
 		 * Only run settings page if Gravity Forms version is installed and compatible 
@@ -133,17 +138,8 @@ class GFPDF_Core extends PDFGenerator
 			 * Run our settings page
 			 */
 			GFPDF_Settings::settings_page();				
-
-			/*
-			 * Only load our scripts if on a Gravity Forms admin page
-			 */
-			if( isset($_GET['page']) && (substr($_GET['page'], 0, 3) === 'gf_') )
-			{
-				/*
-				* Run our scripts and add the settings page to the admin area 
-				*/				
-				add_action('admin_init',  array('GFPDF_Core', 'gfe_admin_init'), 9);
-			}
+	
+			add_action('admin_init',  array('GFPDF_Core', 'gfe_admin_init'), 9);
 		}
 		 
 		/*
@@ -402,7 +398,12 @@ class GFPDF_Core extends PDFGenerator
 		  add_filter('gform_noconflict_scripts', array('GFPDF_Core', 'register_gravityform_scripts')); 
 		  add_filter('gform_noconflict_styles', array('GFPDF_Core', 'register_gravityform_styles')); 
 
-		  add_filter('gform_tooltips', array('GFPDF_Notices', 'add_tooltips'));	 	  
+		  add_filter('gform_tooltips', array('GFPDF_Notices', 'add_tooltips'));	 
+
+		 /*
+		  * Register our settings 
+		  */ 	  
+		 GFPDF_Settings_API::register_settings();
 		  
 	}
 	

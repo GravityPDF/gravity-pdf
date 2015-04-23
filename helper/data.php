@@ -76,6 +76,19 @@ class GFPDFE_DATA
     }
 
     /**
+     * Get the plugin's settings from the database 
+     * @since 3.8
+     */
+    public function set_plugin_settings() {
+        if ( false == get_option( 'gfpdf_settings' ) ) {
+            add_option( 'gfpdf_settings' );
+        }
+
+        /* assign our settings */
+        $this->settings = GFPDF_Settings_API::get_settings();
+    }
+
+    /**
      * Used to set up our PDF template folder, 
      * save folder and font folder
      */
