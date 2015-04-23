@@ -1,97 +1,99 @@
 (function($) {	
-		var tab = $('#tab_PDF');
+		function GravityPDF () {
+			var self = this;
 
-		tab.find('.nav-tab-contents:not(:first)').hide();
-
-		tab.find('.nav-tab').click(function() {
-
-		/*
-		 * Validate Support Form
-		 */
-		$('#support-request-button').click(function() {
-			if (validate_form() === true) {
-				return false;
-			} else {
-				ajax_request();
-				return false;
-			}
-		});
-
-	});
-
-	function ajax_request() {
-		/*
-		 * Create an AJAX Request
-		 */		
-		var spinner = $('<img alt="Loading" class="gfspinner" src="' + GFPDF.GFbaseUrl + '/images/spinner.gif" />');
-		$('#support-request-button').after(spinner);
-
-		$('span.msg').remove();
-		$('span.error').remove();
-
-		$.ajax({
-			type: "POST",
-			url: ajaxurl,
-			dataType: 'json',
-			data: {
-				action: 'support_request',
-				nonce: $('#pdf_settings_nonce_field').val(),
-				email: $('#email-address').val(),
-				supportType: $('#support-type').val(),
-				comments: $('#comments').val()
-			}
-		}).done(function(results) {
-				$('.gfspinner').remove();
-
-				if (results.error) {
-					if (results.error.email) {
-						var $email = $('#email-address');
-						$email.addClass('error').after($('<span class="icon-remove-sign">'));
-					}
-
-					if (results.error.supportType) {
-						var $support = $('#support-type');
-						$support.addClass('error').after($('<span class="icon-remove-sign">'));
-					}
-
-					if (results.error.comments) {
-						var $comments = $('#comments');
-						$comments.addClass('error').after($('<span class="icon-remove-sign">'));
-					}
-
-					$('#support-request-button').after('<span class="error">' + results.error.msg + '</span>');
-				} else if (results.msg) {
-					$('#support-request-button').after('<span class="msg">' + results.msg + '</span>');
+			this.init = function() {
+				if(this.is_settings()) {
+					this.processSettings();
 				}
-			});
-			var tab = $('#tab_PDF');
+			}
 
-		}
+			this.is_settings = function() {
+				return $('#tab_PDF').length;
+			}
 
-	function validate_form() {
-		var error = false;
-		/*
-		 * Check email address is filled out
-		 */
-		var $email = $('#email-address');
-		var $comments = $('#comments');
+			this.processSettings = function() {
+				var active = $('.nav-tab-wrapper a.nav-tab-active:first').text();
 
-		/*
-		 * Reset the errors
-		 */
-		$email.removeClass('error');
-		$comments.removeClass('error');
-		$('#support .icon-remove-sign').remove();
+				this.show_tooltips();
 
-		if ($email.val().length == 0) {
-			$email.addClass('error').after($('<span class="icon-remove-sign">'));
-			error = true;
-		}
+				switch (active) {
+					case 'General':
+						this.do_conditional_general_settings();						
+					break;
+				}
+			}
 
-		if ($comments.val().length == 0) {
-			$comments.addClass('error').after($('<span class="icon-remove-sign">'));
-			error = true;
-		}
-		return error;
-	}
+			this.show_tooltips = function() {
+				$('.gf_hidden_tooltip').each(function() {
+					$(this)
+					.parent()
+					.siblings('th:first')
+					.append(' ')
+					.append(
+						self.get_tooltip($(this).html())
+					);
+
+					$(this).remove();
+				});
+
+				gform_initialize_tooltips();
+			}
+
+			this.do_conditional_general_settings = function() {				
+				var $table             = $('#pdf-general-security');
+				var $adminRestrictions = $table.find('input[name="gfpdf_settings[limit_to_admin]"]');
+				var $userRestrictions  = $table.find('input[name="gfpdf_settings[limit_to_user]"]');
+
+				/*
+				 * Add change event to admin restrictions to show/hide dependant fields 
+				 */
+				$adminRestrictions.change(function() {					
+					if($(this).val() === 'Yes') {
+						/* hide user restrictions and logged out user timeout */
+						$table.find('tr:nth-child(2)').hide();
+						$table.find('tr:nth-child(3)').hide();
+					} else {
+						/* hide user restrictions and logged out user timeout */
+						$table.find('tr:nth-child(2)').show();
+						if($userRestrictions.val() !== 'Yes') {
+							$table.find('tr:nth-child(3)').show();
+						}
+					}
+				});
+
+				/*
+				 * Add change event to logged-out restrictions to show/hide dependant fields 
+				 */
+				$userRestrictions.change(function() {
+					if($(this).val() === 'Yes') {
+						/* hide user restrictions and logged out user timeout */
+						$table.find('tr:nth-child(3)').hide();
+					} else {
+						/* hide user restrictions and logged out user timeout */
+						$table.find('tr:nth-child(3)').show();
+					}
+				});
+			}
+
+			this.get_tooltip = function(html) {
+				var $a = $('<a>');
+				var $i = $('<i class="fa fa-question-circle">');				
+
+				$a.append($i);
+				$a.addClass('gf_tooltip tooltip');
+				$a.click(function() {
+					return false;
+				});
+				
+				$a.attr('title', html);
+				
+				return $a;				
+			}		
+		}	
+
+		$(document).ready(function() {
+			var pdf = new GravityPDF();
+			pdf.init();
+		});
 })(jQuery);

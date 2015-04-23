@@ -34,7 +34,7 @@ if ( !defined( 'ABSPATH' ) ) exit;
 /**
  * Class to set up the settings api callbacks 
  *
- * Pulled straight from the EDD register-settings.php file (props to Pippin and team)
+ * Pulled straight from the Gravity PDF register-settings.php file (props to Pippin and team)
  * @since 3.8
  */
 class GFPDF_Settings_API {
@@ -57,7 +57,7 @@ class GFPDF_Settings_API {
 	/**
 	 * Update an option
 	 *
-	 * Updates an edd setting value in both the db and the global variable.
+	 * Updates an Gravity PDF setting value in both the db and the global variable.
 	 * Warning: Passing in an empty, false or null string value will remove
 	 *          the key from the gfpdf_options array.
 	 *
@@ -101,7 +101,7 @@ class GFPDF_Settings_API {
 	/**
 	 * Remove an option
 	 *
-	 * Removes an edd setting value in both the db and the global variable.
+	 * Removes an Gravity PDF setting value in both the db and the global variable.
 	 *
 	 * @since 3.8
 	 * @param string $key The Key to delete
@@ -153,8 +153,6 @@ class GFPDF_Settings_API {
 	*/
 	public static function register_settings() {
 
-		print_r(get_option( 'gfpdf_settings' )); 
-
 		foreach( self::get_registered_settings() as $tab => $settings ) {
 
 			foreach ( $settings as $option ) {
@@ -171,6 +169,7 @@ class GFPDF_Settings_API {
 						'section'     => $tab,
 						'id'          => isset( $option['id'] )          ? $option['id']      : null,
 						'desc'        => ! empty( $option['desc'] )      ? $option['desc']    : '',
+						'desc2'        => ! empty( $option['desc2'] )      ? $option['desc2']    : '',
 						'name'        => isset( $option['name'] )        ? $option['name']    : null,
 						'size'        => isset( $option['size'] )        ? $option['size']    : null,
 						'options'     => isset( $option['options'] )     ? $option['options'] : '',
@@ -180,7 +179,8 @@ class GFPDF_Settings_API {
 	                    'step'        => isset( $option['step'] )        ? $option['step']    : null,
 	                    'chosen'      => isset( $option['chosen'] )      ? $option['chosen']  : null,
 	                    'placeholder' => isset( $option['placeholder'] ) ? $option['placeholder'] : null,
-	                    'allow_blank' => isset( $option['allow_blank'] ) ? $option['allow_blank'] : true
+	                    'allow_blank' => isset( $option['allow_blank'] ) ? $option['allow_blank'] : true,	                    
+	                    'tooltip'     => isset( $option['tooltip'] ) ? $option['tooltip'] : null,	 
 					)
 				);
 			}
@@ -191,7 +191,7 @@ class GFPDF_Settings_API {
 		register_setting( 'gfpdf_settings', 'gfpdf_settings', array('GFPDF_Settings_API', 'settings_sanitize') );
 
 		/* register our santize functions */
-		add_filter( 'gfpdf_settings_sanitize_text', array('GFPDF_Settings_API', 'sanitize_text_field') );
+		add_filter( 'gfpdf_settings_sanitize_text', array('GFPDF_Settings_API', 'sanitize_text_field') );		
 	}
 
 	/**
@@ -202,8 +202,9 @@ class GFPDF_Settings_API {
 	*/
 	public static function get_registered_settings() {
 
+		global $gfpdfe_data;
 		/**
-		 * 'Whitelisted' EDD settings, filters are provided for each settings
+		 * 'Whitelisted' Gravity PDF settings, filters are provided for each settings
 		 * section to allow extensions and other plugins to add their own settings
 		 */
 		$gfpdf_settings = array(
@@ -211,76 +212,80 @@ class GFPDF_Settings_API {
 			'general' => apply_filters( 'gfpdf_settings_general',
 				array(
 					'pdf_size' => array(
-						'id' => 'pdf_size',
-						'name' => __('Default Paper Size', 'pdfextended'),
-						'desc' => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'pdfextended'),
-						'type' => 'select',
+						'id'      => 'pdf_size',
+						'name'    => __('Default Paper Size', 'pdfextended'),
+						'desc'    => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'pdfextended'),
+						'type'    => 'select',
 						'options' => self::get_paper_size(),
 					),
 
-					'test_mode' => array(
-						'id' => 'test_mode',
-						'name' => __( 'Test Mode', 'edd' ),
-						'desc' => __( 'While in test mode no live transactions are processed. To fully use test mode, you must have a sandbox (test) account for the payment gateway you are testing.', 'edd' ),
-						'type' => 'checkbox'
+					'cleanup' => array(
+						'id'      => 'cleanup',
+						'name'    => __('Regularly Cleanup PDFs', 'pdfextended'),
+						'desc'    => __('When enabled, the PDF will be removed from your file system when it is no longer needed. Enable to save disk space.', 'pdfextended'),
+						'type'    => 'radio',
+						'options' => array(
+							'Yes' => 'Yes',
+							'No'  => 'No'
+						),
+						'std'     => 'Yes',
+						'tooltip' => '<h6>' . __('Cleanup PDFs', 'pdfextended') . '</h6>' . __('If you are using the "notification" or "save" configuration option, by default Gravity PDF will store copies of your PDF on your server. If you have limited disk space you should enable this option. Note: You can regenerate your PDFs at any time.', 'pdfextended'),
 					),
 
-					'currency_position' => array(
-						'id' => 'currency_position',
-						'name' => __( 'Currency Position', 'edd' ),
-						'desc' => __( 'Choose the location of the currency sign.', 'edd' ),
-						'type' => 'select',
+					'default_action' => array(
+						'id'      => 'default_action',
+						'name'    => __('Entry View', 'pdfextended'),
+						'desc'    => sprintf(__('Select the default action used when accessing a PDF from the %sGravity Forms entries list%s page.'), '<a href="'. $gfpdfe_data->admin_url . 'admin.php?page=gf_entries">', '</a>'),
+						'type'    => 'radio',
 						'options' => array(
-							'before' => __( 'Before - $10', 'edd' ),
-							'after' => __( 'After - 10$', 'edd' )
-						)
+							'View'     => 'View', 
+							'Download' => 'Download',
+						),
+						'std'     => 'View',
+					),					
+
+					
+				)
+			),
+
+			'general_security' => apply_filters( 'gfpdf_settings_general_security',
+				array(
+					'limit_to_admin' => array(
+						'id'    => 'limit_to_admin',
+						'name'  => __('Restrict PDFs to Admins', 'pdfextended'),
+						'desc'  => __('Restrict PDF access to users with the <em>"Gravity Forms View Entries"</em> privilege. By default this is administrators only.', 'pdfextended'),						
+						'type'  => 'radio',						
+						'options' => array(
+							'Yes' => 'Yes',
+							'No'  => 'No'
+						),
+						'std'   => 'No',
+						'tooltip' => '<h6>' . __('Restrict Access to Administrators Only', 'pdfextended') . '</h6>' . __("Enable this option if you don't want users accessing the generated PDFs. This is userful if the documents are for internal use, or security is a major concern.", 'pdfextended'),
 					),
-					'thousands_separator' => array(
-						'id' => 'thousands_separator',
-						'name' => __( 'Thousands Separator', 'edd' ),
-						'desc' => __( 'The symbol (usually , or .) to separate thousands', 'edd' ),
-						'type' => 'text',
-						'size' => 'small',
-						'std' => ','
-					),
-					'decimal_separator' => array(
-						'id' => 'decimal_separator',
-						'name' => __( 'Decimal Separator', 'edd' ),
-						'desc' => __( 'The symbol (usually , or .) to separate decimal points', 'edd' ),
-						'type' => 'text',
-						'size' => 'small',
-						'std' => '.'
-					),
-					'api_settings' => array(
-						'id' => 'api_settings',
-						'name' => '<strong>' . __( 'API Settings', 'edd' ) . '</strong>',
-						'desc' => '',
-						'type' => 'header'
-					),
-					'api_allow_user_keys' => array(
-						'id' => 'api_allow_user_keys',
-						'name' => __( 'Allow User Keys', 'edd' ),
-						'desc' => __( 'Check this box to allow all users to generate API keys. Users with the \'manage_shop_settings\' capability are always allowed to generate keys.', 'edd' ),
-						'type' => 'checkbox'
-					),
-					'tracking_settings' => array(
-						'id' => 'tracking_settings',
-						'name' => '<strong>' . __( 'Tracking Settings', 'edd' ) . '</strong>',
-						'desc' => '',
-						'type' => 'header'
-					),
-					'allow_tracking' => array(
-						'id' => 'allow_tracking',
-						'name' => __( 'Allow Usage Tracking?', 'edd' ),
-						'desc' => __( 'Allow Easy Digital Downloads to anonymously track how this plugin is used and help us make the plugin better. Opt-in and receive a 20% discount code for any purchase from the <a href="https://easydigitaldownloads.com/extensions" target="_blank">Easy Digital Downloads store</a>. Your discount code will be emailed to you.', 'edd' ),
-						'type' => 'checkbox'
-					),
-					'uninstall_on_delete' => array(
-						'id' => 'uninstall_on_delete',
-						'name' => __( 'Remove Data on Uninstall?', 'edd' ),
-						'desc' => __( 'Check this box if you would like EDD to completely remove all of its data when the plugin is deleted.', 'edd' ),
-						'type' => 'checkbox'
-					)
+
+					'limit_to_users' => array(
+						'id'    => 'limit_to_user',
+						'name'  => __('Disable Logged Out User Access', 'pdfextended'),
+						'desc'  => __('Restrict PDF access to the logged in <em>owner</em> of the Gravity Form entry, as well as users with the <em>"Gravity Forms View Entries"</em> privilege.', 'pdfextended'),						
+						'type'  => 'radio',						
+						'options' => array(
+							'Yes' => 'Yes',
+							'No'  => 'No'
+						),
+						'std'   => 'No',
+						'tooltip' => '<h6>' . __('Disable Logged Out Users Access', 'pdfextended') . '</h6>' . __("Enable this option if your Gravity Forms are restricted to logged in users only. The logged in owner will still be able to view their generated PDF, as well as site administrators.", 'pdfextended'),
+					),					
+
+					'logged_out_timeout' => array(
+						'id'    => 'logged_out_timeout',
+						'name'  => __('Logged Out Timeout', 'pdfextended'),
+						'desc'  => __('How long a <em>logged out</em> users has direct access to the PDF after completing the form. Set to 0 to disable (not recommended).', 'pdfextended'),
+						'desc2' => __('minutes', 'pdfextended'),
+						'type'  => 'number',
+						'size'  => 'small',
+						'std'   => 20,
+						'tooltip' => '<h6>' . __('Logged Out Timeout', 'pdfextended') . '</h6>' . __("By default, logged out users can view PDFs when their IP matches the IP assigned to the Gravity Form entry. But because IP addresses can change frequently a time-based restriction also applies.", 'pdfextended'),
+					),					
 				)
 			),
 
@@ -451,7 +456,7 @@ class GFPDF_Settings_API {
 	 *
 	 * @since 3.8
 	 * @param array $args Arguments passed by the setting
-	 * @global $gfpdfe_data Array of all the EDD Options
+	 * @global $gfpdfe_data Array of all the Gravity PDF Options
 	 * @return void
 	 */
 	public static function checkbox_callback( $args ) {
@@ -459,8 +464,12 @@ class GFPDF_Settings_API {
 		$gfpdf_options = $gfpdfe_data->settings;
 
 		$checked = isset( $gfpdf_options[ $args['id'] ] ) ? checked( 1, $gfpdf_options[ $args['id'] ], false ) : '';
-		$html = '<input type="checkbox" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="1" ' . $checked . '/>';
-		$html .= '<label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label>';
+		$html = '<input type="checkbox" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="1" ' . $checked . '/>';
+		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
+		
+		if(isset($args['tooltip'])) {
+			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . $args['tooltip'] . '</span>';
+		}		
 
 		echo $html;
 	}
@@ -472,7 +481,7 @@ class GFPDF_Settings_API {
 	 *
 	 * @since 3.8
 	 * @param array $args Arguments passed by the setting
-	 * @global $gfpdfe_data Array of all the EDD Options
+	 * @global $gfpdfe_data Array of all the Gravity PDF Options
 	 * @return void
 	 */
 	public static function multicheck_callback( $args ) {
@@ -482,10 +491,14 @@ class GFPDF_Settings_API {
 		if ( ! empty( $args['options'] ) ) {
 			foreach( $args['options'] as $key => $option ):
 				if( isset( $gfpdf_options[$args['id']][$key] ) ) { $enabled = $option; } else { $enabled = NULL; }
-				echo '<input name="gfpdf_settings[' . $args['id'] . '][' . $key . ']" id="gfpdf_settings[' . $args['id'] . '][' . $key . ']" type="checkbox" value="' . $option . '" ' . checked($option, $enabled, false) . '/>&nbsp;';
-				echo '<label for="gfpdf_settings[' . $args['id'] . '][' . $key . ']">' . $option . '</label><br/>';
+				echo '<input name="gfpdf_settings[' . $args['id'] . '][' . $key . ']" id="gfpdf_settings[' . $args['id'] . '][' . $key . ']" class="gfpdf_settings_' . $args['id'] . '" type="checkbox" value="' . $option . '" ' . checked($option, $enabled, false) . '/>&nbsp;';
+				echo '<label for="gfpdf_settings[' . $args['id'] . '][' . $key . ']">' . $option . '</label><br />';
 			endforeach;
-			echo '<p class="description">' . $args['desc'] . '</p>';
+			echo '<span class="gf_settings_description">' . $args['desc'] . '</span>';
+			
+			if(isset($args['tooltip'])) {
+				echo '<span class="gf_hidden_tooltip" style="display: none;">' . $args['tooltip'] . '</span>';
+			}			
 		}
 	}
 
@@ -496,7 +509,7 @@ class GFPDF_Settings_API {
 	 *
 	 * @since 3.8
 	 * @param array $args Arguments passed by the setting
-	 * @global $gfpdfe_data Array of all the EDD Options
+	 * @global $gfpdfe_data Array of all the Gravity PDF Options
 	 * @return void
 	 */
 	public static function radio_callback( $args ) {
@@ -511,11 +524,15 @@ class GFPDF_Settings_API {
 			elseif( isset( $args['std'] ) && $args['std'] == $key && ! isset( $gfpdf_options[ $args['id'] ] ) )
 				$checked = true;
 
-			echo '<input name="gfpdf_settings[' . $args['id'] . ']"" id="gfpdf_settings[' . $args['id'] . '][' . $key . ']" type="radio" value="' . $key . '" ' . checked(true, $checked, false) . '/>&nbsp;';
-			echo '<label for="gfpdf_settings[' . $args['id'] . '][' . $key . ']">' . $option . '</label><br/>';
+			echo '<label for="gfpdf_settings[' . $args['id'] . '][' . $key . ']"><input name="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . '][' . $key . ']" type="radio" value="' . $key . '" ' . checked(true, $checked, false) . '/>';
+			echo $option . '</label> &nbsp;&nbsp;';
 		endforeach;
 
-		echo '<p class="description">' . $args['desc'] . '</p>';
+		echo '<span class="gf_settings_description">' . $args['desc'] . '</span>';
+		
+		if(isset($args['tooltip'])) {
+			echo '<span class="gf_hidden_tooltip" style="display: none;">' . $args['tooltip'] . '</span>';
+		}
 	}
 
 	/**
@@ -525,7 +542,7 @@ class GFPDF_Settings_API {
 	 *
 	 * @since 3.8
 	 * @param array $args Arguments passed by the setting
-	 * @global $gfpdfe_data Array of all the EDD Options
+	 * @global $gfpdfe_data Array of all the Gravity PDF Options
 	 * @return void
 	 */
 	public static function text_callback( $args ) {
@@ -538,8 +555,12 @@ class GFPDF_Settings_API {
 			$value = isset( $args['std'] ) ? $args['std'] : '';
 
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
-		$html = '<input type="text" class="' . $size . '-text" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '"/>';
-		$html .= '<label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label>';
+		$html = '<input type="text" class="' . $size . '-text" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '"/>';
+		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
+
+		if(isset($args['tooltip'])) {
+			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . $args['tooltip'] . '</span>';
+		}
 
 		echo $html;
 	}
@@ -551,7 +572,7 @@ class GFPDF_Settings_API {
 	 *
 	 * @since 3.8
 	 * @param array $args Arguments passed by the setting
-	 * @global $gfpdfe_data Array of all the EDD Options
+	 * @global $gfpdfe_data Array of all the Gravity PDF Options
 	 * @return void
 	 */
 	public static function number_callback( $args ) {
@@ -568,8 +589,12 @@ class GFPDF_Settings_API {
 		$step = isset( $args['step'] ) ? $args['step'] : 1;
 
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
-		$html = '<input type="number" step="' . esc_attr( $step ) . '" max="' . esc_attr( $max ) . '" min="' . esc_attr( $min ) . '" class="' . $size . '-text" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '"/>';
-		$html .= '<label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label>';
+		$html = '<input type="number" step="' . esc_attr( $step ) . '" max="' . esc_attr( $max ) . '" min="' . esc_attr( $min ) . '" class="' . $size . '-text" class="gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '"/> ' . $args['desc2'];
+		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
+
+		if(isset($args['tooltip'])) {
+			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . $args['tooltip'] . '</span>';
+		}
 
 		echo $html;
 	}
@@ -581,7 +606,7 @@ class GFPDF_Settings_API {
 	 *
 	 * @since 3.8
 	 * @param array $args Arguments passed by the setting
-	 * @global $gfpdfe_data Array of all the EDD Options
+	 * @global $gfpdfe_data Array of all the Gravity PDF Options
 	 * @return void
 	 */
 	public static function textarea_callback( $args ) {
@@ -593,8 +618,12 @@ class GFPDF_Settings_API {
 		else
 			$value = isset( $args['std'] ) ? $args['std'] : '';
 
-		$html = '<textarea class="large-text" cols="50" rows="5" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']">' . esc_textarea( stripslashes( $value ) ) . '</textarea>';
-		$html .= '<label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label>';
+		$html = '<textarea class="large-text" cols="50" rows="5" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']">' . esc_textarea( stripslashes( $value ) ) . '</textarea>';
+		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
+
+		if(isset($args['tooltip'])) {
+			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . $args['tooltip'] . '</span>';
+		}
 
 		echo $html;
 	}
@@ -606,7 +635,7 @@ class GFPDF_Settings_API {
 	 *
 	 * @since 3.8
 	 * @param array $args Arguments passed by the setting
-	 * @global $gfpdfe_data Array of all the EDD Options
+	 * @global $gfpdfe_data Array of all the Gravity PDF Options
 	 * @return void
 	 */
 	public static function password_callback( $args ) {
@@ -619,8 +648,12 @@ class GFPDF_Settings_API {
 			$value = isset( $args['std'] ) ? $args['std'] : '';
 
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
-		$html = '<input type="password" class="' . $size . '-text" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '"/>';
-		$html .= '<label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label>';
+		$html = '<input type="password" class="' . $size . '-text" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '"/>';
+		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
+
+		if(isset($args['tooltip'])) {
+			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . $args['tooltip'] . '</span>';
+		}
 
 		echo $html;
 	}
@@ -635,7 +668,7 @@ class GFPDF_Settings_API {
 	 * @return void
 	 */
 	public static function missing_callback($args) {
-		printf( __( 'The callback public static function used for the <strong>%s</strong> setting is missing.', 'edd' ), $args['id'] );
+		printf( __( 'The callback used for the <strong>%s</strong> setting is missing.', 'pdfextended' ), $args['id'] );
 	}
 
 	/**
@@ -645,7 +678,7 @@ class GFPDF_Settings_API {
 	 *
 	 * @since 3.8
 	 * @param array $args Arguments passed by the setting
-	 * @global $gfpdfe_data Array of all the EDD Options
+	 * @global $gfpdfe_data Array of all the Gravity PDF Options
 	 * @return void
 	 */
 	public static function select_callback($args) {
@@ -667,7 +700,7 @@ class GFPDF_Settings_API {
 		else
 			$chosen = '';
 
-	    $html = '<select id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" ' . $chosen . 'data-placeholder="' . $placeholder . '">';
+	    $html = '<select id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" ' . $chosen . 'data-placeholder="' . $placeholder . '">';
 	    
 		foreach ( $args['options'] as $option => $name ) {
 			if(!is_array($name)) {
@@ -684,7 +717,11 @@ class GFPDF_Settings_API {
 		}
 
 		$html .= '</select>';
-		$html .= '<label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label>';
+		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
+
+		if(isset($args['tooltip'])) {
+			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . $args['tooltip'] . '</span>';
+		}
 
 		echo $html;
 	}
@@ -696,7 +733,7 @@ class GFPDF_Settings_API {
 	 *
 	 * @since 3.8
 	 * @param array $args Arguments passed by the setting
-	 * @global $gfpdfe_data Array of all the EDD Options
+	 * @global $gfpdfe_data Array of all the Gravity PDF Options
 	 * @return void
 	 */
 	public static function color_select_callback( $args ) {
@@ -708,7 +745,7 @@ class GFPDF_Settings_API {
 		else
 			$value = isset( $args['std'] ) ? $args['std'] : '';
 
-		$html = '<select id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']"/>';
+		$html = '<select id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']"/>';
 
 		foreach ( $args['options'] as $option => $color ) :
 			$selected = selected( $option, $value, false );
@@ -716,7 +753,11 @@ class GFPDF_Settings_API {
 		endforeach;
 
 		$html .= '</select>';
-		$html .= '<label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label>';
+		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
+
+		if(isset($args['tooltip'])) {
+			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . $args['tooltip'] . '</span>';
+		}
 
 		echo $html;
 	}
@@ -728,7 +769,7 @@ class GFPDF_Settings_API {
 	 *
 	 * @since 3.8
 	 * @param array $args Arguments passed by the setting
-	 * @global $gfpdfe_data Array of all the EDD Options
+	 * @global $gfpdfe_data Array of all the Gravity PDF Options
 	 * @global $wp_version WordPress Version
 	 */
 	public static function rich_editor_callback( $args ) {
@@ -752,10 +793,14 @@ class GFPDF_Settings_API {
 			wp_editor( stripslashes( $value ), 'gfpdf_settings_' . $args['id'], array( 'textarea_name' => 'gfpdf_settings[' . $args['id'] . ']', 'textarea_rows' => $rows ) );
 			$html = ob_get_clean();
 		} else {
-			$html = '<textarea class="large-text" rows="10" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']">' . esc_textarea( stripslashes( $value ) ) . '</textarea>';
+			$html = '<textarea class="large-text" rows="10" class="gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']">' . esc_textarea( stripslashes( $value ) ) . '</textarea>';
 		}
 
-		$html .= '<br/><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label>';
+		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
+
+		if(isset($args['tooltip'])) {
+			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . $args['tooltip'] . '</span>';
+		}
 
 		echo $html;
 	}
@@ -767,7 +812,7 @@ class GFPDF_Settings_API {
 	 *
 	 * @since 3.8
 	 * @param array $args Arguments passed by the setting
-	 * @global $gfpdfe_data Array of all the EDD Options
+	 * @global $gfpdfe_data Array of all the Gravity PDF Options
 	 * @return void
 	 */
 	public static function upload_callback( $args ) {
@@ -780,9 +825,13 @@ class GFPDF_Settings_API {
 			$value = isset($args['std']) ? $args['std'] : '';
 
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
-		$html = '<input type="text" class="' . $size . '-text" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '"/>';
-		$html .= '<span>&nbsp;<input type="button" class="gfpdf_settings_upload_button button-secondary" value="' . __( 'Upload File', 'edd' ) . '"/></span>';
-		$html .= '<label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label>';
+		$html = '<input type="text" class="' . $size . '-text" class="gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '"/>';
+		$html .= '<span>&nbsp;<input type="button" class="gfpdf_settings_upload_button button-secondary" value="' . __( 'Upload File', 'pdfextended' ) . '"/></span>';
+		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
+
+		if(isset($args['tooltip'])) {
+			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . $args['tooltip'] . '</span>';
+		}
 
 		echo $html;
 	}
@@ -795,7 +844,7 @@ class GFPDF_Settings_API {
 	 *
 	 * @since 3.8
 	 * @param array $args Arguments passed by the setting
-	 * @global $gfpdfe_data Array of all the EDD Options
+	 * @global $gfpdfe_data Array of all the Gravity PDF Options
 	 * @return void
 	 */
 	public static function color_callback( $args ) {
@@ -810,8 +859,12 @@ class GFPDF_Settings_API {
 		$default = isset( $args['std'] ) ? $args['std'] : '';
 
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
-		$html = '<input type="text" class="edd-color-picker" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" data-default-color="' . esc_attr( $default ) . '" />';
-		$html .= '<label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label>';
+		$html = '<input type="text" class="gfpdf-color-picker" class="gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" data-default-color="' . esc_attr( $default ) . '" />';
+		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
+
+		if(isset($args['tooltip'])) {
+			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . $args['tooltip'] . '</span>';
+		}
 
 		echo $html;
 	}

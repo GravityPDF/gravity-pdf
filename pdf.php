@@ -381,7 +381,7 @@ class GFPDF_Core extends PDFGenerator
 		 * Configure the settings page
 		 */
 		  wp_enqueue_style( 'pdfextended-admin-styles', PDF_PLUGIN_URL . 'resources/css/admin-styles.css', array(), '1.3' );		
-		  wp_enqueue_script( 'pdfextended-settings-script', PDF_PLUGIN_URL . 'resources/javascript/admin.min.js', array(), '1.3' );	
+		  wp_enqueue_script( 'pdfextended-settings-script', PDF_PLUGIN_URL . 'resources/javascript/admin.js', array(), '1.3' );	
 
 		  /*
 		   * Localise admin script

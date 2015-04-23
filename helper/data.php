@@ -106,6 +106,8 @@ class GFPDFE_DATA
         $this->template_site_location         = $this->template_location;
         $this->template_save_location         = $this->template_location . 'output/';
         $this->template_font_location         = $this->template_location . 'fonts/';
+
+        $this->admin_url                      = admin_url();
         
         $this->template_location_url          = apply_filters('gfpdfe_template_location_uri', $upload_dir['baseurl'] . '/' . PDF_SAVE_FOLDER . '/', $upload_dir['baseurl'], PDF_SAVE_FOLDER);
         $this->template_site_location_url     = $this->template_location_url;
@@ -127,7 +129,7 @@ class GFPDFE_DATA
             
             $this->template_site_location_url     = $this->template_location_url . $blog_id . '/';
             $this->template_save_location_url     = $this->template_site_location_url . 'output/';
-            $this->template_font_location_url     = $this->template_site_location_url . 'fonts/';   
+            $this->template_font_location_url     = $this->template_site_location_url . 'fonts/';  
             
             $this->old_3_6_template_site_location = $this->template_location . $site_name . '/';
         }    
