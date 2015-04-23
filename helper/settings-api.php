@@ -210,6 +210,14 @@ class GFPDF_Settings_API {
 			/** General Settings */
 			'general' => apply_filters( 'gfpdf_settings_general',
 				array(
+					'pdf_size' => array(
+						'id' => 'pdf_size',
+						'name' => __('Default Paper Size', 'pdfextended'),
+						'desc' => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'pdfextended'),
+						'type' => 'select',
+						'options' => self::get_paper_size(),
+					),
+
 					'test_mode' => array(
 						'id' => 'test_mode',
 						'name' => __( 'Test Mode', 'edd' ),
@@ -287,6 +295,72 @@ class GFPDF_Settings_API {
 		);
 
 		return apply_filters( 'gfpdf_registered_settings', $gfpdf_settings );
+	}
+
+	public static function get_paper_size() {
+		return array(
+			'Common Sizes' => array(
+				'A4'     => __('A4 (210 x 297mm)', 'pdfextended'),
+				'letter' => __('Letter (8.5 x 11in)', 'pdfextended'),
+				'legal'  => __('Legal (8.5 x 14in)', 'pdfextended'),
+				'ledger' => __('Ledger / Tabloid (11 x 17in)', 'pdfextended'),
+				'executive' => __('Executive (7 x 10in)', 'pdfextended'),
+			),
+
+			'"A" Sizes' => array(
+				'A0' => __('A0 (841 x 1189mm)', 'pdfextended'),
+				'A1' => __('A1 (594 x 841mm)', 'pdfextended'),
+				'A2' => __('A2 (420 x 594mm)', 'pdfextended'),
+				'A3' => __('A3 (297 x 420mm)', 'pdfextended'),				
+				'A5' => __('A5 (210 x 297mm)', 'pdfextended'),
+				'A6' => __('A6 (105 x 148mm)', 'pdfextended'),
+				'A7' => __('A7 (74 x 105mm)', 'pdfextended'),
+				'A8' => __('A8 (52 x 74mm)', 'pdfextended'),
+				'A9' => __('A9 (37 x 52mm)', 'pdfextended'),
+				'A10' => __('A10 (26 x 37mm)', 'pdfextended'),
+			),
+
+			'"B" Sizes' => array(
+				'B0' => __('B0 (1414 x 1000mm)', 'pdfextended'),
+				'B1' => __('B1 (1000 x 707mm)', 'pdfextended'),
+				'B2' => __('B2 (707 x 500mm)', 'pdfextended'),
+				'B3' => __('B3 (500 x 353mm)', 'pdfextended'),				
+				'B4' => __('B4 (353 x 250mm)', 'pdfextended'),				
+				'B5' => __('B5 (250 x 176mm)', 'pdfextended'),
+				'B6' => __('B6 (176 x 125mm)', 'pdfextended'),
+				'B7' => __('B7 (125 x 88mm)', 'pdfextended'),
+				'B8' => __('B8 (88 x 62mm)', 'pdfextended'),
+				'B9' => __('B9 (62 x 44mm)', 'pdfextended'),
+				'B10' => __('B10 (44 x 31mm)', 'pdfextended'),
+			),		
+
+			'"C" Sizes' => array(
+				'C0' => __('C0 (1297 x 917mm)', 'pdfextended'),
+				'C1' => __('C1 (917 x 648mm)', 'pdfextended'),
+				'C2' => __('C2 (648 x 458mm)', 'pdfextended'),
+				'C3' => __('C3 (458 x 324mm)', 'pdfextended'),				
+				'C4' => __('C4 (324 x 229mm)', 'pdfextended'),				
+				'C5' => __('C5 (229 x 162mm)', 'pdfextended'),
+				'C6' => __('C6 (162 x 114mm)', 'pdfextended'),
+				'C7' => __('C7 (114 x 81mm)', 'pdfextended'),
+				'C8' => __('C8 (81 x 57mm)', 'pdfextended'),
+				'C9' => __('C9 (57 x 40mm)', 'pdfextended'),
+				'C10' => __('C10 (40 x 28mm)', 'pdfextended'),
+			),		
+			
+			'"RA" and "SRA" Sizes' => array(
+				'RA0' => __('RA0 (860 x 1220mm)', 'pdfextended'),
+				'RA1' => __('RA1 (610 x 860mm)', 'pdfextended'),
+				'RA2' => __('RA2 (430 x 610mm)', 'pdfextended'),
+				'RA3' => __('RA3 (305 x 430mm)', 'pdfextended'),				
+				'RA4' => __('RA4 (215 x 305mm)', 'pdfextended'),				
+				'SRA0' => __('SRA0 (900 x 1280mm)', 'pdfextended'),
+				'SRA1' => __('SRA1 (640 x 900mm)', 'pdfextended'),
+				'SRA2' => __('SRA2 (450 x 640mm)', 'pdfextended'),
+				'SRA3' => __('SRA3 (320 x 450mm)', 'pdfextended'),
+				'SRA4' => __('SRA4 (225 x 320mm)', 'pdfextended'),				
+			),						
+		); 		
 	}
 
 	/**
@@ -589,16 +663,25 @@ class GFPDF_Settings_API {
 			$placeholder = '';
 
 		if ( isset( $args['chosen'] ) )
-			$chosen = 'class="edd-chosen"';
+			$chosen = 'class="gfpdf-chosen"';
 		else
 			$chosen = '';
 
-	    $html = '<select id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" ' . $chosen . 'data-placeholder="' . $placeholder . '" />';
-
-		foreach ( $args['options'] as $option => $name ) :
-			$selected = selected( $option, $value, false );
-			$html .= '<option value="' . $option . '" ' . $selected . '>' . $name . '</option>';
-		endforeach;
+	    $html = '<select id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" ' . $chosen . 'data-placeholder="' . $placeholder . '">';
+	    
+		foreach ( $args['options'] as $option => $name ) {
+			if(!is_array($name)) {
+				$selected = selected( $option, $value, false );
+				$html .= '<option value="' . $option . '" ' . $selected . '>' . $name . '</option>';
+			} else {
+				$html .= '<optgroup label="' . esc_html($option) . '">';
+				foreach($name as $op_value => $op_label) {
+					$selected = selected( $op_value, $value, false );
+					$html .= '<option value="' . $op_value . '" ' . $selected . '>' . $op_label . '</option>';
+				}
+				$html .= '</optgroup>';
+			}
+		}
 
 		$html .= '</select>';
 		$html .= '<label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label>';
