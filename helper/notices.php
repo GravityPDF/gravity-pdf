@@ -419,7 +419,12 @@ class GFPDF_Notices
 
 	public static function add_tooltips($tooltips)
 	{
-		$tooltips['pdf_overwrite'] = sprintf(__('If you reinitialise and enable this option %syou will overwrite%s the default and example template files in your active theme directory.', 'pdfextended'), '<strong>', '</strong>');
+        global $gfpdfe_data;
+
+        $tooltips['pdf_status_wp_memory']     = '<h6>' . __( 'WP Memory Available', 'pdfextended' ) . '</h6>' . sprintf(__( "Producing PDF documents is hard work and Gravity PDF requires more resources than most plugins. We strongly recommend you have at least 128MB, but you may need more.", 'pdfextended' )); 
+        $tooltips['pdf_status_mbstring']      = '<h6>' . __( 'MB String', 'pdfextended' ) . '</h6>' . __( "Gravity PDF requires PHP's MB String extension (with regex capabilities enabled) to correctly produce multilingual documents.", 'pdfextended' );
+        $tooltips['pdf_status_gd_library']    = '<h6>' . __( 'GD Library', 'pdfextended' ) . '</h6>' . __( "Gravity PDF requires PHP's GD Image Processing extension to generate PDFs correctly.", 'pdfextended' );
+        $tooltips['pdf_status_notifications'] = '<h6>' . __( 'PDF Notifications', 'pdfextended' ) . '</h6>' . sprintf(__( 'Sending PDFs automatically via Gravity Form notifications requires write access to our designated output directory: %s.', 'pdfextended' ), "<code>$gfpdfe_data->relative_output_location</code>");		
 
 		return $tooltips;
 	}

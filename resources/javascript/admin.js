@@ -19,7 +19,11 @@
 
 				switch (active) {
 					case 'General':
-						this.do_conditional_general_settings();						
+						this.general_settings();						
+					break;
+
+					case 'Tools':
+						this.tools_settings();
 					break;
 				}
 			}
@@ -40,7 +44,12 @@
 				gform_initialize_tooltips();
 			}
 
-			this.do_conditional_general_settings = function() {				
+			/**
+			 * The general settings model method 
+			 * This sets up and processes any of the JS that needs to be applied on the general settings tab 
+			 * @since 3.8
+			 */
+			this.general_settings = function() {				
 				var $table             = $('#pdf-general-security');
 				var $adminRestrictions = $table.find('input[name="gfpdf_settings[limit_to_admin]"]');
 				var $userRestrictions  = $table.find('input[name="gfpdf_settings[limit_to_user]"]');
@@ -51,13 +60,14 @@
 				$adminRestrictions.change(function() {					
 					if($(this).val() === 'Yes') {
 						/* hide user restrictions and logged out user timeout */
-						$table.find('tr:nth-child(2)').hide();
-						$table.find('tr:nth-child(3)').hide();
+						$table.find('tr:nth-child(2)').fadeOut();
+						$table.find('tr:nth-child(3)').fadeOut();
 					} else {
 						/* hide user restrictions and logged out user timeout */
-						$table.find('tr:nth-child(2)').show();
-						if($userRestrictions.val() !== 'Yes') {
-							$table.find('tr:nth-child(3)').show();
+						$table.find('tr:nth-child(2)').fadeIn();
+
+						if($userRestrictions.parent().find(':checked').val() !== 'Yes') {
+							$table.find('tr:nth-child(3)').fadeIn();
 						}
 					}
 				});
@@ -68,12 +78,52 @@
 				$userRestrictions.change(function() {
 					if($(this).val() === 'Yes') {
 						/* hide user restrictions and logged out user timeout */
-						$table.find('tr:nth-child(3)').hide();
+						$table.find('tr:nth-child(3)').fadeOut();
 					} else {
 						/* hide user restrictions and logged out user timeout */
-						$table.find('tr:nth-child(3)').show();
+						$table.find('tr:nth-child(3)').fadeIn();
 					}
 				});
+			}
+
+			/**
+			 * The tools settings model method 
+			 * This sets up and processes any of the JS that needs to be applied on the tools settings tab 
+			 * @since 3.8
+			 */
+			this.tools_settings = function() {
+				var $reinstall = $('#gfpdf_settings\\[reinstall\\]'); /* escape braces */
+				var $dialog    = $( "#reinstall-confirm" );
+
+				$reinstall.click(function() {
+					var link = this;
+
+					$dialog.wpdialog({
+				      resizable: false,
+				      draggable: false,
+				      width: 350,
+				      height:200,
+				      modal: true,
+					  dialogClass: 'wp-dialog',
+					  zIndex: 300000,		      
+				      buttons: [{
+				      	text: GFPDF.tools_reinstall_confirm,
+				      	click: function() {
+				      		/* do redirect */
+				      		window.location = link.href;
+				      	}
+				      },
+				      {
+				      	text: GFPDF.tools_reinstall_cancel,
+				      	click: function() {
+				      		/* cancel */
+				      		$dialog.wpdialog( "close" );	
+				      	}				      				       
+				      }]
+				    });	
+
+				    return false;			
+				});		    
 			}
 
 			this.get_tooltip = function(html) {

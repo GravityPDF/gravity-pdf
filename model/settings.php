@@ -41,9 +41,7 @@ class GFPDF_Settings_Model extends GFPDF_Settings
          /*
          * Let's check if the web server is going to be compatible
          */
-         $this->check_compatibility();
-
-         add_filter('gform_tooltips', array($this, 'add_tooltips'));
+         $this->check_compatibility();        
      }
 
      /**
@@ -90,21 +88,6 @@ class GFPDF_Settings_Model extends GFPDF_Settings
              * @since 3.8
              */
             $this->navigation = apply_filters('pdf_extended_settings_navigation', $this->navigation);                        
-     }
-
-     /**
-      * [add_tooltips description]
-      * @param [type] $tips [description]
-      */
-     public function add_tooltips($tips) {
-        global $gfpdfe_data;
-
-        $tips['pdf_status_wp_memory']     = '<h6>' . __( 'WP Memory Available', 'pdfextended' ) . '</h6>' . sprintf(__( "Producing PDF documents is hard work and Gravity PDF requires more resources than most plugins. We strongly recommend you have at least 128MB, but you may need more. %sFind our how to change this limit%s.", 'pdfextended' ), '<a href="#">', '</a>'); /* TODO - UPDATE LINK - see http://docs.woothemes.com/document/increasing-the-wordpress-memory-limit/ for example */
-        $tips['pdf_status_mbstring']      = '<h6>' . __( 'MB String', 'pdfextended' ) . '</h6>' . __( "Gravity PDF requires PHP's MB String extension (with regex capabilities enabled) to correctly produce multilingual documents.", 'pdfextended' );
-        $tips['pdf_status_gd_library']    = '<h6>' . __( 'GD Library', 'pdfextended' ) . '</h6>' . __( "Gravity PDF requires PHP's GD Image Processing extension to generate PDFs correctly.", 'pdfextended' );
-        $tips['pdf_status_notifications'] = '<h6>' . __( 'PDF Notifications', 'pdfextended' ) . '</h6>' . sprintf(__( 'Sending PDFs automatically via Gravity Form notifications requires write access to our designated output directory: %s.', 'pdfextended' ), "<code>$gfpdfe_data->relative_output_location</code>");
-
-        return $tips;
      }
 
     public function check_compatibility()

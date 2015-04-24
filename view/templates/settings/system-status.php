@@ -72,7 +72,7 @@
                 <?php if($gfpdfe_data->ram_compatible === false): ?>
                 
                 <span class="gf_settings_description">
-                    <?php echo sprintf(__('We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. The minimum system requirement is 64MB. %sContact your web hosting provider to make this change.', 'pdfextended'), '<br />'); ?>
+                    <?php echo sprintf(__('We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. The minimum system requirement is 64MB. %sFind out how to change this limit%s.', 'pdfextended'), '<br /><a href="#">', '</a>'); /* TODO - UPDATE LINK - see http://docs.woothemes.com/document/increasing-the-wordpress-memory-limit/ for example */ ?>
                 </span>
                 <?php endif; ?>                            
             </td>

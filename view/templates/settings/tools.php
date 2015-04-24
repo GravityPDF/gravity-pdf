@@ -24,3 +24,7 @@
 
 	<?php submit_button(); ?>
 </form>
+
+<div id="reinstall-confirm" title="<?php _e('Confirm Reinstall', 'pdfextended'); ?>" style="display: none;">
+  <?php printf(__('During the reinstall process the PDF templates that ship with the software will be overridden. If you have modified them you should %stake a backup%s before beginning.', 'pdfextended'), '<strong>', '</strong>'); ?>
+</div>
