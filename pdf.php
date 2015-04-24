@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Gravity PDF
  * Plugin URI: https://gravitypdf.com
- * Description: Gravity PDF allows you to save/view/download a PDF from the front- and back-end, and automate PDF creation on form submission. Our Business Plus package also allows you to overlay field onto an existing PDF.
+ * Description: Gravity PDF allows you to save/view/download a PDF from the front- and back-end, and automate PDF creation on form submission.
  * Version: 3.8
  * Author: Blue Liquid Designs
  * Author URI: http://www.blueliquiddesigns.com.au
@@ -403,9 +403,54 @@ class GFPDF_Core extends PDFGenerator
 		  * Register our settings 
 		  */ 	  
 		 GFPDF_Settings_API::register_settings();
+
+		 /*
+		  * Add hooks / filters for admin area 
+		  */
+		 add_filter( 'plugin_action_links_' . GF_PDF_EXTENDED_PLUGIN_BASENAME, array( __CLASS__, 'add_plugin_action_links' ) );
+		 add_filter( 'plugin_row_meta', array( __CLASS__, 'plugin_row_meta' ), 10, 2 );
 		  
 	}
 	
+	/**
+	 * Show action links on the plugin screen.
+	 *
+	 * @param	mixed $links Plugin Action links
+	 * @return	array
+	 * @since  3.8
+	 */
+	public static function add_plugin_action_links( $links ) {
+		global $gfpdfe_data;
+
+		$action_links = array(
+			'configure' => '<a href="' . $gfpdfe_data->settings_url . '" title="' . esc_attr( __( 'View Gravity PDF Settings', 'pdfextended' ) ) . '">' . __( 'Configure', 'pdfextended' ) . '</a>',			
+			'docs' => '<a href="https://developer.gravitypdf.com/documentation/" title="' . esc_attr( __( 'View Gravity PDF Documentation', 'pdfextended' ) ) . '">' . __( 'Docs', 'pdfextended' ) . '</a>',			
+			'support' => '<a href="https://support.gravitypdf.com/" title="' . esc_attr( __( 'Get Help with Gravity PDF', 'pdfextended' ) ) . '">' . __( 'Support', 'pdfextended' ) . '</a>',
+		);
+
+		return array_merge( $action_links, $links );
+	}
+
+	/**
+	 * Show row meta on the plugin screen.
+	 *
+	 * @param	mixed $links Plugin Row Meta
+	 * @param	mixed $file  Plugin Base file
+	 * @return	array
+	 * @since  3.8
+	 */
+	public static function plugin_row_meta( $links, $file ) {
+		if ( $file == GF_PDF_EXTENDED_PLUGIN_BASENAME ) {
+			$row_meta = array(
+				'review'    => '<a href="https://wordpress.org/support/view/plugin-reviews/gravity-forms-pdf-extended" title="' . esc_attr( __( 'Tell the world what you think of Gravity PDF', 'gravitypdf' ) ) . '">' . __( 'Write a Review', 'pdfextended' ) . '</a>',				
+			);
+
+			return array_merge( $links, $row_meta );
+		}
+
+		return (array) $links;
+	}
+
 	/*
 	 * Register our scripts with Gravity Forms so they aren't removed when no conflict mode is active
 	 */
@@ -432,7 +477,7 @@ class GFPDF_Core extends PDFGenerator
 /*
  * array_replace_recursive was added in PHP5.3
  * Add fallback support for those with a version lower than this
- * as Wordpress still supports PHP5.0 to PHP5.2
+ * as Wordpress still supports PHP5.2
  */
 if (!function_exists('array_replace_recursive'))
 {

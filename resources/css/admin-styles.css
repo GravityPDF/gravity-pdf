@@ -63,10 +63,7 @@ display: inline-block;
 clear: left;
 }
 
-#pdf-system-status span.details.path, #support-request span.details.path {
-  padding: 2px;
-  background: #f2f2f2;
-}
+
 
 #support-request input, #support-request select {
  width: 20em;	
@@ -154,11 +151,23 @@ div.notice p {
     padding: 2px;
 }
 
-#pdf-system-status .fa-check-circle, #pdf-system-status .fa-exclamation-triangle, .fa-times-circle {
+
+
+
+
+
+
+
+
+
+/**
+ * System status icons 
+ */
+#pdf-system-status .fa-check-circle, #pdf-system-status .fa-exclamation-triangle, #pdf-system-status .fa-times-circle {
  font-size: 17px; 
  margin-left: 5px;
  vertical-align: bottom;
- margin-bottom: -2px;
+ margin-top: -2px;
 }
 
 .fa-check-circle {
@@ -173,21 +182,7 @@ div.notice p {
  color: #d10b0b;  
 }
 
-#pdf-system-status label, label.inline-label {
-  float: left;
-  width: 15em;  
-}
 
-#pdf-system-status strong {
- display: inline-block;
- float: left; 
- padding-left: 15px;
- line-height: 27px;
-}  
-
-#initialisation label {
-  line-height: 26px;
-}
 
 
 
@@ -248,6 +243,44 @@ div.notice p {
   }    
 
 }
+
+
+/**
+ * Settings Pages 
+ */
+
+table.gfpdfe_table thead th {
+  font-weight: bold;
+}
+
+table.gfpdfe_table tr:nth-child(2n) td, table.gfpdfe_table tr:nth-child(2n) th {
+    background: none repeat scroll 0 0 #fcfcfc;
+}
+
+table.gfpdfe_table tbody th:first-child {
+  width: 33%;
+}
+
+#tab_PDF p.submit {
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+#pdf-system-status th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+#pdf-system-status td {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+#tab_PDF span.path, #tab_PDF span.details.path {
+  padding: 2px;
+  background: #f2f2f2;
+}
+
 
 
 /**

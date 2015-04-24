@@ -86,13 +86,12 @@ class settingsView
                                 <?php include $page['template']; ?>
                             </div>
                         <?php
-                        do_action('pdf-settings-' . $page['id']);
-                    }				            
-				?>                           
-                 
+                        
+                    }		
+
+                    do_action('pdf-settings-' . $page['id']); ?>				                             
             </div>
         
         <?php
-		
 	}
 }

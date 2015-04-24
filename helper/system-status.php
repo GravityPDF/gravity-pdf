@@ -283,12 +283,19 @@ class GFPDF_System_Status
          return false;
      }
 
+     /**
+      * [display_general_status description]
+      * @return [type] [description]
+      */
+    public function display_site_status() {
+      echo $this->get_system_status_html();
+    }
+
     /**
      * [get_system_status_html description]
-     * @param  boolean $strip_html [description]
      * @return [type]  [description]
      */
-    public function get_system_status_html($strip_html = false)
+    public function get_system_status_html()
     {
         global $gfpdfe_data;
 
@@ -297,11 +304,7 @@ class GFPDF_System_Status
         $content = ob_get_contents();
         ob_end_clean();
 
-        if ($strip_html) {
-            return wp_strip_all_tags($content, true);
-        } else {
-            return esc_html($content);
-        }
+        return $content;
     }
 
     /**

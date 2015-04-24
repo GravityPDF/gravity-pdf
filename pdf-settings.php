@@ -53,6 +53,13 @@ class GFPDF_Settings
 			 */ 
 			 RGForms::add_settings_page('PDF', array(self::$model, 'gfpdf_settings_page'));
 				 
+
+			/**
+			 * Assign our settings actions / filters 
+			 */
+			$status = new GFPDF_System_Status();
+			add_action('pdf-settings-general', array($status, 'display_site_status'));
+			add_action('pdf-settings-tools', array($status, 'display_site_status'));
 		}			
 	}
 	

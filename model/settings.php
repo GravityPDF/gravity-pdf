@@ -42,6 +42,8 @@ class GFPDF_Settings_Model extends GFPDF_Settings
          * Let's check if the web server is going to be compatible
          */
          $this->check_compatibility();
+
+         add_filter('gform_tooltips', array($this, 'add_tooltips'));
      }
 
      /**
@@ -70,9 +72,9 @@ class GFPDF_Settings_Model extends GFPDF_Settings
                 ),
 
                 120 => array(
-                    'name' => __('Support', 'pdfextended'),
-                    'id' => 'support',
-                    'template' => PDF_PLUGIN_DIR.'view/templates/settings/support.php' ,
+                    'name' => __('Help', 'pdfextended'),
+                    'id' => 'help',
+                    'template' => PDF_PLUGIN_DIR.'view/templates/settings/help.php' ,
                 ),
 
                 150 => array(
@@ -90,32 +92,20 @@ class GFPDF_Settings_Model extends GFPDF_Settings
             $this->navigation = apply_filters('pdf_extended_settings_navigation', $this->navigation);                        
      }
 
+     /**
+      * [add_tooltips description]
+      * @param [type] $tips [description]
+      */
+     public function add_tooltips($tips) {
+        global $gfpdfe_data;
 
+        $tips['pdf_status_wp_memory']     = '<h6>' . __( 'WP Memory Available', 'pdfextended' ) . '</h6>' . sprintf(__( "Producing PDF documents is hard work and Gravity PDF requires more resources than most plugins. We strongly recommend you have at least 128MB, but you may need more. %sFind our how to change this limit%s.", 'pdfextended' ), '<a href="#">', '</a>'); /* TODO - UPDATE LINK - see http://docs.woothemes.com/document/increasing-the-wordpress-memory-limit/ for example */
+        $tips['pdf_status_mbstring']      = '<h6>' . __( 'MB String', 'pdfextended' ) . '</h6>' . __( "Gravity PDF requires PHP's MB String extension (with regex capabilities enabled) to correctly produce multilingual documents.", 'pdfextended' );
+        $tips['pdf_status_gd_library']    = '<h6>' . __( 'GD Library', 'pdfextended' ) . '</h6>' . __( "Gravity PDF requires PHP's GD Image Processing extension to generate PDFs correctly.", 'pdfextended' );
+        $tips['pdf_status_notifications'] = '<h6>' . __( 'PDF Notifications', 'pdfextended' ) . '</h6>' . sprintf(__( 'Sending PDFs automatically via Gravity Form notifications requires write access to our designated output directory: %s.', 'pdfextended' ), "<code>$gfpdfe_data->relative_output_location</code>");
 
-	/**
-	 * Text Callback
-	 *
-	 * Renders text fields.
-	 *
-	 * @since 1.0
-	 * @param array $args Arguments passed by the setting
-	 * @global $edd_options Array of all the EDD Options
-	 * @return void
-	 */
-	public static function edd_text_callback( $args ) {
-		global $edd_options;
-
-		if ( isset( $edd_options[ $args['id'] ] ) )
-			$value = $edd_options[ $args['id'] ];
-		else
-			$value = isset( $args['std'] ) ? $args['std'] : '';
-
-		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
-		$html = '<input type="text" class="' . $size . '-text" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '"/>';
-		$html .= '<label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label>';
-
-		echo $html;
-	}   
+        return $tips;
+     }
 
     public function check_compatibility()
     {
@@ -157,108 +147,9 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 		*/
         $status = new GFPDF_System_Status();
 
-        $gfpdfe_data->active_plugins           = $status->get_active_plugins();
-        $gfpdfe_data->system_status            = $status->get_system_status_html(false);
+        $gfpdfe_data->active_plugins           = $status->get_active_plugins();        
         $gfpdfe_data->configuration_file       = $status->get_configuration_file();
 
         new settingsView($this);
-    }
-
-
-
-    /*
-     * Handle the AJAX Support Request
-     */
-    public static function gfpdf_support_request()
-    {
-        /*
-         * Check the Nonce to make sure it is a valid request
-         */
-         $nonce = $_POST['nonce'];
-
-        if (! wp_verify_nonce($nonce, 'pdf_settings_nonce')) {
-            print json_encode(array('error' => array('msg' => __('There was a problem with your submission. Please reload the page and try again', 'pdfextended')) ));
-            exit;
-        }
-
-         /*
-          * AJAX Automatically adding slashes so remove them
-          */
-         $email = stripslashes($_POST['email']);
-        $countType = stripslashes($_POST['supportType']);
-        $comments = stripslashes($_POST['comments']);
-
-        $error = array();
-         /*
-          * Check that email, support type and comments are valid
-          */
-          if (! is_email($email)) {
-              $error['email'] = __('Please enter a valid email address', 'pdfextended');
-          }
-
-        $valid_support_types = array(__('Problem', 'pdfextended'), __('Question', 'pdfextended'), __('Suggestion', 'pdfextended'));
-
-        if (in_array($countType, $valid_support_types) === false) {
-            $error['supportType'] = __('Please select a valid support type.', 'pdfextended');
-        }
-
-        if (strlen($comments) == 0) {
-            $error['comments'] = __('Please enter information about your support query so we can aid you more easily.', 'pdfextended');
-        }
-
-        if (sizeof($error) > 0) {
-            $error['msg'] = __('There is a problem with your support request. Please correct the marked issues above.', 'pdfextended');
-            print json_encode(array('error' => $error));
-            exit;
-        }
-
-          /*
-           * Do our POST request to the Gravity PDF API
-           */
-           self::send_support_request($email, $countType, $comments);
-
-        print json_encode(array('msg' => __('Thank you for your support request. We\'ll respond to your request in the next 24-48 hours.', 'pdfextended')));
-        exit;
-    }
-
-    public static function send_support_request($email, $countType, $comments)
-    {
-        global $gfpdfe_data;
-
-         /*
-          * Build our support request array
-          */
-        $status = new GFPDF_System_Status();
-
-		$active_plugins = $status->get_active_plugins();
-		$system_status  = $status->get_system_status_html(true);
-		$configuration  = $status->get_configuration_file();
-		$website        = site_url('/');
-		$comments       = stripslashes($comments);
-		
-		$configuration  = htmlspecialchars_decode($configuration, ENT_QUOTES);
-		
-		$subject        = $countType.': Automated Ticket for "'.get_bloginfo('name').'"';
-		$to             = 'support@gravitypdf.com';
-		$from           = $email;
-		$message        = "Support Type: $countType\r\n\r\nWebsite: $website\r\n\r\n----------------\r\n\r\n$comments\r\n\r\n----------------\r\n\r\n$system_status\r\n\r\n\r\nActive Plugins\r\n\r\n$active_plugins\r\n\r\n\r\n**Configuration**\r\n\r\n$configuration";
-
-        $headers[] = 'From: '.$email;
-
-        if (wp_mail($to, $subject, $message, $headers) === false) {
-            /*
-                 * Error
-                 */
-                 print json_encode(array('error' => array('msg' => $api->response_message )));
-            exit;
-        } else {
-            print json_encode(array('msg' => __('Support request received. We will responed in 24 to 48 hours.', 'pdfextended')));
-            exit;
-        }
-
-         /*
-          * Create our
-          */
-         exit;
     }
 }
