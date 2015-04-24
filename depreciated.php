@@ -41,3 +41,9 @@ define('PDF_SAVE_LOCATION', $gfpdfe_data->template_save_location);
 define('PDF_FONT_LOCATION', $gfpdfe_data->template_font_location); 
 define('PDF_TEMPLATE_LOCATION', $gfpdfe_data->template_site_location); 
 define('PDF_TEMPLATE_URL_LOCATION', $gfpdfe_data->template_site_location_url); 
+
+/**
+ * Moved to $gfpdfe_data class 
+ * @since 3.8
+ */
+define('PDF_SETTINGS_URL', $gfpdfe_data->settings_url); 

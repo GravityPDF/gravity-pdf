@@ -32,7 +32,7 @@
   $deactivate_nonce = wp_create_nonce('gfpdfe_deactivate_license'); 
 
   if (sizeof($addons) > 0): ?>
-    <form method="post" action="<?php echo PDF_SETTINGS_URL; ?>&amp;tab=<?php echo PDF_Common::get('tab'); ?>">
+    <form method="post" action="<?php echo $gfpdfe_data->settings_url; ?>&amp;tab=<?php echo PDF_Common::get('tab'); ?>">
         <?php wp_nonce_field('gfpdfe_license_nonce', 'gfpdfe_license_nonce_field'); ?>
         <?php foreach ($addons as $addon): ?>
 
@@ -57,7 +57,7 @@
                   <span class="expires">
                       <?php echo sprintf(__('Your license expires on %s.', 'pdfextended'), date('F j, Y', strtotime($addon['license_expires']))); ?> <?php echo $renew; ?>
                   </span>
-<span class="deactivate"><a href="<?php echo PDF_SETTINGS_URL; ?>&amp;tab=<?php echo PDF_Common::get('tab'); ?>&amp;deactivate=<?php echo $addon['id']; ?>&amp;nonce=<?php echo $deactivate_nonce; ?>"><?php _e('Deactivate License', 'pdfextended'); ?></a></span>
+<span class="deactivate"><a href="<?php echo $gfpdfe_data->settings_url; ?>&amp;tab=<?php echo PDF_Common::get('tab'); ?>&amp;deactivate=<?php echo $addon['id']; ?>&amp;nonce=<?php echo $deactivate_nonce; ?>"><?php _e('Deactivate License', 'pdfextended'); ?></a></span>
 
                 <?php elseif (strlen($addon['license_status']) > 0 && $addon['license_status'] != 'deactivated'): ?>
                     <i class="fa fa-times gf_keystatus_invalid"></i>

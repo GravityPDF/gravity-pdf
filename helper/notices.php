@@ -81,7 +81,7 @@ class GFPDF_Notices
 		global $gfpdfe_data;
 		if($gfpdfe_data->automated === true && !rgpost('upgrade') && !rgpost('font-initialise'))
 		{
-			return sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>');
+			return sprintf(__(' %sGo to installer%s.', 'pdfextended'), '<a href="'. $gfpdfe_data->settings_url .'">', '</a>');
 		}
 		return '';
 	}
@@ -136,6 +136,8 @@ class GFPDF_Notices
 	 */
 	public static function gf_pdf_problem_detected()
 	{
+		global $gfpdfe_data;
+
 		if( !rgpost('update') )
 		{
 			if(rgget("page") == 'gf_settings' && rgget('subview') == 'PDF')
@@ -144,7 +146,7 @@ class GFPDF_Notices
 			}
 			else
 			{	
-				$msg =  sprintf(__('Gravity PDF detected a configuration problem. Please go to the %splugin\'s settings page%s to reinitialise.', 'pdfextended'), '<a href="'.PDF_SETTINGS_URL.'">', '</a>');	
+				$msg =  sprintf(__('Gravity PDF detected a configuration problem. Please go to the %splugin\'s settings page%s to reinitialise.', 'pdfextended'), '<a href="'. $gfpdfe_data->settings_url .'">', '</a>');	
 			}
 
 			self::error($msg);
@@ -157,6 +159,8 @@ class GFPDF_Notices
 	 */
 	public static function gf_pdf_server_problem_detected()
 	{
+		global $gfpdfe_data;
+
 		if( !rgpost('update') )
 		{
 			if(rgget("page") == 'gf_settings' && rgget('subview') == 'PDF')
@@ -165,7 +169,7 @@ class GFPDF_Notices
 			}
 			else
 			{	
-				$msg =  sprintf(__('Gravity PDF detected a server compatibility problem which prevented the software from running. Please go to the %splugin\'s settings page%s to view the issue.', 'pdfextended'), '<a href="'.PDF_SETTINGS_URL.'">', '</a>');	
+				$msg =  sprintf(__('Gravity PDF detected a server compatibility problem which prevented the software from running. Please go to the %splugin\'s settings page%s to view the issue.', 'pdfextended'), '<a href="'. $gfpdfe_data->settings_url .'">', '</a>');	
 			}
 
 			self::error($msg);
@@ -177,6 +181,8 @@ class GFPDF_Notices
 	 */
 	public static function gf_pdf_not_deployed_fresh()
 	{		
+		global $gfpdfe_data;
+
 		if( !rgpost('update') )
 		{
 			if(rgget("page") == 'gf_settings' && rgget('subview') == 'PDF')
@@ -185,7 +191,7 @@ class GFPDF_Notices
 			}
 			else
 			{
-				$msg =  sprintf(__('Welcome to Gravity PDF. Before you can use the plugin correctly you need to initilise it. Please go to the %splugin\'s settings page%s to initialise.', 'pdfextended'), '<a href="'.PDF_SETTINGS_URL.'">', '</a>');
+				$msg =  sprintf(__('Welcome to Gravity PDF. Before you can use the plugin correctly you need to initilise it. Please go to the %splugin\'s settings page%s to initialise.', 'pdfextended'), '<a href="'. $gfpdfe_data->settings_url .'">', '</a>');
 			}
 
 			self::notice($msg);
@@ -264,6 +270,8 @@ class GFPDF_Notices
 	 */
 	public static function do_template_switch_notice()
 	{		
+		global $gfpdfe_data;
+		
 		/*
 		 * Check we aren't in the middle of doing the sync
 		 */
@@ -272,7 +280,7 @@ class GFPDF_Notices
 			return; 
 		 } 
 			
-		$msg = sprintf(__('Gravity PDF directory structure has been changed. %sMigrate Now%s %sUnsure what this means?%s', 'pdfextended'), '<a href="'. wp_nonce_url(PDF_SETTINGS_URL, 'gfpdfe_migrate') . '" class="button">', '</a>', '<a href="https://developer.gravitypdf.com/news/migrating-template-directory-means/">', '</a>' );
+		$msg = sprintf(__('Gravity PDF directory structure has been changed. %sMigrate Now%s %sUnsure what this means?%s', 'pdfextended'), '<a href="'. wp_nonce_url($gfpdfe_data->settings_url, 'gfpdfe_migrate') . '" class="button">', '</a>', '<a href="https://developer.gravitypdf.com/news/migrating-template-directory-means/">', '</a>' );
 
 		self::notice($msg);
 					 
@@ -304,7 +312,7 @@ class GFPDF_Notices
 
 		if($gfpdfe_data->fresh_install === true)
 		{
-			$msg .= ' ' . sprintf( __('%sLearn how to configuring the plugin%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>');
+			$msg .= ' ' . sprintf( __('%sLearn how to configuring the plugin%s.', 'pdfextended'), '<a href="'. $gfpdfe_data->settings_url .'">', '</a>');
 		}
 		self::notice($msg);				
 	}	
@@ -316,7 +324,7 @@ class GFPDF_Notices
 
 		if($gfpdfe_data->fresh_install === true)
 		{
-			$msg .= ' ' . sprintf( __('%sLearn how to configuring the plugin%s.', 'pdfextended'), '<a href="'. PDF_SETTINGS_URL .'">', '</a>');
+			$msg .= ' ' . sprintf( __('%sLearn how to configuring the plugin%s.', 'pdfextended'), '<a href="'. $gfpdfe_data->settings_url .'">', '</a>');
 		}
 		self::notice($msg);				
 	}
@@ -337,7 +345,7 @@ class GFPDF_Notices
 			foreach($errors as $site)
 			{
 				switch_to_blog( (int) $site['blog_id'] );
-				$url = str_replace($base_site_url, site_url(), PDF_SETTINGS_URL );
+				$url = str_replace($base_site_url, site_url(), $gfpdfe_data->settings_url );
 				$msg .= "<li><a href='$url'>{$site['domain']}{$site['path']}</a></li>";
 				restore_current_blog();
 			}
@@ -369,7 +377,7 @@ class GFPDF_Notices
 			foreach($errors as $site)
 			{
 				switch_to_blog( (int) $site['blog_id'] );
-				$url = str_replace($base_site_url, site_url(), PDF_SETTINGS_URL );
+				$url = str_replace($base_site_url, site_url(), $gfpdfe_data->settings_url );
 				$msg .= "<li><a href='$url'>{$site['domain']}{$site['path']}</a></li>";
 				restore_current_blog();
 			}

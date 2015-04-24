@@ -57,7 +57,7 @@ class settingsView
                 <?php                 
                 foreach($this->model->navigation as $id => $page): ?>
                     <?php $active = ($page['id'] == $tab) ? 'nav-tab-active' : '' ?>
-                    <a href="<?php echo PDF_SETTINGS_URL; ?>&amp;tab=<?php echo $page['id']; ?>" class="nav-tab <?php echo $active; ?>"><?php _e($page['name'], 'pdfextended'); ?></a>      
+                    <a href="<?php echo $gfpdfe_data->settings_url; ?>&amp;tab=<?php echo $page['id']; ?>" class="nav-tab <?php echo $active; ?>"><?php _e($page['name'], 'pdfextended'); ?></a>      
                 <?php                     
                 endforeach; ?>
             </h2> 

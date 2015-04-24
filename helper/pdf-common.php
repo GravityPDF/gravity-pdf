@@ -183,8 +183,9 @@ class PDF_Common
 	 */
 	public static function initialise_WP_filesystem_API($post, $nonce)
 	{
+		global $gfpdfe_data;
 
-		$url = wp_nonce_url(PDF_SETTINGS_URL, $nonce);	
+		$url = wp_nonce_url($gfpdfe_data->settings_url, $nonce);	
 		
 		if (false === ($creds = request_filesystem_credentials($url, '', false, false, $post) ) ) {
 			/* 

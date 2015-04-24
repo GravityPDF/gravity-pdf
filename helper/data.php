@@ -107,7 +107,7 @@ class GFPDFE_DATA
         $this->template_save_location         = $this->template_location . 'output/';
         $this->template_font_location         = $this->template_location . 'fonts/';
 
-        $this->admin_url                      = admin_url();
+        $this->settings_url                   = admin_url('admin.php?page=gf_settings&subview=PDF'); 
         
         $this->template_location_url          = apply_filters('gfpdfe_template_location_uri', $upload_dir['baseurl'] . '/' . PDF_SAVE_FOLDER . '/', $upload_dir['baseurl'], PDF_SAVE_FOLDER);
         $this->template_site_location_url     = $this->template_location_url;

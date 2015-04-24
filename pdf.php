@@ -48,7 +48,6 @@ define('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION', '5');
   
 define('PDF_PLUGIN_DIR', plugin_dir_path( __FILE__ ));  
 define('PDF_PLUGIN_URL', plugin_dir_url( __FILE__ )); 
-define("PDF_SETTINGS_URL", site_url() .'/wp-admin/admin.php?page=gf_settings&subview=PDF'); 
 define('PDF_SAVE_FOLDER', 'PDF_EXTENDED_TEMPLATES'); 
 define('GF_PDF_EXTENDED_PLUGIN_BASENAME', plugin_basename(__FILE__)); 
 
