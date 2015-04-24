@@ -382,7 +382,8 @@ class GFPDF_Core extends PDFGenerator
 		  wp_enqueue_style( 'pdfextended-admin-styles', PDF_PLUGIN_URL . 'resources/css/admin-styles.css', array(), '1.3' );		
 		  wp_enqueue_style (  'wp-jquery-ui-dialog' );
 
-		  wp_enqueue_script( 'pdfextended-settings-script', PDF_PLUGIN_URL . 'resources/javascript/admin.js', array('wpdialogs'), '1.3' );	
+		  wp_enqueue_script( 'pdfextended-autofocus-shim', PDF_PLUGIN_URL . 'resources/javascript/autofocus-polyfill.js', array('jquery'), '1.3' );	
+		  wp_enqueue_script( 'pdfextended-settings-script', PDF_PLUGIN_URL . 'resources/javascript/admin.js', array('pdfextended-autofocus-shim', 'wpdialogs'), '1.3' );	
 
 		  /*
 		   * Localise admin script

@@ -60,6 +60,8 @@ class GFPDF_Settings
 			$status = new GFPDF_System_Status();
 			add_action('pdf-settings-general', array($status, 'display_site_status'));
 			add_action('pdf-settings-tools', array($status, 'display_site_status'));
+
+			add_action('current_screen', array('GFPDF_Settings_Model', 'add_meta_boxes'));
 		}			
 	}
 	

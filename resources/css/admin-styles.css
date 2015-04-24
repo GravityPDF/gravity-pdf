@@ -5,131 +5,6 @@
 margin-top: 20px;	
 }
 
-#pdfextended-settings ol, #pdfextended-settings ul {
-margin-left: 25px;	
-}
-#pdfextended-settings ul > li {
-list-style: disc;	
-}
-
-#pdfextended-settings ol > li {
-list-style: decimal;	
-}
-
-#pdfextended-settings ol li > ul, #pdfextended-settings ul li > ul {
-margin: 5px 0 0 20px;
-}
-
-#pdfextended-settings ul ul > li {
-	list-style: circle;
-}
-
-#pdfextended-settings ol ul > li {
-list-style: disc;	
-}
-
-#gform_tab_group #icon-gf_edit_forms {
-display: none;	
-}
-
-.detailed_pdf {
- clear: left;
- margin-bottom: 3px;	
-}
-
-.detailed_pdf span {
-display: block;
-padding: 2px 0 2px 2px;
-}
-
- #support-request label  {
-	display: block;
-	font-weight: bold; 	
- }
-
-#pdf-system-status {
-  overflow: hidden;
-}
-
-#pdf-system-status p {
-  clear: left;
-}
-
-#pdf-system-status span.details, #support-request span.details  {
-font-size: 95%;
-color: #444;	
-margin-top: 7px;
-display: inline-block;
-clear: left;
-}
-
-
-
-#support-request input, #support-request select {
- width: 20em;	
-}
-
-#support-request input[type="submit"] {
-width: auto;	
-}
-
-#support-request textarea {
- width: 65%;
- height: 150px;	
-}
-
-#support-request input, #support-request textarea {
-padding: 5px 4px;	
-}
-
-#support-request #support-request-button {
-padding: 0 8px;	
-}
-
-#support-request .gfspinner {
-  vertical-align: middle;
-  margin-left: 5px;
-}
-
-#support-request textarea {
-	border: 1px solid #999;
-	color: #444;
-}
-
-#support-request :disabled, #support-request textarea:disabled {
-color: #CCC;
-border: 1px solid #CCC;
-}
-
-#support-request input.error, #support-request textarea.error, #support-request select.error {
- color: #d10b0b;
- border: 1px solid #d10b0b;	
-}
-
-#support-request .fa-times-circle {
-vertical-align: middle;	
-}
-
-.icon-spinner {
-font-size: 18px;
-margin-left: 5px;	
-}
-
-#support-request span.msg {
-  margin-left: 5px;
-  color:  #008000;	
-}
-
-#support-request span.error {
-   margin-left: 5px;	
-   color: #d10b0b;
-}
-
-#pdfextended-settings #changelog h3 {
-margin-top: 20px;	
-}
-
-
 #pdfextended-settings div.notice, .pdf-notice {
     margin: 5px 15px 2px;
     padding: 0 0.6em;
@@ -145,12 +20,6 @@ margin-top: 20px;
     margin: 5px 0 15px;
 	padding: 1px 12px;
 }
-
-div.notice p {
-    margin: 0.5em 0;
-    padding: 2px;
-}
-
 
 
 
@@ -170,78 +39,16 @@ div.notice p {
  margin-top: -2px;
 }
 
-.fa-check-circle {
+#pdf-system-status .fa-check-circle {
  color: #008000;
 }
 
-.fa-exclamation-triangle {
+#pdf-system-status .fa-exclamation-triangle {
  color: #ff8a00;
 }
 
-.fa-times-circle {
+#pdf-system-status .fa-times-circle {
  color: #d10b0b;  
-}
-
-
-
-
-
-
-/* Add media queries */
-@media only screen and (min-width: 1000px) {
-
-  #pdfextended-settings .leftcolumn {
-    width: 65%;
-    float: left;
-  }
-
-  #pdfextended-settings .rightcolumn {
-    margin-left: 70%;
-  }
-
-  #pdf-system-status label, label.inline-label {
-    float: none;
-    width: auto;  
-  }
-
-  #pdf-system-status strong {   
-   display: inline;
-   float: none; 
-   vertical-align: middle;
-  }   
-
-  [class^="icon-"], [class*=" icon-"] {
-    vertical-align: middle;
-  }
-
-  #license label {
-    float: left;
-    width: 20%;
-  }  
-
-  #license span.container {
-    float: left;
-    width: 80%;
-  }  
-}
-
-
-@media only screen and (min-width: 1250px) {
-  #pdf-system-status label, label.inline-label {
-    float: left;
-    width: 15em;  
-  }
-
-  #pdf-system-status strong {
-   /*text-align: center;*/
-   display: inline-block;
-   float: left; 
-  }  
-
-  #support-request span.details.tabbed {
-   margin-left: 16em; 
-  }    
-
 }
 
 
@@ -281,6 +88,72 @@ table.gfpdfe_table tbody th:first-child {
   background: #f2f2f2;
 }
 
+/*
+ * Help and Support Settings 
+ */
+#tab_PDF .metabox-holder h3 {
+  font-size: 14px;
+}
+
+#tab_PDF .postbox-container .postbox {
+  margin: 0 8px 20px 0;
+}
+
+#tab_PDF .postbox .hndle, #tab_PDF .widget .widget-top {
+  cursor: default;
+}
+
+#tab_PDF .postbox .handlediv {
+  display: none;
+}
+
+#tab_PDF .about-wrap, #tab_PDF .about-wrap .about-text {
+  max-width: none;
+  min-height: auto;
+}
+
+#tab_PDF .about-wrap h1, #tab_PDF .about-wrap .about-text, #tab_PDF .about-wrap #search-knowledgebase {
+  text-align: center;
+  margin-right: 0;
+}
+
+#tab_PDF .about-wrap h1 {
+  margin-top: 40px;
+}
+
+#tab_PDF .about-wrap #search-knowledgebase input {
+    font-family: 'FontAwesome', 'Open Sans', sans-serif;
+    font-size: 22px;
+    margin: 10px 0 0;
+    padding: 16px 20px;
+    line-height: 25px;
+    width: 100%;
+}
+
+#tab_PDF #search-results {
+  text-align: left;
+  margin: 0 auto;
+  width: 100%;
+}
+
+#tab_PDF #dashboard_primary .rss-widget ul li {
+  padding-bottom: 8px;
+  border-bottom: 1px solid #EEE;
+}
+
+#tab_PDF #dashboard_primary .rss-widget ul li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+#tab_PDF #dashboard_primary .rss-widget:last-child {
+  padding-bottom: 16px;
+}
+
+#tab_PDF .spinner.is-active {
+  visibility: visible;
+  margin: 0;
+}
 
 
 /**
@@ -330,4 +203,38 @@ table.gfpdfe_table tbody th:first-child {
 
 #license span.container {
   display: block;
+}
+
+
+@media only screen and (min-width: 765px) {
+
+}
+
+
+
+/* Add media queries */
+@media only screen and (min-width: 1000px) {
+
+
+  #license label {
+    float: left;
+    width: 20%;
+  }  
+
+  #license span.container {
+    float: left;
+    width: 80%;
+  }  
+}
+
+
+@media only screen and (min-width: 1400px) {
+  #tab_PDF .about-wrap h1, #tab_PDF .about-wrap .about-text, #tab_PDF .about-wrap #search-knowledgebase {
+    margin-right: 200px;
+  }  
+
+  #tab_PDF .about-wrap #search-knowledgebase input,
+  #tab_PDF #search-results {
+      width: 70%;
+  }  
 }

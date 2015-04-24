@@ -41,7 +41,7 @@ class GFPDF_Settings_Model extends GFPDF_Settings
          /*
          * Let's check if the web server is going to be compatible
          */
-         $this->check_compatibility();        
+         $this->check_compatibility();  
      }
 
      /**
@@ -135,4 +135,96 @@ class GFPDF_Settings_Model extends GFPDF_Settings
 
         new settingsView($this);
     }
+
+    /**
+     * [add_meta_boxes description]
+     * @since  3.8
+     */
+    public static function add_meta_boxes() {
+        $id = 'pdf_knowledgebase';
+        add_meta_box( 
+            $id,
+            __( 'Documentation' ),
+            array('GFPDF_Settings_Model', 'add_meta_' . $id),
+            'pdf-help-and-support',
+            'column-1',
+            'high'
+        );
+
+        $id = 'pdf_support_forum';
+        add_meta_box( 
+            $id,
+            __( 'Support Forum' ),
+            array('GFPDF_Settings_Model', 'add_meta_' . $id),
+            'pdf-help-and-support',
+            'column-2',
+            'high'            
+        );
+
+        $id = 'pdf_direct';
+        add_meta_box( 
+            $id,
+            __( 'Contact Us' ),
+            array('GFPDF_Settings_Model', 'add_meta_' . $id),
+            'pdf-help-and-support',
+            'column-3',
+            'high'            
+        );   
+
+
+        $id = 'pdf_support_hours';
+        add_meta_box( 
+            $id,
+            __( 'Support Hours' ),
+            array('GFPDF_Settings_Model', 'add_meta_' . $id),
+            'pdf-help-and-support',
+            'column-4',
+            'high'            
+        ); 
+
+
+        /* Second columns */
+        $id = 'pdf_recent_forum_articles';
+        add_meta_box( 
+            $id,
+            __( 'Recent Forum Activity' ),
+            array('GFPDF_Settings_Model', 'add_meta_' . $id),
+            'pdf-help-and-support',
+            'column-3'      
+        );        
+
+        $id = 'pdf_popular_articles';
+        add_meta_box( 
+            $id,
+            __( 'Popular Articles' ),
+            array('GFPDF_Settings_Model', 'add_meta_' . $id),
+            'pdf-help-and-support',
+            'column-2'
+        );          
+
+    }
+
+    public static function add_meta_pdf_knowledgebase($object) {       
+        echo 'running';
+    }
+
+    public static function add_meta_pdf_support_forum($object) {       
+        echo 'running';
+    }
+
+    public static function add_meta_pdf_direct($object) {       
+        echo 'running';
+    }    
+
+    public static function add_meta_pdf_popular_articles($object) {       
+        echo 'running';
+    }
+
+    public static function add_meta_pdf_recent_forum_articles($object) {       
+        echo 'running';
+    }
+
+    public static function add_meta_pdf_support_hours($object) {       
+        echo 'running';
+    }           
 }
