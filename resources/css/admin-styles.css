@@ -103,18 +103,24 @@ table.gfpdfe_table tbody th:first-child {
   cursor: default;
 }
 
-#tab_PDF .postbox .handlediv {
+#tab_PDF .postbox .handlediv,
+#tab_PDF #row-1-sortables .postbox h3,
+#tab_PDF #pdf_support_hours h3 {
   display: none;
 }
 
 #tab_PDF .about-wrap, #tab_PDF .about-wrap .about-text {
   max-width: none;
-  min-height: auto;
+  min-height: 0;
 }
 
 #tab_PDF .about-wrap h1, #tab_PDF .about-wrap .about-text, #tab_PDF .about-wrap #search-knowledgebase {
   text-align: center;
   margin-right: 0;
+}
+
+#tab_PDF .postbox .inside {
+  margin-bottom: 0;
 }
 
 #tab_PDF .about-wrap h1 {
@@ -136,6 +142,24 @@ table.gfpdfe_table tbody th:first-child {
   width: 100%;
 }
 
+#search-results .postbox, #search-results .postbox .inside {
+  display: none;
+}
+
+#search-results .postbox h3 {
+  margin-bottom: 0;
+}
+
+#search-results .postbox.is-active h3 {
+  margin-bottom: 8px;
+}
+
+
+
+/**
+ * Help Page 
+ */
+
 #tab_PDF #dashboard_primary .rss-widget ul li {
   padding-bottom: 8px;
   border-bottom: 1px solid #EEE;
@@ -146,15 +170,65 @@ table.gfpdfe_table tbody th:first-child {
   padding-bottom: 0;
 }
 
-#tab_PDF #dashboard_primary .rss-widget:last-child {
+/*#tab_PDF #dashboard_primary .rss-widget:last-child {
   padding-bottom: 16px;
-}
+}*/
 
 #tab_PDF .spinner.is-active {
   visibility: visible;
   margin: 0;
 }
 
+#tab_PDF .help-container {
+  margin: 0 auto;  
+}
+
+#tab_PDF .help-container .postbox {  
+  width: 100%;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box; 
+  min-height: 250px;    
+}
+
+#tab_PDF #row-1-sortables .postbox, #tab_PDF #pdf_support_hours {
+  text-align: center;
+  padding: 15px;
+}
+
+#pdf_knowledgebase i {
+  color: #e74c3c;
+}
+
+#pdf_support_forum i {
+  color: #0f6ca0;
+}
+
+#pdf_direct i {
+  color: #1f1f1f;
+}
+
+#pdf_support_hours i {
+  color: #54a208;
+}
+
+#tab_PDF #row-1-sortables h4, #tab_PDF #pdf_support_hours h4 {
+  font-size: 18px;
+  line-height: 24px;
+  margin: 16px 0;
+}
+
+#tab_PDF .help-container {
+  clear: both;
+}
+
+#tab_PDF #row-2-sortables .rsswidget {
+  font-size: 13px;
+}
+
+#tab_PDF #row-2-sortables li {
+  list-style: inside disc;
+}
 
 /**
  * License page 
@@ -206,8 +280,23 @@ table.gfpdfe_table tbody th:first-child {
 }
 
 
-@media only screen and (min-width: 765px) {
+@media only screen and (min-width: 900px) {
 
+  #tab_PDF .help-container .postbox { 
+    width: 32.66%;
+    float: left;
+    margin-left: 0.5%;
+    margin-right: 0.5%;
+    min-width: 0;
+  }
+
+  #tab_PDF .help-container .postbox:first-child {
+    margin-left: 0;
+  }
+
+  #tab_PDF .help-container .postbox:last-child {
+    margin-right: 0;
+  }
 }
 
 
@@ -229,12 +318,13 @@ table.gfpdfe_table tbody th:first-child {
 
 
 @media only screen and (min-width: 1400px) {
-  #tab_PDF .about-wrap h1, #tab_PDF .about-wrap .about-text, #tab_PDF .about-wrap #search-knowledgebase {
+  #tab_PDF .about-wrap h1, #tab_PDF .about-wrap .about-text, #tab_PDF .about-wrap #search-knowledgebase,
+  #tab_PDF  #support-wrapper {
     margin-right: 200px;
   }  
 
   #tab_PDF .about-wrap #search-knowledgebase input,
-  #tab_PDF #search-results {
-      width: 70%;
+  #tab_PDF #search-results, #tab_PDF .help-container{
+      width: 75%;
   }  
 }

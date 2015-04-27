@@ -147,8 +147,7 @@ class GFPDF_Settings_Model extends GFPDF_Settings
             __( 'Documentation' ),
             array('GFPDF_Settings_Model', 'add_meta_' . $id),
             'pdf-help-and-support',
-            'column-1',
-            'high'
+            'row-1'
         );
 
         $id = 'pdf_support_forum';
@@ -157,8 +156,7 @@ class GFPDF_Settings_Model extends GFPDF_Settings
             __( 'Support Forum' ),
             array('GFPDF_Settings_Model', 'add_meta_' . $id),
             'pdf-help-and-support',
-            'column-2',
-            'high'            
+            'row-1'           
         );
 
         $id = 'pdf_direct';
@@ -167,10 +165,27 @@ class GFPDF_Settings_Model extends GFPDF_Settings
             __( 'Contact Us' ),
             array('GFPDF_Settings_Model', 'add_meta_' . $id),
             'pdf-help-and-support',
-            'column-3',
-            'high'            
+            'row-1'           
         );   
 
+        /* Second columns */
+        $id = 'pdf_popular_articles';
+        add_meta_box( 
+            $id,
+            __( 'Popular Articles' ),
+            array('GFPDF_Settings_Model', 'add_meta_' . $id),
+            'pdf-help-and-support',
+            'row-2'
+        );  
+
+        $id = 'pdf_recent_forum_articles';
+        add_meta_box( 
+            $id,
+            __( 'Recent Forum Activity' ),
+            array('GFPDF_Settings_Model', 'add_meta_' . $id),
+            'pdf-help-and-support',
+            'row-2'      
+        );         
 
         $id = 'pdf_support_hours';
         add_meta_box( 
@@ -178,53 +193,98 @@ class GFPDF_Settings_Model extends GFPDF_Settings
             __( 'Support Hours' ),
             array('GFPDF_Settings_Model', 'add_meta_' . $id),
             'pdf-help-and-support',
-            'column-4',
-            'high'            
-        ); 
-
-
-        /* Second columns */
-        $id = 'pdf_recent_forum_articles';
-        add_meta_box( 
-            $id,
-            __( 'Recent Forum Activity' ),
-            array('GFPDF_Settings_Model', 'add_meta_' . $id),
-            'pdf-help-and-support',
-            'column-3'      
-        );        
-
-        $id = 'pdf_popular_articles';
-        add_meta_box( 
-            $id,
-            __( 'Popular Articles' ),
-            array('GFPDF_Settings_Model', 'add_meta_' . $id),
-            'pdf-help-and-support',
-            'column-2'
-        );          
+            'row-2'         
+        );                
 
     }
 
     public static function add_meta_pdf_knowledgebase($object) {       
-        echo 'running';
+        ?>
+            <i class="fa fa-file-text-o fa-5x"></i>
+            <h4><a href="https://developer.gravitypdf.com/documentation/"><?php _e('Knowledge Base', 'pdfextended'); ?></a></h4>
+            <p><?php _e('Gravity PDF has extensive online documentation to help you get started.', 'pdfextended'); ?></p>
+        <?php
     }
 
     public static function add_meta_pdf_support_forum($object) {       
-        echo 'running';
+        ?>
+            <i class="fa fa-comments-o fa-5x"></i>
+            <h4><a href="https://support.gravitypdf.com/"><?php _e('Support Forum', 'pdfextended'); ?></a></h4>
+            <p><?php _e('Our community support forum is a great resource if you have a problem.', 'pdfextended'); ?></p>
+        <?php
     }
 
     public static function add_meta_pdf_direct($object) {       
-        echo 'running';
+        ?>
+            <i class="fa fa-envelope-o fa-5x"></i>
+            <h4><a href="https://developer.gravitypdf.com/contact/"><?php _e('Contact Us', 'pdfextended'); ?></a></h4>
+            <p><?php _e('You can also get in touch with Gravity PDF staff directly via email or phone.', 'pdfextended'); ?></p>
+        <?php
     }    
 
     public static function add_meta_pdf_popular_articles($object) {       
-        echo 'running';
+        ?>
+            <ul>
+                <li>
+                  <a href="https://wordpress.org/news/2015/04/powell/" class="rsswidget">WordPress 4.2 “Powell”</a>                  
+                </li>
+                <li>
+                  <a href="https://wordpress.org/news/2015/04/powell/" class="rsswidget">WordPress 4.2 “Powell”</a> 
+                </li>
+
+                <li>
+                  <a href="https://wordpress.org/news/2015/04/powell/" class="rsswidget">WordPress 4.2 “Powell”</a>                 
+                </li>
+
+                <li>
+                  <a href="https://wordpress.org/news/2015/04/powell/" class="rsswidget">WordPress 4.2 “Powell”</a>                  
+                </li>                                                  
+
+                <li>
+                  <a href="https://wordpress.org/news/2015/04/powell/" class="rsswidget">WordPress 4.2 “Powell”</a>                  
+                </li>   
+
+                <li>
+                  <a href="https://wordpress.org/news/2015/04/powell/" class="rsswidget">WordPress 4.2 “Powell”</a>                 
+                </li>                                   
+            </ul> 
+        <?php
     }
 
     public static function add_meta_pdf_recent_forum_articles($object) {       
-        echo 'running';
+        ?>
+            <ul>
+                <li>
+                  <a href="https://wordpress.org/news/2015/04/powell/" class="rsswidget">WordPress 4.2 “Powell”</a> <span class="rss-date">April 23, 2015</span>                 
+                </li>
+                <li>
+                  <a href="https://wordpress.org/news/2015/04/powell/" class="rsswidget">WordPress 4.2 “Powell”</a> <span class="rss-date">April 23, 2015</span>                 
+                </li>
+
+                <li>
+                  <a href="https://wordpress.org/news/2015/04/powell/" class="rsswidget">WordPress 4.2 “Powell”</a> <span class="rss-date">April 23, 2015</span>                 
+                </li>
+
+                <li>
+                  <a href="https://wordpress.org/news/2015/04/powell/" class="rsswidget">WordPress 4.2 “Powell”</a> <span class="rss-date">April 23, 2015</span>                 
+                </li>    
+
+                <li>
+                  <a href="https://wordpress.org/news/2015/04/powell/" class="rsswidget">WordPress 4.2 “Powell”</a> <span class="rss-date">April 23, 2015</span>                 
+                </li>   
+
+                <li>
+                  <a href="https://wordpress.org/news/2015/04/powell/" class="rsswidget">WordPress 4.2 “Powell”</a> <span class="rss-date">April 23, 2015</span>                 
+                </li>                                                                                 
+            </ul> 
+        <?php
     }
 
     public static function add_meta_pdf_support_hours($object) {       
-        echo 'running';
+        ?>
+            <i class="fa fa-clock-o fa-5x"></i>
+            <h4><?php _e('Support Hours', 'pdfextended'); ?></h4>
+            <p><?php printf(__("Gravity PDF's support hours are from 9:00am-5:00pm Monday to Friday, %sSydney Australia time%s.", 'pdfextended'), '<a href="http://www.timeanddate.com/worldclock/australia/sydney">', '</a>'); ?></p>
+        <?php
     }           
 }

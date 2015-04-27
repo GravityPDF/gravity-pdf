@@ -382,8 +382,7 @@ class GFPDF_Core extends PDFGenerator
 		  wp_enqueue_style( 'pdfextended-admin-styles', PDF_PLUGIN_URL . 'resources/css/admin-styles.css', array(), '1.3' );		
 		  wp_enqueue_style (  'wp-jquery-ui-dialog' );
 
-		  wp_enqueue_script( 'pdfextended-autofocus-shim', PDF_PLUGIN_URL . 'resources/javascript/autofocus-polyfill.js', array('jquery'), '1.3' );	
-		  wp_enqueue_script( 'pdfextended-settings-script', PDF_PLUGIN_URL . 'resources/javascript/admin.js', array('pdfextended-autofocus-shim', 'wpdialogs'), '1.3' );	
+		  wp_enqueue_script( 'pdfextended-settings-script', PDF_PLUGIN_URL . 'resources/javascript/admin.js', array('wpdialogs', 'backbone', 'underscore', 'jquery-ui-tooltip'), '1.3' );	
 
 		  /*
 		   * Localise admin script
@@ -391,7 +390,8 @@ class GFPDF_Core extends PDFGenerator
 		  $localise_script = array(
 		  	'GFbaseUrl' => GFCommon::get_base_url(),
             'tools_reinstall_confirm' => __('Confirm Reinstall', 'pdfextended'),
-            'tools_reinstall_cancel'  => __('Cancel', 'pdfextended'),		  	
+            'tools_reinstall_cancel'  => __('Cancel', 'pdfextended'),	
+            'help_search_placeholder' => __('Search the Gravity PDF Knowledgebase...', 'pdfextended'),	  	
 		  );
 
 		  wp_localize_script( 'pdfextended-settings-script', 'GFPDF', $localise_script );
