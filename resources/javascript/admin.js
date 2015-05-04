@@ -3,49 +3,56 @@
     // Initializers
     //--------------   
 
-(function($, Backbone, _) {	
+(function($) {	
 	$(function() {
-	    var help = {}; // create namespace for our app
-	    var app = {};
 
-	    help.SearchModel = Backbone.Model.extend({});
+		/**
+		 * Write our backbone model/view/controller for the help API
+		 */	
+		var help = {}; // create namespace for our app
+		var app = {};
 
-	    help.SearchCollection = Backbone.Collection.extend({
-	    	model: help.SearchModel,
+		help.SearchModel = Backbone.Model.extend({});
 
-	    	initialize: function(models, options) {
-	    		this.url = options.url;
-	    	},
+		help.SearchCollection = Backbone.Collection.extend({
+			model: help.SearchModel,
 
-	    	parse: function(response) {
-	    		return response.topic_list.topics;
-	    	}
-	    });
+			initialize: function(models, options) {
+				this.url = options.url;
+			},
 
-	    help.ContainerView = Backbone.View.extend({
-	    	el: '#search-knowledgebase',
+		});
 
-	    	events: {
-	    		'keyup #search-help-input' : 'doSearch', 
-	    		'change #search-help-input' : 'doSearch', 
-	    	},
+		help.SearchCollectionForum = help.SearchCollection.extend({
+			parse: function(response) {
+				return response.topic_list.topics;
+			}
+		}),
 
-	    	initialize: function() {
-	    		/* initialise our timer */
-	    		this.timer = true;
+		help.ContainerView = Backbone.View.extend({
+			el: '#search-knowledgebase',
 
-	    		/* render the container view */
-	    		this.render();
-	    	},
+			events: {
+				'keyup #search-help-input' : 'doSearch', 
+				'change #search-help-input' : 'doSearch', 
+			},
 
-	    	render: function() {
-	    		this.addSearchBar();
+			initialize: function() {
+				/* initialise our timer */
+				this.timer = true;
+
+				/* render the container view */
+				this.render();
+			},
+
+			render: function() {
+				this.addSearchBar();
 				 		
-	    		return this;
-	    	},
+				return this;
+			},
 
-	    	addSearchBar: function() {
-	    		/* create our search element */
+			addSearchBar: function() {
+				/* create our search element */
 				var $input = $('<input>').attr('type', 'text')
 						  			     .attr('placeholder', '  ' + GFPDF.help_search_placeholder)
 						  			     .attr('id', 'search-help-input');					  			     						  			     
@@ -61,10 +68,10 @@
 
 				/* give our search box focus */
 				$input.focus();	    		
-	    	},
+			},
 
-	    	doSearch: function(ev) {
-	    		var $search = $(ev.currentTarget);
+			doSearch: function(ev) {
+				var $search = $(ev.currentTarget);
 
 				/* clear any previous events */
 				window.clearTimeout(this.timer);				
@@ -85,57 +92,37 @@
 				} else if(value.length <= 3 && ev.keyCode == 13) {
 					$search.tooltip( 'enable' ).tooltip( 'open' );
 				}
-	    	},
-
-	    	processSearch: function(search) {
-	    		/* Initialise our Collection and pull the data from our source */
-	    		console.log('doing search');
-
-	    		/* start our forum search */
-	    		new help.ForumView({
-	    			s: search,
-	    		})
-	    	},
-
-
-
-	    });
-
-		help.ForumView = Backbone.View.extend({
-
-			el: '#forum-api',
-
-			template: _.template($('#GravityPDFSearchResults').html()),			
-
-			initialize: function(options) {
-				this.url = 'https://support.gravitypdf.com/';
-				this.s   = options.s;
-				this.render();
 			},
 
-			render: function() {	    		
-				/* show the loading spinner */			
-				this.showSpinner();				
+			processSearch: function(search) {
+				/* Initialise our Collection and pull the data from our source */
+				console.log('doing search');
 
-				/* set up view search params */
-				var s   = encodeURIComponent(this.s);
-				var url = this.url + 'search.json?search=' + s + '&q=' + s;
+				/* start our forum search */
+				new help.ForumView({
+					s: search,
+				});
 
-	    		/* initialise our collection */
-	    		this.collection = new help.SearchCollection([], {
-	    			url: url,	    			
-	    		});
-
-	    		/* do our search */
-	    		this.collection.fetch({
-	    			success: _.bind(this.renderSearch, this),
-	    			error: _.bind(this.renderSearchError),
-	    		});				
-
-	    		return this;
+				new help.DocsView({
+					s: search,
+				})
 			},
 
-	    	renderSearch: function(collection, response) {
+
+
+		});
+
+		help.MainView = Backbone.View.extend({
+
+			callAPI: function(url) {
+				/* do our search */
+				this.collection.fetch({
+					success: _.bind(this.renderSearch, this),
+					error: _.bind(this.renderSearchError),
+				});							
+			},
+
+			renderSearch: function(collection, response) {
 				console.log('rendering search');
 
 				this.hideSpinner();
@@ -152,13 +139,13 @@
 					$wrapper.slideDown(500);
 				}				
 
-	    	},
+			},
 
-	    	renderSearchError: function(collection, response) {
-	    		console.log('search failed');
-	    		console.log(collection);
-	    		console.log(response);
-	    	},
+			renderSearchError: function(collection, response) {
+				console.log('search failed');
+				console.log(collection);
+				console.log(response);
+			},
 
 
 			showSpinner: function() {
@@ -174,6 +161,74 @@
 			},	    	
 		});
 
+		help.DocsView = help.MainView.extend({
+			el: '#documentation-api',					
+
+			template: '#GravityPDFSearchResultsDocumentation',
+
+			initialize: function(options) {
+				this.url = 'https://developer.gfpdfestage.info/wp-json/posts/?type=docs';
+				this.s   = options.s;
+				this.render();
+			},
+
+			render: function() {	    
+				/* set up out template */
+				this.template = _.template($(this.template).html());
+
+				/* show the loading spinner */			
+				this.showSpinner();				
+
+				/* set up view search params */
+				var s   = encodeURIComponent(this.s);
+				var url = this.url + '&s=' + s;
+
+				/* initialise our collection */
+				this.collection = new help.SearchCollection([], {
+					url: url,	    			
+				});
+
+				/* ping api for results */
+				this.callAPI(url);
+
+				return this;
+			},
+		});
+
+		help.ForumView = help.MainView.extend({
+			el: '#forum-api',	
+
+			template: '#GravityPDFSearchResultsForum',		
+
+			initialize: function(options) {
+				this.url = 'https://support.gravitypdf.com/';
+				this.s   = options.s;
+				this.render();
+			},
+
+			render: function() {	    
+				/* set up out template */
+				this.template = _.template($(this.template).html());
+
+				/* show the loading spinner */			
+				this.showSpinner();				
+
+				/* set up view search params */
+				var s   = encodeURIComponent(this.s);
+				var url = this.url + 'search.json?search=' + s + '&q=' + s;
+				
+				/* initialise our collection */
+				this.collection = new help.SearchCollectionForum([], {
+					url: url,	    			
+				});				
+
+				/* ping api for results */
+				this.callAPI(url);
+
+				return this;
+			},
+		});
+
 		/**
 		 * Create a new underscore function to process iso date 
 		 */
@@ -181,10 +236,14 @@
 		    var d = new Date(date); // You could just pass in a regular timestamp here too
 		    return d.toLocaleDateString();
 		};
+		
+
+
 
 		/**
-		 * Write our backbone model/view/controller for the help API
-		 */	
+		 * Our Admin controller 
+		 * Applies correct JS to settings pages 
+		 */
 		function GravityPDF () {
 			var self = this;
 
@@ -322,6 +381,9 @@
 			 * @since 3.8
 			 */
 			this.help_settings = function() {
+				/**
+				 * Load our settings dependancy 
+				 */
 				new help.ContainerView();
 			}
 
@@ -347,6 +409,7 @@
 		}	
 
 		var pdf = new GravityPDF();
-		pdf.init();					    
+		pdf.init();	
+
 	});		
-})(jQuery, Backbone, _);
+})(jQuery);

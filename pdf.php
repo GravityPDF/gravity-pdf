@@ -376,44 +376,47 @@ class GFPDF_Core extends PDFGenerator
 	 */
 	public static function gfe_admin_init()
 	{													
-		/* 
-		 * Configure the settings page
-		 */
-		  wp_enqueue_style( 'pdfextended-admin-styles', PDF_PLUGIN_URL . 'resources/css/admin-styles.css', array(), '1.3' );		
-		  wp_enqueue_style (  'wp-jquery-ui-dialog' );
+	   /* 
+		* Configure the settings page
+		*/
+		wp_enqueue_style( 'pdfextended-admin-styles', PDF_PLUGIN_URL . 'resources/css/admin-styles.css', array(), '1.3' );		
+		wp_enqueue_style (  'wp-jquery-ui-dialog' );
 
-		  wp_enqueue_script( 'pdfextended-settings-script', PDF_PLUGIN_URL . 'resources/javascript/admin.js', array('wpdialogs', 'backbone', 'underscore', 'jquery-ui-tooltip'), '1.3' );	
+		if(PDF_Common::get('page') == 'gf_settings' && PDF_Common::get('subview') == 'PDF') {
+		  	wp_enqueue_script( 'pdfextended-settings-script', PDF_PLUGIN_URL . 'resources/javascript/admin.js', array('wpdialogs', 'backbone', 'underscore', 'jquery-ui-tooltip'), '1.3' );			  
 
-		  /*
-		   * Localise admin script
-		   */
-		  $localise_script = array(
-		  	'GFbaseUrl' => GFCommon::get_base_url(),
-            'tools_reinstall_confirm' => __('Confirm Reinstall', 'pdfextended'),
-            'tools_reinstall_cancel'  => __('Cancel', 'pdfextended'),	
-            'help_search_placeholder' => __('Search the Gravity PDF Knowledgebase...', 'pdfextended'),	  	
-		  );
+			  /*
+			   * Localise admin script
+			   */
+			  $localise_script = array(
+					'GFbaseUrl'               => GFCommon::get_base_url(),
+					'pluginUrl'               => PDF_PLUGIN_URL,
+					'tools_reinstall_confirm' => __('Confirm Reinstall', 'pdfextended'),
+					'tools_reinstall_cancel'  => __('Cancel', 'pdfextended'),	
+					'help_search_placeholder' => __('Search the Gravity PDF Knowledgebase...', 'pdfextended'),	  	
+			  );
 
-		  wp_localize_script( 'pdfextended-settings-script', 'GFPDF', $localise_script );
+			  wp_localize_script( 'pdfextended-settings-script', 'GFPDF', $localise_script );
 		 
-		 /*
-		  * Register our scripts/styles with Gravity Forms to prevent them being removed in no conflict mode
-		  */
-		  add_filter('gform_noconflict_scripts', array('GFPDF_Core', 'register_gravityform_scripts')); 
-		  add_filter('gform_noconflict_styles', array('GFPDF_Core', 'register_gravityform_styles')); 
+			 /*
+			  * Register our scripts/styles with Gravity Forms to prevent them being removed in no conflict mode
+			  */
+			  add_filter('gform_noconflict_scripts', array('GFPDF_Core', 'register_gravityform_scripts')); 
+			  add_filter('gform_noconflict_styles', array('GFPDF_Core', 'register_gravityform_styles')); 
 
-		  add_filter('gform_tooltips', array('GFPDF_Notices', 'add_tooltips'));	 
+			  add_filter('gform_tooltips', array('GFPDF_Notices', 'add_tooltips'));	 
 
-		 /*
-		  * Register our settings 
-		  */ 	  
-		 GFPDF_Settings_API::register_settings();
+			 /*
+			  * Register our settings 
+			  */ 	  
+			 GFPDF_Settings_API::register_settings();
+		}
 
-		 /*
-		  * Add hooks / filters for admin area 
-		  */
-		 add_filter( 'plugin_action_links_' . GF_PDF_EXTENDED_PLUGIN_BASENAME, array( __CLASS__, 'add_plugin_action_links' ) );
-		 add_filter( 'plugin_row_meta', array( __CLASS__, 'plugin_row_meta' ), 10, 2 );
+	   /*
+		* Add hooks / filters for admin area 
+		*/
+		add_filter( 'plugin_action_links_' . GF_PDF_EXTENDED_PLUGIN_BASENAME, array( __CLASS__, 'add_plugin_action_links' ) );
+		add_filter( 'plugin_row_meta', array( __CLASS__, 'plugin_row_meta' ), 10, 2 );
 		  
 	}
 	
