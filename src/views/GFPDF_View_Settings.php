@@ -62,11 +62,11 @@ class GFPDF_View_Settings extends GFPDF_Helper_View
         $this->data = $data;
     }
 
-    /**
-     * Load the Update Welcome Page
+   /**
+     * Load the General Settings Tab
      * @since 4.0
      */
-    public function generalSettings()
+    public function general()
     {
         /*
          * Set up any variables we need for the view and display 
@@ -79,5 +79,97 @@ class GFPDF_View_Settings extends GFPDF_Helper_View
 
         /* load the about page view */        
         $this->load('general', $vars);
+    }
+
+   /**
+     * Load the Tools Tab
+     * @since 4.0
+     */
+    public function tools()
+    {
+        /*
+         * Set up any variables we need for the view and display 
+         */
+        $vars = array(
+
+        ); 
+
+        $vars = array_merge($vars, $this->data);
+
+        /* load the about page view */        
+        $this->load('tools', $vars);
+    }    
+
+   /**
+     * Load the Help Tab
+     * @since 4.0
+     */
+    public function help()
+    {
+        /*
+         * Set up any variables we need for the view and display 
+         */
+        $vars = array(
+
+        ); 
+
+        $vars = array_merge($vars, $this->data);
+
+        /* load the about page view */        
+        $this->load('help', $vars);
+    }
+
+    /**
+     * Load the Welcome Tab tabs
+     * @since 4.0
+     */
+    public function tabs() {
+        global $gfpdf;
+
+        /*
+         * Set up any variables we need for the view and display 
+         */        
+        $vars = array(
+            'selected' => isset( $_GET['tab'] ) ? $_GET['tab'] : 'general',
+            'tabs'     => $this->get_avaliable_tabs(),
+            'data'     => $gfpdf->data,
+        );
+
+        /* load the tabs view */
+        $this->load('tabs', $vars);
+    }
+
+    /**
+     * Set up our settings navigation 
+     * @return array The navigation array 
+     */
+    public function get_avaliable_tabs() {
+            /**
+             * Store the setting navigation
+             * The array key is the settings order
+             * @var array
+             */
+            $navigation = array(
+                5 => array(
+                    'name'     => __('General', 'pdfextended'),
+                    'id'       => 'general',                    
+                ),
+
+                100 => array(
+                    'name'     => __('Tools', 'pdfextended'),
+                    'id'       => 'tools',                    
+                ),
+
+                120 => array(
+                    'name' => __('Help', 'pdfextended'),
+                    'id' => 'help',                    
+                ),
+            );
+
+            /**
+             * Allow additional navigation to be added to the settings page
+             * @since 3.8
+             */
+            return apply_filters('pdf_extended_settings_navigation', $navigation);                      
     }
 }

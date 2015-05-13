@@ -154,7 +154,7 @@ class GFPDF_Helper_Data {
         }
 
         /* assign our settings */
-        //$this->settings = GFPDF_Settings_API::get_settings(); /* TODO */
+        $this->settings = GFPDF_Static_Options_API::get_settings();         
     }
 
     /**

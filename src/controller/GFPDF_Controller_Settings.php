@@ -65,6 +65,9 @@ class GFPDF_Controller_Settings extends GFPDF_Helper_Controller
          * Tell Gravity Forms to initiate our settings page
          * Using the following Class/Model
          */ 
-         //RGForms::add_settings_page('PDF', array(self::$model, 'gfpdf_settings_page'));                
+         RGForms::add_settings_page('PDF', array($this->model, 'displayPage'));            
+
+        /* Load our settings meta boxes */
+        add_action('current_screen', array($this->model, 'add_meta_boxes'));            
     }
 }
