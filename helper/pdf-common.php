@@ -146,6 +146,11 @@ class PDF_Common
 	public static function do_mergetags($string, $form_id, $lead_id)
 	{		
 		/*
+		 * Add custom filters to process mergetag results further 
+		 */
+		add_filter('gform_merge_tag_filter', array(__CLASS__, 'process_paragraph_mergetag'), 10, 5); /* ensure paragraph mergetags in PDF template automatically nl2br */		
+
+		/*
 		 * Unconvert { and } symbols from HTML entities 
 		 */
 		$string = str_replace('&#123;', '{', $string);		
@@ -160,7 +165,27 @@ class PDF_Common
 		$form = RGFormsModel::get_form_meta($form_id);
 		$lead = RGFormsModel::get_lead($lead_id);	
 
-		return trim(GFCommon::replace_variables($string, $form, $lead, false, false, false));		
+		$results = trim(GFCommon::replace_variables($string, $form, $lead, false, false, false));		
+
+		/*
+		 * Remove custom filters to prevent any conflict with Gravity Forms 
+		 */
+		remove_filter('gform_merge_tag_filter', array(__CLASS__, 'process_paragraph_mergetag'));	
+
+		/*
+		 * Return results 
+		 */	
+		return $results;
+
+	}
+
+	public static function process_paragraph_mergetag($value, $input_id, $modifier, $field, $raw_value) {
+		global $gfpdfe_data;
+
+		if(version_compare($gfpdfe_data->gf_version, 1.9, '>=') && $field['type'] == 'textarea') {
+			$value = nl2br($value);
+		}
+		return $value;
 	}
 	
 	/*
