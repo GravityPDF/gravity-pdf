@@ -1,0 +1,31 @@
+.about-wrap .gfpdf-badge {
+    margin-bottom: 1.5em;
+    position: relative;
+    width: 100%;
+}
+
+.gfpdf-badge {
+    background: #1d1d1d url("../images/gravitypdf-globe-white.png") no-repeat 50% 5px;    
+    color: #e7e7e7;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 600;
+    height: 40px;
+    margin: 5px 0 0;
+    padding-top: 120px;
+    text-align: center;
+    text-rendering: optimizelegibility;
+    
+}
+
+
+@media only screen and (min-width: 500px) {
+    .about-wrap .gfpdf-badge {
+        position: absolute;
+        right: 0;
+        top: 0;
+        margin: 0;
+        width: 150px;
+    }
+}
+
