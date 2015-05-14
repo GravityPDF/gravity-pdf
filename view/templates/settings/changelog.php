@@ -41,6 +41,12 @@
 
   <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
   <ul>
+    <li>Bug - Gravity Forms 1.9 didn't automatically nl2br paragraph text mergetags. Fixed this issue in custom PDF templates.</li>
+  </ul>
+
+  <h3>3.7.2</h3>
+
+  <ul>
     <li>Bug - Updated $form_data['date_created'], $form_data['date_created_usa'], $form_data['misc']['date_time'], $form_data['misc']['time_24hr'] and $form_data['misc']['time_12hr'] to factor in the website's timezone settings. </li>
   </ul>
   
