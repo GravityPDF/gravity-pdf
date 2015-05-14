@@ -1,5 +1,7 @@
 <?php
 
+namespace GFPDF\Statics;
+
 /**
  * Common Static Functions Shared throughour Gravity PDF
  *
@@ -37,7 +39,7 @@ if (! defined('ABSPATH')) {
 /**
  * @since  4.0
  */
-class GFPDF_Static_Functions
+class Statics_Functions
 {
 
     /**

@@ -45,12 +45,10 @@ define('PDF_PLUGIN_URL', plugin_dir_url( __FILE__ )); /* plugin directory url */
 define('GF_PDF_EXTENDED_PLUGIN_BASENAME', plugin_basename(__FILE__)); /* the plugin basename */
 
 /*
- * Add our activation and deactivation hooks 
+ * Add our activation hook
  */
-require_once(PDF_PLUGIN_DIR . 'src/controller/GFPDF_Controller_Update.php');
-
-register_activation_hook(   __FILE__, array('GFPDF_Controller_Update', 'activation') );
-register_deactivation_hook( __FILE__, array('GFPDF_Controller_Update', 'deactivation') );
+require_once(PDF_PLUGIN_DIR . 'src/controller/Controller_Update.php');
+register_activation_hook(   __FILE__, array('Controller_Update', 'activation') );
 
 /**
  *
@@ -64,26 +62,38 @@ class GFPDF_Major_Compatibility_Checks
 	/**
 	 * The plugin's basename 
 	 * @var String	 
+	 * @since 4.0
 	 */
 	private $basename;
 
 	/**
 	 * The path to the plugin 
 	 * @var String
+	 * @since 4.0
 	 */
 	private $path;
 
 	/**
 	 * The plugin's required Gravity Forms version 
 	 * @var String
+	 * @since 4.0 
 	 */
 	private $required_gf_version = '1.8';
 
 	/**
 	 * The plugin's required WordPress version 
 	 * @var String
+	 * @since 4.0
 	 */
 	private $required_wp_version = '3.9';
+
+	/**
+	 * The plugin's required PHP version 
+	 * We've made the call to drop PHP5.2 support
+	 * @var String
+	 * @since 4.0
+	 */
+	private $required_php_version = '5.3.2';
 
 	/**
 	 * Set our required variables for a fallback and attempt to initialise 
@@ -113,8 +123,9 @@ class GFPDF_Major_Compatibility_Checks
 
 		/**
 		 * Check Gravity Forms and WordPress meet the version requirements 
-		 * The minimum PHP requirements are currently the minimum WordPress PHP requirements 
-		 * This may change in the future, with a PHP5.4 minimum.
+		 * TODO: php requirements 
+		 *       error message display 
+		 * 
 		 */
 		if(!version_compare($wp_version, $this->required_wp_version, '>='))
 		{
@@ -123,7 +134,7 @@ class GFPDF_Major_Compatibility_Checks
 		} elseif( !class_exists('GFCommon') || !version_compare(GFCommon::$version, $this->required_gf_version, '>=')) {
 			add_action('after_plugin_row_' . $this->basename, array($this, 'gf_outdated_version')); 		
 			return false;				
-		} elseif( !function_exists('spl_autoload_register')) {
+		} elseif( !function_exists('spl_autoload_register')) { 
 			add_action('after_plugin_row_' . $this->basename, array($this, 'php_autoload_dependancy_issue')); 		
 			return false;							
 		}

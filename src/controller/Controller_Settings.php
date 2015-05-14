@@ -1,5 +1,11 @@
 <?php
 
+namespace GFPDF\Controller;
+use GFPDF\Helper\Helper_Controller;
+use GFPDF\Helper\Helper_Model;
+use GFPDF\Helper\Helper_View;
+use \RGForms;
+
 /**
  * Settings Controller
  *
@@ -41,12 +47,12 @@ if (! defined('ABSPATH')) {
  *
  * @since 4.0
  */
-class GFPDF_Controller_Settings extends GFPDF_Helper_Controller
+class Controller_Settings extends Helper_Controller
 {
     /**
      * Load our model and view and required actions
      */
-    public function __construct(GFPDF_Helper_Model $model, GFPDF_Helper_View $view)
+    public function __construct(Helper_Model $model, Helper_View $view)
     {
         /* load our model and view */
         $this->model = $model;

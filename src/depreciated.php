@@ -1,5 +1,8 @@
 <?php
 
+namespace GFPDF;
+use GFPDF\Statics\Statics_Functions;
+
 /**
  * Depreciated Functionality / Classes
  *
@@ -42,7 +45,7 @@ class GFPDF_Core
     public function __construct()
     {
         global $gfpdf;
-        $gfpdf = new GFPDF_Router();
+        $gfpdf = new Router();
         $gfpdf->init();
     }
 }
@@ -53,62 +56,62 @@ class PDF_Common
     }
 
     public static function get_ids() {
-    	return GFPDF_Static_Functions::get_ids();
+    	return Statics_Functions::get_ids();
     }
 
     public static function get_html_template($filename) {
-    	return GFPDF_Static_Functions::get_html_template($filename);
+    	return Statics_Functions::get_html_template($filename);
     }
 
     public static function get_pdf_filename($form_id, $lead_id) {
-    	return GFPDF_Static_Functions::get_pdf_filename($form_id, $lead_id);
+    	return Statics_Functions::get_pdf_filename($form_id, $lead_id);
     }
 
     public static function validate_pdf_name($name, $form_id = false, $lead_id = false) {
-    	return GFPDF_Static_Functions::validate_pdf_name($name, $form_id, $lead_id);
+    	return Statics_Functions::validate_pdf_name($name, $form_id, $lead_id);
     }
 
     public static function remove_invalid_characters($name) {
-    	return GFPDF_Static_Functions::remove_invalid_characters($name);
+    	return Statics_Functions::remove_invalid_characters($name);
     }
 
     public static function do_mergetags($string, $form_id, $lead_id) {
-    	return GFPDF_Static_Functions::do_mergetags($string, $form_id, $lead_id);
+    	return Statics_Functions::do_mergetags($string, $form_id, $lead_id);
     }
 
     public static function view_data($form_data) {
-    	return GFPDF_Static_Functions::view_data($form_data);
+    	return Statics_Functions::view_data($form_data);
     }
 
     public static function initialise_WP_filesystem_API($post, $nonce) {
-    	return GFPDF_Static_Functions::initialise_WP_filesystem_API($post, $nonce);
+    	return Statics_Functions::initialise_WP_filesystem_API($post, $nonce);
     }
 
     public static function is_settings() {
-    	return GFPDF_Static_Functions::is_settings();
+    	return Statics_Functions::is_settings();
     }
 
     public static function post($name) {
-    	return GFPDF_Static_Functions::post($name);
+    	return Statics_Functions::post($name);
     }
 
     public static function get($name) {
-    	return GFPDF_Static_Functions::get($name);
+    	return Statics_Functions::get($name);
     }
 
     public static function get_site_name() {
-    	return GFPDF_Static_Functions::get_site_name();
+    	return Statics_Functions::get_site_name();
     }
 
     public static function get_upload_dir() {
-    	return GFPDF_Static_Functions::get_upload_dir();
+    	return Statics_Functions::get_upload_dir();
     }
 
     public static function is_currency_decimal_dot($currency = null) {
-    	return GFPDF_Static_Functions::is_currency_decimal_dot($currency);
+    	return Statics_Functions::is_currency_decimal_dot($currency);
     }
 
     public static function add_message($message, $type = 'notice') {
-    	return GFPDF_Static_Functions::add_message($message, $type);
+    	return Statics_Functions::add_message($message, $type);
     }
 }

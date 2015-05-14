@@ -1,5 +1,8 @@
 <?php
 
+namespace GFPDF\Helper;
+use \WP_Error;
+
 /**
  * Abstract Helper View
  *
@@ -36,7 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * A simple abstract class views can extent to share similar variables
  * @since 4.0
  */
-abstract class GFPDF_Helper_View {
+abstract class Helper_View {
     /**
      * Each object should have a view name 
      * @var String
@@ -62,7 +65,7 @@ abstract class GFPDF_Helper_View {
                 return $this->buffer($path);
             }
         }
-        return new WP_Error('invalid_path', sprintf(__('Cannot find file %s', 'gfpdftoolkit'), $filename));
+        return new WP_Error('invalid_path', sprintf(__('Cannot find file %s', 'pdfextended'), $filename));
     }
 
     /**

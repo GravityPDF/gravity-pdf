@@ -1,5 +1,8 @@
 <?php
 
+namespace GFPDF\Model;
+use GFPDF\Helper\Helper_Model;
+
 /**
  * Settings Model
  *
@@ -39,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  *
  * @since 4.0
  */
-class GFPDF_Model_Settings extends GFPDF_Helper_Model {
+class Model_Settings extends Helper_Model {
     /**
      * Display the settings page for Gravity PDF 
      * @since 4.0

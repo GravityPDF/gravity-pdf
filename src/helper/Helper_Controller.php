@@ -1,7 +1,9 @@
 <?php
 
+namespace GFPDF\Helper;
+
 /**
- * Install Update Controller
+ * Abstract Helper Controller 
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
@@ -10,9 +12,7 @@
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
-}
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 /*
     This file is part of Gravity PDF.
@@ -35,31 +35,28 @@ if (! defined('ABSPATH')) {
 */
 
 /**
- * Controller_Update
- *
- * A general class for controlling the installation and update procedure 
- *
+ * A simple abstract class controlers can extent to share similar variables
  * @since 4.0
  */
-class GFPDF_Controller_Update
-{
+abstract class Helper_Controller {
+	
     /**
-     * Run plugin activation functionality 
-     * @since 4.0
-     * @return void
-     */
-    public static function activation() {
-        /* Add Upgraded From Option */
-        set_transient('_gravitypdf_activation_redirect', true, 30);
-    }
+	 * Classes will store a model object
+	 * @var Object
+	 * @since 4.0
+	 */
+	private $model = null;
+
+	/**
+	 * Classes will store a view object
+	 * @var Object
+	 * @since 4.0
+	 */	
+	private $view  = null;
 
     /**
-     * Run plugin deactivation functionality
+     * Each controller should have an initialisation function 
      * @since 4.0
-     * @return void
      */
-    public static function deactivation() {
-        
-    }
-
+    abstract public function init();
 }

@@ -1,5 +1,13 @@
 <?php
 
+namespace GFPDF;
+use GFPDF\Controller;
+use GFPDF\Model;
+use GFPDF\View;
+use GFPDF\Helper;
+use GFPDF\Statics;
+use \GFCommon;
+
 /**
  * Bootstrap / Router Class
  * The bootstrap is loaded on WordPress 'plugins_loaded' functionality 
@@ -41,7 +49,7 @@ require_once(PDF_PLUGIN_DIR . 'src/autoload.php');
 /**
  * @since 4.0
  */
-class GFPDF_Router {
+class Router {
     /**
      * Holds our GFPDF_Helper_Data object 
      * which we can autoload with any data needed 
@@ -56,7 +64,7 @@ class GFPDF_Router {
      */
     public function init() {  
         /* Set up our data access layer */
-        $this->data = new GFPDF_Helper_Data();
+        $this->data = new Helper\Helper_Data();
         $this->data->init();    
 
         /**
@@ -87,7 +95,7 @@ class GFPDF_Router {
         add_action('admin_init', array($this, 'setup_settings_fields'));
 
         /* set our notice action */
-        GFPDF_Static_Functions::set_notice_type();
+        Statics\Statics_Functions::set_notice_type();
     }
 
     /**
@@ -196,7 +204,7 @@ class GFPDF_Router {
      * @return 4.0
      */
     public function setup_settings_fields() {
-        GFPDF_Static_Options_API::register_settings();        
+        Statics\Statics_Options_API::register_settings();        
     }
 
     
@@ -209,12 +217,12 @@ class GFPDF_Router {
      */
     private function welcome_screen() {
 
-        $model = new GFPDF_Model_Welcome_Screen();
-        $view  = new GFPDF_View_Welcome_Screen(array(
+        $model = new Model\Model_Welcome_Screen();
+        $view  = new View\View_Welcome_Screen(array(
             'display_version' => PDF_EXTENDED_VERSION
         ));
 
-        $class = new GFPDF_Controller_Welcome_Screen($model, $view);
+        $class = new Controller\Controller_Welcome_Screen($model, $view);
         $class->init();
     }
 
@@ -225,12 +233,12 @@ class GFPDF_Router {
      */
     private function gf_settings() {
         
-        $model = new GFPDF_Model_Settings();
-        $view  = new GFPDF_View_Settings(array(
+        $model = new Model\Model_Settings();
+        $view  = new View\View_Settings(array(
         
         ));
 
-        $class = new GFPDF_Controller_Settings($model, $view);        
+        $class = new Controller\Controller_Settings($model, $view);        
         $class->init();
     }    
 }

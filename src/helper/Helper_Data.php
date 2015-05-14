@@ -1,5 +1,9 @@
 <?php
 
+namespace GFPDF\Helper;
+use GFPDF\PDF_Common;
+use GFPDF\Statics\Statics_Options_API;
+
 /**
  * Data overloaded Helper Class 
  * Cache shared data across the plugin
@@ -36,7 +40,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 /**
  * @since 4.0
  */
-class GFPDF_Helper_Data {
+class Helper_Data {
     /**
      * Location for the overloaded data         
      * @var array
@@ -140,7 +144,7 @@ class GFPDF_Helper_Data {
      */    
     public function set_licensing() {
          /* Set up our licensing */
-         //$this->license = new GFPDF_License_Model();    
+         //$this->license = new License_Model();    
          $this->store_url = 'https://gravitypdf.com/';    
     }
 
@@ -154,7 +158,7 @@ class GFPDF_Helper_Data {
         }
 
         /* assign our settings */
-        $this->settings = GFPDF_Static_Options_API::get_settings();         
+        $this->settings = Statics_Options_API::get_settings();         
     }
 
     /**

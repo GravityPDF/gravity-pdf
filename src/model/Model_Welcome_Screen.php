@@ -1,5 +1,8 @@
 <?php
 
+namespace GFPDF\Model;
+use GFPDF\Helper\Helper_Model;
+
 /**
  * Welcome Screen Model
  *
@@ -39,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  *
  * @since 4.0
  */
-class GFPDF_Model_Welcome_Screen extends GFPDF_Helper_Model {
+class Model_Welcome_Screen extends Helper_Model {
     
     /**
      * @var string The capability users should have to view the page
@@ -68,7 +71,7 @@ class GFPDF_Model_Welcome_Screen extends GFPDF_Helper_Model {
             __( 'What\'s new in Gravity PDF?', 'pdfextended' ),
             __( 'What\'s new in Gravity PDF?', 'pdfextended' ),
             $this->minimum_capability,
-            'gfpdf-about',
+            'gfpdf-update',
             array( $controller, 'update_screen' )
         );
 

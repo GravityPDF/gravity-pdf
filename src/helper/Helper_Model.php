@@ -1,7 +1,9 @@
 <?php
 
+namespace GFPDF\Helper;
+
 /**
- * Abstract Helper Controller 
+ * Abstract Helper Model
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
@@ -36,25 +38,29 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * A simple abstract class controlers can extent to share similar variables
  * @since 4.0
  */
-abstract class GFPDF_Helper_Controller {
+abstract class Helper_Model {
 	
     /**
-	 * Classes will store a model object
+	 * Classes will store a controler object to allow user access
 	 * @var Object
 	 * @since 4.0
 	 */
-	private $model = null;
-
-	/**
-	 * Classes will store a view object
-	 * @var Object
-	 * @since 4.0
-	 */	
-	private $view  = null;
+	private $controller = null;
 
     /**
-     * Each controller should have an initialisation function 
+     * Add a controller setter function with type hinting to ensure compatiiblity 
+     * @param GFPDF_Helper_Controller $class The controller class
      * @since 4.0
      */
-    abstract public function init();
+    public function setController(Helper_Controller $class) {
+        $this->controller = $class;
+    }
+
+    /**
+     * Get the controller
+     * @since 4.0
+     */
+    public function getController() {
+        return $this->controller;
+    }    
 }

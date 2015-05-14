@@ -1,7 +1,10 @@
 <?php
 
+namespace GFPDF\View;
+use GFPDF\Helper\Helper_View;
+
 /**
- * Settings View
+ * Welcome Screen View
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
@@ -41,7 +44,7 @@ if (! defined('ABSPATH')) {
  *
  * @since 4.0
  */
-class GFPDF_View_Settings extends GFPDF_Helper_View
+class View_Welcome_Screen extends Helper_View
 {
 
     /**
@@ -49,7 +52,7 @@ class GFPDF_View_Settings extends GFPDF_Helper_View
      * @var string
      * @since 4.0
      */
-    protected $ViewType = 'Settings';
+    protected $ViewType = 'Welcome';
 
     /**
      * Enable a private data cache we can set and retrive information from 
@@ -62,11 +65,11 @@ class GFPDF_View_Settings extends GFPDF_Helper_View
         $this->data = $data;
     }
 
-   /**
-     * Load the General Settings Tab
+    /**
+     * Load the Update Welcome Page
      * @since 4.0
      */
-    public function general()
+    public function welcome()
     {
         /*
          * Set up any variables we need for the view and display 
@@ -78,14 +81,14 @@ class GFPDF_View_Settings extends GFPDF_Helper_View
         $vars = array_merge($vars, $this->data);
 
         /* load the about page view */        
-        $this->load('general', $vars);
+        $this->load('welcome', $vars);
     }
 
-   /**
-     * Load the Tools Tab
+    /**
+     * Load the Update Welcome Page
      * @since 4.0
      */
-    public function tools()
+    public function update()
     {
         /*
          * Set up any variables we need for the view and display 
@@ -97,26 +100,7 @@ class GFPDF_View_Settings extends GFPDF_Helper_View
         $vars = array_merge($vars, $this->data);
 
         /* load the about page view */        
-        $this->load('tools', $vars);
-    }    
-
-   /**
-     * Load the Help Tab
-     * @since 4.0
-     */
-    public function help()
-    {
-        /*
-         * Set up any variables we need for the view and display 
-         */
-        $vars = array(
-
-        ); 
-
-        $vars = array_merge($vars, $this->data);
-
-        /* load the about page view */        
-        $this->load('help', $vars);
+        $this->load('update', $vars);
     }
 
     /**
@@ -124,52 +108,14 @@ class GFPDF_View_Settings extends GFPDF_Helper_View
      * @since 4.0
      */
     public function tabs() {
-        global $gfpdf;
-
         /*
          * Set up any variables we need for the view and display 
          */        
         $vars = array(
-            'selected' => isset( $_GET['tab'] ) ? $_GET['tab'] : 'general',
-            'tabs'     => $this->get_avaliable_tabs(),
-            'data'     => $gfpdf->data,
+            'selected' => isset( $_GET['page'] ) ? $_GET['page'] : 'gfpdf-getting-started',
         );
 
         /* load the tabs view */
         $this->load('tabs', $vars);
-    }
-
-    /**
-     * Set up our settings navigation 
-     * @return array The navigation array 
-     */
-    public function get_avaliable_tabs() {
-            /**
-             * Store the setting navigation
-             * The array key is the settings order
-             * @var array
-             */
-            $navigation = array(
-                5 => array(
-                    'name'     => __('General', 'pdfextended'),
-                    'id'       => 'general',                    
-                ),
-
-                100 => array(
-                    'name'     => __('Tools', 'pdfextended'),
-                    'id'       => 'tools',                    
-                ),
-
-                120 => array(
-                    'name' => __('Help', 'pdfextended'),
-                    'id' => 'help',                    
-                ),
-            );
-
-            /**
-             * Allow additional navigation to be added to the settings page
-             * @since 3.8
-             */
-            return apply_filters('pdf_extended_settings_navigation', $navigation);                      
     }
 }

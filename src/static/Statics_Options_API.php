@@ -1,5 +1,7 @@
 <?php
 
+namespace GFPDF\Statics;
+
 /**
  * Options API 
  *
@@ -39,7 +41,7 @@ if ( !defined( 'ABSPATH' ) ) exit;
  * Pulled straight from the Gravity PDF register-settings.php file (props to Pippin and team)
  * @since 3.8
  */
-class GFPDF_Static_Options_API {
+class Statics_Options_API {
 	
 	/**
 	 * Get an option
