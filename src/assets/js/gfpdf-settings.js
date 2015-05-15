@@ -168,7 +168,7 @@
 			template: '#GravityPDFSearchResultsDocumentation',
 
 			initialize: function(options) {
-				this.url = 'https://developer.gfpdfestage.info/wp-json/posts/?type=docs';
+				this.url = 'https://developer.gravitypdf.com/wp-json/posts/?type=docs';
 				this.s   = options.s;
 				this.render();
 			},
@@ -262,6 +262,7 @@
 				var active = $('.nav-tab-wrapper a.nav-tab-active:first').text();
 
 				this.show_tooltips();
+				this.setup_select_boxes();
 
 				switch (active) {
 					case 'General':
@@ -294,6 +295,10 @@
 				gform_initialize_tooltips();
 			}
 
+			this.setup_select_boxes = function() {
+				$('.gfpdf-chosen').chosen();
+			}
+
 			/**
 			 * The general settings model method 
 			 * This sets up and processes any of the JS that needs to be applied on the general settings tab 
@@ -303,6 +308,7 @@
 				var $table             = $('#pdf-general-security');
 				var $adminRestrictions = $table.find('input[name="gfpdf_settings[limit_to_admin]"]');
 				var $userRestrictions  = $table.find('input[name="gfpdf_settings[limit_to_user]"]');
+				var $advanced_options  = $('.gfpdf-advanced-options a');
 
 				/*
 				 * Add change event to admin restrictions to show/hide dependant fields 
@@ -311,29 +317,22 @@
 					if($(this).val() === 'Yes') {
 						/* hide user restrictions and logged out user timeout */
 						$table.find('tr:nth-child(2)').fadeOut();
-						$table.find('tr:nth-child(3)').fadeOut();
 					} else {
 						/* hide user restrictions and logged out user timeout */
 						$table.find('tr:nth-child(2)').fadeIn();
-
-						if($userRestrictions.parent().find(':checked').val() !== 'Yes') {
-							$table.find('tr:nth-child(3)').fadeIn();
-						}
 					}
 				});
 
 				/*
-				 * Add change event to logged-out restrictions to show/hide dependant fields 
+				 * Show / Hide Advanced options
 				 */
-				$userRestrictions.change(function() {
-					if($(this).val() === 'Yes') {
-						/* hide user restrictions and logged out user timeout */
-						$table.find('tr:nth-child(3)').fadeOut();
-					} else {
-						/* hide user restrictions and logged out user timeout */
-						$table.find('tr:nth-child(3)').fadeIn();
-					}
-				});
+				$advanced_options.click(function() {
+					$(this).parent().prev().slideToggle(600);
+					var text = $(this).text();
+					$(this).text(
+						text == GFPDF.general_advanced_show ? GFPDF.general_advanced_hide : GFPDF.general_advanced_show
+					);
+				});								
 			}
 
 			/**
@@ -342,38 +341,80 @@
 			 * @since 3.8
 			 */
 			this.tools_settings = function() {
-				var $reinstall = $('#gfpdf_settings\\[reinstall\\]'); /* escape braces */
-				var $dialog    = $( "#reinstall-confirm" );
+				var $copy            = $('#gfpdf_settings\\[copy\\]'); /* escape braces */
+				var $copyDialog      = $( '#setup-templates-confirm' );
+				var $uninstall       = $('#gfpdf-uninstall'); 
+				var $uninstallDialog = $( '#uninstall-confirm' );				
 
-				$reinstall.click(function() {
-					var link = this;
-
-					$dialog.wpdialog({
-				      resizable: false,
-				      draggable: false,
-				      width: 350,
-				      height:200,
-				      modal: true,
-					  dialogClass: 'wp-dialog',
-					  zIndex: 300000,		      
-				      buttons: [{
-				      	text: GFPDF.tools_reinstall_confirm,
+				/* Set up copy dialog */
+				var copyButtons = [{
+				      	text: GFPDF.tools_template_copy_confirm,
 				      	click: function() {
 				      		/* do redirect */
-				      		window.location = link.href;
+				      		window.location = $copy.attr('href');
 				      	}
 				      },
 				      {
-				      	text: GFPDF.tools_reinstall_cancel,
+				      	text: GFPDF.tools_cancel,
 				      	click: function() {
 				      		/* cancel */
-				      		$dialog.wpdialog( "close" );	
+				      		$copyDialog.wpdialog( 'close' );	
 				      	}				      				       
-				      }]
-				    });	
+				}];
 
+				this.wp_dialog($copyDialog, copyButtons, 500, 175);
+
+				$copy.click(function() {
+					$copyDialog.wpdialog('open');
 				    return false;			
-				});		    
+				});	
+
+				/* Set up uninstall dialog */
+				var uninstallButtons = [{
+			      	text: GFPDF.tools_uninstall_confirm,
+			      	click: function() {
+			      		/* submit form */
+			      		$uninstall.parents('form').submit();
+			      	}
+			      },
+			      {
+			      	text: GFPDF.tools_cancel,
+			      	click: function() {
+			      		/* cancel */
+			      		$uninstallDialog.wpdialog( 'close' );	
+			      	}				      				       
+			    }];	
+
+			    this.wp_dialog($uninstallDialog, uninstallButtons, 500, 175);			
+
+				$uninstall.click(function() {
+					$uninstallDialog.wpdialog('open');
+				    return false;			
+				});							    
+			}
+
+			this.wp_dialog = function($elm, buttonsList, boxWidth, boxHeight) {
+				$elm.wpdialog({
+				  autoOpen: false,
+			      resizable: false,
+			      draggable: false,
+			      width: "auto",			      
+			      height: boxHeight,
+			      modal: true,
+				  dialogClass: 'wp-dialog',
+				  zIndex: 300000,		      
+			      buttons: buttonsList,
+			      create: function( event, ui ) {
+			      	$(this).css('maxWidth', boxWidth + 'px');
+			      },
+			      open: function() {
+			      	$(this).siblings('.ui-dialog-buttonpane').find('button:eq(1)').focus(); 
+
+		            $('.ui-widget-overlay').bind('click', function() {
+		                $elm.wpdialog('close');
+		            })			      	
+			      }
+			    });					
 			}
 
 			/**

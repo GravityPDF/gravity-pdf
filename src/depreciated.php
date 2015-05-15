@@ -1,7 +1,7 @@
 <?php
 
 namespace GFPDF;
-use GFPDF\Statics\Statics_Functions;
+use GFPDF\Stat\Stat_Functions;
 
 /**
  * Depreciated Functionality / Classes
@@ -56,62 +56,62 @@ class PDF_Common
     }
 
     public static function get_ids() {
-    	return Statics_Functions::get_ids();
+    	return Stat_Functions::get_ids();
     }
 
     public static function get_html_template($filename) {
-    	return Statics_Functions::get_html_template($filename);
+    	return Stat_Functions::get_html_template($filename);
     }
 
     public static function get_pdf_filename($form_id, $lead_id) {
-    	return Statics_Functions::get_pdf_filename($form_id, $lead_id);
+    	return Stat_Functions::get_pdf_filename($form_id, $lead_id);
     }
 
     public static function validate_pdf_name($name, $form_id = false, $lead_id = false) {
-    	return Statics_Functions::validate_pdf_name($name, $form_id, $lead_id);
+    	return Stat_Functions::validate_pdf_name($name, $form_id, $lead_id);
     }
 
     public static function remove_invalid_characters($name) {
-    	return Statics_Functions::remove_invalid_characters($name);
+    	return Stat_Functions::remove_invalid_characters($name);
     }
 
     public static function do_mergetags($string, $form_id, $lead_id) {
-    	return Statics_Functions::do_mergetags($string, $form_id, $lead_id);
+    	return Stat_Functions::do_mergetags($string, $form_id, $lead_id);
     }
 
     public static function view_data($form_data) {
-    	return Statics_Functions::view_data($form_data);
+    	return Stat_Functions::view_data($form_data);
     }
 
     public static function initialise_WP_filesystem_API($post, $nonce) {
-    	return Statics_Functions::initialise_WP_filesystem_API($post, $nonce);
+    	return Stat_Functions::initialise_WP_filesystem_API($post, $nonce);
     }
 
     public static function is_settings() {
-    	return Statics_Functions::is_settings();
+    	return Stat_Functions::is_settings();
     }
 
     public static function post($name) {
-    	return Statics_Functions::post($name);
+    	return Stat_Functions::post($name);
     }
 
     public static function get($name) {
-    	return Statics_Functions::get($name);
+    	return Stat_Functions::get($name);
     }
 
     public static function get_site_name() {
-    	return Statics_Functions::get_site_name();
+    	return Stat_Functions::get_site_name();
     }
 
     public static function get_upload_dir() {
-    	return Statics_Functions::get_upload_dir();
+    	return Stat_Functions::get_upload_dir();
     }
 
     public static function is_currency_decimal_dot($currency = null) {
-    	return Statics_Functions::is_currency_decimal_dot($currency);
+    	return Stat_Functions::is_currency_decimal_dot($currency);
     }
 
     public static function add_message($message, $type = 'notice') {
-    	return Statics_Functions::add_message($message, $type);
+    	return Stat_Functions::add_message($message, $type);
     }
 }

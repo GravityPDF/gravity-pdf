@@ -2,7 +2,7 @@
 
 namespace GFPDF\Helper;
 use GFPDF\PDF_Common;
-use GFPDF\Statics\Statics_Options_API;
+use GFPDF\Stat\Stat_Options_API;
 
 /**
  * Data overloaded Helper Class 
@@ -158,7 +158,7 @@ class Helper_Data {
         }
 
         /* assign our settings */
-        $this->settings = Statics_Options_API::get_settings();         
+        $this->settings = Stat_Options_API::get_settings();         
     }
 
     /**

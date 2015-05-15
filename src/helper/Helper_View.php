@@ -46,7 +46,34 @@ abstract class Helper_View {
      * @since 4.0
      */    
     protected $ViewType = null;
+
+    /**
+     * Enable a private data cache we can set and retrive information from 
+     * @var array
+     * @since 4.0
+     */
+    protected $data = array();    
     
+
+    /**
+     * Triggered when invoking inaccessible methods in an object context
+     * Use it to load in our views
+     * @param  String $name     Template name to load
+     * @param  Array $arguments Pass in additional parameters to the template view if needed
+     * @return void 
+     * @since 4.0
+     */
+    public function __call($name, $arguments) {
+        /* check if we have any arguments */
+        $vars = $this->data;
+        if(isset($arguments[0]) && is_array($arguments[0])) {
+            $vars = array_merge($arguments[0], $this->data);    
+        }        
+
+        /* load the about page view */        
+        $this->load($name, $vars);        
+    }
+
     /**
      * Load a view file based on the filename and type
      * @param  String $filename The filename to load
@@ -72,6 +99,7 @@ abstract class Helper_View {
      * Store output of included file in a buffer and return
      * @param  String $path File path to include
      * @return String       The contents of the included file
+     * @since 4.0
      */
     private function buffer($path) {
         ob_start();

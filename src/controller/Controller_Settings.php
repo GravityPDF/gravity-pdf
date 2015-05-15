@@ -73,7 +73,32 @@ class Controller_Settings extends Helper_Controller
          */ 
          RGForms::add_settings_page('PDF', array($this->model, 'displayPage'));            
 
+         $this->add_actions();
+         $this->add_filters();       
+    }
+
+    /**
+     * Apply any actions needed for the settings page
+     * @since 4.0
+     * @return void
+     */
+    public function add_actions() {
         /* Load our settings meta boxes */
-        add_action('current_screen', array($this->model, 'add_meta_boxes'));            
+        add_action('current_screen', array($this->model, 'add_meta_boxes')); 
+
+        /* Display our system status on general and tools pages */
+        add_action('pdf-settings-general', array($this->view, 'system_status'));        
+        add_action('pdf-settings-tools', array($this->view, 'system_status'));
+        add_action('pdf-settings-tools', array($this->view, 'uninstaller'), 20);
+    }
+
+    /**
+     * Apply any filters needed for the settings page
+     * @since 4.0
+     * @return void
+     */
+    public function add_filters() {
+        /* Add tooltips */
+        add_action('gform_tooltips', array($this->view, 'add_tooltips'));
     }
 }

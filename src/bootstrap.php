@@ -5,7 +5,7 @@ use GFPDF\Controller;
 use GFPDF\Model;
 use GFPDF\View;
 use GFPDF\Helper;
-use GFPDF\Statics;
+use GFPDF\Stat;
 use \GFCommon;
 
 /**
@@ -95,7 +95,7 @@ class Router {
         add_action('admin_init', array($this, 'setup_settings_fields'));
 
         /* set our notice action */
-        Statics\Statics_Functions::set_notice_type();
+        Stat\Stat_Functions::set_notice_type();
     }
 
     /**
@@ -123,11 +123,15 @@ class Router {
      * @return void
      */
     private function register_styles() {
+        $version = PDF_EXTENDED_VERSION;
+        $suffix  = '';
         if(defined('WP_DEBUG') && WP_DEBUG === true) {
-            wp_register_style('gfpdf_styles', PDF_PLUGIN_URL . 'src/assets/css/gfpdf-styles.css', array(), time());
-        } else {
-            wp_register_style('gfpdf_styles', PDF_PLUGIN_URL . 'src/assets/css/gfpdf-styles.css', array(), PDF_EXTENDED_VERSION);    
-        }                
+            $version = time();
+            $suffix = '.min.';
+        }
+
+        wp_register_style('gfpdf_styles', PDF_PLUGIN_URL . 'src/assets/css/gfpdf-styles'. $suffix .'.css', array(), $version);       
+        wp_register_style( 'gfpdf_chosen_style', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.min.css', array(), $version );     
     }
 
     /**
@@ -137,21 +141,28 @@ class Router {
      */
     private function register_scripts() {
 
+        $version = PDF_EXTENDED_VERSION;
+        $suffix  = '';
         if(defined('WP_DEBUG') && WP_DEBUG === true) {
-            wp_register_script( 'gfpdf_settings', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-settings.js', array('wpdialogs', 'backbone', 'underscore', 'jquery-ui-tooltip'), time() );           
-        } else {
-            wp_register_script( 'gfpdf_settings', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-settings.js', array('wpdialogs', 'backbone', 'underscore', 'jquery-ui-tooltip'), PDF_EXTENDED_VERSION );           
+            $version = time();
+            $suffix = '.min.';
         }
+
+        wp_register_script( 'gfpdf_settings', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-settings'. $suffix .'.js', array('wpdialogs', 'backbone', 'underscore', 'jquery-ui-tooltip'), $version );           
+        wp_register_script( 'gfpdf_chosen', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.jquery.min.js', array('jquery'), $version );                   
 
         /*
         * Localise admin script
         */
         $localise_script = array(
-            'GFbaseUrl'               => GFCommon::get_base_url(),
-            'pluginUrl'               => PDF_PLUGIN_URL,
-            'tools_reinstall_confirm' => __('Confirm Reinstall', 'pdfextended'),
-            'tools_reinstall_cancel'  => __('Cancel', 'pdfextended'),   
-            'help_search_placeholder' => __('Search the Gravity PDF Knowledgebase...', 'pdfextended'),      
+            'GFbaseUrl'                   => GFCommon::get_base_url(),
+            'pluginUrl'                   => PDF_PLUGIN_URL,
+            'general_advanced_show'       => __('Show Advanced Options...', 'pdfextended'),
+            'general_advanced_hide'       => __('Hide Advanced Options...', 'pdfextended'),
+            'tools_template_copy_confirm' => __('Continue', 'pdfextended'),
+            'tools_uninstall_confirm'     => __('Uninstall', 'pdfextended'),
+            'tools_cancel'                => __('Cancel', 'pdfextended'),   
+            'help_search_placeholder'     => __('Search the Gravity PDF Knowledgebase...', 'pdfextended'),      
         );
 
         wp_localize_script( 'gfpdf_settings', 'GFPDF', $localise_script );
@@ -175,10 +186,12 @@ class Router {
         if($this->is_gfpdf_page()) {
             /* load styles */
             wp_enqueue_style('gfpdf_styles');       
-            wp_enqueue_style ('wp-jquery-ui-dialog');
+            wp_enqueue_style('wp-jquery-ui-dialog');
+            wp_enqueue_style('gfpdf_chosen_style');
 
             /* load scripts */
             wp_enqueue_script('gfpdf_settings');       
+            wp_enqueue_script('gfpdf_chosen');       
         }        
     }
 
@@ -204,7 +217,7 @@ class Router {
      * @return 4.0
      */
     public function setup_settings_fields() {
-        Statics\Statics_Options_API::register_settings();        
+        Stat\Stat_Options_API::register_settings();        
     }
 
     

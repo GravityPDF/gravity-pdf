@@ -1,3 +1,41 @@
+<?php 
+
+/**
+ * Tools Settings View
+ *
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2015, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       4.0
+ */
+
+/* Exit if accessed directly */
+if (! defined('ABSPATH')) {
+    exit;
+}
+
+/*
+    This file is part of Gravity PDF.
+
+    Gravity PDF Copyright (C) 2015 Blue Liquid Designs
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
+
+?>
+
 <?php $this->tabs(); ?>
         
         
@@ -5,7 +43,7 @@
 	<h3>
 	<span>
 	  <i class="fa fa-cog"></i>
-	  <?php _e('General Settings', 'pdfextended'); ?>
+	  <?php _e('Tools', 'pdfextended'); ?>
 	</span>
 	</h3>
 
@@ -28,7 +66,9 @@
 		<?php submit_button(); ?>
 	</form>
 
-	<div id="reinstall-confirm" title="<?php _e('Confirm Reinstall', 'pdfextended'); ?>" style="display: none;">
-	  <?php printf(__('During the reinstall process the PDF templates that ship with the software will be overridden. If you have modified them you should %stake a backup%s before beginning.', 'pdfextended'), '<strong>', '</strong>'); ?>
-	</div>		                             
+	<div id="setup-templates-confirm" title="<?php _e('Setup Custom Templates', 'pdfextended'); ?>" style="display: none;">
+	  <?php printf(__('During the setup process %sANY default Gravity PDF template files%s stored in the PDF_EXTENDED_TEMPLATES directory will be overridden.', 'pdfextended'), '<strong>', '</strong>'); ?>
+	</div>	
+
+	<?php do_action('pdf-settings-tools'); ?>	                             
 </div>

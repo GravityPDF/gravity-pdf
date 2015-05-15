@@ -107,64 +107,39 @@ class GFPDF_Major_Compatibility_Checks
      * @param String $basename         Plugin basename
      * @param String $path             The plugin path
      * @param String $required_version Required Gravity PDF version
+     * @since 4.0
      */
-    public function __construct($basename, $path) {
+    public function __construct($basename = '', $path = '') {
         /*
          * Set our class variables
          */
         $this->basename         = $basename;
         $this->path             = $path;
+    }
 
-        /* load the plugin */
+    /**
+     * Load the plugin
+     * @return void 
+     * @since 4.0
+     */
+    public function init() {        
         add_action('plugins_loaded', array($this, 'plugins_loaded'));
     }
 
     /**
      * Check if dependancies are met and load plugin, otherwise display errors
      * @return void
+     * @since 4.0
      */
-    public function plugins_loaded() {
-        global $wp_version;
-
-        /**
-         * Check minimum requirements are met
-         */             
-        
-        /* WordPress version not compatible */
-        if (! version_compare($wp_version, $this->required_wp_version, '>=')) {            
-            $this->notices[] = sprintf(__('WordPress Version %s is required.', 'pdfextended'), $this->required_wp_version);
-        } 
-
-        /* Gravity Forms version not compatible */
-        if (! class_exists('GFCommon') || ! version_compare(GFCommon::$version, $this->required_gf_version, '>=')) {            
-            $this->notices[] = sprintf(__('Gravity Forms Version %s is required.', 'pdfextended'), $this->required_wp_version);
-        } 
-
-        /* Check PHP version is compatible */
-        if (! version_compare(phpversion(), $this->required_php_version, '>=')) {
-            $this->notices[] = sprintf(__('You are running an %soutdated version of PHP%s. Contact your web hosting provider to update.', 'pdfextended'), '<a href="http://www.wpupdatephp.com/update/">', '</a>');
-        }
-
-        /* Check MB String is installed */
-        if (! extension_loaded('mbstring')) {
-            $this->notices[] = __("The PHP Extension MB String (with mb-regex enabled) could not be detected. Contact your web hosting provider to fix.", 'pdfextended');
-        }
-
-        /* Check MB String is compiled with regex capabilities */
-        if ( extension_loaded('mbstring') && ! extension_loaded('mbstring')) {
-            $this->notices[] = __("The PHP Extension MB String does not have MB Regex enabled. Contact your web hosting provider to fix.", 'pdfextended');
-        }        
-
-        /* Check GD Image Library is installed */
-        if (! extension_loaded('gd')) {
-            $this->notices[] = __("The PHP Extension GD Image Library could not be detected. Contact your web hosting provider to fix.", 'pdfextended');
-        }
-
-        /* Check Minimum RAM requirements */
-        $ram = $this->get_ram();
-        if ($ram < 64) {
-            $this->notices[] = sprintf(__("You need %s128MB%s of WP Memory (RAM) but we only found %s available. Contact your web hosting provider to fix (you need to increase your PHP 'memory_limit' setting).", 'pdfextended'), '<strong>', '</strong>', $ram . 'MB');
-        }
+    public function plugins_loaded() {        
+        /* Check minimum requirements are met */             
+        $this->check_wordpress();
+        $this->check_gravity_forms();
+        $this->check_php();
+        $this->check_mb_string();
+        $this->check_mb_string_regex();
+        $this->check_gd();
+        $this->check_ram();
 
         /* check if any errors were thrown, enqueue them and exit early */
         if (sizeof($this->notices) > 0) {
@@ -174,6 +149,109 @@ class GFPDF_Major_Compatibility_Checks
 
         require_once $this->path.'src/bootstrap.php';
     }
+
+    /**
+     * Check if WordPress version is compatible 
+     * @return Boolean whether compatible or not
+     * @since 4.0
+     */
+    public function check_wordpress() {
+        global $wp_version;
+
+        /* WordPress version not compatible */
+        if (! version_compare($wp_version, $this->required_wp_version, '>=')) {            
+            $this->notices[] = sprintf(__('WordPress Version %s is required.', 'pdfextended'), $this->required_wp_version);
+            return false;
+        }         
+        return true;
+    }
+
+    /**
+     * Check if Gravity Forms version is compatible 
+     * @return Boolean whether compatible or not
+     * @since 4.0
+     */
+    public function check_gravity_forms() {
+        /* Gravity Forms version not compatible */
+        if (! class_exists('GFCommon') || ! version_compare(GFCommon::$version, $this->required_gf_version, '>=')) {            
+            $this->notices[] = sprintf(__('Gravity Forms Version %s is required.', 'pdfextended'), $this->required_gf_version);
+            return false;
+        } 
+        return true;
+    }
+
+    /**
+     * Check if PHP version is compatible
+     * @return Boolean whether compatible or not
+     * @since 4.0
+     */
+    public function check_php() {
+        /* Check PHP version is compatible */
+        if (! version_compare(phpversion(), $this->required_php_version, '>=')) {
+            $this->notices[] = sprintf(__('You are running an %soutdated version of PHP%s. Contact your web hosting provider to update.', 'pdfextended'), '<a href="http://www.wpupdatephp.com/update/">', '</a>');
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Check if PHP MB String enabled
+     * @return Boolean whether compatible or not
+     * @since 4.0
+     */
+    public function check_mb_string() {
+        /* Check MB String is installed */
+        if (! extension_loaded('mbstring')) {
+            $this->notices[] = __("The PHP Extension MB String (with mb-regex enabled) could not be detected. Contact your web hosting provider to fix.", 'pdfextended');
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Check if MB String Regex enabled
+     * @return Boolean whether compatible or not
+     * @since 4.0
+     */
+    public function check_mb_string_regex() {
+        /* Check MB String is compiled with regex capabilities */
+        if ( extension_loaded('mbstring') && ! function_exists('mb_regex_encoding')) {
+            $this->notices[] = __("The PHP Extension MB String does not have MB Regex enabled. Contact your web hosting provider to fix.", 'pdfextended');
+            return false;
+        }  
+        return true; 
+    }
+
+    /**
+     * Check if PHP GD Library installed
+     * @return Boolean whether compatible or not
+     * @since 4.0
+     */
+    public function check_gd() {
+        /* Check GD Image Library is installed */
+        if (! extension_loaded('gd')) {
+            $this->notices[] = __("The PHP Extension GD Image Library could not be detected. Contact your web hosting provider to fix.", 'pdfextended');
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Check if minimum RAM requirements met
+     * @return Boolean whether compatible or not 
+     * @since 4.0
+     */
+    public function check_ram() {
+        /* Check Minimum RAM requirements */
+        $ram = $this->get_ram();
+        if ($ram < 64) {
+            $this->notices[] = sprintf(__("You need %s128MB%s of WP Memory (RAM) but we only found %s available. Contact your web hosting provider to fix (you need to increase your PHP 'memory_limit' setting).", 'pdfextended'), '<strong>', '</strong>', $ram . 'MB');
+            return false;
+        }
+        return true;
+    }
+
+
      /**
       * Get the available system memory
       * @return integer The calculated RAM
@@ -221,7 +299,8 @@ class GFPDF_Major_Compatibility_Checks
     public function display_notices() {
     	?>
 		    <div class="error">
-		        <p><?php _e('The minimum requirements for Gravity PDF have not been met. Please fix the issues below to continue:', 'pdfextended'); ?></p>		        
+                <p><strong><?php _e('Gravity PDF Installation Problem', 'pdfextended'); ?></strong></p>
+		        <p><?php _e('The minimum requirements for Gravity PDF have not been met. Please fix the issue(s) below to continue:', 'pdfextended'); ?></p>		        
 				<ul style="padding-bottom: 0.5em">
 	        		<?php foreach($this->notices as $notice): ?>
 						<li style="padding-left: 20px;list-style: inside"><?php echo $notice; ?></li>
@@ -235,7 +314,9 @@ class GFPDF_Major_Compatibility_Checks
 /*
  * Initialise the software
  */
-new GFPDF_Major_Compatibility_Checks(
+$gravitypdf = new GFPDF_Major_Compatibility_Checks(
     GF_PDF_EXTENDED_PLUGIN_BASENAME,
     PDF_PLUGIN_DIR
 );
+
+$gravitypdf->init();

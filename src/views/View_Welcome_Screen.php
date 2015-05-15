@@ -54,53 +54,9 @@ class View_Welcome_Screen extends Helper_View
      */
     protected $ViewType = 'Welcome';
 
-    /**
-     * Enable a private data cache we can set and retrive information from 
-     * @var array
-     * @since 4.0
-     */
-    private $data = array();
 
     public function __construct($data = array()) {
         $this->data = $data;
-    }
-
-    /**
-     * Load the Update Welcome Page
-     * @since 4.0
-     */
-    public function welcome()
-    {
-        /*
-         * Set up any variables we need for the view and display 
-         */
-        $vars = array(
-
-        ); 
-
-        $vars = array_merge($vars, $this->data);
-
-        /* load the about page view */        
-        $this->load('welcome', $vars);
-    }
-
-    /**
-     * Load the Update Welcome Page
-     * @since 4.0
-     */
-    public function update()
-    {
-        /*
-         * Set up any variables we need for the view and display 
-         */
-        $vars = array(
-
-        ); 
-
-        $vars = array_merge($vars, $this->data);
-
-        /* load the about page view */        
-        $this->load('update', $vars);
     }
 
     /**

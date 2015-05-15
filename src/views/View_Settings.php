@@ -2,6 +2,8 @@
 
 namespace GFPDF\View;
 use GFPDF\Helper\Helper_View;
+use GFPDF_Major_Compatibility_Checks;
+use GFCommon;
 
 /**
  * Settings View
@@ -54,77 +56,14 @@ class View_Settings extends Helper_View
      */
     protected $ViewType = 'Settings';
 
-    /**
-     * Enable a private data cache we can set and retrive information from 
-     * @var array
-     * @since 4.0
-     */
-    private $data = array();
-
     public function __construct($data = array()) {
         $this->data = $data;
-    }
-
-   /**
-     * Load the General Settings Tab
-     * @since 4.0
-     */
-    public function general()
-    {
-        /*
-         * Set up any variables we need for the view and display 
-         */
-        $vars = array(
-
-        ); 
-
-        $vars = array_merge($vars, $this->data);
-
-        /* load the about page view */        
-        $this->load('general', $vars);
-    }
-
-   /**
-     * Load the Tools Tab
-     * @since 4.0
-     */
-    public function tools()
-    {
-        /*
-         * Set up any variables we need for the view and display 
-         */
-        $vars = array(
-
-        ); 
-
-        $vars = array_merge($vars, $this->data);
-
-        /* load the about page view */        
-        $this->load('tools', $vars);
-    }    
-
-   /**
-     * Load the Help Tab
-     * @since 4.0
-     */
-    public function help()
-    {
-        /*
-         * Set up any variables we need for the view and display 
-         */
-        $vars = array(
-
-        ); 
-
-        $vars = array_merge($vars, $this->data);
-
-        /* load the about page view */        
-        $this->load('help', $vars);
-    }
+    }   
 
     /**
      * Load the Welcome Tab tabs
      * @since 4.0
+     * @return void
      */
     public function tabs() {
         global $gfpdf;
@@ -138,6 +77,8 @@ class View_Settings extends Helper_View
             'data'     => $gfpdf->data,
         );
 
+        $vars = array_merge($vars, $this->data); 
+
         /* load the tabs view */
         $this->load('tabs', $vars);
     }
@@ -145,6 +86,7 @@ class View_Settings extends Helper_View
     /**
      * Set up our settings navigation 
      * @return array The navigation array 
+     * @since 4.0
      */
     public function get_avaliable_tabs() {
             /**
@@ -174,5 +116,49 @@ class View_Settings extends Helper_View
              * @since 3.8
              */
             return apply_filters('pdf_extended_settings_navigation', $navigation);                      
+    }
+
+    /**
+     * Pull the system status details and show
+     * @return void 
+     * @since 4.0
+     */
+    public function system_status() {
+        global $wp_version;
+
+        $status = new GFPDF_Major_Compatibility_Checks();
+
+        $mb_string = false;
+        if($this->get_mb_string() && $this->check_mb_string_regex()) {
+            $mb_string = true;
+        }
+
+        $vars = array(
+            'memory' => $status->get_ram(),
+            'output' => true, /* TODO - write installer / uninstaller first */
+            'output_path' => 'path/to/file', /* TODO */
+            'wp'     => $wp_version,
+            'php'    => phpversion(),
+            'gf'     => GFCommon::$version,                    
+        );
+
+        $vars = array_merge($vars, $this->data); 
+
+        /* load the system status view */
+        $this->load('system_status', $vars);        
+    }
+
+    /**
+     * Add Gravity Forms Tooltips
+     * @param Array The existing tooltips
+     */
+    public static function add_tooltips($tooltips)
+    {
+        global $gfpdf;        
+
+        $tooltips['pdf_status_wp_memory']     = '<h6>' . __( 'WP Memory Available', 'pdfextended' ) . '</h6>' . sprintf(__( "Producing PDF documents is hard work and Gravity PDF requires more resources than most plugins. We strongly recommend you have at least 128MB, but you may need more.", 'pdfextended' )); 
+        $tooltips['pdf_status_notifications'] = '<h6>' . __( 'PDF Notifications', 'pdfextended' ) . '</h6>' . sprintf(__( 'Sending PDFs automatically via Gravity Form notifications requires write access to our designated output directory: %s.', 'pdfextended' ), '<code>' . $gfpdf->data->relative_output_location . '</code>');       
+
+        return $tooltips;
     }
 }

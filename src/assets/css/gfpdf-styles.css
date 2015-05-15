@@ -29,6 +29,10 @@
     margin-top: 20px;   
 }
 
+#pdfextended-settings h3 {
+  margin-top: 0;
+}
+
 #pdfextended-settings div.notice, div.pdf-notice {
     margin: 5px 15px 2px;
     padding: 0 0.6em;
@@ -43,6 +47,19 @@
 #pdfextended-settings div.notice, div.pdf-notice {
     margin: 5px 0 15px;
     padding: 1px 12px;
+}
+
+#pdfextended-settings #gfpdf-advanced-options {
+  display: none;
+  margin-bottom: 20px;
+}
+
+#pdfextended-settings .gfpdf-advanced-options {
+    margin-top: -18px;
+}
+
+#pdfextended-settings select.large {
+  width: 350px;
 }
 
 /**

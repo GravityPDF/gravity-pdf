@@ -77,6 +77,6 @@ class Model_Welcome_Screen extends Helper_Model {
 
         /* hide the new page from the menu bar */
         remove_submenu_page( 'index.php', 'gfpdf-getting-started' );
-        remove_submenu_page( 'index.php', 'gfpdf-about' );
+        remove_submenu_page( 'index.php', 'gfpdf-update' );
     }     
 }

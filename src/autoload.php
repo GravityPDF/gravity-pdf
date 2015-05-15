@@ -238,5 +238,5 @@ $loader->addNamespace('GFPDF\Controller', PDF_PLUGIN_DIR . '/src/controller');
 $loader->addNamespace('GFPDF\Model', PDF_PLUGIN_DIR . '/src/model');
 $loader->addNamespace('GFPDF\View', PDF_PLUGIN_DIR . '/src/views');
 $loader->addNamespace('GFPDF\Helper', PDF_PLUGIN_DIR . '/src/helper');
-$loader->addNamespace('GFPDF\Statics', PDF_PLUGIN_DIR . '/src/static');
+$loader->addNamespace('GFPDF\Stat', PDF_PLUGIN_DIR . '/src/static');
 $loader->addNamespace('GFPDF\Test', PDF_PLUGIN_DIR . '/tests');
