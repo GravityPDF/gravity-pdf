@@ -54,6 +54,7 @@ if (! defined('ABSPATH')) {
 	                <span class="spinner"></span>
 	              </h3>
 	              <div class="inside rss-widget">
+	              	<ul></ul>
 	              </div>
 	            </div>  
 

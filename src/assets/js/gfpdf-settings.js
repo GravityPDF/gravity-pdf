@@ -97,7 +97,7 @@
 
 			processSearch: function(search) {
 				/* Initialise our Collection and pull the data from our source */
-				console.log('doing search');
+				console.log('Searching our collection...');
 
 				/* start our forum search */
 				new help.ForumView({
@@ -124,7 +124,7 @@
 			},
 
 			renderSearch: function(collection, response) {
-				console.log('rendering search');
+				console.log('Rendering Search Results');
 
 				this.hideSpinner();
 
@@ -143,7 +143,7 @@
 			},
 
 			renderSearchError: function(collection, response) {
-				console.log('search failed');
+				console.log('Search Failed');
 				console.log(collection);
 				console.log(response);
 			},
