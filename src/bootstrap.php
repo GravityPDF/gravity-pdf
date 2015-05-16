@@ -49,7 +49,7 @@ require_once(PDF_PLUGIN_DIR . 'src/autoload.php');
 /**
  * @since 4.0
  */
-class Router {
+class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
     /**
      * Holds our GFPDF_Helper_Data object 
      * which we can autoload with any data needed 
@@ -77,6 +77,7 @@ class Router {
         /* load modules */
         $this->welcome_screen();
         $this->gf_settings();
+        $this->gf_form_settings();
 
         /* Add localisation support */       
         load_plugin_textdomain('pdfextended', false,  dirname( plugin_basename( __FILE__ ) ) . '/assets/languages/' );  
@@ -88,7 +89,7 @@ class Router {
      * @since 4.0
      * @return void
      */
-    private function add_actions() {
+    public function add_actions() {
         add_action('init', array($this, 'register_assets'), 10);
         add_action('init', array($this, 'load_assets'), 15);
 
@@ -103,7 +104,7 @@ class Router {
      * @since 4.0
      * @return void
      */
-    private function add_filters() {
+    public function add_filters() {
 
     }
 
@@ -202,8 +203,8 @@ class Router {
      */    
     private function is_gfpdf_page() {
         if(is_admin()) {
-            if(isset($_GET['page']) && (substr($_GET['page'], 0, 6) == 'gfpdf-') ||
-            (isset($_GET['subview']) && $_GET['subview'] == 'PDF')) {
+            if(isset($_GET['page']) && (substr($_GET['page'], 0, 6) === 'gfpdf-') ||
+            (isset($_GET['subview']) && strtoupper($_GET['subview']) === 'PDF')) {
                 return true;
             }
         }
@@ -240,7 +241,7 @@ class Router {
     }
 
     /**
-     * Include Welcome Screen functionality for installation / upgrades
+     * Include Settings Page functionality 
      * @since 4.0
      * @return void
      */
@@ -253,7 +254,23 @@ class Router {
 
         $class = new Controller\Controller_Settings($model, $view);        
         $class->init();
-    }    
+    }  
+
+    /**
+     * Include Form Settings (PDF) functionality
+     * @since 4.0
+     * @return void
+     */
+    private function gf_form_settings() {
+        
+        $model = new Model\Model_Form_Settings();
+        $view  = new View\View_Form_Settings(array(
+        
+        ));
+
+        $class = new Controller\Controller_Form_Settings($model, $view);        
+        $class->init();
+    }       
 }
 
 

@@ -29,7 +29,8 @@
     margin-top: 20px;   
 }
 
-#pdfextended-settings h3 {
+#pdfextended-settings h3,
+#tab_pdf h3 {
   margin-top: 0;
 }
 
@@ -49,16 +50,19 @@
     padding: 1px 12px;
 }
 
-#pdfextended-settings #gfpdf-advanced-options {
+#pdfextended-settings #gfpdf-advanced-options,
+#tab_pdf #gfpdf-advanced-options {
   display: none;
   margin-bottom: 20px;
 }
 
-#pdfextended-settings .gfpdf-advanced-options {
+#pdfextended-settings .gfpdf-advanced-options,
+#tab_pdf .gfpdf-advanced-options {
     margin-top: -18px;
 }
 
-#pdfextended-settings select.large {
+#pdfextended-settings select.large,
+#tab_pdf select.large {
   width: 350px;
 }
 

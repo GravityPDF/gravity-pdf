@@ -1,25 +1,18 @@
 <?php
 
+namespace GFPDF\Helper;
+
 /**
- * Install Update Controller
+ * Actions Interface
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
- * 
- */
-
-/*
- * This file is called before compatibility checks are run 
- * We cannot add namespace support here which means no access 
- * to the rest of the plugin
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
-}
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 /*
     This file is part of Gravity PDF.
@@ -42,20 +35,14 @@ if (! defined('ABSPATH')) {
 */
 
 /**
- * Controller_Update
- * Basic class to set up activation flag
- *
+ * A simple interface to standardise how actions and filters should be applied in classes
  * @since 4.0
  */
-class Controller_Update
-{
+interface Helper_Int_Actions {
     /**
-     * Run plugin activation functionality 
+     * Apply any actions needed for the settings page
      * @since 4.0
      * @return void
      */
-    public static function activation() {
-        /* Add Upgraded From Option */
-        set_transient('_gravitypdf_activation_redirect', true, 30);
-    }
+    public function add_actions();	
 }

@@ -43,35 +43,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @since 4.0
  */
 class Model_Settings extends Helper_Model {
-    /**
-     * Display the settings page for Gravity PDF 
-     * @since 4.0
-     * @return void
-     */
-    public function displayPage() {
-        $controller = $this->getController();
-
-        /**
-         * Determine which settings page to load
-         */
-        $page = (isset($_GET['tab'])) ? $_GET['tab'] : 'general';
-
-        switch($page) {
-          case 'general':
-            $controller->view->general();      
-          break;
-
-          case 'tools':
-            $controller->view->tools();
-          break;
-
-          case 'help':
-            $controller->view->help();      
-          break;
-        }
-        
-    }
-
+  
     /**
      * Add meta boxes used in the settings "help" tab
      * @since  4.0
@@ -178,6 +150,7 @@ class Model_Settings extends Helper_Model {
 
     /**
      * [add_meta_pdf_popular_articles description]
+     * TODO
      * @param [type] $object [description]
      */
     public function add_meta_pdf_popular_articles($object) {       
@@ -211,6 +184,7 @@ class Model_Settings extends Helper_Model {
 
     /**
      * [add_meta_pdf_recent_forum_articles description]
+     * TODO
      * @param [type] $object [description]
      */
     public function add_meta_pdf_recent_forum_articles($object) {       
@@ -244,6 +218,7 @@ class Model_Settings extends Helper_Model {
 
     /**
      * [add_meta_pdf_support_hours description]
+     * TODO
      * @param [type] $object [description]
      */
     public function add_meta_pdf_support_hours($object) {       

@@ -4,6 +4,7 @@ namespace GFPDF\Controller;
 use GFPDF\Helper\Helper_Controller;
 use GFPDF\Helper\Helper_Model;
 use GFPDF\Helper\Helper_View;
+use GFPDF\Helper\Helper_Int_Actions;
 
 /**
  * Welcome Screen Controller
@@ -41,12 +42,11 @@ if (! defined('ABSPATH')) {
 
 /**
  * Controller_Welcome_Screen
- *
  * A general class for About / Intro Screen
  *
  * @since 4.0
  */
-class Controller_Welcome_Screen extends Helper_Controller
+class Controller_Welcome_Screen extends Helper_Controller implements Helper_Int_Actions
 {
     /**
      * Load our model and view and required actions
@@ -65,8 +65,17 @@ class Controller_Welcome_Screen extends Helper_Controller
      * @since 4.0
      * @return void
      */
-    public function init() {
-        /* Load the welcome screen into the menu */
+    public function init() {       
+        $this->add_actions();
+    }    
+
+    /**
+     * Apply any actions needed for the settings page
+     * @since 4.0
+     * @return void
+     */
+    public function add_actions() {
+         /* Load the welcome screen into the menu */
         add_action('admin_menu', array( $this->model, 'admin_menus'));
         add_action('admin_init', array( $this, 'welcome'));
     }    

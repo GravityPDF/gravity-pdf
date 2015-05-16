@@ -252,10 +252,18 @@
 				if(this.is_settings()) {
 					this.processSettings();
 				}
+
+				if(this.is_form_settings()) {
+					this.processFormSettings();
+				}
 			}
 
 			this.is_settings = function() {
 				return $('#tab_PDF').length;
+			}
+
+			this.is_form_settings = function() {
+				return $('#gfpdf_pdf_form').length;
 			}
 
 			this.processSettings = function() {
@@ -279,6 +287,12 @@
 				}
 			}
 
+			this.processFormSettings = function() {
+				this.show_tooltips();
+				this.setup_select_boxes();	
+				this.setup_advanced_options();	
+			}
+
 			this.show_tooltips = function() {
 				$('.gf_hidden_tooltip').each(function() {
 					$(this)
@@ -296,7 +310,35 @@
 			}
 
 			this.setup_select_boxes = function() {
-				$('.gfpdf-chosen').chosen();
+				$('.gfpdf-chosen').each(function() {
+					var width = $(this).css('width');
+
+					$(this).chosen({
+						disable_search_threshold: 5,
+						width: width,
+					});
+				});					
+			}
+
+			this.setup_advanced_options = function() {
+				var $advanced_options  = $('.gfpdf-advanced-options a');
+
+				/*
+				 * Show / Hide Advanced options
+				 */
+				$advanced_options.click(function() {
+					var click = this;
+
+					/* toggle our slider */
+					$(this).parent().prev().slideToggle(600, function() {
+						var text = $(click).text();
+						$(click).text(
+							text == GFPDF.general_advanced_show ? GFPDF.general_advanced_hide : GFPDF.general_advanced_show
+						);						
+					});	
+
+					return false;				
+				});						
 			}
 
 			/**
@@ -308,7 +350,7 @@
 				var $table             = $('#pdf-general-security');
 				var $adminRestrictions = $table.find('input[name="gfpdf_settings[limit_to_admin]"]');
 				var $userRestrictions  = $table.find('input[name="gfpdf_settings[limit_to_user]"]');
-				var $advanced_options  = $('.gfpdf-advanced-options a');
+				
 
 				/*
 				 * Add change event to admin restrictions to show/hide dependant fields 
@@ -323,16 +365,8 @@
 					}
 				});
 
-				/*
-				 * Show / Hide Advanced options
-				 */
-				$advanced_options.click(function() {
-					$(this).parent().prev().slideToggle(600);
-					var text = $(this).text();
-					$(this).text(
-						text == GFPDF.general_advanced_show ? GFPDF.general_advanced_hide : GFPDF.general_advanced_show
-					);
-				});								
+				/* setup advanced options */
+				this.setup_advanced_options();		
 			}
 
 			/**

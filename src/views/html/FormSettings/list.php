@@ -1,19 +1,12 @@
-<?php
+<?php 
 
 /**
- * Install Update Controller
+ * List of Form Settings View
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
- * 
- */
-
-/*
- * This file is called before compatibility checks are run 
- * We cannot add namespace support here which means no access 
- * to the rest of the plugin
  */
 
 /* Exit if accessed directly */
@@ -41,21 +34,31 @@ if (! defined('ABSPATH')) {
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-/**
- * Controller_Update
- * Basic class to set up activation flag
- *
- * @since 4.0
- */
-class Controller_Update
-{
-    /**
-     * Run plugin activation functionality 
-     * @since 4.0
-     * @return void
-     */
-    public static function activation() {
-        /* Add Upgraded From Option */
-        set_transient('_gravitypdf_activation_redirect', true, 30);
-    }
-}
+/* assign list_items object to variable for easier access */
+$list_itmes = $vars['list_items'];
+
+?>
+
+<?php \GFFormSettings::page_header( $vars['title'] ); ?>
+
+	<h3>
+		<span>
+		  <i class="fa fa-file-o"></i>
+		  <?php echo $vars['title']; ?>
+		  <a id="add-new-pdf" class="add-new-h2" href="<?php echo $vars['add_new_url'] ?>"><?php _e( 'Add New', 'gravityforms' ) ?></a>
+		</span>
+	</h3>
+
+	<form id="gfpdf_list_form" method="post">
+
+		<?php $list_itmes->display(); ?>
+
+		<input id="action_argument" name="action_argument" type="hidden" />
+		<input id="action" name="action" type="hidden" />
+
+		<?php wp_nonce_field( 'gform_pdf_list_action', 'gform_pdf_list_action' ) ?>
+
+	</form>		
+
+
+<?php \GFFormSettings::page_footer(); ?>

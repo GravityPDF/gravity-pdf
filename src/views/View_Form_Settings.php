@@ -1,19 +1,17 @@
 <?php
 
+namespace GFPDF\View;
+use GFPDF\Helper\Helper_View;
+use GFPDF_Major_Compatibility_Checks;
+use GFCommon;
+
 /**
- * Install Update Controller
+ * Settings View
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
- * 
- */
-
-/*
- * This file is called before compatibility checks are run 
- * We cannot add namespace support here which means no access 
- * to the rest of the plugin
  */
 
 /* Exit if accessed directly */
@@ -42,20 +40,23 @@ if (! defined('ABSPATH')) {
 */
 
 /**
- * Controller_Update
- * Basic class to set up activation flag
+ * View_Welcome_Screen
+ *
+ * A general class for About / Intro Screen
  *
  * @since 4.0
  */
-class Controller_Update
+class View_Form_Settings extends Helper_View
 {
+
     /**
-     * Run plugin activation functionality 
+     * Set the view's name
+     * @var string
      * @since 4.0
-     * @return void
      */
-    public static function activation() {
-        /* Add Upgraded From Option */
-        set_transient('_gravitypdf_activation_redirect', true, 30);
-    }
+    protected $ViewType = 'FormSettings';
+
+    public function __construct($data = array()) {
+        $this->data = $data;
+    }   
 }

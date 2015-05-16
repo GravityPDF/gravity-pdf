@@ -189,6 +189,8 @@ class Stat_Options_API {
 						'placeholder' => isset( $option['placeholder'] ) ? $option['placeholder'] : null,
 						'allow_blank' => isset( $option['allow_blank'] ) ? $option['allow_blank'] : true,	                    
 						'tooltip'     => isset( $option['tooltip'] )     ? $option['tooltip'] : null,	 
+						'mergetags'   => isset( $option['mergetags'] )     ? $option['mergetags'] : null,	 
+						'multiple'    => isset( $option['multiple'] )     ? $option['multiple'] : null,	 
 					)
 				);
 			}
@@ -219,8 +221,8 @@ class Stat_Options_API {
 			/** General Settings */
 			'general' => apply_filters( 'gfpdf_settings_general',
 				array(
-					'pdf_size' => array(
-						'id'      => 'pdf_size',
+					'default_pdf_size' => array(
+						'id'      => 'default_pdf_size',
 						'name'    => __('Default Paper Size', 'pdfextended'),
 						'desc'    => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'pdfextended'),
 						'type'    => 'select',
@@ -228,6 +230,26 @@ class Stat_Options_API {
 						'class'   => 'large',	
 						'chosen'  => true,				
 					),
+
+					'default_template' => array(
+						'id'      => 'default_template',
+						'name'    => __('Default Template', 'pdfextended'),
+						'desc'    => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'pdfextended'),
+						'type'    => 'select',
+						'options' => self::get_paper_size(),	
+						'class'   => 'large',	
+						'chosen'  => true,				
+					),
+
+					'default_font_type' => array(
+						'id'      => 'default_font_type',
+						'name'    => __('Default Font Type', 'pdfextended'),
+						'desc'    => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'pdfextended'),
+						'type'    => 'select',
+						'options' => self::get_paper_size(),	
+						'class'   => 'large',	
+						'chosen'  => true,				
+					),					
 
 					'cleanup' => array(
 						'id'      => 'cleanup',
@@ -329,6 +351,183 @@ class Stat_Options_API {
 				)
 			),
 
+			/* Form (PDF) Settings */
+			'form_settings' => apply_filters('gfpdf_form_settings', 
+				array(
+					'name' => array(
+						'id'   => 'name',
+						'name' => __('Name', 'pdfextended'),												
+						'type' => 'text',
+					),					
+
+					'template' => array(
+						'id'      => 'template',
+						'name'    => __('Template', 'pdfextended'),												
+						'desc' => 'test',
+						'type'    => 'select',
+						'options' => self::get_paper_size(),	
+						'class'   => 'large',	
+						'chosen'  => true,							
+						'tooltip' => 'test2',
+					),
+
+					'notification' => array(
+						'id'      => 'notification',
+						'name'    => __('Notifications', 'pdfextended'),												
+						'desc' => 'test',
+						'type'    => 'select',
+						'options' => self::get_paper_size(),	
+						'class'   => 'large',	
+						'chosen'  => true,							
+						'tooltip' => 'test2',
+						'multiple' => true,
+					),							
+
+					'filename' => array(
+						'id'   => 'filename',
+						'name' => __('Filename', 'pdfextended'),												
+						'type' => 'text',						
+						'desc' => 'Enter filename here',
+						'tooltip' => 'test3',
+						'mergetags' => true,
+					),									
+
+				
+				)
+			),
+
+			/* Form (PDF) Settings Appearance */
+			'form_settings_appearance' => apply_filters('form_settings_appearance', 
+				array(
+					'pdf_size' => array(
+						'id'      => 'pdf_size',
+						'name'    => __('Paper Size', 'pdfextended'),
+						'desc'    => __('Set the paper size used when generating PDFs.', 'pdfextended'),
+						'type'    => 'select',
+						'options' => self::get_paper_size(),	
+						'class'   => 'large',	
+						'chosen'  => true,				
+					),	
+
+					'orientation' => array(
+						'id'      => 'orientation',
+						'name'    => __('Orientation', 'pdfextended'),						
+						'type'    => 'select',
+						'options' => array(
+							__('Portrait', 'pdfextended'),
+							__('Landscape', 'pdfextended'),
+						),	
+						'class'   => 'large',	
+						'chosen'  => true,				
+					),	
+
+					'font' => array(
+						'id'      => 'font',
+						'name'    => __('Font', 'pdfextended'),						
+						'type'    => 'select',
+						'options' => array(
+							__('Dejavu Sans', 'pdfextended'),
+							__('Dejavu Sans Serif', 'pdfextended'),
+						),	
+						'class'   => 'large',	
+						'chosen'  => true,				
+					),	
+
+					'rtl' => array(
+						'id'    => 'rtl',
+						'name'    => __('Reverse Text (RTL)', 'pdfextended'),
+						'desc'  => __('Add password protection / restrict what users can do with document.', 'pdfextended'),						
+						'type'  => 'radio',						
+						'options' => array(
+							'Yes' => 'Yes',
+							'No'  => 'No'
+						),
+						'std'   => 'No',
+						'tooltip' => '<h6>' . __('Restrict Access to Administrators Only', 'pdfextended') . '</h6>' . __("Enable this option if you don't want users accessing the generated PDFs. This is userful if the documents are for internal use, or security is a major concern.", 'pdfextended'),
+					),					
+															
+				)
+			),
+
+			/* Form (PDF) Settings Advanced */
+			'form_settings_advanced' => apply_filters('form_settings_advanced', 
+				array(
+					'security' => array(
+						'id'    => 'security',
+						'name'  => __('Enable PDF Security', 'pdfextended'),
+						'desc'  => __('Add password protection / restrict what users can do with document.', 'pdfextended'),						
+						'type'  => 'radio',						
+						'options' => array(
+							'Yes' => 'Yes',
+							'No'  => 'No'
+						),
+						'std'   => 'No',
+						'tooltip' => '<h6>' . __('Restrict Access to Administrators Only', 'pdfextended') . '</h6>' . __("Enable this option if you don't want users accessing the generated PDFs. This is userful if the documents are for internal use, or security is a major concern.", 'pdfextended'),
+					),
+
+					'password' => array(
+						'id'   => 'password',
+						'name' => __('Password', 'pdfextended'),												
+						'type' => 'text',						
+						'desc' => 'Enter password here',
+						'tooltip' => 'test3',
+						'mergetags' => true,
+					),	
+
+					'privilages' => array(
+						'id'      => 'privilages',
+						'name'    => __('Privilages', 'pdfextended'),												
+						'desc' => 'test',
+						'type'    => 'select',
+						'options' => array(
+							'Test1',
+							'Test2',
+							'Test3',
+						),
+						'class'   => 'large',	
+						'chosen'  => true,							
+						'tooltip' => 'test2',
+						'multiple' => true,
+					),
+
+					'format' => array(
+						'id'    => 'format',
+						'name'  => __('Format', 'pdfextended'),
+						'desc'  => __('The PDF format', 'pdfextended'),						
+						'type'  => 'radio',						
+						'options' => array(
+							'Standard' => 'Standard',
+							'PDFA1B'  => 'PDFA1B',
+							'PDFX1A'  => 'PDFX1A',
+						),
+						'std'   => 'Standard',
+						'tooltip' => '<h6>' . __('Restrict Access to Administrators Only', 'pdfextended') . '</h6>' . __("Enable this option if you don't want users accessing the generated PDFs. This is userful if the documents are for internal use, or security is a major concern.", 'pdfextended'),
+					),	
+
+					'image_dpi' => array(
+						'id'    => 'image_dpi',
+						'name'  => __('Image DPI', 'pdfextended'),						
+						'type'  => 'number',
+						'size'  => 'small',
+						'std'   => 96,
+						'tooltip' => '<h6>' . __('Logged Out Timeout', 'pdfextended') . '</h6>' . __("By default, logged out users can view PDFs when their IP matches the IP assigned to the Gravity Form entry. But because IP addresses can change frequently a time-based restriction also applies.", 'pdfextended'),
+					),					
+
+					'save' => array(
+						'id'    => 'save',
+						'name'  => __('Always Save PDF?', 'pdfextended'),
+						'desc'  => __('Add password protection / restrict what users can do with document.', 'pdfextended'),						
+						'type'  => 'radio',						
+						'options' => array(
+							'Yes' => 'Yes',
+							'No'  => 'No'
+						),
+						'std'   => 'No',
+						'tooltip' => '<h6>' . __('Restrict Access to Administrators Only', 'pdfextended') . '</h6>' . __("Enable this option if you don't want users accessing the generated PDFs. This is userful if the documents are for internal use, or security is a major concern.", 'pdfextended'),
+					),
+
+				)
+			),
 		);
 
 		return apply_filters( 'gfpdf_registered_settings', $gfpdf_settings );
@@ -737,7 +936,12 @@ class Stat_Options_API {
 			$class = $args['class'];
 		}
 
-	    $html = '<select id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . ' '. $class .' ' . $chosen . '" name="gfpdf_settings[' . $args['id'] . ']" data-placeholder="' . $placeholder . '">';
+		$multiple = '';
+		if(isset($args['multiple'])) {
+			$multiple = 'multiple';
+		}
+
+	    $html = '<select id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . ' '. $class .' ' . $chosen . '" name="gfpdf_settings[' . $args['id'] . ']" data-placeholder="' . $placeholder . '" '. $multiple .'>';
 	    
 		foreach ( $args['options'] as $option => $name ) {
 			if(!is_array($name)) {

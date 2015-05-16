@@ -5,11 +5,9 @@ use GFPDF\Helper\Helper_Controller;
 use GFPDF\Helper\Helper_Model;
 use GFPDF\Helper\Helper_View;
 use GFPDF\Helper\Helper_Int_Actions;
-use GFPDF\Helper\Helper_Int_Filters;
-use \RGForms;
 
 /**
- * Settings Controller
+ * Form Settings (PDF Configuration) Controller
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
@@ -43,12 +41,12 @@ if (! defined('ABSPATH')) {
 */
 
 /**
- * Controller_Settings
- * A general class for the global PDF settings
+ * Controller_Form_Settings
+ * Controls the individual form PDF settings pages
  *
  * @since 4.0
  */
-class Controller_Settings extends Helper_Controller implements Helper_Int_Actions, Helper_Int_Filters
+class Controller_Form_Settings extends Helper_Controller implements Helper_Int_Actions
 {
     /**
      * Load our model and view and required actions
@@ -68,16 +66,11 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
      * @return void
      */
     public function init() {
-        global $gfpdf;
-        
         /* 
-         * Tell Gravity Forms to initiate our settings page
-         * Using the following Class/Model
+         * Tell Gravity Forms to add our form PDF settings pages         
          */ 
-         RGForms::add_settings_page($gfpdf->data->short_title, array($this, 'displayPage'));            
-
          $this->add_actions();
-         $this->add_filters();       
+        // $this->add_filters();       
     }
 
     /**
@@ -86,49 +79,42 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
      * @return void
      */
     public function add_actions() {
-        /* Load our settings meta boxes */
-        add_action('current_screen', array($this->model, 'add_meta_boxes')); 
+        global $gfpdf;
 
-        /* Display our system status on general and tools pages */
-        add_action('pdf-settings-general', array($this->view, 'system_status'));        
-        add_action('pdf-settings-tools', array($this->view, 'system_status'));
-        add_action('pdf-settings-tools', array($this->view, 'uninstaller'), 20);
+        /* Tell Gravity Forms to add our form PDF settings pages */
+        add_action( 'gform_form_settings_menu', array( $this->model, 'add_form_settings_menu' ), 10, 2 );
+        add_action( 'gform_form_settings_page_' . $gfpdf->data->slug, array( $this, 'displayPage' ) );
     }
 
     /**
-     * Apply any filters needed for the settings page
+     * Processes / Setup the form settings page.
      * @since 4.0
      * @return void
      */
-    public function add_filters() {
-        /* Add tooltips */
-        add_action('gform_tooltips', array($this->view, 'add_tooltips'));
-    }
+    public function displayPage() {        
+        global $gfpdf;
+        
+        /* Determine whether to load the add/edit page, or the list view */
+        $form_id = rgget( 'id' );
+        $pdf_id  = rgget( 'pid' );
 
-    /**
-     * Display the settings page for Gravity PDF 
-     * @since 4.0
-     * @return void
-     */
-    public function displayPage() {
+        /* Load the add/edit page */
+        if ( ! rgblank( $pdf_id ) ) {
+            $this->model->process_edit_view($form_id, $pdf_id);
+            return;
+        }
 
-        /**
-         * Determine which settings page to load
+        /* process list view */
+        $this->model->process_list_view($form_id);                
+
+        /*
+         * TODO: Save form settings if needed...
+         * Undecided if controller should call this (I think it should)
+         * Or model.
+         * It should also be done above 'display_page' in a separate method. But that's a job for later
          */
-        $page = (isset($_GET['tab'])) ? $_GET['tab'] : 'general';
-
-        switch($page) {
-          case 'general':
-            $this->view->general();      
-          break;
-
-          case 'tools':
-            $this->view->tools();
-          break;
-
-          case 'help':
-            $this->view->help();      
-          break;
-        }      
+        
+        //saves form settings if save button was pressed
+        //$this->maybe_save_form_settings( $form );        
     }    
 }

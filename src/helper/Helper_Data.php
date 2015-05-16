@@ -126,6 +126,18 @@ class Helper_Data {
         $this->set_directory_structure();
         $this->set_plugin_settings();
         $this->set_licensing();
+        $this->set_plugin_titles();
+    }
+
+    /**
+     * Set up our short title, long title and slug used in settings pages
+     * @return  void 
+     * @since  4.0
+     */
+    public function set_plugin_titles() {   
+        $this->short_title = __('PDF', 'pdfextended');
+        $this->title       = __('Gravity PDF', 'pdfextended');
+        $this->slug        = 'pdf';
     }
 
     /**
