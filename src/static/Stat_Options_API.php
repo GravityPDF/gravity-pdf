@@ -185,11 +185,10 @@ class Stat_Options_API {
 						'max'         => isset( $option['max'] )         ? $option['max']     : null,
 						'step'        => isset( $option['step'] )        ? $option['step']    : null,
 						'chosen'      => isset( $option['chosen'] )      ? $option['chosen']  : null,
-						'class'       => isset( $option['class'] )       ? $option['class']  : null,
+						'inputClass'  => isset( $option['inputClass'] )       ? $option['inputClass']  : null,
 						'placeholder' => isset( $option['placeholder'] ) ? $option['placeholder'] : null,
 						'allow_blank' => isset( $option['allow_blank'] ) ? $option['allow_blank'] : true,	                    
-						'tooltip'     => isset( $option['tooltip'] )     ? $option['tooltip'] : null,	 
-						'mergetags'   => isset( $option['mergetags'] )   ? $option['mergetags'] : null,	 
+						'tooltip'     => isset( $option['tooltip'] )     ? $option['tooltip'] : null,	 						
 						'multiple'    => isset( $option['multiple'] )    ? $option['multiple'] : null,	 
 						'required'    => isset( $option['required'] )    ? $option['required'] : null,	
 					)
@@ -228,7 +227,7 @@ class Stat_Options_API {
 						'desc'    => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'pdfextended'),
 						'type'    => 'select',
 						'options' => self::get_paper_size(),	
-						'class'   => 'large',	
+						'inputClass'   => 'large',	
 						'chosen'  => true,				
 					),
 
@@ -238,7 +237,7 @@ class Stat_Options_API {
 						'desc'    => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'pdfextended'),
 						'type'    => 'select',
 						'options' => self::get_paper_size(),	
-						'class'   => 'large',	
+						'inputClass'   => 'large',	
 						'chosen'  => true,				
 					),
 
@@ -248,7 +247,7 @@ class Stat_Options_API {
 						'desc'    => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'pdfextended'),
 						'type'    => 'select',
 						'options' => self::get_paper_size(),	
-						'class'   => 'large',	
+						'inputClass'   => 'large',	
 						'chosen'  => true,				
 					),					
 
@@ -368,7 +367,7 @@ class Stat_Options_API {
 						'desc'    =>  sprintf(__('Choose from the pre-installed templates or %sbuild your own%s.', 'pdfextended'), '<a href="#">', '</a>'),
 						'type'    => 'select',
 						'options' => self::get_templates(),	
-						'class'   => 'large',	
+						'inputClass'   => 'large',	
 						'chosen'  => true,							
 						'tooltip' => '<h6>' . __('Templates', 'pdfextended') . '</h6>' . __('Set the template used to generate your PDF.', 'pdfextended'),
 					),
@@ -382,7 +381,7 @@ class Stat_Options_API {
 							'Admin Notification',
 							'User Notification',
 						),	
-						'class'    => 'large',	
+						'inputClass'    => 'large',	
 						'chosen'   => true,													
 						'multiple' => true,
 						'placeholder' => __('Choose a Notification', 'pdfextended'),
@@ -394,7 +393,7 @@ class Stat_Options_API {
 						'type' => 'text',						
 						'desc' => 'The name used when saving a PDF. Mergetags are allowed.',
 						'tooltip' => '<h6>' . __('Filename', 'pdfextended') . '</h6>' . __('Set an appropriate filename for the generated PDF. You should exclude the .pdf extension from the name.', 'pdfextended'),
-						'mergetags' => true,
+						'inputClass' => 'merge-tag-support mt-hide_all_fields',
 						'required' => true,
 					),									
 
@@ -412,7 +411,7 @@ class Stat_Options_API {
 						'type'    => 'select',
 						'options' => self::get_paper_size(),	
 						'std'     => self::get_option('default_pdf_size'),
-						'class'   => 'large',	
+						'inputClass'   => 'large',	
 						'chosen'  => true,				
 					),	
 
@@ -424,7 +423,7 @@ class Stat_Options_API {
 							__('Portrait', 'pdfextended'),
 							__('Landscape', 'pdfextended'),
 						),	
-						'class'   => 'large',	
+						'inputClass'   => 'large',	
 						'chosen'  => true,				
 					),	
 
@@ -434,7 +433,7 @@ class Stat_Options_API {
 						'type'    => 'select',
 						'options' => self::get_installed_fonts(),	
 						'desc'    => __('Set the default font used in the PDF.', 'pdfextended'),
-						'class'   => 'large',	
+						'inputClass'   => 'large',	
 						'chosen'  => true,				
 					),	
 
@@ -470,7 +469,7 @@ class Stat_Options_API {
 						'std'   => 'Standard',
 						'tooltip' => '<h6>' . __('PDF Format', 'pdfextended') . '</h6>' . __("Generate a document adhearing to the appropriate PDF standard. When not in 'Standard' mode, watermarks, alpha-transparent PNGs and security options can NOT be used.", 'pdfextended'),
 					),	
-					
+
 					'security' => array(
 						'id'      => 'security',
 						'name'    => __('Enable PDF Security', 'pdfextended'),
@@ -484,11 +483,11 @@ class Stat_Options_API {
 					),
 
 					'password' => array(
-						'id'        => 'password',
-						'name'      => __('Password', 'pdfextended'),												
-						'type'      => 'text',						
-						'desc'      => 'Set a password to view PDFs. Leave blank to disable password protection.',
-						'mergetags' => true,
+						'id'    => 'password',
+						'name'  => __('Password', 'pdfextended'),												
+						'type'  => 'text',						
+						'desc'  => 'Set a password to view PDFs. Leave blank to disable password protection.',
+						'inputClass' => 'merge-tag-support mt-hide_all_fields',
 					),	
 
 					'privilages' => array(
@@ -507,7 +506,7 @@ class Stat_Options_API {
 							'extract',
 							'assemble',						
 						),
-						'class'       => 'large',	
+						'inputClass'       => 'large',	
 						'chosen'      => true,							
 						'tooltip'     => '<h6>' . __('Privileges', 'pdfextended') . '</h6>' . __("You can prevent the end-user completing certain actions to the PDF, such as copying text, printing, adding annotations or extracting pages.", 'pdfextended'),
 						'multiple'    => true,
@@ -852,8 +851,13 @@ class Stat_Options_API {
 			$required = 'required';
 		}
 
+		$class = '';
+		if(isset($args['inputClass'])) {
+			$class = $args['inputClass'];
+		}		
+
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
-		$html = '<input type="text" class="' . $size . '-text" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" '. $required .' />';
+		$html = '<input type="text" class="' . $size . '-text '. $class .'" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" '. $required .' />';
 		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
 
 		if(isset($args['tooltip'])) {
@@ -988,8 +992,6 @@ class Stat_Options_API {
 			$value = $gfpdf_options[ $args['id'] ];
 		}		
 
-
-
 		$placeholder = '';
 	    if ( isset( $args['placeholder'] ) ) {
 	        $placeholder = $args['placeholder'];	   
@@ -1001,8 +1003,8 @@ class Stat_Options_API {
 		}
 
 		$class = '';
-		if(isset($args['class'])) {
-			$class = $args['class'];
+		if(isset($args['inputClass'])) {
+			$class = $args['inputClass'];
 		}
 
 		$multiple = '';

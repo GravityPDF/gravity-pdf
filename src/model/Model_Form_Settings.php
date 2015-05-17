@@ -98,6 +98,9 @@ class Model_Form_Settings extends Helper_Model {
 
         $controller = $this->getController();
 
+        /* get the form object */
+        $form = RGFormsModel::get_form_meta( $form_id );        
+
         /* parse input and get required information */
         $pdf_id = (int) $pdf_id;
 
@@ -108,7 +111,8 @@ class Model_Form_Settings extends Helper_Model {
         $controller->view->add_edit(array(
             'pdf_id'       => $gfpdf->data->title,
             'title'        => $label, 
-            'button_label' => $label,          
+            'button_label' => $label, 
+            'form'         => $form,         
         ));         
     }
 }

@@ -5,8 +5,26 @@
  */
 
 (function($) {	
+
 	$(function() {
 
+		/*
+		 * Override the gfMergeTagsObj.getTargetElement prototype to better handle CSS special characters in selectors 
+		 */
+		if(typeof form != 'undefined') {
+			window.gfMergeTags.getTargetElement = function(elem) {
+				console.log('Gravity PDF gfMergeTags.getTargetElement Override Running');
+
+				var $elem    = $( elem );
+				var selector = $elem.parents('span.all-merge-tags').data('targetElement');				
+
+				/* escape any meta-characters as per jQuery Spec http://api.jquery.com/category/selectors/ */
+		        selector = selector.replace(/[!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&");        
+
+		        return $('#' + selector );		        		        
+			}
+		}
+		
 		/**
 		 * Write our backbone model/view/controller for the help API
 		 */	

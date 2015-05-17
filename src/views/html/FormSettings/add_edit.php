@@ -36,6 +36,13 @@ if (! defined('ABSPATH')) {
 
 ?>
 
+<!-- Merge tag functionality requires a global form object -->
+<script type="text/javascript">
+    <?php \GFCommon::gf_global(); ?>
+    
+    var form = <?php echo json_encode( $vars['form'] ); ?>;
+</script>
+
 <?php \GFFormSettings::page_header( $vars['title'] ); ?>
 
 	<h3>

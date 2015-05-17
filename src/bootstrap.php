@@ -139,6 +139,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
      * Register requrired JS
      * @since 4.0
      * @return void
+     * @todo Limit js dependancies on particular pages (eg. form pdf settings vs global settings)
      */
     private function register_scripts() {
 
@@ -149,7 +150,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
             $suffix = '.min.';
         }
 
-        wp_register_script( 'gfpdf_settings', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-settings'. $suffix .'.js', array('wpdialogs', 'backbone', 'underscore', 'jquery-ui-tooltip'), $version );           
+        wp_register_script( 'gfpdf_settings', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-settings'. $suffix .'.js', array('wpdialogs', 'backbone', 'underscore', 'jquery-ui-tooltip', 'gform_form_admin'), $version );           
         wp_register_script( 'gfpdf_chosen', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.jquery.min.js', array('jquery'), $version );                   
 
         /*
