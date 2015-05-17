@@ -189,8 +189,9 @@ class Stat_Options_API {
 						'placeholder' => isset( $option['placeholder'] ) ? $option['placeholder'] : null,
 						'allow_blank' => isset( $option['allow_blank'] ) ? $option['allow_blank'] : true,	                    
 						'tooltip'     => isset( $option['tooltip'] )     ? $option['tooltip'] : null,	 
-						'mergetags'   => isset( $option['mergetags'] )     ? $option['mergetags'] : null,	 
-						'multiple'    => isset( $option['multiple'] )     ? $option['multiple'] : null,	 
+						'mergetags'   => isset( $option['mergetags'] )   ? $option['mergetags'] : null,	 
+						'multiple'    => isset( $option['multiple'] )    ? $option['multiple'] : null,	 
+						'required'    => isset( $option['required'] )    ? $option['required'] : null,	
 					)
 				);
 			}
@@ -257,10 +258,10 @@ class Stat_Options_API {
 						'desc'    => __('When enabled, the PDF will be removed from your file system when it is no longer needed. Enable to save disk space.', 'pdfextended'),
 						'type'    => 'radio',
 						'options' => array(
-							'Yes' => 'Yes',
-							'No'  => 'No'
+							'Yes' => __('Yes', 'pdfextended'),
+							'No'  => __('No', 'pdfextended')
 						),
-						'std'     => 'Yes',
+						'std'     => __('Yes', 'pdfextended'),
 						'tooltip' => '<h6>' . __('Cleanup PDFs', 'pdfextended') . '</h6>' . __('If you are using the "notification" or "save" configuration option, by default Gravity PDF will store copies of your PDF on your server. If you have limited disk space you should enable this option. Note: You can regenerate your PDFs at any time.', 'pdfextended'),
 					),
 
@@ -288,10 +289,10 @@ class Stat_Options_API {
 						'desc'  => __('Restrict PDF access to users with the <em>"Gravity Forms View Entries"</em> privilege. By default this is administrators only.', 'pdfextended'),						
 						'type'  => 'radio',						
 						'options' => array(
-							'Yes' => 'Yes',
-							'No'  => 'No'
+							'Yes' => __('Yes', 'pdfextended'),
+							'No'  => __('No', 'pdfextended')
 						),
-						'std'   => 'No',
+						'std'   => __('No', 'pdfextended'),
 						'tooltip' => '<h6>' . __('Restrict Access to Administrators Only', 'pdfextended') . '</h6>' . __("Enable this option if you don't want users accessing the generated PDFs. This is userful if the documents are for internal use, or security is a major concern.", 'pdfextended'),
 					),				
 
@@ -358,38 +359,43 @@ class Stat_Options_API {
 						'id'   => 'name',
 						'name' => __('Name', 'pdfextended'),												
 						'type' => 'text',
+						'required' => true,
 					),					
 
 					'template' => array(
 						'id'      => 'template',
 						'name'    => __('Template', 'pdfextended'),												
-						'desc' => 'test',
+						'desc'    =>  sprintf(__('Choose from the pre-installed templates or %sbuild your own%s.', 'pdfextended'), '<a href="#">', '</a>'),
 						'type'    => 'select',
-						'options' => self::get_paper_size(),	
+						'options' => self::get_templates(),	
 						'class'   => 'large',	
 						'chosen'  => true,							
-						'tooltip' => 'test2',
+						'tooltip' => '<h6>' . __('Templates', 'pdfextended') . '</h6>' . __('Set the template used to generate your PDF.', 'pdfextended'),
 					),
 
 					'notification' => array(
-						'id'      => 'notification',
-						'name'    => __('Notifications', 'pdfextended'),												
-						'desc' => 'test',
-						'type'    => 'select',
-						'options' => self::get_paper_size(),	
-						'class'   => 'large',	
-						'chosen'  => true,							
-						'tooltip' => 'test2',
+						'id'       => 'notification',
+						'name'     => __('Notifications', 'pdfextended'),												
+						'desc'     => __('Automatically attach PDF to the selected notifications.', 'pdfextended'),
+						'type'     => 'select',
+						'options'  => array(
+							'Admin Notification',
+							'User Notification',
+						),	
+						'class'    => 'large',	
+						'chosen'   => true,													
 						'multiple' => true,
+						'placeholder' => __('Choose a Notification', 'pdfextended'),
 					),							
 
 					'filename' => array(
 						'id'   => 'filename',
 						'name' => __('Filename', 'pdfextended'),												
 						'type' => 'text',						
-						'desc' => 'Enter filename here',
-						'tooltip' => 'test3',
+						'desc' => 'The name used when saving a PDF. Mergetags are allowed.',
+						'tooltip' => '<h6>' . __('Filename', 'pdfextended') . '</h6>' . __('Set an appropriate filename for the generated PDF. You should exclude the .pdf extension from the name.', 'pdfextended'),
 						'mergetags' => true,
+						'required' => true,
 					),									
 
 				
@@ -405,6 +411,7 @@ class Stat_Options_API {
 						'desc'    => __('Set the paper size used when generating PDFs.', 'pdfextended'),
 						'type'    => 'select',
 						'options' => self::get_paper_size(),	
+						'std'     => self::get_option('default_pdf_size'),
 						'class'   => 'large',	
 						'chosen'  => true,				
 					),	
@@ -425,10 +432,8 @@ class Stat_Options_API {
 						'id'      => 'font',
 						'name'    => __('Font', 'pdfextended'),						
 						'type'    => 'select',
-						'options' => array(
-							__('Dejavu Sans', 'pdfextended'),
-							__('Dejavu Sans Serif', 'pdfextended'),
-						),	
+						'options' => self::get_installed_fonts(),	
+						'desc'    => __('Set the default font used in the PDF.', 'pdfextended'),
 						'class'   => 'large',	
 						'chosen'  => true,				
 					),	
@@ -436,13 +441,13 @@ class Stat_Options_API {
 					'rtl' => array(
 						'id'    => 'rtl',
 						'name'    => __('Reverse Text (RTL)', 'pdfextended'),
-						'desc'  => __('Add password protection / restrict what users can do with document.', 'pdfextended'),						
+						'desc'  => __('Written languages like Arabic and Hebrew are written right to left.', 'pdfextended'),						
 						'type'  => 'radio',						
 						'options' => array(
-							'Yes' => 'Yes',
-							'No'  => 'No'
+							'Yes' => __('Yes', 'pdfextended'),
+							'No'  => __('No', 'pdfextended')
 						),
-						'std'   => 'No',
+						'std'   => __('No', 'pdfextended'),
 						'tooltip' => '<h6>' . __('Restrict Access to Administrators Only', 'pdfextended') . '</h6>' . __("Enable this option if you don't want users accessing the generated PDFs. This is userful if the documents are for internal use, or security is a major concern.", 'pdfextended'),
 					),					
 															
@@ -452,57 +457,62 @@ class Stat_Options_API {
 			/* Form (PDF) Settings Advanced */
 			'form_settings_advanced' => apply_filters('form_settings_advanced', 
 				array(
-					'security' => array(
-						'id'    => 'security',
-						'name'  => __('Enable PDF Security', 'pdfextended'),
-						'desc'  => __('Add password protection / restrict what users can do with document.', 'pdfextended'),						
+					'format' => array(
+						'id'    => 'format',
+						'name'  => __('Format', 'pdfextended'),
+						'desc'  => __('Generate a PDF in the selected format.', 'pdfextended'),						
 						'type'  => 'radio',						
 						'options' => array(
-							'Yes' => 'Yes',
-							'No'  => 'No'
+							'Standard' => 'Standard',
+							'PDFA1B'  => 'PDF/A-1b',
+							'PDFX1A'  => 'PDF/X-1a',
 						),
-						'std'   => 'No',
-						'tooltip' => '<h6>' . __('Restrict Access to Administrators Only', 'pdfextended') . '</h6>' . __("Enable this option if you don't want users accessing the generated PDFs. This is userful if the documents are for internal use, or security is a major concern.", 'pdfextended'),
+						'std'   => 'Standard',
+						'tooltip' => '<h6>' . __('PDF Format', 'pdfextended') . '</h6>' . __("Generate a document adhearing to the appropriate PDF standard. When not in 'Standard' mode, watermarks, alpha-transparent PNGs and security options can NOT be used.", 'pdfextended'),
+					),	
+					
+					'security' => array(
+						'id'      => 'security',
+						'name'    => __('Enable PDF Security', 'pdfextended'),
+						'desc'    => __('Password protect generated PDFs, or restrict user capabilities.', 'pdfextended'),						
+						'type'    => 'radio',						
+						'options' => array(
+							'Yes' => __('Yes', 'pdfextended'),
+							'No'  => __('No', 'pdfextended')
+						),
+						'std'     => __('No', 'pdfextended'),						
 					),
 
 					'password' => array(
-						'id'   => 'password',
-						'name' => __('Password', 'pdfextended'),												
-						'type' => 'text',						
-						'desc' => 'Enter password here',
-						'tooltip' => 'test3',
+						'id'        => 'password',
+						'name'      => __('Password', 'pdfextended'),												
+						'type'      => 'text',						
+						'desc'      => 'Set a password to view PDFs. Leave blank to disable password protection.',
 						'mergetags' => true,
 					),	
 
 					'privilages' => array(
-						'id'      => 'privilages',
-						'name'    => __('Privilages', 'pdfextended'),												
-						'desc' => 'test',
+						'id'      => 'privileges',
+						'name'    => __('Privileges', 'pdfextended'),												
+						'desc'    => 'Restrict end-user capabilities.',
 						'type'    => 'select',
-						'options' => array(
-							'Test1',
-							'Test2',
-							'Test3',
+						'options' => self::get_privilages(),
+						'std'     => array(
+							'copy',
+							'print',
+							'print-highres',
+							'modify',
+							'annot-forms',
+							'fill-forms',
+							'extract',
+							'assemble',						
 						),
-						'class'   => 'large',	
-						'chosen'  => true,							
-						'tooltip' => 'test2',
-						'multiple' => true,
+						'class'       => 'large',	
+						'chosen'      => true,							
+						'tooltip'     => '<h6>' . __('Privileges', 'pdfextended') . '</h6>' . __("You can prevent the end-user completing certain actions to the PDF, such as copying text, printing, adding annotations or extracting pages.", 'pdfextended'),
+						'multiple'    => true,
+						'placeholder' => __('Select PDF Privileges', 'pdfextended'),
 					),
-
-					'format' => array(
-						'id'    => 'format',
-						'name'  => __('Format', 'pdfextended'),
-						'desc'  => __('The PDF format', 'pdfextended'),						
-						'type'  => 'radio',						
-						'options' => array(
-							'Standard' => 'Standard',
-							'PDFA1B'  => 'PDFA1B',
-							'PDFX1A'  => 'PDFX1A',
-						),
-						'std'   => 'Standard',
-						'tooltip' => '<h6>' . __('Restrict Access to Administrators Only', 'pdfextended') . '</h6>' . __("Enable this option if you don't want users accessing the generated PDFs. This is userful if the documents are for internal use, or security is a major concern.", 'pdfextended'),
-					),	
 
 					'image_dpi' => array(
 						'id'    => 'image_dpi',
@@ -510,20 +520,20 @@ class Stat_Options_API {
 						'type'  => 'number',
 						'size'  => 'small',
 						'std'   => 96,
-						'tooltip' => '<h6>' . __('Logged Out Timeout', 'pdfextended') . '</h6>' . __("By default, logged out users can view PDFs when their IP matches the IP assigned to the Gravity Form entry. But because IP addresses can change frequently a time-based restriction also applies.", 'pdfextended'),
+						'tooltip' => '<h6>' . __('Image DPI', 'pdfextended') . '</h6>' . __("Control the image DPI (dots per inch). Set to 300 when professionally printing.", 'pdfextended'),
 					),					
 
 					'save' => array(
 						'id'    => 'save',
 						'name'  => __('Always Save PDF?', 'pdfextended'),
-						'desc'  => __('Add password protection / restrict what users can do with document.', 'pdfextended'),						
+						'desc'  => __('Force a PDF to be saved to disk when a new entry is submitted.', 'pdfextended'),						
 						'type'  => 'radio',						
 						'options' => array(
-							'Yes' => 'Yes',
-							'No'  => 'No'
+							'Yes' => __('Yes', 'pdfextended'),
+							'No'  => __('No', 'pdfextended')
 						),
-						'std'   => 'No',
-						'tooltip' => '<h6>' . __('Restrict Access to Administrators Only', 'pdfextended') . '</h6>' . __("Enable this option if you don't want users accessing the generated PDFs. This is userful if the documents are for internal use, or security is a major concern.", 'pdfextended'),
+						'std'   => __('No', 'pdfextended'),
+						'tooltip' => '<h6>' . __('Save PDF', 'pdfextended') . '</h6>' . __("When notifications are disabled a PDF is not automatically saved to disk. Enable this option to force the PDF to be generated and saved. Useful when using the 'gfpdf_post_pdf_save' hook to copy / manipulate the PDF further.", 'pdfextended'),
 					),
 
 				)
@@ -533,6 +543,12 @@ class Stat_Options_API {
 		return apply_filters( 'gfpdf_registered_settings', $gfpdf_settings );
 	}
 
+	/**
+	 * Return our paper size 
+	 * @return array The array of paper sizes avaiable 
+	 * @todo allow "Other" option
+	 * @since 4.0
+	 */	
 	public static function get_paper_size() {
 		return array(
 			'Common Sizes' => array(
@@ -597,6 +613,51 @@ class Stat_Options_API {
 				'SRA4' => __('SRA4 (225 x 320mm)', 'pdfextended'),				
 			),						
 		); 		
+	}
+
+	/**
+	 * Parse our installed PDF template files
+	 * @return array The array of templates 
+	 * @since 4.0
+	 */
+	public static function get_templates() {
+		$templates = array(
+			'Pre-Installed' => array(
+				'Awesomeness',
+				'Gravity Forms Style',
+			),
+			'Custom Templates' => array(
+				'Example1',
+				'Example2',
+			),
+		);
+
+		return $templates;
+	}
+
+	public static function get_installed_fonts() {
+		$fonts = array(
+			__('Dejavu Sans', 'pdfextended'),
+			__('Dejavu Sans Serif', 'pdfextended'),
+		);
+
+		return $fonts;
+	}
+
+	public static function get_privilages() {
+		$privilages = array(
+			'copy'          => __('Copy', 'pdfextended'),
+			'print'         => __('Print - Low Resolution', 'pdfextended'),
+			'print-highres' => __('Print - High Resolution', 'pdfextended'),
+			'modify'        => __('Modify', 'pdfextended'),
+			'annot-forms'   => __('Annotate', 'pdfextended'),
+			'fill-forms'    => __('Fill Forms', 'pdfextended'),
+			'extract'       => __('Extract', 'pdfextended'),
+			'assemble'      => __('Assemble', 'pdfextended'),
+			
+		);
+
+		return $privilages;
 	}
 
 	/**
@@ -780,13 +841,19 @@ class Stat_Options_API {
 		global $gfpdf;
 		$gfpdf_options = $gfpdf->data->settings;
 
-		if ( isset( $gfpdf_options[ $args['id'] ] ) )
+		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
 			$value = $gfpdf_options[ $args['id'] ];
-		else
+		} else {
 			$value = isset( $args['std'] ) ? $args['std'] : '';
+		}
+
+		$required = '';
+		if(isset($args['required']) && $args['required'] === true) {
+			$required = 'required';
+		}
 
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
-		$html = '<input type="text" class="' . $size . '-text" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '"/>';
+		$html = '<input type="text" class="' . $size . '-text" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" '. $required .' />';
 		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
 
 		if(isset($args['tooltip'])) {
@@ -919,7 +986,9 @@ class Stat_Options_API {
 		$value = isset( $args['std'] ) ? $args['std'] : '';
 		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
 			$value = $gfpdf_options[ $args['id'] ];
-		}					
+		}		
+
+
 
 		$placeholder = '';
 	    if ( isset( $args['placeholder'] ) ) {
@@ -945,12 +1014,32 @@ class Stat_Options_API {
 	    
 		foreach ( $args['options'] as $option => $name ) {
 			if(!is_array($name)) {
-				$selected = selected( $option, $value, false );
+				if(is_array($value)) {
+					foreach($value as $v) {
+						$selected = selected( $option, $v, false );
+						if($selected != '') {
+							break;
+						}
+					}
+				} else {
+					$selected = selected( $option, $value, false );	
+				}				
+				
 				$html .= '<option value="' . $option . '" ' . $selected . '>' . $name . '</option>';
 			} else {
 				$html .= '<optgroup label="' . esc_html($option) . '">';
 				foreach($name as $op_value => $op_label) {
-					$selected = selected( $op_value, $value, false );
+					if(is_array($value)) {
+						foreach($value as $v) {
+							$selected = selected( $op_value, $v, false );
+							if($selected != '') {
+								break;
+							}
+						}
+					} else {
+						$selected = selected( $op_value, $value, false );	
+					}					
+					
 					$html .= '<option value="' . $op_value . '" ' . $selected . '>' . $op_label . '</option>';
 				}
 				$html .= '</optgroup>';

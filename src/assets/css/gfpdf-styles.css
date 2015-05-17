@@ -65,6 +65,10 @@
 #tab_pdf select.large {
   width: 350px;
 }
+ 
+#tab_pdf .formSubmitted input:invalid {
+  border: 1px solid red;
+}
 
 /**
  * Tools Settings Page

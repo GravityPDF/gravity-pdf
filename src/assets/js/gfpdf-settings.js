@@ -287,10 +287,69 @@
 				}
 			}
 
-			this.processFormSettings = function() {
-				this.show_tooltips();
+			this.processFormSettings = function() {				
 				this.setup_select_boxes();	
 				this.setup_advanced_options();	
+				this.setup_required_fields($('#gfpdf_pdf_form'));				
+				this.show_tooltips();
+
+				var $secTable    = $('#pdf-general-advanced');
+				var $pdfSecurity = $secTable.find('input[name="gfpdf_settings[security]"]');
+				var $format      = $secTable.find('input[name="gfpdf_settings[format]"]');
+
+				/*
+				 * Add change event to admin restrictions to show/hide dependant fields 
+				 */
+				$pdfSecurity.change(function() {					
+					if($(this).is(':checked')) {
+						/* get the format dependancy */
+						var format =  $format.filter(':checked').val();
+
+						if($(this).val() === 'No' || format !== 'Standard') {
+							/* show security password / privileges */
+							$secTable.find('tr:nth-child(3),tr:nth-child(4)').hide();
+						} else {
+							/* hide security password / privileges */
+							$secTable.find('tr:nth-child(3),tr:nth-child(43)').show();
+						}
+
+						if(format !== 'Standard') {
+							$secTable.find('tr:nth-child(2)').hide();
+						} else {
+							$secTable.find('tr:nth-child(2)').show();
+						}
+					}					
+				}).trigger('change');	
+				
+				$format.change(function() {		
+					if($(this).is(':checked')) {
+						$pdfSecurity.trigger('change');
+					}					
+				});
+
+				/*
+				 * Add change event to 'chosen' notification item 
+				 */
+				$("#gfpdf_settings\\[notification\\]").change( function() {
+					var not  = $(this).val();
+					var $elm = $('input[name="gfpdf_settings[save]"]').parents('tr');
+					if(not !== null && not.length > 0) {
+						$elm.hide();
+					} else {
+						$elm.show();
+					}
+				});
+										
+			}
+
+			this.setup_required_fields = function($elm) {
+				$elm.find('input[type="submit"]').click(function() {
+					$(this).parents('form').addClass('formSubmitted');
+				});				
+
+				$elm.find(':input[required=""], :input[required]').each(function() {				
+					$(this).parents('tr').find('th').append('<span class="gfield_required">*</span>');
+				});				
 			}
 
 			this.show_tooltips = function() {
@@ -331,6 +390,7 @@
 
 					/* toggle our slider */
 					$(this).parent().prev().slideToggle(600, function() {
+						/* Toggle our link text */
 						var text = $(click).text();
 						$(click).text(
 							text == GFPDF.general_advanced_show ? GFPDF.general_advanced_hide : GFPDF.general_advanced_show
@@ -358,10 +418,10 @@
 				$adminRestrictions.change(function() {					
 					if($(this).val() === 'Yes') {
 						/* hide user restrictions and logged out user timeout */
-						$table.find('tr:nth-child(2)').fadeOut();
+						$table.find('tr:nth-child(2)').hide();
 					} else {
 						/* hide user restrictions and logged out user timeout */
-						$table.find('tr:nth-child(2)').fadeIn();
+						$table.find('tr:nth-child(2)').show();
 					}
 				});
 
