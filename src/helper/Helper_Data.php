@@ -171,6 +171,9 @@ class Helper_Data {
 
         /* assign our settings */
         $this->settings = Stat_Options_API::get_settings();         
+
+        /* set up storage cache for our form settings */
+        $this->form_settings = array();
     }
 
     /**

@@ -5,6 +5,7 @@ use GFPDF\Helper\Helper_Controller;
 use GFPDF\Helper\Helper_Model;
 use GFPDF\Helper\Helper_View;
 use GFPDF\Helper\Helper_Int_Actions;
+use GFPDF\Helper\Helper_Int_Filters;
 
 /**
  * Form Settings (PDF Configuration) Controller
@@ -46,7 +47,7 @@ if (! defined('ABSPATH')) {
  *
  * @since 4.0
  */
-class Controller_Form_Settings extends Helper_Controller implements Helper_Int_Actions
+class Controller_Form_Settings extends Helper_Controller implements Helper_Int_Actions, Helper_Int_Filters
 {
     /**
      * Load our model and view and required actions
@@ -70,7 +71,7 @@ class Controller_Form_Settings extends Helper_Controller implements Helper_Int_A
          * Tell Gravity Forms to add our form PDF settings pages         
          */ 
          $this->add_actions();
-        // $this->add_filters();       
+         $this->add_filters();       
     }
 
     /**
@@ -87,6 +88,20 @@ class Controller_Form_Settings extends Helper_Controller implements Helper_Int_A
     }
 
     /**
+     * Apply any filters needed for the settings page
+     * @since 4.0
+     * @return void
+     */
+    public function add_filters() {
+
+        /* Add Validation Errors */
+        add_filter( 'gfpdf_form_settings', array($this->model, 'validation_error'));
+
+        /* Enhance sanitize functionality */
+        add_filter( 'gfpdf_settings_sanitize_text', 'wp_strip_all_tags');
+    }
+
+    /**
      * Processes / Setup the form settings page.
      * @since 4.0
      * @return void
@@ -100,21 +115,15 @@ class Controller_Form_Settings extends Helper_Controller implements Helper_Int_A
 
         /* Load the add/edit page */
         if ( ! rgblank( $pdf_id ) ) {
-            $this->model->process_edit_view($form_id, $pdf_id);
+            if( rgpost('gfpdf_save_pdf')) {
+                $this->model->process_submission($form_id, $pdf_id);
+            }
+
+            $this->model->show_edit_view($form_id, $pdf_id);
             return;
         }
 
         /* process list view */
-        $this->model->process_list_view($form_id);                
-
-        /*
-         * TODO: Save form settings if needed...
-         * Undecided if controller should call this (I think it should)
-         * Or model.
-         * It should also be done above 'display_page' in a separate method. But that's a job for later
-         */
-        
-        //saves form settings if save button was pressed
-        //$this->maybe_save_form_settings( $form );        
+        $this->model->process_list_view($form_id);                     
     }    
 }

@@ -56,9 +56,19 @@
   margin-bottom: 20px;
 }
 
+.no-js #pdfextended-settings #gfpdf-advanced-options,
+.no-js #tab_pdf #gfpdf-advanced-options {
+  display: block;
+}
+
 #pdfextended-settings .gfpdf-advanced-options,
 #tab_pdf .gfpdf-advanced-options {
     margin-top: -18px;
+}
+
+.no-js #pdfextended-settings .gfpdf-advanced-options,
+.no-js #tab_pdf .gfpdf-advanced-options {
+  display: none;
 }
 
 #pdfextended-settings select.large,

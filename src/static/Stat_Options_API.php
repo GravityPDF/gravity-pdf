@@ -1,6 +1,7 @@
 <?php
 
 namespace GFPDF\Stat;
+use GFPDF\Model\Model_Form_Settings;
 
 /**
  * Options API 
@@ -153,6 +154,25 @@ class Stat_Options_API {
 	}
 
 	/**
+	 * Get form settings if appropriate items are set
+	 * @return Array The stored form settings 
+	 * @since 4.0
+	 */
+	public static function get_form_settings() {
+		/* get GF settings */
+		$form_id = (int) rgget('id');
+		$pid     = (!empty(rgget('pid'))) ? rgget('pid') : rgpost('gform_pdf_id');
+
+        /* return early if no ID set */
+        if(!$form_id) {
+            return array();
+        }
+
+		$model = new Model_Form_Settings();
+		return $model->get_settings($form_id);		
+	}
+
+	/**
 	 * Add all settings sections and fields
 	 *
 	 * @since 3.8
@@ -185,6 +205,7 @@ class Stat_Options_API {
 						'max'         => isset( $option['max'] )         ? $option['max']     : null,
 						'step'        => isset( $option['step'] )        ? $option['step']    : null,
 						'chosen'      => isset( $option['chosen'] )      ? $option['chosen']  : null,
+						'class'       => isset( $option['class'] )       ? $option['class']  : null,
 						'inputClass'  => isset( $option['inputClass'] )       ? $option['inputClass']  : null,
 						'placeholder' => isset( $option['placeholder'] ) ? $option['placeholder'] : null,
 						'allow_blank' => isset( $option['allow_blank'] ) ? $option['allow_blank'] : true,	                    
@@ -251,8 +272,8 @@ class Stat_Options_API {
 						'chosen'  => true,				
 					),					
 
-					'cleanup' => array(
-						'id'      => 'cleanup',
+					'cleanup_individual' => array(
+						'id'      => 'cleanup_individual',
 						'name'    => __('Regularly Cleanup PDFs', 'pdfextended'),
 						'desc'    => __('When enabled, the PDF will be removed from your file system when it is no longer needed. Enable to save disk space.', 'pdfextended'),
 						'type'    => 'radio',
@@ -270,8 +291,8 @@ class Stat_Options_API {
 						'desc'    => sprintf(__('Select the default action used when accessing a PDF from the %sGravity Forms entries list%s page.'), '<a href="'. admin_url('admin.php?page=gf_entries') . '">', '</a>'),
 						'type'    => 'radio',
 						'options' => array(
-							'View'     => 'View', 
-							'Download' => 'Download',
+							'View'     => __('View', 'pdfextended'), 
+							'Download' => __('Download', 'pdfextended'),
 						),
 						'std'     => 'View',
 					),					
@@ -378,8 +399,8 @@ class Stat_Options_API {
 						'desc'     => __('Automatically attach PDF to the selected notifications.', 'pdfextended'),
 						'type'     => 'select',
 						'options'  => array(
-							'Admin Notification',
-							'User Notification',
+							'Admin Notification' => 'Admin Notification',
+							'User Notification' => 'User Notification',
 						),	
 						'inputClass'    => 'large',	
 						'chosen'   => true,													
@@ -402,7 +423,7 @@ class Stat_Options_API {
 			),
 
 			/* Form (PDF) Settings Appearance */
-			'form_settings_appearance' => apply_filters('form_settings_appearance', 
+			'form_settings_appearance' => apply_filters('gfpdf_form_settings_appearance', 
 				array(
 					'pdf_size' => array(
 						'id'      => 'pdf_size',
@@ -420,8 +441,8 @@ class Stat_Options_API {
 						'name'    => __('Orientation', 'pdfextended'),						
 						'type'    => 'select',
 						'options' => array(
-							__('Portrait', 'pdfextended'),
-							__('Landscape', 'pdfextended'),
+							'portrait' => __('Portrait', 'pdfextended'),
+							'landscape' => __('Landscape', 'pdfextended'),
 						),	
 						'inputClass'   => 'large',	
 						'chosen'  => true,				
@@ -454,7 +475,7 @@ class Stat_Options_API {
 			),
 
 			/* Form (PDF) Settings Advanced */
-			'form_settings_advanced' => apply_filters('form_settings_advanced', 
+			'form_settings_advanced' => apply_filters('gfpdf_form_settings_advanced', 
 				array(
 					'format' => array(
 						'id'    => 'format',
@@ -622,12 +643,12 @@ class Stat_Options_API {
 	public static function get_templates() {
 		$templates = array(
 			'Pre-Installed' => array(
-				'Awesomeness',
-				'Gravity Forms Style',
+				'Awesomeness' => 'Awesomeness',
+				'Gravity Forms Style' => 'Gravity Forms Style',
 			),
 			'Custom Templates' => array(
-				'Example1',
-				'Example2',
+				'Example1' => 'Example1',
+				'Example2' => 'Example2',
 			),
 		);
 
@@ -636,8 +657,8 @@ class Stat_Options_API {
 
 	public static function get_installed_fonts() {
 		$fonts = array(
-			__('Dejavu Sans', 'pdfextended'),
-			__('Dejavu Sans Serif', 'pdfextended'),
+			'dejavusans' => __('Dejavu Sans', 'pdfextended'),
+			'dejavusansserif' => __('Dejavu Sans Serif', 'pdfextended'),
 		);
 
 		return $fonts;
@@ -672,7 +693,6 @@ class Stat_Options_API {
 	 * @return string $input Sanitizied value
 	 */
 	public static function settings_sanitize( $input = array() ) {
-
 		global $gfpdf;
 		$gfpdf_options = $gfpdf->data->settings;
 
@@ -751,10 +771,16 @@ class Stat_Options_API {
 	 * @return void
 	 */
 	public static function checkbox_callback( $args ) {
-		global $gfpdf;
+		global $gfpdf;		
 		$gfpdf_options = $gfpdf->data->settings;
 
+		/* add GF settings */
+		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
+		$gfpdf_form_settings = self::get_form_settings();
+
 		$checked = isset( $gfpdf_options[ $args['id'] ] ) ? checked( 1, $gfpdf_options[ $args['id'] ], false ) : '';
+		$checked = (empty($checked) && isset( $gfpdf_form_settings[ $pid ][ $args['id']])) ? checked( 1, $gfpdf_form_settings[ $pid ][ $args['id']], false ) : '';
+
 		$html = '<input type="checkbox" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="1" ' . $checked . '/>';
 		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
 		
@@ -779,9 +805,14 @@ class Stat_Options_API {
 		global $gfpdf;
 		$gfpdf_options = $gfpdf->data->settings;
 
+		/* add GF settings */
+		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
+		$gfpdf_form_settings = self::get_form_settings();		
+
 		if ( ! empty( $args['options'] ) ) {
 			foreach( $args['options'] as $key => $option ):
 				if( isset( $gfpdf_options[$args['id']][$key] ) ) { $enabled = $option; } else { $enabled = NULL; }
+				if( empty($enabled) && isset( $gfpdf_form_settings[ $pid ][ $args['id']]) ) { $enabled = $option; } else { $enabled = NULL; }
 				echo '<input name="gfpdf_settings[' . $args['id'] . '][' . $key . ']" id="gfpdf_settings[' . $args['id'] . '][' . $key . ']" class="gfpdf_settings_' . $args['id'] . '" type="checkbox" value="' . $option . '" ' . checked($option, $enabled, false) . '/>&nbsp;';
 				echo '<label for="gfpdf_settings[' . $args['id'] . '][' . $key . ']">' . $option . '</label><br />';
 			endforeach;
@@ -807,13 +838,26 @@ class Stat_Options_API {
 		global $gfpdf;
 		$gfpdf_options = $gfpdf->data->settings;
 
+		/* add GF settings */
+		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
+		$gfpdf_form_settings = self::get_form_settings();			
+
+		/**
+		 * Determine which key should be selected
+		 */
+		if(isset($gfpdf_options[ $args['id'] ]) && isset($args['options'][$gfpdf_options[ $args['id'] ]])) {
+			$selected = $gfpdf_options[ $args['id'] ];
+		} elseif(isset($gfpdf_form_settings[ $pid ][ $args['id']]) && isset($args['options'][ $gfpdf_form_settings[ $pid ][ $args['id']] ])) {
+			$selected = $gfpdf_form_settings[ $pid ][ $args['id']];
+		} elseif(isset( $args['std']) && isset($args['std'])) {
+			$selected = $args['std'];
+		}
+
 		foreach ( $args['options'] as $key => $option ) :
 			$checked = false;
-
-			if ( isset( $gfpdf_options[ $args['id'] ] ) && $gfpdf_options[ $args['id'] ] == $key )
+			if($selected == $key) {
 				$checked = true;
-			elseif( isset( $args['std'] ) && $args['std'] == $key && ! isset( $gfpdf_options[ $args['id'] ] ) )
-				$checked = true;
+			}
 
 			echo '<label for="gfpdf_settings[' . $args['id'] . '][' . $key . ']"><input name="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . '][' . $key . ']" type="radio" value="' . $key . '" ' . checked(true, $checked, false) . '/>';
 			echo $option . '</label> &nbsp;&nbsp;';
@@ -840,8 +884,14 @@ class Stat_Options_API {
 		global $gfpdf;
 		$gfpdf_options = $gfpdf->data->settings;
 
+		/* add GF settings */
+		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
+		$gfpdf_form_settings = self::get_form_settings();	
+
 		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
 			$value = $gfpdf_options[ $args['id'] ];
+		} elseif(empty($value) && isset( $gfpdf_form_settings[ $pid ][ $args['id']]) ) {
+			$value = $gfpdf_form_settings[ $pid ][ $args['id']];
 		} else {
 			$value = isset( $args['std'] ) ? $args['std'] : '';
 		}
@@ -881,10 +931,17 @@ class Stat_Options_API {
 		global $gfpdf;
 		$gfpdf_options = $gfpdf->data->settings;
 
-	    if ( isset( $gfpdf_options[ $args['id'] ] ) )
+		/* add GF settings */
+		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
+		$gfpdf_form_settings = self::get_form_settings();	
+
+	    if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
 			$value = $gfpdf_options[ $args['id'] ];
-		else
+	    } elseif(empty($value) && isset( $gfpdf_form_settings[ $pid ][ $args['id']]) ) {
+	    	$value = $gfpdf_form_settings[ $pid ][ $args['id']];
+	    } else {
 			$value = isset( $args['std'] ) ? $args['std'] : '';
+		}
 
 		$max  = isset( $args['max'] ) ? $args['max'] : 999999;
 		$min  = isset( $args['min'] ) ? $args['min'] : 0;
@@ -915,10 +972,17 @@ class Stat_Options_API {
 		global $gfpdf;
 		$gfpdf_options = $gfpdf->data->settings;
 
-		if ( isset( $gfpdf_options[ $args['id'] ] ) )
+		/* add GF settings */
+		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
+		$gfpdf_form_settings = self::get_form_settings();	
+
+		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
 			$value = $gfpdf_options[ $args['id'] ];
-		else
+		} elseif(empty($value) && isset( $gfpdf_form_settings[ $pid ][ $args['id']]) ) {
+			$value = $gfpdf_form_settings[ $pid ][ $args['id']];
+		} else {
 			$value = isset( $args['std'] ) ? $args['std'] : '';
+		}
 
 		$html = '<textarea class="large-text" cols="50" rows="5" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']">' . esc_textarea( stripslashes( $value ) ) . '</textarea>';
 		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
@@ -944,10 +1008,17 @@ class Stat_Options_API {
 		global $gfpdf;
 		$gfpdf_options = $gfpdf->data->settings;
 
-		if ( isset( $gfpdf_options[ $args['id'] ] ) )
+		/* add GF settings */
+		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
+		$gfpdf_form_settings = self::get_form_settings();	
+
+		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
 			$value = $gfpdf_options[ $args['id'] ];
-		else
+		} elseif(empty($value) && isset( $gfpdf_form_settings[ $pid ][ $args['id']]) ) {
+			$value = $gfpdf_form_settings[ $pid ][ $args['id']];
+		} else {
 			$value = isset( $args['std'] ) ? $args['std'] : '';
+		}
 
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
 		$html = '<input type="password" class="' . $size . '-text" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '"/>';
@@ -987,10 +1058,19 @@ class Stat_Options_API {
 		global $gfpdf;
 		$gfpdf_options = $gfpdf->data->settings;
 
-		$value = isset( $args['std'] ) ? $args['std'] : '';
+		/* add GF settings */
+		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
+		$gfpdf_form_settings = self::get_form_settings();	
+
+
+		
 		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
 			$value = $gfpdf_options[ $args['id'] ];
-		}		
+		} elseif(empty($value) && isset( $gfpdf_form_settings[ $pid ][ $args['id']]) ) {
+			$value = $gfpdf_form_settings[ $pid ][ $args['id']];
+		} else {
+			$value = isset( $args['std'] ) ? $args['std'] : '';
+		}
 
 		$placeholder = '';
 	    if ( isset( $args['placeholder'] ) ) {
@@ -1007,12 +1087,13 @@ class Stat_Options_API {
 			$class = $args['inputClass'];
 		}
 
-		$multiple = '';
+		$multiple = $multipleExt = '';
 		if(isset($args['multiple'])) {
-			$multiple = 'multiple';
+			$multiple    = 'multiple';
+			$multipleExt = '[]';
 		}
 
-	    $html = '<select id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . ' '. $class .' ' . $chosen . '" name="gfpdf_settings[' . $args['id'] . ']" data-placeholder="' . $placeholder . '" '. $multiple .'>';
+	    $html = '<select id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . ' '. $class .' ' . $chosen . '" name="gfpdf_settings[' . $args['id'] . ']' . $multipleExt .'" data-placeholder="' . $placeholder . '" '. $multiple .'>';
 	    
 		foreach ( $args['options'] as $option => $name ) {
 			if(!is_array($name)) {
@@ -1072,10 +1153,17 @@ class Stat_Options_API {
 		global $gfpdf;
 		$gfpdf_options = $gfpdf->data->settings;
 
-		if ( isset( $gfpdf_options[ $args['id'] ] ) )
+		/* add GF settings */
+		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
+		$gfpdf_form_settings = self::get_form_settings();	
+
+		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
 			$value = $gfpdf_options[ $args['id'] ];
-		else
+		} elseif(empty($value) && isset( $gfpdf_form_settings[ $pid ][ $args['id']]) ) {
+			$value = $gfpdf_form_settings[ $pid ][ $args['id']];
+		} else {
 			$value = isset( $args['std'] ) ? $args['std'] : '';
+		}
 
 		$html = '<select id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']"/>';
 
@@ -1108,12 +1196,18 @@ class Stat_Options_API {
 		global $gfpdf, $wp_version;
 		$gfpdf_options = $gfpdf->data->settings;
 
+		/* add GF settings */
+		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
+		$gfpdf_form_settings = self::get_form_settings();			
+
 		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
 			$value = $gfpdf_options[ $args['id'] ];
 
 			if( empty( $args['allow_blank'] ) && empty( $value ) ) {
 				$value = isset( $args['std'] ) ? $args['std'] : '';
 			}
+		} elseif(empty($value) && isset( $gfpdf_form_settings[ $pid ][ $args['id']]) ) {
+			$value = $gfpdf_form_settings[ $pid ][ $args['id']];
 		} else {
 			$value = isset( $args['std'] ) ? $args['std'] : '';
 		}
@@ -1151,10 +1245,17 @@ class Stat_Options_API {
 		global $gfpdf;
 		$gfpdf_options = $gfpdf->data->settings;
 
-		if ( isset( $gfpdf_options[ $args['id'] ] ) )
+		/* add GF settings */
+		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
+		$gfpdf_form_settings = self::get_form_settings();			
+
+		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
 			$value = $gfpdf_options[$args['id']];
-		else
+		} elseif(empty($value) && isset( $gfpdf_form_settings[ $pid ][ $args['id']]) ) {
+			$value = $gfpdf_form_settings[ $pid ][ $args['id']];
+		} else {
 			$value = isset($args['std']) ? $args['std'] : '';
+		}
 
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
 		$html = '<input type="text" class="' . $size . '-text" class="gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '"/>';
@@ -1183,10 +1284,17 @@ class Stat_Options_API {
 		global $gfpdf;
 		$gfpdf_options = $gfpdf->data->settings;
 
-		if ( isset( $gfpdf_options[ $args['id'] ] ) )
+		/* add GF settings */
+		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
+		$gfpdf_form_settings = self::get_form_settings();	
+
+		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
 			$value = $gfpdf_options[ $args['id'] ];
-		else
+		} elseif(empty($value) && isset( $gfpdf_form_settings[ $pid ][ $args['id']]) ) {
+			$value = $gfpdf_form_settings[ $pid ][ $args['id']];
+		} else {
 			$value = isset( $args['std'] ) ? $args['std'] : '';
+		}
 
 		$default = isset( $args['std'] ) ? $args['std'] : '';
 

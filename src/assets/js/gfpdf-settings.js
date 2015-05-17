@@ -324,11 +324,11 @@
 						var format =  $format.filter(':checked').val();
 
 						if($(this).val() === 'No' || format !== 'Standard') {
-							/* show security password / privileges */
+							/* hide security password / privileges */
 							$secTable.find('tr:nth-child(3),tr:nth-child(4)').hide();
 						} else {
-							/* hide security password / privileges */
-							$secTable.find('tr:nth-child(3),tr:nth-child(43)').show();
+							/* show security password / privileges */
+							$secTable.find('tr:nth-child(3),tr:nth-child(4)').show();
 						}
 
 						if(format !== 'Standard') {
@@ -343,7 +343,7 @@
 					if($(this).is(':checked')) {
 						$pdfSecurity.trigger('change');
 					}					
-				});
+				}).trigger('change');
 
 				/*
 				 * Add change event to 'chosen' notification item 
@@ -356,7 +356,7 @@
 					} else {
 						$elm.show();
 					}
-				});
+				}).trigger('change');
 										
 			}
 

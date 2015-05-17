@@ -63,7 +63,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	}
 
 	function prepare_items() {
-		$this->items = $this->form['notifications'];
+		$this->items = (isset($this->form['gfpdf_form_settings'])) ? $this->form['gfpdf_form_settings'] : array();
 	}
 
 	function display() {
@@ -99,7 +99,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		static $row_class = '';
 		$row_class = ( $row_class == '' ? ' class="alternate"' : '' );
 
-		echo '<tr id="notification-' . $item['id'] . '" ' . $row_class . '>';
+		echo '<tr id="gfpdf-' . $item['id'] . '" ' . $row_class . '>';
 		echo $this->single_row_columns( $item );
 		echo '</tr>';
 	}
