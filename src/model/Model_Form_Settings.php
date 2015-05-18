@@ -144,7 +144,7 @@ class Model_Form_Settings extends Helper_Model {
         
         /* If we haven't pulled the form meta data from the database do so now */
         if(!isset($gfpdf->data->form_settings[$form_id])) {
-            $form = GFFormsModel::get_form_meta( $form_id );          
+            $form     = GFFormsModel::get_form_meta( $form_id );          
             $settings = (isset($form['gfpdf_form_settings'])) ? $form['gfpdf_form_settings'] : array();
             $gfpdf->data->form_settings[$form_id] = apply_filters( 'gfpdf_get_form_settings', $settings );          
         }
@@ -154,25 +154,24 @@ class Model_Form_Settings extends Helper_Model {
     }    
 
     /**
-     * Get an option
+     * Get pdf config
      *
      * Looks to see if the specified setting exists, returns default if not
      *
      * @since 4.0
      * @return mixed
      */
-    public function get_option( $form_id, $pdf_id, $key = '', $default = false ) {
+    public function get_pdf( $form_id, $pdf_id ) {
         $gfpdf_options = $this->get_settings($form_id);
-        $value         = ! empty( $gfpdf_options[ $pdf_id ][ $key ] ) ? $gfpdf_options[ $pdf_id ][ $key ] : $default;
-        $value         = apply_filters( 'gfpdf_get_option', $value, $key, $default );
+        $value         = ! empty( $gfpdf_options[ $pdf_id ] ) ? $gfpdf_options[ $pdf_id ] : array();
+        return apply_filters( 'gfpdf_pdf_config', $value, $key, $default );
 
-        return apply_filters( 'gfpdf_get_option_' . $key, $value, $key, $default );
     }
 
     /**
-     * Update an option
+     * Update an pdf config
      *
-     * Updates an Gravity PDF setting value in both the db and the global variable.
+     * Updates a Gravity PDF setting value in both the db and the global variable.
      * Warning: Passing in an empty, false or null string value will remove
      *          the key from the gfpdf_options array.
      *
@@ -181,14 +180,10 @@ class Model_Form_Settings extends Helper_Model {
      * @param string|bool|int $value The value to set the key to
      * @return boolean True if updated, false if not.
      */
-    public function update_option( $form_id, $pdf_id, $key = '', $value = false ) {
-        /* If no key, exit */
-        if ( empty( $key ) ){
-            return false;
-        }
+    public function update_pdf( $form_id, $pdf_id, $value = '', $update_db = true ) {
 
-        if ( empty( $value ) ) {
-            $remove_option = self::delete_option( $key );
+        if ( empty( $value ) || ! is_array($value) || sizeof($value) == 0 ) {
+            $remove_option = $this->delete_pdf( $key );
             return $remove_option;
         }
 
@@ -197,14 +192,14 @@ class Model_Form_Settings extends Helper_Model {
 
         if(! is_wp_error($options)) {
             /* Let's let devs alter that value coming in */
-            $value = apply_filters( 'gfpdf_form_update_option', $value, $key );
+            $value = apply_filters( 'gfpdf_form_update_pdf', $value, $key );
 
             if(!is_array($options[ $pdf_id ])) {
                 $options[ $pdf_id ] = array();
             }
 
             /* Next let's try to update the value */
-            $options[ $pdf_id ][ $key ] = $value;
+            $options[ $pdf_id ] = $value;
 
             /* get the up-to-date form object and merge in the results */
             $form = GFFormsModel::get_form_meta($form_id);
@@ -212,11 +207,13 @@ class Model_Form_Settings extends Helper_Model {
             /* Update our GFPDF settings */
             $form['gfpdf_form_settings'] = $options;
             
-            /* update the database, if able */
-            $did_update = GFFormsModel::update_form_meta($form_id, $form);
-
+            if($update_db) {
+                /* update the database, if able */
+                $did_update = GFFormsModel::update_form_meta($form_id, $form);
+            }
+            
             /* If it updated, let's update the global variable */
-            if ( $did_update !== false ){
+            if ( $did_update !== false || !$update_db ){
                 global $gfpdf;     
                 $gfpdf->data->form_settings[$form_id] = $options;
 
@@ -237,12 +234,7 @@ class Model_Form_Settings extends Helper_Model {
      * @param string $key The Key to delete
      * @return boolean True if updated, false if not.
      */
-    public function delete_option( $form_id, $pdf_id, $key = '' ) {
-
-        /* If no key, exit */
-        if ( empty( $key ) ){
-            return false;
-        }
+    public function delete_pdf( $form_id, $pdf_id ) {
 
         /* First let's grab the current settings */
         $options = $this->get_settings($form_id);
@@ -250,8 +242,8 @@ class Model_Form_Settings extends Helper_Model {
         if(! is_wp_error($options)) {
 
             /* Next let's try to update the value */
-            if( isset( $options[ $pdf_id ][ $key ] ) ) {
-                unset( $options[ $pdf_id ][ $key ] );
+            if( isset( $options[ $pdf_id ] ) ) {
+                unset( $options[ $pdf_id ] );
             }
 
             /* get the form and merge in the results */
@@ -261,7 +253,7 @@ class Model_Form_Settings extends Helper_Model {
             $form['gfpdf_form_settings'] = $options;            
 
             /* update the database, if able */
-            $did_update      = GFFormsModel::update_form_meta($form_id, $form);
+            $did_update = GFFormsModel::update_form_meta($form_id, $form);
 
             /* If it updated, let's update the global variable */
             if ( $did_update !== false ) {
@@ -304,21 +296,12 @@ class Model_Form_Settings extends Helper_Model {
 
         $sanitized = $this->settings_sanitize($input);
 
-        /* Ensure we have a valid settings array */
-        if(!is_array( $form['gfpdf_form_settings'])) {
-             $form['gfpdf_form_settings'] = array();
-        }
-
-        if(!is_array( $gfpdf->data->form_settings[$form_id] )) {
-            $gfpdf->data->form_settings[$form_id] = array();
-        }   
         
         /* Update our GFPDF settings */
-        $sanitized['id']                      = $pdf_id;
-        $form['gfpdf_form_settings'][$pdf_id] = $sanitized;                
+        $sanitized['id']     = $pdf_id;
+        $sanitized['active'] = true;
 
-        /* store our sanitized data */
-        $gfpdf->data->form_settings[$form_id][$pdf_id] = $form['gfpdf_form_settings'][$pdf_id];
+        $this->update_pdf($form_id, $pdf_id, $sanitized, false);
 
         /* Do validation */
         if(empty($sanitized['name']) || empty($sanitized['filename'])) {
@@ -330,7 +313,8 @@ class Model_Form_Settings extends Helper_Model {
         /* get the form and merge in the results */
         $form = GFFormsModel::get_form_meta($form_id);
 
-     
+        /* Update our GFPDF settings */
+        $form['gfpdf_form_settings'][$pdf_id] = $sanitized;        
 
         /* Update database */
         $did_update = GFFormsModel::update_form_meta($form_id, $form);
@@ -407,4 +391,93 @@ class Model_Form_Settings extends Helper_Model {
 
         return $input;        
     }
+
+    /**
+     * AJAX Endpoint for deleting PDF Settings
+     * @param $_POST['nonce'] a valid nonce 
+     * @param $_POST['fid'] a valid form ID
+     * @param $_POST['pid'] a valid PDF ID
+     * @return JSON 
+     * @since 4.0
+     */
+    public function delete_gf_pdf_setting() {
+        /*
+         * Validate Endpoint 
+         */
+        $nonce = $_POST['nonce'];
+        $fid   = (int) $_POST['fid'];
+        $pid   = $_POST['pid'];
+
+        $nonce_id = "gfpdf_delete_nonce_{$fid}_{$pid}";
+
+        if(! wp_verify_nonce( $nonce, $nonce_id )) {
+            /* fail */
+            header('HTTP/1.1 401 Unauthorized');
+            exit;
+        }
+
+        $results = $this->delete_pdf($fid, $pid);
+
+        if($results) {
+            $return = array(
+                'msg' => __('PDF successfully deleted.', 'pdfextended'),
+            );
+
+            echo json_encode($return);
+            exit;
+        }
+
+        header('HTTP/1.1 500 Internal Server Error');
+        exit;
+    }
+
+    /**
+     * AJAX Endpoint for duplicating PDF Settings
+     * @param $_POST['nonce'] a valid nonce 
+     * @param $_POST['fid'] a valid form ID
+     * @param $_POST['pid'] a valid PDF ID
+     * @return JSON 
+     * @since 4.0
+     */
+    public function duplicate_gf_pdf_setting() {
+        /*
+         * Validate Endpoint 
+         */
+        $nonce = $_POST['nonce'];
+        $fid   = (int) $_POST['fid'];
+        $pid   = $_POST['pid'];
+
+        $nonce_id = "gfpdf_duplicate_nonce_{$fid}_{$pid}";
+
+        if(! wp_verify_nonce( $nonce, $nonce_id )) {
+            /* fail */
+            header('HTTP/1.1 401 Unauthorized');
+            exit;
+        }
+
+        $config = $this->get_pdf($fid, $pid);
+        $config['id']   = uniqid();
+        $config['name'] = $config['name'] . ' (copy)';
+
+        $results = $this->update_pdf($fid, $config['id'], $config);
+
+        if($results) {
+            $dup_nonce = wp_create_nonce("gfpdf_duplicate_nonce_{$fid}_{$pid}");
+            $del_nonce = wp_create_nonce("gfpdf_delete_nonce_{$fid}_{$pid}");
+
+            $return = array(
+                'msg'       => __('PDF successfully duplicated.', 'pdfextended'),
+                'pid'       => $config['id'],
+                'name'      => $config['name'],
+                'dup_nonce' => $dup_nonce,
+                'del_nonce' => $del_nonce,
+            );
+
+            echo json_encode($return);
+            exit;
+        }
+
+        header('HTTP/1.1 500 Internal Server Error');
+        exit;
+    }    
 }

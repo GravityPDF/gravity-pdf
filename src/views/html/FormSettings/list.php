@@ -53,12 +53,16 @@ $list_itmes = $vars['list_items'];
 
 		<?php $list_itmes->display(); ?>
 
-		<input id="action_argument" name="action_argument" type="hidden" />
+		<!--<input id="action_argument" name="action_argument" type="hidden" />
 		<input id="action" name="action" type="hidden" />
 
-		<?php wp_nonce_field( 'gform_pdf_list_action', 'gform_pdf_list_action' ) ?>
+		<?php wp_nonce_field( 'gform_pdf_list_action', 'gform_pdf_list_action' ) ?>-->
 
 	</form>		
+
+    <div id="delete-confirm" title="<?php _e('Delete PDF?', 'pdfextended'); ?>" style="display: none;">
+        <?php printf(__("Warning! You are about to delete this PDF. Select 'Delete' to delete, 'Cancel' to stop.", 'pdfextended'), '<strong>', '</strong>'); ?>
+    </div>   
 
 
 <?php \GFFormSettings::page_footer(); ?>

@@ -25,8 +25,7 @@
 			}
 		}
 	
-		
-
+	
 
 
 		/**
@@ -46,11 +45,39 @@
 				}
 			}
 
+			/**
+			 * Get if on the global PDF settings pages
+			 * @return Integer
+			 * @since 4.0
+			 */
 			this.is_settings = function() {
 				return $('#tab_PDF').length;
 			}
 
+			/**
+			 * Check if on the individual PDF form settings pages
+			 * @return Integer
+			 * @since 4.0
+			 */
 			this.is_form_settings = function() {
+				return $('#tab_pdf').length;
+			}
+
+			/**
+			 * See if we are on the form settings list page 
+			 * @return Integer
+			 * @since 4.0
+			 */
+			this.is_form_settings_list = function() {
+				return $('#gfpdf_list_form').length;
+			}
+
+			/**
+			 * See if we are on the form settings edit page 
+			 * @return Integer
+			 * @since 4.0
+			 */
+			this.is_form_settings_edit = function() {
 				return $('#gfpdf_pdf_form').length;
 			}
 
@@ -75,7 +102,126 @@
 				}
 			}
 
-			this.processFormSettings = function() {				
+			/**
+			 * Routing functionality for the 
+			 * @return {[type]} [description]
+			 */
+			this.processFormSettings = function() {		
+
+				if(this.is_form_settings_edit()) {
+					this.do_form_settings_edit_page();
+				}		
+
+				if(this.is_form_settings_list()) {
+					this.do_form_settings_list_page();
+				}											
+			}
+
+			/**
+			 * Process the functionality for the PDF form settings 'list' page
+			 * @return void 
+			 * @since 4.0
+			 */
+			this.do_form_settings_list_page = function() {
+				/* Set up our delete dialog */
+				var $deleteDialog = $( '#delete-confirm' );	
+
+				var deleteButtons = [{
+				      	text: GFPDF.pdf_list_delete_confirm,
+				      	click: function() {
+				      		/* handle ajax call */
+				      		$deleteDialog.wpdialog( 'close' );
+
+				      		$elm = $( $deleteDialog.data('elm') );
+
+				      		var data = {
+				      			'action': 'gfpdf_list_delete',
+				      			'nonce': $elm.data('nonce'),
+				      			'fid': $elm.data('fid'),
+				      			'pid': $elm.data('id'),
+				      		};
+
+				      		self.ajax(data, function(response) {	
+				      			if(response.msg) {
+				      				self.show_message(response.msg);
+				      				var $row = $elm.parents('tr');
+				      				$row.css('background', '#ffb8b8').fadeOut('slow');
+				      			}
+
+				      			console.log(response);
+				      		});
+
+				      	}
+				      },
+				      {
+				      	text: GFPDF.tools_cancel,
+				      	click: function() {
+				      		/* cancel */
+				      		$deleteDialog.wpdialog( 'close' );	
+				      	}				      				       
+				}];
+
+				this.wp_dialog($deleteDialog, deleteButtons, 300, 175);								
+
+				$('#gfpdf_list_form').on('click', 'a.submitdelete', function() {
+					var id = String($(this).data('id'));
+					if(id.length > 0) {
+						$deleteDialog.wpdialog( 'open' ).data('elm', this);
+					}
+				});
+
+				$('#gfpdf_list_form').on('click', 'a.submitduplicate', function() {
+					var id = String($(this).data('id'));
+					var that = this;
+
+					if(id.length > 0) {
+			      		var data = {
+			      			'action': 'gfpdf_list_duplicate',
+			      			'nonce': $(this).data('nonce'),
+			      			'fid': $(this).data('fid'),
+			      			'pid': $(this).data('id'),
+			      		};
+
+			      		self.ajax(data, function(response) {	
+			      			if(response.msg) {
+			      				self.show_message(response.msg);
+
+			      				var $row = $(that).parents('tr');
+			      				var $newRow = $row.clone().css('background', '#baffb8');
+
+			      				$newRow.find('.column-name > a, .edit a').each(function() {									
+									var href = $(this).attr('href');
+									href     = self.updateURLParameter(href, 'pid', response.pid);
+									$(this).attr('href', href);
+			      				});
+
+			      				$newRow.find('.column-name > a').html(response.name);
+
+								var $duplicate = $newRow.find('.duplicate a');
+								var $delete    = $newRow.find('.delete a');
+
+								$duplicate.data('id', response.pid);
+								$duplicate.data('nonce', response.dup_nonce);								
+
+								$delete.data('id', response.pid);
+								$delete.data('nonce', response.del_nonce);
+
+								$newRow.hide().insertAfter($row).fadeIn().animate({backgroundColor: '#FFF'});
+
+								//;
+			      			}
+			      			console.log(response);
+			      		});						
+					}
+				});				
+			}
+
+			/**
+			 * Process the individual PDF GF Form Settings Page
+			 * @return void 
+			 * @since 4.0
+			 */
+			this.do_form_settings_edit_page = function() {
 				this.setup_select_boxes();	
 				this.setup_advanced_options();	
 				this.setup_required_fields($('#gfpdf_pdf_form'));				
@@ -126,8 +272,7 @@
 					} else {
 						$elm.show();
 					}
-				}).trigger('change');
-										
+				}).trigger('change');				
 			}
 
 			this.setup_required_fields = function($elm) {
@@ -322,7 +467,77 @@
 				$a.attr('title', html);
 				
 				return $a;				
-			}		
+			}	
+
+			/**
+			 * An AJAX Wrapper function we can use to ajaxify our plugin
+			 * @param post Object an object of data to submit to our ajax endpoint. This MUST include an 'nonce' and an 'action'
+			 * @param successCallback a callback function
+			 * @return void 
+			 * @since 4.0
+			 */
+			this.ajax = function(post, successCallback) {
+				$.ajax({
+					type : "post",
+					dataType : "json",
+					url : GFPDF.ajaxurl,
+					data : post,
+					success: successCallback,
+					error: this.ajax_error,
+				});
+			}	
+
+			/**
+			 * Throw an alert when there is an ajax error 
+			 * @return void 
+			 * @since 4.0
+			 */
+			this.ajax_error = function() {
+				alert(GFPDF.ajax_error);
+			}
+
+			this.show_message = function(msg, timeout, error) {
+				timeout = typeof timeout !== 'undefined' ? timeout : 4500;
+				error = typeof error !== 'undefined' ? error : false;
+
+				var $elm = $('<div id="message">').html('<p>' + msg + '</p>');
+
+				if(error === true) {
+					$elm.addClass('error');
+				} else {
+					$elm.addClass('updated');
+				}
+
+				$('.wrap > h2').after($elm);
+
+				setTimeout(function() {
+					$('div#message').slideUp();
+				}, timeout);
+
+			}
+
+			/**
+			 * http://stackoverflow.com/a/10997390/11236
+			 */
+			this.updateURLParameter = function(url, param, paramVal) {
+			    var newAdditionalURL = "";
+			    var tempArray = url.split("?");
+			    var baseURL = tempArray[0];
+			    var additionalURL = tempArray[1];
+			    var temp = "";
+			    if (additionalURL) {
+			        tempArray = additionalURL.split("&");
+			        for (i=0; i<tempArray.length; i++){
+			            if(tempArray[i].split('=')[0] != param){
+			                newAdditionalURL += temp + tempArray[i];
+			                temp = "&";
+			            }
+			        }
+			    }
+
+			    var rows_txt = temp + "" + param + "=" + paramVal;
+			    return baseURL + "?" + newAdditionalURL + rows_txt;
+			}			
 		}	
 
 		var pdf = new GravityPDF();

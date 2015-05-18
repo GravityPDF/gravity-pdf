@@ -119,18 +119,18 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	}
 
 	function column_name( $item ) {
-		$edit_url = add_query_arg( array( 'pid' => $item['id'] ) );
+		$edit_url        = add_query_arg( array( 'pid' => $item['id'] ) );
+		$form_id         = rgget('id');
+		$duplicate_nonce = wp_create_nonce("gfpdf_duplicate_nonce_{$form_id}_{$item['id']}");
+		$delete_nonce    = wp_create_nonce("gfpdf_delete_nonce_{$form_id}_{$item['id']}");
+
 		$actions  = apply_filters(
-			'gform_notification_actions', array(
+			'gfpdf_pdf_actions', array(
 				'edit'      => '<a title="' . __( 'Edit this PDF', 'pdfextended' ) . '" href="' . $edit_url . '">' . __( 'Edit', 'pdfextended' ) . '</a>',
-				'duplicate' => '<a title="' . __( 'Duplicate this PDF', 'pdfextended' ) . '" onclick="javascript: DuplicateNotification(\'' . $item['id'] . '\');" style="cursor:pointer;">' . __( 'Duplicate', 'gravityforms' ) . '</a>',
-				'delete'    => '<a title="' . __( 'Delete this PDF', 'pdfextended' ) . '" class="submitdelete" onclick="javascript: if(confirm(\'' . __( 'WARNING: You are about to delete this notification.', 'gravityforms' ) . __( "\'Cancel\' to stop, \'OK\' to delete.", 'gravityforms' ) . '\')){ DeleteNotification(\'' . $item['id'] . '\'); }" style="cursor:pointer;">' . __( 'Delete', 'gravityforms' ) . '</a>'
+				'duplicate' => '<a title="' . __( 'Duplicate this PDF', 'pdfextended' ) . '" data-id="' . $item['id'] . '" class="submitduplicate" data-nonce="'. $duplicate_nonce .'"  data-fid="'. $form_id . '">' . __( 'Duplicate', 'pdfextended' ) . '</a>',
+				'delete'    => '<a title="' . __( 'Delete this PDF', 'pdfextended' ) . '" class="submitdelete" data-id="' . $item['id'] . '" data-nonce="'. $delete_nonce .'" data-fid="'. $form_id .'">' . __( 'Delete', 'pdfextended' ) . '</a>'
 			)
 		);
-
-		if ( isset( $item['isDefault'] ) && $item['isDefault'] ) {
-			unset( $actions['delete'] );
-		}
 
 		?>
 

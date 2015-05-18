@@ -325,6 +325,15 @@
   display: block;
 }
 
+/**
+ * PDF Form Settings (individual)
+ */
+
+#gfpdf_list_form .duplicate a:hover,
+#gfpdf_list_form .delete a:hover {
+  cursor: pointer;
+}
+
 
 @media only screen and (min-width: 500px) {
 

@@ -85,6 +85,10 @@ class Controller_Form_Settings extends Helper_Controller implements Helper_Int_A
         /* Tell Gravity Forms to add our form PDF settings pages */
         add_action( 'gform_form_settings_menu', array( $this->model, 'add_form_settings_menu' ), 10, 2 );
         add_action( 'gform_form_settings_page_' . $gfpdf->data->slug, array( $this, 'displayPage' ) );
+
+        /* Add AJAX endpoints */
+        add_action('wp_ajax_gfpdf_list_delete', array( $this->model, 'delete_gf_pdf_setting'));
+        add_action('wp_ajax_gfpdf_list_duplicate', array( $this->model, 'duplicate_gf_pdf_setting'));        
     }
 
     /**

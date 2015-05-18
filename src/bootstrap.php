@@ -152,7 +152,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
             //$suffix = '.min.';
         }
 
-        wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-settings'. $suffix .'.js', array('wpdialogs', 'jquery-ui-tooltip', 'gform_form_admin'), $version );           
+        wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-settings'. $suffix .'.js', array('wpdialogs', 'jquery-ui-tooltip', 'gform_form_admin', 'jquery-color'), $version );           
         wp_register_script( 'gfpdf_js_backbone', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-backbone'. $suffix .'.js', array('gfpdf_js_settings', 'backbone', 'underscore'), $version );           
         wp_register_script( 'gfpdf_js_chosen', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.jquery.min.js', array('jquery'), $version );                   
 
@@ -160,6 +160,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
         * Localise admin script
         */
         $localise_script = array(
+            'ajaxurl'                     => admin_url( 'admin-ajax.php' ),
             'GFbaseUrl'                   => GFCommon::get_base_url(),
             'pluginUrl'                   => PDF_PLUGIN_URL,
             'general_advanced_show'       => __('Show Advanced Options...', 'pdfextended'),
@@ -167,7 +168,9 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
             'tools_template_copy_confirm' => __('Continue', 'pdfextended'),
             'tools_uninstall_confirm'     => __('Uninstall', 'pdfextended'),
             'tools_cancel'                => __('Cancel', 'pdfextended'),   
-            'help_search_placeholder'     => __('Search the Gravity PDF Knowledgebase...', 'pdfextended'),      
+            'pdf_list_delete_confirm'     => __('Delete', 'pdfextended'),   
+            'help_search_placeholder'     => __('Search the Gravity PDF Knowledgebase...', 'pdfextended'),  
+            'ajax_error'                  => __('There was an error processing your request. Please try again.', 'pdfextended'),    
         );
 
         wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $localise_script );
