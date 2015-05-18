@@ -4,7 +4,7 @@ Donate link: https://gravitypdf.com
 Tags: gravity, forms, pdf, automation, attachment
 Requires at least: 3.9
 Tested up to: 4.2
-Stable tag: 3.7.3
+Stable tag: 3.7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
 
@@ -87,6 +87,9 @@ All FAQs can be [viewed on the Gravity PDF website](https://gravitypdf.com/#faqs
 3. The configuration.php file allows you to easily assign PDFs to Gravity Forms
 
 == Changelog ==
+
+= 3.7.4 =
+* Housekpeeing - Revert patch made in last update as Gravity Forms 1.9.9 fixes the issue internally.
 
 = 3.7.3 =
 * Bug - Gravity Forms 1.9 didn't automatically nl2br paragraph text mergetags. Fixed this issue in custom PDF templates.

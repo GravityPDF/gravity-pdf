@@ -40,6 +40,12 @@
     <p><strong>Current Version: <?php echo PDF_EXTENDED_VERSION; ?></strong></p>
 
   <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
+
+  <ul>
+    <li>Housekpeeing - Revert patch made in last update as Gravity Forms 1.9.9 fixes the issue internally.</li>
+  </ul>
+
+  <h3>3.7.3</h3>
   <ul>
     <li>Bug - Gravity Forms 1.9 didn't automatically nl2br paragraph text mergetags. Fixed this issue in custom PDF templates.</li>
   </ul>
