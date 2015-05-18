@@ -105,7 +105,9 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
      * @return void
      */
     public function add_filters() {
-
+        /* automatically handle GF noconflict mode */
+        add_filter('gform_noconflict_scripts', array($this, 'auto_noconflict_gfpdf'));
+        add_filter('gform_noconflict_styles', array($this, 'auto_noconflict_gfpdf'));
     }
 
     /**
@@ -127,12 +129,12 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
         $version = PDF_EXTENDED_VERSION;
         $suffix  = '';
         if(defined('WP_DEBUG') && WP_DEBUG === true) {
-            $version = time();
-            $suffix = '.min.';
+            //$version = time();
+            //$suffix = '.min.';
         }
 
-        wp_register_style('gfpdf_styles', PDF_PLUGIN_URL . 'src/assets/css/gfpdf-styles'. $suffix .'.css', array(), $version);       
-        wp_register_style( 'gfpdf_chosen_style', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.min.css', array(), $version );     
+        wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'src/assets/css/gfpdf-styles'. $suffix .'.css', array(), $version);       
+        wp_register_style( 'gfpdf_css_chosen_style', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.min.css', array('wp-jquery-ui-dialog'), $version );     
     }
 
     /**
@@ -146,12 +148,13 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
         $version = PDF_EXTENDED_VERSION;
         $suffix  = '';
         if(defined('WP_DEBUG') && WP_DEBUG === true) {
-            $version = time();
-            $suffix = '.min.';
+            //$version = time();
+            //$suffix = '.min.';
         }
 
-        wp_register_script( 'gfpdf_settings', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-settings'. $suffix .'.js', array('wpdialogs', 'backbone', 'underscore', 'jquery-ui-tooltip', 'gform_form_admin'), $version );           
-        wp_register_script( 'gfpdf_chosen', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.jquery.min.js', array('jquery'), $version );                   
+        wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-settings'. $suffix .'.js', array('wpdialogs', 'jquery-ui-tooltip', 'gform_form_admin'), $version );           
+        wp_register_script( 'gfpdf_js_backbone', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-backbone'. $suffix .'.js', array('gfpdf_js_settings', 'backbone', 'underscore'), $version );           
+        wp_register_script( 'gfpdf_js_chosen', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.jquery.min.js', array('jquery'), $version );                   
 
         /*
         * Localise admin script
@@ -167,7 +170,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
             'help_search_placeholder'     => __('Search the Gravity PDF Knowledgebase...', 'pdfextended'),      
         );
 
-        wp_localize_script( 'gfpdf_settings', 'GFPDF', $localise_script );
+        wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $localise_script );
 
         /*
         * Register our scripts/styles with Gravity Forms to prevent them being removed in no conflict mode
@@ -187,14 +190,41 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
     public function load_assets() {        
         if($this->is_gfpdf_page()) {
             /* load styles */
-            wp_enqueue_style('gfpdf_styles');       
-            wp_enqueue_style('wp-jquery-ui-dialog');
-            wp_enqueue_style('gfpdf_chosen_style');
+            wp_enqueue_style('gfpdf_css_styles');       
+            wp_enqueue_style('gfpdf_css_chosen_style');
 
             /* load scripts */
-            wp_enqueue_script('gfpdf_settings');       
-            wp_enqueue_script('gfpdf_chosen');       
+            wp_enqueue_script('gfpdf_js_settings');       
+            wp_enqueue_script('gfpdf_js_chosen');       
+        }  
+
+        if($this->is_gfpdf_settings_tab('help')) {
+             wp_enqueue_script('gfpdf_js_backbone');
+        }      
+    }
+
+     /**
+     * Auto no-conflict any preloaded scripts / styles that begin with 'gfpdf_'
+     * @since 4.0
+     * @return void
+     */   
+    public function auto_noconflict_gfpdf($items) {
+        $wp_scripts = wp_scripts();
+        $wp_styles  = wp_styles();
+
+        foreach($wp_scripts->queue as $object) { 
+            if(substr($object, 0, 8) === 'gfpdf_js') {
+                $items[] = $object;
+            }
+        }
+
+        foreach($wp_styles->queue as $object) { 
+            if(substr($object, 0, 9) === 'gfpdf_css') {
+                $items[] = $object;
+            }
         }        
+
+        return $items;
     }
 
     /**
@@ -210,6 +240,24 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
             }
         }
 
+        return false;
+    }
+
+    /**
+     * Check if we are on the current global settings page / tab 
+     * @since 4.0
+     * @return void
+     */  
+    private function is_gfpdf_settings_tab($name) {
+        if(is_admin()) {
+            if($this->is_gfpdf_page()) {
+                $tab = (isset($_GET['tab'])) ? $_GET['tab'] : 'general';
+
+                if($name === $tab) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 

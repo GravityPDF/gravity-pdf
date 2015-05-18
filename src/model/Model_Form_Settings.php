@@ -353,7 +353,7 @@ class Model_Form_Settings extends Helper_Model {
      */
     public function validation_error($fields) {
         /* Check Nonce is valid */
-        if( ! wp_verify_nonce( $_POST['gfpdf_save_pdf'], 'gfpdf_save_pdf' ) ) {            
+        if( empty($_POST['gfpdf_save_pdf']) || ! wp_verify_nonce( $_POST['gfpdf_save_pdf'], 'gfpdf_save_pdf' ) ) {            
             return $fields;
         }       
 
