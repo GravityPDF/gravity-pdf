@@ -131,7 +131,6 @@
 				      	click: function() {
 				      		/* handle ajax call */
 				      		$deleteDialog.wpdialog( 'close' );
-
 				      		$elm = $( $deleteDialog.data('elm') );
 
 				      		var data = {
@@ -145,7 +144,7 @@
 				      			if(response.msg) {
 				      				self.show_message(response.msg);
 				      				var $row = $elm.parents('tr');
-				      				$row.css('background', '#ffb8b8').fadeOut('slow');
+				      				$row.css('background', '#ffb8b8').fadeOut().remove();
 				      			}
 
 				      			console.log(response);
@@ -161,8 +160,10 @@
 				      	}				      				       
 				}];
 
+				/* Add our dleete dialog box */
 				this.wp_dialog($deleteDialog, deleteButtons, 300, 175);								
 
+				/* Add live delete listener. Using on ensures nodes added later will have correct listener */
 				$('#gfpdf_list_form').on('click', 'a.submitdelete', function() {
 					var id = String($(this).data('id'));
 					if(id.length > 0) {
@@ -170,11 +171,13 @@
 					}
 				});
 
+				/* Add live duplicate listener. Using on ensures nodes added later will have correct listener */
 				$('#gfpdf_list_form').on('click', 'a.submitduplicate', function() {
 					var id = String($(this).data('id'));
 					var that = this;
 
 					if(id.length > 0) {
+						/* set up ajax data */
 			      		var data = {
 			      			'action': 'gfpdf_list_duplicate',
 			      			'nonce': $(this).data('nonce'),
@@ -182,38 +185,89 @@
 			      			'pid': $(this).data('id'),
 			      		};
 
+			      		/* do ajax call */
 			      		self.ajax(data, function(response) {	
 			      			if(response.msg) {
+			      				/* provide feedback to use */
 			      				self.show_message(response.msg);
 
-			      				var $row = $(that).parents('tr');
-			      				var $newRow = $row.clone().css('background', '#baffb8');
+			      				/* clone the row to be duplicated */
+								var $row    = $(that).parents('tr');
+								var $newRow = $row.clone().css('background', '#baffb8');
 
+								/* update the edit links to point to the new location */
 			      				$newRow.find('.column-name > a, .edit a').each(function() {									
 									var href = $(this).attr('href');
 									href     = self.updateURLParameter(href, 'pid', response.pid);
 									$(this).attr('href', href);
 			      				});
 
+			      				/* Update the name field */
 			      				$newRow.find('.column-name > a').html(response.name);
 
+			      				/* Find duplicate and delete elements */
 								var $duplicate = $newRow.find('.duplicate a');
 								var $delete    = $newRow.find('.delete a');
+								var $state     = $newRow.find('.check-column img');
 
+								/* update duplicate ID and nonce pointers so the actions are valid */
 								$duplicate.data('id', response.pid);
 								$duplicate.data('nonce', response.dup_nonce);								
 
+								/* update delete ID and nonce pointers so the actions are valid */
 								$delete.data('id', response.pid);
 								$delete.data('nonce', response.del_nonce);
 
-								$newRow.hide().insertAfter($row).fadeIn().animate({backgroundColor: '#FFF'});
+								/* update state ID and nonce pointers so the actions are valid */
+								$state.data('id', response.pid);
+								$state.data('nonce', response.state_nonce);								
 
-								//;
+								/* add fix for alternate row background */
+								if($row.hasClass('alternate')) {
+									$newRow.removeClass('alternate');
+									var background = '#FFF';
+								} else {
+									$newRow.addClass('alternate');
+									var background = '#f9f9f9';
+								}
+
+								/* add row to node and fade in */
+								$newRow.hide().insertAfter($row).fadeIn().animate({backgroundColor: background});
 			      			}
 			      			console.log(response);
 			      		});						
 					}
-				});				
+				});	
+
+				/* Add live state listener to chance active / inactive value */	
+				$('#gfpdf_list_form').on('click', '.check-column img', function() {
+					var id = String($(this).data('id'));
+					var that = this;					
+
+					if(id.length > 0) {
+						var is_active = that.src.indexOf('active1.png') >= 0;
+						if (is_active) {
+							that.src = that.src.replace('active1.png', 'active0.png');
+							$(that).attr('title', GFPDF.inactive).attr('alt', GFPDF.inactive);
+						} else {
+							that.src = that.src.replace('active0.png', 'active1.png');
+							$(that).attr('title', GFPDF.active).attr('alt', GFPDF.active);
+						}	
+						
+						/* set up ajax data */
+			      		var data = {
+			      			'action': 'gfpdf_change_state',
+			      			'nonce': $(this).data('nonce'),
+			      			'fid': $(this).data('fid'),
+			      			'pid': $(this).data('id'),			      			
+			      		};
+
+			      		/* do ajax call */
+			      		self.ajax(data, function(response) {	
+
+			      		});			      		
+			      	}
+				});		
 			}
 
 			/**
@@ -511,7 +565,7 @@
 				$('.wrap > h2').after($elm);
 
 				setTimeout(function() {
-					$('div#message').slideUp();
+					$elm.slideUp();
 				}, timeout);
 
 			}

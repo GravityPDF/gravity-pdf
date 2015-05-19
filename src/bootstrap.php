@@ -169,6 +169,8 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
             'tools_uninstall_confirm'     => __('Uninstall', 'pdfextended'),
             'tools_cancel'                => __('Cancel', 'pdfextended'),   
             'pdf_list_delete_confirm'     => __('Delete', 'pdfextended'),   
+            'active'                      => __('Active', 'pdfextended'),
+            'inactive'                    => __('Inactive', 'pdfextended'),
             'help_search_placeholder'     => __('Search the Gravity PDF Knowledgebase...', 'pdfextended'),  
             'ajax_error'                  => __('There was an error processing your request. Please try again.', 'pdfextended'),    
         );

@@ -462,15 +462,63 @@ class Model_Form_Settings extends Helper_Model {
         $results = $this->update_pdf($fid, $config['id'], $config);
 
         if($results) {
-            $dup_nonce = wp_create_nonce("gfpdf_duplicate_nonce_{$fid}_{$pid}");
-            $del_nonce = wp_create_nonce("gfpdf_delete_nonce_{$fid}_{$pid}");
+            $dup_nonce   = wp_create_nonce("gfpdf_duplicate_nonce_{$fid}_{$config['id']}");
+            $del_nonce   = wp_create_nonce("gfpdf_delete_nonce_{$fid}_{$config['id']}");
+            $state_nonce = wp_create_nonce("gfpdf_state_nonce_{$fid}_{$config['id']}");
 
             $return = array(
-                'msg'       => __('PDF successfully duplicated.', 'pdfextended'),
-                'pid'       => $config['id'],
-                'name'      => $config['name'],
-                'dup_nonce' => $dup_nonce,
-                'del_nonce' => $del_nonce,
+                'msg'         => __('PDF successfully duplicated.', 'pdfextended'),
+                'pid'         => $config['id'],
+                'name'        => $config['name'],
+                'dup_nonce'   => $dup_nonce,
+                'del_nonce'   => $del_nonce,
+                'state_nonce' => $state_nonce,
+            );
+
+            echo json_encode($return);
+            exit;
+        }
+
+        header('HTTP/1.1 500 Internal Server Error');
+        exit;
+    }    
+
+    /**
+     * AJAX Endpoint for changing the PDF Settings state
+     * @param $_POST['nonce'] a valid nonce 
+     * @param $_POST['fid'] a valid form ID
+     * @param $_POST['pid'] a valid PDF ID     
+     * @return JSON 
+     * @since 4.0
+     */
+    public function change_state_pdf_setting() {
+        /*
+         * Validate Endpoint 
+         */
+        $nonce    = $_POST['nonce'];
+        $fid      = (int) $_POST['fid'];
+        $pid      = $_POST['pid'];
+        $nonce_id = "gfpdf_state_nonce_{$fid}_{$pid}";
+
+        if(! wp_verify_nonce( $nonce, $nonce_id )) {
+            /* fail */
+            header('HTTP/1.1 401 Unauthorized');
+            exit;
+        }
+
+        $config = $this->get_pdf($fid, $pid);
+
+        /* toggle state */
+        $config['active'] = ($config['active'] === true) ? false : true;
+        $state            = ($config['active']) ? __( 'Active', 'pdfextended' ) : __( 'Inactive', 'pdfextended' );
+        $src              = GFCommon::get_base_url() . '/images/active' . intval( $config['active'] ) . '.png';
+
+        $results = $this->update_pdf($fid, $config['id'], $config);
+
+        if($results) {
+            $return = array(
+                'state' => $state,
+                'src'   => $src,
             );
 
             echo json_encode($return);

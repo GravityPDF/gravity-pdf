@@ -325,6 +325,14 @@
   display: block;
 }
 
+
+/**
+ * PDF Form Settings List 
+ */
+#gfpdf_list_form .check-column {
+  width: 50px;
+}
+
 /**
  * PDF Form Settings (individual)
  */
@@ -333,6 +341,7 @@
 #gfpdf_list_form .delete a:hover {
   cursor: pointer;
 }
+
 
 
 @media only screen and (min-width: 500px) {

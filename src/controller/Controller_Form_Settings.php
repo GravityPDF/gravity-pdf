@@ -88,7 +88,8 @@ class Controller_Form_Settings extends Helper_Controller implements Helper_Int_A
 
         /* Add AJAX endpoints */
         add_action('wp_ajax_gfpdf_list_delete', array( $this->model, 'delete_gf_pdf_setting'));
-        add_action('wp_ajax_gfpdf_list_duplicate', array( $this->model, 'duplicate_gf_pdf_setting'));        
+        add_action('wp_ajax_gfpdf_list_duplicate', array( $this->model, 'duplicate_gf_pdf_setting'));    
+        add_action('wp_ajax_gfpdf_change_state', array( $this->model, 'change_state_pdf_setting'));            
     }
 
     /**

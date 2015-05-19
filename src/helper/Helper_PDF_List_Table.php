@@ -44,7 +44,12 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 	public $form;
 
-	function __construct( $form ) {
+	/**
+	 * Setup our class with appropriate data (columns, form
+	 * @param  array $form A Gravity Form meta data array
+	 * @since 4.0
+	 */
+	public function __construct( $form ) {
 
 		$this->form = $form;
 
@@ -62,11 +67,15 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		parent::__construct();
 	}
 
-	function prepare_items() {
+	public function prepare_items() {
 		$this->items = (isset($this->form['gfpdf_form_settings'])) ? $this->form['gfpdf_form_settings'] : array();
 	}
 
-	function display() {
+	/**
+	 * Display our table 	 
+	 * @since 4.0
+	 */
+	public function display() {
 		$singular = rgar( $this->_args, 'singular' );
 		?>
 
@@ -95,7 +104,12 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	<?php
 	}
 
-	function single_row( $item ) {
+	/**
+	 * Output the single table row 
+	 * @param  array $item The table row being processed	 
+	 * @since 4.0
+	 */
+	public function single_row( $item ) {
 		static $row_class = '';
 		$row_class = ( $row_class == '' ? ' class="alternate"' : '' );
 
@@ -104,21 +118,52 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		echo '</tr>';
 	}
 
-	function column_default( $item, $column ) {
+	/**
+	 * Default column handler 
+	 * Used when not custom column public function exists 	 
+	 * @param  array $item The table row being processed	 
+	 * @since 4.0
+	 */
+	public function column_default( $item, $column ) {
 		echo rgar( $item, $column );
 	}
 
-	function column_cb( $item ) {
-		if ( rgar( $item, 'isDefault' ) ) {
-			return;
-		}
-		$is_active = isset( $item['isActive'] ) ? $item['isActive'] : true;
+	/**
+	 * Custom public function for displaying the 'cb' column 
+	 * Used to handle active / inactive PDFs
+	 * @param  array $item The table row being processed	 
+	 * @since 4.0
+	 */
+	public function column_cb( $item ) {
+		$is_active   = isset( $item['active'] ) ? $item['active'] : true;
+		$form_id     = rgget('id');		
+		$state_nonce = wp_create_nonce("gfpdf_state_nonce_{$form_id}_{$item['id']}");
 		?>
-		<img src="<?php echo GFCommon::get_base_url() ?>/images/active<?php echo intval( $is_active ) ?>.png" style="cursor: pointer;margin:-5px 0 0 8px;" alt="<?php $is_active ? __( 'Active', 'gravityforms' ) : __( 'Inactive', 'gravityforms' ); ?>" title="<?php echo $is_active ? __( 'Active', 'gravityforms' ) : __( 'Inactive', 'gravityforms' ); ?>" onclick="ToggleActive(this, '<?php echo $item['id'] ?>'); " />
+		<img data-id="<?php echo $item['id'] ?>" data-nonce="<?php echo $state_nonce; ?>" data-fid="<?php echo $form_id; ?>" src="<?php echo GFCommon::get_base_url() ?>/images/active<?php echo intval( $is_active ) ?>.png" style="cursor: pointer;margin:-5px 0 0 8px;" alt="<?php $is_active ? __( 'Active', 'pdfextended' ) : __( 'Inactive', 'pdfextended' ); ?>" title="<?php echo $is_active ? __( 'Active', 'pdfextended' ) : __( 'Inactive', 'pdfextended' ); ?>"/>
 	<?php
 	}
 
-	function column_name( $item ) {
+	/**
+	 * Custom public function for displaying the 'notifications' column 
+	 * Display comma separated list of active notifications, otherwise display 'None'
+	 * @param  array $item The table row being processed	 
+	 * @since 4.0
+	 */
+	public function column_notifications( $item ) {
+		if(!isset($item['notification']) || sizeof($item['notification']) == 0) {
+			_e('None', 'pdfextended');
+			return;
+		}
+
+		echo implode(', ', $item['notification']);
+	}
+
+	/**
+	 * Add column actions to allow edit, duplication and deletion
+	 * @param  array $item The table row being processed	 
+	 * @since 4.0
+	 */
+	public function column_name( $item ) {
 		$edit_url        = add_query_arg( array( 'pid' => $item['id'] ) );
 		$form_id         = rgget('id');
 		$duplicate_nonce = wp_create_nonce("gfpdf_duplicate_nonce_{$form_id}_{$item['id']}");
@@ -157,7 +202,11 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	<?php
 	}
 
-	function no_items() {
-		printf( __( "This form doesn't have any PDFs. Let's go %screate one%s.", 'gravityforms' ), "<a href='" . add_query_arg( array( 'pid' => 0 ) ) . "'>", '</a>' );
+	/**
+	 * Copy to display when no PDF configuration options exist	 
+	 * @since 4.0
+	 */	
+	public function no_items() {
+		printf( __( "This form doesn't have any PDFs. Let's go %screate one%s.", 'pdfextended' ), "<a href='" . add_query_arg( array( 'pid' => 0 ) ) . "'>", '</a>' );
 	}
 }
