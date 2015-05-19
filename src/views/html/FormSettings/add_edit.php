@@ -34,13 +34,17 @@ if (! defined('ABSPATH')) {
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+
 ?>
 
 <!-- Merge tag functionality requires a global form object -->
 <script type="text/javascript">
     <?php \GFCommon::gf_global(); ?>
-    
+    <?php \GFCommon::gf_vars(); ?>   
     var form = <?php echo json_encode( $vars['form'] ); ?>;
+    var gfpdf_current_pdf = <?php echo json_encode( $vars['pdf'] ); ?>;
+    
+    <?php \GFFormSettings::output_field_scripts(); ?>    
 </script>
 
 <?php \GFFormSettings::page_header( $vars['title'] ); ?>

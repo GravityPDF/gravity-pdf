@@ -418,6 +418,21 @@ class Stat_Options_API {
 						'required' => true,
 					),									
 
+					'conditional' => array(
+						'id'      => 'pdf',						
+						'name'    => __('Conditional Logic', 'pdfextended'),												
+						'type'    => 'conditional_logic',					
+						'desc'	  => __('Enable conditional logic', 'pdfextended'),	
+						'class'   => 'conditional_logic',
+						'inputClass' => 'conditional_logic_listener',
+						'tooltip' => '<h6>' . __('Conditional Logic', 'pdfextended') . '</h6>' . __('Create rules to dynamically enable or disable PDFs. This includes attaching to notifications and viewing.', 'pdfextended'),												
+					),	
+
+					'conditionalLogic' => array(
+						'id'      => 'conditionalLogic',																						
+						'type'    => 'hidden',		
+						'class'   => 'gfpdf-hidden',																											
+					),						
 				
 				)
 			),
@@ -781,8 +796,18 @@ class Stat_Options_API {
 		$checked = isset( $gfpdf_options[ $args['id'] ] ) ? checked( 1, $gfpdf_options[ $args['id'] ], false ) : '';
 		$checked = (empty($checked) && isset( $gfpdf_form_settings[ $pid ][ $args['id']])) ? checked( 1, $gfpdf_form_settings[ $pid ][ $args['id']], false ) : '';
 
-		$html = '<input type="checkbox" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="1" ' . $checked . '/>';
-		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
+		$class = '';
+		if(isset($args['inputClass'])) {
+			$class = $args['inputClass'];
+		}		
+
+		$id = 'gfpdf_settings[' . $args['id'] . ']';
+		if(isset($args['idOverride'])) {
+			$id = $args['idOverride'];
+		}
+
+		$html = '<input type="checkbox" id="'. $id .'" class="gfpdf_settings_' . $args['id'] . ' '. $class .'" name="gfpdf_settings[' . $args['id'] . ']" value="1" ' . $checked . '/>';
+		$html .= '<label for="'. $id .'"> '  . $args['desc'] . '</label>';
 		
 		if(isset($args['tooltip'])) {
 			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . $args['tooltip'] . '</span>';
@@ -1339,6 +1364,62 @@ class Stat_Options_API {
 		
 		echo $html;	
 	}	
+
+
+	/**
+	 * Gravity Forms Conditional Logic Callback
+	 *
+	 * Renders the GF Conditional logic container 
+	 *
+	 * @since 4.0
+	 * @param array $args Arguments passed by the setting
+	 * @return void
+	 */
+	public static function conditional_logic_callback( $args ) {
+		$args['idOverride'] = $args['id'] . '_conditional_logic';
+
+		self::checkbox_callback($args);
+		
+		$html .= '<div id="'. $args['id'] .'_conditional_logic_container" class="gfpdf_conditional_logic">
+			<!-- content dynamically created from form_admin.js -->
+		</div>';		
+		
+		echo $html;	
+	}	
+
+	/**
+	 * Render a hidden field 
+	 *	 
+	 *
+	 * @since 4.0
+	 * @param array $args Arguments passed by the setting
+	 * @return void
+	 */
+	public static function hidden_callback( $args ) {
+		global $gfpdf;
+		$gfpdf_options = $gfpdf->data->settings;
+
+		/* add GF settings */
+		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
+		$gfpdf_form_settings = self::get_form_settings();	
+
+		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
+			$value = $gfpdf_options[ $args['id'] ];
+		} elseif(empty($value) && isset( $gfpdf_form_settings[ $pid ][ $args['id']]) ) {
+			$value = $gfpdf_form_settings[ $pid ][ $args['id']];
+		} else {
+			$value = isset( $args['std'] ) ? $args['std'] : '';
+		}
+
+		$class = '';
+		if(isset($args['inputClass'])) {
+			$class = $args['inputClass'];
+		}		
+
+		$html = '<input type="hidden" class="'. $class .'" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" />';
+
+		echo $html;
+	}
 
 	/**
 	 * Descriptive text callback.

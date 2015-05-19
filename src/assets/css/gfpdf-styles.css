@@ -333,13 +333,32 @@
   width: 50px;
 }
 
-/**
- * PDF Form Settings (individual)
- */
-
 #gfpdf_list_form .duplicate a:hover,
 #gfpdf_list_form .delete a:hover {
   cursor: pointer;
+}
+
+/**
+ * PDF Form Settings (individual)
+ */
+.gfpdf-hidden {
+  display: none;
+}
+
+#pdf_action_type {
+  display: none;
+}
+
+.gfpdf_conditional_logic {
+  margin-top: 10px;
+}
+
+#pdf-form-settings .conditional_logic th {
+  padding-top: 15px;
+}
+
+#pdf-form-settings .conditional_logic td {
+  vertical-align: top;
 }
 
 

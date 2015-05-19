@@ -8,6 +8,10 @@
 
 	$(function() {
 
+		if(typeof gf_vars !== 'undefined') {
+			gf_vars.thisFormButton = GFPDF.conditionalText;
+		}
+
 		/*
 		 * Override the gfMergeTagsObj.getTargetElement prototype to better handle CSS special characters in selectors 
 		 */
@@ -326,7 +330,35 @@
 					} else {
 						$elm.show();
 					}
-				}).trigger('change');				
+				}).trigger('change');	
+
+				gform.addFilter( 'gform_conditional_object', function(object, objectType) {
+					console.log(window.gfpdf_current_pdf);
+					if(objectType === 'pdf') {
+						return window.gfpdf_current_pdf;
+					}
+					return object;
+				});						
+
+				/*
+				 * Add chance event to conditional logic 
+				 */			
+				$('#pdf_conditional_logic').change( function() {
+					/* only set up a .conditionalLogic object if it doesn't exist */
+					if(typeof window.gfpdf_current_pdf.conditionalLogic == 'undefined' && $(this).prop('checked')) {											
+						window.gfpdf_current_pdf.conditionalLogic = new ConditionalLogic();
+					} else if(!$(this).prop('checked')) {
+						window.gfpdf_current_pdf.conditionalLogic = null;
+					}
+					ToggleConditionalLogic(false, 'pdf');
+
+				}).trigger('change');
+
+				/* Add listener on submit functionality */
+				$('#gfpdf_pdf_form').submit(function() {
+					/* JSONify the conditional logic */
+					$('#gfpdf_settings\\[conditionalLogic\\]').val(jQuery.toJSON(window.gfpdf_current_pdf.conditionalLogic));
+				});
 			}
 
 			this.setup_required_fields = function($elm) {

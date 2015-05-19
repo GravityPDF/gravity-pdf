@@ -123,6 +123,7 @@ class Model_Form_Settings extends Helper_Model {
             'title'        => $label, 
             'button_label' => $label, 
             'form'         => $form,    
+            'pdf'          => $this->get_pdf($form_id, $pdf_id),
         ));         
     }
 
@@ -292,10 +293,9 @@ class Model_Form_Settings extends Helper_Model {
         if(!is_array($input) || !$pdf_id) {
              GFCommon::add_error_message( __( 'There was a problem saving your PDF settings. Please try again.', 'pdfextneded' ) );
              return false;           
-        }   
+        }  
 
         $sanitized = $this->settings_sanitize($input);
-
         
         /* Update our GFPDF settings */
         $sanitized['id']     = $pdf_id;
@@ -391,6 +391,38 @@ class Model_Form_Settings extends Helper_Model {
 
         return $input;        
     }
+
+    /**
+     * Auto strip the .pdf extension when sanitizing
+     * @param  String $value The value entered by the user
+     * @param  String $key   The field to be parsed
+     * @return String        The sanitized data
+     */ 
+    public function strip_filename_extension($value, $key) {
+
+        if($key == 'filename') {
+            if(substr($value, -4) === '.pdf') {
+                $value = substr($value, 0, -4);
+            }
+        }
+
+        return $value;
+    }
+
+    /**
+     * Auto decode the JSON conditional logic string
+     * @param  String $value The value entered by the user
+     * @param  String $key   The field to be parsed
+     * @return String        The sanitized data
+     */ 
+    public function decode_json($value, $key) {
+
+        if($key == 'conditionalLogic') {
+            return json_decode($value, true);
+        }
+
+        return $value;
+    }    
 
     /**
      * AJAX Endpoint for deleting PDF Settings
