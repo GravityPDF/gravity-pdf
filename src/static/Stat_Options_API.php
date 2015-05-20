@@ -2,6 +2,7 @@
 
 namespace GFPDF\Stat;
 use GFPDF\Model\Model_Form_Settings;
+use GFCommon;
 
 /**
  * Options API 
@@ -231,6 +232,7 @@ class Stat_Options_API {
 		/* register our santize functions */
 		add_filter( 'gfpdf_settings_sanitize_text', array(__CLASS__, 'sanitize_text_field') );		
 		add_filter( 'gfpdf_settings_sanitize_paper_size', array(__CLASS__, 'sanitize_paper_size_field'), 10, 3 );		
+		add_filter( 'gfpdf_settings_sanitize_select', array(__CLASS__, 'sanitize_select_field'), 10, 4 );
 	}
 
 	/**
@@ -263,46 +265,46 @@ class Stat_Options_API {
 					),
 
 					'default_custom_pdf_size' => array(
-						'id'      => 'default_custom_pdf_size',
-						'name'    => __('Custom Paper Size', 'pdfextended'),
-						'desc'    => __('Control the exact paper size. Can be set in millimeters or inches.', 'pdfextended'),						
-						'type'    => 'paper_size',	
-						'size'    => 'small',
-						'chosen'  => true,
+						'id'       => 'default_custom_pdf_size',
+						'name'     => __('Custom Paper Size', 'pdfextended'),
+						'desc'     => __('Control the exact paper size. Can be set in millimeters or inches.', 'pdfextended'),						
+						'type'     => 'paper_size',	
+						'size'     => 'small',
+						'chosen'   => true,
 						'required' => true,
-						'class'   => 'gfpdf-hidden gfpdf_paper_size_other',						
+						'class'    => 'gfpdf-hidden gfpdf_paper_size_other',						
 					),				
 
 					'default_template' => array(
-						'id'      => 'default_template',
-						'name'    => __('Default Template', 'pdfextended'),
-						'desc'    => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'pdfextended'),
-						'type'    => 'select',
-						'options' => self::get_templates(),	
-						'inputClass'   => 'large',	
-						'chosen'  => true,				
+						'id'         => 'default_template',
+						'name'       => __('Default Template', 'pdfextended'),
+						'desc'       => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'pdfextended'),
+						'type'       => 'select',
+						'options'    => self::get_templates(),	
+						'inputClass' => 'large',	
+						'chosen'     => true,				
 					),
 
 					'default_font_type' => array(
-						'id'      => 'default_font_type',
-						'name'    => __('Default Font Type', 'pdfextended'),
-						'desc'    => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'pdfextended'),
-						'type'    => 'select',
-						'options' => self::get_installed_fonts(),	
-						'inputClass'   => 'large',	
-						'chosen'  => true,				
+						'id'         => 'default_font_type',
+						'name'       => __('Default Font Type', 'pdfextended'),
+						'desc'       => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'pdfextended'),
+						'type'       => 'select',
+						'options'    => self::get_installed_fonts(),	
+						'inputClass' => 'large',	
+						'chosen'     => true,				
 					),	
 
 					'default_rtl' => array(
-						'id'    => 'default_rtl',
+						'id'      => 'default_rtl',
 						'name'    => __('Reverse Text (RTL)', 'pdfextended'),
-						'desc'  => __('Written languages like Arabic and Hebrew are written right to left.', 'pdfextended'),						
-						'type'  => 'radio',						
+						'desc'    => __('Written languages like Arabic and Hebrew are written right to left.', 'pdfextended'),						
+						'type'    => 'radio',						
 						'options' => array(
-							'Yes' => __('Yes', 'pdfextended'),
-							'No'  => __('No', 'pdfextended')
+							'Yes'     => __('Yes', 'pdfextended'),
+							'No'      => __('No', 'pdfextended')
 						),
-						'std'   => __('No', 'pdfextended'),						
+						'std'     => __('No', 'pdfextended'),						
 					),										
 
 					'default_action' => array(
@@ -323,27 +325,42 @@ class Stat_Options_API {
 
 			'general_security' => apply_filters( 'gfpdf_settings_general_security',
 				array(
+					'admin_capabilities' => array(
+						'id'          => 'admin_capabilities',
+						'name'        => __('User Restriction', 'pdfextended'),
+						'desc'        => __('Restrict PDF access to logged in users with this capability. The Administrator Role has no restrictions.', 'pdfextended'),
+						'type'        => 'select',
+						'options'     => self::get_capabilities(),	
+						'std'         => 'gravityforms_view_entries',
+						'inputClass'  => 'large',	
+						'chosen'      => true,				
+						'multiple'    => true,
+						'required'    => true,
+						'placeholder' => __('Select Capability', 'pdfextended'),
+						'tooltip'     => '<h6>' . __('User Restriction', 'pdfextended') . '</h6>' . __("Only logged in users with this capability can view generated PDFs they don't have ownership of. Ownership refers to the user who completed the original Gravity Form entry.", 'pdfextended'),
+					),	
+
 					'limit_to_admin' => array(
-						'id'    => 'limit_to_admin',
-						'name'  => __('Restrict PDFs to Admins', 'pdfextended'),
-						'desc'  => __('Restrict PDF access to users with the <em>"Gravity Forms View Entries"</em> privilege. By default this is administrators only.', 'pdfextended'),						
-						'type'  => 'radio',						
+						'id'      => 'limit_to_admin',
+						'name'    => __('Restrict Logged Out Users', 'pdfextended'),
+						'desc'    => __("When enabled, only users who are logged in and have the above capability, or are the original owner, can view PDFs.", 'pdfextended'),						
+						'type'    => 'radio',						
 						'options' => array(
-							'Yes' => __('Yes', 'pdfextended'),
-							'No'  => __('No', 'pdfextended')
+							'Yes'     => __('Yes', 'pdfextended'),
+							'No'      => __('No', 'pdfextended')
 						),
-						'std'   => __('No', 'pdfextended'),
-						'tooltip' => '<h6>' . __('Restrict Access to Administrators Only', 'pdfextended') . '</h6>' . __("Enable this option if you don't want users accessing the generated PDFs. This is userful if the documents are for internal use, or security is a major concern.", 'pdfextended'),
+						'std'     => __('No', 'pdfextended'),
+						'tooltip' => '<h6>' . __('Restrict Logged Out Users', 'pdfextended') . '</h6>' . __("Enable this option if you don't want any logged out users accessing the generated PDFs. Users will be prompted to login if needed.", 'pdfextended'),
 					),				
 
 					'logged_out_timeout' => array(
-						'id'    => 'logged_out_timeout',
-						'name'  => __('Logged Out Timeout', 'pdfextended'),
-						'desc'  => __('How long a <em>logged out</em> users has direct access to the PDF after completing the form. Set to 0 to disable (not recommended).', 'pdfextended'),
-						'desc2' => __('minutes', 'pdfextended'),
-						'type'  => 'number',
-						'size'  => 'small',
-						'std'   => 20,
+						'id'      => 'logged_out_timeout',
+						'name'    => __('Logged Out Timeout', 'pdfextended'),
+						'desc'    => __('Limit how long a <em>logged out</em> users has direct access to the PDF after completing the form. Set to 0 to disable (not recommended).', 'pdfextended'),
+						'desc2'   => __('minutes', 'pdfextended'),
+						'type'    => 'number',
+						'size'    => 'small',
+						'std'     => 20,
 						'tooltip' => '<h6>' . __('Logged Out Timeout', 'pdfextended') . '</h6>' . __("By default, logged out users can view PDFs when their IP matches the IP assigned to the Gravity Form entry. But because IP addresses can change frequently a time-based restriction also applies.", 'pdfextended'),
 					),					
 				)
@@ -360,22 +377,22 @@ class Stat_Options_API {
 
 			'tools' => apply_filters('gfpdf_settings_tools',
 				array(
-					'reinstall' => array(
-						'id'    => 'copy',
-						'name'  => __('Setup Custom Templates', 'pdfextended'),
-						'desc'  => sprintf(__("Ready to get down and dirty with custom PDF templates? %sSee docs to get started%s.", 'pdfextended'), '<a href="#">', '</a>'),						
-						'type'  => 'button',						
-						'std'   => __('Run Setup', 'pdfextended'),
+					'setup_templates' => array(
+						'id'      => 'setup_templates',
+						'name'    => __('Setup Custom Templates', 'pdfextended'),
+						'desc'    => sprintf(__("Ready to get down and dirty with custom PDF templates? %sSee docs to get started%s.", 'pdfextended'), '<a href="#">', '</a>'),						
+						'type'    => 'button',						
+						'std'     => __('Run Setup', 'pdfextended'),
 						'options' => 'copy',
 						'tooltip' => '<h6>' . __('Setup Custom Templates', 'pdfextended') . '</h6>' . __('TODO... Write Copy', 'pdfextended'),
 					),
 
 					'manage_fonts' => array(
-						'id'    => 'manage_fonts',
-						'name'  => __('Fonts', 'pdfextended'),
-						'desc'  => __("Add, update or remove custom fonts.", 'pdfextended'),						
-						'type'  => 'button',						
-						'std'   => __('Manage Fonts', 'pdfextended'),
+						'id'      => 'manage_fonts',
+						'name'    => __('Fonts', 'pdfextended'),
+						'desc'    => __("Add, update or remove custom fonts.", 'pdfextended'),						
+						'type'    => 'button',						
+						'std'     => __('Manage Fonts', 'pdfextended'),
 						'options' => 'install_fonts',
 						'tooltip' => '<h6>' . __('Install Fonts', 'pdfextended') . '</h6>' . sprintf(__("Custom fonts can be installed and used in your PDFs. Currently only %s.ttf%s and %s.otf%s font files are supported. Once installed, fonts can be used in your custom PDF templates with a CSS %sfont-family%s declaration.", 'pdfextended'), '<code>', '</code>', '<code>', '</code>', '<code>', '</code>'),
 					),													
@@ -386,56 +403,56 @@ class Stat_Options_API {
 			'form_settings' => apply_filters('gfpdf_form_settings', 
 				array(
 					'name' => array(
-						'id'   => 'name',
-						'name' => __('Name', 'pdfextended'),												
-						'type' => 'text',
+						'id'       => 'name',
+						'name'     => __('Name', 'pdfextended'),												
+						'type'     => 'text',
 						'required' => true,
 					),					
 
 					'template' => array(
-						'id'      => 'template',
-						'name'    => __('Template', 'pdfextended'),												
-						'desc'    =>  sprintf(__('Choose from the pre-installed templates or %sbuild your own%s.', 'pdfextended'), '<a href="#">', '</a>'),
-						'type'    => 'select',
-						'options' => self::get_templates(),	
-						'inputClass'   => 'large',	
-						'chosen'  => true,							
-						'tooltip' => '<h6>' . __('Templates', 'pdfextended') . '</h6>' . __('Set the template used to generate your PDF.', 'pdfextended'),
+						'id'         => 'template',
+						'name'       => __('Template', 'pdfextended'),												
+						'desc'       =>  sprintf(__('Choose from the pre-installed templates or %sbuild your own%s.', 'pdfextended'), '<a href="#">', '</a>'),
+						'type'       => 'select',
+						'options'    => self::get_templates(),	
+						'inputClass' => 'large',	
+						'chosen'     => true,							
+						'tooltip'    => '<h6>' . __('Templates', 'pdfextended') . '</h6>' . __('Set the template used to generate your PDF.', 'pdfextended'),
 					),
 
 					'notification' => array(
-						'id'       => 'notification',
-						'name'     => __('Notifications', 'pdfextended'),												
-						'desc'     => __('Automatically attach PDF to the selected notifications.', 'pdfextended'),
-						'type'     => 'select',
-						'options'  => array(
+						'id'                 => 'notification',
+						'name'               => __('Notifications', 'pdfextended'),												
+						'desc'               => __('Automatically attach PDF to the selected notifications.', 'pdfextended'),
+						'type'               => 'select',
+						'options'            => array(
 							'Admin Notification' => 'Admin Notification',
-							'User Notification' => 'User Notification',
+							'User Notification'  => 'User Notification',
 						),	
-						'inputClass'    => 'large',	
-						'chosen'   => true,													
-						'multiple' => true,
-						'placeholder' => __('Choose a Notification', 'pdfextended'),
+						'inputClass'         => 'large',	
+						'chosen'             => true,													
+						'multiple'           => true,
+						'placeholder'        => __('Choose a Notification', 'pdfextended'),
 					),							
 
 					'filename' => array(
-						'id'   => 'filename',
-						'name' => __('Filename', 'pdfextended'),												
-						'type' => 'text',						
-						'desc' => 'The name used when saving a PDF. Mergetags are allowed.',
-						'tooltip' => '<h6>' . __('Filename', 'pdfextended') . '</h6>' . __('Set an appropriate filename for the generated PDF. You should exclude the .pdf extension from the name.', 'pdfextended'),
+						'id'         => 'filename',
+						'name'       => __('Filename', 'pdfextended'),												
+						'type'       => 'text',						
+						'desc'       => 'The name used when saving a PDF. Mergetags are allowed.',
+						'tooltip'    => '<h6>' . __('Filename', 'pdfextended') . '</h6>' . __('Set an appropriate filename for the generated PDF. You should exclude the .pdf extension from the name.', 'pdfextended'),
 						'inputClass' => 'merge-tag-support mt-hide_all_fields',
-						'required' => true,
+						'required'   => true,
 					),									
 
 					'conditional' => array(
-						'id'      => 'pdf',						
-						'name'    => __('Conditional Logic', 'pdfextended'),												
-						'type'    => 'conditional_logic',					
-						'desc'	  => __('Enable conditional logic', 'pdfextended'),	
-						'class'   => 'conditional_logic',
+						'id'         => 'pdf',						
+						'name'       => __('Conditional Logic', 'pdfextended'),												
+						'type'       => 'conditional_logic',					
+						'desc'       => __('Enable conditional logic', 'pdfextended'),	
+						'class'      => 'conditional_logic',
 						'inputClass' => 'conditional_logic_listener',
-						'tooltip' => '<h6>' . __('Conditional Logic', 'pdfextended') . '</h6>' . __('Create rules to dynamically enable or disable PDFs. This includes attaching to notifications and viewing.', 'pdfextended'),												
+						'tooltip'    => '<h6>' . __('Conditional Logic', 'pdfextended') . '</h6>' . __('Create rules to dynamically enable or disable PDFs. This includes attaching to notifications and viewing.', 'pdfextended'),												
 					),	
 
 					'conditionalLogic' => array(
@@ -602,9 +619,10 @@ class Stat_Options_API {
 	}
 
 	/**
-	 * [highlight_errors description]
-	 * @param  [type] $settings [description]
-	 * @return [type]           [description]
+	 * If any errors have been passed back from the options.php page we will highlight them
+	 * @param  Array $settings The get_registered_settings() array
+	 * @return Array 
+	 * @since 4.0
 	 */
 	public static function highlight_errors($settings) {
 		global $gfpdf;
@@ -643,9 +661,43 @@ class Stat_Options_API {
 	}
 
 	/**
+	 * Get a list of user capabilities 
+	 * @return array The array of roles available 
+	 * @since 4.0
+	 */
+	public static function get_capabilities() {
+       
+		/* sort through all roles and fetch unique capabilities */
+		$roles        = get_editable_roles();
+		$capabilities = array();
+
+        /* Add Gravity Forms Capabilities */
+        $gf_caps = GFCommon::all_caps();
+
+        foreach ($gf_caps as $gf_cap) {
+            $capabilities['Gravity Forms Capabilities'][$gf_cap] = apply_filters('gfpdf_capability_name', $gf_cap);
+        }		
+
+		foreach($roles as $role) {
+			foreach($role['capabilities'] as $cap => $val) {
+				if(!isset($capabilities[$cap]) && !in_array($cap, $gf_caps)) {
+					$capabilities['Active WordPress Capabilities'][$cap] = apply_filters('gfpdf_capability_name', $cap);
+				}
+			}
+		}
+
+		/* sort alphabetically */
+		foreach($capabilities as &$val) {
+			ksort($val);
+		}
+
+		return apply_filters('gfpdf_capabilities', $capabilities);
+
+	}
+
+	/**
 	 * Return our paper size 
-	 * @return array The array of paper sizes avaiable 
-	 * @todo allow "Other" option
+	 * @return array The array of paper sizes available 
 	 * @since 4.0
 	 */	
 	public static function get_paper_size() {
@@ -782,41 +834,56 @@ class Stat_Options_API {
 
 		parse_str( $_POST['_wp_http_referer'], $referrer );
 
-		$settings = self::get_registered_settings();
-		$tab      = isset( $referrer['tab'] ) ? $referrer['tab'] : 'general';
+		$all_settings = self::get_registered_settings();
+		$tab          = isset( $referrer['tab'] ) ? $referrer['tab'] : 'general';
+		$settings     = (!empty($all_settings[$tab])) ? $all_settings[$tab] : array();
+
+		/*
+		 * Get all setting types 
+		 */
+		$tab_len = strlen($tab);
+		foreach($all_settings as $id => $s) {			
+			/* check if extra item(s) belongs on page but isn't the existing page */
+			if($tab != $id && $tab == substr($id, 0, $tab_len)) {
+				$settings = array_merge($settings, $s);
+			}
+		}
 
 		$input = $input ? $input : array();
 		$input = apply_filters( 'gfpdf_settings_' . $tab . '_sanitize', $input );
+
+		/**
+		 * Loop through the settings whitelist and add any missing required fields to the $input
+		 * Prevalant with Select boxes 
+		 */	
+		foreach($settings as $key => $value) {
+			if(isset($value['required']) && $value['required'] && empty($input[$key])) {
+				$input[$key] = array();
+			}
+		}
 
 		// Loop through each setting being saved and pass it through a sanitization filter
 		foreach ( $input as $key => $value ) {
 
 			// Get the setting type (checkbox, select, etc)
-			$type = isset( $settings[$tab][$key]['type'] ) ? $settings[$tab][$key]['type'] : false;
+			$type = isset( $settings[$key]['type'] ) ? $settings[$key]['type'] : false;
 
 			if ( $type ) {
 				// Field type specific filter
-				$input[$key] = apply_filters( 'gfpdf_settings_sanitize_' . $type, $value, $key, $input );
+				$input[$key] = apply_filters( 'gfpdf_settings_sanitize_' . $type, $value, $key, $input, $settings[$key] );
 			}
 
 			// General filter
-			$input[$key] = apply_filters( 'gfpdf_settings_sanitize', $input[$key], $key, $input );
+			$input[$key] = apply_filters( 'gfpdf_settings_sanitize', $input[$key], $key, $input, $settings[$key] );
 		}
 
 		// Loop through the whitelist and unset any that are empty for the tab being saved
-		if ( ! empty( $settings[$tab] ) ) {
-			foreach ( $settings[$tab] as $key => $value ) {
+		foreach ( $settings as $key => $value ) {
 
-				// settings used to have numeric keys, now they have keys that match the option ID. This ensures both methods work
-				if ( is_numeric( $key ) ) {
-					$key = $value['id'];
-				}
-
-				if ( empty( $input[$key] ) ) {
-					unset( $gfpdf_options[$key] );
-				}
-
+			if ( empty( $input[$key] ) ) {
+				unset( $gfpdf_options[$key] );
 			}
+
 		}
 
 		/* check for errors */
@@ -863,6 +930,25 @@ class Stat_Options_API {
 		return $value;
 	}	
 
+	/**
+	 * Sanitize select field
+	 *
+	 * @since 3.8
+	 * @param array $input The field value
+	 * @return string $input Sanitizied value
+	 */
+	public static function sanitize_select_field( $value, $key, $input, $settings ) {
+
+		if(isset($settings['required']) && $settings['required'] === true) {    
+			$size = count($value);        
+            if(empty($value) || sizeof(array_filter($value)) !== $size) {
+               /* throw error */
+               add_settings_error( 'gfpdf-notices', $key, __( 'PDF Settings could not be saved. Please enter all required information below.', 'pdfextended' ) );
+            }			
+		}
+
+		return $value;
+	}	
 
 	/**
 	 * Checkbox Callback
@@ -1207,7 +1293,12 @@ class Stat_Options_API {
 			$multipleExt = '[]';
 		}
 
-	    $html = '<select id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . ' '. $class .' ' . $chosen . '" name="gfpdf_settings[' . $args['id'] . ']' . $multipleExt .'" data-placeholder="' . $placeholder . '" '. $multiple .'>';
+		$required = '';
+		if(isset($args['required']) && $args['required'] === true) {
+			$required = 'required';
+		}		
+
+	    $html = '<select id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . ' '. $class .' ' . $chosen . '" name="gfpdf_settings[' . $args['id'] . ']' . $multipleExt .'" data-placeholder="' . $placeholder . '" '. $multiple .' '. $required .'>';
 	    
 		foreach ( $args['options'] as $option => $name ) {
 			if(!is_array($name)) {
@@ -1226,6 +1317,7 @@ class Stat_Options_API {
 			} else {
 				$html .= '<optgroup label="' . esc_html($option) . '">';
 				foreach($name as $op_value => $op_label) {
+					$selected = '';
 					if(is_array($value)) {
 						foreach($value as $v) {
 							$selected = selected( $op_value, $v, false );
@@ -1244,7 +1336,7 @@ class Stat_Options_API {
 		}
 
 		$html .= '</select>';
-		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
+		$html .= '<span class="gf_settings_description">'  . $args['desc'] . '</span>';
 
 		if(isset($args['tooltip'])) {
 			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . $args['tooltip'] . '</span>';

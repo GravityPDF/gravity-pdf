@@ -103,12 +103,15 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
      */
     public function add_filters() {
         /* Add tooltips */
-        add_action('gform_tooltips', array($this->view, 'add_tooltips'));
+        add_filter('gform_tooltips', array($this->view, 'add_tooltips'));
 
-        /* If trying to save apply any errors passed back from options.php page */
+        /* If trying to save settings page we'll use this filter to apply any errors passed back from options.php */
         if($this->is_settings_page()) {
             add_filter('gfpdf_registered_settings', array('GFPDF\Stat\Stat_Options_API', 'highlight_errors'));            
         }        
+
+        /* make capability text user friendly */
+        add_filter('gfpdf_capability_name', array($this->view, 'style_capabilities'));
     }
 
     /**

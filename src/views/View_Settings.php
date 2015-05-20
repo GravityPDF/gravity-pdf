@@ -169,8 +169,9 @@ class View_Settings extends Helper_View
     /**
      * Add Gravity Forms Tooltips
      * @param Array The existing tooltips
+     * @since 4.0
      */
-    public static function add_tooltips($tooltips)
+    public function add_tooltips($tooltips)
     {
         global $gfpdf;        
 
@@ -178,5 +179,18 @@ class View_Settings extends Helper_View
         $tooltips['pdf_status_notifications'] = '<h6>' . __( 'PDF Notifications', 'pdfextended' ) . '</h6>' . sprintf(__( 'Sending PDFs automatically via Gravity Form notifications requires write access to our designated output directory: %s.', 'pdfextended' ), '<code>' . $gfpdf->data->relative_output_location . '</code>');       
 
         return $tooltips;
+    }
+
+    /**
+     * Turn capabilities into more friendly strings 
+     * @param  String $cap The wordpress-style capability 
+     * @return String 
+     * @since 4.0
+     */
+    public function style_capabilities($cap) {
+        $cap = str_replace('gravityforms', 'gravity_forms', $cap);
+        $cap = str_replace('_', ' ', $cap);
+        $cap = ucwords($cap);
+        return $cap;
     }
 }

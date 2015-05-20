@@ -390,9 +390,12 @@
 			}
 
 			this.setup_required_fields = function($elm) {
+				/* prevent in browser validation */
+				$elm.attr('novalidate', 'novalidate');
+
 				/* gf compatibility + disable automatic field validation */
 				$elm.find('tr input[type="submit"]').click(function() {
-					$(this).parents('form').addClass('formSubmitted').attr('novalidate', 'novalidate');
+					$elm.addClass('formSubmitted');
 				});			
 
 				/* add the required star to make it easier for users */
@@ -429,7 +432,10 @@
 			}
 
 			this.setup_advanced_options = function() {
-				var $advanced_options  = $('.gfpdf-advanced-options a');
+				var $advanced_options_toggle_container = $('.gfpdf-advanced-options');
+				var $advanced_options_container        = $advanced_options_toggle_container.prev();
+				var $advanced_options                  = $advanced_options_toggle_container.find('a');
+				
 
 				/*
 				 * Show / Hide Advanced options
@@ -438,7 +444,7 @@
 					var click = this;
 
 					/* toggle our slider */
-					$(this).parent().prev().slideToggle(600, function() {
+					$advanced_options_container.slideToggle(600, function() {
 						/* Toggle our link text */
 						var text = $(click).text();
 						$(click).text(
@@ -447,7 +453,11 @@
 					});	
 
 					return false;				
-				});						
+				});
+
+				if($('.gfpdf-advanced-options').prev().find('.gfield_error').length) {
+					$advanced_options_container.show();
+				}
 			}
 
 			/**
@@ -471,10 +481,10 @@
 				$adminRestrictions.change(function() {					
 					if($(this).val() === 'Yes') {
 						/* hide user restrictions and logged out user timeout */
-						$table.find('tr:nth-child(2)').hide();
+						$table.find('tr:nth-child(3)').hide();
 					} else {
 						/* hide user restrictions and logged out user timeout */
-						$table.find('tr:nth-child(2)').show();
+						$table.find('tr:nth-child(3)').show();
 					}
 				});
 
@@ -488,7 +498,7 @@
 			 * @since 3.8
 			 */
 			this.tools_settings = function() {
-				var $copy            = $('#gfpdf_settings\\[copy\\]'); /* escape braces */
+				var $copy            = $('#gfpdf_settings\\[setup_templates\\]'); /* escape braces */
 				var $copyDialog      = $( '#setup-templates-confirm' );
 				var $font            = $('#gfpdf_settings\\[manage_fonts\\]'); /* escape braces */				
 				var $fontDialog      = $( '#manage-font-files' );				
