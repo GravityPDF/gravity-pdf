@@ -93,6 +93,7 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
         add_action('pdf-settings-general', array($this->view, 'system_status'));        
         add_action('pdf-settings-tools', array($this->view, 'system_status'));
         add_action('pdf-settings-tools', array($this->view, 'uninstaller'), 20);
+
     }
 
     /**
@@ -103,6 +104,11 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
     public function add_filters() {
         /* Add tooltips */
         add_action('gform_tooltips', array($this->view, 'add_tooltips'));
+
+        /* If trying to save apply any errors passed back from options.php page */
+        if($this->is_settings_page()) {
+            add_filter('gfpdf_registered_settings', array('GFPDF\Stat\Stat_Options_API', 'highlight_errors'));            
+        }        
     }
 
     /**
@@ -130,5 +136,31 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
             $this->view->help();      
           break;
         }      
-    }    
+    } 
+
+    /**
+     * Check if we are on the Gravity Form settings page
+     * @param  string  $type Do we want to find a specific tab?
+     * @return boolean       
+     * @since  4.0
+     */
+    public function is_settings_page($type = '') {
+
+        /* check we are on the PDF settings page */
+        if(rgget('page') != 'gf_settings' || rgget('subview') != 'PDF') {
+            return false;
+        }
+
+        /* if a type is passed in, check if we have a match */
+        if(!empty($type)) {
+            $page = (isset($_GET['tab'])) ? $_GET['tab'] : 'general';
+
+            if($page != $type) {
+                return false;
+            }
+        } 
+
+        /* we are successful */
+        return true;
+    }
 }

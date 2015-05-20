@@ -101,11 +101,12 @@ class Controller_Form_Settings extends Helper_Controller implements Helper_Int_A
 
         /* Add Validation Errors */
         add_filter( 'gfpdf_form_settings', array($this->model, 'validation_error'));
+        add_filter( 'gfpdf_form_settings_appearance', array($this->model, 'validation_error'));        
 
         /* Enhance sanitize functionality */
-        add_filter( 'gfpdf_settings_sanitize_text', 'wp_strip_all_tags', 10);
-        add_filter( 'gfpdf_settings_sanitize_text',  array($this->model, 'strip_filename_extension'), 15, 2);
-        add_filter( 'gfpdf_settings_sanitize_hidden',  array($this->model, 'decode_json'), 10, 2);
+        add_filter( 'gfpdf_form_settings_sanitize_text', 'wp_strip_all_tags', 10);
+        add_filter( 'gfpdf_form_settings_sanitize_text',  array($this->model, 'strip_filename_extension'), 15, 2);
+        add_filter( 'gfpdf_form_settings_sanitize_hidden',  array($this->model, 'decode_json'), 10, 2);
     }
 
     /**

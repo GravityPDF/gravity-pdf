@@ -57,7 +57,7 @@ if (! defined('ABSPATH')) {
 	</h3>
 
 
-    <form method="post" id="gfpdf_pdf_form" novalidate>
+    <form method="post" id="gfpdf_pdf_form">
 
         <?php wp_nonce_field( 'gfpdf_save_pdf', 'gfpdf_save_pdf' ) ?>        
         

@@ -165,7 +165,7 @@ class Model_Form_Settings extends Helper_Model {
     public function get_pdf( $form_id, $pdf_id ) {
         $gfpdf_options = $this->get_settings($form_id);
         $value         = ! empty( $gfpdf_options[ $pdf_id ] ) ? $gfpdf_options[ $pdf_id ] : array();
-        return apply_filters( 'gfpdf_pdf_config', $value, $key, $default );
+        return apply_filters( 'gfpdf_pdf_config', $value );
 
     }
 
@@ -184,7 +184,7 @@ class Model_Form_Settings extends Helper_Model {
     public function update_pdf( $form_id, $pdf_id, $value = '', $update_db = true ) {
 
         if ( empty( $value ) || ! is_array($value) || sizeof($value) == 0 ) {
-            $remove_option = $this->delete_pdf( $key );
+            $remove_option = $this->delete_pdf( $form_id, $pdf_id );
             return $remove_option;
         }
 
@@ -193,7 +193,7 @@ class Model_Form_Settings extends Helper_Model {
 
         if(! is_wp_error($options)) {
             /* Let's let devs alter that value coming in */
-            $value = apply_filters( 'gfpdf_form_update_pdf', $value, $key );
+            $value = apply_filters( 'gfpdf_form_update_pdf', $value, $form_id, $pdf_id );
 
             if(!is_array($options[ $pdf_id ])) {
                 $options[ $pdf_id ] = array();
@@ -208,19 +208,21 @@ class Model_Form_Settings extends Helper_Model {
             /* Update our GFPDF settings */
             $form['gfpdf_form_settings'] = $options;
             
+            $did_update = false;
             if($update_db) {
                 /* update the database, if able */
                 $did_update = GFFormsModel::update_form_meta($form_id, $form);
             }
             
             /* If it updated, let's update the global variable */
-            if ( $did_update !== false || !$update_db ){
+            if ( !$update_db || $did_update !== false ){
                 global $gfpdf;     
-                $gfpdf->data->form_settings[$form_id] = $options;
-
+                $gfpdf->data->form_settings[$form_id] = $options;                
             }
 
             return $did_update;
+
+            
         }
 
         return false;
@@ -304,7 +306,8 @@ class Model_Form_Settings extends Helper_Model {
         $this->update_pdf($form_id, $pdf_id, $sanitized, false);
 
         /* Do validation */
-        if(empty($sanitized['name']) || empty($sanitized['filename'])) {
+        if(empty($sanitized['name']) || empty($sanitized['filename']) || 
+            ($sanitized['pdf_size'] == 'custom' && ((int) $sanitized['custom_pdf_size'][0] === 0) || ((int) $sanitized['custom_pdf_size'][1]) === 0) ) {
 
             GFCommon::add_error_message( __( 'PDF could not be saved. Please enter all required information below.', 'pdfextended' ) );
             return false;
@@ -345,15 +348,31 @@ class Model_Form_Settings extends Helper_Model {
 
         /* throw errors on required fields */
        foreach($fields as $key => &$field) {
-            if($field['required']) {
-                $value = (isset($input[$field['id']])) ? apply_filters( 'gfpdf_settings_sanitize_text', $input[$field['id']], $key)  : '';
-                if(empty($value)) {
-                    $field['class'] .= $field['class'] . ' gfield_error' ;
+            if(isset($field['required']) && $field['required'] === true) {
+
+                /* get field value */
+                $value          = (isset($input[$field['id']])) ? $input[$field['id']] : '';
+
+                /* set a class if it doesn't exist */
+                $field['class'] = (isset($field['class'])) ? $field['class'] : '';
+
+                /* if the value is an array ensure all items have values */
+                if(is_array($value)) {
+                    $size = sizeof($value);
+                    if(sizeof(array_filter($value)) !== $size) {
+                        $field['class'] .= $field['class'] . ' gfield_error' ;
+                    }
+                } else {
+                    /* if string, sanitize and add error if appropriate */
+                    $value = apply_filters( 'gfpdf_form_settings_sanitize_text', $value, $key);
+                    if(empty($value)) {
+                        $field['class'] .= $field['class'] . ' gfield_error' ;
+                    }                    
                 }
             }
         }
 
-        return $fields;
+        return $fields;        
     }
 
     /**
@@ -381,12 +400,12 @@ class Model_Form_Settings extends Helper_Model {
 
                 if ( $type ) {
                     /* Field type specific filter */
-                    $input[$key] = apply_filters( 'gfpdf_settings_sanitize_' . $type, $value, $key );
+                    $input[$key] = apply_filters( 'gfpdf_form_settings_sanitize_' . $type, $value, $key );
                 }                
             }        
 
             /* General filter */
-            $input[$key] = apply_filters( 'gfpdf_settings_sanitize', $input[$key], $key );
+            $input[$key] = apply_filters( 'gfpdf_form_settings_sanitize', $input[$key], $key );
         }
 
         return $input;        

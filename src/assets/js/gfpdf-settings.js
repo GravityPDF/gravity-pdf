@@ -284,6 +284,7 @@
 				this.setup_advanced_options();	
 				this.setup_required_fields($('#gfpdf_pdf_form'));				
 				this.show_tooltips();
+				this.setup_custom_paper_size();
 
 				var $secTable    = $('#pdf-general-advanced');
 				var $pdfSecurity = $secTable.find('input[name="gfpdf_settings[security]"]');
@@ -313,6 +314,7 @@
 					}					
 				}).trigger('change');	
 				
+				/* The format field effects the security field. When it changes it triggers the security field as changed */
 				$format.change(function() {		
 					if($(this).is(':checked')) {
 						$pdfSecurity.trigger('change');
@@ -332,6 +334,7 @@
 					}
 				}).trigger('change');	
 
+				/* add GF JS filter to change the conditional logic object type */
 				gform.addFilter( 'gform_conditional_object', function(object, objectType) {
 					console.log(window.gfpdf_current_pdf);
 					if(objectType === 'pdf') {
@@ -341,7 +344,7 @@
 				});						
 
 				/*
-				 * Add chance event to conditional logic 
+				 * Add change event to conditional logic 
 				 */			
 				$('#pdf_conditional_logic').change( function() {
 					/* only set up a .conditionalLogic object if it doesn't exist */
@@ -361,14 +364,41 @@
 				});
 			}
 
-			this.setup_required_fields = function($elm) {
-				$elm.find('input[type="submit"]').click(function() {
-					$(this).parents('form').addClass('formSubmitted');
-				});				
+			/**
+			 * Show / Hide our custom paper size as needed 
+			 * @since 4.0
+			 */
+			this.setup_custom_paper_size = function() {
+				var $paperSizeContainer = $('.gfpdf_paper_size');
 
-				$elm.find(':input[required=""], :input[required]').each(function() {				
-					$(this).parents('tr').find('th').append('<span class="gfield_required">*</span>');
-				});				
+				/* there could be multiple paper sizes on a single page (not currently, but there could) */
+				$paperSizeContainer.each(function() {
+					var $customPaperSize = $(this).nextAll('.gfpdf_paper_size_other').first();
+					var $paperSize       = $(this).find('select');
+
+					/* add our change event */
+					$paperSize.change(function() {
+						if($(this).val() === 'custom') {
+							$customPaperSize.fadeIn();
+						} else {
+							$customPaperSize.fadeOut();
+						}
+					}).trigger('change');
+
+				});
+				
+			}
+
+			this.setup_required_fields = function($elm) {
+				/* gf compatibility + disable automatic field validation */
+				$elm.find('tr input[type="submit"]').click(function() {
+					$(this).parents('form').addClass('formSubmitted').attr('novalidate', 'novalidate');
+				});			
+
+				/* add the required star to make it easier for users */
+				$elm.find('tr').each(function() {
+					$(this).find(':input[required=""]:first, :input[required]:first').parents('tr').find('th').append('<span class="gfield_required">*</span>');
+				});			
 			}
 
 			this.show_tooltips = function() {
@@ -425,7 +455,11 @@
 			 * This sets up and processes any of the JS that needs to be applied on the general settings tab 
 			 * @since 3.8
 			 */
-			this.general_settings = function() {				
+			this.general_settings = function() {	
+				/* setup custom paper size */
+				this.setup_custom_paper_size();
+				this.setup_required_fields($('#pdfextended-settings > form'));
+
 				var $table             = $('#pdf-general-security');
 				var $adminRestrictions = $table.find('input[name="gfpdf_settings[limit_to_admin]"]');
 				var $userRestrictions  = $table.find('input[name="gfpdf_settings[limit_to_user]"]');

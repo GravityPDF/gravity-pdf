@@ -174,6 +174,9 @@ class Helper_Data {
 
         /* set up storage cache for our form settings */
         $this->form_settings = array();
+
+        /* set up a place to access form setting validation errors */
+        $this->form_settings_errors = get_transient( 'settings_errors' );
     }
 
     /**

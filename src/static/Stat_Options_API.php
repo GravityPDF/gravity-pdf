@@ -149,7 +149,14 @@ class Stat_Options_API {
 	 * @return array GFPDF settings
 	 */
 	public static function get_settings() {
-		$settings = (is_array(get_option( 'gfpdf_settings' ))) ? get_option( 'gfpdf_settings' ) : array();
+		$tempSettings = get_transient('gfpdf_settings_user_data');
+		delete_transient('gfpdf_settings_user_data');
+
+		if($tempSettings !== false) {
+			$settings = $tempSettings;
+		} else {
+			$settings = (is_array(get_option( 'gfpdf_settings' ))) ? get_option( 'gfpdf_settings' ) : array();	
+		}		
 		return apply_filters( 'gfpdf_get_settings', $settings );
 	}
 
@@ -223,6 +230,7 @@ class Stat_Options_API {
 
 		/* register our santize functions */
 		add_filter( 'gfpdf_settings_sanitize_text', array(__CLASS__, 'sanitize_text_field') );		
+		add_filter( 'gfpdf_settings_sanitize_paper_size', array(__CLASS__, 'sanitize_paper_size_field'), 10, 3 );		
 	}
 
 	/**
@@ -234,6 +242,7 @@ class Stat_Options_API {
 	public static function get_registered_settings() {
 
 		global $gfpdf;
+
 		/**
 		 * 'Whitelisted' Gravity PDF settings, filters are provided for each settings
 		 * section to allow extensions and other plugins to add their own settings
@@ -243,21 +252,33 @@ class Stat_Options_API {
 			'general' => apply_filters( 'gfpdf_settings_general',
 				array(
 					'default_pdf_size' => array(
-						'id'      => 'default_pdf_size',
-						'name'    => __('Default Paper Size', 'pdfextended'),
-						'desc'    => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'pdfextended'),
-						'type'    => 'select',
-						'options' => self::get_paper_size(),	
-						'inputClass'   => 'large',	
-						'chosen'  => true,				
+						'id'         => 'default_pdf_size',
+						'name'       => __('Default Paper Size', 'pdfextended'),
+						'desc'       => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'pdfextended'),
+						'type'       => 'select',
+						'options'    => self::get_paper_size(),	
+						'inputClass' => 'large',	
+						'chosen'     => true,	
+						'class'      => 'gfpdf_paper_size',			
 					),
+
+					'default_custom_pdf_size' => array(
+						'id'      => 'default_custom_pdf_size',
+						'name'    => __('Custom Paper Size', 'pdfextended'),
+						'desc'    => __('Control the exact paper size. Can be set in millimeters or inches.', 'pdfextended'),						
+						'type'    => 'paper_size',	
+						'size'    => 'small',
+						'chosen'  => true,
+						'required' => true,
+						'class'   => 'gfpdf-hidden gfpdf_paper_size_other',						
+					),				
 
 					'default_template' => array(
 						'id'      => 'default_template',
 						'name'    => __('Default Template', 'pdfextended'),
 						'desc'    => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'pdfextended'),
 						'type'    => 'select',
-						'options' => self::get_paper_size(),	
+						'options' => self::get_templates(),	
 						'inputClass'   => 'large',	
 						'chosen'  => true,				
 					),
@@ -267,23 +288,22 @@ class Stat_Options_API {
 						'name'    => __('Default Font Type', 'pdfextended'),
 						'desc'    => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'pdfextended'),
 						'type'    => 'select',
-						'options' => self::get_paper_size(),	
+						'options' => self::get_installed_fonts(),	
 						'inputClass'   => 'large',	
 						'chosen'  => true,				
-					),					
+					),	
 
-					'cleanup_individual' => array(
-						'id'      => 'cleanup_individual',
-						'name'    => __('Regularly Cleanup PDFs', 'pdfextended'),
-						'desc'    => __('When enabled, the PDF will be removed from your file system when it is no longer needed. Enable to save disk space.', 'pdfextended'),
-						'type'    => 'radio',
+					'default_rtl' => array(
+						'id'    => 'default_rtl',
+						'name'    => __('Reverse Text (RTL)', 'pdfextended'),
+						'desc'  => __('Written languages like Arabic and Hebrew are written right to left.', 'pdfextended'),						
+						'type'  => 'radio',						
 						'options' => array(
 							'Yes' => __('Yes', 'pdfextended'),
 							'No'  => __('No', 'pdfextended')
 						),
-						'std'     => __('Yes', 'pdfextended'),
-						'tooltip' => '<h6>' . __('Cleanup PDFs', 'pdfextended') . '</h6>' . __('If you are using the "notification" or "save" configuration option, by default Gravity PDF will store copies of your PDF on your server. If you have limited disk space you should enable this option. Note: You can regenerate your PDFs at any time.', 'pdfextended'),
-					),
+						'std'   => __('No', 'pdfextended'),						
+					),										
 
 					'default_action' => array(
 						'id'      => 'default_action',
@@ -358,16 +378,6 @@ class Stat_Options_API {
 						'std'   => __('Install Fonts', 'pdfextended'),
 						'options' => 'install_fonts',
 						'tooltip' => '<h6>' . __('Install Fonts', 'pdfextended') . '</h6>' . sprintf(__("Custom fonts can be installed and used in your PDFs. Currently only %s.ttf%s font files are supported. Once installed, fonts can be set in your custom PDF templates using CSS's %sfont-family%s declaration.", 'pdfextended'), '<code>', '</code>', '<code>', '</code>'),
-					),
-
-					'cleanup' => array(
-						'id'    => 'cleanup',
-						'name'  => __('Cleanup PDFs', 'pdfextended'),
-						'desc'  => __('Remove all generated PDFs from your file system that are no longer needed. Run to save disk space.', 'pdfextended'),						
-						'type'  => 'button',						
-						'std'   => __('Start Cleanup', 'pdfextended'),
-						'options' => 'cleanup',
-						'tooltip' => '<h6>' . __('Cleanup PDFs', 'pdfextended') . '</h6>' . sprintf(__("Any PDFs generated by Gravity PDF which are more than one hour old will be removed from your file system. You should run this when you enable the %sRegularly Cleanup PDFs%s setting.", 'pdfextended'), '<em>', '</em>'),
 					),													
 				)
 			),
@@ -448,8 +458,21 @@ class Stat_Options_API {
 						'options' => self::get_paper_size(),	
 						'std'     => self::get_option('default_pdf_size'),
 						'inputClass'   => 'large',	
+						'class' => 'gfpdf_paper_size',
 						'chosen'  => true,				
 					),	
+
+					'custom_pdf_size' => array(
+						'id'      => 'custom_pdf_size',
+						'name'    => __('Custom Paper Size', 'pdfextended'),	
+						'desc'    => __('Control the exact paper size. Can be set in millimeters or inches.', 'pdfextended'),					
+						'type'    => 'paper_size',	
+						'size'    => 'small',
+						'chosen'  => true,
+						'required' => true,
+						'class'   => 'gfpdf-hidden gfpdf_paper_size_other',
+						'std'     => self::get_option('default_custom_pdf_size'),
+					),						
 
 					'orientation' => array(
 						'id'      => 'orientation',
@@ -467,7 +490,8 @@ class Stat_Options_API {
 						'id'      => 'font',
 						'name'    => __('Font', 'pdfextended'),						
 						'type'    => 'select',
-						'options' => self::get_installed_fonts(),	
+						'options' => self::get_installed_fonts(),
+						'std'     => self::get_option('default_font_type'),	
 						'desc'    => __('Set the default font used in the PDF.', 'pdfextended'),
 						'inputClass'   => 'large',	
 						'chosen'  => true,				
@@ -482,8 +506,7 @@ class Stat_Options_API {
 							'Yes' => __('Yes', 'pdfextended'),
 							'No'  => __('No', 'pdfextended')
 						),
-						'std'   => __('No', 'pdfextended'),
-						'tooltip' => '<h6>' . __('Restrict Access to Administrators Only', 'pdfextended') . '</h6>' . __("Enable this option if you don't want users accessing the generated PDFs. This is userful if the documents are for internal use, or security is a major concern.", 'pdfextended'),
+						'std'   => self::get_option('default_rtl'),						
 					),					
 															
 				)
@@ -579,19 +602,61 @@ class Stat_Options_API {
 	}
 
 	/**
+	 * [highlight_errors description]
+	 * @param  [type] $settings [description]
+	 * @return [type]           [description]
+	 */
+	public static function highlight_errors($settings) {
+		global $gfpdf;
+		
+		/* we fire too late to tap into get_settings_error() so our data storage holds the details */
+		$errors = $gfpdf->data->form_settings_errors;
+
+		/* loop through errors if any and highlight the appropriate settings */
+		if(is_array($errors) && sizeof($errors) > 0) {
+			foreach($errors as $error) {
+				/* exit if not an error */
+				if($error['type'] !== 'error') {
+					continue;
+				}
+
+				/* loop through our data until we find a match */
+				$found = false;
+				foreach($settings as $key => &$group) {
+					foreach($group as $id => &$item) {
+						if($item['id'] === $error['code']) {
+							$item['class'] = (isset($item['class'])) ? $item['class'] . ' gfield_error' : 'gfield_error';
+							$found = true;
+							break;
+						}
+					}
+
+					/* exit outer loop */
+					if($found) {
+						break;
+					}
+				}
+			}
+		}		
+
+		return $settings;
+	}
+
+	/**
 	 * Return our paper size 
 	 * @return array The array of paper sizes avaiable 
 	 * @todo allow "Other" option
 	 * @since 4.0
 	 */	
 	public static function get_paper_size() {
-		return array(
+		return apply_filters( 'gfpdf_get_paper_size', array(
 			'Common Sizes' => array(
-				'A4'     => __('A4 (210 x 297mm)', 'pdfextended'),
-				'letter' => __('Letter (8.5 x 11in)', 'pdfextended'),
-				'legal'  => __('Legal (8.5 x 14in)', 'pdfextended'),
-				'ledger' => __('Ledger / Tabloid (11 x 17in)', 'pdfextended'),
+				'A4'        => __('A4 (210 x 297mm)', 'pdfextended'),
+				'letter'    => __('Letter (8.5 x 11in)', 'pdfextended'),
+				'legal'     => __('Legal (8.5 x 14in)', 'pdfextended'),
+				'ledger'    => __('Ledger / Tabloid (11 x 17in)', 'pdfextended'),
 				'executive' => __('Executive (7 x 10in)', 'pdfextended'),
+				'custom'    => __('Custom Paper Size', 'pdfextended'),
 			),
 
 			'"A" Sizes' => array(
@@ -647,7 +712,7 @@ class Stat_Options_API {
 				'SRA3' => __('SRA3 (320 x 450mm)', 'pdfextended'),
 				'SRA4' => __('SRA4 (225 x 320mm)', 'pdfextended'),				
 			),						
-		); 		
+		)); 		
 	}
 
 	/**
@@ -731,11 +796,11 @@ class Stat_Options_API {
 
 			if ( $type ) {
 				// Field type specific filter
-				$input[$key] = apply_filters( 'gfpdf_settings_sanitize_' . $type, $value, $key );
+				$input[$key] = apply_filters( 'gfpdf_settings_sanitize_' . $type, $value, $key, $input );
 			}
 
 			// General filter
-			$input[$key] = apply_filters( 'gfpdf_settings_sanitize', $input[$key], $key );
+			$input[$key] = apply_filters( 'gfpdf_settings_sanitize', $input[$key], $key, $input );
 		}
 
 		// Loop through the whitelist and unset any that are empty for the tab being saved
@@ -754,10 +819,15 @@ class Stat_Options_API {
 			}
 		}
 
-		// Merge our new settings with the existing
-		$output = array_merge( $gfpdf_options, $input );
-
-		add_settings_error( 'gfpdf-notices', '', __( 'Settings updated.', 'pdfextended' ), 'updated' );
+		/* check for errors */
+		if(count(get_settings_errors()) === 0) {
+			/* Merge our new settings with the existing */
+			$output = array_merge( $gfpdf_options, $input );
+			add_settings_error( 'gfpdf-notices', '', __( 'Settings updated.', 'pdfextended' ), 'updated' );
+		} else {
+			/* store the user data in a transient */
+			set_transient('gfpdf_settings_user_data', array_merge( $gfpdf_options, $input ), 30);
+		}
 
 		return $output;
 	}
@@ -773,6 +843,25 @@ class Stat_Options_API {
 	public static function sanitize_text_field( $input ) {
 		return trim( $input );
 	}
+
+	/**
+	 * Sanitize paper size fields
+	 *
+	 * @since 3.8
+	 * @param array $input The field value
+	 * @return string $input Sanitizied value
+	 */
+	public static function sanitize_paper_size_field( $value, $key, $input ) {
+		if($input['default_pdf_size'] === 'custom') {
+            $size = sizeof($value);
+            if(sizeof(array_filter($value)) !== $size) {
+               /* throw error */
+               add_settings_error( 'gfpdf-notices', $key, __( 'PDF Settings could not be saved. Please enter all required information below.', 'pdfextended' ) );
+            }			
+		}
+
+		return $value;
+	}	
 
 
 	/**
@@ -973,7 +1062,7 @@ class Stat_Options_API {
 		$step = isset( $args['step'] ) ? $args['step'] : 1;
 
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
-		$html = '<input type="number" step="' . esc_attr( $step ) . '" max="' . esc_attr( $max ) . '" min="' . esc_attr( $min ) . '" class="' . $size . '-text" class="gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '"/> ' . $args['desc2'];
+		$html = '<input type="number" step="' . esc_attr( $step ) . '" max="' . esc_attr( $max ) . '" min="' . esc_attr( $min ) . '" class="' . $size . '-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '"/> ' . $args['desc2'];
 		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
 
 		if(isset($args['tooltip'])) {
@@ -1380,7 +1469,7 @@ class Stat_Options_API {
 
 		self::checkbox_callback($args);
 		
-		$html .= '<div id="'. $args['id'] .'_conditional_logic_container" class="gfpdf_conditional_logic">
+		$html = '<div id="'. $args['id'] .'_conditional_logic_container" class="gfpdf_conditional_logic">
 			<!-- content dynamically created from form_admin.js -->
 		</div>';		
 		
@@ -1419,6 +1508,71 @@ class Stat_Options_API {
 		$html = '<input type="hidden" class="'. $class .'" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" />';
 
 		echo $html;
+	}
+
+	/**
+	 * Render the custom paper size functionality 
+	 *	 
+	 *
+	 * @since 4.0
+	 * @param array $args Arguments passed by the setting
+	 * @return void
+	 */
+	public static function paper_size_callback( $args ) {
+		global $gfpdf;
+		$gfpdf_options = $gfpdf->data->settings;
+
+		/* add GF settings */
+		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
+		$gfpdf_form_settings = self::get_form_settings();	
+
+		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
+			$value = $gfpdf_options[ $args['id'] ];
+
+		} elseif(empty($value) && isset( $gfpdf_form_settings[ $pid ][ $args['id']]) ) {
+			$value = $gfpdf_form_settings[ $pid ][ $args['id']];
+		} else {
+			$value = (isset($args['std']) && is_array($args['std']) ) ? $args['std'] : array('', '', 'mm');
+		}
+
+		$placeholder = '';
+	    if ( isset( $args['placeholder'] ) ) {
+	        $placeholder = $args['placeholder'];	   
+	    }			
+
+		$chosen = '';
+		if ( isset( $args['chosen'] ) ) {
+			$chosen = 'gfpdf-chosen';			
+		}	
+
+		$class = '';
+		if(isset($args['inputClass'])) {
+			$class = $args['inputClass'];
+		}				
+
+		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
+
+		$html = '<input type="number" class="'. $size .'-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_width" min="1" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( stripslashes( $value[0] ) ) . '" required /> ' . __('Width', 'pdfextended');
+		$html .= ' <input type="number" class="'. $size .'-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_height" min="1" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( stripslashes( $value[1] ) ) . '" required /> ' . __('Height', 'pdfextended');
+
+		$measurement = apply_filters( 'gfpdf_paper_size_dimensions', array(
+			'millimeters' => __('mm', 'pdfextended'),
+			'inches' => __('inches', 'pdfextended'),
+		));
+
+		$html .= '&nbsp; — &nbsp; <select id="gfpdf_settings[' . $args['id'] . ']_measurement" style="width: 75px" class="gfpdf_settings_' . $args['id'] . ' '. $class .' ' . $chosen . '" name="gfpdf_settings[' . $args['id'] . '][]" data-placeholder="' . $placeholder . '">';		
+
+		$measure_value = esc_attr( stripslashes( $value[2] ) );
+		foreach($measurement as $key => $val) {
+			$selected = ($measure_value === $key) ? 'selected="selected"' : '';
+			$html .= '<option value="'. $key .'" '. $selected .'>' . $val . '</option>';
+		}
+
+		$html .= '</select> ';
+
+		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
+
+		echo $html;		
 	}
 
 	/**
