@@ -111,7 +111,7 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
         }        
 
         /* make capability text user friendly */
-        add_filter('gfpdf_capability_name', array($this->view, 'style_capabilities'));
+        add_filter('gfpdf_capability_name', array($this->model, 'style_capabilities'));
     }
 
     /**

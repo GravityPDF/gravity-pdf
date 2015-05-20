@@ -106,8 +106,8 @@ if (! defined('ABSPATH')) {
 <script type="text/template" id="GravityPDFSearchResultsDocumentation">    
     <% _.each(collection, function (c) { %>
       <li>
-        <a href="<%= c.get('link') %>" class="rsswidget"><%= c.get('terms').documentation_group[0].name %> - <%= c.get('title') %></a> <span class="rss-date">Last Updated <%= _.template.formatdate(c.get('modified')) %></span>
-        <div class="rssSummary"></div>
+        <a href="<%= c.get('link') %>" class="rsswidget"><%= c.get('terms').documentation_group[0].name %> - <%= c.get('title') %></a>
+        <div class="rssSummary"><%= c.get('excerpt') %></div>
       </li>
     <% }); %>
 

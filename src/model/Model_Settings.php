@@ -43,19 +43,22 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @since 4.0
  */
 class Model_Settings extends Helper_Model {
-  
+
     /**
      * Add meta boxes used in the settings "help" tab
      * @since  4.0
      * @return  void
      */
     public function add_meta_boxes() {
+
+        $controller = $this->getController();
+
         /* set the meta box id */
         $id = 'pdf_knowledgebase';        
         add_meta_box( 
             $id,
-            __( 'Documentation' ),
-            array($this, 'add_meta_' . $id),
+            __( 'Documentation', 'pdfextended' ),
+            array($controller->view, 'add_meta_' . $id),
             'pdf-help-and-support',
             'row-1'
         );
@@ -64,8 +67,8 @@ class Model_Settings extends Helper_Model {
         $id = 'pdf_support_forum';
         add_meta_box( 
             $id,
-            __( 'Support Forum' ),
-            array($this, 'add_meta_' . $id),
+            __( 'Support Forum', 'pdfextended' ),
+            array($controller->view, 'add_meta_' . $id),
             'pdf-help-and-support',
             'row-1'           
         );
@@ -74,8 +77,8 @@ class Model_Settings extends Helper_Model {
         $id = 'pdf_direct';
         add_meta_box( 
             $id,
-            __( 'Contact Us' ),
-            array($this, 'add_meta_' . $id),
+            __( 'Contact Us', 'pdfextended' ),
+            array($controller->view, 'add_meta_' . $id),
             'pdf-help-and-support',
             'row-1'           
         );   
@@ -84,8 +87,8 @@ class Model_Settings extends Helper_Model {
         $id = 'pdf_popular_articles';
         add_meta_box( 
             $id,
-            __( 'Popular Articles' ),
-            array($this, 'add_meta_' . $id),
+            __( 'Popular Documentation', 'pdfextended' ),
+            array($controller->view, 'add_meta_' . $id),
             'pdf-help-and-support',
             'row-2'
         );  
@@ -94,8 +97,8 @@ class Model_Settings extends Helper_Model {
         $id = 'pdf_recent_forum_articles';
         add_meta_box( 
             $id,
-            __( 'Recent Forum Activity' ),
-            array($this, 'add_meta_' . $id),
+            __( 'Recent Forum Activity', 'pdfextended' ),
+            array($this, 'process_meta_' . $id),
             'pdf-help-and-support',
             'row-2'      
         );         
@@ -104,128 +107,85 @@ class Model_Settings extends Helper_Model {
         $id = 'pdf_support_hours';
         add_meta_box( 
             $id,
-            __( 'Support Hours' ),
-            array($this, 'add_meta_' . $id),
+            __( 'Support Hours', 'pdfextended' ),
+            array($controller->view, 'add_meta_' . $id),
             'pdf-help-and-support',
             'row-2'         
         );                
 
-    }
-
-    /**
-     * [add_meta_pdf_knowledgebase description]
-     * @param [type] $object [description]
-     */
-    public function add_meta_pdf_knowledgebase($object) {       
-        ?>
-            <i class="fa fa-file-text-o fa-5x"></i>
-            <h4><a href="https://developer.gravitypdf.com/documentation/"><?php _e('Knowledge Base', 'pdfextended'); ?></a></h4>
-            <p><?php _e('Gravity PDF has extensive online documentation to help you get started.', 'pdfextended'); ?></p>
-        <?php
-    }
-
-    /**
-     * [add_meta_pdf_support_forum description]
-     * @param [type] $object [description]
-     */
-    public function add_meta_pdf_support_forum($object) {       
-        ?>
-            <i class="fa fa-comments-o fa-5x"></i>
-            <h4><a href="https://support.gravitypdf.com/"><?php _e('Support Forum', 'pdfextended'); ?></a></h4>
-            <p><?php _e('Our community support forum is a great resource if you have a problem.', 'pdfextended'); ?></p>
-        <?php
-    }
-
-    /**
-     * [add_meta_pdf_direct description]
-     * @param [type] $object [description]
-     */
-    public function add_meta_pdf_direct($object) {       
-        ?>
-            <i class="fa fa-envelope-o fa-5x"></i>
-            <h4><a href="https://developer.gravitypdf.com/contact/"><?php _e('Contact Us', 'pdfextended'); ?></a></h4>
-            <p><?php _e('You can also get in touch with Gravity PDF staff directly via email or phone.', 'pdfextended'); ?></p>
-        <?php
     }    
 
     /**
-     * [add_meta_pdf_popular_articles description]
-     * TODO
-     * @param [type] $object [description]
+     * Turn capabilities into more friendly strings 
+     * @param  String $cap The wordpress-style capability 
+     * @return String 
+     * @since 4.0
      */
-    public function add_meta_pdf_popular_articles($object) {       
-        ?>
-            <ul>
-                <li>
-                  <a href="https://wordpress.org/news/2015/04/powell/" class="rsswidget">WordPress 4.2 “Powell”</a>                  
-                </li>
-                <li>
-                  <a href="https://wordpress.org/news/2015/04/powell/" class="rsswidget">WordPress 4.2 “Powell”</a> 
-                </li>
-
-                <li>
-                  <a href="https://wordpress.org/news/2015/04/powell/" class="rsswidget">WordPress 4.2 “Powell”</a>                 
-                </li>
-
-                <li>
-                  <a href="https://wordpress.org/news/2015/04/powell/" class="rsswidget">WordPress 4.2 “Powell”</a>                  
-                </li>                                                  
-
-                <li>
-                  <a href="https://wordpress.org/news/2015/04/powell/" class="rsswidget">WordPress 4.2 “Powell”</a>                  
-                </li>   
-
-                <li>
-                  <a href="https://wordpress.org/news/2015/04/powell/" class="rsswidget">WordPress 4.2 “Powell”</a>                 
-                </li>                                   
-            </ul> 
-        <?php
-    }
+    public function style_capabilities($cap) {
+        $cap = str_replace('gravityforms', 'gravity_forms', $cap);
+        $cap = str_replace('_', ' ', $cap);
+        $cap = ucwords($cap);
+        return $cap;
+    } 
 
     /**
-     * [add_meta_pdf_recent_forum_articles description]
-     * TODO
-     * @param [type] $object [description]
+     * Load Recent forum articles meta box
+     * @param Object $object The metabox object 
+     * @return void
+     * @since 4.0
      */
-    public function add_meta_pdf_recent_forum_articles($object) {       
-        ?>
-            <ul>
-                <li>
-                  <a href="https://wordpress.org/news/2015/04/powell/" class="rsswidget">WordPress 4.2 “Powell”</a> <span class="rss-date">April 23, 2015</span>                 
-                </li>
-                <li>
-                  <a href="https://wordpress.org/news/2015/04/powell/" class="rsswidget">WordPress 4.2 “Powell”</a> <span class="rss-date">April 23, 2015</span>                 
-                </li>
+    public function process_meta_pdf_recent_forum_articles($object) {    
+        $controller = $this->getController();     
 
-                <li>
-                  <a href="https://wordpress.org/news/2015/04/powell/" class="rsswidget">WordPress 4.2 “Powell”</a> <span class="rss-date">April 23, 2015</span>                 
-                </li>
+        /* get our list of recent forum topics */
+        $latest     = $this->get_latest_forum_topics();
 
-                <li>
-                  <a href="https://wordpress.org/news/2015/04/powell/" class="rsswidget">WordPress 4.2 “Powell”</a> <span class="rss-date">April 23, 2015</span>                 
-                </li>    
-
-                <li>
-                  <a href="https://wordpress.org/news/2015/04/powell/" class="rsswidget">WordPress 4.2 “Powell”</a> <span class="rss-date">April 23, 2015</span>                 
-                </li>   
-
-                <li>
-                  <a href="https://wordpress.org/news/2015/04/powell/" class="rsswidget">WordPress 4.2 “Powell”</a> <span class="rss-date">April 23, 2015</span>                 
-                </li>                                                                                 
-            </ul> 
-        <?php
-    }
-
-    /**
-     * [add_meta_pdf_support_hours description]
-     * TODO
-     * @param [type] $object [description]
-     */
-    public function add_meta_pdf_support_hours($object) {       
-        ?>
-            <i class="fa fa-clock-o fa-5x"></i>
-            <h4><?php _e('Support Hours', 'pdfextended'); ?></h4>
-            <p><?php printf(__("Gravity PDF's support hours are from 9:00am-5:00pm Monday to Friday, %sSydney Australia time%s.", 'pdfextended'), '<a href="http://www.timeanddate.com/worldclock/australia/sydney">', '</a>'); ?></p>
-        <?php
+        /* call view to render topics */
+        $controller->view->add_meta_pdf_recent_forum_articles($object, $latest);
     }       
+
+    /**
+     * Call forum endpoint and get the latest topic information
+     * @param Object $object The metabox object 
+     * @return void
+     * @since 4.0
+     */
+    public function get_latest_forum_topics() {
+
+        /* check if we have a transient set up with cached response */
+        if ( false !== ( $topics = get_transient( 'gfpdf_latest_forum_topics' ) ) ) {
+            return $topics;
+        }
+
+        /* set up the api endpoint details */
+        $url = 'https://support.gravitypdf.com/latest.json';
+
+        $args = array(
+            'timeout' => 10
+        );
+
+        /* do query */
+        $response = wp_remote_get($url, $args);
+
+        /* check for errors */
+        if(is_wp_error($response)) {
+            return false;
+        }        
+
+        /* decode json response */
+        $json = json_decode($response['body'], true);
+
+        /* check we have the correct keys */
+        if(!isset($json['topic_list']['topics'])) {
+            return false;
+        }
+
+        /* cannot filter number of topics requested from endpoint so slice the data */
+        $topics = array_slice($json['topic_list']['topics'], 2, 5);
+
+        /* set a transient cache */
+        set_transient('gfpdf_latest_forum_topics', $topics, 86400); /* cache for a day */
+
+        return $topics;
+    }
 }

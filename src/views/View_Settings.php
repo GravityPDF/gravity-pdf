@@ -182,15 +182,109 @@ class View_Settings extends Helper_View
     }
 
     /**
-     * Turn capabilities into more friendly strings 
-     * @param  String $cap The wordpress-style capability 
-     * @return String 
+     * Add Knowledebase meta box
+     * @param Object $object The metabox object 
+     * @return void
      * @since 4.0
      */
-    public function style_capabilities($cap) {
-        $cap = str_replace('gravityforms', 'gravity_forms', $cap);
-        $cap = str_replace('_', ' ', $cap);
-        $cap = ucwords($cap);
-        return $cap;
+    public function add_meta_pdf_knowledgebase($object) {       
+        ?>
+            <i class="fa fa-file-text-o fa-5x"></i>
+            <h4><a href="https://developer.gravitypdf.com/documentation/"><?php _e('Knowledge Base', 'pdfextended'); ?></a></h4>
+            <p><?php _e('Gravity PDF has extensive online documentation to help you get started.', 'pdfextended'); ?></p>
+        <?php
     }
+
+    /**
+     * Add support forum meta box
+     * @param Object $object The metabox object 
+     * @return void
+     * @since 4.0
+     */
+    public function add_meta_pdf_support_forum($object) {       
+        ?>
+            <i class="fa fa-comments-o fa-5x"></i>
+            <h4><a href="https://support.gravitypdf.com/"><?php _e('Support Forum', 'pdfextended'); ?></a></h4>
+            <p><?php _e('Our community support forum is a great resource if you have a problem.', 'pdfextended'); ?></p>
+        <?php
+    }
+
+    /**
+     * Add direct contact meta box
+     * @param Object $object The metabox object 
+     * @return void
+     * @since 4.0
+     */
+    public function add_meta_pdf_direct($object) {       
+        ?>
+            <i class="fa fa-envelope-o fa-5x"></i>
+            <h4><a href="https://developer.gravitypdf.com/contact/"><?php _e('Contact Us', 'pdfextended'); ?></a></h4>
+            <p><?php _e('You can also get in touch with Gravity PDF staff directly via email or phone.', 'pdfextended'); ?></p>
+        <?php
+    }    
+
+    /**
+     * Add Key Documentation meta box
+     * @param Object $object The metabox object 
+     * @return void
+     * @since 4.0
+     */
+    public function add_meta_pdf_popular_articles($object) {       
+
+        $articles = array(
+
+            array(
+                'title' => __('Getting Started Guide', 'pdfextended'),
+                'url' => 'https://developer.gravitypdf.com/documentation/getting-started-with-gravity-pdf-configuration/',
+            ),
+
+            array(
+                'title' => __('Creating a Custom PDF Template', 'pdfextended'),
+                'url' => 'https://developer.gravitypdf.com/documentation/custom-templates-introduction/',
+            ),
+                                               
+        );
+
+        ?>
+            <ul>
+                <?php foreach($articles as $a): ?>
+                    <li><a href="<?php echo $a['url']; ?>" class="rsswidget"><?php echo $a['title']; ?></a></li>  
+                <?php endforeach; ?>                
+            </ul> 
+        <?php
+    }
+
+    /**
+     * Add Recent forum articles meta box
+     * @param Object $object The metabox object 
+     * @return void
+     * @since 4.0
+     */
+    public function add_meta_pdf_recent_forum_articles($object, $topics) {       
+
+        if(!$topics || !is_array($topics)) {
+            _e('Latest forum topics could not be loaded.', 'pdfextended');
+            return;
+        }
+
+        ?>
+            <?php foreach($topics as $topic): ?>
+                <li><a href="https://support.gravitypdf.com/t/<?php echo $topic['slug']; ?>/<?php echo $topic['id']; ?>" class="rsswidget"><?php echo $topic['fancy_title']; ?></a></li>  
+            <?php endforeach; ?>
+        <?php 
+    }
+
+    /**
+     * Add Support hour meta box
+     * @param Object $object The metabox object 
+     * @return void
+     * @since 4.0
+     */
+    public function add_meta_pdf_support_hours($object) {       
+        ?>
+            <i class="fa fa-clock-o fa-5x"></i>
+            <h4><?php _e('Support Hours', 'pdfextended'); ?></h4>
+            <p><?php printf(__("Gravity PDF's support hours are from 9:00am-5:00pm Monday to Friday, %sSydney Australia time%s.", 'pdfextended'), '<a href="http://www.timeanddate.com/worldclock/australia/sydney">', '</a>'); ?></p>
+        <?php
+    }       
 }

@@ -194,6 +194,10 @@
   padding-bottom: 0;
 }
 
+#pdfextended-settings #dashboard_primary .rss-widget .rssSummary .continue-reading {
+  display: none;
+}
+
 #pdfextended-settings .spinner.is-active {
   visibility: visible;
   margin: 0;
