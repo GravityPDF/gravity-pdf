@@ -490,6 +490,8 @@
 			this.tools_settings = function() {
 				var $copy            = $('#gfpdf_settings\\[copy\\]'); /* escape braces */
 				var $copyDialog      = $( '#setup-templates-confirm' );
+				var $font            = $('#gfpdf_settings\\[manage_fonts\\]'); /* escape braces */				
+				var $fontDialog      = $( '#manage-font-files' );				
 				var $uninstall       = $('#gfpdf-uninstall'); 
 				var $uninstallDialog = $( '#uninstall-confirm' );				
 
@@ -513,6 +515,14 @@
 
 				$copy.click(function() {
 					$copyDialog.wpdialog('open');
+				    return false;			
+				});	
+
+				/* setup fonts dialog */
+				this.wp_dialog($fontDialog, [], 500, 350);
+
+				$font.click(function() {
+					$fontDialog.wpdialog('open');
 				    return false;			
 				});	
 
@@ -545,15 +555,12 @@
 				  autoOpen: false,
 			      resizable: false,
 			      draggable: false,
-			      width: "auto",			      
+			      width: boxWidth,			      
 			      height: boxHeight,
 			      modal: true,
 				  dialogClass: 'wp-dialog',
 				  zIndex: 300000,		      
 			      buttons: buttonsList,
-			      create: function( event, ui ) {
-			      	$(this).css('maxWidth', boxWidth + 'px');
-			      },
 			      open: function() {
 			      	$(this).siblings('.ui-dialog-buttonpane').find('button:eq(1)').focus(); 
 

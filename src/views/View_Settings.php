@@ -149,6 +149,24 @@ class View_Settings extends Helper_View
     }
 
     /**
+     * Pull the tools details and show
+     * @return void 
+     * @since 4.0
+     */
+    public function tools() {
+        global $gfpdf;
+
+        $vars = array(
+            'template_directory' => str_replace(ABSPATH, '/', $gfpdf->data->template_location),
+        );
+
+        $vars = array_merge($vars, $this->data); 
+
+        /* load the system status view */
+        $this->load('tools', $vars);        
+    }
+
+    /**
      * Add Gravity Forms Tooltips
      * @param Array The existing tooltips
      */

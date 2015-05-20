@@ -370,14 +370,14 @@ class Stat_Options_API {
 						'tooltip' => '<h6>' . __('Setup Custom Templates', 'pdfextended') . '</h6>' . __('TODO... Write Copy', 'pdfextended'),
 					),
 
-					'install_fonts' => array(
-						'id'    => 'install_fonts',
+					'manage_fonts' => array(
+						'id'    => 'manage_fonts',
 						'name'  => __('Fonts', 'pdfextended'),
-						'desc'  => sprintf(__("Use this action to install new fonts found in the %s/fonts/%s directory. %sSee docs for full installation guide%s.", 'pdfextended'), '<code>', '</code>', '<a href="https://developer.gravitypdf.com/documentation/language-support/#install-custom-fonts">', '</a>'),						
+						'desc'  => __("Add, update or remove custom fonts.", 'pdfextended'),						
 						'type'  => 'button',						
-						'std'   => __('Install Fonts', 'pdfextended'),
+						'std'   => __('Manage Fonts', 'pdfextended'),
 						'options' => 'install_fonts',
-						'tooltip' => '<h6>' . __('Install Fonts', 'pdfextended') . '</h6>' . sprintf(__("Custom fonts can be installed and used in your PDFs. Currently only %s.ttf%s font files are supported. Once installed, fonts can be set in your custom PDF templates using CSS's %sfont-family%s declaration.", 'pdfextended'), '<code>', '</code>', '<code>', '</code>'),
+						'tooltip' => '<h6>' . __('Install Fonts', 'pdfextended') . '</h6>' . sprintf(__("Custom fonts can be installed and used in your PDFs. Currently only %s.ttf%s and %s.otf%s font files are supported. Once installed, fonts can be used in your custom PDF templates with a CSS %sfont-family%s declaration.", 'pdfextended'), '<code>', '</code>', '<code>', '</code>', '<code>', '</code>'),
 					),													
 				)
 			),

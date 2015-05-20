@@ -41,18 +41,18 @@ if (! defined('ABSPATH')) {
 <script type="text/javascript">
     <?php \GFCommon::gf_global(); ?>
     <?php \GFCommon::gf_vars(); ?>   
-    var form = <?php echo json_encode( $vars['form'] ); ?>;
-    var gfpdf_current_pdf = <?php echo json_encode( $vars['pdf'] ); ?>;
+    var form = <?php echo json_encode( $args['form'] ); ?>;
+    var gfpdf_current_pdf = <?php echo json_encode( $args['pdf'] ); ?>;
     
     <?php \GFFormSettings::output_field_scripts(); ?>    
 </script>
 
-<?php \GFFormSettings::page_header( $vars['title'] ); ?>
+<?php \GFFormSettings::page_header( $args['title'] ); ?>
 
 	<h3>
 		<span>
 		  <i class="fa fa-file-o"></i>
-		  <?php echo $vars['title']; ?>		 
+		  <?php echo $args['title']; ?>		 
 		</span>
 	</h3>
 
@@ -61,7 +61,7 @@ if (! defined('ABSPATH')) {
 
         <?php wp_nonce_field( 'gfpdf_save_pdf', 'gfpdf_save_pdf' ) ?>        
         
-        <input type="hidden" id="gform_pdf_id" name="gform_pdf_id" value="<?php echo $vars['pdf_id']; ?>" />
+        <input type="hidden" id="gform_pdf_id" name="gform_pdf_id" value="<?php echo $args['pdf_id']; ?>" />
 
         <!-- display standard fields -->
         <table id="pdf-form-settings" class="form-table">     
@@ -104,7 +104,7 @@ if (! defined('ABSPATH')) {
         <div class="gfpdf-advanced-options"><a href="#"><?php _e('Show Advanced Options...', 'pdfextended'); ?></a></div>       
 
         <p class="submit">            
-            <input class="button-primary" type="submit" value="<?php echo $vars['button_label']; ?>" name="save"/>                        
+            <input class="button-primary" type="submit" value="<?php echo $args['button_label']; ?>" name="save"/>                        
         </p>
     </form>
 

@@ -67,7 +67,11 @@ if (! defined('ABSPATH')) {
 	</form>
 
 	<div id="setup-templates-confirm" title="<?php _e('Setup Custom Templates', 'pdfextended'); ?>" style="display: none;">
-	  <?php printf(__('During the setup process %sANY default Gravity PDF template files%s stored in the PDF_EXTENDED_TEMPLATES directory will be overridden.', 'pdfextended'), '<strong>', '</strong>'); ?>
+	  <?php printf(__('During the setup process %sANY Gravity PDF template files%s (excluding custom templates) stored in the %s directory will be overridden.', 'pdfextended'), '<strong>', '</strong>', '<code>' . $args['template_directory'] . '</code>'); ?>
+	</div>	
+
+	<div id="manage-font-files" title="<?php _e('Manage Fonts', 'pdfextended'); ?>" style="display: none;">
+	  Font logic here...
 	</div>	
 
 	<?php do_action('pdf-settings-tools'); ?>	                             

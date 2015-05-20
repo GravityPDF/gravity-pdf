@@ -82,7 +82,7 @@ abstract class Helper_View {
      * @return String/Object           The loaded file, or WP_ERROR
      * @since 4.0
      */
-    protected function load($filename, $vars = array(), $output = true) {
+    protected function load($filename, $args = array(), $output = true) {
         $path = PDF_PLUGIN_DIR . 'src/views/html/' . $this->ViewType . '/' . $filename . '.php';
         if(is_readable($path)) {
             if($output) {

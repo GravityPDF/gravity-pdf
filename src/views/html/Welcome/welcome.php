@@ -37,10 +37,10 @@ if (! defined('ABSPATH')) {
 ?>
 
 <div class="wrap about-wrap">
-	<h1><?php printf( __( 'Welcome to Gravity PDF %s', 'pdfextended' ), $vars['display_version'] ); ?></h1>
-	<div class="about-text"><?php printf( __( "Thanks for installing PDF Overlay Development Toolkit %s. To get you on your way follow the steps below to create your first PDF overlay template.", 'pdfextended' ), $vars['display_version'] ); ?></div>
+	<h1><?php printf( __( 'Welcome to Gravity PDF %s', 'pdfextended' ), $args['display_version'] ); ?></h1>
+	<div class="about-text"><?php printf( __( "Thanks for installing PDF Overlay Development Toolkit %s. To get you on your way follow the steps below to create your first PDF overlay template.", 'pdfextended' ), $args['display_version'] ); ?></div>
 	
-	<div class="gfpdf-badge"><?php printf( __( 'Version %s', 'pdfextended' ), $vars['display_version'] ); ?></div>
+	<div class="gfpdf-badge"><?php printf( __( 'Version %s', 'pdfextended' ), $args['display_version'] ); ?></div>
 
 	<?php $this->tabs(); ?>
 

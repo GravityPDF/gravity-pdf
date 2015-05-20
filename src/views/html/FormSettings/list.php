@@ -35,17 +35,17 @@ if (! defined('ABSPATH')) {
 */
 
 /* assign list_items object to variable for easier access */
-$list_itmes = $vars['list_items'];
+$list_itmes = $args['list_items'];
 
 ?>
 
-<?php \GFFormSettings::page_header( $vars['title'] ); ?>
+<?php \GFFormSettings::page_header( $args['title'] ); ?>
 
 	<h3>
 		<span>
 		  <i class="fa fa-file-o"></i>
-		  <?php echo $vars['title']; ?>
-		  <a id="add-new-pdf" class="add-new-h2" href="<?php echo $vars['add_new_url'] ?>"><?php _e( 'Add New', 'gravityforms' ) ?></a>
+		  <?php echo $args['title']; ?>
+		  <a id="add-new-pdf" class="add-new-h2" href="<?php echo $args['add_new_url'] ?>"><?php _e( 'Add New', 'gravityforms' ) ?></a>
 		</span>
 	</h3>
 
