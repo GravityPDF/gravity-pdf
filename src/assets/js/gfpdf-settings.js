@@ -90,6 +90,7 @@
 
 				this.show_tooltips();
 				this.setup_select_boxes();
+				this.cleanup_gf_navigation();
 
 				switch (active) {
 					case 'General':
@@ -387,6 +388,21 @@
 
 				});
 				
+			}
+
+			/**
+			 * Our &tab=(.+?) url param causes issues with the default GF navigation 
+			 * @since 4.0
+			 */
+			this.cleanup_gf_navigation = function() {
+				var $nav = $('#gform_tabs a');
+
+				$nav.each(function() {
+					var href  = $(this).attr('href');
+					var regex = new RegExp('&tab=[^&;]*', 'g');
+
+					$(this).attr('href', href.replace(regex, ''));
+				});
 			}
 
 			this.setup_required_fields = function($elm) {
