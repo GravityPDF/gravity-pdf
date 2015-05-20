@@ -228,11 +228,6 @@ class Stat_Options_API {
 
 		/* Creates our settings in the options table */
 		register_setting( 'gfpdf_settings', 'gfpdf_settings', array(__CLASS__, 'settings_sanitize') );
-
-		/* register our santize functions */
-		add_filter( 'gfpdf_settings_sanitize_text', array(__CLASS__, 'sanitize_text_field') );		
-		add_filter( 'gfpdf_settings_sanitize_paper_size', array(__CLASS__, 'sanitize_paper_size_field'), 10, 3 );		
-		add_filter( 'gfpdf_settings_sanitize_select', array(__CLASS__, 'sanitize_select_field'), 10, 4 );
 	}
 
 	/**
