@@ -85,14 +85,14 @@ class GFPDF_Major_Compatibility_Checks
      * @var String
      * @since 4.0
      */
-    private $required_gf_version = '1.8';
+    public $required_gf_version = '1.8';
 
     /**
      * The plugin's required WordPress version
      * @var String
      * @since 4.0
      */
-    private $required_wp_version = '3.9';
+    public $required_wp_version = '3.9';
 
     /**
      * The plugin's required PHP version
@@ -100,7 +100,7 @@ class GFPDF_Major_Compatibility_Checks
      * @var String
      * @since 4.0
      */
-    private $required_php_version = '5.3.2';
+    public $required_php_version = '5.3.2';
 
     /**
      * Set our required variables for a fallback and attempt to initialise
@@ -147,7 +147,7 @@ class GFPDF_Major_Compatibility_Checks
             return false;
         }
 
-        require_once $this->path.'src/bootstrap.php';
+        require_once $this->path . 'src/bootstrap.php';
     }
 
     /**
@@ -244,7 +244,7 @@ class GFPDF_Major_Compatibility_Checks
     public function check_ram() {
         /* Check Minimum RAM requirements */
         $ram = $this->get_ram();
-        if ($ram < 64) {
+        if ($ram < 64 && $ram !== -1) {
             $this->notices[] = sprintf(__("You need %s128MB%s of WP Memory (RAM) but we only found %s available. Contact your web hosting provider to fix (you need to increase your PHP 'memory_limit' setting).", 'pdfextended'), '<strong>', '</strong>', $ram . 'MB');
             return false;
         }
