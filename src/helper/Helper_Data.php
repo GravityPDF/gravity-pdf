@@ -1,8 +1,9 @@
 <?php
 
 namespace GFPDF\Helper;
-use GFPDF\PDF_Common;
 use GFPDF\Stat\Stat_Options_API;
+use PDF_Common;
+use GFCommon;
 
 /**
  * Data overloaded Helper Class 
@@ -267,5 +268,29 @@ class Helper_Data {
         $this->relative_output_location = str_replace(ABSPATH, '/', $this->template_save_location);
         $this->relative_font_location   = str_replace(ABSPATH, '/', $this->template_font_location);
         $this->relative_mpdf_tmp        = str_replace(ABSPATH, '/', PDF_PLUGIN_DIR) . 'mPDF/tmp/';        
+    }
+
+    /**
+     * A key-value array to be used in a localized script call for our Gravity PDF javascript files
+     * @return  array
+     * @since  4.0
+     */
+    public function get_localised_script_data() {
+        return apply_filters('gfpdf_localised_script_array', array(
+            'ajaxurl'                     => admin_url( 'admin-ajax.php' ),
+            'GFbaseUrl'                   => GFCommon::get_base_url(),
+            'pluginUrl'                   => PDF_PLUGIN_URL,
+            'general_advanced_show'       => __('Show Advanced Options...', 'gravitypdf'),
+            'general_advanced_hide'       => __('Hide Advanced Options...', 'gravitypdf'),
+            'tools_template_copy_confirm' => __('Continue', 'gravitypdf'),
+            'tools_uninstall_confirm'     => __('Uninstall', 'gravitypdf'),
+            'tools_cancel'                => __('Cancel', 'gravitypdf'),   
+            'pdf_list_delete_confirm'     => __('Delete', 'gravitypdf'),   
+            'active'                      => __('Active', 'gravitypdf'),
+            'inactive'                    => __('Inactive', 'gravitypdf'),
+            'conditionalText'             => __('Enable this PDF if', 'gravitypdf'),
+            'help_search_placeholder'     => __('Search the Gravity PDF Knowledgebase...', 'gravitypdf'),  
+            'ajax_error'                  => __('There was an error processing your request. Please try again.', 'gravitypdf'),                
+        ));        
     }
 }

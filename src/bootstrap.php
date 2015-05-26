@@ -6,7 +6,8 @@ use GFPDF\Model;
 use GFPDF\View;
 use GFPDF\Helper;
 use GFPDF\Stat;
-use \GFCommon;
+use GFCommon;
+use GFPDF_Core;
 
 /**
  * Bootstrap / Router Class
@@ -159,24 +160,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
         /*
         * Localise admin script
         */
-        $localise_script = array(
-            'ajaxurl'                     => admin_url( 'admin-ajax.php' ),
-            'GFbaseUrl'                   => GFCommon::get_base_url(),
-            'pluginUrl'                   => PDF_PLUGIN_URL,
-            'general_advanced_show'       => __('Show Advanced Options...', 'gravitypdf'),
-            'general_advanced_hide'       => __('Hide Advanced Options...', 'gravitypdf'),
-            'tools_template_copy_confirm' => __('Continue', 'gravitypdf'),
-            'tools_uninstall_confirm'     => __('Uninstall', 'gravitypdf'),
-            'tools_cancel'                => __('Cancel', 'gravitypdf'),   
-            'pdf_list_delete_confirm'     => __('Delete', 'gravitypdf'),   
-            'active'                      => __('Active', 'gravitypdf'),
-            'inactive'                    => __('Inactive', 'gravitypdf'),
-            'conditionalText'             => __('Enable this PDF if', 'gravitypdf'),
-            'help_search_placeholder'     => __('Search the Gravity PDF Knowledgebase...', 'gravitypdf'),  
-            'ajax_error'                  => __('There was an error processing your request. Please try again.', 'gravitypdf'),                
-        );
-
-        wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $localise_script );
+        wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $this->data->get_localised_script_data() );
 
         /*
         * Register our scripts/styles with Gravity Forms to prevent them being removed in no conflict mode
