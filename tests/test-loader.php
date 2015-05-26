@@ -136,10 +136,8 @@ class Test_Loader extends WP_UnitTestCase
      * @dataProvider provider_memory
      */
     public function test_get_ram($memory, $bytes) {        
-        ini_set('memory_limit', $memory);
         $expected_mb = ($memory === '-1') ? -1 : floor($bytes / 1024 / 1024); 
-
-        $this->assertEquals($expected_mb, $this->gravitypdf->get_ram());
+        $this->assertEquals($expected_mb, $this->gravitypdf->get_ram($memory));
     }    
 
     /**
@@ -149,8 +147,7 @@ class Test_Loader extends WP_UnitTestCase
      * @dataProvider provider_memory_minimum
      */
     public function test_check_ram($memory, $expected) {        
-        ini_set('memory_limit', $memory);
-        $this->assertEquals($expected, $this->gravitypdf->check_ram());
+        $this->assertEquals($expected, $this->gravitypdf->check_ram($memory));
     }   
 
     /**

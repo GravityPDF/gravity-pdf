@@ -139,7 +139,7 @@ class GFPDF_Major_Compatibility_Checks
         $this->check_mb_string();
         $this->check_mb_string_regex();
         $this->check_gd();
-        $this->check_ram();
+        $this->check_ram(ini_get('memory_limit'));
 
         /* check if any errors were thrown, enqueue them and exit early */
         if (sizeof($this->notices) > 0) {
@@ -238,12 +238,13 @@ class GFPDF_Major_Compatibility_Checks
 
     /**
      * Check if minimum RAM requirements met
+     * @param  $ram String The PHP RAM setting
      * @return Boolean whether compatible or not 
      * @since 4.0
      */
-    public function check_ram() {
+    public function check_ram($ram) {
         /* Check Minimum RAM requirements */
-        $ram = $this->get_ram();
+        $ram = $this->get_ram($ram);
         if ($ram < 64 && $ram !== -1) {
             $this->notices[] = sprintf(__("You need %s128MB%s of WP Memory (RAM) but we only found %s available. Contact your web hosting provider to fix (you need to increase your PHP 'memory_limit' setting).", 'gravitypdf'), '<strong>', '</strong>', $ram . 'MB');
             return false;
@@ -254,12 +255,13 @@ class GFPDF_Major_Compatibility_Checks
 
      /**
       * Get the available system memory
+      * @param  $ram String The PHP RAM setting
       * @return integer The calculated RAM
       * @since 4.0
       */
-     public function get_ram() {
+     public function get_ram($ram) {
      	 /* get memory in standardised bytes format */
-         $memory_limit = $this->convert_ini_memory(ini_get('memory_limit'));
+         $memory_limit = $this->convert_ini_memory($ram);
 
          /* convert to megabytes, or set to -1 if unlimited */
          return ($memory_limit === '-1') ? -1 : floor($memory_limit / 1024 / 1024); 
