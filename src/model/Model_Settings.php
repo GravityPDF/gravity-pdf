@@ -57,7 +57,7 @@ class Model_Settings extends Helper_Model {
         $id = 'pdf_knowledgebase';        
         add_meta_box( 
             $id,
-            __( 'Documentation', 'pdfextended' ),
+            __( 'Documentation', 'gravitypdf' ),
             array($controller->view, 'add_meta_' . $id),
             'pdf-help-and-support',
             'row-1'
@@ -67,7 +67,7 @@ class Model_Settings extends Helper_Model {
         $id = 'pdf_support_forum';
         add_meta_box( 
             $id,
-            __( 'Support Forum', 'pdfextended' ),
+            __( 'Support Forum', 'gravitypdf' ),
             array($controller->view, 'add_meta_' . $id),
             'pdf-help-and-support',
             'row-1'           
@@ -77,7 +77,7 @@ class Model_Settings extends Helper_Model {
         $id = 'pdf_direct';
         add_meta_box( 
             $id,
-            __( 'Contact Us', 'pdfextended' ),
+            __( 'Contact Us', 'gravitypdf' ),
             array($controller->view, 'add_meta_' . $id),
             'pdf-help-and-support',
             'row-1'           
@@ -87,7 +87,7 @@ class Model_Settings extends Helper_Model {
         $id = 'pdf_popular_articles';
         add_meta_box( 
             $id,
-            __( 'Popular Documentation', 'pdfextended' ),
+            __( 'Popular Documentation', 'gravitypdf' ),
             array($controller->view, 'add_meta_' . $id),
             'pdf-help-and-support',
             'row-2'
@@ -97,7 +97,7 @@ class Model_Settings extends Helper_Model {
         $id = 'pdf_recent_forum_articles';
         add_meta_box( 
             $id,
-            __( 'Recent Forum Activity', 'pdfextended' ),
+            __( 'Recent Forum Activity', 'gravitypdf' ),
             array($this, 'process_meta_' . $id),
             'pdf-help-and-support',
             'row-2'      
@@ -107,7 +107,7 @@ class Model_Settings extends Helper_Model {
         $id = 'pdf_support_hours';
         add_meta_box( 
             $id,
-            __( 'Support Hours', 'pdfextended' ),
+            __( 'Support Hours', 'gravitypdf' ),
             array($controller->view, 'add_meta_' . $id),
             'pdf-help-and-support',
             'row-2'         

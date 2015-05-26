@@ -74,7 +74,7 @@ if (! defined('ABSPATH')) {
             <h3>
                 <span>
                   <i class="fa fa-adjust"></i>
-                  <?php _e('Appearance', 'pdfextended'); ?>
+                  <?php _e('Appearance', 'gravitypdf'); ?>
                 </span>
             </h3>
 
@@ -92,7 +92,7 @@ if (! defined('ABSPATH')) {
             <h3>
                 <span>
                   <i class="fa fa-cogs"></i>
-                  <?php _e('Advanced', 'pdfextended'); ?>
+                  <?php _e('Advanced', 'gravitypdf'); ?>
                 </span>
             </h3>
         
@@ -101,7 +101,7 @@ if (! defined('ABSPATH')) {
             </table>    
         </div>
 
-        <div class="gfpdf-advanced-options"><a href="#"><?php _e('Show Advanced Options...', 'pdfextended'); ?></a></div>       
+        <div class="gfpdf-advanced-options"><a href="#"><?php _e('Show Advanced Options...', 'gravitypdf'); ?></a></div>       
 
         <p class="submit">            
             <input class="button-primary" type="submit" value="<?php echo $args['button_label']; ?>" name="save"/>                        

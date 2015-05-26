@@ -41,7 +41,7 @@ if (! defined('ABSPATH')) {
     <h3>
         <span>
             <i class="fa fa-dashboard"></i>
-            <?php _e('Installation Status', 'pdfextended'); ?>
+            <?php _e('Installation Status', 'gravitypdf'); ?>
         </span>
     </h3>    
 
@@ -49,7 +49,7 @@ if (! defined('ABSPATH')) {
 
         <tr>
             <th scope="row">
-                <?php _e('WP Memory Available', 'pdfextended'); ?> <?php gform_tooltip('pdf_status_wp_memory'); ?>
+                <?php _e('WP Memory Available', 'gravitypdf'); ?> <?php gform_tooltip('pdf_status_wp_memory'); ?>
             </th>
 
             <td>
@@ -62,7 +62,7 @@ if (! defined('ABSPATH')) {
                 ?>
 
                 <?php if($args['memory'] === -1): ?>
-                    <?php echo __('Unlimited', 'pdfextended'); ?>
+                    <?php echo __('Unlimited', 'gravitypdf'); ?>
                 <?php else: ?>
                     <?php echo $args['memory']; ?>MB
                 <?php endif; ?>
@@ -72,7 +72,7 @@ if (! defined('ABSPATH')) {
                 <?php if($args['memory'] < 128 && $args['memory'] !== -1): ?>
                 
                 <span class="gf_settings_description">
-                    <?php echo sprintf(__('We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. The minimum system requirement is 64MB. %sFind out how to change this limit%s.', 'pdfextended'), '<br /><a href="#">', '</a>'); /* TODO - UPDATE LINK - see http://docs.woothemes.com/document/increasing-the-wordpress-memory-limit/ for example */ ?>
+                    <?php echo sprintf(__('We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. The minimum system requirement is 64MB. %sFind out how to change this limit%s.', 'gravitypdf'), '<br /><a href="#">', '</a>'); /* TODO - UPDATE LINK - see http://docs.woothemes.com/document/increasing-the-wordpress-memory-limit/ for example */ ?>
                 </span>
                 <?php endif; ?>                            
             </td>
@@ -80,14 +80,14 @@ if (! defined('ABSPATH')) {
 
         <tr>
             <th scope="row">
-                <?php _e('PDF Notifications', 'pdfextended'); ?> <?php gform_tooltip('pdf_status_notifications'); ?>
+                <?php _e('PDF Notifications', 'gravitypdf'); ?> <?php gform_tooltip('pdf_status_notifications'); ?>
             </th>
             <td>
-                <?php ($args['output']  === true) ? _e('Enabled', 'pdfextended') : _e('Disabled', 'pdfextended'); ?>
+                <?php ($args['output']  === true) ? _e('Enabled', 'gravitypdf') : _e('Disabled', 'gravitypdf'); ?>
                 <span class="<?php echo ($args['output'] === true) ? 'fa fa-check-circle' : 'fa fa-times-circle'; ?>"></span> 
 
                 <?php if($args['output'] === false): ?>
-                    <span class="gf_settings_description"><?php echo __('The PDF save directory is not writable by your web server. PDF email notifications are currently disabled.', 'pdfextended'); ?></span>
+                    <span class="gf_settings_description"><?php echo __('The PDF save directory is not writable by your web server. PDF email notifications are currently disabled.', 'gravitypdf'); ?></span>
                     <div class="clear">Path <span class="details path"><?php echo $args['output_path']; ?></span></div>     
                 <?php endif; ?>                                        
             </td>
@@ -96,7 +96,7 @@ if (! defined('ABSPATH')) {
 
         <tr>
             <th scope="row">
-                <?php _e('WordPress Version', 'pdfextended'); ?>
+                <?php _e('WordPress Version', 'gravitypdf'); ?>
             </th>
 
             <td>
@@ -106,7 +106,7 @@ if (! defined('ABSPATH')) {
 
         <tr>
             <th scope="row">
-                <?php _e('Gravity Forms Version', 'pdfextended'); ?>
+                <?php _e('Gravity Forms Version', 'gravitypdf'); ?>
             </th>
 
             <td>
@@ -116,7 +116,7 @@ if (! defined('ABSPATH')) {
 
         <tr>
             <th scope="row">
-                <?php _e('PHP Version', 'pdfextended'); ?>
+                <?php _e('PHP Version', 'gravitypdf'); ?>
             </th>
 
             <td>

@@ -43,7 +43,7 @@ if (! defined('ABSPATH')) {
 	<h3>
 	<span>
 	  <i class="fa fa-cog"></i>
-	  <?php _e('Tools', 'pdfextended'); ?>
+	  <?php _e('Tools', 'gravitypdf'); ?>
 	</span>
 	</h3>
 
@@ -54,7 +54,7 @@ if (! defined('ABSPATH')) {
 		<table id="pdf-tools" class="widefat gfpdfe_table">		
 	    <thead>
 	      <tr>
-	        <th colspan="2"><?php _e( 'Tools', 'pdfextended' ); ?></th>
+	        <th colspan="2"><?php _e( 'Tools', 'gravitypdf' ); ?></th>
 	      </tr>
 	    </thead> 
 	    
@@ -66,11 +66,11 @@ if (! defined('ABSPATH')) {
 		<?php submit_button(); ?>
 	</form>
 
-	<div id="setup-templates-confirm" title="<?php _e('Setup Custom Templates', 'pdfextended'); ?>" style="display: none;">
-	  <?php printf(__('During the setup process %sANY Gravity PDF template files%s (excluding custom templates) stored in the %s directory will be overridden.', 'pdfextended'), '<strong>', '</strong>', '<code>' . $args['template_directory'] . '</code>'); ?>
+	<div id="setup-templates-confirm" title="<?php _e('Setup Custom Templates', 'gravitypdf'); ?>" style="display: none;">
+	  <?php printf(__('During the setup process %sANY Gravity PDF template files%s (excluding custom templates) stored in the %s directory will be overridden.', 'gravitypdf'), '<strong>', '</strong>', '<code>' . $args['template_directory'] . '</code>'); ?>
 	</div>	
 
-	<div id="manage-font-files" title="<?php _e('Manage Fonts', 'pdfextended'); ?>" style="display: none;">
+	<div id="manage-font-files" title="<?php _e('Manage Fonts', 'gravitypdf'); ?>" style="display: none;">
 	  Font logic here...
 	</div>	
 

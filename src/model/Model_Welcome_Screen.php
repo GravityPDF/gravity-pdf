@@ -60,16 +60,16 @@ class Model_Welcome_Screen extends Helper_Model {
         $controller = $this->getController(); 
 
         add_dashboard_page(
-            __( 'Welcome to Gravity PDF', 'pdfextended' ),
-            __( 'Welcome to Gravity PDF', 'pdfextended' ),
+            __( 'Welcome to Gravity PDF', 'gravitypdf' ),
+            __( 'Welcome to Gravity PDF', 'gravitypdf' ),
             $this->minimum_capability,
             'gfpdf-getting-started',
             array( $controller, 'getting_started_screen' )
         );
 
         add_dashboard_page(
-            __( 'What\'s new in Gravity PDF?', 'pdfextended' ),
-            __( 'What\'s new in Gravity PDF?', 'pdfextended' ),
+            __( 'What\'s new in Gravity PDF?', 'gravitypdf' ),
+            __( 'What\'s new in Gravity PDF?', 'gravitypdf' ),
             $this->minimum_capability,
             'gfpdf-update',
             array( $controller, 'update_screen' )

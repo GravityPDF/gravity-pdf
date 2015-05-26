@@ -139,7 +139,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$form_id     = rgget('id');		
 		$state_nonce = wp_create_nonce("gfpdf_state_nonce_{$form_id}_{$item['id']}");
 		?>
-		<img data-id="<?php echo $item['id'] ?>" data-nonce="<?php echo $state_nonce; ?>" data-fid="<?php echo $form_id; ?>" src="<?php echo GFCommon::get_base_url() ?>/images/active<?php echo intval( $is_active ) ?>.png" style="cursor: pointer;margin:-5px 0 0 8px;" alt="<?php $is_active ? __( 'Active', 'pdfextended' ) : __( 'Inactive', 'pdfextended' ); ?>" title="<?php echo $is_active ? __( 'Active', 'pdfextended' ) : __( 'Inactive', 'pdfextended' ); ?>"/>
+		<img data-id="<?php echo $item['id'] ?>" data-nonce="<?php echo $state_nonce; ?>" data-fid="<?php echo $form_id; ?>" src="<?php echo GFCommon::get_base_url() ?>/images/active<?php echo intval( $is_active ) ?>.png" style="cursor: pointer;margin:-5px 0 0 8px;" alt="<?php $is_active ? __( 'Active', 'gravitypdf' ) : __( 'Inactive', 'gravitypdf' ); ?>" title="<?php echo $is_active ? __( 'Active', 'gravitypdf' ) : __( 'Inactive', 'gravitypdf' ); ?>"/>
 	<?php
 	}
 
@@ -151,7 +151,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 */
 	public function column_notifications( $item ) {
 		if(!isset($item['notification']) || sizeof($item['notification']) == 0) {
-			_e('None', 'pdfextended');
+			_e('None', 'gravitypdf');
 			return;
 		}
 
@@ -171,9 +171,9 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 		$actions  = apply_filters(
 			'gfpdf_pdf_actions', array(
-				'edit'      => '<a title="' . __( 'Edit this PDF', 'pdfextended' ) . '" href="' . $edit_url . '">' . __( 'Edit', 'pdfextended' ) . '</a>',
-				'duplicate' => '<a title="' . __( 'Duplicate this PDF', 'pdfextended' ) . '" data-id="' . $item['id'] . '" class="submitduplicate" data-nonce="'. $duplicate_nonce .'"  data-fid="'. $form_id . '">' . __( 'Duplicate', 'pdfextended' ) . '</a>',
-				'delete'    => '<a title="' . __( 'Delete this PDF', 'pdfextended' ) . '" class="submitdelete" data-id="' . $item['id'] . '" data-nonce="'. $delete_nonce .'" data-fid="'. $form_id .'">' . __( 'Delete', 'pdfextended' ) . '</a>'
+				'edit'      => '<a title="' . __( 'Edit this PDF', 'gravitypdf' ) . '" href="' . $edit_url . '">' . __( 'Edit', 'gravitypdf' ) . '</a>',
+				'duplicate' => '<a title="' . __( 'Duplicate this PDF', 'gravitypdf' ) . '" data-id="' . $item['id'] . '" class="submitduplicate" data-nonce="'. $duplicate_nonce .'"  data-fid="'. $form_id . '">' . __( 'Duplicate', 'gravitypdf' ) . '</a>',
+				'delete'    => '<a title="' . __( 'Delete this PDF', 'gravitypdf' ) . '" class="submitdelete" data-id="' . $item['id'] . '" data-nonce="'. $delete_nonce .'" data-fid="'. $form_id .'">' . __( 'Delete', 'gravitypdf' ) . '</a>'
 			)
 		);
 
@@ -207,6 +207,6 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * @since 4.0
 	 */	
 	public function no_items() {
-		printf( __( "This form doesn't have any PDFs. Let's go %screate one%s.", 'pdfextended' ), "<a href='" . add_query_arg( array( 'pid' => 0 ) ) . "'>", '</a>' );
+		printf( __( "This form doesn't have any PDFs. Let's go %screate one%s.", 'gravitypdf' ), "<a href='" . add_query_arg( array( 'pid' => 0 ) ) . "'>", '</a>' );
 	}
 }

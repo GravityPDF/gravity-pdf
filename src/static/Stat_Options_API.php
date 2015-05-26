@@ -250,8 +250,8 @@ class Stat_Options_API {
 				array(
 					'default_pdf_size' => array(
 						'id'         => 'default_pdf_size',
-						'name'       => __('Default Paper Size', 'pdfextended'),
-						'desc'       => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'pdfextended'),
+						'name'       => __('Default Paper Size', 'gravitypdf'),
+						'desc'       => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'gravitypdf'),
 						'type'       => 'select',
 						'options'    => self::get_paper_size(),	
 						'inputClass' => 'large',	
@@ -261,8 +261,8 @@ class Stat_Options_API {
 
 					'default_custom_pdf_size' => array(
 						'id'       => 'default_custom_pdf_size',
-						'name'     => __('Custom Paper Size', 'pdfextended'),
-						'desc'     => __('Control the exact paper size. Can be set in millimeters or inches.', 'pdfextended'),						
+						'name'     => __('Custom Paper Size', 'gravitypdf'),
+						'desc'     => __('Control the exact paper size. Can be set in millimeters or inches.', 'gravitypdf'),						
 						'type'     => 'paper_size',	
 						'size'     => 'small',
 						'chosen'   => true,
@@ -272,8 +272,8 @@ class Stat_Options_API {
 
 					'default_template' => array(
 						'id'         => 'default_template',
-						'name'       => __('Default Template', 'pdfextended'),
-						'desc'       => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'pdfextended'),
+						'name'       => __('Default Template', 'gravitypdf'),
+						'desc'       => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'gravitypdf'),
 						'type'       => 'select',
 						'options'    => self::get_templates(),	
 						'inputClass' => 'large',	
@@ -282,8 +282,8 @@ class Stat_Options_API {
 
 					'default_font_type' => array(
 						'id'         => 'default_font_type',
-						'name'       => __('Default Font Type', 'pdfextended'),
-						'desc'       => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'pdfextended'),
+						'name'       => __('Default Font Type', 'gravitypdf'),
+						'desc'       => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'gravitypdf'),
 						'type'       => 'select',
 						'options'    => self::get_installed_fonts(),	
 						'inputClass' => 'large',	
@@ -292,24 +292,24 @@ class Stat_Options_API {
 
 					'default_rtl' => array(
 						'id'      => 'default_rtl',
-						'name'    => __('Reverse Text (RTL)', 'pdfextended'),
-						'desc'    => __('Written languages like Arabic and Hebrew are written right to left.', 'pdfextended'),						
+						'name'    => __('Reverse Text (RTL)', 'gravitypdf'),
+						'desc'    => __('Written languages like Arabic and Hebrew are written right to left.', 'gravitypdf'),						
 						'type'    => 'radio',						
 						'options' => array(
-							'Yes'     => __('Yes', 'pdfextended'),
-							'No'      => __('No', 'pdfextended')
+							'Yes'     => __('Yes', 'gravitypdf'),
+							'No'      => __('No', 'gravitypdf')
 						),
-						'std'     => __('No', 'pdfextended'),						
+						'std'     => __('No', 'gravitypdf'),						
 					),										
 
 					'default_action' => array(
 						'id'      => 'default_action',
-						'name'    => __('Entry View', 'pdfextended'),
+						'name'    => __('Entry View', 'gravitypdf'),
 						'desc'    => sprintf(__('Select the default action used when accessing a PDF from the %sGravity Forms entries list%s page.'), '<a href="'. admin_url('admin.php?page=gf_entries') . '">', '</a>'),
 						'type'    => 'radio',
 						'options' => array(
-							'View'     => __('View', 'pdfextended'), 
-							'Download' => __('Download', 'pdfextended'),
+							'View'     => __('View', 'gravitypdf'), 
+							'Download' => __('Download', 'gravitypdf'),
 						),
 						'std'     => 'View',
 					),					
@@ -322,8 +322,8 @@ class Stat_Options_API {
 				array(
 					'admin_capabilities' => array(
 						'id'          => 'admin_capabilities',
-						'name'        => __('User Restriction', 'pdfextended'),
-						'desc'        => __('Restrict PDF access to logged in users with this capability. The Administrator Role has no restrictions.', 'pdfextended'),
+						'name'        => __('User Restriction', 'gravitypdf'),
+						'desc'        => __('Restrict PDF access to logged in users with this capability. The Administrator Role has no restrictions.', 'gravitypdf'),
 						'type'        => 'select',
 						'options'     => self::get_capabilities(),	
 						'std'         => 'gravityforms_view_entries',
@@ -331,32 +331,32 @@ class Stat_Options_API {
 						'chosen'      => true,				
 						'multiple'    => true,
 						'required'    => true,
-						'placeholder' => __('Select Capability', 'pdfextended'),
-						'tooltip'     => '<h6>' . __('User Restriction', 'pdfextended') . '</h6>' . __("Only logged in users with this capability can view generated PDFs they don't have ownership of. Ownership refers to the user who completed the original Gravity Form entry.", 'pdfextended'),
+						'placeholder' => __('Select Capability', 'gravitypdf'),
+						'tooltip'     => '<h6>' . __('User Restriction', 'gravitypdf') . '</h6>' . __("Only logged in users with this capability can view generated PDFs they don't have ownership of. Ownership refers to the user who completed the original Gravity Form entry.", 'gravitypdf'),
 					),	
 
 					'limit_to_admin' => array(
 						'id'      => 'limit_to_admin',
-						'name'    => __('Restrict Logged Out Users', 'pdfextended'),
-						'desc'    => __("When enabled, only users who are logged in and have the above capability, or are the original owner, can view PDFs.", 'pdfextended'),						
+						'name'    => __('Restrict Logged Out Users', 'gravitypdf'),
+						'desc'    => __("When enabled, only users who are logged in and have the above capability, or are the original owner, can view PDFs.", 'gravitypdf'),						
 						'type'    => 'radio',						
 						'options' => array(
-							'Yes'     => __('Yes', 'pdfextended'),
-							'No'      => __('No', 'pdfextended')
+							'Yes'     => __('Yes', 'gravitypdf'),
+							'No'      => __('No', 'gravitypdf')
 						),
-						'std'     => __('No', 'pdfextended'),
-						'tooltip' => '<h6>' . __('Restrict Logged Out Users', 'pdfextended') . '</h6>' . __("Enable this option if you don't want any logged out users accessing the generated PDFs. Users will be prompted to login if needed.", 'pdfextended'),
+						'std'     => __('No', 'gravitypdf'),
+						'tooltip' => '<h6>' . __('Restrict Logged Out Users', 'gravitypdf') . '</h6>' . __("Enable this option if you don't want any logged out users accessing the generated PDFs. Users will be prompted to login if needed.", 'gravitypdf'),
 					),				
 
 					'logged_out_timeout' => array(
 						'id'      => 'logged_out_timeout',
-						'name'    => __('Logged Out Timeout', 'pdfextended'),
-						'desc'    => __('Limit how long a <em>logged out</em> users has direct access to the PDF after completing the form. Set to 0 to disable (not recommended).', 'pdfextended'),
-						'desc2'   => __('minutes', 'pdfextended'),
+						'name'    => __('Logged Out Timeout', 'gravitypdf'),
+						'desc'    => __('Limit how long a <em>logged out</em> users has direct access to the PDF after completing the form. Set to 0 to disable time limit (not recommended).', 'gravitypdf'),
+						'desc2'   => __('minutes', 'gravitypdf'),
 						'type'    => 'number',
 						'size'    => 'small',
 						'std'     => 20,
-						'tooltip' => '<h6>' . __('Logged Out Timeout', 'pdfextended') . '</h6>' . __("By default, logged out users can view PDFs when their IP matches the IP assigned to the Gravity Form entry. But because IP addresses can change frequently a time-based restriction also applies.", 'pdfextended'),
+						'tooltip' => '<h6>' . __('Logged Out Timeout', 'gravitypdf') . '</h6>' . __("By default, logged out users can view PDFs when their IP matches the IP assigned to the Gravity Form entry. But because IP addresses can change frequently a time-based restriction also applies.", 'gravitypdf'),
 					),					
 				)
 			),
@@ -374,22 +374,22 @@ class Stat_Options_API {
 				array(
 					'setup_templates' => array(
 						'id'      => 'setup_templates',
-						'name'    => __('Setup Custom Templates', 'pdfextended'),
-						'desc'    => sprintf(__("Ready to get down and dirty with custom PDF templates? %sSee docs to get started%s.", 'pdfextended'), '<a href="#">', '</a>'),						
+						'name'    => __('Setup Custom Templates', 'gravitypdf'),
+						'desc'    => sprintf(__("Ready to get down and dirty with custom PDF templates? %sSee docs to get started%s.", 'gravitypdf'), '<a href="#">', '</a>'),						
 						'type'    => 'button',						
-						'std'     => __('Run Setup', 'pdfextended'),
+						'std'     => __('Run Setup', 'gravitypdf'),
 						'options' => 'copy',
-						'tooltip' => '<h6>' . __('Setup Custom Templates', 'pdfextended') . '</h6>' . __('TODO... Write Copy', 'pdfextended'),
+						'tooltip' => '<h6>' . __('Setup Custom Templates', 'gravitypdf') . '</h6>' . __('TODO... Write Copy', 'gravitypdf'),
 					),
 
 					'manage_fonts' => array(
 						'id'      => 'manage_fonts',
-						'name'    => __('Fonts', 'pdfextended'),
-						'desc'    => __("Add, update or remove custom fonts.", 'pdfextended'),						
+						'name'    => __('Fonts', 'gravitypdf'),
+						'desc'    => __("Add, update or remove custom fonts.", 'gravitypdf'),						
 						'type'    => 'button',						
-						'std'     => __('Manage Fonts', 'pdfextended'),
+						'std'     => __('Manage Fonts', 'gravitypdf'),
 						'options' => 'install_fonts',
-						'tooltip' => '<h6>' . __('Install Fonts', 'pdfextended') . '</h6>' . sprintf(__("Custom fonts can be installed and used in your PDFs. Currently only %s.ttf%s and %s.otf%s font files are supported. Once installed, fonts can be used in your custom PDF templates with a CSS %sfont-family%s declaration.", 'pdfextended'), '<code>', '</code>', '<code>', '</code>', '<code>', '</code>'),
+						'tooltip' => '<h6>' . __('Install Fonts', 'gravitypdf') . '</h6>' . sprintf(__("Custom fonts can be installed and used in your PDFs. Currently only %s.ttf%s and %s.otf%s font files are supported. Once installed, fonts can be used in your custom PDF templates with a CSS %sfont-family%s declaration.", 'gravitypdf'), '<code>', '</code>', '<code>', '</code>', '<code>', '</code>'),
 					),													
 				)
 			),
@@ -399,26 +399,26 @@ class Stat_Options_API {
 				array(
 					'name' => array(
 						'id'       => 'name',
-						'name'     => __('Name', 'pdfextended'),												
+						'name'     => __('Name', 'gravitypdf'),												
 						'type'     => 'text',
 						'required' => true,
 					),					
 
 					'template' => array(
 						'id'         => 'template',
-						'name'       => __('Template', 'pdfextended'),												
-						'desc'       =>  sprintf(__('Choose from the pre-installed templates or %sbuild your own%s.', 'pdfextended'), '<a href="#">', '</a>'),
+						'name'       => __('Template', 'gravitypdf'),												
+						'desc'       =>  sprintf(__('Choose from the pre-installed templates or %sbuild your own%s.', 'gravitypdf'), '<a href="#">', '</a>'),
 						'type'       => 'select',
 						'options'    => self::get_templates(),	
 						'inputClass' => 'large',	
 						'chosen'     => true,							
-						'tooltip'    => '<h6>' . __('Templates', 'pdfextended') . '</h6>' . __('Set the template used to generate your PDF.', 'pdfextended'),
+						'tooltip'    => '<h6>' . __('Templates', 'gravitypdf') . '</h6>' . __('Set the template used to generate your PDF.', 'gravitypdf'),
 					),
 
 					'notification' => array(
 						'id'                 => 'notification',
-						'name'               => __('Notifications', 'pdfextended'),												
-						'desc'               => __('Automatically attach PDF to the selected notifications.', 'pdfextended'),
+						'name'               => __('Notifications', 'gravitypdf'),												
+						'desc'               => __('Automatically attach PDF to the selected notifications.', 'gravitypdf'),
 						'type'               => 'select',
 						'options'            => array(
 							'Admin Notification' => 'Admin Notification',
@@ -427,27 +427,27 @@ class Stat_Options_API {
 						'inputClass'         => 'large',	
 						'chosen'             => true,													
 						'multiple'           => true,
-						'placeholder'        => __('Choose a Notification', 'pdfextended'),
+						'placeholder'        => __('Choose a Notification', 'gravitypdf'),
 					),							
 
 					'filename' => array(
 						'id'         => 'filename',
-						'name'       => __('Filename', 'pdfextended'),												
+						'name'       => __('Filename', 'gravitypdf'),												
 						'type'       => 'text',						
 						'desc'       => 'The name used when saving a PDF. Mergetags are allowed.',
-						'tooltip'    => '<h6>' . __('Filename', 'pdfextended') . '</h6>' . __('Set an appropriate filename for the generated PDF. You should exclude the .pdf extension from the name.', 'pdfextended'),
+						'tooltip'    => '<h6>' . __('Filename', 'gravitypdf') . '</h6>' . __('Set an appropriate filename for the generated PDF. You should exclude the .pdf extension from the name.', 'gravitypdf'),
 						'inputClass' => 'merge-tag-support mt-hide_all_fields',
 						'required'   => true,
 					),									
 
 					'conditional' => array(
 						'id'         => 'pdf',						
-						'name'       => __('Conditional Logic', 'pdfextended'),												
+						'name'       => __('Conditional Logic', 'gravitypdf'),												
 						'type'       => 'conditional_logic',					
-						'desc'       => __('Enable conditional logic', 'pdfextended'),	
+						'desc'       => __('Enable conditional logic', 'gravitypdf'),	
 						'class'      => 'conditional_logic',
 						'inputClass' => 'conditional_logic_listener',
-						'tooltip'    => '<h6>' . __('Conditional Logic', 'pdfextended') . '</h6>' . __('Create rules to dynamically enable or disable PDFs. This includes attaching to notifications and viewing.', 'pdfextended'),												
+						'tooltip'    => '<h6>' . __('Conditional Logic', 'gravitypdf') . '</h6>' . __('Create rules to dynamically enable or disable PDFs. This includes attaching to notifications and viewing.', 'gravitypdf'),												
 					),	
 
 					'conditionalLogic' => array(
@@ -464,8 +464,8 @@ class Stat_Options_API {
 				array(
 					'pdf_size' => array(
 						'id'      => 'pdf_size',
-						'name'    => __('Paper Size', 'pdfextended'),
-						'desc'    => __('Set the paper size used when generating PDFs.', 'pdfextended'),
+						'name'    => __('Paper Size', 'gravitypdf'),
+						'desc'    => __('Set the paper size used when generating PDFs.', 'gravitypdf'),
 						'type'    => 'select',
 						'options' => self::get_paper_size(),	
 						'std'     => self::get_option('default_pdf_size'),
@@ -476,8 +476,8 @@ class Stat_Options_API {
 
 					'custom_pdf_size' => array(
 						'id'      => 'custom_pdf_size',
-						'name'    => __('Custom Paper Size', 'pdfextended'),	
-						'desc'    => __('Control the exact paper size. Can be set in millimeters or inches.', 'pdfextended'),					
+						'name'    => __('Custom Paper Size', 'gravitypdf'),	
+						'desc'    => __('Control the exact paper size. Can be set in millimeters or inches.', 'gravitypdf'),					
 						'type'    => 'paper_size',	
 						'size'    => 'small',
 						'chosen'  => true,
@@ -488,11 +488,11 @@ class Stat_Options_API {
 
 					'orientation' => array(
 						'id'      => 'orientation',
-						'name'    => __('Orientation', 'pdfextended'),						
+						'name'    => __('Orientation', 'gravitypdf'),						
 						'type'    => 'select',
 						'options' => array(
-							'portrait' => __('Portrait', 'pdfextended'),
-							'landscape' => __('Landscape', 'pdfextended'),
+							'portrait' => __('Portrait', 'gravitypdf'),
+							'landscape' => __('Landscape', 'gravitypdf'),
 						),	
 						'inputClass'   => 'large',	
 						'chosen'  => true,				
@@ -500,23 +500,23 @@ class Stat_Options_API {
 
 					'font' => array(
 						'id'      => 'font',
-						'name'    => __('Font', 'pdfextended'),						
+						'name'    => __('Font', 'gravitypdf'),						
 						'type'    => 'select',
 						'options' => self::get_installed_fonts(),
 						'std'     => self::get_option('default_font_type'),	
-						'desc'    => __('Set the default font used in the PDF.', 'pdfextended'),
+						'desc'    => __('Set the default font used in the PDF.', 'gravitypdf'),
 						'inputClass'   => 'large',	
 						'chosen'  => true,				
 					),	
 
 					'rtl' => array(
 						'id'    => 'rtl',
-						'name'    => __('Reverse Text (RTL)', 'pdfextended'),
-						'desc'  => __('Written languages like Arabic and Hebrew are written right to left.', 'pdfextended'),						
+						'name'    => __('Reverse Text (RTL)', 'gravitypdf'),
+						'desc'  => __('Written languages like Arabic and Hebrew are written right to left.', 'gravitypdf'),						
 						'type'  => 'radio',						
 						'options' => array(
-							'Yes' => __('Yes', 'pdfextended'),
-							'No'  => __('No', 'pdfextended')
+							'Yes' => __('Yes', 'gravitypdf'),
+							'No'  => __('No', 'gravitypdf')
 						),
 						'std'   => self::get_option('default_rtl'),						
 					),					
@@ -529,8 +529,8 @@ class Stat_Options_API {
 				array(
 					'format' => array(
 						'id'    => 'format',
-						'name'  => __('Format', 'pdfextended'),
-						'desc'  => __('Generate a PDF in the selected format.', 'pdfextended'),						
+						'name'  => __('Format', 'gravitypdf'),
+						'desc'  => __('Generate a PDF in the selected format.', 'gravitypdf'),						
 						'type'  => 'radio',						
 						'options' => array(
 							'Standard' => 'Standard',
@@ -538,24 +538,24 @@ class Stat_Options_API {
 							'PDFX1A'  => 'PDF/X-1a',
 						),
 						'std'   => 'Standard',
-						'tooltip' => '<h6>' . __('PDF Format', 'pdfextended') . '</h6>' . __("Generate a document adhearing to the appropriate PDF standard. When not in 'Standard' mode, watermarks, alpha-transparent PNGs and security options can NOT be used.", 'pdfextended'),
+						'tooltip' => '<h6>' . __('PDF Format', 'gravitypdf') . '</h6>' . __("Generate a document adhearing to the appropriate PDF standard. When not in 'Standard' mode, watermarks, alpha-transparent PNGs and security options can NOT be used.", 'gravitypdf'),
 					),	
 
 					'security' => array(
 						'id'      => 'security',
-						'name'    => __('Enable PDF Security', 'pdfextended'),
-						'desc'    => __('Password protect generated PDFs, or restrict user capabilities.', 'pdfextended'),						
+						'name'    => __('Enable PDF Security', 'gravitypdf'),
+						'desc'    => __('Password protect generated PDFs, or restrict user capabilities.', 'gravitypdf'),						
 						'type'    => 'radio',						
 						'options' => array(
-							'Yes' => __('Yes', 'pdfextended'),
-							'No'  => __('No', 'pdfextended')
+							'Yes' => __('Yes', 'gravitypdf'),
+							'No'  => __('No', 'gravitypdf')
 						),
-						'std'     => __('No', 'pdfextended'),						
+						'std'     => __('No', 'gravitypdf'),						
 					),
 
 					'password' => array(
 						'id'    => 'password',
-						'name'  => __('Password', 'pdfextended'),												
+						'name'  => __('Password', 'gravitypdf'),												
 						'type'  => 'text',						
 						'desc'  => 'Set a password to view PDFs. Leave blank to disable password protection.',
 						'inputClass' => 'merge-tag-support mt-hide_all_fields',
@@ -563,7 +563,7 @@ class Stat_Options_API {
 
 					'privilages' => array(
 						'id'      => 'privileges',
-						'name'    => __('Privileges', 'pdfextended'),												
+						'name'    => __('Privileges', 'gravitypdf'),												
 						'desc'    => 'Restrict end-user capabilities.',
 						'type'    => 'select',
 						'options' => self::get_privilages(),
@@ -579,31 +579,31 @@ class Stat_Options_API {
 						),
 						'inputClass'       => 'large',	
 						'chosen'      => true,							
-						'tooltip'     => '<h6>' . __('Privileges', 'pdfextended') . '</h6>' . __("You can prevent the end-user completing certain actions to the PDF, such as copying text, printing, adding annotations or extracting pages.", 'pdfextended'),
+						'tooltip'     => '<h6>' . __('Privileges', 'gravitypdf') . '</h6>' . __("You can prevent the end-user completing certain actions to the PDF, such as copying text, printing, adding annotations or extracting pages.", 'gravitypdf'),
 						'multiple'    => true,
-						'placeholder' => __('Select PDF Privileges', 'pdfextended'),
+						'placeholder' => __('Select PDF Privileges', 'gravitypdf'),
 					),
 
 					'image_dpi' => array(
 						'id'    => 'image_dpi',
-						'name'  => __('Image DPI', 'pdfextended'),						
+						'name'  => __('Image DPI', 'gravitypdf'),						
 						'type'  => 'number',
 						'size'  => 'small',
 						'std'   => 96,
-						'tooltip' => '<h6>' . __('Image DPI', 'pdfextended') . '</h6>' . __("Control the image DPI (dots per inch). Set to 300 when professionally printing.", 'pdfextended'),
+						'tooltip' => '<h6>' . __('Image DPI', 'gravitypdf') . '</h6>' . __("Control the image DPI (dots per inch). Set to 300 when professionally printing.", 'gravitypdf'),
 					),					
 
 					'save' => array(
 						'id'    => 'save',
-						'name'  => __('Always Save PDF?', 'pdfextended'),
-						'desc'  => __('Force a PDF to be saved to disk when a new entry is submitted.', 'pdfextended'),						
+						'name'  => __('Always Save PDF?', 'gravitypdf'),
+						'desc'  => __('Force a PDF to be saved to disk when a new entry is submitted.', 'gravitypdf'),						
 						'type'  => 'radio',						
 						'options' => array(
-							'Yes' => __('Yes', 'pdfextended'),
-							'No'  => __('No', 'pdfextended')
+							'Yes' => __('Yes', 'gravitypdf'),
+							'No'  => __('No', 'gravitypdf')
 						),
-						'std'   => __('No', 'pdfextended'),
-						'tooltip' => '<h6>' . __('Save PDF', 'pdfextended') . '</h6>' . __("When notifications are disabled a PDF is not automatically saved to disk. Enable this option to force the PDF to be generated and saved. Useful when using the 'gfpdf_post_pdf_save' hook to copy / manipulate the PDF further.", 'pdfextended'),
+						'std'   => __('No', 'gravitypdf'),
+						'tooltip' => '<h6>' . __('Save PDF', 'gravitypdf') . '</h6>' . __("When notifications are disabled a PDF is not automatically saved to disk. Enable this option to force the PDF to be generated and saved. Useful when using the 'gfpdf_post_pdf_save' hook to copy / manipulate the PDF further.", 'gravitypdf'),
 					),
 
 				)
@@ -698,66 +698,66 @@ class Stat_Options_API {
 	public static function get_paper_size() {
 		return apply_filters( 'gfpdf_get_paper_size', array(
 			'Common Sizes' => array(
-				'A4'        => __('A4 (210 x 297mm)', 'pdfextended'),
-				'letter'    => __('Letter (8.5 x 11in)', 'pdfextended'),
-				'legal'     => __('Legal (8.5 x 14in)', 'pdfextended'),
-				'ledger'    => __('Ledger / Tabloid (11 x 17in)', 'pdfextended'),
-				'executive' => __('Executive (7 x 10in)', 'pdfextended'),
-				'custom'    => __('Custom Paper Size', 'pdfextended'),
+				'A4'        => __('A4 (210 x 297mm)', 'gravitypdf'),
+				'letter'    => __('Letter (8.5 x 11in)', 'gravitypdf'),
+				'legal'     => __('Legal (8.5 x 14in)', 'gravitypdf'),
+				'ledger'    => __('Ledger / Tabloid (11 x 17in)', 'gravitypdf'),
+				'executive' => __('Executive (7 x 10in)', 'gravitypdf'),
+				'custom'    => __('Custom Paper Size', 'gravitypdf'),
 			),
 
 			'"A" Sizes' => array(
-				'A0' => __('A0 (841 x 1189mm)', 'pdfextended'),
-				'A1' => __('A1 (594 x 841mm)', 'pdfextended'),
-				'A2' => __('A2 (420 x 594mm)', 'pdfextended'),
-				'A3' => __('A3 (297 x 420mm)', 'pdfextended'),				
-				'A5' => __('A5 (210 x 297mm)', 'pdfextended'),
-				'A6' => __('A6 (105 x 148mm)', 'pdfextended'),
-				'A7' => __('A7 (74 x 105mm)', 'pdfextended'),
-				'A8' => __('A8 (52 x 74mm)', 'pdfextended'),
-				'A9' => __('A9 (37 x 52mm)', 'pdfextended'),
-				'A10' => __('A10 (26 x 37mm)', 'pdfextended'),
+				'A0' => __('A0 (841 x 1189mm)', 'gravitypdf'),
+				'A1' => __('A1 (594 x 841mm)', 'gravitypdf'),
+				'A2' => __('A2 (420 x 594mm)', 'gravitypdf'),
+				'A3' => __('A3 (297 x 420mm)', 'gravitypdf'),				
+				'A5' => __('A5 (210 x 297mm)', 'gravitypdf'),
+				'A6' => __('A6 (105 x 148mm)', 'gravitypdf'),
+				'A7' => __('A7 (74 x 105mm)', 'gravitypdf'),
+				'A8' => __('A8 (52 x 74mm)', 'gravitypdf'),
+				'A9' => __('A9 (37 x 52mm)', 'gravitypdf'),
+				'A10' => __('A10 (26 x 37mm)', 'gravitypdf'),
 			),
 
 			'"B" Sizes' => array(
-				'B0' => __('B0 (1414 x 1000mm)', 'pdfextended'),
-				'B1' => __('B1 (1000 x 707mm)', 'pdfextended'),
-				'B2' => __('B2 (707 x 500mm)', 'pdfextended'),
-				'B3' => __('B3 (500 x 353mm)', 'pdfextended'),				
-				'B4' => __('B4 (353 x 250mm)', 'pdfextended'),				
-				'B5' => __('B5 (250 x 176mm)', 'pdfextended'),
-				'B6' => __('B6 (176 x 125mm)', 'pdfextended'),
-				'B7' => __('B7 (125 x 88mm)', 'pdfextended'),
-				'B8' => __('B8 (88 x 62mm)', 'pdfextended'),
-				'B9' => __('B9 (62 x 44mm)', 'pdfextended'),
-				'B10' => __('B10 (44 x 31mm)', 'pdfextended'),
+				'B0' => __('B0 (1414 x 1000mm)', 'gravitypdf'),
+				'B1' => __('B1 (1000 x 707mm)', 'gravitypdf'),
+				'B2' => __('B2 (707 x 500mm)', 'gravitypdf'),
+				'B3' => __('B3 (500 x 353mm)', 'gravitypdf'),				
+				'B4' => __('B4 (353 x 250mm)', 'gravitypdf'),				
+				'B5' => __('B5 (250 x 176mm)', 'gravitypdf'),
+				'B6' => __('B6 (176 x 125mm)', 'gravitypdf'),
+				'B7' => __('B7 (125 x 88mm)', 'gravitypdf'),
+				'B8' => __('B8 (88 x 62mm)', 'gravitypdf'),
+				'B9' => __('B9 (62 x 44mm)', 'gravitypdf'),
+				'B10' => __('B10 (44 x 31mm)', 'gravitypdf'),
 			),		
 
 			'"C" Sizes' => array(
-				'C0' => __('C0 (1297 x 917mm)', 'pdfextended'),
-				'C1' => __('C1 (917 x 648mm)', 'pdfextended'),
-				'C2' => __('C2 (648 x 458mm)', 'pdfextended'),
-				'C3' => __('C3 (458 x 324mm)', 'pdfextended'),				
-				'C4' => __('C4 (324 x 229mm)', 'pdfextended'),				
-				'C5' => __('C5 (229 x 162mm)', 'pdfextended'),
-				'C6' => __('C6 (162 x 114mm)', 'pdfextended'),
-				'C7' => __('C7 (114 x 81mm)', 'pdfextended'),
-				'C8' => __('C8 (81 x 57mm)', 'pdfextended'),
-				'C9' => __('C9 (57 x 40mm)', 'pdfextended'),
-				'C10' => __('C10 (40 x 28mm)', 'pdfextended'),
+				'C0' => __('C0 (1297 x 917mm)', 'gravitypdf'),
+				'C1' => __('C1 (917 x 648mm)', 'gravitypdf'),
+				'C2' => __('C2 (648 x 458mm)', 'gravitypdf'),
+				'C3' => __('C3 (458 x 324mm)', 'gravitypdf'),				
+				'C4' => __('C4 (324 x 229mm)', 'gravitypdf'),				
+				'C5' => __('C5 (229 x 162mm)', 'gravitypdf'),
+				'C6' => __('C6 (162 x 114mm)', 'gravitypdf'),
+				'C7' => __('C7 (114 x 81mm)', 'gravitypdf'),
+				'C8' => __('C8 (81 x 57mm)', 'gravitypdf'),
+				'C9' => __('C9 (57 x 40mm)', 'gravitypdf'),
+				'C10' => __('C10 (40 x 28mm)', 'gravitypdf'),
 			),		
 			
 			'"RA" and "SRA" Sizes' => array(
-				'RA0' => __('RA0 (860 x 1220mm)', 'pdfextended'),
-				'RA1' => __('RA1 (610 x 860mm)', 'pdfextended'),
-				'RA2' => __('RA2 (430 x 610mm)', 'pdfextended'),
-				'RA3' => __('RA3 (305 x 430mm)', 'pdfextended'),				
-				'RA4' => __('RA4 (215 x 305mm)', 'pdfextended'),				
-				'SRA0' => __('SRA0 (900 x 1280mm)', 'pdfextended'),
-				'SRA1' => __('SRA1 (640 x 900mm)', 'pdfextended'),
-				'SRA2' => __('SRA2 (450 x 640mm)', 'pdfextended'),
-				'SRA3' => __('SRA3 (320 x 450mm)', 'pdfextended'),
-				'SRA4' => __('SRA4 (225 x 320mm)', 'pdfextended'),				
+				'RA0' => __('RA0 (860 x 1220mm)', 'gravitypdf'),
+				'RA1' => __('RA1 (610 x 860mm)', 'gravitypdf'),
+				'RA2' => __('RA2 (430 x 610mm)', 'gravitypdf'),
+				'RA3' => __('RA3 (305 x 430mm)', 'gravitypdf'),				
+				'RA4' => __('RA4 (215 x 305mm)', 'gravitypdf'),				
+				'SRA0' => __('SRA0 (900 x 1280mm)', 'gravitypdf'),
+				'SRA1' => __('SRA1 (640 x 900mm)', 'gravitypdf'),
+				'SRA2' => __('SRA2 (450 x 640mm)', 'gravitypdf'),
+				'SRA3' => __('SRA3 (320 x 450mm)', 'gravitypdf'),
+				'SRA4' => __('SRA4 (225 x 320mm)', 'gravitypdf'),				
 			),						
 		)); 		
 	}
@@ -784,8 +784,8 @@ class Stat_Options_API {
 
 	public static function get_installed_fonts() {
 		$fonts = array(
-			'dejavusans' => __('Dejavu Sans', 'pdfextended'),
-			'dejavusansserif' => __('Dejavu Sans Serif', 'pdfextended'),
+			'dejavusans' => __('Dejavu Sans', 'gravitypdf'),
+			'dejavusansserif' => __('Dejavu Sans Serif', 'gravitypdf'),
 		);
 
 		return $fonts;
@@ -793,14 +793,14 @@ class Stat_Options_API {
 
 	public static function get_privilages() {
 		$privilages = array(
-			'copy'          => __('Copy', 'pdfextended'),
-			'print'         => __('Print - Low Resolution', 'pdfextended'),
-			'print-highres' => __('Print - High Resolution', 'pdfextended'),
-			'modify'        => __('Modify', 'pdfextended'),
-			'annot-forms'   => __('Annotate', 'pdfextended'),
-			'fill-forms'    => __('Fill Forms', 'pdfextended'),
-			'extract'       => __('Extract', 'pdfextended'),
-			'assemble'      => __('Assemble', 'pdfextended'),
+			'copy'          => __('Copy', 'gravitypdf'),
+			'print'         => __('Print - Low Resolution', 'gravitypdf'),
+			'print-highres' => __('Print - High Resolution', 'gravitypdf'),
+			'modify'        => __('Modify', 'gravitypdf'),
+			'annot-forms'   => __('Annotate', 'gravitypdf'),
+			'fill-forms'    => __('Fill Forms', 'gravitypdf'),
+			'extract'       => __('Extract', 'gravitypdf'),
+			'assemble'      => __('Assemble', 'gravitypdf'),
 			
 		);
 
@@ -885,7 +885,7 @@ class Stat_Options_API {
 		if(count(get_settings_errors()) === 0) {
 			/* Merge our new settings with the existing */
 			$output = array_merge( $gfpdf_options, $input );
-			add_settings_error( 'gfpdf-notices', '', __( 'Settings updated.', 'pdfextended' ), 'updated' );
+			add_settings_error( 'gfpdf-notices', '', __( 'Settings updated.', 'gravitypdf' ), 'updated' );
 		} else {
 			/* store the user data in a transient */
 			set_transient('gfpdf_settings_user_data', array_merge( $gfpdf_options, $input ), 30);
@@ -918,7 +918,7 @@ class Stat_Options_API {
             $size = sizeof($value);
             if(sizeof(array_filter($value)) !== $size) {
                /* throw error */
-               add_settings_error( 'gfpdf-notices', $key, __( 'PDF Settings could not be saved. Please enter all required information below.', 'pdfextended' ) );
+               add_settings_error( 'gfpdf-notices', $key, __( 'PDF Settings could not be saved. Please enter all required information below.', 'gravitypdf' ) );
             }			
 		}
 
@@ -938,7 +938,7 @@ class Stat_Options_API {
 			$size = count($value);        
             if(empty($value) || sizeof(array_filter($value)) !== $size) {
                /* throw error */
-               add_settings_error( 'gfpdf-notices', $key, __( 'PDF Settings could not be saved. Please enter all required information below.', 'pdfextended' ) );
+               add_settings_error( 'gfpdf-notices', $key, __( 'PDF Settings could not be saved. Please enter all required information below.', 'gravitypdf' ) );
             }			
 		}
 
@@ -1236,7 +1236,7 @@ class Stat_Options_API {
 	 * @return void
 	 */
 	public static function missing_callback($args) {
-		printf( __( 'The callback used for the <strong>%s</strong> setting is missing.', 'pdfextended' ), $args['id'] );
+		printf( __( 'The callback used for the <strong>%s</strong> setting is missing.', 'gravitypdf' ), $args['id'] );
 	}
 
 	/**
@@ -1460,7 +1460,7 @@ class Stat_Options_API {
 
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
 		$html = '<input type="text" class="' . $size . '-text" class="gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '"/>';
-		$html .= '<span>&nbsp;<input type="button" class="gfpdf_settings_upload_button button-secondary" value="' . __( 'Upload File', 'pdfextended' ) . '"/></span>';
+		$html .= '<span>&nbsp;<input type="button" class="gfpdf_settings_upload_button button-secondary" value="' . __( 'Upload File', 'gravitypdf' ) . '"/></span>';
 		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
 
 		if(isset($args['tooltip'])) {
@@ -1639,12 +1639,12 @@ class Stat_Options_API {
 
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
 
-		$html = '<input type="number" class="'. $size .'-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_width" min="1" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( stripslashes( $value[0] ) ) . '" required /> ' . __('Width', 'pdfextended');
-		$html .= ' <input type="number" class="'. $size .'-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_height" min="1" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( stripslashes( $value[1] ) ) . '" required /> ' . __('Height', 'pdfextended');
+		$html = '<input type="number" class="'. $size .'-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_width" min="1" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( stripslashes( $value[0] ) ) . '" required /> ' . __('Width', 'gravitypdf');
+		$html .= ' <input type="number" class="'. $size .'-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_height" min="1" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( stripslashes( $value[1] ) ) . '" required /> ' . __('Height', 'gravitypdf');
 
 		$measurement = apply_filters( 'gfpdf_paper_size_dimensions', array(
-			'millimeters' => __('mm', 'pdfextended'),
-			'inches' => __('inches', 'pdfextended'),
+			'millimeters' => __('mm', 'gravitypdf'),
+			'inches' => __('inches', 'gravitypdf'),
 		));
 
 		$html .= '&nbsp; — &nbsp; <select id="gfpdf_settings[' . $args['id'] . ']_measurement" style="width: 75px" class="gfpdf_settings_' . $args['id'] . ' '. $class .' ' . $chosen . '" name="gfpdf_settings[' . $args['id'] . '][]" data-placeholder="' . $placeholder . '">';		

@@ -43,7 +43,7 @@ if (! defined('ABSPATH')) {
 	<h3>
 		<span>
 		  <i class="fa fa-cog"></i>
-		  <?php _e('General Settings', 'pdfextended'); ?>
+		  <?php _e('General Settings', 'gravitypdf'); ?>
 		</span>
 	</h3>
 
@@ -60,7 +60,7 @@ if (! defined('ABSPATH')) {
 			<h3>
 				<span>
 				  <i class="fa fa-lock"></i>
-				  <?php _e('Security Settings', 'pdfextended'); ?>
+				  <?php _e('Security Settings', 'gravitypdf'); ?>
 				</span>
 			</h3>
 
@@ -69,7 +69,7 @@ if (! defined('ABSPATH')) {
 			</table>	
 		</div>
 
-		<div class="gfpdf-advanced-options"><a href="#"><?php _e('Show Advanced Options...', 'pdfextended'); ?></a></div>
+		<div class="gfpdf-advanced-options"><a href="#"><?php _e('Show Advanced Options...', 'gravitypdf'); ?></a></div>
 
 		<?php submit_button(); ?>
 	</form>	

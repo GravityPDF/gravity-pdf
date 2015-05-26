@@ -115,7 +115,7 @@ class Model_Form_Settings extends Helper_Model {
         }      
 
         /* prepare our data */
-        $label = $pdf_id ? __( 'Update PDF', 'pdfextended' ) : __( 'Save PDF', 'pdfextended' );
+        $label = $pdf_id ? __( 'Update PDF', 'gravitypdf' ) : __( 'Save PDF', 'gravitypdf' );
 
         /* pass to view */
         $controller->view->add_edit(array(
@@ -140,7 +140,7 @@ class Model_Form_Settings extends Helper_Model {
 
         $form_id = (int) $form_id;
         if( (int) $form_id === 0) {
-            return new WP_Error('invalid_id', __('You must pass in a valid form ID', 'pdfextended'));
+            return new WP_Error('invalid_id', __('You must pass in a valid form ID', 'gravitypdf'));
         }
         
         /* If we haven't pulled the form meta data from the database do so now */
@@ -309,7 +309,7 @@ class Model_Form_Settings extends Helper_Model {
         if(empty($sanitized['name']) || empty($sanitized['filename']) || 
             ($sanitized['pdf_size'] == 'custom' && ((int) $sanitized['custom_pdf_size'][0] === 0) || ((int) $sanitized['custom_pdf_size'][1]) === 0) ) {
 
-            GFCommon::add_error_message( __( 'PDF could not be saved. Please enter all required information below.', 'pdfextended' ) );
+            GFCommon::add_error_message( __( 'PDF could not be saved. Please enter all required information below.', 'gravitypdf' ) );
             return false;
         }
 
@@ -324,7 +324,7 @@ class Model_Form_Settings extends Helper_Model {
 
         /* If it updated, let's update the global variable */
         if ( $did_update !== false ){                                
-            GFCommon::add_message( sprintf( __( 'PDF saved successfully. %sBack to PDF list.%s', 'pdfextended' ), '<a href="' . remove_query_arg( 'pid' ) . '">', '</a>' ) );
+            GFCommon::add_message( sprintf( __( 'PDF saved successfully. %sBack to PDF list.%s', 'gravitypdf' ), '<a href="' . remove_query_arg( 'pid' ) . '">', '</a>' ) );
             return true;
         }
 
@@ -471,7 +471,7 @@ class Model_Form_Settings extends Helper_Model {
 
         if($results) {
             $return = array(
-                'msg' => __('PDF successfully deleted.', 'pdfextended'),
+                'msg' => __('PDF successfully deleted.', 'gravitypdf'),
             );
 
             echo json_encode($return);
@@ -518,7 +518,7 @@ class Model_Form_Settings extends Helper_Model {
             $state_nonce = wp_create_nonce("gfpdf_state_nonce_{$fid}_{$config['id']}");
 
             $return = array(
-                'msg'         => __('PDF successfully duplicated.', 'pdfextended'),
+                'msg'         => __('PDF successfully duplicated.', 'gravitypdf'),
                 'pid'         => $config['id'],
                 'name'        => $config['name'],
                 'dup_nonce'   => $dup_nonce,
@@ -561,7 +561,7 @@ class Model_Form_Settings extends Helper_Model {
 
         /* toggle state */
         $config['active'] = ($config['active'] === true) ? false : true;
-        $state            = ($config['active']) ? __( 'Active', 'pdfextended' ) : __( 'Inactive', 'pdfextended' );
+        $state            = ($config['active']) ? __( 'Active', 'gravitypdf' ) : __( 'Inactive', 'gravitypdf' );
         $src              = GFCommon::get_base_url() . '/images/active' . intval( $config['active'] ) . '.png';
 
         $results = $this->update_pdf($fid, $config['id'], $config);

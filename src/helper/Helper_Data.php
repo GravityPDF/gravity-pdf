@@ -135,8 +135,8 @@ class Helper_Data {
      * @since  4.0
      */
     public function set_plugin_titles() {   
-        $this->short_title = __('PDF', 'pdfextended');
-        $this->title       = __('Gravity PDF', 'pdfextended');
+        $this->short_title = __('PDF', 'gravitypdf');
+        $this->title       = __('Gravity PDF', 'gravitypdf');
         $this->slug        = 'pdf';
     }
 

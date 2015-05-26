@@ -60,8 +60,8 @@ $list_itmes = $args['list_items'];
 
 	</form>		
 
-    <div id="delete-confirm" title="<?php _e('Delete PDF?', 'pdfextended'); ?>" style="display: none;">
-        <?php printf(__("Warning! You are about to delete this PDF. Select 'Delete' to delete, 'Cancel' to stop.", 'pdfextended'), '<strong>', '</strong>'); ?>
+    <div id="delete-confirm" title="<?php _e('Delete PDF?', 'gravitypdf'); ?>" style="display: none;">
+        <?php printf(__("Warning! You are about to delete this PDF. Select 'Delete' to delete, 'Cancel' to stop.", 'gravitypdf'), '<strong>', '</strong>'); ?>
     </div>   
 
 

@@ -39,7 +39,7 @@ if (! defined('ABSPATH')) {
 <div class="wrap about-wrap">
 	<h1><?php printf( __( 'What\'s new  in Gravity PDF %s?', 'gfpdftoolkit' ), $args['display_version'] ); ?></h1>			
 	
-	<div class="gfpdf-badge"><?php printf( __( 'Version %s', 'pdfextended' ), $args['display_version'] ); ?></div>
+	<div class="gfpdf-badge"><?php printf( __( 'Version %s', 'gravitypdf' ), $args['display_version'] ); ?></div>
 
 	<?php $this->tabs(); ?>
 

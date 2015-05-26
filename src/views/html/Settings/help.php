@@ -42,7 +42,7 @@ if (! defined('ABSPATH')) {
 <div id="pdfextended-settings">    
 	<div class="wrap about-wrap">
 	  <h1><?php _e('Getting Help With Gravity PDF', 'pdfexended'); ?></h1>
-	  <div class="about-text"><?php _e('This is your portal to find quality help, support and documentation for Gravity PDF', 'pdfextended'); ?></div>
+	  <div class="about-text"><?php _e('This is your portal to find quality help, support and documentation for Gravity PDF', 'gravitypdf'); ?></div>
 	  
 	  <div id="search-knowledgebase">	    
 	    <div id="search-results">	   

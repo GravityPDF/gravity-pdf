@@ -41,7 +41,7 @@ if (! defined('ABSPATH')) {
     <h3>
         <span>
             <i class="fa fa-times"></i>
-            <?php _e('Uninstall Gravity PDF', 'pdfextended'); ?>
+            <?php _e('Uninstall Gravity PDF', 'gravitypdf'); ?>
         </span>
     </h3>    
 
@@ -49,15 +49,15 @@ if (! defined('ABSPATH')) {
     <h3><i class="fa fa-exclamation-triangle gf_invalid"></i> Warning</h3>
 
     <div class="gf_delete_notice">
-        <?php printf(__( '%sThis operation deletes ALL Gravity PDF data and deactivates the plugin.%s If you continue, all settings, configuration, custom templates and fonts will be removed.', 'pdfextended'), '<strong>', '</strong>'); ?>
+        <?php printf(__( '%sThis operation deletes ALL Gravity PDF data and deactivates the plugin.%s If you continue, all settings, configuration, custom templates and fonts will be removed.', 'gravitypdf'), '<strong>', '</strong>'); ?>
     </div>
 
     <form method="post">
         <?php wp_nonce_field( 'gfpdf-uninstall-plugin', 'gfpdf-uninstall-plugin' ) ?>
-        <input id="gfpdf-uninstall" type="submit" class="button" value="<?php _e('Uninstall Gravity PDF', 'pdfextended'); ?>" name="uninstall">
+        <input id="gfpdf-uninstall" type="submit" class="button" value="<?php _e('Uninstall Gravity PDF', 'gravitypdf'); ?>" name="uninstall">
     </form>
 </div>   
 
-<div id="uninstall-confirm" title="<?php _e('Uninstall Gravity PDF', 'pdfextended'); ?>" style="display: none;">
- <?php printf(__("Warning! ALL Gravity PDF data, %sincluding configuration and custom templates%s will be deleted. This cannot be undone. Select 'Uninstall' to delete, 'Cancel' to stop.", 'pdfextended'), '<strong>', '</strong>'); ?>
+<div id="uninstall-confirm" title="<?php _e('Uninstall Gravity PDF', 'gravitypdf'); ?>" style="display: none;">
+ <?php printf(__("Warning! ALL Gravity PDF data, %sincluding configuration and custom templates%s will be deleted. This cannot be undone. Select 'Uninstall' to delete, 'Cancel' to stop.", 'gravitypdf'), '<strong>', '</strong>'); ?>
 </div>       

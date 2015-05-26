@@ -92,7 +92,7 @@ abstract class Helper_View {
                 return $this->buffer($path);
             }
         }
-        return new WP_Error('invalid_path', sprintf(__('Cannot find file %s', 'pdfextended'), $filename));
+        return new WP_Error('invalid_path', sprintf(__('Cannot find file %s', 'gravitypdf'), $filename));
     }
 
     /**

@@ -96,17 +96,17 @@ class View_Settings extends Helper_View
              */
             $navigation = array(
                 5 => array(
-                    'name'     => __('General', 'pdfextended'),
+                    'name'     => __('General', 'gravitypdf'),
                     'id'       => 'general',                    
                 ),
 
                 100 => array(
-                    'name'     => __('Tools', 'pdfextended'),
+                    'name'     => __('Tools', 'gravitypdf'),
                     'id'       => 'tools',                    
                 ),
 
                 120 => array(
-                    'name' => __('Help', 'pdfextended'),
+                    'name' => __('Help', 'gravitypdf'),
                     'id' => 'help',                    
                 ),
             );
@@ -175,8 +175,8 @@ class View_Settings extends Helper_View
     {
         global $gfpdf;        
 
-        $tooltips['pdf_status_wp_memory']     = '<h6>' . __( 'WP Memory Available', 'pdfextended' ) . '</h6>' . sprintf(__( "Producing PDF documents is hard work and Gravity PDF requires more resources than most plugins. We strongly recommend you have at least 128MB, but you may need more.", 'pdfextended' )); 
-        $tooltips['pdf_status_notifications'] = '<h6>' . __( 'PDF Notifications', 'pdfextended' ) . '</h6>' . sprintf(__( 'Sending PDFs automatically via Gravity Form notifications requires write access to our designated output directory: %s.', 'pdfextended' ), '<code>' . $gfpdf->data->relative_output_location . '</code>');       
+        $tooltips['pdf_status_wp_memory']     = '<h6>' . __( 'WP Memory Available', 'gravitypdf' ) . '</h6>' . sprintf(__( "Producing PDF documents is hard work and Gravity PDF requires more resources than most plugins. We strongly recommend you have at least 128MB, but you may need more.", 'gravitypdf' )); 
+        $tooltips['pdf_status_notifications'] = '<h6>' . __( 'PDF Notifications', 'gravitypdf' ) . '</h6>' . sprintf(__( 'Sending PDFs automatically via Gravity Form notifications requires write access to our designated output directory: %s.', 'gravitypdf' ), '<code>' . $gfpdf->data->relative_output_location . '</code>');       
 
         return $tooltips;
     }
@@ -190,8 +190,8 @@ class View_Settings extends Helper_View
     public function add_meta_pdf_knowledgebase($object) {       
         ?>
             <i class="fa fa-file-text-o fa-5x"></i>
-            <h4><a href="https://developer.gravitypdf.com/documentation/"><?php _e('Knowledge Base', 'pdfextended'); ?></a></h4>
-            <p><?php _e('Gravity PDF has extensive online documentation to help you get started.', 'pdfextended'); ?></p>
+            <h4><a href="https://developer.gravitypdf.com/documentation/"><?php _e('Knowledge Base', 'gravitypdf'); ?></a></h4>
+            <p><?php _e('Gravity PDF has extensive online documentation to help you get started.', 'gravitypdf'); ?></p>
         <?php
     }
 
@@ -204,8 +204,8 @@ class View_Settings extends Helper_View
     public function add_meta_pdf_support_forum($object) {       
         ?>
             <i class="fa fa-comments-o fa-5x"></i>
-            <h4><a href="https://support.gravitypdf.com/"><?php _e('Support Forum', 'pdfextended'); ?></a></h4>
-            <p><?php _e('Our community support forum is a great resource if you have a problem.', 'pdfextended'); ?></p>
+            <h4><a href="https://support.gravitypdf.com/"><?php _e('Support Forum', 'gravitypdf'); ?></a></h4>
+            <p><?php _e('Our community support forum is a great resource if you have a problem.', 'gravitypdf'); ?></p>
         <?php
     }
 
@@ -218,8 +218,8 @@ class View_Settings extends Helper_View
     public function add_meta_pdf_direct($object) {       
         ?>
             <i class="fa fa-envelope-o fa-5x"></i>
-            <h4><a href="https://developer.gravitypdf.com/contact/"><?php _e('Contact Us', 'pdfextended'); ?></a></h4>
-            <p><?php _e('You can also get in touch with Gravity PDF staff directly via email or phone.', 'pdfextended'); ?></p>
+            <h4><a href="https://developer.gravitypdf.com/contact/"><?php _e('Contact Us', 'gravitypdf'); ?></a></h4>
+            <p><?php _e('You can also get in touch with Gravity PDF staff directly via email or phone.', 'gravitypdf'); ?></p>
         <?php
     }    
 
@@ -234,12 +234,12 @@ class View_Settings extends Helper_View
         $articles = array(
 
             array(
-                'title' => __('Getting Started Guide', 'pdfextended'),
+                'title' => __('Getting Started Guide', 'gravitypdf'),
                 'url' => 'https://developer.gravitypdf.com/documentation/getting-started-with-gravity-pdf-configuration/',
             ),
 
             array(
-                'title' => __('Creating a Custom PDF Template', 'pdfextended'),
+                'title' => __('Creating a Custom PDF Template', 'gravitypdf'),
                 'url' => 'https://developer.gravitypdf.com/documentation/custom-templates-introduction/',
             ),
                                                
@@ -263,7 +263,7 @@ class View_Settings extends Helper_View
     public function add_meta_pdf_recent_forum_articles($object, $topics) {       
 
         if(!$topics || !is_array($topics)) {
-            _e('Latest forum topics could not be loaded.', 'pdfextended');
+            _e('Latest forum topics could not be loaded.', 'gravitypdf');
             return;
         }
 
@@ -283,8 +283,8 @@ class View_Settings extends Helper_View
     public function add_meta_pdf_support_hours($object) {       
         ?>
             <i class="fa fa-clock-o fa-5x"></i>
-            <h4><?php _e('Support Hours', 'pdfextended'); ?></h4>
-            <p><?php printf(__("Gravity PDF's support hours are from 9:00am-5:00pm Monday to Friday, %sSydney Australia time%s.", 'pdfextended'), '<a href="http://www.timeanddate.com/worldclock/australia/sydney">', '</a>'); ?></p>
+            <h4><?php _e('Support Hours', 'gravitypdf'); ?></h4>
+            <p><?php printf(__("Gravity PDF's support hours are from 9:00am-5:00pm Monday to Friday, %sSydney Australia time%s.", 'gravitypdf'), '<a href="http://www.timeanddate.com/worldclock/australia/sydney">', '</a>'); ?></p>
         <?php
     }       
 }
