@@ -52,7 +52,7 @@ abstract class Helper_Model {
      * @param GFPDF_Helper_Controller $class The controller class
      * @since 4.0
      */
-    public function setController(Helper_Controller $class) {
+    final public function setController(Helper_Controller $class) {
         $this->controller = $class;
     }
 
@@ -60,7 +60,7 @@ abstract class Helper_Model {
      * Get the controller
      * @since 4.0
      */
-    public function getController() {
+    final public function getController() {
         return $this->controller;
     }    
 }

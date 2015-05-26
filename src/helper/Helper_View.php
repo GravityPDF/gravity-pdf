@@ -63,7 +63,7 @@ abstract class Helper_View {
      * @return void 
      * @since 4.0
      */
-    public function __call($name, $arguments) {
+    final public function __call($name, $arguments) {
         /* check if we have any arguments */
         $vars = $this->data;
         if(isset($arguments[0]) && is_array($arguments[0])) {
@@ -71,7 +71,7 @@ abstract class Helper_View {
         }        
 
         /* load the about page view */        
-        $this->load($name, $vars);        
+        return $this->load($name, $vars);        
     }
 
     /**
@@ -82,9 +82,9 @@ abstract class Helper_View {
      * @return String/Object           The loaded file, or WP_ERROR
      * @since 4.0
      */
-    protected function load($filename, $args = array(), $output = true) {
+    final protected function load($filename, $args = array(), $output = true) {
         $path = PDF_PLUGIN_DIR . 'src/views/html/' . $this->ViewType . '/' . $filename . '.php';
-        if(is_readable($path)) {
+        if(is_readable($path)) {            
             if($output) {
                 include $path;
                 return true;
@@ -101,7 +101,7 @@ abstract class Helper_View {
      * @return String       The contents of the included file
      * @since 4.0
      */
-    private function buffer($path) {
+    final private function buffer($path) {
         ob_start();
         include $path;
         return ob_get_clean();        
