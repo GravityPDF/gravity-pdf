@@ -1,7 +1,7 @@
 <?php
 
-namespace GFPDF;
 use GFPDF\Stat\Stat_Functions;
+use GFPDF\Router;
 
 /**
  * Depreciated Functionality / Classes
