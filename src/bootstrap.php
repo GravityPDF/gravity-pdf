@@ -96,8 +96,8 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
 
         add_action('admin_init', array($this, 'setup_settings_fields'));
 
-        /* set our notice action */
-        Stat\Stat_Functions::set_notice_type();
+        /* TODO - set our notice action */
+        //Stat\Stat_Functions::set_notice_type(); 
     }
 
     /**
@@ -178,7 +178,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
      * @return void
      */
     public function load_assets() {        
-        if($this->is_gfpdf_page()) {
+        if(Stat\Stat_Functions::is_gfpdf_page()) {
             /* load styles */
             wp_enqueue_style('gfpdf_css_styles');       
             wp_enqueue_style('gfpdf_css_chosen_style');
@@ -188,7 +188,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
             wp_enqueue_script('gfpdf_js_chosen');       
         }  
 
-        if($this->is_gfpdf_settings_tab('help')) {
+        if(Stat\Stat_Functions::is_gfpdf_settings_tab('help')) {
              wp_enqueue_script('gfpdf_js_backbone');
         }      
     }
@@ -218,40 +218,6 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
     }
 
     /**
-     * Check if the current admin page is a Gravity PDF page 
-     * @since 4.0
-     * @return void
-     */    
-    private function is_gfpdf_page() {
-        if(is_admin()) {
-            if(isset($_GET['page']) && (substr($_GET['page'], 0, 6) === 'gfpdf-') ||
-            (isset($_GET['subview']) && strtoupper($_GET['subview']) === 'PDF')) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Check if we are on the current global settings page / tab 
-     * @since 4.0
-     * @return void
-     */  
-    private function is_gfpdf_settings_tab($name) {
-        if(is_admin()) {
-            if($this->is_gfpdf_page()) {
-                $tab = (isset($_GET['tab'])) ? $_GET['tab'] : 'general';
-
-                if($name === $tab) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
      * Register our admin settings
      * @return void 
      * @return 4.0
@@ -261,7 +227,6 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
     }
 
     
-
 
     /**
      * Include Welcome Screen functionality for installation / upgrades

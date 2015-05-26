@@ -43,6 +43,40 @@ class Stat_Functions
 {
 
     /**
+     * Check if the current admin page is a Gravity PDF page 
+     * @since 4.0
+     * @return void
+     */    
+    public static function is_gfpdf_page() {
+        if(is_admin()) {
+            if(isset($_GET['page']) && (substr($_GET['page'], 0, 6) === 'gfpdf-') ||
+            (isset($_GET['subview']) && strtoupper($_GET['subview']) === 'PDF')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if we are on the current global settings page / tab 
+     * @since 4.0
+     * @return void
+     */  
+    public static function is_gfpdf_settings_tab($name) {
+        if(is_admin()) {
+            if(self::is_gfpdf_page()) {
+                $tab = (isset($_GET['tab'])) ? $_GET['tab'] : 'general';
+
+                if($name === $tab) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }    
+
+    /**
      * Takes over for setup_ids() but is now called much earlier in the process
      * @return Boolean whether settings the ids was successful or not
      */
