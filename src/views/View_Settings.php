@@ -134,7 +134,7 @@ class View_Settings extends Helper_View
         }
 
         $vars = array(
-            'memory' => $status->get_ram(),
+            'memory' => $status->get_ram(ini_get('memory_limit')),
             'output' => true, /* TODO - write installer / uninstaller first */
             'output_path' => 'path/to/file', /* TODO */
             'wp'     => $wp_version,

@@ -5,7 +5,7 @@ Version: 4.0.0
 Description: A PHP toolkit to automatically overlay Gravity Forms data onto existing PDF documents with ease. It's the perfect tool for autocompleting government and legal documents that are legally required to be completed in the provided layout. Or for complex PDFs that would be difficult to reproduce using HTML / CSS using our free software.
 Author: Gravity PDF
 Author URI: https://gravitypdf.com
-Text Domain: pdfextended
+Text Domain: gravitypdf
 Domain Path: /src/languages
 */
 

@@ -37,6 +37,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 require_once(PDF_PLUGIN_DIR . 'src/depreciated.php');    
 
 /**
+ * PSR-4 Autoloader Implimentation
+ * 
  * An example of a general-purpose implementation that includes the optional
  * functionality of allowing multiple base directories for a single namespace
  * prefix.
