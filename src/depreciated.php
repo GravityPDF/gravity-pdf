@@ -55,9 +55,17 @@ class PDF_Common
     public static function setup_ids() {
     }
 
-    public static function get_ids() {
+    public static function get_upload_dir() {
+        return Stat_Functions::get_upload_dir();
+    }       
+
+   /* public static function get_ids() {
     	return Stat_Functions::get_ids();
     }
+
+    public static function get_site_name() {
+        return Stat_Functions::get_site_name();
+    }        
 
     public static function get_html_template($filename) {
     	return Stat_Functions::get_html_template($filename);
@@ -99,13 +107,6 @@ class PDF_Common
     	return Stat_Functions::get($name);
     }
 
-    public static function get_site_name() {
-    	return Stat_Functions::get_site_name();
-    }
-
-    public static function get_upload_dir() {
-    	return Stat_Functions::get_upload_dir();
-    }
 
     public static function is_currency_decimal_dot($currency = null) {
     	return Stat_Functions::is_currency_decimal_dot($currency);
@@ -113,5 +114,5 @@ class PDF_Common
 
     public static function add_message($message, $type = 'notice') {
     	return Stat_Functions::add_message($message, $type);
-    }
+    }*/
 }

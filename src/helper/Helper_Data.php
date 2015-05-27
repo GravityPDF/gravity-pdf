@@ -217,9 +217,7 @@ class Helper_Data {
      */
     public function set_directory_structure()
     {
-        $upload_dir = PDF_Common::get_upload_dir();
-        $site_name  = PDF_Common::get_site_name();
-        
+        $upload_dir = PDF_Common::get_upload_dir();        
         /*
          * As of Gravity PDF 3.7 we'll be dropping the 'site_name' folder for single installs 
          * And changing multisite installs to their site ID         
@@ -236,8 +234,6 @@ class Helper_Data {
         $this->template_site_location_url     = $this->template_location_url;
         $this->template_save_location_url     = $this->template_location_url . 'output/';
         $this->template_font_location_url     = $this->template_location_url . 'fonts/';        
-        
-        $this->old_3_6_template_site_location = $this->template_location . $site_name . '/';
 
         /*
          * Use the network ID for multisite installs 
@@ -253,13 +249,11 @@ class Helper_Data {
             $this->template_save_location_url     = $this->template_site_location_url . 'output/';
             $this->template_font_location_url     = $this->template_site_location_url . 'fonts/';  
             
-            $this->old_3_6_template_site_location = $this->template_location . $site_name . '/';
         }    
 
         /*
          * Include old template locations to help with migrations 
-         */
-        $this->old_template_location      = get_stylesheet_directory().'/'. $this->working_folder .'/';
+         */        
         $this->upload_dir                 = $upload_dir['basedir'];
 
         /*

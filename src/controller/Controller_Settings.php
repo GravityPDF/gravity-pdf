@@ -6,6 +6,7 @@ use GFPDF\Helper\Helper_Model;
 use GFPDF\Helper\Helper_View;
 use GFPDF\Helper\Helper_Int_Actions;
 use GFPDF\Helper\Helper_Int_Filters;
+use GFPDF\Stat\Stat_Functions;
 use \RGForms;
 
 /**
@@ -106,7 +107,7 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
         add_filter('gform_tooltips', array($this->view, 'add_tooltips'));
 
         /* If trying to save settings page we'll use this filter to apply any errors passed back from options.php */
-        if($this->is_settings_page()) {
+        if(Stat_Functions::is_gfpdf_page()) {
             add_filter('gfpdf_registered_settings', array('GFPDF\Stat\Stat_Options_API', 'highlight_errors'));            
         }        
 
@@ -120,7 +121,6 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
      * @return void
      */
     public function displayPage() {
-
         /**
          * Determine which settings page to load
          */
@@ -140,30 +140,4 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
           break;
         }      
     } 
-
-    /**
-     * Check if we are on the Gravity Form settings page
-     * @param  string  $type Do we want to find a specific tab?
-     * @return boolean       
-     * @since  4.0
-     */
-    public function is_settings_page($type = '') {
-
-        /* check we are on the PDF settings page */
-        if(rgget('page') != 'gf_settings' || rgget('subview') != 'PDF') {
-            return false;
-        }
-
-        /* if a type is passed in, check if we have a match */
-        if(!empty($type)) {
-            $page = (isset($_GET['tab'])) ? $_GET['tab'] : 'general';
-
-            if($page != $type) {
-                return false;
-            }
-        } 
-
-        /* we are successful */
-        return true;
-    }
 }
