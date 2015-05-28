@@ -10,7 +10,7 @@ use GFPDF\Helper\Helper_View;
 use WP_UnitTestCase;
 
 /**
- * Test Gravity PDF Data Helper Class
+ * Test Gravity PDF MVC Abstraction classes
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
@@ -42,7 +42,7 @@ use WP_UnitTestCase;
  * Test the Controller / Model / View Abstract Class
  * @since 4.0
  */
-class Test_MVP_Abstracts extends WP_UnitTestCase
+class Test_MVC_Abstracts extends WP_UnitTestCase
 {
     /**
      * Our Gravity PDF controller object
