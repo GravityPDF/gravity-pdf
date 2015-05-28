@@ -56,22 +56,22 @@ class Controller_Form_Settings extends Helper_Controller implements Helper_Int_A
     {
         /* load our model and view */
         $this->model = $model;
-        $this->model->setController($this);   
+        $this->model->setController($this);
 
-        $this->view  = $view;        
+        $this->view  = $view;
     }
 
     /**
-     * Initialise our class defaults 
+     * Initialise our class defaults
      * @since 4.0
      * @return void
      */
     public function init() {
-        /* 
-         * Tell Gravity Forms to add our form PDF settings pages         
-         */ 
+        /*
+         * Tell Gravity Forms to add our form PDF settings pages
+         */
          $this->add_actions();
-         $this->add_filters();       
+         $this->add_filters();
     }
 
     /**
@@ -88,8 +88,8 @@ class Controller_Form_Settings extends Helper_Controller implements Helper_Int_A
 
         /* Add AJAX endpoints */
         add_action('wp_ajax_gfpdf_list_delete', array( $this->model, 'delete_gf_pdf_setting'));
-        add_action('wp_ajax_gfpdf_list_duplicate', array( $this->model, 'duplicate_gf_pdf_setting'));    
-        add_action('wp_ajax_gfpdf_change_state', array( $this->model, 'change_state_pdf_setting'));            
+        add_action('wp_ajax_gfpdf_list_duplicate', array( $this->model, 'duplicate_gf_pdf_setting'));
+        add_action('wp_ajax_gfpdf_change_state', array( $this->model, 'change_state_pdf_setting'));
     }
 
     /**
@@ -101,17 +101,17 @@ class Controller_Form_Settings extends Helper_Controller implements Helper_Int_A
 
         /* Add Validation Errors */
         add_filter( 'gfpdf_form_settings', array($this->model, 'validation_error'));
-        add_filter( 'gfpdf_form_settings_appearance', array($this->model, 'validation_error'));        
+        add_filter( 'gfpdf_form_settings_appearance', array($this->model, 'validation_error'));
 
         /* register our core santize functions */
-        add_filter( 'gfpdf_settings_sanitize_text', array('GFPDF\Stat\Stat_Options_API', 'sanitize_text_field') );      
-        add_filter( 'gfpdf_settings_sanitize_paper_size', array('GFPDF\Stat\Stat_Options_API', 'sanitize_paper_size_field'), 10, 3 );       
-        add_filter( 'gfpdf_settings_sanitize_select', array('GFPDF\Stat\Stat_Options_API', 'sanitize_select_field'), 10, 4 );        
+        add_filter( 'gfpdf_settings_sanitize_text', array('GFPDF\Stat\Stat_Options_API', 'sanitize_text_field') );
+        add_filter( 'gfpdf_settings_sanitize_paper_size', array('GFPDF\Stat\Stat_Options_API', 'sanitize_paper_size_field'), 10, 3 );
+        add_filter( 'gfpdf_settings_sanitize_select', array('GFPDF\Stat\Stat_Options_API', 'sanitize_select_field'), 10, 4 );
 
         /* Register custom sanitize functionality */
         add_filter( 'gfpdf_form_settings_sanitize_text', 'wp_strip_all_tags', 10);
         add_filter( 'gfpdf_form_settings_sanitize_text',  array($this->model, 'strip_filename_extension'), 15, 2);
-        add_filter( 'gfpdf_form_settings_sanitize_hidden',  array($this->model, 'decode_json'), 10, 2);        
+        add_filter( 'gfpdf_form_settings_sanitize_hidden',  array($this->model, 'decode_json'), 10, 2);
     }
 
     /**
@@ -119,7 +119,7 @@ class Controller_Form_Settings extends Helper_Controller implements Helper_Int_A
      * @since 4.0
      * @return void
      */
-    public function displayPage() {        
+    public function displayPage() {
         global $gfpdf;
         
         /* Determine whether to load the add/edit page, or the list view */
@@ -137,6 +137,6 @@ class Controller_Form_Settings extends Helper_Controller implements Helper_Int_A
         }
 
         /* process list view */
-        $this->model->process_list_view($form_id);                     
-    }    
+        $this->model->process_list_view($form_id);
+    }
 }

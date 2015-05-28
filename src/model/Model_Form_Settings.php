@@ -63,12 +63,12 @@ class Model_Form_Settings extends Helper_Model {
         global $gfpdf;
         $tabs[] = array( 'name' => $gfpdf->data->slug, 'label' => $gfpdf->data->short_title, 'query' => array( 'pid' => null ) );
         return $tabs;
-    }  
+    }
 
     /**
      * Setup the PDF Settings List View Logic
      * @param  Integer $form_id The Gravity Form ID
-     * @return void 
+     * @return void
      * @since 4.0
      */
     public function process_list_view($form_id) {
@@ -80,30 +80,30 @@ class Model_Form_Settings extends Helper_Model {
 
         /* load our list table */
         $pdf_table = new Helper_PDF_List_Table( $form );
-        $pdf_table->prepare_items();        
+        $pdf_table->prepare_items();
 
         /* pass to view */
         $controller->view->list(array(
             'title'       => $gfpdf->data->title,
             'add_new_url' => $add_new_url = add_query_arg( array( 'pid' => 0 ) ),
             'list_items'  => $pdf_table,
-        ));                
-    }  
+        ));
+    }
 
     /**
      * Setup the PDF Settings Add/Edit View Logic
      * @param  Integer $form_id The Gravity Form ID
      * @param  Integer $pdf_id The PDF configuration ID
-     * @return void 
+     * @return void
      * @since 4.0
      */
-    public function show_edit_view($form_id, $pdf_id) {    
+    public function show_edit_view($form_id, $pdf_id) {
         global $gfpdf;
 
         $controller = $this->getController();
 
         /* get the form object */
-        $form = RGFormsModel::get_form_meta( $form_id );     
+        $form = RGFormsModel::get_form_meta( $form_id );
 
         /* parse input and get required information */
         if(!$pdf_id) {
@@ -112,7 +112,7 @@ class Model_Form_Settings extends Helper_Model {
             } else {
                 $pdf_id = uniqid();
             }
-        }      
+        }
 
         /* prepare our data */
         $label = $pdf_id ? __( 'Update PDF', 'gravitypdf' ) : __( 'Save PDF', 'gravitypdf' );
@@ -120,11 +120,11 @@ class Model_Form_Settings extends Helper_Model {
         /* pass to view */
         $controller->view->add_edit(array(
             'pdf_id'       => $pdf_id,
-            'title'        => $label, 
-            'button_label' => $label, 
-            'form'         => $form,    
+            'title'        => $label,
+            'button_label' => $label,
+            'form'         => $form,
             'pdf'          => $this->get_pdf($form_id, $pdf_id),
-        ));         
+        ));
     }
 
     /**
@@ -133,7 +133,7 @@ class Model_Form_Settings extends Helper_Model {
      * Retrieves all form PDF settings
      *
      * @since 4.0
-     * @return array GFPDF settings
+     * @return Array/Object GFPDF settings or WP_Error
      */
     public function get_settings($form_id) {
         global $gfpdf;
@@ -145,14 +145,14 @@ class Model_Form_Settings extends Helper_Model {
         
         /* If we haven't pulled the form meta data from the database do so now */
         if(!isset($gfpdf->data->form_settings[$form_id])) {
-            $form     = GFFormsModel::get_form_meta( $form_id );          
+            $form     = GFFormsModel::get_form_meta( $form_id );
             $settings = (isset($form['gfpdf_form_settings'])) ? $form['gfpdf_form_settings'] : array();
-            $gfpdf->data->form_settings[$form_id] = apply_filters( 'gfpdf_get_form_settings', $settings );          
+            $gfpdf->data->form_settings[$form_id] = apply_filters( 'gfpdf_get_form_settings', $settings );
         }
 
         /* return the form meta data */
         return $gfpdf->data->form_settings[$form_id];
-    }    
+    }
 
     /**
      * Get pdf config
@@ -164,9 +164,40 @@ class Model_Form_Settings extends Helper_Model {
      */
     public function get_pdf( $form_id, $pdf_id ) {
         $gfpdf_options = $this->get_settings($form_id);
-        $value         = ! empty( $gfpdf_options[ $pdf_id ] ) ? $gfpdf_options[ $pdf_id ] : array();
-        return apply_filters( 'gfpdf_pdf_config', $value );
+        $value         = ! empty( $gfpdf_options[ $pdf_id ] ) ? $gfpdf_options[ $pdf_id ] : false;
+        return apply_filters( 'gfpdf_pdf_config', apply_filters( 'gfpdf_pdf_config_' . $form_id, $value ));
+    }
 
+
+    /**
+     * Create a new PDF configuration option for that form
+     * @param Integer $form_id The form ID
+     * @param array  $value   The settings array
+     * @return mixed
+     * @since 4.0
+     */
+    public function add_pdf( $form_id, $value = array()) {
+        /* First let's grab the current settings */
+        $options = $this->get_settings($form_id);
+
+        if( !is_wp_error($options) ) {
+            /* check the ID, if any */
+            $value['id']     = (isset($value['id'])) ? $value['id'] : uniqid();
+            $value['active'] = (isset($value['active'])) ? $value['active'] : true;
+
+            /* Let's let devs alter that value coming in */
+            $value = apply_filters( 'gfpdf_form_add_pdf', $value, $form_id );
+            $value = apply_filters( 'gfpdf_form_add_pdf_' . $form_id, $value, $form_id );
+
+            $results = $this->update_pdf($form_id, $value['id'], $value, true, false);
+
+            if($results) {
+                /* return the ID if successful */
+                return $value['id'];
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -176,12 +207,15 @@ class Model_Form_Settings extends Helper_Model {
      * Warning: Passing in an empty, false or null string value will remove
      *          the key from the gfpdf_options array.
      *
-     * @since 3.8
-     * @param string $key The Key to update
+     * @since 4.0
+     * @param integer $form_id The Gravity Form ID
+     * @param string $pdf_id The PDF Setting ID
      * @param string|bool|int $value The value to set the key to
+     * @param array $value The PDF settings array
+     * @param boolean $filter Whether to apply the update filters or not
      * @return boolean True if updated, false if not.
      */
-    public function update_pdf( $form_id, $pdf_id, $value = '', $update_db = true ) {
+    public function update_pdf( $form_id, $pdf_id, $value = '', $update_db = true, $filters = true ) {
 
         if ( empty( $value ) || ! is_array($value) || sizeof($value) == 0 ) {
             $remove_option = $this->delete_pdf( $form_id, $pdf_id );
@@ -191,12 +225,12 @@ class Model_Form_Settings extends Helper_Model {
         /* First let's grab the current settings */
         $options = $this->get_settings($form_id);
 
-        if(! is_wp_error($options)) {
-            /* Let's let devs alter that value coming in */
-            $value = apply_filters( 'gfpdf_form_update_pdf', $value, $form_id, $pdf_id );
-
-            if(!is_array($options[ $pdf_id ])) {
-                $options[ $pdf_id ] = array();
+        if( !is_wp_error($options) ) {
+            /* don't run when adding a new PDF */
+            if($filters) {
+                /* Let's let devs alter that value coming in */
+                $value = apply_filters( 'gfpdf_form_update_pdf', $value, $form_id, $pdf_id );
+                $value = apply_filters( 'gfpdf_form_update_pdf_' . $form_id, $value, $form_id, $pdf_id );
             }
 
             /* Next let's try to update the value */
@@ -216,15 +250,13 @@ class Model_Form_Settings extends Helper_Model {
             
             /* If it updated, let's update the global variable */
             if ( !$update_db || $did_update !== false ){
-                global $gfpdf;     
-                $gfpdf->data->form_settings[$form_id] = $options;                
+                global $gfpdf;
+                $gfpdf->data->form_settings[$form_id] = $options;
             }
 
+            /* true if successful, false if failed */
             return $did_update;
-
-            
         }
-
         return false;
     }
 
@@ -253,26 +285,28 @@ class Model_Form_Settings extends Helper_Model {
             $form = GFFormsModel::get_form_meta($form_id);
 
             /* Update our GFPDF settings */
-            $form['gfpdf_form_settings'] = $options;            
+            $form['gfpdf_form_settings'] = $options;
 
             /* update the database, if able */
             $did_update = GFFormsModel::update_form_meta($form_id, $form);
 
             /* If it updated, let's update the global variable */
             if ( $did_update !== false ) {
-                global $gfpdf;        
+                global $gfpdf;
                 $gfpdf->data->form_settings[$form_id] = $options;
             }
 
+            /* true if successful, false if failed */
             return $did_update;
         }
-    }    
+        return false;
+    }
 
     /**
      * Validate, Sanatize and Update PDF settings
      * @param  Integer $form_id The Gravity Form ID
      * @param  Integer $pdf_id The PDF configuration ID
-     * @return void 
+     * @return void
      * @since 4.0
      */
     public function process_submission($form_id, $pdf_id) {
@@ -280,9 +314,9 @@ class Model_Form_Settings extends Helper_Model {
 
         /* Check Nonce is valid */
         if( ! wp_verify_nonce( $_POST['gfpdf_save_pdf'], 'gfpdf_save_pdf' ) ) {
-             GFCommon::add_error_message( __( 'There was a problem saving your PDF settings. Please try again.', 'pdfextneded' ) );
-             return false;    
-        }           
+             GFCommon::add_error_message( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
+             return false;
+        }
 
         /* Check if we have a new PDF ID */
         if(empty($pdf_id)) {
@@ -293,9 +327,9 @@ class Model_Form_Settings extends Helper_Model {
 
         /* check appropriate settings */
         if(!is_array($input) || !$pdf_id) {
-             GFCommon::add_error_message( __( 'There was a problem saving your PDF settings. Please try again.', 'pdfextneded' ) );
-             return false;           
-        }  
+             GFCommon::add_error_message( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
+             return false;
+        }
 
         $sanitized = $this->settings_sanitize($input);
         
@@ -306,7 +340,7 @@ class Model_Form_Settings extends Helper_Model {
         $this->update_pdf($form_id, $pdf_id, $sanitized, false);
 
         /* Do validation */
-        if(empty($sanitized['name']) || empty($sanitized['filename']) || 
+        if(empty($sanitized['name']) || empty($sanitized['filename']) ||
             ($sanitized['pdf_size'] == 'custom' && ((int) $sanitized['custom_pdf_size'][0] === 0) || ((int) $sanitized['custom_pdf_size'][1]) === 0) ) {
 
             GFCommon::add_error_message( __( 'PDF could not be saved. Please enter all required information below.', 'gravitypdf' ) );
@@ -317,32 +351,45 @@ class Model_Form_Settings extends Helper_Model {
         $form = GFFormsModel::get_form_meta($form_id);
 
         /* Update our GFPDF settings */
-        $form['gfpdf_form_settings'][$pdf_id] = $sanitized;        
+        $form['gfpdf_form_settings'][$pdf_id] = $sanitized;
 
         /* Update database */
         $did_update = GFFormsModel::update_form_meta($form_id, $form);
 
         /* If it updated, let's update the global variable */
-        if ( $did_update !== false ){                                
+        if ( $did_update !== false ){
             GFCommon::add_message( sprintf( __( 'PDF saved successfully. %sBack to PDF list.%s', 'gravitypdf' ), '<a href="' . remove_query_arg( 'pid' ) . '">', '</a>' ) );
             return true;
         }
 
-        GFCommon::add_error_message( __( 'There was a problem saving your PDF settings. Please try again.', 'pdfextneded' ) );
+        GFCommon::add_error_message( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
         return false;
     }
 
     /**
      * Apply gfield_error class when validation fails, highlighting field blocks with problems
      * @param  array $fields Array of fields to process
-     * @return array         Modified list of fields     
+     * @return array         Modified list of fields
      * @since 4.0
      */
     public function validation_error($fields) {
-        /* Check Nonce is valid */
-        if( empty($_POST['gfpdf_save_pdf']) || ! wp_verify_nonce( $_POST['gfpdf_save_pdf'], 'gfpdf_save_pdf' ) ) {            
+        /**
+         * Check if we actually need to do any validating
+         * Because of the way the Gravity Forms Settings page is processed we are hooking into the core
+         * "gfpdf_form_settings" filter which runs on both the GF Settings page and the Settings page
+         * We don't need to do any validation when not on the GF PDF Settings page
+         */
+        if( empty($_POST['gfpdf_save_pdf'])) {
             return $fields;
-        }       
+        }
+
+        /**
+         * Check we have a valid nonce, or throw an error
+         */
+        if( ! wp_verify_nonce( $_POST['gfpdf_save_pdf'], 'gfpdf_save_pdf' ) ) {
+            GFCommon::add_error_message( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
+            return false;
+        }
 
         $input = rgpost('gfpdf_settings');
 
@@ -367,48 +414,48 @@ class Model_Form_Settings extends Helper_Model {
                     $value = apply_filters( 'gfpdf_form_settings_sanitize_text', $value, $key);
                     if(empty($value)) {
                         $field['class'] .= $field['class'] . ' gfield_error' ;
-                    }                    
+                    }
                 }
             }
         }
 
-        return $fields;        
+        return $fields;
     }
 
     /**
-     * Similar to GFPDF\Stat\Stat_Options_API::settings_sanitize() except we are storing/processing values 
-     * in Gravity Forms meta table  
+     * Similar to GFPDF\Stat\Stat_Options_API::settings_sanitize() except we are storing/processing values
+     * in Gravity Forms meta table
      * @param  array  $input Fields to process
      * @return array         Sanitized fields
-     * @return void 
+     * @return void
      * @since 4.0
      */
-    private function settings_sanitize($input = array()) {
+    public function settings_sanitize($input = array()) {
 
         $settings = Stat_Options_API::get_registered_settings();
         $sections = array('form_settings', 'form_settings_appearance', 'form_settings_advanced');
 
         foreach($sections as $s) {
-            $input = apply_filters( 'gfpdf_settings_'. $s .'_sanitize', $input );    
-        }                
+            $input = apply_filters( 'gfpdf_settings_'. $s .'_sanitize', $input );
+        }
 
         /* Loop through each setting being saved and pass it through a sanitization filter */
         foreach ( $input as $key => $value ) {
 
             foreach($sections as $s) {
-                $type = isset( $settings[$s][$key]['type'] ) ? $settings[$s][$key]['type'] : false;    
+                $type = isset( $settings[$s][$key]['type'] ) ? $settings[$s][$key]['type'] : false;
 
                 if ( $type ) {
                     /* Field type specific filter */
                     $input[$key] = apply_filters( 'gfpdf_form_settings_sanitize_' . $type, $value, $key );
-                }                
-            }        
+                }
+            }
 
             /* General filter */
             $input[$key] = apply_filters( 'gfpdf_form_settings_sanitize', $input[$key], $key );
         }
 
-        return $input;        
+        return $input;
     }
 
     /**
@@ -416,12 +463,12 @@ class Model_Form_Settings extends Helper_Model {
      * @param  String $value The value entered by the user
      * @param  String $key   The field to be parsed
      * @return String        The sanitized data
-     */ 
+     */
     public function strip_filename_extension($value, $key) {
 
         if($key == 'filename') {
-            if(substr($value, -4) === '.pdf') {
-                $value = substr($value, 0, -4);
+            if(mb_strtolower(mb_substr($value, -4)) === '.pdf') {
+                $value = mb_substr($value, 0, -4);
             }
         }
 
@@ -433,7 +480,7 @@ class Model_Form_Settings extends Helper_Model {
      * @param  String $value The value entered by the user
      * @param  String $key   The field to be parsed
      * @return String        The sanitized data
-     */ 
+     */
     public function decode_json($value, $key) {
 
         if($key == 'conditionalLogic') {
@@ -441,19 +488,19 @@ class Model_Form_Settings extends Helper_Model {
         }
 
         return $value;
-    }    
+    }
 
     /**
      * AJAX Endpoint for deleting PDF Settings
-     * @param $_POST['nonce'] a valid nonce 
+     * @param $_POST['nonce'] a valid nonce
      * @param $_POST['fid'] a valid form ID
      * @param $_POST['pid'] a valid PDF ID
-     * @return JSON 
+     * @return JSON
      * @since 4.0
      */
     public function delete_gf_pdf_setting() {
         /*
-         * Validate Endpoint 
+         * Validate Endpoint
          */
         $nonce = $_POST['nonce'];
         $fid   = (int) $_POST['fid'];
@@ -484,15 +531,15 @@ class Model_Form_Settings extends Helper_Model {
 
     /**
      * AJAX Endpoint for duplicating PDF Settings
-     * @param $_POST['nonce'] a valid nonce 
+     * @param $_POST['nonce'] a valid nonce
      * @param $_POST['fid'] a valid form ID
      * @param $_POST['pid'] a valid PDF ID
-     * @return JSON 
+     * @return JSON
      * @since 4.0
      */
     public function duplicate_gf_pdf_setting() {
         /*
-         * Validate Endpoint 
+         * Validate Endpoint
          */
         $nonce = $_POST['nonce'];
         $fid   = (int) $_POST['fid'];
@@ -532,19 +579,19 @@ class Model_Form_Settings extends Helper_Model {
 
         header('HTTP/1.1 500 Internal Server Error');
         exit;
-    }    
+    }
 
     /**
      * AJAX Endpoint for changing the PDF Settings state
-     * @param $_POST['nonce'] a valid nonce 
+     * @param $_POST['nonce'] a valid nonce
      * @param $_POST['fid'] a valid form ID
-     * @param $_POST['pid'] a valid PDF ID     
-     * @return JSON 
+     * @param $_POST['pid'] a valid PDF ID
+     * @return JSON
      * @since 4.0
      */
     public function change_state_pdf_setting() {
         /*
-         * Validate Endpoint 
+         * Validate Endpoint
          */
         $nonce    = $_POST['nonce'];
         $fid      = (int) $_POST['fid'];
@@ -578,5 +625,5 @@ class Model_Form_Settings extends Helper_Model {
 
         header('HTTP/1.1 500 Internal Server Error');
         exit;
-    }    
+    }
 }
