@@ -134,12 +134,12 @@ class View_Settings extends Helper_View
         }
 
         $vars = array(
-            'memory' => $status->get_ram(ini_get('memory_limit')),
-            'output' => true, /* TODO - write installer / uninstaller first */
+            'memory'      => $status->get_ram(ini_get('memory_limit')),
+            'output'      => true, /* TODO - write installer / uninstaller first */
             'output_path' => 'path/to/file', /* TODO */
-            'wp'     => $wp_version,
-            'php'    => phpversion(),
-            'gf'     => GFCommon::$version,                    
+            'wp'          => $wp_version,
+            'php'         => phpversion(),
+            'gf'          => GFCommon::$version,                    
         );
 
         $vars = array_merge($vars, $this->data); 
