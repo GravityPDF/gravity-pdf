@@ -5,6 +5,7 @@ use GFPDF\Controller\Controller_Settings;
 use GFPDF\Model\Model_Settings;
 use GFPDF\View\View_Settings;
 use WP_UnitTestCase;
+use WP_Error;
 
 /**
  * Test Gravity PDF Settings Functionality
@@ -77,7 +78,7 @@ class Test_Settings extends WP_UnitTestCase
         $this->view  = new View_Settings(array());
 
         $this->controller = new Controller_Settings($this->model, $this->view);
-        $this->controller->init();         
+        $this->controller->init(); 
     }
 
     /**
@@ -109,5 +110,72 @@ class Test_Settings extends WP_UnitTestCase
         $this->controller->add_filters();
 
         $this->assertEquals(10, has_filter( 'gfpdf_registered_settings', array( 'GFPDF\Stat\Stat_Options_API', 'highlight_errors')));
-    }    
+    }  
+
+    /**
+     * Test all required custom meta boxes are added
+     * @since 4.0
+     * @group settings
+     */    
+    public function test_meta_boxes() {
+        global $wp_meta_boxes;
+
+        /* run our method to test */
+        $this->model->add_meta_boxes();
+
+        /* check our meta boxes have been added */
+        $this->assertTrue(isset($wp_meta_boxes['pdf-help-and-support']));
+        $this->assertTrue(isset($wp_meta_boxes['pdf-help-and-support']['row-1']));
+        $this->assertTrue(isset($wp_meta_boxes['pdf-help-and-support']['row-2']));
+
+        /* check they are not empty */
+        $this->assertNotEquals(0, sizeof($wp_meta_boxes['pdf-help-and-support']['row-1']['default']));
+        $this->assertNotEquals(0, sizeof($wp_meta_boxes['pdf-help-and-support']['row-2']['default']));
+    }  
+
+    /**
+     * Test the forum endpoint is returning the correct response
+     * @since 4.0
+     * @group settings
+     */  
+    public function test_latest_forum_endpoint() {
+        /* set a correct response */
+        add_filter( 'pre_http_request', function($return, $r, $url) {
+           $r['body'] = file_get_contents( PDF_PLUGIN_DIR . 'tests/json/latest-posts.json' );           
+           return $r;
+        }, 10, 3);      
+
+        /* check for correct results */
+        $response = $this->model->get_latest_forum_topics();
+        $this->assertEquals(5, sizeof($response));
+    }
+
+    /**
+     * Test the forum endpoint caching works as expected
+     * @since 4.0
+     * @group settings
+     */  
+    public function test_endpoint_caching() {
+        set_transient('gfpdf_latest_forum_topics', 'checking results', 86400);
+
+        $this->assertEquals('checking results', $this->model->get_latest_forum_topics());
+
+        delete_transient('gfpdf_latest_forum_topics');        
+    }
+
+    /**
+     * Test the forum endpoint returns the appropriate response when an error occurs
+     * Note: had to split this out of the original endpoint as WP appeared to be caching the results (wasn't going to case the 'whys' so split it out in own method)
+     * @since 4.0
+     * @group settings
+     */  
+    public function test_latest_forum_endpoint_error() {
+        /* check for appropriate errors */
+        add_filter( 'pre_http_request', function($return, $r, $url) {
+           return new WP_Error('problem', 'Cannot load endpoint');           
+        }, 10, 3);              
+
+        /* check error thrown */
+        $this->assertFalse($this->model->get_latest_forum_topics());        
+    }
 }
