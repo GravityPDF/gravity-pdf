@@ -44,103 +44,52 @@ if ( !defined( 'ABSPATH' ) ) exit;
  * and modified to suit our requirements
  * @since 4.0
  */
-class Helper_Options {
+class Helper_Options implements Helper_Int_Filters {
+
+	/**
+	 * Holds the current global user settings
+	 * @var Array
+	 * @since 4.0
+	 */
+	public $settings = array();
+
+	/**
+	 * Holds the Gravity Form PDF Settings
+	 * @var Array
+	 * @since 4.0
+	 */
+	public $form_settings = array();
+
+	/**
+	 * Initialise the options API
+	 * @return void
+	 * @since 4.0
+	 */
+	public function init() {
+		$this->set_plugin_settings();
+		$this->add_filters();
+	}
+
+	public function add_filters() {
+        /* register our core santize functions */
+        add_filter( 'gfpdf_settings_sanitize_text', array($this, 'sanitize_text_field') );
+        add_filter( 'gfpdf_settings_sanitize_paper_size', array($this, 'sanitize_paper_size_field'), 10, 3 );
+        add_filter( 'gfpdf_settings_sanitize_select', array($this, 'sanitize_select_field'), 10, 4 );
+	}
 	
-	/**
-	 * Get an option
-	 *
-	 * Looks to see if the specified setting exists, returns default if not
-	 *
-	 * @since 4.0
-	 * @return mixed
-	 */
-	public function get_option( $key = '', $default = false ) {
-		global $gfpdf;
-		$gfpdf_options = $gfpdf->data->settings;
+    /**
+     * Get the plugin's settings from the database
+     * @since 4.0
+     * @return  void
+     */
+    public function set_plugin_settings() {
+        if ( false == get_option( 'gfpdf_settings' ) ) {
+            add_option( 'gfpdf_settings' );
+        }
 
-		$value = ! empty( $gfpdf_options[ $key ] ) ? $gfpdf_options[ $key ] : $default;
-		$value = apply_filters( 'gfpdf_get_option', $value, $key, $default );
-		return apply_filters( 'gfpdf_get_option_' . $key, $value, $key, $default );
-	}
-
-	/**
-	 * Update an option
-	 *
-	 * Updates an Gravity PDF setting value in both the db and the global variable.
-	 * Warning: Passing in an empty, false or null string value will remove
-	 *          the key from the gfpdf_options array.
-	 *
-	 * @since 4.0
-	 * @param string $key The Key to update
-	 * @param string|bool|int $value The value to set the key to
-	 * @return boolean True if updated, false if not.
-	 */
-	public function update_option( $key = '', $value = false ) {
-
-		// If no key, exit
-		if ( empty( $key ) ){
-			return false;
-		}
-
-		if ( empty( $value ) ) {
-			$remove_option = self::delete_option( $key );
-			return $remove_option;
-		}
-
-		// First let's grab the current settings
-		$options = get_option( 'gfpdf_settings' );
-
-		// Let's let devs alter that value coming in
-		$value = apply_filters( 'gfpdf_update_option', $value, $key );
-
-		// Next let's try to update the value
-		$options[ $key ] = $value;
-		$did_update      = update_option( 'gfpdf_settings', $options );
-
-		// If it updated, let's update the global variable
-		if ( $did_update ){
-			global $gfpdf;
-			$gfpdf_options = $gfpdf->data->settings;
-			$gfpdf_options[ $key ] = $value;
-
-		}
-
-		return $did_update;
-	}
-
-	/**
-	 * Remove an option
-	 *
-	 * Removes an Gravity PDF setting value in both the db and the global variable.
-	 *
-	 * @since 4.0
-	 * @param string $key The Key to delete
-	 * @return boolean True if updated, false if not.
-	 */
-	public function delete_option( $key = '' ) {
-
-		// If no key, exit
-		if ( empty( $key ) ){
-			return false;
-		}
-
-		// First let's grab the current settings
-		$options = get_option( 'gfpdf_settings' );
-
-		// Next let's try to update the value
-		if( isset( $options[ $key ] ) ) {
-			unset( $options[ $key ] );
-		}
-
-		$did_update = update_option( 'gfpdf_settings', $options );
-
-		if ( $did_update ) {
-			global $gfpdf;
-			$gfpdf_options = $options;
-		}
-
-		return $did_update;
-	}
+        /* assign our settings */
+        $this->settings = $this->get_settings();
+    }
 
 	/**
 	 * Get Settings
@@ -189,7 +138,7 @@ class Helper_Options {
 	*/
 	public function register_settings() {
 
-		foreach( self::get_registered_settings() as $tab => $settings ) {
+		foreach( $this->get_registered_settings() as $tab => $settings ) {
 
 			foreach ( $settings as $option ) {
 
@@ -239,8 +188,6 @@ class Helper_Options {
 	*/
 	public function get_registered_settings() {
 
-		global $gfpdf;
-
 		/**
 		 * 'Whitelisted' Gravity PDF settings, filters are provided for each settings
 		 * section to allow extensions and other plugins to add their own settings
@@ -254,7 +201,7 @@ class Helper_Options {
 						'name'       => __('Default Paper Size', 'gravitypdf'),
 						'desc'       => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'gravitypdf'),
 						'type'       => 'select',
-						'options'    => self::get_paper_size(),
+						'options'    => $this->get_paper_size(),
 						'inputClass' => 'large',
 						'chosen'     => true,
 						'class'      => 'gfpdf_paper_size',
@@ -276,7 +223,7 @@ class Helper_Options {
 						'name'       => __('Default Template', 'gravitypdf'),
 						'desc'       => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'gravitypdf'),
 						'type'       => 'select',
-						'options'    => self::get_templates(),
+						'options'    => $this->get_templates(),
 						'inputClass' => 'large',
 						'chosen'     => true,
 					),
@@ -286,7 +233,7 @@ class Helper_Options {
 						'name'       => __('Default Font Type', 'gravitypdf'),
 						'desc'       => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'gravitypdf'),
 						'type'       => 'select',
-						'options'    => self::get_installed_fonts(),
+						'options'    => $this->get_installed_fonts(),
 						'inputClass' => 'large',
 						'chosen'     => true,
 					),
@@ -326,7 +273,7 @@ class Helper_Options {
 						'name'        => __('User Restriction', 'gravitypdf'),
 						'desc'        => __('Restrict PDF access to logged in users with this capability. The Administrator Role has no restrictions.', 'gravitypdf'),
 						'type'        => 'select',
-						'options'     => self::get_capabilities(),
+						'options'     => $this->get_capabilities(),
 						'std'         => 'gravityforms_view_entries',
 						'inputClass'  => 'large',
 						'chosen'      => true,
@@ -410,7 +357,7 @@ class Helper_Options {
 						'name'       => __('Template', 'gravitypdf'),
 						'desc'       =>  sprintf(__('Choose from the pre-installed templates or %sbuild your own%s.', 'gravitypdf'), '<a href="#">', '</a>'),
 						'type'       => 'select',
-						'options'    => self::get_templates(),
+						'options'    => $this->get_templates(),
 						'inputClass' => 'large',
 						'chosen'     => true,
 						'tooltip'    => '<h6>' . __('Templates', 'gravitypdf') . '</h6>' . __('Set the template used to generate your PDF.', 'gravitypdf'),
@@ -468,8 +415,8 @@ class Helper_Options {
 						'name'    => __('Paper Size', 'gravitypdf'),
 						'desc'    => __('Set the paper size used when generating PDFs.', 'gravitypdf'),
 						'type'    => 'select',
-						'options' => self::get_paper_size(),
-						'std'     => self::get_option('default_pdf_size'),
+						'options' => $this->get_paper_size(),
+						'std'     => $this->get_option('default_pdf_size'),
 						'inputClass'   => 'large',
 						'class' => 'gfpdf_paper_size',
 						'chosen'  => true,
@@ -484,7 +431,7 @@ class Helper_Options {
 						'chosen'  => true,
 						'required' => true,
 						'class'   => 'gfpdf-hidden gfpdf_paper_size_other',
-						'std'     => self::get_option('default_custom_pdf_size'),
+						'std'     => $this->get_option('default_custom_pdf_size'),
 					),
 
 					'orientation' => array(
@@ -503,8 +450,8 @@ class Helper_Options {
 						'id'      => 'font',
 						'name'    => __('Font', 'gravitypdf'),
 						'type'    => 'select',
-						'options' => self::get_installed_fonts(),
-						'std'     => self::get_option('default_font_type'),
+						'options' => $this->get_installed_fonts(),
+						'std'     => $this->get_option('default_font_type'),
 						'desc'    => __('Set the default font used in the PDF.', 'gravitypdf'),
 						'inputClass'   => 'large',
 						'chosen'  => true,
@@ -519,7 +466,7 @@ class Helper_Options {
 							'Yes' => __('Yes', 'gravitypdf'),
 							'No'  => __('No', 'gravitypdf')
 						),
-						'std'   => self::get_option('default_rtl'),
+						'std'   => $this->get_option('default_rtl'),
 					),
 															
 				)
@@ -567,7 +514,7 @@ class Helper_Options {
 						'name'    => __('Privileges', 'gravitypdf'),
 						'desc'    => 'Restrict end-user capabilities.',
 						'type'    => 'select',
-						'options' => self::get_privilages(),
+						'options' => $this->get_privilages(),
 						'std'     => array(
 							'copy',
 							'print',
@@ -614,46 +561,103 @@ class Helper_Options {
 		return apply_filters( 'gfpdf_registered_settings', $gfpdf_settings );
 	}
 
+
+    
+
 	/**
-	 * If any errors have been passed back from the options.php page we will highlight them
-	 * @param  Array $settings The get_registered_settings() array
-	 * @return Array
+	 * Get an option
+	 *
+	 * Looks to see if the specified setting exists, returns default if not
+	 *
 	 * @since 4.0
+	 * @return mixed
 	 */
-	public function highlight_errors($settings) {
-		global $gfpdf;
+	public function get_option( $key = '', $default = false ) {
 		
-		/* we fire too late to tap into get_settings_error() so our data storage holds the details */
-		$errors = $gfpdf->data->form_settings_errors;
+		$gfpdf_options = $this->settings;
 
-		/* loop through errors if any and highlight the appropriate settings */
-		if(is_array($errors) && sizeof($errors) > 0) {
-			foreach($errors as $error) {
-				/* exit if not an error */
-				if($error['type'] !== 'error') {
-					continue;
-				}
+		$value = ! empty( $gfpdf_options[ $key ] ) ? $gfpdf_options[ $key ] : $default;
+		$value = apply_filters( 'gfpdf_get_option', $value, $key, $default );
+		return apply_filters( 'gfpdf_get_option_' . $key, $value, $key, $default );
+	}
 
-				/* loop through our data until we find a match */
-				$found = false;
-				foreach($settings as $key => &$group) {
-					foreach($group as $id => &$item) {
-						if($item['id'] === $error['code']) {
-							$item['class'] = (isset($item['class'])) ? $item['class'] . ' gfield_error' : 'gfield_error';
-							$found = true;
-							break;
-						}
-					}
+	/**
+	 * Update an option
+	 *
+	 * Updates an Gravity PDF setting value in both the db and the global variable.
+	 * Warning: Passing in an empty, false or null string value will remove
+	 *          the key from the gfpdf_options array.
+	 *
+	 * @since 4.0
+	 * @param string $key The Key to update
+	 * @param string|bool|int $value The value to set the key to
+	 * @return boolean True if updated, false if not.
+	 */
+	public function update_option( $key = '', $value = false ) {
 
-					/* exit outer loop */
-					if($found) {
-						break;
-					}
-				}
-			}
+		// If no key, exit
+		if ( empty( $key ) ){
+			return false;
 		}
 
-		return $settings;
+		if ( empty( $value ) ) {
+			$remove_option = $this->delete_option( $key );
+			return $remove_option;
+		}
+
+		// First let's grab the current settings
+		$options = get_option( 'gfpdf_settings' );
+
+		// Let's let devs alter that value coming in
+		$value = apply_filters( 'gfpdf_update_option', $value, $key );
+
+		// Next let's try to update the value
+		$options[ $key ] = $value;
+		$did_update      = update_option( 'gfpdf_settings', $options );
+
+		// If it updated, let's update the global variable
+		if ( $did_update ){
+			
+			$gfpdf_options = $this->settings;
+			$gfpdf_options[ $key ] = $value;
+
+		}
+
+		return $did_update;
+	}
+
+	/**
+	 * Remove an option
+	 *
+	 * Removes an Gravity PDF setting value in both the db and the global variable.
+	 *
+	 * @since 4.0
+	 * @param string $key The Key to delete
+	 * @return boolean True if updated, false if not.
+	 */
+	public function delete_option( $key = '' ) {
+
+		// If no key, exit
+		if ( empty( $key ) ){
+			return false;
+		}
+
+		// First let's grab the current settings
+		$options = get_option( 'gfpdf_settings' );
+
+		// Next let's try to update the value
+		if( isset( $options[ $key ] ) ) {
+			unset( $options[ $key ] );
+		}
+
+		$did_update = update_option( 'gfpdf_settings', $options );
+
+		if ( $did_update ) {
+			
+			$gfpdf_options = $options;
+		}
+
+		return $did_update;
 	}
 
 	/**
@@ -821,8 +825,8 @@ class Helper_Options {
 	 * @return string $input Sanitizied value
 	 */
 	public function settings_sanitize( $input = array() ) {
-		global $gfpdf;
-		$gfpdf_options = $gfpdf->data->settings;
+		
+		$gfpdf_options = $this->settings;
 
 		if ( empty( $_POST['_wp_http_referer'] ) ) {
 			return $input;
@@ -830,7 +834,7 @@ class Helper_Options {
 
 		parse_str( $_POST['_wp_http_referer'], $referrer );
 
-		$all_settings = self::get_registered_settings();
+		$all_settings = $this->get_registered_settings();
 		$tab          = isset( $referrer['tab'] ) ? $referrer['tab'] : 'general';
 		$settings     = (!empty($all_settings[$tab])) ? $all_settings[$tab] : array();
 
@@ -890,6 +894,7 @@ class Helper_Options {
 		} else {
 			/* store the user data in a transient */
 			set_transient('gfpdf_settings_user_data', array_merge( $gfpdf_options, $input ), 30);
+			$output = $input;
 		}
 
 		return $output;
@@ -957,12 +962,12 @@ class Helper_Options {
 	 * @return void
 	 */
 	public function checkbox_callback( $args ) {
-		global $gfpdf;
-		$gfpdf_options = $gfpdf->data->settings;
+		
+		$gfpdf_options = $this->settings;
 
 		/* add GF settings */
 		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = self::get_form_settings();
+		$gfpdf_form_settings = $this->get_form_settings();
 
 		$checked = isset( $gfpdf_options[ $args['id'] ] ) ? checked( 1, $gfpdf_options[ $args['id'] ], false ) : '';
 		$checked = (empty($checked) && isset( $gfpdf_form_settings[ $pid ][ $args['id']])) ? checked( 1, $gfpdf_form_settings[ $pid ][ $args['id']], false ) : '';
@@ -998,12 +1003,12 @@ class Helper_Options {
 	 * @return void
 	 */
 	public function multicheck_callback( $args ) {
-		global $gfpdf;
-		$gfpdf_options = $gfpdf->data->settings;
+		
+		$gfpdf_options = $this->settings;
 
 		/* add GF settings */
 		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = self::get_form_settings();
+		$gfpdf_form_settings = $this->get_form_settings();
 
 		if ( ! empty( $args['options'] ) ) {
 			foreach( $args['options'] as $key => $option ):
@@ -1031,12 +1036,12 @@ class Helper_Options {
 	 * @return void
 	 */
 	public function radio_callback( $args ) {
-		global $gfpdf;
-		$gfpdf_options = $gfpdf->data->settings;
+		
+		$gfpdf_options = $this->settings;
 
 		/* add GF settings */
 		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = self::get_form_settings();
+		$gfpdf_form_settings = $this->get_form_settings();
 
 		/**
 		 * Determine which key should be selected
@@ -1077,12 +1082,12 @@ class Helper_Options {
 	 * @return void
 	 */
 	public function text_callback( $args ) {
-		global $gfpdf;
-		$gfpdf_options = $gfpdf->data->settings;
+		
+		$gfpdf_options = $this->settings;
 
 		/* add GF settings */
 		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = self::get_form_settings();
+		$gfpdf_form_settings = $this->get_form_settings();
 
 		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
 			$value = $gfpdf_options[ $args['id'] ];
@@ -1124,12 +1129,12 @@ class Helper_Options {
 	 * @return void
 	 */
 	public function number_callback( $args ) {
-		global $gfpdf;
-		$gfpdf_options = $gfpdf->data->settings;
+		
+		$gfpdf_options = $this->settings;
 
 		/* add GF settings */
 		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = self::get_form_settings();
+		$gfpdf_form_settings = $this->get_form_settings();
 
 	    if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
 			$value = $gfpdf_options[ $args['id'] ];
@@ -1165,12 +1170,12 @@ class Helper_Options {
 	 * @return void
 	 */
 	public function textarea_callback( $args ) {
-		global $gfpdf;
-		$gfpdf_options = $gfpdf->data->settings;
+		
+		$gfpdf_options = $this->settings;
 
 		/* add GF settings */
 		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = self::get_form_settings();
+		$gfpdf_form_settings = $this->get_form_settings();
 
 		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
 			$value = $gfpdf_options[ $args['id'] ];
@@ -1201,12 +1206,12 @@ class Helper_Options {
 	 * @return void
 	 */
 	public function password_callback( $args ) {
-		global $gfpdf;
-		$gfpdf_options = $gfpdf->data->settings;
+		
+		$gfpdf_options = $this->settings;
 
 		/* add GF settings */
 		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = self::get_form_settings();
+		$gfpdf_form_settings = $this->get_form_settings();
 
 		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
 			$value = $gfpdf_options[ $args['id'] ];
@@ -1251,12 +1256,12 @@ class Helper_Options {
 	 * @return void
 	 */
 	public function select_callback($args) {
-		global $gfpdf;
-		$gfpdf_options = $gfpdf->data->settings;
+		
+		$gfpdf_options = $this->settings;
 
 		/* add GF settings */
 		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = self::get_form_settings();
+		$gfpdf_form_settings = $this->get_form_settings();
 
 
 		
@@ -1352,12 +1357,12 @@ class Helper_Options {
 	 * @return void
 	 */
 	public function color_select_callback( $args ) {
-		global $gfpdf;
-		$gfpdf_options = $gfpdf->data->settings;
+		
+		$gfpdf_options = $this->settings;
 
 		/* add GF settings */
 		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = self::get_form_settings();
+		$gfpdf_form_settings = $this->get_form_settings();
 
 		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
 			$value = $gfpdf_options[ $args['id'] ];
@@ -1396,11 +1401,11 @@ class Helper_Options {
 	 */
 	public function rich_editor_callback( $args ) {
 		global $gfpdf, $wp_version;
-		$gfpdf_options = $gfpdf->data->settings;
+		$gfpdf_options = $this->settings;
 
 		/* add GF settings */
 		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = self::get_form_settings();
+		$gfpdf_form_settings = $this->get_form_settings();
 
 		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
 			$value = $gfpdf_options[ $args['id'] ];
@@ -1444,12 +1449,12 @@ class Helper_Options {
 	 * @return void
 	 */
 	public function upload_callback( $args ) {
-		global $gfpdf;
-		$gfpdf_options = $gfpdf->data->settings;
+		
+		$gfpdf_options = $this->settings;
 
 		/* add GF settings */
 		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = self::get_form_settings();
+		$gfpdf_form_settings = $this->get_form_settings();
 
 		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
 			$value = $gfpdf_options[$args['id']];
@@ -1483,12 +1488,12 @@ class Helper_Options {
 	 * @return void
 	 */
 	public function color_callback( $args ) {
-		global $gfpdf;
-		$gfpdf_options = $gfpdf->data->settings;
+		
+		$gfpdf_options = $this->settings;
 
 		/* add GF settings */
 		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = self::get_form_settings();
+		$gfpdf_form_settings = $this->get_form_settings();
 
 		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
 			$value = $gfpdf_options[ $args['id'] ];
@@ -1521,7 +1526,7 @@ class Helper_Options {
 	 * @return void
 	 */
 	public function button_callback( $args ) {
-		global $gfpdf;
+		
 
 		$tab = (isset($_GET['tab'])) ? $_GET['tab'] : 'general';
 		$nonce = wp_create_nonce('gfpdf_settings[' . $args['id'] . ']"');
@@ -1555,7 +1560,7 @@ class Helper_Options {
 	public function conditional_logic_callback( $args ) {
 		$args['idOverride'] = $args['id'] . '_conditional_logic';
 
-		self::checkbox_callback($args);
+		$this->checkbox_callback($args);
 		
 		$html = '<div id="'. $args['id'] .'_conditional_logic_container" class="gfpdf_conditional_logic">
 			<!-- content dynamically created from form_admin.js -->
@@ -1573,12 +1578,12 @@ class Helper_Options {
 	 * @return void
 	 */
 	public function hidden_callback( $args ) {
-		global $gfpdf;
-		$gfpdf_options = $gfpdf->data->settings;
+		
+		$gfpdf_options = $this->settings;
 
 		/* add GF settings */
 		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = self::get_form_settings();
+		$gfpdf_form_settings = $this->get_form_settings();
 
 		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
 			$value = $gfpdf_options[ $args['id'] ];
@@ -1607,12 +1612,12 @@ class Helper_Options {
 	 * @return void
 	 */
 	public function paper_size_callback( $args ) {
-		global $gfpdf;
-		$gfpdf_options = $gfpdf->data->settings;
+		
+		$gfpdf_options = $this->settings;
 
 		/* add GF settings */
 		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = self::get_form_settings();
+		$gfpdf_form_settings = $this->get_form_settings();
 
 		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
 			$value = $gfpdf_options[ $args['id'] ];

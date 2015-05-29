@@ -77,6 +77,10 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
          */
          RGForms::add_settings_page($gfpdf->data->short_title, array($this, 'displayPage'));
 
+         /* Ensure any errors are stored correctly */
+         $this->model->setup_form_settings_errors();
+
+         /* run actions and filters */
          $this->add_actions();
          $this->add_filters();
     }
@@ -103,14 +107,13 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
      * @return void
      */
     public function add_filters() {
-        global $gfpdf;
 
         /* Add tooltips */
         add_filter('gform_tooltips', array($this->view, 'add_tooltips'));
 
         /* If trying to save settings page we'll use this filter to apply any errors passed back from options.php */
         if(Stat_Functions::is_gfpdf_page()) {
-            add_filter('gfpdf_registered_settings', array($gfpdf->options, 'highlight_errors'));
+            add_filter('gfpdf_registered_settings', array($this->model, 'highlight_errors'));
         }
 
         /* make capability text user friendly */

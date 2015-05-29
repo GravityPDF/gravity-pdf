@@ -111,7 +111,7 @@ class Test_Settings extends WP_UnitTestCase
 
         $this->controller->add_filters();
 
-        $this->assertEquals(10, has_filter( 'gfpdf_registered_settings', array( $gfpdf->options, 'highlight_errors')));
+        $this->assertEquals(10, has_filter( 'gfpdf_registered_settings', array( $this->model, 'highlight_errors')));
     }
 
     /**

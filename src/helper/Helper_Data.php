@@ -161,55 +161,6 @@ class Helper_Data {
     }
 
     /**
-     * Get the plugin's settings from the database
-     * @since 4.0
-     * @return  void
-     */
-    public function set_plugin_settings(Helper_Options $options) {
-        if ( false == get_option( 'gfpdf_settings' ) ) {
-            add_option( 'gfpdf_settings' );
-        }
-
-        /* assign our settings */
-        $this->settings = $options->get_settings();
-
-        /* set up storage cache for our form settings */
-        $this->form_settings = array();
-
-        /* store errors for later manipulation */
-        $this->setup_form_settings_errors();
-    }
-
-    /**
-     * Get the form setting error and remove any duplicates
-     * @since 4.0
-     * @return  void
-     */
-    public function setup_form_settings_errors() {
-        /* set up a place to access form setting validation errors */
-        $this->form_settings_errors = get_transient( 'settings_errors' );
-                
-        /* remove multiple errors for a single form */
-        if($this->form_settings_errors) {
-            $set                    = false;
-            $updated_settings_error = array();
-
-            /* loop through current errors */
-            foreach($this->form_settings_errors as $error) {
-                if($error['setting'] != 'gfpdf-notices' || !$set) {
-                    $updated_settings_error[] = $error;
-                }
-
-                if($error['setting'] == 'gfpdf-notices') {
-                    $set = true;
-                }
-            }
-            /* update transient */
-            set_transient( 'settings_errors', $updated_settings_error, 30 );
-        }
-    }
-
-    /**
      * Used to set up our PDF template folder,
      * save folder and font folder
      * @since  3.6

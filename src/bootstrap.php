@@ -85,6 +85,11 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
         $this->add_actions();
         $this->add_filters();
 
+        /* load modules */
+        $this->welcome_screen();
+        $this->gf_settings();
+        $this->gf_form_settings();
+
         /* Add localisation support */
         load_plugin_textdomain('gravitypdf', false,  dirname( plugin_basename( __FILE__ ) ) . '/assets/languages/' );
 
@@ -101,9 +106,6 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
 
         /* load our modules */
         add_action('admin_init', array($this, 'setup_settings_fields'));
-        add_action('admin_init', array($this, 'gf_settings'));
-        add_action('admin_init', array($this, 'gf_form_settings'));
-        add_action('admin_init', array($this, 'welcome_screen'));
 
         /* TODO - set our notice action */
         //Stat\Stat_Functions::set_notice_type();
@@ -225,8 +227,8 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
         /* create a new instance of our options object */
         $this->options = new Helper\Helper_Options();
 
-        /* ensure our data layer has everything initialised */
-        $this->data->set_plugin_settings($this->options);
+        /* load our options API */
+        $this->options->init();
 
         /* register our options settings */
         $this->options->register_settings();
