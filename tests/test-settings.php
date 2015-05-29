@@ -103,7 +103,7 @@ class Test_Settings extends WP_UnitTestCase
         
         $this->assertEquals(10, has_filter( 'gform_tooltips', array( $this->view, 'add_tooltips')));
         $this->assertEquals(10, has_filter( 'gfpdf_capability_name', array( $this->model, 'style_capabilities')));
-        $this->assertFalse(has_filter( 'gfpdf_registered_settings', array( 'GFPDF\Stat\Stat_Options_API', 'highlight_errors')));
+        $this->assertFalse(has_filter( 'gfpdf_registered_settings', array( $gfpdf->options, 'highlight_errors')));
 
         /* retest the gfpdf_register_settings filter is added when on the correct screen */
         set_current_screen( 'edit.php' );

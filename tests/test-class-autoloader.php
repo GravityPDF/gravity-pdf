@@ -40,7 +40,7 @@ class Test_Autoloader extends WP_UnitTestCase
 {
 
     /**
-     * Ensure our auto initialiser is firing correctly 
+     * Ensure our auto initialiser is firing correctly
      * @group init
      * @since 4.0
      * @dataProvider provider_classes
@@ -51,7 +51,7 @@ class Test_Autoloader extends WP_UnitTestCase
 
     /**
      * A data provider to check the classes exist
-     * @return Array Our test data 
+     * @return Array Our test data
      * @since 4.0
      */
     public function provider_classes() {
@@ -60,18 +60,17 @@ class Test_Autoloader extends WP_UnitTestCase
             array('GFPDF\Controller\Controller_Settings'),
             array('GFPDF\Controller\Controller_Welcome_Screen'),
 
-            array('GFPDF\Helper\Helper_Controller'),           
-            array('GFPDF\Helper\Helper_Data'),                     
-            array('GFPDF\Helper\Helper_Model'),           
-            array('GFPDF\Helper\Helper_PDF_List_Table'),           
-            array('GFPDF\Helper\Helper_View'),          
+            array('GFPDF\Helper\Helper_Controller'),
+            array('GFPDF\Helper\Helper_Data'),
+            array('GFPDF\Helper\Helper_Model'),
+            array('GFPDF\Helper\Helper_PDF_List_Table'),
+            array('GFPDF\Helper\Helper_View'),
 
-            array('GFPDF\Model\Model_Form_Settings'), 
-            array('GFPDF\Model\Model_Settings'), 
-            array('GFPDF\Model\Model_Welcome_Screen'), 
+            array('GFPDF\Model\Model_Form_Settings'),
+            array('GFPDF\Model\Model_Settings'),
+            array('GFPDF\Model\Model_Welcome_Screen'),
 
-            array('GFPDF\Stat\Stat_Functions'), 
-            array('GFPDF\Stat\Stat_Options_API'), 
+            array('GFPDF\Stat\Stat_Functions'),
 
             array('GFPDF\View\View_Form_Settings'),
             array('GFPDF\View\View_Settings'),
@@ -92,22 +91,22 @@ class Test_Autoloader extends WP_UnitTestCase
 
     /**
      * A data provider to check the classes exist
-     * @return Array Our test data 
+     * @return Array Our test data
      * @since 4.0
      */
     public function provider_interfaces() {
         return array(
-            array('GFPDF\Helper\Helper_Int_Actions'),           
-            array('GFPDF\Helper\Helper_Int_Filters'),                     
+            array('GFPDF\Helper\Helper_Int_Actions'),
+            array('GFPDF\Helper\Helper_Int_Filters'),
         );
-    }  
+    }
 
     /**
-     * Ensure all depreciated classes have appropriate fallbacks 
+     * Ensure all depreciated classes have appropriate fallbacks
      * @group init
-     * @since 4.0     
-     */    
+     * @since 4.0
+     */
     public function test_depreciated() {
         $this->markTestIncomplete('This test has not been implimented yet');
-    }       
+    }
 }

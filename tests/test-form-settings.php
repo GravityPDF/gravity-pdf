@@ -4,7 +4,6 @@ namespace GFPDF\Tests;
 use GFPDF\Controller\Controller_Form_Settings;
 use GFPDF\Model\Model_Form_Settings;
 use GFPDF\View\View_Form_Settings;
-use GFPDF\Stat\Stat_Options_API;
 use WP_UnitTestCase;
 use GFAPI;
 use GFForms;
@@ -170,7 +169,7 @@ class Test_Form_Settings extends WP_UnitTestCase
      */
     public function test_filters() {
         global $gfpdf;
-        
+
         /* validation filters */
         $this->assertEquals(10, has_filter( 'gfpdf_form_settings', array( $this->model, 'validation_error')));
         $this->assertEquals(10, has_filter( 'gfpdf_form_settings_appearance', array( $this->model, 'validation_error')));
@@ -434,11 +433,13 @@ class Test_Form_Settings extends WP_UnitTestCase
      * @group form-settings
      */
     public function test_validation_error() {
+        global $gfpdf;
+
         /* remove validation filter on settings */
         remove_all_filters( 'gfpdf_form_settings' );
 
         /* get our fields */
-        $all_fields = Stat_Options_API::get_registered_settings();
+        $all_fields = $gfpdf->options->get_registered_settings();
         $fields     = $all_fields['form_settings'];
 
         /* check there are no issues if not meant to be validated */
