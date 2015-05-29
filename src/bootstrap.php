@@ -90,7 +90,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
 
     }
 
-    /**`
+    /**
      * Add required plugin actions
      * @since 4.0
      * @return void
@@ -137,10 +137,9 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
      */
     private function register_styles() {
         $version = PDF_EXTENDED_VERSION;
-        $suffix  = '';
+        $suffix = '.min.';
         if(defined('WP_DEBUG') && WP_DEBUG === true) {
-            //$version = time();
-            //$suffix = '.min.';
+            $suffix  = '';
         }
 
         wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'src/assets/css/gfpdf-styles'. $suffix .'.css', array(), $version);
@@ -156,10 +155,9 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
     private function register_scripts() {
 
         $version = PDF_EXTENDED_VERSION;
-        $suffix  = '';
+        $suffix  = '.min.';
         if(defined('WP_DEBUG') && WP_DEBUG === true) {
-            //$version = time();
-            //$suffix = '.min.';
+            $suffix = '';
         }
 
         wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-settings'. $suffix .'.js', array('wpdialogs', 'jquery-ui-tooltip', 'gform_form_admin', 'jquery-color'), $version );
@@ -170,14 +168,6 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
         * Localise admin script
         */
         wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $this->data->get_localised_script_data() );
-
-        /*
-        * Register our scripts/styles with Gravity Forms to prevent them being removed in no conflict mode
-        */
-        //add_filter('gform_noconflict_scripts', array('GFPDF_Core', 'register_gravityform_scripts'));
-        //add_filter('gform_noconflict_styles', array('GFPDF_Core', 'register_gravityform_styles'));
-
-        //add_filter('gform_tooltips', array('GFPDF_Notices', 'add_tooltips'));
     }
 
 
