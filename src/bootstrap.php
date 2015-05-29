@@ -11,7 +11,7 @@ use GFPDF_Core;
 
 /**
  * Bootstrap / Router Class
- * The bootstrap is loaded on WordPress 'plugins_loaded' functionality 
+ * The bootstrap is loaded on WordPress 'plugins_loaded' functionality
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
@@ -43,7 +43,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 */
 
 /*
- * Load autoload functionality 
+ * Load autoload functionality
  */
 require_once(PDF_PLUGIN_DIR . 'src/autoload.php');
 
@@ -51,37 +51,42 @@ require_once(PDF_PLUGIN_DIR . 'src/autoload.php');
  * @since 4.0
  */
 class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
+    
     /**
-     * Holds our GFPDF_Helper_Data object 
-     * which we can autoload with any data needed 
+     * Holds our Helper_Data object
+     * which we can autoload with any data needed
      * @var Object
+     * @since 4.0
      */
     public $data;
+
+    /**
+     * Holds our Helper_Options object
+     * Makes it easy to access global PDF settings and individual form PDF settings
+     * @var Object
+     * @since 4.0
+     */
+    public $options;
 
     /**
      * Setup our plugin functionality
      * Note: Fires on WordPress' init hook
      * @since 4.0
      */
-    public function init() {  
+    public function init() {
         /* Set up our data access layer */
         $this->data = new Helper\Helper_Data();
-        $this->data->init();    
+        $this->data->init();
 
         /**
-         * Run generic actions and filters needed to get the plugin functional 
-         * The controllers will set more specific actions / filters as needed 
+         * Run generic actions and filters needed to get the plugin functional
+         * The controllers will set more specific actions / filters as needed
          */
         $this->add_actions();
         $this->add_filters();
 
-        /* load modules */
-        $this->welcome_screen();
-        $this->gf_settings();
-        $this->gf_form_settings();
-
-        /* Add localisation support */       
-        load_plugin_textdomain('gravitypdf', false,  dirname( plugin_basename( __FILE__ ) ) . '/assets/languages/' );  
+        /* Add localisation support */
+        load_plugin_textdomain('gravitypdf', false,  dirname( plugin_basename( __FILE__ ) ) . '/assets/languages/' );
 
     }
 
@@ -94,10 +99,14 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
         add_action('init', array($this, 'register_assets'), 10);
         add_action('init', array($this, 'load_assets'), 15);
 
+        /* load our modules */
         add_action('admin_init', array($this, 'setup_settings_fields'));
+        add_action('admin_init', array($this, 'gf_settings'));
+        add_action('admin_init', array($this, 'gf_form_settings'));
+        add_action('admin_init', array($this, 'welcome_screen'));
 
         /* TODO - set our notice action */
-        //Stat\Stat_Functions::set_notice_type(); 
+        //Stat\Stat_Functions::set_notice_type();
     }
 
     /**
@@ -112,13 +121,13 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
     }
 
     /**
-     * Register all css and js which can be enqueued when needed 
+     * Register all css and js which can be enqueued when needed
      * @since 4.0
      * @return void
      */
-    public function register_assets() {        
+    public function register_assets() {
         $this->register_styles();
-        $this->register_scripts();        
+        $this->register_scripts();
     }
 
     /**
@@ -134,8 +143,8 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
             //$suffix = '.min.';
         }
 
-        wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'src/assets/css/gfpdf-styles'. $suffix .'.css', array(), $version);       
-        wp_register_style( 'gfpdf_css_chosen_style', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.min.css', array('wp-jquery-ui-dialog'), $version );     
+        wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'src/assets/css/gfpdf-styles'. $suffix .'.css', array(), $version);
+        wp_register_style( 'gfpdf_css_chosen_style', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.min.css', array('wp-jquery-ui-dialog'), $version );
     }
 
     /**
@@ -153,9 +162,9 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
             //$suffix = '.min.';
         }
 
-        wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-settings'. $suffix .'.js', array('wpdialogs', 'jquery-ui-tooltip', 'gform_form_admin', 'jquery-color'), $version );           
-        wp_register_script( 'gfpdf_js_backbone', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-backbone'. $suffix .'.js', array('gfpdf_js_settings', 'backbone', 'underscore'), $version );           
-        wp_register_script( 'gfpdf_js_chosen', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.jquery.min.js', array('jquery'), $version );                   
+        wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-settings'. $suffix .'.js', array('wpdialogs', 'jquery-ui-tooltip', 'gform_form_admin', 'jquery-color'), $version );
+        wp_register_script( 'gfpdf_js_backbone', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-backbone'. $suffix .'.js', array('gfpdf_js_settings', 'backbone', 'underscore'), $version );
+        wp_register_script( 'gfpdf_js_chosen', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.jquery.min.js', array('jquery'), $version );
 
         /*
         * Localise admin script
@@ -165,65 +174,72 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
         /*
         * Register our scripts/styles with Gravity Forms to prevent them being removed in no conflict mode
         */
-        //add_filter('gform_noconflict_scripts', array('GFPDF_Core', 'register_gravityform_scripts')); 
-        //add_filter('gform_noconflict_styles', array('GFPDF_Core', 'register_gravityform_styles')); 
+        //add_filter('gform_noconflict_scripts', array('GFPDF_Core', 'register_gravityform_scripts'));
+        //add_filter('gform_noconflict_styles', array('GFPDF_Core', 'register_gravityform_styles'));
 
-        //add_filter('gform_tooltips', array('GFPDF_Notices', 'add_tooltips'));  
+        //add_filter('gform_tooltips', array('GFPDF_Notices', 'add_tooltips'));
     }
 
 
     /**
-     * Load any assets that are needed 
+     * Load any assets that are needed
      * @since 4.0
      * @return void
      */
-    public function load_assets() {        
+    public function load_assets() {
         if(Stat\Stat_Functions::is_gfpdf_page()) {
             /* load styles */
-            wp_enqueue_style('gfpdf_css_styles');       
+            wp_enqueue_style('gfpdf_css_styles');
             wp_enqueue_style('gfpdf_css_chosen_style');
 
             /* load scripts */
-            wp_enqueue_script('gfpdf_js_settings');       
-            wp_enqueue_script('gfpdf_js_chosen');       
-        }  
+            wp_enqueue_script('gfpdf_js_settings');
+            wp_enqueue_script('gfpdf_js_chosen');
+        }
 
         if(Stat\Stat_Functions::is_gfpdf_settings_tab('help')) {
              wp_enqueue_script('gfpdf_js_backbone');
-        }      
+        }
     }
 
      /**
      * Auto no-conflict any preloaded scripts / styles that begin with 'gfpdf_'
      * @since 4.0
      * @return void
-     */   
+     */
     public function auto_noconflict_gfpdf($items) {
         $wp_scripts = wp_scripts();
         $wp_styles  = wp_styles();
 
-        foreach($wp_scripts->queue as $object) { 
+        foreach($wp_scripts->queue as $object) {
             if(substr($object, 0, 8) === 'gfpdf_js') {
                 $items[] = $object;
             }
         }
 
-        foreach($wp_styles->queue as $object) { 
+        foreach($wp_styles->queue as $object) {
             if(substr($object, 0, 9) === 'gfpdf_css') {
                 $items[] = $object;
             }
-        }        
+        }
 
         return $items;
     }
 
     /**
      * Register our admin settings
-     * @return void 
+     * @return void
      * @return 4.0
      */
     public function setup_settings_fields() {
-        Stat\Stat_Options_API::register_settings();        
+        /* create a new instance of our options object */
+        $this->options = new Helper\Helper_Options();
+
+        /* ensure our data layer has everything initialised */
+        $this->data->set_plugin_settings($this->options);
+
+        /* register our options settings */
+        $this->options->register_settings();
     }
 
     
@@ -233,7 +249,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
      * @since 4.0
      * @return void
      */
-    private function welcome_screen() {
+    public function welcome_screen() {
 
         $model = new Model\Model_Welcome_Screen();
         $view  = new View\View_Welcome_Screen(array(
@@ -245,40 +261,40 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
     }
 
     /**
-     * Include Settings Page functionality 
+     * Include Settings Page functionality
      * @since 4.0
      * @return void
      */
-    private function gf_settings() {
+    public function gf_settings() {
         
         $model = new Model\Model_Settings();
         $view  = new View\View_Settings(array(
         
         ));
 
-        $class = new Controller\Controller_Settings($model, $view);        
+        $class = new Controller\Controller_Settings($model, $view);
         $class->init();
-    }  
+    }
 
     /**
      * Include Form Settings (PDF) functionality
      * @since 4.0
      * @return void
      */
-    private function gf_form_settings() {
+    public function gf_form_settings() {
         
         $model = new Model\Model_Form_Settings();
         $view  = new View\View_Form_Settings(array(
         
         ));
 
-        $class = new Controller\Controller_Form_Settings($model, $view);        
+        $class = new Controller\Controller_Form_Settings($model, $view);
         $class->init();
-    }       
+    }
 }
 
 
 /**
- * Execute our bootstrap class 
+ * Execute our bootstrap class
  */
 new GFPDF_Core();

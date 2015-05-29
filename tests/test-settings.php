@@ -45,40 +45,40 @@ class Test_Settings extends WP_UnitTestCase
 
     /**
      * Our Settings Controller
-     * @var Object 
+     * @var Object
      * @since 4.0
      */
     public $controller;
 
     /**
      * Our Settings Model
-     * @var Object 
+     * @var Object
      * @since 4.0
      */
     public $model;
 
     /**
      * Our Settings View
-     * @var Object 
+     * @var Object
      * @since 4.0
      */
-    public $view;    
+    public $view;
 
     /**
-     * The WP Unit Test Set up function 
+     * The WP Unit Test Set up function
      * @since 4.0
      */
-    public function setUp() {        
+    public function setUp() {
 
         /* run parent method */
-        parent::setUp();       
+        parent::setUp();
 
-        /* Setup our test classes */          
+        /* Setup our test classes */
         $this->model = new Model_Settings();
         $this->view  = new View_Settings(array());
 
         $this->controller = new Controller_Settings($this->model, $this->view);
-        $this->controller->init(); 
+        $this->controller->init();
     }
 
     /**
@@ -99,6 +99,8 @@ class Test_Settings extends WP_UnitTestCase
      * @group settings
      */
     public function test_filters() {
+        global $gfpdf;
+        
         $this->assertEquals(10, has_filter( 'gform_tooltips', array( $this->view, 'add_tooltips')));
         $this->assertEquals(10, has_filter( 'gfpdf_capability_name', array( $this->model, 'style_capabilities')));
         $this->assertFalse(has_filter( 'gfpdf_registered_settings', array( 'GFPDF\Stat\Stat_Options_API', 'highlight_errors')));
@@ -109,14 +111,14 @@ class Test_Settings extends WP_UnitTestCase
 
         $this->controller->add_filters();
 
-        $this->assertEquals(10, has_filter( 'gfpdf_registered_settings', array( 'GFPDF\Stat\Stat_Options_API', 'highlight_errors')));
-    }  
+        $this->assertEquals(10, has_filter( 'gfpdf_registered_settings', array( $gfpdf->options, 'highlight_errors')));
+    }
 
     /**
      * Test all required custom meta boxes are added
      * @since 4.0
      * @group settings
-     */    
+     */
     public function test_meta_boxes() {
         global $wp_meta_boxes;
 
@@ -131,19 +133,19 @@ class Test_Settings extends WP_UnitTestCase
         /* check they are not empty */
         $this->assertNotEquals(0, sizeof($wp_meta_boxes['pdf-help-and-support']['row-1']['default']));
         $this->assertNotEquals(0, sizeof($wp_meta_boxes['pdf-help-and-support']['row-2']['default']));
-    }  
+    }
 
     /**
      * Test the forum endpoint is returning the correct response
      * @since 4.0
      * @group settings
-     */  
+     */
     public function test_latest_forum_endpoint() {
         /* set a correct response */
         add_filter( 'pre_http_request', function($return, $r, $url) {
-           $r['body'] = file_get_contents( PDF_PLUGIN_DIR . 'tests/json/latest-posts.json' );           
+           $r['body'] = file_get_contents( PDF_PLUGIN_DIR . 'tests/json/latest-posts.json' );
            return $r;
-        }, 10, 3);      
+        }, 10, 3);
 
         /* check for correct results */
         $response = $this->model->get_latest_forum_topics();
@@ -154,13 +156,13 @@ class Test_Settings extends WP_UnitTestCase
      * Test the forum endpoint caching works as expected
      * @since 4.0
      * @group settings
-     */  
+     */
     public function test_endpoint_caching() {
         set_transient('gfpdf_latest_forum_topics', 'checking results', 86400);
 
         $this->assertEquals('checking results', $this->model->get_latest_forum_topics());
 
-        delete_transient('gfpdf_latest_forum_topics');        
+        delete_transient('gfpdf_latest_forum_topics');
     }
 
     /**
@@ -168,14 +170,14 @@ class Test_Settings extends WP_UnitTestCase
      * Note: had to split this out of the original endpoint as WP appeared to be caching the results (wasn't going to case the 'whys' so split it out in own method)
      * @since 4.0
      * @group settings
-     */  
+     */
     public function test_latest_forum_endpoint_error() {
         /* check for appropriate errors */
         add_filter( 'pre_http_request', function($return, $r, $url) {
-           return new WP_Error('problem', 'Cannot load endpoint');           
-        }, 10, 3);              
+           return new WP_Error('problem', 'Cannot load endpoint');
+        }, 10, 3);
 
         /* check error thrown */
-        $this->assertFalse($this->model->get_latest_forum_topics());        
+        $this->assertFalse($this->model->get_latest_forum_topics());
     }
 }

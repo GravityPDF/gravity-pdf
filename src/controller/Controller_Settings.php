@@ -58,27 +58,27 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
     {
         /* load our model and view */
         $this->model = $model;
-        $this->model->setController($this);   
+        $this->model->setController($this);
 
-        $this->view  = $view;        
+        $this->view  = $view;
     }
 
     /**
-     * Initialise our class defaults 
+     * Initialise our class defaults
      * @since 4.0
      * @return void
      */
     public function init() {
         global $gfpdf;
         
-        /* 
+        /*
          * Tell Gravity Forms to initiate our settings page
          * Using the following Class/Model
-         */ 
-         RGForms::add_settings_page($gfpdf->data->short_title, array($this, 'displayPage'));            
+         */
+         RGForms::add_settings_page($gfpdf->data->short_title, array($this, 'displayPage'));
 
          $this->add_actions();
-         $this->add_filters();       
+         $this->add_filters();
     }
 
     /**
@@ -88,10 +88,10 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
      */
     public function add_actions() {
         /* Load our settings meta boxes */
-        add_action('current_screen', array($this->model, 'add_meta_boxes')); 
+        add_action('current_screen', array($this->model, 'add_meta_boxes'));
 
         /* Display our system status on general and tools pages */
-        add_action('pdf-settings-general', array($this->view, 'system_status'));        
+        add_action('pdf-settings-general', array($this->view, 'system_status'));
         add_action('pdf-settings-tools', array($this->view, 'system_status'));
         add_action('pdf-settings-tools', array($this->view, 'uninstaller'), 20);
 
@@ -103,20 +103,22 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
      * @return void
      */
     public function add_filters() {
+        global $gfpdf;
+
         /* Add tooltips */
         add_filter('gform_tooltips', array($this->view, 'add_tooltips'));
 
         /* If trying to save settings page we'll use this filter to apply any errors passed back from options.php */
         if(Stat_Functions::is_gfpdf_page()) {
-            add_filter('gfpdf_registered_settings', array('GFPDF\Stat\Stat_Options_API', 'highlight_errors'));            
-        }        
+            add_filter('gfpdf_registered_settings', array($gfpdf->options, 'highlight_errors'));
+        }
 
         /* make capability text user friendly */
         add_filter('gfpdf_capability_name', array($this->model, 'style_capabilities'));
     }
 
     /**
-     * Display the settings page for Gravity PDF 
+     * Display the settings page for Gravity PDF
      * @since 4.0
      * @return void
      */
@@ -128,7 +130,7 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
 
         switch($page) {
           case 'general':
-            $this->view->general();      
+            $this->view->general();
           break;
 
           case 'tools':
@@ -136,8 +138,8 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
           break;
 
           case 'help':
-            $this->view->help();      
+            $this->view->help();
           break;
-        }      
-    } 
+        }
+    }
 }

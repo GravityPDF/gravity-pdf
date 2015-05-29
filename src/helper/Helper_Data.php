@@ -1,12 +1,12 @@
 <?php
 
 namespace GFPDF\Helper;
-use GFPDF\Stat\Stat_Options_API;
+use GFPDF\Helper\Helper_Options;
 use PDF_Common;
 use GFCommon;
 
 /**
- * Data overloaded Helper Class 
+ * Data overloaded Helper Class
  * Cache shared data across the plugin
  *
  * @package     Gravity PDF
@@ -43,16 +43,16 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 class Helper_Data {
     /**
-     * Location for the overloaded data         
+     * Location for the overloaded data
      * @var array
      * @since 4.0
      */
     private $data = array();
 
     /**
-     * PHP Magic Method __set() 
+     * PHP Magic Method __set()
      * Run when writing data to inaccessible properties
-     * @param string $name  Name of the peroperty being interacted with 
+     * @param string $name  Name of the peroperty being interacted with
      * @param mixed $value  Data to assign to the $name property
      * @since 4.0
      */
@@ -63,7 +63,7 @@ class Helper_Data {
     /**
      * PHP Magic Method __get()
      * Run when reading data from inaccessible properties
-     * @param string $name  Name of the property being interacted with 
+     * @param string $name  Name of the property being interacted with
      * @return mixed        The data assigned to the $name property is returned
      * @since 4.0
      */
@@ -89,8 +89,8 @@ class Helper_Data {
 
     /**
      * PHP Magic Method __isset()
-     * Triggered when isset() or empty() is called on inaccessible properties 
-     * @param  string  $name Name of the property being interacted with 
+     * Triggered when isset() or empty() is called on inaccessible properties
+     * @param  string  $name Name of the property being interacted with
      * @return boolean       Whether property exists
      * @since 4.0
      */
@@ -100,8 +100,8 @@ class Helper_Data {
 
     /**
      * PHP Magic Method __isset()
-     * Triggered when unset() is called on inaccessible properties 
-     * @param  string  $name Name of the property being interacted with 
+     * Triggered when unset() is called on inaccessible properties
+     * @param  string  $name Name of the property being interacted with
      * @return void
      * @since 4.0
      */
@@ -110,7 +110,7 @@ class Helper_Data {
     }
 
     /**
-     * Set up addon array for use tracking active addons 
+     * Set up addon array for use tracking active addons
      * @since  3.8
      */
     public function set_addon_details() {
@@ -118,24 +118,23 @@ class Helper_Data {
     }
 
     /**
-     * Set up any default data that should be stored 
+     * Set up any default data that should be stored
      * @return void
      * @since 3.8
      */
     public function init() {
         $this->set_working_folder();
         $this->set_directory_structure();
-        $this->set_plugin_settings();
         $this->set_licensing();
         $this->set_plugin_titles();
     }
 
     /**
      * Set up our short title, long title and slug used in settings pages
-     * @return  void 
+     * @return  void
      * @since  4.0
      */
-    public function set_plugin_titles() {   
+    public function set_plugin_titles() {
         $this->short_title = __('PDF', 'gravitypdf');
         $this->title       = __('Gravity PDF', 'gravitypdf');
         $this->slug        = 'pdf';
@@ -143,7 +142,7 @@ class Helper_Data {
 
     /**
      * Set the folder name we'll be using to hold custom templates / PDFs
-     * @return  void 
+     * @return  void
      * @since  4.0
      */
     public function set_working_folder() {
@@ -152,27 +151,27 @@ class Helper_Data {
 
     /**
      * Set up our license model for later use
-     * @return  void 
+     * @return  void
      * @since  4.0
-     */    
+     */
     public function set_licensing() {
          /* Set up our licensing */
-         //$this->license = new License_Model();    
-         $this->store_url = 'https://gravitypdf.com/';    
+         //$this->license = new License_Model();
+         $this->store_url = 'https://gravitypdf.com/';
     }
 
     /**
-     * Get the plugin's settings from the database 
+     * Get the plugin's settings from the database
      * @since 4.0
      * @return  void
      */
-    public function set_plugin_settings() {
+    public function set_plugin_settings(Helper_Options $options) {
         if ( false == get_option( 'gfpdf_settings' ) ) {
             add_option( 'gfpdf_settings' );
         }
 
         /* assign our settings */
-        $this->settings = Stat_Options_API::get_settings();         
+        $this->settings = $options->get_settings();
 
         /* set up storage cache for our form settings */
         $this->form_settings = array();
@@ -182,7 +181,7 @@ class Helper_Data {
     }
 
     /**
-     * Get the form setting error and remove any duplicates 
+     * Get the form setting error and remove any duplicates
      * @since 4.0
      * @return  void
      */
@@ -199,28 +198,28 @@ class Helper_Data {
             foreach($this->form_settings_errors as $error) {
                 if($error['setting'] != 'gfpdf-notices' || !$set) {
                     $updated_settings_error[] = $error;
-                }                
+                }
 
                 if($error['setting'] == 'gfpdf-notices') {
                     $set = true;
-                } 
+                }
             }
             /* update transient */
             set_transient( 'settings_errors', $updated_settings_error, 30 );
-        }        
+        }
     }
 
     /**
-     * Used to set up our PDF template folder, 
+     * Used to set up our PDF template folder,
      * save folder and font folder
      * @since  3.6
      */
     public function set_directory_structure()
     {
-        $upload_dir = PDF_Common::get_upload_dir();        
+        $upload_dir = PDF_Common::get_upload_dir();
         /*
-         * As of Gravity PDF 3.7 we'll be dropping the 'site_name' folder for single installs 
-         * And changing multisite installs to their site ID         
+         * As of Gravity PDF 3.7 we'll be dropping the 'site_name' folder for single installs
+         * And changing multisite installs to their site ID
          */
        
         $this->template_location              = apply_filters('gfpdfe_template_location', $upload_dir['basedir'] . '/' . $this->working_folder . '/', $upload_dir['basedir'], $this->working_folder);
@@ -228,15 +227,15 @@ class Helper_Data {
         $this->template_save_location         = $this->template_location . 'output/';
         $this->template_font_location         = $this->template_location . 'fonts/';
 
-        $this->settings_url                   = admin_url('admin.php?page=gf_settings&subview=PDF'); 
+        $this->settings_url                   = admin_url('admin.php?page=gf_settings&subview=PDF');
         
         $this->template_location_url          = apply_filters('gfpdfe_template_location_uri', $upload_dir['baseurl'] . '/' . $this->working_folder . '/', $upload_dir['baseurl'], $this->working_folder);
         $this->template_site_location_url     = $this->template_location_url;
         $this->template_save_location_url     = $this->template_location_url . 'output/';
-        $this->template_font_location_url     = $this->template_location_url . 'fonts/';        
+        $this->template_font_location_url     = $this->template_location_url . 'fonts/';
 
         /*
-         * Use the network ID for multisite installs 
+         * Use the network ID for multisite installs
          */
         if(is_multisite()) {
             $blog_id                              = get_current_blog_id();
@@ -247,21 +246,21 @@ class Helper_Data {
             
             $this->template_site_location_url     = $this->template_location_url . $blog_id . '/';
             $this->template_save_location_url     = $this->template_site_location_url . 'output/';
-            $this->template_font_location_url     = $this->template_site_location_url . 'fonts/';  
+            $this->template_font_location_url     = $this->template_site_location_url . 'fonts/';
             
-        }    
+        }
 
         /*
-         * Include old template locations to help with migrations 
-         */        
+         * Include old template locations to help with migrations
+         */
         $this->upload_dir                 = $upload_dir['basedir'];
 
         /*
-         * Include relative paths for display on the support pages 
+         * Include relative paths for display on the support pages
          */
         $this->relative_output_location = str_replace(ABSPATH, '/', $this->template_save_location);
         $this->relative_font_location   = str_replace(ABSPATH, '/', $this->template_font_location);
-        $this->relative_mpdf_tmp        = str_replace(ABSPATH, '/', PDF_PLUGIN_DIR) . 'mPDF/tmp/';        
+        $this->relative_mpdf_tmp        = str_replace(ABSPATH, '/', PDF_PLUGIN_DIR) . 'mPDF/tmp/';
     }
 
     /**
@@ -278,13 +277,13 @@ class Helper_Data {
             'general_advanced_hide'       => __('Hide Advanced Options...', 'gravitypdf'),
             'tools_template_copy_confirm' => __('Continue', 'gravitypdf'),
             'tools_uninstall_confirm'     => __('Uninstall', 'gravitypdf'),
-            'tools_cancel'                => __('Cancel', 'gravitypdf'),   
-            'pdf_list_delete_confirm'     => __('Delete', 'gravitypdf'),   
+            'tools_cancel'                => __('Cancel', 'gravitypdf'),
+            'pdf_list_delete_confirm'     => __('Delete', 'gravitypdf'),
             'active'                      => __('Active', 'gravitypdf'),
             'inactive'                    => __('Inactive', 'gravitypdf'),
             'conditionalText'             => __('Enable this PDF if', 'gravitypdf'),
-            'help_search_placeholder'     => __('Search the Gravity PDF Knowledgebase...', 'gravitypdf'),  
-            'ajax_error'                  => __('There was an error processing your request. Please try again.', 'gravitypdf'),                
-        ));        
+            'help_search_placeholder'     => __('Search the Gravity PDF Knowledgebase...', 'gravitypdf'),
+            'ajax_error'                  => __('There was an error processing your request. Please try again.', 'gravitypdf'),
+        ));
     }
 }

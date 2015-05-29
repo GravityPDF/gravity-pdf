@@ -92,6 +92,9 @@ class Test_Form_Settings extends WP_UnitTestCase
         /* import our Gravity Form */
         $this->import_form();
 
+        /* ensure our admin hooks trigger */
+        do_action('admin_init');
+
         /* Setup our test classes */
         $this->model = new Model_Form_Settings();
         $this->view  = new View_Form_Settings(array());
@@ -166,14 +169,16 @@ class Test_Form_Settings extends WP_UnitTestCase
      * @group form-settings
      */
     public function test_filters() {
+        global $gfpdf;
+        
         /* validation filters */
         $this->assertEquals(10, has_filter( 'gfpdf_form_settings', array( $this->model, 'validation_error')));
         $this->assertEquals(10, has_filter( 'gfpdf_form_settings_appearance', array( $this->model, 'validation_error')));
 
         /* core sanitation functions */
-        $this->assertEquals(10, has_filter( 'gfpdf_settings_sanitize_text', array('GFPDF\Stat\Stat_Options_API', 'sanitize_text_field') ));
-        $this->assertEquals(10, has_filter( 'gfpdf_settings_sanitize_paper_size', array('GFPDF\Stat\Stat_Options_API', 'sanitize_paper_size_field'), 10, 3 ));
-        $this->assertEquals(10, has_filter( 'gfpdf_settings_sanitize_select', array('GFPDF\Stat\Stat_Options_API', 'sanitize_select_field')));
+        $this->assertEquals(10, has_filter( 'gfpdf_settings_sanitize_text', array($gfpdf->options, 'sanitize_text_field') ));
+        $this->assertEquals(10, has_filter( 'gfpdf_settings_sanitize_paper_size', array($gfpdf->options, 'sanitize_paper_size_field'), 10, 3 ));
+        $this->assertEquals(10, has_filter( 'gfpdf_settings_sanitize_select', array($gfpdf->options, 'sanitize_select_field')));
 
         /* custom sanitation functions */
         $this->assertEquals(10, has_filter( 'gfpdf_form_settings_sanitize_text', 'wp_strip_all_tags'));

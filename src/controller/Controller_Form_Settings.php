@@ -98,15 +98,16 @@ class Controller_Form_Settings extends Helper_Controller implements Helper_Int_A
      * @return void
      */
     public function add_filters() {
+        global $gfpdf;
 
         /* Add Validation Errors */
         add_filter( 'gfpdf_form_settings', array($this->model, 'validation_error'));
         add_filter( 'gfpdf_form_settings_appearance', array($this->model, 'validation_error'));
 
         /* register our core santize functions */
-        add_filter( 'gfpdf_settings_sanitize_text', array('GFPDF\Stat\Stat_Options_API', 'sanitize_text_field') );
-        add_filter( 'gfpdf_settings_sanitize_paper_size', array('GFPDF\Stat\Stat_Options_API', 'sanitize_paper_size_field'), 10, 3 );
-        add_filter( 'gfpdf_settings_sanitize_select', array('GFPDF\Stat\Stat_Options_API', 'sanitize_select_field'), 10, 4 );
+        add_filter( 'gfpdf_settings_sanitize_text', array($gfpdf->options, 'sanitize_text_field') );
+        add_filter( 'gfpdf_settings_sanitize_paper_size', array($gfpdf->options, 'sanitize_paper_size_field'), 10, 3 );
+        add_filter( 'gfpdf_settings_sanitize_select', array($gfpdf->options, 'sanitize_select_field'), 10, 4 );
 
         /* Register custom sanitize functionality */
         add_filter( 'gfpdf_form_settings_sanitize_text', 'wp_strip_all_tags', 10);

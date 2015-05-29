@@ -3,7 +3,7 @@
 namespace GFPDF\Model;
 use GFPDF\Helper\Helper_Model;
 use GFPDF\Helper\Helper_PDF_List_Table;
-use GFPDF\Stat\Stat_Options_API;
+use GFPDF\Helper\Helper_Options;
 use RGFormsModel;
 use GFFormsModel;
 use GFCommon;
@@ -423,7 +423,7 @@ class Model_Form_Settings extends Helper_Model {
     }
 
     /**
-     * Similar to GFPDF\Stat\Stat_Options_API::settings_sanitize() except we are storing/processing values
+     * Similar to Helper_Options->settings_sanitize() except we are storing/processing values
      * in Gravity Forms meta table
      * @param  array  $input Fields to process
      * @return array         Sanitized fields
@@ -431,8 +431,9 @@ class Model_Form_Settings extends Helper_Model {
      * @since 4.0
      */
     public function settings_sanitize($input = array()) {
-
-        $settings = Stat_Options_API::get_registered_settings();
+        global $gfpdf;
+        
+        $settings = $gfpdf->options->get_registered_settings();
         $sections = array('form_settings', 'form_settings_appearance', 'form_settings_advanced');
 
         foreach($sections as $s) {
