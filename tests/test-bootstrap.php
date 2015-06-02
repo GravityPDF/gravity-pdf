@@ -41,44 +41,44 @@ class Test_Bootstrap extends WP_UnitTestCase
 {
     /**
      * Our Gravity PDF Router object
-     * @var Object 
+     * @var Object
      * @since 4.0
      */
-    public $loader;  
+    public $loader;
 
     /**
-     * The WP Unit Test Set up function 
+     * The WP Unit Test Set up function
      * @since 4.0
      */
     public function setUp() {
         /* run parent method */
-        parent::setUp();       
+        parent::setUp();
 
-        /* Setup out loader class */          
+        /* Setup out loader class */
         $this->loader = new Router();
-        $this->loader->init();        
-    }     
+        $this->loader->init();
+    }
 
     /**
-     * Test the global bootstrap actions are applied 
+     * Test the global bootstrap actions are applied
      * @since 4.0
      * @return void
      */
     public function test_actions() {
         $this->assertEquals(10, has_action('init', array($this->loader, 'register_assets')));
         $this->assertEquals(15, has_action('init', array($this->loader, 'load_assets')));
-        $this->assertEquals(10, has_action('admin_init', array($this->loader, 'setup_settings_fields')));        
-    }   
+        $this->assertEquals(10, has_action('admin_init', array($this->loader, 'setup_settings_fields')));
+    }
 
     /**
-     * Test the global bootstrap filters are applied 
+     * Test the global bootstrap filters are applied
      * @since 4.0
      * @return void
      */
     public function test_filters() {
-        $this->assertEquals(10, has_filter('gform_noconflict_scripts', array($this->loader, 'auto_noconflict_gfpdf')));
-        $this->assertEquals(10, has_filter('gform_noconflict_styles', array($this->loader, 'auto_noconflict_gfpdf')));       
-    }   
+        $this->assertEquals(10, has_filter('gform_noconflict_scripts', array($this->loader, 'auto_noconflict_scripts')));
+        $this->assertEquals(10, has_filter('gform_noconflict_styles', array($this->loader, 'auto_noconflict_styles')));
+    }
 
     /**
      * Test that any Gravity PDF scripts are automatically loading when GF is in no conflict mode
@@ -107,7 +107,7 @@ class Test_Bootstrap extends WP_UnitTestCase
         $wp_scripts->queue = $queue;
 
         /* get the results and test the expected output */
-        $results = $this->loader->auto_noconflict_gfpdf(array());
+        $results = $this->loader->auto_noconflict_scripts(array());
 
         /* run assertions */
         $this->assertEquals(3, sizeof($results));
@@ -146,7 +146,7 @@ class Test_Bootstrap extends WP_UnitTestCase
         $wp_styles->queue = $queue;
 
         /* get the results and test the expected output */
-        $results = $this->loader->auto_noconflict_gfpdf(array());
+        $results = $this->loader->auto_noconflict_styles(array());
 
         /* run assertions */
         $this->assertEquals(2, sizeof($results));
@@ -154,6 +154,6 @@ class Test_Bootstrap extends WP_UnitTestCase
         $this->assertContains('gfpdf_css_styles', $results);
 
         /* reset the queue */
-        $wp_styles->queue = $saved;        
-    }      
+        $wp_styles->queue = $saved;
+    }
 }

@@ -168,9 +168,7 @@ class Test_Form_Settings extends WP_UnitTestCase
         $this->assertEquals(10, has_filter( 'gfpdf_form_settings_appearance', array( $this->model, 'validation_error')));
 
         /* core sanitation functions */
-        $this->assertEquals(10, has_filter( 'gfpdf_settings_sanitize_text', array($gfpdf->options, 'sanitize_text_field') ));
-        $this->assertEquals(10, has_filter( 'gfpdf_settings_sanitize_paper_size', array($gfpdf->options, 'sanitize_paper_size_field'), 10, 3 ));
-        $this->assertEquals(10, has_filter( 'gfpdf_settings_sanitize_select', array($gfpdf->options, 'sanitize_select_field')));
+        $this->assertEquals(10, has_filter( 'gfpdf_settings_sanitize', array($gfpdf->options, 'sanitize_required_field') ));
 
         /* custom sanitation functions */
         $this->assertEquals(10, has_filter( 'gfpdf_form_settings_sanitize_text', 'wp_strip_all_tags'));
