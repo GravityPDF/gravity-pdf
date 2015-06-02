@@ -1108,22 +1108,10 @@ class Helper_Options implements Helper_Int_Filters {
 	 */
 	public function checkbox_callback( $args ) {
 		/* get our selected value */
-		$checked = $this->get_form_value($args);
-
-		$class = '';
-		if(isset($args['inputClass'])) {
-			$class = $args['inputClass'];
-		}
-
-		$required = '';
-		if(isset($args['required']) && $args['required'] === true) {
-			$required = 'required';
-		}
-
-		$id = 'gfpdf_settings[' . $args['id'] . ']';
-		if(isset($args['idOverride'])) {
-			$id = $args['idOverride'];
-		}
+		$checked  = $this->get_form_value($args);
+		$class    = (isset($args['inputClass'])) ? $args['inputClass'] : '';
+		$required = (isset($args['required']) && $args['required'] === true) ? 'required' : '';
+		$id       = (isset($args['idOverride'])) ? $args['idOverride'] : 'gfpdf_settings[' . $args['id'] . ']';
 
 		$html = '<input type="checkbox" id="'. $id .'" class="gfpdf_settings_' . $args['id'] . ' '. $class .'" name="gfpdf_settings[' . $args['id'] . ']" value="1" ' . $checked . ' ' . $required . ' />';
 		$html .= '<label for="'. $id .'"> '  . $args['desc'] . '</label>';
@@ -1147,16 +1135,8 @@ class Helper_Options implements Helper_Int_Filters {
 	 */
 	public function multicheck_callback( $args ) {
 
-		$class = '';
-		if(isset($args['inputClass'])) {
-			$class = $args['inputClass'];
-		}
-
-		$required = '';
-		if(isset($args['required']) && $args['required'] === true) {
-			$required = 'required';
-		}
-
+		$class    = (isset($args['inputClass'])) ? $args['inputClass'] : '';
+		$required = (isset($args['required']) && $args['required'] === true) ? 'required' : '';
 
 		if ( ! empty( $args['options'] ) ) {
 			foreach( $args['options'] as $key => $option ):
@@ -1191,11 +1171,7 @@ class Helper_Options implements Helper_Int_Filters {
 		
 		/* get selected value (if any) */
 		$selected = $this->get_form_value($args);
-
-		$required = '';
-		if(isset($args['required']) && $args['required'] === true) {
-			$required = 'required';
-		}
+		$required = (isset($args['required']) && $args['required'] === true) ? 'required' : '';
 
 		foreach ( $args['options'] as $key => $option ) :
 			$checked = false;
@@ -1227,17 +1203,9 @@ class Helper_Options implements Helper_Int_Filters {
 	public function text_callback( $args ) {
 		
 		/* get selected value (if any) */
-		$value = $this->get_form_value($args);
-
-		$required = '';
-		if(isset($args['required']) && $args['required'] === true) {
-			$required = 'required';
-		}
-
-		$class = '';
-		if(isset($args['inputClass'])) {
-			$class = $args['inputClass'];
-		}
+		$value    = $this->get_form_value($args);
+		$class    = (isset($args['inputClass'])) ? $args['inputClass'] : '';
+		$required = (isset($args['required']) && $args['required'] === true) ? 'required' : '';
 
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
 		$html = '<input type="text" class="' . $size . '-text '. $class .'" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" '. $required .' />';
@@ -1271,17 +1239,15 @@ class Helper_Options implements Helper_Int_Filters {
 		}
 
 		/* check if required */
-		$required = '';
-		if(isset($args['required']) && $args['required'] === true) {
-			$required = 'required';
-		}
+		$class    = (isset($args['inputClass'])) ? $args['inputClass'] : '';
+		$required = (isset($args['required']) && $args['required'] === true) ? 'required' : '';
 
 		$max  = isset( $args['max'] ) ? $args['max'] : 999999;
 		$min  = isset( $args['min'] ) ? $args['min'] : 0;
 		$step = isset( $args['step'] ) ? $args['step'] : 1;
 
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
-		$html = '<input type="number" step="' . esc_attr( $step ) . '" max="' . esc_attr( $max ) . '" min="' . esc_attr( $min ) . '" class="' . $size . '-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" '. $required .' /> ' . $args['desc2'];
+		$html = '<input type="number" step="' . esc_attr( $step ) . '" max="' . esc_attr( $max ) . '" min="' . esc_attr( $min ) . '" class="' . $size . '-text gfpdf_settings_' . $args['id'] . ' '. $class .'" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" '. $required .' /> ' . $args['desc2'];
 		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
 
 		if(isset($args['tooltip'])) {
@@ -1304,18 +1270,9 @@ class Helper_Options implements Helper_Int_Filters {
 	public function textarea_callback( $args ) {
 		
 		/* get selected value (if any) */
-		$value = $this->get_form_value($args);
-
-		/* check if required */
-		$required = '';
-		if(isset($args['required']) && $args['required'] === true) {
-			$required = 'required';
-		}
-
-		$class = '';
-		if(isset($args['inputClass'])) {
-			$class = $args['inputClass'];
-		}
+		$value    = $this->get_form_value($args);
+		$class    = (isset($args['inputClass'])) ? $args['inputClass'] : '';
+		$required = (isset($args['required']) && $args['required'] === true) ? 'required' : '';
 
 		$html = '<textarea cols="50" rows="5" id="gfpdf_settings[' . $args['id'] . ']" class="large-text gfpdf_settings_' . $args['id'] . ' '. $class .'" name="gfpdf_settings[' . $args['id'] . ']" '. $required .'>' . esc_textarea( stripslashes( $value ) ) . '</textarea>';
 		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
@@ -1340,17 +1297,9 @@ class Helper_Options implements Helper_Int_Filters {
 	public function password_callback( $args ) {
 		
 		/* get selected value (if any) */
-		$value = $this->get_form_value($args);
-
-		$required = '';
-		if(isset($args['required']) && $args['required'] === true) {
-			$required = 'required';
-		}
-
-		$class = '';
-		if(isset($args['inputClass'])) {
-			$class = $args['inputClass'];
-		}
+		$value    = $this->get_form_value($args);
+		$class    = (isset($args['inputClass'])) ? $args['inputClass'] : '';
+		$required = (isset($args['required']) && $args['required'] === true) ? 'required' : '';
 
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
 		$html = '<input type="password" class="' . $size . '-text '. $class .'" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" '. $required .' />';
@@ -1376,32 +1325,16 @@ class Helper_Options implements Helper_Int_Filters {
 	public function select_callback($args) {
 		
 		/* get selected value (if any) */
-		$value = $this->get_form_value($args);
-
-		$placeholder = '';
-	    if ( isset( $args['placeholder'] ) ) {
-	        $placeholder = $args['placeholder'];
-	    }
-
-		$chosen = '';
-		if ( isset( $args['chosen'] ) ) {
-			$chosen = 'gfpdf-chosen';
-		}
-
-		$class = '';
-		if(isset($args['inputClass'])) {
-			$class = $args['inputClass'];
-		}
+		$value       = $this->get_form_value($args);
+		$placeholder = ( isset( $args['placeholder'] ) ) ? $args['placeholder'] : '';
+		$chosen      = ( isset( $args['chosen'] ) ) ? 'gfpdf-chosen' : '';
+		$class       = (isset($args['inputClass'])) ? $args['inputClass'] : '';
+		$required    = (isset($args['required']) && $args['required'] === true) ? 'required' : '';
 
 		$multiple = $multipleExt = '';
 		if(isset($args['multiple'])) {
 			$multiple    = 'multiple';
 			$multipleExt = '[]';
-		}
-
-		$required = '';
-		if(isset($args['required']) && $args['required'] === true) {
-			$required = 'required';
 		}
 
 	    $html = '<select id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . ' '. $class .' ' . $chosen . '" name="gfpdf_settings[' . $args['id'] . ']' . $multipleExt .'" data-placeholder="' . $placeholder . '" '. $multiple .' '. $required .'>';
@@ -1497,20 +1430,11 @@ class Helper_Options implements Helper_Int_Filters {
 	public function upload_callback( $args ) {
 		
 		/* get selected value (if any) */
-		$value = $this->get_form_value($args);
-
+		$value                = $this->get_form_value($args);
 		$uploader_title       = ($args['uploaderTitle'])        ? $args['uploaderTitle'] : __('Select Media', 'gravitypdf');
 		$uploader_button_text = ($args['uploaderButtonText'])   ? $args['uploaderButtonText'] : __('Select Media', 'gravitypdf');
-
-		$class = '';
-		if(isset($args['inputClass'])) {
-			$class = $args['inputClass'];
-		}
-
-		$required = '';
-		if(isset($args['required']) && $args['required'] === true) {
-			$required = 'required';
-		}
+		$class                = (isset($args['inputClass'])) ? $args['inputClass'] : '';
+		$required             = (isset($args['required']) && $args['required'] === true) ? 'required' : '';
 
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
 		$html = '<input type="text" class="' . $size . '-text gfpdf_settings_' . $args['id'] . ' '. $class .'" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" '. $required .' />';
@@ -1538,17 +1462,13 @@ class Helper_Options implements Helper_Int_Filters {
 	public function color_callback( $args ) {
 		
 		/* get selected value (if any) */
-		$value = $this->get_form_value($args);
-
-		$default = isset( $args['std'] ) ? $args['std'] : '';
-
-		$class = '';
-		if(isset($args['inputClass'])) {
-			$class = $args['inputClass'];
-		}
+		$value    = $this->get_form_value($args);
+		$default  = isset( $args['std'] ) ? $args['std'] : '';
+		$class    = (isset($args['inputClass'])) ? $args['inputClass'] : '';
+		$required = (isset($args['required']) && $args['required'] === true) ? 'required' : '';
 
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
-		$html = '<input type="text" class="gfpdf-color-picker gfpdf_settings_' . $args['id'] . ' '. $class .'" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" data-default-color="' . esc_attr( $default ) . '" />';
+		$html = '<input type="text" class="gfpdf-color-picker gfpdf_settings_' . $args['id'] . ' '. $class .'" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" data-default-color="' . esc_attr( $default ) . '" '. $required .' />';
 		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
 
 		if(isset($args['tooltip'])) {
@@ -1623,11 +1543,7 @@ class Helper_Options implements Helper_Int_Filters {
 		
 		/* get selected value (if any) */
 		$value = $this->get_form_value($args);
-
-		$class = '';
-		if(isset($args['inputClass'])) {
-			$class = $args['inputClass'];
-		}
+		$class = (isset($args['inputClass'])) ? $args['inputClass'] : '';
 
 		$html = '<input type="hidden" class="'. $class .'" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" />';
 
@@ -1651,22 +1567,10 @@ class Helper_Options implements Helper_Int_Filters {
 			$value = array('', '', 'mm');
 		}
 
-		$placeholder = '';
-	    if ( isset( $args['placeholder'] ) ) {
-	        $placeholder = $args['placeholder'];
-	    }
-
-		$chosen = '';
-		if ( isset( $args['chosen'] ) ) {
-			$chosen = 'gfpdf-chosen';
-		}
-
-		$class = '';
-		if(isset($args['inputClass'])) {
-			$class = $args['inputClass'];
-		}
-
-		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
+		$placeholder = ( isset( $args['placeholder'] ) ) ? $args['placeholder'] : '';
+		$chosen      = ( isset( $args['chosen'] ) ) ? 'gfpdf-chosen' : '';
+		$class       = (isset($args['inputClass'])) ? $args['inputClass'] : '';
+		$size        = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
 
 		$html = '<input type="number" class="'. $size .'-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_width" min="1" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( stripslashes( $value[0] ) ) . '" required /> ' . __('Width', 'gravitypdf');
 		$html .= ' <input type="number" class="'. $size .'-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_height" min="1" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( stripslashes( $value[1] ) ) . '" required /> ' . __('Height', 'gravitypdf');
