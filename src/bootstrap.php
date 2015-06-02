@@ -144,7 +144,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
             $suffix  = '';
         }
 
-        wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'src/assets/css/gfpdf-styles'. $suffix .'.css', array(), $version);
+        wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'src/assets/css/gfpdf-styles'. $suffix .'.css', array('wp-color-picker'), $version);
         wp_register_style( 'gfpdf_css_chosen_style', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.min.css', array('wp-jquery-ui-dialog'), $version );
     }
 
@@ -162,7 +162,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
             $suffix = '';
         }
 
-        wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-settings'. $suffix .'.js', array('wpdialogs', 'jquery-ui-tooltip', 'gform_form_admin', 'jquery-color'), $version );
+        wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-settings'. $suffix .'.js', array('wpdialogs', 'jquery-ui-tooltip', 'gform_form_admin', 'jquery-color', 'wp-color-picker'), $version );
         wp_register_script( 'gfpdf_js_backbone', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-backbone'. $suffix .'.js', array('gfpdf_js_settings', 'backbone', 'underscore'), $version );
         wp_register_script( 'gfpdf_js_chosen', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.jquery.min.js', array('jquery'), $version );
 

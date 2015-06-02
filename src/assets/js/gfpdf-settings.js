@@ -47,6 +47,9 @@
 
 				/* if we have a upload field handle the logic */
 				this.doUploadListener();
+
+				/* if we have a colour picker handle the logic */
+				this.doColorListener();
 			}
 
 			/**
@@ -135,6 +138,12 @@
 				// WP 3.5+ uploader
 				var file_frame;
 				window.formfield = '';
+			}
+
+			this.doColorListener = function() {
+				if( $('.gfpdf-color-picker').length ) {
+					$('.gfpdf-color-picker').wpColorPicker();
+				}
 			}
 
 			this.processSettings = function() {
