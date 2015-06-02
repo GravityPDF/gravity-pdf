@@ -118,8 +118,8 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
      */
     public function add_filters() {
         /* automatically handle GF noconflict mode */
-        add_filter('gform_noconflict_scripts', array($this, 'auto_noconflict_gfpdf'));
-        add_filter('gform_noconflict_styles', array($this, 'auto_noconflict_gfpdf'));
+        add_filter('gform_noconflict_scripts', array($this, 'auto_noconflict_scripts'));
+        add_filter('gform_noconflict_styles', array($this, 'auto_noconflict_styles'));
     }
 
     /**
@@ -187,6 +187,9 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
             /* load scripts */
             wp_enqueue_script('gfpdf_js_settings');
             wp_enqueue_script('gfpdf_js_chosen');
+
+            /* add media uploader */
+            wp_enqueue_media();
         }
 
         if(Stat\Stat_Functions::is_gfpdf_settings_tab('help')) {
@@ -195,13 +198,36 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
     }
 
      /**
-     * Auto no-conflict any preloaded scripts / styles that begin with 'gfpdf_'
+     * Auto no-conflict any preloaded scripts that begin with 'gfpdf_'
      * @since 4.0
      * @return void
      */
-    public function auto_noconflict_gfpdf($items) {
+    public function auto_noconflict_scripts($items) {
         $wp_scripts = wp_scripts();
-        $wp_styles  = wp_styles();
+
+        /* set defaults we will allow to load on GF pages */
+        $default_scripts = array(
+            'editor',
+            'word-count',
+            'quicktags',
+            'wpdialogs-popup',
+            'media-upload',
+            'wplink',
+            'backbone',
+            'underscore',
+            'media-editor',
+            'media-models',
+            'media-views',
+            'plupload',
+            'plupload-flash',
+            'plupload-html4',
+            'plupload-html5',
+            'plupload-silverlight',
+            'wp-plupload',
+            'gform_placeholder',
+            'jquery-ui-autocomplete',
+            'thickbox',
+        );
 
         foreach($wp_scripts->queue as $object) {
             if(substr($object, 0, 8) === 'gfpdf_js') {
@@ -209,13 +235,40 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
             }
         }
 
+        if(Stat\Stat_Functions::is_gfpdf_page()) {
+            $items = array_merge($default_scripts, $items);
+        }
+
+        return apply_filters('gfpdf_autoload_gf_scripts', $items);
+    }
+
+     /**
+     * Auto no-conflict any preloaded styles that begin with 'gfpdf_'
+     * @since 4.0
+     * @return void
+     */
+    public function auto_noconflict_styles($items) {
+        $wp_styles  = wp_styles();
+
+        $default_styles = array(
+            'editor-buttons',
+            'wp-jquery-ui-dialog',
+            'media-views',
+            'buttons',
+            'thickbox',
+        );
+
         foreach($wp_styles->queue as $object) {
             if(substr($object, 0, 9) === 'gfpdf_css') {
                 $items[] = $object;
             }
         }
 
-        return $items;
+        if(Stat\Stat_Functions::is_gfpdf_page()) {
+            $items = array_merge($default_styles, $items);
+        }
+
+        return apply_filters('gfpdf_autoload_gf_styles', $items);
     }
 
     /**
