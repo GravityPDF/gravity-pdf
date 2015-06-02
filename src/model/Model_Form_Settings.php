@@ -138,6 +138,10 @@ class Model_Form_Settings extends Helper_Model {
     public function get_settings($form_id) {
         global $gfpdf;
 
+        if(!isset($gfpdf->data->form_settings)) {
+            $gfpdf->data->form_settings = array();
+        }
+
         $form_id = (int) $form_id;
         if( (int) $form_id === 0) {
             return new WP_Error('invalid_id', __('You must pass in a valid form ID', 'gravitypdf'));

@@ -72,9 +72,11 @@ class Helper_Options implements Helper_Int_Filters {
 
 	public function add_filters() {
         /* register our core santize functions */
-        add_filter( 'gfpdf_settings_sanitize_text', array($this, 'sanitize_text_field') );
-        add_filter( 'gfpdf_settings_sanitize_paper_size', array($this, 'sanitize_paper_size_field'), 10, 3 );
-        add_filter( 'gfpdf_settings_sanitize_select', array($this, 'sanitize_select_field'), 10, 4 );
+        add_filter( 'gfpdf_settings_sanitize', array($this, 'sanitize_required_field'), 10, 4 );
+
+        add_filter( 'gfpdf_settings_sanitize_text', array($this, 'sanitize_trim_field') );
+        add_filter( 'gfpdf_settings_sanitize_textarea', array($this, 'sanitize_trim_field') );
+        add_filter( 'gfpdf_settings_sanitize_number', array($this, 'sanitize_number_field') );
 	}
 	
     /**
@@ -127,7 +129,10 @@ class Helper_Options implements Helper_Int_Filters {
         }
 
 		$model = new Model_Form_Settings();
-		return $model->get_settings($form_id);
+		$settings = $model->get_settings($form_id);
+
+		/* get the selected form settings */
+		return (isset($settings[$pid])) ? $settings[$pid] : array();
 	}
 
 	/**
@@ -151,25 +156,27 @@ class Helper_Options implements Helper_Int_Filters {
 					'gfpdf_settings_' . $tab,
 					'gfpdf_settings_' . $tab,
 					array(
-						'section'     => $tab,
-						'id'          => isset( $option['id'] )         	 ? $option['id']      		: null,
-						'desc'        => ! empty( $option['desc'] )      	? $option['desc']    		: '',
-						'desc2'       => ! empty( $option['desc2'] )     	? $option['desc2']   		: '',
-						'name'        => isset( $option['name'] )        	? $option['name']    		: null,
-						'size'        => isset( $option['size'] )        	? $option['size']    		: null,
-						'options'     => isset( $option['options'] )     	? $option['options'] 		: '',
-						'std'         => isset( $option['std'] )         	? $option['std']     		: '',
-						'min'         => isset( $option['min'] )         	? $option['min']     		: null,
-						'max'         => isset( $option['max'] )         	? $option['max']     		: null,
-						'step'        => isset( $option['step'] )        	? $option['step']    		: null,
-						'chosen'      => isset( $option['chosen'] )      	? $option['chosen']  		: null,
-						'class'       => isset( $option['class'] )       	? $option['class']  		: null,
-						'inputClass'  => isset( $option['inputClass'] )  	? $option['inputClass']  	: null,
-						'placeholder' => isset( $option['placeholder'] ) 	? $option['placeholder'] 	: null,
-						'allow_blank' => isset( $option['allow_blank'] ) 	? $option['allow_blank'] 	: true,
-						'tooltip'     => isset( $option['tooltip'] )     	? $option['tooltip'] 		: null,
-						'multiple'    => isset( $option['multiple'] )    	? $option['multiple'] 		: null,
-						'required'    => isset( $option['required'] )    	? $option['required'] 		: null,
+						'section'            => $tab,
+						'id'                 => isset( $option['id'] )         	    			? $option['id']      				: null,
+						'desc'               => ! empty( $option['desc'] )      				? $option['desc']    				: '',
+						'desc2'              => ! empty( $option['desc2'] )     				? $option['desc2']   				: '',
+						'type'               => isset( $option['type'] )        				? $option['type']    				: null,
+						'name'               => isset( $option['name'] )        				? $option['name']    				: null,
+						'size'               => isset( $option['size'] )        				? $option['size']    				: null,
+						'options'            => isset( $option['options'] )     				? $option['options'] 				: '',
+						'std'                => isset( $option['std'] )         				? $option['std']     				: '',
+						'min'                => isset( $option['min'] )         				? $option['min']     				: null,
+						'max'                => isset( $option['max'] )         				? $option['max']     				: null,
+						'step'               => isset( $option['step'] )        				? $option['step']    				: null,
+						'chosen'             => isset( $option['chosen'] )      				? $option['chosen']  				: null,
+						'class'              => isset( $option['class'] )       				? $option['class']  				: null,
+						'inputClass'         => isset( $option['inputClass'] )  				? $option['inputClass']  			: null,
+						'placeholder'        => isset( $option['placeholder'] ) 				? $option['placeholder'] 			: null,
+						'tooltip'            => isset( $option['tooltip'] )     				? $option['tooltip'] 				: null,
+						'multiple'           => isset( $option['multiple'] )    				? $option['multiple'] 				: null,
+						'required'           => isset( $option['required'] )    				? $option['required'] 		 		: null,
+						'uploaderTitle'      => isset( $option['uploaderTitle'] )    			? $option['uploaderTitle'] 			: null,
+						'uploaderButtonText' => isset( $option['uploaderButtonText'] )    		? $option['uploaderButtonText'] 	: null,
 					)
 				);
 			}
@@ -196,6 +203,7 @@ class Helper_Options implements Helper_Int_Filters {
 			/** General Settings */
 			'general' => apply_filters( 'gfpdf_settings_general',
 				array(
+
 					'default_pdf_size' => array(
 						'id'         => 'default_pdf_size',
 						'name'       => __('Default Paper Size', 'gravitypdf'),
@@ -261,8 +269,6 @@ class Helper_Options implements Helper_Int_Filters {
 						),
 						'std'     => 'View',
 					),
-
-					
 				)
 			),
 
@@ -561,9 +567,6 @@ class Helper_Options implements Helper_Int_Filters {
 		return apply_filters( 'gfpdf_registered_settings', $gfpdf_settings );
 	}
 
-
-    
-
 	/**
 	 * Get an option
 	 *
@@ -771,6 +774,7 @@ class Helper_Options implements Helper_Int_Filters {
 	 * Parse our installed PDF template files
 	 * @return array The array of templates
 	 * @since 4.0
+	 * @todo
 	 */
 	public function get_templates() {
 		$templates = array(
@@ -784,18 +788,30 @@ class Helper_Options implements Helper_Int_Filters {
 			),
 		);
 
-		return $templates;
+		return apply_filters('gfpdf_template_list', $templates);
 	}
 
+	/**
+	 * Parse our installed font files
+	 * @return array The array of fonts
+	 * @since 4.0
+	 * @todo
+	 */
 	public function get_installed_fonts() {
 		$fonts = array(
 			'dejavusans' => __('Dejavu Sans', 'gravitypdf'),
 			'dejavusansserif' => __('Dejavu Sans Serif', 'gravitypdf'),
 		);
 
-		return $fonts;
+		return apply_filters('gfpdf_font_list', $fonts);
 	}
 
+	/**
+	 * Parse our PDF privilages
+	 * @return array The array of privilages
+	 * @since 4.0
+	 * @todo
+	 */
 	public function get_privilages() {
 		$privilages = array(
 			'copy'          => __('Copy', 'gravitypdf'),
@@ -809,14 +825,14 @@ class Helper_Options implements Helper_Int_Filters {
 			
 		);
 
-		return $privilages;
+		return apply_filters('gfpdf_privilages_list', $privilages);
 	}
 
 	/**
 	 * Settings Sanitization
 	 *
 	 * Adds a settings error (for the updated message)
-	 * At some point this will validate input
+	 * Run on admin options.php page
 	 *
 	 * @since 4.0
 	 *
@@ -857,33 +873,43 @@ class Helper_Options implements Helper_Int_Filters {
 		 * Prevalant with Select boxes
 		 */
 		foreach($settings as $key => $value) {
-			if(isset($value['required']) && $value['required'] && empty($input[$key])) {
-				$input[$key] = array();
+			if(isset($value['required']) && $value['required']) {
+				switch($value['type']) {
+					case 'select':
+						if(!isset($input[$key])) {
+							$input[$key] = array();
+						}
+					break;
+
+					default:
+						if(!isset($input[$key])) {
+							$input[$key] = '';
+						}
+					break;
+				}
 			}
 		}
 
-		// Loop through each setting being saved and pass it through a sanitization filter
+		/* Loop through each setting being saved and pass it through a sanitization filter */
 		foreach ( $input as $key => $value ) {
 
-			// Get the setting type (checkbox, select, etc)
+			/* Get the setting type (checkbox, select, etc) */
 			$type = isset( $settings[$key]['type'] ) ? $settings[$key]['type'] : false;
 
 			if ( $type ) {
-				// Field type specific filter
+				/* Field type specific filter */
 				$input[$key] = apply_filters( 'gfpdf_settings_sanitize_' . $type, $value, $key, $input, $settings[$key] );
 			}
 
-			// General filter
+			/* General filter */
 			$input[$key] = apply_filters( 'gfpdf_settings_sanitize', $input[$key], $key, $input, $settings[$key] );
 		}
 
-		// Loop through the whitelist and unset any that are empty for the tab being saved
+		/* Loop through the whitelist and unset any that are empty for the tab being saved */
 		foreach ( $settings as $key => $value ) {
-
 			if ( empty( $input[$key] ) ) {
 				unset( $gfpdf_options[$key] );
 			}
-
 		}
 
 		/* check for errors */
@@ -892,9 +918,11 @@ class Helper_Options implements Helper_Int_Filters {
 			$output = array_merge( $gfpdf_options, $input );
 			add_settings_error( 'gfpdf-notices', '', __( 'Settings updated.', 'gravitypdf' ), 'updated' );
 		} else {
-			/* store the user data in a transient */
+			/* error is thrown. store the user data in a transient so fields are remembered */
 			set_transient('gfpdf_settings_user_data', array_merge( $gfpdf_options, $input ), 30);
-			$output = $input;
+
+			/* return nothing */
+			return array();
 		}
 
 		return $output;
@@ -902,53 +930,170 @@ class Helper_Options implements Helper_Int_Filters {
 
 
 	/**
-	 * Sanitize text fields
+	 * Sanitize text / textarea fields
 	 *
 	 * @since 4.0
 	 * @param array $input The field value
 	 * @return string $input Sanitizied value
 	 */
-	public function sanitize_text_field( $input ) {
+	public function sanitize_trim_field( $input ) {
 		return trim( $input );
 	}
 
 	/**
-	 * Sanitize paper size fields
+	 * Sanitize number fields
 	 *
 	 * @since 4.0
 	 * @param array $input The field value
 	 * @return string $input Sanitizied value
 	 */
-	public function sanitize_paper_size_field( $value, $key, $input ) {
-		if($input['default_pdf_size'] === 'custom') {
-            $size = sizeof($value);
-            if(sizeof(array_filter($value)) !== $size) {
-               /* throw error */
-               add_settings_error( 'gfpdf-notices', $key, __( 'PDF Settings could not be saved. Please enter all required information below.', 'gravitypdf' ) );
-            }
-		}
-
-		return $value;
+	public function sanitize_number_field( $input ) {
+		return (float) $input;
 	}
 
 	/**
 	 * Sanitize select field
 	 *
 	 * @since 4.0
-	 * @param array $input The field value
+	 * @param mixed   $value The field's user input value
+	 * @param string  $key The settings key
+	 * @param array   $input All user fields
+	 * @param array   $settings The field settings
 	 * @return string $input Sanitizied value
 	 */
-	public function sanitize_select_field( $value, $key, $input, $settings ) {
+	public function sanitize_required_field( $value, $key, $input, $settings ) {
 
 		if(isset($settings['required']) && $settings['required'] === true) {
-			$size = count($value);
-            if(empty($value) || sizeof(array_filter($value)) !== $size) {
-               /* throw error */
-               add_settings_error( 'gfpdf-notices', $key, __( 'PDF Settings could not be saved. Please enter all required information below.', 'gravitypdf' ) );
-            }
+
+			switch($settings['type']) {
+				case 'select':
+				case 'multicheck':
+					$size = count($value);
+		            if(empty($value) || sizeof(array_filter($value)) !== $size) {
+		               /* throw error */
+		               add_settings_error( 'gfpdf-notices', $key, __( 'PDF Settings could not be saved. Please enter all required information below.', 'gravitypdf' ) );
+		            }
+				break;
+
+				case 'paper_size':
+					if(isset($input['default_pdf_size']) && $input['default_pdf_size'] === 'custom') {
+			            $size = sizeof($value);
+			            if(sizeof(array_filter($value)) !== $size) {
+			               /* throw error */
+			               add_settings_error( 'gfpdf-notices', $key, __( 'PDF Settings could not be saved. Please enter all required information below.', 'gravitypdf' ) );
+			            }
+					}
+				break;
+
+				default:
+					if(strlen(trim($value)) === 0) {
+		               /* throw error */
+		               add_settings_error( 'gfpdf-notices', $key, __( 'PDF Settings could not be saved. Please enter all required information below.', 'gravitypdf' ) );
+					}
+				break;
+			}
 		}
 
 		return $value;
+	}
+
+	/**
+	 * Gets the correct option value based on the field type
+	 * @param  array  $args The field articles
+	 * @return String       The current value for that particular field
+	 * @since  4.0
+	 */
+	public function get_form_value($args = array()) {
+		/* Get our global Gravity PDF Settings */
+		$options = $this->settings;
+
+		/* Get our PDF GF settings (if any) */
+		$pdf_form_settings = $this->get_form_settings();
+
+		if(!isset($args['type'])) {
+			$args['type'] = '';
+		}
+
+		switch($args['type']) {
+			case 'checkbox':
+
+				if(isset( $options[ $args['id'] ] ) ) {
+					return checked( 1, $options[ $args['id'] ], false );
+
+				} elseif( isset( $pdf_form_settings[ $args['id'] ] ) ) {
+					return checked( 1, $pdf_form_settings[ $args['id'] ], false );
+
+				} elseif( $args['std'] === true ) {
+					return checked(1, 1, false);
+				}
+
+			break;
+
+			case 'multicheck':
+
+				if(isset( $options[$args[ 'id' ] ][ $args['multi-key'] ] ) ) {
+					return $args['multi-option'];
+
+				} elseif( isset($pdf_form_settings[ $args['id']][ $args['multi-key' ] ] ) ) {
+					return $args['multi-option'];
+				}
+
+			break;
+
+			case 'radio':
+
+				if( isset( $options[ $args['id'] ] ) && isset( $args[ 'options' ][ $options[ $args['id'] ] ] ) ) {
+					return $options[ $args['id'] ];
+
+				} elseif( isset( $pdf_form_settings[ $args['id'] ] ) && isset( $args[ 'options' ][ $pdf_form_settings[ $args['id'] ] ]) ) {
+					return $pdf_form_settings[ $args['id']];
+
+				} elseif( isset( $args['std'] ) && isset( $args['std'] ) ) {
+					return $args['std'];
+				}
+
+			break;
+
+			case 'password':
+
+				if ( isset( $options[ $args['id'] ] ) ) {
+					return trim($options[ $args['id'] ]);
+
+				} elseif( isset( $pdf_form_settings[ $args['id'] ] ) ) {
+					return trim($pdf_form_settings[ $args['id'] ] );
+				}
+
+			break;
+
+			case 'select':
+			case 'paper_size':
+				if ( isset( $options[ $args['id'] ] ) ) {
+					return $options[ $args['id'] ];
+
+				} elseif( isset( $pdf_form_settings[ $args['id'] ] ) ) {
+					return $pdf_form_settings[ $args['id'] ] ;
+
+				} elseif( isset( $args['std'] ) ) {
+					return $args['std'];
+				}
+			break;
+
+			/* treat as a text callback */
+			default:
+				if ( isset( $options[ $args['id'] ] ) ) {
+					return trim($options[ $args['id'] ]);
+
+				} elseif( isset( $pdf_form_settings[ $args['id'] ] ) ) {
+					return trim($pdf_form_settings[ $args['id'] ] );
+
+				} elseif( isset( $args['std'] ) ) {
+					return $args['std'];
+				}
+			break;
+		}
+
+		/* if we made it here return empty string */
+		return '';
 	}
 
 	/**
@@ -962,19 +1107,17 @@ class Helper_Options implements Helper_Int_Filters {
 	 * @return void
 	 */
 	public function checkbox_callback( $args ) {
-		
-		$gfpdf_options = $this->settings;
-
-		/* add GF settings */
-		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = $this->get_form_settings();
-
-		$checked = isset( $gfpdf_options[ $args['id'] ] ) ? checked( 1, $gfpdf_options[ $args['id'] ], false ) : '';
-		$checked = (empty($checked) && isset( $gfpdf_form_settings[ $pid ][ $args['id']])) ? checked( 1, $gfpdf_form_settings[ $pid ][ $args['id']], false ) : '';
+		/* get our selected value */
+		$checked = $this->get_form_value($args);
 
 		$class = '';
 		if(isset($args['inputClass'])) {
 			$class = $args['inputClass'];
+		}
+
+		$required = '';
+		if(isset($args['required']) && $args['required'] === true) {
+			$required = 'required';
 		}
 
 		$id = 'gfpdf_settings[' . $args['id'] . ']';
@@ -982,7 +1125,7 @@ class Helper_Options implements Helper_Int_Filters {
 			$id = $args['idOverride'];
 		}
 
-		$html = '<input type="checkbox" id="'. $id .'" class="gfpdf_settings_' . $args['id'] . ' '. $class .'" name="gfpdf_settings[' . $args['id'] . ']" value="1" ' . $checked . '/>';
+		$html = '<input type="checkbox" id="'. $id .'" class="gfpdf_settings_' . $args['id'] . ' '. $class .'" name="gfpdf_settings[' . $args['id'] . ']" value="1" ' . $checked . ' ' . $required . ' />';
 		$html .= '<label for="'. $id .'"> '  . $args['desc'] . '</label>';
 		
 		if(isset($args['tooltip'])) {
@@ -1003,18 +1146,27 @@ class Helper_Options implements Helper_Int_Filters {
 	 * @return void
 	 */
 	public function multicheck_callback( $args ) {
-		
-		$gfpdf_options = $this->settings;
 
-		/* add GF settings */
-		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = $this->get_form_settings();
+		$class = '';
+		if(isset($args['inputClass'])) {
+			$class = $args['inputClass'];
+		}
+
+		$required = '';
+		if(isset($args['required']) && $args['required'] === true) {
+			$required = 'required';
+		}
+
 
 		if ( ! empty( $args['options'] ) ) {
 			foreach( $args['options'] as $key => $option ):
-				if( isset( $gfpdf_options[$args['id']][$key] ) ) { $enabled = $option; } else { $enabled = NULL; }
-				if( empty($enabled) && isset( $gfpdf_form_settings[ $pid ][ $args['id']]) ) { $enabled = $option; } else { $enabled = NULL; }
-				echo '<input name="gfpdf_settings[' . $args['id'] . '][' . $key . ']" id="gfpdf_settings[' . $args['id'] . '][' . $key . ']" class="gfpdf_settings_' . $args['id'] . '" type="checkbox" value="' . $option . '" ' . checked($option, $enabled, false) . '/>&nbsp;';
+				/* set up multi-select option to pass to our form value getter */
+				$args['multi-key']    = $key;
+				$args['multi-option'] = $option;
+
+				$enabled = $this->get_form_value($args);
+
+				echo '<input name="gfpdf_settings[' . $args['id'] . '][' . $key . ']" id="gfpdf_settings[' . $args['id'] . '][' . $key . ']" class="gfpdf_settings_' . $args['id'] . ' '. $class .'" type="checkbox" value="' . $option . '" ' . checked($option, $enabled, false) . ' ' . $required . ' />&nbsp;';
 				echo '<label for="gfpdf_settings[' . $args['id'] . '][' . $key . ']">' . $option . '</label><br />';
 			endforeach;
 			echo '<span class="gf_settings_description">' . $args['desc'] . '</span>';
@@ -1037,21 +1189,12 @@ class Helper_Options implements Helper_Int_Filters {
 	 */
 	public function radio_callback( $args ) {
 		
-		$gfpdf_options = $this->settings;
+		/* get selected value (if any) */
+		$selected = $this->get_form_value($args);
 
-		/* add GF settings */
-		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = $this->get_form_settings();
-
-		/**
-		 * Determine which key should be selected
-		 */
-		if(isset($gfpdf_options[ $args['id'] ]) && isset($args['options'][$gfpdf_options[ $args['id'] ]])) {
-			$selected = $gfpdf_options[ $args['id'] ];
-		} elseif(isset($gfpdf_form_settings[ $pid ][ $args['id']]) && isset($args['options'][ $gfpdf_form_settings[ $pid ][ $args['id']] ])) {
-			$selected = $gfpdf_form_settings[ $pid ][ $args['id']];
-		} elseif(isset( $args['std']) && isset($args['std'])) {
-			$selected = $args['std'];
+		$required = '';
+		if(isset($args['required']) && $args['required'] === true) {
+			$required = 'required';
 		}
 
 		foreach ( $args['options'] as $key => $option ) :
@@ -1060,7 +1203,7 @@ class Helper_Options implements Helper_Int_Filters {
 				$checked = true;
 			}
 
-			echo '<label for="gfpdf_settings[' . $args['id'] . '][' . $key . ']"><input name="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . '][' . $key . ']" type="radio" value="' . $key . '" ' . checked(true, $checked, false) . '/>';
+			echo '<label for="gfpdf_settings[' . $args['id'] . '][' . $key . ']"><input name="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . '][' . $key . ']" type="radio" value="' . $key . '" ' . checked(true, $checked, false) . ' '. $required .' />';
 			echo $option . '</label> &nbsp;&nbsp;';
 		endforeach;
 
@@ -1083,19 +1226,8 @@ class Helper_Options implements Helper_Int_Filters {
 	 */
 	public function text_callback( $args ) {
 		
-		$gfpdf_options = $this->settings;
-
-		/* add GF settings */
-		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = $this->get_form_settings();
-
-		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
-			$value = $gfpdf_options[ $args['id'] ];
-		} elseif(empty($value) && isset( $gfpdf_form_settings[ $pid ][ $args['id']]) ) {
-			$value = $gfpdf_form_settings[ $pid ][ $args['id']];
-		} else {
-			$value = isset( $args['std'] ) ? $args['std'] : '';
-		}
+		/* get selected value (if any) */
+		$value = $this->get_form_value($args);
 
 		$required = '';
 		if(isset($args['required']) && $args['required'] === true) {
@@ -1130,18 +1262,18 @@ class Helper_Options implements Helper_Int_Filters {
 	 */
 	public function number_callback( $args ) {
 		
-		$gfpdf_options = $this->settings;
+		/* get selected value (if any) */
+		$value = $this->get_form_value($args);
 
-		/* add GF settings */
-		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = $this->get_form_settings();
+		/* ensure value is not an array */
+		if(is_array($value)) {
+			$value = implode(' ', $value);
+		}
 
-	    if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
-			$value = $gfpdf_options[ $args['id'] ];
-	    } elseif(empty($value) && isset( $gfpdf_form_settings[ $pid ][ $args['id']]) ) {
-	    	$value = $gfpdf_form_settings[ $pid ][ $args['id']];
-	    } else {
-			$value = isset( $args['std'] ) ? $args['std'] : '';
+		/* check if required */
+		$required = '';
+		if(isset($args['required']) && $args['required'] === true) {
+			$required = 'required';
 		}
 
 		$max  = isset( $args['max'] ) ? $args['max'] : 999999;
@@ -1149,7 +1281,7 @@ class Helper_Options implements Helper_Int_Filters {
 		$step = isset( $args['step'] ) ? $args['step'] : 1;
 
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
-		$html = '<input type="number" step="' . esc_attr( $step ) . '" max="' . esc_attr( $max ) . '" min="' . esc_attr( $min ) . '" class="' . $size . '-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '"/> ' . $args['desc2'];
+		$html = '<input type="number" step="' . esc_attr( $step ) . '" max="' . esc_attr( $max ) . '" min="' . esc_attr( $min ) . '" class="' . $size . '-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" '. $required .' /> ' . $args['desc2'];
 		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
 
 		if(isset($args['tooltip'])) {
@@ -1171,21 +1303,21 @@ class Helper_Options implements Helper_Int_Filters {
 	 */
 	public function textarea_callback( $args ) {
 		
-		$gfpdf_options = $this->settings;
+		/* get selected value (if any) */
+		$value = $this->get_form_value($args);
 
-		/* add GF settings */
-		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = $this->get_form_settings();
-
-		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
-			$value = $gfpdf_options[ $args['id'] ];
-		} elseif(empty($value) && isset( $gfpdf_form_settings[ $pid ][ $args['id']]) ) {
-			$value = $gfpdf_form_settings[ $pid ][ $args['id']];
-		} else {
-			$value = isset( $args['std'] ) ? $args['std'] : '';
+		/* check if required */
+		$required = '';
+		if(isset($args['required']) && $args['required'] === true) {
+			$required = 'required';
 		}
 
-		$html = '<textarea class="large-text" cols="50" rows="5" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']">' . esc_textarea( stripslashes( $value ) ) . '</textarea>';
+		$class = '';
+		if(isset($args['inputClass'])) {
+			$class = $args['inputClass'];
+		}
+
+		$html = '<textarea cols="50" rows="5" id="gfpdf_settings[' . $args['id'] . ']" class="large-text gfpdf_settings_' . $args['id'] . ' '. $class .'" name="gfpdf_settings[' . $args['id'] . ']" '. $required .'>' . esc_textarea( stripslashes( $value ) ) . '</textarea>';
 		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
 
 		if(isset($args['tooltip'])) {
@@ -1207,22 +1339,21 @@ class Helper_Options implements Helper_Int_Filters {
 	 */
 	public function password_callback( $args ) {
 		
-		$gfpdf_options = $this->settings;
+		/* get selected value (if any) */
+		$value = $this->get_form_value($args);
 
-		/* add GF settings */
-		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = $this->get_form_settings();
+		$required = '';
+		if(isset($args['required']) && $args['required'] === true) {
+			$required = 'required';
+		}
 
-		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
-			$value = $gfpdf_options[ $args['id'] ];
-		} elseif(empty($value) && isset( $gfpdf_form_settings[ $pid ][ $args['id']]) ) {
-			$value = $gfpdf_form_settings[ $pid ][ $args['id']];
-		} else {
-			$value = isset( $args['std'] ) ? $args['std'] : '';
+		$class = '';
+		if(isset($args['inputClass'])) {
+			$class = $args['inputClass'];
 		}
 
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
-		$html = '<input type="password" class="' . $size . '-text" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '"/>';
+		$html = '<input type="password" class="' . $size . '-text '. $class .'" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" '. $required .' />';
 		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
 
 		if(isset($args['tooltip'])) {
@@ -1230,19 +1361,6 @@ class Helper_Options implements Helper_Int_Filters {
 		}
 
 		echo $html;
-	}
-
-	/**
-	 * Missing Callback
-	 *
-	 * If a public function is missing for settings callbacks alert the user.
-	 *
-	 * @since 4.0
-	 * @param array $args Arguments passed by the setting
-	 * @return void
-	 */
-	public function missing_callback($args) {
-		printf( __( 'The callback used for the <strong>%s</strong> setting is missing.', 'gravitypdf' ), $args['id'] );
 	}
 
 	/**
@@ -1257,21 +1375,8 @@ class Helper_Options implements Helper_Int_Filters {
 	 */
 	public function select_callback($args) {
 		
-		$gfpdf_options = $this->settings;
-
-		/* add GF settings */
-		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = $this->get_form_settings();
-
-
-		
-		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
-			$value = $gfpdf_options[ $args['id'] ];
-		} elseif(empty($value) && isset( $gfpdf_form_settings[ $pid ][ $args['id']]) ) {
-			$value = $gfpdf_form_settings[ $pid ][ $args['id']];
-		} else {
-			$value = isset( $args['std'] ) ? $args['std'] : '';
-		}
+		/* get selected value (if any) */
+		$value = $this->get_form_value($args);
 
 		$placeholder = '';
 	    if ( isset( $args['placeholder'] ) ) {
@@ -1347,49 +1452,6 @@ class Helper_Options implements Helper_Int_Filters {
 	}
 
 	/**
-	 * Color select Callback
-	 *
-	 * Renders color select fields.
-	 *
-	 * @since 4.0
-	 * @param array $args Arguments passed by the setting
-	 * @global $gfpdf Array of all the Gravity PDF Options
-	 * @return void
-	 */
-	public function color_select_callback( $args ) {
-		
-		$gfpdf_options = $this->settings;
-
-		/* add GF settings */
-		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = $this->get_form_settings();
-
-		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
-			$value = $gfpdf_options[ $args['id'] ];
-		} elseif(empty($value) && isset( $gfpdf_form_settings[ $pid ][ $args['id']]) ) {
-			$value = $gfpdf_form_settings[ $pid ][ $args['id']];
-		} else {
-			$value = isset( $args['std'] ) ? $args['std'] : '';
-		}
-
-		$html = '<select id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']"/>';
-
-		foreach ( $args['options'] as $option => $color ) :
-			$selected = selected( $option, $value, false );
-			$html .= '<option value="' . $option . '" ' . $selected . '>' . $color['label'] . '</option>';
-		endforeach;
-
-		$html .= '</select>';
-		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
-
-		if(isset($args['tooltip'])) {
-			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . $args['tooltip'] . '</span>';
-		}
-
-		echo $html;
-	}
-
-	/**
 	 * Rich Editor Callback
 	 *
 	 * Renders rich editor fields.
@@ -1400,30 +1462,14 @@ class Helper_Options implements Helper_Int_Filters {
 	 * @global $wp_version WordPress Version
 	 */
 	public function rich_editor_callback( $args ) {
-		global $gfpdf, $wp_version;
-		$gfpdf_options = $this->settings;
-
-		/* add GF settings */
-		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = $this->get_form_settings();
-
-		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
-			$value = $gfpdf_options[ $args['id'] ];
-
-			if( empty( $args['allow_blank'] ) && empty( $value ) ) {
-				$value = isset( $args['std'] ) ? $args['std'] : '';
-			}
-		} elseif(empty($value) && isset( $gfpdf_form_settings[ $pid ][ $args['id']]) ) {
-			$value = $gfpdf_form_settings[ $pid ][ $args['id']];
-		} else {
-			$value = isset( $args['std'] ) ? $args['std'] : '';
-		}
+		/* get selected value (if any) */
+		$value = $this->get_form_value($args);
 
 		$rows = isset( $args['size'] ) ? $args['size'] : 20;
 
-		if ( $wp_version >= 3.3 && function_exists( 'wp_editor' ) ) {
+		if ( function_exists( 'wp_editor' ) ) {
 			ob_start();
-			wp_editor( stripslashes( $value ), 'gfpdf_settings_' . $args['id'], array( 'textarea_name' => 'gfpdf_settings[' . $args['id'] . ']', 'textarea_rows' => $rows ) );
+			wp_editor( stripslashes( $value ), 'gfpdf_settings_' . $args['id'], apply_filters('gfpdf_rich_editor_settings', array( 'textarea_name' => 'gfpdf_settings[' . $args['id'] . ']', 'textarea_rows' => $rows )) );
 			$html = ob_get_clean();
 		} else {
 			$html = '<textarea class="large-text" rows="10" class="gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']">' . esc_textarea( stripslashes( $value ) ) . '</textarea>';
@@ -1450,23 +1496,25 @@ class Helper_Options implements Helper_Int_Filters {
 	 */
 	public function upload_callback( $args ) {
 		
-		$gfpdf_options = $this->settings;
+		/* get selected value (if any) */
+		$value = $this->get_form_value($args);
 
-		/* add GF settings */
-		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = $this->get_form_settings();
+		$uploader_title       = ($args['uploaderTitle'])        ? $args['uploaderTitle'] : __('Select Media', 'gravitypdf');
+		$uploader_button_text = ($args['uploaderButtonText'])   ? $args['uploaderButtonText'] : __('Select Media', 'gravitypdf');
 
-		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
-			$value = $gfpdf_options[$args['id']];
-		} elseif(empty($value) && isset( $gfpdf_form_settings[ $pid ][ $args['id']]) ) {
-			$value = $gfpdf_form_settings[ $pid ][ $args['id']];
-		} else {
-			$value = isset($args['std']) ? $args['std'] : '';
+		$class = '';
+		if(isset($args['inputClass'])) {
+			$class = $args['inputClass'];
+		}
+
+		$required = '';
+		if(isset($args['required']) && $args['required'] === true) {
+			$required = 'required';
 		}
 
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
-		$html = '<input type="text" class="' . $size . '-text" class="gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '"/>';
-		$html .= '<span>&nbsp;<input type="button" class="gfpdf_settings_upload_button button-secondary" value="' . __( 'Upload File', 'gravitypdf' ) . '"/></span>';
+		$html = '<input type="text" class="' . $size . '-text gfpdf_settings_' . $args['id'] . ' '. $class .'" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" '. $required .' />';
+		$html .= '<span>&nbsp;<input type="button" class="gfpdf_settings_upload_button button-secondary" value="' . __( 'Upload File', 'gravitypdf' ) . '" data-uploader-title="'. $uploader_title . '" data-uploader-button-text="'. $uploader_button_text . '" /></span>';
 		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
 
 		if(isset($args['tooltip'])) {
@@ -1489,24 +1537,18 @@ class Helper_Options implements Helper_Int_Filters {
 	 */
 	public function color_callback( $args ) {
 		
-		$gfpdf_options = $this->settings;
-
-		/* add GF settings */
-		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = $this->get_form_settings();
-
-		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
-			$value = $gfpdf_options[ $args['id'] ];
-		} elseif(empty($value) && isset( $gfpdf_form_settings[ $pid ][ $args['id']]) ) {
-			$value = $gfpdf_form_settings[ $pid ][ $args['id']];
-		} else {
-			$value = isset( $args['std'] ) ? $args['std'] : '';
-		}
+		/* get selected value (if any) */
+		$value = $this->get_form_value($args);
 
 		$default = isset( $args['std'] ) ? $args['std'] : '';
 
+		$class = '';
+		if(isset($args['inputClass'])) {
+			$class = $args['inputClass'];
+		}
+
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? $args['size'] : 'regular';
-		$html = '<input type="text" class="gfpdf-color-picker" class="gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" data-default-color="' . esc_attr( $default ) . '" />';
+		$html = '<input type="text" class="gfpdf-color-picker gfpdf_settings_' . $args['id'] . ' '. $class .'" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" data-default-color="' . esc_attr( $default ) . '" />';
 		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . $args['desc'] . '</label></span>';
 
 		if(isset($args['tooltip'])) {
@@ -1517,16 +1559,16 @@ class Helper_Options implements Helper_Int_Filters {
 	}
 
 	/**
-	 * Descriptive text callback.
+	 * Add a button callback.
 	 *
-	 * Renders descriptive text onto the settings field.
+	 * Renders a button onto the settings field.
 	 *
 	 * @since 4.0
 	 * @param array $args Arguments passed by the setting
 	 * @return void
 	 */
 	public function button_callback( $args ) {
-		
+		global $gfpdf;
 
 		$tab = (isset($_GET['tab'])) ? $_GET['tab'] : 'general';
 		$nonce = wp_create_nonce('gfpdf_settings[' . $args['id'] . ']"');
@@ -1579,19 +1621,8 @@ class Helper_Options implements Helper_Int_Filters {
 	 */
 	public function hidden_callback( $args ) {
 		
-		$gfpdf_options = $this->settings;
-
-		/* add GF settings */
-		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = $this->get_form_settings();
-
-		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
-			$value = $gfpdf_options[ $args['id'] ];
-		} elseif(empty($value) && isset( $gfpdf_form_settings[ $pid ][ $args['id']]) ) {
-			$value = $gfpdf_form_settings[ $pid ][ $args['id']];
-		} else {
-			$value = isset( $args['std'] ) ? $args['std'] : '';
-		}
+		/* get selected value (if any) */
+		$value = $this->get_form_value($args);
 
 		$class = '';
 		if(isset($args['inputClass'])) {
@@ -1613,19 +1644,11 @@ class Helper_Options implements Helper_Int_Filters {
 	 */
 	public function paper_size_callback( $args ) {
 		
-		$gfpdf_options = $this->settings;
+		/* get selected value (if any) */
+		$value = $this->get_form_value($args);
 
-		/* add GF settings */
-		$pid = (rgget('pid')) ? rgget('pid') : rgpost('gform_pdf_id');
-		$gfpdf_form_settings = $this->get_form_settings();
-
-		if ( isset( $gfpdf_options[ $args['id'] ] ) ) {
-			$value = $gfpdf_options[ $args['id'] ];
-
-		} elseif(empty($value) && isset( $gfpdf_form_settings[ $pid ][ $args['id']]) ) {
-			$value = $gfpdf_form_settings[ $pid ][ $args['id']];
-		} else {
-			$value = (isset($args['std']) && is_array($args['std']) ) ? $args['std'] : array('', '', 'mm');
+		if(empty($value)) {
+			$value = array('', '', 'mm');
 		}
 
 		$placeholder = '';
@@ -1692,6 +1715,19 @@ class Helper_Options implements Helper_Int_Filters {
 	 */
 	public function hook_callback( $args ) {
 		do_action( 'gfpdf_' . $args['id'], $args );
+	}
+
+	/**
+	 * Missing Callback
+	 *
+	 * If a public function is missing for settings callbacks alert the user.
+	 *
+	 * @since 4.0
+	 * @param array $args Arguments passed by the setting
+	 * @return void
+	 */
+	public function missing_callback($args) {
+		printf( __( 'The callback used for the <strong>%s</strong> setting is missing.', 'gravitypdf' ), $args['id'] );
 	}
 
 }
