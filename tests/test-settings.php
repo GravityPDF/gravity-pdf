@@ -115,6 +115,24 @@ class Test_Settings extends WP_UnitTestCase
     }
 
     /**
+     * Test the appropriate filters are set up
+     * @since 4.0
+     * @group settings
+     */
+    public function test_setup_form_settings_errors() {
+        $this->markTestIncomplete('This test has not been implimented yet');
+    }
+
+    /**
+     * Test the appropriate filters are set up
+     * @since 4.0
+     * @group settings
+     */
+    public function test_highlight_errors() {
+        $this->markTestIncomplete('This test has not been implimented yet');
+    }
+
+    /**
      * Test all required custom meta boxes are added
      * @since 4.0
      * @group settings

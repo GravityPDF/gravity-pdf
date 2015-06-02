@@ -78,15 +78,11 @@ class Test_Form_Settings extends WP_UnitTestCase
      * @since 4.0
      */
     public function setUp() {
-
         /*
          * Replace parent::setup() with cut down version
          * so we don't use 'temporary' tables in MySQL
          */
         $this->cut_down_setup();
-
-        /* initialise Gravity Forms tables are created */
-        GFForms::setup(true);
 
         /* import our Gravity Form */
         $this->import_form();
@@ -111,9 +107,6 @@ class Test_Form_Settings extends WP_UnitTestCase
 
         /* run parent function */
         parent::tearDown();
-
-        /* remove Gravity Form tables */
-        RGFormsModel::drop_tables();
 
         /* clean up cache */
         $gfpdf->data->form_settings = array();
