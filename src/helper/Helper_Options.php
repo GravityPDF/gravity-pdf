@@ -51,14 +51,14 @@ class Helper_Options implements Helper_Int_Filters {
 	 * @var Array
 	 * @since 4.0
 	 */
-	public $settings = array();
+	private $settings = array();
 
 	/**
 	 * Holds the Gravity Form PDF Settings
 	 * @var Array
 	 * @since 4.0
 	 */
-	public $form_settings = array();
+	private $form_settings = array();
 
 	/**
 	 * Initialise the options API
@@ -608,22 +608,20 @@ class Helper_Options implements Helper_Int_Filters {
 			return $remove_option;
 		}
 
-		// First let's grab the current settings
+		/* First let's grab the current settings */
 		$options = get_option( 'gfpdf_settings' );
 
-		// Let's let devs alter that value coming in
+		/* Let's let devs alter that value coming in */
 		$value = apply_filters( 'gfpdf_update_option', $value, $key );
+		$value = apply_filters( 'gfpdf_update_option_' . $key, $value, $key );
 
-		// Next let's try to update the value
+		/* Next let's try to update the value */
 		$options[ $key ] = $value;
 		$did_update      = update_option( 'gfpdf_settings', $options );
 
-		// If it updated, let's update the global variable
+		/* If it updated, let's update the global variable */
 		if ( $did_update ){
-			
-			$gfpdf_options = $this->settings;
-			$gfpdf_options[ $key ] = $value;
-
+			$this->settings[ $key ] = $value;
 		}
 
 		return $did_update;
@@ -656,8 +654,7 @@ class Helper_Options implements Helper_Int_Filters {
 		$did_update = update_option( 'gfpdf_settings', $options );
 
 		if ( $did_update ) {
-			
-			$gfpdf_options = $options;
+			$this->settings = $options;
 		}
 
 		return $did_update;
@@ -822,7 +819,6 @@ class Helper_Options implements Helper_Int_Filters {
 			'fill-forms'    => __('Fill Forms', 'gravitypdf'),
 			'extract'       => __('Extract', 'gravitypdf'),
 			'assemble'      => __('Assemble', 'gravitypdf'),
-			
 		);
 
 		return apply_filters('gfpdf_privilages_list', $privilages);
@@ -859,7 +855,10 @@ class Helper_Options implements Helper_Int_Filters {
 		 */
 		$tab_len = strlen($tab);
 		foreach($all_settings as $id => $s) {
-			/* check if extra item(s) belongs on page but isn't the existing page */
+			/*
+			 * Check if extra item(s) belongs on page but isn't the existing page
+			 * Note that this requires the section ID share a similar ID to what is referenced in $tab
+			 */
 			if($tab != $id && $tab == substr($id, 0, $tab_len)) {
 				$settings = array_merge($settings, $s);
 			}
@@ -948,7 +947,7 @@ class Helper_Options implements Helper_Int_Filters {
 	 * @return string $input Sanitizied value
 	 */
 	public function sanitize_number_field( $input ) {
-		return (float) $input;
+		return (integer) $input;
 	}
 
 	/**

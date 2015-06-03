@@ -76,6 +76,9 @@ class Test_Options_API extends WP_UnitTestCase
         if(!is_wp_error($form_id)) {
             $this->form_id = $form_id;
         }
+
+        /* Set up our global settings */
+        $this->options->set_plugin_settings();
     }
 
     /**
@@ -267,7 +270,36 @@ class Test_Options_API extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_get_option() {
+        /* test for real values */
+        $this->assertEquals( 'custom', $this->options->get_option('default_pdf_size'));
+        $this->assertEquals( 'Awesomeness', $this->options->get_option('default_template'));
+        $this->assertEquals( 'No', $this->options->get_option('limit_to_admin'));
+        $this->assertTrue(is_array($this->options->get_option('admin_capabilities')));
 
+        /* test for non-existant option */
+        $this->assertFalse($this->options->get_option('non-existant'));
+
+        /* test default when non-existant option */
+        $this->assertTrue($this->options->get_option('non-existant', true));
+
+        /* check filters */
+        add_filter( 'gfpdf_get_option', function($value) {
+            return 'New Value';
+        });
+
+        $this->assertEquals( 'New Value', $this->options->get_option('default_pdf_size'));
+
+        /* clean up */
+        remove_all_filters('gfpdf_get_option');
+
+        add_filter( 'gfpdf_get_option_default_rtl', function($value) {
+            return 'RTL';
+        });
+
+        $this->assertEquals( 'RTL', $this->options->get_option('default_rtl'));
+
+        /* cleanup */
+        remove_all_filters('gfpdf_get_option_default_rtl');
     }
 
     /**
@@ -276,7 +308,35 @@ class Test_Options_API extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_update_option() {
+        /* test failures */
+        $this->assertFalse($this->options->update_option());
+        $this->assertFalse($this->options->update_option(''));
 
+        /* test update functionality */
+        $this->assertTrue($this->options->update_option('default_pdf_size', 'new pdf size'));
+        $this->assertEquals('new pdf size', $this->options->get_option('default_pdf_size'));
+
+        /* Check filters */
+        add_filter( 'gfpdf_update_option', function($value) {
+            return 'filtered option';
+        });
+
+        $this->assertTrue($this->options->update_option('default_pdf_size', 'new pdf size'));
+        $this->assertEquals('filtered option', $this->options->get_option('default_pdf_size'));
+
+        remove_all_filters('gfpdf_update_option');
+
+        add_filter( 'gfpdf_update_option_limit_to_admin', function($value) {
+            return 'filtered admin option';
+        });
+
+        $this->assertTrue($this->options->update_option('default_pdf_size', 'new pdf size'));
+        $this->assertEquals('new pdf size', $this->options->get_option('default_pdf_size'));
+
+        $this->assertTrue($this->options->update_option('limit_to_admin', 'admin'));
+        $this->assertEquals('filtered admin option', $this->options->get_option('limit_to_admin'));
+
+        remove_all_filters('gfpdf_update_option_limit_to_admin');
     }
 
     /**
@@ -285,6 +345,123 @@ class Test_Options_API extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_delete_option() {
+        /* test failure */
+        $this->assertFalse($this->options->delete_option());
+        $this->assertFalse($this->options->delete_option(''));
 
+        /* test delete functionality */
+        $this->assertEquals('custom', $this->options->get_option('default_pdf_size'));
+        $this->assertTrue($this->options->delete_option('default_pdf_size'));
+        $this->assertFalse($this->options->get_option('default_pdf_size'));
+    }
+
+    /**
+     * Test the returned capabilities list
+     * @group options
+     * @since 4.0
+     */
+    public function test_get_capabilities() {
+        $capabilities = $this->options->get_capabilities();
+
+        $this->assertTrue(isset($capabilities['Gravity Forms Capabilities']));
+        $this->assertTrue(isset($capabilities['Active WordPress Capabilities']));
+
+        $this->assertNotSame(0, sizeof($capabilities['Gravity Forms Capabilities']));
+        $this->assertNotSame(0, sizeof($capabilities['Active WordPress Capabilities']));
+    }
+
+    /**
+     * Test the returned paper size list
+     * @group options
+     * @since 4.0
+     */
+    public function test_get_paper_size() {
+        $paper_size = $this->options->get_paper_size();
+
+        $this->assertTrue(isset($paper_size['Common Sizes']));
+        $this->assertTrue(isset($paper_size['"A" Sizes']));
+        $this->assertTrue(isset($paper_size['"B" Sizes']));
+        $this->assertTrue(isset($paper_size['"C" Sizes']));
+        $this->assertTrue(isset($paper_size['"RA" and "SRA" Sizes']));
+    }
+
+    /**
+     * Test the get templates functionality
+     * @group options
+     * @since 4.0
+     */
+    public function test_get_templates() {
+         $this->markTestIncomplete('This test has not been implimented yet');
+    }
+
+    /**
+     * Test the installed fonts getter functionality
+     * @group options
+     * @since 4.0
+     */
+    public function test_get_installed_fonts() {
+         $this->markTestIncomplete('This test has not been implimented yet');
+    }
+
+    /**
+     * Test the privilages getter
+     * @group options
+     * @since 4.0
+     */
+    public function test_get_privilages() {
+        $this->assertTrue(is_array($this->options->get_privilages()));
+    }
+
+    /**
+     * Test the trim sanitisation function
+     * @group options
+     * @since 4.0
+     * @dataProvider dataprovider_sanitize_trim
+     */
+    public function test_sanitize_trim_field($expected, $input) {
+        $this->assertEquals($expected, $this->options->sanitize_trim_field($input));
+    }
+
+    /**
+     * Test data provider for our trim functionality (test_sanitize_trim_field)
+     * @return array The data to test
+     * @since  4.0
+     */
+    public function dataprovider_sanitize_trim() {
+        return array(
+            array('My First PDF', '    My First PDF '),
+            array('My First   PDF', 'My First   PDF   '),
+            array('123_Advanced_{My Funny\\\'s PDF Name:213}', '              123_Advanced_{My Funny\\\'s PDF Name:213}'),
+            array('驚いた彼は道を走っていった', '   驚いた彼は道を走っていった  '),
+            array('élève forêt', 'élève forêt                '),
+            array('English', 'English'),
+            array('मानक हिन्दी', '            मानक हिन्दी '),
+        );
+    }
+
+    /**
+     * Test the number sanitisation function
+     * @group options
+     * @since 4.0
+     * @dataProvider dataprovider_sanitize_number
+     */
+    public function test_sanitize_number_field($expected, $input) {
+        $this->assertSame($expected, $this->options->sanitize_number_field($input));
+    }
+
+    /**
+     * Test data provider for our number functionality (test_sanitize_number_field)
+     * @return array The data to test
+     * @since  4.0
+     */
+    public function dataprovider_sanitize_number() {
+        return array(
+            array(122, '122.34343The'),
+            array(0, 'The122.34343'),
+            array(20, '20'),
+            array(2000, '2000'),
+            array(20, '20.50'),
+            array(50, '50,20'),
+        );
     }
 }
