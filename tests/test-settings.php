@@ -115,21 +115,28 @@ class Test_Settings extends WP_UnitTestCase
     }
 
     /**
-     * Test the appropriate filters are set up
+     * Test the form errors are generated and stored correctly
      * @since 4.0
      * @group settings
      */
     public function test_setup_form_settings_errors() {
-        $this->markTestIncomplete('This test has not been implimented yet');
-    }
+        global $wp_settings_errors;
 
-    /**
-     * Test the appropriate filters are set up
-     * @since 4.0
-     * @group settings
-     */
-    public function test_highlight_errors() {
-        $this->markTestIncomplete('This test has not been implimented yet');
+        /* Set up test data */
+        add_settings_error( 'notices', 'normal', __( 'Normal Notice', 'gravitypdf' ) );
+        add_settings_error( 'gfpdf-notices', 'select', __( 'PDF Settings could not be saved. Please enter all required information below.', 'gravitypdf' ) );
+        add_settings_error( 'gfpdf-notices', 'text', __( 'PDF Settings could not be saved. Please enter all required information below.', 'gravitypdf' ) );
+        add_settings_error( 'gfpdf-notices', 'hidden', __( 'PDF Settings could not be saved. Please enter all required information below.', 'gravitypdf' ) );
+
+        /* set up test transient (like in options.php) */
+        set_transient( 'settings_errors', $wp_settings_errors, 30);
+
+        /* trigger function */
+        $this->model->setup_form_settings_errors();
+
+        /* test results */
+        $this->assertSame(4, sizeof($this->model->form_settings_errors));
+        $this->assertSame(2, sizeof(get_transient( 'settings_errors' )));
     }
 
     /**

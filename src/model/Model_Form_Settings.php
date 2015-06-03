@@ -150,8 +150,14 @@ class Model_Form_Settings extends Helper_Model {
         /* If we haven't pulled the form meta data from the database do so now */
         if(!isset($gfpdf->data->form_settings[$form_id])) {
             $form     = GFFormsModel::get_form_meta( $form_id );
+
+            if(empty($form)) {
+                return new WP_Error('invalid_id', __('You must pass in a valid form ID', 'gravitypdf'));
+            }
+            
             $settings = (isset($form['gfpdf_form_settings'])) ? $form['gfpdf_form_settings'] : array();
             $gfpdf->data->form_settings[$form_id] = apply_filters( 'gfpdf_get_form_settings', $settings );
+            
         }
 
         /* return the form meta data */
@@ -168,8 +174,14 @@ class Model_Form_Settings extends Helper_Model {
      */
     public function get_pdf( $form_id, $pdf_id ) {
         $gfpdf_options = $this->get_settings($form_id);
-        $value         = ! empty( $gfpdf_options[ $pdf_id ] ) ? $gfpdf_options[ $pdf_id ] : false;
-        return apply_filters( 'gfpdf_pdf_config', apply_filters( 'gfpdf_pdf_config_' . $form_id, $value ));
+
+        if(!is_wp_error($gfpdf_options)) {
+            $value         = ! empty( $gfpdf_options[ $pdf_id ] ) ? $gfpdf_options[ $pdf_id ] : false;
+            return apply_filters( 'gfpdf_pdf_config', apply_filters( 'gfpdf_pdf_config_' . $form_id, $value ));
+        }
+
+        /* return WP_Error */
+        return $gfpdf_options;
     }
 
 
@@ -516,22 +528,22 @@ class Model_Form_Settings extends Helper_Model {
         if(! wp_verify_nonce( $nonce, $nonce_id )) {
             /* fail */
             header('HTTP/1.1 401 Unauthorized');
-            exit;
+            wp_die('401');
         }
 
         $results = $this->delete_pdf($fid, $pid);
 
-        if($results) {
+        if($results && !is_wp_error($results)) {
             $return = array(
                 'msg' => __('PDF successfully deleted.', 'gravitypdf'),
             );
 
             echo json_encode($return);
-            exit;
+            wp_die();
         }
 
         header('HTTP/1.1 500 Internal Server Error');
-        exit;
+        wp_die('500');
     }
 
     /**
@@ -555,35 +567,38 @@ class Model_Form_Settings extends Helper_Model {
         if(! wp_verify_nonce( $nonce, $nonce_id )) {
             /* fail */
             header('HTTP/1.1 401 Unauthorized');
-            exit;
+            wp_die('401');
         }
 
         $config = $this->get_pdf($fid, $pid);
-        $config['id']   = uniqid();
-        $config['name'] = $config['name'] . ' (copy)';
 
-        $results = $this->update_pdf($fid, $config['id'], $config);
+        if(!is_wp_error($config)) {
+            $config['id']   = uniqid();
+            $config['name'] = $config['name'] . ' (copy)';
 
-        if($results) {
-            $dup_nonce   = wp_create_nonce("gfpdf_duplicate_nonce_{$fid}_{$config['id']}");
-            $del_nonce   = wp_create_nonce("gfpdf_delete_nonce_{$fid}_{$config['id']}");
-            $state_nonce = wp_create_nonce("gfpdf_state_nonce_{$fid}_{$config['id']}");
+            $results = $this->update_pdf($fid, $config['id'], $config);
 
-            $return = array(
-                'msg'         => __('PDF successfully duplicated.', 'gravitypdf'),
-                'pid'         => $config['id'],
-                'name'        => $config['name'],
-                'dup_nonce'   => $dup_nonce,
-                'del_nonce'   => $del_nonce,
-                'state_nonce' => $state_nonce,
-            );
+            if($results) {
+                $dup_nonce   = wp_create_nonce("gfpdf_duplicate_nonce_{$fid}_{$config['id']}");
+                $del_nonce   = wp_create_nonce("gfpdf_delete_nonce_{$fid}_{$config['id']}");
+                $state_nonce = wp_create_nonce("gfpdf_state_nonce_{$fid}_{$config['id']}");
 
-            echo json_encode($return);
-            exit;
+                $return = array(
+                    'msg'         => __('PDF successfully duplicated.', 'gravitypdf'),
+                    'pid'         => $config['id'],
+                    'name'        => $config['name'],
+                    'dup_nonce'   => $dup_nonce,
+                    'del_nonce'   => $del_nonce,
+                    'state_nonce' => $state_nonce,
+                );
+
+                echo json_encode($return);
+                wp_die();
+            }
         }
 
         header('HTTP/1.1 500 Internal Server Error');
-        exit;
+        wp_die('500');
     }
 
     /**
@@ -606,29 +621,32 @@ class Model_Form_Settings extends Helper_Model {
         if(! wp_verify_nonce( $nonce, $nonce_id )) {
             /* fail */
             header('HTTP/1.1 401 Unauthorized');
-            exit;
+            wp_die('401');
         }
 
         $config = $this->get_pdf($fid, $pid);
 
-        /* toggle state */
-        $config['active'] = ($config['active'] === true) ? false : true;
-        $state            = ($config['active']) ? __( 'Active', 'gravitypdf' ) : __( 'Inactive', 'gravitypdf' );
-        $src              = GFCommon::get_base_url() . '/images/active' . intval( $config['active'] ) . '.png';
+        if(!is_wp_error($config)) {
 
-        $results = $this->update_pdf($fid, $config['id'], $config);
+            /* toggle state */
+            $config['active'] = ($config['active'] === true) ? false : true;
+            $state            = ($config['active']) ? __( 'Active', 'gravitypdf' ) : __( 'Inactive', 'gravitypdf' );
+            $src              = GFCommon::get_base_url() . '/images/active' . intval( $config['active'] ) . '.png';
 
-        if($results) {
-            $return = array(
-                'state' => $state,
-                'src'   => $src,
-            );
+            $results = $this->update_pdf($fid, $config['id'], $config);
 
-            echo json_encode($return);
-            exit;
+            if($results) {
+                $return = array(
+                    'state' => $state,
+                    'src'   => $src,
+                );
+
+                echo json_encode($return);
+                wp_die();
+            }
         }
 
         header('HTTP/1.1 500 Internal Server Error');
-        exit;
+        wp_die('500');
     }
 }

@@ -131,8 +131,13 @@ class Helper_Options implements Helper_Int_Filters {
 		$model = new Model_Form_Settings();
 		$settings = $model->get_settings($form_id);
 
-		/* get the selected form settings */
-		return (isset($settings[$pid])) ? $settings[$pid] : array();
+		if(!is_wp_error($settings)) {
+			/* get the selected form settings */
+			return (isset($settings[$pid])) ? $settings[$pid] : array();
+		}
+
+		/* there was an error */
+		return array();
 	}
 
 	/**
