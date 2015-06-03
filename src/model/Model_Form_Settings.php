@@ -459,16 +459,20 @@ class Model_Form_Settings extends Helper_Model {
         foreach ( $input as $key => $value ) {
 
             foreach($sections as $s) {
-                $type = isset( $settings[$s][$key]['type'] ) ? $settings[$s][$key]['type'] : false;
 
-                if ( $type ) {
-                    /* Field type specific filter */
-                    $input[$key] = apply_filters( 'gfpdf_form_settings_sanitize_' . $type, $value, $key );
+                /* only process field if found in the section */
+                if(isset($settings[$s][$key])) {
+                    $type = isset( $settings[$s][$key]['type'] ) ? $settings[$s][$key]['type'] : false;
+
+                    if ( $type ) {
+                        /* Field type specific filter */
+                        $input[$key] = apply_filters( 'gfpdf_form_settings_sanitize_' . $type, $input[$key], $key, $input, $settings[$s][$key] );
+                    }
+
+                    /* General filter */
+                    $input[$key] = apply_filters( 'gfpdf_form_settings_sanitize', $input[$key], $key, $input, $settings[$s][$key] );
                 }
             }
-
-            /* General filter */
-            $input[$key] = apply_filters( 'gfpdf_form_settings_sanitize', $input[$key], $key );
         }
 
         return $input;

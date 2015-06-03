@@ -73,6 +73,7 @@ class Helper_Options implements Helper_Int_Filters {
 	public function add_filters() {
         /* register our core santize functions */
         add_filter( 'gfpdf_settings_sanitize', array($this, 'sanitize_required_field'), 10, 4 );
+        add_filter( 'gfpdf_settings_sanitize', array($this, 'sanitize_all_fields'), 10, 4 );
 
         add_filter( 'gfpdf_settings_sanitize_text', array($this, 'sanitize_trim_field') );
         add_filter( 'gfpdf_settings_sanitize_textarea', array($this, 'sanitize_trim_field') );
@@ -208,7 +209,6 @@ class Helper_Options implements Helper_Int_Filters {
 			/** General Settings */
 			'general' => apply_filters( 'gfpdf_settings_general',
 				array(
-
 					'default_pdf_size' => array(
 						'id'         => 'default_pdf_size',
 						'name'       => __('Default Paper Size', 'gravitypdf'),
@@ -356,6 +356,7 @@ class Helper_Options implements Helper_Int_Filters {
 			/* Form (PDF) Settings */
 			'form_settings' => apply_filters('gfpdf_form_settings',
 				array(
+
 					'name' => array(
 						'id'       => 'name',
 						'name'     => __('Name', 'gravitypdf'),
@@ -956,7 +957,41 @@ class Helper_Options implements Helper_Int_Filters {
 	}
 
 	/**
-	 * Sanitize select field
+	 * Sanitize all fields depending on type
+	 *
+	 * @since 4.0
+	 * @param mixed   $value The field's user input value
+	 * @param string  $key The settings key
+	 * @param array   $input All user fields
+	 * @param array   $settings The field settings
+	 * @return string $input Sanitizied value
+	 */
+	public function sanitize_all_fields( $value, $key, $input, $settings ) {
+		if(!isset($settings['type'])) {
+			$settings['type'] = '';
+		}
+
+		switch($settings['type']) {
+			case 'rich_editor':
+			case 'textarea':
+				return wp_kses_post( $value );
+			break;
+
+			/* treat as plain text */
+			default:
+				if(is_array($value)) {
+					array_walk_recursive($value, 'wp_strip_all_tags');
+					return $value;
+				} else {
+					return wp_strip_all_tags($value);
+				}
+				
+			break;
+		}
+	}
+
+	/**
+	 * Sanitize all required fields
 	 *
 	 * @since 4.0
 	 * @param mixed   $value The field's user input value
