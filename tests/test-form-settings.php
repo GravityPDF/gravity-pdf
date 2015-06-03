@@ -83,9 +83,6 @@ class Test_Form_Settings extends WP_UnitTestCase
         /* import our Gravity Form */
         $this->import_form();
 
-        /* ensure our admin hooks trigger */
-        do_action('admin_init');
-
         /* Setup our test classes */
         $this->model = new Model_Form_Settings();
         $this->view  = new View_Form_Settings(array());
@@ -144,15 +141,20 @@ class Test_Form_Settings extends WP_UnitTestCase
     public function test_filters() {
         global $gfpdf;
 
+        /* ensure our options get initialised (only on admin_init) */
+        $this->assertEquals(false, has_filter( 'gfpdf_settings_sanitize', array($gfpdf->options, 'sanitize_required_field') ));
+        $gfpdf->options->init();
+
         /* validation filters */
         $this->assertEquals(10, has_filter( 'gfpdf_form_settings', array( $this->model, 'validation_error')));
         $this->assertEquals(10, has_filter( 'gfpdf_form_settings_appearance', array( $this->model, 'validation_error')));
 
         /* core sanitation functions */
         $this->assertEquals(10, has_filter( 'gfpdf_settings_sanitize', array($gfpdf->options, 'sanitize_required_field') ));
+        $this->assertEquals(10, has_filter( 'gfpdf_settings_sanitize', array($gfpdf->options, 'sanitize_all_fields') ));
 
         /* custom sanitation functions */
-        $this->assertEquals(10, has_filter( 'gfpdf_form_settings_sanitize_text', 'wp_strip_all_tags'));
+        $this->assertEquals(10, has_filter( 'gfpdf_form_settings_sanitize', array($gfpdf->options, 'sanitize_all_fields') ));
         $this->assertEquals(15, has_filter( 'gfpdf_form_settings_sanitize_text',  array($this->model, 'strip_filename_extension')));
         $this->assertEquals(10, has_filter( 'gfpdf_form_settings_sanitize_hidden',  array($this->model, 'decode_json')));
     }
@@ -484,10 +486,9 @@ class Test_Form_Settings extends WP_UnitTestCase
         /**
          * Get global input filter
          */
-        
         add_filter( 'gfpdf_form_settings_sanitize', function($input, $key) {
             return 'global input value';
-        }, 10, 2);
+        }, 15, 2);
 
         $values = $this->model->settings_sanitize($input);
 

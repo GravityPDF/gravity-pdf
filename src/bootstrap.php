@@ -277,8 +277,10 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
      * @return 4.0
      */
     public function setup_settings_fields() {
-        /* create a new instance of our options object */
-        $this->options = new Helper\Helper_Options();
+        /* create a new instance of our options object if not already created*/
+        if(empty($this->options)) {
+            $this->options = new Helper\Helper_Options();
+        }
 
         /* load our options API */
         $this->options->init();

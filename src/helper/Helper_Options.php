@@ -401,7 +401,7 @@ class Helper_Options implements Helper_Int_Filters {
 					),
 
 					'conditional' => array(
-						'id'         => 'pdf',
+						'id'         => 'conditional',
 						'name'       => __('Conditional Logic', 'gravitypdf'),
 						'type'       => 'conditional_logic',
 						'desc'       => __('Enable conditional logic', 'gravitypdf'),
@@ -521,7 +521,7 @@ class Helper_Options implements Helper_Int_Filters {
 						'inputClass' => 'merge-tag-support mt-hide_all_fields',
 					),
 
-					'privilages' => array(
+					'privileges' => array(
 						'id'      => 'privileges',
 						'name'    => __('Privileges', 'gravitypdf'),
 						'desc'    => 'Restrict end-user capabilities.',
