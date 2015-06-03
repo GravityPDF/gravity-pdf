@@ -4,7 +4,6 @@ namespace GFPDF\Model;
 use GFPDF\Helper\Helper_Model;
 use GFPDF\Helper\Helper_PDF_List_Table;
 use GFPDF\Helper\Helper_Options;
-use RGFormsModel;
 use GFFormsModel;
 use GFCommon;
 use WP_Error;
@@ -76,7 +75,7 @@ class Model_Form_Settings extends Helper_Model {
         $controller = $this->getController();
 
         /* get the form object */
-        $form = RGFormsModel::get_form_meta( $form_id );
+        $form = GFFormsModel::get_form_meta( $form_id );
 
         /* load our list table */
         $pdf_table = new Helper_PDF_List_Table( $form );
@@ -103,7 +102,7 @@ class Model_Form_Settings extends Helper_Model {
         $controller = $this->getController();
 
         /* get the form object */
-        $form = RGFormsModel::get_form_meta( $form_id );
+        $form = GFFormsModel::get_form_meta( $form_id );
 
         /* parse input and get required information */
         if(!$pdf_id) {

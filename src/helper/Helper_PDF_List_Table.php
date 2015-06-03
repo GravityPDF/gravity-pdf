@@ -5,7 +5,7 @@ use WP_List_Table;
 use GFCommon;
 
 /**
- * WP_List_Table Helper Controller 
+ * WP_List_Table Helper Controller
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
@@ -72,7 +72,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Display our table 	 
+	 * Display our table
 	 * @since 4.0
 	 */
 	public function display() {
@@ -105,13 +105,13 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Output the single table row 
-	 * @param  array $item The table row being processed	 
+	 * Output the single table row
+	 * @param  array $item The table row being processed
 	 * @since 4.0
 	 */
 	public function single_row( $item ) {
 		static $row_class = '';
-		$row_class = ( $row_class == '' ? ' class="alternate"' : '' );
+		$row_class = ( $row_class == '' ? 'class="alternate"' : $row_class );
 
 		echo '<tr id="gfpdf-' . $item['id'] . '" ' . $row_class . '>';
 		echo $this->single_row_columns( $item );
@@ -119,9 +119,9 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Default column handler 
-	 * Used when not custom column public function exists 	 
-	 * @param  array $item The table row being processed	 
+	 * Default column handler
+	 * Used when not custom column public function exists
+	 * @param  array $item The table row being processed
 	 * @since 4.0
 	 */
 	public function column_default( $item, $column ) {
@@ -129,14 +129,14 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Custom public function for displaying the 'cb' column 
+	 * Custom public function for displaying the 'cb' column
 	 * Used to handle active / inactive PDFs
-	 * @param  array $item The table row being processed	 
+	 * @param  array $item The table row being processed
 	 * @since 4.0
 	 */
 	public function column_cb( $item ) {
 		$is_active   = isset( $item['active'] ) ? $item['active'] : true;
-		$form_id     = rgget('id');		
+		$form_id     = rgget('id');
 		$state_nonce = wp_create_nonce("gfpdf_state_nonce_{$form_id}_{$item['id']}");
 		?>
 		<img data-id="<?php echo $item['id'] ?>" data-nonce="<?php echo $state_nonce; ?>" data-fid="<?php echo $form_id; ?>" src="<?php echo GFCommon::get_base_url() ?>/images/active<?php echo intval( $is_active ) ?>.png" style="cursor: pointer;margin:-5px 0 0 8px;" alt="<?php $is_active ? __( 'Active', 'gravitypdf' ) : __( 'Inactive', 'gravitypdf' ); ?>" title="<?php echo $is_active ? __( 'Active', 'gravitypdf' ) : __( 'Inactive', 'gravitypdf' ); ?>"/>
@@ -144,9 +144,9 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Custom public function for displaying the 'notifications' column 
+	 * Custom public function for displaying the 'notifications' column
 	 * Display comma separated list of active notifications, otherwise display 'None'
-	 * @param  array $item The table row being processed	 
+	 * @param  array $item The table row being processed
 	 * @since 4.0
 	 */
 	public function column_notifications( $item ) {
@@ -160,7 +160,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 	/**
 	 * Add column actions to allow edit, duplication and deletion
-	 * @param  array $item The table row being processed	 
+	 * @param  array $item The table row being processed
 	 * @since 4.0
 	 */
 	public function column_name( $item ) {
@@ -203,9 +203,9 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Copy to display when no PDF configuration options exist	 
+	 * Copy to display when no PDF configuration options exist
 	 * @since 4.0
-	 */	
+	 */
 	public function no_items() {
 		printf( __( "This form doesn't have any PDFs. Let's go %screate one%s.", 'gravitypdf' ), "<a href='" . add_query_arg( array( 'pid' => 0 ) ) . "'>", '</a>' );
 	}

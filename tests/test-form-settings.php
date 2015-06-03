@@ -78,11 +78,7 @@ class Test_Form_Settings extends WP_UnitTestCase
      * @since 4.0
      */
     public function setUp() {
-        /*
-         * Replace parent::setup() with cut down version
-         * so we don't use 'temporary' tables in MySQL
-         */
-        $this->cut_down_setup();
+        parent::setUp();
 
         /* import our Gravity Form */
         $this->import_form();
@@ -110,21 +106,6 @@ class Test_Form_Settings extends WP_UnitTestCase
 
         /* clean up cache */
         $gfpdf->data->form_settings = array();
-    }
-
-    /**
-     * Gravity Forms won't work with Temporary tables due to some of its queries
-     * To work around this we are modifying the start up procedure
-     * @since 4.0
-     */
-    private function cut_down_setup() {
-        global $wpdb;
-
-        /* set up database */
-        $wpdb->suppress_errors = false;
-        $wpdb->show_errors = true;
-        $wpdb->db_connect();
-        $wpdb->query('SET autocommit = 0;');
     }
 
     /**
