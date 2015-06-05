@@ -7,7 +7,8 @@ use GFPDF\Helper\Helper_View;
 use GFPDF\Helper\Helper_Int_Actions;
 use GFPDF\Helper\Helper_Int_Filters;
 use GFPDF\Stat\Stat_Functions;
-use \RGForms;
+use GFForms;
+use GFCommon;
 
 /**
  * Settings Controller
@@ -75,7 +76,7 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
          * Tell Gravity Forms to initiate our settings page
          * Using the following Class/Model
          */
-         RGForms::add_settings_page($gfpdf->data->short_title, array($this, 'displayPage'));
+         GFForms::add_settings_page($gfpdf->data->short_title, array($this, 'displayPage'));
 
          /* Ensure any errors are stored correctly */
          $this->model->setup_form_settings_errors();
@@ -121,6 +122,7 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
 
         /* change capability needed to edit settings page */
         add_filter('option_page_capability_gfpdf_settings', array($this, 'edit_options_cap'));
+        add_filter('gravitypdf_settings_navigation', array($this, 'disable_tools_on_view_cap'));
     }
 
     /**
@@ -156,5 +158,19 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
      */
     public function edit_options_cap() {
         return 'gravityforms_edit_settings';
+    }
+
+    /**
+     * Return our custom capability
+     * @param  $nav Array The existing settings navigation
+     * @since 4.0
+     * @return array
+     */
+    public function disable_tools_on_view_cap($nav) {
+        if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+            unset($nav[100]); /* remove tools tab */
+        }
+        
+        return $nav;
     }
 }

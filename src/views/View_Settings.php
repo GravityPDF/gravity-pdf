@@ -115,7 +115,7 @@ class View_Settings extends Helper_View
              * Allow additional navigation to be added to the settings page
              * @since 3.8
              */
-            return apply_filters('pdf_extended_settings_navigation', $navigation);
+            return apply_filters('gravitypdf_settings_navigation', $navigation);
     }
 
     /**
@@ -174,6 +174,11 @@ class View_Settings extends Helper_View
     public function tools() {
         global $gfpdf;
 
+        /* prevent unauthorized access */
+        if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+            wp_die( __('You do not have permission to access this page', 'gravitypdf') );
+        }
+
         $vars = array(
             'template_directory' => str_replace(ABSPATH, '/', $gfpdf->data->template_location),
         );
@@ -196,7 +201,7 @@ class View_Settings extends Helper_View
         $tooltips['pdf_status_wp_memory']     = '<h6>' . __( 'WP Memory Available', 'gravitypdf' ) . '</h6>' . sprintf(__( "Producing PDF documents is hard work and Gravity PDF requires more resources than most plugins. We strongly recommend you have at least 128MB, but you may need more.", 'gravitypdf' ));
         $tooltips['pdf_status_notifications'] = '<h6>' . __( 'PDF Notifications', 'gravitypdf' ) . '</h6>' . sprintf(__( 'Sending PDFs automatically via Gravity Form notifications requires write access to our designated output directory: %s.', 'gravitypdf' ), '<code>' . $gfpdf->data->relative_output_location . '</code>');
 
-        return $tooltips;
+        return apply_filters('gravitypdf_registered_tooltips', $tooltips);
     }
 
     /**
