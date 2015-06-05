@@ -71,6 +71,12 @@ class Model_Form_Settings extends Helper_Model {
      * @since 4.0
      */
     public function process_list_view($form_id) {
+
+        /* prevent unauthorized access */
+        if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+            wp_die( __('You do not have permission to access this page', 'gravitypdf') );
+        }
+
         global $gfpdf;
         $controller = $this->getController();
 
@@ -98,6 +104,11 @@ class Model_Form_Settings extends Helper_Model {
      */
     public function show_edit_view($form_id, $pdf_id) {
         global $gfpdf;
+
+        /* prevent unauthorized access */
+        if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+            wp_die( __('You do not have permission to access this page', 'gravitypdf') );
+        }
 
         $controller = $this->getController();
 
@@ -327,6 +338,11 @@ class Model_Form_Settings extends Helper_Model {
     public function process_submission($form_id, $pdf_id) {
         global $gfpdf;
 
+        /* prevent unauthorized access */
+        if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+            wp_die( __('You do not have permission to access this page', 'gravitypdf') );
+        }
+
         /* Check Nonce is valid */
         if( ! wp_verify_nonce( $_POST['gfpdf_save_pdf'], 'gfpdf_save_pdf' ) ) {
              GFCommon::add_error_message( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
@@ -519,9 +535,18 @@ class Model_Form_Settings extends Helper_Model {
      * @since 4.0
      */
     public function delete_gf_pdf_setting() {
+        
+        /* prevent unauthorized access */
+        if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+            /* fail */
+            header('HTTP/1.1 401 Unauthorized');
+            wp_die('401');
+        }
+
         /*
          * Validate Endpoint
          */
+        
         $nonce = $_POST['nonce'];
         $fid   = (int) $_POST['fid'];
         $pid   = $_POST['pid'];
@@ -558,6 +583,14 @@ class Model_Form_Settings extends Helper_Model {
      * @since 4.0
      */
     public function duplicate_gf_pdf_setting() {
+
+        /* prevent unauthorized access */
+        if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+            /* fail */
+            header('HTTP/1.1 401 Unauthorized');
+            wp_die('401');
+        }
+
         /*
          * Validate Endpoint
          */
@@ -613,6 +646,13 @@ class Model_Form_Settings extends Helper_Model {
      * @since 4.0
      */
     public function change_state_pdf_setting() {
+        /* prevent unauthorized access */
+        if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+            /* fail */
+            header('HTTP/1.1 401 Unauthorized');
+            wp_die('401');
+        }
+
         /*
          * Validate Endpoint
          */

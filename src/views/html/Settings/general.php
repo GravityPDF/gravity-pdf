@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * General Settings View
@@ -39,7 +39,7 @@ if (! defined('ABSPATH')) {
 <?php $this->tabs(); ?>
         
         
-<div id="pdfextended-settings">    
+<div id="pdfextended-settings">
 	<h3>
 		<span>
 		  <i class="fa fa-cog"></i>
@@ -50,11 +50,11 @@ if (! defined('ABSPATH')) {
 	<form method="post" action="options.php">
 		<?php settings_errors(); ?>
 		<?php settings_fields( 'gfpdf_settings' ); ?>
-		<table id="pdf-general" class="form-table">		
+		<table id="pdf-general" class="form-table">
 			<?php do_settings_fields('gfpdf_settings_general', 'gfpdf_settings_general'); ?>
 		</table>
 
-		<div class="hr-divider"></div>		
+		<div class="hr-divider"></div>
 
 		<div id="gfpdf-advanced-options">
 			<h3>
@@ -64,15 +64,19 @@ if (! defined('ABSPATH')) {
 				</span>
 			</h3>
 
-			<table id="pdf-general-security" class="form-table">		
+			<table id="pdf-general-security" class="form-table">
 				<?php do_settings_fields('gfpdf_settings_general_security', 'gfpdf_settings_general_security'); ?>
-			</table>	
+			</table>
 		</div>
 
 		<div class="gfpdf-advanced-options"><a href="#"><?php _e('Show Advanced Options...', 'gravitypdf'); ?></a></div>
 
-		<?php submit_button(); ?>
-	</form>	
+		<?php
+			if($args['edit_cap']) {
+				submit_button();
+			}
+		?>
+	</form>
 
-	<?php do_action('pdf-settings-general'); ?>		                             
+	<?php do_action('pdf-settings-general'); ?>
 </div>

@@ -42,22 +42,22 @@ class Test_Data_Helper extends WP_UnitTestCase
 {
     /**
      * Our Gravity PDF Data object
-     * @var Object 
+     * @var Object
      * @since 4.0
      */
-    public $data;  
+    public $data;
 
     /**
-     * The WP Unit Test Set up function 
+     * The WP Unit Test Set up function
      * @since 4.0
      */
     public function setUp() {
         /* run parent method */
-        parent::setUp();       
+        parent::setUp();
 
-        /* Setup out loader class */          
-        $this->data = new Helper_Data();        
-    }          
+        /* Setup out loader class */
+        $this->data = new Helper_Data();
+    }
 
     /**
      * Check if our getter / setter is functional with different data types
@@ -115,7 +115,7 @@ class Test_Data_Helper extends WP_UnitTestCase
 
     /**
      * A data provider used to check the getter / setter functionality is working correctly
-     * @return Array Our test data 
+     * @return Array Our test data
      * @since 4.0
      */
     public function provider_setter() {
@@ -138,5 +138,21 @@ class Test_Data_Helper extends WP_UnitTestCase
             array('float', 12.2324),
             array('float2', 0.24),
         );
+    }
+
+    /**
+     * Test the localised script data
+     * @since 4.0
+     * @group data
+     */
+    public function test_localised_script() {
+        $array = $this->data->get_localised_script_data();
+
+        $this->assertArrayHasKey('ajaxurl', $array);
+        $this->assertArrayHasKey('GFbaseUrl', $array);
+        $this->assertArrayHasKey('pluginUrl', $array);
+        $this->assertArrayHasKey('ajax_error', $array);
+        $this->assertArrayHasKey('active', $array);
+        $this->assertArrayHasKey('inactive', $array);
     }
 }

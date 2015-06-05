@@ -118,6 +118,9 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
 
         /* make capability text user friendly */
         add_filter('gfpdf_capability_name', array($this->model, 'style_capabilities'));
+
+        /* change capability needed to edit settings page */
+        add_filter('option_page_capability_gfpdf_settings', array($this, 'edit_options_cap'));
     }
 
     /**
@@ -144,5 +147,14 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
             $this->view->help();
           break;
         }
+    }
+
+    /**
+     * Return our custom capability
+     * @since 4.0
+     * @return void
+     */
+    public function edit_options_cap() {
+        return 'gravityforms_edit_settings';
     }
 }

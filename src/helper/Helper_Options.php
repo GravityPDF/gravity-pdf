@@ -843,7 +843,7 @@ class Helper_Options implements Helper_Int_Filters {
 	 * @return string $input Sanitizied value
 	 */
 	public function settings_sanitize( $input = array() ) {
-		
+
 		$gfpdf_options = $this->settings;
 
 		if ( empty( $_POST['_wp_http_referer'] ) ) {

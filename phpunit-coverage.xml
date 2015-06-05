@@ -19,6 +19,10 @@
 	                    <directory suffix=".php">./tests/</directory>
 	            </exclude>
 	    </whitelist>
+
+	    <blacklist>
+	    	<directory suffic=".php">../../../</directory>
+	    </blacklist>
 	</filter>
 
     <groups>

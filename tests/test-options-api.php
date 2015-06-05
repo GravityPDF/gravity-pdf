@@ -464,4 +464,13 @@ class Test_Options_API extends WP_UnitTestCase
             array(50, '50,20'),
         );
     }
+
+    /**
+     * Test our global sanitisation function
+     * @group options
+     * @since 4.0
+     */
+    public function test_sanitize_all_fields() {
+        $this->markTestIncomplete('This test has not been implimented yet');
+    }
 }
