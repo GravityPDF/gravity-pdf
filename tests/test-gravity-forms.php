@@ -4,6 +4,8 @@ namespace GFPDF\Tests;
 use WP_UnitTestCase;
 use GFFormsModel;
 use GFAPI;
+use GFCommon;
+use WP_User;
 
 /**
  * Test Common Gravity Forms Functions
@@ -233,5 +235,52 @@ class Test_Gravity_Forms extends WP_UnitTestCase
         $this->assertEquals('Test 2', rgar($array, 'item2'));
         $this->assertEquals('Test 3', rgar($array, 'item3'));
         $this->assertEquals('', rgar($array, 'item4'));
+    }
+
+    /**
+     * Test Gravity Form user privlages
+     * i.e GFCommon::current_user_can_any("gravityforms_edit_settings")
+     * @since 4.0
+     * @group gravityforms
+     */
+    public function test_gf_privs()
+    {
+        /* create user using WP Unit Factory functions */
+        $user_id = $this->factory->user->create();
+        $this->assertInternalType('integer', $user_id);
+
+        /*
+         * Set up our users and test the privilages
+         */
+        wp_set_current_user($user_id);
+        $this->assertFalse(GFCommon::current_user_can_any('gravityforms_edit_settings'));
+
+        /* Create second user we'll use to test out the privilage */
+        $user_id = $this->factory->user->create();
+        $this->assertInternalType('integer', $user_id);
+
+        /*
+         * Add the user capability
+         */
+        $user = new WP_User($user_id);
+        $user->add_cap('gravityforms_edit_settings');
+
+        wp_set_current_user($user_id);
+
+        $this->assertTrue(GFCommon::current_user_can_any('gravityforms_edit_settings'));
+
+        /* Create third user we'll use to test out the privilage */
+        $user_id = $this->factory->user->create();
+        $this->assertInternalType('integer', $user_id);
+
+        /*
+         * Add the user capability
+         */
+        $user = new WP_User($user_id);
+        $user->add_cap('gform_full_access');
+
+        wp_set_current_user($user_id);
+
+        $this->assertTrue(GFCommon::current_user_can_any('gravityforms_edit_settings'));
     }
 }
