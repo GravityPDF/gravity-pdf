@@ -45,10 +45,12 @@ define('PDF_PLUGIN_URL', plugin_dir_url(__FILE__)); /* plugin directory url */
 define('GF_PDF_EXTENDED_PLUGIN_BASENAME', plugin_basename(__FILE__)); /* the plugin basename */
 
 /*
- * Add our activation hook
+ * Add our activation hook and deactivation hooks
  */
 require_once PDF_PLUGIN_DIR.'src/controller/Controller_Update.php';
-register_activation_hook(__FILE__, array('Controller_Update', 'activation'));
+
+register_activation_hook( __FILE__, array('Controller_Update', 'activation') );
+register_deactivation_hook( __FILE__, array('Controller_Update', 'deactivation') );
 
 /**
  *
@@ -74,7 +76,7 @@ class GFPDF_Major_Compatibility_Checks
     private $path;
 
     /**
-     * Holds any blocker error messages stopping plugin running 
+     * Holds any blocker error messages stopping plugin running
      * @var array
      * @since 4.0
      */
@@ -119,10 +121,10 @@ class GFPDF_Major_Compatibility_Checks
 
     /**
      * Load the plugin
-     * @return void 
+     * @return void
      * @since 4.0
      */
-    public function init() {        
+    public function init() {
         add_action('plugins_loaded', array($this, 'plugins_loaded'));
     }
 
@@ -131,8 +133,8 @@ class GFPDF_Major_Compatibility_Checks
      * @return void
      * @since 4.0
      */
-    public function plugins_loaded() {        
-        /* Check minimum requirements are met */             
+    public function plugins_loaded() {
+        /* Check minimum requirements are met */
         $this->check_wordpress();
         $this->check_gravity_forms();
         $this->check_php();
@@ -151,7 +153,7 @@ class GFPDF_Major_Compatibility_Checks
     }
 
     /**
-     * Check if WordPress version is compatible 
+     * Check if WordPress version is compatible
      * @return Boolean whether compatible or not
      * @since 4.0
      */
@@ -159,24 +161,24 @@ class GFPDF_Major_Compatibility_Checks
         global $wp_version;
 
         /* WordPress version not compatible */
-        if (! version_compare($wp_version, $this->required_wp_version, '>=')) {            
+        if (! version_compare($wp_version, $this->required_wp_version, '>=')) {
             $this->notices[] = sprintf(__('WordPress Version %s is required.', 'gravitypdf'), $this->required_wp_version);
             return false;
-        }         
+        }
         return true;
     }
 
     /**
-     * Check if Gravity Forms version is compatible 
+     * Check if Gravity Forms version is compatible
      * @return Boolean whether compatible or not
      * @since 4.0
      */
     public function check_gravity_forms() {
         /* Gravity Forms version not compatible */
-        if (! class_exists('GFCommon') || ! version_compare(GFCommon::$version, $this->required_gf_version, '>=')) {            
+        if (! class_exists('GFCommon') || ! version_compare(GFCommon::$version, $this->required_gf_version, '>=')) {
             $this->notices[] = sprintf(__('Gravity Forms Version %s is required.', 'gravitypdf'), $this->required_gf_version);
             return false;
-        } 
+        }
         return true;
     }
 
@@ -218,8 +220,8 @@ class GFPDF_Major_Compatibility_Checks
         if ( extension_loaded('mbstring') && ! function_exists('mb_regex_encoding')) {
             $this->notices[] = __("The PHP Extension MB String does not have MB Regex enabled. Contact your web hosting provider to fix.", 'gravitypdf');
             return false;
-        }  
-        return true; 
+        }
+        return true;
     }
 
     /**
@@ -239,7 +241,7 @@ class GFPDF_Major_Compatibility_Checks
     /**
      * Check if minimum RAM requirements met
      * @param  $ram String The PHP RAM setting
-     * @return Boolean whether compatible or not 
+     * @return Boolean whether compatible or not
      * @since 4.0
      */
     public function check_ram($ram) {
@@ -264,8 +266,8 @@ class GFPDF_Major_Compatibility_Checks
          $memory_limit = $this->convert_ini_memory($ram);
 
          /* convert to megabytes, or set to -1 if unlimited */
-         return ($memory_limit === '-1') ? -1 : floor($memory_limit / 1024 / 1024); 
-     }    
+         return ($memory_limit === '-1') ? -1 : floor($memory_limit / 1024 / 1024);
+     }
 
      /**
       * Convert .ini file memory to bytes
@@ -281,20 +283,20 @@ class GFPDF_Major_Compatibility_Checks
 		}
 
 		/* check if memory allocation is in mb, kb or gb */
-		switch (strtolower(substr($memory, -1))) {            
-			case 'm': 
-				return (int) $memory * 1048576;            
-			case 'k': 
-				return (int) $memory * 1024;            
-			case 'g': 
-				return (int) $memory * 1073741824;            
+		switch (strtolower(substr($memory, -1))) {
+			case 'm':
+				return (int) $memory * 1048576;
+			case 'k':
+				return (int) $memory * 1024;
+			case 'g':
+				return (int) $memory * 1073741824;
 		}
 		return $memory;
      }
 
 
     /**
-     * Helper function to easily display error messages          
+     * Helper function to easily display error messages
      * @return void
      * @since 4.0
      */
@@ -302,14 +304,14 @@ class GFPDF_Major_Compatibility_Checks
     	?>
 		    <div class="error">
                 <p><strong><?php _e('Gravity PDF Installation Problem', 'gravitypdf'); ?></strong></p>
-		        <p><?php _e('The minimum requirements for Gravity PDF have not been met. Please fix the issue(s) below to continue:', 'gravitypdf'); ?></p>		        
+		        <p><?php _e('The minimum requirements for Gravity PDF have not been met. Please fix the issue(s) below to continue:', 'gravitypdf'); ?></p>
 				<ul style="padding-bottom: 0.5em">
 	        		<?php foreach($this->notices as $notice): ?>
 						<li style="padding-left: 20px;list-style: inside"><?php echo $notice; ?></li>
 					<?php endforeach; ?>
-	        	</ul>		        
-		    </div>    	
-	    <?php 
+	        	</ul>
+		    </div>
+	    <?php
     }
 }
 

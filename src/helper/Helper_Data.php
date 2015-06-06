@@ -127,6 +127,7 @@ class Helper_Data {
         $this->set_directory_structure();
         $this->set_licensing();
         $this->set_plugin_titles();
+        $this->set_permalink_regex();
     }
 
     /**
@@ -157,7 +158,16 @@ class Helper_Data {
     public function set_licensing() {
          /* Set up our licensing */
          //$this->license = new License_Model();
-         $this->store_url = 'https://gravitypdf.com/';
+         //$this->store_url = 'https://gravitypdf.com/';
+    }
+
+    /**
+     * Set up our permalink regex structure
+     * @return  void
+     * @since  4.0
+     */
+    public function set_permalink_regex() {
+        $this->permalink = '^pdf/([A-Za-z0-9]+)/([0-9]+)/?';
     }
 
     /**

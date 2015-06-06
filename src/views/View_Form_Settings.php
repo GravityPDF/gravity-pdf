@@ -2,8 +2,6 @@
 
 namespace GFPDF\View;
 use GFPDF\Helper\Helper_View;
-use GFPDF_Major_Compatibility_Checks;
-use GFCommon;
 
 /**
  * Settings View
@@ -40,7 +38,7 @@ if (! defined('ABSPATH')) {
 */
 
 /**
- * View_Welcome_Screen
+ * View_Form_Settings
  *
  * A general class for About / Intro Screen
  *
@@ -58,5 +56,5 @@ class View_Form_Settings extends Helper_View
 
     public function __construct($data = array()) {
         $this->data = $data;
-    }   
+    }
 }

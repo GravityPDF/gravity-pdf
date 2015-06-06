@@ -92,6 +92,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
         $this->welcome_screen();
         $this->gf_settings();
         $this->gf_form_settings();
+        $this->pdf();
 
         /* Add localisation support */
         load_plugin_textdomain('gravitypdf', false,  dirname( plugin_basename( __FILE__ ) ) . '/assets/languages/' );
@@ -334,6 +335,22 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
         ));
 
         $class = new Controller\Controller_Form_Settings($model, $view);
+        $class->init();
+    }
+
+    /**
+     * Include PDF Display functionality
+     * @since 4.0
+     * @return void
+     */
+    public function pdf() {
+        
+        $model = new Model\Model_PDF();
+        $view  = new View\View_PDF(array(
+        
+        ));
+
+        $class = new Controller\Controller_PDF($model, $view);
         $class->init();
     }
 }

@@ -1,19 +1,15 @@
 <?php
 
+namespace GFPDF\View;
+use GFPDF\Helper\Helper_View;
+
 /**
- * Install Update Controller
+ * PDF View
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
- *
- */
-
-/*
- * This file is called before compatibility checks are run
- * We cannot add namespace support here which means no access
- * to the rest of the plugin
  */
 
 /* Exit if accessed directly */
@@ -42,37 +38,23 @@ if (! defined('ABSPATH')) {
 */
 
 /**
- * Controller_Update
- * Basic class to set up activation flag
+ * View_PDF
+ *
+ * A general class for PDF display
  *
  * @since 4.0
  */
-class Controller_Update
+class View_PDF extends Helper_View
 {
-    /**
-     * Run plugin activation functionality
-     * @since 4.0
-     * @return void
-     */
-    public static function activation() {
-        /* Add Upgraded From Option */
-        set_transient('_gravitypdf_activation_redirect', true, 30);
-    }
 
     /**
-     * Run plugin deactivation functionality
+     * Set the view's name
+     * @var string
      * @since 4.0
-     * @return void
      */
-    public static function deactivation() {
-        global $gfpdf;
+    protected $ViewType = 'PDF';
 
-       /**
-        * Remove our rewrite rules
-        * As deactivation hook fires much earlier than flush_rewrite_rules() can be called we'll manually remove our rules
-        */
-       $rules = get_option( 'rewrite_rules' );
-       unset($rules[$gfpdf->data->permalink]);
-       update_option( 'rewrite_rules', $rules);
+    public function __construct($data = array()) {
+        $this->data = $data;
     }
 }

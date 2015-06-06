@@ -40,7 +40,7 @@ if (! defined('ABSPATH')) {
 */
 
 /**
- * View_Welcome_Screen
+ * View_Settings
  *
  * A general class for About / Intro Screen
  *
