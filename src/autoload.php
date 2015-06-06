@@ -3,7 +3,7 @@
 namespace GFPDF;
 
 /**
- * Autoloader Functionality 
+ * Autoloader Functionality
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
@@ -34,18 +34,18 @@ if ( ! defined( 'ABSPATH' ) ) exit;
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-require_once(PDF_PLUGIN_DIR . 'src/depreciated.php');    
+require_once(PDF_PLUGIN_DIR . 'src/depreciated.php');
 
 /**
  * PSR-4 Autoloader Implimentation
- * 
+ *
  * An example of a general-purpose implementation that includes the optional
  * functionality of allowing multiple base directories for a single namespace
  * prefix.
- * 
+ *
  * Given a foo-bar package of classes in the file system at the following
  * paths ...
- * 
+ *
  *     /path/to/packages/foo-bar/
  *         src/
  *             Baz.php             # Foo\Bar\Baz
@@ -55,30 +55,30 @@ require_once(PDF_PLUGIN_DIR . 'src/depreciated.php');
  *             BazTest.php         # Foo\Bar\BazTest
  *             Qux/
  *                 QuuxTest.php    # Foo\Bar\Qux\QuuxTest
- * 
+ *
  * ... add the path to the class files for the \Foo\Bar\ namespace prefix
  * as follows:
- * 
+ *
  *      <?php
  *      // instantiate the loader
  *      $loader = new \GFPDF\Autoloader;
- *      
+ *
  *      // register the autoloader
  *      $loader->register();
- *      
+ *
  *      // register the base directories for the namespace prefix
  *      $loader->addNamespace('Foo\Bar', '/path/to/packages/foo-bar/src');
  *      $loader->addNamespace('Foo\Bar', '/path/to/packages/foo-bar/tests');
- * 
+ *
  * The following line would cause the autoloader to attempt to load the
  * \Foo\Bar\Qux\Quux class from /path/to/packages/foo-bar/src/Qux/Quux.php:
- * 
+ *
  *      <?php
  *      new \Foo\Bar\Qux\Quux;
- * 
- * The following line would cause the autoloader to attempt to load the 
+ *
+ * The following line would cause the autoloader to attempt to load the
  * \Foo\Bar\Qux\QuuxTest class from /path/to/packages/foo-bar/tests/Qux/QuuxTest.php:
- * 
+ *
  *      <?php
  *      new \Foo\Bar\Qux\QuuxTest;
  */
@@ -99,7 +99,7 @@ class Autoloader {
      */
     public function register() {
         spl_autoload_register(array($this, 'loadClass'));
-    }       
+    }
 
      /**
      * Adds a base directory for a namespace prefix.
@@ -165,7 +165,7 @@ class Autoloader {
 
             // remove the trailing namespace separator for the next iteration
             // of strrpos()
-            $prefix = rtrim($prefix, '\\');   
+            $prefix = rtrim($prefix, '\\');
         }
 
         // never found a mapped file
@@ -174,7 +174,7 @@ class Autoloader {
 
     /**
      * Load the mapped file for a namespace prefix and relative class.
-     * 
+     *
      * @param string $prefix The namespace prefix.
      * @param string $relative_class The relative class name.
      * @return mixed Boolean false if no mapped file can be loaded, or the
@@ -211,7 +211,7 @@ class Autoloader {
 
     /**
      * If a file exists, require it from the file system.
-     * 
+     *
      * @param string $file The file to require.
      * @return bool True if the file exists, false if not.
      * @since 4.0
@@ -227,7 +227,7 @@ class Autoloader {
 }
 
 /*
- * Load our autoloader class 
+ * Load our autoloader class
  */
 $loader = new Autoloader();
 
@@ -240,5 +240,9 @@ $loader->addNamespace('GFPDF\Controller', PDF_PLUGIN_DIR . '/src/controller');
 $loader->addNamespace('GFPDF\Model', PDF_PLUGIN_DIR . '/src/model');
 $loader->addNamespace('GFPDF\View', PDF_PLUGIN_DIR . '/src/views');
 $loader->addNamespace('GFPDF\Helper', PDF_PLUGIN_DIR . '/src/helper');
+$loader->addNamespace('GFPDF\Helper', PDF_PLUGIN_DIR . '/src/helper/abstract');
+$loader->addNamespace('GFPDF\Helper', PDF_PLUGIN_DIR . '/src/helper/fields');
+$loader->addNamespace('GFPDF\Helper', PDF_PLUGIN_DIR . '/src/helper/interface');
+$loader->addNamespace('GFPDF\Helper', PDF_PLUGIN_DIR . '/src/helper/list-table');
 $loader->addNamespace('GFPDF\Stat', PDF_PLUGIN_DIR . '/src/static');
 $loader->addNamespace('GFPDF\Test', PDF_PLUGIN_DIR . '/tests');

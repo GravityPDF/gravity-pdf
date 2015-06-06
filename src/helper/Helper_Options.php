@@ -144,12 +144,18 @@ class Helper_Options implements Helper_Int_Filters {
 	/**
 	 * Add all settings sections and fields
 	 *
+	 * @param  $fields Array Fields that should be registered
 	 * @since 4.0
 	 * @return void
 	*/
-	public function register_settings() {
+	public function register_settings( $fields = array() ) {
 
-		foreach( $this->get_registered_settings() as $tab => $settings ) {
+		/* If no fields were passed into the function we'll use the defaults */
+		if(sizeof($fields) == 0) {
+			$fields = $this->get_registered_settings();
+		}
+
+		foreach( $fields as $tab => $settings ) {
 
 			foreach ( $settings as $option ) {
 

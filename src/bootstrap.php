@@ -78,6 +78,9 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
         $this->data = new Helper\Helper_Data();
         $this->data->init();
 
+        /* set up our options object - this is initialised on admin_init but other classes need to access its methods before this */
+        $this->options = new Helper\Helper_Options();
+
         /**
          * Run generic actions and filters needed to get the plugin functional
          * The controllers will set more specific actions / filters as needed
@@ -277,11 +280,6 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
      * @return 4.0
      */
     public function setup_settings_fields() {
-        /* create a new instance of our options object if not already created*/
-        if(empty($this->options)) {
-            $this->options = new Helper\Helper_Options();
-        }
-
         /* load our options API */
         $this->options->init();
 
