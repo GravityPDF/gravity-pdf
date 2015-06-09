@@ -6,6 +6,7 @@ use GFPDF\Helper\Helper_Model;
 use GFPDF\Helper\Helper_View;
 use GFPDF\Helper\Helper_Int_Actions;
 use GFPDF\Helper\Helper_Int_Filters;
+use GFCommon;
 
 /**
  * PDF Display Controller
@@ -87,8 +88,10 @@ class Controller_PDF extends Helper_Controller implements Helper_Int_Actions, He
      * @return void
      */
     public function add_actions() {
+        /* rewrite filters / endpoints */
         add_action( 'init', array($this, 'register_rewrite_rules'));
-        add_action( 'parse_request', array($this, 'process_pdf'));
+        add_action( 'parse_request', array($this, 'process_legacy_pdf_endpoint'), 5); /* give legacy endpoint precedancy over new endpoint */
+        add_action( 'parse_request', array($this, 'process_pdf_endpoint'));
     }
 
     /**
@@ -97,7 +100,13 @@ class Controller_PDF extends Helper_Controller implements Helper_Int_Actions, He
      * @return void
      */
     public function add_filters() {
+        /* rewrite filters */
         add_filter( 'query_vars', array($this, 'register_rewrite_tags'));
+
+        /* PDF authentication middleware */
+        add_filter( 'gfpdf_pdf_middleware', array($this->model, 'middle_logged_out'), 1, 3);
+        add_filter( 'gfpdf_pdf_middleware', array($this->model, 'middle_logged_out_timeout'), 2, 3);
+        add_filter( 'gfpdf_pdf_middleware', array($this->model, 'middle_user_capability'), 3, 3);
     }
 
     /**
@@ -114,7 +123,7 @@ class Controller_PDF extends Helper_Controller implements Helper_Int_Actions, He
         /* Add our main endpoint */
         add_rewrite_rule(
             $query,
-            'index.php?gf_pdf=1&nid=$matches[1]&lid=$matches[2]',
+            'index.php?gf_pdf=1&pid=$matches[1]&lid=$matches[2]',
             'top');
 
         /* check to see if we need to flush the rewrite rules */
@@ -128,7 +137,7 @@ class Controller_PDF extends Helper_Controller implements Helper_Int_Actions, He
      */
     public function register_rewrite_tags( $tags ) {
         $tags[] = 'gf_pdf';
-        $tags[] = 'nid';
+        $tags[] = 'pid';
         $tags[] = 'lid';
 
         return $tags;
@@ -140,14 +149,43 @@ class Controller_PDF extends Helper_Controller implements Helper_Int_Actions, He
      * @since 4.0
      * @return void
      */
-    public function process_pdf() {
-        echo 'running';
+    public function process_pdf_endpoint() {
+        /* exit early if all the required URL parameters aren't met */
+        if ( empty( $GLOBALS['wp']->query_vars['gf_pdf'] ) || empty( $GLOBALS['wp']->query_vars['pid'] ) || empty( $GLOBALS['wp']->query_vars['lid'] ) ) {
+            return;
+        }
 
-        print_r($_GET);
-        echo get_query_var( 'gf_pdf' );
-        echo get_query_var( 'nid' );
-        echo get_query_var( 'lid' );
+        $pid = $GLOBALS['wp']->query_vars['pid'];
+        $lid = (int) $GLOBALS['wp']->query_vars['lid'];
 
-        exit;
+        /*
+         * Send to our model to handle validation / authentication
+         */
+        $results = $this->model->process_pdf($pid, $lid);
+
+        /* if error, display to user */
+        if(is_wp_error($results)) {
+            /* only display detailed error to admins */
+
+            $whitelist_errors = array('timeout_expired');
+            if(GFCommon::current_user_can_any( 'gravityforms_view_settings' ) || in_array($results->get_error_code(), $whitelist_errors)) {
+                wp_die($results->get_error_message());
+            } else {
+                wp_die(__('There was a problem generating your PDF', 'gravitypdf'));
+            }
+            
+        }
+
+    }
+
+    /**
+     * Determines if we should process the legacy PDF endpoint at this stage (the one with $_GET variables)
+     * Fires just before the main WP_Query is executed (we don't need it)
+     * @since 4.0
+     * @return void
+     * @todo
+     */
+    public function process_legacy_pdf_endpoint() {
+
     }
 }

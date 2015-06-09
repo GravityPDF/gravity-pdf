@@ -109,6 +109,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
         add_action('init', array($this, 'load_assets'), 15);
 
         /* load our modules */
+        add_action('init', array($this, 'init_settings_api'));
         add_action('admin_init', array($this, 'setup_settings_fields'));
 
         /* TODO - set our notice action */
@@ -276,19 +277,24 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
     }
 
     /**
+     * Bootstrap our settings API for use
+     * @return void
+     * @return 4.0
+     */
+    public function init_settings_api() {
+        /* load our options API */
+        $this->options->init();
+    }
+
+    /**
      * Register our admin settings
      * @return void
      * @return 4.0
      */
     public function setup_settings_fields() {
-        /* load our options API */
-        $this->options->init();
-
         /* register our options settings */
         $this->options->register_settings();
     }
-
-    
 
     /**
      * Include Welcome Screen functionality for installation / upgrades

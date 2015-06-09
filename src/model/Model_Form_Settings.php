@@ -186,7 +186,7 @@ class Model_Form_Settings extends Helper_Model {
         $gfpdf_options = $this->get_settings($form_id);
 
         if(!is_wp_error($gfpdf_options)) {
-            $value         = ! empty( $gfpdf_options[ $pdf_id ] ) ? $gfpdf_options[ $pdf_id ] : false;
+            $value         = ! empty( $gfpdf_options[ $pdf_id ] ) ? $gfpdf_options[ $pdf_id ] : new WP_Error('invalid_pdf_id', __('You must pass in a valid PDF ID', 'gravitypdf'));
             return apply_filters( 'gfpdf_pdf_config', apply_filters( 'gfpdf_pdf_config_' . $form_id, $value ));
         }
 
