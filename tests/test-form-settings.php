@@ -141,10 +141,6 @@ class Test_Form_Settings extends WP_UnitTestCase
     public function test_filters() {
         global $gfpdf;
 
-        /* ensure our options get initialised (only on admin_init) */
-        $this->assertEquals(false, has_filter( 'gfpdf_settings_sanitize', array($gfpdf->options, 'sanitize_required_field') ));
-        $gfpdf->options->init();
-
         /* validation filters */
         $this->assertEquals(10, has_filter( 'gfpdf_form_settings', array( $this->model, 'validation_error')));
         $this->assertEquals(10, has_filter( 'gfpdf_form_settings_appearance', array( $this->model, 'validation_error')));
@@ -288,7 +284,7 @@ class Test_Form_Settings extends WP_UnitTestCase
         $deletedPDF = $this->model->get_pdf($this->form_id, $pid);
 
         /* check it was deleted */
-        $this->assertEquals(false, $deletedPDF);
+        $this->assertTrue(is_wp_error($deletedPDF));
     }
 
     /**
@@ -305,7 +301,7 @@ class Test_Form_Settings extends WP_UnitTestCase
 
         /* test delete functionality */
         $this->assertSame(1, $this->model->delete_pdf($this->form_id, $pid));
-        $this->assertFalse($this->model->get_pdf($this->form_id, $pid));
+        $this->assertTrue(is_wp_error($this->model->get_pdf($this->form_id, $pid)));
 
     }
 

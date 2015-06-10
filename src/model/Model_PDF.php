@@ -59,7 +59,7 @@ class Model_PDF extends Helper_Model {
         $rules = get_option( 'rewrite_rules' );
 
         if ( ! isset( $rules[ $rule ] ) ) {
-            flush_rewrite_rules();
+            flush_rewrite_rules(false);
         }
     }
 
@@ -115,15 +115,15 @@ class Model_PDF extends Helper_Model {
     public function is_current_pdf_owner($entry, $type = 'all') {
         $owner = false;
         /* check if the user is logged in and the entry is assigned to them */
-
         if($type === 'all' || $type === 'logged_in') {
-            if(is_user_logged_in() && $entry['created_by'] == get_current_user_id()) {
+            if(is_user_logged_in() && (int) $entry['created_by'] === get_current_user_id()) {
                 $owner = true;
             }
         }
 
         if($type === 'all' || $type === 'logged_out') {
-            if($entry['ip'] == GFFormsModel::get_ip() && $entry['id'] !== '127.0.0.1') { /* check if the user IP matches the entry IP */
+            $user_ip = trim(GFFormsModel::get_ip());
+            if($entry['ip'] == $user_ip && $entry['ip'] !== '127.0.0.1' && strlen($user_ip) !== 0) { /* check if the user IP matches the entry IP */
                 $owner = true;
             }
         }
@@ -169,14 +169,15 @@ class Model_PDF extends Helper_Model {
 
         /* ensure another middleware filter hasn't already done validation */
         if(!is_wp_error($action)) {
-            $logged_out_restriction = $gfpdf->options->get_option('limit_to_admin', 'No');
 
             /* only check if PDF timed out if our logged out restriction is not 'Yes' and the user is not logged in */
             if(!is_user_logged_in() && $this->is_current_pdf_owner($entry, 'logged_out') === true) {
-                $timeout = (int) $gfpdf->options->get_option('logged_out_timeout', '30');
+                /* get the global PDF settings */
+                $timeout                = (int) $gfpdf->options->get_option('logged_out_timeout', '30');
 
-                /* if '0' there is no timeout */
-                if($logged_out_restriction !== 'Yes' && $timeout !== 0) {
+                /* if '0' there is no timeout, or if the logged out restrictions are enabled we'll ignore this */
+                if($timeout !== 0) {
+
                     $timeout_stamp   = 60 * $timeout; /* 60 seconds multiplied by number of minutes */
                     $entry_created   = strtotime( $entry['date_created'] ); /* get entry timestamp */
                     $timeout_expires = $entry_created + $timeout_stamp; /* get the timeout expiry based on the entry created time */
