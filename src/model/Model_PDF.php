@@ -94,7 +94,7 @@ class Model_PDF extends Helper_Model {
          * Our middleware authenticator
          * Allow users to tap into our middleware and add additional or remove additional authentication layers
          *
-         * Default middleware includes 'middle_logged_out', 'middle_logged_out_timeout', 'middle_user_capability'
+         * Default middleware includes 'middle_logged_out_restriction', 'middle_logged_out_timeout', 'middle_auth_logged_out_user', 'middle_user_capability'
          * If WP_Error is returned the PDF won't be parsed
          */
         $middleware = apply_filters( 'gfpdf_pdf_middleware', false, $entry, $settings);
@@ -139,7 +139,7 @@ class Model_PDF extends Helper_Model {
      * @return Boolean / Object
      * @since 4.0
      */
-    public function middle_logged_out($action, $entry, $settings) {
+    public function middle_logged_out_restriction($action, $entry, $settings) {
         global $gfpdf;
 
         /* ensure another middleware filter hasn't already done validation */
@@ -183,15 +183,44 @@ class Model_PDF extends Helper_Model {
 
                     /* compare our two timestamps and throw error if outside the timeout */
                     if(time() > $timeout_expires) {
-                        return new WP_Error('timeout_expired', __('Your PDF is no longer accessible.', 'gravitypdf'));
+
+                        /* if there is no user account assigned to this entry throw error */
+                        if(empty($entry['created_by'])) {
+                            return new WP_Error('timeout_expired', __('Your PDF is no longer accessible.', 'gravitypdf'));
+                        } else {
+                            /* prompt to login */
+                            auth_redirect();
+                        }
                     }
                 }
-            } else if(!is_user_logged_in()) {
-                /* prompt user to login as they have no access */
-                auth_redirect();
             }
         }
+        return $action;
+    }
 
+    /**
+     * Check if the user is logged out and authenticate as needed
+     * @param  Boolean / Object $action
+     * @param  Array $entry    The Gravity Forms Entry
+     * @param  Array $settings The Gravity Form PDF Settings
+     * @return Boolean / Object
+     * @since 4.0
+     */
+    public function middle_auth_logged_out_user($action, $entry, $settings) {
+        if(!is_wp_error($action)) {
+
+            /* check if the user is not the current entry owner */
+            if(!is_user_logged_in() && $this->is_current_pdf_owner($entry, 'logged_out') === false) {
+                /* check if there is actually a user who owns entry */
+                if(!empty($entry['created_by'])) {
+                    /* prompt user to login to get access */
+                    auth_redirect();
+                } else {
+                    /* there's no returning, throw generic error */
+                    return new WP_Error('error');
+                }
+            }
+        }
         return $action;
     }
 

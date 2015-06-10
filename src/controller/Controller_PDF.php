@@ -104,9 +104,10 @@ class Controller_PDF extends Helper_Controller implements Helper_Int_Actions, He
         add_filter( 'query_vars', array($this, 'register_rewrite_tags'));
 
         /* PDF authentication middleware */
-        add_filter( 'gfpdf_pdf_middleware', array($this->model, 'middle_logged_out'), 1, 3);
+        add_filter( 'gfpdf_pdf_middleware', array($this->model, 'middle_logged_out_restriction'), 1, 3);
         add_filter( 'gfpdf_pdf_middleware', array($this->model, 'middle_logged_out_timeout'), 2, 3);
-        add_filter( 'gfpdf_pdf_middleware', array($this->model, 'middle_user_capability'), 3, 3);
+        add_filter( 'gfpdf_pdf_middleware', array($this->model, 'middle_auth_logged_out_user'), 3, 3);
+        add_filter( 'gfpdf_pdf_middleware', array($this->model, 'middle_user_capability'), 4, 3);
     }
 
     /**
