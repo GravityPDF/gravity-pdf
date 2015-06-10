@@ -167,7 +167,7 @@ class Controller_PDF extends Helper_Controller implements Helper_Int_Actions, He
         if(is_wp_error($results)) {
             /* only display detailed error to admins */
 
-            $whitelist_errors = array('timeout_expired');
+            $whitelist_errors = array('timeout_expired', 'access_denied');
             if(GFCommon::current_user_can_any( 'gravityforms_view_settings' ) || in_array($results->get_error_code(), $whitelist_errors)) {
                 wp_die($results->get_error_message());
             } else {

@@ -5,6 +5,8 @@ use GFPDF\Model\Model_Form_Settings;
 use GFPDF\Helper\Helper_Model;
 use GFAPI;
 use WP_Error;
+use GFFormsModel;
+use GFCommon;
 
 /**
  * PDF Display Model
@@ -91,15 +93,42 @@ class Model_PDF extends Helper_Model {
         /**
          * Our middleware authenticator
          * Allow users to tap into our middleware and add additional or remove additional authentication layers
-         * Default middleware includes 'middle_logged_out', 'middle_logged_out_timeout', 'middle_user_capability', 'middle_current_pdf_owner'
+         *
+         * Default middleware includes 'middle_logged_out', 'middle_logged_out_timeout', 'middle_user_capability'
          * If WP_Error is returned the PDF won't be parsed
          */
-        $middleware = apply_filters( 'gfpdf_pdf_middleware', true, $entry, $settings);
+        $middleware = apply_filters( 'gfpdf_pdf_middleware', false, $entry, $settings);
 
         /* Throw error */
         if(is_wp_error($middleware)) {
             return $middleware;
         }
+    }
+
+    /**
+     * Check if the current user attempting to access is the PDF owner
+     * @param  Array $entry    The Gravity Forms Entry
+     * @param  String $type    The authentication type we should use
+     * @return Boolean
+     * @since 4.0
+     */
+    public function is_current_pdf_owner($entry, $type = 'all') {
+        $owner = false;
+        /* check if the user is logged in and the entry is assigned to them */
+
+        if($type === 'all' || $type === 'logged_in') {
+            if(is_user_logged_in() && $entry['created_by'] == get_current_user_id()) {
+                $owner = true;
+            }
+        }
+
+        if($type === 'all' || $type === 'logged_out') {
+            if($entry['ip'] == GFFormsModel::get_ip() && $entry['id'] !== '127.0.0.1') { /* check if the user IP matches the entry IP */
+                $owner = true;
+            }
+        }
+
+        return $owner;
     }
 
     /**
@@ -118,7 +147,7 @@ class Model_PDF extends Helper_Model {
             /* get the setting */
             $logged_out_restriction = $gfpdf->options->get_option('limit_to_admin', 'No');
 
-            if($logged_out_restriction === 'Yes' && is_user_logged_in() === false) {
+            if($logged_out_restriction === 'Yes' && !is_user_logged_in()) {
                 /* prompt user to login */
                 auth_redirect();
             }
@@ -143,20 +172,23 @@ class Model_PDF extends Helper_Model {
             $logged_out_restriction = $gfpdf->options->get_option('limit_to_admin', 'No');
 
             /* only check if PDF timed out if our logged out restriction is not 'Yes' and the user is not logged in */
-            if($logged_out_restriction !== 'Yes' && is_user_logged_in() === false) {
+            if(!is_user_logged_in() && $this->is_current_pdf_owner($entry, 'logged_out') === true) {
                 $timeout = (int) $gfpdf->options->get_option('logged_out_timeout', '30');
 
                 /* if '0' there is no timeout */
-                if($timeout !== 0) {
+                if($logged_out_restriction !== 'Yes' && $timeout !== 0) {
                     $timeout_stamp   = 60 * $timeout; /* 60 seconds multiplied by number of minutes */
                     $entry_created   = strtotime( $entry['date_created'] ); /* get entry timestamp */
                     $timeout_expires = $entry_created + $timeout_stamp; /* get the timeout expiry based on the entry created time */
 
-                    /* compare our two timestamps and throw error is outside the timeout */
+                    /* compare our two timestamps and throw error if outside the timeout */
                     if(time() > $timeout_expires) {
                         return new WP_Error('timeout_expired', __('Your PDF is no longer accessible.', 'gravitypdf'));
                     }
                 }
+            } else if(!is_user_logged_in()) {
+                /* prompt user to login as they have no access */
+                auth_redirect();
             }
         }
 
@@ -174,17 +206,26 @@ class Model_PDF extends Helper_Model {
     public function middle_user_capability($action, $entry, $settings) {
         global $gfpdf;
 
-        /* ensure another middleware filter hasn't already done validation */
         if(!is_wp_error($action)) {
-            if(is_user_logged_in()) {
-                /* TODO - check if user has no access */
+            /* check if the user is logged in but is not the current owner */
+            if(is_user_logged_in() && $this->is_current_pdf_owner($entry, 'logged_in') === false) {
+                /* Handle permissions checks */
+                 $admin_permissions = $gfpdf->options->get_option('admin_capabilities', array('gravityforms_view_entries'));
+
+                 /* loop through permissions and check if the current user has any of those capabilities */
+                 $access = false;
+                 foreach($admin_permissions as $permission) {
+                    if(GFCommon::current_user_can_any( $permission )) {
+                        $access = true;
+                    }
+                }
+
+                /* throw error if no access granted */
+                if(!$access) {
+                    return new WP_Error('access_denied', __('You do not have access to view this PDF.', 'gravitypdf'));
+                }
             }
         }
-
         return $action;
-    }
-
-    public function middle_current_pdf_owner($action, $entry, $settings) {
-        /* TODO */
     }
 }

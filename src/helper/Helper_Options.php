@@ -288,7 +288,7 @@ class Helper_Options implements Helper_Int_Filters {
 					'admin_capabilities' => array(
 						'id'          => 'admin_capabilities',
 						'name'        => __('User Restriction', 'gravitypdf'),
-						'desc'        => __('Restrict PDF access to logged in users with this capability. The Administrator Role has no restrictions.', 'gravitypdf'),
+						'desc'        => __('Restrict PDF access to logged in users with any of these capabilities. The Administrator Role always has full access.', 'gravitypdf'),
 						'type'        => 'select',
 						'options'     => $this->get_capabilities(),
 						'std'         => 'gravityforms_view_entries',
@@ -297,13 +297,13 @@ class Helper_Options implements Helper_Int_Filters {
 						'multiple'    => true,
 						'required'    => true,
 						'placeholder' => __('Select Capability', 'gravitypdf'),
-						'tooltip'     => '<h6>' . __('User Restriction', 'gravitypdf') . '</h6>' . __("Only logged in users with this capability can view generated PDFs they don't have ownership of. Ownership refers to the user who completed the original Gravity Form entry.", 'gravitypdf'),
+						'tooltip'     => '<h6>' . __('User Restriction', 'gravitypdf') . '</h6>' . __("Only logged in users with these capabilities can view generated PDFs they don't have ownership of. Ownership refers to the user who completed the original Gravity Form entry.", 'gravitypdf'),
 					),
 
 					'limit_to_admin' => array(
 						'id'      => 'limit_to_admin',
 						'name'    => __('Restrict Logged Out Users', 'gravitypdf'),
-						'desc'    => __("When enabled, only users who are logged in and have the above capability, or are the original owner, can view PDFs.", 'gravitypdf'),
+						'desc'    => __("When enabled, only users who are logged in and have the above capability, or is the original owner, can view PDFs.", 'gravitypdf'),
 						'type'    => 'radio',
 						'options' => array(
 							'Yes'     => __('Yes', 'gravitypdf'),
