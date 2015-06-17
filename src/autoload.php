@@ -242,7 +242,7 @@ $loader->addNamespace('GFPDF\Model', PDF_PLUGIN_DIR . '/src/model');
 $loader->addNamespace('GFPDF\View', PDF_PLUGIN_DIR . '/src/views');
 $loader->addNamespace('GFPDF\Helper', PDF_PLUGIN_DIR . '/src/helper');
 $loader->addNamespace('GFPDF\Helper', PDF_PLUGIN_DIR . '/src/helper/abstract');
-$loader->addNamespace('GFPDF\Helper', PDF_PLUGIN_DIR . '/src/helper/fields');
+$loader->addNamespace('GFPDF\Helper\Fields', PDF_PLUGIN_DIR . '/src/helper/fields');
 $loader->addNamespace('GFPDF\Helper', PDF_PLUGIN_DIR . '/src/helper/interface');
 $loader->addNamespace('GFPDF\Helper', PDF_PLUGIN_DIR . '/src/helper/list-table');
 $loader->addNamespace('GFPDF\Stat', PDF_PLUGIN_DIR . '/src/static');

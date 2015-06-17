@@ -57,7 +57,10 @@ class PDF_Common
 
     public static function get_upload_dir() {
         return Stat_Functions::get_upload_dir();
-    }       
+    }
+
+    public static function view_data($form_data = array()) {
+    }
 
    /* public static function get_ids() {
     	return Stat_Functions::get_ids();
@@ -65,7 +68,7 @@ class PDF_Common
 
     public static function get_site_name() {
         return Stat_Functions::get_site_name();
-    }        
+    }
 
     public static function get_html_template($filename) {
     	return Stat_Functions::get_html_template($filename);
@@ -87,9 +90,7 @@ class PDF_Common
     	return Stat_Functions::do_mergetags($string, $form_id, $lead_id);
     }
 
-    public static function view_data($form_data) {
-    	return Stat_Functions::view_data($form_data);
-    }
+
 
     public static function initialise_WP_filesystem_API($post, $nonce) {
     	return Stat_Functions::initialise_WP_filesystem_API($post, $nonce);
@@ -115,4 +116,10 @@ class PDF_Common
     public static function add_message($message, $type = 'notice') {
     	return Stat_Functions::add_message($message, $type);
     }*/
+}
+
+class GFPDFEntryDetail {
+    public static function lead_detail_grid_array() {
+        
+    }
 }

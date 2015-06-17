@@ -103,6 +103,12 @@ class Model_PDF extends Helper_Model {
         if(is_wp_error($middleware)) {
             return $middleware;
         }
+
+        /**
+         * If we are here we can generate our PDF
+         */
+        $controller = $this->getController();
+        $controller->view->generate_pdf($entry, $settings);
     }
 
     /**

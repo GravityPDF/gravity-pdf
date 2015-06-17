@@ -41,18 +41,18 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 abstract class Helper_View {
     /**
-     * Each object should have a view name 
+     * Each object should have a view name
      * @var String
      * @since 4.0
-     */    
+     */
     protected $ViewType = null;
 
     /**
-     * Enable a private data cache we can set and retrive information from 
+     * Enable a private data cache we can set and retrive information from
      * @var array
      * @since 4.0
      */
-    protected $data = array();    
+    protected $data = array();
     
 
     /**
@@ -60,36 +60,39 @@ abstract class Helper_View {
      * Use it to load in our views
      * @param  String $name     Template name to load
      * @param  Array $arguments Pass in additional parameters to the template view if needed
-     * @return void 
+     * @return void
      * @since 4.0
      */
     final public function __call($name, $arguments) {
         /* check if we have any arguments */
         $vars = $this->data;
         if(isset($arguments[0]) && is_array($arguments[0])) {
-            $vars = array_merge($arguments[0], $this->data);    
-        }        
+            $vars = array_merge($arguments[0], $this->data);
+        }
 
-        /* load the about page view */        
-        return $this->load($name, $vars);        
+        /* load the about page view */
+        return $this->load($name, $vars);
     }
 
     /**
      * Load a view file based on the filename and type
      * @param  String $filename The filename to load
-     * @param  Array $vars Variables to pass to the included file
+     * @param  Array $args Variables to pass to the included file
      * @param  Boolean $output Whether to automatically display the included file or return it's output as a String
      * @return String/Object           The loaded file, or WP_ERROR
      * @since 4.0
      */
-    final protected function load($filename, $args = array(), $output = true) {
-        $path = PDF_PLUGIN_DIR . 'src/views/html/' . $this->ViewType . '/' . $filename . '.php';
-        if(is_readable($path)) {            
+    final protected function load($filename, $args = array(), $output = true, $path = '') {
+        $path = (empty($path)) ? PDF_PLUGIN_DIR . 'src/views/html/' . $this->ViewType . '/' . $filename . '.php' : $path . $filename;
+        if(is_readable($path)) {
+            /* for backwards compatibility extract the $args variable */
+            extract($args, EXTR_SKIP); /* skip any arguments that would clash - i.e filename, args, output, path, this */
+
             if($output) {
                 include $path;
                 return true;
             } else {
-                return $this->buffer($path);
+                return $this->buffer($path, $args);
             }
         }
         return new WP_Error('invalid_path', sprintf(__('Cannot find file %s', 'gravitypdf'), $filename));
@@ -98,12 +101,16 @@ abstract class Helper_View {
     /**
      * Store output of included file in a buffer and return
      * @param  String $path File path to include
+     * @param  Array $args Variables to pass to the included file
      * @return String       The contents of the included file
      * @since 4.0
      */
-    final private function buffer($path) {
+    final private function buffer($path, $args = array()) {
+        /* for backwards compatibility extract the $args variable */
+        extract($args, EXTR_SKIP); /* skip any arguments that would clash - i.e filename, args, output, path, this */
+        
         ob_start();
         include $path;
-        return ob_get_clean();        
+        return ob_get_clean();
     }
 }

@@ -2,6 +2,8 @@
 
 namespace GFPDF\View;
 use GFPDF\Helper\Helper_View;
+use RGFormsModel;
+use mPDF;
 
 /**
  * PDF View
@@ -56,5 +58,53 @@ class View_PDF extends Helper_View
 
     public function __construct($data = array()) {
         $this->data = $data;
+    }
+
+    /**
+     * Our PDF Generator
+     * @param  Array $entry    The Gravity Forms Entry to process
+     * @param  Array $settings The Gravity Form PDF Settings
+     * @return void
+     * @since 4.0
+     */
+    public function generate_pdf($entry, $settings) {
+        global $gfpdf;
+
+        $paper_size = 'A4';
+        $orientation = '';
+
+        $mpdf = new mPDF('', $paper_size, 0, '', 15, 15, 16, 16, 9, 9, $orientation);
+
+        /* set up contstants for gravity forms to use so we can override the security on the printed version */
+        $template = (isset($_GET['template'])) ? $_GET['template'] : '';
+        $html     = '';
+
+        /**
+         * Load our arguments that should be accessed by our view
+         * @var array
+         */
+        $args = array(
+            'form_id'   => $entry['form_id'], /* backwards compat */
+            'lead_ids'  => array($entry['id']), /* backwards compat */
+            'lead_id'   => $entry['id'], /* backwards compat */
+            
+            'form'      => RGFormsModel::get_form_meta($entry['form_id']),
+            'entry'     => $entry,
+            'lead'      => $entry,
+            'form_data' => '',
+        );
+
+        if(file_exists( $gfpdf->data->template_site_location . $template)) {
+            $html = $this->load($template, $args, false, $gfpdf->data->template_site_location);
+        }
+
+        if(isset($_GET['html'])) {
+            echo $html; exit;
+        }
+
+        $mpdf->WriteHTML($html);
+
+        $mpdf->Output('test.pdf', 'I');
+        exit;
     }
 }
