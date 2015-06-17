@@ -1,0 +1,5 @@
+{
+    "require": {
+        "blueliquiddesigns/mpdf": "dev-master"
+    }
+}

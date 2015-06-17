@@ -34,6 +34,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+require_once(PDF_PLUGIN_DIR . 'vendor/autoload.php');
 require_once(PDF_PLUGIN_DIR . 'src/depreciated.php');
 
 /**

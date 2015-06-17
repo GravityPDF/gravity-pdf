@@ -3,3 +3,5 @@ _notes/*
 Thumbs.db
 default.po
 default.mo
+vendor/*
+composer.lock
