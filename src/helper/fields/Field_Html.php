@@ -3,8 +3,7 @@
 namespace GFPDF\Helper\Fields;
 use GFPDF\Helper\Helper_Fields;
 use GFFormsModel;
-use GF_Field_Select;
-use GFCommon;
+use GF_Field_HTML;
 use Exception;
 
 /**
@@ -47,7 +46,7 @@ if (! defined('ABSPATH')) {
  *
  * @since 4.0
  */
-class Field_Select extends Helper_Fields
+class Field_Html extends Helper_Fields
 {
 
     /**
@@ -57,8 +56,8 @@ class Field_Select extends Helper_Fields
      * @since 4.0
      */
     public function __construct($field, $entry) {
-        if(!is_object($field) || !$field instanceof GF_Field_Select) {
-            throw new Exception('$field needs to be in instance of GF_Field_Select');
+        if(!is_object($field) || !$field instanceof GF_Field_HTML) {
+            throw new Exception('$field needs to be in instance of GF_Field_HTML');
         }
 
         /* call our parent method */
@@ -71,23 +70,17 @@ class Field_Select extends Helper_Fields
      * @since 4.0
      */
     public function html() {
-        $data = $this->value();
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-select">' . $data['label'] .'</div>';
+        /* sanitize the HTML */
+        $html = wp_kses_post($this->value()); /* allow the same HTML as per the post editor */
+        return '<div id="field-'. $this->field->id .'" class="gfpdf-html">' . $html .'</div>';
     }
 
     /**
      * Get the standard GF value of this field
-     * @return Array
+     * @return String/Array
      * @since 4.0
      */
     public function value() {
-        $label = GFCommon::selection_display($this->get_value(), $this->field, '', true);
-        $value = GFCommon::selection_display($this->get_value(), $this->field);
-        
-        /* return value / label as an array */
-        return array(
-            'value' => $value,
-            'label' => $label
-        );
+        return $this->field->content;
     }
 }

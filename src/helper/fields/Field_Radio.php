@@ -71,13 +71,13 @@ class Field_Radio extends Helper_Fields
      * @since 4.0
      */
     public function html() {
-        $value = reset($this->value()); /* get the first (and only) array value (which will be the radio's label) */
-        return '<div id="field-'. $this->field->id .'" class="gf-radio">' . $value .'</div>';
+        $data = $this->value();
+        return '<div id="field-'. $this->field->id .'" class="gfpdf-radio">' . $data['label'] .'</div>';
     }
 
     /**
      * Get the standard GF value of this field
-     * @return Array Single Key => Value array. The 'key' is the selected radios value, while the array 'value' is the selected radios label
+     * @return Array
      * @since 4.0
      */
     public function value() {
@@ -85,6 +85,9 @@ class Field_Radio extends Helper_Fields
         $value = GFCommon::selection_display($this->get_value(), $this->field);
         
         /* return value / label as an array */
-        return array($value => $label);
+        return array(
+            'value' => $value,
+            'label' => $label
+        );
     }
 }

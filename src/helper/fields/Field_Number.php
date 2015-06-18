@@ -71,7 +71,7 @@ class Field_Number extends Helper_Fields
      * @since 4.0
      */
     public function html() {
-        return '<div id="field-'. $this->field->id .'" class="gf-number">' . $this->value() .'</div>';
+        return '<div id="field-'. $this->field->id .'" class="gfpdf-number">' . $this->value() .'</div>';
     }
 
     /**

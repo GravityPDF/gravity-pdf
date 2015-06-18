@@ -70,7 +70,7 @@ class Field_Multiselect extends Helper_Fields
      * @since 4.0
      */
     public function html() {
-        $html = '<div id="field-'. $this->field->id .'" class="gf-multiselect">';
+        $html = '<div id="field-'. $this->field->id .'" class="gfpdf-multiselect">';
 
         $items = $this->value();
 

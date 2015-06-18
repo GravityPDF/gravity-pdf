@@ -72,7 +72,7 @@ class Field_Checkbox extends Helper_Fields
      */
     public function html() {
 
-        $html = '<div id="field-'. $this->field->id .'" class="gf-checkbox">';
+        $html = '<div id="field-'. $this->field->id .'" class="gfpdf-checkbox">';
 
         $items = $this->value();
 

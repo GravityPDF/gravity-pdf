@@ -46,17 +46,24 @@ abstract class Helper_Fields {
 	
     /**
 	 * Contains the field array
-	 * @var Array
+	 * @var Array / Object
 	 * @since 4.0
 	 */
-	public $field = array();
+	public $field;
+
+    /**
+     * Contains the form information
+     * @var Array
+     * @since 4.0
+     */
+    public $form;
 
     /**
      * Contains the entry information
      * @var Array
      * @since 4.0
      */
-    public $entry = array();
+    public $entry;
 
     /**
      * Set up the object
@@ -75,6 +82,7 @@ abstract class Helper_Fields {
 
         $this->field = $field;
         $this->entry = $entry;
+        $this->form  = GFFormsModel::get_form_meta( $entry['id'] );
     }
 
     /**
