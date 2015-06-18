@@ -71,15 +71,20 @@ class Field_Select extends Helper_Fields
      * @since 4.0
      */
     public function html() {
-        return '<div id="field-'. $this->field->id .'" class="gf-select">' . $this->get_value() .'</div>';
+        $value = reset($this->value()); /* get the first (and only) array value (which will be the select's label) */
+        return '<div id="field-'. $this->field->id .'" class="gf-select">' . $value .'</div>';
     }
 
     /**
      * Get the standard GF value of this field
-     * @return String/Array
+     * @return Array Single Key => Value array. The 'key' is the selected select value, while the array 'value' is the selected select's label
      * @since 4.0
      */
     public function value() {
-        return GFCommon::selection_display($this->get_value(), $this->field);
+        $label = GFCommon::selection_display($this->get_value(), $this->field, '', true);
+        $value = GFCommon::selection_display($this->get_value(), $this->field);
+        
+        /* return value / label as an array */
+        return array($value => $label);
     }
 }

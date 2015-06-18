@@ -75,8 +75,13 @@ class Field_Multiselect extends Helper_Fields
         $items = $this->value();
 
         if(sizeof($items) > 0) {
-            foreach($items as $value) {
-                $html .= "<li>$value</li>";
+            $i    = 1;
+            foreach($items as $value => $label) {
+                $sanitized_value  = wp_specialchars(preg_replace('/\s+/', '', $value));
+                $sanitized_option = wp_specialchars($label);
+
+                $html .= '<li id="field-' . $this->field->id . '-option-' . $sanitized_value . '">' . $sanitized_option . '</li>';
+                $i++;
             }
         }
 
@@ -98,10 +103,15 @@ class Field_Multiselect extends Helper_Fields
             $value = explode(',', $value);
         }
 
+        /* remove any empty / unselected fields */
+        $value = array_filter($value);
+
         /* loop through array and get the correct selection display value */
         $items = '';
         foreach($value as $item) {
-            $items[] = GFCommon::selection_display($item, $this->field);
+            $label = GFCommon::selection_display($item, $this->field, '', true);
+            $value = GFCommon::selection_display($item, $this->field);
+            $items[$value] = $label;
         }
 
         return $items;

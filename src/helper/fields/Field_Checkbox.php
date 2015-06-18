@@ -3,7 +3,7 @@
 namespace GFPDF\Helper\Fields;
 use GFPDF\Helper\Helper_Fields;
 use GFFormsModel;
-use GF_Field_Number;
+use GF_Field_Checkbox;
 use GFCommon;
 use Exception;
 
@@ -47,7 +47,7 @@ if (! defined('ABSPATH')) {
  *
  * @since 4.0
  */
-class Field_Number extends Helper_Fields
+class Field_Checkbox extends Helper_Fields
 {
 
     /**
@@ -57,8 +57,8 @@ class Field_Number extends Helper_Fields
      * @since 4.0
      */
     public function __construct($field, $entry) {
-        if(!is_object($field) || !$field instanceof GF_Field_Number) {
-            throw new Exception('$field needs to be in instance of GF_Field_Number');
+        if(!is_object($field) || !$field instanceof GF_Field_Checkbox) {
+            throw new Exception('$field needs to be in instance of GF_Field_Checkbox');
         }
 
         /* call our parent method */
@@ -71,7 +71,29 @@ class Field_Number extends Helper_Fields
      * @since 4.0
      */
     public function html() {
-        return '<div id="field-'. $this->field->id .'" class="gf-number">' . $this->value() .'</div>';
+
+        $html = '<div id="field-'. $this->field->id .'" class="gf-checkbox">';
+
+        $items = $this->value();
+
+        /* Generate our drop down list */
+        if(sizeof($items) > 0) {
+            $html .= '<ul class="bulleted">';
+            $i    = 1;
+            foreach($items as $value => $label) {
+                $sanitized_value  = wp_specialchars(preg_replace('/\s+/', '', $value));
+                $sanitized_option = wp_specialchars($label);
+
+                $html .= '<li id="field-' . $this->field->id . '-option-' . $sanitized_value . '">' . $sanitized_option . '</li>';
+                $i++;
+            }
+
+            $html .= '</ul>';
+        }
+
+        $html .= '</div>';
+
+        return $html;
     }
 
     /**
@@ -80,6 +102,26 @@ class Field_Number extends Helper_Fields
      * @since 4.0
      */
     public function value() {
-        return GFCommon::format_number($this->get_value(), $this->field->numberFormat);
+        $value = $this->get_value();
+
+        /* if not an array, make it so */
+        if(!is_array($value)) {
+            $value = array($value);
+        }
+
+        /* remove any unselected fields */
+        $value = array_filter($value);
+
+        /* loop through results and get checkbox 'labels' */
+        $items = array();
+        $i = 0;
+
+        foreach($value as $key => $item) {
+            $label = GFCommon::selection_display($item, $this->field, '', true);
+            $value = GFCommon::selection_display($item, $this->field);
+            $items[$value] = $label;
+        }
+
+        return $items;
     }
 }

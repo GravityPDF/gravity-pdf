@@ -70,7 +70,7 @@ class Field_Text extends Helper_Fields
      * @since 4.0
      */
     public function html() {
-        return '<div id="field-'. $this->field->id .' class="gf-text">' . $this->value() .'</div>';
+        return '<div id="field-'. $this->field->id .'" class="gf-text">' . $this->value() .'</div>';
     }
 
     /**

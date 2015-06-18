@@ -3,7 +3,7 @@
 namespace GFPDF\Helper\Fields;
 use GFPDF\Helper\Helper_Fields;
 use GFFormsModel;
-use GF_Field_Number;
+use GF_Field_Radio;
 use GFCommon;
 use Exception;
 
@@ -47,7 +47,7 @@ if (! defined('ABSPATH')) {
  *
  * @since 4.0
  */
-class Field_Number extends Helper_Fields
+class Field_Radio extends Helper_Fields
 {
 
     /**
@@ -57,8 +57,8 @@ class Field_Number extends Helper_Fields
      * @since 4.0
      */
     public function __construct($field, $entry) {
-        if(!is_object($field) || !$field instanceof GF_Field_Number) {
-            throw new Exception('$field needs to be in instance of GF_Field_Number');
+        if(!is_object($field) || !($field instanceof GF_Field_Radio)) {
+            throw new Exception('$field needs to be in instance of GF_Field_Radio');
         }
 
         /* call our parent method */
@@ -71,15 +71,20 @@ class Field_Number extends Helper_Fields
      * @since 4.0
      */
     public function html() {
-        return '<div id="field-'. $this->field->id .'" class="gf-number">' . $this->value() .'</div>';
+        $value = reset($this->value()); /* get the first (and only) array value (which will be the radio's label) */
+        return '<div id="field-'. $this->field->id .'" class="gf-radio">' . $value .'</div>';
     }
 
     /**
      * Get the standard GF value of this field
-     * @return String/Array
+     * @return Array Single Key => Value array. The 'key' is the selected radios value, while the array 'value' is the selected radios label
      * @since 4.0
      */
     public function value() {
-        return GFCommon::format_number($this->get_value(), $this->field->numberFormat);
+        $label = GFCommon::selection_display($this->get_value(), $this->field, '', true);
+        $value = GFCommon::selection_display($this->get_value(), $this->field);
+        
+        /* return value / label as an array */
+        return array($value => $label);
     }
 }
