@@ -1,6 +1,7 @@
 <?php
 
 namespace GFPDF\Helper\Fields;
+
 use GFPDF\Helper\Helper_Fields;
 use GFFormsModel;
 use GF_Field_Radio;
@@ -70,9 +71,10 @@ class Field_Radio extends Helper_Fields
      * @return String
      * @since 4.0
      */
-    public function html() {
-        $data = $this->value();
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-radio">' . $data['label'] .'</div>';
+    public function html($value = false) {
+        $data   = $this->value();
+        $output = ($value) ? $data['value'] : $data['label'];
+        return '<div id="field-'. $this->field->id .'" class="gfpdf-radio">' . esc_html($output) .'</div>';
     }
 
     /**

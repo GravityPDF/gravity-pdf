@@ -1,6 +1,7 @@
 <?php
 
 namespace GFPDF\Helper\Fields;
+
 use GFPDF\Helper\Helper_Fields;
 use GFFormsModel;
 use GF_Field_Text;
@@ -70,7 +71,7 @@ class Field_Text extends Helper_Fields
      * @since 4.0
      */
     public function html() {
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-text">' . $this->value() .'</div>';
+        return '<div id="field-'. $this->field->id .'" class="gfpdf-text">' . esc_html($this->value()) .'</div>';
     }
 
     /**

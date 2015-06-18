@@ -1,6 +1,7 @@
 <?php
 
 namespace GFPDF\Helper\Fields;
+
 use GFPDF\Helper\Helper_Fields;
 use GFFormsModel;
 use GF_Field_Section;
@@ -72,7 +73,7 @@ class Field_Section extends Helper_Fields
     public function html($desc = false) {
         /* sanitize the HTML */
         $section = $this->value(); /* allow the same HTML as per the post editor */
-        $html = '<h3 id="field-'. $this->field->id .'" class="gfpdf-section-title">' . esc_html($section['title']) .'</h3>';
+        $html    = '<h3 id="field-'. $this->field->id .'" class="gfpdf-section-title">' . esc_html($section['title']) .'</h3>';
 
         if($desc) {
             $html .= '<div id="field-'. $this->field->id .'-desc" class="gfpdf-section-description">' . wp_kses_post($section['description']) . '</div>';

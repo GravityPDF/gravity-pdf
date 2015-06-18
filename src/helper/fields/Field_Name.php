@@ -4,7 +4,8 @@ namespace GFPDF\Helper\Fields;
 
 use GFPDF\Helper\Helper_Fields;
 use GFFormsModel;
-use GF_Field_Hidden;
+use GF_Field_Name;
+use GFCommon;
 use Exception;
 
 /**
@@ -47,7 +48,7 @@ if (! defined('ABSPATH')) {
  *
  * @since 4.0
  */
-class Field_Hidden extends Helper_Fields
+class Field_Name extends Helper_Fields
 {
 
     /**
@@ -57,8 +58,8 @@ class Field_Hidden extends Helper_Fields
      * @since 4.0
      */
     public function __construct($field, $entry) {
-        if(!is_object($field) || !$field instanceof GF_Field_Hidden) {
-            throw new Exception('$field needs to be in instance of GF_Field_Hidden');
+        if(!is_object($field) || !($field instanceof GF_Field_Name)) {
+            throw new Exception('$field needs to be in instance of GF_Field_Name');
         }
 
         /* call our parent method */
@@ -71,15 +72,29 @@ class Field_Hidden extends Helper_Fields
      * @since 4.0
      */
     public function html() {
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-hidden">' . esc_html($this->value()) .'</div>';
+        $data = array_filter($this->value()); /* remove any empty fields from the array */
+        return '<div id="field-'. $this->field->id .'" class="gfpdf-radio">' . esc_html(implode(' ', $data)) .'</div>';
     }
 
     /**
      * Get the standard GF value of this field
-     * @return String/Array
+     * @return Array
      * @since 4.0
      */
     public function value() {
-        return $this->get_value();
+        $value = $this->get_value();
+
+        /* check if the returned results are an array */
+        if(! is_array($value)) {
+            $value[$this->field['id'] . '.3'] = $value; /* set to the first name */
+        }
+
+        return array(
+            'prefix' => rgget($this->field['id'] . '.2', $value),
+            'first'  => rgget($this->field['id'] . '.3', $value),
+            'middle' => rgget($this->field['id'] . '.4', $value),
+            'last'   => rgget($this->field['id'] . '.6', $value),
+            'suffix' => rgget($this->field['id'] . '.8', $value),
+        );
     }
 }

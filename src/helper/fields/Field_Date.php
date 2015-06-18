@@ -4,7 +4,8 @@ namespace GFPDF\Helper\Fields;
 
 use GFPDF\Helper\Helper_Fields;
 use GFFormsModel;
-use GF_Field_Hidden;
+use GFCommon;
+use GF_Field_Date;
 use Exception;
 
 /**
@@ -47,7 +48,7 @@ if (! defined('ABSPATH')) {
  *
  * @since 4.0
  */
-class Field_Hidden extends Helper_Fields
+class Field_Date extends Helper_Fields
 {
 
     /**
@@ -57,8 +58,8 @@ class Field_Hidden extends Helper_Fields
      * @since 4.0
      */
     public function __construct($field, $entry) {
-        if(!is_object($field) || !$field instanceof GF_Field_Hidden) {
-            throw new Exception('$field needs to be in instance of GF_Field_Hidden');
+        if(!is_object($field) || !$field instanceof GF_Field_Date) {
+            throw new Exception('$field needs to be in instance of GF_Field_Date');
         }
 
         /* call our parent method */
@@ -71,7 +72,7 @@ class Field_Hidden extends Helper_Fields
      * @since 4.0
      */
     public function html() {
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-hidden">' . esc_html($this->value()) .'</div>';
+        return '<div id="field-'. $this->field->id .'" class="gfpdf-date">' . esc_html($this->value()) .'</div>';
     }
 
     /**
@@ -80,6 +81,6 @@ class Field_Hidden extends Helper_Fields
      * @since 4.0
      */
     public function value() {
-        return $this->get_value();
+        return GFCommon::date_display($this->get_value(), $this->field->dateFormat);
     }
 }

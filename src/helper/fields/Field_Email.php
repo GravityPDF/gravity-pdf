@@ -4,7 +4,8 @@ namespace GFPDF\Helper\Fields;
 
 use GFPDF\Helper\Helper_Fields;
 use GFFormsModel;
-use GF_Field_Hidden;
+use GF_Field_Email;
+use GFCommon;
 use Exception;
 
 /**
@@ -47,7 +48,7 @@ if (! defined('ABSPATH')) {
  *
  * @since 4.0
  */
-class Field_Hidden extends Helper_Fields
+class Field_Email extends Helper_Fields
 {
 
     /**
@@ -57,8 +58,8 @@ class Field_Hidden extends Helper_Fields
      * @since 4.0
      */
     public function __construct($field, $entry) {
-        if(!is_object($field) || !$field instanceof GF_Field_Hidden) {
-            throw new Exception('$field needs to be in instance of GF_Field_Hidden');
+        if(!is_object($field) || !$field instanceof GF_Field_Email) {
+            throw new Exception('$field needs to be in instance of GF_Field_Email');
         }
 
         /* call our parent method */
@@ -71,7 +72,10 @@ class Field_Hidden extends Helper_Fields
      * @since 4.0
      */
     public function html() {
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-hidden">' . esc_html($this->value()) .'</div>';
+        $value  = $this->value();
+        $output = ( GFCommon::is_valid_email($value) ) ? '<a href="mailto:'. $value .'">'. esc_html($value) .'</a>' : esc_html($value);
+        
+        return '<div id="field-'. $this->field->id .'" class="gfpdf-email">' . $output .'</div>';
     }
 
     /**

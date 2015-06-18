@@ -4,7 +4,7 @@ namespace GFPDF\Helper\Fields;
 
 use GFPDF\Helper\Helper_Fields;
 use GFFormsModel;
-use GF_Field_Hidden;
+use GF_Field_FileUpload;
 use Exception;
 
 /**
@@ -47,7 +47,7 @@ if (! defined('ABSPATH')) {
  *
  * @since 4.0
  */
-class Field_Hidden extends Helper_Fields
+class Field_Fileupload extends Helper_Fields
 {
 
     /**
@@ -57,8 +57,8 @@ class Field_Hidden extends Helper_Fields
      * @since 4.0
      */
     public function __construct($field, $entry) {
-        if(!is_object($field) || !$field instanceof GF_Field_Hidden) {
-            throw new Exception('$field needs to be in instance of GF_Field_Hidden');
+        if(!is_object($field) || !$field instanceof GF_Field_FileUpload) {
+            throw new Exception('$field needs to be in instance of GF_Field_FileUpload');
         }
 
         /* call our parent method */
@@ -71,7 +71,26 @@ class Field_Hidden extends Helper_Fields
      * @since 4.0
      */
     public function html() {
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-hidden">' . esc_html($this->value()) .'</div>';
+        $files = $this->value();
+
+        $html = '<div id="field-'. $this->field->id .'" class="gfpdf-fileupload">';
+
+        if(sizeof($files) > 0) {
+            $html .= '<ul>';
+            $i     = 1;
+
+            foreach($files as $file) {
+                $file_info = pathinfo($file);
+                $html .= '<li id="field-' . $this->field->id . '-option-' . $i . '"><a href="' . esc_url($file) . '">' . esc_html($file_info['basename']) . '</a></li>';
+                $i++;
+            }
+
+            $html .= '</ul>';
+        }
+
+        $html .= '</div>';
+
+        return $html;
     }
 
     /**
@@ -80,6 +99,17 @@ class Field_Hidden extends Helper_Fields
      * @since 4.0
      */
     public function value() {
-        return $this->get_value();
+        $value = $this->get_value();
+        $files = array();
+
+        if(!empty($value)) {
+            $paths = ($this->field->multipleFiles) ? json_decode($value) : array($value);
+
+            foreach($paths as $path) {
+                $files[] = esc_url($path);
+            }
+        }
+
+        return $files;
     }
 }

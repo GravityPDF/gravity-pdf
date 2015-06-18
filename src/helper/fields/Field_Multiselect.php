@@ -1,11 +1,12 @@
 <?php
 
 namespace GFPDF\Helper\Fields;
+
 use GFPDF\Helper\Helper_Fields;
 use GFFormsModel;
 use GF_Field_MultiSelect;
-use Exception;
 use GFCommon;
+use Exception;
 
 /**
  * Gravity Forms Field - Single Text Field
@@ -69,18 +70,18 @@ class Field_Multiselect extends Helper_Fields
      * @return String
      * @since 4.0
      */
-    public function html() {
+    public function html($value = false) {
         $html = '<div id="field-'. $this->field->id .'" class="gfpdf-multiselect">';
 
         $items = $this->value();
 
         if(sizeof($items) > 0) {
-            $i    = 1;
+            $i = 1;
             foreach($items as $value => $label) {
-                $sanitized_value  = wp_specialchars(preg_replace('/\s+/', '', $value));
-                $sanitized_option = wp_specialchars($label);
+                $sanitized_value  = esc_html($value);
+                $sanitized_option = ($value) ? $sanitized_value : esc_html($label);
 
-                $html .= '<li id="field-' . $this->field->id . '-option-' . $sanitized_value . '">' . $sanitized_option . '</li>';
+                $html .= '<li id="field-' . $this->field->id . '-option-' . $i . '">' . $sanitized_option . '</li>';
                 $i++;
             }
         }

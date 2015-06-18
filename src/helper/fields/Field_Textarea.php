@@ -1,6 +1,7 @@
 <?php
 
 namespace GFPDF\Helper\Fields;
+
 use GFPDF\Helper\Helper_Fields;
 use GFFormsModel;
 use GF_Field_Textarea;
@@ -65,7 +66,7 @@ class Field_Textarea extends Helper_Fields
     }
 
     public function html() {
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-textarea">' .$this->get_value() .'</div>';
+        return '<div id="field-'. $this->field->id .'" class="gfpdf-textarea">' . esc_html($this->get_value()) .'</div>';
     }
 
     /**

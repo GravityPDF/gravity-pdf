@@ -4,7 +4,8 @@ namespace GFPDF\Helper\Fields;
 
 use GFPDF\Helper\Helper_Fields;
 use GFFormsModel;
-use GF_Field_Hidden;
+use GF_Field_Website;
+use GFCommon;
 use Exception;
 
 /**
@@ -47,7 +48,7 @@ if (! defined('ABSPATH')) {
  *
  * @since 4.0
  */
-class Field_Hidden extends Helper_Fields
+class Field_Website extends Helper_Fields
 {
 
     /**
@@ -57,8 +58,8 @@ class Field_Hidden extends Helper_Fields
      * @since 4.0
      */
     public function __construct($field, $entry) {
-        if(!is_object($field) || !$field instanceof GF_Field_Hidden) {
-            throw new Exception('$field needs to be in instance of GF_Field_Hidden');
+        if(!is_object($field) || !$field instanceof GF_Field_Website) {
+            throw new Exception('$field needs to be in instance of GF_Field_Website');
         }
 
         /* call our parent method */
@@ -71,7 +72,10 @@ class Field_Hidden extends Helper_Fields
      * @since 4.0
      */
     public function html() {
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-hidden">' . esc_html($this->value()) .'</div>';
+        $value  = $this->value();
+        $output = ( GFCommon::is_valid_url($value) ) ? '<a href="'. esc_url($value) .'" target="_blank">'. esc_html($value) .'</a>' : esc_html($value);
+
+        return '<div id="field-'. $this->field->id .'" class="gfpdf-website">' . $output .'</div>';
     }
 
     /**
