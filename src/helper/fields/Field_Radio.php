@@ -74,6 +74,7 @@ class Field_Radio extends Helper_Fields
     public function html($value = false) {
         $data   = $this->value();
         $output = ($value) ? $data['value'] : $data['label'];
+        
         return '<div id="field-'. $this->field->id .'" class="gfpdf-radio">' . esc_html($output) .'</div>';
     }
 
@@ -83,13 +84,24 @@ class Field_Radio extends Helper_Fields
      * @since 4.0
      */
     public function value() {
-        $label = GFCommon::selection_display($this->get_value(), $this->field, '', true);
-        $value = GFCommon::selection_display($this->get_value(), $this->field);
+        if($this->has_cache()) {
+            return $this->cache();
+        }
+
+        $label = trim(GFCommon::selection_display($this->get_value(), $this->field, '', true));
+        $value = trim(GFCommon::selection_display($this->get_value(), $this->field));
         
+        /* if both fields are blank return an empty array */
+        if(strlen($label) === 0 && strlen($value) === 0) {
+            return array();
+        }
+
         /* return value / label as an array */
-        return array(
+        $this->cache(array(
             'value' => $value,
             'label' => $label
-        );
+        ));
+
+        return $this->cache();
     }
 }

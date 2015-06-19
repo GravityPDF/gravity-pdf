@@ -84,6 +84,12 @@ class Field_Email extends Helper_Fields
      * @since 4.0
      */
     public function value() {
-        return $this->get_value();
+        if($this->has_cache()) {
+            return $this->cache();
+        }
+
+        $this->cache($this->get_value());
+        
+        return $this->cache();
     }
 }

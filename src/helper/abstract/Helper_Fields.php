@@ -2,8 +2,9 @@
 
 namespace GFPDF\Helper;
 
-use Exception;
 use GFFormsModel;
+use WP_Error;
+use Exception;
 
 /**
  * Abstract Helper Fields
@@ -66,6 +67,13 @@ abstract class Helper_Fields {
     public $entry;
 
     /**
+     * Used to cache the $this->value() results
+     * @var Array
+     * @since 4.0
+     */
+    private $cached_results;
+
+    /**
      * Set up the object
      * Check the $entry is an array, or throw exception
      * The $field is validated in the child classes
@@ -83,6 +91,40 @@ abstract class Helper_Fields {
         $this->field = $field;
         $this->entry = $entry;
         $this->form  = GFFormsModel::get_form_meta( $entry['id'] );
+    }
+
+    /**
+     * Control the getting and setting of the cache
+     * @param  Boolean / String / Array $value is passed in it will set a new cache
+     * @return Boolean / String / Array The current cached_results
+     * @since 4.0
+     */
+    final public function cache($value = null) {
+        if(!is_null($value)) {
+            $this->cached_results = $value;
+        }
+
+        return $this->cached_results;
+    }
+
+    /**
+     * Check if we currently have a cach
+     * @return Boolean True is we have a cache and false if we do not
+     * @since 4.0
+     */
+    final public function has_cache() {
+        if(! is_null($this->cached_results)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Reset the cache
+     * @since 4.0
+     */
+    final public function remove_cache() {
+        $this->cached_results = null;
     }
 
     /**

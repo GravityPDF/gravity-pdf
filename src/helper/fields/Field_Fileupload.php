@@ -99,6 +99,10 @@ class Field_Fileupload extends Helper_Fields
      * @since 4.0
      */
     public function value() {
+        if($this->has_cache()) {
+            return $this->cache();
+        }
+
         $value = $this->get_value();
         $files = array();
 
@@ -110,6 +114,8 @@ class Field_Fileupload extends Helper_Fields
             }
         }
 
-        return $files;
+        $this->cache($files);
+        
+        return $this->cache();
     }
 }

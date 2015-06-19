@@ -81,6 +81,12 @@ class Field_Date extends Helper_Fields
      * @since 4.0
      */
     public function value() {
-        return GFCommon::date_display($this->get_value(), $this->field->dateFormat);
+        if($this->has_cache()) {
+            return $this->cache();
+        }
+        
+        $this->cache(GFCommon::date_display($this->get_value(), $this->field->dateFormat));
+        
+        return $this->cache();
     }
 }

@@ -4,7 +4,7 @@ namespace GFPDF\Helper\Fields;
 
 use GFPDF\Helper\Helper_Fields;
 use GFFormsModel;
-use GF_Field_Section;
+use GF_Field_Post_Excerpt;
 use Exception;
 
 /**
@@ -47,7 +47,7 @@ if (! defined('ABSPATH')) {
  *
  * @since 4.0
  */
-class Field_Section extends Helper_Fields
+class Field_Post_Excerpt extends Helper_Fields
 {
 
     /**
@@ -57,8 +57,8 @@ class Field_Section extends Helper_Fields
      * @since 4.0
      */
     public function __construct($field, $entry) {
-        if(!is_object($field) || !$field instanceof GF_Field_Section) {
-            throw new Exception('$field needs to be in instance of GF_Field_Section');
+        if(!is_object($field) || !$field instanceof GF_Field_Post_Excerpt) {
+            throw new Exception('$field needs to be in instance of GF_Field_Post_Excerpt');
         }
 
         /* call our parent method */
@@ -70,16 +70,8 @@ class Field_Section extends Helper_Fields
      * @return String
      * @since 4.0
      */
-    public function html($desc = false) {
-        /* sanitize the HTML */
-        $section = $this->value(); /* allow the same HTML as per the post editor */
-        $html    = '<h3 id="field-'. $this->field->id .'" class="gfpdf-section-title">' . esc_html($section['title']) .'</h3>';
-
-        if($desc) {
-            $html .= '<div id="field-'. $this->field->id .'-desc" class="gfpdf-section-description">' . wp_kses_post($section['description']) . '</div>';
-        }
-
-        return $html;
+    public function html() {
+        return '<div id="field-'. $this->field->id .'" class="gfpdf-post-excerpt">' . esc_html($this->value()) .'</div>';
     }
 
     /**
@@ -92,11 +84,8 @@ class Field_Section extends Helper_Fields
             return $this->cache();
         }
 
-        $this->cache(array(
-            'title'       => $this->field->label,
-            'description' => $this->field->description,
-        ));
-
+        $this->cache($this->get_value());
+        
         return $this->cache();
     }
 }

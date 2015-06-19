@@ -83,13 +83,24 @@ class Field_Select extends Helper_Fields
      * @since 4.0
      */
     public function value() {
-        $label = GFCommon::selection_display($this->get_value(), $this->field, '', true);
-        $value = GFCommon::selection_display($this->get_value(), $this->field);
+        if($this->has_cache()) {
+            return $this->cache();
+        }
+
+        $label = trim(GFCommon::selection_display($this->get_value(), $this->field, '', true));
+        $value = trim(GFCommon::selection_display($this->get_value(), $this->field));
         
+        /* if both fields are blank return an empty array */
+        if(strlen($label) === 0 && strlen($value) === 0) {
+            return array();
+        }
+
         /* return value / label as an array */
-        return array(
+        $this->cache(array(
             'value' => $value,
             'label' => $label
-        );
+        ));
+
+        return $this->cache();
     }
 }

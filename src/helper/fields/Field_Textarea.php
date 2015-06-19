@@ -66,7 +66,7 @@ class Field_Textarea extends Helper_Fields
     }
 
     public function html() {
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-textarea">' . esc_html($this->get_value()) .'</div>';
+        return '<div id="field-'. $this->field->id .'" class="gfpdf-textarea">' . $this->value() .'</div>';
     }
 
     /**
@@ -75,6 +75,12 @@ class Field_Textarea extends Helper_Fields
      * @since 4.0
      */
     public function value() {
-        return nl2br($this->get_value());
+        if($this->has_cache()) {
+            return $this->cache();
+        }
+
+        $this->cache(nl2br(esc_html($this->get_value())));
+        
+        return $this->cache();
     }
 }

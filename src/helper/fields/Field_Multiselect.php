@@ -77,9 +77,9 @@ class Field_Multiselect extends Helper_Fields
 
         if(sizeof($items) > 0) {
             $i = 1;
-            foreach($items as $value => $label) {
-                $sanitized_value  = esc_html($value);
-                $sanitized_option = ($value) ? $sanitized_value : esc_html($label);
+            foreach($items as $item) {
+                $sanitized_value  = esc_html($item['value']);
+                $sanitized_option = ($value) ? $sanitized_value : esc_html($item['label']);
 
                 $html .= '<li id="field-' . $this->field->id . '-option-' . $i . '">' . $sanitized_option . '</li>';
                 $i++;
@@ -97,6 +97,10 @@ class Field_Multiselect extends Helper_Fields
      * @since 4.0
      */
     public function value() {
+        if($this->has_cache()) {
+            return $this->cache();
+        }
+
         $value = $this->get_value();
 
         /* split value into an array */
@@ -108,13 +112,19 @@ class Field_Multiselect extends Helper_Fields
         $value = array_filter($value);
 
         /* loop through array and get the correct selection display value */
-        $items = '';
+        $items = array();
         foreach($value as $item) {
             $label = GFCommon::selection_display($item, $this->field, '', true);
             $value = GFCommon::selection_display($item, $this->field);
-            $items[$value] = $label;
+
+            $items[] = array(
+                'value' => $value,
+                'label' => $label
+            );
         }
 
-        return $items;
+        $this->cache($items);
+        
+        return $this->cache();
     }
 }

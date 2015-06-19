@@ -82,6 +82,10 @@ class Field_Name extends Helper_Fields
      * @since 4.0
      */
     public function value() {
+        if($this->has_cache()) {
+            return $this->cache();
+        }
+
         $value = $this->get_value();
 
         /* check if the returned results are an array */
@@ -89,12 +93,14 @@ class Field_Name extends Helper_Fields
             $value[$this->field['id'] . '.3'] = $value; /* set to the first name */
         }
 
-        return array(
+        $this->cache(array(
             'prefix' => rgget($this->field['id'] . '.2', $value),
             'first'  => rgget($this->field['id'] . '.3', $value),
             'middle' => rgget($this->field['id'] . '.4', $value),
             'last'   => rgget($this->field['id'] . '.6', $value),
             'suffix' => rgget($this->field['id'] . '.8', $value),
-        );
+        ));
+
+        return $this->cache();
     }
 }

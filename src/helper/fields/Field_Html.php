@@ -82,6 +82,11 @@ class Field_Html extends Helper_Fields
      * @since 4.0
      */
     public function value() {
-        return $this->field->content;
+        if($this->has_cache()) {
+            return $this->cache();
+        }
+
+        $this->cache($this->field->content);
+        return $this->cache();
     }
 }

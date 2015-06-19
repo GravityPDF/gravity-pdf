@@ -111,8 +111,11 @@ class Field_Address extends Helper_Fields
             $address[] = $data['country'];
         }
 
+        /* Apply sanitization to address */
+        $address = array_map( 'esc_html', $address);
+
         /* display the address in the correct format */
-        $html .= esc_html(implode('<br />', $address));
+        $html .= implode('<br />', $address);
 
         $html .= '</div>';
 
@@ -126,6 +129,10 @@ class Field_Address extends Helper_Fields
      * @since 4.0
      */
     public function value() {
+        if($this->has_cache()) {
+            return $this->cache();
+        }
+
         $value = $this->get_value();
 
         /* check if the returned results are an array */
@@ -133,13 +140,15 @@ class Field_Address extends Helper_Fields
             $value[$this->field['id'] . '.1'] = $value; /* set to the street value */
         }
 
-        return array(
+        $this->cache(array(
             'street'  => trim(rgget($this->field['id'] . '.1', $value)),
             'street2' => trim(rgget($this->field['id'] . '.2', $value)),
             'city'    => trim(rgget($this->field['id'] . '.3', $value)),
             'state'   => trim(rgget($this->field['id'] . '.4', $value)),
             'zip'     => trim(rgget($this->field['id'] . '.5', $value)),
             'country' => trim(rgget($this->field['id'] . '.6', $value)),
-        );
+        ));
+
+        return $this->cache();
     }
 }

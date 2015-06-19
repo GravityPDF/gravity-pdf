@@ -81,6 +81,12 @@ class Field_Number extends Helper_Fields
      * @since 4.0
      */
     public function value() {
-        return GFCommon::format_number($this->get_value(), $this->field->numberFormat);
+        if($this->has_cache()) {
+            return $this->cache();
+        }
+
+        $this->cache(GFCommon::format_number($this->get_value(), $this->field->numberFormat));
+        
+        return $this->cache();
     }
 }

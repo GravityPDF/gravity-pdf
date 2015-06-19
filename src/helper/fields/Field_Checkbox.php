@@ -81,9 +81,9 @@ class Field_Checkbox extends Helper_Fields
         if(sizeof($items) > 0) {
             $html .= '<ul class="bulleted">';
             $i    = 1;
-            foreach($items as $value => $label) {
-                $sanitized_value  = esc_html($value);
-                $sanitized_option = ($value) ? $sanitized_value : esc_html($label);
+            foreach($items as $item) {
+                $sanitized_value  = esc_html($item['value']);
+                $sanitized_option = ($value) ? $sanitized_value : esc_html($item['label']);
 
                 $html .= '<li id="field-' . $this->field->id . '-option-' . $i . '">' . $sanitized_option . '</li>';
                 $i++;
@@ -103,6 +103,10 @@ class Field_Checkbox extends Helper_Fields
      * @since 4.0
      */
     public function value() {
+        if($this->has_cache()) {
+            return $this->cache();
+        }
+
         $value = $this->get_value();
 
         /* if not an array, make it so */
@@ -120,9 +124,15 @@ class Field_Checkbox extends Helper_Fields
         foreach($value as $key => $item) {
             $label = GFCommon::selection_display($item, $this->field, '', true);
             $value = GFCommon::selection_display($item, $this->field);
-            $items[$value] = $label;
+
+            $items[] = array(
+                'value' => $value,
+                'label' => $label
+            );
         }
 
-        return $items;
+        $this->cache($items);
+        
+        return $this->cache();
     }
 }
