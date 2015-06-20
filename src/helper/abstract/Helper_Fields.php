@@ -74,6 +74,13 @@ abstract class Helper_Fields {
     private $cached_results;
 
     /**
+     * As come fields can have multiple field types we'll use $fieldObject to store the object
+     * @var Object
+     * @since 4.0
+     */
+    public $fieldObject;
+
+    /**
      * Set up the object
      * Check the $entry is an array, or throw exception
      * The $field is validated in the child classes

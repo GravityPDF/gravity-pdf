@@ -43,10 +43,10 @@ class Stat_Functions
 {
 
     /**
-     * Check if the current admin page is a Gravity PDF page 
+     * Check if the current admin page is a Gravity PDF page
      * @since 4.0
      * @return void
-     */    
+     */
     public static function is_gfpdf_page() {
         if(is_admin()) {
             if(isset($_GET['page']) && (substr($_GET['page'], 0, 6) === 'gfpdf-') ||
@@ -59,10 +59,10 @@ class Stat_Functions
     }
 
     /**
-     * Check if we are on the current global settings page / tab 
+     * Check if we are on the current global settings page / tab
      * @since 4.0
      * @return void
-     */  
+     */
     public static function is_gfpdf_settings_tab($name) {
         if(is_admin()) {
             if(self::is_gfpdf_page()) {
@@ -74,7 +74,29 @@ class Stat_Functions
             }
         }
         return false;
-    }    
+    }
+
+    /**
+     * Gravity Forms has a 'type' for each field.
+     * Based on that type, attempt to match it to Gravity PDFs field classes
+     * @param  String $type The field type we are looking up
+     * @return String / Boolean       The Fully Qualified Namespaced Class we matched, or false
+     * @since 4.0
+     */
+    public static function get_field_class($type) {
+        /* Format the type name correctly */
+        $typeArray = explode('_', $type);
+        $typeArray = array_map('ucwords', $typeArray);
+        $type      = implode('_', $typeArray);
+
+        /* See if we have a class that matches */
+        $fqns = 'GFPDF\Helper\Fields\Field_';
+        if(class_exists($fqns . $type)) {
+            return $fqns . $type;
+        }
+
+        return false;
+    }
 
     /**
      * Modified version of get_upload_dir() which just focuses on the base directory
