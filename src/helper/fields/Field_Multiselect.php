@@ -9,7 +9,7 @@ use GFCommon;
 use Exception;
 
 /**
- * Gravity Forms Field - Single Text Field
+ * Gravity Forms Field
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
@@ -43,7 +43,6 @@ if (! defined('ABSPATH')) {
 */
 
 /**
- * Field_Text
  * Controls the display and output of a Gravity Form field
  *
  * @since 4.0

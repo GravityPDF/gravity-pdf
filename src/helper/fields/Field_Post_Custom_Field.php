@@ -5,11 +5,10 @@ namespace GFPDF\Helper\Fields;
 use GFPDF\Helper\Helper_Fields;
 use GFPDF\Stat\Stat_Functions;
 use GFFormsModel;
-use GF_Field;
 use Exception;
 
 /**
- * Gravity Forms Field - Single Text Field
+ * Gravity Forms Field
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
@@ -43,7 +42,6 @@ if (! defined('ABSPATH')) {
 */
 
 /**
- * Field_Text
  * Controls the display and output of a Gravity Form field
  *
  * @since 4.0
@@ -58,9 +56,6 @@ class Field_Post_Custom_Field extends Helper_Fields
      * @since 4.0
      */
     public function __construct($field, $entry) {
-        if(!is_object($field) || !$field instanceof GF_Field) {
-            throw new Exception('$field needs to be in instance of GF_Field');
-        }
 
         /* call our parent method */
         parent::__construct($field, $entry);

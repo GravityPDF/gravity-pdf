@@ -3,6 +3,7 @@
 namespace GFPDF\Helper;
 
 use GFFormsModel;
+use GF_Field;
 use WP_Error;
 use Exception;
 
@@ -90,6 +91,10 @@ abstract class Helper_Fields {
      */
     public function __construct($field, $entry) {
         
+        if(!is_object($field) || ! ($field instanceof GF_Field)) {
+            throw new Exception('$field needs to be in instance of GF_Field');
+        }
+
         /* Throw error if $entry is not an array */
         if(!is_array($entry)) {
             throw new Exception('$entry needs to be an array');

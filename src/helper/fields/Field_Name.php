@@ -9,7 +9,7 @@ use GFCommon;
 use Exception;
 
 /**
- * Gravity Forms Field - Single Text Field
+ * Gravity Forms Field
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
@@ -43,7 +43,6 @@ if (! defined('ABSPATH')) {
 */
 
 /**
- * Field_Text
  * Controls the display and output of a Gravity Form field
  *
  * @since 4.0
@@ -90,15 +89,15 @@ class Field_Name extends Helper_Fields
 
         /* check if the returned results are an array */
         if(! is_array($value)) {
-            $value[$this->field['id'] . '.3'] = $value; /* set to the first name */
+            $value[$this->field->id . '.3'] = $value; /* set to the first name */
         }
 
         $this->cache(array(
-            'prefix' => rgget($this->field['id'] . '.2', $value),
-            'first'  => rgget($this->field['id'] . '.3', $value),
-            'middle' => rgget($this->field['id'] . '.4', $value),
-            'last'   => rgget($this->field['id'] . '.6', $value),
-            'suffix' => rgget($this->field['id'] . '.8', $value),
+            'prefix' => rgget($this->field->id . '.2', $value),
+            'first'  => rgget($this->field->id . '.3', $value),
+            'middle' => rgget($this->field->id . '.4', $value),
+            'last'   => rgget($this->field->id . '.6', $value),
+            'suffix' => rgget($this->field->id . '.8', $value),
         ));
 
         return $this->cache();
