@@ -84,8 +84,7 @@ class Field_Post_Category extends Helper_Fields
     public function html() {
 
         return '<div id="field-'. $this->field->id .'" class="gfpdf-post-category gfpdf-field '. $this->field->cssClass . '">'
-                    . '<div class="label"><strong>' . esc_html(GFFormsModel::get_label($this->field)) . '</strong></div>'
-                    . '<div class="value">' . $this->fieldObject->html() . '</div>'
+                    . $this->fieldObject->html()
                 . '</div>';
     }
 
