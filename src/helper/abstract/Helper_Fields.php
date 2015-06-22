@@ -160,6 +160,23 @@ abstract class Helper_Fields {
     }
 
     /**
+     * Used to check if the current field has a value
+     * @since 4.0
+     * @internal Child classes can override this method when dealing with a specific use case
+     */
+    public function is_empty() {
+        $value = $this->value();
+        
+        if(is_array($value) && sizeof(array_filter($value) > 0)) { /* check for an array */
+            return true;
+        } else if(is_string($value) && strlen(trim($value)) > 0) { /* check for a string */
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Used to process the Gravity Forms value extracted from the entry
      * This is called from the 'value' method
      * @since 4.0

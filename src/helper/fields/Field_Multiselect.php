@@ -70,12 +70,18 @@ class Field_Multiselect extends Helper_Fields
      * @since 4.0
      */
     public function html($value = false) {
-        $html = '<div id="field-'. $this->field->id .'" class="gfpdf-multiselect">';
+        $html = '<div id="field-'. $this->field->id .'" class="gfpdf-multiselect gfpdf-field '. $this->field->cssClass . '">';
+
+        /* Add the label */
+        $html .= '<div class="label"><strong>' . esc_html(GFFormsModel::get_label($this->field)) . '</strong></div>';
+        $html .= '<div class="value">';
 
         $items = $this->value();
 
         if(sizeof($items) > 0) {
-            $i = 1;
+            $i    = 1;
+            $html .= '<ul class="multselect">';
+
             foreach($items as $item) {
                 $sanitized_value  = esc_html($item['value']);
                 $sanitized_option = ($value) ? $sanitized_value : esc_html($item['label']);
@@ -83,9 +89,11 @@ class Field_Multiselect extends Helper_Fields
                 $html .= '<li id="field-' . $this->field->id . '-option-' . $i . '">' . $sanitized_option . '</li>';
                 $i++;
             }
+
+            $html .= '</ul>';
         }
 
-        $html .= '</div>';
+        $html .= '</div></div>';
 
         return $html;
     }

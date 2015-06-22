@@ -71,7 +71,11 @@ class Field_Phone extends Helper_Fields
      * @since 4.0
      */
     public function html() {
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-phone">' . esc_html($this->value()) .'</div>';
+
+        return '<div id="field-'. $this->field->id .'" class="gfpdf-phone gfpdf-field '. $this->field->cssClass . '">'
+                    . '<div class="label"><strong>' . esc_html(GFFormsModel::get_label($this->field)) . '</strong></div>'
+                    . '<div class="value">' . esc_html($this->value()) . '</div>'
+                . '</div>';
     }
 
     /**

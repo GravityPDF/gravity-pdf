@@ -72,10 +72,14 @@ class Field_Fileupload extends Helper_Fields
     public function html() {
         $files = $this->value();
 
-        $html = '<div id="field-'. $this->field->id .'" class="gfpdf-fileupload">';
+        $html = '<div id="field-'. $this->field->id .'" class="gfpdf-fileupload gfpdf-field '. $this->field->cssClass . '">';
+
+        /* Add the label */
+        $html .= '<div class="label"><strong>' . esc_html(GFFormsModel::get_label($this->field)) . '</strong></div>';
+        $html .= '<div class="value">';
 
         if(sizeof($files) > 0) {
-            $html .= '<ul>';
+            $html .= '<ul class="bulleted">';
             $i     = 1;
 
             foreach($files as $file) {
@@ -87,7 +91,7 @@ class Field_Fileupload extends Helper_Fields
             $html .= '</ul>';
         }
 
-        $html .= '</div>';
+        $html .= '</div></div>';
 
         return $html;
     }

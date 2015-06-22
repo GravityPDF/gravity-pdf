@@ -73,8 +73,11 @@ class Field_Email extends Helper_Fields
     public function html() {
         $value  = $this->value();
         $output = ( GFCommon::is_valid_email($value) ) ? '<a href="mailto:'. $value .'">'. esc_html($value) .'</a>' : esc_html($value);
-        
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-email">' . $output .'</div>';
+
+        return '<div id="field-'. $this->field->id .'" class="gfpdf-email gfpdf-field '. $this->field->cssClass . '">'
+                    . '<div class="label"><strong>' . esc_html(GFFormsModel::get_label($this->field)) . '</strong></div>'
+                    . '<div class="value">' . $output . '</div>'
+                . '</div>';
     }
 
     /**

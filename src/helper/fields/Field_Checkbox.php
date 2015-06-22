@@ -72,7 +72,11 @@ class Field_Checkbox extends Helper_Fields
      */
     public function html($value = false) {
 
-        $html = '<div id="field-'. $this->field->id .'" class="gfpdf-checkbox">';
+        $html = '<div id="field-'. $this->field->id .'" class="gfpdf-checkbox gfpdf-field '. $this->field->cssClass . '">';
+
+        /* Add the label */
+        $html .= '<div class="label"><strong>' . esc_html(GFFormsModel::get_label($this->field)) . '</strong></div>';
+        $html .= '<div class="value">';
 
         $items = $this->value();
 
@@ -91,7 +95,7 @@ class Field_Checkbox extends Helper_Fields
             $html .= '</ul>';
         }
 
-        $html .= '</div>';
+        $html .= '</div></div>';
 
         return $html;
     }

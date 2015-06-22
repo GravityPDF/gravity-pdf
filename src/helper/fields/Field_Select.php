@@ -73,7 +73,11 @@ class Field_Select extends Helper_Fields
     public function html($value = false) {
         $data   = $this->value();
         $output = ($value) ? $data['value'] : $data['label'];
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-select">' . esc_html($output) .'</div>';
+
+        return '<div id="field-'. $this->field->id .'" class="gfpdf-select gfpdf-field '. $this->field->cssClass . '">'
+                    . '<div class="label"><strong>' . esc_html(GFFormsModel::get_label($this->field)) . '</strong></div>'
+                    . '<div class="value">' . esc_html($output) . '</div>'
+                . '</div>';
     }
 
     /**

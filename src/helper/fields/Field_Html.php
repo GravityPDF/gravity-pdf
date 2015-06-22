@@ -72,7 +72,7 @@ class Field_Html extends Helper_Fields
     public function html() {
         /* sanitize the HTML */
         $html = wp_kses_post($this->value()); /* allow the same HTML as per the post editor */
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-html">' . $html .'</div>';
+        return '<div id="field-'. $this->field->id .'" class="gfpdf-html gfpdf-field '. $this->field->cssClass . '"><div class="value">' . $html .'</div></div>';
     }
 
     /**

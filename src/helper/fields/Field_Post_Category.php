@@ -68,9 +68,11 @@ class Field_Post_Category extends Helper_Fields
         $class = Stat_functions::get_field_class($field['inputType']);
        
         try {
+            /* check load our class */
             $this->fieldObject = new $class($field, $entry);
         } catch(Exception $e) {
-            /* TODO - Write Generic processor */
+            /* Exception thrown. Load generic field loader */
+            $this->fieldObject = new Field_Default($field, $entry);
         }
     }
 
@@ -80,7 +82,11 @@ class Field_Post_Category extends Helper_Fields
      * @since 4.0
      */
     public function html() {
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-post-category">' . $this->fieldObject->html() .'</div>';
+
+        return '<div id="field-'. $this->field->id .'" class="gfpdf-post-category gfpdf-field '. $this->field->cssClass . '">'
+                    . '<div class="label"><strong>' . esc_html(GFFormsModel::get_label($this->field)) . '</strong></div>'
+                    . '<div class="value">' . $this->fieldObject->html() . '</div>'
+                . '</div>';
     }
 
     /**

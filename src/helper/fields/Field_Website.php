@@ -74,7 +74,10 @@ class Field_Website extends Helper_Fields
         $value  = $this->value();
         $output = ( GFCommon::is_valid_url($value) ) ? '<a href="'. esc_url($value) .'" target="_blank">'. esc_html($value) .'</a>' : esc_html($value);
 
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-website">' . $output .'</div>';
+        return '<div id="field-'. $this->field->id .'" class="gfpdf-website gfpdf-field '. $this->field->cssClass . '">'
+                    . '<div class="label"><strong>' . esc_html(GFFormsModel::get_label($this->field)) . '</strong></div>'
+                    . '<div class="value">' . $output . '</div>'
+                . '</div>';
     }
 
     /**

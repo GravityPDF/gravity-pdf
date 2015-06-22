@@ -73,7 +73,13 @@ class Field_Post_Image extends Helper_Fields
         $value = $this->value();
         $path  = str_replace(home_url() . '/', ABSPATH, $value['url']);
         
-        $html = '<div id="field-'. $this->field->id .'" class="gfpdf-post-image">';
+        $html = '<div id="field-'. $this->field->id .'" class="gfpdf-post-image gfpdf-field '. $this->field->cssClass . '">';
+
+        /* Add the label */
+        $html .= '<div class="label"><strong>' . esc_html(GFFormsModel::get_label($this->field)) . '</strong></div>';
+        $html .= '<div class="value">';
+
+        /* Start building image link */
         $html .= '<a href="'. esc_url($value['url']) . '" target="_blank">';
         $html .= '<img width="150" src="' . esc_url($path) . '" />';
 
@@ -91,7 +97,7 @@ class Field_Post_Image extends Helper_Fields
         }
 
         $html .= '</a>';
-        $html .= '</div>';
+        $html .= '</div></div>';
 
         return $html;
 

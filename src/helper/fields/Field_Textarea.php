@@ -65,7 +65,11 @@ class Field_Textarea extends Helper_Fields
     }
 
     public function html() {
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-textarea">' . $this->value() .'</div>';
+
+        return '<div id="field-'. $this->field->id .'" class="gfpdf-textarea gfpdf-field '. $this->field->cssClass . '">'
+                    . '<div class="label"><strong>' . esc_html(GFFormsModel::get_label($this->field)) . '</strong></div>'
+                    . '<div class="value">' . $this->value() . '</div>'
+                . '</div>';
     }
 
     /**

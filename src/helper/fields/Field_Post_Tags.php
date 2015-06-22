@@ -71,7 +71,11 @@ class Field_Post_Tags extends Helper_Fields
      */
     public function html() {
         $value = implode(', ', $this->value());
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-post-tags">' . esc_html($value) .'</div>';
+
+        return '<div id="field-'. $this->field->id .'" class="gfpdf-post-tags gfpdf-field '. $this->field->cssClass . '">'
+                    . '<div class="label"><strong>' . esc_html(GFFormsModel::get_label($this->field)) . '</strong></div>'
+                    . '<div class="value">' . esc_html($value) . '</div>'
+                . '</div>';
     }
 
     /**

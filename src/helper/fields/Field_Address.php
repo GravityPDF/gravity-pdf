@@ -75,7 +75,11 @@ class Field_Address extends Helper_Fields
         $address = array();
 
         /* generate our HTML markup */
-        $html = '<div id="field-'. $this->field->id .'" class="gfpdf-address">';
+        $html = '<div id="field-'. $this->field->id .'" class="gfpdf-address gfpdf-field '. $this->field->cssClass . '">';
+
+        /* Add the label */
+        $html .= '<div class="label"><strong>' . esc_html(GFFormsModel::get_label($this->field)) . '</strong></div>';
+        $html .= '<div class="value">';
 
         /* check if we should display the zip before the city */
         $address_display_format = apply_filters('gform_address_display_format', 'default');
@@ -116,7 +120,7 @@ class Field_Address extends Helper_Fields
         /* display the address in the correct format */
         $html .= implode('<br />', $address);
 
-        $html .= '</div>';
+        $html .= '</div></div>';
 
         /* return the results */
         return $html;

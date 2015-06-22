@@ -112,41 +112,48 @@ class Field_List extends Helper_Fields
         ob_start();
         ?>
 
-        <div id="field-<?php echo $this->field->id; ?>" class="gfpdf-list">
-            <table autosize="1" class="gfield_list" style="<?php echo implode(';', $css['table']); ?>">
-            
-                <!-- Loop through the column names and output in a header (if using the advanced list) -->
-                <?php if($columns): $columns = array_keys($value[0]); ?>
-                    <thead>
-                        <tr>
-                            <?php foreach($columns as $column): ?>
-                                <th style="<?php echo implode(';', $css['th']); ?>">
-                                    <?php echo esc_html($column); ?>
-                                </th>
-                            <?php endforeach; ?>
-                        </tr>
-                    </thead>
-                <?php endif; ?>
+        <div id="field-<?php echo $this->field->id; ?>" class="gfpdf-list gfpdf-field <?php echo $this->field->cssClass; ?>">
+            <div class="label">
+                <strong><?php echo esc_html(GFFormsModel::get_label($this->field)); ?></strong>
+            </div>
 
-                <!-- Loop through each row -->
-                <tbody>
-                        <?php foreach($value as $item): ?>
+            <div class="value">
+        
+                <table autosize="1" class="gfield_list" style="<?php echo implode(';', $css['table']); ?>">
+
+                    <!-- Loop through the column names and output in a header (if using the advanced list) -->
+                    <?php if($columns): $columns = array_keys($value[0]); ?>
+                        <thead>
                             <tr>
-                                <!-- handle the basic list -->
-                                <?php if(!$columns): ?>
-                                    <td style="<?php echo implode(';', $css['td']); ?>"><?php echo esc_html($item); ?></td>
-                                <?php else: ?><!-- handle the advanced list -->
-                                    <?php foreach($columns as $column): ?>
-                                        <td style="<?php echo implode(';', $css['td']); ?>">
-                                            <?php echo esc_html(rgar($item, $column)); ?>
-                                        </td>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
+                                <?php foreach($columns as $column): ?>
+                                    <th style="<?php echo implode(';', $css['th']); ?>">
+                                        <?php echo esc_html($column); ?>
+                                    </th>
+                                <?php endforeach; ?>
                             </tr>
-                        <?php endforeach; ?>
-                </tbody>
+                        </thead>
+                    <?php endif; ?>
 
-            </table>
+                    <!-- Loop through each row -->
+                    <tbody>
+                            <?php foreach($value as $item): ?>
+                                <tr>
+                                    <!-- handle the basic list -->
+                                    <?php if(!$columns): ?>
+                                        <td style="<?php echo implode(';', $css['td']); ?>"><?php echo esc_html($item); ?></td>
+                                    <?php else: ?><!-- handle the advanced list -->
+                                        <?php foreach($columns as $column): ?>
+                                            <td style="<?php echo implode(';', $css['td']); ?>">
+                                                <?php echo esc_html(rgar($item, $column)); ?>
+                                            </td>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </tr>
+                            <?php endforeach; ?>
+                    </tbody>
+
+                </table>
+            </div>
         </div>
 
         <?php

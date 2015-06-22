@@ -121,7 +121,7 @@ class Field_Products extends Helper_Fields
             </style>
         <?php endif; ?>
 
-        <h3 id="product-field-title">
+        <h3 id="product-field-title gfpdf-field">
             <?php
                 echo apply_filters("gform_order_label_{$form_id}",
                      apply_filters('gform_order_label', __('Order', 'gravityforms'),
@@ -130,7 +130,7 @@ class Field_Products extends Helper_Fields
             ?>
         </h3>
 
-        <table class="entry-products" autosize="1" cellspacing="0" width="97%">
+        <table class="entry-products gfpdf-field" autosize="1" cellspacing="0" width="97%">
             <colgroup>
                   <col class="entry-products-col1" />
                   <col class="entry-products-col2" />
