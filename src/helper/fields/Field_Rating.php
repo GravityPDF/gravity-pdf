@@ -56,10 +56,7 @@ class Field_Rating extends Helper_Fields
     public function html() {
         $value = apply_filters('gform_entry_field_value', $this->get_value(), $this->field, $this->entry, $this->form);
 
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-'. $this->field->inputType .' gfpdf-field '. $this->field->cssClass . '">'
-                    . '<div class="label"><strong>' . esc_html(GFFormsModel::get_label($this->field)) . '</strong></div>'
-                    . '<div class="value">' . $value . '</div>'
-                . '</div>';
+        return parent::html($value);
     }
 
     /**

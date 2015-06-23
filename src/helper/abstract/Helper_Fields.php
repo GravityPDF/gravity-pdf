@@ -171,15 +171,29 @@ abstract class Helper_Fields {
     }
 
     /**
+     * Get the default HTML output for this field
+     * @param  String $value The field value to be displayed
+     * @param  Boolean $label Whether or not to show the field's label
+     * @since 4.0
+     */
+    public function html($value, $label = true) {
+        
+        $html = '<div id="field-'. $this->field->id .'" class="gfpdf-'. $this->field->inputType .' gfpdf-field '. $this->field->cssClass . '">';
+
+        if($label) {
+            $html .= '<div class="label"><strong>' . esc_html(GFFormsModel::get_label($this->field)) . '</strong></div>';
+        }
+
+        $html .= '<div class="value">' . $value . '</div>'
+                . '</div>';
+
+        return $html;
+    }
+
+    /**
      * Used to process the Gravity Forms value extracted from the entry
      * This is called from the 'value' method
      * @since 4.0
      */
     abstract public function value();
-
-    /**
-     * Get the default HTML output for this field
-     * @since 4.0
-     */
-    abstract public function html();
 }

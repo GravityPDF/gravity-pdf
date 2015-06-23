@@ -71,11 +71,9 @@ class Field_Time extends Helper_Fields
      * @since 4.0
      */
     public function html() {
-
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-time gfpdf-field '. $this->field->cssClass . '">'
-                    . '<div class="label"><strong>' . esc_html(GFFormsModel::get_label($this->field)) . '</strong></div>'
-                    . '<div class="value">' . esc_html($this->value()) . '</div>'
-                . '</div>';
+        $value = esc_html($this->value());
+        
+        return parent::html($value);
     }
 
     /**

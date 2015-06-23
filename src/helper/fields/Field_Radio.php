@@ -73,11 +73,9 @@ class Field_Radio extends Helper_Fields
     public function html($value = false) {
         $data   = $this->value();
         $output = ($value) ? $data['value'] : $data['label'];
+        $output = esc_html($output);
 
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-radio gfpdf-field '. $this->field->cssClass . '">'
-                    . '<div class="label"><strong>' . esc_html(GFFormsModel::get_label($this->field)) . '</strong></div>'
-                    . '<div class="value">' . esc_html($output) . '</div>'
-                . '</div>';
+        return parent::html($output);
     }
 
     /**

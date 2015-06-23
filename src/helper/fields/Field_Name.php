@@ -71,12 +71,11 @@ class Field_Name extends Helper_Fields
      * @since 4.0
      */
     public function html() {
-        $data = array_filter($this->value()); /* remove any empty fields from the array */
+        $data  = array_filter($this->value()); /* remove any empty fields from the array */
+        
+        $value = esc_html(implode(' ', $data));
 
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-name gfpdf-field '. $this->field->cssClass . '">'
-                    . '<div class="label"><strong>' . esc_html(GFFormsModel::get_label($this->field)) . '</strong></div>'
-                    . '<div class="value">' . esc_html(implode(' ', $data)) . '</div>'
-                . '</div>';
+        return parent::html($value);
     }
 
     /**

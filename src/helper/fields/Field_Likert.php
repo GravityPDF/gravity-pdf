@@ -56,10 +56,7 @@ class Field_Likert extends Helper_Fields
     public function html() {
         $value = apply_filters('gform_entry_field_value', $this->get_value(), $this->field, $this->entry, $this->form);
 
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-likert gfpdf-field '. $this->field->cssClass . '">'
-                    . '<div class="label"><strong>' . esc_html(GFFormsModel::get_label($this->field)) . '</strong></div>'
-                    . '<div class="value">' . $value . '</div>'
-                . '</div>';
+        return parent::html($value);
     }
 
     /**
@@ -75,7 +72,7 @@ class Field_Likert extends Helper_Fields
         /*
          * Process Single and Multi Column Likerts
          */
-        $likert    = array();
+        $likert = array();
 
         /*
          * Get the column names
@@ -99,6 +96,7 @@ class Field_Likert extends Helper_Fields
                     $likert['rows'][$row['label']][$text] = ( ($row['name'] . ':' . $id) == $data) ? 'selected' : '';
                 }
             }
+            
         } else { /* Handle our single-row likert */
 
             /* Get the value from the entry */

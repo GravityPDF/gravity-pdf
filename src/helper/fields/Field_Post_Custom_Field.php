@@ -86,10 +86,7 @@ class Field_Post_Custom_Field extends Helper_Fields
      * @since 4.0
      */
     public function html() {
-
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-post-custom-field gfpdf-field '. $this->field->cssClass . '">'
-                    . $this->fieldObject->html()
-                . '</div>';
+        return parent::html($this->fieldObject->html(), false);
     }
 
     /**

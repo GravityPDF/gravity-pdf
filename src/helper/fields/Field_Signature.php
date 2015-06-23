@@ -67,10 +67,7 @@ class Field_Signature extends Helper_Fields
     public function html() {
         $value = $this->value();
 
-        return '<div id="field-'. $this->field->id .'" class="gfpdf-signature gfpdf-field '. $this->field->cssClass . '">'
-                    . '<div class="label"><strong>' . esc_html(GFFormsModel::get_label($this->field)) . '</strong></div>'
-                    . '<div class="value">' . $value['img'] .'</div>'
-                . '</div>';
+        return parent::html($value['img']);
     }
 
     /**

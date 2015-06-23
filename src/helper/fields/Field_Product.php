@@ -81,12 +81,7 @@ class Field_Product extends Helper_Fields
      */
     public function html() {
         $value = $this->value();
-
-        $html = '<div id="field-'. $this->field->id .'" class="gfpdf-'. $this->field->type .' gfpdf-field '. $this->field->cssClass . '">';
-
-        /* Add the label */
-        $html .= '<div class="label"><strong>' . esc_html(GFFormsModel::get_label($this->field)) . '</strong></div>';
-        $html .= '<div class="value">';
+        $hmlt  = '';
 
         switch($this->field->type) {
             case 'product':
@@ -111,9 +106,7 @@ class Field_Product extends Helper_Fields
             break;
         }
 
-        $html .= '</div></div>';
-
-        return $html;
+        return parent::html($html);
     }
 
     /**
