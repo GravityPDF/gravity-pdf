@@ -69,6 +69,22 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
     public $options;
 
     /**
+     * Add user depreciation notice for missing methods
+     * @since  4.0
+     */
+    public function __call($name, $arguments) {
+        trigger_error(sprintf(__('"%s" has been depreciated as of Gravity PDF 4.0', 'gravitypdf'), $name), E_USER_DEPRECATED);
+    }
+
+    /**
+     * Add user depreciation notice for missing methods
+     * @since  4.0
+     */
+    public static function __callStatic($name, $arguments) {
+        trigger_error(sprintf(__('"%s" has been depreciated as of Gravity PDF 4.0', 'gravitypdf'), $name), E_USER_DEPRECATED);
+    }
+
+    /**
      * Setup our plugin functionality
      * Note: Fires on WordPress' init hook
      * @since 4.0
@@ -358,6 +374,18 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
 
         $class = new Controller\Controller_PDF($model, $view);
         $class->init();
+    }
+
+    /**
+     * Add backwards compatbility with v3.x.x default PDF template files
+     * This function will now pull the PDF configuration details from the database and return them
+     * @param  Integer $form_id  The Gravity Form ID
+     * @return  Array The matched configuration being requested
+     * @since 4.0
+     */
+    public function get_default_config_data($form_id) {
+        $pid = $GLOBALS['wp']->query_vars['pid'];
+        $lid = (int) $GLOBALS['wp']->query_vars['lid'];
     }
 }
 

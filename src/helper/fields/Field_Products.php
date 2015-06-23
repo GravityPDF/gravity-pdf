@@ -3,6 +3,7 @@
 namespace GFPDF\Helper\Fields;
 
 use GFPDF\Helper\Helper_Fields;
+use GFFormsModel;
 use GFCommon;
 
 /**
@@ -51,15 +52,18 @@ class Field_Products extends Helper_Fields
 {
 
     /**
-     * Check the appropriate variables are parsed in send to the parent construct
-     * @param Object $field The GF_Field_* Object
+     * The Products class doesn't need the $field value so we'll use a stripped down version of the construct
      * @param Array $entry The Gravity Forms Entry
      * @since 4.0
      */
-    public function __construct($field, $entry) {
+    public function __construct($entry) {
+        /* Throw error if $entry is not an array */
+        if(!is_array($entry)) {
+            throw new Exception('$entry needs to be an array');
+        }
 
-        /* call our parent method */
-        parent::__construct($field, $entry);
+        $this->entry = $entry;
+        $this->form  = GFFormsModel::get_form_meta( $entry['id'] );
     }
 
     /**

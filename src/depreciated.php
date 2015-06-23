@@ -2,6 +2,7 @@
 
 use GFPDF\Stat\Stat_Functions;
 use GFPDF\Router;
+use GFPDF\View\View_PDF;
 
 /**
  * Depreciated Functionality / Classes
@@ -52,6 +53,22 @@ class GFPDF_Core
 
 class PDF_Common
 {
+    /**
+     * Add user depreciation notice for missing methods
+     * @since  4.0
+     */
+    public function __call($name, $arguments) {
+        trigger_error(sprintf(__('"%s" has been depreciated as of Gravity PDF 4.0', 'gravitypdf'), $name), E_USER_DEPRECATED);
+    }
+
+    /**
+     * Add user depreciation notice for missing methods
+     * @since  4.0
+     */
+    public static function __callStatic($name, $arguments) {
+        trigger_error(sprintf(__('"%s" has been depreciated as of Gravity PDF 4.0', 'gravitypdf'), $name), E_USER_DEPRECATED);
+    }
+    
     public static function setup_ids() {
     }
 
@@ -119,7 +136,33 @@ class PDF_Common
 }
 
 class GFPDFEntryDetail {
-    public static function lead_detail_grid_array() {
-        
+
+    public static function lead_detail_grid($form, $lead, $allow_display_empty_fields=false, $show_html=false, $show_page_name=false, $return=false) {
+            $config = array(
+                'empty'      => $allow_display_empty_fields,
+                'echo'       => !$return,
+                'legacy_css' => true,
+
+                /* TODO */
+                'html_field' => $show_html,
+                'page_names' => $show_page_name,
+            );
+
+            self::do_lead_detail_grid($form, $lead, $config);
+    }
+
+    /**
+     * Generate our PDF HTML layout
+     * @param  Array $form   The Gravity Form array
+     * @param  Array $lead   The Gravity Form entry
+     * @param  Array $config The PDF Configuration
+     * @return String        The generated HTML
+     */
+    public static function do_lead_detail_grid($form, $lead, $config = array()) {
+        /* Set up any legacy configuration options needed */
+        $config['legacy_css'] = true;
+
+        $view = new View_PDF();
+        $view->generate_html_structure($lead, $config);
     }
 }

@@ -161,9 +161,9 @@ abstract class Helper_Fields {
     public function is_empty() {
         $value = $this->value();
         
-        if(is_array($value) && sizeof(array_filter($value) > 0)) { /* check for an array */
+        if(is_array($value) && sizeof(array_filter($value)) === 0) { /* check for an array */
             return true;
-        } else if(is_string($value) && strlen(trim($value)) > 0) { /* check for a string */
+        } else if(is_string($value) && strlen(trim($value)) === 0) { /* check for a string */
             return true;
         }
 
