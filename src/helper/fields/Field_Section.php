@@ -4,6 +4,7 @@ namespace GFPDF\Helper\Fields;
 
 use GFPDF\Helper\Helper_Fields;
 use GFFormsModel;
+use GFCommon;
 use GF_Field_Section;
 use Exception;
 
@@ -62,6 +63,19 @@ class Field_Section extends Helper_Fields
 
         /* call our parent method */
         parent::__construct($field, $entry);
+    }
+
+    /**
+     * Used to check if the current field has a value
+     * @since 4.0
+     * @internal Child classes can override this method when dealing with a specific use case
+     */
+    public function is_empty() {
+        if( GFCommon::is_section_empty($this->field, $this->form, $this->entry) ) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
