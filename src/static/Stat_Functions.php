@@ -91,6 +91,11 @@ class Stat_Functions
             $type = 'product';
         }
 
+        /* Change our rank field to be processed as a rating field */
+        if($type == 'rank') {
+            $type = 'rating';
+        }
+
         /* Format the type name correctly */
         $typeArray = explode('_', $type);
         $typeArray = array_map('ucwords', $typeArray);
