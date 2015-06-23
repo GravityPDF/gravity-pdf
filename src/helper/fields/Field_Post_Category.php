@@ -65,11 +65,15 @@ class Field_Post_Category extends Helper_Fields
          * Category can be multiple field types
          * eg. Select, MultiSelect, Radio, Dropdown
          */
-        $class = Stat_functions::get_field_class($field['inputType']);
+        $class = Stat_functions::get_field_class($field->inputType);
        
         try {
             /* check load our class */
-            $this->fieldObject = new $class($field, $entry);
+            if(class_exists($class)) {
+                $this->fieldObject = new $class($field, $entry);
+            } else {
+                throw new Exception('Class not found');
+            }
         } catch(Exception $e) {
             /* Exception thrown. Load generic field loader */
             $this->fieldObject = new Field_Default($field, $entry);
