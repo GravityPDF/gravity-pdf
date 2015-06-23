@@ -65,7 +65,7 @@ class Field_Textarea extends Helper_Fields
     }
 
     public function html() {
-        $value = esc_html($this->value());
+        $value = $this->value();
         
         return parent::html($value);
     }
