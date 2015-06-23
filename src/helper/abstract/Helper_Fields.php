@@ -90,7 +90,11 @@ abstract class Helper_Fields {
      * @since 4.0
      */
     public function __construct($field, $entry) {
-        
+        /* Throw error if not dependacies not met */
+        if(!class_exists('GFFormsModel')) {
+            throw new Exception('Gravity Forms is not correctly loaded.');
+        }
+
         if(!is_object($field) || ! ($field instanceof GF_Field)) {
             throw new Exception('$field needs to be in instance of GF_Field');
         }
@@ -145,18 +149,8 @@ abstract class Helper_Fields {
      * @since 4.0
      */
     final public function get_value() {
-            /* Throw error if not dependacies not met */
-            if(!class_exists('GFFormsModel')) {
-                throw new Exception('Gravity Forms is not correctly loaded.');
-            }
-
-            /* Throw error if not an array */
-            if(!is_array($this->entry)) {
-                return new WP_Error('invalid_entry');
-            }
-
-            /* get the GF Value */
-            return GFFormsModel::get_lead_field_value($this->entry, $this->field);
+        /* get the GF Value */
+        return apply_filters( 'gfpdf_field_content', GFFormsModel::get_lead_field_value($this->entry, $this->field), $this->field, $this->entry);
     }
 
     /**
