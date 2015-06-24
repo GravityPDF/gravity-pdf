@@ -163,6 +163,6 @@ class GFPDFEntryDetail {
         $config['legacy_css'] = true;
 
         $view = new View_PDF();
-        $view->generate_html_structure($lead, $config);
+        $view->process_html_structure($lead, $config);
     }
 }

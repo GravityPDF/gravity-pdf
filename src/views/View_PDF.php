@@ -3,13 +3,18 @@
 namespace GFPDF\View;
 
 use GFPDF\Helper\Helper_View;
-use GFPDF\Helper\Fields\Field_Default;
+use GFPDF\Helper\Helper_Fields;
+
 use GFPDF\Helper\Fields\Field_Product;
 use GFPDF\Helper\Fields\Field_Products;
+use GFPDF\Helper\Fields\Field_Default;
+
 use GFPDF\Stat\Stat_functions;
+
 use GFFormsModel;
 use GFCommon;
 use GF_Field;
+
 use mPDF;
 use Exception;
 
@@ -117,151 +122,200 @@ class View_PDF extends Helper_View
     }
 
     /**
-     * Build our HTML structure
+     * Start the PDF HTML Generation Process
      * @param  Array $entry  The Gravity Forms Entry Array
      * @param  Array  $config Any configuration data passed in
      * @return String         The generated HTML
+     * @since 4.0
      */
-    public function generate_html_structure($entry, $config = array()) {
+    public function process_html_structure($entry, $config = array()) {
+        /* Determine whether we should output or return the results */
+        $echo = (rgar($config, 'echo')) ? rgar($config, 'echo') : true; /* whether to output or return the generated markup. Default is echo */
 
-        /* Set up required variables */
-        $form         = GFFormsModel::get_form_meta($entry['form_id']);
-        $products     = new Field_Products($entry);
-        $has_products = false;
-        
-        /* get the user configuration values */
-        $echo                           = (rgar($config, 'echo')) ? rgar($config, 'echo') : true;
-        $show_empty_fields              = (rgar($config, 'empty')) ? rgar($config, 'empty') : false;
-        $skip_marked_fields             = (rgar($config, 'exclude')) ? rgar($config, 'exclude') : true;
-        $skip_hidden_fields             = (rgar($config, 'hidden')) ? rgar($config, 'hidden') : true;
-        $show_individual_product_fields = (rgar($config, 'individual_products')) ? rgar($config, 'individual_products') : false;
-        $load_legacy_css                = (rgar($config, 'legacy_css')) ? rgar($config, 'legacy_css') : false;
-        $show_title                     = (rgar($config, 'show_title')) ? rgar($config, 'show_title') : true;
-        $show_section_description       = (rgar($config, 'section_content')) ? rgar($config, 'section_content') : false;
-
-        /* check if we should return the HTML, or echo it */
-        if($echo === false) {
+        if(!$echo) {
             ob_start();
         }
 
+        /* Generate the markup */
         ?>
 
         <div id="container">
-
-            <?php if($show_title !== false): /* Show the form title, if needed */ ?>
-                    <h3 id="form_title"><?php echo $form['title']?></h3>
-            <?php endif; ?>
+            <?php $this->generate_html_structure($entry, $config); ?>
+        </div>
 
         <?php
 
-        foreach($form['fields'] as $field) {
-
-            /* Skip any fields with the css class 'exclude' */
-            if($css_exclude !== false && strpos($field->cssClass, 'exclude')) {
-                continue;
-            }
-
-            /* Skip over any hidden fields (usually by conditional logic) */
-            if($skip_hidden_fields === true && GFFormsModel::is_field_hidden($form, $field, array(), $entry )) {
-                continue;
-            }
-
-            /* Skip over any product fields */
-            if( $show_individual_product_fields === false && GFCommon::is_product_field($field->type) ) {
-                $has_products = true;
-                continue;
-            }
-
-            /* Load our legacy CSS class names */
-            if($load_legacy_css === true) {
-                $this->load_legacy_css($field);
-            }
-
-            ?>
-            
-            
-
-                <?php
-
-                    /* Try and load a class based on the field type */
-                    $class_name = Stat_functions::get_field_class($field->type);
-                   
-                    try {
-                        /* check load our class */
-                        if(class_exists($class_name)) {
-
-                            $is_product = $this->is_product_field($field);
-
-                            /* Product fields are handled through a single function */
-                            if($show_individual_product_fields && $is_product) {
-                                $class = new Field_Product($field, $entry, $products);
-                            } else if (! $is_product) {
-                                $class = new $class_name($field, $entry);
-                            }
-
-                        } else {
-                            throw new Exception('Class not found');
-                        }
-                    } catch(Exception $e) {
-                        /* Exception thrown. Load generic field loader */
-                        $class = new Field_Default($field, $entry);
-                    }
-
-                    /* Try and display our HTML */
-                    try {
-
-                        /* Only load our HTML if the field is NOT empty, or the $empty config option is true */
-                        if(!$class->is_empty() || $show_empty_fields === true) {
-                            echo ($field->type !== 'section') ? $class->html() : $class->html($show_section_description);
-                        }
-
-                    } catch(Exception $e) {
-                        var_dump($e);
-                    }
-
-                ?>
-            <?php
-        }
-
-        /* Output Product table if needed */
-        if($has_products && !$products->is_empty()) {
-            echo $products->html();
-        }
-
-        ?>
-
-        </div><!-- close #container -->
-
-        <?php
-
-        /* return the output, if needed */
-        if($echo === false) {
+        if(!$echo) {
             return ob_get_clean();
         }
     }
 
     /**
-     * Check if the field being passed is a product field
-     * @param  GF_Field $field The Gravity Form Fields
-     * @return Boolean
+     * Build our HTML structure
+     * @param  Array $entry  The Gravity Forms Entry Array
+     * @param  Array  $config Any configuration data passed in
+     * @return String         The generated HTML
      * @since 4.0
      */
-    public function is_product_field(GF_Field $field) {
+    public function generate_html_structure($entry, $config = array()) {
 
-        $products = array(
-            'product',
-            'option',
-            'quantity',
-            'shipping',
-            'total',
-        );
+        /* Set up required variables */
+        $form                           = GFFormsModel::get_form_meta($entry['form_id']);
+        $products                       = new Field_Products($entry);
+        $has_products                   = false;
+        $page_number                    = 0;
+        
+        /* Allow the config to be changed through a filter */
+        $config                         = apply_filters('gfpdf_pdf_configuration', $config, $entry, $form);
+        
+        /* Get the user configuration values */
+        $skip_marked_fields             = (rgar($config, 'exclude')) ? rgar($config, 'exclude') : true; /* whether we should exclude fields with a CSS value of 'exclude'. Default to true */
+        $skip_hidden_fields             = (rgar($config, 'hidden')) ? rgar($config, 'hidden') : true; /* whether we should skip fields hidden with conditional logic. Default to true. */
+        $show_title                     = (rgar($config, 'show_title')) ? rgar($config, 'show_title') : true; /* whether we should show the form title. Default to true */
+        $show_section_description       = (rgar($config, 'section_content')) ? rgar($config, 'section_content') : false; /* whether we should include a section breaks content. Default to false */
+        $show_page_names                = (rgar($config, 'page_names')) ? rgar($config, 'page_names') : false; /* whether we should show the form's page names. Default to false */
+        $show_html_fields               = (rgar($config, 'html_field')) ? rgar($config, 'html_field') : false; /* whether we should show the form's html fields. Default to false */
+        $show_individual_product_fields = (rgar($config, 'individual_products')) ? rgar($config, 'individual_products') : false; /* Whether to show individual fields in the entry. Default to false - they are grouped together at the end of the form */
 
-        if(in_array($field->type, $products)) {
-            return true;
+        /* Display the form title, if needed */
+        $this->show_form_title($show_title, $form);
+
+        /* Loop through the fields and output or skip if needed */
+        foreach($form['fields'] as $key => $field) {
+
+            /* Load our page name, if needed */
+            if($show_page_names === true && $field->pageNumber !== $page_number) {
+                $this->display_page_name($page_number, $form);
+                $page_number++;
+            }
+
+            /* Skip any fields with the css class 'exclude', if needed */
+            if($css_exclude !== false && strpos($field->cssClass, 'exclude')) {
+                continue;
+            }
+
+            /* Skip over any hidden fields (usually by conditional logic), if needed */
+            if($skip_hidden_fields === true && GFFormsModel::is_field_hidden($form, $field, array(), $entry )) {
+                continue;
+            }
+
+            /* Skip over any product fields, if needed */
+            if( $show_individual_product_fields === false && GFCommon::is_product_field($field->type) ) {
+                $has_products = true;
+                continue;
+            }
+
+            /* Skip HTML fields, if needed */
+            if($show_html_fields === false && $field->type == 'html') {
+                continue;
+            }
+
+            /**
+             * Let's output our field
+             */
+            $this->process_field($field, $entry, $form, $config, $products);
         }
 
-        return false;
+        /* Output product table, if needed */
+        if($has_products && !$products->is_empty()) {
+            echo $products->html();
+        }
+
     }
+
+    /**
+     * Handle our field loader and display the generated HTML
+     * @param  GF_Field $field    The field to process
+     * @param  Array $entry    The Gravity Form Entry
+     * @param  Array $form     The Gravity Form Field
+     * @param  Array $config   The user-passed configuration data
+     * @param  Helper_Fields $products The product fields
+     * @return void
+     * @since 4.0
+     */
+    public function process_field($field, $entry, $form, $config, $products) {
+
+        /*
+        * Set up our configuration variables
+        */
+        $show_empty_fields = (rgar($config, 'empty')) ? rgar($config, 'empty') : false; /* whether to show empty fields or not. Default is false */
+        $load_legacy_css   = (rgar($config, 'legacy_css')) ? rgar($config, 'legacy_css') : false; /* whether we should add our legacy field class names (v3.x.x) to our fields. Default to false */
+
+        /* Try and load a class based on the field type */
+        $class_name        = Stat_functions::get_field_class($field->type);
+       
+        try {
+            /* if we have a valid class name... */
+            if(class_exists($class_name)) {
+                
+                /**
+                 * Developer Note
+                 *
+                 * We've purposefully not added any filters to the Field_* child classes directly.
+                 * Instead, if you want to change how one of the fields are displayed or output (without effecting Gravity Forms itself) you should tap
+                 * into one of the filters below and override or extend the entire class.
+                 *
+                 * Your class MUST extend the \GFPDF\Helper\Helper_Fields abstract class - either directly or by extending an existing \GFPDF\Helper\Fields class.
+                 * eg. class Fields_New_Text extends \GFPDF\Helper\Helper_Fields or Fields_New_Text extends \GFPDF\Helper\Fields\Field_Text
+                 *
+                 * To make your life more simple you should either use the same namespace as the field classes (\GFPDF\Helper\Fields) or import the class directly (use \GFPDF\Helper\Fields\Field_Text)
+                 * We've tried to make the fields as modular as possible. If you have any feedback about this approach please submit a ticket on GitHub (https://github.com/blueliquiddesigns/gravity-forms-pdf-extended/issues)
+                 *
+                 */
+                if(GFCommon::is_product_field($field->type)) {
+                    /* Product fields are handled through a single function */
+                    $class = apply_filters('gfpdf_field_product_class', new Field_Product($field, $entry, $products), $field, $entry, $form);
+                } else {
+                    /* Load the selected class */
+                    $class = apply_filters('gfpdf_field_'. $field->type . '_class', new $class_name($field, $entry), $field, $entry, $form);
+                }
+            }
+            
+            if(empty($class) || !($class instanceof Helper_Fields)) {
+                throw new Exception('Class not found');
+            }
+
+        } catch(Exception $e) {
+            /* Exception thrown. Load generic field loader */
+            $class = apply_filters('gfpdf_field_default_class', new Field_Default($field, $entry), $field, $entry, $form);
+        }
+
+        /* Try and display our HTML */
+        try {
+            /* Only load our HTML if the field is NOT empty, or the $empty config option is true */
+            if(!$class->is_empty() || $show_empty_fields === true) {
+                /* Load our legacy CSS class names */
+                if($load_legacy_css === true) {
+                    $this->load_legacy_css($field);
+                }
+
+                echo ($field->type !== 'section') ? $class->html() : $class->html($show_section_description);
+            }
+
+        } catch(Exception $e) {
+            /**
+             * TODO, would log this information
+             */
+            var_dump($e);
+        }
+    }
+
+    /**
+     * If enabled, we'll show the Gravity Form Title in the document
+     * @param  Boolean $show_title Whether or not to show the title
+     * @param  Array $form       The Gravity Form array
+     * @return void
+     * @since 4.0
+     */
+    public function show_form_title($show_title, $form) {
+        /* Show the form title, if needed */
+        if($show_title !== false): ob_start(); ?>
+            <h3 id="form_title"><?php echo $form['title']?></h3>
+        <?php endif;
+
+        echo apply_filters('gfpdf_pdf_form_title_html', ob_get_clean(), $form);
+    }
+
 
     /**
      * Our default template used a number of legacy classes.
@@ -288,6 +342,25 @@ class View_PDF extends Helper_View
             default:
                 $field->cssClass = $field->cssClass . ' entry-view-field-value';
             break;
+        }
+    }
+
+    /**
+     * Output the current page name HTML
+     * @param  Integer   $page  The current page number
+     * @param  Array     $form  The form array
+     * @return String           The page HTML output
+     */
+    public function display_page_name($page, $form) {
+        /* Only display the current page name if it has changed (and it exists) */
+        if(isset($form['pagination']['pages'][$page]) && strlen(trim($form['pagination']['pages'][$page])) > 0) {
+            ob_start();
+            ?>
+                <h3 id="field-<?php echo $field->id; ?>" class="gfpdf-<?php echo $field->inputType; ?> gfpdf-field <?php echo $field->cssClass; ?>">
+                    <?php echo $form['pagination']['pages'][$page]; ?>
+                </h3>
+            <?php
+            echo apply_filters('gfpdf_field_page_name_html', ob_get_clean(), $page, $field, $form);
         }
     }
 }
