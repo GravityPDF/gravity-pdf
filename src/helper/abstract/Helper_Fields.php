@@ -106,7 +106,8 @@ abstract class Helper_Fields {
 
         $this->field = $field;
         $this->entry = $entry;
-        $this->form  = GFFormsModel::get_form_meta( $entry['id'] );
+        $this->form  = GFFormsModel::get_form_meta( $entry['form_id'] );
+        
     }
 
     /**
@@ -145,7 +146,7 @@ abstract class Helper_Fields {
 
     /**
      * Used to process the Gravity Forms value extracted from the entry array
-     * Each value is then passed to the display_value method set up by the child objects
+     * Each value is then passed to the value method set up by the child objects
      * @since 4.0
      */
     final public function get_value() {
@@ -192,7 +193,6 @@ abstract class Helper_Fields {
 
     /**
      * Used to process the Gravity Forms value extracted from the entry
-     * This is called from the 'value' method
      * @since 4.0
      */
     abstract public function value();
