@@ -5,6 +5,7 @@ namespace GFPDF\Helper\Fields;
 use GFPDF\Helper\Helper_Fields;
 use GFFormsModel;
 use GFCommon;
+use Exception;
 
 /**
  * Gravity Forms Field
