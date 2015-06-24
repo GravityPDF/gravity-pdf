@@ -67,7 +67,8 @@ class Field_Signature extends Helper_Fields
     public function html() {
         $value = $this->value();
 
-        return parent::html($value['img']);
+        $output = (!$this->is_empty()) ? $value['img'] : ''; /* prevents image loading error when non existant */
+        return parent::html($output);
     }
 
     /**
