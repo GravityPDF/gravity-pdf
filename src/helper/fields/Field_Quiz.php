@@ -3,9 +3,7 @@
 namespace GFPDF\Helper\Fields;
 
 use GFPDF\Helper\Helper_Fields;
-use GFPDF\Stat\Stat_Functions;
 use GFFormsModel;
-use Exception;
 
 /**
  * Gravity Forms Field
@@ -48,61 +46,30 @@ if (! defined('ABSPATH')) {
  */
 class Field_Quiz extends Helper_Fields
 {
-
-    /**
-     * Check the appropriate variables are parsed in send to the parent construct
-     * @param Object $field The GF_Field_* Object
-     * @param Array $entry The Gravity Forms Entry
-     * @since 4.0
-     */
-    public function __construct($field, $entry) {
-
-        /* call our parent method */
-        parent::__construct($field, $entry);
-
-        /*
-         * Custom Field can be any of the following field types:
-         * single line text, paragraph, dropdown, select, number, checkbox, radio, hidden,
-         * date, time, phone, website, email, file upload or list
-         */
-        $class = Stat_functions::get_field_class($field->inputType);
-
-        try {
-            /* check load our class */
-            if(class_exists($class)) {
-                $this->fieldObject = new $class($field, $entry);
-            } else {
-                throw new Exception('Class not found');
-            }
-        } catch(Exception $e) {
-            /* Exception thrown. Load generic field loader */
-            $this->fieldObject = new Field_Default($field, $entry);
-        }
-    }
-
     /**
      * Display the HTML version of this field
      * @return String
      * @since 4.0
      */
     public function html() {
-        return parent::html($this->fieldObject->html(), false);
+        $value = apply_filters('gform_entry_field_value', $this->get_value(), $this->field, $this->entry, $this->form);
+
+        /**
+         * Add classe to the quiz images so mPDF can style them (limited cascade support)
+         * May replace this in future with DOMDocument (but that adds another dependancy)
+         */
+        $value = str_replace('<img ', '<img class="gf-quiz-img" ', $value);
+
+        return parent::html($value);
     }
 
     /**
      * Get the standard GF value of this field
      * @return String/Array
      * @since 4.0
+     * @todo Write appropriate value() function
      */
     public function value() {
-        if($this->has_cache()) {
-            return $this->cache();
-        }
-
-        $value = $this->fieldObject->value();
-
-        $this->cache($value);
-        
-        return $this->cache();
+        //$return = array('text' => $choice['text'], 'isCorrect' => $choice['gquizIsCorrect']);
     }
 }
