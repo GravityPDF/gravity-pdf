@@ -81,6 +81,15 @@ class Field_Poll extends Helper_Fields
     }
 
     /**
+     * Used to check if the current field has a value
+     * @since 4.0
+     * @internal Child classes can override this method when dealing with a specific use case
+     */
+    public function is_empty() {
+        return $this->fieldObject->is_empty();
+    }
+
+    /**
      * Display the HTML version of this field
      * @return String
      * @since 4.0
@@ -95,14 +104,14 @@ class Field_Poll extends Helper_Fields
      * @since 4.0
      */
     public function value() {
-        if($this->has_cache()) {
+        if($this->fieldObject->has_cache()) {
             return $this->cache();
         }
 
         $value = $this->fieldObject->value();
 
-        $this->cache($value);
+        $this->fieldObject->cache($value);
         
-        return $this->cache();
+        return $this->fieldObject->cache();
     }
 }

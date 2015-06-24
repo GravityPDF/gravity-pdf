@@ -78,6 +78,18 @@ class Field_Survey extends Helper_Fields
             /* Exception thrown. Load generic field loader */
             $this->fieldObject = new Field_Default($field, $entry);
         }
+
+        /* force the fieldObject value cache */
+        $this->value();
+    }
+
+    /**
+     * Used to check if the current field has a value
+     * @since 4.0
+     * @internal Child classes can override this method when dealing with a specific use case
+     */
+    public function is_empty() {
+        return $this->fieldObject->is_empty();
     }
 
     /**
@@ -95,14 +107,14 @@ class Field_Survey extends Helper_Fields
      * @since 4.0
      */
     public function value() {
-        if($this->has_cache()) {
-            return $this->cache();
+        if($this->fieldObject->has_cache()) {
+            return $this->fieldObject->cache();
         }
 
         $value = $this->fieldObject->value();
 
-        $this->cache($value);
+        $this->fieldObject->cache($value);
         
-        return $this->cache();
+        return $this->fieldObject->cache();
     }
 }

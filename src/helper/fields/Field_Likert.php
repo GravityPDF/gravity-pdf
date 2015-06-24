@@ -49,6 +49,36 @@ class Field_Likert extends Helper_Fields
 {
 
     /**
+     * Used to check if the current field has a value
+     * @since 4.0
+     * @internal Child classes can override this method when dealing with a specific use case
+     */
+    public function is_empty() {
+
+        $value = $this->value();
+        
+        if(isset($value['row'])) { /* Check for single row likerts */
+            if(sizeof(array_filter($value['row'])) === 0) { /* if empty */
+                return true;
+            }
+        } else { /* multi row likert */
+            /* loop through the results and check if they are all empty */
+            $empty = true;
+
+            foreach($value['rows'] as $row) {
+                if(sizeof(array_filter($row)) > 0) {
+                    $empty = false;
+                    break;
+                }
+            }
+
+            return $empty;
+        }
+
+        return false;
+    }
+
+    /**
      * Display the HTML version of this field
      * @return String
      * @since 4.0

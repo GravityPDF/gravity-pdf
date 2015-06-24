@@ -71,6 +71,22 @@ class Field_Signature extends Helper_Fields
     }
 
     /**
+     * Used to check if the current field has a value
+     * @since 4.0
+     * @internal Child classes can override this method when dealing with a specific use case
+     */
+    public function is_empty() {
+        $value = $this->value();
+        
+        /* if the path is both a file and is readable then the field is NOT empty */
+        if(is_file($value['path']) && is_readable($value['path'])) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Get the standard GF value of this field
      * @return String/Array
      * @since 4.0

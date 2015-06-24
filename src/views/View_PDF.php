@@ -224,7 +224,7 @@ class View_PDF extends Helper_View
         }
 
         /* Output Product table if needed */
-        if($has_products) {
+        if($has_products && !$products->is_empty()) {
             echo $products->html();
         }
 

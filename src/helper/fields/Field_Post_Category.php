@@ -78,6 +78,18 @@ class Field_Post_Category extends Helper_Fields
             /* Exception thrown. Load generic field loader */
             $this->fieldObject = new Field_Default($field, $entry);
         }
+
+        /* force the fieldObject value cache */
+        $this->value();
+    }
+
+    /**
+     * Used to check if the current field has a value
+     * @since 4.0
+     * @internal Child classes can override this method when dealing with a specific use case
+     */
+    public function is_empty() {
+        return $this->fieldObject->is_empty();
     }
 
     /**
@@ -107,8 +119,10 @@ class Field_Post_Category extends Helper_Fields
          * The Radio / Select box will return a single-dimensional array,
          * while checkbox and multiselect will not.
          */
+        $single_dimension = false;
         if(!isset($items[0])) { /* convert single-dimensional array to multi-dimensional */
             $items = array($items);
+            $single_dimension = true;
         }
 
         /* Loop through standardised array and convert the label / value to their appropriate category */
@@ -131,7 +145,7 @@ class Field_Post_Category extends Helper_Fields
          * Return in the appropriate format.
          * Select / Radio Buttons will not have a multidimensional array
          */
-        if(!isset($items[1])) {
+        if($single_dimension) {
             $items = $items[0];
         }
 
