@@ -95,14 +95,14 @@ class Field_Post_Custom_Field extends Helper_Fields
      * @since 4.0
      */
     public function value() {
-        if($this->has_cache()) {
-            return $this->cache();
+        if($this->fieldObject->has_cache()) {
+            return$this->fieldObject->cache();
         }
 
         $value = $this->fieldObject->value();
 
-        $this->cache($value);
+        $this->fieldObject->cache($value);
         
-        return $this->cache();
+        return $this->fieldObject->cache();
     }
 }
