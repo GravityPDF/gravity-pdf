@@ -98,7 +98,7 @@ class Field_Survey extends Helper_Fields
      * @since 4.0
      */
     public function html() {
-        return parent::html($this->fieldObject->html(), false);
+        echo $this->fieldObject->html();
     }
 
     /**
