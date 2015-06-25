@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * The Add/Edit Form Settings View
@@ -40,11 +40,11 @@ if (! defined('ABSPATH')) {
 <!-- Merge tag functionality requires a global form object -->
 <script type="text/javascript">
     <?php \GFCommon::gf_global(); ?>
-    <?php \GFCommon::gf_vars(); ?>   
+    <?php \GFCommon::gf_vars(); ?>
     var form = <?php echo json_encode( $args['form'] ); ?>;
     var gfpdf_current_pdf = <?php echo json_encode( $args['pdf'] ); ?>;
     
-    <?php \GFFormSettings::output_field_scripts(); ?>    
+    <?php \GFFormSettings::output_field_scripts(); ?>
 </script>
 
 <?php \GFFormSettings::page_header( $args['title'] ); ?>
@@ -52,24 +52,24 @@ if (! defined('ABSPATH')) {
 	<h3>
 		<span>
 		  <i class="fa fa-file-o"></i>
-		  <?php echo $args['title']; ?>		 
+		  <?php echo $args['title']; ?>
 		</span>
 	</h3>
 
 
     <form method="post" id="gfpdf_pdf_form">
 
-        <?php wp_nonce_field( 'gfpdf_save_pdf', 'gfpdf_save_pdf' ) ?>        
+        <?php wp_nonce_field( 'gfpdf_save_pdf', 'gfpdf_save_pdf' ) ?>
         
         <input type="hidden" id="gform_pdf_id" name="gform_pdf_id" value="<?php echo $args['pdf_id']; ?>" />
 
         <!-- display standard fields -->
-        <table id="pdf-form-settings" class="form-table">     
+        <table id="pdf-form-settings" class="form-table">
             <?php do_settings_fields('gfpdf_settings_form_settings', 'gfpdf_settings_form_settings'); ?>
         </table>
 
 
-        <div class="hr-divider"></div>      
+        <div class="hr-divider"></div>
 
             <h3>
                 <span>
@@ -80,14 +80,18 @@ if (! defined('ABSPATH')) {
 
         <!-- display appearance fields -->
         <div id="gfpdf-appearance-options">
-            <table id="pdf-general-security" class="form-table">        
+            <table id="pdf-general-appearance" class="form-table">
                 <?php do_settings_fields('gfpdf_settings_form_settings_appearance', 'gfpdf_settings_form_settings_appearance'); ?>
-            </table>    
+            </table>
+
+            <table id="pdf-custom-appearance" class="form-table">
+            <?php do_settings_fields('gfpdf_settings_form_settings_custom_appearance', 'gfpdf_settings_form_settings_custom_appearance'); ?>
+            </table>
         </div>
 
         <div class="hr-divider"></div>
 
-        <!-- display advanced fields -->              
+        <!-- display advanced fields -->
         <div id="gfpdf-advanced-options">
             <h3>
                 <span>
@@ -96,15 +100,15 @@ if (! defined('ABSPATH')) {
                 </span>
             </h3>
         
-            <table id="pdf-general-advanced" class="form-table">        
+            <table id="pdf-general-advanced" class="form-table">
                 <?php do_settings_fields('gfpdf_settings_form_settings_advanced', 'gfpdf_settings_form_settings_advanced'); ?>
-            </table>    
+            </table>
         </div>
 
-        <div class="gfpdf-advanced-options"><a href="#"><?php _e('Show Advanced Options...', 'gravitypdf'); ?></a></div>       
+        <div class="gfpdf-advanced-options"><a href="#"><?php _e('Show Advanced Options...', 'gravitypdf'); ?></a></div>
 
-        <p class="submit">            
-            <input class="button-primary" type="submit" value="<?php echo $args['button_label']; ?>" name="save"/>                        
+        <p class="submit">
+            <input class="button-primary" type="submit" value="<?php echo $args['button_label']; ?>" name="save"/>
         </p>
     </form>
 

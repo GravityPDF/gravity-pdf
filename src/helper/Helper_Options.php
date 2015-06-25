@@ -262,7 +262,7 @@ class Helper_Options implements Helper_Int_Filters {
 					'default_rtl' => array(
 						'id'      => 'default_rtl',
 						'name'    => __('Reverse Text (RTL)', 'gravitypdf'),
-						'desc'    => __('Written languages like Arabic and Hebrew are written right to left.', 'gravitypdf'),
+						'desc'    => __('Languages like Arabic and Hebrew are written right to left.', 'gravitypdf'),
 						'type'    => 'radio',
 						'options' => array(
 							'Yes'     => __('Yes', 'gravitypdf'),
@@ -480,7 +480,7 @@ class Helper_Options implements Helper_Int_Filters {
 					'rtl' => array(
 						'id'    => 'rtl',
 						'name'    => __('Reverse Text (RTL)', 'gravitypdf'),
-						'desc'  => __('Written languages like Arabic and Hebrew are written right to left.', 'gravitypdf'),
+						'desc'  => __('Languages like Arabic and Hebrew are written right to left.', 'gravitypdf'),
 						'type'  => 'radio',
 						'options' => array(
 							'Yes' => __('Yes', 'gravitypdf'),
@@ -491,6 +491,13 @@ class Helper_Options implements Helper_Int_Filters {
 															
 				)
 			),
+
+			/**
+			 * Form (PDF) Settings Custom Appearance
+			 * This filter allows templates to add custom options for use specific to that template
+			 * Gravity PDF autoloads a JSON template file if it exists and loads it up with this filter
+			 */
+			'form_settings_custom_appearance' => apply_filters('gfpdf_form_settings_custom_appearance', array()),
 
 			/* Form (PDF) Settings Advanced */
 			'form_settings_advanced' => apply_filters('gfpdf_form_settings_advanced',
