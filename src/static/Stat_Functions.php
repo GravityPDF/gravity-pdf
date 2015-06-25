@@ -111,6 +111,17 @@ class Stat_Functions
     }
 
     /**
+     * Converts a name into something a human can more easily read
+     * @param  String $name The string to convert
+     * @return String
+     * @since  4.0
+     */
+    public static function human_readable($name) {
+        $name = str_replace(array('-', '_'), ' ', $name);
+        return mb_convert_case($name, MB_CASE_TITLE);
+    }
+
+    /**
      * Modified version of get_upload_dir() which just focuses on the base directory
      * no matter if single or multisite installation
      * We also only needed the basedir and baseurl so stripped out all the extras

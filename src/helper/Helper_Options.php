@@ -3,6 +3,7 @@
 namespace GFPDF\Helper;
 
 use GFPDF\Model\Model_Form_Settings;
+use GFPDF\Stat\Stat_Functions;
 
 use GFCommon;
 
@@ -795,16 +796,51 @@ class Helper_Options implements Helper_Int_Filters {
 	 * @todo
 	 */
 	public function get_templates() {
-		$templates = array(
-			'Pre-Installed' => array(
-				'Awesomeness' => 'Awesomeness',
-				'Gravity Forms Style' => 'Gravity Forms Style',
-			),
-			'Custom Templates' => array(
-				'Example1' => 'Example1',
-				'Example2' => 'Example2',
-			),
+		global $gfpdf;
+
+
+		$templates = array();
+
+		/**
+		 * We load in data from the PDF template headers
+		 * @var array
+		 */
+		$headers = array(
+			'template'             => 'Template Name',
+			'version'              => 'Version',
+			'description'          => 'Description',
+			'author'               => 'Author',
+			'group'                => 'Group',
+			'required_pdf_version' => 'Required PDF Version',
 		);
+
+		$prefix = __('User Templates: ', 'gravitypdf');
+		$legacy = __('Legacy', 'gravitypdf');
+
+		/**
+		 * Load templates included with Gravity PDF (we'll exclude any files starting with example-)
+		 */
+		foreach(glob( PDF_PLUGIN_DIR . 'initialisation/templates/*.php') as $filename) {
+			$info = get_file_data($filename, $headers);
+			$file = basename($filename);
+			
+			$templates[$info['group']][$file] = $info['template'];
+		}
+
+		/**
+		 * Now load the user's templates
+		 */
+		foreach(glob( $gfpdf->data->template_site_location . '*.php') as $filename) {
+
+			$info = get_file_data($filename, $headers);
+			$file = basename($filename);
+
+			if(!empty($info['template'])) {
+				$templates[$prefix . $info['group']][$file] = $info['template'];
+			} else if(substr($file, 0, 8) != 'example-') { /* exclude the example templates */
+				$templates[$legacy][$file] = Stat_Functions::human_readable(basename($file, '.php'));
+			}
+		}
 
 		return apply_filters('gfpdf_template_list', $templates);
 	}
