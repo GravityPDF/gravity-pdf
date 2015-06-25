@@ -179,7 +179,9 @@ abstract class Helper_Fields {
      */
     public function html($value, $label = true) {
         
-        $html = '<div id="field-'. $this->field->id .'" class="gfpdf-'. $this->field->inputType .' gfpdf-field '. $this->field->cssClass . '">';
+        $type = (!empty($this->field->inputType)) ? $this->field->inputType : $this->field->type;
+
+        $html = '<div id="field-'. $this->field->id .'" class="gfpdf-'. $type .' gfpdf-field '. $this->field->cssClass . '">';
 
         if($label) {
             $html .= '<div class="label"><strong>' . esc_html(GFFormsModel::get_label($this->field)) . '</strong></div>';
