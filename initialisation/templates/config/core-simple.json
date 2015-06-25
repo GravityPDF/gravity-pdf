@@ -1,0 +1,15 @@
+{
+	"core": {
+		"header": true,
+		"footer": true,
+		"background": true
+	},
+	"fields": {
+		"borderColor": {
+			"type": "color",
+			"text": "Border Colour",
+			"description": "Change the field border colour.",
+			"defaultText": "#CCCCCC"
+		}
+	}
+}
