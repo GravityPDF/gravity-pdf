@@ -112,6 +112,8 @@ class View_PDF extends Helper_View
 
         if(file_exists( $gfpdf->data->template_site_location . $template)) {
             $html = $this->load($template, $args, false, $gfpdf->data->template_site_location);
+        } else if (file_exists( PDF_PLUGIN_DIR . 'initialisation/templates/' . $template)) {
+            $html = $this->load($template, $args, false, PDF_PLUGIN_DIR . 'initialisation/templates/');
         }
 
         if(isset($_GET['html'])) {

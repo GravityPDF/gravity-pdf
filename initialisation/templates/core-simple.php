@@ -34,6 +34,14 @@ if(! class_exists('GFForms') ) {
  *
  */
 
+/**
+ * Load up our template-specific appearance settings
+ */
+
+$value_border_colour = (!empty($settings['border_colour'])) ? $settings['border_colour'] : '#CCCCCC';
+$header              = (!empty($settings['header'])) ? $settings['header'] : '';
+$footer              = (!empty($settings['footer'])) ? $settings['footer'] : '';
+
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -46,6 +54,18 @@ if(! class_exists('GFForms') ) {
 	<style>
 		@page {
 			margin: 10mm;
+			
+			<?php if(!empty($footer)): ?>
+				footer: html_TemplateFooter;
+				margin-footer: 5mm;
+			<?php endif; ?>
+		}
+
+		@page :first {
+			<?php if(!empty($header)): ?>
+				header: html_TemplateHeader;
+				margin-header: 5mm;
+			<?php endif; ?>
 		}
 
 		body {
@@ -151,7 +171,6 @@ if(! class_exists('GFForms') ) {
 		table {
 			width: 100%;
 			border-collapse: collapse;
-			page-break-inside: avoid;
 		}
 
 		th, td {
@@ -168,8 +187,33 @@ if(! class_exists('GFForms') ) {
 
 		li {
 			margin: 0;
-			padding: 0;
+			padding: 0 0.5mm 0 0;
 			list-style-position: inside;
+		}
+
+		/**
+		 * Header / Footer
+		 */
+		.alignleft {
+			float: left;
+		}
+
+		.alignright {
+			float: right;
+		}
+
+		.aligncenter {
+			text-align: center;
+		}
+
+		p.alignleft {
+			text-align: left;
+			float: none;
+		}
+
+		p.alignright {
+			text-align: right;
+			float: none;
 		}
 
 		/**
@@ -181,7 +225,7 @@ if(! class_exists('GFForms') ) {
 		}
 
 		.gfpdf-field .value {
-			border: 1px solid #CCC;
+			border: 1px solid <?php echo $value_border_colour; ?>;
 			padding: 1.5mm 2mm;
 		}
 		
@@ -189,7 +233,26 @@ if(! class_exists('GFForms') ) {
 
 </head>
 	<body>
+        <htmlpageheader name="TemplateHeader">
+            <div id="header">
+            	<?php
+            		/* mPDF currently has no cascading CSS ability to target 'inline' elements. Fix image display issues in header / footer */
+            		echo str_replace('<img ', '<img style="width: auto; max-height: 25mm;" ', $header);
+            	?>
+            </div>
+        </htmlpageheader>
+        
+        <htmlpagefooter name="TemplateFooter">
+        	<div class="footer">
+        		<?php
+        			/* mPDF currently has no cascading CSS ability to target 'inline' elements. Fix image display issues in header / footer */
+        			echo str_replace('<img ', '<img style="width: auto; max-height: 25mm;" ', $footer);
+        		?>
+        	</div>
+        </htmlpagefooter>
+
 		<?php
+
 			/**
 			 * Set up our configuration array to control what is and is not generated
 			 * @var array

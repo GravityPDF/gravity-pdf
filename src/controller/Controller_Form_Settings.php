@@ -102,10 +102,14 @@ class Controller_Form_Settings extends Helper_Controller implements Helper_Int_A
     public function add_filters() {
         global $gfpdf;
         
+        /* Add custom field information if we have a template selected */
+        add_filter( 'gfpdf_form_settings_custom_appearance', array($this->model, 'register_custom_appearance_settings'));
+
         /* Add Validation Errors */
         add_filter( 'gfpdf_form_settings', array($this->model, 'validation_error'));
         add_filter( 'gfpdf_form_settings_appearance', array($this->model, 'validation_error'));
 
+        /* Sanitize Results */
         add_filter( 'gfpdf_form_settings_sanitize', array($gfpdf->options, 'sanitize_all_fields'), 10, 4);
         add_filter( 'gfpdf_form_settings_sanitize_text',  array($this->model, 'strip_filename_extension'), 15, 2);
         add_filter( 'gfpdf_form_settings_sanitize_text',  array($gfpdf->options, 'sanitize_trim_field'), 15, 2);

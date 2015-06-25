@@ -437,7 +437,7 @@ class Helper_Options implements Helper_Int_Filters {
 						'desc'    => __('Set the paper size used when generating PDFs.', 'gravitypdf'),
 						'type'    => 'select',
 						'options' => $this->get_paper_size(),
-						'std'     => $this->get_option('default_pdf_size'),
+						'std'     => $this->get_option('default_pdf_size', 'A4'),
 						'inputClass'   => 'large',
 						'class' => 'gfpdf_paper_size',
 						'chosen'  => true,
@@ -487,7 +487,7 @@ class Helper_Options implements Helper_Int_Filters {
 							'Yes' => __('Yes', 'gravitypdf'),
 							'No'  => __('No', 'gravitypdf')
 						),
-						'std'   => $this->get_option('default_rtl'),
+						'std'   => $this->get_option('default_rtl', 'No'),
 					),
 															
 				)
@@ -822,7 +822,7 @@ class Helper_Options implements Helper_Int_Filters {
 		 */
 		foreach(glob( PDF_PLUGIN_DIR . 'initialisation/templates/*.php') as $filename) {
 			$info = get_file_data($filename, $headers);
-			$file = basename($filename);
+			$file = basename($filename, '.php');
 			
 			$templates[$info['group']][$file] = $info['template'];
 		}
@@ -833,12 +833,12 @@ class Helper_Options implements Helper_Int_Filters {
 		foreach(glob( $gfpdf->data->template_site_location . '*.php') as $filename) {
 
 			$info = get_file_data($filename, $headers);
-			$file = basename($filename);
+			$file = basename($filename, '.php');
 
 			if(!empty($info['template'])) {
 				$templates[$prefix . $info['group']][$file] = $info['template'];
 			} else if(substr($file, 0, 8) != 'example-') { /* exclude the example templates */
-				$templates[$legacy][$file] = Stat_Functions::human_readable(basename($file, '.php'));
+				$templates[$legacy][$file] = Stat_Functions::human_readable($file);
 			}
 		}
 

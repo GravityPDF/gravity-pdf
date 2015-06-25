@@ -498,6 +498,142 @@ class Model_Form_Settings extends Helper_Model {
     }
 
     /**
+     * If the PDF ID exists (either POST or GET) and we have a template with a config file
+     * we will load any fields loaded in the config file
+     * @param  Array $settings Any existing settings loaded
+     * @return Array
+     * @since  4.0
+     */
+    public function register_custom_appearance_settings($settings) {
+
+        $pid     = (!empty(rgget('pid'))) ? rgget('pid') : rgpost('gform_pdf_id');
+        $form_id = (isset($_GET['id'])) ? (int) $_GET['id'] : 0;
+
+        /* exist if we don't have an ID */
+        if(empty($pid) || empty($form_id)) {
+            return $settings;
+        }
+
+        /* Load the PDF configuration */
+        $pdf      = $this->get_pdf($form_id, $pid);
+        $template = $pdf['template'];
+        $class    = $this->get_template_configuration($template);
+
+        /* If we still haven't loaded any class return the settings */
+        if(!is_object($class)) {
+            return $settings;
+        }
+
+        /**
+         * Now we have the class initialised, let's load our configuration array
+         */
+        $template_settings = $class->configuration();
+        
+        /* register our core fields */
+        if(isset($template_settings['core']['header']) && $template_settings['core']['header'] === true) {
+           $settings['header'] = $this->get_header_field();
+        }
+
+        if(isset($template_settings['core']['footer']) && $template_settings['core']['footer'] === true) {
+            $settings['footer'] = $this->get_footer_field();
+        }
+
+        if(isset($template_settings['core']['background']) && $template_settings['core']['background'] === true) {
+           $settings['background'] = $this->get_background_field();
+        }
+
+        /* register any custom fields */
+        if(isset($template_settings['fields']) && is_array($template_settings['fields'])) {
+            foreach($template_settings['fields'] as $key => $field) {
+                $settings[ $key] = $field;
+            }
+        }
+
+        return $settings;
+    }
+
+    public function get_header_field() {
+        return array(
+            'id'         => 'header',
+            'name'       => __('First Page Header', 'gravitypdf'),
+            'type'       => 'rich_editor',
+            'size'       => 8,
+            'desc'       => sprintf(__('The header is included at the top of the first page. For best results, keep the formatting simple.', 'gravitypdf'), '<em>', '</em>', '<em>', '</em>'),
+            'inputClass' => 'merge-tag-support',
+            'tooltip'    => '<h6>' . __('Header', 'gravitypdf') . '</h6>' . sprintf(__('For the best image quality, ensure you insert images at %sFull Size%s. Left and right image alignment work as expected, but to center align you need to wrap the image in a %s tag.', 'gravitypdf'), '<em>', '</em>', esc_html('<div class="centeralign">...</div>'))
+        );
+    }
+
+    public function get_footer_field() {
+        return array(
+            'id'         => 'footer',
+            'name'       => __('Footer', 'gravitypdf'),
+            'type'       => 'rich_editor',
+            'size'       => 8,
+            'desc'       => sprintf(__('The footer is included at the bottom of every page. For simple columns %stry this HTML table snippet%s.', 'gravitypdf'), '<a href="https://gist.github.com/blueliquiddesigns/e6179a96cd97ef0a8457">', '</a>'),
+            'inputClass' => 'merge-tag-support',
+            'tooltip'    => '<h6>' . __('Footer', 'gravitypdf') . '</h6>' . sprintf(__('For simple text footers try use the left, center and right alignment buttons in the editor. You can also use the special %s{PAGENO}%s and %s{nbpg}%s tags to display page numbering.', 'gravitypdf'), '<em>', '</em>', '<em>', '</em>'),
+        );
+    }
+
+    public function get_background_field() {
+        return array(
+            'id'      => 'background',
+            'name'    => __('Background Image', 'gravitypdf'),
+            'type'    => 'upload',
+            'desc'    => __('The background image is included on all pages. For optimal results, use an image the same dimensions as your paper size.', 'gravitypdf'),
+            'tooltip' => '<h6>' . __('Background Image', 'gravitypdf') . '</h6>' . __('For the best results, use a non-interlaced 8-Bit PNG that has the same dimensions as your paper size.', 'gravitypdf'),
+        );
+    }
+
+    /**
+     * Attempts to load the current template configuration (if any)
+     * We first look in the PDF_EXTENDED_TEMPLATE directory (in case a user has overridden the file)
+     * Then we try and load the core configuration file
+     * @param  String $template The template config to load
+     * @return Object
+     * @since 4.0
+     */
+    public function get_template_configuration($template) {
+        global $gfpdf;
+        
+        $file  = $gfpdf->data->template_site_location . 'config/' . $template . '.php';
+        $class = $this->load_template_configuration($file);
+
+        $file = PDF_PLUGIN_DIR . 'initialisation/templates/config/' . $template . '.php';
+        if(empty($class)) {
+            $class = $this->load_template_configuration($file);
+        }
+
+        return $class;
+    }
+
+    /**
+     * Load our template configuration file, if it exists
+     * @param  String $file      The file to load
+     * @return Object
+     * @since 4.0
+     */
+    public function load_template_configuration($file) {
+        $namespace = 'GFPDF\Templates\Config\\';
+        $class     = false;
+
+        if(is_file($file) && is_readable($file)) {
+            require_once($file);
+
+            $class_name = str_replace('-', '_', basename($file, '.php'));
+            $fqcn = $namespace . $class_name;
+
+            /* insure the class we are trying to load exists and impliments our Helper_Int_Config interface */
+            if(class_exists($fqcn) && in_array('GFPDF\Helper\Helper_Int_Config', class_implements($fqcn))) {
+                $class = new $fqcn();
+            }
+        }
+
+        return $class;
+    }
+
+    /**
      * Auto strip the .pdf extension when sanitizing
      * @param  String $value The value entered by the user
      * @param  String $key   The field to be parsed
