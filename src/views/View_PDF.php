@@ -4,6 +4,7 @@ namespace GFPDF\View;
 
 use GFPDF\Helper\Helper_View;
 use GFPDF\Helper\Helper_Fields;
+use GFPDF\Helper\Helper_Field_Container;
 
 use GFPDF\Helper\Fields\Field_Product;
 use GFPDF\Helper\Fields\Field_Products;
@@ -105,6 +106,8 @@ class View_PDF extends Helper_View
             'entry'     => $entry,
             'lead'      => $entry,
             'form_data' => '',
+
+            'settings' => $settings,
         );
 
         if(file_exists( $gfpdf->data->template_site_location . $template)) {
@@ -130,7 +133,8 @@ class View_PDF extends Helper_View
      */
     public function process_html_structure($entry, $config = array()) {
         /* Determine whether we should output or return the results */
-        $echo = (rgar($config, 'echo')) ? rgar($config, 'echo') : true; /* whether to output or return the generated markup. Default is echo */
+        $config['meta'] = (isset($config['meta'])) ? $config['meta'] : array();
+        $echo           = (rgar($config, 'echo')) ? rgar($config, 'echo') : true; /* whether to output or return the generated markup. Default is echo */
 
         if(!$echo) {
             ob_start();
@@ -164,18 +168,20 @@ class View_PDF extends Helper_View
         $products                       = new Field_Products($entry);
         $has_products                   = false;
         $page_number                    = 0;
+        $container                      = new Helper_Field_Container();
         
         /* Allow the config to be changed through a filter */
+        $config['meta']                 = (isset($config['meta'])) ? $config['meta'] : array();
         $config                         = apply_filters('gfpdf_pdf_configuration', $config, $entry, $form);
         
         /* Get the user configuration values */
-        $skip_marked_fields             = (rgar($config, 'exclude')) ? rgar($config, 'exclude') : true; /* whether we should exclude fields with a CSS value of 'exclude'. Default to true */
-        $skip_hidden_fields             = (rgar($config, 'hidden')) ? rgar($config, 'hidden') : true; /* whether we should skip fields hidden with conditional logic. Default to true. */
-        $show_title                     = (rgar($config, 'show_title')) ? rgar($config, 'show_title') : true; /* whether we should show the form title. Default to true */
-        $show_section_description       = (rgar($config, 'section_content')) ? rgar($config, 'section_content') : false; /* whether we should include a section breaks content. Default to false */
-        $show_page_names                = (rgar($config, 'page_names')) ? rgar($config, 'page_names') : false; /* whether we should show the form's page names. Default to false */
-        $show_html_fields               = (rgar($config, 'html_field')) ? rgar($config, 'html_field') : false; /* whether we should show the form's html fields. Default to false */
-        $show_individual_product_fields = (rgar($config, 'individual_products')) ? rgar($config, 'individual_products') : false; /* Whether to show individual fields in the entry. Default to false - they are grouped together at the end of the form */
+        $skip_marked_fields             = (rgar($config['meta'], 'exclude')) ? rgar($config['meta'], 'exclude') : true; /* whether we should exclude fields with a CSS value of 'exclude'. Default to true */
+        $skip_hidden_fields             = (rgar($config['meta'], 'hidden')) ? rgar($config['meta'], 'hidden') : true; /* whether we should skip fields hidden with conditional logic. Default to true. */
+        $show_title                     = (rgar($config['meta'], 'show_title')) ? rgar($config['meta'], 'show_title') : true; /* whether we should show the form title. Default to true */
+        $show_section_description       = (rgar($config['meta'], 'section_content')) ? rgar($config['meta'], 'section_content') : false; /* whether we should include a section breaks content. Default to false */
+        $show_page_names                = (rgar($config['meta'], 'page_names')) ? rgar($config['meta'], 'page_names') : false; /* whether we should show the form's page names. Default to false */
+        $show_html_fields               = (rgar($config['meta'], 'html_field')) ? rgar($config['meta'], 'html_field') : false; /* whether we should show the form's html fields. Default to false */
+        $show_individual_product_fields = (rgar($config['meta'], 'individual_products')) ? rgar($config['meta'], 'individual_products') : false; /* Whether to show individual fields in the entry. Default to false - they are grouped together at the end of the form */
 
         /* Display the form title, if needed */
         $this->show_form_title($show_title, $form);
@@ -213,8 +219,11 @@ class View_PDF extends Helper_View
             /**
              * Let's output our field
              */
-            $this->process_field($field, $entry, $form, $config, $products);
+            $this->process_field($field, $entry, $form, $config, $products, $container);
         }
+
+        /* correctly close / cleanup the HTML container if needed */
+        $container->close();
 
         /* Output product table, if needed */
         if($has_products && !$products->is_empty()) {
@@ -230,16 +239,18 @@ class View_PDF extends Helper_View
      * @param  Array $form     The Gravity Form Field
      * @param  Array $config   The user-passed configuration data
      * @param  Helper_Fields $products The product fields
+     * @param  Helper_Field_Container $container
      * @return void
      * @since 4.0
      */
-    public function process_field($field, $entry, $form, $config, $products) {
+    public function process_field($field, $entry, $form, $config, $products, $container) {
 
         /*
         * Set up our configuration variables
         */
-        $show_empty_fields = (rgar($config, 'empty')) ? rgar($config, 'empty') : false; /* whether to show empty fields or not. Default is false */
-        $load_legacy_css   = (rgar($config, 'legacy_css')) ? rgar($config, 'legacy_css') : false; /* whether we should add our legacy field class names (v3.x.x) to our fields. Default to false */
+        $config['meta']    = (isset($config['meta'])) ? $config['meta'] : array();
+        $show_empty_fields = (rgar($config['meta'], 'empty')) ? rgar($config['meta'], 'empty') : false; /* whether to show empty fields or not. Default is false */
+        $load_legacy_css   = (rgar($config['meta'], 'legacy_css')) ? rgar($config['meta'], 'legacy_css') : false; /* whether we should add our legacy field class names (v3.x.x) to our fields. Default to false */
 
         /* Try and load a class based on the field type */
         $class_name        = Stat_functions::get_field_class($field->type);
@@ -288,6 +299,12 @@ class View_PDF extends Helper_View
                 if($load_legacy_css === true) {
                     $this->load_legacy_css($field);
                 }
+
+                /**
+                 * Add CSS Ready Class Float Support to mPDF
+                 * Open a HTML container if needed
+                 */
+                $container->generate($field);
 
                 echo ($field->type !== 'section') ? $class->html() : $class->html($show_section_description);
             }
