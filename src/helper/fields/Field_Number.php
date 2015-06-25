@@ -3,9 +3,11 @@
 namespace GFPDF\Helper\Fields;
 
 use GFPDF\Helper\Helper_Fields;
+
 use GFFormsModel;
 use GF_Field_Number;
 use GFCommon;
+
 use Exception;
 
 /**

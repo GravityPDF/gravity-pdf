@@ -4,7 +4,9 @@ namespace GFPDF\Helper;
 
 use GFFormsModel;
 use GF_Field;
+
 use WP_Error;
+
 use Exception;
 
 /**

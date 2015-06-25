@@ -1,5 +1,7 @@
 <?php
 
+/* Use the global namespace due to being called directly from the initial PHP file */
+
 /**
  * Install Update Controller
  *

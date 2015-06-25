@@ -1,6 +1,7 @@
 <?php
 
 namespace GFPDF\View;
+
 use GFPDF\Helper\Helper_View;
 
 /**

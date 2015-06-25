@@ -1,7 +1,9 @@
 <?php
 
 namespace GFPDF\Helper;
+
 use GFPDF\Model\Model_Form_Settings;
+
 use GFCommon;
 
 /**

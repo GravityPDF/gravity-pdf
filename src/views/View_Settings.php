@@ -1,8 +1,10 @@
 <?php
 
 namespace GFPDF\View;
+
 use GFPDF\Helper\Helper_View;
 use GFPDF_Major_Compatibility_Checks;
+
 use GFCommon;
 
 /**

@@ -1,8 +1,10 @@
 <?php
 
 namespace GFPDF\Helper;
+
 use GFPDF\Helper\Helper_Options;
 use PDF_Common;
+
 use GFCommon;
 
 /**

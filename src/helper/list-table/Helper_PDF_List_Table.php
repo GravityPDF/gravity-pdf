@@ -1,8 +1,11 @@
 <?php
 
 namespace GFPDF\Helper;
-use WP_List_Table;
+
 use GFCommon;
+
+use WP_List_Table;
+
 
 /**
  * WP_List_Table Helper Controller

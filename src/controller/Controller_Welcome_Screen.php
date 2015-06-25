@@ -1,6 +1,7 @@
 <?php
 
 namespace GFPDF\Controller;
+
 use GFPDF\Helper\Helper_Controller;
 use GFPDF\Helper\Helper_Model;
 use GFPDF\Helper\Helper_View;
@@ -55,19 +56,19 @@ class Controller_Welcome_Screen extends Helper_Controller implements Helper_Int_
     {
         /* load our model and view */
         $this->model = $model;
-        $this->model->setController($this);   
+        $this->model->setController($this);
 
-        $this->view  = $view;  
+        $this->view  = $view;
     }
 
     /**
-     * Initialise our class defaults 
+     * Initialise our class defaults
      * @since 4.0
      * @return void
      */
-    public function init() {       
+    public function init() {
         $this->add_actions();
-    }    
+    }
 
     /**
      * Apply any actions needed for the settings page
@@ -78,10 +79,10 @@ class Controller_Welcome_Screen extends Helper_Controller implements Helper_Int_
          /* Load the welcome screen into the menu */
         add_action('admin_menu', array( $this->model, 'admin_menus'));
         add_action('admin_init', array( $this, 'welcome'));
-    }    
+    }
 
     /**
-     * Sends user to the Welcome page on first activation, as well as everytime plugin is upgraded 
+     * Sends user to the Welcome page on first activation, as well as everytime plugin is upgraded
      *
      * @access public
      * @since 4.0
@@ -110,11 +111,11 @@ class Controller_Welcome_Screen extends Helper_Controller implements Helper_Int_
         }
 
         /* add own update tracker */
-        if (!$installed) { 
+        if (!$installed) {
             /* First time install */
             wp_safe_redirect(admin_url('index.php?page=gfpdf-getting-started'));
             exit;
-        } else { 
+        } else {
             /* Update */
             wp_safe_redirect(admin_url('index.php?page=gfpdf-update'));
             exit;
@@ -123,7 +124,7 @@ class Controller_Welcome_Screen extends Helper_Controller implements Helper_Int_
 
     /**
      * Load our welcome screen
-     * @return void 
+     * @return void
      * @since 4.0
      */
     public function getting_started_screen() {
@@ -132,7 +133,7 @@ class Controller_Welcome_Screen extends Helper_Controller implements Helper_Int_
 
     /**
      * Load our update welcome screen
-     * @return void 
+     * @return void
      * @since 4.0
      */
     public function update_screen() {

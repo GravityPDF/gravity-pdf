@@ -1,6 +1,7 @@
 <?php
 
 namespace GFPDF\View;
+
 use GFPDF\Helper\Helper_View;
 
 /**
@@ -65,8 +66,8 @@ class View_Welcome_Screen extends Helper_View
      */
     public function tabs() {
         /*
-         * Set up any variables we need for the view and display 
-         */        
+         * Set up any variables we need for the view and display
+         */
         $vars = array(
             'selected' => isset( $_GET['page'] ) ? $_GET['page'] : 'gfpdf-getting-started',
         );

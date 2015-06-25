@@ -1,7 +1,8 @@
 <?php
 
 namespace GFPDF\Helper;
-use \WP_Error;
+
+use WP_Error;
 
 /**
  * Abstract Helper View

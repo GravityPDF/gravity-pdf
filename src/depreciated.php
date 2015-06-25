@@ -1,5 +1,7 @@
 <?php
 
+/* For backwards compatibility reasons this file will be in the global namespace */
+
 use GFPDF\Stat\Stat_Functions;
 use GFPDF\Router;
 use GFPDF\View\View_PDF;

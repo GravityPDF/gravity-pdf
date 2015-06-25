@@ -3,8 +3,10 @@
 namespace GFPDF\Helper\Fields;
 
 use GFPDF\Helper\Helper_Fields;
+
 use GFFormsModel;
 use GF_Field_Post_Image;
+
 use Exception;
 
 /**
@@ -71,6 +73,7 @@ class Field_Post_Image extends Helper_Fields
      */
     public function html() {
         $value = $this->value();
+
         $path  = str_replace(home_url() . '/', ABSPATH, $value['url']);
 
         /* Start building image link */

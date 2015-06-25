@@ -1,6 +1,7 @@
 <?php
 
 namespace GFPDF\Model;
+
 use GFPDF\Helper\Helper_Model;
 
 /**
@@ -50,14 +51,14 @@ class Model_Welcome_Screen extends Helper_Model {
     public $minimum_capability = 'manage_options';
 
     /**
-     * Register the Dashboard Welcome pages and then hide them so they aren't displayed in the navigation     
+     * Register the Dashboard Welcome pages and then hide them so they aren't displayed in the navigation
      *
      * @access public
      * @since 4.0
      * @return void
      */
     public function admin_menus() {
-        $controller = $this->getController(); 
+        $controller = $this->getController();
 
         add_dashboard_page(
             __( 'Welcome to Gravity PDF', 'gravitypdf' ),
@@ -78,5 +79,5 @@ class Model_Welcome_Screen extends Helper_Model {
         /* hide the new page from the menu bar */
         remove_submenu_page( 'index.php', 'gfpdf-getting-started' );
         remove_submenu_page( 'index.php', 'gfpdf-update' );
-    }     
+    }
 }

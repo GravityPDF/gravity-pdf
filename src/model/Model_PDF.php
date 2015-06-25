@@ -1,12 +1,15 @@
 <?php
 
 namespace GFPDF\Model;
+
 use GFPDF\Model\Model_Form_Settings;
 use GFPDF\Helper\Helper_Model;
-use GFAPI;
-use WP_Error;
+
 use GFFormsModel;
 use GFCommon;
+use GFAPI;
+
+use WP_Error;
 
 /**
  * PDF Display Model

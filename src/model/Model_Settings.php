@@ -1,6 +1,7 @@
 <?php
 
 namespace GFPDF\Model;
+
 use GFPDF\Helper\Helper_Model;
 
 /**

@@ -1,6 +1,7 @@
 <?php
 
 namespace GFPDF;
+
 use GFPDF\Controller;
 use GFPDF\Model;
 use GFPDF\View;
