@@ -375,7 +375,7 @@ class Model_Form_Settings extends Helper_Model {
 
         /* Do validation */
         if(empty($sanitized['name']) || empty($sanitized['filename']) ||
-            ($sanitized['pdf_size'] == 'custom' && ((int) $sanitized['custom_pdf_size'][0] === 0) || ((int) $sanitized['custom_pdf_size'][1]) === 0) ) {
+            ($sanitized['pdf_size'] == 'custom' && ((int) $sanitized['custom_pdf_size'][0] === 0 || (int) $sanitized['custom_pdf_size'][1] === 0)) ) {
 
             GFCommon::add_error_message( __( 'PDF could not be saved. Please enter all required information below.', 'gravitypdf' ) );
             return false;
@@ -441,13 +441,13 @@ class Model_Form_Settings extends Helper_Model {
                 if(is_array($value)) {
                     $size = sizeof($value);
                     if(sizeof(array_filter($value)) !== $size) {
-                        $field['class'] .= $field['class'] . ' gfield_error' ;
+                        $field['class'] .= ' gfield_error' ;
                     }
                 } else {
                     /* if string, sanitize and add error if appropriate */
                     $value = apply_filters( 'gfpdf_form_settings_sanitize_text', $value, $key);
                     if(empty($value)) {
-                        $field['class'] .= $field['class'] . ' gfield_error' ;
+                        $field['class'] .= ' gfield_error' ;
                     }
                 }
             }
