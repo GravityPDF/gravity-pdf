@@ -139,13 +139,15 @@ class GFPDFEntryDetail {
 
     public static function lead_detail_grid($form, $lead, $allow_display_empty_fields=false, $show_html=false, $show_page_name=false, $return=false) {
             $config = array(
-                'empty'      => $allow_display_empty_fields,
-                'echo'       => !$return,
-                'legacy_css' => true,
+                'meta' => array(
+                    'empty'      => $allow_display_empty_fields,
+                    'echo'       => !$return,
+                    'legacy_css' => true,
 
-                /* TODO */
-                'html_field' => $show_html,
-                'page_names' => $show_page_name,
+                    /* TODO */
+                    'html_field' => $show_html,
+                    'page_names' => $show_page_name
+                )
             );
 
             self::do_lead_detail_grid($form, $lead, $config);
@@ -160,7 +162,7 @@ class GFPDFEntryDetail {
      */
     public static function do_lead_detail_grid($form, $lead, $config = array()) {
         /* Set up any legacy configuration options needed */
-        $config['legacy_css'] = true;
+        $config['meta']['legacy_css'] = true;
 
         $view = new View_PDF();
         $view->process_html_structure($lead, $config);
