@@ -9,7 +9,7 @@
 }
 
 .gfpdf-badge {
-    background: #1d1d1d url("../images/gravitypdf-globe-white.png") no-repeat 50% 5px;    
+    background: #1d1d1d url("../images/gravitypdf-globe-white.png") no-repeat 50% 5px;
     color: #e7e7e7;
     display: inline-block;
     font-size: 14px;
@@ -26,7 +26,7 @@
  * General Settings Page
  */
 #pdfextended-settings {
-    margin-top: 20px;   
+    margin-top: 20px;
 }
 
 #pdfextended-settings h3,
@@ -80,6 +80,10 @@
   border: 1px solid red;
 }
 
+#tab_pdf .wp-editor-wrap {
+  margin: 0 12px 0 0;
+}
+
 /**
  * Tools Settings Page
  */
@@ -87,7 +91,7 @@
   font-weight: bold;
 }
 
-#pdfextended-settings table.gfpdfe_table tr:nth-child(2n) td, 
+#pdfextended-settings table.gfpdfe_table tr:nth-child(2n) td,
 #pdfextended-settings table.gfpdfe_table tr:nth-child(2n) th {
     background: none repeat scroll 0 0 #fcfcfc;
 }
@@ -111,7 +115,7 @@
   padding-bottom: 10px;
 }
 
-#pdfextended-settings  span.path, 
+#pdfextended-settings  span.path,
 #pdfextended-settings  span.details.path {
   padding: 2px;
   background: #f2f2f2;
@@ -204,18 +208,18 @@
 }
 
 #pdfextended-settings .help-container {
-  margin: 0 auto;  
+  margin: 0 auto;
 }
 
-#pdfextended-settings .help-container .postbox {  
+#pdfextended-settings .help-container .postbox {
   width: 100%;
   box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box; 
-  min-height: 250px;    
+  -webkit-box-sizing: border-box;
+  min-height: 250px;
 }
 
-#pdfextended-settings #row-1-sortables .postbox, 
+#pdfextended-settings #row-1-sortables .postbox,
 #pdfextended-settings #pdf_support_hours {
   text-align: center;
   padding: 15px;
@@ -237,7 +241,7 @@
   color: #54a208;
 }
 
-#pdfextended-settings #row-1-sortables h4, 
+#pdfextended-settings #row-1-sortables h4,
 #pdfextended-settings #pdf_support_hours h4 {
   font-size: 18px;
   line-height: 24px;
@@ -257,10 +261,10 @@
 }
 
 /**
- * System status icons 
+ * System status icons
  */
 #pdf-system-status .fa-check-circle, #pdf-system-status .fa-exclamation-triangle, #pdf-system-status .fa-times-circle {
- font-size: 17px; 
+ font-size: 17px;
  margin-left: 5px;
  vertical-align: bottom;
  margin-top: -2px;
@@ -275,12 +279,12 @@
 }
 
 #pdf-system-status .fa-times-circle {
- color: #d10b0b;  
+ color: #d10b0b;
 }
 
 
 /**
- * License page 
+ * License page
  */
 
 #pdf-system-status #license input[type="email"], #pdf-system-status #license input[type="number"], #pdf-system-status #license input[type="password"], #pdf-system-status #license input[type="search"], #pdf-system-status #license input[type="tel"], #pdf-system-status #license input[type="text"], #pdf-system-status #license input[type="url"], #pdf-system-status #license select, #pdf-system-status #license textarea {
@@ -300,12 +304,12 @@
   font-weight: bold;
   line-height: 30px;
   color: #222;
-  font-size: 14px;  
+  font-size: 14px;
   float: left;
-  width: 20em;  
+  width: 20em;
 }
 
-#pdf-system-status #license .expires, #pdf-system-status #license .inactive, #pdf-system-status #license .limit, #pdf-system-status #license .expired, #pdf-system-status #license .deactivate { 
+#pdf-system-status #license .expires, #pdf-system-status #license .inactive, #pdf-system-status #license .limit, #pdf-system-status #license .expired, #pdf-system-status #license .deactivate {
   font-style: italic;
 }
 
@@ -314,7 +318,7 @@
   color: #9e0b0f;
 }
 
-#pdf-system-status #license .gf_keystatus_invalid, 
+#pdf-system-status #license .gf_keystatus_invalid,
 #pdf-system-status #license .gf_keystatus_valid {
   font-size: 120%;
 }
@@ -331,7 +335,7 @@
 
 
 /**
- * PDF Form Settings List 
+ * PDF Form Settings List
  */
 #gfpdf_list_form .check-column {
   width: 50px;
@@ -381,16 +385,16 @@
 
         -webkit-box-shadow: inset 0px 0px 5px 0px #CCC;
         -moz-box-shadow: inset 0px 0px 5px 0px #CCC;
-        box-shadow: inset 0px 0px 5px 0px #CCC;   
+        box-shadow: inset 0px 0px 5px 0px #CCC;
     }
 }
 
 @media only screen and (min-width: 900px) {
 
   /**
-   * Help and Support 
+   * Help and Support
    */
-  #pdfextended-settings  .help-container .postbox { 
+  #pdfextended-settings  .help-container .postbox {
     width: 32.66%;
     float: left;
     margin-left: 0.5%;
@@ -413,17 +417,17 @@
 @media only screen and (min-width: 1000px) {
 
     /**
-     * License page 
+     * License page
      */
       #pdf-system-status #license label {
         float: left;
         width: 20%;
-      }  
+      }
 
       #pdf-system-status #license span.container {
         float: left;
         width: 80%;
-      }  
+      }
 }
 
 
@@ -434,10 +438,10 @@
     #pdfextended-settings .about-wrap h1, #pdfextended-settings .about-wrap .about-text, #pdfextended-settings .about-wrap #search-knowledgebase,
     #pdfextended-settings  #support-wrapper {
        margin-right: 200px;
-    }  
+    }
 
     #pdfextended-settings .about-wrap #search-knowledgebase input,
     #pdfextended-settings #search-results, #pdfextended-settings .help-container{
         width: 75%;
-    }  
+    }
 }
