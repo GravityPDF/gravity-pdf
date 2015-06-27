@@ -141,6 +141,7 @@ class GFPDF_Major_Compatibility_Checks
         $this->check_mb_string();
         $this->check_mb_string_regex();
         $this->check_gd();
+        $this->check_dom();
         $this->check_ram(ini_get('memory_limit'));
 
         /* check if any errors were thrown, enqueue them and exit early */
@@ -233,6 +234,26 @@ class GFPDF_Major_Compatibility_Checks
         /* Check GD Image Library is installed */
         if (! extension_loaded('gd')) {
             $this->notices[] = __("The PHP Extension GD Image Library could not be detected. Contact your web hosting provider to fix.", 'gravitypdf');
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Check if PHP DOM / libxml installed
+     * @return Boolean whether compatible or not
+     * @since 4.0
+     */
+    public function check_dom() {
+        /* Check DOM Class is installed */
+        if (! extension_loaded('dom') || ! class_exists('DOMDocument')) {
+            $this->notices[] = __("The PHP DOM Extension was not found. Contact your web hosting provider to fix.", 'gravitypdf');
+            return false;
+        }
+
+        /* Check libxml is loaded */
+        if (! extension_loaded('libxml')) {
+            $this->notices[] = __("The PHP Extension libxml could not be detected. Contact your web hosting provider to fix.", 'gravitypdf');
             return false;
         }
         return true;

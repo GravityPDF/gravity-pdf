@@ -56,10 +56,14 @@ class Field_Quiz extends Helper_Fields
         $value = apply_filters('gform_entry_field_value', $this->get_value(), $this->field, $this->entry, $this->form);
 
         /**
-         * Add classe to the quiz images so mPDF can style them (limited cascade support)
-         * May replace this in future with DOMDocument (but that adds another dependancy)
+         * Add class to the quiz images so mPDF can style them (limited cascade support)
+         * We'll try use our DOM reader to correctly process the HTML, otherwise use string replace
          */
-        $value = str_replace('<img ', '<img class="gf-quiz-img" ', $value);
+        try {
+            $value = qp($value, 'img')->addClass('gf-quiz-img')->top('body')->children()->html();
+        } catch(Exception $e) {
+            $value = str_replace('<img ', '<img class="gf-quiz-img" ', $value);
+        }
 
         return parent::html($value);
     }

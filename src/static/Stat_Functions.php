@@ -2,6 +2,8 @@
 
 namespace GFPDF\Stat;
 
+use Exception;
+
 /**
  * Common Static Functions Shared throughour Gravity PDF
  *
@@ -119,6 +121,22 @@ class Stat_Functions
     public static function human_readable($name) {
         $name = str_replace(array('-', '_'), ' ', $name);
         return mb_convert_case($name, MB_CASE_TITLE);
+    }
+
+    /**
+     * mPDF currently has no cascading CSS ability to target 'inline' elements. Fix image display issues in header / footer
+     * by adding a specific class name we can target
+     * @param  String $html The HTML to parse
+     * @return String
+     */
+    public static function fix_header_footer($html) {
+        try {
+            /* return the modified HTML */
+            return qp($html, 'img')->addClass('header-footer-img')->top('body')->children()->html();
+        } catch (Exception $e) {
+            /* if there was any issues we'll just return the $html */
+            return $html;
+        }
     }
 
     /**

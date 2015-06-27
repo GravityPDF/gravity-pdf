@@ -37,12 +37,11 @@ if(! class_exists('GFForms') ) {
 /**
  * Load up our template-specific appearance settings
  */
-
 $value_border_colour = (!empty($settings['border_colour'])) 	? $settings['border_colour'] : '#CCCCCC';
 $background_img      = (!empty($settings['background']))		? $settings['background'] : '';
-$first_header        = (!empty($settings['first_header'])) 		? $settings['first_header'] : '';
-$header              = (!empty($settings['header'])) 			? $settings['header'] : '';
-$footer              = (!empty($settings['footer'])) 			? $settings['footer'] : '';
+$first_header        = (!empty($settings['first_header'])) 		? GFPDF\Stat\Stat_Functions::fix_header_footer($settings['first_header']) : '';
+$header              = (!empty($settings['header'])) 			? GFPDF\Stat\Stat_Functions::fix_header_footer($settings['header']) : '';
+$footer              = (!empty($settings['footer'])) 			? GFPDF\Stat\Stat_Functions::fix_header_footer($settings['footer']) : '';
 
 ?>
 
@@ -228,6 +227,11 @@ $footer              = (!empty($settings['footer'])) 			? $settings['footer'] : 
 			float: none;
 		}
 
+		.header-footer-img {
+			width: auto !important;
+			max-height: 25mm;
+		}
+
 		/**
 		 * Independant Template Styles
 		 */
@@ -247,28 +251,19 @@ $footer              = (!empty($settings['footer'])) 			? $settings['footer'] : 
 	<body>
         <htmlpageheader name="TemplateFirstHeader">
             <div id="first_header">
-            	<?php
-            		/* mPDF currently has no cascading CSS ability to target 'inline' elements. Fix image display issues in header / footer */
-            		echo str_replace('<img ', '<img style="width: auto; max-height: 25mm;" ', $first_header);
-            	?>
+            	<?php echo $first_header; ?>
             </div>
         </htmlpageheader>
 
         <htmlpageheader name="TemplateHeader">
             <div id="header">
-            	<?php
-            		/* mPDF currently has no cascading CSS ability to target 'inline' elements. Fix image display issues in header / footer */
-            		echo str_replace('<img ', '<img style="width: auto; max-height: 25mm;" ', $header);
-            	?>
+            	<?php echo $header; ?>
             </div>
         </htmlpageheader>
         
         <htmlpagefooter name="TemplateFooter">
         	<div class="footer">
-        		<?php
-        			/* mPDF currently has no cascading CSS ability to target 'inline' elements. Fix image display issues in header / footer */
-        			echo str_replace('<img ', '<img style="width: auto; max-height: 25mm;" ', $footer);
-        		?>
+        		<?php echo $footer; ?>
         	</div>
         </htmlpagefooter>
 

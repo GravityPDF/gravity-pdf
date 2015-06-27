@@ -1,5 +1,6 @@
 {
     "require": {
-        "blueliquiddesigns/mpdf": "dev-master"
+        "blueliquiddesigns/mpdf": "dev-master",
+        "querypath/QueryPath": ">=3.0.0"
     }
 }
