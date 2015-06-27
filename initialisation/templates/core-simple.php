@@ -38,9 +38,11 @@ if(! class_exists('GFForms') ) {
  * Load up our template-specific appearance settings
  */
 
-$value_border_colour = (!empty($settings['border_colour'])) ? $settings['border_colour'] : '#CCCCCC';
-$header              = (!empty($settings['header'])) ? $settings['header'] : '';
-$footer              = (!empty($settings['footer'])) ? $settings['footer'] : '';
+$value_border_colour = (!empty($settings['border_colour'])) 	? $settings['border_colour'] : '#CCCCCC';
+$background_img      = (!empty($settings['background']))		? $settings['background'] : '';
+$first_header        = (!empty($settings['first_header'])) 		? $settings['first_header'] : '';
+$header              = (!empty($settings['header'])) 			? $settings['header'] : '';
+$footer              = (!empty($settings['footer'])) 			? $settings['footer'] : '';
 
 ?>
 
@@ -54,16 +56,26 @@ $footer              = (!empty($settings['footer'])) ? $settings['footer'] : '';
 	<style>
 		@page {
 			margin: 10mm;
+
+			<?php if(!empty($header)): ?>
+				header: html_TemplateHeader;
+				margin-header: 5mm;
+			<?php endif; ?>
 			
 			<?php if(!empty($footer)): ?>
 				footer: html_TemplateFooter;
 				margin-footer: 5mm;
 			<?php endif; ?>
+
+			<?php if(!empty($background_img)): ?>
+				background-image: url(<?php echo $background_img; ?>) no-repeat 0 0;
+				background-image-resize: 4;
+			<?php endif; ?>
 		}
 
 		@page :first {
-			<?php if(!empty($header)): ?>
-				header: html_TemplateHeader;
+			<?php if(!empty($first_header)): ?>
+				header: html_TemplateFirstHeader;
 				margin-header: 5mm;
 			<?php endif; ?>
 		}
@@ -233,6 +245,15 @@ $footer              = (!empty($settings['footer'])) ? $settings['footer'] : '';
 
 </head>
 	<body>
+        <htmlpageheader name="TemplateFirstHeader">
+            <div id="first_header">
+            	<?php
+            		/* mPDF currently has no cascading CSS ability to target 'inline' elements. Fix image display issues in header / footer */
+            		echo str_replace('<img ', '<img style="width: auto; max-height: 25mm;" ', $first_header);
+            	?>
+            </div>
+        </htmlpageheader>
+
         <htmlpageheader name="TemplateHeader">
             <div id="header">
             	<?php

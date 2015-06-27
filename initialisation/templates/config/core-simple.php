@@ -60,6 +60,7 @@ class core_simple implements Helper_Int_Config {
 		return array(
 			'core' => array(
 				'header' => true,
+				'firstHeader' => true,
 				'footer' => true,
 				'background' => true,
 			),

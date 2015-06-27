@@ -534,6 +534,10 @@ class Model_Form_Settings extends Helper_Model {
            $settings['header'] = $this->get_header_field();
         }
 
+        if(isset($template_settings['core']['firstHeader']) && $template_settings['core']['firstHeader'] === true) {
+           $settings['firstHeader'] = $this->get_first_page_header_field();
+        }
+
         if(isset($template_settings['core']['footer']) && $template_settings['core']['footer'] === true) {
             $settings['footer'] = $this->get_footer_field();
         }
@@ -555,12 +559,23 @@ class Model_Form_Settings extends Helper_Model {
     public function get_header_field() {
         return array(
             'id'         => 'header',
-            'name'       => __('First Page Header', 'gravitypdf'),
+            'name'       => __('Header', 'gravitypdf'),
             'type'       => 'rich_editor',
             'size'       => 8,
-            'desc'       => sprintf(__('The header is included at the top of the first page. For best results, keep the formatting simple.', 'gravitypdf'), '<em>', '</em>', '<em>', '</em>'),
-            'inputClass' => 'merge-tag-support',
+            'desc'       => sprintf(__('The header is included at the top of each page. For best results, keep the formatting simple.', 'gravitypdf'), '<em>', '</em>', '<em>', '</em>'),
+            'inputClass' => 'merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields',
             'tooltip'    => '<h6>' . __('Header', 'gravitypdf') . '</h6>' . sprintf(__('For the best image quality, ensure you insert images at %sFull Size%s. Left and right image alignment work as expected, but to center align you need to wrap the image in a %s tag.', 'gravitypdf'), '<em>', '</em>', esc_html('<div class="centeralign">...</div>'))
+        );
+    }
+
+    public function get_first_page_header_field() {
+        return array(
+            'id'         => 'first_header',
+            'name'       => __('Different First Page Header', 'gravitypdf'),
+            'type'       => 'rich_editor',
+            'size'       => 8,
+            'desc'       => sprintf(__('Override the standard header on the first page of your PDF.', 'gravitypdf'), '<em>', '</em>', '<em>', '</em>'),
+            'inputClass' => 'merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields',
         );
     }
 
@@ -571,7 +586,7 @@ class Model_Form_Settings extends Helper_Model {
             'type'       => 'rich_editor',
             'size'       => 8,
             'desc'       => sprintf(__('The footer is included at the bottom of every page. For simple columns %stry this HTML table snippet%s.', 'gravitypdf'), '<a href="https://gist.github.com/blueliquiddesigns/e6179a96cd97ef0a8457">', '</a>'),
-            'inputClass' => 'merge-tag-support',
+            'inputClass' => 'merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields',
             'tooltip'    => '<h6>' . __('Footer', 'gravitypdf') . '</h6>' . sprintf(__('For simple text footers try use the left, center and right alignment buttons in the editor. You can also use the special %s{PAGENO}%s and %s{nbpg}%s tags to display page numbering.', 'gravitypdf'), '<em>', '</em>', '<em>', '</em>'),
         );
     }
