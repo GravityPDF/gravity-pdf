@@ -96,7 +96,6 @@ class Field_List extends Helper_Fields
 
         $css['th'] = array(
             'text-align:left',
-            'color:#333',
             'background-color: #F1F1F1',
 
             'font-size: 12px',

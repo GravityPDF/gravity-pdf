@@ -221,7 +221,7 @@ class Helper_Options implements Helper_Int_Filters {
 					'default_pdf_size' => array(
 						'id'         => 'default_pdf_size',
 						'name'       => __('Default Paper Size', 'gravitypdf'),
-						'desc'       => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'gravitypdf'),
+						'desc'       => __('Set the default paper size used when generating PDFs.', 'gravitypdf'),
 						'type'       => 'select',
 						'options'    => $this->get_paper_size(),
 						'inputClass' => 'large',
@@ -243,7 +243,7 @@ class Helper_Options implements Helper_Int_Filters {
 					'default_template' => array(
 						'id'         => 'default_template',
 						'name'       => __('Default Template', 'gravitypdf'),
-						'desc'       => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'gravitypdf'),
+						'desc'       => __('Set the default PDF template to use for all forms.', 'gravitypdf'),
 						'type'       => 'select',
 						'options'    => $this->get_templates(),
 						'inputClass' => 'large',
@@ -253,11 +253,19 @@ class Helper_Options implements Helper_Int_Filters {
 					'default_font_type' => array(
 						'id'         => 'default_font_type',
 						'name'       => __('Default Font Type', 'gravitypdf'),
-						'desc'       => __('Set the default paper size used when generating PDFs. This setting is overridden if you set the PDF size when configuring individual PDFs.', 'gravitypdf'),
+						'desc'       => __('Set the default font type used in the PDFs.', 'gravitypdf'),
 						'type'       => 'select',
 						'options'    => $this->get_installed_fonts(),
 						'inputClass' => 'large',
 						'chosen'     => true,
+					),
+
+					'default_font_colour' => array(
+						'id'      => 'default_font_colour',
+						'name'    => __('Default Font Colour', 'gravitypdf'),
+						'type'    => 'color',
+						'std'     => '#000000',
+						'desc'    => __('Set the default font colour used in the PDFs.', 'gravitypdf'),
 					),
 
 					'default_rtl' => array(
@@ -306,7 +314,7 @@ class Helper_Options implements Helper_Int_Filters {
 					'limit_to_admin' => array(
 						'id'      => 'limit_to_admin',
 						'name'    => __('Restrict Logged Out Users', 'gravitypdf'),
-						'desc'    => __("When enabled, only users who are logged in and have the above capability, or is the original owner, can view PDFs.", 'gravitypdf'),
+						'desc'    => __("When enabled, only users who are logged in and have the above capability, or is the original owner, can view the PDF.", 'gravitypdf'),
 						'type'    => 'radio',
 						'options' => array(
 							'Yes'     => __('Yes', 'gravitypdf'),
@@ -476,6 +484,14 @@ class Helper_Options implements Helper_Int_Filters {
 						'desc'    => __('Set the default font used in the PDF.', 'gravitypdf'),
 						'inputClass'   => 'large',
 						'chosen'  => true,
+					),
+
+					'font_colour' => array(
+						'id'      => 'font_colour',
+						'name'    => __('Font Colour', 'gravitypdf'),
+						'type'    => 'color',
+						'std'     => $this->get_option('default_font_colour'),
+						'desc'    => __('Set the default font colour used in the PDF.', 'gravitypdf'),
 					),
 
 					'rtl' => array(
