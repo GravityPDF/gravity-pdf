@@ -154,12 +154,19 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
     }
 
     /**
-     * Return our custom capability
+     * Check our current user has the correct capability
      * @since 4.0
      * @return void
      */
     public function edit_options_cap() {
-        return 'gravityforms_edit_settings';
+        
+        /* because current_user_can() doesn't handle Gravity Forms permissions quite correct we'll do our checks here */
+        if(! GFCommon::current_user_can_any( 'gravityforms_edit_settings' )) {
+            wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
+        }
+
+        /* the user is authenticated by the above so let's pass in the lowest permissions */
+        return 'read';
     }
 
     /**
