@@ -140,6 +140,29 @@ class Stat_Functions
     }
 
     /**
+     * Processes a hex colour and returns an appopriately contrasting black or white
+     * @param  String $color The Hex to be inverted
+     * @return String
+     * @since 4.0
+     */
+    public static function get_contrast($hexcolor) {
+        $hexcolor = str_replace('#', '', $hexcolor);
+        
+        if (strlen($hexcolor) != 6){
+            $hexcolor = str_repeat(substr($hexcolor,0,1),2) . str_repeat(substr($hexcolor,1,1),2) . str_repeat(substr($hexcolor,2,1),2);
+        }
+
+        $r   = hexdec(substr($hexcolor,0,2));
+        $g   = hexdec(substr($hexcolor,2,2));
+        $b   = hexdec(substr($hexcolor,4,2));
+        $yiq = ( ($r*299) + ($g*587) + ($b*114) ) / 1000;
+
+        return ($yiq >= 128) ? 'black' : 'white';
+    }
+
+
+
+    /**
      * Modified version of get_upload_dir() which just focuses on the base directory
      * no matter if single or multisite installation
      * We also only needed the basedir and baseurl so stripped out all the extras
