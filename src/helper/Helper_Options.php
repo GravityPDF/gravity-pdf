@@ -481,7 +481,7 @@ class Helper_Options implements Helper_Int_Filters {
 						'type'    => 'select',
 						'options' => $this->get_installed_fonts(),
 						'std'     => $this->get_option('default_font_type'),
-						'desc'    => __('Set the default font used in the PDF.', 'gravitypdf'),
+						'desc'    => __('Set the font to use in the PDF.', 'gravitypdf'),
 						'inputClass'   => 'large',
 						'chosen'  => true,
 					),
@@ -491,7 +491,7 @@ class Helper_Options implements Helper_Int_Filters {
 						'name'    => __('Font Colour', 'gravitypdf'),
 						'type'    => 'color',
 						'std'     => $this->get_option('default_font_colour'),
-						'desc'    => __('Set the default font colour used in the PDF.', 'gravitypdf'),
+						'desc'    => __('Set the font colour used in the PDF.', 'gravitypdf'),
 					),
 
 					'rtl' => array(
