@@ -8,12 +8,20 @@
 
 	$(function() {
 
+		/**
+		 * Check if the global gf_vars has been set and if so replace the .thisFormButton object with our
+		 * GFPDF.condtionalText object
+		 * @since 4.0
+		 */
 		if(typeof gf_vars !== 'undefined') {
 			gf_vars.thisFormButton = GFPDF.conditionalText;
 		}
 
 		/*
 		 * Override the gfMergeTagsObj.getTargetElement prototype to better handle CSS special characters in selectors
+		 * This is because Gravity Forms doesn't correctly espace meta-characters correctly
+		 * This functionality assists with the merge tag loader
+		 * @since 4.0
 		 */
 		if(typeof form != 'undefined' && typeof window.gfMergeTags != 'undefined') {
 			window.gfMergeTags.getTargetElement = function(elem) {
@@ -32,15 +40,29 @@
 		/**
 		 * Our Admin controller
 		 * Applies correct JS to settings pages
+		 * @since 4.0
 		 */
 		function GravityPDF () {
+			/**
+			 * A reference to the GravityPDF object when 'this' refers to a different object
+			 * @type Object
+			 * @since 4.0
+			 */
 			var self = this;
 
+			/**
+			 * Process the correct settings area (the global PDF settings or individual form PDF settings)
+			 * Also set up any event listeners needed
+			 * @return void
+			 * @since 4.0
+			 */
 			this.init = function() {
+				/* process the global PDF settings */
 				if(this.is_settings()) {
 					this.processSettings();
 				}
 
+				/* process the individual form PDF settings */
 				if(this.is_form_settings()) {
 					this.processFormSettings();
 				}
@@ -91,6 +113,7 @@
 			/**
 			 * Rich Media Uploader
 			 * JS Pulled straight from Easy Digital Download's admin-scripts.js
+			 * @return void
 			 * @since 4.0
 			 */
 			this.doUploadListener = function() {
@@ -99,20 +122,18 @@
 				window.formfield = '';
 
 				$('body').on('click', '.gfpdf_settings_upload_button', function(e) {
-
 					e.preventDefault();
 
-					var $button = $(this);
-
+					var $button      = $(this);
 					window.formfield = $(this).parent().prev();
 
-					// If the media frame already exists, reopen it.
+					/* If the media frame already exists, reopen it. */
 					if ( file_frame ) {
 						file_frame.open();
 						return;
 					}
 
-					// Create the media frame.
+					/* Create the media frame. */
 					file_frame = wp.media.frames.file_frame = wp.media({
 						title: $button.data( 'uploader-title' ),
 						button: {
@@ -121,7 +142,7 @@
 						multiple: false
 					});
 
-					// When an image is selected, run a callback.
+					/* When an image is selected, run a callback. */
 					file_frame.on( 'select', function() {
 						var selection = file_frame.state().get('selection');
 						selection.each( function( attachment, index ) {
@@ -130,29 +151,33 @@
 						});
 					});
 
-					// Finally, open the modal
+					/* Finally, open the modal */
 					file_frame.open();
 				});
-
-
-				// WP 3.5+ uploader
-				var file_frame;
-				window.formfield = '';
 			}
 
+			/**
+			 * Check if a Gravity PDF color picker field is present and initialise
+			 * @return void
+			 * @since 4.0
+			 */
 			this.doColorListener = function() {
 				if( $('.gfpdf-color-picker').length ) {
 					$('.gfpdf-color-picker').wpColorPicker();
 				}
 			}
 
+			/**
+			 * Process the global settings page
+			 * @return void
+			 * @since 4.0
+			 */
 			this.processSettings = function() {
-				var active = $('.nav-tab-wrapper a.nav-tab-active:first').text();
+				this.show_tooltips(); /* enable tooltips, if needed */
+				this.setup_select_boxes(); /* setup smart select boxes, if needed */
+				this.cleanup_gf_navigation(); /* Ensure the Gravity Forms settings navigation (Form Settings / Notifications / Confirmation) has the 'tab' URI stripped from it */
 
-				this.show_tooltips();
-				this.setup_select_boxes();
-				this.cleanup_gf_navigation();
-
+				/* run the appropriate settings page */
 				switch (active) {
 					case 'General':
 						this.general_settings();
@@ -169,8 +194,9 @@
 			}
 
 			/**
-			 * Routing functionality for the
-			 * @return {[type]} [description]
+			 * Routing functionality for the individual form settings page
+			 * @return void
+			 * @since 4.0
 			 */
 			this.processFormSettings = function() {
 
@@ -226,10 +252,10 @@
 				      	}
 				}];
 
-				/* Add our dleete dialog box */
+				/* Add our delete dialog box */
 				this.wp_dialog($deleteDialog, deleteButtons, 300, 175);
 
-				/* Add live delete listener. Using on ensures nodes added later will have correct listener */
+				/* Add live delete listener */
 				$('#gfpdf_list_form').on('click', 'a.submitdelete', function() {
 					var id = String($(this).data('id'));
 					if(id.length > 0) {
@@ -237,7 +263,7 @@
 					}
 				});
 
-				/* Add live duplicate listener. Using on ensures nodes added later will have correct listener */
+				/* Add live duplicate listener */
 				$('#gfpdf_list_form').on('click', 'a.submitduplicate', function() {
 					var id = String($(this).data('id'));
 					var that = this;
@@ -305,7 +331,7 @@
 					}
 				});
 
-				/* Add live state listener to chance active / inactive value */
+				/* Add live state listener to change active / inactive value */
 				$('#gfpdf_list_form').on('click', '.check-column img', function() {
 					var id = String($(this).data('id'));
 					var that = this;
@@ -330,7 +356,7 @@
 
 			      		/* do ajax call */
 			      		self.ajax(data, function(response) {
-
+			      			/* don't do anything with a successful response */
 			      		});
 			      	}
 				});
@@ -342,12 +368,15 @@
 			 * @since 4.0
 			 */
 			this.do_form_settings_edit_page = function() {
-				this.setup_select_boxes();
-				this.setup_advanced_options();
-				this.setup_required_fields($('#gfpdf_pdf_form'));
-				this.show_tooltips();
-				this.setup_custom_paper_size();
+				this.setup_select_boxes(); /* setup smart select boxes, if needed */
+				this.setup_advanced_options(); /* show / hide the advanced options section */
+				this.setup_required_fields($('#gfpdf_pdf_form')); /* highlight which fields are required and disable in-browser validation */
+				this.show_tooltips(); /* enable tooltips, if needed */
+				this.setup_custom_paper_size(); /* set up the custom paper size logic */
 
+				/**
+				 * Get the appropriate elements for use
+				 */
 				var $secTable    = $('#pdf-general-advanced');
 				var $pdfSecurity = $secTable.find('input[name="gfpdf_settings[security]"]');
 				var $format      = $secTable.find('input[name="gfpdf_settings[format]"]');
@@ -383,18 +412,6 @@
 					}
 				}).trigger('change');
 
-				/*
-				 * Add change event to 'chosen' notification item
-				 */
-				$("#gfpdf_settings\\[notification\\]").change( function() {
-					var not  = $(this).val();
-					var $elm = $('input[name="gfpdf_settings[save]"]').parents('tr');
-					if(not !== null && not.length > 0) {
-						$elm.hide();
-					} else {
-						$elm.show();
-					}
-				}).trigger('change');
 
 				/* add GF JS filter to change the conditional logic object type */
 				gform.addFilter( 'gform_conditional_object', function(object, objectType) {
@@ -406,7 +423,7 @@
 				});
 
 				/*
-				 * Add change event to conditional logic
+				 * Add change event to conditional logic field
 				 */
 				$('#pdf_conditional_logic').change( function() {
 					/* only set up a .conditionalLogic object if it doesn't exist */
@@ -421,13 +438,14 @@
 
 				/* Add listener on submit functionality */
 				$('#gfpdf_pdf_form').submit(function() {
-					/* JSONify the conditional logic */
+					/* JSONify the conditional logic so we can pass it through the form and use it in PHP (after running json_decode) */
 					$('#gfpdf_settings\\[conditionalLogic\\]').val(jQuery.toJSON(window.gfpdf_current_pdf.conditionalLogic));
 				});
 			}
 
 			/**
 			 * Show / Hide our custom paper size as needed
+			 * @return void
 			 * @since 4.0
 			 */
 			this.setup_custom_paper_size = function() {
@@ -453,6 +471,7 @@
 
 			/**
 			 * Our &tab=(.+?) url param causes issues with the default GF navigation
+			 * @return void
 			 * @since 4.0
 			 */
 			this.cleanup_gf_navigation = function() {
@@ -466,6 +485,12 @@
 				});
 			}
 
+			/**
+			 * Enable dynamic required fields on the Gravity Forms PDF Settings page
+			 * This function will highlight to the user which fields should be processed, and disable in-browser validation
+			 * @return void
+			 * @since 4.0
+			 */
 			this.setup_required_fields = function($elm) {
 				/* prevent in browser validation */
 				$elm.attr('novalidate', 'novalidate');
@@ -481,6 +506,12 @@
 				});
 			}
 
+			/**
+			 * Because we are using the WordPress Settings API Gravity Forms tooltip support was lacking
+			 * This method fixes that issue
+			 * @return void
+			 * @since 4.0
+			 */
 			this.show_tooltips = function() {
 				$('.gf_hidden_tooltip').each(function() {
 					$(this)
@@ -497,6 +528,11 @@
 				gform_initialize_tooltips();
 			}
 
+			/**
+			 * Set up 'chosen' select boxes
+			 * @return void
+			 * @since 4.0
+			 */
 			this.setup_select_boxes = function() {
 				$('.gfpdf-chosen').each(function() {
 					var width = $(this).css('width');
@@ -508,12 +544,17 @@
 				});
 			}
 
+			/**
+			 * Controls the Advanced Options hide / show functionality
+			 * By default these fields are hidden, but are show automatically if an error occurs.
+			 * @return void
+			 * @since 4.0
+			 */
 			this.setup_advanced_options = function() {
 				var $advanced_options_toggle_container = $('.gfpdf-advanced-options');
 				var $advanced_options_container        = $advanced_options_toggle_container.prev();
 				var $advanced_options                  = $advanced_options_toggle_container.find('a');
 				
-
 				/*
 				 * Show / Hide Advanced options
 				 */
@@ -540,7 +581,8 @@
 			/**
 			 * The general settings model method
 			 * This sets up and processes any of the JS that needs to be applied on the general settings tab
-			 * @since 3.8
+			 * @return void
+			 * @since 4.0
 			 */
 			this.general_settings = function() {
 				/* setup custom paper size */
@@ -572,7 +614,7 @@
 			/**
 			 * The tools settings model method
 			 * This sets up and processes any of the JS that needs to be applied on the tools settings tab
-			 * @since 3.8
+			 * @since 4.0
 			 */
 			this.tools_settings = function() {
 				var $copy            = $('#gfpdf_settings\\[setup_templates\\]'); /* escape braces */
@@ -637,6 +679,15 @@
 				});
 			}
 
+			/**
+			 * Generate a WP Dialog box
+			 * @param  jQuery Object $elm        [description]
+			 * @param  Object buttonsList [description]
+			 * @param  Integer boxWidth    [description]
+			 * @param  Integer boxHeight   [description]
+			 * @return void
+			 * @since 4.0
+			 */
 			this.wp_dialog = function($elm, buttonsList, boxWidth, boxHeight) {
 				$elm.wpdialog({
 				  autoOpen: false,
@@ -659,14 +710,20 @@
 			}
 
 
+			/**
+			 * Fire any Javascript on the Help Settings Page
+			 * @return void
+			 * @since 4.0
+			 */
 			this.help_settings = function() {
 
 			}
 
 			/**
-			 * [get_tooltip description]
-			 * @param  {[type]} html [description]
-			 * @return {[type]}      [description]
+			 * Create the tooltip HTML
+			 * @param  String html The tooltip message
+			 * @return String
+			 * @since 4.0
 			 */
 			this.get_tooltip = function(html) {
 				var $a = $('<a>');
@@ -710,6 +767,14 @@
 				alert(GFPDF.ajax_error);
 			}
 
+			/**
+			 * Display a message or error to the user with an appropriate timeout
+			 * @param  String msg     The message to be displayed
+			 * @param  Integer timeout How long to show the message
+			 * @param  Boolean error   Whether to show an error (true) or a message (false or undefined)
+			 * @return void
+			 * @since 4.0
+			 */
 			this.show_message = function(msg, timeout, error) {
 				timeout = typeof timeout !== 'undefined' ? timeout : 4500;
 				error = typeof error !== 'undefined' ? error : false;
@@ -731,7 +796,13 @@
 			}
 
 			/**
-			 * http://stackoverflow.com/a/10997390/11236
+			 * Update the URL parameter
+			 * @param String    The URL to parse
+			 * @param String    The URL parameter to want to update
+			 * @param String    The replacement string for the URL parameter
+			 * @return String   The processed URL
+			 * @since 4.0
+			 * @link http://stackoverflow.com/a/10997390/11236
 			 */
 			this.updateURLParameter = function(url, param, paramVal) {
 			    var newAdditionalURL = "";
