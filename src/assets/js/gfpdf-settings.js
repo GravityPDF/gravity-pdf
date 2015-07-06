@@ -111,63 +111,6 @@
 			}
 
 			/**
-			 * Rich Media Uploader
-			 * JS Pulled straight from Easy Digital Download's admin-scripts.js
-			 * @return void
-			 * @since 4.0
-			 */
-			this.doUploadListener = function() {
-				// WP 3.5+ uploader
-				var file_frame;
-				window.formfield = '';
-
-				$('body').on('click', '.gfpdf_settings_upload_button', function(e) {
-					e.preventDefault();
-
-					var $button      = $(this);
-					window.formfield = $(this).parent().prev();
-
-					/* If the media frame already exists, reopen it. */
-					if ( file_frame ) {
-						file_frame.open();
-						return;
-					}
-
-					/* Create the media frame. */
-					file_frame = wp.media.frames.file_frame = wp.media({
-						title: $button.data( 'uploader-title' ),
-						button: {
-							text: $button.data( 'uploader-button-text' )
-						},
-						multiple: false
-					});
-
-					/* When an image is selected, run a callback. */
-					file_frame.on( 'select', function() {
-						var selection = file_frame.state().get('selection');
-						selection.each( function( attachment, index ) {
-							attachment = attachment.toJSON();
-							window.formfield.val(attachment.url);
-						});
-					});
-
-					/* Finally, open the modal */
-					file_frame.open();
-				});
-			}
-
-			/**
-			 * Check if a Gravity PDF color picker field is present and initialise
-			 * @return void
-			 * @since 4.0
-			 */
-			this.doColorListener = function() {
-				if( $('.gfpdf-color-picker').length ) {
-					$('.gfpdf-color-picker').wpColorPicker();
-				}
-			}
-
-			/**
 			 * Process the global settings page
 			 * @return void
 			 * @since 4.0
@@ -441,6 +384,63 @@
 					/* JSONify the conditional logic so we can pass it through the form and use it in PHP (after running json_decode) */
 					$('#gfpdf_settings\\[conditionalLogic\\]').val(jQuery.toJSON(window.gfpdf_current_pdf.conditionalLogic));
 				});
+			}
+
+			/**
+			 * Rich Media Uploader
+			 * JS Pulled straight from Easy Digital Download's admin-scripts.js
+			 * @return void
+			 * @since 4.0
+			 */
+			this.doUploadListener = function() {
+				// WP 3.5+ uploader
+				var file_frame;
+				window.formfield = '';
+
+				$('body').on('click', '.gfpdf_settings_upload_button', function(e) {
+					e.preventDefault();
+
+					var $button      = $(this);
+					window.formfield = $(this).parent().prev();
+
+					/* If the media frame already exists, reopen it. */
+					if ( file_frame ) {
+						file_frame.open();
+						return;
+					}
+
+					/* Create the media frame. */
+					file_frame = wp.media.frames.file_frame = wp.media({
+						title: $button.data( 'uploader-title' ),
+						button: {
+							text: $button.data( 'uploader-button-text' )
+						},
+						multiple: false
+					});
+
+					/* When an image is selected, run a callback. */
+					file_frame.on( 'select', function() {
+						var selection = file_frame.state().get('selection');
+						selection.each( function( attachment, index ) {
+							attachment = attachment.toJSON();
+							window.formfield.val(attachment.url);
+						});
+					});
+
+					/* Finally, open the modal */
+					file_frame.open();
+				});
+			}
+
+			/**
+			 * Check if a Gravity PDF color picker field is present and initialise
+			 * @return void
+			 * @since 4.0
+			 */
+			this.doColorListener = function() {
+				if( $('.gfpdf-color-picker').length ) {
+					$('.gfpdf-color-picker').wpColorPicker();
+				}
 			}
 
 			/**
