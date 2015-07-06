@@ -816,6 +816,7 @@ class Helper_Options implements Helper_Int_Filters {
 
 
 		$templates = array();
+		$legacy    = array();
 
 		/**
 		 * We load in data from the PDF template headers
@@ -830,21 +831,11 @@ class Helper_Options implements Helper_Int_Filters {
 			'required_pdf_version' => 'Required PDF Version',
 		);
 
-		$prefix = __('User Templates: ', 'gravitypdf');
-		$legacy = __('Legacy', 'gravitypdf');
+		$prefix_text      = __('User Templates: ', 'gravitypdf');
+		$legacy_text = __('Legacy', 'gravitypdf');
 
 		/**
-		 * Load templates included with Gravity PDF (we'll exclude any files starting with example-)
-		 */
-		foreach(glob( PDF_PLUGIN_DIR . 'initialisation/templates/*.php') as $filename) {
-			$info = get_file_data($filename, $headers);
-			$file = basename($filename, '.php');
-			
-			$templates[$info['group']][$file] = $info['template'];
-		}
-
-		/**
-		 * Now load the user's templates
+		 * Load the user's templates
 		 */
 		foreach(glob( $gfpdf->data->template_site_location . '*.php') as $filename) {
 
@@ -852,10 +843,30 @@ class Helper_Options implements Helper_Int_Filters {
 			$file = basename($filename, '.php');
 
 			if(!empty($info['template'])) {
-				$templates[$prefix . $info['group']][$file] = $info['template'];
+				$templates[$prefix_text . $info['group']][$file] = $info['template'];
 			} else if(substr($file, 0, 8) != 'example-') { /* exclude the example templates */
-				$templates[$legacy][$file] = Stat_Functions::human_readable($file);
+				$legacy[$file] = Stat_Functions::human_readable($file);
 			}
+		}
+
+		/**
+		 * Load templates included with Gravity PDF
+		 * We'll exclude any files starting with example-, and any files overridden by the user
+		 */
+		foreach(glob( PDF_PLUGIN_DIR . 'initialisation/templates/*.php') as $filename) {
+			$info = get_file_data($filename, $headers);
+			$file = basename($filename, '.php');
+			
+			if(!isset($templates[$prefix_text . $info['group']][$file])) {
+				$templates[$info['group']][$file] = $info['template'];
+			}
+		}
+
+		/*
+		 * Add our legacy array to the end of our templates array
+		 */
+		if(sizeof($legacy) > 0) {
+			$templates[$legacy_text] = $legacy;
 		}
 
 		return apply_filters('gfpdf_template_list', $templates);
