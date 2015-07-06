@@ -857,8 +857,12 @@ class Helper_Options implements Helper_Int_Filters {
 			$info = get_file_data($filename, $headers);
 			$file = basename($filename, '.php');
 			
+			/* only add core template if not being overridden by user template */
 			if(!isset($templates[$prefix_text . $info['group']][$file])) {
 				$templates[$info['group']][$file] = $info['template'];
+			} else {
+				/* user template overrides core template. Mark template. */
+				$templates[$prefix_text . $info['group']][$file] = $templates[$prefix_text . $info['group']][$file] . '*';
 			}
 		}
 
