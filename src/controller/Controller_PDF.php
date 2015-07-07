@@ -90,8 +90,6 @@ class Controller_PDF extends Helper_Controller implements Helper_Int_Actions, He
      * @return void
      */
     public function add_actions() {
-        /* rewrite filters / endpoints */
-        add_action( 'init', array($this, 'register_rewrite_rules'));
         add_action( 'parse_request', array($this, 'process_legacy_pdf_endpoint'), 5); /* give legacy endpoint precedancy over new endpoint */
         add_action( 'parse_request', array($this, 'process_pdf_endpoint'));
     }
@@ -102,48 +100,11 @@ class Controller_PDF extends Helper_Controller implements Helper_Int_Actions, He
      * @return void
      */
     public function add_filters() {
-        /* rewrite filters */
-        add_filter( 'query_vars', array($this, 'register_rewrite_tags'));
-
         /* PDF authentication middleware */
         add_filter( 'gfpdf_pdf_middleware', array($this->model, 'middle_logged_out_restriction'), 1, 3);
         add_filter( 'gfpdf_pdf_middleware', array($this->model, 'middle_logged_out_timeout'), 2, 3);
         add_filter( 'gfpdf_pdf_middleware', array($this->model, 'middle_auth_logged_out_user'), 3, 3);
         add_filter( 'gfpdf_pdf_middleware', array($this->model, 'middle_user_capability'), 4, 3);
-    }
-
-    /**
-     * Register our PDF custom rewrite rules
-     * @since 4.0
-     * @return void
-     */
-    public function register_rewrite_rules() {
-        global $gfpdf;
-
-        /* store query */
-        $query = $gfpdf->data->permalink;
-
-        /* Add our main endpoint */
-        add_rewrite_rule(
-            $query,
-            'index.php?gf_pdf=1&pid=$matches[1]&lid=$matches[2]',
-            'top');
-
-        /* check to see if we need to flush the rewrite rules */
-        $this->model->maybe_flush_rewrite_rules($query);
-    }
-
-    /**
-     * Register our PDF custom rewrite rules
-     * @since 4.0
-     * @return void
-     */
-    public function register_rewrite_tags( $tags ) {
-        $tags[] = 'gf_pdf';
-        $tags[] = 'pid';
-        $tags[] = 'lid';
-
-        return $tags;
     }
 
     /**

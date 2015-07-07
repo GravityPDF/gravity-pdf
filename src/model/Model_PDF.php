@@ -51,20 +51,6 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @since 4.0
  */
 class Model_PDF extends Helper_Model {
-    
-    /**
-     * Check if we need to force the rewrite rules to be flushed
-     * @param  $rule The rule to check
-     * @since 4.0
-     * @return void
-     */
-    public function maybe_flush_rewrite_rules($rule) {
-        $rules = get_option( 'rewrite_rules' );
-
-        if ( ! isset( $rules[ $rule ] ) ) {
-            flush_rewrite_rules(false);
-        }
-    }
 
     /**
      * Our Middleware used to handle the authentication process

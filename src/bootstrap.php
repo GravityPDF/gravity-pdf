@@ -106,6 +106,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
         $this->add_filters();
 
         /* load modules */
+        $this->installer();
         $this->welcome_screen();
         $this->gf_settings();
         $this->gf_form_settings();
@@ -311,6 +312,12 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
     public function setup_settings_fields() {
         /* register our options settings */
         $this->options->register_settings();
+    }
+
+    public function installer() {
+        $model = new Model\Model_Install();
+        $class = new Controller\Controller_Install($model);
+        $class->init();
     }
 
     /**

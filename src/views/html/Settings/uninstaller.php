@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * Uninstaller Settings View
@@ -43,7 +43,7 @@ if (! defined('ABSPATH')) {
             <i class="fa fa-times"></i>
             <?php _e('Uninstall Gravity PDF', 'gravitypdf'); ?>
         </span>
-    </h3>    
+    </h3>
 
 <div class="delete-alert alert_red">
     <h3><i class="fa fa-exclamation-triangle gf_invalid"></i> Warning</h3>
@@ -56,8 +56,8 @@ if (! defined('ABSPATH')) {
         <?php wp_nonce_field( 'gfpdf-uninstall-plugin', 'gfpdf-uninstall-plugin' ) ?>
         <input id="gfpdf-uninstall" type="submit" class="button" value="<?php _e('Uninstall Gravity PDF', 'gravitypdf'); ?>" name="uninstall">
     </form>
-</div>   
+</div>
 
 <div id="uninstall-confirm" title="<?php _e('Uninstall Gravity PDF', 'gravitypdf'); ?>" style="display: none;">
- <?php printf(__("Warning! ALL Gravity PDF data, %sincluding configuration and custom templates%s will be deleted. This cannot be undone. Select 'Uninstall' to delete, 'Cancel' to stop.", 'gravitypdf'), '<strong>', '</strong>'); ?>
-</div>       
+ <?php printf(__("Warning! ALL Gravity PDF data, %sincluding PDF configurations%s will be deleted (custom templates are not removed). This cannot be undone. Select 'Uninstall' to delete, 'Cancel' to stop.", 'gravitypdf'), '<strong>', '</strong>'); ?>
+</div>
