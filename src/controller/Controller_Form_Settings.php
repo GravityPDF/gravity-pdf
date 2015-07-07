@@ -84,6 +84,9 @@ class Controller_Form_Settings extends Helper_Controller implements Helper_Int_A
     public function add_actions() {
         global $gfpdf;
 
+        /* Trigger our save method */
+        add_action( 'admin_init', array( $this, 'maybe_save_pdf_settings' ), 5 );
+
         /* Tell Gravity Forms to add our form PDF settings pages */
         add_action( 'gform_form_settings_menu', array( $this->model, 'add_form_settings_menu' ), 10, 2 );
         add_action( 'gform_form_settings_page_' . $gfpdf->data->slug, array( $this, 'displayPage' ) );
@@ -92,6 +95,7 @@ class Controller_Form_Settings extends Helper_Controller implements Helper_Int_A
         add_action('wp_ajax_gfpdf_list_delete', array( $this->model, 'delete_gf_pdf_setting'));
         add_action('wp_ajax_gfpdf_list_duplicate', array( $this->model, 'duplicate_gf_pdf_setting'));
         add_action('wp_ajax_gfpdf_change_state', array( $this->model, 'change_state_pdf_setting'));
+        add_action('wp_ajax_gfpdf_get_template_fields', array( $this->model, 'render_template_fields'));
     }
 
     /**
@@ -117,6 +121,21 @@ class Controller_Form_Settings extends Helper_Controller implements Helper_Int_A
     }
 
     /**
+     * Determine if we should be saving the PDF settings
+     * @return void
+     * @since 4.0
+     */
+    public function maybe_save_pdf_settings() {
+        $form_id = rgget( 'id' );
+        $pdf_id  = rgget( 'pid' );
+
+        /* Load the add/edit page */
+        if ( ! rgblank( $pdf_id ) && rgpost('gfpdf_save_pdf') ) {
+            $this->model->process_submission($form_id, $pdf_id);
+        }
+    }
+
+    /**
      * Processes / Setup the form settings page.
      * @since 4.0
      * @return void
@@ -130,10 +149,6 @@ class Controller_Form_Settings extends Helper_Controller implements Helper_Int_A
 
         /* Load the add/edit page */
         if ( ! rgblank( $pdf_id ) ) {
-            if( rgpost('gfpdf_save_pdf')) {
-                $this->model->process_submission($form_id, $pdf_id);
-            }
-
             $this->model->show_edit_view($form_id, $pdf_id);
             return;
         }
