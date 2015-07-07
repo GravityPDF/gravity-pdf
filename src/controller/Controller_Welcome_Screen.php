@@ -91,6 +91,8 @@ class Controller_Welcome_Screen extends Helper_Controller implements Helper_Int_
      */
     public function welcome()
     {
+        global $gfpdf;
+
         /* Bail if no activation redirect */
         if (!get_transient('_gravitypdf_activation_redirect')) {
             return false;
@@ -99,19 +101,13 @@ class Controller_Welcome_Screen extends Helper_Controller implements Helper_Int_
         /* Delete the redirect transient */
         delete_transient('_gravitypdf_activation_redirect');
 
-        $installed = get_option('gfpdf_is_installed');
-
-        if(!$installed) {
-            update_option('gfpdf_is_installed', true);
-        }
-
         /* Bail if activating from network, or bulk */
         if (is_network_admin() || isset($_GET['activate-multi'])) {
             return false;
         }
 
         /* add own update tracker */
-        if (!$installed) {
+        if (!$gfpdf->data->is_installed) {
             /* First time install */
             wp_safe_redirect(admin_url('index.php?page=gfpdf-getting-started'));
             exit;

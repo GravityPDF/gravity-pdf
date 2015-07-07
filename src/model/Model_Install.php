@@ -48,6 +48,37 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class Model_Install extends Helper_Model {
 
     /**
+     * Get our current installation status
+     * @return  String
+     * @since  4.0
+     */
+    public function is_installed() {
+        return get_option('gfpdf_is_installed');
+    }
+
+    /**
+     * Get our permalink regex structure
+     * @return  String
+     * @since  4.0
+     */
+    public function get_permalink_regex() {
+        return '^pdf/([A-Za-z0-9]+)/([0-9]+)/?';
+    }
+
+    /**
+     * Get the plugin working directory name
+     * @return String
+     * @since  4.0
+     */
+    public function get_working_directory() {
+        return apply_filters('gfpdf_working_folder_name', 'PDF_EXTENDED_TEMPLATES');
+    }
+
+    public function install() {
+            update_option('gfpdf_is_installed', true);
+    }
+
+    /**
      * Register our PDF custom rewrite rules
      * @since 4.0
      * @return void

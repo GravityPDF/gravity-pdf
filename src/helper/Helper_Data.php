@@ -125,11 +125,9 @@ class Helper_Data {
      * @since 3.8
      */
     public function init() {
-        $this->set_working_folder();
         $this->set_directory_structure();
         $this->set_licensing();
         $this->set_plugin_titles();
-        $this->set_permalink_regex();
     }
 
     /**
@@ -142,16 +140,7 @@ class Helper_Data {
         $this->title       = __('Gravity PDF', 'gravitypdf');
         $this->slug        = 'pdf';
     }
-
-    /**
-     * Set the folder name we'll be using to hold custom templates / PDFs
-     * @return  void
-     * @since  4.0
-     */
-    public function set_working_folder() {
-        $this->working_folder = 'PDF_EXTENDED_TEMPLATES';
-    }
-
+    
     /**
      * Set up our license model for later use
      * @return  void
@@ -161,15 +150,6 @@ class Helper_Data {
          /* Set up our licensing */
          //$this->license = new License_Model();
          //$this->store_url = 'https://gravitypdf.com/';
-    }
-
-    /**
-     * Set up our permalink regex structure
-     * @return  void
-     * @since  4.0
-     */
-    public function set_permalink_regex() {
-        $this->permalink = '^pdf/([A-Za-z0-9]+)/([0-9]+)/?';
     }
 
     /**

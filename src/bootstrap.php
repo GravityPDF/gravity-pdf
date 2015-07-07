@@ -318,6 +318,9 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
         $model = new Model\Model_Install();
         $class = new Controller\Controller_Install($model);
         $class->init();
+
+        /* set up required data */
+        $class->setup_defaults();
     }
 
     /**

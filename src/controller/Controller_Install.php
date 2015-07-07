@@ -96,4 +96,18 @@ class Controller_Install extends Helper_Controller implements Helper_Int_Actions
         /* rewrite filters */
         add_filter( 'query_vars', array($this->model, 'register_rewrite_tags'));
     }
+
+    /**
+     * Set up data related to the plugin setup and installation
+     * @return void
+     * @since 4.0
+     * @dependancy $gfpdf GFPDF\Router
+     */
+    public function setup_defaults() {
+        global $gfpdf;
+
+        $gfpdf->data->is_installed   = $this->model->is_installed();
+        $gfpdf->data->permalink      = $this->model->get_permalink_regex();
+        $gfpdf->data->working_folder = $this->model->get_working_directory();
+    }
 }
