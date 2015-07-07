@@ -111,6 +111,18 @@
 			}
 
 			/**
+			 * Check the current active PDF settings page
+			 * @return String
+			 * @since 4.0
+			 */
+			this.get_current_settings_page = function() {
+				if(this.is_settings()) {
+					return $('.nav-tab-wrapper a.nav-tab-active:first').text();
+				}
+				return '';
+			}
+
+			/**
 			 * Process the global settings page
 			 * @return void
 			 * @since 4.0
@@ -121,7 +133,7 @@
 				this.cleanup_gf_navigation(); /* Ensure the Gravity Forms settings navigation (Form Settings / Notifications / Confirmation) has the 'tab' URI stripped from it */
 
 				/* run the appropriate settings page */
-				switch (active) {
+				switch (this.get_current_settings_page()) {
 					case 'General':
 						this.general_settings();
 					break;
