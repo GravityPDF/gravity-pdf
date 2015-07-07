@@ -909,9 +909,7 @@ class Model_Form_Settings extends Helper_Model {
 
         $html = ob_get_clean();
 
-        if(strlen($html) > 0) {
-            echo json_encode(array('fields' => $html));
-        }
+        echo json_encode(array('fields' => $html));
         
         /* end AJAX function */
         wp_die();

@@ -409,7 +409,7 @@
 		      		self.ajax(data, function(response) {
 		      			$spinner.remove();
 
-		      			if(response != undefined && response.fields) {
+		      			if(response !== undefined && response.fields !== undefined) {
 		      				/* replace the fields with the response fields */
 		      				$('#pdf-custom-appearance').hide().html(response.fields).fadeIn();
 
