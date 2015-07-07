@@ -85,7 +85,7 @@ if (! defined('ABSPATH')) {
             </table>
 
             <table id="pdf-custom-appearance" class="form-table">
-            <?php do_settings_fields('gfpdf_settings_form_settings_custom_appearance', 'gfpdf_settings_form_settings_custom_appearance'); ?>
+                <?php do_settings_fields('gfpdf_settings_form_settings_custom_appearance', 'gfpdf_settings_form_settings_custom_appearance'); ?>
             </table>
         </div>
 

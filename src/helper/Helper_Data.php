@@ -236,6 +236,7 @@ class Helper_Data {
             'ajaxurl'                     => admin_url( 'admin-ajax.php' ),
             'GFbaseUrl'                   => GFCommon::get_base_url(),
             'pluginUrl'                   => PDF_PLUGIN_URL,
+            'spinnerUrl'                  => admin_url( 'images/spinner-2x.gif' ),
             'general_advanced_show'       => __('Show Advanced Options...', 'gravitypdf'),
             'general_advanced_hide'       => __('Hide Advanced Options...', 'gravitypdf'),
             'tools_template_copy_confirm' => __('Continue', 'gravitypdf'),

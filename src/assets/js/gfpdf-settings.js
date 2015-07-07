@@ -316,6 +316,7 @@
 				this.setup_required_fields($('#gfpdf_pdf_form')); /* highlight which fields are required and disable in-browser validation */
 				this.show_tooltips(); /* enable tooltips, if needed */
 				this.setup_custom_paper_size(); /* set up the custom paper size logic */
+				this.setup_dynamic_template_fields();
 
 				/**
 				 * Get the appropriate elements for use
@@ -383,6 +384,43 @@
 				$('#gfpdf_pdf_form').submit(function() {
 					/* JSONify the conditional logic so we can pass it through the form and use it in PHP (after running json_decode) */
 					$('#gfpdf_settings\\[conditionalLogic\\]').val(jQuery.toJSON(window.gfpdf_current_pdf.conditionalLogic));
+				});
+			}
+
+			/**
+			 * PDF Templates can assign their own custom settings which can enhance a template
+			 * This function setups the required listeners and functionality to allow this behaviour
+			 * @return return
+			 * @since 4.0
+			 */
+			this.setup_dynamic_template_fields = function() {
+				/* add change listener to our template */
+				$('#gfpdf_settings\\[template\\]').change(function() {
+
+					/* add spinner */
+					var $spinner = $('<img alt="Loading" src="' + GFPDF.spinnerUrl + '" class="gfpdf-spinner" />');
+					$(this).next().after($spinner);
+
+		      		var data = {
+		      			'action': 'gfpdf_get_template_fields',
+		      			'template': $(this).val(),
+		      		};
+
+		      		self.ajax(data, function(response) {
+		      			$spinner.remove();
+
+		      			if(response != undefined && response.fields) {
+		      				/* replace the fields with the response fields */
+		      				$('#pdf-custom-appearance').hide().html(response.fields).fadeIn();
+
+		      				/* set up any dynamic field type */
+		      				self.setup_select_boxes();
+		      				self.doColorListener();
+		      				self.show_tooltips();
+		      			}
+
+		      			console.log(response);
+		      		});
 				});
 			}
 

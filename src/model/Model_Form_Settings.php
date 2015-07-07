@@ -5,6 +5,7 @@ namespace GFPDF\Model;
 use GFPDF\Helper\Helper_Model;
 use GFPDF\Helper\Helper_PDF_List_Table;
 use GFPDF\Helper\Helper_Options;
+use GFPDF\Helper\Helper_Int_Config;
 
 use GFFormsModel;
 use GFCommon;
@@ -129,6 +130,8 @@ class Model_Form_Settings extends Helper_Model {
 
         /* prepare our data */
         $label = $pdf_id ? __( 'Update PDF', 'gravitypdf' ) : __( 'Save PDF', 'gravitypdf' );
+
+        /* re-register out options */
 
         /* pass to view */
         $controller->view->add_edit(array(
@@ -519,8 +522,19 @@ class Model_Form_Settings extends Helper_Model {
         $template = $pdf['template'];
         $class    = $this->get_template_configuration($template);
 
-        /* If we still haven't loaded any class return the settings */
-        if(!is_object($class)) {
+        return $this->setup_custom_appearance_settings($class, $settings);
+    }
+
+    /**
+     * Load our custom appearance settings (if needed)
+     * @param  Object $class    The template configuration class
+     * @param  Array  $settings Any current settings
+     * @return Array
+     * @since 4.0
+     */
+    public function setup_custom_appearance_settings($class, $settings = array()) {
+        /* If class isn't an instance of our interface return $settings */
+        if(! ($class instanceof Helper_Int_Config )) {
             return $settings;
         }
 
@@ -549,7 +563,7 @@ class Model_Form_Settings extends Helper_Model {
         /* register any custom fields */
         if(isset($template_settings['fields']) && is_array($template_settings['fields'])) {
             foreach($template_settings['fields'] as $key => $field) {
-                $settings[ $key] = $field;
+                $settings[$key] = $field;
             }
         }
 
@@ -845,5 +859,61 @@ class Model_Form_Settings extends Helper_Model {
 
         header('HTTP/1.1 500 Internal Server Error');
         wp_die('500');
+    }
+
+    /**
+     * AJAX Endpoint for rendering the template field settings options
+     * @param $_POST['template'] the template to select
+     * @return JSON
+     * @since 4.0
+     */
+    public function render_template_fields() {
+        global $gfpdf;
+
+        /* prevent unauthorized access */
+        if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+            /* fail */
+            header('HTTP/1.1 401 Unauthorized');
+            wp_die('401');
+        }
+
+        /* get the current template */
+        $template = $_POST['template'];
+        $class    = $this->get_template_configuration($template);
+        $settings = $this->setup_custom_appearance_settings($class);
+
+        /**
+         * Had issues displaying multiple wp_editors via AJAX. In the interim we'll display appropriate message for that field
+         * @TODO: in future would like to correctly load WP_Editor via AJAX. Pull requests welcome
+         */
+        foreach($settings as &$field) {
+           if(isset($field['type']) && $field['type'] == 'rich_editor') {
+                $field['type'] = 'descriptive_text';
+                $field['desc'] = __("Update PDF to edit this setting.", 'gravitypdf');
+            }
+        }
+
+        /* add our filter to override what template gets rendered (by default it is the current selected template in the config) */
+        add_filter('gfpdf_form_settings_custom_appearance', function() use (&$settings) {
+            /* check if the template has any configuration */
+            return $settings;
+        }, 100);
+
+        /* Ensure our new fields are registered */
+        $gfpdf->options->register_settings();
+
+        /* generate the HTML */
+        ob_start();
+
+        do_settings_fields('gfpdf_settings_form_settings_custom_appearance', 'gfpdf_settings_form_settings_custom_appearance');
+
+        $html = ob_get_clean();
+
+        if(strlen($html) > 0) {
+            echo json_encode(array('fields' => $html));
+        }
+        
+        /* end AJAX function */
+        wp_die();
     }
 }
