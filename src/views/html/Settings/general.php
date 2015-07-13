@@ -54,8 +54,6 @@ if (! defined('ABSPATH')) {
 			<?php do_settings_fields('gfpdf_settings_general', 'gfpdf_settings_general'); ?>
 		</table>
 
-		<div class="hr-divider"></div>
-
 		<div id="gfpdf-advanced-options">
 			<h3>
 				<span>

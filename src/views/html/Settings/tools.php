@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * Tools Settings View
@@ -39,7 +39,7 @@ if (! defined('ABSPATH')) {
 <?php $this->tabs(); ?>
         
         
-<div id="pdfextended-settings">    
+<div id="pdfextended-settings">
 	<h3>
 	<span>
 	  <i class="fa fa-cog"></i>
@@ -51,14 +51,14 @@ if (! defined('ABSPATH')) {
 		<?php settings_errors(); ?>
 		<?php settings_fields( 'gfpdf_settings' ); ?>
 
-		<table id="pdf-tools" class="widefat gfpdfe_table">		
+		<table id="pdf-tools" class="widefat gfpdfe_table">
 	    <thead>
 	      <tr>
 	        <th colspan="2"><?php _e( 'Tools', 'gravitypdf' ); ?></th>
 	      </tr>
-	    </thead> 
+	    </thead>
 	    
-	    <tbody>   
+	    <tbody>
 			  <?php do_settings_fields('gfpdf_settings_tools', 'gfpdf_settings_tools'); ?>
 	    </tbody>
 		</table>
@@ -68,11 +68,11 @@ if (! defined('ABSPATH')) {
 
 	<div id="setup-templates-confirm" title="<?php _e('Setup Custom Templates', 'gravitypdf'); ?>" style="display: none;">
 	  <?php printf(__('During the setup process %sANY Gravity PDF template files%s (excluding custom templates) stored in the %s directory will be overridden.', 'gravitypdf'), '<strong>', '</strong>', '<code>' . $args['template_directory'] . '</code>'); ?>
-	</div>	
+	</div>
 
 	<div id="manage-font-files" title="<?php _e('Manage Fonts', 'gravitypdf'); ?>" style="display: none;">
 	  Font logic here...
-	</div>	
+	</div>
 
-	<?php do_action('pdf-settings-tools'); ?>	                             
+	<?php do_action('pdf-settings-tools'); ?>
 </div>
