@@ -54,6 +54,14 @@ require_once(PDF_PLUGIN_DIR . 'src/autoload.php');
 class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
     
     /**
+     * Holds our Helper_Notices object
+     * which we can use to queue up admin messages for the user
+     * @var Object
+     * @since 4.0
+     */
+    public $notices;
+
+    /**
      * Holds our Helper_Data object
      * which we can autoload with any data needed
      * @var Object
@@ -70,7 +78,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
     public $options;
 
     /**
-     * Add user depreciation notice for missing methods
+     * Add user depreciation notice for any methods not included in current object
      * @since  4.0
      */
     public function __call($name, $arguments) {
@@ -78,7 +86,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
     }
 
     /**
-     * Add user depreciation notice for missing methods
+     * Add user depreciation notice for any methods not included in current object
      * @since  4.0
      */
     public static function __callStatic($name, $arguments) {
@@ -91,6 +99,10 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
      * @since 4.0
      */
     public function init() {
+        /* Set up our notices */
+        $this->notices = new Helper\Helper_Notices();
+        $this->notices->init();
+
         /* Set up our data access layer */
         $this->data = new Helper\Helper_Data();
         $this->data->init();
@@ -129,9 +141,6 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
         /* load our modules */
         add_action('init', array($this, 'init_settings_api'));
         add_action('admin_init', array($this, 'setup_settings_fields'));
-
-        /* TODO - set our notice action */
-        //Stat\Stat_Functions::set_notice_type();
     }
 
     /**
