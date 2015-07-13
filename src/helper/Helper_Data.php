@@ -3,7 +3,6 @@
 namespace GFPDF\Helper;
 
 use GFPDF\Helper\Helper_Options;
-use PDF_Common;
 
 use GFCommon;
 
@@ -125,7 +124,6 @@ class Helper_Data {
      * @since 3.8
      */
     public function init() {
-        $this->set_directory_structure();
         $this->set_licensing();
         $this->set_plugin_titles();
     }
@@ -150,60 +148,6 @@ class Helper_Data {
          /* Set up our licensing */
          //$this->license = new License_Model();
          //$this->store_url = 'https://gravitypdf.com/';
-    }
-
-    /**
-     * Used to set up our PDF template folder,
-     * save folder and font folder
-     * @since  3.6
-     */
-    public function set_directory_structure()
-    {
-        $upload_dir = PDF_Common::get_upload_dir();
-        /*
-         * As of Gravity PDF 3.7 we'll be dropping the 'site_name' folder for single installs
-         * And changing multisite installs to their site ID
-         */
-       
-        $this->template_location              = apply_filters('gfpdfe_template_location', $upload_dir['basedir'] . '/' . $this->working_folder . '/', $upload_dir['basedir'], $this->working_folder);
-        $this->template_site_location         = $this->template_location;
-        $this->template_save_location         = $this->template_location . 'output/';
-        $this->template_font_location         = $this->template_location . 'fonts/';
-
-        $this->settings_url                   = admin_url('admin.php?page=gf_settings&subview=PDF');
-        
-        $this->template_location_url          = apply_filters('gfpdfe_template_location_uri', $upload_dir['baseurl'] . '/' . $this->working_folder . '/', $upload_dir['baseurl'], $this->working_folder);
-        $this->template_site_location_url     = $this->template_location_url;
-        $this->template_save_location_url     = $this->template_location_url . 'output/';
-        $this->template_font_location_url     = $this->template_location_url . 'fonts/';
-
-        /*
-         * Use the network ID for multisite installs
-         */
-        if(is_multisite()) {
-            $blog_id                              = get_current_blog_id();
-            
-            $this->template_site_location         = $this->template_location . $blog_id . '/';
-            $this->template_save_location         = $this->template_site_location . 'output/';
-            $this->template_font_location         = $this->template_site_location . 'fonts/';
-            
-            $this->template_site_location_url     = $this->template_location_url . $blog_id . '/';
-            $this->template_save_location_url     = $this->template_site_location_url . 'output/';
-            $this->template_font_location_url     = $this->template_site_location_url . 'fonts/';
-            
-        }
-
-        /*
-         * Include old template locations to help with migrations
-         */
-        $this->upload_dir                 = $upload_dir['basedir'];
-
-        /*
-         * Include relative paths for display on the support pages
-         */
-        $this->relative_output_location = str_replace(ABSPATH, '/', $this->template_save_location);
-        $this->relative_font_location   = str_replace(ABSPATH, '/', $this->template_font_location);
-        $this->relative_mpdf_tmp        = str_replace(ABSPATH, '/', PDF_PLUGIN_DIR) . 'mPDF/tmp/';
     }
 
     /**

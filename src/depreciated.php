@@ -41,6 +41,14 @@ if (! defined('ABSPATH')) {
 */
 
 /**
+ * Add backwards compatibility for constants
+ */
+define('PDF_SAVE_LOCATION', $gfpdf->data->template_tmp_location);
+define('PDF_FONT_LOCATION', $gfpdf->data->template_font_location);
+define('PDF_TEMPLATE_LOCATION', $gfpdf->data->template_location);
+define('PDF_TEMPLATE_URL_LOCATION', $gfpdf->data->template_location); /* no cases in mPDF where a URL should be used instead of a path */
+
+/**
  * Add backwards compatibility for expired / renamed classes
  */
 class GFPDF_Core
@@ -69,9 +77,6 @@ class PDF_Common
      */
     public static function __callStatic($name, $arguments) {
         trigger_error(sprintf(__('"%s" has been depreciated as of Gravity PDF 4.0', 'gravitypdf'), $name), E_USER_DEPRECATED);
-    }
-    
-    public static function setup_ids() {
     }
 
     public static function get_upload_dir() {
@@ -137,6 +142,9 @@ class PDF_Common
     }*/
 }
 
+/**
+ * Add depreciated functionality for generating our standard PDF HTML
+ */
 class GFPDFEntryDetail {
 
     public static function lead_detail_grid($form, $lead, $allow_display_empty_fields=false, $show_html=false, $show_page_name=false, $return=false) {

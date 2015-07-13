@@ -54,10 +54,11 @@ if (! defined('ABSPATH')) {
 
     <form method="post">
         <?php wp_nonce_field( 'gfpdf-uninstall-plugin', 'gfpdf-uninstall-plugin' ) ?>
+        <input type="hidden" name="gfpdf_uninstall" value="1" />
         <input id="gfpdf-uninstall" type="submit" class="button" value="<?php _e('Uninstall Gravity PDF', 'gravitypdf'); ?>" name="uninstall">
     </form>
 </div>
 
 <div id="uninstall-confirm" title="<?php _e('Uninstall Gravity PDF', 'gravitypdf'); ?>" style="display: none;">
- <?php printf(__("Warning! ALL Gravity PDF data, %sincluding PDF configurations%s will be deleted (custom templates are not removed). This cannot be undone. Select 'Uninstall' to delete, 'Cancel' to stop.", 'gravitypdf'), '<strong>', '</strong>'); ?>
+ <?php printf(__("Warning! ALL Gravity PDF data, %sincluding PDF configurations and ALL custom templates%s will be deleted. This cannot be undone. Select 'Uninstall' to delete, 'Cancel' to stop.", 'gravitypdf'), '<strong>', '</strong>'); ?>
 </div>

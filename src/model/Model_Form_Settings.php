@@ -350,7 +350,7 @@ class Model_Form_Settings extends Helper_Model {
         }
 
         /* Check Nonce is valid */
-        if( ! wp_verify_nonce( $_POST['gfpdf_save_pdf'], 'gfpdf_save_pdf' ) ) {
+        if( ! wp_verify_nonce( rgpost('gfpdf_save_pdf'), 'gfpdf_save_pdf' ) ) {
              GFCommon::add_error_message( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
              return false;
         }
@@ -423,7 +423,7 @@ class Model_Form_Settings extends Helper_Model {
         /**
          * Check we have a valid nonce, or throw an error
          */
-        if( ! wp_verify_nonce( $_POST['gfpdf_save_pdf'], 'gfpdf_save_pdf' ) ) {
+        if( ! wp_verify_nonce( rgpost('gfpdf_save_pdf'), 'gfpdf_save_pdf' ) ) {
             GFCommon::add_error_message( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
             return false;
         }
@@ -509,7 +509,7 @@ class Model_Form_Settings extends Helper_Model {
      */
     public function register_custom_appearance_settings($settings) {
 
-        $pid     = (!empty(rgget('pid'))) ? rgget('pid') : rgpost('gform_pdf_id');
+        $pid     = rgget('pid');
         $form_id = (isset($_GET['id'])) ? (int) $_GET['id'] : 0;
 
         /* exist if we don't have an ID */
@@ -626,7 +626,7 @@ class Model_Form_Settings extends Helper_Model {
     public function get_template_configuration($template) {
         global $gfpdf;
         
-        $file  = $gfpdf->data->template_site_location . 'config/' . $template . '.php';
+        $file  = $gfpdf->data->template_location . 'config/' . $template . '.php';
         $class = $this->load_template_configuration($file);
 
         $file = PDF_PLUGIN_DIR . 'initialisation/templates/config/' . $template . '.php';

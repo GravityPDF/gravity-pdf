@@ -201,7 +201,7 @@ class View_Settings extends Helper_View
         global $gfpdf;
 
         $tooltips['pdf_status_wp_memory']     = '<h6>' . __( 'WP Memory Available', 'gravitypdf' ) . '</h6>' . sprintf(__( "Producing PDF documents is hard work and Gravity PDF requires more resources than most plugins. We strongly recommend you have at least 128MB, but you may need more.", 'gravitypdf' ));
-        $tooltips['pdf_status_notifications'] = '<h6>' . __( 'PDF Notifications', 'gravitypdf' ) . '</h6>' . sprintf(__( 'Sending PDFs automatically via Gravity Form notifications requires write access to our designated output directory: %s.', 'gravitypdf' ), '<code>' . $gfpdf->data->relative_output_location . '</code>');
+        $tooltips['pdf_status_notifications'] = '<h6>' . __( 'PDF Notifications', 'gravitypdf' ) . '</h6>' . sprintf(__( 'Sending PDFs automatically via Gravity Form notifications requires write access to our designated output directory: %s.', 'gravitypdf' ), '<code>' . str_replace(ABSPATH, '', $gfpdf->data->template_save_location_url) . '</code>');
 
         return apply_filters('gravitypdf_registered_tooltips', $tooltips);
     }

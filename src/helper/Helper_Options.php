@@ -837,7 +837,7 @@ class Helper_Options implements Helper_Int_Filters {
 		/**
 		 * Load the user's templates
 		 */
-		foreach(glob( $gfpdf->data->template_site_location . '*.php') as $filename) {
+		foreach(glob( $gfpdf->data->template_location . '*.php') as $filename) {
 
 			$info = get_file_data($filename, $headers);
 			$file = basename($filename, '.php');

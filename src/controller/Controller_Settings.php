@@ -100,7 +100,11 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
         /* Display our system status on general and tools pages */
         add_action('pdf-settings-general', array($this->view, 'system_status'));
         add_action('pdf-settings-tools', array($this->view, 'system_status'));
-        add_action('pdf-settings-tools', array($this->view, 'uninstaller'), 20);
+
+        /* Display the uninstaller if use has the correct permissions */
+        if(GFCommon::current_user_can_any( 'gravityforms_uninstall' )) {
+            add_action('pdf-settings-tools', array($this->view, 'uninstaller'), 5);
+        }
 
     }
 

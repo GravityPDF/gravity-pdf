@@ -3,7 +3,9 @@
 namespace GFPDF\Model;
 
 use GFPDF\Helper\Helper_Model;
+use GFPDF\Stat\Stat_Functions;
 
+use GFAPI;
 use GFCommon;
 
 /**
@@ -48,12 +50,79 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class Model_Install extends Helper_Model {
 
     /**
-     * Get our current installation status
-     * @return  String
-     * @since  4.0
+     * The Gravity PDF Installer
+     * @return void
+     * @since 4.0
      */
-    public function is_installed() {
-        return get_option('gfpdf_is_installed');
+    public function install_plugin() {
+            update_option('gfpdf_is_installed', true);
+    }
+
+    /**
+     * The Gravity PDF Uninstaller
+     * @return void
+     * @since 4.0
+     * @todo  Add Multisite Support (Network Activated)
+     */
+    public function uninstall_plugin() {
+        $this->remove_plugin_options();
+        $this->remove_plugin_form_settings();
+        $this->remove_folder_structure();
+        $this->deactivate_plugin();
+        $this->redirect_to_plugins_page();
+    }
+
+    public function remove_plugin_options() {
+        delete_option('gfpdf_is_installed');
+        delete_option('gfpdf_settings');
+    }
+
+    public function remove_plugin_form_settings() {
+        global $gfpdf;
+
+        $forms = GFAPI::get_forms();
+
+        foreach($forms as $form) {
+            /* only update forms which have a PDF configuration */
+            if(isset($form['gfpdf_form_settings'])) {
+                unset($form['gfpdf_form_settings']);
+                if(GFAPI::update_form($form) !== true) {
+                    $gfpdf->notices->add_error(sprintf(__('There was a problem removing the Gravity Form "%s" PDF configuration. Try delete manually.', 'gravitypdf'), $form['ID'] . ': ' . $form['title']));
+                }
+            }
+        }
+    }
+
+    public function remove_folder_structure() {
+        global $gfpdf;
+
+        $paths = apply_filters('gfpdf_uninstall_path', array(
+            $gfpdf->data->template_location,
+        ));
+
+        foreach($paths as $dir) {
+            if(is_dir($dir)) {
+                $results = Stat_Functions::rmdir($dir);
+
+                if(is_wp_error($results) || !$results) {
+                    $gfpdf->notices->add_error(sprintf(__('There was a problem removing the "%s" directory. Clean up manually via (S)FTP.', 'gravitypdf'), str_replace(ABSPATH, '', $dir)));
+                }
+            }
+        }
+    }
+
+    public function deactivate_plugin() {
+        deactivate_plugins(PDF_PLUGIN_BASENAME);
+    }
+
+    public function redirect_to_plugins_page() {
+        /* check if user can view the plugins page */
+        if(current_user_can('activate_plugins') ) {
+            wp_safe_redirect( admin_url('plugins.php'));
+        } else { /* otherwise redirect to dashboard */
+            wp_safe_redirect( admin_url('index.php'));
+        }
+        exit;
     }
 
     /**
@@ -74,8 +143,22 @@ class Model_Install extends Helper_Model {
         return apply_filters('gfpdf_working_folder_name', 'PDF_EXTENDED_TEMPLATES');
     }
 
-    public function install() {
-            update_option('gfpdf_is_installed', true);
+    /**
+     * Get a link to the plugin's settings page URL
+     * @return String
+     * @since  4.0
+     */
+    public function get_settings_url() {
+        return admin_url('admin.php?page=gf_settings&subview=PDF');
+    }
+
+    /**
+     * Get our current installation status
+     * @return  String
+     * @since  4.0
+     */
+    public function is_installed() {
+        return get_option('gfpdf_is_installed');
     }
 
     /**
@@ -100,6 +183,19 @@ class Model_Install extends Helper_Model {
     }
 
     /**
+     * Register our PDF custom rewrite rules
+     * @since 4.0
+     * @return void
+     */
+    public function register_rewrite_tags( $tags ) {
+        $tags[] = 'gf_pdf';
+        $tags[] = 'pid';
+        $tags[] = 'lid';
+
+        return $tags;
+    }
+
+    /**
      * Check if we need to force the rewrite rules to be flushed
      * @param  $rule The rule to check
      * @since 4.0
@@ -111,18 +207,5 @@ class Model_Install extends Helper_Model {
         if ( ! isset( $rules[ $rule ] ) ) {
             flush_rewrite_rules(false);
         }
-    }
-
-    /**
-     * Register our PDF custom rewrite rules
-     * @since 4.0
-     * @return void
-     */
-    public function register_rewrite_tags( $tags ) {
-        $tags[] = 'gf_pdf';
-        $tags[] = 'pid';
-        $tags[] = 'lid';
-
-        return $tags;
     }
 }

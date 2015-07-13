@@ -2,6 +2,10 @@
 
 namespace GFPDF\Stat;
 
+use WP_Error;
+
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use Exception;
 
 /**
@@ -43,7 +47,6 @@ if (! defined('ABSPATH')) {
  */
 class Stat_Functions
 {
-
     /**
      * Check if the current admin page is a Gravity PDF page
      * @since 4.0
@@ -160,8 +163,6 @@ class Stat_Functions
         return ($yiq >= 128) ? 'black' : 'white';
     }
 
-
-
     /**
      * Modified version of get_upload_dir() which just focuses on the base directory
      * no matter if single or multisite installation
@@ -169,41 +170,48 @@ class Stat_Functions
      * @return Array Base dir and url for the upload directory
      */
     public static function get_upload_dir() {
-        $siteurl = get_option('siteurl');
+        $siteurl     = get_option('siteurl');
         $upload_path = trim(get_option('upload_path'));
+        $dir         = $upload_path;
 
-        if (empty($upload_path) || 'wp-content/uploads' == $upload_path) {
-            $dir = WP_CONTENT_DIR.'/uploads';
-        } elseif (0 !== strpos($upload_path, ABSPATH)) {
-            // $dir is absolute, $upload_path is (maybe) relative to ABSPATH
-                    $dir = path_join(ABSPATH, $upload_path);
-        } else {
-            $dir = $upload_path;
+        if (empty($upload_path) || $upload_path == 'wp-content/uploads') {
+            $dir = WP_CONTENT_DIR . '/uploads';
+        } elseif (strpos($upload_path, ABSPATH) !== 0) {
+            /* $dir is absolute, $upload_path is (maybe) relative to ABSPATH */
+            $dir = path_join(ABSPATH, $upload_path);
         }
 
-        if (!$url = get_option('upload_url_path')) {
-            if (empty($upload_path) || ('wp-content/uploads' == $upload_path) || ($upload_path == $dir)) {
-                $url = WP_CONTENT_URL.'/uploads';
-            } else {
-                $url = trailingslashit($siteurl).$upload_path;
-            }
+        /*
+         * Honor the value of UPLOADS. This happens as long as ms-files rewriting is disabled.
+         * We also sometimes obey UPLOADS when rewriting is enabled -- see the next block.
+         */
+        if (defined('UPLOADS') && ! (is_multisite() && get_site_option('ms_files_rewriting'))) {
+            $dir = ABSPATH . UPLOADS;
         }
 
-            /*
-             * Honor the value of UPLOADS. This happens as long as ms-files rewriting is disabled.
-             * We also sometimes obey UPLOADS when rewriting is enabled -- see the next block.
-             */
-            if (defined('UPLOADS') && ! (is_multisite() && get_site_option('ms_files_rewriting'))) {
-                $dir = ABSPATH.UPLOADS;
-                $url = trailingslashit($siteurl).UPLOADS;
+        return $dir;
+    }
+
+    /**
+     * This function recursively deletes all files and folders under the given directory, and then the directory itself
+     * equivalent to Bash: rm -r $dir
+     * @param String $dir The path to be deleted
+     */
+    function rmdir($dir) {
+        try {
+            $files = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+                RecursiveIteratorIterator::CHILD_FIRST
+            );
+        
+            foreach ($files as $fileinfo) {
+                $function = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
+                $function($fileinfo->getRealPath());
             }
+        } catch (Exception $e) {
+            return new WP_Error('recursion_delete_problem', $e);
+        }
 
-        $basedir = $dir;
-        $baseurl = $url;
-
-        return array(
-            'basedir' => $basedir,
-            'baseurl' => $baseurl,
-        );
+        return rmdir($dir);
     }
 }
