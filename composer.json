@@ -2,5 +2,18 @@
     "require": {
         "blueliquiddesigns/mpdf": "dev-master",
         "querypath/QueryPath": ">=3.0.0"
+    },
+
+    "autoload": {
+    	"psr-4": {
+    		"GFPDF\\": "src/",
+    		"GFPDF\\Controller\\": "src/controller/",
+    		"GFPDF\\Model\\": "src/model/",
+    		"GFPDF\\View\\": "src/views/",
+    		"GFPDF\\Helper\\": ["src/helper/", "src/helper/abstract/", "src/helper/interface/", "src/helper/list-table/"],
+    		"GFPDF\\Helper\\Fields\\": "src/helper/fields/",
+    		"GFPDF\\Stat\\": "src/static/",
+    		"GFPDF\\Test\\": "tests/"
+    	}
     }
 }

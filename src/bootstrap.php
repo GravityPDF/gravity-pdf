@@ -44,7 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 */
 
 /*
- * Load autoload functionality
+ * Load dependancies
  */
 require_once(PDF_PLUGIN_DIR . 'src/autoload.php');
 
