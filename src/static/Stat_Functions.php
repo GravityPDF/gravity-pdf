@@ -197,7 +197,7 @@ class Stat_Functions
      * equivalent to Bash: rm -r $dir
      * @param String $dir The path to be deleted
      */
-    function rmdir($dir) {
+    public function rmdir($dir) {
         try {
             $files = new RecursiveIteratorIterator(
                 new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
@@ -213,5 +213,67 @@ class Stat_Functions
         }
 
         return rmdir($dir);
+    }
+
+    /**
+     * This function recursively copies all files and folders under a given directory
+     * equivalent to Bash: cp -R $dir
+     * @param  String $source      The path to be copied
+     * @param  String $destination The path to copy to
+     * @return Boolean
+     * @since 4.0
+     */
+    public function copyr($source, $destination) {
+        try {
+            if(!is_dir($destination)) {
+                wp_mkdir_p($destination);
+            }
+
+            $files = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($source, RecursiveDirectoryIterator::SKIP_DOTS),
+                RecursiveIteratorIterator::SELF_FIRST
+            );
+        
+            foreach ($files as $fileinfo) {
+               if($fileinfo->isDir()) {
+                    mkdir($destination . DIRECTORY_SEPARATOR . $files->getSubPathName());
+               } else {
+                    copy($fileinfo, $destination . DIRECTORY_SEPARATOR . $files->getSubPathName());
+               }
+            }
+        } catch (Exception $e) {
+            return new WP_Error('recursion_copy_problem', $e);
+        }
+
+        return true;
+    }
+
+    /**
+     * Get a path relative to the root WP directory, provided a user hasn't moved the wp-content directory outside the ABSPATH
+     * @param  String $path The relative path
+     * @param  String $replace What ABSPATH should be replaced with
+     * @return String
+     * @since 4.0
+     */
+    public function relative_path($path, $replace = '') {
+        return str_replace(ABSPATH, $replace, $path);
+    }
+
+    /**
+     * Check if the web server can write a file to the path specified
+     * @param  String  $path The path to check
+     * @return Boolean
+     * @since  4.0
+     */
+    public function is_directory_writable($path) {
+        $tmp_file = $path . '.tmpFile';
+
+        if(is_writable($path)) {
+            if(touch($tmp_file) && is_file($tmp_file)) {
+                unlink($tmp_file);
+                return true;
+            }
+        }
+        return false;
     }
 }

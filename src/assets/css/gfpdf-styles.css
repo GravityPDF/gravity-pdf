@@ -121,6 +121,14 @@
   background: #f2f2f2;
 }
 
+#setup-templates-confirm ul {
+  margin-top: 5px;
+}
+#setup-templates-confirm li {
+  list-style-type: disc;
+  margin-left: 20px;
+}
+
 /**
  * Help Settings Page
  */

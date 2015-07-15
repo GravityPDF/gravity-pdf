@@ -47,9 +47,7 @@ if (! defined('ABSPATH')) {
 	</span>
 	</h3>
 
-	<form method="post" action="options.php">
-		<?php settings_errors(); ?>
-		<?php settings_fields( 'gfpdf_settings' ); ?>
+	<form method="post">
 
 		<table id="pdf-tools" class="widefat gfpdfe_table">
 	    <thead>
@@ -66,9 +64,21 @@ if (! defined('ABSPATH')) {
 		<?php submit_button(); ?>
 	</form>
 
-	<div id="setup-templates-confirm" title="<?php _e('Setup Custom Templates', 'gravitypdf'); ?>" style="display: none;">
-	  <?php printf(__('During the setup process %sANY Gravity PDF template files%s (excluding custom templates) stored in the %s directory will be overridden.', 'gravitypdf'), '<strong>', '</strong>', '<code>' . $args['template_directory'] . '</code>'); ?>
-	</div>
+
+	<?php if($args['custom_template_setup_warning']): ?>
+		<!-- only show custom template warning if user has already installed them once -->
+		<div id="setup-templates-confirm" title="<?php _e('Setup Custom Templates', 'gravitypdf'); ?>" style="display: none;">
+		  <?php printf(__('During the setup process any of the following templates stored in %s will be overridden. If you have modified any of the following template or template configuration files %smake a backup before continuing%s.', 'gravitypdf'), '<br><code>' . $args['template_directory'] . '</code>', '<strong>', '</strong>'); ?>
+
+		  <?php if(sizeof($args['template_files']) > 0): ?>
+		  <ul>
+		  	<?php foreach($args['template_files'] as $file): ?>
+		  		<li><?php echo basename($file); ?></li>
+		  	<?php endforeach; ?>
+		  </ul>
+		  <?php endif; ?>
+		</div>
+	<?php endif; ?>
 
 	<div id="manage-font-files" title="<?php _e('Manage Fonts', 'gravitypdf'); ?>" style="display: none;">
 	  Font logic here...

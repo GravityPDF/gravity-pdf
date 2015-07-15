@@ -156,7 +156,7 @@ class Helper_Notices implements Helper_Int_Actions {
      */
     private function html($text, $class = 'updated') {
         ?>
-            <div class="<?php echo $class; ?>">
+            <div class="<?php echo $class; ?> is-dismissible notice">
                 <p><?php echo $text; ?></p>
             </div>
         <?php

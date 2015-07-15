@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * System Status Settings View
@@ -43,9 +43,9 @@ if (! defined('ABSPATH')) {
             <i class="fa fa-dashboard"></i>
             <?php _e('Installation Status', 'gravitypdf'); ?>
         </span>
-    </h3>    
+    </h3>
 
-    <table id="pdf-system-status" class="form-table">  
+    <table id="pdf-system-status" class="form-table">
 
         <tr>
             <th scope="row">
@@ -56,9 +56,9 @@ if (! defined('ABSPATH')) {
 
                 <?php
                 $ram_icon = 'fa fa-check-circle';
-                if($args['memory'] < 128 && $args['memory'] !== -1) {                
+                if($args['memory'] < 128 && $args['memory'] !== -1) {
                     $ram_icon = 'fa fa-exclamation-triangle';
-                }                
+                }
                 ?>
 
                 <?php if($args['memory'] === -1): ?>
@@ -72,27 +72,11 @@ if (! defined('ABSPATH')) {
                 <?php if($args['memory'] < 128 && $args['memory'] !== -1): ?>
                 
                 <span class="gf_settings_description">
-                    <?php echo sprintf(__('We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. The minimum system requirement is 64MB. %sFind out how to change this limit%s.', 'gravitypdf'), '<br /><a href="#">', '</a>'); /* TODO - UPDATE LINK - see http://docs.woothemes.com/document/increasing-the-wordpress-memory-limit/ for example */ ?>
+                    <?php echo sprintf(__('We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. %sFind out how to increase this limit%s.', 'gravitypdf'), '<br /><a href="#">', '</a>'); /* TODO - UPDATE LINK - see http://docs.woothemes.com/document/increasing-the-wordpress-memory-limit/ for example */ ?>
                 </span>
-                <?php endif; ?>                            
+                <?php endif; ?>
             </td>
         </tr>
-
-        <tr>
-            <th scope="row">
-                <?php _e('PDF Notifications', 'gravitypdf'); ?> <?php gform_tooltip('pdf_status_notifications'); ?>
-            </th>
-            <td>
-                <?php ($args['output']  === true) ? _e('Enabled', 'gravitypdf') : _e('Disabled', 'gravitypdf'); ?>
-                <span class="<?php echo ($args['output'] === true) ? 'fa fa-check-circle' : 'fa fa-times-circle'; ?>"></span> 
-
-                <?php if($args['output'] === false): ?>
-                    <span class="gf_settings_description"><?php echo __('The PDF save directory is not writable by your web server. PDF email notifications are currently disabled.', 'gravitypdf'); ?></span>
-                    <div class="clear">Path <span class="details path"><?php echo $args['output_path']; ?></span></div>     
-                <?php endif; ?>                                        
-            </td>
-        </tr>          
-
 
         <tr>
             <th scope="row">
@@ -100,9 +84,9 @@ if (! defined('ABSPATH')) {
             </th>
 
             <td>
-                <?php echo $args['wp']; ?>                
+                <?php echo $args['wp']; ?>
             </td>
-        </tr>  
+        </tr>
 
         <tr>
             <th scope="row">
@@ -110,9 +94,9 @@ if (! defined('ABSPATH')) {
             </th>
 
             <td>
-                <?php echo $args['gf']; ?>                
+                <?php echo $args['gf']; ?>
             </td>
-        </tr>   
+        </tr>
 
         <tr>
             <th scope="row">
@@ -120,8 +104,8 @@ if (! defined('ABSPATH')) {
             </th>
 
             <td>
-                <?php echo $args['php']; ?>                
+                <?php echo $args['php']; ?>
             </td>
-        </tr>                                      
+        </tr>
 
-    </table>  
+    </table>

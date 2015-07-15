@@ -157,7 +157,7 @@ class Controller_Install extends Helper_Controller implements Helper_Int_Actions
     public function create_folder_structures() {
         global $gfpdf;
 
-        /* don't create the folder structure on our welcome page  or through AJAX as an errors on the first page they see will confuse users */
+        /* don't create the folder structure on our welcome page or through AJAX as an errors on the first page they see will confuse users */
         if( is_admin() &&
             (rgget('page') == 'gfpdf-getting-started') || (defined( 'DOING_AJAX' ) && DOING_AJAX))  {
             return false;
@@ -180,7 +180,12 @@ class Controller_Install extends Helper_Controller implements Helper_Int_Actions
         foreach($folders as $dir) {
             if(!is_dir($dir)) {
                 if(! wp_mkdir_p($dir)) {
-                    $gfpdf->notices->add_error(sprintf(__('There was a problem creating the "%s" directory. Ensure you have write permissions to your upload directory.', str_replace(ABSPATH, '', $dir)), 'gravitypdf'));
+                    $gfpdf->notices->add_error(sprintf(__('There was a problem creating the %s directory. Ensure you have write permissions to your upload directory.', 'gravitypdf'), '<code>' . Stat_Functions::relative_path($dir) . '</code>'));
+                }
+            } else {
+                /* test the directory is currently writable by the web server, otherwise throw and error */
+                if(! Stat_Functions::is_directory_writable($dir)) {
+                    $gfpdf->notices->add_error(sprintf(__('Gravity PDF does not have write permissions to the %s directory. Contact your web hosting provider to fix the issue.', 'gravitypdf'), '<code>' . Stat_Functions::relative_path($dir) . '</code>'));
                 }
             }
         }

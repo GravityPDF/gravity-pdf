@@ -3,6 +3,7 @@
 namespace GFPDF\Model;
 
 use GFPDF\Helper\Helper_Model;
+use GFPDF\Stat\Stat_Functions;
 
 /**
  * Settings Model
@@ -140,6 +141,24 @@ class Model_Settings extends Helper_Model {
     }
 
     /**
+     * Install the files stored in /initialisation/template/ to the user's template directory
+     * @return Boolean
+     * @since 4.0
+     */
+    public function install_templates() {
+        global $gfpdf;
+
+        if(! Stat_Functions::copyr(PDF_PLUGIN_DIR . 'initialisation/templates/', $gfpdf->data->template_location)) {
+            $gfpdf->notices->add_error(sprintf(__('There was a problem copying all PDF templates to %s. Please try again.', 'gravitypdf'), '<code>' . Stat_Functions::relative_path($gfpdf->data->template_location) . '</code>'));
+            return false;
+        }
+
+        $gfpdf->notices->add_notice(sprintf(__('Gravity PDF Custom Templates successfully installed to %s.', 'gravitypdf'), '<code>' . Stat_Functions::relative_path($gfpdf->data->template_location) . '</code>'));
+        $gfpdf->options->update_option('custom_pdf_template_files_installed', true);
+        return true;
+    }
+
+    /**
      * Call forum endpoint and get the latest topic information
      * @param Object $object The metabox object
      * @return void
@@ -183,7 +202,6 @@ class Model_Settings extends Helper_Model {
 
         return $topics;
     }
-
 
     /**
      * Turn capabilities into more friendly strings

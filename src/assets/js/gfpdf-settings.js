@@ -678,8 +678,8 @@
 				var copyButtons = [{
 				      	text: GFPDF.tools_template_copy_confirm,
 				      	click: function() {
-				      		/* do redirect */
-				      		window.location = $copy.attr('href');
+				      		/* submit form */
+				      		$copy.unbind().click();
 				      	}
 				      },
 				      {
@@ -690,12 +690,14 @@
 				      	}
 				}];
 
-				this.wp_dialog($copyDialog, copyButtons, 500, 175);
+				if($copyDialog.length) {
+					this.wp_dialog($copyDialog, copyButtons, 500, 350);
 
-				$copy.click(function() {
-					$copyDialog.wpdialog('open');
-				    return false;
-				});
+					$copy.click(function() {
+						$copyDialog.wpdialog('open');
+						return false;
+					});
+				}
 
 				/* setup fonts dialog */
 				this.wp_dialog($fontDialog, [], 500, 350);

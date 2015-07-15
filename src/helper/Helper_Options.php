@@ -283,7 +283,7 @@ class Helper_Options implements Helper_Int_Filters {
 					'default_action' => array(
 						'id'      => 'default_action',
 						'name'    => __('Entry View', 'gravitypdf'),
-						'desc'    => sprintf(__('Select the default action used when accessing a PDF from the %sGravity Forms entries list%s page.'), '<a href="'. admin_url('admin.php?page=gf_entries') . '">', '</a>'),
+						'desc'    => sprintf(__('Select the default action used when accessing a PDF from the %sGravity Forms entries list%s page.', 'gravitypdf'), '<a href="'. admin_url('admin.php?page=gf_entries') . '">', '</a>'),
 						'type'    => 'radio',
 						'options' => array(
 							'View'     => __('View', 'gravitypdf'),
@@ -814,7 +814,6 @@ class Helper_Options implements Helper_Int_Filters {
 	public function get_templates() {
 		global $gfpdf;
 
-
 		$templates = array();
 		$legacy    = array();
 
@@ -853,7 +852,7 @@ class Helper_Options implements Helper_Int_Filters {
 		 * Load templates included with Gravity PDF
 		 * We'll exclude any files starting with example-, and any files overridden by the user
 		 */
-		foreach(glob( PDF_PLUGIN_DIR . 'initialisation/templates/*.php') as $filename) {
+		foreach($this->get_plugin_pdf_templates() as $filename) {
 			$info = get_file_data($filename, $headers);
 			$file = basename($filename, '.php');
 			
@@ -875,6 +874,16 @@ class Helper_Options implements Helper_Int_Filters {
 
 		return apply_filters('gfpdf_template_list', $templates);
 	}
+
+    /**
+     * Returns an array of the current PDF templates shipped with Gravity PDF
+     * @return Array
+     * @since 4.0
+     */
+    public function get_plugin_pdf_templates() {
+        return glob( PDF_PLUGIN_DIR . 'initialisation/templates/*.php');
+    }
+
 
 	/**
 	 * Parse our installed font files
@@ -1624,16 +1633,12 @@ class Helper_Options implements Helper_Int_Filters {
 		global $gfpdf;
 
 		$tab = (isset($_GET['tab'])) ? esc_attr($_GET['tab']) : 'general';
-		$nonce = wp_create_nonce('gfpdf_settings[' . $args['id'] . ']"');
+		$nonce = wp_create_nonce('gfpdf_settings[' . $args['id'] . ']');
 
-		$link = esc_url( add_query_arg( array(
-			'tab'    => $tab,
-			'action' => $args['options'],
-			'_nonce' => $nonce,
-		), $gfpdf->data->settings_url));
 
-		$html = '<a  href="' . $link .'" id="gfpdf_settings[' . $args['id'] . ']" class="button gfpdf-button">' . esc_html($args['std']) .'</a>';
+		$html = '<button id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . '][name]" value="'. $args['id'] . '" class="button gfpdf-button" type="submit">' . esc_html($args['std']) .'</button>';
 		$html .= '<span class="gf_settings_description">'  . wp_kses_post($args['desc']) . '</span>';
+		$html .= '<input type="hidden" name="gfpdf_settings[' . $args['id'] . '][nonce]" value="' . $nonce . '" />';
 
 		if(isset($args['tooltip'])) {
 			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . wp_kses_post($args['tooltip']) . '</span>';

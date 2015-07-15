@@ -106,6 +106,9 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
             add_action('pdf-settings-tools', array($this->view, 'uninstaller'), 5);
         }
 
+        /* Process the tool tab actions */
+        add_action('admin_init', array($this, 'process_tool_tab_actions'));
+
     }
 
     /**
@@ -185,5 +188,37 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
         }
         
         return $nav;
+    }
+
+    /**
+     * Check if any of the tool tab actions have been triggered and process
+     * @return void
+     * @since 4.0
+     */
+    public function process_tool_tab_actions() {
+        global $gfpdf;
+
+        /* check if we are on the tools settings page */
+        if(! Stat_Functions::is_gfpdf_settings_tab('tools')) {
+            return;
+        }
+
+        /* check if the user has permission to copy the templates */
+        if(! GFCommon::current_user_can_any( 'gravityforms_edit_settings' )) {
+            return false;
+        }
+
+        $settings = rgpost('gfpdf_settings');
+
+        /* check if we should install the custom templates */
+        if(isset($settings['setup_templates']['name'])) {
+            /* verify the nonce */
+            if( ! wp_verify_nonce( $settings['setup_templates']['nonce'], 'gfpdf_settings[setup_templates]' ) ) {
+                 $gfpdf->notices->add_error( __( 'There was a problem installing the PDF templates. Please try again.', 'gravitypdf' ) );
+                 return false;
+            }
+
+            $this->model->install_templates();
+        }
     }
 }

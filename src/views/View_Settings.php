@@ -4,6 +4,7 @@ namespace GFPDF\View;
 
 use GFPDF\Helper\Helper_View;
 use GFPDF_Major_Compatibility_Checks;
+use GFPDF\Stat\Stat_Functions;
 
 use GFCommon;
 
@@ -130,15 +131,8 @@ class View_Settings extends Helper_View
 
         $status = new GFPDF_Major_Compatibility_Checks();
 
-        $mb_string = false;
-        if($this->get_mb_string() && $this->check_mb_string_regex()) {
-            $mb_string = true;
-        }
-
         $vars = array(
             'memory'      => $status->get_ram(ini_get('memory_limit')),
-            'output'      => true, /* TODO - write installer / uninstaller first */
-            'output_path' => 'path/to/file', /* TODO */
             'wp'          => $wp_version,
             'php'         => phpversion(),
             'gf'          => GFCommon::$version,
@@ -182,7 +176,9 @@ class View_Settings extends Helper_View
         }
 
         $vars = array(
-            'template_directory' => str_replace(ABSPATH, '/', $gfpdf->data->template_location),
+            'template_directory' => Stat_Functions::relative_path($gfpdf->data->template_location, '/'),
+            'template_files' => $gfpdf->options->get_plugin_pdf_templates(),
+            'custom_template_setup_warning' => $gfpdf->options->get_option('custom_pdf_template_files_installed')
         );
 
         $vars = array_merge($vars, $this->data);
@@ -201,7 +197,7 @@ class View_Settings extends Helper_View
         global $gfpdf;
 
         $tooltips['pdf_status_wp_memory']     = '<h6>' . __( 'WP Memory Available', 'gravitypdf' ) . '</h6>' . sprintf(__( "Producing PDF documents is hard work and Gravity PDF requires more resources than most plugins. We strongly recommend you have at least 128MB, but you may need more.", 'gravitypdf' ));
-        $tooltips['pdf_status_notifications'] = '<h6>' . __( 'PDF Notifications', 'gravitypdf' ) . '</h6>' . sprintf(__( 'Sending PDFs automatically via Gravity Form notifications requires write access to our designated output directory: %s.', 'gravitypdf' ), '<code>' . str_replace(ABSPATH, '', $gfpdf->data->template_save_location_url) . '</code>');
+        $tooltips['pdf_status_notifications'] = '<h6>' . __( 'PDF Notifications', 'gravitypdf' ) . '</h6>' . sprintf(__( 'Sending PDFs automatically via Gravity Form notifications requires write access to our designated output directory: %s.', 'gravitypdf' ), '<code>' . Stat_Functions::relative_path($gfpdf->data->template_save_location_url) . '</code>');
 
         return apply_filters('gravitypdf_registered_tooltips', $tooltips);
     }
