@@ -90,8 +90,14 @@ class Controller_PDF extends Helper_Controller implements Helper_Int_Actions, He
      * @return void
      */
     public function add_actions() {
-        add_action( 'parse_request', array($this, 'process_legacy_pdf_endpoint'), 5); /* give legacy endpoint precedancy over new endpoint */
-        add_action( 'parse_request', array($this, 'process_pdf_endpoint'));
+        /* Process PDF if needed */
+        add_action( 'parse_request', array($this, 'process_legacy_pdf_endpoint'), 5); /* give legacy endpoint precedancy over new endpoint for backwards compatibility */
+        add_action( 'parse_request', array($this, 'process_pdf_endpoint')); /* new PDF endpoint */
+
+        /* Display PDF links in Gravity Forms Admin Area */
+        add_action( 'gform_entries_first_column_actions', array($this->model, 'view_pdf_entry_list'), 10, 4);
+        add_action( 'gform_entry_info', array($this->model, 'view_pdf_entry_detail'), 10, 2);
+
     }
 
     /**

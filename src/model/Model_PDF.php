@@ -253,4 +253,118 @@ class Model_PDF extends Helper_Model {
         }
         return $action;
     }
+
+    /**
+     * Display PDF on Gravity Form entry list page
+     * @param  Integer $form_id  Gravity Form ID
+     * @param  Integer $field_id Current field ID
+     * @param  Mixed $value    Current value of field
+     * @param  Array $lead     Entry Information
+     * @return void
+     * @since 4.0
+     */
+    public function view_pdf_entry_list($form_id, $field_id, $value, $lead) {
+        $controller = $this->getController();
+
+        /* Check if we have any PDFs */
+        $form = GFAPI::get_form($lead['form_id']);
+        $pdfs = (isset($form['gfpdf_form_settings'])) ? $this->get_active_pdfs($form['gfpdf_form_settings'], $lead) : array();
+
+
+        if(!empty($pdfs)) {
+
+            if(sizeof($pdfs) > 1) {
+                $args = array('pdfs' => array());
+
+                foreach($pdfs as $pdf) {
+                    $args['pdfs'][] = array(
+                        'name' => $this->get_pdf_name($pdf, $lead),
+                        'url' => $this->get_pdf_url($pdf, $lead),
+                    );
+                }
+
+                $controller->view->entry_list_pdf_multiple($args);
+            } else {
+                /* Only one PDF for this form so display a simple 'View PDF' link */
+                $pdf = array_shift($pdfs);
+
+                $args = array(
+                    'url' => $this->get_pdf_url($pdf, $lead),
+                );
+
+                $controller->view->entry_list_pdf_single($args);
+            }
+        }
+    }
+
+    /**
+     * Display the PDF links on the entry detailed section of the admin area
+     * @param  Integer $form_id Gravity Form ID
+     * @param  Array $lead    The entry information
+     * @return void
+     * @since  4.0
+     */
+    public function view_pdf_entry_detail($form_id, $lead) {
+        $controller = $this->getController();
+
+        /* Check if we have any PDFs */
+        $form = GFAPI::get_form($lead['form_id']);
+        $pdfs = (isset($form['gfpdf_form_settings'])) ? $this->get_active_pdfs($form['gfpdf_form_settings'], $lead) : array();
+
+        if(!empty($pdfs)) {
+            $args = array('pdfs' => array());
+
+            foreach($pdfs as $pdf) {
+                $args['pdfs'][] = array(
+                    'name' => $this->get_pdf_name($pdf, $lead),
+                    'url' => $this->get_pdf_url($pdf, $lead),
+                );
+            }
+
+            $controller->view->entry_detailed_pdf($args);
+        }
+    }
+
+    /**
+     * Generate the PDF Name
+     * @param  Array $pdf  The PDF Form Settings
+     * @param  Array $lead The Gravity Form entry details
+     * @return String      The PDF Name
+     * @since  4.0
+     */
+    public function get_pdf_name($pdf, $lead) {
+        $form = GFAPI::get_form($lead['form_id']);
+        return GFCommon::replace_variables($pdf['filename'], $form, $lead);
+    }
+
+    /**
+     * Create a PDF Link based on the current PDF settings and entry
+     * @param  Array $pdf  The PDF Form Settings
+     * @param  Array $lead The Gravity Form entry details
+     * @return String       Direct link to the PDF
+     * @since  4.0
+     */
+    public function get_pdf_url($pdf, $lead) {
+        return esc_url(home_url() . '/pdf/' . $pdf['id'] . '/' . $lead['id'] . '/');
+    }
+
+    /**
+     * Filter out inactive PDFs and those who don't meet the conditional logic
+     * @param  Array $pdfs The PDF settings array
+     * @param  Array $lead The current entry information
+     * @return Array       The filtered PDFs
+     * @since 4.0
+     */
+    public function get_active_pdfs($pdfs, $lead) {
+        $filtered = array();
+        $form     = GFAPI::get_form($lead['form_id']);
+
+        foreach($pdfs as $pdf) {
+            if($pdf['active'] && GFCommon::evaluate_conditional_logic( $pdf['conditionalLogic'], $form, $lead)) {
+                $filtered[$pdf['id']] = $pdf;
+            }
+        }
+
+        return $filtered;
+    }
 }

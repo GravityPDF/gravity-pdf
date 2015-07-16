@@ -383,6 +383,20 @@
   width: 20px;
 }
 
+/**
+ * Gravity Forms Entry Details Page
+ */
+.gfpdf_detailed_pdf_container_pdf {
+  clear: left;
+  margin-bottom: 3px;
+}
+
+.gfpdf_detailed_pdf_container span {
+  display: block;
+  word-wrap: break-word;
+  padding: 2px 0 2px 2px;
+}
+
 
 
 @media only screen and (min-width: 500px) {

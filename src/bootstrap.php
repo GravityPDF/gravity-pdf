@@ -197,7 +197,8 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
         wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-settings'. $suffix .'.js', array('wpdialogs', 'jquery-ui-tooltip', 'gform_form_admin', 'jquery-color', 'wp-color-picker'), $version );
         wp_register_script( 'gfpdf_js_backbone', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-backbone'. $suffix .'.js', array('gfpdf_js_settings', 'backbone', 'underscore'), $version );
         wp_register_script( 'gfpdf_js_chosen', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.jquery.min.js', array('jquery'), $version );
-
+        wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-entries' . $suffix . '.js', array('jquery'), $version );
+        
         /*
         * Localise admin script
         */
@@ -226,6 +227,11 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
 
         if(Stat\Stat_Functions::is_gfpdf_settings_tab('help')) {
              wp_enqueue_script('gfpdf_js_backbone');
+        }
+
+        if(is_admin() && rgget('page') == 'gf_entries') {
+            wp_enqueue_script('gfpdf_js_entries');
+            wp_enqueue_style('gfpdf_css_styles');
         }
     }
 
