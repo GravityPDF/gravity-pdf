@@ -197,7 +197,7 @@ class Stat_Functions
      * equivalent to Bash: rm -r $dir
      * @param String $dir The path to be deleted
      */
-    public function rmdir($dir) {
+    public static function rmdir($dir) {
         try {
             $files = new RecursiveIteratorIterator(
                 new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
@@ -223,7 +223,7 @@ class Stat_Functions
      * @return Boolean
      * @since 4.0
      */
-    public function copyr($source, $destination) {
+    public static function copyr($source, $destination) {
         try {
             if(!is_dir($destination)) {
                 wp_mkdir_p($destination);
@@ -255,7 +255,7 @@ class Stat_Functions
      * @return String
      * @since 4.0
      */
-    public function relative_path($path, $replace = '') {
+    public static function relative_path($path, $replace = '') {
         return str_replace(ABSPATH, $replace, $path);
     }
 
@@ -265,7 +265,7 @@ class Stat_Functions
      * @return Boolean
      * @since  4.0
      */
-    public function is_directory_writable($path) {
+    public static function is_directory_writable($path) {
         $tmp_file = $path . '.tmpFile';
 
         if(is_writable($path)) {

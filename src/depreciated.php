@@ -41,14 +41,6 @@ if (! defined('ABSPATH')) {
 */
 
 /**
- * Add backwards compatibility for constants
- */
-define('PDF_SAVE_LOCATION', $gfpdf->data->template_tmp_location);
-define('PDF_FONT_LOCATION', $gfpdf->data->template_font_location);
-define('PDF_TEMPLATE_LOCATION', $gfpdf->data->template_location);
-define('PDF_TEMPLATE_URL_LOCATION', $gfpdf->data->template_location); /* no cases in mPDF where a URL should be used instead of a path */
-
-/**
  * Add backwards compatibility for expired / renamed classes
  */
 class GFPDF_Core
@@ -58,6 +50,16 @@ class GFPDF_Core
         global $gfpdf;
         $gfpdf = new Router();
         $gfpdf->init();
+        $this->setup_constants();
+    }
+
+    public function setup_constants() {
+        global $gfpdf;
+
+        define('PDF_SAVE_LOCATION', $gfpdf->data->template_tmp_location);
+        define('PDF_FONT_LOCATION', $gfpdf->data->template_font_location);
+        define('PDF_TEMPLATE_LOCATION', $gfpdf->data->template_location);
+        define('PDF_TEMPLATE_URL_LOCATION', $gfpdf->data->template_location); /* no cases in mPDF where a URL should be used instead of a path */
     }
 }
 

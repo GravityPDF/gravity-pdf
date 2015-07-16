@@ -85,6 +85,7 @@ abstract class Helper_View {
      */
     final protected function load($filename, $args = array(), $output = true, $path = '') {
         $path = (empty($path)) ? PDF_PLUGIN_DIR . 'src/views/html/' . $this->ViewType . '/' . $filename . '.php' : $path . $filename;
+
         if(is_readable($path)) {
             /* for backwards compatibility extract the $args variable */
             extract($args, EXTR_SKIP); /* skip any arguments that would clash - i.e filename, args, output, path, this */

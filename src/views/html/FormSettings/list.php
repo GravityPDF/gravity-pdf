@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * List of Form Settings View
@@ -35,7 +35,7 @@ if (! defined('ABSPATH')) {
 */
 
 /* assign list_items object to variable for easier access */
-$list_itmes = $args['list_items'];
+$list_items = $args['list_items'];
 
 ?>
 
@@ -51,18 +51,18 @@ $list_itmes = $args['list_items'];
 
 	<form id="gfpdf_list_form" method="post">
 
-		<?php $list_itmes->display(); ?>
+		<?php $list_items->display(); ?>
 
 		<!--<input id="action_argument" name="action_argument" type="hidden" />
 		<input id="action" name="action" type="hidden" />
 
 		<?php wp_nonce_field( 'gform_pdf_list_action', 'gform_pdf_list_action' ) ?>-->
 
-	</form>		
+	</form>
 
     <div id="delete-confirm" title="<?php _e('Delete PDF?', 'gravitypdf'); ?>" style="display: none;">
         <?php printf(__("Warning! You are about to delete this PDF. Select 'Delete' to delete, 'Cancel' to stop.", 'gravitypdf'), '<strong>', '</strong>'); ?>
-    </div>   
+    </div>
 
 
 <?php \GFFormSettings::page_footer(); ?>

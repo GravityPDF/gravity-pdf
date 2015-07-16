@@ -264,6 +264,8 @@ class Model_PDF extends Helper_Model {
      * @since 4.0
      */
     public function view_pdf_entry_list($form_id, $field_id, $value, $lead) {
+        global $gfpdf;
+
         $controller = $this->getController();
 
         /* Check if we have any PDFs */
@@ -273,13 +275,15 @@ class Model_PDF extends Helper_Model {
 
         if(!empty($pdfs)) {
 
+            $download = ($gfpdf->options->get_option('default_action') == 'Download') ? '?download=1' : '';
+
             if(sizeof($pdfs) > 1) {
                 $args = array('pdfs' => array());
 
                 foreach($pdfs as $pdf) {
                     $args['pdfs'][] = array(
                         'name' => $this->get_pdf_name($pdf, $lead),
-                        'url' => $this->get_pdf_url($pdf, $lead),
+                        'url' => $this->get_pdf_url($pdf, $lead) . $download,
                     );
                 }
 
@@ -289,7 +293,7 @@ class Model_PDF extends Helper_Model {
                 $pdf = array_shift($pdfs);
 
                 $args = array(
-                    'url' => $this->get_pdf_url($pdf, $lead),
+                    'url' => $this->get_pdf_url($pdf, $lead) . $download,
                 );
 
                 $controller->view->entry_list_pdf_single($args);

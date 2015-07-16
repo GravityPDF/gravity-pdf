@@ -382,4 +382,5 @@ class View_PDF extends Helper_View
             echo apply_filters('gfpdf_field_page_name_html', ob_get_clean(), $page, $field, $form);
         }
     }
+
 }
