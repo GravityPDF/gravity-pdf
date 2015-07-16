@@ -84,13 +84,31 @@ class View_PDF extends Helper_View
     public function generate_pdf($entry, $settings) {
         global $gfpdf;
 
-        $paper_size = 'A4';
-        $orientation = '';
+        /**
+         * Get the paper size
+         */
+        $paper_size = $settings['pdf_size'];
+
+        /**
+         * Get the correct orientation based on the paper size selected
+         * and use the custom paper size settings, if needed
+         */
+        if($paper_size == 'custom') {
+            $paper_size  = $this->get_paper_size($settings['custom_pdf_size']);
+            $orientation = ($settings['orientation'] == 'landscape') ? 'L' : 'P';
+        } else {
+            $orientation = ($settings['orientation'] == 'landscape') ? '-L' : '';
+        }
 
         $mpdf = new mPDF('', $paper_size, 0, '', 15, 15, 16, 16, 9, 9, $orientation);
 
         /* set up contstants for gravity forms to use so we can override the security on the printed version */
-        $template = (isset($_GET['template'])) ? $_GET['template'] : '';
+        $template = $this->get_template_filename($settings['template']);
+
+        if(rgget('template')) {
+            $template = $this->get_template_filename(rgget('template'));
+        }
+
         $html     = '';
 
         /**
@@ -111,19 +129,54 @@ class View_PDF extends Helper_View
         );
 
         if(file_exists( $gfpdf->data->template_location . $template)) {
-            $html = $this->load($template, $args, false, $gfpdf->data->template_site_location);
+            $html = $this->load($template, $args, false, $gfpdf->data->template_location);
         } else if (file_exists( PDF_PLUGIN_DIR . 'initialisation/templates/' . $template)) {
             $html = $this->load($template, $args, false, PDF_PLUGIN_DIR . 'initialisation/templates/');
+        } else {
+            /* throw error */
+            throw new Exception('Could not load the template: ' . $template);
         }
 
         if(isset($_GET['html'])) {
             echo $html; exit;
         }
 
-        $mpdf->WriteHTML($html);
-
-        $mpdf->Output('test.pdf', 'I');
+        if(! is_wp_error($html)) {
+            $mpdf->WriteHTML($html);
+            $mpdf->Output('test.pdf', 'I');
+        }
+        
         exit;
+    }
+
+    /**
+     * Ensure the custom paper size has the correct values
+     * @param  Array $size
+     * @return Array
+     * @since  4.0
+     */
+    public function get_paper_size($size) {
+        $size[0] = ($size[2] == 'inches') ? (int) $size[0] * 25.4 : (int) $size[0];
+        $size[1] = ($size[2] == 'inches') ? (int) $size[1] * 25.4 : (int) $size[1];
+
+        /* tidy up custom paper size array */
+        unset($size[2]);
+
+        return $size;
+    }
+
+    /**
+     * Ensure a PHP extension is added to the end of the template name
+     * @param  String $name The PHP template
+     * @return String
+     * @since  4.0
+     */
+    public function get_template_filename($name) {
+        if(substr($name, -4) !== '.php') {
+            $name = $name . '.php';
+        }
+
+        return $name;
     }
 
     /**
@@ -309,6 +362,11 @@ class View_PDF extends Helper_View
                 $container->generate($field);
 
                 echo ($field->type !== 'section') ? $class->html() : $class->html($show_section_description);
+            } else {
+                /**
+                 * Close our CSS Ready Class Row, if open
+                 */
+                $container->close();
             }
 
         } catch(Exception $e) {
