@@ -74,11 +74,9 @@ class Field_Post_Image extends Helper_Fields
     public function html() {
         $value = $this->value();
 
-        $path  = str_replace(home_url() . '/', ABSPATH, $value['url']);
-
         /* Start building image link */
         $html = '<a href="'. esc_url($value['url']) . '" target="_blank">';
-        $html .= '<img width="150" src="' . esc_url($path) . '" />';
+        $html .= '<img width="150" src="' . esc_url($value['url']) . '" />';
 
         /* Include title / caption / description if needed */
         if(!empty($value['title'])) {

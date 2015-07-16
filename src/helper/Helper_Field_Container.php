@@ -190,7 +190,7 @@ class Helper_Field_Container {
      * @since 4.0
      */
     private function process_skipped_fields($field) {
-        /* if we have a skipped field and the cotnainer is open we will close it */
+        /* if we have a skipped field and the container is open we will close it */
         if(in_array($field->type, $this->skip_fields)) {
             if($this->currently_open) {
                 $this->close_container();
