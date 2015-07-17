@@ -98,6 +98,10 @@ class Controller_PDF extends Helper_Controller implements Helper_Int_Actions, He
         add_action( 'gform_entries_first_column_actions', array($this->model, 'view_pdf_entry_list'), 10, 4);
         add_action( 'gform_entry_info', array($this->model, 'view_pdf_entry_detail'), 10, 2);
 
+        /* Add save and cleanup PDF filters */
+        add_action( 'gform_after_submission', array($this->model, 'maybe_save_pdf'), 10, 2);
+        add_action( 'gform_after_submission', array($this->model, 'cleanup_pdf'), 9999, 2);
+
     }
 
     /**
@@ -111,6 +115,9 @@ class Controller_PDF extends Helper_Controller implements Helper_Int_Actions, He
         add_filter( 'gfpdf_pdf_middleware', array($this->model, 'middle_logged_out_timeout'), 2, 3);
         add_filter( 'gfpdf_pdf_middleware', array($this->model, 'middle_auth_logged_out_user'), 3, 3);
         add_filter( 'gfpdf_pdf_middleware', array($this->model, 'middle_user_capability'), 4, 3);
+
+        /* Tap into GF notifications */
+        add_filter( 'gform_notification', array($this->model, 'notifications'), 9999, 3 ); /* ensure Gravity PDF is one of the last filters to be applied */
     }
 
     /**

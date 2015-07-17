@@ -5,12 +5,13 @@ namespace GFPDF\View;
 use GFPDF\Helper\Helper_View;
 use GFPDF\Helper\Helper_Fields;
 use GFPDF\Helper\Helper_Field_Container;
+use GFPDF\Helper\Helper_PDF;
 
 use GFPDF\Helper\Fields\Field_Product;
 use GFPDF\Helper\Fields\Field_Products;
 use GFPDF\Helper\Fields\Field_Default;
 
-use GFPDF\Stat\Stat_functions;
+use GFPDF\Stat\Stat_Functions;
 
 use GFFormsModel;
 use GFCommon;
@@ -82,88 +83,59 @@ class View_PDF extends Helper_View
      * @since 4.0
      */
     public function generate_pdf($entry, $settings) {
-        global $gfpdf;
 
         /**
-         * Get the paper size
-         */
-        $paper_size = $settings['pdf_size'];
-
-        /**
-         * Get the correct orientation based on the paper size selected
-         * and use the custom paper size settings, if needed
-         */
-        if($paper_size == 'custom') {
-            $paper_size  = $this->get_paper_size($settings['custom_pdf_size']);
-            $orientation = ($settings['orientation'] == 'landscape') ? 'L' : 'P';
-        } else {
-            $orientation = ($settings['orientation'] == 'landscape') ? '-L' : '';
-        }
-
-        $mpdf = new mPDF('', $paper_size, 0, '', 15, 15, 16, 16, 9, 9, $orientation);
-
-        /* set up contstants for gravity forms to use so we can override the security on the printed version */
-        $template = $this->get_template_filename($settings['template']);
-
-        if(rgget('template')) {
-            $template = $this->get_template_filename(rgget('template'));
-        }
-
-        $html     = '';
-
-        /**
-         * Load our arguments that should be accessed by our view
+         * Load our arguments that should be accessed by our PDF template
          * @var array
          */
-        $args = array(
-            'form_id'   => $entry['form_id'], /* backwards compat */
-            'lead_ids'  => array($entry['id']), /* backwards compat */
-            'lead_id'   => $entry['id'], /* backwards compat */
-            
-            'form'      => GFFormsModel::get_form_meta($entry['form_id']),
-            'entry'     => $entry,
-            'lead'      => $entry,
-            'form_data' => '',
+        $args = Stat_Functions::get_template_args($entry, $settings);
 
-            'settings' => $settings,
-        );
+        /**
+         * Set out our PDF abstraction class
+         */
+        $pdf = new Helper_PDF($entry, $settings);
 
-        if(file_exists( $gfpdf->data->template_location . $template)) {
-            $html = $this->load($template, $args, false, $gfpdf->data->template_location);
-        } else if (file_exists( PDF_PLUGIN_DIR . 'initialisation/templates/' . $template)) {
-            $html = $this->load($template, $args, false, PDF_PLUGIN_DIR . 'initialisation/templates/');
-        } else {
-            /* throw error */
-            throw new Exception('Could not load the template: ' . $template);
+        try {
+            $pdf->init();
+            $pdf->renderHtml($args);
+
+            /* set display type */
+            if(rgget('download')) {
+                $pdf->setOutputType('download');
+            }
+
+            /* Generate PDF */
+            $pdf->generate();
+        } catch(Exception $e) {
+            /* Log Error */
         }
-
-        if(isset($_GET['html'])) {
-            echo $html; exit;
-        }
-
-        if(! is_wp_error($html)) {
-            $mpdf->WriteHTML($html);
-            $mpdf->Output('test.pdf', 'I');
-        }
-        
-        exit;
     }
 
     /**
-     * Ensure the custom paper size has the correct values
-     * @param  Array $size
-     * @return Array
+     * Save the PDF to our tmp directory
+     * @param  String $pdf      The generated PDF to be saved
+     * @param  String $filename The PDF filename
+     * @param  Array $settings The Gravity PDF Settings
+     * @return Mixed           The full path to the file or false if failed
      * @since  4.0
      */
-    public function get_paper_size($size) {
-        $size[0] = ($size[2] == 'inches') ? (int) $size[0] * 25.4 : (int) $size[0];
-        $size[1] = ($size[2] == 'inches') ? (int) $size[1] * 25.4 : (int) $size[1];
+    public function savePDF($pdf, $filename, $entry) {
+        global $gfpdf;
 
-        /* tidy up custom paper size array */
-        unset($size[2]);
+        $path = $gfpdf->data->template_tmp_location . '/' . $entry['form_id'] . $entry['id'] . '/';
 
-        return $size;
+        /* create our path */
+        if(wp_mkdir_p($path)) {
+            /* save our PDF */
+            if(file_put_contents($path . $filename, $pdf)) {
+                return $path . $filename;
+            }
+        }
+
+        return false;
     }
+
+
 
     /**
      * Ensure a PHP extension is added to the end of the template name
@@ -233,7 +205,6 @@ class View_PDF extends Helper_View
         $skip_marked_fields             = (rgar($config['meta'], 'exclude')) ? rgar($config['meta'], 'exclude') : true; /* whether we should exclude fields with a CSS value of 'exclude'. Default to true */
         $skip_hidden_fields             = (rgar($config['meta'], 'hidden')) ? rgar($config['meta'], 'hidden') : true; /* whether we should skip fields hidden with conditional logic. Default to true. */
         $show_title                     = (rgar($config['meta'], 'show_title')) ? rgar($config['meta'], 'show_title') : true; /* whether we should show the form title. Default to true */
-        $show_section_description       = (rgar($config['meta'], 'section_content')) ? rgar($config['meta'], 'section_content') : false; /* whether we should include a section breaks content. Default to false */
         $show_page_names                = (rgar($config['meta'], 'page_names')) ? rgar($config['meta'], 'page_names') : false; /* whether we should show the form's page names. Default to false */
         $show_html_fields               = (rgar($config['meta'], 'html_field')) ? rgar($config['meta'], 'html_field') : false; /* whether we should show the form's html fields. Default to false */
         $show_individual_product_fields = (rgar($config['meta'], 'individual_products')) ? rgar($config['meta'], 'individual_products') : false; /* Whether to show individual fields in the entry. Default to false - they are grouped together at the end of the form */
@@ -251,7 +222,7 @@ class View_PDF extends Helper_View
             }
 
             /* Skip any fields with the css class 'exclude', if needed */
-            if($css_exclude !== false && strpos($field->cssClass, 'exclude')) {
+            if($skip_marked_fields !== false && strpos($field->cssClass, 'exclude')) {
                 continue;
             }
 
@@ -303,9 +274,10 @@ class View_PDF extends Helper_View
         /*
         * Set up our configuration variables
         */
-        $config['meta']    = (isset($config['meta'])) ? $config['meta'] : array();
-        $show_empty_fields = (rgar($config['meta'], 'empty')) ? rgar($config['meta'], 'empty') : false; /* whether to show empty fields or not. Default is false */
-        $load_legacy_css   = (rgar($config['meta'], 'legacy_css')) ? rgar($config['meta'], 'legacy_css') : false; /* whether we should add our legacy field class names (v3.x.x) to our fields. Default to false */
+        $config['meta']           = (isset($config['meta'])) ? $config['meta'] : array();
+        $show_empty_fields        = (rgar($config['meta'], 'empty')) ? rgar($config['meta'], 'empty') : false; /* whether to show empty fields or not. Default is false */
+        $load_legacy_css          = (rgar($config['meta'], 'legacy_css')) ? rgar($config['meta'], 'legacy_css') : false; /* whether we should add our legacy field class names (v3.x.x) to our fields. Default to false */
+        $show_section_description = (rgar($config['meta'], 'section_content')) ? rgar($config['meta'], 'section_content') : false; /* whether we should include a section breaks content. Default to false */
 
         /* Try and load a class based on the field type */
         $class_name        = Stat_functions::get_field_class($field->type);

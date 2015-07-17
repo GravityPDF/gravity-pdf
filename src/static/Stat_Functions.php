@@ -3,6 +3,7 @@
 namespace GFPDF\Stat;
 
 use WP_Error;
+use GFAPI;
 
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -275,5 +276,29 @@ class Stat_Functions
             }
         }
         return false;
+    }
+
+    /**
+     * Get the arguments array that should be passed to our PDF Template
+     * @param  Array $entry    Gravity Form Entry
+     * @param  Array $settings PDF Settings Array
+     * @return Array
+     * @since 4.0
+     */
+    public static function get_template_args($entry, $settings) {
+        $form = GFAPI::get_form($entry['form_id']);
+
+        return apply_filters('gfpdf_template_args', array(
+            'form_id'   => $entry['form_id'], /* backwards compat */
+            'lead_ids'  => array($entry['id']), /* backwards compat */
+            'lead_id'   => $entry['id'], /* backwards compat */
+            
+            'form'      => $form,
+            'entry'     => $entry,
+            'lead'      => $entry,
+            'form_data' => '',
+
+            'settings' => $settings,
+        ), $entry, $settings, $form);
     }
 }

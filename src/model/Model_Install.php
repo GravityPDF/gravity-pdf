@@ -95,6 +95,86 @@ class Model_Install extends Helper_Model {
     }
 
     /**
+     * Used to set up our PDF template folder, tmp folder and font folder
+     * @since 4.0
+     */
+    public function setup_template_location() {
+        global $gfpdf;
+
+        $gfpdf->data->template_location      = apply_filters('gfpdfe_template_location', $gfpdf->data->upload_dir . '/' . $gfpdf->data->working_folder . '/', $gfpdf->data->upload_dir, $gfpdf->data->working_folder);
+        $gfpdf->data->template_font_location = $gfpdf->data->template_location . 'fonts/';
+        $gfpdf->data->template_tmp_location  = $gfpdf->data->template_location . 'tmp/';
+    }
+
+    /**
+     * If running a multisite we'll setup the path to the current multisite folder
+     * @since 4.0
+     * @return void
+     */
+    public function setup_multisite_template_location() {
+        global $gfpdf;
+
+        if(is_multisite()) {
+            $blog_id = get_current_blog_id();
+            $gfpdf->data->multisite_template_location = apply_filters('gfpdfe_multisite_template_location', $gfpdf->data->upload_dir . '/' . $gfpdf->data->working_folder . '/', $gfpdf->data->upload_dir, $gfpdf->data->working_folder);
+        }
+    }
+
+    /**
+     * Create the appropriate folder structure automatically
+     * The upload directory should have all appropriate permissions to allow this kind of maniupulation
+     * but devs who tap into the gfpdfe_template_location filter will need to ensure we can write to the appropraite folder
+     * @since 4.0
+     * @return void
+     */
+    public function create_folder_structures() {
+        global $gfpdf;
+
+        /* don't create the folder structure on our welcome page or through AJAX as an errors on the first page they see will confuse users */
+        if( is_admin() &&
+            (rgget('page') == 'gfpdf-getting-started') || (defined( 'DOING_AJAX' ) && DOING_AJAX))  {
+            return false;
+        }
+
+        /* add folders that need to be checked */
+        $folders = array(
+            $gfpdf->data->template_font_location,
+            $gfpdf->data->template_tmp_location,
+        );
+
+        if(is_multisite()) {
+            $folders[] = $gfpdf->data->multisite_template_location;
+        }
+
+        /* allow other plugins to add their own folders which should be checked */
+        $folders = apply_filters('gfpdf_installer_create_folders', $folders);
+
+        /* create the required folder structure, or throw error */
+        foreach($folders as $dir) {
+            if(!is_dir($dir)) {
+                if(! wp_mkdir_p($dir)) {
+                    $gfpdf->notices->add_error(sprintf(__('There was a problem creating the %s directory. Ensure you have write permissions to your upload directory.', 'gravitypdf'), '<code>' . Stat_Functions::relative_path($dir) . '</code>'));
+                }
+            } else {
+                /* test the directory is currently writable by the web server, otherwise throw and error */
+                if(! Stat_Functions::is_directory_writable($dir)) {
+                    $gfpdf->notices->add_error(sprintf(__('Gravity PDF does not have write permissions to the %s directory. Contact your web hosting provider to fix the issue.', 'gravitypdf'), '<code>' . Stat_Functions::relative_path($dir) . '</code>'));
+                }
+            }
+        }
+
+        /* create blank index file in all folders to prevent web servers listing the entire directory */
+        if(is_dir($gfpdf->data->template_location) && !is_file($gfpdf->data->template_location . 'index.html')) {
+            GFCommon::recursive_add_index_file($gfpdf->data->template_location);
+        }
+
+        /* create deny htaccess file to prevent direct access to files */
+        if(is_dir($gfpdf->data->template_location) && !is_file($gfpdf->data->template_location . '.htaccess')) {
+            file_put_contents($gfpdf->data->template_location . '.htaccess', 'deny from all');
+        }
+    }
+
+    /**
      * Register our PDF custom rewrite rules
      * @since 4.0
      * @return void

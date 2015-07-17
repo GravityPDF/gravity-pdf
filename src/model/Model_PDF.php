@@ -4,12 +4,16 @@ namespace GFPDF\Model;
 
 use GFPDF\Model\Model_Form_Settings;
 use GFPDF\Helper\Helper_Model;
+use GFPDF\Helper\Helper_PDF;
+use GFPDF\Stat\Stat_Functions;
 
 use GFFormsModel;
 use GFCommon;
 use GFAPI;
 
 use WP_Error;
+
+use Exception;
 
 /**
  * PDF Display Model
@@ -259,18 +263,18 @@ class Model_PDF extends Helper_Model {
      * @param  Integer $form_id  Gravity Form ID
      * @param  Integer $field_id Current field ID
      * @param  Mixed $value    Current value of field
-     * @param  Array $lead     Entry Information
+     * @param  Array $entry     Entry Information
      * @return void
      * @since 4.0
      */
-    public function view_pdf_entry_list($form_id, $field_id, $value, $lead) {
+    public function view_pdf_entry_list($form_id, $field_id, $value, $entry) {
         global $gfpdf;
 
         $controller = $this->getController();
 
         /* Check if we have any PDFs */
-        $form = GFAPI::get_form($lead['form_id']);
-        $pdfs = (isset($form['gfpdf_form_settings'])) ? $this->get_active_pdfs($form['gfpdf_form_settings'], $lead) : array();
+        $form = GFAPI::get_form($entry['form_id']);
+        $pdfs = (isset($form['gfpdf_form_settings'])) ? $this->get_active_pdfs($form['gfpdf_form_settings'], $entry) : array();
 
 
         if(!empty($pdfs)) {
@@ -282,8 +286,8 @@ class Model_PDF extends Helper_Model {
 
                 foreach($pdfs as $pdf) {
                     $args['pdfs'][] = array(
-                        'name' => $this->get_pdf_name($pdf, $lead),
-                        'url' => $this->get_pdf_url($pdf, $lead) . $download,
+                        'name' => $this->get_pdf_name($pdf, $entry),
+                        'url' => $this->get_pdf_url($pdf, $entry) . $download,
                     );
                 }
 
@@ -293,7 +297,7 @@ class Model_PDF extends Helper_Model {
                 $pdf = array_shift($pdfs);
 
                 $args = array(
-                    'url' => $this->get_pdf_url($pdf, $lead) . $download,
+                    'url' => $this->get_pdf_url($pdf, $entry) . $download,
                 );
 
                 $controller->view->entry_list_pdf_single($args);
@@ -304,24 +308,24 @@ class Model_PDF extends Helper_Model {
     /**
      * Display the PDF links on the entry detailed section of the admin area
      * @param  Integer $form_id Gravity Form ID
-     * @param  Array $lead    The entry information
+     * @param  Array $entry    The entry information
      * @return void
      * @since  4.0
      */
-    public function view_pdf_entry_detail($form_id, $lead) {
+    public function view_pdf_entry_detail($form_id, $entry) {
         $controller = $this->getController();
 
         /* Check if we have any PDFs */
-        $form = GFAPI::get_form($lead['form_id']);
-        $pdfs = (isset($form['gfpdf_form_settings'])) ? $this->get_active_pdfs($form['gfpdf_form_settings'], $lead) : array();
+        $form = GFAPI::get_form($entry['form_id']);
+        $pdfs = (isset($form['gfpdf_form_settings'])) ? $this->get_active_pdfs($form['gfpdf_form_settings'], $entry) : array();
 
         if(!empty($pdfs)) {
             $args = array('pdfs' => array());
 
             foreach($pdfs as $pdf) {
                 $args['pdfs'][] = array(
-                    'name' => $this->get_pdf_name($pdf, $lead),
-                    'url' => $this->get_pdf_url($pdf, $lead),
+                    'name' => $this->get_pdf_name($pdf, $entry),
+                    'url' => $this->get_pdf_url($pdf, $entry),
                 );
             }
 
@@ -332,43 +336,232 @@ class Model_PDF extends Helper_Model {
     /**
      * Generate the PDF Name
      * @param  Array $pdf  The PDF Form Settings
-     * @param  Array $lead The Gravity Form entry details
+     * @param  Array $entry The Gravity Form entry details
      * @return String      The PDF Name
      * @since  4.0
      */
-    public function get_pdf_name($pdf, $lead) {
-        $form = GFAPI::get_form($lead['form_id']);
-        return GFCommon::replace_variables($pdf['filename'], $form, $lead);
+    public function get_pdf_name($pdf, $entry) {
+        $form = GFAPI::get_form($entry['form_id']);
+        $name = GFCommon::replace_variables($pdf['filename'], $form, $entry);
+
+        /* add filter to modify PDF name */
+        $name = apply_filters('gfpdf_pdf_filename', $name, $form, $entry, $pdf);
+        $name = apply_filters('gfpdfe_pdf_filename', $name, $form, $entry, $pdf); /* backwards compat */
+
+        return $name;
     }
 
     /**
      * Create a PDF Link based on the current PDF settings and entry
      * @param  Array $pdf  The PDF Form Settings
-     * @param  Array $lead The Gravity Form entry details
+     * @param  Array $entry The Gravity Form entry details
      * @return String       Direct link to the PDF
      * @since  4.0
      */
-    public function get_pdf_url($pdf, $lead) {
-        return esc_url(home_url() . '/pdf/' . $pdf['id'] . '/' . $lead['id'] . '/');
+    public function get_pdf_url($pdf, $entry) {
+        return esc_url(home_url() . '/pdf/' . $pdf['id'] . '/' . $entry['id'] . '/');
     }
 
     /**
      * Filter out inactive PDFs and those who don't meet the conditional logic
      * @param  Array $pdfs The PDF settings array
-     * @param  Array $lead The current entry information
+     * @param  Array $entry The current entry information
      * @return Array       The filtered PDFs
      * @since 4.0
      */
-    public function get_active_pdfs($pdfs, $lead) {
+    public function get_active_pdfs($pdfs, $entry) {
         $filtered = array();
-        $form     = GFAPI::get_form($lead['form_id']);
+        $form     = GFAPI::get_form($entry['form_id']);
 
         foreach($pdfs as $pdf) {
-            if($pdf['active'] && GFCommon::evaluate_conditional_logic( $pdf['conditionalLogic'], $form, $lead)) {
+            if($pdf['active'] && GFCommon::evaluate_conditional_logic( $pdf['conditionalLogic'], $form, $entry)) {
                 $filtered[$pdf['id']] = $pdf;
             }
         }
 
         return $filtered;
+    }
+
+    /**
+     * Generate and save PDF to disk
+     * @param  Object $pdf The Helper_PDF object
+     * @return Boolean
+     * @since 4.0
+     */
+    public function process_and_save_pdf($pdf) {
+        /* Check that the PDF hasn't already been created this session */
+        if($this->does_pdf_exist($pdf)) {
+            try {
+                $pdf->init();
+                $pdf->renderHtml(Stat_Functions::get_template_args($pdf->getEntry(), $pdf->getSettings()));
+                $pdf->setOutputType('save');
+
+                /* Generate PDF */
+                $raw_pdf  = $pdf->generate();
+                $pdf->savePdf($raw_pdf);
+
+                return true;
+            } catch(Exception $e) {
+                /* Log Error */
+                return false;
+            }
+        }
+    }
+
+    /**
+     * Check if the form has any PDFs, generate them and attach to the notification
+     * @param  Array $notifications Gravity Forms Notification Array
+     * @param  Array $form
+     * @param  Array $entry
+     * @return Array
+     * @since 4.0
+     */
+    public function notifications($notifications, $form, $entry) {
+        $pdfs       = (isset($form['gfpdf_form_settings'])) ? $this->get_active_pdfs($form['gfpdf_form_settings'], $entry) : array();
+
+        if(sizeof($pdfs) > 0) {
+            /* set up classes */
+            $controller  = $this->getController();
+            $settingsAPI = new Model_Form_Settings();
+
+            /* loop through each PDF config and generate */
+            foreach($pdfs as $pdf) {
+                $settings = $settingsAPI->get_pdf( $entry['form_id'], $pdf['id']);
+
+                if(! is_wp_error($settings) && $this->maybe_attach_to_notification($notifications, $settings)) {
+                    $pdf = new Helper_PDF($entry, $settings);
+                    
+                    if($this->process_and_save_pdf($pdf)) {
+                        $pdf_path = $pdf->getPath() . $pdf->getFilename();
+
+                        if(is_file($pdf_path)) {
+                            $notifications['attachments'][] = $pdf_path;
+                        }
+                    }
+                }
+            }
+        }
+        return $notifications;
+    }
+
+    /**
+     * Determine if the PDF should be attached to the current notification
+     * @param  Array $notification The Gravity Form Notification currently being processed
+     * @param  Array $settings     The current Gravity PDF Settings
+     * @return Boolean
+     * @since 4.0
+     */
+    public function maybe_attach_to_notification($notification, $settings) {
+        if(isset($settings['notification']) && is_array($settings['notification'])) {
+            if(isset($notification['isActive']) && $notification['isActive'] && in_array($notification['name'], $settings['notification'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if the PDF should be saved to disk
+     * @param  Array $settings     The current Gravity PDF Settings
+     * @return Boolean
+     * @since 4.0
+     */
+    public function maybe_always_save_pdf($settings) {
+        if(strtolower($settings['save']) == 'yes') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Creates a PDF on every submission, except when the PDF is already created during the notification hook
+     * @param  Array $entry The GF Entry Details
+     * @param  Array $form  The Gravity Form
+     * @return void
+     * @since 4.0
+     */
+    public function maybe_save_pdf($entry, $form) {
+        $pdfs = (isset($form['gfpdf_form_settings'])) ? $this->get_active_pdfs($form['gfpdf_form_settings'], $entry) : array();
+
+        if(sizeof($pdfs) > 0) {
+            /* set up classes */
+            $controller  = $this->getController();
+            $settingsAPI = new Model_Form_Settings();
+
+            /* loop through each PDF config */
+            foreach($pdfs as $pdf) {
+                $settings = $settingsAPI->get_pdf( $entry['form_id'], $pdf['id']);
+
+                /* Only generate if the PDF wasn't created during the notification process */
+                if(! is_wp_error($settings)) {
+                    $pdf = new Helper_PDF($entry, $settings);
+
+                    /* Check that the PDF hasn't already been created this session */
+                    if($this->maybe_always_save_pdf($settings)) {
+                        $this->process_and_save_pdf($pdf);
+                    }
+
+                    /* Run an action users can tap into to manipulate the PDF */
+                    if($this->does_pdf_exist($pdf)) {
+                        do_action('gfpdf_post_pdf_save', $entry['form_id'], $entry['id'], $settings, $pdf->getPath() . $pdf->getFilename());
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Check if the current PDF to be processed already exists on disk
+     * @param  Object $pdf     The Helper_PDF Object
+     * @return Boolean
+     * @since  4.0
+     */
+    public function does_pdf_exist($pdf) {
+        $pdf->setPath();
+        $pdf->setFilename();
+
+        if(is_file( $pdf->getPath() . $pdf->getFilename())) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Remove the generated PDF from the server to save disk space
+     * @internal  In future we may give the option to cache PDFs to save on processing power
+     * @param  Array $entry The GF Entry Data
+     * @param  Array $form  The Gravity Form
+     * @return void
+     * @since 4.0
+     */
+    public function cleanup_pdf($entry, $form) {
+        $pdfs = (isset($form['gfpdf_form_settings'])) ? $this->get_active_pdfs($form['gfpdf_form_settings'], $entry) : array();
+
+        if(sizeof($pdfs) > 0) {
+            /* set up classes */
+            $controller  = $this->getController();
+            $settingsAPI = new Model_Form_Settings();
+
+            /* loop through each PDF config */
+            foreach($pdfs as $pdf) {
+                $settings = $settingsAPI->get_pdf( $entry['form_id'], $pdf['id']);
+
+                /* Only generate if the PDF wasn't during the notification process */
+                if(! is_wp_error($settings)) {
+                    $pdf = new Helper_PDF($entry, $settings);
+
+                    if($this->does_pdf_exist($pdf)) {
+                        try {
+                            Stat_Functions::rmdir($pdf->getPath());
+                        } catch(Exception $e) {
+                            /* Log to file */
+                        }
+                    }
+                }
+            }
+        }
     }
 }
