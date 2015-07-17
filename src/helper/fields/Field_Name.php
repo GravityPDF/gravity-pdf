@@ -72,7 +72,7 @@ class Field_Name extends Helper_Fields
      * @return String
      * @since 4.0
      */
-    public function html() {
+    public function html($value = '', $label = true) {
         $data  = array_filter($this->value()); /* remove any empty fields from the array */
         
         $value = esc_html(implode(' ', $data));

@@ -179,7 +179,7 @@ abstract class Helper_Fields {
      * @param  Boolean $label Whether or not to show the field's label
      * @since 4.0
      */
-    public function html($value, $label = true) {
+    public function html($value = '', $label = true) {
         
         $type = (!empty($this->field->inputType)) ? $this->field->inputType : $this->field->type;
 

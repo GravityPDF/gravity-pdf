@@ -71,7 +71,7 @@ class Field_List extends Helper_Fields
      * @return String
      * @since 4.0
      */
-    public function html() {
+    public function html($value = '', $label = true) {
 
         /* exit early if list field is empty */
         if($this->is_empty()) {

@@ -72,7 +72,7 @@ class Field_Email extends Helper_Fields
      * @return String
      * @since 4.0
      */
-    public function html() {
+    public function html($value = '', $label = true) {
         $value  = $this->value();
         
         $output = ( GFCommon::is_valid_email($value) ) ? '<a href="mailto:'. $value .'">'. esc_html($value) .'</a>' : esc_html($value);

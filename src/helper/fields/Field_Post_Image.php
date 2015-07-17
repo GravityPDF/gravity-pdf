@@ -71,7 +71,7 @@ class Field_Post_Image extends Helper_Fields
      * @return String
      * @since 4.0
      */
-    public function html() {
+    public function html($value = '', $label = true) {
         $value = $this->value();
 
         /* Start building image link */

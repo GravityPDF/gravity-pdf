@@ -72,7 +72,7 @@ class Field_Website extends Helper_Fields
      * @return String
      * @since 4.0
      */
-    public function html() {
+    public function html($value = '', $label = true) {
         $value  = $this->value();
         
         $output = ( GFCommon::is_valid_url($value) ) ? '<a href="'. esc_url($value) .'" target="_blank">'. esc_html($value) .'</a>' : esc_html($value);

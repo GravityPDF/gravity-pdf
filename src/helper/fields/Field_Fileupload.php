@@ -71,7 +71,7 @@ class Field_Fileupload extends Helper_Fields
      * @return String
      * @since 4.0
      */
-    public function html() {
+    public function html($value = '', $label = true) {
         $files = $this->value();
 
         if(sizeof($files) > 0) {

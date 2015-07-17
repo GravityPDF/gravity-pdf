@@ -72,7 +72,7 @@ class Field_Time extends Helper_Fields
      * @return String
      * @since 4.0
      */
-    public function html() {
+    public function html($value = '', $label = true) {
         $value = esc_html($this->value());
         
         return parent::html($value);

@@ -71,7 +71,7 @@ class Field_Html extends Helper_Fields
      * @return String
      * @since 4.0
      */
-    public function html() {
+    public function html($value = '', $label = true) {
         $html = wp_kses_post($this->value()); /* allow the same HTML as per the post editor */
 
         return parent::html($html, false);

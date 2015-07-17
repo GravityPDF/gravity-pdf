@@ -85,14 +85,14 @@ class Field_Section extends Helper_Fields
      * @return String
      * @since 4.0
      */
-    public function html($desc = false) {
+    public function html($value = '', $label = true) {
         /* sanitize the HTML */
         $section = $this->value(); /* allow the same HTML as per the post editor */
         
         $html    = '<div id="field-'. $this->field->id .'" class="gfpdf-section-title gfpdf-field">';
         $html    .= '<h3>' . esc_html($section['title']) .'</h3>';
 
-        if($desc) {
+        if(!empty($value)) {
             $html .= '<div id="field-'. $this->field->id .'-desc" class="gfpdf-section-description gfpdf-field">' . wp_kses_post($section['description']) . '</div>';
         }
 

@@ -72,7 +72,7 @@ class Field_Select extends Helper_Fields
      * @return String
      * @since 4.0
      */
-    public function html($value = false) {
+    public function html($value = '', $label = true) {
         $data   = $this->value();
        
         $output = ($value) ? $data['value'] : $data['label'];

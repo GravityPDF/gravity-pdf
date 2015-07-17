@@ -99,7 +99,7 @@ class Field_Survey extends Helper_Fields
      * @return String
      * @since 4.0
      */
-    public function html() {
+    public function html($value = '', $label = true) {
         echo $this->fieldObject->html();
     }
 

@@ -55,7 +55,7 @@ class Field_Rating extends Helper_Fields
      * @return String
      * @since 4.0
      */
-    public function html() {
+    public function html($value = '', $label = true) {
         $value = apply_filters('gform_entry_field_value', $this->get_value(), $this->field, $this->entry, $this->form);
 
         return parent::html($value);

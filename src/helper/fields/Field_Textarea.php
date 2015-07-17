@@ -66,7 +66,7 @@ class Field_Textarea extends Helper_Fields
         parent::__construct($field, $entry);
     }
 
-    public function html() {
+    public function html($value = '', $label = true) {
         $value = $this->value();
         
         return parent::html($value);

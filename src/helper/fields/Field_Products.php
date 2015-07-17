@@ -74,7 +74,7 @@ class Field_Products extends Helper_Fields
      * @return String
      * @since 4.0
      */
-    public function html() {
+    public function html($value = '', $label = true) {
         $products = $this->value();
         $form_id  = $this->form['id'];
 

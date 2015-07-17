@@ -72,7 +72,7 @@ class Field_Address extends Helper_Fields
      * @return String
      * @since 4.0
      */
-    public function html() {
+    public function html($value = '', $label = true) {
         $data    = $this->value(); /* remove any empty fields from the array */
         $address = array();
 
