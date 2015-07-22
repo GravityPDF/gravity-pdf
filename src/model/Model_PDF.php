@@ -237,7 +237,8 @@ class Model_PDF extends Helper_Model {
 
         if(!is_wp_error($action)) {
             /* check if the user is logged in but is not the current owner */
-            if(is_user_logged_in() && $this->is_current_pdf_owner($entry, 'logged_in') === false) {
+            if(is_user_logged_in() &&
+                ( ($gfpdf->options->get_option('limit_to_admin', 'No') == 'Yes') || ($this->is_current_pdf_owner($entry, 'logged_in') === false)) ) {
                 /* Handle permissions checks */
                  $admin_permissions = $gfpdf->options->get_option('admin_capabilities', array('gravityforms_view_entries'));
 

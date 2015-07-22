@@ -313,15 +313,15 @@ class Helper_Options implements Helper_Int_Filters {
 
 					'limit_to_admin' => array(
 						'id'      => 'limit_to_admin',
-						'name'    => __('Restrict Logged Out Users', 'gravitypdf'),
-						'desc'    => __("When enabled, only users who are logged in and have the above capability, or is the original owner, can view the PDF.", 'gravitypdf'),
+						'name'    => __('Restrict Owner', 'gravitypdf'),
+						'desc'    => __("When enabled, the original entry owner will NOT be able to view their PDF.", 'gravitypdf'),
 						'type'    => 'radio',
 						'options' => array(
 							'Yes'     => __('Yes', 'gravitypdf'),
 							'No'      => __('No', 'gravitypdf')
 						),
 						'std'     => __('No', 'gravitypdf'),
-						'tooltip' => '<h6>' . __('Restrict Logged Out Users', 'gravitypdf') . '</h6>' . __("Enable this option if you don't want any logged out users accessing the generated PDFs. Users will be prompted to login if needed.", 'gravitypdf'),
+						'tooltip' => '<h6>' . __('Restrict Owner', 'gravitypdf') . '</h6>' . __("Enable this option if you only want logged in users with the above capability to view PDFs.", 'gravitypdf'),
 					),
 
 					'logged_out_timeout' => array(
