@@ -1704,11 +1704,11 @@ class Helper_Options implements Helper_Int_Filters {
 	 * @return void
 	 */
 	public function conditional_logic_callback( $args ) {
-		$args['idOverride'] = esc_attr($args['id']) . '_conditional_logic';
+		$args['idOverride'] = 'gfpdf_conditional_logic';
 
 		$this->checkbox_callback($args);
 		
-		$html = '<div id="'. esc_attr($args['id']) .'_conditional_logic_container" class="gfpdf_conditional_logic">
+		$html = '<div id="gfpdf_conditional_logic_container" class="gfpdf_conditional_logic">
 			<!-- content dynamically created from form_admin.js -->
 		</div>';
 		

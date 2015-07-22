@@ -372,7 +372,7 @@
 				/* add GF JS filter to change the conditional logic object type */
 				gform.addFilter( 'gform_conditional_object', function(object, objectType) {
 					console.log(window.gfpdf_current_pdf);
-					if(objectType === 'pdf') {
+					if(objectType === 'gfpdf') {
 						return window.gfpdf_current_pdf;
 					}
 					return object;
@@ -381,14 +381,14 @@
 				/*
 				 * Add change event to conditional logic field
 				 */
-				$('#pdf_conditional_logic').change( function() {
+				$('#gfpdf_conditional_logic').change( function() {
 					/* only set up a .conditionalLogic object if it doesn't exist */
 					if(typeof window.gfpdf_current_pdf.conditionalLogic == 'undefined' && $(this).prop('checked')) {
 						window.gfpdf_current_pdf.conditionalLogic = new ConditionalLogic();
 					} else if(!$(this).prop('checked')) {
 						window.gfpdf_current_pdf.conditionalLogic = null;
 					}
-					ToggleConditionalLogic(false, 'pdf');
+					ToggleConditionalLogic(false, 'gfpdf');
 
 				}).trigger('change');
 
