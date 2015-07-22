@@ -60,7 +60,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			array(
 				'cb'      => '',
 				'name'    => __( 'Name', 'gravityforms' ),
-				'shortcode' => __('Shortcode', 'gravitypdf'),
+				'shortcode' => __('Download Shortcode', 'gravitypdf'),
 				'template' => __( 'Template', 'gravityforms' ),
 				'notifications' => __( 'Notifications', 'gravityforms' ),
 			),
