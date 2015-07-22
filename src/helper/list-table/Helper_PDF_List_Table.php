@@ -60,8 +60,9 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			array(
 				'cb'      => '',
 				'name'    => __( 'Name', 'gravityforms' ),
+				'shortcode' => __('Shortcode', 'gravitypdf'),
 				'template' => __( 'Template', 'gravityforms' ),
-				'notifications' => __( 'Notifications', 'gravityforms' )
+				'notifications' => __( 'Notifications', 'gravityforms' ),
 			),
 			array(),
 			array(),
@@ -142,7 +143,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$form_id     = rgget('id');
 		$state_nonce = wp_create_nonce("gfpdf_state_nonce_{$form_id}_{$item['id']}");
 		?>
-		<img data-id="<?php echo $item['id'] ?>" data-nonce="<?php echo $state_nonce; ?>" data-fid="<?php echo $form_id; ?>" src="<?php echo GFCommon::get_base_url() ?>/images/active<?php echo intval( $is_active ) ?>.png" style="cursor: pointer;margin:-5px 0 0 8px;" alt="<?php $is_active ? __( 'Active', 'gravitypdf' ) : __( 'Inactive', 'gravitypdf' ); ?>" title="<?php echo $is_active ? __( 'Active', 'gravitypdf' ) : __( 'Inactive', 'gravitypdf' ); ?>"/>
+		<img data-id="<?php echo $item['id'] ?>" data-nonce="<?php echo $state_nonce; ?>" data-fid="<?php echo $form_id; ?>" src="<?php echo GFCommon::get_base_url() ?>/images/active<?php echo intval( $is_active ) ?>.png" style="cursor: pointer;margin:-1px 0 0 8px;" alt="<?php $is_active ? __( 'Active', 'gravitypdf' ) : __( 'Inactive', 'gravitypdf' ); ?>" title="<?php echo $is_active ? __( 'Active', 'gravitypdf' ) : __( 'Inactive', 'gravitypdf' ); ?>"/>
 	<?php
 	}
 
@@ -159,6 +160,33 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		}
 
 		echo implode(', ', $item['notification']);
+	}
+
+	/**
+	 * Translates the template raw name to a user-friendly name
+	 * @param  array $item The table row being processed
+	 * @since 4.0
+	 */
+	public function column_shortcode( $item ) {
+		$shortcode = '[gravitypdf id="'. $item['id'] . '" text="' . __('Download PDF', 'gravitypdf') . '"]';
+		echo '<input type="text" class="gravitypdf_shortcode" value="'. esc_html($shortcode) .'" readonly="readonly" onfocus="jQuery(this).select();" onclick="jQuery(this).select();" />';
+	}
+
+	/**
+	 * Translates the template raw name to a user-friendly name
+	 * @param  array $item The table row being processed
+	 * @since 4.0
+	 */
+	public function column_template( $item ) {
+		global $gfpdf;
+
+		$template = $gfpdf->options->get_template_information($item['template']);
+
+		if(is_array($template) && isset($template['template'])) {
+			echo "<strong>{$template['group']} – </strong> {$template['template']}";
+		} else {
+			echo "<strong>{$template['group']}</strong> – " . Stat_Functions::human_readable(rgar( $item, 'template' ));
+		}
 	}
 
 	/**

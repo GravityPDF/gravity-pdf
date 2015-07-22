@@ -817,19 +817,6 @@ class Helper_Options implements Helper_Int_Filters {
 		$templates = array();
 		$legacy    = array();
 
-		/**
-		 * We load in data from the PDF template headers
-		 * @var array
-		 */
-		$headers = array(
-			'template'             => 'Template Name',
-			'version'              => 'Version',
-			'description'          => 'Description',
-			'author'               => 'Author',
-			'group'                => 'Group',
-			'required_pdf_version' => 'Required PDF Version',
-		);
-
 		$prefix_text      = __('User Templates: ', 'gravitypdf');
 		$legacy_text = __('Legacy', 'gravitypdf');
 
@@ -838,7 +825,7 @@ class Helper_Options implements Helper_Int_Filters {
 		 */
 		foreach(glob( $gfpdf->data->template_location . '*.php') as $filename) {
 
-			$info = get_file_data($filename, $headers);
+			$info = $this->get_template_headers($filename);
 			$file = basename($filename, '.php');
 
 			if(!empty($info['template'])) {
@@ -853,7 +840,7 @@ class Helper_Options implements Helper_Int_Filters {
 		 * We'll exclude any files starting with example-, and any files overridden by the user
 		 */
 		foreach($this->get_plugin_pdf_templates() as $filename) {
-			$info = get_file_data($filename, $headers);
+			$info = $this->get_template_headers($filename);
 			$file = basename($filename, '.php');
 			
 			/* only add core template if not being overridden by user template */
@@ -873,6 +860,65 @@ class Helper_Options implements Helper_Int_Filters {
 		}
 
 		return apply_filters('gfpdf_template_list', $templates);
+	}
+
+	/**
+	 * An array used to parse the template headers
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function get_template_header_details() {
+		/**
+		 * We load in data from the PDF template headers
+		 * @var array
+		 */
+		return apply_filters('gfpdf_template_header_details', array(
+			'template'             => 'Template Name',
+			'version'              => 'Version',
+			'description'          => 'Description',
+			'author'               => 'Author',
+			'group'                => 'Group',
+			'required_pdf_version' => 'Required PDF Version',
+		));
+	}
+
+	/**
+	 * Gets the template information based on the raw template name
+	 * @param  String $name The template to get information for
+	 * @return Array       The template information
+	 * @since 4.0
+	 */
+	public function get_template_information( $name ) {
+		global $gfpdf;
+
+		if( is_file( $gfpdf->data->template_location . $name . '.php')) {
+			$template = $this->get_template_headers($gfpdf->data->template_location . $name . '.php');
+			$template['group'] = __('User Templates: ', 'gravitypdf') . $template['group'];
+			return $template;
+		}
+
+		if( is_file( PDF_PLUGIN_DIR . 'initialisation/templates/' . $name . '.php')) {
+			return $this->get_template_headers(PDF_PLUGIN_DIR . 'initialisation/templates/' . $name . '.php');
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get the current template headers
+	 * @param  String $path The path to the file
+	 * @return Array        Details about the file
+	 * @since 4.0
+	 */
+	public function get_template_headers($path) {
+		$info = get_file_data($path, $this->get_template_header_details());
+
+		/* this is a legacy template */
+		if(empty($info['template'])) {
+			return array('group' => 'Legacy');
+		} else {
+			return $info;
+		}
 	}
 
     /**

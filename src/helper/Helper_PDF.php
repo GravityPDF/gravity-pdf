@@ -495,7 +495,7 @@ class Helper_PDF {
 
         /* Allow a user to change the current template if they have the appropriate capabilities */
         if(rgget('template') && is_user_logged_in() && GFCommon::current_user_can_any( 'gravityforms_edit_settings' )) {
-            $template = $this->get_template_filename(rgget('template'));
+            $template = $this->getExtension(rgget('template'));
         }
 
         /**
