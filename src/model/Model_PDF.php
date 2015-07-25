@@ -288,7 +288,7 @@ class Model_PDF extends Helper_Model {
                 foreach($pdfs as $pdf) {
                     $args['pdfs'][] = array(
                         'name' => $this->get_pdf_name($pdf, $entry),
-                        'url' => $this->get_pdf_url($pdf, $entry) . $download,
+                        'url' => $this->get_pdf_url($pdf['id'], $entry['id']) . $download,
                     );
                 }
 
@@ -298,7 +298,7 @@ class Model_PDF extends Helper_Model {
                 $pdf = array_shift($pdfs);
 
                 $args = array(
-                    'url' => $this->get_pdf_url($pdf, $entry) . $download,
+                    'url' => $this->get_pdf_url($pdf['id'], $entry['id']) . $download,
                 );
 
                 $controller->view->entry_list_pdf_single($args);
@@ -326,7 +326,7 @@ class Model_PDF extends Helper_Model {
             foreach($pdfs as $pdf) {
                 $args['pdfs'][] = array(
                     'name' => $this->get_pdf_name($pdf, $entry),
-                    'url' => $this->get_pdf_url($pdf, $entry),
+                    'url' => $this->get_pdf_url($pdf['id'], $entry['id']),
                 );
             }
 
@@ -354,13 +354,19 @@ class Model_PDF extends Helper_Model {
 
     /**
      * Create a PDF Link based on the current PDF settings and entry
-     * @param  Array $pdf  The PDF Form Settings
-     * @param  Array $entry The Gravity Form entry details
+     * @param  Integer $pid  The PDF Form Settings ID
+     * @param  Integer $id The Gravity Form entry ID
      * @return String       Direct link to the PDF
      * @since  4.0
      */
-    public function get_pdf_url($pdf, $entry) {
-        return esc_url(home_url() . '/pdf/' . $pdf['id'] . '/' . $entry['id'] . '/');
+    public function get_pdf_url($pid, $id, $esc = true) {
+        $url = home_url() . '/pdf/' . $pid . '/' . $id . '/';
+
+        if($esc) {
+            $url = esc_url($url);
+        }
+
+        return $url;
     }
 
     /**
