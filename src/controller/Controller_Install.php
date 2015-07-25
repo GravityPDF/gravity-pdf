@@ -20,12 +20,6 @@ use GFCommon;
  *
  */
 
-/*
- * This file is called before compatibility checks are run
- * We cannot add namespace support here which means no access
- * to the rest of the plugin
- */
-
 /* Exit if accessed directly */
 if (! defined('ABSPATH')) {
     exit;
