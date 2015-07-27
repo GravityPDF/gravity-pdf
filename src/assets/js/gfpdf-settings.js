@@ -465,10 +465,10 @@
 						button: {
 							text: $button.data( 'uploader-button-text' )
 						},
-						multiple: false
+						multiple: false,
 					});
 
-					/* When an image is selected, run a callback. */
+					/* When a file is selected, run a callback. */
 					file_frame.on( 'select', function() {
 						var selection = file_frame.state().get('selection');
 						selection.each( function( attachment, index ) {
@@ -700,7 +700,7 @@
 				}
 
 				/* setup fonts dialog */
-				this.wp_dialog($fontDialog, [], 500, 350);
+				this.wp_dialog($fontDialog, [], 500, 500);
 
 				$font.click(function() {
 					$fontDialog.wpdialog('open');

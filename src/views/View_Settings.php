@@ -118,7 +118,7 @@ class View_Settings extends Helper_View
              * Allow additional navigation to be added to the settings page
              * @since 3.8
              */
-            return apply_filters('gravitypdf_settings_navigation', $navigation);
+            return apply_filters('gfpdf_settings_navigation', $navigation);
     }
 
     /**

@@ -226,7 +226,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
             wp_enqueue_media();
         }
 
-        if(Stat\Stat_Functions::is_gfpdf_settings_tab('help')) {
+        if(Stat\Stat_Functions::is_gfpdf_settings_tab('help') || Stat\Stat_Functions::is_gfpdf_settings_tab('tools')) {
              wp_enqueue_script('gfpdf_js_backbone');
         }
 

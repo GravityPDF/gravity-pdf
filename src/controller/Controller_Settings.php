@@ -132,6 +132,9 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
         /* change capability needed to edit settings page */
         add_filter('option_page_capability_gfpdf_settings', array($this, 'edit_options_cap'));
         add_filter('gravitypdf_settings_navigation', array($this, 'disable_tools_on_view_cap'));
+
+        /* allow TTF and OTF uploads */
+        add_filter('upload_mimes', array($this, 'allow_font_uploads'));
     }
 
     /**
@@ -220,5 +223,17 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
 
             $this->model->install_templates();
         }
+    }
+
+    /**
+     * Add .ttf and .otf to upload whitelist
+     * @param  array  $mime_types
+     * @return array
+     * @since 4.0
+     */
+    public function allow_font_uploads( $mime_types = array() ) {
+        $mime_types['ttf|otf'] = 'application/octet-stream';
+           
+        return $mime_types;
     }
 }

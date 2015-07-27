@@ -68,7 +68,7 @@ class Model_Shortcodes extends Helper_Model {
             'entry'   => '',
         ), $attributes, 'gravitypdf');
 
-        $attributes = apply_filters('gravitypdf_shortcode_attributes', $attributes);
+        $attributes = apply_filters('gfpdf_gravityforms_shortcode_attributes', $attributes);
 
         /* Add Shortcake preview support */
         if ( isset($_POST['shortcode']) ) {

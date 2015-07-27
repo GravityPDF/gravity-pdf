@@ -42,7 +42,8 @@ $background_img      = (!empty($settings['background']))		? $settings['backgroun
 $first_header        = (!empty($settings['first_header'])) 		? GFPDF\Stat\Stat_Functions::fix_header_footer($settings['first_header']) : '';
 $header              = (!empty($settings['header'])) 			? GFPDF\Stat\Stat_Functions::fix_header_footer($settings['header']) : '';
 $footer              = (!empty($settings['footer'])) 			? GFPDF\Stat\Stat_Functions::fix_header_footer($settings['footer']) : '';
-$font_colour		 = (!empty($settings['font_colour'])) 		? $settings['font_colour'] : '#333';
+$font_colour         = (!empty($settings['font_colour'])) 		? $settings['font_colour'] : '#333';
+$font                = (!empty($settings['font'])) 		        ? $settings['font'] : 'DejavuSansCondensed';
 
 ?>
 
@@ -81,7 +82,7 @@ $font_colour		 = (!empty($settings['font_colour'])) 		? $settings['font_colour']
 		}
 
 		body {
-			font-family: Dejavu Sans, sans-serif;
+			font-family: <?php echo $font; ?>, sans-serif;
 			font-size: 9pt;
 		}
 

@@ -740,7 +740,7 @@ class Helper_Options implements Helper_Int_Filters {
 	 */
 	public function get_paper_size() {
 		return apply_filters( 'gfpdf_get_paper_size', array(
-			'Common Sizes' => array(
+			__('Common Sizes', 'gravitypdf') => array(
 				'A4'        => __('A4 (210 x 297mm)', 'gravitypdf'),
 				'letter'    => __('Letter (8.5 x 11in)', 'gravitypdf'),
 				'legal'     => __('Legal (8.5 x 14in)', 'gravitypdf'),
@@ -749,7 +749,7 @@ class Helper_Options implements Helper_Int_Filters {
 				'custom'    => __('Custom Paper Size', 'gravitypdf'),
 			),
 
-			'"A" Sizes' => array(
+			__('"A" Sizes', 'gravitypdf') => array(
 				'A0' => __('A0 (841 x 1189mm)', 'gravitypdf'),
 				'A1' => __('A1 (594 x 841mm)', 'gravitypdf'),
 				'A2' => __('A2 (420 x 594mm)', 'gravitypdf'),
@@ -762,7 +762,7 @@ class Helper_Options implements Helper_Int_Filters {
 				'A10' => __('A10 (26 x 37mm)', 'gravitypdf'),
 			),
 
-			'"B" Sizes' => array(
+			__('"B" Sizes', 'gravitypdf') => array(
 				'B0' => __('B0 (1414 x 1000mm)', 'gravitypdf'),
 				'B1' => __('B1 (1000 x 707mm)', 'gravitypdf'),
 				'B2' => __('B2 (707 x 500mm)', 'gravitypdf'),
@@ -776,7 +776,7 @@ class Helper_Options implements Helper_Int_Filters {
 				'B10' => __('B10 (44 x 31mm)', 'gravitypdf'),
 			),
 
-			'"C" Sizes' => array(
+			__('"C" Sizes', 'gravitypdf') => array(
 				'C0' => __('C0 (1297 x 917mm)', 'gravitypdf'),
 				'C1' => __('C1 (917 x 648mm)', 'gravitypdf'),
 				'C2' => __('C2 (648 x 458mm)', 'gravitypdf'),
@@ -790,7 +790,7 @@ class Helper_Options implements Helper_Int_Filters {
 				'C10' => __('C10 (40 x 28mm)', 'gravitypdf'),
 			),
 			
-			'"RA" and "SRA" Sizes' => array(
+			__('"RA" and "SRA" Sizes', 'gravitypdf') => array(
 				'RA0' => __('RA0 (860 x 1220mm)', 'gravitypdf'),
 				'RA1' => __('RA1 (610 x 860mm)', 'gravitypdf'),
 				'RA2' => __('RA2 (430 x 610mm)', 'gravitypdf'),
@@ -817,7 +817,7 @@ class Helper_Options implements Helper_Int_Filters {
 		$templates = array();
 		$legacy    = array();
 
-		$prefix_text      = __('User Templates: ', 'gravitypdf');
+		$prefix_text = __('User Templates: ', 'gravitypdf');
 		$legacy_text = __('Legacy', 'gravitypdf');
 
 		/**
@@ -873,12 +873,12 @@ class Helper_Options implements Helper_Int_Filters {
 		 * @var array
 		 */
 		return apply_filters('gfpdf_template_header_details', array(
-			'template'             => 'Template Name',
-			'version'              => 'Version',
-			'description'          => 'Description',
-			'author'               => 'Author',
-			'group'                => 'Group',
-			'required_pdf_version' => 'Required PDF Version',
+			'template'             => __('Template Name', 'gravitypdf'),
+			'version'              => __('Version', 'gravitypdf'),
+			'description'          => __('Description', 'gravitypdf'),
+			'author'               => __('Author', 'gravitypdf'),
+			'group'                => __('Group', 'gravitypdf'),
+			'required_pdf_version' => __('Required PDF Version', 'gravitypdf'),
 		));
 	}
 
@@ -892,7 +892,7 @@ class Helper_Options implements Helper_Int_Filters {
 		global $gfpdf;
 
 		if( is_file( $gfpdf->data->template_location . $name . '.php')) {
-			$template = $this->get_template_headers($gfpdf->data->template_location . $name . '.php');
+			$template          = $this->get_template_headers($gfpdf->data->template_location . $name . '.php');
 			$template['group'] = __('User Templates: ', 'gravitypdf') . $template['group'];
 			return $template;
 		}
@@ -935,15 +935,74 @@ class Helper_Options implements Helper_Int_Filters {
 	 * Parse our installed font files
 	 * @return array The array of fonts
 	 * @since 4.0
-	 * @todo
 	 */
 	public function get_installed_fonts() {
 		$fonts = array(
-			'dejavusans' => __('Dejavu Sans', 'gravitypdf'),
-			'dejavusansserif' => __('Dejavu Sans Serif', 'gravitypdf'),
+			__('Unicode', 'gravitypdf') => array(
+				'desjavusanscondensed'  => 'Dejavus Sans Condensed',
+				'desjavusans'           => 'Dejavus Sans',
+				'desjavuserifcondensed' => 'Dejavus Serif Condensed',
+				'desjavuserif'          => 'Dejavus Serif',
+				'desjavusansmono'       => 'Dejavus Sans Mono',
+				
+				'freesans'              => 'Free Sans',
+				'freemono'              => 'Free Mono',
+
+				'mph2bdamase'			=> 'MPH 2B Damase',
+			),
+			
+			__('Indic', 'gravitypdf')   => array(
+				'lohitkannada' => 'Lohit Kannada',
+				'pothana2000'  => 'Pothana2000',
+			),
+			
+			__('Arabic', 'gravitypdf')  => array(
+				'xbriyaz' => 'XB Riyaz',
+				'lateef' => 'Lateef',
+				'kfgqpcuthmantahanaskh' => 'Bahif Uthman Taha',
+			),
+			
+			__('Other', 'gravitypdf')   => array(
+				'estrangeloedessa' => 'Estrangelo Edessa (Syriac)',
+				'kaputaunicode'    => 'Kaputa (Sinhala)',
+				'abyssinicasil'    => 'Abyssinica SIL (Ethiopic)',
+				'aboriginalsans'   => 'Aboriginal Sans (Cherokee / Canadian)',
+				'jomolhari'        => 'Jomolhari (Tibetan)',
+				'sundaneseunicode' => 'Sundanese (Sundanese)',
+				'taiheritagepro'   => 'Tai Heritage Pro (Tai Viet)',
+				'aegean'           => 'Aegean (Greek)',
+				'quivira'          => 'Quivira (Greek)',
+				'eeyekunicode'     => 'Eeyek (Meetei Mayek)',
+				'lannaalif'        => 'Lanna Alif (Tai Tham)',
+				'daibannasilbook'  => 'Dai Banna SIL (New Tai Lue)',
+				'garuda'           => 'Garuda (Thai)',
+				'khmeros'          => 'Khmer OS (Khmer)',
+				'dhyana'           => 'Dhyana (Lao)',
+				'tharlon'          => 'TharLon (Myanmar / Burmese)',
+				'padaukbook'       => 'Padauk Book (Myanmar / Burmese)',
+				'zawgyi-one'       => 'Zawgyi One (Myanmar / Burmese)',
+				'ayar'             => 'Ayar Myanmar (Myanmar / Burmese)',
+			),
 		);
 
 		return apply_filters('gfpdf_font_list', $fonts);
+	}
+
+	/**
+	 * Get the font's display name from the font key
+	 * @param  String $font_key The font key to search for
+	 * @return Mixed (String / Object)           The font display name or WP_Error
+	 * @since 4.0
+	 */
+	public function get_font_display_name( $font_key ) {
+
+		foreach($this->get_installed_fonts() as $groups) {
+			if(isset($groups[ $font_key ])) {
+				return $groups[ $font_key ];
+			}
+		}
+
+		return new WP_Error('font_not_found', __('Could not find Gravity PDF Font'));
 	}
 
 	/**
@@ -1180,6 +1239,12 @@ class Helper_Options implements Helper_Int_Filters {
 	 * @since  4.0
 	 */
 	public function get_form_value($args = array()) {
+
+		/* if callbacks called directly */
+		if(isset($args['value'])) {
+			return $args['value'];
+		}
+
 		/* Get our global Gravity PDF Settings */
 		$options = $this->settings;
 
@@ -1617,15 +1682,16 @@ class Helper_Options implements Helper_Int_Filters {
 		
 		/* get selected value (if any) */
 		$value                = $this->get_form_value($args);
-		$uploader_title       = ($args['uploaderTitle'])        ? esc_attr($args['uploaderTitle']) : __('Select Media', 'gravitypdf');
-		$uploader_button_text = ($args['uploaderButtonText'])   ? esc_attr($args['uploaderButtonText']) : __('Select Media', 'gravitypdf');
+		$uploader_title       = (isset($args['uploaderTitle']))        ? esc_attr($args['uploaderTitle']) : __('Select Media', 'gravitypdf');
+		$uploader_button_text = (isset($args['uploaderButtonText']))   ? esc_attr($args['uploaderButtonText']) : __('Select Media', 'gravitypdf');
+		$button_text          = (isset($args['buttonText']))           ? esc_attr($args['buttonText']) : __('Upload File', 'gravitypdf');
 		$class                = (isset($args['inputClass'])) ? esc_attr($args['inputClass']) : '';
 		$required             = (isset($args['required']) && $args['required'] === true) ? 'required' : '';
 		$args['id']           = esc_attr($args['id']);
 		$size                 = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? esc_attr($args['size']) : 'regular';
 
 		$html = '<input type="text" class="' . $size . '-text gfpdf_settings_' . $args['id'] . ' '. $class .'" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" '. $required .' />';
-		$html .= '<span>&nbsp;<input type="button" class="gfpdf_settings_upload_button button-secondary" value="' . __( 'Upload File', 'gravitypdf' ) . '" data-uploader-title="'. $uploader_title . '" data-uploader-button-text="'. $uploader_button_text . '" /></span>';
+		$html .= '<span>&nbsp;<input type="button" class="gfpdf_settings_upload_button button-secondary" value="' . $button_text . '" data-uploader-title="'. $uploader_title . '" data-uploader-button-text="'. $uploader_button_text . '" /></span>';
 		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . wp_kses_post($args['desc']) . '</label></span>';
 
 		if(isset($args['tooltip'])) {
