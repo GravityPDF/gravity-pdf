@@ -473,7 +473,7 @@
 						var selection = file_frame.state().get('selection');
 						selection.each( function( attachment, index ) {
 							attachment = attachment.toJSON();
-							window.formfield.val(attachment.url);
+							window.formfield.val(attachment.url).change();
 						});
 					});
 

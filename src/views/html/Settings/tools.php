@@ -84,16 +84,25 @@ if (! defined('ABSPATH')) {
 
 	<div id="manage-font-files" title="<?php _e('Manage Fonts', 'gravitypdf'); ?>" style="display: none;">
 		<?php _e('Manage all your custom Gravity PDF fonts in one place.', 'gravitypdf'); ?> <strong><?php _e('Only .ttf and .otf font files are supported.', 'gravitypdf'); ?></strong>
-	  	<div id="font-list"><!-- backbone to manage font list --></div>
-	  	<div id="font-add-list"><!-- backbone managed --></div>
+	  	<div id="font-list">
+		  	<!-- backbone to manage font list -->
+		</div>
+	  	<div id="font-add-list">
+	  		<!-- backbone managed -->
+	  	</div>
 	</div>
 
 	<?php do_action('pdf-settings-tools'); ?>
 </div>
 
+<script type="text/template" id="GravityPDFFontsEmpty">
+	<div id="font-empty">
+		<?php printf( __('Looks bare in here!%s Click "Add Font" below to get started.', 'gravitypdf'), '<br>'); ?>
+	</div>
+</script>
 
 <script type="text/template" id="GravityPDFFonts">
-    <a href="#" class="font-name"><i class="fa fa-angle-right"></i><span><%= model.get('fontName') %></span></a>
+    <a href="#" class="font-name"><i class="fa fa-angle-right"></i><span name="font_name"><%= model.get('font_name') %></span></a>
     <div class="font-settings" style="display: none">
 
     	<form method="post">
@@ -105,31 +114,31 @@ if (! defined('ABSPATH')) {
 
     	<div class="font-selector">
     		<label><?php _e('Font Name', 'gravitypdf'); ?> <span class="gfield_required">*</span></label>
-    		<input type="text" required="required" value="<%= model.get('fontName') %>" name="font_name" class="regular-text font-name-field">
-    		<span class="gf_settings_description"><label><?php _e('Will only accept alphanumeric characters and spaces.', 'gravitypdf'); ?></label></span>
+    		<input type="text" required="required" value="<%= model.get('font_name') %>" name="font_name" class="regular-text font-name-field">
+    		<span class="gf_settings_description"><label><?php _e('Only alphanumeric characters and spaces are accepted.', 'gravitypdf'); ?></label></span>
     	</div>
 
 		<div class="font-selector">
 			<label><?php _e('Regular', 'gravitypdf'); ?> <span class="gfield_required">*</span></label>
-			<input type="text" value="<%= model.get('regular') %>" required="required" name="font_regular" class="regular-text">
+			<input type="text" value="<%= model.get('regular') %>" required="required" name="regular" class="regular-text">
 			<span><input type="button" data-uploader-button-text="<?php _e('Select Font', 'gravitypdf'); ?>" data-uploader-title="<?php _e('Select Font', 'gravitypdf'); ?>" value="<?php _e('Select Font', 'gravitypdf'); ?>" class="gfpdf_settings_upload_button button-secondary"></span>
 		</div>
 
 		<div class="font-selector">
 			<label><?php _e('Bold', 'gravitypdf'); ?></label>
-			<input type="text" value="<%= model.get('bold') %>" name="font_bold" class="regular-text">
+			<input type="text" value="<%= model.get('bold') %>" name="bold" class="regular-text">
 			<span><input type="button" data-uploader-button-text="<?php _e('Select Font', 'gravitypdf'); ?>" data-uploader-title="<?php _e('Select Font', 'gravitypdf'); ?>" value="<?php _e('Select Font', 'gravitypdf'); ?>" class="gfpdf_settings_upload_button button-secondary"></span>
 		</div>
 
 		<div class="font-selector">
 			<label><?php _e('Italics', 'gravitypdf'); ?></label>
-			<input type="text" value="<%= model.get('italics') %>" name="font_italics" class="regular-text">
+			<input type="text" value="<%= model.get('italics') %>" name="italics" class="regular-text">
 			<span><input type="button" data-uploader-button-text="<?php _e('Select Font', 'gravitypdf'); ?>" data-uploader-title="<?php _e('Select Font', 'gravitypdf'); ?>" value="<?php _e('Select Font', 'gravitypdf'); ?>" class="gfpdf_settings_upload_button button-secondary"></span>
 		</div>
 
 		<div class="font-selector">
 			<label><?php _e('Bold Italics', 'gravitypdf'); ?></label>
-			<input type="text" value="<%= model.get('bolditalics') %>" name="font_bold_italics" class="regular-text">
+			<input type="text" value="<%= model.get('bolditalics') %>" name="bolditalics" class="regular-text">
 			<span><input type="button" data-uploader-button-text="<?php _e('Select Font', 'gravitypdf'); ?>" data-uploader-title="<?php _e('Select Font', 'gravitypdf'); ?>" value="<?php _e('Select Font', 'gravitypdf'); ?>" class="gfpdf_settings_upload_button button-secondary"></span>
 		</div>
 
@@ -142,3 +151,7 @@ if (! defined('ABSPATH')) {
 
     <a href="#" class="delete-font"><i class="fa fa-trash-o"></i></a>
 </script>
+
+<div id="delete-confirm" title="<?php _e('Delete Font?', 'gravitypdf'); ?>" style="display: none;">
+        <?php printf(__("Warning! You are about to delete this Font. Select 'Delete' to delete, 'Cancel' to stop.", 'gravitypdf'), '<strong>', '</strong>'); ?>
+</div>

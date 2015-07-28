@@ -169,6 +169,14 @@
   cursor: pointer;
 }
 
+#manage-font-files #font-empty {
+    font-size: 14px;
+    font-style: italic;
+    line-height: 21px;
+    padding: 60px 0 15px;
+    text-align: center;
+}
+
 #manage-font-files #font-add-list:hover {
   color: #555;
 }
