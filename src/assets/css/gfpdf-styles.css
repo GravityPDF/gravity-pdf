@@ -139,6 +139,23 @@
 
 #manage-font-files li {
   border: 1px solid #CCC;
+  position: relative;
+}
+
+#manage-font-files li .delete-font {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 5px 10px;
+}
+
+#manage-font-files li .delete-font:hover {
+  background: #dc0606;
+  color: #FFF;
+}
+
+#manage-font-files input.invalid {
+  border: 1px solid red;
 }
 
 #manage-font-files .font-submit {
@@ -169,7 +186,7 @@
   text-decoration: none;
 }
 
-#manage-font-files li a .fa {
+#manage-font-files li a.font-name .fa {
   margin-right: 5px;
 }
 

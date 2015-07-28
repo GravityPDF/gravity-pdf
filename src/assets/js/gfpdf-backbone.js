@@ -7,11 +7,25 @@
 (function($) {
 
 	$(function() {
+		
+
+
 		/**
-		 * Write our backbone model/view/controller for the help API
+		 *
+		 *
+		 *
+		 *
+		 *
+		 *
+		 *
+		 *
+		 *
+		 *
 		 */
-		var help  = {}; // create namespace for our app
 		var tools = {}; // create namespace for our app
+
+
+
 
 		tools.FontsModel = Backbone.Model.extend({
 			defaults: {
@@ -20,16 +34,55 @@
 				bold: '',
 				italics: '',
 				bolditalics: ''
+			},
+
+			save: function(options) {
+				/* write custom save code here */
+			    var $params = {
+			        emulateJSON: true,
+			        data: {
+			                 action: 'your_wp_ajax_action',
+			                 payload : this.toJSON()
+			              }
+			        };
+
+			    return Backbone.sync( 'update', this, $params );
+			},
+
+			destroy: function(options) {
+				/* write custom delete code here */
+				var $params = {
+			        emulateJSON: true,
+			        data: {
+			                 action: 'your_wp_ajax_action',
+			                 payload : this.toJSON()
+			              }
+			        };
+
+			    return Backbone.sync( 'delete', this, $params );
 			}
 		});
+
+
+
+
+
 
 		tools.FontsCollection = Backbone.Collection.extend({
-			model: tools.FontsModel,
-
-			initialize: function(models, options) {
-
-			}
+			model: tools.FontsModel
 		});
+
+
+
+
+
+
+
+
+
+
+
+
 
 		tools.FontsContainerView = Backbone.View.extend({
 			el: '#font-list',
@@ -44,7 +97,7 @@
 			render: function() {
 				this.$el.html(''); /* reset HTML view */
 
-				this.collection.each(function(font){
+				this.collection.each(function(font) {
 					this.addRender(font);
 				}, this);
 
@@ -59,6 +112,9 @@
 			}
 		});
 
+
+
+
 		tools.FontView = Backbone.View.extend({
 			tagName: 'li',
 
@@ -66,8 +122,13 @@
 
 			events: {
 				'click .font-name' : 'toggleView',
+				
 				'keyup .font-name-field': 'updateModelName',
 				'change .font-name-field': 'updateModelName',
+				
+				'click .delete-font': 'deleteModel',
+
+				'submit form': 'formSubmission',
 			},
 
 			initialize: function() {
@@ -108,14 +169,104 @@
 
 			updateDOM: function(model) {
 				this.$el.find('a.font-name span').html(model.get('fontName'));
+			},
+
+			formSubmission: function(ev) {
+
+				/* allow native validation without submitting actual form */
+				ev.preventDefault();
+
+				var $form = $(ev.currentTarget);
+
+				/* check if the native form validation is a success */
+				if(ev.currentTarget.checkValidity()) {
+					/* grab a json version of our form */
+					var object = $form.serializeJSON();
+
+					/* validate if our fonts are TTF or OTF files */
+					if(this.validateFonts(object, $form)) {
+						/* everything is valid, let's save the model */
+						this.model.save();
+					}
+				}
+			},
+
+			validateFonts: function(formObject, $form) {
+
+				/* set validation to true and any that fail will mark as false */
+				var validation = true;
+
+				/* set up an object with our key-value pairs refering to the input data */
+				var fonts = {
+					font_regular: 		formObject.font_regular,
+					font_bold: 			formObject.font_bold,
+					font_italics: 		formObject.font_italics,
+					font_bold_italics: 	formObject.font_bold_italics,
+				};
+
+				/* set up an error message */
+				$error = $('<span class="gf_settings_description"><label>Only TTF and OTF font files are supported.</label></span>');
+
+				$.each( fonts, $.proxy(function( index, font ) {
+
+					var $input = $form.find('input[name="' + index + '"]');
+
+					if(font.length > 0 && this.isValidFile(font) === false) {
+						/* mark our global validation as false */
+						validation = false;
+
+						/* tell user about error */
+						if(! $input.hasClass('invalid')) {
+							$input.addClass('invalid').next().after($error.clone());
+						}
+					} else {
+						/* remove validation error */
+						if($input.hasClass('invalid')) {
+							$input.removeClass('invalid').next().next().remove();
+						}
+					}
+				}, this));
+
+				return validation;
+			},
+
+			isValidFile: function(font) {
+				/* check if the value could contain enough characters to be valid */
+				if(font.length < 5) {
+					return false;
+				}
+
+				/* get the last 4 characters and convert to lower case */
+				var extension = font.substr(font.length - 4).toLowerCase();
+
+				/* check if they match a TTF or OTF font file */
+				if(extension === '.ttf' || extension === '.otf') {
+					return true;
+				}
+
+				return false;
+			},
+
+			deleteModel: function(ev) {
+
+				/* get the view container */
+				$container = $(ev.currentTarget).parent();
+
+				/* hide the container */
+				$container.hide();
+
+				/* do our AJAX delete call */
+				this.model.destroy();
+
+				return false;
 			}
 		});
+
+
 
 		tools.FontAddView = Backbone.View.extend({
 
 			el: '#font-add-list',
-
-			className: 'add-new-font',
 
 			events: {
 				'click': 'addFont',
@@ -134,9 +285,39 @@
 				var elm = new tools.FontsModel();
 				this.collection.add(elm);
 				this.container.$el.find('li:last .font-settings').toggle()
-							  .find('input:first').focus();
+							  .find('input[type="text"]:first').focus();
 			}
-		})
+		});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		/**
+		 *
+		 *
+		 *
+		 *
+		 *
+		 *
+		 *
+		 *
+		 *
+		 *
+		 */
+		
+		var help  = {}; // create namespace for our app
 
 		help.SearchModel = Backbone.Model.extend({});
 

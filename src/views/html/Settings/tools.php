@@ -96,38 +96,49 @@ if (! defined('ABSPATH')) {
     <a href="#" class="font-name"><i class="fa fa-angle-right"></i><span><%= model.get('fontName') %></span></a>
     <div class="font-settings" style="display: none">
 
+    	<form method="post">
+
+    	<input type="hidden" name="action" value="gfpdf_font_update" />
+    	<input type="hidden" name="cid" value="<%= model.cid %>" />
+    	<input type="hidden" name="id" value="<%= model.get('id') %>" />
+    	<?php wp_nonce_field( 'gfpdf_font_nonce' ); ?>
+
     	<div class="font-selector">
     		<label><?php _e('Font Name', 'gravitypdf'); ?> <span class="gfield_required">*</span></label>
-    		<input type="text" required="required" value="<%= model.get('fontName') %>" name="font-name-<%= model.cid %>" class="regular-text font-name-field">
+    		<input type="text" required="required" value="<%= model.get('fontName') %>" name="font_name" class="regular-text font-name-field">
     		<span class="gf_settings_description"><label><?php _e('Will only accept alphanumeric characters and spaces.', 'gravitypdf'); ?></label></span>
     	</div>
 
 		<div class="font-selector">
 			<label><?php _e('Regular', 'gravitypdf'); ?> <span class="gfield_required">*</span></label>
-			<input type="text" value="<%= model.get('regular') %>" required="required" name="font-regular-url-<%= model.cid %>" class="regular-text">
+			<input type="text" value="<%= model.get('regular') %>" required="required" name="font_regular" class="regular-text">
 			<span><input type="button" data-uploader-button-text="<?php _e('Select Font', 'gravitypdf'); ?>" data-uploader-title="<?php _e('Select Font', 'gravitypdf'); ?>" value="<?php _e('Select Font', 'gravitypdf'); ?>" class="gfpdf_settings_upload_button button-secondary"></span>
 		</div>
 
 		<div class="font-selector">
 			<label><?php _e('Bold', 'gravitypdf'); ?></label>
-			<input type="text" value="<%= model.get('bold') %>" name="font-bold-url-<%= model.cid %>" class="regular-text">
+			<input type="text" value="<%= model.get('bold') %>" name="font_bold" class="regular-text">
 			<span><input type="button" data-uploader-button-text="<?php _e('Select Font', 'gravitypdf'); ?>" data-uploader-title="<?php _e('Select Font', 'gravitypdf'); ?>" value="<?php _e('Select Font', 'gravitypdf'); ?>" class="gfpdf_settings_upload_button button-secondary"></span>
 		</div>
 
 		<div class="font-selector">
 			<label><?php _e('Italics', 'gravitypdf'); ?></label>
-			<input type="text" value="<%= model.get('italics') %>" name="font-italics-url-<%= model.cid %>" class="regular-text">
+			<input type="text" value="<%= model.get('italics') %>" name="font_italics" class="regular-text">
 			<span><input type="button" data-uploader-button-text="<?php _e('Select Font', 'gravitypdf'); ?>" data-uploader-title="<?php _e('Select Font', 'gravitypdf'); ?>" value="<?php _e('Select Font', 'gravitypdf'); ?>" class="gfpdf_settings_upload_button button-secondary"></span>
 		</div>
 
 		<div class="font-selector">
 			<label><?php _e('Bold Italics', 'gravitypdf'); ?></label>
-			<input type="text" value="<%= model.get('bolditalics') %>" name="font-bold-italics-url-<%= model.cid %>" class="regular-text">
+			<input type="text" value="<%= model.get('bolditalics') %>" name="font_bold_italics" class="regular-text">
 			<span><input type="button" data-uploader-button-text="<?php _e('Select Font', 'gravitypdf'); ?>" data-uploader-title="<?php _e('Select Font', 'gravitypdf'); ?>" value="<?php _e('Select Font', 'gravitypdf'); ?>" class="gfpdf_settings_upload_button button-secondary"></span>
 		</div>
 
 		<div class="font-submit">
 			<button class="button button-primary"><?php _e('Save Font', 'gravitypdf'); ?></button>
 		</div>
+
+		</form>
     </div>
+
+    <a href="#" class="delete-font"><i class="fa fa-trash-o"></i></a>
 </script>
