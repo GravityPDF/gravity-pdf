@@ -5,6 +5,8 @@ namespace GFPDF\Model;
 use GFPDF\Helper\Helper_Model;
 use GFPDF\Stat\Stat_Functions;
 
+use GFCommon;
+
 /**
  * Settings Model
  *
@@ -125,22 +127,6 @@ class Model_Settings extends Helper_Model {
     }
 
     /**
-     * Load Recent forum articles meta box
-     * @param Object $object The metabox object
-     * @return void
-     * @since 4.0
-     */
-    public function process_meta_pdf_recent_forum_articles($object) {
-        $controller = $this->getController();
-
-        /* get our list of recent forum topics */
-        $latest     = $this->get_latest_forum_topics();
-
-        /* call view to render topics */
-        $controller->view->add_meta_pdf_recent_forum_articles($object, $latest);
-    }
-
-    /**
      * Install the files stored in /initialisation/template/ to the user's template directory
      * @return Boolean
      * @since 4.0
@@ -156,6 +142,308 @@ class Model_Settings extends Helper_Model {
         $gfpdf->notices->add_notice(sprintf(__('Gravity PDF Custom Templates successfully installed to %s.', 'gravitypdf'), '<code>' . Stat_Functions::relative_path($gfpdf->data->template_location) . '</code>'));
         $gfpdf->options->update_option('custom_pdf_template_files_installed', true);
         return true;
+    }
+
+    /**
+     * AJAX Endpoint for saving the custom font
+     * @return void
+     * @since 4.0
+     */
+    public function save_font() {
+
+        /* prevent unauthorized access */
+        $this->ajax_font_validation();
+
+        /* Handle the validation and saving of the font */
+        $results = $this->process_font($_POST['payload']);
+
+        /* If we reached this point the results were successful so return the new object */
+        echo json_encode($results);
+        wp_die();
+    }
+
+    /**
+     * AJAX Endpoint for deleting a custom font
+     * @return void
+     * @since 4.0
+     */
+    public function delete_font() {
+        global $gfpdf;
+       
+        /* prevent unauthorized access */
+        $this->ajax_font_validation();
+
+        /* Get the required details for deleting fonts */
+        $id    = $_POST['id'];
+        $fonts = $gfpdf->options->get_option('custom_fonts');
+
+        /* Check font actually exists and remove */
+        if(isset($fonts[$id])) {
+
+            if($this->remove_font_file($fonts[$id])) {
+                unset($fonts[$id]);
+
+                if($gfpdf->options->update_option('custom_fonts', $fonts)) {
+                    /* Success */
+                    echo json_encode(array('success' => true));
+                    wp_die();
+                }
+            }
+        }
+
+        header('HTTP/1.1 400 Bad Request');
+
+        $return = array(
+            'error' => __('Could not delete Gravity PDF font correctly. Please try again.', 'gravitypdf')
+        );
+
+        echo json_encode($return);
+        wp_die();
+    }
+
+    /**
+     * Check a user is authorized to make modifications via this endpoint and
+     * that there is a valid nonce
+     * @return void
+     * @since  4.0
+     */
+    private function ajax_font_validation() {
+        /* prevent unauthorized access */
+        if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+            /* fail */
+            header('HTTP/1.1 401 Unauthorized');
+            wp_die('401');
+        }
+
+        /*
+         * Validate Endpoint
+         */
+        $nonce    = $_POST['nonce'];
+        $nonce_id = 'gfpdf_font_nonce';
+
+        if(! wp_verify_nonce( $nonce, $nonce_id )) {
+            /* fail */
+            header('HTTP/1.1 401 Unauthorized');
+            wp_die('401');
+        }
+    }
+
+    /**
+     * Removes the current font's TTF or OTF files from our font directory
+     * @param  Array $fonts The font config
+     * @return Boolean        True on success, false on failure
+     * @since  4.0
+     */
+    public function remove_font_file($fonts) {
+        global $gfpdf;
+
+        $fonts = array_filter($fonts);
+        $types = array('regular', 'bold', 'italics', 'bolditalics');
+
+        foreach($types as $type) {
+            if(isset($fonts[$type])) {
+                $filename = basename($fonts[$type]);
+
+                if(is_file($gfpdf->data->template_font_location . $filename) && !unlink($gfpdf->data->template_font_location . $filename)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public function process_font($font) {
+        global $gfpdf;
+        
+        /* remove any empty fields */
+        $font = array_filter($font);
+
+        /* Check we have the required data */
+        if(!isset($font['font_name']) || !isset($font['regular']) ||
+           strlen($font['font_name']) === 0 || strlen($font['regular']) === 0)  {
+           
+            header('HTTP/1.1 400 Bad Request');
+
+            $return = array(
+                'error' => __('Required fields have not been included.', 'gravitypdf')
+            );
+
+            echo json_encode($return);
+            wp_die();
+        }
+
+        /* Check we have a valid font name */
+        $name = $font['font_name'];
+
+        if(! $this->is_font_name_valid($name)) {
+
+            header('HTTP/1.1 400 Bad Request');
+            
+            $return = array(
+                'error' => __('Font name is not valid. Only alphanumeric characters and spaces are accepted.', 'gravitypdf')
+            );
+
+            echo json_encode($return);
+            wp_die();
+        }
+
+        /* Check the font name is unique */
+        $shortname = $gfpdf->options->get_font_short_name($name);
+        $id = (isset($font['id'])) ? $font['id'] : '';
+
+        if( ! $this->is_font_name_unique($shortname, $id)) {
+            
+            header('HTTP/1.1 400 Bad Request');
+            
+            $return = array(
+                'error' => __('A font with the same name already exists. Try a different name.', 'gravitypdf')
+            );
+
+            echo json_encode($return);
+            wp_die();
+        }
+
+        /* Move fonts to our Gravity PDF font folder */
+        $installation = $this->install_fonts($font);
+
+        /* Check if any errors occured installing the fonts */
+        if(isset($installation['errors'])) {
+            
+            header('HTTP/1.1 400 Bad Request');
+            
+            $return = array(
+                'error' => $installation
+            );
+
+            echo json_encode($return);
+            wp_die();
+        }
+
+        /* If we got here the installation was successful so return the data */
+        return $installation;
+    }
+
+    /**
+     * Check that the font name passed conforms to our expected nameing convesion
+     * @param  String  $name The font name to check
+     * @return boolean       True on valid, false on failure
+     * @since 4.0
+     */
+    public function is_font_name_valid($name) {
+
+        $regex = '^[A-Za-z0-9 ]+$';
+
+        if(preg_match("/$regex/", $name)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Query our custom fonts options table and check if the font name already exists
+     * @param  String $name The font name to check
+     * @param  Integer $id The configuration ID (if any)
+     * @return boolean True if valid, false on failure
+     */
+    public function is_font_name_unique($name, $id = '') {
+        global $gfpdf;
+
+        /* Loop through default fonts and check for duplicate */
+        $default_fonts = $gfpdf->options->get_installed_fonts();
+
+        foreach($default_fonts as $group) {
+            if(isset($group[$name])) {
+                return false;
+            }
+        }
+
+        /* Loop through custom fonts and check for duplicate */
+        $custom_fonts  = $gfpdf->options->get_option('custom_fonts');
+
+        if(is_array($custom_fonts)) {
+            foreach($custom_fonts as $font) {
+                /* skip over itself */
+                if(! empty($id) && $font['id'] == $id) {
+                    continue;
+                }
+
+                if($gfpdf->options->get_font_short_name($font['font_name']) == $name) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public function install_fonts($fonts) {
+        global $gfpdf;
+
+        $types = array('regular', 'bold', 'italics', 'bolditalics');
+        $errors = array();
+
+        foreach($types as $type) {
+
+            /* Check if a key exists for this type and process */
+            if( isset($fonts[$type])) {
+                $path = Stat_Functions::convert_url_to_path( $fonts[$type] );
+
+                /* Couldn't find file so throw error */
+                if(is_wp_error($path)) {
+                    $errors[] = sprintf(__('Could not locate font on web server: %s', 'gravitypdf'), $fonts[$type]);
+                }
+
+                /* Copy font to our fonts folder */
+                $filename = basename($path);
+                if( !is_file($gfpdf->data->template_font_location . $filename) && ! copy($path, $gfpdf->data->template_font_location . $filename)) {
+                    $errors[] = sprintf(__('There was a problem installing the font %s. Please try again.', 'gravitypdf'), $filename);
+                }
+            }
+        }
+
+        /* If errors were found then return */
+        if(sizeof($errors) > 0) {
+            return array('errors' => $errors);
+        } else {
+            /* Insert our font into the database */
+            $custom_fonts  = $gfpdf->options->get_option('custom_fonts');
+
+            /* Prepare our font data and give it a unique id */
+            if(empty($fonts['id'])) {
+                $id                = uniqid();
+                $fonts['id']       = $id;
+            }
+
+            $custom_fonts[$fonts['id']] = $fonts;
+
+            /* Update our font database */
+            $gfpdf->options->update_option('custom_fonts', $custom_fonts);
+        }
+
+        /* Fonts sucessfully installed so return font data */
+        return $fonts;
+    }
+
+
+
+
+
+    /**
+     * Load Recent forum articles meta box
+     * @param Object $object The metabox object
+     * @return void
+     * @since 4.0
+     */
+    public function process_meta_pdf_recent_forum_articles($object) {
+        $controller = $this->getController();
+
+        /* get our list of recent forum topics */
+        $latest     = $this->get_latest_forum_topics();
+
+        /* call view to render topics */
+        $controller->view->add_meta_pdf_recent_forum_articles($object, $latest);
     }
 
     /**

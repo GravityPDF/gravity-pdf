@@ -156,6 +156,10 @@ class Helper_Data {
      * @since  4.0
      */
     public function get_localised_script_data() {
+        global $gfpdf;
+
+        $custom_fonts = array_values($gfpdf->options->get_custom_fonts());
+
         return apply_filters('gfpdf_localised_script_array', array(
             'ajaxurl'                     => admin_url( 'admin-ajax.php' ),
             'GFbaseUrl'                   => GFCommon::get_base_url(),
@@ -172,6 +176,9 @@ class Helper_Data {
             'conditionalText'             => __('Enable this PDF if', 'gravitypdf'),
             'help_search_placeholder'     => __('Search the Gravity PDF Knowledgebase...', 'gravitypdf'),
             'ajax_error'                  => __('There was an error processing your request. Please try again.', 'gravitypdf'),
+            'update_success'              => __('Successfully Updated', 'gravitypdf'),
+            'delete_success'              => __('Successfully Deleted', 'gravitypdf'),
+            'custom_fonts'                => json_encode($custom_fonts),
         ));
     }
 }

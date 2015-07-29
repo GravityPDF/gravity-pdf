@@ -137,6 +137,10 @@
   margin: 10px 0;
 }
 
+#manage-font-files div.updated {
+  margin-top: 0;
+}
+
 #manage-font-files li {
   border: 1px solid #CCC;
   position: relative;
@@ -218,6 +222,21 @@
 
 #manage-font-files .regular-text  {
   width: 16em;
+}
+
+#manage-font-files .css-usage {
+  text-align: center;
+}
+
+#manage-font-files .css-usage input {
+  width: 100%;
+  text-align: center;
+}
+
+#manage-font-files .css-usage pre {
+  margin: 5px 0;
+  background: #EEE;
+  padding: 7.5px;
 }
 
 /**
@@ -487,7 +506,7 @@
   vertical-align: top;
 }
 
-#pdf-form-settings .gfpdf-spinner {
+.forms_page_gf_settings .gfpdf-spinner {
   padding-left: 5px;
   vertical-align: middle;
   width: 20px;

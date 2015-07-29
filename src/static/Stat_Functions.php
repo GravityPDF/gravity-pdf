@@ -301,4 +301,49 @@ class Stat_Functions
             'settings' => $settings,
         ), $entry, $settings, $form);
     }
+
+    /**
+     * Attempt to convert the current URL to an internal path
+     * @param  String $url The Url to convert
+     * @return Mixed (String / Object)      Path on success or WP_Error on failure
+     * @since  4.0
+     */
+    public static function convert_url_to_path($url) {
+
+        /* Mostly we'll be accessing files in the upload directory, so attempt that first */
+        $upload = wp_upload_dir();
+
+        $try_path = str_replace($upload['baseurl'], $upload['basedir'], $url);
+
+        if(is_file($try_path)) {
+            return $try_path;
+        }
+
+        /* If WP_CONTENT_DIR and WP_CONTENT_URL are set we'll try them */
+        if(defined('WP_CONTENT_DIR') && defined('WP_CONTENT_URL')) {
+            $try_path = str_replace(WP_CONTENT_URL, WP_CONTENT_DIR, $url);
+
+            if(is_file($try_path)) {
+                return $try_path;
+            }
+        }
+
+        /* If that didn't work let's try use home_url() and get_home_path() */
+        $try_path = str_replace(home_url(), get_home_path(), $url);
+
+        if(is_file($try_path)) {
+            return $try_path;
+        }
+
+        /* If that didn't work let's try use site_url() and ABSPATH */
+        $try_path = str_replace(site_url(), ABSPATH, $url);
+
+        if(is_file($try_path)) {
+            return $try_path;
+        }
+
+        /* If we are here we couldn't locate the file */
+        return new WP_Error('file_not_found');
+
+    }
 }

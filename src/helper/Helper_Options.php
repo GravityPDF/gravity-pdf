@@ -939,11 +939,11 @@ class Helper_Options implements Helper_Int_Filters {
 	public function get_installed_fonts() {
 		$fonts = array(
 			__('Unicode', 'gravitypdf') => array(
-				'desjavusanscondensed'  => 'Dejavus Sans Condensed',
-				'desjavusans'           => 'Dejavus Sans',
-				'desjavuserifcondensed' => 'Dejavus Serif Condensed',
-				'desjavuserif'          => 'Dejavus Serif',
-				'desjavusansmono'       => 'Dejavus Sans Mono',
+				'dejavusanscondensed'  => 'Dejavus Sans Condensed',
+				'dejavusans'           => 'Dejavus Sans',
+				'dejavuserifcondensed' => 'Dejavus Serif Condensed',
+				'dejavuserif'          => 'Dejavus Serif',
+				'dejavusansmono'       => 'Dejavus Sans Mono',
 				
 				'freesans'              => 'Free Sans',
 				'freemono'              => 'Free Mono',
@@ -987,6 +987,35 @@ class Helper_Options implements Helper_Int_Filters {
 
 		return apply_filters('gfpdf_font_list', $fonts);
 	}
+
+	/**
+	 * Get a list of the custom fonts installed
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function get_custom_fonts() {
+		$fonts = $this->get_option('custom_fonts');
+
+		if(is_array($fonts) && sizeof($fonts) > 0) {
+			foreach($fonts as &$font) {
+				$font['shortname'] = $this->get_font_short_name($font['font_name']);
+			}
+
+			return $fonts;
+		}
+
+		return array();
+	}
+
+    /**
+     * Get font shortname we can use an in array
+     * @param  String $name The font name to convert
+     * @return String       Shortname of font
+     * @since  4.0
+     */
+    public function get_font_short_name($name) {
+        return mb_strtolower(str_replace(' ', '', $name), 'UTF-8');
+    }
 
 	/**
 	 * Get the font's display name from the font key

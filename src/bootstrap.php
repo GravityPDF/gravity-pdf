@@ -136,8 +136,8 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
      * @return void
      */
     public function add_actions() {
-        add_action('init', array($this, 'register_assets'), 10);
-        add_action('init', array($this, 'load_assets'), 15);
+        add_action('init', array($this, 'register_assets'), 500);
+        add_action('init', array($this, 'load_assets'), 600);
 
         /* load our modules */
         add_action('init', array($this, 'init_settings_api'));

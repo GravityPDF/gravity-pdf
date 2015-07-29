@@ -109,6 +109,12 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
         /* Process the tool tab actions */
         add_action('admin_init', array($this, 'process_tool_tab_actions'));
 
+        /**
+         * Add AJAX Action Endpoints
+         */
+        add_action( 'wp_ajax_gfpdf_font_save', array($this->model, 'save_font') );
+        add_action( 'wp_ajax_gfpdf_font_delete', array($this->model, 'delete_font') );
+
     }
 
     /**

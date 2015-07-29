@@ -883,7 +883,7 @@ class Model_Form_Settings extends Helper_Model {
         $settings = $this->setup_custom_appearance_settings($class);
 
         /**
-         * Had issues displaying multiple wp_editors via AJAX. In the interim we'll display appropriate message for that field
+         * Had issues displaying multiple wp_editors via AJAX. In the interim we'll display appropriate message about saving / reloading the page
          * @TODO: in future would like to correctly load WP_Editor via AJAX. Pull requests welcome
          */
         foreach($settings as &$field) {

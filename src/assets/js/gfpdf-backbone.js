@@ -57,42 +57,52 @@
 			 * Route save through ajax-admin.php which doesn't support standard
 			 * REST API features. Emulate POST and JSON data structures.
 			 * @param  Object options
+			 * @param  Object additional configuration options
 			 * @return Object
 			 * @since 4.0
 			 */
-			save: function(options) {
+			save: function(options, config) {
 				
-			    var $params = {
+			    var params = {
 			    	emulateHTTP: true,
 			        emulateJSON: true,
 			        data: {
 			                 action: 'gfpdf_font_save',
+			                 nonce: options.nonce,
 			                 payload : this.toJSON()
 			              }
-			        };
+			    };
 
-			    return Backbone.sync( 'update', this, $params );
+			    /* Merge out two objects together */
+			    $.extend(params, config);
+
+			    return Backbone.sync( 'update', this, params );
 			},
 
 			/**
 			 * Route delete through ajax-admin.php which doesn't support standard
 			 * REST API features. Emulate POST and JSON data structures.
 			 * @param  Object options
+			 * @param  Object additional configuration options
 			 * @return Object
 			 * @since 4.0
 			 */
-			destroy: function(options) {
+			destroy: function(options, config) {
 				
-				var $params = {
+				var params = {
 					emulateHTTP: true,
 			        emulateJSON: true,
 			        data: {
 			                 action: 'gfpdf_font_delete',
-			                 payload : this.toJSON()
+			                 nonce: options.nonce,
+			                 id : this.get('id'),
 			              }
-			        };
+			    };
 
-			    return Backbone.sync( 'update', this, $params );
+			    /* Merge out two objects together */
+			    $.extend(params, config);
+
+			    return Backbone.sync( 'update', this, params );
 			},
 
 			/**
@@ -110,14 +120,16 @@
 				/* Do name validation */
 				var regex = new RegExp('^[A-Za-z0-9 ]+$');
 				
-				if(! regex.test(attrs.font_name) ) {
+				if( attrs.font_name.length > 0) {
+					if(! regex.test(attrs.font_name) ) {
 
-					/* If not successful trigger error */
-				  	return 'invalid_characters';
-				} else {
+						/* If not successful trigger error */
+					  	return 'invalid_characters';
+					} else {
 
-					/* trigger successful event to disable the view error */
-					this.trigger('valid_name');
+						/* trigger successful event to disable the view error */
+						this.trigger('valid_name');
+					}
 				}
 
 				/**
@@ -162,7 +174,7 @@
 
 						/* mark our global validation as false */
 						validation = false;
-						this.trigger('invalid_font', this, true, index); /* tell oru view the fotn is invalid */
+						this.trigger('invalid_font', this, true, index); /* tell our view the font is invalid */
 					} else {
 						this.trigger('valid_font', this, false, index); /* tell our view the font is valid */
 					}
@@ -192,11 +204,44 @@
 
 				/* Check if they match a TTF or OTF font file */
 				if(extension === '.ttf' || extension === '.otf') {
-					return true;
+					
+					/* Check if we have a valid URL */
+					var regex = new RegExp(/^[a-z](?:[-a-z0-9\+\.])*:(?:\/\/(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~!\$&'\(\)\*\+,;=:\xA0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[\uD800-\uD83E\uD840-\uD87E\uD880-\uD8BE\uD8C0-\uD8FE\uD900-\uD93E\uD940-\uD97E\uD980-\uD9BE\uD9C0-\uD9FE\uDA00-\uDA3E\uDA40-\uDA7E\uDA80-\uDABE\uDAC0-\uDAFE\uDB00-\uDB3E\uDB44-\uDB7E][\uDC00-\uDFFF]|[\uD83F\uD87F\uD8BF\uD8FF\uD93F\uD97F\uD9BF\uD9FF\uDA3F\uDA7F\uDABF\uDAFF\uDB3F\uDB7F][\uDC00-\uDFFD])*@)?(?:\[(?:(?:(?:[0-9a-f]{1,4}:){6}(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|::(?:[0-9a-f]{1,4}:){5}(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|(?:[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){4}(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|(?:[0-9a-f]{1,4}:[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){3}(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|(?:(?:[0-9a-f]{1,4}:){0,2}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){2}(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|(?:(?:[0-9a-f]{1,4}:){0,3}[0-9a-f]{1,4})?::[0-9a-f]{1,4}:(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|(?:(?:[0-9a-f]{1,4}:){0,4}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|(?:(?:[0-9a-f]{1,4}:){0,5}[0-9a-f]{1,4})?::[0-9a-f]{1,4}|(?:(?:[0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4})?::)|v[0-9a-f]+[-a-z0-9\._~!\$&'\(\)\*\+,;=:]+)\]|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3}|(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~!\$&'\(\)\*\+,;=@\xA0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[\uD800-\uD83E\uD840-\uD87E\uD880-\uD8BE\uD8C0-\uD8FE\uD900-\uD93E\uD940-\uD97E\uD980-\uD9BE\uD9C0-\uD9FE\uDA00-\uDA3E\uDA40-\uDA7E\uDA80-\uDABE\uDAC0-\uDAFE\uDB00-\uDB3E\uDB44-\uDB7E][\uDC00-\uDFFF]|[\uD83F\uD87F\uD8BF\uD8FF\uD93F\uD97F\uD9BF\uD9FF\uDA3F\uDA7F\uDABF\uDAFF\uDB3F\uDB7F][\uDC00-\uDFFD])*)(?::[0-9]*)?(?:\/(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~!\$&'\(\)\*\+,;=:@\xA0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[\uD800-\uD83E\uD840-\uD87E\uD880-\uD8BE\uD8C0-\uD8FE\uD900-\uD93E\uD940-\uD97E\uD980-\uD9BE\uD9C0-\uD9FE\uDA00-\uDA3E\uDA40-\uDA7E\uDA80-\uDABE\uDAC0-\uDAFE\uDB00-\uDB3E\uDB44-\uDB7E][\uDC00-\uDFFF]|[\uD83F\uD87F\uD8BF\uD8FF\uD93F\uD97F\uD9BF\uD9FF\uDA3F\uDA7F\uDABF\uDAFF\uDB3F\uDB7F][\uDC00-\uDFFD]))*)*|\/(?:(?:(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~!\$&'\(\)\*\+,;=:@\xA0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[\uD800-\uD83E\uD840-\uD87E\uD880-\uD8BE\uD8C0-\uD8FE\uD900-\uD93E\uD940-\uD97E\uD980-\uD9BE\uD9C0-\uD9FE\uDA00-\uDA3E\uDA40-\uDA7E\uDA80-\uDABE\uDAC0-\uDAFE\uDB00-\uDB3E\uDB44-\uDB7E][\uDC00-\uDFFF]|[\uD83F\uD87F\uD8BF\uD8FF\uD93F\uD97F\uD9BF\uD9FF\uDA3F\uDA7F\uDABF\uDAFF\uDB3F\uDB7F][\uDC00-\uDFFD]))+)(?:\/(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~!\$&'\(\)\*\+,;=:@\xA0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[\uD800-\uD83E\uD840-\uD87E\uD880-\uD8BE\uD8C0-\uD8FE\uD900-\uD93E\uD940-\uD97E\uD980-\uD9BE\uD9C0-\uD9FE\uDA00-\uDA3E\uDA40-\uDA7E\uDA80-\uDABE\uDAC0-\uDAFE\uDB00-\uDB3E\uDB44-\uDB7E][\uDC00-\uDFFF]|[\uD83F\uD87F\uD8BF\uD8FF\uD93F\uD97F\uD9BF\uD9FF\uDA3F\uDA7F\uDABF\uDAFF\uDB3F\uDB7F][\uDC00-\uDFFD]))*)*)?|(?:(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~!\$&'\(\)\*\+,;=:@\xA0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[\uD800-\uD83E\uD840-\uD87E\uD880-\uD8BE\uD8C0-\uD8FE\uD900-\uD93E\uD940-\uD97E\uD980-\uD9BE\uD9C0-\uD9FE\uDA00-\uDA3E\uDA40-\uDA7E\uDA80-\uDABE\uDAC0-\uDAFE\uDB00-\uDB3E\uDB44-\uDB7E][\uDC00-\uDFFF]|[\uD83F\uD87F\uD8BF\uD8FF\uD93F\uD97F\uD9BF\uD9FF\uDA3F\uDA7F\uDABF\uDAFF\uDB3F\uDB7F][\uDC00-\uDFFD]))+)(?:\/(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~!\$&'\(\)\*\+,;=:@\xA0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[\uD800-\uD83E\uD840-\uD87E\uD880-\uD8BE\uD8C0-\uD8FE\uD900-\uD93E\uD940-\uD97E\uD980-\uD9BE\uD9C0-\uD9FE\uDA00-\uDA3E\uDA40-\uDA7E\uDA80-\uDABE\uDAC0-\uDAFE\uDB00-\uDB3E\uDB44-\uDB7E][\uDC00-\uDFFF]|[\uD83F\uD87F\uD8BF\uD8FF\uD93F\uD97F\uD9BF\uD9FF\uDA3F\uDA7F\uDABF\uDAFF\uDB3F\uDB7F][\uDC00-\uDFFD]))*)*|(?!(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~!\$&'\(\)\*\+,;=:@\xA0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[\uD800-\uD83E\uD840-\uD87E\uD880-\uD8BE\uD8C0-\uD8FE\uD900-\uD93E\uD940-\uD97E\uD980-\uD9BE\uD9C0-\uD9FE\uDA00-\uDA3E\uDA40-\uDA7E\uDA80-\uDABE\uDAC0-\uDAFE\uDB00-\uDB3E\uDB44-\uDB7E][\uDC00-\uDFFF]|[\uD83F\uD87F\uD8BF\uD8FF\uD93F\uD97F\uD9BF\uD9FF\uDA3F\uDA7F\uDABF\uDAFF\uDB3F\uDB7F][\uDC00-\uDFFD])))(?:\?(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~!\$&'\(\)\*\+,;=:@\/\?\xA0-\uD7FF\uE000-\uFDCF\uFDF0-\uFFEF]|[\uD800-\uD83E\uD840-\uD87E\uD880-\uD8BE\uD8C0-\uD8FE\uD900-\uD93E\uD940-\uD97E\uD980-\uD9BE\uD9C0-\uD9FE\uDA00-\uDA3E\uDA40-\uDA7E\uDA80-\uDABE\uDAC0-\uDAFE\uDB00-\uDB3E\uDB44-\uDB7E\uDB80-\uDBBE\uDBC0-\uDBFE][\uDC00-\uDFFF]|[\uD83F\uD87F\uD8BF\uD8FF\uD93F\uD97F\uD9BF\uD9FF\uDA3F\uDA7F\uDABF\uDAFF\uDB3F\uDB7F\uDBBF\uDBFF][\uDC00-\uDFFD])*)?(?:\#(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~!\$&'\(\)\*\+,;=:@\/\?\xA0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[\uD800-\uD83E\uD840-\uD87E\uD880-\uD8BE\uD8C0-\uD8FE\uD900-\uD93E\uD940-\uD97E\uD980-\uD9BE\uD9C0-\uD9FE\uDA00-\uDA3E\uDA40-\uDA7E\uDA80-\uDABE\uDAC0-\uDAFE\uDB00-\uDB3E\uDB44-\uDB7E][\uDC00-\uDFFF]|[\uD83F\uD87F\uD8BF\uD8FF\uD93F\uD97F\uD9BF\uD9FF\uDA3F\uDA7F\uDABF\uDAFF\uDB3F\uDB7F][\uDC00-\uDFFD])*)?$/igm);
+
+					if(regex.test(font) ) {
+						return true;
+					}
 				}
 
 				return false;
 			},
+
+			/**
+			 * Our ModelBinder CSS Declaration Converter
+			 * @param  String direction Either ModelToView or ViewToModel
+			 * @param  String value     The value to convert
+			 * @param  String target    The DOM target name
+			 * @param  Object model     The Model
+			 * @return String
+			 * @since 4.0
+			 */
+			cssDeclaration: function(direction, value, target, model) {
+				var shortname = model.getShortname(value);
+				return 'font-family: "' + value + '", ' + shortname + ', sans-serif;';
+			},
+
+			/**
+			 * Converts a standard name to the format used in mPDF
+			 * @param  String name The name to convert
+			 * @return String
+			 * @since 4.0
+			 */
+			getShortname: function(name) {
+				name = name.toLowerCase();
+				name = name.replace(' ', '');
+
+				return name;
+			}
 		});
 
 
@@ -247,6 +292,7 @@
 			initialize: function(options) {
 
 				this.listenTo(this.collection, 'add', this.addRender);
+				this.listenTo(this.collection, 'remove', this.render);
 				this.render();
 			},
 
@@ -291,7 +337,10 @@
 				}
 
 				/* Create an individual font view */
-				var item = new Fonts.View.Item({ model: font });
+				var item = new Fonts.View.Item({
+					model: font,
+					collection: this.collection
+				});
 
 				/* Append it to our container */
 				this.$el.append(item.render().el);
@@ -379,7 +428,9 @@
 				this.template = _.template( $( this.template ).html() );
 
 				/* Set View Element HTML to our Underscore template, passing in our model */
-				this.$el.html(this.template({ model: this.model }));
+				this.$el.html(this.template({
+					model: this.model,
+				}));
 
 				/**
 				 * Enable two-way data binding between our model and view
@@ -390,7 +441,15 @@
 				 * We also want to run our validation routine on the this.model.set() command (by default this is disabled)
 				 * so the user isn't confused with the live-update display of the Font Name field.
 				 */
-				this.modelBinder.bind(this.model, this.el, null, {
+				this.modelBinder.bind(this.model, this.el, {
+					font_name: 		[ { selector: '[name=font_name]' } , {selector: '[name=usage]', converter: this.model.cssDeclaration } ],
+					regular: 		'[name=regular]',
+					bold: 			'[name=bold]',
+					italics: 		'[name=italics]',
+					bolditalics: 	'[name=bolditalics]',
+				},
+
+				{
 
 					changeTriggers: {
 						'': 'change',
@@ -505,9 +564,46 @@
 				/* Allow native validation without submitting actual form to backend */
 				ev.preventDefault();
 
+				var $form = $(ev.currentTarget);
+
 				/* Check if the native form validation is a success */
 				if(ev.currentTarget.checkValidity() && this.model.get('disabled') === false) {
-					this.model.save();
+
+					/* Show saving spinner */
+					this.addSpinner();
+
+					/* Remove previous message */
+					this.removeMessage();
+
+					console.log(this.model);
+
+					this.model.save({
+						nonce: this.$el.find('input[name=wpnonce]').val()
+					}, {
+						success: $.proxy(function(model, response, options) {
+
+							/* Remove saving spinner */
+							this.removeSpinner();
+
+							/* Display Message */
+							this.displayMessage(GFPDF.update_success);
+
+							/* Keep our model in sync */
+							this.model.set(model);
+
+						}, this),
+
+						error: $.proxy(function(response, type, errorName) {
+
+							/* Remove saving spinner */
+							this.removeSpinner();
+
+							/* Display Error */
+							if(response.responseJSON.error) {
+								this.displayMessage(response.responseJSON.error, true);
+							}
+						}, this)
+					});
 				}
 			},
 
@@ -534,16 +630,51 @@
 
 							/* If an ID is set (pulled from DB) do our AJAX delete call */
 							if(this.model.get('id')) {
+
+								/* Show saving spinner */
+								this.addSpinner();
+
+								/* Remove previous message */
+								this.removeMessage();
 								
 								/* Hide the container */
-								$(ev.currentTarget).parent().hide();
+								this.$el.hide();
 
-								this.model.destroy();
+								this.model.destroy({
+									nonce: this.$el.find('input[name=wpnonce]').val()
+								}, {
+									success: $.proxy(function(model, response, options) {
+
+										/* Remove saving spinner */
+										this.removeSpinner();
+
+										/* Display Message */
+										this.displayMessage(GFPDF.delete_success);
+
+										/* Remove from collection */
+										this.collection.remove(this.model);
+
+									}, this),
+
+									error: $.proxy(function(response, type, errorName) {
+
+										/* Remove saving spinner */
+										this.removeSpinner();
+
+										/* Remove from collection */
+										this.collection.remove(this.model);
+
+										/* Display Error */
+										if(response.responseJSON.error) {
+											this.displayMessage(response.responseJSON.error, true);
+										}
+
+									}, this)
+								});
 
 								/* TODO: if destroy() is successful remove the hidden item */
 							} else {
-								/* Remove the container */
-								$(ev.currentTarget).parent().remove();
+								this.collection.remove(this.model);
 							}
 
 				      	}, this)
@@ -562,6 +693,56 @@
 
 				/* Open the dialog box */
 				$dialog.wpdialog( 'open' );
+			},
+
+			/**
+			 * Adds an AJAX loader so the user knows a query is being made
+			 * @since 4.0
+			 */
+			addSpinner: function() {
+				var $spinner = $('<img alt="Loading" src="' + GFPDF.spinnerUrl + '" class="gfpdf-spinner" style="margin-top: 4px;" />');
+				this.$el.find('.font-submit button').after($spinner);
+			},
+
+			/**
+			 * Remove AJAX loader so the user knows a query is finished
+			 * @since 4.0
+			 */
+			removeSpinner: function() {
+				this.$el.find('.gfpdf-spinner').remove();
+			},
+
+			/**
+			 * Show message to the user
+			 * @param  String  msg     The message to be displayed
+			 * @param  Boolean isError If set to true an error will be displayed
+			 * @since 4.0
+			 */
+			displayMessage: function(msg, isError) {
+
+				/* Generate our error template */
+				var $message = $('<div class="updated notice">');
+
+				/* Add our error class if requested */
+				if(isError === true) {
+					$message.addClass('error');
+				}
+
+				/* Add the message to be displayed */
+				$message.html('<p>' + msg + '</p>');
+
+				/* Add message to the DOM */
+				this.$el.find('form').before($message);
+			},
+
+			/**
+			 * Remove any messages currently being shown to the user
+			 * @since 4.0
+			 */
+			removeMessage: function() {
+				this.$el.find('div.notice').slideUp(function() {
+					$(this).remove();
+				});
 			}
 		});
 
@@ -955,10 +1136,10 @@
 			this.tools_settings = function() {
 
 				/* Parse our fake data - this will be swapped with data from our database */
-				var json = JSON.parse('[{"id":20,"font_name":"Custom Font 1","regular":"http:\/\/www.test.com\/file1.ttf","bold":"http:\/\/www.test.com\/file1.ttf","italics":"http:\/\/www.test.com\/file1.ttf","bolditalics":"http:\/\/www.test.com\/file1.ttf"},{"id":210,"font_name":"Custom Font 2","regular":"http:\/\/www.test.com\/file2.ttf"},{"id":22,"font_name":"Custom Font 3","regular":"http:\/\/www.test.com\/file3.ttf","bold":"http:\/\/www.test.com\/file3.ttf","italics":"http:\/\/www.test.com\/file3.ttf","bolditalics":"http:\/\/www.test.com\/file3.ttf"},{"id":25,"font_name":"Custom Font 4","regular":"http:\/\/www.test.com\/file4.ttf"}]');
+				var json = JSON.parse(GFPDF.custom_fonts);
 
 				/* Initialise our collection and load with our font JSON data */
-				var fontCollection = new Fonts.Collection.Core();
+				var fontCollection = new Fonts.Collection.Core(json);
 
 				/* Create a container View and pass in our collection */
 				var container = new Fonts.View.Container({
