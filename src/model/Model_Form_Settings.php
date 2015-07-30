@@ -131,7 +131,8 @@ class Model_Form_Settings extends Helper_Model {
         /* prepare our data */
         $label = $pdf_id ? __( 'Update PDF', 'gravitypdf' ) : __( 'Save PDF', 'gravitypdf' );
 
-        /* re-register out options */
+        /* re-register our Gravity Forms Notifications */
+        $this->register_notifications($form['notifications']);
 
         /* pass to view */
         $controller->view->add_edit(array(
@@ -692,6 +693,30 @@ class Model_Form_Settings extends Helper_Model {
         }
 
         return $value;
+    }
+
+
+    /**
+     * Update our notification form settings which is specific to the PDF Form Settings Page
+     * @param  Array $notifications The current form notifications
+     * @return void
+     * @since 4.0
+     */
+    public function register_notifications($notifications) {
+        global $gfpdf;
+
+
+        /* Loop through notifications and format it to our standard */
+        if(is_array($notifications)) {
+            $options = array();
+
+            foreach($notifications as $notif) {
+                $options[ $notif['id'] ] = $notif['name'];
+            }
+
+            /* Apply our settings update */
+            $gfpdf->options->update_registered_field( 'form_settings', 'notification', 'options', $options);
+        }
     }
 
     /**
