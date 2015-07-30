@@ -310,6 +310,11 @@ class Stat_Functions
      */
     public static function convert_url_to_path($url) {
 
+        /* If $url is empty we'll return early */
+        if( empty( trim($url) ) ) {
+            return $url;
+        }
+
         /* Mostly we'll be accessing files in the upload directory, so attempt that first */
         $upload = wp_upload_dir();
 
@@ -343,7 +348,19 @@ class Stat_Functions
         }
 
         /* If we are here we couldn't locate the file */
-        return new WP_Error('file_not_found');
+        return $url;
+    }
 
+    /**
+     * Push an associative array onto the beginning of an existing array
+     * @param  Array $arr The array to push onto
+     * @param  String $key The key to use for the newly-pushed array
+     * @param  Mixed $val  The value being pushed
+     * @return Array       The modified array
+     */
+    public static function array_unshift_assoc($arr, $key, $val) {
+        $arr = array_reverse($arr, true);
+        $arr[$key] = $val;
+        return array_reverse($arr, true);
     }
 }

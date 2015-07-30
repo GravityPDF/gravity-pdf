@@ -397,10 +397,7 @@ class Helper_Options implements Helper_Int_Filters {
 						'name'               => __('Notifications', 'gravitypdf'),
 						'desc'               => __('Automatically attach PDF to the selected notifications.', 'gravitypdf'),
 						'type'               => 'select',
-						'options'            => array(
-							'Admin Notification' => 'Admin Notification',
-							'User Notification'  => 'User Notification',
-						),
+						'options'            => array(),
 						'inputClass'         => 'large',
 						'chosen'             => true,
 						'multiple'           => true,
@@ -603,6 +600,29 @@ class Helper_Options implements Helper_Int_Filters {
 		);
 
 		return apply_filters( 'gfpdf_registered_settings', $gfpdf_settings );
+	}
+
+	/**
+	 * Update a current registered settings
+	 * @param  String $group_id     The top-level group we're updating
+	 * @param  String $setting_id   The section group we're updating
+	 * @param  String $option_id    The option we are updating
+	 * @param  Mixed $option_value  The new option value
+	 * @return Boolean               True on success, false on failure
+	 */
+	public function update_registered_field( $group_id, $setting_id, $option_id, $option_value) {
+		global $wp_settings_fields;
+
+		$group = 'gfpdf_settings_' . $group_id;
+		$setting = "gfpdf_settings[$setting_id]";
+
+		/* Check if our setting exists */
+		if( isset($wp_settings_fields[$group][$group][$setting]['args'][$option_id]) ) {
+			$wp_settings_fields[$group][$group][$setting]['args'][$option_id] = $option_value;
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -945,10 +965,10 @@ class Helper_Options implements Helper_Int_Filters {
 				'dejavuserif'          => 'Dejavus Serif',
 				'dejavusansmono'       => 'Dejavus Sans Mono',
 				
-				'freesans'              => 'Free Sans',
-				'freemono'              => 'Free Mono',
-
-				'mph2bdamase'			=> 'MPH 2B Damase',
+				'freesans'             => 'Free Sans',
+				'freemono'             => 'Free Mono',
+				
+				'mph2bdamase'          => 'MPH 2B Damase',
 			),
 			
 			__('Indic', 'gravitypdf')   => array(
@@ -985,7 +1005,33 @@ class Helper_Options implements Helper_Int_Filters {
 			),
 		);
 
+		$fonts = $this->add_custom_fonts($fonts);
+
 		return apply_filters('gfpdf_font_list', $fonts);
+	}
+
+	/**
+	 * If any custom fonts add them to our font list
+	 * @param Array $fonts Current font list
+	 * @since 4.0
+	 */
+	public function add_custom_fonts($fonts = array()) {
+		$custom_fonts = $this->get_custom_fonts();
+
+		if(sizeof($custom_fonts) > 0) {
+			
+			$user_defined_fonts = array();
+			
+			/* Loop through our fonts and assign them to a new array in the appropriate format */
+			foreach($custom_fonts as $font) {
+				$user_defined_fonts[ $font['shortname'] ] = $font['font_name'];
+			}
+
+			/* Merge the new fonts at the beginning of the $fonts array */
+			$fonts = Stat_Functions::array_unshift_assoc( $fonts, __('User-Defined Fonts', 'gravitypdf'), $user_defined_fonts );
+		}
+
+		return $fonts;
 	}
 
 	/**

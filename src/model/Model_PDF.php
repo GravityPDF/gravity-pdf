@@ -571,4 +571,57 @@ class Model_PDF extends Helper_Model {
             }
         }
     }
+
+    /**
+     * Changes mPDF's tmp and fontdata folders
+     * @param  String $path The current path
+     * @return String       The new path
+     */
+    public function mpdf_tmp_path( $path ) {
+        return $this->data->template_tmp_location;
+    }
+
+    /**
+     * An mPDF filter that checks if mPDF has the font currently installed, otherwise
+     * will look in the Gravity PDF font folder for an alternative.
+     * @param String $path The current path to the font mPDF is trying to load
+     * @param String $font The current font name trying to be loaded
+     * @since 4.0
+     */
+    public function set_current_pdf_font($path, $font) {
+        global $gfpdf;
+
+        /* If the current font doesn't exist in mPDF core we'll look in our font folder */
+        if( ! is_file($path)) {
+
+            if( is_file($gfpdf->data->template_font_location . $font) ) {
+                $path = $gfpdf->data->template_font_location . $font;
+            }
+        }
+
+        return $path;
+    }
+
+    /**
+     * An mPDF filter which will register our custom font data with mPDF
+     * @param Array $fonts The registered fonts
+     * @since 4.0
+     */
+    public function register_custom_font_data_with_mPDF($fonts) {
+        global $gfpdf;
+
+        $custom_fonts = $gfpdf->options->get_custom_fonts();
+
+        foreach( $custom_fonts as $font ) {
+
+            $fonts[ $font['shortname'] ] = array_filter(array(
+                'R'          => basename($font['regular']),
+                'B'          => basename($font['bold']),
+                'I'          => basename($font['italics']),
+                'BI'         => basename($font['bolditalics'])
+            ));
+        }
+
+        return $fonts;
+    }
 }

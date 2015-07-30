@@ -112,6 +112,14 @@ class Controller_PDF extends Helper_Controller implements Helper_Int_Actions, He
 
         /* Tap into GF notifications */
         add_filter( 'gform_notification', array($this->model, 'notifications'), 9999, 3 ); /* ensure Gravity PDF is one of the last filters to be applied */
+
+        /* Modify mPDF's path locations */
+        add_filter( 'mpdf_tmp_path', array($this, 'mpdf_tmp_path'));
+        add_filter( 'mpdf_fontdata_path', array($this, 'mpdf_tmp_path'));
+
+        /* Change mPDF settings */
+        add_filter( 'mpdf_current_font_path', array($this->model, 'set_current_pdf_font'), 10, 2);
+        add_filter( 'mpdf_font_data', array($this->model, 'register_custom_font_data_with_mPDF') );
     }
 
     /**
