@@ -110,13 +110,6 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
         /* set up our options object - this is initialised on admin_init but other classes need to access its methods before this */
         $this->options = new Helper\Helper_Options();
 
-        /**
-         * Run generic actions and filters needed to get the plugin functional
-         * The controllers will set more specific actions / filters as needed
-         */
-        $this->add_actions();
-        $this->add_filters();
-
         /* load modules */
         $this->installer();
         $this->welcome_screen();
@@ -128,6 +121,13 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
         /* Add localisation support */
         load_plugin_textdomain('gravitypdf', false,  dirname( plugin_basename( __FILE__ ) ) . '/assets/languages/' );
 
+        /**
+         * Run generic actions and filters needed to get the plugin functional
+         * The controllers will set more specific actions / filters as needed
+         */
+        $this->add_actions();
+        $this->add_filters();
+
     }
 
     /**
@@ -136,12 +136,14 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
      * @return void
      */
     public function add_actions() {
-        add_action('init', array($this, 'register_assets'), 500);
-        add_action('init', array($this, 'load_assets'), 600);
+        add_action( 'init', array($this, 'register_assets') );
+        add_action( 'init', array($this, 'load_assets'), 15 );
 
-        /* load our modules */
-        add_action('init', array($this, 'init_settings_api'));
-        add_action('admin_init', array($this, 'setup_settings_fields'));
+        /**
+         * Cache our Gravity PDF Settings and register our settings fields with the Options API
+         */
+        add_action( 'init', array($this, 'init_settings_api'), 1 );
+        add_action( 'admin_init', array($this, 'setup_settings_fields'), 1 );
     }
 
     /**
@@ -150,9 +152,10 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
      * @return void
      */
     public function add_filters() {
-        /* automatically handle GF noconflict mode */
-        add_filter('gform_noconflict_scripts', array($this, 'auto_noconflict_scripts'));
-        add_filter('gform_noconflict_styles', array($this, 'auto_noconflict_styles'));
+       
+        /* Automatically handle GF noconflict mode */
+        add_filter( 'gform_noconflict_scripts', array($this, 'auto_noconflict_scripts') );
+        add_filter( 'gform_noconflict_styles', array($this, 'auto_noconflict_styles') );
     }
 
     /**
@@ -422,10 +425,11 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
 
     /**
      * Add backwards compatbility with v3.x.x default PDF template files
-     * This function will now pull the PDF configuration details from the database and return them
+     * This function will now pull the PDF configuration details from our query variables
      * @param  Integer $form_id  The Gravity Form ID
      * @return  Array The matched configuration being requested
      * @since 4.0
+     * @todo
      */
     public function get_default_config_data($form_id) {
         $pid = $GLOBALS['wp']->query_vars['pid'];
