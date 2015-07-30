@@ -42,27 +42,27 @@ class Test_Loader extends WP_UnitTestCase
 {
 
     /**
-     * Our Gravity PDF object used in tests 
-     * @var Object 
+     * Our Gravity PDF object used in tests
+     * @var Object
      * @since 4.0
      */
     public $gravitypdf;
 
     /**
-     * The WP Unit Test Set up function 
+     * The WP Unit Test Set up function
      * @since 4.0
      */
     public function setUp() {
         /* run parent method */
-        parent::setUp();       
+        parent::setUp();
 
-        /* Setup out loader class */          
+        /* Setup out loader class */
         $this->gravitypdf = new GFPDF_Major_Compatibility_Checks(
             GF_PDF_EXTENDED_PLUGIN_BASENAME,
             PDF_PLUGIN_DIR
         );
 
-        $this->gravitypdf->init();        
+        $this->gravitypdf->init();
     }
 
     /**
@@ -75,11 +75,11 @@ class Test_Loader extends WP_UnitTestCase
         $this->assertTrue(defined('PDF_EXTENDED_VERSION'));
         $this->assertTrue(defined('PDF_PLUGIN_DIR'));
         $this->assertTrue(defined('PDF_PLUGIN_URL'));
-        $this->assertTrue(defined('GF_PDF_EXTENDED_PLUGIN_BASENAME'));
+        $this->assertTrue(defined('PDF_PLUGIN_BASENAME'));
     }
 
     /**
-     * Ensure our auto initialiser is firing correctly 
+     * Ensure our auto initialiser is firing correctly
      * @group init
      * @since 4.0
      */
@@ -89,33 +89,33 @@ class Test_Loader extends WP_UnitTestCase
     }
 
     /**
-     * Test our min WordPress version is working correctly 
+     * Test our min WordPress version is working correctly
      * @group init
      * @since 4.0
      * @dataProvider provider_version
      */
     public function test_check_wordpress($min_version, $test_wp_version, $expected) {
         /* set up our current WP version and the min version */
-        global $wp_version;        
+        global $wp_version;
         $wp_version = $test_wp_version;
         $this->gravitypdf->required_wp_version = $min_version;
 
-        /* run our test */        
+        /* run our test */
         $this->assertEquals($expected, $this->gravitypdf->check_wordpress());
     }
 
     /**
-     * Test our min Gravity Forms version is working correctly 
+     * Test our min Gravity Forms version is working correctly
      * @group init
      * @since 4.0
      * @dataProvider provider_version
      */
     public function test_check_gravityforms($min_version, $test_gf_version, $expected) {
-        /* set up our current Gravity Forms version and the min version */      
+        /* set up our current Gravity Forms version and the min version */
         GFCommon::$version = $test_gf_version;
         $this->gravitypdf->required_gf_version = $min_version;
 
-        /* run our test */        
+        /* run our test */
         $this->assertEquals($expected, $this->gravitypdf->check_gravity_forms());
     }
 
@@ -125,7 +125,7 @@ class Test_Loader extends WP_UnitTestCase
      * @since 4.0
      * @dataProvider provider_memory
      */
-    public function test_convert_ini_memory($memory, $bytes) {        
+    public function test_convert_ini_memory($memory, $bytes) {
         $this->assertEquals($bytes, $this->gravitypdf->convert_ini_memory($memory));
     }
 
@@ -135,10 +135,10 @@ class Test_Loader extends WP_UnitTestCase
      * @since 4.0
      * @dataProvider provider_memory
      */
-    public function test_get_ram($memory, $bytes) {        
-        $expected_mb = ($memory === '-1') ? -1 : floor($bytes / 1024 / 1024); 
+    public function test_get_ram($memory, $bytes) {
+        $expected_mb = ($memory === '-1') ? -1 : floor($bytes / 1024 / 1024);
         $this->assertEquals($expected_mb, $this->gravitypdf->get_ram($memory));
-    }    
+    }
 
     /**
      * Check if we meet the minimum RAM requirements
@@ -146,16 +146,16 @@ class Test_Loader extends WP_UnitTestCase
      * @since 4.0
      * @dataProvider provider_memory_minimum
      */
-    public function test_check_ram($memory, $expected) {        
+    public function test_check_ram($memory, $expected) {
         $this->assertEquals($expected, $this->gravitypdf->check_ram($memory));
-    }   
+    }
 
     /**
      * Check that our notice is being correctly called
      * @group init
      * @since 4.0
      */
-    public function test_loader_notice() {     
+    public function test_loader_notice() {
         /* trigger a notice (it's a private variable) */
         $this->test_check_ram('40M', false);
 
@@ -164,11 +164,11 @@ class Test_Loader extends WP_UnitTestCase
 
         /* check the notice was attached */
         $this->assertEquals(10, has_action('admin_notices', array($this->gravitypdf, 'display_notices')));
-    }       
+    }
 
     /**
      * A data provider for any tests that need to check PHP memory
-     * @return Array Our test data 
+     * @return Array Our test data
      * @since 4.0
      */
     public function provider_memory() {
@@ -187,11 +187,11 @@ class Test_Loader extends WP_UnitTestCase
             array('1g', '1073741824'),
             array('-1', '-1'),
         );
-    }    
+    }
 
     /**
      * A data provider to check we meet the minimum memory requirements
-     * @return Array Our test data 
+     * @return Array Our test data
      * @since 4.0
      */
     public function provider_memory_minimum() {
@@ -204,15 +204,15 @@ class Test_Loader extends WP_UnitTestCase
             array('63M', false),
             array('60M', false),
             array('60k', false),
-            array('3G', true),            
-            array('1G', true),            
+            array('3G', true),
+            array('1G', true),
             array('-1', true),
         );
-    }      
+    }
 
     /**
      * A data provider for any tests that need version number checks
-     * @return Array Our test data 
+     * @return Array Our test data
      * @since 4.0
      */
     public function provider_version() {

@@ -44,42 +44,42 @@ class Test_Welcome_Screen extends WP_UnitTestCase
 
     /**
      * Our Welcome Screen Controller
-     * @var Object 
+     * @var Object
      * @since 4.0
      */
     public $controller;
 
     /**
      * Our Welcome Screen Model
-     * @var Object 
+     * @var Object
      * @since 4.0
      */
     public $model;
 
     /**
      * Our Welcome Screen View
-     * @var Object 
+     * @var Object
      * @since 4.0
      */
-    public $view;    
+    public $view;
 
     /**
-     * The WP Unit Test Set up function 
+     * The WP Unit Test Set up function
      * @since 4.0
      */
-    public function setUp() {        
+    public function setUp() {
 
         /* run parent method */
-        parent::setUp();       
+        parent::setUp();
 
-        /* Setup our test classes */          
+        /* Setup our test classes */
         $this->model = new Model_Welcome_Screen();
         $this->view  = new View_Welcome_Screen(array(
             'display_version' => PDF_EXTENDED_VERSION
         ));
 
         $this->controller = new Controller_Welcome_Screen($this->model, $this->view);
-        $this->controller->init();         
+        $this->controller->init();
     }
 
     /**
@@ -90,28 +90,5 @@ class Test_Welcome_Screen extends WP_UnitTestCase
     public function test_actions() {
         $this->assertEquals(10, has_action( 'admin_menu', array( $this->model, 'admin_menus')));
         $this->assertEquals(10, has_action( 'admin_init', array( $this->controller, 'welcome')));
-    }
-
-    /**
-     * Test the welcome screen is triggered correctly 
-     * @since 4.0
-     * @group welcome
-     */
-    public function test_welcome_screen() {
-        /* run our tests */
-        $this->assertFalse($this->controller->welcome()); /* exists early - no transient */
-        $this->assertFalse(get_option('gfpdf_is_installed')); /* check not installed */
-
-        /* get our transient / installer is working correctly */
-        set_transient('_gravitypdf_activation_redirect', true);
-
-         /* ensure we exit test before redirects / exit is triggered */
-        $_GET['activate-multi'] = 1;
-
-        /* re-run our test */
-        $this->assertFalse($this->controller->welcome()); 
-
-        /* check now installed */
-        $this->assertTrue(get_option('gfpdf_is_installed'));
     }
 }

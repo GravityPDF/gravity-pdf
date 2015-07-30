@@ -90,7 +90,6 @@ class Test_Settings extends WP_UnitTestCase
         $this->assertEquals(10, has_action( 'current_screen', array( $this->model, 'add_meta_boxes')));
         $this->assertEquals(10, has_action( 'pdf-settings-general', array( $this->view, 'system_status')));
         $this->assertEquals(10, has_action( 'pdf-settings-tools', array( $this->view, 'system_status')));
-        $this->assertEquals(20, has_action( 'pdf-settings-tools', array( $this->view, 'uninstaller')));
     }
 
     /**

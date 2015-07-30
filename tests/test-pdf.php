@@ -93,7 +93,6 @@ class Test_PDF extends WP_UnitTestCase
      * @group pdf
      */
     public function test_actions() {
-        $this->assertSame(10, has_action('init', array($this->controller, 'register_rewrite_rules')));
         $this->assertSame(5, has_action('parse_request', array($this->controller, 'process_legacy_pdf_endpoint')));
         $this->assertSame(10, has_action('parse_request', array($this->controller, 'process_pdf_endpoint')));
     }
@@ -104,8 +103,6 @@ class Test_PDF extends WP_UnitTestCase
      * @group pdf
      */
     public function test_filters() {
-        $this->assertSame(10, has_filter('query_vars', array($this->controller, 'register_rewrite_tags')));
-
         $this->assertSame(1, has_filter('gfpdf_pdf_middleware', array($this->model, 'middle_logged_out_restriction')));
         $this->assertSame(2, has_filter('gfpdf_pdf_middleware', array($this->model, 'middle_logged_out_timeout')));
         $this->assertSame(3, has_filter('gfpdf_pdf_middleware', array($this->model, 'middle_auth_logged_out_user')));
