@@ -59,6 +59,7 @@ class Controller_Welcome_Screen extends Helper_Controller implements Helper_Int_
         $this->model->setController($this);
 
         $this->view  = $view;
+        $this->view->setController($this);
     }
 
     /**
@@ -110,11 +111,11 @@ class Controller_Welcome_Screen extends Helper_Controller implements Helper_Int_
         if (!$gfpdf->data->is_installed) {
             /* First time install */
             wp_safe_redirect(admin_url('index.php?page=gfpdf-getting-started'));
-            exit;
+            wp_die();
         } else {
             /* Update */
             wp_safe_redirect(admin_url('index.php?page=gfpdf-update'));
-            exit;
+            wp_die();
         }
     }
 

@@ -61,6 +61,7 @@ class Controller_Shortcodes extends Helper_Controller implements Helper_Int_Filt
         $this->model->setController($this);
 
         $this->view  = $view;
+        $this->view->setController($this);
     }
 
     /**

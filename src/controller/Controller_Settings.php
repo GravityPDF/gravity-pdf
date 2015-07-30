@@ -64,6 +64,7 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
         $this->model->setController($this);
 
         $this->view  = $view;
+        $this->view->setController($this);
     }
 
     /**
