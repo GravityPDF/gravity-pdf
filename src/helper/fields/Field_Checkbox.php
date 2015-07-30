@@ -68,6 +68,33 @@ class Field_Checkbox extends Helper_Fields
     }
 
     /**
+     * Return the HTML form data
+     * @return Array
+     * @since 4.0
+     */
+    public function form_data() {
+
+        $value = $this->value();
+        $label = GFFormsModel::get_label($this->field);
+        $data  = array();
+
+        foreach($value as $item) {
+        
+            /* Standadised Format */
+            $data['field'][ $this->field->id . '.' . $label ][]           = $item['value'];
+            $data['field'][ $this->field->id ][]                          = $item['value'];
+            $data['field'][ $label ][]                                    = $item['value'];
+            
+            /* Name Format */
+            $data['field'][ $this->field->id . '.' . $label . '_name' ][] = $item['label'];
+            $data['field'][ $this->field->id . '_name' ][]                = $item['label'];
+            $data['field'][ $label . '_name' ][]                          = $item['label'];
+        }
+
+        return $data;
+    }
+
+    /**
      * Display the HTML version of this field
      * @return String
      * @since 4.0

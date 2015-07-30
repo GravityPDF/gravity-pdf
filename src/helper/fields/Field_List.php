@@ -67,6 +67,28 @@ class Field_List extends Helper_Fields
     }
 
     /**
+     * Return the HTML form data
+     * @return Array
+     * @since 4.0
+     */
+    public function form_data() {
+
+        $data = array();
+        $label = GFFormsModel::get_label($this->field);
+        $html = $this->html();
+
+        /* Add our List array */
+        $data['list'][ $this->field->id ] = $this->value();
+
+        /* Add our List HTML */
+        $data['field'][ $this->field->id . '.' . $label ] = $html;
+        $data['field'][ $this->field->id ]                = $html;
+        $data['field'][ $label ]                          = $html;
+
+        return $data;
+    }
+
+    /**
      * Display the HTML version of this field
      * @return String
      * @since 4.0
@@ -179,5 +201,47 @@ class Field_List extends Helper_Fields
         $this->cache($value);
         
         return $this->cache();
+    }
+
+    /**
+     * Remove empty list rows
+     * @param  Array $list The current list array
+     * @return Array       The filtered list array
+     * @since 4.0
+     */
+    private function remove_empty_list_rows($list) {
+        
+        /* if list field empty return early */
+        if(!is_array($list) || sizeof($list) === 0) {
+            return $list;
+        }
+
+        /* If single list field */
+        if( ! is_array($list[0]) ) {
+            $list = array_filter($list);
+        } else {
+
+            /* Loop through the multi-column list */
+            foreach($list as $id => $row) {
+
+                $empty = true;
+
+                foreach($row as &$col) {
+                    
+                    /* Check if there is data and if so break the loop */
+                    if( trim( strlen( $col ) > 0) ) {
+                        $empty = false;
+                        break;
+                    }
+                }
+
+                /* Remove row from list */
+                if($empty) {
+                    unset( $list[$id] );
+                }
+            }
+        }
+
+        return $list;
     }
 }

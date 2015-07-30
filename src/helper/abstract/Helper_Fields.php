@@ -174,6 +174,29 @@ abstract class Helper_Fields {
     }
 
     /**
+     * Standardised method for returning the field's correct $form_data['field'] keys
+     * @return Array
+     * @since 4.0
+     */
+    public function form_data() {
+        
+        $value = $this->value();
+        $label = GFFormsModel::get_label($this->field);
+        $data  = array();
+
+        /* Add field data using standardised naming convesion */
+        $data[ $this->field->id . '.' . $label ] = $value;
+
+        /* Add field data using standardised naming convesion */
+        $data[ $this->field->id ] = $value;
+
+        /* Keep backwards compatibility */
+        $data[ $label ] = $value;
+
+        return array( 'field' => $data );
+    }
+
+    /**
      * Get the default HTML output for this field
      * @param  String $value The field value to be displayed
      * @param  Boolean $label Whether or not to show the field's label

@@ -90,6 +90,24 @@ class Field_Signature extends Helper_Fields
     }
 
     /**
+     * Return the HTML form data
+     * @return Array
+     * @since 4.0
+     */
+    public function form_data() {
+
+        $data = array();
+
+        $value = $this->value();
+
+        $data['signature'][]                              = $value['img'];
+        $data['signature_details'][]                      = $value;
+        $data['signature_details_id'][ $this->field->id ] = $value;
+
+        return $data;
+    }
+
+    /**
      * Get the standard GF value of this field
      * @return String/Array
      * @since 4.0

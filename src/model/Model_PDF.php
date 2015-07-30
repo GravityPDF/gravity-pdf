@@ -7,9 +7,15 @@ use GFPDF\Helper\Helper_Model;
 use GFPDF\Helper\Helper_PDF;
 use GFPDF\Stat\Stat_Functions;
 
+use GFPDF\Helper\Helper_Fields;
+use GFPDF\Helper\Fields\Field_Product;
+use GFPDF\Helper\Fields\Field_Default;
+use GFPDF\Helper\Fields\Field_Products;
+
 use GFFormsModel;
 use GFCommon;
 use GFAPI;
+use GF_Field;
 
 use WP_Error;
 
@@ -578,7 +584,9 @@ class Model_PDF extends Helper_Model {
      * @return String       The new path
      */
     public function mpdf_tmp_path( $path ) {
-        return $this->data->template_tmp_location;
+        global $gfpdf;
+
+        return $gfpdf->data->template_tmp_location;
     }
 
     /**
@@ -623,5 +631,161 @@ class Model_PDF extends Helper_Model {
         }
 
         return $fonts;
+    }
+
+    /**
+     * Generates our $form_data array
+     * @param  Array $entry The Gravity Form Entry
+     * @return Array        The $form_data array
+     * @since 4.0
+     */
+    public function get_form_data($entry) {
+
+        $form      = GFFormsModel::get_form_meta( $entry['form_id'] );
+
+        /* Setup our basic structure */
+        $form_data = array(
+            'misc'               => array(),
+            'field'              => array(),
+            'field_descriptions' => array(),
+        );
+
+        /**
+         * Create a product class for use
+         * @var Field_Products
+         */
+        $products = new Field_Products($entry);
+
+        /* Merge in the defaults */
+        $form_data = array_replace_recursive($form_data, $this->get_form_data_meta($form, $entry));
+
+        /**
+         * Loop through the form data, call the correct field object and
+         * save the data to our $form_data array
+         */
+        $has_product_fields = false;
+
+        foreach($form['fields'] as $field) {
+
+            /* Skip over product fields as they will be grouped at the end */
+            if( GFCommon::is_product_field( $field->type ) ){
+                $has_product_fields = true;
+            }
+
+            /* Skip over captcha, password and page fields */
+            $fields_to_skip = apply_filters( 'gfpdf_form_data_skip_fields', array( 'captcha', 'password', 'page' ) );
+
+            if( in_array( $field->type, $fields_to_skip ) ) {
+                continue;
+            }
+
+            /* Include any field descriptions */
+            $form_data['field_descriptions'][ $field->id ] = (!empty($field->description)) ? $field->description : '';
+
+            /* Get our field object */
+            $class = $this->get_field_class($field, $form, $entry, $products);
+
+            /* Merge in the field object form_data() results */
+            $form_data = array_replace_recursive($form_data, $class->form_data());
+        }
+
+        /* Load our product array if products exist */
+        if( $has_product_fields ) {
+            $form_data = array_replace_recursive($form_data, $products->form_data() );
+        }
+
+        //print '<pre>';
+        //print_r($form_data); exit;
+
+        return $form_data;
+    }
+
+    /**
+     * Return our general $form_data information
+     * @param  Array $form The Gravity Form
+     * @param  Array $entry The Gravity Form Entry
+     * @return Array        The $form_data array
+     * @since 4.0
+     */
+    public function get_form_data_meta($form, $entry) {
+            $data = array();
+
+            /* Add form_id and entry_id for convinience */
+            $data['form_id']  = $form_id;
+            $data['entry_id'] = $entry['id'];
+
+            /* Set title and dates (both US and international) */
+            $data['form_title']       = (isset($form['title'])) ? $form['title'] : '';;
+            $data['form_description'] = (isset($form['description'])) ? $form['description'] : '';
+            $data['date_created']     = GFCommon::format_date( $entry['date_created'], false, 'j/n/Y', false);
+            $data['date_created_usa'] = GFCommon::format_date( $entry['date_created'], false, 'n/j/Y', false);
+
+            /* Include page names */
+            $data['pages'] = $form['pagination']['pages'];
+
+            /* Add misc fields */
+            $data['misc']['date_time']        = GFCommon::format_date( $entry['date_created'], false, 'Y-m-d H:i:s', false);
+            $data['misc']['time_24hr']        = GFCommon::format_date( $entry['date_created'], false, 'H:i', false);
+            $data['misc']['time_12hr']        = GFCommon::format_date( $entry['date_created'], false, 'g:ia', false);
+
+            $include = array('is_starred', 'is_read', 'ip', 'source_url', 'post_id', 'currency', 'payment_status', 'payment_date', 'transaction_id', 'payment_amount', 'is_fulfilled', 'created_by', 'transaction_type', 'user_agent', 'status');
+
+            foreach($include as $item) {
+                $data['misc'][ $item ] = ( isset( $entry[ $item ]) ) ? $entry[ $item ] : '';
+            }
+
+            return $data;
+    }
+
+    /**
+     * Pass in a Gravity Form Field Object and get back a Gravity PDF Field Object
+     * @param  Object $field Gravity Form Field Object
+     * @param  Array  $form  The Gravity Form Array
+     * @param  Object $entry The Gravity Form Entry
+     * @param  Object $products A Field_Products Object
+     * @return Object        Gravity PDF Field Object
+     * @since 4.0
+     */
+    public function get_field_class(GF_Field $field, $form, $entry, Field_Products $products) {
+
+        $class_name = Stat_Functions::get_field_class($field->type);
+        
+        try {
+            /* if we have a valid class name... */
+            if(class_exists($class_name)) {
+                
+                /**
+                 * Developer Note
+                 *
+                 * We've purposefully not added any filters to the Field_* child classes directly.
+                 * Instead, if you want to change how one of the fields are displayed or output (without effecting Gravity Forms itself) you should tap
+                 * into one of the filters below and override or extend the entire class.
+                 *
+                 * Your class MUST extend the \GFPDF\Helper\Helper_Fields abstract class - either directly or by extending an existing \GFPDF\Helper\Fields class.
+                 * eg. class Fields_New_Text extends \GFPDF\Helper\Helper_Fields or Fields_New_Text extends \GFPDF\Helper\Fields\Field_Text
+                 *
+                 * To make your life more simple you should either use the same namespace as the field classes (\GFPDF\Helper\Fields) or import the class directly (use \GFPDF\Helper\Fields\Field_Text)
+                 * We've tried to make the fields as modular as possible. If you have any feedback about this approach please submit a ticket on GitHub (https://github.com/blueliquiddesigns/gravity-forms-pdf-extended/issues)
+                 *
+                 */
+                if(GFCommon::is_product_field($field->type)) {
+                    /* Product fields are handled through a single function */
+                    $class = apply_filters('gfpdf_field_product_class', new Field_Product($field, $entry, $products), $field, $entry, $form);
+                } else {
+                    /* Load the selected class */
+                    $class = apply_filters('gfpdf_field_'. $field->type . '_class', new $class_name($field, $entry), $field, $entry, $form);
+                }
+            }
+            
+            if(empty($class) || !($class instanceof Helper_Fields)) {
+                throw new Exception('Class not found');
+            }
+
+        } catch(Exception $e) {
+            /* Exception thrown. Load generic field loader */
+            $class = apply_filters('gfpdf_field_default_class', new Field_Default($field, $entry), $field, $entry, $form);
+        }
+        
+        return $class;
     }
 }

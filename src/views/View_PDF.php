@@ -2,14 +2,13 @@
 
 namespace GFPDF\View;
 
+use GFPDF\Helper\Helper_Model;
 use GFPDF\Helper\Helper_View;
 use GFPDF\Helper\Helper_Fields;
 use GFPDF\Helper\Helper_Field_Container;
 use GFPDF\Helper\Helper_PDF;
 
-use GFPDF\Helper\Fields\Field_Product;
 use GFPDF\Helper\Fields\Field_Products;
-use GFPDF\Helper\Fields\Field_Default;
 
 use GFPDF\Stat\Stat_Functions;
 
@@ -158,7 +157,7 @@ class View_PDF extends Helper_View
      * @return String         The generated HTML
      * @since 4.0
      */
-    public function process_html_structure($entry, $config = array()) {
+    public function process_html_structure($entry, Helper_Model $model, $config = array()) {
         /* Determine whether we should output or return the results */
         $config['meta'] = (isset($config['meta'])) ? $config['meta'] : array();
         $echo           = (rgar($config, 'echo')) ? rgar($config, 'echo') : true; /* whether to output or return the generated markup. Default is echo */
@@ -171,7 +170,7 @@ class View_PDF extends Helper_View
         ?>
 
         <div id="container">
-            <?php $this->generate_html_structure($entry, $config); ?>
+            <?php $this->generate_html_structure($entry, $model, $config); ?>
         </div>
 
         <?php
@@ -188,7 +187,7 @@ class View_PDF extends Helper_View
      * @return String         The generated HTML
      * @since 4.0
      */
-    public function generate_html_structure($entry, $config = array()) {
+    public function generate_html_structure($entry, Helper_Model $model, $config = array()) {
 
         /* Set up required variables */
         $form                           = GFFormsModel::get_form_meta($entry['form_id']);
@@ -245,7 +244,7 @@ class View_PDF extends Helper_View
             /**
              * Let's output our field
              */
-            $this->process_field($field, $entry, $form, $config, $products, $container);
+            $this->process_field($field, $entry, $form, $config, $products, $container, $model);
         }
 
         /* correctly close / cleanup the HTML container if needed */
@@ -264,14 +263,14 @@ class View_PDF extends Helper_View
      * @param  Array $entry    The Gravity Form Entry
      * @param  Array $form     The Gravity Form Field
      * @param  Array $config   The user-passed configuration data
-     * @param  Helper_Fields $products The product fields
+     * @param  Object $products A Field_Products Object
      * @param  Helper_Field_Container $container
      * @return void
      * @since 4.0
      */
-    public function process_field($field, $entry, $form, $config, $products, $container) {
+    public function process_field($field, $entry, $form, $config, Field_Products $products, Helper_Field_Container $container, Helper_Model $model) {
 
-        /*
+       /*
         * Set up our configuration variables
         */
         $config['meta']           = (isset($config['meta'])) ? $config['meta'] : array();
@@ -279,44 +278,7 @@ class View_PDF extends Helper_View
         $load_legacy_css          = (rgar($config['meta'], 'legacy_css')) ? rgar($config['meta'], 'legacy_css') : false; /* whether we should add our legacy field class names (v3.x.x) to our fields. Default to false */
         $show_section_description = (rgar($config['meta'], 'section_content')) ? rgar($config['meta'], 'section_content') : false; /* whether we should include a section breaks content. Default to false */
 
-        /* Try and load a class based on the field type */
-        $class_name        = Stat_functions::get_field_class($field->type);
-       
-        try {
-            /* if we have a valid class name... */
-            if(class_exists($class_name)) {
-                
-                /**
-                 * Developer Note
-                 *
-                 * We've purposefully not added any filters to the Field_* child classes directly.
-                 * Instead, if you want to change how one of the fields are displayed or output (without effecting Gravity Forms itself) you should tap
-                 * into one of the filters below and override or extend the entire class.
-                 *
-                 * Your class MUST extend the \GFPDF\Helper\Helper_Fields abstract class - either directly or by extending an existing \GFPDF\Helper\Fields class.
-                 * eg. class Fields_New_Text extends \GFPDF\Helper\Helper_Fields or Fields_New_Text extends \GFPDF\Helper\Fields\Field_Text
-                 *
-                 * To make your life more simple you should either use the same namespace as the field classes (\GFPDF\Helper\Fields) or import the class directly (use \GFPDF\Helper\Fields\Field_Text)
-                 * We've tried to make the fields as modular as possible. If you have any feedback about this approach please submit a ticket on GitHub (https://github.com/blueliquiddesigns/gravity-forms-pdf-extended/issues)
-                 *
-                 */
-                if(GFCommon::is_product_field($field->type)) {
-                    /* Product fields are handled through a single function */
-                    $class = apply_filters('gfpdf_field_product_class', new Field_Product($field, $entry, $products), $field, $entry, $form);
-                } else {
-                    /* Load the selected class */
-                    $class = apply_filters('gfpdf_field_'. $field->type . '_class', new $class_name($field, $entry), $field, $entry, $form);
-                }
-            }
-            
-            if(empty($class) || !($class instanceof Helper_Fields)) {
-                throw new Exception('Class not found');
-            }
-
-        } catch(Exception $e) {
-            /* Exception thrown. Load generic field loader */
-            $class = apply_filters('gfpdf_field_default_class', new Field_Default($field, $entry), $field, $entry, $form);
-        }
+        $class = $model->get_field_class($field, $form, $entry, $products);
 
         /* Try and display our HTML */
         try {

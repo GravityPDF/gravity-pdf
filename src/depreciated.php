@@ -4,6 +4,7 @@
 
 use GFPDF\Stat\Stat_Functions;
 use GFPDF\Router;
+use GFPDF\Model\Model_PDF;
 use GFPDF\View\View_PDF;
 
 /**
@@ -149,6 +150,17 @@ class PDF_Common
  */
 class GFPDFEntryDetail {
 
+    /**
+     * Generate our PDF HTML layout
+     * @param  Array $form   The Gravity Form array
+     * @param  Array $lead   The Gravity Form entry
+     * @param  boolean $allow_display_empty_fields
+     * @param  boolean $show_html
+     * @param  boolean $show_page_name
+     * @param  boolean $return
+     * @return void
+     * @since 3.0
+     */
     public static function lead_detail_grid($form, $lead, $allow_display_empty_fields=false, $show_html=false, $show_page_name=false, $return=false) {
             $config = array(
                 'meta' => array(
@@ -171,12 +183,26 @@ class GFPDFEntryDetail {
      * @param  Array $lead   The Gravity Form entry
      * @param  Array $config The PDF Configuration
      * @return String        The generated HTML
+     * @since 3.7
      */
     public static function do_lead_detail_grid($form, $lead, $config = array()) {
         /* Set up any legacy configuration options needed */
         $config['meta']['legacy_css'] = true;
 
+        $model = new Model_PDF();
         $view = new View_PDF();
-        $view->process_html_structure($lead, $config);
+        $view->process_html_structure($lead, $model, $config);
+    }
+
+    /**
+     * Get the $form_data array
+     * @param  Array $form   The Gravity Form array
+     * @param  Array $lead   The Gravity Form entry
+     * @return Array
+     * @since 3.0
+     */
+    public static function lead_detail_grid_array($form, $lead) {
+        $model = new Model_PDF();
+        return $model->get_form_data($lead);
     }
 }

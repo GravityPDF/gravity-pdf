@@ -67,6 +67,23 @@ class Field_Html extends Helper_Fields
     }
 
     /**
+     * Return the HTML form data
+     * @return Array
+     * @since 4.0
+     */
+    public function form_data() {
+
+        $data = array();
+
+        $html = wpautop( wp_kses_post ( $this->value() ) );
+
+        $data['html'][]                      = $html;
+        $data['html_id'][ $this->field->id ] = $html;
+
+        return $data;
+    }
+
+    /**
      * Display the HTML version of this field
      * @return String
      * @since 4.0

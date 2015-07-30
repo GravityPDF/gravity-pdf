@@ -68,6 +68,30 @@ class Field_Select extends Helper_Fields
     }
 
     /**
+     * Return the HTML form data
+     * @return Array
+     * @since 4.0
+     */
+    public function form_data() {
+
+        $value = $this->value();
+        $label = GFFormsModel::get_label($this->field);
+        $data  = array();
+        
+        /* Standadised Format */
+        $data['field'][ $this->field->id . '.' . $label ]           = $value['value'];
+        $data['field'][ $this->field->id ]                          = $value['value'];
+        $data['field'][ $label ]                                    = $value['value'];
+        
+        /* Name Format */
+        $data['field'][ $this->field->id . '.' . $label . '_name' ] = $value['label'];
+        $data['field'][ $this->field->id . '_name' ]                = $value['label'];
+        $data['field'][ $label . '_name' ]                          = $value['label'];
+
+        return $data;
+    }
+
+    /**
      * Display the HTML version of this field
      * @return String
      * @since 4.0

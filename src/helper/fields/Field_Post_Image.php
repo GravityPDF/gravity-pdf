@@ -3,6 +3,7 @@
 namespace GFPDF\Helper\Fields;
 
 use GFPDF\Helper\Helper_Fields;
+use GFPDF\Stat\Stat_Functions;
 
 use GFFormsModel;
 use GF_Field_Post_Image;
@@ -113,9 +114,15 @@ class Field_Post_Image extends Helper_Fields
             $value = explode('|:|', $this->get_value());
             
             $img['url']         = (isset($value[0])) ? $value[0] : '';
+            $img['path']        = (isset($value[0])) ? $value[0] : '';
             $img['title']       = (isset($value[1])) ? $value[1] : '';
             $img['caption']     = (isset($value[2])) ? $value[2] : '';
             $img['description'] = (isset($value[3])) ? $value[3] : '';
+            
+            $path               = (isset($value[0])) ? Stat_Functions::convert_url_to_path($value[0]) : '';
+            if($path != $img['url']) {
+                $img['path'] = $path;
+            }
         }
         
         $this->cache($img);

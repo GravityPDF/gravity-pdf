@@ -66,7 +66,21 @@ class Field_Products extends Helper_Fields
         }
 
         $this->entry = $entry;
-        $this->form  = GFFormsModel::get_form_meta( $entry['id'] );
+        $this->form  = GFFormsModel::get_form_meta( $entry['form_id'] );
+    }
+
+    /**
+     * Return the HTML form data
+     * @return Array
+     * @since 4.0
+     */
+    public function form_data() {
+
+        $data = array();
+
+        $data = $this->value();
+
+        return $data;
     }
 
     /**

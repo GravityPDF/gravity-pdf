@@ -2,6 +2,8 @@
 
 namespace GFPDF\Helper;
 
+use GFPDF\Helper\Helper_Model;
+
 use WP_Error;
 
 /**
@@ -40,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * A simple abstract class views can extent to share similar variables
  * @since 4.0
  */
-abstract class Helper_View {
+abstract class Helper_View extends Helper_Model {
     /**
      * Each object should have a view name
      * @var String

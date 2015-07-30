@@ -67,6 +67,25 @@ class Field_Post_Tags extends Helper_Fields
     }
 
     /**
+     * Standardised method for returning the field's correct $form_data['field'] keys
+     * @return Array
+     * @since 4.0
+     */
+    public function form_data() {
+        
+        $value = implode(', ', $this->value());
+        $label = GFFormsModel::get_label($this->field);
+        $data  = array();
+        
+        /* Add HTML output */
+        $data[ $this->field->id . '.' . $label ] = $value;
+        $data[ $this->field->id ]                = $value;
+        $data[ $label ]                          = $value;
+
+        return array( 'field' => $data );
+    }
+
+    /**
      * Display the HTML version of this field
      * @return String
      * @since 4.0
