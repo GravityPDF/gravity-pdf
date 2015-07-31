@@ -95,6 +95,49 @@ class Field_Post_Category extends Helper_Fields
     }
 
     /**
+     * Return the HTML form data
+     * @return Array
+     * @since 4.0
+     */
+    public function form_data() {
+
+        $field_value = $this->value();
+        $label = GFFormsModel::get_label($this->field);
+        $data  = array();
+        $value = array(
+            'value' => '',
+            'label' => '',
+        );
+
+        /* If Radio of Select boxes */
+        if( ! isset( $field_value[0] ) ) {
+
+            /* Set up our basic values */
+            $value['value'] = $field_value['value'];
+            $value['label'] = $field_value['label'];
+
+        } else { /* If Checkboxes or Multiselects */
+
+            /* Loop through the results and store in array */
+            foreach($field_value as $item) {
+                $value['value'][] = $item['value'];
+                $value['label'][] = $item['label'];
+            }
+        }
+        
+        $data['field'][ $this->field->id . '.' . $label ]           = $value['value'];
+        $data['field'][ $this->field->id ]                          = $value['value'];
+        $data['field'][ $label ]                                    = $value['value'];
+        
+        /* Name Format */
+        $data['field'][ $this->field->id . '.' . $label . '_name' ] = $value['label'];
+        $data['field'][ $this->field->id . '_name' ]                = $value['label'];
+        $data['field'][ $label . '_name' ]                          = $value['label'];
+
+        return $data;
+    }
+
+    /**
      * Display the HTML version of this field
      * @return String
      * @since 4.0

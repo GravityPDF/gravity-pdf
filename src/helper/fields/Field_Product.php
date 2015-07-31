@@ -77,6 +77,66 @@ class Field_Product extends Helper_Fields
     }
 
     /**
+     * Return the HTML form data
+     * @return Array
+     * @since 4.0
+     */
+    public function form_data() {
+
+        $value = $this->value();
+        $label = GFFormsModel::get_label($this->field);
+        $data  = array();
+
+        switch($this->field->type) {
+            case 'product':
+                $name  = $value['name'] . " ({$value['price']})";
+                $price = $value['price_unformatted'];
+            break;
+
+            case 'option':
+                if(sizeof($value['options']) > 1) {
+                    foreach($value['options'] as $option) {
+                        $name[]  = $option['option_name'] . " ({$option['price_formatted']})";
+                        $price[] = $option['price'];
+                    }
+                } else {
+                    $name  = $value['options'][0]['option_name'] . " ({$value['options'][0]['price_formatted']})";
+                    $price = $value['options'][0]['price'];
+                }
+            break;
+
+            case 'shipping':
+                $name  = $value['shipping_name'] . " ({$value['shipping_formatted']})";
+                $price = $value['shipping'];
+            break;
+
+            case 'quantity':
+            default:
+                $name  = $value;
+                $price = $value;
+            break;
+        }
+        
+        
+        /* Standadised Format */
+        $data['field'][ $this->field->id . '.' . $label ]           = $name;
+        $data['field'][ $this->field->id ]                          = $name;
+        $data['field'][ $label ]                                    = $name;
+        
+        /* Name Format */
+        $data['field'][ $this->field->id . '.' . $label . '_name' ] = $name;
+        $data['field'][ $this->field->id . '_name' ]                = $name;
+        $data['field'][ $label . '_name' ]                          = $name;
+
+        /* Value */
+        $data['field'][ $this->field->id . '.' . $label . '_value' ] = $price;
+        $data['field'][ $this->field->id . '_value' ]                = $price;
+        $data['field'][ $label . '_value' ]                          = $price;
+
+        return $data;
+    }
+
+    /**
      * Display the HTML version of this field
      * @return String
      * @since 4.0

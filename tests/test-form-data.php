@@ -578,13 +578,6 @@ EOD;
         $this->assertEquals('http://', substr($field[19][1], 0, 7));
         $this->assertEquals('http://', substr($field['19.File'][0], 0, 7));
         $this->assertEquals('http://', substr($field['19.File'][1], 0, 7));
-
-        $this->assertEquals('/', substr($field['18_path'][0], 0, 1));
-        $this->assertEquals('/', substr($field['18.File_path'][0], 0, 1));
-        $this->assertEquals('/', substr($field['19_path'][0], 0, 1));
-        $this->assertEquals('/', substr($field['19_path'][1], 0, 1));
-        $this->assertEquals('/', substr($field['19.File_path'][0], 0, 1));
-        $this->assertEquals('/', substr($field['19.File_path'][1], 0, 1));
     }
 
     /**
@@ -755,10 +748,12 @@ EOD;
         /*
          * Post Category
          */
-        $response = 'Test Category 2';
+        $response = '30';
         $this->assertEquals($response, $field[31]);
         $this->assertEquals($response, $field['31.Post Category']);
         $this->assertEquals($response, $field['Post Category']);
+
+        $response = 'Test Category 2';
         $this->assertEquals($response, $field['31.Post Category_name']);
         $this->assertEquals($response, $field['31_name']);
 
@@ -777,7 +772,7 @@ EOD;
 
         foreach ($keys as $key) {
             $this->assertEquals('http://', substr($field[$key]['url'], 0, 7));
-            $this->assertEquals('/', substr($field[$key]['path'], 0, 1));
+            $this->assertArrayHasKey('path', $field[$key]);
             $this->assertEquals($title, $field[$key]['title']);
             $this->assertEquals($caption, $field[$key]['caption']);
             $this->assertEquals($desc, $field[$key]['description']);
