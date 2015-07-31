@@ -81,6 +81,21 @@ class Field_Likert extends Helper_Fields
     }
 
     /**
+     * Return the HTML form data
+     * @return Array
+     * @since 4.0
+     */
+    public function form_data() {
+
+        $data = array();
+        $value = $this->value();
+
+        $data['survey']['likert'][ $this->field->id ] = $value;
+
+        return $data;
+    }
+
+    /**
      * Display the HTML version of this field
      * @return String
      * @since 4.0

@@ -92,6 +92,40 @@ class Field_Poll extends Helper_Fields
     }
 
     /**
+     * Return the HTML form data
+     * @return Array
+     * @since 4.0
+     */
+    public function form_data() {
+
+        $data = array();
+        $value = $this->value();
+        $label = GFFormsModel::get_label($this->field);
+
+        if( isset($value[0]) ) {
+            
+            $field = array();
+            $fieldValue = array();
+
+            foreach($value as $item) {
+                /* For backwards compatibility, we'll wrap these in their own array key */
+                $field[0][]      = $item['label'];
+                $fieldValue[0][] = $item['value'];
+            }
+        } else {
+            $field      = $value['label'];
+            $fieldValue = $value['value'];
+        }
+
+        $data[ $this->field->id . '.' . $label ] = $field;
+        $data[ $this->field->id . '.' . $label . '_name' ] = $field; /* for backwards compatibility */
+        $data[ $this->field->id ]                = $field;
+        $data[ $label ]                          = $field;
+
+        return array( 'field' => $data );
+    }
+
+    /**
      * Display the HTML version of this field
      * @return String
      * @since 4.0

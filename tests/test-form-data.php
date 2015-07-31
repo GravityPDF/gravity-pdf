@@ -649,6 +649,7 @@ EOD;
          * Run our tests...
          */
         $response = 'Quiz Dropdown - Second Choice';
+
         $this->assertEquals($response, $field[24]['text']);
         $this->assertEquals($response, $field['24.Quiz Dropdown_name']['text']);
 
@@ -668,6 +669,7 @@ EOD;
          * Run our tests...
          * Radio button first
          */
+
         $response = 'Survay Radio - First Choice';
         $this->assertEquals($response, $field[46]);
         $this->assertEquals($response, $field['46.Radio Survey Field_name']);

@@ -47,6 +47,30 @@ if (! defined('ABSPATH')) {
  */
 class Field_Quiz extends Helper_Fields
 {
+
+    /**
+     * Return the HTML form data
+     * @return Array
+     * @since 4.0
+     */
+    public function form_data() {
+
+        $value = $this->value();
+        $label = GFFormsModel::get_label($this->field);
+        $data  = array();
+        
+        $data['field'][ $this->field->id . '.' . $label ]           = $value;
+        $data['field'][ $this->field->id ]                          = $value;
+        $data['field'][ $label ]                                    = $value;
+        
+        /* Backwards compatible */
+        $data['field'][ $this->field->id . '.' . $label . '_name' ] = $value;
+        $data['field'][ $this->field->id . '_name' ]                = $value;
+        $data['field'][ $label . '_name' ]                          = $value;
+
+        return $data;
+    }
+
     /**
      * Display the HTML version of this field
      * @return String
@@ -72,9 +96,20 @@ class Field_Quiz extends Helper_Fields
      * Get the standard GF value of this field
      * @return String/Array
      * @since 4.0
-     * @todo Write appropriate value() function
      */
     public function value() {
-        //$return = array('text' => $choice['text'], 'isCorrect' => $choice['gquizIsCorrect']);
+        $value = $this->get_value();
+
+        foreach($this->field->choices as $choice) {
+            if($choice['value'] == $value) {
+                return array(
+                    'text'      => $choice['text'],
+                    'isCorrect' => $choice['gquizIsCorrect'],
+                    'weight'    => (isset($choice['gquizWeight'])) ? $choice['gquizWeight'] : '',
+                );
+            }
+        }
+
+        return array('text' => '', 'isCorrect' => '', 'weight' => '');
     }
 }

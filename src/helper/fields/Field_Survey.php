@@ -86,6 +86,20 @@ class Field_Survey extends Helper_Fields
     }
 
     /**
+     * Get the $form_data object
+     * Survey field uses multiple field types so we need to account for that
+     * @return Array
+     * @since 4.0
+     */
+    private function get_form_data() {
+        if( method_exists( $this->fieldObject, 'form_data' ) ) {
+            return $this->fieldObject->form_data();
+        }
+        
+        return parent::form_data();
+    }
+
+    /**
      * Used to check if the current field has a value
      * @since 4.0
      * @internal Child classes can override this method when dealing with a specific use case
@@ -93,6 +107,62 @@ class Field_Survey extends Helper_Fields
     public function is_empty() {
         return $this->fieldObject->is_empty();
     }
+
+    /**
+     * Return the HTML form data
+     * @return Array
+     * @since 4.0
+     */
+    public function form_data() {
+
+        $data = array();
+
+        /* Provide backwards compatibility fixes to certain fields */
+        switch($this->field->inputType) {
+            case 'radio':
+            case 'select':
+            
+                $data = $this->get_form_data();
+                $value = $data['field'][ $this->field->id . '_name' ];
+
+                /* Overriding survey radio values with name */
+                array_walk( $data['field'], function(&$item, $key, $value) {
+                    $item = $value;
+                }, $value);
+
+            break;
+
+            case 'checkbox':
+                $value = $this->get_value();
+
+                /* Convert survey ID to real value */
+                foreach( $this->field->choices as $choice ) {
+                    
+                    if( ( $key = array_search( $choice['value'], $value) ) !== false ) {
+                        $value[ $key ] = $choice['text'];
+                    }
+                }
+
+                $value = array( $value );
+                $label = GFFormsModel::get_label($this->field);
+
+                $data[ $this->field->id . '.' . $label ] = $value;
+                $data[ $this->field->id ] = $value;
+                $data[ $label ] = $value;
+
+                $data = array( 'field' => $data );
+
+            break;
+
+            default:
+                $data = $this->get_form_data();
+            break;
+        }
+        
+
+        return $data;
+    }
+
 
     /**
      * Display the HTML version of this field

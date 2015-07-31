@@ -16,6 +16,10 @@ use GFFormsModel;
 use GFCommon;
 use GFAPI;
 use GF_Field;
+use GFQuiz;
+use GFSurvey;
+use GFPolls;
+use GFResults;
 
 use WP_Error;
 
@@ -634,9 +638,9 @@ class Model_PDF extends Helper_Model {
     }
 
     /**
-     * Generates our $form_data array
+     * Generates our $data array
      * @param  Array $entry The Gravity Form Entry
-     * @return Array        The $form_data array
+     * @return Array        The $data array
      * @since 4.0
      */
     public function get_form_data($entry) {
@@ -644,7 +648,7 @@ class Model_PDF extends Helper_Model {
         $form      = GFFormsModel::get_form_meta( $entry['form_id'] );
 
         /* Setup our basic structure */
-        $form_data = array(
+        $data = array(
             'misc'               => array(),
             'field'              => array(),
             'field_descriptions' => array(),
@@ -656,12 +660,20 @@ class Model_PDF extends Helper_Model {
          */
         $products = new Field_Products($entry);
 
-        /* Merge in the defaults */
-        $form_data = array_replace_recursive($form_data, $this->get_form_data_meta($form, $entry));
+        /* Get the form details */
+        $form_meta = $this->get_form_data_meta($form, $entry);
+
+        /* Get the survey, quiz and poll data if applicable */
+        $quiz   = $this->get_quiz_results($form, $entry);
+        $survey = $this->get_survey_results($form, $entry);
+        $poll   = $this->get_poll_results($form, $entry);
+
+        /* Merge in the meta data and survey, quiz and poll data */
+        $data = array_replace_recursive($data, $form_meta, $quiz, $survey, $poll);
 
         /**
          * Loop through the form data, call the correct field object and
-         * save the data to our $form_data array
+         * save the data to our $data array
          */
         $has_product_fields = false;
 
@@ -680,31 +692,31 @@ class Model_PDF extends Helper_Model {
             }
 
             /* Include any field descriptions */
-            $form_data['field_descriptions'][ $field->id ] = (!empty($field->description)) ? $field->description : '';
+            $data['field_descriptions'][ $field->id ] = (!empty($field->description)) ? $field->description : '';
 
             /* Get our field object */
             $class = $this->get_field_class($field, $form, $entry, $products);
 
             /* Merge in the field object form_data() results */
-            $form_data = array_replace_recursive($form_data, $class->form_data());
+            $data = array_replace_recursive($data, $class->form_data());
         }
 
         /* Load our product array if products exist */
         if( $has_product_fields ) {
-            $form_data = array_replace_recursive($form_data, $products->form_data() );
+            $data = array_replace_recursive($data, $products->form_data() );
         }
 
         //print '<pre>';
-        //print_r($form_data); exit;
+        //print_r($data); exit;
 
-        return $form_data;
+        return $data;
     }
 
     /**
-     * Return our general $form_data information
+     * Return our general $data information
      * @param  Array $form The Gravity Form
      * @param  Array $entry The Gravity Form Entry
-     * @return Array        The $form_data array
+     * @return Array        The $data array
      * @since 4.0
      */
     public function get_form_data_meta($form, $entry) {
@@ -735,6 +747,254 @@ class Model_PDF extends Helper_Model {
             }
 
             return $data;
+    }
+
+    /**
+     * Pull the Survey Results into the $form_data array
+     * @param  Array $form  The Gravity Form
+     * @param  Array $entry The Gravity Form Entry
+     * @return Array        The results
+     * @since  4.0
+     */
+    public function get_survey_results($form, $entry) {
+
+        $data = array();
+
+        if( class_exists('GFSurvey') && $this->check_field_exists( 'survey', $form ) ) {
+          
+            /* Get survey fields */
+            $fields = GFCommon::get_fields_by_type($form, array('survey'));
+
+            /* Include the survey score, if any */
+            if ( isset( $lead['gsurvey_score'] ) ) {
+                $data['survey']['score'] = $lead['gsurvey_score'];
+            }
+
+            $results = $this->get_addon_global_data($form, array(), $fields);
+
+            /* Loop through the global survey data and convert information correctly */
+            foreach($fields as $field) {
+
+                /* Check if we have a multifield likert and replace the row key */
+                if( isset( $field['gsurveyLikertEnableMultipleRows'] ) && $field['gsurveyLikertEnableMultipleRows'] == 1 ) {
+                    
+                    foreach($field['gsurveyLikertRows'] as $row) {
+                        $results['field_data'][ $field->id ] = $this->replace_key($results['field_data'][ $field->id ], $row['value'], $row['text']);
+                            
+                        if( isset( $field->choices ) && is_array( $field->choices ) ) {
+                            foreach($field->choices as $choice) {
+                                $results['field_data'][ $field->id ][ $row['text'] ] = $this->replace_key($results['field_data'][ $field->id ][ $row['value'] ], $choice['value'], $choice['text']);
+                            }
+                        }
+                    }
+                }
+
+                /* Replace the standard row data */
+                if( isset( $field->choices ) && is_array( $field->choices ) ) {
+                    foreach($field->choices as $choice) {
+                        $results['field_data'][ $field->id ] = $this->replace_key($results['field_data'][ $field->id ], $choice['value'], $choice['text']);
+                    }
+                }
+            }
+
+            $data['survey']['global'] = $results;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Pull the Quiz Results into the $form_data array
+     * @param  Array $form  The Gravity Form
+     * @param  Array $entry The Gravity Form Entry
+     * @return Array        The results
+     * @since  4.0
+     */
+    public function get_quiz_results($form, $entry) {
+
+        $data = array();
+
+        if( class_exists('GFQuiz') && $this->check_field_exists( 'quiz', $form )  ) {
+            
+            /* Get quiz fields */
+            $fields = GFCommon::get_fields_by_type($form, array('quiz'));
+
+            /* Store the quiz pass configuration */
+            $data['quiz']['config']['grading']     = (isset($form['gravityformsquiz']['grading'])) ?        $form['gravityformsquiz']['grading'] :      '';
+            $data['quiz']['config']['passPercent'] = (isset($form['gravityformsquiz']['passPercent'])) ?    $form['gravityformsquiz']['passPercent'] :  '';
+            $data['quiz']['config']['grades']      = (isset($form['gravityformsquiz']['grades'])) ?         $form['gravityformsquiz']['grades'] :       '';
+            
+            /* Store the user's quiz results */
+            $data['quiz']['results']['score']      = rgar($entry, 'gquiz_score');
+            $data['quiz']['results']['percent']    = rgar($entry, 'gquiz_percent');
+            $data['quiz']['results']['is_pass']    = rgar($entry, 'gquiz_is_pass');
+            $data['quiz']['results']['grade']      = rgar($entry, 'gquiz_grade');
+
+            /* Poll for the global quiz overall results */
+            $data['quiz']['global'] = $this->get_quiz_overall_data($form, $fields);
+
+        }
+
+        return $data;
+    }
+
+    /**
+     * Pull the Poll Results into the $form_data array
+     * @param  Array $form  The Gravity Form
+     * @param  Array $entry The Gravity Form Entry
+     * @return Array        The results
+     * @since  4.0
+     */
+    public function get_poll_results($form, $entry) {
+
+        $data = array();
+
+        if( class_exists('GFPolls') && $this->check_field_exists( 'poll', $form ) ) {
+
+            /* Get poll fields and the overall results */
+            $fields  = GFCommon::get_fields_by_type($form, array('poll'));
+            $results = $this->get_addon_global_data($form, array(), $fields);
+
+            /* Loop through our fields and update the results as needed */
+            foreach( $fields as $field ) {
+                                
+                /* Add the field name to a new 'misc' array key */
+                $results['field_data'][ $field->id ]['misc']['label'] = $field->label;
+
+                /* Loop through the field choices */
+                foreach( $field->choices as $choice ) {
+                    $results['field_data'][ $field->id ] = $this->replace_key($results['field_data'][ $field->id ], $choice['value'], $choice['text']);
+                }
+            }
+            
+            $data['poll']['global'] = $results;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Parse the Quiz Overall Results
+     * @param  Array $form   The Gravity Form
+     * @param  Array $fields The quiz fields
+     * @return Array         The parsed results
+     * @since 4.0
+     */
+    public function get_quiz_overall_data($form, $fields) {
+
+        if( ! class_exists('GFQuiz') ) {
+            return array();
+        }
+
+        /* GFQuiz is a singleton. Get the instance */
+        $quiz   = GFQuiz::get_instance();
+
+        /* Create our callback to add additional data to the array specific to the quiz plugin */
+        $options['callbacks']['calculation'] = array(
+                $quiz,
+                'results_calculation'
+        );
+
+        $results = $this->get_addon_global_data($form, $options, $fields);
+
+        /* Loop through our fields and update our global results */
+        foreach($fields as $field) {
+
+            /* Replace ['totals'] key with ['misc'] key */
+            $results['field_data'][ $field->id ] = $this->replace_key($results['field_data'][ $field->id ], 'totals', 'misc');
+
+            /* Add the field name to the ['misc'] key */
+            $results['field_data'][ $field->id ]['misc']['label'] = $field->label;
+
+            /* Loop through the field choices */
+            if(is_array($field->choices)) {
+                foreach($field->choices as $choice) {
+                    $results['field_data'][ $field->id ] = $this->replace_key($results['field_data'][ $field->id ], $choice['value'], $choice['text']);
+
+                    /* Check if this is the correct field */
+                    if(isset($choice['gquizIsCorrect']) && $choice['gquizIsCorrect'] == 1) {
+                        $results['field_data'][ $field->id ]['misc']['correct_option_name'][] = $choice['text'];
+                    }
+                }
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Pull Gravity Forms global results Data
+     * @param  Array $form    The Gravity Form array
+     * @param  Array $options The global query options
+     * @param  Array $fields  The field array to use in our query
+     * @return Array          The results
+     * @since 4.0
+     */
+    private function get_addon_global_data($form, $options, $fields)
+    {
+            /* If the results class isn't loaded, load it */
+            if ( !class_exists( 'GFResults' ) ) {
+                require_once( GFCommon::get_base_path() . '/includes/addon/class-gf-results.php');
+            }
+
+            $form_id = $form['id'];
+
+            /* Add form filter to keep in line with GF standard */
+            $form = apply_filters( "gform_form_pre_results_$form_id", apply_filters( 'gform_form_pre_results', $form ) );
+
+            /* Initiate the results class */
+            $gf_results = new GFResults('', $options);
+            
+            /* Ensure that only active leads are queried */
+            $search = array(
+                'field_filters' => array('mode' => ''),
+                'status'        => 'active'
+            );
+
+            /* Get the results */
+            $data = $gf_results->get_results_data($form, $fields, $search);
+
+            /* Unset some array keys we don't need */
+            unset($data['status']);
+            unset($data['timestamp']);
+
+            return $data;
+    }
+
+    /**
+     * Sniff the form fields and determine if there are any of the $type available
+     * @param  String $type the field type we are looking for
+     * @param  Array $form the form array
+     * @return Boolean       Whether there is a match or not
+     * @since 4.0
+     */
+    public function check_field_exists($type, $form)
+    {
+        foreach( $form['fields'] as $field ) {
+            if( $field['type'] == $type ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Remove existing array item and replace it with a new one
+     * @param  Array $array The array to be modified
+     * @param  String $key   The key to remove
+     * @param  String $text  The new array key
+     * @return Array        The modified array
+     * @since 4.0
+     */
+    public function replace_key($array, $key, $text)
+    {
+        if( $key !== $text && isset( $array[ $key ] ) ) {
+            
+            /* Replace the array key with the actual field name */
+            $array[ $text ] = $array[ $key ];
+            unset( $array[ $key ] );
+        }
+        return $array;
     }
 
     /**
