@@ -40,7 +40,7 @@ global $gfpdf;
 
 <div class="wrap about-wrap">
 	<h1><?php _e( 'Welcome to Gravity PDF', 'gravitypdf' ); ?></h1>
-	<div class="about-text"><?php _e( "You're just a few clicks away from producing highly customisable business-ready PDF documents using Gravity Forms data.", 'gravitypdf' ); ?></div>
+	<div class="about-text"><?php _e( "You're just minutes away from producing your first highly-customisable PDF document using Gravity Forms data.", 'gravitypdf' ); ?></div>
 	
 	<div class="gfpdf-badge"><?php printf( __( 'Version %s', 'gravitypdf' ), $args['display_version'] ); ?></div>
 
@@ -120,7 +120,7 @@ global $gfpdf;
 						<p>It's like a theme shop, but for Gravity PDF templates. <a href="#">Head over to our online store</a> and view our growing selection of premium PDF templates.</p>
 
 						<h4>Stay Up To Date</h4>
-						<p><a href="#">Sign up to our newsletter</a> to be amongst the first to receive the latest news and get details on upcoming feature.</p>
+						<p><a href="#">Sign up to our newsletter</a> to be amongst the first to receive the latest news and details on upcoming feature.</p>
 
 					</div>
 
