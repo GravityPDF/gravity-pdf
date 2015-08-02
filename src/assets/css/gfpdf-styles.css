@@ -9,8 +9,8 @@
 }
 
 .gfpdf-badge {
-    background: #1d1d1d url("../images/gravitypdf-globe-white.png") no-repeat 50% 5px;
-    color: #e7e7e7;
+    background: url("../images/gravitypdf-globe-black.png") no-repeat 50% 5px;
+    color: #333;
     display: inline-block;
     font-size: 14px;
     font-weight: 600;
@@ -19,7 +19,29 @@
     padding-top: 120px;
     text-align: center;
     text-rendering: optimizelegibility;
-    
+}
+
+.gfpdf-mascot-sitting {
+  background: url("../images/cap-paws-sitting.png") no-repeat 0 0;
+  width: 181px;
+  height: 193px;
+  display: inline-block;
+  float: right;
+  margin-top: -149px;
+}
+
+div img.gfpdf-image {
+  border: 1px solid #CCC;
+  max-width: 99%;
+  
+-webkit-box-shadow: 1px 1px 3px 1px rgba(0,0,0,0.15);
+-moz-box-shadow: 1px 1px 3px 1px rgba(0,0,0,0.15);
+box-shadow: 1px 1px 3px 1px rgba(0,0,0,0.15);
+
+}
+
+.gfpdf-mascot-container {
+  padding-bottom: 120px !important;
 }
 
 /**
@@ -539,10 +561,6 @@
         top: 0;
         margin: 0;
         width: 130px;
-
-        -webkit-box-shadow: inset 0px 0px 5px 0px #CCC;
-        -moz-box-shadow: inset 0px 0px 5px 0px #CCC;
-        box-shadow: inset 0px 0px 5px 0px #CCC;
     }
 }
 

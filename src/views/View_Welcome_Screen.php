@@ -4,6 +4,8 @@ namespace GFPDF\View;
 
 use GFPDF\Helper\Helper_View;
 
+use GFAPI;
+
 /**
  * Welcome Screen View
  *
@@ -65,14 +67,33 @@ class View_Welcome_Screen extends Helper_View
      * @since 4.0
      */
     public function tabs() {
-        /*
-         * Set up any variables we need for the view and display
-         */
-        $vars = array(
+        
+        /* Load any variables we want to pass to our view */
+        $args = array(
             'selected' => isset( $_GET['page'] ) ? $_GET['page'] : 'gfpdf-getting-started',
         );
 
+        $args = array_merge($args, $this->data);
+
         /* load the tabs view */
-        $this->load('tabs', $vars);
+        $this->load('tabs', $args);
+    }
+
+    /**
+     * Output the welcome screen
+     * @since 4.0
+     */
+    public function welcome() {
+
+        /* Load any variables we want to pass to our view */
+        $args = array(
+            'forms' => GFAPI::get_forms(),
+        );
+
+        $args = array_merge($args, $this->data);
+
+        /* Render our view */
+        $this->load('welcome', $args);
+
     }
 }

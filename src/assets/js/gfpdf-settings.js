@@ -72,6 +72,9 @@
 
 				/* if we have a colour picker handle the logic */
 				this.doColorListener();
+
+				/* if we have any select boxes to handle */
+				this.setup_select_boxes();
 			}
 
 			/**
@@ -129,7 +132,6 @@
 			 */
 			this.processSettings = function() {
 				this.show_tooltips(); /* enable tooltips, if needed */
-				this.setup_select_boxes(); /* setup smart select boxes, if needed */
 				this.cleanup_gf_navigation(); /* Ensure the Gravity Forms settings navigation (Form Settings / Notifications / Confirmation) has the 'tab' URI stripped from it */
 
 				/* run the appropriate settings page */
@@ -323,7 +325,6 @@
 			 * @since 4.0
 			 */
 			this.do_form_settings_edit_page = function() {
-				this.setup_select_boxes(); /* setup smart select boxes, if needed */
 				this.setup_advanced_options(); /* show / hide the advanced options section */
 				this.setup_required_fields($('#gfpdf_pdf_form')); /* highlight which fields are required and disable in-browser validation */
 				this.show_tooltips(); /* enable tooltips, if needed */

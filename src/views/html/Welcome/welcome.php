@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * Getting Started - Welcome Screen View
@@ -34,67 +34,115 @@ if (! defined('ABSPATH')) {
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+global $gfpdf;
+
 ?>
 
 <div class="wrap about-wrap">
-	<h1><?php printf( __( 'Welcome to Gravity PDF %s', 'gravitypdf' ), $args['display_version'] ); ?></h1>
-	<div class="about-text"><?php printf( __( "Thanks for installing PDF Overlay Development Toolkit %s. To get you on your way follow the steps below to create your first PDF overlay template.", 'gravitypdf' ), $args['display_version'] ); ?></div>
+	<h1><?php _e( 'Welcome to Gravity PDF', 'gravitypdf' ); ?></h1>
+	<div class="about-text"><?php _e( "You're just a few clicks away from producing highly customisable business-ready PDF documents using Gravity Forms data.", 'gravitypdf' ); ?></div>
 	
 	<div class="gfpdf-badge"><?php printf( __( 'Version %s', 'gravitypdf' ), $args['display_version'] ); ?></div>
 
 	<?php $this->tabs(); ?>
+		
 
-	<div class="changelog">
-		<h3><?php _e( 'TODO - Getting Started Steps / Documentation', 'gravitypdf' );?></h3>
+		<div class="feature-section two-col">
 
-		<div class="feature-section">
+			<div class="col">
+				<h3><?php _e( 'Where to Start?', 'gravitypdf' );?></h3>
 
-			<p><?php _e( 'Version 2.3 introduces a comprehensive customer management interface. Get detailed statistics on your customers, quickly make edits, and leave detailed notes.', 'gravitypdf' );?></p>
-
-			<img src="<?php echo EDD_PLUGIN_URL . 'assets/images/screenshots/customer-ui.png'; ?>" class="edd-welcome-screenshots"/>
-
-			<h4><?php _e( 'Better Customer Details on Payment', 'gravitypdf' );?></h4>
-			<p><?php _e( 'The Customer Details section of the View Order Details screen has been updated to make it easier to move payment records between customers. A quick link to the customer\'s overview page has also been added, letting you easily see all purchases made by the customer.', 'gravitypdf' );?></p>					
-
-		</div>
-	</div>
-
-	<div class="changelog">
-		<h3><?php _e( 'Additional Updates', 'gravitypdf' );?></h3>
-
-		<div class="feature-section col three-col">
-			<div>
-
-				<h4><?php _e( 'PolyLang Support', 'gravitypdf' );?></h4>
-				<p><?php _e( 'We\'ve improved support for the popular PolyLang Plugin in 2.3 making EDD more accessible in more languages.', 'gravitypdf' );?></p>
-
-				<h4><?php _e( 'Customer API', 'gravitypdf' );?></h4>
-				<p><?php _e( 'A new EDD_Customer class has been introduced that makes it easy for developers to interact with customer data.', 'gravitypdf' );?></p>
-
+				<p>
+				   Your first step is to review <a href="<?php echo esc_url($gfpdf->data->settings_url); ?>">Gravity PDF's General Settings</a> which can be found by navigating to <code>Forms -> Settings -> PDF</code> in your WordPress admin area.
+				   From here you'll be able to set defaults for paper size, font face, font colour, and select a PDF template – <strong>we ship with five completely-free layouts</strong> – which will be used for all new PDFs.
+				   There's even an easy-to-use interface for installing custom fonts.
+				</p>
+			
+				<a href="<?php echo esc_url($gfpdf->data->settings_url); ?>" class="button">Configure Settings</a>
 			</div>
 
-			<div>
-
-				<h4><?php _e( 'Schema Validation', 'gravitypdf' );?></h4>
-				<p><?php _e( 'The Schema Markup has been improved and now properly includes prices for both single and multi-price option products.' ,'gravitypdf' );?></p>
-
-				<h4><?php _e( 'Buy Now Button Improvements', 'gravitypdf' );?></h4>
-				<p><?php _e( 'Buy Now buttons no longer create pending payment records when they are clicked. Buy Now buttons are now automatically deactivated if no supported payment gateway is activated.' ,'gravitypdf' );?></p>
-
-			</div>
-
-			<div class="last-feature">
-
-				<h4><?php _e( 'Improved Upgrade Routine API', 'gravitypdf' );?></h4>
-				<p><?php _e( 'The upgrade routine has been improved to be more robust and user friendly. It now supports multiple upgrades in a single release, logs which have been completed ,as well as allows incomplete upgrades to be resumed.', 'gravitypdf' );?></p>
-
+			<div class="col">
+				<img class="gfpdf-image" src="<?php echo esc_url(PDF_PLUGIN_URL . 'src/assets/images/welcome-pdf-settings-page.png'); ?>">
 			</div>
 
 		</div>
-	</div>
 
-	<div class="return-to-dashboard">
-		<a href="<?php echo esc_url( admin_url( add_query_arg( array( 'post_type' => 'download', 'page' => 'edd-settings' ), 'edit.php' ) ) ); ?>"><?php _e( 'Go to Easy Digital Downloads Settings', 'gravitypdf' ); ?></a> &middot;
-		<a href="<?php echo esc_url( admin_url( add_query_arg( array( 'page' => 'edd-changelog' ), 'index.php' ) ) ); ?>"><?php _e( 'View the Full Changelog', 'gravitypdf' ); ?></a>
-	</div>
-</div>		
+		<div class="feature-section two-col">
+
+			<div class="col">
+				<img class="gfpdf-image" src="<?php echo esc_url(PDF_PLUGIN_URL . 'src/assets/images/welcome-individual-pdf-settings.png'); ?>">
+			</div>
+
+			<div class="col gfpdf-mascot-container">
+				<h3><?php _e( 'Setting up a PDF', 'gravitypdf' );?></h3>
+
+				<p>
+				   You can setup individual PDF documents from the <a href="<?php echo esc_url( admin_url( "admin.php?page=gf_edit_forms" ) ); ?>">Gravity Form "Forms" page</a> in your admin area – located at <code>Forms -> Forms</code> in your navigation.
+				   A new <code>PDF</code> option will be avaliable in the forms' settings section.
+				   Setting up a PDF is much like setting Gravity Forms Confirmation and Notifications, so the interface should be familiar.
+				   The only required fields are <em>Name</em> – an internal identifier – and <em>Filename</em> – the name used when saving and emailing the PDF.
+				   The remaining optional settings default to the most common options.
+				</p>
+
+				<!-- Output a quick Gravity Forms selector so we can let users get redirected to a PDF form of their choice -->
+				<?php if(sizeof($args['forms']) > 0): ?>
+					<form action="<?php echo admin_url( 'admin.php' ); ?>">
+						<input type="hidden" name="page" value="gf_edit_forms" />
+						<input type="hidden" name="view" value="settings" />
+						<input type="hidden" name="subview" value="pdf" />
+						<input type="hidden" name="pid" value="0" />
+
+						<p><strong>Select which Form you want to setup first:</strong><br>
+						<select name="id" class="">
+							<?php foreach($args['forms'] as $form): ?>
+								<option value="<?php echo $form['id']; ?>"><?php echo $form['title']; ?></option>
+							<?php endforeach; ?>
+						</select>
+
+						<button class="button" style="vertical-align: middle">Create a PDF</button>
+
+						</p>
+
+					</form>
+				<?php endif; ?>
+			</div>
+		</div>
+
+		<div class="gfpdf-mascot-sitting"></div>
+
+		<div class="changelog">
+				<h3>Get more out of Gravity PDF</h3>
+
+				<div class="feature-section col three-col">
+					<div>
+
+						<h4>PDF Template Shop</h4>
+						<p>It's like a theme shop, but for Gravity PDF templates. <a href="#">Head over to our online store</a> and view our growing selection of premium PDF templates.</p>
+
+						<h4>Stay Up To Date</h4>
+						<p><a href="#">Sign up to our newsletter</a> to be amongst the first to receive the latest news and get details on upcoming feature.</p>
+
+					</div>
+
+					<div>
+
+						<h4>Tailored PDFs</h4>
+						<p>If the PDF Shop doesn't have what you're after <a href="#">our friendly team can build a document just for you</a>. With an addon, our devs can even create templates that auto fill existing PDFs – like government and legal documents.</p>
+
+						<h4>Get Support</h4>
+						<p>Have trouble using Gravity PDF? <a href="#">Contact our friendly staff</a> who are avaliable 9am to 5pm Monday to Friday, <a href="http://www.timeanddate.com/worldclock/australia/sydney">Australian Eastern Standard Time</a>.</p>
+						
+
+					</div>
+
+					<div class="last-feature">
+
+						<h4>Roll your Own</h4>
+						<p>If PHP, HTML and CSS come easy to you, you'll find creating your own PDF templates a breeze. With <a href="#">extensive documentation and great examples</a> you'll be up and running in no time.</p>
+
+					</div>
+
+				</div>
+		</div>
+
+</div>
