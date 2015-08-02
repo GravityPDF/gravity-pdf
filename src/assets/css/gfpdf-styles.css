@@ -28,6 +28,8 @@
   display: inline-block;
   float: right;
   margin-top: -149px;
+  position: relative;
+  z-index: 100;
 }
 
 div img.gfpdf-image {
