@@ -47,8 +47,30 @@ class Model_Welcome_Screen extends Helper_Model {
     
     /**
      * @var string The capability users should have to view the page
+     * @since 4.0
      */
     public $minimum_capability = 'manage_options';
+
+    /**
+     * @var String The welcome page title
+     * @since 4.0
+     */
+    public $welcome_title;
+
+    /**
+     * @var String The updated page title
+     * @since 4.0
+     */
+    public $updated_title;
+
+    /**
+     * Assign our page titles
+     * @since 4.0
+     */
+    public function __construct() {
+        $this->welcome_title = __( 'Welcome to Gravity PDF', 'gravitypdf' );
+        $this->updated_title = __( "What's new in Gravity PDF?", 'gravitypdf' );
+    }
 
     /**
      * Register the Dashboard Welcome pages and then hide them so they aren't displayed in the navigation
@@ -61,16 +83,16 @@ class Model_Welcome_Screen extends Helper_Model {
         $controller = $this->getController();
 
         add_dashboard_page(
-            __( 'Welcome to Gravity PDF', 'gravitypdf' ),
-            __( 'Welcome to Gravity PDF', 'gravitypdf' ),
+            $this->welcome_title,
+            $this->welcome_title,
             $this->minimum_capability,
             'gfpdf-getting-started',
             array( $controller, 'getting_started_screen' )
         );
 
         add_dashboard_page(
-            __( 'What\'s new in Gravity PDF?', 'gravitypdf' ),
-            __( 'What\'s new in Gravity PDF?', 'gravitypdf' ),
+            $this->updated_title,
+            $this->updated_title,
             $this->minimum_capability,
             'gfpdf-update',
             array( $controller, 'update_screen' )
@@ -79,5 +101,25 @@ class Model_Welcome_Screen extends Helper_Model {
         /* hide the new page from the menu bar */
         remove_submenu_page( 'index.php', 'gfpdf-getting-started' );
         remove_submenu_page( 'index.php', 'gfpdf-update' );
+    }
+
+    /**
+     * Because we want to hide our welcome pages (using remove_submenu_page) our page titles no longer work
+     * This method will fix that
+     * @param String $title The page title
+     */
+    public function add_page_title($title) {
+
+        switch(rgget('page')) {
+            case 'gfpdf-getting-started':
+                return $this->welcome_title;
+            break;
+
+            case 'gfpdf-update':
+                return $this->updated_title;
+            break;
+        }
+
+        return $title;
     }
 }

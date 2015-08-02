@@ -6,6 +6,7 @@ use GFPDF\Helper\Helper_Controller;
 use GFPDF\Helper\Helper_Model;
 use GFPDF\Helper\Helper_View;
 use GFPDF\Helper\Helper_Int_Actions;
+use GFPDF\Helper\Helper_Int_Filters;
 
 /**
  * Welcome Screen Controller
@@ -47,7 +48,7 @@ if (! defined('ABSPATH')) {
  *
  * @since 4.0
  */
-class Controller_Welcome_Screen extends Helper_Controller implements Helper_Int_Actions
+class Controller_Welcome_Screen extends Helper_Controller implements Helper_Int_Actions, Helper_Int_Filters
 {
     /**
      * Load our model and view and required actions
@@ -69,10 +70,11 @@ class Controller_Welcome_Screen extends Helper_Controller implements Helper_Int_
      */
     public function init() {
         $this->add_actions();
+        $this->add_filters();
     }
 
     /**
-     * Apply any actions needed for the settings page
+     * Apply any actions needed for the welcome page
      * @since 4.0
      * @return void
      */
@@ -80,6 +82,15 @@ class Controller_Welcome_Screen extends Helper_Controller implements Helper_Int_
          /* Load the welcome screen into the menu */
         add_action('admin_menu', array( $this->model, 'admin_menus'));
         add_action('admin_init', array( $this, 'welcome'));
+    }
+
+    /**
+     * Apply any filters needed for the welcome page
+     * @since 4.0
+     * @return void
+     */
+    public function add_filters() {
+        add_filter('admin_title', array($this->model, 'add_page_title'), 10, 3);
     }
 
     /**
