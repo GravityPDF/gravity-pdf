@@ -74,7 +74,8 @@ class Helper_Options implements Helper_Int_Filters {
 	}
 
 	public function add_filters() {
-        /* register our core santize functions */
+        
+        /* Register our core santize functions */
         add_filter( 'gfpdf_settings_sanitize', array($this, 'sanitize_required_field'), 10, 4 );
         add_filter( 'gfpdf_settings_sanitize', array($this, 'sanitize_all_fields'), 10, 4 );
 
@@ -379,17 +380,18 @@ class Helper_Options implements Helper_Int_Filters {
 						'name'     => __('Name', 'gravitypdf'),
 						'type'     => 'text',
 						'required' => true,
+						'tooltip'  => '<h6>' . __('Name', 'gravitypdf') . '</h6>' . __('The internal PDF name, making it easy to distinguish between multiple PDFs.', 'gravitypdf'),
 					),
 
 					'template' => array(
 						'id'         => 'template',
 						'name'       => __('Template', 'gravitypdf'),
-						'desc'       =>  sprintf(__('Choose from the pre-installed templates or %sbuild your own%s.', 'gravitypdf'), '<a href="#">', '</a>'),
+						'desc'       =>  sprintf(__('Choose an existing template or purchased more %sfrom our theme shop%s.%s You can also %sbuild your own%s or %shire us%s to create a custom solution.', 'gravitypdf'), '<a href="#">', '</a>', '<br>', '<a href="#">', '</a>', '<a href="#">', '</a>'),
 						'type'       => 'select',
 						'options'    => $this->get_templates(),
 						'inputClass' => 'large',
 						'chosen'     => true,
-						'tooltip'    => '<h6>' . __('Templates', 'gravitypdf') . '</h6>' . __('Set the template used to generate your PDF.', 'gravitypdf'),
+						'tooltip'    => '<h6>' . __('Templates', 'gravitypdf') . '</h6>' . sprintf( __('Gravity PDF comes with %sfive completely-free and highly customisable designs%s to choose. You can also purchase additional templates from our theme shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravitypdf'), '<strong>', '</strong>' ),
 					),
 
 					'notification' => array(
@@ -402,6 +404,7 @@ class Helper_Options implements Helper_Int_Filters {
 						'chosen'             => true,
 						'multiple'           => true,
 						'placeholder'        => __('Choose a Notification', 'gravitypdf'),
+						'tooltip'  => '<h6>' . __('Notifications', 'gravitypdf') . '</h6>' . __('Automatically generate and attach the PDF to your selected notifications. Conditional Logic for both the PDF and the Notification applies.', 'gravitypdf'),
 					),
 
 					'filename' => array(
@@ -478,7 +481,7 @@ class Helper_Options implements Helper_Int_Filters {
 						'type'    => 'select',
 						'options' => $this->get_installed_fonts(),
 						'std'     => $this->get_option('default_font_type'),
-						'desc'    => __('Set the font to use in the PDF.', 'gravitypdf'),
+						'desc'    => __('Set the font type to use in the PDF.', 'gravitypdf'),
 						'inputClass'   => 'large',
 						'chosen'  => true,
 					),
@@ -1315,7 +1318,7 @@ class Helper_Options implements Helper_Int_Filters {
 	 */
 	public function get_form_value($args = array()) {
 
-		/* if callbacks called directly */
+		/* If callback method called directly (and not through the Settings API) */
 		if(isset($args['value'])) {
 			return $args['value'];
 		}
@@ -1456,8 +1459,9 @@ class Helper_Options implements Helper_Int_Filters {
 		$args['id'] = esc_attr($args['id']);
 
 		if ( ! empty( $args['options'] ) ) {
-			foreach( $args['options'] as $key => $option ):
-				/* set up multi-select option to pass to our form value getter */
+			foreach( $args['options'] as $key => $option ) {
+
+				/* Set up multi-select option to pass to our form value getter */
 				$args['multi-key']    = esc_attr($key);
 				$args['multi-option'] = $option;
 
@@ -1465,8 +1469,9 @@ class Helper_Options implements Helper_Int_Filters {
 
 				echo '<input name="gfpdf_settings[' . $args['id'] . '][' . esc_attr($key) . ']" id="gfpdf_settings[' . $args['id'] . '][' . esc_attr($key) . ']" class="gfpdf_settings_' . $args['id'] . ' '. $class .'" type="checkbox" value="' . $option . '" ' . checked($option, $enabled, false) . ' ' . $required . ' />&nbsp;';
 				echo '<label for="gfpdf_settings[' . $args['id'] . '][' . esc_attr($key) . ']">' . $option . '</label><br />';
-			endforeach;
-			echo '<span class="gf_settings_description">' . wp_kses_post($args['desc']) . '</span>';
+			}
+
+			$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . wp_kses_post($args['desc']) . '</label></span>';
 			
 			if(isset($args['tooltip'])) {
 				echo '<span class="gf_hidden_tooltip" style="display: none;">' . wp_kses_post($args['tooltip']) . '</span>';
@@ -1490,22 +1495,26 @@ class Helper_Options implements Helper_Int_Filters {
 		$selected   = $this->get_form_value($args);
 		$required   = (isset($args['required']) && $args['required'] === true) ? 'required' : '';
 		$args['id'] = esc_attr($args['id']);
+		$html       = '';
 
-		foreach ( $args['options'] as $key => $option ) :
+		foreach ( $args['options'] as $key => $option ) {
+		
 			$checked = false;
 			if($selected == $key) {
 				$checked = true;
 			}
 
-			echo '<label for="gfpdf_settings[' . $args['id'] . '][' . esc_attr($key) . ']"><input name="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . '][' . esc_attr($key) . ']" type="radio" value="' . esc_attr($key) . '" ' . checked(true, $checked, false) . ' '. $required .' />';
-			echo $option . '</label> &nbsp;&nbsp;';
-		endforeach;
+			$html .= '<label for="gfpdf_settings[' . $args['id'] . '][' . esc_attr($key) . ']"><input name="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . '][' . esc_attr($key) . ']" type="radio" value="' . esc_attr($key) . '" ' . checked(true, $checked, false) . ' '. $required .' />';
+			$html .= $option . '</label> &nbsp;&nbsp;';
+		}
 
-		echo '<span class="gf_settings_description">' . wp_kses_post($args['desc']) . '</span>';
+		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . wp_kses_post($args['desc']) . '</label></span>';
 		
 		if(isset($args['tooltip'])) {
-			echo '<span class="gf_hidden_tooltip" style="display: none;">' . wp_kses_post($args['tooltip']) . '</span>';
+			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . wp_kses_post($args['tooltip']) . '</span>';
 		}
+
+		echo $html;
 	}
 
 	/**
@@ -1698,7 +1707,7 @@ class Helper_Options implements Helper_Int_Filters {
 		}
 
 		$html .= '</select>';
-		$html .= '<span class="gf_settings_description">'  . wp_kses_post($args['desc']) . '</span>';
+		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> '  . wp_kses_post($args['desc']) . '</label></span>';
 
 		if(isset($args['tooltip'])) {
 			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . wp_kses_post($args['tooltip']) . '</span>';
