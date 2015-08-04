@@ -2,6 +2,8 @@
 
 namespace GFPDF\Stat;
 
+use GFPDF\Model\Model_PDF;
+
 use WP_Error;
 use GFAPI;
 
@@ -282,6 +284,7 @@ class Stat_Functions
      */
     public static function get_template_args($entry, $settings) {
         $form = GFAPI::get_form($entry['form_id']);
+        $pdf  = new Model_PDF();
 
         return apply_filters('gfpdf_template_args', array(
             'form_id'   => $entry['form_id'], /* backwards compat */
@@ -291,7 +294,7 @@ class Stat_Functions
             'form'      => $form,
             'entry'     => $entry,
             'lead'      => $entry,
-            'form_data' => '',
+            'form_data' => $pdf->get_form_data($entry),
 
             'settings' => $settings,
         ), $entry, $settings, $form);

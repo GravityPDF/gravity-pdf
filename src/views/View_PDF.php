@@ -90,6 +90,16 @@ class View_PDF extends Helper_View
         $args = Stat_Functions::get_template_args($entry, $settings);
 
         /**
+         * Show $form_data array if requested
+         */
+        if( isset( $_GET['data'] ) && GFCommon::current_user_can_any( 'gravityforms_view_settings' ) ) {
+            echo '<pre>';
+            print_r($args['form_data']);
+            echo '</pre>';
+            exit;
+        }
+
+        /**
          * Set out our PDF abstraction class
          */
         $pdf = new Helper_PDF($entry, $settings);
