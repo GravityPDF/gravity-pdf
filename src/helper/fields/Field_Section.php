@@ -89,7 +89,7 @@ class Field_Section extends Helper_Fields
 
         $data = array();
 
-        $data['section_break'][ $field->id ] = $this->value();
+        $data['section_break'][ $this->field->id ] = $this->value();
 
         return $data;
     }

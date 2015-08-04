@@ -117,12 +117,15 @@ class Field_Survey extends Helper_Fields
 
         $data = array();
 
-        /* Provide backwards compatibility fixes to certain fields */
+        /*
+         * Provide backwards compatibility fixes to certain fields
+         * TODO: allow standard 4.x layout in appropriate array key ($form_data[survey])
+         */
         switch($this->field->inputType) {
             case 'radio':
             case 'select':
             
-                $data = $this->get_form_data();
+                $data  = $this->get_form_data();
                 $value = $data['field'][ $this->field->id . '_name' ];
 
                 /* Overriding survey radio values with name */

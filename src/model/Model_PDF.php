@@ -706,8 +706,18 @@ class Model_PDF extends Helper_Model {
             $data = array_replace_recursive($data, $products->form_data() );
         }
 
-        //print '<pre>';
-        //print_r($data); exit;
+        /* Re-order the array keys to make it more readable */
+        $order = array('misc', 'field', 'list', 'signature_details_id', 'products', 'products_totals', 'poll', 'survey', 'quiz', 'pages', 'html_id', 'section_break', 'field_descriptions', 'signature', 'signature_details', 'html');
+
+        foreach($order as $key) {
+
+            /* If item exists pop it onto the end of the array */
+            if( isset($data[ $key ] ) ) {
+                $item = $data[ $key ];
+                unset( $data[ $key ] );
+                $data[ $key ] = $item;
+            }
+        }
 
         return $data;
     }
@@ -723,7 +733,7 @@ class Model_PDF extends Helper_Model {
             $data = array();
 
             /* Add form_id and entry_id for convinience */
-            $data['form_id']  = $form_id;
+            $data['form_id']  = $entry['form_id'];
             $data['entry_id'] = $entry['id'];
 
             /* Set title and dates (both US and international) */
