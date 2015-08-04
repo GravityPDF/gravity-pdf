@@ -102,6 +102,7 @@ class Model_Install extends Helper_Model {
         global $gfpdf;
 
         $gfpdf->data->template_location      = apply_filters('gfpdfe_template_location', $gfpdf->data->upload_dir . '/' . $gfpdf->data->working_folder . '/', $gfpdf->data->upload_dir, $gfpdf->data->working_folder);
+        $gfpdf->data->template_location_url  = apply_filters('gfpdfe_template_location_url', $gfpdf->data->upload_dir_url . '/' . $gfpdf->data->working_folder . '/', $gfpdf->data->upload_dir_url, $gfpdf->data->working_folder);
         $gfpdf->data->template_font_location = $gfpdf->data->template_location . 'fonts/';
         $gfpdf->data->template_tmp_location  = $gfpdf->data->template_location . 'tmp/';
     }
@@ -116,7 +117,8 @@ class Model_Install extends Helper_Model {
 
         if(is_multisite()) {
             $blog_id = get_current_blog_id();
-            $gfpdf->data->multisite_template_location = apply_filters('gfpdfe_multisite_template_location', $gfpdf->data->upload_dir . '/' . $gfpdf->data->working_folder . '/', $gfpdf->data->upload_dir, $gfpdf->data->working_folder);
+            $gfpdf->data->multisite_template_location     = apply_filters('gfpdfe_multisite_template_location', $gfpdf->data->upload_dir . '/' . $gfpdf->data->working_folder . '/', $gfpdf->data->upload_dir, $gfpdf->data->working_folder);
+            $gfpdf->data->multisite_template_location_url = apply_filters('gfpdfe_multisite_template_location_url', $gfpdf->data->upload_dir_url . '/' . $gfpdf->data->working_folder . '/', $gfpdf->data->upload_dir_url, $gfpdf->data->working_folder);
         }
     }
 
@@ -169,8 +171,8 @@ class Model_Install extends Helper_Model {
         }
 
         /* create deny htaccess file to prevent direct access to files */
-        if(is_dir($gfpdf->data->template_location) && !is_file($gfpdf->data->template_location . '.htaccess')) {
-            file_put_contents($gfpdf->data->template_location . '.htaccess', 'deny from all');
+        if(is_dir($gfpdf->data->template_tmp_location) && !is_file($gfpdf->data->template_tmp_location . '.htaccess')) {
+            file_put_contents($gfpdf->data->template_tmp_location . '.htaccess', 'deny from all');
         }
     }
 

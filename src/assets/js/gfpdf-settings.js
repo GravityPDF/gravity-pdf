@@ -408,15 +408,19 @@
 			 */
 			this.setup_dynamic_template_fields = function() {
 				/* add change listener to our template */
-				$('#gfpdf_settings\\[template\\]').change(function() {
+				$('#gfpdf_settings\\[template\\], #gfpdf_settings\\[default_template\\]').change(function() {
 
 					/* add spinner */
 					var $spinner = $('<img alt="Loading" src="' + GFPDF.spinnerUrl + '" class="gfpdf-spinner" />');
 					$(this).next().after($spinner);
 
+					/* Hide our template preview */
+					$('#gfpdf-template-example').hide();
+
 		      		var data = {
 		      			'action': 'gfpdf_get_template_fields',
 		      			'template': $(this).val(),
+		      			'type': $(this).attr('id'),
 		      		};
 
 		      		self.ajax(data, function(response) {
@@ -432,7 +436,12 @@
 		      				self.show_tooltips();
 		      			}
 
-		      			console.log(response);
+		      			/* Update our template example preview and display it */
+		      			if(response !== undefined && response.preview != false) {
+		      				$('#gfpdf-template-example').attr('src', response.preview).load(function() {
+		      					$(this).show();
+		      				});
+		      			}
 		      		});
 				});
 			}
@@ -638,6 +647,7 @@
 			this.general_settings = function() {
 				/* setup custom paper size */
 				this.setup_custom_paper_size();
+				this.setup_dynamic_template_fields();
 				this.setup_required_fields($('#pdfextended-settings > form'));
 
 				var $table             = $('#pdf-general-security');

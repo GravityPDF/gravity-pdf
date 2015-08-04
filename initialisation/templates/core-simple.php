@@ -23,6 +23,7 @@ if(! class_exists('GFForms') ) {
  * $lead (alias of $entry)
  * $form_data (The processed entry data stored in an array)
  * $settings (the current PDF configuration)
+ * $args (contains an array of all variables - the ones being described right now - passed to the template)
  *
  * The following variables are avaliable for backwards compatibility purposes:
  *
@@ -42,6 +43,7 @@ $background_img      = (!empty($settings['background']))		? $settings['backgroun
 $first_header        = (!empty($settings['first_header'])) 		? GFPDF\Stat\Stat_Functions::fix_header_footer($settings['first_header']) : '';
 $header              = (!empty($settings['header'])) 			? GFPDF\Stat\Stat_Functions::fix_header_footer($settings['header']) : '';
 $footer              = (!empty($settings['footer'])) 			? GFPDF\Stat\Stat_Functions::fix_header_footer($settings['footer']) : '';
+$first_footer        = (!empty($settings['first_footer'])) 		? GFPDF\Stat\Stat_Functions::fix_header_footer($settings['first_footer']) : '';
 $font_colour         = (!empty($settings['font_colour'])) 		? $settings['font_colour'] : '#333';
 $font                = (!empty($settings['font'])) 		        ? $settings['font'] : 'DejavuSansCondensed';
 
@@ -78,6 +80,11 @@ $font                = (!empty($settings['font'])) 		        ? $settings['font']
 			<?php if(!empty($first_header)): ?>
 				header: html_TemplateFirstHeader;
 				margin-header: 5mm;
+			<?php endif; ?>
+
+			<?php if(!empty($first_footer)): ?>
+				header: html_TemplateFirstFooter;
+				margin-footer: 5mm;
 			<?php endif; ?>
 		}
 
@@ -265,6 +272,12 @@ $font                = (!empty($settings['font'])) 		        ? $settings['font']
             	<?php echo $header; ?>
             </div>
         </htmlpageheader>
+
+        <htmlpageheader name="TemplateFirstFooter">
+            <div id="first_footer">
+            	<?php echo $first_footer; ?>
+            </div>
+        </htmlpageheader>
         
         <htmlpagefooter name="TemplateFooter">
         	<div class="footer">
@@ -304,7 +317,7 @@ $font                = (!empty($settings['font'])) 		        ? $settings['font']
 			 *
 			 */
 			$pdf = new GFPDF\View\View_PDF;
-			$pdf->process_html_structure($entry, $config);
+			$pdf->process_html_structure($entry, new GFPDF\Model\Model_PDF(), $config);
 		?>
 	</body>
 </html>

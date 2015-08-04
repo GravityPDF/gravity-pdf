@@ -59,10 +59,11 @@ class core_simple implements Helper_Int_Config {
 	public function configuration() {
 		return array(
 			'core' => array(
-				'header' => true,
+				'header'      => true,
 				'firstHeader' => true,
-				'footer' => true,
-				'background' => true,
+				'footer'      => true,
+				'firstFooter' => true,
+				'background'  => true,
 			),
 
 			'fields' => array(

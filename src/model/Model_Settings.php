@@ -426,6 +426,25 @@ class Model_Settings extends Helper_Model {
         return $fonts;
     }
 
+    /**
+     * Add an image of the current selected template (if any)
+     * @param Array $settings Any existing settings loaded
+     */
+    public function add_template_image($settings) {
+        global $gfpdf;
+
+        if( isset( $settings['default_template'] ) ) {
+            $current_template = $gfpdf->options->get_form_value( $settings['default_template'] );
+            $template_image   = Stat_Functions::get_template_image( $current_template );
+
+            if( ! empty($template_image) ) {
+                $img                                  = '<img src="'. esc_url($template_image) . '" alt="' . __('Template Example') . '" id="gfpdf-template-example" />';
+                $settings['default_template']['desc'] = $settings['default_template']['desc'] . $img;
+            }
+        }
+        return $settings;
+    }
+
 
 
 

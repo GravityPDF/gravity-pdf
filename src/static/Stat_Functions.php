@@ -162,12 +162,12 @@ class Stat_Functions
     }
 
     /**
-     * Modified version of get_upload_dir() which just focuses on the base directory
+     * Modified version of get_upload_path() which just focuses on the base directory
      * no matter if single or multisite installation
      * We also only needed the basedir and baseurl so stripped out all the extras
      * @return Array Base dir and url for the upload directory
      */
-    public static function get_upload_dir() {
+    public static function get_upload_details() {
         $siteurl     = get_option('siteurl');
         $upload_path = trim(get_option('upload_path'));
         $dir         = $upload_path;
@@ -179,15 +179,24 @@ class Stat_Functions
             $dir = path_join(ABSPATH, $upload_path);
         }
 
+        if ( ! $url = get_option( 'upload_url_path' ) ) {
+            if ( empty($upload_path) || ( 'wp-content/uploads' == $upload_path ) || ( $upload_path == $dir ) ) {
+                $url = WP_CONTENT_URL . '/uploads';
+            } else {
+                $url = trailingslashit( $siteurl ) . $upload_path;
+            }
+        }
+
         /*
          * Honor the value of UPLOADS. This happens as long as ms-files rewriting is disabled.
          * We also sometimes obey UPLOADS when rewriting is enabled -- see the next block.
          */
         if (defined('UPLOADS') && ! (is_multisite() && get_site_option('ms_files_rewriting'))) {
             $dir = ABSPATH . UPLOADS;
+            $url = trailingslashit( $siteurl ) . UPLOADS;
         }
 
-        return $dir;
+        return array('path' => $dir, 'url' => $url);
     }
 
     /**
@@ -283,6 +292,9 @@ class Stat_Functions
      * @since 4.0
      */
     public static function get_template_args($entry, $settings) {
+        /* TEMP FIX */
+        error_reporting(E_ALL ^ E_NOTICE);
+
         $form = GFAPI::get_form($entry['form_id']);
         $pdf  = new Model_PDF();
 
@@ -360,5 +372,28 @@ class Stat_Functions
         $arr = array_reverse($arr, true);
         $arr[$key] = $val;
         return array_reverse($arr, true);
+    }
+
+    /**
+     * Do a lookup for the current template image (if any) and return the path
+     * @param  String $template The template name to look for
+     * @return String       Full URL to image
+     */
+    public static function get_template_image( $template ) {
+        global $gfpdf;
+
+        /* Add our extension */
+        $template .= '.png';
+
+        $default_template_path = PDF_PLUGIN_DIR . 'initialisation/templates/images/';
+        $default_template_url  = PDF_PLUGIN_URL . 'initialisation/templates/images/';
+
+        if(is_file( $gfpdf->data->template_location . 'images/' . $template )) {
+            return $gfpdf->data->template_location_url . 'images/' . $template;
+        } else if( is_file( $default_template_path . $template)) {
+            return $default_template_url . $template;
+        }
+
+        return false;
     }
 }

@@ -6,6 +6,7 @@ use GFPDF\Helper\Helper_Model;
 use GFPDF\Helper\Helper_PDF_List_Table;
 use GFPDF\Helper\Helper_Options;
 use GFPDF\Helper\Helper_Int_Config;
+use GFPDF\Stat\Stat_Functions;
 
 use GFFormsModel;
 use GFCommon;
@@ -129,7 +130,7 @@ class Model_Form_Settings extends Helper_Model {
         }
 
         /* prepare our data */
-        $label = $pdf_id ? __( 'Update PDF', 'gravitypdf' ) : __( 'Save PDF', 'gravitypdf' );
+        $label = (rgget('pid')) ? __( 'Update PDF', 'gravitypdf' ) : __( 'Add PDF', 'gravitypdf' );
 
         /* re-register our Gravity Forms Notifications */
         $this->register_notifications($form['notifications']);
@@ -527,6 +528,25 @@ class Model_Form_Settings extends Helper_Model {
     }
 
     /**
+     * Add an image of the current selected template (if any)
+     * @param Array $settings Any existing settings loaded
+     */
+    public function add_template_image($settings) {
+        global $gfpdf;
+
+        if( isset( $settings['template'] ) ) {
+            $current_template = $gfpdf->options->get_form_value( $settings['template'] );
+            $template_image   = Stat_Functions::get_template_image( $current_template );
+
+            if( ! empty($template_image) ) {
+                $img              = '<img src="'. esc_url($template_image) . '" alt="' . __('Template Example') . '" id="gfpdf-template-example" />';
+                $settings['template']['desc'] = $settings['template']['desc'] . $img;
+            }
+        }
+        return $settings;
+    }
+
+    /**
      * Load our custom appearance settings (if needed)
      * @param  Object $class    The template configuration class
      * @param  Array  $settings Any current settings
@@ -555,6 +575,10 @@ class Model_Form_Settings extends Helper_Model {
 
         if(isset($template_settings['core']['footer']) && $template_settings['core']['footer'] === true) {
             $settings['footer'] = $this->get_footer_field();
+        }
+
+        if(isset($template_settings['core']['firstFooter']) && $template_settings['core']['firstFooter'] === true) {
+           $settings['firstFooter'] = $this->get_first_page_footer_field();
         }
 
         if(isset($template_settings['core']['background']) && $template_settings['core']['background'] === true) {
@@ -589,7 +613,7 @@ class Model_Form_Settings extends Helper_Model {
             'name'       => __('Different First Page Header', 'gravitypdf'),
             'type'       => 'rich_editor',
             'size'       => 8,
-            'desc'       => sprintf(__('Override the standard header on the first page of your PDF.', 'gravitypdf'), '<em>', '</em>', '<em>', '</em>'),
+            'desc'       => __('Override the standard header on the first page of your PDF.', 'gravitypdf'),
             'inputClass' => 'merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields',
         );
     }
@@ -603,6 +627,17 @@ class Model_Form_Settings extends Helper_Model {
             'desc'       => sprintf(__('The footer is included at the bottom of every page. For simple columns %stry this HTML table snippet%s.', 'gravitypdf'), '<a href="https://gist.github.com/blueliquiddesigns/e6179a96cd97ef0a8457">', '</a>'),
             'inputClass' => 'merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields',
             'tooltip'    => '<h6>' . __('Footer', 'gravitypdf') . '</h6>' . sprintf(__('For simple text footers try use the left, center and right alignment buttons in the editor. You can also use the special %s{PAGENO}%s and %s{nbpg}%s tags to display page numbering.', 'gravitypdf'), '<em>', '</em>', '<em>', '</em>'),
+        );
+    }
+
+    public function get_first_page_footer_field() {
+        return array(
+            'id'         => 'first_footer',
+            'name'       => __('Different First Page Footer', 'gravitypdf'),
+            'type'       => 'rich_editor',
+            'size'       => 8,
+            'desc'       => __('Override the standard footer on the first page of your PDF.', 'gravitypdf'),
+            'inputClass' => 'merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields',
         );
     }
 
@@ -904,37 +939,49 @@ class Model_Form_Settings extends Helper_Model {
 
         /* get the current template */
         $template = $_POST['template'];
+        $type     = $_POST['type'];
         $class    = $this->get_template_configuration($template);
         $settings = $this->setup_custom_appearance_settings($class);
 
-        /**
-         * Had issues displaying multiple wp_editors via AJAX. In the interim we'll display appropriate message about saving / reloading the page
-         * @TODO: in future would like to correctly load WP_Editor via AJAX. Pull requests welcome
-         */
-        foreach($settings as &$field) {
-           if(isset($field['type']) && $field['type'] == 'rich_editor') {
-                $field['type'] = 'descriptive_text';
-                $field['desc'] = __("Update PDF to edit this setting.", 'gravitypdf');
+        /* Check if the selected template has a preview */
+        $template_image = Stat_Functions::get_template_image( $template );
+
+        if($type != 'gfpdf_settings[default_template]') {
+            /**
+             * Had issues displaying multiple wp_editors via AJAX. In the interim we'll display appropriate message about saving / reloading the page
+             * @TODO: in future would like to correctly load WP_Editor via AJAX. Pull requests welcome
+             */
+            foreach($settings as &$field) {
+               if(isset($field['type']) && $field['type'] == 'rich_editor') {
+                    $field['type'] = 'descriptive_text';
+                    $field['desc'] = __("Update PDF to edit this setting.", 'gravitypdf');
+                }
             }
+
+            /* add our filter to override what template gets rendered (by default it is the current selected template in the config) */
+            add_filter('gfpdf_form_settings_custom_appearance', function() use (&$settings) {
+                /* check if the template has any configuration */
+                return $settings;
+            }, 100);
+
+            /* Ensure our new fields are registered */
+            $gfpdf->options->register_settings();
+
+            /* generate the HTML */
+            ob_start();
+
+            do_settings_fields('gfpdf_settings_form_settings_custom_appearance', 'gfpdf_settings_form_settings_custom_appearance');
+
+            $html = ob_get_clean();
+        } else {
+            $html = null;
+
         }
 
-        /* add our filter to override what template gets rendered (by default it is the current selected template in the config) */
-        add_filter('gfpdf_form_settings_custom_appearance', function() use (&$settings) {
-            /* check if the template has any configuration */
-            return $settings;
-        }, 100);
-
-        /* Ensure our new fields are registered */
-        $gfpdf->options->register_settings();
-
-        /* generate the HTML */
-        ob_start();
-
-        do_settings_fields('gfpdf_settings_form_settings_custom_appearance', 'gfpdf_settings_form_settings_custom_appearance');
-
-        $html = ob_get_clean();
-
-        echo json_encode(array('fields' => $html));
+        echo json_encode(array(
+            'fields' => $html,
+            'preview' => $template_image,
+        ));
         
         /* end AJAX function */
         wp_die();

@@ -108,7 +108,10 @@ class Controller_Install extends Helper_Controller implements Helper_Int_Actions
         $gfpdf->data->permalink      = $this->model->get_permalink_regex();
         $gfpdf->data->working_folder = $this->model->get_working_directory();
         $gfpdf->data->settings_url   = $this->model->get_settings_url();
-        $gfpdf->data->upload_dir     = Stat_Functions::get_upload_dir();
+
+        $upload_details              = Stat_Functions::get_upload_details();
+        $gfpdf->data->upload_dir     = $upload_details['path'];
+        $gfpdf->data->upload_dir_url = $upload_details['url'];
 
         $this->model->setup_template_location();
         $this->model->setup_multisite_template_location();

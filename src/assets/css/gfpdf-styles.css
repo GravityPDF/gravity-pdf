@@ -530,10 +530,19 @@ box-shadow: 1px 1px 3px 1px rgba(0,0,0,0.15);
   vertical-align: top;
 }
 
-.forms_page_gf_settings .gfpdf-spinner {
+#pdf-form-settings .gfpdf-spinner,
+#pdfextended-settings .gfpdf-spinner {
   padding-left: 5px;
   vertical-align: middle;
   width: 20px;
+}
+
+#gfpdf-template-example {
+  width: 100%;
+  max-width: 300px;
+  border: 1px solid #CCC;
+  display: block;
+  margin-top: 5px;
 }
 
 /**

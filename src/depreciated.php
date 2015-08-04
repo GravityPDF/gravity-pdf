@@ -83,7 +83,7 @@ class PDF_Common
     }
 
     public static function get_upload_dir() {
-        return Stat_Functions::get_upload_dir();
+        return Stat_Functions::get_upload_details();
     }
 
     public static function view_data($form_data = array()) {

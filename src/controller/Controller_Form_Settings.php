@@ -107,6 +107,9 @@ class Controller_Form_Settings extends Helper_Controller implements Helper_Int_A
     public function add_filters() {
         global $gfpdf;
         
+        /* Add a sample image of what the template looks like */
+        add_filter( 'gfpdf_form_settings', array($this->model, 'add_template_image'));
+
         /* Add custom field information if we have a template selected */
         add_filter( 'gfpdf_form_settings_custom_appearance', array($this->model, 'register_custom_appearance_settings'));
 
