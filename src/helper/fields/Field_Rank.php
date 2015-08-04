@@ -47,7 +47,7 @@ if (! defined('ABSPATH')) {
  *
  * @since 4.0
  */
-class Field_Rating extends Helper_Fields
+class Field_Rank extends Helper_Fields
 {
 
     /**
@@ -60,7 +60,7 @@ class Field_Rating extends Helper_Fields
         $data = array();
         $value = $this->value();
 
-        $data['survey']['rating'][ $this->field->id ] = $value;
+        $data['survey']['rank'][ $this->field->id ] = $value;
 
         return $data;
     }

@@ -26,7 +26,7 @@ use WP_Error;
 use Exception;
 
 /**
- * PDF Display Model
+ * PDF Display Model, including the $form_data array
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
@@ -777,13 +777,14 @@ class Model_PDF extends Helper_Model {
 
                 /* Check if we have a multifield likert and replace the row key */
                 if( isset( $field['gsurveyLikertEnableMultipleRows'] ) && $field['gsurveyLikertEnableMultipleRows'] == 1 ) {
-                    
+
                     foreach($field['gsurveyLikertRows'] as $row) {
+
                         $results['field_data'][ $field->id ] = $this->replace_key($results['field_data'][ $field->id ], $row['value'], $row['text']);
-                            
+
                         if( isset( $field->choices ) && is_array( $field->choices ) ) {
                             foreach($field->choices as $choice) {
-                                $results['field_data'][ $field->id ][ $row['text'] ] = $this->replace_key($results['field_data'][ $field->id ][ $row['value'] ], $choice['value'], $choice['text']);
+                                $results['field_data'][ $field->id ][ $row['text'] ] = $this->replace_key($results['field_data'][ $field->id ][ $row['text'] ], $choice['value'], $choice['text']);
                             }
                         }
                     }

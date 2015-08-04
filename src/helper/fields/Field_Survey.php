@@ -65,9 +65,9 @@ class Field_Survey extends Helper_Fields
         /*
          * Survey Field can be any of the following:
          * single line text, paragraph, dropdown, select, checkbox,
-         * likert or rating
+         * likert, rank or rating
          */
-        $class = Stat_functions::get_field_class($field->inputType);
+        $class = Stat_Functions::get_field_class($field->inputType);
 
         try {
             /* check load our class */
