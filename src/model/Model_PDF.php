@@ -70,10 +70,11 @@ class Model_PDF extends Helper_Model {
      * Our Middleware used to handle the authentication process
      * @param  $pid The Gravity Form PDF Settings ID
      * @param  $lid The Gravity Form Entry ID
+     * @param  $action Whether the PDF should be viewed or downloaded
      * @since 4.0
      * @return void
      */
-    public function process_pdf($pid, $lid) {
+    public function process_pdf($pid, $lid, $action = 'view') {
         
         /**
          * Check if we have a valid Gravity Form Entry and PDF Settings ID
@@ -87,6 +88,9 @@ class Model_PDF extends Helper_Model {
 
         $settingsAPI = new Model_Form_Settings();
         $settings = $settingsAPI->get_pdf( $entry['form_id'], $pid);
+
+        /* Add our download setting */
+        $settings['pdf_action'] = $action;
 
         /* Not valid settings */
         if(is_wp_error($settings)) {
@@ -290,7 +294,7 @@ class Model_PDF extends Helper_Model {
 
         if(!empty($pdfs)) {
 
-            $download = ($gfpdf->options->get_option('default_action') == 'Download') ? '?download=1' : '';
+            $download = ($gfpdf->options->get_option('default_action') == 'Download') ? 'download/' : '';
 
             if(sizeof($pdfs) > 1) {
                 $args = array('pdfs' => array());

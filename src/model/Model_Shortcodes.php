@@ -97,7 +97,7 @@ class Model_Shortcodes extends Helper_Model {
         /* everything looks valid so let's get the URL */
         $pdf = new Model_PDF();
         $pdf_url = $pdf->get_pdf_url($attributes['id'], $attributes['entry']);
-        $attributes['url'] = ($attributes['type'] == 'download') ? $pdf_url . '?download=1' : $pdf_url;
+        $attributes['url'] = ($attributes['type'] == 'download') ? $pdf_url . 'download/' : $pdf_url;
 
         /* generate the markup and return */
         return $controller->view->display_gravitypdf_shortcode($attributes);
@@ -183,7 +183,7 @@ class Model_Shortcodes extends Helper_Model {
 
                         /* check if the PDF should be auto-prompted to download, or whether the user should view it in the browser */
                         if(! isset($code['attr']['attr']) || $code['attr']['attr'] == 'download') {
-                            $pdf_url .= '?download=1';
+                            $pdf_url .= 'download/';
                         }
 
                         /* override the confirmation URL submitted */

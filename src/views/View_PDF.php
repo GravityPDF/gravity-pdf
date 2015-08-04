@@ -109,7 +109,7 @@ class View_PDF extends Helper_View
             $pdf->renderHtml($args);
 
             /* set display type */
-            if(rgget('download')) {
+            if($settings['pdf_action'] == 'download') {
                 $pdf->setOutputType('download');
             }
 

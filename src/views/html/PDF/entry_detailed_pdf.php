@@ -42,6 +42,6 @@ if (! defined('ABSPATH')) {
     <div class="gfpdf_detailed_pdf_container">
         <span><?php echo $pdf['name']; ?></span>
         <a href="<?php echo $pdf['url']; ?>" target="_blank" class="button"><?php _e('View', 'gravitypdf'); ?></a>
-        <a href="<?php echo $pdf['url'] . '?download=1'; ?>" target="_blank" class="button"><?php _e('Download', 'gravitypdf'); ?></a>
+        <a href="<?php echo $pdf['url'] . 'download/'; ?>" target="_blank" class="button"><?php _e('Download', 'gravitypdf'); ?></a>
     </div>
 <?php endforeach; ?>

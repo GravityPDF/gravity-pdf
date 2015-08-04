@@ -64,7 +64,7 @@ class Model_Install extends Helper_Model {
      * @since  4.0
      */
     public function get_permalink_regex() {
-        return '^pdf/([A-Za-z0-9]+)/([0-9]+)/?';
+        return '^pdf\/([A-Za-z0-9]+)\/([0-9]+)\/?(download)?\/?';
     }
 
     /**
@@ -188,7 +188,7 @@ class Model_Install extends Helper_Model {
         /* Add our main endpoint */
         add_rewrite_rule(
             $query,
-            'index.php?gf_pdf=1&pid=$matches[1]&lid=$matches[2]',
+            'index.php?gf_pdf=1&pid=$matches[1]&lid=$matches[2]&action=$matches[3]',
             'top');
 
         /* check to see if we need to flush the rewrite rules */
@@ -204,6 +204,7 @@ class Model_Install extends Helper_Model {
         $tags[] = 'gf_pdf';
         $tags[] = 'pid';
         $tags[] = 'lid';
+        $tags[] = 'action';
 
         return $tags;
     }

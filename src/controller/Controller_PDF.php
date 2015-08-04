@@ -130,6 +130,7 @@ class Controller_PDF extends Helper_Controller implements Helper_Int_Actions, He
      * @return void
      */
     public function process_pdf_endpoint() {
+
         /* exit early if all the required URL parameters aren't met */
         if ( empty( $GLOBALS['wp']->query_vars['gf_pdf'] ) || empty( $GLOBALS['wp']->query_vars['pid'] ) || empty( $GLOBALS['wp']->query_vars['lid'] ) ) {
             return;
@@ -137,11 +138,12 @@ class Controller_PDF extends Helper_Controller implements Helper_Int_Actions, He
 
         $pid = $GLOBALS['wp']->query_vars['pid'];
         $lid = (int) $GLOBALS['wp']->query_vars['lid'];
+        $action = ( $GLOBALS['wp']->query_vars['action'] == 'download' ) ? 'download' : 'view';
 
         /*
          * Send to our model to handle validation / authentication
          */
-        $results = $this->model->process_pdf($pid, $lid);
+        $results = $this->model->process_pdf($pid, $lid, $action);
 
         /* if error, display to user */
         if(is_wp_error($results)) {
