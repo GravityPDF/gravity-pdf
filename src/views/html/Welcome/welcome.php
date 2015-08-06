@@ -73,15 +73,14 @@ global $gfpdf;
 				<img class="gfpdf-image" src="<?php echo esc_url(PDF_PLUGIN_URL . 'src/assets/images/welcome-individual-pdf-settings.png'); ?>">
 			</div>
 
-			<div class="col gfpdf-mascot-container">
+			<div class="col">
 				<h3><?php _e( 'Setting up a PDF', 'gravitypdf' );?></h3>
 
 				<p>
 				   You can setup individual PDF documents from the <a href="<?php echo esc_url( admin_url( "admin.php?page=gf_edit_forms" ) ); ?>">Gravity Form "Forms" page</a> in your admin area – located at <code>Forms -> Forms</code> in your navigation.
 				   A new <code>PDF</code> option will be avaliable in the forms' settings section.
-				   Setting up a PDF is much like setting Gravity Forms Confirmation and Notifications, so the interface should be familiar.
 				   The only required fields are <em>Name</em> – an internal identifier – and <em>Filename</em> – the name used when saving and emailing the PDF.
-				   The remaining optional settings default to the most common options.
+				
 				</p>
 
 				<!-- Output a quick Gravity Forms selector so we can let users get redirected to a PDF form of their choice -->
@@ -108,7 +107,27 @@ global $gfpdf;
 			</div>
 		</div>
 
+		<div id="gfpdf-mascot-container" class="changelog feature-section three-col">
+			<div>
+				<img class="gfpdf-image" src="<?php echo esc_url(PDF_PLUGIN_URL . 'src/assets/images/welcome-download-shortcode.png'); ?>">
+				<h3>Simple PDF Download Links</h3>
+				<p>The <code>[gravitypdf]</code> shortcode allows you to <a href="#">easily place a PDF download link</a> on any of the Gravity Forms Confirmation types.</p>
+			</div>
+			<div>
+				<img class="gfpdf-image" src="<?php echo esc_url(PDF_PLUGIN_URL . 'src/assets/images/welcome-notification-conditional.png'); ?>">
+				<h3>Automated PDF Emails</h3>
+				<p>Select a Gravity Form Notification and your PDF <a href="#">will automatically be sent as an attachment</a>. Powerful conditional logic can also be used to determine if a PDF will be included.</p>
+			</div>
+			<div class="last-feature">
+				<img class="gfpdf-image" src="<?php echo esc_url(PDF_PLUGIN_URL . 'src/assets/images/welcome-manage-fonts.png'); ?>">
+				<h3>Custom Fonts</h3>
+				<p>Make your documents stand out by including your favourite fonts with our <a href="#">simple font manager</a>.</p>
+			</div>
+		</div>
+
 		<div class="gfpdf-mascot-sitting"></div>
+
+		
 
 		<div class="changelog">
 				<h3>Get more out of Gravity PDF</h3>
@@ -143,6 +162,7 @@ global $gfpdf;
 					</div>
 
 				</div>
+
 		</div>
 
 </div>
