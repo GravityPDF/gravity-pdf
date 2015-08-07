@@ -343,6 +343,11 @@ class Stat_Functions
             }
         }
 
+        /* Include our get_home_path functionality */
+        if( ! function_exists( 'get_home_path' ) ) {
+            require_once(ABSPATH . 'wp-admin/includes/file.php');
+        }
+
         /* If that didn't work let's try use home_url() and get_home_path() */
         $try_path = str_replace(home_url(), get_home_path(), $url);
 
