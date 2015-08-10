@@ -616,11 +616,12 @@ class Model_Form_Settings extends Helper_Model {
     public function get_first_page_header_field() {
         return array(
             'id'         => 'first_header',
-            'name'       => __('Different First Page Header', 'gravitypdf'),
+            'name'       => __('First Page Header', 'gravitypdf'),
             'type'       => 'rich_editor',
             'size'       => 8,
             'desc'       => __('Override the standard header on the first page of your PDF.', 'gravitypdf'),
             'inputClass' => 'merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields',
+            'toggle'     => __('Use different header on first page of PDF?', 'gravitypdf'),
         );
     }
 
@@ -639,11 +640,12 @@ class Model_Form_Settings extends Helper_Model {
     public function get_first_page_footer_field() {
         return array(
             'id'         => 'first_footer',
-            'name'       => __('Different First Page Footer', 'gravitypdf'),
+            'name'       => __('First Page Footer', 'gravitypdf'),
             'type'       => 'rich_editor',
             'size'       => 8,
             'desc'       => __('Override the standard footer on the first page of your PDF.', 'gravitypdf'),
             'inputClass' => 'merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields',
+            'toggle'     => __('Use different footer on first page of PDF?', 'gravitypdf'),
         );
     }
 

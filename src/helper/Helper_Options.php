@@ -193,6 +193,7 @@ class Helper_Options implements Helper_Int_Filters {
 						'required'           => isset( $option['required'] )    				? $option['required'] 		 		: null,
 						'uploaderTitle'      => isset( $option['uploaderTitle'] )    			? $option['uploaderTitle'] 			: null,
 						'uploaderButtonText' => isset( $option['uploaderButtonText'] )    		? $option['uploaderButtonText'] 	: null,
+						'toggle'			 => isset( $option['toggle'] )						? $option['toggle'] 				: null,
 					)
 				);
 			}
@@ -1611,6 +1612,13 @@ class Helper_Options implements Helper_Int_Filters {
 			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . wp_kses_post($args['tooltip']) . '</span>';
 		}
 
+		/* Check if the field should include a toggle option */
+		$toggle = (! empty($args['toggle'] ) ) ? $args['toggle'] : false;
+
+		if( $toggle !== false) {
+			$html = $this->create_toggle_input($toggle, $html, $value);
+		}
+
 		echo $html;
 	}
 
@@ -1747,6 +1755,13 @@ class Helper_Options implements Helper_Int_Filters {
 
 		if(isset($args['tooltip'])) {
 			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . wp_kses_post($args['tooltip']) . '</span>';
+		}
+
+		/* Check if the field should include a toggle option */
+		$toggle = (! empty($args['toggle'] ) ) ? $args['toggle'] : false;
+
+		if( $toggle !== false) {
+			$html = $this->create_toggle_input($toggle, $html, $value);
 		}
 
 		echo $html;
@@ -1967,6 +1982,29 @@ class Helper_Options implements Helper_Int_Filters {
 	 */
 	public function missing_callback($args) {
 		printf( __( 'The callback used for the <strong>%s</strong> setting is missing.', 'gravitypdf' ), $args['id'] );
+	}
+
+	/**
+	 * Creates jQuery toggle functionality for the current fiel
+	 * @param  String $toggle The text to be used in the toggle
+	 * @param  String $html   The field HTML
+	 * @param  String $value  Whether the field currently has a value
+	 * @return String         The modified HTML
+	 */
+	public function create_toggle_input($toggle, $html, $value) {
+
+		$has_value = (strlen($value) > 0) ? 1 : 0;
+		$current_display = ( ! $has_value) ? 'style="display: none;"' : '';
+
+		$toggle_elm = '<label><input class="gfpdf-input-toggle" type="checkbox" value="1" ' . checked( $has_value, 1, false) . ' /> ' . esc_attr($toggle) . '</label>';
+
+		$html = '<div class="gfpdf-toggle-wrapper" '. $current_display . '>' .
+					$html .
+				'</div>';
+
+		$html = $toggle_elm . $html;
+
+		return $html;
 	}
 
 }

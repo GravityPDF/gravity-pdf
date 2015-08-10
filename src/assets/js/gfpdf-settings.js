@@ -331,6 +331,28 @@
 				this.setup_custom_paper_size(); /* set up the custom paper size logic */
 				this.setup_dynamic_template_fields();
 
+				$('.gfpdf-input-toggle').change(function() {
+
+					var $container = $(this).parent().next();
+
+					/* Currently checked so hide out input and if cotains rich_text, textarea or input we will delete values */
+					if( $(this).prop('checked') ) {
+						$container.slideDown('slow');
+					} else {
+						$container.slideUp('slow');
+
+						/* Remove TinyMCE Content */
+						$container.find('.wp-editor-area').each(function() {
+							tinyMCE.get( $(this).attr('id') ).setContent('');
+						});
+
+						/* Remove textarea content */
+						$container.find('textarea').each(function() {
+							$(this).val('');
+						});
+					}
+				});
+
 				/*
 				 * Workaround for Firefix TinyMCE Editor Bug NS_ERROR_UNEXPECTED (http://www.tinymce.com/develop/bugtracker_view.php?id=3152)
 				 * Manual save TinyMCE editors on form submission

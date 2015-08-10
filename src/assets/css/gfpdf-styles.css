@@ -532,6 +532,10 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
   margin-top: 5px;
 }
 
+#gfpdf_pdf_form .gfpdf-toggle-wrapper {
+  padding-top: 15px;
+}
+
 /**
  * Gravity Forms Entry Details Page
  */
