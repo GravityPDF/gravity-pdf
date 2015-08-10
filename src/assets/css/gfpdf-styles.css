@@ -536,6 +536,17 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
   padding-top: 15px;
 }
 
+#gfpdf_pdf_form .gfpdf-tab-container {
+    border-bottom: 1px solid #e6e6e6;
+    clear: both;
+    padding: 0 0 24px 0;
+    margin: 0 0 24px 0;
+}
+
+#gfpdf_pdf_form .nav-tab-wrapper {
+  margin-bottom: 20px;
+}
+
 /**
  * Gravity Forms Entry Details Page
  */

@@ -325,33 +325,12 @@
 			 * @since 4.0
 			 */
 			this.do_form_settings_edit_page = function() {
-				this.setup_advanced_options(); /* show / hide the advanced options section */
 				this.setup_required_fields($('#gfpdf_pdf_form')); /* highlight which fields are required and disable in-browser validation */
 				this.show_tooltips(); /* enable tooltips, if needed */
 				this.setup_custom_paper_size(); /* set up the custom paper size logic */
 				this.setup_dynamic_template_fields();
-
-				$('.gfpdf-input-toggle').change(function() {
-
-					var $container = $(this).parent().next();
-
-					/* Currently checked so hide out input and if cotains rich_text, textarea or input we will delete values */
-					if( $(this).prop('checked') ) {
-						$container.slideDown('slow');
-					} else {
-						$container.slideUp('slow');
-
-						/* Remove TinyMCE Content */
-						$container.find('.wp-editor-area').each(function() {
-							tinyMCE.get( $(this).attr('id') ).setContent('');
-						});
-
-						/* Remove textarea content */
-						$container.find('textarea').each(function() {
-							$(this).val('');
-						});
-					}
-				});
+				this.setup_toggled_fields();
+				this.setup_gfpdf_tabs();
 
 				/*
 				 * Workaround for Firefix TinyMCE Editor Bug NS_ERROR_UNEXPECTED (http://www.tinymce.com/develop/bugtracker_view.php?id=3152)
@@ -429,6 +408,65 @@
 				$('#gfpdf_pdf_form').submit(function() {
 					/* JSONify the conditional logic so we can pass it through the form and use it in PHP (after running json_decode) */
 					$('#gfpdf_settings\\[conditionalLogic\\]').val(jQuery.toJSON(window.gfpdf_current_pdf.conditionalLogic));
+				});
+			}
+
+			/**
+			 * Handle our AJAX tabs to make it easier to navigate around our settings
+			 * @return void
+			 * @since 4.0
+			 */
+			this.setup_gfpdf_tabs = function() {
+				
+				/* Hide all containers except the first one */
+				$('.gfpdf-tab-container').not(":eq(0)").hide();
+
+				/* Add click handler when our nav is selected */
+				$('.gfpdf-tab-wrapper a').click(function() {
+
+					/* Reset the active class */
+					$(this).parent().find('a').removeClass('nav-tab-active');
+
+					/* Add the new active class */
+					$(this).addClass('nav-tab-active');
+
+					/* Hide all containers */
+					$('.gfpdf-tab-container').hide();
+
+					/* Show new active container */
+					$( $(this).attr('href') ).show();
+
+					return false;
+
+				});
+			}
+
+			/**
+			 * Add change event listeners on our toggle params and toggle the container
+			 * @return void
+			 * @since 4.0
+			 */
+			this.setup_toggled_fields = function() {
+				$('form').on( 'change', '.gfpdf-input-toggle', function() {
+
+					var $container = $(this).parent().next();
+
+					/* Currently checked so hide out input and if cotains rich_text, textarea or input we will delete values */
+					if( $(this).prop('checked') ) {
+						$container.slideDown('slow');
+					} else {
+						$container.slideUp('slow');
+
+						/* Remove TinyMCE Content */
+						$container.find('.wp-editor-area').each(function() {
+							tinyMCE.get( $(this).attr('id') ).setContent('');
+						});
+
+						/* Remove textarea content */
+						$container.find('textarea').each(function() {
+							$(this).val('');
+						});
+					}
 				});
 			}
 

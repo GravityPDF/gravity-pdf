@@ -569,7 +569,18 @@ class Model_Form_Settings extends Helper_Model {
          * Now we have the class initialised, let's load our configuration array
          */
         $template_settings = $class->configuration();
-        
+
+        /* register any custom fields */
+        if(isset($template_settings['fields']) && is_array($template_settings['fields'])) {
+            foreach($template_settings['fields'] as $key => $field) {
+                $settings[$key] = $field;
+            }
+        }
+
+        if(isset($template_settings['core']['background']) && $template_settings['core']['background'] === true) {
+           $settings['background'] = $this->get_background_field();
+        }
+
         /* register our core fields */
         if(isset($template_settings['core']['header']) && $template_settings['core']['header'] === true) {
            $settings['header'] = $this->get_header_field();
@@ -585,17 +596,6 @@ class Model_Form_Settings extends Helper_Model {
 
         if(isset($template_settings['core']['firstFooter']) && $template_settings['core']['firstFooter'] === true) {
            $settings['firstFooter'] = $this->get_first_page_footer_field();
-        }
-
-        if(isset($template_settings['core']['background']) && $template_settings['core']['background'] === true) {
-           $settings['background'] = $this->get_background_field();
-        }
-
-        /* register any custom fields */
-        if(isset($template_settings['fields']) && is_array($template_settings['fields'])) {
-            foreach($template_settings['fields'] as $key => $field) {
-                $settings[$key] = $field;
-            }
         }
 
         return $settings;
