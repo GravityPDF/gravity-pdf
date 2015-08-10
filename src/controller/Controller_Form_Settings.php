@@ -122,6 +122,9 @@ class Controller_Form_Settings extends Helper_Controller implements Helper_Int_A
         add_filter( 'gfpdf_form_settings_sanitize_text',  array($this->model, 'strip_filename_extension'), 15, 2);
         add_filter( 'gfpdf_form_settings_sanitize_text',  array($gfpdf->options, 'sanitize_trim_field'), 15, 2);
         add_filter( 'gfpdf_form_settings_sanitize_hidden',  array($this->model, 'decode_json'), 10, 2);
+
+        /* Store our TinyMCE Options */
+        add_filter( 'tiny_mce_before_init', array($this, 'store_tinymce_settings'));
     }
 
     /**
@@ -159,5 +162,21 @@ class Controller_Form_Settings extends Helper_Controller implements Helper_Int_A
 
         /* process list view */
         $this->model->process_list_view($form_id);
+    }
+
+    /**
+     * Store our TinyMCE init settings for use in our AJAX wp_editor calls
+     * @param $settings The current TinyMCE Settings
+     * @return Original Settings
+     * @since 4.0
+     */
+    public function store_tinymce_settings( $settings ) {
+        global $gfpdf;
+
+        if( empty($gfpdf->data->tiny_mce_editor_settings) ) {
+            $gfpdf->data->tiny_mce_editor_settings = $settings;
+        }
+
+        return $settings;
     }
 }

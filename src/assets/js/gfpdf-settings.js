@@ -19,7 +19,7 @@
 
 		/*
 		 * Override the gfMergeTagsObj.getTargetElement prototype to better handle CSS special characters in selectors
-		 * This is because Gravity Forms doesn't correctly espace meta-characters correctly
+		 * This is because Gravity Forms doesn't correctly espace meta-characters
 		 * This functionality assists with the merge tag loader
 		 * @since 4.0
 		 */
@@ -331,6 +331,16 @@
 				this.setup_custom_paper_size(); /* set up the custom paper size logic */
 				this.setup_dynamic_template_fields();
 
+				/*
+				 * Workaround for Firefix TinyMCE Editor Bug NS_ERROR_UNEXPECTED (http://www.tinymce.com/develop/bugtracker_view.php?id=3152)
+				 * Manual save TinyMCE editors on form submission
+				 */
+				$('#gfpdf_pdf_form').submit(function() {
+					try {
+						tinyMCE.triggerSave();
+					} catch(e) {};
+				});
+
 				/**
 				 * Get the appropriate elements for use
 				 */
@@ -421,19 +431,85 @@
 		      			'action': 'gfpdf_get_template_fields',
 		      			'template': $(this).val(),
 		      			'type': $(this).attr('id'),
+		      			'id': $('#gform_id').val(),
+		      			'gform_pdf_id': $('#gform_pdf_id').val(),
 		      		};
 
 		      		self.ajax(data, function(response) {
 		      			$spinner.remove();
 
 		      			if(response !== undefined && response.fields !== undefined) {
-		      				/* replace the fields with the response fields */
+
+		      				/* Remove any existing merge tag-marked inputs so they aren't processed twice */
+		      				$('.merge-tag-support').removeClass('merge-tag-support');
+
+		      				/* Remove any previously loaded editors */
+		      				$.each( response.editors, function( index, value ) {
+
+		      					/* Remove existing editor so we can add the new one */
+		      					var editor = tinyMCE.get( value );
+		      					if( editor !== null ) {
+		      						/* Bug Fix for Firefox - http://www.tinymce.com/develop/bugtracker_view.php?id=3152 */
+									try {
+										tinyMCE.remove(editor);
+									} catch (e) {}
+						        }
+
+						    });
+
+
+		      				/* Replace the custom appearance with the AJAX response fields */
 		      				$('#pdf-custom-appearance').hide().html(response.fields).fadeIn();
+
+		      				/* Load our new editors */
+		      				$.each( response.editors, function( index, value ) {
+
+		      					var fullId = value;
+
+		      					var settings = response.editor_init;
+
+		      					/* Setup out selector */
+								settings.selector   = '#' + fullId;
+								settings.body_class = 'id post-type-post post-status-publish post-format-standard';
+								settings.formats    =  {
+		                			alignleft: [
+		                				{selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li', styles: {textAlign:'left'}},
+		                				{selector: 'img,table,dl.wp-caption', classes: 'alignleft'}
+		                			],
+		                			aligncenter: [
+		                				{selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li', styles: {textAlign:'center'}},
+		                				{selector: 'img,table,dl.wp-caption', classes: 'aligncenter'}
+		                			],
+		                			alignright: [
+		                				{selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li', styles: {textAlign:'right'}},
+		                				{selector: 'img,table,dl.wp-caption', classes: 'alignright'}
+		                			],
+		                			strikethrough: {inline: 'del'}
+		                		};
+		      			
+								/* Initialise our editor */
+								tinyMCE.init( settings );
+								
+						        /* Add our editor to the DOM */
+					        	tinyMCE.execCommand('mceAddEditor', false, fullId);
+					        	
+					        	/* Enable WP quick tags */
+						        if ( typeof(QTags) == 'function' ) {
+					                	QTags( {'id': fullId } );
+					                	QTags._buttonsInit();
+				                    	
+				                    	/* remember last tab selected */
+				                    	switchEditors.switchto( jQuery( '#wp-' + fullId + '-wrap' ).find( '.wp-switch-editor.switch-' + ( getUserSetting( 'editor' ) == 'html' ? 'html' : 'tmce' ) )[0] );
+					            }
+
+		      				} );
 
 		      				/* set up any dynamic field type */
 		      				self.setup_select_boxes();
 		      				self.doColorListener();
 		      				self.show_tooltips();
+		      				self.doMergetags();
+
 		      			}
 
 		      			/* Update our template example preview and display it */
@@ -501,6 +577,17 @@
 				if( $('.gfpdf-color-picker').length ) {
 					$('.gfpdf-color-picker').wpColorPicker();
 				}
+			}
+
+			/**
+			 * Remove any existing merge tags and reinitialise
+			 * @return void
+			 * @since 4.0
+			 */
+			this.doMergetags = function() {
+			    if(typeof form != 'undefined') {
+			        window.gfMergeTags = new gfMergeTagsObj(form);
+			    }
 			}
 
 			/**

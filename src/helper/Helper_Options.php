@@ -125,8 +125,8 @@ class Helper_Options implements Helper_Int_Filters {
 	 */
 	public function get_form_settings() {
 		/* get GF settings */
-		$form_id = (int) rgget('id');
-		$pid     = (!empty(rgget('pid'))) ? rgget('pid') : rgpost('gform_pdf_id');
+		$form_id = ( ! empty( rgget('id') ) ) ? (int) rgget('id') : (int) rgpost('id');
+		$pid     = ( ! empty( rgget('pid') ) ) ? rgget('pid') : rgpost('gform_pdf_id');
 
         /* return early if no ID set */
         if(!$form_id) {
@@ -512,7 +512,7 @@ class Helper_Options implements Helper_Int_Filters {
 			/**
 			 * Form (PDF) Settings Custom Appearance
 			 * This filter allows templates to add custom options for use specific to that template
-			 * Gravity PDF autoloads a JSON template file if it exists and loads it up with this filter
+			 * Gravity PDF autoloads a PHP template file if it exists and loads it up with this filter
 			 */
 			'form_settings_custom_appearance' => apply_filters('gfpdf_form_settings_custom_appearance', array()),
 
@@ -1329,7 +1329,7 @@ class Helper_Options implements Helper_Int_Filters {
 		/* Get our PDF GF settings (if any) */
 		$pdf_form_settings = $this->get_form_settings();
 
-		if(!isset($args['type'])) {
+		if( ! isset($args['type']) ) {
 			$args['type'] = '';
 		}
 

@@ -12,6 +12,7 @@ use GFFormsModel;
 use GFCommon;
 
 use WP_Error;
+use _WP_Editors;
 
 /**
  * Settings Model
@@ -135,13 +136,17 @@ class Model_Form_Settings extends Helper_Model {
         /* re-register our Gravity Forms Notifications */
         $this->register_notifications($form['notifications']);
 
+        /* re-register all our settings to show form-specific options */
+        $gfpdf->options->register_settings();
+
         /* pass to view */
         $controller->view->add_edit(array(
-            'pdf_id'       => $pdf_id,
-            'title'        => $label,
-            'button_label' => $label,
-            'form'         => $form,
-            'pdf'          => $this->get_pdf($form_id, $pdf_id),
+            'pdf_id'           => $pdf_id,
+            'title'            => $label,
+            'button_label'     => $label,
+            'form'             => $form,
+            'pdf'              => $this->get_pdf($form_id, $pdf_id),
+            'wp_editor_loaded' => class_exists( '_WP_Editors' ),
         ));
     }
 
@@ -386,6 +391,7 @@ class Model_Form_Settings extends Helper_Model {
             return false;
         }
 
+
         /* get the form and merge in the results */
         $form = GFFormsModel::get_form_meta($form_id);
 
@@ -473,7 +479,7 @@ class Model_Form_Settings extends Helper_Model {
         global $gfpdf;
         
         $settings = $gfpdf->options->get_registered_settings();
-        $sections = array('form_settings', 'form_settings_appearance', 'form_settings_advanced');
+        $sections = array('form_settings', 'form_settings_appearance', 'form_settings_custom_appearance', 'form_settings_advanced');
 
         foreach($sections as $s) {
             $input = apply_filters( 'gfpdf_settings_'. $s .'_sanitize', $input );
@@ -603,7 +609,7 @@ class Model_Form_Settings extends Helper_Model {
             'size'       => 8,
             'desc'       => sprintf(__('The header is included at the top of each page. For best results, keep the formatting simple.', 'gravitypdf'), '<em>', '</em>', '<em>', '</em>'),
             'inputClass' => 'merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields',
-            'tooltip'    => '<h6>' . __('Header', 'gravitypdf') . '</h6>' . sprintf(__('For the best image quality, ensure you insert images at %sFull Size%s. Left and right image alignment work as expected, but to center align you need to wrap the image in a %s tag.', 'gravitypdf'), '<em>', '</em>', esc_html('<div class="centeralign">...</div>'))
+            'tooltip'    => '<h6>' . __('Header', 'gravitypdf') . '</h6>' . sprintf(__('For the best image quality, ensure you insert images at %sFull Size%s. Left and right image alignment work as expected, but to center align you need to wrap the image in a %s tag.', 'gravitypdf'), '<em>', '</em>', esc_html('<div class="centeralign">...</div>')),
         );
     }
 
@@ -946,17 +952,8 @@ class Model_Form_Settings extends Helper_Model {
         /* Check if the selected template has a preview */
         $template_image = Stat_Functions::get_template_image( $template );
 
+        /* Only handle fields when in the PDF Forms Settings, and not in the general settings */
         if($type != 'gfpdf_settings[default_template]') {
-            /**
-             * Had issues displaying multiple wp_editors via AJAX. In the interim we'll display appropriate message about saving / reloading the page
-             * @TODO: in future would like to correctly load WP_Editor via AJAX. Pull requests welcome
-             */
-            foreach($settings as &$field) {
-               if(isset($field['type']) && $field['type'] == 'rich_editor') {
-                    $field['type'] = 'descriptive_text';
-                    $field['desc'] = __("Update PDF to edit this setting.", 'gravitypdf');
-                }
-            }
 
             /* add our filter to override what template gets rendered (by default it is the current selected template in the config) */
             add_filter('gfpdf_form_settings_custom_appearance', function() use (&$settings) {
@@ -973,14 +970,31 @@ class Model_Form_Settings extends Helper_Model {
             do_settings_fields('gfpdf_settings_form_settings_custom_appearance', 'gfpdf_settings_form_settings_custom_appearance');
 
             $html = ob_get_clean();
-        } else {
-            $html = null;
+
+
+            /*
+             * Pass the required wp_editor IDs and settings in our AJAX response so the client
+             * can correctly load the instances.
+             */
+            $editors     = array();
+            
+            foreach($settings as $field) {
+               if(isset($field['type']) && $field['type'] == 'rich_editor') {
+                    $editors[] = 'gfpdf_settings_' . $field['id'];
+                }
+            }
 
         }
 
+        $editor_init = ( isset($gfpdf->data->tiny_mce_editor_settings) ) ? $gfpdf->data->tiny_mce_editor_settings : null;
+        $html        = ( isset($html) ) ? $html : null;
+        $editors     = ( isset($editors) ) ? $editors : null;
+
         echo json_encode(array(
-            'fields' => $html,
-            'preview' => $template_image,
+            'fields'      => $html,
+            'preview'     => $template_image,
+            'editors'     => $editors,
+            'editor_init' => $editor_init,
         ));
         
         /* end AJAX function */

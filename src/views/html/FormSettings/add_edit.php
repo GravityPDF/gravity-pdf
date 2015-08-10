@@ -47,6 +47,15 @@ if (! defined('ABSPATH')) {
     <?php \GFFormSettings::output_field_scripts(); ?>
 </script>
 
+<!-- Check if a wp_editor instance has already loaded -->
+<div style="display: none">
+    <?php
+        if( $args['wp_editor_loaded'] !== true) {
+            wp_editor('', 'gfpdf_settings_');
+        }
+    ?>
+</div>
+
 <?php \GFFormSettings::page_header( $args['title'] ); ?>
 
 	<h3>
@@ -62,6 +71,7 @@ if (! defined('ABSPATH')) {
         <?php wp_nonce_field( 'gfpdf_save_pdf', 'gfpdf_save_pdf' ) ?>
         
         <input type="hidden" id="gform_pdf_id" name="gform_pdf_id" value="<?php echo $args['pdf_id']; ?>" />
+        <input type="hidden" id="gform_id" name="gform_id" value="<?php echo $args['form']['id']; ?>" />
 
         <!-- display standard fields -->
         <table id="pdf-form-settings" class="form-table">
