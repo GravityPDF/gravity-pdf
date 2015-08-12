@@ -59,7 +59,7 @@ class Helper_Misc {
 
         if( is_admin() ) {
             if( isset( $_GET['page'] ) && 'gfpdf-' === ( substr( $_GET['page'], 0, 6 ) ) ||
-            ( isset( $_GET['subview'] ) && 'PDF' === strtoupper( $_GET['subview'] ) ) ) {
+            (   isset( $_GET['subview'] ) && 'PDF' ===   strtoupper( $_GET['subview'] ) ) ) {
                 return true;
             }
         }
@@ -72,11 +72,11 @@ class Helper_Misc {
      * @since 4.0
      * @return void
      */
-    public function is_gfpdf_settings_tab($name) {
+    public function is_gfpdf_settings_tab( $name ) {
 
-        if(is_admin()) {
-            if(self::is_gfpdf_page()) {
-                $tab = (isset($_GET['tab'])) ? $_GET['tab'] : 'general';
+        if( is_admin() ) {
+            if( $this->is_gfpdf_page() ) {
+                $tab = ( isset( $_GET['tab'] ) ) ? $_GET['tab'] : 'general';
 
                 if($name === $tab) {
                     return true;
@@ -93,23 +93,23 @@ class Helper_Misc {
      * @return String / Boolean       The Fully Qualified Namespaced Class we matched, or false
      * @since 4.0
      */
-    public function get_field_class($type) {
+    public function get_field_class( $type ) {
 
         /* change our product field types to use a single master product class */
         $convert_product_type = array('quantity', 'option', 'shipping', 'total');
 
-        if(in_array(strtolower($type), $convert_product_type)) {
+        if( in_array( strtolower($type), $convert_product_type ) ) {
             $type = 'product';
         }
 
         /* Format the type name correctly */
-        $typeArray = explode('_', $type);
-        $typeArray = array_map('ucwords', $typeArray);
-        $type      = implode('_', $typeArray);
+        $typeArray = explode( '_', $type );
+        $typeArray = array_map( 'ucwords', $typeArray );
+        $type      = implode( '_', $typeArray );
 
         /* See if we have a class that matches */
         $fqns = 'GFPDF\Helper\Fields\Field_';
-        if(class_exists($fqns . $type)) {
+        if( class_exists( $fqns . $type ) ) {
             return $fqns . $type;
         }
 
@@ -122,10 +122,10 @@ class Helper_Misc {
      * @return String
      * @since  4.0
      */
-    public function human_readable($name) {
+    public function human_readable( $name ) {
 
-        $name = str_replace(array('-', '_'), ' ', $name);
-        return mb_convert_case($name, MB_CASE_TITLE);
+        $name = str_replace( array( '-', '_' ), ' ', $name );
+        return mb_convert_case( $name, MB_CASE_TITLE );
     }
 
     /**
@@ -134,12 +134,12 @@ class Helper_Misc {
      * @param  String $html The HTML to parse
      * @return String
      */
-    public function fix_header_footer($html) {
+    public function fix_header_footer( $html ) {
 
         try {
             /* return the modified HTML */
-            return qp($html, 'img')->addClass('header-footer-img')->top('body')->children()->html();
-        } catch (Exception $e) {
+            return qp( $html, 'img' )->addClass('header-footer-img')->top('body')->children()->html();
+        } catch ( Exception $e ) {
             /* if there was any issues we'll just return the $html */
             return $html;
         }
@@ -151,20 +151,20 @@ class Helper_Misc {
      * @return String
      * @since 4.0
      */
-    public function get_contrast($hexcolor) {
+    public function get_contrast( $hexcolor ) {
 
-        $hexcolor = str_replace('#', '', $hexcolor);
+        $hexcolor = str_replace( '#', '', $hexcolor );
         
-        if (strlen($hexcolor) != 6){
-            $hexcolor = str_repeat(substr($hexcolor,0,1),2) . str_repeat(substr($hexcolor,1,1),2) . str_repeat(substr($hexcolor,2,1),2);
+        if ( 6 !== strlen( $hexcolor ) ){
+            $hexcolor = str_repeat( substr( $hexcolor, 0, 1 ), 2 ) . str_repeat( substr( $hexcolor, 1, 1), 2 ) . str_repeat( substr( $hexcolor, 2, 1 ), 2 );
         }
 
-        $r   = hexdec(substr($hexcolor,0,2));
-        $g   = hexdec(substr($hexcolor,2,2));
-        $b   = hexdec(substr($hexcolor,4,2));
-        $yiq = ( ($r*299) + ($g*587) + ($b*114) ) / 1000;
+        $r   = hexdec( substr( $hexcolor, 0, 2 ) );
+        $g   = hexdec( substr( $hexcolor, 2, 2 ) );
+        $b   = hexdec( substr( $hexcolor, 4, 2 ) );
+        $yiq = ( ($r * 299) + ($g * 587) + ($b * 114) ) / 1000;
 
-        return ($yiq >= 128) ? 'black' : 'white';
+        return ( $yiq >= 128 ) ? 'black' : 'white';
     }
 
 
@@ -176,11 +176,11 @@ class Helper_Misc {
      * @param  Mixed $val  The value being pushed
      * @return Array       The modified array
      */
-    public function array_unshift_assoc($arr, $key, $val) {
+    public function array_unshift_assoc( $arr, $key, $val ) {
 
-        $arr = array_reverse($arr, true);
+        $arr       = array_reverse( $arr, true );
         $arr[$key] = $val;
-        return array_reverse($arr, true);
+        return array_reverse( $arr, true );
     }
 
     /**
@@ -188,20 +188,20 @@ class Helper_Misc {
      * equivalent to Bash: rm -r $dir
      * @param String $dir The path to be deleted
      */
-    public function rmdir($dir) {
+    public function rmdir( $dir ) {
 
         try {
             $files = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+                new RecursiveDirectoryIterator( $dir, RecursiveDirectoryIterator::SKIP_DOTS ),
                 RecursiveIteratorIterator::CHILD_FIRST
             );
         
-            foreach ($files as $fileinfo) {
-                $function = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
-                $function($fileinfo->getRealPath());
+            foreach ( $files as $fileinfo ) {
+                $function = ( $fileinfo->isDir() ) ? 'rmdir' : 'unlink';
+                $function( $fileinfo->getRealPath() );
             }
-        } catch (Exception $e) {
-            return new WP_Error('recursion_delete_problem', $e);
+        } catch ( Exception $e ) {
+            return new WP_Error( 'recursion_delete_problem', $e );
         }
 
         return rmdir($dir);
@@ -215,11 +215,11 @@ class Helper_Misc {
      * @return Boolean
      * @since 4.0
      */
-    public function copyr($source, $destination) {
+    public function copyr( $source, $destination ) {
 
         try {
-            if(!is_dir($destination)) {
-                wp_mkdir_p($destination);
+            if( ! is_dir( $destination ) ) {
+                wp_mkdir_p( $destination );
             }
 
             $files = new RecursiveIteratorIterator(
@@ -227,14 +227,14 @@ class Helper_Misc {
                 RecursiveIteratorIterator::SELF_FIRST
             );
         
-            foreach ($files as $fileinfo) {
-               if($fileinfo->isDir()) {
-                    mkdir($destination . DIRECTORY_SEPARATOR . $files->getSubPathName());
+            foreach( $files as $fileinfo ) {
+               if( $fileinfo->isDir() ) {
+                    mkdir( $destination . DIRECTORY_SEPARATOR . $files->getSubPathName() );
                } else {
-                    copy($fileinfo, $destination . DIRECTORY_SEPARATOR . $files->getSubPathName());
+                    copy( $fileinfo, $destination . DIRECTORY_SEPARATOR . $files->getSubPathName() );
                }
             }
-        } catch (Exception $e) {
+        } catch ( Exception $e ) {
             return new WP_Error('recursion_copy_problem', $e);
         }
 
@@ -248,8 +248,8 @@ class Helper_Misc {
      * @return String
      * @since 4.0
      */
-    public function relative_path($path, $replace = '') {
-        return str_replace(ABSPATH, $replace, $path);
+    public function relative_path( $path, $replace = '' ) {
+        return str_replace( ABSPATH, $replace, $path );
     }
 
     /**
@@ -258,13 +258,13 @@ class Helper_Misc {
      * @return Boolean
      * @since  4.0
      */
-    public function is_directory_writable($path) {
+    public function is_directory_writable( $path ) {
 
         $tmp_file = $path . '.tmpFile';
 
-        if(is_writable($path)) {
-            if(touch($tmp_file) && is_file($tmp_file)) {
-                unlink($tmp_file);
+        if( is_writable( $path ) ) {
+            if( touch( $tmp_file ) && is_file( $tmp_file ) ) {
+                unlink( $tmp_file );
                 return true;
             }
         }
@@ -283,11 +283,11 @@ class Helper_Misc {
         $upload_path = trim(get_option('upload_path'));
         $dir         = $upload_path;
 
-        if (empty($upload_path) || $upload_path == 'wp-content/uploads') {
+        if ( empty($upload_path) || 'wp-content/uploads' == $upload_path ) {
             $dir = WP_CONTENT_DIR . '/uploads';
-        } elseif (strpos($upload_path, ABSPATH) !== 0) {
+        } elseif ( 0 !== strpos( $upload_path, ABSPATH ) ) {
             /* $dir is absolute, $upload_path is (maybe) relative to ABSPATH */
-            $dir = path_join(ABSPATH, $upload_path);
+            $dir = path_join( ABSPATH, $upload_path );
         }
 
         if ( ! $url = get_option( 'upload_url_path' ) ) {
@@ -302,12 +302,15 @@ class Helper_Misc {
          * Honor the value of UPLOADS. This happens as long as ms-files rewriting is disabled.
          * We also sometimes obey UPLOADS when rewriting is enabled -- see the next block.
          */
-        if (defined('UPLOADS') && ! (is_multisite() && get_site_option('ms_files_rewriting'))) {
+        if ( defined('UPLOADS') && ! ( is_multisite() && get_site_option('ms_files_rewriting') ) ) {
             $dir = ABSPATH . UPLOADS;
             $url = trailingslashit( $siteurl ) . UPLOADS;
         }
 
-        return array('path' => $dir, 'url' => $url);
+        return array(
+            'path' => $dir,
+            'url' => $url
+        );
     }
 
     /**
@@ -316,7 +319,7 @@ class Helper_Misc {
      * @return Mixed (String / Object)      Path on success or WP_Error on failure
      * @since  4.0
      */
-    public function convert_url_to_path($url) {
+    public function convert_url_to_path( $url ) {
 
         /* If $url is empty we'll return early */
         if( empty( trim($url) ) ) {
@@ -326,17 +329,17 @@ class Helper_Misc {
         /* Mostly we'll be accessing files in the upload directory, so attempt that first */
         $upload = wp_upload_dir();
 
-        $try_path = str_replace($upload['baseurl'], $upload['basedir'], $url);
+        $try_path = str_replace( $upload['baseurl'], $upload['basedir'], $url );
 
-        if(is_file($try_path)) {
+        if( is_file( $try_path ) ) {
             return $try_path;
         }
 
         /* If WP_CONTENT_DIR and WP_CONTENT_URL are set we'll try them */
-        if(defined('WP_CONTENT_DIR') && defined('WP_CONTENT_URL')) {
-            $try_path = str_replace(WP_CONTENT_URL, WP_CONTENT_DIR, $url);
+        if( defined('WP_CONTENT_DIR') && defined('WP_CONTENT_URL') ) {
+            $try_path = str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, $url );
 
-            if(is_file($try_path)) {
+            if( is_file( $try_path ) ) {
                 return $try_path;
             }
         }
@@ -347,16 +350,16 @@ class Helper_Misc {
         }
 
         /* If that didn't work let's try use home_url() and get_home_path() */
-        $try_path = str_replace(home_url(), get_home_path(), $url);
+        $try_path = str_replace( home_url(), get_home_path(), $url );
 
-        if(is_file($try_path)) {
+        if( is_file( $try_path ) ) {
             return $try_path;
         }
 
         /* If that didn't work let's try use site_url() and ABSPATH */
-        $try_path = str_replace(site_url(), ABSPATH, $url);
+        $try_path = str_replace( site_url(), ABSPATH, $url );
 
-        if(is_file($try_path)) {
+        if( is_file( $try_path ) ) {
             return $try_path;
         }
 
@@ -371,7 +374,7 @@ class Helper_Misc {
      * @return Array
      * @since 4.0
      */
-    public function get_template_args($entry, $settings) {
+    public function get_template_args( $entry, $settings ) {
         /*
          * @todo TEMP FIX so we can render PDF
          */
@@ -411,9 +414,9 @@ class Helper_Misc {
         $default_template_path = PDF_PLUGIN_DIR . $relative_image_path;
         $default_template_url  = PDF_PLUGIN_URL . $relative_image_path;
 
-        if(is_file( $gfpdf->data->template_location . 'images/' . $template )) {
+        if( is_file( $gfpdf->data->template_location . 'images/' . $template ) ) {
             return $gfpdf->data->template_location_url . 'images/' . $template;
-        } else if( is_file( $default_template_path . $template)) {
+        } else if( is_file( $default_template_path . $template ) ) {
             return $default_template_url . $template;
         }
 
