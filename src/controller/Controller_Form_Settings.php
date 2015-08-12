@@ -7,7 +7,6 @@ use GFPDF\Helper\Helper_Model;
 use GFPDF\Helper\Helper_View;
 use GFPDF\Helper\Helper_Int_Actions;
 use GFPDF\Helper\Helper_Int_Filters;
-use GFPDF\Helper\Helper_Options;
 
 /**
  * Form Settings (PDF Configuration) Controller

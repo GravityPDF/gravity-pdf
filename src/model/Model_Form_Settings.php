@@ -4,7 +4,6 @@ namespace GFPDF\Model;
 
 use GFPDF\Helper\Helper_Model;
 use GFPDF\Helper\Helper_PDF_List_Table;
-use GFPDF\Helper\Helper_Options;
 use GFPDF\Helper\Helper_Int_Config;
 use GFPDF\Stat\Stat_Functions;
 
@@ -137,7 +136,7 @@ class Model_Form_Settings extends Helper_Model {
         $this->register_notifications($form['notifications']);
 
         /* re-register all our settings to show form-specific options */
-        $gfpdf->options->register_settings();
+        $gfpdf->options->register_settings( $gfpdf->options->get_registered_fields() );
 
         /* pass to view */
         $controller->view->add_edit(array(
@@ -964,7 +963,7 @@ class Model_Form_Settings extends Helper_Model {
             }, 100);
 
             /* Ensure our new fields are registered */
-            $gfpdf->options->register_settings();
+            $gfpdf->options->register_settings( $gfpdf->options->get_registered_fields() );
 
             /* generate the HTML */
             ob_start();

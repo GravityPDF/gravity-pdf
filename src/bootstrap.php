@@ -70,7 +70,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
     public $data;
 
     /**
-     * Holds our Helper_Options object
+     * Holds our Helper_Options / Helper_Options_Fields object
      * Makes it easy to access global PDF settings and individual form PDF settings
      * @var Object
      * @since 4.0
@@ -108,7 +108,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
         $this->data->init();
 
         /* set up our options object - this is initialised on admin_init but other classes need to access its methods before this */
-        $this->options = new Helper\Helper_Options();
+        $this->options = new Helper\Helper_Options_Fields();
 
         /* load modules */
         $this->installer();
@@ -331,7 +331,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
      */
     public function setup_settings_fields() {
         /* register our options settings */
-        $this->options->register_settings();
+        $this->options->register_settings( $this->options->get_registered_fields() );
     }
 
     public function installer() {

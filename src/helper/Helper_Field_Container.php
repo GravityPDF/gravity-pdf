@@ -2,8 +2,6 @@
 
 namespace GFPDF\Helper;
 
-use GFPDF\Helper\Helper_Options;
-
 use GF_Field;
 
 /**
