@@ -53,10 +53,12 @@ class Helper_Options_Fields extends Helper_Options {
 	public function get_registered_fields() {
 
 		/**
-		 * 'Whitelisted' Gravity PDF settings, filters are provided for each settings
-		 * section to allow extensions and other plugins to add their own settings
+		 * Gravity PDF settings
+		 * Filters are provided for each settings section to allow extensions and other plugins to add their own option
+		 * which will be processed by our settings API
 		 */
 		$gfpdf_settings = array(
+
 			/** General Settings */
 			'general' => apply_filters( 'gfpdf_settings_general',
 				array(
@@ -137,6 +139,7 @@ class Helper_Options_Fields extends Helper_Options {
 			),
 
 			'general_security' => apply_filters( 'gfpdf_settings_general_security',
+
 				array(
 					'admin_capabilities' => array(
 						'id'          => 'admin_capabilities',
@@ -189,6 +192,7 @@ class Helper_Options_Fields extends Helper_Options {
 			),
 
 			'tools' 		=> apply_filters('gfpdf_settings_tools',
+
 				array(
 					'setup_templates' => array(
 						'id'      => 'setup_templates',
@@ -214,6 +218,7 @@ class Helper_Options_Fields extends Helper_Options {
 
 			/* Form (PDF) Settings */
 			'form_settings' => apply_filters('gfpdf_form_settings',
+
 				array(
 
 					'name' => array(
@@ -279,6 +284,7 @@ class Helper_Options_Fields extends Helper_Options {
 
 			/* Form (PDF) Settings Appearance */
 			'form_settings_appearance' => apply_filters('gfpdf_form_settings_appearance',
+
 				array(
 					'pdf_size' => array(
 						'id'      => 'pdf_size',
@@ -354,11 +360,15 @@ class Helper_Options_Fields extends Helper_Options {
 			 * Form (PDF) Settings Custom Appearance
 			 * This filter allows templates to add custom options for use specific to that template
 			 * Gravity PDF autoloads a PHP template file if it exists and loads it up with this filter
+			 * @todo  add link to documentation on doing this
 			 */
-			'form_settings_custom_appearance' => apply_filters('gfpdf_form_settings_custom_appearance', array()),
+			'form_settings_custom_appearance' => apply_filters('gfpdf_form_settings_custom_appearance',
+				array()
+			),
 
 			/* Form (PDF) Settings Advanced */
 			'form_settings_advanced' => apply_filters('gfpdf_form_settings_advanced',
+				
 				array(
 					'format' => array(
 						'id'    => 'format',

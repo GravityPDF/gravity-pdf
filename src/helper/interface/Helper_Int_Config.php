@@ -39,6 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @since 4.0
  */
 interface Helper_Int_Config {
+    
     /**
      * Classes should return a key => value array with the template settings
      * The array should be multidimensional with the top-level keys being either "core" or "fields"
