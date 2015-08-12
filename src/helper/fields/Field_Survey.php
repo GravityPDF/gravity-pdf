@@ -18,8 +18,8 @@ use Exception;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -50,146 +50,145 @@ if (! defined('ABSPATH')) {
 class Field_Survey extends Helper_Fields
 {
 
-    /**
-     * Check the appropriate variables are parsed in send to the parent construct
-     * @param Object $field The GF_Field_* Object
-     * @param Array $entry The Gravity Forms Entry
-     * @since 4.0
-     */
-    public function __construct($field, $entry) {
-        global $gfpdf;
+	/**
+	 * Check the appropriate variables are parsed in send to the parent construct
+	 * @param Object $field The GF_Field_* Object
+	 * @param Array  $entry The Gravity Forms Entry
+	 * @since 4.0
+	 */
+	public function __construct( $field, $entry ) {
+		global $gfpdf;
 
-        /* call our parent method */
-        parent::__construct($field, $entry);
+		/* call our parent method */
+		parent::__construct( $field, $entry );
 
-        /*
+		/*
          * Survey Field can be any of the following:
          * single line text, paragraph, dropdown, select, checkbox,
          * likert, rank or rating
          */
-        $class = $gfpdf->misc->get_field_class($field->inputType);
+		$class = $gfpdf->misc->get_field_class( $field->inputType );
 
-        try {
-            /* check load our class */
-            if(class_exists($class)) {
-                $this->fieldObject = new $class($field, $entry);
-            } else {
-                throw new Exception();
-            }
-        } catch(Exception $e) {
-            /* Exception thrown. Load generic field loader */
-            $this->fieldObject = new Field_Default($field, $entry);
-        }
+		try {
+			/* check load our class */
+			if ( class_exists( $class ) ) {
+				$this->fieldObject = new $class($field, $entry);
+			} else {
+				throw new Exception();
+			}
+		} catch (Exception $e) {
+			/* Exception thrown. Load generic field loader */
+			$this->fieldObject = new Field_Default( $field, $entry );
+		}
 
-        /* force the fieldObject value cache */
-        $this->value();
-    }
+		/* force the fieldObject value cache */
+		$this->value();
+	}
 
-    /**
-     * Get the $form_data object
-     * Survey field uses multiple field types so we need to account for that
-     * @return Array
-     * @since 4.0
-     */
-    private function get_form_data() {
-        if( method_exists( $this->fieldObject, 'form_data' ) ) {
-            return $this->fieldObject->form_data();
-        }
-        
-        return parent::form_data();
-    }
+	/**
+	 * Get the $form_data object
+	 * Survey field uses multiple field types so we need to account for that
+	 * @return Array
+	 * @since 4.0
+	 */
+	private function get_form_data() {
+		if ( method_exists( $this->fieldObject, 'form_data' ) ) {
+			return $this->fieldObject->form_data();
+		}
 
-    /**
-     * Used to check if the current field has a value
-     * @since 4.0
-     * @internal Child classes can override this method when dealing with a specific use case
-     */
-    public function is_empty() {
-        return $this->fieldObject->is_empty();
-    }
+		return parent::form_data();
+	}
 
-    /**
-     * Return the HTML form data
-     * @return Array
-     * @since 4.0
-     */
-    public function form_data() {
+	/**
+	 * Used to check if the current field has a value
+	 * @since 4.0
+	 * @internal Child classes can override this method when dealing with a specific use case
+	 */
+	public function is_empty() {
+		return $this->fieldObject->is_empty();
+	}
 
-        $data = array();
+	/**
+	 * Return the HTML form data
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function form_data() {
 
-        /*
+		$data = array();
+
+		/*
          * Provide backwards compatibility fixes to certain fields
          * TODO: allow standard 4.x layout in appropriate array key ($form_data[survey])
          */
-        switch($this->field->inputType) {
-            case 'radio':
-            case 'select':
-            
-                $data  = $this->get_form_data();
-                $value = $data['field'][ $this->field->id . '_name' ];
+		switch ( $this->field->inputType ) {
+			case 'radio':
+			case 'select':
 
-                /* Overriding survey radio values with name */
-                array_walk( $data['field'], function(&$item, $key, $value) {
-                    $item = $value;
-                }, $value);
+				$data  = $this->get_form_data();
+				$value = $data['field'][ $this->field->id . '_name' ];
 
-            break;
+				/* Overriding survey radio values with name */
+				array_walk( $data['field'], function ( &$item, $key, $value ) {
+					$item = $value;
+				}, $value);
 
-            case 'checkbox':
-                $value = $this->get_value();
+			break;
 
-                /* Convert survey ID to real value */
-                foreach( $this->field->choices as $choice ) {
-                    
-                    if( ( $key = array_search( $choice['value'], $value) ) !== false ) {
-                        $value[ $key ] = $choice['text'];
-                    }
-                }
+			case 'checkbox':
+				$value = $this->get_value();
 
-                $value = array( $value );
-                $label = GFFormsModel::get_label($this->field);
+				/* Convert survey ID to real value */
+				foreach ( $this->field->choices as $choice ) {
 
-                $data[ $this->field->id . '.' . $label ] = $value;
-                $data[ $this->field->id ] = $value;
-                $data[ $label ] = $value;
+					if ( ( $key = array_search( $choice['value'], $value ) ) !== false ) {
+						$value[ $key ] = $choice['text'];
+					}
+				}
 
-                $data = array( 'field' => $data );
+				$value = array( $value );
+				$label = GFFormsModel::get_label( $this->field );
 
-            break;
+				$data[ $this->field->id . '.' . $label ] = $value;
+				$data[ $this->field->id ] = $value;
+				$data[ $label ] = $value;
 
-            default:
-                $data = $this->get_form_data();
-            break;
-        }
-        
+				$data = array( 'field' => $data );
 
-        return $data;
-    }
+			break;
+
+			default:
+				$data = $this->get_form_data();
+			break;
+		}
+
+		return $data;
+	}
 
 
-    /**
-     * Display the HTML version of this field
-     * @return String
-     * @since 4.0
-     */
-    public function html($value = '', $label = true) {
-        echo $this->fieldObject->html();
-    }
+	/**
+	 * Display the HTML version of this field
+	 * @return String
+	 * @since 4.0
+	 */
+	public function html( $value = '', $label = true ) {
+		echo $this->fieldObject->html();
+	}
 
-    /**
-     * Get the standard GF value of this field
-     * @return String/Array
-     * @since 4.0
-     */
-    public function value() {
-        if($this->fieldObject->has_cache()) {
-            return $this->fieldObject->cache();
-        }
+	/**
+	 * Get the standard GF value of this field
+	 * @return String/Array
+	 * @since 4.0
+	 */
+	public function value() {
+		if ( $this->fieldObject->has_cache() ) {
+			return $this->fieldObject->cache();
+		}
 
-        $value = $this->fieldObject->value();
+		$value = $this->fieldObject->value();
 
-        $this->fieldObject->cache($value);
-        
-        return $this->fieldObject->cache();
-    }
+		$this->fieldObject->cache( $value );
+
+		return $this->fieldObject->cache();
+	}
 }

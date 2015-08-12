@@ -12,7 +12,9 @@ namespace GFPDF;
  */
 
 /* Exit if accessed directly */
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /*
     This file is part of Gravity PDF.

@@ -19,8 +19,8 @@ use Exception;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -51,39 +51,39 @@ if (! defined('ABSPATH')) {
 class Field_Textarea extends Helper_Fields
 {
 
-    /**
-     * Check the appropriate variables are parsed in send to the parent construct
-     * @param Object $field The GF_Field_* Object
-     * @param Array $entry The Gravity Forms Entry
-     * @since 4.0
-     */
-    public function __construct($field, $entry) {
-        if(!is_object($field) || !$field instanceof GF_Field_Textarea) {
-            throw new Exception('$field needs to be in instance of GF_Field_Textarea');
-        }
+	/**
+	 * Check the appropriate variables are parsed in send to the parent construct
+	 * @param Object $field The GF_Field_* Object
+	 * @param Array  $entry The Gravity Forms Entry
+	 * @since 4.0
+	 */
+	public function __construct( $field, $entry ) {
+		if ( ! is_object( $field ) || ! $field instanceof GF_Field_Textarea ) {
+			throw new Exception( '$field needs to be in instance of GF_Field_Textarea' );
+		}
 
-        /* call our parent method */
-        parent::__construct($field, $entry);
-    }
+		/* call our parent method */
+		parent::__construct( $field, $entry );
+	}
 
-    public function html($value = '', $label = true) {
-        $value = $this->value();
-        
-        return parent::html($value);
-    }
+	public function html( $value = '', $label = true ) {
+		$value = $this->value();
 
-    /**
-     * Get the standard GF value of this field
-     * @return String/Array
-     * @since 4.0
-     */
-    public function value() {
-        if($this->has_cache()) {
-            return $this->cache();
-        }
+		return parent::html( $value );
+	}
 
-        $this->cache(nl2br(esc_html($this->get_value())));
-        
-        return $this->cache();
-    }
+	/**
+	 * Get the standard GF value of this field
+	 * @return String/Array
+	 * @since 4.0
+	 */
+	public function value() {
+		if ( $this->has_cache() ) {
+			return $this->cache();
+		}
+
+		$this->cache( nl2br( esc_html( $this->get_value() ) ) );
+
+		return $this->cache();
+	}
 }

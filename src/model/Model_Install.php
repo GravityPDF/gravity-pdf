@@ -17,7 +17,9 @@ use GFCommon;
  */
 
 /* Exit if accessed directly */
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /*
     This file is part of Gravity PDF.
@@ -48,273 +50,273 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 class Model_Install extends Helper_Model {
 
-    /**
-     * The Gravity PDF Installer
-     * @return void
-     * @since 4.0
-     */
-    public function install_plugin() {
-            update_option('gfpdf_is_installed', true);
-    }
+	/**
+	 * The Gravity PDF Installer
+	 * @return void
+	 * @since 4.0
+	 */
+	public function install_plugin() {
+			update_option( 'gfpdf_is_installed', true );
+	}
 
-    /**
-     * Get our permalink regex structure
-     * @return  String
-     * @since  4.0
-     */
-    public function get_permalink_regex() {
-        return '^pdf\/([A-Za-z0-9]+)\/([0-9]+)\/?(download)?\/?';
-    }
+	/**
+	 * Get our permalink regex structure
+	 * @return  String
+	 * @since  4.0
+	 */
+	public function get_permalink_regex() {
+		return '^pdf\/([A-Za-z0-9]+)\/([0-9]+)\/?(download)?\/?';
+	}
 
-    /**
-     * Get the plugin working directory name
-     * @return String
-     * @since  4.0
-     */
-    public function get_working_directory() {
-        return apply_filters('gfpdf_working_folder_name', 'PDF_EXTENDED_TEMPLATES');
-    }
+	/**
+	 * Get the plugin working directory name
+	 * @return String
+	 * @since  4.0
+	 */
+	public function get_working_directory() {
+		return apply_filters( 'gfpdf_working_folder_name', 'PDF_EXTENDED_TEMPLATES' );
+	}
 
-    /**
-     * Get a link to the plugin's settings page URL
-     * @return String
-     * @since  4.0
-     */
-    public function get_settings_url() {
-        return admin_url('admin.php?page=gf_settings&subview=PDF');
-    }
+	/**
+	 * Get a link to the plugin's settings page URL
+	 * @return String
+	 * @since  4.0
+	 */
+	public function get_settings_url() {
+		return admin_url( 'admin.php?page=gf_settings&subview=PDF' );
+	}
 
-    /**
-     * Get our current installation status
-     * @return  String
-     * @since  4.0
-     */
-    public function is_installed() {
-        return get_option('gfpdf_is_installed');
-    }
+	/**
+	 * Get our current installation status
+	 * @return  String
+	 * @since  4.0
+	 */
+	public function is_installed() {
+		return get_option( 'gfpdf_is_installed' );
+	}
 
-    /**
-     * Used to set up our PDF template folder, tmp folder and font folder
-     * @since 4.0
-     */
-    public function setup_template_location() {
-        global $gfpdf;
+	/**
+	 * Used to set up our PDF template folder, tmp folder and font folder
+	 * @since 4.0
+	 */
+	public function setup_template_location() {
+		global $gfpdf;
 
-        $gfpdf->data->template_location      = apply_filters('gfpdfe_template_location', $gfpdf->data->upload_dir . '/' . $gfpdf->data->working_folder . '/', $gfpdf->data->upload_dir, $gfpdf->data->working_folder);
-        $gfpdf->data->template_location_url  = apply_filters('gfpdfe_template_location_url', $gfpdf->data->upload_dir_url . '/' . $gfpdf->data->working_folder . '/', $gfpdf->data->upload_dir_url, $gfpdf->data->working_folder);
-        $gfpdf->data->template_font_location = $gfpdf->data->template_location . 'fonts/';
-        $gfpdf->data->template_tmp_location  = $gfpdf->data->template_location . 'tmp/';
-    }
+		$gfpdf->data->template_location      = apply_filters( 'gfpdfe_template_location', $gfpdf->data->upload_dir . '/' . $gfpdf->data->working_folder . '/', $gfpdf->data->upload_dir, $gfpdf->data->working_folder );
+		$gfpdf->data->template_location_url  = apply_filters( 'gfpdfe_template_location_url', $gfpdf->data->upload_dir_url . '/' . $gfpdf->data->working_folder . '/', $gfpdf->data->upload_dir_url, $gfpdf->data->working_folder );
+		$gfpdf->data->template_font_location = $gfpdf->data->template_location . 'fonts/';
+		$gfpdf->data->template_tmp_location  = $gfpdf->data->template_location . 'tmp/';
+	}
 
-    /**
-     * If running a multisite we'll setup the path to the current multisite folder
-     * @since 4.0
-     * @return void
-     */
-    public function setup_multisite_template_location() {
-        global $gfpdf;
+	/**
+	 * If running a multisite we'll setup the path to the current multisite folder
+	 * @since 4.0
+	 * @return void
+	 */
+	public function setup_multisite_template_location() {
+		global $gfpdf;
 
-        if(is_multisite()) {
-            $blog_id = get_current_blog_id();
-            $gfpdf->data->multisite_template_location     = apply_filters('gfpdfe_multisite_template_location', $gfpdf->data->upload_dir . '/' . $gfpdf->data->working_folder . '/', $gfpdf->data->upload_dir, $gfpdf->data->working_folder);
-            $gfpdf->data->multisite_template_location_url = apply_filters('gfpdfe_multisite_template_location_url', $gfpdf->data->upload_dir_url . '/' . $gfpdf->data->working_folder . '/', $gfpdf->data->upload_dir_url, $gfpdf->data->working_folder);
-        }
-    }
+		if ( is_multisite() ) {
+			$blog_id = get_current_blog_id();
+			$gfpdf->data->multisite_template_location     = apply_filters( 'gfpdfe_multisite_template_location', $gfpdf->data->upload_dir . '/' . $gfpdf->data->working_folder . '/', $gfpdf->data->upload_dir, $gfpdf->data->working_folder );
+			$gfpdf->data->multisite_template_location_url = apply_filters( 'gfpdfe_multisite_template_location_url', $gfpdf->data->upload_dir_url . '/' . $gfpdf->data->working_folder . '/', $gfpdf->data->upload_dir_url, $gfpdf->data->working_folder );
+		}
+	}
 
-    /**
-     * Create the appropriate folder structure automatically
-     * The upload directory should have all appropriate permissions to allow this kind of maniupulation
-     * but devs who tap into the gfpdfe_template_location filter will need to ensure we can write to the appropraite folder
-     * @since 4.0
-     * @return void
-     */
-    public function create_folder_structures() {
-        global $gfpdf;
+	/**
+	 * Create the appropriate folder structure automatically
+	 * The upload directory should have all appropriate permissions to allow this kind of maniupulation
+	 * but devs who tap into the gfpdfe_template_location filter will need to ensure we can write to the appropraite folder
+	 * @since 4.0
+	 * @return void
+	 */
+	public function create_folder_structures() {
+		global $gfpdf;
 
-        /* don't create the folder structure on our welcome page or through AJAX as an errors on the first page they see will confuse users */
-        if( is_admin() &&
-            (rgget('page') == 'gfpdf-getting-started') || (defined( 'DOING_AJAX' ) && DOING_AJAX))  {
-            return false;
-        }
+		/* don't create the folder structure on our welcome page or through AJAX as an errors on the first page they see will confuse users */
+		if ( is_admin() &&
+			(rgget( 'page' ) == 'gfpdf-getting-started') || (defined( 'DOING_AJAX' ) && DOING_AJAX) ) {
+			return false;
+		}
 
-        /* add folders that need to be checked */
-        $folders = array(
-            $gfpdf->data->template_font_location,
-            $gfpdf->data->template_tmp_location,
-        );
+		/* add folders that need to be checked */
+		$folders = array(
+			$gfpdf->data->template_font_location,
+			$gfpdf->data->template_tmp_location,
+		);
 
-        if(is_multisite()) {
-            $folders[] = $gfpdf->data->multisite_template_location;
-        }
+		if ( is_multisite() ) {
+			$folders[] = $gfpdf->data->multisite_template_location;
+		}
 
-        /* allow other plugins to add their own folders which should be checked */
-        $folders = apply_filters('gfpdf_installer_create_folders', $folders);
+		/* allow other plugins to add their own folders which should be checked */
+		$folders = apply_filters( 'gfpdf_installer_create_folders', $folders );
 
-        /* create the required folder structure, or throw error */
-        foreach($folders as $dir) {
-            if( !is_dir($dir)) {
-                if( ! wp_mkdir_p($dir)) {
-                    $gfpdf->notices->add_error(sprintf(__('There was a problem creating the %s directory. Ensure you have write permissions to your upload directory.', 'gravitypdf'), '<code>' . $gfpdf->misc->relative_path($dir) . '</code>'));
-                }
-            } else {
-                /* test the directory is currently writable by the web server, otherwise throw and error */
-                if( ! $gfpdf->misc->is_directory_writable($dir)) {
-                    $gfpdf->notices->add_error(sprintf(__('Gravity PDF does not have write permissions to the %s directory. Contact your web hosting provider to fix the issue.', 'gravitypdf'), '<code>' . $gfpdf->misc->relative_path($dir) . '</code>'));
-                }
-            }
-        }
+		/* create the required folder structure, or throw error */
+		foreach ( $folders as $dir ) {
+			if ( ! is_dir( $dir ) ) {
+				if ( ! wp_mkdir_p( $dir ) ) {
+					$gfpdf->notices->add_error( sprintf( __( 'There was a problem creating the %s directory. Ensure you have write permissions to your upload directory.', 'gravitypdf' ), '<code>' . $gfpdf->misc->relative_path( $dir ) . '</code>' ) );
+				}
+			} else {
+				/* test the directory is currently writable by the web server, otherwise throw and error */
+				if ( ! $gfpdf->misc->is_directory_writable( $dir ) ) {
+					$gfpdf->notices->add_error( sprintf( __( 'Gravity PDF does not have write permissions to the %s directory. Contact your web hosting provider to fix the issue.', 'gravitypdf' ), '<code>' . $gfpdf->misc->relative_path( $dir ) . '</code>' ) );
+				}
+			}
+		}
 
-        /* create blank index file in all folders to prevent web servers listing the entire directory */
-        if(is_dir($gfpdf->data->template_location) && !is_file($gfpdf->data->template_location . 'index.html')) {
-            GFCommon::recursive_add_index_file($gfpdf->data->template_location);
-        }
+		/* create blank index file in all folders to prevent web servers listing the entire directory */
+		if ( is_dir( $gfpdf->data->template_location ) && ! is_file( $gfpdf->data->template_location . 'index.html' ) ) {
+			GFCommon::recursive_add_index_file( $gfpdf->data->template_location );
+		}
 
-        /* create deny htaccess file to prevent direct access to files */
-        if(is_dir($gfpdf->data->template_tmp_location) && !is_file($gfpdf->data->template_tmp_location . '.htaccess')) {
-            file_put_contents($gfpdf->data->template_tmp_location . '.htaccess', 'deny from all');
-        }
-    }
+		/* create deny htaccess file to prevent direct access to files */
+		if ( is_dir( $gfpdf->data->template_tmp_location ) && ! is_file( $gfpdf->data->template_tmp_location . '.htaccess' ) ) {
+			file_put_contents( $gfpdf->data->template_tmp_location . '.htaccess', 'deny from all' );
+		}
+	}
 
-    /**
-     * Register our PDF custom rewrite rules
-     * @since 4.0
-     * @return void
-     */
-    public function register_rewrite_rules() {
-        global $gfpdf;
+	/**
+	 * Register our PDF custom rewrite rules
+	 * @since 4.0
+	 * @return void
+	 */
+	public function register_rewrite_rules() {
+		global $gfpdf;
 
-        /* store query */
-        $query = $gfpdf->data->permalink;
+		/* store query */
+		$query = $gfpdf->data->permalink;
 
-        /* Add our main endpoint */
-        add_rewrite_rule(
-            $query,
-            'index.php?gf_pdf=1&pid=$matches[1]&lid=$matches[2]&action=$matches[3]',
-            'top');
+		/* Add our main endpoint */
+		add_rewrite_rule(
+			$query,
+			'index.php?gf_pdf=1&pid=$matches[1]&lid=$matches[2]&action=$matches[3]',
+		'top');
 
-        /* check to see if we need to flush the rewrite rules */
-        $this->maybe_flush_rewrite_rules($query);
-    }
+		/* check to see if we need to flush the rewrite rules */
+		$this->maybe_flush_rewrite_rules( $query );
+	}
 
-    /**
-     * Register our PDF custom rewrite rules
-     * @since 4.0
-     * @return void
-     */
-    public function register_rewrite_tags( $tags ) {
-        $tags[] = 'gf_pdf';
-        $tags[] = 'pid';
-        $tags[] = 'lid';
-        $tags[] = 'action';
+	/**
+	 * Register our PDF custom rewrite rules
+	 * @since 4.0
+	 * @return void
+	 */
+	public function register_rewrite_tags( $tags ) {
+		$tags[] = 'gf_pdf';
+		$tags[] = 'pid';
+		$tags[] = 'lid';
+		$tags[] = 'action';
 
-        return $tags;
-    }
+		return $tags;
+	}
 
-    /**
-     * Check if we need to force the rewrite rules to be flushed
-     * @param  $rule The rule to check
-     * @since 4.0
-     * @return void
-     */
-    public function maybe_flush_rewrite_rules($rule) {
-        $rules = get_option( 'rewrite_rules' );
+	/**
+	 * Check if we need to force the rewrite rules to be flushed
+	 * @param  $rule The rule to check
+	 * @since 4.0
+	 * @return void
+	 */
+	public function maybe_flush_rewrite_rules( $rule ) {
+		$rules = get_option( 'rewrite_rules' );
 
-        if ( ! isset( $rules[ $rule ] ) ) {
-            flush_rewrite_rules(false);
-        }
-    }
+		if ( ! isset( $rules[ $rule ] ) ) {
+			flush_rewrite_rules( false );
+		}
+	}
 
 
-    /**
-     * The Gravity PDF Uninstaller
-     * @return void
-     * @since 4.0
-     * @todo  Add Multisite Support (Network Activated)
-     */
-    public function uninstall_plugin() {
-        $this->remove_plugin_options();
-        $this->remove_plugin_form_settings();
-        $this->remove_folder_structure();
-        $this->deactivate_plugin();
-        $this->redirect_to_plugins_page();
-    }
+	/**
+	 * The Gravity PDF Uninstaller
+	 * @return void
+	 * @since 4.0
+	 * @todo  Add Multisite Support (Network Activated)
+	 */
+	public function uninstall_plugin() {
+		$this->remove_plugin_options();
+		$this->remove_plugin_form_settings();
+		$this->remove_folder_structure();
+		$this->deactivate_plugin();
+		$this->redirect_to_plugins_page();
+	}
 
-    /**
-     * Remove and options stored in the database
-     * @return void
-     * @since 4.0
-     */
-    public function remove_plugin_options() {
-        delete_option('gfpdf_is_installed');
-        delete_option('gfpdf_settings');
-    }
+	/**
+	 * Remove and options stored in the database
+	 * @return void
+	 * @since 4.0
+	 */
+	public function remove_plugin_options() {
+		delete_option( 'gfpdf_is_installed' );
+		delete_option( 'gfpdf_settings' );
+	}
 
-    /**
-     * Remove all form settings from each individual form.
-     * Because we stored out PDF settings with each form and have no index we need to individually load and forms and check them for Gravity PDF settings
-     * @return void
-     * @since 4.0
-     */
-    public function remove_plugin_form_settings() {
-        global $gfpdf;
+	/**
+	 * Remove all form settings from each individual form.
+	 * Because we stored out PDF settings with each form and have no index we need to individually load and forms and check them for Gravity PDF settings
+	 * @return void
+	 * @since 4.0
+	 */
+	public function remove_plugin_form_settings() {
+		global $gfpdf;
 
-        $forms = GFAPI::get_forms();
+		$forms = GFAPI::get_forms();
 
-        foreach($forms as $form) {
-            /* only update forms which have a PDF configuration */
-            if(isset($form['gfpdf_form_settings'])) {
-                unset($form['gfpdf_form_settings']);
-                if(GFAPI::update_form($form) !== true) {
-                    $gfpdf->notices->add_error(sprintf(__('There was a problem removing the Gravity Form "%s" PDF configuration. Try delete manually.', 'gravitypdf'), $form['ID'] . ': ' . $form['title']));
-                }
-            }
-        }
-    }
+		foreach ( $forms as $form ) {
+			/* only update forms which have a PDF configuration */
+			if ( isset($form['gfpdf_form_settings']) ) {
+				unset($form['gfpdf_form_settings']);
+				if ( GFAPI::update_form( $form ) !== true ) {
+					$gfpdf->notices->add_error( sprintf( __( 'There was a problem removing the Gravity Form "%s" PDF configuration. Try delete manually.', 'gravitypdf' ), $form['ID'] . ': ' . $form['title'] ) );
+				}
+			}
+		}
+	}
 
-    /**
-     * Remove our PDF directory structure
-     * @return void
-     * @since 4.0
-     */
-    public function remove_folder_structure() {
-        global $gfpdf;
+	/**
+	 * Remove our PDF directory structure
+	 * @return void
+	 * @since 4.0
+	 */
+	public function remove_folder_structure() {
+		global $gfpdf;
 
-        $paths = apply_filters('gfpdf_uninstall_path', array(
-            $gfpdf->data->template_location,
-        ));
+		$paths = apply_filters('gfpdf_uninstall_path', array(
+			$gfpdf->data->template_location,
+		));
 
-        foreach($paths as $dir) {
-            if(is_dir($dir)) {
-                $results = $gfpdf->misc->rmdir($dir);
+		foreach ( $paths as $dir ) {
+			if ( is_dir( $dir ) ) {
+				$results = $gfpdf->misc->rmdir( $dir );
 
-                if(is_wp_error($results) || !$results) {
-                    $gfpdf->notices->add_error(sprintf(__('There was a problem removing the %s directory. Clean up manually via (S)FTP.', 'gravitypdf'), '<code>' . $gfpdf->misc->relative_path($dir) . '</code>'));
-                }
-            }
-        }
-    }
+				if ( is_wp_error( $results ) || ! $results ) {
+					$gfpdf->notices->add_error( sprintf( __( 'There was a problem removing the %s directory. Clean up manually via (S)FTP.', 'gravitypdf' ), '<code>' . $gfpdf->misc->relative_path( $dir ) . '</code>' ) );
+				}
+			}
+		}
+	}
 
-    /**
-     * Deactivate Gravity PDF
-     * @return void
-     * @since 4.0
-     */
-    public function deactivate_plugin() {
-        deactivate_plugins(PDF_PLUGIN_BASENAME);
-    }
+	/**
+	 * Deactivate Gravity PDF
+	 * @return void
+	 * @since 4.0
+	 */
+	public function deactivate_plugin() {
+		deactivate_plugins( PDF_PLUGIN_BASENAME );
+	}
 
-    /**
-     * Safe redirect after deactivation
-     * @return void
-     * @since 4.0
-     */
-    public function redirect_to_plugins_page() {
-        /* check if user can view the plugins page */
-        if(current_user_can('activate_plugins') ) {
-            wp_safe_redirect( admin_url('plugins.php'));
-        } else { /* otherwise redirect to dashboard */
-            wp_safe_redirect( admin_url('index.php'));
-        }
-        exit;
-    }
+	/**
+	 * Safe redirect after deactivation
+	 * @return void
+	 * @since 4.0
+	 */
+	public function redirect_to_plugins_page() {
+		/* check if user can view the plugins page */
+		if ( current_user_can( 'activate_plugins' ) ) {
+			wp_safe_redirect( admin_url( 'plugins.php' ) );
+		} else { /* otherwise redirect to dashboard */
+			wp_safe_redirect( admin_url( 'index.php' ) );
+		}
+		exit;
+	}
 }

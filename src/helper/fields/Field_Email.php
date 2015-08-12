@@ -20,8 +20,8 @@ use Exception;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -52,46 +52,46 @@ if (! defined('ABSPATH')) {
 class Field_Email extends Helper_Fields
 {
 
-    /**
-     * Check the appropriate variables are parsed in send to the parent construct
-     * @param Object $field The GF_Field_* Object
-     * @param Array $entry The Gravity Forms Entry
-     * @since 4.0
-     */
-    public function __construct($field, $entry) {
-        if(!is_object($field) || !$field instanceof GF_Field_Email) {
-            throw new Exception('$field needs to be in instance of GF_Field_Email');
-        }
+	/**
+	 * Check the appropriate variables are parsed in send to the parent construct
+	 * @param Object $field The GF_Field_* Object
+	 * @param Array  $entry The Gravity Forms Entry
+	 * @since 4.0
+	 */
+	public function __construct( $field, $entry ) {
+		if ( ! is_object( $field ) || ! $field instanceof GF_Field_Email ) {
+			throw new Exception( '$field needs to be in instance of GF_Field_Email' );
+		}
 
-        /* call our parent method */
-        parent::__construct($field, $entry);
-    }
+		/* call our parent method */
+		parent::__construct( $field, $entry );
+	}
 
-    /**
-     * Display the HTML version of this field
-     * @return String
-     * @since 4.0
-     */
-    public function html($value = '', $label = true) {
-        $value  = $this->value();
-        
-        $output = ( GFCommon::is_valid_email($value) ) ? '<a href="mailto:'. $value .'">'. esc_html($value) .'</a>' : esc_html($value);
+	/**
+	 * Display the HTML version of this field
+	 * @return String
+	 * @since 4.0
+	 */
+	public function html( $value = '', $label = true ) {
+		$value  = $this->value();
 
-        return parent::html($output);
-    }
+		$output = ( GFCommon::is_valid_email( $value ) ) ? '<a href="mailto:'. $value .'">'. esc_html( $value ) .'</a>' : esc_html( $value );
 
-    /**
-     * Get the standard GF value of this field
-     * @return String/Array
-     * @since 4.0
-     */
-    public function value() {
-        if($this->has_cache()) {
-            return $this->cache();
-        }
+		return parent::html( $output );
+	}
 
-        $this->cache($this->get_value());
-        
-        return $this->cache();
-    }
+	/**
+	 * Get the standard GF value of this field
+	 * @return String/Array
+	 * @since 4.0
+	 */
+	public function value() {
+		if ( $this->has_cache() ) {
+			return $this->cache();
+		}
+
+		$this->cache( $this->get_value() );
+
+		return $this->cache();
+	}
 }

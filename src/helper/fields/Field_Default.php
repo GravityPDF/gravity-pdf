@@ -18,8 +18,8 @@ use Exception;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -49,29 +49,29 @@ if (! defined('ABSPATH')) {
  */
 class Field_Default extends Helper_Fields
 {
-    /**
-     * Display the HTML version of this field
-     * @return String
-     * @since 4.0
-     */
-    public function html($value = '', $label = true) {
-        $value = esc_html($this->value());
-        
-        return parent::html($value);
-    }
+	/**
+	 * Display the HTML version of this field
+	 * @return String
+	 * @since 4.0
+	 */
+	public function html( $value = '', $label = true ) {
+		$value = esc_html( $this->value() );
 
-    /**
-     * Get the standard GF value of this field
-     * @return String/Array
-     * @since 4.0
-     */
-    public function value() {
-        if($this->has_cache()) {
-            return $this->cache();
-        }
+		return parent::html( $value );
+	}
 
-        $this->cache($this->get_value());
-        
-        return $this->cache();
-    }
+	/**
+	 * Get the standard GF value of this field
+	 * @return String/Array
+	 * @since 4.0
+	 */
+	public function value() {
+		if ( $this->has_cache() ) {
+			return $this->cache();
+		}
+
+		$this->cache( $this->get_value() );
+
+		return $this->cache();
+	}
 }

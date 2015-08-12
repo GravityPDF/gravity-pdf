@@ -9,7 +9,6 @@
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
- *
  */
 
 /*
@@ -19,8 +18,8 @@
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -51,30 +50,30 @@ if (! defined('ABSPATH')) {
  */
 class Controller_Update
 {
-    /**
-     * Run plugin activation functionality
-     * @since 4.0
-     * @return void
-     */
-    public static function activation() {
-        /* Add Upgraded From Option */
-        set_transient('_gravitypdf_activation_redirect', true, 30);
-    }
+	/**
+	 * Run plugin activation functionality
+	 * @since 4.0
+	 * @return void
+	 */
+	public static function activation() {
+		/* Add Upgraded From Option */
+		set_transient( '_gravitypdf_activation_redirect', true, 30 );
+	}
 
-    /**
-     * Run plugin deactivation functionality
-     * @since 4.0
-     * @return void
-     */
-    public static function deactivation() {
-        global $gfpdf;
+	/**
+	 * Run plugin deactivation functionality
+	 * @since 4.0
+	 * @return void
+	 */
+	public static function deactivation() {
+		global $gfpdf;
 
-       /**
-        * Remove our rewrite rules
-        * As deactivation hook fires much earlier than flush_rewrite_rules() can be called we'll manually remove our rules
-        */
-       $rules = get_option( 'rewrite_rules' );
-       unset($rules[$gfpdf->data->permalink]);
-       update_option( 'rewrite_rules', $rules);
-    }
+		/**
+		* Remove our rewrite rules
+		* As deactivation hook fires much earlier than flush_rewrite_rules() can be called we'll manually remove our rules
+		*/
+		$rules = get_option( 'rewrite_rules' );
+		unset($rules[$gfpdf->data->permalink]);
+		update_option( 'rewrite_rules', $rules );
+	}
 }

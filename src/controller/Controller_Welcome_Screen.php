@@ -18,8 +18,8 @@ use GFPDF\Helper\Helper_Int_Filters;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -50,103 +50,99 @@ if (! defined('ABSPATH')) {
  */
 class Controller_Welcome_Screen extends Helper_Controller implements Helper_Int_Actions, Helper_Int_Filters
 {
-    /**
-     * Load our model and view and required actions
-     */
-    public function __construct(Helper_Model $model, Helper_View $view)
-    {
-        /* load our model and view */
-        $this->model = $model;
-        $this->model->setController($this);
+	/**
+	 * Load our model and view and required actions
+	 */
+	public function __construct( Helper_Model $model, Helper_View $view ) {
+		/* load our model and view */
+		$this->model = $model;
+		$this->model->setController( $this );
 
-        $this->view  = $view;
-        $this->view->setController($this);
-    }
+		$this->view  = $view;
+		$this->view->setController( $this );
+	}
 
-    /**
-     * Initialise our class defaults
-     * @since 4.0
-     * @return void
-     */
-    public function init() {
-        $this->add_actions();
-        $this->add_filters();
-    }
+	/**
+	 * Initialise our class defaults
+	 * @since 4.0
+	 * @return void
+	 */
+	public function init() {
+		$this->add_actions();
+		$this->add_filters();
+	}
 
-    /**
-     * Apply any actions needed for the welcome page
-     * @since 4.0
-     * @return void
-     */
-    public function add_actions() {
-         /* Load the welcome screen into the menu */
-        add_action('admin_menu', array( $this->model, 'admin_menus'));
-        add_action('admin_init', array( $this, 'welcome'));
-    }
+	/**
+	 * Apply any actions needed for the welcome page
+	 * @since 4.0
+	 * @return void
+	 */
+	public function add_actions() {
+		 /* Load the welcome screen into the menu */
+		add_action( 'admin_menu', array( $this->model, 'admin_menus' ) );
+		add_action( 'admin_init', array( $this, 'welcome' ) );
+	}
 
-    /**
-     * Apply any filters needed for the welcome page
-     * @since 4.0
-     * @return void
-     */
-    public function add_filters() {
-        add_filter('admin_title', array($this->model, 'add_page_title'), 10, 3);
-    }
+	/**
+	 * Apply any filters needed for the welcome page
+	 * @since 4.0
+	 * @return void
+	 */
+	public function add_filters() {
+		add_filter( 'admin_title', array( $this->model, 'add_page_title' ), 10, 3 );
+	}
 
-    /**
-     * Sends user to the Welcome page on first activation, as well as everytime plugin is upgraded
-     *
-     * @access public
-     * @since 4.0
-     * @return void
-     * @todo configure upgrade page as needed
-     */
-    public function welcome()
-    {
-        global $gfpdf;
+	/**
+	 * Sends user to the Welcome page on first activation, as well as everytime plugin is upgraded
+	 *
+	 * @access public
+	 * @since 4.0
+	 * @return void
+	 * @todo configure upgrade page as needed
+	 */
+	public function welcome() {
+		global $gfpdf;
 
-        /* Bail if no activation redirect */
-        if (!get_transient('_gravitypdf_activation_redirect')) {
-            return false;
-        }
+		/* Bail if no activation redirect */
+		if ( ! get_transient( '_gravitypdf_activation_redirect' ) ) {
+			return false;
+		}
 
-        /* Delete the redirect transient */
-        delete_transient('_gravitypdf_activation_redirect');
+		/* Delete the redirect transient */
+		delete_transient( '_gravitypdf_activation_redirect' );
 
-        /* Bail if activating from network, or bulk */
-        if (is_network_admin() || isset($_GET['activate-multi'])) {
-            return false;
-        }
+		/* Bail if activating from network, or bulk */
+		if ( is_network_admin() || isset($_GET['activate-multi']) ) {
+			return false;
+		}
 
-        /* add own update tracker */
-        if (!$gfpdf->data->is_installed) {
-            /* First time install */
-            wp_safe_redirect(admin_url('index.php?page=gfpdf-getting-started'));
-            exit;
-        } else {
-            /* Update */
-            wp_safe_redirect(admin_url('index.php?page=gfpdf-update'));
-            exit;
-        }
-    }
+		/* add own update tracker */
+		if ( ! $gfpdf->data->is_installed ) {
+			/* First time install */
+			wp_safe_redirect( admin_url( 'index.php?page=gfpdf-getting-started' ) );
+			exit;
+		} else {
+			/* Update */
+			wp_safe_redirect( admin_url( 'index.php?page=gfpdf-update' ) );
+			exit;
+		}
+	}
 
-    /**
-     * Load our welcome screen
-     * @return void
-     * @since 4.0
-     */
-    public function getting_started_screen() {
-        $this->view->welcome();
-    }
+	/**
+	 * Load our welcome screen
+	 * @return void
+	 * @since 4.0
+	 */
+	public function getting_started_screen() {
+		$this->view->welcome();
+	}
 
-    /**
-     * Load our update welcome screen
-     * @return void
-     * @since 4.0
-     */
-    public function update_screen() {
-    	$this->view->update();
-    }
-
-
+	/**
+	 * Load our update welcome screen
+	 * @return void
+	 * @since 4.0
+	 */
+	public function update_screen() {
+		$this->view->update();
+	}
 }

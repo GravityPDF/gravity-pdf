@@ -19,8 +19,8 @@ use Exception;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -54,51 +54,51 @@ require_once( GFCommon::get_base_path() . '/currency.php' );
 class Field_Products extends Helper_Fields
 {
 
-    /**
-     * The Products class doesn't need the $field value so we'll use a stripped down version of the construct
-     * @param Array $entry The Gravity Forms Entry
-     * @since 4.0
-     */
-    public function __construct($entry) {
-        /* Throw error if $entry is not an array */
-        if(!is_array($entry)) {
-            throw new Exception('$entry needs to be an array');
-        }
+	/**
+	 * The Products class doesn't need the $field value so we'll use a stripped down version of the construct
+	 * @param Array $entry The Gravity Forms Entry
+	 * @since 4.0
+	 */
+	public function __construct( $entry ) {
+		/* Throw error if $entry is not an array */
+		if ( ! is_array( $entry ) ) {
+			throw new Exception( '$entry needs to be an array' );
+		}
 
-        $this->entry = $entry;
-        $this->form  = GFFormsModel::get_form_meta( $entry['form_id'] );
-    }
+		$this->entry = $entry;
+		$this->form  = GFFormsModel::get_form_meta( $entry['form_id'] );
+	}
 
-    /**
-     * Return the HTML form data
-     * @return Array
-     * @since 4.0
-     */
-    public function form_data() {
+	/**
+	 * Return the HTML form data
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function form_data() {
 
-        $data = array();
+		$data = array();
 
-        $data = $this->value();
+		$data = $this->value();
 
-        return $data;
-    }
+		return $data;
+	}
 
-    /**
-     * Display the HTML version of this field
-     * @return String
-     * @since 4.0
-     */
-    public function html($value = '', $label = true) {
-        $products = $this->value();
-        $form_id  = $this->form['id'];
+	/**
+	 * Display the HTML version of this field
+	 * @return String
+	 * @since 4.0
+	 */
+	public function html( $value = '', $label = true ) {
+		$products = $this->value();
+		$form_id  = $this->form['id'];
 
-        /* start output buffer */
-        ob_start();
+		/* start output buffer */
+		ob_start();
 
-        $include_styles = apply_filters('gfpdf_include_product_table_styles', true);
+		$include_styles = apply_filters( 'gfpdf_include_product_table_styles', true );
 
-        ?>
-        <?php if($include_styles): ?>
+		?>
+        <?php if ( $include_styles ) : ?>
             <style>
                 table.entry-products th {
                     background-color: #F4F4F4;
@@ -144,11 +144,11 @@ class Field_Products extends Helper_Fields
 
         <h3 id="product-field-title gfpdf-field">
             <?php
-                echo apply_filters("gform_order_label_{$form_id}",
-                     apply_filters('gform_order_label', __('Order', 'gravityforms'),
-                     $form_id),
-                     $form_id);
-            ?>
+				echo apply_filters("gform_order_label_{$form_id}",
+					apply_filters('gform_order_label', __( 'Order', 'gravityforms' ),
+					$form_id),
+				$form_id);
+			?>
         </h3>
 
         <table class="entry-products gfpdf-field" autosize="1" cellspacing="0" width="97%">
@@ -163,42 +163,42 @@ class Field_Products extends Helper_Fields
               <tr>
                 <th scope="col">
                     <?php
-                        echo apply_filters('gform_product_{$form_id}',
-                             apply_filters('gform_product', __('Product', 'gravityforms'),
-                             $form_id),
-                             $form_id);
-                    ?>
+						echo apply_filters('gform_product_{$form_id}',
+							apply_filters('gform_product', __( 'Product', 'gravityforms' ),
+							$form_id),
+						$form_id);
+					?>
                 </th>
 
                 <th scope="col" class='textcenter'>
                     <?php
-                        echo apply_filters('gform_product_qty_{$form_id}',
-                             apply_filters('gform_product_qty', __('Qty', 'gravityforms'),
-                             $form_id),
-                             $form_id);
-                    ?>
+						echo apply_filters('gform_product_qty_{$form_id}',
+							apply_filters('gform_product_qty', __( 'Qty', 'gravityforms' ),
+							$form_id),
+						$form_id);
+					?>
                 </th>
                 <th scope="col">
                     <?php
-                        echo apply_filters('gform_product_unitprice_{$form_id}',
-                             apply_filters('gform_product_unitprice', __('Unit Price', 'gravityforms'),
-                             $form_id),
-                             $form_id);
-                    ?>
+						echo apply_filters('gform_product_unitprice_{$form_id}',
+							apply_filters('gform_product_unitprice', __( 'Unit Price', 'gravityforms' ),
+							$form_id),
+						$form_id);
+					?>
                 </th>
                 <th scope="col">
                     <?php
-                        echo apply_filters('gform_product_price_{$form_id}',
-                             apply_filters('gform_product_price', __('Price', 'gravityforms'),
-                             $form_id),
-                             $form_id);
-                    ?>
+						echo apply_filters('gform_product_price_{$form_id}',
+							apply_filters('gform_product_price', __( 'Price', 'gravityforms' ),
+							$form_id),
+						$form_id);
+					?>
                 </th>
               </tr>
             </thead>
 
             <tbody>
-                <?php foreach($products['products'] as $product): ?>
+                <?php foreach ( $products['products'] as $product ) : ?>
                         <tr>
                             <td>
                                 <div class="product_name">
@@ -206,40 +206,40 @@ class Field_Products extends Helper_Fields
                                 </div>
 
                                     <?php
-                                    $price = $product['price_unformatted'];
+									$price = $product['price_unformatted'];
 
-                                    if(sizeof($product['options']) > 0): ?>
+									if ( sizeof( $product['options'] ) > 0 ) : ?>
                                         <ul class="product_options">
-                                            <?php foreach($product['options'] as $option): $price += $option['price']; ?>
+                                            <?php foreach ( $product['options'] as $option ) : $price += $option['price']; ?>
                                                 <li><?php echo $option['option_label']; ?></li>
                                             <?php endforeach; ?>
                                         </ul>
                                     <?php endif; ?>
                             </td>
                             <td class="textcenter"><?php echo $product['quantity']; ?></td>
-                            <td><?php echo GFCommon::format_number($price, 'currency'); ?></td>
+                            <td><?php echo GFCommon::format_number( $price, 'currency' ); ?></td>
                             <td><?php echo $product['subtotal_formatted'] ?></td>
                         </tr>
                 <?php endforeach; ?>
 
-                <?php if(!empty($products['products_totals']['shipping_name'])): ?>
+                <?php if ( ! empty($products['products_totals']['shipping_name']) ) : ?>
                     <tr>
                         <td rowspan="3" class="emptycell"></td>
-                        <td colspan="2" class="textright subtotal totals"><?php _e('Subtotal', 'gravitypdf'); ?></td>
+                        <td colspan="2" class="textright subtotal totals"><?php _e( 'Subtotal', 'gravitypdf' ); ?></td>
                         <td class="subtotal_amount totals"><?php echo $products['products_totals']['subtotal_formatted']; ?></td>
                     </tr>
                     <tr>
-                        <td colspan="2" class="textright shipping totals"><?php echo sprintf(__('Shipping (%s)', 'gravitypdf'), $products['products_totals']['shipping_name']); ?></td>
+                        <td colspan="2" class="textright shipping totals"><?php echo sprintf( __( 'Shipping (%s)', 'gravitypdf' ), $products['products_totals']['shipping_name'] ); ?></td>
                         <td class="shipping_amount totals"><?php echo $products['products_totals']['shipping_formatted']; ?></td>
                     </tr>
                 <?php endif; ?>
 
                 <tr>
-                    <?php if(empty($products['products_totals']['shipping_name'])): ?>
+                    <?php if ( empty($products['products_totals']['shipping_name']) ) : ?>
                         <td class="emptycell"></td>
                     <?php endif; ?>
 
-                    <td colspan="2" class="textright grandtotal totals"><?php _e('Total', 'gravityforms') ?></td>
+                    <td colspan="2" class="textright grandtotal totals"><?php _e( 'Total', 'gravityforms' ) ?></td>
                     <td class="grandtotal_amount totals"><?php echo $products['products_totals']['total_formatted']; ?></td>
                 </tr>
             </tbody>
@@ -247,104 +247,105 @@ class Field_Products extends Helper_Fields
 
         <?php
 
-        return ob_get_clean();
-    }
+		return ob_get_clean();
+	}
 
-    /**
-     * Gravity Forms handles product fields in bulk as they are all linked together to get the order totals
-     * This class is used to handle this in bulk
-     * @return String/Array
-     * @since 4.0
-     */
-    public function value() {
+	/**
+	 * Gravity Forms handles product fields in bulk as they are all linked together to get the order totals
+	 * This class is used to handle this in bulk
+	 * @return String/Array
+	 * @since 4.0
+	 */
+	public function value() {
 
-        /* check if we have a value already stored in the cache */
-        if($this->has_cache()) {
-            return $this->cache();
-        }
+		/* check if we have a value already stored in the cache */
+		if ( $this->has_cache() ) {
+			return $this->cache();
+		}
 
-        /* Set up the form / lead information */
-        $form            = $this->form;
-        $lead            = $this->entry;
-        
-        /* Set up the curreny format we should output products totals in */
-        $currency_type   = GFCommon::is_currency_decimal_dot();
-        $currency_format = $currency_type ? 'decimal_dot' : 'decimal_comma';
-        
-        /* Get all products for this field */
-        $products        = GFCommon::get_product_fields($form, $lead, true);
-        
-        /* Set up the appropriate varaibles needed for our product processing */
-        $form_array      = array(); /* holds the actual product data */
-        $order_total     = 0; /* holds the total cost of the order */
+		/* Set up the form / lead information */
+		$form            = $this->form;
+		$lead            = $this->entry;
 
-        /* check that there are actual product fields to process */
-        if(sizeof($products['products']) > 0 ) {
+		/* Set up the curreny format we should output products totals in */
+		$currency_type   = GFCommon::is_currency_decimal_dot();
+		$currency_format = $currency_type ? 'decimal_dot' : 'decimal_comma';
 
-            foreach($products['products'] as $id => $product) {
+		/* Get all products for this field */
+		$products        = GFCommon::get_product_fields( $form, $lead, true );
 
-                /* Get the raw pricing data */
-                $product_raw_price = GFCommon::to_number($product['price']);
+		/* Set up the appropriate varaibles needed for our product processing */
+		$form_array      = array(); /* holds the actual product data */
+		$order_total     = 0; /* holds the total cost of the order */
 
-                /* Check if we should include options */
-                $options = isset($product['options']) ? $product['options'] : array();
+		/* check that there are actual product fields to process */
+		if ( sizeof( $products['products'] ) > 0 ) {
 
-                /* Process our options array */
-                foreach($options as &$option) {
-                    /* Get the options raw price */
-                    $option_raw_price          = GFCommon::to_number($option['price']);
+			foreach ( $products['products'] as $id => $product ) {
 
-                    /* Add the options price to the products price */
-                    $product_raw_price         += $option_raw_price;
+				/* Get the raw pricing data */
+				$product_raw_price = GFCommon::to_number( $product['price'] );
 
-                    /* add our formatted options price to the array */
-                    $option['price_formatted'] = GFCommon::format_number($option_raw_price, 'currency');
+				/* Check if we should include options */
+				$options = isset($product['options']) ? $product['options'] : array();
 
-                    /* Format our option strings correctly */
-                    $option['field_label']  = esc_html($option['field_label']);
-                    $option['option_name']  = esc_html($option['option_name']);
-                    $option['option_label'] = esc_html($option['option_label']);
-                }
+				/* Process our options array */
+				foreach ( $options as &$option ) {
+					/* Get the options raw price */
+					$option_raw_price          = GFCommon::to_number( $option['price'] );
 
-                /* calculate subtotal */
-                $product_subtotal = floatval($product['quantity']) * $product_raw_price;
+					/* Add the options price to the products price */
+					$product_raw_price         += $option_raw_price;
 
-                /* increment the total */
-                $order_total += $product_subtotal;
+					/* add our formatted options price to the array */
+					$option['price_formatted'] = GFCommon::format_number( $option_raw_price, 'currency' );
 
-                /* Store product in $form_array array */
-                $form_array['products'][$id] = array(
-                        'name'               => esc_html($product['name']),
-                        'price'              => GFCommon::format_number(GFCommon::clean_number($product['price'], $currency_format), 'currency'),
-                        'price_unformatted'  => GFCommon::clean_number($product['price'], $currency_format),
-                        'options'            => $options,
-                        'quantity'           => $product['quantity'],
-                        'subtotal'           => $product_subtotal,
-                        'subtotal_formatted' => GFCommon::format_number($product_subtotal, 'currency'));
-            }
+					/* Format our option strings correctly */
+					$option['field_label']  = esc_html( $option['field_label'] );
+					$option['option_name']  = esc_html( $option['option_name'] );
+					$option['option_label'] = esc_html( $option['option_label'] );
+				}
 
-            /* Increment total */
-            $shipping_price = (isset($products['shipping']['price'])) ? floatval($products['shipping']['price']) : 0;
-            $order_total    += $shipping_price;
-            $order_subtotal = $order_total - $shipping_price;
+				/* calculate subtotal */
+				$product_subtotal = floatval( $product['quantity'] ) * $product_raw_price;
 
-            /* add totals to form data */
-            $form_array['products_totals'] = array(
-                    'subtotal'           => $order_subtotal,
-                    'subtotal_formatted' => GFCommon::format_number($order_subtotal, 'currency'),
-                    'shipping'           => $shipping_price,
-                    'shipping_formatted' => GFCommon::format_number($shipping_price, 'currency'),
-                    'shipping_name'      => (isset($products['shipping']['name'])) ? preg_replace('/(.+?) \((.+?)\)/', '$2', $products['shipping']['name']) : '',
-                    'total'              => $order_total,
-                    'total_formatted'    => GFCommon::format_number($order_total, 'currency'),
+				/* increment the total */
+				$order_total += $product_subtotal;
 
-            );
-        }
+				/* Store product in $form_array array */
+				$form_array['products'][$id] = array(
+						'name'               => esc_html( $product['name'] ),
+						'price'              => GFCommon::format_number( GFCommon::clean_number( $product['price'], $currency_format ), 'currency' ),
+						'price_unformatted'  => GFCommon::clean_number( $product['price'], $currency_format ),
+						'options'            => $options,
+						'quantity'           => $product['quantity'],
+						'subtotal'           => $product_subtotal,
+						'subtotal_formatted' => GFCommon::format_number( $product_subtotal, 'currency' ),
+				);
+			}
 
-        /* Save the array into the cache */
-        $this->cache($form_array);
-        
-        /* return the cache results */
-        return $this->cache();
-    }
+			/* Increment total */
+			$shipping_price = (isset($products['shipping']['price'])) ? floatval( $products['shipping']['price'] ) : 0;
+			$order_total    += $shipping_price;
+			$order_subtotal = $order_total - $shipping_price;
+
+			/* add totals to form data */
+			$form_array['products_totals'] = array(
+					'subtotal'           => $order_subtotal,
+					'subtotal_formatted' => GFCommon::format_number( $order_subtotal, 'currency' ),
+					'shipping'           => $shipping_price,
+					'shipping_formatted' => GFCommon::format_number( $shipping_price, 'currency' ),
+					'shipping_name'      => (isset($products['shipping']['name'])) ? preg_replace( '/(.+?) \((.+?)\)/', '$2', $products['shipping']['name'] ) : '',
+					'total'              => $order_total,
+					'total_formatted'    => GFCommon::format_number( $order_total, 'currency' ),
+
+			);
+		}
+
+		/* Save the array into the cache */
+		$this->cache( $form_array );
+
+		/* return the cache results */
+		return $this->cache();
+	}
 }

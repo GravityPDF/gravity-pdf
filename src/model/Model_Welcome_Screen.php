@@ -14,7 +14,9 @@ use GFPDF\Helper\Helper_Model;
  */
 
 /* Exit if accessed directly */
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /*
     This file is part of Gravity PDF.
@@ -44,82 +46,82 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @since 4.0
  */
 class Model_Welcome_Screen extends Helper_Model {
-    
-    /**
-     * @var string The capability users should have to view the page
-     * @since 4.0
-     */
-    public $minimum_capability = 'manage_options';
 
-    /**
-     * @var String The welcome page title
-     * @since 4.0
-     */
-    public $welcome_title;
+	/**
+	 * @var string The capability users should have to view the page
+	 * @since 4.0
+	 */
+	public $minimum_capability = 'manage_options';
 
-    /**
-     * @var String The updated page title
-     * @since 4.0
-     */
-    public $updated_title;
+	/**
+	 * @var String The welcome page title
+	 * @since 4.0
+	 */
+	public $welcome_title;
 
-    /**
-     * Assign our page titles
-     * @since 4.0
-     */
-    public function __construct() {
-        $this->welcome_title = __( 'Welcome to Gravity PDF', 'gravitypdf' );
-        $this->updated_title = __( "What's new in Gravity PDF?", 'gravitypdf' );
-    }
+	/**
+	 * @var String The updated page title
+	 * @since 4.0
+	 */
+	public $updated_title;
 
-    /**
-     * Register the Dashboard Welcome pages and then hide them so they aren't displayed in the navigation
-     *
-     * @access public
-     * @since 4.0
-     * @return void
-     */
-    public function admin_menus() {
-        $controller = $this->getController();
+	/**
+	 * Assign our page titles
+	 * @since 4.0
+	 */
+	public function __construct() {
+		$this->welcome_title = __( 'Welcome to Gravity PDF', 'gravitypdf' );
+		$this->updated_title = __( "What's new in Gravity PDF?", 'gravitypdf' );
+	}
 
-        add_dashboard_page(
-            $this->welcome_title,
-            $this->welcome_title,
-            $this->minimum_capability,
-            'gfpdf-getting-started',
-            array( $controller, 'getting_started_screen' )
-        );
+	/**
+	 * Register the Dashboard Welcome pages and then hide them so they aren't displayed in the navigation
+	 *
+	 * @access public
+	 * @since 4.0
+	 * @return void
+	 */
+	public function admin_menus() {
+		$controller = $this->getController();
 
-        add_dashboard_page(
-            $this->updated_title,
-            $this->updated_title,
-            $this->minimum_capability,
-            'gfpdf-update',
-            array( $controller, 'update_screen' )
-        );
+		add_dashboard_page(
+			$this->welcome_title,
+			$this->welcome_title,
+			$this->minimum_capability,
+			'gfpdf-getting-started',
+			array( $controller, 'getting_started_screen' )
+		);
 
-        /* hide the new page from the menu bar */
-        remove_submenu_page( 'index.php', 'gfpdf-getting-started' );
-        remove_submenu_page( 'index.php', 'gfpdf-update' );
-    }
+		add_dashboard_page(
+			$this->updated_title,
+			$this->updated_title,
+			$this->minimum_capability,
+			'gfpdf-update',
+			array( $controller, 'update_screen' )
+		);
 
-    /**
-     * Because we want to hide our welcome pages (using remove_submenu_page) our page titles no longer work
-     * This method will fix that
-     * @param String $title The page title
-     */
-    public function add_page_title($title) {
+		/* hide the new page from the menu bar */
+		remove_submenu_page( 'index.php', 'gfpdf-getting-started' );
+		remove_submenu_page( 'index.php', 'gfpdf-update' );
+	}
 
-        switch(rgget('page')) {
-            case 'gfpdf-getting-started':
-                return $this->welcome_title;
-            break;
+	/**
+	 * Because we want to hide our welcome pages (using remove_submenu_page) our page titles no longer work
+	 * This method will fix that
+	 * @param String $title The page title
+	 */
+	public function add_page_title( $title ) {
 
-            case 'gfpdf-update':
-                return $this->updated_title;
-            break;
-        }
+		switch ( rgget( 'page' ) ) {
+			case 'gfpdf-getting-started':
+				return $this->welcome_title;
+			break;
 
-        return $title;
-    }
+			case 'gfpdf-update':
+				return $this->updated_title;
+			break;
+		}
+
+		return $title;
+	}
 }

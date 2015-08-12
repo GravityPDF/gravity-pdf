@@ -19,8 +19,8 @@ use Exception;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -51,66 +51,66 @@ if (! defined('ABSPATH')) {
 class Field_Post_Tags extends Helper_Fields
 {
 
-    /**
-     * Check the appropriate variables are parsed in send to the parent construct
-     * @param Object $field The GF_Field_* Object
-     * @param Array $entry The Gravity Forms Entry
-     * @since 4.0
-     */
-    public function __construct($field, $entry) {
-        if(!is_object($field) || !$field instanceof GF_Field_Post_Tags) {
-            throw new Exception('$field needs to be in instance of GF_Field_Post_Tags');
-        }
+	/**
+	 * Check the appropriate variables are parsed in send to the parent construct
+	 * @param Object $field The GF_Field_* Object
+	 * @param Array  $entry The Gravity Forms Entry
+	 * @since 4.0
+	 */
+	public function __construct( $field, $entry ) {
+		if ( ! is_object( $field ) || ! $field instanceof GF_Field_Post_Tags ) {
+			throw new Exception( '$field needs to be in instance of GF_Field_Post_Tags' );
+		}
 
-        /* call our parent method */
-        parent::__construct($field, $entry);
-    }
+		/* call our parent method */
+		parent::__construct( $field, $entry );
+	}
 
-    /**
-     * Standardised method for returning the field's correct $form_data['field'] keys
-     * @return Array
-     * @since 4.0
-     */
-    public function form_data() {
-        
-        $value = implode(', ', $this->value());
-        $label = GFFormsModel::get_label($this->field);
-        $data  = array();
-        
-        /* Add HTML output */
-        $data[ $this->field->id . '.' . $label ] = $value;
-        $data[ $this->field->id ]                = $value;
-        $data[ $label ]                          = $value;
+	/**
+	 * Standardised method for returning the field's correct $form_data['field'] keys
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function form_data() {
 
-        return array( 'field' => $data );
-    }
+		$value = implode( ', ', $this->value() );
+		$label = GFFormsModel::get_label( $this->field );
+		$data  = array();
 
-    /**
-     * Display the HTML version of this field
-     * @return String
-     * @since 4.0
-     */
-    public function html($value = '', $label = true) {
-        $value = implode(', ', $this->value());
-        
-        return parent::html($value);
-    }
+		/* Add HTML output */
+		$data[ $this->field->id . '.' . $label ] = $value;
+		$data[ $this->field->id ]                = $value;
+		$data[ $label ]                          = $value;
 
-    /**
-     * Get the standard GF value of this field
-     * @return String/Array
-     * @since 4.0
-     */
-    public function value() {
-        if($this->has_cache()) {
-            return $this->cache();
-        }
+		return array( 'field' => $data );
+	}
 
-        $value = explode(',', $this->get_value()); /* get tags and turn into array */
-        $value = array_map('trim', $value); /* apply trim callback to all array elements */
+	/**
+	 * Display the HTML version of this field
+	 * @return String
+	 * @since 4.0
+	 */
+	public function html( $value = '', $label = true ) {
+		$value = implode( ', ', $this->value() );
 
-        $this->cache($value);
-        
-        return $this->cache();
-    }
+		return parent::html( $value );
+	}
+
+	/**
+	 * Get the standard GF value of this field
+	 * @return String/Array
+	 * @since 4.0
+	 */
+	public function value() {
+		if ( $this->has_cache() ) {
+			return $this->cache();
+		}
+
+		$value = explode( ',', $this->get_value() ); /* get tags and turn into array */
+		$value = array_map( 'trim', $value ); /* apply trim callback to all array elements */
+
+		$this->cache( $value );
+
+		return $this->cache();
+	}
 }

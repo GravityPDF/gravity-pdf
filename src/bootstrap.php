@@ -21,7 +21,9 @@ use GFPDF_Core;
  */
 
 /* Exit if accessed directly */
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /*
     This file is part of Gravity PDF.
@@ -52,405 +54,398 @@ require_once(PDF_PLUGIN_DIR . 'src/autoload.php');
  * @since 4.0
  */
 class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
-    
-    /**
-     * Holds our Helper_Notices object
-     * which we can use to queue up admin messages for the user
-     * @var Object
-     * @since 4.0
-     */
-    public $notices;
 
-    /**
-     * Holds our Helper_Data object
-     * which we can autoload with any data needed
-     * @var Object
-     * @since 4.0
-     */
-    public $data;
+	/**
+	 * Holds our Helper_Notices object
+	 * which we can use to queue up admin messages for the user
+	 * @var Object
+	 * @since 4.0
+	 */
+	public $notices;
 
-    /**
-     * Holds our Helper_Options / Helper_Options_Fields object
-     * Makes it easy to access global PDF settings and individual form PDF settings
-     * @var Object
-     * @since 4.0
-     */
-    public $options;
+	/**
+	 * Holds our Helper_Data object
+	 * which we can autoload with any data needed
+	 * @var Object
+	 * @since 4.0
+	 */
+	public $data;
 
-    /**
-     * Holds our Helper_Misc object
-     * Makes it easy to access common methods throughout the plugin
-     * @var Object
-     * @since 4.0
-     */
-    public $misc;
+	/**
+	 * Holds our Helper_Options / Helper_Options_Fields object
+	 * Makes it easy to access global PDF settings and individual form PDF settings
+	 * @var Object
+	 * @since 4.0
+	 */
+	public $options;
 
-    /**
-     * Add user depreciation notice for any methods not included in current object
-     * @since  4.0
-     */
-    public function __call($name, $arguments) {
-        trigger_error(sprintf(__('"%s" has been depreciated as of Gravity PDF 4.0', 'gravitypdf'), $name), E_USER_DEPRECATED);
-    }
+	/**
+	 * Holds our Helper_Misc object
+	 * Makes it easy to access common methods throughout the plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	public $misc;
 
-    /**
-     * Add user depreciation notice for any methods not included in current object
-     * @since  4.0
-     */
-    public static function __callStatic($name, $arguments) {
-        trigger_error(sprintf(__('"%s" has been depreciated as of Gravity PDF 4.0', 'gravitypdf'), $name), E_USER_DEPRECATED);
-    }
+	/**
+	 * Add user depreciation notice for any methods not included in current object
+	 * @since  4.0
+	 */
+	public function __call( $name, $arguments ) {
+		trigger_error( sprintf( __( '"%s" has been depreciated as of Gravity PDF 4.0', 'gravitypdf' ), $name ), E_USER_DEPRECATED );
+	}
 
-    /**
-     * Setup our plugin functionality
-     * Note: Fires on WordPress' init hook
-     * @since 4.0
-     */
-    public function init() {
+	/**
+	 * Add user depreciation notice for any methods not included in current object
+	 * @since  4.0
+	 */
+	public static function __callStatic( $name, $arguments ) {
+		trigger_error( sprintf( __( '"%s" has been depreciated as of Gravity PDF 4.0', 'gravitypdf' ), $name ), E_USER_DEPRECATED );
+	}
 
-        /* Set up our notices */
-        $this->notices = new Helper\Helper_Notices();
-        $this->notices->init();
+	/**
+	 * Setup our plugin functionality
+	 * Note: Fires on WordPress' init hook
+	 * @since 4.0
+	 */
+	public function init() {
 
-        /* Set up our data access layer */
-        $this->data = new Helper\Helper_Data();
-        $this->data->init();
+		/* Set up our notices */
+		$this->notices = new Helper\Helper_Notices();
+		$this->notices->init();
 
-        /* Set up our options object - this is initialised on admin_init but other classes need to access its methods before this */
-        $this->options = new Helper\Helper_Options_Fields();
+		/* Set up our data access layer */
+		$this->data = new Helper\Helper_Data();
+		$this->data->init();
 
-        /* Set up our misc object */
-        $this->misc = new Helper\Helper_Misc();
+		/* Set up our options object - this is initialised on admin_init but other classes need to access its methods before this */
+		$this->options = new Helper\Helper_Options_Fields();
 
-        /* Load modules */
-        $this->installer();
-        $this->welcome_screen();
-        $this->gf_settings();
-        $this->gf_form_settings();
-        $this->pdf();
-        $this->shortcodes();
+		/* Set up our misc object */
+		$this->misc = new Helper\Helper_Misc();
 
-        /* Add localisation support */
-        load_plugin_textdomain('gravitypdf', false,  dirname( plugin_basename( __FILE__ ) ) . '/assets/languages/' );
+		/* Load modules */
+		$this->installer();
+		$this->welcome_screen();
+		$this->gf_settings();
+		$this->gf_form_settings();
+		$this->pdf();
+		$this->shortcodes();
 
-        /**
-         * Run generic actions and filters needed to get the plugin functional
-         * The controllers will set more specific actions / filters as needed
-         */
-        $this->add_actions();
-        $this->add_filters();
+		/* Add localisation support */
+		load_plugin_textdomain( 'gravitypdf', false,  dirname( plugin_basename( __FILE__ ) ) . '/assets/languages/' );
 
-    }
+		/**
+		 * Run generic actions and filters needed to get the plugin functional
+		 * The controllers will set more specific actions / filters as needed
+		 */
+		$this->add_actions();
+		$this->add_filters();
 
-    /**
-     * Add required plugin actions
-     * @since 4.0
-     * @return void
-     */
-    public function add_actions() {
-        add_action( 'init', array($this, 'register_assets') );
-        add_action( 'init', array($this, 'load_assets'), 15 );
+	}
 
-        /**
-         * Cache our Gravity PDF Settings and register our settings fields with the Options API
-         */
-        add_action( 'init', array($this, 'init_settings_api'), 1 );
-        add_action( 'admin_init', array($this, 'setup_settings_fields'), 1 );
-    }
+	/**
+	 * Add required plugin actions
+	 * @since 4.0
+	 * @return void
+	 */
+	public function add_actions() {
+		add_action( 'init', array( $this, 'register_assets' ) );
+		add_action( 'init', array( $this, 'load_assets' ), 15 );
 
-    /**
-     * Add required plugin filters
-     * @since 4.0
-     * @return void
-     */
-    public function add_filters() {
-       
-        /* Automatically handle GF noconflict mode */
-        add_filter( 'gform_noconflict_scripts', array($this, 'auto_noconflict_scripts') );
-        add_filter( 'gform_noconflict_styles', array($this, 'auto_noconflict_styles') );
-    }
+		/**
+		 * Cache our Gravity PDF Settings and register our settings fields with the Options API
+		 */
+		add_action( 'init', array( $this, 'init_settings_api' ), 1 );
+		add_action( 'admin_init', array( $this, 'setup_settings_fields' ), 1 );
+	}
 
-    /**
-     * Register all css and js which can be enqueued when needed
-     * @since 4.0
-     * @return void
-     */
-    public function register_assets() {
-        $this->register_styles();
-        $this->register_scripts();
-    }
+	/**
+	 * Add required plugin filters
+	 * @since 4.0
+	 * @return void
+	 */
+	public function add_filters() {
 
-    /**
-     * Register requrired CSS
-     * @since 4.0
-     * @return void
-     */
-    private function register_styles() {
-        $version = PDF_EXTENDED_VERSION;
-        $suffix = '.min.';
-        if(defined('WP_DEBUG') && WP_DEBUG === true) {
-            $suffix  = '';
-        }
+		/* Automatically handle GF noconflict mode */
+		add_filter( 'gform_noconflict_scripts', array( $this, 'auto_noconflict_scripts' ) );
+		add_filter( 'gform_noconflict_styles', array( $this, 'auto_noconflict_styles' ) );
+	}
 
-        wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'src/assets/css/gfpdf-styles'. $suffix .'.css', array('wp-color-picker'), $version);
-        wp_register_style( 'gfpdf_css_chosen_style', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.min.css', array('wp-jquery-ui-dialog'), $version );
-    }
+	/**
+	 * Register all css and js which can be enqueued when needed
+	 * @since 4.0
+	 * @return void
+	 */
+	public function register_assets() {
+		$this->register_styles();
+		$this->register_scripts();
+	}
 
-    /**
-     * Register requrired JS
-     * @since 4.0
-     * @return void
-     * @todo Limit js dependancies on particular pages (eg. form pdf settings vs global settings)
-     */
-    private function register_scripts() {
+	/**
+	 * Register requrired CSS
+	 * @since 4.0
+	 * @return void
+	 */
+	private function register_styles() {
+		$version = PDF_EXTENDED_VERSION;
+		$suffix = '.min.';
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG === true ) {
+			$suffix  = '';
+		}
 
-        $version = PDF_EXTENDED_VERSION;
-        $suffix  = '.min.';
-        if(defined('WP_DEBUG') && WP_DEBUG === true) {
-            $suffix = '';
-        }
+		wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'src/assets/css/gfpdf-styles'. $suffix .'.css', array( 'wp-color-picker' ), $version );
+		wp_register_style( 'gfpdf_css_chosen_style', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.min.css', array( 'wp-jquery-ui-dialog' ), $version );
+	}
 
-        wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-settings'. $suffix .'.js', array('wpdialogs', 'jquery-ui-tooltip', 'gform_forms', 'gform_form_admin', 'jquery-color', 'wp-color-picker'), $version );
-        wp_register_script( 'gfpdf_js_backbone', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-backbone'. $suffix .'.js', array('gfpdf_js_settings', 'backbone', 'underscore', 'gfpdf_js_backbone_model_binder', 'wpdialogs'), $version );
-        wp_register_script( 'gfpdf_js_chosen', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.jquery.min.js', array('jquery'), $version );
-        wp_register_script( 'gfpdf_js_backbone_model_binder', PDF_PLUGIN_URL . 'bower_components/backbone.modelbinder/Backbone.ModelBinder.js', array('backbone', 'underscore'), $version );
-        wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-entries' . $suffix . '.js', array('jquery'), $version );
-        
-        /*
+	/**
+	 * Register requrired JS
+	 * @since 4.0
+	 * @return void
+	 * @todo Limit js dependancies on particular pages (eg. form pdf settings vs global settings)
+	 */
+	private function register_scripts() {
+
+		$version = PDF_EXTENDED_VERSION;
+		$suffix  = '.min.';
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG === true ) {
+			$suffix = '';
+		}
+
+		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-settings'. $suffix .'.js', array( 'wpdialogs', 'jquery-ui-tooltip', 'gform_forms', 'gform_form_admin', 'jquery-color', 'wp-color-picker' ), $version );
+		wp_register_script( 'gfpdf_js_backbone', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-backbone'. $suffix .'.js', array( 'gfpdf_js_settings', 'backbone', 'underscore', 'gfpdf_js_backbone_model_binder', 'wpdialogs' ), $version );
+		wp_register_script( 'gfpdf_js_chosen', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.jquery.min.js', array( 'jquery' ), $version );
+		wp_register_script( 'gfpdf_js_backbone_model_binder', PDF_PLUGIN_URL . 'bower_components/backbone.modelbinder/Backbone.ModelBinder.js', array( 'backbone', 'underscore' ), $version );
+		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-entries' . $suffix . '.js', array( 'jquery' ), $version );
+
+		/*
         * Localise admin script
         */
-        wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $this->data->get_localised_script_data() );
-    }
+		wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $this->data->get_localised_script_data() );
+	}
 
 
-    /**
-     * Load any assets that are needed
-     * @since 4.0
-     * @return void
-     */
-    public function load_assets() {
-        global $gfpdf;
+	/**
+	 * Load any assets that are needed
+	 * @since 4.0
+	 * @return void
+	 */
+	public function load_assets() {
+		global $gfpdf;
 
-        if($gfpdf->misc->is_gfpdf_page()) {
-            /* load styles */
-            wp_enqueue_style('gfpdf_css_styles');
-            wp_enqueue_style('gfpdf_css_chosen_style');
+		if ( $gfpdf->misc->is_gfpdf_page() ) {
+			/* load styles */
+			wp_enqueue_style( 'gfpdf_css_styles' );
+			wp_enqueue_style( 'gfpdf_css_chosen_style' );
 
-            /* load scripts */
-            wp_enqueue_script('gfpdf_js_settings');
-            wp_enqueue_script('gfpdf_js_chosen');
+			/* load scripts */
+			wp_enqueue_script( 'gfpdf_js_settings' );
+			wp_enqueue_script( 'gfpdf_js_chosen' );
 
-            /* add media uploader */
-            wp_enqueue_media();
-        }
+			/* add media uploader */
+			wp_enqueue_media();
+		}
 
-        if($gfpdf->misc->is_gfpdf_settings_tab('help') || $gfpdf->misc->is_gfpdf_settings_tab('tools')) {
-             wp_enqueue_script('gfpdf_js_backbone');
-        }
+		if ( $gfpdf->misc->is_gfpdf_settings_tab( 'help' ) || $gfpdf->misc->is_gfpdf_settings_tab( 'tools' ) ) {
+			 wp_enqueue_script( 'gfpdf_js_backbone' );
+		}
 
-        if(is_admin() && rgget('page') == 'gf_entries') {
-            wp_enqueue_script('gfpdf_js_entries');
-            wp_enqueue_style('gfpdf_css_styles');
-        }
-    }
+		if ( is_admin() && rgget( 'page' ) == 'gf_entries' ) {
+			wp_enqueue_script( 'gfpdf_js_entries' );
+			wp_enqueue_style( 'gfpdf_css_styles' );
+		}
+	}
 
-     /**
-     * Auto no-conflict any preloaded scripts that begin with 'gfpdf_'
-     * @since 4.0
-     * @return void
-     */
-    public function auto_noconflict_scripts($items) {
-        
-        $wp_scripts = wp_scripts();
+	 /**
+	  * Auto no-conflict any preloaded scripts that begin with 'gfpdf_'
+	  * @since 4.0
+	  * @return void
+	  */
+	public function auto_noconflict_scripts( $items ) {
 
-        /* set defaults we will allow to load on GF pages */
-        $default_scripts = array(
-            'editor',
-            'word-count',
-            'quicktags',
-            'wpdialogs-popup',
-            'media-upload',
-            'wplink',
-            'backbone',
-            'underscore',
-            'media-editor',
-            'media-models',
-            'media-views',
-            'plupload',
-            'plupload-flash',
-            'plupload-html4',
-            'plupload-html5',
-            'plupload-silverlight',
-            'wp-plupload',
-            'gform_placeholder',
-            'jquery-ui-autocomplete',
-            'thickbox',
-        );
+		$wp_scripts = wp_scripts();
 
-        foreach($wp_scripts->queue as $object) {
-            if(substr($object, 0, 8) === 'gfpdf_js') {
-                $items[] = $object;
-            }
-        }
+		/* set defaults we will allow to load on GF pages */
+		$default_scripts = array(
+			'editor',
+			'word-count',
+			'quicktags',
+			'wpdialogs-popup',
+			'media-upload',
+			'wplink',
+			'backbone',
+			'underscore',
+			'media-editor',
+			'media-models',
+			'media-views',
+			'plupload',
+			'plupload-flash',
+			'plupload-html4',
+			'plupload-html5',
+			'plupload-silverlight',
+			'wp-plupload',
+			'gform_placeholder',
+			'jquery-ui-autocomplete',
+			'thickbox',
+		);
 
-        if($this->misc->is_gfpdf_page()) {
-            $items = array_merge($default_scripts, $items);
-        }
+		foreach ( $wp_scripts->queue as $object ) {
+			if ( substr( $object, 0, 8 ) === 'gfpdf_js' ) {
+				$items[] = $object;
+			}
+		}
 
-        return apply_filters('gfpdf_autoload_gf_scripts', $items);
-    }
+		if ( $this->misc->is_gfpdf_page() ) {
+			$items = array_merge( $default_scripts, $items );
+		}
 
-     /**
-     * Auto no-conflict any preloaded styles that begin with 'gfpdf_'
-     * @since 4.0
-     * @return void
-     */
-    public function auto_noconflict_styles($items) {
+		return apply_filters( 'gfpdf_autoload_gf_scripts', $items );
+	}
 
-        $wp_styles  = wp_styles();
+	 /**
+	  * Auto no-conflict any preloaded styles that begin with 'gfpdf_'
+	  * @since 4.0
+	  * @return void
+	  */
+	public function auto_noconflict_styles( $items ) {
 
-        $default_styles = array(
-            'editor-buttons',
-            'wp-jquery-ui-dialog',
-            'media-views',
-            'buttons',
-            'thickbox',
-        );
+		$wp_styles  = wp_styles();
 
-        foreach($wp_styles->queue as $object) {
-            if(substr($object, 0, 9) === 'gfpdf_css') {
-                $items[] = $object;
-            }
-        }
+		$default_styles = array(
+			'editor-buttons',
+			'wp-jquery-ui-dialog',
+			'media-views',
+			'buttons',
+			'thickbox',
+		);
 
-        if($this->misc->is_gfpdf_page()) {
-            $items = array_merge($default_styles, $items);
-        }
+		foreach ( $wp_styles->queue as $object ) {
+			if ( substr( $object, 0, 9 ) === 'gfpdf_css' ) {
+				$items[] = $object;
+			}
+		}
 
-        return apply_filters('gfpdf_autoload_gf_styles', $items);
-    }
+		if ( $this->misc->is_gfpdf_page() ) {
+			$items = array_merge( $default_styles, $items );
+		}
 
-    /**
-     * Bootstrap our settings API for use
-     * @return void
-     * @return 4.0
-     */
-    public function init_settings_api() {
-        /* load our options API */
-        $this->options->init();
-    }
+		return apply_filters( 'gfpdf_autoload_gf_styles', $items );
+	}
 
-    /**
-     * Register our admin settings
-     * @return void
-     * @return 4.0
-     */
-    public function setup_settings_fields() {
-        /* register our options settings */
-        $this->options->register_settings( $this->options->get_registered_fields() );
-    }
+	/**
+	 * Bootstrap our settings API for use
+	 * @return void
+	 * @return 4.0
+	 */
+	public function init_settings_api() {
+		/* load our options API */
+		$this->options->init();
+	}
 
-    public function installer() {
-        $model = new Model\Model_Install();
-        $class = new Controller\Controller_Install($model);
-        $class->init();
+	/**
+	 * Register our admin settings
+	 * @return void
+	 * @return 4.0
+	 */
+	public function setup_settings_fields() {
+		/* register our options settings */
+		$this->options->register_settings( $this->options->get_registered_fields() );
+	}
 
-        /* set up required data */
-        $class->setup_defaults();
-    }
+	public function installer() {
+		$model = new Model\Model_Install();
+		$class = new Controller\Controller_Install( $model );
+		$class->init();
 
-    /**
-     * Include Welcome Screen functionality for installation / upgrades
-     * @since 4.0
-     * @return void
-     */
-    public function welcome_screen() {
+		/* set up required data */
+		$class->setup_defaults();
+	}
 
-        $model = new Model\Model_Welcome_Screen();
-        $view  = new View\View_Welcome_Screen(array(
-            'display_version' => PDF_EXTENDED_VERSION
-        ));
+	/**
+	 * Include Welcome Screen functionality for installation / upgrades
+	 * @since 4.0
+	 * @return void
+	 */
+	public function welcome_screen() {
 
-        $class = new Controller\Controller_Welcome_Screen($model, $view);
-        $class->init();
-    }
+		$model = new Model\Model_Welcome_Screen();
+		$view  = new View\View_Welcome_Screen(array(
+			'display_version' => PDF_EXTENDED_VERSION,
+		));
 
-    /**
-     * Include Settings Page functionality
-     * @since 4.0
-     * @return void
-     */
-    public function gf_settings() {
-        
-        $model = new Model\Model_Settings();
-        $view  = new View\View_Settings(array(
-        
-        ));
+		$class = new Controller\Controller_Welcome_Screen( $model, $view );
+		$class->init();
+	}
 
-        $class = new Controller\Controller_Settings($model, $view);
-        $class->init();
-    }
+	/**
+	 * Include Settings Page functionality
+	 * @since 4.0
+	 * @return void
+	 */
+	public function gf_settings() {
 
-    /**
-     * Include Form Settings (PDF) functionality
-     * @since 4.0
-     * @return void
-     */
-    public function gf_form_settings() {
-        
-        $model = new Model\Model_Form_Settings();
-        $view  = new View\View_Form_Settings(array(
-        
-        ));
+		$model = new Model\Model_Settings();
+		$view  = new View\View_Settings( array() );
 
-        $class = new Controller\Controller_Form_Settings($model, $view);
-        $class->init();
-    }
+		$class = new Controller\Controller_Settings( $model, $view );
+		$class->init();
+	}
 
-    /**
-     * Include PDF Display functionality
-     * @since 4.0
-     * @return void
-     */
-    public function pdf() {
-        
-        $model = new Model\Model_PDF();
-        $view  = new View\View_PDF(array(
-        
-        ));
+	/**
+	 * Include Form Settings (PDF) functionality
+	 * @since 4.0
+	 * @return void
+	 */
+	public function gf_form_settings() {
 
-        $class = new Controller\Controller_PDF($model, $view);
-        $class->init();
-    }
+		$model = new Model\Model_Form_Settings();
+		$view  = new View\View_Form_Settings( array() );
 
-    /**
-     * Include PDF Shortcodes functionality
-     * @since 4.0
-     * @return void
-     */
-    public function shortcodes() {
-        
-        $model = new Model\Model_Shortcodes();
-        $view  = new View\View_Shortcodes(array(
-        
-        ));
+		$class = new Controller\Controller_Form_Settings( $model, $view );
+		$class->init();
+	}
 
-        $class = new Controller\Controller_Shortcodes($model, $view);
-        $class->init();
-    }
+	/**
+	 * Include PDF Display functionality
+	 * @since 4.0
+	 * @return void
+	 */
+	public function pdf() {
 
-    /**
-     * Add backwards compatbility with v3.x.x default PDF template files
-     * This function will now pull the PDF configuration details from our query variables
-     * @param  Integer $form_id  The Gravity Form ID
-     * @return  Array The matched configuration being requested
-     * @since 4.0
-     * @todo
-     */
-    public function get_default_config_data($form_id) {
-        $pid = $GLOBALS['wp']->query_vars['pid'];
-        $lid = (int) $GLOBALS['wp']->query_vars['lid'];
-    }
+		$model = new Model\Model_PDF();
+		$view  = new View\View_PDF( array() );
+
+		$class = new Controller\Controller_PDF( $model, $view );
+		$class->init();
+	}
+
+	/**
+	 * Include PDF Shortcodes functionality
+	 * @since 4.0
+	 * @return void
+	 */
+	public function shortcodes() {
+
+		$model = new Model\Model_Shortcodes();
+		$view  = new View\View_Shortcodes( array() );
+
+		$class = new Controller\Controller_Shortcodes( $model, $view );
+		$class->init();
+	}
+
+	/**
+	 * Add backwards compatbility with v3.x.x default PDF template files
+	 * This function will now pull the PDF configuration details from our query variables
+	 *
+	 * @param  Integer $form_id  The Gravity Form ID
+	 * @return  Array The matched configuration being requested
+	 * @since 4.0
+	 * @todo
+	 */
+	public function get_default_config_data( $form_id ) {
+		$pid = $GLOBALS['wp']->query_vars['pid'];
+		$lid = (int) $GLOBALS['wp']->query_vars['lid'];
+	}
 }
 
 

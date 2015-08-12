@@ -21,8 +21,8 @@ use GFCommon;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -53,197 +53,196 @@ if (! defined('ABSPATH')) {
  */
 class Controller_Settings extends Helper_Controller implements Helper_Int_Actions, Helper_Int_Filters
 {
-    /**
-     * Load our model and view and required actions
-     */
-    public function __construct(Helper_Model $model, Helper_View $view)
-    {
-        /* load our model and view */
-        $this->model = $model;
-        $this->model->setController($this);
+	/**
+	 * Load our model and view and required actions
+	 */
+	public function __construct( Helper_Model $model, Helper_View $view ) {
+		/* load our model and view */
+		$this->model = $model;
+		$this->model->setController( $this );
 
-        $this->view  = $view;
-        $this->view->setController($this);
-    }
+		$this->view  = $view;
+		$this->view->setController( $this );
+	}
 
-    /**
-     * Initialise our class defaults
-     * @since 4.0
-     * @return void
-     */
-    public function init() {
-        global $gfpdf;
-        
-        /*
+	/**
+	 * Initialise our class defaults
+	 * @since 4.0
+	 * @return void
+	 */
+	public function init() {
+		global $gfpdf;
+
+		/*
          * Tell Gravity Forms to initiate our settings page
          * Using the following Class/Model
          */
-         GFForms::add_settings_page($gfpdf->data->short_title, array($this, 'displayPage'));
+		 GFForms::add_settings_page( $gfpdf->data->short_title, array( $this, 'displayPage' ) );
 
-         /* Ensure any errors are stored correctly */
-         $this->model->setup_form_settings_errors();
+		 /* Ensure any errors are stored correctly */
+		 $this->model->setup_form_settings_errors();
 
-         /* run actions and filters */
-         $this->add_actions();
-         $this->add_filters();
-    }
+		 /* run actions and filters */
+		 $this->add_actions();
+		 $this->add_filters();
+	}
 
-    /**
-     * Apply any actions needed for the settings page
-     * @since 4.0
-     * @return void
-     */
-    public function add_actions() {
-        /* Load our settings meta boxes */
-        add_action('current_screen', array($this->model, 'add_meta_boxes'));
+	/**
+	 * Apply any actions needed for the settings page
+	 * @since 4.0
+	 * @return void
+	 */
+	public function add_actions() {
+		/* Load our settings meta boxes */
+		add_action( 'current_screen', array( $this->model, 'add_meta_boxes' ) );
 
-        /* Display our system status on general and tools pages */
-        add_action('pdf-settings-general', array($this->view, 'system_status'));
-        add_action('pdf-settings-tools', array($this->view, 'system_status'));
+		/* Display our system status on general and tools pages */
+		add_action( 'pdf-settings-general', array( $this->view, 'system_status' ) );
+		add_action( 'pdf-settings-tools', array( $this->view, 'system_status' ) );
 
-        /* Display the uninstaller if use has the correct permissions */
-        if(GFCommon::current_user_can_any( 'gravityforms_uninstall' )) {
-            add_action('pdf-settings-tools', array($this->view, 'uninstaller'), 5);
-        }
+		/* Display the uninstaller if use has the correct permissions */
+		if ( GFCommon::current_user_can_any( 'gravityforms_uninstall' ) ) {
+			add_action( 'pdf-settings-tools', array( $this->view, 'uninstaller' ), 5 );
+		}
 
-        /* Process the tool tab actions */
-        add_action('admin_init', array($this, 'process_tool_tab_actions'));
+		/* Process the tool tab actions */
+		add_action( 'admin_init', array( $this, 'process_tool_tab_actions' ) );
 
-        /**
-         * Add AJAX Action Endpoints
-         */
-        add_action( 'wp_ajax_gfpdf_font_save', array($this->model, 'save_font') );
-        add_action( 'wp_ajax_gfpdf_font_delete', array($this->model, 'delete_font') );
+		/**
+		 * Add AJAX Action Endpoints
+		 */
+		add_action( 'wp_ajax_gfpdf_font_save', array( $this->model, 'save_font' ) );
+		add_action( 'wp_ajax_gfpdf_font_delete', array( $this->model, 'delete_font' ) );
 
-    }
+	}
 
-    /**
-     * Apply any filters needed for the settings page
-     * @since 4.0
-     * @return void
-     */
-    public function add_filters() {
-        global $gfpdf;
+	/**
+	 * Apply any filters needed for the settings page
+	 * @since 4.0
+	 * @return void
+	 */
+	public function add_filters() {
+		global $gfpdf;
 
-        /* Add tooltips */
-        add_filter('gform_tooltips', array($this->view, 'add_tooltips'));
+		/* Add tooltips */
+		add_filter( 'gform_tooltips', array( $this->view, 'add_tooltips' ) );
 
-        /* If trying to save settings page we'll use this filter to apply any errors passed back from options.php */
-        if( $gfpdf->misc->is_gfpdf_page() ) {
-            add_filter('gfpdf_registered_settings', array($this->model, 'highlight_errors'));
-        }
+		/* If trying to save settings page we'll use this filter to apply any errors passed back from options.php */
+		if ( $gfpdf->misc->is_gfpdf_page() ) {
+			add_filter( 'gfpdf_registered_settings', array( $this->model, 'highlight_errors' ) );
+		}
 
-        /* make capability text user friendly */
-        add_filter('gfpdf_capability_name', array($this->model, 'style_capabilities'));
+		/* make capability text user friendly */
+		add_filter( 'gfpdf_capability_name', array( $this->model, 'style_capabilities' ) );
 
-        /* change capability needed to edit settings page */
-        add_filter('option_page_capability_gfpdf_settings', array($this, 'edit_options_cap'));
-        add_filter('gravitypdf_settings_navigation', array($this, 'disable_tools_on_view_cap'));
+		/* change capability needed to edit settings page */
+		add_filter( 'option_page_capability_gfpdf_settings', array( $this, 'edit_options_cap' ) );
+		add_filter( 'gravitypdf_settings_navigation', array( $this, 'disable_tools_on_view_cap' ) );
 
-        /* allow TTF and OTF uploads */
-        add_filter('upload_mimes', array($this, 'allow_font_uploads'));
+		/* allow TTF and OTF uploads */
+		add_filter( 'upload_mimes', array( $this, 'allow_font_uploads' ) );
 
-        /* Add a sample image of what the template looks like */
-        add_filter( 'gfpdf_settings_general', array( $this->model, 'add_template_image'));
-    }
+		/* Add a sample image of what the template looks like */
+		add_filter( 'gfpdf_settings_general', array( $this->model, 'add_template_image' ) );
+	}
 
-    /**
-     * Display the settings page for Gravity PDF
-     * @since 4.0
-     * @return void
-     */
-    public function displayPage() {
-        /**
-         * Determine which settings page to load
-         */
-        $page = (isset($_GET['tab'])) ? $_GET['tab'] : 'general';
+	/**
+	 * Display the settings page for Gravity PDF
+	 * @since 4.0
+	 * @return void
+	 */
+	public function displayPage() {
+		/**
+		 * Determine which settings page to load
+		 */
+		$page = (isset($_GET['tab'])) ? $_GET['tab'] : 'general';
 
-        switch($page) {
-          case 'general':
-            $this->view->general();
-          break;
+		switch ( $page ) {
+			case 'general':
+				$this->view->general();
+		  break;
 
-          case 'tools':
-            $this->view->tools();
-          break;
+			case 'tools':
+				$this->view->tools();
+		  break;
 
-          case 'help':
-            $this->view->help();
-          break;
-        }
-    }
+			case 'help':
+				$this->view->help();
+		  break;
+		}
+	}
 
-    /**
-     * Check our current user has the correct capability
-     * @since 4.0
-     * @return void
-     */
-    public function edit_options_cap() {
-        
-        /* because current_user_can() doesn't handle Gravity Forms permissions quite correct we'll do our checks here */
-        if(! GFCommon::current_user_can_any( 'gravityforms_edit_settings' )) {
-            wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
-        }
+	/**
+	 * Check our current user has the correct capability
+	 * @since 4.0
+	 * @return void
+	 */
+	public function edit_options_cap() {
 
-        /* the user is authenticated by the above so let's pass in the lowest permissions */
-        return 'read';
-    }
+		/* because current_user_can() doesn't handle Gravity Forms permissions quite correct we'll do our checks here */
+		if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+			wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
+		}
 
-    /**
-     * Return our custom capability
-     * @param  $nav Array The existing settings navigation
-     * @since 4.0
-     * @return array
-     */
-    public function disable_tools_on_view_cap($nav) {
-        if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
-            unset($nav[100]); /* remove tools tab */
-        }
-        
-        return $nav;
-    }
+		/* the user is authenticated by the above so let's pass in the lowest permissions */
+		return 'read';
+	}
 
-    /**
-     * Check if any of the tool tab actions have been triggered and process
-     * @return void
-     * @since 4.0
-     */
-    public function process_tool_tab_actions() {
-        global $gfpdf;
+	/**
+	 * Return our custom capability
+	 * @param  $nav Array The existing settings navigation
+	 * @since 4.0
+	 * @return array
+	 */
+	public function disable_tools_on_view_cap( $nav ) {
+		if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+			unset($nav[100]); /* remove tools tab */
+		}
 
-        /* check if we are on the tools settings page */
-        if( ! $gfpdf->misc->is_gfpdf_settings_tab('tools') ) {
-            return;
-        }
+		return $nav;
+	}
 
-        /* check if the user has permission to copy the templates */
-        if( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
-            return false;
-        }
+	/**
+	 * Check if any of the tool tab actions have been triggered and process
+	 * @return void
+	 * @since 4.0
+	 */
+	public function process_tool_tab_actions() {
+		global $gfpdf;
 
-        $settings = rgpost('gfpdf_settings');
+		/* check if we are on the tools settings page */
+		if ( ! $gfpdf->misc->is_gfpdf_settings_tab( 'tools' ) ) {
+			return;
+		}
 
-        /* check if we should install the custom templates */
-        if(isset($settings['setup_templates']['name'])) {
-            /* verify the nonce */
-            if( ! wp_verify_nonce( $settings['setup_templates']['nonce'], 'gfpdf_settings[setup_templates]' ) ) {
-                 $gfpdf->notices->add_error( __( 'There was a problem installing the PDF templates. Please try again.', 'gravitypdf' ) );
-                 return false;
-            }
+		/* check if the user has permission to copy the templates */
+		if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+			return false;
+		}
 
-            $this->model->install_templates();
-        }
-    }
+		$settings = rgpost( 'gfpdf_settings' );
 
-    /**
-     * Add .ttf and .otf to upload whitelist
-     * @param  array  $mime_types
-     * @return array
-     * @since 4.0
-     */
-    public function allow_font_uploads( $mime_types = array() ) {
-        $mime_types['ttf|otf'] = 'application/octet-stream';
-           
-        return $mime_types;
-    }
+		/* check if we should install the custom templates */
+		if ( isset($settings['setup_templates']['name']) ) {
+			/* verify the nonce */
+			if ( ! wp_verify_nonce( $settings['setup_templates']['nonce'], 'gfpdf_settings[setup_templates]' ) ) {
+				 $gfpdf->notices->add_error( __( 'There was a problem installing the PDF templates. Please try again.', 'gravitypdf' ) );
+				 return false;
+			}
+
+			$this->model->install_templates();
+		}
+	}
+
+	/**
+	 * Add .ttf and .otf to upload whitelist
+	 * @param  array $mime_types
+	 * @return array
+	 * @since 4.0
+	 */
+	public function allow_font_uploads( $mime_types = array() ) {
+		$mime_types['ttf|otf'] = 'application/octet-stream';
+
+		return $mime_types;
+	}
 }

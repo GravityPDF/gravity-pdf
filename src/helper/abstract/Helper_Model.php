@@ -12,7 +12,9 @@ namespace GFPDF\Helper;
  */
 
 /* Exit if accessed directly */
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /*
     This file is part of Gravity PDF.
@@ -39,28 +41,28 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @since 4.0
  */
 abstract class Helper_Model {
-	
-    /**
+
+	/**
 	 * Classes will store a controler object to allow user access
 	 * @var Object
 	 * @since 4.0
 	 */
 	private $controller = null;
 
-    /**
-     * Add a controller setter function with type hinting to ensure compatiiblity 
-     * @param GFPDF_Helper_Controller $class The controller class
-     * @since 4.0
-     */
-    final public function setController(Helper_Controller $class) {
-        $this->controller = $class;
-    }
+	/**
+	 * Add a controller setter function with type hinting to ensure compatiiblity
+	 * @param GFPDF_Helper_Controller $class The controller class
+	 * @since 4.0
+	 */
+	final public function setController( Helper_Controller $class ) {
+		$this->controller = $class;
+	}
 
-    /**
-     * Get the controller
-     * @since 4.0
-     */
-    final public function getController() {
-        return $this->controller;
-    }    
+	/**
+	 * Get the controller
+	 * @since 4.0
+	 */
+	final public function getController() {
+		return $this->controller;
+	}
 }

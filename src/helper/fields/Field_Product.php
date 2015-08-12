@@ -19,8 +19,8 @@ use Exception;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -48,190 +48,190 @@ if (! defined('ABSPATH')) {
  * product, option, shipping, quantity and total fields
  *
  * If you just want the complete product list / HTML table use the Field_Products class
+ *
  * @since 4.0
  */
 class Field_Product extends Helper_Fields
 {
 
-    /**
-     * Our products class which handles all Gravity Form products fields in bulk
-     * @var Class
-     */
-    private $products;
+	/**
+	 * Our products class which handles all Gravity Form products fields in bulk
+	 * @var Class
+	 */
+	private $products;
 
-    /**
-     * Check the appropriate variables are parsed in send to the parent construct
-     * @param Object $field The GF_Field_* Object
-     * @param Array $entry The Gravity Forms Entry
-     * @param Object $products A class that gets the full breakdown of products for the form
-     * @since 4.0
-     */
-    public function __construct($field, $entry, Helper_Fields $products) {
+	/**
+	 * Check the appropriate variables are parsed in send to the parent construct
+	 * @param Object $field The GF_Field_* Object
+	 * @param Array  $entry The Gravity Forms Entry
+	 * @param Object $products A class that gets the full breakdown of products for the form
+	 * @since 4.0
+	 */
+	public function __construct( $field, $entry, Helper_Fields $products ) {
 
-        /* call our parent method */
-        parent::__construct($field, $entry);
+		/* call our parent method */
+		parent::__construct( $field, $entry );
 
-        /* store our products class */
-        $this->products = $products;
-    }
+		/* store our products class */
+		$this->products = $products;
+	}
 
-    /**
-     * Return the HTML form data
-     * @return Array
-     * @since 4.0
-     */
-    public function form_data() {
+	/**
+	 * Return the HTML form data
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function form_data() {
 
-        $value = $this->value();
-        $label = GFFormsModel::get_label($this->field);
-        $data  = array();
+		$value = $this->value();
+		$label = GFFormsModel::get_label( $this->field );
+		$data  = array();
 
-        switch($this->field->type) {
-            case 'product':
-                $name  = $value['name'] . " ({$value['price']})";
-                $price = $value['price_unformatted'];
-            break;
+		switch ( $this->field->type ) {
+			case 'product':
+				$name  = $value['name'] . " ({$value['price']})";
+				$price = $value['price_unformatted'];
+			break;
 
-            case 'option':
-                if(sizeof($value['options']) > 1) {
-                    foreach($value['options'] as $option) {
-                        $name[]  = $option['option_name'] . " ({$option['price_formatted']})";
-                        $price[] = $option['price'];
-                    }
-                } else {
-                    $name  = $value['options'][0]['option_name'] . " ({$value['options'][0]['price_formatted']})";
-                    $price = $value['options'][0]['price'];
-                }
-            break;
+			case 'option':
+				if ( sizeof( $value['options'] ) > 1 ) {
+					foreach ( $value['options'] as $option ) {
+						$name[]  = $option['option_name'] . " ({$option['price_formatted']})";
+						$price[] = $option['price'];
+					}
+				} else {
+					$name  = $value['options'][0]['option_name'] . " ({$value['options'][0]['price_formatted']})";
+					$price = $value['options'][0]['price'];
+				}
+			break;
 
-            case 'shipping':
-                $name  = $value['shipping_name'] . " ({$value['shipping_formatted']})";
-                $price = $value['shipping'];
-            break;
+			case 'shipping':
+				$name  = $value['shipping_name'] . " ({$value['shipping_formatted']})";
+				$price = $value['shipping'];
+			break;
 
-            case 'quantity':
-            default:
-                $name  = $value;
-                $price = $value;
-            break;
-        }
-        
-        
-        /* Standadised Format */
-        $data['field'][ $this->field->id . '.' . $label ]           = $name;
-        $data['field'][ $this->field->id ]                          = $name;
-        $data['field'][ $label ]                                    = $name;
-        
-        /* Name Format */
-        $data['field'][ $this->field->id . '.' . $label . '_name' ] = $name;
-        $data['field'][ $this->field->id . '_name' ]                = $name;
-        $data['field'][ $label . '_name' ]                          = $name;
+			case 'quantity':
+			default:
+				$name  = $value;
+				$price = $value;
+			break;
+		}
 
-        /* Value */
-        $data['field'][ $this->field->id . '.' . $label . '_value' ] = $price;
-        $data['field'][ $this->field->id . '_value' ]                = $price;
-        $data['field'][ $label . '_value' ]                          = $price;
+		/* Standadised Format */
+		$data['field'][ $this->field->id . '.' . $label ]           = $name;
+		$data['field'][ $this->field->id ]                          = $name;
+		$data['field'][ $label ]                                    = $name;
 
-        return $data;
-    }
+		/* Name Format */
+		$data['field'][ $this->field->id . '.' . $label . '_name' ] = $name;
+		$data['field'][ $this->field->id . '_name' ]                = $name;
+		$data['field'][ $label . '_name' ]                          = $name;
 
-    /**
-     * Display the HTML version of this field
-     * @return String
-     * @since 4.0
-     */
-    public function html($value = '', $label = true) {
-        $value = $this->value();
-        $hmlt  = '';
+		/* Value */
+		$data['field'][ $this->field->id . '.' . $label . '_value' ] = $price;
+		$data['field'][ $this->field->id . '_value' ]                = $price;
+		$data['field'][ $label . '_value' ]                          = $price;
 
-        switch($this->field->type) {
-            case 'product':
-                $html .= $value['name'] . ' - ' . $value['price'];
-                $html .= $this->get_option_html($value['options']);
-            break;
+		return $data;
+	}
 
-            case 'option':
-                $html .= $this->get_option_html($value['options']);
-            break;
+	/**
+	 * Display the HTML version of this field
+	 * @return String
+	 * @since 4.0
+	 */
+	public function html( $value = '', $label = true ) {
+		$value = $this->value();
+		$hmlt  = '';
 
-            case 'quantity':
-                $html .= $value;
-            break;
+		switch ( $this->field->type ) {
+			case 'product':
+				$html .= $value['name'] . ' - ' . $value['price'];
+				$html .= $this->get_option_html( $value['options'] );
+			break;
 
-            case 'shipping':
-                $html .= $value['shipping_formatted'];
-            break;
+			case 'option':
+				$html .= $this->get_option_html( $value['options'] );
+			break;
 
-            case 'total':
-                $html .= $value['total_formatted'];
-            break;
-        }
+			case 'quantity':
+				$html .= $value;
+			break;
 
-        return parent::html($html);
-    }
+			case 'shipping':
+				$html .= $value['shipping_formatted'];
+			break;
 
-    /**
-     * Get a HTML list of the product's selected options
-     * @param  Array $options A list of the selected products
-     * @param  string $html   Pass in an existing HTML, or default to blank
-     * @return string         The finalised HTML
-     */
-    public function get_option_html($options, $html = '') {
-        if(is_array($options)) {
-            $html .= '<ul class="product_options">';
-            
-            foreach($options as $option) {
-                $html .= '<li>' . $option['option_name'] . ' - ' . $option['price_formatted'] . '</li>';
-            }
+			case 'total':
+				$html .= $value['total_formatted'];
+			break;
+		}
 
-            $html .= '</ul>';
-        }
+		return parent::html( $html );
+	}
 
-        return $html;
-    }
+	/**
+	 * Get a HTML list of the product's selected options
+	 * @param  Array  $options A list of the selected products
+	 * @param  string $html   Pass in an existing HTML, or default to blank
+	 * @return string         The finalised HTML
+	 */
+	public function get_option_html( $options, $html = '' ) {
+		if ( is_array( $options ) ) {
+			$html .= '<ul class="product_options">';
 
-    /**
-     * Get the standard GF value of this field
-     * @return String/Array
-     * @since 4.0
-     * @internal We won't use a cache here because it's being handled in the Field_Products class, which is linked to this class through a static object
-     */
-    public function value() {
-        /* Get the full products array */
-        $data = $this->products->value();
+			foreach ( $options as $option ) {
+				$html .= '<li>' . $option['option_name'] . ' - ' . $option['price_formatted'] . '</li>';
+			}
 
-        /* Filter out the product information we require */
-        if($this->field->type == 'product' && isset($data['products'][$this->field->id])) {
-            return $data['products'][$this->field->id];
-        }
+			$html .= '</ul>';
+		}
 
-        /* Filter out the options information we require */
-        if($this->field->type == 'option' && isset($data['products'][$this->field->productField]['options'])) {
-            return array('options' => $data['products'][$this->field->productField]['options']);
-        }
+		return $html;
+	}
 
-        /* Filter out the quantity field */
-        if($this->field->type == 'quantity' && isset($data['products'][$this->field->productField]['quantity'])) {
-            return $data['products'][$this->field->productField]['quantity'];
-        }
+	/**
+	 * Get the standard GF value of this field
+	 * @return String/Array
+	 * @since 4.0
+	 * @internal We won't use a cache here because it's being handled in the Field_Products class, which is linked to this class through a static object
+	 */
+	public function value() {
+		/* Get the full products array */
+		$data = $this->products->value();
 
-        /* Filter out the shipping field */
-        if($this->field->type == 'shipping' && isset($data['products_totals']['shipping'])) {
-            return array(
-                'shipping'           => $data['products_totals']['shipping'],
-                'shipping_formatted' => $data['products_totals']['shipping_formatted'],
-                'shipping_name'      => $data['products_totals']['shipping_name']
-            );
-        }
+		/* Filter out the product information we require */
+		if ( $this->field->type == 'product' && isset($data['products'][$this->field->id]) ) {
+			return $data['products'][$this->field->id];
+		}
 
-        /* Filter out the total field */
-        if($this->field->type == 'total' && isset($data['products_totals']['total'])) {
-            return array(
-                'total'           => $data['products_totals']['total'],
-                'total_formatted' => $data['products_totals']['total_formatted'],
-            );
-        }
+		/* Filter out the options information we require */
+		if ( $this->field->type == 'option' && isset($data['products'][$this->field->productField]['options']) ) {
+			return array( 'options' => $data['products'][$this->field->productField]['options'] );
+		}
 
-        return array();
-    }
+		/* Filter out the quantity field */
+		if ( $this->field->type == 'quantity' && isset($data['products'][$this->field->productField]['quantity']) ) {
+			return $data['products'][$this->field->productField]['quantity'];
+		}
+
+		/* Filter out the shipping field */
+		if ( $this->field->type == 'shipping' && isset($data['products_totals']['shipping']) ) {
+			return array(
+				'shipping'           => $data['products_totals']['shipping'],
+				'shipping_formatted' => $data['products_totals']['shipping_formatted'],
+				'shipping_name'      => $data['products_totals']['shipping_name'],
+			);
+		}
+
+		/* Filter out the total field */
+		if ( $this->field->type == 'total' && isset($data['products_totals']['total']) ) {
+			return array(
+				'total'           => $data['products_totals']['total'],
+				'total_formatted' => $data['products_totals']['total_formatted'],
+			);
+		}
+
+		return array();
+	}
 }

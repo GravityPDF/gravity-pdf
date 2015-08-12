@@ -18,8 +18,8 @@ use Exception;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -50,73 +50,73 @@ if (! defined('ABSPATH')) {
 class Field_Post_Custom_Field extends Helper_Fields
 {
 
-    /**
-     * Check the appropriate variables are parsed in send to the parent construct
-     * @param Object $field The GF_Field_* Object
-     * @param Array $entry The Gravity Forms Entry
-     * @since 4.0
-     */
-    public function __construct($field, $entry) {
-        global $gfpdf;
+	/**
+	 * Check the appropriate variables are parsed in send to the parent construct
+	 * @param Object $field The GF_Field_* Object
+	 * @param Array  $entry The Gravity Forms Entry
+	 * @since 4.0
+	 */
+	public function __construct( $field, $entry ) {
+		global $gfpdf;
 
-        /* call our parent method */
-        parent::__construct($field, $entry);
+		/* call our parent method */
+		parent::__construct( $field, $entry );
 
-        /*
+		/*
          * Custom Field can be any of the following field types:
          * single line text, paragraph, dropdown, select, number, checkbox, radio, hidden,
          * date, time, phone, website, email, file upload or list
          */
-        $class = $gfpdf->misc->get_field_class($field->inputType);
+		$class = $gfpdf->misc->get_field_class( $field->inputType );
 
-        try {
-            /* check load our class */
-            if(class_exists($class)) {
-                $this->fieldObject = new $class($field, $entry);
-            } else {
-                throw new Exception('Class not found');
-            }
-        } catch(Exception $e) {
-            /* Exception thrown. Load generic field loader */
-            $this->fieldObject = new Field_Default($field, $entry);
-        }
+		try {
+			/* check load our class */
+			if ( class_exists( $class ) ) {
+				$this->fieldObject = new $class($field, $entry);
+			} else {
+				throw new Exception( 'Class not found' );
+			}
+		} catch (Exception $e) {
+			/* Exception thrown. Load generic field loader */
+			$this->fieldObject = new Field_Default( $field, $entry );
+		}
 
-        /* force the fieldObject value cache */
-        $this->value();
-    }
+		/* force the fieldObject value cache */
+		$this->value();
+	}
 
-    /**
-     * Used to check if the current field has a value
-     * @since 4.0
-     * @internal Child classes can override this method when dealing with a specific use case
-     */
-    public function is_empty() {
-        return $this->fieldObject->is_empty();
-    }
+	/**
+	 * Used to check if the current field has a value
+	 * @since 4.0
+	 * @internal Child classes can override this method when dealing with a specific use case
+	 */
+	public function is_empty() {
+		return $this->fieldObject->is_empty();
+	}
 
-    /**
-     * Display the HTML version of this field
-     * @return String
-     * @since 4.0
-     */
-    public function html($value = '', $label = true) {
-        echo $this->fieldObject->html();
-    }
+	/**
+	 * Display the HTML version of this field
+	 * @return String
+	 * @since 4.0
+	 */
+	public function html( $value = '', $label = true ) {
+		echo $this->fieldObject->html();
+	}
 
-    /**
-     * Get the standard GF value of this field
-     * @return String/Array
-     * @since 4.0
-     */
-    public function value() {
-        if($this->fieldObject->has_cache()) {
-            return$this->fieldObject->cache();
-        }
+	/**
+	 * Get the standard GF value of this field
+	 * @return String/Array
+	 * @since 4.0
+	 */
+	public function value() {
+		if ( $this->fieldObject->has_cache() ) {
+			return$this->fieldObject->cache();
+		}
 
-        $value = $this->fieldObject->value();
+		$value = $this->fieldObject->value();
 
-        $this->fieldObject->cache($value);
-        
-        return $this->fieldObject->cache();
-    }
+		$this->fieldObject->cache( $value );
+
+		return $this->fieldObject->cache();
+	}
 }

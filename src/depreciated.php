@@ -15,8 +15,8 @@ use GFPDF\View\View_PDF;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -44,52 +44,52 @@ if (! defined('ABSPATH')) {
  */
 class GFPDF_Core
 {
-    public function __construct()
-    {
-        global $gfpdf;
-        $gfpdf = new Router();
-        $gfpdf->init();
-        $this->setup_constants();
-    }
+	public function __construct() {
+		global $gfpdf;
+		$gfpdf = new Router();
+		$gfpdf->init();
+		$this->setup_constants();
+	}
 
-    public function setup_constants() {
-        global $gfpdf;
+	public function setup_constants() {
+		global $gfpdf;
 
-        define('PDF_SAVE_LOCATION', $gfpdf->data->template_tmp_location);
-        define('PDF_FONT_LOCATION', $gfpdf->data->template_font_location);
-        define('PDF_TEMPLATE_LOCATION', $gfpdf->data->template_location);
-        define('PDF_TEMPLATE_URL_LOCATION', $gfpdf->data->template_location); /* no cases in mPDF where a URL should be used instead of a path */
-    }
+		define( 'PDF_SAVE_LOCATION', $gfpdf->data->template_tmp_location );
+		define( 'PDF_FONT_LOCATION', $gfpdf->data->template_font_location );
+		define( 'PDF_TEMPLATE_LOCATION', $gfpdf->data->template_location );
+		define( 'PDF_TEMPLATE_URL_LOCATION', $gfpdf->data->template_location ); /* no cases in mPDF where a URL should be used instead of a path */
+	}
 }
 
 class PDF_Common
 {
-    /**
-     * Add user depreciation notice for missing methods
-     * @since  4.0
-     */
-    public function __call($name, $arguments) {
-        trigger_error(sprintf(__('"%s" has been depreciated as of Gravity PDF 4.0', 'gravitypdf'), $name), E_USER_DEPRECATED);
-    }
+	/**
+	 * Add user depreciation notice for missing methods
+	 * @since  4.0
+	 */
+	public function __call( $name, $arguments ) {
+		trigger_error( sprintf( __( '"%s" has been depreciated as of Gravity PDF 4.0', 'gravitypdf' ), $name ), E_USER_DEPRECATED );
+	}
 
-    /**
-     * Add user depreciation notice for missing methods
-     * @since  4.0
-     */
-    public static function __callStatic($name, $arguments) {
-        trigger_error(sprintf(__('"%s" has been depreciated as of Gravity PDF 4.0', 'gravitypdf'), $name), E_USER_DEPRECATED);
-    }
+	/**
+	 * Add user depreciation notice for missing methods
+	 * @since  4.0
+	 */
+	public static function __callStatic( $name, $arguments ) {
+		trigger_error( sprintf( __( '"%s" has been depreciated as of Gravity PDF 4.0', 'gravitypdf' ), $name ), E_USER_DEPRECATED );
+	}
 
-    public static function get_upload_dir() {
-        global $gfpdf;
-        
-        return $gfpdf->misc->get_upload_details();
-    }
+	public static function get_upload_dir() {
+		global $gfpdf;
 
-    public static function view_data($form_data = array()) {
-    }
+		return $gfpdf->misc->get_upload_details();
+	}
 
-   /* public static function get_ids() {
+	public static function view_data( $form_data = array() ) {
+	}
+
+	/*
+	public static function get_ids() {
     	return Stat_Functions::get_ids();
     }
 
@@ -150,59 +150,59 @@ class PDF_Common
  */
 class GFPDFEntryDetail {
 
-    /**
-     * Generate our PDF HTML layout
-     * @param  Array $form   The Gravity Form array
-     * @param  Array $lead   The Gravity Form entry
-     * @param  boolean $allow_display_empty_fields
-     * @param  boolean $show_html
-     * @param  boolean $show_page_name
-     * @param  boolean $return
-     * @return void
-     * @since 3.0
-     */
-    public static function lead_detail_grid($form, $lead, $allow_display_empty_fields=false, $show_html=false, $show_page_name=false, $return=false) {
-            $config = array(
-                'meta' => array(
-                    'empty'      => $allow_display_empty_fields,
-                    'echo'       => !$return,
-                    'legacy_css' => true,
+	/**
+	 * Generate our PDF HTML layout
+	 * @param  Array   $form   The Gravity Form array
+	 * @param  Array   $lead   The Gravity Form entry
+	 * @param  boolean $allow_display_empty_fields
+	 * @param  boolean $show_html
+	 * @param  boolean $show_page_name
+	 * @param  boolean $return
+	 * @return void
+	 * @since 3.0
+	 */
+	public static function lead_detail_grid( $form, $lead, $allow_display_empty_fields = false, $show_html = false, $show_page_name = false, $return = false ) {
+			$config = array(
+				'meta' => array(
+					'empty'      => $allow_display_empty_fields,
+					'echo'       => ! $return,
+					'legacy_css' => true,
 
-                    /* TODO */
-                    'html_field' => $show_html,
-                    'page_names' => $show_page_name
-                )
-            );
+					/* TODO */
+					'html_field' => $show_html,
+					'page_names' => $show_page_name,
+				),
+			);
 
-            self::do_lead_detail_grid($form, $lead, $config);
-    }
+			self::do_lead_detail_grid( $form, $lead, $config );
+	}
 
-    /**
-     * Generate our PDF HTML layout
-     * @param  Array $form   The Gravity Form array
-     * @param  Array $lead   The Gravity Form entry
-     * @param  Array $config The PDF Configuration
-     * @return String        The generated HTML
-     * @since 3.7
-     */
-    public static function do_lead_detail_grid($form, $lead, $config = array()) {
-        /* Set up any legacy configuration options needed */
-        $config['meta']['legacy_css'] = true;
+	/**
+	 * Generate our PDF HTML layout
+	 * @param  Array $form   The Gravity Form array
+	 * @param  Array $lead   The Gravity Form entry
+	 * @param  Array $config The PDF Configuration
+	 * @return String        The generated HTML
+	 * @since 3.7
+	 */
+	public static function do_lead_detail_grid( $form, $lead, $config = array() ) {
+		/* Set up any legacy configuration options needed */
+		$config['meta']['legacy_css'] = true;
 
-        $model = new Model_PDF();
-        $view = new View_PDF();
-        $view->process_html_structure($lead, $model, $config);
-    }
+		$model = new Model_PDF();
+		$view = new View_PDF();
+		$view->process_html_structure( $lead, $model, $config );
+	}
 
-    /**
-     * Get the $form_data array
-     * @param  Array $form   The Gravity Form array
-     * @param  Array $lead   The Gravity Form entry
-     * @return Array
-     * @since 3.0
-     */
-    public static function lead_detail_grid_array($form, $lead) {
-        $model = new Model_PDF();
-        return $model->get_form_data($lead);
-    }
+	/**
+	 * Get the $form_data array
+	 * @param  Array $form   The Gravity Form array
+	 * @param  Array $lead   The Gravity Form entry
+	 * @return Array
+	 * @since 3.0
+	 */
+	public static function lead_detail_grid_array( $form, $lead ) {
+		$model = new Model_PDF();
+		return $model->get_form_data( $lead );
+	}
 }

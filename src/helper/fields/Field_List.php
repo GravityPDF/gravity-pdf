@@ -19,8 +19,8 @@ use Exception;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -51,105 +51,105 @@ if (! defined('ABSPATH')) {
 class Field_List extends Helper_Fields
 {
 
-    /**
-     * Check the appropriate variables are parsed in send to the parent construct
-     * @param Object $field The GF_Field_* Object
-     * @param Array $entry The Gravity Forms Entry
-     * @since 4.0
-     */
-    public function __construct($field, $entry) {
-        if(!is_object($field) || !$field instanceof GF_Field_List) {
-            throw new Exception('$field needs to be in instance of GF_Field_List');
-        }
+	/**
+	 * Check the appropriate variables are parsed in send to the parent construct
+	 * @param Object $field The GF_Field_* Object
+	 * @param Array  $entry The Gravity Forms Entry
+	 * @since 4.0
+	 */
+	public function __construct( $field, $entry ) {
+		if ( ! is_object( $field ) || ! $field instanceof GF_Field_List ) {
+			throw new Exception( '$field needs to be in instance of GF_Field_List' );
+		}
 
-        /* call our parent method */
-        parent::__construct($field, $entry);
-    }
+		/* call our parent method */
+		parent::__construct( $field, $entry );
+	}
 
-    /**
-     * Return the HTML form data
-     * @return Array
-     * @since 4.0
-     */
-    public function form_data() {
+	/**
+	 * Return the HTML form data
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function form_data() {
 
-        $data = array();
-        $label = GFFormsModel::get_label($this->field);
-        $html = $this->html();
+		$data = array();
+		$label = GFFormsModel::get_label( $this->field );
+		$html = $this->html();
 
-        /* Add our List array */
-        $data['list'][ $this->field->id ] = $this->value();
+		/* Add our List array */
+		$data['list'][ $this->field->id ] = $this->value();
 
-        /* Add our List HTML */
-        $data['field'][ $this->field->id . '.' . $label ] = $html;
-        $data['field'][ $this->field->id ]                = $html;
-        $data['field'][ $label ]                          = $html;
+		/* Add our List HTML */
+		$data['field'][ $this->field->id . '.' . $label ] = $html;
+		$data['field'][ $this->field->id ]                = $html;
+		$data['field'][ $label ]                          = $html;
 
-        return $data;
-    }
+		return $data;
+	}
 
-    /**
-     * Display the HTML version of this field
-     * @return String
-     * @since 4.0
-     */
-    public function html($value = '', $label = true) {
+	/**
+	 * Display the HTML version of this field
+	 * @return String
+	 * @since 4.0
+	 */
+	public function html( $value = '', $label = true ) {
 
-        /* exit early if list field is empty */
-        if($this->is_empty()) {
-            return parent::html('');
-        }
+		/* exit early if list field is empty */
+		if ( $this->is_empty() ) {
+			return parent::html( '' );
+		}
 
-        /* get out field value */
-        $value   = $this->value();
-        $columns = is_array($value[0]);
+		/* get out field value */
+		$value   = $this->value();
+		$columns = is_array( $value[0] );
 
-        $css = array();
+		$css = array();
 
-        $css['table'] = array(
-            'border-collapse: collapse',
-            'border: 1px solid #DFDFDF',
+		$css['table'] = array(
+			'border-collapse: collapse',
+			'border: 1px solid #DFDFDF',
 
-            'margin: 2px 0 6px',
-            'padding: 0',
-            
-            'width: 100%',
-        );
+			'margin: 2px 0 6px',
+			'padding: 0',
 
-        $css['th'] = array(
-            'text-align:left',
-            'background-color: #F1F1F1',
+			'width: 100%',
+		);
 
-            'font-size: 12px',
-            'font-weight: bold',
-            
-            'padding: 6px 10px',
-            'background-image: none',
-            'border: 1px solid #DFDFDF',
-        );
+		$css['th'] = array(
+			'text-align:left',
+			'background-color: #F1F1F1',
 
-        $css['td'] = array(
-            'font-size:12px',
-            'padding: 6px 10px',
-            'border: 1px solid #DFDFDF'
-        );
+			'font-size: 12px',
+			'font-weight: bold',
 
-        /* add filter so users can modify the default list style */
-        $css = apply_filters('gfpdf_field_list_css', $css);
+			'padding: 6px 10px',
+			'background-image: none',
+			'border: 1px solid #DFDFDF',
+		);
 
-        /* Start buffer and generate a list table */
-        ob_start();
-        ?>
+		$css['td'] = array(
+			'font-size:12px',
+			'padding: 6px 10px',
+			'border: 1px solid #DFDFDF',
+		);
+
+		/* add filter so users can modify the default list style */
+		$css = apply_filters( 'gfpdf_field_list_css', $css );
+
+		/* Start buffer and generate a list table */
+		ob_start();
+		?>
         
-        <table autosize="1" class="gfield_list" style="<?php echo implode(';', $css['table']); ?>">
+        <table autosize="1" class="gfield_list" style="<?php echo implode( ';', $css['table'] ); ?>">
 
             <!-- Loop through the column names and output in a header (if using the advanced list) -->
-            <?php if($columns): $columns = array_keys($value[0]); ?>
+            <?php if ( $columns ) : $columns = array_keys( $value[0] ); ?>
                 <thead>
                     <tr>
-                        <?php foreach($columns as $column): ?>
-                            <th style="<?php echo implode(';', $css['th']); ?>">
-                                <?php echo esc_html($column); ?>
+                        <?php foreach ( $columns as $column ) : ?>
+                            <th style="<?php echo implode( ';', $css['th'] ); ?>">
+                                <?php echo esc_html( $column ); ?>
                             </th>
                         <?php endforeach; ?>
                     </tr>
@@ -158,15 +158,15 @@ class Field_List extends Helper_Fields
 
             <!-- Loop through each row -->
             <tbody>
-                    <?php foreach($value as $item): ?>
+                    <?php foreach ( $value as $item ) : ?>
                         <tr>
                             <!-- handle the basic list -->
-                            <?php if(!$columns): ?>
-                                <td style="<?php echo implode(';', $css['td']); ?>"><?php echo esc_html($item); ?></td>
-                            <?php else: ?><!-- handle the advanced list -->
-                                <?php foreach($columns as $column): ?>
-                                    <td style="<?php echo implode(';', $css['td']); ?>">
-                                        <?php echo esc_html(rgar($item, $column)); ?>
+                            <?php if ( ! $columns ) : ?>
+                                <td style="<?php echo implode( ';', $css['td'] ); ?>"><?php echo esc_html( $item ); ?></td>
+                            <?php else : ?><!-- handle the advanced list -->
+                                <?php foreach ( $columns as $column ) : ?>
+                                    <td style="<?php echo implode( ';', $css['td'] ); ?>">
+                                        <?php echo esc_html( rgar( $item, $column ) ); ?>
                                     </td>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -177,71 +177,71 @@ class Field_List extends Helper_Fields
         </table>
         
         <?php
-        /* get buffer and return HTML */
-        return parent::html(ob_get_clean());
-    }
+		/* get buffer and return HTML */
+		return parent::html( ob_get_clean() );
+	}
 
-    /**
-     * Get the standard GF value of this field
-     * @return String/Array
-     * @since 4.0
-     */
-    public function value() {
-        if($this->has_cache()) {
-            return $this->cache();
-        }
+	/**
+	 * Get the standard GF value of this field
+	 * @return String/Array
+	 * @since 4.0
+	 */
+	public function value() {
+		if ( $this->has_cache() ) {
+			return $this->cache();
+		}
 
-        $value = maybe_unserialize($this->get_value());
+		$value = maybe_unserialize( $this->get_value() );
 
-        /* make sure value is an array */
-        if(!is_array($value)) {
-            $value = array($value);
-        }
+		/* make sure value is an array */
+		if ( ! is_array( $value ) ) {
+			$value = array( $value );
+		}
 
-        $this->cache($value);
-        
-        return $this->cache();
-    }
+		$this->cache( $value );
 
-    /**
-     * Remove empty list rows
-     * @param  Array $list The current list array
-     * @return Array       The filtered list array
-     * @since 4.0
-     */
-    private function remove_empty_list_rows($list) {
-        
-        /* if list field empty return early */
-        if(!is_array($list) || sizeof($list) === 0) {
-            return $list;
-        }
+		return $this->cache();
+	}
 
-        /* If single list field */
-        if( ! is_array($list[0]) ) {
-            $list = array_filter($list);
-        } else {
+	/**
+	 * Remove empty list rows
+	 * @param  Array $list The current list array
+	 * @return Array       The filtered list array
+	 * @since 4.0
+	 */
+	private function remove_empty_list_rows( $list ) {
 
-            /* Loop through the multi-column list */
-            foreach($list as $id => $row) {
+		/* if list field empty return early */
+		if ( ! is_array( $list ) || sizeof( $list ) === 0 ) {
+			return $list;
+		}
 
-                $empty = true;
+		/* If single list field */
+		if ( ! is_array( $list[0] ) ) {
+			$list = array_filter( $list );
+		} else {
 
-                foreach($row as &$col) {
-                    
-                    /* Check if there is data and if so break the loop */
-                    if( trim( strlen( $col ) > 0) ) {
-                        $empty = false;
-                        break;
-                    }
-                }
+			/* Loop through the multi-column list */
+			foreach ( $list as $id => $row ) {
 
-                /* Remove row from list */
-                if($empty) {
-                    unset( $list[$id] );
-                }
-            }
-        }
+				$empty = true;
 
-        return $list;
-    }
+				foreach ( $row as &$col ) {
+
+					/* Check if there is data and if so break the loop */
+					if ( trim( strlen( $col ) > 0 ) ) {
+						$empty = false;
+						break;
+					}
+				}
+
+				/* Remove row from list */
+				if ( $empty ) {
+					unset( $list[$id] );
+				}
+			}
+		}
+
+		return $list;
+	}
 }

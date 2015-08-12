@@ -3,7 +3,7 @@
 namespace GFPDF\Helper;
 
 /**
- * Abstract Helper Controller 
+ * Abstract Helper Controller
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
@@ -12,7 +12,9 @@ namespace GFPDF\Helper;
  */
 
 /* Exit if accessed directly */
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /*
     This file is part of Gravity PDF.
@@ -39,8 +41,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @since 4.0
  */
 abstract class Helper_Controller {
-	
-    /**
+
+	/**
 	 * Classes will store a model object
 	 * @var Object
 	 * @since 4.0
@@ -51,12 +53,12 @@ abstract class Helper_Controller {
 	 * Classes will store a view object
 	 * @var Object
 	 * @since 4.0
-	 */	
+	 */
 	private $view  = null;
 
-    /**
-     * Each controller should have an initialisation function 
-     * @since 4.0
-     */
-    abstract public function init();
+	/**
+	 * Each controller should have an initialisation function
+	 * @since 4.0
+	 */
+	abstract public function init();
 }

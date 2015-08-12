@@ -19,8 +19,8 @@ use Exception;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -51,95 +51,95 @@ if (! defined('ABSPATH')) {
 class Field_Fileupload extends Helper_Fields
 {
 
-    /**
-     * Check the appropriate variables are parsed in send to the parent construct
-     * @param Object $field The GF_Field_* Object
-     * @param Array $entry The Gravity Forms Entry
-     * @since 4.0
-     */
-    public function __construct($field, $entry) {
-        if(!is_object($field) || !$field instanceof GF_Field_FileUpload) {
-            throw new Exception('$field needs to be in instance of GF_Field_FileUpload');
-        }
+	/**
+	 * Check the appropriate variables are parsed in send to the parent construct
+	 * @param Object $field The GF_Field_* Object
+	 * @param Array  $entry The Gravity Forms Entry
+	 * @since 4.0
+	 */
+	public function __construct( $field, $entry ) {
+		if ( ! is_object( $field ) || ! $field instanceof GF_Field_FileUpload ) {
+			throw new Exception( '$field needs to be in instance of GF_Field_FileUpload' );
+		}
 
-        /* call our parent method */
-        parent::__construct($field, $entry);
-    }
+		/* call our parent method */
+		parent::__construct( $field, $entry );
+	}
 
-    /**
-     * Return the HTML form data
-     * @return Array
-     * @since 4.0
-     */
-    public function form_data() {
-        global $gfpdf;
+	/**
+	 * Return the HTML form data
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function form_data() {
+		global $gfpdf;
 
-        $data  = array();
-        $label = GFFormsModel::get_label($this->field);
-        $value = $this->value();
+		$data  = array();
+		$label = GFFormsModel::get_label( $this->field );
+		$value = $this->value();
 
-        foreach($value as $image) {
-            
-            $data[ $this->field->id . '.' . $label ][] = $image;
-            $data[ $this->field->id ][]                = $image;
-            $data[ $label ][]                          = $image;
+		foreach ( $value as $image ) {
 
-            $path = $gfpdf->misc->convert_url_to_path($image);
+			$data[ $this->field->id . '.' . $label ][] = $image;
+			$data[ $this->field->id ][]                = $image;
+			$data[ $label ][]                          = $image;
 
-            $data[ $this->field->id . '_path' ][]                = $path;
-            $data[ $this->field->id . '.' . $label . '_path' ][] = $path;
-        }
+			$path = $gfpdf->misc->convert_url_to_path( $image );
 
-        return array( 'field' => $data );
-    }
+			$data[ $this->field->id . '_path' ][]                = $path;
+			$data[ $this->field->id . '.' . $label . '_path' ][] = $path;
+		}
 
-    /**
-     * Display the HTML version of this field
-     * @return String
-     * @since 4.0
-     */
-    public function html($value = '', $label = true) {
-        $files = $this->value();
+		return array( 'field' => $data );
+	}
 
-        if(sizeof($files) > 0) {
-            $html = '<ul class="bulleted">';
-            $i     = 1;
+	/**
+	 * Display the HTML version of this field
+	 * @return String
+	 * @since 4.0
+	 */
+	public function html( $value = '', $label = true ) {
+		$files = $this->value();
 
-            foreach($files as $file) {
-                $file_info = pathinfo($file);
-                $html .= '<li id="field-' . $this->field->id . '-option-' . $i . '"><a href="' . esc_url($file) . '">' . esc_html($file_info['basename']) . '</a></li>';
-                $i++;
-            }
+		if ( sizeof( $files ) > 0 ) {
+			$html = '<ul class="bulleted">';
+			$i     = 1;
 
-            $html .= '</ul>';
-        }
+			foreach ( $files as $file ) {
+				$file_info = pathinfo( $file );
+				$html .= '<li id="field-' . $this->field->id . '-option-' . $i . '"><a href="' . esc_url( $file ) . '">' . esc_html( $file_info['basename'] ) . '</a></li>';
+				$i++;
+			}
 
-        return parent::html($html);
-    }
+			$html .= '</ul>';
+		}
 
-    /**
-     * Get the standard GF value of this field
-     * @return String/Array
-     * @since 4.0
-     */
-    public function value() {
-        if($this->has_cache()) {
-            return $this->cache();
-        }
+		return parent::html( $html );
+	}
 
-        $value = $this->get_value();
-        $files = array();
+	/**
+	 * Get the standard GF value of this field
+	 * @return String/Array
+	 * @since 4.0
+	 */
+	public function value() {
+		if ( $this->has_cache() ) {
+			return $this->cache();
+		}
 
-        if(!empty($value)) {
-            $paths = ($this->field->multipleFiles) ? json_decode($value) : array($value);
+		$value = $this->get_value();
+		$files = array();
 
-            foreach($paths as $path) {
-                $files[] = esc_url($path);
-            }
-        }
+		if ( ! empty($value) ) {
+			$paths = ($this->field->multipleFiles) ? json_decode( $value ) : array( $value );
 
-        $this->cache($files);
-        
-        return $this->cache();
-    }
+			foreach ( $paths as $path ) {
+				$files[] = esc_url( $path );
+			}
+		}
+
+		$this->cache( $files );
+
+		return $this->cache();
+	}
 }

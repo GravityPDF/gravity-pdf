@@ -14,8 +14,8 @@ use GFPDF\Helper\Helper_View;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -48,14 +48,14 @@ if (! defined('ABSPATH')) {
 class View_Form_Settings extends Helper_View
 {
 
-    /**
-     * Set the view's name
-     * @var string
-     * @since 4.0
-     */
-    protected $ViewType = 'FormSettings';
+	/**
+	 * Set the view's name
+	 * @var string
+	 * @since 4.0
+	 */
+	protected $ViewType = 'FormSettings';
 
-    public function __construct($data = array()) {
-        $this->data = $data;
-    }
+	public function __construct( $data = array() ) {
+		$this->data = $data;
+	}
 }

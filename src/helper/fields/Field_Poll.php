@@ -18,8 +18,8 @@ use Exception;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -50,104 +50,104 @@ if (! defined('ABSPATH')) {
 class Field_Poll extends Helper_Fields
 {
 
-    /**
-     * Check the appropriate variables are parsed in send to the parent construct
-     * @param Object $field The GF_Field_* Object
-     * @param Array $entry The Gravity Forms Entry
-     * @since 4.0
-     */
-    public function __construct($field, $entry) {
-        global $gfpdf;
+	/**
+	 * Check the appropriate variables are parsed in send to the parent construct
+	 * @param Object $field The GF_Field_* Object
+	 * @param Array  $entry The Gravity Forms Entry
+	 * @since 4.0
+	 */
+	public function __construct( $field, $entry ) {
+		global $gfpdf;
 
-        /* call our parent method */
-        parent::__construct($field, $entry);
+		/* call our parent method */
+		parent::__construct( $field, $entry );
 
-        /*
+		/*
          * Custom Field can be any of the following field types:
          * single line text, paragraph, dropdown, select, number, checkbox, radio, hidden,
          * date, time, phone, website, email, file upload or list
          */
-        $class = $gfpdf->misc->get_field_class($field->inputType);
+		$class = $gfpdf->misc->get_field_class( $field->inputType );
 
-        try {
-            /* check load our class */
-            if(class_exists($class)) {
-                $this->fieldObject = new $class($field, $entry);
-            } else {
-                throw new Exception('Class not found');
-            }
-        } catch(Exception $e) {
-            /* Exception thrown. Load generic field loader */
-            $this->fieldObject = new Field_Default($field, $entry);
-        }
-    }
+		try {
+			/* check load our class */
+			if ( class_exists( $class ) ) {
+				$this->fieldObject = new $class($field, $entry);
+			} else {
+				throw new Exception( 'Class not found' );
+			}
+		} catch (Exception $e) {
+			/* Exception thrown. Load generic field loader */
+			$this->fieldObject = new Field_Default( $field, $entry );
+		}
+	}
 
-    /**
-     * Used to check if the current field has a value
-     * @since 4.0
-     * @internal Child classes can override this method when dealing with a specific use case
-     */
-    public function is_empty() {
-        return $this->fieldObject->is_empty();
-    }
+	/**
+	 * Used to check if the current field has a value
+	 * @since 4.0
+	 * @internal Child classes can override this method when dealing with a specific use case
+	 */
+	public function is_empty() {
+		return $this->fieldObject->is_empty();
+	}
 
-    /**
-     * Return the HTML form data
-     * @return Array
-     * @since 4.0
-     */
-    public function form_data() {
+	/**
+	 * Return the HTML form data
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function form_data() {
 
-        $data = array();
-        $value = $this->value();
-        $label = GFFormsModel::get_label($this->field);
+		$data = array();
+		$value = $this->value();
+		$label = GFFormsModel::get_label( $this->field );
 
-        if( isset($value[0]) ) {
-            
-            $field = array();
-            $fieldValue = array();
+		if ( isset($value[0]) ) {
 
-            foreach($value as $item) {
-                /* For backwards compatibility, we'll wrap these in their own array key */
-                $field[0][]      = $item['label'];
-                $fieldValue[0][] = $item['value'];
-            }
-        } else {
-            $field      = $value['label'];
-            $fieldValue = $value['value'];
-        }
+			$field = array();
+			$fieldValue = array();
 
-        $data[ $this->field->id . '.' . $label ] = $field;
-        $data[ $this->field->id . '.' . $label . '_name' ] = $field; /* for backwards compatibility */
-        $data[ $this->field->id ]                = $field;
-        $data[ $label ]                          = $field;
+			foreach ( $value as $item ) {
+				/* For backwards compatibility, we'll wrap these in their own array key */
+				$field[0][]      = $item['label'];
+				$fieldValue[0][] = $item['value'];
+			}
+		} else {
+			$field      = $value['label'];
+			$fieldValue = $value['value'];
+		}
 
-        return array( 'field' => $data );
-    }
+		$data[ $this->field->id . '.' . $label ] = $field;
+		$data[ $this->field->id . '.' . $label . '_name' ] = $field; /* for backwards compatibility */
+		$data[ $this->field->id ]                = $field;
+		$data[ $label ]                          = $field;
 
-    /**
-     * Display the HTML version of this field
-     * @return String
-     * @since 4.0
-     */
-    public function html($value = '', $label = true) {
-        echo $this->fieldObject->html();
-    }
+		return array( 'field' => $data );
+	}
 
-    /**
-     * Get the standard GF value of this field
-     * @return String/Array
-     * @since 4.0
-     */
-    public function value() {
-        if($this->fieldObject->has_cache()) {
-            return $this->cache();
-        }
+	/**
+	 * Display the HTML version of this field
+	 * @return String
+	 * @since 4.0
+	 */
+	public function html( $value = '', $label = true ) {
+		echo $this->fieldObject->html();
+	}
 
-        $value = $this->fieldObject->value();
+	/**
+	 * Get the standard GF value of this field
+	 * @return String/Array
+	 * @since 4.0
+	 */
+	public function value() {
+		if ( $this->fieldObject->has_cache() ) {
+			return $this->cache();
+		}
 
-        $this->fieldObject->cache($value);
-        
-        return $this->fieldObject->cache();
-    }
+		$value = $this->fieldObject->value();
+
+		$this->fieldObject->cache( $value );
+
+		return $this->fieldObject->cache();
+	}
 }

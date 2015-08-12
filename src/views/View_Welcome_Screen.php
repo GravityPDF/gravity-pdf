@@ -16,8 +16,8 @@ use GFAPI;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -50,50 +50,50 @@ if (! defined('ABSPATH')) {
 class View_Welcome_Screen extends Helper_View
 {
 
-    /**
-     * Set the view's name
-     * @var string
-     * @since 4.0
-     */
-    protected $ViewType = 'Welcome';
+	/**
+	 * Set the view's name
+	 * @var string
+	 * @since 4.0
+	 */
+	protected $ViewType = 'Welcome';
 
 
-    public function __construct($data = array()) {
-        $this->data = $data;
-    }
+	public function __construct( $data = array() ) {
+		$this->data = $data;
+	}
 
-    /**
-     * Load the Welcome Tab tabs
-     * @since 4.0
-     */
-    public function tabs() {
-        
-        /* Load any variables we want to pass to our view */
-        $args = array(
-            'selected' => isset( $_GET['page'] ) ? $_GET['page'] : 'gfpdf-getting-started',
-        );
+	/**
+	 * Load the Welcome Tab tabs
+	 * @since 4.0
+	 */
+	public function tabs() {
 
-        $args = array_merge($args, $this->data);
+		/* Load any variables we want to pass to our view */
+		$args = array(
+			'selected' => isset( $_GET['page'] ) ? $_GET['page'] : 'gfpdf-getting-started',
+		);
 
-        /* load the tabs view */
-        $this->load('tabs', $args);
-    }
+		$args = array_merge( $args, $this->data );
 
-    /**
-     * Output the welcome screen
-     * @since 4.0
-     */
-    public function welcome() {
+		/* load the tabs view */
+		$this->load( 'tabs', $args );
+	}
 
-        /* Load any variables we want to pass to our view */
-        $args = array(
-            'forms' => GFAPI::get_forms(),
-        );
+	/**
+	 * Output the welcome screen
+	 * @since 4.0
+	 */
+	public function welcome() {
 
-        $args = array_merge($args, $this->data);
+		/* Load any variables we want to pass to our view */
+		$args = array(
+			'forms' => GFAPI::get_forms(),
+		);
 
-        /* Render our view */
-        $this->load('welcome', $args);
+		$args = array_merge( $args, $this->data );
 
-    }
+		/* Render our view */
+		$this->load( 'welcome', $args );
+
+	}
 }

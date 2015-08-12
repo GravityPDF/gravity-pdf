@@ -20,8 +20,8 @@ use Exception;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -52,84 +52,84 @@ if (! defined('ABSPATH')) {
 class Field_Section extends Helper_Fields
 {
 
-    /**
-     * Check the appropriate variables are parsed in send to the parent construct
-     * @param Object $field The GF_Field_* Object
-     * @param Array $entry The Gravity Forms Entry
-     * @since 4.0
-     */
-    public function __construct($field, $entry) {
-        if(!is_object($field) || !$field instanceof GF_Field_Section) {
-            throw new Exception('$field needs to be in instance of GF_Field_Section');
-        }
+	/**
+	 * Check the appropriate variables are parsed in send to the parent construct
+	 * @param Object $field The GF_Field_* Object
+	 * @param Array  $entry The Gravity Forms Entry
+	 * @since 4.0
+	 */
+	public function __construct( $field, $entry ) {
+		if ( ! is_object( $field ) || ! $field instanceof GF_Field_Section ) {
+			throw new Exception( '$field needs to be in instance of GF_Field_Section' );
+		}
 
-        /* call our parent method */
-        parent::__construct($field, $entry);
-    }
+		/* call our parent method */
+		parent::__construct( $field, $entry );
+	}
 
-    /**
-     * Used to check if the current field has a value
-     * @since 4.0
-     * @internal Child classes can override this method when dealing with a specific use case
-     */
-    public function is_empty() {
-        if( GFCommon::is_section_empty($this->field, $this->form, $this->entry) ) {
-            return true;
-        }
+	/**
+	 * Used to check if the current field has a value
+	 * @since 4.0
+	 * @internal Child classes can override this method when dealing with a specific use case
+	 */
+	public function is_empty() {
+		if ( GFCommon::is_section_empty( $this->field, $this->form, $this->entry ) ) {
+			return true;
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    /**
-     * Return the HTML form data
-     * @return Array
-     * @since 4.0
-     */
-    public function form_data() {
+	/**
+	 * Return the HTML form data
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function form_data() {
 
-        $data = array();
+		$data = array();
 
-        $data['section_break'][ $this->field->id ] = $this->value();
+		$data['section_break'][ $this->field->id ] = $this->value();
 
-        return $data;
-    }
+		return $data;
+	}
 
-    /**
-     * Display the HTML version of this field
-     * @return String
-     * @since 4.0
-     */
-    public function html($value = '', $label = true) {
-        /* sanitize the HTML */
-        $section = $this->value(); /* allow the same HTML as per the post editor */
-        
-        $html    = '<div id="field-'. $this->field->id .'" class="gfpdf-section-title gfpdf-field">';
-        $html    .= '<h3>' . esc_html($section['title']) .'</h3>';
+	/**
+	 * Display the HTML version of this field
+	 * @return String
+	 * @since 4.0
+	 */
+	public function html( $value = '', $label = true ) {
+		/* sanitize the HTML */
+		$section = $this->value(); /* allow the same HTML as per the post editor */
 
-        if(!empty($value)) {
-            $html .= '<div id="field-'. $this->field->id .'-desc" class="gfpdf-section-description gfpdf-field">' . wp_kses_post($section['description']) . '</div>';
-        }
+		$html    = '<div id="field-'. $this->field->id .'" class="gfpdf-section-title gfpdf-field">';
+		$html    .= '<h3>' . esc_html( $section['title'] ) .'</h3>';
 
-        $html .= '</div>';
+		if ( ! empty($value) ) {
+			$html .= '<div id="field-'. $this->field->id .'-desc" class="gfpdf-section-description gfpdf-field">' . wp_kses_post( $section['description'] ) . '</div>';
+		}
 
-        return $html;
-    }
+		$html .= '</div>';
 
-    /**
-     * Get the standard GF value of this field
-     * @return String/Array
-     * @since 4.0
-     */
-    public function value() {
-        if($this->has_cache()) {
-            return $this->cache();
-        }
+		return $html;
+	}
 
-        $this->cache(array(
-            'title'       => $this->field->label,
-            'description' => $this->field->description,
-        ));
+	/**
+	 * Get the standard GF value of this field
+	 * @return String/Array
+	 * @since 4.0
+	 */
+	public function value() {
+		if ( $this->has_cache() ) {
+			return $this->cache();
+		}
 
-        return $this->cache();
-    }
+		$this->cache(array(
+			'title'       => $this->field->label,
+			'description' => $this->field->description,
+		));
+
+		return $this->cache();
+	}
 }

@@ -19,7 +19,9 @@ use Exception;
  */
 
 /* Exit if accessed directly */
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /*
     This file is part of Gravity PDF.
@@ -46,358 +48,358 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 class Helper_PDF {
 
-    /**
-     * Holds our PDF Object
-     * @var Object
-     * @since 4.0
-     */
-    public $mpdf;
+	/**
+	 * Holds our PDF Object
+	 * @var Object
+	 * @since 4.0
+	 */
+	public $mpdf;
 
-    /**
-     * Holds our Gravity Form Entry Details
-     * @var Array
-     * @since 4.0
-     */
-    protected $entry;
+	/**
+	 * Holds our Gravity Form Entry Details
+	 * @var Array
+	 * @since 4.0
+	 */
+	protected $entry;
 
-    /**
-     * Holds our PDF Settings
-     * @var Array
-     * @since 4.0
-     */
-    protected $settings;
+	/**
+	 * Holds our PDF Settings
+	 * @var Array
+	 * @since 4.0
+	 */
+	protected $settings;
 
-    /**
-     * Controls how the PDF should be output.
-     * Whether to display it in the browser, force a download, or save it to disk
-     * @var string
-     * @since 4.0
-     */
-    protected $output = 'DISPLAY';
+	/**
+	 * Controls how the PDF should be output.
+	 * Whether to display it in the browser, force a download, or save it to disk
+	 * @var string
+	 * @since 4.0
+	 */
+	protected $output = 'DISPLAY';
 
-    /**
-     * Holds the predetermined paper size
-     * @var Mixed (String or Array)
-     * @since 4.0
-     */
-    protected $paper_size;
+	/**
+	 * Holds the predetermined paper size
+	 * @var Mixed (String or Array)
+	 * @since 4.0
+	 */
+	protected $paper_size;
 
-    /**
-     * Holds our paper orientation in mPDF flavour
-     * @var String
-     * @since 4.0
-     */
-    protected $orientation;
+	/**
+	 * Holds our paper orientation in mPDF flavour
+	 * @var String
+	 * @since 4.0
+	 */
+	protected $orientation;
 
-    /**
-     * Holds the full path to the PHP template to load
-     * @var String
-     * @since 4.0
-     */
-    protected $template_path;
+	/**
+	 * Holds the full path to the PHP template to load
+	 * @var String
+	 * @since 4.0
+	 */
+	protected $template_path;
 
-    /**
-     * Holds the PDF filename that should be used
-     * @var String
-     * @since 4.0
-     */
-    protected $filename;
+	/**
+	 * Holds the PDF filename that should be used
+	 * @var String
+	 * @since 4.0
+	 */
+	protected $filename;
 
-    /**
-     * Holds the path the PDF should be saved to
-     * @var String
-     * @since 4.0
-     */
-    protected $path;
+	/**
+	 * Holds the path the PDF should be saved to
+	 * @var String
+	 * @since 4.0
+	 */
+	protected $path;
 
-    /**
-     * Whether to force the print dialog when the PDF is opened
-     * @var boolean
-     * @since 4.0
-     */
-    protected $print = false;
+	/**
+	 * Whether to force the print dialog when the PDF is opened
+	 * @var boolean
+	 * @since 4.0
+	 */
+	protected $print = false;
 
-    /**
-     * Initialise our class
-     * @param Array $entry    The Gravity Form Entry to be processed
-     * @param Array $settings The Gravity PDF Settings Array
-     * @since 4.0
-     */
-    public function __construct($entry, $settings) {
-        $this->entry = $entry;
-        $this->settings = $settings;
-    }
+	/**
+	 * Initialise our class
+	 * @param Array $entry    The Gravity Form Entry to be processed
+	 * @param Array $settings The Gravity PDF Settings Array
+	 * @since 4.0
+	 */
+	public function __construct( $entry, $settings ) {
+		$this->entry = $entry;
+		$this->settings = $settings;
+	}
 
-    /**
-     * A public method to start our PDF creation process
-     * @return void
-     * @since 4.0
-     */
-    public function init() {
-        $this->setPaper();
-        $this->setFilename();
-        $this->beginPdf();
-        $this->setImageDpi();
-        $this->setTextDirection();
-        $this->setPdfFormat();
-        $this->setPdfSecurity();
-    }
+	/**
+	 * A public method to start our PDF creation process
+	 * @return void
+	 * @since 4.0
+	 */
+	public function init() {
+		$this->set_paper();
+		$this->set_filename();
+		$this->begin_pdf();
+		$this->set_image_dpi();
+		$this->set_text_direction();
+		$this->set_pdf_format();
+		$this->set_pdf_security();
+	}
 
-    /**
-     * Render the HTML to our PDF
-     * @param  Array  $args Any arguments that should be passed to the PDF template
-     * @param  String $html By pass the template  file and pass in a HTML string directly to the engine. Optional.
-     * @return void
-     * @since 4.0
-     */
-    public function renderHtml($args = array(), $html = '') {
-        /* Load in our PHP template */
-        if(empty($html)) {
-            $this->setTemplate();
-            $html = $this->loadHtml($args);
-        }
+	/**
+	 * Render the HTML to our PDF
+	 * @param  Array  $args Any arguments that should be passed to the PDF template
+	 * @param  String $html By pass the template  file and pass in a HTML string directly to the engine. Optional.
+	 * @return void
+	 * @since 4.0
+	 */
+	public function render_html( $args = array(), $html = '' ) {
+		/* Load in our PHP template */
+		if ( empty($html) ) {
+			$this->set_template();
+			$html = $this->load_html( $args );
+		}
 
-        /* check if we should output the HTML to the browser, for debugging */
-        $this->maybeDisplayRawHtml($html);
+		/* check if we should output the HTML to the browser, for debugging */
+		$this->maybe_display_raw_html( $html );
 
-        /* write the HTML to mPDF */
-        $this->mpdf->WriteHTML($html);
-    }
+		/* write the HTML to mPDF */
+		$this->mpdf->WriteHTML( $html );
+	}
 
-    /**
-     * Create the PDF
-     * @return void
-     * @since 4.0
-     */
-    public function generate() {
+	/**
+	 * Create the PDF
+	 * @return void
+	 * @since 4.0
+	 */
+	public function generate() {
 
-        /* Process any final settings before outputting */
-        $this->showPrintDialog();
+		/* Process any final settings before outputting */
+		$this->show_print_dialog();
 
-        /* allow $mpdf object class to be modified */
-        apply_filters('gfpdf_mpdf_class', $this->mpdf, $this->entry, $this->settings);
+		/* allow $mpdf object class to be modified */
+		apply_filters( 'gfpdf_mpdf_class', $this->mpdf, $this->entry, $this->settings );
 
-        apply_filters('gfpdfe_mpdf_class_pre_render', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->getFilename()); /* backwards compat */
-        apply_filters('gfpdfe_pre_render_pdf', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->getFilename()); /* backwards compat */
-        apply_filters('gfpdfe_mpdf_class', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->getFilename()); /* backwards compat */
+		apply_filters( 'gfpdfe_mpdf_class_pre_render', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->getFilename() ); /* backwards compat */
+		apply_filters( 'gfpdfe_pre_render_pdf', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->getFilename() ); /* backwards compat */
+		apply_filters( 'gfpdfe_mpdf_class', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->getFilename() ); /* backwards compat */
 
-        /* If a developer decides to disable all security protocols we don't want the PDF indexed */
-        if (!headers_sent()) {
-            header( 'X-Robots-Tag: noindex, nofollow', true);
-        }
+		/* If a developer decides to disable all security protocols we don't want the PDF indexed */
+		if ( ! headers_sent() ) {
+			header( 'X-Robots-Tag: noindex, nofollow', true );
+		}
 
-        switch($this->output) {
-            case 'DISPLAY':
-                $this->mpdf->Output($this->filename, 'I');
-                exit;
-            break;
+		switch ( $this->output ) {
+			case 'DISPLAY':
+				$this->mpdf->Output( $this->filename, 'I' );
+				exit;
+			break;
 
-            case 'DOWNLOAD':
-                $this->mpdf->Output($this->filename, 'D');
-                exit;
-            break;
+			case 'DOWNLOAD':
+				$this->mpdf->Output( $this->filename, 'D' );
+				exit;
+			break;
 
-            case 'SAVE':
-                return $this->mpdf->Output('', 'S');
-            break;
-        }
-    }
+			case 'SAVE':
+				return $this->mpdf->Output( '', 'S' );
+			break;
+		}
+	}
 
-    /**
-     * Save the PDF to our tmp directory
-     * @param  String $raw_pdf_string  The generated PDF to be saved
-     * @return Mixed                   The full path to the file or false if failed
-     * @since  4.0
-     */
-    public function savePdf($raw_pdf_string) {
+	/**
+	 * Save the PDF to our tmp directory
+	 * @param  String $raw_pdf_string  The generated PDF to be saved
+	 * @return Mixed                   The full path to the file or false if failed
+	 * @since  4.0
+	 */
+	public function save_pdf( $raw_pdf_string ) {
 
-        if(empty($this->path)) {
-            $this->setPath();
-        }
-        
-        /* create our path */
-        if(! is_dir($this->path)) {
-            if(! wp_mkdir_p($this->path)) {
-                throw new Exception(sprintf('Could not create directory: %s'), esc_html($this->path));
-            }
-        }
+		if ( empty($this->path) ) {
+			$this->set_path();
+		}
 
-        /* save our PDF */
-        if(! file_put_contents($this->path . $this->filename, $raw_pdf_string)) {
-            throw new Exception(sprintf('Could not save PDF: %s', $this->path . $this->filename));
-        }
+		/* create our path */
+		if ( ! is_dir( $this->path ) ) {
+			if ( ! wp_mkdir_p( $this->path ) ) {
+				throw new Exception( sprintf( 'Could not create directory: %s' ), esc_html( $this->path ) );
+			}
+		}
 
-        return $this->path . $this->filename;
-    }
+		/* save our PDF */
+		if ( ! file_put_contents( $this->path . $this->filename, $raw_pdf_string ) ) {
+			throw new Exception( sprintf( 'Could not save PDF: %s', $this->path . $this->filename ) );
+		}
 
-    /**
-     * Public endpoint to allow users to control how the generated PDF will be displayed
-     * @param String $type Only display, download or save options are valid
-     * @since 4.0
-     */
-    public function setOutputType($type) {
-        $valid = array('DISPLAY', 'DOWNLOAD', 'SAVE');
+		return $this->path . $this->filename;
+	}
 
-        if(! in_array(strtoupper($type), $valid)) {
-            throw new Exception(sprintf('Display type not valid. Use %s', implode(', ', $valid)));
-            return;
-        }
+	/**
+	 * Public endpoint to allow users to control how the generated PDF will be displayed
+	 * @param String $type Only display, download or save options are valid
+	 * @since 4.0
+	 */
+	public function set_output_type( $type ) {
+		$valid = array( 'DISPLAY', 'DOWNLOAD', 'SAVE' );
 
-        $this->output = strtoupper($type);
-    }
+		if ( ! in_array( strtoupper( $type ), $valid ) ) {
+			throw new Exception( sprintf( 'Display type not valid. Use %s', implode( ', ', $valid ) ) );
+			return;
+		}
 
-
-    /**
-     * Public Method to mark the PDF document creator
-     * @return void
-     * @since 4.0
-     */
-    public function setCreator($text = '') {
-        if(empty($text)) {
-            $this->mpdf->SetCreator('Gravity PDF v' . PDF_EXTENDED_VERSION . '. https://gravitypdf.com');
-        } else {
-            $this->mpdf->SetCreator($text);
-        }
-    }
-
-    /**
-     * Public Method to set how the PDF should be displyed when first open
-     * @param Mixed $mode A string or integer setting the zoom mode
-     * @param String $layout The PDF layout format
-     * @return void
-     * @since 4.0
-     */
-    public function setDisplayMode($mode = 'fullpage', $layout = 'continuous') {
-
-        $valid_mode = array('fullpage', 'fullwidth', 'real', 'default');
-        $valid_layout = array('single', 'continuous', 'two', 'twoleft', 'tworight', 'default');
-
-        /* check the mode */
-        if(! in_array(strtolower($mode), $valid_mode)) {
-            /* determine if the mode is an integer */
-            if(!is_int( $mode ) || $mode <= 10) {
-                throw new Exception(sprintf('Mode must be an number value more than 10 or one of these types: %s', implode(', ', $valid_mode)));
-            }
-        }
-
-        /* check theh layout */
-        if(! in_array(strtolower($mode), $valid_mode)) {
-            throw new Exception(sprintf('Layout must be one of these types: %s', implode(', ', $valid_mode)));
-        }
-
-        $this->mpdf->SetDisplayMode($mode, $layout);
-    }
+		$this->output = strtoupper( $type );
+	}
 
 
-    /**
-     * Public Method to allow the print dialog to be display when PDF is opened
-     * @param boolean $print
-     * @return void
-     * @since 4.0
-     */
-    public function setPrintDialog($print = true) {
-        if(! is_bool($print)) {
-            throw new Exception('Only boolean values true and false can been passed to setPrintDialog().');
-        }
+	/**
+	 * Public Method to mark the PDF document creator
+	 * @return void
+	 * @since 4.0
+	 */
+	public function set_creator( $text = '' ) {
+		if ( empty($text) ) {
+			$this->mpdf->SetCreator( 'Gravity PDF v' . PDF_EXTENDED_VERSION . '. https://gravitypdf.com' );
+		} else {
+			$this->mpdf->SetCreator( $text );
+		}
+	}
 
-        $this->print = $print;
-    }
+	/**
+	 * Public Method to set how the PDF should be displyed when first open
+	 * @param Mixed  $mode A string or integer setting the zoom mode
+	 * @param String $layout The PDF layout format
+	 * @return void
+	 * @since 4.0
+	 */
+	public function set_display_mode( $mode = 'fullpage', $layout = 'continuous' ) {
 
-    /**
-     * Generic PDF JS Setter function
-     * @param String $js The PDF Javascript to execute
-     * @since 4.0
-     */
-    public function setJS($js) {
-        $this->mpdf->SetJS($js);
-    }
+		$valid_mode = array( 'fullpage', 'fullwidth', 'real', 'default' );
+		$valid_layout = array( 'single', 'continuous', 'two', 'twoleft', 'tworight', 'default' );
 
-    /**
-     * Get the current PDF Name
-     * @return String
-     * @since 4.0
-     */
-    public function getFilename() {
-        return $this->filename;
-    }
+		/* check the mode */
+		if ( ! in_array( strtolower( $mode ), $valid_mode ) ) {
+			/* determine if the mode is an integer */
+			if ( ! is_int( $mode ) || $mode <= 10 ) {
+				throw new Exception( sprintf( 'Mode must be an number value more than 10 or one of these types: %s', implode( ', ', $valid_mode ) ) );
+			}
+		}
 
-    /**
-     * Get the current Gravity Form Entry
-     * @return String
-     * @since 4.0
-     */
-    public function getEntry() {
-        return $this->entry;
-    }
+		/* check theh layout */
+		if ( ! in_array( strtolower( $mode ), $valid_mode ) ) {
+			throw new Exception( sprintf( 'Layout must be one of these types: %s', implode( ', ', $valid_mode ) ) );
+		}
 
-    /**
-     * Get the current PDF Settings
-     * @return String
-     * @since 4.0
-     */
-    public function getSettings() {
-        return $this->settings;
-    }
-    /**
-     * Generate the PDF filename used
-     * @return void
-     * @since 4.0
-     */
-    public function setFilename() {
-        /* Process mergetags */
-        $model = new Model_PDF();
-        $this->filename = $this->getExtension($model->get_pdf_name($this->settings, $this->entry), '.pdf');
-    }
+		$this->mpdf->SetDisplayMode( $mode, $layout );
+	}
 
-    /**
-     * Get the current PDF path
-     * @return String
-     * @since 4.0
-     */
-    public function getPath() {
-        return $this->path;
-    }
 
-    /**
-     * Sets the path the PDF should be saved to
-     * @param string $path
-     * @return void
-     * @since 4.0
-     */
-    public function setPath($path = '') {
-        global $gfpdf;
+	/**
+	 * Public Method to allow the print dialog to be display when PDF is opened
+	 * @param boolean $print
+	 * @return void
+	 * @since 4.0
+	 */
+	public function set_print_dialog( $print = true ) {
+		if ( ! is_bool( $print ) ) {
+			throw new Exception( 'Only boolean values true and false can been passed to setPrintDialog().' );
+		}
 
-        if(empty($path)) {
-            /* build our PDF path location */
-            $path = $gfpdf->data->template_tmp_location . '/' . $this->entry['form_id'] . $this->entry['id'] . '/';
-        } else {
-            /* ensure the path ends with a forward slash */
-            if(substr($path, -1) !== '/') {
-                $path .= '/';
-            }
-        }
+		$this->print = $print;
+	}
 
-        $this->path = $path;
-    }
+	/**
+	 * Generic PDF JS Setter function
+	 * @param String $js The PDF Javascript to execute
+	 * @since 4.0
+	 */
+	public function set_JS( $js ) {
+		$this->mpdf->SetJS( $js );
+	}
 
-    /**
-     * Initialise our mPDF object
-     * @return void
-     * @since 4.0
-     */
-    protected function beginPdf() {
-        $this->mpdf = new mPDF('', $this->paper_size, 0, '', 15, 15, 16, 16, 9, 9, $this->orientation);
-    }
+	/**
+	 * Get the current PDF Name
+	 * @return String
+	 * @since 4.0
+	 */
+	public function get_filename() {
+		return $this->filename;
+	}
 
-    /**
-     * Set up the paper size and orentation
-     * @return void
-     * @since 4.0
-     */
-    protected function setPaper() {
+	/**
+	 * Get the current Gravity Form Entry
+	 * @return String
+	 * @since 4.0
+	 */
+	public function get_entry() {
+		return $this->entry;
+	}
 
-        /* Get the paper size from the settings */
-        $paper_size = (isset($this->settings['pdf_size'])) ? strtoupper($this->settings['pdf_size']) : 'A4';
+	/**
+	 * Get the current PDF Settings
+	 * @return String
+	 * @since 4.0
+	 */
+	public function get_settings() {
+		return $this->settings;
+	}
+	/**
+	 * Generate the PDF filename used
+	 * @return void
+	 * @since 4.0
+	 */
+	public function set_filename() {
+		/* Process mergetags */
+		$model = new Model_PDF();
+		$this->filename = $this->get_extension( $model->get_pdf_name( $this->settings, $this->entry ), '.pdf' );
+	}
+
+	/**
+	 * Get the current PDF path
+	 * @return String
+	 * @since 4.0
+	 */
+	public function get_path() {
+		return $this->path;
+	}
+
+	/**
+	 * Sets the path the PDF should be saved to
+	 * @param string $path
+	 * @return void
+	 * @since 4.0
+	 */
+	public function set_path( $path = '' ) {
+		global $gfpdf;
+
+		if ( empty($path) ) {
+			/* build our PDF path location */
+			$path = $gfpdf->data->template_tmp_location . '/' . $this->entry['form_id'] . $this->entry['id'] . '/';
+		} else {
+			/* ensure the path ends with a forward slash */
+			if ( substr( $path, -1 ) !== '/' ) {
+				$path .= '/';
+			}
+		}
+
+		$this->path = $path;
+	}
+
+	/**
+	 * Initialise our mPDF object
+	 * @return void
+	 * @since 4.0
+	 */
+	protected function begin_pdf() {
+		$this->mpdf = new mPDF( '', $this->paper_size, 0, '', 15, 15, 16, 16, 9, 9, $this->orientation );
+	}
+
+	/**
+	 * Set up the paper size and orentation
+	 * @return void
+	 * @since 4.0
+	 */
+	protected function set_paper() {
+
+		/* Get the paper size from the settings */
+		$paper_size = (isset($this->settings['pdf_size'])) ? strtoupper( $this->settings['pdf_size'] ) : 'A4';
 
         $valid_paper_size = array(
             '4A0', '2A0',
@@ -409,223 +411,222 @@ class Helper_PDF {
             'LETTER', 'LEGAL', 'LEDGER', 'TABLOID', 'EXECUTIVE', 'FOILIO', 'B', 'A', 'DEMY', 'ROYAL', 'CUSTOM'
         );
 
-        if(! in_array($paper_size, $valid_paper_size)) {
-            throw new Exception(sprintf('Paper size not valid. Use %s', implode(', ', $valid)));
-            return;
-        }
-        
-        /* set our paper size and orientation based on user selection */
-        if($paper_size == 'CUSTOM') {
-            $this->setCustomPaperSize();
-            $this->setOrientation(true);
-        } else {
-            $this->setPaperSize($paper_size);
-            $this->setOrientation();
-        }
-    }
+		if ( ! in_array( $paper_size, $valid_paper_size ) ) {
+			throw new Exception( sprintf( 'Paper size not valid. Use %s', implode( ', ', $valid ) ) );
+			return;
+		}
 
-    /**
-     * Set our paper size using pre-defined values
-     * @return void
-     * @since 4.0
-     */
-    protected function setPaperSize($size) {
-        $this->paper_size = $size;
-    }
+		/* set our paper size and orientation based on user selection */
+		if ( $paper_size == 'CUSTOM' ) {
+			$this->set_custom_paper_size();
+			$this->set_orientation( true );
+		} else {
+			$this->set_paper_size( $paper_size );
+			$this->set_orientation();
+		}
+	}
 
-    /**
-     * Set our custom paper size which will be a 2-key array signifying the
-     * width and height of the paper stock
-     * @return void
-     * @since 4.0
-     */
-    protected function setCustomPaperSize() {
-        $custom_paper_size = (isset($this->settings['custom_paper_size'])) ? $this->settings['custom_paper_size'] : array();
+	/**
+	 * Set our paper size using pre-defined values
+	 * @return void
+	 * @since 4.0
+	 */
+	protected function set_paper_size( $size ) {
+		$this->paper_size = $size;
+	}
 
-        if(sizeof($custom_paper_size) !== 3) {
-            throw new Exception('Custom paper size not valid. Array should contain three keys: width, height and unit type');
-        }
+	/**
+	 * Set our custom paper size which will be a 2-key array signifying the
+	 * width and height of the paper stock
+	 * @return void
+	 * @since 4.0
+	 */
+	protected function set_custom_paper_size() {
+		$custom_paper_size = (isset($this->settings['custom_paper_size'])) ? $this->settings['custom_paper_size'] : array();
 
-        $this->paper_size = $this->getPaperSize($custom_paper_size);
-        
-    }
+		if ( sizeof( $custom_paper_size ) !== 3 ) {
+			throw new Exception( 'Custom paper size not valid. Array should contain three keys: width, height and unit type' );
+		}
 
-    /**
-     * Ensure the custom paper size has the correct values
-     * @param  Array $size
-     * @return Array
-     * @since  4.0
-     */
-    protected function getPaperSize($size) {
-        $size[0] = ($size[2] == 'inches') ? (int) $size[0] * 25.4 : (int) $size[0];
-        $size[1] = ($size[2] == 'inches') ? (int) $size[1] * 25.4 : (int) $size[1];
+		$this->paper_size = $this->get_paper_size( $custom_paper_size );
 
-        /* tidy up custom paper size array */
-        unset($size[2]);
+	}
 
-        return $size;
-    }
+	/**
+	 * Ensure the custom paper size has the correct values
+	 * @param  Array $size
+	 * @return Array
+	 * @since  4.0
+	 */
+	protected function get_paper_size( $size ) {
+		$size[0] = ($size[2] == 'inches') ? (int) $size[0] * 25.4 : (int) $size[0];
+		$size[1] = ($size[2] == 'inches') ? (int) $size[1] * 25.4 : (int) $size[1];
 
-    /**
-     * Set the page orientation based on the paper size selected
-     * @param Boolean $custom Whether a predefined paper size was used, or a custom size
-     * @return void
-     * @since 4.0
-     */
-    protected function setOrientation($custom = false) {
+		/* tidy up custom paper size array */
+		unset($size[2]);
 
-        $orientation = (isset($this->settings['orientation'])) ? strtolower($this->settings['orientation']) : 'portrait';
+		return $size;
+	}
 
-        if($custom) {
-            $this->orientation = ($orientation == 'landscape') ? 'L' : 'P';
-        } else {
-            $this->orientation = ($orientation == 'landscape') ? '-L' : '';
-        }
-    }
+	/**
+	 * Set the page orientation based on the paper size selected
+	 * @param Boolean $custom Whether a predefined paper size was used, or a custom size
+	 * @return void
+	 * @since 4.0
+	 */
+	protected function set_orientation( $custom = false ) {
 
-    /**
-     * Get the correct path to the PHP template we should load into mPDF
-     * @return void
-     * @since 4.0
-     */
-    protected function setTemplate() {
-        global $gfpdf;
+		$orientation = (isset($this->settings['orientation'])) ? strtolower( $this->settings['orientation'] ) : 'portrait';
 
-        $template = (isset($this->settings['template'])) ? $this->getExtension($this->settings['template']) : '';
+		if ( $custom ) {
+			$this->orientation = ($orientation == 'landscape') ? 'L' : 'P';
+		} else {
+			$this->orientation = ($orientation == 'landscape') ? '-L' : '';
+		}
+	}
 
-        /* Allow a user to change the current template if they have the appropriate capabilities */
-        if(rgget('template') && is_user_logged_in() && GFCommon::current_user_can_any( 'gravityforms_edit_settings' )) {
-            $template = $this->getExtension(rgget('template'));
-        }
+	/**
+	 * Get the correct path to the PHP template we should load into mPDF
+	 * @return void
+	 * @since 4.0
+	 */
+	protected function set_template() {
+		global $gfpdf;
 
-        /**
-         * Check for the template's existance
-         * We'll first look for a user-overridding template
-         * Then check our default templates
-         */
-        $default_template_path = PDF_PLUGIN_DIR . 'initialisation/templates/';
+		$template = (isset($this->settings['template'])) ? $this->getExtension( $this->settings['template'] ) : '';
 
-        if(is_file( $gfpdf->data->template_location . $template )) {
-            $this->template_path = $gfpdf->data->template_location . $template;
-        } else if( is_file( $default_template_path . $template)) {
-            $this->template_path = $default_template_path . $template;
-        } else {
-            throw new Exception('Could not find the template: ' . esc_html($template));
-        }
-    }
+		/* Allow a user to change the current template if they have the appropriate capabilities */
+		if ( rgget( 'template' ) && is_user_logged_in() && GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+			$template = $this->get_extension( rgget( 'template' ) );
+		}
 
+		/**
+		 * Check for the template's existance
+		 * We'll first look for a user-overridding template
+		 * Then check our default templates
+		 */
+		$default_template_path = PDF_PLUGIN_DIR . 'initialisation/templates/';
 
-    /**
-     * Ensure an extension is added to the end of the name
-     * @param  String $name The PHP template
-     * @return String
-     * @since  4.0
-     */
-    protected function getExtension($name, $extension = '.php') {
-        if(substr($name, -strlen($extension)) !== $extension) {
-            $name = $name . $extension;
-        }
-
-        return $name;
-    }
-
-    /**
-     * Load our PHP template file and return the buffered HTML
-     * @return String The buffered HTML to pass into mPDF
-     * @since 4.0
-     */
-    protected function loadHtml($args = array()) {
-        /* for backwards compatibility extract the $args variable */
-        extract($args, EXTR_SKIP); /* skip any arguments that would clash - i.e filename, args, output, path, this */
-
-        ob_start();
-        include $this->template_path;
-        return ob_get_clean();
-    }
+		if ( is_file( $gfpdf->data->template_location . $template ) ) {
+			$this->template_path = $gfpdf->data->template_location . $template;
+		} else if ( is_file( $default_template_path . $template ) ) {
+			$this->template_path = $default_template_path . $template;
+		} else {
+			throw new Exception( 'Could not find the template: ' . esc_html( $template ) );
+		}
+	}
 
 
-    /**
-     * Allow site admins to view the RAW HTML if needed
-     * @param  String $html
-     * @return void
-     * @since 4.0
-     */
-    protected function maybeDisplayRawHtml($html) {
-        if($this->output !== 'SAVE' && rgget('html') && GFCommon::current_user_can_any( 'gravityforms_edit_settings' )) {
-            echo $html;
-            exit;
-        }
-    }
+	/**
+	 * Ensure an extension is added to the end of the name
+	 * @param  String $name The PHP template
+	 * @return String
+	 * @since  4.0
+	 */
+	protected function get_extension( $name, $extension = '.php' ) {
+		if ( substr( $name, -strlen( $extension ) ) !== $extension ) {
+			$name = $name . $extension;
+		}
 
-    /**
-     * Prompt the print dialog box
-     * @return void
-     * @since 4.0
-     */
-    protected function showPrintDialog() {
-        if($this->print) {
-            $this->setJS('this.print();');
-        }
-    }
+		return $name;
+	}
 
-    /**
-     * Sets the image DPI in the PDF
-     * @return void
-     * @since 4.0
-     */
-    protected function setImageDpi() {
-        $dpi = (isset($this->settings['image_dpi'])) ? (int) $this->settings['image_dpi'] : 96;
+	/**
+	 * Load our PHP template file and return the buffered HTML
+	 * @return String The buffered HTML to pass into mPDF
+	 * @since 4.0
+	 */
+	protected function load_html( $args = array() ) {
+		/* for backwards compatibility extract the $args variable */
+		extract( $args, EXTR_SKIP ); /* skip any arguments that would clash - i.e filename, args, output, path, this */
 
-        $this->mpdf->img_dpi = $dpi;
-    }
+		ob_start();
+		include $this->template_path;
+		return ob_get_clean();
+	}
 
-    /**
-     * Sets the text direction in the PDF (RTL support)
-     * @return void
-     * @since 4.0
-     */
-    protected function setTextDirection() {
-        $rtl = (isset($this->settings['rtl'])) ? $this->settings['rtl'] : 'No';
 
-        if(strtolower($rtl) == 'yes') {
-            $this->mpdf->SetDirectionality('rtl');
-        }
-    }
+	/**
+	 * Allow site admins to view the RAW HTML if needed
+	 * @param  String $html
+	 * @return void
+	 * @since 4.0
+	 */
+	protected function maybe_display_raw_html( $html ) {
+		if ( $this->output !== 'SAVE' && rgget( 'html' ) && GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+			echo $html;
+			exit;
+		}
+	}
 
-    /**
-     * Set the correct PDF Format
-     * Normal, PDF/A-1b or PDF/X-1a
-     * @return void
-     * @since 4.0
-     */
-    protected function setPdfFormat() {
-        switch(strtolower($this->settings['format'])) {
-            case 'pdfa1b':
-                $this->mpdf->PDFA     = true;
-                $this->mpdf->PDFAauto = true;
-            break;
+	/**
+	 * Prompt the print dialog box
+	 * @return void
+	 * @since 4.0
+	 */
+	protected function show_print_dialog() {
+		if ( $this->print ) {
+			$this->setJS( 'this.print();' );
+		}
+	}
 
-            case 'pdfx1a':
-                $this->mpdf->PDFX     = true;
-                $this->mpdf->PDFXauto = true;
-            break;
-        }
-    }
+	/**
+	 * Sets the image DPI in the PDF
+	 * @return void
+	 * @since 4.0
+	 */
+	protected function set_image_dpi() {
+		$dpi = (isset($this->settings['image_dpi'])) ? (int) $this->settings['image_dpi'] : 96;
 
-    /**
-     * Add PDF Security, if able
-     * @return void
-     * @since 4.0
-     */
-    protected function setPdfSecurity() {
-        /* Security settings cannot be applied to pdfa1b or pdfx1a formats */
-        if(strtolower($this->settings['format']) == 'normal' && strtolower($this->settings['security'] == 'Yes')) {
+		$this->mpdf->img_dpi = $dpi;
+	}
 
-            $password = (isset($this->settings['password'])) ? $this->settings['password'] : '';
-            $privileges = (isset($this->settings['privileges'])) ? $this->settings['privileges'] : array();
+	/**
+	 * Sets the text direction in the PDF (RTL support)
+	 * @return void
+	 * @since 4.0
+	 */
+	protected function set_text_direction() {
+		$rtl = (isset($this->settings['rtl'])) ? $this->settings['rtl'] : 'No';
 
-            $this->mpdf->SetProtection($privileges, $password, '', 128);
-        }
-    }
+		if ( strtolower( $rtl ) == 'yes' ) {
+			$this->mpdf->SetDirectionality( 'rtl' );
+		}
+	}
 
+	/**
+	 * Set the correct PDF Format
+	 * Normal, PDF/A-1b or PDF/X-1a
+	 * @return void
+	 * @since 4.0
+	 */
+	protected function set_pdf_format() {
+		switch ( strtolower( $this->settings['format'] ) ) {
+			case 'pdfa1b':
+				$this->mpdf->PDFA     = true;
+				$this->mpdf->PDFAauto = true;
+			break;
+
+			case 'pdfx1a':
+				$this->mpdf->PDFX     = true;
+				$this->mpdf->PDFXauto = true;
+			break;
+		}
+	}
+
+	/**
+	 * Add PDF Security, if able
+	 * @return void
+	 * @since 4.0
+	 */
+	protected function set_pdf_security() {
+		/* Security settings cannot be applied to pdfa1b or pdfx1a formats */
+		if ( strtolower( $this->settings['format'] ) == 'normal' && strtolower( $this->settings['security'] == 'Yes' ) ) {
+
+			$password = (isset($this->settings['password'])) ? $this->settings['password'] : '';
+			$privileges = (isset($this->settings['privileges'])) ? $this->settings['privileges'] : array();
+
+			$this->mpdf->SetProtection( $privileges, $password, '', 128 );
+		}
+	}
 }

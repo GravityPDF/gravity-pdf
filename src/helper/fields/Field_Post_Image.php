@@ -19,8 +19,8 @@ use Exception;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -51,83 +51,83 @@ if (! defined('ABSPATH')) {
 class Field_Post_Image extends Helper_Fields
 {
 
-    /**
-     * Check the appropriate variables are parsed in send to the parent construct
-     * @param Object $field The GF_Field_* Object
-     * @param Array $entry The Gravity Forms Entry
-     * @since 4.0
-     */
-    public function __construct($field, $entry) {
-        if(!is_object($field) || !$field instanceof GF_Field_Post_Image) {
-            throw new Exception('$field needs to be in instance of GF_Field_Post_Image');
-        }
+	/**
+	 * Check the appropriate variables are parsed in send to the parent construct
+	 * @param Object $field The GF_Field_* Object
+	 * @param Array  $entry The Gravity Forms Entry
+	 * @since 4.0
+	 */
+	public function __construct( $field, $entry ) {
+		if ( ! is_object( $field ) || ! $field instanceof GF_Field_Post_Image ) {
+			throw new Exception( '$field needs to be in instance of GF_Field_Post_Image' );
+		}
 
-        /* call our parent method */
-        parent::__construct($field, $entry);
-    }
+		/* call our parent method */
+		parent::__construct( $field, $entry );
+	}
 
-    /**
-     * Display the HTML version of this field
-     * @return String
-     * @since 4.0
-     */
-    public function html($value = '', $label = true) {
-        $value = $this->value();
+	/**
+	 * Display the HTML version of this field
+	 * @return String
+	 * @since 4.0
+	 */
+	public function html( $value = '', $label = true ) {
+		$value = $this->value();
 
-        /* Start building image link */
-        $html = '<a href="'. esc_url($value['url']) . '" target="_blank">';
-        $html .= '<img width="150" src="' . esc_url($value['url']) . '" />';
+		/* Start building image link */
+		$html = '<a href="'. esc_url( $value['url'] ) . '" target="_blank">';
+		$html .= '<img width="150" src="' . esc_url( $value['url'] ) . '" />';
 
-        /* Include title / caption / description if needed */
-        if(!empty($value['title'])) {
-            $html .= '<div class="gfpdf-post-image-title">' . esc_html($value['title']) . '</div>';
-        }
+		/* Include title / caption / description if needed */
+		if ( ! empty($value['title']) ) {
+			$html .= '<div class="gfpdf-post-image-title">' . esc_html( $value['title'] ) . '</div>';
+		}
 
-        if(!empty($value['caption'])) {
-            $html .= '<div class="gfpdf-post-image-caption">' . esc_html($value['caption']) . '</div>';
-        }
+		if ( ! empty($value['caption']) ) {
+			$html .= '<div class="gfpdf-post-image-caption">' . esc_html( $value['caption'] ) . '</div>';
+		}
 
-        if(!empty($value['description'])) {
-            $html .= '<div class="gfpdf-post-image-description">' . esc_html($value['description']) . '</div>';
-        }
+		if ( ! empty($value['description']) ) {
+			$html .= '<div class="gfpdf-post-image-description">' . esc_html( $value['description'] ) . '</div>';
+		}
 
-        $html .= '</a>';
+		$html .= '</a>';
 
-        return parent::html($html);
-    }
+		return parent::html( $html );
+	}
 
-    /**
-     * Get the standard GF value of this field
-     * @return String/Array
-     * @since 4.0
-     */
-    public function value() {
-        global $gfpdf;
-        
-        if($this->has_cache()) {
-            return $this->cache();
-        }
+	/**
+	 * Get the standard GF value of this field
+	 * @return String/Array
+	 * @since 4.0
+	 */
+	public function value() {
+		global $gfpdf;
 
-        $value = $this->get_value();
-        $img   = array();
+		if ( $this->has_cache() ) {
+			return $this->cache();
+		}
 
-        if(strlen($value) > 0) {
-            $value = explode('|:|', $this->get_value());
-            
-            $img['url']         = (isset($value[0])) ? $value[0] : '';
-            $img['path']        = (isset($value[0])) ? $value[0] : '';
-            $img['title']       = (isset($value[1])) ? $value[1] : '';
-            $img['caption']     = (isset($value[2])) ? $value[2] : '';
-            $img['description'] = (isset($value[3])) ? $value[3] : '';
-            
-            $path               = (isset($value[0])) ? $gfpdf->misc->convert_url_to_path($value[0]) : '';
-            if($path != $img['url']) {
-                $img['path'] = $path;
-            }
-        }
-        
-        $this->cache($img);
-        
-        return $this->cache();
-    }
+		$value = $this->get_value();
+		$img   = array();
+
+		if ( strlen( $value ) > 0 ) {
+			$value = explode( '|:|', $this->get_value() );
+
+			$img['url']         = (isset($value[0])) ? $value[0] : '';
+			$img['path']        = (isset($value[0])) ? $value[0] : '';
+			$img['title']       = (isset($value[1])) ? $value[1] : '';
+			$img['caption']     = (isset($value[2])) ? $value[2] : '';
+			$img['description'] = (isset($value[3])) ? $value[3] : '';
+
+			$path               = (isset($value[0])) ? $gfpdf->misc->convert_url_to_path( $value[0] ) : '';
+			if ( $path != $img['url'] ) {
+				$img['path'] = $path;
+			}
+		}
+
+		$this->cache( $img );
+
+		return $this->cache();
+	}
 }

@@ -14,8 +14,8 @@ use GFPDF\Helper\Helper_View;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -44,42 +44,42 @@ if (! defined('ABSPATH')) {
  */
 class View_Shortcodes extends Helper_View
 {
-    /**
-     * Set the view's name
-     * @var string
-     * @since 4.0
-     */
-    protected $ViewType = 'Shortcodes';
+	/**
+	 * Set the view's name
+	 * @var string
+	 * @since 4.0
+	 */
+	protected $ViewType = 'Shortcodes';
 
 
-    public function __construct($data = array()) {
-        $this->data = $data;
-    }
+	public function __construct( $data = array() ) {
+		$this->data = $data;
+	}
 
-    /**
-     * Shortcode Error: Entry ID not passed through the shortcode - directly or through the URL.
-     * @return String The error message
-     * @since 4.0
-     */
-    public function no_entry_id() {
-        return $this->load('no_entry_id', array(), false);
-    }
+	/**
+	 * Shortcode Error: Entry ID not passed through the shortcode - directly or through the URL.
+	 * @return String The error message
+	 * @since 4.0
+	 */
+	public function no_entry_id() {
+		return $this->load( 'no_entry_id', array(), false );
+	}
 
-    /**
-     * Shortcode Error: Entry ID, Form ID or PDF ID mismatch. Cannot get PDF configuration.
-     * @return String The error message
-     * @since 4.0
-     */
-    public function invalid_pdf_config() {
-        return $this->load('invalid_pdf_config', array(), false);
-    }
+	/**
+	 * Shortcode Error: Entry ID, Form ID or PDF ID mismatch. Cannot get PDF configuration.
+	 * @return String The error message
+	 * @since 4.0
+	 */
+	public function invalid_pdf_config() {
+		return $this->load( 'invalid_pdf_config', array(), false );
+	}
 
-    /**
-     * Generate the Gravity PDF link
-     * @param  Array $attr The parameters
-     * @return String       The Shortcode Markup
-     */
-    public function display_gravitypdf_shortcode($attr) {
-        return $this->load('gravitypdf', $attr, false);
-    }
+	/**
+	 * Generate the Gravity PDF link
+	 * @param  Array $attr The parameters
+	 * @return String       The Shortcode Markup
+	 */
+	public function display_gravitypdf_shortcode( $attr ) {
+		return $this->load( 'gravitypdf', $attr, false );
+	}
 }

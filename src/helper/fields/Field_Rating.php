@@ -18,8 +18,8 @@ use Exception;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -50,63 +50,61 @@ if (! defined('ABSPATH')) {
 class Field_Rating extends Helper_Fields
 {
 
-    /**
-     * Return the HTML form data
-     * @return Array
-     * @since 4.0
-     */
-    public function form_data() {
+	/**
+	 * Return the HTML form data
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function form_data() {
 
-        $data = array();
-        $value = $this->value();
+		$data = array();
+		$value = $this->value();
 
-        $data['survey']['rating'][ $this->field->id ] = $value;
+		$data['survey']['rating'][ $this->field->id ] = $value;
 
-        return $data;
-    }
+		return $data;
+	}
 
-    /**
-     * Display the HTML version of this field
-     * @return String
-     * @since 4.0
-     */
-    public function html($value = '', $label = true) {
-        $value = apply_filters('gform_entry_field_value', $this->get_value(), $this->field, $this->entry, $this->form);
+	/**
+	 * Display the HTML version of this field
+	 * @return String
+	 * @since 4.0
+	 */
+	public function html( $value = '', $label = true ) {
+		$value = apply_filters( 'gform_entry_field_value', $this->get_value(), $this->field, $this->entry, $this->form );
 
-        return parent::html($value);
-    }
+		return parent::html( $value );
+	}
 
-    /**
-     * Get the standard GF value of this field
-     * @return String/Array
-     * @since 4.0
-     */
-    public function value() {
-        if($this->has_cache()) {
-            return $this->cache();
-        }
+	/**
+	 * Get the standard GF value of this field
+	 * @return String/Array
+	 * @since 4.0
+	 */
+	public function value() {
+		if ( $this->has_cache() ) {
+			return $this->cache();
+		}
 
-        /* Process field */
-        $items = explode(',', $this->get_value());
+		/* Process field */
+		$items = explode( ',', $this->get_value() );
 
-        $value  = array();
+		$value  = array();
 
-        /* Loop through each of the user-selected items */
-        foreach($items as $rating) {
+		/* Loop through each of the user-selected items */
+		foreach ( $items as $rating ) {
 
-            /* Loop through the total choices */
-            foreach($this->field->choices as $choice)
-            {
-                if(trim($choice['value']) == trim($rating))
-                {
-                    $value[] = $choice['text'];
-                    break; /* exit inner loop as soon as found */
-                }
-            }
-        }
+			/* Loop through the total choices */
+			foreach ( $this->field->choices as $choice ) {
+				if ( trim( $choice['value'] ) == trim( $rating ) ) {
+					$value[] = $choice['text'];
+					break; /* exit inner loop as soon as found */
+				}
+			}
+		}
 
-        $this->cache($value); /* for backwards compatbility we'll wrap it in an array */
-        
-        return $this->cache();
-    }
+		$this->cache( $value ); /* for backwards compatbility we'll wrap it in an array */
+
+		return $this->cache();
+	}
 }

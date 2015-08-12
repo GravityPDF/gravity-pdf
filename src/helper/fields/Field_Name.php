@@ -20,8 +20,8 @@ use Exception;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -52,59 +52,59 @@ if (! defined('ABSPATH')) {
 class Field_Name extends Helper_Fields
 {
 
-    /**
-     * Check the appropriate variables are parsed in send to the parent construct
-     * @param Object $field The GF_Field_* Object
-     * @param Array $entry The Gravity Forms Entry
-     * @since 4.0
-     */
-    public function __construct($field, $entry) {
-        if(!is_object($field) || !($field instanceof GF_Field_Name)) {
-            throw new Exception('$field needs to be in instance of GF_Field_Name');
-        }
+	/**
+	 * Check the appropriate variables are parsed in send to the parent construct
+	 * @param Object $field The GF_Field_* Object
+	 * @param Array  $entry The Gravity Forms Entry
+	 * @since 4.0
+	 */
+	public function __construct( $field, $entry ) {
+		if ( ! is_object( $field ) || ! ($field instanceof GF_Field_Name) ) {
+			throw new Exception( '$field needs to be in instance of GF_Field_Name' );
+		}
 
-        /* call our parent method */
-        parent::__construct($field, $entry);
-    }
+		/* call our parent method */
+		parent::__construct( $field, $entry );
+	}
 
-    /**
-     * Display the HTML version of this field
-     * @return String
-     * @since 4.0
-     */
-    public function html($value = '', $label = true) {
-        $data  = array_filter($this->value()); /* remove any empty fields from the array */
-        
-        $value = esc_html(implode(' ', $data));
+	/**
+	 * Display the HTML version of this field
+	 * @return String
+	 * @since 4.0
+	 */
+	public function html( $value = '', $label = true ) {
+		$data  = array_filter( $this->value() ); /* remove any empty fields from the array */
 
-        return parent::html($value);
-    }
+		$value = esc_html( implode( ' ', $data ) );
 
-    /**
-     * Get the standard GF value of this field
-     * @return Array
-     * @since 4.0
-     */
-    public function value() {
-        if($this->has_cache()) {
-            return $this->cache();
-        }
+		return parent::html( $value );
+	}
 
-        $value = $this->get_value();
+	/**
+	 * Get the standard GF value of this field
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function value() {
+		if ( $this->has_cache() ) {
+			return $this->cache();
+		}
 
-        /* check if the returned results are an array */
-        if(! is_array($value)) {
-            $value[$this->field->id . '.3'] = $value; /* set to the first name */
-        }
+		$value = $this->get_value();
 
-        $this->cache(array(
-            'prefix' => rgget($this->field->id . '.2', $value),
-            'first'  => rgget($this->field->id . '.3', $value),
-            'middle' => rgget($this->field->id . '.4', $value),
-            'last'   => rgget($this->field->id . '.6', $value),
-            'suffix' => rgget($this->field->id . '.8', $value),
-        ));
+		/* check if the returned results are an array */
+		if ( ! is_array( $value ) ) {
+			$value[$this->field->id . '.3'] = $value; /* set to the first name */
+		}
 
-        return $this->cache();
-    }
+		$this->cache(array(
+			'prefix' => rgget( $this->field->id . '.2', $value ),
+			'first'  => rgget( $this->field->id . '.3', $value ),
+			'middle' => rgget( $this->field->id . '.4', $value ),
+			'last'   => rgget( $this->field->id . '.6', $value ),
+			'suffix' => rgget( $this->field->id . '.8', $value ),
+		));
+
+		return $this->cache();
+	}
 }

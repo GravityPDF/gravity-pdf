@@ -20,8 +20,8 @@ use Exception;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -52,99 +52,99 @@ if (! defined('ABSPATH')) {
 class Field_Address extends Helper_Fields
 {
 
-    /**
-     * Check the appropriate variables are parsed in send to the parent construct
-     * @param Object $field The GF_Field_* Object
-     * @param Array $entry The Gravity Forms Entry
-     * @since 4.0
-     */
-    public function __construct($field, $entry) {
-        if(!is_object($field) || !($field instanceof GF_Field_Address)) {
-            throw new Exception('$field needs to be in instance of GF_Field_Address');
-        }
+	/**
+	 * Check the appropriate variables are parsed in send to the parent construct
+	 * @param Object $field The GF_Field_* Object
+	 * @param Array  $entry The Gravity Forms Entry
+	 * @since 4.0
+	 */
+	public function __construct( $field, $entry ) {
+		if ( ! is_object( $field ) || ! $field instanceof GF_Field_Address ) {
+			throw new Exception( '$field needs to be in instance of GF_Field_Address' );
+		}
 
-        /* call our parent method */
-        parent::__construct($field, $entry);
-    }
+		/* call our parent method */
+		parent::__construct( $field, $entry );
+	}
 
-    /**
-     * Display the HTML version of this field
-     * @return String
-     * @since 4.0
-     */
-    public function html($value = '', $label = true) {
-        $data    = $this->value(); /* remove any empty fields from the array */
-        $address = array();
+	/**
+	 * Display the HTML version of this field
+	 * @return String
+	 * @since 4.0
+	 */
+	public function html( $value = '', $label = true ) {
+		$data    = $this->value(); /* remove any empty fields from the array */
+		$address = array();
 
-        /* check if we should display the zip before the city */
-        $address_display_format = apply_filters('gform_address_display_format', 'default');
+		/* check if we should display the zip before the city */
+		$address_display_format = apply_filters( 'gform_address_display_format', 'default' );
 
-        /* Start putting our address together */
-        $address[] = $data['street'];
+		/* Start putting our address together */
+		$address[] = $data['street'];
 
-        if(!empty($data['street2'])) {
-            $address[] = $data['street2'];
-        }
+		if ( ! empty($data['street2']) ) {
+			$address[] = $data['street2'];
+		}
 
-        /* display in the standard "city, state zip" format */
-        if($address_display_format != 'zip_before_city') {
-            $zip_string = $data['city'];
-            $zip_string .= (!empty($zip_string) && !empty($data['state'])) ? ", {$data['state']}" : trim($data['state']);
-            $zip_string .= " {$data['zip']}";
+		/* display in the standard "city, state zip" format */
+		if ( $address_display_format != 'zip_before_city' ) {
+			$zip_string = $data['city'];
+			$zip_string .= ( ! empty($zip_string) && ! empty($data['state'])) ? ", {$data['state']}" : trim( $data['state'] );
+			$zip_string .= " {$data['zip']}";
 
-            if(!empty($zip_string)) {
-                $address[] = trim($zip_string);
-            }
-        } else { /* display in the "zip, city state" format */
-            $zip_string = trim($data['zip'] . ' ' . $data['city']);
-            $zip_string .= (!empty($zip_string) && !empty($data['state'])) ? ", {$data['state']}" : trim($data['state']);
+			if ( ! empty($zip_string) ) {
+				$address[] = trim( $zip_string );
+			}
+		} else { /* display in the "zip, city state" format */
+			$zip_string = trim( $data['zip'] . ' ' . $data['city'] );
+			$zip_string .= ( ! empty($zip_string) && ! empty($data['state'])) ? ", {$data['state']}" : trim( $data['state'] );
 
-            if(!empty($zip_string)) {
-                $address[] = trim($zip_string);
-            }
-        }
+			if ( ! empty($zip_string) ) {
+				$address[] = trim( $zip_string );
+			}
+		}
 
-        /* add country to address, if present */
-        if(!empty($data['country'])) {
-            $address[] = $data['country'];
-        }
+		/* add country to address, if present */
+		if ( ! empty($data['country']) ) {
+			$address[] = $data['country'];
+		}
 
-        /* Apply sanitization to address */
-        $address = array_map( 'esc_html', $address);
+		/* Apply sanitization to address */
+		$address = array_map( 'esc_html', $address );
 
-        /* display the address in the correct format */
-        $html = implode('<br />', $address);
+		/* display the address in the correct format */
+		$html = implode( '<br />', $address );
 
-        /* return the results */
-        return parent::html($html);
-    }
+		/* return the results */
+		return parent::html( $html );
+	}
 
-    /**
-     * Get the standard GF value of this field
-     * @return Array
-     * @since 4.0
-     */
-    public function value() {
-        if($this->has_cache()) {
-            return $this->cache();
-        }
+	/**
+	 * Get the standard GF value of this field
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function value() {
+		if ( $this->has_cache() ) {
+			return $this->cache();
+		}
 
-        $value = $this->get_value();
+		$value = $this->get_value();
 
-        /* check if the returned results are an array */
-        if(! is_array($value)) {
-            $value[$this->field->id . '.1'] = $value; /* set to the street value */
-        }
+		/* check if the returned results are an array */
+		if ( ! is_array( $value ) ) {
+			$value[$this->field->id . '.1'] = $value; /* set to the street value */
+		}
 
-        $this->cache(array(
-            'street'  => trim(rgget($this->field->id . '.1', $value)),
-            'street2' => trim(rgget($this->field->id . '.2', $value)),
-            'city'    => trim(rgget($this->field->id . '.3', $value)),
-            'state'   => trim(rgget($this->field->id . '.4', $value)),
-            'zip'     => trim(rgget($this->field->id . '.5', $value)),
-            'country' => trim(rgget($this->field->id . '.6', $value)),
-        ));
+		$this->cache(array(
+			'street'  => trim( rgget( $this->field->id . '.1', $value ) ),
+			'street2' => trim( rgget( $this->field->id . '.2', $value ) ),
+			'city'    => trim( rgget( $this->field->id . '.3', $value ) ),
+			'state'   => trim( rgget( $this->field->id . '.4', $value ) ),
+			'zip'     => trim( rgget( $this->field->id . '.5', $value ) ),
+			'country' => trim( rgget( $this->field->id . '.6', $value ) ),
+		));
 
-        return $this->cache();
-    }
+		return $this->cache();
+	}
 }

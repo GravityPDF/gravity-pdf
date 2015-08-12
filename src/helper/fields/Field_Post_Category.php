@@ -19,8 +19,8 @@ use Exception;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -51,152 +51,152 @@ if (! defined('ABSPATH')) {
 class Field_Post_Category extends Helper_Fields
 {
 
-    /**
-     * Check the appropriate variables are parsed in send to the parent construct
-     * @param Object $field The GF_Field_* Object
-     * @param Array $entry The Gravity Forms Entry
-     * @since 4.0
-     */
-    public function __construct($field, $entry) {
-        global $gfpdf;
+	/**
+	 * Check the appropriate variables are parsed in send to the parent construct
+	 * @param Object $field The GF_Field_* Object
+	 * @param Array  $entry The Gravity Forms Entry
+	 * @since 4.0
+	 */
+	public function __construct( $field, $entry ) {
+		global $gfpdf;
 
-        /* call our parent method */
-        parent::__construct($field, $entry);
+		/* call our parent method */
+		parent::__construct( $field, $entry );
 
-        /*
+		/*
          * Category can be multiple field types
          * eg. Select, MultiSelect, Radio, Dropdown
          */
-        $class = $gfpdf->misc->get_field_class($field->inputType);
-       
-        try {
-            /* check load our class */
-            if(class_exists($class)) {
-                $this->fieldObject = new $class($field, $entry);
-            } else {
-                throw new Exception('Class not found');
-            }
-        } catch(Exception $e) {
-            /* Exception thrown. Load generic field loader */
-            $this->fieldObject = new Field_Default($field, $entry);
-        }
+		$class = $gfpdf->misc->get_field_class( $field->inputType );
 
-        /* force the fieldObject value cache */
-        $this->value();
-    }
+		try {
+			/* check load our class */
+			if ( class_exists( $class ) ) {
+				$this->fieldObject = new $class($field, $entry);
+			} else {
+				throw new Exception( 'Class not found' );
+			}
+		} catch (Exception $e) {
+			/* Exception thrown. Load generic field loader */
+			$this->fieldObject = new Field_Default( $field, $entry );
+		}
 
-    /**
-     * Used to check if the current field has a value
-     * @since 4.0
-     * @internal Child classes can override this method when dealing with a specific use case
-     */
-    public function is_empty() {
-        return $this->fieldObject->is_empty();
-    }
+		/* force the fieldObject value cache */
+		$this->value();
+	}
 
-    /**
-     * Return the HTML form data
-     * @return Array
-     * @since 4.0
-     */
-    public function form_data() {
+	/**
+	 * Used to check if the current field has a value
+	 * @since 4.0
+	 * @internal Child classes can override this method when dealing with a specific use case
+	 */
+	public function is_empty() {
+		return $this->fieldObject->is_empty();
+	}
 
-        $field_value = $this->value();
-        $label = GFFormsModel::get_label($this->field);
-        $data  = array();
-        $value = array(
-            'value' => '',
-            'label' => '',
-        );
+	/**
+	 * Return the HTML form data
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function form_data() {
 
-        /* If Radio of Select boxes */
-        if( ! isset( $field_value[0] ) ) {
+		$field_value = $this->value();
+		$label = GFFormsModel::get_label( $this->field );
+		$data  = array();
+		$value = array(
+			'value' => '',
+			'label' => '',
+		);
 
-            /* Set up our basic values */
-            $value['value'] = $field_value['value'];
-            $value['label'] = $field_value['label'];
+		/* If Radio of Select boxes */
+		if ( ! isset( $field_value[0] ) ) {
 
-        } else { /* If Checkboxes or Multiselects */
+			/* Set up our basic values */
+			$value['value'] = $field_value['value'];
+			$value['label'] = $field_value['label'];
 
-            /* Loop through the results and store in array */
-            foreach($field_value as $item) {
-                $value['value'][] = $item['value'];
-                $value['label'][] = $item['label'];
-            }
-        }
-        
-        $data['field'][ $this->field->id . '.' . $label ]           = $value['value'];
-        $data['field'][ $this->field->id ]                          = $value['value'];
-        $data['field'][ $label ]                                    = $value['value'];
-        
-        /* Name Format */
-        $data['field'][ $this->field->id . '.' . $label . '_name' ] = $value['label'];
-        $data['field'][ $this->field->id . '_name' ]                = $value['label'];
-        $data['field'][ $label . '_name' ]                          = $value['label'];
+		} else { /* If Checkboxes or Multiselects */
 
-        return $data;
-    }
+			/* Loop through the results and store in array */
+			foreach ( $field_value as $item ) {
+				$value['value'][] = $item['value'];
+				$value['label'][] = $item['label'];
+			}
+		}
 
-    /**
-     * Display the HTML version of this field
-     * @return String
-     * @since 4.0
-     */
-    public function html($value = '', $label = true) {
-        echo $this->fieldObject->html();
-    }
+		$data['field'][ $this->field->id . '.' . $label ]           = $value['value'];
+		$data['field'][ $this->field->id ]                          = $value['value'];
+		$data['field'][ $label ]                                    = $value['value'];
 
-    /**
-     * Get the standard GF value of this field
-     * @return String/Array
-     * @since 4.0
-     */
-    public function value() {
-        if($this->fieldObject->has_cache()) {
-            return $this->fieldObject->cache();
-        }
+		/* Name Format */
+		$data['field'][ $this->field->id . '.' . $label . '_name' ] = $value['label'];
+		$data['field'][ $this->field->id . '_name' ]                = $value['label'];
+		$data['field'][ $label . '_name' ]                          = $value['label'];
 
-        /* get the value from the correct field object */
-        $items = $this->fieldObject->value();
+		return $data;
+	}
 
-        /**
-         * Standardise the $items format
-         * The Radio / Select box will return a single-dimensional array,
-         * while checkbox and multiselect will not.
-         */
-        $single_dimension = false;
-        if(!isset($items[0])) { /* convert single-dimensional array to multi-dimensional */
-            $items = array($items);
-            $single_dimension = true;
-        }
+	/**
+	 * Display the HTML version of this field
+	 * @return String
+	 * @since 4.0
+	 */
+	public function html( $value = '', $label = true ) {
+		echo $this->fieldObject->html();
+	}
 
-        /* Loop through standardised array and convert the label / value to their appropriate category */
-        foreach($items as &$val) {
+	/**
+	 * Get the standard GF value of this field
+	 * @return String/Array
+	 * @since 4.0
+	 */
+	public function value() {
+		if ( $this->fieldObject->has_cache() ) {
+			return $this->fieldObject->cache();
+		}
 
-            /* Process the category label */
-            if(isset($val['label'])) {
-                $label        = GFCommon::prepare_post_category_value($val['label'], $this->field);
-                $val['label'] = (is_array($label) && isset($label[0])) ? $label[0] : $label;
-            }
+		/* get the value from the correct field object */
+		$items = $this->fieldObject->value();
 
-            /* process the category value */
-            if(isset($val['value'])) {
-                $id           = GFCommon::prepare_post_category_value($val['value'], $this->field, 'conditional_logic');
-                $val['value'] = (is_array($id) && isset($id[0])) ? $id[0] : $id;
-            }
-        }
+		/**
+		 * Standardise the $items format
+		 * The Radio / Select box will return a single-dimensional array,
+		 * while checkbox and multiselect will not.
+		 */
+		$single_dimension = false;
+		if ( ! isset($items[0]) ) { /* convert single-dimensional array to multi-dimensional */
+			$items = array( $items );
+			$single_dimension = true;
+		}
 
-        /**
-         * Return in the appropriate format.
-         * Select / Radio Buttons will not have a multidimensional array
-         */
-        if($single_dimension) {
-            $items = $items[0];
-        }
+		/* Loop through standardised array and convert the label / value to their appropriate category */
+		foreach ( $items as &$val ) {
 
-        /* force the fieldObject cache to be set so it doesn't run their 'value' method directly */
-        $this->fieldObject->cache($items);
-        
-        return $this->fieldObject->cache();
-    }
+			/* Process the category label */
+			if ( isset($val['label']) ) {
+				$label        = GFCommon::prepare_post_category_value( $val['label'], $this->field );
+				$val['label'] = (is_array( $label ) && isset($label[0])) ? $label[0] : $label;
+			}
+
+			/* process the category value */
+			if ( isset($val['value']) ) {
+				$id           = GFCommon::prepare_post_category_value( $val['value'], $this->field, 'conditional_logic' );
+				$val['value'] = (is_array( $id ) && isset($id[0])) ? $id[0] : $id;
+			}
+		}
+
+		/**
+		 * Return in the appropriate format.
+		 * Select / Radio Buttons will not have a multidimensional array
+		 */
+		if ( $single_dimension ) {
+			$items = $items[0];
+		}
+
+		/* force the fieldObject cache to be set so it doesn't run their 'value' method directly */
+		$this->fieldObject->cache( $items );
+
+		return $this->fieldObject->cache();
+	}
 }

@@ -20,8 +20,8 @@ use Exception;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -52,111 +52,111 @@ if (! defined('ABSPATH')) {
 class Field_Checkbox extends Helper_Fields
 {
 
-    /**
-     * Check the appropriate variables are parsed in send to the parent construct
-     * @param Object $field The GF_Field_* Object
-     * @param Array $entry The Gravity Forms Entry
-     * @since 4.0
-     */
-    public function __construct($field, $entry) {
-        if(!is_object($field) || !$field instanceof GF_Field_Checkbox) {
-            throw new Exception('$field needs to be in instance of GF_Field_Checkbox');
-        }
+	/**
+	 * Check the appropriate variables are parsed in send to the parent construct
+	 * @param Object $field The GF_Field_* Object
+	 * @param Array  $entry The Gravity Forms Entry
+	 * @since 4.0
+	 */
+	public function __construct( $field, $entry ) {
+		if ( ! is_object( $field ) || ! $field instanceof GF_Field_Checkbox ) {
+			throw new Exception( '$field needs to be in instance of GF_Field_Checkbox' );
+		}
 
-        /* call our parent method */
-        parent::__construct($field, $entry);
-    }
+		/* call our parent method */
+		parent::__construct( $field, $entry );
+	}
 
-    /**
-     * Return the HTML form data
-     * @return Array
-     * @since 4.0
-     */
-    public function form_data() {
+	/**
+	 * Return the HTML form data
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function form_data() {
 
-        $value = $this->value();
-        $label = GFFormsModel::get_label($this->field);
-        $data  = array();
+		$value = $this->value();
+		$label = GFFormsModel::get_label( $this->field );
+		$data  = array();
 
-        foreach($value as $item) {
-        
-            /* Standadised Format */
-            $data['field'][ $this->field->id . '.' . $label ][]           = $item['value'];
-            $data['field'][ $this->field->id ][]                          = $item['value'];
-            $data['field'][ $label ][]                                    = $item['value'];
-            
-            /* Name Format */
-            $data['field'][ $this->field->id . '.' . $label . '_name' ][] = $item['label'];
-            $data['field'][ $this->field->id . '_name' ][]                = $item['label'];
-            $data['field'][ $label . '_name' ][]                          = $item['label'];
-        }
+		foreach ( $value as $item ) {
 
-        return $data;
-    }
+			/* Standadised Format */
+			$data['field'][ $this->field->id . '.' . $label ][]           = $item['value'];
+			$data['field'][ $this->field->id ][]                          = $item['value'];
+			$data['field'][ $label ][]                                    = $item['value'];
 
-    /**
-     * Display the HTML version of this field
-     * @return String
-     * @since 4.0
-     */
-    public function html($value = '', $label = true) {
+			/* Name Format */
+			$data['field'][ $this->field->id . '.' . $label . '_name' ][] = $item['label'];
+			$data['field'][ $this->field->id . '_name' ][]                = $item['label'];
+			$data['field'][ $label . '_name' ][]                          = $item['label'];
+		}
 
-        $items = $this->value();
+		return $data;
+	}
 
-        /* Generate our drop down list */
-        if(sizeof($items) > 0) {
-            $html = '<ul class="bulleted">';
-            $i    = 1;
-            foreach($items as $item) {
-                $sanitized_value  = esc_html($item['value']);
-                $sanitized_option = ($value) ? $sanitized_value : esc_html($item['label']);
+	/**
+	 * Display the HTML version of this field
+	 * @return String
+	 * @since 4.0
+	 */
+	public function html( $value = '', $label = true ) {
 
-                $html .= '<li id="field-' . $this->field->id . '-option-' . $i . '">' . $sanitized_option . '</li>';
-                $i++;
-            }
+		$items = $this->value();
 
-            $html .= '</ul>';
-        }
+		/* Generate our drop down list */
+		if ( sizeof( $items ) > 0 ) {
+			$html = '<ul class="bulleted">';
+			$i    = 1;
+			foreach ( $items as $item ) {
+				$sanitized_value  = esc_html( $item['value'] );
+				$sanitized_option = ($value) ? $sanitized_value : esc_html( $item['label'] );
 
-        return parent::html($html);
-    }
+				$html .= '<li id="field-' . $this->field->id . '-option-' . $i . '">' . $sanitized_option . '</li>';
+				$i++;
+			}
 
-    /**
-     * Get the standard GF value of this field
-     * @return String/Array
-     * @since 4.0
-     */
-    public function value() {
-        if($this->has_cache()) {
-            return $this->cache();
-        }
+			$html .= '</ul>';
+		}
 
-        $value = $this->get_value();
+		return parent::html( $html );
+	}
 
-        /* if not an array, make it so */
-        if(!is_array($value)) {
-            $value = array($value);
-        }
+	/**
+	 * Get the standard GF value of this field
+	 * @return String/Array
+	 * @since 4.0
+	 */
+	public function value() {
+		if ( $this->has_cache() ) {
+			return $this->cache();
+		}
 
-        /* remove any unselected fields */
-        $value = array_filter($value);
+		$value = $this->get_value();
 
-        /* loop through results and get checkbox 'labels' */
-        $items = array();
-        $i = 0;
+		/* if not an array, make it so */
+		if ( ! is_array( $value ) ) {
+			$value = array( $value );
+		}
 
-        foreach($value as $key => $item) {
-            $label = GFCommon::selection_display($item, $this->field, '', true);
-            $value = GFCommon::selection_display($item, $this->field);
+		/* remove any unselected fields */
+		$value = array_filter( $value );
 
-            $items[] = array(
-                'value' => $value,
-                'label' => $label
-            );
-        }
+		/* loop through results and get checkbox 'labels' */
+		$items = array();
+		$i = 0;
 
-        $this->cache($items);
-        
-        return $this->cache();
-    }
+		foreach ( $value as $key => $item ) {
+			$label = GFCommon::selection_display( $item, $this->field, '', true );
+			$value = GFCommon::selection_display( $item, $this->field );
+
+			$items[] = array(
+				'value' => $value,
+				'label' => $label,
+			);
+		}
+
+		$this->cache( $items );
+
+		return $this->cache();
+	}
 }

@@ -20,8 +20,8 @@ use Exception;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -52,82 +52,82 @@ if (! defined('ABSPATH')) {
 class Field_Radio extends Helper_Fields
 {
 
-    /**
-     * Check the appropriate variables are parsed in send to the parent construct
-     * @param Object $field The GF_Field_* Object
-     * @param Array $entry The Gravity Forms Entry
-     * @since 4.0
-     */
-    public function __construct($field, $entry) {
-        if(!is_object($field) || !($field instanceof GF_Field_Radio)) {
-            throw new Exception('$field needs to be in instance of GF_Field_Radio');
-        }
+	/**
+	 * Check the appropriate variables are parsed in send to the parent construct
+	 * @param Object $field The GF_Field_* Object
+	 * @param Array  $entry The Gravity Forms Entry
+	 * @since 4.0
+	 */
+	public function __construct( $field, $entry ) {
+		if ( ! is_object( $field ) || ! $field instanceof GF_Field_Radio ) {
+			throw new Exception( '$field needs to be in instance of GF_Field_Radio' );
+		}
 
-        /* call our parent method */
-        parent::__construct($field, $entry);
-    }
+		/* call our parent method */
+		parent::__construct( $field, $entry );
+	}
 
-    /**
-     * Display the HTML version of this field
-     * @return String
-     * @since 4.0
-     */
-    public function html($value = '', $label = true) {
-        $data   = $this->value();
-        $output = ($value) ? $data['value'] : $data['label'];
-        $output = esc_html($output);
+	/**
+	 * Display the HTML version of this field
+	 * @return String
+	 * @since 4.0
+	 */
+	public function html( $value = '', $label = true ) {
+		$data   = $this->value();
+		$output = ($value) ? $data['value'] : $data['label'];
+		$output = esc_html( $output );
 
-        return parent::html($output);
-    }
+		return parent::html( $output );
+	}
 
-    /**
-     * Return the HTML form data
-     * @return Array
-     * @since 4.0
-     */
-    public function form_data() {
+	/**
+	 * Return the HTML form data
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function form_data() {
 
-        $value = $this->value();
-        $label = GFFormsModel::get_label($this->field);
-        $data  = array();
-        
-        /* Standadised Format */
-        $data['field'][ $this->field->id . '.' . $label ]           = $value['value'];
-        $data['field'][ $this->field->id ]                          = $value['value'];
-        $data['field'][ $label ]                                    = $value['value'];
-        
-        /* Name Format */
-        $data['field'][ $this->field->id . '.' . $label . '_name' ] = $value['label'];
-        $data['field'][ $this->field->id . '_name' ]                = $value['label'];
-        $data['field'][ $label . '_name' ]                          = $value['label'];
+		$value = $this->value();
+		$label = GFFormsModel::get_label( $this->field );
+		$data  = array();
 
-        return $data;
-    }
+		/* Standadised Format */
+		$data['field'][ $this->field->id . '.' . $label ]           = $value['value'];
+		$data['field'][ $this->field->id ]                          = $value['value'];
+		$data['field'][ $label ]                                    = $value['value'];
 
-    /**
-     * Get the standard GF value of this field
-     * @return Array
-     * @since 4.0
-     */
-    public function value() {
-        if($this->has_cache()) {
-            return $this->cache();
-        }
+		/* Name Format */
+		$data['field'][ $this->field->id . '.' . $label . '_name' ] = $value['label'];
+		$data['field'][ $this->field->id . '_name' ]                = $value['label'];
+		$data['field'][ $label . '_name' ]                          = $value['label'];
 
-        $label = trim(GFCommon::selection_display($this->get_value(), $this->field, '', true));
-        $value = trim(GFCommon::selection_display($this->get_value(), $this->field));
-        
-        /* if both fields are blank return an empty array */
-        if(strlen($label) === 0 && strlen($value) === 0) {
-            return array();
-        }
+		return $data;
+	}
 
-        /* return value / label as an array */
-        $this->cache(array(
-            'value' => $value,
-            'label' => $label
-        ));
+	/**
+	 * Get the standard GF value of this field
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function value() {
+		if ( $this->has_cache() ) {
+			return $this->cache();
+		}
 
-        return $this->cache();
-    }
+		$label = trim( GFCommon::selection_display( $this->get_value(), $this->field, '', true ) );
+		$value = trim( GFCommon::selection_display( $this->get_value(), $this->field ) );
+
+		/* if both fields are blank return an empty array */
+		if ( strlen( $label ) === 0 && strlen( $value ) === 0 ) {
+			return array();
+		}
+
+		/* return value / label as an array */
+		$this->cache(array(
+			'value' => $value,
+			'label' => $label,
+		));
+
+		return $this->cache();
+	}
 }

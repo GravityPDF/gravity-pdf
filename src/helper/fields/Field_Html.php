@@ -19,8 +19,8 @@ use Exception;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -51,60 +51,60 @@ if (! defined('ABSPATH')) {
 class Field_Html extends Helper_Fields
 {
 
-    /**
-     * Check the appropriate variables are parsed in send to the parent construct
-     * @param Object $field The GF_Field_* Object
-     * @param Array $entry The Gravity Forms Entry
-     * @since 4.0
-     */
-    public function __construct($field, $entry) {
-        if(!is_object($field) || !$field instanceof GF_Field_HTML) {
-            throw new Exception('$field needs to be in instance of GF_Field_HTML');
-        }
+	/**
+	 * Check the appropriate variables are parsed in send to the parent construct
+	 * @param Object $field The GF_Field_* Object
+	 * @param Array  $entry The Gravity Forms Entry
+	 * @since 4.0
+	 */
+	public function __construct( $field, $entry ) {
+		if ( ! is_object( $field ) || ! $field instanceof GF_Field_HTML ) {
+			throw new Exception( '$field needs to be in instance of GF_Field_HTML' );
+		}
 
-        /* call our parent method */
-        parent::__construct($field, $entry);
-    }
+		/* call our parent method */
+		parent::__construct( $field, $entry );
+	}
 
-    /**
-     * Return the HTML form data
-     * @return Array
-     * @since 4.0
-     */
-    public function form_data() {
+	/**
+	 * Return the HTML form data
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function form_data() {
 
-        $data = array();
+		$data = array();
 
-        $html = wpautop( wp_kses_post ( $this->value() ) );
+		$html = wpautop( wp_kses_post( $this->value() ) );
 
-        $data['html'][]                      = $html;
-        $data['html_id'][ $this->field->id ] = $html;
+		$data['html'][]                      = $html;
+		$data['html_id'][ $this->field->id ] = $html;
 
-        return $data;
-    }
+		return $data;
+	}
 
-    /**
-     * Display the HTML version of this field
-     * @return String
-     * @since 4.0
-     */
-    public function html($value = '', $label = true) {
-        $html = wp_kses_post($this->value()); /* allow the same HTML as per the post editor */
+	/**
+	 * Display the HTML version of this field
+	 * @return String
+	 * @since 4.0
+	 */
+	public function html( $value = '', $label = true ) {
+		$html = wp_kses_post( $this->value() ); /* allow the same HTML as per the post editor */
 
-        return parent::html($html, false);
-    }
+		return parent::html( $html, false );
+	}
 
-    /**
-     * Get the standard GF value of this field
-     * @return String/Array
-     * @since 4.0
-     */
-    public function value() {
-        if($this->has_cache()) {
-            return $this->cache();
-        }
+	/**
+	 * Get the standard GF value of this field
+	 * @return String/Array
+	 * @since 4.0
+	 */
+	public function value() {
+		if ( $this->has_cache() ) {
+			return $this->cache();
+		}
 
-        $this->cache($this->field->content);
-        return $this->cache();
-    }
+		$this->cache( $this->field->content );
+		return $this->cache();
+	}
 }

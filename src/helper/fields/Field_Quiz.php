@@ -16,8 +16,8 @@ use GFFormsModel;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -48,68 +48,68 @@ if (! defined('ABSPATH')) {
 class Field_Quiz extends Helper_Fields
 {
 
-    /**
-     * Return the HTML form data
-     * @return Array
-     * @since 4.0
-     */
-    public function form_data() {
+	/**
+	 * Return the HTML form data
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function form_data() {
 
-        $value = $this->value();
-        $label = GFFormsModel::get_label($this->field);
-        $data  = array();
-        
-        $data['field'][ $this->field->id . '.' . $label ]           = $value;
-        $data['field'][ $this->field->id ]                          = $value;
-        $data['field'][ $label ]                                    = $value;
-        
-        /* Backwards compatible */
-        $data['field'][ $this->field->id . '.' . $label . '_name' ] = $value;
-        $data['field'][ $this->field->id . '_name' ]                = $value;
-        $data['field'][ $label . '_name' ]                          = $value;
+		$value = $this->value();
+		$label = GFFormsModel::get_label( $this->field );
+		$data  = array();
 
-        return $data;
-    }
+		$data['field'][ $this->field->id . '.' . $label ]           = $value;
+		$data['field'][ $this->field->id ]                          = $value;
+		$data['field'][ $label ]                                    = $value;
 
-    /**
-     * Display the HTML version of this field
-     * @return String
-     * @since 4.0
-     */
-    public function html($value = '', $label = true) {
-        $value = apply_filters('gform_entry_field_value', $this->get_value(), $this->field, $this->entry, $this->form);
+		/* Backwards compatible */
+		$data['field'][ $this->field->id . '.' . $label . '_name' ] = $value;
+		$data['field'][ $this->field->id . '_name' ]                = $value;
+		$data['field'][ $label . '_name' ]                          = $value;
 
-        /**
-         * Add class to the quiz images so mPDF can style them (limited cascade support)
-         * We'll try use our DOM reader to correctly process the HTML, otherwise use string replace
-         */
-        try {
-            $value = qp($value, 'img')->addClass('gf-quiz-img')->top('body')->children()->html();
-        } catch(Exception $e) {
-            $value = str_replace('<img ', '<img class="gf-quiz-img" ', $value);
-        }
+		return $data;
+	}
 
-        return parent::html($value);
-    }
+	/**
+	 * Display the HTML version of this field
+	 * @return String
+	 * @since 4.0
+	 */
+	public function html( $value = '', $label = true ) {
+		$value = apply_filters( 'gform_entry_field_value', $this->get_value(), $this->field, $this->entry, $this->form );
 
-    /**
-     * Get the standard GF value of this field
-     * @return String/Array
-     * @since 4.0
-     */
-    public function value() {
-        $value = $this->get_value();
+		/**
+		 * Add class to the quiz images so mPDF can style them (limited cascade support)
+		 * We'll try use our DOM reader to correctly process the HTML, otherwise use string replace
+		 */
+		try {
+			$value = qp( $value, 'img' )->addClass( 'gf-quiz-img' )->top( 'body' )->children()->html();
+		} catch (Exception $e) {
+			$value = str_replace( '<img ', '<img class="gf-quiz-img" ', $value );
+		}
 
-        foreach($this->field->choices as $choice) {
-            if($choice['value'] == $value) {
-                return array(
-                    'text'      => $choice['text'],
-                    'isCorrect' => $choice['gquizIsCorrect'],
-                    'weight'    => (isset($choice['gquizWeight'])) ? $choice['gquizWeight'] : '',
-                );
-            }
-        }
+		return parent::html( $value );
+	}
 
-        return array('text' => '', 'isCorrect' => '', 'weight' => '');
-    }
+	/**
+	 * Get the standard GF value of this field
+	 * @return String/Array
+	 * @since 4.0
+	 */
+	public function value() {
+		$value = $this->get_value();
+
+		foreach ( $this->field->choices as $choice ) {
+			if ( $choice['value'] == $value ) {
+				return array(
+					'text'      => $choice['text'],
+					'isCorrect' => $choice['gquizIsCorrect'],
+					'weight'    => (isset($choice['gquizWeight'])) ? $choice['gquizWeight'] : '',
+				);
+			}
+		}
+
+		return array( 'text' => '', 'isCorrect' => '', 'weight' => '' );
+	}
 }

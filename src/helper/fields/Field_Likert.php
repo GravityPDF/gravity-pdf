@@ -18,8 +18,8 @@ use Exception;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -50,112 +50,112 @@ if (! defined('ABSPATH')) {
 class Field_Likert extends Helper_Fields
 {
 
-    /**
-     * Used to check if the current field has a value
-     * @since 4.0
-     * @internal Child classes can override this method when dealing with a specific use case
-     */
-    public function is_empty() {
+	/**
+	 * Used to check if the current field has a value
+	 * @since 4.0
+	 * @internal Child classes can override this method when dealing with a specific use case
+	 */
+	public function is_empty() {
 
-        $value = $this->value();
-        
-        if(isset($value['row'])) { /* Check for single row likerts */
-            if(sizeof(array_filter($value['row'])) === 0) { /* if empty */
-                return true;
-            }
-        } else { /* multi row likert */
-            /* loop through the results and check if they are all empty */
-            $empty = true;
+		$value = $this->value();
 
-            foreach($value['rows'] as $row) {
-                if(sizeof(array_filter($row)) > 0) {
-                    $empty = false;
-                    break;
-                }
-            }
+		if ( isset($value['row']) ) { /* Check for single row likerts */
+			if ( sizeof( array_filter( $value['row'] ) ) === 0 ) { /* if empty */
+				return true;
+			}
+		} else { /*
+			multi row likert */
+			/* loop through the results and check if they are all empty */
+			$empty = true;
 
-            return $empty;
-        }
+			foreach ( $value['rows'] as $row ) {
+				if ( sizeof( array_filter( $row ) ) > 0 ) {
+					$empty = false;
+					break;
+				}
+			}
 
-        return false;
-    }
+			return $empty;
+		}
 
-    /**
-     * Return the HTML form data
-     * @return Array
-     * @since 4.0
-     */
-    public function form_data() {
+		return false;
+	}
 
-        $data = array();
-        $value = $this->value();
+	/**
+	 * Return the HTML form data
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function form_data() {
 
-        $data['survey']['likert'][ $this->field->id ] = $value;
+		$data = array();
+		$value = $this->value();
 
-        return $data;
-    }
+		$data['survey']['likert'][ $this->field->id ] = $value;
 
-    /**
-     * Display the HTML version of this field
-     * @return String
-     * @since 4.0
-     */
-    public function html($value = '', $label = true) {
-        $value = apply_filters('gform_entry_field_value', $this->get_value(), $this->field, $this->entry, $this->form);
+		return $data;
+	}
 
-        return parent::html($value);
-    }
+	/**
+	 * Display the HTML version of this field
+	 * @return String
+	 * @since 4.0
+	 */
+	public function html( $value = '', $label = true ) {
+		$value = apply_filters( 'gform_entry_field_value', $this->get_value(), $this->field, $this->entry, $this->form );
 
-    /**
-     * Get the standard GF value of this field
-     * @return String/Array
-     * @since 4.0
-     */
-    public function value() {
-        if($this->has_cache()) {
-            return $this->cache();
-        }
+		return parent::html( $value );
+	}
 
-        /*
+	/**
+	 * Get the standard GF value of this field
+	 * @return String/Array
+	 * @since 4.0
+	 */
+	public function value() {
+		if ( $this->has_cache() ) {
+			return $this->cache();
+		}
+
+		/*
          * Process Single and Multi Column Likerts
          */
-        $likert = array();
+		$likert = array();
 
-        /*
+		/*
          * Get the column names
          */
-        foreach($this->field->choices as $column) {
-            $likert['col'][$column['value']] = $column['text'];
-        }
+		foreach ( $this->field->choices as $column ) {
+			$likert['col'][$column['value']] = $column['text'];
+		}
 
-        /**
-         * Build our Likert Array
-         */
-        if(is_array($this->field->inputs) && sizeof($this->field->inputs) > 0) { /* Handle our multirow likert */
+		/**
+		 * Build our Likert Array
+		 */
+		if ( is_array( $this->field->inputs ) && sizeof( $this->field->inputs ) > 0 ) { /* Handle our multirow likert */
 
-            /* loop through each row */
-            foreach($this->field->inputs as $row) {
-                /* loop through each column */
-                foreach($likert['col'] as $id => $text) {
-                    /* check if user selected this likert value */
-                    $data = rgar($this->entry, $row['id']);
+			/* loop through each row */
+			foreach ( $this->field->inputs as $row ) {
+				/* loop through each column */
+				foreach ( $likert['col'] as $id => $text ) {
+					/* check if user selected this likert value */
+					$data = rgar( $this->entry, $row['id'] );
 
-                    $likert['rows'][$row['label']][$text] = ( ($row['name'] . ':' . $id) == $data) ? 'selected' : '';
-                }
-            }
-            
-        } else { /* Handle our single-row likert */
+					$likert['rows'][$row['label']][$text] = ( ($row['name'] . ':' . $id) == $data) ? 'selected' : '';
+				}
+			}
+		} else { /* Handle our single-row likert */
 
-            /* Get the value from the entry */
-            $data = rgar($this->entry, $this->field->id);
-            foreach($likert['col'] as $id => $text) {
-                /* check if user selected this likert value */
-                $likert['row'][$text] = ($id == $data) ? 'selected' : '';
-            }
-        }
+			/* Get the value from the entry */
+			$data = rgar( $this->entry, $this->field->id );
+			foreach ( $likert['col'] as $id => $text ) {
+				/* check if user selected this likert value */
+				$likert['row'][$text] = ($id == $data) ? 'selected' : '';
+			}
+		}
 
-        $this->cache($likert);
-        
-        return $this->cache();
-    }
+		$this->cache( $likert );
+
+		return $this->cache();
+	}
 }

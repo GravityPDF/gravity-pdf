@@ -15,12 +15,11 @@ use GFPDF\Helper\Helper_Int_Filters;
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
- *
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -51,114 +50,113 @@ if (! defined('ABSPATH')) {
  */
 class Controller_Shortcodes extends Helper_Controller implements Helper_Int_Filters
 {
-    /**
-     * Load our model and view and required actions
-     */
-    public function __construct(Helper_Model $model, Helper_View $view)
-    {
-        /* load our model and view */
-        $this->model = $model;
-        $this->model->setController($this);
+	/**
+	 * Load our model and view and required actions
+	 */
+	public function __construct( Helper_Model $model, Helper_View $view ) {
+		/* load our model and view */
+		$this->model = $model;
+		$this->model->setController( $this );
 
-        $this->view  = $view;
-        $this->view->setController($this);
-    }
+		$this->view  = $view;
+		$this->view->setController( $this );
+	}
 
-    /**
-     * Initialise our class defaults
-     * @since 4.0
-     * @return void
-     */
-    public function init() {
-        $this->add_filters();
-        $this->add_shortcodes();
+	/**
+	 * Initialise our class defaults
+	 * @since 4.0
+	 * @return void
+	 */
+	public function init() {
+		$this->add_filters();
+		$this->add_shortcodes();
 
-        /* Add support for the new shortcake UI currently being considered for core integration */
-        if( is_admin() && function_exists('shortcode_ui_register_for_shortcode') ) {
-            $this->add_shortcake_support();
-        }
-    }
+		/* Add support for the new shortcake UI currently being considered for core integration */
+		if ( is_admin() && function_exists( 'shortcode_ui_register_for_shortcode' ) ) {
+			$this->add_shortcake_support();
+		}
+	}
 
-    /**
-     * Apply any filters needed for the settings page
-     * @since 4.0
-     * @return void
-     */
-    public function add_filters() {
-        
-        add_filter('gform_confirmation', array($this->model, 'gravitypdf_confirmation'), 10, 3);
-        add_filter('gform_admin_pre_render', array($this->model, 'gravitypdf_redirect_confirmation'));
-    }
+	/**
+	 * Apply any filters needed for the settings page
+	 * @since 4.0
+	 * @return void
+	 */
+	public function add_filters() {
 
-   
-
-    /**
-     * Register our shortcodes
-     * @since 4.0
-     * @return void
-     */
-    public function add_shortcodes() {
-        add_shortcode('gravitypdf', array($this->model, 'gravitypdf'));
-    }
+		add_filter( 'gform_confirmation', array( $this->model, 'gravitypdf_confirmation' ), 10, 3 );
+		add_filter( 'gform_admin_pre_render', array( $this->model, 'gravitypdf_redirect_confirmation' ) );
+	}
 
 
-    /**
-     * Register our shortcake attributes
-     * See https://github.com/fusioneng/Shortcake for more details
-     * @since 4.0
-     * @return void
-     */
-    public function add_shortcake_support() {
-        /* Enhance further */
-        shortcode_ui_register_for_shortcode( 'gravitypdf', array(
-            'label' => __('Gravity PDF', 'gravitypdf'),
 
-             'listItemImage' => 'dashicons-admin-site',
+	/**
+	 * Register our shortcodes
+	 * @since 4.0
+	 * @return void
+	 */
+	public function add_shortcodes() {
+		add_shortcode( 'gravitypdf', array( $this->model, 'gravitypdf' ) );
+	}
 
-            'attrs' => array(
-                array(
-                    'label' => 'ID',
-                    'attr'  => 'id',
-                    'type'  => 'text',
-                ),
 
-                array(
-                    'label' => 'Anchor Text',
-                    'attr'  => 'text',
-                    'type'  => 'text',
-                ),
+	/**
+	 * Register our shortcake attributes
+	 * See https://github.com/fusioneng/Shortcake for more details
+	 * @since 4.0
+	 * @return void
+	 */
+	public function add_shortcake_support() {
+		/* Enhance further */
+		shortcode_ui_register_for_shortcode( 'gravitypdf', array(
+			'label' => __( 'Gravity PDF', 'gravitypdf' ),
 
-                array(
-                    'label' => 'View',
-                    'attr' => 'type',
-                    'type' => 'select',
-                    'default' => 'download',
-                    'options' => array(
-                        'download' => 'Download',
-                        'view' => 'View',
-                    ),
-                ),
+			 'listItemImage' => 'dashicons-admin-site',
 
-                array(
-                    'label' => 'Anchor Classes',
-                    'attr'  => 'classes',
-                    'type'  => 'text',
-                    'description' => 'Optional. Add any classes - separated by a space - you want to apply to the PDF link.',
-                    'meta' => array(
-                        'placeholder' => '',
-                    ),
-                ),
+			'attrs' => array(
+				array(
+					'label' => 'ID',
+					'attr'  => 'id',
+					'type'  => 'text',
+				),
 
-                array(
-                    'label' => 'Entry ID',
-                    'attr'  => 'entry',
-                    'type'  => 'text',
-                    'description' => 'Optional. You can pass in a specific ID or let us auto select one.',
-                    'meta' => array(
-                        'placeholder' => '',
-                    ),
-                ),
-            ),
-        ) );
-    }
+				array(
+					'label' => 'Anchor Text',
+					'attr'  => 'text',
+					'type'  => 'text',
+				),
+
+				array(
+					'label' => 'View',
+					'attr' => 'type',
+					'type' => 'select',
+					'default' => 'download',
+					'options' => array(
+						'download' => 'Download',
+						'view' => 'View',
+					),
+				),
+
+				array(
+					'label' => 'Anchor Classes',
+					'attr'  => 'classes',
+					'type'  => 'text',
+					'description' => 'Optional. Add any classes - separated by a space - you want to apply to the PDF link.',
+					'meta' => array(
+						'placeholder' => '',
+					),
+				),
+
+				array(
+					'label' => 'Entry ID',
+					'attr'  => 'entry',
+					'type'  => 'text',
+					'description' => 'Optional. You can pass in a specific ID or let us auto select one.',
+					'meta' => array(
+						'placeholder' => '',
+					),
+				),
+			),
+		) );
+	}
 }

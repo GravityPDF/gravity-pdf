@@ -12,7 +12,9 @@ namespace GFPDF\Helper;
  */
 
 /* Exit if accessed directly */
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /*
     This file is part of Gravity PDF.
@@ -39,10 +41,11 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @since 4.0
  */
 interface Helper_Int_Filters {
-    /**
-     * Apply any actions needed for the settings page
-     * @since 4.0
-     * @return void
-     */
-    public function add_filters();	
+
+	/**
+	 * Apply any actions needed for the settings page
+	 * @since 4.0
+	 * @return void
+	 */
+	public function add_filters();
 }
