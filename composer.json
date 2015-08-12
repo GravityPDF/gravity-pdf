@@ -10,7 +10,7 @@
     		"GFPDF\\Controller\\": "src/controller/",
     		"GFPDF\\Model\\": "src/model/",
     		"GFPDF\\View\\": "src/views/",
-    		"GFPDF\\Helper\\": ["src/helper/", "src/helper/abstract/", "src/helper/interface/", "src/helper/list-table/"],
+    		"GFPDF\\Helper\\": ["src/helper/", "src/helper/abstract/", "src/helper/interface/"],
     		"GFPDF\\Helper\\Fields\\": "src/helper/fields/",
     		"GFPDF\\Test\\": "tests/"
     	}
