@@ -7,7 +7,6 @@ use GFPDF\Helper\Helper_Model;
 use GFPDF\Helper\Helper_View;
 use GFPDF\Helper\Helper_Int_Actions;
 use GFPDF\Helper\Helper_Int_Filters;
-use GFPDF\Stat\Stat_Functions;
 
 use GFForms;
 use GFCommon;
@@ -124,12 +123,13 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
      * @return void
      */
     public function add_filters() {
+        global $gfpdf;
 
         /* Add tooltips */
         add_filter('gform_tooltips', array($this->view, 'add_tooltips'));
 
         /* If trying to save settings page we'll use this filter to apply any errors passed back from options.php */
-        if(Stat_Functions::is_gfpdf_page()) {
+        if( $gfpdf->misc->is_gfpdf_page() ) {
             add_filter('gfpdf_registered_settings', array($this->model, 'highlight_errors'));
         }
 
@@ -212,12 +212,12 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
         global $gfpdf;
 
         /* check if we are on the tools settings page */
-        if(! Stat_Functions::is_gfpdf_settings_tab('tools')) {
+        if( ! $gfpdf->misc->is_gfpdf_settings_tab('tools') ) {
             return;
         }
 
         /* check if the user has permission to copy the templates */
-        if(! GFCommon::current_user_can_any( 'gravityforms_edit_settings' )) {
+        if( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
             return false;
         }
 

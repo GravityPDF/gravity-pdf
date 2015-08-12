@@ -10,8 +10,6 @@ use GFPDF\Helper\Helper_PDF;
 
 use GFPDF\Helper\Fields\Field_Products;
 
-use GFPDF\Stat\Stat_Functions;
-
 use GFFormsModel;
 use GFCommon;
 use GF_Field;
@@ -82,12 +80,13 @@ class View_PDF extends Helper_View
      * @since 4.0
      */
     public function generate_pdf($entry, $settings) {
-
+        global $gfpdf;
+        
         /**
          * Load our arguments that should be accessed by our PDF template
          * @var array
          */
-        $args = Stat_Functions::get_template_args($entry, $settings);
+        $args = $gfpdf->misc->get_template_args($entry, $settings);
 
         /**
          * Show $form_data array if requested

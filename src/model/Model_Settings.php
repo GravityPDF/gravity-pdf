@@ -3,7 +3,6 @@
 namespace GFPDF\Model;
 
 use GFPDF\Helper\Helper_Model;
-use GFPDF\Stat\Stat_Functions;
 
 use GFCommon;
 
@@ -134,12 +133,12 @@ class Model_Settings extends Helper_Model {
     public function install_templates() {
         global $gfpdf;
 
-        if(! Stat_Functions::copyr(PDF_PLUGIN_DIR . 'initialisation/templates/', $gfpdf->data->template_location)) {
-            $gfpdf->notices->add_error(sprintf(__('There was a problem copying all PDF templates to %s. Please try again.', 'gravitypdf'), '<code>' . Stat_Functions::relative_path($gfpdf->data->template_location) . '</code>'));
+        if( ! $gfpdf->misc->copyr(PDF_PLUGIN_DIR . 'initialisation/templates/', $gfpdf->data->template_location) ) {
+            $gfpdf->notices->add_error(sprintf(__('There was a problem copying all PDF templates to %s. Please try again.', 'gravitypdf'), '<code>' . $gfpdf->misc->relative_path($gfpdf->data->template_location) . '</code>'));
             return false;
         }
 
-        $gfpdf->notices->add_notice(sprintf(__('Gravity PDF Custom Templates successfully installed to %s.', 'gravitypdf'), '<code>' . Stat_Functions::relative_path($gfpdf->data->template_location) . '</code>'));
+        $gfpdf->notices->add_notice(sprintf(__('Gravity PDF Custom Templates successfully installed to %s.', 'gravitypdf'), '<code>' . $gfpdf->misc->relative_path($gfpdf->data->template_location) . '</code>'));
         $gfpdf->options->update_option('custom_pdf_template_files_installed', true);
         return true;
     }
@@ -388,7 +387,7 @@ class Model_Settings extends Helper_Model {
 
             /* Check if a key exists for this type and process */
             if( isset($fonts[$type])) {
-                $path = Stat_Functions::convert_url_to_path( $fonts[$type] );
+                $path = $gfpdf->misc->convert_url_to_path( $fonts[$type] );
 
                 /* Couldn't find file so throw error */
                 if(is_wp_error($path)) {
@@ -435,7 +434,7 @@ class Model_Settings extends Helper_Model {
 
         if( isset( $settings['default_template'] ) ) {
             $current_template = $gfpdf->options->get_form_value( $settings['default_template'] );
-            $template_image   = Stat_Functions::get_template_image( $current_template );
+            $template_image   = $gfpdf->misc->get_template_image( $current_template );
 
             if( ! empty($template_image) ) {
                 $img                                  = '<img src="'. esc_url($template_image) . '" alt="' . __('Template Example') . '" id="gfpdf-template-example" />';

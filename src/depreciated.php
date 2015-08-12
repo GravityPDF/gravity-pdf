@@ -1,8 +1,6 @@
 <?php
 
 /* For backwards compatibility reasons this file will be in the global namespace */
-
-use GFPDF\Stat\Stat_Functions;
 use GFPDF\Router;
 use GFPDF\Model\Model_PDF;
 use GFPDF\View\View_PDF;
@@ -83,7 +81,9 @@ class PDF_Common
     }
 
     public static function get_upload_dir() {
-        return Stat_Functions::get_upload_details();
+        global $gfpdf;
+        
+        return $gfpdf->misc->get_upload_details();
     }
 
     public static function view_data($form_data = array()) {

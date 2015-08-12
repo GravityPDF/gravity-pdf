@@ -3,7 +3,6 @@
 namespace GFPDF\Model;
 
 use GFPDF\Helper\Helper_Model;
-use GFPDF\Stat\Stat_Functions;
 
 use GFAPI;
 use GFCommon;
@@ -153,14 +152,14 @@ class Model_Install extends Helper_Model {
 
         /* create the required folder structure, or throw error */
         foreach($folders as $dir) {
-            if(!is_dir($dir)) {
-                if(! wp_mkdir_p($dir)) {
-                    $gfpdf->notices->add_error(sprintf(__('There was a problem creating the %s directory. Ensure you have write permissions to your upload directory.', 'gravitypdf'), '<code>' . Stat_Functions::relative_path($dir) . '</code>'));
+            if( !is_dir($dir)) {
+                if( ! wp_mkdir_p($dir)) {
+                    $gfpdf->notices->add_error(sprintf(__('There was a problem creating the %s directory. Ensure you have write permissions to your upload directory.', 'gravitypdf'), '<code>' . $gfpdf->misc->relative_path($dir) . '</code>'));
                 }
             } else {
                 /* test the directory is currently writable by the web server, otherwise throw and error */
-                if(! Stat_Functions::is_directory_writable($dir)) {
-                    $gfpdf->notices->add_error(sprintf(__('Gravity PDF does not have write permissions to the %s directory. Contact your web hosting provider to fix the issue.', 'gravitypdf'), '<code>' . Stat_Functions::relative_path($dir) . '</code>'));
+                if( ! $gfpdf->misc->is_directory_writable($dir)) {
+                    $gfpdf->notices->add_error(sprintf(__('Gravity PDF does not have write permissions to the %s directory. Contact your web hosting provider to fix the issue.', 'gravitypdf'), '<code>' . $gfpdf->misc->relative_path($dir) . '</code>'));
                 }
             }
         }
@@ -286,10 +285,10 @@ class Model_Install extends Helper_Model {
 
         foreach($paths as $dir) {
             if(is_dir($dir)) {
-                $results = Stat_Functions::rmdir($dir);
+                $results = $gfpdf->misc->rmdir($dir);
 
                 if(is_wp_error($results) || !$results) {
-                    $gfpdf->notices->add_error(sprintf(__('There was a problem removing the %s directory. Clean up manually via (S)FTP.', 'gravitypdf'), '<code>' . Stat_Functions::relative_path($dir) . '</code>'));
+                    $gfpdf->notices->add_error(sprintf(__('There was a problem removing the %s directory. Clean up manually via (S)FTP.', 'gravitypdf'), '<code>' . $gfpdf->misc->relative_path($dir) . '</code>'));
                 }
             }
         }

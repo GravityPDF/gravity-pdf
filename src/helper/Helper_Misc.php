@@ -1,6 +1,6 @@
 <?php
 
-namespace GFPDF\Stat;
+namespace GFPDF\Helper;
 
 use GFPDF\Model\Model_PDF;
 
@@ -12,7 +12,7 @@ use RecursiveIteratorIterator;
 use Exception;
 
 /**
- * Common Static Functions Shared throughour Gravity PDF
+ * Common Functions shared throughour Gravity PDF
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
@@ -48,17 +48,18 @@ if (! defined('ABSPATH')) {
 /**
  * @since  4.0
  */
-class Stat_Functions
-{
+class Helper_Misc {
+
     /**
      * Check if the current admin page is a Gravity PDF page
      * @since 4.0
      * @return void
      */
-    public static function is_gfpdf_page() {
-        if(is_admin()) {
-            if(isset($_GET['page']) && (substr($_GET['page'], 0, 6) === 'gfpdf-') ||
-            (isset($_GET['subview']) && strtoupper($_GET['subview']) === 'PDF')) {
+    public function is_gfpdf_page() {
+
+        if( is_admin() ) {
+            if( isset( $_GET['page'] ) && 'gfpdf-' === ( substr( $_GET['page'], 0, 6 ) ) ||
+            ( isset( $_GET['subview'] ) && 'PDF' === strtoupper( $_GET['subview'] ) ) ) {
                 return true;
             }
         }
@@ -71,7 +72,8 @@ class Stat_Functions
      * @since 4.0
      * @return void
      */
-    public static function is_gfpdf_settings_tab($name) {
+    public function is_gfpdf_settings_tab($name) {
+
         if(is_admin()) {
             if(self::is_gfpdf_page()) {
                 $tab = (isset($_GET['tab'])) ? $_GET['tab'] : 'general';
@@ -91,7 +93,8 @@ class Stat_Functions
      * @return String / Boolean       The Fully Qualified Namespaced Class we matched, or false
      * @since 4.0
      */
-    public static function get_field_class($type) {
+    public function get_field_class($type) {
+
         /* change our product field types to use a single master product class */
         $convert_product_type = array('quantity', 'option', 'shipping', 'total');
 
@@ -119,7 +122,8 @@ class Stat_Functions
      * @return String
      * @since  4.0
      */
-    public static function human_readable($name) {
+    public function human_readable($name) {
+
         $name = str_replace(array('-', '_'), ' ', $name);
         return mb_convert_case($name, MB_CASE_TITLE);
     }
@@ -130,7 +134,8 @@ class Stat_Functions
      * @param  String $html The HTML to parse
      * @return String
      */
-    public static function fix_header_footer($html) {
+    public function fix_header_footer($html) {
+
         try {
             /* return the modified HTML */
             return qp($html, 'img')->addClass('header-footer-img')->top('body')->children()->html();
@@ -146,7 +151,8 @@ class Stat_Functions
      * @return String
      * @since 4.0
      */
-    public static function get_contrast($hexcolor) {
+    public function get_contrast($hexcolor) {
+
         $hexcolor = str_replace('#', '', $hexcolor);
         
         if (strlen($hexcolor) != 6){
@@ -161,13 +167,118 @@ class Stat_Functions
         return ($yiq >= 128) ? 'black' : 'white';
     }
 
+
+
+    /**
+     * Push an associative array onto the beginning of an existing array
+     * @param  Array $arr The array to push onto
+     * @param  String $key The key to use for the newly-pushed array
+     * @param  Mixed $val  The value being pushed
+     * @return Array       The modified array
+     */
+    public function array_unshift_assoc($arr, $key, $val) {
+
+        $arr = array_reverse($arr, true);
+        $arr[$key] = $val;
+        return array_reverse($arr, true);
+    }
+
+    /**
+     * This function recursively deletes all files and folders under the given directory, and then the directory itself
+     * equivalent to Bash: rm -r $dir
+     * @param String $dir The path to be deleted
+     */
+    public function rmdir($dir) {
+
+        try {
+            $files = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+                RecursiveIteratorIterator::CHILD_FIRST
+            );
+        
+            foreach ($files as $fileinfo) {
+                $function = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
+                $function($fileinfo->getRealPath());
+            }
+        } catch (Exception $e) {
+            return new WP_Error('recursion_delete_problem', $e);
+        }
+
+        return rmdir($dir);
+    }
+
+    /**
+     * This function recursively copies all files and folders under a given directory
+     * equivalent to Bash: cp -R $dir
+     * @param  String $source      The path to be copied
+     * @param  String $destination The path to copy to
+     * @return Boolean
+     * @since 4.0
+     */
+    public function copyr($source, $destination) {
+
+        try {
+            if(!is_dir($destination)) {
+                wp_mkdir_p($destination);
+            }
+
+            $files = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($source, RecursiveDirectoryIterator::SKIP_DOTS),
+                RecursiveIteratorIterator::SELF_FIRST
+            );
+        
+            foreach ($files as $fileinfo) {
+               if($fileinfo->isDir()) {
+                    mkdir($destination . DIRECTORY_SEPARATOR . $files->getSubPathName());
+               } else {
+                    copy($fileinfo, $destination . DIRECTORY_SEPARATOR . $files->getSubPathName());
+               }
+            }
+        } catch (Exception $e) {
+            return new WP_Error('recursion_copy_problem', $e);
+        }
+
+        return true;
+    }
+
+    /**
+     * Get a path relative to the root WP directory, provided a user hasn't moved the wp-content directory outside the ABSPATH
+     * @param  String $path The relative path
+     * @param  String $replace What ABSPATH should be replaced with
+     * @return String
+     * @since 4.0
+     */
+    public function relative_path($path, $replace = '') {
+        return str_replace(ABSPATH, $replace, $path);
+    }
+
+    /**
+     * Check if the web server can write a file to the path specified
+     * @param  String  $path The path to check
+     * @return Boolean
+     * @since  4.0
+     */
+    public function is_directory_writable($path) {
+
+        $tmp_file = $path . '.tmpFile';
+
+        if(is_writable($path)) {
+            if(touch($tmp_file) && is_file($tmp_file)) {
+                unlink($tmp_file);
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Modified version of get_upload_path() which just focuses on the base directory
      * no matter if single or multisite installation
      * We also only needed the basedir and baseurl so stripped out all the extras
      * @return Array Base dir and url for the upload directory
      */
-    public static function get_upload_details() {
+    public function get_upload_details() {
+
         $siteurl     = get_option('siteurl');
         $upload_path = trim(get_option('upload_path'));
         $dir         = $upload_path;
@@ -200,125 +311,12 @@ class Stat_Functions
     }
 
     /**
-     * This function recursively deletes all files and folders under the given directory, and then the directory itself
-     * equivalent to Bash: rm -r $dir
-     * @param String $dir The path to be deleted
-     */
-    public static function rmdir($dir) {
-        try {
-            $files = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
-                RecursiveIteratorIterator::CHILD_FIRST
-            );
-        
-            foreach ($files as $fileinfo) {
-                $function = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
-                $function($fileinfo->getRealPath());
-            }
-        } catch (Exception $e) {
-            return new WP_Error('recursion_delete_problem', $e);
-        }
-
-        return rmdir($dir);
-    }
-
-    /**
-     * This function recursively copies all files and folders under a given directory
-     * equivalent to Bash: cp -R $dir
-     * @param  String $source      The path to be copied
-     * @param  String $destination The path to copy to
-     * @return Boolean
-     * @since 4.0
-     */
-    public static function copyr($source, $destination) {
-        try {
-            if(!is_dir($destination)) {
-                wp_mkdir_p($destination);
-            }
-
-            $files = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($source, RecursiveDirectoryIterator::SKIP_DOTS),
-                RecursiveIteratorIterator::SELF_FIRST
-            );
-        
-            foreach ($files as $fileinfo) {
-               if($fileinfo->isDir()) {
-                    mkdir($destination . DIRECTORY_SEPARATOR . $files->getSubPathName());
-               } else {
-                    copy($fileinfo, $destination . DIRECTORY_SEPARATOR . $files->getSubPathName());
-               }
-            }
-        } catch (Exception $e) {
-            return new WP_Error('recursion_copy_problem', $e);
-        }
-
-        return true;
-    }
-
-    /**
-     * Get a path relative to the root WP directory, provided a user hasn't moved the wp-content directory outside the ABSPATH
-     * @param  String $path The relative path
-     * @param  String $replace What ABSPATH should be replaced with
-     * @return String
-     * @since 4.0
-     */
-    public static function relative_path($path, $replace = '') {
-        return str_replace(ABSPATH, $replace, $path);
-    }
-
-    /**
-     * Check if the web server can write a file to the path specified
-     * @param  String  $path The path to check
-     * @return Boolean
-     * @since  4.0
-     */
-    public static function is_directory_writable($path) {
-        $tmp_file = $path . '.tmpFile';
-
-        if(is_writable($path)) {
-            if(touch($tmp_file) && is_file($tmp_file)) {
-                unlink($tmp_file);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Get the arguments array that should be passed to our PDF Template
-     * @param  Array $entry    Gravity Form Entry
-     * @param  Array $settings PDF Settings Array
-     * @return Array
-     * @since 4.0
-     */
-    public static function get_template_args($entry, $settings) {
-        /* TEMP FIX */
-        error_reporting(E_ALL ^ E_NOTICE);
-
-        $form = GFAPI::get_form($entry['form_id']);
-        $pdf  = new Model_PDF();
-
-        return apply_filters('gfpdf_template_args', array(
-            'form_id'   => $entry['form_id'], /* backwards compat */
-            'lead_ids'  => array($entry['id']), /* backwards compat */
-            'lead_id'   => $entry['id'], /* backwards compat */
-            
-            'form'      => $form,
-            'entry'     => $entry,
-            'lead'      => $entry,
-            'form_data' => $pdf->get_form_data($entry),
-
-            'settings' => $settings,
-        ), $entry, $settings, $form);
-    }
-
-    /**
      * Attempt to convert the current URL to an internal path
      * @param  String $url The Url to convert
      * @return Mixed (String / Object)      Path on success or WP_Error on failure
      * @since  4.0
      */
-    public static function convert_url_to_path($url) {
+    public function convert_url_to_path($url) {
 
         /* If $url is empty we'll return early */
         if( empty( trim($url) ) ) {
@@ -367,16 +365,35 @@ class Stat_Functions
     }
 
     /**
-     * Push an associative array onto the beginning of an existing array
-     * @param  Array $arr The array to push onto
-     * @param  String $key The key to use for the newly-pushed array
-     * @param  Mixed $val  The value being pushed
-     * @return Array       The modified array
+     * Get the arguments array that should be passed to our PDF Template
+     * @param  Array $entry    Gravity Form Entry
+     * @param  Array $settings PDF Settings Array
+     * @return Array
+     * @since 4.0
      */
-    public static function array_unshift_assoc($arr, $key, $val) {
-        $arr = array_reverse($arr, true);
-        $arr[$key] = $val;
-        return array_reverse($arr, true);
+    public function get_template_args($entry, $settings) {
+        /*
+         * @todo TEMP FIX so we can render PDF
+         */
+        error_reporting(E_ALL ^ E_NOTICE);
+
+        $form = GFAPI::get_form($entry['form_id']);
+        $pdf  = new Model_PDF();
+
+        return apply_filters('gfpdf_template_args', array(
+
+            'form_id'   => $entry['form_id'], /* backwards compat */
+            'lead_ids'  => array($entry['id']), /* backwards compat */
+            'lead_id'   => $entry['id'], /* backwards compat */
+            
+            'form'      => $form,
+            'entry'     => $entry,
+            'lead'      => $entry,
+            'form_data' => $pdf->get_form_data($entry),
+
+            'settings' => $settings,
+
+        ), $entry, $settings, $form);
     }
 
     /**
@@ -384,14 +401,15 @@ class Stat_Functions
      * @param  String $template The template name to look for
      * @return String       Full URL to image
      */
-    public static function get_template_image( $template ) {
+    public function get_template_image( $template ) {
         global $gfpdf;
 
         /* Add our extension */
         $template .= '.png';
 
-        $default_template_path = PDF_PLUGIN_DIR . 'initialisation/templates/images/';
-        $default_template_url  = PDF_PLUGIN_URL . 'initialisation/templates/images/';
+        $relative_image_path   = 'initialisation/templates/images/';
+        $default_template_path = PDF_PLUGIN_DIR . $relative_image_path;
+        $default_template_url  = PDF_PLUGIN_URL . $relative_image_path;
 
         if(is_file( $gfpdf->data->template_location . 'images/' . $template )) {
             return $gfpdf->data->template_location_url . 'images/' . $template;

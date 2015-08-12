@@ -3,7 +3,6 @@
 namespace GFPDF\Helper\Fields;
 
 use GFPDF\Helper\Helper_Fields;
-use GFPDF\Stat\Stat_Functions;
 
 use GFFormsModel;
 use GFCommon;
@@ -59,6 +58,7 @@ class Field_Post_Category extends Helper_Fields
      * @since 4.0
      */
     public function __construct($field, $entry) {
+        global $gfpdf;
 
         /* call our parent method */
         parent::__construct($field, $entry);
@@ -67,7 +67,7 @@ class Field_Post_Category extends Helper_Fields
          * Category can be multiple field types
          * eg. Select, MultiSelect, Radio, Dropdown
          */
-        $class = Stat_functions::get_field_class($field->inputType);
+        $class = $gfpdf->misc->get_field_class($field->inputType);
        
         try {
             /* check load our class */

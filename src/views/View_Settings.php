@@ -4,7 +4,6 @@ namespace GFPDF\View;
 
 use GFPDF\Helper\Helper_View;
 use GFPDF_Major_Compatibility_Checks;
-use GFPDF\Stat\Stat_Functions;
 
 use GFCommon;
 
@@ -176,9 +175,9 @@ class View_Settings extends Helper_View
         }
 
         $vars = array(
-            'template_directory' => Stat_Functions::relative_path($gfpdf->data->template_location, '/'),
-            'template_files' => $gfpdf->options->get_plugin_pdf_templates(),
-            'custom_template_setup_warning' => $gfpdf->options->get_option('custom_pdf_template_files_installed')
+            'template_directory'            => $gfpdf->misc->relative_path($gfpdf->data->template_location, '/'),
+            'template_files'                => $gfpdf->options->get_plugin_pdf_templates(),
+            'custom_template_setup_warning' => $gfpdf->options->get_option('custom_pdf_template_files_installed'),
         );
 
         $vars = array_merge($vars, $this->data);

@@ -1,7 +1,7 @@
 <?php
 
 namespace GFPDF\Tests;
-use GFPDF\Helper\Helper_Options;
+use GFPDF\Helper\Helper_Options_Fields;
 use WP_UnitTestCase;
 use GFAPI;
 
@@ -64,7 +64,7 @@ class Test_Options_API extends WP_UnitTestCase
         parent::setUp();
 
         /* setup our object */
-        $this->options = new Helper_Options();
+        $this->options = new Helper_Options_Fields();
 
         /* load settings in database  */
         update_option( 'gfpdf_settings', json_decode(file_get_contents( PDF_PLUGIN_DIR . 'tests/json/options-settings.json' ), true));

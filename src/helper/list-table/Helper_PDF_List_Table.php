@@ -185,7 +185,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		if(is_array($template) && isset($template['template'])) {
 			echo "<strong>{$template['group']} – </strong> {$template['template']}";
 		} else {
-			echo "<strong>{$template['group']}</strong> – " . Stat_Functions::human_readable(rgar( $item, 'template' ));
+			echo "<strong>{$template['group']}</strong> – " . $gfpdf->misc->human_readable(rgar( $item, 'template' ));
 		}
 	}
 

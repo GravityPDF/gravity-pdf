@@ -6,7 +6,6 @@ use GFPDF\Helper\Helper_Controller;
 use GFPDF\Helper\Helper_Int_Actions;
 use GFPDF\Helper\Helper_Int_Filters;
 use GFPDF\Helper\Helper_Model;
-use GFPDF\Stat\Stat_Functions;
 
 use GFCommon;
 
@@ -109,7 +108,7 @@ class Controller_Install extends Helper_Controller implements Helper_Int_Actions
         $gfpdf->data->working_folder = $this->model->get_working_directory();
         $gfpdf->data->settings_url   = $this->model->get_settings_url();
 
-        $upload_details              = Stat_Functions::get_upload_details();
+        $upload_details              = $gfpdf->misc->get_upload_details();
         $gfpdf->data->upload_dir     = $upload_details['path'];
         $gfpdf->data->upload_dir_url = $upload_details['url'];
 

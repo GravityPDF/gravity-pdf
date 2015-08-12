@@ -70,8 +70,6 @@ class Test_Autoloader extends WP_UnitTestCase
             array('GFPDF\Model\Model_Settings'),
             array('GFPDF\Model\Model_Welcome_Screen'),
 
-            array('GFPDF\Stat\Stat_Functions'),
-
             array('GFPDF\View\View_Form_Settings'),
             array('GFPDF\View\View_Settings'),
             array('GFPDF\View\View_Welcome_Screen'),

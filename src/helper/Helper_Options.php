@@ -3,7 +3,6 @@
 namespace GFPDF\Helper;
 
 use GFPDF\Model\Model_Form_Settings;
-use GFPDF\Stat\Stat_Functions;
 
 use GFCommon;
 
@@ -448,7 +447,7 @@ class Helper_Options implements Helper_Int_Filters {
 			if(!empty($info['template'])) {
 				$templates[$prefix_text . $info['group']][$file] = $info['template'];
 			} else if(substr($file, 0, 8) != 'example-') { /* exclude the example templates */
-				$legacy[$file] = Stat_Functions::human_readable($file);
+				$legacy[$file] = $gfpdf->misc->human_readable($file);
 			}
 		}
 
@@ -613,6 +612,8 @@ class Helper_Options implements Helper_Int_Filters {
 	 * @since 4.0
 	 */
 	public function add_custom_fonts($fonts = array()) {
+		global $gfpdf;
+		
 		$custom_fonts = $this->get_custom_fonts();
 
 		if(sizeof($custom_fonts) > 0) {
@@ -625,7 +626,7 @@ class Helper_Options implements Helper_Int_Filters {
 			}
 
 			/* Merge the new fonts at the beginning of the $fonts array */
-			$fonts = Stat_Functions::array_unshift_assoc( $fonts, __('User-Defined Fonts', 'gravitypdf'), $user_defined_fonts );
+			$fonts = $gfpdf->misc->array_unshift_assoc( $fonts, __('User-Defined Fonts', 'gravitypdf'), $user_defined_fonts );
 		}
 
 		return $fonts;

@@ -5,7 +5,6 @@ namespace GFPDF\Model;
 use GFPDF\Helper\Helper_Model;
 use GFPDF\Helper\Helper_PDF_List_Table;
 use GFPDF\Helper\Helper_Int_Config;
-use GFPDF\Stat\Stat_Functions;
 
 use GFFormsModel;
 use GFCommon;
@@ -541,7 +540,7 @@ class Model_Form_Settings extends Helper_Model {
 
         if( isset( $settings['template'] ) ) {
             $current_template = $gfpdf->options->get_form_value( $settings['template'] );
-            $template_image   = Stat_Functions::get_template_image( $current_template );
+            $template_image   = $gfpdf->misc->get_template_image( $current_template );
 
             if( ! empty($template_image) ) {
                 $img              = '<img src="'. esc_url($template_image) . '" alt="' . __('Template Example') . '" id="gfpdf-template-example" />';
@@ -951,7 +950,7 @@ class Model_Form_Settings extends Helper_Model {
         $settings = $this->setup_custom_appearance_settings($class);
 
         /* Check if the selected template has a preview */
-        $template_image = Stat_Functions::get_template_image( $template );
+        $template_image = $gfpdf->misc->get_template_image( $template );
 
         /* Only handle fields when in the PDF Forms Settings, and not in the general settings */
         if($type != 'gfpdf_settings[default_template]') {

@@ -3,7 +3,6 @@
 namespace GFPDF\Helper\Fields;
 
 use GFPDF\Helper\Helper_Fields;
-use GFPDF\Stat\Stat_Functions;
 
 use GFFormsModel;
 use GF_Field_FileUpload;
@@ -73,6 +72,7 @@ class Field_Fileupload extends Helper_Fields
      * @since 4.0
      */
     public function form_data() {
+        global $gfpdf;
 
         $data  = array();
         $label = GFFormsModel::get_label($this->field);
@@ -84,7 +84,7 @@ class Field_Fileupload extends Helper_Fields
             $data[ $this->field->id ][]                = $image;
             $data[ $label ][]                          = $image;
 
-            $path = Stat_Functions::convert_url_to_path($image);
+            $path = $gfpdf->misc->convert_url_to_path($image);
 
             $data[ $this->field->id . '_path' ][]                = $path;
             $data[ $this->field->id . '.' . $label . '_path' ][] = $path;

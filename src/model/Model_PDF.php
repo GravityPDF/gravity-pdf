@@ -5,7 +5,6 @@ namespace GFPDF\Model;
 use GFPDF\Model\Model_Form_Settings;
 use GFPDF\Helper\Helper_Model;
 use GFPDF\Helper\Helper_PDF;
-use GFPDF\Stat\Stat_Functions;
 
 use GFPDF\Helper\Helper_Fields;
 use GFPDF\Helper\Fields\Field_Product;
@@ -410,11 +409,13 @@ class Model_PDF extends Helper_Model {
      * @since 4.0
      */
     public function process_and_save_pdf($pdf) {
+        global $gfpdf;
+        
         /* Check that the PDF hasn't already been created this session */
         if($this->does_pdf_exist($pdf)) {
             try {
                 $pdf->init();
-                $pdf->renderHtml(Stat_Functions::get_template_args($pdf->getEntry(), $pdf->getSettings()));
+                $pdf->renderHtml( $gfpdf->misc->get_template_args($pdf->getEntry(), $pdf->getSettings()));
                 $pdf->setOutputType('save');
 
                 /* Generate PDF */
@@ -559,6 +560,8 @@ class Model_PDF extends Helper_Model {
      * @since 4.0
      */
     public function cleanup_pdf($entry, $form) {
+        global $gfpdf;
+
         $pdfs = (isset($form['gfpdf_form_settings'])) ? $this->get_active_pdfs($form['gfpdf_form_settings'], $entry) : array();
 
         if(sizeof($pdfs) > 0) {
@@ -576,7 +579,7 @@ class Model_PDF extends Helper_Model {
 
                     if($this->does_pdf_exist($pdf)) {
                         try {
-                            Stat_Functions::rmdir($pdf->getPath());
+                            $gfpdf->misc->rmdir($pdf->getPath());
                         } catch(Exception $e) {
                             /* Log to file */
                         }
@@ -1022,8 +1025,9 @@ class Model_PDF extends Helper_Model {
      * @since 4.0
      */
     public function get_field_class(GF_Field $field, $form, $entry, Field_Products $products) {
+        global $gfpdf;
 
-        $class_name = Stat_Functions::get_field_class($field->type);
+        $class_name = $gfpdf->misc->get_field_class($field->type);
         
         try {
             /* if we have a valid class name... */

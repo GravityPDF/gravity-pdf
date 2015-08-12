@@ -78,6 +78,14 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
     public $options;
 
     /**
+     * Holds our Helper_Misc object
+     * Makes it easy to access common methods throughout the plugin
+     * @var Object
+     * @since 4.0
+     */
+    public $misc;
+
+    /**
      * Add user depreciation notice for any methods not included in current object
      * @since  4.0
      */
@@ -99,6 +107,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
      * @since 4.0
      */
     public function init() {
+
         /* Set up our notices */
         $this->notices = new Helper\Helper_Notices();
         $this->notices->init();
@@ -107,10 +116,13 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
         $this->data = new Helper\Helper_Data();
         $this->data->init();
 
-        /* set up our options object - this is initialised on admin_init but other classes need to access its methods before this */
+        /* Set up our options object - this is initialised on admin_init but other classes need to access its methods before this */
         $this->options = new Helper\Helper_Options_Fields();
 
-        /* load modules */
+        /* Set up our misc object */
+        $this->misc = new Helper\Helper_Misc();
+
+        /* Load modules */
         $this->installer();
         $this->welcome_screen();
         $this->gf_settings();
@@ -217,7 +229,9 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
      * @return void
      */
     public function load_assets() {
-        if(Stat\Stat_Functions::is_gfpdf_page()) {
+        global $gfpdf;
+
+        if($gfpdf->misc->is_gfpdf_page()) {
             /* load styles */
             wp_enqueue_style('gfpdf_css_styles');
             wp_enqueue_style('gfpdf_css_chosen_style');
@@ -230,7 +244,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
             wp_enqueue_media();
         }
 
-        if(Stat\Stat_Functions::is_gfpdf_settings_tab('help') || Stat\Stat_Functions::is_gfpdf_settings_tab('tools')) {
+        if($gfpdf->misc->is_gfpdf_settings_tab('help') || $gfpdf->misc->is_gfpdf_settings_tab('tools')) {
              wp_enqueue_script('gfpdf_js_backbone');
         }
 
@@ -246,6 +260,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
      * @return void
      */
     public function auto_noconflict_scripts($items) {
+        
         $wp_scripts = wp_scripts();
 
         /* set defaults we will allow to load on GF pages */
@@ -278,7 +293,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
             }
         }
 
-        if(Stat\Stat_Functions::is_gfpdf_page()) {
+        if($this->misc->is_gfpdf_page()) {
             $items = array_merge($default_scripts, $items);
         }
 
@@ -291,6 +306,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
      * @return void
      */
     public function auto_noconflict_styles($items) {
+
         $wp_styles  = wp_styles();
 
         $default_styles = array(
@@ -307,7 +323,7 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
             }
         }
 
-        if(Stat\Stat_Functions::is_gfpdf_page()) {
+        if($this->misc->is_gfpdf_page()) {
             $items = array_merge($default_styles, $items);
         }
 

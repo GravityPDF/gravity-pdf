@@ -34,15 +34,17 @@ if(! class_exists('GFForms') ) {
  *
  */
 
+global $gfpdf;
+
 /**
  * Load up our template-specific appearance settings
  */
 $title_background_colour = (!empty($settings['title_background_colour'])) 	? $settings['title_background_colour'] : '#222222';
-$title_colour            = GFPDF\Stat\Stat_Functions::get_contrast($title_background_colour);
+$title_colour            = $gfpdf->misc->get_contrast($title_background_colour);
 /*$background_img          = (!empty($settings['background']))				? $settings['background'] : '';
-$first_header            = (!empty($settings['first_header'])) 				? GFPDF\Stat\Stat_Functions::fix_header_footer($settings['first_header']) : '';
-$header                  = (!empty($settings['header'])) 					? GFPDF\Stat\Stat_Functions::fix_header_footer($settings['header']) : '';
-$footer                  = (!empty($settings['footer'])) 					? GFPDF\Stat\Stat_Functions::fix_header_footer($settings['footer']) : '';*/
+$first_header            = (!empty($settings['first_header'])) 				? $gfpdf->misc->fix_header_footer($settings['first_header']) : '';
+$header                  = (!empty($settings['header'])) 					? $gfpdf->misc->fix_header_footer($settings['header']) : '';
+$footer                  = (!empty($settings['footer'])) 					? $gfpdf->misc->fix_header_footer($settings['footer']) : '';*/
 $font_colour             = (!empty($settings['font_colour'])) 				? $settings['font_colour'] : '#333';
 $font                    = (!empty($settings['font'])) 		                ? $settings['font'] : 'DejavuSansCondensed';
 
@@ -308,7 +310,7 @@ $font                    = (!empty($settings['font'])) 		                ? $sett
 			 *
 			 */
 			$pdf = new GFPDF\View\View_PDF;
-			$pdf->process_html_structure($entry, $config);
+			$pdf->process_html_structure($entry, new GFPDF\Model\Model_PDF(), $config);
 		?>
 	</body>
 </html>
