@@ -785,7 +785,7 @@
 			 * @since 4.0
 			 */
 			render: function() {
-				this.$el.html('<i class="fa fa-plus fa-4x"></i><span>Add Font</span>')
+				this.$el.html('<i class="fa fa-plus fa-4x"></i><span>Add Font</span>');
 			},
 
 			/**
@@ -840,7 +840,7 @@
 					});
 				}
 		    });
-		}
+		};
 
 
 
@@ -875,7 +875,7 @@
 			parse: function(response) {
 				return response.topic_list.topics;
 			}
-		}),
+		});
 
 		help.ContainerView = Backbone.View.extend({
 			el: '#search-knowledgebase',
@@ -953,10 +953,8 @@
 
 				new help.DocsView({
 					s: search,
-				})
-			},
-
-
+				});
+			}
 
 		});
 
@@ -1096,11 +1094,11 @@
 				if(this.is_settings()) {
 					this.processSettings();
 				}
-			}
+			};
 
 			this.is_settings = function() {
 				return $('#tab_PDF').length;
-			}
+			};
 
 			this.processSettings = function() {
 				var active = $('.nav-tab-wrapper a.nav-tab-active:first').text();
@@ -1114,7 +1112,7 @@
 						this.help_settings();
 					break;
 				}
-			}
+			};
 
 			/**
 			 * The help settings model method
@@ -1126,7 +1124,7 @@
 				 * Load our settings dependancy
 				 */
 				new help.ContainerView();
-			}
+			};
 
 			/**
 			 * The help tools model method
@@ -1151,7 +1149,7 @@
 					collection: fontCollection,
 					container: container
 				});
-			}
+			};
 
 		}
 

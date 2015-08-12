@@ -179,6 +179,9 @@ class Helper_Data {
             'update_success'              => __('Successfully Updated', 'gravitypdf'),
             'delete_success'              => __('Successfully Deleted', 'gravitypdf'),
             'custom_fonts'                => json_encode($custom_fonts),
+            'no'                          => __('No', 'gravitypdf'),
+            'yes'                         => __('Yes', 'gravitypdf'),
+            'standard'                    => __('Standard', 'gravitypdf'),
         ));
     }
 }

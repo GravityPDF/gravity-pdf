@@ -6,11 +6,15 @@
 
 (function($) {
 
+	/**
+	 * Fires on the Document Ready Event (the same as $(document).ready(function() { ... });)
+	 * @since 4.0
+	 */
 	$(function() {
 
 		/**
 		 * Check if the global gf_vars has been set and if so replace the .thisFormButton object with our
-		 * GFPDF.condtionalText object
+		 * GFPDF.condtionalText object. This allows us to override the standard Gravity Forms conditional logic text "Enable this field if" gets turned to "Enable this PDF if"
 		 * @since 4.0
 		 */
 		if(typeof gf_vars !== 'undefined') {
@@ -19,7 +23,7 @@
 
 		/*
 		 * Override the gfMergeTagsObj.getTargetElement prototype to better handle CSS special characters in selectors
-		 * This is because Gravity Forms doesn't correctly espace meta-characters
+		 * This is because Gravity Forms doesn't correctly espace meta-characters such a [ and ] (which we use extensively as IDs)
 		 * This functionality assists with the merge tag loader
 		 * @since 4.0
 		 */
@@ -34,17 +38,19 @@
 		        selector = selector.replace(/[!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&");
 
 		        return $('#' + selector );
-			}
+			};
 		}
 
 		/**
 		 * Our Admin controller
-		 * Applies correct JS to settings pages
+		 * Applies correct JS to our Gravity PDF pages
 		 * @since 4.0
 		 */
 		function GravityPDF () {
+			
 			/**
 			 * A reference to the GravityPDF object when 'this' refers to a different object
+			 * Usage is inside AJAX closures. All other functions should use $.proxy() to set this appropriately
 			 * @type Object
 			 * @since 4.0
 			 */
@@ -57,73 +63,97 @@
 			 * @since 4.0
 			 */
 			this.init = function() {
-				/* process the global PDF settings */
-				if(this.is_settings()) {
+
+				/* Process any common functions */
+				this.initCommon();
+
+				/* Process the global PDF settings */
+				if(this.isSettings()) {
 					this.processSettings();
 				}
 
-				/* process the individual form PDF settings */
-				if(this.is_form_settings()) {
+				/* Process the individual form PDF settings */
+				if(this.isFormSettings()) {
 					this.processFormSettings();
 				}
+			};
 
-				/* if we have a upload field handle the logic */
+			/**
+			 * Initialise any common elements
+			 * @return void
+			 * @since 4.0
+			 */
+			this.initCommon = function() {
+				
+				/* If we have a upload field handle the logic */
 				this.doUploadListener();
 
-				/* if we have a colour picker handle the logic */
-				this.doColorListener();
+				/* If we have a colour picker handle the logic */
+				this.doColorPicker();
 
-				/* if we have any select boxes to handle */
-				this.setup_select_boxes();
-			}
+				/* If we have any select boxes to handle */
+				this.setupSelectBoxes();
+
+				/* Enable tooltips, if needed */
+				this.showTooltips();
+
+				/* Setup custom paper size, if needed */
+				this.setupCustomPaperSize();
+
+				/* Setup toggled fields, if needed */
+				this.setupToggledFields();
+
+				/* Setup our template loader, if needed */
+				this.setupDynamicTemplateFields();
+			};
 
 			/**
 			 * Get if on the global PDF settings pages
 			 * @return Integer
 			 * @since 4.0
 			 */
-			this.is_settings = function() {
+			this.isSettings = function() {
 				return $('#tab_PDF').length;
-			}
+			};
 
 			/**
 			 * Check if on the individual PDF form settings pages
 			 * @return Integer
 			 * @since 4.0
 			 */
-			this.is_form_settings = function() {
+			this.isFormSettings = function() {
 				return $('#tab_pdf').length;
-			}
+			};
 
 			/**
 			 * See if we are on the form settings list page
 			 * @return Integer
 			 * @since 4.0
 			 */
-			this.is_form_settings_list = function() {
+			this.isFormSettingsList = function() {
 				return $('#gfpdf_list_form').length;
-			}
+			};
 
 			/**
 			 * See if we are on the form settings edit page
 			 * @return Integer
 			 * @since 4.0
 			 */
-			this.is_form_settings_edit = function() {
+			this.isFormSettingsEdit = function() {
 				return $('#gfpdf_pdf_form').length;
-			}
+			};
 
 			/**
 			 * Check the current active PDF settings page
 			 * @return String
 			 * @since 4.0
 			 */
-			this.get_current_settings_page = function() {
-				if(this.is_settings()) {
+			this.getCurrentSettingsPage = function() {
+				if(this.isSettings()) {
 					return $('.nav-tab-wrapper a.nav-tab-active:first').text();
 				}
 				return '';
-			}
+			};
 
 			/**
 			 * Process the global settings page
@@ -131,24 +161,21 @@
 			 * @since 4.0
 			 */
 			this.processSettings = function() {
-				this.show_tooltips(); /* enable tooltips, if needed */
-				this.cleanup_gf_navigation(); /* Ensure the Gravity Forms settings navigation (Form Settings / Notifications / Confirmation) has the 'tab' URI stripped from it */
+				
+				/* Ensure the Gravity Forms settings navigation (Form Settings / Notifications / Confirmation) has the 'tab' URI stripped from it */
+				this.cleanupGFNavigation();
 
-				/* run the appropriate settings page */
-				switch (this.get_current_settings_page()) {
+				/* Run the appropriate settings page */
+				switch (this.getCurrentSettingsPage()) {
 					case 'General':
-						this.general_settings();
+						this.generalSettings();
 					break;
 
 					case 'Tools':
-						this.tools_settings();
-					break;
-
-					case 'Help':
-						this.help_settings();
+						this.toolsSettings();
 					break;
 				}
-			}
+			};
 
 			/**
 			 * Routing functionality for the individual form settings page
@@ -157,21 +184,257 @@
 			 */
 			this.processFormSettings = function() {
 
-				if(this.is_form_settings_edit()) {
-					this.do_form_settings_edit_page();
+				/* Process PDF list page */
+				if(this.isFormSettingsList()) {
+					this.doFormSettingsListPage();
 				}
 
-				if(this.is_form_settings_list()) {
-					this.do_form_settings_list_page();
+				/* Process single edit page */
+				if(this.isFormSettingsEdit()) {
+					this.doFormSettingsEditPage();
 				}
-			}
+			};
+
+			/**
+			 * Process the individual PDF GF Form Settings Page
+			 * @return void
+			 * @since 4.0
+			 */
+			this.doFormSettingsEditPage = function() {
+
+				this.setupRequiredFields( $('#gfpdf_pdf_form') ); /* highlight which fields are required and disable in-browser validation */
+				this.setupPdfTabs();
+				this.handleSecurityConditionals();
+				this.handlePDFConditionalLogic();
+
+				/*
+				 * Workaround for Firefix TinyMCE Editor Bug NS_ERROR_UNEXPECTED (http://www.tinymce.com/develop/bugtracker_view.php?id=3152) when loading wp_editor via AJAX
+				 * Manual save TinyMCE editors on form submission
+				 */
+				$('#gfpdf_pdf_form').submit(function() {
+					try {
+						tinyMCE.triggerSave();
+					} catch(e) {};
+				});
+
+				/* Add listener on submit functionality */
+				$('#gfpdf_pdf_form').submit(function() {
+					/* JSONify the conditional logic so we can pass it through the form and use it in PHP (after running json_decode) */
+					$('#gfpdf_settings\\[conditionalLogic\\]').val(jQuery.toJSON(window.gfpdf_current_pdf.conditionalLogic));
+				});
+
+			};
+
+			/**
+			 * Handles our DOM security conditional logic based on the user selection
+			 * @return void
+			 * @since 4.0
+			 */
+			this.handleSecurityConditionals = function() {
+
+				/* Get the appropriate elements for use */
+				var $secTable    = $('#pdf-general-advanced');
+				var $pdfSecurity = $secTable.find('input[name="gfpdf_settings[security]"]');
+				var $format      = $secTable.find('input[name="gfpdf_settings[format]"]');
+
+				/* Add change event to admin restrictions to show/hide dependant fields */
+				$pdfSecurity.change(function() {
+
+					if($(this).is(':checked')) {
+						
+						/* Get the format dependancy */
+						var format =  $format.filter(':checked').val();
+
+						/* TODO - fix translation */
+						if($(this).val() === GFPDF.no || format !== GFPDF.standard) {
+							/* hide security password / privileges */
+							$secTable.find('tr:nth-child(3),tr:nth-child(4)').hide();
+						} else {
+							/* show security password / privileges */
+							$secTable.find('tr:nth-child(3),tr:nth-child(4)').show();
+						}
+
+						if(format !== GFPDF.standard) {
+							$secTable.find('tr:nth-child(2)').hide();
+						} else {
+							$secTable.find('tr:nth-child(2)').show();
+						}
+					}
+
+				}).trigger('change');
+				
+				/* The format field effects the security field. When it changes it triggers the security field as changed */
+				$format.change(function() {
+					if($(this).is(':checked')) {
+						$pdfSecurity.trigger('change');
+					}
+				}).trigger('change');
+			};
+
+			/**
+			 * Add GF JS filter to change the conditional logic object type to our PDF
+			 * @return Object
+			 * @since 4.0
+			 */
+			this.handlePDFConditionalLogic = function() {
+				
+				gform.addFilter( 'gform_conditional_object', function(object, objectType) {
+					if(objectType === 'gfpdf') {
+						return window.gfpdf_current_pdf;
+					}
+					return object;
+				});
+
+				/* Add change event to conditional logic field */
+				$('#gfpdf_conditional_logic').change( function() {
+					
+					/* Only set up a .conditionalLogic object if it doesn't exist */
+					if(typeof window.gfpdf_current_pdf.conditionalLogic == 'undefined' && $(this).prop('checked')) {
+
+						window.gfpdf_current_pdf.conditionalLogic = new ConditionalLogic();
+					} else if(!$(this).prop('checked')) {
+
+						window.gfpdf_current_pdf.conditionalLogic = null;
+					}
+					ToggleConditionalLogic(false, 'gfpdf');
+
+				}).trigger('change');
+			};
 
 			/**
 			 * Process the functionality for the PDF form settings 'list' page
 			 * @return void
 			 * @since 4.0
 			 */
-			this.do_form_settings_list_page = function() {
+			this.doFormSettingsListPage = function() {
+
+				this.setupAJAXListDeleteListener();
+				this.setupAJAXListDuplicateListener();
+				this.setupAJAXListStateListener();
+			};
+
+			/**
+			 * Handles the state change of a PDF list item via AJAX
+			 * @return void
+			 * @since 4.0
+			 */
+			this.setupAJAXListStateListener = function() {
+				
+				/* Add live state listener to change active / inactive value */
+				$('#gfpdf_list_form').on('click', '.check-column img', function() {
+					var id = String($(this).data('id'));
+					var that = this;
+
+					if(id.length > 0) {
+						var is_active = that.src.indexOf('active1.png') >= 0;
+						
+						if (is_active) {
+							that.src = that.src.replace('active1.png', 'active0.png');
+							$(that).attr('title', GFPDF.inactive).attr('alt', GFPDF.inactive);
+						} else {
+							that.src = that.src.replace('active0.png', 'active1.png');
+							$(that).attr('title', GFPDF.active).attr('alt', GFPDF.active);
+						}
+						
+						/* Set up ajax data */
+			      		var data = {
+			      			'action': 'gfpdf_change_state',
+			      			'nonce': $(this).data('nonce'),
+			      			'fid': $(this).data('fid'),
+			      			'pid': $(this).data('id'),
+			      		};
+
+			      		/* Do ajax call */
+			      		self.ajax(data, function(response) {
+			      			/* Don't do anything with a successful response */
+			      		});
+			      	}
+				});
+			};
+
+			/**
+			 * Handles the duplicate of a PDF list item via AJAX and fixes up all the nonce actions
+			 * @return void
+			 * @since 4.0
+			 */
+			this.setupAJAXListDuplicateListener = function() {
+				
+				/* Add live duplicate listener */
+				$('#gfpdf_list_form').on('click', 'a.submitduplicate', function() {
+
+					var id = String($(this).data('id'));
+					var that = this;
+
+					if(id.length > 0) {
+						/* Set up ajax data */
+			      		var data = {
+			      			'action': 'gfpdf_list_duplicate',
+			      			'nonce': $(this).data('nonce'),
+			      			'fid': $(this).data('fid'),
+			      			'pid': $(this).data('id'),
+			      		};
+
+			      		/* Do ajax call */
+			      		self.ajax(data, function(response) {
+			      			if(response.msg) {
+			      				/* Provide feedback to use */
+			      				self.show_message(response.msg);
+
+			      				/* Clone the row to be duplicated */
+								var $row    = $(that).parents('tr');
+								var $newRow = $row.clone().css('background', '#baffb8');
+
+								/* Update the edit links to point to the new location */
+			      				$newRow.find('.column-name > a, .edit a').each(function() {
+									var href = $(this).attr('href');
+									href     = self.updateURLParameter(href, 'pid', response.pid);
+									$(this).attr('href', href);
+			      				});
+
+			      				/* Update the name field */
+			      				$newRow.find('.column-name > a').html(response.name);
+
+			      				/* Find duplicate and delete elements */
+								var $duplicate = $newRow.find('.duplicate a');
+								var $delete    = $newRow.find('.delete a');
+								var $state     = $newRow.find('.check-column img');
+
+								/* Update duplicate ID and nonce pointers so the actions are valid */
+								$duplicate.data('id', response.pid);
+								$duplicate.data('nonce', response.dup_nonce);
+
+								/* Update delete ID and nonce pointers so the actions are valid */
+								$delete.data('id', response.pid);
+								$delete.data('nonce', response.del_nonce);
+
+								/* update state ID and nonce pointers so the actions are valid */
+								$state.data('id', response.pid);
+								$state.data('nonce', response.state_nonce);
+
+								/* Add fix for alternate row background */
+								var background = '';
+								if($row.hasClass('alternate')) {
+									$newRow.removeClass('alternate');
+									background = '#FFF';
+								} else {
+									$newRow.addClass('alternate');
+									background = '#f9f9f9';
+								}
+
+								/* Add row to node and fade in */
+								$newRow.hide().insertAfter($row).fadeIn().animate({backgroundColor: background});
+			      			}
+			      		});
+					}
+				});
+			};
+
+			/**
+			 * Handles the deletion of a PDF list item via AJAX
+			 * @return void
+			 * @since 4.0
+			 */
+			this.setupAJAXListDeleteListener = function() {
 				/* Set up our delete dialog */
 				var $deleteDialog = $( '#delete-confirm' );
 
@@ -195,8 +458,6 @@
 				      				var $row = $elm.parents('tr');
 				      				$row.css('background', '#ffb8b8').fadeOut().remove();
 				      			}
-
-				      			console.log(response);
 				      		});
 
 				      	}
@@ -219,204 +480,14 @@
 						$deleteDialog.wpdialog( 'open' ).data('elm', this);
 					}
 				});
-
-				/* Add live duplicate listener */
-				$('#gfpdf_list_form').on('click', 'a.submitduplicate', function() {
-					var id = String($(this).data('id'));
-					var that = this;
-
-					if(id.length > 0) {
-						/* set up ajax data */
-			      		var data = {
-			      			'action': 'gfpdf_list_duplicate',
-			      			'nonce': $(this).data('nonce'),
-			      			'fid': $(this).data('fid'),
-			      			'pid': $(this).data('id'),
-			      		};
-
-			      		/* do ajax call */
-			      		self.ajax(data, function(response) {
-			      			if(response.msg) {
-			      				/* provide feedback to use */
-			      				self.show_message(response.msg);
-
-			      				/* clone the row to be duplicated */
-								var $row    = $(that).parents('tr');
-								var $newRow = $row.clone().css('background', '#baffb8');
-
-								/* update the edit links to point to the new location */
-			      				$newRow.find('.column-name > a, .edit a').each(function() {
-									var href = $(this).attr('href');
-									href     = self.updateURLParameter(href, 'pid', response.pid);
-									$(this).attr('href', href);
-			      				});
-
-			      				/* Update the name field */
-			      				$newRow.find('.column-name > a').html(response.name);
-
-			      				/* Find duplicate and delete elements */
-								var $duplicate = $newRow.find('.duplicate a');
-								var $delete    = $newRow.find('.delete a');
-								var $state     = $newRow.find('.check-column img');
-
-								/* update duplicate ID and nonce pointers so the actions are valid */
-								$duplicate.data('id', response.pid);
-								$duplicate.data('nonce', response.dup_nonce);
-
-								/* update delete ID and nonce pointers so the actions are valid */
-								$delete.data('id', response.pid);
-								$delete.data('nonce', response.del_nonce);
-
-								/* update state ID and nonce pointers so the actions are valid */
-								$state.data('id', response.pid);
-								$state.data('nonce', response.state_nonce);
-
-								/* add fix for alternate row background */
-								if($row.hasClass('alternate')) {
-									$newRow.removeClass('alternate');
-									var background = '#FFF';
-								} else {
-									$newRow.addClass('alternate');
-									var background = '#f9f9f9';
-								}
-
-								/* add row to node and fade in */
-								$newRow.hide().insertAfter($row).fadeIn().animate({backgroundColor: background});
-			      			}
-			      			console.log(response);
-			      		});
-					}
-				});
-
-				/* Add live state listener to change active / inactive value */
-				$('#gfpdf_list_form').on('click', '.check-column img', function() {
-					var id = String($(this).data('id'));
-					var that = this;
-
-					if(id.length > 0) {
-						var is_active = that.src.indexOf('active1.png') >= 0;
-						if (is_active) {
-							that.src = that.src.replace('active1.png', 'active0.png');
-							$(that).attr('title', GFPDF.inactive).attr('alt', GFPDF.inactive);
-						} else {
-							that.src = that.src.replace('active0.png', 'active1.png');
-							$(that).attr('title', GFPDF.active).attr('alt', GFPDF.active);
-						}
-						
-						/* set up ajax data */
-			      		var data = {
-			      			'action': 'gfpdf_change_state',
-			      			'nonce': $(this).data('nonce'),
-			      			'fid': $(this).data('fid'),
-			      			'pid': $(this).data('id'),
-			      		};
-
-			      		/* do ajax call */
-			      		self.ajax(data, function(response) {
-			      			/* don't do anything with a successful response */
-			      		});
-			      	}
-				});
-			}
-
-			/**
-			 * Process the individual PDF GF Form Settings Page
-			 * @return void
-			 * @since 4.0
-			 */
-			this.do_form_settings_edit_page = function() {
-				this.setup_required_fields($('#gfpdf_pdf_form')); /* highlight which fields are required and disable in-browser validation */
-				this.show_tooltips(); /* enable tooltips, if needed */
-				this.setup_custom_paper_size(); /* set up the custom paper size logic */
-				this.setup_dynamic_template_fields();
-				this.setup_toggled_fields();
-				this.setup_gfpdf_tabs();
-
-				/*
-				 * Workaround for Firefix TinyMCE Editor Bug NS_ERROR_UNEXPECTED (http://www.tinymce.com/develop/bugtracker_view.php?id=3152)
-				 * Manual save TinyMCE editors on form submission
-				 */
-				$('#gfpdf_pdf_form').submit(function() {
-					try {
-						tinyMCE.triggerSave();
-					} catch(e) {};
-				});
-
-				/**
-				 * Get the appropriate elements for use
-				 */
-				var $secTable    = $('#pdf-general-advanced');
-				var $pdfSecurity = $secTable.find('input[name="gfpdf_settings[security]"]');
-				var $format      = $secTable.find('input[name="gfpdf_settings[format]"]');
-
-				/*
-				 * Add change event to admin restrictions to show/hide dependant fields
-				 */
-				$pdfSecurity.change(function() {
-					if($(this).is(':checked')) {
-						/* get the format dependancy */
-						var format =  $format.filter(':checked').val();
-
-						if($(this).val() === 'No' || format !== 'Standard') {
-							/* hide security password / privileges */
-							$secTable.find('tr:nth-child(3),tr:nth-child(4)').hide();
-						} else {
-							/* show security password / privileges */
-							$secTable.find('tr:nth-child(3),tr:nth-child(4)').show();
-						}
-
-						if(format !== 'Standard') {
-							$secTable.find('tr:nth-child(2)').hide();
-						} else {
-							$secTable.find('tr:nth-child(2)').show();
-						}
-					}
-				}).trigger('change');
-				
-				/* The format field effects the security field. When it changes it triggers the security field as changed */
-				$format.change(function() {
-					if($(this).is(':checked')) {
-						$pdfSecurity.trigger('change');
-					}
-				}).trigger('change');
-
-
-				/* add GF JS filter to change the conditional logic object type */
-				gform.addFilter( 'gform_conditional_object', function(object, objectType) {
-					console.log(window.gfpdf_current_pdf);
-					if(objectType === 'gfpdf') {
-						return window.gfpdf_current_pdf;
-					}
-					return object;
-				});
-
-				/*
-				 * Add change event to conditional logic field
-				 */
-				$('#gfpdf_conditional_logic').change( function() {
-					/* only set up a .conditionalLogic object if it doesn't exist */
-					if(typeof window.gfpdf_current_pdf.conditionalLogic == 'undefined' && $(this).prop('checked')) {
-						window.gfpdf_current_pdf.conditionalLogic = new ConditionalLogic();
-					} else if(!$(this).prop('checked')) {
-						window.gfpdf_current_pdf.conditionalLogic = null;
-					}
-					ToggleConditionalLogic(false, 'gfpdf');
-
-				}).trigger('change');
-
-				/* Add listener on submit functionality */
-				$('#gfpdf_pdf_form').submit(function() {
-					/* JSONify the conditional logic so we can pass it through the form and use it in PHP (after running json_decode) */
-					$('#gfpdf_settings\\[conditionalLogic\\]').val(jQuery.toJSON(window.gfpdf_current_pdf.conditionalLogic));
-				});
-			}
+			};
 
 			/**
 			 * Handle our AJAX tabs to make it easier to navigate around our settings
 			 * @return void
 			 * @since 4.0
 			 */
-			this.setup_gfpdf_tabs = function() {
+			this.setupPdfTabs = function() {
 				
 				/* Hide all containers except the first one */
 				$('.gfpdf-tab-container').not(":eq(0)").hide();
@@ -439,15 +510,16 @@
 					return false;
 
 				});
-			}
+			};
 
 			/**
 			 * Add change event listeners on our toggle params and toggle the container
 			 * @return void
 			 * @since 4.0
 			 */
-			this.setup_toggled_fields = function() {
-				$('form').on( 'change', '.gfpdf-input-toggle', function() {
+			this.setupToggledFields = function() {
+
+				$('form').off('change', '.gfpdf-input-toggle').on( 'change', '.gfpdf-input-toggle', function() {
 
 					var $container = $(this).parent().next();
 
@@ -468,7 +540,7 @@
 						});
 					}
 				});
-			}
+			};
 
 			/**
 			 * PDF Templates can assign their own custom settings which can enhance a template
@@ -476,37 +548,41 @@
 			 * @return return
 			 * @since 4.0
 			 */
-			this.setup_dynamic_template_fields = function() {
-				/* add change listener to our template */
-				$('#gfpdf_settings\\[template\\], #gfpdf_settings\\[default_template\\]').change(function() {
+			this.setupDynamicTemplateFields = function() {
 
-					/* add spinner */
+				/* Add change listener to our template */
+				$('#gfpdf_settings\\[template\\], #gfpdf_settings\\[default_template\\]').off('change').change(function() {
+
+					/* Add spinner */
 					var $spinner = $('<img alt="Loading" src="' + GFPDF.spinnerUrl + '" class="gfpdf-spinner" />');
+
 					$(this).next().after($spinner);
 
 					/* Hide our template preview */
 					$('#gfpdf-template-example').hide();
 
 		      		var data = {
-		      			'action': 'gfpdf_get_template_fields',
-		      			'template': $(this).val(),
-		      			'type': $(this).attr('id'),
-		      			'id': $('#gform_id').val(),
+		      			'action': 		'gfpdf_get_template_fields',
+		      			'template': 	$(this).val(),
+		      			'type': 		$(this).attr('id'),
+		      			'id': 			$('#gform_id').val(),
 		      			'gform_pdf_id': $('#gform_pdf_id').val(),
 		      		};
 
 		      		self.ajax(data, function(response) {
+		      			
+		      			/* Remove our UI loader */
 		      			$spinner.remove();
 
-		      			if(response !== undefined && response.fields !== undefined) {
+		      			/* Only process if the response is valid */
+		      			if(response.fields) {
 
-		      				/* Remove any existing merge tag-marked inputs so they aren't processed twice */
+		      				/* Remove any existing mergetag-marked inputs so they aren't processed twice after we add our new fields to the DOM */
 		      				$('.merge-tag-support').removeClass('merge-tag-support');
 
-		      				/* Remove any previously loaded editors */
+		      				/* Remove any previously loaded editors to prevent conflicts loading an editor with same name */
 		      				$.each( response.editors, function( index, value ) {
 
-		      					/* Remove existing editor so we can add the new one */
 		      					var editor = tinyMCE.get( value );
 		      					if( editor !== null ) {
 		      						/* Bug Fix for Firefox - http://www.tinymce.com/develop/bugtracker_view.php?id=3152 */
@@ -522,65 +598,76 @@
 		      				$('#pdf-custom-appearance').hide().html(response.fields).fadeIn();
 
 		      				/* Load our new editors */
-		      				$.each( response.editors, function( index, value ) {
+		      				self.loadTinyMCEEditor(response.editors, response.editor_init);
 
-		      					var fullId = value;
-
-		      					var settings = response.editor_init;
-
-		      					/* Setup out selector */
-								settings.selector   = '#' + fullId;
-								settings.body_class = 'id post-type-post post-status-publish post-format-standard';
-								settings.formats    =  {
-		                			alignleft: [
-		                				{selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li', styles: {textAlign:'left'}},
-		                				{selector: 'img,table,dl.wp-caption', classes: 'alignleft'}
-		                			],
-		                			aligncenter: [
-		                				{selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li', styles: {textAlign:'center'}},
-		                				{selector: 'img,table,dl.wp-caption', classes: 'aligncenter'}
-		                			],
-		                			alignright: [
-		                				{selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li', styles: {textAlign:'right'}},
-		                				{selector: 'img,table,dl.wp-caption', classes: 'alignright'}
-		                			],
-		                			strikethrough: {inline: 'del'}
-		                		};
-		      			
-								/* Initialise our editor */
-								tinyMCE.init( settings );
-								
-						        /* Add our editor to the DOM */
-					        	tinyMCE.execCommand('mceAddEditor', false, fullId);
-					        	
-					        	/* Enable WP quick tags */
-						        if ( typeof(QTags) == 'function' ) {
-					                	QTags( {'id': fullId } );
-					                	QTags._buttonsInit();
-				                    	
-				                    	/* remember last tab selected */
-				                    	switchEditors.switchto( jQuery( '#wp-' + fullId + '-wrap' ).find( '.wp-switch-editor.switch-' + ( getUserSetting( 'editor' ) == 'html' ? 'html' : 'tmce' ) )[0] );
-					            }
-
-		      				} );
-
-		      				/* set up any dynamic field type */
-		      				self.setup_select_boxes();
-		      				self.doColorListener();
-		      				self.show_tooltips();
+		      				/* reinitialise new dom elements */
+		      				self.initCommon();
 		      				self.doMergetags();
 
 		      			}
 
 		      			/* Update our template example preview and display it */
-		      			if(response !== undefined && response.preview != false) {
+		      			if(response.preview != null) {
 		      				$('#gfpdf-template-example').attr('src', response.preview).load(function() {
 		      					$(this).show();
 		      				});
 		      			}
 		      		});
 				});
-			}
+			};
+
+			/**
+			 * Initialises AJAX-loaded wp_editor TinyMCE containers for use
+			 * @param  Array editors  The DOM element IDs to parse
+			 * @param  Object settings The TinyMCE settings to use
+			 * @return void
+			 * @since  4.0
+			 */
+			this.loadTinyMCEEditor = function(editors, settings) {
+				
+				if(settings != null) {
+					/* Ensure appropriate settings defaults */
+					settings.body_class = 'id post-type-post post-status-publish post-format-standard';
+					settings.formats    =  {
+	        			alignleft: [
+	        				{selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li', styles: {textAlign:'left'}},
+	        				{selector: 'img,table,dl.wp-caption', classes: 'alignleft'}
+	        			],
+	        			aligncenter: [
+	        				{selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li', styles: {textAlign:'center'}},
+	        				{selector: 'img,table,dl.wp-caption', classes: 'aligncenter'}
+	        			],
+	        			alignright: [
+	        				{selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li', styles: {textAlign:'right'}},
+	        				{selector: 'img,table,dl.wp-caption', classes: 'alignright'}
+	        			],
+	        			strikethrough: {inline: 'del'}
+	        		};
+	        	}
+
+				/* Load our new editors */
+  				$.each( editors, function( index, fullId ) {
+
+  					/* Setup out selector */
+					settings.selector   = '#' + fullId;
+  			
+					/* Initialise our editor */
+					tinyMCE.init( settings );
+					
+			        /* Add our editor to the DOM */
+		        	tinyMCE.execCommand('mceAddEditor', false, fullId);
+		        	
+		        	/* Enable WP quick tags */
+			        if ( typeof(QTags) == 'function' ) {
+		                	QTags( {'id': fullId } );
+		                	QTags._buttonsInit();
+	                    	
+	                    	/* remember last tab selected */
+	                    	switchEditors.switchto( jQuery( '#wp-' + fullId + '-wrap' ).find( '.wp-switch-editor.switch-' + ( getUserSetting( 'editor' ) == 'html' ? 'html' : 'tmce' ) )[0] );
+		            }
+
+  				} );
+			};
 
 			/**
 			 * Rich Media Uploader
@@ -593,7 +680,7 @@
 				var file_frame;
 				window.formfield = '';
 
-				$('body').on('click', '.gfpdf_settings_upload_button', function(e) {
+				$('body').off('click', '.gfpdf_settings_upload_button').on('click', '.gfpdf_settings_upload_button', function(e) {
 					e.preventDefault();
 
 					var $button      = $(this);
@@ -626,18 +713,19 @@
 					/* Finally, open the modal */
 					file_frame.open();
 				});
-			}
+			};
 
 			/**
 			 * Check if a Gravity PDF color picker field is present and initialise
 			 * @return void
 			 * @since 4.0
 			 */
-			this.doColorListener = function() {
-				if( $('.gfpdf-color-picker').length ) {
-					$('.gfpdf-color-picker').wpColorPicker();
-				}
-			}
+			this.doColorPicker = function() {
+
+				$('.gfpdf-color-picker').each(function() {
+					$(this).wpColorPicker();
+				});
+			};
 
 			/**
 			 * Remove any existing merge tags and reinitialise
@@ -648,23 +736,21 @@
 			    if(typeof form != 'undefined') {
 			        window.gfMergeTags = new gfMergeTagsObj(form);
 			    }
-			}
+			};
 
 			/**
 			 * Show / Hide our custom paper size as needed
 			 * @return void
 			 * @since 4.0
 			 */
-			this.setup_custom_paper_size = function() {
-				var $paperSizeContainer = $('.gfpdf_paper_size');
+			this.setupCustomPaperSize = function() {
 
-				/* there could be multiple paper sizes on a single page (not currently, but there could) */
-				$paperSizeContainer.each(function() {
+				$('.gfpdf_paper_size').each(function() {
 					var $customPaperSize = $(this).nextAll('.gfpdf_paper_size_other').first();
 					var $paperSize       = $(this).find('select');
 
-					/* add our change event */
-					$paperSize.change(function() {
+					/* Add our change event */
+					$paperSize.off('change').change(function() {
 						if($(this).val() === 'custom') {
 							$customPaperSize.fadeIn();
 						} else {
@@ -674,14 +760,14 @@
 
 				});
 				
-			}
+			};
 
 			/**
 			 * Our &tab=(.+?) url param causes issues with the default GF navigation
 			 * @return void
 			 * @since 4.0
 			 */
-			this.cleanup_gf_navigation = function() {
+			this.cleanupGFNavigation = function() {
 				var $nav = $('#gform_tabs a');
 
 				$nav.each(function() {
@@ -690,7 +776,7 @@
 
 					$(this).attr('href', href.replace(regex, ''));
 				});
-			}
+			};
 
 			/**
 			 * Enable dynamic required fields on the Gravity Forms PDF Settings page
@@ -698,7 +784,7 @@
 			 * @return void
 			 * @since 4.0
 			 */
-			this.setup_required_fields = function($elm) {
+			this.setupRequiredFields = function($elm) {
 				/* prevent in browser validation */
 				$elm.attr('novalidate', 'novalidate');
 
@@ -711,7 +797,7 @@
 				$elm.find('tr').each(function() {
 					$(this).find(':input[required=""]:first, :input[required]:first').parents('tr').find('th').append('<span class="gfield_required">*</span>');
 				});
-			}
+			};
 
 			/**
 			 * Because we are using the WordPress Settings API Gravity Forms tooltip support was lacking
@@ -719,7 +805,7 @@
 			 * @return void
 			 * @since 4.0
 			 */
-			this.show_tooltips = function() {
+			this.showTooltips = function() {
 				$('.gf_hidden_tooltip').each(function() {
 					$(this)
 					.parent()
@@ -733,14 +819,14 @@
 				});
 
 				gform_initialize_tooltips();
-			}
+			};
 
 			/**
 			 * Set up 'chosen' select boxes
 			 * @return void
 			 * @since 4.0
 			 */
-			this.setup_select_boxes = function() {
+			this.setupSelectBoxes = function() {
 				$('.gfpdf-chosen').each(function() {
 					var width = $(this).css('width');
 
@@ -749,7 +835,7 @@
 						width: width,
 					});
 				});
-			}
+			};
 
 			/**
 			 * Controls the Advanced Options hide / show functionality
@@ -783,7 +869,7 @@
 				if($('.gfpdf-advanced-options').prev().find('.gfield_error').length) {
 					$advanced_options_container.show();
 				}
-			}
+			};
 
 			/**
 			 * The general settings model method
@@ -791,11 +877,8 @@
 			 * @return void
 			 * @since 4.0
 			 */
-			this.general_settings = function() {
-				/* setup custom paper size */
-				this.setup_custom_paper_size();
-				this.setup_dynamic_template_fields();
-				this.setup_required_fields($('#pdfextended-settings > form'));
+			this.generalSettings = function() {
+				this.setupRequiredFields( $('#pdfextended-settings > form') );
 
 				var $table             = $('#pdf-general-security');
 				var $adminRestrictions = $table.find('input[name="gfpdf_settings[limit_to_admin]"]');
@@ -817,20 +900,28 @@
 
 				/* setup advanced options */
 				this.setup_advanced_options();
-			}
+			};
 
 			/**
 			 * The tools settings model method
 			 * This sets up and processes any of the JS that needs to be applied on the tools settings tab
 			 * @since 4.0
 			 */
-			this.tools_settings = function() {
+			this.toolsSettings = function() {
+				this.setupToolsTemplateInstallerDialog();
+				this.setupToolsFontsDialog();
+				this.setupToolsUninstallDialog();
+			};
+
+			/**
+			 * Handles the Template Installer Dialog Box
+			 * @return void
+			 * @since 4.0
+			 */
+			this.setupToolsTemplateInstallerDialog = function() {
+
 				var $copy            = $('#gfpdf_settings\\[setup_templates\\]'); /* escape braces */
 				var $copyDialog      = $( '#setup-templates-confirm' );
-				var $font            = $('#gfpdf_settings\\[manage_fonts\\]'); /* escape braces */
-				var $fontDialog      = $( '#manage-font-files' );
-				var $uninstall       = $('#gfpdf-uninstall');
-				var $uninstallDialog = $( '#uninstall-confirm' );
 
 				/* Set up copy dialog */
 				var copyButtons = [{
@@ -856,6 +947,16 @@
 						return false;
 					});
 				}
+			};
+
+			/**
+			 * Handles the Fonts Dialog Box
+			 * @return void
+			 * @since 4.0
+			 */
+			this.setupToolsFontsDialog = function() {
+				var $font            = $('#gfpdf_settings\\[manage_fonts\\]'); /* escape braces */
+				var $fontDialog      = $( '#manage-font-files' );
 
 				/* setup fonts dialog */
 				this.wp_dialog($fontDialog, [], 500, 500);
@@ -864,6 +965,16 @@
 					$fontDialog.wpdialog('open');
 				    return false;
 				});
+			};
+
+			/**
+			 * Handles the Uninstall Dialog Box
+			 * @return void
+			 * @since 4.0
+			 */
+			this.setupToolsUninstallDialog = function() {
+				var $uninstall       = $('#gfpdf-uninstall');
+				var $uninstallDialog = $( '#uninstall-confirm' );
 
 				/* Set up uninstall dialog */
 				var uninstallButtons = [{
@@ -887,7 +998,7 @@
 					$uninstallDialog.wpdialog('open');
 				    return false;
 				});
-			}
+			};
 
 			/**
 			 * Generate a WP Dialog box
@@ -914,20 +1025,10 @@
 
 		            $('.ui-widget-overlay').bind('click', function() {
 		                $elm.wpdialog('close');
-		            })
+		            });
 			      }
 			    });
-			}
-
-
-			/**
-			 * Fire any Javascript on the Help Settings Page
-			 * @return void
-			 * @since 4.0
-			 */
-			this.help_settings = function() {
-
-			}
+			};
 
 			/**
 			 * Create the tooltip HTML
@@ -948,7 +1049,7 @@
 				$a.attr('title', html);
 				
 				return $a;
-			}
+			};
 
 			/**
 			 * An AJAX Wrapper function we can use to ajaxify our plugin
@@ -966,7 +1067,7 @@
 					success: successCallback,
 					error: this.ajax_error,
 				});
-			}
+			};
 
 			/**
 			 * Throw an alert when there is an ajax error
@@ -975,7 +1076,7 @@
 			 */
 			this.ajax_error = function() {
 				alert(GFPDF.ajax_error);
-			}
+			};
 
 			/**
 			 * Display a message or error to the user with an appropriate timeout
@@ -1003,7 +1104,7 @@
 					$elm.slideUp();
 				}, timeout);
 
-			}
+			};
 
 			/**
 			 * Update the URL parameter
@@ -1032,7 +1133,7 @@
 
 			    var rows_txt = temp + "" + param + "=" + paramVal;
 			    return baseURL + "?" + newAdditionalURL + rows_txt;
-			}
+			};
 		}
 
 		var pdf = new GravityPDF();
