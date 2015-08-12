@@ -2,10 +2,8 @@
 
 namespace GFPDF\View;
 
-use GFPDF\Helper\Helper_View;
+use GFPDF\Helper\Helper_Abstract_View;
 use GFPDF_Major_Compatibility_Checks;
-
-use GFCommon;
 
 /**
  * Settings View
@@ -48,7 +46,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class View_Settings extends Helper_View
+class View_Settings extends Helper_Abstract_View
 {
 
 	/**
@@ -126,7 +124,7 @@ class View_Settings extends Helper_View
 	 * @since 4.0
 	 */
 	public function system_status() {
-		global $wp_version;
+		global $wp_version, $gfpdf;
 
 		$status = new GFPDF_Major_Compatibility_Checks();
 
@@ -134,7 +132,7 @@ class View_Settings extends Helper_View
 			'memory'      => $status->get_ram( ini_get( 'memory_limit' ) ),
 			'wp'          => $wp_version,
 			'php'         => phpversion(),
-			'gf'          => GFCommon::$version,
+			'gf'          => $gfpdf->form->get_version(),
 		);
 
 		$vars = array_merge( $vars, $this->data );
@@ -152,7 +150,7 @@ class View_Settings extends Helper_View
 		global $gfpdf;
 
 		$vars = array(
-			'edit_cap' => GFCommon::current_user_can_any( 'gravityforms_edit_settings' ),
+			'edit_cap' => $gfpdf->form->has_capability( 'gravityforms_edit_settings' ),
 		);
 
 		$vars = array_merge( $vars, $this->data );
@@ -170,7 +168,7 @@ class View_Settings extends Helper_View
 		global $gfpdf;
 
 		/* prevent unauthorized access */
-		if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			wp_die( __( 'You do not have permission to access this page', 'gravitypdf' ) );
 		}
 

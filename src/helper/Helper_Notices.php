@@ -2,8 +2,8 @@
 
 namespace GFPDF\Helper;
 
-use GFPDF\Helper\Helper_Int_Actions;
-use GFPDF\Helper\Helper_Int_Filters;
+use GFPDF\Helper\Helper_Interface_Actions;
+use GFPDF\Helper\Helper_Interface_Filters;
 
 /**
  * Give a standardised format to queue admin notices
@@ -42,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * @since 4.0
  */
-class Helper_Notices implements Helper_Int_Actions {
+class Helper_Notices implements Helper_Interface_Actions {
 
 	/**
 	 * Holds any notices that we've triggered

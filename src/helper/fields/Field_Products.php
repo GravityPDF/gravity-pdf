@@ -2,9 +2,8 @@
 
 namespace GFPDF\Helper\Fields;
 
-use GFPDF\Helper\Helper_Fields;
+use GFPDF\Helper\Helper_Abstract_Fields;
 
-use GFFormsModel;
 use GFCommon;
 
 use Exception;
@@ -51,7 +50,7 @@ require_once( GFCommon::get_base_path() . '/currency.php' );
  *
  * @since 4.0
  */
-class Field_Products extends Helper_Fields
+class Field_Products extends Helper_Abstract_Fields
 {
 
 	/**
@@ -60,13 +59,15 @@ class Field_Products extends Helper_Fields
 	 * @since 4.0
 	 */
 	public function __construct( $entry ) {
+		global $gfpdf;
+
 		/* Throw error if $entry is not an array */
 		if ( ! is_array( $entry ) ) {
 			throw new Exception( '$entry needs to be an array' );
 		}
 
 		$this->entry = $entry;
-		$this->form  = GFFormsModel::get_form_meta( $entry['form_id'] );
+		$this->form  = $gfpdf->form->get_form( $entry['form_id'] );
 	}
 
 	/**

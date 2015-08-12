@@ -2,7 +2,7 @@
 
 namespace GFPDF\Helper\Fields;
 
-use GFPDF\Helper\Helper_Fields;
+use GFPDF\Helper\Helper_Abstract_Fields;
 
 use GFFormsModel;
 
@@ -45,7 +45,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Quiz extends Helper_Fields
+class Field_Quiz extends Helper_Abstract_Fields
 {
 
 	/**

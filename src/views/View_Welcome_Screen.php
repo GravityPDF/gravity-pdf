@@ -2,9 +2,7 @@
 
 namespace GFPDF\View;
 
-use GFPDF\Helper\Helper_View;
-
-use GFAPI;
+use GFPDF\Helper\Helper_Abstract_View;
 
 /**
  * Welcome Screen View
@@ -47,7 +45,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class View_Welcome_Screen extends Helper_View
+class View_Welcome_Screen extends Helper_Abstract_View
 {
 
 	/**
@@ -84,10 +82,11 @@ class View_Welcome_Screen extends Helper_View
 	 * @since 4.0
 	 */
 	public function welcome() {
+		global $gfpdf;
 
 		/* Load any variables we want to pass to our view */
 		$args = array(
-			'forms' => GFAPI::get_forms(),
+			'forms' => $gfpdf->form->get_forms(),
 		);
 
 		$args = array_merge( $args, $this->data );

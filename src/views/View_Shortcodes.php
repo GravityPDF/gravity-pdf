@@ -2,7 +2,7 @@
 
 namespace GFPDF\View;
 
-use GFPDF\Helper\Helper_View;
+use GFPDF\Helper\Helper_Abstract_View;
 
 /**
  * Shortcode View
@@ -42,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Controls the Gravity PDF Shortcode View / Display
  * @since 4.0
  */
-class View_Shortcodes extends Helper_View
+class View_Shortcodes extends Helper_Abstract_View
 {
 	/**
 	 * Set the view's name

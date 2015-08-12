@@ -2,7 +2,7 @@
 
 namespace GFPDF\Helper\Fields;
 
-use GFPDF\Helper\Helper_Fields;
+use GFPDF\Helper\Helper_Abstract_Fields;
 
 use GFFormsModel;
 
@@ -50,7 +50,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Product extends Helper_Fields
+class Field_Product extends Helper_Abstract_Fields
 {
 
 	/**
@@ -66,7 +66,7 @@ class Field_Product extends Helper_Fields
 	 * @param Object $products A class that gets the full breakdown of products for the form
 	 * @since 4.0
 	 */
-	public function __construct( $field, $entry, Helper_Fields $products ) {
+	public function __construct( $field, $entry, Helper_Abstract_Fields $products ) {
 
 		/* call our parent method */
 		parent::__construct( $field, $entry );

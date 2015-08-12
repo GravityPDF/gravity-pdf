@@ -2,9 +2,7 @@
 
 namespace GFPDF\Model;
 
-use GFPDF\Helper\Helper_Model;
-
-use GFCommon;
+use GFPDF\Helper\Helper_Abstract_Model;
 
 /**
  * Settings Model
@@ -47,7 +45,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Model_Settings extends Helper_Model {
+class Model_Settings extends Helper_Abstract_Model {
 
 	/**
 	 * Errors with the global form submission process are stored here
@@ -209,8 +207,10 @@ class Model_Settings extends Helper_Model {
 	 * @since  4.0
 	 */
 	private function ajax_font_validation() {
+		global $gfpdf;
+		
 		/* prevent unauthorized access */
-		if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			/* fail */
 			header( 'HTTP/1.1 401 Unauthorized' );
 			wp_die( '401' );

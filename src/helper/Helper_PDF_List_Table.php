@@ -74,7 +74,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	}
 
 	public function prepare_items() {
-		$this->items = (isset($this->form['gfpdf_form_settings'])) ? $this->form['gfpdf_form_settings'] : array();
+		$this->items = ( isset( $this->form['gfpdf_form_settings'] ) ) ? $this->form['gfpdf_form_settings'] : array();
 	}
 
 	/**

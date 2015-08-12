@@ -2,9 +2,9 @@
 
 namespace GFPDF\View;
 
-use GFPDF\Helper\Helper_Model;
-use GFPDF\Helper\Helper_View;
-use GFPDF\Helper\Helper_Fields;
+use GFPDF\Helper\Helper_Abstract_Model;
+use GFPDF\Helper\Helper_Abstract_View;
+use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Field_Container;
 use GFPDF\Helper\Helper_PDF;
 
@@ -58,7 +58,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class View_PDF extends Helper_View
+class View_PDF extends Helper_Abstract_View
 {
 
 	/**
@@ -91,7 +91,7 @@ class View_PDF extends Helper_View
 		/**
 		 * Show $form_data array if requested
 		 */
-		if ( isset( $_GET['data'] ) && GFCommon::current_user_can_any( 'gravityforms_view_settings' ) ) {
+		if ( isset( $_GET['data'] ) && $gfpdf->form->has_capability( 'gravityforms_view_settings' ) ) {
 			echo '<pre>';
 			print_r( $args['form_data'] );
 			echo '</pre>';
@@ -166,7 +166,7 @@ class View_PDF extends Helper_View
 	 * @return String         The generated HTML
 	 * @since 4.0
 	 */
-	public function process_html_structure( $entry, Helper_Model $model, $config = array() ) {
+	public function process_html_structure( $entry, Helper_Abstract_Model $model, $config = array() ) {
 		/* Determine whether we should output or return the results */
 		$config['meta'] = (isset($config['meta'])) ? $config['meta'] : array();
 		$echo           = (rgar( $config, 'echo' )) ? rgar( $config, 'echo' ) : true; /* whether to output or return the generated markup. Default is echo */
@@ -196,10 +196,11 @@ class View_PDF extends Helper_View
 	 * @return String         The generated HTML
 	 * @since 4.0
 	 */
-	public function generate_html_structure( $entry, Helper_Model $model, $config = array() ) {
-
+	public function generate_html_structure( $entry, Helper_Abstract_Model $model, $config = array() ) {
+		global $gfpdf;
+		
 		/* Set up required variables */
-		$form                           = GFFormsModel::get_form_meta( $entry['form_id'] );
+		$form                           = $gfpdf->form->get_form( $entry['form_id'] );
 		$products                       = new Field_Products( $entry );
 		$has_products                   = false;
 		$page_number                    = 0;
@@ -277,7 +278,7 @@ class View_PDF extends Helper_View
 	 * @return void
 	 * @since 4.0
 	 */
-	public function process_field( GF_Field $field, $entry, $form, $config, Field_Products $products, Helper_Field_Container $container, Helper_Model $model ) {
+	public function process_field( GF_Field $field, $entry, $form, $config, Field_Products $products, Helper_Field_Container $container, Helper_Abstract_Model $model ) {
 
 		/*
         * Set up our configuration variables

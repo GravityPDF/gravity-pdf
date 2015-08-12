@@ -2,7 +2,7 @@
 
 namespace GFPDF\Templates\Config;
 
-use GFPDF\Helper\Helper_Int_Config;
+use GFPDF\Helper\Helper_Interface_Config;
 
 /**
  * core-simple.php configuration file
@@ -46,7 +46,7 @@ if (! defined('ABSPATH')) {
  * For instance, a template called core-simple.php would have a class of "core_simple"
  * This naming convension is very important, otherwise the software cannot correctly load the configuration
  */
-class core_simple implements Helper_Int_Config {
+class core_simple implements Helper_Interface_Config {
 
 	/**
 	 * Return the configuration structure.

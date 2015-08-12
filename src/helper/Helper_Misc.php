@@ -4,7 +4,6 @@ namespace GFPDF\Helper;
 
 use GFPDF\Model\Model_PDF;
 use WP_Error;
-use GFAPI;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Exception;
@@ -367,12 +366,14 @@ class Helper_Misc
 	 * @since 4.0
 	 */
 	public function get_template_args( $entry, $settings ) {
+		global $gfpdf;
+
 		/*
          * @todo TEMP FIX so we can render PDF
          */
 		error_reporting( E_ALL ^ E_NOTICE );
 
-		$form = GFAPI::get_form( $entry['form_id'] );
+		$form = $gfpdf->form->get_form( $entry['form_id'] );
 		$pdf  = new Model_PDF();
 
 		return apply_filters('gfpdf_template_args', array(

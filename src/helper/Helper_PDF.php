@@ -4,7 +4,6 @@ namespace GFPDF\Helper;
 
 use GFPDF\Model\Model_PDF;
 
-use GFCommon;
 use mPDF;
 
 use Exception;
@@ -179,9 +178,9 @@ class Helper_PDF {
 		/* allow $mpdf object class to be modified */
 		apply_filters( 'gfpdf_mpdf_class', $this->mpdf, $this->entry, $this->settings );
 
-		apply_filters( 'gfpdfe_mpdf_class_pre_render', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->getFilename() ); /* backwards compat */
-		apply_filters( 'gfpdfe_pre_render_pdf', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->getFilename() ); /* backwards compat */
-		apply_filters( 'gfpdfe_mpdf_class', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->getFilename() ); /* backwards compat */
+		apply_filters( 'gfpdfe_mpdf_class_pre_render', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() ); /* backwards compat */
+		apply_filters( 'gfpdfe_pre_render_pdf', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() ); /* backwards compat */
+		apply_filters( 'gfpdfe_mpdf_class', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() ); /* backwards compat */
 
 		/* If a developer decides to disable all security protocols we don't want the PDF indexed */
 		if ( ! headers_sent() ) {
@@ -493,10 +492,10 @@ class Helper_PDF {
 	protected function set_template() {
 		global $gfpdf;
 
-		$template = (isset($this->settings['template'])) ? $this->getExtension( $this->settings['template'] ) : '';
+		$template = (isset($this->settings['template'])) ? $this->get_extension( $this->settings['template'] ) : '';
 
 		/* Allow a user to change the current template if they have the appropriate capabilities */
-		if ( rgget( 'template' ) && is_user_logged_in() && GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+		if ( rgget( 'template' ) && is_user_logged_in() && $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			$template = $this->get_extension( rgget( 'template' ) );
 		}
 
@@ -553,7 +552,9 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	protected function maybe_display_raw_html( $html ) {
-		if ( $this->output !== 'SAVE' && rgget( 'html' ) && GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+		global $gfpdf;
+		
+		if ( $this->output !== 'SAVE' && rgget( 'html' ) && $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			echo $html;
 			exit;
 		}

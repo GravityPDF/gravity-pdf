@@ -3,17 +3,16 @@
 namespace GFPDF\Model;
 
 use GFPDF\Model\Model_Form_Settings;
-use GFPDF\Helper\Helper_Model;
+use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_PDF;
 
-use GFPDF\Helper\Helper_Fields;
+use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Fields\Field_Product;
 use GFPDF\Helper\Fields\Field_Default;
 use GFPDF\Helper\Fields\Field_Products;
 
 use GFFormsModel;
 use GFCommon;
-use GFAPI;
 use GF_Field;
 use GFQuiz;
 use GFSurvey;
@@ -65,7 +64,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Model_PDF extends Helper_Model {
+class Model_PDF extends Helper_Abstract_Model {
 
 	/**
 	 * Our Middleware used to handle the authentication process
@@ -76,11 +75,12 @@ class Model_PDF extends Helper_Model {
 	 * @return void
 	 */
 	public function process_pdf( $pid, $lid, $action = 'view' ) {
+		global $gfpdf;
 
 		/**
 		 * Check if we have a valid Gravity Form Entry and PDF Settings ID
 		 */
-		$entry = GFAPI::get_entry( $lid );
+		$entry = $gfpdf->form->get_entry( $lid );
 
 		/* not a valid entry */
 		if ( is_wp_error( $entry ) ) {
@@ -260,7 +260,7 @@ class Model_PDF extends Helper_Model {
 				 /* loop through permissions and check if the current user has any of those capabilities */
 				 $access = false;
 				foreach ( $admin_permissions as $permission ) {
-					if ( GFCommon::current_user_can_any( $permission ) ) {
+					if ( $gfpdf->form->has_capability( $permission ) ) {
 						$access = true;
 					}
 				}
@@ -289,7 +289,7 @@ class Model_PDF extends Helper_Model {
 		$controller = $this->getController();
 
 		/* Check if we have any PDFs */
-		$form = GFAPI::get_form( $entry['form_id'] );
+		$form = $gfpdf->form->get_form( $entry['form_id'] );
 		$pdfs = (isset($form['gfpdf_form_settings'])) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : array();
 
 		if ( ! empty($pdfs) ) {
@@ -328,10 +328,12 @@ class Model_PDF extends Helper_Model {
 	 * @since  4.0
 	 */
 	public function view_pdf_entry_detail( $form_id, $entry ) {
+		global $gfpdf;
+
 		$controller = $this->getController();
 
 		/* Check if we have any PDFs */
-		$form = GFAPI::get_form( $entry['form_id'] );
+		$form = $gfpdf->form->get_form( $entry['form_id'] );
 		$pdfs = (isset($form['gfpdf_form_settings'])) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : array();
 
 		if ( ! empty($pdfs) ) {
@@ -356,7 +358,9 @@ class Model_PDF extends Helper_Model {
 	 * @since  4.0
 	 */
 	public function get_pdf_name( $pdf, $entry ) {
-		$form = GFAPI::get_form( $entry['form_id'] );
+		global $gfpdf;
+
+		$form = $gfpdf->form->get_form( $entry['form_id'] );
 		$name = GFCommon::replace_variables( $pdf['filename'], $form, $entry );
 
 		/* add filter to modify PDF name */
@@ -391,8 +395,10 @@ class Model_PDF extends Helper_Model {
 	 * @since 4.0
 	 */
 	public function get_active_pdfs( $pdfs, $entry ) {
+		global $gfpdf;
+		
 		$filtered = array();
-		$form     = GFAPI::get_form( $entry['form_id'] );
+		$form     = $gfpdf->form->get_form( $entry['form_id'] );
 
 		foreach ( $pdfs as $pdf ) {
 			if ( $pdf['active'] && GFCommon::evaluate_conditional_logic( $pdf['conditionalLogic'], $form, $entry ) ) {
@@ -652,8 +658,9 @@ class Model_PDF extends Helper_Model {
 	 * @since 4.0
 	 */
 	public function get_form_data( $entry ) {
+		global $gfpdf;
 
-		$form      = GFFormsModel::get_form_meta( $entry['form_id'] );
+		$form = $gfpdf->form->get_form( $entry['form_id'] );
 
 		/* Setup our basic structure */
 		$data = array(
@@ -1039,8 +1046,8 @@ class Model_PDF extends Helper_Model {
 				 * Instead, if you want to change how one of the fields are displayed or output (without effecting Gravity Forms itself) you should tap
 				 * into one of the filters below and override or extend the entire class.
 				 *
-				 * Your class MUST extend the \GFPDF\Helper\Helper_Fields abstract class - either directly or by extending an existing \GFPDF\Helper\Fields class.
-				 * eg. class Fields_New_Text extends \GFPDF\Helper\Helper_Fields or Fields_New_Text extends \GFPDF\Helper\Fields\Field_Text
+				 * Your class MUST extend the \GFPDF\Helper\Helper_Abstract_Fields abstract class - either directly or by extending an existing \GFPDF\Helper\Fields class.
+				 * eg. class Fields_New_Text extends \GFPDF\Helper\Helper_Abstract_Fields or Fields_New_Text extends \GFPDF\Helper\Fields\Field_Text
 				 *
 				 * To make your life more simple you should either use the same namespace as the field classes (\GFPDF\Helper\Fields) or import the class directly (use \GFPDF\Helper\Fields\Field_Text)
 				 * We've tried to make the fields as modular as possible. If you have any feedback about this approach please submit a ticket on GitHub (https://github.com/blueliquiddesigns/gravity-forms-pdf-extended/issues)
@@ -1054,7 +1061,7 @@ class Model_PDF extends Helper_Model {
 				}
 			}
 
-			if ( empty($class) || ! ($class instanceof Helper_Fields) ) {
+			if ( empty($class) || ! ($class instanceof Helper_Abstract_Fields) ) {
 				throw new Exception( 'Class not found' );
 			}
 		} catch (Exception $e) {

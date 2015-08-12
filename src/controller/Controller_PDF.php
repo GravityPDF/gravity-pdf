@@ -2,13 +2,11 @@
 
 namespace GFPDF\Controller;
 
-use GFPDF\Helper\Helper_Controller;
-use GFPDF\Helper\Helper_Model;
-use GFPDF\Helper\Helper_View;
-use GFPDF\Helper\Helper_Int_Actions;
-use GFPDF\Helper\Helper_Int_Filters;
-
-use GFCommon;
+use GFPDF\Helper\Helper_Abstract_Controller;
+use GFPDF\Helper\Helper_Abstract_Model;
+use GFPDF\Helper\Helper_Abstract_View;
+use GFPDF\Helper\Helper_Interface_Actions;
+use GFPDF\Helper\Helper_Interface_Filters;
 
 /**
  * PDF Display Controller
@@ -50,12 +48,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Controller_PDF extends Helper_Controller implements Helper_Int_Actions, Helper_Int_Filters
+class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters
 {
 	/**
 	 * Load our model and view and required actions
 	 */
-	public function __construct( Helper_Model $model, Helper_View $view ) {
+	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view ) {
 		/* load our model and view */
 		$this->model = $model;
 		$this->model->setController( $this );
@@ -128,6 +126,7 @@ class Controller_PDF extends Helper_Controller implements Helper_Int_Actions, He
 	 * @return void
 	 */
 	public function process_pdf_endpoint() {
+		global $gfpdf;
 
 		/* exit early if all the required URL parameters aren't met */
 		if ( empty( $GLOBALS['wp']->query_vars['gf_pdf'] ) || empty( $GLOBALS['wp']->query_vars['pid'] ) || empty( $GLOBALS['wp']->query_vars['lid'] ) ) {
@@ -148,7 +147,7 @@ class Controller_PDF extends Helper_Controller implements Helper_Int_Actions, He
 
 			/* only display detailed error to admins */
 			$whitelist_errors = array( 'timeout_expired', 'access_denied' );
-			if ( GFCommon::current_user_can_any( 'gravityforms_view_settings' ) || in_array( $results->get_error_code(), $whitelist_errors ) ) {
+			if ( $gfpdf->form->has_capability( 'gravityforms_view_settings' ) || in_array( $results->get_error_code(), $whitelist_errors ) ) {
 				wp_die( $results->get_error_message() );
 			} else {
 				wp_die( __( 'There was a problem generating your PDF', 'gravitypdf' ) );

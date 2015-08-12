@@ -1,13 +1,9 @@
 <?php
 
-namespace GFPDF\Helper\Fields;
-
-use GFPDF\Helper\Helper_Abstract_Fields;
-
-use Exception;
+namespace GFPDF\Helper;
 
 /**
- * Gravity Forms Field
+ * Abstract Helper Controller
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
@@ -41,35 +37,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 */
 
 /**
- * Controls the display and output of a Gravity Form field
- *
+ * A simple abstract class controlers can extent to share similar variables
  * @since 4.0
  */
-class Field_Default extends Helper_Abstract_Fields
-{
-	/**
-	 * Display the HTML version of this field
-	 * @return String
-	 * @since 4.0
-	 */
-	public function html( $value = '', $label = true ) {
-		$value = esc_html( $this->value() );
-
-		return parent::html( $value );
-	}
+abstract class Helper_Abstract_Controller {
 
 	/**
-	 * Get the standard GF value of this field
-	 * @return String/Array
+	 * Classes will store a model object
+	 * @var Object
 	 * @since 4.0
 	 */
-	public function value() {
-		if ( $this->has_cache() ) {
-			return $this->cache();
-		}
+	private $model = null;
 
-		$this->cache( $this->get_value() );
+	/**
+	 * Classes will store a view object
+	 * @var Object
+	 * @since 4.0
+	 */
+	private $view  = null;
 
-		return $this->cache();
-	}
+	/**
+	 * Each controller should have an initialisation function
+	 * @since 4.0
+	 */
+	abstract public function init();
 }

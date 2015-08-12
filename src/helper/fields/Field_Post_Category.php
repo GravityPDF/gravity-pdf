@@ -2,7 +2,7 @@
 
 namespace GFPDF\Helper\Fields;
 
-use GFPDF\Helper\Helper_Fields;
+use GFPDF\Helper\Helper_Abstract_Fields;
 
 use GFFormsModel;
 use GFCommon;
@@ -48,7 +48,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Post_Category extends Helper_Fields
+class Field_Post_Category extends Helper_Abstract_Fields
 {
 
 	/**

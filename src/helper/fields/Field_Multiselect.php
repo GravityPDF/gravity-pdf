@@ -2,7 +2,7 @@
 
 namespace GFPDF\Helper\Fields;
 
-use GFPDF\Helper\Helper_Fields;
+use GFPDF\Helper\Helper_Abstract_Fields;
 
 use GFFormsModel;
 use GF_Field_MultiSelect;
@@ -49,7 +49,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Multiselect extends Helper_Fields
+class Field_Multiselect extends Helper_Abstract_Fields
 {
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct

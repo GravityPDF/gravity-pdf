@@ -52,7 +52,14 @@ require_once(PDF_PLUGIN_DIR . 'src/autoload.php');
 /**
  * @since 4.0
  */
-class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
+class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface_Filters {
+
+	/**
+	 * Holds abstracted functions related to the forms plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	public $form;
 
 	/**
 	 * Holds our Helper_Notices object
@@ -109,6 +116,12 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
 	 */
 	public function init() {
 
+		/* Set up our form object */
+		$this->form = new Helper\Helper_Form();
+
+		/* Set up our misc object */
+		$this->misc = new Helper\Helper_Misc();
+
 		/* Set up our notices */
 		$this->notices = new Helper\Helper_Notices();
 		$this->notices->init();
@@ -119,9 +132,6 @@ class Router implements Helper\Helper_Int_Actions, Helper\Helper_Int_Filters {
 
 		/* Set up our options object - this is initialised on admin_init but other classes need to access its methods before this */
 		$this->options = new Helper\Helper_Options_Fields();
-
-		/* Set up our misc object */
-		$this->misc = new Helper\Helper_Misc();
 
 		/* Load modules */
 		$this->installer();

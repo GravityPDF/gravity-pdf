@@ -2,7 +2,7 @@
 
 namespace GFPDF\Model;
 
-use GFPDF\Helper\Helper_Model;
+use GFPDF\Helper\Helper_Abstract_Model;
 
 /**
  * Welcome Screen Model
@@ -45,7 +45,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Model_Welcome_Screen extends Helper_Model {
+class Model_Welcome_Screen extends Helper_Abstract_Model {
 
 	/**
 	 * @var string The capability users should have to view the page

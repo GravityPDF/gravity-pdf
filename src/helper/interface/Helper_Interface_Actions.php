@@ -1,13 +1,9 @@
 <?php
 
-namespace GFPDF\Helper\Fields;
-
-use GFPDF\Helper\Helper_Abstract_Fields;
-
-use Exception;
+namespace GFPDF\Helper;
 
 /**
- * Gravity Forms Field
+ * Actions Interface
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
@@ -41,35 +37,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 */
 
 /**
- * Controls the display and output of a Gravity Form field
- *
+ * A simple interface to standardise how actions and filters should be applied in classes
  * @since 4.0
  */
-class Field_Default extends Helper_Abstract_Fields
-{
-	/**
-	 * Display the HTML version of this field
-	 * @return String
-	 * @since 4.0
-	 */
-	public function html( $value = '', $label = true ) {
-		$value = esc_html( $this->value() );
-
-		return parent::html( $value );
-	}
+interface Helper_Interface_Actions {
 
 	/**
-	 * Get the standard GF value of this field
-	 * @return String/Array
+	 * Apply any actions needed for the settings page
 	 * @since 4.0
+	 * @return void
 	 */
-	public function value() {
-		if ( $this->has_cache() ) {
-			return $this->cache();
-		}
-
-		$this->cache( $this->get_value() );
-
-		return $this->cache();
-	}
+	public function add_actions();
 }

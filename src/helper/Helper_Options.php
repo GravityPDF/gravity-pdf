@@ -4,8 +4,6 @@ namespace GFPDF\Helper;
 
 use GFPDF\Model\Model_Form_Settings;
 
-use GFCommon;
-
 /**
  * Our Gravity PDF Options API
  *
@@ -49,7 +47,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Helper_Options implements Helper_Int_Filters {
+class Helper_Options implements Helper_Interface_Filters {
 
 	/**
 	 * Holds the current global user settings
@@ -322,13 +320,14 @@ class Helper_Options implements Helper_Int_Filters {
 	 * @since 4.0
 	 */
 	public function get_capabilities() {
+		global $gfpdf;
 
 		/* sort through all roles and fetch unique capabilities */
 		$roles        = get_editable_roles();
 		$capabilities = array();
 
 		/* Add Gravity Forms Capabilities */
-		$gf_caps = GFCommon::all_caps();
+		$gf_caps = $gfpdf->form->get_capabilities();
 
 		foreach ( $gf_caps as $gf_cap ) {
 			$capabilities['Gravity Forms Capabilities'][$gf_cap] = apply_filters( 'gfpdf_capability_name', $gf_cap );

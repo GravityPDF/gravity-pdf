@@ -2,11 +2,9 @@
 
 namespace GFPDF\Model;
 
-use GFPDF\Helper\Helper_Model;
+use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Model\Model_Form_Settings;
 use GFPDF\Model\Model_PDF;
-
-use GFAPI;
 
 /**
  * PDF Shortcode Model
@@ -47,7 +45,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Handles all the PDF Shortcode logic
  * @since 4.0
  */
-class Model_Shortcodes extends Helper_Model {
+class Model_Shortcodes extends Helper_Abstract_Model {
 
 	/**
 	 * Generates a direct link to the PDF that should be generated
@@ -58,6 +56,7 @@ class Model_Shortcodes extends Helper_Model {
 	 * @since 4.0
 	 */
 	public function gravitypdf( $attributes ) {
+		global $gfpdf;
 
 		$controller = $this->getController();
 
@@ -89,7 +88,7 @@ class Model_Shortcodes extends Helper_Model {
 
 		/* Check if we have a valid PDF configuration */
 		$settings    = new Model_Form_Settings();
-		$entry  = GFAPI::get_entry( $attributes['entry'] );
+		$entry  = $gfpdf->form->get_entry( $attributes['entry'] );
 		$config = ( ! is_wp_error( $entry )) ? $settings->get_pdf( $entry['form_id'], $attributes['id'] ) : $entry; /* if invalid entry a WP_Error will be thrown */
 
 		if ( is_wp_error( $config ) ) {

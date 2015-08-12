@@ -2,9 +2,8 @@
 
 namespace GFPDF\Model;
 
-use GFPDF\Helper\Helper_Model;
+use GFPDF\Helper\Helper_Abstract_Model;
 
-use GFAPI;
 use GFCommon;
 
 /**
@@ -48,7 +47,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Model_Install extends Helper_Model {
+class Model_Install extends Helper_Abstract_Model {
 
 	/**
 	 * The Gravity PDF Installer
@@ -260,13 +259,13 @@ class Model_Install extends Helper_Model {
 	public function remove_plugin_form_settings() {
 		global $gfpdf;
 
-		$forms = GFAPI::get_forms();
+		$forms = $gfpdf->form->get_forms();
 
 		foreach ( $forms as $form ) {
 			/* only update forms which have a PDF configuration */
 			if ( isset($form['gfpdf_form_settings']) ) {
 				unset($form['gfpdf_form_settings']);
-				if ( GFAPI::update_form( $form ) !== true ) {
+				if ( $gfpdf->form->update_form( $form ) !== true ) {
 					$gfpdf->notices->add_error( sprintf( __( 'There was a problem removing the Gravity Form "%s" PDF configuration. Try delete manually.', 'gravitypdf' ), $form['ID'] . ': ' . $form['title'] ) );
 				}
 			}

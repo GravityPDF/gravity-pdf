@@ -2,12 +2,10 @@
 
 namespace GFPDF\Controller;
 
-use GFPDF\Helper\Helper_Controller;
-use GFPDF\Helper\Helper_Int_Actions;
-use GFPDF\Helper\Helper_Int_Filters;
-use GFPDF\Helper\Helper_Model;
-
-use GFCommon;
+use GFPDF\Helper\Helper_Abstract_Controller;
+use GFPDF\Helper\Helper_Interface_Actions;
+use GFPDF\Helper\Helper_Interface_Filters;
+use GFPDF\Helper\Helper_Abstract_Model;
 
 /**
  * Install Update Controller
@@ -49,12 +47,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Controller_Install extends Helper_Controller implements Helper_Int_Actions, Helper_Int_Filters
+class Controller_Install extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters
 {
 	/**
 	 * Load our model and view and required actions
 	 */
-	public function __construct( Helper_Model $model ) {
+	public function __construct( Helper_Abstract_Model $model ) {
 		/* load our model and view */
 		$this->model = $model;
 		$this->model->setController( $this );
@@ -133,7 +131,7 @@ class Controller_Install extends Helper_Controller implements Helper_Int_Actions
 			}
 
 			/* check if user has permission to uninstall the plugin */
-			if ( ! GFCommon::current_user_can_any( 'gravityforms_uninstall' ) ) {
+			if ( ! $gfpdf->form->has_capability( 'gravityforms_uninstall' ) ) {
 				wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
 			}
 

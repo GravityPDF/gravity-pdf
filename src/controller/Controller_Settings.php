@@ -2,14 +2,13 @@
 
 namespace GFPDF\Controller;
 
-use GFPDF\Helper\Helper_Controller;
-use GFPDF\Helper\Helper_Model;
-use GFPDF\Helper\Helper_View;
-use GFPDF\Helper\Helper_Int_Actions;
-use GFPDF\Helper\Helper_Int_Filters;
+use GFPDF\Helper\Helper_Abstract_Controller;
+use GFPDF\Helper\Helper_Abstract_Model;
+use GFPDF\Helper\Helper_Abstract_View;
+use GFPDF\Helper\Helper_Interface_Actions;
+use GFPDF\Helper\Helper_Interface_Filters;
 
 use GFForms;
-use GFCommon;
 
 /**
  * Settings Controller
@@ -51,12 +50,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Controller_Settings extends Helper_Controller implements Helper_Int_Actions, Helper_Int_Filters
+class Controller_Settings extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters
 {
 	/**
 	 * Load our model and view and required actions
 	 */
-	public function __construct( Helper_Model $model, Helper_View $view ) {
+	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view ) {
 		/* load our model and view */
 		$this->model = $model;
 		$this->model->setController( $this );
@@ -93,6 +92,8 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
 	 * @return void
 	 */
 	public function add_actions() {
+		global $gfpdf;
+
 		/* Load our settings meta boxes */
 		add_action( 'current_screen', array( $this->model, 'add_meta_boxes' ) );
 
@@ -101,7 +102,7 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
 		add_action( 'pdf-settings-tools', array( $this->view, 'system_status' ) );
 
 		/* Display the uninstaller if use has the correct permissions */
-		if ( GFCommon::current_user_can_any( 'gravityforms_uninstall' ) ) {
+		if ( $gfpdf->form->has_capability( 'gravityforms_uninstall' ) ) {
 			add_action( 'pdf-settings-tools', array( $this->view, 'uninstaller' ), 5 );
 		}
 
@@ -178,9 +179,10 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
 	 * @return void
 	 */
 	public function edit_options_cap() {
+		global $gfpdf;
 
 		/* because current_user_can() doesn't handle Gravity Forms permissions quite correct we'll do our checks here */
-		if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
 		}
 
@@ -195,7 +197,9 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
 	 * @return array
 	 */
 	public function disable_tools_on_view_cap( $nav ) {
-		if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+		global $gfpdf;
+		
+		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			unset($nav[100]); /* remove tools tab */
 		}
 
@@ -216,7 +220,7 @@ class Controller_Settings extends Helper_Controller implements Helper_Int_Action
 		}
 
 		/* check if the user has permission to copy the templates */
-		if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			return false;
 		}
 

@@ -2,11 +2,10 @@
 
 namespace GFPDF\Model;
 
-use GFPDF\Helper\Helper_Model;
+use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_PDF_List_Table;
-use GFPDF\Helper\Helper_Int_Config;
+use GFPDF\Helper\Helper_Interface_Config;
 
-use GFFormsModel;
 use GFCommon;
 
 use WP_Error;
@@ -53,7 +52,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Model_Form_Settings extends Helper_Model {
+class Model_Form_Settings extends Helper_Abstract_Model {
 
 	/**
 	 * Add the form settings tab.
@@ -78,9 +77,10 @@ class Model_Form_Settings extends Helper_Model {
 	 * @since 4.0
 	 */
 	public function process_list_view( $form_id ) {
+		global $gfpdf;
 
 		/* prevent unauthorized access */
-		if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			wp_die( __( 'You do not have permission to access this page', 'gravitypdf' ) );
 		}
 
@@ -88,7 +88,7 @@ class Model_Form_Settings extends Helper_Model {
 		$controller = $this->getController();
 
 		/* get the form object */
-		$form = GFFormsModel::get_form_meta( $form_id );
+		$form = $gfpdf->form->get_form( $form_id );
 
 		/* load our list table */
 		$pdf_table = new Helper_PDF_List_Table( $form );
@@ -113,14 +113,14 @@ class Model_Form_Settings extends Helper_Model {
 		global $gfpdf;
 
 		/* prevent unauthorized access */
-		if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			wp_die( __( 'You do not have permission to access this page', 'gravitypdf' ) );
 		}
 
 		$controller = $this->getController();
 
 		/* get the form object */
-		$form = GFFormsModel::get_form_meta( $form_id );
+		$form = $gfpdf->form->get_form( $form_id );
 
 		/* parse input and get required information */
 		if ( ! $pdf_id ) {
@@ -173,7 +173,7 @@ class Model_Form_Settings extends Helper_Model {
 
 		/* If we haven't pulled the form meta data from the database do so now */
 		if ( ! isset($gfpdf->data->form_settings[$form_id]) ) {
-			$form     = GFFormsModel::get_form_meta( $form_id );
+			$form = $gfpdf->form->get_form( $form_id );
 
 			if ( empty($form) ) {
 				return new WP_Error( 'invalid_id', __( 'You must pass in a valid form ID', 'gravitypdf' ) );
@@ -256,7 +256,8 @@ class Model_Form_Settings extends Helper_Model {
 	 * @return boolean True if updated, false if not.
 	 */
 	public function update_pdf( $form_id, $pdf_id, $value = '', $update_db = true, $filters = true ) {
-
+		global $gfpdf;
+		
 		if ( empty( $value ) || ! is_array( $value ) || sizeof( $value ) == 0 ) {
 			$remove_option = $this->delete_pdf( $form_id, $pdf_id );
 			return $remove_option;
@@ -277,7 +278,7 @@ class Model_Form_Settings extends Helper_Model {
 			$options[ $pdf_id ] = $value;
 
 			/* get the up-to-date form object and merge in the results */
-			$form = GFFormsModel::get_form_meta( $form_id );
+			$form = $gfpdf->form->get_form( $form_id );
 
 			/* Update our GFPDF settings */
 			$form['gfpdf_form_settings'] = $options;
@@ -285,7 +286,7 @@ class Model_Form_Settings extends Helper_Model {
 			$did_update = false;
 			if ( $update_db ) {
 				/* update the database, if able */
-				$did_update = GFFormsModel::update_form_meta( $form_id, $form );
+				$did_update = $gfpdf->form->update_form( $form );
 			}
 
 			/* If it updated, let's update the global variable */
@@ -310,6 +311,7 @@ class Model_Form_Settings extends Helper_Model {
 	 * @return boolean True if updated, false if not.
 	 */
 	public function delete_pdf( $form_id, $pdf_id ) {
+		global $gfpdf;
 
 		/* First let's grab the current settings */
 		$options = $this->get_settings( $form_id );
@@ -322,13 +324,13 @@ class Model_Form_Settings extends Helper_Model {
 			}
 
 			/* get the form and merge in the results */
-			$form = GFFormsModel::get_form_meta( $form_id );
+			$form = $gfpdf->form->get_form( $form_id );
 
 			/* Update our GFPDF settings */
 			$form['gfpdf_form_settings'] = $options;
 
 			/* update the database, if able */
-			$did_update = GFFormsModel::update_form_meta( $form_id, $form );
+			$did_update = $gfpdf->form->update_form( $form );
 
 			/* If it updated, let's update the global variable */
 			if ( $did_update !== false ) {
@@ -353,7 +355,7 @@ class Model_Form_Settings extends Helper_Model {
 		global $gfpdf;
 
 		/* prevent unauthorized access */
-		if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			wp_die( __( 'You do not have permission to access this page', 'gravitypdf' ) );
 		}
 
@@ -393,13 +395,13 @@ class Model_Form_Settings extends Helper_Model {
 		}
 
 		/* get the form and merge in the results */
-		$form = GFFormsModel::get_form_meta( $form_id );
+		$form = $gfpdf->form->get_form( $form_id );
 
 		/* Update our GFPDF settings */
 		$form['gfpdf_form_settings'][$pdf_id] = $sanitized;
 
 		/* Update database */
-		$did_update = GFFormsModel::update_form_meta( $form_id, $form );
+		$did_update = $gfpdf->form->update_form( $form );
 
 		/* If it updated, let's update the global variable */
 		if ( $did_update !== false ) {
@@ -561,7 +563,7 @@ class Model_Form_Settings extends Helper_Model {
 	 */
 	public function setup_custom_appearance_settings( $class, $settings = array() ) {
 		/* If class isn't an instance of our interface return $settings */
-		if ( ! ($class instanceof Helper_Int_Config ) ) {
+		if ( ! ($class instanceof Helper_Interface_Config ) ) {
 			return $settings;
 		}
 
@@ -697,8 +699,8 @@ class Model_Form_Settings extends Helper_Model {
 			$class_name = str_replace( '-', '_', basename( $file, '.php' ) );
 			$fqcn = $namespace . $class_name;
 
-			/* insure the class we are trying to load exists and impliments our Helper_Int_Config interface */
-			if ( class_exists( $fqcn ) && in_array( 'GFPDF\Helper\Helper_Int_Config', class_implements( $fqcn ) ) ) {
+			/* insure the class we are trying to load exists and impliments our Helper_Interface_Config interface */
+			if ( class_exists( $fqcn ) && in_array( 'GFPDF\Helper\Helper_Interface_Config', class_implements( $fqcn ) ) ) {
 				$class = new $fqcn();
 			}
 		}
@@ -770,9 +772,10 @@ class Model_Form_Settings extends Helper_Model {
 	 * @since 4.0
 	 */
 	public function delete_gf_pdf_setting() {
+		global $gfpdf;
 
 		/* prevent unauthorized access */
-		if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			/* fail */
 			header( 'HTTP/1.1 401 Unauthorized' );
 			wp_die( '401' );
@@ -818,9 +821,10 @@ class Model_Form_Settings extends Helper_Model {
 	 * @since 4.0
 	 */
 	public function duplicate_gf_pdf_setting() {
+		global $gfpdf;
 
 		/* prevent unauthorized access */
-		if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			/* fail */
 			header( 'HTTP/1.1 401 Unauthorized' );
 			wp_die( '401' );
@@ -881,8 +885,10 @@ class Model_Form_Settings extends Helper_Model {
 	 * @since 4.0
 	 */
 	public function change_state_pdf_setting() {
+		global $gfpdf;
+		
 		/* prevent unauthorized access */
-		if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			/* fail */
 			header( 'HTTP/1.1 401 Unauthorized' );
 			wp_die( '401' );
@@ -938,7 +944,7 @@ class Model_Form_Settings extends Helper_Model {
 		global $gfpdf;
 
 		/* prevent unauthorized access */
-		if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_settings' ) ) {
+		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			/* fail */
 			header( 'HTTP/1.1 401 Unauthorized' );
 			wp_die( '401' );
