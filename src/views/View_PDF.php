@@ -277,7 +277,7 @@ class View_PDF extends Helper_View
 	 * @return void
 	 * @since 4.0
 	 */
-	public function process_field( $field, $entry, $form, $config, Field_Products $products, Helper_Field_Container $container, Helper_Model $model ) {
+	public function process_field( GF_Field $field, $entry, $form, $config, Field_Products $products, Helper_Field_Container $container, Helper_Model $model ) {
 
 		/*
         * Set up our configuration variables
