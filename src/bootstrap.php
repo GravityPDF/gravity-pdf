@@ -7,7 +7,6 @@ use GFPDF\Model;
 use GFPDF\View;
 use GFPDF\Helper;
 use GFPDF\Stat;
-use GFCommon;
 use GFPDF_Core;
 
 /**

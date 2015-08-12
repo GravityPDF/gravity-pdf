@@ -6,7 +6,6 @@ use GFPDF\Helper\Helper_Fields;
 
 use GFFormsModel;
 use GF_Field_Email;
-use GFCommon;
 
 use Exception;
 
@@ -75,7 +74,7 @@ class Field_Email extends Helper_Fields
 	public function html( $value = '', $label = true ) {
 		$value  = $this->value();
 
-		$output = ( GFCommon::is_valid_email( $value ) ) ? '<a href="mailto:'. $value .'">'. esc_html( $value ) .'</a>' : esc_html( $value );
+		$output = ( is_email( $value ) ) ? '<a href="mailto:'. $value .'">'. esc_html( $value ) .'</a>' : esc_html( $value );
 
 		return parent::html( $output );
 	}
