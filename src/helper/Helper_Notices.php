@@ -41,6 +41,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * @since 4.0
+ * @todo Impliment Transient Support so errors and notices can be saved
  */
 class Helper_Notices implements Helper_Interface_Actions {
 
