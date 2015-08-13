@@ -496,10 +496,10 @@
 				$('.gfpdf-tab-wrapper a').click(function() {
 
 					/* Reset the active class */
-					$(this).parent().find('a').removeClass('nav-tab-active');
+					$(this).parents('ul').find('a').removeClass('current');
 
 					/* Add the new active class */
-					$(this).addClass('nav-tab-active');
+					$(this).addClass('current').blur();
 
 					/* Hide all containers */
 					$('.gfpdf-tab-container').hide();

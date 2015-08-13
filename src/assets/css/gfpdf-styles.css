@@ -45,6 +45,11 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
   margin-top: 5px;
 }
 
+#pdfextended-settings h3 i,
+#tab_pdf h3 i {
+  padding-right: 2px;
+}
+
 #pdfextended-settings #add-new-pdf {
   padding: 4px 8px;
 }
@@ -545,6 +550,10 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
 
 #gfpdf_pdf_form .nav-tab-wrapper {
   margin-bottom: 20px;
+}
+
+.gfpdf-tab-wrapper.wp-filter {
+  margin: 0 0 5px;
 }
 
 /**

@@ -68,12 +68,29 @@ if (! defined('ABSPATH')) {
 
     <form method="post" id="gfpdf_pdf_form">
 
-        <h2 class="nav-tab-wrapper gfpdf-tab-wrapper">
-                <a href="#gfpdf-general-options" class="nav-tab nav-tab-active"><i class="fa fa-cog"></i> General</a>
-                <a href="#gfpdf-appearance-options" class="nav-tab "><i class="fa fa-adjust"></i> Appearance</a>
-                <a href="#gfpdf-custom-appearance-options" class="nav-tab "><i class="fa fa-file-text-o"></i> Template</a>
-                <a href="#gfpdf-advanced-pdf-options" class="nav-tab "><i class="fa fa-cogs"></i> Advanced</a>
-        </h2>
+        <div class="wp-filter gfpdf-tab-wrapper">
+            <ul class="filter-links">
+                <li>
+                    <a href="#gfpdf-general-options" class="current"><i class="fa fa-cog"></i> General</a>
+                </li>
+
+                <li>
+                    <a href="#gfpdf-appearance-options"><i class="fa fa-adjust"></i> Appearance</a>
+                </li>
+
+                <li>
+                    <a href="#gfpdf-custom-appearance-options"><i class="fa fa-file-text-o"></i> Template</a>
+                </li>
+
+                <li>
+                    <a href="#gfpdf-advanced-pdf-options"><i class="fa fa-cogs"></i> Advanced</a>
+                </li>
+            </ul>
+                
+                
+                
+                
+        </div>
 
         <?php wp_nonce_field( 'gfpdf_save_pdf', 'gfpdf_save_pdf' ) ?>
         
