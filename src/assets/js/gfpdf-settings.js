@@ -597,6 +597,9 @@
 		      				/* Replace the custom appearance with the AJAX response fields */
 		      				$('#pdf-custom-appearance').hide().html(response.fields).fadeIn();
 
+		      				/* Ensure our template nav item isn't hidden */
+		      				$('#gfpdf-custom-appearance-nav').show();
+
 		      				/* Load our new editors */
 		      				self.loadTinyMCEEditor(response.editors, response.editor_init);
 
@@ -604,6 +607,9 @@
 		      				self.initCommon();
 		      				self.doMergetags();
 
+		      			} else {
+							/* Hide our template nav item as there are no fields */
+		      				$('#gfpdf-custom-appearance-nav').hide();
 		      			}
 
 		      			/* Update our template example preview and display it */
@@ -965,6 +971,13 @@
 					$fontDialog.wpdialog('open');
 				    return false;
 				});
+
+				/* Check if our manage_fonts hash and open the dialog */
+				if(window.location.hash) {
+					if(window.location.hash == '#manage_fonts') {
+						$font.click();
+					}
+				}
 			};
 
 			/**

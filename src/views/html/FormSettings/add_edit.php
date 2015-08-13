@@ -34,6 +34,8 @@ if (! defined('ABSPATH')) {
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+global $wp_settings_fields;
+
 
 ?>
 
@@ -78,7 +80,7 @@ if (! defined('ABSPATH')) {
                     <a href="#gfpdf-appearance-options"><i class="fa fa-adjust"></i> Appearance</a>
                 </li>
 
-                <li>
+                <li id="gfpdf-custom-appearance-nav" <?php if( empty($wp_settings_fields['gfpdf_settings_form_settings_custom_appearance']['gfpdf_settings_form_settings_custom_appearance'])) : ?> style="display: none" <?php endif; ?>>
                     <a href="#gfpdf-custom-appearance-options"><i class="fa fa-file-text-o"></i> Template</a>
                 </li>
 

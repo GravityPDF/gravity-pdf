@@ -553,7 +553,11 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
 }
 
 .gfpdf-tab-wrapper.wp-filter {
-  margin: 0 0 5px;
+  margin: 0 0 15px;
+}
+
+#gfpdf_conditional_logic_container .gf_conditional_logic_rules_container :first-child {
+  width: 250px;
 }
 
 /**

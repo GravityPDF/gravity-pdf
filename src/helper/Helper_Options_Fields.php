@@ -54,6 +54,8 @@ class Helper_Options_Fields extends Helper_Options {
 	 */
 	public function get_registered_fields() {
 
+		global $gfpdf;
+
 		/**
 		 * Gravity PDF settings
 		 * Filters are provided for each settings section to allow extensions and other plugins to add their own option
@@ -89,21 +91,33 @@ class Helper_Options_Fields extends Helper_Options {
 					'default_template' => array(
 						'id'         => 'default_template',
 						'name'       => __( 'Default Template', 'gravitypdf' ),
-						'desc'       => __( 'Set the default PDF template to use for all forms.', 'gravitypdf' ),
+						'desc'       => sprintf( __( 'Choose an existing template or purchased more %sfrom our theme shop%s.%s You can also %sbuild your own%s or %shire us%s to create a custom solution.', 'gravitypdf' ), '<a href="#">', '</a>', '<br>', '<a href="#">', '</a>', '<a href="#">', '</a>' ),
 						'type'       => 'select',
 						'options'    => $this->get_templates(),
 						'inputClass' => 'large',
 						'chosen'     => true,
+						'tooltip'    => '<h6>' . __( 'Templates', 'gravitypdf' ) . '</h6>' . sprintf( __( 'Gravity PDF comes with %sfive completely-free and highly customisable designs%s to choose. You can also purchase additional templates from our theme shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravitypdf' ), '<strong>', '</strong>' ),
 					),
 
 					'default_font_type' => array(
 						'id'         => 'default_font_type',
 						'name'       => __( 'Default Font Type', 'gravitypdf' ),
-						'desc'       => __( 'Set the default font type used in the PDFs.', 'gravitypdf' ),
+						'desc'       => sprintf( __( 'Set the default font type used in PDFs. Choose an existing font or %sinstall your own%s.', 'gravitypdf' ), '<a href="'. $gfpdf->data->settings_url .'&tab=tools#manage_fonts">', '</a>' ),
 						'type'       => 'select',
 						'options'    => $this->get_installed_fonts(),
 						'inputClass' => 'large',
 						'chosen'     => true,
+						'tooltip'    => '<h6>' . __( 'Fonts', 'gravitypdf' ) . '</h6>' . __( 'Gravity PDF comes bundled with fonts for most languages world-wide. Want to use a specific font type? Use the font installer (found in the Tools tab).', 'gravitypdf' ),
+					),
+
+					'default_font_size' => array(
+						'id'      => 'default_font_size',
+						'name'    => __( 'Default Font Size', 'gravitypdf' ),
+						'desc'    => __( 'Set the default font size used in PDFs.', 'gravitypdf' ),
+						'desc2'   => 'pt',
+						'type'    => 'number',
+						'size'    => 'small',
+						'std'     => 12,
 					),
 
 					'default_font_colour' => array(
@@ -111,19 +125,20 @@ class Helper_Options_Fields extends Helper_Options {
 						'name'    => __( 'Default Font Colour', 'gravitypdf' ),
 						'type'    => 'color',
 						'std'     => '#000000',
-						'desc'    => __( 'Set the default font colour used in the PDFs.', 'gravitypdf' ),
+						'desc'    => __( 'Set the default font colour used in PDFs.', 'gravitypdf' ),
 					),
 
 					'default_rtl' => array(
 						'id'      => 'default_rtl',
 						'name'    => __( 'Reverse Text (RTL)', 'gravitypdf' ),
-						'desc'    => __( 'Languages like Arabic and Hebrew are written right to left.', 'gravitypdf' ),
+						'desc'    => __( 'Script like Arabic and Hebrew are written right to left.', 'gravitypdf' ),
 						'type'    => 'radio',
 						'options' => array(
 							'Yes'     => __( 'Yes', 'gravitypdf' ),
 							'No'      => __( 'No', 'gravitypdf' ),
 						),
 						'std'     => __( 'No', 'gravitypdf' ),
+						'tooltip'    => '<h6>' . __( 'Reverse Text (RTL)', 'gravitypdf' ) . '</h6>' . __( "Enable RTL if you are writing in Arabic, Hebrew, Syriac, N'ko, Thaana, Tifinar or Urdu.", 'gravitypdf' ),
 					),
 
 					'default_action' => array(
@@ -136,6 +151,7 @@ class Helper_Options_Fields extends Helper_Options {
 							'Download' => __( 'Download', 'gravitypdf' ),
 						),
 						'std'     => 'View',
+						'tooltip'    => '<h6>' . __( 'Entry View', 'gravitypdf' ) . '</h6>' . __( 'Choose to view the PDF in your web browser or download the document to your computer.', 'gravitypdf' ),
 					),
 				)
 			),
@@ -145,7 +161,7 @@ class Helper_Options_Fields extends Helper_Options {
 					'admin_capabilities' => array(
 						'id'          => 'admin_capabilities',
 						'name'        => __( 'User Restriction', 'gravitypdf' ),
-						'desc'        => __( 'Restrict PDF access to logged in users with any of these capabilities. The Administrator Role always has full access.', 'gravitypdf' ),
+						'desc'        => __( 'Restrict PDF access to users with any of these capabilities. The Administrator Role always has full access.', 'gravitypdf' ),
 						'type'        => 'select',
 						'options'     => $this->get_capabilities(),
 						'std'         => 'gravityforms_view_entries',
@@ -154,20 +170,20 @@ class Helper_Options_Fields extends Helper_Options {
 						'multiple'    => true,
 						'required'    => true,
 						'placeholder' => __( 'Select Capability', 'gravitypdf' ),
-						'tooltip'     => '<h6>' . __( 'User Restriction', 'gravitypdf' ) . '</h6>' . __( "Only logged in users with these capabilities can view generated PDFs they don't have ownership of. Ownership refers to the user who completed the original Gravity Form entry.", 'gravitypdf' ),
+						'tooltip'     => '<h6>' . __( 'User Restriction', 'gravitypdf' ) . '</h6>' . __( "Only logged in users with any selected capability can view generated PDFs they don't have ownership of. Ownership refers to an end user who completed the original Gravity Form entry.", 'gravitypdf' ),
 					),
 
 					'limit_to_admin' => array(
 						'id'      => 'limit_to_admin',
 						'name'    => __( 'Restrict Owner', 'gravitypdf' ),
-						'desc'    => __( 'When enabled, the original entry owner will NOT be able to view their PDF.', 'gravitypdf' ),
+						'desc'    => __( 'When enabled, the original entry owner will NOT be able to view the PDFs.', 'gravitypdf' ),
 						'type'    => 'radio',
 						'options' => array(
 							'Yes'     => __( 'Yes', 'gravitypdf' ),
 							'No'      => __( 'No', 'gravitypdf' ),
 						),
 						'std'     => __( 'No', 'gravitypdf' ),
-						'tooltip' => '<h6>' . __( 'Restrict Owner', 'gravitypdf' ) . '</h6>' . __( 'Enable this option if you only want logged in users with the above capability to view PDFs.', 'gravitypdf' ),
+						'tooltip' => '<h6>' . __( 'Restrict Owner', 'gravitypdf' ) . '</h6>' . __( 'Enable this setting if your PDFs should not be viewable by the end user.', 'gravitypdf' ),
 					),
 
 					'logged_out_timeout' => array(
@@ -178,7 +194,7 @@ class Helper_Options_Fields extends Helper_Options {
 						'type'    => 'number',
 						'size'    => 'small',
 						'std'     => 20,
-						'tooltip' => '<h6>' . __( 'Logged Out Timeout', 'gravitypdf' ) . '</h6>' . __( 'By default, logged out users can view PDFs when their IP matches the IP assigned to the Gravity Form entry. But because IP addresses can change frequently a time-based restriction also applies.', 'gravitypdf' ),
+						'tooltip' => '<h6>' . __( 'Logged Out Timeout', 'gravitypdf' ) . '</h6>' . __( 'Logged out users can view PDFs when their IP matches the one assigned to the Gravity Form entry. Because IP addresses can change, a time-based restriction also applies.', 'gravitypdf' ),
 					),
 				)
 			),
@@ -196,11 +212,11 @@ class Helper_Options_Fields extends Helper_Options {
 					'setup_templates' => array(
 						'id'      => 'setup_templates',
 						'name'    => __( 'Setup Custom Templates', 'gravitypdf' ),
-						'desc'    => sprintf( __( 'Ready to get down and dirty with custom PDF templates? %sSee docs to get started%s.', 'gravitypdf' ), '<a href="#">', '</a>' ),
+						'desc'    => sprintf( __( 'Setup environment for building custom templates. %sSee docs to get started%s.', 'gravitypdf' ), '<a href="#">', '</a>' ),
 						'type'    => 'button',
 						'std'     => __( 'Run Setup', 'gravitypdf' ),
 						'options' => 'copy',
-						'tooltip' => '<h6>' . __( 'Setup Custom Templates', 'gravitypdf' ) . '</h6>' . __( 'TODO... Write Copy', 'gravitypdf' ),
+						'tooltip' => '<h6>' . __( 'Setup Custom Templates', 'gravitypdf' ) . '</h6>' . __( 'The setup will create a environment in your uploads directory so you can freely create custom PDF templates without the risk of overriding your modifications when the plugin updates.', 'gravitypdf' ),
 					),
 
 					'manage_fonts' => array(
@@ -210,7 +226,7 @@ class Helper_Options_Fields extends Helper_Options {
 						'type'    => 'button',
 						'std'     => __( 'Manage Fonts', 'gravitypdf' ),
 						'options' => 'install_fonts',
-						'tooltip' => '<h6>' . __( 'Install Fonts', 'gravitypdf' ) . '</h6>' . sprintf( __( 'Custom fonts can be installed and used in your PDFs. Currently only %s.ttf%s and %s.otf%s font files are supported. Once installed, fonts can be used in your custom PDF templates with a CSS %sfont-family%s declaration.', 'gravitypdf' ), '<code>', '</code>', '<code>', '</code>', '<code>', '</code>' ),
+						'tooltip' => '<h6>' . __( 'Install Fonts', 'gravitypdf' ) . '</h6>' . sprintf( __( 'Custom fonts can be installed so you can use them in your PDFs. Only %s.ttf%s and %s.otf%s font files are supported.', 'gravitypdf' ), '<code>', '</code>', '<code>', '</code>', '<code>', '</code>' ),
 					),
 				)
 			),
@@ -224,7 +240,7 @@ class Helper_Options_Fields extends Helper_Options {
 						'name'     => __( 'Name', 'gravitypdf' ),
 						'type'     => 'text',
 						'required' => true,
-						'tooltip'  => '<h6>' . __( 'Name', 'gravitypdf' ) . '</h6>' . __( 'The internal PDF name, making it easy to distinguish between multiple PDFs.', 'gravitypdf' ),
+						'tooltip'  => '<h6>' . __( 'PDF Name', 'gravitypdf' ) . '</h6>' . sprintf( __( 'Make it easy to distinguish between multiple PDFs by giving it an easy-to-remember name (for internal use). Use the %sFilename%s field below to set the actual PDF name.', 'gravitypdf' ), '<em>', '</em>' ),
 					),
 
 					'template' => array(
@@ -233,6 +249,7 @@ class Helper_Options_Fields extends Helper_Options {
 						'desc'       => sprintf( __( 'Choose an existing template or purchased more %sfrom our theme shop%s.%s You can also %sbuild your own%s or %shire us%s to create a custom solution.', 'gravitypdf' ), '<a href="#">', '</a>', '<br>', '<a href="#">', '</a>', '<a href="#">', '</a>' ),
 						'type'       => 'select',
 						'options'    => $this->get_templates(),
+						'std'     	 => $this->get_option( 'default_template', 'core-simple' ),
 						'inputClass' => 'large',
 						'chosen'     => true,
 						'tooltip'    => '<h6>' . __( 'Templates', 'gravitypdf' ) . '</h6>' . sprintf( __( 'Gravity PDF comes with %sfive completely-free and highly customisable designs%s to choose. You can also purchase additional templates from our theme shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravitypdf' ), '<strong>', '</strong>' ),
@@ -268,7 +285,7 @@ class Helper_Options_Fields extends Helper_Options {
 						'desc'       => __( 'Enable conditional logic', 'gravitypdf' ),
 						'class'      => 'conditional_logic',
 						'inputClass' => 'conditional_logic_listener',
-						'tooltip'    => '<h6>' . __( 'Conditional Logic', 'gravitypdf' ) . '</h6>' . __( 'Create rules to dynamically enable or disable PDFs. This includes attaching to notifications and viewing.', 'gravitypdf' ),
+						'tooltip'    => '<h6>' . __( 'Conditional Logic', 'gravitypdf' ) . '</h6>' . __( 'Create rules to dynamically enable or disable PDFs. This includes attaching to notifications and viewing from your admin area.', 'gravitypdf' ),
 					),
 
 					'conditionalLogic' => array(
@@ -325,29 +342,41 @@ class Helper_Options_Fields extends Helper_Options {
 						'type'    => 'select',
 						'options' => $this->get_installed_fonts(),
 						'std'     => $this->get_option( 'default_font_type' ),
-						'desc'    => __( 'Set the font type to use in the PDF.', 'gravitypdf' ),
+						'desc'    => sprintf( __( 'Set the font type used in PDFs. Choose an existing font or %sinstall your own%s.', 'gravitypdf' ), '<a href="'. $gfpdf->data->settings_url .'&tab=tools#manage_fonts">', '</a>' ),
 						'inputClass'   => 'large',
 						'chosen'  => true,
+						'tooltip'    => '<h6>' . __( 'Fonts', 'gravitypdf' ) . '</h6>' . __( 'Gravity PDF comes bundled with fonts for most languages world-wide. Want to use a specific font type? Use the font installer (found in the Forms -> Settings -> Tools tab).', 'gravitypdf' ),
+					),
+
+					'font_size' => array(
+						'id'      => 'font_size',
+						'name'    => __( 'Font Size', 'gravitypdf' ),
+						'desc'    => __( 'Set the font size to use in the PDF.', 'gravitypdf' ),
+						'desc2'   => 'pt',
+						'type'    => 'number',
+						'size'    => 'small',
+						'std'     => $this->get_option( 'default_font_size', 12 ),
 					),
 
 					'font_colour' => array(
 						'id'      => 'font_colour',
 						'name'    => __( 'Font Colour', 'gravitypdf' ),
 						'type'    => 'color',
-						'std'     => $this->get_option( 'default_font_colour' ),
+						'std'     => $this->get_option( 'default_font_colour', '#000000' ),
 						'desc'    => __( 'Set the font colour used in the PDF.', 'gravitypdf' ),
 					),
 
 					'rtl' => array(
 						'id'    => 'rtl',
 						'name'    => __( 'Reverse Text (RTL)', 'gravitypdf' ),
-						'desc'  => __( 'Languages like Arabic and Hebrew are written right to left.', 'gravitypdf' ),
+						'desc'  => __( 'Script like Arabic and Hebrew are written right to left.', 'gravitypdf' ),
 						'type'  => 'radio',
 						'options' => array(
 							'Yes' => __( 'Yes', 'gravitypdf' ),
 							'No'  => __( 'No', 'gravitypdf' ),
 						),
 						'std'   => $this->get_option( 'default_rtl', 'No' ),
+						'tooltip'    => '<h6>' . __( 'Reverse Text (RTL)', 'gravitypdf' ) . '</h6>' . __( "Enable RTL if you are writing in Arabic, Hebrew, Syriac, N'ko, Thaana, Tifinar or Urdu.", 'gravitypdf' ),
 					),
 
 				)
@@ -377,7 +406,7 @@ class Helper_Options_Fields extends Helper_Options {
 							'PDFX1A'  => 'PDF/X-1a',
 						),
 						'std'   => 'Standard',
-						'tooltip' => '<h6>' . __( 'PDF Format', 'gravitypdf' ) . '</h6>' . __( "Generate a document adhearing to the appropriate PDF standard. When not in 'Standard' mode, watermarks, alpha-transparent PNGs and security options can NOT be used.", 'gravitypdf' ),
+						'tooltip' => '<h6>' . __( 'PDF Format', 'gravitypdf' ) . '</h6>' . sprintf( __( "Generate a document adhearing to the appropriate PDF standard. When not in %sStandard%s mode, watermarks, alpha-transparent PNGs and security options can NOT be used.", 'gravitypdf' ), '<em>', '</em>' ),
 					),
 
 					'security' => array(
@@ -396,14 +425,14 @@ class Helper_Options_Fields extends Helper_Options {
 						'id'    => 'password',
 						'name'  => __( 'Password', 'gravitypdf' ),
 						'type'  => 'text',
-						'desc'  => 'Set a password to view PDFs. Leave blank to disable password protection.',
+						'desc'  => 'Password protect the PDFs, or leave blank to disable password protection.',
 						'inputClass' => 'merge-tag-support mt-hide_all_fields',
 					),
 
 					'privileges' => array(
 						'id'      => 'privileges',
 						'name'    => __( 'Privileges', 'gravitypdf' ),
-						'desc'    => 'Restrict end-user capabilities.',
+						'desc'    => 'Restrict end user capabilities by removing privileges.',
 						'type'    => 'select',
 						'options' => $this->get_privilages(),
 						'std'     => array(
@@ -418,9 +447,9 @@ class Helper_Options_Fields extends Helper_Options {
 						),
 						'inputClass'       => 'large',
 						'chosen'      => true,
-						'tooltip'     => '<h6>' . __( 'Privileges', 'gravitypdf' ) . '</h6>' . __( 'You can prevent the end-user completing certain actions to the PDF, such as copying text, printing, adding annotations or extracting pages.', 'gravitypdf' ),
+						'tooltip'     => '<h6>' . __( 'Privileges', 'gravitypdf' ) . '</h6>' . __( 'You can prevent the end user completing certain actions to the PDF – such as copying text, printing, adding annotations or extracting pages.', 'gravitypdf' ),
 						'multiple'    => true,
-						'placeholder' => __( 'Select PDF Privileges', 'gravitypdf' ),
+						'placeholder' => __( 'Select End User PDF Privileges', 'gravitypdf' ),
 					),
 
 					'image_dpi' => array(
@@ -429,20 +458,20 @@ class Helper_Options_Fields extends Helper_Options {
 						'type'  => 'number',
 						'size'  => 'small',
 						'std'   => 96,
-						'tooltip' => '<h6>' . __( 'Image DPI', 'gravitypdf' ) . '</h6>' . __( 'Control the image DPI (dots per inch). Set to 300 when professionally printing.', 'gravitypdf' ),
+						'tooltip' => '<h6>' . __( 'Image DPI', 'gravitypdf' ) . '</h6>' . __( 'Control the image DPI (dots per inch) in PDFs. Set to 300 when professionally printing document.', 'gravitypdf' ),
 					),
 
 					'save' => array(
 						'id'    => 'save',
 						'name'  => __( 'Always Save PDF?', 'gravitypdf' ),
-						'desc'  => __( 'Force a PDF to be saved to disk when a new entry is submitted.', 'gravitypdf' ),
+						'desc'  => __( 'Force a PDF to be saved to disk when a new entry is created.', 'gravitypdf' ),
 						'type'  => 'radio',
 						'options' => array(
 							'Yes' => __( 'Yes', 'gravitypdf' ),
 							'No'  => __( 'No', 'gravitypdf' ),
 						),
 						'std'   => __( 'No', 'gravitypdf' ),
-						'tooltip' => '<h6>' . __( 'Save PDF', 'gravitypdf' ) . '</h6>' . __( "When notifications are disabled a PDF is not automatically saved to disk. Enable this option to force the PDF to be generated and saved. Useful when using the 'gfpdf_post_pdf_save' hook to copy / manipulate the PDF further.", 'gravitypdf' ),
+						'tooltip' => '<h6>' . __( 'Save PDF', 'gravitypdf' ) . '</h6>' . __( "By default, PDFs are not automatically saved to disk. Enable this option to force the PDF to be generated and saved. Useful when using the 'gfpdf_post_pdf_save' hook to copy the PDF to an alternate location.", 'gravitypdf' ),
 					),
 
 				)

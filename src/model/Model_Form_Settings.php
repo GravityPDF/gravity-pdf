@@ -255,7 +255,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function update_pdf( $form_id, $pdf_id, $value = '', $update_db = true, $filters = true ) {
 		global $gfpdf;
-		
+
 		if ( empty( $value ) || ! is_array( $value ) || sizeof( $value ) == 0 ) {
 			$remove_option = $this->delete_pdf( $form_id, $pdf_id );
 			return $remove_option;
@@ -518,19 +518,21 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @since  4.0
 	 */
 	public function register_custom_appearance_settings( $settings ) {
+		global $gfpdf;
 
 		$pid     = rgget( 'pid' );
 		$form_id = (isset($_GET['id'])) ? (int) $_GET['id'] : 0;
 
-		/* exist if we don't have an ID */
+		/* If we don't have a specific PDF we'll use the defaults */
 		if ( empty($pid) || empty($form_id) ) {
-			return $settings;
+			$template = $gfpdf->options->get_option( 'default_template', 'core-simple' );
+		} else {
+			/* Load the PDF configuration */
+			$pdf      = $this->get_pdf( $form_id, $pid );
+			$template = $pdf['template'];
 		}
 
-		/* Load the PDF configuration */
-		$pdf      = $this->get_pdf( $form_id, $pid );
-		$template = $pdf['template'];
-		$class    = $this->get_template_configuration( $template );
+		$class = $this->get_template_configuration( $template );
 
 		return $this->setup_custom_appearance_settings( $class, $settings );
 	}
@@ -621,7 +623,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			'name'       => __( 'First Page Header', 'gravitypdf' ),
 			'type'       => 'rich_editor',
 			'size'       => 8,
-			'desc'       => __( 'Override the standard header on the first page of your PDF.', 'gravitypdf' ),
+			'desc'       => __( 'Override the header on the first page of your PDF.', 'gravitypdf' ),
 			'inputClass' => 'merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields',
 			'toggle'     => __( 'Use different header on first page of PDF?', 'gravitypdf' ),
 		);
@@ -645,7 +647,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			'name'       => __( 'First Page Footer', 'gravitypdf' ),
 			'type'       => 'rich_editor',
 			'size'       => 8,
-			'desc'       => __( 'Override the standard footer on the first page of your PDF.', 'gravitypdf' ),
+			'desc'       => __( 'Override the footer on the first page of your PDF.', 'gravitypdf' ),
 			'inputClass' => 'merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields',
 			'toggle'     => __( 'Use different footer on first page of PDF?', 'gravitypdf' ),
 		);
@@ -657,7 +659,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			'name'    => __( 'Background Image', 'gravitypdf' ),
 			'type'    => 'upload',
 			'desc'    => __( 'The background image is included on all pages. For optimal results, use an image the same dimensions as your paper size.', 'gravitypdf' ),
-			'tooltip' => '<h6>' . __( 'Background Image', 'gravitypdf' ) . '</h6>' . __( 'For the best results, use a non-interlaced 8-Bit PNG that has the same dimensions as your paper size.', 'gravitypdf' ),
+			'tooltip' => '<h6>' . __( 'Background Image', 'gravitypdf' ) . '</h6>' . __( 'For the best results, use a JPG or non-interlaced 8-Bit PNG that has the same dimensions as your paper size.', 'gravitypdf' ),
 		);
 	}
 
@@ -886,7 +888,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function change_state_pdf_setting() {
 		global $gfpdf;
-		
+
 		/* prevent unauthorized access */
 		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			/* fail */
@@ -982,7 +984,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
              * Pass the required wp_editor IDs and settings in our AJAX response so the client
              * can correctly load the instances.
              */
-			$editors     = array();
+			$editors = array();
 
 			foreach ( $settings as $field ) {
 				if ( isset($field['type']) && $field['type'] == 'rich_editor' ) {
@@ -992,7 +994,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		}
 
 		$editor_init = ( isset($gfpdf->data->tiny_mce_editor_settings) ) ? $gfpdf->data->tiny_mce_editor_settings : null;
-		$html        = ( isset($html) ) ? $html : null;
+		$html        = ( isset($html) && strlen( trim( $html ) ) > 0 ) ? $html : null;
 		$editors     = ( isset($editors) ) ? $editors : null;
 
 		echo json_encode(array(
