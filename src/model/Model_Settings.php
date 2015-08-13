@@ -86,7 +86,7 @@ class Model_Settings extends Helper_Abstract_Model {
 
 	/**
 	 * If any errors have been passed back from the options.php page we will highlight them
-	 * @param  Array $settings The get_registered_settings() array
+	 * @param  Array $settings The get_registered_fields() array
 	 * @return Array
 	 * @since 4.0
 	 */

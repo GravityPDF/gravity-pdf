@@ -48,7 +48,6 @@ if (! defined('ABSPATH')) {
 	</h3>
 
 	<form method="post" action="options.php">
-		<?php settings_errors(); ?>
 		<?php settings_fields( 'gfpdf_settings' ); ?>
 		<table id="pdf-general" class="form-table">
 			<?php do_settings_fields('gfpdf_settings_general', 'gfpdf_settings_general'); ?>

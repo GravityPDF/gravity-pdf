@@ -724,7 +724,7 @@ class Helper_Options implements Helper_Interface_Filters {
 
 		parse_str( $_POST['_wp_http_referer'], $referrer );
 
-		$all_settings = $this->get_registered_settings();
+		$all_settings = $this->get_registered_fields();
 		$tab          = isset( $referrer['tab'] ) ? $referrer['tab'] : 'general';
 		$settings     = ( ! empty($all_settings[$tab])) ? $all_settings[$tab] : array();
 

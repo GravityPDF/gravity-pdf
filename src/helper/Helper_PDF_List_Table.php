@@ -2,8 +2,6 @@
 
 namespace GFPDF\Helper;
 
-use GFCommon;
-
 use WP_List_Table;
 
 
@@ -138,12 +136,14 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * @since 4.0
 	 */
 	public function column_cb( $item ) {
+		global $gfpdf;
+
 		$is_active   = isset( $item['active'] ) ? $item['active'] : true;
 		$form_id     = rgget( 'id' );
 		$state_nonce = wp_create_nonce( "gfpdf_state_nonce_{$form_id}_{$item['id']}" );
 		?>
 
-		<img data-id="<?php echo $item['id'] ?>" data-nonce="<?php echo $state_nonce; ?>" data-fid="<?php echo $form_id; ?>" src="<?php echo GFCommon::get_base_url() ?>/images/active<?php echo intval( $is_active ) ?>.png" style="cursor: pointer;margin:-1px 0 0 8px;" alt="<?php $is_active ? __( 'Active', 'gravitypdf' ) : __( 'Inactive', 'gravitypdf' ); ?>" title="<?php echo $is_active ? __( 'Active', 'gravitypdf' ) : __( 'Inactive', 'gravitypdf' ); ?>"/>
+		<img data-id="<?php echo $item['id'] ?>" data-nonce="<?php echo $state_nonce; ?>" data-fid="<?php echo $form_id; ?>" src="<?php echo $gfpdf->form->get_plugin_url() ?>/images/active<?php echo intval( $is_active ) ?>.png" style="cursor: pointer;margin:-1px 0 0 8px;" alt="<?php $is_active ? __( 'Active', 'gravitypdf' ) : __( 'Inactive', 'gravitypdf' ); ?>" title="<?php echo $is_active ? __( 'Active', 'gravitypdf' ) : __( 'Inactive', 'gravitypdf' ); ?>"/>
 		
 		<?php
 	}

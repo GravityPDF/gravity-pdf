@@ -2,8 +2,6 @@
 
 namespace GFPDF\Helper;
 
-use GFCommon;
-
 /**
  * Data overloaded Helper Class
  * Cache shared data across the plugin
@@ -163,7 +161,7 @@ class Helper_Data {
 
 		return apply_filters('gfpdf_localised_script_array', array(
 			'ajaxurl'                     => admin_url( 'admin-ajax.php' ),
-			'GFbaseUrl'                   => GFCommon::get_base_url(),
+			'GFbaseUrl'                   => $gfpdf->form->get_plugin_url(),
 			'pluginUrl'                   => PDF_PLUGIN_URL,
 			'spinnerUrl'                  => admin_url( 'images/spinner-2x.gif' ),
 			'general_advanced_show'       => __( 'Show Advanced Options...', 'gravitypdf' ),

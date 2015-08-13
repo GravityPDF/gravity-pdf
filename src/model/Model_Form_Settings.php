@@ -6,8 +6,6 @@ use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_PDF_List_Table;
 use GFPDF\Helper\Helper_Interface_Config;
 
-use GFCommon;
-
 use WP_Error;
 use _WP_Editors;
 
@@ -361,7 +359,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* Check Nonce is valid */
 		if ( ! wp_verify_nonce( rgpost( 'gfpdf_save_pdf' ), 'gfpdf_save_pdf' ) ) {
-			 GFCommon::add_error_message( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
+			$gfpdf->notices->add_error( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
 			 return false;
 		}
 
@@ -374,7 +372,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* check appropriate settings */
 		if ( ! is_array( $input ) || ! $pdf_id ) {
-			 GFCommon::add_error_message( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
+			 $gfpdf->notices->add_error( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
 			 return false;
 		}
 
@@ -390,7 +388,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		if ( empty($sanitized['name']) || empty($sanitized['filename']) ||
 			($sanitized['pdf_size'] == 'custom' && ((int) $sanitized['custom_pdf_size'][0] === 0 || (int) $sanitized['custom_pdf_size'][1] === 0)) ) {
 
-			GFCommon::add_error_message( __( 'PDF could not be saved. Please enter all required information below.', 'gravitypdf' ) );
+			$gfpdf->notices->add_error( __( 'PDF could not be saved. Please enter all required information below.', 'gravitypdf' ) );
 			return false;
 		}
 
@@ -405,11 +403,11 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* If it updated, let's update the global variable */
 		if ( $did_update !== false ) {
-			GFCommon::add_message( sprintf( __( 'PDF saved successfully. %sBack to PDF list.%s', 'gravitypdf' ), '<a href="' . remove_query_arg( 'pid' ) . '">', '</a>' ) );
+			$gfpdf->notices->add_notice( sprintf( __( 'PDF saved successfully. %sBack to PDF list.%s', 'gravitypdf' ), '<a href="' . remove_query_arg( 'pid' ) . '">', '</a>' ) );
 			return true;
 		}
 
-		GFCommon::add_error_message( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
+		$gfpdf->notices->add_error( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
 		return false;
 	}
 
@@ -420,6 +418,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function validation_error( $fields ) {
+		global $gfpdf;
+
 		/**
 		 * Check if we actually need to do any validating
 		 * Because of the way the Gravity Forms Settings page is processed we are hooking into the core
@@ -434,7 +434,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		 * Check we have a valid nonce, or throw an error
 		 */
 		if ( ! wp_verify_nonce( rgpost( 'gfpdf_save_pdf' ), 'gfpdf_save_pdf' ) ) {
-			GFCommon::add_error_message( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
+			$gfpdf->notices->add_error( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
 			return false;
 		}
 
@@ -480,7 +480,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	public function settings_sanitize( $input = array() ) {
 		global $gfpdf;
 
-		$settings = $gfpdf->options->get_registered_settings();
+		$settings = $gfpdf->options->get_registered_fields();
 		$sections = array( 'form_settings', 'form_settings_appearance', 'form_settings_custom_appearance', 'form_settings_advanced' );
 
 		foreach ( $sections as $s ) {
@@ -915,7 +915,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			/* toggle state */
 			$config['active'] = ($config['active'] === true) ? false : true;
 			$state            = ($config['active']) ? __( 'Active', 'gravitypdf' ) : __( 'Inactive', 'gravitypdf' );
-			$src              = GFCommon::get_base_url() . '/images/active' . intval( $config['active'] ) . '.png';
+			$src              = $gfpdf->form->get_plugin_url() . '/images/active' . intval( $config['active'] ) . '.png';
 
 			$results = $this->update_pdf( $fid, $config['id'], $config );
 
