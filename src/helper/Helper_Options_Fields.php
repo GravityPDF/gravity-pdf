@@ -153,6 +153,19 @@ class Helper_Options_Fields extends Helper_Options {
 						'std'     => 'View',
 						'tooltip'    => '<h6>' . __( 'Entry View', 'gravitypdf' ) . '</h6>' . __( 'Choose to view the PDF in your web browser or download the document to your computer.', 'gravitypdf' ),
 					),
+
+					'update_screen_action' => array(
+						'id'      => 'update_screen_action',
+						'name'    => __( "Show What's New?", 'gravitypdf' ),
+						'desc'    => "When updating to a new release we'll redirect you to our What's New page.",
+						'type'    => 'radio',
+						'options' => array(
+							'Enable'     => __( 'Enable', 'gravitypdf' ),
+							'Disable' => __( 'Disable', 'gravitypdf' ),
+						),
+						'std'     => 'Enable',
+						'tooltip'    => '<h6>' . __( "Show What's New Page", 'gravitypdf' ) . '</h6>' . __( "When upgrading Gravity PDF we'll automatically redirect you to our What's New page so you can see the changes. Bug fix and security releases are excluded (4.0.x).", 'gravitypdf' ),
+					),
 				)
 			),
 

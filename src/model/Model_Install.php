@@ -276,6 +276,7 @@ class Model_Install extends Helper_Abstract_Model {
 	 */
 	public function remove_plugin_options() {
 		delete_option( 'gfpdf_is_installed' );
+		delete_option( 'gfpdf_current_version' );
 		delete_option( 'gfpdf_settings' );
 	}
 

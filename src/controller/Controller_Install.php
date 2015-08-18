@@ -75,6 +75,7 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	 */
 	public function add_actions() {
 		add_action( 'admin_init', array( $this, 'maybe_uninstall' ) );
+		add_action( 'wp_loaded', array( $this, 'check_install_status' ), 9999 );
 
 		/* rewrite endpoints */
 		add_action( 'init', array( $this->model, 'register_rewrite_rules' ) );
@@ -111,6 +112,24 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 		$this->model->setup_template_location();
 		$this->model->setup_multisite_template_location();
 		$this->model->create_folder_structures();
+	}
+
+	/**
+	 * Check the software has been installed on this website before and
+	 * the version numbers are in sync
+	 * @return void
+	 * @since 4.0
+	 */
+	public function check_install_status() {
+		global $gfpdf;
+
+		 if( ! $gfpdf->data->is_installed ) {
+		 	$this->model->install_plugin();
+		 }
+
+		 if( PDF_EXTENDED_VERSION != get_option( 'gfpdf_current_version' ) ) {
+		 	update_option( 'gfpdf_current_version', PDF_EXTENDED_VERSION );
+		 }
 	}
 
 	/**
