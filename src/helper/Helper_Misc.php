@@ -428,4 +428,23 @@ class Helper_Misc
 
 		return false;
 	}
+
+	/**
+	 * Increment the PDF Generation Counter
+	 * To decrease load on the database we'll increment by 10 after a rand() function matches
+	 * This is less accurate but we only need a rough guesstimation to prompt the user
+	 * @return void
+	 * @since 4.0
+	 */
+	public function increment_pdf_count() {
+		global $gfpdf;
+
+		$rand = rand(1, 10);
+
+		if( 10 === $rand ) {
+			$total_pdf_count = (int) $gfpdf->options->get_option( 'pdf_count', 0 );
+			$total_pdf_count += 10;
+			$gfpdf->options->update_option( 'pdf_count', $total_pdf_count );
+		}
+	}
 }

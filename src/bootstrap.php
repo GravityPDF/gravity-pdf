@@ -152,6 +152,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->gf_form_settings();
 		$this->pdf();
 		$this->shortcodes();
+		$this->actions();
 
 		/* Add localisation support */
 		load_plugin_textdomain( 'gravitypdf', false,  dirname( plugin_basename( __FILE__ ) ) . '/assets/languages/' );
@@ -544,6 +545,20 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$view  = new View\View_Shortcodes( array() );
 
 		$class = new Controller\Controller_Shortcodes( $model, $view );
+		$class->init();
+	}
+
+	/**
+	 * Include one-time actions functionality
+	 * @since 4.0
+	 * @return void
+	 */
+	public function actions() {
+
+		$model = new Model\Model_Actions();
+		$view  = new View\View_Actions( array() );
+
+		$class = new Controller\Controller_Actions( $model, $view );
 		$class->init();
 	}
 

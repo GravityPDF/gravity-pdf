@@ -158,7 +158,7 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 */
 	private function html( $text, $class = 'updated' ) {
 		?>
-            <div class="<?php echo $class; ?> is-dismissible notice">
+            <div class="<?php echo $class; ?> notice">
                 <p><?php echo $text; ?></p>
             </div>
         <?php

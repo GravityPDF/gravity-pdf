@@ -112,6 +112,8 @@ class View_PDF extends Helper_Abstract_View
 				$pdf->set_output_type( 'download' );
 			}
 
+			$gfpdf->misc->increment_pdf_count();
+
 			/* Generate PDF */
 			$pdf->generate();
 		} catch (Exception $e) {

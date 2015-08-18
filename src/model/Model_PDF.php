@@ -521,6 +521,7 @@ class Model_PDF extends Helper_Abstract_Model {
 						$pdf_path = $pdf->get_path() . $pdf->get_filename();
 
 						if ( is_file( $pdf_path ) ) {
+							$gfpdf->misc->increment_pdf_count();
 							$notifications['attachments'][] = $pdf_path;
 						}
 					}
