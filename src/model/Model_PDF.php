@@ -470,12 +470,12 @@ class Model_PDF extends Helper_Abstract_Model {
 		if ( $this->does_pdf_exist( $pdf ) ) {
 			try {
 				$pdf->init();
-				$pdf->renderHtml( $gfpdf->misc->get_template_args( $pdf->getEntry(), $pdf->getSettings() ) );
+				$pdf->renderHtml( $gfpdf->misc->get_template_args( $pdf->get_entry(), $pdf->get_settings() ) );
 				$pdf->setOutputType( 'save' );
 
 				/* Generate PDF */
 				$raw_pdf  = $pdf->generate();
-				$pdf->savePdf( $raw_pdf );
+				$pdf->save_pdf( $raw_pdf );
 
 				return true;
 			} catch (Exception $e) {
@@ -612,10 +612,10 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since  4.0
 	 */
 	public function does_pdf_exist( $pdf ) {
-		$pdf->setPath();
-		$pdf->setFilename();
+		$pdf->set_path();
+		$pdf->set_filename();
 
-		if ( is_file( $pdf->getPath() . $pdf->getFilename() ) ) {
+		if ( is_file( $pdf->get_path() . $pdf->get_filename() ) ) {
 			return true;
 		}
 
@@ -651,13 +651,53 @@ class Model_PDF extends Helper_Abstract_Model {
 
 					if ( $this->does_pdf_exist( $pdf ) ) {
 						try {
-							$gfpdf->misc->rmdir( $pdf->getPath() );
+							$gfpdf->misc->rmdir( $pdf->get_path() );
 						} catch (Exception $e) {
 							
 							$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Cleanup PDF Error', array(
 								'pdf'       => $pdf,
 								'exception' => $e,
 							) );
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * To prevent out tmp directory getting huge we will clean it up every 24 hours
+	 * @return void
+	 * @since 4.0
+	 */
+	public function cleanup_tmp_dir() {
+		global $gfpdf;
+		
+		$max_file_age  = 24 * 3600; /* Max age is 24 hours old */
+		$tmp_directory = $gfpdf->data->template_tmp_location;
+
+		if( is_dir( $tmp_directory ) ) {
+			/* Scan the tmp directory and get a list of files / folders */
+			$directory_list = array_diff( scandir($tmp_directory), array( '..', '.', '.htaccess' ) );
+
+			foreach( $directory_list as $item ) {
+				$file      = $tmp_directory . $item;
+				$directory = false;
+				
+				/* Fix to allow filemtime to work on directories too */
+				if( is_dir($file) ) {
+					$file .= '.';
+					$directory = true;
+				}
+
+				/* Check if the file is too old and delete file / directory */
+				if( filemtime( $file ) < time() - $max_file_age ) {
+
+					if($directory) {
+						$gfpdf->misc->rmdir( substr( $file, 0, -1 ) );
+					} else {
+						if( ! unlink( $file ) ) {
+							$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Filesystem Delete Error', array( 'file' => $file ) );
 						}
 					}
 				}

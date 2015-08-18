@@ -75,5 +75,10 @@ class Controller_Activation
 		$rules = get_option( 'rewrite_rules' );
 		unset( $rules[ $gfpdf->data->permalink ] );
 		update_option( 'rewrite_rules', $rules );
+
+		/**
+		 * Remove our scheduled tasks
+		 */
+		wp_clear_scheduled_hook( 'gfpdf_cleanup_tmp_dir' );
 	}
 }

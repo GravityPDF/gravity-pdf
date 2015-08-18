@@ -73,6 +73,11 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
          */
 		 $this->add_actions();
 		 $this->add_filters();
+
+		/* Add scheduled tasks */
+		if ( ! wp_next_scheduled( 'gfpdf_cleanup_tmp_dir' ) ) {
+		  wp_schedule_event( time(), 'daily', 'gfpdf_cleanup_tmp_dir' );
+		}
 	}
 
 	/**
@@ -93,6 +98,8 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		add_action( 'gform_after_submission', array( $this->model, 'maybe_save_pdf' ), 10, 2 );
 		add_action( 'gform_after_submission', array( $this->model, 'cleanup_pdf' ), 9999, 2 );
 
+		/* Setup clean-up cron */
+		add_action( 'gfpdf_cleanup_tmp_dir', array( $this->model, 'cleanup_tmp_dir' ) );
 	}
 
 	/**
