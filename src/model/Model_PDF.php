@@ -84,6 +84,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		/* not a valid entry */
 		if ( is_wp_error( $entry ) ) {
+			$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Invalid Entry.', array( 'entry' => $entry ) );
 			return $entry; /* return error */
 		}
 
@@ -95,6 +96,12 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		/* Not valid settings */
 		if ( is_wp_error( $settings ) ) {
+			
+			$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Invalid PDF Settings.', array(
+				'entry'    => $entry,
+				'WP_Error' => $settings,
+			) );
+
 			return $settings; /* return error */
 		}
 
@@ -109,6 +116,13 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		/* Throw error */
 		if ( is_wp_error( $middleware ) ) {
+			
+			$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Invalid PDF Settings.', array(
+				'entry'    => $entry,
+				'settings' => $settings,
+				'WP_Error' => $middleware,
+			) );
+
 			return $middleware;
 		}
 
@@ -162,6 +176,12 @@ class Model_PDF extends Helper_Abstract_Model {
 			$logged_out_restriction = $gfpdf->options->get_option( 'limit_to_admin', 'No' );
 
 			if ( $logged_out_restriction === 'Yes' && ! is_user_logged_in() ) {
+
+				$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Redirecting to Login.', array(
+					'entry'    => $entry,
+					'settings' => $settings,
+				) );
+
 				/* prompt user to login */
 				auth_redirect();
 			}
@@ -203,6 +223,12 @@ class Model_PDF extends Helper_Abstract_Model {
 						if ( empty($entry['created_by']) ) {
 							return new WP_Error( 'timeout_expired', __( 'Your PDF is no longer accessible.', 'gravitypdf' ) );
 						} else {
+
+							$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Redirecting to Login.', array(
+								'entry'    => $entry,
+								'settings' => $settings,
+							) );
+
 							/* prompt to login */
 							auth_redirect();
 						}
@@ -222,12 +248,20 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function middle_auth_logged_out_user( $action, $entry, $settings ) {
+		global $gfpdf;
+
 		if ( ! is_wp_error( $action ) ) {
 
 			/* check if the user is not the current entry owner */
 			if ( ! is_user_logged_in() && $this->is_current_pdf_owner( $entry, 'logged_out' ) === false ) {
 				/* check if there is actually a user who owns entry */
 				if ( ! empty($entry['created_by']) ) {
+					
+					$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Redirecting to Login.', array(
+						'entry'    => $entry,
+						'settings' => $settings,
+					) );
+
 					/* prompt user to login to get access */
 					auth_redirect();
 				} else {
@@ -292,22 +326,30 @@ class Model_PDF extends Helper_Abstract_Model {
 		$form = $gfpdf->form->get_form( $entry['form_id'] );
 		$pdfs = (isset($form['gfpdf_form_settings'])) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : array();
 
+		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Display PDF Entry List.', array(
+			'pdfs'  => $pdfs,
+			'entry' => $entry,
+		) );
+
 		if ( ! empty($pdfs) ) {
 
 			$download = ($gfpdf->options->get_option( 'default_action' ) == 'Download') ? 'download/' : '';
 
 			if ( sizeof( $pdfs ) > 1 ) {
+
 				$args = array( 'pdfs' => array() );
 
 				foreach ( $pdfs as $pdf ) {
 					$args['pdfs'][] = array(
 						'name' => $this->get_pdf_name( $pdf, $entry ),
-						'url' => $this->get_pdf_url( $pdf['id'], $entry['id'] ) . $download,
+						'url'  => $this->get_pdf_url( $pdf['id'], $entry['id'] ) . $download,
 					);
 				}
 
 				$controller->view->entry_list_pdf_multiple( $args );
+
 			} else {
+
 				/* Only one PDF for this form so display a simple 'View PDF' link */
 				$pdf = array_shift( $pdfs );
 
@@ -336,13 +378,18 @@ class Model_PDF extends Helper_Abstract_Model {
 		$form = $gfpdf->form->get_form( $entry['form_id'] );
 		$pdfs = (isset($form['gfpdf_form_settings'])) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : array();
 
+		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Display PDF Entry Detail List.', array(
+			'pdfs'  => $pdfs,
+			'entry' => $entry,
+		) );
+
 		if ( ! empty($pdfs) ) {
 			$args = array( 'pdfs' => array() );
 
 			foreach ( $pdfs as $pdf ) {
 				$args['pdfs'][] = array(
 					'name' => $this->get_pdf_name( $pdf, $entry ),
-					'url' => $this->get_pdf_url( $pdf['id'], $entry['id'] ),
+					'url'  => $this->get_pdf_url( $pdf['id'], $entry['id'] ),
 				);
 			}
 
@@ -378,6 +425,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since  4.0
 	 */
 	public function get_pdf_url( $pid, $id, $esc = true ) {
+
 		$url = home_url() . '/pdf/' . $pid . '/' . $id . '/';
 
 		if ( $esc ) {
@@ -402,7 +450,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		foreach ( $pdfs as $pdf ) {
 			if ( $pdf['active'] && GFCommon::evaluate_conditional_logic( $pdf['conditionalLogic'], $form, $entry ) ) {
-				$filtered[$pdf['id']] = $pdf;
+				$filtered[ $pdf['id'] ] = $pdf;
 			}
 		}
 
@@ -431,7 +479,12 @@ class Model_PDF extends Helper_Abstract_Model {
 
 				return true;
 			} catch (Exception $e) {
-				/* Log Error */
+
+				$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'PDF Generation Error', array(
+					'pdf'       => $pdf,
+					'exception' => $e,
+				) );
+				
 				return false;
 			}
 		}
@@ -446,18 +499,22 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function notifications( $notifications, $form, $entry ) {
+		global $gfpdf;
+
 		$pdfs       = (isset($form['gfpdf_form_settings'])) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : array();
 
 		if ( sizeof( $pdfs ) > 0 ) {
-			/* set up classes */
+
+			/* Set up classes */
 			$controller  = $this->getController();
 			$settingsAPI = new Model_Form_Settings();
 
-			/* loop through each PDF config and generate */
+			/* Loop through each PDF config and generate */
 			foreach ( $pdfs as $pdf ) {
 				$settings = $settingsAPI->get_pdf( $entry['form_id'], $pdf['id'] );
 
 				if ( ! is_wp_error( $settings ) && $this->maybe_attach_to_notification( $notifications, $settings ) ) {
+
 					$pdf = new Helper_PDF( $entry, $settings );
 
 					if ( $this->process_and_save_pdf( $pdf ) ) {
@@ -469,6 +526,12 @@ class Model_PDF extends Helper_Abstract_Model {
 					}
 				}
 			}
+
+			$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Gravity Forms Attachments', array(
+				'attachments'  => $notifications['attachments'],
+				'notification' => $notifications,
+			) );
+
 		}
 		return $notifications;
 	}
@@ -525,6 +588,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 				/* Only generate if the PDF wasn't created during the notification process */
 				if ( ! is_wp_error( $settings ) ) {
+
 					$pdf = new Helper_PDF( $entry, $settings );
 
 					/* Check that the PDF hasn't already been created this session */
@@ -572,6 +636,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		$pdfs = (isset($form['gfpdf_form_settings'])) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : array();
 
 		if ( sizeof( $pdfs ) > 0 ) {
+
 			/* set up classes */
 			$controller  = $this->getController();
 			$settingsAPI = new Model_Form_Settings();
@@ -588,7 +653,11 @@ class Model_PDF extends Helper_Abstract_Model {
 						try {
 							$gfpdf->misc->rmdir( $pdf->getPath() );
 						} catch (Exception $e) {
-							/* Log to file */
+							
+							$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Cleanup PDF Error', array(
+								'pdf'       => $pdf,
+								'exception' => $e,
+							) );
 						}
 					}
 				}
@@ -733,6 +802,10 @@ class Model_PDF extends Helper_Abstract_Model {
 				$data[ $key ] = $item;
 			}
 		}
+
+		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Form Data Array Created', array(
+			'data'       => $data,
+		) );
 
 		return $data;
 	}

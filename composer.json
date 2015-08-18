@@ -1,7 +1,8 @@
 {
     "require": {
         "blueliquiddesigns/mpdf": "dev-master",
-        "querypath/QueryPath": ">=3.0.0"
+        "querypath/QueryPath": ">=3.0.0",
+        "monolog/monolog": "1.16.0"
     },
 
     "autoload": {

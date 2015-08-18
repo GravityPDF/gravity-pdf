@@ -73,7 +73,7 @@ class Controller_Activation
 		* As deactivation hook fires much earlier than flush_rewrite_rules() can be called we'll manually remove our rules from the database
 		*/
 		$rules = get_option( 'rewrite_rules' );
-		unset($rules[$gfpdf->data->permalink]);
+		unset( $rules[ $gfpdf->data->permalink ] );
 		update_option( 'rewrite_rules', $rules );
 	}
 }

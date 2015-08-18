@@ -111,13 +111,16 @@ class Model_Welcome_Screen extends Helper_Abstract_Model {
 	 * @param String $title The page title
 	 */
 	public function add_page_title( $title ) {
+		global $gfpdf;
 
 		switch ( rgget( 'page' ) ) {
 			case 'gfpdf-getting-started':
+				$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Display Welcome Screen' );
 				return $this->welcome_title;
 			break;
 
 			case 'gfpdf-update':
+				$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Display Update Screen' );
 				return $this->updated_title;
 			break;
 		}

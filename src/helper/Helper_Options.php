@@ -124,12 +124,19 @@ class Helper_Options implements Helper_Interface_Filters {
 	 * @since 4.0
 	 */
 	public function get_form_settings() {
+		global $gfpdf;
+
 		/* get GF settings */
 		$form_id = ( ! empty( rgget( 'id' ) ) ) ? (int) rgget( 'id' ) : (int) rgpost( 'id' );
 		$pid     = ( ! empty( rgget( 'pid' ) ) ) ? rgget( 'pid' ) : rgpost( 'gform_pdf_id' );
 
 		/* return early if no ID set */
 		if ( ! $form_id ) {
+			$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Settings Retreival Error', array(
+				'form_id' => $form_id,
+				'pid'     => $pid,
+			) );
+
 			return array();
 		}
 
@@ -140,6 +147,12 @@ class Helper_Options implements Helper_Interface_Filters {
 			/* get the selected form settings */
 			return (isset($settings[$pid])) ? $settings[$pid] : array();
 		}
+
+		$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Settings Retreival Error', array(
+			'form_id'  => $form_id,
+			'pid'      => $pid,
+			'WP_Error' => $settings,
+		) );
 
 		/* there was an error */
 		return array();
@@ -213,8 +226,8 @@ class Helper_Options implements Helper_Interface_Filters {
 		$setting = "gfpdf_settings[$setting_id]";
 
 		/* Check if our setting exists */
-		if ( isset($wp_settings_fields[$group][$group][$setting]['args'][$option_id]) ) {
-			$wp_settings_fields[$group][$group][$setting]['args'][$option_id] = $option_value;
+		if ( isset($wp_settings_fields[ $group ][ $group ][ $setting ]['args'][ $option_id ]) ) {
+			$wp_settings_fields[ $group ][ $group ][ $setting ]['args'][ $option_id ] = $option_value;
 			return true;
 		}
 
@@ -251,9 +264,14 @@ class Helper_Options implements Helper_Interface_Filters {
 	 * @return boolean True if updated, false if not.
 	 */
 	public function update_option( $key = '', $value = false ) {
+		global $gfpdf;
 
 		// If no key, exit
 		if ( empty( $key ) ) {
+			$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Option Update Error', array(
+				'key'   => $key,
+				'value' => $value,
+			) );
 			return false;
 		}
 
@@ -294,6 +312,7 @@ class Helper_Options implements Helper_Interface_Filters {
 
 		// If no key, exit
 		if ( empty( $key ) ) {
+			$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Option Delete Error' );
 			return false;
 		}
 

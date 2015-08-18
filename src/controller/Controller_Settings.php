@@ -184,6 +184,12 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 
 		/* because current_user_can() doesn't handle Gravity Forms permissions quite correct we'll do our checks here */
 		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
+			
+			$gfpdf->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
+				'user'      => wp_get_current_user(),
+				'user_meta' => get_user_meta( get_current_user_id() )
+			) );
+
 			wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
 		}
 
@@ -201,6 +207,8 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		global $gfpdf;
 		
 		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
+			$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities' );
+
 			unset($nav[100]); /* remove tools tab */
 		}
 
@@ -222,6 +230,12 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 
 		/* check if the user has permission to copy the templates */
 		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
+			
+			$gfpdf->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
+				'user'      => wp_get_current_user(),
+				'user_meta' => get_user_meta( get_current_user_id() )
+			) );
+
 			return false;
 		}
 
@@ -231,6 +245,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		if ( isset($settings['setup_templates']['name']) ) {
 			/* verify the nonce */
 			if ( ! wp_verify_nonce( $settings['setup_templates']['nonce'], 'gfpdf_settings[setup_templates]' ) ) {
+				 $gfpdf->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
 				 $gfpdf->notices->add_error( __( 'There was a problem installing the PDF templates. Please try again.', 'gravitypdf' ) );
 				 return false;
 			}

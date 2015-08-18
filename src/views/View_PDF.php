@@ -115,7 +115,11 @@ class View_PDF extends Helper_Abstract_View
 			/* Generate PDF */
 			$pdf->generate();
 		} catch (Exception $e) {
-			/* Log Error */
+			$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'PDF Generation Error', array(
+				'entry'     => $entry,
+				'settings'  => $settings,
+				'exception' => $e,
+			) );
 		}
 	}
 
@@ -279,7 +283,8 @@ class View_PDF extends Helper_Abstract_View
 	 * @since 4.0
 	 */
 	public function process_field( GF_Field $field, $entry, $form, $config, Field_Products $products, Helper_Field_Container $container, Helper_Abstract_Model $model ) {
-
+		global $gfpdf;
+		
 		/*
         * Set up our configuration variables
         */
@@ -313,10 +318,13 @@ class View_PDF extends Helper_Abstract_View
 				$container->close();
 			}
 		} catch (Exception $e) {
-			/**
-			 * TODO, would log this information
-			 */
-			var_dump( $e );
+			$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'PDF Generation Error', array(
+				'field'     => $field,
+				'entry'     => $entry,
+				'config'    => $config,
+				'form'      => $form,
+				'exception' => $e,
+			) );
 		}
 	}
 

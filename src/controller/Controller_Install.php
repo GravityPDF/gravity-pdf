@@ -127,11 +127,18 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 			/* Check Nonce is valid */
 			if ( ! wp_verify_nonce( rgpost( 'gfpdf-uninstall-plugin' ), 'gfpdf-uninstall-plugin' ) ) {
 				 $gfpdf->notices->add_error( __( 'There was a problem removing Gravity PDF. Please try again.', 'gravitypdf' ) );
+				 $gfpdf->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
 				 return false;
 			}
 
 			/* check if user has permission to uninstall the plugin */
 			if ( ! $gfpdf->form->has_capability( 'gravityforms_uninstall' ) ) {
+	
+				$gfpdf->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
+					'user'      => wp_get_current_user(),
+					'user_meta' => get_user_meta( get_current_user_id() )
+				) );
+
 				wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
 			}
 

@@ -55,6 +55,9 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function install_plugin() {
+			global $gfpdf;
+			$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Gravity PDF Installed' );
+
 			update_option( 'gfpdf_is_installed', true );
 	}
 
@@ -105,6 +108,13 @@ class Model_Install extends Helper_Abstract_Model {
 		$gfpdf->data->template_location_url  = apply_filters( 'gfpdfe_template_location_url', $gfpdf->data->upload_dir_url . '/' . $gfpdf->data->working_folder . '/', $gfpdf->data->upload_dir_url, $gfpdf->data->working_folder );
 		$gfpdf->data->template_font_location = $gfpdf->data->template_location . 'fonts/';
 		$gfpdf->data->template_tmp_location  = $gfpdf->data->template_location . 'tmp/';
+
+		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Template Locations', array(
+			'path' => $gfpdf->data->template_location,
+			'url'  => $gfpdf->data->template_location_url,
+			'font' => $gfpdf->data->template_font_location,
+			'tmp'  => $gfpdf->data->template_tmp_location,
+		) );
 	}
 
 	/**
@@ -119,6 +129,11 @@ class Model_Install extends Helper_Abstract_Model {
 			$blog_id = get_current_blog_id();
 			$gfpdf->data->multisite_template_location     = apply_filters( 'gfpdfe_multisite_template_location', $gfpdf->data->upload_dir . '/' . $gfpdf->data->working_folder . '/', $gfpdf->data->upload_dir, $gfpdf->data->working_folder );
 			$gfpdf->data->multisite_template_location_url = apply_filters( 'gfpdfe_multisite_template_location_url', $gfpdf->data->upload_dir_url . '/' . $gfpdf->data->working_folder . '/', $gfpdf->data->upload_dir_url, $gfpdf->data->working_folder );
+
+			$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Multisite Template Locations', array(
+				'path' => $gfpdf->data->multisite_template_location,
+				'url'  => $gfpdf->data->multisite_template_location_url,
+			) );
 		}
 	}
 
@@ -155,11 +170,13 @@ class Model_Install extends Helper_Abstract_Model {
 		foreach ( $folders as $dir ) {
 			if ( ! is_dir( $dir ) ) {
 				if ( ! wp_mkdir_p( $dir ) ) {
+					$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Failed Creating Folder Structure', array( 'dir' => $dir ) );
 					$gfpdf->notices->add_error( sprintf( __( 'There was a problem creating the %s directory. Ensure you have write permissions to your upload directory.', 'gravitypdf' ), '<code>' . $gfpdf->misc->relative_path( $dir ) . '</code>' ) );
 				}
 			} else {
 				/* test the directory is currently writable by the web server, otherwise throw and error */
 				if ( ! $gfpdf->misc->is_directory_writable( $dir ) ) {
+					$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Failed Write Permissions Check.', array( 'dir' => $dir ) );
 					$gfpdf->notices->add_error( sprintf( __( 'Gravity PDF does not have write permissions to the %s directory. Contact your web hosting provider to fix the issue.', 'gravitypdf' ), '<code>' . $gfpdf->misc->relative_path( $dir ) . '</code>' ) );
 				}
 			}
@@ -172,6 +189,7 @@ class Model_Install extends Helper_Abstract_Model {
 
 		/* create deny htaccess file to prevent direct access to files */
 		if ( is_dir( $gfpdf->data->template_tmp_location ) && ! is_file( $gfpdf->data->template_tmp_location . '.htaccess' ) ) {
+			$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Create Apache .htaccess Security' );
 			file_put_contents( $gfpdf->data->template_tmp_location . '.htaccess', 'deny from all' );
 		}
 	}
@@ -185,13 +203,19 @@ class Model_Install extends Helper_Abstract_Model {
 		global $gfpdf;
 
 		/* store query */
-		$query = $gfpdf->data->permalink;
+		$query      = $gfpdf->data->permalink;
+		$rewrite_to = 'index.php?gf_pdf=1&pid=$matches[1]&lid=$matches[2]&action=$matches[3]';
 
 		/* Add our main endpoint */
 		add_rewrite_rule(
 			$query,
-			'index.php?gf_pdf=1&pid=$matches[1]&lid=$matches[2]&action=$matches[3]',
+			$rewrite_to,
 		'top');
+
+		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Add Rewrite Rules', array(
+			'query'   => $query,
+			'rewrite' => $rewrite_to,
+		) );
 
 		/* check to see if we need to flush the rewrite rules */
 		$this->maybe_flush_rewrite_rules( $query );
@@ -218,9 +242,12 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @return void
 	 */
 	public function maybe_flush_rewrite_rules( $rule ) {
+		global $gfpdf;
+
 		$rules = get_option( 'rewrite_rules' );
 
 		if ( ! isset( $rules[ $rule ] ) ) {
+			$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Flushing WordPress Rewrite Rules.' );
 			flush_rewrite_rules( false );
 		}
 	}
@@ -233,6 +260,8 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @todo  Add Multisite Support (Network Activated)
 	 */
 	public function uninstall_plugin() {
+		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Uninstall Gravity PDF.' );
+
 		$this->remove_plugin_options();
 		$this->remove_plugin_form_settings();
 		$this->remove_folder_structure();
@@ -266,7 +295,8 @@ class Model_Install extends Helper_Abstract_Model {
 			if ( isset($form['gfpdf_form_settings']) ) {
 				unset($form['gfpdf_form_settings']);
 				if ( $gfpdf->form->update_form( $form ) !== true ) {
-					$gfpdf->notices->add_error( sprintf( __( 'There was a problem removing the Gravity Form "%s" PDF configuration. Try delete manually.', 'gravitypdf' ), $form['ID'] . ': ' . $form['title'] ) );
+					$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Cannot Remove PDF Settings from Form.', array( 'form' => $form ) );
+					$gfpdf->notices->add_error( sprintf( __( 'There was a problem removing the Gravity Form "%s" PDF configuration. Try delete manually.', 'gravitypdf' ), $form['id'] . ': ' . $form['title'] ) );
 				}
 			}
 		}
@@ -289,6 +319,11 @@ class Model_Install extends Helper_Abstract_Model {
 				$results = $gfpdf->misc->rmdir( $dir );
 
 				if ( is_wp_error( $results ) || ! $results ) {
+					$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Cannot Remove Folder Structure.', array(
+						'WP_Error' => $results,
+						'dir'      => $dir,
+					) );
+					
 					$gfpdf->notices->add_error( sprintf( __( 'There was a problem removing the %s directory. Clean up manually via (S)FTP.', 'gravitypdf' ), '<code>' . $gfpdf->misc->relative_path( $dir ) . '</code>' ) );
 				}
 			}

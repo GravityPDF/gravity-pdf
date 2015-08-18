@@ -68,6 +68,7 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 	 * @return void
 	 */
 	public function init() {
+
 		$this->add_filters();
 		$this->add_shortcodes();
 
@@ -107,6 +108,10 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 	 * @return void
 	 */
 	public function add_shortcake_support() {
+		global $gfpdf;
+
+		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Enable Shortcake support.' );
+
 		/* Enhance further */
 		shortcode_ui_register_for_shortcode( 'gravitypdf', array(
 			'label' => __( 'Gravity PDF', 'gravitypdf' ),
@@ -133,7 +138,7 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 					'default' => 'download',
 					'options' => array(
 						'download' => 'Download',
-						'view' => 'View',
+						'view'     => 'View',
 					),
 				),
 

@@ -58,6 +58,8 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	public function gravitypdf( $attributes ) {
 		global $gfpdf;
 
+		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Generating Shortcode' );
+
 		$controller = $this->getController();
 
 		/* merge in any missing defaults */
@@ -82,7 +84,13 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 			if ( isset($_GET['lid']) || isset($_GET['entry']) ) {
 				$attributes['entry'] = (isset($_GET['lid'])) ? (int) $_GET['lid'] : (int) $_GET['entry'];
 			} else {
-				return $controller->view->no_entry_id();
+
+				/* Only display error to users with appropriate permissions */
+				if( $gfpdf->form->has_capability( 'gravityforms_view_entries' ) ) {
+					return $controller->view->no_entry_id();
+				} else {
+					return '';
+				}
 			}
 		}
 
@@ -92,15 +100,23 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		$config = ( ! is_wp_error( $entry )) ? $settings->get_pdf( $entry['form_id'], $attributes['id'] ) : $entry; /* if invalid entry a WP_Error will be thrown */
 
 		if ( is_wp_error( $config ) ) {
-			return $controller->view->invalid_pdf_config();
+
+			/* Only display error to users with appropriate permissions */
+			if( $gfpdf->form->has_capability( 'gravityforms_view_entries' ) ) {
+				return $controller->view->invalid_pdf_config();
+			} else {
+				return '';
+			}
 		}
 
-		/* everything looks valid so let's get the URL */
+		/* Everything looks valid so let's get the URL */
 		$pdf = new Model_PDF();
 		$pdf_url = $pdf->get_pdf_url( $attributes['id'], $attributes['entry'] );
 		$attributes['url'] = ($attributes['type'] == 'download') ? $pdf_url . 'download/' : $pdf_url;
 
 		/* generate the markup and return */
+		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Generating Shortcode Markup', array( 'attr' => $attributes ) );
+
 		return $controller->view->display_gravitypdf_shortcode( $attributes );
 	}
 
@@ -114,7 +130,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	 */
 	public function gravitypdf_confirmation( $confirmation, $form, $lead ) {
 
-		/* check if confirmation is text-based and our shortcode exists */
+		/* check if confirmation is text-based */
 		if ( ! is_array( $confirmation ) ) {
 			/* check if our shortcode exists and add the entry ID if needed */
 			$gravitypdf = $this->get_shortcode_information( 'gravitypdf', $confirmation );
@@ -163,9 +179,16 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function gravitypdf_redirect_confirmation( $form ) {
+		global $gfpdf;
 
 		/* check if the confirmation is currently being saved */
 		if ( isset($_POST['form_confirmation_url']) ) {
+
+			$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Process Redirect Confirmation Save', array(
+				'form' => $form,
+				'post' => $_POST
+			) );
+
 			$url = stripslashes_deep( $_POST['form_confirmation_url'] );
 
 			 /* check if our shortcode exists and convert it to a URL */
@@ -210,7 +233,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 
 		if ( has_shortcode( $text, $shortcode ) ) {
 
-			/* out shortcode exists, so check if "entry" exists and override, otherwise add it */
+			/* our shortcode exists so parse the shortcode data and return an easy-to-use array */
 			$pattern = get_shortcode_regex();
 			preg_match_all( "/$pattern/s", $text, $matches );
 

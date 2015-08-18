@@ -137,6 +137,8 @@ class View_Settings extends Helper_Abstract_View
 
 		$vars = array_merge( $vars, $this->data );
 
+		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'System Status', array( 'status' => $vars ) );
+
 		/* load the system status view */
 		$this->load( 'system_status', $vars );
 	}
@@ -169,6 +171,8 @@ class View_Settings extends Helper_Abstract_View
 
 		/* prevent unauthorized access */
 		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
+			$gfpdf->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.' );
+			
 			wp_die( __( 'You do not have permission to access this page', 'gravitypdf' ) );
 		}
 

@@ -113,15 +113,21 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 
 		/* Bail if activating from network, or bulk */
 		if ( is_network_admin() || isset($_GET['activate-multi']) ) {
+			$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Network Activation.' );
+
 			return false;
 		}
 
 		/* add own update tracker */
 		if ( ! $gfpdf->data->is_installed ) {
+			$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Redirect to Getting Started page (first time activated).' );
+
 			/* First time install */
 			wp_safe_redirect( admin_url( 'index.php?page=gfpdf-getting-started' ) );
 			exit;
 		} else {
+			$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Redirect to Update page (previously activated).' );
+
 			/* Update */
 			wp_safe_redirect( admin_url( 'index.php?page=gfpdf-update' ) );
 			exit;

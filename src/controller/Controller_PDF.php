@@ -137,6 +137,12 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		$lid = (int) $GLOBALS['wp']->query_vars['lid'];
 		$action = ( $GLOBALS['wp']->query_vars['action'] == 'download' ) ? 'download' : 'view';
 
+		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Processing PDF endpoint.', array(
+			'pid' => $pid,
+			'lid' => $lid,
+			'action' => $action,
+		) );
+
 		/*
          * Send to our model to handle validation / authentication
          */
@@ -144,6 +150,8 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 
 		/* if error, display to user */
 		if ( is_wp_error( $results ) ) {
+
+			$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'PDF Generation Error.', array( 'WP_Error' => $results ) );
 
 			/* only display detailed error to admins */
 			$whitelist_errors = array( 'timeout_expired', 'access_denied' );

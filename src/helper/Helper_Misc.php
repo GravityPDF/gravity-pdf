@@ -157,7 +157,7 @@ class Helper_Misc
 		$r   = hexdec( substr( $hexcolor, 0, 2 ) );
 		$g   = hexdec( substr( $hexcolor, 2, 2 ) );
 		$b   = hexdec( substr( $hexcolor, 4, 2 ) );
-		$yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+		$yiq = ( ($r * 299) + ($g * 587) + ($b * 114) ) / 1000;
 
 		return ($yiq >= 128) ? 'black' : 'white';
 	}
@@ -182,6 +182,8 @@ class Helper_Misc
 	 * @param String $dir The path to be deleted
 	 */
 	public function rmdir( $dir ) {
+		global $gfpdf;
+
 		try {
 			$files = new RecursiveIteratorIterator(
 				new RecursiveDirectoryIterator( $dir, RecursiveDirectoryIterator::SKIP_DOTS ),
@@ -193,6 +195,11 @@ class Helper_Misc
 				$function($fileinfo->getRealPath());
 			}
 		} catch (Exception $e) {
+			$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Filesystem Delete Error', array(
+				'dir'       => $dir,
+				'exception' => $e,
+			) );
+
 			return new WP_Error( 'recursion_delete_problem', $e );
 		}
 
@@ -226,6 +233,12 @@ class Helper_Misc
 				}
 			}
 		} catch (Exception $e) {
+			$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Filesystem Copy Error', array(
+				'source'      => $source,
+				'destination' => $destination,
+				'exception'   => $e,
+			) );
+
 			return new WP_Error( 'recursion_copy_problem', $e );
 		}
 
