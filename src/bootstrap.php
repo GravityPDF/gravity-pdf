@@ -271,7 +271,17 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		/* Enable remote logging */
 		if( $run_remote_logging ) {
-			$this->log->pushHandler( new \Monolog\Handler\LogglyHandler('8ad317ed-213d-44c9-a2e8-f2eebd542c66/tag/gravitypdf', \Monolog\Logger::INFO ) );
+
+			/* Setup Loggly logging with correct format for buffer logging */
+			$formatter = new \Monolog\Formatter\LogglyFormatter();
+			$loggly    = new \Monolog\Handler\LogglyHandler( '8ad317ed-213d-44c9-a2e8-f2eebd542c66/tag/gravitypdf', \Monolog\Logger::INFO );
+			$loggly->setFormatter( $formatter );
+
+			/* Set up our buffer logging to save multiple API calls */
+			$buffer = new \Monolog\Handler\BufferHandler( $loggly, 20, \Monolog\Logger::INFO );
+
+			/* Impliment our buffer */
+			$this->log->pushHandler( $buffer );
 		}
 	}
 
