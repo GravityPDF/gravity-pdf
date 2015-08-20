@@ -45,6 +45,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Helper_PDF_List_Table extends WP_List_Table {
 
+	/**
+	 * Our Gravity Form array
+	 * @var Array
+	 * @since 4.0
+	 */
 	public $form;
 
 	/**
@@ -54,16 +59,12 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 */
 	public function __construct( $form ) {
 
+		/* Store our Gravity Form for later user */
 		$this->form = $form;
 
+		/* Cache column header internally so we don't have to work with the global get_column_headers() function */
 		$this->_column_headers = array(
-			array(
-				'cb'            => '',
-				'name'          => __( 'Name', 'gravityforms' ),
-				'shortcode'     => __( 'Download Shortcode', 'gravitypdf' ),
-				'template'      => __( 'Template', 'gravityforms' ),
-				'notifications' => __( 'Notifications', 'gravityforms' ),
-			),
+			$this->get_columns(),
 			array(),
 			array(),
 		);
@@ -71,6 +72,38 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		parent::__construct();
 	}
 
+	/**
+	 * Return the columns that should be used in the list table
+	 * @return array
+	 */
+	public function get_columns() {
+
+		$columns = array(
+				'cb'            => '',
+				'name'          => __( 'Name', 'gravitypdf' ),
+				'shortcode'     => __( 'Download Shortcode', 'gravitypdf' ),
+				'template'      => __( 'Template', 'gravitypdf' ),
+				'notifications' => __( 'Notifications', 'gravitypdf' ),
+		);
+
+		$columns = apply_filters( 'gfpdf_pdf_list_columns', $columns );
+
+		return $columns;
+	}
+
+	/**
+	 * Get the name of the default primary column.
+	 * @return string Name of the default primary column, in this case, 'name'
+	 * @since 4.0
+	 */
+	protected function get_default_primary_column_name() {
+		return 'name';
+	}
+
+	/**
+	 * Prepares the list of items for displaying.
+	 * @since 4.0
+	 */
 	public function prepare_items() {
 		$this->items = ( isset( $this->form['gfpdf_form_settings'] ) ) ? $this->form['gfpdf_form_settings'] : array();
 	}
@@ -80,6 +113,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * @since 4.0
 	 */
 	public function display() {
+
 		$singular = rgar( $this->_args, 'singular' );
 		?>
 
@@ -90,18 +124,19 @@ class Helper_PDF_List_Table extends WP_List_Table {
 				</tr>
 			</thead>
 
+			<tbody id="the-list" <?php if ( $singular ) { echo " class='list:$singular'"; } ?>>
+				<?php $this->display_rows_or_placeholder(); ?>
+			</tbody>
+
 			<tfoot>
 				<tr>
 					<?php $this->print_column_headers( false ); ?>
 				</tr>
 			</tfoot>
 
-			<tbody id="the-list" <?php if ( $singular ) { echo " class='list:$singular'"; } ?>>
-				<?php $this->display_rows_or_placeholder(); ?>
-			</tbody>
 		</table>
 
-	<?php
+		<?php
 	}
 
 	/**
