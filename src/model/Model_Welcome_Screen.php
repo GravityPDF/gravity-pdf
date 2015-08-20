@@ -4,6 +4,8 @@ namespace GFPDF\Model;
 
 use GFPDF\Helper\Helper_Abstract_Model;
 
+use Psr\Log\LoggerInterface;
+
 /**
  * Welcome Screen Model
  *
@@ -66,10 +68,20 @@ class Model_Welcome_Screen extends Helper_Abstract_Model {
 	public $updated_title;
 
 	/**
-	 * Assign our page titles
+	 * Holds our log class
+	 * @var Object
 	 * @since 4.0
 	 */
-	public function __construct() {
+	protected $log;
+
+	/**
+	 * Load our model and view and required actions
+	 */
+	public function __construct( LoggerInterface $log ) {
+		
+		/* Assign our internal variables */
+		$this->log = $log;
+
 		$this->welcome_title = __( 'Welcome to Gravity PDF', 'gravitypdf' );
 		$this->updated_title = __( "What's new in Gravity PDF?", 'gravitypdf' );
 	}
@@ -111,16 +123,15 @@ class Model_Welcome_Screen extends Helper_Abstract_Model {
 	 * @param String $title The page title
 	 */
 	public function add_page_title( $title ) {
-		global $gfpdf;
 
 		switch ( rgget( 'page' ) ) {
 			case 'gfpdf-getting-started':
-				$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Display Welcome Screen' );
+				$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Display Welcome Screen' );
 				return $this->welcome_title;
 			break;
 
 			case 'gfpdf-update':
-				$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Display Update Screen' );
+				$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Display Update Screen' );
 				return $this->updated_title;
 			break;
 		}

@@ -7,6 +7,10 @@ use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_View;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
+use GFPDF\Helper\Helper_Abstract_Form;
+
+use Psr\Log\LoggerInterface;
+
 
 /**
  * PDF Display Controller
@@ -50,11 +54,31 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters
 {
+
+	/**
+	 * Holds abstracted functions related to the forms plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $form;
+
+	/**
+	 * Holds our log class
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $log;
+
 	/**
 	 * Load our model and view and required actions
 	 */
-	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view ) {
-		/* load our model and view */
+	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Abstract_Form $form, LoggerInterface $log ) {
+		
+		/* Assign our internal variables */
+		$this->form    = $form;
+		$this->log     = $log;
+
+		/* Load our model and view */
 		$this->model = $model;
 		$this->model->setController( $this );
 
@@ -133,7 +157,6 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 * @return void
 	 */
 	public function process_pdf_endpoint() {
-		global $gfpdf;
 
 		/* exit early if all the required URL parameters aren't met */
 		if ( empty( $GLOBALS['wp']->query_vars['gf_pdf'] ) || empty( $GLOBALS['wp']->query_vars['pid'] ) || empty( $GLOBALS['wp']->query_vars['lid'] ) ) {
@@ -144,7 +167,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		$lid = (int) $GLOBALS['wp']->query_vars['lid'];
 		$action = ( $GLOBALS['wp']->query_vars['action'] == 'download' ) ? 'download' : 'view';
 
-		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Processing PDF endpoint.', array(
+		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Processing PDF endpoint.', array(
 			'pid' => $pid,
 			'lid' => $lid,
 			'action' => $action,
@@ -158,11 +181,11 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		/* if error, display to user */
 		if ( is_wp_error( $results ) ) {
 
-			$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'PDF Generation Error.', array( 'WP_Error' => $results ) );
+			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'PDF Generation Error.', array( 'WP_Error' => $results ) );
 
 			/* only display detailed error to admins */
 			$whitelist_errors = array( 'timeout_expired', 'access_denied' );
-			if ( $gfpdf->form->has_capability( 'gravityforms_view_settings' ) || in_array( $results->get_error_code(), $whitelist_errors ) ) {
+			if ( $this->form->has_capability( 'gravityforms_view_settings' ) || in_array( $results->get_error_code(), $whitelist_errors ) ) {
 				wp_die( $results->get_error_message() );
 			} else {
 				wp_die( __( 'There was a problem generating your PDF', 'gravitypdf' ) );

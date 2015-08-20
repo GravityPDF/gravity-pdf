@@ -4,6 +4,12 @@ namespace GFPDF\View;
 
 use GFPDF\Helper\Helper_Abstract_View;
 use GFPDF_Major_Compatibility_Checks;
+use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Helper_Options;
+use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Misc;
+
+use Psr\Log\LoggerInterface;
 
 /**
  * Settings View
@@ -56,8 +62,59 @@ class View_Settings extends Helper_Abstract_View
 	 */
 	protected $ViewType = 'Settings';
 
-	public function __construct( $data = array() ) {
+	/**
+	 * Holds abstracted functions related to the forms plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $form;
+
+	/**
+	 * Holds our log class
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $log;
+
+	/**
+	 * Holds our Helper_Options / Helper_Options_Fields object
+	 * Makes it easy to access global PDF settings and individual form PDF settings
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $options;
+
+	/**
+	 * Holds our Helper_Data object
+	 * which we can autoload with any data needed
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $plugin_data;
+
+	/**
+	 * Holds our Helper_Misc object
+	 * Makes it easy to access common methods throughout the plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $misc;
+
+
+
+	/**
+	 * [__construct description]
+	 * @param array $data [description]
+	 */
+	public function __construct( $data = array(), Helper_Abstract_Form $form, LoggerInterface $log, Helper_Options $options, Helper_Data $plugin_data, Helper_Misc $misc ) {
 		$this->data = $data;
+
+		/* Assign our internal variables */
+		$this->form        = $form;
+		$this->log         = $log;
+		$this->options     = $options;
+		$this->plugin_data = $plugin_data;
+		$this->misc        = $misc;
 	}
 
 	/**
@@ -66,7 +123,6 @@ class View_Settings extends Helper_Abstract_View
 	 * @return void
 	 */
 	public function tabs() {
-		global $gfpdf;
 
 		/*
          * Set up any variables we need for the view and display
@@ -74,7 +130,7 @@ class View_Settings extends Helper_Abstract_View
 		$vars = array(
 			'selected' => isset( $_GET['tab'] ) ? $_GET['tab'] : 'general',
 			'tabs'     => $this->get_avaliable_tabs(),
-			'data'     => $gfpdf->data,
+			'data'     => $this->plugin_data,
 		);
 
 		$vars = array_merge( $vars, $this->data );
@@ -124,7 +180,7 @@ class View_Settings extends Helper_Abstract_View
 	 * @since 4.0
 	 */
 	public function system_status() {
-		global $wp_version, $gfpdf;
+		global $wp_version;
 
 		$status = new GFPDF_Major_Compatibility_Checks();
 
@@ -132,12 +188,12 @@ class View_Settings extends Helper_Abstract_View
 			'memory'      => $status->get_ram( ini_get( 'memory_limit' ) ),
 			'wp'          => $wp_version,
 			'php'         => phpversion(),
-			'gf'          => $gfpdf->form->get_version(),
+			'gf'          => $this->form->get_version(),
 		);
 
 		$vars = array_merge( $vars, $this->data );
 
-		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'System Status', array( 'status' => $vars ) );
+		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'System Status', array( 'status' => $vars ) );
 
 		/* load the system status view */
 		$this->load( 'system_status', $vars );
@@ -149,10 +205,9 @@ class View_Settings extends Helper_Abstract_View
 	 * @since 4.0
 	 */
 	public function general() {
-		global $gfpdf;
 
 		$vars = array(
-			'edit_cap' => $gfpdf->form->has_capability( 'gravityforms_edit_settings' ),
+			'edit_cap' => $this->form->has_capability( 'gravityforms_edit_settings' ),
 		);
 
 		$vars = array_merge( $vars, $this->data );
@@ -167,19 +222,18 @@ class View_Settings extends Helper_Abstract_View
 	 * @since 4.0
 	 */
 	public function tools() {
-		global $gfpdf;
 
 		/* prevent unauthorized access */
-		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
-			$gfpdf->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.' );
+		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
+			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.' );
 			
 			wp_die( __( 'You do not have permission to access this page', 'gravitypdf' ) );
 		}
 
 		$vars = array(
-			'template_directory'            => $gfpdf->misc->relative_path( $gfpdf->data->template_location, '/' ),
-			'template_files'                => $gfpdf->options->get_plugin_pdf_templates(),
-			'custom_template_setup_warning' => $gfpdf->options->get_option( 'custom_pdf_template_files_installed' ),
+			'template_directory'            => $this->misc->relative_path( $this->plugin_data->template_location, '/' ),
+			'template_files'                => $this->options->get_plugin_pdf_templates(),
+			'custom_template_setup_warning' => $this->options->get_option( 'custom_pdf_template_files_installed' ),
 		);
 
 		$vars = array_merge( $vars, $this->data );
@@ -194,7 +248,6 @@ class View_Settings extends Helper_Abstract_View
 	 * @since 4.0
 	 */
 	public function add_tooltips( $tooltips ) {
-		global $gfpdf;
 
 		$tooltips['pdf_status_wp_memory']     = '<h6>' . __( 'WP Memory Available', 'gravitypdf' ) . '</h6>' . sprintf( __( 'Producing PDF documents is hard work and Gravity PDF requires more resources than most plugins. We strongly recommend you have at least 128MB, but you may need more.', 'gravitypdf' ) );
 

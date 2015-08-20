@@ -3,6 +3,13 @@
 namespace GFPDF\Model;
 
 use GFPDF\Helper\Helper_Abstract_Model;
+use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Helper_Notices;
+use GFPDF\Helper\Helper_Options;
+use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Misc;
+
+use Psr\Log\LoggerInterface;
 
 /**
  * Settings Model
@@ -55,12 +62,63 @@ class Model_Settings extends Helper_Abstract_Model {
 	public $form_settings_errors;
 
 	/**
+	 * Holds abstracted functions related to the forms plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $form;
+
+	/**
+	 * Holds our log class
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $log;
+
+	/**
+	 * Holds our Helper_Options / Helper_Options_Fields object
+	 * Makes it easy to access global PDF settings and individual form PDF settings
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $options;
+
+	/**
+	 * Holds our Helper_Data object
+	 * which we can autoload with any data needed
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $data;
+
+	/**
+	 * Holds our Helper_Misc object
+	 * Makes it easy to access common methods throughout the plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $misc;
+
+	/**
+	 * Load our model and view and required actions
+	 */
+	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log, Helper_Notices $notices, Helper_Options $options, Helper_Data $data, Helper_Misc $misc ) {
+		
+		/* Assign our internal variables */
+		$this->form    = $form;
+		$this->log     = $log;
+		$this->options = $options;
+		$this->notices = $notices;
+		$this->data    = $data;
+		$this->misc    = $misc;
+	}
+
+	/**
 	 * Get the form setting error and remove any duplicates
 	 * @since 4.0
 	 * @return  void
 	 */
 	public function setup_form_settings_errors() {
-		global $gfpdf;
 
 		/* set up a place to access form setting validation errors */
 		$this->form_settings_errors = get_transient( 'settings_errors' );
@@ -84,7 +142,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			/* update transient */
 			set_transient( 'settings_errors', $updated_settings_error, 30 );
 
-			$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'PDF Settings Errors', array(
+			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'PDF Settings Errors', array(
 				'original' => $this->form_settings_errors,
 				'cleaned'  => $updated_settings_error,
 			) );
@@ -138,16 +196,15 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function install_templates() {
-		global $gfpdf;
 
-		if ( ! $gfpdf->misc->copyr( PDF_PLUGIN_DIR . 'initialisation/templates/', $gfpdf->data->template_location ) ) {
-			$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Template Installation Error.' );
-			$gfpdf->notices->add_error( sprintf( __( 'There was a problem copying all PDF templates to %s. Please try again.', 'gravitypdf' ), '<code>' . $gfpdf->misc->relative_path( $gfpdf->data->template_location ) . '</code>' ) );
+		if ( ! $this->misc->copyr( PDF_PLUGIN_DIR . 'initialisation/templates/', $this->data->template_location ) ) {
+			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Template Installation Error.' );
+			$this->notices->add_error( sprintf( __( 'There was a problem copying all PDF templates to %s. Please try again.', 'gravitypdf' ), '<code>' . $this->misc->relative_path( $this->data->template_location ) . '</code>' ) );
 			return false;
 		}
 
-		$gfpdf->notices->add_notice( sprintf( __( 'Gravity PDF Custom Templates successfully installed to %s.', 'gravitypdf' ), '<code>' . $gfpdf->misc->relative_path( $gfpdf->data->template_location ) . '</code>' ) );
-		$gfpdf->options->update_option( 'custom_pdf_template_files_installed', true );
+		$this->notices->add_notice( sprintf( __( 'Gravity PDF Custom Templates successfully installed to %s.', 'gravitypdf' ), '<code>' . $this->misc->relative_path( $this->data->template_location ) . '</code>' ) );
+		$this->options->update_option( 'custom_pdf_template_files_installed', true );
 		return true;
 	}
 
@@ -157,9 +214,8 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function save_font() {
-		global $gfpdf;
 
-		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Running AJAX Endpoint', array( 'type' => 'Save Font' ) );
+		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Running AJAX Endpoint', array( 'type' => 'Save Font' ) );
 
 		/* prevent unauthorized access */
 		$this->ajax_font_validation();
@@ -168,7 +224,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		$results = $this->process_font( $_POST['payload'] );
 
 		/* If we reached this point the results were successful so return the new object */
-		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'AJAX Endpoint Successful', array( 'results' => $results ) );
+		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'AJAX Endpoint Successful', array( 'results' => $results ) );
 
 		echo json_encode( $results );
 		wp_die();
@@ -180,16 +236,15 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function delete_font() {
-		global $gfpdf;
 
-		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Running AJAX Endpoint', array( 'type' => 'Delete Font' ) );
+		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Running AJAX Endpoint', array( 'type' => 'Delete Font' ) );
 
 		/* prevent unauthorized access */
 		$this->ajax_font_validation();
 
 		/* Get the required details for deleting fonts */
 		$id    = $_POST['id'];
-		$fonts = $gfpdf->options->get_option( 'custom_fonts' );
+		$fonts = $this->options->get_option( 'custom_fonts' );
 
 		/* Check font actually exists and remove */
 		if ( isset($fonts[$id]) ) {
@@ -197,9 +252,9 @@ class Model_Settings extends Helper_Abstract_Model {
 			if ( $this->remove_font_file( $fonts[$id] ) ) {
 				unset($fonts[$id]);
 
-				if ( $gfpdf->options->update_option( 'custom_fonts', $fonts ) ) {
+				if ( $this->options->update_option( 'custom_fonts', $fonts ) ) {
 					/* Success */
-					$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'AJAX Endpoint Successful' );
+					$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'AJAX Endpoint Successful' );
 					echo json_encode( array( 'success' => true ) );
 					wp_die();
 				}
@@ -212,7 +267,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			'error' => __( 'Could not delete Gravity PDF font correctly. Please try again.', 'gravitypdf' ),
 		);
 
-		$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'AJAX Endpoint Error', array( 'error' => $return ) );
+		$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'AJAX Endpoint Error', array( 'error' => $return ) );
 
 		echo json_encode( $return );
 		wp_die();
@@ -225,12 +280,11 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @since  4.0
 	 */
 	private function ajax_font_validation() {
-		global $gfpdf;
 		
 		/* prevent unauthorized access */
-		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			/* fail */
-			$gfpdf->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
+			$this->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
 				'user_meta' => get_user_meta( get_current_user_id() )
 			) );
@@ -247,7 +301,7 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		if ( ! wp_verify_nonce( $nonce, $nonce_id ) ) {
 			/* fail */
-			$gfpdf->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
+			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
 
 			header( 'HTTP/1.1 401 Unauthorized' );
 			wp_die( '401' );
@@ -261,7 +315,6 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @since  4.0
 	 */
 	public function remove_font_file( $fonts ) {
-		global $gfpdf;
 
 		$fonts = array_filter( $fonts );
 		$types = array( 'regular', 'bold', 'italics', 'bolditalics' );
@@ -270,7 +323,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			if ( isset($fonts[$type]) ) {
 				$filename = basename( $fonts[$type] );
 
-				if ( is_file( $gfpdf->data->template_font_location . $filename ) && ! unlink( $gfpdf->data->template_font_location . $filename ) ) {
+				if ( is_file( $this->data->template_font_location . $filename ) && ! unlink( $this->data->template_font_location . $filename ) ) {
 					return false;
 				}
 			}
@@ -286,9 +339,8 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function process_font( $font ) {
-		global $gfpdf;
 
-		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Running AJAX Endpoint', array( 'type' => 'Save Font' ) );
+		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Running AJAX Endpoint', array( 'type' => 'Save Font' ) );
 
 		/* remove any empty fields */
 		$font = array_filter( $font );
@@ -303,7 +355,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				'error' => __( 'Required fields have not been included.', 'gravitypdf' ),
 			);
 
-			$gfpdf->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Validation Failed.', $return );
+			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Validation Failed.', $return );
 
 			echo json_encode( $return );
 			wp_die();
@@ -320,14 +372,14 @@ class Model_Settings extends Helper_Abstract_Model {
 				'error' => __( 'Font name is not valid. Only alphanumeric characters and spaces are accepted.', 'gravitypdf' ),
 			);
 
-			$gfpdf->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Validation Failed.', $return );
+			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Validation Failed.', $return );
 
 			echo json_encode( $return );
 			wp_die();
 		}
 
 		/* Check the font name is unique */
-		$shortname = $gfpdf->options->get_font_short_name( $name );
+		$shortname = $this->options->get_font_short_name( $name );
 		$id = (isset($font['id'])) ? $font['id'] : '';
 
 		if ( ! $this->is_font_name_unique( $shortname, $id ) ) {
@@ -338,7 +390,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				'error' => __( 'A font with the same name already exists. Try a different name.', 'gravitypdf' ),
 			);
 
-			$gfpdf->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Validation Failed.', $return );
+			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Validation Failed.', $return );
 
 			echo json_encode( $return );
 			wp_die();
@@ -356,13 +408,13 @@ class Model_Settings extends Helper_Abstract_Model {
 				'error' => $installation,
 			);
 
-			$gfpdf->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Validation Failed.', $return );
+			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Validation Failed.', $return );
 
 			echo json_encode( $return );
 			wp_die();
 		}
 
-		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'AJAX Endpoint Successful', array( 'message' => $installation ) );
+		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'AJAX Endpoint Successful', array( 'message' => $installation ) );
 
 		/* If we got here the installation was successful so return the data */
 		return $installation;
@@ -392,10 +444,9 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @return boolean True if valid, false on failure
 	 */
 	public function is_font_name_unique( $name, $id = '' ) {
-		global $gfpdf;
 
 		/* Loop through default fonts and check for duplicate */
-		$default_fonts = $gfpdf->options->get_installed_fonts();
+		$default_fonts = $this->options->get_installed_fonts();
 
 		foreach ( $default_fonts as $group ) {
 			if ( isset($group[$name]) ) {
@@ -404,7 +455,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		}
 
 		/* Loop through custom fonts and check for duplicate */
-		$custom_fonts  = $gfpdf->options->get_option( 'custom_fonts' );
+		$custom_fonts  = $this->options->get_option( 'custom_fonts' );
 
 		if ( is_array( $custom_fonts ) ) {
 			foreach ( $custom_fonts as $font ) {
@@ -413,7 +464,7 @@ class Model_Settings extends Helper_Abstract_Model {
 					continue;
 				}
 
-				if ( $gfpdf->options->get_font_short_name( $font['font_name'] ) == $name ) {
+				if ( $this->options->get_font_short_name( $font['font_name'] ) == $name ) {
 					return false;
 				}
 			}
@@ -429,7 +480,6 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function install_fonts( $fonts ) {
-		global $gfpdf;
 
 		$types = array( 'regular', 'bold', 'italics', 'bolditalics' );
 		$errors = array();
@@ -438,7 +488,7 @@ class Model_Settings extends Helper_Abstract_Model {
 
 			/* Check if a key exists for this type and process */
 			if ( isset($fonts[$type]) ) {
-				$path = $gfpdf->misc->convert_url_to_path( $fonts[$type] );
+				$path = $this->misc->convert_url_to_path( $fonts[$type] );
 
 				/* Couldn't find file so throw error */
 				if ( is_wp_error( $path ) ) {
@@ -447,7 +497,7 @@ class Model_Settings extends Helper_Abstract_Model {
 
 				/* Copy font to our fonts folder */
 				$filename = basename( $path );
-				if ( ! is_file( $gfpdf->data->template_font_location . $filename ) && ! copy( $path, $gfpdf->data->template_font_location . $filename ) ) {
+				if ( ! is_file( $this->data->template_font_location . $filename ) && ! copy( $path, $this->data->template_font_location . $filename ) ) {
 					$errors[] = sprintf( __( 'There was a problem installing the font %s. Please try again.', 'gravitypdf' ), $filename );
 				}
 			}
@@ -455,11 +505,11 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		/* If errors were found then return */
 		if ( sizeof( $errors ) > 0 ) {
-			$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Install Error.', array( 'errors' => $errors ) );
+			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Install Error.', array( 'errors' => $errors ) );
 			return array( 'errors' => $errors );
 		} else {
 			/* Insert our font into the database */
-			$custom_fonts  = $gfpdf->options->get_option( 'custom_fonts' );
+			$custom_fonts  = $this->options->get_option( 'custom_fonts' );
 
 			/* Prepare our font data and give it a unique id */
 			if ( empty($fonts['id']) ) {
@@ -470,7 +520,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			$custom_fonts[$fonts['id']] = $fonts;
 
 			/* Update our font database */
-			$gfpdf->options->update_option( 'custom_fonts', $custom_fonts );
+			$this->options->update_option( 'custom_fonts', $custom_fonts );
 		}
 
 		/* Fonts sucessfully installed so return font data */
@@ -482,11 +532,10 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @param Array $settings Any existing settings loaded
 	 */
 	public function add_template_image( $settings ) {
-		global $gfpdf;
 
 		if ( isset( $settings['default_template'] ) ) {
-			$current_template = $gfpdf->options->get_form_value( $settings['default_template'] );
-			$template_image   = $gfpdf->misc->get_template_image( $current_template );
+			$current_template = $this->options->get_form_value( $settings['default_template'] );
+			$template_image   = $this->misc->get_template_image( $current_template );
 
 			if ( ! empty($template_image) ) {
 				$img                                  = '<img src="'. esc_url( $template_image ) . '" alt="' . __( 'Template Example' ) . '" id="gfpdf-template-example" />';

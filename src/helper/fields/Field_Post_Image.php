@@ -2,6 +2,8 @@
 
 namespace GFPDF\Helper\Fields;
 
+use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Abstract_Fields;
 
 use GF_Field_Post_Image;
@@ -56,13 +58,14 @@ class Field_Post_Image extends Helper_Abstract_Fields
 	 * @param Array  $entry The Gravity Forms Entry
 	 * @since 4.0
 	 */
-	public function __construct( $field, $entry ) {
+	public function __construct( $field, $entry, Helper_Abstract_Form $form, Helper_Misc $misc ) {
+		
 		if ( ! is_object( $field ) || ! $field instanceof GF_Field_Post_Image ) {
 			throw new Exception( '$field needs to be in instance of GF_Field_Post_Image' );
 		}
 
 		/* call our parent method */
-		parent::__construct( $field, $entry );
+		parent::__construct( $field, $entry, $form, $misc );
 	}
 
 	/**
@@ -101,7 +104,6 @@ class Field_Post_Image extends Helper_Abstract_Fields
 	 * @since 4.0
 	 */
 	public function value() {
-		global $gfpdf;
 
 		if ( $this->has_cache() ) {
 			return $this->cache();
@@ -119,7 +121,7 @@ class Field_Post_Image extends Helper_Abstract_Fields
 			$img['caption']     = (isset($value[2])) ? $value[2] : '';
 			$img['description'] = (isset($value[3])) ? $value[3] : '';
 
-			$path               = (isset($value[0])) ? $gfpdf->misc->convert_url_to_path( $value[0] ) : '';
+			$path               = (isset($value[0])) ? $this->misc->convert_url_to_path( $value[0] ) : '';
 			if ( $path != $img['url'] ) {
 				$img['path'] = $path;
 			}

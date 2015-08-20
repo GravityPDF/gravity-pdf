@@ -6,7 +6,13 @@ use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_View;
 use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Field_Container;
+use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_PDF;
+use GFPDF\Helper\Helper_Options;
+use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Misc;
+
+use Psr\Log\LoggerInterface;
 
 use GFPDF\Helper\Fields\Field_Products;
 
@@ -68,8 +74,57 @@ class View_PDF extends Helper_Abstract_View
 	 */
 	protected $ViewType = 'PDF';
 
-	public function __construct( $data = array() ) {
+	/**
+	 * Holds abstracted functions related to the forms plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $form;
+
+	/**
+	 * Holds our log class
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $log;
+
+	/**
+	 * Holds our Helper_Options / Helper_Options_Fields object
+	 * Makes it easy to access global PDF settings and individual form PDF settings
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $options;
+
+	/**
+	 * Holds our Helper_Data object
+	 * which we can autoload with any data needed
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $plugin_data;
+
+	/**
+	 * Holds our Helper_Misc object
+	 * Makes it easy to access common methods throughout the plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $misc;
+
+	/**
+	 * [__construct description]
+	 * @param array $data [description]
+	 */
+	public function __construct( $data = array(), Helper_Abstract_Form $form, LoggerInterface $log, Helper_Options $options, Helper_Data $plugin_data, Helper_Misc $misc ) {
 		$this->data = $data;
+
+		/* Assign our internal variables */
+		$this->form        = $form;
+		$this->log         = $log;
+		$this->options     = $options;
+		$this->plugin_data = $plugin_data;
+		$this->misc        = $misc;
 	}
 
 	/**
@@ -80,18 +135,20 @@ class View_PDF extends Helper_Abstract_View
 	 * @since 4.0
 	 */
 	public function generate_pdf( $entry, $settings ) {
-		global $gfpdf;
+
+		$controller = $this->getController();
+		$model      = $controller->model;
 
 		/**
 		 * Load our arguments that should be accessed by our PDF template
 		 * @var array
 		 */
-		$args = $gfpdf->misc->get_template_args( $entry, $settings );
+		$args = $this->misc->get_template_args( $entry, $settings );
 
 		/**
 		 * Show $form_data array if requested
 		 */
-		if ( isset( $_GET['data'] ) && $gfpdf->form->has_capability( 'gravityforms_view_settings' ) ) {
+		if ( isset( $_GET['data'] ) && $this->form->has_capability( 'gravityforms_view_settings' ) ) {
 			echo '<pre>';
 			print_r( $args['form_data'] );
 			echo '</pre>';
@@ -101,7 +158,8 @@ class View_PDF extends Helper_Abstract_View
 		/**
 		 * Set out our PDF abstraction class
 		 */
-		$pdf = new Helper_PDF( $entry, $settings );
+		$pdf = new Helper_PDF( $entry, $settings, $this->form, $this->plugin_data );
+		$pdf->set_filename( $model->get_pdf_name( $settings, $entry ) );
 
 		try {
 			$pdf->init();
@@ -112,16 +170,24 @@ class View_PDF extends Helper_Abstract_View
 				$pdf->set_output_type( 'download' );
 			}
 
-			$gfpdf->misc->increment_pdf_count();
+			$this->options->increment_pdf_count();
 
 			/* Generate PDF */
 			$pdf->generate();
+
 		} catch (Exception $e) {
-			$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'PDF Generation Error', array(
+
+			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'PDF Generation Error', array(
 				'entry'     => $entry,
 				'settings'  => $settings,
 				'exception' => $e,
 			) );
+
+			if( $this->form->has_capability( 'gravityforms_view_entries' ) ) {
+				wp_die( $e->getMessage() );
+			}
+			
+			wp_die( __( 'There was a problem generating your PDF', 'gravitypdf' ) );
 		}
 	}
 
@@ -134,9 +200,8 @@ class View_PDF extends Helper_Abstract_View
 	 * @since  4.0
 	 */
 	public function savePDF( $pdf, $filename, $entry ) {
-		global $gfpdf;
 
-		$path = $gfpdf->data->template_tmp_location . '/' . $entry['form_id'] . $entry['id'] . '/';
+		$path = $this->plugin_data->template_tmp_location . '/' . $entry['form_id'] . $entry['id'] . '/';
 
 		/* create our path */
 		if ( wp_mkdir_p( $path ) ) {
@@ -203,11 +268,10 @@ class View_PDF extends Helper_Abstract_View
 	 * @since 4.0
 	 */
 	public function generate_html_structure( $entry, Helper_Abstract_Model $model, $config = array() ) {
-		global $gfpdf;
 		
 		/* Set up required variables */
-		$form                           = $gfpdf->form->get_form( $entry['form_id'] );
-		$products                       = new Field_Products( $entry );
+		$form                           = $this->form->get_form( $entry['form_id'] );
+		$products                       = new Field_Products( new GF_Field(), $entry, $this->form, $this->misc );
 		$has_products                   = false;
 		$page_number                    = 0;
 		$container                      = new Helper_Field_Container();
@@ -285,7 +349,6 @@ class View_PDF extends Helper_Abstract_View
 	 * @since 4.0
 	 */
 	public function process_field( GF_Field $field, $entry, $form, $config, Field_Products $products, Helper_Field_Container $container, Helper_Abstract_Model $model ) {
-		global $gfpdf;
 		
 		/*
         * Set up our configuration variables
@@ -320,7 +383,7 @@ class View_PDF extends Helper_Abstract_View
 				$container->close();
 			}
 		} catch (Exception $e) {
-			$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'PDF Generation Error', array(
+			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'PDF Generation Error', array(
 				'field'     => $field,
 				'entry'     => $entry,
 				'config'    => $config,

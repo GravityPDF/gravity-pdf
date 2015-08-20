@@ -7,6 +7,10 @@ use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_View;
+use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Helper_Notices;
+
+use Psr\Log\LoggerInterface;
 
 /**
  * Actions Controller
@@ -51,11 +55,40 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Controller_Actions extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters
 {
+
+	/**
+	 * Holds abstracted functions related to the forms plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $form;
+
+	/**
+	 * Holds our log class
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $log;
+
+	/**
+	 * Holds our Helper_Notices object
+	 * which we can use to queue up admin messages for the user
+	 * @var Object Helper_Notices
+	 * @since 4.0
+	 */
+	protected $notices;
+
 	/**
 	 * Load our model and view and required actions
 	 */
-	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view ) {
-		/* load our model and view */
+	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Abstract_Form $form, LoggerInterface $log, Helper_Notices $notices ) {
+		
+		/* Assign our internal variables */
+		$this->form    = $form;
+		$this->log     = $log;
+		$this->notices = $notices;
+
+		/* Load our model and view */
 		$this->model = $model;
 		$this->model->setController( $this );
 
@@ -126,17 +159,16 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	 * @since 4.0
 	 */
 	public function route_notices() {
-		global $gfpdf;
 
 		foreach($this->get_routes() as $route) {
 
 			/* Before displaying check the user has the correct capabilities, the notice isn't already been dismissed and the route condition has been met */
-			if( $gfpdf->form->has_capability( $route['capability'] ) &&
+			if( $this->form->has_capability( $route['capability'] ) &&
 				! $this->model->is_notice_already_dismissed( $route['action'] ) &&
 				call_user_func( $route['condition'] ) ) {
 
-				$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Trigger Action Notification.', array( 'route' => $route ) );
-				$gfpdf->notices->add_notice( call_user_func($route['view'], $route['action'], $route['action_text'] ) );
+				$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Trigger Action Notification.', array( 'route' => $route ) );
+				$this->notices->add_notice( call_user_func($route['view'], $route['action'], $route['action_text'] ) );
 			}
 		}
 	}
@@ -147,7 +179,6 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	 * @since 4.0
 	 */
 	public function route() {
-		global $gfpdf;
 
 		foreach($this->get_routes() as $route) {
 
@@ -155,9 +186,9 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 			if( rgpost('action') == 'gfpdf_' . $route['action'] && call_user_func( $route['condition'] ) ) {
 
 				/* Check user capability */
-				if( ! $gfpdf->form->has_capability( $route['capability'] ) ) {
+				if( ! $this->form->has_capability( $route['capability'] ) ) {
 			
-					$gfpdf->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
+					$this->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
 						'user'      => wp_get_current_user(),
 						'user_meta' => get_user_meta( get_current_user_id() )
 					) );
@@ -168,18 +199,18 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 				/* Check nonce is valid */
 				if ( ! wp_verify_nonce( rgpost( 'gfpdf_action_' . $route['action'] ), 'gfpdf_action_' . $route['action'] ) ) {
 					
-					$gfpdf->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
-					$gfpdf->notices->add_error( __( 'There was a problem processing the action. Please try again.', 'gravitypdf' ) );
+					$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
+					$this->notices->add_error( __( 'There was a problem processing the action. Please try again.', 'gravitypdf' ) );
 
 					continue;
 				}
 
 				/* Check if the user wants to dismiss the notice, otherwise process the route */
 				if( isset( $_POST['gfpdf-dismiss-notice'] ) ) {
-					$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Dismiss Action.', array( 'route' => $route ) );
+					$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Dismiss Action.', array( 'route' => $route ) );
 					$this->model->dismiss_notice( $type );
 				} else {
-					$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Trigger Action Process.', array( 'route' => $route ) );
+					$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Trigger Action Process.', array( 'route' => $route ) );
 					call_user_func( $route['process'], $route['action'], $route );
 				}
 			}

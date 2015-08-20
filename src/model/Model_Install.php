@@ -3,6 +3,11 @@
 namespace GFPDF\Model;
 
 use GFPDF\Helper\Helper_Abstract_Model;
+use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Misc;
+use GFPDF\Helper\Helper_Notices;
+
+use Psr\Log\LoggerInterface;
 
 use GFCommon;
 
@@ -50,14 +55,56 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Model_Install extends Helper_Abstract_Model {
 
 	/**
+	 * Holds our log class
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $log;
+
+	/**
+	 * Holds our Helper_Data object
+	 * which we can autoload with any data needed
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $data;
+
+	/**
+	 * Holds our Helper_Misc object
+	 * Makes it easy to access common methods throughout the plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $misc;
+
+	/**
+	 * Holds our Helper_Notices object
+	 * which we can use to queue up admin messages for the user
+	 * @var Object Helper_Notices
+	 * @since 4.0
+	 */
+	protected $notices;
+
+	/**
+	 * Load our model and view and required actions
+	 */
+	public function __construct( LoggerInterface $log, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices ) {
+		
+		/* Assign our internal variables */
+		$this->log     = $log;
+		$this->data    = $data;
+		$this->misc    = $misc;
+		$this->notices = $notices;
+	}
+
+	/**
 	 * The Gravity PDF Installer
 	 * @return void
 	 * @since 4.0
 	 */
 	public function install_plugin() {
-			global $gfpdf;
-			$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Gravity PDF Installed' );
 
+			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Gravity PDF Installed' );
 			update_option( 'gfpdf_is_installed', true );
 	}
 
@@ -102,18 +149,17 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function setup_template_location() {
-		global $gfpdf;
 
-		$gfpdf->data->template_location      = apply_filters( 'gfpdfe_template_location', $gfpdf->data->upload_dir . '/' . $gfpdf->data->working_folder . '/', $gfpdf->data->upload_dir, $gfpdf->data->working_folder );
-		$gfpdf->data->template_location_url  = apply_filters( 'gfpdfe_template_location_url', $gfpdf->data->upload_dir_url . '/' . $gfpdf->data->working_folder . '/', $gfpdf->data->upload_dir_url, $gfpdf->data->working_folder );
-		$gfpdf->data->template_font_location = $gfpdf->data->template_location . 'fonts/';
-		$gfpdf->data->template_tmp_location  = $gfpdf->data->template_location . 'tmp/';
+		$this->data->template_location      = apply_filters( 'gfpdfe_template_location', $this->data->upload_dir . '/' . $this->data->working_folder . '/', $this->data->upload_dir, $this->data->working_folder );
+		$this->data->template_location_url  = apply_filters( 'gfpdfe_template_location_url', $this->data->upload_dir_url . '/' . $this->data->working_folder . '/', $this->data->upload_dir_url, $this->data->working_folder );
+		$this->data->template_font_location = $this->data->template_location . 'fonts/';
+		$this->data->template_tmp_location  = $this->data->template_location . 'tmp/';
 
-		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Template Locations', array(
-			'path' => $gfpdf->data->template_location,
-			'url'  => $gfpdf->data->template_location_url,
-			'font' => $gfpdf->data->template_font_location,
-			'tmp'  => $gfpdf->data->template_tmp_location,
+		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Template Locations', array(
+			'path' => $this->data->template_location,
+			'url'  => $this->data->template_location_url,
+			'font' => $this->data->template_font_location,
+			'tmp'  => $this->data->template_tmp_location,
 		) );
 	}
 
@@ -123,16 +169,15 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @return void
 	 */
 	public function setup_multisite_template_location() {
-		global $gfpdf;
 
 		if ( is_multisite() ) {
 			$blog_id = get_current_blog_id();
-			$gfpdf->data->multisite_template_location     = apply_filters( 'gfpdfe_multisite_template_location', $gfpdf->data->upload_dir . '/' . $gfpdf->data->working_folder . '/', $gfpdf->data->upload_dir, $gfpdf->data->working_folder );
-			$gfpdf->data->multisite_template_location_url = apply_filters( 'gfpdfe_multisite_template_location_url', $gfpdf->data->upload_dir_url . '/' . $gfpdf->data->working_folder . '/', $gfpdf->data->upload_dir_url, $gfpdf->data->working_folder );
+			$this->data->multisite_template_location     = apply_filters( 'gfpdfe_multisite_template_location', $this->data->upload_dir . '/' . $this->data->working_folder . '/', $this->data->upload_dir, $this->data->working_folder );
+			$this->data->multisite_template_location_url = apply_filters( 'gfpdfe_multisite_template_location_url', $this->data->upload_dir_url . '/' . $this->data->working_folder . '/', $this->data->upload_dir_url, $this->data->working_folder );
 
-			$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Multisite Template Locations', array(
-				'path' => $gfpdf->data->multisite_template_location,
-				'url'  => $gfpdf->data->multisite_template_location_url,
+			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Multisite Template Locations', array(
+				'path' => $this->data->multisite_template_location,
+				'url'  => $this->data->multisite_template_location_url,
 			) );
 		}
 	}
@@ -145,7 +190,6 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @return void
 	 */
 	public function create_folder_structures() {
-		global $gfpdf;
 
 		/* don't create the folder structure on our welcome page or through AJAX as an errors on the first page they see will confuse users */
 		if ( is_admin() &&
@@ -155,12 +199,12 @@ class Model_Install extends Helper_Abstract_Model {
 
 		/* add folders that need to be checked */
 		$folders = array(
-			$gfpdf->data->template_font_location,
-			$gfpdf->data->template_tmp_location,
+			$this->data->template_font_location,
+			$this->data->template_tmp_location,
 		);
 
 		if ( is_multisite() ) {
-			$folders[] = $gfpdf->data->multisite_template_location;
+			$folders[] = $this->data->multisite_template_location;
 		}
 
 		/* allow other plugins to add their own folders which should be checked */
@@ -170,27 +214,27 @@ class Model_Install extends Helper_Abstract_Model {
 		foreach ( $folders as $dir ) {
 			if ( ! is_dir( $dir ) ) {
 				if ( ! wp_mkdir_p( $dir ) ) {
-					$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Failed Creating Folder Structure', array( 'dir' => $dir ) );
-					$gfpdf->notices->add_error( sprintf( __( 'There was a problem creating the %s directory. Ensure you have write permissions to your upload directory.', 'gravitypdf' ), '<code>' . $gfpdf->misc->relative_path( $dir ) . '</code>' ) );
+					$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Failed Creating Folder Structure', array( 'dir' => $dir ) );
+					$this->notices->add_error( sprintf( __( 'There was a problem creating the %s directory. Ensure you have write permissions to your upload directory.', 'gravitypdf' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
 				}
 			} else {
 				/* test the directory is currently writable by the web server, otherwise throw and error */
-				if ( ! $gfpdf->misc->is_directory_writable( $dir ) ) {
-					$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Failed Write Permissions Check.', array( 'dir' => $dir ) );
-					$gfpdf->notices->add_error( sprintf( __( 'Gravity PDF does not have write permissions to the %s directory. Contact your web hosting provider to fix the issue.', 'gravitypdf' ), '<code>' . $gfpdf->misc->relative_path( $dir ) . '</code>' ) );
+				if ( ! $this->misc->is_directory_writable( $dir ) ) {
+					$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Failed Write Permissions Check.', array( 'dir' => $dir ) );
+					$this->notices->add_error( sprintf( __( 'Gravity PDF does not have write permissions to the %s directory. Contact your web hosting provider to fix the issue.', 'gravitypdf' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
 				}
 			}
 		}
 
 		/* create blank index file in all folders to prevent web servers listing the entire directory */
-		if ( is_dir( $gfpdf->data->template_location ) && ! is_file( $gfpdf->data->template_location . 'index.html' ) ) {
-			GFCommon::recursive_add_index_file( $gfpdf->data->template_location );
+		if ( is_dir( $this->data->template_location ) && ! is_file( $this->data->template_location . 'index.html' ) ) {
+			GFCommon::recursive_add_index_file( $this->data->template_location );
 		}
 
 		/* create deny htaccess file to prevent direct access to files */
-		if ( is_dir( $gfpdf->data->template_tmp_location ) && ! is_file( $gfpdf->data->template_tmp_location . '.htaccess' ) ) {
-			$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Create Apache .htaccess Security' );
-			file_put_contents( $gfpdf->data->template_tmp_location . '.htaccess', 'deny from all' );
+		if ( is_dir( $this->data->template_tmp_location ) && ! is_file( $this->data->template_tmp_location . '.htaccess' ) ) {
+			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Create Apache .htaccess Security' );
+			file_put_contents( $this->data->template_tmp_location . '.htaccess', 'deny from all' );
 		}
 	}
 
@@ -200,10 +244,9 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @return void
 	 */
 	public function register_rewrite_rules() {
-		global $gfpdf;
 
 		/* store query */
-		$query      = $gfpdf->data->permalink;
+		$query      = $this->data->permalink;
 		$rewrite_to = 'index.php?gf_pdf=1&pid=$matches[1]&lid=$matches[2]&action=$matches[3]';
 
 		/* Add our main endpoint */
@@ -212,7 +255,7 @@ class Model_Install extends Helper_Abstract_Model {
 			$rewrite_to,
 		'top');
 
-		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Add Rewrite Rules', array(
+		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Add Rewrite Rules', array(
 			'query'   => $query,
 			'rewrite' => $rewrite_to,
 		) );
@@ -242,12 +285,11 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @return void
 	 */
 	public function maybe_flush_rewrite_rules( $rule ) {
-		global $gfpdf;
 
 		$rules = get_option( 'rewrite_rules' );
 
 		if ( ! isset( $rules[ $rule ] ) ) {
-			$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Flushing WordPress Rewrite Rules.' );
+			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Flushing WordPress Rewrite Rules.' );
 			flush_rewrite_rules( false );
 		}
 	}
@@ -260,7 +302,7 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @todo  Add Multisite Support (Network Activated)
 	 */
 	public function uninstall_plugin() {
-		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Uninstall Gravity PDF.' );
+		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Uninstall Gravity PDF.' );
 
 		$this->remove_plugin_options();
 		$this->remove_plugin_form_settings();
@@ -287,17 +329,16 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function remove_plugin_form_settings() {
-		global $gfpdf;
 
-		$forms = $gfpdf->form->get_forms();
+		$forms = $this->form->get_forms();
 
 		foreach ( $forms as $form ) {
 			/* only update forms which have a PDF configuration */
 			if ( isset($form['gfpdf_form_settings']) ) {
 				unset($form['gfpdf_form_settings']);
-				if ( $gfpdf->form->update_form( $form ) !== true ) {
-					$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Cannot Remove PDF Settings from Form.', array( 'form' => $form ) );
-					$gfpdf->notices->add_error( sprintf( __( 'There was a problem removing the Gravity Form "%s" PDF configuration. Try delete manually.', 'gravitypdf' ), $form['id'] . ': ' . $form['title'] ) );
+				if ( $this->form->update_form( $form ) !== true ) {
+					$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Cannot Remove PDF Settings from Form.', array( 'form' => $form ) );
+					$this->notices->add_error( sprintf( __( 'There was a problem removing the Gravity Form "%s" PDF configuration. Try delete manually.', 'gravitypdf' ), $form['id'] . ': ' . $form['title'] ) );
 				}
 			}
 		}
@@ -309,23 +350,22 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function remove_folder_structure() {
-		global $gfpdf;
 
 		$paths = apply_filters('gfpdf_uninstall_path', array(
-			$gfpdf->data->template_location,
+			$this->data->template_location,
 		));
 
 		foreach ( $paths as $dir ) {
 			if ( is_dir( $dir ) ) {
-				$results = $gfpdf->misc->rmdir( $dir );
+				$results = $this->misc->rmdir( $dir );
 
 				if ( is_wp_error( $results ) || ! $results ) {
-					$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Cannot Remove Folder Structure.', array(
+					$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Cannot Remove Folder Structure.', array(
 						'WP_Error' => $results,
 						'dir'      => $dir,
 					) );
 					
-					$gfpdf->notices->add_error( sprintf( __( 'There was a problem removing the %s directory. Clean up manually via (S)FTP.', 'gravitypdf' ), '<code>' . $gfpdf->misc->relative_path( $dir ) . '</code>' ) );
+					$this->notices->add_error( sprintf( __( 'There was a problem removing the %s directory. Clean up manually via (S)FTP.', 'gravitypdf' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
 				}
 			}
 		}

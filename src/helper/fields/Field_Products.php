@@ -54,33 +54,13 @@ class Field_Products extends Helper_Abstract_Fields
 {
 
 	/**
-	 * The Products class doesn't need the $field value so we'll use a stripped down version of the construct
-	 * @param Array $entry The Gravity Forms Entry
-	 * @since 4.0
-	 */
-	public function __construct( $entry ) {
-		global $gfpdf;
-
-		/* Throw error if $entry is not an array */
-		if ( ! is_array( $entry ) ) {
-			throw new Exception( '$entry needs to be an array' );
-		}
-
-		$this->entry = $entry;
-		$this->form  = $gfpdf->form->get_form( $entry['form_id'] );
-	}
-
-	/**
 	 * Return the HTML form data
 	 * @return Array
 	 * @since 4.0
 	 */
 	public function form_data() {
 
-		$data = array();
-
 		$data = $this->value();
-
 		return $data;
 	}
 

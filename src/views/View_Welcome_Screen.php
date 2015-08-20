@@ -3,6 +3,7 @@
 namespace GFPDF\View;
 
 use GFPDF\Helper\Helper_Abstract_View;
+use GFPDF\Helper\Helper_Abstract_Form;
 
 /**
  * Welcome Screen View
@@ -55,9 +56,18 @@ class View_Welcome_Screen extends Helper_Abstract_View
 	 */
 	protected $ViewType = 'Welcome';
 
+	/**
+	 * Holds abstracted functions related to the forms plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $form;
 
-	public function __construct( $data = array() ) {
+	public function __construct( $data = array(), Helper_Abstract_Form $form ) {
 		$this->data = $data;
+
+		/* Assign our internal variables */
+		$this->form        = $form;
 	}
 
 	/**
@@ -82,11 +92,10 @@ class View_Welcome_Screen extends Helper_Abstract_View
 	 * @since 4.0
 	 */
 	public function welcome() {
-		global $gfpdf;
 
 		/* Load any variables we want to pass to our view */
 		$args = array(
-			'forms' => $gfpdf->form->get_forms(),
+			'forms' => $this->form->get_forms(),
 		);
 
 		$args = array_merge( $args, $this->data );

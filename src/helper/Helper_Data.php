@@ -2,6 +2,9 @@
 
 namespace GFPDF\Helper;
 
+use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Helper_Options;
+
 /**
  * Data overloaded Helper Class
  * Cache shared data across the plugin
@@ -154,14 +157,13 @@ class Helper_Data {
 	 * @return  array
 	 * @since  4.0
 	 */
-	public function get_localised_script_data() {
-		global $gfpdf;
+	public function get_localised_script_data(Helper_Options $options, Helper_Abstract_Form $form) {
 
-		$custom_fonts = array_values( $gfpdf->options->get_custom_fonts() );
+		$custom_fonts = array_values( $options->get_custom_fonts() );
 
 		return apply_filters('gfpdf_localised_script_array', array(
 			'ajaxurl'                     => admin_url( 'admin-ajax.php' ),
-			'GFbaseUrl'                   => $gfpdf->form->get_plugin_url(),
+			'GFbaseUrl'                   => $form->get_plugin_url(),
 			'pluginUrl'                   => PDF_PLUGIN_URL,
 			'spinnerUrl'                  => admin_url( 'images/spinner-2x.gif' ),
 			'general_advanced_show'       => __( 'Show Advanced Options...', 'gravitypdf' ),

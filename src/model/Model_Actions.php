@@ -3,6 +3,7 @@
 namespace GFPDF\Model;
 
 use GFPDF\Helper\Helper_Abstract_Model;
+use GFPDF\Helper\Helper_Options;
 
 /**
  * Action Model
@@ -47,6 +48,23 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Model_Actions extends Helper_Abstract_Model {
 
+    /**
+     * Holds our Helper_Options / Helper_Options_Fields object
+     * Makes it easy to access global PDF settings and individual form PDF settings
+     * @var Object
+     * @since 4.0
+     */
+    protected $options;
+
+    /**
+     * Load our model and view and required actions
+     */
+    public function __construct( Helper_Options $options ) {
+        
+        /* Assign our internal variables */
+        $this->options = $options;
+    }
+
 
     /**
      * Check if the current notice has already been dismissed
@@ -55,9 +73,8 @@ class Model_Actions extends Helper_Abstract_Model {
      * @since 4.0
      */
     public function is_notice_already_dismissed( $type ) {
-        global $gfpdf;
 
-        $dismissed_notices = $gfpdf->options->get_option( 'action_dismissal', array() );
+        $dismissed_notices = $this->options->get_option( 'action_dismissal', array() );
 
         if( isset( $dismissed_notices[ $type ] ) ) {
             return true;
@@ -73,11 +90,10 @@ class Model_Actions extends Helper_Abstract_Model {
      * @since 4.0
      */
     public function dismiss_notice( $type ) {
-        global $gfpdf;
 
-        $dismissed_notices = $gfpdf->options->get_option( 'action_dismissal', array() );
+        $dismissed_notices = $this->options->get_option( 'action_dismissal', array() );
         $dismissed_notices[ $type ] = $type;
-        $gfpdf->options->update_option( 'action_dismissal', $dismissed_notices );
+        $this->options->update_option( 'action_dismissal', $dismissed_notices );
     }
 
     /**
@@ -87,9 +103,8 @@ class Model_Actions extends Helper_Abstract_Model {
      * @since 4.0
      */
 	public function review_condition() {
-		global $gfpdf;
 
-        $total_pdf_count = (int) $gfpdf->options->get_option( 'pdf_count', 0 );
+        $total_pdf_count = (int) $this->options->get_option( 'pdf_count', 0 );
 
         if( 100 < $total_pdf_count ) {
             return true;

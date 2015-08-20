@@ -5,6 +5,13 @@ namespace GFPDF\Model;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_PDF_List_Table;
 use GFPDF\Helper\Helper_Interface_Config;
+use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Misc;
+use GFPDF\Helper\Helper_Notices;
+use GFPDF\Helper\Helper_Options;
+
+use Psr\Log\LoggerInterface;
 
 use WP_Error;
 use _WP_Editors;
@@ -53,6 +60,66 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Model_Form_Settings extends Helper_Abstract_Model {
 
 	/**
+	 * Holds abstracted functions related to the forms plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $form;
+
+	/**
+	 * Holds our log class
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $log;
+
+	/**
+	 * Holds our Helper_Data object
+	 * which we can autoload with any data needed
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $data;
+
+	/**
+	 * Holds our Helper_Options / Helper_Options_Fields object
+	 * Makes it easy to access global PDF settings and individual form PDF settings
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $options;
+
+	/**
+	 * Holds our Helper_Misc object
+	 * Makes it easy to access common methods throughout the plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $misc;
+
+	/**
+	 * Holds our Helper_Notices object
+	 * which we can use to queue up admin messages for the user
+	 * @var Object Helper_Notices
+	 * @since 4.0
+	 */
+	protected $notices;
+
+	/**
+	 * Load our model and view and required actions
+	 */
+	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log, Helper_Data $data, Helper_Options $options, Helper_Misc $misc, Helper_Notices $notices ) {
+		
+		/* Assign our internal variables */
+		$this->form    = $form;
+		$this->log     = $log;
+		$this->data    = $data;
+		$this->options = $options;
+		$this->misc    = $misc;
+		$this->notices = $notices;
+	}
+
+	/**
 	 * Add the form settings tab.
 	 *
 	 * Override this function to add the tab conditionally.
@@ -63,8 +130,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function add_form_settings_menu( $tabs, $form_id ) {
-		global $gfpdf;
-		$tabs[] = array( 'name' => $gfpdf->data->slug, 'label' => $gfpdf->data->short_title, 'query' => array( 'pid' => null ) );
+		$tabs[] = array( 'name' => $this->data->slug, 'label' => $this->data->short_title, 'query' => array( 'pid' => null ) );
 		return $tabs;
 	}
 
@@ -75,28 +141,26 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function process_list_view( $form_id ) {
-		global $gfpdf;
 
 		/* prevent unauthorized access */
-		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			
-			$gfpdf->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.' );
+			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.' );
 			wp_die( __( 'You do not have permission to access this page', 'gravitypdf' ) );
 		}
 
-		global $gfpdf;
 		$controller = $this->getController();
 
 		/* get the form object */
-		$form = $gfpdf->form->get_form( $form_id );
+		$form = $this->form->get_form( $form_id );
 
 		/* load our list table */
-		$pdf_table = new Helper_PDF_List_Table( $form );
+		$pdf_table = new Helper_PDF_List_Table( $form, $this->form, $this->misc, $this->options );
 		$pdf_table->prepare_items();
 
 		/* pass to view */
 		$controller->view->list(array(
-			'title'       => $gfpdf->data->title,
+			'title'       => $this->data->title,
 			'add_new_url' => $add_new_url = add_query_arg( array( 'pid' => 0 ) ),
 			'list_items'  => $pdf_table,
 		));
@@ -110,18 +174,17 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function show_edit_view( $form_id, $pdf_id ) {
-		global $gfpdf;
 
 		/* prevent unauthorized access */
-		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
-			$gfpdf->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.' );
+		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
+			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.' );
 			wp_die( __( 'You do not have permission to access this page', 'gravitypdf' ) );
 		}
 
 		$controller = $this->getController();
 
 		/* get the form object */
-		$form = $gfpdf->form->get_form( $form_id );
+		$form = $this->form->get_form( $form_id );
 
 		/* parse input and get required information */
 		if ( ! $pdf_id ) {
@@ -139,7 +202,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$this->register_notifications( $form['notifications'] );
 
 		/* re-register all our settings to show form-specific options */
-		$gfpdf->options->register_settings( $gfpdf->options->get_registered_fields() );
+		$this->options->register_settings( $this->options->get_registered_fields() );
 
 		/* pass to view */
 		$controller->view->add_edit(array(
@@ -161,36 +224,35 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @return Array/Object GFPDF settings or WP_Error
 	 */
 	public function get_settings( $form_id ) {
-		global $gfpdf;
 
-		if ( ! isset($gfpdf->data->form_settings) ) {
-			$gfpdf->data->form_settings = array();
+		if ( ! isset($this->data->form_settings) ) {
+			$this->data->form_settings = array();
 		}
 
 		$form_id = (int) $form_id;
 		if ( (int) $form_id === 0 ) {
 			$error = new WP_Error( 'invalid_id', __( 'You must pass in a valid form ID', 'gravitypdf' ) );
-			$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Error Getting Settings.', array( 'WP_Error' => $error ) );
+			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Error Getting Settings.', array( 'WP_Error' => $error ) );
 			return $error;
 		}
 
 		/* If we haven't pulled the form meta data from the database do so now */
-		if ( ! isset($gfpdf->data->form_settings[$form_id]) ) {
-			$form = $gfpdf->form->get_form( $form_id );
+		if ( ! isset($this->data->form_settings[$form_id]) ) {
+			$form = $this->form->get_form( $form_id );
 
 			if ( empty($form) ) {
 				$error = new WP_Error( 'invalid_id', __( 'You must pass in a valid form ID', 'gravitypdf' ) );
-				$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Error Getting Settings.', array( 'WP_Error' => $error ) );
+				$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Error Getting Settings.', array( 'WP_Error' => $error ) );
 				return $error;
 			}
 
 			$settings = (isset($form['gfpdf_form_settings'])) ? $form['gfpdf_form_settings'] : array();
-			$gfpdf->data->form_settings[$form_id] = apply_filters( 'gfpdf_get_form_settings', $settings );
+			$this->data->form_settings[$form_id] = apply_filters( 'gfpdf_get_form_settings', $settings );
 
 		}
 
 		/* return the form meta data */
-		return $gfpdf->data->form_settings[$form_id];
+		return $this->data->form_settings[$form_id];
 	}
 
 	/**
@@ -202,9 +264,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @return mixed
 	 */
 	public function get_pdf( $form_id, $pdf_id ) {
-		global $gfpdf;
 
-		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Getting Settings.', array(
+		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Getting Settings.', array(
 			'form_id' => $form_id,
 			'pdf_id'  => $pdf_id,
 		) );
@@ -229,9 +290,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function add_pdf( $form_id, $value = array() ) {
-		global $gfpdf;
 
-		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Adding Settings.', array(
+		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Adding Settings.', array(
 			'form_id'      => $form_id,
 			'new_settings' => $value,
 		) );
@@ -252,11 +312,11 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 			if ( $results ) {
 				/* return the ID if successful */
-				$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Successfully Added.', array( 'pdf' => $value ) );
+				$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Successfully Added.', array( 'pdf' => $value ) );
 				return $value['id'];
 			}
 
-			$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Error Saving.', array(
+			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Error Saving.', array(
 				'error' => $results,
 				'pdf' => $value
 			) );
@@ -281,9 +341,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @return boolean True if updated, false if not.
 	 */
 	public function update_pdf( $form_id, $pdf_id, $value = '', $update_db = true, $filters = true ) {
-		global $gfpdf;
 
-		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Updating Settings.', array(
+		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Updating Settings.', array(
 			'form_id'      => $form_id,
 			'pdf_id'       => $pdf_id,
 			'new_settings' => $value,
@@ -300,7 +359,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		if ( ! is_wp_error( $options ) ) {
 			/* don't run when adding a new PDF */
 			if ( $filters ) {
-				$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Trigger Filters.' );
+				$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Trigger Filters.' );
 
 				/* Let's let devs alter that value coming in */
 				$value = apply_filters( 'gfpdf_form_update_pdf', $value, $form_id, $pdf_id );
@@ -311,7 +370,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			$options[ $pdf_id ] = $value;
 
 			/* get the up-to-date form object and merge in the results */
-			$form = $gfpdf->form->get_form( $form_id );
+			$form = $this->form->get_form( $form_id );
 
 			/* Update our GFPDF settings */
 			$form['gfpdf_form_settings'] = $options;
@@ -319,15 +378,15 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			$did_update = false;
 			if ( $update_db ) {
 
-				$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Update Form.', array( 'form' => $form ) );
+				$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Update Form.', array( 'form' => $form ) );
 				/* update the database, if able */
-				$did_update = $gfpdf->form->update_form( $form );
+				$did_update = $this->form->update_form( $form );
 			}
 
 			/* If it updated, let's update the global variable */
 			if ( ! $update_db || $did_update !== false ) {
-				$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Save Local Form Cache.' );
-				$gfpdf->data->form_settings[$form_id] = $options;
+				$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Save Local Form Cache.' );
+				$this->data->form_settings[$form_id] = $options;
 			}
 
 			/* true if successful, false if failed */
@@ -346,9 +405,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @return boolean True if updated, false if not.
 	 */
 	public function delete_pdf( $form_id, $pdf_id ) {
-		global $gfpdf;
 
-		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Deleting Setting.', array(
+		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Deleting Setting.', array(
 			'form_id' => $form_id,
 			'pdf_id'  => $pdf_id,
 		) );
@@ -360,35 +418,35 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 			/* Next let's try to update the value */
 			if ( isset( $options[ $pdf_id ] ) ) {
-				$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Found Setting. Now deleting...', array( 'pdf' => $options[ $pdf_id ] ) );
+				$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Found Setting. Now deleting...', array( 'pdf' => $options[ $pdf_id ] ) );
 				unset( $options[ $pdf_id ] );
 			}
 
 			/* get the form and merge in the results */
-			$form = $gfpdf->form->get_form( $form_id );
+			$form = $this->form->get_form( $form_id );
 
 			/* Update our GFPDF settings */
 			$form['gfpdf_form_settings'] = $options;
 
 			/* update the database, if able */
-			$did_update = $gfpdf->form->update_form( $form );
+			$did_update = $this->form->update_form( $form );
 
 			/* If it updated, let's update the global variable */
 			if ( $did_update !== false ) {
 			
-				$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Setting Deleted.', array(
+				$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Setting Deleted.', array(
 					'form_id' => $form_id,
 					'pdf_id'  => $pdf_id,
 				) );
 
-				$gfpdf->data->form_settings[$form_id] = $options;
+				$this->data->form_settings[$form_id] = $options;
 			}
 
 			/* true if successful, false if failed */
 			return $did_update;
 		}
 
-		$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'PDF Delete Failed.', array(
+		$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'PDF Delete Failed.', array(
 			'form_id' => $form_id,
 			'pdf_id'  => $pdf_id,
 			'form' => $form,
@@ -405,12 +463,11 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function process_submission( $form_id, $pdf_id ) {
-		global $gfpdf;
 
 		/* prevent unauthorized access */
-		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			
-			$gfpdf->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
+			$this->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
 				'user_meta' => get_user_meta( get_current_user_id() )
 			) );
@@ -420,8 +477,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* Check Nonce is valid */
 		if ( ! wp_verify_nonce( rgpost( 'gfpdf_save_pdf' ), 'gfpdf_save_pdf' ) ) {
-			$gfpdf->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
-			$gfpdf->notices->add_error( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
+			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
+			$this->notices->add_error( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
 			 return false;
 		}
 
@@ -434,8 +491,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* check appropriate settings */
 		if ( ! is_array( $input ) || ! $pdf_id ) {
-			 $gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Invalid Data.', array( 'post' => $input, 'pid' => $pdf_id ) );
-			 $gfpdf->notices->add_error( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
+			 $this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Invalid Data.', array( 'post' => $input, 'pid' => $pdf_id ) );
+			 $this->notices->add_error( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
 			 return false;
 		}
 
@@ -451,35 +508,35 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		if ( empty($sanitized['name']) || empty($sanitized['filename']) ||
 			($sanitized['pdf_size'] == 'custom' && ((int) $sanitized['custom_pdf_size'][0] === 0 || (int) $sanitized['custom_pdf_size'][1] === 0)) ) {
 
-			$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Validation failed.' );
-			$gfpdf->notices->add_error( __( 'PDF could not be saved. Please enter all required information below.', 'gravitypdf' ) );
+			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Validation failed.' );
+			$this->notices->add_error( __( 'PDF could not be saved. Please enter all required information below.', 'gravitypdf' ) );
 			return false;
 		}
 
 		/* get the form and merge in the results */
-		$form = $gfpdf->form->get_form( $form_id );
+		$form = $this->form->get_form( $form_id );
 
 		/* Update our GFPDF settings */
 		$form['gfpdf_form_settings'][$pdf_id] = $sanitized;
 
 		/* Update database */
-		$did_update = $gfpdf->form->update_form( $form );
+		$did_update = $this->form->update_form( $form );
 
 		/* If it updated, let's update the global variable */
 		if ( $did_update !== false ) {
 
-			$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Successfully Saved.', array(
+			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Successfully Saved.', array(
 				'form_id'  => $form_id,
 				'pdf_id'   => $pdf_id,
 				'settings' => $form['gfpdf_form_settings'][$pdf_id],
 			) );
 
-			$gfpdf->notices->add_notice( sprintf( __( 'PDF saved successfully. %sBack to PDF list.%s', 'gravitypdf' ), '<a href="' . remove_query_arg( 'pid' ) . '">', '</a>' ) );
+			$this->notices->add_notice( sprintf( __( 'PDF saved successfully. %sBack to PDF list.%s', 'gravitypdf' ), '<a href="' . remove_query_arg( 'pid' ) . '">', '</a>' ) );
 			return true;
 		}
 
-		$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Database Update Failed.' );
-		$gfpdf->notices->add_error( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
+		$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Database Update Failed.' );
+		$this->notices->add_error( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
 		return false;
 	}
 
@@ -490,7 +547,6 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function validation_error( $fields ) {
-		global $gfpdf;
 
 		/**
 		 * Check if we actually need to do any validating
@@ -506,8 +562,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		 * Check we have a valid nonce, or throw an error
 		 */
 		if ( ! wp_verify_nonce( rgpost( 'gfpdf_save_pdf' ), 'gfpdf_save_pdf' ) ) {
-			$gfpdf->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
-			$gfpdf->notices->add_error( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
+			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
+			$this->notices->add_error( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
 			return false;
 		}
 
@@ -551,9 +607,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function settings_sanitize( $input = array() ) {
-		global $gfpdf;
 
-		$settings = $gfpdf->options->get_registered_fields();
+		$settings = $this->options->get_registered_fields();
 		$sections = array( 'form_settings', 'form_settings_appearance', 'form_settings_custom_appearance', 'form_settings_advanced' );
 
 		foreach ( $sections as $s ) {
@@ -591,14 +646,13 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @since  4.0
 	 */
 	public function register_custom_appearance_settings( $settings ) {
-		global $gfpdf;
 
 		$pid     = rgget( 'pid' );
 		$form_id = (isset($_GET['id'])) ? (int) $_GET['id'] : 0;
 
 		/* If we don't have a specific PDF we'll use the defaults */
 		if ( empty($pid) || empty($form_id) ) {
-			$template = $gfpdf->options->get_option( 'default_template', 'core-simple' );
+			$template = $this->options->get_option( 'default_template', 'core-simple' );
 		} else {
 			/* Load the PDF configuration */
 			$pdf      = $this->get_pdf( $form_id, $pid );
@@ -615,11 +669,10 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @param Array $settings Any existing settings loaded
 	 */
 	public function add_template_image( $settings ) {
-		global $gfpdf;
 
 		if ( isset( $settings['template'] ) ) {
-			$current_template = $gfpdf->options->get_form_value( $settings['template'] );
-			$template_image   = $gfpdf->misc->get_template_image( $current_template );
+			$current_template = $this->options->get_form_value( $settings['template'] );
+			$template_image   = $this->misc->get_template_image( $current_template );
 
 			if ( ! empty($template_image) ) {
 				$img              = '<img src="'. esc_url( $template_image ) . '" alt="' . __( 'Template Example' ) . '" id="gfpdf-template-example" />';
@@ -637,12 +690,11 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function setup_custom_appearance_settings( $class, $settings = array() ) {
-		global $gfpdf;
 
 		/* If class isn't an instance of our interface return $settings */
 		if ( ! ($class instanceof Helper_Interface_Config ) ) {
 
-			$gfpdf->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Instanceof Failed.', array(
+			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Instanceof Failed.', array(
 				'object' => $class,
 				'type'   => 'Helper_Interface_Config',
 			) );
@@ -683,7 +735,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			$settings['firstFooter'] = $this->get_first_page_footer_field();
 		}
 
-		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Setup Template-Specific Settings', array( 'settings' => $settings ) );
+		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Setup Template-Specific Settings', array( 'settings' => $settings ) );
 
 		return $settings;
 	}
@@ -755,9 +807,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function get_template_configuration( $template ) {
-		global $gfpdf;
 
-		$file  = $gfpdf->data->template_location . 'config/' . $template . '.php';
+		$file  = $this->data->template_location . 'config/' . $template . '.php';
 		$class = $this->load_template_configuration( $file );
 
 		$file = PDF_PLUGIN_DIR . 'initialisation/templates/config/' . $template . '.php';
@@ -775,7 +826,6 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function load_template_configuration( $file ) {
-		global $gfpdf;
 
 		$namespace = 'GFPDF\Templates\Config\\';
 		$class     = false;
@@ -791,7 +841,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				$class = new $fqcn();
 			}
 		} else {
-			$gfpdf->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Template Configuration Failed to Load', array( 'file' => $file ) );
+			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Template Configuration Failed to Load', array( 'file' => $file ) );
 		}
 
 		return $class;
@@ -837,7 +887,6 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function register_notifications( $notifications ) {
-		global $gfpdf;
 
 		/* Loop through notifications and format it to our standard */
 		if ( is_array( $notifications ) ) {
@@ -848,7 +897,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			}
 
 			/* Apply our settings update */
-			$gfpdf->options->update_registered_field( 'form_settings', 'notification', 'options', $options );
+			$this->options->update_registered_field( 'form_settings', 'notification', 'options', $options );
 		}
 	}
 
@@ -861,14 +910,13 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function delete_gf_pdf_setting() {
-		global $gfpdf;
 
-		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Running AJAX Endpoint', array( 'type' => 'Delete PDF Settings' ) );
+		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Running AJAX Endpoint', array( 'type' => 'Delete PDF Settings' ) );
 
 		/* prevent unauthorized access */
-		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 
-			$gfpdf->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
+			$this->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
 				'user_meta' => get_user_meta( get_current_user_id() )
 			) );
@@ -889,7 +937,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		if ( ! wp_verify_nonce( $nonce, $nonce_id ) ) {
 			
-			$gfpdf->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
+			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
 
 			header( 'HTTP/1.1 401 Unauthorized' );
 			wp_die( '401' );
@@ -899,7 +947,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		if ( $results && ! is_wp_error( $results ) ) {
 
-			$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'AJAX Endpoint Successful' );
+			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'AJAX Endpoint Successful' );
 
 			$return = array(
 				'msg' => __( 'PDF successfully deleted.', 'gravitypdf' ),
@@ -922,14 +970,13 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function duplicate_gf_pdf_setting() {
-		global $gfpdf;
 
-		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Running AJAX Endpoint', array( 'type' => 'Duplicate PDF Settings' ) );
+		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Running AJAX Endpoint', array( 'type' => 'Duplicate PDF Settings' ) );
 
 		/* prevent unauthorized access */
-		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 
-			$gfpdf->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
+			$this->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
 				'user_meta' => get_user_meta( get_current_user_id() )
 			) );
@@ -949,7 +996,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		if ( ! wp_verify_nonce( $nonce, $nonce_id ) ) {
 			
-			$gfpdf->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
+			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
 
 			header( 'HTTP/1.1 401 Unauthorized' );
 			wp_die( '401' );
@@ -964,7 +1011,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			$results = $this->update_pdf( $fid, $config['id'], $config );
 
 			if ( $results ) {
-				$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'AJAX Endpoint Successful' );
+				$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'AJAX Endpoint Successful' );
 
 				$dup_nonce   = wp_create_nonce( "gfpdf_duplicate_nonce_{$fid}_{$config['id']}" );
 				$del_nonce   = wp_create_nonce( "gfpdf_delete_nonce_{$fid}_{$config['id']}" );
@@ -997,14 +1044,13 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function change_state_pdf_setting() {
-		global $gfpdf;
 
-		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Running AJAX Endpoint', array( 'type' => 'Change PDF Settings State' ) );
+		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Running AJAX Endpoint', array( 'type' => 'Change PDF Settings State' ) );
 
 		/* prevent unauthorized access */
-		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 
-			$gfpdf->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
+			$this->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
 				'user_meta' => get_user_meta( get_current_user_id() )
 			) );
@@ -1023,7 +1069,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		if ( ! wp_verify_nonce( $nonce, $nonce_id ) ) {
 
-			$gfpdf->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
+			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
 
 			header( 'HTTP/1.1 401 Unauthorized' );
 			wp_die( '401' );
@@ -1036,12 +1082,12 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			/* toggle state */
 			$config['active'] = ($config['active'] === true) ? false : true;
 			$state            = ($config['active']) ? __( 'Active', 'gravitypdf' ) : __( 'Inactive', 'gravitypdf' );
-			$src              = $gfpdf->form->get_plugin_url() . '/images/active' . intval( $config['active'] ) . '.png';
+			$src              = $this->form->get_plugin_url() . '/images/active' . intval( $config['active'] ) . '.png';
 
 			$results = $this->update_pdf( $fid, $config['id'], $config );
 
 			if ( $results ) {
-				$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'AJAX Endpoint Successful' );
+				$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'AJAX Endpoint Successful' );
 
 				$return = array(
 					'state' => $state,
@@ -1064,14 +1110,13 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function render_template_fields() {
-		global $gfpdf;
 
-		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Running AJAX Endpoint', array( 'type' => 'Render Template Custom Fields' ) );
+		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Running AJAX Endpoint', array( 'type' => 'Render Template Custom Fields' ) );
 
 		/* prevent unauthorized access */
-		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			
-			$gfpdf->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
+			$this->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
 				'user_meta' => get_user_meta( get_current_user_id() )
 			) );
@@ -1087,7 +1132,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$settings = $this->setup_custom_appearance_settings( $class );
 
 		/* Check if the selected template has a preview */
-		$template_image = $gfpdf->misc->get_template_image( $template );
+		$template_image = $this->misc->get_template_image( $template );
 
 		/* Only handle fields when in the PDF Forms Settings, and not in the general settings */
 		if ( $type != 'gfpdf_settings[default_template]' ) {
@@ -1099,7 +1144,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			}, 100);
 
 			/* Ensure our new fields are registered */
-			$gfpdf->options->register_settings( $gfpdf->options->get_registered_fields() );
+			$this->options->register_settings( $this->options->get_registered_fields() );
 
 			/* generate the HTML */
 			ob_start();
@@ -1121,7 +1166,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			}
 		}
 
-		$editor_init = ( isset($gfpdf->data->tiny_mce_editor_settings) ) ? $gfpdf->data->tiny_mce_editor_settings : null;
+		$editor_init = ( isset($this->data->tiny_mce_editor_settings) ) ? $this->data->tiny_mce_editor_settings : null;
 		$html        = ( isset($html) && strlen( trim( $html ) ) > 0 ) ? $html : null;
 		$editors     = ( isset($editors) ) ? $editors : null;
 
@@ -1132,7 +1177,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			'editor_init' => $editor_init,
 		);
 
-		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'AJAX Endpoint Successful', $return );
+		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'AJAX Endpoint Successful', $return );
 
 		echo json_encode( $return );
 

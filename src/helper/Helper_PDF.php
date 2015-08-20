@@ -3,6 +3,8 @@
 namespace GFPDF\Helper;
 
 use GFPDF\Model\Model_PDF;
+use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Helper_Data;
 
 use mPDF;
 
@@ -102,7 +104,7 @@ class Helper_PDF {
 	 * @var String
 	 * @since 4.0
 	 */
-	protected $filename;
+	protected $filename = 'document.pdf';
 
 	/**
 	 * Holds the path the PDF should be saved to
@@ -119,14 +121,33 @@ class Helper_PDF {
 	protected $print = false;
 
 	/**
+	 * Holds abstracted functions related to the forms plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $form;
+
+	/**
+	 * Holds our Helper_Data object
+	 * which we can autoload with any data needed
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $data;
+
+	/**
 	 * Initialise our class
 	 * @param Array $entry    The Gravity Form Entry to be processed
 	 * @param Array $settings The Gravity PDF Settings Array
 	 * @since 4.0
 	 */
-	public function __construct( $entry, $settings ) {
-		$this->entry = $entry;
+	public function __construct( $entry, $settings, Helper_Abstract_Form $form, Helper_Data $data ) {
+		
+		/* Assign our internal variables */
+		$this->entry    = $entry;
 		$this->settings = $settings;
+		$this->form     = $form;
+		$this->data     = $data;
 	}
 
 	/**
@@ -136,7 +157,6 @@ class Helper_PDF {
 	 */
 	public function init() {
 		$this->set_paper();
-		$this->set_filename();
 		$this->begin_pdf();
 		$this->set_image_dpi();
 		$this->set_text_direction();
@@ -344,10 +364,8 @@ class Helper_PDF {
 	 * @return void
 	 * @since 4.0
 	 */
-	public function set_filename() {
-		/* Process mergetags */
-		$model = new Model_PDF();
-		$this->filename = $this->get_extension( $model->get_pdf_name( $this->settings, $this->entry ), '.pdf' );
+	public function set_filename( $filename ) {
+		$this->filename = $this->get_extension( $filename, '.pdf' );
 	}
 
 	/**
@@ -366,11 +384,10 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	public function set_path( $path = '' ) {
-		global $gfpdf;
 
 		if ( empty($path) ) {
 			/* build our PDF path location */
-			$path = $gfpdf->data->template_tmp_location . '/' . $this->entry['form_id'] . $this->entry['id'] . '/';
+			$path = $this->data->template_tmp_location . '/' . $this->entry['form_id'] . $this->entry['id'] . '/';
 		} else {
 			/* ensure the path ends with a forward slash */
 			if ( substr( $path, -1 ) !== '/' ) {
@@ -490,12 +507,11 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	protected function set_template() {
-		global $gfpdf;
 
 		$template = (isset($this->settings['template'])) ? $this->get_extension( $this->settings['template'] ) : '';
 
 		/* Allow a user to change the current template if they have the appropriate capabilities */
-		if ( rgget( 'template' ) && is_user_logged_in() && $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( rgget( 'template' ) && is_user_logged_in() && $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			$template = $this->get_extension( rgget( 'template' ) );
 		}
 
@@ -506,8 +522,8 @@ class Helper_PDF {
 		 */
 		$default_template_path = PDF_PLUGIN_DIR . 'initialisation/templates/';
 
-		if ( is_file( $gfpdf->data->template_location . $template ) ) {
-			$this->template_path = $gfpdf->data->template_location . $template;
+		if ( is_file( $this->data->template_location . $template ) ) {
+			$this->template_path = $this->data->template_location . $template;
 		} else if ( is_file( $default_template_path . $template ) ) {
 			$this->template_path = $default_template_path . $template;
 		} else {
@@ -552,9 +568,8 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	protected function maybe_display_raw_html( $html ) {
-		global $gfpdf;
 		
-		if ( $this->output !== 'SAVE' && rgget( 'html' ) && $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( $this->output !== 'SAVE' && rgget( 'html' ) && $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			echo $html;
 			exit;
 		}

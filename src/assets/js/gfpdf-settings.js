@@ -669,7 +669,9 @@
 		                	QTags._buttonsInit();
 	                    	
 	                    	/* remember last tab selected */
-	                    	switchEditors.switchto( jQuery( '#wp-' + fullId + '-wrap' ).find( '.wp-switch-editor.switch-' + ( getUserSetting( 'editor' ) == 'html' ? 'html' : 'tmce' ) )[0] );
+	                    	if( typeof switchEditors.switchto === 'function' ) {
+	                    		switchEditors.switchto( jQuery( '#wp-' + fullId + '-wrap' ).find( '.wp-switch-editor.switch-' + ( getUserSetting( 'editor' ) == 'html' ? 'html' : 'tmce' ) )[0] );
+	                    	}
 		            }
 
   				} );

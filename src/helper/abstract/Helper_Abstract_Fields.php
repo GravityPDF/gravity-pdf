@@ -2,6 +2,9 @@
 
 namespace GFPDF\Helper;
 
+use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Helper_Misc;
+
 use GFFormsModel;
 use GF_Field;
 
@@ -86,6 +89,14 @@ abstract class Helper_Abstract_Fields {
 	public $fieldObject;
 
 	/**
+	 * Holds our Helper_Misc object
+	 * Makes it easy to access common methods throughout the plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $misc;
+
+	/**
 	 * Set up the object
 	 * Check the $entry is an array, or throw exception
 	 * The $field is validated in the child classes
@@ -93,8 +104,10 @@ abstract class Helper_Abstract_Fields {
 	 * @param Array  $entry The Gravity Forms Entry
 	 * @since 4.0
 	 */
-	public function __construct( $field, $entry ) {
-		global $gfpdf;
+	public function __construct( $field, $entry, Helper_Abstract_Form $form, Helper_Misc $misc ) {
+
+		/* Assign our internal variables */
+		$this->misc = $misc;
 
 		/* Throw error if not dependacies not met */
 		if ( ! class_exists( 'GFFormsModel' ) ) {
@@ -112,7 +125,7 @@ abstract class Helper_Abstract_Fields {
 
 		$this->field = $field;
 		$this->entry = $entry;
-		$this->form  = $gfpdf->form->get_form( $entry['form_id'] );
+		$this->form  = $form->get_form( $entry['form_id'] );
 
 	}
 

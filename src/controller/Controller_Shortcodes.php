@@ -5,8 +5,9 @@ namespace GFPDF\Controller;
 use GFPDF\Helper\Helper_Abstract_Controller;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_View;
-
 use GFPDF\Helper\Helper_Interface_Filters;
+
+use Psr\Log\LoggerInterface;
 
 /**
  * PDF Shortcode Controller
@@ -50,11 +51,23 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper_Interface_Filters
 {
+
+	/**
+	 * Holds our log class
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $log;
+
 	/**
 	 * Load our model and view and required actions
 	 */
-	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view ) {
-		/* load our model and view */
+	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, LoggerInterface $log ) {
+
+		/* Assign our internal variables */
+		$this->log = $log;
+
+		/* Load our model and view */
 		$this->model = $model;
 		$this->model->setController( $this );
 
@@ -108,9 +121,8 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 	 * @return void
 	 */
 	public function add_shortcake_support() {
-		global $gfpdf;
 
-		$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Enable Shortcake support.' );
+		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Enable Shortcake support.' );
 
 		/* Enhance further */
 		shortcode_ui_register_for_shortcode( 'gravitypdf', array(

@@ -51,17 +51,6 @@ class Field_Signature extends Helper_Abstract_Fields
 {
 
 	/**
-	 * Check the appropriate variables are parsed in send to the parent construct
-	 * @param Object $field The GF_Field_* Object
-	 * @param Array  $entry The Gravity Forms Entry
-	 * @since 4.0
-	 */
-	public function __construct( $field, $entry ) {
-		/* call our parent method */
-		parent::__construct( $field, $entry );
-	}
-
-	/**
 	 * Display the HTML version of this field
 	 * @return String
 	 * @since 4.0

@@ -7,6 +7,10 @@ use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_View;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
+use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Options;
+
+use Psr\Log\LoggerInterface;
 
 /**
  * Welcome Screen Controller
@@ -50,11 +54,41 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Controller_Welcome_Screen extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters
 {
+
+	/**
+	 * Holds our log class
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $log;
+
+	/**
+	 * Holds our Helper_Data object
+	 * which we can autoload with any data needed
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $data;
+
+	/**
+	 * Holds our Helper_Options / Helper_Options_Fields object
+	 * Makes it easy to access global PDF settings and individual form PDF settings
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $options;
+
 	/**
 	 * Load our model and view and required actions
 	 */
-	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view ) {
-		/* load our model and view */
+	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, LoggerInterface $log, Helper_Data $data, Helper_Options $options ) {
+	
+		/* Assign our internal variables */
+		$this->log     = $log;
+		$this->data    = $data;
+		$this->options = $options;
+
+		/* Load our model and view */
 		$this->model = $model;
 		$this->model->setController( $this );
 
@@ -101,7 +135,6 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 	 * @todo configure upgrade page as needed
 	 */
 	public function welcome() {
-		global $gfpdf;
 
 		/* Bail if no activation redirect */
 		if ( ! get_transient( '_gravitypdf_activation_redirect' ) ) {
@@ -113,14 +146,14 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 
 		/* Bail if activating from network, or bulk */
 		if ( is_network_admin() || isset($_GET['activate-multi']) ) {
-			$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Network Activation.' );
+			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Network Activation.' );
 
 			return false;
 		}
 
 		/* add own update tracker */
-		if ( ! $gfpdf->data->is_installed ) {
-			$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Redirect to Getting Started page (first time activated).' );
+		if ( ! $this->data->is_installed ) {
+			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Redirect to Getting Started page (first time activated).' );
 
 			/* First time install */
 			wp_safe_redirect( admin_url( 'index.php?page=gfpdf-getting-started' ) );
@@ -132,7 +165,6 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 	}
 
 	public function maybe_display_update_screen() {
-		global $gfpdf;
 
 		/* Check we actually upgraded, otherwise don't redirect */
 		if( PDF_EXTENDED_VERSION == get_option( 'gfpdf_current_version' ) ) {
@@ -149,11 +181,11 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 		}
 
 		/* Check if the user has opted to view the What's New page */
-		$show_update_page = $gfpdf->options->get_option( 'update_screen_action', 'Enable' );
+		$show_update_page = $this->options->get_option( 'update_screen_action', 'Enable' );
 
 		if( $show_update_page == 'Enable' ) {
 
-			$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Redirect to Update page (previously activated).' );
+			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Redirect to Update page (previously activated).' );
 
 			/* Update */
 			wp_safe_redirect( admin_url( 'index.php?page=gfpdf-update' ) );

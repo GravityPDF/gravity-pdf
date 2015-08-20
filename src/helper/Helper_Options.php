@@ -3,6 +3,12 @@
 namespace GFPDF\Helper;
 
 use GFPDF\Model\Model_Form_Settings;
+use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Misc;
+use GFPDF\Helper\Helper_Notices;
+
+use Psr\Log\LoggerInterface;
 
 /**
  * Our Gravity PDF Options API
@@ -50,6 +56,44 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Helper_Options implements Helper_Interface_Filters {
 
 	/**
+	 * Holds abstracted functions related to the forms plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $form;
+
+	/**
+	 * Holds our log class
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $log;
+
+	/**
+	 * Holds our Helper_Data object
+	 * which we can autoload with any data needed
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $data;
+
+	/**
+	 * Holds our Helper_Misc object
+	 * Makes it easy to access common methods throughout the plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $misc;
+
+	/**
+	 * Holds our Helper_Notices object
+	 * which we can use to queue up admin messages for the user
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $notices;
+
+	/**
 	 * Holds the current global user settings
 	 * @var Array
 	 * @since 4.0
@@ -62,6 +106,17 @@ class Helper_Options implements Helper_Interface_Filters {
 	 * @since 4.0
 	 */
 	private $form_settings = array();
+
+
+	public function __construct( LoggerInterface $log, Helper_Abstract_Form $form, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices ) {
+		
+		/* Assign our internal variables */
+		$this->log     = $log;
+		$this->form    = $form;
+		$this->data    = $data;
+		$this->misc    = $misc;
+		$this->notices = $notices;
+	}
 
 	/**
 	 * Initialise the options API
@@ -124,7 +179,6 @@ class Helper_Options implements Helper_Interface_Filters {
 	 * @since 4.0
 	 */
 	public function get_form_settings() {
-		global $gfpdf;
 
 		/* get GF settings */
 		$form_id = ( ! empty( rgget( 'id' ) ) ) ? (int) rgget( 'id' ) : (int) rgpost( 'id' );
@@ -132,7 +186,7 @@ class Helper_Options implements Helper_Interface_Filters {
 
 		/* return early if no ID set */
 		if ( ! $form_id ) {
-			$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Settings Retreival Error', array(
+			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Settings Retreival Error', array(
 				'form_id' => $form_id,
 				'pid'     => $pid,
 			) );
@@ -140,7 +194,7 @@ class Helper_Options implements Helper_Interface_Filters {
 			return array();
 		}
 
-		$model = new Model_Form_Settings();
+		$model = new Model_Form_Settings( $this->form, $this->log, $this->data, $this, $this->misc, $this->notices );
 		$settings = $model->get_settings( $form_id );
 
 		if ( ! is_wp_error( $settings ) ) {
@@ -148,7 +202,7 @@ class Helper_Options implements Helper_Interface_Filters {
 			return (isset($settings[$pid])) ? $settings[$pid] : array();
 		}
 
-		$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Settings Retreival Error', array(
+		$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Settings Retreival Error', array(
 			'form_id'  => $form_id,
 			'pid'      => $pid,
 			'WP_Error' => $settings,
@@ -264,11 +318,10 @@ class Helper_Options implements Helper_Interface_Filters {
 	 * @return boolean True if updated, false if not.
 	 */
 	public function update_option( $key = '', $value = false ) {
-		global $gfpdf;
 
 		// If no key, exit
 		if ( empty( $key ) ) {
-			$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Option Update Error', array(
+			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Option Update Error', array(
 				'key'   => $key,
 				'value' => $value,
 			) );
@@ -312,7 +365,7 @@ class Helper_Options implements Helper_Interface_Filters {
 
 		// If no key, exit
 		if ( empty( $key ) ) {
-			$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Option Delete Error' );
+			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Option Delete Error' );
 			return false;
 		}
 
@@ -339,14 +392,13 @@ class Helper_Options implements Helper_Interface_Filters {
 	 * @since 4.0
 	 */
 	public function get_capabilities() {
-		global $gfpdf;
 
 		/* sort through all roles and fetch unique capabilities */
 		$roles        = get_editable_roles();
 		$capabilities = array();
 
 		/* Add Gravity Forms Capabilities */
-		$gf_caps = $gfpdf->form->get_capabilities();
+		$gf_caps = $this->form->get_capabilities();
 
 		foreach ( $gf_caps as $gf_cap ) {
 			$capabilities['Gravity Forms Capabilities'][$gf_cap] = apply_filters( 'gfpdf_capability_name', $gf_cap );
@@ -449,7 +501,6 @@ class Helper_Options implements Helper_Interface_Filters {
 	 * @todo
 	 */
 	public function get_templates() {
-		global $gfpdf;
 
 		$templates = array();
 		$legacy    = array();
@@ -460,7 +511,7 @@ class Helper_Options implements Helper_Interface_Filters {
 		/**
 		 * Load the user's templates
 		 */
-		foreach ( glob( $gfpdf->data->template_location . '*.php' ) as $filename ) {
+		foreach ( glob( $this->data->template_location . '*.php' ) as $filename ) {
 
 			$info = $this->get_template_headers( $filename );
 			$file = basename( $filename, '.php' );
@@ -468,7 +519,7 @@ class Helper_Options implements Helper_Interface_Filters {
 			if ( ! empty($info['template']) ) {
 				$templates[$prefix_text . $info['group']][$file] = $info['template'];
 			} else if ( substr( $file, 0, 8 ) != 'example-' ) { /* exclude the example templates */
-				$legacy[$file] = $gfpdf->misc->human_readable( $file );
+				$legacy[$file] = $this->misc->human_readable( $file );
 			}
 		}
 
@@ -526,10 +577,9 @@ class Helper_Options implements Helper_Interface_Filters {
 	 * @since 4.0
 	 */
 	public function get_template_information( $name ) {
-		global $gfpdf;
 
-		if ( is_file( $gfpdf->data->template_location . $name . '.php' ) ) {
-			$template          = $this->get_template_headers( $gfpdf->data->template_location . $name . '.php' );
+		if ( is_file( $this->data->template_location . $name . '.php' ) ) {
+			$template          = $this->get_template_headers( $this->data->template_location . $name . '.php' );
 			$template['group'] = __( 'User Templates: ', 'gravitypdf' ) . $template['group'];
 			return $template;
 		}
@@ -633,7 +683,6 @@ class Helper_Options implements Helper_Interface_Filters {
 	 * @since 4.0
 	 */
 	public function add_custom_fonts( $fonts = array() ) {
-		global $gfpdf;
 
 		$custom_fonts = $this->get_custom_fonts();
 
@@ -647,7 +696,7 @@ class Helper_Options implements Helper_Interface_Filters {
 			}
 
 			/* Merge the new fonts at the beginning of the $fonts array */
-			$fonts = $gfpdf->misc->array_unshift_assoc( $fonts, __( 'User-Defined Fonts', 'gravitypdf' ), $user_defined_fonts );
+			$fonts = $this->misc->array_unshift_assoc( $fonts, __( 'User-Defined Fonts', 'gravitypdf' ), $user_defined_fonts );
 		}
 
 		return $fonts;
@@ -719,6 +768,24 @@ class Helper_Options implements Helper_Interface_Filters {
 		);
 
 		return apply_filters( 'gfpdf_privilages_list', $privilages );
+	}
+
+	/**
+	 * Increment the PDF Generation Counter
+	 * To decrease load on the database we'll increment by 10 after a rand() function matches
+	 * This is less accurate but we only need a rough guesstimation to prompt the user
+	 * @return void
+	 * @since 4.0
+	 */
+	public function increment_pdf_count() {
+
+		$rand = rand(1, 10);
+
+		if( 10 === $rand ) {
+			$total_pdf_count = (int) $this->get_option( 'pdf_count', 0 );
+			$total_pdf_count += 10;
+			$this->update_option( 'pdf_count', $total_pdf_count );
+		}
 	}
 
 	/**
@@ -1039,7 +1106,6 @@ class Helper_Options implements Helper_Interface_Filters {
 	 *
 	 * @since 4.0
 	 * @param array $args Arguments passed by the setting
-	 * @global $gfpdf Array of all the Gravity PDF Options
 	 * @return void
 	 */
 	public function checkbox_callback( $args ) {
@@ -1066,7 +1132,6 @@ class Helper_Options implements Helper_Interface_Filters {
 	 *
 	 * @since 4.0
 	 * @param array $args Arguments passed by the setting
-	 * @global $gfpdf Array of all the Gravity PDF Options
 	 * @return void
 	 */
 	public function multicheck_callback( $args ) {
@@ -1103,7 +1168,6 @@ class Helper_Options implements Helper_Interface_Filters {
 	 *
 	 * @since 4.0
 	 * @param array $args Arguments passed by the setting
-	 * @global $gfpdf Array of all the Gravity PDF Options
 	 * @return void
 	 */
 	public function radio_callback( $args ) {
@@ -1141,7 +1205,6 @@ class Helper_Options implements Helper_Interface_Filters {
 	 *
 	 * @since 4.0
 	 * @param array $args Arguments passed by the setting
-	 * @global $gfpdf Array of all the Gravity PDF Options
 	 * @return void
 	 */
 	public function text_callback( $args ) {
@@ -1170,7 +1233,6 @@ class Helper_Options implements Helper_Interface_Filters {
 	 *
 	 * @since 4.0
 	 * @param array $args Arguments passed by the setting
-	 * @global $gfpdf Array of all the Gravity PDF Options
 	 * @return void
 	 */
 	public function number_callback( $args ) {
@@ -1210,7 +1272,6 @@ class Helper_Options implements Helper_Interface_Filters {
 	 *
 	 * @since 4.0
 	 * @param array $args Arguments passed by the setting
-	 * @global $gfpdf Array of all the Gravity PDF Options
 	 * @return void
 	 */
 	public function textarea_callback( $args ) {
@@ -1245,7 +1306,6 @@ class Helper_Options implements Helper_Interface_Filters {
 	 *
 	 * @since 4.0
 	 * @param array $args Arguments passed by the setting
-	 * @global $gfpdf Array of all the Gravity PDF Options
 	 * @return void
 	 */
 	public function password_callback( $args ) {
@@ -1274,7 +1334,6 @@ class Helper_Options implements Helper_Interface_Filters {
 	 *
 	 * @since 4.0
 	 * @param array $args Arguments passed by the setting
-	 * @global $gfpdf Array of all the Gravity PDF Options
 	 * @return void
 	 */
 	public function select_callback( $args ) {
@@ -1347,7 +1406,6 @@ class Helper_Options implements Helper_Interface_Filters {
 	 *
 	 * @since 4.0
 	 * @param array $args Arguments passed by the setting
-	 * @global $gfpdf Array of all the Gravity PDF Options
 	 * @global $wp_version WordPress Version
 	 */
 	public function rich_editor_callback( $args ) {
@@ -1390,7 +1448,6 @@ class Helper_Options implements Helper_Interface_Filters {
 	 *
 	 * @since 4.0
 	 * @param array $args Arguments passed by the setting
-	 * @global $gfpdf Array of all the Gravity PDF Options
 	 * @return void
 	 */
 	public function upload_callback( $args ) {
@@ -1424,7 +1481,6 @@ class Helper_Options implements Helper_Interface_Filters {
 	 *
 	 * @since 4.0
 	 * @param array $args Arguments passed by the setting
-	 * @global $gfpdf Array of all the Gravity PDF Options
 	 * @return void
 	 */
 	public function color_callback( $args ) {
@@ -1457,7 +1513,6 @@ class Helper_Options implements Helper_Interface_Filters {
 	 * @return void
 	 */
 	public function button_callback( $args ) {
-		global $gfpdf;
 
 		$tab = (isset($_GET['tab'])) ? esc_attr( $_GET['tab'] ) : 'general';
 		$nonce = wp_create_nonce( 'gfpdf_settings[' . $args['id'] . ']' );

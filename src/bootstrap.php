@@ -125,25 +125,27 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function init() {
 
+		/* Set up our logger */
+		$this->setup_logger();
+
 		/* Set up our form object */
 		$this->form = new Helper\Helper_Form();
-
-		/* Set up our misc object */
-		$this->misc = new Helper\Helper_Misc();
-
-		/* Set up our notices */
-		$this->notices = new Helper\Helper_Notices();
-		$this->notices->init();
 
 		/* Set up our data access layer */
 		$this->data = new Helper\Helper_Data();
 		$this->data->init();
 
-		/* Set up our logger */
-		$this->setup_logger();
+		/* Set up our misc object */
+		$this->misc = new Helper\Helper_Misc( $this->log, $this->form, $this->data );
+
+		/* Set up our notices */
+		$this->notices = new Helper\Helper_Notices();
+		$this->notices->init();
+
+
 
 		/* Set up our options object - this is initialised on admin_init but other classes need to access its methods before this */
-		$this->options = new Helper\Helper_Options_Fields();
+		$this->options = new Helper\Helper_Options_Fields( $this->log, $this->form, $this->data, $this->misc, $this->notices );
 
 		/* Load modules */
 		$this->installer();
@@ -334,7 +336,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/*
         * Localise admin script
         */
-		wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $this->data->get_localised_script_data() );
+		wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $this->data->get_localised_script_data( $this->options, $this->form ) );
 	}
 
 
@@ -344,9 +346,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @return void
 	 */
 	public function load_assets() {
-		global $gfpdf;
 
-		if ( $gfpdf->misc->is_gfpdf_page() ) {
+		if ( $this->misc->is_gfpdf_page() ) {
 			/* load styles */
 			wp_enqueue_style( 'gfpdf_css_styles' );
 			wp_enqueue_style( 'gfpdf_css_chosen_style' );
@@ -359,7 +360,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			wp_enqueue_media();
 		}
 
-		if ( $gfpdf->misc->is_gfpdf_settings_tab( 'help' ) || $gfpdf->misc->is_gfpdf_settings_tab( 'tools' ) ) {
+		if ( $this->misc->is_gfpdf_settings_tab( 'help' ) || $this->misc->is_gfpdf_settings_tab( 'tools' ) ) {
 			 wp_enqueue_script( 'gfpdf_js_backbone' );
 		}
 
@@ -478,8 +479,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	}
 
 	public function installer() {
-		$model = new Model\Model_Install();
-		$class = new Controller\Controller_Install( $model );
+		$model = new Model\Model_Install( $this->log, $this->data, $this->misc, $this->notices );
+		$class = new Controller\Controller_Install( $model, $this->form, $this->log, $this->notices, $this->data, $this->misc );
 		$class->init();
 
 		/* set up required data */
@@ -493,12 +494,12 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function welcome_screen() {
 
-		$model = new Model\Model_Welcome_Screen();
+		$model = new Model\Model_Welcome_Screen( $this->log );
 		$view  = new View\View_Welcome_Screen(array(
 			'display_version' => PDF_EXTENDED_VERSION,
-		));
+		), $this->form );
 
-		$class = new Controller\Controller_Welcome_Screen( $model, $view );
+		$class = new Controller\Controller_Welcome_Screen( $model, $view, $this->log, $this->data, $this->options );
 		$class->init();
 	}
 
@@ -509,10 +510,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function gf_settings() {
 
-		$model = new Model\Model_Settings();
-		$view  = new View\View_Settings( array() );
+		$model = new Model\Model_Settings( $this->form, $this->log, $this->notices, $this->options, $this->data, $this->misc );
+		$view  = new View\View_Settings( array(), $this->form, $this->log, $this->options, $this->data, $this->misc );
 
-		$class = new Controller\Controller_Settings( $model, $view );
+		$class = new Controller\Controller_Settings( $model, $view, $this->form, $this->log, $this->notices, $this->data, $this->misc );
 		$class->init();
 	}
 
@@ -523,10 +524,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function gf_form_settings() {
 
-		$model = new Model\Model_Form_Settings();
+		$model = new Model\Model_Form_Settings( $this->form, $this->log, $this->data, $this->options, $this->misc, $this->notices );
 		$view  = new View\View_Form_Settings( array() );
 
-		$class = new Controller\Controller_Form_Settings( $model, $view );
+		$class = new Controller\Controller_Form_Settings( $model, $view, $this->data, $this->options );
 		$class->init();
 	}
 
@@ -537,10 +538,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function pdf() {
 
-		$model = new Model\Model_PDF();
-		$view  = new View\View_PDF( array() );
+		$model = new Model\Model_PDF( $this->form, $this->log, $this->options, $this->data, $this->misc, $this->notices );
+		$view  = new View\View_PDF( array(), $this->form, $this->log, $this->options, $this->data, $this->misc );
 
-		$class = new Controller\Controller_PDF( $model, $view );
+		$class = new Controller\Controller_PDF( $model, $view, $this->form, $this->log );
 		$class->init();
 	}
 
@@ -551,10 +552,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function shortcodes() {
 
-		$model = new Model\Model_Shortcodes();
+		$model = new Model\Model_Shortcodes( $this->form, $this->log );
 		$view  = new View\View_Shortcodes( array() );
 
-		$class = new Controller\Controller_Shortcodes( $model, $view );
+		$class = new Controller\Controller_Shortcodes( $model, $view, $this->log );
 		$class->init();
 	}
 
@@ -565,10 +566,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function actions() {
 
-		$model = new Model\Model_Actions();
+		$model = new Model\Model_Actions( $this->options );
 		$view  = new View\View_Actions( array() );
 
-		$class = new Controller\Controller_Actions( $model, $view );
+		$class = new Controller\Controller_Actions( $model, $view, $this->form, $this->log, $this->notices );
 		$class->init();
 	}
 

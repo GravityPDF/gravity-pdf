@@ -309,8 +309,9 @@ $font                    = (!empty($settings['font'])) 		                ? $sett
 			 * full namespace (as we have done below)
 			 *
 			 */
-			$pdf = new GFPDF\View\View_PDF;
-			$pdf->process_html_structure($entry, new GFPDF\Model\Model_PDF(), $config);
+			$pdf = new GFPDF\View\View_PDF( array(), $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
+			$pdf->process_html_structure($entry, new GFPDF\Model\Model_PDF( $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices ), $config);
+
 		?>
 	</body>
 </html>

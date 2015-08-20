@@ -54,8 +54,6 @@ class Helper_Options_Fields extends Helper_Options {
 	 */
 	public function get_registered_fields() {
 
-		global $gfpdf;
-
 		/**
 		 * Gravity PDF settings
 		 * Filters are provided for each settings section to allow extensions and other plugins to add their own option
@@ -102,7 +100,7 @@ class Helper_Options_Fields extends Helper_Options {
 					'default_font_type' => array(
 						'id'         => 'default_font_type',
 						'name'       => __( 'Default Font Type', 'gravitypdf' ),
-						'desc'       => sprintf( __( 'Set the default font type used in PDFs. Choose an existing font or %sinstall your own%s.', 'gravitypdf' ), '<a href="'. $gfpdf->data->settings_url .'&tab=tools#manage_fonts">', '</a>' ),
+						'desc'       => sprintf( __( 'Set the default font type used in PDFs. Choose an existing font or %sinstall your own%s.', 'gravitypdf' ), '<a href="'. $this->data->settings_url .'&tab=tools#manage_fonts">', '</a>' ),
 						'type'       => 'select',
 						'options'    => $this->get_installed_fonts(),
 						'inputClass' => 'large',
@@ -355,7 +353,7 @@ class Helper_Options_Fields extends Helper_Options {
 						'type'    => 'select',
 						'options' => $this->get_installed_fonts(),
 						'std'     => $this->get_option( 'default_font_type' ),
-						'desc'    => sprintf( __( 'Set the font type used in PDFs. Choose an existing font or %sinstall your own%s.', 'gravitypdf' ), '<a href="'. $gfpdf->data->settings_url .'&tab=tools#manage_fonts">', '</a>' ),
+						'desc'    => sprintf( __( 'Set the font type used in PDFs. Choose an existing font or %sinstall your own%s.', 'gravitypdf' ), '<a href="'. $this->data->settings_url .'&tab=tools#manage_fonts">', '</a>' ),
 						'inputClass'   => 'large',
 						'chosen'  => true,
 						'tooltip'    => '<h6>' . __( 'Fonts', 'gravitypdf' ) . '</h6>' . __( 'Gravity PDF comes bundled with fonts for most languages world-wide. Want to use a specific font type? Use the font installer (found in the Forms -> Settings -> Tools tab).', 'gravitypdf' ),

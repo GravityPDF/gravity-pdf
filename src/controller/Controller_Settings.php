@@ -7,6 +7,12 @@ use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_View;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
+use GFPDF\Helper\Helper_Notices;
+use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Helper_Misc;
+
+use Psr\Log\LoggerInterface;
 
 use GFForms;
 
@@ -53,10 +59,56 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Controller_Settings extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters
 {
 	/**
+	 * Holds abstracted functions related to the forms plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $form;
+
+	/**
+	 * Holds our log class
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $log;
+
+	/**
+	 * Holds our Helper_Notices object
+	 * which we can use to queue up admin messages for the user
+	 * @var Object Helper_Notices
+	 * @since 4.0
+	 */
+	protected $notices;
+
+	/**
+	 * Holds our Helper_Data object
+	 * which we can autoload with any data needed
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $data;
+
+	/**
+	 * Holds our Helper_Misc object
+	 * Makes it easy to access common methods throughout the plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $misc;
+
+	/**
 	 * Load our model and view and required actions
 	 */
-	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view ) {
-		/* load our model and view */
+	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Abstract_Form $form, LoggerInterface $log, Helper_Notices $notices, Helper_Data $data, Helper_Misc $misc ) {
+		
+		/* Assign our internal variables */
+		$this->form    = $form;
+		$this->log     = $log;
+		$this->notices = $notices;
+		$this->data    = $data;
+		$this->misc    = $misc;
+
+		/* Load our model and view */
 		$this->model = $model;
 		$this->model->setController( $this );
 
@@ -70,13 +122,12 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	 * @return void
 	 */
 	public function init() {
-		global $gfpdf;
 
 		/*
          * Tell Gravity Forms to initiate our settings page
          * Using the following Class/Model
          */
-		 GFForms::add_settings_page( $gfpdf->data->short_title, array( $this, 'displayPage' ) );
+		 GFForms::add_settings_page( $this->data->short_title, array( $this, 'displayPage' ) );
 
 		 /* Ensure any errors are stored correctly */
 		 $this->model->setup_form_settings_errors();
@@ -92,7 +143,6 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	 * @return void
 	 */
 	public function add_actions() {
-		global $gfpdf;
 
 		/* Load our settings meta boxes */
 		add_action( 'current_screen', array( $this->model, 'add_meta_boxes' ) );
@@ -102,7 +152,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		add_action( 'pdf-settings-tools', array( $this->view, 'system_status' ) );
 
 		/* Display the uninstaller if use has the correct permissions */
-		if ( $gfpdf->form->has_capability( 'gravityforms_uninstall' ) ) {
+		if ( $this->form->has_capability( 'gravityforms_uninstall' ) ) {
 			add_action( 'pdf-settings-tools', array( $this->view, 'uninstaller' ), 5 );
 		}
 
@@ -123,13 +173,12 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	 * @return void
 	 */
 	public function add_filters() {
-		global $gfpdf;
 
 		/* Add tooltips */
 		add_filter( 'gform_tooltips', array( $this->view, 'add_tooltips' ) );
 
 		/* If trying to save settings page we'll use this filter to apply any errors passed back from options.php */
-		if ( $gfpdf->misc->is_gfpdf_page() ) {
+		if ( $this->misc->is_gfpdf_page() ) {
 			add_filter( 'gfpdf_registered_settings', array( $this->model, 'highlight_errors' ) );
 			add_filter( 'admin_notices', 'settings_errors' );
 		}
@@ -180,10 +229,9 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	 * @return void
 	 */
 	public function edit_options_cap() {
-		global $gfpdf;
 
 		/* because current_user_can() doesn't handle Gravity Forms permissions quite correct we'll do our checks here */
-		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			
 			$gfpdf->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
@@ -204,10 +252,9 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	 * @return array
 	 */
 	public function disable_tools_on_view_cap( $nav ) {
-		global $gfpdf;
 		
-		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
-			$gfpdf->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities' );
+		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
+			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities' );
 
 			unset($nav[100]); /* remove tools tab */
 		}
@@ -221,17 +268,16 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	 * @since 4.0
 	 */
 	public function process_tool_tab_actions() {
-		global $gfpdf;
 
 		/* check if we are on the tools settings page */
-		if ( ! $gfpdf->misc->is_gfpdf_settings_tab( 'tools' ) ) {
+		if ( ! $this->misc->is_gfpdf_settings_tab( 'tools' ) ) {
 			return;
 		}
 
 		/* check if the user has permission to copy the templates */
-		if ( ! $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			
-			$gfpdf->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
+			$this->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
 				'user_meta' => get_user_meta( get_current_user_id() )
 			) );
@@ -245,8 +291,8 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		if ( isset($settings['setup_templates']['name']) ) {
 			/* verify the nonce */
 			if ( ! wp_verify_nonce( $settings['setup_templates']['nonce'], 'gfpdf_settings[setup_templates]' ) ) {
-				 $gfpdf->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
-				 $gfpdf->notices->add_error( __( 'There was a problem installing the PDF templates. Please try again.', 'gravitypdf' ) );
+				 $this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
+				 $this->notices->add_error( __( 'There was a problem installing the PDF templates. Please try again.', 'gravitypdf' ) );
 				 return false;
 			}
 

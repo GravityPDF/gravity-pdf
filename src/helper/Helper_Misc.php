@@ -3,6 +3,11 @@
 namespace GFPDF\Helper;
 
 use GFPDF\Model\Model_PDF;
+use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Helper_Data;
+
+use Psr\Log\LoggerInterface;
+
 use WP_Error;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -47,6 +52,43 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Helper_Misc
 {
+
+	/**
+	 * Holds abstracted functions related to the forms plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $form;
+
+	/**
+	 * Holds our log class
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $log;
+
+	/**
+	 * Holds our Helper_Data object
+	 * which we can autoload with any data needed
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $data;
+
+	/**
+	 * Store required classes locally
+	 * @param LoggerInterface      $log
+	 * @param Helper_Abstract_Form $form
+	 * @param Helper_Data          $data
+	 * @since 4.0
+	 */
+	public function __construct( LoggerInterface $log, Helper_Abstract_Form $form, Helper_Data $data ) {
+		
+		/* Assign our internal variables */
+		$this->log  = $log;
+		$this->form = $form;
+		$this->data = $data;
+	}
 
 	/**
 	 * Check if the current admin page is a Gravity PDF page
@@ -182,7 +224,6 @@ class Helper_Misc
 	 * @param String $dir The path to be deleted
 	 */
 	public function rmdir( $dir ) {
-		global $gfpdf;
 
 		try {
 			$files = new RecursiveIteratorIterator(
@@ -195,7 +236,7 @@ class Helper_Misc
 				$function($fileinfo->getRealPath());
 			}
 		} catch (Exception $e) {
-			$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Filesystem Delete Error', array(
+			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Filesystem Delete Error', array(
 				'dir'       => $dir,
 				'exception' => $e,
 			) );
@@ -226,14 +267,14 @@ class Helper_Misc
 			);
 
 			foreach ( $files as $fileinfo ) {
-				if ( $fileinfo->isDir() ) {
-					mkdir( $destination.DIRECTORY_SEPARATOR.$files->getSubPathName() );
-				} else {
-					copy( $fileinfo, $destination.DIRECTORY_SEPARATOR.$files->getSubPathName() );
+				if ( $fileinfo->isDir() && ! file_exists( $destination . DIRECTORY_SEPARATOR . $files->getSubPathName() ) ) {
+					mkdir( $destination . DIRECTORY_SEPARATOR . $files->getSubPathName() );
+				} elseif ( ! file_exists ( DIRECTORY_SEPARATOR . $files->getSubPathName() ) ) {
+					copy( $fileinfo, $destination . DIRECTORY_SEPARATOR . $files->getSubPathName() );
 				}
 			}
 		} catch (Exception $e) {
-			$gfpdf->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Filesystem Copy Error', array(
+			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Filesystem Copy Error', array(
 				'source'      => $source,
 				'destination' => $destination,
 				'exception'   => $e,
@@ -381,13 +422,8 @@ class Helper_Misc
 	public function get_template_args( $entry, $settings ) {
 		global $gfpdf;
 
-		/*
-         * @todo TEMP FIX so we can render PDF
-         */
-		error_reporting( E_ALL ^ E_NOTICE );
-
-		$form = $gfpdf->form->get_form( $entry['form_id'] );
-		$pdf  = new Model_PDF();
+		$form = $this->form->get_form( $entry['form_id'] );
+		$pdf  = new Model_PDF( $this->form, $this->log, $gfpdf->options, $this->data, $this, $gfpdf->notices );
 
 		return apply_filters('gfpdf_template_args', array(
 
@@ -411,7 +447,6 @@ class Helper_Misc
 	 * @return String Full URL to image
 	 */
 	public function get_template_image( $template ) {
-		global $gfpdf;
 
 		/* Add our extension */
 		$template .= '.png';
@@ -420,31 +455,12 @@ class Helper_Misc
 		$default_template_path = PDF_PLUGIN_DIR.$relative_image_path;
 		$default_template_url  = PDF_PLUGIN_URL.$relative_image_path;
 
-		if ( is_file( $gfpdf->data->template_location.'images/'.$template ) ) {
-			return $gfpdf->data->template_location_url.'images/'.$template;
+		if ( is_file( $this->data->template_location.'images/'.$template ) ) {
+			return $this->data->template_location_url.'images/'.$template;
 		} elseif ( is_file( $default_template_path.$template ) ) {
 			return $default_template_url.$template;
 		}
 
 		return false;
-	}
-
-	/**
-	 * Increment the PDF Generation Counter
-	 * To decrease load on the database we'll increment by 10 after a rand() function matches
-	 * This is less accurate but we only need a rough guesstimation to prompt the user
-	 * @return void
-	 * @since 4.0
-	 */
-	public function increment_pdf_count() {
-		global $gfpdf;
-
-		$rand = rand(1, 10);
-
-		if( 10 === $rand ) {
-			$total_pdf_count = (int) $gfpdf->options->get_option( 'pdf_count', 0 );
-			$total_pdf_count += 10;
-			$gfpdf->options->update_option( 'pdf_count', $total_pdf_count );
-		}
 	}
 }

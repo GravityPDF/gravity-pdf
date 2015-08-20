@@ -2,6 +2,8 @@
 
 namespace GFPDF\Helper\Fields;
 
+use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Abstract_Fields;
 
 use GFCommon;
@@ -57,13 +59,14 @@ class Field_Date extends Helper_Abstract_Fields
 	 * @param Array  $entry The Gravity Forms Entry
 	 * @since 4.0
 	 */
-	public function __construct( $field, $entry ) {
+	public function __construct( $field, $entry, Helper_Abstract_Form $form, Helper_Misc $misc ) {
+		
 		if ( ! is_object( $field ) || ! $field instanceof GF_Field_Date ) {
 			throw new Exception( '$field needs to be in instance of GF_Field_Date' );
 		}
 
 		/* call our parent method */
-		parent::__construct( $field, $entry );
+		parent::__construct( $field, $entry, $form, $misc );
 	}
 
 	/**

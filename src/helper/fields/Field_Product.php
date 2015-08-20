@@ -2,6 +2,8 @@
 
 namespace GFPDF\Helper\Fields;
 
+use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Abstract_Fields;
 
 use GFFormsModel;
@@ -60,18 +62,11 @@ class Field_Product extends Helper_Abstract_Fields
 	private $products;
 
 	/**
-	 * Check the appropriate variables are parsed in send to the parent construct
-	 * @param Object $field The GF_Field_* Object
-	 * @param Array  $entry The Gravity Forms Entry
-	 * @param Object $products A class that gets the full breakdown of products for the form
+	 * Store our products class for later user
+	 * @param Helper_Abstract_Fields $products
 	 * @since 4.0
 	 */
-	public function __construct( $field, $entry, Helper_Abstract_Fields $products ) {
-
-		/* call our parent method */
-		parent::__construct( $field, $entry );
-
-		/* store our products class */
+	public function set_products( Helper_Abstract_Fields $products ) {
 		$this->products = $products;
 	}
 

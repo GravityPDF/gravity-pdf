@@ -2,6 +2,8 @@
 
 namespace GFPDF\Helper\Fields;
 
+use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Abstract_Fields;
 
 use Exception;
@@ -54,29 +56,28 @@ class Field_Post_Custom_Field extends Helper_Abstract_Fields
 	 * @param Array  $entry The Gravity Forms Entry
 	 * @since 4.0
 	 */
-	public function __construct( $field, $entry ) {
-		global $gfpdf;
+	public function __construct( $field, $entry, Helper_Abstract_Form $form, Helper_Misc $misc ) {
 
 		/* call our parent method */
-		parent::__construct( $field, $entry );
+		parent::__construct( $field, $entry, $form, $misc );
 
 		/*
          * Custom Field can be any of the following field types:
          * single line text, paragraph, dropdown, select, number, checkbox, radio, hidden,
          * date, time, phone, website, email, file upload or list
          */
-		$class = $gfpdf->misc->get_field_class( $field->inputType );
+		$class = $this->misc->get_field_class( $field->inputType );
 
 		try {
 			/* check load our class */
 			if ( class_exists( $class ) ) {
-				$this->fieldObject = new $class($field, $entry);
+				$this->fieldObject = new $class( $field, $entry, $form, $misc );
 			} else {
 				throw new Exception( 'Class not found' );
 			}
 		} catch (Exception $e) {
 			/* Exception thrown. Load generic field loader */
-			$this->fieldObject = new Field_Default( $field, $entry );
+			$this->fieldObject = new Field_Default( $field, $entry, $form, $misc );
 		}
 
 		/* force the fieldObject value cache */

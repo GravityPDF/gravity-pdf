@@ -2,6 +2,8 @@
 
 namespace GFPDF\Helper\Fields;
 
+use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Abstract_Fields;
 
 use GFFormsModel;
@@ -57,13 +59,14 @@ class Field_Fileupload extends Helper_Abstract_Fields
 	 * @param Array  $entry The Gravity Forms Entry
 	 * @since 4.0
 	 */
-	public function __construct( $field, $entry ) {
+	public function __construct( $field, $entry, Helper_Abstract_Form $form, Helper_Misc $misc ) {
+		
 		if ( ! is_object( $field ) || ! $field instanceof GF_Field_FileUpload ) {
 			throw new Exception( '$field needs to be in instance of GF_Field_FileUpload' );
 		}
 
 		/* call our parent method */
-		parent::__construct( $field, $entry );
+		parent::__construct( $field, $entry, $form, $misc );
 	}
 
 	/**
@@ -72,7 +75,6 @@ class Field_Fileupload extends Helper_Abstract_Fields
 	 * @since 4.0
 	 */
 	public function form_data() {
-		global $gfpdf;
 
 		$data  = array();
 		$label = GFFormsModel::get_label( $this->field );
@@ -84,7 +86,7 @@ class Field_Fileupload extends Helper_Abstract_Fields
 			$data[ $this->field->id ][]                = $image;
 			$data[ $label ][]                          = $image;
 
-			$path = $gfpdf->misc->convert_url_to_path( $image );
+			$path = $this->misc->convert_url_to_path( $image );
 
 			$data[ $this->field->id . '_path' ][]                = $path;
 			$data[ $this->field->id . '.' . $label . '_path' ][] = $path;

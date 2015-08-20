@@ -2,6 +2,10 @@
 
 namespace GFPDF\Helper;
 
+use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Helper_Misc;
+use GFPDF\Helper\Helper_Options;
+
 use WP_List_Table;
 
 
@@ -53,14 +57,40 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	public $form;
 
 	/**
+	 * Holds abstracted functions related to the forms plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $form_plugin;
+
+	/**
+	 * Holds our Helper_Misc object
+	 * Makes it easy to access common methods throughout the plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $misc;
+
+	/**
+	 * Holds our Helper_Options / Helper_Options_Fields object
+	 * Makes it easy to access global PDF settings and individual form PDF settings
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $options;
+
+	/**
 	 * Setup our class with appropriate data (columns, form
 	 * @param  array $form A Gravity Form meta data array
 	 * @since 4.0
 	 */
-	public function __construct( $form ) {
+	public function __construct( $form, Helper_Abstract_Form $form_plugin, Helper_Misc $misc, Helper_Options $options ) {
 
-		/* Store our Gravity Form for later user */
-		$this->form = $form;
+		/* Assign our internal variables */
+		$this->form        = $form;
+		$this->form_plugin = $form_plugin;
+		$this->misc        = $misc;
+		$this->options     = $options;
 
 		/* Cache column header internally so we don't have to work with the global get_column_headers() function */
 		$this->_column_headers = array(
@@ -171,14 +201,13 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * @since 4.0
 	 */
 	public function column_cb( $item ) {
-		global $gfpdf;
 
 		$is_active   = isset( $item['active'] ) ? $item['active'] : true;
 		$form_id     = rgget( 'id' );
 		$state_nonce = wp_create_nonce( "gfpdf_state_nonce_{$form_id}_{$item['id']}" );
 		?>
 
-		<img data-id="<?php echo $item['id'] ?>" data-nonce="<?php echo $state_nonce; ?>" data-fid="<?php echo $form_id; ?>" src="<?php echo $gfpdf->form->get_plugin_url() ?>/images/active<?php echo intval( $is_active ) ?>.png" style="cursor: pointer;margin:-1px 0 0 8px;" alt="<?php $is_active ? __( 'Active', 'gravitypdf' ) : __( 'Inactive', 'gravitypdf' ); ?>" title="<?php echo $is_active ? __( 'Active', 'gravitypdf' ) : __( 'Inactive', 'gravitypdf' ); ?>"/>
+		<img data-id="<?php echo $item['id'] ?>" data-nonce="<?php echo $state_nonce; ?>" data-fid="<?php echo $form_id; ?>" src="<?php echo $this->form_plugin->get_plugin_url() ?>/images/active<?php echo intval( $is_active ) ?>.png" style="cursor: pointer;margin:-1px 0 0 8px;" alt="<?php $is_active ? __( 'Active', 'gravitypdf' ) : __( 'Inactive', 'gravitypdf' ); ?>" title="<?php echo $is_active ? __( 'Active', 'gravitypdf' ) : __( 'Inactive', 'gravitypdf' ); ?>"/>
 		
 		<?php
 	}
@@ -214,14 +243,13 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * @since 4.0
 	 */
 	public function column_template( $item ) {
-		global $gfpdf;
 
-		$template = $gfpdf->options->get_template_information( $item['template'] );
+		$template = $this->options->get_template_information( $item['template'] );
 
 		if ( is_array( $template ) && isset($template['template']) ) {
 			echo "<strong>{$template['group']} – </strong> {$template['template']}";
 		} else {
-			echo "<strong>{$template['group']}</strong> – " . $gfpdf->misc->human_readable( rgar( $item, 'template' ) );
+			echo "<strong>{$template['group']}</strong> – " . $this->misc->human_readable( rgar( $item, 'template' ) );
 		}
 	}
 

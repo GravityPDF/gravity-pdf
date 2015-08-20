@@ -7,6 +7,8 @@ use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_View;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
+use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Options;
 
 /**
  * Form Settings (PDF Configuration) Controller
@@ -51,10 +53,31 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Controller_Form_Settings extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters
 {
 	/**
+	 * Holds our Helper_Data object
+	 * which we can autoload with any data needed
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $data;
+
+	/**
+	 * Holds our Helper_Options / Helper_Options_Fields object
+	 * Makes it easy to access global PDF settings and individual form PDF settings
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $options;
+
+	/**
 	 * Load our model and view and required actions
 	 */
-	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view ) {
-		/* load our model and view */
+	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Data $data, Helper_Options $options ) {
+		
+		/* Assign our internal variables */
+		$this->data    = $data;
+		$this->options = $options;
+
+		/* Load our model and view */
 		$this->model = $model;
 		$this->model->setController( $this );
 
@@ -68,6 +91,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	 * @return void
 	 */
 	public function init() {
+
 		/*
          * Tell Gravity Forms to add our form PDF settings pages
          */
@@ -81,14 +105,13 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	 * @return void
 	 */
 	public function add_actions() {
-		global $gfpdf;
 
 		/* Trigger our save method */
 		add_action( 'admin_init', array( $this, 'maybe_save_pdf_settings' ), 5 );
 
 		/* Tell Gravity Forms to add our form PDF settings pages */
 		add_action( 'gform_form_settings_menu', array( $this->model, 'add_form_settings_menu' ), 10, 2 );
-		add_action( 'gform_form_settings_page_' . $gfpdf->data->slug, array( $this, 'displayPage' ) );
+		add_action( 'gform_form_settings_page_' . $this->data->slug, array( $this, 'displayPage' ) );
 
 		/* Add AJAX endpoints */
 		add_action( 'wp_ajax_gfpdf_list_delete', array( $this->model, 'delete_gf_pdf_setting' ) );
@@ -103,7 +126,6 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	 * @return void
 	 */
 	public function add_filters() {
-		global $gfpdf;
 
 		/* Add a sample image of what the template looks like */
 		add_filter( 'gfpdf_form_settings', array( $this->model, 'add_template_image' ) );
@@ -116,9 +138,9 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 		add_filter( 'gfpdf_form_settings_appearance', array( $this->model, 'validation_error' ) );
 
 		/* Sanitize Results */
-		add_filter( 'gfpdf_form_settings_sanitize', array( $gfpdf->options, 'sanitize_all_fields' ), 10, 4 );
+		add_filter( 'gfpdf_form_settings_sanitize', array( $this->options, 'sanitize_all_fields' ), 10, 4 );
 		add_filter( 'gfpdf_form_settings_sanitize_text',  array( $this->model, 'strip_filename_extension' ), 15, 2 );
-		add_filter( 'gfpdf_form_settings_sanitize_text',  array( $gfpdf->options, 'sanitize_trim_field' ), 15, 2 );
+		add_filter( 'gfpdf_form_settings_sanitize_text',  array( $this->options, 'sanitize_trim_field' ), 15, 2 );
 		add_filter( 'gfpdf_form_settings_sanitize_hidden',  array( $this->model, 'decode_json' ), 10, 2 );
 
 		/* Store our TinyMCE Options */
@@ -146,7 +168,6 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	 * @return void
 	 */
 	public function displayPage() {
-		global $gfpdf;
 
 		/* Determine whether to load the add/edit page, or the list view */
 		$form_id = rgget( 'id' );
@@ -169,10 +190,9 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	 * @since 4.0
 	 */
 	public function store_tinymce_settings( $settings ) {
-		global $gfpdf;
 
-		if ( empty($gfpdf->data->tiny_mce_editor_settings) ) {
-			$gfpdf->data->tiny_mce_editor_settings = $settings;
+		if ( empty($this->data->tiny_mce_editor_settings) ) {
+			$this->data->tiny_mce_editor_settings = $settings;
 		}
 
 		return $settings;
