@@ -518,7 +518,7 @@ class Helper_Options implements Helper_Interface_Filters {
 
 			if ( ! empty($info['template']) ) {
 				$templates[$prefix_text . $info['group']][$file] = $info['template'];
-			} else if ( substr( $file, 0, 8 ) != 'example-' ) { /* exclude the example templates */
+			} else if ( substr( $file, 0, 8 ) != 'example-' && $file !== 'configuration' && $file !== 'configuration.depreciated' ) { /* exclude the example templates & old configuration files */
 				$legacy[$file] = $this->misc->human_readable( $file );
 			}
 		}
