@@ -109,7 +109,7 @@ class Helper_Options implements Helper_Interface_Filters {
 
 
 	public function __construct( LoggerInterface $log, Helper_Abstract_Form $form, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices ) {
-		
+
 		/* Assign our internal variables */
 		$this->log     = $log;
 		$this->form    = $form;
@@ -220,8 +220,15 @@ class Helper_Options implements Helper_Interface_Filters {
 	 * @return void
 	 */
 	public function register_settings( $fields = array() ) {
+		global $wp_settings_fields;
 
 		foreach ( $fields as $tab => $settings ) {
+
+			/* Clear all previously set types */
+			$group = 'gfpdf_settings_' . $tab;
+			if ( isset($wp_settings_fields[ $group ]) ) {
+				unset($wp_settings_fields[ $group ]);
+			}
 
 			foreach ( $settings as $option ) {
 
@@ -779,9 +786,9 @@ class Helper_Options implements Helper_Interface_Filters {
 	 */
 	public function increment_pdf_count() {
 
-		$rand = rand(1, 10);
+		$rand = rand( 1, 10 );
 
-		if( 10 === $rand ) {
+		if ( 10 === $rand ) {
 			$total_pdf_count = (int) $this->get_option( 'pdf_count', 0 );
 			$total_pdf_count += 10;
 			$this->update_option( 'pdf_count', $total_pdf_count );
