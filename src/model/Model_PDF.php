@@ -470,6 +470,9 @@ class Model_PDF extends Helper_Abstract_Model {
 		$form = $this->form->get_form( $entry['form_id'] );
 		$name = GFCommon::replace_variables( $pdf['filename'], $form, $entry );
 
+		/* Remove any characters that cannot be present in a filename */
+		$name = $this->meta->strip_invalid_characters( $name );
+
 		/* add filter to modify PDF name */
 		$name = apply_filters( 'gfpdf_pdf_filename', $name, $form, $entry, $pdf );
 		$name = apply_filters( 'gfpdfe_pdf_filename', $name, $form, $entry, $pdf ); /* backwards compat */

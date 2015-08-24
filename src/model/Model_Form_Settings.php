@@ -665,6 +665,16 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Check if we need to run a migration from the 3.x to 4.x configuration style
+	 * @param  Array $settings Any existing settings loaded
+	 * @return Array
+	 * @since  4.0
+	 */
+	public function register_3_x_configuration_migration( $settings ) {
+		return $settings;
+	}
+
+	/**
 	 * Add an image of the current selected template (if any)
 	 * @param Array $settings Any existing settings loaded
 	 */
@@ -853,12 +863,14 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @param  String $key   The field to be parsed
 	 * @return String        The sanitized data
 	 */
-	public function strip_filename_extension( $value, $key ) {
+	public function parse_filename_extension( $value, $key ) {
 
 		if ( $key == 'filename' ) {
 			if ( mb_strtolower( mb_substr( $value, -4 ) ) === '.pdf' ) {
 				$value = mb_substr( $value, 0, -4 );
 			}
+
+			$value = $this->misc->strip_invalid_characters( $value );
 		}
 
 		return $value;

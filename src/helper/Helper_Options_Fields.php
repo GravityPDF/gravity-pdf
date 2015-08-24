@@ -284,7 +284,7 @@ class Helper_Options_Fields extends Helper_Options {
 						'name'       => __( 'Filename', 'gravitypdf' ),
 						'type'       => 'text',
 						'desc'       => 'The name used when saving a PDF. Mergetags are allowed.',
-						'tooltip'    => '<h6>' . __( 'Filename', 'gravitypdf' ) . '</h6>' . __( 'Set an appropriate filename for the generated PDF. You should exclude the .pdf extension from the name.', 'gravitypdf' ),
+						'tooltip'    => '<h6>' . __( 'Filename', 'gravitypdf' ) . '</h6>' . sprintf( __( 'Set an appropriate filename for the generated PDF. You should exclude the .pdf extension from the name. The following are invalid characters and will be converted to an underscore (_): %s', 'gravitypdf' ), '<code>/ \ " * ? | : < ></code>' ),
 						'inputClass' => 'merge-tag-support mt-hide_all_fields',
 						'required'   => true,
 					),

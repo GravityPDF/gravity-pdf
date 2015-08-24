@@ -445,6 +445,7 @@ class Helper_Misc
 	 * Do a lookup for the current template image (if any) and return the path
 	 * @param  String $template The template name to look for
 	 * @return String Full URL to image
+	 * @since 4.0
 	 */
 	public function get_template_image( $template ) {
 
@@ -452,15 +453,27 @@ class Helper_Misc
 		$template .= '.png';
 
 		$relative_image_path   = 'initialisation/templates/images/';
-		$default_template_path = PDF_PLUGIN_DIR.$relative_image_path;
-		$default_template_url  = PDF_PLUGIN_URL.$relative_image_path;
+		$default_template_path = PDF_PLUGIN_DIR . $relative_image_path;
+		$default_template_url  = PDF_PLUGIN_URL . $relative_image_path;
 
-		if ( is_file( $this->data->template_location.'images/'.$template ) ) {
-			return $this->data->template_location_url.'images/'.$template;
-		} elseif ( is_file( $default_template_path.$template ) ) {
-			return $default_template_url.$template;
+		if ( is_file( $this->data->template_location . 'images/' . $template ) ) {
+			return $this->data->template_location_url . 'images/' . $template;
+		} elseif ( is_file( $default_template_path . $template ) ) {
+			return $default_template_url . $template;
 		}
 
 		return false;
+	}
+
+	/**
+	 * Remove any characters that are invalid in filenames (mostly on Windows systems)
+	 * @param  String $name The string / name to process
+	 * @return String
+	 * @since 4.0
+	 */
+	public function strip_invalid_characters( $name ) {
+		$characters = array( '/', '\\', '"', '*', '?', '|', ':', '<', '>' );
+
+		return str_replace( $characters, '_', $name );
 	}
 }
