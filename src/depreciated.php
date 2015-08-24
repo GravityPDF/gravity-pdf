@@ -46,7 +46,9 @@ class GFPDF_Core
 {
 	public function __construct() {
 		global $gfpdf;
+
 		$gfpdf = new Router();
+
 		$gfpdf->init();
 		$this->setup_constants();
 	}
@@ -57,7 +59,7 @@ class GFPDF_Core
 		define( 'PDF_SAVE_LOCATION', $gfpdf->data->template_tmp_location );
 		define( 'PDF_FONT_LOCATION', $gfpdf->data->template_font_location );
 		define( 'PDF_TEMPLATE_LOCATION', $gfpdf->data->template_location );
-		define( 'PDF_TEMPLATE_URL_LOCATION', $gfpdf->data->template_location ); /* no cases in mPDF where a URL should be used instead of a path */
+		define( 'PDF_TEMPLATE_URL_LOCATION', $gfpdf->data->template_location );
 	}
 }
 
@@ -85,8 +87,8 @@ class PDF_Common
 		return $gfpdf->misc->get_upload_details();
 	}
 
-	public static function view_data( $form_data = array() ) {
-	}
+	/*public static function view_data( $form_data = array() ) {
+	}*/
 
 	/*
 	public static function get_ids() {
@@ -167,8 +169,6 @@ class GFPDFEntryDetail {
 					'empty'      => $allow_display_empty_fields,
 					'echo'       => ! $return,
 					'legacy_css' => true,
-
-					/* TODO */
 					'html_field' => $show_html,
 					'page_names' => $show_page_name,
 				),
@@ -186,11 +186,13 @@ class GFPDFEntryDetail {
 	 * @since 3.7
 	 */
 	public static function do_lead_detail_grid( $form, $lead, $config = array() ) {
+		global $gfpdf;
+
 		/* Set up any legacy configuration options needed */
 		$config['meta']['legacy_css'] = true;
 
-		$model = new Model_PDF();
-		$view = new View_PDF();
+		$model = new Model_PDF( $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
+		$view  = new View_PDF( array(), $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc);
 		$view->process_html_structure( $lead, $model, $config );
 	}
 
@@ -202,7 +204,9 @@ class GFPDFEntryDetail {
 	 * @since 3.0
 	 */
 	public static function lead_detail_grid_array( $form, $lead ) {
-		$model = new Model_PDF();
+		global $gfpdf;
+
+		$model = new Model_PDF( $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
 		return $model->get_form_data( $lead );
 	}
 }
