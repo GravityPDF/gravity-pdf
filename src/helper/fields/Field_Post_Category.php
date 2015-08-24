@@ -114,8 +114,8 @@ class Field_Post_Category extends Helper_Abstract_Fields
 		if ( ! isset( $field_value[0] ) ) {
 
 			/* Set up our basic values */
-			$value['value'] = $field_value['value'];
-			$value['label'] = $field_value['label'];
+			$value['value'] = ( isset($field_value['value']) ) ? $field_value['value'] : '';
+			$value['label'] = ( isset($field_value['label']) ) ? $field_value['label'] : '';
 
 		} else { /* If Checkboxes or Multiselects */
 

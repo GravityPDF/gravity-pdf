@@ -114,8 +114,8 @@ class Field_Poll extends Helper_Abstract_Fields
 				$fieldValue[0][] = $item['value'];
 			}
 		} else {
-			$field      = $value['label'];
-			$fieldValue = $value['value'];
+			$field      = ( isset($value['label']) ) ? $value['label'] : '';
+			$fieldValue = ( isset($value['value']) ) ? $value['value'] : '';
 		}
 
 		$data[ $this->field->id . '.' . $label ] = $field;

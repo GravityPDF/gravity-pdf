@@ -119,11 +119,7 @@ class Field_Radio extends Helper_Abstract_Fields
 
 		$label = trim( GFCommon::selection_display( $this->get_value(), $this->field, '', true ) );
 		$value = trim( GFCommon::selection_display( $this->get_value(), $this->field ) );
-
-		/* if both fields are blank return an empty array */
-		if ( strlen( $label ) === 0 && strlen( $value ) === 0 ) {
-			return array();
-		}
+		
 
 		/* return value / label as an array */
 		$this->cache(array(
