@@ -191,30 +191,6 @@ class View_PDF extends Helper_Abstract_View
 		}
 	}
 
-	/**
-	 * Save the PDF to our tmp directory
-	 * @param  String $pdf      The generated PDF to be saved
-	 * @param  String $filename The PDF filename
-	 * @param  Array  $settings The Gravity PDF Settings
-	 * @return Mixed           The full path to the file or false if failed
-	 * @since  4.0
-	 */
-	public function savePDF( $pdf, $filename, $entry ) {
-
-		$path = $this->plugin_data->template_tmp_location . '/' . $entry['form_id'] . $entry['id'] . '/';
-
-		/* create our path */
-		if ( wp_mkdir_p( $path ) ) {
-			/* save our PDF */
-			if ( file_put_contents( $path . $filename, $pdf ) ) {
-				return $path . $filename;
-			}
-		}
-
-		return false;
-	}
-
-
 
 	/**
 	 * Ensure a PHP extension is added to the end of the template name

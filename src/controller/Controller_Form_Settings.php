@@ -132,6 +132,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 
 		/* Add custom field information if we have a template selected */
 		add_filter( 'gfpdf_form_settings_custom_appearance', array( $this->model, 'register_custom_appearance_settings' ) );
+		add_filter( 'gfpdf_settings_tools', array( $this->model, 'register_3_x_configuration_migration' ) );
 
 		/* Add Validation Errors */
 		add_filter( 'gfpdf_form_settings', array( $this->model, 'validation_error' ) );
@@ -139,7 +140,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 
 		/* Sanitize Results */
 		add_filter( 'gfpdf_form_settings_sanitize', array( $this->options, 'sanitize_all_fields' ), 10, 4 );
-		add_filter( 'gfpdf_form_settings_sanitize_text',  array( $this->model, 'strip_filename_extension' ), 15, 2 );
+		add_filter( 'gfpdf_form_settings_sanitize_text',  array( $this->model, 'parse_filename_extension' ), 15, 2 );
 		add_filter( 'gfpdf_form_settings_sanitize_text',  array( $this->options, 'sanitize_trim_field' ), 15, 2 );
 		add_filter( 'gfpdf_form_settings_sanitize_hidden',  array( $this->model, 'decode_json' ), 10, 2 );
 

@@ -476,4 +476,23 @@ class Helper_Misc
 
 		return str_replace( $characters, '_', $name );
 	}
+
+	/**
+	 * Replace all the merge tag fields in the string
+	 * @param  String $string  The string to process
+	 * @param  Array $form The Gravity Form array
+	 * @param  Array $lead The Gravity Form Entry Array
+	 * @return String
+	 * @since 4.0
+	 */
+	public static function do_mergetags($string, $form, $lead)
+	{
+		/* Unconvert { and } symbols from HTML entities and remove {all_fields} tag */
+		$find    = array( '&#123;', '&#125;', '{all_fields}' );
+		$replace = array( '{', '}', '' );
+
+		$string = str_replace( $find, $replace, $string );
+
+		return trim( GFCommon::replace_variables( $string, $form, $lead, false, false, false ) );
+	}
 }

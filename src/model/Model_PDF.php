@@ -468,7 +468,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function get_pdf_name( $pdf, $entry ) {
 
 		$form = $this->form->get_form( $entry['form_id'] );
-		$name = GFCommon::replace_variables( $pdf['filename'], $form, $entry );
+		$name = $this->misc->do_mergetags( $pdf['filename'], $form, $entry );
 
 		/* Remove any characters that cannot be present in a filename */
 		$name = $this->meta->strip_invalid_characters( $name );

@@ -4,6 +4,8 @@
 use GFPDF\Router;
 use GFPDF\Model\Model_PDF;
 use GFPDF\View\View_PDF;
+use GFPDF\Helper\Fields\Field_Products;
+use GFPDF\Helper\Fields\Field_Likert;
 
 /**
  * Depreciated Functionality / Classes
@@ -40,9 +42,33 @@ if ( ! defined( 'ABSPATH' ) ) {
 */
 
 /**
- * Add backwards compatibility for expired / renamed classes
+ * Add's an easy depreciated class abstract fallback
+ * @since 4.0
  */
-class GFPDF_Core
+abstract class GFPDF_Depreciated_Abstract
+{
+	/**
+	 * Add user depreciation notice for missing methods
+	 * @since  4.0
+	 */
+	public function __call( $name, $arguments ) {
+		trigger_error( sprintf( __( '"%s" has been depreciated as of Gravity PDF 4.0', 'gravitypdf' ), $name ), E_USER_DEPRECATED );
+	}
+
+	/**
+	 * Add user depreciation notice for missing methods
+	 * @since  4.0
+	 */
+	public static function __callStatic( $name, $arguments ) {
+		trigger_error( sprintf( __( '"%s" has been depreciated as of Gravity PDF 4.0', 'gravitypdf' ), $name ), E_USER_DEPRECATED );
+	}
+}
+
+/**
+ * Add backwards compatibility support for our main core class
+ * @since 3.0
+ */
+class GFPDF_Core extends GFPDF_Depreciated_Abstract
 {
 	public function __construct() {
 		global $gfpdf;
@@ -63,94 +89,130 @@ class GFPDF_Core
 	}
 }
 
-class PDF_Common
+
+/**
+ * Add backwards compatibility support for our common class
+ * @since 3.0
+ */
+class PDF_Common extends GFPDF_Depreciated_Abstract
 {
+
 	/**
-	 * Add user depreciation notice for missing methods
-	 * @since  4.0
+	 * Takes over for setup_ids() but is now called much earlier in the process
+	 * @return Boolean
+	 * @since 4.0
 	 */
-	public function __call( $name, $arguments ) {
-		trigger_error( sprintf( __( '"%s" has been depreciated as of Gravity PDF 4.0', 'gravitypdf' ), $name ), E_USER_DEPRECATED );
+	public static function get_ids() {
+		global $form_id, $lead_id, $lead_ids;
+		
+		$form_id  =  ($form_id) ? $form_id : absint( rgget( 'fid' ) );
+		$lead_ids =  ($lead_id) ? array($lead_id) : explode(',', rgget( 'lid' ) );
+		
+		/* If form ID and lead ID hasn't been set stop the PDF from attempting to generate */
+		if( empty($form_id) || empty($lead_ids) ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
-	 * Add user depreciation notice for missing methods
-	 * @since  4.0
+	 * Get the base upload directory details
+	 * @return Array
+	 * @since 3.0
 	 */
-	public static function __callStatic( $name, $arguments ) {
-		trigger_error( sprintf( __( '"%s" has been depreciated as of Gravity PDF 4.0', 'gravitypdf' ), $name ), E_USER_DEPRECATED );
-	}
-
 	public static function get_upload_dir() {
 		global $gfpdf;
 
 		return $gfpdf->misc->get_upload_details();
 	}
 
-	/*public static function view_data( $form_data = array() ) {
-	}*/
+	/**
+	 * Convert merge tags to real Gravity Form values
+	 * @param  String $string
+	 * @param  Integer $form_id
+	 * @param  Integer $lead_id
+	 * @return String
+	 * @since 3.0
+	 */
+	public static function do_mergetags( $string, $form_id, $lead_id ) {
+		global $gfpdf;
 
-	/*
-	public static function get_ids() {
-    	return Stat_Functions::get_ids();
-    }
+		return $gfpdf->misc->do_mergetags( $string, $gfpdf->form->get_form( $form_id ), $gfpdf->form->get_entry( $lead_id ) );
+	}
 
-    public static function get_site_name() {
-        return Stat_Functions::get_site_name();
-    }
+	/**
+	 * Allow users to view the $form_data array, if it exists
+	 * @param String $form_data
+	 * @since 4.0
+	 */
+	public static function view_data( $form_data ) {
 
-    public static function get_html_template($filename) {
-    	return Stat_Functions::get_html_template($filename);
-    }
+		if ( isset( $_GET['data'] ) && $this->form->has_capability( 'gravityforms_view_settings' ) ) {
+			print '<pre>';
+			print_r( $form_data );
+			print '</pre>';
+			exit;
+		}
+	}
 
-    public static function get_pdf_filename($form_id, $lead_id) {
-    	return Stat_Functions::get_pdf_filename($form_id, $lead_id);
-    }
+	/**
+	 * Get $_POST key, or return nothing
+	 * @param  String $name Key Name
+	 * @return String
+	 * @since 3.0
+	 */
+	public static function post( $name ) {
+		if ( isset( $_POST[$name] ) ) {
+			return $_POST[$name];
+		}
 
-    public static function validate_pdf_name($name, $form_id = false, $lead_id = false) {
-    	return Stat_Functions::validate_pdf_name($name, $form_id, $lead_id);
-    }
+		return '';
+	}
 
-    public static function remove_invalid_characters($name) {
-    	return Stat_Functions::remove_invalid_characters($name);
-    }
+	/**
+	 * Get $_GET key, or return nothing
+	 * @param  String $name Key Name
+	 * @return String
+	 * @since 3.0
+	 */
+	public static function get( $name ) {
+		if ( isset( $_GET[$name] ) ) {
+			return $_GET[$name];
+		}
 
-    public static function do_mergetags($string, $form_id, $lead_id) {
-    	return Stat_Functions::do_mergetags($string, $form_id, $lead_id);
-    }
+		return '';
+	}
 
+	/**
+	 * Get the name of the PDF based on the Form and the submission
+	 * @param  $form_id Integer
+	 * @param  $lead_id Integer
+	 * @return String
+	 * @since 3.0
+	 */
+	public static function get_pdf_filename( $form_id, $lead_id ) {
+		return "form-$form_id-entry-$lead_id.pdf";
+	}
 
+	/**
+	 * Remove any characters that are invalid in filenames (mostly on Windows systems)
+	 * @param  String $name The string / name to process
+	 * @return String
+	 * @since 4.0
+	 */
+	public static function remove_invalid_characters( $name ) {
+		global $gfpdf;
 
-    public static function initialise_WP_filesystem_API($post, $nonce) {
-    	return Stat_Functions::initialise_WP_filesystem_API($post, $nonce);
-    }
-
-    public static function is_settings() {
-    	return Stat_Functions::is_settings();
-    }
-
-    public static function post($name) {
-    	return Stat_Functions::post($name);
-    }
-
-    public static function get($name) {
-    	return Stat_Functions::get($name);
-    }
-
-
-    public static function is_currency_decimal_dot($currency = null) {
-    	return Stat_Functions::is_currency_decimal_dot($currency);
-    }
-
-    public static function add_message($message, $type = 'notice') {
-    	return Stat_Functions::add_message($message, $type);
-    }*/
+		return $gfpdf->meta->strip_invalid_characters( $name );
+	}
 }
 
 /**
  * Add depreciated functionality for generating our standard PDF HTML
+ * @since 3.0
  */
-class GFPDFEntryDetail {
+class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 
 	/**
 	 * Generate our PDF HTML layout
@@ -192,7 +254,7 @@ class GFPDFEntryDetail {
 		$config['meta']['legacy_css'] = true;
 
 		$model = new Model_PDF( $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
-		$view  = new View_PDF( array(), $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc);
+		$view  = new View_PDF( array(), $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
 		$view->process_html_structure( $lead, $model, $config );
 	}
 
@@ -209,4 +271,45 @@ class GFPDFEntryDetail {
 		$model = new Model_PDF( $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
 		return $model->get_form_data( $lead );
 	}
+
+	/**
+	 * Generate a standard Gravity Forms product table based on the form / entry data
+	 * @param  Array $form   The Gravity Form array
+	 * @param  Array $lead   The Gravity Form entry
+	 * @return void
+	 * @since 3.0
+	 */
+	public static function product_table( $form, $lead ) {
+		global $gfpdf;
+
+		$products = new Field_Products( new GF_Field(), $lead, $gfpdf->form, $gfpdf->misc );
+		echo $products->html();
+	}
+
+	/**
+	 * Public method for outputting likert (survey addon field)
+	 * @param  Array $form   The Gravity Form array
+	 * @param  Array $lead   The Gravity Form entry
+	 * @param  Array $field_id The field ID to output
+	 * @return void
+	 * @since 3.0
+	 */
+	public static function get_likert( $form, $lead, $field_id ) {
+		global $gfpdf;
+
+		/* Find our field ID, if any */
+		foreach ( $form['fields'] as $field ) {
+			if ( $field->id == $field_id ) {
+
+				/* Output our likert */
+				$likert = new Field_Likert( $field, $lead, $gfpdf->form, $gfpdf->misc );
+				echo $likert->html();
+				return;
+			}
+		}
+	}
 }
+
+class GFPDF_Core_Model extends GFPDF_Depreciated_Abstract { }
+class GFPDF_Settings_Model extends GFPDF_Depreciated_Abstract { }
+class GFPDF_Settings extends GFPDF_Depreciated_Abstract { }
