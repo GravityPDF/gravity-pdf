@@ -471,7 +471,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		$name = $this->misc->do_mergetags( $pdf['filename'], $form, $entry );
 
 		/* Remove any characters that cannot be present in a filename */
-		$name = $this->meta->strip_invalid_characters( $name );
+		$name = $this->misc->strip_invalid_characters( $name );
 
 		/* add filter to modify PDF name */
 		$name = apply_filters( 'gfpdf_pdf_filename', $name, $form, $entry, $pdf );
@@ -531,8 +531,8 @@ class Model_PDF extends Helper_Abstract_Model {
 		if ( $this->does_pdf_exist( $pdf ) ) {
 			try {
 				$pdf->init();
-				$pdf->renderHtml( $this->misc->get_template_args( $pdf->get_entry(), $pdf->get_settings() ) );
-				$pdf->setOutputType( 'save' );
+				$pdf->render_html( $this->misc->get_template_args( $pdf->get_entry(), $pdf->get_settings() ) );
+				$pdf->set_output_type( 'save' );
 
 				/* Generate PDF */
 				$raw_pdf  = $pdf->generate();
@@ -570,8 +570,8 @@ class Model_PDF extends Helper_Abstract_Model {
 			$settingsAPI = new Model_Form_Settings();
 
 			/* Loop through each PDF config and generate */
-			foreach ( $pdfs as $pdf ) {
-				$settings = $settingsAPI->get_pdf( $entry['form_id'], $pdf['id'] );
+			foreach ( $pdfs as $pdf_config ) {
+				$settings = $settingsAPI->get_pdf( $entry['form_id'], $pdf_config['id'] );
 
 				if ( ! is_wp_error( $settings ) && $this->maybe_attach_to_notification( $notifications, $settings ) ) {
 
@@ -661,7 +661,9 @@ class Model_PDF extends Helper_Abstract_Model {
 
 					/* Run an action users can tap into to manipulate the PDF */
 					if ( $this->does_pdf_exist( $pdf ) ) {
-						do_action( 'gfpdf_post_pdf_save', $entry['form_id'], $entry['id'], $settings, $pdf->get_path() . $pdf->get_filename() );
+						do_action( 'gfpdf_post_pdf_save', $entry['form_id'], $entry['id'], $settings, $pdf->get_path() . $pdf->get_filename() ); /* Backwards compatibility */
+						do_action( 'gfpdf_post_save_pdf', $form, $entry, $settings, $pdf->get_path() . $pdf->get_filename() );
+						do_action( "gfpdf_post_save_pdf_{$form['id']}", $form, $entry, $settings, $pdf->get_path() . $pdf->get_filename() );
 					}
 				}
 			}

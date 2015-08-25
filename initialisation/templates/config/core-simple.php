@@ -59,11 +59,17 @@ class core_simple implements Helper_Interface_Config {
 	public function configuration() {
 		return array(
 			'core' => array(
-				'header'      => true,
-				'firstHeader' => true,
-				'footer'      => true,
-				'firstFooter' => true,
-				'background'  => true,
+				'show_form_title'      => true,
+				'show_page_names'      => true,
+				'show_html'            => true,
+				'show_section_content' => true,
+				'show_hidden'          => true,
+				'show_empty'           => true,
+				'header'               => true,
+				'first_header'         => true,
+				'footer'               => true,
+				'first_footer'         => true,
+				'background'           => true,
 			),
 
 			'fields' => array(

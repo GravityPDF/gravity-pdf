@@ -2,6 +2,7 @@
 
 namespace GFPDF\Helper;
 
+use GFPDF\Helper\Helper_Interface_Filters;
 use GFPDF\Model\Model_Form_Settings;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Data;

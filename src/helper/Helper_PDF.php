@@ -172,17 +172,28 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	public function render_html( $args = array(), $html = '' ) {
+		
+		$form = $this->form->get_form( $this->entry['form_id'] );
+
 		/* Load in our PHP template */
 		if ( empty($html) ) {
 			$this->set_template();
 			$html = $this->load_html( $args );
+
+			apply_filters("gfpdfe_pdf_template_{$form['id']}", apply_filters('gfpdfe_pdf_template', $html, $form['id'], $this->entry['id'], $this->settings), $this->entry['id'], $this->settings); /* Backwards compat */
+			apply_filters("gfpdf_pdf_html_output_{$form['id']}", apply_filters('gfpdf_pdf_html_output', $html, $form, $this->entry, $this->settings), $this->form, $this->entry, $this->settings);
 		}
 
-		/* check if we should output the HTML to the browser, for debugging */
+		/* Check if we should output the HTML to the browser, for debugging */
 		$this->maybe_display_raw_html( $html );
 
-		/* write the HTML to mPDF */
-		$this->mpdf->WriteHTML( $html );
+		/* Add filter to prevent HTML being written to document when it returns true */
+		$prevent_html = apply_filters("gfpdfe_pre_load_template", $form['id'], $this->entry['id'], basename($this->template_path), $form['id'] . $this->entry['id'], $this->output, $this->filename, $this->backwards_compat_conversion($this->settings) ); /* Backwards Compatibility */
+
+		/* Write the HTML to mPDF */
+		if( $prevent_html !== true ) {
+			$this->mpdf->WriteHTML( $html );
+		}
 	}
 
 	/**
@@ -644,5 +655,17 @@ class Helper_PDF {
 
 			$this->mpdf->SetProtection( $privileges, $password, '', 128 );
 		}
+	}
+
+	/**
+	 * Converts the 4.x settings array into a compatible 3.x settings array
+	 * @param  Array $settings The 4.x settings to be converted
+	 * @return Array           The 3.x compatible settings
+	 * @since 4.0
+	 * @todo
+	 */
+	protected function backwards_compat_conversion( $settings ) {
+		
+		return $settings;
 	}
 }

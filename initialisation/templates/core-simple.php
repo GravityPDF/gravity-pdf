@@ -40,14 +40,20 @@ global $gfpdf;
 /**
  * Load up our template-specific appearance settings
  */
-$value_border_colour = (!empty($settings['border_colour'])) 	? $settings['border_colour'] : '#CCCCCC';
-$background_img      = (!empty($settings['background']))		? $settings['background'] : '';
-$first_header        = (!empty($settings['first_header'])) 		? $gfpdf->misc->fix_header_footer($settings['first_header']) : '';
-$header              = (!empty($settings['header'])) 			? $gfpdf->misc->fix_header_footer($settings['header']) : '';
-$footer              = (!empty($settings['footer'])) 			? $gfpdf->misc->fix_header_footer($settings['footer']) : '';
-$first_footer        = (!empty($settings['first_footer'])) 		? $gfpdf->misc->fix_header_footer($settings['first_footer']) : '';
-$font_colour         = (!empty($settings['font_colour'])) 		? $settings['font_colour'] : '#333';
-$font                = (!empty($settings['font'])) 		        ? $settings['font'] : 'DejavuSansCondensed';
+$value_border_colour  = (!empty($settings['border_colour'])) 	? $settings['border_colour'] : '#CCCCCC';
+$show_form_title      = (!empty($settings['show_form_title']) && $settings['show_form_title'] == 'Yes') 	? true : false;
+$show_page_names      = (!empty($settings['show_page_names']) && $settings['show_page_names'] == 'Yes') 	? true : false;
+$show_html            = (!empty($settings['show_html']) && $settings['show_html'] == 'Yes') 	? true : false;
+$show_section_content = (!empty($settings['show_section_content']) && $settings['show_section_content'] == 'Yes') 	? true : false;
+$show_hidden          = (!empty($settings['show_hidden']) && $settings['show_hidden'] == 'Yes') 	? true : false;
+$show_empty           = (!empty($settings['show_empty']) && $settings['show_empty'] == 'Yes') 	? true : false;
+$background_img       = (!empty($settings['background']))		? $settings['background'] : '';
+$first_header         = (!empty($settings['first_header'])) 		? $gfpdf->misc->fix_header_footer($settings['first_header']) : '';
+$header               = (!empty($settings['header'])) 			? $gfpdf->misc->fix_header_footer($settings['header']) : '';
+$footer               = (!empty($settings['footer'])) 			? $gfpdf->misc->fix_header_footer($settings['footer']) : '';
+$first_footer         = (!empty($settings['first_footer'])) 		? $gfpdf->misc->fix_header_footer($settings['first_footer']) : '';
+$font_colour          = (!empty($settings['font_colour'])) 		? $settings['font_colour'] : '#333';
+$font                 = (!empty($settings['font'])) 		        ? $settings['font'] : 'DejavuSansCondensed';
 
 ?>
 
@@ -298,12 +304,12 @@ $font                = (!empty($settings['font'])) 		        ? $settings['font']
 				'meta' 		=> array(
 					'echo'                => true,
 					'exclude'             => true, /* whether we should exclude fields with a CSS value of 'exclude'. Default to true */
-					'empty'               => false, /* whether to show empty fields or not. Default is false */
-					'hidden'              => true, /* whether we should skip fields hidden with conditional logic. Default to true. */
-					'show_title'          => true, /* whether we should show the form title. Default to true */
-					'section_content'     => false, /* whether we should include a section breaks content. Default to false */
-					'page_names'          => false, /* whether we should show the form's page names. Default to false */
-					'html_field'          => false, /* whether we should show the form's html fields. Default to false */
+					'empty'               => $show_empty, /* whether to show empty fields or not. Default is false */
+					'hidden'              => $show_hidden, /* whether we should skip fields hidden with conditional logic. Default to true. */
+					'show_title'          => $show_title, /* whether we should show the form title. Default to true */
+					'section_content'     => $show_section_content, /* whether we should include a section breaks content. Default to false */
+					'page_names'          => $show_page_names, /* whether we should show the form's page names. Default to false */
+					'html_field'          => $show_html, /* whether we should show the form's html fields. Default to false */
 					'individual_products' => false, /* Whether to show individual fields in the entry. Default to false - they are grouped together at the end of the form */
 				)
 			);

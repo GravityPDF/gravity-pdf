@@ -8,6 +8,8 @@ use GFPDF\Helper\Helper_Data;
 
 use Psr\Log\LoggerInterface;
 
+use GFCommon;
+
 use WP_Error;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;

@@ -102,6 +102,11 @@ class Field_Likert extends Helper_Abstract_Fields
 	public function html( $value = '', $label = true ) {
 		$value = apply_filters( 'gform_entry_field_value', $this->get_value(), $this->field, $this->entry, $this->form );
 
+		/* Return early to prevent unwanted details being displayed when the plugin isn't enabled */
+		if( ! class_exists( 'GFSurvey' ) ) {
+			return parent::html( '' );
+		}
+
 		return parent::html( $value );
 	}
 

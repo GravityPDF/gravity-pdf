@@ -3,6 +3,7 @@
 namespace GFPDF\Helper;
 
 use GFPDF\Helper\Helper_Options; /* not needed, but helps define usage */
+use GFPDF\Helper\Helper_Interface_Filters;
 
 /**
  * Our Gravity PDF Options API Field Registration
@@ -44,7 +45,16 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Helper_Options_Fields extends Helper_Options {
+class Helper_Options_Fields extends Helper_Options implements Helper_Interface_Filters {
+
+	public function add_filters() {
+
+		/* Conditionally enable specific fields */
+		add_filter( 'gfpdf_form_settings_advanced', array( $this, 'get_public_access_field' ) );
+		add_filter( 'gfpdf_form_settings_advanced', array( $this, 'get_advanced_template_field' ) );
+
+		parent::add_filters();
+	}
 
 	/**
 	 * Retrieve the array of registered fields
@@ -490,5 +500,261 @@ class Helper_Options_Fields extends Helper_Options {
 		);
 
 		return apply_filters( 'gfpdf_registered_settings', $gfpdf_settings );
+	}
+
+	/**
+	 * Enable public access field if the user has enabled it with a filter
+	 * @param  Array $settings The 'form_settings_advanced' array
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function get_public_access_field( $settings ) {
+
+		$enabled = apply_filters( 'gfpdf_enable_public_access_field', false );
+
+		if( $enabled !== true ) {
+			return $settings;
+		}
+
+		$settings['public_access'] = array(
+						'id'    => 'public_access',
+						'name'  => __( 'Enable Public Acccess?', 'gravitypdf' ),
+						'desc'  => sprintf( __( 'Allow ANYONE to access the PDFs. %sWarning: This disables all security protocols.%s', 'gravitypdf' ), '<strong>', '</strong>' ),
+						'type'  => 'radio',
+						'options' => array(
+							'Yes' => __( 'Yes', 'gravitypdf' ),
+							'No'  => __( 'No', 'gravitypdf' ),
+						),
+						'std'   => __( 'No', 'gravitypdf' ),
+		);
+
+		return $settings;
+	}
+
+	/**
+	 * Enable advanced templating field if the user has enabled it with a filter, or our premium plugin has been installed
+	 * @param  Array $settings The 'form_settings_advanced' array
+	 * @return Array
+	 * @since 4.0
+	 * @todo Currently not sure if this method is actually needed for our v4.x release. We will need the access key during our import process for backwards compatibility
+	 */
+	public function get_advanced_template_field( $settings ) {
+
+		$enabled = apply_filters( 'gfpdf_enable_advanced_template_field', false );
+
+		if( $enabled !== true && ! class_exists( 'gfpdfe_business_plus' ) ) {
+			return $settings;
+		}
+
+		$settings['advanced_template'] = array(
+						'id'    => 'advanced_template',
+						'name'  => __( 'Enable Advanced Templating?', 'gravitypdf' ),
+						'desc'  => sprintf( __( 'By enabling, a PDF template will no longer be treated as HTML. %sUse wisely.%s', 'gravitypdf' ), '<strong>', '</strong>' ),
+						'type'  => 'radio',
+						'options' => array(
+							'Yes' => __( 'Yes', 'gravitypdf' ),
+							'No'  => __( 'No', 'gravitypdf' ),
+						),
+						'std'   => __( 'No', 'gravitypdf' ),
+		);
+
+		return $settings;
+	}
+
+	/**
+	 * Return the optional template-specific form title field
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function get_form_title_display_field() {
+		return apply_filters( 'gfpdf_form_title_display_setting', array(
+			'id'    => 'show_form_title',
+			'name'  => __( 'Show Form Title?', 'gravitypdf' ),
+			'desc'  => __( 'Display the form title at the beginning of the PDF.', 'gravitypdf' ),
+			'type'  => 'radio',
+			'options' => array(
+				'Yes' => __( 'Yes', 'gravitypdf' ),
+				'No'  => __( 'No', 'gravitypdf' ),
+			),
+			'std'   => __( 'No', 'gravitypdf' ),
+		) );
+	}
+
+	/**
+	 * Return the optional template-specific page names field
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function get_page_names_display_field() {
+		return apply_filters( 'gfpdf_page_names_display_setting', array(
+			'id'    => 'show_page_names',
+			'name'  => __( 'Show Page Names?', 'gravitypdf' ),
+			'desc'  => __( 'Display form page names on the PDF when enabled (only works when using page break field).', 'gravitypdf' ),
+			'type'  => 'radio',
+			'options' => array(
+				'Yes' => __( 'Yes', 'gravitypdf' ),
+				'No'  => __( 'No', 'gravitypdf' ),
+			),
+			'std'   => __( 'No', 'gravitypdf' ),
+		) );
+	}
+
+	/**
+	 * Return the optional template-specific HTML field
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function get_html_display_field() {
+		return apply_filters( 'gfpdf_html_display_setting', array(
+			'id'    => 'show_html',
+			'name'  => __( 'Show HTML Fields?', 'gravitypdf' ),
+			'desc'  => __( 'Display HTML fields in the PDF.', 'gravitypdf' ),
+			'type'  => 'radio',
+			'options' => array(
+				'Yes' => __( 'Yes', 'gravitypdf' ),
+				'No'  => __( 'No', 'gravitypdf' ),
+			),
+			'std'   => __( 'No', 'gravitypdf' ),
+		) );
+	}
+
+	/**
+	 * Return the optional template-specific section content field
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function get_section_content_display_field() {
+		return apply_filters( 'gfpdf_section_content_display_setting', array(
+			'id'    => 'show_section_content',
+			'name'  => __( 'Show Section Break Description?', 'gravitypdf' ),
+			'desc'  => __( 'Display Section Break field description in the PDF.', 'gravitypdf' ),
+			'type'  => 'radio',
+			'options' => array(
+				'Yes' => __( 'Yes', 'gravitypdf' ),
+				'No'  => __( 'No', 'gravitypdf' ),
+			),
+			'std'   => __( 'No', 'gravitypdf' ),
+		) );
+	}
+
+	/**
+	 * Return the optional template-specific hidden field
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function get_hidden_display_field() {
+		return apply_filters( 'gfpdf_hidden_display_setting', array(
+			'id'    => 'show_hidden',
+			'name'  => __( 'Show Hidden Fields?', 'gravitypdf' ),
+			'desc'  => __( 'Display Hidden fields in the PDF.', 'gravitypdf' ),
+			'type'  => 'radio',
+			'options' => array(
+				'Yes' => __( 'Yes', 'gravitypdf' ),
+				'No'  => __( 'No', 'gravitypdf' ),
+			),
+			'std'   => __( 'No', 'gravitypdf' ),
+		) );
+	}
+
+	/**
+	 * Return the optional template-specific empty field
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function get_empty_display_field() {
+		return apply_filters( 'gfpdf_empty_display_setting', array(
+			'id'    => 'show_empty',
+			'name'  => __( 'Show Empty Fields?', 'gravitypdf' ),
+			'desc'  => __( 'Display Empy fields in the PDF.', 'gravitypdf' ),
+			'type'  => 'radio',
+			'options' => array(
+				'Yes' => __( 'Yes', 'gravitypdf' ),
+				'No'  => __( 'No', 'gravitypdf' ),
+			),
+			'std'   => __( 'No', 'gravitypdf' ),
+		) );
+	}
+
+	/**
+	 * Return the optional template-specific header field
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function get_header_field() {
+		return apply_filters( 'gfpdf_header_field_setting', array(
+			'id'         => 'header',
+			'name'       => __( 'Header', 'gravitypdf' ),
+			'type'       => 'rich_editor',
+			'size'       => 8,
+			'desc'       => sprintf( __( 'The header is included at the top of each page. For best results, keep the formatting simple.', 'gravitypdf' ), '<em>', '</em>', '<em>', '</em>' ),
+			'inputClass' => 'merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields',
+			'tooltip'    => '<h6>' . __( 'Header', 'gravitypdf' ) . '</h6>' . sprintf( __( 'For the best image quality, ensure you insert images at %sFull Size%s. Left and right image alignment work as expected, but to center align you need to wrap the image in a %s tag.', 'gravitypdf' ), '<em>', '</em>', esc_html( '<div class="centeralign">...</div>' ) ),
+		) );
+	}
+
+	/**
+	 * Return the optional template-specific first page header field
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function get_first_page_header_field() {
+		return apply_filters( 'gfpdf_first_page_header_field_setting', array(
+			'id'         => 'first_header',
+			'name'       => __( 'First Page Header', 'gravitypdf' ),
+			'type'       => 'rich_editor',
+			'size'       => 8,
+			'desc'       => __( 'Override the header on the first page of the PDF.', 'gravitypdf' ),
+			'inputClass' => 'merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields',
+			'toggle'     => __( 'Use different header on first page of PDF?', 'gravitypdf' ),
+		) );
+	}
+
+	/**
+	 * Return the optional template-specific footer field
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function get_footer_field() {
+		return apply_filters( 'gfpdf_footer_field_setting', array(
+			'id'         => 'footer',
+			'name'       => __( 'Footer', 'gravitypdf' ),
+			'type'       => 'rich_editor',
+			'size'       => 8,
+			'desc'       => sprintf( __( 'The footer is included at the bottom of every page. For simple columns %stry this HTML table snippet%s.', 'gravitypdf' ), '<a href="https://gist.github.com/blueliquiddesigns/e6179a96cd97ef0a8457">', '</a>' ),
+			'inputClass' => 'merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields',
+			'tooltip'    => '<h6>' . __( 'Footer', 'gravitypdf' ) . '</h6>' . sprintf( __( 'For simple text footers try use the left, center and right alignment buttons in the editor. You can also use the special %s{PAGENO}%s and %s{nbpg}%s tags to display page numbering.', 'gravitypdf' ), '<em>', '</em>', '<em>', '</em>' ),
+		) );
+	}
+
+	/**
+	 * Return the optional template-specific first page footer field
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function get_first_page_footer_field() {
+		return apply_filters( 'gfpdf_first_page_footer_field_setting', array(
+			'id'         => 'first_footer',
+			'name'       => __( 'First Page Footer', 'gravitypdf' ),
+			'type'       => 'rich_editor',
+			'size'       => 8,
+			'desc'       => __( 'Override the footer on the first page of the PDF.', 'gravitypdf' ),
+			'inputClass' => 'merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields',
+			'toggle'     => __( 'Use different footer on first page of PDF?', 'gravitypdf' ),
+		) );
+	}
+
+	/**
+	 * Return the optional template-specific background image field
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function get_background_field() {
+		return apply_filters( 'gfpdf_background_field_setting', array(
+			'id'      => 'background',
+			'name'    => __( 'Background Image', 'gravitypdf' ),
+			'type'    => 'upload',
+			'desc'    => __( 'The background image is included on all pages. For optimal results, use an image the same dimensions as the paper size.', 'gravitypdf' ),
+			'tooltip' => '<h6>' . __( 'Background Image', 'gravitypdf' ) . '</h6>' . __( 'For the best results, use a JPG or non-interlaced 8-Bit PNG that has the same dimensions as the paper size.', 'gravitypdf' ),
+		) );
 	}
 }

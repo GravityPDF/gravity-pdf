@@ -221,6 +221,9 @@ abstract class Helper_Abstract_Fields {
 	 */
 	public function html( $value = '', $label = true ) {
 
+		$value = $this->encode_tags( $value, $this->field->type ); /* Prevent shortcodes being processed from user input */
+		$value = apply_filters( 'gfpdf_field_content', $value, $this->field, $value, $this->entry['id'], $this->form['id'] ); /* Backwards compat */
+
 		$type = ( ! empty($this->field->inputType)) ? $this->field->inputType : $this->field->type;
 
 		$html = '<div id="field-'. $this->field->id .'" class="gfpdf-'. $type .' gfpdf-field '. $this->field->cssClass . '">';
@@ -240,4 +243,23 @@ abstract class Helper_Abstract_Fields {
 	 * @since 4.0
 	 */
 	abstract public function value();
+
+	/**
+	 * Prevent user-data shortcodes from being processed by the PDF templates
+	 * @param  String $value The text to be converted
+	 * @param  String $type  The field type
+	 * @return String
+	 * @since 4.0
+	 */
+    public function encode_tags($value, $type) {
+    	
+    	if( $type != 'html' && $type != 'signature' && $type != 'section' ) {
+
+			$find      = array( '[', ']', '{', '}' );
+			$converted = array( '&#91;', '&#93;', '&#123;', '&#125;' );
+			$value     = str_replace( $find, $converted, $value );
+    	}
+
+    	return $value;
+    }
 }

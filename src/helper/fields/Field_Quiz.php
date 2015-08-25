@@ -79,6 +79,11 @@ class Field_Quiz extends Helper_Abstract_Fields
 	public function html( $value = '', $label = true ) {
 		$value = apply_filters( 'gform_entry_field_value', $this->get_value(), $this->field, $this->entry, $this->form );
 
+		/* Return early to prevent any problems with when field is empty or the quiz plugin isn't enabled */
+		if( empty( trim( $value ) ) || ! class_exists( 'GFQuiz' ) ) {
+			return parent::html( '' );
+		}
+
 		/**
 		 * Add class to the quiz images so mPDF can style them (limited cascade support)
 		 * We'll try use our DOM reader to correctly process the HTML, otherwise use string replace

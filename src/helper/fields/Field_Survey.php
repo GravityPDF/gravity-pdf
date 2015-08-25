@@ -173,6 +173,12 @@ class Field_Survey extends Helper_Abstract_Fields
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
+		
+		/* Return early to prevent unwanted details being displayed when the plugin isn't enabled */
+		if( ! class_exists( 'GFSurvey' ) ) {
+			return parent::html( '' );
+		}
+
 		echo $this->fieldObject->html();
 	}
 

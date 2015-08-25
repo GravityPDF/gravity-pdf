@@ -89,6 +89,24 @@ class GFPDF_Core extends GFPDF_Depreciated_Abstract
 	}
 }
 
+/**
+ * Add backwards compatibility support for our PDF generator
+ * @since 3.0
+ */
+class PDFRender extends GFPDF_Depreciated_Abstract
+{
+	/**
+	 * Saves the PDF to disk
+	 * @param String $pdf
+	 * @param String $filename
+	 * @param Integer $id
+	 * @since 3.0
+	 */
+	public function savePDF($pdf, $filename, $id) {
+
+	}
+}
+
 
 /**
  * Add backwards compatibility support for our common class
