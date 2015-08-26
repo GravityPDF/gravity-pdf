@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The Dismisal Button
+ * The Review Plugin Notice
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
@@ -36,16 +36,12 @@ if (! defined('ABSPATH')) {
 
 ?>
 
-<form method="post">
-    <input type="hidden" name="action" value="gfpdf_<?php echo $args['type']; ?>" />
-    <?php wp_nonce_field( 'gfpdf_action_' . $args['type'], 'gfpdf_action_' . $args['type'] ) ?>
+<div style="font-size:15px; line-height: 25px">
 
-    <p>
-        <button class="button button-primary"><?php echo $args['button_text'] ?></button>
+    <strong><?php _e( "Gravity PDF needs to migration your configuration.", 'gravitypdf' ); ?></strong>
+    
+    <br>
 
-        <?php if( $args['dismissal'] == 'enabled' ): ?>
-            <input class="button" type="submit" value="<?php _e('Dismiss Notice', 'gravitypdf'); ?>" name="gfpdf-dismiss-notice" />
-        <?php endif; ?>
-    </p>
-
-</form>
+    <?php _e('The migration process will import your old configuration file into the database.', 'gravitypdf' ); ?>
+    
+</div>

@@ -812,7 +812,7 @@ class Helper_Options implements Helper_Interface_Filters {
 
 		$gfpdf_options = $this->settings;
 
-		if ( empty( $_POST['_wp_http_referer'] ) ) {
+		if ( empty( $_POST['_wp_http_referer'] ) || empty( $_POST['option_name'] ) || $_POST['option_name'] != 'option_page' ) {
 			return $input;
 		}
 

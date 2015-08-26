@@ -6,6 +6,7 @@ use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
+use GFPDF\Helper\Helper_Abstract_Form;
 
 use Psr\Log\LoggerInterface;
 
@@ -55,6 +56,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Model_Install extends Helper_Abstract_Model {
 
 	/**
+	 * Holds abstracted functions related to the forms plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $form;
+
+	/**
 	 * Holds our log class
 	 * @var Object
 	 * @since 4.0
@@ -88,9 +96,10 @@ class Model_Install extends Helper_Abstract_Model {
 	/**
 	 * Load our model and view and required actions
 	 */
-	public function __construct( LoggerInterface $log, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices ) {
+	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices ) {
 		
 		/* Assign our internal variables */
+		$this->form    = $form;
 		$this->log     = $log;
 		$this->data    = $data;
 		$this->misc    = $misc;

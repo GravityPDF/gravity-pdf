@@ -469,7 +469,7 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	protected function set_custom_paper_size() {
-		$custom_paper_size = (isset($this->settings['custom_paper_size'])) ? $this->settings['custom_paper_size'] : array();
+		$custom_paper_size = (isset($this->settings['custom_pdf_size'])) ? $this->settings['custom_pdf_size'] : array();
 
 		if ( sizeof( $custom_paper_size ) !== 3 ) {
 			throw new Exception( 'Custom paper size not valid. Array should contain three keys: width, height and unit type' );

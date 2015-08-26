@@ -59,14 +59,16 @@ class View_Actions extends Helper_Abstract_View
 	 * Add our primary button and an opt-our dismissal button
 	 * @param  String $type        The action ID
 	 * @param  String $button_text The primary button text
+	 * @param  String $dismissal   Whether the dismissal button should be shown
 	 * @return String              The action_buttons HTML
 	 * @since 4.0
 	 */
-	private function get_action_buttons( $type, $button_text ) {
+	private function get_action_buttons( $type, $button_text, $dismissal = 'enabled' ) {
 
 		return $this->load( 'action_buttons', array(
 			'type'        => $type,
-			'button_text' => $button_text
+			'button_text' => $button_text,
+			'dismissal'   => $dismissal,
 		), false);
 
 	}
@@ -81,7 +83,22 @@ class View_Actions extends Helper_Abstract_View
 	public function review_plugin( $type, $button_text ) {
 
 		$html = $this->load( 'review_plugin', array(), false);
-		$html .= $this->get_action_buttons( $type, $button_text);
+		$html .= $this->get_action_buttons( $type, $button_text );
+
+		return $html;
+	}
+
+	/**
+	 * Load our v3 to v4 Migration Notice
+	 * @param  String $type        The action ID
+	 * @param  String $button_text The primary button text
+	 * @return String              The notice HTML
+	 * @since 4.0
+	 */
+	public function migration( $type, $button_text ) {
+
+		$html = $this->load( 'migration', array(), false);
+		$html .= $this->get_action_buttons( $type, $button_text, 'disabled' );
 
 		return $html;
 	}

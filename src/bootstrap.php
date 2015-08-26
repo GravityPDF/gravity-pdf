@@ -479,7 +479,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	}
 
 	public function installer() {
-		$model = new Model\Model_Install( $this->log, $this->data, $this->misc, $this->notices );
+		$model = new Model\Model_Install( $this->form, $this->log, $this->data, $this->misc, $this->notices );
 		$class = new Controller\Controller_Install( $model, $this->form, $this->log, $this->notices, $this->data, $this->misc );
 		$class->init();
 
@@ -566,7 +566,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function actions() {
 
-		$model = new Model\Model_Actions( $this->options );
+		$model = new Model\Model_Actions( $this->data, $this->options, $this->notices );
 		$view  = new View\View_Actions( array() );
 
 		$class = new Controller\Controller_Actions( $model, $view, $this->form, $this->log, $this->notices );

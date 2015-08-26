@@ -82,7 +82,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	 * Load our model and view and required actions
 	 */
 	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Abstract_Form $form, LoggerInterface $log, Helper_Notices $notices ) {
-		
+
 		/* Assign our internal variables */
 		$this->form    = $form;
 		$this->log     = $log;
@@ -134,6 +134,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	 * condition: The function or method to call to determine if a notice should be displayed (Boolean)
 	 * process: The function to handle a successful action. On success the disable_route() method should be called
 	 * view: The function used to display the notice content
+	 *
 	 * @return Array
 	 * @since 4.0
 	 */
@@ -141,12 +142,21 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 
 		$routes = array(
 			array(
-				'action'     => 'review_plugin',
+				'action'      => 'review_plugin',
 				'action_text' => __( 'Review Submitted', 'gravitypdf' ),
-				'condition'  => array( $this->model, 'review_condition' ),
-				'process'    => array( $this->model, 'dismiss_notice' ),
-				'view'       => array( $this->view, 'review_plugin' ),
-				'capability' => 'gravityforms_view_settings',
+				'condition'   => array( $this->model, 'review_condition' ),
+				'process'     => array( $this->model, 'dismiss_notice' ),
+				'view'        => array( $this->view, 'review_plugin' ),
+				'capability'  => 'gravityforms_view_settings',
+			),
+
+			array(
+				'action'      => 'migrate_v3_to_v4',
+				'action_text' => __( 'Begin Migration', 'gravitypdf' ),
+				'condition'   => array( $this->model, 'migration_condition' ),
+				'process'     => array( $this->model, 'begin_migration' ),
+				'view'        => array( $this->view, 'migration' ),
+				'capability'  => 'gravityforms_edit_settings',
 			),
 		);
 
@@ -160,15 +170,15 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	 */
 	public function route_notices() {
 
-		foreach($this->get_routes() as $route) {
+		foreach ( $this->get_routes() as $route ) {
 
 			/* Before displaying check the user has the correct capabilities, the notice isn't already been dismissed and the route condition has been met */
-			if( $this->form->has_capability( $route['capability'] ) &&
+			if ( $this->form->has_capability( $route['capability'] ) &&
 				! $this->model->is_notice_already_dismissed( $route['action'] ) &&
 				call_user_func( $route['condition'] ) ) {
 
 				$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Trigger Action Notification.', array( 'route' => $route ) );
-				$this->notices->add_notice( call_user_func($route['view'], $route['action'], $route['action_text'] ) );
+				$this->notices->add_notice( call_user_func( $route['view'], $route['action'], $route['action_text'] ) );
 			}
 		}
 	}
@@ -180,17 +190,17 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	 */
 	public function route() {
 
-		foreach($this->get_routes() as $route) {
+		foreach ( $this->get_routes() as $route ) {
 
 			/* Check we have a valid action and the display condition is true */
-			if( rgpost('action') == 'gfpdf_' . $route['action'] && call_user_func( $route['condition'] ) ) {
+			if ( rgpost( 'action' ) == 'gfpdf_' . $route['action'] && call_user_func( $route['condition'] ) ) {
 
 				/* Check user capability */
-				if( ! $this->form->has_capability( $route['capability'] ) ) {
-			
+				if ( ! $this->form->has_capability( $route['capability'] ) ) {
+
 					$this->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
 						'user'      => wp_get_current_user(),
-						'user_meta' => get_user_meta( get_current_user_id() )
+						'user_meta' => get_user_meta( get_current_user_id() ),
 					) );
 
 					wp_die( __( 'You do not have permission to access this page', 'gravitypdf' ) );
@@ -198,7 +208,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 
 				/* Check nonce is valid */
 				if ( ! wp_verify_nonce( rgpost( 'gfpdf_action_' . $route['action'] ), 'gfpdf_action_' . $route['action'] ) ) {
-					
+
 					$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
 					$this->notices->add_error( __( 'There was a problem processing the action. Please try again.', 'gravitypdf' ) );
 
@@ -206,9 +216,9 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 				}
 
 				/* Check if the user wants to dismiss the notice, otherwise process the route */
-				if( isset( $_POST['gfpdf-dismiss-notice'] ) ) {
+				if ( isset( $_POST['gfpdf-dismiss-notice'] ) ) {
 					$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Dismiss Action.', array( 'route' => $route ) );
-					$this->model->dismiss_notice( $type );
+					$this->model->dismiss_notice( $route['action'] );
 				} else {
 					$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Trigger Action Process.', array( 'route' => $route ) );
 					call_user_func( $route['process'], $route['action'], $route );
@@ -216,5 +226,4 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 			}
 		}
 	}
-
 }
