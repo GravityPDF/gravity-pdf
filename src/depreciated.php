@@ -97,12 +97,12 @@ class PDFRender extends GFPDF_Depreciated_Abstract
 {
 	/**
 	 * Saves the PDF to disk
-	 * @param String $pdf
-	 * @param String $filename
+	 * @param String  $pdf
+	 * @param String  $filename
 	 * @param Integer $id
 	 * @since 3.0
 	 */
-	public function savePDF($pdf, $filename, $id) {
+	public function savePDF( $pdf, $filename, $id ) {
 
 	}
 }
@@ -122,12 +122,12 @@ class PDF_Common extends GFPDF_Depreciated_Abstract
 	 */
 	public static function get_ids() {
 		global $form_id, $lead_id, $lead_ids;
-		
-		$form_id  =  ($form_id) ? $form_id : absint( rgget( 'fid' ) );
-		$lead_ids =  ($lead_id) ? array($lead_id) : explode(',', rgget( 'lid' ) );
-		
+
+		$form_id  = ($form_id) ? $form_id : absint( rgget( 'fid' ) );
+		$lead_ids = ($lead_id) ? array( $lead_id ) : explode( ',', rgget( 'lid' ) );
+
 		/* If form ID and lead ID hasn't been set stop the PDF from attempting to generate */
-		if( empty($form_id) || empty($lead_ids) ) {
+		if ( empty($form_id) || empty($lead_ids) ) {
 			return false;
 		}
 
@@ -147,7 +147,7 @@ class PDF_Common extends GFPDF_Depreciated_Abstract
 
 	/**
 	 * Convert merge tags to real Gravity Form values
-	 * @param  String $string
+	 * @param  String  $string
 	 * @param  Integer $form_id
 	 * @param  Integer $lead_id
 	 * @return String
@@ -268,9 +268,27 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 	public static function do_lead_detail_grid( $form, $lead, $config = array() ) {
 		global $gfpdf;
 
+		/* Convert old config values to our new ones */
+		if( ! isset( $config['meta'] ) ) {
+
+			$convert = array(
+				'empty_field' => 'empty',
+				'return'      => 'echo',
+			);
+
+			foreach( $convert as $key => $val ) {
+				if( isset( $config[ $key ] ) ) {
+					$config[ $val ] = $config[ $key ];
+					unset( $config[ $key ] );
+				}
+			}
+
+			$config = array( 'meta' => $config );
+		}
+
 		/* Set up any legacy configuration options needed */
 		$config['meta']['legacy_css'] = true;
-
+		
 		$model = new Model_PDF( $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
 		$view  = new View_PDF( array(), $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
 		$view->process_html_structure( $lead, $model, $config );

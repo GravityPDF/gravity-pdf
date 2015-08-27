@@ -575,7 +575,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 	/**
 	 * Add backwards compatbility with v3.x.x default PDF template files
-	 * This function will now pull the PDF configuration details from our query variables
+	 * This function will now pull the PDF configuration details from our query variables / or our backwards compatible URL params method
 	 *
 	 * @param  Integer $form_id  The Gravity Form ID
 	 * @return  Array The matched configuration being requested
@@ -585,6 +585,16 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function get_default_config_data( $form_id ) {
 		$pid = $GLOBALS['wp']->query_vars['pid'];
 		$lid = (int) $GLOBALS['wp']->query_vars['lid'];
+
+		$settingsAPI = new Model\Model_Form_Settings( $this->form, $this->log, $this->data, $this->options, $this->misc, $this->notices );
+		$settings = $settingsAPI->get_pdf( $form_id, $pid );
+
+		return array(
+			'empty_field'     => true,
+			'html_field'      => true,
+			'page_names'      => true,
+			'section_content' => true,
+		);
 	}
 }
 
