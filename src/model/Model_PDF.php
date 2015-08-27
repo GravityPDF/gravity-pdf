@@ -567,7 +567,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 			/* Set up classes */
 			$controller  = $this->getController();
-			$settingsAPI = new Model_Form_Settings();
+			$settingsAPI = new Model_Form_Settings( $this->form, $this->log, $this->data, $this->options, $this->misc, $this->notices );
 
 			/* Loop through each PDF config and generate */
 			foreach ( $pdfs as $pdf_config ) {
@@ -642,7 +642,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		if ( sizeof( $pdfs ) > 0 ) {
 			/* set up classes */
 			$controller  = $this->getController();
-			$settingsAPI = new Model_Form_Settings();
+			$settingsAPI = new Model_Form_Settings( $this->form, $this->log, $this->data, $this->options, $this->misc, $this->notices );
 
 			/* loop through each PDF config */
 			foreach ( $pdfs as $pdf ) {
@@ -703,7 +703,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 			/* set up classes */
 			$controller  = $this->getController();
-			$settingsAPI = new Model_Form_Settings();
+			$settingsAPI = new Model_Form_Settings( $this->form, $this->log, $this->data, $this->options, $this->misc, $this->notices );
 
 			/* loop through each PDF config */
 			foreach ( $pdfs as $pdf ) {
@@ -1243,5 +1243,45 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		return $class;
+	}
+
+	/**
+	 * Attempts to find a configuration which matches the legacy routing method
+	 * @param  Array $config
+	 * @return Mixed
+	 * @since  4.0
+	 */
+	public function get_legacy_config( $config ) {
+
+		$settingsAPI = new Model_Form_Settings( $this->form, $this->log, $this->data, $this->options, $this->misc, $this->notices );
+
+		/* Get the form settings */
+		$pdfs = $settingsAPI->get_settings( $config['fid'] );
+
+		if( is_wp_error( $pdfs ) ) {
+			return $pdfs;
+		}
+
+		/* Reindex the $pdfs keys */
+		$pdfs = array_values( $pdfs );
+
+		/* Use the legacy aid to determine which PDF to load */
+		if( $config['aid'] !== false ) {
+			$selector = $config['aid'] - 1;
+
+			if( isset( $pdfs[ $selector ] ) && $pdfs[ $selector ]['template'] == $config['template'] ) {
+				return $pdfs[ $selector ]['id'];
+			}
+		}
+
+		/* The aid method failed so lets load the first matching configuration */
+		$matches = array();
+		foreach( $pdfs as $pdf ) {
+			if( $pdf['active'] === true && $pdf['template'] == $config['template'] ) {
+				return $pdf['id'];
+			}
+		}
+
+		return new WP_Error( 'Could not find PDF configuration requested' );
 	}
 }

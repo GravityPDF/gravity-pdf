@@ -648,12 +648,13 @@ class Helper_PDF {
 	 */
 	protected function set_pdf_security() {
 		/* Security settings cannot be applied to pdfa1b or pdfx1a formats */
-		if ( strtolower( $this->settings['format'] ) == 'normal' && strtolower( $this->settings['security'] == 'Yes' ) ) {
+		if ( ( empty( $this->settings['format'] ) || strtolower( $this->settings['format'] ) == 'normal' ) && strtolower( $this->settings['security'] == 'Yes' ) ) {
 
-			$password = (isset($this->settings['password'])) ? $this->settings['password'] : '';
-			$privileges = (isset($this->settings['privileges'])) ? $this->settings['privileges'] : array();
+			$password        = (isset( $this->settings['password'] ) ) ? 		$this->settings['password'] : 			'';
+			$privileges      = (isset( $this->settings['privileges'] ) ) ? 		$this->settings['privileges'] : 		array();
+			$master_password = (isset( $this->settings['master_password'] ) ) ? $this->settings['master_password'] : 	'';
 
-			$this->mpdf->SetProtection( $privileges, $password, '', 128 );
+			$this->mpdf->SetProtection( $privileges, $password, $master_password, 128 );
 		}
 	}
 

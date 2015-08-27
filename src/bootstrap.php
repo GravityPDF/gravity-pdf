@@ -580,20 +580,18 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @param  Integer $form_id  The Gravity Form ID
 	 * @return  Array The matched configuration being requested
 	 * @since 4.0
-	 * @todo
 	 */
 	public function get_default_config_data( $form_id ) {
 		$pid = $GLOBALS['wp']->query_vars['pid'];
-		$lid = (int) $GLOBALS['wp']->query_vars['lid'];
 
 		$settingsAPI = new Model\Model_Form_Settings( $this->form, $this->log, $this->data, $this->options, $this->misc, $this->notices );
 		$settings = $settingsAPI->get_pdf( $form_id, $pid );
 
 		return array(
-			'empty_field'     => true,
-			'html_field'      => true,
-			'page_names'      => true,
-			'section_content' => true,
+			'empty_field'     => ( isset( $settings['empty'] ) && $settings['empty'] == 'Yes' ) ? true : false,
+			'html_field'      => ( isset( $settings['html_field'] ) && $settings['html_field'] == 'Yes' ) ? true : false,
+			'page_names'      => ( isset( $settings['page_names'] ) && $settings['page_names'] == 'Yes' ) ? true : false,
+			'section_content' => ( isset( $settings['section_content'] ) && $settings['section_content'] == 'Yes' ) ? true : false,
 		);
 	}
 }

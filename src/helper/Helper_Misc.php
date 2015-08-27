@@ -430,7 +430,7 @@ class Helper_Misc
 		return apply_filters('gfpdf_template_args', array(
 
 			'form_id'   => $entry['form_id'], /* backwards compat */
-			'lead_ids'  => array( $entry['id'] ), /* backwards compat */
+			'lead_ids'  => $this->get_legacy_ids( $entry['id'], $settings ), /* backwards compat */
 			'lead_id'   => $entry['id'], /* backwards compat */
 
 			'form'      => $form,
@@ -487,7 +487,7 @@ class Helper_Misc
 	 * @return String
 	 * @since 4.0
 	 */
-	public static function do_mergetags($string, $form, $lead)
+	public function do_mergetags($string, $form, $lead)
 	{
 		/* Unconvert { and } symbols from HTML entities and remove {all_fields} tag */
 		$find    = array( '&#123;', '&#125;', '{all_fields}' );
@@ -496,5 +496,37 @@ class Helper_Misc
 		$string = str_replace( $find, $replace, $string );
 
 		return trim( GFCommon::replace_variables( $string, $form, $lead, false, false, false ) );
+	}
+
+	/**
+	 * Backwards compatibility that allows multiple IDs to be passed to the renderer
+	 * @param  Integer $entry_id The fallback ID if none present
+	 * @param  Array $settings The current PDF settings
+	 * @return Array
+	 * @since 4.0
+	 */
+	private function get_legacy_ids( $entry_id, $settings ) {
+
+		$leads    = rgget( 'lid' );
+		$override = ( isset( $settings['public_access'] ) && $settings['public_access'] == 'Yes' ) ? true : false;
+
+		if( $leads && ( $override === true || $this->form->has_capability( 'gravityforms_view_entries' ) ) ) {
+			$ids = explode( ',', $leads );
+
+			/* ensure all passed ids are integers */
+			array_walk( $ids, function( &$id ) {
+				$id = (int) $id;
+			});
+
+			/* filter our any zero-value ids */
+			$ids = array_filter( $ids );
+
+			if( sizeof( $ids ) > 0 ) {
+				return $ids;
+			}
+		}
+
+		/* if not processing legacy endpoint, or if invalid IDs were passed we'll return the original entry ID */
+		return array( $entry_id );
 	}
 }

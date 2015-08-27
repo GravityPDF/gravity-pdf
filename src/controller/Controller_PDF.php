@@ -111,7 +111,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 */
 	public function add_actions() {
 		/* Process PDF if needed */
-		add_action( 'parse_request', array( $this, 'process_legacy_pdf_endpoint' ), 5 ); /* give legacy endpoint precedancy over new endpoint for backwards compatibility */
+		add_action( 'parse_request', array( $this, 'process_legacy_pdf_endpoint' ) ); /* legacy PDF endpoint */
 		add_action( 'parse_request', array( $this, 'process_pdf_endpoint' ) ); /* new PDF endpoint */
 
 		/* Display PDF links in Gravity Forms Admin Area */
@@ -133,10 +133,12 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 */
 	public function add_filters() {
 		/* PDF authentication middleware */
-		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_logged_out_restriction' ), 1, 3 );
-		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_logged_out_timeout' ), 2, 3 );
-		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_auth_logged_out_user' ), 3, 3 );
-		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_user_capability' ), 4, 3 );
+		//add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_active' ), 10, 3 ); /* TODO */
+		//add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_conditional' ), 10, 3 ); /* TODO */
+		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_logged_out_restriction' ), 20, 3 );
+		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_logged_out_timeout' ), 30, 3 );
+		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_auth_logged_out_user' ), 40, 3 );
+		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_user_capability' ), 50, 3 );
 
 		/* Tap into GF notifications */
 		add_filter( 'gform_notification', array( $this->model, 'notifications' ), 9999, 3 ); /* ensure Gravity PDF is one of the last filters to be applied */
@@ -173,23 +175,12 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 			'action' => $action,
 		) );
 
-		/*
-         * Send to our model to handle validation / authentication
-         */
+		/*  Send to our model to handle validation / authentication */
 		$results = $this->model->process_pdf( $pid, $lid, $action );
 
 		/* if error, display to user */
 		if ( is_wp_error( $results ) ) {
-
-			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'PDF Generation Error.', array( 'WP_Error' => $results ) );
-
-			/* only display detailed error to admins */
-			$whitelist_errors = array( 'timeout_expired', 'access_denied' );
-			if ( $this->form->has_capability( 'gravityforms_view_settings' ) || in_array( $results->get_error_code(), $whitelist_errors ) ) {
-				wp_die( $results->get_error_message() );
-			} else {
-				wp_die( __( 'There was a problem generating your PDF', 'gravitypdf' ) );
-			}
+			$this->pdf_error( $results );
 		}
 	}
 
@@ -203,5 +194,60 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 */
 	public function process_legacy_pdf_endpoint() {
 
+		/* exit early if all our required parameters aren't met */
+		if( empty( $_GET['gf_pdf'] ) || empty( $_GET['fid'] ) || empty( $_GET['lid'] ) || empty( $_GET['template'] ) ) {
+			return;
+		}
+
+		$config = array(
+			'lid'      => $_GET['lid'],
+			'fid'      => (int) $_GET['fid'],
+			'aid'      => ( isset( $_GET['aid'] ) ) ? (int) $_GET['aid'] : false,
+			'template' => substr($_GET['template'], 0, -4), /* strip .php from the template name */
+			'action'   => ( isset( $_GET['download'] ) ) ? 'download' : 'view',
+		);
+
+		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Processing Legacy PDF endpoint.', array(
+			'config' => $config
+		) );
+
+		/* Attempt to find a valid config */
+		$pid = $this->model->get_legacy_config( $config );
+
+		if( is_wp_error( $pid ) ) {
+			$this->pdf_error( $pid );
+		}
+
+		/* Store our ids in the WP query_vars object */
+		$GLOBALS['wp']->query_vars['gf_pdf'] = 1;
+		$GLOBALS['wp']->query_vars['pid']    = $pid;
+		$GLOBALS['wp']->query_vars['lid']    = $lid;
+
+		/* Send to our model to handle validation / authentication */
+		$results = $this->model->process_pdf( $pid, $config['lid'], $config['action'] );
+
+		/* if error, display to user */
+		if ( is_wp_error( $results ) ) {
+			$this->pdf_error( $results );
+		}
+	}
+
+	/**
+	 * Output PDF error to user
+	 * @param  Object $error The WP_Error object
+	 * @return void
+	 * @since 4.0
+	 */
+	private function pdf_error( $error ) {
+
+		$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'PDF Generation Error.', array( 'WP_Error' => $error ) );
+
+		/* only display detailed error to admins */
+		$whitelist_errors = array( 'timeout_expired', 'access_denied' );
+		if ( $this->form->has_capability( 'gravityforms_view_settings' ) || in_array( $error->get_error_code(), $whitelist_errors ) ) {
+			wp_die( $error->get_error_message() );
+		} else {
+			wp_die( __( 'There was a problem generating your PDF', 'gravitypdf' ) );
+		}
 	}
 }
