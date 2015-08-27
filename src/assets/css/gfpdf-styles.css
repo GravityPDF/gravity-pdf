@@ -529,7 +529,7 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
   width: 20px;
 }
 
-#gfpdf-template-example {
+#gfpdf-template-example img {
   width: 100%;
   max-width: 300px;
   border: 1px solid #CCC;
@@ -573,8 +573,6 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
   word-wrap: break-word;
   padding: 2px 0 2px 2px;
 }
-
-
 
 @media only screen and (min-width: 500px) {
 

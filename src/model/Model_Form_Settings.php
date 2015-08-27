@@ -684,10 +684,14 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			$current_template = $this->options->get_form_value( $settings['template'] );
 			$template_image   = $this->misc->get_template_image( $current_template );
 
+			$settings['template']['desc'] .= '<div id="gfpdf-template-example">';
+
 			if ( ! empty($template_image) ) {
-				$img              = '<img src="'. esc_url( $template_image ) . '" alt="' . __( 'Template Example' ) . '" id="gfpdf-template-example" />';
-				$settings['template']['desc'] = $settings['template']['desc'] . $img;
+				$img              = '<img src="'. esc_url( $template_image ) . '" />';
+				$settings['template']['desc'] .= $img;
 			}
+
+			$settings['template']['desc'] .= '</div>';
 		}
 		return $settings;
 	}

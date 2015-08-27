@@ -614,8 +614,8 @@
 
 		      			/* Update our template example preview and display it */
 		      			if(response.preview != null) {
-		      				$('#gfpdf-template-example').attr('src', response.preview).load(function() {
-		      					$(this).show();
+		      				$('#gfpdf-template-example').html('<img src="' + response.preview + '" />').find('img').load(function() {
+		      					$(this).parent().show();
 		      				});
 		      			}
 		      		});
