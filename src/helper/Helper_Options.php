@@ -1522,10 +1522,11 @@ class Helper_Options implements Helper_Interface_Filters {
 	 */
 	public function button_callback( $args ) {
 
-		$tab = (isset($_GET['tab'])) ? esc_attr( $_GET['tab'] ) : 'general';
+		$tab   = (isset($_GET['tab'])) ? esc_attr( $_GET['tab'] ) : 'general';
 		$nonce = wp_create_nonce( 'gfpdf_settings[' . $args['id'] . ']' );
+		$class = (isset($args['inputClass'])) ? esc_attr( $args['inputClass'] ) : '';
 
-		$html = '<button id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . '][name]" value="'. $args['id'] . '" class="button gfpdf-button" type="submit">' . esc_html( $args['std'] ) .'</button>';
+		$html = '<button id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . '][name]" value="'. $args['id'] . '" class="button gfpdf-button '. $class .'" type="submit">' . esc_html( $args['std'] ) .'</button>';
 		$html .= '<span class="gf_settings_description">'  . wp_kses_post( $args['desc'] ) . '</span>';
 		$html .= '<input type="hidden" name="gfpdf_settings[' . $args['id'] . '][nonce]" value="' . $nonce . '" />';
 
@@ -1535,7 +1536,6 @@ class Helper_Options implements Helper_Interface_Filters {
 
 		echo $html;
 	}
-
 
 	/**
 	 * Gravity Forms Conditional Logic Callback
