@@ -198,11 +198,11 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* prepare our data */
 		$label = (rgget( 'pid' )) ? __( 'Update PDF', 'gravitypdf' ) : __( 'Add PDF', 'gravitypdf' );
 
-		/* re-register our Gravity Forms Notifications */
-		$this->register_notifications( $form['notifications'] );
-
 		/* re-register all our settings to show form-specific options */
 		$this->options->register_settings( $this->options->get_registered_fields() );
+
+		/* re-register our Gravity Forms Notifications */
+		$this->register_notifications( $form['notifications'] );
 
 		/* pass to view */
 		$controller->view->add_edit(array(
@@ -770,6 +770,17 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$file = PDF_PLUGIN_DIR . 'initialisation/templates/config/' . $template . '.php';
 		if ( empty($class) ) {
 			$class = $this->load_template_configuration( $file );
+		}
+
+		/* If class still empty it's either a legacy template or doesn't have a config. Check for legacy templates which support certain fields */
+		$legacy_templates = apply_filters( 'gfpdf_legacy_templates', array(
+			'default-template',
+			'default-template-two-rows',
+			'default-template-no-style',
+		) );
+
+		if( in_array( $template, $legacy_templates ) ) {
+			$class = $this->load_template_configuration( PDF_PLUGIN_DIR . 'initialisation/templates/config/legacy.php' );
 		}
 
 		return $class;

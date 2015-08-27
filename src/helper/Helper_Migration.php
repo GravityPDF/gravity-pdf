@@ -180,6 +180,7 @@ class Helper_Migration {
 	private function convert_v3_to_v4( $raw_config ) {
 
 		$migration_key = array(
+			'notifications'				   => 'notification',
 			'premium'                      => 'advanced_template',
 			'access'                       => 'public_access',
 			'dpi'                          => 'image_dpi',
@@ -187,7 +188,7 @@ class Helper_Migration {
 			'pdf_privileges'               => 'privileges',
 			'pdf_master_password'          => 'master_password',
 			'default-show-html'            => 'show_html',
-			'default-show-empty'           => 'show_hidden',
+			'default-show-empty'           => 'show_empty',
 			'default-show-page-names'      => 'show_page_names',
 			'default-show-section-content' => 'show_section_content',
 		);
@@ -210,21 +211,6 @@ class Helper_Migration {
 	 */
 	private function process_individual_v3_nodes( $node, $migration_key = array() ) {
 
-		/* Loop through each array key */
-		foreach ( $node as $id => &$val ) {
-
-			/* Convert our boolean values into 'Yes' or 'No' responses */
-			if ( is_bool( $val ) && $id != 'notifications' ) {
-				$val = ($val) ? 'Yes' : 'No';
-			}
-
-			/* Convert to our v4 configuration names */
-			if ( isset( $migration_key[ $id ] ) ) {
-				unset( $node[ $id ] );
-				$node[ $migration_key[ $id ] ] = $val;
-			}
-		}
-
 		/* Handle PDFA1B and PDFX1A separately */
 		if ( isset( $node['pdfa1b'] ) && $node['pdfa1b'] === true ) {
 			unset( $node['pdfa1b']);
@@ -237,8 +223,8 @@ class Helper_Migration {
 		}
 
 		/* Fix the public access key */
-		if ( isset( $node['public_access'] ) ) {
-			$node['public_access'] = ($node['public_access'] == 'all') ? 'Yes' : 'No';
+		if ( isset( $node['access'] ) ) {
+			$node['access'] = ($node['access'] == 'all') ? 'Yes' : 'No';
 		}
 
 		/* Remove .php from the template file */
@@ -266,6 +252,22 @@ class Helper_Migration {
                 unset( $node['pdf_size'] );
             }
         }
+
+		/* Loop through each array key */
+		foreach ( $node as $id => &$val ) {
+
+			/* Convert our boolean values into 'Yes' or 'No' responses, with the exception of notification */
+			$skip_nodes = array( 'notifications', 'notification' );
+			if ( is_bool( $val ) && ! in_array( $id, $skip_nodes ) ) {
+				$val = ($val) ? 'Yes' : 'No';
+			}
+
+			/* Convert to our v4 configuration names */
+			if ( isset( $migration_key[ $id ] ) ) {
+				unset( $node[ $id ] );
+				$node[ $migration_key[ $id ] ] = $val;
+			}
+		}
 
 		return $node;
 	}
@@ -349,11 +351,12 @@ class Helper_Migration {
 
 			if ( ! is_wp_error( $form ) ) {
 
-				/* Get an array of all the form notifications for later use */
+				/* Get an array of all the form notification for later use */
 				$notifications = array();
 				foreach ( $form['notifications'] as $not ) {
-					$notifications[] = $not['name'];
+					$notifications[ $not['id'] ] = $not['name'];
 				}
+
 
                 /* Hold name in array so we can prevent duplicates */
                 $name = array();
@@ -366,9 +369,15 @@ class Helper_Migration {
                         continue;
                     }
 
+                    /* Set our default fields */
 					$node['id']     = uniqid();
 					$node['active'] = true;
 					$node['name']   = $this->misc->human_readable( $node['template'] );
+
+					/* Include a filename if none given */
+					if( empty( $node['filename'] ) ) {
+						$node['filename'] = 'form-{form_id}-entry-{entry_id}';
+					}
 
                     /* Prevent duplicate names by adding a number to the end of the name */
                     if( isset( $name[ $node['name'] ] ) ) {
@@ -379,9 +388,34 @@ class Helper_Migration {
                         $name[ $node['name'] ] = 1;
                     }
 
-					/* Pull all notifications names into array */
-					if ( $node['notifications'] === true ) {
-						$node['notifications'] = $notifications;
+					/* Update all notification and pull correct IDs into new array */
+					if( isset( $node['notification'] ) ) {
+
+						/* If assigned to all we'll consume all notification IDs, otherwise we'll sniff out the correct IDs */
+						if ( $node['notification'] === true ) {
+							$node['notification'] = array_keys( $notifications );
+						} else {
+
+							/* Turn into array if not already */
+							if( ! is_array( $node['notification'] ) ) {
+								$node['notification'] = array( $node['notification'] );
+							}
+
+							$new_notification = array();
+							foreach( $node['notification'] as $email ) {
+								$match = array_search( $email, $notifications );
+
+								if( $match !== false ) {
+									$new_notification[] = $match;
+								}
+							}
+
+							$node['notification'] = $new_notification;
+
+							if( sizeof( $node['notification'] ) === 0 ) {
+								unset( $node['notification'] );
+							}
+						}
 					}
 
 					/* Insert into database */

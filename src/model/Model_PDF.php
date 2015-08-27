@@ -607,7 +607,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function maybe_attach_to_notification( $notification, $settings ) {
 		if ( isset($settings['notification']) && is_array( $settings['notification'] ) ) {
-			if ( isset($notification['isActive']) && $notification['isActive'] && in_array( $notification['name'], $settings['notification'] ) ) {
+			if ( isset($notification['isActive']) && $notification['isActive'] && in_array( $notification['id'], $settings['notification'] ) ) {
 				return true;
 			}
 		}

@@ -224,7 +224,15 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			return;
 		}
 
-		echo implode( ', ', $item['notification'] );
+		/* Convert our IDs to names */
+		$notification_names = array();
+		foreach( $this->form['notifications'] as $notification ) {
+			if( in_array( $notification['id'], $item['notification'] ) ) {
+				$notification_names[] = $notification['name'];
+			}
+		}
+
+		echo implode( ', ', $notification_names );
 	}
 
 	/**
