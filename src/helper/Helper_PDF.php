@@ -648,7 +648,7 @@ class Helper_PDF {
 	 */
 	protected function set_pdf_security() {
 		/* Security settings cannot be applied to pdfa1b or pdfx1a formats */
-		if ( ( empty( $this->settings['format'] ) || strtolower( $this->settings['format'] ) == 'normal' ) && strtolower( $this->settings['security'] == 'Yes' ) ) {
+		if ( strtolower( $this->settings['format'] ) == 'standard' && strtolower( $this->settings['security'] == 'Yes' ) ) {
 
 			$password        = (isset( $this->settings['password'] ) ) ? 		$this->settings['password'] : 			'';
 			$privileges      = (isset( $this->settings['privileges'] ) ) ? 		$this->settings['privileges'] : 		array();
