@@ -195,9 +195,6 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			}
 		}
 
-		/* prepare our data */
-		$label = (rgget( 'pid' )) ? __( 'Update PDF', 'gravitypdf' ) : __( 'Add PDF', 'gravitypdf' );
-
 		/* re-register all our settings to show form-specific options */
 		$this->options->register_settings( $this->options->get_registered_fields() );
 
@@ -206,6 +203,9 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* Pull the PDF settings */
 		$pdf = $this->get_pdf( $form_id, $pdf_id );
+
+		/* prepare our data */
+		$label = ( ! is_wp_error( $pdf ) && ! isset( $pdf['status'] ) ) ? __( 'Update PDF', 'gravitypdf' ) : __( 'Add PDF', 'gravitypdf' );
 
 		/* pass to view */
 		$controller->view->add_edit(array(
@@ -240,7 +240,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		}
 
 		/* If we haven't pulled the form meta data from the database do so now */
-		if ( ! isset($this->data->form_settings[$form_id]) ) {
+		if ( ! isset( $this->data->form_settings[ $form_id ] ) ) {
 			$form = $this->form->get_form( $form_id );
 
 			if ( empty($form) ) {
@@ -249,13 +249,13 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				return $error;
 			}
 
-			$settings = (isset($form['gfpdf_form_settings'])) ? $form['gfpdf_form_settings'] : array();
-			$this->data->form_settings[$form_id] = apply_filters( 'gfpdf_get_form_settings', $settings );
+			$settings = ( isset($form['gfpdf_form_settings'] ) ) ? $form['gfpdf_form_settings'] : array();
+			$this->data->form_settings[ $form_id ] = apply_filters( 'gfpdf_get_form_settings', $settings );
 
 		}
 
 		/* return the form meta data */
-		return $this->data->form_settings[$form_id];
+		return $this->data->form_settings[ $form_id ];
 	}
 
 	/**
@@ -504,6 +504,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* Update our GFPDF settings */
 		$sanitized['id']     = $pdf_id;
 		$sanitized['active'] = true;
+		$sanitized['status'] = 'sanitizing'; /* used as a switch to tell when a record has been saved to the database, or stuck in validation */
 
 		$this->update_pdf( $form_id, $pdf_id, $sanitized, false );
 
@@ -516,14 +517,11 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			return false;
 		}
 
-		/* get the form and merge in the results */
-		$form = $this->form->get_form( $form_id );
+		/* Remove our status */
+		unset( $sanitized['status'] );
 
-		/* Update our GFPDF settings */
-		$form['gfpdf_form_settings'][$pdf_id] = $sanitized;
-
-		/* Update database */
-		$did_update = $this->form->update_form( $form );
+		/* Update the database */
+		$did_update = $this->update_pdf( $form_id, $pdf_id, $sanitized );
 
 		/* If it updated, let's update the global variable */
 		if ( $did_update !== false ) {
