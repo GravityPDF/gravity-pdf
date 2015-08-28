@@ -36,17 +36,16 @@ if (! defined('ABSPATH')) {
 
 global $wp_settings_fields;
 
-
 ?>
 
 <!-- Merge tag functionality requires a global form object -->
 <script type="text/javascript">
-    <?php \GFCommon::gf_global(); ?>
-    <?php \GFCommon::gf_vars(); ?>
+    <?php GFCommon::gf_global(); ?>
+    <?php GFCommon::gf_vars(); ?>
     var form = <?php echo json_encode( $args['form'] ); ?>;
     var gfpdf_current_pdf = <?php echo json_encode( $args['pdf'] ); ?>;
     
-    <?php \GFFormSettings::output_field_scripts(); ?>
+    <?php GFFormSettings::output_field_scripts(); ?>
 </script>
 
 <!-- Check if a wp_editor instance has already loaded -->
@@ -58,7 +57,7 @@ global $wp_settings_fields;
     ?>
 </div>
 
-<?php \GFFormSettings::page_header( $args['title'] ); ?>
+<?php GFFormSettings::page_header( $args['title'] ); ?>
 
     <h3>
         <span>
@@ -140,4 +139,4 @@ global $wp_settings_fields;
     </form>
 
 
-<?php \GFFormSettings::page_footer(); ?>
+<?php GFFormSettings::page_footer(); ?>
