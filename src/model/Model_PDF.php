@@ -529,6 +529,10 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		/* Check that the PDF hasn't already been created this session */
 		if ( $this->does_pdf_exist( $pdf ) ) {
+
+			/* Enable Multicurrency support */
+			$this->misc->maybe_add_multicurrency_support();
+
 			try {
 				$pdf->init();
 				$pdf->render_html( $this->misc->get_template_args( $pdf->get_entry(), $pdf->get_settings() ) );

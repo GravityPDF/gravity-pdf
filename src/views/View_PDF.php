@@ -155,6 +155,9 @@ class View_PDF extends Helper_Abstract_View
 			exit;
 		}
 
+		/* Enable Multicurrency support */
+		$this->misc->maybe_add_multicurrency_support();
+
 		/**
 		 * Set out our PDF abstraction class
 		 */

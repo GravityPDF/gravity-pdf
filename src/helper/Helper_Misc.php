@@ -9,6 +9,7 @@ use GFPDF\Helper\Helper_Data;
 use Psr\Log\LoggerInterface;
 
 use GFCommon;
+use GFMultiCurrency;
 
 use WP_Error;
 use RecursiveDirectoryIterator;
@@ -528,5 +529,18 @@ class Helper_Misc
 
 		/* if not processing legacy endpoint, or if invalid IDs were passed we'll return the original entry ID */
 		return array( $entry_id );
+	}
+
+	/**
+	 * Add support for the third-party plugin GF Multi Currency
+	 * https://github.com/ilanco/gravity-forms-multi-currency
+	 * @return void
+	 * @since 4.0
+	 */
+	public function maybe_add_multicurrency_support() {
+		if( class_exists( 'GFMultiCurrency' ) && method_exists( 'GFMultiCurrency', 'admin_pre_render' ) ) {
+			$currency = GFMultiCurrency::init();
+			add_filter( 'gform_form_post_get_meta', array( $currency, 'admin_pre_render' ) );
+		}
 	}
 }
