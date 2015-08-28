@@ -1023,6 +1023,11 @@ class Helper_Options implements Helper_Interface_Filters {
 			$args['type'] = '';
 		}
 
+		/* Fix up our conditional logic array so it returns a string value */
+		if( $args['id'] == 'conditionalLogic' && isset( $pdf_form_settings['conditionalLogic'] ) ) {
+			$pdf_form_settings['conditionalLogic'] = json_encode( $pdf_form_settings['conditionalLogic'] );
+		}
+
 		switch ( $args['type'] ) {
 			case 'checkbox':
 
@@ -1087,7 +1092,7 @@ class Helper_Options implements Helper_Interface_Filters {
 				}
 			break;
 
-			/* treat as a text callback */
+			/* treat as a text or hidden callback */
 			default:
 				if ( isset( $options[ $args['id'] ] ) ) {
 					return trim( $options[ $args['id'] ] );
@@ -1115,6 +1120,7 @@ class Helper_Options implements Helper_Interface_Filters {
 	 * @return void
 	 */
 	public function checkbox_callback( $args ) {
+
 		/* get our selected value */
 		$checked  = $this->get_form_value( $args );
 		$class    = (isset($args['inputClass'])) ? esc_attr( $args['inputClass'] ) : '';
@@ -1546,6 +1552,7 @@ class Helper_Options implements Helper_Interface_Filters {
 	 */
 	public function conditional_logic_callback( $args ) {
 		$args['idOverride'] = 'gfpdf_conditional_logic';
+		$args['type']       = 'checkbox';
 
 		$this->checkbox_callback( $args );
 
