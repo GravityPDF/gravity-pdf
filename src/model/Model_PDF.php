@@ -158,9 +158,6 @@ class Model_PDF extends Helper_Abstract_Model {
 		$settingsAPI = new Model_Form_Settings( $this->form, $this->log, $this->data, $this->options, $this->misc, $this->notices );
 		$settings = $settingsAPI->get_pdf( $entry['form_id'], $pid );
 
-		/* Add our download setting */
-		$settings['pdf_action'] = $action;
-
 		/* Not valid settings */
 		if ( is_wp_error( $settings ) ) {
 			
@@ -171,6 +168,9 @@ class Model_PDF extends Helper_Abstract_Model {
 
 			return $settings; /* return error */
 		}
+
+		/* Add our download setting */
+		$settings['pdf_action'] = $action;
 
 		/**
 		 * Our middleware authenticator
