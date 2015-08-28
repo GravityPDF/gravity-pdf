@@ -100,7 +100,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 
 		/* Add scheduled tasks */
 		if ( ! wp_next_scheduled( 'gfpdf_cleanup_tmp_dir' ) ) {
-		  wp_schedule_event( time(), 'daily', 'gfpdf_cleanup_tmp_dir' );
+			wp_schedule_event( time(), 'daily', 'gfpdf_cleanup_tmp_dir' );
 		}
 	}
 
@@ -130,6 +130,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 * Apply any filters needed for the settings page
 	 * @since 4.0
 	 * @return void
+	 * @todo add active and conditional middleware
 	 */
 	public function add_filters() {
 		/* PDF authentication middleware */
@@ -190,7 +191,6 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 *
 	 * @since 4.0
 	 * @return void
-	 * @todo
 	 */
 	public function process_legacy_pdf_endpoint() {
 

@@ -506,7 +506,6 @@ class Helper_Options implements Helper_Interface_Filters {
 	 *
 	 * @return array The array of templates
 	 * @since 4.0
-	 * @todo
 	 */
 	public function get_templates() {
 
@@ -761,7 +760,6 @@ class Helper_Options implements Helper_Interface_Filters {
 	 *
 	 * @return array The array of privilages
 	 * @since 4.0
-	 * @todo
 	 */
 	public function get_privilages() {
 		$privilages = array(

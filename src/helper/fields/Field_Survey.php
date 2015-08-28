@@ -113,15 +113,13 @@ class Field_Survey extends Helper_Abstract_Fields
 	 * Return the HTML form data
 	 * @return Array
 	 * @since 4.0
+	 * @todo Our standard v4 array format had to be changes to be backwards compatible. The v4 version is better and we should include the format in the $form_data array
 	 */
 	public function form_data() {
 
 		$data = array();
 
-		/*
-         * Provide backwards compatibility fixes to certain fields
-         * TODO: allow standard 4.x layout in appropriate array key ($form_data[survey])
-         */
+		/* Provide backwards compatibility fixes to certain fields */
 		switch ( $this->field->inputType ) {
 			case 'radio':
 			case 'select':

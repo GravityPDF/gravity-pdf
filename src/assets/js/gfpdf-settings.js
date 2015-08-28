@@ -245,7 +245,6 @@
 						/* Get the format dependancy */
 						var format =  $format.filter(':checked').val();
 
-						/* TODO - fix translation */
 						if($(this).val() === GFPDF.no || format !== GFPDF.standard) {
 							/* hide security password / privileges */
 							$secTable.find('tr:nth-child(3),tr:nth-child(4)').hide();

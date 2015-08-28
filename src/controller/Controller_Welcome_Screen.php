@@ -132,7 +132,6 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 	 * @access public
 	 * @since 4.0
 	 * @return void
-	 * @todo configure upgrade page as needed
 	 */
 	public function welcome() {
 
