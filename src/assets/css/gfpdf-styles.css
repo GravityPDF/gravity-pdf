@@ -561,6 +561,17 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
 }
 
 /**
+ * Entry List Page
+ */
+.gfpdf_form_action_has_submenu {
+  position: relative;
+}
+
+.gfpdf_submenu {
+  width: 200px;
+}
+
+/**
  * Gravity Forms Entry Details Page
  */
 .gfpdf_detailed_pdf_container_pdf {
