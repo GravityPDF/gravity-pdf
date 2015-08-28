@@ -204,13 +204,16 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* re-register our Gravity Forms Notifications */
 		$this->register_notifications( $form['notifications'] );
 
+		/* Pull the PDF settings */
+		$pdf = $this->get_pdf( $form_id, $pdf_id );
+
 		/* pass to view */
 		$controller->view->add_edit(array(
 			'pdf_id'           => $pdf_id,
 			'title'            => $label,
 			'button_label'     => $label,
 			'form'             => $form,
-			'pdf'              => $this->get_pdf( $form_id, $pdf_id ),
+			'pdf'              => $pdf,
 			'wp_editor_loaded' => class_exists( '_WP_Editors' ),
 		));
 	}
