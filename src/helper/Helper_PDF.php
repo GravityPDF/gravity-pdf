@@ -181,10 +181,11 @@ class Helper_PDF {
 		if ( empty($html) ) {
 			$this->set_template();
 			$html = $this->load_html( $args );
-
-			apply_filters("gfpdfe_pdf_template_{$form['id']}", apply_filters('gfpdfe_pdf_template', $html, $form['id'], $this->entry['id'], $this->settings), $this->entry['id'], $this->settings); /* Backwards compat */
-			apply_filters("gfpdf_pdf_html_output_{$form['id']}", apply_filters('gfpdf_pdf_html_output', $html, $form, $this->entry, $this->settings), $this->form, $this->entry, $this->settings);
 		}
+
+		/* Apply our filters */
+		$html = apply_filters("gfpdfe_pdf_template_{$form['id']}", apply_filters('gfpdfe_pdf_template', $html, $form['id'], $this->entry['id'], $this->settings), $this->entry['id'], $this->settings); /* Backwards compat */
+		$html = apply_filters("gfpdf_pdf_html_output_{$form['id']}", apply_filters('gfpdf_pdf_html_output', $html, $form, $this->entry, $this->settings), $this->form, $this->entry, $this->settings);
 
 		/* Check if we should output the HTML to the browser, for debugging */
 		$this->maybe_display_raw_html( $html );

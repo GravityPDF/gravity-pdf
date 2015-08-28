@@ -8,6 +8,7 @@ use GFPDF\Helper\Helper_Abstract_View;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
 use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Helper_Misc;
 
 use Psr\Log\LoggerInterface;
 
@@ -70,13 +71,22 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	protected $log;
 
 	/**
+	 * Holds our Helper_Misc object
+	 * Makes it easy to access common methods throughout the plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $misc;
+
+	/**
 	 * Load our model and view and required actions
 	 */
-	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Abstract_Form $form, LoggerInterface $log ) {
+	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Abstract_Form $form, LoggerInterface $log, Helper_Misc $misc ) {
 		
 		/* Assign our internal variables */
 		$this->form    = $form;
 		$this->log     = $log;
+		$this->misc    = $misc;
 
 		/* Load our model and view */
 		$this->model = $model;
@@ -150,6 +160,10 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		/* Change mPDF settings */
 		add_filter( 'mpdf_current_font_path', array( $this->model, 'set_current_pdf_font' ), 10, 2 );
 		add_filter( 'mpdf_font_data', array( $this->model, 'register_custom_font_data_with_mPDF' ) );
+
+		/* Process mergetags and shortcodes in PDF */
+		add_filter( 'gfpdf_pdf_html_output', array( $this->misc, 'do_mergetags'), 10, 3 );
+		add_filter( 'gfpdf_pdf_html_output', 'do_shortcode' );
 	}
 
 	/**

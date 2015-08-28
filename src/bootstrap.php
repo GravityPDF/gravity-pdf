@@ -541,7 +541,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$model = new Model\Model_PDF( $this->form, $this->log, $this->options, $this->data, $this->misc, $this->notices );
 		$view  = new View\View_PDF( array(), $this->form, $this->log, $this->options, $this->data, $this->misc );
 
-		$class = new Controller\Controller_PDF( $model, $view, $this->form, $this->log );
+		$class = new Controller\Controller_PDF( $model, $view, $this->form, $this->log, $this->misc );
 		$class->init();
 	}
 
