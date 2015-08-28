@@ -222,6 +222,10 @@ class Helper_Migration {
 			$node['format'] = 'PDFX1A';
 		}
 
+		if( ! isset( $node['format'] ) ) {
+			$node['format'] = 'Standard';
+		}
+
 		/* Fix the public access key */
 		if ( isset( $node['access'] ) ) {
 			$node['access'] = ($node['access'] == 'all') ? 'Yes' : 'No';
@@ -370,9 +374,11 @@ class Helper_Migration {
                     }
 
                     /* Set our default fields */
-					$node['id']     = uniqid();
-					$node['active'] = true;
-					$node['name']   = $this->misc->human_readable( $node['template'] );
+					$node['id']               = uniqid();
+					$node['active']           = true;
+					$node['name']             = $this->misc->human_readable( $node['template'] );
+					$node['conditionalLogic'] = '';
+
 
 					/* Include a filename if none given */
 					if( empty( $node['filename'] ) ) {
