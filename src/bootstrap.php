@@ -585,7 +585,24 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$pid = $GLOBALS['wp']->query_vars['pid'];
 
 		$settingsAPI = new Model\Model_Form_Settings( $this->form, $this->log, $this->data, $this->options, $this->misc, $this->notices );
-		$settings = $settingsAPI->get_pdf( $form_id, $pid );
+		$settings    = $settingsAPI->get_pdf( $form_id, $pid );
+
+		if( is_wp_error( $settings ) ) {
+
+			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Invalid PDF Settings.', array(
+				'form_id'  => $form_id,
+				'pid'      => $pid,
+				'WP_Error' => $settings,
+			) );
+
+			/* Set all optional config values to default */
+			$settings = array(
+				'empty'           => false,
+				'html_field'      => false,
+				'page_names'      => false,
+				'section_content' => false,
+			);
+		}
 
 		return array(
 			'empty_field'     => ( isset( $settings['empty'] ) && $settings['empty'] == 'Yes' ) ? true : false,

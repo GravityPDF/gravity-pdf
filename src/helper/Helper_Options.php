@@ -187,11 +187,6 @@ class Helper_Options implements Helper_Interface_Filters {
 
 		/* return early if no ID set */
 		if ( ! $form_id ) {
-			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Settings Retreival Error', array(
-				'form_id' => $form_id,
-				'pid'     => $pid,
-			) );
-
 			return array();
 		}
 

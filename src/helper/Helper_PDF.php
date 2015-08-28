@@ -148,6 +148,8 @@ class Helper_PDF {
 		$this->settings = $settings;
 		$this->form     = $form;
 		$this->data     = $data;
+
+		$this->set_path();
 	}
 
 	/**
@@ -242,10 +244,6 @@ class Helper_PDF {
 	 * @since  4.0
 	 */
 	public function save_pdf( $raw_pdf_string ) {
-
-		if ( empty($this->path) ) {
-			$this->set_path();
-		}
 
 		/* create our path */
 		if ( ! is_dir( $this->path ) ) {
@@ -376,7 +374,7 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	public function set_filename( $filename ) {
-		$this->filename = $this->get_extension( $filename, '.pdf' );
+		$this->filename = $this->get_file_with_extension( $filename, '.pdf' );
 	}
 
 	/**
@@ -398,7 +396,7 @@ class Helper_PDF {
 
 		if ( empty($path) ) {
 			/* build our PDF path location */
-			$path = $this->data->template_tmp_location . '/' . $this->entry['form_id'] . $this->entry['id'] . '/';
+			$path = $this->data->template_tmp_location . $this->entry['form_id'] . $this->entry['id'] . '/';
 		} else {
 			/* ensure the path ends with a forward slash */
 			if ( substr( $path, -1 ) !== '/' ) {
@@ -519,11 +517,11 @@ class Helper_PDF {
 	 */
 	protected function set_template() {
 
-		$template = (isset($this->settings['template'])) ? $this->get_extension( $this->settings['template'] ) : '';
+		$template = (isset($this->settings['template'])) ? $this->get_file_with_extension( $this->settings['template'] ) : '';
 
 		/* Allow a user to change the current template if they have the appropriate capabilities */
 		if ( rgget( 'template' ) && is_user_logged_in() && $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
-			$template = $this->get_extension( rgget( 'template' ) );
+			$template = $this->get_file_with_extension( rgget( 'template' ) );
 		}
 
 		/**
@@ -549,7 +547,7 @@ class Helper_PDF {
 	 * @return String
 	 * @since  4.0
 	 */
-	protected function get_extension( $name, $extension = '.php' ) {
+	protected function get_file_with_extension( $name, $extension = '.php' ) {
 		if ( substr( $name, -strlen( $extension ) ) !== $extension ) {
 			$name = $name . $extension;
 		}

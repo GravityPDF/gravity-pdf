@@ -174,9 +174,9 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		/**
 		 * Our middleware authenticator
-		 * Allow users to tap into our middleware and add additional or remove additional authentication layers
+		 * Allow users to tap into our middleware and add or remove additional authentication layers
 		 *
-		 * Default middleware includes 'middle_logged_out_restriction', 'middle_logged_out_timeout', 'middle_auth_logged_out_user', 'middle_user_capability'
+		 * Default middleware includes 'middle_active', 'middle_conditional', 'middle_logged_out_restriction', 'middle_logged_out_timeout', 'middle_auth_logged_out_user', 'middle_user_capability'
 		 * If WP_Error is returned the PDF won't be parsed
 		 */
 		$middleware = apply_filters( 'gfpdf_pdf_middleware', false, $entry, $settings );
@@ -198,6 +198,42 @@ class Model_PDF extends Helper_Abstract_Model {
 		 */
 		$controller = $this->getController();
 		$controller->view->generate_pdf( $entry, $settings );
+	}
+
+	/**
+	 * Check if the current PDF trying to be viewed is active
+	 * @param  Boolean / Object $action
+	 * @param  Array            $entry    The Gravity Forms Entry
+	 * @param  Array            $settings The Gravity Form PDF Settings
+	 * @return Boolean / Object
+	 * @since 4.0
+	 */
+	public function middle_active( $action, $entry, $settings ) {
+
+		if ( ! is_wp_error( $action ) ) {
+			if( $settings['active'] !== true ) {
+				return new WP_Error( 'inactive', __( 'The PDF configuration is not currently active.', 'gravitypdf' ) );
+			}
+		}
+		return $action;
+	}
+
+	/**
+	 * Check if the current PDF trying to be viewed has conditional logic which passes
+	 * @param  Boolean / Object $action
+	 * @param  Array            $entry    The Gravity Forms Entry
+	 * @param  Array            $settings The Gravity Form PDF Settings
+	 * @return Boolean / Object
+	 * @since 4.0
+	 */
+	public function middle_conditional( $action, $entry, $settings ) {
+
+		if ( ! is_wp_error( $action ) ) {
+			if( isset( $settings['conditionalLogic'] ) && ! GFCommon::evaluate_conditional_logic( $settings['conditionalLogic'], $this->form->get_form( $entry['form_id'] ), $entry ) ) {
+				return new WP_Error( 'conditional_logic', __( "PDF conditional logic requirements have not been met.", 'gravitypdf' ) );
+			}
+		}
+		return $action;
 	}
 
 	/**
@@ -511,7 +547,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		$form     = $this->form->get_form( $entry['form_id'] );
 
 		foreach ( $pdfs as $pdf ) {
-			if ( $pdf['active'] && GFCommon::evaluate_conditional_logic( $pdf['conditionalLogic'], $form, $entry ) ) {
+			if ( $pdf['active'] && ( empty( $pdf['conditionalLogic'] ) || GFCommon::evaluate_conditional_logic( $pdf['conditionalLogic'], $form, $entry ) ) ) {
 				$filtered[ $pdf['id'] ] = $pdf;
 			}
 		}
@@ -528,18 +564,26 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function process_and_save_pdf( $pdf ) {
 
 		/* Check that the PDF hasn't already been created this session */
-		if ( $this->does_pdf_exist( $pdf ) ) {
+		if ( ! $this->does_pdf_exist( $pdf ) ) {
 
 			/* Enable Multicurrency support */
 			$this->misc->maybe_add_multicurrency_support();
 
+			/* Get required parameters */
+			$entry    = $pdf->get_entry();
+			$settings = $pdf->get_settings();
+
+			/* Add backwards compatibility support */
+			$GLOBALS['wp']->query_vars['pid'] = $settings['id'];
+			$GLOBALS['wp']->query_vars['lid'] = $entry['id'];
+
 			try {
 				$pdf->init();
-				$pdf->render_html( $this->misc->get_template_args( $pdf->get_entry(), $pdf->get_settings() ) );
+				$pdf->render_html( $this->misc->get_template_args( $entry, $settings ) );
 				$pdf->set_output_type( 'save' );
 
 				/* Generate PDF */
-				$raw_pdf  = $pdf->generate();
+				$raw_pdf = $pdf->generate();
 				$pdf->save_pdf( $raw_pdf );
 
 				return true;
@@ -553,6 +597,8 @@ class Model_PDF extends Helper_Abstract_Model {
 				return false;
 			}
 		}
+
+		return true;
 	}
 
 	/**
@@ -565,7 +611,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function notifications( $notifications, $form, $entry ) {
 
-		$pdfs       = (isset($form['gfpdf_form_settings'])) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : array();
+		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : array();
 
 		if ( sizeof( $pdfs ) > 0 ) {
 
@@ -575,6 +621,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 			/* Loop through each PDF config and generate */
 			foreach ( $pdfs as $pdf_config ) {
+
 				$settings = $settingsAPI->get_pdf( $entry['form_id'], $pdf_config['id'] );
 
 				if ( ! is_wp_error( $settings ) && $this->maybe_attach_to_notification( $notifications, $settings ) ) {
@@ -599,6 +646,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			) );
 
 		}
+
 		return $notifications;
 	}
 
@@ -610,8 +658,9 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function maybe_attach_to_notification( $notification, $settings ) {
+
 		if ( isset($settings['notification']) && is_array( $settings['notification'] ) ) {
-			if ( isset($notification['isActive']) && $notification['isActive'] && in_array( $notification['id'], $settings['notification'] ) ) {
+			if ( in_array( $notification['id'], $settings['notification'] ) ) {
 				return true;
 			}
 		}
@@ -644,22 +693,23 @@ class Model_PDF extends Helper_Abstract_Model {
 		$pdfs = (isset($form['gfpdf_form_settings'])) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : array();
 
 		if ( sizeof( $pdfs ) > 0 ) {
-			/* set up classes */
+			
+			/* Aet up classes */
 			$controller  = $this->getController();
 			$settingsAPI = new Model_Form_Settings( $this->form, $this->log, $this->data, $this->options, $this->misc, $this->notices );
 
-			/* loop through each PDF config */
+			/* Loop through each PDF config */
 			foreach ( $pdfs as $pdf ) {
 				$settings = $settingsAPI->get_pdf( $entry['form_id'], $pdf['id'] );
 
 				/* Only generate if the PDF wasn't created during the notification process */
 				if ( ! is_wp_error( $settings ) ) {
 
-					$pdf = new Helper_PDF( $entry, $settings, $this->form, $this->data );
-					$pdf->set_filename( $this->get_pdf_name( $settings, $entry ) );
-
 					/* Check that the PDF hasn't already been created this session */
 					if ( $this->maybe_always_save_pdf( $settings ) ) {
+
+						$pdf = new Helper_PDF( $entry, $settings, $this->form, $this->data );
+						$pdf->set_filename( $this->get_pdf_name( $settings, $entry ) );
 						$this->process_and_save_pdf( $pdf );
 					}
 
@@ -681,56 +731,12 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since  4.0
 	 */
 	public function does_pdf_exist( Helper_PDF $pdf ) {
-		$pdf->set_path();
-		$pdf->set_filename();
 
 		if ( is_file( $pdf->get_path() . $pdf->get_filename() ) ) {
 			return true;
 		}
 
 		return false;
-	}
-
-	/**
-	 * Remove the generated PDF from the server to save disk space
-	 * @internal  In future we may give the option to cache PDFs to save on processing power
-	 * @param  Array $entry The GF Entry Data
-	 * @param  Array $form  The Gravity Form
-	 * @return void
-	 * @since 4.0
-	 */
-	public function cleanup_pdf( $entry, $form ) {
-
-		$pdfs = (isset($form['gfpdf_form_settings'])) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : array();
-
-		if ( sizeof( $pdfs ) > 0 ) {
-
-			/* set up classes */
-			$controller  = $this->getController();
-			$settingsAPI = new Model_Form_Settings( $this->form, $this->log, $this->data, $this->options, $this->misc, $this->notices );
-
-			/* loop through each PDF config */
-			foreach ( $pdfs as $pdf ) {
-				$settings = $settingsAPI->get_pdf( $entry['form_id'], $pdf['id'] );
-
-				/* Only generate if the PDF wasn't during the notification process */
-				if ( ! is_wp_error( $settings ) ) {
-					$pdf = new Helper_PDF( $entry, $settings, $this->form, $this->data );
-
-					if ( $this->does_pdf_exist( $pdf ) ) {
-						try {
-							$this->misc->rmdir( $pdf->get_path() );
-						} catch (Exception $e) {
-							
-							$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Cleanup PDF Error', array(
-								'pdf'       => $pdf,
-								'exception' => $e,
-							) );
-						}
-					}
-				}
-			}
-		}
 	}
 
 	/**
@@ -871,7 +877,11 @@ class Model_PDF extends Helper_Abstract_Model {
 			}
 
 			/* Skip over captcha, password and page fields */
-			$fields_to_skip = apply_filters( 'gfpdf_form_data_skip_fields', array( 'captcha', 'password', 'page' ) );
+			$fields_to_skip = apply_filters( 'gfpdf_form_data_skip_fields', array(
+				'captcha',
+				'password',
+				'page'
+			) );
 
 			if ( in_array( $field->type, $fields_to_skip ) ) {
 				continue;
@@ -906,7 +916,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Form Data Array Created', array(
-			'data'       => $data,
+			'data' => $data,
 		) );
 
 		return $data;
@@ -920,34 +930,34 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function get_form_data_meta( $form, $entry ) {
-			$data = array();
+		$data = array();
 
-			/* Add form_id and entry_id for convinience */
-			$data['form_id']  = $entry['form_id'];
-			$data['entry_id'] = $entry['id'];
+		/* Add form_id and entry_id for convinience */
+		$data['form_id']  = $entry['form_id'];
+		$data['entry_id'] = $entry['id'];
 
-			/* Set title and dates (both US and international) */
-			$data['form_title']       = (isset($form['title'])) ? $form['title'] : '';
-		;
-			$data['form_description'] = (isset($form['description'])) ? $form['description'] : '';
-			$data['date_created']     = GFCommon::format_date( $entry['date_created'], false, 'j/n/Y', false );
-			$data['date_created_usa'] = GFCommon::format_date( $entry['date_created'], false, 'n/j/Y', false );
+		/* Set title and dates (both US and international) */
+		$data['form_title'] = (isset($form['title'])) ? $form['title'] : '';
 
-			/* Include page names */
-			$data['pages'] = $form['pagination']['pages'];
+		$data['form_description'] = (isset($form['description'])) ? $form['description'] : '';
+		$data['date_created']     = GFCommon::format_date( $entry['date_created'], false, 'j/n/Y', false );
+		$data['date_created_usa'] = GFCommon::format_date( $entry['date_created'], false, 'n/j/Y', false );
 
-			/* Add misc fields */
-			$data['misc']['date_time']        = GFCommon::format_date( $entry['date_created'], false, 'Y-m-d H:i:s', false );
-			$data['misc']['time_24hr']        = GFCommon::format_date( $entry['date_created'], false, 'H:i', false );
-			$data['misc']['time_12hr']        = GFCommon::format_date( $entry['date_created'], false, 'g:ia', false );
+		/* Include page names */
+		$data['pages'] = $form['pagination']['pages'];
 
-			$include = array( 'is_starred', 'is_read', 'ip', 'source_url', 'post_id', 'currency', 'payment_status', 'payment_date', 'transaction_id', 'payment_amount', 'is_fulfilled', 'created_by', 'transaction_type', 'user_agent', 'status' );
+		/* Add misc fields */
+		$data['misc']['date_time'] = GFCommon::format_date( $entry['date_created'], false, 'Y-m-d H:i:s', false );
+		$data['misc']['time_24hr'] = GFCommon::format_date( $entry['date_created'], false, 'H:i', false );
+		$data['misc']['time_12hr'] = GFCommon::format_date( $entry['date_created'], false, 'g:ia', false );
+
+		$include = array( 'is_starred', 'is_read', 'ip', 'source_url', 'post_id', 'currency', 'payment_status', 'payment_date', 'transaction_id', 'payment_amount', 'is_fulfilled', 'created_by', 'transaction_type', 'user_agent', 'status' );
 
 		foreach ( $include as $item ) {
 			$data['misc'][ $item ] = ( isset( $entry[ $item ]) ) ? $entry[ $item ] : '';
 		}
 
-			return $data;
+		return $data;
 	}
 
 	/**

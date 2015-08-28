@@ -118,9 +118,8 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		add_action( 'gform_entries_first_column_actions', array( $this->model, 'view_pdf_entry_list' ), 10, 4 );
 		add_action( 'gform_entry_info', array( $this->model, 'view_pdf_entry_detail' ), 10, 2 );
 
-		/* Add save and cleanup PDF filters */
+		/* Add save PDF filter */
 		add_action( 'gform_after_submission', array( $this->model, 'maybe_save_pdf' ), 10, 2 );
-		add_action( 'gform_after_submission', array( $this->model, 'cleanup_pdf' ), 9999, 2 );
 
 		/* Setup clean-up cron */
 		add_action( 'gfpdf_cleanup_tmp_dir', array( $this->model, 'cleanup_tmp_dir' ) );
@@ -134,8 +133,8 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 */
 	public function add_filters() {
 		/* PDF authentication middleware */
-		//add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_active' ), 10, 3 ); /* TODO */
-		//add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_conditional' ), 10, 3 ); /* TODO */
+		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_active' ), 10, 3 );
+		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_conditional' ), 10, 3 );
 		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_logged_out_restriction' ), 20, 3 );
 		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_logged_out_timeout' ), 30, 3 );
 		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_auth_logged_out_user' ), 40, 3 );
@@ -166,8 +165,8 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 			return;
 		}
 
-		$pid = $GLOBALS['wp']->query_vars['pid'];
-		$lid = (int) $GLOBALS['wp']->query_vars['lid'];
+		$pid    = $GLOBALS['wp']->query_vars['pid'];
+		$lid    = (int) $GLOBALS['wp']->query_vars['lid'];
 		$action = ( $GLOBALS['wp']->query_vars['action'] == 'download' ) ? 'download' : 'view';
 
 		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Processing PDF endpoint.', array(
