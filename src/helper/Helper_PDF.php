@@ -174,12 +174,23 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	public function render_html( $args = array(), $html = '' ) {
+
+		/* Because this class can load any content we'll only set up our template if no HTML is passed */
+		if( empty( $html ) ) {
+			$this->set_template();
+		}
 		
 		$form = $this->form->get_form( $this->entry['form_id'] );
 
+		/* Add filter to prevent HTML being written to document when it returns true. Backwards compatibility. */
+		$prevent_html = apply_filters("gfpdfe_pre_load_template", $form['id'], $this->entry['id'], basename($this->template_path), $form['id'] . $this->entry['id'], $this->backwards_compat_output($this->output), $this->filename, $this->backwards_compat_conversion($this->settings), $args ); /* Backwards Compatibility */
+
+		if( $prevent_html === true ) {
+			return;
+		}
+
 		/* Load in our PHP template */
-		if ( empty($html) ) {
-			$this->set_template();
+		if ( empty( $html ) ) {
 			$html = $this->load_html( $args );
 		}
 
@@ -190,13 +201,8 @@ class Helper_PDF {
 		/* Check if we should output the HTML to the browser, for debugging */
 		$this->maybe_display_raw_html( $html );
 
-		/* Add filter to prevent HTML being written to document when it returns true */
-		$prevent_html = apply_filters("gfpdfe_pre_load_template", $form['id'], $this->entry['id'], basename($this->template_path), $form['id'] . $this->entry['id'], $this->output, $this->filename, $this->backwards_compat_conversion($this->settings) ); /* Backwards Compatibility */
-
 		/* Write the HTML to mPDF */
-		if( $prevent_html !== true ) {
-			$this->mpdf->WriteHTML( $html );
-		}
+		$this->mpdf->WriteHTML( $html );
 	}
 
 	/**
@@ -666,6 +672,37 @@ class Helper_PDF {
 	 */
 	protected function backwards_compat_conversion( $settings ) {
 		
-		return $settings;
+		$compat                   = array();
+		$compat['rtl']            = ( isset($settings['rtl']) && $settings['rtl'] == 'Yes' ) ? true : false;
+		$compat['dpi']            = ( isset($settings['image_dpi']) ) ? (int) $settings['image_dpi'] : 96;
+		$compat['security']       = ( isset($settings['security']) && $settings['security'] == 'Yes' ) ? true : false;
+		$compat['pdf_password']   = ( isset($settings['password']) ) ? $settings['password'] : '';
+		$compat['pdf_privileges'] = ( isset($settings['privileges']) ) ? $settings['privileges'] : '';
+		$compat['pdfa1b']         = ( isset($settings['format']) && $settings['format'] == 'PDFA1B' ) ? true : false;
+		$compat['pdfx1a']         = ( isset($settings['format']) && $settings['format'] == 'PDFX1A' ) ? true : false;
+
+		return $compat;
+	}
+
+	/**
+	 * Converts the 4.x output to into a compatible 3.x type
+	 * @param  String $type
+	 * @return String
+	 * @since 4.0
+	 */
+	protected function backwards_compat_output( $type ) {
+		switch( strtolower( $type ) ) {
+			case 'display':
+				return 'view';
+			break;
+
+			case 'download':
+				return 'download';
+			break;
+
+			default:
+				return 'save';
+			break;
+		}
 	}
 }

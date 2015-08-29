@@ -164,6 +164,9 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		/* Process mergetags and shortcodes in PDF */
 		add_filter( 'gfpdf_pdf_html_output', array( $this->misc, 'do_mergetags'), 10, 3 );
 		add_filter( 'gfpdf_pdf_html_output', 'do_shortcode' );
+
+		/* Backwards compatibility for our Tier 2 plugin */
+		add_filter( 'gfpdfe_pre_load_template', array( 'PDFRender', 'prepare_ids' ), 1, 8 );
 	}
 
 	/**

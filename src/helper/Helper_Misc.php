@@ -506,7 +506,7 @@ class Helper_Misc
 	 * @return Array
 	 * @since 4.0
 	 */
-	private function get_legacy_ids( $entry_id, $settings ) {
+	public function get_legacy_ids( $entry_id, $settings ) {
 
 		$leads    = rgget( 'lid' );
 		$override = ( isset( $settings['public_access'] ) && $settings['public_access'] == 'Yes' ) ? true : false;

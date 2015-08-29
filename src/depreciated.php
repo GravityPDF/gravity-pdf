@@ -103,7 +103,19 @@ class PDFRender extends GFPDF_Depreciated_Abstract
 	 * @since 3.0
 	 */
 	public function savePDF( $pdf, $filename, $id ) {
+		echo 'todo'; exit;
+	}
 
+	/**
+	 * Handles backwards compatibility support for our Tier 2 add on
+	 * @return void
+	 * @since 4.0
+	 */
+	public function prepare_ids( $form_id, $lead_id, $template, $id, $output, $filename, $arguments, $args) {
+		global $lead_ids;
+		$lead_ids = $args['lead_ids'];
+
+		return $form_id;
 	}
 }
 
