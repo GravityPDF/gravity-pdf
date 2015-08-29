@@ -561,7 +561,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @return Boolean
 	 * @since 4.0
 	 */
-	public function process_and_save_pdf( $pdf ) {
+	public function process_and_save_pdf( Helper_PDF $pdf ) {
 
 		/* Check that the PDF hasn't already been created this session */
 		if ( ! $this->does_pdf_exist( $pdf ) ) {
@@ -626,11 +626,11 @@ class Model_PDF extends Helper_Abstract_Model {
 
 				if ( ! is_wp_error( $settings ) && $this->maybe_attach_to_notification( $notifications, $settings ) ) {
 
-					$pdf = new Helper_PDF( $entry, $settings, $this->form, $this->data );
-					$pdf->set_filename( $this->get_pdf_name( $settings, $entry ) );
+					$pdf_generator = new Helper_PDF( $entry, $settings, $this->form, $this->data );
+					$pdf_generator->set_filename( $this->get_pdf_name( $settings, $entry ) );
 
-					if ( $this->process_and_save_pdf( $pdf ) ) {
-						$pdf_path = $pdf->get_path() . $pdf->get_filename();
+					if ( $this->process_and_save_pdf( $pdf_generator ) ) {
+						$pdf_path = $pdf_generator->get_path() . $pdf_generator->get_filename();
 
 						if ( is_file( $pdf_path ) ) {
 							$this->options->increment_pdf_count();
@@ -705,19 +705,19 @@ class Model_PDF extends Helper_Abstract_Model {
 				/* Only generate if the PDF wasn't created during the notification process */
 				if ( ! is_wp_error( $settings ) ) {
 
+					$pdf_generator = new Helper_PDF( $entry, $settings, $this->form, $this->data );
+					$pdf_generator->set_filename( $this->get_pdf_name( $settings, $entry ) );
+
 					/* Check that the PDF hasn't already been created this session */
 					if ( $this->maybe_always_save_pdf( $settings ) ) {
-
-						$pdf = new Helper_PDF( $entry, $settings, $this->form, $this->data );
-						$pdf->set_filename( $this->get_pdf_name( $settings, $entry ) );
-						$this->process_and_save_pdf( $pdf );
+						$this->process_and_save_pdf( $pdf_generator );
 					}
 
 					/* Run an action users can tap into to manipulate the PDF */
-					if ( $this->does_pdf_exist( $pdf ) ) {
-						do_action( 'gfpdf_post_pdf_save', $entry['form_id'], $entry['id'], $settings, $pdf->get_path() . $pdf->get_filename() ); /* Backwards compatibility */
-						do_action( 'gfpdf_post_save_pdf', $form, $entry, $settings, $pdf->get_path() . $pdf->get_filename() );
-						do_action( "gfpdf_post_save_pdf_{$form['id']}", $form, $entry, $settings, $pdf->get_path() . $pdf->get_filename() );
+					if ( $this->does_pdf_exist( $pdf_generator ) ) {
+						do_action( 'gfpdf_post_pdf_save', $entry['form_id'], $entry['id'], $settings, $pdf_generator->get_path() . $pdf_generator->get_filename() ); /* Backwards compatibility */
+						do_action( 'gfpdf_post_save_pdf', $form, $entry, $settings, $pdf_generator->get_path() . $pdf_generator->get_filename() );
+						do_action( "gfpdf_post_save_pdf_{$form['id']}", $form, $entry, $settings, $pdf_generator->get_path() . $pdf_generator->get_filename() );
 					}
 				}
 			}

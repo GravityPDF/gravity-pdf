@@ -83,6 +83,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function gravitypdf( $attributes ) {
+		global $gfpdf;
 
 		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Generating Shortcode' );
 
@@ -121,7 +122,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		}
 
 		/* Check if we have a valid PDF configuration */
-		$settings    = new Model_Form_Settings();
+		$settings    = new Model_Form_Settings( $this->form, $this->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
 		$entry  = $this->form->get_entry( $attributes['entry'] );
 		$config = ( ! is_wp_error( $entry )) ? $settings->get_pdf( $entry['form_id'], $attributes['id'] ) : $entry; /* if invalid entry a WP_Error will be thrown */
 
