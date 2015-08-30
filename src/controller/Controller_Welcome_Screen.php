@@ -145,14 +145,14 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 
 		/* Bail if activating from network, or bulk */
 		if ( is_network_admin() || isset($_GET['activate-multi']) ) {
-			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Network Activation.' );
+			$this->log->addNotice( 'Network Activation.' );
 
 			return false;
 		}
 
 		/* add own update tracker */
 		if ( ! $this->data->is_installed ) {
-			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Redirect to Getting Started page (first time activated).' );
+			$this->log->addNotice( 'Redirect to Getting Started page (first time activated).' );
 
 			/* First time install */
 			wp_safe_redirect( admin_url( 'index.php?page=gfpdf-getting-started' ) );
@@ -184,7 +184,7 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 
 		if( $show_update_page == 'Enable' ) {
 
-			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Redirect to Update page (previously activated).' );
+			$this->log->addNotice( 'Redirect to Update page (previously activated).' );
 
 			/* Update */
 			wp_safe_redirect( admin_url( 'index.php?page=gfpdf-update' ) );

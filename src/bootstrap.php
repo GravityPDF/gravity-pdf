@@ -210,6 +210,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/* Initialise our logger */
 		$this->log = new \Monolog\Logger( 'gravitypdf' );
 
+		/* Ensure log contains details about the method / class / function calling it and the processor peak memory */
+		$this->log->pushProcessor( new \Monolog\Processor\IntrospectionProcessor );
+		$this->log->pushProcessor( new \Monolog\Processor\MemoryPeakUsageProcessor );
+
 		/* If running an alpha, beta or rc version of the plugin send all logs to Loggly */
 		$this->maybe_run_remote_logging();
 
@@ -273,7 +277,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		/* Enable remote logging */
 		if( $run_remote_logging ) {
-
 			/* Setup Loggly logging with correct format for buffer logging */
 			$formatter = new \Monolog\Formatter\LogglyFormatter();
 			$loggly    = new \Monolog\Handler\LogglyHandler( '8ad317ed-213d-44c9-a2e8-f2eebd542c66/tag/gravitypdf', \Monolog\Logger::INFO );
@@ -281,6 +284,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 			/* Set up our buffer logging to save multiple API calls */
 			$buffer = new \Monolog\Handler\BufferHandler( $loggly, 20, \Monolog\Logger::INFO );
+
+			/* Push additional log details about function called from, peak memory and user IP / referrer */
+			$this->log->pushProcessor( new \Monolog\Processor\WebProcessor );
 
 			/* Impliment our buffer */
 			$this->log->pushHandler( $buffer );
@@ -589,7 +595,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		if( is_wp_error( $settings ) ) {
 
-			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Invalid PDF Settings.', array(
+			$this->log->addError( 'Invalid PDF Settings.', array(
 				'form_id'  => $form_id,
 				'pid'      => $pid,
 				'WP_Error' => $settings,

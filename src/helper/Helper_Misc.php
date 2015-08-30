@@ -239,7 +239,7 @@ class Helper_Misc
 				$function($fileinfo->getRealPath());
 			}
 		} catch (Exception $e) {
-			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Filesystem Delete Error', array(
+			$this->log->addError( 'Filesystem Delete Error', array(
 				'dir'       => $dir,
 				'exception' => $e,
 			) );
@@ -277,7 +277,7 @@ class Helper_Misc
 				}
 			}
 		} catch (Exception $e) {
-			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Filesystem Copy Error', array(
+			$this->log->addError( 'Filesystem Copy Error', array(
 				'source'      => $source,
 				'destination' => $destination,
 				'exception'   => $e,

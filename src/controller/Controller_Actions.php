@@ -177,7 +177,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 				! $this->model->is_notice_already_dismissed( $route['action'] ) &&
 				call_user_func( $route['condition'] ) ) {
 
-				$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Trigger Action Notification.', array( 'route' => $route ) );
+				$this->log->addNotice( 'Trigger Action Notification.', array( 'route' => $route ) );
 				$this->notices->add_notice( call_user_func( $route['view'], $route['action'], $route['action_text'] ) );
 			}
 		}
@@ -198,7 +198,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 				/* Check user capability */
 				if ( ! $this->form->has_capability( $route['capability'] ) ) {
 
-					$this->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
+					$this->log->addCritical( 'Lack of User Capabilities.', array(
 						'user'      => wp_get_current_user(),
 						'user_meta' => get_user_meta( get_current_user_id() ),
 					) );
@@ -209,7 +209,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 				/* Check nonce is valid */
 				if ( ! wp_verify_nonce( rgpost( 'gfpdf_action_' . $route['action'] ), 'gfpdf_action_' . $route['action'] ) ) {
 
-					$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
+					$this->log->addWarning( 'Nonce Verification Failed.' );
 					$this->notices->add_error( __( 'There was a problem processing the action. Please try again.', 'gravitypdf' ) );
 
 					continue;
@@ -217,10 +217,10 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 
 				/* Check if the user wants to dismiss the notice, otherwise process the route */
 				if ( isset( $_POST['gfpdf-dismiss-notice'] ) ) {
-					$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Dismiss Action.', array( 'route' => $route ) );
+					$this->log->addNotice( 'Dismiss Action.', array( 'route' => $route ) );
 					$this->model->dismiss_notice( $route['action'] );
 				} else {
-					$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Trigger Action Process.', array( 'route' => $route ) );
+					$this->log->addNotice( 'Trigger Action Process.', array( 'route' => $route ) );
 					call_user_func( $route['process'], $route['action'], $route );
 				}
 			}

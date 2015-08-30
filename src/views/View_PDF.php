@@ -180,7 +180,7 @@ class View_PDF extends Helper_Abstract_View
 
 		} catch (Exception $e) {
 
-			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'PDF Generation Error', array(
+			$this->log->addError( 'PDF Generation Error', array(
 				'entry'     => $entry,
 				'settings'  => $settings,
 				'exception' => $e,
@@ -362,7 +362,7 @@ class View_PDF extends Helper_Abstract_View
 				$container->close();
 			}
 		} catch (Exception $e) {
-			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'PDF Generation Error', array(
+			$this->log->addError( 'PDF Generation Error', array(
 				'field'     => $field,
 				'entry'     => $entry,
 				'config'    => $config,

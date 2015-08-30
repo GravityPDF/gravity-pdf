@@ -145,7 +145,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* prevent unauthorized access */
 		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			
-			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.' );
+			$this->log->addWarning( 'Lack of User Capabilities.' );
 			wp_die( __( 'You do not have permission to access this page', 'gravitypdf' ) );
 		}
 
@@ -177,7 +177,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* prevent unauthorized access */
 		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
-			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.' );
+			$this->log->addWarning( 'Lack of User Capabilities.' );
 			wp_die( __( 'You do not have permission to access this page', 'gravitypdf' ) );
 		}
 
@@ -235,7 +235,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$form_id = (int) $form_id;
 		if ( (int) $form_id === 0 ) {
 			$error = new WP_Error( 'invalid_id', __( 'You must pass in a valid form ID', 'gravitypdf' ) );
-			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Error Getting Settings.', array( 'WP_Error' => $error ) );
+			$this->log->addError( 'Error Getting Settings.', array( 'WP_Error' => $error ) );
 			return $error;
 		}
 
@@ -245,7 +245,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 			if ( empty($form) ) {
 				$error = new WP_Error( 'invalid_id', __( 'You must pass in a valid form ID', 'gravitypdf' ) );
-				$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Error Getting Settings.', array( 'WP_Error' => $error ) );
+				$this->log->addError( 'Error Getting Settings.', array( 'WP_Error' => $error ) );
 				return $error;
 			}
 
@@ -268,7 +268,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function get_pdf( $form_id, $pdf_id ) {
 
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Getting Settings.', array(
+		$this->log->addNotice( 'Getting Settings.', array(
 			'form_id' => $form_id,
 			'pdf_id'  => $pdf_id,
 		) );
@@ -294,7 +294,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function add_pdf( $form_id, $value = array() ) {
 
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Adding Settings.', array(
+		$this->log->addNotice( 'Adding Settings.', array(
 			'form_id'      => $form_id,
 			'new_settings' => $value,
 		) );
@@ -315,11 +315,11 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 			if ( $results ) {
 				/* return the ID if successful */
-				$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Successfully Added.', array( 'pdf' => $value ) );
+				$this->log->addNotice( 'Successfully Added.', array( 'pdf' => $value ) );
 				return $value['id'];
 			}
 
-			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Error Saving.', array(
+			$this->log->addError( 'Error Saving.', array(
 				'error' => $results,
 				'pdf' => $value
 			) );
@@ -345,7 +345,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function update_pdf( $form_id, $pdf_id, $value = '', $update_db = true, $filters = true ) {
 
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Updating Settings.', array(
+		$this->log->addNotice( 'Updating Settings.', array(
 			'form_id'      => $form_id,
 			'pdf_id'       => $pdf_id,
 			'new_settings' => $value,
@@ -362,7 +362,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		if ( ! is_wp_error( $options ) ) {
 			/* don't run when adding a new PDF */
 			if ( $filters ) {
-				$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Trigger Filters.' );
+				$this->log->addNotice( 'Trigger Filters.' );
 
 				/* Let's let devs alter that value coming in */
 				$value = apply_filters( 'gfpdf_form_update_pdf', $value, $form_id, $pdf_id );
@@ -381,14 +381,14 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			$did_update = false;
 			if ( $update_db ) {
 
-				$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Update Form.', array( 'form' => $form ) );
+				$this->log->addNotice( 'Update Form.', array( 'form' => $form ) );
 				/* update the database, if able */
 				$did_update = $this->form->update_form( $form );
 			}
 
 			/* If it updated, let's update the global variable */
 			if ( ! $update_db || $did_update !== false ) {
-				$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Save Local Form Cache.' );
+				$this->log->addNotice( 'Save Local Form Cache.' );
 				$this->data->form_settings[$form_id] = $options;
 			}
 
@@ -409,7 +409,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function delete_pdf( $form_id, $pdf_id ) {
 
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Deleting Setting.', array(
+		$this->log->addNotice( 'Deleting Setting.', array(
 			'form_id' => $form_id,
 			'pdf_id'  => $pdf_id,
 		) );
@@ -421,7 +421,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 			/* Next let's try to update the value */
 			if ( isset( $options[ $pdf_id ] ) ) {
-				$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Found Setting. Now deleting...', array( 'pdf' => $options[ $pdf_id ] ) );
+				$this->log->addNotice( 'Found Setting. Now deleting...', array( 'pdf' => $options[ $pdf_id ] ) );
 				unset( $options[ $pdf_id ] );
 			}
 
@@ -437,7 +437,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			/* If it updated, let's update the global variable */
 			if ( $did_update !== false ) {
 			
-				$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Setting Deleted.', array(
+				$this->log->addNotice( 'Setting Deleted.', array(
 					'form_id' => $form_id,
 					'pdf_id'  => $pdf_id,
 				) );
@@ -449,7 +449,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			return $did_update;
 		}
 
-		$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'PDF Delete Failed.', array(
+		$this->log->addError( 'PDF Delete Failed.', array(
 			'form_id' => $form_id,
 			'pdf_id'  => $pdf_id,
 			'form' => $form,
@@ -470,7 +470,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* prevent unauthorized access */
 		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			
-			$this->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
+			$this->log->addCritical( 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
 				'user_meta' => get_user_meta( get_current_user_id() )
 			) );
@@ -480,7 +480,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* Check Nonce is valid */
 		if ( ! wp_verify_nonce( rgpost( 'gfpdf_save_pdf' ), 'gfpdf_save_pdf' ) ) {
-			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
+			$this->log->addWarning( 'Nonce Verification Failed.' );
 			$this->notices->add_error( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
 			 return false;
 		}
@@ -494,7 +494,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* check appropriate settings */
 		if ( ! is_array( $input ) || ! $pdf_id ) {
-			 $this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Invalid Data.', array( 'post' => $input, 'pid' => $pdf_id ) );
+			 $this->log->addError( 'Invalid Data.', array( 'post' => $input, 'pid' => $pdf_id ) );
 			 $this->notices->add_error( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
 			 return false;
 		}
@@ -512,7 +512,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		if ( empty($sanitized['name']) || empty($sanitized['filename']) ||
 			($sanitized['pdf_size'] == 'custom' && ((int) $sanitized['custom_pdf_size'][0] === 0 || (int) $sanitized['custom_pdf_size'][1] === 0)) ) {
 
-			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Validation failed.' );
+			$this->log->addNotice( 'Validation failed.' );
 			$this->notices->add_error( __( 'PDF could not be saved. Please enter all required information below.', 'gravitypdf' ) );
 			return false;
 		}
@@ -526,7 +526,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* If it updated, let's update the global variable */
 		if ( $did_update !== false ) {
 
-			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Successfully Saved.', array(
+			$this->log->addNotice( 'Successfully Saved.', array(
 				'form_id'  => $form_id,
 				'pdf_id'   => $pdf_id,
 				'settings' => $form['gfpdf_form_settings'][$pdf_id],
@@ -536,7 +536,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			return true;
 		}
 
-		$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Database Update Failed.' );
+		$this->log->addError( 'Database Update Failed.' );
 		$this->notices->add_error( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
 		return false;
 	}
@@ -563,7 +563,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		 * Check we have a valid nonce, or throw an error
 		 */
 		if ( ! wp_verify_nonce( rgpost( 'gfpdf_save_pdf' ), 'gfpdf_save_pdf' ) ) {
-			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
+			$this->log->addWarning( 'Nonce Verification Failed.' );
 			$this->notices->add_error( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
 			return false;
 		}
@@ -709,7 +709,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* If class isn't an instance of our interface return $settings */
 		if ( ! ( $class instanceof Helper_Interface_Config ) ) {
 
-			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Instanceof Failed.', array(
+			$this->log->addWarning( 'Instanceof Failed.', array(
 				'object' => $class,
 				'type'   => 'Helper_Interface_Config',
 			) );
@@ -754,7 +754,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			}
 		}
 
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Setup Template-Specific Settings', array( 'settings' => $settings ) );
+		$this->log->addNotice( 'Setup Template-Specific Settings', array( 'settings' => $settings ) );
 
 		return $settings;
 	}
@@ -813,7 +813,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				$class = new $fqcn();
 			}
 		} else {
-			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Template Configuration Failed to Load', array( 'file' => $file ) );
+			$this->log->addWarning( 'Template Configuration Failed to Load', array( 'file' => $file ) );
 		}
 
 		return $class;
@@ -885,12 +885,12 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function delete_gf_pdf_setting() {
 
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Running AJAX Endpoint', array( 'type' => 'Delete PDF Settings' ) );
+		$this->log->addNotice( 'Running AJAX Endpoint', array( 'type' => 'Delete PDF Settings' ) );
 
 		/* prevent unauthorized access */
 		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 
-			$this->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
+			$this->log->addCritical( 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
 				'user_meta' => get_user_meta( get_current_user_id() )
 			) );
@@ -911,7 +911,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		if ( ! wp_verify_nonce( $nonce, $nonce_id ) ) {
 			
-			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
+			$this->log->addWarning( 'Nonce Verification Failed.' );
 
 			header( 'HTTP/1.1 401 Unauthorized' );
 			wp_die( '401' );
@@ -921,7 +921,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		if ( $results && ! is_wp_error( $results ) ) {
 
-			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'AJAX Endpoint Successful' );
+			$this->log->addNotice( 'AJAX Endpoint Successful' );
 
 			$return = array(
 				'msg' => __( 'PDF successfully deleted.', 'gravitypdf' ),
@@ -945,12 +945,12 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function duplicate_gf_pdf_setting() {
 
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Running AJAX Endpoint', array( 'type' => 'Duplicate PDF Settings' ) );
+		$this->log->addNotice( 'Running AJAX Endpoint', array( 'type' => 'Duplicate PDF Settings' ) );
 
 		/* prevent unauthorized access */
 		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 
-			$this->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
+			$this->log->addCritical( 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
 				'user_meta' => get_user_meta( get_current_user_id() )
 			) );
@@ -970,7 +970,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		if ( ! wp_verify_nonce( $nonce, $nonce_id ) ) {
 			
-			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
+			$this->log->addWarning( 'Nonce Verification Failed.' );
 
 			header( 'HTTP/1.1 401 Unauthorized' );
 			wp_die( '401' );
@@ -985,7 +985,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			$results = $this->update_pdf( $fid, $config['id'], $config );
 
 			if ( $results ) {
-				$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'AJAX Endpoint Successful' );
+				$this->log->addNotice( 'AJAX Endpoint Successful' );
 
 				$dup_nonce   = wp_create_nonce( "gfpdf_duplicate_nonce_{$fid}_{$config['id']}" );
 				$del_nonce   = wp_create_nonce( "gfpdf_delete_nonce_{$fid}_{$config['id']}" );
@@ -1019,12 +1019,12 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function change_state_pdf_setting() {
 
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Running AJAX Endpoint', array( 'type' => 'Change PDF Settings State' ) );
+		$this->log->addNotice( 'Running AJAX Endpoint', array( 'type' => 'Change PDF Settings State' ) );
 
 		/* prevent unauthorized access */
 		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 
-			$this->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
+			$this->log->addCritical( 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
 				'user_meta' => get_user_meta( get_current_user_id() )
 			) );
@@ -1043,7 +1043,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		if ( ! wp_verify_nonce( $nonce, $nonce_id ) ) {
 
-			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
+			$this->log->addWarning( 'Nonce Verification Failed.' );
 
 			header( 'HTTP/1.1 401 Unauthorized' );
 			wp_die( '401' );
@@ -1061,7 +1061,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			$results = $this->update_pdf( $fid, $config['id'], $config );
 
 			if ( $results ) {
-				$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'AJAX Endpoint Successful' );
+				$this->log->addNotice( 'AJAX Endpoint Successful' );
 
 				$return = array(
 					'state' => $state,
@@ -1085,12 +1085,12 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function render_template_fields() {
 
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Running AJAX Endpoint', array( 'type' => 'Render Template Custom Fields' ) );
+		$this->log->addNotice( 'Running AJAX Endpoint', array( 'type' => 'Render Template Custom Fields' ) );
 
 		/* prevent unauthorized access */
 		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			
-			$this->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
+			$this->log->addCritical( 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
 				'user_meta' => get_user_meta( get_current_user_id() )
 			) );
@@ -1151,7 +1151,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			'editor_init' => $editor_init,
 		);
 
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'AJAX Endpoint Successful', $return );
+		$this->log->addNotice( 'AJAX Endpoint Successful', $return );
 
 		echo json_encode( $return );
 

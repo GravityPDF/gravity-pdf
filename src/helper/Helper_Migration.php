@@ -126,7 +126,7 @@ class Helper_Migration {
 			$raw_config = $this->load_old_configuration();
 		} catch (Exception $e) {
 
-			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Migration Error', array(
+			$this->log->addError( 'Migration Error', array(
 				'exception' => $e,
 			) );
 
@@ -429,10 +429,10 @@ class Helper_Migration {
 
 					if ( $results ) {
 						/* return the ID if successful */
-						$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Successfully Added.', array( 'pdf' => $node ) );
+						$this->log->addNotice( 'Successfully Added.', array( 'pdf' => $node ) );
 					} else {
 						/* Log errors */
-						$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Error Saving.', array(
+						$this->log->addError( 'Error Saving.', array(
 							'error' => $results,
 							'pdf' => $node,
 						) );

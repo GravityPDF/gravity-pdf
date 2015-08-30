@@ -113,7 +113,7 @@ class Model_Install extends Helper_Abstract_Model {
 	 */
 	public function install_plugin() {
 
-			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Gravity PDF Installed' );
+			$this->log->addNotice( 'Gravity PDF Installed' );
 			update_option( 'gfpdf_is_installed', true );
 	}
 
@@ -164,7 +164,7 @@ class Model_Install extends Helper_Abstract_Model {
 		$this->data->template_font_location = $this->data->template_location . 'fonts/';
 		$this->data->template_tmp_location  = $this->data->template_location . 'tmp/';
 
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Template Locations', array(
+		$this->log->addNotice( 'Template Locations', array(
 			'path' => $this->data->template_location,
 			'url'  => $this->data->template_location_url,
 			'font' => $this->data->template_font_location,
@@ -184,7 +184,7 @@ class Model_Install extends Helper_Abstract_Model {
 			$this->data->multisite_template_location     = apply_filters( 'gfpdfe_multisite_template_location', $this->data->upload_dir . '/' . $this->data->working_folder . '/', $this->data->upload_dir, $this->data->working_folder );
 			$this->data->multisite_template_location_url = apply_filters( 'gfpdfe_multisite_template_location_url', $this->data->upload_dir_url . '/' . $this->data->working_folder . '/', $this->data->upload_dir_url, $this->data->working_folder );
 
-			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Multisite Template Locations', array(
+			$this->log->addNotice( 'Multisite Template Locations', array(
 				'path' => $this->data->multisite_template_location,
 				'url'  => $this->data->multisite_template_location_url,
 			) );
@@ -223,13 +223,13 @@ class Model_Install extends Helper_Abstract_Model {
 		foreach ( $folders as $dir ) {
 			if ( ! is_dir( $dir ) ) {
 				if ( ! wp_mkdir_p( $dir ) ) {
-					$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Failed Creating Folder Structure', array( 'dir' => $dir ) );
+					$this->log->addError( 'Failed Creating Folder Structure', array( 'dir' => $dir ) );
 					$this->notices->add_error( sprintf( __( 'There was a problem creating the %s directory. Ensure you have write permissions to your upload directory.', 'gravitypdf' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
 				}
 			} else {
 				/* test the directory is currently writable by the web server, otherwise throw and error */
 				if ( ! $this->misc->is_directory_writable( $dir ) ) {
-					$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Failed Write Permissions Check.', array( 'dir' => $dir ) );
+					$this->log->addError( 'Failed Write Permissions Check.', array( 'dir' => $dir ) );
 					$this->notices->add_error( sprintf( __( 'Gravity PDF does not have write permissions to the %s directory. Contact your web hosting provider to fix the issue.', 'gravitypdf' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
 				}
 			}
@@ -242,7 +242,7 @@ class Model_Install extends Helper_Abstract_Model {
 
 		/* create deny htaccess file to prevent direct access to files */
 		if ( is_dir( $this->data->template_tmp_location ) && ! is_file( $this->data->template_tmp_location . '.htaccess' ) ) {
-			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Create Apache .htaccess Security' );
+			$this->log->addNotice( 'Create Apache .htaccess Security' );
 			file_put_contents( $this->data->template_tmp_location . '.htaccess', 'deny from all' );
 		}
 	}
@@ -264,7 +264,7 @@ class Model_Install extends Helper_Abstract_Model {
 			$rewrite_to,
 		'top');
 
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Add Rewrite Rules', array(
+		$this->log->addNotice( 'Add Rewrite Rules', array(
 			'query'   => $query,
 			'rewrite' => $rewrite_to,
 		) );
@@ -298,7 +298,7 @@ class Model_Install extends Helper_Abstract_Model {
 		$rules = get_option( 'rewrite_rules' );
 
 		if ( ! isset( $rules[ $rule ] ) ) {
-			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Flushing WordPress Rewrite Rules.' );
+			$this->log->addNotice( 'Flushing WordPress Rewrite Rules.' );
 			flush_rewrite_rules( false );
 		}
 	}
@@ -311,7 +311,7 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @todo  Add Multisite Support (Network Activated)
 	 */
 	public function uninstall_plugin() {
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Uninstall Gravity PDF.' );
+		$this->log->addNotice( 'Uninstall Gravity PDF.' );
 
 		$this->remove_plugin_options();
 		$this->remove_plugin_form_settings();
@@ -346,7 +346,7 @@ class Model_Install extends Helper_Abstract_Model {
 			if ( isset($form['gfpdf_form_settings']) ) {
 				unset($form['gfpdf_form_settings']);
 				if ( $this->form->update_form( $form ) !== true ) {
-					$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Cannot Remove PDF Settings from Form.', array( 'form' => $form ) );
+					$this->log->addError( 'Cannot Remove PDF Settings from Form.', array( 'form' => $form ) );
 					$this->notices->add_error( sprintf( __( 'There was a problem removing the Gravity Form "%s" PDF configuration. Try delete manually.', 'gravitypdf' ), $form['id'] . ': ' . $form['title'] ) );
 				}
 			}
@@ -369,7 +369,7 @@ class Model_Install extends Helper_Abstract_Model {
 				$results = $this->misc->rmdir( $dir );
 
 				if ( is_wp_error( $results ) || ! $results ) {
-					$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Cannot Remove Folder Structure.', array(
+					$this->log->addError( 'Cannot Remove Folder Structure.', array(
 						'WP_Error' => $results,
 						'dir'      => $dir,
 					) );

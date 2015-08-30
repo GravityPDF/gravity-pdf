@@ -151,7 +151,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		/* not a valid entry */
 		if ( is_wp_error( $entry ) ) {
-			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Invalid Entry.', array( 'entry' => $entry ) );
+			$this->log->addError( 'Invalid Entry.', array( 'entry' => $entry ) );
 			return $entry; /* return error */
 		}
 
@@ -161,7 +161,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		/* Not valid settings */
 		if ( is_wp_error( $settings ) ) {
 			
-			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Invalid PDF Settings.', array(
+			$this->log->addError( 'Invalid PDF Settings.', array(
 				'entry'    => $entry,
 				'WP_Error' => $settings,
 			) );
@@ -184,7 +184,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		/* Throw error */
 		if ( is_wp_error( $middleware ) ) {
 			
-			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Invalid PDF Settings.', array(
+			$this->log->addError( 'Invalid PDF Settings.', array(
 				'entry'    => $entry,
 				'settings' => $settings,
 				'WP_Error' => $middleware,
@@ -279,7 +279,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 			if ( $logged_out_restriction === 'Yes' && ! is_user_logged_in() ) {
 
-				$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Redirecting to Login.', array(
+				$this->log->addNotice( 'Redirecting to Login.', array(
 					'entry'    => $entry,
 					'settings' => $settings,
 				) );
@@ -325,7 +325,7 @@ class Model_PDF extends Helper_Abstract_Model {
 							return new WP_Error( 'timeout_expired', __( 'Your PDF is no longer accessible.', 'gravitypdf' ) );
 						} else {
 
-							$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Redirecting to Login.', array(
+							$this->log->addNotice( 'Redirecting to Login.', array(
 								'entry'    => $entry,
 								'settings' => $settings,
 							) );
@@ -357,7 +357,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				/* check if there is actually a user who owns entry */
 				if ( ! empty($entry['created_by']) ) {
 					
-					$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Redirecting to Login.', array(
+					$this->log->addNotice( 'Redirecting to Login.', array(
 						'entry'    => $entry,
 						'settings' => $settings,
 					) );
@@ -424,7 +424,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		$form = $this->form->get_form( $entry['form_id'] );
 		$pdfs = (isset($form['gfpdf_form_settings'])) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : array();
 
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Display PDF Entry List.', array(
+		$this->log->addNotice( 'Display PDF Entry List.', array(
 			'pdfs'  => $pdfs,
 			'entry' => $entry,
 		) );
@@ -475,7 +475,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		$form = $this->form->get_form( $entry['form_id'] );
 		$pdfs = (isset($form['gfpdf_form_settings'])) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : array();
 
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Display PDF Entry Detail List.', array(
+		$this->log->addNotice( 'Display PDF Entry Detail List.', array(
 			'pdfs'  => $pdfs,
 			'entry' => $entry,
 		) );
@@ -589,7 +589,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				return true;
 			} catch (Exception $e) {
 
-				$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'PDF Generation Error', array(
+				$this->log->addError( 'PDF Generation Error', array(
 					'pdf'       => $pdf,
 					'exception' => $e,
 				) );
@@ -640,7 +640,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				}
 			}
 
-			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Gravity Forms Attachments', array(
+			$this->log->addNotice( 'Gravity Forms Attachments', array(
 				'attachments'  => $notifications['attachments'],
 				'notification' => $notifications,
 			) );
@@ -770,7 +770,7 @@ class Model_PDF extends Helper_Abstract_Model {
 						$this->misc->rmdir( substr( $file, 0, -1 ) );
 					} else {
 						if( ! unlink( $file ) ) {
-							$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Filesystem Delete Error', array( 'file' => $file ) );
+							$this->log->addError( 'Filesystem Delete Error', array( 'file' => $file ) );
 						}
 					}
 				}
@@ -915,7 +915,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			}
 		}
 
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Form Data Array Created', array(
+		$this->log->addNotice( 'Form Data Array Created', array(
 			'data' => $data,
 		) );
 

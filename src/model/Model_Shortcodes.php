@@ -85,7 +85,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	public function gravitypdf( $attributes ) {
 		global $gfpdf;
 
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Generating Shortcode' );
+		$this->log->addNotice( 'Generating Shortcode' );
 
 		$controller = $this->getController();
 
@@ -142,7 +142,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		$attributes['url'] = ($attributes['type'] == 'download') ? $pdf_url . 'download/' : $pdf_url;
 
 		/* generate the markup and return */
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Generating Shortcode Markup', array( 'attr' => $attributes ) );
+		$this->log->addNotice( 'Generating Shortcode Markup', array( 'attr' => $attributes ) );
 
 		return $controller->view->display_gravitypdf_shortcode( $attributes );
 	}
@@ -210,7 +210,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		/* check if the confirmation is currently being saved */
 		if ( isset($_POST['form_confirmation_url']) ) {
 
-			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Process Redirect Confirmation Save', array(
+			$this->log->addNotice( 'Process Redirect Confirmation Save', array(
 				'form' => $form,
 				'post' => $_POST
 			) );

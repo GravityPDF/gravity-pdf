@@ -198,7 +198,7 @@ class Helper_Options implements Helper_Interface_Filters {
 			return (isset($settings[$pid])) ? $settings[$pid] : array();
 		}
 
-		$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Settings Retreival Error', array(
+		$this->log->addError( 'Settings Retreival Error', array(
 			'form_id'  => $form_id,
 			'pid'      => $pid,
 			'WP_Error' => $settings,
@@ -324,7 +324,7 @@ class Helper_Options implements Helper_Interface_Filters {
 
 		// If no key, exit
 		if ( empty( $key ) ) {
-			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Option Update Error', array(
+			$this->log->addError( 'Option Update Error', array(
 				'key'   => $key,
 				'value' => $value,
 			) );
@@ -368,7 +368,7 @@ class Helper_Options implements Helper_Interface_Filters {
 
 		// If no key, exit
 		if ( empty( $key ) ) {
-			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Option Delete Error' );
+			$this->log->addError( 'Option Delete Error' );
 			return false;
 		}
 

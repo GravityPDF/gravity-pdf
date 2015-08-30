@@ -193,7 +193,7 @@ class View_Settings extends Helper_Abstract_View
 
 		$vars = array_merge( $vars, $this->data );
 
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'System Status', array( 'status' => $vars ) );
+		$this->log->addNotice( 'System Status', array( 'status' => $vars ) );
 
 		/* load the system status view */
 		$this->load( 'system_status', $vars );
@@ -225,7 +225,7 @@ class View_Settings extends Helper_Abstract_View
 
 		/* prevent unauthorized access */
 		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
-			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.' );
+			$this->log->addWarning( 'Lack of User Capabilities.' );
 			
 			wp_die( __( 'You do not have permission to access this page', 'gravitypdf' ) );
 		}

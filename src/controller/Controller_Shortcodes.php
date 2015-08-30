@@ -122,7 +122,7 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 	 */
 	public function add_shortcake_support() {
 
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Enable Shortcake support.' );
+		$this->log->addNotice( 'Enable Shortcake support.' );
 
 		/* Enhance further */
 		shortcode_ui_register_for_shortcode( 'gravitypdf', array(

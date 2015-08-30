@@ -142,7 +142,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			/* update transient */
 			set_transient( 'settings_errors', $updated_settings_error, 30 );
 
-			$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'PDF Settings Errors', array(
+			$this->log->addNotice( 'PDF Settings Errors', array(
 				'original' => $this->form_settings_errors,
 				'cleaned'  => $updated_settings_error,
 			) );
@@ -198,7 +198,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	public function install_templates() {
 
 		if ( ! $this->misc->copyr( PDF_PLUGIN_DIR . 'initialisation/templates/', $this->data->template_location ) ) {
-			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Template Installation Error.' );
+			$this->log->addError( 'Template Installation Error.' );
 			$this->notices->add_error( sprintf( __( 'There was a problem copying all PDF templates to %s. Please try again.', 'gravitypdf' ), '<code>' . $this->misc->relative_path( $this->data->template_location ) . '</code>' ) );
 			return false;
 		}
@@ -215,7 +215,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 */
 	public function save_font() {
 
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Running AJAX Endpoint', array( 'type' => 'Save Font' ) );
+		$this->log->addNotice( 'Running AJAX Endpoint', array( 'type' => 'Save Font' ) );
 
 		/* prevent unauthorized access */
 		$this->ajax_font_validation();
@@ -224,7 +224,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		$results = $this->process_font( $_POST['payload'] );
 
 		/* If we reached this point the results were successful so return the new object */
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'AJAX Endpoint Successful', array( 'results' => $results ) );
+		$this->log->addNotice( 'AJAX Endpoint Successful', array( 'results' => $results ) );
 
 		echo json_encode( $results );
 		wp_die();
@@ -237,7 +237,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 */
 	public function delete_font() {
 
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Running AJAX Endpoint', array( 'type' => 'Delete Font' ) );
+		$this->log->addNotice( 'Running AJAX Endpoint', array( 'type' => 'Delete Font' ) );
 
 		/* prevent unauthorized access */
 		$this->ajax_font_validation();
@@ -254,7 +254,7 @@ class Model_Settings extends Helper_Abstract_Model {
 
 				if ( $this->options->update_option( 'custom_fonts', $fonts ) ) {
 					/* Success */
-					$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'AJAX Endpoint Successful' );
+					$this->log->addNotice( 'AJAX Endpoint Successful' );
 					echo json_encode( array( 'success' => true ) );
 					wp_die();
 				}
@@ -267,7 +267,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			'error' => __( 'Could not delete Gravity PDF font correctly. Please try again.', 'gravitypdf' ),
 		);
 
-		$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'AJAX Endpoint Error', array( 'error' => $return ) );
+		$this->log->addError( 'AJAX Endpoint Error', array( 'error' => $return ) );
 
 		echo json_encode( $return );
 		wp_die();
@@ -284,7 +284,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		/* prevent unauthorized access */
 		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			/* fail */
-			$this->log->addCritical( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Lack of User Capabilities.', array(
+			$this->log->addCritical( 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
 				'user_meta' => get_user_meta( get_current_user_id() )
 			) );
@@ -301,7 +301,7 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		if ( ! wp_verify_nonce( $nonce, $nonce_id ) ) {
 			/* fail */
-			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Nonce Verification Failed.' );
+			$this->log->addWarning( 'Nonce Verification Failed.' );
 
 			header( 'HTTP/1.1 401 Unauthorized' );
 			wp_die( '401' );
@@ -340,7 +340,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 */
 	public function process_font( $font ) {
 
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Running AJAX Endpoint', array( 'type' => 'Save Font' ) );
+		$this->log->addNotice( 'Running AJAX Endpoint', array( 'type' => 'Save Font' ) );
 
 		/* remove any empty fields */
 		$font = array_filter( $font );
@@ -355,7 +355,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				'error' => __( 'Required fields have not been included.', 'gravitypdf' ),
 			);
 
-			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Validation Failed.', $return );
+			$this->log->addWarning( 'Validation Failed.', $return );
 
 			echo json_encode( $return );
 			wp_die();
@@ -372,7 +372,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				'error' => __( 'Font name is not valid. Only alphanumeric characters and spaces are accepted.', 'gravitypdf' ),
 			);
 
-			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Validation Failed.', $return );
+			$this->log->addWarning( 'Validation Failed.', $return );
 
 			echo json_encode( $return );
 			wp_die();
@@ -390,7 +390,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				'error' => __( 'A font with the same name already exists. Try a different name.', 'gravitypdf' ),
 			);
 
-			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Validation Failed.', $return );
+			$this->log->addWarning( 'Validation Failed.', $return );
 
 			echo json_encode( $return );
 			wp_die();
@@ -408,13 +408,13 @@ class Model_Settings extends Helper_Abstract_Model {
 				'error' => $installation,
 			);
 
-			$this->log->addWarning( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Validation Failed.', $return );
+			$this->log->addWarning( 'Validation Failed.', $return );
 
 			echo json_encode( $return );
 			wp_die();
 		}
 
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'AJAX Endpoint Successful', array( 'message' => $installation ) );
+		$this->log->addNotice( 'AJAX Endpoint Successful', array( 'message' => $installation ) );
 
 		/* If we got here the installation was successful so return the data */
 		return $installation;
@@ -505,7 +505,7 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		/* If errors were found then return */
 		if ( sizeof( $errors ) > 0 ) {
-			$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Install Error.', array( 'errors' => $errors ) );
+			$this->log->addError( 'Install Error.', array( 'errors' => $errors ) );
 			return array( 'errors' => $errors );
 		} else {
 			/* Insert our font into the database */

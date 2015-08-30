@@ -186,7 +186,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		$lid    = (int) $GLOBALS['wp']->query_vars['lid'];
 		$action = ( $GLOBALS['wp']->query_vars['action'] == 'download' ) ? 'download' : 'view';
 
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Processing PDF endpoint.', array(
+		$this->log->addNotice( 'Processing PDF endpoint.', array(
 			'pid' => $pid,
 			'lid' => $lid,
 			'action' => $action,
@@ -223,7 +223,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 			'action'   => ( isset( $_GET['download'] ) ) ? 'download' : 'view',
 		);
 
-		$this->log->addNotice( __CLASS__ . '::' . __METHOD__ . '(): ' . 'Processing Legacy PDF endpoint.', array(
+		$this->log->addNotice( 'Processing Legacy PDF endpoint.', array(
 			'config' => $config
 		) );
 
@@ -256,7 +256,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 */
 	private function pdf_error( $error ) {
 
-		$this->log->addError( __CLASS__ . '::' . __METHOD__ . '(): ' . 'PDF Generation Error.', array( 'WP_Error' => $error ) );
+		$this->log->addError( 'PDF Generation Error.', array( 'WP_Error' => $error ) );
 
 		/* only display detailed error to admins */
 		$whitelist_errors = array( 'timeout_expired', 'access_denied' );
