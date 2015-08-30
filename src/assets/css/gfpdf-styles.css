@@ -8,6 +8,10 @@
 	width: 100%;
 }
 
+.about-wrap .feature-section:not(.under-the-hood) .col.gfpdf-breakdown {
+  margin-top: 0;
+}
+
 .gfpdf-badge {
 	background: url("../images/gravitypdf-globe-black.png") no-repeat 50% 5px;
 	color: #333;

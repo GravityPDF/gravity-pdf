@@ -108,17 +108,17 @@ global $gfpdf;
 		</div>
 
 		<div id="gfpdf-mascot-container" class="changelog feature-section three-col">
-			<div>
+			<div class="col">
 				<img class="gfpdf-image" src="<?php echo esc_url(PDF_PLUGIN_URL . 'src/assets/images/welcome-download-shortcode.png'); ?>">
 				<h3>Simple PDF Download Links</h3>
 				<p>The <code>[gravitypdf]</code> shortcode allows you to <a href="#">easily place a PDF download link</a> on any of the Gravity Forms Confirmation types.</p>
 			</div>
-			<div>
+			<div class="col">
 				<img class="gfpdf-image" src="<?php echo esc_url(PDF_PLUGIN_URL . 'src/assets/images/welcome-notification-conditional.png'); ?>">
 				<h3>Automated PDF Emails</h3>
 				<p>Select a Gravity Form Notification and your PDF <a href="#">will automatically be sent as an attachment</a>. Powerful conditional logic can also be used to determine if a PDF will be included.</p>
 			</div>
-			<div class="last-feature">
+			<div class="col last-feature">
 				<img class="gfpdf-image" src="<?php echo esc_url(PDF_PLUGIN_URL . 'src/assets/images/welcome-manage-fonts.png'); ?>">
 				<h3>Custom Fonts</h3>
 				<p>Make your documents stand out by including your favourite fonts with our <a href="#">simple font manager</a>.</p>
@@ -132,8 +132,8 @@ global $gfpdf;
 		<div class="changelog">
 				<h3>Get more out of Gravity PDF</h3>
 
-				<div class="feature-section col three-col">
-					<div>
+				<div class="feature-section three-col">
+					<div class="col gfpdf-breakdown">
 
 						<h4>PDF Template Shop</h4>
 						<p>It's like a theme shop, but for Gravity PDF templates. <a href="#">Head over to our online store</a> and view our growing selection of premium PDF templates.</p>
@@ -143,7 +143,7 @@ global $gfpdf;
 
 					</div>
 
-					<div>
+					<div class="col gfpdf-breakdown">
 
 						<h4>Tailored PDFs</h4>
 						<p>If the PDF Shop doesn't have what you're after <a href="#">our friendly team can build a document just for you</a>. With an addon, our devs can even create templates that auto fill existing PDFs – like government and legal documents.</p>
@@ -154,7 +154,7 @@ global $gfpdf;
 
 					</div>
 
-					<div class="last-feature">
+					<div class="col gfpdf-breakdown last-feature">
 
 						<h4>Roll your Own</h4>
 						<p>If PHP, HTML and CSS come easy to you, you'll find creating your own PDF templates a breeze. With <a href="#">extensive documentation and great examples</a> you'll be up and running in no time.</p>
