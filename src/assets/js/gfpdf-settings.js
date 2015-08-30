@@ -813,6 +813,12 @@
 			 * @since 4.0
 			 */
 			this.showTooltips = function() {
+
+				if (typeof gform_initialize_tooltips !== 'function') {
+					return;
+				}
+
+
 				$('.gf_hidden_tooltip').each(function() {
 					$(this)
 					.parent()
