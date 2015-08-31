@@ -90,9 +90,10 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
      * @todo test correct permissions
      */
     public function test_change_state_pdf_setting() {
+        global $gfpdf;
 
         /* set up our data provider */
-        $model = new Model_Form_Settings();
+        $model = new Model_Form_Settings( $gfpdf->form, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
 
         /* set up our post data and role */
         $this->_setRole( 'administrator' );
@@ -144,6 +145,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
         $this->assertEquals('Inactive', $response['state']);
 
         /* Test the function performed correctly */
+        unset( $gfpdf->data->form_settings );
         $pdf   = $model->get_pdf($this->form_id, $this->pid);
         $this->assertFalse($pdf['active']);
 
@@ -168,7 +170,8 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
         $this->assertEquals('Active', $response['state']);
 
         /* Test the function performed correctly */
-        $pdf   = $model->get_pdf($this->form_id, $this->pid);
+        unset( $gfpdf->data->form_settings );
+        $pdf = $model->get_pdf($this->form_id, $this->pid);
         $this->assertTrue($pdf['active']);
     }
 
@@ -178,9 +181,10 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
      * @todo test correct permissions
      */
     public function test_duplicate_gf_pdf_settings() {
+        global $gfpdf;
 
         /* set up our data provider */
-        $model = new Model_Form_Settings();
+        $model = new Model_Form_Settings( $gfpdf->form, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
 
         /* set up our post data and role */
         $this->_setRole( 'administrator' );
@@ -236,6 +240,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
         
 
         /* Test the function performed correctly */
+        unset( $gfpdf->data->form_settings );
         $pdf1   = $model->get_pdf($this->form_id, $this->pid);
         $pdf2   = $model->get_pdf($this->form_id, $response['pid']);
         
@@ -253,9 +258,10 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
      * @todo test correct permissions
      */
     public function test_delete_gf_pdf_setting() {
+        global $gfpdf;
 
         /* set up our data provider */
-        $model = new Model_Form_Settings();
+        $model = new Model_Form_Settings( $gfpdf->form, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
 
         /* test configuration exists already */
         $pdf   = $model->get_pdf($this->form_id, $this->pid);
@@ -309,7 +315,8 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
         $this->assertArrayHasKey('msg', $response);
         
         /* Test the function performed correctly */
+        unset( $gfpdf->data->form_settings );
         $pdf   = $model->get_pdf($this->form_id, $this->pid);
-        $this->assertFalse($pdf);
+        $this->assertTrue( is_wp_error($pdf) );
     }
 }

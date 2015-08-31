@@ -69,15 +69,16 @@ class Test_Settings extends WP_UnitTestCase
      * @since 4.0
      */
     public function setUp() {
+        global $gfpdf;
 
         /* run parent method */
         parent::setUp();
 
         /* Setup our test classes */
-        $this->model = new Model_Settings();
+        $this->model = new Model_Settings( $gfpdf->form, $gfpdf->log, $gfpdf->notices, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
         $this->view  = new View_Settings(array());
 
-        $this->controller = new Controller_Settings($this->model, $this->view);
+        $this->controller = new Controller_Settings($this->model, $this->view, $gfpdf->form, $gfpdf->log, $gfpdf->notices, $gfpdf->data, $gfpdf->misc);
         $this->controller->init();
     }
 
@@ -110,7 +111,7 @@ class Test_Settings extends WP_UnitTestCase
 
         $this->controller->add_filters();
 
-        $this->assertEquals(10, has_filter( 'gfpdf_registered_settings', array( $this->model, 'highlight_errors')));
+        $this->assertEquals(10, has_filter( 'gfpdf_registered_fields', array( $this->model, 'highlight_errors')));
     }
 
     /**

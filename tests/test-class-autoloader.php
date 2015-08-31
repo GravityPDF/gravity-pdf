@@ -60,11 +60,12 @@ class Test_Autoloader extends WP_UnitTestCase
             array('GFPDF\Controller\Controller_Settings'),
             array('GFPDF\Controller\Controller_Welcome_Screen'),
 
-            array('GFPDF\Helper\Helper_Controller'),
+            array('GFPDF\Helper\Helper_Abstract_Controller'),
+            array('GFPDF\Helper\Helper_Abstract_Model'),
+            array('GFPDF\Helper\Helper_Abstract_View'),
+
             array('GFPDF\Helper\Helper_Data'),
-            array('GFPDF\Helper\Helper_Model'),
             array('GFPDF\Helper\Helper_PDF_List_Table'),
-            array('GFPDF\Helper\Helper_View'),
 
             array('GFPDF\Model\Model_Form_Settings'),
             array('GFPDF\Model\Model_Settings'),
@@ -94,8 +95,8 @@ class Test_Autoloader extends WP_UnitTestCase
      */
     public function provider_interfaces() {
         return array(
-            array('GFPDF\Helper\Helper_Int_Actions'),
-            array('GFPDF\Helper\Helper_Int_Filters'),
+            array('GFPDF\Helper\Helper_Interface_Actions'),
+            array('GFPDF\Helper\Helper_Interface_Filters'),
         );
     }
 

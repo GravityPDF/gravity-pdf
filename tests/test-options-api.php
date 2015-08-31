@@ -60,11 +60,13 @@ class Test_Options_API extends WP_UnitTestCase
      * @since 4.0
      */
     public function setUp() {
+        global $gfpdf;
+
         /* run parent method */
         parent::setUp();
 
         /* setup our object */
-        $this->options = new Helper_Options_Fields();
+        $this->options = new Helper_Options_Fields( $gfpdf->log, $gfpdf->form, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
 
         /* load settings in database  */
         update_option( 'gfpdf_settings', json_decode(file_get_contents( PDF_PLUGIN_DIR . 'tests/json/options-settings.json' ), true));
@@ -162,21 +164,19 @@ class Test_Options_API extends WP_UnitTestCase
      */
     public function test_register_settings() {
         global $wp_settings_fields, $new_whitelist_options;
-
-        add_filter( 'gfpdf_registered_settings', function($settings) {
-            return array(
-                'general' => array(
-                    'my_test_item' => array(
-                        'id'   => 'my_test_item',
-                        'name' => 'Test Item',
-                        'type' => 'text',
-                    ),
-                )
-            );
-        });
+        
+        $fields = array(
+            'general' => array(
+                'my_test_item' => array(
+                    'id'   => 'my_test_item',
+                    'name' => 'Test Item',
+                    'type' => 'text',
+                ),
+            )
+        );
 
         /* call our function */
-        $this->options->register_settings();
+        $this->options->register_settings( $fields );
 
         /* Test setting was added correctly */
         $this->assertTrue(isset($wp_settings_fields['gfpdf_settings_general']['gfpdf_settings_general']['gfpdf_settings[my_test_item]']));
@@ -186,7 +186,7 @@ class Test_Options_API extends WP_UnitTestCase
         $this->assertTrue(isset($new_whitelist_options['gfpdf_settings']));
 
         /* clean up filter */
-        remove_all_filters( 'gfpdf_registered_settings' );
+        remove_all_filters( 'gfpdf_registered_fields' );
     }
 
     /**
@@ -195,7 +195,7 @@ class Test_Options_API extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_get_registered_settings() {
-        $items = $this->options->get_registered_settings();
+        $items = $this->options->get_registered_fields();
 
         /* Check the array */
         $this->assertTrue(isset($items['general']));
@@ -241,7 +241,7 @@ class Test_Options_API extends WP_UnitTestCase
         });
 
         /* reset items */
-        $items = $this->options->get_registered_settings();
+        $items = $this->options->get_registered_fields();
 
         $this->assertEquals('General Settings', $items['general']);
         $this->assertEquals('General Security Settings', $items['general_security']);

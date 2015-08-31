@@ -146,7 +146,9 @@ class Test_Data_Helper extends WP_UnitTestCase
      * @group data
      */
     public function test_localised_script() {
-        $array = $this->data->get_localised_script_data();
+        global $gfpdf;
+
+        $array = $this->data->get_localised_script_data( $gfpdf->options, $gfpdf->form );
 
         $this->assertArrayHasKey('ajaxurl', $array);
         $this->assertArrayHasKey('GFbaseUrl', $array);

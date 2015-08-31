@@ -78,16 +78,18 @@ class Test_Form_Settings extends WP_UnitTestCase
      * @since 4.0
      */
     public function setUp() {
+        global $gfpdf;
+
         parent::setUp();
 
         /* import our Gravity Form */
         $this->import_form();
 
         /* Setup our test classes */
-        $this->model = new Model_Form_Settings();
+        $this->model = new Model_Form_Settings( $gfpdf->form, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
         $this->view  = new View_Form_Settings(array());
 
-        $this->controller = new Controller_Form_Settings($this->model, $this->view);
+        $this->controller = new Controller_Form_Settings( $this->model, $this->view, $gfpdf->data, $gfpdf->options );
         $this->controller->init();
     }
 
@@ -151,7 +153,7 @@ class Test_Form_Settings extends WP_UnitTestCase
 
         /* custom sanitation functions */
         $this->assertEquals(10, has_filter( 'gfpdf_form_settings_sanitize', array($gfpdf->options, 'sanitize_all_fields') ));
-        $this->assertEquals(15, has_filter( 'gfpdf_form_settings_sanitize_text',  array($this->model, 'strip_filename_extension')));
+        $this->assertEquals(15, has_filter( 'gfpdf_form_settings_sanitize_text',  array($this->model, 'parse_filename_extension')));
         $this->assertEquals(10, has_filter( 'gfpdf_form_settings_sanitize_hidden',  array($this->model, 'decode_json')));
     }
 
@@ -300,7 +302,7 @@ class Test_Form_Settings extends WP_UnitTestCase
         $this->assertEquals('My First PDF Template', $pdf['name']);
 
         /* test delete functionality */
-        $this->assertSame(1, $this->model->delete_pdf($this->form_id, $pid));
+        $this->assertSame(true, $this->model->delete_pdf($this->form_id, $pid));
         $this->assertTrue(is_wp_error($this->model->get_pdf($this->form_id, $pid)));
 
     }
@@ -409,7 +411,7 @@ class Test_Form_Settings extends WP_UnitTestCase
         remove_all_filters( 'gfpdf_form_settings' );
 
         /* get our fields */
-        $all_fields = $gfpdf->options->get_registered_settings();
+        $all_fields = $gfpdf->options->get_registered_fields();
         $fields     = $all_fields['form_settings'];
 
         /* check there are no issues if not meant to be validated */
@@ -526,7 +528,7 @@ class Test_Form_Settings extends WP_UnitTestCase
      * @dataProvider provider_strip_filename
      */
     public function test_strip_filename_extension($expected, $string) {
-        $this->assertSame($expected, $this->model->strip_filename_extension($string, 'filename'));
+        $this->assertSame($expected, $this->model->parse_filename_extension($string, 'filename'));
     }
 
     /**
