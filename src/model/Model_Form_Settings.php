@@ -529,7 +529,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			$this->log->addNotice( 'Successfully Saved.', array(
 				'form_id'  => $form_id,
 				'pdf_id'   => $pdf_id,
-				'settings' => $form['gfpdf_form_settings'][$pdf_id],
+				'settings' => $sanitized,
 			) );
 
 			$this->notices->add_notice( sprintf( __( 'PDF saved successfully. %sBack to PDF list.%s', 'gravitypdf' ), '<a href="' . remove_query_arg( 'pid' ) . '">', '</a>' ) );
@@ -831,8 +831,6 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			if ( mb_strtolower( mb_substr( $value, -4 ) ) === '.pdf' ) {
 				$value = mb_substr( $value, 0, -4 );
 			}
-
-			$value = $this->misc->strip_invalid_characters( $value );
 		}
 
 		return $value;
