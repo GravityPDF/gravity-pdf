@@ -191,6 +191,7 @@ class Field_Product extends Helper_Abstract_Fields
 	 * @internal We won't use a cache here because it's being handled in the Field_Products class, which is linked to this class through a static object
 	 */
 	public function value() {
+		
 		/* Get the full products array */
 		$data = $this->products->value();
 

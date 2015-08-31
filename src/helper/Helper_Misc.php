@@ -241,7 +241,7 @@ class Helper_Misc
 		} catch (Exception $e) {
 			$this->log->addError( 'Filesystem Delete Error', array(
 				'dir'       => $dir,
-				'exception' => $e,
+				'exception' => $e->getMessage(),
 			) );
 
 			return new WP_Error( 'recursion_delete_problem', $e );

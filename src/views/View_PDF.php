@@ -183,7 +183,7 @@ class View_PDF extends Helper_Abstract_View
 			$this->log->addError( 'PDF Generation Error', array(
 				'entry'     => $entry,
 				'settings'  => $settings,
-				'exception' => $e,
+				'exception' => $e->getMessage(),
 			) );
 
 			if( $this->form->has_capability( 'gravityforms_view_entries' ) ) {
@@ -367,7 +367,7 @@ class View_PDF extends Helper_Abstract_View
 				'entry'     => $entry,
 				'config'    => $config,
 				'form'      => $form,
-				'exception' => $e,
+				'exception' => $e->getMessage(),
 			) );
 		}
 	}

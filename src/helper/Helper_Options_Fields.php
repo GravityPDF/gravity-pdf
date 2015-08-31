@@ -499,7 +499,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 			),
 		);
 
-		return apply_filters( 'gfpdf_registered_settings', $gfpdf_settings );
+		return apply_filters( 'gfpdf_registered_fields', $gfpdf_settings );
 	}
 
 	/**

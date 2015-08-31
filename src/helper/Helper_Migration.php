@@ -127,7 +127,7 @@ class Helper_Migration {
 		} catch (Exception $e) {
 
 			$this->log->addError( 'Migration Error', array(
-				'exception' => $e,
+				'exception' => $e->getMessage(),
 			) );
 
 			$this->notices->add_error( __( 'There was a problem processing the action. Please try again.', 'gravitypdf' ) );

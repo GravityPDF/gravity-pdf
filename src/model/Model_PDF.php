@@ -594,7 +594,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 				$this->log->addError( 'PDF Generation Error', array(
 					'pdf'       => $pdf,
-					'exception' => $e,
+					'exception' => $e->getMessage(),
 				) );
 				
 				return false;
@@ -1239,9 +1239,10 @@ class Model_PDF extends Helper_Abstract_Model {
 				 * We've tried to make the fields as modular as possible. If you have any feedback about this approach please submit a ticket on GitHub (https://github.com/blueliquiddesigns/gravity-forms-pdf-extended/issues)
 				 */
 				if ( GFCommon::is_product_field( $field->type ) ) {
+
 					/* Product fields are handled through a single function */
 					$product = new Field_Product( $field, $entry, $this->form, $this->misc );
-					$product = $product->set_products( $products );
+					$product->set_products( $products );
 
 					$class = apply_filters( 'gfpdf_field_product_class', $product, $field, $entry, $form );
 				} else {
@@ -1254,6 +1255,14 @@ class Model_PDF extends Helper_Abstract_Model {
 				throw new Exception( 'Class not found' );
 			}
 		} catch (Exception $e) {
+
+			$this->log->addError( 'Invalid Field Class.', array(
+				'exception' => $e->getMessage(),
+				'field'     => $field,
+				'form'      => $form,
+				'entry'     => $entry,
+			) );
+
 			/* Exception thrown. Load generic field loader */
 			$class = apply_filters( 'gfpdf_field_default_class', new Field_Default( $field, $entry, $this->form, $this->misc ), $field, $entry, $form );
 		}

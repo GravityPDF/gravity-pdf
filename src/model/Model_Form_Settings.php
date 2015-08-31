@@ -929,6 +929,10 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			wp_die();
 		}
 
+		$this->log->addError( 'AJAX Endpoint Failed', array(
+			'WP_Error' => $config
+		) );
+
 		header( 'HTTP/1.1 500 Internal Server Error' );
 		wp_die( '500' );
 	}
@@ -1003,6 +1007,10 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			}
 		}
 
+		$this->log->addError( 'AJAX Endpoint Failed', array(
+			'WP_Error' => $config
+		) );
+
 		header( 'HTTP/1.1 500 Internal Server Error' );
 		wp_die( '500' );
 	}
@@ -1064,12 +1072,18 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				$return = array(
 					'state' => $state,
 					'src'   => $src,
+					'fid' => $fid,
+					'pid' => $config['id'],
 				);
 
 				echo json_encode( $return );
 				wp_die();
 			}
 		}
+
+		$this->log->addError( 'AJAX Endpoint Failed', array(
+			'WP_Error' => $config
+		) );
 
 		header( 'HTTP/1.1 500 Internal Server Error' );
 		wp_die( '500' );
