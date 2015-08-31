@@ -166,13 +166,13 @@ class View_PDF extends Helper_Abstract_View
 
 		try {
 			$pdf->init();
-			$pdf->render_html( $args );
-
+			
 			/* set display type */
 			if ( $settings['pdf_action'] == 'download' ) {
 				$pdf->set_output_type( 'download' );
 			}
 
+			$pdf->render_html( $args );
 			$this->options->increment_pdf_count();
 
 			/* Generate PDF */

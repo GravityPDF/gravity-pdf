@@ -95,15 +95,31 @@ class GFPDF_Core extends GFPDF_Depreciated_Abstract
  */
 class PDFRender extends GFPDF_Depreciated_Abstract
 {
+
 	/**
 	 * Saves the PDF to disk
-	 * @param String  $pdf
+	 * @param String  $raw_pdf_string
 	 * @param String  $filename
 	 * @param Integer $id
 	 * @since 3.0
 	 */
-	public function savePDF( $pdf, $filename, $id ) {
-		echo 'todo'; exit;
+	public function savePDF( $raw_pdf_string, $filename, $id ) {
+
+		/* create our path */
+		$path = PDF_SAVE_LOCATION . $id . '/';
+		if ( ! is_dir( $path ) ) {
+			if ( ! wp_mkdir_p( $path ) ) {
+				throw new Exception( sprintf( 'Could not create directory: %s' ), esc_html( $path ) );
+			}
+		}
+
+		/* save our PDF */
+		if ( ! file_put_contents( $path . $filename, $raw_pdf_string ) ) {
+			throw new Exception( sprintf( 'Could not save PDF: %s', $path . $filename ) );
+		}
+
+		/* return the path to the PDF */
+		return $path . $filename;
 	}
 
 	/**
@@ -111,7 +127,7 @@ class PDFRender extends GFPDF_Depreciated_Abstract
 	 * @return void
 	 * @since 4.0
 	 */
-	public function prepare_ids( $form_id, $lead_id, $template, $id, $output, $filename, $arguments, $args) {
+	public static function prepare_ids( $form_id, $lead_id, $template, $id, $output, $filename, $arguments, $args) {
 		global $lead_ids;
 		$lead_ids = $args['lead_ids'];
 

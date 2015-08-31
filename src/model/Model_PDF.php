@@ -563,6 +563,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function process_and_save_pdf( Helper_PDF $pdf ) {
 
+
 		/* Check that the PDF hasn't already been created this session */
 		if ( ! $this->does_pdf_exist( $pdf ) ) {
 
@@ -579,12 +580,14 @@ class Model_PDF extends Helper_Abstract_Model {
 
 			try {
 				$pdf->init();
-				$pdf->render_html( $this->misc->get_template_args( $entry, $settings ) );
 				$pdf->set_output_type( 'save' );
+				$pdf->render_html( $this->misc->get_template_args( $entry, $settings ) );
 
-				/* Generate PDF */
-				$raw_pdf = $pdf->generate();
-				$pdf->save_pdf( $raw_pdf );
+				/* Generate PDF if PDF doesn't already exists (backwards compatibility support for v3 Tier 2) */
+				if ( ! $this->does_pdf_exist( $pdf ) ) {
+					$raw_pdf = $pdf->generate();
+					$pdf->save_pdf( $raw_pdf );
+				}
 
 				return true;
 			} catch (Exception $e) {
@@ -731,7 +734,6 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since  4.0
 	 */
 	public function does_pdf_exist( Helper_PDF $pdf ) {
-
 		if ( is_file( $pdf->get_path() . $pdf->get_filename() ) ) {
 			return true;
 		}

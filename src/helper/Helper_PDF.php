@@ -673,6 +673,7 @@ class Helper_PDF {
 	protected function backwards_compat_conversion( $settings ) {
 		
 		$compat                   = array();
+		$compat['premium']		  = ( isset($settings['advanced_template']) && $settings['advanced_template'] == 'Yes' ) ? true : false;
 		$compat['rtl']            = ( isset($settings['rtl']) && $settings['rtl'] == 'Yes' ) ? true : false;
 		$compat['dpi']            = ( isset($settings['image_dpi']) ) ? (int) $settings['image_dpi'] : 96;
 		$compat['security']       = ( isset($settings['security']) && $settings['security'] == 'Yes' ) ? true : false;
