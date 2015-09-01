@@ -82,7 +82,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 * Load our model and view and required actions
 	 */
 	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Abstract_Form $form, LoggerInterface $log, Helper_Misc $misc ) {
-		
+
 		/* Assign our internal variables */
 		$this->form    = $form;
 		$this->log     = $log;
@@ -162,7 +162,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		add_filter( 'mpdf_font_data', array( $this->model, 'register_custom_font_data_with_mPDF' ) );
 
 		/* Process mergetags and shortcodes in PDF */
-		add_filter( 'gfpdf_pdf_html_output', array( $this->misc, 'do_mergetags'), 10, 3 );
+		add_filter( 'gfpdf_pdf_html_output', array( $this->misc, 'do_mergetags' ), 10, 3 );
 		add_filter( 'gfpdf_pdf_html_output', 'do_shortcode' );
 
 		/* Backwards compatibility for our Tier 2 plugin */
@@ -179,7 +179,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 
 		/* exit early if all the required URL parameters aren't met */
 		if ( empty( $GLOBALS['wp']->query_vars['gf_pdf'] ) || empty( $GLOBALS['wp']->query_vars['pid'] ) || empty( $GLOBALS['wp']->query_vars['lid'] ) ) {
-			return;
+			return false;
 		}
 
 		$pid    = $GLOBALS['wp']->query_vars['pid'];
@@ -211,27 +211,27 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	public function process_legacy_pdf_endpoint() {
 
 		/* exit early if all our required parameters aren't met */
-		if( empty( $_GET['gf_pdf'] ) || empty( $_GET['fid'] ) || empty( $_GET['lid'] ) || empty( $_GET['template'] ) ) {
-			return;
+		if ( empty( $_GET['gf_pdf'] ) || empty( $_GET['fid'] ) || empty( $_GET['lid'] ) || empty( $_GET['template'] ) ) {
+			return false;
 		}
 
 		$config = array(
 			'lid'      => $_GET['lid'],
 			'fid'      => (int) $_GET['fid'],
 			'aid'      => ( isset( $_GET['aid'] ) ) ? (int) $_GET['aid'] : false,
-			'template' => substr($_GET['template'], 0, -4), /* strip .php from the template name */
+			'template' => substr( $_GET['template'], 0, -4 ), /* strip .php from the template name */
 			'action'   => ( isset( $_GET['download'] ) ) ? 'download' : 'view',
 		);
 
 		$this->log->addNotice( 'Processing Legacy PDF endpoint.', array(
-			'config' => $config
+			'config' => $config,
 		) );
 
 		/* Attempt to find a valid config */
 		$pid = $this->model->get_legacy_config( $config );
 
-		if( is_wp_error( $pid ) ) {
-			$this->pdf_error( $pid );
+		if ( is_wp_error( $pid ) ) {
+			return $this->pdf_error( $pid );
 		}
 
 		/* Store our ids in the WP query_vars object */

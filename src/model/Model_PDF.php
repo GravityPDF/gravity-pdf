@@ -124,7 +124,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * Load our model and view and required actions
 	 */
 	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log, Helper_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices ) {
-		
+
 		/* Assign our internal variables */
 		$this->form    = $form;
 		$this->log     = $log;
@@ -160,7 +160,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		/* Not valid settings */
 		if ( is_wp_error( $settings ) ) {
-			
+
 			$this->log->addError( 'Invalid PDF Settings.', array(
 				'entry'    => $entry,
 				'WP_Error' => $settings,
@@ -183,7 +183,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		/* Throw error */
 		if ( is_wp_error( $middleware ) ) {
-			
+
 			$this->log->addError( 'Invalid PDF Settings.', array(
 				'entry'    => $entry,
 				'settings' => $settings,
@@ -211,7 +211,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function middle_active( $action, $entry, $settings ) {
 
 		if ( ! is_wp_error( $action ) ) {
-			if( $settings['active'] !== true ) {
+			if ( $settings['active'] !== true ) {
 				return new WP_Error( 'inactive', __( 'The PDF configuration is not currently active.', 'gravitypdf' ) );
 			}
 		}
@@ -229,8 +229,8 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function middle_conditional( $action, $entry, $settings ) {
 
 		if ( ! is_wp_error( $action ) ) {
-			if( isset( $settings['conditionalLogic'] ) && ! GFCommon::evaluate_conditional_logic( $settings['conditionalLogic'], $this->form->get_form( $entry['form_id'] ), $entry ) ) {
-				return new WP_Error( 'conditional_logic', __( "PDF conditional logic requirements have not been met.", 'gravitypdf' ) );
+			if ( isset( $settings['conditionalLogic'] ) && ! GFCommon::evaluate_conditional_logic( $settings['conditionalLogic'], $this->form->get_form( $entry['form_id'] ), $entry ) ) {
+				return new WP_Error( 'conditional_logic', __( 'PDF conditional logic requirements have not been met.', 'gravitypdf' ) );
 			}
 		}
 		return $action;
@@ -356,7 +356,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			if ( ! is_user_logged_in() && $this->is_current_pdf_owner( $entry, 'logged_out' ) === false ) {
 				/* check if there is actually a user who owns entry */
 				if ( ! empty($entry['created_by']) ) {
-					
+
 					$this->log->addNotice( 'Redirecting to Login.', array(
 						'entry'    => $entry,
 						'settings' => $settings,
@@ -420,41 +420,20 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		$controller = $this->getController();
 
-		/* Check if we have any PDFs */
-		$form = $this->form->get_form( $entry['form_id'] );
-		$pdfs = (isset($form['gfpdf_form_settings'])) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : array();
-
 		$this->log->addNotice( 'Display PDF Entry List.', array(
 			'pdfs'  => $pdfs,
 			'entry' => $entry,
 		) );
 
-		if ( ! empty($pdfs) ) {
+		$pdf_list = $this->get_pdf_display_list( $entry );
 
-			$download = ($this->options->get_option( 'default_action' ) == 'Download') ? 'download/' : '';
-
-			if ( sizeof( $pdfs ) > 1 ) {
-
-				$args = array( 'pdfs' => array() );
-
-				foreach ( $pdfs as $pdf ) {
-					$args['pdfs'][] = array(
-						'name' => $this->get_pdf_name( $pdf, $entry ),
-						'url'  => $this->get_pdf_url( $pdf['id'], $entry['id'] ) . $download,
-					);
-				}
-
+		if ( ! empty($pdf_list) ) {
+			if ( sizeof( $pdf_list ) > 1 ) {
+				$args = array( 'pdfs' => $pdf_list );
 				$controller->view->entry_list_pdf_multiple( $args );
-
 			} else {
-
 				/* Only one PDF for this form so display a simple 'View PDF' link */
-				$pdf = array_shift( $pdfs );
-
-				$args = array(
-					'url' => $this->get_pdf_url( $pdf['id'], $entry['id'] ) . $download,
-				);
-
+				$args = array_shift( $pdf_list );
 				$controller->view->entry_list_pdf_single( $args );
 			}
 		}
@@ -471,27 +450,47 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		$controller = $this->getController();
 
-		/* Check if we have any PDFs */
-		$form = $this->form->get_form( $entry['form_id'] );
-		$pdfs = (isset($form['gfpdf_form_settings'])) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : array();
-
 		$this->log->addNotice( 'Display PDF Entry Detail List.', array(
 			'pdfs'  => $pdfs,
 			'entry' => $entry,
 		) );
 
-		if ( ! empty($pdfs) ) {
-			$args = array( 'pdfs' => array() );
+		$pdf_list = $this->get_pdf_display_list( $entry );
 
-			foreach ( $pdfs as $pdf ) {
-				$args['pdfs'][] = array(
-					'name' => $this->get_pdf_name( $pdf, $entry ),
-					'url'  => $this->get_pdf_url( $pdf['id'], $entry['id'] ),
-				);
-			}
-
+		if ( ! empty($pdf_list) ) {
+			$args = array( 'pdfs' => $pdf_list );
 			$controller->view->entry_detailed_pdf( $args );
 		}
+	}
+
+	/**
+	 * Get a preformatted list of active PDFs with name and URL
+	 * @param Array $entry
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function get_pdf_display_list( $entry ) {
+
+		/* Stores our formatted PDFs */
+		$args = array();
+
+		/* Check if we have any PDFs */
+		$form = $this->form->get_form( $entry['form_id'] );
+		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : array();
+
+		if ( ! empty($pdfs) ) {
+			$download = ($this->options->get_option( 'default_action' ) == 'Download') ? 'download/' : '';
+
+			foreach ( $pdfs as $pdf ) {
+
+				$args[] = array(
+					'name' => $this->get_pdf_name( $pdf, $entry ),
+					'url'  => $this->get_pdf_url( $pdf['id'], $entry['id'] ) . $download,
+				);
+			}
+		}
+
+		return $args;
 	}
 
 	/**
@@ -542,7 +541,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function get_active_pdfs( $pdfs, $entry ) {
-		
+
 		$filtered = array();
 		$form     = $this->form->get_form( $entry['form_id'] );
 
@@ -562,7 +561,6 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function process_and_save_pdf( Helper_PDF $pdf ) {
-
 
 		/* Check that the PDF hasn't already been created this session */
 		if ( ! $this->does_pdf_exist( $pdf ) ) {
@@ -596,7 +594,7 @@ class Model_PDF extends Helper_Abstract_Model {
 					'pdf'       => $pdf,
 					'exception' => $e->getMessage(),
 				) );
-				
+
 				return false;
 			}
 		}
@@ -693,10 +691,10 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function maybe_save_pdf( $entry, $form ) {
-		$pdfs = (isset($form['gfpdf_form_settings'])) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : array();
+		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : array();
 
 		if ( sizeof( $pdfs ) > 0 ) {
-			
+
 			/* Aet up classes */
 			$controller  = $this->getController();
 			$settingsAPI = new Model_Form_Settings( $this->form, $this->log, $this->data, $this->options, $this->misc, $this->notices );
@@ -747,31 +745,31 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function cleanup_tmp_dir() {
-		
+
 		$max_file_age  = 24 * 3600; /* Max age is 24 hours old */
 		$tmp_directory = $this->data->template_tmp_location;
 
-		if( is_dir( $tmp_directory ) ) {
+		if ( is_dir( $tmp_directory ) ) {
 			/* Scan the tmp directory and get a list of files / folders */
-			$directory_list = array_diff( scandir($tmp_directory), array( '..', '.', '.htaccess' ) );
+			$directory_list = array_diff( scandir( $tmp_directory ), array( '..', '.', '.htaccess' ) );
 
-			foreach( $directory_list as $item ) {
+			foreach ( $directory_list as $item ) {
 				$file      = $tmp_directory . $item;
 				$directory = false;
-				
+
 				/* Fix to allow filemtime to work on directories too */
-				if( is_dir($file) ) {
+				if ( is_dir( $file ) ) {
 					$file .= '.';
 					$directory = true;
 				}
 
 				/* Check if the file is too old and delete file / directory */
-				if( filemtime( $file ) < time() - $max_file_age ) {
+				if ( filemtime( $file ) < time() - $max_file_age ) {
 
-					if($directory) {
+					if ( $directory ) {
 						$this->misc->rmdir( substr( $file, 0, -1 ) );
 					} else {
-						if( ! unlink( $file ) ) {
+						if ( ! unlink( $file ) ) {
 							$this->log->addError( 'Filesystem Delete Error', array( 'file' => $file ) );
 						}
 					}
@@ -882,7 +880,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			$fields_to_skip = apply_filters( 'gfpdf_form_data_skip_fields', array(
 				'captcha',
 				'password',
-				'page'
+				'page',
 			) );
 
 			if ( in_array( $field->type, $fields_to_skip ) ) {
@@ -1191,18 +1189,18 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Remove existing array item and replace it with a new one
+	 * Swap out the array key
 	 * @param  Array  $array The array to be modified
 	 * @param  String $key   The key to remove
-	 * @param  String $text  The new array key
+	 * @param  String $replacement_key  The new array key
 	 * @return Array        The modified array
 	 * @since 4.0
 	 */
-	public function replace_key( $array, $key, $text ) {
-		if ( $key !== $text && isset( $array[ $key ] ) ) {
+	public function replace_key( $array, $key, $replacement_key ) {
+		if ( $key !== $replacement_key && isset( $array[ $key ] ) ) {
 
 			/* Replace the array key with the actual field name */
-			$array[ $text ] = $array[ $key ];
+			$array[ $replacement_key ] = $array[ $key ];
 			unset( $array[ $key ] );
 		}
 		return $array;
@@ -1283,7 +1281,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		/* Get the form settings */
 		$pdfs = $settingsAPI->get_settings( $config['fid'] );
 
-		if( is_wp_error( $pdfs ) ) {
+		if ( is_wp_error( $pdfs ) ) {
 			return $pdfs;
 		}
 
@@ -1291,18 +1289,18 @@ class Model_PDF extends Helper_Abstract_Model {
 		$pdfs = array_values( $pdfs );
 
 		/* Use the legacy aid to determine which PDF to load */
-		if( $config['aid'] !== false ) {
+		if ( $config['aid'] !== false ) {
 			$selector = $config['aid'] - 1;
 
-			if( isset( $pdfs[ $selector ] ) && $pdfs[ $selector ]['template'] == $config['template'] ) {
+			if ( isset( $pdfs[ $selector ] ) && $pdfs[ $selector ]['template'] == $config['template'] ) {
 				return $pdfs[ $selector ]['id'];
 			}
 		}
 
 		/* The aid method failed so lets load the first matching configuration */
 		$matches = array();
-		foreach( $pdfs as $pdf ) {
-			if( $pdf['active'] === true && $pdf['template'] == $config['template'] ) {
+		foreach ( $pdfs as $pdf ) {
+			if ( $pdf['active'] === true && $pdf['template'] == $config['template'] ) {
 				return $pdf['id'];
 			}
 		}

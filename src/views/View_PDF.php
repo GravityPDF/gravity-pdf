@@ -166,7 +166,7 @@ class View_PDF extends Helper_Abstract_View
 
 		try {
 			$pdf->init();
-			
+
 			/* set display type */
 			if ( $settings['pdf_action'] == 'download' ) {
 				$pdf->set_output_type( 'download' );
@@ -186,10 +186,10 @@ class View_PDF extends Helper_Abstract_View
 				'exception' => $e->getMessage(),
 			) );
 
-			if( $this->form->has_capability( 'gravityforms_view_entries' ) ) {
+			if ( $this->form->has_capability( 'gravityforms_view_entries' ) ) {
 				wp_die( $e->getMessage() );
 			}
-			
+
 			wp_die( __( 'There was a problem generating your PDF', 'gravitypdf' ) );
 		}
 	}
@@ -247,7 +247,7 @@ class View_PDF extends Helper_Abstract_View
 	 * @since 4.0
 	 */
 	public function generate_html_structure( $entry, Helper_Abstract_Model $model, $config = array() ) {
-		
+
 		/* Set up required variables */
 		$form                           = $this->form->get_form( $entry['form_id'] );
 		$products                       = new Field_Products( new GF_Field(), $entry, $this->form, $this->misc );
@@ -328,7 +328,7 @@ class View_PDF extends Helper_Abstract_View
 	 * @since 4.0
 	 */
 	public function process_field( GF_Field $field, $entry, $form, $config, Field_Products $products, Helper_Field_Container $container, Helper_Abstract_Model $model ) {
-		
+
 		/*
         * Set up our configuration variables
         */
