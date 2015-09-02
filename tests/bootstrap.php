@@ -58,10 +58,11 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		require_once $this->plugin_dir . '/tmp/gravityformspoll/polls.php';
 		require_once $this->plugin_dir . '/tmp/gravityformsquiz/quiz.php';
 		require_once $this->plugin_dir . '/tmp/gravityformssurvey/survey.php';
-		require_once $this->plugin_dir . '/gravity-pdf.php';
 
 		/* set up Gravity Forms database */
 		GFForms::setup( true );
+		
+		require_once $this->plugin_dir . '/gravity-pdf.php';
 	}
 
 	/**
