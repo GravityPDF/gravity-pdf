@@ -6,6 +6,7 @@ use WP_Ajax_UnitTestCase;
 use WPAjaxDieStopException;
 use WPAjaxDieContinueException;
 use GFAPI;
+use GFForms;
 
 
 
@@ -72,6 +73,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
      */
     public function setUp() {
         parent::setUp();
+        GFForms::setup_database();
         $this->import_form();
     }
 

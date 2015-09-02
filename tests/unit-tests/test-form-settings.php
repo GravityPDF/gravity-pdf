@@ -83,6 +83,7 @@ class Test_Form_Settings extends WP_UnitTestCase
         parent::setUp();
 
         /* import our Gravity Form */
+        GFForms::setup_database();
         $this->import_form();
 
         /* Setup our test classes */

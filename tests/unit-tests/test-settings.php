@@ -6,6 +6,7 @@ use GFPDF\Model\Model_Settings;
 use GFPDF\View\View_Settings;
 use WP_UnitTestCase;
 use WP_Error;
+use GFForms;
 
 /**
  * Test Gravity PDF Settings Functionality
@@ -73,6 +74,8 @@ class Test_Settings extends WP_UnitTestCase
 
         /* run parent method */
         parent::setUp();
+
+        GFForms::setup_database();
 
         /* Setup our test classes */
         $this->model = new Model_Settings( $gfpdf->form, $gfpdf->log, $gfpdf->notices, $gfpdf->options, $gfpdf->data, $gfpdf->misc );

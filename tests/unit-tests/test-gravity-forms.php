@@ -5,6 +5,7 @@ use WP_UnitTestCase;
 use GFFormsModel;
 use GFAPI;
 use WP_User;
+use GFForms;
 
 /**
  * Test Common Gravity Forms Functions
@@ -54,6 +55,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase
      */
     public function setUp() {
         parent::setUp();
+        GFForms::setup_database();
         $this->import_form();
     }
 

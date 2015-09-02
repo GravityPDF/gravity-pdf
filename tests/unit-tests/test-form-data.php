@@ -7,6 +7,7 @@ use WP_UnitTestCase;
 use GFFormsModel;
 use GFAPI;
 use GFCommon;
+use GFForms;
 
 use GFPDFEntryDetail;
 
@@ -71,6 +72,7 @@ class Test_Form_Data extends WP_UnitTestCase
      */
     public function setUp() {
         parent::setUp();
+        GFForms::setup_database();
         $this->create_form_and_entries();
     }
 

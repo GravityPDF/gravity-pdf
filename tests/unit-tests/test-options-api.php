@@ -4,6 +4,7 @@ namespace GFPDF\Tests;
 use GFPDF\Helper\Helper_Options_Fields;
 use WP_UnitTestCase;
 use GFAPI;
+use GFForms;
 
 /**
  * Test Gravity PDF Options API Class
@@ -64,6 +65,8 @@ class Test_Options_API extends WP_UnitTestCase
 
         /* run parent method */
         parent::setUp();
+
+        GFForms::setup_database();
 
         /* setup our object */
         $this->options = new Helper_Options_Fields( $gfpdf->log, $gfpdf->form, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );

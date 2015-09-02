@@ -45,7 +45,9 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		require_once( $this->wp_tests_dir . '/includes/bootstrap.php' );
 
 		/* clean up Gravity Forms database when finished */
-		register_shutdown_function( array( $this, 'shutdown') );
+		register_shutdown_function( function() {
+			RGFormsModel::drop_tables();
+		} );
 	}
 
 	/**
@@ -61,17 +63,8 @@ class GravityPDF_Unit_Tests_Bootstrap {
 
 		/* set up Gravity Forms database */
 		GFForms::setup( true );
-		
-		require_once $this->plugin_dir . '/gravity-pdf.php';
-	}
 
-	/**
-	 * Run clean up when PHP finishes executing
-	 *
-	 * @since 4.0
-	 */
-	public function shutdown() {
-		RGFormsModel::drop_tables();
+		require_once $this->plugin_dir . '/gravity-pdf.php';
 	}
 
 }

@@ -11,6 +11,7 @@ use GFPDF\Helper\Fields\Field_Products;
 use GFAPI;
 use GFFormsModel;
 use GF_Field;
+use GFForms;
 
 use WP_UnitTestCase;
 use WP_UnitTest_Factory;
@@ -100,6 +101,8 @@ class Test_PDF extends WP_UnitTestCase
 
 		/* run parent method */
 		parent::setUp();
+
+		GFForms::setup_database();
 
 		/* Setup our test classes */
 		$this->model = new Model_PDF( $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
