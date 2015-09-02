@@ -104,6 +104,7 @@ class Test_PDF extends WP_UnitTestCase
 
 		/* Remove temporary tables which causes problems with GF */
 		remove_all_filters( 'query', 10 );
+		GFForms::setup_database();
 
 		/* Setup our test classes */
 		$this->model = new Model_PDF( $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );

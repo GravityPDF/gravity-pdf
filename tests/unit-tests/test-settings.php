@@ -77,6 +77,7 @@ class Test_Settings extends WP_UnitTestCase
 
         /* Remove temporary tables which causes problems with GF */
         remove_all_filters( 'query', 10 );
+        GFForms::setup_database();
 
         /* Setup our test classes */
         $this->model = new Model_Settings( $gfpdf->form, $gfpdf->log, $gfpdf->notices, $gfpdf->options, $gfpdf->data, $gfpdf->misc );

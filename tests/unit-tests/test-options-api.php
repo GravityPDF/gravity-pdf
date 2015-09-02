@@ -68,6 +68,7 @@ class Test_Options_API extends WP_UnitTestCase
 
         /* Remove temporary tables which causes problems with GF */
         remove_all_filters( 'query', 10 );
+        GFForms::setup_database();
 
         /* setup our object */
         $this->options = new Helper_Options_Fields( $gfpdf->log, $gfpdf->form, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );

@@ -75,6 +75,7 @@ class Test_Form_Data extends WP_UnitTestCase
        
         /* Remove temporary tables which causes problems with GF */
         remove_all_filters( 'query', 10 );
+        GFForms::setup_database();
 
         $this->create_form_and_entries();
     }

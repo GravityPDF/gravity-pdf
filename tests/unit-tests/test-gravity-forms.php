@@ -58,6 +58,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase
 
         /* Remove temporary tables which causes problems with GF */
         remove_all_filters( 'query', 10 );
+        GFForms::setup_database();
 
         $this->import_form();
     }
