@@ -73,7 +73,10 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
      */
     public function setUp() {
         parent::setUp();
-        GFForms::setup_database();
+
+        /* Remove temporary tables which causes problems with GF */
+        remove_all_filters( 'query', 10 );
+        
         $this->import_form();
     }
 

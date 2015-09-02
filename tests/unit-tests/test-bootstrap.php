@@ -62,7 +62,7 @@ class Test_Bootstrap extends WP_UnitTestCase
     /**
      * Test the global bootstrap actions are applied
      * @since 4.0
-     * @return void
+     * @group bootstrap
      */
     public function test_actions() {
         $this->assertEquals(10, has_action('init', array($this->loader, 'register_assets')));
@@ -73,7 +73,7 @@ class Test_Bootstrap extends WP_UnitTestCase
     /**
      * Test the global bootstrap filters are applied
      * @since 4.0
-     * @return void
+     * @group bootstrap
      */
     public function test_filters() {
         $this->assertEquals(10, has_filter('gform_noconflict_scripts', array($this->loader, 'auto_noconflict_scripts')));
@@ -83,7 +83,7 @@ class Test_Bootstrap extends WP_UnitTestCase
     /**
      * Test that any Gravity PDF scripts are automatically loading when GF is in no conflict mode
      * @since 4.0
-     * @return void
+     * @group bootstrap
      */
     public function test_auto_noconflict_gfpdf_js() {
         /* get test data */
@@ -102,7 +102,7 @@ class Test_Bootstrap extends WP_UnitTestCase
         );
 
         /* override queue */
-        $wp_scripts = wp_scripts();
+        $wp_scripts = \wp_scripts();
         $saved = $wp_scripts->queue;
         $wp_scripts->queue = $queue;
 
@@ -122,7 +122,7 @@ class Test_Bootstrap extends WP_UnitTestCase
     /**
      * Test that any Gravity PDF styles are automatically loading when GF is in no conflict mode
      * @since 4.0
-     * @return void
+     * @group bootstrap
      */
     public function test_auto_noconflict_gfpdf_css() {
         /* get test data */
@@ -141,7 +141,7 @@ class Test_Bootstrap extends WP_UnitTestCase
         );
 
         /* override queue */
-        $wp_styles = wp_styles();
+        $wp_styles = \wp_styles();
         $saved = $wp_styles->queue;
         $wp_styles->queue = $queue;
 

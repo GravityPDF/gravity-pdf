@@ -7,7 +7,6 @@ use GFPDF\View\View_Form_Settings;
 use WP_UnitTestCase;
 use GFAPI;
 use GFForms;
-use RGFormsModel;
 
 /**
  * Test Gravity PDF Form Settings Functionality
@@ -82,8 +81,9 @@ class Test_Form_Settings extends WP_UnitTestCase
 
         parent::setUp();
 
-        /* import our Gravity Form */
-        GFForms::setup_database();
+        /* Remove temporary tables which causes problems with GF */
+        remove_all_filters( 'query', 10 );
+
         $this->import_form();
 
         /* Setup our test classes */
@@ -92,20 +92,6 @@ class Test_Form_Settings extends WP_UnitTestCase
 
         $this->controller = new Controller_Form_Settings( $this->model, $this->view, $gfpdf->data, $gfpdf->options );
         $this->controller->init();
-    }
-
-    /**
-     * Customise Tear Down Functionality
-     * @since 4.0
-     */
-    public function tearDown() {
-        global $gfpdf;
-
-        /* run parent function */
-        parent::tearDown();
-
-        /* clean up cache */
-        $gfpdf->data->form_settings = array();
     }
 
     /**
