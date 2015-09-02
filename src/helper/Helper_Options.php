@@ -182,8 +182,8 @@ class Helper_Options implements Helper_Interface_Filters {
 	public function get_form_settings() {
 
 		/* get GF settings */
-		$form_id = ( ! empty( rgget( 'id' ) ) ) ? (int) rgget( 'id' ) : (int) rgpost( 'id' );
-		$pid     = ( ! empty( rgget( 'pid' ) ) ) ? rgget( 'pid' ) : rgpost( 'gform_pdf_id' );
+		$form_id = ( ! empty( $_GET['id'] ) ) ? (int) rgget( 'id' ) : (int) rgpost( 'id' );
+		$pid     = ( ! empty( $_GET['pid'] ) ) ? rgget( 'pid' ) : rgpost( 'gform_pdf_id' );
 
 		/* return early if no ID set */
 		if ( ! $form_id ) {
