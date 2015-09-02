@@ -13,16 +13,13 @@
 			<directory suffix=".php">./tests/unit-tests</directory>
 		</testsuite>
 	</testsuites>
-    <groups>
-        <exclude>
-            <group>ajax</group>
-            <group>form-data</group>
-        </exclude>
-    </groups>
 	<filter>
 		<blacklist>
 			<directory suffix=".php">./tests/</directory>
 			<directory suffix=".php">./tmp/</directory>
 		</blacklist>
 	</filter>
+	<logging>
+		<log type="coverage-clover" target="./tmp/clover.xml" charset="UTF-8" />
+	</logging>
 </phpunit>

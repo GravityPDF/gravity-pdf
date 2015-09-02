@@ -2,32 +2,78 @@
 
 /**
  * Override certain pluggable functions so we can unit test them correctly
+ * @since 4.0
  */
 function auth_redirect() {
     throw new Exception('Redirecting');
 }
 
-$_tests_dir = getenv('WP_TESTS_DIR');
-if ( !$_tests_dir ) $_tests_dir = '/tmp/wordpress-tests-lib';
+/**
+ * Gravity PDF Unit Tests Bootstrap
+ *
+ * @since 4.0
+ */
+class GravityPDF_Unit_Tests_Bootstrap {
 
-require_once $_tests_dir . '/includes/functions.php';
+	/** @var string directory where wordpress-tests-lib is installed */
+	public $wp_tests_dir;
 
-function _manually_load_plugin() {
-	require dirname( __FILE__ ) . '/../../gravityforms/gravityforms.php';
-	require dirname( __FILE__ ) . '/../../gravityformspolls/polls.php';
-	require dirname( __FILE__ ) . '/../../gravityformsquiz/quiz.php';
-	require dirname( __FILE__ ) . '/../../gravityformssurvey/survey.php';
+	/** @var string testing directory */
+	public $tests_dir;
 
-    /* initialise Gravity Forms tables are created */
-    GFForms::setup(true);
-    
-	require dirname( __FILE__ ) . '/../../gravity-pdf/gravity-pdf.php';
+	/** @var string plugin directory */
+	public $plugin_dir;
+
+	/**
+	 * Setup the unit testing environment
+	 *
+	 * @since 4.0
+	 */
+	public function __construct() {
+
+		$this->tests_dir    = dirname( __FILE__ );
+		$this->plugin_dir   = dirname( $this->tests_dir );
+		$this->wp_tests_dir = getenv( 'WP_TESTS_DIR' ) ? getenv( 'WP_TESTS_DIR' ) : $this->plugin_dir . '/tmp/wordpress-tests-lib';
+
+		/* load test function so tests_add_filter() is available */
+		require_once $this->wp_tests_dir . '/includes/functions.php';
+
+		/* load Gravity PDF */
+		tests_add_filter( 'muplugins_loaded', array( $this, 'load' ) );
+
+		/* load the WP testing environment */
+		require_once( $this->wp_tests_dir . '/includes/bootstrap.php' );
+
+		/* clean up Gravity Forms database when finished */
+		register_shutdown_function( array( $this, 'shutdown') );
+	}
+
+	/**
+	 * Load Gravity Forms and Gravity PDF
+	 *
+	 * @since 4.0
+	 */
+	public function load() {
+		require_once $this->plugin_dir . '/tmp/gravityforms/gravityforms.php';
+		require_once $this->plugin_dir . '/tmp/gravityformspoll/polls.php';
+		require_once $this->plugin_dir . '/tmp/gravityformsquiz/quiz.php';
+		require_once $this->plugin_dir . '/tmp/gravityformssurvey/survey.php';
+		require_once $this->plugin_dir . '/gravity-pdf.php';
+
+		/* set up Gravity Forms database */
+		GFForms::setup( true );
+	}
+
+	/**
+	 * Run clean up when PHP finishes executing
+	 *
+	 * @since 4.0
+	 */
+	public function shutdown() {
+		RGFormsModel::drop_tables();
+	}
+
 }
-tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 
-require $_tests_dir . '/includes/bootstrap.php';
+new GravityPDF_Unit_Tests_Bootstrap();
 
-register_shutdown_function(function(){
-    /* remove Gravity Form tables */
-    RGFormsModel::drop_tables();
-});

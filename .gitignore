@@ -1,6 +1,44 @@
+# Help from https://www.gitignore.io
+
+### Mac ###
+.DS_Store
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+
+### SublimeText ###
+*.sublime-project
+*.sublime-workspace
+
+### Composer ###
+composer.lock
+
+### Libraries ###
+vendor/*
+
+### Grunt ###
+node_modules/*
+
+### PhpStorm ###
+# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm
+
+## File-based project format:
+*.ipr
+*.iws
+
+## Plugin-specific files:
+.min.css
+.min.js
+
+# Unit tests
+/tmp
+/tests/bin/
+
+# Others
 _notes
 _notes/*
 Thumbs.db
-default.po
-default.mo
-vendor/*
+
