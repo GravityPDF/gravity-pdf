@@ -370,7 +370,7 @@ class Helper_Misc
 	public function convert_url_to_path( $url ) {
 
 		/* If $url is empty we'll return early */
-		if ( empty(trim( $url )) ) {
+		if ( trim( $url ) == false ) {
 			return $url;
 		}
 
