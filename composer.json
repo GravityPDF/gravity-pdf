@@ -13,7 +13,7 @@
     		"GFPDF\\View\\": "src/views/",
     		"GFPDF\\Helper\\": ["src/helper/", "src/helper/abstract/", "src/helper/interface/"],
     		"GFPDF\\Helper\\Fields\\": "src/helper/fields/",
-    		"GFPDF\\Test\\": "tests/"
+    		"GFPDF\\Test\\": "tests/unit-tests/"
     	}
     }
 }

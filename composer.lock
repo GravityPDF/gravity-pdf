@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ed503d746fd19ab12f9b938cb71398e1",
+    "hash": "fe8549d805fe66bbc50a9bf18be621f1",
     "packages": [
         {
             "name": "blueliquiddesigns/mpdf",
@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/blueliquiddesigns/mpdf.git",
-                "reference": "7ba99a3f02b659a24a0671579397644f4a24a30a"
+                "reference": "f9ff22a6989ee8b7873e6cbc7225b1fddc284fd8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/blueliquiddesigns/mpdf/zipball/7ba99a3f02b659a24a0671579397644f4a24a30a",
-                "reference": "7ba99a3f02b659a24a0671579397644f4a24a30a",
+                "url": "https://api.github.com/repos/blueliquiddesigns/mpdf/zipball/f9ff22a6989ee8b7873e6cbc7225b1fddc284fd8",
+                "reference": "f9ff22a6989ee8b7873e6cbc7225b1fddc284fd8",
                 "shasum": ""
             },
             "require": {
@@ -44,14 +44,14 @@
                     "role": "Developer"
                 }
             ],
-            "description": "A PHP class to generate PDF files from HTML with Unicode/UTF-8 and CJK support, with a strong focus on WordPress integration. If you just want a standalone option (without WordPress) use the mpdf/mpdf packagist option.",
+            "description": "A PHP class to generate PDF files from HTML with Unicode/UTF-8 and CJK support, with a stronger focus on WordPress integration. If you just want a standalone option (without WordPress) use the mpdf/mpdf packagist option.",
             "homepage": "http://www.mpdf1.com/mpdf/index.php",
             "keywords": [
                 "pdf",
                 "php",
                 "utf-8"
             ],
-            "time": "2015-07-06 01:56:56"
+            "time": "2015-08-29 05:19:25"
         },
         {
             "name": "monolog/monolog",
