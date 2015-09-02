@@ -22,9 +22,5 @@ matrix:
 before_script:
   - composer install --prefer-source --no-dev --optimize-autoloader
   - bash tests/bin/install.sh gravitypdf_test root '' localhost $WP_VERSION
-  - bash tests/bin/travis.sh before
 
 script: phpunit -c phpunit.xml.dist
-
-after_script:
-  - bash tests/bin/travis.sh after
