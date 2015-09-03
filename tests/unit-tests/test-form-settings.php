@@ -85,7 +85,7 @@ class Test_Form_Settings extends WP_UnitTestCase
         remove_all_filters( 'query', 10 );
         GFForms::setup_database();
 
-        $this->import_form();
+        $this->setup_form();
 
         /* Setup our test classes */
         $this->model = new Model_Form_Settings( $gfpdf->form, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
@@ -96,12 +96,14 @@ class Test_Form_Settings extends WP_UnitTestCase
     }
 
     /**
-     * Load the JSON data and import it into Gravity Forms
+     * Setup our form data and our cached form settings
      * @since 4.0
      */
-    private function import_form() {
-        $json = json_decode( file_get_contents( dirname( __FILE__ ) . '/json/form-settings.json' ), true);
-        $this->form_id = GFAPI::add_form($json);
+    private function setup_form() {
+        global $gfpdf;
+        
+        $this->form_id = $GLOBALS['GFPDF_Test']->form['form-settings']['id'];
+        $gfpdf->data->form_settings[ $this->form_id ] = $GLOBALS['GFPDF_Test']->form['form-settings']['gfpdf_form_settings'];
     }
 
     /**

@@ -77,12 +77,7 @@ class Test_Options_API extends WP_UnitTestCase
         update_option( 'gfpdf_settings', json_decode(file_get_contents( dirname( __FILE__ ) . '/json/options-settings.json' ), true));
 
         /* Load a form / form PDF settings into database */
-        $form = json_decode(file_get_contents( dirname( __FILE__ ) . '/json/form-settings.json' ), true);
-        $form_id = GFAPI::add_form($form);
-
-        if(!is_wp_error($form_id)) {
-            $this->form_id = $form_id;
-        }
+        $this->form_id = $GLOBALS['GFPDF_Test']->form['form-settings']['id'];
 
         /* Set up our global settings */
         $this->options->set_plugin_settings();

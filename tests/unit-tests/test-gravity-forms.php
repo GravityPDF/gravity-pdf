@@ -60,16 +60,15 @@ class Test_Gravity_Forms extends WP_UnitTestCase
         remove_all_filters( 'query', 10 );
         GFForms::setup_database();
 
-        $this->import_form();
+        $this->setup_form();
     }
 
     /**
-     * Load the JSON data and import it into Gravity Forms
+     * Pull in our form data
      * @since 4.0
      */
-    private function import_form() {
-        $json = json_decode(file_get_contents( dirname( __FILE__ ) . '/json/form-settings.json' ), true);
-        $this->form_id = GFAPI::add_form($json);
+    private function setup_form() {
+        $this->form_id = $GLOBALS['GFPDF_Test']->form['form-settings']['id'];
     }
 
     /**
@@ -79,7 +78,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase
      */
     public function test_get_form_meta() {
         /* Test non-existant form */
-        $this->assertSame( null, GFFormsModel::get_form_meta( $this->form_id + 1 ));
+        $this->assertSame( null, GFFormsModel::get_form_meta( $this->form_id + 5000 ));
 
         /* Test for existing form */
         $form = GFFormsModel::get_form_meta( $this->form_id );
