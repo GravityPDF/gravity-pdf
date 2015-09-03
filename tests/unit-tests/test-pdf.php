@@ -580,7 +580,7 @@ EOD;
 	 * @since 4.0
 	 * @group pdf
 	 */
-	public function test_middle_middle_user_capability() {
+	public function test_middle_user_capability() {
 		global $current_user;
 
 		/* Check for WP Error */
@@ -616,6 +616,8 @@ EOD;
 
 		/* Add default capability and test */
 		$user->add_cap( 'gravityforms_view_entries' );
+		$user->get_role_caps();
+		$user->update_user_level_from_caps();
 		$this->assertTrue( $this->model->middle_user_capability( true, '', '' ) );
 	}
 

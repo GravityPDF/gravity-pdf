@@ -125,8 +125,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function init() {
 
-		/* Set up our logger */
-		$this->setup_logger();
+		/* Set up our logger is not running via CLI (unit testing) */
+		if ( substr($sapi_type, 0, 3) !== 'cli' ) {
+			$this->setup_logger();
+		}
 
 		/* Set up our form object */
 		$this->form = new Helper\Helper_Form();
