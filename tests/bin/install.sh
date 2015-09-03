@@ -12,7 +12,7 @@ DB_HOST=${4-localhost}
 WP_VERSION=${5-latest}
 
 WP_TESTS_DIR="${PWD}/tmp/wordpress-tests-lib"
-WP_CORE_DIR="${PWD}/tmp/wordpress"
+WP_CORE_DIR="${PWD}/tmp/wordpress/"
 
 set -ex
 
@@ -60,15 +60,14 @@ install_test_suite() {
 	else
 		local ioption='-i'
 	fi
-	
-	#Modified test suite to fix forward slash issues
-	wget -nv -O /tmp/wptestingsuite.tar.gz https://github.com/GravityPDF/wptestingsuite/archive/master.tar.gz
-	mkdir -p $WP_TESTS_DIR
-	tar --strip-components=1 -zxf /tmp/wptestingsuite.tar.gz -C $WP_TESTS_DIR
 
+	# set up testing suite
+	mkdir -p $WP_TESTS_DIR
 	cd $WP_TESTS_DIR
+	svn co --quiet https://develop.svn.wordpress.org/trunk/tests/phpunit/includes/
+
 	wget -nv -O wp-tests-config.php https://develop.svn.wordpress.org/trunk/wp-tests-config-sample.php
-	sed $ioption "s:dirname( __FILE__ ) . '/src/':'$WP_CORE_DIR/':" wp-tests-config.php
+	sed $ioption "s:dirname( __FILE__ ) . '/src/':'$WP_CORE_DIR':" wp-tests-config.php
 	sed $ioption "s/youremptytestdbnamehere/$DB_NAME/" wp-tests-config.php
 	sed $ioption "s/yourusernamehere/$DB_USER/" wp-tests-config.php
 	sed $ioption "s/yourpasswordhere/$DB_PASS/" wp-tests-config.php
