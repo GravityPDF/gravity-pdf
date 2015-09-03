@@ -54,12 +54,6 @@ class Test_Bootstrap extends WP_UnitTestCase
         /* run parent method */
         parent::setUp();
 
-        /* For some reasons certain TravisCI builds aren't finding the wp_scripts() function so lets ensure they are loaded */
-        require_once( ABSPATH . WPINC . '/class.wp-scripts.php' );
-        require_once( ABSPATH . WPINC . '/functions.wp-scripts.php' );
-        require_once( ABSPATH . WPINC . '/class.wp-styles.php' );
-        require_once( ABSPATH . WPINC . '/functions.wp-styles.php' );
-
         /* Setup out loader class */
         $this->loader = new Router();
         $this->loader->init();
