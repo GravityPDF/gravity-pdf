@@ -126,9 +126,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function init() {
 
 		/* Set up our logger is not running via CLI (unit testing) */
-		if ( substr(php_sapi_name(), 0, 3) !== 'cli' ) {
-			$this->setup_logger();
-		}
+		$this->setup_logger();
 
 		/* Set up our form object */
 		$this->form = new Helper\Helper_Form();
@@ -215,6 +213,12 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/* Ensure log contains details about the method / class / function calling it and the processor peak memory */
 		$this->log->pushProcessor( new \Monolog\Processor\IntrospectionProcessor );
 		$this->log->pushProcessor( new \Monolog\Processor\MemoryPeakUsageProcessor );
+
+		/* Prevent logging in CLI mode */
+		if ( substr(php_sapi_name(), 0, 3) === 'cli' ) {
+			$this->log->pushHandler( new \Monolog\Handler\NullHandler( \Monolog\Logger::INFO ) ); /* throw logs away */
+			return;
+		}
 
 		/* If running an alpha, beta or rc version of the plugin send all logs to Loggly */
 		$this->maybe_run_remote_logging();
