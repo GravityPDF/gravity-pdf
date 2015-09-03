@@ -43,11 +43,6 @@ class GravityPDF_Unit_Tests_Bootstrap {
 
 		/* load the WP testing environment */
 		require_once( $this->wp_tests_dir . '/includes/bootstrap.php' );
-
-		/* clean up Gravity Forms database when finished */
-		register_shutdown_function( function() {
-			RGFormsModel::drop_tables();
-		} );
 	}
 
 	/**
