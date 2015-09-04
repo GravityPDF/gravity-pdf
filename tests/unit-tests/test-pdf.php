@@ -4,14 +4,17 @@ namespace GFPDF\Tests;
 
 use GFPDF\Controller\Controller_PDF;
 use GFPDF\Model\Model_PDF;
+use GFPDF\Model\Model_Form_Settings;
 use GFPDF\View\View_PDF;
 use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Fields\Field_Products;
+use GFPDF\Helper\Helper_Field_Container;
 
 use GFAPI;
 use GFFormsModel;
 use GF_Field;
 use GFForms;
+use GFCache;
 
 use WP_UnitTestCase;
 use WP_UnitTest_Factory;
@@ -122,9 +125,13 @@ class Test_PDF extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	private function create_form_and_entries() {
+		global $gfpdf;
 
 		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
 		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+
+		$gfpdf->data->form_settings = array();
+		$gfpdf->data->form_settings[ $form['id'] ] = $form['gfpdf_form_settings'];
 
 		return array(
 			'form'  => $form,
@@ -1108,74 +1115,235 @@ class Test_PDF extends WP_UnitTestCase
 	}
 
     /**
-     * ...
+     * Test that we can successfully generate a PDF based on an entry and settings
      * @since 4.0
      * @group pdf
      */
     public function test_generate_pdf() {
-        $this->markTestIncomplete( 'This test has not been implimented yet' );
+    	global $gfpdf;
+
+    	$pdf_settings = new Model_Form_Settings( $gfpdf->form, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
+        
+		/* Setup our form and entries */
+		$results = $this->create_form_and_entries();
+		$entry = $results['entry'];
+		$fid = $results['form']['id'];
+		$pid = '555ad84787d7e';
+
+		/* Get our PDF */
+		$pdf = $pdf_settings->get_pdf( $fid, $pid );
+
+		/* Fix our template */
+		$pdf['template'] = 'core-simple';
+
+		/* Add filters to force the PDF to save to the server */
+		add_filter( 'mpdf_output_destination', function() {
+			return 'F';
+		});
+
+		add_filter( 'mpdf_output_name', function() {
+			return dirname( __FILE__ ) . '/output.pdf';
+		});
+
+		try {
+			$this->view->generate_pdf( $entry, $pdf );
+		} catch( Exception $e )  {
+			/* Expected */
+		}
+
+		$this->assertFileExists( dirname( __FILE__ ) . '/output.pdf' );
+
+		unlink( dirname( __FILE__ ) . '/output.pdf' );
+
     }
 
     /**
-     * ...
+     * Test that we can successfully get the template filename
      * @since 4.0
      * @group pdf
+     * @dataProvider provider_get_template_filename
      */
-    public function test_get_template_filename() {
-        $this->markTestIncomplete( 'This test has not been implimented yet' );
+    public function test_get_template_filename( $expected, $template ) {
+    	$this->assertEquals( $expected, $this->view->get_template_filename( $template ) );
     }
 
     /**
-     * ...
+     * Our data provider for getting View_PDF::get_template_filename()
+     * @return array
+     * @since 4.0
+     */
+    public function provider_get_template_filename() {
+    	return array(
+    		array('my-pdf-document.php', 'my-pdf-document'),
+    		array('hello-world.ph.php', 'hello-world.ph'),
+    		array('gravitypdf.php', 'gravitypdf.php'),
+    		array('assimilate.p.php', 'assimilate.p'),
+    		array('groundhog..php', 'groundhog.'),
+    	);
+    }
+
+    /**
+     * Check that we're correctly process a valid HTML structure
      * @since 4.0
      * @group pdf
      */
     public function test_process_html_structure() {
-        $this->markTestIncomplete( 'This test has not been implimented yet' );
+
+    	$results = $this->create_form_and_entries();
+		$entry = $results['entry'];
+
+        $html = $this->view->process_html_structure( $entry, $this->model, array( 'echo' => false ) );
+
+        $this->assertNotFalse( strpos( $html, '<td class="grandtotal_amount totals">' ) );
     }
 
     /**
-     * ...
+     * Check our main html structure generator works correctly
      * @since 4.0
      * @group pdf
      */
     public function test_generate_html_structure() {
-        $this->markTestIncomplete( 'This test has not been implimented yet' );
+    	$results = $this->create_form_and_entries();
+		$entry = $results['entry'];
+
+		ob_start();
+        $this->view->generate_html_structure( $entry, $this->model, array() );
+        $html = ob_get_clean();
+
+        $this->assertNotFalse( strpos( $html, '<td class="grandtotal_amount totals">' ) );
     }
 
     /**
-     * ...
+     * Test a single field and check if the results are valid
      * @since 4.0
      * @group pdf
      */
     public function test_process_field() {
-        $this->markTestIncomplete( 'This test has not been implimented yet' );
+
+    	global $gfpdf;
+        
+		$results  = $this->create_form_and_entries();
+		$form     = $results['form'];
+		$entry    = $results['entry'];
+		$field    = $form['fields'][0];
+		$products = new Field_Products( new GF_Field(), $entry, $gfpdf->form, $gfpdf->misc );
+
+		/* Check for standard output */
+		GFCache::flush();
+		ob_start();
+		$this->view->process_field( $field, $entry, $form, array(), $products, new Helper_Field_Container(), $this->model );
+		$html = ob_get_clean();
+		
+		$this->assertNotFalse( strpos( $html, '<div class="value">My Single Line Response</div>' ) );
+
+		/* Check for empty output */
+		GFCache::flush();
+		$entry[1] = '';
+		
+		ob_start();
+		$this->view->process_field( $field, $entry, $form, array(), $products, new Helper_Field_Container(), $this->model );
+		$html = ob_get_clean();
+
+		$this->assertTrue( empty( $html ) );
+
+		/* Enable showing empty fields */
+		$config['meta']['empty'] = true;
+
+		ob_start();
+		$this->view->process_field( $field, $entry, $form, $config, $products, new Helper_Field_Container(), $this->model );
+		$html = ob_get_clean();
+
+		$this->assertNotFalse( strpos( $html, '<div class="value"></div>' ) );
+
+		/* Enable legacy css */
+		$config['meta']['legacy_css'] = true;
+
+		ob_start();
+		$this->view->process_field( $field, $entry, $form, $config, $products, new Helper_Field_Container(), $this->model );
+		$html = ob_get_clean();
+
+		$this->assertNotFalse( strpos( $html, 'entry-view-field-value' ) );
+
     }
 
     /**
-     * ...
+     * Test if the form title should be displayed
      * @since 4.0
      * @group pdf
      */
     public function test_show_form_title() {
-        $this->markTestIncomplete( 'This test has not been implimented yet' );
+        
+    	$form['title'] = 'Form Title';
+
+        /* Ensure a false reading */
+        ob_start();
+        $this->view->show_form_title( false, $form );
+        $html = ob_get_clean();
+
+        $this->assertFalse( strpos( $html, '<h3 id="form_title">' ) );
+
+		/* Ensure a positive reading */
+        ob_start();
+        $this->view->show_form_title( true, $form );
+        $html = ob_get_clean();
+
+        $this->assertNotFalse( strpos( $html, '<h3 id="form_title">' ) );
     }
 
     /**
-     * ...
+     * Check our legacy (v3) classes are loaded correctly
      * @since 4.0
      * @group pdf
      */
     public function test_load_legacy_css() {
-        $this->markTestIncomplete( 'This test has not been implimented yet' );
+        
+        /* Create standard field objects */
+        $text = new GF_Field();
+        $text->type = 'text';
+
+        $html = new GF_Field();
+        $html->type = 'html';
+
+        $section = new GF_Field();
+        $section->type = 'section';
+
+        $this->view->load_legacy_css( $text );
+        $this->view->load_legacy_css( $html );
+        $this->view->load_legacy_css( $section );
+
+        $this->assertNotFalse( strpos( $text->cssClass, 'entry-view-field-value' ) );
+        $this->assertNotFalse( strpos( $html->cssClass, 'entry-view-html-value' ) );
+        $this->assertNotFalse( strpos( $section->cssClass, 'entry-view-section-break-content' ) );
     }
 
     /**
-     * ...
+     * Test if we should be displaying the page name
      * @since 4.0
      * @group pdf
      */
     public function test_display_page_name() {
-        $this->markTestIncomplete( 'This test has not been implimented yet' );
+    	$form = array(
+    		'pagination' => array(
+    			'pages' => array(
+    				1 => 'My Test Page',
+    			),
+    		),
+    	);
+
+    	$field = new GF_Field();
+    	$field->id = 25;
+    	$field->inputType = 'page';
+        
+    	ob_start();
+    	$this->view->display_page_name( 1, $form );
+    	$html = ob_get_clean();
+
+    	$this->assertNotFalse( strpos( $html, '<h3 id="field-' . $field->id . '"', $field ) );
+
+    	ob_start();
+    	$this->view->display_page_name( 2, $form, $field );
+    	$html = ob_get_clean();
+
+    	$this->assertFalse( strpos( $html, '<h3 id="field-' . $field->id . '"' ) );
     }
 }

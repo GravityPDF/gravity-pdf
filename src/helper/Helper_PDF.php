@@ -230,12 +230,12 @@ class Helper_PDF {
 		switch ( $this->output ) {
 			case 'DISPLAY':
 				$this->mpdf->Output( $this->filename, 'I' );
-				exit;
+				wp_die();
 			break;
 
 			case 'DOWNLOAD':
 				$this->mpdf->Output( $this->filename, 'D' );
-				exit;
+				wp_die();
 			break;
 
 			case 'SAVE':

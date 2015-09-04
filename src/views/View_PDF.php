@@ -218,8 +218,8 @@ class View_PDF extends Helper_Abstract_View
 	 */
 	public function process_html_structure( $entry, Helper_Abstract_Model $model, $config = array() ) {
 		/* Determine whether we should output or return the results */
-		$config['meta'] = (isset($config['meta'])) ? $config['meta'] : array();
-		$echo           = (rgar( $config, 'echo' )) ? rgar( $config, 'echo' ) : true; /* whether to output or return the generated markup. Default is echo */
+		$config['meta'] = ( isset( $config['meta'] ) ) ? $config['meta'] : array();
+		$echo           = ( isset( $config['echo'] ) ) ? $config['echo'] : true; /* whether to output or return the generated markup. Default is echo */
 
 		if ( ! $echo ) {
 			ob_start();
@@ -256,16 +256,16 @@ class View_PDF extends Helper_Abstract_View
 		$container                      = new Helper_Field_Container();
 
 		/* Allow the config to be changed through a filter */
-		$config['meta']                 = (isset($config['meta'])) ? $config['meta'] : array();
+		$config['meta']                 = ( isset( $config['meta'] ) ) ? $config['meta'] : array();
 		$config                         = apply_filters( 'gfpdf_pdf_configuration', $config, $entry, $form );
 
 		/* Get the user configuration values */
-		$skip_marked_fields             = (rgar( $config['meta'], 'exclude' )) ? rgar( $config['meta'], 'exclude' ) : true; /* whether we should exclude fields with a CSS value of 'exclude'. Default to true */
-		$skip_hidden_fields             = (rgar( $config['meta'], 'hidden' )) ? rgar( $config['meta'], 'hidden' ) : true; /* whether we should skip fields hidden with conditional logic. Default to true. */
-		$show_title                     = (rgar( $config['meta'], 'show_title' )) ? rgar( $config['meta'], 'show_title' ) : true; /* whether we should show the form title. Default to true */
-		$show_page_names                = (rgar( $config['meta'], 'page_names' )) ? rgar( $config['meta'], 'page_names' ) : false; /* whether we should show the form's page names. Default to false */
-		$show_html_fields               = (rgar( $config['meta'], 'html_field' )) ? rgar( $config['meta'], 'html_field' ) : false; /* whether we should show the form's html fields. Default to false */
-		$show_individual_product_fields = (rgar( $config['meta'], 'individual_products' )) ? rgar( $config['meta'], 'individual_products' ) : false; /* Whether to show individual fields in the entry. Default to false - they are grouped together at the end of the form */
+		$skip_marked_fields             = ( isset( $config['meta']['exclude'] ) ) ? $config['meta']['exclude'] : true; /* whether we should exclude fields with a CSS value of 'exclude'. Default to true */
+		$skip_hidden_fields             = ( isset( $config['meta']['hidden'] ) ) ? $config['meta']['hidden'] : true; /* whether we should skip fields hidden with conditional logic. Default to true. */
+		$show_title                     = ( isset( $config['meta']['show_title'] ) ) ? $config['meta']['show_title']  : true; /* whether we should show the form title. Default to true */
+		$show_page_names                = ( isset( $config['meta']['page_names'] ) ) ? $config['meta']['page_names']  : false; /* whether we should show the form's page names. Default to false */
+		$show_html_fields               = ( isset( $config['meta']['html_field'] ) ) ? $config['meta']['html_field']  : false; /* whether we should show the form's html fields. Default to false */
+		$show_individual_product_fields = ( isset( $config['meta']['individual_products'] ) ) ? $config['meta']['individual_products']  : false; /* Whether to show individual fields in the entry. Default to false - they are grouped together at the end of the form */
 
 		/* Display the form title, if needed */
 		$this->show_form_title( $show_title, $form );
@@ -275,7 +275,7 @@ class View_PDF extends Helper_Abstract_View
 
 			/* Load our page name, if needed */
 			if ( $show_page_names === true && $field->pageNumber !== $page_number ) {
-				$this->display_page_name( $page_number, $form );
+				$this->display_page_name( $page_number, $form, $field );
 				$page_number++;
 			}
 
@@ -332,15 +332,16 @@ class View_PDF extends Helper_Abstract_View
 		/*
         * Set up our configuration variables
         */
-		$config['meta']           = (isset($config['meta'])) ? $config['meta'] : array();
-		$show_empty_fields        = (rgar( $config['meta'], 'empty' )) ? rgar( $config['meta'], 'empty' ) : false; /* whether to show empty fields or not. Default is false */
-		$load_legacy_css          = (rgar( $config['meta'], 'legacy_css' )) ? rgar( $config['meta'], 'legacy_css' ) : false; /* whether we should add our legacy field class names (v3.x.x) to our fields. Default to false */
-		$show_section_description = (rgar( $config['meta'], 'section_content' )) ? rgar( $config['meta'], 'section_content' ) : false; /* whether we should include a section breaks content. Default to false */
+		$config['meta']           = ( isset($config['meta']) ) ? $config['meta'] : array(); /* ensure we have a meta key */
+		$show_empty_fields        = ( isset( $config['meta']['empty'] ) ) ? $config['meta']['empty'] : false; /* whether to show empty fields or not. Default is false */
+		$load_legacy_css          = ( isset( $config['meta']['legacy_css'] ) ) ? $config['meta']['legacy_css'] : false; /* whether we should add our legacy field class names (v3.x.x) to our fields. Default to false */
+		$show_section_description = ( isset( $config['meta']['section_content'] ) ) ? $config['meta']['section_content'] : false; /* whether we should include a section breaks content. Default to false */
 
 		$class = $model->get_field_class( $field, $form, $entry, $products );
 
 		/* Try and display our HTML */
 		try {
+
 			/* Only load our HTML if the field is NOT empty, or the $empty config option is true */
 			if ( ! $class->is_empty() || $show_empty_fields === true ) {
 				/* Load our legacy CSS class names */
@@ -380,8 +381,10 @@ class View_PDF extends Helper_Abstract_View
 	 * @since 4.0
 	 */
 	public function show_form_title( $show_title, $form ) {
+		ob_start();
+
 		/* Show the form title, if needed */
-		if ( $show_title !== false ) : ob_start(); ?>
+		if ( $show_title !== false ) : ?>
             <h3 id="form_title"><?php echo $form['title']?></h3>
         <?php endif;
 
@@ -396,7 +399,7 @@ class View_PDF extends Helper_Abstract_View
 	 * @return void (classes are passed by reference)
 	 * @since 4.0
 	 */
-	public function load_legacy_css( $field ) {
+	public function load_legacy_css( GF_Field $field ) {
 		static $counter = 1;
 
 		/* Add odd / even rows */
@@ -421,18 +424,21 @@ class View_PDF extends Helper_Abstract_View
 	 * Output the current page name HTML
 	 * @param  Integer $page  The current page number
 	 * @param  Array   $form  The form array
+	 * @param  Object  $field The page field
 	 * @return String           The page HTML output
 	 */
-	public function display_page_name( $page, $form ) {
-		/* Only display the current page name if it has changed (and it exists) */
+	public function display_page_name( $page, $form, GF_Field $field ) {
+		ob_start();
+
+		/* Only display the current page name if it exists */
 		if ( isset($form['pagination']['pages'][$page]) && strlen( trim( $form['pagination']['pages'][$page] ) ) > 0 ) {
-			ob_start();
 			?>
                 <h3 id="field-<?php echo $field->id; ?>" class="gfpdf-<?php echo $field->inputType; ?> gfpdf-field <?php echo $field->cssClass; ?>">
                     <?php echo $form['pagination']['pages'][$page]; ?>
                 </h3>
             <?php
-			echo apply_filters( 'gfpdf_field_page_name_html', ob_get_clean(), $page, $field, $form );
 		}
+
+		echo apply_filters( 'gfpdf_field_page_name_html', ob_get_clean(), $page, $field, $form );
 	}
 }
