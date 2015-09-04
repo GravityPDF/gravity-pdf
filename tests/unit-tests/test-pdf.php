@@ -1118,6 +1118,7 @@ class Test_PDF extends WP_UnitTestCase
      * Test that we can successfully generate a PDF based on an entry and settings
      * @since 4.0
      * @group pdf
+     * @codeCoverageIgnore
      */
     public function test_generate_pdf() {
     	global $gfpdf;
@@ -1153,7 +1154,7 @@ class Test_PDF extends WP_UnitTestCase
 
 		$this->assertFileExists( dirname( __FILE__ ) . '/output.pdf' );
 
-		unlink( dirname( __FILE__ ) . '/output.pdf' );
+		@unlink( dirname( __FILE__ ) . '/output.pdf' );
 
     }
 
