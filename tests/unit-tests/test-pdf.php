@@ -1118,7 +1118,6 @@ class Test_PDF extends WP_UnitTestCase
      * Test that we can successfully generate a PDF based on an entry and settings
      * @since 4.0
      * @group pdf
-     * @codeCoverageIgnore
      */
     public function test_generate_pdf() {
     	global $gfpdf;
@@ -1137,13 +1136,9 @@ class Test_PDF extends WP_UnitTestCase
 		/* Fix our template */
 		$pdf['template'] = 'core-simple';
 
-		/* Add filters to force the PDF to save to the server */
+		/* Add filters to force the PDF to throw and error */
 		add_filter( 'mpdf_output_destination', function() {
-			return 'F';
-		});
-
-		add_filter( 'mpdf_output_name', function() {
-			return dirname( __FILE__ ) . '/output.pdf';
+			return 'O';
 		});
 
 		try {
@@ -1152,10 +1147,7 @@ class Test_PDF extends WP_UnitTestCase
 			/* Expected */
 		}
 
-		$this->assertFileExists( dirname( __FILE__ ) . '/output.pdf' );
-
-		@unlink( dirname( __FILE__ ) . '/output.pdf' );
-
+		$this->assertEquals( 'There was a problem generating your PDF', $e->getMessage() );
     }
 
     /**
