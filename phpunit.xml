@@ -16,7 +16,6 @@
     <groups>
         <exclude>
             <group>ajax</group>
-            <group>form-data</group>
         </exclude>
     </groups>
 	<filter>

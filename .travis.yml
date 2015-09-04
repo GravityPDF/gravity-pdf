@@ -25,7 +25,12 @@ matrix:
     env: WP_VERSION=3.9 WP_MULTISITE=0
 
 before_script:
-  - composer install --prefer-source --no-dev --optimize-autoloader
+  - composer install --prefer-source --optimize-autoloader
   - bash tests/bin/install.sh gravitypdf_test root '' localhost $WP_VERSION
 
 script: phpunit -c phpunit.xml.dist
+
+after_script:
+  - php vendor/bin/coveralls --verbose --exclude-no-stmt
+  - wget https://scrutinizer-ci.com/ocular.phar
+  - php ocular.phar code-coverage:upload --format=php-clover ./tmp/clover.xml

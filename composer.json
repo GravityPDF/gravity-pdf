@@ -5,6 +5,10 @@
         "monolog/monolog": "1.16.0"
     },
 
+    "require-dev": {
+        "satooshi/php-coveralls": "0.7.x-dev"
+    },
+
     "autoload": {
     	"psr-4": {
     		"GFPDF\\": "src/",
