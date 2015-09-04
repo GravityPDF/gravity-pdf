@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/blueliquiddesigns/mpdf.git",
-                "reference": "f9ff22a6989ee8b7873e6cbc7225b1fddc284fd8"
+                "reference": "908f297e1e0ae07f66918e1dc5caf0e9d29a146d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/blueliquiddesigns/mpdf/zipball/f9ff22a6989ee8b7873e6cbc7225b1fddc284fd8",
-                "reference": "f9ff22a6989ee8b7873e6cbc7225b1fddc284fd8",
+                "url": "https://api.github.com/repos/blueliquiddesigns/mpdf/zipball/908f297e1e0ae07f66918e1dc5caf0e9d29a146d",
+                "reference": "908f297e1e0ae07f66918e1dc5caf0e9d29a146d",
                 "shasum": ""
             },
             "require": {
@@ -51,7 +51,7 @@
                 "php",
                 "utf-8"
             ],
-            "time": "2015-08-29 05:19:25"
+            "time": "2015-09-04 03:48:54"
         },
         {
             "name": "monolog/monolog",
