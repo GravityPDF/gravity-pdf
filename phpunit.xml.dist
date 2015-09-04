@@ -13,4 +13,9 @@
 			<directory suffix=".php">./tests/unit-tests</directory>
 		</testsuite>
 	</testsuites>
+    <groups>
+        <exclude>
+            <group>ajax</group>
+        </exclude>
+    </groups>
 </phpunit>

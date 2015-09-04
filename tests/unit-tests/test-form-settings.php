@@ -104,6 +104,7 @@ class Test_Form_Settings extends WP_UnitTestCase
         
         $this->form_id = $GLOBALS['GFPDF_Test']->form['form-settings']['id'];
         $gfpdf->data->form_settings[ $this->form_id ] = $GLOBALS['GFPDF_Test']->form['form-settings']['gfpdf_form_settings'];
+
     }
 
     /**
@@ -222,6 +223,9 @@ class Test_Form_Settings extends WP_UnitTestCase
 
         /* check it was successful */
         $this->assertNotFalse($id);
+
+        /* remove local cache and retest */
+        $gfpdf->data->form_settings = array();
 
         /* verify it was added */
         $pdf = $this->model->get_pdf($this->form_id, $id);
