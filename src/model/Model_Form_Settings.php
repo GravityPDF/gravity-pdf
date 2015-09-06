@@ -657,7 +657,10 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		} else {
 			/* Load the PDF configuration */
 			$pdf      = $this->get_pdf( $form_id, $pid );
-			$template = $pdf['template'];
+
+			if( ! is_wp_error( $pdf ) ) {
+				$template = $pdf['template'];
+			}
 		}
 
 		$class = $this->get_template_configuration( $template );
