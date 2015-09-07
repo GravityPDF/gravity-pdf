@@ -148,13 +148,11 @@ class Test_Data_Helper extends WP_UnitTestCase
     public function test_localised_script() {
         global $gfpdf;
 
-        $array = $this->data->get_localised_script_data( $gfpdf->options, $gfpdf->form );
+        $localised_data = $this->data->get_localised_script_data( $gfpdf->options, $gfpdf->form );
+        $required_keys = array( 'ajaxurl', 'GFbaseUrl', 'pluginUrl', 'spinnerUrl', 'general_advanced_show', 'general_advanced_hide', 'tools_template_copy_confirm', 'tools_uninstall_confirm', 'tools_cancel', 'pdf_list_delete_confirm', 'active', 'inactive', 'conditionalText', 'help_search_placeholder', 'ajax_error', 'update_success', 'delete_success', 'custom_fonts', 'no', 'yes', 'standard' );
 
-        $this->assertArrayHasKey('ajaxurl', $array);
-        $this->assertArrayHasKey('GFbaseUrl', $array);
-        $this->assertArrayHasKey('pluginUrl', $array);
-        $this->assertArrayHasKey('ajax_error', $array);
-        $this->assertArrayHasKey('active', $array);
-        $this->assertArrayHasKey('inactive', $array);
+        foreach( $required_keys as $key ) {
+            $this->assertArrayHasKey( $key, $localised_data );
+        }
     }
 }

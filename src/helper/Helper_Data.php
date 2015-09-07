@@ -44,6 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 4.0
  */
 class Helper_Data {
+	
 	/**
 	 * Location for the overloaded data
 	 * @var array
@@ -59,7 +60,7 @@ class Helper_Data {
 	 * @since 4.0
 	 */
 	public function __set( $name, $value ) {
-		$this->data[$name] = $value;
+		$this->data[ $name ] = $value;
 	}
 
 	/**
@@ -73,7 +74,7 @@ class Helper_Data {
 		/* Check if we actually have a key matching what was requested */
 		if ( array_key_exists( $name, $this->data ) ) {
 			/* key exists, so return */
-			return $this->data[$name];
+			return $this->data[ $name ];
 		}
 
 		/* Not found so generate error */
@@ -82,7 +83,7 @@ class Helper_Data {
 			'Undefined property via __get(): ' . $name .
 			' in ' . $trace[0]['file'] .
 			' on line ' . $trace[0]['line'],
-		E_USER_NOTICE);
+		E_USER_NOTICE );
 
 		/* because we are returning by reference we need return something that can be referenced */
 		$value = null;
@@ -97,7 +98,7 @@ class Helper_Data {
 	 * @since 4.0
 	 */
 	public function __isset( $name ) {
-		return isset($this->data[$name]);
+		return isset( $this->data[$name] );
 	}
 
 	/**
@@ -108,7 +109,7 @@ class Helper_Data {
 	 * @since 4.0
 	 */
 	public function __unset( $name ) {
-		unset($this->data[$name]);
+		unset( $this->data[$name] );
 	}
 
 	/**
@@ -157,7 +158,7 @@ class Helper_Data {
 	 * @return  array
 	 * @since  4.0
 	 */
-	public function get_localised_script_data(Helper_Options $options, Helper_Abstract_Form $form) {
+	public function get_localised_script_data( Helper_Options $options, Helper_Abstract_Form $form ) {
 
 		$custom_fonts = array_values( $options->get_custom_fonts() );
 
