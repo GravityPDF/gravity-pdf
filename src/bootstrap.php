@@ -268,7 +268,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	private function maybe_run_remote_logging() {
 
 		/* Enable remote logging */
-		if ( $this->misc->is_development_version( PDF_EXTENDED_VERSION ) ) {
+		if ( $this->is_development_version( PDF_EXTENDED_VERSION ) ) {
 			/* Setup Loggly logging with correct format for buffer logging */
 			$formatter = new \Monolog\Formatter\LogglyFormatter();
 			$loggly    = new \Monolog\Handler\LogglyHandler( '8ad317ed-213d-44c9-a2e8-f2eebd542c66/tag/gravitypdf', \Monolog\Logger::INFO );
@@ -283,6 +283,29 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			/* Impliment our buffer */
 			$this->log->pushHandler( $buffer );
 		}
+	}
+
+	/**
+	 * Check if the current version of Gravity PDF is a development edition
+	 * Development editions contain either 'alpha', 'beta', or 'rc' in the version number
+	 * @param  String  $version The version to check
+	 * @return boolean
+	 * @since 4.0
+	 */
+	public function is_development_version( $version ) {
+		
+		$dev = false;
+		$dev_version        = array('alpha', 'beta', 'rc');
+		$plugin_version     = strtolower( $version );
+
+		foreach( $dev_version as $v ) {
+			if( strpos( $plugin_version, $v ) !== false ) {
+				return true;
+				break;
+			}
+		}
+
+		return false;
 	}
 
 	/**

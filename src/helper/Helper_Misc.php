@@ -543,27 +543,4 @@ class Helper_Misc
 			add_filter( 'gform_form_post_get_meta', array( $currency, 'admin_pre_render' ) );
 		}
 	}
-
-	/**
-	 * Check if the current version of Gravity PDF is a development edition
-	 * Development editions contain either 'alpha', 'beta', or 'rc' in the version number
-	 * @param  String  $version The version to check
-	 * @return boolean
-	 * @since 4.0
-	 */
-	public function is_development_version( $version ) {
-		
-		$dev = false;
-		$dev_version        = array('alpha', 'beta', 'rc');
-		$plugin_version     = strtolower( $version );
-
-		foreach( $dev_version as $v ) {
-			if( strpos( $plugin_version, $v ) !== false ) {
-				return true;
-				break;
-			}
-		}
-
-		return false;
-	}
 }
