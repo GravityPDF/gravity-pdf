@@ -37,6 +37,7 @@ use StdClass;
 /**
  * Test the PSR-4 Autoloader Implimentation
  * @since 4.0
+ * @group data
  */
 class Test_Data_Helper extends WP_UnitTestCase
 {
@@ -61,7 +62,6 @@ class Test_Data_Helper extends WP_UnitTestCase
 
     /**
      * Check if our getter / setter is functional with different data types
-     * @group data
      * @since 4.0
      * @dataProvider provider_setter
      */
@@ -75,7 +75,6 @@ class Test_Data_Helper extends WP_UnitTestCase
 
     /**
      * Check if our isset and unset magic methods work correctly
-     * @group data
      * @since 4.0
      * @dataProvider provider_setter
      */
@@ -96,7 +95,6 @@ class Test_Data_Helper extends WP_UnitTestCase
 
     /**
      * Ensure data accessed is returned by reference
-     * @group data
      * @since 4.0
      */
     public function test_by_reference() {
@@ -143,7 +141,6 @@ class Test_Data_Helper extends WP_UnitTestCase
     /**
      * Test the localised script data
      * @since 4.0
-     * @group data
      */
     public function test_localised_script() {
         global $gfpdf;
