@@ -109,7 +109,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * Load our model and view and required actions
 	 */
 	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log, Helper_Data $data, Helper_Options $options, Helper_Misc $misc, Helper_Notices $notices ) {
-		
+
 		/* Assign our internal variables */
 		$this->form    = $form;
 		$this->log     = $log;
@@ -144,7 +144,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* prevent unauthorized access */
 		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
-			
+
 			$this->log->addWarning( 'Lack of User Capabilities.' );
 			wp_die( __( 'You do not have permission to access this page', 'gravitypdf' ) );
 		}
@@ -159,11 +159,11 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$pdf_table->prepare_items();
 
 		/* pass to view */
-		$controller->view->list(array(
+		$controller->view->list( array(
 			'title'       => $this->data->title,
 			'add_new_url' => $add_new_url = add_query_arg( array( 'pid' => 0 ) ),
 			'list_items'  => $pdf_table,
-		));
+		) );
 	}
 
 	/**
@@ -233,23 +233,32 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		}
 
 		$form_id = (int) $form_id;
-		if ( (int) $form_id === 0 ) {
+
+		if ( 0 === $form_id ) {
+
 			$error = new WP_Error( 'invalid_id', __( 'You must pass in a valid form ID', 'gravitypdf' ) );
 			$this->log->addError( 'Error Getting Settings.', array( 'WP_Error' => $error ) );
+
 			return $error;
 		}
 
 		/* If we haven't pulled the form meta data from the database do so now */
 		if ( ! isset( $this->data->form_settings[ $form_id ] ) ) {
+			
 			$form = $this->form->get_form( $form_id );
 
 			if ( empty($form) ) {
+			
 				$error = new WP_Error( 'invalid_id', __( 'You must pass in a valid form ID', 'gravitypdf' ) );
 				$this->log->addError( 'Error Getting Settings.', array( 'WP_Error' => $error ) );
+			
 				return $error;
 			}
 
+			/* Pull the settings from the $form object, if they exist */
 			$settings = ( isset($form['gfpdf_form_settings'] ) ) ? $form['gfpdf_form_settings'] : array();
+
+			/* Store the settings in our data object. Run filter to allow devs to modify the object as needed */
 			$this->data->form_settings[ $form_id ] = apply_filters( 'gfpdf_get_form_settings', $settings );
 
 		}
@@ -276,8 +285,16 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$gfpdf_options = $this->get_settings( $form_id );
 
 		if ( ! is_wp_error( $gfpdf_options ) ) {
+
+			/* Get our PDF array if it exists */
 			$value         = ! empty( $gfpdf_options[ $pdf_id ] ) ? $gfpdf_options[ $pdf_id ] : new WP_Error( 'invalid_pdf_id', __( 'You must pass in a valid PDF ID', 'gravitypdf' ) );
-			return apply_filters( 'gfpdf_pdf_config', apply_filters( 'gfpdf_pdf_config_' . $form_id, $value ) );
+
+			if( ! is_wp_error ( $value ) ) {
+				return apply_filters( 'gfpdf_pdf_config', apply_filters( 'gfpdf_pdf_config_' . $form_id, $value ) );
+			}
+
+			/* return WP_Error */
+			return $value;
 		}
 
 		/* return WP_Error */
@@ -303,6 +320,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$options = $this->get_settings( $form_id );
 
 		if ( ! is_wp_error( $options ) ) {
+
 			/* check the ID, if any */
 			$value['id']     = (isset($value['id'])) ? $value['id'] : uniqid();
 			$value['active'] = (isset($value['active'])) ? $value['active'] : true;
@@ -314,14 +332,16 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			$results = $this->update_pdf( $form_id, $value['id'], $value, true, false );
 
 			if ( $results ) {
+
 				/* return the ID if successful */
-				$this->log->addNotice( 'Successfully Added.', array( 'pdf' => $value ) );
+				$this->log->addNotice( 'Successfuly Added.', array( 'pdf' => $value ) );
+
 				return $value['id'];
 			}
 
 			$this->log->addError( 'Error Saving.', array(
 				'error' => $results,
-				'pdf' => $value
+				'pdf' => $value,
 			) );
 		}
 
@@ -352,7 +372,9 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		) );
 
 		if ( empty( $value ) || ! is_array( $value ) || sizeof( $value ) == 0 ) {
+			/* No value was passed in so we will delete the PDF */
 			$remove_option = $this->delete_pdf( $form_id, $pdf_id );
+
 			return $remove_option;
 		}
 
@@ -360,8 +382,10 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$options = $this->get_settings( $form_id );
 
 		if ( ! is_wp_error( $options ) ) {
-			/* don't run when adding a new PDF */
+
+			/* Don't run when adding a new PDF */
 			if ( $filters ) {
+
 				$this->log->addNotice( 'Trigger Filters.' );
 
 				/* Let's let devs alter that value coming in */
@@ -382,19 +406,23 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			if ( $update_db ) {
 
 				$this->log->addNotice( 'Update Form.', array( 'form' => $form ) );
-				/* update the database, if able */
+
+				/* Update the database, if able */
 				$did_update = $this->form->update_form( $form );
 			}
-
-			/* If it updated, let's update the global variable */
+			
 			if ( ! $update_db || $did_update !== false ) {
+
+				/* If it updated successfully let's update the global variable */
 				$this->log->addNotice( 'Save Local Form Cache.' );
+
 				$this->data->form_settings[$form_id] = $options;
 			}
 
 			/* true if successful, false if failed */
 			return $did_update;
 		}
+
 		return false;
 	}
 
@@ -421,7 +449,9 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 			/* Next let's try to update the value */
 			if ( isset( $options[ $pdf_id ] ) ) {
+
 				$this->log->addNotice( 'Found Setting. Now deleting...', array( 'pdf' => $options[ $pdf_id ] ) );
+
 				unset( $options[ $pdf_id ] );
 			}
 
@@ -436,7 +466,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 			/* If it updated, let's update the global variable */
 			if ( $did_update !== false ) {
-			
+
 				$this->log->addNotice( 'Setting Deleted.', array(
 					'form_id' => $form_id,
 					'pdf_id'  => $pdf_id,
@@ -453,7 +483,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			'form_id' => $form_id,
 			'pdf_id'  => $pdf_id,
 			'form' => $form,
-		));
+		) );
 
 		return false;
 	}
@@ -469,10 +499,10 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* prevent unauthorized access */
 		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
-			
+
 			$this->log->addCritical( 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
-				'user_meta' => get_user_meta( get_current_user_id() )
+				'user_meta' => get_user_meta( get_current_user_id() ),
 			) );
 
 			wp_die( __( 'You do not have permission to access this page', 'gravitypdf' ) );
@@ -482,7 +512,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		if ( ! wp_verify_nonce( rgpost( 'gfpdf_save_pdf' ), 'gfpdf_save_pdf' ) ) {
 			$this->log->addWarning( 'Nonce Verification Failed.' );
 			$this->notices->add_error( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
-			 return false;
+			return false;
 		}
 
 		/* Check if we have a new PDF ID */
@@ -552,42 +582,45 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/**
 		 * Check if we actually need to do any validating
 		 * Because of the way the Gravity Forms Settings page is processed we are hooking into the core
-		 * "gfpdf_form_settings" filter which runs on both the GF Settings page and the Settings page
+		 * "gfpdf_form_settings" filter which runs when ever update_option( 'pdf_form_settings' ) is run.
 		 * We don't need to do any validation when not on the GF PDF Settings page
 		 */
 		if ( empty($_POST['gfpdf_save_pdf']) ) {
 			return $fields;
 		}
 
-		/**
-		 * Check we have a valid nonce, or throw an error
-		 */
+		/* Check we have a valid nonce, or throw an error */
 		if ( ! wp_verify_nonce( rgpost( 'gfpdf_save_pdf' ), 'gfpdf_save_pdf' ) ) {
+
 			$this->log->addWarning( 'Nonce Verification Failed.' );
 			$this->notices->add_error( __( 'There was a problem saving your PDF settings. Please try again.', 'gravitypdf' ) );
+
 			return false;
 		}
 
 		$input = rgpost( 'gfpdf_settings' );
 
-		/* throw errors on required fields */
+		/* Throw errors on required fields */
 		foreach ( $fields as $key => &$field ) {
+
 			if ( isset($field['required']) && $field['required'] === true ) {
 
-				/* get field value */
+				/* Get field value */
 				$value = (isset($input[$field['id']])) ? $input[$field['id']] : '';
 
-				/* set a class if it doesn't exist */
+				/* Set a class if it doesn't exist */
 				$field['class'] = (isset($field['class'])) ? $field['class'] : '';
 
-				/* if the value is an array ensure all items have values */
+				/* If the value is an array ensure all items have values */
 				if ( is_array( $value ) ) {
+					
 					$size = sizeof( $value );
 					if ( sizeof( array_filter( $value ) ) !== $size ) {
 						$field['class'] .= ' gfield_error' ;
 					}
 				} else {
-					/* if string, sanitize and add error if appropriate */
+					
+					/* If string, sanitize and add error if appropriate */
 					$value = apply_filters( 'gfpdf_form_settings_sanitize_text', $value, $key );
 					if ( empty($value) ) {
 						$field['class'] .= ' gfield_error' ;
@@ -600,8 +633,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Similar to Helper_Options->settings_sanitize() except we are storing/processing values
-	 * in Gravity Forms meta table
+	 * Similar to Helper_Options->settings_sanitize() except we don't need as robust validation and error checking
 	 * @param  array $input Fields to process
 	 * @return array         Sanitized fields
 	 * @return void
@@ -649,7 +681,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	public function register_custom_appearance_settings( $settings ) {
 
 		$pid     = rgget( 'pid' );
-		$form_id = (isset($_GET['id'])) ? (int) $_GET['id'] : 0;
+		$form_id = ( isset( $_GET['id'] ) ) ? (int) $_GET['id'] : 0;
 
 		/* If we don't have a specific PDF we'll use the defaults */
 		if ( empty($pid) || empty($form_id) ) {
@@ -658,8 +690,10 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			/* Load the PDF configuration */
 			$pdf      = $this->get_pdf( $form_id, $pid );
 
-			if( ! is_wp_error( $pdf ) ) {
+			if ( ! is_wp_error( $pdf ) ) {
 				$template = $pdf['template'];
+			} else {
+				$template = '';
 			}
 		}
 
@@ -669,22 +703,14 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Check if we need to run a migration from the 3.x to 4.x configuration style
-	 * @param  Array $settings Any existing settings loaded
-	 * @return Array
-	 * @since  4.0
-	 */
-	public function register_3_x_configuration_migration( $settings ) {
-		return $settings;
-	}
-
-	/**
 	 * Add an image of the current selected template (if any)
 	 * @param Array $settings Any existing settings loaded
+	 * @since 4.0
 	 */
 	public function add_template_image( $settings ) {
 
 		if ( isset( $settings['template'] ) ) {
+
 			$current_template = $this->options->get_form_value( $settings['template'] );
 			$template_image   = $this->misc->get_template_image( $current_template );
 
@@ -726,12 +752,29 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$template_settings = $class->configuration();
 
 		/* register any custom fields */
-		if ( isset($template_settings['fields']) && is_array( $template_settings['fields'] ) ) {
+		if ( isset( $template_settings['fields'] ) && is_array( $template_settings['fields'] ) ) {
 			foreach ( $template_settings['fields'] as $key => $field ) {
-				$settings[$key] = $field;
+				$settings[ $key ] = $field;
 			}
 		}
 
+		$settings = $this->setup_core_custom_appearance_settings( $settings, $class, $template_settings );
+
+		$this->log->addNotice( 'Setup Template-Specific Settings', array( 'settings' => $settings ) );
+
+		return $settings;
+	}
+
+	/**
+	 * Setup any core fields that are registered to the PDF template
+	 * @param  Array                   $settings          Any current settings
+	 * @param  Helper_Interface_Config $class             The template configuration class
+	 * @param  Array                  $template_settings Loaded configuration array
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function setup_core_custom_appearance_settings( $settings = array(), Helper_Interface_Config $class, $template_settings ) {
+		
 		/* register our core fields */
 		$core_fields = array(
 			'show_form_title'      => 'get_form_title_display_field',
@@ -740,7 +783,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			'show_section_content' => 'get_section_content_display_field',
 			'show_hidden'          => 'get_hidden_display_field',
 			'show_empty'           => 'get_empty_display_field',
-			
+
 			'background'           => 'get_background_field',
 			'header'               => 'get_header_field',
 			'first_header'         => 'get_first_page_header_field',
@@ -750,14 +793,12 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		$core_fields = apply_filters( 'gfpdf_core_template_fields_list', $core_fields, $template_settings, $class );
 
-		foreach( $core_fields as $id => $method ) {
+		foreach ( $core_fields as $id => $method ) {
 
-			if( isset( $template_settings['core'][ $id ] ) && $template_settings['core'][ $id ] === true ) {
+			if ( isset( $template_settings['core'][ $id ] ) && $template_settings['core'][ $id ] === true ) {
 				$settings[ $id ] = call_user_func( array( $this->options, $method ) );
 			}
 		}
-
-		$this->log->addNotice( 'Setup Template-Specific Settings', array( 'settings' => $settings ) );
 
 		return $settings;
 	}
@@ -787,7 +828,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			'default-template-no-style',
 		) );
 
-		if( in_array( $template, $legacy_templates ) ) {
+		if ( in_array( $template, $legacy_templates ) ) {
 			$class = $this->load_template_configuration( PDF_PLUGIN_DIR . 'initialisation/templates/config/legacy.php' );
 		}
 
@@ -856,7 +897,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 
 	/**
-	 * Update our notification form settings which is specific to the PDF Form Settings Page
+	 * Update our notification form settings which is specific to the PDF Form Settings Page (i.e we need an actual $form object which isn't present when we originally register the settings)
 	 * @param  Array $notifications The current form notifications
 	 * @return void
 	 * @since 4.0
@@ -893,9 +934,9 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 			$this->log->addCritical( 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
-				'user_meta' => get_user_meta( get_current_user_id() )
+				'user_meta' => get_user_meta( get_current_user_id() ),
 			) );
-			
+
 			header( 'HTTP/1.1 401 Unauthorized' );
 			wp_die( '401' );
 		}
@@ -911,7 +952,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$nonce_id = "gfpdf_delete_nonce_{$fid}_{$pid}";
 
 		if ( ! wp_verify_nonce( $nonce, $nonce_id ) ) {
-			
+
 			$this->log->addWarning( 'Nonce Verification Failed.' );
 
 			header( 'HTTP/1.1 401 Unauthorized' );
@@ -933,7 +974,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		}
 
 		$this->log->addError( 'AJAX Endpoint Failed', array(
-			'WP_Error' => $config
+			'WP_Error' => $config,
 		) );
 
 		header( 'HTTP/1.1 500 Internal Server Error' );
@@ -957,7 +998,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 			$this->log->addCritical( 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
-				'user_meta' => get_user_meta( get_current_user_id() )
+				'user_meta' => get_user_meta( get_current_user_id() ),
 			) );
 
 			header( 'HTTP/1.1 401 Unauthorized' );
@@ -974,7 +1015,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$nonce_id = "gfpdf_duplicate_nonce_{$fid}_{$pid}";
 
 		if ( ! wp_verify_nonce( $nonce, $nonce_id ) ) {
-			
+
 			$this->log->addWarning( 'Nonce Verification Failed.' );
 
 			header( 'HTTP/1.1 401 Unauthorized' );
@@ -1011,7 +1052,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		}
 
 		$this->log->addError( 'AJAX Endpoint Failed', array(
-			'WP_Error' => $config
+			'WP_Error' => $config,
 		) );
 
 		header( 'HTTP/1.1 500 Internal Server Error' );
@@ -1035,7 +1076,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 			$this->log->addCritical( 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
-				'user_meta' => get_user_meta( get_current_user_id() )
+				'user_meta' => get_user_meta( get_current_user_id() ),
 			) );
 
 			header( 'HTTP/1.1 401 Unauthorized' );
@@ -1085,7 +1126,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		}
 
 		$this->log->addError( 'AJAX Endpoint Failed', array(
-			'WP_Error' => $config
+			'WP_Error' => $config,
 		) );
 
 		header( 'HTTP/1.1 500 Internal Server Error' );
@@ -1104,10 +1145,10 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* prevent unauthorized access */
 		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
-			
+
 			$this->log->addCritical( 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
-				'user_meta' => get_user_meta( get_current_user_id() )
+				'user_meta' => get_user_meta( get_current_user_id() ),
 			) );
 
 			header( 'HTTP/1.1 401 Unauthorized' );

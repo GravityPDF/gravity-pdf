@@ -72,7 +72,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	 * Load our model and view and required actions
 	 */
 	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Data $data, Helper_Options $options ) {
-		
+
 		/* Assign our internal variables */
 		$this->data    = $data;
 		$this->options = $options;
@@ -132,7 +132,6 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 
 		/* Add custom field information if we have a template selected */
 		add_filter( 'gfpdf_form_settings_custom_appearance', array( $this->model, 'register_custom_appearance_settings' ) );
-		add_filter( 'gfpdf_settings_tools', array( $this->model, 'register_3_x_configuration_migration' ) );
 
 		/* Add Validation Errors */
 		add_filter( 'gfpdf_form_settings', array( $this->model, 'validation_error' ) );
@@ -154,11 +153,11 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	 * @since 4.0
 	 */
 	public function maybe_save_pdf_settings() {
-		$form_id = rgget( 'id' );
-		$pdf_id  = rgget( 'pid' );
+		$form_id = ( isset( $_GET['id'] ) ) ? (int) $_GET['id'] : false;
+		$pdf_id  = ( isset( $_GET['pid'] ) ) ? $_GET['pid'] : false;
 
 		/* Load the add/edit page */
-		if ( ! rgblank( $pdf_id ) && rgpost( 'gfpdf_save_pdf' ) ) {
+		if ( ! empty( $pdf_id ) && rgpost( 'gfpdf_save_pdf' ) ) {
 			$this->model->process_submission( $form_id, $pdf_id );
 		}
 	}
@@ -171,11 +170,11 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	public function displayPage() {
 
 		/* Determine whether to load the add/edit page, or the list view */
-		$form_id = rgget( 'id' );
-		$pdf_id  = rgget( 'pid' );
+		$form_id = ( isset( $_GET['id'] ) ) ? (int) $_GET['id'] : false;
+		$pdf_id  = ( isset( $_GET['pid'] ) ) ? $_GET['pid'] : false;
 
 		/* Load the add/edit page */
-		if ( ! rgblank( $pdf_id ) ) {
+		if ( ! empty( $pdf_id ) ) {
 			$this->model->show_edit_view( $form_id, $pdf_id );
 			return;
 		}
@@ -192,7 +191,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	 */
 	public function store_tinymce_settings( $settings ) {
 
-		if ( empty($this->data->tiny_mce_editor_settings) ) {
+		if ( empty( $this->data->tiny_mce_editor_settings ) ) {
 			$this->data->tiny_mce_editor_settings = $settings;
 		}
 
