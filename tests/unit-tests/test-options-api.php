@@ -194,6 +194,28 @@ class Test_Options_API extends WP_UnitTestCase
 	}
 
 	/**
+	 * Check that we can successfully update a registered field item
+	 * @since 4.0
+	 */
+	public function test_update_registered_field() {
+		global $wp_settings_fields;
+
+		$this->options->register_settings( $this->options->get_registered_fields() );
+
+		$group     = 'gfpdf_settings_form_settings';
+		$setting   = 'gfpdf_settings[notification]';
+		$option_id = 'options';
+		
+		/* Run false test */
+		$this->assertSame( 0, sizeof( $wp_settings_fields[ $group ][ $group ][ $setting ]['args'][ $option_id ] ) );
+
+		/* Run valid test */
+		$this->options->update_registered_field( 'form_settings', 'notification', 'options', 'working' );
+
+		$this->assertEquals( 'working', $wp_settings_fields[ $group ][ $group ][ $setting ]['args'][ $option_id ] );
+	}
+
+	/**
 	 * Check the options list is returned correctly
 	 *
 	 * @since 4.0
@@ -395,8 +417,56 @@ class Test_Options_API extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function test_get_templates() {
-		 $this->markTestIncomplete( 'This test has not been implimented yet' );
+		
+		$templates = $this->options->get_templates();
+
+		$this->assertArrayHasKey( 'Core', $templates );
+		$this->assertNotSame( 0, sizeof( $templates['Core'] ) );
 	}
+
+	/**
+	 * Test our PDF template headers are all registered
+	 *
+	 * @since 4.0
+	 */
+	public function test_get_template_header_details() {
+		$header = $this->options->get_template_header_details();
+
+		$this->assertArrayHasKey( 'template', $header );
+		$this->assertArrayHasKey( 'version', $header );
+		$this->assertArrayHasKey( 'description', $header );
+		$this->assertArrayHasKey( 'author', $header );
+		$this->assertArrayHasKey( 'group', $header );
+		$this->assertArrayHasKey( 'required_pdf_version', $header );
+	}
+
+	/**
+	 * Check we can correctly read the template headers
+	 *
+	 * @since 4.0
+	 */
+	public function test_get_template_headers() {
+		
+		$path = PDF_PLUGIN_DIR . 'initialisation/templates/core-simple.php';
+		$header = $this->options->get_template_headers( $path );
+
+		$this->assertEquals( 'Simple Structure', $header['template'] );
+		$this->assertEquals( '1.0', $header['version'] );
+		$this->assertEquals( 'The default template for Gravity PDF 4.x+', $header['description'] );
+		$this->assertEquals( 'Gravity PDF', $header['author'] );
+		$this->assertEquals( 'Core', $header['group'] );
+		$this->assertEquals( '4.0', $header['required_pdf_version'] );
+	}
+
+	/**
+	 * Check we can get the core PDF templates
+	 *
+	 * @since 4.0
+	 */
+	public function test_get_plugin_pdf_templates() {
+		$this->assertNotSame( 0, sizeof( $this->options->get_plugin_pdf_templates() ) );
+	}
+
 
 	/**
 	 * Test the installed fonts getter functionality
@@ -404,7 +474,74 @@ class Test_Options_API extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function test_get_installed_fonts() {
-		 $this->markTestIncomplete( 'This test has not been implimented yet' );
+		 
+		$fonts = $this->options->get_installed_fonts();
+
+		$this->assertArrayHasKey( 'Unicode', $fonts );
+		$this->assertArrayHasKey( 'Indic', $fonts );
+		$this->assertArrayHasKey( 'Arabic', $fonts );
+		$this->assertArrayHasKey( 'Other', $fonts );
+
+		$this->assertTrue( isset( $fonts['Unicode']['dejavusans'] ) );
+	}
+
+	/**
+	 * Add a custom font to our array
+	 *
+	 * @since 4.0
+	 */
+	public function test_add_custom_fonts() {
+
+		$fonts = array(
+			array( 'font_name' => 'Helvetica' ),
+			array( 'font_name' => 'Calibri Bold' ),
+		);
+
+		$this->options->update_option( 'custom_fonts', $fonts );
+
+		$existing_fonts = array(
+			'Unicode' => array(
+				'dejavusans' => 'Dejavu Sans',
+				'courier'    => 'Courier',
+			)
+		);
+
+		$get_fonts = $this->options->add_custom_fonts( $existing_fonts );
+
+		$this->assertTrue( isset( $get_fonts['Unicode'] ) );
+		$this->assertTrue( isset( $get_fonts['User-Defined Fonts'] ) );
+
+		$this->assertSame( 2, sizeof( $get_fonts['Unicode'] ) );
+		$this->assertSame( 2, sizeof( $get_fonts['User-Defined Fonts'] ) );
+	}
+
+	/**
+	 * Test the custom font getter
+	 *
+	 * @since 4.0
+	 */
+	public function test_get_custom_fonts() {
+		
+		$fonts = array(
+			array( 'font_name' => 'Helvetica' ),
+			array( 'font_name' => 'Calibri Bold' ),
+		);
+
+		$this->options->update_option( 'custom_fonts', $fonts );
+
+		$get_fonts = $this->options->get_custom_fonts();
+
+		$this->assertEquals( 'helvetica', $get_fonts[0]['shortname'] );
+		$this->assertEquals( 'calibribold', $get_fonts[1]['shortname'] );
+	}
+
+	/**
+	 * Test the font display name getter
+	 *
+	 * @since 4.0
+	 */
+	public function test_get_font_display_name() {
+		$this->assertEquals( 'Dejavu Sans', $this->options->get_font_display_name( 'dejavusans' ) );
 	}
 
 	/**
@@ -414,6 +551,53 @@ class Test_Options_API extends WP_UnitTestCase
 	 */
 	public function test_get_privilages() {
 		$this->assertTrue( is_array( $this->options->get_privilages() ) );
+	}
+
+	/**
+	 * Test our semi-cached PDF counter will increment correctly
+	 *
+	 * @since 4.0
+	 */
+	public function test_increment_pdf_count() {
+
+		while( 100 >= $this->options->get_option( 'pdf_count' ) ) {
+			$this->options->increment_pdf_count();
+		}
+
+		$this->assertGreaterThan( 100, $this->options->get_option( 'pdf_count' ) );
+	}
+
+	public function test_settings_sanitize() {
+		
+		/* Test failed referer / option name */
+		$this->assertEquals( 'test', $this->options->settings_sanitize( 'test' ) );
+
+		$_POST['_wp_http_referer'] = '?tab=general';
+		$_POST['option_name']      = 'option_page';
+
+		$input = array(
+			'default_pdf_size' => 'A5',
+			'default_font_size' => '15',
+			'other_type' => 'wont validate',
+		);
+
+		/* Test our current settings */
+		$initial_settings = $this->options->get_settings();
+
+		$this->assertEquals( 'custom', $initial_settings['default_pdf_size'] );
+		$this->assertEmpty( $initial_settings['default_font_size'] );
+		$this->assertEmpty( $initial_settings['other_type'] );
+
+		/* Run our settings santize function and check the results are accurate */
+		$this->options->settings_sanitize( $input );
+
+		$updated_settings = $this->options->get_settings();
+
+		$this->assertEquals( 'A5', $updated_settings['default_pdf_size'] );
+		$this->assertEquals( '15', $updated_settings['default_font_size'] );
+		$this->assertEmpty( $updated_settings['other_type'] );
+
+
 	}
 
 	/**
@@ -473,8 +657,78 @@ class Test_Options_API extends WP_UnitTestCase
 	 * Test our global sanitisation function
 	 *
 	 * @since 4.0
+	 * @dataProvider provider_sanitize_all_fields
 	 */
-	public function test_sanitize_all_fields() {
+	public function test_sanitize_all_fields( $type, $value, $expected ) {
+		$this->assertEquals( $expected, $this->options->sanitize_all_fields( $value, '', '', array( 'type' => $type ) ) );
+	}
+
+	/**
+	 * Test our sanitize_all_fields functions correctly
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function provider_sanitize_all_fields() {
+		return array(
+			array( 'rich_editor', '<strong>Test</strong> <script>console.log("test");</script>', 'Test console.log("test");' ),
+			array( 'textarea', '<strong>Test</strong> <script>console.log("test");</script>', 'Test console.log("test");' ),
+			array( 'text', '<b><em>Test</em></b>', 'Test' ),
+			array( 'checkbox', array( '<b>Item 1</b>', '<em>Item 2</em>' ), array( 'Item 1', 'Item 2' ) ),
+		);
+	}
+
+	/**
+	 * Test our required sanitized field errors trigger
+	 *
+	 * @since 4.0
+	 * @dataProvider provider_sanitize_required_field
+	 */
+	public function test_sanitize_required_field( $type, $value, $expected ) {
+		global $wp_settings_errors;
+
+		/* Reset the WP errors */
+		$wp_settings_errors = array();
+
+		/* Setup data needed for our test */
+		$input = array( 'default_pdf_size' => 'custom' );
+
+		$settings = array(
+			'required' => true,
+			'type'     => $type,
+		);
+
+		/* Execute test */
+		$this->options->sanitize_required_field( $value, $type, $input, $settings );
+
+		/* Check the results */
+		$this->assertEquals( $expected, sizeof( $wp_settings_errors ) );
+	}
+
+	/**
+	 * Test our sanitize_required_field functions correctly
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function provider_sanitize_required_field() {
+		return array(
+			array( 'select', array(), true ),
+			array( 'multicheck', array(), true ),
+			array( 'paper_size', array(), true ),
+			array( 'text', '', true ),
+
+			array( 'select', array( 'item' ), false ),
+			array( 'multicheck', array( 'item' ), false ),
+			array( 'paper_size', array( '10', '20', 'cm' ), false ),
+			array( 'text', 'Working', false ),
+		);
+	}
+
+	/**
+	 * Test we can correctly get the field details
+	 * @since  4.0
+	 * @todo
+	 */
+	public function test_get_form_value() {
 		$this->markTestIncomplete( 'This test has not been implimented yet' );
 	}
 }

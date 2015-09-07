@@ -519,9 +519,9 @@ class Helper_Options implements Helper_Interface_Filters {
 			$file = basename( $filename, '.php' );
 
 			if ( ! empty($info['template']) ) {
-				$templates[$prefix_text . $info['group']][$file] = $info['template'];
+				$templates[ $prefix_text . $info['group'] ][ $file ] = $info['template'];
 			} else if ( $file !== 'configuration' && $file !== 'configuration.archive' ) { /* exclude the example templates & old configuration files */
-				$legacy[$file] = $this->misc->human_readable( $file );
+				$legacy[ $file ] = $this->misc->human_readable( $file );
 			}
 		}
 
@@ -534,11 +534,11 @@ class Helper_Options implements Helper_Interface_Filters {
 			$file = basename( $filename, '.php' );
 
 			/* only add core template if not being overridden by user template */
-			if ( ! isset($templates[$prefix_text . $info['group']][$file]) ) {
-				$templates[$info['group']][$file] = $info['template'];
+			if ( ! isset($templates[ $prefix_text . $info['group'] ][ $file ]) ) {
+				$templates[ $info['group'] ][ $file ] = $info['template'];
 			} else {
 				/* user template overrides core template. Mark template. */
-				$templates[$prefix_text . $info['group']][$file] = $templates[$prefix_text . $info['group']][$file] . '*';
+				$templates[ $prefix_text . $info['group'] ][ $file ] = $templates[ $prefix_text . $info['group'] ][ $file ] . '*';
 			}
 		}
 
@@ -546,7 +546,7 @@ class Helper_Options implements Helper_Interface_Filters {
          * Add our legacy array to the end of our templates array
 		 */
 		if ( sizeof( $legacy ) > 0 ) {
-			$templates[$legacy_text] = $legacy;
+			$templates[ $legacy_text ] = $legacy;
 		}
 
 		return apply_filters( 'gfpdf_template_list', $templates );
@@ -628,11 +628,11 @@ class Helper_Options implements Helper_Interface_Filters {
 	public function get_installed_fonts() {
 		$fonts = array(
 			__( 'Unicode', 'gravitypdf' ) => array(
-				'dejavusanscondensed'  => 'Dejavus Sans Condensed',
-				'dejavusans'           => 'Dejavus Sans',
-				'dejavuserifcondensed' => 'Dejavus Serif Condensed',
-				'dejavuserif'          => 'Dejavus Serif',
-				'dejavusansmono'       => 'Dejavus Sans Mono',
+				'dejavusanscondensed'  => 'Dejavu Sans Condensed',
+				'dejavusans'           => 'Dejavu Sans',
+				'dejavuserifcondensed' => 'Dejavu Serif Condensed',
+				'dejavuserif'          => 'Dejavu Serif',
+				'dejavusansmono'       => 'Dejavu Sans Mono',
 
 				'freesans'             => 'Free Sans',
 				'freemono'             => 'Free Mono',
@@ -840,14 +840,14 @@ class Helper_Options implements Helper_Interface_Filters {
 			if ( isset($value['required']) && $value['required'] ) {
 				switch ( $value['type'] ) {
 					case 'select':
-						if ( ! isset($input[$key]) ) {
-							$input[$key] = array();
+						if ( ! isset( $input[ $key ] ) ) {
+							$input[ $key ] = array();
 						}
 					break;
 
 					default:
-						if ( ! isset($input[$key]) ) {
-							$input[$key] = '';
+						if ( ! isset( $input[ $key ] ) ) {
+							$input[ $key ] = '';
 						}
 					break;
 				}
@@ -857,22 +857,28 @@ class Helper_Options implements Helper_Interface_Filters {
 		/* Loop through each setting being saved and pass it through a sanitization filter */
 		foreach ( $input as $key => $value ) {
 
+			/* Check if the input is apart of our whitelist, otherwise remove */
+			if( ! isset( $settings[ $key ] ) ) {
+				unset( $input[ $key ] );
+				continue;
+			}
+
 			/* Get the setting type (checkbox, select, etc) */
-			$type = isset( $settings[$key]['type'] ) ? $settings[$key]['type'] : false;
+			$type = isset( $settings[ $key ]['type'] ) ? $settings[ $key ]['type'] : false;
 
 			if ( $type ) {
 				/* Field type specific filter */
-				$input[$key] = apply_filters( 'gfpdf_settings_sanitize_' . $type, $value, $key, $input, $settings[$key] );
+				$input[ $key ] = apply_filters( 'gfpdf_settings_sanitize_' . $type, $value, $key, $input, $settings[ $key ] );
 			}
 
 			/* General filter */
-			$input[$key] = apply_filters( 'gfpdf_settings_sanitize', $input[$key], $key, $input, $settings[$key] );
+			$input[ $key ] = apply_filters( 'gfpdf_settings_sanitize', $input[ $key ], $key, $input, $settings[ $key ] );
 		}
 
 		/* Loop through the whitelist and unset any that are empty for the tab being saved */
 		foreach ( $settings as $key => $value ) {
-			if ( empty( $input[$key] ) ) {
-				unset( $gfpdf_options[$key] );
+			if ( empty( $input[ $key ] ) ) {
+				unset( $gfpdf_options[ $key ] );
 			}
 		}
 
@@ -939,7 +945,9 @@ class Helper_Options implements Helper_Interface_Filters {
 			/* treat as plain text */
 			default:
 				if ( is_array( $value ) ) {
-					array_walk_recursive( $value, 'wp_strip_all_tags' );
+					array_walk_recursive( $value, function( &$item) {
+						$item = wp_strip_all_tags( $item );
+					} );
 					return $value;
 				} else {
 					return wp_strip_all_tags( $value );
@@ -975,8 +983,7 @@ class Helper_Options implements Helper_Interface_Filters {
 
 				case 'paper_size':
 					if ( isset($input['default_pdf_size']) && $input['default_pdf_size'] === 'custom' ) {
-			            $size = sizeof( $value );
-			            if ( sizeof( array_filter( $value ) ) !== $size ) {
+			            if ( sizeof( array_filter( $value ) ) !== 3 ) {
 							/* throw error */
 							add_settings_error( 'gfpdf-notices', $key, __( 'PDF Settings could not be saved. Please enter all required information below.', 'gravitypdf' ) );
 			            }
