@@ -35,77 +35,120 @@ use WP_UnitTestCase;
 /**
  * Test the PSR-4 Autoloader Implimentation
  * @since 4.0
+ * @group init
  */
 class Test_Autoloader extends WP_UnitTestCase
 {
 
-    /**
-     * Ensure our auto initialiser is firing correctly
-     * @group init
-     * @since 4.0
-     * @dataProvider provider_classes
-     */
-    public function test_classes($class) {
-        $this->assertTrue(class_exists($class));
-    }
+	/**
+	 * Ensure our auto initialiser is firing correctly
+	 * @since 4.0
+	 * @dataProvider provider_classes
+	 */
+	public function test_classes( $class ) {
+		$this->assertTrue( class_exists( $class ) );
+	}
+
+	/**
+	 * A data provider to check the classes exist
+	 * @return Array Our test data
+	 * @since 4.0
+	 */
+	public function provider_classes() {
+		return array(
+			array( 'GFPDF\Controller\Controller_Actions' ),
+			array( 'Controller_Activation' ),
+			array( 'GFPDF\Controller\Controller_Form_Settings' ),
+			array( 'GFPDF\Controller\Controller_Install' ),
+			array( 'GFPDF\Controller\Controller_PDF' ),
+			array( 'GFPDF\Controller\Controller_Settings' ),
+			array( 'GFPDF\Controller\Controller_Shortcodes' ),
+			array( 'GFPDF\Controller\Controller_Welcome_Screen' ),
+
+			array( 'GFPDF\Helper\Helper_Abstract_Controller' ),
+			array( 'GFPDF\Helper\Helper_Abstract_Fields' ),
+			array( 'GFPDF\Helper\Helper_Abstract_Form' ),
+			array( 'GFPDF\Helper\Helper_Abstract_Model' ),
+			array( 'GFPDF\Helper\Helper_Abstract_View' ),
+
+			array( 'GFPDF\Helper\Helper_Data' ),
+			array( 'GFPDF\Helper\Helper_Field_Container' ),
+			array( 'GFPDF\Helper\Helper_Form' ),
+			array( 'GFPDF\Helper\Helper_Migration' ),
+			array( 'GFPDF\Helper\Helper_Misc' ),
+			array( 'GFPDF\Helper\Helper_Notices' ),
+			array( 'GFPDF\Helper\Helper_Options' ),
+			array( 'GFPDF\Helper\Helper_Options_Fields' ),
+			array( 'GFPDF\Helper\Helper_PDF' ),
+			array( 'GFPDF\Helper\Helper_PDF_List_Table' ),
+
+			array( 'GFPDF\Model\Model_Actions' ),
+			array( 'GFPDF\Model\Model_Form_Settings' ),
+			array( 'GFPDF\Model\Model_Install' ),
+			array( 'GFPDF\Model\Model_PDF' ),
+			array( 'GFPDF\Model\Model_Settings' ),
+			array( 'GFPDF\Model\Model_Shortcodes' ),
+			array( 'GFPDF\Model\Model_Welcome_Screen' ),
+
+			array( 'GFPDF\View\View_Actions' ),
+			array( 'GFPDF\View\View_Form_Settings' ),
+			array( 'GFPDF\View\View_PDF' ),
+			array( 'GFPDF\View\View_Settings' ),
+			array( 'GFPDF\View\View_Shortcodes' ),
+			array( 'GFPDF\View\View_Welcome_Screen' ),
+
+		);
+	}
+
+	/**
+	 * Ensure our auto initialiser is firing correctly and loading any interfaces
+	 * @since 4.0
+	 * @dataProvider provider_interfaces
+	 */
+	public function test_interface( $class ) {
+		$this->assertTrue( interface_exists( $class ) );
+	}
+
+	/**
+	 * A data provider to check the classes exist
+	 * @return Array Our test data
+	 * @since 4.0
+	 */
+	public function provider_interfaces() {
+		return array(
+			array( 'GFPDF\Helper\Helper_Interface_Actions' ),
+			array( 'GFPDF\Helper\Helper_Interface_Config' ),
+			array( 'GFPDF\Helper\Helper_Interface_Filters' ),
+		);
+	}
+
+	/**
+	 * Ensure all depreciated classes have appropriate fallbacks
+	 * @since 4.0
+     * @dataProvider provider_depreciated
+	 */
+	public function test_depreciated( $class ) {
+		$this->assertTrue( class_exists( $class ) );
+	}
 
     /**
-     * A data provider to check the classes exist
-     * @return Array Our test data
+     * Test we have appropriate depreciated classes form our v3 version
+     * @return array
      * @since 4.0
      */
-    public function provider_classes() {
+    public function provider_depreciated() {
         return array(
-            array('GFPDF\Controller\Controller_Form_Settings'),
-            array('GFPDF\Controller\Controller_Settings'),
-            array('GFPDF\Controller\Controller_Welcome_Screen'),
-
-            array('GFPDF\Helper\Helper_Abstract_Controller'),
-            array('GFPDF\Helper\Helper_Abstract_Model'),
-            array('GFPDF\Helper\Helper_Abstract_View'),
-
-            array('GFPDF\Helper\Helper_Data'),
-            array('GFPDF\Helper\Helper_PDF_List_Table'),
-
-            array('GFPDF\Model\Model_Form_Settings'),
-            array('GFPDF\Model\Model_Settings'),
-            array('GFPDF\Model\Model_Welcome_Screen'),
-
-            array('GFPDF\View\View_Form_Settings'),
-            array('GFPDF\View\View_Settings'),
-            array('GFPDF\View\View_Welcome_Screen'),
-
+            array( 'GFPDF_Core' ),
+            array( 'PDFGenerator' ),
+            array( 'GFPDF_Settings' ),
+            array( 'GFPDF_Core_Model' ),
+            array( 'GFPDF_Settings_Model' ),
+            array( 'GFPDFE_DATA' ),
+            array( 'GFPDF_InstallUpdater' ),
+            array( 'GFPDF_Notices' ),
+            array( 'PDF_Common' ),
+            array( 'GFPDFEntryDetail' ),
+            array( 'PDF_Generator' ),
         );
-    }
-
-    /**
-     * Ensure our auto initialiser is firing correctly and loading any interfaces
-     * @group init
-     * @since 4.0
-     * @dataProvider provider_interfaces
-     */
-    public function test_interface($class) {
-        $this->assertTrue(interface_exists($class));
-    }
-
-    /**
-     * A data provider to check the classes exist
-     * @return Array Our test data
-     * @since 4.0
-     */
-    public function provider_interfaces() {
-        return array(
-            array('GFPDF\Helper\Helper_Interface_Actions'),
-            array('GFPDF\Helper\Helper_Interface_Filters'),
-        );
-    }
-
-    /**
-     * Ensure all depreciated classes have appropriate fallbacks
-     * @group init
-     * @since 4.0
-     */
-    public function test_depreciated() {
-        $this->markTestIncomplete('This test has not been implimented yet');
     }
 }

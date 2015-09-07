@@ -374,6 +374,11 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 	}
 }
 
+class PDFGenerator extends GFPDF_Depreciated_Abstract { }
+class GFPDFE_DATA extends GFPDF_Depreciated_Abstract { }
+class GFPDF_InstallUpdater extends GFPDF_Depreciated_Abstract { }
+class GFPDF_Notices extends GFPDF_Depreciated_Abstract { }
+class PDF_Generator extends GFPDF_Depreciated_Abstract { }
 class GFPDF_Core_Model extends GFPDF_Depreciated_Abstract { }
 class GFPDF_Settings_Model extends GFPDF_Depreciated_Abstract { }
 class GFPDF_Settings extends GFPDF_Depreciated_Abstract { }
