@@ -151,4 +151,35 @@ class Test_Autoloader extends WP_UnitTestCase
             array( 'PDF_Generator' ),
         );
     }
+
+    /**
+     * Check our composer files are loaded correctly
+     * @since 4.0
+     * @dataProvider provider_composer_dependancies
+     */
+    public function test_composer_dependancies( $class ) {
+    	$this->assertTrue( class_exists( $class ) );
+    }
+
+    /**
+     * Test we have appropriate composer classes loaded
+     * @return array
+     * @since 4.0
+     */
+    public function provider_composer_dependancies() {
+        return array(
+            array( 'mPDF' ),
+            array( 'QueryPath' ),
+            array( 'Monolog\Logger' ),
+            array( 'Monolog\Processor\IntrospectionProcessor' ),
+            array( 'Monolog\Processor\MemoryPeakUsageProcessor' ),
+            array( 'Monolog\Handler\NullHandler' ),
+            array( 'Monolog\Formatter\LineFormatter' ),
+            array( 'Monolog\Handler\StreamHandler' ),
+            array( 'Monolog\Formatter\LogglyFormatter' ),
+            array( 'Monolog\Handler\LogglyHandler' ),
+            array( 'Monolog\Handler\BufferHandler' ),
+            array( 'Monolog\Processor\WebProcessor' ),
+        );
+    }
 }
