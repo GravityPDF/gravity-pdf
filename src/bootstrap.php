@@ -142,8 +142,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->notices = new Helper\Helper_Notices();
 		$this->notices->init();
 
-
-
 		/* Set up our options object - this is initialised on admin_init but other classes need to access its methods before this */
 		$this->options = new Helper\Helper_Options_Fields( $this->log, $this->form, $this->data, $this->misc, $this->notices );
 
@@ -215,7 +213,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->log->pushProcessor( new \Monolog\Processor\MemoryPeakUsageProcessor );
 
 		/* Prevent logging in CLI mode */
-		if ( substr(php_sapi_name(), 0, 3) === 'cli' ) {
+		if ( substr( php_sapi_name(), 0, 3 ) === 'cli' ) {
 			$this->log->pushHandler( new \Monolog\Handler\NullHandler( \Monolog\Logger::INFO ) ); /* throw logs away */
 			return;
 		}
@@ -234,7 +232,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @todo Change 'gravity-pdf' back to 'gravity-forms-pdf-extended' to match original plugin folder name
 	 */
 	private function setup_gravityforms_logging() {
-		
+
 		/* Check if Gravity Forms logging is enabled and push stream logging */
 		if ( class_exists( 'GFLogging' ) ) {
 
@@ -254,7 +252,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 				$formatter = new \Monolog\Formatter\LineFormatter( "%datetime% - %level_name% --> %message% %context% %extra%\n" );
 				$stream    = new \Monolog\Handler\StreamHandler( $log_file_name, $monolog_level );
 				$stream->setFormatter( $formatter );
-				
+
 				/* Add our log file stream */
 				$this->log->pushHandler( $stream );
 			}
@@ -269,20 +267,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	private function maybe_run_remote_logging() {
 
-		/* Determine if we should do any logger by sniffing the version number */
-		$run_remote_logging = false;
-		$dev_version        = array('alpha', 'beta', 'rc');
-		$plugin_version     = strtolower( PDF_EXTENDED_VERSION );
-
-		foreach( $dev_version as $v ) {
-			if( strpos( $plugin_version, $v ) !== false ) {
-				$run_remote_logging = true;
-				break;
-			}
-		}
-
 		/* Enable remote logging */
-		if( $run_remote_logging ) {
+		if ( $this->misc->is_development_version( PDF_EXTENDED_VERSION ) ) {
 			/* Setup Loggly logging with correct format for buffer logging */
 			$formatter = new \Monolog\Formatter\LogglyFormatter();
 			$loggly    = new \Monolog\Handler\LogglyHandler( '8ad317ed-213d-44c9-a2e8-f2eebd542c66/tag/gravitypdf', \Monolog\Logger::INFO );
@@ -599,7 +585,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$settingsAPI = new Model\Model_Form_Settings( $this->form, $this->log, $this->data, $this->options, $this->misc, $this->notices );
 		$settings    = $settingsAPI->get_pdf( $form_id, $pid );
 
-		if( is_wp_error( $settings ) ) {
+		if ( is_wp_error( $settings ) ) {
 
 			$this->log->addError( 'Invalid PDF Settings.', array(
 				'form_id'  => $form_id,
