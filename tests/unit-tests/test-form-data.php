@@ -2,14 +2,14 @@
 
 namespace GFPDF\Tests;
 
-use WP_UnitTestCase;
+use GFPDFEntryDetail;
 
 use GFFormsModel;
 use GFAPI;
 use GFCommon;
 use GFForms;
 
-use GFPDFEntryDetail;
+use WP_UnitTestCase;
 
 /**
  * Test our custom template $form_data array

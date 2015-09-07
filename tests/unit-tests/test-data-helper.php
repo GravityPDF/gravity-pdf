@@ -1,8 +1,11 @@
 <?php
 
 namespace GFPDF\Tests;
+
 use GFPDF\Helper\Helper_Data;
+
 use WP_UnitTestCase;
+
 use StdClass;
 
 /**

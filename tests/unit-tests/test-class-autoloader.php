@@ -1,6 +1,7 @@
 <?php
 
 namespace GFPDF\Tests;
+
 use WP_UnitTestCase;
 
 /**

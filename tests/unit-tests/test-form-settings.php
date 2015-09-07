@@ -6,11 +6,11 @@ use GFPDF\Controller\Controller_Form_Settings;
 use GFPDF\Model\Model_Form_Settings;
 use GFPDF\View\View_Form_Settings;
 
-use WP_UnitTestCase;
-
 use GFAPI;
 use GFForms;
 use GFCommon;
+
+use WP_UnitTestCase;
 
 use Exception;
 
@@ -166,97 +166,97 @@ class Test_Form_Settings extends WP_UnitTestCase
 	 */
 	public function test_maybe_save_pdf_settings() {
 
-        /* Don't run the submission process */
+		/* Don't run the submission process */
 		$this->assertSame( null, $this->controller->maybe_save_pdf_settings() );
 
-        /* Test running the submission process */
-        $_GET['id'] = 1;
-        $_GET['pid'] = '223421afjiaf2';
-        $_POST['gfpdf_save_pdf'] = true;
+		/* Test running the submission process */
+		$_GET['id'] = 1;
+		$_GET['pid'] = '223421afjiaf2';
+		$_POST['gfpdf_save_pdf'] = true;
 
-        try {
-            $this->controller->maybe_save_pdf_settings();
-        } catch( Exception $e ) {
-            /* Expected. Do Nothing */
-        }
+		try {
+			$this->controller->maybe_save_pdf_settings();
+		} catch ( Exception $e ) {
+			/* Expected. Do Nothing */
+		}
 
-        $this->assertEquals( 'You do not have permission to access this page', $e->getMessage() );
+		$this->assertEquals( 'You do not have permission to access this page', $e->getMessage() );
 	}
 
-    /**
-     * Test the process_list_view() method correctly renders the view
-     * or throws an error when the user doesn't have the correct capabilities
-     * @since 4.0
-     */
-    public function test_process_list_view() {
+	/**
+	 * Test the process_list_view() method correctly renders the view
+	 * or throws an error when the user doesn't have the correct capabilities
+	 * @since 4.0
+	 */
+	public function test_process_list_view() {
 
-        require_once( GFCommon::get_base_path() . '/form_settings.php' );
+		require_once( GFCommon::get_base_path() . '/form_settings.php' );
 
-        $form_id = $this->form_id;
+		$form_id = $this->form_id;
 
-        /* Test capability security */
-        try {
-            $this->model->process_list_view( $form_id );
-        } catch( Exception $e ) {
-            /* Expected. Do Nothing */
-        }
+		/* Test capability security */
+		try {
+			$this->model->process_list_view( $form_id );
+		} catch ( Exception $e ) {
+			/* Expected. Do Nothing */
+		}
 
-        $this->assertEquals( 'You do not have permission to access this page', $e->getMessage() );
+		$this->assertEquals( 'You do not have permission to access this page', $e->getMessage() );
 
-        /* Authorise the current user and check correct output */
-        $user_id = $this->factory->user->create();
-        $this->assertInternalType( 'integer', $user_id );
+		/* Authorise the current user and check correct output */
+		$user_id = $this->factory->user->create();
+		$this->assertInternalType( 'integer', $user_id );
 
-        $user = get_user_by( 'id', $user_id );
-        $user->remove_role( 'subscriber' );
-        $user->add_role( 'administrator' );
+		$user = get_user_by( 'id', $user_id );
+		$user->remove_role( 'subscriber' );
+		$user->add_role( 'administrator' );
 
-        wp_set_current_user( $user_id );
+		wp_set_current_user( $user_id );
 
-        ob_start();
-        $this->model->process_list_view( $form_id );
-        $html = ob_get_clean();
+		ob_start();
+		$this->model->process_list_view( $form_id );
+		$html = ob_get_clean();
 
-        $this->assertNotFalse( strpos( $html, '<form id="gfpdf_list_form" method="post">' ) );
-    }
+		$this->assertNotFalse( strpos( $html, '<form id="gfpdf_list_form" method="post">' ) );
+	}
 
-    /**
-     * Test the show_edit_view() method correctly renders the view
-     * or throws an error when the user doesn't have the correct capabilities
-     * @since 4.0
-     */
-    public function test_show_edit_view() {
+	/**
+	 * Test the show_edit_view() method correctly renders the view
+	 * or throws an error when the user doesn't have the correct capabilities
+	 * @since 4.0
+	 */
+	public function test_show_edit_view() {
 
-        require_once( GFCommon::get_base_path() . '/form_settings.php' );
+		require_once( GFCommon::get_base_path() . '/form_settings.php' );
 
-        $form_id = $this->form_id;
-        $pid     = '555ad84787d7e';
+		$form_id = $this->form_id;
+		$pid     = '555ad84787d7e';
 
-        /* Test capability security */
-        try {
-            $this->model->show_edit_view( $form_id, $pid );
-        } catch( Exception $e ) {
-            /* Expected. Do Nothing */
-        }
+		/* Test capability security */
+		try {
+			$this->model->show_edit_view( $form_id, $pid );
+		} catch ( Exception $e ) {
+			/* Expected. Do Nothing */
+		}
 
-        $this->assertEquals( 'You do not have permission to access this page', $e->getMessage() );
+		$this->assertEquals( 'You do not have permission to access this page', $e->getMessage() );
 
-        /* Authorise the current user and check correct output */
-        $user_id = $this->factory->user->create();
-        $this->assertInternalType( 'integer', $user_id );
+		/* Authorise the current user and check correct output */
+		$user_id = $this->factory->user->create();
+		$this->assertInternalType( 'integer', $user_id );
 
-        $user = get_user_by( 'id', $user_id );
-        $user->remove_role( 'subscriber' );
-        $user->add_role( 'administrator' );
+		$user = get_user_by( 'id', $user_id );
+		$user->remove_role( 'subscriber' );
+		$user->add_role( 'administrator' );
 
-        wp_set_current_user( $user_id );
+		wp_set_current_user( $user_id );
 
-        ob_start();
-        $this->model->show_edit_view( $form_id, $pid );
-        $html = ob_get_clean();
+		ob_start();
+		$this->model->show_edit_view( $form_id, $pid );
+		$html = ob_get_clean();
 
-        $this->assertNotFalse( strpos( $html, '<form method="post" id="gfpdf_pdf_form">' ) );
-    }
+		$this->assertNotFalse( strpos( $html, '<form method="post" id="gfpdf_pdf_form">' ) );
+	}
 
 	/**
 	 * Test we can get the form's PDF settings
@@ -534,54 +534,54 @@ class Test_Form_Settings extends WP_UnitTestCase
 		$this->assertFalse( strstr( $validatedFields['filename']['class'], 'gfield_error' ) );
 	}
 
-    /**
-     * Check our process submission permissions, sanitization and save / update functionality works correctly
-     * @since 4.0
-     */
-    public function test_process_submission() {
+	/**
+	 * Check our process submission permissions, sanitization and save / update functionality works correctly
+	 * @since 4.0
+	 */
+	public function test_process_submission() {
 
-        $form_id = $this->form_id;
-        $pid     = '555ad84787d7e';
+		$form_id = $this->form_id;
+		$pid     = '555ad84787d7e';
 
-        /* Test capability security */
-        try {
-            $this->model->process_submission( $form_id, $pid );
-        } catch( Exception $e ) {
-            /* Expected. Do Nothing */
-        }
+		/* Test capability security */
+		try {
+			$this->model->process_submission( $form_id, $pid );
+		} catch ( Exception $e ) {
+			/* Expected. Do Nothing */
+		}
 
-        $this->assertEquals( 'You do not have permission to access this page', $e->getMessage() );
+		$this->assertEquals( 'You do not have permission to access this page', $e->getMessage() );
 
-        /* Authorise the current user and check correct output */
-        $user_id = $this->factory->user->create();
-        $this->assertInternalType( 'integer', $user_id );
+		/* Authorise the current user and check correct output */
+		$user_id = $this->factory->user->create();
+		$this->assertInternalType( 'integer', $user_id );
 
-        $user = get_user_by( 'id', $user_id );
-        $user->remove_role( 'subscriber' );
-        $user->add_role( 'administrator' );
+		$user = get_user_by( 'id', $user_id );
+		$user->remove_role( 'subscriber' );
+		$user->add_role( 'administrator' );
 
-        wp_set_current_user( $user_id );
+		wp_set_current_user( $user_id );
 
-        /* Fail the nonce */
-        $this->assertFalse( $this->model->process_submission( $form_id, $pid ) );
+		/* Fail the nonce */
+		$this->assertFalse( $this->model->process_submission( $form_id, $pid ) );
 
-        /* Setup valid nonce */
-        $_POST['gfpdf_save_pdf'] = wp_create_nonce( 'gfpdf_save_pdf' );
+		/* Setup valid nonce */
+		$_POST['gfpdf_save_pdf'] = wp_create_nonce( 'gfpdf_save_pdf' );
 
-        /* Create semi-valid post data */
-        $_POST['gfpdf_settings']['name'] = 'My New Name';
+		/* Create semi-valid post data */
+		$_POST['gfpdf_settings']['name'] = 'My New Name';
 
-        /* Fail sanitization */
-        $this->assertFalse( $this->model->process_submission( $form_id, $pid ) );
+		/* Fail sanitization */
+		$this->assertFalse( $this->model->process_submission( $form_id, $pid ) );
 
-        $pdf = $this->model->get_pdf( $form_id, $pid );
-        $this->assertEquals( 'sanitizing', $pdf['status'] );
+		$pdf = $this->model->get_pdf( $form_id, $pid );
+		$this->assertEquals( 'sanitizing', $pdf['status'] );
 
-        /* Pass sanitizing */
-        $_POST['gfpdf_settings']['filename'] = 'My Filename';
+		/* Pass sanitizing */
+		$_POST['gfpdf_settings']['filename'] = 'My Filename';
 
-        $this->assertTrue( $this->model->process_submission( $form_id, $pid ) );
-    }
+		$this->assertTrue( $this->model->process_submission( $form_id, $pid ) );
+	}
 
 	/**
 	 * Test our sanitize filters are correctly firing for each section type
@@ -690,145 +690,145 @@ class Test_Form_Settings extends WP_UnitTestCase
 		);
 	}
 
-    /**
-     * Check if we are registering our custom template appearance settings
-     * @since 4.0
-     */
-    public function test_register_custom_appearance_settings() {
-        $form_id = $_GET['id'] = $this->form_id;
-        $pid     = $_GET['pid'] = '555ad84787d7e';
+	/**
+	 * Check if we are registering our custom template appearance settings
+	 * @since 4.0
+	 */
+	public function test_register_custom_appearance_settings() {
+		$form_id = $_GET['id'] = $this->form_id;
+		$pid     = $_GET['pid'] = '555ad84787d7e';
 
-        /* Setup a valid template */
-        $pdf = $this->model->get_pdf( $form_id, $pid );
-        $pdf['template'] = 'core-simple';
-        $this->model->update_pdf( $form_id, $pid, $pdf );
+		/* Setup a valid template */
+		$pdf = $this->model->get_pdf( $form_id, $pid );
+		$pdf['template'] = 'core-simple';
+		$this->model->update_pdf( $form_id, $pid, $pdf );
 
-        $results = $this->model->register_custom_appearance_settings( array() );
+		$results = $this->model->register_custom_appearance_settings( array() );
 
-        $this->assertSame( 12, sizeof( $results ) );
-    }
+		$this->assertSame( 12, sizeof( $results ) );
+	}
 
-    /**
-     * Check our template image is correctly loaded
-     * @since 4.0
-     */
-    public function test_add_template_image() {
-        $settings = array(
-            'template' => array(
-                'value' => '',
-                'desc' => ''
-            )
-        );
-        
-        $results = $this->model->add_template_image( $settings );
+	/**
+	 * Check our template image is correctly loaded
+	 * @since 4.0
+	 */
+	public function test_add_template_image() {
+		$settings = array(
+			'template' => array(
+				'value' => '',
+				'desc' => '',
+			),
+		);
 
-        /* Test for lack of an image */
-        $this->assertFalse( strpos( $results['template']['desc'], '<img' ) );
+		$results = $this->model->add_template_image( $settings );
 
-        /* Test for image existance */
-        $settings['template']['value'] = 'core-simple';
-        $results = $this->model->add_template_image( $settings );
+		/* Test for lack of an image */
+		$this->assertFalse( strpos( $results['template']['desc'], '<img' ) );
 
-        $this->assertNotFalse( strpos( $results['template']['desc'], '<img' ) );
-        
-        /* Test skipping results */
-        $results = $this->model->add_template_image( array() );
+		/* Test for image existance */
+		$settings['template']['value'] = 'core-simple';
+		$results = $this->model->add_template_image( $settings );
 
-        $this->assertEmpty( $results );
-    }
+		$this->assertNotFalse( strpos( $results['template']['desc'], '<img' ) );
 
-    /**
-     * Check if we are registering our custom template appearance settings correctly
-     * @since 4.0
-     */
-    public function test_setup_custom_appearance_settings() {
+		/* Test skipping results */
+		$results = $this->model->add_template_image( array() );
 
-        $class = $this->model->get_template_configuration( 'core-simple' );
-        $settings = $this->model->setup_custom_appearance_settings( $class, array() );
+		$this->assertEmpty( $results );
+	}
 
-        $this->assertEquals( 12, sizeof( $settings ) );
-        $this->assertArrayHasKey( 'border_colour', $settings );
-    }
+	/**
+	 * Check if we are registering our custom template appearance settings correctly
+	 * @since 4.0
+	 */
+	public function test_setup_custom_appearance_settings() {
 
-    /**
-     * Check if we are registering our core custom template appearance settings correctly
-     * @since 4.0
-     */
-    public function test_setup_core_custom_appearance_settings() {
+		$class = $this->model->get_template_configuration( 'core-simple' );
+		$settings = $this->model->setup_custom_appearance_settings( $class, array() );
 
-        $class = $this->model->get_template_configuration( 'core-simple' );
-        $settings = $this->model->setup_core_custom_appearance_settings( array(), $class, $class->configuration() );
+		$this->assertEquals( 12, sizeof( $settings ) );
+		$this->assertArrayHasKey( 'border_colour', $settings );
+	}
 
-        $this->assertEquals( 11, sizeof( $settings ) );
+	/**
+	 * Check if we are registering our core custom template appearance settings correctly
+	 * @since 4.0
+	 */
+	public function test_setup_core_custom_appearance_settings() {
 
-        $core_fields = array( 'show_form_title', 'show_page_names', 'show_html', 'show_section_content', 'show_hidden', 'show_empty', 'header', 'first_header', 'footer', 'first_footer', 'background' );
+		$class = $this->model->get_template_configuration( 'core-simple' );
+		$settings = $this->model->setup_core_custom_appearance_settings( array(), $class, $class->configuration() );
 
-        foreach( $core_fields as $key ) {
-            $this->assertTrue( isset( $settings[ $key ] ) );
-        }
-    }
+		$this->assertEquals( 11, sizeof( $settings ) );
 
-    /**
-     * Check if we are registering our core custom template appearance settings correctly
-     * @since 4.0
-     */
-    public function test_get_template_configuration() {
+		$core_fields = array( 'show_form_title', 'show_page_names', 'show_html', 'show_section_content', 'show_hidden', 'show_empty', 'header', 'first_header', 'footer', 'first_footer', 'background' );
 
-        /* Test failure first */
-        $this->assertFalse( $this->model->get_template_configuration( 'test' ) );
+		foreach ( $core_fields as $key ) {
+			$this->assertTrue( isset( $settings[ $key ] ) );
+		}
+	}
 
-        /* Test default template */
-        $this->assertEquals( 'GFPDF\Templates\Config\core_simple', get_class( $this->model->get_template_configuration( 'core-simple' ) ) );
+	/**
+	 * Check if we are registering our core custom template appearance settings correctly
+	 * @since 4.0
+	 */
+	public function test_get_template_configuration() {
 
-        /* Test legacy templates */
-        $this->assertEquals( 'GFPDF\Templates\Config\legacy', get_class( $this->model->get_template_configuration( 'default-template' ) ) );
-    }
+		/* Test failure first */
+		$this->assertFalse( $this->model->get_template_configuration( 'test' ) );
 
-    /**
-     * Check we are decoding the json data successfully
-     * @since 4.0
-     */
-    public function test_decode_json() {
+		/* Test default template */
+		$this->assertEquals( 'GFPDF\Templates\Config\core_simple', get_class( $this->model->get_template_configuration( 'core-simple' ) ) );
 
-        $json = '{"conditionalLogic":["Item 1","Item 2"]}';
+		/* Test legacy templates */
+		$this->assertEquals( 'GFPDF\Templates\Config\legacy', get_class( $this->model->get_template_configuration( 'default-template' ) ) );
+	}
 
-        /* Test decode result */
-        $data = $this->model->decode_json( $json, 'conditionalLogic' );
+	/**
+	 * Check we are decoding the json data successfully
+	 * @since 4.0
+	 */
+	public function test_decode_json() {
 
-        $this->assertArrayHasKey( 'conditionalLogic', $data );
-        $this->assertSame( 2, sizeof( $data['conditionalLogic'] ) );
+		$json = '{"conditionalLogic":["Item 1","Item 2"]}';
 
-        /* Test pass result */
-        $this->assertEquals( $json, $this->model->decode_json( $json, 'other' ) );
-    }
+		/* Test decode result */
+		$data = $this->model->decode_json( $json, 'conditionalLogic' );
 
-    /**
-     * Check we can successfully update the notification field data
-     * @since 4.0
-     */
-    public function test_register_notifications() {
-        global $wp_settings_fields, $gfpdf;
+		$this->assertArrayHasKey( 'conditionalLogic', $data );
+		$this->assertSame( 2, sizeof( $data['conditionalLogic'] ) );
 
-        $gfpdf->options->register_settings( $gfpdf->options->get_registered_fields() );
+		/* Test pass result */
+		$this->assertEquals( $json, $this->model->decode_json( $json, 'other' ) );
+	}
 
-        $group     = 'gfpdf_settings_form_settings';
-        $setting   = 'gfpdf_settings[notification]';
-        $option_id = 'options';
+	/**
+	 * Check we can successfully update the notification field data
+	 * @since 4.0
+	 */
+	public function test_register_notifications() {
+		global $wp_settings_fields, $gfpdf;
 
-        /* Run false test */
-        $this->assertSame( 0, sizeof($wp_settings_fields[ $group ][ $group ][ $setting ]['args'][ $option_id ]) );
+		$gfpdf->options->register_settings( $gfpdf->options->get_registered_fields() );
 
-        /* Setup notification data */
-        $notifications = array(
-            array( 'id' => 'id1', 'name' => 'Notification  1' ),
-            array( 'id' => 'id2', 'name' => 'Notification  2' ),
-            array( 'id' => 'id3', 'name' => 'Notification  3' ),
-        );
+		$group     = 'gfpdf_settings_form_settings';
+		$setting   = 'gfpdf_settings[notification]';
+		$option_id = 'options';
 
-        /* Run valid test */
-        $this->model->register_notifications( $notifications );
+		/* Run false test */
+		$this->assertSame( 0, sizeof( $wp_settings_fields[ $group ][ $group ][ $setting ]['args'][ $option_id ] ) );
 
-        $this->assertSame( 3, sizeof( $wp_settings_fields[ $group ][ $group ][ $setting ]['args'][ $option_id ] ) );
+		/* Setup notification data */
+		$notifications = array(
+			array( 'id' => 'id1', 'name' => 'Notification  1' ),
+			array( 'id' => 'id2', 'name' => 'Notification  2' ),
+			array( 'id' => 'id3', 'name' => 'Notification  3' ),
+		);
 
-    }
+		/* Run valid test */
+		$this->model->register_notifications( $notifications );
+
+		$this->assertSame( 3, sizeof( $wp_settings_fields[ $group ][ $group ][ $setting ]['args'][ $option_id ] ) );
+
+	}
 }

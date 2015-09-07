@@ -1,9 +1,11 @@
 <?php
 
 namespace GFPDF\Tests;
+
 use GFPDF\Controller\Controller_Welcome_Screen;
 use GFPDF\Model\Model_Welcome_Screen;
 use GFPDF\View\View_Welcome_Screen;
+
 use WP_UnitTestCase;
 
 /**
@@ -38,57 +40,57 @@ use WP_UnitTestCase;
 /**
  * Test the model / view / controller for the Welcome Screen
  * @since 4.0
+ * @group welcome
  */
 class Test_Welcome_Screen extends WP_UnitTestCase
 {
 
-    /**
-     * Our Welcome Screen Controller
-     * @var Object
-     * @since 4.0
-     */
-    public $controller;
+	/**
+	 * Our Welcome Screen Controller
+	 * @var Object
+	 * @since 4.0
+	 */
+	public $controller;
 
-    /**
-     * Our Welcome Screen Model
-     * @var Object
-     * @since 4.0
-     */
-    public $model;
+	/**
+	 * Our Welcome Screen Model
+	 * @var Object
+	 * @since 4.0
+	 */
+	public $model;
 
-    /**
-     * Our Welcome Screen View
-     * @var Object
-     * @since 4.0
-     */
-    public $view;
+	/**
+	 * Our Welcome Screen View
+	 * @var Object
+	 * @since 4.0
+	 */
+	public $view;
 
-    /**
-     * The WP Unit Test Set up function
-     * @since 4.0
-     */
-    public function setUp() {
+	/**
+	 * The WP Unit Test Set up function
+	 * @since 4.0
+	 */
+	public function setUp() {
 
-        /* run parent method */
-        parent::setUp();
+		/* run parent method */
+		parent::setUp();
 
-        /* Setup our test classes */
-        $this->model = new Model_Welcome_Screen();
-        $this->view  = new View_Welcome_Screen(array(
-            'display_version' => PDF_EXTENDED_VERSION
-        ));
+		/* Setup our test classes */
+		$this->model = new Model_Welcome_Screen();
+		$this->view  = new View_Welcome_Screen(array(
+			'display_version' => PDF_EXTENDED_VERSION,
+		) );
 
-        $this->controller = new Controller_Welcome_Screen($this->model, $this->view);
-        $this->controller->init();
-    }
+		$this->controller = new Controller_Welcome_Screen( $this->model, $this->view );
+		$this->controller->init();
+	}
 
-    /**
-     * Test the appropriate actions are set up
-     * @since 4.0
-     * @group welcome
-     */
-    public function test_actions() {
-        $this->assertEquals(10, has_action( 'admin_menu', array( $this->model, 'admin_menus')));
-        $this->assertEquals(10, has_action( 'admin_init', array( $this->controller, 'welcome')));
-    }
+	/**
+	 * Test the appropriate actions are set up
+	 * @since 4.0
+	 */
+	public function test_actions() {
+		$this->assertEquals( 10, has_action( 'admin_menu', array( $this->model, 'admin_menus' ) ) );
+		$this->assertEquals( 10, has_action( 'admin_init', array( $this->controller, 'welcome' ) ) );
+	}
 }

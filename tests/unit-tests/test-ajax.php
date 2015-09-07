@@ -1,12 +1,15 @@
 <?php
 
 namespace GFPDF\Tests;
+
 use GFPDF\Model\Model_Form_Settings;
+
+use GFAPI;
+use GFForms;
+
 use WP_Ajax_UnitTestCase;
 use WPAjaxDieStopException;
 use WPAjaxDieContinueException;
-use GFAPI;
-use GFForms;
 
 
 

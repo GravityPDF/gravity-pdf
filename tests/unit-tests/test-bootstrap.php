@@ -1,7 +1,9 @@
 <?php
 
 namespace GFPDF\Tests;
+
 use GFPDF\Router;
+
 use WP_UnitTestCase;
 
 /**

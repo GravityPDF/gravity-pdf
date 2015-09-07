@@ -1,7 +1,9 @@
 <?php
 
 namespace GFPDF\Tests;
+
 use WP_UnitTestCase;
+
 use ReflectionClass;
 
 /**
@@ -36,28 +38,27 @@ use ReflectionClass;
 /**
  * Test all helper Interfaces are standardised
  * @since 4.0
+ * @group interfaces
  */
 class Test_Interfaces extends WP_UnitTestCase
 {
-    /**
-     * Ensure our actions interface
-     * @group interfaces
-     * @since 4.0
-     */
-    public function test_actions_interface() {
-        $actions = new ReflectionClass('GFPDF\Helper\Helper_Interface_Actions');
-        $methods = $actions->getMethods();
-        $this->assertEquals('add_actions', $methods[0]->name);
-    }
+	/**
+	 * Ensure our actions interface
+	 * @since 4.0
+	 */
+	public function test_actions_interface() {
+		$actions = new ReflectionClass( 'GFPDF\Helper\Helper_Interface_Actions' );
+		$methods = $actions->getMethods();
+		$this->assertEquals( 'add_actions', $methods[0]->name );
+	}
 
-    /**
-     * Ensure our filter interface
-     * @group interfaces
-     * @since 4.0
-     */
-    public function test_filters_interface() {
-        $actions = new ReflectionClass('GFPDF\Helper\Helper_Interface_Filters');
-        $methods = $actions->getMethods();
-        $this->assertEquals('add_filters', $methods[0]->name);
-    }
+	/**
+	 * Ensure our filter interface
+	 * @since 4.0
+	 */
+	public function test_filters_interface() {
+		$actions = new ReflectionClass( 'GFPDF\Helper\Helper_Interface_Filters' );
+		$methods = $actions->getMethods();
+		$this->assertEquals( 'add_filters', $methods[0]->name );
+	}
 }

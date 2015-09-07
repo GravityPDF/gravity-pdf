@@ -56,6 +56,7 @@ use ReflectionMethod;
 /**
  * Test the model / view / controller for the PDF Endpoint functionality
  * @since 4.0
+ * @group pdf
  */
 class Test_PDF extends WP_UnitTestCase
 {
@@ -142,7 +143,6 @@ class Test_PDF extends WP_UnitTestCase
 	/**
 	 * Check if all the correct actions are applied
 	 * @since 4.0
-	 * @group pdf
 	 */
 	public function test_actions() {
 		$this->assertSame( 10, has_action( 'parse_request', array( $this->controller, 'process_legacy_pdf_endpoint' ) ) );
@@ -157,7 +157,6 @@ class Test_PDF extends WP_UnitTestCase
 	/**
 	 * Check if all the correct filters are applied
 	 * @since 4.0
-	 * @group pdf
 	 */
 	public function test_filters() {
 		global $gfpdf;
@@ -183,136 +182,131 @@ class Test_PDF extends WP_UnitTestCase
 		$this->assertSame( 1, has_filter( 'gfpdfe_pre_load_template', array( 'PDFRender', 'prepare_ids' ) ) );
 	}
 
-    /**
-     * Ensure we're cleaning up the tmp directory and set intervals
-     * @since 4.0
-     * @group pdf
-     */
-    public function test_scheduled_tmp_cleanup() {
-        $this->assertNotFalse( wp_next_scheduled( 'gfpdf_cleanup_tmp_dir' ) );
-    }
+	/**
+	 * Ensure we're cleaning up the tmp directory and set intervals
+	 * @since 4.0
+	 */
+	public function test_scheduled_tmp_cleanup() {
+		$this->assertNotFalse( wp_next_scheduled( 'gfpdf_cleanup_tmp_dir' ) );
+	}
 
-    /**
-     * Ensure our PDF endpoint listener is working correctly
-     * @since 4.0
-     * @group pdf
-     */
-    public function test_process_pdf_endpoint() {
+	/**
+	 * Ensure our PDF endpoint listener is working correctly
+	 * @since 4.0
+	 */
+	public function test_process_pdf_endpoint() {
 
-        /* Force a failure */
-        $this->assertFalse( $this->controller->process_pdf_endpoint() );
+		/* Force a failure */
+		$this->assertFalse( $this->controller->process_pdf_endpoint() );
 
-        /* Test our endpoint is firing correctly */
-        $GLOBALS['wp']->query_vars['gf_pdf'] = 1;
-        $GLOBALS['wp']->query_vars['pid']    = 1;
-        $GLOBALS['wp']->query_vars['lid']    = 500;
-        
-        try {
-            $results = $this->controller->process_pdf_endpoint();
-        } catch ( Exception $e ) {
-            $this->assertEquals( 'There was a problem generating your PDF', $e->getMessage() );
-            return;
-        }
+		/* Test our endpoint is firing correctly */
+		$GLOBALS['wp']->query_vars['gf_pdf'] = 1;
+		$GLOBALS['wp']->query_vars['pid']    = 1;
+		$GLOBALS['wp']->query_vars['lid']    = 500;
 
-        $this->fail( 'This test did not fail as expected' );
-    }
+		try {
+			$results = $this->controller->process_pdf_endpoint();
+		} catch ( Exception $e ) {
+			$this->assertEquals( 'There was a problem generating your PDF', $e->getMessage() );
+			return;
+		}
 
-    /**
-     * Ensure our legacy PDF endpoint listener is working correctly
-     * @since 4.0
-     * @group pdf
-     */
-    public function test_process_legacy_pdf_endpoint() {
+		$this->fail( 'This test did not fail as expected' );
+	}
 
-        /* Force a failure */
-        $this->assertFalse( $this->controller->process_legacy_pdf_endpoint() );
+	/**
+	 * Ensure our legacy PDF endpoint listener is working correctly
+	 * @since 4.0
+	 */
+	public function test_process_legacy_pdf_endpoint() {
 
-        /* Test our endpoint is firing correctly */
-        $_GET['gf_pdf']   = 1;
-        $_GET['fid']      = -1;
-        $_GET['lid']      = -1;
-        $_GET['template'] = 'test';
+		/* Force a failure */
+		$this->assertFalse( $this->controller->process_legacy_pdf_endpoint() );
 
-        try {
-            $results = $this->controller->process_legacy_pdf_endpoint();
-        } catch ( Exception $e ) {
-            $this->assertEquals( 'There was a problem generating your PDF', $e->getMessage() );
-            return;
-        }
+		/* Test our endpoint is firing correctly */
+		$_GET['gf_pdf']   = 1;
+		$_GET['fid']      = -1;
+		$_GET['lid']      = -1;
+		$_GET['template'] = 'test';
 
-        $this->fail( 'This test did not fail as expected' );
-    }
+		try {
+			$results = $this->controller->process_legacy_pdf_endpoint();
+		} catch ( Exception $e ) {
+			$this->assertEquals( 'There was a problem generating your PDF', $e->getMessage() );
+			return;
+		}
 
-    /**
-     * Ensure the correct error message is shown to the user
-     * @since 4.0
-     * @group pdf
-     */
-    public function test_pdf_error() {
+		$this->fail( 'This test did not fail as expected' );
+	}
 
-        /* pdf_error is private but we do want to verify the different errors are showing to the correct audience without having to go through the public API */
-        $method = new ReflectionMethod(
-            '\GFPDF\Controller\Controller_PDF', 'pdf_error'
-        );
+	/**
+	 * Ensure the correct error message is shown to the user
+	 * @since 4.0
+	 */
+	public function test_pdf_error() {
 
-        $method->setAccessible(true);
+		/* pdf_error is private but we do want to verify the different errors are showing to the correct audience without having to go through the public API */
+		$method = new ReflectionMethod(
+			'\GFPDF\Controller\Controller_PDF', 'pdf_error'
+		);
 
-        /* Ensure our public errors are shown */
+		$method->setAccessible( true );
 
-        try {
-            $error = new WP_Error( 'timeout_expired', 'Expired' );
-            $method->invoke( $this->controller, $error );
-        } catch( Exception $e ) {
-            /* Do nothing here */
-        }
+		/* Ensure our public errors are shown */
 
-        $this->assertEquals( 'Expired', $e->getMessage() );
+		try {
+			$error = new WP_Error( 'timeout_expired', 'Expired' );
+			$method->invoke( $this->controller, $error );
+		} catch ( Exception $e ) {
+			/* Do nothing here */
+		}
 
-        try {
-            $error = new WP_Error( 'access_denied', 'Denied' );
-            $method->invoke( $this->controller, $error );
-        } catch( Exception $e ) {
-            /* Do nothing here */
-        }
+		$this->assertEquals( 'Expired', $e->getMessage() );
 
-        $this->assertEquals( 'Denied', $e->getMessage() );
+		try {
+			$error = new WP_Error( 'access_denied', 'Denied' );
+			$method->invoke( $this->controller, $error );
+		} catch ( Exception $e ) {
+			/* Do nothing here */
+		}
 
-        /* Ensure our private errors aren't shown to unauthorised users */
-        try {
-            $error = new WP_Error( 'other_problem', 'Other' );
-            $method->invoke( $this->controller, $error );
-        } catch( Exception $e ) {
-            /* Do nothing here */
-        }
+		$this->assertEquals( 'Denied', $e->getMessage() );
 
-        $this->assertEquals( 'There was a problem generating your PDF', $e->getMessage() );
+		/* Ensure our private errors aren't shown to unauthorised users */
+		try {
+			$error = new WP_Error( 'other_problem', 'Other' );
+			$method->invoke( $this->controller, $error );
+		} catch ( Exception $e ) {
+			/* Do nothing here */
+		}
 
-        /* Authorise the current user and check the message is displayed correctly */
-        $user_id = $this->factory->user->create();
-        $this->assertInternalType( 'integer', $user_id );
+		$this->assertEquals( 'There was a problem generating your PDF', $e->getMessage() );
 
-        $user = get_user_by( 'id', $user_id );
-        $user->remove_role( 'subscriber' );
-        $user->add_role( 'administrator' );
+		/* Authorise the current user and check the message is displayed correctly */
+		$user_id = $this->factory->user->create();
+		$this->assertInternalType( 'integer', $user_id );
 
-        wp_set_current_user( $user_id );
+		$user = get_user_by( 'id', $user_id );
+		$user->remove_role( 'subscriber' );
+		$user->add_role( 'administrator' );
 
-        try {
-            $error = new WP_Error( 'other_problem', 'Other' );
-            $method->invoke( $this->controller, $error );
-        } catch( Exception $e ) {
-            /* Do nothing here */
-        }
+		wp_set_current_user( $user_id );
 
-        $this->assertEquals( 'Other', $e->getMessage() );
-        
-    }
+		try {
+			$error = new WP_Error( 'other_problem', 'Other' );
+			$method->invoke( $this->controller, $error );
+		} catch ( Exception $e ) {
+			/* Do nothing here */
+		}
+
+		$this->assertEquals( 'Other', $e->getMessage() );
+
+	}
 
 	/**
 	 * Test our PDF generator function works as expected
 	 * This function prepares all the details for generating a PDF and is our authentication layer
 	 * @since 4.0
-	 * @group pdf
 	 */
 	public function test_process_pdf() {
 
@@ -349,7 +343,6 @@ class Test_PDF extends WP_UnitTestCase
 	/**
 	 * Test if our active PDF middleware works correctly
 	 * @since 4.0
-	 * @group pdf
 	 */
 	public function test_middle_active() {
 
@@ -365,7 +358,6 @@ class Test_PDF extends WP_UnitTestCase
 	/**
 	 * Test if our conditional logic middleware works correctly
 	 * @since 4.0
-	 * @group pdf
 	 */
 	public function test_middle_conditional() {
 
@@ -398,7 +390,6 @@ class Test_PDF extends WP_UnitTestCase
 	/**
 	 * Check if correct GF entry owner is determined
 	 * @since 4.0
-	 * @group pdf
 	 */
 	public function test_is_current_pdf_owner() {
 		/* set up a user to test its privilages */
@@ -438,7 +429,6 @@ class Test_PDF extends WP_UnitTestCase
 	/**
 	 * Check if our logged out restrictions are being applied correctly
 	 * @since 4.0
-	 * @group pdf
 	 */
 	public function test_middle_logged_out_restrictions() {
 		global $gfpdf;
@@ -470,7 +460,6 @@ class Test_PDF extends WP_UnitTestCase
 	/**
 	 * Check if our logged out timeout restrictions are being applied correctly
 	 * @since 4.0
-	 * @group pdf
 	 */
 	public function test_middle_logged_out_timeout() {
 		global $gfpdf;
@@ -515,7 +504,6 @@ class Test_PDF extends WP_UnitTestCase
 	/**
 	 * Check if our logged out user has access to our PDF
 	 * @since 4.0
-	 * @group pdf
 	 */
 	public function test_middle_auth_logged_out_user() {
 
@@ -550,7 +538,6 @@ class Test_PDF extends WP_UnitTestCase
 	/**
 	 * Check if our logged in user has access to our PDF
 	 * @since 4.0
-	 * @group pdf
 	 */
 	public function test_middle_user_capability() {
 		global $current_user;
@@ -596,7 +583,6 @@ class Test_PDF extends WP_UnitTestCase
 	/**
 	 * Check that an array of PDFs gets correctly returned in the right format
 	 * @since 4.0
-	 * @group pdf
 	 */
 	public function test_get_pdf_display_list() {
 
@@ -604,7 +590,7 @@ class Test_PDF extends WP_UnitTestCase
 		$results = $this->create_form_and_entries();
 		$form    = $results['form'];
 		$entry   = $results['entry'];
-		
+
 		$pdfs = $this->model->get_pdf_display_list( $entry );
 
 		$this->assertArrayHasKey( 'name', $pdfs[0] );
@@ -618,7 +604,6 @@ class Test_PDF extends WP_UnitTestCase
 	 * Check that our PDF name gets processed correctly
 	 * We'll unit test in more detail do_mergetags and strip_invalid_characters separetly so just a quick run through here
 	 * @since 4.0
-	 * @group pdf
 	 */
 	public function test_get_pdf_name() {
 
@@ -657,8 +642,9 @@ class Test_PDF extends WP_UnitTestCase
 
 	/**
 	 * Check that the returned PDF URL is correct
+	 *
 	 * @since 4.0
-	 * @group pdf
+	 *
 	 * @dataProvider provider_get_pdf_url
 	 */
 	public function test_get_pdf_url( $pid, $id, $expected ) {
@@ -681,8 +667,9 @@ class Test_PDF extends WP_UnitTestCase
 
 	/**
 	 * Check if we are determining active PDFs correctly
+	 *
 	 * @since 4.0
-	 * @group pdf
+	 *
 	 * @dataProvider provider_get_active_pdfs
 	 */
 	public function test_get_active_pdfs( $expected, $pdf ) {
@@ -758,28 +745,27 @@ class Test_PDF extends WP_UnitTestCase
 		);
 	}
 
-    /**
-     * Check if the PDF is rendered and saved on disk correctly
-     * @since 4.0
-     * @group pdf
-     */
+	/**
+	 * Check if the PDF is rendered and saved on disk correctly
+	 * @since 4.0
+	 */
 	public function test_process_and_save_pdf() {
 		$this->markTestIncomplete( 'This test has not been implimented yet' );
 	}
 
-    /**
-     * Check if the correct PDFs are attached to Gravity Forms notifications
-     * @since 4.0
-     * @group pdf
-     */
+	/**
+	 * Check if the correct PDFs are attached to Gravity Forms notifications
+	 * @since 4.0
+	 */
 	public function test_notifications() {
 		$this->markTestIncomplete( 'This test has not been implimented yet' );
 	}
 
 	/**
 	 * Check if we should attach a PDF to the current notification
+	 *
 	 * @since 4.0
-	 * @group pdf
+	 *
 	 * @dataProvider provider_maybe_attach_to_notification
 	 */
 	public function test_maybe_attach_to_notification( $expectation, $notification, $settings ) {
@@ -815,7 +801,6 @@ class Test_PDF extends WP_UnitTestCase
 	/**
 	 * Check if we should be always saving the PDF based on the settings
 	 * @since 4.0
-	 * @group pdf
 	 */
 	public function test_maybe_always_save_pdf() {
 
@@ -826,11 +811,10 @@ class Test_PDF extends WP_UnitTestCase
 		$this->assertSame( false, $this->model->maybe_always_save_pdf( $settings ) );
 	}
 
-    /**
-     * Check if the correct PDFs are saved on disk
-     * @since 4.0
-     * @group pdf
-     */
+	/**
+	 * Check if the correct PDFs are saved on disk
+	 * @since 4.0
+	 */
 	public function maybe_save_pdf() {
 		$this->markTestIncomplete( 'This test has not been implimented yet' );
 	}
@@ -838,7 +822,6 @@ class Test_PDF extends WP_UnitTestCase
 	/**
 	 * Check if our PDF exists on disk
 	 * @since 4.0
-	 * @group pdf
 	 */
 	public function test_does_pdf_exist() {
 		global $gfpdf;
@@ -859,7 +842,6 @@ class Test_PDF extends WP_UnitTestCase
 	/**
 	 * Check our tmp directory is being cleaned up correctly
 	 * @since 4.0
-	 * @group pdf
 	 */
 	public function test_cleanup_tmp_dir() {
 		global $gfpdf;
@@ -904,13 +886,12 @@ class Test_PDF extends WP_UnitTestCase
 	/**
 	 * Test our mPDF font override is working correctly
 	 * @since 4.0
-	 * @group pdf
 	 */
 	public function test_set_current_pdf_font() {
 		global $gfpdf;
 
 		/* Check our alternate font location is bypassed */
-        unlink( $gfpdf->data->template_font_location . 'font' );
+		unlink( $gfpdf->data->template_font_location . 'font' );
 		$this->assertEquals( ABSPATH . 'font', $this->model->set_current_pdf_font( ABSPATH . 'font', 'font' ) );
 
 		/* Create the file and ensure it isn't bypassed */
@@ -921,7 +902,6 @@ class Test_PDF extends WP_UnitTestCase
 	/**
 	 * Test our custom fonts are registering correctly
 	 * @since 4.0
-	 * @group pdf
 	 */
 	public function test_register_custom_font_data_with_mPDF() {
 		global $gfpdf;
@@ -968,7 +948,6 @@ class Test_PDF extends WP_UnitTestCase
 	/**
 	 * Test that our field exists
 	 * @since 4.0
-	 * @group pdf
 	 */
 	public function test_check_field_exists() {
 
@@ -983,7 +962,6 @@ class Test_PDF extends WP_UnitTestCase
 	/**
 	 * Check we are replacing the array key correctly
 	 * @since 4.0
-	 * @group pdf
 	 */
 	public function test_replace_key() {
 
@@ -1005,11 +983,10 @@ class Test_PDF extends WP_UnitTestCase
 
 	}
 
-    /**
-     * Check the correct field class is being called
-     * @since 4.0
-     * @group pdf
-     */
+	/**
+	 * Check the correct field class is being called
+	 * @since 4.0
+	 */
 	public function test_get_field_class() {
 		global $gfpdf;
 
@@ -1018,112 +995,110 @@ class Test_PDF extends WP_UnitTestCase
 		$form     = $results['form'];
 		$entry    = $results['entry'];
 		$products = new Field_Products( new GF_Field(), $entry, $gfpdf->form, $gfpdf->misc );
-        $namespace = 'GFPDF\Helper\Fields\\';
+		$namespace = 'GFPDF\Helper\Fields\\';
 
-        $expected = array(
-            1  => $namespace . 'Field_Text',
-            2  => $namespace . 'Field_Textarea',
-            3  => $namespace . 'Field_Select',
-            4  => $namespace . 'Field_Multiselect',
-            5  => $namespace . 'Field_Number',
-            6  => $namespace . 'Field_Checkbox',
-            7  => $namespace . 'Field_Radio',
-            8  => $namespace . 'Field_Hidden',
-            9  => $namespace . 'Field_Html',
-            10 => $namespace . 'Field_Section',
-            11 => $namespace . 'Field_Name',
-            12 => $namespace . 'Field_Date',
-            13 => $namespace . 'Field_Time',
-            14 => $namespace . 'Field_Phone',
-            15 => $namespace . 'Field_Address',
-            16 => $namespace . 'Field_Website',
-            17 => $namespace . 'Field_Email',
-            18 => $namespace . 'Field_Fileupload',
-            19 => $namespace . 'Field_Fileupload',
-            20 => $namespace . 'Field_List',
-            21 => $namespace . 'Field_List',
-            22 => $namespace . 'Field_Poll',
-            23 => $namespace . 'Field_Poll',
-            41 => $namespace . 'Field_Poll',
-            24 => $namespace . 'Field_Quiz',
-            42 => $namespace . 'Field_Quiz',
-            43 => $namespace . 'Field_Quiz',
-            25 => $namespace . 'Field_Signature',
-            26 => $namespace . 'Field_Survey',
-            27 => $namespace . 'Field_Survey',
-            44 => $namespace . 'Field_Survey',
-            45 => $namespace . 'Field_Survey',
-            46 => $namespace . 'Field_Survey',
-            47 => $namespace . 'Field_Survey',
-            48 => $namespace . 'Field_Survey',
-            49 => $namespace . 'Field_Survey',
-            50 => $namespace . 'Field_Survey',
-            28 => $namespace . 'Field_Post_Title',
-            29 => $namespace . 'Field_Post_Excerpt',
-            30 => $namespace . 'Field_Post_Tags',
-            31 => $namespace . 'Field_Post_Category',
-            32 => $namespace . 'Field_Post_Image',
-            33 => $namespace . 'Field_Post_Custom_Field',
-            34 => $namespace . 'Field_Product',
-            35 => $namespace . 'Field_Product',
-            51 => $namespace . 'Field_Product',
-            52 => $namespace . 'Field_Product',
-            53 => $namespace . 'Field_Product',
-            54 => $namespace . 'Field_Product',
-            36 => $namespace . 'Field_Product',
-            37 => $namespace . 'Field_Product',
-            38 => $namespace . 'Field_Product',
-            39 => $namespace . 'Field_Product',
-            40 => $namespace . 'Field_Product',
-        );
+		$expected = array(
+			1  => $namespace . 'Field_Text',
+			2  => $namespace . 'Field_Textarea',
+			3  => $namespace . 'Field_Select',
+			4  => $namespace . 'Field_Multiselect',
+			5  => $namespace . 'Field_Number',
+			6  => $namespace . 'Field_Checkbox',
+			7  => $namespace . 'Field_Radio',
+			8  => $namespace . 'Field_Hidden',
+			9  => $namespace . 'Field_Html',
+			10 => $namespace . 'Field_Section',
+			11 => $namespace . 'Field_Name',
+			12 => $namespace . 'Field_Date',
+			13 => $namespace . 'Field_Time',
+			14 => $namespace . 'Field_Phone',
+			15 => $namespace . 'Field_Address',
+			16 => $namespace . 'Field_Website',
+			17 => $namespace . 'Field_Email',
+			18 => $namespace . 'Field_Fileupload',
+			19 => $namespace . 'Field_Fileupload',
+			20 => $namespace . 'Field_List',
+			21 => $namespace . 'Field_List',
+			22 => $namespace . 'Field_Poll',
+			23 => $namespace . 'Field_Poll',
+			41 => $namespace . 'Field_Poll',
+			24 => $namespace . 'Field_Quiz',
+			42 => $namespace . 'Field_Quiz',
+			43 => $namespace . 'Field_Quiz',
+			25 => $namespace . 'Field_Signature',
+			26 => $namespace . 'Field_Survey',
+			27 => $namespace . 'Field_Survey',
+			44 => $namespace . 'Field_Survey',
+			45 => $namespace . 'Field_Survey',
+			46 => $namespace . 'Field_Survey',
+			47 => $namespace . 'Field_Survey',
+			48 => $namespace . 'Field_Survey',
+			49 => $namespace . 'Field_Survey',
+			50 => $namespace . 'Field_Survey',
+			28 => $namespace . 'Field_Post_Title',
+			29 => $namespace . 'Field_Post_Excerpt',
+			30 => $namespace . 'Field_Post_Tags',
+			31 => $namespace . 'Field_Post_Category',
+			32 => $namespace . 'Field_Post_Image',
+			33 => $namespace . 'Field_Post_Custom_Field',
+			34 => $namespace . 'Field_Product',
+			35 => $namespace . 'Field_Product',
+			51 => $namespace . 'Field_Product',
+			52 => $namespace . 'Field_Product',
+			53 => $namespace . 'Field_Product',
+			54 => $namespace . 'Field_Product',
+			36 => $namespace . 'Field_Product',
+			37 => $namespace . 'Field_Product',
+			38 => $namespace . 'Field_Product',
+			39 => $namespace . 'Field_Product',
+			40 => $namespace . 'Field_Product',
+		);
 
 		foreach ( $form['fields'] as $field ) {
 			$this->assertEquals( $expected[ $field->id ], get_class( $this->model->get_field_class( $field, $form, $entry, $products ) ) );
 		}
 
-        /* Check our fallback class */
-        $this->assertEquals( $namespace . 'Field_Default', get_class( $this->model->get_field_class( new GF_Field(), $form, $entry, $products ) ) );
+		/* Check our fallback class */
+		$this->assertEquals( $namespace . 'Field_Default', get_class( $this->model->get_field_class( new GF_Field(), $form, $entry, $products ) ) );
 
 	}
 
-    /**
-     * Check our legacy configuration is being loaded correctly
-     * @since 4.0
-     * @group pdf
-     */
+	/**
+	 * Check our legacy configuration is being loaded correctly
+	 * @since 4.0
+	 */
 	public function test_get_legacy_config() {
 
-        /* Setup some test data */
-        $results  = $this->create_form_and_entries();
-        $form     = $results['form'];
+		/* Setup some test data */
+		$results  = $this->create_form_and_entries();
+		$form     = $results['form'];
 
-        /* Test our aid legacy PDF selector is working */
-        $config = array(
-            'fid' => $form['id'],
-            'aid' => 2,
-            'template' => 'Gravity Forms Style',
-        );
+		/* Test our aid legacy PDF selector is working */
+		$config = array(
+			'fid' => $form['id'],
+			'aid' => 2,
+			'template' => 'Gravity Forms Style',
+		);
 
-        $pid = $this->model->get_legacy_config( $config );
-        $this->assertEquals( '556690c67856b', $pid );
+		$pid = $this->model->get_legacy_config( $config );
+		$this->assertEquals( '556690c67856b', $pid );
 
-        /* Test our fallback works */
-        unset( $config['aid'] );
+		/* Test our fallback works */
+		unset( $config['aid'] );
 
-        $pid = $this->model->get_legacy_config( $config );
-        $this->assertEquals( '555ad84787d7e', $pid );
+		$pid = $this->model->get_legacy_config( $config );
+		$this->assertEquals( '555ad84787d7e', $pid );
 	}
 
-    /**
-     * Test that we can successfully generate a PDF based on an entry and settings
-     * @since 4.0
-     * @group pdf
-     */
-    public function test_generate_pdf() {
-    	global $gfpdf;
+	/**
+	 * Test that we can successfully generate a PDF based on an entry and settings
+	 * @since 4.0
+	 */
+	public function test_generate_pdf() {
+		global $gfpdf;
 
-    	$pdf_settings = new Model_Form_Settings( $gfpdf->form, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
-        
+		$pdf_settings = new Model_Form_Settings( $gfpdf->form, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
+
 		/* Setup our form and entries */
 		$results = $this->create_form_and_entries();
 		$entry = $results['entry'];
@@ -1137,84 +1112,82 @@ class Test_PDF extends WP_UnitTestCase
 		$pdf['template'] = 'core-simple';
 
 		/* Add filters to force the PDF to throw and error */
-		add_filter( 'mpdf_output_destination', function() {
+		add_filter( 'mpdf_output_destination', function () {
 			return 'O';
 		});
 
 		try {
 			$this->view->generate_pdf( $entry, $pdf );
-		} catch( Exception $e )  {
+		} catch ( Exception $e ) {
 			/* Expected */
 		}
 
 		$this->assertEquals( 'There was a problem generating your PDF', $e->getMessage() );
-    }
+	}
 
-    /**
-     * Test that we can successfully get the template filename
-     * @since 4.0
-     * @group pdf
-     * @dataProvider provider_get_template_filename
-     */
-    public function test_get_template_filename( $expected, $template ) {
-    	$this->assertEquals( $expected, $this->view->get_template_filename( $template ) );
-    }
+	/**
+	 * Test that we can successfully get the template filename
+	 *
+	 * @since 4.0
+	 *
+	 * @dataProvider provider_get_template_filename
+	 */
+	public function test_get_template_filename( $expected, $template ) {
+		$this->assertEquals( $expected, $this->view->get_template_filename( $template ) );
+	}
 
-    /**
-     * Our data provider for getting View_PDF::get_template_filename()
-     * @return array
-     * @since 4.0
-     */
-    public function provider_get_template_filename() {
-    	return array(
-    		array('my-pdf-document.php', 'my-pdf-document'),
-    		array('hello-world.ph.php', 'hello-world.ph'),
-    		array('gravitypdf.php', 'gravitypdf.php'),
-    		array('assimilate.p.php', 'assimilate.p'),
-    		array('groundhog..php', 'groundhog.'),
-    	);
-    }
+	/**
+	 * Our data provider for getting View_PDF::get_template_filename()
+	 * @return array
+	 * @since 4.0
+	 */
+	public function provider_get_template_filename() {
+		return array(
+			array( 'my-pdf-document.php', 'my-pdf-document' ),
+			array( 'hello-world.ph.php', 'hello-world.ph' ),
+			array( 'gravitypdf.php', 'gravitypdf.php' ),
+			array( 'assimilate.p.php', 'assimilate.p' ),
+			array( 'groundhog..php', 'groundhog.' ),
+		);
+	}
 
-    /**
-     * Check that we're correctly process a valid HTML structure
-     * @since 4.0
-     * @group pdf
-     */
-    public function test_process_html_structure() {
+	/**
+	 * Check that we're correctly process a valid HTML structure
+	 * @since 4.0
+	 */
+	public function test_process_html_structure() {
 
-    	$results = $this->create_form_and_entries();
+		$results = $this->create_form_and_entries();
 		$entry = $results['entry'];
 
-        $html = $this->view->process_html_structure( $entry, $this->model, array( 'echo' => false ) );
+		$html = $this->view->process_html_structure( $entry, $this->model, array( 'echo' => false ) );
 
-        $this->assertNotFalse( strpos( $html, '<td class="grandtotal_amount totals">' ) );
-    }
+		$this->assertNotFalse( strpos( $html, '<td class="grandtotal_amount totals">' ) );
+	}
 
-    /**
-     * Check our main html structure generator works correctly
-     * @since 4.0
-     * @group pdf
-     */
-    public function test_generate_html_structure() {
-    	$results = $this->create_form_and_entries();
+	/**
+	 * Check our main html structure generator works correctly
+	 * @since 4.0
+	 */
+	public function test_generate_html_structure() {
+		$results = $this->create_form_and_entries();
 		$entry = $results['entry'];
 
 		ob_start();
-        $this->view->generate_html_structure( $entry, $this->model, array() );
-        $html = ob_get_clean();
+		$this->view->generate_html_structure( $entry, $this->model, array() );
+		$html = ob_get_clean();
 
-        $this->assertNotFalse( strpos( $html, '<td class="grandtotal_amount totals">' ) );
-    }
+		$this->assertNotFalse( strpos( $html, '<td class="grandtotal_amount totals">' ) );
+	}
 
-    /**
-     * Test a single field and check if the results are valid
-     * @since 4.0
-     * @group pdf
-     */
-    public function test_process_field() {
+	/**
+	 * Test a single field and check if the results are valid
+	 * @since 4.0
+	 */
+	public function test_process_field() {
 
-    	global $gfpdf;
-        
+		global $gfpdf;
+
 		$results  = $this->create_form_and_entries();
 		$form     = $results['form'];
 		$entry    = $results['entry'];
@@ -1226,13 +1199,13 @@ class Test_PDF extends WP_UnitTestCase
 		ob_start();
 		$this->view->process_field( $field, $entry, $form, array(), $products, new Helper_Field_Container(), $this->model );
 		$html = ob_get_clean();
-		
+
 		$this->assertNotFalse( strpos( $html, '<div class="value">My Single Line Response</div>' ) );
 
 		/* Check for empty output */
 		GFCache::flush();
 		$entry[1] = '';
-		
+
 		ob_start();
 		$this->view->process_field( $field, $entry, $form, array(), $products, new Helper_Field_Container(), $this->model );
 		$html = ob_get_clean();
@@ -1257,86 +1230,83 @@ class Test_PDF extends WP_UnitTestCase
 
 		$this->assertNotFalse( strpos( $html, 'entry-view-field-value' ) );
 
-    }
+	}
 
-    /**
-     * Test if the form title should be displayed
-     * @since 4.0
-     * @group pdf
-     */
-    public function test_show_form_title() {
-        
-    	$form['title'] = 'Form Title';
+	/**
+	 * Test if the form title should be displayed
+	 * @since 4.0
+	 */
+	public function test_show_form_title() {
 
-        /* Ensure a false reading */
-        ob_start();
-        $this->view->show_form_title( false, $form );
-        $html = ob_get_clean();
+		$form['title'] = 'Form Title';
 
-        $this->assertFalse( strpos( $html, '<h3 id="form_title">' ) );
+		/* Ensure a false reading */
+		ob_start();
+		$this->view->show_form_title( false, $form );
+		$html = ob_get_clean();
+
+		$this->assertFalse( strpos( $html, '<h3 id="form_title">' ) );
 
 		/* Ensure a positive reading */
-        ob_start();
-        $this->view->show_form_title( true, $form );
-        $html = ob_get_clean();
+		ob_start();
+		$this->view->show_form_title( true, $form );
+		$html = ob_get_clean();
 
-        $this->assertNotFalse( strpos( $html, '<h3 id="form_title">' ) );
-    }
+		$this->assertNotFalse( strpos( $html, '<h3 id="form_title">' ) );
+	}
 
-    /**
-     * Check our legacy (v3) classes are loaded correctly
-     * @since 4.0
-     * @group pdf
-     */
-    public function test_load_legacy_css() {
-        
-        /* Create standard field objects */
-        $text = new GF_Field();
-        $text->type = 'text';
+	/**
+	 * Check our legacy (v3) classes are loaded correctly
+	 * @since 4.0
+	 */
+	public function test_load_legacy_css() {
 
-        $html = new GF_Field();
-        $html->type = 'html';
+		/* Create standard field objects */
+		$text = new GF_Field();
+		$text->type = 'text';
 
-        $section = new GF_Field();
-        $section->type = 'section';
+		$html = new GF_Field();
+		$html->type = 'html';
 
-        $this->view->load_legacy_css( $text );
-        $this->view->load_legacy_css( $html );
-        $this->view->load_legacy_css( $section );
+		$section = new GF_Field();
+		$section->type = 'section';
 
-        $this->assertNotFalse( strpos( $text->cssClass, 'entry-view-field-value' ) );
-        $this->assertNotFalse( strpos( $html->cssClass, 'entry-view-html-value' ) );
-        $this->assertNotFalse( strpos( $section->cssClass, 'entry-view-section-break-content' ) );
-    }
+		$this->view->load_legacy_css( $text );
+		$this->view->load_legacy_css( $html );
+		$this->view->load_legacy_css( $section );
 
-    /**
-     * Test if we should be displaying the page name
-     * @since 4.0
-     * @group pdf
-     */
-    public function test_display_page_name() {
-    	$form = array(
-    		'pagination' => array(
-    			'pages' => array(
-    				1 => 'My Test Page',
-    			),
-    		),
-    	);
+		$this->assertNotFalse( strpos( $text->cssClass, 'entry-view-field-value' ) );
+		$this->assertNotFalse( strpos( $html->cssClass, 'entry-view-html-value' ) );
+		$this->assertNotFalse( strpos( $section->cssClass, 'entry-view-section-break-content' ) );
+	}
 
-    	$field = new GF_Field();
-    	$field->id = 25;
-    	$field->inputType = 'page';
-        
-    	ob_start();
-    	$this->view->display_page_name( 1, $form );
-    	$html = ob_get_clean();
+	/**
+	 * Test if we should be displaying the page name
+	 * @since 4.0
+	 */
+	public function test_display_page_name() {
+		$form = array(
+			'pagination' => array(
+				'pages' => array(
+					1 => 'My Test Page',
+				),
+			),
+		);
 
-    	$this->assertNotFalse( strpos( $html, '<h3 id="field-' . $field->id . '"', $field ) );
+		$field = new GF_Field();
+		$field->id = 25;
+		$field->inputType = 'page';
 
-    	ob_start();
-    	$this->view->display_page_name( 2, $form, $field );
-    	$html = ob_get_clean();
+		ob_start();
+		$this->view->display_page_name( 1, $form );
+		$html = ob_get_clean();
 
-    	$this->assertFalse( strpos( $html, '<h3 id="field-' . $field->id . '"' ) );
-    }
+		$this->assertNotFalse( strpos( $html, '<h3 id="field-' . $field->id . '"', $field ) );
+
+		ob_start();
+		$this->view->display_page_name( 2, $form, $field );
+		$html = ob_get_clean();
+
+		$this->assertFalse( strpos( $html, '<h3 id="field-' . $field->id . '"' ) );
+	}
 }
