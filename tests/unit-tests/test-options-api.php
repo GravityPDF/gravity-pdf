@@ -670,8 +670,8 @@ class Test_Options_API extends WP_UnitTestCase
 	 */
 	public function provider_sanitize_all_fields() {
 		return array(
-			array( 'rich_editor', '<strong>Test</strong> <script>console.log("test");</script>', 'Test console.log("test");' ),
-			array( 'textarea', '<strong>Test</strong> <script>console.log("test");</script>', 'Test console.log("test");' ),
+			array( 'rich_editor', '<strong>Test</strong> <script>console.log("test");</script>', '<strong>Test</strong> console.log("test");' ),
+			array( 'textarea', '<em>Test</em> <script>console.log("test");</script>', '<em>Test</em> console.log("test");' ),
 			array( 'text', '<b><em>Test</em></b>', 'Test' ),
 			array( 'checkbox', array( '<b>Item 1</b>', '<em>Item 2</em>' ), array( 'Item 1', 'Item 2' ) ),
 		);
