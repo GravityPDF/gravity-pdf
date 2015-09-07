@@ -726,9 +726,137 @@ class Test_Options_API extends WP_UnitTestCase
 	/**
 	 * Test we can correctly get the field details
 	 * @since  4.0
-	 * @todo
+	 * @dataProvider provider_get_form_value
+	 * @todo checkbox, multicheck and conditionalLogic
 	 */
-	public function test_get_form_value() {
-		$this->markTestIncomplete( 'This test has not been implimented yet' );
+	public function test_get_form_value( $input, $expected ) {
+		$_GET['id']  = $this->form_id;
+		$_GET['pid'] = '555ad84787d7e';
+		$this->options->update_option( 'default_font_size', 13 );
+
+		$this->assertEquals( $expected, $this->options->get_form_value( $input ) );
+	}
+
+
+	public function provider_get_form_value() {
+		return array(
+
+			/* Test Settings Radio */
+			array( array(
+				'id' => 'default_action',
+				'type' => 'radio',
+				'options' => array(
+					'View' => 'View',
+					'Download'  => 'Download',
+				),
+			), 'View' ),
+
+			/* Test Form Settings Radio */
+			array( array(
+				'id' => 'rtl',
+				'type' => 'radio',
+				'options' => array(
+					'Yes' => 'Yes',
+					'No'  => 'No',
+				),
+			), 'No' ),
+
+			/* Test Fallback Radio */
+			array( array(
+				'id' => 'no_field',
+				'type' => 'radio',
+				'options' => array(
+					'Yes' => 'Yes',
+					'No'  => 'No',
+				),
+				'std' => 'Yes',
+			), 'Yes' ),
+
+
+			/* Test Blank Radio */
+			array( array(
+				'id' => 'no_field',
+				'type' => 'radio',
+				'options' => array(
+					'Yes' => 'Yes',
+					'No'  => 'No',
+				),
+			), '' ),
+
+
+			/* Test Settings Select */
+			array( array(
+				'id' => 'admin_capabilities',
+				'type' => 'select',
+				'options' => array(
+					'Gravity Forms Capabilities' => array(
+						'gform_view_settings'
+					),
+
+					'Active WordPress Capabilities' => array(
+						'read'
+					),
+				),
+			), array( 'gravityforms_create_form' ) ),
+
+			/* Test Form Settings Select */
+			array( array(
+				'id' => 'template',
+				'type' => 'select',
+				'options' => array(
+
+				),
+			), 'Gravity Forms Style' ),
+
+			/* Test Fallback Select */
+			array( array(
+				'id' => 'no_field',
+				'type' => 'select',
+				'options' => array(
+					'Yes' => 'Yes',
+					'No'  => 'No',
+				),
+				'std' => 'Yes',
+			), 'Yes' ),
+
+
+			/* Test Blank Select */
+			array( array(
+				'id' => 'no_field',
+				'type' => 'select',
+				'options' => array(
+					'Yes' => 'Yes',
+					'No'  => 'No',
+				),
+			), '' ),
+
+
+
+			/* Test Settings Text */
+			array( array(
+				'id' => 'default_font_size',
+				'type' => 'number',
+			), '13' ),
+
+			/* Test Form Settings Text */
+			array( array(
+				'id' => 'name',
+				'type' => 'text',
+			), 'My First PDF Template' ),
+
+			/* Test Fallback Text */
+			array( array(
+				'id' => 'no_field',
+				'type' => 'text',
+				'std' => 'Working',
+			), 'Working' ),
+
+
+			/* Test Blank Text */
+			array( array(
+				'id' => 'no_field',
+				'type' => 'text',
+			), '' ),
+		);
 	}
 }

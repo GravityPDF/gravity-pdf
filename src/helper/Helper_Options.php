@@ -404,13 +404,13 @@ class Helper_Options implements Helper_Interface_Filters {
 		$gf_caps = $this->form->get_capabilities();
 
 		foreach ( $gf_caps as $gf_cap ) {
-			$capabilities['Gravity Forms Capabilities'][$gf_cap] = apply_filters( 'gfpdf_capability_name', $gf_cap );
+			$capabilities[ __( 'Gravity Forms Capabilities', 'gravitypdf' ) ][ $gf_cap ] = apply_filters( 'gfpdf_capability_name', $gf_cap );
 		}
 
 		foreach ( $roles as $role ) {
 			foreach ( $role['capabilities'] as $cap => $val ) {
-				if ( ! isset($capabilities[$cap]) && ! in_array( $cap, $gf_caps ) ) {
-					$capabilities['Active WordPress Capabilities'][$cap] = apply_filters( 'gfpdf_capability_name', $cap );
+				if ( ! isset($capabilities[ $cap ]) && ! in_array( $cap, $gf_caps ) ) {
+					$capabilities[ __( 'Active WordPress Capabilities', 'gravitypdf' ) ][ $cap ] = apply_filters( 'gfpdf_capability_name', $cap );
 				}
 			}
 		}
