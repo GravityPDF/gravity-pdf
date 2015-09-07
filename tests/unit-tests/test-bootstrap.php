@@ -68,7 +68,7 @@ class Test_Bootstrap extends WP_UnitTestCase
 		$this->assertEquals( 10, has_action( 'init', array( $this->loader, 'register_assets' ) ) );
 		$this->assertEquals( 15, has_action( 'init', array( $this->loader, 'load_assets' ) ) );
 
-		$this->assertEquals( 15, has_action( 'init', array( $this->loader, 'init_settings_api' ) ) );
+		$this->assertEquals( 1, has_action( 'init', array( $this->loader, 'init_settings_api' ) ) );
 		$this->assertEquals( 1, has_action( 'admin_init', array( $this->loader, 'setup_settings_fields' ) ) );
 	}
 
