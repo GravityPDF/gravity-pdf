@@ -25,6 +25,7 @@
 			<directory suffix=".php">./vendor/</directory>
 			<directory suffix=".php">./bower_components/</directory>
 			<directory suffix=".php">./resources/</directory>
+			<directory suffix=".php">./initialisation/</directory>
 			<directory suffix=".php">./src/assets/resources/</directory>
 		</blacklist>
 	</filter>
