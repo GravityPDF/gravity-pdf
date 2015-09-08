@@ -209,105 +209,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		return true;
 	}
 
-	/**
-	 * AJAX Endpoint for saving the custom font
-	 * @return void
-	 * @since 4.0
-	 */
-	public function save_font() {
 
-		$this->log->addNotice( 'Running AJAX Endpoint', array( 'type' => 'Save Font' ) );
-
-		/* prevent unauthorized access */
-		$this->ajax_font_validation();
-
-		/* Handle the validation and saving of the font */
-		$results = $this->process_font( $_POST['payload'] );
-
-		/* If we reached this point the results were successful so return the new object */
-		$this->log->addNotice( 'AJAX Endpoint Successful', array( 'results' => $results ) );
-
-		echo json_encode( $results );
-		wp_die();
-	}
-
-	/**
-	 * AJAX Endpoint for deleting a custom font
-	 * @return void
-	 * @since 4.0
-	 */
-	public function delete_font() {
-
-		$this->log->addNotice( 'Running AJAX Endpoint', array( 'type' => 'Delete Font' ) );
-
-		/* prevent unauthorized access */
-		$this->ajax_font_validation();
-
-		/* Get the required details for deleting fonts */
-		$id    = $_POST['id'];
-		$fonts = $this->options->get_option( 'custom_fonts' );
-
-		/* Check font actually exists and remove */
-		if ( isset($fonts[$id]) ) {
-
-			if ( $this->remove_font_file( $fonts[$id] ) ) {
-				unset($fonts[$id]);
-
-				if ( $this->options->update_option( 'custom_fonts', $fonts ) ) {
-					/* Success */
-					$this->log->addNotice( 'AJAX Endpoint Successful' );
-					echo json_encode( array( 'success' => true ) );
-					wp_die();
-				}
-			}
-		}
-
-		header( 'HTTP/1.1 400 Bad Request' );
-
-		$return = array(
-			'error' => __( 'Could not delete Gravity PDF font correctly. Please try again.', 'gravitypdf' ),
-		);
-
-		$this->log->addError( 'AJAX Endpoint Error', array( 'error' => $return ) );
-
-		echo json_encode( $return );
-		wp_die();
-	}
-
-	/**
-	 * Check a user is authorized to make modifications via this endpoint and
-	 * that there is a valid nonce
-	 * @return void
-	 * @since  4.0
-	 */
-	private function ajax_font_validation() {
-		
-		/* prevent unauthorized access */
-		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
-			/* fail */
-			$this->log->addCritical( 'Lack of User Capabilities.', array(
-				'user'      => wp_get_current_user(),
-				'user_meta' => get_user_meta( get_current_user_id() )
-			) );
-
-			header( 'HTTP/1.1 401 Unauthorized' );
-			wp_die( '401' );
-		}
-
-		/*
-         * Validate Endpoint
-         */
-		$nonce    = $_POST['nonce'];
-		$nonce_id = 'gfpdf_font_nonce';
-
-		if ( ! wp_verify_nonce( $nonce, $nonce_id ) ) {
-			/* fail */
-			$this->log->addWarning( 'Nonce Verification Failed.' );
-
-			header( 'HTTP/1.1 401 Unauthorized' );
-			wp_die( '401' );
-		}
-	}
 
 	/**
 	 * Removes the current font's TTF or OTF files from our font directory
@@ -331,94 +233,6 @@ class Model_Settings extends Helper_Abstract_Model {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Validate user input and save as new font
-	 * @param  Array $font The four font fields to be processed
-	 * @return Array
-	 * @since 4.0
-	 */
-	public function process_font( $font ) {
-
-		$this->log->addNotice( 'Running AJAX Endpoint', array( 'type' => 'Save Font' ) );
-
-		/* remove any empty fields */
-		$font = array_filter( $font );
-
-		/* Check we have the required data */
-		if ( ! isset($font['font_name']) || ! isset($font['regular']) ||
-		   strlen( $font['font_name'] ) === 0 || strlen( $font['regular'] ) === 0 ) {
-
-			header( 'HTTP/1.1 400 Bad Request' );
-
-			$return = array(
-				'error' => __( 'Required fields have not been included.', 'gravitypdf' ),
-			);
-
-			$this->log->addWarning( 'Validation Failed.', $return );
-
-			echo json_encode( $return );
-			wp_die();
-		}
-
-		/* Check we have a valid font name */
-		$name = $font['font_name'];
-
-		if ( ! $this->is_font_name_valid( $name ) ) {
-
-			header( 'HTTP/1.1 400 Bad Request' );
-
-			$return = array(
-				'error' => __( 'Font name is not valid. Only alphanumeric characters and spaces are accepted.', 'gravitypdf' ),
-			);
-
-			$this->log->addWarning( 'Validation Failed.', $return );
-
-			echo json_encode( $return );
-			wp_die();
-		}
-
-		/* Check the font name is unique */
-		$shortname = $this->options->get_font_short_name( $name );
-		$id = (isset($font['id'])) ? $font['id'] : '';
-
-		if ( ! $this->is_font_name_unique( $shortname, $id ) ) {
-
-			header( 'HTTP/1.1 400 Bad Request' );
-
-			$return = array(
-				'error' => __( 'A font with the same name already exists. Try a different name.', 'gravitypdf' ),
-			);
-
-			$this->log->addWarning( 'Validation Failed.', $return );
-
-			echo json_encode( $return );
-			wp_die();
-		}
-
-		/* Move fonts to our Gravity PDF font folder */
-		$installation = $this->install_fonts( $font );
-
-		/* Check if any errors occured installing the fonts */
-		if ( isset($installation['errors']) ) {
-
-			header( 'HTTP/1.1 400 Bad Request' );
-
-			$return = array(
-				'error' => $installation,
-			);
-
-			$this->log->addWarning( 'Validation Failed.', $return );
-
-			echo json_encode( $return );
-			wp_die();
-		}
-
-		$this->log->addNotice( 'AJAX Endpoint Successful', array( 'message' => $installation ) );
-
-		/* If we got here the installation was successful so return the data */
-		return $installation;
 	}
 
 	/**
@@ -697,5 +511,190 @@ class Model_Settings extends Helper_Abstract_Model {
 			'pdf-help-and-support',
 			'row-2'
 		);
+	}
+
+
+	/**
+	 * Check a user is authorized to make modifications via this endpoint and
+	 * that there is a valid nonce
+	 * @return void
+	 * @since  4.0
+	 */
+	private function ajax_font_validation() {
+		
+		/* prevent unauthorized access */
+		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
+			/* fail */
+			$this->log->addCritical( 'Lack of User Capabilities.', array(
+				'user'      => wp_get_current_user(),
+				'user_meta' => get_user_meta( get_current_user_id() )
+			) );
+
+			header( 'HTTP/1.1 401 Unauthorized' );
+			wp_die( '401' );
+		}
+
+		/*
+         * Validate Endpoint
+         */
+		$nonce    = $_POST['nonce'];
+		$nonce_id = 'gfpdf_font_nonce';
+
+		if ( ! wp_verify_nonce( $nonce, $nonce_id ) ) {
+			/* fail */
+			$this->log->addWarning( 'Nonce Verification Failed.' );
+
+			header( 'HTTP/1.1 401 Unauthorized' );
+			wp_die( '401' );
+		}
+	}
+
+	/**
+	 * AJAX Endpoint for saving the custom font
+	 * @return void
+	 * @since 4.0
+	 */
+	public function save_font() {
+
+		$this->log->addNotice( 'Running AJAX Endpoint', array( 'type' => 'Save Font' ) );
+
+		/* prevent unauthorized access */
+		$this->ajax_font_validation();
+
+		/* Handle the validation and saving of the font */
+		$results = $this->process_font( $_POST['payload'] );
+
+		/* If we reached this point the results were successful so return the new object */
+		$this->log->addNotice( 'AJAX Endpoint Successful', array( 'results' => $results ) );
+
+		echo json_encode( $results );
+		wp_die();
+	}
+
+	/**
+	 * AJAX Endpoint for deleting a custom font
+	 * @return void
+	 * @since 4.0
+	 */
+	public function delete_font() {
+
+		$this->log->addNotice( 'Running AJAX Endpoint', array( 'type' => 'Delete Font' ) );
+
+		/* prevent unauthorized access */
+		$this->ajax_font_validation();
+
+		/* Get the required details for deleting fonts */
+		$id    = $_POST['id'];
+		$fonts = $this->options->get_option( 'custom_fonts' );
+
+		/* Check font actually exists and remove */
+		if ( isset($fonts[ $id ]) ) {
+
+			if ( $this->remove_font_file( $fonts[ $id ] ) ) {
+				unset($fonts[ $id ]);
+
+				if ( $this->options->update_option( 'custom_fonts', $fonts ) ) {
+					/* Success */
+					$this->log->addNotice( 'AJAX Endpoint Successful' );
+					echo json_encode( array( 'success' => true ) );
+					wp_die();
+				}
+			}
+		}
+
+		header( 'HTTP/1.1 400 Bad Request' );
+
+		$return = array(
+			'error' => __( 'Could not delete Gravity PDF font correctly. Please try again.', 'gravitypdf' ),
+		);
+
+		$this->log->addError( 'AJAX Endpoint Error', array( 'error' => $return ) );
+
+		echo json_encode( $return );
+		wp_die();
+	}
+
+	/**
+	 * Validate user input and save as new font
+	 * @param  Array $font The four font fields to be processed
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function process_font( $font ) {
+
+		/* remove any empty fields */
+		$font = array_filter( $font );
+
+		/* Check we have the required data */
+		if ( ! isset($font['font_name']) || ! isset($font['regular']) ||
+		   strlen( $font['font_name'] ) === 0 || strlen( $font['regular'] ) === 0 ) {
+
+			header( 'HTTP/1.1 400 Bad Request' );
+
+			$return = array(
+				'error' => __( 'Required fields have not been included.', 'gravitypdf' ),
+			);
+
+			$this->log->addWarning( 'Validation Failed.', $return );
+
+			echo json_encode( $return );
+			wp_die();
+		}
+
+		/* Check we have a valid font name */
+		$name = $font['font_name'];
+
+		if ( ! $this->is_font_name_valid( $name ) ) {
+
+			header( 'HTTP/1.1 400 Bad Request' );
+
+			$return = array(
+				'error' => __( 'Font name is not valid. Only alphanumeric characters and spaces are accepted.', 'gravitypdf' ),
+			);
+
+			$this->log->addWarning( 'Validation Failed.', $return );
+
+			echo json_encode( $return );
+			wp_die();
+		}
+
+		/* Check the font name is unique */
+		$shortname = $this->options->get_font_short_name( $name );
+		$id = (isset($font['id'])) ? $font['id'] : '';
+
+		if ( ! $this->is_font_name_unique( $shortname, $id ) ) {
+
+			header( 'HTTP/1.1 400 Bad Request' );
+
+			$return = array(
+				'error' => __( 'A font with the same name already exists. Try a different name.', 'gravitypdf' ),
+			);
+
+			$this->log->addWarning( 'Validation Failed.', $return );
+
+			echo json_encode( $return );
+			wp_die();
+		}
+
+		/* Move fonts to our Gravity PDF font folder */
+		$installation = $this->install_fonts( $font );
+
+		/* Check if any errors occured installing the fonts */
+		if ( isset($installation['errors']) ) {
+
+			header( 'HTTP/1.1 400 Bad Request' );
+
+			$return = array(
+				'error' => $installation,
+			);
+
+			$this->log->addWarning( 'Validation Failed.', $return );
+
+			echo json_encode( $return );
+			wp_die();
+		}
+
+		/* If we got here the installation was successful so return the data */
+		return $installation;
 	}
 }

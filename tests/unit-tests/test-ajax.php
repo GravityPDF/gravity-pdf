@@ -3,6 +3,7 @@
 namespace GFPDF\Tests;
 
 use GFPDF\Model\Model_Form_Settings;
+use GFPDF\Model\Model_Settings;
 
 use GFAPI;
 use GFForms;
@@ -89,14 +90,14 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
      * @since 4.0
      */
     private function import_form() {
-        $json = json_decode(file_get_contents( dirname( __FILE__ ) . '/json/form-settings.json' ), true);
+        $json = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/form-settings.json' ) ), true );
         $this->form_id = GFAPI::add_form($json);
     }
 
     /**
      * Test our Gravity Forms PDF Settings configuration state change
+     * @class Model_Form_Settings
      * @since 4.0
-     * @todo test correct permissions
      */
     public function test_change_state_pdf_setting() {
         global $gfpdf;
@@ -186,8 +187,8 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
 
     /**
      * Test our Gravity Forms PDF Settings configuration duplication functionality
+     * @class Model_Form_Settings
      * @since 4.0
-     * @todo test correct permissions
      */
     public function test_duplicate_gf_pdf_settings() {
         global $gfpdf;
@@ -263,8 +264,8 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
 
     /**
      * Test our Gravity Forms PDF Settings configuration duplication functionality
+     * @class Model_Form_Settings
      * @since 4.0
-     * @todo test correct permissions
      */
     public function test_delete_gf_pdf_setting() {
         global $gfpdf;
@@ -327,5 +328,113 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
         unset( $gfpdf->data->form_settings );
         $pdf   = $model->get_pdf($this->form_id, $this->pid);
         $this->assertTrue( is_wp_error($pdf) );
+    }
+
+    /**
+     * Test we can save the font via AJAX
+     * @class Model_Form_Settings
+     * @since 4.0
+     */
+    public function test_save_font() {
+        
+        /* set up our post data and role */
+        $this->_setRole( 'administrator' );
+
+        /* Check for nonce failure */
+        try {
+            $this->_handleAjax( 'gfpdf_font_save' );
+        } catch ( WPAjaxDieStopException $e ) {
+            /* do nothing (error expected) */
+        }
+
+        $this->assertEquals( '401', $e->getMessage() );
+
+        /* Set up a bad request by excluding required fields */
+        $_POST['nonce'] = wp_create_nonce( 'gfpdf_font_nonce' );
+
+        try {
+            $this->_handleAjax( 'gfpdf_font_save' );
+        } catch ( WPAjaxDieContinueException $e ) {
+            /* do nothing (error expected) */
+        }
+        
+        $response = json_decode( $this->_last_response, true );
+        unset( $this->_last_response );
+        $this->assertEquals( 'Required fields have not been included.', $response['error'] );
+
+        /* Test for invalid font name */
+        $_POST['payload'] = array(
+            'font_name' => 'My AJAX_Font',
+            'regular' => 'myajaxfont.ttf',
+        );
+
+        try {
+            $this->_handleAjax( 'gfpdf_font_save' );
+        } catch ( WPAjaxDieContinueException $e ) {
+            /* do nothing (error expected) */
+        }
+        
+        $response = json_decode( $this->_last_response, true );
+        unset( $this->_last_response );
+
+        $this->assertEquals( 'Font name is not valid. Only alphanumeric characters and spaces are accepted.', $response['error'] );
+
+        /* Test a valid installation */
+        touch( ABSPATH . 'myajaxfont.ttf' );
+
+        $_POST['payload'] = array(
+            'font_name' => 'My AJAX Font',
+            'regular' => ABSPATH . 'myajaxfont.ttf',
+        );
+
+        try {
+            $this->_handleAjax( 'gfpdf_font_save' );
+        } catch ( WPAjaxDieContinueException $e ) {
+            /* do nothing (error expected) */
+        }
+        
+        $response = json_decode( $this->_last_response, true );
+
+        $this->assertArrayHasKey( 'id', $response );
+
+    }
+
+    /**
+     * Test we can do the process of deleting a font via AJAX
+     * Because the database state never changes between requests we cannot
+     * correctly install a font and then do an AJAX request (two seperate processes).
+     * Instead, we'll just mimick a failed attempt and test the actual font removal function elsewhere
+     *
+     * @class Model_Form_Settings
+     * @since 4.0
+     */
+    public function test_delete_font() {
+
+       /* set up our post data and role */
+        $this->_setRole( 'administrator' );
+
+        /* Check for nonce failure */
+        try {
+            $this->_handleAjax( 'gfpdf_font_delete' );
+        } catch ( WPAjaxDieStopException $e ) {
+            /* do nothing (error expected) */
+        }
+
+        $this->assertEquals( '401', $e->getMessage() );
+
+        /* Set up a real delete request */
+        $_POST['nonce'] = wp_create_nonce( 'gfpdf_font_nonce' );
+        $_POST['id']    = '';
+
+        try {
+            $this->_handleAjax( 'gfpdf_font_delete' );
+        } catch ( WPAjaxDieContinueException $e ) {
+            /* do nothing (error expected) */
+        }
+
+        $response = json_decode( $this->_last_response, true );
+        unset( $this->_last_response );
+
+        $this->assertEquals( 'Could not delete Gravity PDF font correctly. Please try again.', $response['error'] );
     }
 }
