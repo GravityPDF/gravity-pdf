@@ -111,7 +111,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 
 		/* Tell Gravity Forms to add our form PDF settings pages */
 		add_action( 'gform_form_settings_menu', array( $this->model, 'add_form_settings_menu' ), 10, 2 );
-		add_action( 'gform_form_settings_page_' . $this->data->slug, array( $this, 'displayPage' ) );
+		add_action( 'gform_form_settings_page_' . $this->data->slug, array( $this, 'display_page' ) );
 
 		/* Add AJAX endpoints */
 		add_action( 'wp_ajax_gfpdf_list_delete', array( $this->model, 'delete_gf_pdf_setting' ) );
@@ -167,7 +167,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	 * @since 4.0
 	 * @return void
 	 */
-	public function displayPage() {
+	public function display_page() {
 
 		/* Determine whether to load the add/edit page, or the list view */
 		$form_id = ( isset( $_GET['id'] ) ) ? (int) $_GET['id'] : false;
