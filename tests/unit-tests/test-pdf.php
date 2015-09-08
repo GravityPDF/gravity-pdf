@@ -62,20 +62,6 @@ class Test_PDF extends WP_UnitTestCase
 {
 
 	/**
-	 * The Gravity Form IDs assigned to the imported form
-	 * @var Integer
-	 * @since 4.0
-	 */
-	public $form_id = array();
-
-	/**
-	 * The Gravity Form entries imported
-	 * @var Integer
-	 * @since 4.0
-	 */
-	public $entries = array();
-
-	/**
 	 * Our Settings Controller
 	 * @var Object
 	 * @since 4.0
@@ -581,6 +567,40 @@ class Test_PDF extends WP_UnitTestCase
 	}
 
 	/**
+	 * Check our PDF list is displaying correctly
+	 * @since 4.0
+	 */
+	public function test_view_pdf_entry_list() {
+		
+		$results = $this->create_form_and_entries();
+		$form_id = $results['form']['id'];
+		$entry   = $results['entry'];
+
+		ob_start();
+		$this->model->view_pdf_entry_list( $form_id, '', '', $entry );
+		$html = ob_get_clean();
+
+		$this->assertNotFalse( strpos( $html, 'View PDFs</a>' ) );
+	}
+
+	/**
+	 * Check our PDF detail list is displaying correctly
+	 * @since 4.0
+	 */
+	public function test_view_pdf_entry_detail() {
+		
+		$results = $this->create_form_and_entries();
+		$form_id = $results['form']['id'];
+		$entry   = $results['entry'];
+
+		ob_start();
+		$this->model->view_pdf_entry_detail( $form_id, $entry );
+		$html = ob_get_clean();
+
+		$this->assertNotFalse( strpos( $html, '<strong>PDFs</strong>' ) );
+	}
+
+	/**
 	 * Check that an array of PDFs gets correctly returned in the right format
 	 * @since 4.0
 	 */
@@ -750,7 +770,22 @@ class Test_PDF extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function test_process_and_save_pdf() {
-		$this->markTestIncomplete( 'This test has not been implimented yet' );
+		global $gfpdf;
+
+		/* Setup some test data */
+		$results  = $this->create_form_and_entries();
+		$entry    = $results['entry'];
+		$form     = $results['form'];
+		$settings = $form['gfpdf_form_settings']['555ad84787d7e'];
+		$settings['template'] = 'core-simple';
+
+		/* Create our PDF object */
+		$pdf_generator = new Helper_PDF( $entry, $settings, $gfpdf->form, $gfpdf->data );
+		$pdf_generator->set_filename( 'Unit Testing' );
+
+		/* Generate the PDF and verify it was successfull */
+		$this->assertTrue( $this->model->process_and_save_pdf( $pdf_generator ) );
+		$this->assertFileExists( $pdf_generator->get_path() . $pdf_generator->get_filename() );
 	}
 
 	/**
@@ -758,7 +793,19 @@ class Test_PDF extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function test_notifications() {
-		$this->markTestIncomplete( 'This test has not been implimented yet' );
+		
+		/* Setup some test data */
+		$results  = $this->create_form_and_entries();
+		$entry    = $results['entry'];
+		$form     = $results['form'];
+
+		$notifications = $this->model->notifications( $form['notifications']['54bca349732b8'], $form, $entry );
+
+		/* Check the results are successful */
+		$this->assertNotFalse( strpos( $notifications['attachments'][0], "PDF_EXTENDED_TEMPLATES/tmp/{$form['id']}{$entry['id']}/test-{$form['id']}.pdf" ) );
+
+		/* Clean up */
+		unlink( $notifications['attachments'][0] );
 	}
 
 	/**
@@ -815,8 +862,22 @@ class Test_PDF extends WP_UnitTestCase
 	 * Check if the correct PDFs are saved on disk
 	 * @since 4.0
 	 */
-	public function maybe_save_pdf() {
-		$this->markTestIncomplete( 'This test has not been implimented yet' );
+	public function test_maybe_save_pdf() {
+		global $gfpdf;
+		
+		/* Setup some test data */
+		$results  = $this->create_form_and_entries();
+		$entry    = $results['entry'];
+		$form     = $results['form'];
+		$file     = $gfpdf->data->template_tmp_location . "{$form['id']}{$entry['id']}/test-{$form['id']}.pdf";
+
+		$this->model->maybe_save_pdf( $entry, $form );
+
+		/* Check the results are successful */
+		$this->assertFileExists( $file );
+
+		/* Clean up */
+		unlink( $file );
 	}
 
 	/**
@@ -1076,12 +1137,12 @@ class Test_PDF extends WP_UnitTestCase
 		/* Test our aid legacy PDF selector is working */
 		$config = array(
 			'fid' => $form['id'],
-			'aid' => 2,
+			'aid' => 3,
 			'template' => 'Gravity Forms Style',
 		);
 
 		$pid = $this->model->get_legacy_config( $config );
-		$this->assertEquals( '556690c67856b', $pid );
+		$this->assertEquals( 'fawf90c678523b', $pid );
 
 		/* Test our fallback works */
 		unset( $config['aid'] );

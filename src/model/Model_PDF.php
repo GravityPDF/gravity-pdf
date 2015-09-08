@@ -419,13 +419,12 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function view_pdf_entry_list( $form_id, $field_id, $value, $entry ) {
 
 		$controller = $this->getController();
+		$pdf_list   = $this->get_pdf_display_list( $entry );
 
 		$this->log->addNotice( 'Display PDF Entry List.', array(
-			'pdfs'  => $pdfs,
+			'pdfs'  => $pdf_list,
 			'entry' => $entry,
 		) );
-
-		$pdf_list = $this->get_pdf_display_list( $entry );
 
 		if ( ! empty($pdf_list) ) {
 			if ( sizeof( $pdf_list ) > 1 ) {
@@ -449,13 +448,12 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function view_pdf_entry_detail( $form_id, $entry ) {
 
 		$controller = $this->getController();
+		$pdf_list   = $this->get_pdf_display_list( $entry );
 
 		$this->log->addNotice( 'Display PDF Entry Detail List.', array(
-			'pdfs'  => $pdfs,
+			'pdfs'  => $pdf_list,
 			'entry' => $entry,
 		) );
-
-		$pdf_list = $this->get_pdf_display_list( $entry );
 
 		if ( ! empty($pdf_list) ) {
 			$args = array( 'pdfs' => $pdf_list );
@@ -590,6 +588,8 @@ class Model_PDF extends Helper_Abstract_Model {
 				return true;
 			} catch (Exception $e) {
 
+				var_dump( $e->getMessage() );
+
 				$this->log->addError( 'PDF Generation Error', array(
 					'pdf'       => $pdf,
 					'exception' => $e->getMessage(),
@@ -709,7 +709,7 @@ class Model_PDF extends Helper_Abstract_Model {
 					$pdf_generator = new Helper_PDF( $entry, $settings, $this->form, $this->data );
 					$pdf_generator->set_filename( $this->get_pdf_name( $settings, $entry ) );
 
-					/* Check that the PDF hasn't already been created this session */
+					/* Check if we should force the PDF to be saved to disk */
 					if ( $this->maybe_always_save_pdf( $settings ) ) {
 						$this->process_and_save_pdf( $pdf_generator );
 					}
