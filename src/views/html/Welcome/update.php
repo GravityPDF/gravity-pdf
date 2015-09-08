@@ -38,7 +38,7 @@ global $gfpdf;
 
 ?>
 
-<div class="wrap about-wrap">
+<div class="wrap about-wrap gfpdf-update-screen">
 	<h1><?php printf( __( 'Discover Gravity PDF %s', 'gravitypdf' ), $args['display_version'] ); ?></h1>
 	
   <div class="about-text"><?php _e( "Gravity PDF has been completely rebuilt with simplicity, stability and security in mind. Our team has spent six months making a great product even greater. Discover what's new...", 'gravitypdf' ); ?></div>

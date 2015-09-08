@@ -159,19 +159,19 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 			exit;
 
 		} else {
-			$this->maybe_display_update_screen();
+			$this->maybe_display_update_screen( PDF_EXTENDED_VERSION );
 		}
 	}
 
-	public function maybe_display_update_screen() {
+	public function maybe_display_update_screen( $version ) {
 
 		/* Check we actually upgraded, otherwise don't redirect */
-		if( PDF_EXTENDED_VERSION == get_option( 'gfpdf_current_version' ) ) {
+		if( $version == get_option( 'gfpdf_current_version' ) ) {
 			return false;
 		}
 
 		/* Check current version is not a bug fix or security release */
-		$version = explode('.', PDF_EXTENDED_VERSION);
+		$version = explode( '.', $version );
 
 		/* Check is there is a third version identifier (4.1.x) and if so see if it's an interger or does not equal zero */
 		if( isset( $version[2] ) && ! is_int( $version[2] ) || 0 !== (int) $version[2] ) {
@@ -182,7 +182,7 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 		/* Check if the user has opted to view the What's New page */
 		$show_update_page = $this->options->get_option( 'update_screen_action', 'Enable' );
 
-		if( $show_update_page == 'Enable' ) {
+		if( 'Enable' == $show_update_page ) {
 
 			$this->log->addNotice( 'Redirect to Update page (previously activated).' );
 

@@ -71,17 +71,18 @@ class Test_Welcome_Screen extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function setUp() {
+		global $gfpdf;
 
 		/* run parent method */
 		parent::setUp();
 
 		/* Setup our test classes */
-		$this->model = new Model_Welcome_Screen();
-		$this->view  = new View_Welcome_Screen(array(
+		$this->model = new Model_Welcome_Screen( $gfpdf->log );
+		$this->view  = new View_Welcome_Screen( array(
 			'display_version' => PDF_EXTENDED_VERSION,
-		) );
+		), $gfpdf->form );
 
-		$this->controller = new Controller_Welcome_Screen( $this->model, $this->view );
+		$this->controller = new Controller_Welcome_Screen( $this->model, $this->view, $gfpdf->log, $gfpdf->data, $gfpdf->options );
 		$this->controller->init();
 	}
 
@@ -92,5 +93,72 @@ class Test_Welcome_Screen extends WP_UnitTestCase
 	public function test_actions() {
 		$this->assertEquals( 10, has_action( 'admin_menu', array( $this->model, 'admin_menus' ) ) );
 		$this->assertEquals( 10, has_action( 'admin_init', array( $this->controller, 'welcome' ) ) );
+	}
+
+	/**
+	 * Test the appropriate filters are set up
+	 * @since 4.0
+	 */
+	public function test_filters() {
+		$this->assertEquals( 10, has_filter( 'admin_title', array( $this->model, 'add_page_title' ) ) );
+	}
+
+	/**
+	 * Test the getting started page loads correctly
+	 * @since 4.0
+	 */
+	public function test_getting_started_screen() {
+		
+		ob_start();
+		$this->controller->getting_started_screen();
+		$html = ob_get_clean();
+
+		$this->assertNotFalse( strpos( $html, 'gfpdf-welcome-screen' ) );
+	}
+
+	/**
+	 * Test the update page loads correctly
+	 * @since 4.0
+	 */
+	public function test_update_screen() {
+		
+		ob_start();
+		$this->controller->update_screen();
+		$html = ob_get_clean();
+
+		$this->assertNotFalse( strpos( $html, 'gfpdf-update-screen' ) );
+	}
+
+	/**
+	 * Check our welcome and update admin menus are correctly added
+	 * @since 4.0
+	 */
+	public function test_admin_menus() {
+		global $_wp_submenu_nopriv;
+
+		/* Run our registration */
+		$this->model->admin_menus();
+
+		/* Test the results */
+		$this->assertTrue( isset( $_wp_submenu_nopriv['index.php']['gfpdf-getting-started'] ) );
+		$this->assertTrue( isset( $_wp_submenu_nopriv['index.php']['gfpdf-update'] ) );
+	}
+
+	/**
+	 * Check the page titles load correctly
+	 * @since 4.0
+	 */
+	public function test_add_page_title() {
+
+		/* Test a pass */
+		$this->assertEquals( 'Title', $this->model->add_page_title( 'Title' ) );
+
+		/* Test welcome screen */
+		$_GET['page'] = 'gfpdf-getting-started';
+		$this->assertEquals( 'Welcome to Gravity PDF', $this->model->add_page_title( 'Title' ) );
+
+		/* Test update screen */
+		$_GET['page'] = 'gfpdf-update';
+		$this->assertEquals( "What's new in Gravity PDF?", $this->model->add_page_title( 'Title' ) );
 	}
 }

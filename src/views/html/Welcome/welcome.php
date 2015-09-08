@@ -38,7 +38,7 @@ global $gfpdf;
 
 ?>
 
-<div class="wrap about-wrap">
+<div class="wrap about-wrap gfpdf-welcome-screen">
 	<h1><?php _e( 'Welcome to Gravity PDF', 'gravitypdf' ); ?></h1>
 	<div class="about-text"><?php _e( "You're just minutes away from producing your first highly-customisable PDF document using Gravity Forms data.", 'gravitypdf' ); ?></div>
 	
