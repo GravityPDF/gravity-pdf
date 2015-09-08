@@ -125,7 +125,7 @@ class Test_Form_Settings extends WP_UnitTestCase
 		$this->assertEquals( 5, has_action( 'admin_init', array( $this->controller, 'maybe_save_pdf_settings' ) ) );
 
 		$this->assertEquals( 10, has_action( 'gform_form_settings_menu', array( $this->model, 'add_form_settings_menu' ) ) );
-		$this->assertEquals( 10, has_action( 'gform_form_settings_page_' . $gfpdf->data->slug, array( $this->controller, 'displayPage' ) ) );
+		$this->assertEquals( 10, has_action( 'gform_form_settings_page_' . $gfpdf->data->slug, array( $this->controller, 'display_page' ) ) );
 
 		/* ajax endpoints */
 		$this->assertEquals( 10, has_action( 'wp_ajax_gfpdf_list_delete', array( $this->model, 'delete_gf_pdf_setting' ) ) );
@@ -204,13 +204,8 @@ class Test_Form_Settings extends WP_UnitTestCase
 		$this->assertEquals( 'You do not have permission to access this page', $e->getMessage() );
 
 		/* Authorise the current user and check correct output */
-		$user_id = $this->factory->user->create();
+		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
 		$this->assertInternalType( 'integer', $user_id );
-
-		$user = get_user_by( 'id', $user_id );
-		$user->remove_role( 'subscriber' );
-		$user->add_role( 'administrator' );
-
 		wp_set_current_user( $user_id );
 
 		ob_start();
@@ -242,13 +237,8 @@ class Test_Form_Settings extends WP_UnitTestCase
 		$this->assertEquals( 'You do not have permission to access this page', $e->getMessage() );
 
 		/* Authorise the current user and check correct output */
-		$user_id = $this->factory->user->create();
+		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
 		$this->assertInternalType( 'integer', $user_id );
-
-		$user = get_user_by( 'id', $user_id );
-		$user->remove_role( 'subscriber' );
-		$user->add_role( 'administrator' );
-
 		wp_set_current_user( $user_id );
 
 		ob_start();
@@ -553,13 +543,8 @@ class Test_Form_Settings extends WP_UnitTestCase
 		$this->assertEquals( 'You do not have permission to access this page', $e->getMessage() );
 
 		/* Authorise the current user and check correct output */
-		$user_id = $this->factory->user->create();
+		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
 		$this->assertInternalType( 'integer', $user_id );
-
-		$user = get_user_by( 'id', $user_id );
-		$user->remove_role( 'subscriber' );
-		$user->add_role( 'administrator' );
-
 		wp_set_current_user( $user_id );
 
 		/* Fail the nonce */

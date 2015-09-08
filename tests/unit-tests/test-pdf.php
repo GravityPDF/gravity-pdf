@@ -17,7 +17,6 @@ use GFForms;
 use GFCache;
 
 use WP_UnitTestCase;
-use WP_UnitTest_Factory;
 use WP_Error;
 use WP_Rewrite;
 
@@ -102,9 +101,6 @@ class Test_PDF extends WP_UnitTestCase
 
 		$this->controller = new Controller_PDF( $this->model, $this->view, $gfpdf->form, $gfpdf->log, $gfpdf->misc );
 		$this->controller->init();
-
-		/* Set up WP Factory so we can use it */
-		$this->factory = new WP_UnitTest_Factory();
 	}
 
 	/**
@@ -269,13 +265,8 @@ class Test_PDF extends WP_UnitTestCase
 		$this->assertEquals( 'There was a problem generating your PDF', $e->getMessage() );
 
 		/* Authorise the current user and check the message is displayed correctly */
-		$user_id = $this->factory->user->create();
+		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
 		$this->assertInternalType( 'integer', $user_id );
-
-		$user = get_user_by( 'id', $user_id );
-		$user->remove_role( 'subscriber' );
-		$user->add_role( 'administrator' );
-
 		wp_set_current_user( $user_id );
 
 		try {
