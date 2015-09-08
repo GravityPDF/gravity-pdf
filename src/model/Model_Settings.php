@@ -157,18 +157,19 @@ class Model_Settings extends Helper_Abstract_Model {
 	 */
 	public function highlight_errors( $settings ) {
 
-		/* we fire too late to tap into get_settings_error() so our data storage holds the details */
+		/* We fire too late to tap into get_settings_error() so our data storage holds the details */
 		$errors = $this->form_settings_errors;
 
-		/* loop through errors if any and highlight the appropriate settings */
+		/* Loop through errors if any and highlight the appropriate settings */
 		if ( is_array( $errors ) && sizeof( $errors ) > 0 ) {
 			foreach ( $errors as $error ) {
-				/* exit if not an error */
+				
+				/* Skip over if not an error */
 				if ( $error['type'] !== 'error' ) {
 					continue;
 				}
 
-				/* loop through our data until we find a match */
+				/* Loop through our data until we find a match */
 				$found = false;
 				foreach ( $settings as $key => &$group ) {
 					foreach ( $group as $id => &$item ) {
@@ -320,8 +321,8 @@ class Model_Settings extends Helper_Abstract_Model {
 		$types = array( 'regular', 'bold', 'italics', 'bolditalics' );
 
 		foreach ( $types as $type ) {
-			if ( isset($fonts[$type]) ) {
-				$filename = basename( $fonts[$type] );
+			if ( isset($fonts[ $type ]) ) {
+				$filename = basename( $fonts[ $type ] );
 
 				if ( is_file( $this->data->template_font_location . $filename ) && ! unlink( $this->data->template_font_location . $filename ) ) {
 					return false;
@@ -445,26 +446,32 @@ class Model_Settings extends Helper_Abstract_Model {
 	 */
 	public function is_font_name_unique( $name, $id = '' ) {
 
+		/* Get the shortname of the current font */
+		$name = $this->options->get_font_short_name( $name );
+
 		/* Loop through default fonts and check for duplicate */
 		$default_fonts = $this->options->get_installed_fonts();
 
+		unset( $default_fonts[ __('User-Defined Fonts', 'gravitypdf') ] );
+
+		/* check for exact match */
 		foreach ( $default_fonts as $group ) {
-			if ( isset($group[$name]) ) {
+			if ( isset( $group[ $name ] ) ) {
 				return false;
 			}
 		}
-
-		/* Loop through custom fonts and check for duplicate */
+		
 		$custom_fonts  = $this->options->get_option( 'custom_fonts' );
 
 		if ( is_array( $custom_fonts ) ) {
 			foreach ( $custom_fonts as $font ) {
-				/* skip over itself */
-				if ( ! empty($id) && $font['id'] == $id ) {
+				
+				/* Skip over itself */
+				if ( ! empty( $id ) && $font['id'] == $id ) {
 					continue;
 				}
 
-				if ( $this->options->get_font_short_name( $font['font_name'] ) == $name ) {
+				if ( $name == $this->options->get_font_short_name( $font['font_name'] ) ) {
 					return false;
 				}
 			}
@@ -487,7 +494,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		foreach ( $types as $type ) {
 
 			/* Check if a key exists for this type and process */
-			if ( isset($fonts[$type]) ) {
+			if ( isset($fonts[ $type ]) ) {
 				$path = $this->misc->convert_url_to_path( $fonts[$type] );
 
 				/* Couldn't find file so throw error */
@@ -517,7 +524,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				$fonts['id']       = $id;
 			}
 
-			$custom_fonts[$fonts['id']] = $fonts;
+			$custom_fonts[ $fonts['id'] ] = $fonts;
 
 			/* Update our font database */
 			$this->options->update_option( 'custom_fonts', $custom_fonts );

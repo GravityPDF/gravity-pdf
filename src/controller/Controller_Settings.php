@@ -127,7 +127,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
          * Tell Gravity Forms to initiate our settings page
          * Using the following Class/Model
          */
-		 GFForms::add_settings_page( $this->data->short_title, array( $this, 'displayPage' ) );
+		 GFForms::add_settings_page( $this->data->short_title, array( $this, 'display_page' ) );
 
 		 /* Ensure any errors are stored correctly */
 		 $this->model->setup_form_settings_errors();
@@ -202,11 +202,9 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	 * @since 4.0
 	 * @return void
 	 */
-	public function displayPage() {
-		/**
-		 * Determine which settings page to load
-		 */
-		$page = (isset($_GET['tab'])) ? $_GET['tab'] : 'general';
+	public function display_page() {
+
+		$page = ( isset( $_GET['tab'] ) ) ? $_GET['tab'] : 'general';
 
 		switch ( $page ) {
 			case 'general':
@@ -233,7 +231,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		/* because current_user_can() doesn't handle Gravity Forms permissions quite correct we'll do our checks here */
 		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			
-			$gfpdf->log->addCritical( 'Lack of User Capabilities.', array(
+			$this->log->addCritical( 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
 				'user_meta' => get_user_meta( get_current_user_id() )
 			) );
@@ -271,7 +269,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 
 		/* check if we are on the tools settings page */
 		if ( ! $this->misc->is_gfpdf_settings_tab( 'tools' ) ) {
-			return;
+			return false;
 		}
 
 		/* check if the user has permission to copy the templates */
