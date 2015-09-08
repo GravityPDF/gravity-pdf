@@ -128,7 +128,7 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 		shortcode_ui_register_for_shortcode( 'gravitypdf', array(
 			'label' => __( 'Gravity PDF', 'gravitypdf' ),
 
-			 'listItemImage' => 'dashicons-admin-site',
+			'listItemImage' => 'dashicons-admin-site',
 
 			'attrs' => array(
 				array(

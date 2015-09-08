@@ -199,7 +199,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Check if a currently submitting a new confirmation redirect URL in the admin area,
+	 * Check if user is currently submitting a new confirmation redirect URL in the admin area,
 	 * if so replace any shortcodes with a direct link to the PDF (as Gravity Forms correctly validates the URL)
 	 * @param  Array $form Gravity Form Array
 	 * @return Array

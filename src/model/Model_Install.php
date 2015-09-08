@@ -308,7 +308,7 @@ class Model_Install extends Helper_Abstract_Model {
 	 * The Gravity PDF Uninstaller
 	 * @return void
 	 * @since 4.0
-	 * @todo  Add Multisite Support (Network Activated)
+	 * @todo  Add Multisite Support
 	 */
 	public function uninstall_plugin() {
 		$this->log->addNotice( 'Uninstall Gravity PDF.' );

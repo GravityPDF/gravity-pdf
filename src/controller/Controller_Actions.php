@@ -4,7 +4,6 @@ namespace GFPDF\Controller;
 
 use GFPDF\Helper\Helper_Abstract_Controller;
 use GFPDF\Helper\Helper_Interface_Actions;
-use GFPDF\Helper\Helper_Interface_Filters;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_View;
 use GFPDF\Helper\Helper_Abstract_Form;
@@ -53,7 +52,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Controller_Actions extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters
+class Controller_Actions extends Helper_Abstract_Controller implements Helper_Interface_Actions
 {
 
 	/**
@@ -114,15 +113,6 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	public function add_actions() {
 		add_action( 'admin_init', array( $this, 'route' ) );
 		add_action( 'admin_init', array( $this, 'route_notices' ), 20 ); /* Run later than our route check */
-	}
-
-	/**
-	 * Apply any filters
-	 * @since 4.0
-	 * @return void
-	 */
-	public function add_filters() {
-
 	}
 
 	/**
