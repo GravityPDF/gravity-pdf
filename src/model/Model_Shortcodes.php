@@ -188,12 +188,28 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	 */
 	public function add_shortcode_attr( $code, $attr, $value ) {
 		/* if the attribute doesn't already exist... */
-		if ( ! isset($code['attr'][$attr]) ) {
-			$code['shortcode'] = str_ireplace( $code['attr_raw'], "{$code['attr_raw']} {$attr}=\"{$value}\"", $code['shortcode'] );
+		if ( ! isset( $code['attr'][ $attr ] ) ) {
+
+			$raw_attr = "{$code['attr_raw']} {$attr}=\"{$value}\"";
+
+			/* if there are no attributes at all we'll need to fix our str replace */
+			if( 0 === strlen( $code['attr_raw']) ) {
+				$pattern = '^\[([a-zA-Z]+)';
+				$code['shortcode'] = preg_replace( "/$pattern/s", "[$1 {$attr}=\"{$value}\"", $code['shortcode'] );
+			} else {
+				$code['shortcode'] = str_ireplace( $code['attr_raw'], $raw_attr, $code['shortcode'] );
+			}
+
+			$code['attr_raw'] = $raw_attr;
+
 		} else { /* replace the current attribute */
 			$pattern = $attr . '="(.+?)"';
 			$code['shortcode'] = preg_replace( "/$pattern/si", $attr . '="' . $value . '"', $code['shortcode'] );
+			$code['attr_raw'] = preg_replace( "/$pattern/si", $attr . '="' . $value . '"', $code['attr_raw'] );
 		}
+
+		/* Update the actual attribute */
+		$code['attr'][ $attr ] = $value;
 
 		return $code;
 	}
@@ -221,9 +237,11 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 			$gravitypdf = $this->get_shortcode_information( 'gravitypdf', $url );
 
 			if ( sizeof( $gravitypdf ) > 0 ) {
+
 				foreach ( $gravitypdf as $code ) {
+					
 					/* get the PDF Settings ID */
-					$pid = (isset($code['attr']['id'])) ? $code['attr']['id'] : '';
+					$pid = ( isset( $code['attr']['id'] ) ) ? $code['attr']['id'] : '';
 
 					if ( ! empty($pid) ) {
 
@@ -232,7 +250,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 						$pdf_url = $pdf->get_pdf_url( $pid, '{entry_id}', false );
 
 						/* check if the PDF should be auto-prompted to download, or whether the user should view it in the browser */
-						if ( ! isset($code['attr']['attr']) || $code['attr']['attr'] == 'download' ) {
+						if ( ! isset($code['attr']['type']) || $code['attr']['type'] == 'download' ) {
 							$pdf_url .= 'download/';
 						}
 

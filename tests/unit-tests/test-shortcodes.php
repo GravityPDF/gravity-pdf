@@ -107,8 +107,36 @@ class Test_Shortcode extends WP_UnitTestCase
      * Test the gravitypdf shortcodes render as expected
      * @since 4.0
      */
-    public function test_gravitypdf() {
-        $this->markTestIncomplete( 'Write unit test' );
+    public function test_gravitypdf_shortcode() {
+
+        $entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+
+        /* Test for a failed result */
+        $this->assertEquals( '', $this->model->gravitypdf( array() ) );
+
+        /* Authorise the current user */
+        $user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+        $this->assertInternalType( 'integer', $user_id );
+        wp_set_current_user( $user_id );
+
+        /* Test for error */
+        $this->assertNotFalse( strpos( $this->model->gravitypdf( array( 'entry' => $entry['id'] ) ), '<pre class="gravitypdf-error">' ) );
+
+        /* Test for actual result */
+        $this->assertNotFalse( strpos( $this->model->gravitypdf( array( 'entry' => $entry['id'], 'id' => '555ad84787d7e' ) ), 'Download PDF' ) );
+
+        /* Test for configured results */
+        $this->assertNotFalse( strpos( $this->model->gravitypdf( array( 'entry' => $entry['id'], 'id' => '555ad84787d7e', 'text' => 'View PDF' ) ), 'View PDF' ) );
+        $this->assertFalse( strpos( $this->model->gravitypdf( array( 'entry' => $entry['id'], 'id' => '555ad84787d7e', 'type' => 'view' ) ), '/download/' ) );
+        $this->assertNotFalse( strpos( $this->model->gravitypdf( array( 'entry' => $entry['id'], 'id' => '555ad84787d7e' ) ), '/download/' ) );
+        $this->assertNotFalse( strpos( $this->model->gravitypdf( array( 'entry' => $entry['id'], 'id' => '555ad84787d7e', 'classes' => 'my-pdf-download-link' ) ), 'my-pdf-download-link' ) );
+
+        /* Test for entry URL loading */
+        $_GET['lid'] = $entry['id'];
+        $this->assertNotFalse( strpos( $this->model->gravitypdf( array('id' => '555ad84787d7e' ) ), 'Download PDF' ) );
+
+        $_GET['lid'] = '5000';
+        $this->assertNotFalse( strpos( $this->model->gravitypdf( array('id' => '555ad84787d7e' ) ), '<pre class="gravitypdf-error">' ) );
     }
 
     /**
@@ -116,7 +144,24 @@ class Test_Shortcode extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_gravitypdf_confirmation() {
-        $this->markTestIncomplete( 'Write unit test' );
+        
+        /* Setup test data */
+        $confirmation = 'Thanks for getting in touch. [gravitypdf id="555ad84787d7e"]';
+        $form = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+        $lead = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+
+        /* Check our entry ID is being automatically added */
+        $results = $this->model->gravitypdf_confirmation( $confirmation, $form, $lead );
+        $this->assertNotFalse( strpos( $results, '[gravitypdf id="555ad84787d7e" entry="'. $lead['id'] . '"]' ) );
+
+        /* Check we don't modify the ID when it already exists */
+        $confirmation = 'Thanks for getting in touch. [gravitypdf id="555ad84787d7e" entry="5000"]';
+        $results = $this->model->gravitypdf_confirmation( $confirmation, $form, $lead );
+        $this->assertNotFalse( strpos( $results, '[gravitypdf id="555ad84787d7e" entry="5000"]' ) );
+
+        /* Check we pass when confirmation is an array */
+        $results = $this->model->gravitypdf_confirmation( array( 'data' ), $form, $lead );
+        $this->assertEquals( 'data', $results[0] );
     }
 
     /**
@@ -124,7 +169,36 @@ class Test_Shortcode extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_add_shortcode_attr() {
-        $this->markTestIncomplete( 'Write unit test' );
+
+        /* Setup our test data */
+        $content = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/shortcode-data.json' ) ), true );
+
+        $shortcodes = $this->model->get_shortcode_information( 'gravitypdf', $content );
+
+        $code1 = $shortcodes[0];
+        $code2 = $shortcodes[1];
+        $code3 = $shortcodes[2];
+
+        /* Check we can correctly replace attributes in code 1 */
+        $results = $this->model->add_shortcode_attr( $code1, 'text', 'Get My PDF' );
+        $this->assertEquals( '[gravitypdf text="Get My PDF"]', $results['shortcode'] );
+        $this->assertEquals( ' text="Get My PDF"', $results['attr_raw'] );
+        $this->assertEquals( 'Get My PDF', $results['attr']['text'] );
+
+        $results = $this->model->add_shortcode_attr( $code2, 'class', 'class_here' );
+        $this->assertEquals( '[gravitypdf id="1231241221" text="View PDF" type="view" class="class_here"]', $results['shortcode'] );
+        $this->assertEquals( ' id="1231241221" text="View PDF" type="view" class="class_here"', $results['attr_raw'] );
+        $this->assertEquals( 'class_here', $results['attr']['class'] );
+
+        $results = $this->model->add_shortcode_attr( $code2, 'type', 'download' );
+        $this->assertEquals( '[gravitypdf id="1231241221" text="View PDF" type="download"]', $results['shortcode'] );
+        $this->assertEquals( ' id="1231241221" text="View PDF" type="download"', $results['attr_raw'] );
+        $this->assertEquals( 'download', $results['attr']['type'] );
+
+        $results = $this->model->add_shortcode_attr( $code3, 'entry', '{entry_id}' );
+        $this->assertEquals( '[gravitypdf id="78454" classes="my-custom-class" entry="{entry_id}"]', $results['shortcode'] );
+        $this->assertEquals( ' id="78454" classes="my-custom-class" entry="{entry_id}"', $results['attr_raw'] );
+        $this->assertEquals( '{entry_id}', $results['attr']['entry'] );
     }
 
     /**
@@ -132,7 +206,20 @@ class Test_Shortcode extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_gravitypdf_redirect_confirmation() {
-        $this->markTestIncomplete( 'Write unit test' );
+        
+        /* Setup our redirect confirmation value */
+        $_POST['form_confirmation_url'] = '[gravitypdf id="555ad84787d7e"]';
+
+        /* Run the test */
+        $this->model->gravitypdf_redirect_confirmation( '' );
+        $this->assertEquals( site_url() . '/pdf/555ad84787d7e/{entry_id}/download/', $_POST['form_confirmation_url'] );
+
+        /* Check for viewing URL */
+        $_POST['form_confirmation_url'] = '[gravitypdf id="555ad84787d7e" type="view"]';
+
+        $this->model->gravitypdf_redirect_confirmation( '' );
+        $this->assertEquals( site_url() . '/pdf/555ad84787d7e/{entry_id}/', $_POST['form_confirmation_url'] );
+
     }
 
     /**
@@ -140,7 +227,36 @@ class Test_Shortcode extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_get_shortcode_information() {
-        $this->markTestIncomplete( 'Write unit test' );
+        $content = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/shortcode-data.json' ) ), true );
+
+        $shortcodes = $this->model->get_shortcode_information( 'gravitypdf', $content );
+
+        /* Test the results */
+        $this->assertSame( 4, sizeof( $shortcodes ) );
+
+        $this->assertEquals( '[gravitypdf]', $shortcodes[0]['shortcode'] );
+        $this->assertEquals( '', $shortcodes[0]['attr_raw'] );
+        $this->assertEquals( '', $shortcodes[0]['attr'] );
+
+        $this->assertEquals( '[gravitypdf id="1231241221" text="View PDF" type="view"]', $shortcodes[1]['shortcode'] );
+        $this->assertEquals( ' id="1231241221" text="View PDF" type="view"', $shortcodes[1]['attr_raw'] );
+        $this->assertEquals( '1231241221', $shortcodes[1]['attr']['id'] );
+        $this->assertEquals( 'View PDF', $shortcodes[1]['attr']['text'] );
+        $this->assertEquals( 'view', $shortcodes[1]['attr']['type'] );
+
+        $this->assertEquals( '[gravitypdf id="78454" classes="my-custom-class" entry="2000"]', $shortcodes[2]['shortcode'] );
+        $this->assertEquals( ' id="78454" classes="my-custom-class" entry="2000"', $shortcodes[2]['attr_raw'] );
+        $this->assertEquals( '78454', $shortcodes[2]['attr']['id'] );
+        $this->assertEquals( 'my-custom-class', $shortcodes[2]['attr']['classes'] );
+        $this->assertEquals( '2000', $shortcodes[2]['attr']['entry'] );
+
+        $this->assertEquals( '[gravitypdf id="afawfjoa420204" classes="my-custom-class-2" entry="3000" text="View PDF" type="view"]', $shortcodes[3]['shortcode'] );
+        $this->assertEquals( ' id="afawfjoa420204" classes="my-custom-class-2" entry="3000" text="View PDF" type="view"', $shortcodes[3]['attr_raw'] );
+        $this->assertEquals( 'afawfjoa420204', $shortcodes[3]['attr']['id'] );
+        $this->assertEquals( 'my-custom-class-2', $shortcodes[3]['attr']['classes'] );
+        $this->assertEquals( '3000', $shortcodes[3]['attr']['entry'] );
+        $this->assertEquals( 'View PDF', $shortcodes[3]['attr']['text'] );
+        $this->assertEquals( 'view', $shortcodes[3]['attr']['type'] );
     }
 
     /**
@@ -148,7 +264,7 @@ class Test_Shortcode extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_no_entry_id() {
-        $this->markTestIncomplete( 'Write unit test' );
+        $this->assertNotFalse( strpos( $this->view->no_entry_id(), 'No Gravity Form entry ID' ) );
     }
 
     /**
@@ -156,7 +272,7 @@ class Test_Shortcode extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_invalid_pdf_config() {
-        $this->markTestIncomplete( 'Write unit test' );
+        $this->assertNotFalse( strpos( $this->view->invalid_pdf_config(), 'Could not get Gravity PDF configuration' ) );
     }
 
     /**
@@ -164,6 +280,6 @@ class Test_Shortcode extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_display_gravitypdf_shortcode() {
-        $this->markTestIncomplete( 'Write unit test' );
+        $this->assertNotFalse( strpos( $this->view->display_gravitypdf_shortcode(), '<a href="' ) );
     }
 }
