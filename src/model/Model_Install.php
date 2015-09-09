@@ -115,6 +115,9 @@ class Model_Install extends Helper_Abstract_Model {
 
 			$this->log->addNotice( 'Gravity PDF Installed' );
 			update_option( 'gfpdf_is_installed', true );
+			$this->data->is_installed = true;
+
+			do_action( 'gfpdf_plugin_installed' );
 	}
 
 	/**
@@ -317,7 +320,6 @@ class Model_Install extends Helper_Abstract_Model {
 		$this->remove_plugin_form_settings();
 		$this->remove_folder_structure();
 		$this->deactivate_plugin();
-		$this->redirect_to_plugins_page();
 	}
 
 	/**

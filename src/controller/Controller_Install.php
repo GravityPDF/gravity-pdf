@@ -178,6 +178,8 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 		 }
 
 		 if( PDF_EXTENDED_VERSION != get_option( 'gfpdf_current_version' ) ) {
+
+		 	do_action( 'gfpdf_version_changed', get_option( 'gfpdf_current_version' ), PDF_EXTENDED_VERSION );
 		 	update_option( 'gfpdf_current_version', PDF_EXTENDED_VERSION );
 		 }
 	}
@@ -211,6 +213,7 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 			}
 
 			$this->model->uninstall_plugin();
+			
 		}
 	}
 }
