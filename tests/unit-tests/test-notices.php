@@ -68,15 +68,7 @@ class Test_Notices extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_actions() {
-        $this->markTestIncomplete( 'Write unit test' );
-    }
-
-    /**
-     * Test we correctly return the notice type based on the current location of the user
-     * @since 4.0
-     */
-    public function test_get_notice_type() {
-        $this->markTestIncomplete( 'Write unit test' );
+        $this->assertEquals( 10, has_action( 'admin_notices', array( $this->notices, 'process' ) ) );
     }
 
     /**
@@ -84,7 +76,10 @@ class Test_Notices extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_add_notice() {
-        $this->markTestIncomplete( 'Write unit test' );
+        
+        $this->assertFalse( $this->notices->has_notice() );
+        $this->notices->add_notice( 'My First Notice' );
+        $this->assertTrue( $this->notices->has_notice() );
     }
 
     /**
@@ -92,15 +87,10 @@ class Test_Notices extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_add_error() {
-        $this->markTestIncomplete( 'Write unit test' );
-    }
-
-    /**
-     * Can we correctly determine if there are any scheduled notices
-     * @since 4.0
-     */
-    public function test_has_notice() {
-        $this->markTestIncomplete( 'Write unit test' );
+        
+        $this->assertFalse( $this->notices->has_error() );
+        $this->notices->add_error( 'My First Error' );
+        $this->assertTrue( $this->notices->has_error() );
     }
 
     /**
@@ -108,6 +98,15 @@ class Test_Notices extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_process() {
-        $this->markTestIncomplete( 'Write unit test' );
+        
+        $this->notices->add_notice( 'My First Notice' );
+        $this->notices->add_error( 'My First Error' );
+
+        ob_start();
+        $this->notices->process();
+        $html = ob_get_clean();
+
+        $this->assertNotFalse( strpos( $html, '<p>My First Notice</p>' ) );
+        $this->assertNotFalse( strpos( $html, '<p>My First Error</p>' ) );
     }
 }
