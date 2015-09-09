@@ -80,6 +80,9 @@ class Test_Notices extends WP_UnitTestCase
         $this->assertFalse( $this->notices->has_notice() );
         $this->notices->add_notice( 'My First Notice' );
         $this->assertTrue( $this->notices->has_notice() );
+
+        /* Cleanup notices */
+        $this->notices->clear();
     }
 
     /**
@@ -90,6 +93,54 @@ class Test_Notices extends WP_UnitTestCase
         
         $this->assertFalse( $this->notices->has_error() );
         $this->notices->add_error( 'My First Error' );
+        $this->assertTrue( $this->notices->has_error() );
+
+        /* Cleanup notices */
+        $this->notices->clear();
+    }
+
+    /**
+     * Ensure we can clear notices correctly
+     * @since 4.0
+     */
+    public function test_clear() {
+
+        /* Load some data */
+        $this->notices->add_notice( 'My First Notice' );
+        $this->notices->add_notice( 'My First Notice' );
+        $this->notices->add_error( 'My First Error' );
+        $this->notices->add_error( 'My First Error' );
+
+        /* Verify that data */
+        $this->assertTrue( $this->notices->has_notice() );
+        $this->assertTrue( $this->notices->has_error() );
+
+        /* Clear all notices */
+        $this->notices->clear( 'all' );
+
+        $this->assertFalse( $this->notices->has_notice() );
+        $this->assertFalse( $this->notices->has_error() );
+
+        /* Test clearing errors only */
+        $this->notices->add_notice( 'My First Notice' );
+        $this->notices->add_notice( 'My First Notice' );
+        $this->notices->add_error( 'My First Error' );
+        $this->notices->add_error( 'My First Error' );
+
+        $this->notices->clear( 'errors' );
+
+        $this->assertTrue( $this->notices->has_notice() );
+        $this->assertFalse( $this->notices->has_error() );
+
+        /* Test clearning notices only */
+        $this->notices->add_notice( 'My First Notice' );
+        $this->notices->add_notice( 'My First Notice' );
+        $this->notices->add_error( 'My First Error' );
+        $this->notices->add_error( 'My First Error' );
+
+        $this->notices->clear( 'notices' );
+
+        $this->assertFalse( $this->notices->has_notice() );
         $this->assertTrue( $this->notices->has_error() );
     }
 

@@ -135,6 +135,22 @@ class Helper_Notices implements Helper_Interface_Actions {
 	}
 
 	/**
+	 * Remove all notices / errors
+	 * @param  string $type Switch to remove all messages, errors or just notices. Valid arguments are 'all', 'notices', 'errors'
+	 * @since 4.0
+	 */
+	public function clear( $type = 'all' ) {
+
+		if( 'errors' === $type || 'all' === $type ) {
+			$this->errors = array();
+		}
+
+		if( 'notices' === $type || 'all' === $type ) {
+			$this->notices = array();
+		}
+	}
+
+	/**
 	 * Process our admin notice and error messages
 	 * @return void
 	 * @since 4.0
