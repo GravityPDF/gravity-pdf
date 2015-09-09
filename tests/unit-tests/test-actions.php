@@ -8,6 +8,8 @@ use GFPDF\View\View_Actions;
 
 use WP_UnitTestCase;
 
+use Exception;
+
 /**
  * Test Gravity PDF Actions functionality
  *
@@ -88,7 +90,8 @@ class Test_Actions extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_actions() {
-        $this->markTestIncomplete( 'Write unit test' );
+        $this->assertSame( 10, has_action( 'admin_init', array( $this->controller, 'route' ) ) );
+        $this->assertSame( 20, has_action( 'admin_init', array( $this->controller, 'route_notices' ) ) );
     }
 
     /**
@@ -96,7 +99,19 @@ class Test_Actions extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_get_routes() {
-        $this->markTestIncomplete( 'Write unit test' );
+        
+        $routes = $this->controller->get_routes();
+
+        $counter = 0;
+        $expected = array( 'review_plugin', 'migrate_v3_to_v4' );
+
+        foreach( $routes as $route ) {
+            if( in_array( $route['action'], $expected ) ) {
+                $counter++;
+            }
+        }
+
+        $this->assertSame( 2, $counter );
     }
 
     /**
@@ -104,7 +119,85 @@ class Test_Actions extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_route_notices() {
-        $this->markTestIncomplete( 'Write unit test' );
+        global $gfpdf;
+
+        /* Set up a custom route */
+        add_filter( 'gfpdf_one_time_action_routes', function( $routes ) {
+
+            return array(
+                array(
+                    'action'      => 'test_action',
+                    'action_text' => 'My Test Action',
+                    'condition'   => function() { return true; },
+                    'process'     => function() { echo 'processing'; },
+                    'view'        => function() { return 'my test view'; },
+                    'capability'  => 'gravityforms_view_settings',
+                )
+            );
+        } );
+
+        /* Verify no notices present */
+        $this->assertFalse( $gfpdf->notices->has_notice() );
+
+        /* Test failure due to no capabilities */
+        $this->controller->route_notices();
+
+        /* Verify no notices present */
+        $this->assertFalse( $gfpdf->notices->has_notice() );
+
+        /* Set up authorized user */
+        $user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+        $this->assertInternalType( 'integer', $user_id );
+        wp_set_current_user( $user_id );
+
+        /* Verify notice now present */
+        $this->controller->route_notices();
+
+        /* Verify notice now exists */
+        $this->assertTrue( $gfpdf->notices->has_notice() );
+
+        /* Cleanup notices */
+        $gfpdf->notices->clear();
+    }
+
+    /**
+     * Test route notices are displayed correctly (verfiy capability, check for dismissal, check condition met)
+     * @since 4.0
+     */
+    public function test_route_notices_fail_condition() {
+        global $gfpdf;
+
+        /* Set up a custom route */
+        add_filter( 'gfpdf_one_time_action_routes', function( $routes ) {
+
+            return array(
+                array(
+                    'action'      => 'test_action',
+                    'action_text' => 'My Test Action',
+                    'condition'   => function() { return false; },
+                    'process'     => function() { echo 'processing'; },
+                    'view'        => function() { return 'my test view'; },
+                    'capability'  => 'gravityforms_view_settings',
+                )
+            );
+        } );
+
+        /* Set up authorized user */
+        $user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+        $this->assertInternalType( 'integer', $user_id );
+        wp_set_current_user( $user_id );
+
+        /* Verify no notices present */
+        $this->assertFalse( $gfpdf->notices->has_notice() );
+
+        /* Verify notice now present */
+        $this->controller->route_notices();
+
+        /* Verify notice now exists */
+        $this->assertFalse( $gfpdf->notices->has_notice() );
+
+        /* Cleanup notices */
+        $gfpdf->notices->clear();
     }
 
     /**
@@ -112,7 +205,62 @@ class Test_Actions extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_route() {
-        $this->markTestIncomplete( 'Write unit test' );
+        
+        /* Set up a custom route */
+        add_filter( 'gfpdf_one_time_action_routes', function( $routes ) {
+
+            return array(
+                array(
+                    'action'      => 'test_action',
+                    'action_text' => 'My Test Action',
+                    'condition'   => function() { return true; },
+                    'process'     => function() { echo 'processing'; },
+                    'view'        => function() { return 'my test view'; },
+                    'capability'  => 'gravityforms_view_settings',
+                )
+            );
+        } );
+
+        $_POST['action'] = 'gfpdf_test_action';
+
+        /* Fail capability check */
+        try {
+            $this->controller->route();
+        } catch ( Exception $e ) {
+            /* Expected */
+        }
+
+        $this->assertEquals( 'You do not have permission to access this page', $e->getMessage() );
+
+        /* Set up authorized user */
+        $user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+        $this->assertInternalType( 'integer', $user_id );
+        wp_set_current_user( $user_id );
+
+        /* Force nonce fail */
+        ob_start();
+        $this->controller->route();
+        $html = ob_get_clean();
+
+        $this->assertSame( '', $html );
+
+        /* Check action runs correctly */
+        $_POST['gfpdf_action_test_action'] = wp_create_nonce( 'gfpdf_action_test_action' );
+        ob_start();
+        $this->controller->route();
+        $html = ob_get_clean();
+
+        $this->assertSame( 'processing', $html );
+
+        /* Dismiss the notice */
+        $_POST['gfpdf-dismiss-notice'] = 'yes';
+        ob_start();
+        $this->controller->route();
+        $html = ob_get_clean();
+
+        $this->assertSame( '', $html );
+        $this->assertTrue( $this->model->is_notice_already_dismissed( 'test_action' ) );
+
     }
 
     /**
@@ -120,23 +268,24 @@ class Test_Actions extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_is_notice_already_dismissed() {
-        $this->markTestIncomplete( 'Write unit test' );
+        $type = 'review_plugin';
+
+        $this->assertFalse( $this->model->is_notice_already_dismissed( $type ) );
+        $this->model->dismiss_notice( $type );
+        $this->assertTrue( $this->model->is_notice_already_dismissed( $type ) );
     }
 
-    /**
-     * Check the notice dismissal function is accurate
-     * @since 4.0
-     */
-    public function test_dismiss_notice() {
-        $this->markTestIncomplete( 'Write unit test' );
-    }
 
     /**
      * Check the core review action conditional works as expected
      * @since 4.0
      */
     public function test_review_condition() {
-        $this->markTestIncomplete( 'Write unit test' );
+        global $gfpdf;
+
+        $this->assertFalse( $this->model->review_condition() );
+        $gfpdf->options->update_option( 'pdf_count', 101 );
+        $this->assertTrue( $this->model->review_condition() );
     }
 
     /**
@@ -144,7 +293,14 @@ class Test_Actions extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_migration_condition() {
-        $this->markTestIncomplete( 'Write unit test' );
+        global $gfpdf;
+
+        $this->assertFalse( $this->model->migration_condition() );
+        touch( $this->data->template_location . 'configuration.php' );
+        $this->assertTrue( $this->model->migration_condition() );
+
+        unlink( $this->data->template_location . 'configuration.php' );
+
     }
 
     /**
@@ -152,22 +308,16 @@ class Test_Actions extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_get_action_buttons() {
-    	$this->markTestIncomplete( 'Write unit test' );
-    }
+    	
+        $html = $this->view->get_action_buttons( 'review_plugin', 'Review' );
 
-    /**
-     * Check our review view generates correctly
-     * @since 4.0
-     */
-    public function test_review_plugin() {
-    	$this->markTestIncomplete( 'Write unit test' );
-    }
+        $this->assertNotFalse( strpos( $html, 'Review</button>' ) );
+        $this->assertNotFalse( strpos( $html, 'name="gfpdf-dismiss-notice"' ) );
 
-    /**
-     * Check our migration view generates correctly
-     * @since 4.0
-     */
-    public function test_migration() {
-    	$this->markTestIncomplete( 'Write unit test' );
+        /* Check action button without dismissal button */
+        $html = $this->view->get_action_buttons( 'review_plugin', 'Review', 'disabled' );
+
+        $this->assertNotFalse( strpos( $html, 'Review</button>' ) );
+        $this->assertFalse( strpos( $html, 'name="gfpdf-dismiss-notice"' ) );
     }
 }

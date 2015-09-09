@@ -59,11 +59,11 @@ class View_Actions extends Helper_Abstract_View
 	 * Add our primary button and an opt-our dismissal button
 	 * @param  String $type        The action ID
 	 * @param  String $button_text The primary button text
-	 * @param  String $dismissal   Whether the dismissal button should be shown
+	 * @param  String $dismissal   Whether the dismissal button should be shown. Valid arguments are 'enabled' or 'disabled'
 	 * @return String              The action_buttons HTML
 	 * @since 4.0
 	 */
-	private function get_action_buttons( $type, $button_text, $dismissal = 'enabled' ) {
+	public function get_action_buttons( $type, $button_text, $dismissal = 'enabled' ) {
 
 		return $this->load( 'action_buttons', array(
 			'type'        => $type,

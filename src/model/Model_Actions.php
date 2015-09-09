@@ -135,8 +135,6 @@ class Model_Actions extends Helper_Abstract_Model {
 		return false;
 	}
 
-
-
 	/**
 	 * Check if our v3 configuration file exists
 	 * @return Boolean
@@ -171,7 +169,5 @@ class Model_Actions extends Helper_Abstract_Model {
 		if( $migration->begin_migration() ) {
             $this->dismiss_notice( 'migrate_v3_to_v4' );
         }
-
-
 	}
 }
