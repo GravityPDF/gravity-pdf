@@ -102,7 +102,6 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	 */
 	public function init() {
 		 $this->add_actions();
-		 $this->add_filters();
 	}
 
 	/**
