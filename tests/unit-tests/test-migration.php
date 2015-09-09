@@ -60,7 +60,7 @@ class Test_Migration extends WP_UnitTestCase
         parent::setUp();
 
         /* Setup our test classes */
-        $this->migration = new Helper_Notices( $gfpdf->form, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
+        $this->migration = new Helper_Migration( $gfpdf->form, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
     }
 
     /**
