@@ -1,0 +1,106 @@
+<?php
+
+/**
+ * v3 Configuration sample for our testing suite
+ */
+
+if( ! class_exists( 'GravityPDF_Unit_Tests_Bootstrap' ) ) {
+  die();
+}
+
+/*
+ * Gravity PDF Configuration
+ * Each option is explained in detail in this file but you can also find a more user-friendly option online:
+ * https://developer.gravitypdf.com/documentation/configuration-options-examples/
+ */
+ 
+ global $gf_pdf_default_configuration;
+ 
+ $gf_pdf_default_configuration = array(
+  'template' => 'default-template.php',
+  'pdf_size' => 'A4',
+ );
+ 
+ /*
+  * ------------------------------------------------------------
+  * Bare minimum configuration code
+  * Usage: Will generate PDF and send to all notifications
+  * Remove the comments around the code blocks below to use (/*)
+  * form_id Mixed - Integer or Array. Required. The Gravity Form ID you are assigning the PDF to.
+  * notifications Mixed - String, Boolean or Array.
+  */
+  
+  $gf_pdf_config[] = array(
+    'form_id' => 1,
+    'notifications' => true,
+    'premium' => true,
+    'template' => 'health-care-directive.php',
+  );
+
+  $gf_pdf_config[] = array(
+    'form_id' => 1,
+    'template' => 'example-template.php',
+    'filename' => 'testman.pdf',
+    'notifications' => 'Admin Notification',
+    'access' => 'all',
+  );
+
+  $gf_pdf_config[] = array(
+    'form_id' => 1,
+    'template' => 'default-template-no-style.php',
+    'filename' => 'Double Trouble.pdf',
+    'default-show-html' => true,
+    'default-show-empty' => true,
+    'default-show-page-names' => true,
+    'default-show-section-content' => true,
+  );
+
+  $gf_pdf_config[] = array(
+    'form_id' => 1,
+    'notifications' => true,
+    'filename' => 'testman.pdf',
+     
+    'security' => true,
+    'pdf_password' => 'myPDFpass',
+    'pdf_privileges' => array('copy', 'print', 'modify', 'annot-forms', 'fill-forms', 'extract', 'assemble', 'print-highres'),
+    'pdf_master_password' => 'admin password',
+  );
+
+  $gf_pdf_config[] = array(
+    'form_id' => 1,
+    'filename' => 'testman2.pdf',
+    'notifications' => array('Admin Notification', 'User Notification'),
+     
+    'security' => true,
+    'pdf_password' => '',
+    'pdf_privileges' => array('copy', 'print', 'extract', 'assemble', 'print-highres'),
+    'pdf_master_password' => 'adfawfawr5q2atd',
+  );
+
+  $gf_pdf_config[] = array(
+    'form_id' => 1,
+    'filename' => 'testman3.pdf',
+     
+    'security' => true,
+    'pdf_password' => '',
+    'pdf_master_password' => '',
+  );
+
+  $gf_pdf_config[] = array(
+    'form_id' => 1,
+    'orientation' => 'landscape',
+    'pdf_size' => 'letter',
+    'rtl' => true,
+    'pdfa1b' => true,
+    'dpi' => 300,
+  );
+
+  /* Custom PDF Size */
+   $gf_pdf_config[] = array(
+    'form_id' => 1,
+    'notifications' => 'Admin Notification',
+    'pdf_size' => array(50, 200),
+    'save' => true,
+    'pdfx1a' => true,
+    'dpi' => 300,
+  );
