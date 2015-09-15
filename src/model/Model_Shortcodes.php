@@ -3,9 +3,9 @@
 namespace GFPDF\Model;
 
 use GFPDF\Helper\Helper_Abstract_Model;
-use GFPDF\Model\Model_Form_Settings;
 use GFPDF\Model\Model_PDF;
 use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Helper_Options;
 
 use Psr\Log\LoggerInterface;
 
@@ -65,13 +65,22 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	protected $log;
 
 	/**
+	 * Holds our Helper_Options / Helper_Options_Fields object
+	 * Makes it easy to access global PDF settings and individual form PDF settings
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $options;
+
+	/**
 	 * Load our model and view and required actions
 	 */
-	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log ) {
+	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log, Helper_Options $options ) {
 		
 		/* Assign our internal variables */
 		$this->form    = $form;
 		$this->log     = $log;
+		$this->options = $options;
 	}
 
 	/**
@@ -122,9 +131,8 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		}
 
 		/* Check if we have a valid PDF configuration */
-		$settings    = new Model_Form_Settings( $this->form, $this->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
 		$entry  = $this->form->get_entry( $attributes['entry'] );
-		$config = ( ! is_wp_error( $entry )) ? $settings->get_pdf( $entry['form_id'], $attributes['id'] ) : $entry; /* if invalid entry a WP_Error will be thrown */
+		$config = ( ! is_wp_error( $entry ) ) ? $this->options->get_pdf( $entry['form_id'], $attributes['id'] ) : $entry; /* if invalid entry a WP_Error will be thrown */
 
 		if ( is_wp_error( $config ) ) {
 

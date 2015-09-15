@@ -202,7 +202,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$this->register_notifications( $form['notifications'] );
 
 		/* Pull the PDF settings */
-		$pdf = $this->get_pdf( $form_id, $pdf_id );
+		$pdf = $this->options->get_pdf( $form_id, $pdf_id );
 
 		/* prepare our data */
 		$label = ( ! is_wp_error( $pdf ) && ! isset( $pdf['status'] ) ) ? __( 'Update PDF', 'gravitypdf' ) : __( 'Add PDF', 'gravitypdf' );
@@ -216,276 +216,6 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			'pdf'              => $pdf,
 			'wp_editor_loaded' => class_exists( '_WP_Editors' ),
 		));
-	}
-
-	/**
-	 * Get Form Settings
-	 *
-	 * Retrieves all form PDF settings
-	 *
-	 * @since 4.0
-	 * @return Array/Object GFPDF settings or WP_Error
-	 */
-	public function get_settings( $form_id ) {
-
-		if ( ! isset($this->data->form_settings) ) {
-			$this->data->form_settings = array();
-		}
-
-		$form_id = (int) $form_id;
-
-		if ( 0 === $form_id ) {
-
-			$error = new WP_Error( 'invalid_id', __( 'You must pass in a valid form ID', 'gravitypdf' ) );
-			$this->log->addError( 'Error Getting Settings.', array( 'WP_Error' => $error ) );
-
-			return $error;
-		}
-
-		/* If we haven't pulled the form meta data from the database do so now */
-		if ( ! isset( $this->data->form_settings[ $form_id ] ) ) {
-			
-			$form = $this->form->get_form( $form_id );
-
-			if ( empty($form) ) {
-			
-				$error = new WP_Error( 'invalid_id', __( 'You must pass in a valid form ID', 'gravitypdf' ) );
-				$this->log->addError( 'Error Getting Settings.', array( 'WP_Error' => $error ) );
-			
-				return $error;
-			}
-
-			/* Pull the settings from the $form object, if they exist */
-			$settings = ( isset($form['gfpdf_form_settings'] ) ) ? $form['gfpdf_form_settings'] : array();
-
-			/* Store the settings in our data object. Run filter to allow devs to modify the object as needed */
-			$this->data->form_settings[ $form_id ] = apply_filters( 'gfpdf_get_form_settings', $settings );
-
-		}
-
-		/* return the form meta data */
-		return $this->data->form_settings[ $form_id ];
-	}
-
-	/**
-	 * Get pdf config
-	 *
-	 * Looks to see if the specified setting exists, returns default if not
-	 *
-	 * @since 4.0
-	 * @return mixed
-	 */
-	public function get_pdf( $form_id, $pdf_id ) {
-
-		$this->log->addNotice( 'Getting Settings.', array(
-			'form_id' => $form_id,
-			'pdf_id'  => $pdf_id,
-		) );
-
-		$gfpdf_options = $this->get_settings( $form_id );
-
-		if ( ! is_wp_error( $gfpdf_options ) ) {
-
-			/* Get our PDF array if it exists */
-			$value         = ! empty( $gfpdf_options[ $pdf_id ] ) ? $gfpdf_options[ $pdf_id ] : new WP_Error( 'invalid_pdf_id', __( 'You must pass in a valid PDF ID', 'gravitypdf' ) );
-
-			if( ! is_wp_error ( $value ) ) {
-				return apply_filters( 'gfpdf_pdf_config', apply_filters( 'gfpdf_pdf_config_' . $form_id, $value ) );
-			}
-
-			/* return WP_Error */
-			return $value;
-		}
-
-		/* return WP_Error */
-		return $gfpdf_options;
-	}
-
-
-	/**
-	 * Create a new PDF configuration option for that form
-	 * @param Integer $form_id The form ID
-	 * @param array   $value   The settings array
-	 * @return mixed
-	 * @since 4.0
-	 */
-	public function add_pdf( $form_id, $value = array() ) {
-
-		$this->log->addNotice( 'Adding Settings.', array(
-			'form_id'      => $form_id,
-			'new_settings' => $value,
-		) );
-
-		/* First let's grab the current settings */
-		$options = $this->get_settings( $form_id );
-
-		if ( ! is_wp_error( $options ) ) {
-
-			/* check the ID, if any */
-			$value['id']     = (isset($value['id'])) ? $value['id'] : uniqid();
-			$value['active'] = (isset($value['active'])) ? $value['active'] : true;
-
-			/* Let's let devs alter that value coming in */
-			$value = apply_filters( 'gfpdf_form_add_pdf', $value, $form_id );
-			$value = apply_filters( 'gfpdf_form_add_pdf_' . $form_id, $value, $form_id );
-
-			$results = $this->update_pdf( $form_id, $value['id'], $value, true, false );
-
-			if ( $results ) {
-
-				/* return the ID if successful */
-				$this->log->addNotice( 'Successfuly Added.', array( 'pdf' => $value ) );
-
-				return $value['id'];
-			}
-
-			$this->log->addError( 'Error Saving.', array(
-				'error' => $results,
-				'pdf' => $value,
-			) );
-		}
-
-		return false;
-	}
-
-	/**
-	 * Update an pdf config
-	 *
-	 * Updates a Gravity PDF setting value in both the db and the global variable.
-	 * Warning: Passing in an empty, false or null string value will remove
-	 *          the key from the gfpdf_options array.
-	 *
-	 * @since 4.0
-	 * @param integer         $form_id The Gravity Form ID
-	 * @param string          $pdf_id The PDF Setting ID
-	 * @param string|bool|int $value The value to set the key to
-	 * @param array           $value The PDF settings array
-	 * @param boolean         $filter Whether to apply the update filters or not
-	 * @return boolean True if updated, false if not.
-	 */
-	public function update_pdf( $form_id, $pdf_id, $value = '', $update_db = true, $filters = true ) {
-
-		$this->log->addNotice( 'Updating Settings.', array(
-			'form_id'      => $form_id,
-			'pdf_id'       => $pdf_id,
-			'new_settings' => $value,
-		) );
-
-		if ( empty( $value ) || ! is_array( $value ) || sizeof( $value ) == 0 ) {
-			/* No value was passed in so we will delete the PDF */
-			$remove_option = $this->delete_pdf( $form_id, $pdf_id );
-
-			return $remove_option;
-		}
-
-		/* First let's grab the current settings */
-		$options = $this->get_settings( $form_id );
-
-		if ( ! is_wp_error( $options ) ) {
-
-			/* Don't run when adding a new PDF */
-			if ( $filters ) {
-
-				$this->log->addNotice( 'Trigger Filters.' );
-
-				/* Let's let devs alter that value coming in */
-				$value = apply_filters( 'gfpdf_form_update_pdf', $value, $form_id, $pdf_id );
-				$value = apply_filters( 'gfpdf_form_update_pdf_' . $form_id, $value, $form_id, $pdf_id );
-			}
-
-			/* Next let's try to update the value */
-			$options[ $pdf_id ] = $value;
-
-			/* get the up-to-date form object and merge in the results */
-			$form = $this->form->get_form( $form_id );
-
-			/* Update our GFPDF settings */
-			$form['gfpdf_form_settings'] = $options;
-
-			$did_update = false;
-			if ( $update_db ) {
-
-				$this->log->addNotice( 'Update Form.', array( 'form' => $form ) );
-
-				/* Update the database, if able */
-				$did_update = $this->form->update_form( $form );
-			}
-			
-			if ( ! $update_db || $did_update !== false ) {
-
-				/* If it updated successfully let's update the global variable */
-				$this->log->addNotice( 'Save Local Form Cache.' );
-
-				$this->data->form_settings[$form_id] = $options;
-			}
-
-			/* true if successful, false if failed */
-			return $did_update;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Remove an option
-	 *
-	 * Removes an Gravity PDF setting value in both the db and the global variable.
-	 *
-	 * @since 4.0
-	 * @param string $key The Key to delete
-	 * @return boolean True if updated, false if not.
-	 */
-	public function delete_pdf( $form_id, $pdf_id ) {
-
-		$this->log->addNotice( 'Deleting Setting.', array(
-			'form_id' => $form_id,
-			'pdf_id'  => $pdf_id,
-		) );
-
-		/* First let's grab the current settings */
-		$options = $this->get_settings( $form_id );
-
-		if ( ! is_wp_error( $options ) ) {
-
-			/* Next let's try to update the value */
-			if ( isset( $options[ $pdf_id ] ) ) {
-
-				$this->log->addNotice( 'Found Setting. Now deleting...', array( 'pdf' => $options[ $pdf_id ] ) );
-
-				unset( $options[ $pdf_id ] );
-			}
-
-			/* get the form and merge in the results */
-			$form = $this->form->get_form( $form_id );
-
-			/* Update our GFPDF settings */
-			$form['gfpdf_form_settings'] = $options;
-
-			/* update the database, if able */
-			$did_update = $this->form->update_form( $form );
-
-			/* If it updated, let's update the global variable */
-			if ( $did_update !== false ) {
-
-				$this->log->addNotice( 'Setting Deleted.', array(
-					'form_id' => $form_id,
-					'pdf_id'  => $pdf_id,
-				) );
-
-				$this->data->form_settings[$form_id] = $options;
-			}
-
-			/* true if successful, false if failed */
-			return $did_update;
-		}
-
-		$this->log->addError( 'PDF Delete Failed.', array(
-			'form_id' => $form_id,
-			'pdf_id'  => $pdf_id,
-			'form' => $form,
-		) );
-
-		return false;
 	}
 
 	/**
@@ -536,7 +266,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$sanitized['active'] = true;
 		$sanitized['status'] = 'sanitizing'; /* used as a switch to tell when a record has been saved to the database, or stuck in validation */
 
-		$this->update_pdf( $form_id, $pdf_id, $sanitized, false );
+		$this->options->update_pdf( $form_id, $pdf_id, $sanitized, false );
 
 		/* Do validation */
 		if ( empty($sanitized['name']) || empty($sanitized['filename']) ||
@@ -551,7 +281,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		unset( $sanitized['status'] );
 
 		/* Update the database */
-		$did_update = $this->update_pdf( $form_id, $pdf_id, $sanitized );
+		$did_update = $this->options->update_pdf( $form_id, $pdf_id, $sanitized );
 
 		/* If it updated, let's update the global variable */
 		if ( $did_update !== false ) {
@@ -688,7 +418,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			$template = $this->options->get_option( 'default_template', 'core-simple' );
 		} else {
 			/* Load the PDF configuration */
-			$pdf      = $this->get_pdf( $form_id, $pid );
+			$pdf      = $this->options->get_pdf( $form_id, $pid );
 
 			if ( ! is_wp_error( $pdf ) ) {
 				$template = $pdf['template'];
@@ -959,7 +689,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			wp_die( '401' );
 		}
 
-		$results = $this->delete_pdf( $fid, $pid );
+		$results = $this->options->delete_pdf( $fid, $pid );
 
 		if ( $results && ! is_wp_error( $results ) ) {
 
@@ -1022,13 +752,13 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			wp_die( '401' );
 		}
 
-		$config = $this->get_pdf( $fid, $pid );
+		$config = $this->options->get_pdf( $fid, $pid );
 
 		if ( ! is_wp_error( $config ) ) {
 			$config['id']   = uniqid();
 			$config['name'] = $config['name'] . ' (copy)';
 
-			$results = $this->update_pdf( $fid, $config['id'], $config );
+			$results = $this->options->update_pdf( $fid, $config['id'], $config );
 
 			if ( $results ) {
 				$this->log->addNotice( 'AJAX Endpoint Successful' );
@@ -1099,7 +829,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			wp_die( '401' );
 		}
 
-		$config = $this->get_pdf( $fid, $pid );
+		$config = $this->options->get_pdf( $fid, $pid );
 
 		if ( ! is_wp_error( $config ) ) {
 
@@ -1108,7 +838,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			$state            = ($config['active']) ? __( 'Active', 'gravitypdf' ) : __( 'Inactive', 'gravitypdf' );
 			$src              = $this->form->get_plugin_url() . '/images/active' . intval( $config['active'] ) . '.png';
 
-			$results = $this->update_pdf( $fid, $config['id'], $config );
+			$results = $this->options->update_pdf( $fid, $config['id'], $config );
 
 			if ( $results ) {
 				$this->log->addNotice( 'AJAX Endpoint Successful' );

@@ -573,7 +573,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function shortcodes() {
 
-		$model = new Model\Model_Shortcodes( $this->form, $this->log );
+		$model = new Model\Model_Shortcodes( $this->form, $this->log, $this->options );
 		$view  = new View\View_Shortcodes( array() );
 
 		$class = new Controller\Controller_Shortcodes( $model, $view, $this->log );
@@ -603,10 +603,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @since 4.0
 	 */
 	public function get_default_config_data( $form_id ) {
-		$pid = $GLOBALS['wp']->query_vars['pid'];
+		global $gfpdf;
 
-		$settingsAPI = new Model\Model_Form_Settings( $this->form, $this->log, $this->data, $this->options, $this->misc, $this->notices );
-		$settings    = $settingsAPI->get_pdf( $form_id, $pid );
+		$pid = $GLOBALS['wp']->query_vars['pid'];
+	
+		$settings    = $gfpdf->options->get_pdf( $form_id, $pid );
 
 		if ( is_wp_error( $settings ) ) {
 

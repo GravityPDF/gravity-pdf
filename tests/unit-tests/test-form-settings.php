@@ -249,240 +249,6 @@ class Test_Form_Settings extends WP_UnitTestCase
 	}
 
 	/**
-	 * Test we can get the form's PDF settings
-	 * @since 4.0
-	 */
-	public function test_get_settings() {
-		/* get our form settings */
-		$settings = $this->model->get_settings( $this->form_id );
-
-		/* check basic expected results */
-		$this->assertTrue( is_array( $settings ) );
-		$this->assertEquals( 3, sizeof( $settings ) );
-
-		/* check values are avaliable */
-		$pdf = $settings['555ad84787d7e'];
-
-		$this->assertEquals( 'My First PDF Template', $pdf['name'] );
-		$this->assertEquals( 'Gravity Forms Style', $pdf['template'] );
-		$this->assertTrue( is_array( $pdf['notification'] ) );
-		$this->assertEquals( 2, sizeof( $pdf['notification'] ) );
-		$this->assertEquals( 'test', $pdf['filename'] );
-		$this->assertTrue( is_array( $pdf['conditionalLogic'] ) );
-		$this->assertEquals( 3, sizeof( $pdf['conditionalLogic'] ) );
-		$this->assertEquals( 'custom', $pdf['pdf_size'] );
-		$this->assertEquals( '150', $pdf['custom_pdf_size'][0] );
-		$this->assertEquals( '300', $pdf['custom_pdf_size'][1] );
-		$this->assertEquals( 'millimeters', $pdf['custom_pdf_size'][2] );
-		$this->assertEquals( 'landscape', $pdf['orientation'] );
-		$this->assertEquals( 'dejavusans', $pdf['font'] );
-		$this->assertEquals( 'No', $pdf['rtl'] );
-		$this->assertEquals( 'Standard', $pdf['format'] );
-		$this->assertEquals( 'Yes', $pdf['security'] );
-		$this->assertEquals( 'my password', $pdf['password'] );
-		$this->assertTrue( is_array( $pdf['privileges'] ) );
-		$this->assertEquals( 8, sizeof( $pdf['privileges'] ) );
-		$this->assertEquals( '300', $pdf['image_dpi'] );
-		$this->assertEquals( 'No', $pdf['save'] );
-		$this->assertEquals( '555ad84787d7e', $pdf['id'] );
-		$this->assertSame( true, $pdf['active'] );
-	}
-
-	/**
-	 * Test we can get individual PDF settings
-	 * @since 4.0
-	 */
-	public function test_get_pdf() {
-		$pdf = $this->model->get_pdf( $this->form_id, '555ad84787d7e' );
-		$this->assertEquals( 'My First PDF Template', $pdf['name'] );
-
-		$pdf = $this->model->get_pdf( $this->form_id, '556690c67856b' );
-		$this->assertEquals( 'My First PDF Template (copy)', $pdf['name'] );
-
-		$pdf = $this->model->get_pdf( $this->form_id, '556690c8d7f82' );
-		$this->assertEquals( 'Disable PDF Template', $pdf['name'] );
-		$this->assertSame( false, $pdf['active'] );
-	}
-
-	/**
-	 * Test we can successfully add a new PDF setting
-	 * @since 4.0
-	 */
-	public function test_add_pdf() {
-		global $gfpdf;
-
-		$pdf = array(
-			'name'     => 'Added PDF',
-			'template' => 'default-template',
-		);
-
-		$id = $this->model->add_pdf( $this->form_id, $pdf );
-
-		/* check it was successful */
-		$this->assertNotFalse( $id );
-
-		/* remove local cache and retest */
-		$gfpdf->data->form_settings = array();
-
-		/* verify it was added */
-		$pdf = $this->model->get_pdf( $this->form_id, $id );
-
-		$this->assertEquals( 'Added PDF', $pdf['name'] );
-		$this->assertEquals( 'default-template', $pdf['template'] );
-	}
-
-	/**
-	 * Test we can make changes to individual PDF settings
-	 * @since 4.0
-	 */
-	public function test_update_pdf() {
-		global $gfpdf;
-
-		/* get the configuration node */
-		$pid = '555ad84787d7e';
-		$pdf = $this->model->get_pdf( $this->form_id, $pid );
-
-		/* assign new values */
-		$pdf['name']   = 'My New Name';
-		$pdf['active'] = false;
-
-		/* update database */
-		$this->model->update_pdf( $this->form_id, $pid, $pdf );
-
-		/* check the update was successful */
-		$newPDF = $this->model->get_pdf( $this->form_id, $pid );
-
-		/* ensure everything worked correctly */
-		$this->assertEquals( 'My New Name', $newPDF['name'] );
-		$this->assertSame( false, $newPDF['active'] );
-
-		/* remove local cache and retest */
-		$gfpdf->data->form_settings = array();
-
-		/* retest */
-		$newPDF = $this->model->get_pdf( $this->form_id, $pid );
-
-		/* ensure everything worked correctly */
-		$this->assertEquals( 'My New Name', $newPDF['name'] );
-		$this->assertSame( false, $newPDF['active'] );
-
-		/* check the auto delete functionality works correctly */
-		$this->model->update_pdf( $this->form_id, $pid );
-
-		/* test that the PDF was deleted in the last call */
-		$has_pdf_deleted = $this->model->get_pdf( $this->form_id, $pid );
-
-		/* check it was deleted */
-		$this->assertTrue( is_wp_error( $has_pdf_deleted ) );
-	}
-
-	/**
-	 * Test we can make delete individual PDF settings
-	 * @since 4.0
-	 */
-	public function test_delete_pdf() {
-
-		/* check the pdf exists */
-		$pid = '555ad84787d7e';
-		$pdf = $this->model->get_pdf( $this->form_id, $pid );
-		$this->assertEquals( 'My First PDF Template', $pdf['name'] );
-
-		/* test delete functionality */
-		$this->assertSame( true, $this->model->delete_pdf( $this->form_id, $pid ) );
-		$this->assertTrue( is_wp_error( $this->model->get_pdf( $this->form_id, $pid ) ) );
-
-	}
-
-	/**
-	 * Check user's can correctly tap into the appropriate filters triggered
-	 * during a get_pdf() call
-	 * @since 4.0
-	 */
-	public function test_get_pdf_filter() {
-		add_filter('gfpdf_pdf_config', function () {
-			return 'main filter fired';
-		});
-
-		/* check filter was triggered */
-		$this->assertEquals( 'main filter fired', $this->model->get_pdf( $this->form_id, '555ad84787d7e' ) );
-
-		/* cleanup filters */
-		remove_all_filters( 'gfpdf_pdf_config' );
-
-		/* run individual form ID filter */
-		add_filter('gfpdf_pdf_config_' . $this->form_id, function () {
-			return 'ID filter fired';
-		});
-
-		/* check filter was triggered */
-		$this->assertEquals( 'ID filter fired', $this->model->get_pdf( $this->form_id, '555ad84787d7e' ) );
-	}
-
-	/**
-	 * Check user's can correctly tap into the appropriate filters triggered
-	 * during an add_pdf() call
-	 * @since 4.0
-	 */
-	public function test_add_pdf_filter() {
-		add_filter('gfpdf_form_add_pdf', function () {
-			return array( 'name' => 'Add Filter Fired' );
-		});
-
-		/* run our method */
-		$id = $this->model->add_pdf( $this->form_id, array( 'name' => 'test' ) );
-
-		/* verify the results */
-		$pdf = $this->model->get_pdf( $this->form_id, $id );
-		$this->assertEquals( 'Add Filter Fired', $pdf['name'] );
-
-		/* cleanup filters */
-		remove_all_filters( 'gfpdf_pdf_config' );
-
-		add_filter('gfpdf_form_add_pdf_' . $this->form_id, function () {
-			return array( 'name' => 'ID Add Filter Fired' );
-		});
-
-		/* run our method */
-		$id = $this->model->add_pdf( $this->form_id, array( 'name' => 'test' ) );
-
-		/* verify the results */
-		$pdf = $this->model->get_pdf( $this->form_id, $id );
-		$this->assertEquals( 'ID Add Filter Fired', $pdf['name'] );
-	}
-
-	/**
-	 * Check user's can correctly tap into the appropriate filters triggered
-	 * during a update_pdf() call
-	 * @since 4.0
-	 */
-	public function test_update_pdf_filter() {
-		add_filter('gfpdf_form_update_pdf', function () {
-			return array( 'name' => 'Update Filter Fired' );
-		});
-
-		/* run our method */
-		$this->model->update_pdf( $this->form_id, '555ad84787d7e', array( 'name' => 'test' ) );
-
-		/* verify the results */
-		$pdf = $this->model->get_pdf( $this->form_id, '555ad84787d7e' );
-		$this->assertEquals( 'Update Filter Fired', $pdf['name'] );
-
-		/* cleanup filters */
-		remove_all_filters( 'gfpdf_pdf_config' );
-
-		add_filter('gfpdf_form_update_pdf_' . $this->form_id, function () {
-			return array( 'name' => 'ID Update Filter Fired' );
-		});
-
-		/* run our method */
-		$this->model->update_pdf( $this->form_id, '555ad84787d7e', array( 'name' => 'test' ) );
-
-		/* verify the results */
-		$pdf = $this->model->get_pdf( $this->form_id, '555ad84787d7e' );
-		$this->assertEquals( 'ID Update Filter Fired', $pdf['name'] );
-	}
-
-	/**
 	 * Check our validation method correctly functions
 	 * @since 4.0
 	 */
@@ -529,6 +295,7 @@ class Test_Form_Settings extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function test_process_submission() {
+		global $gfpdf;
 
 		$form_id = $this->form_id;
 		$pid     = '555ad84787d7e';
@@ -559,7 +326,7 @@ class Test_Form_Settings extends WP_UnitTestCase
 		/* Fail sanitization */
 		$this->assertFalse( $this->model->process_submission( $form_id, $pid ) );
 
-		$pdf = $this->model->get_pdf( $form_id, $pid );
+		$pdf = $gfpdf->options->get_pdf( $form_id, $pid );
 		$this->assertEquals( 'sanitizing', $pdf['status'] );
 
 		/* Pass sanitizing */
@@ -680,13 +447,15 @@ class Test_Form_Settings extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function test_register_custom_appearance_settings() {
+		global $gfpdf;
+
 		$form_id = $_GET['id'] = $this->form_id;
 		$pid     = $_GET['pid'] = '555ad84787d7e';
 
 		/* Setup a valid template */
-		$pdf = $this->model->get_pdf( $form_id, $pid );
+		$pdf = $gfpdf->options->get_pdf( $form_id, $pid );
 		$pdf['template'] = 'core-simple';
-		$this->model->update_pdf( $form_id, $pid, $pdf );
+		$gfpdf->options->update_pdf( $form_id, $pid, $pdf );
 
 		$results = $this->model->register_custom_appearance_settings( array() );
 

@@ -8,8 +8,6 @@ use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
 
-use GFPDF\Model\Model_Form_Settings;
-
 use Psr\Log\LoggerInterface;
 
 use Exception;
@@ -346,7 +344,6 @@ class Helper_Migration {
 	 */
 	private function import_v3_config( $config ) {
 
-		$pdfs   = new Model_Form_Settings( $this->form, $this->log, $this->data, $this->options, $this->misc, $this->notices );
 		$errors = array();
 
 		/* Loop through forms and attempt to get the form data */
@@ -425,7 +422,7 @@ class Helper_Migration {
 					}
 
 					/* Insert into database */
-					$results = $pdfs->update_pdf( $form_id, $node['id'], $node, true, false );
+					$results = $this->options->update_pdf( $form_id, $node['id'], $node, true, false );
 
 					if ( $results ) {
 						/* return the ID if successful */

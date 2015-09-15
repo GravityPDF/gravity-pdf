@@ -2,9 +2,6 @@
 
 namespace GFPDF\Tests;
 
-use GFPDF\Model\Model_Form_Settings;
-use GFPDF\Model\Model_Settings;
-
 use GFAPI;
 use GFForms;
 
@@ -102,9 +99,6 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
     public function test_change_state_pdf_setting() {
         global $gfpdf;
 
-        /* set up our data provider */
-        $model = new Model_Form_Settings( $gfpdf->form, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
-
         /* set up our post data and role */
         $this->_setRole( 'administrator' );
         $_POST['fid'] = 0;
@@ -156,7 +150,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
 
         /* Test the function performed correctly */
         unset( $gfpdf->data->form_settings );
-        $pdf   = $model->get_pdf($this->form_id, $this->pid);
+        $pdf   = $gfpdf->options->get_pdf($this->form_id, $this->pid);
         $this->assertFalse($pdf['active']);
 
         /* reset the last response */
@@ -181,7 +175,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
 
         /* Test the function performed correctly */
         unset( $gfpdf->data->form_settings );
-        $pdf = $model->get_pdf($this->form_id, $this->pid);
+        $pdf = $gfpdf->options->get_pdf($this->form_id, $this->pid);
         $this->assertTrue($pdf['active']);
     }
 
@@ -192,9 +186,6 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
      */
     public function test_duplicate_gf_pdf_settings() {
         global $gfpdf;
-
-        /* set up our data provider */
-        $model = new Model_Form_Settings( $gfpdf->form, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
 
         /* set up our post data and role */
         $this->_setRole( 'administrator' );
@@ -251,8 +242,8 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
 
         /* Test the function performed correctly */
         unset( $gfpdf->data->form_settings );
-        $pdf1   = $model->get_pdf($this->form_id, $this->pid);
-        $pdf2   = $model->get_pdf($this->form_id, $response['pid']);
+        $pdf1   = $gfpdf->options->get_pdf($this->form_id, $this->pid);
+        $pdf2   = $gfpdf->options->get_pdf($this->form_id, $response['pid']);
         
         $this->assertEquals($pdf1['name'] . ' (copy)', $pdf2['name']);
         $this->assertEquals($pdf1['template'], $pdf2['template']);
@@ -270,11 +261,8 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
     public function test_delete_gf_pdf_setting() {
         global $gfpdf;
 
-        /* set up our data provider */
-        $model = new Model_Form_Settings( $gfpdf->form, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
-
         /* test configuration exists already */
-        $pdf   = $model->get_pdf($this->form_id, $this->pid);
+        $pdf   = $gfpdf->options->get_pdf($this->form_id, $this->pid);
         $this->assertEquals('My First PDF Template', $pdf['name']);
 
         /* set up our post data and role */
@@ -326,7 +314,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
         
         /* Test the function performed correctly */
         unset( $gfpdf->data->form_settings );
-        $pdf   = $model->get_pdf($this->form_id, $this->pid);
+        $pdf   = $gfpdf->options->get_pdf($this->form_id, $this->pid);
         $this->assertTrue( is_wp_error($pdf) );
     }
 

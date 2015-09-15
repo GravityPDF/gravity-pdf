@@ -3,7 +3,6 @@
 namespace GFPDF\Tests;
 
 use GFPDF\Helper\Helper_Migration;
-use GFPDF\Model\Model_Form_Settings;
 
 use GFForms;
 
@@ -60,13 +59,6 @@ class Test_Migration extends WP_UnitTestCase
 	public $form_id;
 
 	/**
-	 * Holds our form settings object
-	 * @var Object
-	 * @since 4.0
-	 */
-	public $settings;
-
-	/**
 	 * The WP Unit Test Set up function
 	 * @since 4.0
 	 */
@@ -82,7 +74,6 @@ class Test_Migration extends WP_UnitTestCase
 
 		/* Setup our test classes */
 		$this->migration = new Helper_Migration( $gfpdf->form, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
-		$this->settings = new Model_Form_Settings( $gfpdf->form, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
 
 		/* Get our form ID */
 		$this->form_id = $gfpdf->form->add_form( json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/migration_v3_to_v4.json' ) ), true ) );
@@ -149,7 +140,7 @@ class Test_Migration extends WP_UnitTestCase
         $this->assertTrue( $this->migration->begin_migration() );
 
         /* Check the results */
-        $settings = $this->settings->get_settings( $this->form_id );
+        $settings = $gfpdf->options->get_form_pdfs( $this->form_id );
         $settings = array_values( $settings );
 
         $data = $this->provider_imported_data();

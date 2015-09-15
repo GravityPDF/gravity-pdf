@@ -4,7 +4,6 @@ namespace GFPDF\Tests;
 
 use GFPDF\Controller\Controller_PDF;
 use GFPDF\Model\Model_PDF;
-use GFPDF\Model\Model_Form_Settings;
 use GFPDF\View\View_PDF;
 use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Fields\Field_Products;
@@ -1147,8 +1146,6 @@ class Test_PDF extends WP_UnitTestCase
 	public function test_generate_pdf() {
 		global $gfpdf;
 
-		$pdf_settings = new Model_Form_Settings( $gfpdf->form, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
-
 		/* Setup our form and entries */
 		$results = $this->create_form_and_entries();
 		$entry = $results['entry'];
@@ -1156,7 +1153,7 @@ class Test_PDF extends WP_UnitTestCase
 		$pid = '555ad84787d7e';
 
 		/* Get our PDF */
-		$pdf = $pdf_settings->get_pdf( $fid, $pid );
+		$pdf = $gfpdf->options->get_pdf( $fid, $pid );
 
 		/* Fix our template */
 		$pdf['template'] = 'core-simple';

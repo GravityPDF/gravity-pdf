@@ -2,7 +2,6 @@
 
 namespace GFPDF\Model;
 
-use GFPDF\Model\Model_Form_Settings;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_PDF;
 
@@ -155,8 +154,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			return $entry; /* return error */
 		}
 
-		$settingsAPI = new Model_Form_Settings( $this->form, $this->log, $this->data, $this->options, $this->misc, $this->notices );
-		$settings = $settingsAPI->get_pdf( $entry['form_id'], $pid );
+		$settings = $this->options->get_pdf( $entry['form_id'], $pid );
 
 		/* Not valid settings */
 		if ( is_wp_error( $settings ) ) {
@@ -618,12 +616,11 @@ class Model_PDF extends Helper_Abstract_Model {
 
 			/* Set up classes */
 			$controller  = $this->getController();
-			$settingsAPI = new Model_Form_Settings( $this->form, $this->log, $this->data, $this->options, $this->misc, $this->notices );
 
 			/* Loop through each PDF config and generate */
 			foreach ( $pdfs as $pdf_config ) {
 
-				$settings = $settingsAPI->get_pdf( $entry['form_id'], $pdf_config['id'] );
+				$settings = $this->options->get_pdf( $entry['form_id'], $pdf_config['id'] );
 
 				if ( ! is_wp_error( $settings ) && $this->maybe_attach_to_notification( $notifications, $settings ) ) {
 
@@ -697,11 +694,10 @@ class Model_PDF extends Helper_Abstract_Model {
 
 			/* Aet up classes */
 			$controller  = $this->getController();
-			$settingsAPI = new Model_Form_Settings( $this->form, $this->log, $this->data, $this->options, $this->misc, $this->notices );
 
 			/* Loop through each PDF config */
 			foreach ( $pdfs as $pdf ) {
-				$settings = $settingsAPI->get_pdf( $entry['form_id'], $pdf['id'] );
+				$settings = $this->options->get_pdf( $entry['form_id'], $pdf['id'] );
 
 				/* Only generate if the PDF wasn't created during the notification process */
 				if ( ! is_wp_error( $settings ) ) {
@@ -1276,10 +1272,8 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function get_legacy_config( $config ) {
 
-		$settingsAPI = new Model_Form_Settings( $this->form, $this->log, $this->data, $this->options, $this->misc, $this->notices );
-
 		/* Get the form settings */
-		$pdfs = $settingsAPI->get_settings( $config['fid'] );
+		$pdfs = $this->options->get_form_pdfs( $config['fid'] );
 
 		if ( is_wp_error( $pdfs ) ) {
 			return $pdfs;

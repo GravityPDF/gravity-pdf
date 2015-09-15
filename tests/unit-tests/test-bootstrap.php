@@ -210,6 +210,7 @@ class Test_Bootstrap extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function test_get_default_config_data() {
+		global $gfpdf;
 
 		/* Test a failure first */
 		$settings = $this->loader->get_default_config_data( 1 );
@@ -223,9 +224,9 @@ class Test_Bootstrap extends WP_UnitTestCase
 		$form_id = $GLOBALS['GFPDF_Test']->form['form-settings']['id'];
 		$pid     = $GLOBALS['wp']->query_vars['pid'] = '555ad84787d7e';
 
-		$this->loader->data->form_settings = array();
-		$this->loader->data->form_settings[ $form_id ]                       = $GLOBALS['GFPDF_Test']->form['form-settings']['gfpdf_form_settings'];
-		$this->loader->data->form_settings[ $form_id ][ $pid ]['html_field'] = 'Yes';
+		$gfpdf->data->form_settings = array();
+		$gfpdf->data->form_settings[ $form_id ]                       = $GLOBALS['GFPDF_Test']->form['form-settings']['gfpdf_form_settings'];
+		$gfpdf->data->form_settings[ $form_id ][ $pid ]['html_field'] = 'Yes';
 
 		$settings = $this->loader->get_default_config_data( $form_id );
 
