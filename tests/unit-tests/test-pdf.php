@@ -904,7 +904,6 @@ class Test_PDF extends WP_UnitTestCase
 		$files = array(
 			'test' => time(),
 			'test1' => time() - (23 * 3600),
-			'test2' => time() - (24 * 3600),
 			'test3' => time() - (24.5 * 3600),
 			'test4' => time() - (25 * 3600),
 			'test5' => time() - (15 * 3600),
@@ -921,7 +920,6 @@ class Test_PDF extends WP_UnitTestCase
 
 		$this->assertTrue( is_file( $tmp . 'test' ) );
 		$this->assertTrue( is_file( $tmp . 'test1' ) );
-		$this->assertTrue( is_file( $tmp . 'test2' ) );
 		$this->assertFalse( is_file( $tmp . 'test3' ) );
 		$this->assertFalse( is_file( $tmp . 'test4' ) );
 		$this->assertTrue( is_file( $tmp . 'test5' ) );
