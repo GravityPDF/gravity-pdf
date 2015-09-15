@@ -5,6 +5,12 @@ namespace GFPDF\Tests;
 use GFFormsModel;
 use GFAPI;
 use GFForms;
+use GFEntryDetail;
+use GFFormDisplay;
+use RGFormsModel;
+use GFCommon;
+
+use PDF_Common;
 
 use WP_UnitTestCase;
 use WP_User;
@@ -286,5 +292,225 @@ class Test_Gravity_Forms extends WP_UnitTestCase
 		wp_set_current_user( $user_id );
 
 		$this->assertTrue( $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) );
+	}
+
+	/**
+	 * Check the core classes exist
+	 * @since 3.6
+	 */
+	public function test_core_classes() {
+		$this->assertTrue( true, class_exists( 'GFCommon' ) );
+		$this->assertTrue( true, class_exists( 'GFFormsModel' ) );
+		$this->assertTrue( true, class_exists( 'GFEntryDetail' ) );
+		$this->assertTrue( true, class_exists( 'GFFormDisplay' ) );
+	}
+
+	/**
+	 * Check that RGFormsModel::get_form_meta() method works as expected
+	 * @since 3.6
+	 */
+	public function test_get_forms() {
+		$form = RGFormsModel::get_form_meta( $GLOBALS['GFPDF_Test']->form['gravityform-1']['id'] );
+
+		/*
+         * Check the basics
+         * Title is there, field number is correct
+         */
+		$this->assertEquals( 'Simple Form Testing', $form['title'] );
+		$this->assertEquals( true, is_array( $form['fields'] ) );
+		$this->assertEquals( 7, sizeof( $form['fields'] ) );
+		$this->assertEquals( 1, $form['is_active'] );
+
+		/*
+         * Run through each field type and ensure the correct data is present
+         */
+		foreach ( $form['fields'] as $field ) {
+			switch ( $field['type'] ) {
+				case 'name':
+					$this->assertEquals( $field['inputs'][0]['id'], $field['id'].'.3' );
+					$this->assertEquals( $field['inputs'][1]['id'], $field['id'].'.6' );
+				break;
+
+				case 'address':
+					$this->assertEquals( $field['inputs'][0]['id'], $field['id'].'.1' );
+					$this->assertEquals( $field['inputs'][1]['id'], $field['id'].'.2' );
+					$this->assertEquals( $field['inputs'][2]['id'], $field['id'].'.3' );
+					$this->assertEquals( $field['inputs'][3]['id'], $field['id'].'.4' );
+					$this->assertEquals( $field['inputs'][4]['id'], $field['id'].'.5' );
+					$this->assertEquals( $field['inputs'][5]['id'], $field['id'].'.6' );
+				break;
+
+				case 'email':
+					$this->assertEquals( 3, $field['id'] );
+				break;
+
+				case 'phone':
+					$this->assertEquals( 4, $field['id'] );
+					$this->assertEquals( 'standard', $field['phoneFormat'] );
+				break;
+
+				case 'select':
+				case 'multiselect':
+					$this->assertEquals( 3, sizeof( $field['choices'] ) );
+				break;
+
+				case 'textarea':
+					$this->assertEquals( 7, $field['id'] );
+				break;
+			}
+		}
+
+		/*
+         * Run through the notifications
+         */
+		$this->assertEquals( 2, sizeof( $form['notifications'] ) );
+
+		$form['notifications'] = array_values( $form['notifications'] );
+
+		$this->assertEquals( 'Admin Notification', $form['notifications'][0]['name'] );
+		$this->assertEquals( 'User Notification', $form['notifications'][1]['name'] );
+	}
+
+	/**
+	 * Test that RGFormsModel::get_lead() functionality works correctly
+	 * @since 3.6
+	 */
+	public function test_get_entry() {
+		$entry = RGFormsModel::get_lead( $GLOBALS['GFPDF_Test']->entries['gravityform-1'][0]['id'] );
+
+		$valid_entries = array(
+			'id',
+		'form_id',
+		'date_created',
+		'is_starred',
+		'is_read',
+		'ip',
+		'source_url',
+		'post_id',
+		'currency',
+		'payment_status',
+		'payment_date',
+		'transaction_id',
+		'payment_amount',
+		'payment_method',
+		'is_fulfilled',
+		'created_by',
+		'transaction_type',
+		'user_agent',
+		'status',
+		);
+
+		foreach ( $valid_entries as $v ) {
+			$this->assertEquals( array_key_exists( $v, $entry ), true );
+		}
+
+		$this->assertEquals( 'My', $entry['1.3'] );
+		$this->assertEquals( 'Name', $entry['1.6'] );
+		$this->assertEquals( 'First Choice', $entry[5] );
+
+		$entry = RGFormsModel::get_lead( $GLOBALS['GFPDF_Test']->entries['gravityform-1'][1]['id'] );
+
+		$this->assertEquals( 'First', $entry['1.3'] );
+		$this->assertEquals( 'Last', $entry['1.6'] );
+		$this->assertEquals( '12 Alister St', $entry['2.1'] );
+		$this->assertEquals( 'Ali', $entry['2.3'] );
+		$this->assertEquals( 'State', $entry['2.4'] );
+		$this->assertEquals( '2678', $entry['2.5'] );
+		$this->assertEquals( 'Barbados', $entry['2.6'] );
+		$this->assertEquals( 'my@test.com', $entry['3'] );
+		$this->assertEquals( '(345)445-4566', $entry['4'] );
+		$this->assertEquals( 'Second Choice', $entry['5'] );
+		$this->assertEquals( 'First Choice,Second Choice,Third Choice', $entry['6'] );
+
+		$entry = RGFormsModel::get_lead( $GLOBALS['GFPDF_Test']->entries['gravityform-1'][2]['id'] );
+
+		$this->assertEquals( 'Jake', $entry['1.3'] );
+		$this->assertEquals( 'Jackson', $entry['1.6'] );
+		$this->assertEquals( '123 Fake St', $entry['2.1'] );
+		$this->assertEquals( 'Line 2', $entry['2.2'] );
+		$this->assertEquals( 'City', $entry['2.3'] );
+		$this->assertEquals( 'State', $entry['2.4'] );
+		$this->assertEquals( '2441', $entry['2.5'] );
+		$this->assertEquals( 'Albania', $entry['2.6'] );
+		$this->assertEquals( 'test@test.com', $entry['3'] );
+		$this->assertEquals( '(123)123-1234', $entry['4'] );
+		$this->assertEquals( 'Third Choice', $entry['5'] );
+		$this->assertEquals( 'Second Choice,Third Choice', $entry['6'] );
+		$this->assertEquals( 'This is paragraph test!', $entry['7'] );
+	}
+
+	/**
+	 * Test GF replace variables function (merge tags)
+	 * i.e GFCommon::replace_variables
+	 *
+	 * @since 3.6
+	 * @dataProvider provider_mergetag_test
+	 */
+	public function test_replace_variables( $mergetag, $value ) {
+		$this->assertEquals( $value, PDF_Common::do_mergetags( $mergetag, $GLOBALS['GFPDF_Test']->form['gravityform-1']['id'], $GLOBALS['GFPDF_Test']->entries['gravityform-1'][2]['id'] ) );
+	}
+
+	/**
+	 * Data provider for testing merge tags replace correctly
+	 * @since 3.6
+	 */
+	public function provider_mergetag_test() {
+		return array(
+			array( '{:1.3}', 'Jake' ),
+			array( '{:1.6}', 'Jackson' ),
+			array( '{:5}', 'Third Choice' ),
+			array( '{:7}', 'This is paragraph test!' ),
+			array( '{date_dmy}', date( 'd/m/Y' ) ),
+			array( '{date_mdy}', date( 'm/d/Y' ) ),
+			array( '{form_title}', 'Simple Form Testing' ),
+		);
+	}
+
+	/**
+	 * Test that the correct IP is returned by the function
+	 *
+	 * @param String $ip  The test IP address
+	 * @param String $var The $_SERVER array key
+	 *
+	 * @dataProvider provider_ip_testing
+	 * @since 3.6
+	 */
+	public function run_ip_test( $ip, $var ) {
+		$_SERVER[ $var ] = $ip;
+		$this->assertEquals( $ip, GFFormsModel::get_ip() );
+		unset( $_SERVER[ $var ] );
+	}
+
+	/**
+	 * The data provider for the run_ip_test() function
+	 * @since 3.6
+	 */
+	public function provider_ip_testing() {
+		return array(
+			array( '5.120.2.1', 'HTTP_CLIENT_IP' ),
+			array( '6.10.3.9', 'HTTP_X_FORWARDED_FOR' ),
+			array( '7.60.126.3', 'REMOTE_ADDR' ),
+			array( '240.24.12.44,5.120.2.1', 'HTTP_CLIENT_IP' ),
+			array( '10.17.54.234,6.10.3.9', 'HTTP_X_FORWARDED_FOR' ),
+			array( '7.60.126.3,65.4.69.129', 'REMOTE_ADDR' ),
+		);
+	}
+
+	/**
+	 * Test that GFCommon::$version will produce
+	 * the expected result.
+	 * @since 3.6
+	 */
+	public function test_gf_version() {
+		$version = GFCommon::$version;
+
+		/* which the version number is a string before we try to match it */
+		$this->assertEquals( true, is_string( $version ) );
+
+		/*
+         * Do a final test to match the version number according to a set standard
+         * This will validate up to a four digit version x.x.x.x
+         */
+		$this->assertRegExp( '/^(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)$/', $version );
 	}
 }

@@ -90,6 +90,8 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		$forms = array(
 			'all-form-fields.json',
 			'form-settings.json',
+			'gravityform-1.json',
+			'gravityform-2.json',
 		);
 		
 		foreach( $forms as $json ) {
@@ -102,6 +104,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		$entries = array(
 			'all-form-fields' => 'all-form-fields-entries.json',
 			'form-settings'   => '',
+			'gravityform-1'   => 'gravityform-1-entries.json',
 		);
 
 
