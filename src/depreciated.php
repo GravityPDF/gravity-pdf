@@ -70,6 +70,9 @@ abstract class GFPDF_Depreciated_Abstract
  */
 class GFPDF_Core extends GFPDF_Depreciated_Abstract
 {
+	/**
+	 * Initialise our Gravity PDF Router and initialise
+	 */
 	public function __construct() {
 		global $gfpdf;
 
@@ -79,13 +82,28 @@ class GFPDF_Core extends GFPDF_Depreciated_Abstract
 		$this->setup_constants();
 	}
 
+	/**
+	 * Setup our v3 template location constants
+	 * @since 4.0
+	 */
 	public function setup_constants() {
 		global $gfpdf;
 
-		define( 'PDF_SAVE_LOCATION', $gfpdf->data->template_tmp_location );
-		define( 'PDF_FONT_LOCATION', $gfpdf->data->template_font_location );
-		define( 'PDF_TEMPLATE_LOCATION', $gfpdf->data->template_location );
-		define( 'PDF_TEMPLATE_URL_LOCATION', $gfpdf->data->template_location );
+		if( ! defined( 'PDF_SAVE_LOCATION') ) {
+			define( 'PDF_SAVE_LOCATION', $gfpdf->data->template_tmp_location );
+		}
+
+		if( ! defined( 'PDF_FONT_LOCATION' ) ) {
+			define( 'PDF_FONT_LOCATION', $gfpdf->data->template_font_location );
+		}
+
+		if( ! defined( 'PDF_TEMPLATE_LOCATION' ) ) {
+			define( 'PDF_TEMPLATE_LOCATION', $gfpdf->data->template_location );
+		}
+
+		if( ! defined( 'PDF_TEMPLATE_URL_LOCATION' ) ) {
+			define( 'PDF_TEMPLATE_URL_LOCATION', $gfpdf->data->template_location_url );
+		}
 	}
 }
 
