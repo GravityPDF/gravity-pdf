@@ -85,23 +85,8 @@ class Test_Migration extends WP_UnitTestCase
 		$this->settings = new Model_Form_Settings( $gfpdf->form, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
 
 		/* Get our form ID */
-		$this->form_id = $GLOBALS['GFPDF_Test']->form['form-settings']['id'];
-
-        /* Remove any existing PDF configuration for our form */
-        $this->remove_form_pdf_settings();
+		$this->form_id = $gfpdf->form->add_form( json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/migration_v3_to_v4.json' ) ), true ) );
 	}
-
-    /**
-     * Remove all PDFs for a particular form
-     * @since 4.0
-     */
-    private function remove_form_pdf_settings() {
-        $settings = $this->settings->get_settings( $this->form_id );
-
-        foreach( $settings as $pdf ) {
-            $this->settings->delete_pdf( $this->form_id, $pdf['id'] );
-        }
-    }
 
 	/**
 	 * Replaces a string in a file

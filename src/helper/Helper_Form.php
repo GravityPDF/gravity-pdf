@@ -77,6 +77,26 @@ class Helper_Form extends Helper_Abstract_Form {
 	}
 
 	/**
+	 * Add's a new form and returns the newly-added form ID
+	 * @param  Array $form The form object to add
+	 * @since 4.0
+	 * @return Integer/Object The ID if successful, or a WP_Error
+	 */
+	public function add_form( $form ) {
+		return GFAPI::add_form( $form );
+	}
+
+	/**
+	 * Delete's a form by ID
+	 * @param  Integer The form ID to remove
+	 * @since 4.0
+	 * @return Boolean/Object True on successful, or a WP_Error
+	 */
+	public function delete_form( $form_id ) {
+		return GFAPI::delete_form( $form_id );
+	}
+
+	/**
 	 * Get form plugin's form array
 	 * @param  Integer $form_id
 	 * @return Mixed
