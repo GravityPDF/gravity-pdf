@@ -123,36 +123,6 @@ class Test_Autoloader extends WP_UnitTestCase
 		);
 	}
 
-	/**
-	 * Ensure all depreciated classes have appropriate fallbacks
-	 * @since 4.0
-     * @dataProvider provider_depreciated
-	 */
-	public function test_depreciated( $class ) {
-		$this->assertTrue( class_exists( $class ) );
-	}
-
-    /**
-     * Test we have appropriate depreciated classes form our v3 version
-     * @return array
-     * @since 4.0
-     */
-    public function provider_depreciated() {
-        return array(
-            array( 'GFPDF_Core' ),
-            array( 'PDFGenerator' ),
-            array( 'GFPDF_Settings' ),
-            array( 'GFPDF_Core_Model' ),
-            array( 'GFPDF_Settings_Model' ),
-            array( 'GFPDFE_DATA' ),
-            array( 'GFPDF_InstallUpdater' ),
-            array( 'GFPDF_Notices' ),
-            array( 'PDF_Common' ),
-            array( 'GFPDFEntryDetail' ),
-            array( 'PDF_Generator' ),
-        );
-    }
-
     /**
      * Check our composer files are loaded correctly
      * @since 4.0
