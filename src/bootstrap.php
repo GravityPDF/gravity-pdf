@@ -49,7 +49,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
  * Load dependancies
  */
-require_once(PDF_PLUGIN_DIR . 'src/autoload.php');
+require_once( PDF_PLUGIN_DIR . 'src/autoload.php' );
 
 /**
  * @since 4.0
@@ -164,6 +164,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->add_actions();
 		$this->add_filters();
 
+		/* Trigger fully loaded action */
+		do_action( 'gfpdf_fully_loaded', $this );
+
 	}
 
 	/**
@@ -172,12 +175,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @return void
 	 */
 	public function add_actions() {
+		
 		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'init', array( $this, 'load_assets' ), 15 );
 
-		/**
-		 * Cache our Gravity PDF Settings and register our settings fields with the Options API
-		 */
+		/* Cache our Gravity PDF Settings and register our settings fields with the Options API */
 		add_action( 'init', array( $this, 'init_settings_api' ), 1 );
 		add_action( 'admin_init', array( $this, 'setup_settings_fields' ), 1 );
 	}
@@ -261,7 +263,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 	/**
 	 * Send all logs to Loggly (https://www.loggly.com/) when running a dev version
-	 * of Gravity PDF. This allows us to better track any problems a user might have.
+	 * of Gravity PDF. This allows us to better track any problems a user might have when running open betas.
 	 * @return void
 	 * @since 4.0
 	 */
@@ -294,9 +296,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function is_development_version( $version ) {
 		
-		$dev = false;
-		$dev_version        = array('alpha', 'beta', 'rc');
-		$plugin_version     = strtolower( $version );
+		$dev            = false;
+		$dev_version    = array('alpha', 'beta', 'rc');
+		$plugin_version = strtolower( $version );
 
 		foreach( $dev_version as $v ) {
 			if( strpos( $plugin_version, $v ) !== false ) {
