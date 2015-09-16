@@ -100,8 +100,8 @@ class Helper_Misc
 	 */
 	public function is_gfpdf_page() {
 		if ( is_admin() ) {
-			if ( isset($_GET['page']) && 'gfpdf-' === (substr( $_GET['page'], 0, 6 )) ||
-			(isset($_GET['subview']) && 'PDF' === strtoupper( $_GET['subview'] )) ) {
+			if ( isset($_GET['page']) && 'gfpdf-' === ( substr( $_GET['page'], 0, 6 ) ) ||
+			( isset( $_GET['subview'] ) && 'PDF' === strtoupper( $_GET['subview'] ) ) ) {
 				return true;
 			}
 		}
@@ -117,7 +117,7 @@ class Helper_Misc
 	public function is_gfpdf_settings_tab( $name ) {
 		if ( is_admin() ) {
 			if ( $this->is_gfpdf_page() ) {
-				$tab = (isset($_GET['tab'])) ? $_GET['tab'] : 'general';
+				$tab = ( isset( $_GET['tab'] ) ) ? $_GET['tab'] : 'general';
 
 				if ( $name === $tab ) {
 					return true;
@@ -151,8 +151,8 @@ class Helper_Misc
 
 		/* See if we have a class that matches */
 		$fqns = 'GFPDF\Helper\Fields\Field_';
-		if ( class_exists( $fqns.$type ) ) {
-			return $fqns.$type;
+		if ( class_exists( $fqns . $type ) ) {
+			return $fqns . $type;
 		}
 
 		return false;
@@ -196,7 +196,7 @@ class Helper_Misc
 		$hexcolor = str_replace( '#', '', $hexcolor );
 
 		if ( 6 !== strlen( $hexcolor ) ) {
-			$hexcolor = str_repeat( substr( $hexcolor, 0, 1 ), 2 ).str_repeat( substr( $hexcolor, 1, 1 ), 2 ).str_repeat( substr( $hexcolor, 2, 1 ), 2 );
+			$hexcolor = str_repeat( substr( $hexcolor, 0, 1 ), 2 ) . str_repeat( substr( $hexcolor, 1, 1 ), 2 ) . str_repeat( substr( $hexcolor, 2, 1 ), 2 );
 		}
 
 		$r   = hexdec( substr( $hexcolor, 0, 2 ) );
@@ -209,16 +209,16 @@ class Helper_Misc
 
 	/**
 	 * Push an associative array onto the beginning of an existing array
-	 * @param  Array  $arr The array to push onto
+	 * @param  Array  $array The array to push onto
 	 * @param  String $key The key to use for the newly-pushed array
 	 * @param  Mixed  $val The value being pushed
 	 * @return Array  The modified array
 	 */
-	public function array_unshift_assoc( $arr, $key, $val ) {
-		$arr       = array_reverse( $arr, true );
-		$arr[$key] = $val;
+	public function array_unshift_assoc( $array, $key, $val ) {
+		$array         = array_reverse( $array, true );
+		$array[ $key ] = $val;
 
-		return array_reverse( $arr, true );
+		return array_reverse( $array, true );
 	}
 
 	/**
@@ -307,12 +307,11 @@ class Helper_Misc
 	 * @since  4.0
 	 */
 	public function is_directory_writable( $path ) {
-		$tmp_file = $path.'.tmpFile';
+		$tmp_file = $path . '.tmpFile';
 
 		if ( is_writable( $path ) ) {
 			if ( touch( $tmp_file ) && is_file( $tmp_file ) ) {
 				unlink( $tmp_file );
-
 				return true;
 			}
 		}

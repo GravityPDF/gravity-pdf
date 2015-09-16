@@ -63,6 +63,116 @@ class Test_Helper_Misc extends WP_UnitTestCase
         $this->misc = new Helper_Misc( $gfpdf->log, $gfpdf->form, $gfpdf->data );
     }
 
+    /**
+     * Ensure we correctly determine when we are on a Gravity PDF admin page
+     * @since 4.0
+     */
+    public function test_is_gfpdf_page() {
+
+        $this->assertFalse( $this->misc->is_gfpdf_page() );
+
+        /* Set admin page */
+        set_current_screen( 'dashboard-user' );
+        $this->assertFalse( $this->misc->is_gfpdf_page() );
+
+        /* Set up PDF page */
+        $_GET['page'] = 'gfpdf-tools';
+        $this->assertTrue( $this->misc->is_gfpdf_page() );
+
+        unset( $_GET['page'] );
+
+        $_GET['subview'] = 'PDF';
+        $this->assertTrue( $this->misc->is_gfpdf_page() );
+    }
+
+    /**
+     * Check if we are on the current settings tab
+     * @since 4.0
+     */
+    public function test_is_gfpdf_settings_tab() {
+        $this->assertFalse( $this->misc->is_gfpdf_settings_tab( 'general' ) );
+
+        /* Set admin page */
+        set_current_screen( 'dashboard-user' );
+        $_GET['subview'] = 'PDF';
+
+        $this->assertTrue( $this->misc->is_gfpdf_settings_tab( 'general' ) );
+
+        /* Try a different tab */
+        $this->assertFalse( $this->misc->is_gfpdf_settings_tab( 'tools' ) );
+
+        $_GET['tab'] = 'tools';
+        $this->assertTrue( $this->misc->is_gfpdf_settings_tab( 'tools' ) );
+    }
+
+    /**
+     * Check we convert IDs into something human readable
+     * @param  $expected
+     * @param  $name
+     * @since 4.0
+     * @dataProvider provider_human_readable
+     */
+    public function test_human_readable( $expected, $name ) {
+        $this->assertEquals( $expected, $this->misc->human_readable( $name ) );
+    }
+
+    /**
+     * Data provider for human_readable test
+     * @return array
+     * @since  4.0
+     */
+    public function provider_human_readable() {
+        return array(
+            array('My Pretty Name', 'my_pretty-name'),
+            array('Working Title', 'worKing-title'),
+            array('Easy Listening', 'Easy Listening'),
+            array('Double  Trouble  Listening', 'Double--Trouble__listening'),
+            array('Out Of This World', 'OUT_OF_THIS_WORLD'),
+        );
+    }
+
+    /**
+     * Check if our HTML DOM manipulator correctly adds the class "header-footer-img" to <img /> tags
+     * @param  $expected
+     * @param  $html
+     * @since 4.0
+     * @dataProvider provider_test_fix_header_footer
+     */
+    public function test_fix_header_footer( $expected, $html ) {
+        $this->assertEquals( $expected, $this->misc->fix_header_footer( $html ) );
+    }
+
+    /**
+     * Dataprovider for our fix_header_footer method
+     * @since 4.0
+     */
+    public function provider_test_fix_header_footer() {
+        return array(
+            array( '<img src="my-image.jpg" alt="My Image" class="header-footer-img"/>', '<img src="my-image.jpg" alt="My Image" />' ),
+            array( '<img src="my-image.jpg" alt="My Image" class="header-footer-img"/>', '<img src="my-image.jpg" alt="My Image">' ),
+            array( '<img src="my-image.jpg" alt="My Image" class="alternate header-footer-img"/>', '<img src="my-image.jpg" alt="My Image" class="alternate" />' ),
+            array( '<span>Nothing</span>', '<span>Nothing</span>' ),
+            array( '', '' ),
+        );
+    }
+
+    /**
+     * Check that we can push an associated array item onto the beginning of an existing array
+     * @since 4.0
+     */
+    public function test_array_unshift_assoc() {
+        $array = array(
+            'item1' => 'Yes',
+            'item2' => 'Maybe',
+            'item3' => 'I do not know',
+        );
+
+        $test = $this->misc->array_unshift_assoc( $array, 'item0', 'No' );
+
+        $this->assertEquals( 'No', reset( $test ) );
+        $this->assertEquals( 'Yes', next( $test ) );
+        $this->assertEquals( 'I do not know', end( $test ) );
+    }
 
     /**
      * Test we are correctly stripping an extension from the end of a string
