@@ -163,7 +163,7 @@ class Model_Install extends Helper_Abstract_Model {
 	public function setup_template_location() {
 
 		$this->data->template_location      = apply_filters( 'gfpdfe_template_location', $this->data->upload_dir . '/' . $this->data->working_folder . '/', $this->data->upload_dir, $this->data->working_folder );
-		$this->data->template_location_url  = apply_filters( 'gfpdfe_template_location_url', $this->data->upload_dir_url . '/' . $this->data->working_folder . '/', $this->data->upload_dir_url, $this->data->working_folder );
+		$this->data->template_location_url  = apply_filters( 'gfpdfe_template_location_uri', $this->data->upload_dir_url . '/' . $this->data->working_folder . '/', $this->data->upload_dir_url, $this->data->working_folder );
 		$this->data->template_font_location = $this->data->template_location . 'fonts/';
 		$this->data->template_tmp_location  = $this->data->template_location . 'tmp/';
 

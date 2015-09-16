@@ -120,7 +120,7 @@ class Field_Signature extends Helper_Abstract_Fields
 		/* If we can load in the signature let's optimise the signature size for PDF display */
 		if ( is_file( $signature ) ) {
 			$signature_details = getimagesize( $signature );
-			$optimised_width   = $signature_details[0] / 3;
+			$optimised_width   = apply_filters('gfpdfe_signature_width', $signature_details[0] / 3, $signature_details[0] ); /* backwards compat */
 			$optimised_height  = $signature_details[1] / 3;
 			$html              = str_replace( 'width="' . $width . '"', 'width="' . $optimised_width . '"', $html );
 

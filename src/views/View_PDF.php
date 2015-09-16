@@ -168,6 +168,7 @@ class View_PDF extends Helper_Abstract_View
 			$pdf->init();
 
 			/* set display type */
+			$settings['pdf_action'] = apply_filters( 'gfpdfe_pdf_output_type',  $settings['pdf_action'] ); /* Backwards compat */
 			if ( $settings['pdf_action'] == 'download' ) {
 				$pdf->set_output_type( 'download' );
 			}

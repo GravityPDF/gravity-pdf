@@ -432,7 +432,7 @@ class Helper_Misc
 
 			'form_id'   => $entry['form_id'], /* backwards compat */
 			'lead_ids'  => $this->get_legacy_ids( $entry['id'], $settings ), /* backwards compat */
-			'lead_id'   => $entry['id'], /* backwards compat */
+			'lead_id'   => apply_filters('gfpdfe_lead_id', $entry['id'], $form, $entry, $gfpdf), /* backwards compat */
 
 			'form'      => $form,
 			'entry'     => $entry,
@@ -542,6 +542,38 @@ class Helper_Misc
 			$currency = GFMultiCurrency::init();
 			add_filter( 'gform_form_post_get_meta', array( $currency, 'admin_pre_render' ) );
 		}
+	}
+
+	/**
+	 * Remove an extension from the end of a string
+	 * @param  String $string
+	 * @param  String $type   The extension to remove from the end of the string
+	 * @return String
+	 * @since 4.0
+	 */
+	public function remove_extension_from_string( $string, $type = '.pdf' ) {
+		$type_length = mb_strlen( $type );
+
+		if( mb_strtolower( mb_substr( $string, -$type_length ) ) === mb_strtolower( $type ) ) {
+			$string = mb_substr( $string, 0, -$type_length );
+		}
+
+		return $string;
+	}
+
+	/**
+	 *  Convert our v3 boolean values into 'Yes' or 'No' responses
+	 * @param  Mixed $value
+	 * @return Mixed
+	 * @since  4.0
+	 */
+	public function update_depreciated_config( $value ) {
+
+		if( is_bool( $value ) ) {
+			$value = ( $value ) ? 'Yes' : 'No';
+		}
+
+		return $value;
 	}
 
 	/**

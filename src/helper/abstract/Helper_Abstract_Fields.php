@@ -170,7 +170,7 @@ abstract class Helper_Abstract_Fields {
 	 */
 	final public function get_value() {
 		/* get the GF Value */
-		return apply_filters( 'gfpdf_field_content', GFFormsModel::get_lead_field_value( $this->entry, $this->field ), $this->field, $this->entry );
+		return apply_filters( 'gfpdf_field_value', GFFormsModel::get_lead_field_value( $this->entry, $this->field ), $this->field, $this->entry );
 	}
 
 	/**

@@ -230,13 +230,13 @@ class Helper_Migration {
 		}
 
 		/* Remove .php from the template file */
-		if ( isset( $node['template'] ) && substr( $node['template'], -4 ) === '.php' ) {
-			$node['template'] = substr( $node['template'], 0, -4 );
+		if ( isset( $node['template'] ) ) {
+			$node['template'] = $this->misc->remove_extension_from_string( $node['template'], '.php' );
 		}
 
 		/* Remove .pdf from the filename */
-		if ( isset( $node['filename'] ) && substr( $node['filename'], -4 ) === '.pdf' ) {
-			$node['filename'] = substr( $node['filename'], 0, -4 );
+		if ( isset( $node['filename'] ) ) {
+			$node['filename'] = $this->misc->remove_extension_from_string( $node['filename'] );
 		}
 
         /* Fix up our custom PDF size */
@@ -260,8 +260,8 @@ class Helper_Migration {
 
 			/* Convert our boolean values into 'Yes' or 'No' responses, with the exception of notification */
 			$skip_nodes = array( 'notifications', 'notification' );
-			if ( is_bool( $val ) && ! in_array( $id, $skip_nodes ) ) {
-				$val = ($val) ? 'Yes' : 'No';
+			if ( ! in_array( $id, $skip_nodes ) ) {
+				$val = $this->misc->update_depreciated_config( $val );
 			}
 
 			/* Convert to our v4 configuration names */

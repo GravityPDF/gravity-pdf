@@ -1356,4 +1356,71 @@ class Test_PDF extends WP_UnitTestCase
 
 		$this->assertFalse( strpos( $html, '<h3 id="field-' . $field->id . '"' ) );
 	}
+
+	/**
+	 * Check that our backwards compatibility filters work as expected
+	 * @since 4.0
+	 */
+	public function test_apply_backwards_compatibility_filters() {
+		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$entry['form_id'] = $GLOBALS['GFPDF_Test']->form['all-form-fields']['id'];
+
+		$settings = array(
+			'filename'        => 'My PDF Document',
+			'template'        => 'core-simple',
+			'orientation'     => 'portrait',
+			'security'        => 'Yes',
+			'privileges'      => array('print'),
+			'password'        => 'fjai2i0ra0if',
+			'master_password' => 'A@490fkfkff',
+			'rtl'             => 'No',
+		);
+
+		/* Test everything passes back the same */
+		$this->assertSame( 0, sizeof( array_diff( $settings, $this->model->apply_backwards_compatibility_filters( $settings, $entry ) ) ) );
+
+		/* Add filters to manipulate the data */
+		add_filter( 'gfpdfe_pdf_name', function( $item ) {
+			return 'big-document.pdf';
+		});
+
+		add_filter( 'gfpdfe_template', function( $item ) {
+			return 'default-template.php';
+		});
+
+		add_filter( 'gfpdf_orientation', function( $item ) {
+			return 'landscape';
+		});
+
+		add_filter( 'gfpdf_security', function( $item ) {
+			return false;
+		});
+
+		add_filter( 'gfpdf_privilages', function( $item ) {
+			return array( 'print', 'print-highres');
+		});
+
+		add_filter( 'gfpdf_password', function( $item ) {
+			return 'pass';
+		});
+
+		add_filter( 'gfpdf_master_password', function( $item ) {
+			return '';
+		});
+
+		add_filter( 'gfpdf_rtl', function( $item ) {
+			return true;
+		});
+
+		$test = $this->model->apply_backwards_compatibility_filters( $settings, $entry );
+
+		$this->assertEquals( 'big-document', $test['filename'] );
+		$this->assertEquals( 'default-template', $test['template'] );
+		$this->assertEquals( 'landscape', $test['orientation'] );
+		$this->assertEquals( 'No', $test['security'] );
+		$this->assertEquals( 2, sizeof( $test['privileges'] ) );
+		$this->assertEquals( 'pass', $test['password'] );
+		$this->assertEquals( '', $test['master_password'] );
+		$this->assertEquals( 'Yes', $test['rtl'] );
+	}
 }

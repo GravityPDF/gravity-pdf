@@ -602,9 +602,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	public function parse_filename_extension( $value, $key ) {
 
 		if ( $key == 'filename' ) {
-			if ( mb_strtolower( mb_substr( $value, -4 ) ) === '.pdf' ) {
-				$value = mb_substr( $value, 0, -4 );
-			}
+			$value = $this->misc->remove_extension_from_string( $value );
 		}
 
 		return $value;

@@ -191,11 +191,56 @@ class Model_PDF extends Helper_Abstract_Model {
 			return $middleware;
 		}
 
+		/* Add backwards compatibility support for certain settings */
+		$settings = $this->apply_backwards_compatibility_filters( $settings, $entry );
+
 		/**
 		 * If we are here we can generate our PDF
 		 */
 		$controller = $this->getController();
 		$controller->view->generate_pdf( $entry, $settings );
+	}
+
+	/**
+	 * Apply filters to particular settings to maintain backwards compatibility
+	 * Note: If you want to modify the $settings array you should use the new "gfpdf_pdf_config" filter instead
+	 * @param  Array $settings The PDF settings array
+	 * @param  Array $entry
+	 * @return Array           The $settings array
+	 * @since  4.0
+	 */
+	public function apply_backwards_compatibility_filters( $settings, $entry ) {
+		
+		$form = $this->form->get_form( $entry['form_id'] );
+
+		$settings['filename'] = $this->misc->remove_extension_from_string( apply_filters( 'gfpdfe_pdf_name', $settings['filename'], $form, $entry ) );
+		$settings['template'] = $this->misc->remove_extension_from_string( apply_filters( 'gfpdfe_template', $settings['template'], $form, $entry ), '.php' );
+
+		if( isset( $settings['orientation'] ) ) {
+			$settings['orientation'] = apply_filters( 'gfpdf_orientation', $settings['orientation'], $form, $entry );
+		}
+
+		if( isset( $settings['security'] ) ) {
+			$settings['security'] = $this->misc->update_depreciated_config( apply_filters( 'gfpdf_security', $settings['security'], $form, $entry ) );
+		}
+
+		if( isset( $settings['privileges'] ) ) {
+			$settings['privileges'] = apply_filters( 'gfpdf_privilages', $settings['privileges'], $form, $entry );
+		}
+
+		if( isset( $settings['password'] ) ) {
+			$settings['password'] = apply_filters( 'gfpdf_password', $settings['password'], $form, $entry );
+		}
+
+		if( isset( $settings['master_password'] ) ) {
+			$settings['master_password'] = apply_filters( 'gfpdf_master_password', $settings['master_password'], $form, $entry );
+		}
+
+		if( isset( $settings['rtl'] ) ) {
+			$settings['rtl'] = $this->misc->update_depreciated_config( apply_filters( 'gfpdf_rtl', $settings['rtl'], $form, $entry ) );
+		}
+
+		return $settings;
 	}
 
 	/**
