@@ -39,4 +39,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 require_once(PDF_PLUGIN_DIR . 'vendor/autoload.php');
 require_once(PDF_PLUGIN_DIR . 'src/backwards-compatibility.php');
 require_once(PDF_PLUGIN_DIR . 'src/depreciated.php');
+require_once(PDF_PLUGIN_DIR . 'src/api.php');
 
