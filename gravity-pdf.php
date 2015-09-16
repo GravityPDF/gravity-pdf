@@ -111,9 +111,8 @@ class GFPDF_Major_Compatibility_Checks
 	 * @since 4.0
 	 */
 	public function __construct( $basename = '', $path = '' ) {
-		/*
-         * Set our class variables
-         */
+		
+		/* Set our class variables */
 		$this->basename         = $basename;
 		$this->path             = $path;
 	}
@@ -284,66 +283,66 @@ class GFPDF_Major_Compatibility_Checks
 	}
 
 
-	 /**
-	  * Get the available system memory
-	  * @param  $ram String The PHP RAM setting
-	  * @return integer The calculated RAM
-	  * @since 4.0
-	  */
-	 public function get_ram( $ram ) {
+	/**
+	* Get the available system memory
+	* @param  $ram String The PHP RAM setting
+	* @return integer The calculated RAM
+	* @since 4.0
+	*/
+	public function get_ram( $ram ) {
 
-	 	 /* Get memory in standardised bytes format */
-		 $memory_limit = $this->convert_ini_memory( $ram );
+		/* Get memory in standardised bytes format */
+		$memory_limit = $this->convert_ini_memory( $ram );
 
-		 /* Convert to megabytes, or set to -1 if unlimited */
-		 return ($memory_limit === '-1') ? -1 : floor( $memory_limit / 1024 / 1024 );
+		/* Convert to megabytes, or set to -1 if unlimited */
+		return ($memory_limit === '-1') ? -1 : floor( $memory_limit / 1024 / 1024 );
+	}
+
+	/**
+	 * Convert .ini file memory to bytes
+	 * @param  String The .ini memory limit
+	 * @return Integer The calculated memory limit in bytes
+	 */
+	public function convert_ini_memory( $memory ) {
+
+		$convert = array( 'mb' => 'm', 'kb' => 'k', 'gb' => 'g' );
+
+		/* Standardise format */
+		foreach ( $convert as $k => $v ) {
+			$memory = str_ireplace( $k, $v, $memory );
 		}
 
-		/**
-		 * Convert .ini file memory to bytes
-		 * @param  String The .ini memory limit
-		 * @return Integer The calculated memory limit in bytes
-		 */
-		public function convert_ini_memory( $memory ) {
-
-			$convert = array( 'mb' => 'm', 'kb' => 'k', 'gb' => 'g' );
-
-			/* Standardise format */
-			foreach ( $convert as $k => $v ) {
-				$memory = str_ireplace( $k, $v, $memory );
-			}
-
-			/* Check if memory allocation is in mb, kb or gb */
-			switch ( strtolower( substr( $memory, -1 ) ) ) {
-				case 'm':
-					return (int) $memory * 1048576;
-				case 'k':
-					return (int) $memory * 1024;
-				case 'g':
-					return (int) $memory * 1073741824;
-			}
-			return $memory;
+		/* Check if memory allocation is in mb, kb or gb */
+		switch ( strtolower( substr( $memory, -1 ) ) ) {
+			case 'm':
+				return (int) $memory * 1048576;
+			case 'k':
+				return (int) $memory * 1024;
+			case 'g':
+				return (int) $memory * 1073741824;
 		}
+		return $memory;
+	}
 
 
-		/**
-		 * Helper function to easily display error messages
-		 * @return void
-		 * @since 4.0
-		 */
-		public function display_notices() {
-			?>
-		    <div class="error">
-                <p><strong><?php _e( 'Gravity PDF Installation Problem', 'gravitypdf' ); ?></strong></p>
-		        <p><?php _e( 'The minimum requirements for Gravity PDF have not been met. Please fix the issue(s) below to continue:', 'gravitypdf' ); ?></p>
-				<ul style="padding-bottom: 0.5em">
-	        		<?php foreach ( $this->notices as $notice ) : ?>
-						<li style="padding-left: 20px;list-style: inside"><?php echo $notice; ?></li>
-					<?php endforeach; ?>
-	        	</ul>
-		    </div>
-	    <?php
-		}
+	/**
+	 * Helper function to easily display error messages
+	 * @return void
+	 * @since 4.0
+	 */
+	public function display_notices() {
+		?>
+	    <div class="error">
+            <p><strong><?php _e( 'Gravity PDF Installation Problem', 'gravitypdf' ); ?></strong></p>
+	        <p><?php _e( 'The minimum requirements for Gravity PDF have not been met. Please fix the issue(s) below to continue:', 'gravitypdf' ); ?></p>
+			<ul style="padding-bottom: 0.5em">
+        		<?php foreach ( $this->notices as $notice ) : ?>
+					<li style="padding-left: 20px;list-style: inside"><?php echo $notice; ?></li>
+				<?php endforeach; ?>
+        	</ul>
+	    </div>
+    	<?php
+	}
 }
 
 /*
