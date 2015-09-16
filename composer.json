@@ -6,7 +6,8 @@
     },
 
     "require-dev": {
-        "satooshi/php-coveralls": "0.7.x-dev"
+        "satooshi/php-coveralls": "0.7.x-dev",
+        "mouf/nodejs-installer": "~1.0"
     },
 
     "autoload": {
@@ -19,5 +20,25 @@
     		"GFPDF\\Helper\\Fields\\": "src/helper/fields/",
     		"GFPDF\\Test\\": "tests/unit-tests/"
     	}
+    },
+
+    "extra": {
+        "mouf": {
+            "nodejs": {
+                "includeBinInPath": true
+            }
+        },
+        "expose-npm-packages": true
+    },
+
+    "scripts": {
+        "post-update-cmd": [
+            "npm install",
+            "gulp"
+        ],
+        "post-install-cmd": [
+            "npm install",
+            "gulp"
+        ]
     }
 }
