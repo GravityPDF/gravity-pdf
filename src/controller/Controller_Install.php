@@ -213,7 +213,7 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 			}
 
 			$this->model->uninstall_plugin();
-			
+			$this->model->redirect_to_plugins_page();
 		}
 	}
 }
