@@ -121,7 +121,7 @@ class Test_Settings extends WP_UnitTestCase
 		$this->assertEquals( 10, has_filter( 'option_page_capability_gfpdf_settings', array( $this->controller, 'edit_options_cap' ) ) );
 		$this->assertEquals( 10, has_filter( 'gravitypdf_settings_navigation', array( $this->controller, 'disable_tools_on_view_cap' ) ) );
 		$this->assertEquals( 10, has_filter( 'upload_mimes', array( $this->controller, 'allow_font_uploads' ) ) );
-		$this->assertEquals( 10, has_filter( 'gfpdf_settings_general', array( $this->model, 'add_template_image' ) ) );
+		$this->assertEquals( 10, has_filter( 'gfpdf_settings_general', array( $gfpdf->misc, 'add_template_image' ) ) );
 		
 		$this->assertFalse( has_filter( 'gfpdf_registered_settings', array( $gfpdf->options, 'highlight_errors' ) ) );
 		/* retest the gfpdf_register_settings filter is added when on the correct screen */

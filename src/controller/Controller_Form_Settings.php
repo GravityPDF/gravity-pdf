@@ -8,6 +8,7 @@ use GFPDF\Helper\Helper_Abstract_View;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
 use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Options;
 
 /**
@@ -69,13 +70,22 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	protected $options;
 
 	/**
+	 * Holds our Helper_Misc object
+	 * Makes it easy to access common methods throughout the plugin
+	 * @var Object
+	 * @since 4.0
+	 */
+	protected $misc;
+
+	/**
 	 * Load our model and view and required actions
 	 */
-	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Data $data, Helper_Options $options ) {
+	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Data $data, Helper_Options $options, Helper_Misc $misc ) {
 
 		/* Assign our internal variables */
 		$this->data    = $data;
 		$this->options = $options;
+		$this->misc    = $misc;
 
 		/* Load our model and view */
 		$this->model = $model;
@@ -128,7 +138,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	public function add_filters() {
 
 		/* Add a sample image of what the template looks like */
-		add_filter( 'gfpdf_form_settings', array( $this->model, 'add_template_image' ) );
+		add_filter( 'gfpdf_form_settings', array( $this->misc, 'add_template_image' ) );
 
 		/* Add custom field information if we have a template selected */
 		add_filter( 'gfpdf_form_settings_custom_appearance', array( $this->model, 'register_custom_appearance_settings' ) );

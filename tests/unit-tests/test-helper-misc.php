@@ -231,4 +231,33 @@ class Test_Helper_Misc extends WP_UnitTestCase
             array('false', 'false'),
         );
     }
+
+    /**
+     * Check our template image is correctly loaded
+     * @since 4.0
+     */
+    public function test_add_template_image() {
+        $settings = array(
+            'template' => array(
+                'value' => '',
+                'desc' => '',
+            ),
+        );
+
+        $results = $this->misc->add_template_image( $settings );
+
+        /* Test for lack of an image */
+        $this->assertFalse( strpos( $results['template']['desc'], '<img' ) );
+
+        /* Test for image existance */
+        $settings['template']['value'] = 'core-simple';
+        $results = $this->misc->add_template_image( $settings );
+
+        $this->assertNotFalse( strpos( $results['template']['desc'], '<img' ) );
+
+        /* Test skipping results */
+        $results = $this->misc->add_template_image( array() );
+
+        $this->assertEmpty( $results );
+    }
 }

@@ -550,7 +550,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$model = new Model\Model_Form_Settings( $this->form, $this->log, $this->data, $this->options, $this->misc, $this->notices );
 		$view  = new View\View_Form_Settings( array() );
 
-		$class = new Controller\Controller_Form_Settings( $model, $view, $this->data, $this->options );
+		$class = new Controller\Controller_Form_Settings( $model, $view, $this->data, $this->options, $this->misc );
 		$class->init();
 	}
 

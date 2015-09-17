@@ -194,7 +194,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		add_filter( 'upload_mimes', array( $this, 'allow_font_uploads' ) );
 
 		/* Add a sample image of what the template looks like */
-		add_filter( 'gfpdf_settings_general', array( $this->model, 'add_template_image' ) );
+		add_filter( 'gfpdf_settings_general', array( $this->misc, 'add_template_image' ) );
 	}
 
 	/**

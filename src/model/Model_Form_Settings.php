@@ -433,30 +433,6 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Add an image of the current selected template (if any)
-	 * @param Array $settings Any existing settings loaded
-	 * @since 4.0
-	 */
-	public function add_template_image( $settings ) {
-
-		if ( isset( $settings['template'] ) ) {
-
-			$current_template = $this->options->get_form_value( $settings['template'] );
-			$template_image   = $this->misc->get_template_image( $current_template );
-
-			$settings['template']['desc'] .= '<div id="gfpdf-template-example">';
-
-			if ( ! empty($template_image) ) {
-				$img              = '<img src="'. esc_url( $template_image ) . '" />';
-				$settings['template']['desc'] .= $img;
-			}
-
-			$settings['template']['desc'] .= '</div>';
-		}
-		return $settings;
-	}
-
-	/**
 	 * Load our custom appearance settings (if needed)
 	 * @param  Object $class    The template configuration class
 	 * @param  Array  $settings Any current settings

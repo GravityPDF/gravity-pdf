@@ -98,7 +98,7 @@ class Test_Form_Settings extends WP_UnitTestCase
 		$this->model = new Model_Form_Settings( $gfpdf->form, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
 		$this->view  = new View_Form_Settings( array() );
 
-		$this->controller = new Controller_Form_Settings( $this->model, $this->view, $gfpdf->data, $gfpdf->options );
+		$this->controller = new Controller_Form_Settings( $this->model, $this->view, $gfpdf->data, $gfpdf->options, $gfpdf->misc );
 		$this->controller->init();
 	}
 
@@ -143,7 +143,7 @@ class Test_Form_Settings extends WP_UnitTestCase
 		global $gfpdf;
 
 		/* general filters */
-		$this->assertEquals( 10, has_filter( 'gfpdf_form_settings', array( $this->model, 'add_template_image' ) ) );
+		$this->assertEquals( 10, has_filter( 'gfpdf_form_settings', array( $gfpdf->misc, 'add_template_image' ) ) );
 		$this->assertEquals( 10, has_filter( 'gfpdf_form_settings_custom_appearance', array( $this->model, 'register_custom_appearance_settings' ) ) );
 
 		/* validation filters */
@@ -460,35 +460,6 @@ class Test_Form_Settings extends WP_UnitTestCase
 		$results = $this->model->register_custom_appearance_settings( array() );
 
 		$this->assertSame( 12, sizeof( $results ) );
-	}
-
-	/**
-	 * Check our template image is correctly loaded
-	 * @since 4.0
-	 */
-	public function test_add_template_image() {
-		$settings = array(
-			'template' => array(
-				'value' => '',
-				'desc' => '',
-			),
-		);
-
-		$results = $this->model->add_template_image( $settings );
-
-		/* Test for lack of an image */
-		$this->assertFalse( strpos( $results['template']['desc'], '<img' ) );
-
-		/* Test for image existance */
-		$settings['template']['value'] = 'core-simple';
-		$results = $this->model->add_template_image( $settings );
-
-		$this->assertNotFalse( strpos( $results['template']['desc'], '<img' ) );
-
-		/* Test skipping results */
-		$results = $this->model->add_template_image( array() );
-
-		$this->assertEmpty( $results );
 	}
 
 	/**

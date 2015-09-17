@@ -464,7 +464,7 @@ class Helper_Misc
 			return $default_template_url . $template;
 		}
 
-		return false;
+		return null;
 	}
 
 	/**
@@ -573,6 +573,33 @@ class Helper_Misc
 		}
 
 		return $value;
+	}
+
+	/**
+	 * Add an image of the current selected template (if any) to the template and default_template field descriptions
+	 * @param Array $settings Any existing settings loaded
+	 * @since 4.0
+	 */
+	public function add_template_image( $settings ) {
+		global $gfpdf;
+
+		if ( isset( $settings['template'] ) || isset( $settings['default_template'] ) ) {
+
+			$key = ( isset( $settings['template'] ) ) ? 'template' : 'default_template';
+ 
+			$current_template = $gfpdf->options->get_form_value( $settings[ $key ] );
+			$template_image   = $this->get_template_image( $current_template );
+
+			$settings[ $key ]['desc'] .= '<div id="gfpdf-template-example">';
+
+			if ( ! empty($template_image) ) {
+				$img              = '<img src="'. esc_url( $template_image ) . '" />';
+				$settings[ $key ]['desc'] .= $img;
+			}
+
+			$settings[ $key ]['desc'] .= '</div>';
+		}
+		return $settings;
 	}
 
 	/**

@@ -99,7 +99,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 					'default_template' => array(
 						'id'         => 'default_template',
 						'name'       => __( 'Default Template', 'gravitypdf' ),
-						'desc'       => sprintf( __( 'Choose an existing template or purchased more %sfrom our theme shop%s.%s You can also %sbuild your own%s or %shire us%s to create a custom solution.', 'gravitypdf' ), '<a href="#">', '</a>', '<br>', '<a href="#">', '</a>', '<a href="#">', '</a>' ),
+						'desc'       => sprintf( __( 'Choose an existing template or purchased more %sfrom our theme shop%s. You can also %sbuild your own%s or %shire us%s to create a custom solution.', 'gravitypdf' ), '<a href="#">', '</a>', '<a href="#">', '</a>', '<a href="#">', '</a>' ),
 						'type'       => 'select',
 						'options'    => $this->get_templates(),
 						'inputClass' => 'large',
@@ -267,7 +267,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 					'template' => array(
 						'id'         => 'template',
 						'name'       => __( 'Template', 'gravitypdf' ),
-						'desc'       => sprintf( __( 'Choose an existing template or purchased more %sfrom our theme shop%s.%s You can also %sbuild your own%s or %shire us%s to create a custom solution.', 'gravitypdf' ), '<a href="#">', '</a>', '<br>', '<a href="#">', '</a>', '<a href="#">', '</a>' ),
+						'desc'       => sprintf( __( 'Choose an existing template or purchased more %sfrom our theme shop%s. You can also %sbuild your own%s or %shire us%s to create a custom solution.', 'gravitypdf' ), '<a href="#">', '</a>', '<a href="#">', '</a>', '<a href="#">', '</a>' ),
 						'type'       => 'select',
 						'options'    => $this->get_templates(),
 						'std'     	 => $this->get_option( 'default_template', 'core-simple' ),

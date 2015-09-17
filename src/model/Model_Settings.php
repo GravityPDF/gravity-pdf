@@ -349,27 +349,6 @@ class Model_Settings extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Add an image of the current selected template (if any)
-	 * @param Array $settings Any existing settings loaded
-	 */
-	public function add_template_image( $settings ) {
-
-		if ( isset( $settings['default_template'] ) ) {
-			$current_template = $this->options->get_form_value( $settings['default_template'] );
-			$template_image   = $this->misc->get_template_image( $current_template );
-
-			if ( ! empty($template_image) ) {
-				$img                                  = '<img src="'. esc_url( $template_image ) . '" alt="' . __( 'Template Example' ) . '" id="gfpdf-template-example" />';
-				$settings['default_template']['desc'] = $settings['default_template']['desc'] . $img;
-			}
-		}
-		return $settings;
-	}
-
-
-
-
-	/**
 	 * Load Recent forum articles meta box
 	 * @param Object $object The metabox object
 	 * @return void
