@@ -6,3 +6,4 @@
 /README.md      	export-ignore
 /node_modules  	 	export-ignore
 /.coveralls.yml	 	export-ignore
+/.travis.yml	 	export-ignore
