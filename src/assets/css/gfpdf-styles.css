@@ -527,7 +527,8 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
 }
 
 #pdf-form-settings .gfpdf-spinner,
-#pdfextended-settings .gfpdf-spinner {
+#pdfextended-settings .gfpdf-spinner,
+.wp-dialog .gfpdf-spinner {
   padding-left: 5px;
   vertical-align: middle;
   width: 20px;
