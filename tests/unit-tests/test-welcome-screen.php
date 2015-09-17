@@ -92,7 +92,7 @@ class Test_Welcome_Screen extends WP_UnitTestCase
 	 */
 	public function test_actions() {
 		$this->assertEquals( 10, has_action( 'admin_menu', array( $this->model, 'admin_menus' ) ) );
-		$this->assertEquals( 10, has_action( 'admin_init', array( $this->controller, 'welcome' ) ) );
+		$this->assertEquals( 10, has_action( 'init', array( $this->controller, 'welcome' ) ) );
 	}
 
 	/**

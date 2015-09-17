@@ -114,7 +114,7 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 	public function add_actions() {
 		 /* Load the welcome screen into the menu */
 		add_action( 'admin_menu', array( $this->model, 'admin_menus' ) );
-		add_action( 'admin_init', array( $this, 'welcome' ) );
+		add_action( 'init', array( $this, 'welcome' ) );
 	}
 
 	/**
@@ -136,7 +136,7 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 	public function welcome() {
 
 		/* Bail if no activation redirect */
-		if ( ! get_transient( '_gravitypdf_activation_redirect' ) ) {
+		if ( ! get_transient( '_gravitypdf_activation_redirect' ) || ! is_admin() || ! current_user_can( 'activate_plugins' ) ) {
 			return false;
 		}
 
@@ -152,6 +152,7 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 
 		/* add own update tracker */
 		if ( ! $this->data->is_installed ) {
+
 			$this->log->addNotice( 'Redirect to Getting Started page (first time activated).' );
 
 			/* First time install */
