@@ -167,7 +167,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 		$pdf_id  = ( isset( $_GET['pid'] ) ) ? $_GET['pid'] : false;
 
 		/* Load the add/edit page */
-		if ( ! empty( $pdf_id ) && rgpost( 'gfpdf_save_pdf' ) ) {
+		if ( $pdf_id !== false && rgpost( 'gfpdf_save_pdf' ) ) {
 			$this->model->process_submission( $form_id, $pdf_id );
 		}
 	}
@@ -184,7 +184,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 		$pdf_id  = ( isset( $_GET['pid'] ) ) ? $_GET['pid'] : false;
 
 		/* Load the add/edit page */
-		if ( ! empty( $pdf_id ) ) {
+		if ( $pdf_id !== false ) {
 			$this->model->show_edit_view( $form_id, $pdf_id );
 			return;
 		}
