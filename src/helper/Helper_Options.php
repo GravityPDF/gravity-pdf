@@ -789,16 +789,16 @@ class Helper_Options implements Helper_Interface_Filters {
 			$info = $this->get_template_headers( $filename );
 			$file = basename( $filename, '.php' );
 
-			if ( ! empty($info['template']) ) {
+			if ( ! empty( $info['template'] ) ) {
 				$templates[ $prefix_text . $info['group'] ][ $file ] = $info['template'];
-			} else if ( $file !== 'configuration' && $file !== 'configuration.archive' ) { /* exclude the example templates & old configuration files */
+			} else if ( $file !== 'configuration' && $file !== 'configuration.archive' ) { /* exclude legacy configuration file */
 				$legacy[ $file ] = $this->misc->human_readable( $file );
 			}
 		}
 
 		/**
 		 * Load templates included with Gravity PDF
-		 * We'll exclude any files starting with example-, and any files overridden by the user
+		 * We'll exclude any files overridden by the user
 		 */
 		foreach ( $this->get_plugin_pdf_templates() as $filename ) {
 			$info = $this->get_template_headers( $filename );
@@ -809,7 +809,7 @@ class Helper_Options implements Helper_Interface_Filters {
 				$templates[ $info['group'] ][ $file ] = $info['template'];
 			} else {
 				/* user template overrides core template. Mark template. */
-				$templates[ $prefix_text . $info['group'] ][ $file ] = $templates[ $prefix_text . $info['group'] ][ $file ] . '*';
+				$templates[ $prefix_text . $info['group'] ][ $file ] = $templates[ $prefix_text . $info['group'] ][ $file ];
 			}
 		}
 
