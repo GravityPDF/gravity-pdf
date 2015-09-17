@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a119e88e179f2e8aa284b5849dc8aede",
+    "hash": "002bfce3e6d603654a809ee8ccb3d820",
     "packages": [
         {
             "name": "blueliquiddesigns/mpdf",
@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/blueliquiddesigns/mpdf.git",
-                "reference": "908f297e1e0ae07f66918e1dc5caf0e9d29a146d"
+                "reference": "7233a54d559c20fe29d07f936c2d0704d922a44f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/blueliquiddesigns/mpdf/zipball/908f297e1e0ae07f66918e1dc5caf0e9d29a146d",
-                "reference": "908f297e1e0ae07f66918e1dc5caf0e9d29a146d",
+                "url": "https://api.github.com/repos/blueliquiddesigns/mpdf/zipball/7233a54d559c20fe29d07f936c2d0704d922a44f",
+                "reference": "7233a54d559c20fe29d07f936c2d0704d922a44f",
                 "shasum": ""
             },
             "require": {
@@ -51,7 +51,7 @@
                 "php",
                 "utf-8"
             ],
-            "time": "2015-09-04 03:48:54"
+            "time": "2015-09-17 05:29:05"
         },
         {
             "name": "monolog/monolog",
