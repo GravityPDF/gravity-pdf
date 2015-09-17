@@ -327,7 +327,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	private function register_styles() {
 		$version = PDF_EXTENDED_VERSION;
-		$suffix = '.min.';
+		$suffix = '.min';
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG === true ) {
 			$suffix  = '';
 		}
@@ -345,7 +345,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	private function register_scripts() {
 
 		$version = PDF_EXTENDED_VERSION;
-		$suffix  = '.min.';
+		$suffix  = '.min';
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG === true ) {
 			$suffix = '';
 		}
