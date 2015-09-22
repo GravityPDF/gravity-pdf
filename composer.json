@@ -1,4 +1,8 @@
 {
+    "config": {
+        "preferred-install": "dist"
+    },
+    
     "require": {
         "blueliquiddesigns/mpdf": "dev-master",
         "querypath/QueryPath": ">=3.0.0",
