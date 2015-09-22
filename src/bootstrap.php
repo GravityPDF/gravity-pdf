@@ -210,10 +210,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/* Initialise our logger */
 		$this->log = new \Monolog\Logger( 'gravitypdf' );
 
-		/* Ensure log contains details about the method / class / function calling it and the processor peak memory */
-		$this->log->pushProcessor( new \Monolog\Processor\IntrospectionProcessor );
-		$this->log->pushProcessor( new \Monolog\Processor\MemoryPeakUsageProcessor );
-
 		/* Prevent logging in CLI mode */
 		if ( substr( php_sapi_name(), 0, 3 ) === 'cli' ) {
 			$this->log->pushHandler( new \Monolog\Handler\NullHandler( \Monolog\Logger::INFO ) ); /* throw logs away */
@@ -225,6 +221,12 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		/* Setup our Gravity Forms local file logger, if enabled */
 		$this->setup_gravityforms_logging();
+
+		/* Check if we have a handler pushed and add our Introspection and Memory Peak usage processors */
+		if( sizeof( $this->log->getHandlers() ) > 0 ) {
+			$this->log->pushProcessor( new \Monolog\Processor\IntrospectionProcessor );
+			$this->log->pushProcessor( new \Monolog\Processor\MemoryPeakUsageProcessor );
+		}
 	}
 
 	/**

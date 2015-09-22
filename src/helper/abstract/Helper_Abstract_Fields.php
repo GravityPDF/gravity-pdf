@@ -7,6 +7,7 @@ use GFPDF\Helper\Helper_Misc;
 
 use GFFormsModel;
 use GF_Field;
+use GFCache;
 
 use WP_Error;
 
@@ -169,6 +170,22 @@ abstract class Helper_Abstract_Fields {
 	 * @since 4.0
 	 */
 	final public function get_value() {
+		
+		/**
+		 * Gravity Forms' GFCache function was thrashing the database, causing double the amount of time for the field_value() method to run.
+		 * The reason is that the cache was checking against a field value stored in a transient every time `GFFormsModel::get_lead_field_value()` is called.
+		 * What we're doing is checking if the results are already in the local cache (not database). If they are not we'll set the cache to false to prevent the database call.
+		 *
+		 * @hack
+		 * @since  4.0
+		 * @param  string $cache_key Field Value transient key used by Gravity Forms
+		 * @param mixed false Setting the value of the cache to false so that it's not used by Gravity Forms' GFFormsModel::get_lead_field_value() method
+		 * @param boolean false Tell Gravity Forms not to store this as a transient
+		 * @param  int 0 Time to store the value. 0 is maximum amount of time possible.
+		 * @credit Zack Katz (Gravity View author)
+		 */
+		GFCache::set( 'GFFormsModel::get_lead_field_value_' . $this->entry['id'] . '_' . $this->field->id, false, false, 0 );
+
 		/* get the GF Value */
 		return apply_filters( 'gfpdf_field_value', GFFormsModel::get_lead_field_value( $this->entry, $this->field ), $this->field, $this->entry );
 	}
