@@ -905,9 +905,6 @@ class Helper_Options implements Helper_Interface_Filters {
 				'dejavuserif'          => 'Dejavu Serif',
 				'dejavusansmono'       => 'Dejavu Sans Mono',
 
-				'freesans'             => 'Free Sans',
-				'freemono'             => 'Free Mono',
-
 				'mph2bdamase'          => 'MPH 2B Damase',
 			),
 
