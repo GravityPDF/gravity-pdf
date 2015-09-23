@@ -424,6 +424,9 @@ class Helper_Misc
 	public function get_template_args( $entry, $settings ) {
 		global $gfpdf;
 
+		/* Disable the field encryption checks which can slow down our entry queries */
+		add_filter( 'gform_is_encrypted_field', '__return_false' );
+
 		$form = $this->form->get_form( $entry['form_id'] );
 		$pdf  = new Model_PDF( $this->form, $this->log, $gfpdf->options, $this->data, $this, $gfpdf->notices );
 

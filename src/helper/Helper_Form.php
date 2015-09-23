@@ -6,6 +6,7 @@ use GFPDF\Helper\Helper_Abstract_Form; /* not needed, but helps define usage */
 
 use GFAPI;
 use GFCommon;
+use GFFormsModel;
 
 /**
  * Gravity Forms Abstraction Method Class
@@ -98,12 +99,13 @@ class Helper_Form extends Helper_Abstract_Form {
 
 	/**
 	 * Get form plugin's form array
+	 * The API has a performance problem and makes a database call each time. Skip over that problem.
 	 * @param  Integer $form_id
 	 * @return Mixed
 	 * @since 4.0
 	 */
 	public function get_form( $form_id ) {
-		return GFAPI::get_form( $form_id );
+		return GFFormsModel::get_form_meta( $form_id );
 	}
 
 	/**
@@ -112,7 +114,18 @@ class Helper_Form extends Helper_Abstract_Form {
 	 * @since 4.0
 	 */
 	public function get_forms() {
-		return GFAPI::get_forms();
+
+		$form_ids = GFFormsModel::get_form_ids( true, false );
+		if ( empty( $form_ids ) ) {
+			return array();
+		}
+
+		$forms = array();
+		foreach ( $form_ids as $form_id ) {
+			$forms[] = GFFormsModel::get_form_meta( $form_id );
+		}
+
+		return $forms;
 	}
 
 	/**
