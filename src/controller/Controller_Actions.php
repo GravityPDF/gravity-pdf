@@ -159,6 +159,12 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	 */
 	public function route_notices() {
 
+		/* Prevent actions being displayed on our welcome pages */
+		if ( ! is_admin() ||
+			( rgget( 'page' ) == 'gfpdf-getting-started' ) || ( rgget( 'page' ) == 'gfpdf-update' ) || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
+			return false;
+		}
+
 		foreach ( $this->get_routes() as $route ) {
 
 			/* Before displaying check the user has the correct capabilities, the notice isn't already been dismissed and the route condition has been met */

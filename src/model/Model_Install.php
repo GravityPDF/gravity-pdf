@@ -205,7 +205,7 @@ class Model_Install extends Helper_Abstract_Model {
 
 		/* don't create the folder structure on our welcome page or through AJAX as an errors on the first page they see will confuse users */
 		if ( is_admin() &&
-			(rgget( 'page' ) == 'gfpdf-getting-started') || (defined( 'DOING_AJAX' ) && DOING_AJAX) ) {
+			( rgget( 'page' ) == 'gfpdf-getting-started' ) || ( rgget( 'page' ) == 'gfpdf-update' ) || (defined( 'DOING_AJAX' ) && DOING_AJAX) || get_transient( '_gravitypdf_activation_redirect' ) ) {
 			return false;
 		}
 

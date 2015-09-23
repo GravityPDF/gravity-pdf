@@ -164,8 +164,8 @@ class Helper_Migration {
 		}
 
 		return array(
-			'default' => ( is_array( $gf_pdf_default_configuration ) ) ? $gf_pdf_default_configuration : array(),
-			'config'  => ( is_array( $gf_pdf_config ) ) ? $gf_pdf_config : array(),
+			'default' => ( isset( $gf_pdf_default_configuration ) && is_array( $gf_pdf_default_configuration ) ) ? $gf_pdf_default_configuration : array(),
+			'config'  => ( isset( $gf_pdf_config ) && is_array( $gf_pdf_config ) ) ? $gf_pdf_config : array(),
 		);
 	}
 
@@ -283,7 +283,7 @@ class Helper_Migration {
 	private function process_v3_configuration( $raw_config ) {
 
 		if ( ! is_array( $raw_config['config'] ) || sizeof( $raw_config['config'] ) == 0 ) {
-			return $config;
+			return array();
 		}
 
 		/* Store configuration by form ID */

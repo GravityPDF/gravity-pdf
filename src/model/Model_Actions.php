@@ -165,9 +165,7 @@ class Model_Actions extends Helper_Abstract_Model {
 
 		$migration = new Helper_Migration( $gfpdf->form, $gfpdf->log, $this->data, $this->options, $gfpdf->misc, $gfpdf->notices );
 
-        /* Do migration and then disable the migration nag */
-		if( $migration->begin_migration() ) {
-            $this->dismiss_notice( 'migrate_v3_to_v4' );
-        }
+        /* Do migration */
+		$migration->begin_migration();
 	}
 }
