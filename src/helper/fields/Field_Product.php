@@ -136,16 +136,20 @@ class Field_Product extends Helper_Abstract_Fields
 	 */
 	public function html( $value = '', $label = true ) {
 		$value = $this->value();
-		$hmlt  = '';
+		$html  = '';
 
 		switch ( $this->field->type ) {
 			case 'product':
-				$html .= $value['name'] . ' - ' . $value['price'];
-				$html .= $this->get_option_html( $value['options'] );
+				if( isset( $value['name'] ) ) {
+					$html .= $value['name'] . ' - ' . $value['price'];
+					$html .= $this->get_option_html( $value['options'] );
+				}
 			break;
 
 			case 'option':
-				$html .= $this->get_option_html( $value['options'] );
+				if( isset( $value['options'] ) ) {
+					$html .= $this->get_option_html( $value['options'] );
+				}
 			break;
 
 			case 'quantity':
@@ -153,11 +157,15 @@ class Field_Product extends Helper_Abstract_Fields
 			break;
 
 			case 'shipping':
-				$html .= $value['shipping_formatted'];
+				if( isset( $value['shipping_formatted'] ) ) {
+					$html .= $value['shipping_formatted'];
+				}
 			break;
 
 			case 'total':
-				$html .= $value['total_formatted'];
+				if( isset( $value['total_formatted'] ) ) {
+					$html .= $value['total_formatted'];
+				}
 			break;
 		}
 
@@ -196,22 +204,22 @@ class Field_Product extends Helper_Abstract_Fields
 		$data = $this->products->value();
 
 		/* Filter out the product information we require */
-		if ( $this->field->type == 'product' && isset($data['products'][$this->field->id]) ) {
-			return $data['products'][$this->field->id];
+		if ( $this->field->type == 'product' && isset( $data['products'][ $this->field->id ] ) ) {
+			return $data['products'][ $this->field->id ];
 		}
 
 		/* Filter out the options information we require */
-		if ( $this->field->type == 'option' && isset($data['products'][$this->field->productField]['options']) ) {
-			return array( 'options' => $data['products'][$this->field->productField]['options'] );
+		if ( $this->field->type == 'option' && isset( $data['products'][ $this->field->productField ]['options'] ) ) {
+			return array( 'options' => $data['products'][ $this->field->productField ]['options'] );
 		}
 
 		/* Filter out the quantity field */
-		if ( $this->field->type == 'quantity' && isset($data['products'][$this->field->productField]['quantity']) ) {
-			return $data['products'][$this->field->productField]['quantity'];
+		if ( $this->field->type == 'quantity' && isset( $data['products'][ $this->field->productField ]['quantity'] ) ) {
+			return $data['products'][ $this->field->productField ]['quantity'];
 		}
 
 		/* Filter out the shipping field */
-		if ( $this->field->type == 'shipping' && isset($data['products_totals']['shipping']) ) {
+		if ( $this->field->type == 'shipping' && isset( $data['products_totals']['shipping'] ) ) {
 			return array(
 				'shipping'           => $data['products_totals']['shipping'],
 				'shipping_formatted' => $data['products_totals']['shipping_formatted'],
@@ -220,7 +228,7 @@ class Field_Product extends Helper_Abstract_Fields
 		}
 
 		/* Filter out the total field */
-		if ( $this->field->type == 'total' && isset($data['products_totals']['total']) ) {
+		if ( $this->field->type == 'total' && isset( $data['products_totals']['total'] ) ) {
 			return array(
 				'total'           => $data['products_totals']['total'],
 				'total_formatted' => $data['products_totals']['total_formatted'],

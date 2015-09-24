@@ -429,12 +429,13 @@ class Model_PDF extends Helper_Abstract_Model {
 		if ( ! is_wp_error( $action ) ) {
 			/* check if the user is logged in but is not the current owner */
 			if ( is_user_logged_in() &&
-				( ($this->options->get_option( 'limit_to_admin', 'No' ) == 'Yes') || ($this->is_current_pdf_owner( $entry, 'logged_in' ) === false)) ) {
+				( ( $this->options->get_option( 'limit_to_admin', 'No' ) == 'Yes' ) || ( $this->is_current_pdf_owner( $entry, 'logged_in' ) === false ) ) ) {
+				
 				/* Handle permissions checks */
-				 $admin_permissions = $this->options->get_option( 'admin_capabilities', array( 'gravityforms_view_entries' ) );
+				$admin_permissions = $this->options->get_option( 'admin_capabilities', array( 'gravityforms_view_entries' ) );
 
-				 /* loop through permissions and check if the current user has any of those capabilities */
-				 $access = false;
+				/* loop through permissions and check if the current user has any of those capabilities */
+				$access = false;
 				foreach ( $admin_permissions as $permission ) {
 					if ( $this->form->has_capability( $permission ) ) {
 						$access = true;

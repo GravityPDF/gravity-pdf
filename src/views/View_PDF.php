@@ -432,10 +432,10 @@ class View_PDF extends Helper_Abstract_View
 		ob_start();
 
 		/* Only display the current page name if it exists */
-		if ( isset($form['pagination']['pages'][$page]) && strlen( trim( $form['pagination']['pages'][$page] ) ) > 0 ) {
+		if ( isset($form['pagination']['pages'][ $page ]) && strlen( trim( $form['pagination']['pages'][ $page ] ) ) > 0 ) {
 			?>
-                <h3 id="field-<?php echo $field->id; ?>" class="gfpdf-<?php echo $field->inputType; ?> gfpdf-field <?php echo $field->cssClass; ?>">
-                    <?php echo $form['pagination']['pages'][$page]; ?>
+                <h3 class="gfpdf-page gfpdf-field <?php echo $field->cssClass; ?>">
+                    <?php echo $form['pagination']['pages'][ $page ]; ?>
                 </h3>
             <?php
 		}

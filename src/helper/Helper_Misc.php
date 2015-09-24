@@ -151,6 +151,7 @@ class Helper_Misc
 
 		/* See if we have a class that matches */
 		$fqns = 'GFPDF\Helper\Fields\Field_';
+
 		if ( class_exists( $fqns . $type ) ) {
 			return $fqns . $type;
 		}
