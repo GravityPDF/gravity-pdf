@@ -178,7 +178,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	public function process_pdf_endpoint() {
 
 		/* exit early if all the required URL parameters aren't met */
-		if ( empty( $GLOBALS['wp']->query_vars['gf_pdf'] ) || empty( $GLOBALS['wp']->query_vars['pid'] ) || empty( $GLOBALS['wp']->query_vars['lid'] ) ) {
+		if ( empty( $GLOBALS['wp']->query_vars['gpdf'] ) || empty( $GLOBALS['wp']->query_vars['pid'] ) || empty( $GLOBALS['wp']->query_vars['lid'] ) ) {
 			return false;
 		}
 
@@ -187,8 +187,8 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		$action = ( $GLOBALS['wp']->query_vars['action'] == 'download' ) ? 'download' : 'view';
 
 		$this->log->addNotice( 'Processing PDF endpoint.', array(
-			'pid' => $pid,
-			'lid' => $lid,
+			'pid'    => $pid,
+			'lid'    => $lid,
 			'action' => $action,
 		) );
 
@@ -235,7 +235,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		}
 
 		/* Store our ids in the WP query_vars object */
-		$GLOBALS['wp']->query_vars['gf_pdf'] = 1;
+		$GLOBALS['wp']->query_vars['gpdf'] = 1;
 		$GLOBALS['wp']->query_vars['pid']    = $pid;
 		$GLOBALS['wp']->query_vars['lid']    = $lid;
 

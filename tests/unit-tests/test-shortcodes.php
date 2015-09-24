@@ -127,8 +127,8 @@ class Test_Shortcode extends WP_UnitTestCase
 
         /* Test for configured results */
         $this->assertNotFalse( strpos( $this->model->gravitypdf( array( 'entry' => $entry['id'], 'id' => '555ad84787d7e', 'text' => 'View PDF' ) ), 'View PDF' ) );
-        $this->assertFalse( strpos( $this->model->gravitypdf( array( 'entry' => $entry['id'], 'id' => '555ad84787d7e', 'type' => 'view' ) ), '/download/' ) );
-        $this->assertNotFalse( strpos( $this->model->gravitypdf( array( 'entry' => $entry['id'], 'id' => '555ad84787d7e' ) ), '/download/' ) );
+        $this->assertFalse( strpos( $this->model->gravitypdf( array( 'entry' => $entry['id'], 'id' => '555ad84787d7e', 'type' => 'view' ) ), 'action=download' ) );
+        $this->assertNotFalse( strpos( $this->model->gravitypdf( array( 'entry' => $entry['id'], 'id' => '555ad84787d7e' ) ), 'action=download' ) );
         $this->assertNotFalse( strpos( $this->model->gravitypdf( array( 'entry' => $entry['id'], 'id' => '555ad84787d7e', 'classes' => 'my-pdf-download-link' ) ), 'my-pdf-download-link' ) );
 
         /* Test for entry URL loading */
@@ -206,19 +206,39 @@ class Test_Shortcode extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_gravitypdf_redirect_confirmation() {
-        
+        global $wp_rewrite;
+
+        /* Process fancy permalinks */
+        $old_permalink_structure = get_option( 'permalink_structure' );
+        $wp_rewrite->set_permalink_structure( '/%postname%/' );
+        flush_rewrite_rules();
+
         /* Setup our redirect confirmation value */
         $_POST['form_confirmation_url'] = '[gravitypdf id="555ad84787d7e"]';
 
         /* Run the test */
         $this->model->gravitypdf_redirect_confirmation( '' );
-        $this->assertEquals( site_url() . '/pdf/555ad84787d7e/{entry_id}/download/', $_POST['form_confirmation_url'] );
+        $this->assertEquals( home_url() . '/pdf/555ad84787d7e/{entry_id}/download/', $_POST['form_confirmation_url'] );
 
         /* Check for viewing URL */
         $_POST['form_confirmation_url'] = '[gravitypdf id="555ad84787d7e" type="view"]';
 
         $this->model->gravitypdf_redirect_confirmation( '' );
-        $this->assertEquals( site_url() . '/pdf/555ad84787d7e/{entry_id}/', $_POST['form_confirmation_url'] );
+        $this->assertEquals( home_url() . '/pdf/555ad84787d7e/{entry_id}/', $_POST['form_confirmation_url'] );
+
+        $wp_rewrite->set_permalink_structure( $old_permalink_structure );
+        flush_rewrite_rules();
+
+        /* Run the test */
+        $_POST['form_confirmation_url'] = '[gravitypdf id="555ad84787d7e"]';
+        $this->model->gravitypdf_redirect_confirmation( '' );
+        $this->assertEquals( home_url() . '/?gpdf=1&pid=555ad84787d7e&lid={entry_id}&action=download', $_POST['form_confirmation_url'] );
+
+        /* Check for viewing URL */
+        $_POST['form_confirmation_url'] = '[gravitypdf id="555ad84787d7e" type="view"]';
+
+        $this->model->gravitypdf_redirect_confirmation( '' );
+        $this->assertEquals( home_url() . '/?gpdf=1&pid=555ad84787d7e&lid={entry_id}', $_POST['form_confirmation_url'] );
 
     }
 

@@ -181,7 +181,7 @@ class Test_PDF extends WP_UnitTestCase
 		$this->assertFalse( $this->controller->process_pdf_endpoint() );
 
 		/* Test our endpoint is firing correctly */
-		$GLOBALS['wp']->query_vars['gf_pdf'] = 1;
+		$GLOBALS['wp']->query_vars['gpdf'] = 1;
 		$GLOBALS['wp']->query_vars['pid']    = 1;
 		$GLOBALS['wp']->query_vars['lid']    = 500;
 
@@ -595,6 +595,7 @@ class Test_PDF extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function test_get_pdf_display_list() {
+		global $wp_rewrite;
 
 		/* Setup some test data */
 		$results = $this->create_form_and_entries();
@@ -607,7 +608,19 @@ class Test_PDF extends WP_UnitTestCase
 		$this->assertArrayHasKey( 'url', $pdfs[0] );
 
 		$this->assertNotFalse( strpos( $pdfs[0]['name'], 'test-' ) );
+		$this->assertNotFalse( strpos( $pdfs[0]['url'], 'http://example.org/?gpdf=1&#038;pid=556690c67856b&#038;lid=1' ) );
+
+		/* Process fancy permalinks */
+		$old_permalink_structure = get_option( 'permalink_structure' );
+		$wp_rewrite->set_permalink_structure( '/%postname%/' );
+		flush_rewrite_rules();
+
+		$pdfs = $this->model->get_pdf_display_list( $entry );
+
 		$this->assertNotFalse( strpos( $pdfs[0]['url'], 'http://example.org/pdf/556690c67856b/' ) );
+
+		$wp_rewrite->set_permalink_structure( $old_permalink_structure );
+		flush_rewrite_rules();
 	}
 
 	/**
@@ -658,7 +671,17 @@ class Test_PDF extends WP_UnitTestCase
 	 * @dataProvider provider_get_pdf_url
 	 */
 	public function test_get_pdf_url( $pid, $id, $expected ) {
+		global $wp_rewrite;
+
+		/* Process fancy permalinks */
+		$old_permalink_structure = get_option( 'permalink_structure' );
+		$wp_rewrite->set_permalink_structure( '/%postname%/' );
+		flush_rewrite_rules();
+
 		$this->assertEquals( $expected, $this->model->get_pdf_url( $pid, $id ) );
+
+		$wp_rewrite->set_permalink_structure( $old_permalink_structure );
+		flush_rewrite_rules();
 	}
 
 	/**
@@ -672,6 +695,31 @@ class Test_PDF extends WP_UnitTestCase
 			array( 'AIfawjoi24012', '9992', 'http://example.org/pdf/AIfawjoi24012/9992/' ),
 			array( 'JJiawfafwwaa', '5020', 'http://example.org/pdf/JJiawfafwwaa/5020/' ),
 			array( 'fa2a20koawas', '2', 'http://example.org/pdf/fa2a20koawas/2/' ),
+		);
+	}
+
+	/**
+	 * Check that the returned PDF URL is correct
+	 *
+	 * @since 4.0
+	 *
+	 * @dataProvider provider_get_pdf_url_no_perma
+	 */
+	public function test_get_pdf_url_no_perma( $pid, $id, $expected ) {
+		$this->assertEquals( $expected, $this->model->get_pdf_url( $pid, $id ) );
+	}
+
+	/**
+	 * The data provider for the test_get_pdf_url() function
+	 * @since 4.0
+	 */
+	public function provider_get_pdf_url_no_perma() {
+		return array(
+			array( '240arkj92kda', '50', 'http://example.org/?gpdf=1&#038;pid=240arkj92kda&#038;lid=50' ),
+			array( 'kjoai2', '25', 'http://example.org/?gpdf=1&#038;pid=kjoai2&#038;lid=25' ),
+			array( 'AIfawjoi24012', '9992', 'http://example.org/?gpdf=1&#038;pid=AIfawjoi24012&#038;lid=9992' ),
+			array( 'JJiawfafwwaa', '5020', 'http://example.org/?gpdf=1&#038;pid=JJiawfafwwaa&#038;lid=5020' ),
+			array( 'fa2a20koawas', '2', 'http://example.org/?gpdf=1&#038;pid=fa2a20koawas&#038;lid=2' ),
 		);
 	}
 

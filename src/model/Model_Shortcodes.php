@@ -145,9 +145,9 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		}
 
 		/* Everything looks valid so let's get the URL */
-		$pdf = new Model_PDF();
-		$pdf_url = $pdf->get_pdf_url( $attributes['id'], $attributes['entry'] );
-		$attributes['url'] = ($attributes['type'] == 'download') ? $pdf_url . 'download/' : $pdf_url;
+		$pdf               = new Model_PDF( $this->form, $this->log, $this->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
+		$download          = ( $attributes['type'] == 'download' ) ? true : false;
+		$attributes['url'] = $pdf->get_pdf_url( $attributes['id'], $attributes['entry'], $download );
 
 		/* generate the markup and return */
 		$this->log->addNotice( 'Generating Shortcode Markup', array( 'attr' => $attributes ) );
@@ -230,6 +230,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function gravitypdf_redirect_confirmation( $form ) {
+		global $gfpdf;
 
 		/* check if the confirmation is currently being saved */
 		if ( isset($_POST['form_confirmation_url']) ) {
@@ -254,13 +255,9 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 					if ( ! empty($pid) ) {
 
 						/* generate the PDF URL */
-						$pdf = new Model_PDF();
-						$pdf_url = $pdf->get_pdf_url( $pid, '{entry_id}', false );
-
-						/* check if the PDF should be auto-prompted to download, or whether the user should view it in the browser */
-						if ( ! isset($code['attr']['type']) || $code['attr']['type'] == 'download' ) {
-							$pdf_url .= 'download/';
-						}
+						$pdf      = new Model_PDF( $this->form, $this->log, $this->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
+						$download = ( ! isset($code['attr']['type']) || $code['attr']['type'] == 'download' ) ? true : false;
+						$pdf_url  = $pdf->get_pdf_url( $pid, '{entry_id}', $download, false );
 
 						/* override the confirmation URL submitted */
 						$_POST['form_confirmation_url'] = str_replace( $code['shortcode'], $pdf_url, $url );

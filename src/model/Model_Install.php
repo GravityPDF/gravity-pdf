@@ -259,7 +259,7 @@ class Model_Install extends Helper_Abstract_Model {
 
 		/* store query */
 		$query      = $this->data->permalink;
-		$rewrite_to = 'index.php?gf_pdf=1&pid=$matches[1]&lid=$matches[2]&action=$matches[3]';
+		$rewrite_to = 'index.php?gpdf=1&pid=$matches[1]&lid=$matches[2]&action=$matches[3]';
 
 		/* Add our main endpoint */
 		add_rewrite_rule(
@@ -282,7 +282,7 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @return void
 	 */
 	public function register_rewrite_tags( $tags ) {
-		$tags[] = 'gf_pdf';
+		$tags[] = 'gpdf';
 		$tags[] = 'pid';
 		$tags[] = 'lid';
 		$tags[] = 'action';

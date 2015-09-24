@@ -520,13 +520,13 @@ class Model_PDF extends Helper_Abstract_Model {
 		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : array();
 
 		if ( ! empty($pdfs) ) {
-			$download = ($this->options->get_option( 'default_action' ) == 'Download') ? 'download/' : '';
+			$download = ($this->options->get_option( 'default_action' ) == 'Download') ? true : false;
 
 			foreach ( $pdfs as $pdf ) {
 
 				$args[] = array(
 					'name' => $this->get_pdf_name( $pdf, $entry ),
-					'url'  => $this->get_pdf_url( $pdf['id'], $entry['id'] ) . $download,
+					'url'  => $this->get_pdf_url( $pdf['id'], $entry['id'], $download ),
 				);
 			}
 		}
@@ -560,12 +560,27 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * Create a PDF Link based on the current PDF settings and entry
 	 * @param  Integer $pid  The PDF Form Settings ID
 	 * @param  Integer $id The Gravity Form entry ID
+	 * @param  Boolean $download Whether the PDF should be downloaded or not
+	 * @param  Boolean $esc Whether to escape the URL or not
 	 * @return String       Direct link to the PDF
 	 * @since  4.0
 	 */
-	public function get_pdf_url( $pid, $id, $esc = true ) {
+	public function get_pdf_url( $pid, $id, $download = false, $esc = true ) {
 
-		$url = home_url() . '/pdf/' . $pid . '/' . $id . '/';
+		/* Check if permalinks are enabled, otherwise fall back to our ugly link structure for 4.0 (not the same as our v3 links) */
+		if ( get_option('permalink_structure') ) {
+			$url = home_url() . '/pdf/' . $pid . '/' . $id . '/';
+
+			if( $download ) {
+				$url .= 'download/';
+			}
+		} else {
+			$url = home_url() . '/?gpdf=1&pid=' . $pid . '&lid=' . $id;
+
+			if( $download ) {
+				$url .= '&action=download';
+			}
+		}
 
 		if ( $esc ) {
 			$url = esc_url( $url );
