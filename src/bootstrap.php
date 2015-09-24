@@ -197,6 +197,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		/* Enable Gravity Forms Logging */
 		add_filter( 'gform_logging_supported', array( $this, 'add_gf_logger' ) );
+
+		/* Add quick links on the plugins page */
+		add_filter( 'plugin_action_links_' . PDF_PLUGIN_BASENAME, array( $this, 'plugin_action_links' ) );
+		add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
 	}
 
 	/**
@@ -310,6 +314,47 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		}
 
 		return false;
+	}
+
+	/**
+	 * Show action links on the plugin screen.
+	 *
+	 * @param	mixed $links Plugin Action links
+	 * @return	array
+	 * @since 4.0
+	 */
+	public static function plugin_action_links( $links ) {
+		global $gfpdf;
+
+		$action_links = array(
+			'settings' => '<a href="' . esc_url( $gfpdf->data->settings_url ) . '" title="' . esc_attr( __( 'View Gravity PDF Settings', 'gravitypdf' ) ) . '">' . __( 'Settings', 'gravitypdf' ) . '</a>',
+		);
+
+		return array_merge( $action_links, $links );
+	}
+
+	/**
+	 * Show row meta on the plugin screen.
+	 *
+	 * @param	mixed $links Plugin Row Meta
+	 * @param	mixed $file  Plugin Base file
+	 * @return	array
+	 * @since  4.0
+	 */
+	public static function plugin_row_meta( $links, $file ) {
+		global $gfpdf;
+		
+		if ( $file == PDF_PLUGIN_BASENAME ) {
+			$row_meta = array(
+				'docs'    => '<a href="' . esc_url( 'https://gravitypdf.com/documentation/' ) . '" title="' . esc_attr( __( 'View Gravity PDF Documentation', 'gravitypdf' ) ) . '">' . __( 'Docs', 'gravitypdf' ) . '</a>',
+				'support' => '<a href="' . esc_url( $gfpdf->data->settings_url . '&tab=help' ) . '" title="' . esc_attr( __( 'Get help and support', 'gravitypdf' ) ) . '">' . __( 'Support', 'gravitypdf' ) . '</a>',
+				'shop'    => '<a href="' . esc_url( 'https://gravitypdf.com/shop/' ) . '" title="' . esc_attr( __( 'View Gravity PDF Theme Shop', 'gravitypdf' ) ) . '">' . __( 'Theme Shop', 'gravitypdf' ) . '</a>',
+			);
+
+			return array_merge( $links, $row_meta );
+		}
+
+		return (array) $links;
 	}
 
 	/**
