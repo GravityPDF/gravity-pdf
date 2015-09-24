@@ -249,6 +249,11 @@ abstract class Helper_Abstract_Fields {
 			$html .= '<div class="label"><strong>' . esc_html( GFFormsModel::get_label( $this->field ) ) . '</strong></div>';
 		}
 
+		/* If the field value is empty we'll add a non-breaking space to act like a character and maintain proper layout */
+		if( strlen( trim( $value ) ) === 0 ) {
+			$value = '&nbsp;';
+		}
+
 		$html .= '<div class="value">' . $value . '</div>'
 				. '</div>';
 

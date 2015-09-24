@@ -75,6 +75,20 @@ class Test_API extends WP_UnitTestCase
     }
 
     /**
+     * Check we are returning the correct class when called
+     * @since 4.0
+     */
+    public function test_get_pdf_class() {
+        /* Check View Class */
+        $class = GPDFAPI::get_pdf_class();
+        $this->assertEquals( 'GFPDF\View\View_PDF', get_class( $class ) );
+
+        /* Check Model Class */
+        $class = GPDFAPI::get_pdf_class( 'model' );
+        $this->assertEquals( 'GFPDF\Model\Model_PDF', get_class( $class ) );
+    }
+
+    /**
      * Check we can add a new PDF
      * @since 4.0
      */

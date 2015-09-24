@@ -263,7 +263,7 @@ class View_PDF extends Helper_Abstract_View
 		/* Get the user configuration values */
 		$skip_marked_fields             = ( isset( $config['meta']['exclude'] ) ) ? $config['meta']['exclude'] : true; /* whether we should exclude fields with a CSS value of 'exclude'. Default to true */
 		$skip_hidden_fields             = ( isset( $config['meta']['hidden'] ) ) ? $config['meta']['hidden'] : true; /* whether we should skip fields hidden with conditional logic. Default to true. */
-		$show_title                     = ( isset( $config['meta']['show_title'] ) ) ? $config['meta']['show_title']  : true; /* whether we should show the form title. Default to true */
+		$show_title                     = ( isset( $config['meta']['show_title'] ) ) ? $config['meta']['show_title']  : false; /* whether we should show the form title. Default to true */
 		$show_page_names                = ( isset( $config['meta']['page_names'] ) ) ? $config['meta']['page_names']  : false; /* whether we should show the form's page names. Default to false */
 		$show_html_fields               = ( isset( $config['meta']['html_field'] ) ) ? $config['meta']['html_field']  : false; /* whether we should show the form's html fields. Default to false */
 		$show_individual_product_fields = ( isset( $config['meta']['individual_products'] ) ) ? $config['meta']['individual_products']  : false; /* Whether to show individual fields in the entry. Default to false - they are grouped together at the end of the form */

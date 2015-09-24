@@ -133,6 +133,26 @@ class GPDFAPI {
 	}
 
 	/**
+	 * Returns a new instance of one of our PDF generating code (model or view)
+	 * @param  string $type Type of class to return. Valid options include 'view' or 'model'
+	 * @return Object
+	 * @since  4.0
+	 */
+	public static function get_pdf_class( $type = 'view' ) {
+		global $gfpdf;
+
+		if( $type === 'view' ) {
+			return new GFPDF\View\View_PDF( array(), $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
+		}
+
+		if( $type === 'model' ) {
+			return new GFPDF\Model\Model_PDF( $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
+		}
+
+		return null;
+	}
+
+	/**
 	 * Gets a list of current PDFs setup for a particular Gravity Form
 	 * @param  Integer $form_id The Gravity Form ID
 	 * @return Array / WP_Error Array of PDF settings or WP_Error

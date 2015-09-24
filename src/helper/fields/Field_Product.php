@@ -83,25 +83,25 @@ class Field_Product extends Helper_Abstract_Fields
 
 		switch ( $this->field->type ) {
 			case 'product':
-				$name  = $value['name'] . " ({$value['price']})";
-				$price = $value['price_unformatted'];
+				$name  = ( isset( $value['name'] ) && isset( $value['price'] ) ) ? $value['name'] . " ({$value['price']})" : '';
+				$price = ( isset( $value['price_unformatted'] ) ) ? $value['price_unformatted'] : '';
 			break;
 
 			case 'option':
-				if ( sizeof( $value['options'] ) > 1 ) {
+				if ( isset( $value['options'] ) && sizeof( $value['options'] ) > 1 ) {
 					foreach ( $value['options'] as $option ) {
-						$name[]  = $option['option_name'] . " ({$option['price_formatted']})";
-						$price[] = $option['price'];
+						$name[]  = ( isset( $option['option_name'] ) ) ? $option['option_name'] . " ({$option['price_formatted']})" : '';
+						$price[] = ( isset( $option['price'] ) ) ? $option['price'] : '';
 					}
 				} else {
-					$name  = $value['options'][0]['option_name'] . " ({$value['options'][0]['price_formatted']})";
-					$price = $value['options'][0]['price'];
+					$name  = ( isset( $value['options'][0]['option_name'] ) ) ? $value['options'][0]['option_name'] . " ({$value['options'][0]['price_formatted']})" : '';
+					$price = ( isset( $value['options'][0]['price'] ) ) ? $value['options'][0]['price'] : '';
 				}
 			break;
 
 			case 'shipping':
-				$name  = $value['shipping_name'] . " ({$value['shipping_formatted']})";
-				$price = $value['shipping'];
+				$name  = ( isset( $value['shipping_name'] ) ) ? $value['shipping_name'] . " ({$value['shipping_formatted']})" : '';
+				$price = ( isset( $value['shipping'] ) ) ? $value['shipping'] : '';
 			break;
 
 			case 'quantity':

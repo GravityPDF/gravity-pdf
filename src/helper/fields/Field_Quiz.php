@@ -80,7 +80,7 @@ class Field_Quiz extends Helper_Abstract_Fields
 		$value = apply_filters( 'gform_entry_field_value', $this->get_value(), $this->field, $this->entry, $this->form );
 
 		/* Return early to prevent any problems with when field is empty or the quiz plugin isn't enabled */
-		if( trim( $value ) == false || ! class_exists( 'GFQuiz' ) ) {
+		if( ! class_exists( 'GFQuiz' ) || ! is_string( $value ) || trim( $value ) == false ) {
 			return parent::html( '' );
 		}
 
