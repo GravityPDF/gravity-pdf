@@ -121,6 +121,8 @@ class Test_Actions extends WP_UnitTestCase
     public function test_route_notices() {
         global $gfpdf;
 
+        set_current_screen( 'edit.php' );
+
         /* Set up a custom route */
         add_filter( 'gfpdf_one_time_action_routes', function( $routes ) {
 
@@ -158,6 +160,12 @@ class Test_Actions extends WP_UnitTestCase
 
         /* Cleanup notices */
         $gfpdf->notices->clear();
+
+        /* Check routes aren't handled when not in admin area */
+        set_current_screen( 'front' );
+
+        $this->controller->route_notices();
+        $this->assertFalse( $gfpdf->notices->has_notice() );
     }
 
     /**
