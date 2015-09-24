@@ -1314,7 +1314,7 @@ class Test_PDF extends WP_UnitTestCase
 		$this->view->process_field( $field, $entry, $form, $config, $products, new Helper_Field_Container(), $this->model );
 		$html = ob_get_clean();
 
-		$this->assertNotFalse( strpos( $html, '<div class="value"></div>' ) );
+		$this->assertNotFalse( strpos( $html, '<div class="value">&nbsp;</div>' ) );
 
 		/* Enable legacy css */
 		$config['meta']['legacy_css'] = true;
