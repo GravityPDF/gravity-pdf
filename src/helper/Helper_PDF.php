@@ -290,7 +290,7 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	public function set_creator( $text = '' ) {
-		if ( empty($text) ) {
+		if ( empty( $text ) ) {
 			$this->mpdf->SetCreator( 'Gravity PDF v' . PDF_EXTENDED_VERSION . '. https://gravitypdf.com' );
 		} else {
 			$this->mpdf->SetCreator( $text );
@@ -306,7 +306,7 @@ class Helper_PDF {
 	 */
 	public function set_display_mode( $mode = 'fullpage', $layout = 'continuous' ) {
 
-		$valid_mode = array( 'fullpage', 'fullwidth', 'real', 'default' );
+		$valid_mode   = array( 'fullpage', 'fullwidth', 'real', 'default' );
 		$valid_layout = array( 'single', 'continuous', 'two', 'twoleft', 'tworight', 'default' );
 
 		/* check the mode */
@@ -401,7 +401,7 @@ class Helper_PDF {
 	 */
 	public function set_path( $path = '' ) {
 
-		if ( empty($path) ) {
+		if ( empty( $path ) ) {
 			/* build our PDF path location */
 			$path = $this->data->template_tmp_location . $this->entry['form_id'] . $this->entry['id'] . '/';
 		} else {
@@ -431,7 +431,7 @@ class Helper_PDF {
 	protected function set_paper() {
 
 		/* Get the paper size from the settings */
-		$paper_size = (isset($this->settings['pdf_size'])) ? strtoupper( $this->settings['pdf_size'] ) : 'A4';
+		$paper_size = ( isset($this->settings['pdf_size'] ) ) ? strtoupper( $this->settings['pdf_size'] ) : 'A4';
 
         $valid_paper_size = array(
             '4A0', '2A0',
@@ -474,7 +474,7 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	protected function set_custom_paper_size() {
-		$custom_paper_size = (isset($this->settings['custom_pdf_size'])) ? $this->settings['custom_pdf_size'] : array();
+		$custom_paper_size = ( isset( $this->settings['custom_pdf_size'] ) ) ? $this->settings['custom_pdf_size'] : array();
 
 		if ( sizeof( $custom_paper_size ) !== 3 ) {
 			throw new Exception( 'Custom paper size not valid. Array should contain three keys: width, height and unit type' );
@@ -491,11 +491,11 @@ class Helper_PDF {
 	 * @since  4.0
 	 */
 	protected function get_paper_size( $size ) {
-		$size[0] = ($size[2] == 'inches') ? (int) $size[0] * 25.4 : (int) $size[0];
-		$size[1] = ($size[2] == 'inches') ? (int) $size[1] * 25.4 : (int) $size[1];
+		$size[0] = ( $size[2] == 'inches' ) ? (int) $size[0] * 25.4 : (int) $size[0];
+		$size[1] = ( $size[2] == 'inches' ) ? (int) $size[1] * 25.4 : (int) $size[1];
 
 		/* tidy up custom paper size array */
-		unset($size[2]);
+		unset( $size[2] );
 
 		return $size;
 	}
@@ -508,12 +508,17 @@ class Helper_PDF {
 	 */
 	protected function set_orientation( $custom = false ) {
 
-		$orientation = (isset($this->settings['orientation'])) ? strtolower( $this->settings['orientation'] ) : 'portrait';
+		$orientation = ( isset( $this->settings['orientation'] ) ) ? strtolower( $this->settings['orientation'] ) : 'portrait';
 
+		/**
+		 * If using a custom paper size (with an array) we'll pass in the L or P. If standard paper size the -L attribute needs to be added to the $paper_size argument.
+		 * @todo Update mPDF to be more consistent when setting portrait and landscape documentation
+		 */
 		if ( $custom ) {
-			$this->orientation = ($orientation == 'landscape') ? 'L' : 'P';
+			$this->orientation = ( $orientation == 'landscape' ) ? 'L' : 'P';
 		} else {
-			$this->orientation = ($orientation == 'landscape') ? '-L' : '';
+			$this->orientation = ( $orientation == 'landscape' ) ? '-L' : '';
+			$this->paper_size .= $this->orientation;
 		}
 	}
 
@@ -524,7 +529,7 @@ class Helper_PDF {
 	 */
 	protected function set_template() {
 
-		$template = (isset($this->settings['template'])) ? $this->get_file_with_extension( $this->settings['template'] ) : '';
+		$template = ( isset( $this->settings['template'] ) ) ? $this->get_file_with_extension( $this->settings['template'] ) : '';
 
 		/* Allow a user to change the current template if they have the appropriate capabilities */
 		if ( rgget( 'template' ) && is_user_logged_in() && $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
@@ -608,7 +613,7 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	protected function set_image_dpi() {
-		$dpi = (isset($this->settings['image_dpi'])) ? (int) $this->settings['image_dpi'] : 96;
+		$dpi = ( isset( $this->settings['image_dpi'] ) ) ? (int) $this->settings['image_dpi'] : 96;
 
 		$this->mpdf->img_dpi = $dpi;
 	}
@@ -619,7 +624,7 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	protected function set_text_direction() {
-		$rtl = (isset($this->settings['rtl'])) ? $this->settings['rtl'] : 'No';
+		$rtl = ( isset( $this->settings['rtl'] ) ) ? $this->settings['rtl'] : 'No';
 
 		if ( strtolower( $rtl ) == 'yes' ) {
 			$this->mpdf->SetDirectionality( 'rtl' );
