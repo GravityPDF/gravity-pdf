@@ -201,6 +201,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/* Add quick links on the plugins page */
 		add_filter( 'plugin_action_links_' . PDF_PLUGIN_BASENAME, array( $this, 'plugin_action_links' ) );
 		add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
+
+		/* Add class when on Gravity PDF pages */
+		add_filter( 'admin_body_class', array( $this, 'add_body_class') );
 	}
 
 	/**
@@ -323,7 +326,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @return	array
 	 * @since 4.0
 	 */
-	public static function plugin_action_links( $links ) {
+	public function plugin_action_links( $links ) {
 		global $gfpdf;
 
 		$action_links = array(
@@ -341,9 +344,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @return	array
 	 * @since  4.0
 	 */
-	public static function plugin_row_meta( $links, $file ) {
+	public function plugin_row_meta( $links, $file ) {
 		global $gfpdf;
-		
+
 		if ( $file == PDF_PLUGIN_BASENAME ) {
 			$row_meta = array(
 				'docs'    => '<a href="' . esc_url( 'https://gravitypdf.com/documentation/' ) . '" title="' . esc_attr( __( 'View Gravity PDF Documentation', 'gravitypdf' ) ) . '">' . __( 'Docs', 'gravitypdf' ) . '</a>',
@@ -355,6 +358,20 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		}
 
 		return (array) $links;
+	}
+
+	/**
+	 * If on a Gravity Form page add a new class
+	 * @param Array $classes
+	 * @since 4.0
+	 */
+	public function add_body_class( $classes ) {
+
+		if( $this->misc->is_gfpdf_page() ) {
+			$classes .= ' gfpdf-page';
+		}
+
+		return $classes;
 	}
 
 	/**
