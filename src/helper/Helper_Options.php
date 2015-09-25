@@ -786,10 +786,17 @@ class Helper_Options implements Helper_Interface_Filters {
 		 */
 		foreach ( glob( $this->data->template_location . '*.php' ) as $filename ) {
 
+			/* Get the header information to find out what group it's in and if it is compatible with our verison of Gravity PDF */
 			$info = $this->get_template_headers( $filename );
 			$file = basename( $filename, '.php' );
 
 			if ( ! empty( $info['template'] ) ) {
+
+				/* Check if template compatible */
+				if( ! empty( $info['required_pdf_version'] ) && version_compare( $info['required_pdf_version'], PDF_EXTENDED_VERSION, '>' ) ) {
+					$info['template'] .= ' (+ '. _x( 'needs', 'Required', 'gravitypdf') . ' v' . $info['required_pdf_version'] . ')';
+				}
+
 				$templates[ $prefix_text . $info['group'] ][ $file ] = $info['template'];
 			} else if ( $file !== 'configuration' && $file !== 'configuration.archive' ) { /* exclude legacy configuration file */
 				$legacy[ $file ] = $this->misc->human_readable( $file );

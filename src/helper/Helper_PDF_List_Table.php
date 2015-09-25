@@ -254,8 +254,14 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 		$template = $this->options->get_template_information( $item['template'] );
 
-		if ( is_array( $template ) && isset($template['template']) ) {
+		if ( is_array( $template ) && isset( $template['template'] ) ) {
 			echo "<strong>{$template['group']} – </strong> {$template['template']}";
+
+			/* Add addendum if version is incompatible */
+			if( ! empty( $template['required_pdf_version'] ) && version_compare( $template['required_pdf_version'], PDF_EXTENDED_VERSION, '>' ) ) {
+				echo ' (+ '. _x( 'needs', 'Required', 'gravitypdf') . ' v' . $template['required_pdf_version'] . ')';
+			}
+
 		} else {
 			echo "<strong>{$template['group']}</strong> – " . $this->misc->human_readable( rgar( $item, 'template' ) );
 		}

@@ -550,6 +550,20 @@ class Helper_PDF {
 		} else {
 			throw new Exception( 'Could not find the template: ' . esc_html( $template ) );
 		}
+
+		/*
+		 * Check if the template version is compatible with our version of Gravity PDF
+		 */
+		$headers = get_file_data( $this->template_path, array( 'required_pdf_version' =>  __( 'Required PDF Version', 'gravitypdf' ) ) );
+
+		/* Check if there are version requirements */
+		if( strlen( $headers['required_pdf_version'] ) > 0 ) {
+			/* Check if the version requirements are NOT met and throw and error */
+			if( version_compare( $headers['required_pdf_version'], PDF_EXTENDED_VERSION, '>' ) ) {
+				throw new Exception( sprintf( __( 'The PDF Tempalte %s requires Gravity PDF version %s. Upgrade to the latest version.', 'gravitypdf'), "<em>$template</em>", "<em>{$headers['required_pdf_version']}</em>" ) );
+			}
+		}
+		
 	}
 
 
