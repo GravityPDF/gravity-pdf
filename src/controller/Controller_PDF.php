@@ -263,7 +263,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		if ( $this->form->has_capability( 'gravityforms_view_settings' ) || in_array( $error->get_error_code(), $whitelist_errors ) ) {
 			wp_die( $error->get_error_message() );
 		} else {
-			wp_die( __( 'There was a problem generating your PDF', 'gravitypdf' ) );
+			wp_die( __( 'There was a problem generating your PDF', 'gravity-forms-pdf-extended' ) );
 		}
 	}
 }

@@ -37,7 +37,7 @@ if (! defined('ABSPATH')) {
 ?>
 
 <span class="gf_form_toolbar_settings gf_form_action_has_submenu gfpdf_form_action_has_submenu">
-   | <a href="#" title="View PDFs" onclick="return false" class=""><?php _e('View PDFs', 'gravitypdf'); ?></a>
+   | <a href="#" title="View PDFs" onclick="return false" class=""><?php _e('View PDFs', 'gravity-forms-pdf-extended' ); ?></a>
     
     <div class="gf_submenu gfpdf_submenu">
         <ul>

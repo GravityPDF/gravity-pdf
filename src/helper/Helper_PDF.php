@@ -554,13 +554,13 @@ class Helper_PDF {
 		/*
 		 * Check if the template version is compatible with our version of Gravity PDF
 		 */
-		$headers = get_file_data( $this->template_path, array( 'required_pdf_version' =>  __( 'Required PDF Version', 'gravitypdf' ) ) );
+		$headers = get_file_data( $this->template_path, array( 'required_pdf_version' =>  __( 'Required PDF Version', 'gravity-forms-pdf-extended' ) ) );
 
 		/* Check if there are version requirements */
 		if( strlen( $headers['required_pdf_version'] ) > 0 ) {
 			/* Check if the version requirements are NOT met and throw and error */
 			if( version_compare( $headers['required_pdf_version'], PDF_EXTENDED_VERSION, '>' ) ) {
-				throw new Exception( sprintf( __( 'The PDF Tempalte %s requires Gravity PDF version %s. Upgrade to the latest version.', 'gravitypdf'), "<em>$template</em>", "<em>{$headers['required_pdf_version']}</em>" ) );
+				throw new Exception( sprintf( __( 'The PDF Tempalte %s requires Gravity PDF version %s. Upgrade to the latest version.', 'gravity-forms-pdf-extended' ), "<em>$template</em>", "<em>{$headers['required_pdf_version']}</em>" ) );
 			}
 		}
 		

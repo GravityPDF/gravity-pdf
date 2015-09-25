@@ -200,11 +200,11 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		if ( ! $this->misc->copyr( PDF_PLUGIN_DIR . 'initialisation/templates/', $this->data->template_location ) ) {
 			$this->log->addError( 'Template Installation Error.' );
-			$this->notices->add_error( sprintf( __( 'There was a problem copying all PDF templates to %s. Please try again.', 'gravitypdf' ), '<code>' . $this->misc->relative_path( $this->data->template_location ) . '</code>' ) );
+			$this->notices->add_error( sprintf( __( 'There was a problem copying all PDF templates to %s. Please try again.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $this->data->template_location ) . '</code>' ) );
 			return false;
 		}
 
-		$this->notices->add_notice( sprintf( __( 'Gravity PDF Custom Templates successfully installed to %s.', 'gravitypdf' ), '<code>' . $this->misc->relative_path( $this->data->template_location ) . '</code>' ) );
+		$this->notices->add_notice( sprintf( __( 'Gravity PDF Custom Templates successfully installed to %s.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $this->data->template_location ) . '</code>' ) );
 		$this->options->update_option( 'custom_pdf_template_files_installed', true );
 		return true;
 	}
@@ -266,7 +266,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		/* Loop through default fonts and check for duplicate */
 		$default_fonts = $this->options->get_installed_fonts();
 
-		unset( $default_fonts[ __('User-Defined Fonts', 'gravitypdf') ] );
+		unset( $default_fonts[ __('User-Defined Fonts', 'gravity-forms-pdf-extended' ) ] );
 
 		/* check for exact match */
 		foreach ( $default_fonts as $group ) {
@@ -313,13 +313,13 @@ class Model_Settings extends Helper_Abstract_Model {
 
 				/* Couldn't find file so throw error */
 				if ( is_wp_error( $path ) ) {
-					$errors[] = sprintf( __( 'Could not locate font on web server: %s', 'gravitypdf' ), $fonts[$type] );
+					$errors[] = sprintf( __( 'Could not locate font on web server: %s', 'gravity-forms-pdf-extended' ), $fonts[$type] );
 				}
 
 				/* Copy font to our fonts folder */
 				$filename = basename( $path );
 				if ( ! is_file( $this->data->template_font_location . $filename ) && ! copy( $path, $this->data->template_font_location . $filename ) ) {
-					$errors[] = sprintf( __( 'There was a problem installing the font %s. Please try again.', 'gravitypdf' ), $filename );
+					$errors[] = sprintf( __( 'There was a problem installing the font %s. Please try again.', 'gravity-forms-pdf-extended' ), $filename );
 				}
 			}
 		}
@@ -435,7 +435,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		$id = 'pdf_knowledgebase';
 		add_meta_box(
 			$id,
-			__( 'Documentation', 'gravitypdf' ),
+			__( 'Documentation', 'gravity-forms-pdf-extended' ),
 			array( $controller->view, 'add_meta_' . $id ),
 			'pdf-help-and-support',
 			'row-1'
@@ -445,7 +445,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		$id = 'pdf_support_forum';
 		add_meta_box(
 			$id,
-			__( 'Support Forum', 'gravitypdf' ),
+			__( 'Support Forum', 'gravity-forms-pdf-extended' ),
 			array( $controller->view, 'add_meta_' . $id ),
 			'pdf-help-and-support',
 			'row-1'
@@ -455,7 +455,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		$id = 'pdf_direct';
 		add_meta_box(
 			$id,
-			__( 'Contact Us', 'gravitypdf' ),
+			__( 'Contact Us', 'gravity-forms-pdf-extended' ),
 			array( $controller->view, 'add_meta_' . $id ),
 			'pdf-help-and-support',
 			'row-1'
@@ -465,7 +465,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		$id = 'pdf_popular_articles';
 		add_meta_box(
 			$id,
-			__( 'Popular Documentation', 'gravitypdf' ),
+			__( 'Popular Documentation', 'gravity-forms-pdf-extended' ),
 			array( $controller->view, 'add_meta_' . $id ),
 			'pdf-help-and-support',
 			'row-2'
@@ -475,7 +475,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		$id = 'pdf_recent_forum_articles';
 		add_meta_box(
 			$id,
-			__( 'Recent Forum Activity', 'gravitypdf' ),
+			__( 'Recent Forum Activity', 'gravity-forms-pdf-extended' ),
 			array( $this, 'process_meta_' . $id ),
 			'pdf-help-and-support',
 			'row-2'
@@ -485,7 +485,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		$id = 'pdf_support_hours';
 		add_meta_box(
 			$id,
-			__( 'Support Hours', 'gravitypdf' ),
+			__( 'Support Hours', 'gravity-forms-pdf-extended' ),
 			array( $controller->view, 'add_meta_' . $id ),
 			'pdf-help-and-support',
 			'row-2'
@@ -584,7 +584,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		header( 'HTTP/1.1 400 Bad Request' );
 
 		$return = array(
-			'error' => __( 'Could not delete Gravity PDF font correctly. Please try again.', 'gravitypdf' ),
+			'error' => __( 'Could not delete Gravity PDF font correctly. Please try again.', 'gravity-forms-pdf-extended' ),
 		);
 
 		$this->log->addError( 'AJAX Endpoint Error', array( 'error' => $return ) );
@@ -611,7 +611,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			header( 'HTTP/1.1 400 Bad Request' );
 
 			$return = array(
-				'error' => __( 'Required fields have not been included.', 'gravitypdf' ),
+				'error' => __( 'Required fields have not been included.', 'gravity-forms-pdf-extended' ),
 			);
 
 			$this->log->addWarning( 'Validation Failed.', $return );
@@ -628,7 +628,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			header( 'HTTP/1.1 400 Bad Request' );
 
 			$return = array(
-				'error' => __( 'Font name is not valid. Only alphanumeric characters and spaces are accepted.', 'gravitypdf' ),
+				'error' => __( 'Font name is not valid. Only alphanumeric characters and spaces are accepted.', 'gravity-forms-pdf-extended' ),
 			);
 
 			$this->log->addWarning( 'Validation Failed.', $return );
@@ -646,7 +646,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			header( 'HTTP/1.1 400 Bad Request' );
 
 			$return = array(
-				'error' => __( 'A font with the same name already exists. Try a different name.', 'gravitypdf' ),
+				'error' => __( 'A font with the same name already exists. Try a different name.', 'gravity-forms-pdf-extended' ),
 			);
 
 			$this->log->addWarning( 'Validation Failed.', $return );

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * Help Settings View
@@ -39,16 +39,16 @@ if (! defined('ABSPATH')) {
 <?php $this->tabs(); ?>
         
         
-<div id="pdfextended-settings">    
+<div id="pdfextended-settings">
 	<div class="wrap about-wrap">
 	  <h1><?php _e('Getting Help With Gravity PDF', 'pdfexended'); ?></h1>
-	  <div class="about-text"><?php _e('This is your portal to find quality help, support and documentation for Gravity PDF', 'gravitypdf'); ?></div>
+	  <div class="about-text"><?php _e('This is your portal to find quality help, support and documentation for Gravity PDF', 'gravity-forms-pdf-extended' ); ?></div>
 	  
-	  <div id="search-knowledgebase">	    
-	    <div id="search-results">	   
-	      <div id="dashboard_primary" class="metabox-holder">      
+	  <div id="search-knowledgebase">
+	    <div id="search-results">
+	      <div id="dashboard_primary" class="metabox-holder">
 
-	            <div id="documentation-api" class="postbox">   
+	            <div id="documentation-api" class="postbox">
 	              <h3 class="hndle">
 	                <span>Documentation</span>
 	                <span class="spinner"></span>
@@ -56,9 +56,9 @@ if (! defined('ABSPATH')) {
 	              <div class="inside rss-widget">
 	              	<ul></ul>
 	              </div>
-	            </div>  
+	            </div>
 
-	            <div id="forum-api" class="postbox ">   
+	            <div id="forum-api" class="postbox ">
 	              <h3 class="hndle">
 	                <span>Support Forum</span>
 	                <span class="spinner"></span>
@@ -66,10 +66,10 @@ if (! defined('ABSPATH')) {
 	              <div class="inside rss-widget">
 	                <ul></ul>
 	              </div>
-	            </div>  
+	            </div>
 
 	 
-	      </div><!-- close #dashboard_primary -->	      
+	      </div><!-- close #dashboard_primary -->
 	    </div><!-- close #search-results -->
 	  </div><!-- close #search-knowledgebase -->
 
@@ -87,10 +87,10 @@ if (! defined('ABSPATH')) {
 	</div><!-- close wrap about-wrap -->
 
 
-	<?php do_action('pdf-settings-help'); ?>	                             
+	<?php do_action('pdf-settings-help'); ?>
 </div><!-- close #pdfextended-settings -->
 
-<script type="text/template" id="GravityPDFSearchResultsForum">    
+<script type="text/template" id="GravityPDFSearchResultsForum">
     <% _.each(collection, function (c) { %>
       <li>
         <a href="<%= url %>t/<%= c.get('slug') %>/<%= c.get('id') %>" class="rsswidget"><%= c.get('fancy_title') %></a> (<%= c.get('views') %>) <span class="rss-date">Last Updated <%= _.template.formatdate(c.get('last_posted_at')) %></span>
@@ -99,11 +99,11 @@ if (! defined('ABSPATH')) {
     <% }); %>
 
     <% if(collection.length === 0) { %>
-      <li>No topics found for your search.</li>      
+      <li>No topics found for your search.</li>
     <% } %>
 </script>
 
-<script type="text/template" id="GravityPDFSearchResultsDocumentation">    
+<script type="text/template" id="GravityPDFSearchResultsDocumentation">
     <% _.each(collection, function (c) { %>
       <li>
         <a href="<%= c.get('link') %>" class="rsswidget"><%= c.get('terms').documentation_group[0].name %> - <%= c.get('title') %></a>
@@ -112,6 +112,6 @@ if (! defined('ABSPATH')) {
     <% }); %>
 
     <% if(collection.length === 0) { %>
-      <li>No topics found for your search.</li>      
+      <li>No topics found for your search.</li>
     <% } %>
-</script>	
+</script>

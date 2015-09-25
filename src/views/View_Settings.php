@@ -152,17 +152,17 @@ class View_Settings extends Helper_Abstract_View
 			 */
 			$navigation = array(
 				5 => array(
-					'name'     => __( 'General', 'gravitypdf' ),
+					'name'     => __( 'General', 'gravity-forms-pdf-extended' ),
 					'id'       => 'general',
 				),
 
 				100 => array(
-					'name'     => __( 'Tools', 'gravitypdf' ),
+					'name'     => __( 'Tools', 'gravity-forms-pdf-extended' ),
 					'id'       => 'tools',
 				),
 
 				120 => array(
-					'name' => __( 'Help', 'gravitypdf' ),
+					'name' => __( 'Help', 'gravity-forms-pdf-extended' ),
 					'id' => 'help',
 				),
 			);
@@ -227,7 +227,7 @@ class View_Settings extends Helper_Abstract_View
 		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			$this->log->addWarning( 'Lack of User Capabilities.' );
 			
-			wp_die( __( 'You do not have permission to access this page', 'gravitypdf' ) );
+			wp_die( __( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
 		}
 
 		$vars = array(
@@ -249,7 +249,7 @@ class View_Settings extends Helper_Abstract_View
 	 */
 	public function add_tooltips( $tooltips ) {
 
-		$tooltips['pdf_status_wp_memory']     = '<h6>' . __( 'WP Memory Available', 'gravitypdf' ) . '</h6>' . sprintf( __( 'Producing PDF documents is hard work and Gravity PDF requires more resources than most plugins. We strongly recommend you have at least 128MB, but you may need more.', 'gravitypdf' ) );
+		$tooltips['pdf_status_wp_memory']     = '<h6>' . __( 'WP Memory Available', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'Producing PDF documents is hard work and Gravity PDF requires more resources than most plugins. We strongly recommend you have at least 128MB, but you may need more.', 'gravity-forms-pdf-extended' ) );
 
 		return apply_filters( 'gravitypdf_registered_tooltips', $tooltips );
 	}
@@ -263,8 +263,8 @@ class View_Settings extends Helper_Abstract_View
 	public function add_meta_pdf_knowledgebase( $object ) {
 		?>
             <i class="fa fa-file-text-o fa-5x"></i>
-            <h4><a href="https://developer.gravitypdf.com/documentation/"><?php _e( 'Knowledge Base', 'gravitypdf' ); ?></a></h4>
-            <p><?php _e( 'Gravity PDF has extensive online documentation to help you get started.', 'gravitypdf' ); ?></p>
+            <h4><a href="https://developer.gravitypdf.com/documentation/"><?php _e( 'Knowledge Base', 'gravity-forms-pdf-extended' ); ?></a></h4>
+            <p><?php _e( 'Gravity PDF has extensive online documentation to help you get started.', 'gravity-forms-pdf-extended' ); ?></p>
         <?php
 	}
 
@@ -277,8 +277,8 @@ class View_Settings extends Helper_Abstract_View
 	public function add_meta_pdf_support_forum( $object ) {
 		?>
             <i class="fa fa-comments-o fa-5x"></i>
-            <h4><a href="https://support.gravitypdf.com/"><?php _e( 'Support Forum', 'gravitypdf' ); ?></a></h4>
-            <p><?php _e( 'Our community support forum is a great resource if you have a problem.', 'gravitypdf' ); ?></p>
+            <h4><a href="https://support.gravitypdf.com/"><?php _e( 'Support Forum', 'gravity-forms-pdf-extended' ); ?></a></h4>
+            <p><?php _e( 'Our community support forum is a great resource if you have a problem.', 'gravity-forms-pdf-extended' ); ?></p>
         <?php
 	}
 
@@ -291,8 +291,8 @@ class View_Settings extends Helper_Abstract_View
 	public function add_meta_pdf_direct( $object ) {
 		?>
             <i class="fa fa-envelope-o fa-5x"></i>
-            <h4><a href="https://developer.gravitypdf.com/contact/"><?php _e( 'Contact Us', 'gravitypdf' ); ?></a></h4>
-            <p><?php _e( 'You can also get in touch with Gravity PDF staff directly via email or phone.', 'gravitypdf' ); ?></p>
+            <h4><a href="https://developer.gravitypdf.com/contact/"><?php _e( 'Contact Us', 'gravity-forms-pdf-extended' ); ?></a></h4>
+            <p><?php _e( 'You can also get in touch with Gravity PDF staff directly via email or phone.', 'gravity-forms-pdf-extended' ); ?></p>
         <?php
 	}
 
@@ -307,12 +307,12 @@ class View_Settings extends Helper_Abstract_View
 		$articles = array(
 
 			array(
-				'title' => __( 'Getting Started Guide', 'gravitypdf' ),
+				'title' => __( 'Getting Started Guide', 'gravity-forms-pdf-extended' ),
 				'url' => 'https://developer.gravitypdf.com/documentation/getting-started-with-gravity-pdf-configuration/',
 			),
 
 			array(
-				'title' => __( 'Creating a Custom PDF Template', 'gravitypdf' ),
+				'title' => __( 'Creating a Custom PDF Template', 'gravity-forms-pdf-extended' ),
 				'url' => 'https://developer.gravitypdf.com/documentation/custom-templates-introduction/',
 			),
 
@@ -336,7 +336,7 @@ class View_Settings extends Helper_Abstract_View
 	public function add_meta_pdf_recent_forum_articles( $object, $topics ) {
 
 		if ( ! $topics || ! is_array( $topics ) ) {
-			_e( 'Latest forum topics could not be loaded.', 'gravitypdf' );
+			_e( 'Latest forum topics could not be loaded.', 'gravity-forms-pdf-extended' );
 			return;
 		}
 
@@ -356,8 +356,8 @@ class View_Settings extends Helper_Abstract_View
 	public function add_meta_pdf_support_hours( $object ) {
 		?>
             <i class="fa fa-clock-o fa-5x"></i>
-            <h4><?php _e( 'Support Hours', 'gravitypdf' ); ?></h4>
-            <p><?php printf( __( "Gravity PDF's support hours are from 9:00am-5:00pm Monday to Friday, %sSydney Australia time%s.", 'gravitypdf' ), '<a href="http://www.timeanddate.com/worldclock/australia/sydney">', '</a>' ); ?></p>
+            <h4><?php _e( 'Support Hours', 'gravity-forms-pdf-extended' ); ?></h4>
+            <p><?php printf( __( "Gravity PDF's support hours are from 9:00am-5:00pm Monday to Friday, %sSydney Australia time%s.", 'gravity-forms-pdf-extended' ), '<a href="http://www.timeanddate.com/worldclock/australia/sydney">', '</a>' ); ?></p>
         <?php
 	}
 }

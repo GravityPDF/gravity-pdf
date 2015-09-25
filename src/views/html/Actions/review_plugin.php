@@ -38,13 +38,13 @@ if (! defined('ABSPATH')) {
 
 <div style="font-size:15px; line-height: 25px">
 
-    <strong><?php _e( "Hey, we've noticed you've just generated your 100th PDF using Gravity PDF - that's awesome!", 'gravitypdf' ); ?></strong>
+    <strong><?php _e( "Hey, we've noticed you've just generated your 100th PDF using Gravity PDF - that's awesome!", 'gravity-forms-pdf-extended' ); ?></strong>
 
     <br>
 
-    <?php printf( __('If you love how much time Gravity PDF saves you, do us a BIG favour and %sgive it a 5-star rating on WordPress%s.', 'gravitypdf' ), '<a href="https://wordpress.org/support/view/plugin-reviews/gravity-forms-pdf-extended">', '</a>' ); ?>
+    <?php printf( __('If you love how much time Gravity PDF saves you, do us a BIG favour and %sgive it a 5-star rating on WordPress%s.', 'gravity-forms-pdf-extended' ), '<a href="https://wordpress.org/support/view/plugin-reviews/gravity-forms-pdf-extended">', '</a>' ); ?>
 
     <br>
 
-    <?php printf( __( 'Or let people %son Twitter know how good it is%s.', 'gravitypdf' ), '<a href="https://goo.gl/07NhJQ">', '</a>' ); ?>
+    <?php printf( __( 'Or let people %son Twitter know how good it is%s.', 'gravity-forms-pdf-extended' ), '<a href="https://goo.gl/07NhJQ">', '</a>' ); ?>
 </div>

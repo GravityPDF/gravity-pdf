@@ -37,5 +37,5 @@ if (! defined('ABSPATH')) {
 ?>
 
 | <a href="<?php echo $args['url']; ?>" target="_blank">
-    <?php _e('View PDF', 'gravitypdf'); ?>
+    <?php _e('View PDF', 'gravity-forms-pdf-extended' ); ?>
 </a>

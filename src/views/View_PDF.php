@@ -191,7 +191,7 @@ class View_PDF extends Helper_Abstract_View
 				wp_die( $e->getMessage() );
 			}
 
-			wp_die( __( 'There was a problem generating your PDF', 'gravitypdf' ) );
+			wp_die( __( 'There was a problem generating your PDF', 'gravity-forms-pdf-extended' ) );
 		}
 	}
 

@@ -136,8 +136,8 @@ class Helper_Data {
 	 * @since  4.0
 	 */
 	public function set_plugin_titles() {
-		$this->short_title = __( 'PDF', 'gravitypdf' );
-		$this->title       = __( 'Gravity PDF', 'gravitypdf' );
+		$this->short_title = __( 'PDF', 'gravity-forms-pdf-extended' );
+		$this->title       = __( 'Gravity PDF', 'gravity-forms-pdf-extended' );
 		$this->slug        = 'pdf';
 	}
 
@@ -167,23 +167,23 @@ class Helper_Data {
 			'GFbaseUrl'                   => $form->get_plugin_url(),
 			'pluginUrl'                   => PDF_PLUGIN_URL,
 			'spinnerUrl'                  => admin_url( 'images/spinner-2x.gif' ),
-			'general_advanced_show'       => __( 'Show Advanced Options...', 'gravitypdf' ),
-			'general_advanced_hide'       => __( 'Hide Advanced Options...', 'gravitypdf' ),
-			'tools_template_copy_confirm' => __( 'Continue', 'gravitypdf' ),
-			'tools_uninstall_confirm'     => __( 'Uninstall', 'gravitypdf' ),
-			'tools_cancel'                => __( 'Cancel', 'gravitypdf' ),
-			'pdf_list_delete_confirm'     => __( 'Delete', 'gravitypdf' ),
-			'active'                      => __( 'Active', 'gravitypdf' ),
-			'inactive'                    => __( 'Inactive', 'gravitypdf' ),
-			'conditionalText'             => __( 'Enable this PDF if', 'gravitypdf' ),
-			'help_search_placeholder'     => __( 'Search the Gravity PDF Knowledgebase...', 'gravitypdf' ),
-			'ajax_error'                  => __( 'There was an error processing your request. Please try again.', 'gravitypdf' ),
-			'update_success'              => __( 'Successfully Updated', 'gravitypdf' ),
-			'delete_success'              => __( 'Successfully Deleted', 'gravitypdf' ),
+			'general_advanced_show'       => __( 'Show Advanced Options...', 'gravity-forms-pdf-extended' ),
+			'general_advanced_hide'       => __( 'Hide Advanced Options...', 'gravity-forms-pdf-extended' ),
+			'tools_template_copy_confirm' => __( 'Continue', 'gravity-forms-pdf-extended' ),
+			'tools_uninstall_confirm'     => __( 'Uninstall', 'gravity-forms-pdf-extended' ),
+			'tools_cancel'                => __( 'Cancel', 'gravity-forms-pdf-extended' ),
+			'pdf_list_delete_confirm'     => __( 'Delete', 'gravity-forms-pdf-extended' ),
+			'active'                      => __( 'Active', 'gravity-forms-pdf-extended' ),
+			'inactive'                    => __( 'Inactive', 'gravity-forms-pdf-extended' ),
+			'conditionalText'             => __( 'Enable this PDF if', 'gravity-forms-pdf-extended' ),
+			'help_search_placeholder'     => __( 'Search the Gravity PDF Knowledgebase...', 'gravity-forms-pdf-extended' ),
+			'ajax_error'                  => __( 'There was an error processing your request. Please try again.', 'gravity-forms-pdf-extended' ),
+			'update_success'              => __( 'Successfully Updated', 'gravity-forms-pdf-extended' ),
+			'delete_success'              => __( 'Successfully Deleted', 'gravity-forms-pdf-extended' ),
 			'custom_fonts'                => json_encode( $custom_fonts ),
-			'no'                          => __( 'No', 'gravitypdf' ),
-			'yes'                         => __( 'Yes', 'gravitypdf' ),
-			'standard'                    => __( 'Standard', 'gravitypdf' ),
+			'no'                          => __( 'No', 'gravity-forms-pdf-extended' ),
+			'yes'                         => __( 'Yes', 'gravity-forms-pdf-extended' ),
+			'standard'                    => __( 'Standard', 'gravity-forms-pdf-extended' ),
 		));
 	}
 }

@@ -128,7 +128,7 @@ class Helper_Migration {
 				'exception' => $e->getMessage(),
 			) );
 
-			$this->notices->add_error( __( 'There was a problem processing the action. Please try again.', 'gravitypdf' ) );
+			$this->notices->add_error( __( 'There was a problem processing the action. Please try again.', 'gravity-forms-pdf-extended' ) );
 
             return false;
 		}
@@ -444,7 +444,7 @@ class Helper_Migration {
 		/* Check for any errors */
 		if ( sizeof( $errors ) > 0 ) {
 
-			$error_msg = __( 'There was a problem migrating the following configuration nodes. You will need to manually setup those PDFs.', 'gravitypdf' );
+			$error_msg = __( 'There was a problem migrating the following configuration nodes. You will need to manually setup those PDFs.', 'gravity-forms-pdf-extended' );
 			$error_msg .= '<ul>';
 
 			foreach ( $errors as $error ) {
@@ -454,7 +454,7 @@ class Helper_Migration {
 			$error_msg .= '</ul>';
 			$this->notices->add_error( $error_msg );
 		} else {
-            $this->notices->add_notice( __( 'Migration Successful.', 'gravitypdf' ) );
+            $this->notices->add_notice( __( 'Migration Successful.', 'gravity-forms-pdf-extended' ) );
         }
 
 		/* Attempt to rename the configuration file */

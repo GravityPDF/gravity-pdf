@@ -290,7 +290,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 			/* verify the nonce */
 			if ( ! wp_verify_nonce( $settings['setup_templates']['nonce'], 'gfpdf_settings[setup_templates]' ) ) {
 				 $this->log->addWarning( 'Nonce Verification Failed.' );
-				 $this->notices->add_error( __( 'There was a problem installing the PDF templates. Please try again.', 'gravitypdf' ) );
+				 $this->notices->add_error( __( 'There was a problem installing the PDF templates. Please try again.', 'gravity-forms-pdf-extended' ) );
 				 return false;
 			}
 

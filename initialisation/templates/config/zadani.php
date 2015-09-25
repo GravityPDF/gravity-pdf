@@ -86,9 +86,9 @@ class zadani implements Helper_Interface_Config {
 			'fields' => array(
 				'border_colour' => array(
 					'id'   => 'border_colour',
-					'name' => __('Field Border Colour', 'gravitypdf'),
+					'name' => __('Field Border Colour', 'gravity-forms-pdf-extended' ),
 					'type' => 'color',
-					'desc' => __('Control the colour of the field border.', 'gravitypdf'),
+					'desc' => __('Control the colour of the field border.', 'gravity-forms-pdf-extended' ),
 					'std'  => '#CCCCCC'
 				),
 			)

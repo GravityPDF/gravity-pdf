@@ -249,7 +249,7 @@ class GPDFAPI {
 
 		/* Check the option doesn't already exist */
 		if( null !== $options->get_option( $key, null ) ) {
-			return new WP_Error( 'option_exists', __( 'The option key %s already exists. Use GPDFAPI::update_plugin_option instead', 'gravitypdf') );
+			return new WP_Error( 'option_exists', __( 'The option key %s already exists. Use GPDFAPI::update_plugin_option instead', 'gravity-forms-pdf-extended' ) );
 		}
 
 		return self::update_plugin_option( $key, $value );

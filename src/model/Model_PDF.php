@@ -255,7 +255,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		if ( ! is_wp_error( $action ) ) {
 			if ( $settings['active'] !== true ) {
-				return new WP_Error( 'inactive', __( 'The PDF configuration is not currently active.', 'gravitypdf' ) );
+				return new WP_Error( 'inactive', __( 'The PDF configuration is not currently active.', 'gravity-forms-pdf-extended' ) );
 			}
 		}
 		return $action;
@@ -273,7 +273,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		if ( ! is_wp_error( $action ) ) {
 			if ( isset( $settings['conditionalLogic'] ) && ! GFCommon::evaluate_conditional_logic( $settings['conditionalLogic'], $this->form->get_form( $entry['form_id'] ), $entry ) ) {
-				return new WP_Error( 'conditional_logic', __( 'PDF conditional logic requirements have not been met.', 'gravitypdf' ) );
+				return new WP_Error( 'conditional_logic', __( 'PDF conditional logic requirements have not been met.', 'gravity-forms-pdf-extended' ) );
 			}
 		}
 		return $action;
@@ -365,7 +365,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 						/* if there is no user account assigned to this entry throw error */
 						if ( empty($entry['created_by']) ) {
-							return new WP_Error( 'timeout_expired', __( 'Your PDF is no longer accessible.', 'gravitypdf' ) );
+							return new WP_Error( 'timeout_expired', __( 'Your PDF is no longer accessible.', 'gravity-forms-pdf-extended' ) );
 						} else {
 
 							$this->log->addNotice( 'Redirecting to Login.', array(
@@ -444,7 +444,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 				/* throw error if no access granted */
 				if ( ! $access ) {
-					return new WP_Error( 'access_denied', __( 'You do not have access to view this PDF.', 'gravitypdf' ) );
+					return new WP_Error( 'access_denied', __( 'You do not have access to view this PDF.', 'gravity-forms-pdf-extended' ) );
 				}
 			}
 		}

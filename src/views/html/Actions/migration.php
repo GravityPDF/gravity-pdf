@@ -38,10 +38,10 @@ if (! defined('ABSPATH')) {
 
 <div style="font-size:15px; line-height: 25px">
 
-    <strong><?php _e( "Gravity PDF needs to migration your configuration.", 'gravitypdf' ); ?></strong>
+    <strong><?php _e( "Gravity PDF needs to migration your configuration.", 'gravity-forms-pdf-extended' ); ?></strong>
     
     <br>
 
-    <?php _e('The migration process will import your old configuration file into the database.', 'gravitypdf' ); ?>
+    <?php _e('The migration process will import your old configuration file into the database.', 'gravity-forms-pdf-extended' ); ?>
     
 </div>

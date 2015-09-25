@@ -206,11 +206,11 @@ class Field_Products extends Helper_Abstract_Fields
                 <?php if ( ! empty($products['products_totals']['shipping_name']) ) : ?>
                     <tr>
                         <td rowspan="3" class="emptycell"></td>
-                        <td colspan="2" class="textright subtotal totals"><?php _e( 'Subtotal', 'gravitypdf' ); ?></td>
+                        <td colspan="2" class="textright subtotal totals"><?php _e( 'Subtotal', 'gravity-forms-pdf-extended' ); ?></td>
                         <td class="subtotal_amount totals"><?php echo $products['products_totals']['subtotal_formatted']; ?></td>
                     </tr>
                     <tr>
-                        <td colspan="2" class="textright shipping totals"><?php echo sprintf( __( 'Shipping (%s)', 'gravitypdf' ), $products['products_totals']['shipping_name'] ); ?></td>
+                        <td colspan="2" class="textright shipping totals"><?php echo sprintf( __( 'Shipping (%s)', 'gravity-forms-pdf-extended' ), $products['products_totals']['shipping_name'] ); ?></td>
                         <td class="shipping_amount totals"><?php echo $products['products_totals']['shipping_formatted']; ?></td>
                     </tr>
                 <?php endif; ?>

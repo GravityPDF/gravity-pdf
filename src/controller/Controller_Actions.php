@@ -132,7 +132,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 		$routes = array(
 			array(
 				'action'      => 'review_plugin',
-				'action_text' => __( 'Review Submitted', 'gravitypdf' ),
+				'action_text' => __( 'Review Submitted', 'gravity-forms-pdf-extended' ),
 				'condition'   => array( $this->model, 'review_condition' ),
 				'process'     => array( $this->model, 'dismiss_notice' ),
 				'view'        => array( $this->view, 'review_plugin' ),
@@ -141,7 +141,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 
 			array(
 				'action'      => 'migrate_v3_to_v4',
-				'action_text' => __( 'Begin Migration', 'gravitypdf' ),
+				'action_text' => __( 'Begin Migration', 'gravity-forms-pdf-extended' ),
 				'condition'   => array( $this->model, 'migration_condition' ),
 				'process'     => array( $this->model, 'begin_migration' ),
 				'view'        => array( $this->view, 'migration' ),
@@ -198,14 +198,14 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 						'user_meta' => get_user_meta( get_current_user_id() ),
 					) );
 
-					wp_die( __( 'You do not have permission to access this page', 'gravitypdf' ) );
+					wp_die( __( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
 				}
 
 				/* Check nonce is valid */
 				if ( ! wp_verify_nonce( rgpost( 'gfpdf_action_' . $route['action'] ), 'gfpdf_action_' . $route['action'] ) ) {
 
 					$this->log->addWarning( 'Nonce Verification Failed.' );
-					$this->notices->add_error( __( 'There was a problem processing the action. Please try again.', 'gravitypdf' ) );
+					$this->notices->add_error( __( 'There was a problem processing the action. Please try again.', 'gravity-forms-pdf-extended' ) );
 
 					continue;
 				}

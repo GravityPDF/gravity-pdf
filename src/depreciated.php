@@ -52,7 +52,7 @@ abstract class GFPDF_Depreciated_Abstract
 	 * @since  4.0
 	 */
 	public function __call( $name, $arguments ) {
-		trigger_error( sprintf( __( '"%s" has been depreciated as of Gravity PDF 4.0', 'gravitypdf' ), $name ), E_USER_DEPRECATED );
+		trigger_error( sprintf( __( '"%s" has been depreciated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ), E_USER_DEPRECATED );
 	}
 
 	/**
@@ -60,7 +60,7 @@ abstract class GFPDF_Depreciated_Abstract
 	 * @since  4.0
 	 */
 	public static function __callStatic( $name, $arguments ) {
-		trigger_error( sprintf( __( '"%s" has been depreciated as of Gravity PDF 4.0', 'gravitypdf' ), $name ), E_USER_DEPRECATED );
+		trigger_error( sprintf( __( '"%s" has been depreciated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ), E_USER_DEPRECATED );
 	}
 }
 

@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: Gravity PDF
-Version: 4.0
+Version: 4.0-alpha
 Description: Automatically generate highly-customisable PDF documents using Gravity Forms.
 Author: Gravity PDF
 Author URI: https://gravitypdf.com
-Text Domain: gravitypdf
+Text Domain: gravity-forms-pdf-extended
 Domain Path: /src/languages
 */
 
@@ -162,7 +162,7 @@ class GFPDF_Major_Compatibility_Checks
 
 		/* WordPress version not compatible */
 		if ( ! version_compare( $wp_version, $this->required_wp_version, '>=' ) ) {
-			$this->notices[] = sprintf( __( 'WordPress Version %s is required.', 'gravitypdf' ), $this->required_wp_version );
+			$this->notices[] = sprintf( __( 'WordPress Version %s is required.', 'gravity-forms-pdf-extended' ), $this->required_wp_version );
 			return false;
 		}
 		return true;
@@ -177,7 +177,7 @@ class GFPDF_Major_Compatibility_Checks
 
 		/* Gravity Forms version not compatible */
 		if ( ! class_exists( 'GFCommon' ) || ! version_compare( GFCommon::$version, $this->required_gf_version, '>=' ) ) {
-			$this->notices[] = sprintf( __( 'Gravity Forms Version %s is required.', 'gravitypdf' ), $this->required_gf_version );
+			$this->notices[] = sprintf( __( 'Gravity Forms Version %s is required.', 'gravity-forms-pdf-extended' ), $this->required_gf_version );
 			return false;
 		}
 		return true;
@@ -192,7 +192,7 @@ class GFPDF_Major_Compatibility_Checks
 
 		/* Check PHP version is compatible */
 		if ( ! version_compare( phpversion(), $this->required_php_version, '>=' ) ) {
-			$this->notices[] = sprintf( __( 'You are running an %soutdated version of PHP%s. Contact your web hosting provider to update.', 'gravitypdf' ), '<a href="http://www.wpupdatephp.com/update/">', '</a>' );
+			$this->notices[] = sprintf( __( 'You are running an %soutdated version of PHP%s. Contact your web hosting provider to update.', 'gravity-forms-pdf-extended' ), '<a href="http://www.wpupdatephp.com/update/">', '</a>' );
 			return false;
 		}
 		return true;
@@ -207,7 +207,7 @@ class GFPDF_Major_Compatibility_Checks
 
 		/* Check MB String is installed */
 		if ( ! extension_loaded( 'mbstring' ) ) {
-			$this->notices[] = __( 'The PHP Extension MB String (with mb-regex enabled) could not be detected. Contact your web hosting provider to fix.', 'gravitypdf' );
+			$this->notices[] = __( 'The PHP Extension MB String (with mb-regex enabled) could not be detected. Contact your web hosting provider to fix.', 'gravity-forms-pdf-extended' );
 			return false;
 		}
 		return true;
@@ -222,7 +222,7 @@ class GFPDF_Major_Compatibility_Checks
 
 		/* Check MB String is compiled with regex capabilities */
 		if ( extension_loaded( 'mbstring' ) && ! function_exists( 'mb_regex_encoding' ) ) {
-			$this->notices[] = __( 'The PHP Extension MB String does not have MB Regex enabled. Contact your web hosting provider to fix.', 'gravitypdf' );
+			$this->notices[] = __( 'The PHP Extension MB String does not have MB Regex enabled. Contact your web hosting provider to fix.', 'gravity-forms-pdf-extended' );
 			return false;
 		}
 		return true;
@@ -237,7 +237,7 @@ class GFPDF_Major_Compatibility_Checks
 
 		/* Check GD Image Library is installed */
 		if ( ! extension_loaded( 'gd' ) ) {
-			$this->notices[] = __( 'The PHP Extension GD Image Library could not be detected. Contact your web hosting provider to fix.', 'gravitypdf' );
+			$this->notices[] = __( 'The PHP Extension GD Image Library could not be detected. Contact your web hosting provider to fix.', 'gravity-forms-pdf-extended' );
 			return false;
 		}
 		return true;
@@ -252,13 +252,13 @@ class GFPDF_Major_Compatibility_Checks
 
 		/* Check DOM Class is installed */
 		if ( ! extension_loaded( 'dom' ) || ! class_exists( 'DOMDocument' ) ) {
-			$this->notices[] = __( 'The PHP DOM Extension was not found. Contact your web hosting provider to fix.', 'gravitypdf' );
+			$this->notices[] = __( 'The PHP DOM Extension was not found. Contact your web hosting provider to fix.', 'gravity-forms-pdf-extended' );
 			return false;
 		}
 
 		/* Check libxml is loaded */
 		if ( ! extension_loaded( 'libxml' ) ) {
-			$this->notices[] = __( 'The PHP Extension libxml could not be detected. Contact your web hosting provider to fix.', 'gravitypdf' );
+			$this->notices[] = __( 'The PHP Extension libxml could not be detected. Contact your web hosting provider to fix.', 'gravity-forms-pdf-extended' );
 			return false;
 		}
 		return true;
@@ -276,7 +276,7 @@ class GFPDF_Major_Compatibility_Checks
 		$ram = $this->get_ram( $ram );
 
 		if ( $ram < 64 && $ram !== -1 ) {
-			$this->notices[] = sprintf( __( "You need %s128MB%s of WP Memory (RAM) but we only found %s available. Contact your web hosting provider to fix (you need to increase your PHP 'memory_limit' setting).", 'gravitypdf' ), '<strong>', '</strong>', $ram . 'MB' );
+			$this->notices[] = sprintf( __( "You need %s128MB%s of WP Memory (RAM) but we only found %s available. Contact your web hosting provider to fix (you need to increase your PHP 'memory_limit' setting).", 'gravity-forms-pdf-extended' ), '<strong>', '</strong>', $ram . 'MB' );
 			return false;
 		}
 		return true;
@@ -333,8 +333,8 @@ class GFPDF_Major_Compatibility_Checks
 	public function display_notices() {
 		?>
 	    <div class="error">
-            <p><strong><?php _e( 'Gravity PDF Installation Problem', 'gravitypdf' ); ?></strong></p>
-	        <p><?php _e( 'The minimum requirements for Gravity PDF have not been met. Please fix the issue(s) below to continue:', 'gravitypdf' ); ?></p>
+            <p><strong><?php _e( 'Gravity PDF Installation Problem', 'gravity-forms-pdf-extended' ); ?></strong></p>
+	        <p><?php _e( 'The minimum requirements for Gravity PDF have not been met. Please fix the issue(s) below to continue:', 'gravity-forms-pdf-extended' ); ?></p>
 			<ul style="padding-bottom: 0.5em">
         		<?php foreach ( $this->notices as $notice ) : ?>
 					<li style="padding-left: 20px;list-style: inside"><?php echo $notice; ?></li>

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * Navigation - Welcome Screen View
@@ -38,9 +38,9 @@ if (! defined('ABSPATH')) {
 
 <h2 class="nav-tab-wrapper">
 	<a class="nav-tab <?php echo $args['selected'] == 'gfpdf-getting-started' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url( admin_url( add_query_arg( array( 'page' => 'gfpdf-getting-started' ), 'index.php' ) ) ); ?>">
-		<?php _e( 'Getting Started', 'gravitypdf' ); ?>
+		<?php _e( 'Getting Started', 'gravity-forms-pdf-extended' ); ?>
 	</a>
 	<a class="nav-tab <?php echo $args['selected'] == 'gfpdf-update' ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url( admin_url( add_query_arg( array( 'page' => 'gfpdf-update' ), 'index.php' ) ) ); ?>">
-		<?php _e( "What's New", 'gravitypdf' ); ?>
+		<?php _e( "What's New", 'gravity-forms-pdf-extended' ); ?>
 	</a>
 </h2>

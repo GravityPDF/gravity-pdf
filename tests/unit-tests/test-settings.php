@@ -243,10 +243,10 @@ class Test_Settings extends WP_UnitTestCase
 		global $wp_settings_errors;
 
 		/* Set up test data */
-		add_settings_error( 'notices', 'normal', __( 'Normal Notice', 'gravitypdf' ) );
-		add_settings_error( 'gfpdf-notices', 'select', __( 'PDF Settings could not be saved. Please enter all required information below.', 'gravitypdf' ) );
-		add_settings_error( 'gfpdf-notices', 'text', __( 'PDF Settings could not be saved. Please enter all required information below.', 'gravitypdf' ) );
-		add_settings_error( 'gfpdf-notices', 'hidden', __( 'PDF Settings could not be saved. Please enter all required information below.', 'gravitypdf' ) );
+		add_settings_error( 'notices', 'normal', __( 'Normal Notice', 'gravity-forms-pdf-extended' ) );
+		add_settings_error( 'gfpdf-notices', 'select', __( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
+		add_settings_error( 'gfpdf-notices', 'text', __( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
+		add_settings_error( 'gfpdf-notices', 'hidden', __( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
 
 		/* set up test transient (like in options.php) */
 		set_transient( 'settings_errors', $wp_settings_errors, 30 );
