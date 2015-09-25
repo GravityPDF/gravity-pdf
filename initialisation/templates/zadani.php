@@ -7,7 +7,7 @@
  * Author: Gravity PDF
  * Group: Core
  * License: GPLv2
- * Required PDF Version: 4.0
+ * Required PDF Version: 4.0-alpha
  */
 
 /* Prevent direct access to the template */
