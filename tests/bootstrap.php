@@ -77,7 +77,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		/* set up Gravity Forms database */
 		@GFForms::setup( true );
 
-		require_once $this->plugin_dir . '/gravity-pdf.php';
+		require_once $this->plugin_dir . '/pdf.php';
 	}
 
 	/**
