@@ -270,7 +270,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 						'desc'       => sprintf( __( 'Choose an existing template or purchased more %sfrom our theme shop%s. You can also %sbuild your own%s or %shire us%s to create a custom solution.', 'gravitypdf' ), '<a href="#">', '</a>', '<a href="#">', '</a>', '<a href="#">', '</a>' ),
 						'type'       => 'select',
 						'options'    => $this->get_templates(),
-						'std'     	 => $this->get_option( 'default_template', 'core-simple' ),
+						'std'     	 => $this->get_option( 'default_template', 'zadani' ),
 						'inputClass' => 'large',
 						'chosen'     => true,
 						'tooltip'    => '<h6>' . __( 'Templates', 'gravitypdf' ) . '</h6>' . sprintf( __( 'Gravity PDF comes with %sfive completely-free and highly customisable designs%s to choose. You can also purchase additional templates from our theme shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravitypdf' ), '<strong>', '</strong>' ),

@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Template Name: Simple Structure
+ * Template Name: Zadani
  * Version: 1.0
- * Description: The default template for Gravity PDF 4.x+
+ * Description: A minimalist business-style template that will generate a well-spaced document great for printing.
  * Author: Gravity PDF
  * Group: Core
  * License: GPLv2

@@ -5,9 +5,11 @@ namespace GFPDF\Templates\Config;
 use GFPDF\Helper\Helper_Interface_Config;
 
 /**
- * core-simple.php configuration file
+ * Zadani configuration file
+ *
  * This configuration file can be overridden by being placed in the PDF_EXTENDED_TEMPLATES/config/ folder
- * Note: if running a multisite that would be the PDF_EXTENDED_TEMPLATES/:id/config/ folder, where :id is the subsite ID number
+ *
+ * If running a multisite that would be the PDF_EXTENDED_TEMPLATES/:id/config/ folder, where :id is the subsite ID number
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
@@ -17,7 +19,7 @@ use GFPDF\Helper\Helper_Interface_Config;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
+if ( ! defined('ABSPATH') ) {
     exit;
 }
 
@@ -42,22 +44,30 @@ if (! defined('ABSPATH')) {
 */
 
 /**
- * The class name should be the exact same as the template file name (with hyphens replaced with underscores)
+ * The configuration class name should be the exact same as the template file name (with hyphens replaced with underscores)
+ *
  * For instance, a template called core-simple.php would have a class of "core_simple"
+ *
  * This naming convension is very important, otherwise the software cannot correctly load the configuration
+ * @todo Write documentation on creating and using a template configuration file
  */
-class core_simple implements Helper_Interface_Config {
+class zadani implements Helper_Interface_Config {
 
 	/**
-	 * Return the configuration structure.
+	 * Return the templates configuration structure which control what extra fields will be shown in the "Template" tab when configuring a form's PDF.
 	 *
 	 * The fields key is based on our \GFPDF\Helper\Helper_Options Settings API
+	 *
 	 * See the register_settings() method for the exact fields that can be passed in
+	 *
 	 * @return Array The array, split into core components and custom fields
 	 * @since 4.0
 	 */
 	public function configuration() {
+
 		return array(
+
+			/* Enable core fields */
 			'core' => array(
 				'show_form_title'      => true,
 				'show_page_names'      => true,
@@ -72,6 +82,7 @@ class core_simple implements Helper_Interface_Config {
 				'background'           => true,
 			),
 
+			/* Create custom fields to control the look and feel of a template */
 			'fields' => array(
 				'border_colour' => array(
 					'id'   => 'border_colour',

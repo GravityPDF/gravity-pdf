@@ -454,7 +454,7 @@ class Test_Form_Settings extends WP_UnitTestCase
 
 		/* Setup a valid template */
 		$pdf = $gfpdf->options->get_pdf( $form_id, $pid );
-		$pdf['template'] = 'core-simple';
+		$pdf['template'] = 'zadani';
 		$gfpdf->options->update_pdf( $form_id, $pid, $pdf );
 
 		$results = $this->model->register_custom_appearance_settings( array() );
@@ -468,7 +468,7 @@ class Test_Form_Settings extends WP_UnitTestCase
 	 */
 	public function test_setup_custom_appearance_settings() {
 
-		$class = $this->model->get_template_configuration( 'core-simple' );
+		$class = $this->model->get_template_configuration( 'zadani' );
 		$settings = $this->model->setup_custom_appearance_settings( $class, array() );
 
 		$this->assertEquals( 12, sizeof( $settings ) );
@@ -481,7 +481,7 @@ class Test_Form_Settings extends WP_UnitTestCase
 	 */
 	public function test_setup_core_custom_appearance_settings() {
 
-		$class = $this->model->get_template_configuration( 'core-simple' );
+		$class = $this->model->get_template_configuration( 'zadani' );
 		$settings = $this->model->setup_core_custom_appearance_settings( array(), $class, $class->configuration() );
 
 		$this->assertEquals( 11, sizeof( $settings ) );
@@ -503,7 +503,7 @@ class Test_Form_Settings extends WP_UnitTestCase
 		$this->assertFalse( $this->model->get_template_configuration( 'test' ) );
 
 		/* Test default template */
-		$this->assertEquals( 'GFPDF\Templates\Config\core_simple', get_class( $this->model->get_template_configuration( 'core-simple' ) ) );
+		$this->assertEquals( 'GFPDF\Templates\Config\zadani', get_class( $this->model->get_template_configuration( 'zadani' ) ) );
 
 		/* Test legacy templates */
 		$this->assertEquals( 'GFPDF\Templates\Config\legacy', get_class( $this->model->get_template_configuration( 'default-template' ) ) );

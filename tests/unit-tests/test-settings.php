@@ -296,11 +296,11 @@ class Test_Settings extends WP_UnitTestCase
 	public function test_install_template() {
 		global $gfpdf;
 
-		$this->assertFileNotExists( $gfpdf->data->template_location . 'core-simple.php' );
+		$this->assertFileNotExists( $gfpdf->data->template_location . 'zadani.php' );
 
 		$this->model->install_templates();
 
-		$this->assertFileExists( $gfpdf->data->template_location . 'core-simple.php' );
+		$this->assertFileExists( $gfpdf->data->template_location . 'zadani.php' );
 
 		/* Cleanup */
 		foreach( glob( PDF_PLUGIN_DIR . 'initialisation/templates/*' ) as $file ) {

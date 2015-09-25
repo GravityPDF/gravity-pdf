@@ -250,7 +250,7 @@ class Test_Helper_Misc extends WP_UnitTestCase
         $this->assertFalse( strpos( $results['template']['desc'], '<img' ) );
 
         /* Test for image existance */
-        $settings['template']['value'] = 'core-simple';
+        $settings['template']['value'] = 'zadani';
         $results = $this->misc->add_template_image( $settings );
 
         $this->assertNotFalse( strpos( $results['template']['desc'], '<img' ) );

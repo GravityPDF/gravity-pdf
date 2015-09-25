@@ -415,7 +415,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* If we don't have a specific PDF we'll use the defaults */
 		if ( empty($pid) || empty($form_id) ) {
-			$template = $this->options->get_option( 'default_template', 'core-simple' );
+			$template = $this->options->get_option( 'default_template', 'zadani' );
 		} else {
 			/* Load the PDF configuration */
 			$pdf      = $this->options->get_pdf( $form_id, $pid );

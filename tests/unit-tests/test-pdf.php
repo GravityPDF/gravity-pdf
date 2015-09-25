@@ -815,7 +815,7 @@ class Test_PDF extends WP_UnitTestCase
 		$entry    = $results['entry'];
 		$form     = $results['form'];
 		$settings = $form['gfpdf_form_settings']['555ad84787d7e'];
-		$settings['template'] = 'core-simple';
+		$settings['template'] = 'zadani';
 
 		/* Create our PDF object */
 		$pdf_generator = new Helper_PDF( $entry, $settings, $gfpdf->form, $gfpdf->data );
@@ -1204,7 +1204,7 @@ class Test_PDF extends WP_UnitTestCase
 		$pdf = $gfpdf->options->get_pdf( $fid, $pid );
 
 		/* Fix our template */
-		$pdf['template'] = 'core-simple';
+		$pdf['template'] = 'zadani';
 
 		/* Add filters to force the PDF to throw and error */
 		add_filter( 'mpdf_output_destination', function () {
@@ -1415,7 +1415,7 @@ class Test_PDF extends WP_UnitTestCase
 
 		$settings = array(
 			'filename'        => 'My PDF Document',
-			'template'        => 'core-simple',
+			'template'        => 'zadani',
 			'orientation'     => 'portrait',
 			'security'        => 'Yes',
 			'privileges'      => array('print'),

@@ -682,12 +682,12 @@ class Test_Options_API extends WP_UnitTestCase
 	 */
 	public function test_get_template_headers() {
 		
-		$path = PDF_PLUGIN_DIR . 'initialisation/templates/core-simple.php';
+		$path = PDF_PLUGIN_DIR . 'initialisation/templates/zadani.php';
 		$header = $this->options->get_template_headers( $path );
 
-		$this->assertEquals( 'Simple Structure', $header['template'] );
+		$this->assertEquals( 'Zadani', $header['template'] );
 		$this->assertEquals( '1.0', $header['version'] );
-		$this->assertEquals( 'The default template for Gravity PDF 4.x+', $header['description'] );
+		$this->assertEquals( 'A minimalist business-style template that will generate a well-spaced document great for printing.', $header['description'] );
 		$this->assertEquals( 'Gravity PDF', $header['author'] );
 		$this->assertEquals( 'Core', $header['group'] );
 		$this->assertEquals( '4.0', $header['required_pdf_version'] );
