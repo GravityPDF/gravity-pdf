@@ -349,9 +349,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		if ( $file == PDF_PLUGIN_BASENAME ) {
 			$row_meta = array(
-				'docs'    => '<a href="' . esc_url( 'https://gravitypdf.com/documentation/' ) . '" title="' . esc_attr( __( 'View Gravity PDF Documentation', 'gravitypdf' ) ) . '">' . __( 'Docs', 'gravitypdf' ) . '</a>',
+				'docs'    => '<a href="' . esc_url( '#' ) . '" title="' . esc_attr( __( 'View Gravity PDF Documentation', 'gravitypdf' ) ) . '">' . __( 'Docs', 'gravitypdf' ) . '</a>',
 				'support' => '<a href="' . esc_url( $gfpdf->data->settings_url . '&tab=help' ) . '" title="' . esc_attr( __( 'Get help and support', 'gravitypdf' ) ) . '">' . __( 'Support', 'gravitypdf' ) . '</a>',
-				'shop'    => '<a href="' . esc_url( 'https://gravitypdf.com/shop/' ) . '" title="' . esc_attr( __( 'View Gravity PDF Theme Shop', 'gravitypdf' ) ) . '">' . __( 'Theme Shop', 'gravitypdf' ) . '</a>',
+				'shop'    => '<a href="' . esc_url( '#' ) . '" title="' . esc_attr( __( 'View Gravity PDF Theme Shop', 'gravitypdf' ) ) . '">' . __( 'Theme Shop', 'gravitypdf' ) . '</a>',
 			);
 
 			return array_merge( $links, $row_meta );
