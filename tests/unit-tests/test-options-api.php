@@ -690,7 +690,7 @@ class Test_Options_API extends WP_UnitTestCase
 		$this->assertEquals( 'A minimalist business-style template that will generate a well-spaced document great for printing.', $header['description'] );
 		$this->assertEquals( 'Gravity PDF', $header['author'] );
 		$this->assertEquals( 'Core', $header['group'] );
-		$this->assertEquals( '4.0', $header['required_pdf_version'] );
+		$this->assertEquals( '4.0-alpha', $header['required_pdf_version'] );
 	}
 
 	/**

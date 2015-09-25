@@ -173,15 +173,18 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	 */
 	public function check_install_status() {
 
-		 if( ! $this->data->is_installed ) {
-		 	$this->model->install_plugin();
-		 }
+		if( ! is_admin() || ( defined('DOING_AJAX') && DOING_AJAX ) || ! current_user_can( 'activate_plugins' ) ) {
+			return false;
+		}
 
-		 if( PDF_EXTENDED_VERSION != get_option( 'gfpdf_current_version' ) ) {
+		if( ! $this->data->is_installed ) {
+			$this->model->install_plugin();
+		}
 
-		 	do_action( 'gfpdf_version_changed', get_option( 'gfpdf_current_version' ), PDF_EXTENDED_VERSION );
-		 	update_option( 'gfpdf_current_version', PDF_EXTENDED_VERSION );
-		 }
+		if( PDF_EXTENDED_VERSION != get_option( 'gfpdf_current_version' ) ) {
+			do_action( 'gfpdf_version_changed', get_option( 'gfpdf_current_version' ), PDF_EXTENDED_VERSION );
+			update_option( 'gfpdf_current_version', PDF_EXTENDED_VERSION );
+		}
 	}
 
 	/**

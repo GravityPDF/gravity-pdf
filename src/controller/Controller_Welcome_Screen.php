@@ -136,7 +136,7 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 	public function welcome() {
 
 		/* Bail if no activation redirect */
-		if ( ! get_transient( '_gravitypdf_activation_redirect' ) || ! is_admin() || ! current_user_can( 'activate_plugins' ) ) {
+		if ( ( defined('DOING_AJAX') && DOING_AJAX ) || ! is_admin() || ! current_user_can( 'activate_plugins' ) || ! get_transient( '_gravitypdf_activation_redirect' ) ) {
 			return false;
 		}
 
@@ -150,8 +150,8 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 			return false;
 		}
 
-		/* add own update tracker */
-		if ( ! $this->data->is_installed ) {
+		/* Check if it's a fresh installation and we should display the welcome screen, or whether we should display the update screen */
+		if ( ! $this->data->is_installed && ! is_file( PDF_TEMPLATE_LOCATION . 'configuration.php' ) ) {
 
 			$this->log->addNotice( 'Redirect to Getting Started page (first time activated).' );
 
@@ -191,6 +191,7 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 			wp_safe_redirect( admin_url( 'index.php?page=gfpdf-update' ) );
 			exit;
 		}
+
 	}
 
 	/**

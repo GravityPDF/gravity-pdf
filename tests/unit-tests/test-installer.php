@@ -104,6 +104,15 @@ class Test_Installer extends WP_UnitTestCase
 
         /* Check the plugin marks the appropriate data key as true when installed */
         $gfpdf->data->is_installed = false;
+
+        /* Set admin screen */
+        set_current_screen( 'edit.php' );
+        
+        /* Set up authorized user */
+        $user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+        $this->assertInternalType( 'integer', $user_id );
+        wp_set_current_user( $user_id );
+
         $this->controller->check_install_status();
         $this->assertTrue( $gfpdf->data->is_installed );
 
@@ -206,6 +215,16 @@ class Test_Installer extends WP_UnitTestCase
     public function test_uninstall_plugin() {
         global $gfpdf;
 
+        /* Set admin screen */
+        set_current_screen( 'edit.php' );
+        
+        /* Set up authorized user */
+        $user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+        $this->assertInternalType( 'integer', $user_id );
+        wp_set_current_user( $user_id );
+
+        $this->controller->check_install_status();
+
         /* Verify the plugin is installed correctly before removing */
         $this->assertTrue( is_dir( $gfpdf->data->template_location ) );
         $this->assertNotFalse( get_option('gfpdf_current_version') );
@@ -229,6 +248,16 @@ class Test_Installer extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_remove_plugin_options() {
+
+        /* Set admin screen */
+        set_current_screen( 'edit.php' );
+        
+        /* Set up authorized user */
+        $user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+        $this->assertInternalType( 'integer', $user_id );
+        wp_set_current_user( $user_id );
+
+        $this->controller->check_install_status();
         
         $this->assertNotFalse( get_option( 'gfpdf_is_installed' ) );
         $this->assertNotFalse( get_option( 'gfpdf_current_version' ) );
