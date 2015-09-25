@@ -276,7 +276,7 @@ class GFPDF_Major_Compatibility_Checks
 		$ram = $this->get_ram( $ram );
 
 		if ( $ram < 64 && $ram !== -1 ) {
-			$this->notices[] = sprintf( __( "You need %s128MB%s of WP Memory (RAM) but we only found %s available. Contact your web hosting provider to fix (you need to increase your PHP 'memory_limit' setting).", 'gravity-forms-pdf-extended' ), '<strong>', '</strong>', $ram . 'MB' );
+			$this->notices[] = sprintf( __( "You need %s128MB%s of WP Memory (RAM) but we only found %s available. %sTry these methods%s to increase your memory limit, otherwise contact your web hosting provider to fix.", 'gravity-forms-pdf-extended' ), '<a href="#">', '</a>', '<strong>', '</strong>', $ram . 'MB' );
 			return false;
 		}
 		return true;
