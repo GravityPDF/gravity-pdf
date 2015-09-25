@@ -41,18 +41,21 @@ global $gfpdf;
 <div class="wrap about-wrap gfpdf-update-screen">
 	<h1><?php printf( __( 'Discover Gravity PDF %s', 'gravitypdf' ), $args['display_version'] ); ?></h1>
 	
-  <div class="about-text"><?php _e( "Gravity PDF has been completely rebuilt with simplicity, stability and security in mind. Our team has spent six months making a great product even greater. Discover what's new...", 'gravitypdf' ); ?></div>
+  <div class="about-text"><?php _e( "Gravity PDF has been completely rebuilt with simplicity, stability and security in mind. Our team has spent over six months making a great product even greater. Discover what's new...", 'gravitypdf' ); ?></div>
 	
 	<div class="gfpdf-badge"><?php printf( __( 'Version %s', 'gravitypdf' ), $args['display_version'] ); ?></div>
 
 	<?php $this->tabs(); ?>
 
 
+		<!-- @todo -->
+		<!--
 		<div class="headline-feature feature-video">
-			<img class="gfpdf-image" src="<?php echo esc_url(PDF_PLUGIN_URL . 'src/assets/images/video-placeholder.png'); ?>">
+			
 		</div>
 
 		<hr />
+		-->
 
 		<div class="feature-section two-col">
 
@@ -60,12 +63,12 @@ global $gfpdf;
 				<h3><?php _e( 'Bringing Config Settings to WordPress', 'gravitypdf' );?></h3>
 
 				<p>
-				   We've done away with the need to edit PHP files to configure Gravity PDF.
-				   From now on you'll have a familiar and seamless experience controlling PDF settings direct from your WordPress Admin area.
+				   <?php _e( "We've done away with the need to edit PHP files to configure Gravity PDF.
+				   You'll have a familiar and seamless experience controlling PDF settings direct from your WordPress Admin area.", 'gravitypdf' ); ?>
 				</p>
 
 				<p>
-				   Ever configured a Gravity Form add on? You'll feel right at home setting up PDFs.
+				   <?php _e( "If you've ever configured a Gravity Form add-on you'll feel right at home setting up PDFs.", 'gravitypdf' ); ?>
 				</p>
 
 				<p></p>
@@ -73,7 +76,7 @@ global $gfpdf;
 			</div>
 
 			<div class="col">
-				<img class="gfpdf-image" src="<?php echo esc_url(PDF_PLUGIN_URL . 'src/assets/images/updated-new-ui.png'); ?>">
+				<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/updated-new-ui.png' ); ?>">
 			</div>
 
 		</div>
@@ -82,21 +85,21 @@ global $gfpdf;
 		<div class="feature-section two-col">
 
 			<div class="col">
-				<img class="gfpdf-image" src="<?php echo esc_url(PDF_PLUGIN_URL . 'src/assets/images/updated-css-ready-class-templates.png'); ?>">
+				<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/updated-css-ready-class-templates.png' ); ?>">
 			</div>
 
 			<div class="col">
 				<h3><?php _e( 'All-New Templates with CSS Ready Class Support', 'gravitypdf' );?></h3>
 
 				<p>
-				   People were always asking for PDFs that look more like their Gravity Forms layouts.
-				   <strong>You asked and we've delivered!</strong>
+				   <?php printf( __( "We were always getting feedback for templates that look more like their Gravity Forms layouts.
+				   %sYou asked and we've delivered!%s", 'gravitypdf' ), '<strong>', '</strong>' ); ?>
 				</p>
 
 				<p>
-				   All PDFs shipped now support <a href="#">Gravity Forms CSS Ready Classes</a>, so your PDF can have two or three column layouts that match your form's.
+				   <?php printf( __( "All PDFs now support %sGravity Forms CSS Ready Classes%s. When used in your form, the PDF will automatically create two and three column layouts to suit.
 
-				   Plus, Gravity PDF <strong>now ships with five PDF templates</strong> – two existing designs and three all-new PDFs.
+				   Plus, Gravity PDF %snow ships with five PDF templates%s out of the box.", 'gravitypdf' ), '<a href="https://www.gravityhelp.com/documentation/article/css-ready-classes/">', '</a>', '<strong>', '</strong>' ); ?>
 				</p>
 
 			</div>
@@ -109,13 +112,13 @@ global $gfpdf;
 				<h3><?php _e( 'A Beautiful Font Manager', 'gravitypdf' );?></h3>
 
 				<p>
-				   No more playing around with FTP, or "guessing" the font family name to use in your templates.
-				   Our all-new font manager makes it a breeze to upload TTF or OTF font files and create your own font type.
+				   <?php _e( 'No more playing around with FTP when installing fonts, or "guessing" the font family name to use in your templates.
+				   Our all-new font manager makes it a breeze to upload TTF or OTF font files and use them in your PDFs.', 'gravitypdf' ); ?>
 
 				</p>
 
 				<p>
-				   Once installed, you'll have full control over the font face, size and colour using our powerful settings interface.
+				   <?php _e( "Once installed, you'll have full control over the font face, size and colour using our powerful settings interface." ,'gravitypdf' ); ?>
 				</p>
 
 				<p></p>
@@ -123,7 +126,7 @@ global $gfpdf;
 			</div>
 
 			<div class="col">
-				<img class="gfpdf-image" src="<?php echo esc_url(PDF_PLUGIN_URL . 'src/assets/images/updated-font-manager.png'); ?>">
+				<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/updated-font-manager.png' ); ?>">
 			</div>
 
 		</div>
@@ -131,19 +134,19 @@ global $gfpdf;
 
 		<div id="gfpdf-mascot-container" class="changelog feature-section three-col">
 			<div class="col">
-				<img class="gfpdf-image" src="<?php echo esc_url(PDF_PLUGIN_URL . 'src/assets/images/welcome-download-shortcode.png'); ?>">
-				<h3>Simple PDF Download Links</h3>
-				<p>The <code>[gravitypdf]</code> shortcode allows you to <a href="#">easily place a PDF download link</a> on any of the Gravity Forms Confirmation types.</p>
+				<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/welcome-download-shortcode.png' ); ?>">
+				<h3><?php _e( 'Simple PDF Download Links', 'gravitypdf' ); ?></h3>
+				<p><?php printf( __( 'The %s[gravitypdf]%s shortcode allows you to %seasily place a PDF download link%s on any of the Gravity Forms Confirmation types.', 'gravitypdf'), '<code>', '</code>', '<a href="#">', '</a>' ); ?></p>
 			</div>
 			<div class="col">
-				<img class="gfpdf-image" src="<?php echo esc_url(PDF_PLUGIN_URL . 'src/assets/images/welcome-notification-conditional.png'); ?>">
-				<h3>PDF Conditional Logic</h3>
-				<p>Enable or disable PDFs with Gravity Forms powerful conditional logic feature. Control when PDFs are attached to email notifications or disable the PDF from being viewed if your conditions aren't met.</p>
+				<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/welcome-notification-conditional.png' ); ?>">
+				<h3><?php _e( 'PDF Conditional Logic', 'gravitypdf' ); ?></h3>
+				<p><?php _e( "Enable or disable PDFs with Gravity Forms powerful conditional logic feature. Control when PDFs are attached to email notifications or disable the PDF from being viewed if your conditions aren't met.", 'gravitypdf' ); ?></p>
 			</div>
 			<div class="col last-feature">
-				<img class="gfpdf-image" src="<?php echo esc_url(PDF_PLUGIN_URL . 'src/assets/images/updating-header-footer.png'); ?>">
-				<h3>Headers and Footers</h3>
-				<p>We've built in header and footer support in all our PDF templates. You can optionally have a different first page header and footer. Now that's control!</p>
+				<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/updating-header-footer.png' ); ?>">
+				<h3><?php _e( 'Headers and Footers', 'gravitypdf' ); ?></h3>
+				<p><?php _e( "We've built in header and footer support in all our PDF templates. You can optionally have a different first page header and footer. Now that's control!", 'gravitypdf' ); ?></p>
 			</div>
 		</div>
 
@@ -152,34 +155,34 @@ global $gfpdf;
 		
 
 		<div class="changelog">
-				<h3>Get more out of Gravity PDF</h3>
+				<h3><?php _e( 'Get more out of Gravity PDF', 'gravitypdf' ); ?></h3>
 
 				<div class="feature-section three-col">
 					<div class="col gfpdf-breakdown">
 
-						<h4>PDF Template Shop</h4>
-						<p>It's like a theme shop, but for Gravity PDF templates. <a href="#">Head over to our online store</a> and view our growing selection of premium PDF templates.</p>
+						<h4><?php _e( 'PDF Template Shop', 'gravitypdf' ); ?></h4>
+						<p><?php printf( __( "It's like a theme shop, but for Gravity PDF templates. %sHead over to our online store%s and view our growing selection of premium PDF templates.", 'gravitypdf' ), '<a href="#">', '</a>' ); ?></p>
 
-						<h4>Stay Up To Date</h4>
-						<p><a href="#">Sign up to our newsletter</a> to be amongst the first to receive the latest news and details on upcoming feature.</p>
+						<h4><?php _e( 'Stay Up To Date', 'gravitypdf' ); ?></h4>
+						<p><?php printf( __( '%sSign up to our newsletter%s to be amongst the first to receive the latest news and details on upcoming feature.', 'gravitypdf' ), '<a href="#">', '</a>' ); ?></p>
 
 					</div>
 
 					<div class="col gfpdf-breakdown">
 
-						<h4>Tailored PDFs</h4>
-						<p>If the PDF Shop doesn't have what you're after <a href="#">our friendly team can build a document just for you</a>. With an addon, our devs can even create templates that auto fill existing PDFs – like government and legal documents.</p>
+						<h4><?php _e( 'Tailored PDFs', 'gravitypdf' ); ?></h4>
+						<p><?php printf( __( "If the PDF Shop doesn't have what you're after %sour friendly team can build a document just for you%s. With an addon, our devs can even create templates that auto fill existing PDFs – like government and legal documents.", 'gravitypdf' ), '<a href="#">', '</a>' ); ?></p>
 
-						<h4>Get Support</h4>
-						<p>Have trouble using Gravity PDF? <a href="#">Contact our friendly staff</a> who are avaliable 9am to 5pm Monday to Friday, <a href="http://www.timeanddate.com/worldclock/australia/sydney">Australian Eastern Standard Time</a>.</p>
+						<h4><?php _e( 'Get Support', 'gravitypdf' ); ?></h4>
+						<p><?php printf( __( 'Have trouble using Gravity PDF? %sContact our friendly staff%s who are avaliable 9am to 5pm Monday to Friday, %sAustralian Eastern Standard Time%s.', 'gravitypdf'), '<a href="#">', '</a>', '<a href="http://www.timeanddate.com/worldclock/australia/sydney">', '</a>' ); ?></p>
 						
 
 					</div>
 
 					<div class="col gfpdf-breakdown last-feature">
 
-						<h4>Roll your Own</h4>
-						<p>If PHP, HTML and CSS come easy to you, you'll find creating your own PDF templates a breeze. With <a href="#">extensive documentation and great examples</a> you'll be up and running in no time.</p>
+						<h4><?php _e( 'Roll your Own', 'gravitypdf' ); ?></h4>
+						<p><?php printf( __( "If PHP, HTML and CSS come easy to you, you'll find creating your own PDF templates a breeze. With %sextensive documentation and great examples%s you'll be up and running in no time.", 'gravitypdf' ), '<a href="#">', '</a>' ); ?></p>
 
 					</div>
 
