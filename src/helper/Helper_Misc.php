@@ -236,8 +236,10 @@ class Helper_Misc
 			);
 
 			foreach ( $files as $fileinfo ) {
-				$function = ($fileinfo->isDir()) ? 'rmdir' : 'unlink';
-				$function($fileinfo->getRealPath());
+				$function = ( $fileinfo->isDir() ) ? 'rmdir' : 'unlink';
+				if( ! @$function( $fileinfo->getRealPath() ) ) {
+					throw new Exception( 'Could not run '. $function . ' on  ' . $fileinfo->getRealPath() );
+				}
 			}
 		} catch (Exception $e) {
 			$this->log->addError( 'Filesystem Delete Error', array(
@@ -260,9 +262,13 @@ class Helper_Misc
 	 * @since 4.0
 	 */
 	public function copyr( $source, $destination ) {
+
 		try {
 			if ( ! is_dir( $destination ) ) {
-				wp_mkdir_p( $destination );
+				if( ! wp_mkdir_p( $destination ) ) {
+					$this->log->addError( 'Failed Creating Folder Structure', array( 'dir' => $destination ) );
+					throw new Exception( 'Could not create folder structure at ' . $destination );
+				}
 			}
 
 			$files = new RecursiveIteratorIterator(
@@ -271,13 +277,20 @@ class Helper_Misc
 			);
 
 			foreach ( $files as $fileinfo ) {
-				if ( $fileinfo->isDir() && ! file_exists( $destination . DIRECTORY_SEPARATOR . $files->getSubPathName() ) ) {
-					mkdir( $destination . DIRECTORY_SEPARATOR . $files->getSubPathName() );
-				} elseif ( ! file_exists ( DIRECTORY_SEPARATOR . $files->getSubPathName() ) ) {
-					copy( $fileinfo, $destination . DIRECTORY_SEPARATOR . $files->getSubPathName() );
+				if ( $fileinfo->isDir() && ! file_exists( $destination . $files->getSubPathName() ) ) {
+					if( ! @mkdir( $destination . $files->getSubPathName() ) ) {
+						$this->log->addError( 'Failed Creating Folder', array( 'dir' => $destination . $files->getSubPathName() ) );
+						throw new Exception( 'Could not create folder at ' . $destination . $files->getSubPathName() );
+					}
+				} elseif ( ! file_exists ( $destination . $files->getSubPathName() ) ) {
+					if( ! @copy( $fileinfo, $destination . $files->getSubPathName() ) ) {
+						$this->log->addError( 'Failed Creating File', array( 'file' => $destination . $files->getSubPathName() ) );
+						throw new Exception( 'Could not create file at ' . $destination . $files->getSubPathName() );
+					}
 				}
 			}
 		} catch (Exception $e) {
+
 			$this->log->addError( 'Filesystem Copy Error', array(
 				'source'      => $source,
 				'destination' => $destination,

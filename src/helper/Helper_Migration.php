@@ -471,12 +471,12 @@ class Helper_Migration {
 	 */
 	private function archive_v3_configuration() {
 		if ( ! is_multisite() && is_file( $this->data->template_location . 'configuration.php' ) ) {
-			rename( $this->data->template_location . 'configuration.php', $this->data->template_location . 'configuration.archive.php' );
+			@rename( $this->data->template_location . 'configuration.php', $this->data->template_location . 'configuration.archive.php' );
 		}
 
 		/* Check multisite installation */
 		if ( is_multisite() && is_file( $this->data->multisite_template_location . 'configuration.php' ) ) {
-			rename( $this->data->multisite_template_location . 'configuration.php', $this->data->multisite_template_location . 'configuration.archive.php' );
+			@rename( $this->data->multisite_template_location . 'configuration.php', $this->data->multisite_template_location . 'configuration.archive.php' );
 		}
 	}
 }

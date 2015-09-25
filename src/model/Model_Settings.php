@@ -198,7 +198,8 @@ class Model_Settings extends Helper_Abstract_Model {
 	 */
 	public function install_templates() {
 
-		if ( ! $this->misc->copyr( PDF_PLUGIN_DIR . 'initialisation/templates/', $this->data->template_location ) ) {
+		$copy = $this->misc->copyr( PDF_PLUGIN_DIR . 'initialisation/templates/', $this->data->template_location );
+		if ( is_wp_error( $copy ) ) {
 			$this->log->addError( 'Template Installation Error.' );
 			$this->notices->add_error( sprintf( __( 'There was a problem copying all PDF templates to %s. Please try again.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $this->data->template_location ) . '</code>' ) );
 			return false;

@@ -166,6 +166,17 @@ class Model_Actions extends Helper_Abstract_Model {
 		$migration = new Helper_Migration( $gfpdf->form, $gfpdf->log, $this->data, $this->options, $gfpdf->misc, $gfpdf->notices );
 
         /* Do migration */
-		$migration->begin_migration();
+		if( $migration->begin_migration() ) {
+
+			/**
+			 * Migration Successful.
+			 *
+			 * If there was a problem removing the configuration file we'll automatically prevent the migration message displaying again
+			 */
+			if ( ( ! is_multisite() && is_file( $this->data->template_location . 'configuration.php' ) ) ||
+			     (  is_multisite() && is_file( $this->data->multisite_template_location . 'configuration.php' ) ) ) {
+				$this->dismiss_notice( 'migrate_v3_to_v4' );
+			}
+		}
 	}
 }

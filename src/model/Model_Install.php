@@ -211,6 +211,7 @@ class Model_Install extends Helper_Abstract_Model {
 
 		/* add folders that need to be checked */
 		$folders = array(
+			$this->data->template_location,
 			$this->data->template_font_location,
 			$this->data->template_tmp_location,
 		);
