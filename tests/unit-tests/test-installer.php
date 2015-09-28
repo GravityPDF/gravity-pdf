@@ -111,6 +111,11 @@ class Test_Installer extends WP_UnitTestCase
         /* Set up authorized user */
         $user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
         $this->assertInternalType( 'integer', $user_id );
+
+        if( is_multisite() ) {
+            grant_super_admin( $user_id );
+        }
+                
         wp_set_current_user( $user_id );
 
         $this->controller->check_install_status();
@@ -221,6 +226,11 @@ class Test_Installer extends WP_UnitTestCase
         /* Set up authorized user */
         $user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
         $this->assertInternalType( 'integer', $user_id );
+
+        if( is_multisite() ) {
+            grant_super_admin( $user_id );
+        }
+
         wp_set_current_user( $user_id );
 
         $this->controller->check_install_status();
@@ -255,6 +265,11 @@ class Test_Installer extends WP_UnitTestCase
         /* Set up authorized user */
         $user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
         $this->assertInternalType( 'integer', $user_id );
+
+        if( is_multisite() ) {
+            grant_super_admin( $user_id );
+        }
+
         wp_set_current_user( $user_id );
 
         $this->controller->check_install_status();
