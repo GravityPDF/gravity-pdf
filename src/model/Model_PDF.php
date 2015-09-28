@@ -699,6 +699,8 @@ class Model_PDF extends Helper_Abstract_Model {
 				}
 			}
 
+			$notifications['attachments'] = ( isset( $notifications['attachments'] ) ) ? $notifications['attachments'] : array();
+			
 			$this->log->addNotice( 'Gravity Forms Attachments', array(
 				'attachments'  => $notifications['attachments'],
 				'notification' => $notifications,

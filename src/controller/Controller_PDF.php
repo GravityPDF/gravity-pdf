@@ -184,7 +184,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 
 		$pid    = $GLOBALS['wp']->query_vars['pid'];
 		$lid    = (int) $GLOBALS['wp']->query_vars['lid'];
-		$action = ( $GLOBALS['wp']->query_vars['action'] == 'download' ) ? 'download' : 'view';
+		$action = ( ( isset( $GLOBALS['wp']->query_vars['action'] ) ) && $GLOBALS['wp']->query_vars['action'] == 'download' ) ? 'download' : 'view';
 
 		$this->log->addNotice( 'Processing PDF endpoint.', array(
 			'pid'    => $pid,
