@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The Dismisal Button
+ * The start of the multisite migration
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
@@ -36,16 +36,10 @@ if (! defined('ABSPATH')) {
 
 ?>
 
-<form method="post">
-    <input type="hidden" name="gfpdf_action" value="gfpdf_<?php echo $args['type']; ?>" />
-    <input type="hidden" name="gfpdf_action_<?php echo $args['type']; ?>" value="<?php echo wp_create_nonce( 'gfpdf_action_' . $args['type'] ); ?>" />
+<!-- Close the div.wrap tag -->
+</div>
 
-    <p>
-        <button class="button button-primary"><?php echo $args['button_text'] ?></button>
+<?php
 
-        <?php if( $args['dismissal'] == 'enabled' ): ?>
-            <input class="button" type="submit" value="<?php _e('Dismiss Notice', 'gravity-forms-pdf-extended' ); ?>" name="gfpdf-dismiss-notice" />
-        <?php endif; ?>
-    </p>
-
-</form>
+include( ABSPATH . 'wp-admin/admin-footer.php' );
+exit;

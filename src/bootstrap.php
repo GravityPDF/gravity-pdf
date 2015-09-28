@@ -419,11 +419,13 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		wp_register_script( 'gfpdf_js_chosen', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.jquery.min.js', array( 'jquery' ), $version );
 		wp_register_script( 'gfpdf_js_backbone_model_binder', PDF_PLUGIN_URL . 'bower_components/backbone.modelbinder/Backbone.ModelBinder.js', array( 'backbone', 'underscore' ), $version );
 		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-entries' . $suffix . '.js', array( 'jquery' ), $version );
+		wp_register_script( 'gfpdf_js_v3_migration', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-migration'. $suffix .'.js', array( 'gfpdf_js_settings' ), $version );
 
 		/*
         * Localise admin script
         */
 		wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $this->data->get_localised_script_data( $this->options, $this->form ) );
+		wp_localize_script( 'gfpdf_js_v3_migration', 'GFPDF', $this->data->get_localised_script_data( $this->options, $this->form ) );
 	}
 
 

@@ -167,6 +167,7 @@ class Helper_Data {
 			'GFbaseUrl'                   => $form->get_plugin_url(),
 			'pluginUrl'                   => PDF_PLUGIN_URL,
 			'spinnerUrl'                  => admin_url( 'images/spinner-2x.gif' ),
+			'spinnerAlt'				  => __( 'Loading...', 'gravity-forms-pdf-extended' ),
 			'general_advanced_show'       => __( 'Show Advanced Options...', 'gravity-forms-pdf-extended' ),
 			'general_advanced_hide'       => __( 'Hide Advanced Options...', 'gravity-forms-pdf-extended' ),
 			'tools_template_copy_confirm' => __( 'Continue', 'gravity-forms-pdf-extended' ),

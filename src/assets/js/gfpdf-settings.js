@@ -553,7 +553,7 @@
 				$('#gfpdf_settings\\[template\\], #gfpdf_settings\\[default_template\\]').off('change').change(function() {
 
 					/* Add spinner */
-					var $spinner = $('<img alt="Loading" src="' + GFPDF.spinnerUrl + '" class="gfpdf-spinner" />');
+					var $spinner = $('<img alt="' + GFPDF.spinnerAlt + '" src="' + GFPDF.spinnerUrl + '" class="gfpdf-spinner" />');
 
 					$(this).next().after($spinner);
 

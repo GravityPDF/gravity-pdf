@@ -112,6 +112,9 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	public function add_actions() {
 		add_action( 'admin_init', array( $this, 'route' ) );
 		add_action( 'admin_init', array( $this, 'route_notices' ), 20 ); /* Run later than our route check */
+
+		/* Add AJAX endpoints */
+		add_action( 'wp_ajax_multisite_v3_migration', array( $this->model, 'ajax_multisite_v3_migration' ) );
 	}
 
 	/**
@@ -145,7 +148,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 				'condition'   => array( $this->model, 'migration_condition' ),
 				'process'     => array( $this->model, 'begin_migration' ),
 				'view'        => array( $this->view, 'migration' ),
-				'capability'  => 'gravityforms_edit_settings',
+				'capability'  => 'update_plugins',
 			),
 		);
 
@@ -188,7 +191,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 		foreach ( $this->get_routes() as $route ) {
 
 			/* Check we have a valid action and the display condition is true */
-			if ( rgpost( 'action' ) == 'gfpdf_' . $route['action'] && call_user_func( $route['condition'] ) ) {
+			if ( rgpost( 'gfpdf_action' ) == 'gfpdf_' . $route['action'] && call_user_func( $route['condition'] ) ) {
 
 				/* Check user capability */
 				if ( ! $this->form->has_capability( $route['capability'] ) ) {

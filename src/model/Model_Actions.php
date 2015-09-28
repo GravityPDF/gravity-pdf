@@ -148,8 +148,18 @@ class Model_Actions extends Helper_Abstract_Model {
 		}
 
 		/* Check multisite installation */
-		if ( is_multisite() && is_file( $this->data->multisite_template_location . 'configuration.php' ) ) {
-			return true;
+		if ( is_multisite() && is_super_admin() ) {
+			if( is_file( $this->data->multisite_template_location . 'configuration.php' ) ) {
+				return true;
+			} else {
+				/* Check other multisites for a config file */
+				$sites = wp_get_sites();
+				foreach( $sites as $site ) {
+					if( is_file( $this->data->template_location . '/' . $site['blog_id'] . '/configuration.php' ) ) {
+						return true;
+					}
+				}
+			}
 		}
 
 		return false;
@@ -161,11 +171,70 @@ class Model_Actions extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function begin_migration() {
+
+		if( is_multisite() ) {
+
+			/* Verify we have a site to migrate */
+			$sites = wp_get_sites();
+			$found = false;
+
+			foreach( $sites as $site ) {
+				$site_config = $this->data->template_location . '/' . $site['blog_id'] . '/';
+
+				if( is_file( $site_config . 'configuration.php' ) ) {
+					$found = true;
+					break;
+				}
+			}
+
+			if( $found ) {
+				/* Remove all notices to prevent any messages showing up on the migration screen */
+				remove_all_actions( 'network_admin_notices' );
+				remove_all_actions( 'admin_notices' );
+				remove_all_actions( 'all_admin_notices' );
+
+				/* We need a user interface so queue this right before the admin page runs */
+				add_action( 'all_admin_notices', array( $this, 'handle_multisite_migration' ) );
+
+				/* Add our migration script */
+				wp_enqueue_script( 'gfpdf_js_v3_migration' );
+			}
+
+			//$current_multisite_path = $this->data->multisite_template_location;
+
+			/* Loop through the sites and only migrate those that need it */
+			//foreach( $sites as $site ) {
+			//	$site_config = $this->data->template_location . '/' . $site['blog_id'] . '/';
+
+			//	if( is_file( $site_config . 'configuration.php' ) ) {
+					/* Switch to the blog and update the multisite template path before beginning the migration */
+				/*	switch_to_blog( $site['blog_id'] );
+					$this->data->multisite_template_location = $site_config;
+					$this->migrate_v3( $migration, $site_config );
+				}
+
+				/* Restore the current multisite details */
+				/*restore_current_blog();
+				$this->data->multisite_template_location = $current_multisite_path;*/
+			/*}*/
+
+		} else if( is_file( $this->data->template_location . 'configuration.php' ) ) {
+				$this->migrate_v3( $this->data->template_location );
+		}
+	}
+
+	/**
+	 * Does the migration and notice clearing (if unsuccessful)
+	 * @param  Helper_Migration $migration [description]
+	 * @param  String           $path      Path to the current site's template directory
+	 * @return Boolean
+	 * @since  4.0
+	 */
+	private function migrate_v3( $path ) {
 		global $gfpdf;
 
 		$migration = new Helper_Migration( $gfpdf->form, $gfpdf->log, $this->data, $this->options, $gfpdf->misc, $gfpdf->notices );
 
-        /* Do migration */
 		if( $migration->begin_migration() ) {
 
 			/**
@@ -173,10 +242,129 @@ class Model_Actions extends Helper_Abstract_Model {
 			 *
 			 * If there was a problem removing the configuration file we'll automatically prevent the migration message displaying again
 			 */
-			if ( ( ! is_multisite() && is_file( $this->data->template_location . 'configuration.php' ) ) ||
-			     (  is_multisite() && is_file( $this->data->multisite_template_location . 'configuration.php' ) ) ) {
+			if ( is_file( $path . 'configuration.php' ) ) {
 				$this->dismiss_notice( 'migrate_v3_to_v4' );
 			}
+
+			return true;
 		}
+
+		return false;
 	}
+
+	/**
+	 * Handles the multsite migration
+	 *
+	 * Use AJAX query to process each multisite individually
+	 *
+	 * @since 4.0
+	 */
+	public function handle_multisite_migration() {
+		$controller = $this->getController();
+
+		$args = array(
+			'multisite_ids'    => $this->get_multisite_ids_with_v3_config(),
+			'current_page_url' => add_query_arg( NULL, NULL ),
+			'gf_forms_url'     => admin_url( 'admin.php?page=gf_edit_forms' ),
+		);
+		$controller->view->begin_multisite_migration( $args );
+		$controller->view->end_multisite_migration();
+	}
+
+	/**
+	 * Return an array of mulitsite blog IDs which have a v3 config
+	 * @return Array
+	 * @since  4.0
+	 */
+	private function get_multisite_ids_with_v3_config() {
+		$sites = wp_get_sites();
+		$blog_ids = array();
+
+		foreach( $sites as $site ) {
+			$site_config = $this->data->template_location . '/' . $site['blog_id'] . '/';
+
+			if( is_file( $site_config . 'configuration.php' ) ) {
+				$blog_ids[] = $site['blog_id'];
+			}
+		}
+
+		return $blog_ids;
+	}
+
+	/**
+	 * AJAX Endpoint for migrating each multisite to our v4 config
+	 * @param $_POST['nonce'] a valid nonce
+	 * @param $_POST['blog_id'] a valid site ID
+	 * @since 4.0
+	 */
+	public function ajax_multisite_v3_migration() {
+		global $gfpdf;
+
+		$gfpdf->log->addNotice( 'Running AJAX Endpoint', array( 'type' => 'Multisite v3 to v4 config', 'post' => $_POST ) );
+
+		/* prevent unauthorized access */
+		if ( ! is_multisite() || ! is_super_admin() ) {
+
+			$gfpdf->log->addCritical( 'Lack of User Capabilities.', array(
+				'user'      => wp_get_current_user(),
+				'user_meta' => get_user_meta( get_current_user_id() ),
+				'multisite' => is_multisite(),
+				'super_admin' => is_super_admin(),
+			) );
+
+			header( 'HTTP/1.1 401 Unauthorized' );
+			wp_die( '401' );
+		}
+
+		/*
+         * Validate Endpoint
+         */
+		$nonce   = $_POST['nonce'];
+		$blog_id = (int) $_POST['blog_id'];
+
+		if ( ! wp_verify_nonce( $nonce, 'gfpdf_multisite_migration' ) ) {
+
+			$gfpdf->log->addWarning( 'Nonce Verification Failed.' );
+
+			header( 'HTTP/1.1 401 Unauthorized' );
+			wp_die( '401' );
+		}
+
+		/* Check if we have a config file that should be migrated */
+		$path = $this->data->template_location . '/' . $blog_id . '/';
+
+		if( ! is_file( $path . 'configuration.php' ) ) {
+
+			$return = array(
+				'error' => sprintf( __( 'No configuration.php file found for site #%s', 'gravity-forms-pdf-extended' ), $blog_id ),
+			);
+
+			$gfpdf->log->addError( 'AJAX Endpoint Failed', $return );
+
+			echo json_encode( array( 'results' => $return ) );
+			wp_die();
+		}
+
+		/* Do migration */
+		if( $this->migrate_v3( $path ) ) {
+			echo json_encode( array( 'results' => 'complete' ) );
+			wp_die();
+		} else {
+
+			$return = array(
+				'error' => sprintf( __( 'Database import problem for site #%s', 'gravity-forms-pdf-extended' ), $blog_id ),
+			);
+
+			$gfpdf->log->addError( 'AJAX Endpoint Failed', $return );
+
+			echo json_encode( array( 'results' => $return ) );
+			wp_die();
+		}
+
+		$gfpdf->log->addError( 'AJAX Endpoint Failed' );
+		header( 'HTTP/1.1 500 Internal Server Error' );
+		wp_die( '500' );
+
+	}
+
 }

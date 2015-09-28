@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The Dismisal Button
+ * The start of the multisite migration
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
@@ -36,16 +36,21 @@ if (! defined('ABSPATH')) {
 
 ?>
 
-<form method="post">
-    <input type="hidden" name="gfpdf_action" value="gfpdf_<?php echo $args['type']; ?>" />
-    <input type="hidden" name="gfpdf_action_<?php echo $args['type']; ?>" value="<?php echo wp_create_nonce( 'gfpdf_action_' . $args['type'] ); ?>" />
+<script type="text/javascript">
+    var gfpdf_migration_multisite_ids = <?php echo json_encode( $args['multisite_ids'] ); ?>;
+</script>
 
-    <p>
-        <button class="button button-primary"><?php echo $args['button_text'] ?></button>
+<div class="wrap">
 
-        <?php if( $args['dismissal'] == 'enabled' ): ?>
-            <input class="button" type="submit" value="<?php _e('Dismiss Notice', 'gravity-forms-pdf-extended' ); ?>" name="gfpdf-dismiss-notice" />
-        <?php endif; ?>
-    </p>
+    <h1><?php _e( 'Gravity PDF Multisite Migration', 'gravity-forms-pdf-extended' ); ?></h1>
 
-</form>
+    <p>Beginning Migration... </p>
+    <div id="gfpdf-multisite-migration-copy" data-nonce="<?php echo wp_create_nonce( 'gfpdf_multisite_migration' ); ?>">
+        <!-- Container for our AJAX endpoint -->
+    </div>
+
+    <div id="gfpdf-multisite-migration-complete" style="display: none">
+        <p>Migration Complete.</p>
+
+        <p><a href="<?php echo $args['current_page_url']; ?>">Return to current page</a> | <a href="<?php echo $args['gf_forms_url']; ?>">View Gravity Forms</a></p>
+    </div>
