@@ -475,9 +475,19 @@ class Helper_Misc
 		$default_template_path = PDF_PLUGIN_DIR . $relative_image_path;
 		$default_template_url  = PDF_PLUGIN_URL . $relative_image_path;
 
+
+		/* Multisite Location */
+		if ( is_file( $this->data->multisite_template_location . 'images/' . $template ) ) {
+			return $this->data->multisite_template_location_url . 'images/' . $template;
+		}
+
+		/* Standard Location */
 		if ( is_file( $this->data->template_location . 'images/' . $template ) ) {
 			return $this->data->template_location_url . 'images/' . $template;
-		} elseif ( is_file( $default_template_path . $template ) ) {
+		}
+
+		/* Core plugin file location */
+		if ( is_file( $default_template_path . $template ) ) {
 			return $default_template_url . $template;
 		}
 

@@ -230,8 +230,10 @@ class View_Settings extends Helper_Abstract_View
 			wp_die( __( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
 		}
 
+		$template_directory = ( is_multisite() ) ? $this->plugin_data->multisite_template_location : $this->plugin_data->template_location;
+
 		$vars = array(
-			'template_directory'            => $this->misc->relative_path( $this->plugin_data->template_location, '/' ),
+			'template_directory'            => $this->misc->relative_path( $template_directory, '/' ),
 			'template_files'                => $this->options->get_plugin_pdf_templates(),
 			'custom_template_setup_warning' => $this->options->get_option( 'custom_pdf_template_files_installed' ),
 		);

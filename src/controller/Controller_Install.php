@@ -204,8 +204,15 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 				 return false;
 			}
 
-			/* check if user has permission to uninstall the plugin */
-			if ( ! $this->form->has_capability( 'gravityforms_uninstall' ) ) {
+			/**
+			 * Run the uninstaller if the user has the correct permissions
+			 *
+			 * If not a multisite any user with the GF uninstaller permission can remove it (usually just admins)
+			 *
+			 * If multisite only the super admin can uninstall the software. This is due to how the plugin shares similar directory structures across networked sites
+			 */
+			if ( ( ! is_multisite() && ! $this->form->has_capability( 'gravityforms_uninstall' ) ) ||
+			     ( is_multisite() && ! is_super_admin() ) ) {
 	
 				$this->log->addCritical( 'Lack of User Capabilities.', array(
 					'user'      => wp_get_current_user(),

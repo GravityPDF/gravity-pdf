@@ -98,11 +98,13 @@ class GFPDF_Core extends GFPDF_Depreciated_Abstract
 		}
 
 		if( ! defined( 'PDF_TEMPLATE_LOCATION' ) ) {
-			define( 'PDF_TEMPLATE_LOCATION', $gfpdf->data->template_location );
+			$destination_path = ( is_multisite() ) ? $gfpdf->data->multisite_template_location : $gfpdf->data->template_location;
+			define( 'PDF_TEMPLATE_LOCATION', $destination_path );
 		}
 
 		if( ! defined( 'PDF_TEMPLATE_URL_LOCATION' ) ) {
-			define( 'PDF_TEMPLATE_URL_LOCATION', $gfpdf->data->template_location_url );
+			$destination_url = ( is_multisite() ) ? $gfpdf->data->multisite_template_location_url : $gfpdf->data->template_location_url;
+			define( 'PDF_TEMPLATE_URL_LOCATION', $destination_url );
 		}
 	}
 }

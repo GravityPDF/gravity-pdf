@@ -112,8 +112,14 @@ class Test_Depreciated extends WP_UnitTestCase
 
         $this->assertEquals( $gfpdf->data->template_tmp_location, PDF_SAVE_LOCATION );
         $this->assertEquals( $gfpdf->data->template_font_location, PDF_FONT_LOCATION );
-        $this->assertEquals( $gfpdf->data->template_location, PDF_TEMPLATE_LOCATION );
-        $this->assertEquals( $gfpdf->data->template_location_url, PDF_TEMPLATE_URL_LOCATION );
+
+        if( is_multisite() ) {
+            $this->assertEquals( $gfpdf->data->multisite_template_location, PDF_TEMPLATE_LOCATION );
+            $this->assertEquals( $gfpdf->data->multisite_template_location_url, PDF_TEMPLATE_URL_LOCATION );
+        } else {
+            $this->assertEquals( $gfpdf->data->template_location, PDF_TEMPLATE_LOCATION );
+            $this->assertEquals( $gfpdf->data->template_location_url, PDF_TEMPLATE_URL_LOCATION );
+        }
     }
 
     /**

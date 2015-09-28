@@ -519,9 +519,19 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function get_template_configuration( $template ) {
 
-		$file  = $this->data->template_location . 'config/' . $template . '.php';
-		$class = $this->load_template_configuration( $file );
+		/* Try load the multisite template configuration first */
+		if( is_multisite() ) {
+			$file  = $this->data->multisite_template_location . 'config/' . $template . '.php';
+			$class = $this->load_template_configuration( $file );
+		}
 
+		/* If no multisite class we'll try load the standard user template config */
+		if( empty( $class ) ) {
+			$file  = $this->data->template_location . 'config/' . $template . '.php';
+			$class = $this->load_template_configuration( $file );
+		}
+
+		/* If there are no user overriding templates we'll attempt to load a config from the main plugin */
 		$file = PDF_PLUGIN_DIR . 'initialisation/templates/config/' . $template . '.php';
 		if ( empty($class) ) {
 			$class = $this->load_template_configuration( $file );
@@ -549,21 +559,20 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function load_template_configuration( $file ) {
 
-		$namespace = 'GFPDF\Templates\Config\\';
-		$class     = false;
+		$namespace  = 'GFPDF\Templates\Config\\';
+		$class      = false;
+		$class_name = str_replace( '-', '_', basename( $file, '.php' ) );
+		$fqcn       = $namespace . $class_name;
 
-		if ( is_file( $file ) && is_readable( $file ) ) {
+		if ( ! class_exists( $fqcn ) && is_file( $file ) && is_readable( $file ) ) {
 			require_once($file);
-
-			$class_name = str_replace( '-', '_', basename( $file, '.php' ) );
-			$fqcn = $namespace . $class_name;
-
-			/* Insure the class we are trying to load exists and impliments our Helper_Interface_Config interface */
-			if ( class_exists( $fqcn ) && in_array( 'GFPDF\Helper\Helper_Interface_Config', class_implements( $fqcn ) ) ) {
-				$class = new $fqcn();
-			}
 		} else {
 			$this->log->addWarning( 'Template Configuration Failed to Load', array( 'file' => $file ) );
+		}
+
+		/* Insure the class we are trying to load exists and impliments our Helper_Interface_Config interface */
+		if ( class_exists( $fqcn ) && in_array( 'GFPDF\Helper\Helper_Interface_Config', class_implements( $fqcn ) ) ) {
+			$class = new $fqcn();
 		}
 
 		return $class;

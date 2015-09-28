@@ -184,8 +184,8 @@ class Model_Install extends Helper_Abstract_Model {
 
 		if ( is_multisite() ) {
 			$blog_id = get_current_blog_id();
-			$this->data->multisite_template_location     = apply_filters( 'gfpdfe_multisite_template_location', $this->data->upload_dir . '/' . $this->data->working_folder . '/', $this->data->upload_dir, $this->data->working_folder );
-			$this->data->multisite_template_location_url = apply_filters( 'gfpdfe_multisite_template_location_url', $this->data->upload_dir_url . '/' . $this->data->working_folder . '/', $this->data->upload_dir_url, $this->data->working_folder );
+			$this->data->multisite_template_location     = apply_filters( 'gfpdfe_multisite_template_location', $this->data->upload_dir . '/' . $this->data->working_folder . '/' . $blog_id . '/', $this->data->upload_dir, $this->data->working_folder );
+			$this->data->multisite_template_location_url = apply_filters( 'gfpdfe_multisite_template_location_url', $this->data->upload_dir_url . '/' . $this->data->working_folder . '/' . $blog_id . '/', $this->data->upload_dir_url, $this->data->working_folder );
 
 			$this->log->addNotice( 'Multisite Template Locations', array(
 				'path' => $this->data->multisite_template_location,

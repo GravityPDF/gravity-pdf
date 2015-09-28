@@ -198,14 +198,15 @@ class Model_Settings extends Helper_Abstract_Model {
 	 */
 	public function install_templates() {
 
-		$copy = $this->misc->copyr( PDF_PLUGIN_DIR . 'initialisation/templates/', $this->data->template_location );
+		$destination = ( is_multisite() ) ? $this->data->multisite_template_location : $this->data->template_location;
+		$copy = $this->misc->copyr( PDF_PLUGIN_DIR . 'initialisation/templates/', $destination );
 		if ( is_wp_error( $copy ) ) {
 			$this->log->addError( 'Template Installation Error.' );
-			$this->notices->add_error( sprintf( __( 'There was a problem copying all PDF templates to %s. Please try again.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $this->data->template_location ) . '</code>' ) );
+			$this->notices->add_error( sprintf( __( 'There was a problem copying all PDF templates to %s. Please try again.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $destination ) . '</code>' ) );
 			return false;
 		}
 
-		$this->notices->add_notice( sprintf( __( 'Gravity PDF Custom Templates successfully installed to %s.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $this->data->template_location ) . '</code>' ) );
+		$this->notices->add_notice( sprintf( __( 'Gravity PDF Custom Templates successfully installed to %s.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $destination ) . '</code>' ) );
 		$this->options->update_option( 'custom_pdf_template_files_installed', true );
 		return true;
 	}

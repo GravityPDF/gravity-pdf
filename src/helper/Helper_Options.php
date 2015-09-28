@@ -784,7 +784,13 @@ class Helper_Options implements Helper_Interface_Filters {
 		/**
 		 * Load the user's templates
 		 */
-		foreach ( glob( $this->data->template_location . '*.php' ) as $filename ) {
+		$discovered_user_templates = glob( $this->data->template_location . '*.php' );
+
+		if( is_multisite() ) {
+			$discovered_user_templates = array_merge( $discovered_user_templates, glob( $this->data->multisite_template_location . '*.php' ) );
+		}
+
+		foreach ( $discovered_user_templates as $filename ) {
 
 			/* Get the header information to find out what group it's in and if it is compatible with our verison of Gravity PDF */
 			$info = $this->get_template_headers( $filename );

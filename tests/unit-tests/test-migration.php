@@ -130,11 +130,13 @@ class Test_Migration extends WP_UnitTestCase
     public function test_imported_data( $data ) {
         global $gfpdf;
 
+        $configuration_path = ( is_multisite() ) ? $gfpdf->data->multisite_template_location : $gfpdf->data->template_location;
+
         /* Create our fake config file */
-        copy( dirname( __FILE__ ) . '/php/simple_config', $gfpdf->data->template_location . 'configuration.php' );
+        copy( dirname( __FILE__ ) . '/php/simple_config', $configuration_path . 'configuration.php' );
 
         /* Fix up form IDs */
-        $this->replace_in_file( $gfpdf->data->template_location . 'configuration.php', "'form_id' => 1,", "'form_id' => {$this->form_id},");
+        $this->replace_in_file( $configuration_path . 'configuration.php', "'form_id' => 1,", "'form_id' => {$this->form_id},");
 
         /* Do our import */
         $this->assertTrue( $this->migration->begin_migration() );
@@ -161,8 +163,8 @@ class Test_Migration extends WP_UnitTestCase
         $this->assertSame( 0, sizeof( array_diff( $settings[ 7 ], $data[7]['config'] ) ) );
 
         /* Verify our config file was archived and clean up */
-        $this->assertFileExists( $gfpdf->data->template_location . 'configuration.archive.php' );
-        unlink( $gfpdf->data->template_location . 'configuration.archive.php' );
+        $this->assertFileExists( $configuration_path . 'configuration.archive.php' );
+        unlink( $configuration_path . 'configuration.archive.php' );
     }
 
     /**
