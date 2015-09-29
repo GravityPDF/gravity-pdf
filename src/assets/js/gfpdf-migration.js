@@ -7,7 +7,7 @@
 (function($) {
 
 	function ajax_migration( blog_id, nonce, $container ) {
-		$container.append( '<p>Migrating site #' + blog_id + ' <img alt="' + GFPDF.spinnerAlt + '" src="' + GFPDF.spinnerUrl + '" class="gfpdf-spinner" style="width:20px;vertical-align: middle;padding-left:5px" /></p>' );
+		$container.append( '<p>' + GFPDF.migration_start.replace( /%s/g, blog_id ) + ' <img alt="' + GFPDF.spinnerAlt + '" src="' + GFPDF.spinnerUrl + '" class="gfpdf-spinner" style="width:20px;vertical-align: middle;padding-left:5px" /></p>' );
 
 		$.ajax({
 			type : "post",
@@ -19,16 +19,19 @@
 	  			'blog_id': blog_id,
 			},
 			success: function( json ) {
+				/* Remove the spinner */
 				$container.find( '.gfpdf-spinner' ).remove();
 
+				/* Display appropriate response. Either complete, specific error or generic error */
 				if( json.results === "complete" ) {
-					$container.append( '<p>Site #' + blog_id + ' migration complete.</p>' );
+					$container.append( '<p>' + GFPDF.migration_complete.replace( /%s/g, blog_id ) + '</p>' );
 				} else if( json.results.error ) {
-					$container.append( '<p><strong>Migration Error: ' + json.results.error + '</strong></p>' );
+					$container.append( '<p><strong>' + GFPDF.migration_error_specific + ': ' + json.results.error + '</strong></p>' );
 				} else {
-					$container.append( '<p><strong>Site #' + blog_id + ' migration errors.</strong></p>' );
+					$container.append( '<p><strong>' + GFPDF.migration_error_generic.replace( /%s/g, blog_id ) + '</strong></p>' );
 				}
 
+				/* Run the next migration, if it exists, or show as complete */
 				if( gfpdf_migration_multisite_ids.length > 0 ) {
 					ajax_migration( gfpdf_migration_multisite_ids.shift(), nonce, $container );
 				} else {
@@ -36,11 +39,17 @@
 				}
 			},
 			error: function() {
+				/* Remove the spinner */
 				$container.find( '.gfpdf-spinner' ).remove();
-				$container.append( '<p><strong>Site #' + blog_id + ' migration errors.</strong></p>' );
 
+				/* Add a generic error */
+				$container.append( '<p><strong>' + GFPDF.migration_error_generic.replace( /%s/g, blog_id ) + '</strong></p>' );
+
+				/* Run the next migration, if it exists, or show as complete */
 				if( gfpdf_migration_multisite_ids.length > 0 ) {
 					ajax_migration( gfpdf_migration_multisite_ids.shift(), nonce, $container );
+				} else {
+					$( '#gfpdf-multisite-migration-complete' ).show();
 				}
 			},
 		});
@@ -51,9 +60,12 @@
 	 * @since 4.0
 	 */
 	$(function() {
+
+		/* Grab the container and nonce */
 		var $container = $( '#gfpdf-multisite-migration-copy' );
 		var nonce = $container.data( 'nonce' );
 
+		/* Begin the migration */
 		if( gfpdf_migration_multisite_ids.length > 0 ) {
 			ajax_migration( gfpdf_migration_multisite_ids.shift(), nonce, $container );
 		}
