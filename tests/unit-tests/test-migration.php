@@ -76,7 +76,8 @@ class Test_Migration extends WP_UnitTestCase
 		$this->migration = new Helper_Migration( $gfpdf->form, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
 
 		/* Get our form ID */
-		$this->form_id = $gfpdf->form->add_form( json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/migration_v3_to_v4.json' ) ), true ) );
+		$this->form_id[] = $gfpdf->form->add_form( json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/migration_v3_to_v4.json' ) ), true ) );
+        $this->form_id[] = $gfpdf->form->add_form( json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/migration_v3_to_v4.json' ) ), true ) );
 	}
 
 	/**
@@ -130,19 +131,22 @@ class Test_Migration extends WP_UnitTestCase
     public function test_imported_data( $data ) {
         global $gfpdf;
 
+        $main_form_id      = $this->form_id[0];
+        $secondary_form_id = $this->form_id[1];
+
         $configuration_path = ( is_multisite() ) ? $gfpdf->data->multisite_template_location : $gfpdf->data->template_location;
 
         /* Create our fake config file */
         copy( dirname( __FILE__ ) . '/php/simple_config', $configuration_path . 'configuration.php' );
 
         /* Fix up form IDs */
-        $this->replace_in_file( $configuration_path . 'configuration.php', "'form_id' => 1,", "'form_id' => {$this->form_id},");
+        $this->replace_in_file( $configuration_path . 'configuration.php', "'form_id' => 1,", "'form_id' => {$main_form_id},");
 
         /* Do our import */
         $this->assertTrue( $this->migration->begin_migration() );
 
         /* Check the results */
-        $settings = $gfpdf->options->get_form_pdfs( $this->form_id );
+        $settings = $gfpdf->options->get_form_pdfs( $main_form_id );
         $settings = array_values( $settings );
 
         $data = $this->provider_imported_data();
@@ -161,6 +165,14 @@ class Test_Migration extends WP_UnitTestCase
         $this->assertSame( 0, sizeof( array_diff( $settings[ 5 ], $data[5]['config'] ) ) );
         $this->assertSame( 0, sizeof( array_diff( $settings[ 6 ], $data[6]['config'] ) ) );
         $this->assertSame( 0, sizeof( array_diff( $settings[ 7 ], $data[7]['config'] ) ) );
+
+        /* Check our default config was imported into our second form */
+        $settings = $gfpdf->options->get_form_pdfs( $secondary_form_id );
+        $settings = array_values( $settings );
+
+        $this->assertEquals( 'default-template', $settings[0]['template'] );
+        $this->assertEquals( 'A4', $settings[0]['pdf_size'] );
+        $this->assertEquals( 'form-{form_id}-entry-{entry_id}', $settings[0]['filename'] );
 
         /* Verify our config file was archived and clean up */
         $this->assertFileExists( $configuration_path . 'configuration.archive.php' );
@@ -329,12 +341,4 @@ class Test_Migration extends WP_UnitTestCase
             )
         );
     }
-
-	/**
-	 * Check multisite migration works as expected
-	 * @since 4.0
-	 */
-	public function test_multisite_migration() {
-		$this->markTestIncomplete( 'Write unit test' );
-	}
 }

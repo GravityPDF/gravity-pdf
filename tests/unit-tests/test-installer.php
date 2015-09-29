@@ -174,7 +174,10 @@ class Test_Installer extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_multisite_template_location() {
-        $this->markTestIncomplete( 'Write unit test' );
+        global $gfpdf;
+        if( is_multisite() ) {
+            $this->assertTrue( is_dir( $gfpdf->data->multisite_template_location ) );
+        }
     }
 
     /**
