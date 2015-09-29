@@ -295,7 +295,7 @@ class Test_Migration extends WP_UnitTestCase
                     'template' => 'default-template',
                     'name' => 'Default Template #3',
                     'filename' => 'form-{form_id}-entry-{entry_id}',
-                    'pdf_size' => 'letter',
+                    'pdf_size' => 'LETTER',
                     'format' => 'PDFA1B',
                     'orientation' => 'landscape',
                     'rtl' => 'Yes',
@@ -316,7 +316,7 @@ class Test_Migration extends WP_UnitTestCase
                         '55598a8994685',
                     ),
 
-                    'pdf_size' => 'custom',
+                    'pdf_size' => 'CUSTOM',
                     'custom_pdf_size' => array(50, 200, 'millimeters'),
                     'format' => 'PDFX1A',
                     

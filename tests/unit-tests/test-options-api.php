@@ -925,7 +925,7 @@ class Test_Options_API extends WP_UnitTestCase
 		$wp_settings_errors = array();
 
 		/* Setup data needed for our test */
-		$input = array( 'default_pdf_size' => 'custom' );
+		$input = array( 'default_pdf_size' => 'CUSTOM' );
 
 		$settings = array(
 			'required' => true,

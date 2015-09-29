@@ -758,7 +758,7 @@
 
 					/* Add our change event */
 					$paperSize.off('change').change(function() {
-						if($(this).val() === 'custom') {
+						if($(this).val() === 'CUSTOM') {
 							$customPaperSize.fadeIn();
 						} else {
 							$customPaperSize.fadeOut();

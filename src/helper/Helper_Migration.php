@@ -249,10 +249,12 @@ class Helper_Migration {
                 $node['pdf_size'][2]     = 'millimeters';
                 
                 $node['custom_pdf_size'] = $node['pdf_size'];
-                $node['pdf_size']        = 'custom';
+                $node['pdf_size']        = 'CUSTOM';
             } else {
                 unset( $node['pdf_size'] );
             }
+        } else if ( isset( $node['pdf_size'] ) && ! is_array ( $node['pdf_size'] ) ) {
+        	$node['pdf_size'] = mb_strtoupper( $node['pdf_size'] );
         }
 
 		/* Loop through each array key */

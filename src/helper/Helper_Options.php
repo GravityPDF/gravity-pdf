@@ -704,11 +704,11 @@ class Helper_Options implements Helper_Interface_Filters {
 		return apply_filters( 'gfpdf_get_paper_size', array(
 			__( 'Common Sizes', 'gravity-forms-pdf-extended' ) => array(
 				'A4'        => __( 'A4 (210 x 297mm)', 'gravity-forms-pdf-extended' ),
-				'letter'    => __( 'Letter (8.5 x 11in)', 'gravity-forms-pdf-extended' ),
-				'legal'     => __( 'Legal (8.5 x 14in)', 'gravity-forms-pdf-extended' ),
-				'ledger'    => __( 'Ledger / Tabloid (11 x 17in)', 'gravity-forms-pdf-extended' ),
-				'executive' => __( 'Executive (7 x 10in)', 'gravity-forms-pdf-extended' ),
-				'custom'    => __( 'Custom Paper Size', 'gravity-forms-pdf-extended' ),
+				'LETTER'    => __( 'Letter (8.5 x 11in)', 'gravity-forms-pdf-extended' ),
+				'LEGAL'     => __( 'Legal (8.5 x 14in)', 'gravity-forms-pdf-extended' ),
+				'LEDGER'    => __( 'Ledger / Tabloid (11 x 17in)', 'gravity-forms-pdf-extended' ),
+				'EXECUTIVE' => __( 'Executive (7 x 10in)', 'gravity-forms-pdf-extended' ),
+				'CUSTOM'    => __( 'Custom Paper Size', 'gravity-forms-pdf-extended' ),
 			),
 
 			__( '"A" Sizes', 'gravity-forms-pdf-extended' ) => array(
@@ -1264,7 +1264,7 @@ class Helper_Options implements Helper_Interface_Filters {
 				break;
 
 				case 'paper_size':
-					if ( isset($input['default_pdf_size']) && $input['default_pdf_size'] === 'custom' ) {
+					if ( isset($input['default_pdf_size']) && $input['default_pdf_size'] === 'CUSTOM' ) {
 			            if ( sizeof( array_filter( $value ) ) !== 3 ) {
 							/* throw error */
 							add_settings_error( 'gfpdf-notices', $key, __( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
