@@ -200,24 +200,6 @@ class Model_Actions extends Helper_Abstract_Model {
 				wp_enqueue_script( 'gfpdf_js_v3_migration' );
 			}
 
-			//$current_multisite_path = $this->data->multisite_template_location;
-
-			/* Loop through the sites and only migrate those that need it */
-			//foreach( $sites as $site ) {
-			//	$site_config = $this->data->template_location . '/' . $site['blog_id'] . '/';
-
-			//	if( is_file( $site_config . 'configuration.php' ) ) {
-					/* Switch to the blog and update the multisite template path before beginning the migration */
-				/*	switch_to_blog( $site['blog_id'] );
-					$this->data->multisite_template_location = $site_config;
-					$this->migrate_v3( $migration, $site_config );
-				}
-
-				/* Restore the current multisite details */
-				/*restore_current_blog();
-				$this->data->multisite_template_location = $current_multisite_path;*/
-			/*}*/
-
 		} else if( is_file( $this->data->template_location . 'configuration.php' ) ) {
 				$this->migrate_v3( $this->data->template_location );
 		}
@@ -344,6 +326,11 @@ class Model_Actions extends Helper_Abstract_Model {
 			echo json_encode( array( 'results' => $return ) );
 			wp_die();
 		}
+
+		
+		/* Setup correct migration settings */
+		switch_to_blog( $blog_id );
+		$this->data->multisite_template_location = $path;
 
 		/* Do migration */
 		if( $this->migrate_v3( $path ) ) {

@@ -317,8 +317,23 @@ class Model_Install extends Helper_Abstract_Model {
 	public function uninstall_plugin() {
 		$this->log->addNotice( 'Uninstall Gravity PDF.' );
 
-		$this->remove_plugin_options();
-		$this->remove_plugin_form_settings();
+		/* Clean up database */
+		if( is_multisite() ) {
+			$sites = wp_get_sites();
+
+			foreach( $sites as $site ) {
+				switch_to_blog( $site['blog_id'] );
+				$this->remove_plugin_options();
+				$this->remove_plugin_form_settings();
+			}
+			restore_current_blog();
+
+		} else {
+			$this->remove_plugin_options();
+			$this->remove_plugin_form_settings();
+		}
+		
+		/* Remove folder structure and deactivate */
 		$this->remove_folder_structure();
 		$this->deactivate_plugin();
 	}

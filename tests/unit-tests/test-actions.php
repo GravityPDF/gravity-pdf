@@ -229,7 +229,7 @@ class Test_Actions extends WP_UnitTestCase
             );
         } );
 
-        $_POST['action'] = 'gfpdf_test_action';
+        $_POST['gfpdf_action'] = 'gfpdf_test_action';
 
         /* Fail capability check */
         try {
@@ -303,11 +303,20 @@ class Test_Actions extends WP_UnitTestCase
     public function test_migration_condition() {
         global $gfpdf;
 
+        $path = ( is_multisite() ) ? $this->data->multisite_template_location : $this->data->template_location;
+  
+        /* Multisite can only be run by super admins */
+        if( is_multisite() ) {
+            $user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+            grant_super_admin( $user_id );
+            wp_set_current_user( $user_id );
+        }
+
         $this->assertFalse( $this->model->migration_condition() );
-        touch( $this->data->template_location . 'configuration.php' );
+        touch( $path . 'configuration.php' );
         $this->assertTrue( $this->model->migration_condition() );
 
-        unlink( $this->data->template_location . 'configuration.php' );
+        unlink( $path . 'configuration.php' );
 
     }
 
