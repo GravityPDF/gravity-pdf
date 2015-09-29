@@ -133,8 +133,9 @@ class Helper_Migration {
             return false;
 		}
 
-		/* Convert our v3 config into our v4 format */
+		/* Convert our v3 config into our v4 format and merge in the defaults */
 		$v4_config = $this->convert_v3_to_v4( $raw_config );
+		$v4_config = $this->process_default_configuration( $v4_config );
 
 		/* Index configuration by form ID */
 		$config = $this->process_v3_configuration( $v4_config );
@@ -319,6 +320,49 @@ class Helper_Migration {
 		}
 
 		return $config_by_fid;
+	}
+
+	/**
+	 * Add the default configuration to any missing forms
+	 *
+	 * @param  Array $raw_config   The semi-processed configuration
+	 * @return Array
+	 * @since  4.0
+	 */
+	private function process_default_configuration( $raw_config ) {
+		 
+		/* Only handle when enabled */
+		if ( ( ! defined( 'GFPDF_SET_DEFAULT_TEMPLATE' ) || GFPDF_SET_DEFAULT_TEMPLATE === true ) && sizeof( $raw_config['default'] ) > 0 ) {
+
+			/* Get all forms */
+			$forms = $this->form->get_forms();
+
+			/* Create an index of current form IDs */
+			$form_ids = array();
+			foreach( $raw_config['config'] as $config ) {
+
+				if( is_array( $config['form_id'] ) ) {
+					foreach( $config['form_id'] as $fid ) {
+						$form_ids[ $fid ] = 1;
+					}
+				} else {
+					$form_ids[ $config['form_id'] ] = 1;
+				}
+			}
+
+			/* Loop through all forms and merge in defaults */
+			foreach( $forms as $form ) {
+
+				/* If nothing exists we'll merge in our default parameters */
+				if( ! isset( $form_ids[ $form['id'] ] ) ) {
+
+					$new_config             = array_merge( $raw_config['default'], array( 'form_id' => $form['id'] ) );
+					$raw_config['config'][] = $new_config;
+				}
+			}
+		}
+
+		 return $raw_config;
 	}
 
 	/**
