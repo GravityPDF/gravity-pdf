@@ -477,7 +477,7 @@ class Helper_Misc
 
 
 		/* Multisite Location */
-		if ( is_file( $this->data->multisite_template_location . 'images/' . $template ) ) {
+		if ( is_multisite() && is_file( $this->data->multisite_template_location . 'images/' . $template ) ) {
 			return $this->data->multisite_template_location_url . 'images/' . $template;
 		}
 
