@@ -877,12 +877,36 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		foreach ( $custom_fonts as $font ) {
 
-			$fonts[ $font['shortname'] ] = array_filter(array(
+			$fonts[ $font['shortname'] ] = array_filter( array(
 				'R'          => basename( $font['regular'] ),
 				'B'          => basename( $font['bold'] ),
 				'I'          => basename( $font['italics'] ),
 				'BI'         => basename( $font['bolditalics'] ),
 			));
+		}
+
+		return $fonts;
+	}
+
+	/**
+	 * Read all fonts from our fonts directory and auto-load them into mPDF if they are not found
+	 * @param Array $fonts The registered fonts
+	 * @since 4.0
+	 */
+	public function add_unregistered_fonts_to_mPDF( $fonts ) {
+
+		foreach( glob( $this->data->template_font_location . '*.{otf,ttf}', GLOB_BRACE ) as $font ) {
+			
+			/* Get font shortname */
+			$font_name = basename( $font );
+			$short_name = $this->options->get_font_short_name( substr( $font_name, 0, -4 ) );
+
+			/* Check if it exists already, otherwise add it */
+			if( ! isset( $fonts[ $short_name ] ) ) {
+				$fonts[ $short_name ] = array(
+					'R' => $font_name,
+				);
+			}
 		}
 
 		return $fonts;

@@ -155,6 +155,7 @@ class Test_PDF extends WP_UnitTestCase
 		$this->assertSame( 10, has_filter( 'mpdf_fontdata_path', array( $this->model, 'mpdf_tmp_path' ) ) );
 		$this->assertSame( 10, has_filter( 'mpdf_current_font_path', array( $this->model, 'set_current_pdf_font' ) ) );
 		$this->assertSame( 10, has_filter( 'mpdf_font_data', array( $this->model, 'register_custom_font_data_with_mPDF' ) ) );
+		$this->assertSame( 20, has_filter( 'mpdf_font_data', array( $this->model, 'add_unregistered_fonts_to_mPDF' ) ) );
 
 		$this->assertSame( 10, has_filter( 'gfpdf_pdf_html_output', array( $gfpdf->misc, 'do_mergetags' ) ) );
 		$this->assertSame( 10, has_filter( 'gfpdf_pdf_html_output', 'do_shortcode' ) );
@@ -1040,6 +1041,22 @@ class Test_PDF extends WP_UnitTestCase
 		$this->assertEquals( 'arialB', $results['arial']['B'] );
 		$this->assertEquals( 'arialI', $results['arial']['I'] );
 		$this->assertEquals( 'arialBI', $results['arial']['BI'] );
+	}
+
+	/**
+	 * Check that any unregistred fonts will be autoloaded into mPDF
+	 * @since 4.0
+	 */
+	public function test_add_unregistered_fonts_to_mPDF() {
+		global $gfpdf;
+
+		touch( $gfpdf->data->template_font_location . 'calibri.ttf' );
+		touch( $gfpdf->data->template_font_location . 'aladin.otf' );
+
+		$fonts = $this->model->add_unregistered_fonts_to_mPDF( array() );
+		
+		$this->assertArrayHasKey( 'calibri', $fonts );
+		$this->assertArrayHasKey( 'aladin', $fonts );
 	}
 
 	/**

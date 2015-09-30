@@ -160,6 +160,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		/* Change mPDF settings */
 		add_filter( 'mpdf_current_font_path', array( $this->model, 'set_current_pdf_font' ), 10, 2 );
 		add_filter( 'mpdf_font_data', array( $this->model, 'register_custom_font_data_with_mPDF' ) );
+		add_filter( 'mpdf_font_data', array( $this->model, 'add_unregistered_fonts_to_mPDF' ), 20 );
 
 		/* Process mergetags and shortcodes in PDF */
 		add_filter( 'gfpdf_pdf_html_output', array( $this->misc, 'do_mergetags' ), 10, 3 );
