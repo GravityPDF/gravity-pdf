@@ -174,7 +174,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				foreach ( $settings as $key => &$group ) {
 					foreach ( $group as $id => &$item ) {
 						if ( $item['id'] === $error['code'] ) {
-							$item['class'] = (isset($item['class'])) ? $item['class'] . ' gfield_error' : 'gfield_error';
+							$item['class'] = ( isset( $item['class'] ) ) ? $item['class'] . ' gfield_error' : 'gfield_error';
 							$found = true;
 							break;
 						}
