@@ -153,6 +153,8 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 		add_filter( 'gfpdf_form_settings_sanitize_text',  array( $this->options, 'sanitize_trim_field' ), 15, 2 );
 		add_filter( 'gfpdf_form_settings_sanitize_hidden',  array( $this->model, 'decode_json' ), 10, 2 );
 
+		add_filter( 'gfpdf_skip_highlight_errors', array( $this->model, 'check_custom_size_error_highlighting' ), 10, 3 );
+
 		/* Store our TinyMCE Options */
 		add_filter( 'tiny_mce_before_init', array( $this, 'store_tinymce_settings' ) );
 	}

@@ -336,14 +336,21 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			if ( isset($field['required']) && $field['required'] === true ) {
 
 				/* Get field value */
-				$value = (isset($input[$field['id']])) ? $input[$field['id']] : '';
+				$value = ( isset( $input[ $field['id'] ] ) ) ? $input[ $field['id'] ] : '';
 
 				/* Set a class if it doesn't exist */
-				$field['class'] = (isset($field['class'])) ? $field['class'] : '';
+				$field['class'] = ( isset( $field['class'] ) ) ? $field['class'] : '';
+
+				/* Add way to skip the highlighting of errors */
+				$skip_errors = apply_filters( 'gfpdf_skip_highlight_errors', false, $field, $input );
+
+				if( $skip_errors ) {
+					continue;
+				}
 
 				/* If the value is an array ensure all items have values */
 				if ( is_array( $value ) ) {
-					
+
 					$size = sizeof( $value );
 					if ( sizeof( array_filter( $value ) ) !== $size ) {
 						$field['class'] .= ' gfield_error' ;
@@ -360,6 +367,28 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		}
 
 		return $fields;
+	}
+
+	/**
+	 * Do further checks to see if the custom PDF size should in fact be marked as an error
+	 * Because it is dependant on the paper size option in some cases it shouldn't be highlighted
+	 * @param  Boolean $skip  Whether to skip error highlighting checks
+	 * @param  Array $field The Gravity Form field
+	 * @param  Array $input The user input
+	 * @return Boolean
+	 * @since  4.0
+	 */
+	public function check_custom_size_error_highlighting( $skip, $field, $input ) {
+
+		if( $field['id'] == 'custom_pdf_size' ) {
+
+			/* Skip if not currently being shown */
+			if( $input['pdf_size'] !== 'CUSTOM' ) {
+				return true;
+			}
+		}
+
+		return $skip;
 	}
 
 	/**
