@@ -146,6 +146,22 @@ class Test_API extends WP_UnitTestCase
 
         /* Verify cleanup */
         $this->assertSame( 0, sizeof( GPDFAPI::get_plugin_settings() ) );
+    }
 
+    /**
+     * Ensure we generate the product table correctly
+     * @since 4.0
+     */
+    public function test_product_table() {
+
+        $entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+
+        $table = GPDFAPI::product_table( $entry, true );
+        $this->assertNotFalse( strpos( $table, '<table class="entry-products' ) );
+
+        ob_start();
+        GPDFAPI::product_table( $entry );
+        $table = ob_get_clean();
+        $this->assertNotFalse( strpos( $table, '<table class="entry-products' ) );
     }
 }

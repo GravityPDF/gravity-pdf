@@ -149,7 +149,7 @@ class GPDFAPI {
 			return new GFPDF\Model\Model_PDF( $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
 		}
 
-		return null;
+		return new WP_Error( 'invalid_type', __( 'The $type parameter is invalid. Only "view" and "model" are accepted', 'gravity-forms-pdf-extended' ) );
 	}
 
 	/**
@@ -280,5 +280,25 @@ class GPDFAPI {
 	public static function delete_plugin_option( $key ) {
 		$options = self::get_options_class();
 		return $options->delete_option( $key );
+	}
+
+
+	/**
+	 * Generates the current entry's HTML product table
+	 * @param  Array $entry The current entry
+	 * @param  Boolean $return Whether to ourput or return the HTML
+	 * @return Mixed       The product table or null
+	 * @since  4.0
+	 */
+	public static function product_table( $entry, $return = false ) {
+		global $gfpdf;
+
+		$products = new GFPDF\Helper\Fields\Field_Products( new GF_Field(), $entry, $gfpdf->form, $gfpdf->misc );
+
+		if( $return ) {
+			return $products->html();
+		}
+		
+		echo $products->html();
 	}
 }

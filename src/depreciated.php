@@ -364,10 +364,7 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 	 * @since 3.0
 	 */
 	public static function product_table( $form, $lead ) {
-		global $gfpdf;
-
-		$products = new Field_Products( new GF_Field(), $lead, $gfpdf->form, $gfpdf->misc );
-		echo $products->html();
+		GPDFAPI::product_table( $lead );
 	}
 
 	/**
