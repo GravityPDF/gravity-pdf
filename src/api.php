@@ -285,8 +285,8 @@ class GPDFAPI {
 
 	/**
 	 * Generates the current entry's HTML product table
-	 * @param  Array $entry The current entry
-	 * @param  Boolean $return Whether to ourput or return the HTML
+	 * @param  Array $entry The Gravity Form entry
+	 * @param  Boolean $return Whether to output or return the HTML
 	 * @return Mixed       The product table or null
 	 * @since  4.0
 	 */
@@ -300,5 +300,42 @@ class GPDFAPI {
 		}
 		
 		echo $products->html();
+	}
+
+	/**
+	 * Generates a likert table
+	 * @param  Array  $entry    The Gravity Form entry
+	 * @param  Integer  $field_id The likert field ID
+	 * @param  Boolean $return   Whether to output or return the HTML
+	 * @return Mixed 	The likert table or null
+	 * @since  4.0
+	 */
+	public static function likert_table( $entry, $field_id, $return = false ) {
+		global $gfpdf;
+
+		/* Get our form */
+		$form = $gfpdf->form->get_form( $entry['form_id'] );
+
+		/* Check for errors */
+		if( is_wp_error( $form ) ) {
+			return '';
+		}
+
+		/* Find our field ID, if any */
+		foreach ( $form['fields'] as $field ) {
+
+			if ( $field->id == $field_id && $field->inputType == 'likert' ) {
+				
+				/* Output our likert */
+				$likert = new GFPDF\Helper\Fields\Field_Likert( $field, $entry, $gfpdf->form, $gfpdf->misc );
+				
+				if( $return ) {
+					return $likert->html();
+				}
+
+				echo $likert->html();
+				break;
+			}
+		}
 	}
 }

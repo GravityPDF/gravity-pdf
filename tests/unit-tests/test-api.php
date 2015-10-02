@@ -164,4 +164,20 @@ class Test_API extends WP_UnitTestCase
         $table = ob_get_clean();
         $this->assertNotFalse( strpos( $table, '<table class="entry-products' ) );
     }
+
+    /**
+     * Ensure we generate the likert table correctly
+     * @since 4.0
+     */
+    public function test_likert_table() {
+        $entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+
+        $table = GPDFAPI::likert_table( $entry, 26, true );
+        $this->assertNotFalse( strpos( $table, "<td class='gsurvey-likert-choice-label'>" ) );
+
+        ob_start();
+        GPDFAPI::likert_table( $entry, 26 );
+        $table = ob_get_clean();
+        $this->assertNotFalse( strpos( $table, "<td class='gsurvey-likert-choice-label'>" ) );
+    }
 }

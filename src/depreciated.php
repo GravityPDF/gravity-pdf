@@ -376,18 +376,7 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 	 * @since 3.0
 	 */
 	public static function get_likert( $form, $lead, $field_id ) {
-		global $gfpdf;
-
-		/* Find our field ID, if any */
-		foreach ( $form['fields'] as $field ) {
-			if ( $field->id == $field_id ) {
-
-				/* Output our likert */
-				$likert = new Field_Likert( $field, $lead, $gfpdf->form, $gfpdf->misc );
-				echo $likert->html();
-				return;
-			}
-		}
+		return GPDFAPI::likert_table( $lead, $field_id, true );
 	}
 }
 
