@@ -132,6 +132,7 @@ class Test_PDF extends WP_UnitTestCase
 		$this->assertSame( 10, has_action( 'gform_entries_first_column_actions', array( $this->model, 'view_pdf_entry_list' ) ) );
 		$this->assertSame( 10, has_action( 'gform_entry_info', array( $this->model, 'view_pdf_entry_detail' ) ) );
 		$this->assertSame( 10, has_action( 'gform_after_submission', array( $this->model, 'maybe_save_pdf' ) ) );
+		$this->assertSame( 9999, has_action( 'gform_after_submission', array( $this->model, 'cleanup_pdf' ) ) );
 		$this->assertSame( 10, has_action( 'gfpdf_cleanup_tmp_dir', array( $this->model, 'cleanup_tmp_dir' ) ) );
 	}
 
@@ -978,7 +979,29 @@ class Test_PDF extends WP_UnitTestCase
 		foreach ( $files as $file => $modified ) {
 			@unlink( $tmp . $file, $modified );
 		}
+	}
 
+	/**
+	 * Check that our PDF is cleaned up after the Gravity Forms entry save process
+	 * @since 4.0
+	 */
+	public function test_cleanup_pdf() {
+		global $gfpdf;
+
+		/* Setup some test data */
+		$results  = $this->create_form_and_entries();
+		$entry    = $results['entry'];
+		$form     = $results['form'];
+		$file     = $gfpdf->data->template_tmp_location . "{$form['id']}{$entry['id']}/test-{$form['id']}.pdf";
+
+		wp_mkdir_p( dirname( $file ) );
+		touch( $file );
+
+		$this->assertFileExists( $file );
+
+		$this->model->cleanup_pdf( $entry, $form );
+
+		$this->assertFileNotExists( $file );
 	}
 
 	/**

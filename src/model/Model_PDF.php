@@ -791,6 +791,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since  4.0
 	 */
 	public function does_pdf_exist( Helper_PDF $pdf ) {
+
 		if ( is_file( $pdf->get_path() . $pdf->get_filename() ) ) {
 			return true;
 		}
@@ -830,6 +831,49 @@ class Model_PDF extends Helper_Abstract_Model {
 					} else {
 						if ( ! unlink( $file ) ) {
 							$this->log->addError( 'Filesystem Delete Error', array( 'file' => $file ) );
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Remove the generated PDF from the server to save disk space
+	 * @internal  In future we may give the option to cache PDFs to save on processing power
+	 * @param  Array $entry The GF Entry Data
+	 * @param  Array $form  The Gravity Form
+	 * @return void
+	 * @since 4.0
+	 * @todo Add caching support and make software more performant
+	 */
+	public function cleanup_pdf( $entry, $form ) {
+
+		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : array();
+
+		if ( sizeof( $pdfs ) > 0 ) {
+
+			/* set up classes */
+			$controller  = $this->getController();
+
+			/* loop through each PDF config */
+			foreach ( $pdfs as $pdf ) {
+				$settings = $this->options->get_pdf( $entry['form_id'], $pdf['id'] );
+
+				/* Only generate if the PDF wasn't during the notification process */
+				if ( ! is_wp_error( $settings ) ) {
+					$pdf_generator = new Helper_PDF( $entry, $settings, $this->form, $this->data );
+					$pdf_generator->set_filename( $this->get_pdf_name( $settings, $entry ) );
+
+					if ( $this->does_pdf_exist( $pdf_generator ) ) {
+						try {
+							$this->misc->rmdir( $pdf_generator->get_path() );
+						} catch (Exception $e) {
+							
+							$this->log->addError( 'Cleanup PDF Error', array(
+								'pdf'       => $pdf,
+								'exception' => $e,
+							) );
 						}
 					}
 				}
