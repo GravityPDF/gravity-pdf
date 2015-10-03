@@ -11,7 +11,8 @@
 
     "require-dev": {
         "satooshi/php-coveralls": "0.7.x-dev",
-        "mouf/nodejs-installer": "~1.0"
+        "mouf/nodejs-installer": "~1.0",
+        "phpunit/phpunit": "~4.0"
     },
 
     "autoload": {

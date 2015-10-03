@@ -1,5 +1,6 @@
 {
   "name": "gravity-pdf",
+  "private": true,
   "main": "gulpfile.js",
   "dependencies": {},
   "devDependencies": {
