@@ -3,7 +3,7 @@ Gravity PDF
 
 [![Build Status](https://travis-ci.org/GravityPDF/gravity-forms-pdf-extended.svg?branch=premium)](https://travis-ci.org/GravityPDF/gravity-forms-pdf-extended) [![Coverage Status](https://coveralls.io/repos/GravityPDF/gravity-forms-pdf-extended/badge.svg?branch=premium&service=github)](https://coveralls.io/github/GravityPDF/gravity-forms-pdf-extended?branch=premium)
 
-Gravity PDF is a Wordpress plugin that allows you to save/view/download a PDF from the front- and back-end, and automate PDF creation on form submission.
+Gravity PDF is a WordPress plugin that allows you to save/view/download a PDF from the front- and back-end, and automate PDF creation on form submission.
 
 Find out more at [https://gravitypdf.com](http://gravitypdf.com/).
 
