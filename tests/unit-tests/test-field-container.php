@@ -202,6 +202,8 @@ class Test_Field_Container extends WP_UnitTestCase
 		$field->cssClass = 'gf_left_third';
 		$field->type = 'html';
 
-		$this->assertEquals( '</div>', $this->generate( $field ) );
+		$this->generate( $field );
+
+		$this->assertEquals( ' ', $field->cssClass );
 	}
 }
