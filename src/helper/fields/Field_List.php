@@ -201,6 +201,9 @@ class Field_List extends Helper_Abstract_Fields
 			$value = array( $value );
 		}
 
+		/* Remove empty rows */
+		$value = $this->remove_empty_list_rows( $value );
+
 		$this->cache( $value );
 
 		return $this->cache();
