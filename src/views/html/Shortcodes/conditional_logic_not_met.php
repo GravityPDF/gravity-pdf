@@ -1,7 +1,7 @@
 <?php
 
 /**
- * No Entry ID for Shortcode
+ * PDF Conditional Logic not met
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
@@ -36,4 +36,4 @@ if (! defined('ABSPATH')) {
 
 ?>
 
-<pre class="gravitypdf-error"><?php _e('No Gravity Form entry ID passed to Gravity PDF. Ensure you pass the entry ID via the confirmation url query string – using either "entry" or "lid" as the query string name – or by passing an ID directly to the shortcode.', 'gravity-forms-pdf-extended' ); ?> <small><?php _e( '(Admin Only Message)', 'gravity-forms-pdf-extended' ); ?></small></pre>
+<pre class="gravitypdf-error"><?php _e('PDF link not displayed because conditional logic requirements have not been met.', 'gravity-forms-pdf-extended' ); ?> <small><?php _e( '(Admin Only Message)', 'gravity-forms-pdf-extended' ); ?></small></pre>

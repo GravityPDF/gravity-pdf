@@ -9,6 +9,8 @@ use GFPDF\Helper\Helper_Options;
 
 use Psr\Log\LoggerInterface;
 
+use GFCommon;
+
 /**
  * PDF Shortcode Model
  *
@@ -97,6 +99,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		$this->log->addNotice( 'Generating Shortcode' );
 
 		$controller = $this->getController();
+		$has_view_permissions = $this->form->has_capability( 'gravityforms_view_entries' );
 
 		/* merge in any missing defaults */
 		$attributes = shortcode_atts(array(
@@ -116,17 +119,17 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		}
 
 		/* Check if we have an entry ID, otherwise check the GET and POST data */
-		if ( empty($attributes['entry']) ) {
-			if ( isset($_GET['lid']) || isset($_GET['entry']) ) {
-				$attributes['entry'] = (isset($_GET['lid'])) ? (int) $_GET['lid'] : (int) $_GET['entry'];
+		if ( empty( $attributes['entry'] ) ) {
+			if ( isset( $_GET['lid'] ) || isset( $_GET['entry'] ) ) {
+				$attributes['entry'] = ( isset( $_GET['lid'] ) ) ? (int) $_GET['lid'] : (int) $_GET['entry'];
 			} else {
 
 				/* Only display error to users with appropriate permissions */
-				if( $this->form->has_capability( 'gravityforms_view_entries' ) ) {
+				if( $has_view_permissions ) {
 					return $controller->view->no_entry_id();
-				} else {
-					return '';
 				}
+				
+				return '';
 			}
 		}
 
@@ -137,11 +140,30 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		if ( is_wp_error( $config ) ) {
 
 			/* Only display error to users with appropriate permissions */
-			if( $this->form->has_capability( 'gravityforms_view_entries' ) ) {
+			if( $has_view_permissions ) {
 				return $controller->view->invalid_pdf_config();
-			} else {
-				return '';
 			}
+			
+			return '';
+		}
+
+		/* Check if the PDF is enabled AND the conditional logic (if any) has been met */
+		if ( $config['active'] !== true ) {
+			/* Only display error to users with appropriate permissions */
+			if( $has_view_permissions ) {
+				return $controller->view->pdf_not_active();
+			}
+			
+			return '';
+		}
+
+		if( isset( $config['conditionalLogic'] ) && ! GFCommon::evaluate_conditional_logic( $config['conditionalLogic'], $this->form->get_form( $entry['form_id'] ), $entry ) ) {
+			/* Only display error to users with appropriate permissions */
+			if( $has_view_permissions ) {
+				return $controller->view->conditional_logic_not_met();
+			}
+			
+			return '';
 		}
 
 		/* Everything looks valid so let's get the URL */

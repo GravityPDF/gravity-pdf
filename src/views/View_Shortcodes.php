@@ -75,6 +75,24 @@ class View_Shortcodes extends Helper_Abstract_View
 	}
 
 	/**
+	 * Shortcode Error: PDF configuration not active
+	 * @return String The error message
+	 * @since 4.0
+	 */
+	public function pdf_not_active() {
+		return $this->load( 'pdf_not_active', array(), false );
+	}
+
+	/**
+	 * Shortcode Error: PDF Conditional Logic not met
+	 * @return String The error message
+	 * @since 4.0
+	 */
+	public function conditional_logic_not_met() {
+		return $this->load( 'conditional_logic_not_met', array(), false );
+	}
+
+	/**
 	 * Generate the Gravity PDF link
 	 * @param  Array $attr The parameters
 	 * @return String       The Shortcode Markup

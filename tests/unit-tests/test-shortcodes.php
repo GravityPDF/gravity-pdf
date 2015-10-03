@@ -121,22 +121,23 @@ class Test_Shortcode extends WP_UnitTestCase
 
         /* Test for error */
         $this->assertNotFalse( strpos( $this->model->gravitypdf( array( 'entry' => $entry['id'] ) ), '<pre class="gravitypdf-error">' ) );
+        $this->assertNotFalse( strpos( $this->model->gravitypdf( array( 'entry' => $entry['id'], 'id' => '555ad84787d7e' ) ), '<pre class="gravitypdf-error">' ) ); /* conditional logic error */
 
         /* Test for actual result */
-        $this->assertNotFalse( strpos( $this->model->gravitypdf( array( 'entry' => $entry['id'], 'id' => '555ad84787d7e' ) ), 'Download PDF' ) );
+        $this->assertNotFalse( strpos( $this->model->gravitypdf( array( 'entry' => $entry['id'], 'id' => '556690c67856b' ) ), 'Download PDF' ) );
 
         /* Test for configured results */
-        $this->assertNotFalse( strpos( $this->model->gravitypdf( array( 'entry' => $entry['id'], 'id' => '555ad84787d7e', 'text' => 'View PDF' ) ), 'View PDF' ) );
-        $this->assertFalse( strpos( $this->model->gravitypdf( array( 'entry' => $entry['id'], 'id' => '555ad84787d7e', 'type' => 'view' ) ), 'action=download' ) );
-        $this->assertNotFalse( strpos( $this->model->gravitypdf( array( 'entry' => $entry['id'], 'id' => '555ad84787d7e' ) ), 'action=download' ) );
-        $this->assertNotFalse( strpos( $this->model->gravitypdf( array( 'entry' => $entry['id'], 'id' => '555ad84787d7e', 'classes' => 'my-pdf-download-link' ) ), 'my-pdf-download-link' ) );
+        $this->assertNotFalse( strpos( $this->model->gravitypdf( array( 'entry' => $entry['id'], 'id' => '556690c67856b', 'text' => 'View PDF' ) ), 'View PDF' ) );
+        $this->assertFalse( strpos( $this->model->gravitypdf( array( 'entry' => $entry['id'], 'id' => '556690c67856b', 'type' => 'view' ) ), 'action=download' ) );
+        $this->assertNotFalse( strpos( $this->model->gravitypdf( array( 'entry' => $entry['id'], 'id' => '556690c67856b' ) ), 'action=download' ) );
+        $this->assertNotFalse( strpos( $this->model->gravitypdf( array( 'entry' => $entry['id'], 'id' => '556690c67856b', 'classes' => 'my-pdf-download-link' ) ), 'my-pdf-download-link' ) );
 
         /* Test for entry URL loading */
         $_GET['lid'] = $entry['id'];
-        $this->assertNotFalse( strpos( $this->model->gravitypdf( array('id' => '555ad84787d7e' ) ), 'Download PDF' ) );
+        $this->assertNotFalse( strpos( $this->model->gravitypdf( array('id' => '556690c67856b' ) ), 'Download PDF' ) );
 
         $_GET['lid'] = '5000';
-        $this->assertNotFalse( strpos( $this->model->gravitypdf( array('id' => '555ad84787d7e' ) ), '<pre class="gravitypdf-error">' ) );
+        $this->assertNotFalse( strpos( $this->model->gravitypdf( array('id' => '556690c67856b' ) ), '<pre class="gravitypdf-error">' ) );
     }
 
     /**
@@ -293,6 +294,22 @@ class Test_Shortcode extends WP_UnitTestCase
      */
     public function test_invalid_pdf_config() {
         $this->assertNotFalse( strpos( $this->view->invalid_pdf_config(), 'Could not get Gravity PDF configuration' ) );
+    }
+
+    /**
+     * Check our inactive PDF view displays correctly
+     * @since 4.0
+     */
+    public function test_pdf_not_active() {
+        $this->assertNotFalse( strpos( $this->view->pdf_not_active(), 'PDF link not displayed because PDF is inactive.' ) );
+    }
+
+    /**
+     * Check our failed conditional logic view displays correctly
+     * @since 4.0
+     */
+    public function test_conditional_logic_not_met() {
+        $this->assertNotFalse( strpos( $this->view->conditional_logic_not_met(), 'PDF link not displayed because conditional logic requirements have not been met.' ) );
     }
 
     /**
