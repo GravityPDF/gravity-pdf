@@ -895,21 +895,23 @@
 
 				var $table             = $('#pdf-general-security');
 				var $adminRestrictions = $table.find('input[name="gfpdf_settings[limit_to_admin]"]');
-				var $userRestrictions  = $table.find('input[name="gfpdf_settings[limit_to_user]"]');
 				
 
 				/*
 				 * Add change event to admin restrictions to show/hide dependant fields
 				 */
 				$adminRestrictions.change(function() {
-					if($(this).val() === 'Yes') {
-						/* hide user restrictions and logged out user timeout */
-						$table.find('tr:nth-child(3)').hide();
-					} else {
-						/* hide user restrictions and logged out user timeout */
-						$table.find('tr:nth-child(3)').show();
+					
+					if( $(this).is(':checked') )  {
+						if($(this).val() === 'Yes') {
+							/* hide user restrictions and logged out user timeout */
+							$table.find('tr:nth-child(3)').hide();
+						} else {
+							/* hide user restrictions and logged out user timeout */
+							$table.find('tr:nth-child(3)').show();
+						}
 					}
-				});
+				}).trigger('change');
 
 				/* setup advanced options */
 				this.setup_advanced_options();
