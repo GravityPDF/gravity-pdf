@@ -299,6 +299,7 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 					'legacy_css' => true,
 					'html_field' => $show_html,
 					'page_names' => $show_page_name,
+					'show_title' => true,
 				),
 			);
 
@@ -336,6 +337,7 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 
 		/* Set up any legacy configuration options needed */
 		$config['meta']['legacy_css'] = true;
+		$config['meta']['show_title'] = true;
 		
 		$model = new Model_PDF( $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
 		$view  = new View_PDF( array(), $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
