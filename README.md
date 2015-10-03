@@ -12,14 +12,14 @@ Find out more at [https://gravitypdf.com](http://gravitypdf.com/).
 1. Clone the repository using `git clone https://github.com/GravityPDF/gravity-forms-pdf-extended/`
 1. Install Composer (skip this step if already installed). Here are instructions [for the Linux / Mac installation](https://getcomposer.org/doc/00-intro.md#installation-linux-unix-osx) and the [Windows installation](https://getcomposer.org/doc/00-intro.md#installation-windows).
 1. Open your terminal / command prompt to the Gravity PDF root directory and run `composer install`.
-1. Copy the plugin to your WordPress plugin directory (if not there already) and active the plugin.
+1. Copy the plugin to your WordPress plugin directory (if not there already) and active through your WordPress admin area.
 
 # Documentation
 
 All documentation can be found at [https://gravitypdf.com](http://gravitypdf.com/documentation/).
 
 # Contributions
-You are more than welcome to contribute to Gravity PDF but we recommend you open a new issue on GitHub and discuss your user-case before creating a pull request. We reserve the right to merge or reject the pull request at our discretion. Any additions to the plugin must have appropriate unit tests written. Modifications of the existing code base must pass all unit tests. Pull requests that don't pass unit testing or do not have the proper tests to accompany the changes will be rejected.
+You are more than welcome to contribute to Gravity PDF but we recommend you [open a new issue on GitHub](https://github.com/GravityPDF/gravity-forms-pdf-extended/issues) and discuss your use-case before creating a pull request. We reserve the right to merge or reject the pull request at our discretion. Any additions to the plugin must have appropriate unit tests written. Modifications of the existing code base must pass all unit tests. Pull requests that don't pass existing unit testing or do not have the proper tests to accompany the changes will be rejected.
 
 #### Run Unit Tests
 
