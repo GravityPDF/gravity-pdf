@@ -41,7 +41,7 @@ global $gfpdf;
 <div class="wrap about-wrap gfpdf-update-screen">
 	<h1><?php printf( __( 'Discover Gravity PDF %s', 'gravity-forms-pdf-extended' ), $args['display_version'] ); ?></h1>
 	
-  <div class="about-text"><?php _e( "Gravity PDF has been completely rebuilt with simplicity, stability and security in mind. Our team has spent over six months making a great product even greater. Discover what's new...", 'gravity-forms-pdf-extended' ); ?></div>
+  <div class="about-text"><?php _e( "Gravity PDF has been completely rebuilt with simplicity, stability and security in mind. Our team has spent over ten months making a great product even greater. Discover what's new...", 'gravity-forms-pdf-extended' ); ?></div>
 	
 	<div class="gfpdf-badge"><?php printf( __( 'Version %s', 'gravity-forms-pdf-extended' ), $args['display_version'] ); ?></div>
 
