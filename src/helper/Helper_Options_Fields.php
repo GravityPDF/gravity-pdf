@@ -146,7 +146,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 							'No'      => __( 'No', 'gravity-forms-pdf-extended' ),
 						),
 						'std'     => __( 'No', 'gravity-forms-pdf-extended' ),
-						'tooltip'    => '<h6>' . __( 'Reverse Text (RTL)', 'gravity-forms-pdf-extended' ) . '</h6>' . __( "Enable RTL if you are writing in Arabic, Hebrew, Syriac, N'ko, Thaana, Tifinar or Urdu.", 'gravity-forms-pdf-extended' ),
+						'tooltip'    => '<h6>' . __( 'Reverse Text (RTL)', 'gravity-forms-pdf-extended' ) . '</h6>' . __( "Enable RTL if you are writing in Arabic, Hebrew, Syriac, N'ko, Thaana, Tifinar, Urdu or other RTL languages.", 'gravity-forms-pdf-extended' ),
 					),
 
 					'default_action' => array(
@@ -172,7 +172,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 							'Disable' => __( 'Disable', 'gravity-forms-pdf-extended' ),
 						),
 						'std'     => 'Enable',
-						'tooltip'    => '<h6>' . __( "Show What's New Page", 'gravity-forms-pdf-extended' ) . '</h6>' . __( "When upgrading Gravity PDF we'll automatically redirect you to our What's New page so you can see the changes. Bug fix and security releases are excluded (4.0.x).", 'gravity-forms-pdf-extended' ),
+						'tooltip'    => '<h6>' . __( "Show What's New Page", 'gravity-forms-pdf-extended' ) . '</h6>' . __( "When upgrading Gravity PDF to a new major release (4.x) we'll automatically redirect you to our What's New page so you can see the changes. Bug fix and security releases are excluded (4.x.x).", 'gravity-forms-pdf-extended' ),
 					),
 				)
 			),
