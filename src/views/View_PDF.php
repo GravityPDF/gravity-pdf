@@ -403,22 +403,29 @@ class View_PDF extends Helper_Abstract_View
 	public function load_legacy_css( GF_Field $field ) {
 		static $counter = 1;
 
+		/* Because multiple PDFs can be processed at the same time and will share the same field classes we'll only update the css once */
+		if( strpos( $field->cssClass, 'gfpdf-field-processed' ) !== false ) {
+			return;
+		}
+
 		/* Add odd / even rows */
 		$field->cssClass = ($counter++ % 2) ? $field->cssClass . ' odd' : ' even';
 
 		switch ( $field->type ) {
 			case 'html':
-				$field->cssClass = $field->cssClass . ' entry-view-html-value';
+				$field->cssClass .= ' entry-view-html-value';
 			break;
 
 			case 'section':
-				$field->cssClass = $field->cssClass . ' entry-view-section-break-content';
+				$field->cssClass .= ' entry-view-section-break-content';
 			break;
 
 			default:
-				$field->cssClass = $field->cssClass . ' entry-view-field-value';
+				$field->cssClass .= ' entry-view-field-value';
 			break;
 		}
+
+		$field->cssClass .= ' gfpdf-field-processed';
 	}
 
 	/**
