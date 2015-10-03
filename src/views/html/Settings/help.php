@@ -90,19 +90,6 @@ if (! defined('ABSPATH')) {
 	<?php do_action('pdf-settings-help'); ?>
 </div><!-- close #pdfextended-settings -->
 
-<script type="text/template" id="GravityPDFSearchResultsForum">
-    <% _.each(collection, function (c) { %>
-      <li>
-        <a href="<%= url %>t/<%= c.get('slug') %>/<%= c.get('id') %>" class="rsswidget"><%= c.get('fancy_title') %></a> (<%= c.get('views') %>) <span class="rss-date">Last Updated <%= _.template.formatdate(c.get('last_posted_at')) %></span>
-        <div class="rssSummary"></div>
-      </li>
-    <% }); %>
-
-    <% if(collection.length === 0) { %>
-      <li>No topics found for your search.</li>
-    <% } %>
-</script>
-
 <script type="text/template" id="GravityPDFSearchResultsDocumentation">
     <% _.each(collection, function (c) { %>
       <li>

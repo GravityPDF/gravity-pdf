@@ -871,12 +871,6 @@
 
 		});
 
-		help.SearchCollectionForum = help.SearchCollection.extend({
-			parse: function(response) {
-				return response.topic_list.topics;
-			}
-		});
-
 		help.ContainerView = Backbone.View.extend({
 			el: '#search-knowledgebase',
 
@@ -945,11 +939,6 @@
 			processSearch: function(search) {
 				/* Initialise our Collection and pull the data from our source */
 				console.log('Searching our collection...');
-
-				/* start our forum search */
-				new help.ForumView({
-					s: search,
-				});
 
 				new help.DocsView({
 					s: search,
@@ -1040,48 +1029,6 @@
 				return this;
 			},
 		});
-
-		help.ForumView = help.MainView.extend({
-			el: '#forum-api',
-
-			template: '#GravityPDFSearchResultsForum',
-
-			initialize: function(options) {
-				this.url = 'https://support.gravitypdf.com/';
-				this.s   = options.s;
-				this.render();
-			},
-
-			render: function() {
-				/* set up out template */
-				this.template = _.template($(this.template).html());
-
-				/* show the loading spinner */
-				this.showSpinner();
-
-				/* set up view search params */
-				var s   = encodeURIComponent(this.s);
-				var url = this.url + 'search.json?search=' + s + '&q=' + s;
-				
-				/* initialise our collection */
-				this.collection = new help.SearchCollectionForum([], {
-					url: url,
-				});
-
-				/* ping api for results */
-				this.callAPI(url);
-
-				return this;
-			},
-		});
-
-		/**
-		 * Create a new underscore function to process iso date
-		 */
-		_.template.formatdate = function (date) {
-		    var d = new Date(date); // You could just pass in a regular timestamp here too
-		    return d.toLocaleDateString();
-		};
 
 		/**
 		 * Our Admin controller
