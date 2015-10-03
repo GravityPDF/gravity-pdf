@@ -12,7 +12,7 @@
 
 /* Prevent direct access to the template */
 if ( ! class_exists( 'GFForms' ) ) {
-	return;
+    return;
 }
 
 /**
@@ -39,20 +39,20 @@ global $gfpdf;
 /**
  * Load up our template-specific appearance settings
  */
-$value_border_colour  = ( ! empty( $settings['border_colour']) ) 														? $settings['border_colour'] : '#CCCCCC';
-$show_form_title      = ( ! empty( $settings['show_form_title'] ) && $settings['show_form_title'] == 'Yes' ) 			? true : false;
-$show_page_names      = ( ! empty( $settings['show_page_names'] ) && $settings['show_page_names'] == 'Yes' ) 			? true : false;
-$show_html            = ( ! empty( $settings['show_html'] ) && $settings['show_html'] == 'Yes' ) 						? true : false;
-$show_section_content = ( ! empty( $settings['show_section_content'] ) && $settings['show_section_content'] == 'Yes' ) 	? true : false;
-$show_hidden          = ( ! empty( $settings['show_hidden'] ) && $settings['show_hidden'] == 'Yes' ) 					? true : false;
-$show_empty           = ( ! empty( $settings['show_empty'] ) && $settings['show_empty'] == 'Yes' ) 						? true : false;
-$background_img       = ( ! empty( $settings['background'] ) )															? $settings['background'] : '';
-$first_header         = ( ! empty( $settings['first_header'] ) ) 														? $gfpdf->misc->fix_header_footer( $settings['first_header'] ) : '';
-$header               = ( ! empty( $settings['header'] ) ) 																? $gfpdf->misc->fix_header_footer( $settings['header'] ) : '';
-$footer               = ( ! empty( $settings['footer'] ) ) 																? $gfpdf->misc->fix_header_footer( $settings['footer'] ) : '';
-$first_footer         = ( ! empty( $settings['first_footer'] ) ) 														? $gfpdf->misc->fix_header_footer( $settings['first_footer'] ) : '';
-$font_colour          = ( ! empty( $settings['font_colour'] ) ) 														? $settings['font_colour'] : '#333';
-$font                 = ( ! empty( $settings['font'] ) ) 		        												? $settings['font'] : 'DejavuSansCondensed';
+$value_border_colour  = ( ! empty( $settings['border_colour']) )                                                        ? $settings['border_colour'] : '#CCCCCC';
+$show_form_title      = ( ! empty( $settings['show_form_title'] ) && $settings['show_form_title'] == 'Yes' )            ? true : false;
+$show_page_names      = ( ! empty( $settings['show_page_names'] ) && $settings['show_page_names'] == 'Yes' )            ? true : false;
+$show_html            = ( ! empty( $settings['show_html'] ) && $settings['show_html'] == 'Yes' )                        ? true : false;
+$show_section_content = ( ! empty( $settings['show_section_content'] ) && $settings['show_section_content'] == 'Yes' )  ? true : false;
+$show_hidden          = ( ! empty( $settings['show_hidden'] ) && $settings['show_hidden'] == 'Yes' )                    ? true : false;
+$show_empty           = ( ! empty( $settings['show_empty'] ) && $settings['show_empty'] == 'Yes' )                      ? true : false;
+$background_img       = ( ! empty( $settings['background'] ) )                                                          ? $settings['background'] : '';
+$first_header         = ( ! empty( $settings['first_header'] ) )                                                        ? $gfpdf->misc->fix_header_footer( $settings['first_header'] ) : '';
+$header               = ( ! empty( $settings['header'] ) )                                                              ? $gfpdf->misc->fix_header_footer( $settings['header'] ) : '';
+$footer               = ( ! empty( $settings['footer'] ) )                                                              ? $gfpdf->misc->fix_header_footer( $settings['footer'] ) : '';
+$first_footer         = ( ! empty( $settings['first_footer'] ) )                                                        ? $gfpdf->misc->fix_header_footer( $settings['first_footer'] ) : '';
+$font_colour          = ( ! empty( $settings['font_colour'] ) )                                                         ? $settings['font_colour'] : '#333';
+$font                 = ( ! empty( $settings['font'] ) )                                                                ? $settings['font'] : 'DejavuSansCondensed';
 
 ?>
 
@@ -67,41 +67,41 @@ $font                 = ( ! empty( $settings['font'] ) ) 		        												?
         @page {
             margin: 10mm;
 
-			<?php if ( ! empty($header) ) : ?>
+            <?php if ( ! empty($header) ) : ?>
                 header: html_TemplateHeader;
                 margin-header: 5mm;
-			<?php endif; ?>
+            <?php endif; ?>
             
-			<?php if ( ! empty($footer) ) : ?>
+            <?php if ( ! empty($footer) ) : ?>
                 footer: html_TemplateFooter;
                 margin-footer: 5mm;
-			<?php endif; ?>
+            <?php endif; ?>
 
-			<?php if ( ! empty($background_img) ) : ?>
-				background-image: url(<?php echo $background_img; ?>) no-repeat 0 0;
+            <?php if ( ! empty($background_img) ) : ?>
+                background-image: url(<?php echo $background_img; ?>) no-repeat 0 0;
                 background-image-resize: 4;
-			<?php endif; ?>
+            <?php endif; ?>
         }
 
         @page :first {
-			<?php if ( ! empty($first_header) ) : ?>
+            <?php if ( ! empty($first_header) ) : ?>
                 header: html_TemplateFirstHeader;
                 margin-header: 5mm;
-			<?php endif; ?>
+            <?php endif; ?>
 
-			<?php if ( ! empty($first_footer) ) : ?>
+            <?php if ( ! empty($first_footer) ) : ?>
                 footer: html_TemplateFirstFooter;
                 margin-footer: 5mm;
-			<?php endif; ?>
+            <?php endif; ?>
         }
 
         body {
-			font-family: <?php echo $font; ?>, sans-serif;
+            font-family: <?php echo $font; ?>, sans-serif;
             font-size: 9pt;
         }
 
         body, th , td , ul li, ol li {
-			color: <?php echo $font_colour; ?> !important;
+            color: <?php echo $font_colour; ?> !important;
         }
 
         /* Handle Gravity Forms CSS Ready Classes */
@@ -128,7 +128,7 @@ $font                 = ( ! empty( $settings['font'] ) ) 		        												?
 
         .gf_left_third, .gf_middle_third, .gf_right_third,
         .gf_list_3col li {
-            width: 32.33%;
+            width: 32.3%;
         }
 
         .gf_list_4col li {
@@ -190,7 +190,7 @@ $font                 = ( ! empty( $settings['font'] ) ) 		        												?
             padding: 4px;
         }
 
-        .gsurvey-likert-choice {
+        .gsurvey-likert-choice, .gsurvey-likert-choice-label {
             text-align: center;
         }
 
@@ -259,7 +259,7 @@ $font                 = ( ! empty( $settings['font'] ) ) 		        												?
         }
 
         .gfpdf-field .value {
-			border: 1px solid <?php echo $value_border_colour; ?>;
+            border: 1px solid <?php echo $value_border_colour; ?>;
             padding: 1.5mm 2mm;
         }
         
@@ -269,61 +269,61 @@ $font                 = ( ! empty( $settings['font'] ) ) 		        												?
     <body>
         <htmlpageheader name="TemplateFirstHeader">
             <div id="first_header">
-            	<?php echo $first_header; ?>
+                <?php echo $first_header; ?>
             </div>
         </htmlpageheader>
 
         <htmlpageheader name="TemplateHeader">
             <div id="header">
-            	<?php echo $header; ?>
+                <?php echo $header; ?>
             </div>
         </htmlpageheader>
 
-        <htmlpageheader name="TemplateFirstFooter">
+        <htmlpagefooter name="TemplateFirstFooter">
             <div id="first_footer">
-            	<?php echo $first_footer; ?>
+                <?php echo $first_footer; ?>
             </div>
-        </htmlpageheader>
+        </htmlpagefooter>
         
         <htmlpagefooter name="TemplateFooter">
             <div class="footer">
-        		<?php echo $footer; ?>
+                <?php echo $footer; ?>
             </div>
         </htmlpagefooter>
 
-		<?php
+        <?php
 
-			/**
-			 * Set up our configuration array to control what is and is not generated
-			 * @var array
-			 */
-			$config = array(
-				'settings' 	=> $settings,
-				'meta' 		=> array(
-					'echo'                => true, /* whether to output the HTML or return it */
-					'exclude'             => true, /* whether we should exclude fields with a CSS value of 'exclude'. Default to true */
-					'empty'               => $show_empty, /* whether to show empty fields or not. Default is false */
-					'hidden'              => $show_hidden, /* whether we should skip fields hidden with conditional logic. Default to true. */
-					'show_title'          => $show_form_title, /* whether we should show the form title. Default to true */
-					'section_content'     => $show_section_content, /* whether we should include a section breaks content. Default to false */
-					'page_names'          => $show_page_names, /* whether we should show the form's page names. Default to false */
-					'html_field'          => $show_html, /* whether we should show the form's html fields. Default to false */
-					'individual_products' => false, /* Whether to show individual fields in the entry. Default to false - they are grouped together at the end of the form */
-				),
-			);
+            /**
+             * Set up our configuration array to control what is and is not generated
+             * @var array
+             */
+            $config = array(
+                'settings'  => $settings,
+                'meta'      => array(
+                    'echo'                => true, /* whether to output the HTML or return it */
+                    'exclude'             => true, /* whether we should exclude fields with a CSS value of 'exclude'. Default to true */
+                    'empty'               => $show_empty, /* whether to show empty fields or not. Default is false */
+                    'hidden'              => $show_hidden, /* whether we should skip fields hidden with conditional logic. Default to true. */
+                    'show_title'          => $show_form_title, /* whether we should show the form title. Default to true */
+                    'section_content'     => $show_section_content, /* whether we should include a section breaks content. Default to false */
+                    'page_names'          => $show_page_names, /* whether we should show the form's page names. Default to false */
+                    'html_field'          => $show_html, /* whether we should show the form's html fields. Default to false */
+                    'individual_products' => false, /* Whether to show individual fields in the entry. Default to false - they are grouped together at the end of the form */
+                ),
+            );
 
-			/**
-			 * Generate our HTML markup
-			 *
-			 * Gravity PDF uses PHP Namespaces to structure its codebase.
-			 *
-			 * To keep it simplier for users the PDF template files are in PHP's global namespace, which means you have easy access to all PHP and WordPress' core classes.
-			 *
-			 * You can access Gravity PDFs common functions and classes through our API wrapper class "GPDFAPI", or use the full namespaces to references classes (GFPDF\View\View_PDF or GFPDF\Model\Model_PDF)
-			 */
-			$pdf = GPDFAPI::get_pdf_class();
-			$pdf->process_html_structure( $entry, GPDFAPI::get_pdf_class( 'model' ), $config );
+            /**
+             * Generate our HTML markup
+             *
+             * Gravity PDF uses PHP Namespaces to structure its codebase.
+             *
+             * To keep it simplier for users the PDF template files are in PHP's global namespace, which means you have easy access to all PHP and WordPress' core classes.
+             *
+             * You can access Gravity PDFs common functions and classes through our API wrapper class "GPDFAPI", or use the full namespaces to references classes (GFPDF\View\View_PDF or GFPDF\Model\Model_PDF)
+             */
+            $pdf = GPDFAPI::get_pdf_class();
+            $pdf->process_html_structure( $entry, GPDFAPI::get_pdf_class( 'model' ), $config );
 
-		?>
+        ?>
     </body>
 </html>
