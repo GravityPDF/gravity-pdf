@@ -136,8 +136,15 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 	public function welcome() {
 
 		/* Bail if no activation redirect */
-		if ( ( defined('DOING_AJAX') && DOING_AJAX ) || ! is_admin() || ! current_user_can( 'activate_plugins' ) || ! get_transient( '_gravitypdf_activation_redirect' ) ) {
+		if ( ( defined('DOING_AJAX') && DOING_AJAX ) || ! is_admin() || ! current_user_can( 'activate_plugins' ) ) {
 			return false;
+		}
+
+		$version = PDF_EXTENDED_VERSION;
+
+		/* Do not continue if we do not have a transient set (activation hook) and the versions match */
+		if( ! get_transient( '_gravitypdf_activation_redirect' ) && $version == get_option( 'gfpdf_current_version' ) ) {
+			return;
 		}
 
 		/* Delete the redirect transient */
@@ -160,7 +167,7 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 			exit;
 
 		} else {
-			$this->maybe_display_update_screen( PDF_EXTENDED_VERSION );
+			$this->maybe_display_update_screen( $version );
 		}
 	}
 
@@ -172,10 +179,10 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 		}
 
 		/* Check current version is not a bug fix or security release */
-		$version = explode( '.', $version );
+		$individual_version = explode( '.', $version );
 
 		/* Check is there is a third version identifier (4.1.x) and if so see if it's an interger or does not equal zero */
-		if( isset( $version[2] ) && ! is_int( $version[2] ) || 0 !== (int) $version[2] ) {
+		if( isset( $individual_version[2] ) && ! is_int( $individual_version[2] ) || 0 !== (int) $individual_version[2] ) {
 			/* bug fix or security release, do not redirect */
 			return false;
 		}
@@ -186,6 +193,9 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 		if( 'Enable' == $show_update_page ) {
 
 			$this->log->addNotice( 'Redirect to Update page (previously activated).' );
+
+			/* Update current version */
+			update_option( 'gfpdf_current_version', $version );
 
 			/* Update */
 			wp_safe_redirect( admin_url( 'index.php?page=gfpdf-update' ) );
