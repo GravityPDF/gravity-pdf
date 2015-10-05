@@ -142,7 +142,7 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 
 		$version = PDF_EXTENDED_VERSION;
 
-		/* Do not continue if we do not have a transient set (activation hook) and the versions match */
+		/* Bail if we do not have a transient set (activation hook) and the versions match */
 		if( ! get_transient( '_gravitypdf_activation_redirect' ) && $version == get_option( 'gfpdf_current_version' ) ) {
 			return;
 		}
@@ -150,8 +150,13 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 		/* Delete the redirect transient */
 		delete_transient( '_gravitypdf_activation_redirect' );
 
+		/* Bail if we are already on the welcome page */
+		if( isset( $_GET['page'] ) && ( $_GET['page'] == 'gfpdf-getting-started' || $_GET['page'] == 'gfpdf-update' ) ) {
+			return;
+		}
+
 		/* Bail if activating from network, or bulk */
-		if ( is_network_admin() || isset($_GET['activate-multi']) ) {
+		if ( is_network_admin() || isset( $_GET['activate-multi'] ) ) {
 			$this->log->addNotice( 'Network Activation.' );
 
 			return false;
@@ -193,9 +198,6 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 		if( 'Enable' == $show_update_page ) {
 
 			$this->log->addNotice( 'Redirect to Update page (previously activated).' );
-
-			/* Update current version */
-			update_option( 'gfpdf_current_version', $version );
 
 			/* Update */
 			wp_safe_redirect( admin_url( 'index.php?page=gfpdf-update' ) );
