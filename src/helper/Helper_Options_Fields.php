@@ -237,7 +237,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 						'type'    => 'button',
 						'std'     => __( 'Run Setup', 'gravity-forms-pdf-extended' ),
 						'options' => 'copy',
-						'tooltip' => '<h6>' . __( 'Setup Custom Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . __( 'The setup will create a environment in your uploads directory so you can freely create custom PDF templates without the risk of overriding your modifications when the plugin updates.', 'gravity-forms-pdf-extended' ),
+						'tooltip' => '<h6>' . __( 'Setup Custom Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . __( 'The setup will copy the plugin templates to your uploads directory so you can freely create and modify PDF templates – without the risk of overriding your modifications when the plugin updates.', 'gravity-forms-pdf-extended' ),
 					),
 
 					'manage_fonts' => array(
@@ -247,7 +247,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 						'type'    => 'button',
 						'std'     => __( 'Manage Fonts', 'gravity-forms-pdf-extended' ),
 						'options' => 'install_fonts',
-						'tooltip' => '<h6>' . __( 'Install Fonts', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'Custom fonts can be installed so you can use them in your PDFs. Only %s.ttf%s and %s.otf%s font files are supported.', 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<code>', '</code>', '<code>', '</code>' ),
+						'tooltip' => '<h6>' . __( 'Install Fonts', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'Custom fonts can be installed for use in your PDFs. Only %s.ttf%s and %s.otf%s font files are supported.', 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<code>', '</code>', '<code>', '</code>' ),
 					),
 				)
 			),
@@ -261,7 +261,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 						'name'     => __( 'Name', 'gravity-forms-pdf-extended' ),
 						'type'     => 'text',
 						'required' => true,
-						'tooltip'  => '<h6>' . __( 'PDF Name', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'Make it easy to distinguish between multiple PDFs by giving it an easy-to-remember name (for internal use). Use the %sFilename%s field below to set the actual PDF name.', 'gravity-forms-pdf-extended' ), '<em>', '</em>' ),
+						'tooltip'  => '<h6>' . __( 'PDF Name', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'Distinguish between multiple PDFs by giving it an easy-to-remember name (for internal use). Use the %sFilename%s field below to set the actual PDF name.', 'gravity-forms-pdf-extended' ), '<em>', '</em>' ),
 					),
 
 					'template' => array(
@@ -492,7 +492,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 							'No'  => __( 'No', 'gravity-forms-pdf-extended' ),
 						),
 						'std'   => __( 'No', 'gravity-forms-pdf-extended' ),
-						'tooltip' => '<h6>' . __( 'Save PDF', 'gravity-forms-pdf-extended' ) . '</h6>' . __( "By default, PDFs are not automatically saved to disk. Enable this option to force the PDF to be generated and saved. Useful when using the 'gfpdf_post_pdf_save' hook to copy the PDF to an alternate location.", 'gravity-forms-pdf-extended' ),
+						'tooltip' => '<h6>' . __( 'Save PDF', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( "By default, PDFs are not automatically saved to disk. Enable this option to force the PDF to be generated and saved. Useful when using the %sgfpdf_post_pdf_save%s hook to copy the PDF to an alternate location.", 'gravity-forms-pdf-extended' ), '<code>' , '</code>' ),
 					),
 
 				)
@@ -627,7 +627,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 		return apply_filters( 'gfpdf_section_content_display_setting', array(
 			'id'    => 'show_section_content',
 			'name'  => __( 'Show Section Break Description?', 'gravity-forms-pdf-extended' ),
-			'desc'  => __( 'Display Section Break field description in the PDF.', 'gravity-forms-pdf-extended' ),
+			'desc'  => __( 'Display the Section Break field description in the PDF.', 'gravity-forms-pdf-extended' ),
 			'type'  => 'radio',
 			'options' => array(
 				'Yes' => __( 'Yes', 'gravity-forms-pdf-extended' ),
@@ -688,7 +688,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 			'size'       => 8,
 			'desc'       => sprintf( __( 'The header is included at the top of each page. For best results, keep the formatting simple.', 'gravity-forms-pdf-extended' ), '<em>', '</em>', '<em>', '</em>' ),
 			'inputClass' => 'merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields',
-			'tooltip'    => '<h6>' . __( 'Header', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'For the best image quality, ensure you insert images at %sFull Size%s. Left and right image alignment work as expected, but to center align you need to wrap the image in a %s tag.', 'gravity-forms-pdf-extended' ), '<em>', '</em>', esc_html( '<div class="centeralign">...</div>' ) ),
+			'tooltip'    => '<h6>' . __( 'Header', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'When inserting images in the header ensure you select %sFull Size%s. Left and right image alignment work as expected, but to center align you need to wrap the image in a %s tag.', 'gravity-forms-pdf-extended' ), '<em>', '</em>', esc_html( '<div class="centeralign">...</div>' ) ),
 		) );
 	}
 
@@ -722,7 +722,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 			'size'       => 8,
 			'desc'       => sprintf( __( 'The footer is included at the bottom of every page. For simple columns %stry this HTML table snippet%s.', 'gravity-forms-pdf-extended' ), '<a href="https://gist.github.com/blueliquiddesigns/e6179a96cd97ef0a8457">', '</a>' ),
 			'inputClass' => 'merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields',
-			'tooltip'    => '<h6>' . __( 'Footer', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'For simple text footers try use the left, center and right alignment buttons in the editor. You can also use the special %s{PAGENO}%s and %s{nbpg}%s tags to display page numbering.', 'gravity-forms-pdf-extended' ), '<em>', '</em>', '<em>', '</em>' ),
+			'tooltip'    => '<h6>' . __( 'Footer', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'For simple text footers use the left, center and right alignment buttons in the editor. You can also use the special %s{PAGENO}%s and %s{nbpg}%s tags to display page numbering.', 'gravity-forms-pdf-extended' ), '<em>', '</em>', '<em>', '</em>' ),
 		) );
 	}
 
