@@ -279,7 +279,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	private function maybe_run_remote_logging() {
 
 		/* Enable remote logging */
-		if ( $this->is_development_version( PDF_EXTENDED_VERSION ) ) {
+		if ( function_exists( 'curl_version' ) && $this->is_development_version( PDF_EXTENDED_VERSION ) ) {
 			/* Setup Loggly logging with correct format for buffer logging */
 			$formatter = new \Monolog\Formatter\LogglyFormatter();
 			$loggly    = new \Monolog\Handler\LogglyHandler( '8ad317ed-213d-44c9-a2e8-f2eebd542c66/tag/gravitypdf', \Monolog\Logger::INFO );
