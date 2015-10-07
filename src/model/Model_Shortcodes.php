@@ -211,6 +211,38 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 
 
 	/**
+	 * Update our Gravity Forms Notification Shortcode to include the current entry ID
+	 * @param  String $notification The confirmation text
+	 * @param  Array  $form         The Gravity Form array
+	 * @param  Array  $lead         The Gravity Form entry information
+	 * @return Array               The confirmation text
+	 * @since 4.0
+	 */
+	public function gravitypdf_notification( $notification, $form, $lead ) {
+
+		/* check if notification has a 'message' */
+		if ( isset( $notification['message'] ) ) {
+			/* check if our shortcode exists and add the entry ID if needed */
+			$gravitypdf = $this->get_shortcode_information( 'gravitypdf', $notification['message'] );
+
+			if ( sizeof( $gravitypdf ) > 0 ) {
+				foreach ( $gravitypdf as $shortcode ) {
+					/* if the user hasn't explicitely defined an entry to display... */
+					if ( ! isset($shortcode['attr']['entry']) ) {
+						/* get the new shortcode information */
+						$new_shortcode = $this->add_shortcode_attr( $shortcode, 'entry', $lead['id'] );
+
+						/* update our confirmation message */
+						$notification['message'] = str_replace( $shortcode['shortcode'], $new_shortcode['shortcode'], $notification['message'] );
+					}
+				}
+			}
+		}
+
+		return $notification;
+	}
+
+	/**
 	 * Update a shortcode attributes
 	 * @param Array  $code  In individual shortcode array pulled in from the $this->get_shortcode_information() function
 	 * @param String $attr  The attribute to add / replace
