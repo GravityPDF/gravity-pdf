@@ -543,7 +543,7 @@ class Helper_PDF {
 		 */
 		$default_template_path = PDF_PLUGIN_DIR . 'initialisation/templates/';
 
-		if ( is_file( $this->data->multisite_template_location . $template ) ) {
+		if ( is_multisite() && is_file( $this->data->multisite_template_location . $template ) ) {
 			$this->template_path = $this->data->multisite_template_location . $template;
 		} else if ( is_file( $this->data->template_location . $template ) ) {
 			$this->template_path = $this->data->template_location . $template;
