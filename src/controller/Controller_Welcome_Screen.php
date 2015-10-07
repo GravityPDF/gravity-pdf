@@ -187,9 +187,11 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 		$individual_version = explode( '.', $version );
 
 		/* Check is there is a third version identifier (4.1.x) and if so see if it's an interger or does not equal zero */
-		if( isset( $individual_version[2] ) && ! is_int( $individual_version[2] ) || 0 !== (int) $individual_version[2] ) {
-			/* bug fix or security release, do not redirect */
-			return false;
+		if( isset( $individual_version[2] ) ) {
+			if(  ! is_int( $individual_version[2] ) || 0 !== (int) $individual_version[2] ) {
+				/* bug fix or security release, do not redirect */
+				return false;
+			}
 		}
 
 		/* Check if the user has opted to view the What's New page */
