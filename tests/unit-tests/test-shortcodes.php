@@ -89,6 +89,7 @@ class Test_Shortcode extends WP_UnitTestCase
      */
     public function test_filters() {
         $this->assertEquals( 10, has_filter( 'gform_confirmation', array( $this->model, 'gravitypdf_confirmation' ) ) );
+        $this->assertEquals( 10, has_filter( 'gform_notification', array( $this->model, 'gravitypdf_notification' ) ) );
         $this->assertEquals( 10, has_filter( 'gform_admin_pre_render', array( $this->model, 'gravitypdf_redirect_confirmation' ) ) );
     }
 
@@ -163,6 +164,32 @@ class Test_Shortcode extends WP_UnitTestCase
         /* Check we pass when confirmation is an array */
         $results = $this->model->gravitypdf_confirmation( array( 'data' ), $form, $lead );
         $this->assertEquals( 'data', $results[0] );
+    }
+
+    /**
+     * Test we're correctly handling the Gravity Forms notifications method and including the entry ID
+     * @since 4.0
+     */
+    public function test_gravitypdf_notification() {
+        
+        /* Setup test data */
+        $notification = array();
+        $notification['message'] = 'Thanks for getting in touch. [gravitypdf id="555ad84787d7e"]';
+        $form = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+        $lead = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+
+        /* Check our entry ID is being automatically added */
+        $results = $this->model->gravitypdf_notification( $notification, $form, $lead );
+        $this->assertNotFalse( strpos( $results, '[gravitypdf id="555ad84787d7e" entry="'. $lead['id'] . '"]' ) );
+
+        /* Check we don't modify the ID when it already exists */
+        $notification['message']  = 'Thanks for getting in touch. [gravitypdf id="555ad84787d7e" entry="5000"]';
+        $results = $this->model->gravitypdf_notification( $notification, $form, $lead );
+        $this->assertNotFalse( strpos( $results, '[gravitypdf id="555ad84787d7e" entry="5000"]' ) );
+
+        /* Check we pass when the message key doesn't exist */
+        $results = $this->model->gravitypdf_notification( 'Test', $form, $lead );
+        $this->assertEquals( 'Test', $results );
     }
 
     /**
