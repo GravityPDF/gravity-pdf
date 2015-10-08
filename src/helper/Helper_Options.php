@@ -1086,7 +1086,7 @@ class Helper_Options implements Helper_Interface_Filters {
 
 		$gfpdf_options = $this->settings;
 
-		if ( empty( $_POST['_wp_http_referer'] ) || empty( $_POST['option_name'] ) || $_POST['option_name'] != 'option_page' ) {
+		if ( empty( $_POST['_wp_http_referer'] ) || empty( $_POST['option_page'] ) || $_POST['option_page'] != 'gfpdf_settings' ) {
 			return $input;
 		}
 
@@ -1094,7 +1094,7 @@ class Helper_Options implements Helper_Interface_Filters {
 
 		$all_settings = $this->get_registered_fields();
 		$tab          = isset( $referrer['tab'] ) ? $referrer['tab'] : 'general';
-		$settings     = ( ! empty($all_settings[$tab])) ? $all_settings[$tab] : array();
+		$settings     = ( ! empty( $all_settings[ $tab ] ) ) ? $all_settings[ $tab ] : array();
 
 		/*
          * Get all setting types
@@ -1118,7 +1118,7 @@ class Helper_Options implements Helper_Interface_Filters {
 		 * Prevalant with Select boxes
 		 */
 		foreach ( $settings as $key => $value ) {
-			if ( isset($value['required']) && $value['required'] ) {
+			if ( isset( $value['required']) && $value['required'] ) {
 				switch ( $value['type'] ) {
 					case 'select':
 						if ( ! isset( $input[ $key ] ) ) {
@@ -1154,13 +1154,6 @@ class Helper_Options implements Helper_Interface_Filters {
 
 			/* General filter */
 			$input[ $key ] = apply_filters( 'gfpdf_settings_sanitize', $input[ $key ], $key, $input, $settings[ $key ] );
-		}
-
-		/* Loop through the whitelist and unset any that are empty for the tab being saved */
-		foreach ( $settings as $key => $value ) {
-			if ( empty( $input[ $key ] ) ) {
-				unset( $gfpdf_options[ $key ] );
-			}
 		}
 
 		/* check for errors */
