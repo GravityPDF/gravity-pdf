@@ -802,13 +802,18 @@ class Test_Options_API extends WP_UnitTestCase
 		$this->assertGreaterThan( 100, $this->options->get_option( 'pdf_count' ) );
 	}
 
+	/**
+	 * Test we are correctly sanitizing our settings
+	 *
+	 * @since 4.0
+	 */
 	public function test_settings_sanitize() {
 		
 		/* Test failed referer / option name */
 		$this->assertEquals( 'test', $this->options->settings_sanitize( 'test' ) );
 
 		$_POST['_wp_http_referer'] = '?tab=general';
-		$_POST['option_name']      = 'option_page';
+		$_POST['option_page']      = 'gfpdf_settings';
 
 		$input = array(
 			'default_pdf_size' => 'A5',
