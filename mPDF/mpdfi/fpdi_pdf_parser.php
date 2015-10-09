@@ -60,7 +60,7 @@ class fpdi_pdf_parser extends pdf_parser {
      * @param string $filename  Source-Filename
      * @param object $fpdi      Object of type fpdi
      */
-    function fpdi_pdf_parser($filename,&$fpdi) {
+    function __construct($filename,&$fpdi) {
         $this->fpdi =& $fpdi;
 	  $this->filename = $filename;
 
@@ -216,16 +216,16 @@ class fpdi_pdf_parser extends pdf_parser {
             switch ($_filter[1]) {
                 case "/FlateDecode":
 			if (function_exists('gzuncompress')) {
-                        $stream = (strlen($stream) > 0) ? @gzuncompress($stream) : '';                        
+                        $stream = (strlen($stream) > 0) ? @gzuncompress($stream) : '';
 			} else {
                         $this->fpdi->error(sprintf("To handle %s filter, please compile php with zlib support.",$_filter[1]));
 			}
-			if ($stream === false) { 
+			if ($stream === false) {
                         $this->fpdi->error("Error while decompressing stream.");
 			}
                 break;
 			// mPDF 4.2.003
-                case '/LZWDecode': 
+                case '/LZWDecode':
 			include_once(_MPDF_PATH.'mpdfi/filters/FilterLZW.php');
 			// mPDF 5.0 Removed pass by reference =&
 			$decoder = new FilterLZW();
@@ -359,5 +359,3 @@ class fpdi_pdf_parser extends pdf_parser {
     
     
 }
-
-?>

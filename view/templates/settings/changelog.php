@@ -23,14 +23,14 @@
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/ 
+*/
   
   /*
    <li>Don't run if the correct class isn't present
    */
   if(!class_exists('GFPDF_Settings_Model'))
   {
-	 exit;  
+	 exit;
   }
   
   ?>
@@ -40,7 +40,11 @@
     <p><strong>Current Version: <?php echo PDF_EXTENDED_VERSION; ?></strong></p>
 
   <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
+  <ul>
+    <li>Tweak mPDF package to be PHP7 compatible.</li>
+  </ul>
 
+  <h3>3.7.4</h3>
   <ul>
     <li>Housekpeeing - Revert patch made in last update as Gravity Forms 1.9.9 fixes the issue internally.</li>
   </ul>
@@ -68,9 +72,9 @@
 
   <h3>3.7.0</h3>
 <ul>
-<li>Feature - Added 'default-show-section-content' configuration option. You can now display the section break content in the default template. If this option is enabled and the section break is empty it will still be displayed on the PDF. Note: Existing installations will have to reinitialise their templates with the 'Reinstall Default and Example Templates' option enabled.</li> 
+<li>Feature - Added 'default-show-section-content' configuration option. You can now display the section break content in the default template. If this option is enabled and the section break is empty it will still be displayed on the PDF. Note: Existing installations will have to reinitialise their templates with the 'Reinstall Default and Example Templates' option enabled.</li>
 <li>Feature - Added hooks 'gfpdfe_template_location' and 'gfpdfe_template_location_uri' to change PDF template location</li>
-<li>Housekeeping - Migrate your template and configuration files. As of Gravity PDF 3.7 we'll be dropping the 'site_name' folder for single WordPress installs and changing the multisite install directory to the site ID.</li> 
+<li>Housekeeping - Migrate your template and configuration files. As of Gravity PDF 3.7 we'll be dropping the 'site_name' folder for single WordPress installs and changing the multisite install directory to the site ID.</li>
 <li>Housekeeping - Added $form_data['html_id'] key which has the HTML fields added by their ID (much like the signature_details_id key).</li>
 <li>Housekeeping - Add large number of unit tests </li>
 <li>Housekeeping - Derestrict certain pages software loads on.</li>
@@ -160,7 +164,7 @@
     <li>Bug - Correctly check if the plugin is loaded correctly before letting the PDF class fully load</li>
   </ul>
 
-  <h3>3.5.4</h3> 
+  <h3>3.5.4</h3>
   <ul>
     <li>Bug - Fixed issue with incorrect PDF name showing on the entry details page</li>
     <li>Bug - Fixed issue with custom fonts being inaccessible without manually reinstalling after upgrading.</li>
@@ -210,7 +214,7 @@
       <li>Housekeeping - Update initialisation tab copy for both pre- and post- initialisation</li>
       <li>Housekeeping - Use Gravity Forms get_ip() function instead of custom function</li>
       <li>Housekeeping - The in-built support form uses SSL once again (disabled in the past due to some servers being unable to verify the certificate). </li>
-      <li>Bug - When testing write permissions, file_exist() is throwing false positives for some users which would generate a warning when unlink() is called. Hide warning using '@'. </li>     
+      <li>Bug - When testing write permissions, file_exist() is throwing false positives for some users which would generate a warning when unlink() is called. Hide warning using '@'. </li>
     </ul>
 
 
@@ -335,7 +339,7 @@
       <li>Feature - Added a Support tab to the settings page which allows users to securely (over HTTPS) submit a support ticket to the Gravity PDF support desk</li>
       <li>Feature - Changed select, multiselect and radio fields so that the default templates use the name rather than the value. $form_data now also includes the name and values for all these fields.</li>
       <li>Feature - $form_data now includes all miscellaneous lead information in the $form_data['misc'] array.</li>
-      <li>Feature - $form_data now contains 24 and 12 hour time of entry submission.</li>      
+      <li>Feature - $form_data now contains 24 and 12 hour time of entry submission.</li>
       <li>Feature - Added localisation support</li>
       <li>Compatibility - Added new multi-upload support which was added in Gravity Forms 1.8.</li>
       <li>Bug - Added 'aid' parametre to the PDF url when multiple configuration nodes present on a single form</li>
@@ -349,7 +353,7 @@
       <li>Housekeeping - Update core styles to match Wordpress 3.8/Gravity Forms 1.8.</li>
       <li>Housekeeping - Updated header/footer examples to use @page in example.</li>
       
-    </ul> 
+    </ul>
     
     <h3>3.2.0</h3>
     <ul>

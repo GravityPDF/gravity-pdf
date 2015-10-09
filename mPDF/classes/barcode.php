@@ -10,24 +10,24 @@
 // License     : GNU LGPL (http://www.gnu.org/copyleft/lesser.html)
 // 	----------------------------------------------------------------------------
 //  Copyright (C) 2008-2009 Nicola Asuni - Tecnick.com S.r.l.
-// 	
+//
 // 	This program is free software: you can redistribute it and/or modify
 // 	it under the terms of the GNU Lesser General Public License as published by
 // 	the Free Software Foundation, either version 2.1 of the License, or
 // 	(at your option) any later version.
-// 	
+//
 // 	This program is distributed in the hope that it will be useful,
 // 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 // 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // 	GNU Lesser General Public License for more details.
-// 	
+//
 // 	You should have received a copy of the GNU Lesser General Public License
 // 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
-// 	
+//
 // 	See LICENSE.TXT file for more information.
 //  ----------------------------------------------------------------------------
 //
-// Description : PHP class to creates array representations for 
+// Description : PHP class to creates array representations for
 //               common 1D barcodes to be used with TCPDF.
 //
 // Author: Nicola Asuni
@@ -123,11 +123,11 @@ class PDFBarcode {
 				$xdim = 0.508;			// Nominal value for X-dim (bar width) in mm (spec.)
 				$bpi = 22;				// Bars per inch
 				// Ratio of Nominal value for width of spaces in mm / Nominal value for X-dim (bar width) in mm based on bars per inch
-				$this->gapwidth =  ((25.4/$bpi) - $xdim)/$xdim; 
+				$this->gapwidth =  ((25.4/$bpi) - $xdim)/$xdim;
 				$this->daft = array('D'=>2, 'A'=>2, 'F'=>3, 'T'=>1);	// Descender; Ascender; Full; Tracker bar heights
 				$arrcode = $this->barcode_imb($code);
 				$arrcode['nom-X'] = $xdim ;
-				$arrcode['nom-H'] = 3.68;	// Nominal value for Height of Full bar in mm (spec.) 
+				$arrcode['nom-H'] = 3.68;	// Nominal value for Height of Full bar in mm (spec.)
 									// USPS-B-3200 Revision C = 4.623
 									// USPS-B-3200 Revision E = 3.68
 				$arrcode['quietL'] = 3.175;	// LEFT Quiet margin =  mm (spec.)
@@ -139,7 +139,7 @@ class PDFBarcode {
 				$xdim = 0.508;			// Nominal value for X-dim (bar width) in mm (spec.)
 				$bpi = 22;				// Bars per inch
 				// Ratio of Nominal value for width of spaces in mm / Nominal value for X-dim (bar width) in mm based on bars per inch
-				$this->gapwidth =  ((25.4/$bpi) - $xdim)/$xdim; 
+				$this->gapwidth =  ((25.4/$bpi) - $xdim)/$xdim;
 				$this->daft = array('D'=>5, 'A'=>5, 'F'=>8, 'T'=>2);	// Descender; Ascender; Full; Tracker bar heights
 				$arrcode = $this->barcode_rm4scc($code, false);
 				$arrcode['nom-X'] = $xdim ;
@@ -153,7 +153,7 @@ class PDFBarcode {
 				$xdim = 0.508;			// Nominal value for X-dim (bar width) in mm (spec.)
 				$bpi = 22;				// Bars per inch
 				// Ratio of Nominal value for width of spaces in mm / Nominal value for X-dim (bar width) in mm based on bars per inch
-				$this->gapwidth =  ((25.4/$bpi) - $xdim)/$xdim; 
+				$this->gapwidth =  ((25.4/$bpi) - $xdim)/$xdim;
 				$this->daft = array('D'=>5, 'A'=>5, 'F'=>8, 'T'=>2);	// Descender; Ascender; Full; Tracker bar heights
 				$arrcode = $this->barcode_rm4scc($code, true);
 				$arrcode['nom-X'] = $xdim ;
@@ -167,7 +167,7 @@ class PDFBarcode {
 				$xdim = 0.508;			// Nominal value for X-dim (bar width) in mm (spec.)
 				$bpi = 22;				// Bars per inch
 				// Ratio of Nominal value for width of spaces in mm / Nominal value for X-dim (bar width) in mm based on bars per inch
-				$this->gapwidth =  ((25.4/$bpi) - $xdim)/$xdim; 
+				$this->gapwidth =  ((25.4/$bpi) - $xdim)/$xdim;
 				$arrcode = $this->barcode_postnet($code, false);
 				$arrcode['nom-X'] = $xdim ;
 				$arrcode['nom-H'] = 3.175;	// Nominal value for Height of Full bar in mm (spec.)
@@ -180,7 +180,7 @@ class PDFBarcode {
 				$xdim = 0.508;			// Nominal value for X-dim (bar width) in mm (spec.)
 				$bpi = 22;				// Bars per inch
 				// Ratio of Nominal value for width of spaces in mm / Nominal value for X-dim (bar width) in mm based on bars per inch
-				$this->gapwidth =  ((25.4/$bpi) - $xdim)/$xdim; 
+				$this->gapwidth =  ((25.4/$bpi) - $xdim)/$xdim;
 				$arrcode = $this->barcode_postnet($code, true);
 				$arrcode['nom-X'] = $xdim ;
 				$arrcode['nom-H'] = 3.175;	// Nominal value for Height of Full bar in mm (spec.)
@@ -611,7 +611,7 @@ class PDFBarcode {
 		}
 		$bararray['bcode'][$k] = array('t' => true, 'w' => 1, 'h' => 1, 'p' => 0);
 		$bararray['maxw'] += 1;
-		++$k;		
+		++$k;
 		$bararray['checkdigit'] = $checkdigit;
 		return $bararray;
 	}
@@ -626,7 +626,7 @@ class PDFBarcode {
 			'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
 			'W', 'X', 'Y', 'Z', '-', '.', ' ', '$', '/', '+', '%');
 		// translate special characters
-		$code = strtr($code, chr(128).chr(129).chr(130).chr(131), '$/+%');	
+		$code = strtr($code, chr(128).chr(129).chr(130).chr(131), '$/+%');
 		$len = strlen($code);
 		// calculate check digit C
 		$p = 1;
@@ -680,7 +680,7 @@ class PDFBarcode {
 	
 	/**
 	 * MSI.
-	 * Variation of Plessey code, with similar applications 
+	 * Variation of Plessey code, with similar applications
 	 * Contains digits (0 to 9) and encodes the data only in the width of bars.
 	 */
 	protected function barcode_msi($code, $checksum=false) {
@@ -728,7 +728,7 @@ class PDFBarcode {
 				return false;
 			}
 			$seq .= $chr[$digit];
-		}		
+		}
 		$seq .= '1001'; // right guard
 		$bararray = array('code' => $code, 'maxw' => 0, 'maxh' => 1, 'bcode' => array());
 		$bararray['checkdigit'] = $checkdigit;
@@ -769,7 +769,7 @@ class PDFBarcode {
 				return false;
 			}
 			$seq .= $chr[$digit];
-		}		
+		}
 		$seq .= '1101011';
 		$bararray = array('code' => $code, 'maxw' => 0, 'maxh' => 1, 'bcode' => array());
 		$bararray['checkdigit'] = $checkdigit;
@@ -867,7 +867,7 @@ class PDFBarcode {
 	}
 	
 	/**
-	 * C128 barcodes. 
+	 * C128 barcodes.
 	 * Very capable code, excellent density, high reliability; in very wide use world-wide
 	 */
 	protected function barcode_c128($code, $type='B', $ean=false) {
@@ -1059,7 +1059,7 @@ class PDFBarcode {
 			}
 		}
 		$bararray['checkdigit'] = $checkdigit;
-		return $bararray;		
+		return $bararray;
 	}
 	
 	/**
@@ -1322,7 +1322,7 @@ class PDFBarcode {
 			'7'=>array('A','B','A','B','A'),
 			'8'=>array('A','B','A','A','B'),
 			'9'=>array('A','A','B','A','B')
-		);	
+		);
 		$p = $parities[$len][$r];
 		$seq = '1011'; // left guard bar
 		$seq .= $codes[$p[0]][$code{0}];
@@ -1392,11 +1392,11 @@ class PDFBarcode {
 			for ($j = 0; $j < 5; ++$j) {
 				$bh = $barlen[$code[$i]][$j];
 				if ($bh == 2) {
-					$h = 5; 
+					$h = 5;
 					$p = 0;
 				}
 				else {
-					$h = 2; 
+					$h = 2;
 					$p = 3;
 				}
 				$bararray['bcode'][$k++] = array('t' => 1, 'w' => 1, 'h' => $h, 'p' => $p);
@@ -1459,7 +1459,7 @@ class PDFBarcode {
 			'W' => array(1,2,4,3),
 			'X' => array(2,1,3,4),
 			'Y' => array(2,1,4,3),
-			'Z' => array(2,2,3,3)		
+			'Z' => array(2,2,3,3)
 		);
 		$code = strtoupper($code);
 		$len = strlen($code);
@@ -1665,7 +1665,7 @@ class PDFBarcode {
 		$check %= 11;
 		if ($check == 10) {
 			$check = '-';
-		} 
+		}
 		$code .= $check;
 		$checkdigit = $check;
 		if ($len > 10) {
@@ -1718,7 +1718,7 @@ class PDFBarcode {
 	
 	/**
 	 * IMB - Intelligent Mail Barcode - Onecode - USPS-B-3200
-	 * (requires PHP bcmath extension) 
+	 * (requires PHP bcmath extension)
 	 * Intelligent Mail barcode is a 65-bar code for use on mail in the United States.
 	 * The fields are described as follows:<ul><li>The Barcode Identifier shall be assigned by USPS to encode the presort identification that is currently printed in human readable form on the optional endorsement line (OEL) as well as for future USPS use. This shall be two digits, with the second digit in the range of 0-4. The allowable encoding ranges shall be 00-04, 10-14, 20-24, 30-34, 40-44, 50-54, 60-64, 70-74, 80-84, and 90-94.</li><li>The Service Type Identifier shall be assigned by USPS for any combination of services requested on the mailpiece. The allowable encoding range shall be 000-999. Each 3-digit value shall correspond to a particular mail class with a particular combination of service(s). Each service program, such as OneCode Confirm and OneCode ACS, shall provide the list of Service Type Identifier values.</li><li>The Mailer or Customer Identifier shall be assigned by USPS as a unique, 6 or 9 digit number that identifies a business entity. The allowable encoding range for the 6 digit Mailer ID shall be 000000- 899999, while the allowable encoding range for the 9 digit Mailer ID shall be 900000000-999999999.</li><li>The Serial or Sequence Number shall be assigned by the mailer for uniquely identifying and tracking mailpieces. The allowable encoding range shall be 000000000-999999999 when used with a 6 digit Mailer ID and 000000-999999 when used with a 9 digit Mailer ID. e. The Delivery Point ZIP Code shall be assigned by the mailer for routing the mailpiece. This shall replace POSTNET for routing the mailpiece to its final delivery point. The length may be 0, 5, 9, or 11 digits. The allowable encoding ranges shall be no ZIP Code, 00000-99999,  000000000-999999999, and 00000000000-99999999999.</li></ul>
 	 */
@@ -1843,7 +1843,7 @@ class PDFBarcode {
 	
 	/**
 	 * Convert large integer number to hexadecimal representation.
-	 * (requires PHP bcmath extension) 
+	 * (requires PHP bcmath extension)
 	 */
 	public function dec_to_hex($number) {
 		$i = 0;
@@ -1865,7 +1865,7 @@ class PDFBarcode {
 	
 	/**
 	 * Convert large hexadecimal number to decimal representation (string).
-	 * (requires PHP bcmath extension) 
+	 * (requires PHP bcmath extension)
 	 */
 	public function hex_to_dec($hex) {
 		$dec = 0;
@@ -1876,7 +1876,7 @@ class PDFBarcode {
 			$bitval = bcmul($bitval, 16);
 		}
 		return $dec;
-	}	
+	}
 	
 	/**
 	 * Intelligent Mail Barcode calculation of Frame Check Sequence
@@ -1908,7 +1908,7 @@ class PDFBarcode {
 				$data <<= 1;
 			}
 		}
-		return $fcs;		
+		return $fcs;
 	}
 	
 	/**
@@ -1961,6 +1961,5 @@ class PDFBarcode {
 } // end of class
 
 //============================================================+
-// END OF FILE                                                 
+// END OF FILE
 //============================================================+
-?>

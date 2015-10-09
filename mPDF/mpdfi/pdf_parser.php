@@ -82,7 +82,7 @@ class pdf_parser {
      *
      * @param string $filename  Source-Filename
      */
-	function pdf_parser($filename) {
+	function __construct($filename) {
         $this->filename = $filename;
 	  // mPDF 4.0
 	  $this->success = true;
@@ -120,9 +120,9 @@ class pdf_parser {
      */
     function closeFile() {
     	if (isset($this->f)) {
-    	    fclose($this->f);	
+    	    fclose($this->f);
     		unset($this->f);
-    	}	
+    	}
     }
     
       /**
@@ -131,7 +131,7 @@ class pdf_parser {
      * @param string $msg  Error-Message
      */
     function error($msg) {
-    	die("<b>PDF-Parser Error:</b> ".$msg);	
+    	die("<b>PDF-Parser Error:</b> ".$msg);
     }
   
     /**
@@ -181,7 +181,7 @@ class pdf_parser {
        	fseek ($this->f, -min(filesize($this->filename),1500), SEEK_END);
         $data = fread($this->f, 1500);
         
-        $pos = strlen($data) - strpos(strrev($data), strrev('startxref')); 
+        $pos = strlen($data) - strpos(strrev($data), strrev('startxref'));
         $data = substr($data, $pos);
         
         if (!preg_match('/\s*(\d+).*$/s', $data, $matches)) {
@@ -207,7 +207,7 @@ class pdf_parser {
 		fseek($this->f, $o_pos = $offset);
             $data = trim(fgets($this->f,1024));
 
-            if (strlen($data) == 0) 
+            if (strlen($data) == 0)
                 $data = trim(fgets($this->f,1024));
 
             if ($data !== 'xref') {
@@ -215,7 +215,7 @@ class pdf_parser {
             	$data = trim(_fgets($this->f, true));
             	if ($data !== 'xref') {
             	    if (preg_match('/(.*xref)(.*)/m', $data, $m)) { // xref 0 128 - in one line
-                        fseek($this->f, $o_pos+strlen($m[1]));            	        
+                        fseek($this->f, $o_pos+strlen($m[1]));
             	    } elseif (preg_match('/(x|r|e|f)+/', $data, $m)) { // correct invalid xref-pointer
             	        $tmpOffset = $offset-4+strlen($m[0]);
             	        $this->pdf_read_xref($result, $tmpOffset, $start, $end);
@@ -271,7 +271,7 @@ class pdf_parser {
 
     	$o_pos = ftell($this->f);
         $data = fgets($this->f,1024);
-		if (strlen(trim($data)) == 0) 
+		if (strlen(trim($data)) == 0)
 		    $data = fgets($this->f, 1024);
 
         if (preg_match("/trailer/",$data)) {
@@ -433,7 +433,7 @@ class pdf_parser {
     					if ($pos > $c->offset + $c->length) {
     						$c->increase_length();
     					}
-    				}    				
+    				}
                 }
 
             case "stream":
@@ -454,14 +454,14 @@ class pdf_parser {
 		        	$tmp_length = $this->pdf_resolve_object($tmp_c,$this->actual_obj[1][1]['/Length']);
 		        	$length = $tmp_length[1][1];
 		        } else {
-		        	$length = $this->actual_obj[1][1]['/Length'][1];	
+		        	$length = $this->actual_obj[1][1]['/Length'][1];
 		        }
 		        
 		        if ($length > 0) {
     		        $c->reset($startpos+$e,$length);
     		        $v = $c->buffer;
 		        } else {
-		            $v = '';   
+		            $v = '';
 		        }
 		        $c->reset($startpos+$e+$length+9); // 9 = strlen("endstream")
 		        
@@ -686,5 +686,3 @@ class pdf_parser {
 
 	
 }
-
-?>
