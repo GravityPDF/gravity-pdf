@@ -238,8 +238,8 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 
 		/* Store our ids in the WP query_vars object */
 		$GLOBALS['wp']->query_vars['gpdf'] = 1;
-		$GLOBALS['wp']->query_vars['pid']    = $pid;
-		$GLOBALS['wp']->query_vars['lid']    = $lid;
+		$GLOBALS['wp']->query_vars['pid']  = $pid;
+		$GLOBALS['wp']->query_vars['lid']  = $config['lid'];
 
 		/* Send to our model to handle validation / authentication */
 		$results = $this->model->process_pdf( $pid, $config['lid'], $config['action'] );
