@@ -279,6 +279,8 @@ class Test_PDF extends WP_UnitTestCase
 
 		$this->assertEquals( 'Other', $e->getMessage() );
 
+		wp_set_current_user(0);
+
 	}
 
 	/**
@@ -402,6 +404,8 @@ class Test_PDF extends WP_UnitTestCase
 		$this->assertTrue( $this->model->is_current_pdf_owner( $entry ) );
 		$this->assertTrue( $this->model->is_current_pdf_owner( $entry, 'logged_out' ) );
 		$this->assertFalse( $this->model->is_current_pdf_owner( $entry, 'logged_in' ) );
+
+		wp_set_current_user(0);
 	}
 
 	/**
@@ -433,6 +437,8 @@ class Test_PDF extends WP_UnitTestCase
 		$this->assertInternalType( 'integer', $user_id );
 		wp_set_current_user( $user_id );
 		$this->assertTrue( $this->model->middle_logged_out_restriction( true, '', '' ) );
+
+		wp_set_current_user(0);
 	}
 
 	/**
@@ -477,6 +483,8 @@ class Test_PDF extends WP_UnitTestCase
 		$this->assertInternalType( 'integer', $user_id );
 		wp_set_current_user( $user_id );
 		$this->assertTrue( $this->model->middle_logged_out_timeout( true, $entry, '' ) );
+
+		wp_set_current_user(0);
 	}
 
 	/**
@@ -511,6 +519,8 @@ class Test_PDF extends WP_UnitTestCase
 		$this->assertInternalType( 'integer', $user_id );
 		wp_set_current_user( $user_id );
 		$this->assertTrue( $this->model->middle_auth_logged_out_user( true, $entry, '' ) );
+
+		wp_set_current_user(0);
 	}
 
 	/**
@@ -556,6 +566,8 @@ class Test_PDF extends WP_UnitTestCase
 		$user->get_role_caps();
 		$user->update_user_level_from_caps();
 		$this->assertTrue( $this->model->middle_user_capability( true, '', '' ) );
+
+		wp_set_current_user(0);
 	}
 
 	/**

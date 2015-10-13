@@ -125,6 +125,8 @@ class Test_Installer extends WP_UnitTestCase
         delete_option( 'gfpdf_current_version' );
         $this->controller->check_install_status();
         $this->assertEquals( PDF_EXTENDED_VERSION, get_option( 'gfpdf_current_version') );
+
+        wp_set_current_user(0);
     }
 
     /**
@@ -254,6 +256,8 @@ class Test_Installer extends WP_UnitTestCase
 
         /* Verify the install works correctly */
         $this->assertTrue( is_dir( $gfpdf->data->template_location ) );
+
+        wp_set_current_user(0);
     }
 
     /**
@@ -286,6 +290,8 @@ class Test_Installer extends WP_UnitTestCase
         $this->assertFalse( get_option( 'gfpdf_is_installed' ) );
         $this->assertFalse( get_option( 'gfpdf_current_version' ) );
         $this->assertFalse( get_option( 'gfpdf_settings' ) );
+
+        wp_set_current_user(0);
     }
 
     /**

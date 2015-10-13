@@ -166,6 +166,8 @@ class Test_Actions extends WP_UnitTestCase
 
         $this->controller->route_notices();
         $this->assertFalse( $gfpdf->notices->has_notice() );
+
+        wp_set_current_user(0);
     }
 
     /**
@@ -206,6 +208,8 @@ class Test_Actions extends WP_UnitTestCase
 
         /* Cleanup notices */
         $gfpdf->notices->clear();
+
+        wp_set_current_user(0);
     }
 
     /**
@@ -269,6 +273,8 @@ class Test_Actions extends WP_UnitTestCase
         $this->assertSame( '', $html );
         $this->assertTrue( $this->model->is_notice_already_dismissed( 'test_action' ) );
 
+        wp_set_current_user(0);
+
     }
 
     /**
@@ -317,6 +323,8 @@ class Test_Actions extends WP_UnitTestCase
         $this->assertTrue( $this->model->migration_condition() );
 
         unlink( $path . 'configuration.php' );
+
+        wp_set_current_user(0);
 
     }
 

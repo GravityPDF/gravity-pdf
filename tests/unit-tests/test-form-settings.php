@@ -213,6 +213,8 @@ class Test_Form_Settings extends WP_UnitTestCase
 		$html = ob_get_clean();
 
 		$this->assertNotFalse( strpos( $html, '<form id="gfpdf_list_form" method="post">' ) );
+
+		wp_set_current_user(0);
 	}
 
 	/**
@@ -246,6 +248,8 @@ class Test_Form_Settings extends WP_UnitTestCase
 		$html = ob_get_clean();
 
 		$this->assertNotFalse( strpos( $html, '<form method="post" id="gfpdf_pdf_form">' ) );
+
+		wp_set_current_user(0);
 	}
 
 	/**
@@ -333,6 +337,8 @@ class Test_Form_Settings extends WP_UnitTestCase
 		$_POST['gfpdf_settings']['filename'] = 'My Filename';
 
 		$this->assertTrue( $this->model->process_submission( $form_id, $pid ) );
+
+		wp_set_current_user(0);
 	}
 
 	/**

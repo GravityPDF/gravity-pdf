@@ -19,15 +19,18 @@
         </exclude>
     </groups>
 	<filter>
-		<blacklist>
-			<directory suffix=".php">./tests/</directory>
-			<directory suffix=".php">./tmp/</directory>
-			<directory suffix=".php">./vendor/</directory>
-			<directory suffix=".php">./bower_components/</directory>
-			<directory suffix=".php">./resources/</directory>
-			<directory suffix=".php">./initialisation/</directory>
-			<directory suffix=".php">./src/assets/resources/</directory>
-		</blacklist>
+		<whitelist>
+			<directory>./</directory>
+			<exclude>
+				<directory suffix=".php">./tests/</directory>
+				<directory suffix=".php">./tmp/</directory>
+				<directory suffix=".php">./vendor/</directory>
+				<directory suffix=".php">./bower_components/</directory>
+				<directory suffix=".php">./resources/</directory>
+				<directory suffix=".php">./initialisation/</directory>
+				<directory suffix=".php">./src/assets/resources/</directory>
+			</exclude>
+		</whitelist>
 	</filter>
 	<logging>
 		<log type="coverage-clover" target="./tmp/clover.xml" charset="UTF-8" />

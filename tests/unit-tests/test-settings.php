@@ -186,6 +186,8 @@ class Test_Settings extends WP_UnitTestCase
 		wp_set_current_user( $user_id );
 
 		$this->assertEquals( 'read', $this->controller->edit_options_cap() );
+
+		wp_set_current_user(0);
 	}
 
 	/**
@@ -210,6 +212,8 @@ class Test_Settings extends WP_UnitTestCase
 
 		$results = $this->controller->disable_tools_on_view_cap( $nav );
 		$this->assertTrue( isset( $results[100] ) );
+
+		wp_set_current_user(0);
 	}
 
 	/**

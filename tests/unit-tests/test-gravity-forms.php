@@ -292,6 +292,8 @@ class Test_Gravity_Forms extends WP_UnitTestCase
 		wp_set_current_user( $user_id );
 
 		$this->assertTrue( $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) );
+
+		wp_set_current_user(0);
 	}
 
 	/**

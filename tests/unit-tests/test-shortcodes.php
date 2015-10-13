@@ -139,6 +139,8 @@ class Test_Shortcode extends WP_UnitTestCase
 
         $_GET['lid'] = '5000';
         $this->assertNotFalse( strpos( $this->model->gravitypdf( array('id' => '556690c67856b' ) ), '<pre class="gravitypdf-error">' ) );
+
+        wp_set_current_user(0);
     }
 
     /**
