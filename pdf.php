@@ -207,7 +207,7 @@ class GFPDF_Major_Compatibility_Checks
 
 		/* Check MB String is installed */
 		if ( ! extension_loaded( 'mbstring' ) ) {
-			$this->notices[] = __( 'The PHP Extension MB String (with mb-regex enabled) could not be detected. Contact your web hosting provider to fix.', 'gravity-forms-pdf-extended' );
+			$this->notices[] = __( 'The PHP Extension MB String could not be detected. Contact your web hosting provider to fix.', 'gravity-forms-pdf-extended' );
 			return false;
 		}
 		return true;
