@@ -7,6 +7,10 @@ Gravity PDF is a WordPress plugin that allows you to save/view/download a PDF fr
 
 Find out more at [https://gravitypdf.com](http://gravitypdf.com/).
 
+# About
+
+This Git repository is for developers who want to contribute to Gravity PDF. **Don't use it in production**. For production use, [download the Gravity PDF from the WordPress Plugin Directory](https://wordpress.org/plugins/gravity-forms-pdf-extended/).
+
 # Installation
 
 1. Clone the repository using `git clone https://github.com/GravityPDF/gravity-forms-pdf-extended/`
