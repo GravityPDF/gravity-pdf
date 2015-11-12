@@ -139,6 +139,7 @@ class Helper_Options implements Helper_Interface_Filters {
 		add_filter( 'gfpdf_settings_sanitize_text', array( $this, 'sanitize_trim_field' ) );
 		add_filter( 'gfpdf_settings_sanitize_textarea', array( $this, 'sanitize_trim_field' ) );
 		add_filter( 'gfpdf_settings_sanitize_number', array( $this, 'sanitize_number_field' ) );
+		add_filter( 'gfpdf_settings_sanitize_paper_size', array( $this, 'sanitize_paper_size' ) );
 	}
 
 	/**
@@ -274,7 +275,7 @@ class Helper_Options implements Helper_Interface_Filters {
 		if ( ! $form_id ) {
 			return array();
 		}
-		
+
 		$settings = $this->get_pdf( $form_id, $pid );
 
 		if ( ! is_wp_error( $settings ) ) {
@@ -318,14 +319,14 @@ class Helper_Options implements Helper_Interface_Filters {
 
 		/* If we haven't pulled the form meta data from the database do so now */
 		if ( ! isset( $this->data->form_settings[ $form_id ] ) ) {
-			
+
 			$form = $this->form->get_form( $form_id );
 
 			if ( empty($form) ) {
-			
+
 				$error = new WP_Error( 'invalid_id', __( 'You must pass in a valid form ID', 'gravity-forms-pdf-extended' ) );
 				$this->log->addError( 'Error Getting Settings.', array( 'WP_Error' => $error ) );
-			
+
 				return $error;
 			}
 
@@ -484,7 +485,7 @@ class Helper_Options implements Helper_Interface_Filters {
 				/* Update the database, if able */
 				$did_update = $this->form->update_form( $form );
 			}
-			
+
 			if ( ! $update_db || $did_update !== false ) {
 
 				/* If it updated successfully let's update the global variable */
@@ -1147,13 +1148,13 @@ class Helper_Options implements Helper_Interface_Filters {
 			/* Get the setting type (checkbox, select, etc) */
 			$type = isset( $settings[ $key ]['type'] ) ? $settings[ $key ]['type'] : false;
 
+			/* General filter */
+			$input[ $key ] = apply_filters( 'gfpdf_settings_sanitize', $input[ $key ], $key, $input, $settings[ $key ] );
+
 			if ( $type ) {
 				/* Field type specific filter */
 				$input[ $key ] = apply_filters( 'gfpdf_settings_sanitize_' . $type, $value, $key, $input, $settings[ $key ] );
 			}
-
-			/* General filter */
-			$input[ $key ] = apply_filters( 'gfpdf_settings_sanitize', $input[ $key ], $key, $input, $settings[ $key ] );
 		}
 
 		/* check for errors */
@@ -1193,6 +1194,21 @@ class Helper_Options implements Helper_Interface_Filters {
 	 */
 	public function sanitize_number_field( $input ) {
 		return (integer) $input;
+	}
+
+	/**
+	 * Converts negative numbers to positive numbers
+	 * @param  Array $input The unsanitized paper size
+	 * @return Array		The sanitized paper size
+	 * @since 4.0
+	 */
+	public function sanitize_paper_size( $input ) {
+		if( is_array( $input ) && sizeof( $input ) == 3 ) {
+			$input[0] = abs( $input[0] );
+			$input[1] = abs( $input[1] );
+		}
+
+		return $input;
 	}
 
 	/**
