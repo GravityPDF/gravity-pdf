@@ -107,9 +107,9 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 						'tooltip'    => '<h6>' . __( 'Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'Gravity PDF comes with %sfive completely-free and highly customisable designs%s to choose. You can also purchase additional templates from our theme shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
 					),
 
-					'default_font_type' => array(
-						'id'         => 'default_font_type',
-						'name'       => __( 'Default Font Type', 'gravity-forms-pdf-extended' ),
+					'default_font' => array(
+						'id'         => 'default_font',
+						'name'       => __( 'Default Font', 'gravity-forms-pdf-extended' ),
 						'desc'       => sprintf( __( 'Set the default font type used in PDFs. Choose an existing font or %sinstall your own%s.', 'gravity-forms-pdf-extended' ), '<a href="'. $this->data->settings_url .'&tab=tools#manage_fonts">', '</a>' ),
 						'type'       => 'select',
 						'options'    => $this->get_installed_fonts(),
@@ -362,7 +362,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 						'name'    => __( 'Font', 'gravity-forms-pdf-extended' ),
 						'type'    => 'select',
 						'options' => $this->get_installed_fonts(),
-						'std'     => $this->get_option( 'default_font_type' ),
+						'std'     => $this->get_option( 'default_font' ),
 						'desc'    => sprintf( __( 'Set the font type used in PDFs. Choose an existing font or %sinstall your own%s.', 'gravity-forms-pdf-extended' ), '<a href="'. $this->data->settings_url .'&tab=tools#manage_fonts">', '</a>' ),
 						'inputClass'   => 'large',
 						'chosen'  => true,
