@@ -575,7 +575,7 @@ class Test_PDF extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function test_view_pdf_entry_list() {
-		
+
 		$results = $this->create_form_and_entries();
 		$form_id = $results['form']['id'];
 		$entry   = $results['entry'];
@@ -592,7 +592,7 @@ class Test_PDF extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function test_view_pdf_entry_detail() {
-		
+
 		$results = $this->create_form_and_entries();
 		$form_id = $results['form']['id'];
 		$entry   = $results['entry'];
@@ -609,7 +609,7 @@ class Test_PDF extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function test_get_pdf_display_list() {
-		global $wp_rewrite;
+		global $wp_rewrite, $gfpdf;
 
 		/* Setup some test data */
 		$results = $this->create_form_and_entries();
@@ -619,10 +619,12 @@ class Test_PDF extends WP_UnitTestCase
 		$pdfs = $this->model->get_pdf_display_list( $entry );
 
 		$this->assertArrayHasKey( 'name', $pdfs[0] );
-		$this->assertArrayHasKey( 'url', $pdfs[0] );
+		$this->assertArrayHasKey( 'view', $pdfs[0] );
+		$this->assertArrayHasKey( 'download', $pdfs[0] );
 
 		$this->assertNotFalse( strpos( $pdfs[0]['name'], 'test-' ) );
-		$this->assertNotFalse( strpos( $pdfs[0]['url'], 'http://example.org/?gpdf=1&#038;pid=556690c67856b&#038;lid=1' ) );
+		$this->assertNotFalse( strpos( $pdfs[0]['view'], 'http://example.org/?gpdf=1&#038;pid=556690c67856b&#038;lid=1' ) );
+		$this->assertNotFalse( strpos( $pdfs[0]['download'], 'http://example.org/?gpdf=1&#038;pid=556690c67856b&#038;lid=1&#038;action=download' ) );
 
 		/* Process fancy permalinks */
 		$old_permalink_structure = get_option( 'permalink_structure' );
@@ -631,7 +633,8 @@ class Test_PDF extends WP_UnitTestCase
 
 		$pdfs = $this->model->get_pdf_display_list( $entry );
 
-		$this->assertNotFalse( strpos( $pdfs[0]['url'], 'http://example.org/pdf/556690c67856b/' ) );
+		$this->assertNotFalse( strpos( $pdfs[0]['view'], 'http://example.org/pdf/556690c67856b/' ) );
+		$this->assertNotFalse( strpos( $pdfs[0]['download'], '/download/' ) );		
 
 		$wp_rewrite->set_permalink_structure( $old_permalink_structure );
 		flush_rewrite_rules();
@@ -845,7 +848,7 @@ class Test_PDF extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function test_notifications() {
-		
+
 		/* Setup some test data */
 		$results  = $this->create_form_and_entries();
 		$entry    = $results['entry'];
@@ -916,7 +919,7 @@ class Test_PDF extends WP_UnitTestCase
 	 */
 	public function test_maybe_save_pdf() {
 		global $gfpdf;
-		
+
 		/* Setup some test data */
 		$results  = $this->create_form_and_entries();
 		$entry    = $results['entry'];
@@ -1089,7 +1092,7 @@ class Test_PDF extends WP_UnitTestCase
 		touch( $gfpdf->data->template_font_location . 'aladin.otf' );
 
 		$fonts = $this->model->add_unregistered_fonts_to_mPDF( array() );
-		
+
 		$this->assertArrayHasKey( 'calibri', $fonts );
 		$this->assertArrayHasKey( 'aladin', $fonts );
 	}
