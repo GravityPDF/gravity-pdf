@@ -206,7 +206,7 @@ class Test_Options_API extends WP_UnitTestCase
 		$group     = 'gfpdf_settings_form_settings';
 		$setting   = 'gfpdf_settings[notification]';
 		$option_id = 'options';
-		
+
 		/* Run false test */
 		$this->assertSame( 0, sizeof( $wp_settings_fields[ $group ][ $group ][ $setting ]['args'][ $option_id ] ) );
 
@@ -652,7 +652,7 @@ class Test_Options_API extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function test_get_templates() {
-		
+
 		$templates = $this->options->get_templates();
 
 		$this->assertArrayHasKey( 'Core', $templates );
@@ -681,7 +681,7 @@ class Test_Options_API extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function test_get_template_headers() {
-		
+
 		$path = PDF_PLUGIN_DIR . 'initialisation/templates/zadani.php';
 		$header = $this->options->get_template_headers( $path );
 
@@ -709,7 +709,7 @@ class Test_Options_API extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function test_get_installed_fonts() {
-		 
+
 		$fonts = $this->options->get_installed_fonts();
 
 		$this->assertArrayHasKey( 'Unicode', $fonts );
@@ -756,7 +756,7 @@ class Test_Options_API extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function test_get_custom_fonts() {
-		
+
 		$fonts = array(
 			array( 'font_name' => 'Helvetica' ),
 			array( 'font_name' => 'Calibri Bold' ),
@@ -808,7 +808,7 @@ class Test_Options_API extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function test_settings_sanitize() {
-		
+
 		/* Test failed referer / option name */
 		$this->assertEquals( 'test', $this->options->settings_sanitize( 'test' ) );
 
@@ -890,6 +890,32 @@ class Test_Options_API extends WP_UnitTestCase
 			array( 2000, '2000' ),
 			array( 20, '20.50' ),
 			array( 50, '50,20' ),
+		);
+	}
+
+	/**
+	 * Test the paper size sanitisation function
+	 *
+	 * @since 4.0
+	 * @dataProvider dataprovider_sanitize_paper_size
+	 */
+	public function test_sanitize_paper_size( $expected, $input ) {
+		$this->assertSame( $expected, $this->options->sanitize_paper_size( $input ) );
+	}
+
+	/**
+	 * Test data provider for our number functionality (test_sanitize_number_field)
+	 * @return array The data to test
+	 * @since  4.0
+	 */
+	public function dataprovider_sanitize_paper_size() {
+		return array(
+			array( array(200, 100, 'mm'), array(200, 100, 'mm') ),
+			array( array(200, 100, 'mm'), array(-200, -100, 'mm') ),
+			array( array(72, 210, 'inches'), array(72, 210, 'inches') ),
+			array( array(72, 210, 'inches'), array(-72, -210, 'inches') ),
+			array( array( -20, -50 ), array( -20, -50 )  ),
+			array( '50', '50' ),
 		);
 	}
 
