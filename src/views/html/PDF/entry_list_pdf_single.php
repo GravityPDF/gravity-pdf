@@ -36,6 +36,6 @@ if (! defined('ABSPATH')) {
 
 ?>
 
-| <a href="<?php echo $args['url']; ?>" target="_blank">
+| <a href="<?php echo ( $args['view'] == 'download' ) ? $args['pdf']['download'] : $args['pdf']['url']; ?>" target="_blank">
     <?php _e('View PDF', 'gravity-forms-pdf-extended' ); ?>
 </a>

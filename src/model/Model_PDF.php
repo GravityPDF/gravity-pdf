@@ -210,7 +210,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since  4.0
 	 */
 	public function apply_backwards_compatibility_filters( $settings, $entry ) {
-		
+
 		$form = $this->form->get_form( $entry['form_id'] );
 
 		$settings['filename'] = $this->misc->remove_extension_from_string( apply_filters( 'gfpdfe_pdf_name', $settings['filename'], $form, $entry ) );
@@ -430,7 +430,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			/* check if the user is logged in but is not the current owner */
 			if ( is_user_logged_in() &&
 				( ( $this->options->get_option( 'limit_to_admin', 'No' ) == 'Yes' ) || ( $this->is_current_pdf_owner( $entry, 'logged_in' ) === false ) ) ) {
-				
+
 				/* Handle permissions checks */
 				$admin_permissions = $this->options->get_option( 'admin_capabilities', array( 'gravityforms_view_entries' ) );
 
@@ -471,12 +471,21 @@ class Model_PDF extends Helper_Abstract_Model {
 		) );
 
 		if ( ! empty($pdf_list) ) {
+
 			if ( sizeof( $pdf_list ) > 1 ) {
-				$args = array( 'pdfs' => $pdf_list );
+				$args = array(
+                    'pdfs' => $pdf_list,
+                    'view' => strtolower( $this->options->get_option( 'default_action' ) ),
+				);
+
 				$controller->view->entry_list_pdf_multiple( $args );
 			} else {
 				/* Only one PDF for this form so display a simple 'View PDF' link */
-				$args = array_shift( $pdf_list );
+				$args = array(
+                    'pdf'  => array_shift( $pdf_list ),
+                    'view' => strtolower( $this->options->get_option( 'default_action' ) ),
+				);
+
 				$controller->view->entry_list_pdf_single( $args );
 			}
 		}
@@ -500,7 +509,9 @@ class Model_PDF extends Helper_Abstract_Model {
 		) );
 
 		if ( ! empty($pdf_list) ) {
-			$args = array( 'pdfs' => $pdf_list );
+			$args = array(
+				'pdfs' => $pdf_list
+			);			
 			$controller->view->entry_detailed_pdf( $args );
 		}
 	}
@@ -521,13 +532,13 @@ class Model_PDF extends Helper_Abstract_Model {
 		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : array();
 
 		if ( ! empty($pdfs) ) {
-			$download = ($this->options->get_option( 'default_action' ) == 'Download') ? true : false;
 
 			foreach ( $pdfs as $pdf ) {
 
 				$args[] = array(
-					'name' => $this->get_pdf_name( $pdf, $entry ),
-					'url'  => $this->get_pdf_url( $pdf['id'], $entry['id'], $download ),
+                    'name'     => $this->get_pdf_name( $pdf, $entry ),
+                    'view'     => $this->get_pdf_url( $pdf['id'], $entry['id'], false ),
+                    'download' => $this->get_pdf_url( $pdf['id'], $entry['id'], true ),
 				);
 			}
 		}
@@ -700,7 +711,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			}
 
 			$notifications['attachments'] = ( isset( $notifications['attachments'] ) ) ? $notifications['attachments'] : array();
-			
+
 			$this->log->addNotice( 'Gravity Forms Attachments', array(
 				'attachments'  => $notifications['attachments'],
 				'notification' => $notifications,
@@ -869,7 +880,7 @@ class Model_PDF extends Helper_Abstract_Model {
 						try {
 							$this->misc->rmdir( $pdf_generator->get_path() );
 						} catch (Exception $e) {
-							
+
 							$this->log->addError( 'Cleanup PDF Error', array(
 								'pdf'       => $pdf,
 								'exception' => $e,
@@ -940,7 +951,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function add_unregistered_fonts_to_mPDF( $fonts ) {
 
 		foreach( glob( $this->data->template_font_location . '*.{otf,ttf}', GLOB_BRACE ) as $font ) {
-			
+
 			/* Get font shortname */
 			$font_name = basename( $font );
 			$short_name = $this->options->get_font_short_name( substr( $font_name, 0, -4 ) );
