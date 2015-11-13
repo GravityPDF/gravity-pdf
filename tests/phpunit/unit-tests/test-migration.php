@@ -337,4 +337,37 @@ class Test_Migration extends WP_UnitTestCase
             )
         );
     }
+
+    /**
+     * Check that the output directory is cleaned up correctly during a migration
+     * @since 4.0
+     */
+    public function test_cleanup_output_directory() {
+        global $gfpdf;
+
+        /* Create a config so we can do a migration */
+        $configuration_path = ( is_multisite() ) ? $gfpdf->data->multisite_template_location : $gfpdf->data->template_location;
+        wp_mkdir_p( $configuration_path );
+        touch( $configuration_path . 'configuration.php' );
+
+        /* Setup an output directory and fill it with files */
+        mkdir( $gfpdf->data->template_location . 'output' );
+        mkdir( $gfpdf->data->template_location . 'output/123/' );
+        touch( $gfpdf->data->template_location . 'output/file' );
+        touch( $gfpdf->data->template_location . 'output/123/file' );
+
+        /* Verify the output folder exists */
+        $this->assertTrue( is_dir( $gfpdf->data->template_location . 'output' ) );
+
+        /* Run the migration */
+        $this->assertTrue( $this->migration->begin_migration() );
+
+        /* Verify our output folder no longer exists */
+        $this->assertFalse( is_dir( $gfpdf->data->template_location . 'output' ) );
+        $this->assertTrue( is_dir( $gfpdf->data->template_location ) );
+
+        /* Verify our config file was archived and clean up */
+        $this->assertFileExists( $configuration_path . 'configuration.archive.php' );
+        unlink( $configuration_path . 'configuration.archive.php' );
+    }
 }
