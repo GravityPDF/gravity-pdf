@@ -140,6 +140,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 				'process'     => array( $this->model, 'dismiss_notice' ),
 				'view'        => array( $this->view, 'review_plugin' ),
 				'capability'  => 'gravityforms_view_settings',
+				'view_class'  => 'gfpdf-alert-mascot'
 			),
 
 			array(
@@ -176,7 +177,9 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 				call_user_func( $route['condition'] ) ) {
 
 				$this->log->addNotice( 'Trigger Action Notification.', array( 'route' => $route ) );
-				$this->notices->add_notice( call_user_func( $route['view'], $route['action'], $route['action_text'] ) );
+
+				$class = ( isset( $route['view_class'] ) ) ? $route['view_class'] : '';
+				$this->notices->add_notice( call_user_func( $route['view'], $route['action'], $route['action_text'] ), $class );
 			}
 		}
 	}

@@ -93,11 +93,17 @@ class Helper_Notices implements Helper_Interface_Actions {
 	/**
 	 * Public endpoint for adding a new notice
 	 * @param String $notice The message to be queued
+	 * @param String $class  The class that should be included with the notice box
 	 * @return void
 	 * @since 4.0
 	 */
-	public function add_notice( $notice ) {
-		$this->notices[] = $notice;
+	public function add_notice( $notice, $class = '' ) {
+
+		if( empty( $class ) ) {
+			$this->notices[] = $notice;
+		} else {
+			$this->notices[ $class ] = $notice;
+		}
 	}
 
 	/**
@@ -106,8 +112,13 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 * @return void
 	 * @since 4.0
 	 */
-	public function add_error( $error ) {
-		$this->errors[] = $error;
+	public function add_error( $error, $class = '' ) {
+
+		if( empty( $class ) ) {
+			$this->errors[] = $error;
+		} else {
+			$this->errors[ $class ] = $error;
+		}
 	}
 
 	/**
@@ -156,12 +167,14 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 * @since 4.0
 	 */
 	public function process() {
-		foreach ( $this->notices as $notice ) {
-			$this->html( $notice );
+		foreach ( $this->notices as $class => $notice ) {
+			$include_class = ( ! is_int( $class ) ) ? $class : '';
+			$this->html( $notice, 'updated ' . $include_class );
 		}
 
-		foreach ( $this->errors as $error ) {
-			$this->html( $error, 'error' );
+		foreach ( $this->errors as $class => $error ) {
+			$include_class = ( ! is_int( $class ) ) ? $class : '';
+			$this->html( $error, 'error ' . $include_class );
 		}
 	}
 

@@ -175,7 +175,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @return void
 	 */
 	public function add_actions() {
-		
+
 		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'init', array( $this, 'load_assets' ), 15 );
 
@@ -304,7 +304,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @since 4.0
 	 */
 	public function is_development_version( $version ) {
-		
+
 		$dev            = false;
 		$dev_version    = array('alpha', 'beta', 'rc');
 		$plugin_version = strtolower( $version );
@@ -397,6 +397,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		}
 
 		wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'src/assets/css/gfpdf-styles'. $suffix .'.css', array( 'wp-color-picker' ), $version );
+		wp_register_style( 'gfpdf_css_admin_styles', PDF_PLUGIN_URL . 'src/assets/css/gfpdf-admin-styles'. $suffix .'.css', array(), $version );
 		wp_register_style( 'gfpdf_css_chosen_style', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.min.css', array( 'wp-jquery-ui-dialog' ), $version );
 	}
 
@@ -456,6 +457,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		if ( is_admin() && rgget( 'page' ) == 'gf_entries' ) {
 			wp_enqueue_script( 'gfpdf_js_entries' );
 			wp_enqueue_style( 'gfpdf_css_styles' );
+		}
+
+		if( is_admin() ) {
+			wp_enqueue_style( 'gfpdf_css_admin_styles' );
 		}
 	}
 
@@ -674,7 +679,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		global $gfpdf;
 
 		$pid = $GLOBALS['wp']->query_vars['pid'];
-	
+
 		$settings    = $gfpdf->options->get_pdf( $form_id, $pid );
 
 		if ( is_wp_error( $settings ) ) {
