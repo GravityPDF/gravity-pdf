@@ -98,7 +98,7 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	 * Load our model and view and required actions
 	 */
 	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_Form $form, LoggerInterface $log, Helper_Notices $notices, Helper_Data $data, Helper_Misc $misc ) {
-		
+
 		/* Assign our internal variables */
 		$this->form    = $form;
 		$this->log     = $log;
@@ -155,6 +155,8 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 		$this->data->permalink      = $this->model->get_permalink_regex();
 		$this->data->working_folder = $this->model->get_working_directory();
 		$this->data->settings_url   = $this->model->get_settings_url();
+
+		$this->data->memory_limit   = ini_get( 'memory_limit' );
 
 		$upload_details             = $this->misc->get_upload_details();
 		$this->data->upload_dir     = $upload_details['path'];
@@ -213,7 +215,7 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 			 */
 			if ( ( ! is_multisite() && ! $this->form->has_capability( 'gravityforms_uninstall' ) ) ||
 			     ( is_multisite() && ! is_super_admin() ) ) {
-	
+
 				$this->log->addCritical( 'Lack of User Capabilities.', array(
 					'user'      => wp_get_current_user(),
 					'user_meta' => get_user_meta( get_current_user_id() )

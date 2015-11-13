@@ -185,7 +185,7 @@ class View_Settings extends Helper_Abstract_View
 		$status = new GFPDF_Major_Compatibility_Checks();
 
 		$vars = array(
-			'memory'      => $status->get_ram( ini_get( 'memory_limit' ) ),
+			'memory'      => $status->get_ram( $this->plugin_data->memory_limit ),
 			'wp'          => $wp_version,
 			'php'         => phpversion(),
 			'gf'          => $this->form->get_version(),
@@ -226,7 +226,7 @@ class View_Settings extends Helper_Abstract_View
 		/* prevent unauthorized access */
 		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			$this->log->addWarning( 'Lack of User Capabilities.' );
-			
+
 			wp_die( __( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
 		}
 
