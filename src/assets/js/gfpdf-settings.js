@@ -47,7 +47,7 @@
 		 * @since 4.0
 		 */
 		function GravityPDF () {
-			
+
 			/**
 			 * A reference to the GravityPDF object when 'this' refers to a different object
 			 * Usage is inside AJAX closures. All other functions should use $.proxy() to set this appropriately
@@ -84,7 +84,7 @@
 			 * @since 4.0
 			 */
 			this.initCommon = function() {
-				
+
 				/* If we have a upload field handle the logic */
 				this.doUploadListener();
 
@@ -161,7 +161,7 @@
 			 * @since 4.0
 			 */
 			this.processSettings = function() {
-				
+
 				/* Ensure the Gravity Forms settings navigation (Form Settings / Notifications / Confirmation) has the 'tab' URI stripped from it */
 				this.cleanupGFNavigation();
 
@@ -241,7 +241,7 @@
 				$pdfSecurity.change(function() {
 
 					if($(this).is(':checked')) {
-						
+
 						/* Get the format dependancy */
 						var format =  $format.filter(':checked').val();
 
@@ -261,7 +261,7 @@
 					}
 
 				}).trigger('change');
-				
+
 				/* The format field effects the security field. When it changes it triggers the security field as changed */
 				$format.change(function() {
 					if($(this).is(':checked')) {
@@ -276,7 +276,7 @@
 			 * @since 4.0
 			 */
 			this.handlePDFConditionalLogic = function() {
-				
+
 				gform.addFilter( 'gform_conditional_object', function(object, objectType) {
 					if(objectType === 'gfpdf') {
 						return window.gfpdf_current_pdf;
@@ -286,7 +286,7 @@
 
 				/* Add change event to conditional logic field */
 				$('#gfpdf_conditional_logic').change( function() {
-					
+
 					/* Only set up a .conditionalLogic object if it doesn't exist */
 					if(typeof window.gfpdf_current_pdf.conditionalLogic == 'undefined' && $(this).prop('checked')) {
 
@@ -318,7 +318,7 @@
 			 * @since 4.0
 			 */
 			this.setupAJAXListStateListener = function() {
-				
+
 				/* Add live state listener to change active / inactive value */
 				$('#gfpdf_list_form').on('click', '.check-column img', function() {
 					var id = String($(this).data('id'));
@@ -326,7 +326,7 @@
 
 					if(id.length > 0) {
 						var is_active = that.src.indexOf('active1.png') >= 0;
-						
+
 						if (is_active) {
 							that.src = that.src.replace('active1.png', 'active0.png');
 							$(that).attr('title', GFPDF.inactive).attr('alt', GFPDF.inactive);
@@ -334,7 +334,7 @@
 							that.src = that.src.replace('active0.png', 'active1.png');
 							$(that).attr('title', GFPDF.active).attr('alt', GFPDF.active);
 						}
-						
+
 						/* Set up ajax data */
 			      		var data = {
 			      			'action': 'gfpdf_change_state',
@@ -357,7 +357,7 @@
 			 * @since 4.0
 			 */
 			this.setupAJAXListDuplicateListener = function() {
-				
+
 				/* Add live duplicate listener */
 				$('#gfpdf_list_form').on('click', 'a.submitduplicate', function() {
 
@@ -397,6 +397,7 @@
 								var $duplicate = $newRow.find('.duplicate a');
 								var $delete    = $newRow.find('.delete a');
 								var $state     = $newRow.find('.check-column img');
+								var $shortcode = $newRow.find('.column-shortcode input');
 
 								/* Update duplicate ID and nonce pointers so the actions are valid */
 								$duplicate.data('id', response.pid);
@@ -409,6 +410,11 @@
 								/* update state ID and nonce pointers so the actions are valid */
 								$state.data('id', response.pid);
 								$state.data('nonce', response.state_nonce);
+
+								/* Update our shortcode ID */
+								var shortcodeValue = $shortcode.val();
+								shortcodeValue     = shortcodeValue.replace(id, response.pid);
+								$shortcode.val(shortcodeValue);
 
 								/* Add fix for alternate row background */
 								var background = '';
@@ -487,7 +493,7 @@
 			 * @since 4.0
 			 */
 			this.setupPdfTabs = function() {
-				
+
 				/* Hide all containers except the first one */
 				$('.gfpdf-tab-container').not(":eq(0)").hide();
 
@@ -569,7 +575,7 @@
 		      		};
 
 		      		self.ajax(data, function(response) {
-		      			
+
 		      			/* Remove our UI loader */
 		      			$spinner.remove();
 
@@ -629,7 +635,7 @@
 			 * @since  4.0
 			 */
 			this.loadTinyMCEEditor = function(editors, settings) {
-				
+
 				if(settings != null) {
 					/* Ensure appropriate settings defaults */
 					settings.body_class = 'id post-type-post post-status-publish post-format-standard';
@@ -655,18 +661,18 @@
 
   					/* Setup out selector */
 					settings.selector   = '#' + fullId;
-  			
+
 					/* Initialise our editor */
 					tinyMCE.init( settings );
-					
+
 			        /* Add our editor to the DOM */
 		        	tinyMCE.execCommand('mceAddEditor', false, fullId);
-		        	
+
 		        	/* Enable WP quick tags */
 			        if ( typeof(QTags) == 'function' ) {
 		                	QTags( {'id': fullId } );
 		                	QTags._buttonsInit();
-	                    	
+
 	                    	/* remember last tab selected */
 	                    	if( typeof switchEditors.switchto === 'function' ) {
 	                    		switchEditors.switchto( jQuery( '#wp-' + fullId + '-wrap' ).find( '.wp-switch-editor.switch-' + ( getUserSetting( 'editor' ) == 'html' ? 'html' : 'tmce' ) )[0] );
@@ -766,7 +772,7 @@
 					}).trigger('change');
 
 				});
-				
+
 			};
 
 			/**
@@ -860,7 +866,7 @@
 				var $advanced_options_toggle_container = $('.gfpdf-advanced-options');
 				var $advanced_options_container        = $advanced_options_toggle_container.prev();
 				var $advanced_options                  = $advanced_options_toggle_container.find('a');
-				
+
 				/*
 				 * Show / Hide Advanced options
 				 */
@@ -895,13 +901,13 @@
 
 				var $table             = $('#pdf-general-security');
 				var $adminRestrictions = $table.find('input[name="gfpdf_settings[limit_to_admin]"]');
-				
+
 
 				/*
 				 * Add change event to admin restrictions to show/hide dependant fields
 				 */
 				$adminRestrictions.change(function() {
-					
+
 					if( $(this).is(':checked') )  {
 						if($(this).val() === 'Yes') {
 							/* hide user restrictions and logged out user timeout */
@@ -1067,9 +1073,9 @@
 				$a.click(function() {
 					return false;
 				});
-				
+
 				$a.attr('title', html);
-				
+
 				return $a;
 			};
 
