@@ -143,6 +143,9 @@ class Helper_Migration {
 		/* Import the configuration into the database */
 		$this->import_v3_config( $config );
 
+		/* Clean-up the old 'output' directory as we use 'tmp' now */
+		$this->cleanup_output_directory();
+
         return true;
 	}
 
@@ -248,7 +251,7 @@ class Helper_Migration {
                 $node['pdf_size'][0]     = (int) $node['pdf_size'][0];
                 $node['pdf_size'][1]     = (int) $node['pdf_size'][1];
                 $node['pdf_size'][2]     = 'millimeters';
-                
+
                 $node['custom_pdf_size'] = $node['pdf_size'];
                 $node['pdf_size']        = 'CUSTOM';
             } else {
@@ -330,7 +333,7 @@ class Helper_Migration {
 	 * @since  4.0
 	 */
 	private function process_default_configuration( $raw_config ) {
-		 
+
 		/* Only handle when enabled */
 		if ( ( ! defined( 'GFPDF_SET_DEFAULT_TEMPLATE' ) || GFPDF_SET_DEFAULT_TEMPLATE === true ) && sizeof( $raw_config['default'] ) > 0 ) {
 
@@ -524,5 +527,20 @@ class Helper_Migration {
 		if ( is_multisite() && is_file( $this->data->multisite_template_location . 'configuration.php' ) ) {
 			@rename( $this->data->multisite_template_location . 'configuration.php', $this->data->multisite_template_location . 'configuration.archive.php' );
 		}
+	}
+
+	/**
+	 * Try and clean-up the old output directory during the migration
+	 * @return Boolean
+	 * @since 4.0
+	 */
+	private function cleanup_output_directory() {
+		$output_dir = $this->data->template_location . 'output';
+
+		if( is_dir( $output_dir ) ) {
+			return $this->misc->rmdir( $output_dir );
+		}
+
+		return false;
 	}
 }

@@ -150,7 +150,7 @@ class Test_Migration extends WP_UnitTestCase
         $settings = array_values( $settings );
 
         $data = $this->provider_imported_data();
-       
+
         /* remove the ID as we aren't using it in our comparison */
         foreach( $settings as &$setting ) {
             unset( $setting['id'] );
@@ -184,7 +184,7 @@ class Test_Migration extends WP_UnitTestCase
      * @return Array
      */
     public function provider_imported_data() {
-        
+
         return array(
             array(
                 'id' => 0,
@@ -331,7 +331,7 @@ class Test_Migration extends WP_UnitTestCase
                     'pdf_size' => 'CUSTOM',
                     'custom_pdf_size' => array(50, 200, 'millimeters'),
                     'format' => 'PDFX1A',
-                    
+
                     'image_dpi' => 300,
                     'save' => 'Yes',
 
@@ -340,5 +340,37 @@ class Test_Migration extends WP_UnitTestCase
                 ),
             )
         );
+    }
+
+    /**
+     * Check that the output directory is cleaned up correctly during a migration
+     * @since 4.0
+     */
+    public function test_cleanup_output_directory() {
+        global $gfpdf;
+
+        /* Create a config so we can do a migration */
+        $configuration_path = ( is_multisite() ) ? $gfpdf->data->multisite_template_location : $gfpdf->data->template_location;
+        touch( $configuration_path . 'configuration.php' );
+
+        /* Setup an output directory and fill it with files */
+        mkdir( $configuration_path . 'output' );
+        mkdir( $configuration_path . 'output/123/' );
+        touch( $configuration_path . 'output/file' );
+        touch( $configuration_path . 'output/123/file' );
+
+        /* Verify the output folder exists */
+        $this->assertTrue( is_dir( $configuration_path . 'output' ) );
+
+        /* Run the migration */
+        $this->assertTrue( $this->migration->begin_migration() );
+
+        /* Verify our output folder no longer exists */
+        $this->assertFalse( is_dir( $configuration_path . 'output' ) );
+        $this->assertTrue( is_dir( $configuration_path ) );
+
+        /* Verify our config file was archived and clean up */
+        $this->assertFileExists( $configuration_path . 'configuration.archive.php' );
+        unlink( $configuration_path . 'configuration.archive.php' );
     }
 }
