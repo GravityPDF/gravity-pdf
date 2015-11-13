@@ -1102,8 +1102,13 @@
 			 * @return void
 			 * @since 4.0
 			 */
-			this.ajax_error = function() {
-				alert(GFPDF.ajax_error);
+			this.ajax_error = function(jqXHR, textStatus, errorThrown) {
+				console.log( textStatus );
+				console.log( errorThrown );
+
+				if (jqXHR.readyState === 4) {
+					alert.log(GFPDF.ajax_error);
+				}
 			};
 
 			/**
