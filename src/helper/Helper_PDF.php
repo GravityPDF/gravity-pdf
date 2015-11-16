@@ -142,7 +142,7 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	public function __construct( $entry, $settings, Helper_Abstract_Form $form, Helper_Data $data ) {
-		
+
 		/* Assign our internal variables */
 		$this->entry    = $entry;
 		$this->settings = $settings;
@@ -160,6 +160,7 @@ class Helper_PDF {
 	public function init() {
 		$this->set_paper();
 		$this->begin_pdf();
+		$this->set_creator();
 		$this->set_image_dpi();
 		$this->set_text_direction();
 		$this->set_pdf_format();
@@ -179,7 +180,7 @@ class Helper_PDF {
 		if( empty( $html ) ) {
 			$this->set_template();
 		}
-		
+
 		$form = $this->form->get_form( $this->entry['form_id'] );
 
 		/* Add filter to prevent HTML being written to document when it returns true. Backwards compatibility. */
@@ -214,13 +215,15 @@ class Helper_PDF {
 
 		/* Process any final settings before outputting */
 		$this->show_print_dialog();
+		$this->set_metadata();
 
 		/* allow $mpdf object class to be modified */
-		apply_filters( 'gfpdf_mpdf_class', $this->mpdf, $this->entry, $this->settings );
+		$this->mpdf = apply_filters( 'gfpdf_mpdf_class', $this->mpdf, $this->entry, $this->settings );
 
-		apply_filters( 'gfpdfe_mpdf_class_pre_render', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() ); /* backwards compat */
-		apply_filters( 'gfpdfe_pre_render_pdf', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() ); /* backwards compat */
-		apply_filters( 'gfpdfe_mpdf_class', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() ); /* backwards compat */
+		/* depreciated backwards compatibility filters */
+		$this->mpdf = apply_filters( 'gfpdfe_mpdf_class_pre_render', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() );
+		$this->mpdf = apply_filters( 'gfpdfe_pre_render_pdf', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() );
+		$this->mpdf = apply_filters( 'gfpdfe_mpdf_class', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() );
 
 		/* If a developer decides to disable all security protocols we don't want the PDF indexed */
 		if ( ! headers_sent() ) {
@@ -283,6 +286,14 @@ class Helper_PDF {
 		$this->output = strtoupper( $type );
 	}
 
+	/**
+	 * Set the PDF meta data, including title, author, creator and subject
+	 * @since 4.0
+	 */
+	protected function set_metadata() {
+		$this->mpdf->SetTitle( strcode2utf( strip_tags( $this->get_filename() ) ) );
+		$this->mpdf->SetAuthor( strcode2utf( strip_tags( get_bloginfo('name') ) ) );
+	}
 
 	/**
 	 * Public Method to mark the PDF document creator
@@ -421,6 +432,9 @@ class Helper_PDF {
 	 */
 	protected function begin_pdf() {
 		$this->mpdf = new mPDF( '', $this->paper_size, 0, '', 15, 15, 16, 16, 9, 9, $this->orientation );
+
+		/* allow $mpdf object class to be modified */
+		$this->mpdf = apply_filters( 'gfpdf_mpdf_init_class', $this->mpdf, $this->entry, $this->settings );
 	}
 
 	/**
@@ -565,7 +579,7 @@ class Helper_PDF {
 				throw new Exception( sprintf( __( 'The PDF Tempalte %s requires Gravity PDF version %s. Upgrade to the latest version.', 'gravity-forms-pdf-extended' ), "<em>$template</em>", "<em>{$headers['required_pdf_version']}</em>" ) );
 			}
 		}
-		
+
 	}
 
 
@@ -605,7 +619,7 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	protected function maybe_display_raw_html( $html ) {
-		
+
 		if ( $this->output !== 'SAVE' && rgget( 'html' ) && $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			echo $html;
 			exit;
@@ -692,7 +706,7 @@ class Helper_PDF {
 	 * @todo
 	 */
 	protected function backwards_compat_conversion( $settings ) {
-		
+
 		$compat                   = array();
 		$compat['premium']		  = ( isset($settings['advanced_template']) && $settings['advanced_template'] == 'Yes' ) ? true : false;
 		$compat['rtl']            = ( isset($settings['rtl']) && $settings['rtl'] == 'Yes' ) ? true : false;

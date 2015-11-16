@@ -64,6 +64,25 @@ class Test_Helper_Misc extends WP_UnitTestCase
     }
 
     /**
+     * Create our testing data
+     * @since 4.0
+     */
+    private function create_form_and_entries() {
+        global $gfpdf;
+
+        $form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+        $entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+
+        $gfpdf->data->form_settings = array();
+        $gfpdf->data->form_settings[ $form['id'] ] = $form['gfpdf_form_settings'];
+
+        return array(
+            'form'  => $form,
+            'entry' => $entry,
+        );
+    }
+
+    /**
      * Ensure we correctly determine when we are on a Gravity PDF admin page
      * @since 4.0
      */
@@ -149,6 +168,9 @@ class Test_Helper_Misc extends WP_UnitTestCase
     public function provider_test_fix_header_footer() {
         return array(
             array( '<img src="my-image.jpg" alt="My Image" class="header-footer-img"/>', '<img src="my-image.jpg" alt="My Image" />' ),
+            array( '<div id="header">' . "\n" . '  <img src="my-image.jpg" alt="My Image" class="header-footer-img"/>' . "\n" . '</div>', '<div id="header"><img src="my-image.jpg" alt="My Image" /></div>' ),
+            array( '<span>Intro</span> <img src="my-image.jpg" alt="My Image" class="header-footer-img"/><span>Outro</span>', '<span>Intro</span> <img src="my-image.jpg" alt="My Image" /> <span>Outro</span>' ),
+            array( '<b>This is bold</b>. <i>This is italics</i> <img src="image.jpg" class="header-footer-img"/>', '<b>This is bold</b>. <i>This is italics</i> <img src="image.jpg" />' ),
             array( '<img src="my-image.jpg" alt="My Image" class="header-footer-img"/>', '<img src="my-image.jpg" alt="My Image">' ),
             array( '<img src="my-image.jpg" alt="My Image" class="alternate header-footer-img"/>', '<img src="my-image.jpg" alt="My Image" class="alternate" />' ),
             array( '<span>Nothing</span>', '<span>Nothing</span>' ),
@@ -259,5 +281,44 @@ class Test_Helper_Misc extends WP_UnitTestCase
         $results = $this->misc->add_template_image( array() );
 
         $this->assertEmpty( $results );
+    }
+
+    /**
+     * Check that the appropriate array keys are returned when getting the template arguments
+     * @since 4.0
+     */
+    public function test_get_template_args() {
+
+        /* Get test entry and Gravity Forms settings */
+        $results   = $this->create_form_and_entries();
+
+        $entry     = $results['entry'];
+        $pdf       = \GPDFAPI::get_pdf( $entry['form_id'], '556690c67856b' );
+
+        /* Pass details on to our test method */
+        $data = $this->misc->get_template_args( $entry, $pdf );
+
+        /* Check all our keys exist */
+        $this->assertArrayHasKey( 'form_id', $data );
+        $this->assertArrayHasKey( 'lead_ids', $data );
+        $this->assertArrayHasKey( 'lead_id', $data );
+        $this->assertArrayHasKey( 'form', $data );
+        $this->assertArrayHasKey( 'entry', $data );
+        $this->assertArrayHasKey( 'lead', $data );
+        $this->assertArrayHasKey( 'form_data', $data );
+        $this->assertArrayHasKey( 'settings', $data );
+        $this->assertArrayHasKey( 'gfpdf', $data );
+
+        /* Sniff that our keys have the correct details */
+        $this->assertEquals( $entry['form_id'], $data['form_id'] );
+        $this->assertEquals( $entry['id'], $data['lead_id'] );
+        $this->assertEquals( array( $entry['id'] ), $data['lead_ids'] );
+        $this->assertTrue( is_array( $data['form'] ) );
+        $this->assertTrue( is_array( $data['entry'] ) );
+        $this->assertTrue( is_array( $data['lead'] ) );
+        $this->assertTrue( is_array( $data['form_data'] ) );
+        $this->assertEquals( $data['entry'], $data['lead'] );
+        $this->assertEquals( $pdf, $data['settings'] );
+        $this->assertEquals( 'GFPDF\Router', get_class( $data['gfpdf'] ) );
     }
 }

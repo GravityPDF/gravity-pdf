@@ -449,4 +449,22 @@ class View_PDF extends Helper_Abstract_View
 
 		echo apply_filters( 'gfpdf_field_page_name_html', ob_get_clean(), $page, $field, $form );
 	}
+
+	/**
+	 * Automatically render our core PDF fields, a styles in templates to simplify there usage for users
+	 * @param  Object $mpdf     The mPDF object
+	 * @param  Array $entry     The Gravity Form entry being processed
+	 * @param  Array $settings  The current PDF settings
+	 */
+	public function autoprocess_core_template_options( $mpdf, $entry, $settings ) {
+
+		if( ! $mpdf instanceof mPDF ) {
+			return $mpdf;
+		}
+
+		$html = $this->load( 'core_template_styles', array( 'settings' => $settings ), false );
+		$mpdf->WriteHTML( $html );
+
+		return $mpdf;
+	}
 }

@@ -86,7 +86,7 @@ class Helper_Misc
 	 * @since 4.0
 	 */
 	public function __construct( LoggerInterface $log, Helper_Abstract_Form $form, Helper_Data $data ) {
-		
+
 		/* Assign our internal variables */
 		$this->log  = $log;
 		$this->form = $form;
@@ -180,7 +180,7 @@ class Helper_Misc
 	public function fix_header_footer( $html ) {
 		try {
 			/* return the modified HTML */
-			return qp( $html, 'img' )->addClass( 'header-footer-img' )->top( 'body' )->children()->html();
+			return htmlqp( $html, 'img' )->addClass( 'header-footer-img' )->top( 'body' )->innerHTML();
 		} catch (Exception $e) {
 			/* if there was any issues we'll just return the $html */
 			return $html;
@@ -455,7 +455,9 @@ class Helper_Misc
 			'lead'      => $entry,
 			'form_data' => $pdf->get_form_data( $entry ),
 
-			'settings' => $settings,
+			'settings'  => $settings,
+
+			'gfpdf'     => $gfpdf,
 
 		), $entry, $settings, $form);
 	}
@@ -613,7 +615,7 @@ class Helper_Misc
 		if ( isset( $settings['template'] ) || isset( $settings['default_template'] ) ) {
 
 			$key = ( isset( $settings['template'] ) ) ? 'template' : 'default_template';
- 
+
 			$current_template = $gfpdf->options->get_form_value( $settings[ $key ] );
 			$template_image   = $this->get_template_image( $current_template );
 
@@ -637,7 +639,7 @@ class Helper_Misc
 	 * @since 4.0
 	 */
 	public function get_allowed_html_tags() {
-		
+
 		$allowedposttags = array(
 				'address' => array(),
 				'a' => array(
