@@ -40,7 +40,7 @@ use WP_UnitTestCase;
 /**
  * Test the model / view / controller for the Shortcode MVC
  * @since 4.0
- * @group shortcode
+ * @group shortcodes
  */
 class Test_Shortcode extends WP_UnitTestCase
 {
@@ -148,7 +148,7 @@ class Test_Shortcode extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_gravitypdf_confirmation() {
-        
+
         /* Setup test data */
         $confirmation = 'Thanks for getting in touch. [gravitypdf id="555ad84787d7e"]';
         $form = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
@@ -173,7 +173,7 @@ class Test_Shortcode extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_gravitypdf_notification() {
-        
+
         /* Setup test data */
         $notification = array();
         $notification['message'] = 'Thanks for getting in touch. [gravitypdf id="555ad84787d7e"]';

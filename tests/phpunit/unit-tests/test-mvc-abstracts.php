@@ -44,7 +44,7 @@ use WP_UnitTestCase;
 /**
  * Test the Controller / Model / View Abstract Class
  * @since 4.0
- * @group mvp
+ * @group mvc-abstracts
  */
 class Test_MVC_Abstracts extends WP_UnitTestCase
 {

@@ -38,7 +38,7 @@ use WP_UnitTestCase;
 /**
  * Test the Helper_Misc class
  * @since 4.0
- * @group misc
+ * @group helper-misc
  */
 class Test_Helper_Misc extends WP_UnitTestCase
 {

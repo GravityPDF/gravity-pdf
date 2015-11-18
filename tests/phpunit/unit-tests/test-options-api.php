@@ -41,7 +41,7 @@ use WP_UnitTestCase;
 /**
  * Test the WordPress Options API Implimentation
  * @since 4.0
- * @group options
+ * @group options-api
  */
 class Test_Options_API extends WP_UnitTestCase
 {
@@ -69,10 +69,6 @@ class Test_Options_API extends WP_UnitTestCase
 
 		/* run parent method */
 		parent::setUp();
-
-		/* Remove temporary tables which causes problems with GF */
-		remove_all_filters( 'query', 10 );
-		GFForms::setup_database();
 
 		/* setup our object */
 		$this->options = new Helper_Options_Fields( $gfpdf->log, $gfpdf->form, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );

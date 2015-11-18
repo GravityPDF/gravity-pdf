@@ -81,10 +81,6 @@ class Test_Settings extends WP_UnitTestCase
 		/* run parent method */
 		parent::setUp();
 
-		/* Remove temporary tables which causes problems with GF */
-		remove_all_filters( 'query', 10 );
-		GFForms::setup_database();
-
 		/* Setup our test classes */
 		$this->model = new Model_Settings( $gfpdf->form, $gfpdf->log, $gfpdf->notices, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
 		$this->view  = new View_Settings( array(), $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
@@ -106,7 +102,7 @@ class Test_Settings extends WP_UnitTestCase
 
 		$this->assertEquals( 10, has_action( 'wp_ajax_gfpdf_font_save', array( $this->model, 'save_font' ) ) );
 		$this->assertEquals( 10, has_action( 'wp_ajax_gfpdf_font_delete', array( $this->model, 'delete_font' ) ) );
-		
+
 	}
 
 	/**
@@ -122,7 +118,7 @@ class Test_Settings extends WP_UnitTestCase
 		$this->assertEquals( 10, has_filter( 'gravitypdf_settings_navigation', array( $this->controller, 'disable_tools_on_view_cap' ) ) );
 		$this->assertEquals( 10, has_filter( 'upload_mimes', array( $this->controller, 'allow_font_uploads' ) ) );
 		$this->assertEquals( 10, has_filter( 'gfpdf_settings_general', array( $gfpdf->misc, 'add_template_image' ) ) );
-		
+
 		$this->assertFalse( has_filter( 'gfpdf_registered_settings', array( $gfpdf->options, 'highlight_errors' ) ) );
 		/* retest the gfpdf_register_settings filter is added when on the correct screen */
 		set_current_screen( 'edit.php' );
@@ -137,7 +133,7 @@ class Test_Settings extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function test_display_page() {
-		
+
 		/* Test for missing tab */
 		ob_start();
 		$_GET['tab'] = 'test';
@@ -172,7 +168,7 @@ class Test_Settings extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function test_edit_options_cap() {
-		
+
 		try {
 			$this->controller->edit_options_cap();
 		} catch( Exception $e ) {
@@ -221,7 +217,7 @@ class Test_Settings extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function test_process_tool_tab_actions() {
-		
+
 		/* Show we're on the tools tab */
 		$_GET['page']    = 'gfpdf-';
 		$_GET['subview'] = 'PDF';
@@ -268,7 +264,7 @@ class Test_Settings extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function test_highlight_errors() {
-		
+
 		/* Setup an error to match */
 		$this->model->form_settings_errors = array(
 			array( 'type' => 'error', 'code' => 'rtl' ),

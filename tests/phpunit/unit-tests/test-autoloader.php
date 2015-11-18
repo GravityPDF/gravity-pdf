@@ -36,7 +36,7 @@ use WP_UnitTestCase;
 /**
  * Test the PSR-4 Autoloader Implimentation
  * @since 4.0
- * @group init
+ * @group autoloader
  */
 class Test_Autoloader extends WP_UnitTestCase
 {

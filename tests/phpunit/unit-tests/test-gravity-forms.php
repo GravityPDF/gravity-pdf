@@ -47,7 +47,7 @@ use WP_User;
 /**
  * Test the Gravity Forms functionality we rely on in Gravity PDF
  * @since 4.0
- * @group gravityforms
+ * @group gravity-forms
  */
 class Test_Gravity_Forms extends WP_UnitTestCase
 {
@@ -64,10 +64,6 @@ class Test_Gravity_Forms extends WP_UnitTestCase
 	 */
 	public function setUp() {
 		parent::setUp();
-
-		/* Remove temporary tables which causes problems with GF */
-		remove_all_filters( 'query', 10 );
-		GFForms::setup_database();
 
 		$this->setup_form();
 	}
