@@ -90,10 +90,6 @@ class Test_PDF extends WP_UnitTestCase
 		/* run parent method */
 		parent::setUp();
 
-		/* Remove temporary tables which causes problems with GF */
-		remove_all_filters( 'query', 10 );
-		GFForms::setup_database();
-
 		/* Setup our test classes */
 		$this->model = new Model_PDF( $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
 		$this->view  = new View_PDF( array(), $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
@@ -281,43 +277,6 @@ class Test_PDF extends WP_UnitTestCase
 
 		wp_set_current_user(0);
 
-	}
-
-	/**
-	 * Test our PDF generator function works as expected
-	 * This function prepares all the details for generating a PDF and is our authentication layer
-	 * @since 4.0
-	 */
-	public function test_process_pdf() {
-
-		/* Setup our form and entries */
-		$results = $this->create_form_and_entries();
-		$lid = $results['entry']['id'];
-		$pid = '555ad84787d7e';
-
-		/* Test for invalid entry error */
-		$results = $this->model->process_pdf( $pid, 0 );
-		$this->assertEquals( 'not_found', $results->get_error_code() );
-
-		/* Test for invalid PDF settings */
-		$results = $this->model->process_pdf( '', $lid );
-		$this->assertEquals( 'invalid_pdf_id', $results->get_error_code() );
-
-		/* Test our middleware works correctly */
-		$results = $this->model->process_pdf( $pid, $lid );
-		$this->assertEquals( 'conditional_logic', $results->get_error_code() );
-
-		/* Disable all middleware and check if PDF generation begins */
-		remove_all_filters( 'gfpdf_pdf_middleware' );
-
-		try {
-			$results = $this->model->process_pdf( $pid, $lid );
-		} catch ( Exception $e ) {
-			$this->assertEquals( 'There was a problem generating your PDF', $e->getMessage() );
-			return;
-		}
-
-		$this->fail( 'This test did not fail as expected' );
 	}
 
 	/**
@@ -634,7 +593,7 @@ class Test_PDF extends WP_UnitTestCase
 		$pdfs = $this->model->get_pdf_display_list( $entry );
 
 		$this->assertNotFalse( strpos( $pdfs[0]['view'], 'http://example.org/pdf/556690c67856b/' ) );
-		$this->assertNotFalse( strpos( $pdfs[0]['download'], '/download/' ) );		
+		$this->assertNotFalse( strpos( $pdfs[0]['download'], '/download/' ) );
 
 		$wp_rewrite->set_permalink_structure( $old_permalink_structure );
 		flush_rewrite_rules();
@@ -821,29 +780,6 @@ class Test_PDF extends WP_UnitTestCase
 	}
 
 	/**
-	 * Check if the PDF is rendered and saved on disk correctly
-	 * @since 4.0
-	 */
-	public function test_process_and_save_pdf() {
-		global $gfpdf;
-
-		/* Setup some test data */
-		$results  = $this->create_form_and_entries();
-		$entry    = $results['entry'];
-		$form     = $results['form'];
-		$settings = $form['gfpdf_form_settings']['555ad84787d7e'];
-		$settings['template'] = 'zadani';
-
-		/* Create our PDF object */
-		$pdf_generator = new Helper_PDF( $entry, $settings, $gfpdf->form, $gfpdf->data );
-		$pdf_generator->set_filename( 'Unit Testing' );
-
-		/* Generate the PDF and verify it was successfull */
-		$this->assertTrue( $this->model->process_and_save_pdf( $pdf_generator ) );
-		$this->assertFileExists( $pdf_generator->get_path() . $pdf_generator->get_filename() );
-	}
-
-	/**
 	 * Check if the correct PDFs are attached to Gravity Forms notifications
 	 * @since 4.0
 	 */
@@ -854,6 +790,12 @@ class Test_PDF extends WP_UnitTestCase
 		$entry    = $results['entry'];
 		$form     = $results['form'];
 
+		/* Create PDF file so it isn't recreated */
+		$path = PDF_TEMPLATE_LOCATION . "tmp/{$form['id']}{$entry['id']}/";
+
+		wp_mkdir_p( $path );
+		touch( $path . "test-{$form['id']}.pdf");
+
 		$notifications = $this->model->notifications( $form['notifications']['54bca349732b8'], $form, $entry );
 
 		/* Check the results are successful */
@@ -861,78 +803,6 @@ class Test_PDF extends WP_UnitTestCase
 
 		/* Clean up */
 		unlink( $notifications['attachments'][0] );
-	}
-
-	/**
-	 * Check if we should attach a PDF to the current notification
-	 *
-	 * @since 4.0
-	 *
-	 * @dataProvider provider_maybe_attach_to_notification
-	 */
-	public function test_maybe_attach_to_notification( $expectation, $notification, $settings ) {
-		$this->assertSame( $expectation, $this->model->maybe_attach_to_notification( $notification, $settings ) );
-	}
-
-	/**
-	 * Data provider for test_maybe_attach_to_notification()
-	 * @return array
-	 * @since 4.0
-	 */
-	public function provider_maybe_attach_to_notification() {
-
-		$notification = array(
-			'aasffaa2FAa2',
-			'sjfajwa124FAS',
-			'91230jfa021AF',
-			'0890afjIWFjas',
-		);
-
-		return array(
-			array( false, array( 'id' => '123afjafwij4' ), array( 'notification' => $notification ) ),
-			array( true, array( 'id' => 'aasffaa2FAa2' ), array( 'notification' => $notification ) ),
-			array( false, array( 'id' => 'koa290' ),       array( 'notification' => $notification ) ),
-			array( false, array( 'id' => 'AAFwa25940359' ), array( 'notification' => $notification ) ),
-			array( true, array( 'id' => 'sjfajwa124FAS' ), array( 'notification' => $notification ) ),
-			array( true, array( 'id' => '91230jfa021AF' ), array( 'notification' => $notification ) ),
-			array( true, array( 'id' => '0890afjIWFjas' ), array( 'notification' => $notification ) ),
-			array( false, array( 'id' => 'fawfja24a90fa' ), array( 'notification' => $notification ) ),
-		);
-	}
-
-	/**
-	 * Check if we should be always saving the PDF based on the settings
-	 * @since 4.0
-	 */
-	public function test_maybe_always_save_pdf() {
-
-		$settings['save'] = 'Yes';
-		$this->assertSame( true, $this->model->maybe_always_save_pdf( $settings ) );
-
-		$settings['save'] = 'No';
-		$this->assertSame( false, $this->model->maybe_always_save_pdf( $settings ) );
-	}
-
-	/**
-	 * Check if the correct PDFs are saved on disk
-	 * @since 4.0
-	 */
-	public function test_maybe_save_pdf() {
-		global $gfpdf;
-
-		/* Setup some test data */
-		$results  = $this->create_form_and_entries();
-		$entry    = $results['entry'];
-		$form     = $results['form'];
-		$file     = $gfpdf->data->template_tmp_location . "{$form['id']}{$entry['id']}/test-{$form['id']}.pdf";
-
-		$this->model->maybe_save_pdf( $entry, $form );
-
-		/* Check the results are successful */
-		$this->assertFileExists( $file );
-
-		/* Clean up */
-		unlink( $file );
 	}
 
 	/**
@@ -1240,39 +1110,6 @@ class Test_PDF extends WP_UnitTestCase
 
 		$pid = $this->model->get_legacy_config( $config );
 		$this->assertEquals( '555ad84787d7e', $pid );
-	}
-
-	/**
-	 * Test that we can successfully generate a PDF based on an entry and settings
-	 * @since 4.0
-	 */
-	public function test_generate_pdf() {
-		global $gfpdf;
-
-		/* Setup our form and entries */
-		$results = $this->create_form_and_entries();
-		$entry = $results['entry'];
-		$fid = $results['form']['id'];
-		$pid = '555ad84787d7e';
-
-		/* Get our PDF */
-		$pdf = $gfpdf->options->get_pdf( $fid, $pid );
-
-		/* Fix our template */
-		$pdf['template'] = 'zadani';
-
-		/* Add filters to force the PDF to throw and error */
-		add_filter( 'mpdf_output_destination', function () {
-			return 'O';
-		});
-
-		try {
-			$this->view->generate_pdf( $entry, $pdf );
-		} catch ( Exception $e ) {
-			/* Expected */
-		}
-
-		$this->assertEquals( 'There was a problem generating your PDF', $e->getMessage() );
 	}
 
 	/**

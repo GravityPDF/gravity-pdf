@@ -40,9 +40,9 @@ use WP_UnitTestCase;
 /**
  * Test the initial bootup plugin phase
  * @since 4.0
- * @group init
+ * @group pre-checks
  */
-class Test_Loader extends WP_UnitTestCase
+class Test_Pre_Checks extends WP_UnitTestCase
 {
 
 	/**

@@ -41,7 +41,7 @@ use Exception;
 /**
  * Test the model / controller for the Installer
  * @since 4.0
- * @group install
+ * @group installer
  */
 class Test_Installer extends WP_UnitTestCase
 {
@@ -107,7 +107,7 @@ class Test_Installer extends WP_UnitTestCase
 
         /* Set admin screen */
         set_current_screen( 'edit.php' );
-        
+
         /* Set up authorized user */
         $user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
         $this->assertInternalType( 'integer', $user_id );
@@ -115,7 +115,7 @@ class Test_Installer extends WP_UnitTestCase
         if( is_multisite() ) {
             grant_super_admin( $user_id );
         }
-                
+
         wp_set_current_user( $user_id );
 
         $this->controller->check_install_status();
@@ -135,7 +135,7 @@ class Test_Installer extends WP_UnitTestCase
      */
     public function test_maybe_uninstall() {
         global $gfpdf;
-        
+
         $_POST['gfpdf_uninstall'] = true;
 
         /* Verify nonce checks work */
@@ -227,7 +227,7 @@ class Test_Installer extends WP_UnitTestCase
 
         /* Set admin screen */
         set_current_screen( 'edit.php' );
-        
+
         /* Set up authorized user */
         $user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
         $this->assertInternalType( 'integer', $user_id );
@@ -268,7 +268,7 @@ class Test_Installer extends WP_UnitTestCase
 
         /* Set admin screen */
         set_current_screen( 'edit.php' );
-        
+
         /* Set up authorized user */
         $user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
         $this->assertInternalType( 'integer', $user_id );
@@ -280,7 +280,7 @@ class Test_Installer extends WP_UnitTestCase
         wp_set_current_user( $user_id );
 
         $this->controller->check_install_status();
-        
+
         $this->assertNotFalse( get_option( 'gfpdf_is_installed' ) );
         $this->assertNotFalse( get_option( 'gfpdf_current_version' ) );
         $this->assertNotFalse( get_option( 'gfpdf_settings' ) );

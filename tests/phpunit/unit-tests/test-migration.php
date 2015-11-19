@@ -68,10 +68,6 @@ class Test_Migration extends WP_UnitTestCase
 		/* run parent method */
 		parent::setUp();
 
-		/* Remove temporary tables which causes problems with GF */
-		remove_all_filters( 'query', 10 );
-		GFForms::setup_database();
-
 		/* Setup our test classes */
 		$this->migration = new Helper_Migration( $gfpdf->form, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
 
@@ -150,7 +146,7 @@ class Test_Migration extends WP_UnitTestCase
         $settings = array_values( $settings );
 
         $data = $this->provider_imported_data();
-       
+
         /* remove the ID as we aren't using it in our comparison */
         foreach( $settings as &$setting ) {
             unset( $setting['id'] );
@@ -184,7 +180,7 @@ class Test_Migration extends WP_UnitTestCase
      * @return Array
      */
     public function provider_imported_data() {
-        
+
         return array(
             array(
                 'id' => 0,
@@ -331,7 +327,7 @@ class Test_Migration extends WP_UnitTestCase
                     'pdf_size' => 'CUSTOM',
                     'custom_pdf_size' => array(50, 200, 'millimeters'),
                     'format' => 'PDFX1A',
-                    
+
                     'image_dpi' => 300,
                     'save' => 'Yes',
 

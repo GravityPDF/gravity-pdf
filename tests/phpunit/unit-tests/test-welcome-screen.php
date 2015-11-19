@@ -40,7 +40,7 @@ use WP_UnitTestCase;
 /**
  * Test the model / view / controller for the Welcome Screen
  * @since 4.0
- * @group welcome
+ * @group welcome-screen
  */
 class Test_Welcome_Screen extends WP_UnitTestCase
 {
@@ -108,7 +108,7 @@ class Test_Welcome_Screen extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function test_getting_started_screen() {
-		
+
 		ob_start();
 		$this->controller->getting_started_screen();
 		$html = ob_get_clean();
@@ -121,7 +121,7 @@ class Test_Welcome_Screen extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function test_update_screen() {
-		
+
 		ob_start();
 		$this->controller->update_screen();
 		$html = ob_get_clean();

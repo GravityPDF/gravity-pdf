@@ -40,7 +40,7 @@ use StdClass;
 /**
  * Test the PSR-4 Autoloader Implimentation
  * @since 4.0
- * @group data
+ * @group data-helper
  */
 class Test_Data_Helper extends WP_UnitTestCase
 {

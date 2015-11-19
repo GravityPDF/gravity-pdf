@@ -47,7 +47,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 	public function __construct() {
 
 		$this->tests_dir    = dirname( __FILE__ );
-		$this->plugin_dir   = dirname( $this->tests_dir );
+		$this->plugin_dir   = dirname( $this->tests_dir ) . '/..';
 		$this->wp_tests_dir = getenv( 'WP_TESTS_DIR' ) ? getenv( 'WP_TESTS_DIR' ) : $this->plugin_dir . '/tmp/wordpress-tests-lib';
 
 		/* load test function so tests_add_filter() is available */
@@ -93,7 +93,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 			'gravityform-1.json',
 			'gravityform-2.json',
 		);
-		
+
 		foreach( $forms as $json ) {
 			$form                = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/unit-tests/json/' . $json ) ), true );
 			$form_id             = GFAPI::add_form($form);

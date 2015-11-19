@@ -75,10 +75,6 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
     public function setUp() {
         parent::setUp();
 
-        /* Remove temporary tables which causes problems with GF */
-        remove_all_filters( 'query', 10 );
-        GFForms::setup_database();
-        
         $this->import_form();
     }
 
@@ -238,13 +234,13 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
         $this->assertArrayHasKey('dup_nonce', $response);
         $this->assertArrayHasKey('del_nonce', $response);
         $this->assertArrayHasKey('state_nonce', $response);
-        
+
 
         /* Test the function performed correctly */
         unset( $gfpdf->data->form_settings );
         $pdf1   = $gfpdf->options->get_pdf($this->form_id, $this->pid);
         $pdf2   = $gfpdf->options->get_pdf($this->form_id, $response['pid']);
-        
+
         $this->assertEquals($pdf1['name'] . ' (copy)', $pdf2['name']);
         $this->assertEquals($pdf1['template'], $pdf2['template']);
         $this->assertEquals($pdf1['filename'], $pdf2['filename']);
@@ -311,7 +307,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
 
         /* Test the response is accurate */
         $this->assertArrayHasKey('msg', $response);
-        
+
         /* Test the function performed correctly */
         unset( $gfpdf->data->form_settings );
         $pdf   = $gfpdf->options->get_pdf($this->form_id, $this->pid);
@@ -324,7 +320,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
      * @since 4.0
      */
     public function test_save_font() {
-        
+
         /* set up our post data and role */
         $this->_setRole( 'administrator' );
 
@@ -345,7 +341,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
         } catch ( WPAjaxDieContinueException $e ) {
             /* do nothing (error expected) */
         }
-        
+
         $response = json_decode( $this->_last_response, true );
         unset( $this->_last_response );
         $this->assertEquals( 'Required fields have not been included.', $response['error'] );
@@ -361,7 +357,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
         } catch ( WPAjaxDieContinueException $e ) {
             /* do nothing (error expected) */
         }
-        
+
         $response = json_decode( $this->_last_response, true );
         unset( $this->_last_response );
 
@@ -380,7 +376,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase
         } catch ( WPAjaxDieContinueException $e ) {
             /* do nothing (error expected) */
         }
-        
+
         $response = json_decode( $this->_last_response, true );
 
         $this->assertArrayHasKey( 'id', $response );
