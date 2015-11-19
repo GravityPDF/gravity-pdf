@@ -99,7 +99,7 @@ class Test_Actions extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_get_routes() {
-        
+
         $routes = $this->controller->get_routes();
 
         $counter = 0;
@@ -217,7 +217,7 @@ class Test_Actions extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_route() {
-        
+
         /* Set up a custom route */
         add_filter( 'gfpdf_one_time_action_routes', function( $routes ) {
 
@@ -310,7 +310,7 @@ class Test_Actions extends WP_UnitTestCase
         global $gfpdf;
 
         $path = ( is_multisite() ) ? $this->data->multisite_template_location : $this->data->template_location;
-  
+
         /* Multisite can only be run by super admins */
         if( is_multisite() ) {
             $user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
@@ -318,6 +318,7 @@ class Test_Actions extends WP_UnitTestCase
             wp_set_current_user( $user_id );
         }
 
+        unlink( $path . 'configuration.php' );
         $this->assertFalse( $this->model->migration_condition() );
         touch( $path . 'configuration.php' );
         $this->assertTrue( $this->model->migration_condition() );
@@ -333,7 +334,7 @@ class Test_Actions extends WP_UnitTestCase
      * @since 4.0
      */
     public function test_get_action_buttons() {
-    	
+
         $html = $this->view->get_action_buttons( 'review_plugin', 'Review' );
 
         $this->assertNotFalse( strpos( $html, 'Review</button>' ) );
