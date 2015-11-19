@@ -325,7 +325,7 @@ class Helper_Misc
 
 		if ( is_writable( $path ) ) {
 			if ( touch( $tmp_file ) && is_file( $tmp_file ) ) {
-				unlink( $tmp_file );
+				@unlink( $tmp_file );
 				return true;
 			}
 		}
