@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
-	bootstrap="tests/bootstrap.php"
+	bootstrap="tests/phpunit/bootstrap.php"
 	backupGlobals="false"
 	colors="true"
 	convertErrorsToExceptions="true"
@@ -11,12 +11,13 @@
 
 	<testsuites>
 		<testsuite name="Gravity PDF Test Suite">
-			<directory suffix=".php">./tests/unit-tests</directory>
+			<directory suffix=".php">./tests/phpunit/unit-tests</directory>
 		</testsuite>
 	</testsuites>
     <groups>
         <exclude>
             <group>ajax</group>
+            <group>slow-pdf-processes</group>
         </exclude>
     </groups>
 	<filter>
