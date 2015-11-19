@@ -1,6 +1,13 @@
 <?php
 
 /**
+ * If Xdebug is installed disable stack traces for phpunit
+ */
+if( function_exists('xdebug_disable') ) {
+   xdebug_disable();
+}
+
+/**
  * Override certain pluggable functions so we can unit test them correctly
  * @since 4.0
  */
@@ -75,6 +82,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		require_once $this->plugin_dir . '/tmp/gravityformssurvey/survey.php';
 
 		/* set up Gravity Forms database */
+		RGFormsModel::drop_tables();
 		@GFForms::setup( true );
 
 		require_once $this->plugin_dir . '/pdf.php';
@@ -129,11 +137,3 @@ class GravityPDF_Unit_Tests_Bootstrap {
 }
 
 $GLOBALS['GFPDF_Test'] = new GravityPDF_Unit_Tests_Bootstrap();
-
-
-/* Clean up the GF Database when we're done */
-register_shutdown_function( 'gfpdf_shutdown' );
-
-function gfpdf_shutdown() {
-	RGFormsModel::drop_tables();
-}
