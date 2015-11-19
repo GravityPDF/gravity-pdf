@@ -2,7 +2,7 @@
     "config": {
         "preferred-install": "dist"
     },
-    
+
     "require": {
         "blueliquiddesigns/mpdf": "dev-master",
         "querypath/QueryPath": ">=3.0.0",
@@ -10,8 +10,6 @@
     },
 
     "require-dev": {
-        "satooshi/php-coveralls": "0.7.x-dev",
-        "mouf/nodejs-installer": "~1.0",
         "phpunit/phpunit": "~4.0"
     },
 
@@ -25,25 +23,5 @@
     		"GFPDF\\Helper\\Fields\\": "src/helper/fields/",
     		"GFPDF\\Test\\": "tests/unit-tests/"
     	}
-    },
-
-    "extra": {
-        "mouf": {
-            "nodejs": {
-                "includeBinInPath": true
-            }
-        },
-        "expose-npm-packages": true
-    },
-
-    "scripts": {
-        "post-update-cmd": [
-            "npm install",
-            "gulp"
-        ],
-        "post-install-cmd": [
-            "npm install",
-            "gulp"
-        ]
     }
 }
