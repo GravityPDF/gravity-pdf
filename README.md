@@ -27,7 +27,7 @@ All documentation can be found at [https://gravitypdf.com](http://gravitypdf.com
 
 You are more than welcome to contribute to Gravity PDF but we recommend you [open a new issue on GitHub](https://github.com/GravityPDF/gravity-pdf/issues) and discuss your use-case before creating a pull request.
 
-There are a few rules that need to be followed to ensure a smooth pull request. These include:
+There are a few guidelines that need to be followed to ensure a smooth pull request. These include:
 
 1. Adhere to the existing code standard which mostly follows [WordPress standards](https://make.wordpress.org/core/handbook/best-practices/coding-standards/php/).
 1. All PRs must be to the `development` branch.

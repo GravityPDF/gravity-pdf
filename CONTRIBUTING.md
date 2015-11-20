@@ -5,7 +5,7 @@ You are more than welcome to create a pull request and contribute to Gravity PDF
 
 ## Guidelines
 
-There are a few rules that need to be followed to ensure a smooth pull request. These include:
+There are a few guidelines that need to be followed to ensure a smooth pull request. These include:
 
 1. Adhere to the existing code standard which mostly follows [WordPress standards](https://make.wordpress.org/core/handbook/best-practices/coding-standards/php/).
 
