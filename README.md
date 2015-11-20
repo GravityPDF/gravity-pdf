@@ -37,7 +37,7 @@ There are a few rules that need to be followed to ensure a smooth pull request. 
 1. Where appropriate, you should also [update the Gravity PDF documentation on GitHub](https://github.com/GravityPDF/v4-documentation) by creating a pull request. This ensures we have up-to-date documentation for Gravity PDF with each release. Just make sure you cross reference the PRs in each repo so we can easily keep track.
 1. Once our team is happy with the PR we'll ask you to squash your branch into a single commit, rebase it onto the development branch and push the changes to GitHub. This ensures we keep a clean Git history.
 
-If you are uncertain whether your PR meets all these requirements don't worry! If there are problems, our friendly team will guide you in the right direction.
+If you are uncertain whether your PR meets all these requirements: don't worry! If there are problems our friendly team will guide you in the right direction.
 
 #### Run Unit Tests
 

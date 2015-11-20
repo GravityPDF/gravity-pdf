@@ -23,7 +23,7 @@ There are a few rules that need to be followed to ensure a smooth pull request. 
 
 We've put together these guidelines to streamline the contributor process for our team AND ensure code quality.
 
-If you are uncertain whether your PR meets all these requirements don't worry! If there are problems, our friendly team will guide you in the right direction.
+If you are uncertain whether your PR meets all these requirements: don't worry! If there are problems our friendly team will guide you in the right direction.
 
 Happy Coding.
 
