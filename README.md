@@ -3,13 +3,13 @@ Gravity PDF
 
 [![Build Status](https://travis-ci.org/GravityPDF/gravity-forms-pdf-extended.svg?branch=beta)](https://travis-ci.org/GravityPDF/gravity-forms-pdf-extended)
 
-Gravity PDF is a WordPress plugin that allows you to save/view/download a PDF from the front- and back-end, and automate PDF creation on form submission.
-
-Find out more at [https://gravitypdf.com](http://gravitypdf.com/).
+Gravity PDF is a WordPress plugin that allows you to save/view/download a PDF from the front- and back-end, and automate PDF creation on form submission. Find out more at [https://gravitypdf.com](http://gravitypdf.com/).
 
 # About
 
 This Git repository is for developers who want to contribute to Gravity PDF. **Don't use it in production**. For production use, [download the Gravity PDF from the WordPress Plugin Directory](https://wordpress.org/plugins/gravity-forms-pdf-extended/).
+
+The `development` branch is our considered our bleeding edge branch, with all new changes pushed to it. The `master` branch is our latest stable version of Gravity PDF.
 
 # Installation
 
