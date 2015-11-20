@@ -25,7 +25,7 @@ All documentation can be found at [https://gravitypdf.com](http://gravitypdf.com
 
 # Contributions
 
-You are more than welcome to contribute to Gravity PDF but we recommend you [open a new issue on GitHub](https://github.com/GravityPDF/gravity-forms-pdf-extended/issues) and discuss your use-case before creating a pull request.
+You are more than welcome to contribute to Gravity PDF but we recommend you [open a new issue on GitHub](https://github.com/GravityPDF/gravity-pdf/issues) and discuss your use-case before creating a pull request.
 
 There are a few rules that need to be followed to ensure a smooth pull request. These include:
 

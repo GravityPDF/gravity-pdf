@@ -1372,7 +1372,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				 * eg. class Fields_New_Text extends \GFPDF\Helper\Helper_Abstract_Fields or Fields_New_Text extends \GFPDF\Helper\Fields\Field_Text
 				 *
 				 * To make your life more simple you should either use the same namespace as the field classes (\GFPDF\Helper\Fields) or import the class directly (use \GFPDF\Helper\Fields\Field_Text)
-				 * We've tried to make the fields as modular as possible. If you have any feedback about this approach please submit a ticket on GitHub (https://github.com/blueliquiddesigns/gravity-forms-pdf-extended/issues)
+				 * We've tried to make the fields as modular as possible. If you have any feedback about this approach please submit a ticket on GitHub (https://github.com/GravityPDF/gravity-pdf/issues)
 				 */
 				if ( GFCommon::is_product_field( $field->type ) ) {
 
