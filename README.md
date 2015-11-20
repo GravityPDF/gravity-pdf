@@ -29,6 +29,7 @@ You are more than welcome to contribute to Gravity PDF but we recommend you [ope
 
 There are a few rules that need to be followed to ensure a smooth pull request. These include:
 
+1. All Pull Requests must be to the `development` branch
 1. Modifications of the existing code base must pass all unit tests
 1. Any additions to the plugin must have appropriate unit tests written
 1. Adhere to the existing code standard which mostly follows [WordPress standards](https://make.wordpress.org/core/handbook/best-practices/coding-standards/php/)
