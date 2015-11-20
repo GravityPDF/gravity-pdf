@@ -511,7 +511,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		if ( ! empty($pdf_list) ) {
 			$args = array(
 				'pdfs' => $pdf_list
-			);			
+			);
 			$controller->view->entry_detailed_pdf( $args );
 		}
 	}
@@ -1442,5 +1442,32 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		return new WP_Error( 'Could not find PDF configuration requested' );
+	}
+
+	/**
+	 * Do any preprocessing to our arguments before they are sent to the template
+	 * @param  Array $args
+	 * @return Array
+	 * @since  4.0
+	 */
+	public function preprocess_template_arguments( $args ) {
+
+		if( isset( $args['settings']['header'] ) ) {
+			$args['settings']['header'] 		= $this->misc->fix_header_footer( $args['settings']['header'] );
+		}
+
+		if( isset( $args['settings']['first_header'] ) ) {
+			$args['settings']['first_header'] 	= $this->misc->fix_header_footer( $args['settings']['first_header'] );
+		}
+
+		if( isset( $args['settings']['footer'] ) ) {
+			$args['settings']['footer'] 		= $this->misc->fix_header_footer( $args['settings']['footer'] );
+		}
+
+		if( isset( $args['settings']['first_footer'] ) ) {
+			$args['settings']['first_footer'] 	= $this->misc->fix_header_footer( $args['settings']['first_footer'] );
+		}
+
+		return $args;
 	}
 }

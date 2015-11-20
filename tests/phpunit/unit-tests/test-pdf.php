@@ -157,6 +157,9 @@ class Test_PDF extends WP_UnitTestCase
 		$this->assertSame( 10, has_filter( 'gfpdf_pdf_html_output', array( $gfpdf->misc, 'do_mergetags' ) ) );
 		$this->assertSame( 10, has_filter( 'gfpdf_pdf_html_output', 'do_shortcode' ) );
 
+		$this->assertSame( 10, has_filter( 'gfpdf_template_args', array( $this->model, 'preprocess_template_arguments' ) ) );
+		$this->assertSame( 10, has_filter( 'gfpdf_mpdf_init_class', array( $this->view, 'autoprocess_core_template_options' ) ) );
+
 		/* Backwards compatiblity */
 		$this->assertSame( 1, has_filter( 'gfpdfe_pre_load_template', array( 'PDFRender', 'prepare_ids' ) ) );
 	}
@@ -1362,5 +1365,89 @@ class Test_PDF extends WP_UnitTestCase
 		$this->assertEquals( 'pass', $test['password'] );
 		$this->assertEquals( '', $test['master_password'] );
 		$this->assertEquals( 'Yes', $test['rtl'] );
+	}
+
+	/**
+	 * Check that our PDF settings get preprocessed correctly
+	 * @since 4.0
+	 */
+	public function test_preprocess_template_arguments() {
+
+		/* Setup the testing data */
+		$args = array(
+			'settings' => array(
+				'header'       => '<img src="test.png" class="my-class" />',
+				'first_header' => '<span>Working</span> <img src="going.jpg" width="150" /> <span>Other Stuff</span>',
+				'footer'       => '<strong>Footer</strong>',
+				'first_footer' => '<img src="/this/is/my/path/image.gif" class="class1 class2" />',
+				'other_value'  => 'testing',
+			)
+		);
+
+		$results = $this->model->preprocess_template_arguments( $args );
+
+		/* Test the results */
+		$this->assertNotFalse( strpos( $results['settings']['header'], '<img src=' ) );
+		$this->assertNotFalse( strpos( $results['settings']['header'], 'class="my-class header-footer-img"' ) );
+		$this->assertNotFalse( strpos( $results['settings']['first_header'], 'class="header-footer-img"' ) );
+		$this->assertNotFalse( strpos( $results['settings']['first_header'], '<img src=' ) );
+
+		$this->assertFalse( strpos( $results['settings']['footer'], 'class="my-class header-footer-img"' ) );
+		$this->assertNotFalse( strpos( $results['settings']['first_footer'], 'class="class1 class2 header-footer-img"' ) );
+		$this->assertNotFalse( strpos( $results['settings']['first_footer'], '<img src=' ) );
+
+		$this->assertEquals( 'testing', $results['settings']['other_value'] );
+
+		/* Test non-related array */
+		$args = array( 'other_array' );
+
+		$results = $this->model->preprocess_template_arguments( $args );
+
+		$this->assertEquals( 'other_array', $args[0] );
+	}
+
+	/**
+	 * Verify our core HTML output is accurate for the input settings we include
+	 * @since 4.0
+	 */
+	public function test_core_template_options() {
+
+		/* Setup the test data */
+		$settings = array(
+			'font'           => 'Arial',
+			'font_colour'    => '#CCC',
+			'font_size'      => '12',
+
+			'header'         => 'This is my header',
+			'first_header'   => 'This is the first header',
+
+			'footer'         => 'This is the footer',
+			'first_footer'   => 'This is the first footer',
+
+			'background' => '/path/image.png',
+		);
+
+		ob_start();
+		$this->view->core_template_styles( array( 'settings' => $settings ) );
+		$results = ob_get_clean();
+
+		/* Test the results */
+		$this->assertNotFalse( strpos( $results, 'font-family: Arial, sans-serif;' ) );
+		$this->assertNotFalse( strpos( $results, 'font-size: 12pt;' ) );
+		$this->assertNotFalse( strpos( $results, 'color: #CCC' ) );
+
+		$this->assertNotFalse( strpos( $results, 'header: html_TemplateHeader' ) );
+		$this->assertNotFalse( strpos( $results, 'footer: html_TemplateFooter' ) );
+		$this->assertNotFalse( strpos( $results, 'header: html_TemplateFirstHeader' ) );
+		$this->assertNotFalse( strpos( $results, 'footer: html_TemplateFirstFooter' ) );
+
+		$this->assertNotFalse( strpos( $results, 'This is my header' ) );
+		$this->assertNotFalse( strpos( $results, 'This is the first header' ) );
+
+		$this->assertNotFalse( strpos( $results, 'This is the footer' ) );
+		$this->assertNotFalse( strpos( $results, 'This is the first footer' ) );
+
+		$this->assertNotFalse( strpos( $results, 'background-image: url(/path/image.png) no-repeat 0 0;' ) );
+		$this->assertNotFalse( strpos( $results, 'background-image-resize: 4;' ) );
 	}
 }

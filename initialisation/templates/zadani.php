@@ -23,6 +23,7 @@ if ( ! class_exists( 'GFForms' ) ) {
  * $lead (alias of $entry)
  * $form_data (The processed entry data stored in an array)
  * $settings (the current PDF configuration)
+ * $gfpdf (the main Gravity PDF object containing all our helper classes)
  * $args (contains an array of all variables - the ones being described right now - passed to the template)
  *
  * The following variables are avaliable for backwards compatibility purposes:
@@ -34,75 +35,18 @@ if ( ! class_exists( 'GFForms' ) ) {
  * To see the variable structure add "var_dump($variable); exit;" to your PDF template and view in your browser
  */
 
-global $gfpdf;
-
 /**
  * Load up our template-specific appearance settings
  */
-$value_border_colour  = ( ! empty( $settings['border_colour']) )                                                        ? $settings['border_colour'] : '#CCCCCC';
-$show_form_title      = ( ! empty( $settings['show_form_title'] ) && $settings['show_form_title'] == 'Yes' )            ? true : false;
-$show_page_names      = ( ! empty( $settings['show_page_names'] ) && $settings['show_page_names'] == 'Yes' )            ? true : false;
-$show_html            = ( ! empty( $settings['show_html'] ) && $settings['show_html'] == 'Yes' )                        ? true : false;
-$show_section_content = ( ! empty( $settings['show_section_content'] ) && $settings['show_section_content'] == 'Yes' )  ? true : false;
-$show_hidden          = ( ! empty( $settings['show_hidden'] ) && $settings['show_hidden'] == 'Yes' )                    ? true : false;
-$show_empty           = ( ! empty( $settings['show_empty'] ) && $settings['show_empty'] == 'Yes' )                      ? true : false;
-$background_img       = ( ! empty( $settings['background'] ) )                                                          ? $settings['background'] : '';
-$first_header         = ( ! empty( $settings['first_header'] ) )                                                        ? $gfpdf->misc->fix_header_footer( $settings['first_header'] ) : '';
-$header               = ( ! empty( $settings['header'] ) )                                                              ? $gfpdf->misc->fix_header_footer( $settings['header'] ) : '';
-$footer               = ( ! empty( $settings['footer'] ) )                                                              ? $gfpdf->misc->fix_header_footer( $settings['footer'] ) : '';
-$first_footer         = ( ! empty( $settings['first_footer'] ) )                                                        ? $gfpdf->misc->fix_header_footer( $settings['first_footer'] ) : '';
-$font_colour          = ( ! empty( $settings['font_colour'] ) )                                                         ? $settings['font_colour'] : '#333';
-$font                 = ( ! empty( $settings['font'] ) )                                                                ? $settings['font'] : 'DejavuSansCondensed';
+$value_border_colour  = ( ! empty( $settings['border_colour']) ) ? $settings['border_colour'] : '#CCCCCC';
 
 ?>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html>
 <head>
-    <title>Gravity PDF</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
     <style>
-        @page {
-            margin: 10mm;
-
-            <?php if ( ! empty($header) ) : ?>
-                header: html_TemplateHeader;
-                margin-header: 5mm;
-            <?php endif; ?>
-            
-            <?php if ( ! empty($footer) ) : ?>
-                footer: html_TemplateFooter;
-                margin-footer: 5mm;
-            <?php endif; ?>
-
-            <?php if ( ! empty($background_img) ) : ?>
-                background-image: url(<?php echo $background_img; ?>) no-repeat 0 0;
-                background-image-resize: 4;
-            <?php endif; ?>
-        }
-
-        @page :first {
-            <?php if ( ! empty($first_header) ) : ?>
-                header: html_TemplateFirstHeader;
-                margin-header: 5mm;
-            <?php endif; ?>
-
-            <?php if ( ! empty($first_footer) ) : ?>
-                footer: html_TemplateFirstFooter;
-                margin-footer: 5mm;
-            <?php endif; ?>
-        }
-
-        body {
-            font-family: <?php echo $font; ?>, sans-serif;
-            font-size: 9pt;
-        }
-
-        body, th , td , ul li, ol li {
-            color: <?php echo $font_colour; ?> !important;
-        }
 
         /* Handle Gravity Forms CSS Ready Classes */
         .row-separator {
@@ -245,11 +189,6 @@ $font                 = ( ! empty( $settings['font'] ) )                        
             float: none;
         }
 
-        .header-footer-img {
-            width: auto !important;
-            max-height: 25mm;
-        }
-
         /**
          * Independant Template Styles
          */
@@ -262,36 +201,23 @@ $font                 = ( ! empty( $settings['font'] ) )                        
             border: 1px solid <?php echo $value_border_colour; ?>;
             padding: 1.5mm 2mm;
         }
-        
+
     </style>
 
 </head>
     <body>
-        <htmlpageheader name="TemplateFirstHeader">
-            <div id="first_header">
-                <?php echo $first_header; ?>
-            </div>
-        </htmlpageheader>
-
-        <htmlpageheader name="TemplateHeader">
-            <div id="header">
-                <?php echo $header; ?>
-            </div>
-        </htmlpageheader>
-
-        <htmlpagefooter name="TemplateFirstFooter">
-            <div id="first_footer">
-                <?php echo $first_footer; ?>
-            </div>
-        </htmlpagefooter>
-        
-        <htmlpagefooter name="TemplateFooter">
-            <div class="footer">
-                <?php echo $footer; ?>
-            </div>
-        </htmlpagefooter>
 
         <?php
+
+            /**
+             * Load our core-specific styles we'll pass to our $config array below which will control the display of certain fields in our Gravity Form
+             */
+            $show_form_title      = ( ! empty( $settings['show_form_title'] ) && $settings['show_form_title'] == 'Yes' )            ? true : false;
+            $show_page_names      = ( ! empty( $settings['show_page_names'] ) && $settings['show_page_names'] == 'Yes' )            ? true : false;
+            $show_html            = ( ! empty( $settings['show_html'] ) && $settings['show_html'] == 'Yes' )                        ? true : false;
+            $show_section_content = ( ! empty( $settings['show_section_content'] ) && $settings['show_section_content'] == 'Yes' )  ? true : false;
+            $show_hidden          = ( ! empty( $settings['show_hidden'] ) && $settings['show_hidden'] == 'Yes' )                    ? true : false;
+            $show_empty           = ( ! empty( $settings['show_empty'] ) && $settings['show_empty'] == 'Yes' )                      ? true : false;
 
             /**
              * Set up our configuration array to control what is and is not generated

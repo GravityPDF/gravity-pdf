@@ -89,7 +89,7 @@ class Field_Quiz extends Helper_Abstract_Fields
 		 * We'll try use our DOM reader to correctly process the HTML, otherwise use string replace
 		 */
 		try {
-			$value = qp( $value, 'img' )->addClass( 'gf-quiz-img' )->top( 'body' )->children()->html();
+			$value = htmlqp( $value, 'img' )->addClass( 'gf-quiz-img' )->top( 'body' )->innerHTML();
 		} catch (Exception $e) {
 			$value = str_replace( '<img ', '<img class="gf-quiz-img" ', $value );
 		}
