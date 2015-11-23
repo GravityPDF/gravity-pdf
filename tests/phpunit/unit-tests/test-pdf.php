@@ -1425,6 +1425,7 @@ class Test_PDF extends WP_UnitTestCase
 			'first_footer'     => 'This is the first footer',
 
 			'background_image' => '/path/image.png',
+			'background_color' => 'red',
 		);
 
 		ob_start();
@@ -1449,5 +1450,7 @@ class Test_PDF extends WP_UnitTestCase
 
 		$this->assertNotFalse( strpos( $results, 'background-image: url(/path/image.png) no-repeat 0 0;' ) );
 		$this->assertNotFalse( strpos( $results, 'background-image-resize: 4;' ) );
+
+		$this->assertNotFalse( strpos( $results, 'background-color: red;' ) );
 	}
 }

@@ -519,6 +519,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			'show_hidden'          => 'get_hidden_display_field',
 			'show_empty'           => 'get_empty_display_field',
 
+			'background_color'     => 'get_background_color_field',
 			'background_image'     => 'get_background_image_field',
 			'header'               => 'get_header_field',
 			'first_header'         => 'get_first_page_header_field',

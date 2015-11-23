@@ -23,6 +23,7 @@ $footer               = ( ! empty( $settings['footer'] ) ) 			    ? $settings['f
 $first_header         = ( ! empty( $settings['first_header'] ) ) 	    ? $settings['first_header'] : '';
 $first_footer         = ( ! empty( $settings['first_footer'] ) ) 	    ? $settings['first_footer'] : '';
 
+$background_color     = ( ! empty( $settings['background_color'] ) )    ? $settings['background_color'] : '';
 $background_image     = ( ! empty( $settings['background_image'] ) )  	? $settings['background_image'] : '';
 
 ?>
@@ -40,6 +41,10 @@ $background_image     = ( ! empty( $settings['background_image'] ) )  	? $settin
         <?php if ( ! empty($footer) ) : ?>
             footer: html_TemplateFooter;
             margin-footer: 5mm;
+        <?php endif; ?>
+
+        <?php if ( ! empty($background_color) ) : ?>
+            background-color: <?php echo $background_color; ?>;
         <?php endif; ?>
 
         <?php if ( ! empty($background_image) ) : ?>
