@@ -1414,17 +1414,17 @@ class Test_PDF extends WP_UnitTestCase
 
 		/* Setup the test data */
 		$settings = array(
-			'font'           => 'Arial',
-			'font_colour'    => '#CCC',
-			'font_size'      => '12',
+			'font'             => 'Arial',
+			'font_colour'      => '#CCC',
+			'font_size'        => '12',
 
-			'header'         => 'This is my header',
-			'first_header'   => 'This is the first header',
+			'header'           => 'This is my header',
+			'first_header'     => 'This is the first header',
 
-			'footer'         => 'This is the footer',
-			'first_footer'   => 'This is the first footer',
+			'footer'           => 'This is the footer',
+			'first_footer'     => 'This is the first footer',
 
-			'background' => '/path/image.png',
+			'background_image' => '/path/image.png',
 		);
 
 		ob_start();

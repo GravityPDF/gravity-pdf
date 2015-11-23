@@ -748,9 +748,9 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 	 * @return Array
 	 * @since 4.0
 	 */
-	public function get_background_field() {
+	public function get_background_image_field() {
 		return apply_filters( 'gfpdf_background_field_setting', array(
-			'id'      => 'background',
+			'id'      => 'background_image',
 			'name'    => __( 'Background Image', 'gravity-forms-pdf-extended' ),
 			'type'    => 'upload',
 			'desc'    => __( 'The background image is included on all pages. For optimal results, use an image the same dimensions as the paper size.', 'gravity-forms-pdf-extended' ),
