@@ -14,16 +14,16 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-$font                 = ( ! empty( $settings['font'] ) ) 			? $settings['font'] : 'DejavuSansCondensed';
-$font_colour          = ( ! empty( $settings['font_colour'] ) ) 	? $settings['font_colour'] : '#333';
-$font_size            = ( ! empty( $settings['font_size'] ) ) 		? $settings['font_size'] : '9';
+$font                 = ( ! empty( $settings['font'] ) ) 			    ? $settings['font'] : 'DejavuSansCondensed';
+$font_colour          = ( ! empty( $settings['font_colour'] ) ) 	    ? $settings['font_colour'] : '#333';
+$font_size            = ( ! empty( $settings['font_size'] ) ) 		    ? $settings['font_size'] : '9';
 
-$header               = ( ! empty( $settings['header'] ) ) 			? $settings['header'] : '';
-$footer               = ( ! empty( $settings['footer'] ) ) 			? $settings['footer'] : '';
-$first_header         = ( ! empty( $settings['first_header'] ) ) 	? $settings['first_header'] : '';
-$first_footer         = ( ! empty( $settings['first_footer'] ) ) 	? $settings['first_footer'] : '';
+$header               = ( ! empty( $settings['header'] ) ) 			    ? $settings['header'] : '';
+$footer               = ( ! empty( $settings['footer'] ) ) 			    ? $settings['footer'] : '';
+$first_header         = ( ! empty( $settings['first_header'] ) ) 	    ? $settings['first_header'] : '';
+$first_footer         = ( ! empty( $settings['first_footer'] ) ) 	    ? $settings['first_footer'] : '';
 
-$background_img       = ( ! empty( $settings['background'] ) )  	? $settings['background'] : '';
+$background_image     = ( ! empty( $settings['background_image'] ) )  	? $settings['background_image'] : '';
 
 ?>
 
@@ -42,8 +42,8 @@ $background_img       = ( ! empty( $settings['background'] ) )  	? $settings['ba
             margin-footer: 5mm;
         <?php endif; ?>
 
-        <?php if ( ! empty($background_img) ) : ?>
-            background-image: url(<?php echo $background_img; ?>) no-repeat 0 0;
+        <?php if ( ! empty($background_image) ) : ?>
+            background-image: url(<?php echo $background_image; ?>) no-repeat 0 0;
             background-image-resize: 4;
         <?php endif; ?>
     }

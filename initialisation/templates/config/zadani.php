@@ -79,7 +79,7 @@ class zadani implements Helper_Interface_Config {
 				'first_header'         => true,
 				'footer'               => true,
 				'first_footer'         => true,
-				'background'           => true,
+				'background_image'     => true,
 			),
 
 			/* Create custom fields to control the look and feel of a template */
