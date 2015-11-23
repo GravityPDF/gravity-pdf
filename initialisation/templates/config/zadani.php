@@ -79,6 +79,7 @@ class zadani implements Helper_Interface_Config {
 				'first_header'         => true,
 				'footer'               => true,
 				'first_footer'         => true,
+				'background_color'	   => true,
 				'background_image'     => true,
 			),
 

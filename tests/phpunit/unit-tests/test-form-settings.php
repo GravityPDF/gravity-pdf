@@ -465,7 +465,7 @@ class Test_Form_Settings extends WP_UnitTestCase
 
 		$results = $this->model->register_custom_appearance_settings( array() );
 
-		$this->assertSame( 12, sizeof( $results ) );
+		$this->assertSame( 13, sizeof( $results ) );
 	}
 
 	/**
@@ -477,7 +477,7 @@ class Test_Form_Settings extends WP_UnitTestCase
 		$class = $this->model->get_template_configuration( 'zadani' );
 		$settings = $this->model->setup_custom_appearance_settings( $class, array() );
 
-		$this->assertEquals( 12, sizeof( $settings ) );
+		$this->assertEquals( 13, sizeof( $settings ) );
 		$this->assertArrayHasKey( 'border_colour', $settings );
 	}
 
@@ -490,9 +490,9 @@ class Test_Form_Settings extends WP_UnitTestCase
 		$class = $this->model->get_template_configuration( 'zadani' );
 		$settings = $this->model->setup_core_custom_appearance_settings( array(), $class, $class->configuration() );
 
-		$this->assertEquals( 11, sizeof( $settings ) );
+		$this->assertEquals( 12, sizeof( $settings ) );
 
-		$core_fields = array( 'show_form_title', 'show_page_names', 'show_html', 'show_section_content', 'show_hidden', 'show_empty', 'header', 'first_header', 'footer', 'first_footer', 'background_image' );
+		$core_fields = array( 'show_form_title', 'show_page_names', 'show_html', 'show_section_content', 'show_hidden', 'show_empty', 'header', 'first_header', 'footer', 'first_footer', 'background_color', 'background_image' );
 
 		foreach ( $core_fields as $key ) {
 			$this->assertTrue( isset( $settings[ $key ] ) );

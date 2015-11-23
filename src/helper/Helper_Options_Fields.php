@@ -744,6 +744,21 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 	}
 
 	/**
+	 * Return the optional template-specific background color field
+	 * @return Array
+	 * @since 4.0
+	 */
+	public function get_background_color_field() {
+		return apply_filters( 'gfpdf_background_color_field_setting', array(
+			'id'      => 'background_color',
+			'name'    => __( 'Background Color', 'gravity-forms-pdf-extended' ),
+			'type'    => 'color',
+			'std'	  => '#FFF',
+			'desc'    => __( 'Set the background color for all pages.', 'gravity-forms-pdf-extended' ),
+		) );
+	}
+
+	/**
 	 * Return the optional template-specific background image field
 	 * @return Array
 	 * @since 4.0
