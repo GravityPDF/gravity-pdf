@@ -99,7 +99,8 @@ class Helper_Form extends Helper_Abstract_Form {
 
 	/**
 	 * Get form plugin's form array
-	 * The API has a performance problem and makes a database call each time. Skip over that problem.
+	 * The GFAPI has a performance problem when using GFAPI::get_form() and makes a database call each time to get the `is_active`, `date_created`, or `is_trash` data.
+	 * We're bypassing the API to prevent that problem but the array doesn't include the aforementioned fields. Once the issue is resolved we'll look at switching back.
 	 * @param  Integer $form_id
 	 * @return Mixed
 	 * @since 4.0
@@ -135,6 +136,16 @@ class Helper_Form extends Helper_Abstract_Form {
 	 * @since 4.0
 	 */
 	public function update_form( $form ) {
+
+		/**
+		 * Because of the performance issues mentioned in the `get_form` method the `is_active`, `date_created` and `is_trash` keys are missing from `$form`
+		 * We'll add them back in right before the update to prevent any issues with the form status
+		 */
+		$form_info            = GFFormsModel::get_form( $form['id'], true );
+		$form['is_active']    = $form_info->is_active;
+		$form['date_created'] = $form_info->date_created;
+		$form['is_trash']     = $form_info->is_trash;
+
 		return GFAPI::update_form( $form );
 	}
 
