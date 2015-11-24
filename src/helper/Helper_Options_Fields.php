@@ -50,7 +50,6 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 	public function add_filters() {
 
 		/* Conditionally enable specific fields */
-		add_filter( 'gfpdf_form_settings_advanced', array( $this, 'get_public_access_field' ) );
 		add_filter( 'gfpdf_form_settings_advanced', array( $this, 'get_advanced_template_field' ) );
 
 		parent::add_filters();
@@ -495,40 +494,23 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 						'tooltip' => '<h6>' . __( 'Save PDF', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( "By default, PDFs are not automatically saved to disk. Enable this option to force the PDF to be generated and saved. Useful when using the %sgfpdf_post_pdf_save%s hook to copy the PDF to an alternate location.", 'gravity-forms-pdf-extended' ), '<code>' , '</code>' ),
 					),
 
-				)
-			),
-		);
-
-		return apply_filters( 'gfpdf_registered_fields', $gfpdf_settings );
-	}
-
-	/**
-	 * Enable public access field if the user has enabled it with a filter
-	 * @param  Array $settings The 'form_settings_advanced' array
-	 * @return Array
-	 * @since 4.0
-	 */
-	public function get_public_access_field( $settings ) {
-
-		$enabled = apply_filters( 'gfpdf_enable_public_access_field', false );
-
-		if( $enabled !== true ) {
-			return $settings;
-		}
-
-		$settings['public_access'] = array(
+					'public_access' => array(
 						'id'    => 'public_access',
 						'name'  => __( 'Enable Public Acccess', 'gravity-forms-pdf-extended' ),
-						'desc'  => sprintf( __( 'Allow ANYONE to access the PDFs. %sWarning: This disables all security protocols.%s', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
+						'desc'  => sprintf( __( 'Allow %sanyone%s with a direct link to access the PDF. %sThis disables all %ssecurity protocols%s for this PDF.%s ', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>', '<em>', '<a href="#">', '</a>', '</em>' ),
 						'type'  => 'radio',
 						'options' => array(
 							'Yes' => __( 'Yes', 'gravity-forms-pdf-extended' ),
 							'No'  => __( 'No', 'gravity-forms-pdf-extended' ),
 						),
 						'std'   => __( 'No', 'gravity-forms-pdf-extended' ),
+						'tooltip' => '<h6>' . __( 'Public Access', 'gravity-forms-pdf-extended' ) . '</h6>' . __( "When public access is on all security protocols are disabled and anyone worldwide can view the PDF document for ALL your form's entries. For most users the standard security measures will be adequate and public access should remain disabled.", 'gravity-forms-pdf-extended' ),
+					),
+				)
+			),
 		);
 
-		return $settings;
+		return apply_filters( 'gfpdf_registered_fields', $gfpdf_settings );
 	}
 
 	/**
