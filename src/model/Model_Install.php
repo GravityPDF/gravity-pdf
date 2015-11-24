@@ -94,10 +94,16 @@ class Model_Install extends Helper_Abstract_Model {
 	protected $notices;
 
 	/**
-	 * Load our model and view and required actions
+	 * Setup our class by injecting all our dependancies
+	 * @param Helper_Abstract_Form $form    Our abstracted Gravity Forms helper functions
+	 * @param LoggerInterface      $log     Our logger class
+	 * @param Helper_Data          $data    Our plugin data store
+	 * @param Helper_Misc          $misc    Our miscellaneous class
+	 * @param Helper_Notices       $notices Our notice class used to queue admin messages and errors
+	 * @since 4.0
 	 */
 	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices ) {
-		
+
 		/* Assign our internal variables */
 		$this->form    = $form;
 		$this->log     = $log;
@@ -332,7 +338,7 @@ class Model_Install extends Helper_Abstract_Model {
 			$this->remove_plugin_options();
 			$this->remove_plugin_form_settings();
 		}
-		
+
 		/* Remove folder structure and deactivate */
 		$this->remove_folder_structure();
 		$this->deactivate_plugin();
@@ -391,7 +397,7 @@ class Model_Install extends Helper_Abstract_Model {
 						'WP_Error' => $results,
 						'dir'      => $dir,
 					) );
-					
+
 					$this->notices->add_error( sprintf( __( 'There was a problem removing the %s directory. Clean up manually via (S)FTP.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
 				}
 			}

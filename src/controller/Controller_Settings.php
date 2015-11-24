@@ -97,10 +97,18 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	protected $misc;
 
 	/**
-	 * Load our model and view and required actions
+	 * Setup our class by injecting all our dependancies
+	 * @param Helper_Abstract_Model $model   Our Settings Model the controller will manage
+	 * @param Helper_Abstract_View  $view    Our Settings View the controller will manage
+	 * @param Helper_Abstract_Form  $form    Our abstracted Gravity Forms helper functions
+	 * @param LoggerInterface       $log     Our logger class
+	 * @param Helper_Notices        $notices Our notice class used to queue admin messages and errors
+	 * @param Helper_Data           $data    Our plugin data store
+	 * @param Helper_Misc           $misc    Our miscellaneous class
+	 * @since 4.0
 	 */
 	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Abstract_Form $form, LoggerInterface $log, Helper_Notices $notices, Helper_Data $data, Helper_Misc $misc ) {
-		
+
 		/* Assign our internal variables */
 		$this->form    = $form;
 		$this->log     = $log;
@@ -237,7 +245,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 
 		/* because current_user_can() doesn't handle Gravity Forms permissions quite correct we'll do our checks here */
 		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
-			
+
 			$this->log->addCritical( 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
 				'user_meta' => get_user_meta( get_current_user_id() )
@@ -257,7 +265,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	 * @return array
 	 */
 	public function disable_tools_on_view_cap( $nav ) {
-		
+
 		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			$this->log->addNotice( 'Lack of User Capabilities' );
 
@@ -281,7 +289,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 
 		/* check if the user has permission to copy the templates */
 		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
-			
+
 			$this->log->addCritical( 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
 				'user_meta' => get_user_meta( get_current_user_id() )

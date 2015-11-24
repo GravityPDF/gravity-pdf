@@ -78,7 +78,13 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	protected $notices;
 
 	/**
-	 * Load our model and view and required actions
+	 * Setup our class by injecting all our dependancies
+	 * @param Helper_Abstract_Model $model   Our Actions Model the controller will manage
+	 * @param Helper_Abstract_View  $view    Our Actions View the controller will manage
+	 * @param Helper_Abstract_Form  $form    Our abstracted Gravity Forms helper functions
+	 * @param LoggerInterface       $log     Our logger class
+	 * @param Helper_Notices        $notices Our notice class used to queue admin messages and errors
+	 * @since 4.0
 	 */
 	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Abstract_Form $form, LoggerInterface $log, Helper_Notices $notices ) {
 

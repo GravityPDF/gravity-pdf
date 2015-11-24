@@ -78,7 +78,13 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	protected $misc;
 
 	/**
-	 * Load our model and view and required actions
+	 * Setup our class by injecting all our dependancies
+	 * @param Helper_Abstract_Model $model   Our Form Model the controller will manage
+	 * @param Helper_Abstract_View  $view    Our Form View the controller will manage
+	 * @param Helper_Data           $data    Our plugin data store
+	 * @param Helper_Options        $options Our options class which allows us to access any settings
+	 * @param Helper_Misc           $misc    Our miscellaneous methods
+	 * @since 4.0
 	 */
 	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Data $data, Helper_Options $options, Helper_Misc $misc ) {
 

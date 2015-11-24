@@ -60,7 +60,11 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 	protected $log;
 
 	/**
-	 * Load our model and view and required actions
+	 * Setup our class by injecting all our dependancies
+	 * @param Helper_Abstract_Model $model Our Shortcodes Model the controller will manage
+	 * @param Helper_Abstract_View  $view  Our Shortcodes View the controller will manage
+	 * @param LoggerInterface       $log   Our logger class
+	 * @since 4.0
 	 */
 	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, LoggerInterface $log ) {
 

@@ -101,13 +101,13 @@ class View_Settings extends Helper_Abstract_View
 	protected $misc;
 
 	/**
-	 * Setup our view with the needed data and classes
+	 * Setup our class by injecting all our dependancies
 	 * @param array                $data_cache  An array of data to pass to the view
 	 * @param Helper_Abstract_Form $form        Our abstracted Gravity Forms helper functions
 	 * @param LoggerInterface      $log         Our logger class
 	 * @param Helper_Options       $options     Our options class which allows us to access any settings
-	 * @param Helper_Data          $data Our plugin data store
-	 * @param Helper_Misc          $misc        Our miscellanious methods
+	 * @param Helper_Data          $data        Our plugin data store
+	 * @param Helper_Misc          $misc        Our miscellaneous class
 	 * @since 4.0
 	 */
 	public function __construct( $data_cache = array(), Helper_Abstract_Form $form, LoggerInterface $log, Helper_Options $options, Helper_Data $data, Helper_Misc $misc ) {

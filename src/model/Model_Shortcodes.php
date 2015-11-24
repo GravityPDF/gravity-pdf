@@ -75,10 +75,14 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	protected $options;
 
 	/**
-	 * Load our model and view and required actions
+	 * Setup our class by injecting all our dependancies
+	 * @param Helper_Abstract_Form $form    Our abstracted Gravity Forms helper functions
+	 * @param LoggerInterface      $log     Our logger class
+	 * @param Helper_Options       $options Our options class which allows us to access any settings
+	 * @since 4.0
 	 */
 	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log, Helper_Options $options ) {
-		
+
 		/* Assign our internal variables */
 		$this->form    = $form;
 		$this->log     = $log;
@@ -128,7 +132,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 				if( $has_view_permissions ) {
 					return $controller->view->no_entry_id();
 				}
-				
+
 				return '';
 			}
 		}
@@ -143,7 +147,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 			if( $has_view_permissions ) {
 				return $controller->view->invalid_pdf_config();
 			}
-			
+
 			return '';
 		}
 
@@ -153,7 +157,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 			if( $has_view_permissions ) {
 				return $controller->view->pdf_not_active();
 			}
-			
+
 			return '';
 		}
 
@@ -162,7 +166,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 			if( $has_view_permissions ) {
 				return $controller->view->conditional_logic_not_met();
 			}
-			
+
 			return '';
 		}
 
@@ -302,7 +306,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 			if ( sizeof( $gravitypdf ) > 0 ) {
 
 				foreach ( $gravitypdf as $code ) {
-					
+
 					/* get the PDF Settings ID */
 					$pid = ( isset( $code['attr']['id'] ) ) ? $code['attr']['id'] : '';
 

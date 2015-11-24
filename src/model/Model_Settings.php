@@ -100,10 +100,17 @@ class Model_Settings extends Helper_Abstract_Model {
 	protected $misc;
 
 	/**
-	 * Load our model and view and required actions
+	 * [__construct description]
+	 * @param Helper_Abstract_Form $form        Our abstracted Gravity Forms helper functions
+	 * @param LoggerInterface      $log         Our logger class
+	 * @param Helper_Notices        $notices Our notice class used to queue admin messages and errors
+	 * @param Helper_Options       $options     Our options class which allows us to access any settings
+	 * @param Helper_Data          $data        Our plugin data store
+	 * @param Helper_Misc          $misc        Our miscellaneous class
+	 * @since 4.0
 	 */
 	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log, Helper_Notices $notices, Helper_Options $options, Helper_Data $data, Helper_Misc $misc ) {
-		
+
 		/* Assign our internal variables */
 		$this->form    = $form;
 		$this->log     = $log;
@@ -163,7 +170,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		/* Loop through errors if any and highlight the appropriate settings */
 		if ( is_array( $errors ) && sizeof( $errors ) > 0 ) {
 			foreach ( $errors as $error ) {
-				
+
 				/* Skip over if not an error */
 				if ( $error['type'] !== 'error' ) {
 					continue;
@@ -276,12 +283,12 @@ class Model_Settings extends Helper_Abstract_Model {
 				return false;
 			}
 		}
-		
+
 		$custom_fonts  = $this->options->get_option( 'custom_fonts' );
 
 		if ( is_array( $custom_fonts ) ) {
 			foreach ( $custom_fonts as $font ) {
-				
+
 				/* Skip over itself */
 				if ( ! empty( $id ) && $font['id'] == $id ) {
 					continue;
@@ -502,7 +509,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @since  4.0
 	 */
 	private function ajax_font_validation() {
-		
+
 		/* prevent unauthorized access */
 		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			/* fail */

@@ -120,7 +120,14 @@ class Model_PDF extends Helper_Abstract_Model {
 	protected $notices;
 
 	/**
-	 * Load our model and view and required actions
+	 * Setup our view with the needed data and classes
+	 * @param Helper_Abstract_Form $form        Our abstracted Gravity Forms helper functions
+	 * @param LoggerInterface      $log         Our logger class
+	 * @param Helper_Options       $options     Our options class which allows us to access any settings
+	 * @param Helper_Data          $data        Our plugin data store
+	 * @param Helper_Misc          $misc        Our miscellaneous class
+	 * @param Helper_Notices       $notices     Our notice class used to queue admin messages and errors
+	 * @since 4.0
 	 */
 	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log, Helper_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices ) {
 

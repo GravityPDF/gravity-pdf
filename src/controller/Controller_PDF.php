@@ -79,7 +79,13 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	protected $misc;
 
 	/**
-	 * Load our model and view and required actions
+	 * Setup our class by injecting all our dependancies
+	 * @param Helper_Abstract_Model $model Our PDF Model the controller will manage
+	 * @param Helper_Abstract_View  $view  Our PDF View the controller will manage
+	 * @param Helper_Abstract_Form  $form  Our abstracted Gravity Forms helper functions
+	 * @param LoggerInterface       $log   Our logger class
+	 * @param Helper_Misc           $misc  Our miscellaneous class
+	 * @since 4.0
 	 */
 	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Abstract_Form $form, LoggerInterface $log, Helper_Misc $misc ) {
 
