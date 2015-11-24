@@ -150,6 +150,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 */
 	public function add_filters() {
 		/* PDF authentication middleware */
+		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_public_access'), 5, 3 );
 		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_active' ), 10, 3 );
 		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_conditional' ), 10, 3 );
 		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_logged_out_restriction' ), 20, 3 );

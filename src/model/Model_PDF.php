@@ -251,6 +251,26 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Check if the current PDF trying to be viewed has public access enabled
+	 * If it does, we'll remove some of our middleware filters to allow this feature
+	 * @param  Boolean / Object $action
+	 * @param  Array            $entry    The Gravity Forms Entry
+	 * @param  Array            $settings The Gravity Form PDF Settings
+	 * @return Boolean / Object
+	 * @since 4.0
+	 */
+	public function middle_public_access( $action, $entry, $settings ) {
+		if( isset( $settings['public_access'] ) && 'Yes' === $settings['public_access'] ) {
+			remove_filter( 'gfpdf_pdf_middleware', array( $this, 'middle_logged_out_restriction'), 20 );
+			remove_filter( 'gfpdf_pdf_middleware', array( $this, 'middle_logged_out_timeout'), 30 );
+			remove_filter( 'gfpdf_pdf_middleware', array( $this, 'middle_auth_logged_out_user'), 40 );
+			remove_filter( 'gfpdf_pdf_middleware', array( $this, 'middle_user_capability'), 50 );
+		}
+
+		return $action;
+	}
+
+	/**
 	 * Check if the current PDF trying to be viewed is active
 	 * @param  Boolean / Object $action
 	 * @param  Array            $entry    The Gravity Forms Entry
