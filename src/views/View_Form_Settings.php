@@ -47,15 +47,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class View_Form_Settings extends Helper_Abstract_View
 {
-
 	/**
 	 * Set the view's name
 	 * @var string
 	 * @since 4.0
 	 */
 	protected $ViewType = 'FormSettings';
-
-	public function __construct( $data = array() ) {
-		$this->data = $data;
-	}
 }

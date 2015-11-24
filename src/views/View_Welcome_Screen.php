@@ -63,11 +63,18 @@ class View_Welcome_Screen extends Helper_Abstract_View
 	 */
 	protected $form;
 
-	public function __construct( $data = array(), Helper_Abstract_Form $form ) {
-		$this->data = $data;
+	/**
+	 * Setup our view with the needed data and classes
+	 * @param array                $data_cache  An array of data to pass to the view
+	 * @param Helper_Abstract_Form $form        Our abstracted Gravity Forms helper functions
+	 */
+	public function __construct( $data_cache = array(), Helper_Abstract_Form $form ) {
+
+		/* Call our parent constructor */
+		parent::__construct( $data_cache );
 
 		/* Assign our internal variables */
-		$this->form        = $form;
+		$this->form = $form;
 	}
 
 	/**
@@ -80,8 +87,6 @@ class View_Welcome_Screen extends Helper_Abstract_View
 		$args = array(
 			'selected' => isset( $_GET['page'] ) ? $_GET['page'] : 'gfpdf-getting-started',
 		);
-
-		$args = array_merge( $args, $this->data );
 
 		/* load the tabs view */
 		$this->load( 'tabs', $args );
@@ -97,8 +102,6 @@ class View_Welcome_Screen extends Helper_Abstract_View
 		$args = array(
 			'forms' => $this->form->get_forms(),
 		);
-
-		$args = array_merge( $args, $this->data );
 
 		/* Render our view */
 		$this->load( 'welcome', $args );

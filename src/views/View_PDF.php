@@ -102,7 +102,7 @@ class View_PDF extends Helper_Abstract_View
 	 * @var Object
 	 * @since 4.0
 	 */
-	protected $plugin_data;
+	protected $data;
 
 	/**
 	 * Holds our Helper_Misc object
@@ -113,18 +113,26 @@ class View_PDF extends Helper_Abstract_View
 	protected $misc;
 
 	/**
-	 * [__construct description]
-	 * @param array $data [description]
+	 * Setup our view with the needed data and classes
+	 * @param array                $data_cache  An array of data to pass to the view
+	 * @param Helper_Abstract_Form $form        Our abstracted Gravity Forms helper functions
+	 * @param LoggerInterface      $log         Our logger class
+	 * @param Helper_Options       $options     Our options class which allows us to access any settings
+	 * @param Helper_Data          $data Our plugin data store
+	 * @param Helper_Misc          $misc        Our miscellanious methods
+	 * @since 4.0
 	 */
-	public function __construct( $data = array(), Helper_Abstract_Form $form, LoggerInterface $log, Helper_Options $options, Helper_Data $plugin_data, Helper_Misc $misc ) {
-		$this->data = $data;
+	public function __construct( $data_cache = array(), Helper_Abstract_Form $form, LoggerInterface $log, Helper_Options $options, Helper_Data $data, Helper_Misc $misc ) {
+
+		/* Call our parent constructor */
+		parent::__construct( $data_cache );
 
 		/* Assign our internal variables */
-		$this->form        = $form;
-		$this->log         = $log;
-		$this->options     = $options;
-		$this->plugin_data = $plugin_data;
-		$this->misc        = $misc;
+		$this->form    = $form;
+		$this->log     = $log;
+		$this->options = $options;
+		$this->data    = $data;
+		$this->misc    = $misc;
 	}
 
 	/**
@@ -161,7 +169,7 @@ class View_PDF extends Helper_Abstract_View
 		/**
 		 * Set out our PDF abstraction class
 		 */
-		$pdf = new Helper_PDF( $entry, $settings, $this->form, $this->plugin_data );
+		$pdf = new Helper_PDF( $entry, $settings, $this->form, $this->data );
 		$pdf->set_filename( $model->get_pdf_name( $settings, $entry ) );
 
 		try {
