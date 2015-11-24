@@ -63,6 +63,7 @@ class Test_API extends WP_UnitTestCase
             array( 'GFPDF\Helper\Helper_Data', 'get_data_class' ),
             array( 'GFPDF\Helper\Helper_Options_Fields', 'get_options_class' ),
             array( 'GFPDF\Helper\Helper_Misc', 'get_misc_class' ),
+            array( 'GFPDF\Helper\Helper_Form', 'get_form_class')
         );
     }
 

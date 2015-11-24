@@ -133,6 +133,23 @@ class GPDFAPI {
 	}
 
 	/**
+	 * Returns our abstracted Gravity Forms API class we use throughout the plugin
+	 *
+	 * While you could just use the GFAPI directly, some methods in this class have been cache-optimised and are specifically tuned for Gravity PDF.
+	 * Note: not all the methods in the GFAPI are implimented.
+	 *
+	 * Usage:
+	 *
+	 * $form->get_form( $form_id );
+	 *
+	 * @return Object Helper_Form
+	 */
+	public static function get_form_class() {
+		global $gfpdf;
+		return $gfpdf->form;
+	}
+
+	/**
 	 * Returns a new instance of one of our PDF generating code (model or view)
 	 * @param  string $type Type of class to return. Valid options include 'view' or 'model'
 	 * @return Object
@@ -298,7 +315,7 @@ class GPDFAPI {
 		if( $return ) {
 			return $products->html();
 		}
-		
+
 		echo $products->html();
 	}
 
@@ -325,10 +342,10 @@ class GPDFAPI {
 		foreach ( $form['fields'] as $field ) {
 
 			if ( $field->id == $field_id && $field->inputType == 'likert' ) {
-				
+
 				/* Output our likert */
 				$likert = new GFPDF\Helper\Fields\Field_Likert( $field, $entry, $gfpdf->form, $gfpdf->misc );
-				
+
 				if( $return ) {
 					return $likert->html();
 				}
