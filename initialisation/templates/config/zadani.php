@@ -73,7 +73,7 @@ class zadani implements Helper_Interface_Config {
 				'show_page_names'      => true,
 				'show_html'            => true,
 				'show_section_content' => true,
-				'show_hidden'          => true,
+				'enable_conditional'   => true,
 				'show_empty'           => true,
 				'header'               => true,
 				'first_header'         => true,

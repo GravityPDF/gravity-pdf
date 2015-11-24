@@ -642,17 +642,18 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 	 * @return Array
 	 * @since 4.0
 	 */
-	public function get_hidden_display_field() {
-		return apply_filters( 'gfpdf_hidden_display_setting', array(
-			'id'    => 'show_hidden',
-			'name'  => __( 'Show Hidden Fields?', 'gravity-forms-pdf-extended' ),
-			'desc'  => __( 'Display Hidden fields in the PDF.', 'gravity-forms-pdf-extended' ),
+	public function get_conditional_display_field() {
+		return apply_filters( 'gfpdf_conditional_display_setting', array(
+			'id'    => 'enable_conditional',
+			'name'  => __( 'Enable Conditional Logic', 'gravity-forms-pdf-extended' ),
+			'desc'  => __( 'When enabled the PDF will adhere to your form conditional logic.', 'gravity-forms-pdf-extended' ),
 			'type'  => 'radio',
 			'options' => array(
 				'Yes' => __( 'Yes', 'gravity-forms-pdf-extended' ),
 				'No'  => __( 'No', 'gravity-forms-pdf-extended' ),
 			),
-			'std'   => __( 'No', 'gravity-forms-pdf-extended' ),
+			'std'   => __( 'Yes', 'gravity-forms-pdf-extended' ),
+			'tooltip'    => '<h6>' . __( 'Enable Conditional Logic', 'gravity-forms-pdf-extended' ) . '</h6>' . __( 'Enable this option to prevent failed conditional logic fields from being displayed in the PDF.', 'gravity-forms-pdf-extended' ),
 		) );
 	}
 
