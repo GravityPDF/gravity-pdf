@@ -685,8 +685,6 @@ class Model_PDF extends Helper_Abstract_Model {
 				return true;
 			} catch (Exception $e) {
 
-				var_dump( $e->getMessage() );
-
 				$this->log->addError( 'PDF Generation Error', array(
 					'pdf'       => $pdf,
 					'exception' => $e->getMessage(),
@@ -697,6 +695,29 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Generate and save the PDF to disk
+	 * @param  Array $entry    The Gravity Form entry array (usually passed in as a filter or pulled using GFAPI::get_entry( $id ) )
+	 * @param  Array $settings  The PDF configuration settings for the particular entry / form being processed
+	 * @return Mixed           Return the full path to the PDF, or a WP_Error on failure
+	 */
+	public function generate_and_save_pdf( $entry, $settings ) {
+
+		$pdf_generator = new Helper_PDF( $entry, $settings, $this->form, $this->data );
+		$pdf_generator->set_filename( $this->get_pdf_name( $settings, $entry ) );
+
+		if ( $this->process_and_save_pdf( $pdf_generator ) ) {
+			$pdf_path = $pdf_generator->get_full_pdf_path();
+
+			if ( is_file( $pdf_path ) ) {
+				return $pdf_path;
+			}
+		}
+
+		return new WP_Error( 'pdf_generation_failure', __( 'The PDF could not be saved.', 'gravity-forms-pdf-extended' ) );
+
 	}
 
 	/**
@@ -716,6 +737,9 @@ class Model_PDF extends Helper_Abstract_Model {
 			/* Set up classes */
 			$controller  = $this->getController();
 
+			/* Ensure our notification has an array setup for the attachments key */
+			$notifications['attachments'] = ( isset( $notifications['attachments'] ) ) ? $notifications['attachments'] : array();
+
 			/* Loop through each PDF config and generate */
 			foreach ( $pdfs as $pdf_config ) {
 
@@ -723,21 +747,14 @@ class Model_PDF extends Helper_Abstract_Model {
 
 				if ( ! is_wp_error( $settings ) && $this->maybe_attach_to_notification( $notifications, $settings ) ) {
 
-					$pdf_generator = new Helper_PDF( $entry, $settings, $this->form, $this->data );
-					$pdf_generator->set_filename( $this->get_pdf_name( $settings, $entry ) );
+					$filename = $this->generate_and_save_pdf( $entry, $settings );
 
-					if ( $this->process_and_save_pdf( $pdf_generator ) ) {
-						$pdf_path = $pdf_generator->get_path() . $pdf_generator->get_filename();
-
-						if ( is_file( $pdf_path ) ) {
-							$this->options->increment_pdf_count();
-							$notifications['attachments'][] = $pdf_path;
-						}
+					if( ! is_wp_error( $filename ) ) {
+						$this->options->increment_pdf_count();
+						$notifications['attachments'][] = $filename;
 					}
 				}
 			}
-
-			$notifications['attachments'] = ( isset( $notifications['attachments'] ) ) ? $notifications['attachments'] : array();
 
 			$this->log->addNotice( 'Gravity Forms Attachments', array(
 				'attachments'  => $notifications['attachments'],
@@ -801,21 +818,15 @@ class Model_PDF extends Helper_Abstract_Model {
 				$settings = $this->options->get_pdf( $entry['form_id'], $pdf['id'] );
 
 				/* Only generate if the PDF wasn't created during the notification process */
-				if ( ! is_wp_error( $settings ) ) {
+				if ( ! is_wp_error( $settings ) && $this->maybe_always_save_pdf( $settings ) ) {
 
-					$pdf_generator = new Helper_PDF( $entry, $settings, $this->form, $this->data );
-					$pdf_generator->set_filename( $this->get_pdf_name( $settings, $entry ) );
-
-					/* Check if we should force the PDF to be saved to disk */
-					if ( $this->maybe_always_save_pdf( $settings ) ) {
-						$this->process_and_save_pdf( $pdf_generator );
-					}
+					$filename = $this->generate_and_save_pdf( $entry, $settings );
 
 					/* Run an action users can tap into to manipulate the PDF */
-					if ( $this->does_pdf_exist( $pdf_generator ) ) {
-						do_action( 'gfpdf_post_pdf_save', $entry['form_id'], $entry['id'], $settings, $pdf_generator->get_path() . $pdf_generator->get_filename() ); /* Backwards compatibility */
-						do_action( 'gfpdf_post_save_pdf', $form, $entry, $settings, $pdf_generator->get_path() . $pdf_generator->get_filename() );
-						do_action( "gfpdf_post_save_pdf_{$form['id']}", $form, $entry, $settings, $pdf_generator->get_path() . $pdf_generator->get_filename() );
+					if ( ! is_wp_error( $filename ) ) {
+						do_action( 'gfpdf_post_pdf_save', $entry['form_id'], $entry['id'], $settings, $filename ); /* Backwards compatibility */
+						do_action( 'gfpdf_post_save_pdf', $form, $entry, $settings, $filename );
+						do_action( "gfpdf_post_save_pdf_{$form['id']}", $form, $entry, $settings, $filename );
 					}
 				}
 			}
@@ -830,7 +841,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function does_pdf_exist( Helper_PDF $pdf ) {
 
-		if ( is_file( $pdf->get_path() . $pdf->get_filename() ) ) {
+		if ( is_file( $pdf->get_full_pdf_path() ) ) {
 			return true;
 		}
 
@@ -1468,7 +1479,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			}
 		}
 
-		return new WP_Error( 'Could not find PDF configuration requested' );
+		return new WP_Error( 'pdf_configuration_error', 'Could not find PDF configuration requested' );
 	}
 
 	/**

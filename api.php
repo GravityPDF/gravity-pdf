@@ -299,6 +299,28 @@ class GPDFAPI {
 		return $options->delete_option( $key );
 	}
 
+	/**
+	 * Provided the Gravity Form entry and PDF settings, this method will correctly generate the PDF, save it to disk
+	 * and return the absolute path to the PDF.
+	 *
+ 	 * @param  Array $entry     The Gravity Form entry array – eg. GFAPI::get_entry( $id )
+	 * @param  Array $setting   The PDF configuration settings for the particular entry / form being processed – eg. GPDFAPI::get_pdf( $form_id, $pdf_id )
+	 * @return Mixed            Return the full path to the PDF, or a WP_Error on failure
+	 * @since 4.0
+	 */
+	public static function create_pdf( $entry, $setting ) {
+
+		if( ! is_array( $entry ) || empty( $entry['id'] ) ) {
+			return new WP_Error( 'invalid_entry', 'The $entry value is not a valid Gravity Forms Entry object. Use "GFAPI::get_entry( $id )" to get the object.' );
+		}
+
+		if( ! is_array( $setting ) || empty( $setting['id'] ) ) {
+			return new WP_Error( 'invalid_pdf_setting', 'The $setting value is not a valid Gravity PDF Setting object. Use "GPDFAPI::get_pdf( $form_id, $pdf_id )" to get the object.' );
+		}
+
+		$pdf = self::get_pdf_class( 'model' );
+		return $pdf->generate_and_save_pdf( $entry, $setting );
+	}
 
 	/**
 	 * Generates the current entry's HTML product table
