@@ -164,7 +164,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 
 					'update_screen_action' => array(
 						'id'      => 'update_screen_action',
-						'name'    => __( "Show What's New?", 'gravity-forms-pdf-extended' ),
+						'name'    => __( "Show What's New", 'gravity-forms-pdf-extended' ),
 						'desc'    => "When updating to a new release we'll redirect you to our What's New page.",
 						'type'    => 'radio',
 						'options' => array(
@@ -484,7 +484,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 
 					'save' => array(
 						'id'    => 'save',
-						'name'  => __( 'Always Save PDF?', 'gravity-forms-pdf-extended' ),
+						'name'  => __( 'Always Save PDF', 'gravity-forms-pdf-extended' ),
 						'desc'  => __( 'Force a PDF to be saved to disk when a new entry is created.', 'gravity-forms-pdf-extended' ),
 						'type'  => 'radio',
 						'options' => array(
@@ -518,7 +518,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 
 		$settings['public_access'] = array(
 						'id'    => 'public_access',
-						'name'  => __( 'Enable Public Acccess?', 'gravity-forms-pdf-extended' ),
+						'name'  => __( 'Enable Public Acccess', 'gravity-forms-pdf-extended' ),
 						'desc'  => sprintf( __( 'Allow ANYONE to access the PDFs. %sWarning: This disables all security protocols.%s', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
 						'type'  => 'radio',
 						'options' => array(
@@ -548,7 +548,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 
 		$settings['advanced_template'] = array(
 						'id'    => 'advanced_template',
-						'name'  => __( 'Enable Advanced Templating?', 'gravity-forms-pdf-extended' ),
+						'name'  => __( 'Enable Advanced Templating', 'gravity-forms-pdf-extended' ),
 						'desc'  => sprintf( __( 'By enabling, a PDF template will no longer be treated as HTML. %sUse wisely.%s', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
 						'type'  => 'radio',
 						'options' => array(
@@ -569,7 +569,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 	public function get_form_title_display_field() {
 		return apply_filters( 'gfpdf_form_title_display_setting', array(
 			'id'    => 'show_form_title',
-			'name'  => __( 'Show Form Title?', 'gravity-forms-pdf-extended' ),
+			'name'  => __( 'Show Form Title', 'gravity-forms-pdf-extended' ),
 			'desc'  => __( 'Display the form title at the beginning of the PDF.', 'gravity-forms-pdf-extended' ),
 			'type'  => 'radio',
 			'options' => array(
@@ -588,7 +588,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 	public function get_page_names_display_field() {
 		return apply_filters( 'gfpdf_page_names_display_setting', array(
 			'id'    => 'show_page_names',
-			'name'  => __( 'Show Page Names?', 'gravity-forms-pdf-extended' ),
+			'name'  => __( 'Show Page Names', 'gravity-forms-pdf-extended' ),
 			'desc'  => __( 'Display form page names on the PDF when enabled (only works when using page break field).', 'gravity-forms-pdf-extended' ),
 			'type'  => 'radio',
 			'options' => array(
@@ -607,7 +607,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 	public function get_html_display_field() {
 		return apply_filters( 'gfpdf_html_display_setting', array(
 			'id'    => 'show_html',
-			'name'  => __( 'Show HTML Fields?', 'gravity-forms-pdf-extended' ),
+			'name'  => __( 'Show HTML Fields', 'gravity-forms-pdf-extended' ),
 			'desc'  => __( 'Display HTML fields in the PDF.', 'gravity-forms-pdf-extended' ),
 			'type'  => 'radio',
 			'options' => array(
@@ -626,7 +626,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 	public function get_section_content_display_field() {
 		return apply_filters( 'gfpdf_section_content_display_setting', array(
 			'id'    => 'show_section_content',
-			'name'  => __( 'Show Section Break Description?', 'gravity-forms-pdf-extended' ),
+			'name'  => __( 'Show Section Break Description', 'gravity-forms-pdf-extended' ),
 			'desc'  => __( 'Display the Section Break field description in the PDF.', 'gravity-forms-pdf-extended' ),
 			'type'  => 'radio',
 			'options' => array(
@@ -665,7 +665,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 	public function get_empty_display_field() {
 		return apply_filters( 'gfpdf_empty_display_setting', array(
 			'id'    => 'show_empty',
-			'name'  => __( 'Show Empty Fields?', 'gravity-forms-pdf-extended' ),
+			'name'  => __( 'Show Empty Fields', 'gravity-forms-pdf-extended' ),
 			'desc'  => __( 'Display Empy fields in the PDF.', 'gravity-forms-pdf-extended' ),
 			'type'  => 'radio',
 			'options' => array(
