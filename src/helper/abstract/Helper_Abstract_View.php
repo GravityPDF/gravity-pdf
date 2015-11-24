@@ -57,8 +57,15 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 	 * @var array
 	 * @since 4.0
 	 */
-	protected $data = array();
+	protected $data_cache = array();
 
+	/**
+	 * Automatically define our constructor which will set our data cache
+	 * @param array $data An array of data to pass to the view
+	 */
+	public function __construct( $data = array() ) {
+		$this->data_cache = $data;
+	}
 
 	/**
 	 * Triggered when invoking inaccessible methods in an object context
@@ -70,9 +77,9 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 	 */
 	final public function __call( $name, $arguments ) {
 		/* check if we have any arguments */
-		$vars = $this->data;
+		$vars = $this->data_cache;
 		if ( isset($arguments[0]) && is_array( $arguments[0] ) ) {
-			$vars = array_merge( $arguments[0], $this->data );
+			$vars = array_merge( $arguments[0], $vars );
 		}
 
 		/* load the about page view */

@@ -51,10 +51,6 @@ class View_Actions extends Helper_Abstract_View
 	 */
 	protected $ViewType = 'Actions';
 
-	public function __construct( $data = array() ) {
-		$this->data = $data;
-	}
-
 	/**
 	 * Add our primary button and an opt-our dismissal button
 	 * @param  String $type        The action ID

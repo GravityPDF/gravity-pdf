@@ -90,7 +90,7 @@ class View_Settings extends Helper_Abstract_View
 	 * @var Object
 	 * @since 4.0
 	 */
-	protected $plugin_data;
+	protected $data;
 
 	/**
 	 * Holds our Helper_Misc object
@@ -100,21 +100,27 @@ class View_Settings extends Helper_Abstract_View
 	 */
 	protected $misc;
 
-
-
 	/**
-	 * [__construct description]
-	 * @param array $data [description]
+	 * Setup our view with the needed data and classes
+	 * @param array                $data_cache  An array of data to pass to the view
+	 * @param Helper_Abstract_Form $form        Our abstracted Gravity Forms helper functions
+	 * @param LoggerInterface      $log         Our logger class
+	 * @param Helper_Options       $options     Our options class which allows us to access any settings
+	 * @param Helper_Data          $data Our plugin data store
+	 * @param Helper_Misc          $misc        Our miscellanious methods
+	 * @since 4.0
 	 */
-	public function __construct( $data = array(), Helper_Abstract_Form $form, LoggerInterface $log, Helper_Options $options, Helper_Data $plugin_data, Helper_Misc $misc ) {
-		$this->data = $data;
+	public function __construct( $data_cache = array(), Helper_Abstract_Form $form, LoggerInterface $log, Helper_Options $options, Helper_Data $data, Helper_Misc $misc ) {
+
+		/* Call our parent constructor */
+		parent::__construct( $data_cache );
 
 		/* Assign our internal variables */
-		$this->form        = $form;
-		$this->log         = $log;
-		$this->options     = $options;
-		$this->plugin_data = $plugin_data;
-		$this->misc        = $misc;
+		$this->form    = $form;
+		$this->log     = $log;
+		$this->options = $options;
+		$this->data    = $data;
+		$this->misc    = $misc;
 	}
 
 	/**
@@ -130,10 +136,8 @@ class View_Settings extends Helper_Abstract_View
 		$vars = array(
 			'selected' => isset( $_GET['tab'] ) ? $_GET['tab'] : 'general',
 			'tabs'     => $this->get_avaliable_tabs(),
-			'data'     => $this->plugin_data,
+			'data'     => $this->data,
 		);
-
-		$vars = array_merge( $vars, $this->data );
 
 		/* load the tabs view */
 		$this->load( 'tabs', $vars );
@@ -185,13 +189,11 @@ class View_Settings extends Helper_Abstract_View
 		$status = new GFPDF_Major_Compatibility_Checks();
 
 		$vars = array(
-			'memory'      => $status->get_ram( $this->plugin_data->memory_limit ),
+			'memory'      => $status->get_ram( $this->data->memory_limit ),
 			'wp'          => $wp_version,
 			'php'         => phpversion(),
 			'gf'          => $this->form->get_version(),
 		);
-
-		$vars = array_merge( $vars, $this->data );
 
 		$this->log->addNotice( 'System Status', array( 'status' => $vars ) );
 
@@ -209,8 +211,6 @@ class View_Settings extends Helper_Abstract_View
 		$vars = array(
 			'edit_cap' => $this->form->has_capability( 'gravityforms_edit_settings' ),
 		);
-
-		$vars = array_merge( $vars, $this->data );
 
 		/* load the system status view */
 		$this->load( 'general', $vars );
@@ -230,15 +230,13 @@ class View_Settings extends Helper_Abstract_View
 			wp_die( __( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
 		}
 
-		$template_directory = ( is_multisite() ) ? $this->plugin_data->multisite_template_location : $this->plugin_data->template_location;
+		$template_directory = ( is_multisite() ) ? $this->data->multisite_template_location : $this->data->template_location;
 
 		$vars = array(
 			'template_directory'            => $this->misc->relative_path( $template_directory, '/' ),
 			'template_files'                => $this->options->get_plugin_pdf_templates(),
 			'custom_template_setup_warning' => $this->options->get_option( 'custom_pdf_template_files_installed' ),
 		);
-
-		$vars = array_merge( $vars, $this->data );
 
 		/* load the system status view */
 		$this->load( 'tools', $vars );

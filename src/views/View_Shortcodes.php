@@ -51,11 +51,6 @@ class View_Shortcodes extends Helper_Abstract_View
 	 */
 	protected $ViewType = 'Shortcodes';
 
-
-	public function __construct( $data = array() ) {
-		$this->data = $data;
-	}
-
 	/**
 	 * Shortcode Error: Entry ID not passed through the shortcode - directly or through the URL.
 	 * @return String The error message
