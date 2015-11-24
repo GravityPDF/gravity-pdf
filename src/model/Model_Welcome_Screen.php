@@ -75,10 +75,12 @@ class Model_Welcome_Screen extends Helper_Abstract_Model {
 	protected $log;
 
 	/**
-	 * Load our model and view and required actions
+	 * Setup our view with the needed data and classes
+	 * @param LoggerInterface $log Our logger class
+	 * @since 4.0
 	 */
 	public function __construct( LoggerInterface $log ) {
-		
+
 		/* Assign our internal variables */
 		$this->log = $log;
 

@@ -95,7 +95,14 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	protected $misc;
 
 	/**
-	 * Load our model and view and required actions
+	 * Setup our class by injecting all our dependancies
+	 * @param Helper_Abstract_Model $model   Our Install Model the controller will manage
+	 * @param Helper_Abstract_Form  $form    Our Install View the controller will manage
+	 * @param LoggerInterface       $log     Our logger class
+	 * @param Helper_Notices        $notices Our notice class used to queue admin messages and errors
+	 * @param Helper_Data           $data    Our plugin data store
+	 * @param Helper_Misc           $misc    Our miscellaneous methods
+	 * @since 4.0
 	 */
 	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_Form $form, LoggerInterface $log, Helper_Notices $notices, Helper_Data $data, Helper_Misc $misc ) {
 

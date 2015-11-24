@@ -77,7 +77,10 @@ class Model_Actions extends Helper_Abstract_Model {
     protected $notices;
 
 	/**
-	 * Load our model and view and required actions
+	 * Setup our class by injecting all our dependancies
+	 * @param Helper_Data    $data    Our plugin data store
+	 * @param Helper_Options $options Our options class which allows us to access any settings
+	 * @param Helper_Notices $notices Our notice class used to queue admin messages and errors
 	 */
 	public function __construct( Helper_Data $data, Helper_Options $options, Helper_Notices $notices ) {
 
@@ -86,7 +89,6 @@ class Model_Actions extends Helper_Abstract_Model {
 		$this->options = $options;
         $this->notices = $notices;
 	}
-
 
 	/**
 	 * Check if the current notice has already been dismissed
@@ -327,7 +329,7 @@ class Model_Actions extends Helper_Abstract_Model {
 			wp_die();
 		}
 
-		
+
 		/* Setup correct migration settings */
 		switch_to_blog( $blog_id );
 		$this->data->multisite_template_location = $path;

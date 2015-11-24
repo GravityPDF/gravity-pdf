@@ -64,7 +64,7 @@ class View_Welcome_Screen extends Helper_Abstract_View
 	protected $form;
 
 	/**
-	 * Setup our view with the needed data and classes
+	 * Setup our class by injecting all our dependancies
 	 * @param array                $data_cache  An array of data to pass to the view
 	 * @param Helper_Abstract_Form $form        Our abstracted Gravity Forms helper functions
 	 */
