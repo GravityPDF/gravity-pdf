@@ -492,7 +492,7 @@ class Test_Form_Settings extends WP_UnitTestCase
 
 		$this->assertEquals( 12, sizeof( $settings ) );
 
-		$core_fields = array( 'show_form_title', 'show_page_names', 'show_html', 'show_section_content', 'show_hidden', 'show_empty', 'header', 'first_header', 'footer', 'first_footer', 'background_color', 'background_image' );
+		$core_fields = array( 'show_form_title', 'show_page_names', 'show_html', 'show_section_content', 'enable_conditional', 'show_empty', 'header', 'first_header', 'footer', 'first_footer', 'background_color', 'background_image' );
 
 		foreach ( $core_fields as $key ) {
 			$this->assertTrue( isset( $settings[ $key ] ) );

@@ -516,7 +516,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			'show_page_names'      => 'get_page_names_display_field',
 			'show_html'            => 'get_html_display_field',
 			'show_section_content' => 'get_section_content_display_field',
-			'show_hidden'          => 'get_hidden_display_field',
+			'enable_conditional'   => 'get_conditional_display_field',
 			'show_empty'           => 'get_empty_display_field',
 
 			'background_color'     => 'get_background_color_field',
