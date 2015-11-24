@@ -208,7 +208,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		?>
 
 		<img data-id="<?php echo $item['id'] ?>" data-nonce="<?php echo $state_nonce; ?>" data-fid="<?php echo $form_id; ?>" src="<?php echo $this->form_plugin->get_plugin_url() ?>/images/active<?php echo intval( $is_active ) ?>.png" style="cursor: pointer;margin:-1px 0 0 8px;" alt="<?php $is_active ? __( 'Active', 'gravity-forms-pdf-extended' ) : __( 'Inactive', 'gravity-forms-pdf-extended' ); ?>" title="<?php echo $is_active ? __( 'Active', 'gravity-forms-pdf-extended' ) : __( 'Inactive', 'gravity-forms-pdf-extended' ); ?>"/>
-		
+
 		<?php
 	}
 
@@ -241,8 +241,18 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * @since 4.0
 	 */
 	public function column_shortcode( $item ) {
-		$shortcode = '[gravitypdf id="'. $item['id'] . '" text="' . __( 'Download PDF', 'gravity-forms-pdf-extended' ) . '"]';
-		echo '<input type="text" class="gravitypdf_shortcode" value="'. esc_html( $shortcode ) .'" readonly="readonly" onfocus="jQuery(this).select();" onclick="jQuery(this).select();" />';
+
+		/**
+		 * While esc_attr() used below will ensure no display issues when copied the double quote will cause shortcode parse issues
+		 * We'll prevent this by removing them before hand
+		 */
+		$name = str_replace( '"', '', $item['name'] );
+
+		/* Prepare our shortcode sample */
+		$shortcode = '[gravitypdf name="'. esc_attr( $name ) .'" id="'. esc_attr( $item['id'] ) . '" text="' . __( 'Download PDF', 'gravity-forms-pdf-extended' ) . '"]';
+
+		/* Display in a readonly field */
+		echo '<input type="text" class="gravitypdf_shortcode" value="'. esc_attr( $shortcode ) .'" readonly="readonly" onfocus="jQuery(this).select();" onclick="jQuery(this).select();" />';
 	}
 
 	/**
