@@ -49,18 +49,24 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Name extends Helper_Abstract_Fields
-{
+class Field_Name extends Helper_Abstract_Fields {
 
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
-	 * @param Object $field The GF_Field_* Object
-	 * @param Array  $entry The Gravity Forms Entry
+	 *
+	 * @param object               $field The GF_Field_* Object
+	 * @param array                $entry The Gravity Forms Entry
+	 *
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
+	 * @param \GFPDF\Helper\Helper_Misc          $misc
+	 *
+	 * @throws Exception
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( $field, $entry, Helper_Abstract_Form $form, Helper_Misc $misc ) {
-		
-		if ( ! is_object( $field ) || ! ($field instanceof GF_Field_Name) ) {
+
+		if ( ! is_object( $field ) || ! ( $field instanceof GF_Field_Name ) ) {
 			throw new Exception( '$field needs to be in instance of GF_Field_Name' );
 		}
 
@@ -70,11 +76,16 @@ class Field_Name extends Helper_Abstract_Fields
 
 	/**
 	 * Display the HTML version of this field
-	 * @return String
+	 *
+	 * @param string $value
+	 * @param bool   $label
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
-		$data  = array_filter( $this->value() ); /* remove any empty fields from the array */
+		$data = array_filter( $this->value() ); /* remove any empty fields from the array */
 
 		$value = esc_html( implode( ' ', $data ) );
 
@@ -83,7 +94,9 @@ class Field_Name extends Helper_Abstract_Fields
 
 	/**
 	 * Get the standard GF value of this field
-	 * @return Array
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public function value() {
@@ -95,16 +108,16 @@ class Field_Name extends Helper_Abstract_Fields
 
 		/* check if the returned results are an array */
 		if ( ! is_array( $value ) ) {
-			$value[$this->field->id . '.3'] = $value; /* set to the first name */
+			$value[ $this->field->id . '.3' ] = $value; /* set to the first name */
 		}
 
-		$this->cache(array(
+		$this->cache( array(
 			'prefix' => rgget( $this->field->id . '.2', $value ),
 			'first'  => rgget( $this->field->id . '.3', $value ),
 			'middle' => rgget( $this->field->id . '.4', $value ),
 			'last'   => rgget( $this->field->id . '.6', $value ),
 			'suffix' => rgget( $this->field->id . '.8', $value ),
-		));
+		) );
 
 		return $this->cache();
 	}

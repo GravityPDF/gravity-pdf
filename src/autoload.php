@@ -36,8 +36,8 @@ if ( ! defined( 'ABSPATH' ) ) {
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-require_once(PDF_PLUGIN_DIR . 'vendor/autoload.php');
-require_once(PDF_PLUGIN_DIR . 'src/backwards-compatibility.php');
-require_once(PDF_PLUGIN_DIR . 'src/depreciated.php');
-require_once(PDF_PLUGIN_DIR . 'api.php');
+require_once( PDF_PLUGIN_DIR . 'vendor/autoload.php' );
+require_once( PDF_PLUGIN_DIR . 'src/backwards-compatibility.php' );
+require_once( PDF_PLUGIN_DIR . 'src/depreciated.php' );
+require_once( PDF_PLUGIN_DIR . 'api.php' );
 

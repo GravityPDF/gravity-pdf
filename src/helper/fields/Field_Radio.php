@@ -51,17 +51,23 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Radio extends Helper_Abstract_Fields
-{
+class Field_Radio extends Helper_Abstract_Fields {
 
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
-	 * @param Object $field The GF_Field_* Object
-	 * @param Array  $entry The Gravity Forms Entry
+	 *
+	 * @param object               $field The GF_Field_* Object
+	 * @param array                $entry The Gravity Forms Entry
+	 *
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
+	 * @param \GFPDF\Helper\Helper_Misc          $misc
+	 *
+	 * @throws Exception
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( $field, $entry, Helper_Abstract_Form $form, Helper_Misc $misc ) {
-		
+
 		if ( ! is_object( $field ) || ! $field instanceof GF_Field_Radio ) {
 			throw new Exception( '$field needs to be in instance of GF_Field_Radio' );
 		}
@@ -72,12 +78,16 @@ class Field_Radio extends Helper_Abstract_Fields
 
 	/**
 	 * Display the HTML version of this field
-	 * @return String
+	 *
+	 * @param string $value
+	 * @param bool   $label
+	 *
+	 * @return string
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
 		$data   = $this->value();
-		$output = ($value) ? $data['value'] : $data['label'];
+		$output = ( $value ) ? $data['value'] : $data['label'];
 		$output = esc_html( $output );
 
 		return parent::html( $output );
@@ -85,7 +95,9 @@ class Field_Radio extends Helper_Abstract_Fields
 
 	/**
 	 * Return the HTML form data
-	 * @return Array
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public function form_data() {
@@ -95,9 +107,9 @@ class Field_Radio extends Helper_Abstract_Fields
 		$data  = array();
 
 		/* Standadised Format */
-		$data['field'][ $this->field->id . '.' . $label ]           = $value['value'];
-		$data['field'][ $this->field->id ]                          = $value['value'];
-		$data['field'][ $label ]                                    = $value['value'];
+		$data['field'][ $this->field->id . '.' . $label ] = $value['value'];
+		$data['field'][ $this->field->id ]                = $value['value'];
+		$data['field'][ $label ]                          = $value['value'];
 
 		/* Name Format */
 		$data['field'][ $this->field->id . '.' . $label . '_name' ] = $value['label'];
@@ -109,7 +121,9 @@ class Field_Radio extends Helper_Abstract_Fields
 
 	/**
 	 * Get the standard GF value of this field
-	 * @return Array
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public function value() {
@@ -119,13 +133,13 @@ class Field_Radio extends Helper_Abstract_Fields
 
 		$label = trim( GFCommon::selection_display( $this->get_value(), $this->field, '', true ) );
 		$value = trim( GFCommon::selection_display( $this->get_value(), $this->field ) );
-		
+
 
 		/* return value / label as an array */
-		$this->cache(array(
+		$this->cache( array(
 			'value' => $value,
 			'label' => $label,
-		));
+		) );
 
 		return $this->cache();
 	}

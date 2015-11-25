@@ -50,17 +50,23 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Post_Tags extends Helper_Abstract_Fields
-{
+class Field_Post_Tags extends Helper_Abstract_Fields {
 
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
-	 * @param Object $field The GF_Field_* Object
-	 * @param Array  $entry The Gravity Forms Entry
+	 *
+	 * @param object                             $field The GF_Field_* Object
+	 * @param array                              $entry The Gravity Forms Entry
+	 *
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
+	 * @param \GFPDF\Helper\Helper_Misc          $misc
+	 *
+	 * @throws Exception
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( $field, $entry, Helper_Abstract_Form $form, Helper_Misc $misc ) {
-		
+
 		if ( ! is_object( $field ) || ! $field instanceof GF_Field_Post_Tags ) {
 			throw new Exception( '$field needs to be in instance of GF_Field_Post_Tags' );
 		}
@@ -71,26 +77,34 @@ class Field_Post_Tags extends Helper_Abstract_Fields
 
 	/**
 	 * Standardised method for returning the field's correct $form_data['field'] keys
-	 * @return Array
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public function form_data() {
 
-		$value = implode( ', ', $this->value() );
-		$label = GFFormsModel::get_label( $this->field );
-		$data  = array();
+		$value    = implode( ', ', $this->value() );
+		$label    = GFFormsModel::get_label( $this->field );
+		$field_id = (int) $this->field->id;
+		$data     = array();
 
 		/* Add HTML output */
-		$data[ $this->field->id . '.' . $label ] = $value;
-		$data[ $this->field->id ]                = $value;
-		$data[ $label ]                          = $value;
+		$data[ $field_id . '.' . $label ] = $value;
+		$data[ $field_id ]                = $value;
+		$data[ $label ]                   = $value;
 
 		return array( 'field' => $data );
 	}
 
 	/**
 	 * Display the HTML version of this field
-	 * @return String
+	 *
+	 * @param string $value
+	 * @param bool   $label
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
@@ -101,7 +115,9 @@ class Field_Post_Tags extends Helper_Abstract_Fields
 
 	/**
 	 * Get the standard GF value of this field
-	 * @return String/Array
+	 *
+	 * @return string|array
+	 *
 	 * @since 4.0
 	 */
 	public function value() {

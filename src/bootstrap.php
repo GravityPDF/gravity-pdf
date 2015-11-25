@@ -6,8 +6,18 @@ use GFPDF\Controller;
 use GFPDF\Model;
 use GFPDF\View;
 use GFPDF\Helper;
-use GFPDF\Stat;
 use GFPDF_Core;
+
+use Monolog\Formatter\LineFormatter;
+use Monolog\Formatter\LogglyFormatter;
+use Monolog\Handler\BufferHandler;
+use Monolog\Handler\LogglyHandler;
+use Monolog\Handler\NullHandler;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use Monolog\Processor\IntrospectionProcessor;
+use Monolog\Processor\MemoryPeakUsageProcessor;
+use Monolog\Processor\WebProcessor;
 
 use GFFormsModel;
 
@@ -58,14 +68,18 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 	/**
 	 * Holds our log class
-	 * @var Object
+	 *
+	 * @var \Monolog\Logger
+	 *
 	 * @since 4.0
 	 */
 	public $log;
 
 	/**
 	 * Holds abstracted functions related to the forms plugin
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Form
+	 *
 	 * @since 4.0
 	 */
 	public $form;
@@ -73,7 +87,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Holds our Helper_Notices object
 	 * which we can use to queue up admin messages for the user
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Notices
+	 *
 	 * @since 4.0
 	 */
 	public $notices;
@@ -81,7 +97,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Data
+	 *
 	 * @since 4.0
 	 */
 	public $data;
@@ -89,7 +107,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Holds our Helper_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Options_Fields
+	 *
 	 * @since 4.0
 	 */
 	public $options;
@@ -97,14 +117,20 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Misc
+	 *
 	 * @since 4.0
 	 */
 	public $misc;
 
 	/**
 	 * Add user depreciation notice for any methods not included in current object
-	 * @since  4.0
+	 *
+	 * @param string $name The function name to be called
+	 * @param array $arguments An enumerated array containing the parameters passed to the $name'ed method
+	 *
+	 * @since 4.0
 	 */
 	public function __call( $name, $arguments ) {
 		trigger_error( sprintf( __( '"%s" has been depreciated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ), E_USER_DEPRECATED );
@@ -112,6 +138,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 	/**
 	 * Add user depreciation notice for any methods not included in current object
+	 *
+	 * @param string $name The function name to be called
+	 * @param array $arguments An enumerated array containing the parameters passed to the $name'ed method
+	 *
 	 * @since  4.0
 	 */
 	public static function __callStatic( $name, $arguments ) {
@@ -121,6 +151,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Setup our plugin functionality
 	 * Note: Fires on WordPress' init hook
+	 *
 	 * @since 4.0
 	 */
 	public function init() {
@@ -155,7 +186,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->actions();
 
 		/* Add localisation support */
-		load_plugin_textdomain( 'gravity-forms-pdf-extended', false,  dirname( plugin_basename( __FILE__ ) ) . '/assets/languages/' );
+		load_plugin_textdomain( 'gravity-forms-pdf-extended', false, dirname( plugin_basename( __FILE__ ) ) . '/assets/languages/' );
 
 		/**
 		 * Run generic actions and filters needed to get the plugin functional
@@ -171,7 +202,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 	/**
 	 * Add required plugin actions
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function add_actions() {
@@ -186,7 +219,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 	/**
 	 * Add required plugin filters
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function add_filters() {
@@ -203,23 +238,26 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
 
 		/* Add class when on Gravity PDF pages */
-		add_filter( 'admin_body_class', array( $this, 'add_body_class') );
+		add_filter( 'admin_body_class', array( $this, 'add_body_class' ) );
 	}
 
 	/**
 	 * Initialise our logging class (we're using Monolog instead of Gravity Form's KLogger)
 	 * and set up appropriate handlers based on the logger settings
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	public function setup_logger() {
 
 		/* Initialise our logger */
-		$this->log = new \Monolog\Logger( 'gravitypdf' );
+		$this->log = new Logger( 'gravitypdf' );
 
 		/* Prevent logging in CLI mode */
 		if ( substr( php_sapi_name(), 0, 3 ) === 'cli' ) {
-			$this->log->pushHandler( new \Monolog\Handler\NullHandler( \Monolog\Logger::INFO ) ); /* throw logs away */
+			$this->log->pushHandler( new NullHandler( Logger::INFO ) ); /* throw logs away */
+
 			return;
 		}
 
@@ -230,17 +268,20 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->setup_gravityforms_logging();
 
 		/* Check if we have a handler pushed and add our Introspection and Memory Peak usage processors */
-		if( sizeof( $this->log->getHandlers() ) > 0 ) {
-			$this->log->pushProcessor( new \Monolog\Processor\IntrospectionProcessor );
-			$this->log->pushProcessor( new \Monolog\Processor\MemoryPeakUsageProcessor );
+		if ( sizeof( $this->log->getHandlers() ) > 0 ) {
+			$this->log->pushProcessor( new IntrospectionProcessor );
+			$this->log->pushProcessor( new MemoryPeakUsageProcessor );
 		}
 	}
 
 	/**
 	 * Setup Gravity Forms logging, if currently enabled by the user
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
-	 * @todo Change 'gravity-pdf' back to 'gravity-forms-pdf-extended' to match original plugin folder name
+	 *
+	 * @todo  Change 'gravity-pdf' back to 'gravity-forms-pdf-extended' to match original plugin folder name
 	 */
 	private function setup_gravityforms_logging() {
 
@@ -251,17 +292,17 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$settings  = get_option( 'gf_logging_settings', array() );
 			$log_level = rgar( $settings, 'gravity-pdf' );
 
-			if ( ! empty($log_level) && $log_level !== 6 ) {
+			if ( ! empty( $log_level ) && $log_level !== 6 ) {
 
 				/* Set our log file */
 				$log_file_name = GFFormsModel::get_upload_root() . 'logs/gravity-pdf.txt';
 
 				/* Convert Gravity Forms log levels to the appropriate Monolog level */
-				$monolog_level = ($log_level == 4) ? \Monolog\Logger::ERROR : \Monolog\Logger::INFO;
+				$monolog_level = ( $log_level == 4 ) ? Logger::ERROR : Logger::INFO;
 
 				/* Setup our stream and change the format to more-suit Gravity Forms */
-				$formatter = new \Monolog\Formatter\LineFormatter( "%datetime% - %level_name% --> %message% %context% %extra%\n" );
-				$stream    = new \Monolog\Handler\StreamHandler( $log_file_name, $monolog_level );
+				$formatter = new LineFormatter( "%datetime% - %level_name% --> %message% %context% %extra%\n" );
+				$stream    = new StreamHandler( $log_file_name, $monolog_level );
 				$stream->setFormatter( $formatter );
 
 				/* Add our log file stream */
@@ -273,7 +314,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Send all logs to Loggly (https://www.loggly.com/) when running a dev version
 	 * of Gravity PDF. This allows us to better track any problems a user might have when running open betas.
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	private function maybe_run_remote_logging() {
@@ -281,15 +324,15 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/* Enable remote logging */
 		if ( function_exists( 'curl_version' ) && $this->is_development_version( PDF_EXTENDED_VERSION ) ) {
 			/* Setup Loggly logging with correct format for buffer logging */
-			$formatter = new \Monolog\Formatter\LogglyFormatter();
-			$loggly    = new \Monolog\Handler\LogglyHandler( '8ad317ed-213d-44c9-a2e8-f2eebd542c66/tag/gravitypdf', \Monolog\Logger::INFO );
+			$formatter = new LogglyFormatter();
+			$loggly    = new LogglyHandler( '8ad317ed-213d-44c9-a2e8-f2eebd542c66/tag/gravitypdf', Logger::INFO );
 			$loggly->setFormatter( $formatter );
 
 			/* Set up our buffer logging to save multiple API calls */
-			$buffer = new \Monolog\Handler\BufferHandler( $loggly, 20, \Monolog\Logger::INFO );
+			$buffer = new BufferHandler( $loggly, 20, Logger::INFO );
 
 			/* Push additional log details about function called from, peak memory and user IP / referrer */
-			$this->log->pushProcessor( new \Monolog\Processor\WebProcessor );
+			$this->log->pushProcessor( new WebProcessor );
 
 			/* Impliment our buffer */
 			$this->log->pushHandler( $buffer );
@@ -299,18 +342,20 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Check if the current version of Gravity PDF is a development edition
 	 * Development editions contain either 'alpha', 'beta', or 'rc' in the version number
-	 * @param  String  $version The version to check
+	 *
+	 * @param  string $version The version to check
+	 *
 	 * @return boolean
+	 *
 	 * @since 4.0
 	 */
 	public function is_development_version( $version ) {
 
-		$dev            = false;
-		$dev_version    = array('alpha', 'beta', 'rc');
+		$dev_version    = array( 'alpha', 'beta', 'rc' );
 		$plugin_version = strtolower( $version );
 
-		foreach( $dev_version as $v ) {
-			if( strpos( $plugin_version, $v ) !== false ) {
+		foreach ( $dev_version as $v ) {
+			if ( strpos( $plugin_version, $v ) !== false ) {
 				return true;
 				break;
 			}
@@ -322,8 +367,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Show action links on the plugin screen.
 	 *
-	 * @param	mixed $links Plugin Action links
-	 * @return	array
+	 * @param    mixed $links Plugin Action links
+	 *
+	 * @return    array
+	 *
 	 * @since 4.0
 	 */
 	public function plugin_action_links( $links ) {
@@ -339,9 +386,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Show row meta on the plugin screen.
 	 *
-	 * @param	mixed $links Plugin Row Meta
-	 * @param	mixed $file  Plugin Base file
-	 * @return	array
+	 * @param    mixed $links Plugin Row Meta
+	 * @param    mixed $file  Plugin Base file
+	 *
+	 * @return    array
+	 *
 	 * @since  4.0
 	 */
 	public function plugin_row_meta( $links, $file ) {
@@ -362,12 +411,16 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 	/**
 	 * If on a Gravity Form page add a new class
-	 * @param Array $classes
+	 *
+	 * @param array $classes
+	 *
 	 * @since 4.0
+	 *
+	 * @return string
 	 */
 	public function add_body_class( $classes ) {
 
-		if( $this->misc->is_gfpdf_page() ) {
+		if ( $this->misc->is_gfpdf_page() ) {
 			$classes .= ' gfpdf-page';
 		}
 
@@ -376,7 +429,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 	/**
 	 * Register all css and js which can be enqueued when needed
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function register_assets() {
@@ -386,26 +441,31 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 	/**
 	 * Register requrired CSS
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	private function register_styles() {
 		$version = PDF_EXTENDED_VERSION;
-		$suffix = '.min';
+		$suffix  = '.min';
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG === true ) {
-			$suffix  = '';
+			$suffix = '';
 		}
 
-		wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'src/assets/css/gfpdf-styles'. $suffix .'.css', array( 'wp-color-picker' ), $version );
-		wp_register_style( 'gfpdf_css_admin_styles', PDF_PLUGIN_URL . 'src/assets/css/gfpdf-admin-styles'. $suffix .'.css', array(), $version );
+		wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'src/assets/css/gfpdf-styles' . $suffix . '.css', array( 'wp-color-picker' ), $version );
+		wp_register_style( 'gfpdf_css_admin_styles', PDF_PLUGIN_URL . 'src/assets/css/gfpdf-admin-styles' . $suffix . '.css', array(), $version );
 		wp_register_style( 'gfpdf_css_chosen_style', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.min.css', array( 'wp-jquery-ui-dialog' ), $version );
 	}
 
 	/**
 	 * Register requrired JS
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
-	 * @todo Limit js dependancies on particular pages (eg. form pdf settings vs global settings)
+	 *
+	 * @todo  Limit js dependancies on particular pages (eg. form pdf settings vs global settings)
 	 */
 	private function register_scripts() {
 
@@ -415,12 +475,28 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$suffix = '';
 		}
 
-		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-settings'. $suffix .'.js', array( 'wpdialogs', 'jquery-ui-tooltip', 'gform_forms', 'gform_form_admin', 'jquery-color', 'wp-color-picker' ), $version );
-		wp_register_script( 'gfpdf_js_backbone', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-backbone'. $suffix .'.js', array( 'gfpdf_js_settings', 'backbone', 'underscore', 'gfpdf_js_backbone_model_binder', 'wpdialogs' ), $version );
+		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-settings' . $suffix . '.js', array(
+			'wpdialogs',
+			'jquery-ui-tooltip',
+			'gform_forms',
+			'gform_form_admin',
+			'jquery-color',
+			'wp-color-picker',
+		), $version );
+		wp_register_script( 'gfpdf_js_backbone', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-backbone' . $suffix . '.js', array(
+			'gfpdf_js_settings',
+			'backbone',
+			'underscore',
+			'gfpdf_js_backbone_model_binder',
+			'wpdialogs',
+		), $version );
 		wp_register_script( 'gfpdf_js_chosen', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.jquery.min.js', array( 'jquery' ), $version );
-		wp_register_script( 'gfpdf_js_backbone_model_binder', PDF_PLUGIN_URL . 'bower_components/backbone.modelbinder/Backbone.ModelBinder.js', array( 'backbone', 'underscore' ), $version );
+		wp_register_script( 'gfpdf_js_backbone_model_binder', PDF_PLUGIN_URL . 'bower_components/backbone.modelbinder/Backbone.ModelBinder.js', array(
+			'backbone',
+			'underscore',
+		), $version );
 		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-entries' . $suffix . '.js', array( 'jquery' ), $version );
-		wp_register_script( 'gfpdf_js_v3_migration', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-migration'. $suffix .'.js', array( 'gfpdf_js_settings' ), $version );
+		wp_register_script( 'gfpdf_js_v3_migration', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-migration' . $suffix . '.js', array( 'gfpdf_js_settings' ), $version );
 
 		/*
         * Localise admin script
@@ -432,7 +508,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 	/**
 	 * Load any assets that are needed
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function load_assets() {
@@ -451,7 +529,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		}
 
 		if ( $this->misc->is_gfpdf_settings_tab( 'help' ) || $this->misc->is_gfpdf_settings_tab( 'tools' ) ) {
-			 wp_enqueue_script( 'gfpdf_js_backbone' );
+			wp_enqueue_script( 'gfpdf_js_backbone' );
 		}
 
 		if ( is_admin() && rgget( 'page' ) == 'gf_entries' ) {
@@ -459,16 +537,20 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			wp_enqueue_style( 'gfpdf_css_styles' );
 		}
 
-		if( is_admin() ) {
+		if ( is_admin() ) {
 			wp_enqueue_style( 'gfpdf_css_admin_styles' );
 		}
 	}
 
-	 /**
-	  * Auto no-conflict any preloaded scripts that begin with 'gfpdf_'
-	  * @since 4.0
-	  * @return void
-	  */
+	/**
+	 * Auto no-conflict any preloaded scripts that begin with 'gfpdf_'
+	 *
+	 * @since 4.0
+	 *
+	 * @param array $items The current list of no-conflict scripts
+	 *
+	 * @return array
+	 */
 	public function auto_noconflict_scripts( $items ) {
 
 		$wp_scripts = wp_scripts();
@@ -510,14 +592,18 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		return apply_filters( 'gfpdf_autoload_gf_scripts', $items );
 	}
 
-	 /**
-	  * Auto no-conflict any preloaded styles that begin with 'gfpdf_'
-	  * @since 4.0
-	  * @return void
-	  */
+	/**
+	 * Auto no-conflict any preloaded styles that begin with 'gfpdf_'
+	 *
+	 * @since 4.0
+	 *
+	 * @param array $items The current list of no-conflict styles
+	 *
+	 * @return array
+	 */
 	public function auto_noconflict_styles( $items ) {
 
-		$wp_styles  = wp_styles();
+		$wp_styles = wp_styles();
 
 		$default_styles = array(
 			'editor-buttons',
@@ -542,8 +628,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 	/**
 	 * Register our plugin with Gravity Form's Logger
-	 * @param Array $loggers
-	 * @return Array
+	 *
+	 * @param array $loggers
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public function add_gf_logger( $loggers ) {
@@ -554,7 +643,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 	/**
 	 * Bootstrap our settings API for use
+	 *
 	 * @return void
+	 *
 	 * @return 4.0
 	 */
 	public function init_settings_api() {
@@ -564,7 +655,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 	/**
 	 * Register our admin settings
+	 *
 	 * @return void
+	 *
 	 * @return 4.0
 	 */
 	public function setup_settings_fields() {
@@ -572,6 +665,13 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->options->register_settings( $this->options->get_registered_fields() );
 	}
 
+	/**
+	 * Loads our Gravity PDF installer classes
+	 *
+	 * @since 4.0
+	 *
+	 * @return void
+	 */
 	public function installer() {
 		$model = new Model\Model_Install( $this->form, $this->log, $this->data, $this->misc, $this->notices );
 		$class = new Controller\Controller_Install( $model, $this->form, $this->log, $this->notices, $this->data, $this->misc );
@@ -583,13 +683,15 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 	/**
 	 * Include Welcome Screen functionality for installation / upgrades
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function welcome_screen() {
 
 		$model = new Model\Model_Welcome_Screen( $this->log );
-		$view  = new View\View_Welcome_Screen(array(
+		$view  = new View\View_Welcome_Screen( array(
 			'display_version' => PDF_EXTENDED_VERSION,
 		), $this->form );
 
@@ -599,7 +701,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 	/**
 	 * Include Settings Page functionality
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function gf_settings() {
@@ -613,7 +717,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 	/**
 	 * Include Form Settings (PDF) functionality
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function gf_form_settings() {
@@ -627,7 +733,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 	/**
 	 * Include PDF Display functionality
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function pdf() {
@@ -641,7 +749,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 	/**
 	 * Include PDF Shortcodes functionality
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function shortcodes() {
@@ -655,7 +765,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 	/**
 	 * Include one-time actions functionality
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function actions() {
@@ -671,8 +783,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * Add backwards compatbility with v3.x.x default PDF template files
 	 * This function will now pull the PDF configuration details from our query variables / or our backwards compatible URL params method
 	 *
-	 * @param  Integer $form_id  The Gravity Form ID
-	 * @return  Array The matched configuration being requested
+	 * @param integer $form_id The Gravity Form ID
+	 *
+	 * @return array The matched configuration being requested
+	 *
 	 * @since 4.0
 	 */
 	public function get_default_config_data( $form_id ) {
@@ -680,7 +794,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		$pid = $GLOBALS['wp']->query_vars['pid'];
 
-		$settings    = $gfpdf->options->get_pdf( $form_id, $pid );
+		$settings = $gfpdf->options->get_pdf( $form_id, $pid );
 
 		if ( is_wp_error( $settings ) ) {
 

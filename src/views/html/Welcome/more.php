@@ -10,8 +10,8 @@
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -39,36 +39,40 @@ if (! defined('ABSPATH')) {
 <div class="gfpdf-mascot-sitting"></div>
 
 <div class="changelog">
-    <h3><?php _e( 'Get more out of Gravity PDF', 'gravity-forms-pdf-extended' ); ?></h3>
+	<h3><?php _e( 'Get more out of Gravity PDF', 'gravity-forms-pdf-extended' ); ?></h3>
 
-    <div class="feature-section three-col">
-        <div class="col gfpdf-breakdown">
+	<div class="feature-section three-col">
+		<div class="col gfpdf-breakdown">
 
-            <h4><?php _e( 'PDF Template Shop', 'gravity-forms-pdf-extended' ); ?></h4>
-            <p><?php printf( __( "It's like a theme shop, but for Gravity PDF templates. %sHead over to our online store%s and view our growing selection of premium PDF templates.", 'gravity-forms-pdf-extended' ), '<a href="#">', '</a>' ); ?></p>
+			<h4><?php _e( 'PDF Template Shop', 'gravity-forms-pdf-extended' ); ?></h4>
 
-            <h4><?php _e( 'Stay Up To Date', 'gravity-forms-pdf-extended' ); ?></h4>
-            <p><?php printf( __( '%sSign up to our newsletter%s to be amongst the first to receive the latest news and details on upcoming feature.', 'gravity-forms-pdf-extended' ), '<a href="#">', '</a>' ); ?></p>
+			<p><?php printf( __( "It's like a theme shop, but for Gravity PDF templates. %sHead over to our online store%s and view our growing selection of premium PDF templates.", 'gravity-forms-pdf-extended' ), '<a href="#">', '</a>' ); ?></p>
 
-        </div>
+			<h4><?php _e( 'Stay Up To Date', 'gravity-forms-pdf-extended' ); ?></h4>
 
-        <div class="col gfpdf-breakdown">
+			<p><?php printf( __( '%sSign up to our newsletter%s to be amongst the first to receive the latest news and details on upcoming feature.', 'gravity-forms-pdf-extended' ), '<a href="#">', '</a>' ); ?></p>
 
-            <h4><?php _e( 'Tailored PDFs', 'gravity-forms-pdf-extended' ); ?></h4>
-            <p><?php printf( __( "If the PDF Shop doesn't have what you're after %sour friendly team can build a document just for you%s. With an addon, our devs can even create templates that auto fill existing PDFs – like government and legal documents.", 'gravity-forms-pdf-extended' ), '<a href="#">', '</a>' ); ?></p>
+		</div>
 
-            <h4><?php _e( 'Get Support', 'gravity-forms-pdf-extended' ); ?></h4>
-            <p><?php printf( __( 'Have trouble using Gravity PDF? %sContact our friendly staff%s who are avaliable 9am to 5pm Monday to Friday, %sAustralian Eastern Standard Time%s.', 'gravity-forms-pdf-extended' ), '<a href="#">', '</a>', '<a href="http://www.timeanddate.com/worldclock/australia/sydney">', '</a>' ); ?></p>
-            
+		<div class="col gfpdf-breakdown">
 
-        </div>
+			<h4><?php _e( 'Tailored PDFs', 'gravity-forms-pdf-extended' ); ?></h4>
 
-        <div class="col gfpdf-breakdown last-feature">
+			<p><?php printf( __( "If the PDF Shop doesn't have what you're after %sour friendly team can build a document just for you%s. With an addon, our devs can even create templates that auto fill existing PDFs – like government and legal documents.", 'gravity-forms-pdf-extended' ), '<a href="#">', '</a>' ); ?></p>
 
-            <h4><?php _e( 'Roll your Own', 'gravity-forms-pdf-extended' ); ?></h4>
-            <p><?php printf( __( "If PHP, HTML and CSS come easy to you, you'll find creating your own PDF templates a breeze. With %sextensive documentation and great examples%s you'll be up and running in no time.", 'gravity-forms-pdf-extended' ), '<a href="#">', '</a>' ); ?></p>
+			<h4><?php _e( 'Get Support', 'gravity-forms-pdf-extended' ); ?></h4>
 
-        </div>
+			<p><?php printf( __( 'Have trouble using Gravity PDF? %sContact our friendly staff%s who are avaliable 9am to 5pm Monday to Friday, %sAustralian Eastern Standard Time%s.', 'gravity-forms-pdf-extended' ), '<a href="#">', '</a>', '<a href="http://www.timeanddate.com/worldclock/australia/sydney">', '</a>' ); ?></p>
 
-    </div>
+		</div>
+
+		<div class="col gfpdf-breakdown last-feature">
+
+			<h4><?php _e( 'Roll your Own', 'gravity-forms-pdf-extended' ); ?></h4>
+
+			<p><?php printf( __( "If PHP, HTML and CSS come easy to you, you'll find creating your own PDF templates a breeze. With %sextensive documentation and great examples%s you'll be up and running in no time.", 'gravity-forms-pdf-extended' ), '<a href="#">', '</a>' ); ?></p>
+
+		</div>
+
+	</div>
 </div>

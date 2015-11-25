@@ -51,12 +51,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Controller_Form_Settings extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters
-{
+class Controller_Form_Settings extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters {
 	/**
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Data
+	 *
 	 * @since 4.0
 	 */
 	protected $data;
@@ -64,7 +65,9 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	/**
 	 * Holds our Helper_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Options_Fields
+	 *
 	 * @since 4.0
 	 */
 	protected $options;
@@ -72,18 +75,22 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	/**
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Misc
+	 *
 	 * @since 4.0
 	 */
 	protected $misc;
 
 	/**
 	 * Setup our class by injecting all our dependancies
-	 * @param Helper_Abstract_Model $model   Our Form Model the controller will manage
-	 * @param Helper_Abstract_View  $view    Our Form View the controller will manage
-	 * @param Helper_Data           $data    Our plugin data store
-	 * @param Helper_Options        $options Our options class which allows us to access any settings
-	 * @param Helper_Misc           $misc    Our miscellaneous methods
+	 *
+	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_Form_Settings $model   Our Form Model the controller will manage
+	 * @param Helper_Abstract_View|\GFPDF\View\View_Form_Settings  $view    Our Form View the controller will manage
+	 * @param \GFPDF\Helper\Helper_Data           $data    Our plugin data store
+	 * @param \GFPDF\Helper\Helper_Options        $options Our options class which allows us to access any settings
+	 * @param \GFPDF\Helper\Helper_Misc           $misc    Our miscellaneous methods
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Data $data, Helper_Options $options, Helper_Misc $misc ) {
@@ -97,13 +104,15 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 		$this->model = $model;
 		$this->model->setController( $this );
 
-		$this->view  = $view;
+		$this->view = $view;
 		$this->view->setController( $this );
 	}
 
 	/**
 	 * Initialise our class defaults
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function init() {
@@ -111,13 +120,15 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 		/*
          * Tell Gravity Forms to add our form PDF settings pages
          */
-		 $this->add_actions();
-		 $this->add_filters();
+		$this->add_actions();
+		$this->add_filters();
 	}
 
 	/**
 	 * Apply any actions needed for the settings page
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function add_actions() {
@@ -126,7 +137,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 		add_action( 'admin_init', array( $this, 'maybe_save_pdf_settings' ), 5 );
 
 		/* Tell Gravity Forms to add our form PDF settings pages */
-		add_action( 'gform_form_settings_menu', array( $this->model, 'add_form_settings_menu' ), 10, 2 );
+		add_action( 'gform_form_settings_menu', array( $this->model, 'add_form_settings_menu' ) );
 		add_action( 'gform_form_settings_page_' . $this->data->slug, array( $this, 'display_page' ) );
 
 		/* Add AJAX endpoints */
@@ -138,7 +149,9 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 
 	/**
 	 * Apply any filters needed for the settings page
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function add_filters() {
@@ -147,7 +160,10 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 		add_filter( 'gfpdf_form_settings', array( $this->misc, 'add_template_image' ) );
 
 		/* Add custom field information if we have a template selected */
-		add_filter( 'gfpdf_form_settings_custom_appearance', array( $this->model, 'register_custom_appearance_settings' ) );
+		add_filter( 'gfpdf_form_settings_custom_appearance', array(
+			$this->model,
+			'register_custom_appearance_settings',
+		) );
 
 		/* Add Validation Errors */
 		add_filter( 'gfpdf_form_settings', array( $this->model, 'validation_error' ) );
@@ -155,11 +171,14 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 
 		/* Sanitize Results */
 		add_filter( 'gfpdf_form_settings_sanitize', array( $this->options, 'sanitize_all_fields' ), 10, 4 );
-		add_filter( 'gfpdf_form_settings_sanitize_text',  array( $this->model, 'parse_filename_extension' ), 15, 2 );
-		add_filter( 'gfpdf_form_settings_sanitize_text',  array( $this->options, 'sanitize_trim_field' ), 15, 2 );
-		add_filter( 'gfpdf_form_settings_sanitize_hidden',  array( $this->model, 'decode_json' ), 10, 2 );
+		add_filter( 'gfpdf_form_settings_sanitize_text', array( $this->model, 'parse_filename_extension' ), 15, 2 );
+		add_filter( 'gfpdf_form_settings_sanitize_text', array( $this->options, 'sanitize_trim_field' ), 15, 2 );
+		add_filter( 'gfpdf_form_settings_sanitize_hidden', array( $this->model, 'decode_json' ), 10, 2 );
 
-		add_filter( 'gfpdf_skip_highlight_errors', array( $this->model, 'check_custom_size_error_highlighting' ), 10, 3 );
+		add_filter( 'gfpdf_skip_highlight_errors', array(
+			$this->model,
+			'check_custom_size_error_highlighting',
+		), 10, 3 );
 
 		/* Store our TinyMCE Options */
 		add_filter( 'tiny_mce_before_init', array( $this, 'store_tinymce_settings' ) );
@@ -167,7 +186,9 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 
 	/**
 	 * Determine if we should be saving the PDF settings
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	public function maybe_save_pdf_settings() {
@@ -182,7 +203,9 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 
 	/**
 	 * Processes / Setup the form settings page.
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function display_page() {
@@ -194,7 +217,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 		/* Load the add/edit page */
 		if ( $pdf_id !== false ) {
 			$this->model->show_edit_view( $form_id, $pdf_id );
-			return;
+			return null;
 		}
 
 		/* process list view */
@@ -203,8 +226,11 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 
 	/**
 	 * Store our TinyMCE init settings for use in our AJAX wp_editor calls
-	 * @param $settings The current TinyMCE Settings
-	 * @return Original Settings
+	 *
+	 * @param array $settings The current TinyMCE Settings
+	 *
+	 * @return array Original Settings
+	 *
 	 * @since 4.0
 	 */
 	public function store_tinymce_settings( $settings ) {

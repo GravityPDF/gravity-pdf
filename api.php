@@ -39,6 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * An easy-to-use API developers can use to work with Gravity PDF
+ *
  * @since 4.0
  */
 class GPDFAPI {
@@ -60,11 +61,13 @@ class GPDFAPI {
 	 *
 	 * When in production Gravity PDF will only log to a file when the Gravity Forms Logging plugin is enabled and Gravity PDF is set to "Log errors only" ($log->addError() or higher) or "Log all messages" ($log->addNotice() or higher)
 	 *
-	 * @return Object Monolog\Logger
+	 * @return \Monolog\Logger
+	 *
 	 * @since 4.0
 	 */
 	public static function get_log_class() {
 		global $gfpdf;
+
 		return $gfpdf->log;
 	}
 
@@ -77,11 +80,13 @@ class GPDFAPI {
 	 *
 	 * This taps into the 'admin_notices' or 'network_admin_notices' WordPress hooks so you need to add your notices before then.
 	 *
-	 * @return Object Helper_Notices
+	 * @return \GFPDF\Helper\Helper_Notices
+	 *
 	 * @since 4.0
 	 */
 	public static function get_notice_class() {
 		global $gfpdf;
+
 		return $gfpdf->notices;
 	}
 
@@ -97,11 +102,13 @@ class GPDFAPI {
 	 *
 	 * Note: Our __get() magic method returns variables by reference
 	 *
-	 * @return Object Helper_Data
+	 * @return \GFPDF\Helper\Helper_Data
+	 *
 	 * @since 4.0
 	 */
 	public static function get_data_class() {
 		global $gfpdf;
+
 		return $gfpdf->data;
 	}
 
@@ -110,11 +117,13 @@ class GPDFAPI {
 	 *
 	 * Note: Most relevant methods have been broken our and are avaiable through the GPDFAPI directly (GPDFAPI::get_pdf, GPDFAPI::get_plugin_settings ect)
 	 *
-	 * @return Object Helper_Options_Fields (extends Helper_Options)
+	 * @return \GFPDF\Helper\Helper_Options_Fields
+	 *
 	 * @since 4.0
 	 */
 	public static function get_options_class() {
 		global $gfpdf;
+
 		return $gfpdf->options;
 	}
 
@@ -125,10 +134,13 @@ class GPDFAPI {
 	 *
 	 * $misc->is_gfpdf_page();
 	 *
-	 * @return Object Helper_Misc
+	 * @return \GFPDF\Helper\Helper_Misc
+	 *
+	 * @since 4.0
 	 */
 	public static function get_misc_class() {
 		global $gfpdf;
+
 		return $gfpdf->misc;
 	}
 
@@ -142,27 +154,33 @@ class GPDFAPI {
 	 *
 	 * $form->get_form( $form_id );
 	 *
-	 * @return Object Helper_Form
+	 * @return \GFPDF\Helper\Helper_Form
+	 *
+	 * @since 4.0
 	 */
 	public static function get_form_class() {
 		global $gfpdf;
+
 		return $gfpdf->form;
 	}
 
 	/**
 	 * Returns a new instance of one of our PDF generating code (model or view)
+	 *
 	 * @param  string $type Type of class to return. Valid options include 'view' or 'model'
-	 * @return Object
+	 *
+	 * @return \GFPDF\Model\Model_PDF|\GFPDF\View\View_PDF
+	 *
 	 * @since  4.0
 	 */
 	public static function get_pdf_class( $type = 'view' ) {
 		global $gfpdf;
 
-		if( $type === 'view' ) {
+		if ( $type === 'view' ) {
 			return new GFPDF\View\View_PDF( array(), $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
 		}
 
-		if( $type === 'model' ) {
+		if ( $type === 'model' ) {
 			return new GFPDF\Model\Model_PDF( $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
 		}
 
@@ -171,82 +189,109 @@ class GPDFAPI {
 
 	/**
 	 * Gets a list of current PDFs setup for a particular Gravity Form
-	 * @param  Integer $form_id The Gravity Form ID
-	 * @return Array / WP_Error Array of PDF settings or WP_Error
+	 *
+	 * @param  integer $form_id The Gravity Form ID
+	 *
+	 * @return array|WP_Error Array of PDF settings or WP_Error
+	 *
 	 * @since 4.0
 	 */
 	public static function get_form_pdfs( $form_id ) {
 		$options = self::get_options_class();
+
 		return $options->get_form_pdfs( $form_id );
 	}
 
 	/**
 	 * Gets a specific Gravity Form PDF configuration
-	 * @param  Integer $form_id The Gravity Form ID
-	 * @param  String $pdf_id   The PDF ID
-	 * @return Array / WP_Error Array of PDF settings or WP_Error
+	 *
+	 * @param  integer $form_id The Gravity Form ID
+	 * @param  string  $pdf_id  The PDF ID
+	 *
+	 * @return array|WP_Error Array of PDF settings or WP_Error
 	 * @since 4.0
 	 */
 	public static function get_pdf( $form_id, $pdf_id ) {
 		$options = self::get_options_class();
+
 		return $options->get_pdf( $form_id, $pdf_id );
 	}
 
 	/**
 	 * Add a new PDF to a Gravity Form
-	 * @param Integer $form_id  The Gravity Form ID
-	 * @param Array  $settings  The settings for the PDF
-	 * @return Boolean / String The PDF ID on success, false on failure
+	 *
+	 * @param integer $form_id  The Gravity Form ID
+	 * @param array   $settings The settings for the PDF
+	 *
+	 * @return boolean / String The PDF ID on success, false on failure
+	 *
+	 * @since 4.0
 	 */
 	public static function add_pdf( $form_id, $settings = array() ) {
 		$options = self::get_options_class();
+
 		return $options->add_pdf( $form_id, $settings );
 	}
 
 	/**
 	 * Updates an existing Gravity Form PDF. Passing an empty $settings array will delete the PDF
-	 * @param  Integer $form_id  The Gravity Form ID
-	 * @param  String $pdf_id    The PDF ID
-	 * @param  Array  $settings  The settings for the PDF
-	 * @return Boolean           True on success, false on failure
+	 *
+	 * @param  integer $form_id  The Gravity Form ID
+	 * @param  string  $pdf_id   The PDF ID
+	 * @param  array   $settings The settings for the PDF
+	 *
+	 * @return boolean           True on success, false on failure
+	 *
 	 * @since  4.0
 	 */
 	public static function update_pdf( $form_id, $pdf_id, $settings = array() ) {
 		$options = self::get_options_class();
+
 		return $options->update_pdf( $form_id, $pdf_id, $settings );
 	}
 
 	/**
 	 * Gets a specific Gravity Form PDF configuration
-	 * @param  Integer $form_id The Gravity Form ID
-	 * @param  String $pdf_id   The PDF ID
-	 * @return Boolean           True on success, false on failure
+	 *
+	 * @param  integer $form_id The Gravity Form ID
+	 * @param  string  $pdf_id  The PDF ID
+	 *
+	 * @return boolean           True on success, false on failure
+	 *
 	 * @since  4.0
 	 */
 	public static function delete_pdf( $form_id, $pdf_id ) {
 		$options = self::get_options_class();
+
 		return $options->delete_pdf( $form_id, $pdf_id );
 	}
 
 	/**
 	 * Retrieve an array of the global Gravity PDF settings (this doesn't include individual form configuration details - see GPDFAPI::get_form_pdfs)
-	 * @return Array
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public static function get_plugin_settings() {
 		$options = self::get_options_class();
+
 		return $options->get_settings();
 	}
 
 	/**
 	 * Get an option from the global Gravity PDF settings. If it doesn't exist the $default value will be returned
-	 * @param  String $key     The Gravity PDF option key
-	 * @param  Mixed $default  What's returned if the option doesn't exist
-	 * @return Mixed
+	 *
+	 * @param string $key     The Gravity PDF option key
+	 * @param mixed  $default What's returned if the option doesn't exist
+	 *
+	 * @return mixed
+	 *
 	 * @since 4.0
 	 */
 	public static function get_plugin_option( $key, $default = '' ) {
 		$options = self::get_options_class();
+
 		return $options->get_option( $key, $default );
 	}
 
@@ -256,16 +301,18 @@ class GPDFAPI {
 	 * If option already exists a WP_Error is returned
 	 * In most cases you'll want to use GPDFAPI::update_plugin_option() instead
 	 *
-	 * @param String $key   The option key to add
-	 * @param Mixed $value
-	 * @return Boolean / WP_Error
+	 * @param string $key The option key to add
+	 * @param mixed  $value
+	 *
+	 * @return boolean|WP_Error
+	 *
 	 * @since 4.0
 	 */
 	public static function add_plugin_option( $key, $value ) {
 		$options = self::get_options_class();
 
 		/* Check the option doesn't already exist */
-		if( null !== $options->get_option( $key, null ) ) {
+		if ( null !== $options->get_option( $key, null ) ) {
 			return new WP_Error( 'option_exists', __( 'The option key %s already exists. Use GPDFAPI::update_plugin_option instead', 'gravity-forms-pdf-extended' ) );
 		}
 
@@ -277,25 +324,31 @@ class GPDFAPI {
 	 *
 	 * If $value is falsy (determined by empty() ) the option is deleted.
 	 *
-	 * @param String $key   The option key to update
-	 * @param Mixed $value
-	 * @return Boolean / WP_Error
+	 * @param string $key The option key to update
+	 * @param mixed  $value
+	 *
+	 * @return boolean|WP_Error
+	 *
 	 * @since 4.0
 	 */
 	public static function update_plugin_option( $key, $value ) {
 		$options = self::get_options_class();
+
 		return $options->update_option( $key, $value );
 	}
 
 	/**
 	 * Delete's a Gravity PDF global option.
 	 *
-	 * @param String $key   The option key to delete
-	 * @return Boolean
+	 * @param string $key The option key to delete
+	 *
+	 * @return boolean
+	 *
 	 * @since 4.0
 	 */
 	public static function delete_plugin_option( $key ) {
 		$options = self::get_options_class();
+
 		return $options->delete_option( $key );
 	}
 
@@ -303,30 +356,36 @@ class GPDFAPI {
 	 * Provided the Gravity Form entry and PDF settings, this method will correctly generate the PDF, save it to disk
 	 * and return the absolute path to the PDF.
 	 *
- 	 * @param  Array $entry     The Gravity Form entry array – eg. GFAPI::get_entry( $id )
-	 * @param  Array $setting   The PDF configuration settings for the particular entry / form being processed – eg. GPDFAPI::get_pdf( $form_id, $pdf_id )
-	 * @return Mixed            Return the full path to the PDF, or a WP_Error on failure
+	 * @param  array $entry   The Gravity Form entry array – eg. GFAPI::get_entry( $id )
+	 * @param  array $setting The PDF configuration settings for the particular entry / form being processed – eg. GPDFAPI::get_pdf( $form_id, $pdf_id )
+	 *
+	 * @return mixed            Return the full path to the PDF, or a WP_Error on failure
+	 *
 	 * @since 4.0
 	 */
 	public static function create_pdf( $entry, $setting ) {
 
-		if( ! is_array( $entry ) || empty( $entry['id'] ) ) {
+		if ( ! is_array( $entry ) || empty( $entry['id'] ) ) {
 			return new WP_Error( 'invalid_entry', 'The $entry value is not a valid Gravity Forms Entry object. Use "GFAPI::get_entry( $id )" to get the object.' );
 		}
 
-		if( ! is_array( $setting ) || empty( $setting['id'] ) ) {
+		if ( ! is_array( $setting ) || empty( $setting['id'] ) ) {
 			return new WP_Error( 'invalid_pdf_setting', 'The $setting value is not a valid Gravity PDF Setting object. Use "GPDFAPI::get_pdf( $form_id, $pdf_id )" to get the object.' );
 		}
 
 		$pdf = self::get_pdf_class( 'model' );
+
 		return $pdf->generate_and_save_pdf( $entry, $setting );
 	}
 
 	/**
 	 * Generates the current entry's HTML product table
-	 * @param  Array $entry The Gravity Form entry
-	 * @param  Boolean $return Whether to output or return the HTML
-	 * @return Mixed       The product table or null
+	 *
+	 * @param  array   $entry  The Gravity Form entry
+	 * @param  boolean $return Whether to output or return the HTML
+	 *
+	 * @return string|void     The product table or null
+	 *
 	 * @since  4.0
 	 */
 	public static function product_table( $entry, $return = false ) {
@@ -334,19 +393,24 @@ class GPDFAPI {
 
 		$products = new GFPDF\Helper\Fields\Field_Products( new GF_Field(), $entry, $gfpdf->form, $gfpdf->misc );
 
-		if( $return ) {
+		if ( $return ) {
 			return $products->html();
 		}
 
 		echo $products->html();
+
+		return null;
 	}
 
 	/**
 	 * Generates a likert table
-	 * @param  Array  $entry    The Gravity Form entry
-	 * @param  Integer  $field_id The likert field ID
-	 * @param  Boolean $return   Whether to output or return the HTML
-	 * @return Mixed 	The likert table or null
+	 *
+	 * @param  array   $entry    The Gravity Form entry
+	 * @param  integer $field_id The likert field ID
+	 * @param  boolean $return   Whether to output or return the HTML
+	 *
+	 * @return void    The likert table or null
+	 *
 	 * @since  4.0
 	 */
 	public static function likert_table( $entry, $field_id, $return = false ) {
@@ -356,8 +420,8 @@ class GPDFAPI {
 		$form = $gfpdf->form->get_form( $entry['form_id'] );
 
 		/* Check for errors */
-		if( is_wp_error( $form ) ) {
-			return '';
+		if ( is_wp_error( $form ) ) {
+			return null;
 		}
 
 		/* Find our field ID, if any */
@@ -368,7 +432,7 @@ class GPDFAPI {
 				/* Output our likert */
 				$likert = new GFPDF\Helper\Fields\Field_Likert( $field, $entry, $gfpdf->form, $gfpdf->misc );
 
-				if( $return ) {
+				if ( $return ) {
 					return $likert->html();
 				}
 

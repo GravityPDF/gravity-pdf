@@ -42,33 +42,39 @@ use WP_UnitTestCase;
 
 /**
  * Test the Gravity Forms functionality we rely on in Gravity PDF
+ *
  * @since 4.0
  * @group form-data
  */
-class Test_Form_Data extends WP_UnitTestCase
-{
+class Test_Form_Data extends WP_UnitTestCase {
 	/**
 	 * The Gravity Form
-	 * @var Integer
+	 *
+	 * @var integer
+	 *
 	 * @since 4.0
 	 */
 	public $form;
 
 	/**
 	 * The Gravity Form entries imported
-	 * @var Integer
+	 *
+	 * @var integer
+	 *
 	 * @since 4.0
 	 */
 	public $entries = array();
 
 	/**
 	 * The $form_data array
+	 *
 	 * @var array
 	 */
 	private $form_data;
 
 	/**
 	 * The WP Unit Test Set up function
+	 *
 	 * @since 4.0
 	 */
 	public function setUp() {
@@ -79,6 +85,7 @@ class Test_Form_Data extends WP_UnitTestCase
 
 	/**
 	 * Create our testing data
+	 *
 	 * @since 4.0
 	 */
 	private function setup_stubs() {
@@ -112,8 +119,9 @@ class Test_Form_Data extends WP_UnitTestCase
 	/**
 	 * Test all the misc data
 	 * Most of this blank in our test form so we'll just check all the fields exist for the moment
-	 * TODO: expand unit test later
-     *
+	 *
+	 * @todo expand unit test later
+	 *
 	 * @since 4.0
 	 */
 	public function test_misc_form_data() {
@@ -723,11 +731,11 @@ class Test_Form_Data extends WP_UnitTestCase
 		$keys = array( '32', '32.Post Image', 'Post Image' );
 
 		foreach ( $keys as $key ) {
-			$this->assertEquals( 'http://', substr( $field[$key]['url'], 0, 7 ) );
-			$this->assertArrayHasKey( 'path', $field[$key] );
-			$this->assertEquals( $title, $field[$key]['title'] );
-			$this->assertEquals( $caption, $field[$key]['caption'] );
-			$this->assertEquals( $desc, $field[$key]['description'] );
+			$this->assertEquals( 'http://', substr( $field[ $key ]['url'], 0, 7 ) );
+			$this->assertArrayHasKey( 'path', $field[ $key ] );
+			$this->assertEquals( $title, $field[ $key ]['title'] );
+			$this->assertEquals( $caption, $field[ $key ]['caption'] );
+			$this->assertEquals( $desc, $field[ $key ]['description'] );
 		}
 
 		/*
@@ -855,7 +863,7 @@ class Test_Form_Data extends WP_UnitTestCase
 	public function test_signature_blocks() {
 		$data = $this->form_data;
 
-		$response = '<img src="'. ABSPATH . 'wp-content/uploads/gravity_forms/signatures/54bdac4ed24af5.01502579.png" alt="Signature" width="75" />';
+		$response = '<img src="' . ABSPATH . 'wp-content/uploads/gravity_forms/signatures/54bdac4ed24af5.01502579.png" alt="Signature" width="75" />';
 
 		/*
          * Standard Signature Array

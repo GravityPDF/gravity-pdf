@@ -4,8 +4,6 @@ namespace GFPDF\Helper\Fields;
 
 use GFPDF\Helper\Helper_Abstract_Fields;
 
-use Exception;
-
 /**
  * Gravity Forms Field
  *
@@ -45,17 +43,18 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Rank extends Helper_Abstract_Fields
-{
+class Field_Rank extends Helper_Abstract_Fields {
 
 	/**
 	 * Return the HTML form data
-	 * @return Array
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public function form_data() {
 
-		$data = array();
+		$data  = array();
 		$value = $this->value();
 
 		$data['survey']['rank'][ $this->field->id ] = $value;
@@ -65,7 +64,12 @@ class Field_Rank extends Helper_Abstract_Fields
 
 	/**
 	 * Display the HTML version of this field
-	 * @return String
+	 *
+	 * @param string $value
+	 * @param bool   $label
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
@@ -76,7 +80,9 @@ class Field_Rank extends Helper_Abstract_Fields
 
 	/**
 	 * Get the standard GF value of this field
-	 * @return String/Array
+	 *
+	 * @return string|array
+	 *
 	 * @since 4.0
 	 */
 	public function value() {
@@ -87,7 +93,7 @@ class Field_Rank extends Helper_Abstract_Fields
 		/* Process field */
 		$items = explode( ',', $this->get_value() );
 
-		$value  = array();
+		$value = array();
 
 		/* Loop through each of the user-selected items */
 		foreach ( $items as $rating ) {

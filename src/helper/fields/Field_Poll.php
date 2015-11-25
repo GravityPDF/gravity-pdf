@@ -49,13 +49,19 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Poll extends Helper_Abstract_Fields
-{
+class Field_Poll extends Helper_Abstract_Fields {
 
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
-	 * @param Object $field The GF_Field_* Object
-	 * @param Array  $entry The Gravity Forms Entry
+	 *
+	 * @param object                             $field The GF_Field_* Object
+	 * @param array                              $entry The Gravity Forms Entry
+	 *
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
+	 * @param \GFPDF\Helper\Helper_Misc          $misc
+	 *
+	 * @throws Exception
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( $field, $entry, Helper_Abstract_Form $form, Helper_Misc $misc ) {
@@ -77,7 +83,7 @@ class Field_Poll extends Helper_Abstract_Fields
 			} else {
 				throw new Exception( 'Class not found' );
 			}
-		} catch (Exception $e) {
+		} catch ( Exception $e ) {
 			/* Exception thrown. Load generic field loader */
 			$this->fieldObject = new Field_Default( $field, $entry, $form, $misc );
 		}
@@ -85,8 +91,8 @@ class Field_Poll extends Helper_Abstract_Fields
 
 	/**
 	 * Used to check if the current field has a value
-	 * @since 4.0
-	 * @internal Child classes can override this method when dealing with a specific use case
+	 *
+	 * @since    4.0
 	 */
 	public function is_empty() {
 		return $this->fieldObject->is_empty();
@@ -94,41 +100,46 @@ class Field_Poll extends Helper_Abstract_Fields
 
 	/**
 	 * Return the HTML form data
-	 * @return Array
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public function form_data() {
 
-		$data = array();
-		$value = $this->value();
-		$label = GFFormsModel::get_label( $this->field );
+		$data     = array();
+		$value    = $this->value();
+		$field_id = (int) $this->field->id;
+		$label    = GFFormsModel::get_label( $this->field );
 
-		if ( isset($value[0]) ) {
+		if ( isset( $value[0] ) ) {
 
 			$field = array();
-			$fieldValue = array();
 
 			foreach ( $value as $item ) {
 				/* For backwards compatibility, we'll wrap these in their own array key */
-				$field[0][]      = $item['label'];
-				$fieldValue[0][] = $item['value'];
+				$field[0][] = $item['label'];
 			}
 		} else {
-			$field      = ( isset($value['label']) ) ? $value['label'] : '';
-			$fieldValue = ( isset($value['value']) ) ? $value['value'] : '';
+			$field = ( isset( $value['label'] ) ) ? $value['label'] : '';
 		}
 
-		$data[ $this->field->id . '.' . $label ] = $field;
-		$data[ $this->field->id . '.' . $label . '_name' ] = $field; /* for backwards compatibility */
-		$data[ $this->field->id ]                = $field;
-		$data[ $label ]                          = $field;
+		$data[ $field_id . '.' . $label ]           = $field;
+		$data[ $field_id . '.' . $label . '_name' ] = $field; /* for backwards compatibility */
+		$data[ $field_id ]                          = $field;
+		$data[ $label ]                             = $field;
 
 		return array( 'field' => $data );
 	}
 
 	/**
 	 * Display the HTML version of this field
-	 * @return String
+	 *
+	 * @param string $value
+	 * @param bool   $label
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
@@ -137,7 +148,9 @@ class Field_Poll extends Helper_Abstract_Fields
 
 	/**
 	 * Get the standard GF value of this field
-	 * @return String/Array
+	 *
+	 * @return string|array
+	 *
 	 * @since 4.0
 	 */
 	public function value() {

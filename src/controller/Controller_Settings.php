@@ -56,18 +56,21 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Controller_Settings extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters
-{
+class Controller_Settings extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters {
 	/**
 	 * Holds abstracted functions related to the forms plugin
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Form
+	 *
 	 * @since 4.0
 	 */
 	protected $form;
 
 	/**
 	 * Holds our log class
-	 * @var Object
+	 *
+	 * @var \Monolog\Logger|LoggerInterface
+	 *
 	 * @since 4.0
 	 */
 	protected $log;
@@ -75,7 +78,9 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	/**
 	 * Holds our Helper_Notices object
 	 * which we can use to queue up admin messages for the user
-	 * @var Object Helper_Notices
+	 *
+	 * @var \GFPDF\Helper\Helper_Notices
+	 *
 	 * @since 4.0
 	 */
 	protected $notices;
@@ -83,7 +88,9 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	/**
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Data
+	 *
 	 * @since 4.0
 	 */
 	protected $data;
@@ -91,20 +98,24 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	/**
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Misc
+	 *
 	 * @since 4.0
 	 */
 	protected $misc;
 
 	/**
 	 * Setup our class by injecting all our dependancies
-	 * @param Helper_Abstract_Model $model   Our Settings Model the controller will manage
-	 * @param Helper_Abstract_View  $view    Our Settings View the controller will manage
-	 * @param Helper_Abstract_Form  $form    Our abstracted Gravity Forms helper functions
-	 * @param LoggerInterface       $log     Our logger class
-	 * @param Helper_Notices        $notices Our notice class used to queue admin messages and errors
-	 * @param Helper_Data           $data    Our plugin data store
-	 * @param Helper_Misc           $misc    Our miscellaneous class
+	 *
+	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_Settings $model   Our Settings Model the controller will manage
+	 * @param Helper_Abstract_View|\GFPDF\View\View_Settings    $view    Our Settings View the controller will manage
+	 * @param \GFPDF\Helper\Helper_Abstract_Form                $form    Our abstracted Gravity Forms helper functions
+	 * @param \Monolog\Logger|LoggerInterface                   $log     Our logger class
+	 * @param \GFPDF\Helper\Helper_Notices                      $notices Our notice class used to queue admin messages and errors
+	 * @param \GFPDF\Helper\Helper_Data                         $data    Our plugin data store
+	 * @param \GFPDF\Helper\Helper_Misc                         $misc    Our miscellaneous class
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Abstract_Form $form, LoggerInterface $log, Helper_Notices $notices, Helper_Data $data, Helper_Misc $misc ) {
@@ -120,13 +131,15 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		$this->model = $model;
 		$this->model->setController( $this );
 
-		$this->view  = $view;
+		$this->view = $view;
 		$this->view->setController( $this );
 	}
 
 	/**
 	 * Initialise our class defaults
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function init() {
@@ -135,19 +148,21 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
          * Tell Gravity Forms to initiate our settings page
          * Using the following Class/Model
          */
-		 GFForms::add_settings_page( $this->data->short_title, array( $this, 'display_page' ) );
+		GFForms::add_settings_page( $this->data->short_title, array( $this, 'display_page' ) );
 
-		 /* Ensure any errors are stored correctly */
-		 $this->model->setup_form_settings_errors();
+		/* Ensure any errors are stored correctly */
+		$this->model->setup_form_settings_errors();
 
-		 /* run actions and filters */
-		 $this->add_actions();
-		 $this->add_filters();
+		/* run actions and filters */
+		$this->add_actions();
+		$this->add_filters();
 	}
 
 	/**
 	 * Apply any actions needed for the settings page
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function add_actions() {
@@ -167,7 +182,8 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		 * If multisite only the super admin can uninstall the software. This is due to how the plugin shares similar directory structures across networked sites
 		 */
 		if ( ( ! is_multisite() && $this->form->has_capability( 'gravityforms_uninstall' ) ) ||
-			 ( is_multisite() && is_super_admin() ) ) {
+		     ( is_multisite() && is_super_admin() )
+		) {
 			add_action( 'pdf-settings-tools', array( $this->view, 'uninstaller' ), 5 );
 		}
 
@@ -184,7 +200,9 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 
 	/**
 	 * Apply any filters needed for the settings page
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function add_filters() {
@@ -214,7 +232,9 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 
 	/**
 	 * Display the settings page for Gravity PDF
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function display_page() {
@@ -224,22 +244,24 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		switch ( $page ) {
 			case 'general':
 				$this->view->general();
-		  break;
+				break;
 
 			case 'tools':
 				$this->view->tools();
-		  break;
+				break;
 
 			case 'help':
 				$this->view->help();
-		  break;
+				break;
 		}
 	}
 
 	/**
 	 * Check our current user has the correct capability
+	 *
 	 * @since 4.0
-	 * @return void
+	 *
+	 * @return string
 	 */
 	public function edit_options_cap() {
 
@@ -248,20 +270,24 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 
 			$this->log->addCritical( 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
-				'user_meta' => get_user_meta( get_current_user_id() )
+				'user_meta' => get_user_meta( get_current_user_id() ),
 			) );
 
 			wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
 		}
 
 		/* the user is authenticated by the above so let's pass in the lowest permissions */
+
 		return 'read';
 	}
 
 	/**
 	 * Return our custom capability
-	 * @param  $nav Array The existing settings navigation
+	 *
+	 * @param array $nav The existing settings navigation
+	 *
 	 * @since 4.0
+	 *
 	 * @return array
 	 */
 	public function disable_tools_on_view_cap( $nav ) {
@@ -269,7 +295,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
 			$this->log->addNotice( 'Lack of User Capabilities' );
 
-			unset($nav[100]); /* remove tools tab */
+			unset( $nav[100] ); /* remove tools tab */
 		}
 
 		return $nav;
@@ -277,14 +303,16 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 
 	/**
 	 * Check if any of the tool tab actions have been triggered and process
-	 * @return void
+	 *
+	 * @return void|boolean
+	 *
 	 * @since 4.0
 	 */
 	public function process_tool_tab_actions() {
 
 		/* check if we are on the tools settings page */
 		if ( ! $this->misc->is_gfpdf_settings_tab( 'tools' ) ) {
-			return false;
+			return null;
 		}
 
 		/* check if the user has permission to copy the templates */
@@ -292,31 +320,35 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 
 			$this->log->addCritical( 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
-				'user_meta' => get_user_meta( get_current_user_id() )
+				'user_meta' => get_user_meta( get_current_user_id() ),
 			) );
 
-			return false;
+			return null;
 		}
 
 		$settings = rgpost( 'gfpdf_settings' );
 
 		/* check if we should install the custom templates */
-		if ( isset($settings['setup_templates']['name']) ) {
+		if ( isset( $settings['setup_templates']['name'] ) ) {
 			/* verify the nonce */
 			if ( ! wp_verify_nonce( $settings['setup_templates']['nonce'], 'gfpdf_settings[setup_templates]' ) ) {
-				 $this->log->addWarning( 'Nonce Verification Failed.' );
-				 $this->notices->add_error( __( 'There was a problem installing the PDF templates. Please try again.', 'gravity-forms-pdf-extended' ) );
-				 return false;
+				$this->log->addWarning( 'Nonce Verification Failed.' );
+				$this->notices->add_error( __( 'There was a problem installing the PDF templates. Please try again.', 'gravity-forms-pdf-extended' ) );
+
+				return null;
 			}
 
-			$this->model->install_templates();
+			return $this->model->install_templates();
 		}
 	}
 
 	/**
 	 * Add .ttf and .otf to upload whitelist
+	 *
 	 * @param  array $mime_types
+	 *
 	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public function allow_font_uploads( $mime_types = array() ) {

@@ -53,19 +53,22 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Controller_Install extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters
-{
+class Controller_Install extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters {
 
 	/**
 	 * Holds abstracted functions related to the forms plugin
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Form
+	 *
 	 * @since 4.0
 	 */
 	protected $form;
 
 	/**
 	 * Holds our log class
-	 * @var Object
+	 *
+	 * @var \Monolog\Logger|LoggerInterface
+	 *
 	 * @since 4.0
 	 */
 	protected $log;
@@ -73,7 +76,9 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	/**
 	 * Holds our Helper_Notices object
 	 * which we can use to queue up admin messages for the user
-	 * @var Object Helper_Notices
+	 *
+	 * @var \GFPDF\Helper\Helper_Notices
+	 *
 	 * @since 4.0
 	 */
 	protected $notices;
@@ -81,7 +86,9 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	/**
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Data
+	 *
 	 * @since 4.0
 	 */
 	protected $data;
@@ -89,19 +96,23 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	/**
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Misc
+	 *
 	 * @since 4.0
 	 */
 	protected $misc;
 
 	/**
 	 * Setup our class by injecting all our dependancies
-	 * @param Helper_Abstract_Model $model   Our Install Model the controller will manage
-	 * @param Helper_Abstract_Form  $form    Our Install View the controller will manage
-	 * @param LoggerInterface       $log     Our logger class
-	 * @param Helper_Notices        $notices Our notice class used to queue admin messages and errors
-	 * @param Helper_Data           $data    Our plugin data store
-	 * @param Helper_Misc           $misc    Our miscellaneous methods
+	 *
+	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_Install $model   Our Install Model the controller will manage
+	 * @param \GFPDF\Helper\Helper_Abstract_Form               $form    Our Install View the controller will manage
+	 * @param \Monolog\Logger|LoggerInterface                  $log     Our logger class
+	 * @param \GFPDF\Helper\Helper_Notices                     $notices Our notice class used to queue admin messages and errors
+	 * @param \GFPDF\Helper\Helper_Data                        $data    Our plugin data store
+	 * @param \GFPDF\Helper\Helper_Misc                        $misc    Our miscellaneous methods
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_Form $form, LoggerInterface $log, Helper_Notices $notices, Helper_Data $data, Helper_Misc $misc ) {
@@ -120,17 +131,21 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 
 	/**
 	 * Initialise our class defaults
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function init() {
-		 $this->add_actions();
-		 $this->add_filters();
+		$this->add_actions();
+		$this->add_filters();
 	}
 
 	/**
 	 * Apply any actions needed for the settings page
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function add_actions() {
@@ -143,7 +158,9 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 
 	/**
 	 * Apply any filters needed for the settings page
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function add_filters() {
@@ -153,7 +170,9 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 
 	/**
 	 * Set up data related to the plugin setup and installation
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	public function setup_defaults() {
@@ -163,7 +182,7 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 		$this->data->working_folder = $this->model->get_working_directory();
 		$this->data->settings_url   = $this->model->get_settings_url();
 
-		$this->data->memory_limit   = ini_get( 'memory_limit' );
+		$this->data->memory_limit = ini_get( 'memory_limit' );
 
 		$upload_details             = $this->misc->get_upload_details();
 		$this->data->upload_dir     = $upload_details['path'];
@@ -177,20 +196,22 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	/**
 	 * Check the software has been installed on this website before and
 	 * the version numbers are in sync
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	public function check_install_status() {
 
-		if( ! is_admin() || ( defined('DOING_AJAX') && DOING_AJAX ) || ! current_user_can( 'activate_plugins' ) ) {
-			return false;
+		if ( ! is_admin() || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ! current_user_can( 'activate_plugins' ) ) {
+			return null;
 		}
 
-		if( ! $this->data->is_installed ) {
+		if ( ! $this->data->is_installed ) {
 			$this->model->install_plugin();
 		}
 
-		if( PDF_EXTENDED_VERSION != get_option( 'gfpdf_current_version' ) ) {
+		if ( PDF_EXTENDED_VERSION != get_option( 'gfpdf_current_version' ) ) {
 			do_action( 'gfpdf_version_changed', get_option( 'gfpdf_current_version' ), PDF_EXTENDED_VERSION );
 			update_option( 'gfpdf_current_version', PDF_EXTENDED_VERSION );
 		}
@@ -198,7 +219,9 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 
 	/**
 	 * Determine if we should be saving the PDF settings
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	public function maybe_uninstall() {
@@ -208,9 +231,10 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 
 			/* Check Nonce is valid */
 			if ( ! wp_verify_nonce( rgpost( 'gfpdf-uninstall-plugin' ), 'gfpdf-uninstall-plugin' ) ) {
-				 $this->notices->add_error( __( 'There was a problem removing Gravity PDF. Please try again.', 'gravity-forms-pdf-extended' ) );
-				 $this->log->addWarning( 'Nonce Verification Failed.' );
-				 return false;
+				$this->notices->add_error( __( 'There was a problem removing Gravity PDF. Please try again.', 'gravity-forms-pdf-extended' ) );
+				$this->log->addWarning( 'Nonce Verification Failed.' );
+
+				return null;
 			}
 
 			/**
@@ -221,11 +245,12 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 			 * If multisite only the super admin can uninstall the software. This is due to how the plugin shares similar directory structures across networked sites
 			 */
 			if ( ( ! is_multisite() && ! $this->form->has_capability( 'gravityforms_uninstall' ) ) ||
-			     ( is_multisite() && ! is_super_admin() ) ) {
+			     ( is_multisite() && ! is_super_admin() )
+			) {
 
 				$this->log->addCritical( 'Lack of User Capabilities.', array(
 					'user'      => wp_get_current_user(),
-					'user_meta' => get_user_meta( get_current_user_id() )
+					'user_meta' => get_user_meta( get_current_user_id() ),
 				) );
 
 				wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
@@ -234,5 +259,6 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 			$this->model->uninstall_plugin();
 			$this->model->redirect_to_plugins_page();
 		}
+
 	}
 }

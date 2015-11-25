@@ -46,27 +46,33 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class View_Welcome_Screen extends Helper_Abstract_View
-{
+class View_Welcome_Screen extends Helper_Abstract_View {
 
 	/**
 	 * Set the view's name
+	 *
 	 * @var string
+	 *
 	 * @since 4.0
 	 */
 	protected $ViewType = 'Welcome';
 
 	/**
 	 * Holds abstracted functions related to the forms plugin
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Form
+	 *
 	 * @since 4.0
 	 */
 	protected $form;
 
 	/**
 	 * Setup our class by injecting all our dependancies
-	 * @param array                $data_cache  An array of data to pass to the view
-	 * @param Helper_Abstract_Form $form        Our abstracted Gravity Forms helper functions
+	 *
+	 * @param array                                          $data_cache An array of data to pass to the view
+	 * @param \GFPDF\Helper\Helper_Form|Helper_Abstract_Form $form       Our abstracted Gravity Forms helper functions
+	 *
+	 * @since 4.0
 	 */
 	public function __construct( $data_cache = array(), Helper_Abstract_Form $form ) {
 
@@ -79,6 +85,7 @@ class View_Welcome_Screen extends Helper_Abstract_View
 
 	/**
 	 * Load the Welcome Tab tabs
+	 *
 	 * @since 4.0
 	 */
 	public function tabs() {
@@ -94,6 +101,7 @@ class View_Welcome_Screen extends Helper_Abstract_View
 
 	/**
 	 * Output the welcome screen
+	 *
 	 * @since 4.0
 	 */
 	public function welcome() {

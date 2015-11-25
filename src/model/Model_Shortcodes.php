@@ -3,7 +3,6 @@
 namespace GFPDF\Model;
 
 use GFPDF\Helper\Helper_Abstract_Model;
-use GFPDF\Model\Model_PDF;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Options;
 
@@ -48,20 +47,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  *
  * Handles all the PDF Shortcode logic
+ *
  * @since 4.0
  */
 class Model_Shortcodes extends Helper_Abstract_Model {
 
 	/**
 	 * Holds abstracted functions related to the forms plugin
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Form
+	 *
 	 * @since 4.0
 	 */
 	protected $form;
 
 	/**
 	 * Holds our log class
-	 * @var Object
+	 *
+	 * @var \Monolog\Logger|LoggerInterface
+	 *
 	 * @since 4.0
 	 */
 	protected $log;
@@ -69,16 +73,20 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	/**
 	 * Holds our Helper_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Options_Fields
+	 *
 	 * @since 4.0
 	 */
 	protected $options;
 
 	/**
 	 * Setup our class by injecting all our dependancies
-	 * @param Helper_Abstract_Form $form    Our abstracted Gravity Forms helper functions
-	 * @param LoggerInterface      $log     Our logger class
-	 * @param Helper_Options       $options Our options class which allows us to access any settings
+	 *
+	 * @param \GFPDF\Helper\Helper_Abstract_Form|\GFPDF\Helper\Helper_Form     $form    Our abstracted Gravity Forms helper functions
+	 * @param \Monolog\Logger|LoggerInterface                    $log     Our logger class
+	 * @param \GFPDF\Helper\Helper_Options|\GFPDF\Helper\Helper_Options_Fields $options Our options class which allows us to access any settings
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log, Helper_Options $options ) {
@@ -93,8 +101,11 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	 * Generates a direct link to the PDF that should be generated
 	 * If placed in a confirmation the appropriate entry will be displayed.
 	 * A user also has the option to pass in an "entry" parameter to define the entry ID
-	 * @param Array $attributes The shortcode attributes specified
-	 * @return void
+	 *
+	 * @param array $attributes The shortcode attributes specified
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	public function gravitypdf( $attributes ) {
@@ -102,23 +113,24 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 
 		$this->log->addNotice( 'Generating Shortcode' );
 
-		$controller = $this->getController();
+		$controller           = $this->getController();
 		$has_view_permissions = $this->form->has_capability( 'gravityforms_view_entries' );
 
 		/* merge in any missing defaults */
-		$attributes = shortcode_atts(array(
+		$attributes = shortcode_atts( array(
 			'id'      => '',
 			'text'    => 'Download PDF',
 			'type'    => 'download',
 			'classes' => 'gravitypdf-download-link',
 			'entry'   => '',
-		), $attributes, 'gravitypdf');
+		), $attributes, 'gravitypdf' );
 
 		$attributes = apply_filters( 'gfpdf_gravityforms_shortcode_attributes', $attributes );
 
 		/* Add Shortcake preview support */
 		if ( defined( 'SHORTCODE_UI_DOING_PREVIEW' ) && SHORTCODE_UI_DOING_PREVIEW === true ) {
 			$attributes['url'] = '#';
+
 			return $controller->view->display_gravitypdf_shortcode( $attributes );
 		}
 
@@ -129,7 +141,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 			} else {
 
 				/* Only display error to users with appropriate permissions */
-				if( $has_view_permissions ) {
+				if ( $has_view_permissions ) {
 					return $controller->view->no_entry_id();
 				}
 
@@ -144,7 +156,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		if ( is_wp_error( $config ) ) {
 
 			/* Only display error to users with appropriate permissions */
-			if( $has_view_permissions ) {
+			if ( $has_view_permissions ) {
 				return $controller->view->invalid_pdf_config();
 			}
 
@@ -154,16 +166,16 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		/* Check if the PDF is enabled AND the conditional logic (if any) has been met */
 		if ( $config['active'] !== true ) {
 			/* Only display error to users with appropriate permissions */
-			if( $has_view_permissions ) {
+			if ( $has_view_permissions ) {
 				return $controller->view->pdf_not_active();
 			}
 
 			return '';
 		}
 
-		if( isset( $config['conditionalLogic'] ) && ! GFCommon::evaluate_conditional_logic( $config['conditionalLogic'], $this->form->get_form( $entry['form_id'] ), $entry ) ) {
+		if ( isset( $config['conditionalLogic'] ) && ! GFCommon::evaluate_conditional_logic( $config['conditionalLogic'], $this->form->get_form( $entry['form_id'] ), $entry ) ) {
 			/* Only display error to users with appropriate permissions */
-			if( $has_view_permissions ) {
+			if ( $has_view_permissions ) {
 				return $controller->view->conditional_logic_not_met();
 			}
 
@@ -183,10 +195,13 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 
 	/**
 	 * Update our Gravity Forms "Text" Confirmation Shortcode to include the current entry ID
-	 * @param  String $confirmation The confirmation text
-	 * @param  Array  $form         The Gravity Form array
-	 * @param  Array  $lead         The Gravity Form entry information
-	 * @return Array               The confirmation text
+	 *
+	 * @param  string $confirmation The confirmation text
+	 * @param  array  $form         The Gravity Form array
+	 * @param  array  $lead         The Gravity Form entry information
+	 *
+	 * @return array               The confirmation text
+	 *
 	 * @since 4.0
 	 */
 	public function gravitypdf_confirmation( $confirmation, $form, $lead ) {
@@ -199,7 +214,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 			if ( sizeof( $gravitypdf ) > 0 ) {
 				foreach ( $gravitypdf as $shortcode ) {
 					/* if the user hasn't explicitely defined an entry to display... */
-					if ( ! isset($shortcode['attr']['entry']) ) {
+					if ( ! isset( $shortcode['attr']['entry'] ) ) {
 						/* get the new shortcode information */
 						$new_shortcode = $this->add_shortcode_attr( $shortcode, 'entry', $lead['id'] );
 
@@ -216,10 +231,13 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 
 	/**
 	 * Update our Gravity Forms Notification Shortcode to include the current entry ID
-	 * @param  String $notification The confirmation text
-	 * @param  Array  $form         The Gravity Form array
-	 * @param  Array  $lead         The Gravity Form entry information
-	 * @return Array               The confirmation text
+	 *
+	 * @param  string $notification The confirmation text
+	 * @param  array  $form         The Gravity Form array
+	 * @param  array  $lead         The Gravity Form entry information
+	 *
+	 * @return array               The confirmation text
+	 *
 	 * @since 4.0
 	 */
 	public function gravitypdf_notification( $notification, $form, $lead ) {
@@ -232,7 +250,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 			if ( sizeof( $gravitypdf ) > 0 ) {
 				foreach ( $gravitypdf as $shortcode ) {
 					/* if the user hasn't explicitely defined an entry to display... */
-					if ( ! isset($shortcode['attr']['entry']) ) {
+					if ( ! isset( $shortcode['attr']['entry'] ) ) {
 						/* get the new shortcode information */
 						$new_shortcode = $this->add_shortcode_attr( $shortcode, 'entry', $lead['id'] );
 
@@ -248,9 +266,14 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 
 	/**
 	 * Update a shortcode attributes
-	 * @param Array  $code  In individual shortcode array pulled in from the $this->get_shortcode_information() function
-	 * @param String $attr  The attribute to add / replace
-	 * @param String $value The new attribute value
+	 *
+	 * @param array  $code  In individual shortcode array pulled in from the $this->get_shortcode_information() function
+	 * @param string $attr  The attribute to add / replace
+	 * @param string $value The new attribute value
+	 *
+	 * @return array
+	 *
+	 * @since 4.0
 	 */
 	public function add_shortcode_attr( $code, $attr, $value ) {
 		/* if the attribute doesn't already exist... */
@@ -259,8 +282,8 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 			$raw_attr = "{$code['attr_raw']} {$attr}=\"{$value}\"";
 
 			/* if there are no attributes at all we'll need to fix our str replace */
-			if( 0 === strlen( $code['attr_raw']) ) {
-				$pattern = '^\[([a-zA-Z]+)';
+			if ( 0 === strlen( $code['attr_raw'] ) ) {
+				$pattern           = '^\[([a-zA-Z]+)';
 				$code['shortcode'] = preg_replace( "/$pattern/s", "[$1 {$attr}=\"{$value}\"", $code['shortcode'] );
 			} else {
 				$code['shortcode'] = str_ireplace( $code['attr_raw'], $raw_attr, $code['shortcode'] );
@@ -269,9 +292,9 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 			$code['attr_raw'] = $raw_attr;
 
 		} else { /* replace the current attribute */
-			$pattern = $attr . '="(.+?)"';
+			$pattern           = $attr . '="(.+?)"';
 			$code['shortcode'] = preg_replace( "/$pattern/si", $attr . '="' . $value . '"', $code['shortcode'] );
-			$code['attr_raw'] = preg_replace( "/$pattern/si", $attr . '="' . $value . '"', $code['attr_raw'] );
+			$code['attr_raw']  = preg_replace( "/$pattern/si", $attr . '="' . $value . '"', $code['attr_raw'] );
 		}
 
 		/* Update the actual attribute */
@@ -283,24 +306,27 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	/**
 	 * Check if user is currently submitting a new confirmation redirect URL in the admin area,
 	 * if so replace any shortcodes with a direct link to the PDF (as Gravity Forms correctly validates the URL)
-	 * @param  Array $form Gravity Form Array
-	 * @return Array
+	 *
+	 * @param  array $form Gravity Form Array
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public function gravitypdf_redirect_confirmation( $form ) {
 		global $gfpdf;
 
 		/* check if the confirmation is currently being saved */
-		if ( isset($_POST['form_confirmation_url']) ) {
+		if ( isset( $_POST['form_confirmation_url'] ) ) {
 
 			$this->log->addNotice( 'Process Redirect Confirmation Save', array(
 				'form' => $form,
-				'post' => $_POST
+				'post' => $_POST,
 			) );
 
 			$url = stripslashes_deep( $_POST['form_confirmation_url'] );
 
-			 /* check if our shortcode exists and convert it to a URL */
+			/* check if our shortcode exists and convert it to a URL */
 			$gravitypdf = $this->get_shortcode_information( 'gravitypdf', $url );
 
 			if ( sizeof( $gravitypdf ) > 0 ) {
@@ -310,11 +336,11 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 					/* get the PDF Settings ID */
 					$pid = ( isset( $code['attr']['id'] ) ) ? $code['attr']['id'] : '';
 
-					if ( ! empty($pid) ) {
+					if ( ! empty( $pid ) ) {
 
 						/* generate the PDF URL */
 						$pdf      = new Model_PDF( $this->form, $this->log, $this->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
-						$download = ( ! isset($code['attr']['type']) || $code['attr']['type'] == 'download' ) ? true : false;
+						$download = ( ! isset( $code['attr']['type'] ) || $code['attr']['type'] == 'download' ) ? true : false;
 						$pdf_url  = $pdf->get_pdf_url( $pid, '{entry_id}', $download, false );
 
 						/* override the confirmation URL submitted */
@@ -325,14 +351,18 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		}
 
 		/* it's a filter so return the $form array */
+
 		return $form;
 	}
 
 	/**
 	 * Search for any shortcodes in the text and return any matches
-	 * @param  String $shortcode The shortcode to search for
-	 * @param  String $text      The text to search in
-	 * @return Array             The shortcode information
+	 *
+	 * @param  string $shortcode The shortcode to search for
+	 * @param  string $text      The text to search in
+	 *
+	 * @return array             The shortcode information
+	 *
 	 * @since 4.0
 	 */
 	public function get_shortcode_information( $shortcode, $text ) {
@@ -344,18 +374,19 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 			$pattern = get_shortcode_regex();
 			preg_match_all( "/$pattern/s", $text, $matches );
 
-			if ( ! empty($matches) && isset($matches[2]) ) {
+			if ( ! empty( $matches ) && isset( $matches[2] ) ) {
 				foreach ( $matches[2] as $key => $code ) {
 					if ( $code == $shortcode ) {
 						$shortcodes[] = array(
-							'shortcode' => $matches[0][$key],
-							'attr_raw'  => $matches[3][$key],
-							'attr'      => shortcode_parse_atts( $matches[3][$key] ),
+							'shortcode' => $matches[0][ $key ],
+							'attr_raw'  => $matches[3][ $key ],
+							'attr'      => shortcode_parse_atts( $matches[3][ $key ] ),
 						);
 					}
 				}
 			}
 		}
+
 		return $shortcodes;
 	}
 }

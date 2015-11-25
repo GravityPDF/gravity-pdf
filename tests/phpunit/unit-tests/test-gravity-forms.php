@@ -46,20 +46,23 @@ use WP_User;
 
 /**
  * Test the Gravity Forms functionality we rely on in Gravity PDF
+ *
  * @since 4.0
  * @group gravity-forms
  */
-class Test_Gravity_Forms extends WP_UnitTestCase
-{
+class Test_Gravity_Forms extends WP_UnitTestCase {
 	/**
 	 * The Gravity Form ID assigned to the imported form
-	 * @var Integer
+	 *
+	 * @var integer
+	 *
 	 * @since 4.0
 	 */
 	public $form_id;
 
 	/**
 	 * The WP Unit Test Set up function
+	 *
 	 * @since 4.0
 	 */
 	public function setUp() {
@@ -70,6 +73,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase
 
 	/**
 	 * Pull in our form data
+	 *
 	 * @since 4.0
 	 */
 	private function setup_form() {
@@ -78,6 +82,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase
 
 	/**
 	 * Test Gravity Form's GFFormsModel::get_form_meta( $form_id ) functionality
+	 *
 	 * @since 4.0
 	 */
 	public function test_get_form_meta() {
@@ -97,6 +102,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase
 
 	/**
 	 * Test Gravity Form's GFFormsModel::update_form_meta( $form_id ) functionality
+	 *
 	 * @since 4.0
 	 */
 	public function test_update_form_meta() {
@@ -124,18 +130,19 @@ class Test_Gravity_Forms extends WP_UnitTestCase
 	/**
 	 * Test Gravity Form's rgpost() functionality
 	 * Will return the value in the $_POST array, or empty string if not
+	 *
 	 * @since 4.0
 	 */
 	public function test_rgpost() {
 		/* set up post data */
 		$_POST = array(
 			'my_object' => 'Data here',
-			'array' => array(
+			'array'     => array(
 				'item1',
-		"item2\'s",
-		'item3',
+				"item2\'s",
+				'item3',
 			),
-			'slashes' => "How\'s it going?",
+			'slashes'   => "How\'s it going?",
 		);
 
 		/* check string */
@@ -156,18 +163,19 @@ class Test_Gravity_Forms extends WP_UnitTestCase
 	/**
 	 * Test Gravity Form's rgget() functionality
 	 * Will return the value in the $_GET array, or empty string if not
+	 *
 	 * @since 4.0
 	 */
 	public function test_rgget() {
 		/* set up post data */
 		$_GET = array(
 			'my_object' => 'Data here',
-			'array' => array(
+			'array'     => array(
 				'item1',
-		"item2's",
-		'item3',
+				"item2's",
+				'item3',
 			),
-			'slashes' => "How's it going?",
+			'slashes'   => "How's it going?",
 		);
 
 		/* check string */
@@ -189,6 +197,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase
 	 * Test Gravity Form's rgempty() functionality which focuses on whether an array key exists
 	 * If not array is passed, it will use the $_POST data
 	 * If an array is passed as the first parameter it will check if the array is empty
+	 *
 	 * @since 4.0
 	 */
 	public function test_rgempty() {
@@ -217,6 +226,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase
 	/**
 	 * Test Gravity Form's rgblank() functionality
 	 * Checks if the string is empty and doesn't equal 0 - which equates to true when calling empty()
+	 *
 	 * @since 4.0
 	 */
 	public function test_rgblank() {
@@ -228,6 +238,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase
 	/**
 	 * Test Gravity Form's rgar() functionality
 	 * Will return the value in the passed $array, or empty string if not
+	 *
 	 * @since 4.0
 	 */
 	public function test_rgar() {
@@ -246,6 +257,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase
 	/**
 	 * Test Gravity Form user privlages
 	 * i.e $gfpdf->form->has_capability("gravityforms_edit_settings")
+	 *
 	 * @since 4.0
 	 */
 	public function test_gf_privs() {
@@ -289,11 +301,12 @@ class Test_Gravity_Forms extends WP_UnitTestCase
 
 		$this->assertTrue( $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) );
 
-		wp_set_current_user(0);
+		wp_set_current_user( 0 );
 	}
 
 	/**
 	 * Check the core classes exist
+	 *
 	 * @since 3.6
 	 */
 	public function test_core_classes() {
@@ -305,6 +318,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase
 
 	/**
 	 * Check that RGFormsModel::get_form_meta() method works as expected
+	 *
 	 * @since 3.6
 	 */
 	public function test_get_forms() {
@@ -325,36 +339,36 @@ class Test_Gravity_Forms extends WP_UnitTestCase
 		foreach ( $form['fields'] as $field ) {
 			switch ( $field['type'] ) {
 				case 'name':
-					$this->assertEquals( $field['inputs'][0]['id'], $field['id'].'.3' );
-					$this->assertEquals( $field['inputs'][1]['id'], $field['id'].'.6' );
-				break;
+					$this->assertEquals( $field['inputs'][0]['id'], $field['id'] . '.3' );
+					$this->assertEquals( $field['inputs'][1]['id'], $field['id'] . '.6' );
+					break;
 
 				case 'address':
-					$this->assertEquals( $field['inputs'][0]['id'], $field['id'].'.1' );
-					$this->assertEquals( $field['inputs'][1]['id'], $field['id'].'.2' );
-					$this->assertEquals( $field['inputs'][2]['id'], $field['id'].'.3' );
-					$this->assertEquals( $field['inputs'][3]['id'], $field['id'].'.4' );
-					$this->assertEquals( $field['inputs'][4]['id'], $field['id'].'.5' );
-					$this->assertEquals( $field['inputs'][5]['id'], $field['id'].'.6' );
-				break;
+					$this->assertEquals( $field['inputs'][0]['id'], $field['id'] . '.1' );
+					$this->assertEquals( $field['inputs'][1]['id'], $field['id'] . '.2' );
+					$this->assertEquals( $field['inputs'][2]['id'], $field['id'] . '.3' );
+					$this->assertEquals( $field['inputs'][3]['id'], $field['id'] . '.4' );
+					$this->assertEquals( $field['inputs'][4]['id'], $field['id'] . '.5' );
+					$this->assertEquals( $field['inputs'][5]['id'], $field['id'] . '.6' );
+					break;
 
 				case 'email':
 					$this->assertEquals( 3, $field['id'] );
-				break;
+					break;
 
 				case 'phone':
 					$this->assertEquals( 4, $field['id'] );
 					$this->assertEquals( 'standard', $field['phoneFormat'] );
-				break;
+					break;
 
 				case 'select':
 				case 'multiselect':
 					$this->assertEquals( 3, sizeof( $field['choices'] ) );
-				break;
+					break;
 
 				case 'textarea':
 					$this->assertEquals( 7, $field['id'] );
-				break;
+					break;
 			}
 		}
 
@@ -371,6 +385,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase
 
 	/**
 	 * Test that RGFormsModel::get_lead() functionality works correctly
+	 *
 	 * @since 3.6
 	 */
 	public function test_get_entry() {
@@ -378,24 +393,24 @@ class Test_Gravity_Forms extends WP_UnitTestCase
 
 		$valid_entries = array(
 			'id',
-		'form_id',
-		'date_created',
-		'is_starred',
-		'is_read',
-		'ip',
-		'source_url',
-		'post_id',
-		'currency',
-		'payment_status',
-		'payment_date',
-		'transaction_id',
-		'payment_amount',
-		'payment_method',
-		'is_fulfilled',
-		'created_by',
-		'transaction_type',
-		'user_agent',
-		'status',
+			'form_id',
+			'date_created',
+			'is_starred',
+			'is_read',
+			'ip',
+			'source_url',
+			'post_id',
+			'currency',
+			'payment_status',
+			'payment_date',
+			'transaction_id',
+			'payment_amount',
+			'payment_method',
+			'is_fulfilled',
+			'created_by',
+			'transaction_type',
+			'user_agent',
+			'status',
 		);
 
 		foreach ( $valid_entries as $v ) {
@@ -441,7 +456,8 @@ class Test_Gravity_Forms extends WP_UnitTestCase
 	 * Test GF replace variables function (merge tags)
 	 * i.e GFCommon::replace_variables
 	 *
-	 * @since 3.6
+	 * @since        3.6
+	 *
 	 * @dataProvider provider_mergetag_test
 	 */
 	public function test_replace_variables( $mergetag, $value ) {
@@ -450,6 +466,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase
 
 	/**
 	 * Data provider for testing merge tags replace correctly
+	 *
 	 * @since 3.6
 	 */
 	public function provider_mergetag_test() {
@@ -471,7 +488,8 @@ class Test_Gravity_Forms extends WP_UnitTestCase
 	 * @param String $var The $_SERVER array key
 	 *
 	 * @dataProvider provider_ip_testing
-	 * @since 3.6
+	 *
+	 * @since        3.6
 	 */
 	public function run_ip_test( $ip, $var ) {
 		$_SERVER[ $var ] = $ip;
@@ -481,6 +499,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase
 
 	/**
 	 * The data provider for the run_ip_test() function
+	 *
 	 * @since 3.6
 	 */
 	public function provider_ip_testing() {
@@ -497,6 +516,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase
 	/**
 	 * Test that GFCommon::$version will produce
 	 * the expected result.
+	 *
 	 * @since 3.6
 	 */
 	public function test_gf_version() {

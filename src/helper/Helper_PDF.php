@@ -2,10 +2,6 @@
 
 namespace GFPDF\Helper;
 
-use GFPDF\Model\Model_PDF;
-use GFPDF\Helper\Helper_Abstract_Form;
-use GFPDF\Helper\Helper_Data;
-
 use mPDF;
 
 use Exception;
@@ -51,21 +47,27 @@ class Helper_PDF {
 
 	/**
 	 * Holds our PDF Object
-	 * @var Object
+	 *
+	 * @var \mPDF
+	 *
 	 * @since 4.0
 	 */
 	public $mpdf;
 
 	/**
 	 * Holds our Gravity Form Entry Details
-	 * @var Array
+	 *
+	 * @var array
+	 *
 	 * @since 4.0
 	 */
 	protected $entry;
 
 	/**
 	 * Holds our PDF Settings
-	 * @var Array
+	 *
+	 * @var array
+	 *
 	 * @since 4.0
 	 */
 	protected $settings;
@@ -73,56 +75,72 @@ class Helper_PDF {
 	/**
 	 * Controls how the PDF should be output.
 	 * Whether to display it in the browser, force a download, or save it to disk
+	 *
 	 * @var string
+	 *
 	 * @since 4.0
 	 */
 	protected $output = 'DISPLAY';
 
 	/**
 	 * Holds the predetermined paper size
-	 * @var Mixed (String or Array)
+	 *
+	 * @var string|array
+	 *
 	 * @since 4.0
 	 */
 	protected $paper_size;
 
 	/**
 	 * Holds our paper orientation in mPDF flavour
-	 * @var String
+	 *
+	 * @var string
+	 *
 	 * @since 4.0
 	 */
 	protected $orientation;
 
 	/**
 	 * Holds the full path to the PHP template to load
-	 * @var String
+	 *
+	 * @var string
+	 *
 	 * @since 4.0
 	 */
 	protected $template_path;
 
 	/**
 	 * Holds the PDF filename that should be used
-	 * @var String
+	 *
+	 * @var string
+	 *
 	 * @since 4.0
 	 */
 	protected $filename = 'document.pdf';
 
 	/**
 	 * Holds the path the PDF should be saved to
-	 * @var String
+	 *
+	 * @var string
+	 *
 	 * @since 4.0
 	 */
 	protected $path;
 
 	/**
 	 * Whether to force the print dialog when the PDF is opened
+	 *
 	 * @var boolean
+	 *
 	 * @since 4.0
 	 */
 	protected $print = false;
 
 	/**
 	 * Holds abstracted functions related to the forms plugin
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Form
+	 *
 	 * @since 4.0
 	 */
 	protected $form;
@@ -130,15 +148,22 @@ class Helper_PDF {
 	/**
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Data
+	 *
 	 * @since 4.0
 	 */
 	protected $data;
 
 	/**
 	 * Initialise our class
-	 * @param Array $entry    The Gravity Form Entry to be processed
-	 * @param Array $settings The Gravity PDF Settings Array
+	 *
+	 * @param array                              $entry    The Gravity Form Entry to be processed
+	 * @param array                              $settings The Gravity PDF Settings Array
+	 *
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
+	 * @param \GFPDF\Helper\Helper_Data          $data
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( $entry, $settings, Helper_Abstract_Form $form, Helper_Data $data ) {
@@ -154,7 +179,9 @@ class Helper_PDF {
 
 	/**
 	 * A public method to start our PDF creation process
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	public function init() {
@@ -169,24 +196,27 @@ class Helper_PDF {
 
 	/**
 	 * Render the HTML to our PDF
-	 * @param  Array  $args Any arguments that should be passed to the PDF template
-	 * @param  String $html By pass the template  file and pass in a HTML string directly to the engine. Optional.
+	 *
+	 * @param  array  $args Any arguments that should be passed to the PDF template
+	 * @param  string $html By pass the template  file and pass in a HTML string directly to the engine. Optional.
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	public function render_html( $args = array(), $html = '' ) {
 
 		/* Because this class can load any content we'll only set up our template if no HTML is passed */
-		if( empty( $html ) ) {
+		if ( empty( $html ) ) {
 			$this->set_template();
 		}
 
 		$form = $this->form->get_form( $this->entry['form_id'] );
 
 		/* Add filter to prevent HTML being written to document when it returns true. Backwards compatibility. */
-		$prevent_html = apply_filters("gfpdfe_pre_load_template", $form['id'], $this->entry['id'], basename($this->template_path), $form['id'] . $this->entry['id'], $this->backwards_compat_output($this->output), $this->filename, $this->backwards_compat_conversion($this->settings), $args ); /* Backwards Compatibility */
+		$prevent_html = apply_filters( "gfpdfe_pre_load_template", $form['id'], $this->entry['id'], basename( $this->template_path ), $form['id'] . $this->entry['id'], $this->backwards_compat_output( $this->output ), $this->filename, $this->backwards_compat_conversion( $this->settings ), $args ); /* Backwards Compatibility */
 
-		if( $prevent_html === true ) {
+		if ( $prevent_html === true ) {
 			return;
 		}
 
@@ -196,8 +226,8 @@ class Helper_PDF {
 		}
 
 		/* Apply our filters */
-		$html = apply_filters("gfpdfe_pdf_template_{$form['id']}", apply_filters('gfpdfe_pdf_template', $html, $form['id'], $this->entry['id'], $this->settings), $this->entry['id'], $this->settings); /* Backwards compat */
-		$html = apply_filters("gfpdf_pdf_html_output_{$form['id']}", apply_filters('gfpdf_pdf_html_output', $html, $form, $this->entry, $this->settings), $this->form, $this->entry, $this->settings);
+		$html = apply_filters( "gfpdfe_pdf_template_{$form['id']}", apply_filters( 'gfpdfe_pdf_template', $html, $form['id'], $this->entry['id'], $this->settings ), $this->entry['id'], $this->settings ); /* Backwards compat */
+		$html = apply_filters( "gfpdf_pdf_html_output_{$form['id']}", apply_filters( 'gfpdf_pdf_html_output', $html, $form, $this->entry, $this->settings ), $this->form, $this->entry, $this->settings );
 
 		/* Check if we should output the HTML to the browser, for debugging */
 		$this->maybe_display_raw_html( $html );
@@ -208,7 +238,9 @@ class Helper_PDF {
 
 	/**
 	 * Create the PDF
-	 * @return void
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	public function generate() {
@@ -234,23 +266,30 @@ class Helper_PDF {
 			case 'DISPLAY':
 				$this->mpdf->Output( $this->filename, 'I' );
 				wp_die();
-			break;
+				break;
 
 			case 'DOWNLOAD':
 				$this->mpdf->Output( $this->filename, 'D' );
 				wp_die();
-			break;
+				break;
 
 			case 'SAVE':
 				return $this->mpdf->Output( '', 'S' );
-			break;
+				break;
 		}
+
+		return false;
 	}
 
 	/**
 	 * Save the PDF to our tmp directory
-	 * @param  String $raw_pdf_string  The generated PDF to be saved
-	 * @return Mixed                   The full path to the file or false if failed
+	 *
+	 * @param  string $raw_pdf_string The generated PDF to be saved
+	 *
+	 * @return string|boolean The full path to the file or false if failed
+	 *
+	 * @throws Exception
+	 *
 	 * @since  4.0
 	 */
 	public function save_pdf( $raw_pdf_string ) {
@@ -272,7 +311,11 @@ class Helper_PDF {
 
 	/**
 	 * Public endpoint to allow users to control how the generated PDF will be displayed
-	 * @param String $type Only display, download or save options are valid
+	 *
+	 * @param string $type Only display, download or save options are valid
+	 *
+	 * @throws Exception
+	 *
 	 * @since 4.0
 	 */
 	public function set_output_type( $type ) {
@@ -280,7 +323,6 @@ class Helper_PDF {
 
 		if ( ! in_array( strtoupper( $type ), $valid ) ) {
 			throw new Exception( sprintf( 'Display type not valid. Use %s', implode( ', ', $valid ) ) );
-			return;
 		}
 
 		$this->output = strtoupper( $type );
@@ -288,16 +330,19 @@ class Helper_PDF {
 
 	/**
 	 * Set the PDF meta data, including title, author, creator and subject
+	 *
 	 * @since 4.0
 	 */
 	protected function set_metadata() {
 		$this->mpdf->SetTitle( strcode2utf( strip_tags( $this->get_filename() ) ) );
-		$this->mpdf->SetAuthor( strcode2utf( strip_tags( get_bloginfo('name') ) ) );
+		$this->mpdf->SetAuthor( strcode2utf( strip_tags( get_bloginfo( 'name' ) ) ) );
 	}
 
 	/**
 	 * Public Method to mark the PDF document creator
-	 * @return void
+	 *
+	 * @param string $text The PDF Creator
+	 *
 	 * @since 4.0
 	 */
 	public function set_creator( $text = '' ) {
@@ -310,9 +355,12 @@ class Helper_PDF {
 
 	/**
 	 * Public Method to set how the PDF should be displyed when first open
-	 * @param Mixed  $mode A string or integer setting the zoom mode
-	 * @param String $layout The PDF layout format
-	 * @return void
+	 *
+	 * @param mixed  $mode   A string or integer setting the zoom mode
+	 * @param string $layout The PDF layout format
+	 *
+	 * @throws Exception
+	 *
 	 * @since 4.0
 	 */
 	public function set_display_mode( $mode = 'fullpage', $layout = 'continuous' ) {
@@ -328,9 +376,9 @@ class Helper_PDF {
 			}
 		}
 
-		/* check theh layout */
-		if ( ! in_array( strtolower( $mode ), $valid_mode ) ) {
-			throw new Exception( sprintf( 'Layout must be one of these types: %s', implode( ', ', $valid_mode ) ) );
+		/* check the layout */
+		if ( ! in_array( strtolower( $layout ), $valid_layout ) ) {
+			throw new Exception( sprintf( 'Layout must be one of these types: %s', implode( ', ', $valid_layout ) ) );
 		}
 
 		$this->mpdf->SetDisplayMode( $mode, $layout );
@@ -339,8 +387,11 @@ class Helper_PDF {
 
 	/**
 	 * Public Method to allow the print dialog to be display when PDF is opened
-	 * @param boolean $print
-	 * @return void
+	 *
+	 * @param boolean $print Whether the PDF should open the print dialog every time the PDF is opened
+	 *
+	 * @throws Exception
+	 *
 	 * @since 4.0
 	 */
 	public function set_print_dialog( $print = true ) {
@@ -353,7 +404,9 @@ class Helper_PDF {
 
 	/**
 	 * Generic PDF JS Setter function
-	 * @param String $js The PDF Javascript to execute
+	 *
+	 * @param string $js The PDF Javascript to execute
+	 *
 	 * @since 4.0
 	 */
 	public function set_JS( $js ) {
@@ -361,8 +414,10 @@ class Helper_PDF {
 	}
 
 	/**
+	 *
 	 * Get the current Gravity Form Entry
-	 * @return String
+	 *
+	 * @return string
 	 * @since 4.0
 	 */
 	public function get_entry() {
@@ -371,7 +426,9 @@ class Helper_PDF {
 
 	/**
 	 * Get the current PDF Settings
-	 * @return String
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	public function get_settings() {
@@ -380,7 +437,9 @@ class Helper_PDF {
 
 	/**
 	 * Get the current PDF Name
-	 * @return String
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	public function get_filename() {
@@ -389,7 +448,9 @@ class Helper_PDF {
 
 	/**
 	 * Generate the PDF filename used
-	 * @return void
+	 *
+	 * @param string $filename The PDF filename you want to use
+	 *
 	 * @since 4.0
 	 */
 	public function set_filename( $filename ) {
@@ -398,7 +459,9 @@ class Helper_PDF {
 
 	/**
 	 * Get the current PDF path
-	 * @return String
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	public function get_path() {
@@ -407,8 +470,11 @@ class Helper_PDF {
 
 	/**
 	 * Sets the path the PDF should be saved to
+	 *
 	 * @param string $path
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	public function set_path( $path = '' ) {
@@ -418,7 +484,7 @@ class Helper_PDF {
 			$path = $this->data->template_tmp_location . $this->entry['form_id'] . $this->entry['id'] . '/';
 		} else {
 			/* ensure the path ends with a forward slash */
-			if ( substr( $path, -1 ) !== '/' ) {
+			if ( substr( $path, - 1 ) !== '/' ) {
 				$path .= '/';
 			}
 		}
@@ -428,7 +494,9 @@ class Helper_PDF {
 
 	/**
 	 * Gets the absolute path to the PDF
-	 * @return String The full path and filename of the PDF
+	 *
+	 * @return string The full path and filename of the PDF
+	 *
 	 * @since 4.0
 	 */
 	public function get_full_pdf_path() {
@@ -437,7 +505,9 @@ class Helper_PDF {
 
 	/**
 	 * Initialise our mPDF object
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	protected function begin_pdf() {
@@ -449,27 +519,28 @@ class Helper_PDF {
 
 	/**
 	 * Set up the paper size and orentation
-	 * @return void
+	 *
+	 * @throws Exception
+	 *
 	 * @since 4.0
 	 */
 	protected function set_paper() {
 
 		/* Get the paper size from the settings */
-		$paper_size = ( isset($this->settings['pdf_size'] ) ) ? strtoupper( $this->settings['pdf_size'] ) : 'A4';
+		$paper_size = ( isset( $this->settings['pdf_size'] ) ) ? strtoupper( $this->settings['pdf_size'] ) : 'A4';
 
-        $valid_paper_size = array(
-            '4A0', '2A0',
-            'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10',
-            'B0', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10',
-            'C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10',
-            'RA0', 'RA1', 'RA2', 'RA3', 'RA4',
-            'SRA0', 'SRA1', 'SRA2', 'SRA3', 'SRA4',
-            'LETTER', 'LEGAL', 'LEDGER', 'TABLOID', 'EXECUTIVE', 'FOILIO', 'B', 'A', 'DEMY', 'ROYAL', 'CUSTOM'
-        );
+		$valid_paper_size = array(
+			'4A0', '2A0',
+			'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10',
+			'B0', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10',
+			'C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10',
+			'RA0', 'RA1', 'RA2', 'RA3', 'RA4',
+			'SRA0', 'SRA1', 'SRA2', 'SRA3', 'SRA4',
+			'LETTER', 'LEGAL', 'LEDGER', 'TABLOID', 'EXECUTIVE', 'FOILIO', 'B', 'A', 'DEMY', 'ROYAL', 'CUSTOM'
+		);
 
 		if ( ! in_array( $paper_size, $valid_paper_size ) ) {
-			throw new Exception( sprintf( 'Paper size not valid. Use %s', implode( ', ', $valid ) ) );
-			return;
+			throw new Exception( sprintf( 'Paper size not valid. Use %s', implode( ', ', $valid_paper_size ) ) );
 		}
 
 		/* set our paper size and orientation based on user selection */
@@ -484,7 +555,9 @@ class Helper_PDF {
 
 	/**
 	 * Set our paper size using pre-defined values
-	 * @return void
+	 *
+	 * @param string $size The paper size to be set
+	 *
 	 * @since 4.0
 	 */
 	protected function set_paper_size( $size ) {
@@ -494,7 +567,9 @@ class Helper_PDF {
 	/**
 	 * Set our custom paper size which will be a 2-key array signifying the
 	 * width and height of the paper stock
-	 * @return void
+	 *
+	 * @throws Exception
+	 *
 	 * @since 4.0
 	 */
 	protected function set_custom_paper_size() {
@@ -510,8 +585,11 @@ class Helper_PDF {
 
 	/**
 	 * Ensure the custom paper size has the correct values
-	 * @param  Array $size
-	 * @return Array
+	 *
+	 * @param  array $size
+	 *
+	 * @return array
+	 *
 	 * @since  4.0
 	 */
 	protected function get_paper_size( $size ) {
@@ -526,8 +604,11 @@ class Helper_PDF {
 
 	/**
 	 * Set the page orientation based on the paper size selected
-	 * @param Boolean $custom Whether a predefined paper size was used, or a custom size
+	 *
+	 * @param boolean $custom Whether a predefined paper size was used, or a custom size
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	protected function set_orientation( $custom = false ) {
@@ -536,6 +617,7 @@ class Helper_PDF {
 
 		/**
 		 * If using a custom paper size (with an array) we'll pass in the L or P. If standard paper size the -L attribute needs to be added to the $paper_size argument.
+		 *
 		 * @todo Update mPDF to be more consistent when setting portrait and landscape documentation
 		 */
 		if ( $custom ) {
@@ -548,7 +630,9 @@ class Helper_PDF {
 
 	/**
 	 * Get the correct path to the PHP template we should load into mPDF
-	 * @return void
+	 *
+	 * @throws Exception
+	 *
 	 * @since 4.0
 	 */
 	protected function set_template() {
@@ -580,12 +664,12 @@ class Helper_PDF {
 		/*
 		 * Check if the template version is compatible with our version of Gravity PDF
 		 */
-		$headers = get_file_data( $this->template_path, array( 'required_pdf_version' =>  __( 'Required PDF Version', 'gravity-forms-pdf-extended' ) ) );
+		$headers = get_file_data( $this->template_path, array( 'required_pdf_version' => __( 'Required PDF Version', 'gravity-forms-pdf-extended' ) ) );
 
 		/* Check if there are version requirements */
-		if( strlen( $headers['required_pdf_version'] ) > 0 ) {
+		if ( strlen( $headers['required_pdf_version'] ) > 0 ) {
 			/* Check if the version requirements are NOT met and throw and error */
-			if( version_compare( $headers['required_pdf_version'], PDF_EXTENDED_VERSION, '>' ) ) {
+			if ( version_compare( $headers['required_pdf_version'], PDF_EXTENDED_VERSION, '>' ) ) {
 				throw new Exception( sprintf( __( 'The PDF Tempalte %s requires Gravity PDF version %s. Upgrade to the latest version.', 'gravity-forms-pdf-extended' ), "<em>$template</em>", "<em>{$headers['required_pdf_version']}</em>" ) );
 			}
 		}
@@ -595,12 +679,17 @@ class Helper_PDF {
 
 	/**
 	 * Ensure an extension is added to the end of the name
-	 * @param  String $name The PHP template
-	 * @return String
+	 *
+	 * @param  string $name The PHP template
+	 *
+	 * @param string  $extension The extension that should be added to the filename
+	 *
+	 * @return string
+	 *
 	 * @since  4.0
 	 */
 	protected function get_file_with_extension( $name, $extension = '.php' ) {
-		if ( substr( $name, -strlen( $extension ) ) !== $extension ) {
+		if ( substr( $name, - strlen( $extension ) ) !== $extension ) {
 			$name = $name . $extension;
 		}
 
@@ -609,7 +698,11 @@ class Helper_PDF {
 
 	/**
 	 * Load our PHP template file and return the buffered HTML
-	 * @return String The buffered HTML to pass into mPDF
+	 *
+	 * @param array $args Any arguments that should be passed to the PDF template file
+	 *
+	 * @return string The buffered HTML to pass into mPDF
+	 *
 	 * @since 4.0
 	 */
 	protected function load_html( $args = array() ) {
@@ -618,14 +711,18 @@ class Helper_PDF {
 
 		ob_start();
 		include $this->template_path;
+
 		return ob_get_clean();
 	}
 
 
 	/**
 	 * Allow site admins to view the RAW HTML if needed
-	 * @param  String $html
+	 *
+	 * @param  string $html The HTML that should be output to the browser
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	protected function maybe_display_raw_html( $html ) {
@@ -638,18 +735,22 @@ class Helper_PDF {
 
 	/**
 	 * Prompt the print dialog box
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	protected function show_print_dialog() {
 		if ( $this->print ) {
-			$this->setJS( 'this.print();' );
+			$this->mpdf->setJS( 'this.print();' );
 		}
 	}
 
 	/**
 	 * Sets the image DPI in the PDF
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	protected function set_image_dpi() {
@@ -660,7 +761,9 @@ class Helper_PDF {
 
 	/**
 	 * Sets the text direction in the PDF (RTL support)
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	protected function set_text_direction() {
@@ -674,7 +777,9 @@ class Helper_PDF {
 	/**
 	 * Set the correct PDF Format
 	 * Normal, PDF/A-1b or PDF/X-1a
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	protected function set_pdf_format() {
@@ -682,27 +787,29 @@ class Helper_PDF {
 			case 'pdfa1b':
 				$this->mpdf->PDFA     = true;
 				$this->mpdf->PDFAauto = true;
-			break;
+				break;
 
 			case 'pdfx1a':
 				$this->mpdf->PDFX     = true;
 				$this->mpdf->PDFXauto = true;
-			break;
+				break;
 		}
 	}
 
 	/**
 	 * Add PDF Security, if able
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	protected function set_pdf_security() {
 		/* Security settings cannot be applied to pdfa1b or pdfx1a formats */
 		if ( strtolower( $this->settings['format'] ) == 'standard' && strtolower( $this->settings['security'] == 'Yes' ) ) {
 
-			$password        = (isset( $this->settings['password'] ) ) ? 		$this->settings['password'] : 			'';
-			$privileges      = (isset( $this->settings['privileges'] ) ) ? 		$this->settings['privileges'] : 		array();
-			$master_password = (isset( $this->settings['master_password'] ) ) ? $this->settings['master_password'] : 	'';
+			$password        = ( isset( $this->settings['password'] ) ) ? $this->settings['password'] : '';
+			$privileges      = ( isset( $this->settings['privileges'] ) ) ? $this->settings['privileges'] : array();
+			$master_password = ( isset( $this->settings['master_password'] ) ) ? $this->settings['master_password'] : '';
 
 			$this->mpdf->SetProtection( $privileges, $password, $master_password, 128 );
 		}
@@ -710,45 +817,50 @@ class Helper_PDF {
 
 	/**
 	 * Converts the 4.x settings array into a compatible 3.x settings array
-	 * @param  Array $settings The 4.x settings to be converted
-	 * @return Array           The 3.x compatible settings
+	 *
+	 * @param  array $settings The 4.x settings to be converted
+	 *
+	 * @return array           The 3.x compatible settings
+	 *
 	 * @since 4.0
-	 * @todo
 	 */
 	protected function backwards_compat_conversion( $settings ) {
 
 		$compat                   = array();
-		$compat['premium']		  = ( isset($settings['advanced_template']) && $settings['advanced_template'] == 'Yes' ) ? true : false;
-		$compat['rtl']            = ( isset($settings['rtl']) && $settings['rtl'] == 'Yes' ) ? true : false;
-		$compat['dpi']            = ( isset($settings['image_dpi']) ) ? (int) $settings['image_dpi'] : 96;
-		$compat['security']       = ( isset($settings['security']) && $settings['security'] == 'Yes' ) ? true : false;
-		$compat['pdf_password']   = ( isset($settings['password']) ) ? $settings['password'] : '';
-		$compat['pdf_privileges'] = ( isset($settings['privileges']) ) ? $settings['privileges'] : '';
-		$compat['pdfa1b']         = ( isset($settings['format']) && $settings['format'] == 'PDFA1B' ) ? true : false;
-		$compat['pdfx1a']         = ( isset($settings['format']) && $settings['format'] == 'PDFX1A' ) ? true : false;
+		$compat['premium']        = ( isset( $settings['advanced_template'] ) && $settings['advanced_template'] == 'Yes' )  ? true : false;
+		$compat['rtl']            = ( isset( $settings['rtl'] ) && $settings['rtl'] == 'Yes' )                              ? true : false;
+		$compat['dpi']            = ( isset( $settings['image_dpi'] ) )                                                     ? (int) $settings['image_dpi'] : 96;
+		$compat['security']       = ( isset( $settings['security'] ) && $settings['security'] == 'Yes' )                    ? true : false;
+		$compat['pdf_password']   = ( isset( $settings['password'] ) )                                                      ? $settings['password'] : '';
+		$compat['pdf_privileges'] = ( isset( $settings['privileges'] ) )                                                    ? $settings['privileges'] : '';
+		$compat['pdfa1b']         = ( isset( $settings['format'] ) && $settings['format'] == 'PDFA1B' )                     ? true : false;
+		$compat['pdfx1a']         = ( isset( $settings['format'] ) && $settings['format'] == 'PDFX1A' )                     ? true : false;
 
 		return $compat;
 	}
 
 	/**
 	 * Converts the 4.x output to into a compatible 3.x type
-	 * @param  String $type
-	 * @return String
+	 *
+	 * @param  string $type
+	 *
+	 * @return string
+	 * 
 	 * @since 4.0
 	 */
 	protected function backwards_compat_output( $type ) {
-		switch( strtolower( $type ) ) {
+		switch ( strtolower( $type ) ) {
 			case 'display':
 				return 'view';
-			break;
+				break;
 
 			case 'download':
 				return 'download';
-			break;
+				break;
 
 			default:
 				return 'save';
-			break;
+				break;
 		}
 	}
 }

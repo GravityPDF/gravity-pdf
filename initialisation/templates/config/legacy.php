@@ -15,8 +15,8 @@ use GFPDF\Helper\Helper_Interface_Config;
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -51,6 +51,7 @@ class legacy implements Helper_Interface_Config {
 	 *
 	 * The fields key is based on our \GFPDF\Helper\Helper_Options Settings API
 	 * See the register_settings() method for the exact fields that can be passed in
+	 *
 	 * @return Array The array, split into core components and custom fields
 	 * @since 4.0
 	 */
@@ -61,7 +62,7 @@ class legacy implements Helper_Interface_Config {
 				'show_html'            => true,
 				'show_section_content' => true,
 				'show_empty'           => true,
-			)
+			),
 		);
 	}
 }

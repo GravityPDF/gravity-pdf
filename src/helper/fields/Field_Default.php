@@ -4,8 +4,6 @@ namespace GFPDF\Helper\Fields;
 
 use GFPDF\Helper\Helper_Abstract_Fields;
 
-use Exception;
-
 /**
  * Gravity Forms Field
  *
@@ -45,11 +43,15 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Default extends Helper_Abstract_Fields
-{
+class Field_Default extends Helper_Abstract_Fields {
 	/**
 	 * Display the HTML version of this field
-	 * @return String
+	 *
+	 * @param string $value
+	 * @param bool   $label
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
@@ -60,7 +62,9 @@ class Field_Default extends Helper_Abstract_Fields
 
 	/**
 	 * Get the standard GF value of this field
-	 * @return String/Array
+	 *
+	 * @return string|array
+	 *
 	 * @since 4.0
 	 */
 	public function value() {

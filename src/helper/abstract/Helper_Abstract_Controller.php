@@ -38,26 +38,32 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * A simple abstract class controlers can extent to share similar variables
+ *
  * @since 4.0
  */
 abstract class Helper_Abstract_Controller {
 
 	/**
 	 * Classes will store a model object
-	 * @var Object
+	 *
+	 * @var object
+	 *
 	 * @since 4.0
 	 */
-	private $model = null;
+	public $model = null;
 
 	/**
 	 * Classes will store a view object
-	 * @var Object
+	 *
+	 * @var object
+	 *
 	 * @since 4.0
 	 */
-	private $view  = null;
+	public $view = null;
 
 	/**
 	 * Each controller should have an initialisation function
+	 *
 	 * @since 4.0
 	 */
 	abstract public function init();

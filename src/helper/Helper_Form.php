@@ -2,8 +2,6 @@
 
 namespace GFPDF\Helper;
 
-use GFPDF\Helper\Helper_Abstract_Form; /* not needed, but helps define usage */
-
 use GFAPI;
 use GFCommon;
 use GFFormsModel;
@@ -52,7 +50,9 @@ class Helper_Form extends Helper_Abstract_Form {
 
 	/**
 	 * Get the form plugins current version
-	 * @return String
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	public function get_version() {
@@ -61,7 +61,9 @@ class Helper_Form extends Helper_Abstract_Form {
 
 	/**
 	 * Get form plugin's path
-	 * @return String
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	public function get_plugin_path() {
@@ -70,7 +72,9 @@ class Helper_Form extends Helper_Abstract_Form {
 
 	/**
 	 * Get form plugin's URL
-	 * @return String
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	public function get_plugin_url() {
@@ -79,9 +83,12 @@ class Helper_Form extends Helper_Abstract_Form {
 
 	/**
 	 * Add's a new form and returns the newly-added form ID
-	 * @param  Array $form The form object to add
+	 *
+	 * @param array $form The form object to add
+	 *
 	 * @since 4.0
-	 * @return Integer/Object The ID if successful, or a WP_Error
+	 *
+	 * @return integer|object The ID if successful, or a WP_Error
 	 */
 	public function add_form( $form ) {
 		return GFAPI::add_form( $form );
@@ -89,9 +96,12 @@ class Helper_Form extends Helper_Abstract_Form {
 
 	/**
 	 * Delete's a form by ID
-	 * @param  Integer The form ID to remove
+	 *
+	 * @param integer $form_id The form ID to remove
+	 *
 	 * @since 4.0
-	 * @return Boolean/Object True on successful, or a WP_Error
+	 *
+	 * @return boolean|\WP_Error
 	 */
 	public function delete_form( $form_id ) {
 		return GFAPI::delete_form( $form_id );
@@ -101,8 +111,11 @@ class Helper_Form extends Helper_Abstract_Form {
 	 * Get form plugin's form array
 	 * The GFAPI has a performance problem when using GFAPI::get_form() and makes a database call each time to get the `is_active`, `date_created`, or `is_trash` data.
 	 * We're bypassing the API to prevent that problem but the array doesn't include the aforementioned fields. Once the issue is resolved we'll look at switching back.
-	 * @param  Integer $form_id
-	 * @return Mixed
+	 *
+	 * @param integer $form_id
+	 *
+	 * @return mixed
+	 *
 	 * @since 4.0
 	 */
 	public function get_form( $form_id ) {
@@ -111,7 +124,9 @@ class Helper_Form extends Helper_Abstract_Form {
 
 	/**
 	 * Get form plugin's current forms array
-	 * @return Mixed
+	 *
+	 * @return mixed
+	 *
 	 * @since 4.0
 	 */
 	public function get_forms() {
@@ -131,8 +146,11 @@ class Helper_Form extends Helper_Abstract_Form {
 
 	/**
 	 * Get form plugin's form array
-	 * @param  Array / Object $form The form object to be updated
-	 * @return Mixed
+	 *
+	 * @param array|object $form The form object to be updated
+	 *
+	 * @return mixed
+	 *
 	 * @since 4.0
 	 */
 	public function update_form( $form ) {
@@ -151,8 +169,11 @@ class Helper_Form extends Helper_Abstract_Form {
 
 	/**
 	 * Get the entry based on the ID
-	 * @param  Integer $entry_id
-	 * @return Mixed
+	 *
+	 * @param integer $entry_id
+	 *
+	 * @return mixed
+	 *
 	 * @since 4.0
 	 */
 	public function get_entry( $entry_id ) {
@@ -161,11 +182,14 @@ class Helper_Form extends Helper_Abstract_Form {
 
 	/**
 	 * Get multiple entries from multiple forms based on search criteria
-	 * @param  Integer | Array $form_ids    The ID's of the form or an array of ideas.
-	 * @param  Array           $search_criteria      An array containing the search criteria
-	 * @param  Array           $sorting               An array containing the sort criteria
-	 * @param  Array           $paging                Use to limit the number of entries returned
-	 * @return Mixed
+	 *
+	 * @param integer|array   $form_ids        The ID's of the form or an array of ideas.
+	 * @param array           $search_criteria An array containing the search criteria
+	 * @param array           $sorting         An array containing the sort criteria
+	 * @param array           $paging          Use to limit the number of entries returned
+	 *
+	 * @return mixed
+	 *
 	 * @since 4.0
 	 */
 	public function get_entries( $form_ids, $search_criteria = array(), $sorting = null, $paging = null ) {
@@ -174,8 +198,11 @@ class Helper_Form extends Helper_Abstract_Form {
 
 	/**
 	 * Update the current entry object
-	 * @param  Object $entry The entry to be updated
-	 * @return Mixed
+	 *
+	 * @param array|object $entry The entry to be updated
+	 *
+	 * @return mixed
+	 *
 	 * @since 4.0
 	 */
 	public function update_entry( $entry ) {
@@ -184,7 +211,9 @@ class Helper_Form extends Helper_Abstract_Form {
 
 	/**
 	 * Get all custom form plugin capabilities added to WordPress, if any
-	 * @return Array
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public function get_capabilities() {
@@ -193,9 +222,12 @@ class Helper_Form extends Helper_Abstract_Form {
 
 	/**
 	 * Check if the user has the capability passed
-	 * @param  String | Array $capability
-	 * @param  Integer        $user_id
-	 * @return Boolean            True if successful, false if failed
+	 *
+	 * @param string|array   $capability
+	 * @param integer        $user_id
+	 *
+	 * @return boolean            True if successful, false if failed
+	 *
 	 * @since 4.0
 	 */
 	public function has_capability( $capability, $user_id = null ) {
@@ -210,7 +242,7 @@ class Helper_Form extends Helper_Abstract_Form {
 
 		/* Restore current user */
 		if ( $user_id !== null ) {
-			wp_set_current_user( $current_user );
+			wp_set_current_user( $current_user->ID );
 		}
 
 		return $has_capability;

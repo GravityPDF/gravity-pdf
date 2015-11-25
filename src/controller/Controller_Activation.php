@@ -48,11 +48,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Controller_Activation
-{
+class Controller_Activation {
 	/**
 	 * Run plugin activation functionality
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public static function activation() {
@@ -62,16 +63,18 @@ class Controller_Activation
 
 	/**
 	 * Run plugin deactivation functionality
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public static function deactivation() {
 		global $gfpdf;
 
 		/**
-		* Remove our rewrite rules
-		* As deactivation hook fires much earlier than flush_rewrite_rules() can be called we'll manually remove our rules from the database
-		*/
+		 * Remove our rewrite rules
+		 * As deactivation hook fires much earlier than flush_rewrite_rules() can be called we'll manually remove our rules from the database
+		 */
 		$rules = get_option( 'rewrite_rules' );
 		unset( $rules[ $gfpdf->data->permalink ] );
 		update_option( 'rewrite_rules', $rules );

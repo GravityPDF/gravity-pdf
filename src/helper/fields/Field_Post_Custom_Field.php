@@ -47,13 +47,19 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Post_Custom_Field extends Helper_Abstract_Fields
-{
+class Field_Post_Custom_Field extends Helper_Abstract_Fields {
 
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
-	 * @param Object $field The GF_Field_* Object
-	 * @param Array  $entry The Gravity Forms Entry
+	 *
+	 * @param object               $field The GF_Field_* Object
+	 * @param array                $entry The Gravity Forms Entry
+	 *
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
+	 * @param \GFPDF\Helper\Helper_Misc          $misc
+	 *
+	 * @throws Exception
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( $field, $entry, Helper_Abstract_Form $form, Helper_Misc $misc ) {
@@ -75,7 +81,7 @@ class Field_Post_Custom_Field extends Helper_Abstract_Fields
 			} else {
 				throw new Exception( 'Class not found' );
 			}
-		} catch (Exception $e) {
+		} catch ( Exception $e ) {
 			/* Exception thrown. Load generic field loader */
 			$this->fieldObject = new Field_Default( $field, $entry, $form, $misc );
 		}
@@ -86,8 +92,8 @@ class Field_Post_Custom_Field extends Helper_Abstract_Fields
 
 	/**
 	 * Used to check if the current field has a value
+	 *
 	 * @since 4.0
-	 * @internal Child classes can override this method when dealing with a specific use case
 	 */
 	public function is_empty() {
 		return $this->fieldObject->is_empty();
@@ -95,7 +101,11 @@ class Field_Post_Custom_Field extends Helper_Abstract_Fields
 
 	/**
 	 * Display the HTML version of this field
-	 * @return String
+	 *
+	 * @param string $value
+	 * @param bool   $label
+	 *
+	 * @return string
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
@@ -104,12 +114,14 @@ class Field_Post_Custom_Field extends Helper_Abstract_Fields
 
 	/**
 	 * Get the standard GF value of this field
-	 * @return String/Array
+	 *
+	 * @return string|array
+	 *
 	 * @since 4.0
 	 */
 	public function value() {
 		if ( $this->fieldObject->has_cache() ) {
-			return$this->fieldObject->cache();
+			return $this->fieldObject->cache();
 		}
 
 		$value = $this->fieldObject->value();

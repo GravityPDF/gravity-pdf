@@ -57,14 +57,18 @@ class Model_Install extends Helper_Abstract_Model {
 
 	/**
 	 * Holds abstracted functions related to the forms plugin
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Form
+	 *
 	 * @since 4.0
 	 */
 	protected $form;
 
 	/**
 	 * Holds our log class
-	 * @var Object
+	 *
+	 * @var \Monolog\Logger|LoggerInterface
+	 *
 	 * @since 4.0
 	 */
 	protected $log;
@@ -72,7 +76,9 @@ class Model_Install extends Helper_Abstract_Model {
 	/**
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Data
+	 *
 	 * @since 4.0
 	 */
 	protected $data;
@@ -80,7 +86,9 @@ class Model_Install extends Helper_Abstract_Model {
 	/**
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Misc
+	 *
 	 * @since 4.0
 	 */
 	protected $misc;
@@ -88,18 +96,22 @@ class Model_Install extends Helper_Abstract_Model {
 	/**
 	 * Holds our Helper_Notices object
 	 * which we can use to queue up admin messages for the user
-	 * @var Object Helper_Notices
+	 *
+	 * @var \GFPDF\Helper\Helper_Notices
+	 *
 	 * @since 4.0
 	 */
 	protected $notices;
 
 	/**
 	 * Setup our class by injecting all our dependancies
-	 * @param Helper_Abstract_Form $form    Our abstracted Gravity Forms helper functions
-	 * @param LoggerInterface      $log     Our logger class
-	 * @param Helper_Data          $data    Our plugin data store
-	 * @param Helper_Misc          $misc    Our miscellaneous class
-	 * @param Helper_Notices       $notices Our notice class used to queue admin messages and errors
+	 *
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $form    Our abstracted Gravity Forms helper functions
+	 * @param \Monolog\Logger|LoggerInterface    $log     Our logger class
+	 * @param \GFPDF\Helper\Helper_Data          $data    Our plugin data store
+	 * @param \GFPDF\Helper\Helper_Misc          $misc    Our miscellaneous class
+	 * @param \GFPDF\Helper\Helper_Notices       $notices Our notice class used to queue admin messages and errors
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices ) {
@@ -114,21 +126,25 @@ class Model_Install extends Helper_Abstract_Model {
 
 	/**
 	 * The Gravity PDF Installer
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	public function install_plugin() {
 
-			$this->log->addNotice( 'Gravity PDF Installed' );
-			update_option( 'gfpdf_is_installed', true );
-			$this->data->is_installed = true;
+		$this->log->addNotice( 'Gravity PDF Installed' );
+		update_option( 'gfpdf_is_installed', true );
+		$this->data->is_installed = true;
 
-			do_action( 'gfpdf_plugin_installed' );
+		do_action( 'gfpdf_plugin_installed' );
 	}
 
 	/**
 	 * Get our permalink regex structure
-	 * @return  String
+	 *
+	 * @return  string
+	 *
 	 * @since  4.0
 	 */
 	public function get_permalink_regex() {
@@ -137,7 +153,9 @@ class Model_Install extends Helper_Abstract_Model {
 
 	/**
 	 * Get the plugin working directory name
-	 * @return String
+	 *
+	 * @return string
+	 *
 	 * @since  4.0
 	 */
 	public function get_working_directory() {
@@ -146,7 +164,9 @@ class Model_Install extends Helper_Abstract_Model {
 
 	/**
 	 * Get a link to the plugin's settings page URL
-	 * @return String
+	 *
+	 * @return string
+	 *
 	 * @since  4.0
 	 */
 	public function get_settings_url() {
@@ -155,7 +175,9 @@ class Model_Install extends Helper_Abstract_Model {
 
 	/**
 	 * Get our current installation status
-	 * @return  String
+	 *
+	 * @return  string
+	 *
 	 * @since  4.0
 	 */
 	public function is_installed() {
@@ -164,6 +186,7 @@ class Model_Install extends Helper_Abstract_Model {
 
 	/**
 	 * Used to set up our PDF template folder, tmp folder and font folder
+	 *
 	 * @since 4.0
 	 */
 	public function setup_template_location() {
@@ -183,13 +206,15 @@ class Model_Install extends Helper_Abstract_Model {
 
 	/**
 	 * If running a multisite we'll setup the path to the current multisite folder
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function setup_multisite_template_location() {
 
 		if ( is_multisite() ) {
-			$blog_id = get_current_blog_id();
+			$blog_id                                     = get_current_blog_id();
 			$this->data->multisite_template_location     = apply_filters( 'gfpdfe_multisite_template_location', $this->data->upload_dir . '/' . $this->data->working_folder . '/' . $blog_id . '/', $this->data->upload_dir, $this->data->working_folder );
 			$this->data->multisite_template_location_url = apply_filters( 'gfpdfe_multisite_template_location_url', $this->data->upload_dir_url . '/' . $this->data->working_folder . '/' . $blog_id . '/', $this->data->upload_dir_url, $this->data->working_folder );
 
@@ -204,15 +229,18 @@ class Model_Install extends Helper_Abstract_Model {
 	 * Create the appropriate folder structure automatically
 	 * The upload directory should have all appropriate permissions to allow this kind of maniupulation
 	 * but devs who tap into the gfpdfe_template_location filter will need to ensure we can write to the appropraite folder
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function create_folder_structures() {
 
 		/* don't create the folder structure on our welcome page or through AJAX as an errors on the first page they see will confuse users */
 		if ( is_admin() &&
-			( rgget( 'page' ) == 'gfpdf-getting-started' ) || ( rgget( 'page' ) == 'gfpdf-update' ) || (defined( 'DOING_AJAX' ) && DOING_AJAX) || get_transient( '_gravitypdf_activation_redirect' ) ) {
-			return false;
+		     ( rgget( 'page' ) == 'gfpdf-getting-started' ) || ( rgget( 'page' ) == 'gfpdf-update' ) || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || get_transient( '_gravitypdf_activation_redirect' )
+		) {
+			return null;
 		}
 
 		/* add folders that need to be checked */
@@ -259,7 +287,9 @@ class Model_Install extends Helper_Abstract_Model {
 
 	/**
 	 * Register our PDF custom rewrite rules
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function register_rewrite_rules() {
@@ -272,7 +302,7 @@ class Model_Install extends Helper_Abstract_Model {
 		add_rewrite_rule(
 			$query,
 			$rewrite_to,
-		'top');
+			'top' );
 
 		$this->log->addNotice( 'Add Rewrite Rules', array(
 			'query'   => $query,
@@ -285,8 +315,12 @@ class Model_Install extends Helper_Abstract_Model {
 
 	/**
 	 * Register our PDF custom rewrite rules
+	 *
 	 * @since 4.0
-	 * @return void
+	 *
+	 * @param array $tags
+	 *
+	 * @return array
 	 */
 	public function register_rewrite_tags( $tags ) {
 		$tags[] = 'gpdf';
@@ -299,8 +333,11 @@ class Model_Install extends Helper_Abstract_Model {
 
 	/**
 	 * Check if we need to force the rewrite rules to be flushed
-	 * @param  $rule The rule to check
+	 *
+	 * @param string $rule The rule to check
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function maybe_flush_rewrite_rules( $rule ) {
@@ -316,18 +353,19 @@ class Model_Install extends Helper_Abstract_Model {
 
 	/**
 	 * The Gravity PDF Uninstaller
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
-	 * @todo  Add Multisite Support
 	 */
 	public function uninstall_plugin() {
 		$this->log->addNotice( 'Uninstall Gravity PDF.' );
 
 		/* Clean up database */
-		if( is_multisite() ) {
+		if ( is_multisite() ) {
 			$sites = wp_get_sites();
 
-			foreach( $sites as $site ) {
+			foreach ( $sites as $site ) {
 				switch_to_blog( $site['blog_id'] );
 				$this->remove_plugin_options();
 				$this->remove_plugin_form_settings();
@@ -346,7 +384,9 @@ class Model_Install extends Helper_Abstract_Model {
 
 	/**
 	 * Remove and options stored in the database
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	public function remove_plugin_options() {
@@ -358,7 +398,9 @@ class Model_Install extends Helper_Abstract_Model {
 	/**
 	 * Remove all form settings from each individual form.
 	 * Because we stored out PDF settings with each form and have no index we need to individually load and forms and check them for Gravity PDF settings
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	public function remove_plugin_form_settings() {
@@ -367,8 +409,8 @@ class Model_Install extends Helper_Abstract_Model {
 
 		foreach ( $forms as $form ) {
 			/* only update forms which have a PDF configuration */
-			if ( isset($form['gfpdf_form_settings']) ) {
-				unset($form['gfpdf_form_settings']);
+			if ( isset( $form['gfpdf_form_settings'] ) ) {
+				unset( $form['gfpdf_form_settings'] );
 				if ( $this->form->update_form( $form ) !== true ) {
 					$this->log->addError( 'Cannot Remove PDF Settings from Form.', array( 'form' => $form ) );
 					$this->notices->add_error( sprintf( __( 'There was a problem removing the Gravity Form "%s" PDF configuration. Try delete manually.', 'gravity-forms-pdf-extended' ), $form['id'] . ': ' . $form['title'] ) );
@@ -379,14 +421,16 @@ class Model_Install extends Helper_Abstract_Model {
 
 	/**
 	 * Remove our PDF directory structure
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	public function remove_folder_structure() {
 
-		$paths = apply_filters('gfpdf_uninstall_path', array(
+		$paths = apply_filters( 'gfpdf_uninstall_path', array(
 			$this->data->template_location,
-		));
+		) );
 
 		foreach ( $paths as $dir ) {
 			if ( is_dir( $dir ) ) {
@@ -406,7 +450,9 @@ class Model_Install extends Helper_Abstract_Model {
 
 	/**
 	 * Deactivate Gravity PDF
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	public function deactivate_plugin() {
@@ -415,7 +461,9 @@ class Model_Install extends Helper_Abstract_Model {
 
 	/**
 	 * Safe redirect after deactivation
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	public function redirect_to_plugins_page() {

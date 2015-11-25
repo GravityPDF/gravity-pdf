@@ -10,8 +10,8 @@
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -37,5 +37,5 @@ if (! defined('ABSPATH')) {
 ?>
 
 <a href="<?php echo $args['url']; ?>" class="<?php echo $args['classes']; ?>">
-    <?php echo $args['text']; ?>
+	<?php echo $args['text']; ?>
 </a>

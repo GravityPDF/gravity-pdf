@@ -24,6 +24,7 @@ node_modules/*
 
 ### PhpStorm ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm
+.idea/*
 
 ## File-based project format:
 *.ipr

@@ -49,17 +49,23 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Post_Image extends Helper_Abstract_Fields
-{
+class Field_Post_Image extends Helper_Abstract_Fields {
 
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
-	 * @param Object $field The GF_Field_* Object
-	 * @param Array  $entry The Gravity Forms Entry
+	 *
+	 * @param object               $field The GF_Field_* Object
+	 * @param array                $entry The Gravity Forms Entry
+	 *
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
+	 * @param \GFPDF\Helper\Helper_Misc          $misc
+	 *
+	 * @throws Exception
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( $field, $entry, Helper_Abstract_Form $form, Helper_Misc $misc ) {
-		
+
 		if ( ! is_object( $field ) || ! $field instanceof GF_Field_Post_Image ) {
 			throw new Exception( '$field needs to be in instance of GF_Field_Post_Image' );
 		}
@@ -70,26 +76,31 @@ class Field_Post_Image extends Helper_Abstract_Fields
 
 	/**
 	 * Display the HTML version of this field
-	 * @return String
+	 *
+	 * @param string $value
+	 * @param bool   $label
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
 		$value = $this->value();
 
 		/* Start building image link */
-		$html = '<a href="'. esc_url( $value['url'] ) . '" target="_blank">';
+		$html = '<a href="' . esc_url( $value['url'] ) . '" target="_blank">';
 		$html .= '<img width="150" src="' . esc_url( $value['url'] ) . '" />';
 
 		/* Include title / caption / description if needed */
-		if ( ! empty($value['title']) ) {
+		if ( ! empty( $value['title'] ) ) {
 			$html .= '<div class="gfpdf-post-image-title">' . esc_html( $value['title'] ) . '</div>';
 		}
 
-		if ( ! empty($value['caption']) ) {
+		if ( ! empty( $value['caption'] ) ) {
 			$html .= '<div class="gfpdf-post-image-caption">' . esc_html( $value['caption'] ) . '</div>';
 		}
 
-		if ( ! empty($value['description']) ) {
+		if ( ! empty( $value['description'] ) ) {
 			$html .= '<div class="gfpdf-post-image-description">' . esc_html( $value['description'] ) . '</div>';
 		}
 
@@ -100,7 +111,9 @@ class Field_Post_Image extends Helper_Abstract_Fields
 
 	/**
 	 * Get the standard GF value of this field
-	 * @return String/Array
+	 *
+	 * @return string|array
+	 *
 	 * @since 4.0
 	 */
 	public function value() {
@@ -115,13 +128,13 @@ class Field_Post_Image extends Helper_Abstract_Fields
 		if ( strlen( $value ) > 0 ) {
 			$value = explode( '|:|', $this->get_value() );
 
-			$img['url']         = (isset($value[0])) ? $value[0] : '';
-			$img['path']        = (isset($value[0])) ? $value[0] : '';
-			$img['title']       = (isset($value[1])) ? $value[1] : '';
-			$img['caption']     = (isset($value[2])) ? $value[2] : '';
-			$img['description'] = (isset($value[3])) ? $value[3] : '';
+			$img['url']         = ( isset( $value[0] ) ) ? $value[0] : '';
+			$img['path']        = ( isset( $value[0] ) ) ? $value[0] : '';
+			$img['title']       = ( isset( $value[1] ) ) ? $value[1] : '';
+			$img['caption']     = ( isset( $value[2] ) ) ? $value[2] : '';
+			$img['description'] = ( isset( $value[3] ) ) ? $value[3] : '';
 
-			$path               = (isset($value[0])) ? $this->misc->convert_url_to_path( $value[0] ) : '';
+			$path = ( isset( $value[0] ) ) ? $this->misc->convert_url_to_path( $value[0] ) : '';
 			if ( $path != $img['url'] ) {
 				$img['path'] = $path;
 			}

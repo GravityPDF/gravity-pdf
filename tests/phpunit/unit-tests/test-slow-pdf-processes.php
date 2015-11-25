@@ -46,35 +46,42 @@ use Exception;
 
 /**
  * Test the model / view / controller for the PDF Endpoint functionality
+ *
  * @since 4.0
  * @group slow-pdf-processes
  */
-class Test_Slow_PDF_Processes extends WP_UnitTestCase
-{
+class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 
 	/**
 	 * Our Settings Controller
-	 * @var Object
+	 *
+	 * @var \GFPDF\Controller\Controller_PDF
+	 *
 	 * @since 4.0
 	 */
 	public $controller;
 
 	/**
 	 * Our Settings Model
-	 * @var Object
+	 *
+	 * @var \GFPDF\Model\Model_PDF
+	 *
 	 * @since 4.0
 	 */
 	public $model;
 
 	/**
 	 * Our Settings View
-	 * @var Object
+	 *
+	 * @var \GFPDF\View\View_PDF
+	 *
 	 * @since 4.0
 	 */
 	public $view;
 
 	/**
 	 * The WP Unit Test Set up function
+	 *
 	 * @since 4.0
 	 */
 	public function setUp() {
@@ -93,6 +100,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase
 
 	/**
 	 * Create our testing data
+	 *
 	 * @since 4.0
 	 */
 	private function create_form_and_entries() {
@@ -101,7 +109,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase
 		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
 		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
 
-		$gfpdf->data->form_settings = array();
+		$gfpdf->data->form_settings                = array();
 		$gfpdf->data->form_settings[ $form['id'] ] = $form['gfpdf_form_settings'];
 
 		return array(
@@ -115,14 +123,15 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase
 	 * This function prepares all the details for generating a PDF and is our authentication layer
 	 *
 	 * Belongs to Model_PDF.php
+	 *
 	 * @since 4.0
 	 */
 	public function test_process_pdf() {
 
 		/* Setup our form and entries */
 		$results = $this->create_form_and_entries();
-		$lid = $results['entry']['id'];
-		$pid = '555ad84787d7e';
+		$lid     = $results['entry']['id'];
+		$pid     = '555ad84787d7e';
 
 		/* Test for invalid entry error */
 		$results = $this->model->process_pdf( $pid, 0 );
@@ -143,6 +152,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase
 			$results = $this->model->process_pdf( $pid, $lid );
 		} catch ( Exception $e ) {
 			$this->assertEquals( 'There was a problem generating your PDF', $e->getMessage() );
+
 			return;
 		}
 
@@ -153,16 +163,17 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase
 	 * Check if the PDF is rendered and saved on disk correctly
 	 *
 	 * Belongs to Helper_PDF.php
+	 *
 	 * @since 4.0
 	 */
 	public function test_process_and_save_pdf() {
 		global $gfpdf;
 
 		/* Setup some test data */
-		$results  = $this->create_form_and_entries();
-		$entry    = $results['entry'];
-		$form     = $results['form'];
-		$settings = $form['gfpdf_form_settings']['555ad84787d7e'];
+		$results              = $this->create_form_and_entries();
+		$entry                = $results['entry'];
+		$form                 = $results['form'];
+		$settings             = $form['gfpdf_form_settings']['555ad84787d7e'];
 		$settings['template'] = 'zadani';
 
 		/* Create our PDF object */
@@ -177,16 +188,17 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase
 	/**
 	 * Check if the correct PDFs are saved on disk
 	 * Belongs to Model_PDF.php
+	 *
 	 * @since 4.0
 	 */
 	public function test_maybe_save_pdf() {
 		global $gfpdf;
 
 		/* Setup some test data */
-		$results  = $this->create_form_and_entries();
-		$entry    = $results['entry'];
-		$form     = $results['form'];
-		$file     = $gfpdf->data->template_tmp_location . "{$form['id']}{$entry['id']}/test-{$form['id']}.pdf";
+		$results = $this->create_form_and_entries();
+		$entry   = $results['entry'];
+		$form    = $results['form'];
+		$file    = $gfpdf->data->template_tmp_location . "{$form['id']}{$entry['id']}/test-{$form['id']}.pdf";
 
 		$this->model->maybe_save_pdf( $entry, $form );
 
@@ -201,6 +213,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase
 	 * Test that we can successfully generate a PDF based on an entry and settings
 	 *
 	 * Belongs to View_PDF.php
+	 *
 	 * @since 4.0
 	 */
 	public function test_generate_pdf() {
@@ -221,7 +234,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase
 		/* Add filters to force the PDF to throw and error */
 		add_filter( 'mpdf_output_destination', function () {
 			return 'O';
-		});
+		} );
 
 		try {
 			$this->view->generate_pdf( $entry, $pdf );
@@ -236,6 +249,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase
 	 * Check if we should be always saving the PDF based on the settings
 	 *
 	 * Belongs to Model_PDF.php
+	 *
 	 * @since 4.0
 	 */
 	public function test_maybe_always_save_pdf() {
@@ -250,7 +264,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase
 	/**
 	 * Check if we should attach a PDF to the current notification
 	 *
-	 * @since 4.0
+	 * @since        4.0
 	 *
 	 * @dataProvider provider_maybe_attach_to_notification
 	 */
@@ -260,6 +274,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase
 
 	/**
 	 * Data provider for test_maybe_attach_to_notification()
+	 *
 	 * @return array
 	 * @since 4.0
 	 */
@@ -273,13 +288,13 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase
 		);
 
 		return array(
-			array( false, array( 'id' => '123afjafwij4' ),  array( 'notification' => $notification ) ),
-			array( true,  array( 'id' => 'aasffaa2FAa2' ),  array( 'notification' => $notification ) ),
-			array( false, array( 'id' => 'koa290' ),        array( 'notification' => $notification ) ),
+			array( false, array( 'id' => '123afjafwij4' ), array( 'notification' => $notification ) ),
+			array( true, array( 'id' => 'aasffaa2FAa2' ), array( 'notification' => $notification ) ),
+			array( false, array( 'id' => 'koa290' ), array( 'notification' => $notification ) ),
 			array( false, array( 'id' => 'AAFwa25940359' ), array( 'notification' => $notification ) ),
-			array( true,  array( 'id' => 'sjfajwa124FAS' ), array( 'notification' => $notification ) ),
-			array( true,  array( 'id' => '91230jfa021AF' ), array( 'notification' => $notification ) ),
-			array( true,  array( 'id' => '0890afjIWFjas' ), array( 'notification' => $notification ) ),
+			array( true, array( 'id' => 'sjfajwa124FAS' ), array( 'notification' => $notification ) ),
+			array( true, array( 'id' => '91230jfa021AF' ), array( 'notification' => $notification ) ),
+			array( true, array( 'id' => '0890afjIWFjas' ), array( 'notification' => $notification ) ),
 			array( false, array( 'id' => 'fawfja24a90fa' ), array( 'notification' => $notification ) ),
 		);
 	}
@@ -288,6 +303,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase
 	 * Verify a PDF is generated and the appropriate PDF path is returned
 	 *
 	 * Belongs to Model_PDF.php
+	 *
 	 * @since 4.0
 	 */
 	public function test_generate_and_save_pdf() {
@@ -300,7 +316,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase
 		$pid     = '555ad84787d7e';
 
 		/* Get our PDF */
-		$settings = $gfpdf->options->get_pdf( $fid, $pid );
+		$settings             = $gfpdf->options->get_pdf( $fid, $pid );
 		$settings['template'] = 'zadani';
 
 		/* Generate our PDF and verify it worked correctly */
@@ -308,7 +324,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase
 
 		$this->assertTrue( is_file( $filename ) );
 
-		if( is_file( $filename ) ) {
+		if ( is_file( $filename ) ) {
 			unlink( $filename );
 		}
 
@@ -322,6 +338,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase
 	 * Verify the appropriate variables are passed in and that a PDF is correctly generated
 	 *
 	 * Belongs to GPDFAPI class (found in api.php)
+	 *
 	 * @since 4.0
 	 */
 	public function test_create_pdf() {
@@ -334,7 +351,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase
 		$pid     = '555ad84787d7e';
 
 		/* Get our PDF */
-		$settings = $gfpdf->options->get_pdf( $fid, $pid );
+		$settings             = $gfpdf->options->get_pdf( $fid, $pid );
 		$settings['template'] = 'zadani';
 
 		/* Check for $entry error first */
@@ -350,7 +367,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase
 
 		$this->assertTrue( is_file( $filename ) );
 
-		if( is_file( $filename ) ) {
+		if ( is_file( $filename ) ) {
 			unlink( $filename );
 		}
 

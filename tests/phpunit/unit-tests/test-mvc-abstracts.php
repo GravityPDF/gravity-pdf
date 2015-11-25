@@ -43,34 +43,41 @@ use WP_UnitTestCase;
 
 /**
  * Test the Controller / Model / View Abstract Class
+ *
  * @since 4.0
  * @group mvc-abstracts
  */
-class Test_MVC_Abstracts extends WP_UnitTestCase
-{
+class Test_MVC_Abstracts extends WP_UnitTestCase {
 	/**
 	 * Our Gravity PDF controller object
-	 * @var Object
+	 *
+	 * @var \GFPDF\Controller\Controller_Settings
+	 *
 	 * @since 4.0
 	 */
 	public $controller;
 
 	/**
 	 * Our Gravity PDF model object
-	 * @var Object
+	 *
+	 * @var \GFPDF\Model\Model_Settings
+	 *
 	 * @since 4.0
 	 */
 	public $model;
 
 	/**
 	 * Our Gravity PDF view object
-	 * @var Object
+	 *
+	 * @var \GFPDF\View\View_Settings
+	 *
 	 * @since 4.0
 	 */
 	public $view;
 
 	/**
 	 * The WP Unit Test Set up function
+	 *
 	 * @since 4.0
 	 */
 	public function setUp() {
@@ -87,6 +94,7 @@ class Test_MVC_Abstracts extends WP_UnitTestCase
 
 	/**
 	 * Test the abstract controller methods
+	 *
 	 * @since 4.0
 	 */
 	public function test_abstract_controller() {
@@ -104,6 +112,7 @@ class Test_MVC_Abstracts extends WP_UnitTestCase
 
 	/**
 	 * Test the abstract model methods
+	 *
 	 * @since 4.0
 	 */
 	public function test_abstract_model() {
@@ -118,6 +127,7 @@ class Test_MVC_Abstracts extends WP_UnitTestCase
 
 	/**
 	 * Test the abstract view methods
+	 *
 	 * @since 4.0
 	 */
 	public function test_abstract_view() {
@@ -128,7 +138,7 @@ class Test_MVC_Abstracts extends WP_UnitTestCase
 		/* check we are loading data correctly  */
 		ob_start();
 		$results = $this->view->uninstaller( array() );
-		$string = ob_get_clean();
+		$string  = ob_get_clean();
 
 		/* check results are accurate */
 		$this->assertTrue( $results );

@@ -39,21 +39,24 @@ use WP_UnitTestCase;
 
 /**
  * Test the initial bootup plugin phase
+ *
  * @since 4.0
  * @group pre-checks
  */
-class Test_Pre_Checks extends WP_UnitTestCase
-{
+class Test_Pre_Checks extends WP_UnitTestCase {
 
 	/**
 	 * Our Gravity PDF object used in tests
-	 * @var Object
+	 *
+	 * @var \GFPDF_Major_Compatibility_Checks
+	 *
 	 * @since 4.0
 	 */
 	public $gravitypdf;
 
 	/**
 	 * The WP Unit Test Set up function
+	 *
 	 * @since 4.0
 	 */
 	public function setUp() {
@@ -94,13 +97,14 @@ class Test_Pre_Checks extends WP_UnitTestCase
 	/**
 	 * Test our min WordPress version is working correctly
 	 *
-	 * @since 4.0
+	 * @since        4.0
+	 *
 	 * @dataProvider provider_version
 	 */
 	public function test_check_wordpress( $min_version, $test_wp_version, $expected ) {
 		/* set up our current WP version and the min version */
 		global $wp_version;
-		$wp_version = $test_wp_version;
+		$wp_version                            = $test_wp_version;
 		$this->gravitypdf->required_wp_version = $min_version;
 
 		/* run our test */
@@ -110,12 +114,13 @@ class Test_Pre_Checks extends WP_UnitTestCase
 	/**
 	 * Test our min Gravity Forms version is working correctly
 	 *
-	 * @since 4.0
+	 * @since        4.0
+	 *
 	 * @dataProvider provider_version
 	 */
 	public function test_check_gravityforms( $min_version, $test_gf_version, $expected ) {
 		/* set up our current Gravity Forms version and the min version */
-		GFCommon::$version = $test_gf_version;
+		GFCommon::$version                     = $test_gf_version;
 		$this->gravitypdf->required_gf_version = $min_version;
 
 		/* run our test */
@@ -125,7 +130,8 @@ class Test_Pre_Checks extends WP_UnitTestCase
 	/**
 	 * Ensure we are getting the correct memory (in bytes) based on the PHP ini setting
 	 *
-	 * @since 4.0
+	 * @since        4.0
+	 *
 	 * @dataProvider provider_memory
 	 */
 	public function test_convert_ini_memory( $memory, $bytes ) {
@@ -135,18 +141,20 @@ class Test_Pre_Checks extends WP_UnitTestCase
 	/**
 	 * Ensure we are getting the correct memory (in mb) based on the PHP ini setting
 	 *
-	 * @since 4.0
+	 * @since        4.0
+	 *
 	 * @dataProvider provider_memory
 	 */
 	public function test_get_ram( $memory, $bytes ) {
-		$expected_mb = ($memory === '-1') ? -1 : floor( $bytes / 1024 / 1024 );
+		$expected_mb = ( $memory === '-1' ) ? - 1 : floor( $bytes / 1024 / 1024 );
 		$this->assertEquals( $expected_mb, $this->gravitypdf->get_ram( $memory ) );
 	}
 
 	/**
 	 * Check if we meet the minimum RAM requirements
 	 *
-	 * @since 4.0
+	 * @since        4.0
+	 *
 	 * @dataProvider provider_memory_minimum
 	 */
 	public function test_check_ram( $memory, $expected ) {
@@ -171,7 +179,9 @@ class Test_Pre_Checks extends WP_UnitTestCase
 
 	/**
 	 * A data provider for any tests that need to check PHP memory
-	 * @return Array Our test data
+	 *
+	 * @return array Our test data
+	 *
 	 * @since 4.0
 	 */
 	public function provider_memory() {
@@ -194,7 +204,9 @@ class Test_Pre_Checks extends WP_UnitTestCase
 
 	/**
 	 * A data provider to check we meet the minimum memory requirements
-	 * @return Array Our test data
+	 *
+	 * @return array Our test data
+	 *
 	 * @since 4.0
 	 */
 	public function provider_memory_minimum() {
@@ -215,7 +227,9 @@ class Test_Pre_Checks extends WP_UnitTestCase
 
 	/**
 	 * A data provider for any tests that need version number checks
-	 * @return Array Our test data
+	 *
+	 * @return array Our test data
+	 *
 	 * @since 4.0
 	 */
 	public function provider_version() {
