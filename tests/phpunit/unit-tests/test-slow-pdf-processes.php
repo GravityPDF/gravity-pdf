@@ -9,6 +9,7 @@ use GFPDF\Helper\Helper_PDF;
 
 use GFForms;
 
+use GPDFAPI;
 use WP_UnitTestCase;
 
 use Exception;
@@ -112,6 +113,8 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase
 	/**
 	 * Test our PDF generator function works as expected
 	 * This function prepares all the details for generating a PDF and is our authentication layer
+	 *
+	 * Belongs to Model_PDF.php
 	 * @since 4.0
 	 */
 	public function test_process_pdf() {
@@ -148,6 +151,8 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase
 
 	/**
 	 * Check if the PDF is rendered and saved on disk correctly
+	 *
+	 * Belongs to Helper_PDF.php
 	 * @since 4.0
 	 */
 	public function test_process_and_save_pdf() {
@@ -166,11 +171,12 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase
 
 		/* Generate the PDF and verify it was successfull */
 		$this->assertTrue( $this->model->process_and_save_pdf( $pdf_generator ) );
-		$this->assertFileExists( $pdf_generator->get_path() . $pdf_generator->get_filename() );
+		$this->assertFileExists( $pdf_generator->get_full_pdf_path() );
 	}
 
 	/**
 	 * Check if the correct PDFs are saved on disk
+	 * Belongs to Model_PDF.php
 	 * @since 4.0
 	 */
 	public function test_maybe_save_pdf() {
@@ -193,6 +199,8 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase
 
 	/**
 	 * Test that we can successfully generate a PDF based on an entry and settings
+	 *
+	 * Belongs to View_PDF.php
 	 * @since 4.0
 	 */
 	public function test_generate_pdf() {
@@ -226,6 +234,8 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase
 
 	/**
 	 * Check if we should be always saving the PDF based on the settings
+	 *
+	 * Belongs to Model_PDF.php
 	 * @since 4.0
 	 */
 	public function test_maybe_always_save_pdf() {
@@ -274,4 +284,75 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase
 		);
 	}
 
+	/**
+	 * Verify a PDF is generated and the appropriate PDF path is returned
+	 *
+	 * Belongs to Model_PDF.php
+	 * @since 4.0
+	 */
+	public function test_generate_and_save_pdf() {
+		global $gfpdf;
+
+		/* Setup our form and entries */
+		$results = $this->create_form_and_entries();
+		$entry   = $results['entry'];
+		$fid     = $results['form']['id'];
+		$pid     = '555ad84787d7e';
+
+		/* Get our PDF */
+		$settings = $gfpdf->options->get_pdf( $fid, $pid );
+		$settings['template'] = 'zadani';
+
+		/* Generate our PDF and verify it worked correctly */
+		$filename = $this->model->generate_and_save_pdf( $entry, $settings );
+
+		$this->assertTrue( is_file( $filename ) );
+
+		if( is_file( $filename ) ) {
+			unlink( $filename );
+		}
+
+		/* Trigger an error */
+		$error = $this->model->generate_and_save_pdf( '', '' );
+
+		$this->assertTrue( is_wp_error( $error ) );
+	}
+
+	/**
+	 * Verify the appropriate variables are passed in and that a PDF is correctly generated
+	 *
+	 * Belongs to GPDFAPI class (found in api.php)
+	 * @since 4.0
+	 */
+	public function test_create_pdf() {
+		global $gfpdf;
+
+		/* Setup our form and entries */
+		$results = $this->create_form_and_entries();
+		$entry   = $results['entry'];
+		$fid     = $results['form']['id'];
+		$pid     = '555ad84787d7e';
+
+		/* Get our PDF */
+		$settings = $gfpdf->options->get_pdf( $fid, $pid );
+		$settings['template'] = 'zadani';
+
+		/* Check for $entry error first */
+		$pdf = GPDFAPI::create_pdf( '', $settings );
+		$this->assertEquals( 'invalid_entry', $pdf->get_error_code() );
+
+		/* Check for $settings error */
+		$pdf = GPDFAPI::create_pdf( $entry, '' );
+		$this->assertEquals( 'invalid_pdf_setting', $pdf->get_error_code() );
+
+		/* Create the PDF and test it was correctly generated */
+		$filename = GPDFAPI::create_pdf( $entry, $settings );
+
+		$this->assertTrue( is_file( $filename ) );
+
+		if( is_file( $filename ) ) {
+			unlink( $filename );
+		}
+
+	}
 }

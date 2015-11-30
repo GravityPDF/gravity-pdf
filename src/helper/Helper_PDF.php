@@ -361,15 +361,6 @@ class Helper_PDF {
 	}
 
 	/**
-	 * Get the current PDF Name
-	 * @return String
-	 * @since 4.0
-	 */
-	public function get_filename() {
-		return $this->filename;
-	}
-
-	/**
 	 * Get the current Gravity Form Entry
 	 * @return String
 	 * @since 4.0
@@ -386,6 +377,16 @@ class Helper_PDF {
 	public function get_settings() {
 		return $this->settings;
 	}
+
+	/**
+	 * Get the current PDF Name
+	 * @return String
+	 * @since 4.0
+	 */
+	public function get_filename() {
+		return $this->filename;
+	}
+
 	/**
 	 * Generate the PDF filename used
 	 * @return void
@@ -423,6 +424,15 @@ class Helper_PDF {
 		}
 
 		$this->path = $path;
+	}
+
+	/**
+	 * Gets the absolute path to the PDF
+	 * @return String The full path and filename of the PDF
+	 * @since 4.0
+	 */
+	public function get_full_pdf_path() {
+		return $this->get_path() . $this->get_filename();
 	}
 
 	/**
