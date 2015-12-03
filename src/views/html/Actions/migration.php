@@ -38,7 +38,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div style="font-size:15px; line-height: 25px">
 
-	<strong><?php _e( "Gravity PDF needs to migration your configuration.", 'gravity-forms-pdf-extended' ); ?></strong>
+	<strong><?php _e( "Gravity PDF needs to migrate your configuration.", 'gravity-forms-pdf-extended' ); ?></strong>
 
 	<br>
 
