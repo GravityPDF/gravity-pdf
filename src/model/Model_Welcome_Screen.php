@@ -51,32 +51,38 @@ class Model_Welcome_Screen extends Helper_Abstract_Model {
 
 	/**
 	 * @var string The capability users should have to view the page
+	 *
 	 * @since 4.0
 	 */
 	public $minimum_capability = 'manage_options';
 
 	/**
-	 * @var String The welcome page title
+	 * @var string The welcome page title
+	 *
 	 * @since 4.0
 	 */
 	public $welcome_title;
 
 	/**
-	 * @var String The updated page title
+	 * @var string The updated page title
+	 *
 	 * @since 4.0
 	 */
 	public $updated_title;
 
 	/**
 	 * Holds our log class
-	 * @var Object
+	 *
+	 * @var LoggerInterface
 	 * @since 4.0
 	 */
 	protected $log;
 
 	/**
 	 * Setup our view with the needed data and classes
+	 *
 	 * @param LoggerInterface $log Our logger class
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( LoggerInterface $log ) {
@@ -91,8 +97,8 @@ class Model_Welcome_Screen extends Helper_Abstract_Model {
 	/**
 	 * Register the Dashboard Welcome pages and then hide them so they aren't displayed in the navigation
 	 *
-	 * @access public
-	 * @since 4.0
+	 * @since  4.0
+	 *
 	 * @return void
 	 */
 	public function admin_menus() {
@@ -122,20 +128,25 @@ class Model_Welcome_Screen extends Helper_Abstract_Model {
 	/**
 	 * Because we want to hide our welcome pages (using remove_submenu_page) our page titles no longer work
 	 * This method will fix that
-	 * @param String $title The page title
+	 *
+	 * @param string $title The page title
+	 *
+	 * @return string
 	 */
 	public function add_page_title( $title ) {
 
 		switch ( rgget( 'page' ) ) {
 			case 'gfpdf-getting-started':
 				$this->log->addNotice( 'Display Welcome Screen' );
+
 				return $this->welcome_title;
-			break;
+				break;
 
 			case 'gfpdf-update':
 				$this->log->addNotice( 'Display Update Screen' );
+
 				return $this->updated_title;
-			break;
+				break;
 		}
 
 		return $title;

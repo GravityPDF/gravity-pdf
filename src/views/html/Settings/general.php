@@ -10,8 +10,8 @@
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -37,43 +37,44 @@ if (! defined('ABSPATH')) {
 ?>
 
 <?php $this->tabs(); ?>
-        
-        
+
+
 <div id="pdfextended-settings">
 	<h3>
 		<span>
-		  <i class="fa fa-cog"></i>
-		  <?php _e('General Settings', 'gravity-forms-pdf-extended' ); ?>
+		    <i class="fa fa-cog"></i>
+			<?php _e( 'General Settings', 'gravity-forms-pdf-extended' ); ?>
 		</span>
 	</h3>
 
 	<form method="post" action="options.php">
 		<?php settings_fields( 'gfpdf_settings' ); ?>
+
 		<table id="pdf-general" class="form-table">
-			<?php do_settings_fields('gfpdf_settings_general', 'gfpdf_settings_general'); ?>
+			<?php do_settings_fields( 'gfpdf_settings_general', 'gfpdf_settings_general' ); ?>
 		</table>
 
 		<div id="gfpdf-advanced-options">
 			<h3>
 				<span>
-				  <i class="fa fa-lock"></i>
-				  <?php _e('Security Settings', 'gravity-forms-pdf-extended' ); ?>
+				    <i class="fa fa-lock"></i>
+					<?php _e( 'Security Settings', 'gravity-forms-pdf-extended' ); ?>
 				</span>
 			</h3>
 
 			<table id="pdf-general-security" class="form-table">
-				<?php do_settings_fields('gfpdf_settings_general_security', 'gfpdf_settings_general_security'); ?>
+				<?php do_settings_fields( 'gfpdf_settings_general_security', 'gfpdf_settings_general_security' ); ?>
 			</table>
 		</div>
 
-		<div class="gfpdf-advanced-options"><a href="#"><?php _e('Show Advanced Options...', 'gravity-forms-pdf-extended' ); ?></a></div>
+		<div class="gfpdf-advanced-options"><a href="#"><?php _e( 'Show Advanced Options...', 'gravity-forms-pdf-extended' ); ?></a></div>
 
 		<?php
-			if($args['edit_cap']) {
+			if ( $args['edit_cap'] ) {
 				submit_button();
 			}
 		?>
 	</form>
 
-	<?php do_action('pdf-settings-general'); ?>
+	<?php do_action( 'pdf-settings-general' ); ?>
 </div>

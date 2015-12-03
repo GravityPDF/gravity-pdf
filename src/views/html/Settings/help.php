@@ -10,8 +10,8 @@
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -37,68 +37,73 @@ if (! defined('ABSPATH')) {
 ?>
 
 <?php $this->tabs(); ?>
-        
-        
+
+
 <div id="pdfextended-settings">
 	<div class="wrap about-wrap">
-	  <h1><?php _e('Getting Help With Gravity PDF', 'pdfexended'); ?></h1>
-	  <div class="about-text"><?php _e('This is your portal to find quality help, support and documentation for Gravity PDF', 'gravity-forms-pdf-extended' ); ?></div>
-	  
-	  <div id="search-knowledgebase">
-	    <div id="search-results">
-	      <div id="dashboard_primary" class="metabox-holder">
+		<h1><?php _e( 'Getting Help With Gravity PDF', 'pdfexended' ); ?></h1>
 
-	            <div id="documentation-api" class="postbox">
-	              <h3 class="hndle">
-	                <span>Documentation</span>
-	                <span class="spinner"></span>
-	              </h3>
-	              <div class="inside rss-widget">
-	              	<ul></ul>
-	              </div>
-	            </div>
+		<div class="about-text"><?php _e( 'This is your portal to find quality help, support and documentation for Gravity PDF', 'gravity-forms-pdf-extended' ); ?></div>
 
-	            <div id="forum-api" class="postbox ">
-	              <h3 class="hndle">
-	                <span>Support Forum</span>
-	                <span class="spinner"></span>
-	              </h3>
-	              <div class="inside rss-widget">
-	                <ul></ul>
-	              </div>
-	            </div>
+		<div id="search-knowledgebase">
+			<div id="search-results">
+				<div id="dashboard_primary" class="metabox-holder">
 
-	 
-	      </div><!-- close #dashboard_primary -->
-	    </div><!-- close #search-results -->
-	  </div><!-- close #search-knowledgebase -->
+					<div id="documentation-api" class="postbox">
+						<h3 class="hndle">
+							<span>Documentation</span>
+							<span class="spinner"></span>
+						</h3>
 
-	  <div class="hr-divider"></div>
-	  
-      <div id="support-wrapper" class="metabox-holder">
-	        <div class="help-container">
-	            <?php do_meta_boxes( 'pdf-help-and-support', 'row-1', '' ); ?>
-	        </div><!-- close postbox-container -->
+						<div class="inside rss-widget">
+							<ul></ul>
+						</div>
+					</div>
 
-	        <div class="help-container">
-	          	<?php do_meta_boxes( 'pdf-help-and-support', 'row-2', '' ); ?>
-	        </div><!-- close postbox-container -->
-      </div><!-- close metabox-holder -->
+					<div id="forum-api" class="postbox ">
+						<h3 class="hndle">
+							<span>Support Forum</span>
+							<span class="spinner"></span>
+						</h3>
+
+						<div class="inside rss-widget">
+							<ul></ul>
+						</div>
+					</div>
+
+
+				</div><!-- close #dashboard_primary -->
+			</div><!-- close #search-results -->
+		</div><!-- close #search-knowledgebase -->
+
+		<div class="hr-divider"></div>
+
+		<div id="support-wrapper" class="metabox-holder">
+			<div class="help-container">
+				<?php do_meta_boxes( 'pdf-help-and-support', 'row-1', '' ); ?>
+			</div><!-- close postbox-container -->
+
+			<div class="help-container">
+				<?php do_meta_boxes( 'pdf-help-and-support', 'row-2', '' ); ?>
+			</div><!-- close postbox-container -->
+		</div><!-- close metabox-holder -->
 	</div><!-- close wrap about-wrap -->
 
 
-	<?php do_action('pdf-settings-help'); ?>
+	<?php do_action( 'pdf-settings-help' ); ?>
 </div><!-- close #pdfextended-settings -->
 
 <script type="text/template" id="GravityPDFSearchResultsDocumentation">
-    <% _.each(collection, function (c) { %>
-      <li>
-        <a href="<%= c.get('link') %>" class="rsswidget"><%= c.get('terms').documentation_group[0].name %> - <%= c.get('title') %></a>
-        <div class="rssSummary"><%= c.get('excerpt') %></div>
-      </li>
-    <% }); %>
+	<% _.each(collection, function (c) { %>
+	<li>
+		<a href="<%= c.get('link') %>" class="rsswidget"><%= c.get('terms').documentation_group[0].name %> - <%=
+			c.get('title') %></a>
 
-    <% if(collection.length === 0) { %>
-      <li>No topics found for your search.</li>
-    <% } %>
+		<div class="rssSummary"><%= c.get('excerpt') %></div>
+	</li>
+	<% }); %>
+
+	<% if(collection.length === 0) { %>
+	<li>No topics found for your search.</li>
+	<% } %>
 </script>

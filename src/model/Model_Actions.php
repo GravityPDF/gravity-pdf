@@ -55,7 +55,9 @@ class Model_Actions extends Helper_Abstract_Model {
 	/**
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Data
+	 *
 	 * @since 4.0
 	 */
 	protected $data;
@@ -63,37 +65,47 @@ class Model_Actions extends Helper_Abstract_Model {
 	/**
 	 * Holds our Helper_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Options_Fields
+	 *
 	 * @since 4.0
 	 */
 	protected $options;
 
-    /**
-     * Holds our Helper_Notices object
-     * which we can use to queue up admin messages for the user
-     * @var Object Helper_Notices
-     * @since 4.0
-     */
-    protected $notices;
+	/**
+	 * Holds our Helper_Notices object
+	 * which we can use to queue up admin messages for the user
+	 *
+	 * @var \GFPDF\Helper\Helper_Notices
+	 *
+	 * @since 4.0
+	 */
+	protected $notices;
 
 	/**
 	 * Setup our class by injecting all our dependancies
-	 * @param Helper_Data    $data    Our plugin data store
-	 * @param Helper_Options $options Our options class which allows us to access any settings
-	 * @param Helper_Notices $notices Our notice class used to queue admin messages and errors
+	 *
+	 * @param \GFPDF\Helper\Helper_Data    $data    Our plugin data store
+	 * @param \GFPDF\Helper\Helper_Options $options Our options class which allows us to access any settings
+	 * @param \GFPDF\Helper\Helper_Notices $notices Our notice class used to queue admin messages and errors
+	 *
+	 * @since 4.0
 	 */
 	public function __construct( Helper_Data $data, Helper_Options $options, Helper_Notices $notices ) {
 
 		/* Assign our internal variables */
 		$this->data    = $data;
 		$this->options = $options;
-        $this->notices = $notices;
+		$this->notices = $notices;
 	}
 
 	/**
 	 * Check if the current notice has already been dismissed
-	 * @param  String $type The current notice ID
+	 *
+	 * @param  string $type The current notice ID
+	 *
 	 * @return boolean       True if dismissed, false otherwise
+	 *
 	 * @since 4.0
 	 */
 	public function is_notice_already_dismissed( $type ) {
@@ -109,13 +121,16 @@ class Model_Actions extends Helper_Abstract_Model {
 
 	/**
 	 * Mark the current notice as being dismissed
-	 * @param  String $type The current notice ID
+	 *
+	 * @param  string $type The current notice ID
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	public function dismiss_notice( $type ) {
 
-		$dismissed_notices = $this->options->get_option( 'action_dismissal', array() );
+		$dismissed_notices          = $this->options->get_option( 'action_dismissal', array() );
 		$dismissed_notices[ $type ] = $type;
 		$this->options->update_option( 'action_dismissal', $dismissed_notices );
 	}
@@ -123,7 +138,9 @@ class Model_Actions extends Helper_Abstract_Model {
 	/**
 	 * Check if our review notice condition has been met
 	 * A review will only display if more than 100 PDFs have been generated
-	 * @return Boolean
+	 *
+	 * @return boolean
+	 *
 	 * @since 4.0
 	 */
 	public function review_condition() {
@@ -139,7 +156,9 @@ class Model_Actions extends Helper_Abstract_Model {
 
 	/**
 	 * Check if our v3 configuration file exists
-	 * @return Boolean
+	 *
+	 * @return boolean
+	 *
 	 * @since 4.0
 	 */
 	public function migration_condition() {
@@ -151,13 +170,13 @@ class Model_Actions extends Helper_Abstract_Model {
 
 		/* Check multisite installation */
 		if ( is_multisite() && is_super_admin() ) {
-			if( is_file( $this->data->multisite_template_location . 'configuration.php' ) ) {
+			if ( is_file( $this->data->multisite_template_location . 'configuration.php' ) ) {
 				return true;
 			} else {
 				/* Check other multisites for a config file */
 				$sites = wp_get_sites();
-				foreach( $sites as $site ) {
-					if( is_file( $this->data->template_location . '/' . $site['blog_id'] . '/configuration.php' ) ) {
+				foreach ( $sites as $site ) {
+					if ( is_file( $this->data->template_location . '/' . $site['blog_id'] . '/configuration.php' ) ) {
 						return true;
 					}
 				}
@@ -169,27 +188,29 @@ class Model_Actions extends Helper_Abstract_Model {
 
 	/**
 	 * Process our v3 to v4 migration
-	 * @return Boolean
+	 *
+	 * @return boolean
+	 *
 	 * @since 4.0
 	 */
 	public function begin_migration() {
 
-		if( is_multisite() ) {
+		if ( is_multisite() ) {
 
 			/* Verify we have a site to migrate */
 			$sites = wp_get_sites();
 			$found = false;
 
-			foreach( $sites as $site ) {
+			foreach ( $sites as $site ) {
 				$site_config = $this->data->template_location . '/' . $site['blog_id'] . '/';
 
-				if( is_file( $site_config . 'configuration.php' ) ) {
+				if ( is_file( $site_config . 'configuration.php' ) ) {
 					$found = true;
 					break;
 				}
 			}
 
-			if( $found ) {
+			if ( $found ) {
 				/* Remove all notices to prevent any messages showing up on the migration screen */
 				remove_all_actions( 'network_admin_notices' );
 				remove_all_actions( 'admin_notices' );
@@ -202,24 +223,26 @@ class Model_Actions extends Helper_Abstract_Model {
 				wp_enqueue_script( 'gfpdf_js_v3_migration' );
 			}
 
-		} else if( is_file( $this->data->template_location . 'configuration.php' ) ) {
-				$this->migrate_v3( $this->data->template_location );
+		} else if ( is_file( $this->data->template_location . 'configuration.php' ) ) {
+			$this->migrate_v3( $this->data->template_location );
 		}
 	}
 
 	/**
 	 * Does the migration and notice clearing (if unsuccessful)
-	 * @param  Helper_Migration $migration [description]
-	 * @param  String           $path      Path to the current site's template directory
-	 * @return Boolean
-	 * @since  4.0
+	 *
+	 * @param  string $path Path to the current site's template directory
+	 *
+	 * @return boolean
+	 *
+	 * @since    4.0
 	 */
 	private function migrate_v3( $path ) {
 		global $gfpdf;
 
 		$migration = new Helper_Migration( $gfpdf->form, $gfpdf->log, $this->data, $this->options, $gfpdf->misc, $gfpdf->notices );
 
-		if( $migration->begin_migration() ) {
+		if ( $migration->begin_migration() ) {
 
 			/**
 			 * Migration Successful.
@@ -248,7 +271,7 @@ class Model_Actions extends Helper_Abstract_Model {
 
 		$args = array(
 			'multisite_ids'    => $this->get_multisite_ids_with_v3_config(),
-			'current_page_url' => add_query_arg( NULL, NULL ),
+			'current_page_url' => add_query_arg( null, null ),
 			'gf_forms_url'     => admin_url( 'admin.php?page=gf_edit_forms' ),
 		);
 		$controller->view->begin_multisite_migration( $args );
@@ -257,17 +280,19 @@ class Model_Actions extends Helper_Abstract_Model {
 
 	/**
 	 * Return an array of mulitsite blog IDs which have a v3 config
-	 * @return Array
+	 *
+	 * @return array
+	 *
 	 * @since  4.0
 	 */
 	private function get_multisite_ids_with_v3_config() {
-		$sites = wp_get_sites();
+		$sites    = wp_get_sites();
 		$blog_ids = array();
 
-		foreach( $sites as $site ) {
+		foreach ( $sites as $site ) {
 			$site_config = $this->data->template_location . '/' . $site['blog_id'] . '/';
 
-			if( is_file( $site_config . 'configuration.php' ) ) {
+			if ( is_file( $site_config . 'configuration.php' ) ) {
 				$blog_ids[] = $site['blog_id'];
 			}
 		}
@@ -277,22 +302,27 @@ class Model_Actions extends Helper_Abstract_Model {
 
 	/**
 	 * AJAX Endpoint for migrating each multisite to our v4 config
-	 * @param $_POST['nonce'] a valid nonce
-	 * @param $_POST['blog_id'] a valid site ID
-	 * @since 4.0
+	 *
+	 * @internal param $_POST ['nonce'] a valid nonce
+	 * @internal param $_POST ['blog_id'] a valid site ID
+	 *
+	 * @since    4.0
 	 */
 	public function ajax_multisite_v3_migration() {
 		global $gfpdf;
 
-		$gfpdf->log->addNotice( 'Running AJAX Endpoint', array( 'type' => 'Multisite v3 to v4 config', 'post' => $_POST ) );
+		$gfpdf->log->addNotice( 'Running AJAX Endpoint', array(
+			'type' => 'Multisite v3 to v4 config',
+			'post' => $_POST,
+		) );
 
 		/* prevent unauthorized access */
 		if ( ! is_multisite() || ! is_super_admin() ) {
 
 			$gfpdf->log->addCritical( 'Lack of User Capabilities.', array(
-				'user'      => wp_get_current_user(),
-				'user_meta' => get_user_meta( get_current_user_id() ),
-				'multisite' => is_multisite(),
+				'user'        => wp_get_current_user(),
+				'user_meta'   => get_user_meta( get_current_user_id() ),
+				'multisite'   => is_multisite(),
 				'super_admin' => is_super_admin(),
 			) );
 
@@ -317,7 +347,7 @@ class Model_Actions extends Helper_Abstract_Model {
 		/* Check if we have a config file that should be migrated */
 		$path = $this->data->template_location . '/' . $blog_id . '/';
 
-		if( ! is_file( $path . 'configuration.php' ) ) {
+		if ( ! is_file( $path . 'configuration.php' ) ) {
 
 			$return = array(
 				'error' => sprintf( __( 'No configuration.php file found for site #%s', 'gravity-forms-pdf-extended' ), $blog_id ),
@@ -335,7 +365,7 @@ class Model_Actions extends Helper_Abstract_Model {
 		$this->data->multisite_template_location = $path;
 
 		/* Do migration */
-		if( $this->migrate_v3( $path ) ) {
+		if ( $this->migrate_v3( $path ) ) {
 			echo json_encode( array( 'results' => 'complete' ) );
 			wp_die();
 		} else {

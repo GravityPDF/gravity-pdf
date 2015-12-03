@@ -10,8 +10,8 @@
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -38,74 +38,72 @@ if (! defined('ABSPATH')) {
 
 <div class="hr-divider"></div>
 
-    <h3>
-        <span>
-            <i class="fa fa-dashboard"></i>
-            <?php _e('Installation Status', 'gravity-forms-pdf-extended' ); ?>
-        </span>
-    </h3>
+<h3>
+    <span>
+        <i class="fa fa-dashboard"></i>
+        <?php _e( 'Installation Status', 'gravity-forms-pdf-extended' ); ?>
+    </span>
+</h3>
 
-    <table id="pdf-system-status" class="form-table">
+<table id="pdf-system-status" class="form-table">
+	<tr>
+		<th scope="row">
+			<?php _e( 'WP Memory Available', 'gravity-forms-pdf-extended' ); ?><?php gform_tooltip( 'pdf_status_wp_memory' ); ?>
+		</th>
 
-        <tr>
-            <th scope="row">
-                <?php _e('WP Memory Available', 'gravity-forms-pdf-extended' ); ?> <?php gform_tooltip('pdf_status_wp_memory'); ?>
-            </th>
+		<td>
 
-            <td>
+			<?php
+				$ram_icon = 'fa fa-check-circle';
+				if ( $args['memory'] < 128 && $args['memory'] !== -1 ) {
+					$ram_icon = 'fa fa-exclamation-triangle';
+				}
+			?>
 
-                <?php
-                $ram_icon = 'fa fa-check-circle';
-                if($args['memory'] < 128 && $args['memory'] !== -1) {
-                    $ram_icon = 'fa fa-exclamation-triangle';
-                }
-                ?>
+			<?php if ( $args['memory'] === -1 ): ?>
+				<?php echo __( 'Unlimited', 'gravity-forms-pdf-extended' ); ?>
+			<?php else: ?>
+				<?php echo $args['memory']; ?>MB
+			<?php endif; ?>
 
-                <?php if($args['memory'] === -1): ?>
-                    <?php echo __('Unlimited', 'gravity-forms-pdf-extended' ); ?>
-                <?php else: ?>
-                    <?php echo $args['memory']; ?>MB
-                <?php endif; ?>
+			<span class="<?php echo $ram_icon; ?>"></span>
 
-                <span class="<?php echo $ram_icon; ?>"></span>
-
-                <?php if($args['memory'] < 128 && $args['memory'] !== -1): ?>
-                
-                <span class="gf_settings_description">
-                    <?php echo sprintf(__('We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. %sFind out how to increase this limit%s.', 'gravity-forms-pdf-extended' ), '<br /><a href="#">', '</a>'); /* @todo - UPDATE LINK - see http://docs.woothemes.com/document/increasing-the-wordpress-memory-limit/ for example */ ?>
+			<?php if ( $args['memory'] < 128 && $args['memory'] !== -1 ): ?>
+				<span class="gf_settings_description">
+                    <?php echo sprintf( __( 'We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. %sFind out how to increase this limit%s.', 'gravity-forms-pdf-extended' ), '<br /><a href="#">', '</a>' ); /* @todo - UPDATE LINK - see http://docs.woothemes.com/document/increasing-the-wordpress-memory-limit/ for example */ ?>
                 </span>
-                <?php endif; ?>
-            </td>
-        </tr>
+			<?php endif; ?>
+		</td>
+	</tr>
 
-        <tr>
-            <th scope="row">
-                <?php _e('WordPress Version', 'gravity-forms-pdf-extended' ); ?>
-            </th>
+	<tr>
+		<th scope="row">
+			<?php _e( 'WordPress Version', 'gravity-forms-pdf-extended' ); ?>
+		</th>
 
-            <td>
-                <?php echo $args['wp']; ?>
-            </td>
-        </tr>
+		<td>
+			<?php echo $args['wp']; ?>
+		</td>
+	</tr>
 
-        <tr>
-            <th scope="row">
-                <?php _e('Gravity Forms Version', 'gravity-forms-pdf-extended' ); ?>
-            </th>
+	<tr>
+		<th scope="row">
+			<?php _e( 'Gravity Forms Version', 'gravity-forms-pdf-extended' ); ?>
+		</th>
 
-            <td>
-                <?php echo $args['gf']; ?>
-            </td>
-        </tr>
+		<td>
+			<?php echo $args['gf']; ?>
+		</td>
+	</tr>
 
-        <tr>
-            <th scope="row">
-                <?php _e('PHP Version', 'gravity-forms-pdf-extended' ); ?>
-            </th>
+	<tr>
+		<th scope="row">
+			<?php _e( 'PHP Version', 'gravity-forms-pdf-extended' ); ?>
+		</th>
 
-            <td>
-                <?php echo $args['php']; ?>
-            </td>
-        </tr>
+		<td>
+			<?php echo $args['php']; ?>
+		</td>
+	</tr>
 
-    </table>
+</table>

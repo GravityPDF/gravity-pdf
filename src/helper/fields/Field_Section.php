@@ -50,17 +50,23 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Section extends Helper_Abstract_Fields
-{
+class Field_Section extends Helper_Abstract_Fields {
 
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
-	 * @param Object $field The GF_Field_* Object
-	 * @param Array  $entry The Gravity Forms Entry
+	 *
+	 * @param object               $field The GF_Field_* Object
+	 * @param array                $entry The Gravity Forms Entry
+	 *
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
+	 * @param \GFPDF\Helper\Helper_Misc          $misc
+	 *
+	 * @throws Exception
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( $field, $entry, Helper_Abstract_Form $form, Helper_Misc $misc ) {
-		
+
 		if ( ! is_object( $field ) || ! $field instanceof GF_Field_Section ) {
 			throw new Exception( '$field needs to be in instance of GF_Field_Section' );
 		}
@@ -71,8 +77,8 @@ class Field_Section extends Helper_Abstract_Fields
 
 	/**
 	 * Used to check if the current field has a value
-	 * @since 4.0
-	 * @internal Child classes can override this method when dealing with a specific use case
+	 *
+	 * @since    4.0
 	 */
 	public function is_empty() {
 		if ( GFCommon::is_section_empty( $this->field, $this->form, $this->entry ) ) {
@@ -84,7 +90,9 @@ class Field_Section extends Helper_Abstract_Fields
 
 	/**
 	 * Return the HTML form data
-	 * @return Array
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public function form_data() {
@@ -98,18 +106,23 @@ class Field_Section extends Helper_Abstract_Fields
 
 	/**
 	 * Display the HTML version of this field
-	 * @return String
+	 *
+	 * @param string $value
+	 * @param bool   $label
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
 		/* sanitize the HTML */
 		$section = $this->value(); /* allow the same HTML as per the post editor */
 
-		$html    = '<div id="field-'. $this->field->id .'" class="gfpdf-section-title gfpdf-field">';
-		$html    .= '<h3>' . esc_html( $section['title'] ) .'</h3>';
+		$html = '<div id="field-' . $this->field->id . '" class="gfpdf-section-title gfpdf-field">';
+		$html .= '<h3>' . esc_html( $section['title'] ) . '</h3>';
 
-		if ( ! empty($value) ) {
-			$html .= '<div id="field-'. $this->field->id .'-desc" class="gfpdf-section-description gfpdf-field">' . wp_kses( $section['description'], $this->misc->get_allowed_html_tags() ) . '</div>';
+		if ( ! empty( $value ) ) {
+			$html .= '<div id="field-' . $this->field->id . '-desc" class="gfpdf-section-description gfpdf-field">' . wp_kses( $section['description'], $this->misc->get_allowed_html_tags() ) . '</div>';
 		}
 
 		$html .= '</div>';
@@ -119,7 +132,9 @@ class Field_Section extends Helper_Abstract_Fields
 
 	/**
 	 * Get the standard GF value of this field
-	 * @return String/Array
+	 *
+	 * @return string|array
+	 *
 	 * @since 4.0
 	 */
 	public function value() {
@@ -127,10 +142,10 @@ class Field_Section extends Helper_Abstract_Fields
 			return $this->cache();
 		}
 
-		$this->cache(array(
+		$this->cache( array(
 			'title'       => $this->field->label,
 			'description' => $this->field->description,
-		));
+		) );
 
 		return $this->cache();
 	}

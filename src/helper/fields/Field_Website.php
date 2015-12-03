@@ -50,17 +50,23 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Website extends Helper_Abstract_Fields
-{
+class Field_Website extends Helper_Abstract_Fields {
 
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
-	 * @param Object $field The GF_Field_* Object
-	 * @param Array  $entry The Gravity Forms Entry
+	 *
+	 * @param object               $field The GF_Field_* Object
+	 * @param array                $entry The Gravity Forms Entry
+	 *
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
+	 * @param \GFPDF\Helper\Helper_Misc          $misc
+	 *
+	 * @throws Exception
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( $field, $entry, Helper_Abstract_Form $form, Helper_Misc $misc ) {
-		
+
 		if ( ! is_object( $field ) || ! $field instanceof GF_Field_Website ) {
 			throw new Exception( '$field needs to be in instance of GF_Field_Website' );
 		}
@@ -71,20 +77,27 @@ class Field_Website extends Helper_Abstract_Fields
 
 	/**
 	 * Display the HTML version of this field
-	 * @return String
+	 *
+	 * @param string $value
+	 * @param bool   $label
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
-		$value  = $this->value();
+		$value = $this->value();
 
-		$output = ( GFCommon::is_valid_url( $value ) ) ? '<a href="'. esc_url( $value ) .'" target="_blank">'. esc_html( $value ) .'</a>' : esc_html( $value );
+		$output = ( GFCommon::is_valid_url( $value ) ) ? '<a href="' . esc_url( $value ) . '" target="_blank">' . esc_html( $value ) . '</a>' : esc_html( $value );
 
 		return parent::html( $output );
 	}
 
 	/**
 	 * Get the standard GF value of this field
-	 * @return String/Array
+	 *
+	 * @return string|array
+	 *
 	 * @since 4.0
 	 */
 	public function value() {

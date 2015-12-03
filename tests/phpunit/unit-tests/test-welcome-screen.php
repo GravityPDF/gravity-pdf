@@ -39,35 +39,42 @@ use WP_UnitTestCase;
 
 /**
  * Test the model / view / controller for the Welcome Screen
+ *
  * @since 4.0
  * @group welcome-screen
  */
-class Test_Welcome_Screen extends WP_UnitTestCase
-{
+class Test_Welcome_Screen extends WP_UnitTestCase {
 
 	/**
 	 * Our Welcome Screen Controller
-	 * @var Object
+	 *
+	 * @var \GFPDF\Controller\Controller_Welcome_Screen
+	 *
 	 * @since 4.0
 	 */
 	public $controller;
 
 	/**
 	 * Our Welcome Screen Model
-	 * @var Object
+	 *
+	 * @var \GFPDF\Model\Model_Welcome_Screen
+	 *
 	 * @since 4.0
 	 */
 	public $model;
 
 	/**
 	 * Our Welcome Screen View
-	 * @var Object
+	 *
+	 * @var \GFPDF\View\View_Welcome_Screen
+	 *
 	 * @since 4.0
 	 */
 	public $view;
 
 	/**
 	 * The WP Unit Test Set up function
+	 *
 	 * @since 4.0
 	 */
 	public function setUp() {
@@ -88,6 +95,7 @@ class Test_Welcome_Screen extends WP_UnitTestCase
 
 	/**
 	 * Test the appropriate actions are set up
+	 *
 	 * @since 4.0
 	 */
 	public function test_actions() {
@@ -97,6 +105,7 @@ class Test_Welcome_Screen extends WP_UnitTestCase
 
 	/**
 	 * Test the appropriate filters are set up
+	 *
 	 * @since 4.0
 	 */
 	public function test_filters() {
@@ -105,6 +114,7 @@ class Test_Welcome_Screen extends WP_UnitTestCase
 
 	/**
 	 * Test the getting started page loads correctly
+	 *
 	 * @since 4.0
 	 */
 	public function test_getting_started_screen() {
@@ -118,6 +128,7 @@ class Test_Welcome_Screen extends WP_UnitTestCase
 
 	/**
 	 * Test the update page loads correctly
+	 *
 	 * @since 4.0
 	 */
 	public function test_update_screen() {
@@ -131,6 +142,7 @@ class Test_Welcome_Screen extends WP_UnitTestCase
 
 	/**
 	 * Check our welcome and update admin menus are correctly added
+	 *
 	 * @since 4.0
 	 */
 	public function test_admin_menus() {
@@ -146,6 +158,7 @@ class Test_Welcome_Screen extends WP_UnitTestCase
 
 	/**
 	 * Check the page titles load correctly
+	 *
 	 * @since 4.0
 	 */
 	public function test_add_page_title() {

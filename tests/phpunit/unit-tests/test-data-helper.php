@@ -39,120 +39,163 @@ use StdClass;
 
 /**
  * Test the PSR-4 Autoloader Implimentation
+ *
  * @since 4.0
  * @group data-helper
  */
-class Test_Data_Helper extends WP_UnitTestCase
-{
-    /**
-     * Our Gravity PDF Data object
-     * @var Object
-     * @since 4.0
-     */
-    public $data;
+class Test_Data_Helper extends WP_UnitTestCase {
+	/**
+	 * Our Gravity PDF Data object
+	 *
+	 * @var \GFPDF\Helper\Helper_Data
+	 *
+	 * @since 4.0
+	 */
+	public $data;
 
-    /**
-     * The WP Unit Test Set up function
-     * @since 4.0
-     */
-    public function setUp() {
-        /* run parent method */
-        parent::setUp();
+	/**
+	 * The WP Unit Test Set up function
+	 *
+	 * @since 4.0
+	 */
+	public function setUp() {
+		/* run parent method */
+		parent::setUp();
 
-        /* Setup out loader class */
-        $this->data = new Helper_Data();
-    }
+		/* Setup out loader class */
+		$this->data = new Helper_Data();
+	}
 
-    /**
-     * Check if our getter / setter is functional with different data types
-     * @since 4.0
-     * @dataProvider provider_setter
-     */
-    public function test_setter($key, $val)  {
-        $this->data->$key = $val;
+	/**
+	 * Check if our getter / setter is functional with different data types
+	 *
+	 * @since        4.0
+	 *
+	 * @dataProvider provider_setter
+	 */
+	public function test_setter( $key, $val ) {
+		$this->data->$key = $val;
 
-        $result = $this->data->$key;
+		$result = $this->data->$key;
 
-        $this->assertSame($result, $val);
-    }
+		$this->assertSame( $result, $val );
+	}
 
-    /**
-     * Check if our isset and unset magic methods work correctly
-     * @since 4.0
-     * @dataProvider provider_setter
-     */
-    public function test_isset($key, $val) {
-        /* check data is empty */
-        $this->assertFalse(isset($this->data->$key));
+	/**
+	 * Check if our isset and unset magic methods work correctly
+	 *
+	 * @since        4.0
+	 *
+	 * @dataProvider provider_setter
+	 */
+	public function test_isset( $key, $val ) {
+		/* check data is empty */
+		$this->assertFalse( isset( $this->data->$key ) );
 
-        $this->data->$key = $val;
+		$this->data->$key = $val;
 
-        /* check data exists */
-        $this->assertTrue(isset($this->data->$key));
+		/* check data exists */
+		$this->assertTrue( isset( $this->data->$key ) );
 
-        unset($this->data->$key);
+		unset( $this->data->$key );
 
-        /* check data is empty after unset */
-        $this->assertFalse(isset($this->data->$key));
-    }
+		/* check data is empty after unset */
+		$this->assertFalse( isset( $this->data->$key ) );
+	}
 
-    /**
-     * Ensure data accessed is returned by reference
-     * @since 4.0
-     */
-    public function test_by_reference() {
-        /* set up data */
-        $this->data->item = 'Reference';
+	/**
+	 * Ensure data accessed is returned by reference
+	 *
+	 * @since 4.0
+	 */
+	public function test_by_reference() {
+		/* set up data */
+		$this->data->item = 'Reference';
 
-        /* assign item, returned by reference and setup so $item refers to $data->item */
-        $item = &$this->data->item;
+		/* assign item, returned by reference and setup so $item refers to $data->item */
+		$item = &$this->data->item;
 
-        /* update initial data object */
-        $this->data->item = 'Reference Working';
+		/* update initial data object */
+		$this->data->item = 'Reference Working';
 
-        /* ensure item correctly matches */
-        $this->assertEquals('Reference Working', $item);
-    }
+		/* ensure item correctly matches */
+		$this->assertEquals( 'Reference Working', $item );
+	}
 
-    /**
-     * A data provider used to check the getter / setter functionality is working correctly
-     * @return Array Our test data
-     * @since 4.0
-     */
-    public function provider_setter() {
-        $object = new StdClass();
-        $object->item = 'This';
-        $object->function = function() {
-            return false;
-        };
+	/**
+	 * A data provider used to check the getter / setter functionality is working correctly
+	 *
+	 * @return array Our test data
+	 *
+	 * @since 4.0
+	 */
+	public function provider_setter() {
+		$object           = new StdClass();
+		$object->item     = 'This';
+		$object->function = function () {
+			return false;
+		};
 
-        return array(
-            array('test', 'This is my test data'),
-            array('item1', 20),
-            array('array', array(
-                'one', 'two', 'three',
-            )),
-            array('object', new StdClass()),
-            array('object2', $object),
-            array('boolean', true),
-            array('boolean2', false),
-            array('float', 12.2324),
-            array('float2', 0.24),
-        );
-    }
+		return array(
+			array( 'test', 'This is my test data' ),
+			array( 'item1', 20 ),
+			array(
+				'array',
+				array(
+					'one',
+					'two',
+					'three',
+				),
+			),
+			array( 'object', new StdClass() ),
+			array( 'object2', $object ),
+			array( 'boolean', true ),
+			array( 'boolean2', false ),
+			array( 'float', 12.2324 ),
+			array( 'float2', 0.24 ),
+		);
+	}
 
-    /**
-     * Test the localised script data
-     * @since 4.0
-     */
-    public function test_localised_script() {
-        global $gfpdf;
+	/**
+	 * Test the localised script data
+	 *
+	 * @since 4.0
+	 */
+	public function test_localised_script() {
+		global $gfpdf;
 
-        $localised_data = $this->data->get_localised_script_data( $gfpdf->options, $gfpdf->form );
-        $required_keys = array( 'ajaxurl', 'GFbaseUrl', 'pluginUrl', 'spinnerUrl', 'spinnerAlt', 'general_advanced_show', 'general_advanced_hide', 'tools_template_copy_confirm', 'tools_uninstall_confirm', 'tools_cancel', 'pdf_list_delete_confirm', 'active', 'inactive', 'conditionalText', 'help_search_placeholder', 'ajax_error', 'update_success', 'delete_success', 'custom_fonts', 'no', 'yes', 'standard', 'migration_start', 'migration_complete', 'migration_error_specific', 'migration_error_generic' );
+		$localised_data = $this->data->get_localised_script_data( $gfpdf->options, $gfpdf->form );
+		$required_keys  = array(
+			'ajaxurl',
+			'GFbaseUrl',
+			'pluginUrl',
+			'spinnerUrl',
+			'spinnerAlt',
+			'general_advanced_show',
+			'general_advanced_hide',
+			'tools_template_copy_confirm',
+			'tools_uninstall_confirm',
+			'tools_cancel',
+			'pdf_list_delete_confirm',
+			'active',
+			'inactive',
+			'conditionalText',
+			'help_search_placeholder',
+			'ajax_error',
+			'update_success',
+			'delete_success',
+			'custom_fonts',
+			'no',
+			'yes',
+			'standard',
+			'migration_start',
+			'migration_complete',
+			'migration_error_specific',
+			'migration_error_generic',
+		);
 
-        foreach( $required_keys as $key ) {
-            $this->assertArrayHasKey( $key, $localised_data );
-        }
-    }
+		foreach ( $required_keys as $key ) {
+			$this->assertArrayHasKey( $key, $localised_data );
+		}
+	}
 }

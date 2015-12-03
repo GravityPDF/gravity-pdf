@@ -6,6 +6,8 @@ use GFPDF\Helper\Helper_Abstract_Fields;
 
 use GFFormsModel;
 
+use Exception;
+
 /**
  * Gravity Forms Field
  *
@@ -45,12 +47,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Quiz extends Helper_Abstract_Fields
-{
+class Field_Quiz extends Helper_Abstract_Fields {
 
 	/**
 	 * Return the HTML form data
-	 * @return Array
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public function form_data() {
@@ -59,9 +62,9 @@ class Field_Quiz extends Helper_Abstract_Fields
 		$label = GFFormsModel::get_label( $this->field );
 		$data  = array();
 
-		$data['field'][ $this->field->id . '.' . $label ]           = $value;
-		$data['field'][ $this->field->id ]                          = $value;
-		$data['field'][ $label ]                                    = $value;
+		$data['field'][ $this->field->id . '.' . $label ] = $value;
+		$data['field'][ $this->field->id ]                = $value;
+		$data['field'][ $label ]                          = $value;
 
 		/* Backwards compatible */
 		$data['field'][ $this->field->id . '.' . $label . '_name' ] = $value;
@@ -73,14 +76,19 @@ class Field_Quiz extends Helper_Abstract_Fields
 
 	/**
 	 * Display the HTML version of this field
-	 * @return String
+	 *
+	 * @param string $value
+	 * @param bool   $label
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
 		$value = apply_filters( 'gform_entry_field_value', $this->get_value(), $this->field, $this->entry, $this->form );
 
 		/* Return early to prevent any problems with when field is empty or the quiz plugin isn't enabled */
-		if( ! class_exists( 'GFQuiz' ) || ! is_string( $value ) || trim( $value ) == false ) {
+		if ( ! class_exists( 'GFQuiz' ) || ! is_string( $value ) || trim( $value ) == false ) {
 			return parent::html( '' );
 		}
 
@@ -90,7 +98,7 @@ class Field_Quiz extends Helper_Abstract_Fields
 		 */
 		try {
 			$value = htmlqp( $value, 'img' )->addClass( 'gf-quiz-img' )->top( 'body' )->innerHTML();
-		} catch (Exception $e) {
+		} catch ( Exception $e ) {
 			$value = str_replace( '<img ', '<img class="gf-quiz-img" ', $value );
 		}
 
@@ -99,7 +107,9 @@ class Field_Quiz extends Helper_Abstract_Fields
 
 	/**
 	 * Get the standard GF value of this field
-	 * @return String/Array
+	 *
+	 * @return string|array
+	 *
 	 * @since 4.0
 	 */
 	public function value() {
@@ -110,7 +120,7 @@ class Field_Quiz extends Helper_Abstract_Fields
 				return array(
 					'text'      => $choice['text'],
 					'isCorrect' => $choice['gquizIsCorrect'],
-					'weight'    => (isset($choice['gquizWeight'])) ? $choice['gquizWeight'] : '',
+					'weight'    => ( isset( $choice['gquizWeight'] ) ) ? $choice['gquizWeight'] : '',
 				);
 			}
 		}

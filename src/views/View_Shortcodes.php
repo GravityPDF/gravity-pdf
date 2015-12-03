@@ -40,20 +40,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Controls the Gravity PDF Shortcode View / Display
+ *
  * @since 4.0
  */
-class View_Shortcodes extends Helper_Abstract_View
-{
+class View_Shortcodes extends Helper_Abstract_View {
+
 	/**
 	 * Set the view's name
+	 *
 	 * @var string
+	 *
 	 * @since 4.0
 	 */
 	protected $ViewType = 'Shortcodes';
 
 	/**
 	 * Shortcode Error: Entry ID not passed through the shortcode - directly or through the URL.
-	 * @return String The error message
+	 *
+	 * @return string The error message
+	 *
 	 * @since 4.0
 	 */
 	public function no_entry_id() {
@@ -62,7 +67,9 @@ class View_Shortcodes extends Helper_Abstract_View
 
 	/**
 	 * Shortcode Error: Entry ID, Form ID or PDF ID mismatch. Cannot get PDF configuration.
-	 * @return String The error message
+	 *
+	 * @return string The error message
+	 *
 	 * @since 4.0
 	 */
 	public function invalid_pdf_config() {
@@ -71,7 +78,9 @@ class View_Shortcodes extends Helper_Abstract_View
 
 	/**
 	 * Shortcode Error: PDF configuration not active
-	 * @return String The error message
+	 *
+	 * @return string The error message
+	 *
 	 * @since 4.0
 	 */
 	public function pdf_not_active() {
@@ -80,7 +89,9 @@ class View_Shortcodes extends Helper_Abstract_View
 
 	/**
 	 * Shortcode Error: PDF Conditional Logic not met
-	 * @return String The error message
+	 *
+	 * @return string The error message
+	 *
 	 * @since 4.0
 	 */
 	public function conditional_logic_not_met() {
@@ -89,8 +100,12 @@ class View_Shortcodes extends Helper_Abstract_View
 
 	/**
 	 * Generate the Gravity PDF link
-	 * @param  Array $attr The parameters
-	 * @return String       The Shortcode Markup
+	 *
+	 * @param  array $attr The parameters
+	 *
+	 * @return string       The Shortcode Markup
+	 *
+	 * @since 4.0
 	 */
 	public function display_gravitypdf_shortcode( $attr ) {
 		return $this->load( 'gravitypdf', $attr, false );

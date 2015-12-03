@@ -4,8 +4,6 @@ namespace GFPDF\Helper\Fields;
 
 use GFPDF\Helper\Helper_Abstract_Fields;
 
-use Exception;
-
 /**
  * Gravity Forms Field
  *
@@ -45,19 +43,18 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Likert extends Helper_Abstract_Fields
-{
+class Field_Likert extends Helper_Abstract_Fields {
 
 	/**
 	 * Used to check if the current field has a value
-	 * @since 4.0
-	 * @internal Child classes can override this method when dealing with a specific use case
+	 *
+	 * @since    4.0
 	 */
 	public function is_empty() {
 
 		$value = $this->value();
 
-		if ( isset($value['row']) ) { /* Check for single row likerts */
+		if ( isset( $value['row'] ) ) { /* Check for single row likerts */
 			if ( sizeof( array_filter( $value['row'] ) ) === 0 ) { /* if empty */
 				return true;
 			}
@@ -81,12 +78,14 @@ class Field_Likert extends Helper_Abstract_Fields
 
 	/**
 	 * Return the HTML form data
-	 * @return Array
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public function form_data() {
 
-		$data = array();
+		$data  = array();
 		$value = $this->value();
 
 		$data['survey']['likert'][ $this->field->id ] = $value;
@@ -96,14 +95,19 @@ class Field_Likert extends Helper_Abstract_Fields
 
 	/**
 	 * Display the HTML version of this field
-	 * @return String
+	 *
+	 * @param string $value
+	 * @param bool   $label
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
 		$value = apply_filters( 'gform_entry_field_value', $this->get_value(), $this->field, $this->entry, $this->form );
 
 		/* Return early to prevent unwanted details being displayed when the plugin isn't enabled */
-		if( ! class_exists( 'GFSurvey' ) ) {
+		if ( ! class_exists( 'GFSurvey' ) ) {
 			return parent::html( '' );
 		}
 
@@ -112,7 +116,9 @@ class Field_Likert extends Helper_Abstract_Fields
 
 	/**
 	 * Get the standard GF value of this field
-	 * @return String/Array
+	 *
+	 * @return string|array
+	 *
 	 * @since 4.0
 	 */
 	public function value() {
@@ -129,7 +135,7 @@ class Field_Likert extends Helper_Abstract_Fields
          * Get the column names
          */
 		foreach ( $this->field->choices as $column ) {
-			$likert['col'][$column['value']] = $column['text'];
+			$likert['col'][ $column['value'] ] = $column['text'];
 		}
 
 		/**
@@ -144,7 +150,7 @@ class Field_Likert extends Helper_Abstract_Fields
 					/* check if user selected this likert value */
 					$data = rgar( $this->entry, $row['id'] );
 
-					$likert['rows'][$row['label']][$text] = ( ($row['name'] . ':' . $id) == $data) ? 'selected' : '';
+					$likert['rows'][ $row['label'] ][ $text ] = ( ( $row['name'] . ':' . $id ) == $data ) ? 'selected' : '';
 				}
 			}
 		} else { /* Handle our single-row likert */
@@ -153,7 +159,7 @@ class Field_Likert extends Helper_Abstract_Fields
 			$data = rgar( $this->entry, $this->field->id );
 			foreach ( $likert['col'] as $id => $text ) {
 				/* check if user selected this likert value */
-				$likert['row'][$text] = ($id == $data) ? 'selected' : '';
+				$likert['row'][ $text ] = ( $id == $data ) ? 'selected' : '';
 			}
 		}
 

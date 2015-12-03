@@ -6,8 +6,6 @@ use GFPDF\Helper\Helper_Abstract_Fields;
 
 use GFFormsModel;
 
-use Exception;
-
 /**
  * Gravity Forms Field
  *
@@ -47,25 +45,30 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Signature extends Helper_Abstract_Fields
-{
+class Field_Signature extends Helper_Abstract_Fields {
 
 	/**
 	 * Display the HTML version of this field
-	 * @return String
+	 *
+	 * @param string $value
+	 * @param bool   $label
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
 		$value = $this->value();
 
-		$output = ( ! $this->is_empty()) ? $value['img'] : ''; /* prevents image loading error when non existant */
+		$output = ( ! $this->is_empty() ) ? $value['img'] : ''; /* prevents image loading error when non existant */
+
 		return parent::html( $output );
 	}
 
 	/**
 	 * Used to check if the current field has a value
-	 * @since 4.0
-	 * @internal Child classes can override this method when dealing with a specific use case
+	 *
+	 * @since    4.0
 	 */
 	public function is_empty() {
 		$value = $this->value();
@@ -80,7 +83,9 @@ class Field_Signature extends Helper_Abstract_Fields
 
 	/**
 	 * Return the HTML form data
-	 * @return Array
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public function form_data() {
@@ -98,7 +103,9 @@ class Field_Signature extends Helper_Abstract_Fields
 
 	/**
 	 * Get the standard GF value of this field
-	 * @return String/Array
+	 *
+	 * @return string|array
+	 *
 	 * @since 4.0
 	 */
 	public function value() {
@@ -120,13 +127,13 @@ class Field_Signature extends Helper_Abstract_Fields
 		/* If we can load in the signature let's optimise the signature size for PDF display */
 		if ( is_file( $signature ) ) {
 			$signature_details = getimagesize( $signature );
-			$optimised_width   = apply_filters('gfpdfe_signature_width', $signature_details[0] / 3, $signature_details[0] ); /* backwards compat */
+			$optimised_width   = apply_filters( 'gfpdfe_signature_width', $signature_details[0] / 3, $signature_details[0] ); /* backwards compat */
 			$optimised_height  = $signature_details[1] / 3;
 			$html              = str_replace( 'width="' . $width . '"', 'width="' . $optimised_width . '"', $html );
 
 			/* override the default width */
-			$width             = $optimised_width;
-			$height            = $optimised_height;
+			$width  = $optimised_width;
+			$height = $optimised_height;
 		}
 
 		/*

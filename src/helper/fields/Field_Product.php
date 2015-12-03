@@ -2,13 +2,9 @@
 
 namespace GFPDF\Helper\Fields;
 
-use GFPDF\Helper\Helper_Abstract_Form;
-use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Abstract_Fields;
 
 use GFFormsModel;
-
-use Exception;
 
 /**
  * Gravity Forms Field
@@ -52,18 +48,20 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Product extends Helper_Abstract_Fields
-{
+class Field_Product extends Helper_Abstract_Fields {
 
 	/**
 	 * Our products class which handles all Gravity Form products fields in bulk
-	 * @var Class
+	 *
+	 * @var \GFPDF\Helper\Helper_Abstract_fields
 	 */
 	private $products;
 
 	/**
 	 * Store our products class for later user
-	 * @param Helper_Abstract_Fields $products
+	 *
+	 * @param \GFPDF\Helper\Helper_Abstract_Fields $products
+	 *
 	 * @since 4.0
 	 */
 	public function set_products( Helper_Abstract_Fields $products ) {
@@ -72,20 +70,24 @@ class Field_Product extends Helper_Abstract_Fields
 
 	/**
 	 * Return the HTML form data
-	 * @return Array
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public function form_data() {
 
-		$value = $this->value();
-		$label = GFFormsModel::get_label( $this->field );
-		$data  = array();
+		$value    = $this->value();
+		$label    = GFFormsModel::get_label( $this->field );
+		$field_id = (int) $this->field->id;
+		$data     = array();
+		$name     = $price = '';
 
 		switch ( $this->field->type ) {
 			case 'product':
 				$name  = ( isset( $value['name'] ) && isset( $value['price'] ) ) ? $value['name'] . " ({$value['price']})" : '';
 				$price = ( isset( $value['price_unformatted'] ) ) ? $value['price_unformatted'] : '';
-			break;
+				break;
 
 			case 'option':
 				if ( isset( $value['options'] ) && sizeof( $value['options'] ) > 1 ) {
@@ -97,41 +99,46 @@ class Field_Product extends Helper_Abstract_Fields
 					$name  = ( isset( $value['options'][0]['option_name'] ) ) ? $value['options'][0]['option_name'] . " ({$value['options'][0]['price_formatted']})" : '';
 					$price = ( isset( $value['options'][0]['price'] ) ) ? $value['options'][0]['price'] : '';
 				}
-			break;
+				break;
 
 			case 'shipping':
 				$name  = ( isset( $value['shipping_name'] ) ) ? $value['shipping_name'] . " ({$value['shipping_formatted']})" : '';
 				$price = ( isset( $value['shipping'] ) ) ? $value['shipping'] : '';
-			break;
+				break;
 
 			case 'quantity':
 			default:
 				$name  = $value;
 				$price = $value;
-			break;
+				break;
 		}
 
 		/* Standadised Format */
-		$data['field'][ $this->field->id . '.' . $label ]           = $name;
-		$data['field'][ $this->field->id ]                          = $name;
-		$data['field'][ $label ]                                    = $name;
+		$data['field'][ $field_id . '.' . $label ] = $name;
+		$data['field'][ $field_id ]                = $name;
+		$data['field'][ $label ]                   = $name;
 
 		/* Name Format */
-		$data['field'][ $this->field->id . '.' . $label . '_name' ] = $name;
-		$data['field'][ $this->field->id . '_name' ]                = $name;
-		$data['field'][ $label . '_name' ]                          = $name;
+		$data['field'][ $field_id . '.' . $label . '_name' ] = $name;
+		$data['field'][ $field_id . '_name' ]                = $name;
+		$data['field'][ $label . '_name' ]                   = $name;
 
 		/* Value */
-		$data['field'][ $this->field->id . '.' . $label . '_value' ] = $price;
-		$data['field'][ $this->field->id . '_value' ]                = $price;
-		$data['field'][ $label . '_value' ]                          = $price;
+		$data['field'][ $field_id . '.' . $label . '_value' ] = $price;
+		$data['field'][ $field_id . '_value' ]                = $price;
+		$data['field'][ $label . '_value' ]                   = $price;
 
 		return $data;
 	}
 
 	/**
 	 * Display the HTML version of this field
-	 * @return String
+	 *
+	 * @param string $value
+	 * @param bool   $label
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
@@ -140,33 +147,33 @@ class Field_Product extends Helper_Abstract_Fields
 
 		switch ( $this->field->type ) {
 			case 'product':
-				if( isset( $value['name'] ) ) {
+				if ( isset( $value['name'] ) ) {
 					$html .= $value['name'] . ' - ' . $value['price'];
 					$html .= $this->get_option_html( $value['options'] );
 				}
-			break;
+				break;
 
 			case 'option':
-				if( isset( $value['options'] ) ) {
+				if ( isset( $value['options'] ) ) {
 					$html .= $this->get_option_html( $value['options'] );
 				}
-			break;
+				break;
 
 			case 'quantity':
 				$html .= $value;
-			break;
+				break;
 
 			case 'shipping':
-				if( isset( $value['shipping_formatted'] ) ) {
+				if ( isset( $value['shipping_formatted'] ) ) {
 					$html .= $value['shipping_formatted'];
 				}
-			break;
+				break;
 
 			case 'total':
-				if( isset( $value['total_formatted'] ) ) {
+				if ( isset( $value['total_formatted'] ) ) {
 					$html .= $value['total_formatted'];
 				}
-			break;
+				break;
 		}
 
 		return parent::html( $html );
@@ -174,9 +181,13 @@ class Field_Product extends Helper_Abstract_Fields
 
 	/**
 	 * Get a HTML list of the product's selected options
-	 * @param  Array  $options A list of the selected products
-	 * @param  string $html   Pass in an existing HTML, or default to blank
+	 *
+	 * @param  array  $options A list of the selected products
+	 * @param  string $html    Pass in an existing HTML, or default to blank
+	 *
 	 * @return string         The finalised HTML
+	 *
+	 * @since 4.0
 	 */
 	public function get_option_html( $options, $html = '' ) {
 		if ( is_array( $options ) ) {
@@ -194,12 +205,15 @@ class Field_Product extends Helper_Abstract_Fields
 
 	/**
 	 * Get the standard GF value of this field
-	 * @return String/Array
-	 * @since 4.0
+	 *
+	 * @return string|array
+	 *
+	 * @since    4.0
+	 *
 	 * @internal We won't use a cache here because it's being handled in the Field_Products class, which is linked to this class through a static object
 	 */
 	public function value() {
-		
+
 		/* Get the full products array */
 		$data = $this->products->value();
 

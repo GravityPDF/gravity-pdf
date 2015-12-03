@@ -49,21 +49,23 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper_Interface_Filters
-{
+class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper_Interface_Filters {
 
 	/**
 	 * Holds our log class
-	 * @var Object
+	 *
+	 * @var \Monolog\Logger|LoggerInterface
 	 * @since 4.0
 	 */
 	protected $log;
 
 	/**
 	 * Setup our class by injecting all our dependancies
-	 * @param Helper_Abstract_Model $model Our Shortcodes Model the controller will manage
-	 * @param Helper_Abstract_View  $view  Our Shortcodes View the controller will manage
-	 * @param LoggerInterface       $log   Our logger class
+	 *
+	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_Shortcodes $model Our Shortcodes Model the controller will manage
+	 * @param Helper_Abstract_View|\GFPDF\View\View_Shortcodes    $view  Our Shortcodes View the controller will manage
+	 * @param \Monolog\Logger|LoggerInterface                    $log   Our logger class
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, LoggerInterface $log ) {
@@ -75,13 +77,15 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 		$this->model = $model;
 		$this->model->setController( $this );
 
-		$this->view  = $view;
+		$this->view = $view;
 		$this->view->setController( $this );
 	}
 
 	/**
 	 * Initialise our class defaults
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function init() {
@@ -90,14 +94,16 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 		$this->add_shortcodes();
 
 		/* Add support for the new shortcake UI currently being considered for core integration */
-		if ( is_admin() && function_exists( 'shortcode_ui_register_for_shortcode' ) ) {
+		if ( is_admin() ) {
 			$this->add_shortcake_support();
 		}
 	}
 
 	/**
 	 * Apply any filters needed for the settings page
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function add_filters() {
@@ -108,10 +114,11 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 	}
 
 
-
 	/**
 	 * Register our shortcodes
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function add_shortcodes() {
@@ -122,10 +129,17 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 	/**
 	 * Register our shortcake attributes
 	 * See https://github.com/fusioneng/Shortcake for more details
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function add_shortcake_support() {
+
+		/* Exist if the shortcake function doesn't exist */
+		if ( ! function_exists( 'shortcode_ui_register_for_shortcode' ) ) {
+			return null;
+		}
 
 		$this->log->addNotice( 'Enable Shortcake support.' );
 
@@ -149,9 +163,9 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 				),
 
 				array(
-					'label' => 'View',
-					'attr' => 'type',
-					'type' => 'select',
+					'label'   => 'View',
+					'attr'    => 'type',
+					'type'    => 'select',
 					'default' => 'download',
 					'options' => array(
 						'download' => 'Download',
@@ -160,21 +174,21 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 				),
 
 				array(
-					'label' => 'Anchor Classes',
-					'attr'  => 'classes',
-					'type'  => 'text',
+					'label'       => 'Anchor Classes',
+					'attr'        => 'classes',
+					'type'        => 'text',
 					'description' => 'Optional. Add any classes - separated by a space - you want to apply to the PDF link.',
-					'meta' => array(
+					'meta'        => array(
 						'placeholder' => '',
 					),
 				),
 
 				array(
-					'label' => 'Entry ID',
-					'attr'  => 'entry',
-					'type'  => 'text',
+					'label'       => 'Entry ID',
+					'attr'        => 'entry',
+					'type'        => 'text',
 					'description' => 'Optional. You can pass in a specific ID or let us auto select one.',
-					'meta' => array(
+					'meta'        => array(
 						'placeholder' => '',
 					),
 				),

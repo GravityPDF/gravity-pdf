@@ -37,13 +37,14 @@ use ReflectionClass;
 
 /**
  * Test all helper Interfaces are standardised
+ *
  * @since 4.0
  * @group interfaces
  */
-class Test_Interfaces extends WP_UnitTestCase
-{
+class Test_Interfaces extends WP_UnitTestCase {
 	/**
 	 * Ensure our actions interface
+	 *
 	 * @since 4.0
 	 */
 	public function test_actions_interface() {
@@ -54,6 +55,7 @@ class Test_Interfaces extends WP_UnitTestCase
 
 	/**
 	 * Ensure our filter interface
+	 *
 	 * @since 4.0
 	 */
 	public function test_filters_interface() {

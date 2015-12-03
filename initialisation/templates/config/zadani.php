@@ -19,8 +19,8 @@ use GFPDF\Helper\Helper_Interface_Config;
  */
 
 /* Exit if accessed directly */
-if ( ! defined('ABSPATH') ) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -49,6 +49,7 @@ if ( ! defined('ABSPATH') ) {
  * For instance, a template called core-simple.php would have a class of "core_simple"
  *
  * This naming convension is very important, otherwise the software cannot correctly load the configuration
+ *
  * @todo Write documentation on creating and using a template configuration file
  */
 class zadani implements Helper_Interface_Config {
@@ -68,7 +69,7 @@ class zadani implements Helper_Interface_Config {
 		return array(
 
 			/* Enable core fields */
-			'core' => array(
+			'core'   => array(
 				'show_form_title'      => true,
 				'show_page_names'      => true,
 				'show_html'            => true,
@@ -79,7 +80,7 @@ class zadani implements Helper_Interface_Config {
 				'first_header'         => true,
 				'footer'               => true,
 				'first_footer'         => true,
-				'background_color'	   => true,
+				'background_color'     => true,
 				'background_image'     => true,
 			),
 
@@ -87,12 +88,12 @@ class zadani implements Helper_Interface_Config {
 			'fields' => array(
 				'border_colour' => array(
 					'id'   => 'border_colour',
-					'name' => __('Field Border Colour', 'gravity-forms-pdf-extended' ),
+					'name' => __( 'Field Border Colour', 'gravity-forms-pdf-extended' ),
 					'type' => 'color',
-					'desc' => __('Control the colour of the field border.', 'gravity-forms-pdf-extended' ),
-					'std'  => '#CCCCCC'
+					'desc' => __( 'Control the colour of the field border.', 'gravity-forms-pdf-extended' ),
+					'std'  => '#CCCCCC',
 				),
-			)
+			),
 		);
 	}
 }

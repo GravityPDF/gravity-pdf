@@ -53,19 +53,22 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters
-{
+class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters {
 
 	/**
 	 * Holds abstracted functions related to the forms plugin
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Form
+	 *
 	 * @since 4.0
 	 */
 	protected $form;
 
 	/**
 	 * Holds our log class
-	 * @var Object
+	 *
+	 * @var \Monolog\Logger|LoggerInterface
+	 *
 	 * @since 4.0
 	 */
 	protected $log;
@@ -73,46 +76,52 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	/**
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Misc
+	 *
 	 * @since 4.0
 	 */
 	protected $misc;
 
 	/**
 	 * Setup our class by injecting all our dependancies
-	 * @param Helper_Abstract_Model $model Our PDF Model the controller will manage
-	 * @param Helper_Abstract_View  $view  Our PDF View the controller will manage
-	 * @param Helper_Abstract_Form  $form  Our abstracted Gravity Forms helper functions
-	 * @param LoggerInterface       $log   Our logger class
-	 * @param Helper_Misc           $misc  Our miscellaneous class
+	 *
+	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_PDF $model Our PDF Model the controller will manage
+	 * @param Helper_Abstract_View|\GFPDF\View\View_PDF    $view  Our PDF View the controller will manage
+	 * @param \GFPDF\Helper\Helper_Abstract_Form           $form  Our abstracted Gravity Forms helper functions
+	 * @param \Monolog\Logger|LoggerInterface              $log   Our logger class
+	 * @param \GFPDF\Helper\Helper_Misc                    $misc  Our miscellaneous class
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Abstract_Form $form, LoggerInterface $log, Helper_Misc $misc ) {
 
 		/* Assign our internal variables */
-		$this->form    = $form;
-		$this->log     = $log;
-		$this->misc    = $misc;
+		$this->form = $form;
+		$this->log  = $log;
+		$this->misc = $misc;
 
 		/* Load our model and view */
 		$this->model = $model;
 		$this->model->setController( $this );
 
-		$this->view  = $view;
+		$this->view = $view;
 		$this->view->setController( $this );
 	}
 
 	/**
 	 * Initialise our class defaults
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function init() {
 		/*
          * Tell Gravity Forms to add our form PDF settings pages
          */
-		 $this->add_actions();
-		 $this->add_filters();
+		$this->add_actions();
+		$this->add_filters();
 
 		/* Add scheduled tasks */
 		if ( ! wp_next_scheduled( 'gfpdf_cleanup_tmp_dir' ) ) {
@@ -122,7 +131,9 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 
 	/**
 	 * Apply any actions needed for the settings page
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function add_actions() {
@@ -144,13 +155,14 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 
 	/**
 	 * Apply any filters needed for the settings page
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
-	 * @todo add active and conditional middleware
 	 */
 	public function add_filters() {
 		/* PDF authentication middleware */
-		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_public_access'), 5, 3 );
+		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_public_access' ), 5, 3 );
 		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_active' ), 10, 3 );
 		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_conditional' ), 10, 3 );
 		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_logged_out_restriction' ), 20, 3 );
@@ -159,7 +171,10 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_user_capability' ), 50, 3 );
 
 		/* Tap into GF notifications */
-		add_filter( 'gform_notification', array( $this->model, 'notifications' ), 9999, 3 ); /* ensure Gravity PDF is one of the last filters to be applied */
+		add_filter( 'gform_notification', array(
+			$this->model,
+			'notifications',
+		), 9999, 3 ); /* ensure Gravity PDF is one of the last filters to be applied */
 
 		/* Modify mPDF's path locations */
 		add_filter( 'mpdf_tmp_path', array( $this->model, 'mpdf_tmp_path' ) );
@@ -178,21 +193,23 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		add_filter( 'gfpdfe_pre_load_template', array( 'PDFRender', 'prepare_ids' ), 1, 8 );
 
 		/* Pre-process our template arguments and automatically render them in PDF */
-		add_filter( 'gfpdf_template_args', array( $this->model, 'preprocess_template_arguments') );
-		add_filter( 'gfpdf_mpdf_init_class', array( $this->view, 'autoprocess_core_template_options'), 10, 3 );
+		add_filter( 'gfpdf_template_args', array( $this->model, 'preprocess_template_arguments' ) );
+		add_filter( 'gfpdf_mpdf_init_class', array( $this->view, 'autoprocess_core_template_options' ), 10, 3 );
 	}
 
 	/**
 	 * Determines if we should process the PDF at this stage
 	 * Fires just before the main WP_Query is executed (we don't need it)
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function process_pdf_endpoint() {
 
 		/* exit early if all the required URL parameters aren't met */
 		if ( empty( $GLOBALS['wp']->query_vars['gpdf'] ) || empty( $GLOBALS['wp']->query_vars['pid'] ) || empty( $GLOBALS['wp']->query_vars['lid'] ) ) {
-			return false;
+			return null;
 		}
 
 		$pid    = $GLOBALS['wp']->query_vars['pid'];
@@ -219,13 +236,14 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 * Fires just before the main WP_Query is executed (we don't need it)
 	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function process_legacy_pdf_endpoint() {
 
 		/* exit early if all our required parameters aren't met */
 		if ( empty( $_GET['gf_pdf'] ) || empty( $_GET['fid'] ) || empty( $_GET['lid'] ) || empty( $_GET['template'] ) ) {
-			return false;
+			return null;
 		}
 
 		$config = array(
@@ -263,8 +281,11 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 
 	/**
 	 * Output PDF error to user
+	 *
 	 * @param  Object $error The WP_Error object
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	private function pdf_error( $error ) {

@@ -38,6 +38,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * A simple interface to standardise how actions and filters should be applied in classes
+ *
  * @since 4.0
  */
 interface Helper_Interface_Config {
@@ -48,8 +49,10 @@ interface Helper_Interface_Config {
 	 * The "core" array will allow boolean values to be passed to enable core features, such as "headers", "footers" or "backgrounds"
 	 * The "fields" array allows a template to load in custom fields. It is based on our \GFPDF\Helper\Helper_Options Settings API
 	 * See the Helper_Options::register_settings() method for the exact fields that can be passed in
+	 *
 	 * @since 4.0
-	 * @return Array
+	 *
+	 * @return array
 	 */
 	public function configuration();
 }

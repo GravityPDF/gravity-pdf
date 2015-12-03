@@ -37,20 +37,23 @@ use WP_UnitTestCase;
 
 /**
  * Test the Bootstrap / Main Router
+ *
  * @since 4.0
  * @group bootstrap
  */
-class Test_Bootstrap extends WP_UnitTestCase
-{
+class Test_Bootstrap extends WP_UnitTestCase {
 	/**
 	 * Our Gravity PDF Router object
-	 * @var Object
+	 *
+	 * @var \GFPDF\Router
+	 *
 	 * @since 4.0
 	 */
 	public $loader;
 
 	/**
 	 * The WP Unit Test Set up function
+	 *
 	 * @since 4.0
 	 */
 	public function setUp() {
@@ -64,6 +67,7 @@ class Test_Bootstrap extends WP_UnitTestCase
 
 	/**
 	 * Test the global bootstrap actions are applied
+	 *
 	 * @since 4.0
 	 */
 	public function test_actions() {
@@ -76,18 +80,27 @@ class Test_Bootstrap extends WP_UnitTestCase
 
 	/**
 	 * Test the global bootstrap filters are applied
+	 *
 	 * @since 4.0
 	 */
 	public function test_filters() {
-		$this->assertEquals( 10, has_filter( 'gform_noconflict_scripts', array( $this->loader, 'auto_noconflict_scripts' ) ) );
-		$this->assertEquals( 10, has_filter( 'gform_noconflict_styles', array( $this->loader, 'auto_noconflict_styles' ) ) );
+		$this->assertEquals( 10, has_filter( 'gform_noconflict_scripts', array(
+			$this->loader,
+			'auto_noconflict_scripts',
+		) ) );
+		$this->assertEquals( 10, has_filter( 'gform_noconflict_styles', array(
+			$this->loader,
+			'auto_noconflict_styles',
+		) ) );
 
 		$this->assertEquals( 10, has_filter( 'gform_logging_supported', array( $this->loader, 'add_gf_logger' ) ) );
 	}
 
 	/**
 	 * Check the required helper classes are loaded into the Router
-	 * @since 4.0
+	 *
+	 * @since        4.0
+	 *
 	 * @dataProvider provider_dependant_helper_classes
 	 */
 	public function test_dependant_helper_classes( $expected, $property ) {
@@ -97,7 +110,9 @@ class Test_Bootstrap extends WP_UnitTestCase
 	/**
 	 * Returns the test data for our test_dependant_helper_classes
 	 * Test the $log property in another test
+	 *
 	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public function provider_dependant_helper_classes() {
@@ -112,6 +127,7 @@ class Test_Bootstrap extends WP_UnitTestCase
 
 	/**
 	 * Test that any Gravity PDF scripts are automatically loading when GF is in no conflict mode
+	 *
 	 * @since 4.0
 	 */
 	public function test_auto_noconflict_gfpdf_js() {
@@ -131,8 +147,8 @@ class Test_Bootstrap extends WP_UnitTestCase
 		);
 
 		/* override queue */
-		$wp_scripts = wp_scripts();
-		$saved = $wp_scripts->queue;
+		$wp_scripts        = wp_scripts();
+		$saved             = $wp_scripts->queue;
 		$wp_scripts->queue = $queue;
 
 		/* get the results and test the expected output */
@@ -150,6 +166,7 @@ class Test_Bootstrap extends WP_UnitTestCase
 
 	/**
 	 * Test that any Gravity PDF styles are automatically loading when GF is in no conflict mode
+	 *
 	 * @since 4.0
 	 */
 	public function test_auto_noconflict_gfpdf_css() {
@@ -169,8 +186,8 @@ class Test_Bootstrap extends WP_UnitTestCase
 		);
 
 		/* override queue */
-		$wp_styles = wp_styles();
-		$saved = $wp_styles->queue;
+		$wp_styles        = wp_styles();
+		$saved            = $wp_styles->queue;
 		$wp_styles->queue = $queue;
 
 		/* get the results and test the expected output */
@@ -187,6 +204,7 @@ class Test_Bootstrap extends WP_UnitTestCase
 
 	/**
 	 * Check the logger is setting up correctly
+	 *
 	 * @since 4.0
 	 */
 	public function test_setup_logger() {
@@ -199,6 +217,7 @@ class Test_Bootstrap extends WP_UnitTestCase
 
 	/**
 	 * Check we're registering Gravity PDF with the Gravity Forms logger
+	 *
 	 * @since 4.0
 	 */
 	public function test_add_gf_logger() {
@@ -207,6 +226,7 @@ class Test_Bootstrap extends WP_UnitTestCase
 
 	/**
 	 * Test backwards compatibility function for our v3 default PDF templates
+	 *
 	 * @since 4.0
 	 */
 	public function test_get_default_config_data() {
@@ -221,10 +241,10 @@ class Test_Bootstrap extends WP_UnitTestCase
 		$this->assertFalse( $settings['section_content'] );
 
 		/* Test pass */
-		$form_id = $GLOBALS['GFPDF_Test']->form['form-settings']['id'];
-		$pid     = $GLOBALS['wp']->query_vars['pid'] = '555ad84787d7e';
+		$form_id                                 = $GLOBALS['GFPDF_Test']->form['form-settings']['id'];
+		$pid = $GLOBALS['wp']->query_vars['pid'] = '555ad84787d7e';
 
-		$gfpdf->data->form_settings = array();
+		$gfpdf->data->form_settings                                   = array();
 		$gfpdf->data->form_settings[ $form_id ]                       = $GLOBALS['GFPDF_Test']->form['form-settings']['gfpdf_form_settings'];
 		$gfpdf->data->form_settings[ $form_id ][ $pid ]['html_field'] = 'Yes';
 

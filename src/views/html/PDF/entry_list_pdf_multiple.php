@@ -10,8 +10,8 @@
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -37,15 +37,15 @@ if (! defined('ABSPATH')) {
 ?>
 
 <span class="gf_form_toolbar_settings gf_form_action_has_submenu gfpdf_form_action_has_submenu">
-   | <a href="#" title="View PDFs" onclick="return false" class=""><?php echo ( $args['view'] == 'download' ) ? __('Download PDFs', 'gravity-forms-pdf-extended') : __('View PDFs', 'gravity-forms-pdf-extended' ); ?></a>
+   | <a href="#" title="View PDFs" onclick="return false" class=""><?php echo ( $args['view'] == 'download' ) ? __( 'Download PDFs', 'gravity-forms-pdf-extended' ) : __( 'View PDFs', 'gravity-forms-pdf-extended' ); ?></a>
 
     <div class="gf_submenu gfpdf_submenu">
-        <ul>
-            <?php foreach( $args['pdfs'] as $pdf ): ?>
-                <li>
-                    <a href="<?php echo ( $args['view'] == 'download' ) ? $pdf['download'] : $pdf['view']; ?>" target="_blank"><?php echo $pdf['name']; ?></a>
-                </li>
-            <?php endforeach; ?>
-        </ul>
+	    <ul>
+		    <?php foreach ( $args['pdfs'] as $pdf ): ?>
+			    <li>
+				    <a href="<?php echo ( $args['view'] == 'download' ) ? $pdf['download'] : $pdf['view']; ?>" target="_blank"><?php echo $pdf['name']; ?></a>
+			    </li>
+		    <?php endforeach; ?>
+	    </ul>
     </div>
 </span>

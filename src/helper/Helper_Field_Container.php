@@ -47,21 +47,27 @@ class Helper_Field_Container {
 	/**
 	 * Holds the current width of our container based on the field passed in
 	 * The value is out of 100
-	 * @var Integer
+	 *
+	 * @var integer
+	 *
 	 * @since 4.0
 	 */
 	private $current_width = 0;
 
 	/**
 	 * Boolean value to tell if the element is currently opened
+	 *
 	 * @var boolean
+	 *
 	 * @since 4.0
 	 */
 	private $currently_open = false;
 
 	/**
 	 * Matches class names to width percentages
+	 *
 	 * @var array
+	 *
 	 * @since 4.0
 	 */
 	private $class_map = array(
@@ -74,21 +80,27 @@ class Helper_Field_Container {
 
 	/**
 	 * The HTML tag used when opening the container
+	 *
 	 * @var string
+	 *
 	 * @since 4.0
 	 */
 	private $open_tag = '<div class="row-separator">';
 
 	/**
 	 * The HTML tag used when closing the container
+	 *
 	 * @var string
+	 *
 	 * @since 4.0
 	 */
 	private $close_tag = '</div>';
 
 	/**
 	 * The Gravity Form fields we should not wrap in a container
+	 *
 	 * @var array
+	 *
 	 * @since 4.0
 	 */
 	private $skip_fields = array(
@@ -99,7 +111,9 @@ class Helper_Field_Container {
 
 	/**
 	 * Set up the object
+	 *
 	 * @param array $config Allow user to override the open / close tag and which fields are skipped
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( $config = array() ) {
@@ -119,15 +133,18 @@ class Helper_Field_Container {
 
 	/**
 	 * Handles the opening and closing of our container
+	 *
 	 * @param  GF_Field $field The Gravity Form field currently being processed
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	public function generate( GF_Field $field ) {
 
 		/* Check if we are processing a field that should not be floated and treat it as a 100% field */
 		$this->process_skipped_fields( $field );
-			
+
 		/* Check if we need to close the container */
 		if ( $this->currently_open ) {
 			$this->handle_open_container( $field );
@@ -142,7 +159,9 @@ class Helper_Field_Container {
 	/**
 	 * Close the current container if still open.
 	 * This is usually called publically after the form loop
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	public function close() {
@@ -154,8 +173,11 @@ class Helper_Field_Container {
 
 	/**
 	 * Open the container
+	 *
 	 * @param  GF_Field $field The Gravity Form field currently being processed
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	private function handle_closed_container( GF_Field $field ) {
@@ -166,8 +188,11 @@ class Helper_Field_Container {
 
 	/**
 	 * Determine if we should close a container based on its classes
+	 *
 	 * @param  GF_Field $field The Gravity Form field currently being processed
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	private function handle_open_container( GF_Field $field ) {
@@ -183,8 +208,11 @@ class Helper_Field_Container {
 
 	/**
 	 * Process our skipped Gravity Form fields (close the container if needed)
+	 *
 	 * @param  GF_Field $field The Gravity Form field currently being processed
+	 *
 	 * @return boolean true if we processed a skipped field, false otherwise
+	 *
 	 * @since 4.0
 	 */
 	private function process_skipped_fields( GF_Field $field ) {
@@ -192,6 +220,7 @@ class Helper_Field_Container {
 		if ( in_array( $field->type, $this->skip_fields ) ) {
 			$this->strip_field_of_any_classmaps( $field );
 			$this->close();
+
 			return true;
 		}
 
@@ -200,8 +229,11 @@ class Helper_Field_Container {
 
 	/**
 	 * Remove any mapped classes from our skipped fields
+	 *
 	 * @param  GF_Field $field The Gravity Form field currently being processed
+	 *
 	 * @return void
+	 *
 	 * @since  4.0
 	 */
 	private function strip_field_of_any_classmaps( GF_Field $field ) {
@@ -210,7 +242,9 @@ class Helper_Field_Container {
 
 	/**
 	 * Output the open tag
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	private function open_container() {
@@ -219,7 +253,9 @@ class Helper_Field_Container {
 
 	/**
 	 * Output the close tag
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	private function close_container() {
@@ -228,7 +264,9 @@ class Helper_Field_Container {
 
 	/**
 	 * Mark our class as currently being open
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	private function start() {
@@ -237,7 +275,9 @@ class Helper_Field_Container {
 
 	/**
 	 * Reset our class back to its original state
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	private function reset() {
@@ -247,8 +287,11 @@ class Helper_Field_Container {
 
 	/**
 	 * Increment our current field width
-	 * @param  String $classes The field classes
+	 *
+	 * @param string $classes The field classes
+	 *
 	 * @return void
+	 *
 	 * @since  4.0
 	 */
 	private function increment_width( $classes ) {
@@ -257,21 +300,25 @@ class Helper_Field_Container {
 
 	/**
 	 * Loop through all classes and return our class map if found, or 100
+	 *
 	 * @param  String $classes The field classes
-	 * @return void
+	 *
+	 * @return integer The field width based on assigned class
+	 *
 	 * @since  4.0
 	 */
 	private function get_field_width( $classes ) {
 		$classes = explode( ' ', $classes );
 
 		foreach ( $classes as $class ) {
-			if ( isset ($this->class_map[ $class ] ) ) {
+			if ( isset ( $this->class_map[ $class ] ) ) {
 				/* return field width */
 				return $this->class_map[ $class ];
 			}
 		}
 
 		/* no match, so assuming full width */
+
 		return 100;
 	}
 }

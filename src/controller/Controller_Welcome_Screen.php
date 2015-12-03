@@ -52,12 +52,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Controller_Welcome_Screen extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters
-{
+class Controller_Welcome_Screen extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters {
 
 	/**
 	 * Holds our log class
-	 * @var Object
+	 *
+	 * @var \Monolog\Logger|LoggerInterface
+	 *
 	 * @since 4.0
 	 */
 	protected $log;
@@ -65,7 +66,9 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 	/**
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Data
+	 *
 	 * @since 4.0
 	 */
 	protected $data;
@@ -73,18 +76,22 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 	/**
 	 * Holds our Helper_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Options
+	 *
 	 * @since 4.0
 	 */
 	protected $options;
 
 	/**
 	 * Setup our class by injecting all our dependancies
-	 * @param Helper_Abstract_Model $model   Our Welcome Screen Model the controller will manage
-	 * @param Helper_Abstract_View  $view    Our Welcome Screen View the controller will manage
-	 * @param LoggerInterface       $log     Our logger class
-	 * @param Helper_Data           $data    Our plugin data store
-	 * @param Helper_Options        $options Our options class which allows us to access any settings
+	 *
+	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_Welcome_Screen $model   Our Welcome Screen Model the controller will manage
+	 * @param Helper_Abstract_View|\GFPDF\View\View_Welcome_Screen    $view    Our Welcome Screen View the controller will manage
+	 * @param \Monolog\Logger|LoggerInterface                         $log     Our logger class
+	 * @param \GFPDF\Helper\Helper_Data                               $data    Our plugin data store
+	 * @param \GFPDF\Helper\Helper_Options                            $options Our options class which allows us to access any settings
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, LoggerInterface $log, Helper_Data $data, Helper_Options $options ) {
@@ -98,13 +105,15 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 		$this->model = $model;
 		$this->model->setController( $this );
 
-		$this->view  = $view;
+		$this->view = $view;
 		$this->view->setController( $this );
 	}
 
 	/**
 	 * Initialise our class defaults
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function init() {
@@ -114,18 +123,22 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 
 	/**
 	 * Apply any actions needed for the welcome page
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function add_actions() {
-		 /* Load the welcome screen into the menu */
+		/* Load the welcome screen into the menu */
 		add_action( 'admin_menu', array( $this->model, 'admin_menus' ) );
 		add_action( 'init', array( $this, 'welcome' ) );
 	}
 
 	/**
 	 * Apply any filters needed for the welcome page
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function add_filters() {
@@ -135,37 +148,37 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 	/**
 	 * Sends user to the Welcome page on first activation, as well as everytime plugin is upgraded
 	 *
-	 * @access public
-	 * @since 4.0
+	 * @since  4.0
+	 *
 	 * @return void
 	 */
 	public function welcome() {
 
 		/* Bail if no activation redirect */
-		if ( ( defined('DOING_AJAX') && DOING_AJAX ) || ! is_admin() || ! current_user_can( 'activate_plugins' ) ) {
-			return false;
+		if ( ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ! is_admin() || ! current_user_can( 'activate_plugins' ) ) {
+			return null;
 		}
 
 		$version = PDF_EXTENDED_VERSION;
 
 		/* Bail if we do not have a transient set (activation hook) and the versions match */
-		if( ! get_transient( '_gravitypdf_activation_redirect' ) && $version == get_option( 'gfpdf_current_version' ) ) {
-			return;
+		if ( ! get_transient( '_gravitypdf_activation_redirect' ) && $version == get_option( 'gfpdf_current_version' ) ) {
+			return null;
 		}
 
 		/* Delete the redirect transient */
 		delete_transient( '_gravitypdf_activation_redirect' );
 
 		/* Bail if we are already on the welcome page */
-		if( isset( $_GET['page'] ) && ( $_GET['page'] == 'gfpdf-getting-started' || $_GET['page'] == 'gfpdf-update' ) ) {
-			return;
+		if ( isset( $_GET['page'] ) && ( $_GET['page'] == 'gfpdf-getting-started' || $_GET['page'] == 'gfpdf-update' ) ) {
+			return null;
 		}
 
 		/* Bail if activating from network, or bulk */
 		if ( is_network_admin() || isset( $_GET['activate-multi'] ) ) {
 			$this->log->addNotice( 'Network Activation.' );
 
-			return false;
+			return null;
 		}
 
 		/* Check if it's a fresh installation and we should display the welcome screen, or whether we should display the update screen */
@@ -182,28 +195,37 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 		}
 	}
 
+	/**
+	 * Check if our Gravity PDF update screen should be displayed to the user
+	 *
+	 * @param string $version
+	 *
+	 * @return void
+	 *
+	 * @since 4.0
+	 */
 	public function maybe_display_update_screen( $version ) {
 
 		/* Check we actually upgraded, otherwise don't redirect */
-		if( $version == get_option( 'gfpdf_current_version' ) ) {
-			return false;
+		if ( $version == get_option( 'gfpdf_current_version' ) ) {
+			return null;
 		}
 
 		/* Check current version is not a bug fix or security release */
 		$individual_version = explode( '.', $version );
 
 		/* Check is there is a third version identifier (4.1.x) and if so see if it's an interger or does not equal zero */
-		if( isset( $individual_version[2] ) ) {
-			if(  ! is_int( $individual_version[2] ) || 0 !== (int) $individual_version[2] ) {
+		if ( isset( $individual_version[2] ) ) {
+			if ( ! is_int( $individual_version[2] ) || 0 !== (int) $individual_version[2] ) {
 				/* bug fix or security release, do not redirect */
-				return false;
+				return null;
 			}
 		}
 
 		/* Check if the user has opted to view the What's New page */
 		$show_update_page = $this->options->get_option( 'update_screen_action', 'Enable' );
 
-		if( 'Enable' == $show_update_page ) {
+		if ( 'Enable' == $show_update_page ) {
 
 			$this->log->addNotice( 'Redirect to Update page (previously activated).' );
 
@@ -216,7 +238,9 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 
 	/**
 	 * Load our welcome screen
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	public function getting_started_screen() {
@@ -225,7 +249,9 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 
 	/**
 	 * Load our update welcome screen
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	public function update_screen() {

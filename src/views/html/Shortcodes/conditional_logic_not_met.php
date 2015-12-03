@@ -10,8 +10,8 @@
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -36,4 +36,7 @@ if (! defined('ABSPATH')) {
 
 ?>
 
-<pre class="gravitypdf-error"><?php _e('PDF link not displayed because conditional logic requirements have not been met.', 'gravity-forms-pdf-extended' ); ?> <small><?php _e( '(Admin Only Message)', 'gravity-forms-pdf-extended' ); ?></small></pre>
+<pre class="gravitypdf-error">
+	<?php _e( 'PDF link not displayed because conditional logic requirements have not been met.', 'gravity-forms-pdf-extended' ); ?>
+	<small><?php _e( '(Admin Only Message)', 'gravity-forms-pdf-extended' ); ?></small>
+</pre>

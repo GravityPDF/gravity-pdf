@@ -40,28 +40,33 @@ use WP_UnitTestCase;
 
 /**
  * Test the WordPress Options API Implimentation
+ *
  * @since 4.0
  * @group options-api
  */
-class Test_Options_API extends WP_UnitTestCase
-{
+class Test_Options_API extends WP_UnitTestCase {
 
 	/**
 	 * Our Gravity PDF Options API Object
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Options_Fields
+	 *
 	 * @since 4.0
 	 */
 	public $options;
 
 	/**
 	 * The Gravity Form ID we are working with
-	 * @var Integer
+	 *
+	 * @var integer
+	 *
 	 * @since  4.0
 	 */
 	public $form_id;
 
 	/**
 	 * The WP Unit Test Set up function
+	 *
 	 * @since 4.0
 	 */
 	public function setUp() {
@@ -77,7 +82,7 @@ class Test_Options_API extends WP_UnitTestCase
 		update_option( 'gfpdf_settings', json_decode( file_get_contents( dirname( __FILE__ ) . '/json/options-settings.json' ), true ) );
 
 		/* Load a form / form PDF settings into database */
-		$this->form_id = $GLOBALS['GFPDF_Test']->form['form-settings']['id'];
+		$this->form_id                                = $GLOBALS['GFPDF_Test']->form['form-settings']['id'];
 		$gfpdf->data->form_settings[ $this->form_id ] = $GLOBALS['GFPDF_Test']->form['form-settings']['gfpdf_form_settings'];
 
 		/* Set up our global settings */
@@ -143,7 +148,7 @@ class Test_Options_API extends WP_UnitTestCase
 		$pid = key( $form['gfpdf_form_settings'] );
 
 		/* set up our $_GET variables */
-		$_GET['id'] = $this->form_id;
+		$_GET['id']  = $this->form_id;
 		$_GET['pid'] = $pid;
 
 		/* get legitimate results */
@@ -180,11 +185,11 @@ class Test_Options_API extends WP_UnitTestCase
 		$this->options->register_settings( $fields );
 
 		/* Test setting was added correctly */
-		$this->assertTrue( isset($wp_settings_fields['gfpdf_settings_general']['gfpdf_settings_general']['gfpdf_settings[my_test_item]']) );
+		$this->assertTrue( isset( $wp_settings_fields['gfpdf_settings_general']['gfpdf_settings_general']['gfpdf_settings[my_test_item]'] ) );
 		$this->assertEquals( 'Test Item', $wp_settings_fields['gfpdf_settings_general']['gfpdf_settings_general']['gfpdf_settings[my_test_item]']['title'] );
 
 		/* Test our registered settings were added */
-		$this->assertTrue( isset($new_whitelist_options['gfpdf_settings']) );
+		$this->assertTrue( isset( $new_whitelist_options['gfpdf_settings'] ) );
 
 		/* clean up filter */
 		remove_all_filters( 'gfpdf_registered_fields' );
@@ -192,6 +197,7 @@ class Test_Options_API extends WP_UnitTestCase
 
 	/**
 	 * Check that we can successfully update a registered field item
+	 *
 	 * @since 4.0
 	 */
 	public function test_update_registered_field() {
@@ -221,47 +227,47 @@ class Test_Options_API extends WP_UnitTestCase
 		$items = $this->options->get_registered_fields();
 
 		/* Check the array */
-		$this->assertTrue( isset($items['general']) );
-		$this->assertTrue( isset($items['general_security']) );
-		$this->assertTrue( isset($items['extensions']) );
-		$this->assertTrue( isset($items['licenses']) );
-		$this->assertTrue( isset($items['tools']) );
-		$this->assertTrue( isset($items['form_settings']) );
-		$this->assertTrue( isset($items['form_settings_appearance']) );
-		$this->assertTrue( isset($items['form_settings_advanced']) );
+		$this->assertTrue( isset( $items['general'] ) );
+		$this->assertTrue( isset( $items['general_security'] ) );
+		$this->assertTrue( isset( $items['extensions'] ) );
+		$this->assertTrue( isset( $items['licenses'] ) );
+		$this->assertTrue( isset( $items['tools'] ) );
+		$this->assertTrue( isset( $items['form_settings'] ) );
+		$this->assertTrue( isset( $items['form_settings_appearance'] ) );
+		$this->assertTrue( isset( $items['form_settings_advanced'] ) );
 
 		/* Check filters work correctly */
 		add_filter( 'gfpdf_settings_general', function ( $array ) {
 			return 'General Settings';
-		});
+		} );
 
 		add_filter( 'gfpdf_settings_general_security', function ( $array ) {
 			return 'General Security Settings';
-		});
+		} );
 
 		add_filter( 'gfpdf_settings_extensions', function ( $array ) {
 			return 'Extension Settings';
-		});
+		} );
 
 		add_filter( 'gfpdf_settings_licenses', function ( $array ) {
 			return 'License Settings';
-		});
+		} );
 
 		add_filter( 'gfpdf_settings_tools', function ( $array ) {
 			return 'Tools Settings';
-		});
+		} );
 
 		add_filter( 'gfpdf_form_settings', function ( $array ) {
 			return 'PDF Form Settings';
-		});
+		} );
 
 		add_filter( 'gfpdf_form_settings_appearance', function ( $array ) {
 			return 'PDF Form Settings Appearance';
-		});
+		} );
 
 		add_filter( 'gfpdf_form_settings_advanced', function ( $array ) {
 			return 'PDF Form Settings Advanced';
-		});
+		} );
 
 		/* reset items */
 		$items = $this->options->get_registered_fields();
@@ -288,6 +294,7 @@ class Test_Options_API extends WP_UnitTestCase
 
 	/**
 	 * Test we can get the form's PDF settings
+	 *
 	 * @since 4.0
 	 */
 	public function test_get_form_pdfs() {
@@ -328,6 +335,7 @@ class Test_Options_API extends WP_UnitTestCase
 
 	/**
 	 * Test we can get individual PDF settings
+	 *
 	 * @since 4.0
 	 */
 	public function test_get_pdf() {
@@ -344,6 +352,7 @@ class Test_Options_API extends WP_UnitTestCase
 
 	/**
 	 * Test we can successfully add a new PDF setting
+	 *
 	 * @since 4.0
 	 */
 	public function test_add_pdf() {
@@ -371,6 +380,7 @@ class Test_Options_API extends WP_UnitTestCase
 
 	/**
 	 * Test we can make changes to individual PDF settings
+	 *
 	 * @since 4.0
 	 */
 	public function test_update_pdf() {
@@ -416,6 +426,7 @@ class Test_Options_API extends WP_UnitTestCase
 
 	/**
 	 * Test we can make delete individual PDF settings
+	 *
 	 * @since 4.0
 	 */
 	public function test_delete_pdf() {
@@ -434,12 +445,13 @@ class Test_Options_API extends WP_UnitTestCase
 	/**
 	 * Check user's can correctly tap into the appropriate filters triggered
 	 * during a get_pdf() call
+	 *
 	 * @since 4.0
 	 */
 	public function test_get_pdf_filter() {
-		add_filter('gfpdf_pdf_config', function () {
+		add_filter( 'gfpdf_pdf_config', function () {
 			return 'main filter fired';
-		});
+		} );
 
 		/* check filter was triggered */
 		$this->assertEquals( 'main filter fired', $this->options->get_pdf( $this->form_id, '555ad84787d7e' ) );
@@ -448,9 +460,9 @@ class Test_Options_API extends WP_UnitTestCase
 		remove_all_filters( 'gfpdf_pdf_config' );
 
 		/* run individual form ID filter */
-		add_filter('gfpdf_pdf_config_' . $this->form_id, function () {
+		add_filter( 'gfpdf_pdf_config_' . $this->form_id, function () {
 			return 'ID filter fired';
-		});
+		} );
 
 		/* check filter was triggered */
 		$this->assertEquals( 'ID filter fired', $this->options->get_pdf( $this->form_id, '555ad84787d7e' ) );
@@ -459,12 +471,13 @@ class Test_Options_API extends WP_UnitTestCase
 	/**
 	 * Check user's can correctly tap into the appropriate filters triggered
 	 * during an add_pdf() call
+	 *
 	 * @since 4.0
 	 */
 	public function test_add_pdf_filter() {
-		add_filter('gfpdf_form_add_pdf', function () {
+		add_filter( 'gfpdf_form_add_pdf', function () {
 			return array( 'name' => 'Add Filter Fired' );
-		});
+		} );
 
 		/* run our method */
 		$id = $this->options->add_pdf( $this->form_id, array( 'name' => 'test' ) );
@@ -476,9 +489,9 @@ class Test_Options_API extends WP_UnitTestCase
 		/* cleanup filters */
 		remove_all_filters( 'gfpdf_pdf_config' );
 
-		add_filter('gfpdf_form_add_pdf_' . $this->form_id, function () {
+		add_filter( 'gfpdf_form_add_pdf_' . $this->form_id, function () {
 			return array( 'name' => 'ID Add Filter Fired' );
-		});
+		} );
 
 		/* run our method */
 		$id = $this->options->add_pdf( $this->form_id, array( 'name' => 'test' ) );
@@ -491,12 +504,13 @@ class Test_Options_API extends WP_UnitTestCase
 	/**
 	 * Check user's can correctly tap into the appropriate filters triggered
 	 * during a update_pdf() call
+	 *
 	 * @since 4.0
 	 */
 	public function test_update_pdf_filter() {
-		add_filter('gfpdf_form_update_pdf', function () {
+		add_filter( 'gfpdf_form_update_pdf', function () {
 			return array( 'name' => 'Update Filter Fired' );
-		});
+		} );
 
 		/* run our method */
 		$this->options->update_pdf( $this->form_id, '555ad84787d7e', array( 'name' => 'test' ) );
@@ -508,9 +522,9 @@ class Test_Options_API extends WP_UnitTestCase
 		/* cleanup filters */
 		remove_all_filters( 'gfpdf_pdf_config' );
 
-		add_filter('gfpdf_form_update_pdf_' . $this->form_id, function () {
+		add_filter( 'gfpdf_form_update_pdf_' . $this->form_id, function () {
 			return array( 'name' => 'ID Update Filter Fired' );
-		});
+		} );
 
 		/* run our method */
 		$this->options->update_pdf( $this->form_id, '555ad84787d7e', array( 'name' => 'test' ) );
@@ -542,7 +556,7 @@ class Test_Options_API extends WP_UnitTestCase
 		/* check filters */
 		add_filter( 'gfpdf_get_option', function ( $value ) {
 			return 'New Value';
-		});
+		} );
 
 		$this->assertEquals( 'New Value', $this->options->get_option( 'default_pdf_size' ) );
 
@@ -551,7 +565,7 @@ class Test_Options_API extends WP_UnitTestCase
 
 		add_filter( 'gfpdf_get_option_default_rtl', function ( $value ) {
 			return 'RTL';
-		});
+		} );
 
 		$this->assertEquals( 'RTL', $this->options->get_option( 'default_rtl' ) );
 
@@ -576,7 +590,7 @@ class Test_Options_API extends WP_UnitTestCase
 		/* Check filters */
 		add_filter( 'gfpdf_update_option', function ( $value ) {
 			return 'filtered option';
-		});
+		} );
 
 		$this->assertTrue( $this->options->update_option( 'default_pdf_size', 'new pdf size' ) );
 		$this->assertEquals( 'filtered option', $this->options->get_option( 'default_pdf_size' ) );
@@ -585,7 +599,7 @@ class Test_Options_API extends WP_UnitTestCase
 
 		add_filter( 'gfpdf_update_option_limit_to_admin', function ( $value ) {
 			return 'filtered admin option';
-		});
+		} );
 
 		$this->assertTrue( $this->options->update_option( 'default_pdf_size', 'new pdf size' ) );
 		$this->assertEquals( 'new pdf size', $this->options->get_option( 'default_pdf_size' ) );
@@ -620,8 +634,8 @@ class Test_Options_API extends WP_UnitTestCase
 	public function test_get_capabilities() {
 		$capabilities = $this->options->get_capabilities();
 
-		$this->assertTrue( isset($capabilities['Gravity Forms Capabilities']) );
-		$this->assertTrue( isset($capabilities['Active WordPress Capabilities']) );
+		$this->assertTrue( isset( $capabilities['Gravity Forms Capabilities'] ) );
+		$this->assertTrue( isset( $capabilities['Active WordPress Capabilities'] ) );
 
 		$this->assertNotSame( 0, sizeof( $capabilities['Gravity Forms Capabilities'] ) );
 		$this->assertNotSame( 0, sizeof( $capabilities['Active WordPress Capabilities'] ) );
@@ -635,11 +649,11 @@ class Test_Options_API extends WP_UnitTestCase
 	public function test_get_paper_size() {
 		$paper_size = $this->options->get_paper_size();
 
-		$this->assertTrue( isset($paper_size['Common Sizes']) );
-		$this->assertTrue( isset($paper_size['"A" Sizes']) );
-		$this->assertTrue( isset($paper_size['"B" Sizes']) );
-		$this->assertTrue( isset($paper_size['"C" Sizes']) );
-		$this->assertTrue( isset($paper_size['"RA" and "SRA" Sizes']) );
+		$this->assertTrue( isset( $paper_size['Common Sizes'] ) );
+		$this->assertTrue( isset( $paper_size['"A" Sizes'] ) );
+		$this->assertTrue( isset( $paper_size['"B" Sizes'] ) );
+		$this->assertTrue( isset( $paper_size['"C" Sizes'] ) );
+		$this->assertTrue( isset( $paper_size['"RA" and "SRA" Sizes'] ) );
 	}
 
 	/**
@@ -678,7 +692,7 @@ class Test_Options_API extends WP_UnitTestCase
 	 */
 	public function test_get_template_headers() {
 
-		$path = PDF_PLUGIN_DIR . 'initialisation/templates/zadani.php';
+		$path   = PDF_PLUGIN_DIR . 'initialisation/templates/zadani.php';
 		$header = $this->options->get_template_headers( $path );
 
 		$this->assertEquals( 'Zadani', $header['template'] );
@@ -734,7 +748,7 @@ class Test_Options_API extends WP_UnitTestCase
 			'Unicode' => array(
 				'dejavusans' => 'Dejavu Sans',
 				'courier'    => 'Courier',
-			)
+			),
 		);
 
 		$get_fonts = $this->options->add_custom_fonts( $existing_fonts );
@@ -791,7 +805,7 @@ class Test_Options_API extends WP_UnitTestCase
 	 */
 	public function test_increment_pdf_count() {
 
-		while( 100 >= $this->options->get_option( 'pdf_count' ) ) {
+		while ( 100 >= $this->options->get_option( 'pdf_count' ) ) {
 			$this->options->increment_pdf_count();
 		}
 
@@ -812,9 +826,9 @@ class Test_Options_API extends WP_UnitTestCase
 		$_POST['option_page']      = 'gfpdf_settings';
 
 		$input = array(
-			'default_pdf_size' => 'A5',
+			'default_pdf_size'  => 'A5',
 			'default_font_size' => '15',
-			'other_type' => 'wont validate',
+			'other_type'        => 'wont validate',
 		);
 
 		/* Test our current settings */
@@ -839,7 +853,8 @@ class Test_Options_API extends WP_UnitTestCase
 	/**
 	 * Test the trim sanitisation function
 	 *
-	 * @since 4.0
+	 * @since        4.0
+	 *
 	 * @dataProvider dataprovider_sanitize_trim
 	 */
 	public function test_sanitize_trim_field( $expected, $input ) {
@@ -848,14 +863,19 @@ class Test_Options_API extends WP_UnitTestCase
 
 	/**
 	 * Test data provider for our trim functionality (test_sanitize_trim_field)
+	 *
 	 * @return array The data to test
+	 *
 	 * @since  4.0
 	 */
 	public function dataprovider_sanitize_trim() {
 		return array(
 			array( 'My First PDF', '    My First PDF ' ),
 			array( 'My First   PDF', 'My First   PDF   ' ),
-			array( '123_Advanced_{My Funny\\\'s PDF Name:213}', '              123_Advanced_{My Funny\\\'s PDF Name:213}' ),
+			array(
+				'123_Advanced_{My Funny\\\'s PDF Name:213}',
+				'              123_Advanced_{My Funny\\\'s PDF Name:213}',
+			),
 			array( '驚いた彼は道を走っていった', '   驚いた彼は道を走っていった  ' ),
 			array( 'élève forêt', 'élève forêt                ' ),
 			array( 'English', 'English' ),
@@ -866,7 +886,8 @@ class Test_Options_API extends WP_UnitTestCase
 	/**
 	 * Test the number sanitisation function
 	 *
-	 * @since 4.0
+	 * @since        4.0
+	 *
 	 * @dataProvider dataprovider_sanitize_number
 	 */
 	public function test_sanitize_number_field( $expected, $input ) {
@@ -875,7 +896,9 @@ class Test_Options_API extends WP_UnitTestCase
 
 	/**
 	 * Test data provider for our number functionality (test_sanitize_number_field)
+	 *
 	 * @return array The data to test
+	 *
 	 * @since  4.0
 	 */
 	public function dataprovider_sanitize_number() {
@@ -892,7 +915,8 @@ class Test_Options_API extends WP_UnitTestCase
 	/**
 	 * Test the paper size sanitisation function
 	 *
-	 * @since 4.0
+	 * @since        4.0
+	 *
 	 * @dataProvider dataprovider_sanitize_paper_size
 	 */
 	public function test_sanitize_paper_size( $expected, $input ) {
@@ -901,16 +925,18 @@ class Test_Options_API extends WP_UnitTestCase
 
 	/**
 	 * Test data provider for our number functionality (test_sanitize_number_field)
+	 *
 	 * @return array The data to test
+	 *
 	 * @since  4.0
 	 */
 	public function dataprovider_sanitize_paper_size() {
 		return array(
-			array( array(200, 100, 'mm'), array(200, 100, 'mm') ),
-			array( array(200, 100, 'mm'), array(-200, -100, 'mm') ),
-			array( array(72, 210, 'inches'), array(72, 210, 'inches') ),
-			array( array(72, 210, 'inches'), array(-72, -210, 'inches') ),
-			array( array( -20, -50 ), array( -20, -50 )  ),
+			array( array( 200, 100, 'mm' ), array( 200, 100, 'mm' ) ),
+			array( array( 200, 100, 'mm' ), array( - 200, - 100, 'mm' ) ),
+			array( array( 72, 210, 'inches' ), array( 72, 210, 'inches' ) ),
+			array( array( 72, 210, 'inches' ), array( - 72, - 210, 'inches' ) ),
+			array( array( - 20, - 50 ), array( - 20, - 50 ) ),
 			array( '50', '50' ),
 		);
 	}
@@ -918,7 +944,8 @@ class Test_Options_API extends WP_UnitTestCase
 	/**
 	 * Test our global sanitisation function
 	 *
-	 * @since 4.0
+	 * @since        4.0
+	 *
 	 * @dataProvider provider_sanitize_all_fields
 	 */
 	public function test_sanitize_all_fields( $type, $value, $expected ) {
@@ -927,13 +954,23 @@ class Test_Options_API extends WP_UnitTestCase
 
 	/**
 	 * Test our sanitize_all_fields functions correctly
-	 * @return Array
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public function provider_sanitize_all_fields() {
 		return array(
-			array( 'rich_editor', '<strong>Test</strong> <script>console.log("test");</script>', '<strong>Test</strong> console.log("test");' ),
-			array( 'textarea', '<em>Test</em> <script>console.log("test");</script>', '<em>Test</em> console.log("test");' ),
+			array(
+				'rich_editor',
+				'<strong>Test</strong> <script>console.log("test");</script>',
+				'<strong>Test</strong> console.log("test");',
+			),
+			array(
+				'textarea',
+				'<em>Test</em> <script>console.log("test");</script>',
+				'<em>Test</em> console.log("test");',
+			),
 			array( 'text', '<b><em>Test</em></b>', 'Test' ),
 			array( 'checkbox', array( '<b>Item 1</b>', '<em>Item 2</em>' ), array( 'Item 1', 'Item 2' ) ),
 		);
@@ -942,7 +979,8 @@ class Test_Options_API extends WP_UnitTestCase
 	/**
 	 * Test our required sanitized field errors trigger
 	 *
-	 * @since 4.0
+	 * @since        4.0
+	 *
 	 * @dataProvider provider_sanitize_required_field
 	 */
 	public function test_sanitize_required_field( $type, $value, $expected ) {
@@ -968,7 +1006,9 @@ class Test_Options_API extends WP_UnitTestCase
 
 	/**
 	 * Test our sanitize_required_field functions correctly
-	 * @return Array
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public function provider_sanitize_required_field() {
@@ -987,9 +1027,12 @@ class Test_Options_API extends WP_UnitTestCase
 
 	/**
 	 * Test we can correctly get the field details
-	 * @since  4.0
+	 *
+	 * @since        4.0
+	 *
 	 * @dataProvider provider_get_form_value
-	 * @todo checkbox, multicheck and conditionalLogic
+	 *
+	 * @todo         checkbox, multicheck and conditionalLogic
 	 */
 	public function test_get_form_value( $input, $expected ) {
 		$_GET['id']  = $this->form_id;
@@ -999,126 +1042,165 @@ class Test_Options_API extends WP_UnitTestCase
 		$this->assertEquals( $expected, $this->options->get_form_value( $input ) );
 	}
 
-
+	/**
+	 * The data provider for test_get_form_value()
+	 *
+	 * @return array
+	 *
+	 * @since 4.0
+	 */
 	public function provider_get_form_value() {
 		return array(
 
 			/* Test Settings Radio */
-			array( array(
-				'id' => 'default_action',
-				'type' => 'radio',
-				'options' => array(
-					'View' => 'View',
-					'Download'  => 'Download',
+			array(
+				array(
+					'id'      => 'default_action',
+					'type'    => 'radio',
+					'options' => array(
+						'View'     => 'View',
+						'Download' => 'Download',
+					),
 				),
-			), 'View' ),
+				'View',
+			),
 
 			/* Test Form Settings Radio */
-			array( array(
-				'id' => 'rtl',
-				'type' => 'radio',
-				'options' => array(
-					'Yes' => 'Yes',
-					'No'  => 'No',
+			array(
+				array(
+					'id'      => 'rtl',
+					'type'    => 'radio',
+					'options' => array(
+						'Yes' => 'Yes',
+						'No'  => 'No',
+					),
 				),
-			), 'No' ),
+				'No',
+			),
 
 			/* Test Fallback Radio */
-			array( array(
-				'id' => 'no_field',
-				'type' => 'radio',
-				'options' => array(
-					'Yes' => 'Yes',
-					'No'  => 'No',
+			array(
+				array(
+					'id'      => 'no_field',
+					'type'    => 'radio',
+					'options' => array(
+						'Yes' => 'Yes',
+						'No'  => 'No',
+					),
+					'std'     => 'Yes',
 				),
-				'std' => 'Yes',
-			), 'Yes' ),
+				'Yes',
+			),
 
 
 			/* Test Blank Radio */
-			array( array(
-				'id' => 'no_field',
-				'type' => 'radio',
-				'options' => array(
-					'Yes' => 'Yes',
-					'No'  => 'No',
+			array(
+				array(
+					'id'      => 'no_field',
+					'type'    => 'radio',
+					'options' => array(
+						'Yes' => 'Yes',
+						'No'  => 'No',
+					),
 				),
-			), '' ),
+				'',
+			),
 
 
 			/* Test Settings Select */
-			array( array(
-				'id' => 'admin_capabilities',
-				'type' => 'select',
-				'options' => array(
-					'Gravity Forms Capabilities' => array(
-						'gform_view_settings'
-					),
+			array(
+				array(
+					'id'      => 'admin_capabilities',
+					'type'    => 'select',
+					'options' => array(
+						'Gravity Forms Capabilities' => array(
+							'gform_view_settings',
+						),
 
-					'Active WordPress Capabilities' => array(
-						'read'
+						'Active WordPress Capabilities' => array(
+							'read',
+						),
 					),
 				),
-			), array( 'gravityforms_create_form' ) ),
+				array( 'gravityforms_create_form' ),
+			),
 
 			/* Test Form Settings Select */
-			array( array(
-				'id' => 'template',
-				'type' => 'select',
-				'options' => array(
-
+			array(
+				array(
+					'id'      => 'template',
+					'type'    => 'select',
+					'options' => array(),
 				),
-			), 'Gravity Forms Style' ),
+				'Gravity Forms Style',
+			),
 
 			/* Test Fallback Select */
-			array( array(
-				'id' => 'no_field',
-				'type' => 'select',
-				'options' => array(
-					'Yes' => 'Yes',
-					'No'  => 'No',
+			array(
+				array(
+					'id'      => 'no_field',
+					'type'    => 'select',
+					'options' => array(
+						'Yes' => 'Yes',
+						'No'  => 'No',
+					),
+					'std'     => 'Yes',
 				),
-				'std' => 'Yes',
-			), 'Yes' ),
+				'Yes',
+			),
 
 
 			/* Test Blank Select */
-			array( array(
-				'id' => 'no_field',
-				'type' => 'select',
-				'options' => array(
-					'Yes' => 'Yes',
-					'No'  => 'No',
+			array(
+				array(
+					'id'      => 'no_field',
+					'type'    => 'select',
+					'options' => array(
+						'Yes' => 'Yes',
+						'No'  => 'No',
+					),
 				),
-			), '' ),
-
+				'',
+			),
 
 
 			/* Test Settings Text */
-			array( array(
-				'id' => 'default_font_size',
-				'type' => 'number',
-			), '13' ),
+			array(
+				array(
+					'id'   => 'default_font_size',
+					'type' => 'number',
+				),
+				'13',
+			),
 
 			/* Test Form Settings Text */
-			array( array(
-				'id' => 'name',
-				'type' => 'text',
-			), 'My First PDF Template' ),
+			array(
+				array(
+					'id'   => 'name',
+					'type' => 'text',
+				),
+				'My First PDF Template',
+			),
 
 			/* Test Fallback Text */
-			array( array(
-				'id' => 'no_field',
-				'type' => 'text',
-				'std' => 'Working',
-			), 'Working' ),
+			array(
+				array(
+					'id'   => 'no_field',
+					'type' => 'text',
+					'std'  => 'Working',
+				),
+				'Working',
+			),
 
 
 			/* Test Blank Text */
-			array( array(
-				'id' => 'no_field',
-				'type' => 'text',
-			), '' ),
+			array(
+				array(
+					'id'   => 'no_field',
+					'type' => 'text',
+				),
+				'',
+			),
 		);
 	}
 }

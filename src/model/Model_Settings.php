@@ -56,21 +56,27 @@ class Model_Settings extends Helper_Abstract_Model {
 
 	/**
 	 * Errors with the global form submission process are stored here
-	 * @var Array
+	 *
+	 * @var array
+	 *
 	 * @since 4.0
 	 */
 	public $form_settings_errors;
 
 	/**
 	 * Holds abstracted functions related to the forms plugin
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Form
+	 *
 	 * @since 4.0
 	 */
 	protected $form;
 
 	/**
 	 * Holds our log class
-	 * @var Object
+	 *
+	 * @var \Monolog\Logger|LoggerInterface
+	 *
 	 * @since 4.0
 	 */
 	protected $log;
@@ -78,7 +84,9 @@ class Model_Settings extends Helper_Abstract_Model {
 	/**
 	 * Holds our Helper_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Options_Fields
+	 *
 	 * @since 4.0
 	 */
 	protected $options;
@@ -86,7 +94,9 @@ class Model_Settings extends Helper_Abstract_Model {
 	/**
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Data
+	 *
 	 * @since 4.0
 	 */
 	protected $data;
@@ -94,19 +104,23 @@ class Model_Settings extends Helper_Abstract_Model {
 	/**
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Misc
+	 *
 	 * @since 4.0
 	 */
 	protected $misc;
 
 	/**
-	 * [__construct description]
-	 * @param Helper_Abstract_Form $form        Our abstracted Gravity Forms helper functions
-	 * @param LoggerInterface      $log         Our logger class
-	 * @param Helper_Notices        $notices Our notice class used to queue admin messages and errors
-	 * @param Helper_Options       $options     Our options class which allows us to access any settings
-	 * @param Helper_Data          $data        Our plugin data store
-	 * @param Helper_Misc          $misc        Our miscellaneous class
+	 * Set up our dependancies
+	 *
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $form    Our abstracted Gravity Forms helper functions
+	 * @param \Monolog\Logger|LoggerInterface    $log     Our logger class
+	 * @param \GFPDF\Helper\Helper_Notices       $notices Our notice class used to queue admin messages and errors
+	 * @param \GFPDF\Helper\Helper_Options       $options Our options class which allows us to access any settings
+	 * @param \GFPDF\Helper\Helper_Data          $data    Our plugin data store
+	 * @param \GFPDF\Helper\Helper_Misc          $misc    Our miscellaneous class
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log, Helper_Notices $notices, Helper_Options $options, Helper_Data $data, Helper_Misc $misc ) {
@@ -122,7 +136,9 @@ class Model_Settings extends Helper_Abstract_Model {
 
 	/**
 	 * Get the form setting error and remove any duplicates
+	 *
 	 * @since 4.0
+	 *
 	 * @return  void
 	 */
 	public function setup_form_settings_errors() {
@@ -158,8 +174,11 @@ class Model_Settings extends Helper_Abstract_Model {
 
 	/**
 	 * If any errors have been passed back from the options.php page we will highlight the actual fields that caused them
-	 * @param  Array $settings The get_registered_fields() array
-	 * @return Array
+	 *
+	 * @param  array $settings The get_registered_fields() array
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public function highlight_errors( $settings ) {
@@ -182,7 +201,7 @@ class Model_Settings extends Helper_Abstract_Model {
 					foreach ( $group as $id => &$item ) {
 						if ( $item['id'] === $error['code'] ) {
 							$item['class'] = ( isset( $item['class'] ) ) ? $item['class'] . ' gfield_error' : 'gfield_error';
-							$found = true;
+							$found         = true;
 							break;
 						}
 					}
@@ -200,30 +219,36 @@ class Model_Settings extends Helper_Abstract_Model {
 
 	/**
 	 * Install the files stored in /initialisation/template/ to the user's template directory
-	 * @return Boolean
+	 *
+	 * @return boolean
+	 *
 	 * @since 4.0
 	 */
 	public function install_templates() {
 
 		$destination = ( is_multisite() ) ? $this->data->multisite_template_location : $this->data->template_location;
-		$copy = $this->misc->copyr( PDF_PLUGIN_DIR . 'initialisation/templates/', $destination );
+		$copy        = $this->misc->copyr( PDF_PLUGIN_DIR . 'initialisation/templates/', $destination );
 		if ( is_wp_error( $copy ) ) {
 			$this->log->addError( 'Template Installation Error.' );
 			$this->notices->add_error( sprintf( __( 'There was a problem copying all PDF templates to %s. Please try again.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $destination ) . '</code>' ) );
+
 			return false;
 		}
 
 		$this->notices->add_notice( sprintf( __( 'Gravity PDF Custom Templates successfully installed to %s.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $destination ) . '</code>' ) );
 		$this->options->update_option( 'custom_pdf_template_files_installed', true );
+
 		return true;
 	}
 
 
-
 	/**
 	 * Removes the current font's TTF or OTF files from our font directory
-	 * @param  Array $fonts The font config
-	 * @return Boolean        True on success, false on failure
+	 *
+	 * @param  array $fonts The font config
+	 *
+	 * @return boolean        True on success, false on failure
+	 *
 	 * @since  4.0
 	 */
 	public function remove_font_file( $fonts ) {
@@ -232,7 +257,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		$types = array( 'regular', 'bold', 'italics', 'bolditalics' );
 
 		foreach ( $types as $type ) {
-			if ( isset($fonts[ $type ]) ) {
+			if ( isset( $fonts[ $type ] ) ) {
 				$filename = basename( $fonts[ $type ] );
 
 				if ( is_file( $this->data->template_font_location . $filename ) && ! unlink( $this->data->template_font_location . $filename ) ) {
@@ -246,8 +271,11 @@ class Model_Settings extends Helper_Abstract_Model {
 
 	/**
 	 * Check that the font name passed conforms to our expected nameing convesion
-	 * @param  String $name The font name to check
+	 *
+	 * @param  string $name The font name to check
+	 *
 	 * @return boolean       True on valid, false on failure
+	 *
 	 * @since 4.0
 	 */
 	public function is_font_name_valid( $name ) {
@@ -263,9 +291,13 @@ class Model_Settings extends Helper_Abstract_Model {
 
 	/**
 	 * Query our custom fonts options table and check if the font name already exists
-	 * @param  String  $name The font name to check
-	 * @param  Integer $id The configuration ID (if any)
-	 * @return boolean True if valid, false on failure
+	 *
+	 * @param  string    $name The font name to check
+	 * @param int|string $id   The configuration ID (if any)
+	 *
+	 * @return bool True if valid, false on failure
+	 *
+	 * @since 4.0
 	 */
 	public function is_font_name_unique( $name, $id = '' ) {
 
@@ -275,7 +307,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		/* Loop through default fonts and check for duplicate */
 		$default_fonts = $this->options->get_installed_fonts();
 
-		unset( $default_fonts[ __('User-Defined Fonts', 'gravity-forms-pdf-extended' ) ] );
+		unset( $default_fonts[ __( 'User-Defined Fonts', 'gravity-forms-pdf-extended' ) ] );
 
 		/* check for exact match */
 		foreach ( $default_fonts as $group ) {
@@ -284,7 +316,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			}
 		}
 
-		$custom_fonts  = $this->options->get_option( 'custom_fonts' );
+		$custom_fonts = $this->options->get_option( 'custom_fonts' );
 
 		if ( is_array( $custom_fonts ) ) {
 			foreach ( $custom_fonts as $font ) {
@@ -305,24 +337,27 @@ class Model_Settings extends Helper_Abstract_Model {
 
 	/**
 	 * Handles the database updates required to save a new font
-	 * @param  Array $fonts
-	 * @return Array
+	 *
+	 * @param  array $fonts
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public function install_fonts( $fonts ) {
 
-		$types = array( 'regular', 'bold', 'italics', 'bolditalics' );
+		$types  = array( 'regular', 'bold', 'italics', 'bolditalics' );
 		$errors = array();
 
 		foreach ( $types as $type ) {
 
 			/* Check if a key exists for this type and process */
-			if ( isset($fonts[ $type ]) ) {
-				$path = $this->misc->convert_url_to_path( $fonts[$type] );
+			if ( isset( $fonts[ $type ] ) ) {
+				$path = $this->misc->convert_url_to_path( $fonts[ $type ] );
 
 				/* Couldn't find file so throw error */
 				if ( is_wp_error( $path ) ) {
-					$errors[] = sprintf( __( 'Could not locate font on web server: %s', 'gravity-forms-pdf-extended' ), $fonts[$type] );
+					$errors[] = sprintf( __( 'Could not locate font on web server: %s', 'gravity-forms-pdf-extended' ), $fonts[ $type ] );
 				}
 
 				/* Copy font to our fonts folder */
@@ -336,15 +371,16 @@ class Model_Settings extends Helper_Abstract_Model {
 		/* If errors were found then return */
 		if ( sizeof( $errors ) > 0 ) {
 			$this->log->addError( 'Install Error.', array( 'errors' => $errors ) );
+
 			return array( 'errors' => $errors );
 		} else {
 			/* Insert our font into the database */
-			$custom_fonts  = $this->options->get_option( 'custom_fonts' );
+			$custom_fonts = $this->options->get_option( 'custom_fonts' );
 
 			/* Prepare our font data and give it a unique id */
-			if ( empty($fonts['id']) ) {
-				$id                = uniqid();
-				$fonts['id']       = $id;
+			if ( empty( $fonts['id'] ) ) {
+				$id          = uniqid();
+				$fonts['id'] = $id;
 			}
 
 			$custom_fonts[ $fonts['id'] ] = $fonts;
@@ -354,20 +390,24 @@ class Model_Settings extends Helper_Abstract_Model {
 		}
 
 		/* Fonts sucessfully installed so return font data */
+
 		return $fonts;
 	}
 
 	/**
 	 * Load Recent forum articles meta box
-	 * @param Object $object The metabox object
+	 *
+	 * @param object $object The metabox object
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	public function process_meta_pdf_recent_forum_articles( $object ) {
 		$controller = $this->getController();
 
 		/* get our list of recent forum topics */
-		$latest     = $this->get_latest_forum_topics();
+		$latest = $this->get_latest_forum_topics();
 
 		/* call view to render topics */
 		$controller->view->add_meta_pdf_recent_forum_articles( $object, $latest );
@@ -375,8 +415,9 @@ class Model_Settings extends Helper_Abstract_Model {
 
 	/**
 	 * Call forum endpoint and get the latest topic information
-	 * @param Object $object The metabox object
-	 * @return void
+	 *
+	 * @return string|boolean
+	 *
 	 * @since 4.0
 	 */
 	public function get_latest_forum_topics() {
@@ -405,7 +446,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		$json = json_decode( $response['body'], true );
 
 		/* check we have the correct keys */
-		if ( ! isset($json['topic_list']['topics']) ) {
+		if ( ! isset( $json['topic_list']['topics'] ) ) {
 			return false;
 		}
 
@@ -420,20 +461,26 @@ class Model_Settings extends Helper_Abstract_Model {
 
 	/**
 	 * Turn capabilities into more friendly strings
-	 * @param  String $cap The wordpress-style capability
-	 * @return String
+	 *
+	 * @param  string $cap The wordpress-style capability
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	public function style_capabilities( $cap ) {
 		$cap = str_replace( 'gravityforms', 'gravity_forms', $cap );
 		$cap = str_replace( '_', ' ', $cap );
 		$cap = ucwords( $cap );
+
 		return $cap;
 	}
 
 	/**
 	 * Add meta boxes used in the settings "help" tab
+	 *
 	 * @since  4.0
+	 *
 	 * @return  void
 	 */
 	public function add_meta_boxes() {
@@ -505,7 +552,9 @@ class Model_Settings extends Helper_Abstract_Model {
 	/**
 	 * Check a user is authorized to make modifications via this endpoint and
 	 * that there is a valid nonce
+	 *
 	 * @return void
+	 *
 	 * @since  4.0
 	 */
 	private function ajax_font_validation() {
@@ -515,7 +564,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			/* fail */
 			$this->log->addCritical( 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
-				'user_meta' => get_user_meta( get_current_user_id() )
+				'user_meta' => get_user_meta( get_current_user_id() ),
 			) );
 
 			header( 'HTTP/1.1 401 Unauthorized' );
@@ -539,7 +588,9 @@ class Model_Settings extends Helper_Abstract_Model {
 
 	/**
 	 * AJAX Endpoint for saving the custom font
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	public function save_font() {
@@ -561,7 +612,9 @@ class Model_Settings extends Helper_Abstract_Model {
 
 	/**
 	 * AJAX Endpoint for deleting a custom font
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	public function delete_font() {
@@ -576,10 +629,10 @@ class Model_Settings extends Helper_Abstract_Model {
 		$fonts = $this->options->get_option( 'custom_fonts' );
 
 		/* Check font actually exists and remove */
-		if ( isset($fonts[ $id ]) ) {
+		if ( isset( $fonts[ $id ] ) ) {
 
 			if ( $this->remove_font_file( $fonts[ $id ] ) ) {
-				unset($fonts[ $id ]);
+				unset( $fonts[ $id ] );
 
 				if ( $this->options->update_option( 'custom_fonts', $fonts ) ) {
 					/* Success */
@@ -604,8 +657,11 @@ class Model_Settings extends Helper_Abstract_Model {
 
 	/**
 	 * Validate user input and save as new font
-	 * @param  Array $font The four font fields to be processed
-	 * @return Array
+	 *
+	 * @param  array $font The four font fields to be processed
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public function process_font( $font ) {
@@ -614,8 +670,9 @@ class Model_Settings extends Helper_Abstract_Model {
 		$font = array_filter( $font );
 
 		/* Check we have the required data */
-		if ( ! isset($font['font_name']) || ! isset($font['regular']) ||
-		   strlen( $font['font_name'] ) === 0 || strlen( $font['regular'] ) === 0 ) {
+		if ( ! isset( $font['font_name'] ) || ! isset( $font['regular'] ) ||
+		     strlen( $font['font_name'] ) === 0 || strlen( $font['regular'] ) === 0
+		) {
 
 			header( 'HTTP/1.1 400 Bad Request' );
 
@@ -648,7 +705,7 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		/* Check the font name is unique */
 		$shortname = $this->options->get_font_short_name( $name );
-		$id = (isset($font['id'])) ? $font['id'] : '';
+		$id        = ( isset( $font['id'] ) ) ? $font['id'] : '';
 
 		if ( ! $this->is_font_name_unique( $shortname, $id ) ) {
 
@@ -668,7 +725,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		$installation = $this->install_fonts( $font );
 
 		/* Check if any errors occured installing the fonts */
-		if ( isset($installation['errors']) ) {
+		if ( isset( $installation['errors'] ) ) {
 
 			header( 'HTTP/1.1 400 Bad Request' );
 
@@ -683,6 +740,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		}
 
 		/* If we got here the installation was successful so return the data */
+
 		return $installation;
 	}
 }

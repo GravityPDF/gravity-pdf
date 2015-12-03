@@ -2,10 +2,6 @@
 
 namespace GFPDF\Helper;
 
-use GFPDF\Helper\Helper_Abstract_Form;
-use GFPDF\Helper\Helper_Misc;
-use GFPDF\Helper\Helper_Options;
-
 use WP_List_Table;
 
 
@@ -45,20 +41,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * A simple abstract class controlers can extent to share similar variables
+ *
  * @since 4.0
  */
 class Helper_PDF_List_Table extends WP_List_Table {
 
 	/**
 	 * Our Gravity Form array
-	 * @var Array
+	 *
+	 * @var array
+	 *
 	 * @since 4.0
 	 */
-	public $form;
+	public $form_array;
 
 	/**
 	 * Holds abstracted functions related to the forms plugin
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Form
+	 *
 	 * @since 4.0
 	 */
 	protected $form_plugin;
@@ -66,7 +67,9 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	/**
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Misc
+	 *
 	 * @since 4.0
 	 */
 	protected $misc;
@@ -74,20 +77,27 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	/**
 	 * Holds our Helper_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Options_Fields
+	 *
 	 * @since 4.0
 	 */
 	protected $options;
 
 	/**
 	 * Setup our class with appropriate data (columns, form
-	 * @param  array $form A Gravity Form meta data array
+	 *
+	 * @param  array                             $form A Gravity Form meta data array
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $form_plugin
+	 * @param \GFPDF\Helper\Helper_Misc          $misc
+	 * @param \GFPDF\Helper\Helper_Options       $options
+	 *
 	 * @since 4.0
 	 */
-	public function __construct( $form, Helper_Abstract_Form $form_plugin, Helper_Misc $misc, Helper_Options $options ) {
+	public function __construct( $form_array, Helper_Abstract_Form $form_plugin, Helper_Misc $misc, Helper_Options $options ) {
 
 		/* Assign our internal variables */
-		$this->form        = $form;
+		$this->form_array  = $form_array;
 		$this->form_plugin = $form_plugin;
 		$this->misc        = $misc;
 		$this->options     = $options;
@@ -104,16 +114,17 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 	/**
 	 * Return the columns that should be used in the list table
+	 *
 	 * @return array
 	 */
 	public function get_columns() {
 
 		$columns = array(
-				'cb'            => '',
-				'name'          => __( 'Name', 'gravity-forms-pdf-extended' ),
-				'shortcode'     => __( 'Download Shortcode', 'gravity-forms-pdf-extended' ),
-				'template'      => __( 'Template', 'gravity-forms-pdf-extended' ),
-				'notifications' => __( 'Notifications', 'gravity-forms-pdf-extended' ),
+			'cb'            => '',
+			'name'          => __( 'Name', 'gravity-forms-pdf-extended' ),
+			'shortcode'     => __( 'Download Shortcode', 'gravity-forms-pdf-extended' ),
+			'template'      => __( 'Template', 'gravity-forms-pdf-extended' ),
+			'notifications' => __( 'Notifications', 'gravity-forms-pdf-extended' ),
 		);
 
 		$columns = apply_filters( 'gfpdf_pdf_list_columns', $columns );
@@ -123,7 +134,9 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 	/**
 	 * Get the name of the default primary column.
+	 *
 	 * @return string Name of the default primary column, in this case, 'name'
+	 *
 	 * @since 4.0
 	 */
 	protected function get_default_primary_column_name() {
@@ -132,14 +145,16 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 	/**
 	 * Prepares the list of items for displaying.
+	 *
 	 * @since 4.0
 	 */
 	public function prepare_items() {
-		$this->items = ( isset( $this->form['gfpdf_form_settings'] ) ) ? $this->form['gfpdf_form_settings'] : array();
+		$this->items = ( isset( $this->form_array['gfpdf_form_settings'] ) ) ? $this->form_array['gfpdf_form_settings'] : array();
 	}
 
 	/**
 	 * Display our table
+	 *
 	 * @since 4.0
 	 */
 	public function display() {
@@ -149,19 +164,21 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 		<table class="wp-list-table <?php echo implode( ' ', $this->get_table_classes() ); ?>" cellspacing="0">
 			<thead>
-				<tr>
-					<?php $this->print_column_headers(); ?>
-				</tr>
+			<tr>
+				<?php $this->print_column_headers(); ?>
+			</tr>
 			</thead>
 
-			<tbody id="the-list" <?php if ( $singular ) { echo " class='list:$singular'"; } ?>>
-				<?php $this->display_rows_or_placeholder(); ?>
+			<tbody id="the-list" <?php if ( $singular ) {
+				echo " class='list:$singular'";
+			} ?>>
+			<?php $this->display_rows_or_placeholder(); ?>
 			</tbody>
 
 			<tfoot>
-				<tr>
-					<?php $this->print_column_headers( false ); ?>
-				</tr>
+			<tr>
+				<?php $this->print_column_headers( false ); ?>
+			</tr>
 			</tfoot>
 
 		</table>
@@ -171,7 +188,9 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 	/**
 	 * Output the single table row
-	 * @param  array $item The table row being processed
+	 *
+	 * @param  object $item The table row being processed
+	 *
 	 * @since 4.0
 	 */
 	public function single_row( $item ) {
@@ -180,14 +199,18 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$row_class = ( $row_class == '' ? 'class="alternate"' : $row_class );
 
 		echo '<tr id="gfpdf-' . $item['id'] . '" ' . $row_class . '>';
-		echo $this->single_row_columns( $item );
+		$this->single_row_columns( $item );
 		echo '</tr>';
 	}
 
 	/**
 	 * Default column handler
 	 * Used when not custom column public function exists
+	 *
 	 * @param  array $item The table row being processed
+	 *
+	 * @param string $column
+	 *
 	 * @since 4.0
 	 */
 	public function column_default( $item, $column ) {
@@ -197,7 +220,9 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	/**
 	 * Custom public function for displaying the 'cb' column
 	 * Used to handle active / inactive PDFs
+	 *
 	 * @param  array $item The table row being processed
+	 *
 	 * @since 4.0
 	 */
 	public function column_cb( $item ) {
@@ -207,7 +232,12 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$state_nonce = wp_create_nonce( "gfpdf_state_nonce_{$form_id}_{$item['id']}" );
 		?>
 
-		<img data-id="<?php echo $item['id'] ?>" data-nonce="<?php echo $state_nonce; ?>" data-fid="<?php echo $form_id; ?>" src="<?php echo $this->form_plugin->get_plugin_url() ?>/images/active<?php echo intval( $is_active ) ?>.png" style="cursor: pointer;margin:-1px 0 0 8px;" alt="<?php $is_active ? __( 'Active', 'gravity-forms-pdf-extended' ) : __( 'Inactive', 'gravity-forms-pdf-extended' ); ?>" title="<?php echo $is_active ? __( 'Active', 'gravity-forms-pdf-extended' ) : __( 'Inactive', 'gravity-forms-pdf-extended' ); ?>"/>
+		<img data-id="<?php echo $item['id'] ?>" data-nonce="<?php echo $state_nonce; ?>"
+		     data-fid="<?php echo $form_id; ?>"
+		     src="<?php echo $this->form_plugin->get_plugin_url() ?>/images/active<?php echo intval( $is_active ) ?>.png"
+		     style="cursor: pointer;margin:-1px 0 0 8px;"
+		     alt="<?php $is_active ? __( 'Active', 'gravity-forms-pdf-extended' ) : __( 'Inactive', 'gravity-forms-pdf-extended' ); ?>"
+		     title="<?php echo $is_active ? __( 'Active', 'gravity-forms-pdf-extended' ) : __( 'Inactive', 'gravity-forms-pdf-extended' ); ?>"/>
 
 		<?php
 	}
@@ -215,19 +245,22 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	/**
 	 * Custom public function for displaying the 'notifications' column
 	 * Display comma separated list of active notifications, otherwise display 'None'
+	 *
 	 * @param  array $item The table row being processed
+	 *
 	 * @since 4.0
 	 */
 	public function column_notifications( $item ) {
-		if ( ! isset($item['notification']) || sizeof( $item['notification'] ) == 0 ) {
+		if ( ! isset( $item['notification'] ) || sizeof( $item['notification'] ) == 0 ) {
 			_e( 'None', 'gravity-forms-pdf-extended' );
+
 			return;
 		}
 
 		/* Convert our IDs to names */
 		$notification_names = array();
-		foreach( $this->form['notifications'] as $notification ) {
-			if( in_array( $notification['id'], $item['notification'] ) ) {
+		foreach ( $this->form_array['notifications'] as $notification ) {
+			if ( in_array( $notification['id'], $item['notification'] ) ) {
 				$notification_names[] = $notification['name'];
 			}
 		}
@@ -237,7 +270,9 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 	/**
 	 * Translates the template raw name to a user-friendly name
+	 *
 	 * @param  array $item The table row being processed
+	 *
 	 * @since 4.0
 	 */
 	public function column_shortcode( $item ) {
@@ -249,15 +284,17 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$name = str_replace( '"', '', $item['name'] );
 
 		/* Prepare our shortcode sample */
-		$shortcode = '[gravitypdf name="'. esc_attr( $name ) .'" id="'. esc_attr( $item['id'] ) . '" text="' . __( 'Download PDF', 'gravity-forms-pdf-extended' ) . '"]';
+		$shortcode = '[gravitypdf name="' . esc_attr( $name ) . '" id="' . esc_attr( $item['id'] ) . '" text="' . __( 'Download PDF', 'gravity-forms-pdf-extended' ) . '"]';
 
 		/* Display in a readonly field */
-		echo '<input type="text" class="gravitypdf_shortcode" value="'. esc_attr( $shortcode ) .'" readonly="readonly" onfocus="jQuery(this).select();" onclick="jQuery(this).select();" />';
+		echo '<input type="text" class="gravitypdf_shortcode" value="' . esc_attr( $shortcode ) . '" readonly="readonly" onfocus="jQuery(this).select();" onclick="jQuery(this).select();" />';
 	}
 
 	/**
 	 * Translates the template raw name to a user-friendly name
+	 *
 	 * @param  array $item The table row being processed
+	 *
 	 * @since 4.0
 	 */
 	public function column_template( $item ) {
@@ -268,8 +305,8 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			echo "<strong>{$template['group']} – </strong> {$template['template']}";
 
 			/* Add addendum if version is incompatible */
-			if( ! empty( $template['required_pdf_version'] ) && version_compare( $template['required_pdf_version'], PDF_EXTENDED_VERSION, '>' ) ) {
-				echo ' (+ '. _x( 'needs', 'Required', 'gravity-forms-pdf-extended' ) . ' v' . $template['required_pdf_version'] . ')';
+			if ( ! empty( $template['required_pdf_version'] ) && version_compare( $template['required_pdf_version'], PDF_EXTENDED_VERSION, '>' ) ) {
+				echo ' (+ ' . _x( 'needs', 'Required', 'gravity-forms-pdf-extended' ) . ' v' . $template['required_pdf_version'] . ')';
 			}
 
 		} else {
@@ -279,7 +316,9 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 	/**
 	 * Add column actions to allow edit, duplication and deletion
+	 *
 	 * @param  array $item The table row being processed
+	 *
 	 * @since 4.0
 	 */
 	public function column_name( $item ) {
@@ -288,11 +327,11 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$duplicate_nonce = wp_create_nonce( "gfpdf_duplicate_nonce_{$form_id}_{$item['id']}" );
 		$delete_nonce    = wp_create_nonce( "gfpdf_delete_nonce_{$form_id}_{$item['id']}" );
 
-		$actions  = apply_filters(
+		$actions = apply_filters(
 			'gfpdf_pdf_actions', array(
 				'edit'      => '<a title="' . __( 'Edit this PDF', 'gravity-forms-pdf-extended' ) . '" href="' . $edit_url . '">' . __( 'Edit', 'gravity-forms-pdf-extended' ) . '</a>',
-				'duplicate' => '<a title="' . __( 'Duplicate this PDF', 'gravity-forms-pdf-extended' ) . '" data-id="' . $item['id'] . '" class="submitduplicate" data-nonce="'. $duplicate_nonce .'"  data-fid="'. $form_id . '">' . __( 'Duplicate', 'gravity-forms-pdf-extended' ) . '</a>',
-				'delete'    => '<a title="' . __( 'Delete this PDF', 'gravity-forms-pdf-extended' ) . '" class="submitdelete" data-id="' . $item['id'] . '" data-nonce="'. $delete_nonce .'" data-fid="'. $form_id .'">' . __( 'Delete', 'gravity-forms-pdf-extended' ) . '</a>',
+				'duplicate' => '<a title="' . __( 'Duplicate this PDF', 'gravity-forms-pdf-extended' ) . '" data-id="' . $item['id'] . '" class="submitduplicate" data-nonce="' . $duplicate_nonce . '"  data-fid="' . $form_id . '">' . __( 'Duplicate', 'gravity-forms-pdf-extended' ) . '</a>',
+				'delete'    => '<a title="' . __( 'Delete this PDF', 'gravity-forms-pdf-extended' ) . '" class="submitdelete" data-id="' . $item['id'] . '" data-nonce="' . $delete_nonce . '" data-fid="' . $form_id . '">' . __( 'Delete', 'gravity-forms-pdf-extended' ) . '</a>',
 			)
 		);
 
@@ -311,18 +350,19 @@ class Helper_PDF_List_Table extends WP_List_Table {
 					<span class="<?php echo $key; ?>">
                         <?php echo $html . $divider; ?>
                     </span>
-				<?php
+					<?php
 				}
 			}
 			?>
 
 		</div>
 
-	<?php
+		<?php
 	}
 
 	/**
 	 * Copy to display when no PDF configuration options exist
+	 *
 	 * @since 4.0
 	 */
 	public function no_items() {

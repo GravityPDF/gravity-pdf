@@ -50,17 +50,23 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Fileupload extends Helper_Abstract_Fields
-{
+class Field_Fileupload extends Helper_Abstract_Fields {
 
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
-	 * @param Object $field The GF_Field_* Object
-	 * @param Array  $entry The Gravity Forms Entry
+	 *
+	 * @param object                             $field The GF_Field_* Object
+	 * @param array                              $entry The Gravity Forms Entry
+	 *
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
+	 * @param \GFPDF\Helper\Helper_Misc          $misc
+	 *
+	 * @throws Exception
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( $field, $entry, Helper_Abstract_Form $form, Helper_Misc $misc ) {
-		
+
 		if ( ! is_object( $field ) || ! $field instanceof GF_Field_FileUpload ) {
 			throw new Exception( '$field needs to be in instance of GF_Field_FileUpload' );
 		}
@@ -71,7 +77,8 @@ class Field_Fileupload extends Helper_Abstract_Fields
 
 	/**
 	 * Return the HTML form data
-	 * @return Array
+	 *
+	 * @return array
 	 * @since 4.0
 	 */
 	public function form_data() {
@@ -82,14 +89,16 @@ class Field_Fileupload extends Helper_Abstract_Fields
 
 		foreach ( $value as $image ) {
 
-			$data[ $this->field->id . '.' . $label ][] = $image;
-			$data[ $this->field->id ][]                = $image;
-			$data[ $label ][]                          = $image;
+			$field_id = (int) $this->field->id;
+
+			$data[ $field_id . '.' . $label ][] = $image;
+			$data[ $field_id ][]                = $image;
+			$data[ $label ][]                   = $image;
 
 			$path = $this->misc->convert_url_to_path( $image );
 
-			$data[ $this->field->id . '_path' ][]                = $path;
-			$data[ $this->field->id . '.' . $label . '_path' ][] = $path;
+			$data[ $field_id . '_path' ][]                = $path;
+			$data[ $field_id . '.' . $label . '_path' ][] = $path;
 		}
 
 		return array( 'field' => $data );
@@ -97,20 +106,25 @@ class Field_Fileupload extends Helper_Abstract_Fields
 
 	/**
 	 * Display the HTML version of this field
-	 * @return String
+	 *
+	 * @param string $value
+	 * @param bool   $label
+	 *
+	 * @return string
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
 		$files = $this->value();
+		$html  = '';
 
 		if ( sizeof( $files ) > 0 ) {
 			$html = '<ul class="bulleted">';
-			$i     = 1;
+			$i    = 1;
 
 			foreach ( $files as $file ) {
 				$file_info = pathinfo( $file );
 				$html .= '<li id="field-' . $this->field->id . '-option-' . $i . '"><a href="' . esc_url( $file ) . '">' . esc_html( $file_info['basename'] ) . '</a></li>';
-				$i++;
+				$i ++;
 			}
 
 			$html .= '</ul>';
@@ -121,7 +135,8 @@ class Field_Fileupload extends Helper_Abstract_Fields
 
 	/**
 	 * Get the standard GF value of this field
-	 * @return String/Array
+	 *
+	 * @return string|array
 	 * @since 4.0
 	 */
 	public function value() {
@@ -132,8 +147,8 @@ class Field_Fileupload extends Helper_Abstract_Fields
 		$value = $this->get_value();
 		$files = array();
 
-		if ( ! empty($value) ) {
-			$paths = ($this->field->multipleFiles) ? json_decode( $value ) : array( $value );
+		if ( ! empty( $value ) ) {
+			$paths = ( $this->field->multipleFiles ) ? json_decode( $value ) : array( $value );
 
 			foreach ( $paths as $path ) {
 				$files[] = esc_url( $path );

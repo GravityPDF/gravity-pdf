@@ -2,15 +2,10 @@
 
 namespace GFPDF\Helper;
 
-use GFPDF\Helper\Helper_Abstract_Form;
-use GFPDF\Helper\Helper_Misc;
-
 use GFFormsModel;
 use GF_Field;
 use GFCache;
 use GFCommon;
-
-use WP_Error;
 
 use Exception;
 
@@ -51,41 +46,52 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Helper fields can be extended to allow each Gravity Form field type to be displayed correctly
  * We found the default GF display functionality isn't quite up to par for the Gravity PDF requirements
+ *
  * @since 4.0
  */
 abstract class Helper_Abstract_Fields {
 
 	/**
 	 * Contains the field array
-	 * @var Array / Object
+	 *
+	 * @var array|object
+	 *
 	 * @since 4.0
 	 */
 	public $field;
 
 	/**
 	 * Contains the form information
-	 * @var Array
+	 *
+	 * @var array
+	 *
 	 * @since 4.0
 	 */
 	public $form;
 
 	/**
 	 * Contains the entry information
-	 * @var Array
+	 *
+	 * @var array
+	 *
 	 * @since 4.0
 	 */
 	public $entry;
 
 	/**
 	 * Used to cache the $this->value() results
-	 * @var Array
+	 *
+	 * @var array
+	 *
 	 * @since 4.0
 	 */
 	private $cached_results;
 
 	/**
 	 * As come fields can have multiple field types we'll use $fieldObject to store the object
-	 * @var Object
+	 *
+	 * @var object
+	 *
 	 * @since 4.0
 	 */
 	public $fieldObject;
@@ -93,7 +99,9 @@ abstract class Helper_Abstract_Fields {
 	/**
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Misc
+	 *
 	 * @since 4.0
 	 */
 	protected $misc;
@@ -102,8 +110,15 @@ abstract class Helper_Abstract_Fields {
 	 * Set up the object
 	 * Check the $entry is an array, or throw exception
 	 * The $field is validated in the child classes
-	 * @param Object $field The GF_Field_* Object
-	 * @param Array  $entry The Gravity Forms Entry
+	 *
+	 * @param object                             $field The GF_Field_* Object
+	 * @param array                              $entry The Gravity Forms Entry
+	 *
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
+	 * @param \GFPDF\Helper\Helper_Misc          $misc
+	 *
+	 * @throws Exception
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( $field, $entry, Helper_Abstract_Form $form, Helper_Misc $misc ) {
@@ -116,7 +131,7 @@ abstract class Helper_Abstract_Fields {
 			throw new Exception( 'Gravity Forms is not correctly loaded.' );
 		}
 
-		if ( ! is_object( $field ) || ! ($field instanceof GF_Field) ) {
+		if ( ! is_object( $field ) || ! ( $field instanceof GF_Field ) ) {
 			throw new Exception( '$field needs to be in instance of GF_Field' );
 		}
 
@@ -133,8 +148,11 @@ abstract class Helper_Abstract_Fields {
 
 	/**
 	 * Control the getting and setting of the cache
-	 * @param  Boolean / String / Array $value is passed in it will set a new cache
-	 * @return Boolean / String / Array The current cached_results
+	 *
+	 * @param  mixed $value is passed in it will set a new cache
+	 *
+	 * @return mixed The current cached_results
+	 *
 	 * @since 4.0
 	 */
 	final public function cache( $value = null ) {
@@ -147,18 +165,22 @@ abstract class Helper_Abstract_Fields {
 
 	/**
 	 * Check if we currently have a cach
-	 * @return Boolean True is we have a cache and false if we do not
+	 *
+	 * @return boolean True is we have a cache and false if we do not
+	 *
 	 * @since 4.0
 	 */
 	final public function has_cache() {
 		if ( ! is_null( $this->cached_results ) ) {
 			return true;
 		}
+
 		return false;
 	}
 
 	/**
 	 * Reset the cache
+	 *
 	 * @since 4.0
 	 */
 	final public function remove_cache() {
@@ -168,10 +190,11 @@ abstract class Helper_Abstract_Fields {
 	/**
 	 * Used to process the Gravity Forms value extracted from the entry array
 	 * Each value is then passed to the value method set up by the child objects
+	 *
 	 * @since 4.0
 	 */
 	final public function get_value() {
-		
+
 		/**
 		 * Gravity Forms' GFCache function was thrashing the database, causing double the amount of time for the field_value() method to run.
 		 * The reason is that the cache was checking against a field value stored in a transient every time `GFFormsModel::get_lead_field_value()` is called.
@@ -180,9 +203,9 @@ abstract class Helper_Abstract_Fields {
 		 * @hack
 		 * @since  4.0
 		 * @credit Zack Katz (Gravity View author)
-		 * @fixed Gravity Forms 1.9.13.25
+		 * @fixed  Gravity Forms 1.9.13.25
 		 */
-		if( class_exists( 'GFCache' ) && version_compare( GFCommon::$version, '1.9.13.25', '<' ) ) {
+		if ( class_exists( 'GFCache' ) && version_compare( GFCommon::$version, '1.9.13.25', '<' ) ) {
 			GFCache::set( 'GFFormsModel::get_lead_field_value_' . $this->entry['id'] . '_' . $this->field->id, false, false, 0 );
 		}
 
@@ -192,7 +215,9 @@ abstract class Helper_Abstract_Fields {
 
 	/**
 	 * Used to check if the current field has a value
+	 *
 	 * @since 4.0
+	 *
 	 * @internal Child classes can override this method when dealing with a specific use case
 	 */
 	public function is_empty() {
@@ -209,20 +234,23 @@ abstract class Helper_Abstract_Fields {
 
 	/**
 	 * Standardised method for returning the field's correct $form_data['field'] keys
-	 * @return Array
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public function form_data() {
 
-		$value = $this->value();
-		$label = GFFormsModel::get_label( $this->field );
-		$data  = array();
+		$value    = $this->value();
+		$label    = GFFormsModel::get_label( $this->field );
+		$field_id = (int) $this->field->id;
+		$data     = array();
 
 		/* Add field data using standardised naming convesion */
-		$data[ $this->field->id . '.' . $label ] = $value;
+		$data[ $field_id . '.' . $label ] = $value;
 
 		/* Add field data using standardised naming convesion */
-		$data[ $this->field->id ] = $value;
+		$data[ $field_id ] = $value;
 
 		/* Keep backwards compatibility */
 		$data[ $label ] = $value;
@@ -232,56 +260,64 @@ abstract class Helper_Abstract_Fields {
 
 	/**
 	 * Get the default HTML output for this field
-	 * @param  String  $value The field value to be displayed
-	 * @param  Boolean $label Whether or not to show the field's label
+	 *
+	 * @param  string  $value The field value to be displayed
+	 * @param  boolean $label Whether or not to show the field's label
+	 *
 	 * @since 4.0
+	 *
+	 * @return string
 	 */
 	public function html( $value = '', $label = true ) {
 
 		$value = $this->encode_tags( $value, $this->field->type ); /* Prevent shortcodes being processed from user input */
 		$value = apply_filters( 'gfpdf_field_content', $value, $this->field, $value, $this->entry['id'], $this->form['id'] ); /* Backwards compat */
 
-		$type = ( ! empty($this->field->inputType)) ? $this->field->inputType : $this->field->type;
+		$type = ( ! empty( $this->field->inputType ) ) ? $this->field->inputType : $this->field->type;
 
-		$html = '<div id="field-'. $this->field->id .'" class="gfpdf-'. $type .' gfpdf-field '. $this->field->cssClass . '">';
+		$html = '<div id="field-' . $this->field->id . '" class="gfpdf-' . $type . ' gfpdf-field ' . $this->field->cssClass . '">';
 
 		if ( $label ) {
 			$html .= '<div class="label"><strong>' . esc_html( GFFormsModel::get_label( $this->field ) ) . '</strong></div>';
 		}
 
 		/* If the field value is empty we'll add a non-breaking space to act like a character and maintain proper layout */
-		if( strlen( trim( $value ) ) === 0 ) {
+		if ( strlen( trim( $value ) ) === 0 ) {
 			$value = '&nbsp;';
 		}
 
 		$html .= '<div class="value">' . $value . '</div>'
-				. '</div>';
+		         . '</div>';
 
 		return $html;
 	}
 
 	/**
 	 * Used to process the Gravity Forms value extracted from the entry
+	 *
 	 * @since 4.0
 	 */
 	abstract public function value();
 
 	/**
 	 * Prevent user-data shortcodes from being processed by the PDF templates
-	 * @param  String $value The text to be converted
-	 * @param  String $type  The field type
-	 * @return String
+	 *
+	 * @param  string $value The text to be converted
+	 * @param  string $type  The field type
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
-    public function encode_tags($value, $type) {
-    	
-    	if( $type != 'html' && $type != 'signature' && $type != 'section' ) {
+	public function encode_tags( $value, $type ) {
+
+		if ( $type != 'html' && $type != 'signature' && $type != 'section' ) {
 
 			$find      = array( '[', ']', '{', '}' );
 			$converted = array( '&#91;', '&#93;', '&#123;', '&#125;' );
 			$value     = str_replace( $find, $converted, $value );
-    	}
+		}
 
-    	return $value;
-    }
+		return $value;
+	}
 }

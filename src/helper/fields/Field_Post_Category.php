@@ -50,13 +50,19 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Post_Category extends Helper_Abstract_Fields
-{
+class Field_Post_Category extends Helper_Abstract_Fields {
 
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
-	 * @param Object $field The GF_Field_* Object
-	 * @param Array  $entry The Gravity Forms Entry
+	 *
+	 * @param object               $field The GF_Field_* Object
+	 * @param array                $entry The Gravity Forms Entry
+	 *
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
+	 * @param \GFPDF\Helper\Helper_Misc          $misc
+	 *
+	 * @throws Exception
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( $field, $entry, Helper_Abstract_Form $form, Helper_Misc $misc ) {
@@ -77,7 +83,7 @@ class Field_Post_Category extends Helper_Abstract_Fields
 			} else {
 				throw new Exception( 'Class not found' );
 			}
-		} catch (Exception $e) {
+		} catch ( Exception $e ) {
 			/* Exception thrown. Load generic field loader */
 			$this->fieldObject = new Field_Default( $field, $entry, $form, $misc );
 		}
@@ -88,8 +94,8 @@ class Field_Post_Category extends Helper_Abstract_Fields
 
 	/**
 	 * Used to check if the current field has a value
-	 * @since 4.0
-	 * @internal Child classes can override this method when dealing with a specific use case
+	 *
+	 * @since    4.0
 	 */
 	public function is_empty() {
 		return $this->fieldObject->is_empty();
@@ -97,15 +103,17 @@ class Field_Post_Category extends Helper_Abstract_Fields
 
 	/**
 	 * Return the HTML form data
-	 * @return Array
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public function form_data() {
 
 		$field_value = $this->value();
-		$label = GFFormsModel::get_label( $this->field );
-		$data  = array();
-		$value = array(
+		$label       = GFFormsModel::get_label( $this->field );
+		$data        = array();
+		$value       = array(
 			'value' => '',
 			'label' => '',
 		);
@@ -114,8 +122,8 @@ class Field_Post_Category extends Helper_Abstract_Fields
 		if ( ! isset( $field_value[0] ) ) {
 
 			/* Set up our basic values */
-			$value['value'] = ( isset($field_value['value']) ) ? $field_value['value'] : '';
-			$value['label'] = ( isset($field_value['label']) ) ? $field_value['label'] : '';
+			$value['value'] = ( isset( $field_value['value'] ) ) ? $field_value['value'] : '';
+			$value['label'] = ( isset( $field_value['label'] ) ) ? $field_value['label'] : '';
 
 		} else { /* If Checkboxes or Multiselects */
 
@@ -126,9 +134,9 @@ class Field_Post_Category extends Helper_Abstract_Fields
 			}
 		}
 
-		$data['field'][ $this->field->id . '.' . $label ]           = $value['value'];
-		$data['field'][ $this->field->id ]                          = $value['value'];
-		$data['field'][ $label ]                                    = $value['value'];
+		$data['field'][ $this->field->id . '.' . $label ] = $value['value'];
+		$data['field'][ $this->field->id ]                = $value['value'];
+		$data['field'][ $label ]                          = $value['value'];
 
 		/* Name Format */
 		$data['field'][ $this->field->id . '.' . $label . '_name' ] = $value['label'];
@@ -140,7 +148,12 @@ class Field_Post_Category extends Helper_Abstract_Fields
 
 	/**
 	 * Display the HTML version of this field
-	 * @return String
+	 *
+	 * @param string $value
+	 * @param bool   $label
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
@@ -149,7 +162,9 @@ class Field_Post_Category extends Helper_Abstract_Fields
 
 	/**
 	 * Get the standard GF value of this field
-	 * @return String/Array
+	 *
+	 * @return string|array
+	 *
 	 * @since 4.0
 	 */
 	public function value() {
@@ -166,8 +181,8 @@ class Field_Post_Category extends Helper_Abstract_Fields
 		 * while checkbox and multiselect will not.
 		 */
 		$single_dimension = false;
-		if ( ! isset($items[0]) ) { /* convert single-dimensional array to multi-dimensional */
-			$items = array( $items );
+		if ( ! isset( $items[0] ) ) { /* convert single-dimensional array to multi-dimensional */
+			$items            = array( $items );
 			$single_dimension = true;
 		}
 
@@ -175,15 +190,15 @@ class Field_Post_Category extends Helper_Abstract_Fields
 		foreach ( $items as &$val ) {
 
 			/* Process the category label */
-			if ( isset($val['label']) ) {
+			if ( isset( $val['label'] ) ) {
 				$label        = GFCommon::prepare_post_category_value( $val['label'], $this->field );
-				$val['label'] = (is_array( $label ) && isset($label[0])) ? $label[0] : $label;
+				$val['label'] = ( is_array( $label ) && isset( $label[0] ) ) ? $label[0] : $label;
 			}
 
 			/* process the category value */
-			if ( isset($val['value']) ) {
+			if ( isset( $val['value'] ) ) {
 				$id           = GFCommon::prepare_post_category_value( $val['value'], $this->field, 'conditional_logic' );
-				$val['value'] = (is_array( $id ) && isset($id[0])) ? $id[0] : $id;
+				$val['value'] = ( is_array( $id ) && isset( $id[0] ) ) ? $id[0] : $id;
 			}
 		}
 

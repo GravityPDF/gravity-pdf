@@ -2,9 +2,6 @@
 
 namespace GFPDF\Helper;
 
-use GFPDF\Helper\Helper_Interface_Actions;
-use GFPDF\Helper\Helper_Interface_Filters;
-
 /**
  * Give a standardised format to queue admin notices
  *
@@ -41,27 +38,34 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * @since 4.0
- * @todo Impliment Transient Support so errors and notices can be saved
+ *
+ * @todo  Implement Transient Support so errors and notices can be saved
  */
 class Helper_Notices implements Helper_Interface_Actions {
 
 	/**
 	 * Holds any notices that we've triggered
+	 *
 	 * @var array
+	 *
 	 * @since 4.0
 	 */
 	private $notices = array();
 
 	/**
 	 * Holds any errors that we've triggered
+	 *
 	 * @var array
+	 *
 	 * @since 4.0
 	 */
 	private $errors = array();
 
 	/**
 	 * Initialise our class defaults
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function init() {
@@ -69,8 +73,10 @@ class Helper_Notices implements Helper_Interface_Actions {
 	}
 
 	/**
-	 * Apply any actions needed to impliment notices
+	 * Apply any actions needed to implement notices
+	 *
 	 * @since 4.0
+	 *
 	 * @return void
 	 */
 	public function add_actions() {
@@ -79,7 +85,9 @@ class Helper_Notices implements Helper_Interface_Actions {
 
 	/**
 	 * Determine which notice should be triggered
-	 * @return String
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	private function get_notice_type() {
@@ -92,14 +100,17 @@ class Helper_Notices implements Helper_Interface_Actions {
 
 	/**
 	 * Public endpoint for adding a new notice
-	 * @param String $notice The message to be queued
-	 * @param String $class  The class that should be included with the notice box
+	 *
+	 * @param string $notice The message to be queued
+	 * @param string $class  The class that should be included with the notice box
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	public function add_notice( $notice, $class = '' ) {
 
-		if( empty( $class ) ) {
+		if ( empty( $class ) ) {
 			$this->notices[] = $notice;
 		} else {
 			$this->notices[ $class ] = $notice;
@@ -108,13 +119,17 @@ class Helper_Notices implements Helper_Interface_Actions {
 
 	/**
 	 * Public endpoint for adding a new notice
-	 * @param String $notice The message to be queued
-	 * @return void
-	 * @since 4.0
+	 *
+	 * @param string $error The error message that should be added
+	 * @param string $class Any class names that should apply to the error
+	 *
+	 * @internal param string $notice The message to be queued
+	 *
+	 * @since    4.0
 	 */
 	public function add_error( $error, $class = '' ) {
 
-		if( empty( $class ) ) {
+		if ( empty( $class ) ) {
 			$this->errors[] = $error;
 		} else {
 			$this->errors[ $class ] = $error;
@@ -123,47 +138,57 @@ class Helper_Notices implements Helper_Interface_Actions {
 
 	/**
 	 * Check if we currently have a notice
+	 *
 	 * @return boolean
+	 *
 	 * @since 4.0
 	 */
 	public function has_notice() {
 		if ( sizeof( $this->notices ) > 0 ) {
 			return true;
 		}
+
 		return false;
 	}
 
 	/**
 	 * Check if we currently have an error
+	 *
 	 * @return boolean
+	 *
 	 * @since 4.0
 	 */
 	public function has_error() {
 		if ( sizeof( $this->errors ) > 0 ) {
 			return true;
 		}
+
 		return false;
 	}
 
 	/**
 	 * Remove all notices / errors
+	 *
 	 * @param  string $type Switch to remove all messages, errors or just notices. Valid arguments are 'all', 'notices', 'errors'
+	 *
 	 * @since 4.0
 	 */
 	public function clear( $type = 'all' ) {
 
-		if( 'errors' === $type || 'all' === $type ) {
+		if ( 'errors' === $type || 'all' === $type ) {
 			$this->errors = array();
 		}
 
-		if( 'notices' === $type || 'all' === $type ) {
+		if ( 'notices' === $type || 'all' === $type ) {
 			$this->notices = array();
 		}
 	}
 
 	/**
 	 * Process our admin notice and error messages
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	public function process() {
@@ -180,16 +205,19 @@ class Helper_Notices implements Helper_Interface_Actions {
 
 	/**
 	 * Generate the HTML used to display the notice / error
-	 * @param  String $text  The message to be displayed
-	 * @param  String $class The class name (updated / error)
+	 *
+	 * @param  string $text  The message to be displayed
+	 * @param  string $class The class name (updated / error)
+	 *
 	 * @return void
+	 *
 	 * @since 4.0
 	 */
 	private function html( $text, $class = 'updated' ) {
 		?>
-            <div class="<?php echo $class; ?> notice">
-                <p><?php echo $text; ?></p>
-            </div>
-        <?php
+		<div class="<?php echo $class; ?> notice">
+			<p><?php echo $text; ?></p>
+		</div>
+		<?php
 	}
 }

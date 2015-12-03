@@ -44,35 +44,39 @@ use Exception;
 
 /**
  * Test the model / view / controller for the Settings Page
+ *
  * @since 4.0
  * @group settings
  */
-class Test_Settings extends WP_UnitTestCase
-{
+class Test_Settings extends WP_UnitTestCase {
 
 	/**
 	 * Our Settings Controller
-	 * @var Object
+	 *
+	 * @var \GFPDF\Controller\Controller_Settings
 	 * @since 4.0
 	 */
 	public $controller;
 
 	/**
 	 * Our Settings Model
-	 * @var Object
+	 *
+	 * @var \GFPDF\Model\Model_Settings
 	 * @since 4.0
 	 */
 	public $model;
 
 	/**
 	 * Our Settings View
-	 * @var Object
+	 *
+	 * @var \GFPDF\View\View_Settings
 	 * @since 4.0
 	 */
 	public $view;
 
 	/**
 	 * The WP Unit Test Set up function
+	 *
 	 * @since 4.0
 	 */
 	public function setUp() {
@@ -91,6 +95,7 @@ class Test_Settings extends WP_UnitTestCase
 
 	/**
 	 * Test the appropriate actions are set up
+	 *
 	 * @since 4.0
 	 */
 	public function test_actions() {
@@ -107,6 +112,7 @@ class Test_Settings extends WP_UnitTestCase
 
 	/**
 	 * Test the appropriate filters are set up
+	 *
 	 * @since 4.0
 	 */
 	public function test_filters() {
@@ -114,8 +120,14 @@ class Test_Settings extends WP_UnitTestCase
 
 		$this->assertEquals( 10, has_filter( 'gform_tooltips', array( $this->view, 'add_tooltips' ) ) );
 		$this->assertEquals( 10, has_filter( 'gfpdf_capability_name', array( $this->model, 'style_capabilities' ) ) );
-		$this->assertEquals( 10, has_filter( 'option_page_capability_gfpdf_settings', array( $this->controller, 'edit_options_cap' ) ) );
-		$this->assertEquals( 10, has_filter( 'gravitypdf_settings_navigation', array( $this->controller, 'disable_tools_on_view_cap' ) ) );
+		$this->assertEquals( 10, has_filter( 'option_page_capability_gfpdf_settings', array(
+			$this->controller,
+			'edit_options_cap',
+		) ) );
+		$this->assertEquals( 10, has_filter( 'gravitypdf_settings_navigation', array(
+			$this->controller,
+			'disable_tools_on_view_cap',
+		) ) );
 		$this->assertEquals( 10, has_filter( 'upload_mimes', array( $this->controller, 'allow_font_uploads' ) ) );
 		$this->assertEquals( 10, has_filter( 'gfpdf_settings_general', array( $gfpdf->misc, 'add_template_image' ) ) );
 
@@ -130,6 +142,7 @@ class Test_Settings extends WP_UnitTestCase
 
 	/**
 	 * Check the appropriate settings pages are loading
+	 *
 	 * @since 4.0
 	 */
 	public function test_display_page() {
@@ -140,7 +153,7 @@ class Test_Settings extends WP_UnitTestCase
 		$this->controller->display_page();
 		$html = ob_get_clean();
 
-		$this->assertEquals( NULL, $html );
+		$this->assertEquals( null, $html );
 
 		/* test help tab */
 		ob_start();
@@ -155,7 +168,7 @@ class Test_Settings extends WP_UnitTestCase
 
 		try {
 			$this->controller->display_page();
-		} catch( Exception $e ) {
+		} catch ( Exception $e ) {
 			/* Expected */
 		}
 
@@ -165,13 +178,14 @@ class Test_Settings extends WP_UnitTestCase
 
 	/**
 	 * Check only users with the appropriate permissions can edit the Gravity PDF options
+	 *
 	 * @since 4.0
 	 */
 	public function test_edit_options_cap() {
 
 		try {
 			$this->controller->edit_options_cap();
-		} catch( Exception $e ) {
+		} catch ( Exception $e ) {
 			/* Expected */
 		}
 
@@ -183,17 +197,18 @@ class Test_Settings extends WP_UnitTestCase
 
 		$this->assertEquals( 'read', $this->controller->edit_options_cap() );
 
-		wp_set_current_user(0);
+		wp_set_current_user( 0 );
 	}
 
 	/**
 	 * Check the tools tab gets hidden when the user permissions aren't high enough
+	 *
 	 * @since 4.0
 	 */
 	public function test_disable_tools_on_view_cap() {
 
 		$nav = array(
-			10 => 'General',
+			10  => 'General',
 			100 => 'Tools',
 		);
 
@@ -209,11 +224,12 @@ class Test_Settings extends WP_UnitTestCase
 		$results = $this->controller->disable_tools_on_view_cap( $nav );
 		$this->assertTrue( isset( $results[100] ) );
 
-		wp_set_current_user(0);
+		wp_set_current_user( 0 );
 	}
 
 	/**
 	 * Check this can't be executed if permissions are wrong
+	 *
 	 * @since 4.0
 	 */
 	public function test_process_tool_tab_actions() {
@@ -223,11 +239,12 @@ class Test_Settings extends WP_UnitTestCase
 		$_GET['subview'] = 'PDF';
 		$_GET['tab']     = 'tools';
 
-		$this->assertFalse( $this->controller->process_tool_tab_actions() );
+		$this->assertNull( $this->controller->process_tool_tab_actions() );
 	}
 
 	/**
 	 * Verify our font mime types are added to the allowed upload list
+	 *
 	 * @since 4.0
 	 */
 	public function test_allow_font_uploads() {
@@ -237,6 +254,7 @@ class Test_Settings extends WP_UnitTestCase
 
 	/**
 	 * Test the form errors are generated and stored correctly
+	 *
 	 * @since 4.0
 	 */
 	public function test_setup_form_settings_errors() {
@@ -261,6 +279,7 @@ class Test_Settings extends WP_UnitTestCase
 
 	/**
 	 * Verify errors are highlighted appropriately
+	 *
 	 * @since 4.0
 	 */
 	public function test_highlight_errors() {
@@ -291,6 +310,7 @@ class Test_Settings extends WP_UnitTestCase
 
 	/**
 	 * Check our template installer functions correctly
+	 *
 	 * @since 4.0
 	 */
 	public function test_install_template() {
@@ -305,11 +325,11 @@ class Test_Settings extends WP_UnitTestCase
 		$this->assertFileExists( $install_path . 'zadani.php' );
 
 		/* Cleanup */
-		foreach( glob( PDF_PLUGIN_DIR . 'initialisation/templates/*' ) as $file ) {
+		foreach ( glob( PDF_PLUGIN_DIR . 'initialisation/templates/*' ) as $file ) {
 
 			$file = $install_path . basename( $file );
 
-			if( is_dir( $file ) ) {
+			if ( is_dir( $file ) ) {
 				$gfpdf->misc->rmdir( $file );
 			} else {
 				unlink( $file );
@@ -319,6 +339,7 @@ class Test_Settings extends WP_UnitTestCase
 
 	/**
 	 * Check the font removal method works
+	 *
 	 * @since 4.0
 	 */
 	public function test_remove_font_file() {
@@ -327,11 +348,11 @@ class Test_Settings extends WP_UnitTestCase
 		/* Create font array */
 		$font = array(
 			'regular' => 'MyFont.ttf',
-			'bold' => 'MyFont-Bold.ttf',
+			'bold'    => 'MyFont-Bold.ttf',
 		);
 
 		/* Create our tmp font files */
-		array_walk( $font, function( $value ) use ($gfpdf) {
+		array_walk( $font, function ( $value ) use ( $gfpdf ) {
 			touch( $gfpdf->data->template_font_location . $value );
 		} );
 
@@ -348,7 +369,9 @@ class Test_Settings extends WP_UnitTestCase
 
 	/**
 	 * Check if we have a valid font name
-	 * @since 4.0
+	 *
+	 * @since        4.0
+	 *
 	 * @dataProvider provider_is_font_name_valid
 	 */
 	public function test_is_font_name_valid( $expected, $name ) {
@@ -357,6 +380,7 @@ class Test_Settings extends WP_UnitTestCase
 
 	/**
 	 * Dataprovider for test_is_font_name_valid
+	 *
 	 * @since 4.0
 	 */
 	public function provider_is_font_name_valid() {
@@ -372,6 +396,7 @@ class Test_Settings extends WP_UnitTestCase
 
 	/**
 	 * Verify we have a unique font name
+	 *
 	 * @since 4.0
 	 */
 	public function test_is_font_name_unique() {
@@ -395,6 +420,11 @@ class Test_Settings extends WP_UnitTestCase
 		$this->assertTrue( $this->model->is_font_name_unique( 'Calibri', $id ) );
 	}
 
+	/**
+	 * Test the install_fonts() method
+	 *
+	 * @since 4.0
+	 */
 	public function test_install_fonts() {
 		global $gfpdf;
 
@@ -402,7 +432,7 @@ class Test_Settings extends WP_UnitTestCase
 
 		/* Create font array */
 		$font = array(
-			'name'		  => 'Custom Font',
+			'name'        => 'Custom Font',
 			'regular'     => $uploads['url'] . '/MyFont.ttf',
 			'bold'        => $uploads['url'] . '/MyFont-Bold.ttf',
 			'italics'     => $uploads['url'] . '/MyFont-Italics.otf',
@@ -410,7 +440,7 @@ class Test_Settings extends WP_UnitTestCase
 		);
 
 		/* Create our tmp font files */
-		array_walk( $font, function( $value ) use ($uploads) {
+		array_walk( $font, function ( $value ) use ( $uploads ) {
 			touch( $uploads['path'] . '/' . basename( $value ) );
 		} );
 
@@ -434,6 +464,7 @@ class Test_Settings extends WP_UnitTestCase
 
 	/**
 	 * Test all required custom meta boxes are added
+	 *
 	 * @since 4.0
 	 */
 	public function test_meta_boxes() {
@@ -443,9 +474,9 @@ class Test_Settings extends WP_UnitTestCase
 		$this->model->add_meta_boxes();
 
 		/* check our meta boxes have been added */
-		$this->assertTrue( isset($wp_meta_boxes['pdf-help-and-support']) );
-		$this->assertTrue( isset($wp_meta_boxes['pdf-help-and-support']['row-1']) );
-		$this->assertTrue( isset($wp_meta_boxes['pdf-help-and-support']['row-2']) );
+		$this->assertTrue( isset( $wp_meta_boxes['pdf-help-and-support'] ) );
+		$this->assertTrue( isset( $wp_meta_boxes['pdf-help-and-support']['row-1'] ) );
+		$this->assertTrue( isset( $wp_meta_boxes['pdf-help-and-support']['row-2'] ) );
 
 		/* check they are not empty */
 		$this->assertNotEquals( 0, sizeof( $wp_meta_boxes['pdf-help-and-support']['row-1']['default'] ) );
@@ -454,14 +485,16 @@ class Test_Settings extends WP_UnitTestCase
 
 	/**
 	 * Test the forum endpoint is returning the correct response
+	 *
 	 * @since 4.0
 	 */
 	public function test_latest_forum_endpoint() {
 		/* set a correct response */
 		add_filter( 'pre_http_request', function ( $return, $r, $url ) {
 			$r['body'] = file_get_contents( dirname( __FILE__ ) . '/json/latest-posts.json' );
+
 			return $r;
-		}, 10, 3);
+		}, 10, 3 );
 
 		/* check for correct results */
 		$response = $this->model->get_latest_forum_topics();
@@ -470,6 +503,7 @@ class Test_Settings extends WP_UnitTestCase
 
 	/**
 	 * Test the forum endpoint caching works as expected
+	 *
 	 * @since 4.0
 	 */
 	public function test_endpoint_caching() {
@@ -483,13 +517,14 @@ class Test_Settings extends WP_UnitTestCase
 	/**
 	 * Test the forum endpoint returns the appropriate response when an error occurs
 	 * Note: had to split this out of the original endpoint as WP appeared to be caching the results (wasn't going to case the 'whys' so split it out in own method)
+	 *
 	 * @since 4.0
 	 */
 	public function test_latest_forum_endpoint_error() {
 		/* check for appropriate errors */
 		add_filter( 'pre_http_request', function ( $return, $r, $url ) {
 			return new WP_Error( 'problem', 'Cannot load endpoint' );
-		}, 10, 3);
+		}, 10, 3 );
 
 		/* check error thrown */
 		$this->assertFalse( $this->model->get_latest_forum_topics() );

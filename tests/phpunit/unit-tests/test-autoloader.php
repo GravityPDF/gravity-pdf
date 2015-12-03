@@ -35,15 +35,17 @@ use WP_UnitTestCase;
 
 /**
  * Test the PSR-4 Autoloader Implimentation
+ *
  * @since 4.0
  * @group autoloader
  */
-class Test_Autoloader extends WP_UnitTestCase
-{
+class Test_Autoloader extends WP_UnitTestCase {
 
 	/**
 	 * Ensure our auto initialiser is firing correctly
-	 * @since 4.0
+	 *
+	 * @since        4.0
+	 *
 	 * @dataProvider provider_classes
 	 */
 	public function test_classes( $class ) {
@@ -52,7 +54,9 @@ class Test_Autoloader extends WP_UnitTestCase
 
 	/**
 	 * A data provider to check the classes exist
-	 * @return Array Our test data
+	 *
+	 * @return array Our test data
+	 *
 	 * @since 4.0
 	 */
 	public function provider_classes() {
@@ -103,7 +107,9 @@ class Test_Autoloader extends WP_UnitTestCase
 
 	/**
 	 * Ensure our auto initialiser is firing correctly and loading any interfaces
-	 * @since 4.0
+	 *
+	 * @since        4.0
+	 *
 	 * @dataProvider provider_interfaces
 	 */
 	public function test_interface( $class ) {
@@ -112,7 +118,9 @@ class Test_Autoloader extends WP_UnitTestCase
 
 	/**
 	 * A data provider to check the classes exist
-	 * @return Array Our test data
+	 *
+	 * @return array Our test data
+	 *
 	 * @since 4.0
 	 */
 	public function provider_interfaces() {
@@ -123,34 +131,37 @@ class Test_Autoloader extends WP_UnitTestCase
 		);
 	}
 
-    /**
-     * Check our composer files are loaded correctly
-     * @since 4.0
-     * @dataProvider provider_composer_dependancies
-     */
-    public function test_composer_dependancies( $class ) {
-    	$this->assertTrue( class_exists( $class ) );
-    }
+	/**
+	 * Check our composer files are loaded correctly
+	 *
+	 * @since        4.0
+	 * @dataProvider provider_composer_dependancies
+	 */
+	public function test_composer_dependancies( $class ) {
+		$this->assertTrue( class_exists( $class ) );
+	}
 
-    /**
-     * Test we have appropriate composer classes loaded
-     * @return array
-     * @since 4.0
-     */
-    public function provider_composer_dependancies() {
-        return array(
-            array( 'mPDF' ),
-            array( 'QueryPath' ),
-            array( 'Monolog\Logger' ),
-            array( 'Monolog\Processor\IntrospectionProcessor' ),
-            array( 'Monolog\Processor\MemoryPeakUsageProcessor' ),
-            array( 'Monolog\Handler\NullHandler' ),
-            array( 'Monolog\Formatter\LineFormatter' ),
-            array( 'Monolog\Handler\StreamHandler' ),
-            array( 'Monolog\Formatter\LogglyFormatter' ),
-            array( 'Monolog\Handler\LogglyHandler' ),
-            array( 'Monolog\Handler\BufferHandler' ),
-            array( 'Monolog\Processor\WebProcessor' ),
-        );
-    }
+	/**
+	 * Test we have appropriate composer classes loaded
+	 *
+	 * @return array
+	 *
+	 * @since 4.0
+	 */
+	public function provider_composer_dependancies() {
+		return array(
+			array( 'mPDF' ),
+			array( 'QueryPath' ),
+			array( 'Monolog\Logger' ),
+			array( 'Monolog\Processor\IntrospectionProcessor' ),
+			array( 'Monolog\Processor\MemoryPeakUsageProcessor' ),
+			array( 'Monolog\Handler\NullHandler' ),
+			array( 'Monolog\Formatter\LineFormatter' ),
+			array( 'Monolog\Handler\StreamHandler' ),
+			array( 'Monolog\Formatter\LogglyFormatter' ),
+			array( 'Monolog\Handler\LogglyHandler' ),
+			array( 'Monolog\Handler\BufferHandler' ),
+			array( 'Monolog\Processor\WebProcessor' ),
+		);
+	}
 }

@@ -2,8 +2,6 @@
 
 namespace GFPDF\Helper;
 
-use GFPDF\Helper\Helper_Abstract_Model;
-
 use WP_Error;
 
 /**
@@ -42,26 +40,34 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * A simple abstract class views can extent to share similar variables
+ *
  * @since 4.0
  */
 abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 	/**
 	 * Each object should have a view name
-	 * @var String
+	 *
+	 * @var string
+	 *
 	 * @since 4.0
 	 */
 	protected $ViewType = null;
 
 	/**
 	 * Enable a private data cache we can set and retrive information from
+	 *
 	 * @var array
+	 *
 	 * @since 4.0
 	 */
 	protected $data_cache = array();
 
 	/**
 	 * Automatically define our constructor which will set our data cache
+	 *
 	 * @param array $data An array of data to pass to the view
+	 *
+	 * @since 4.0
 	 */
 	public function __construct( $data = array() ) {
 		$this->data_cache = $data;
@@ -70,15 +76,18 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 	/**
 	 * Triggered when invoking inaccessible methods in an object context
 	 * Use it to load in our views
-	 * @param  String $name     Template name to load
-	 * @param  Array  $arguments Pass in additional parameters to the template view if needed
-	 * @return void
+	 *
+	 * @param  string $name      Template name to load
+	 * @param  array  $arguments Pass in additional parameters to the template view if needed
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	final public function __call( $name, $arguments ) {
 		/* check if we have any arguments */
 		$vars = $this->data_cache;
-		if ( isset($arguments[0]) && is_array( $arguments[0] ) ) {
+		if ( isset( $arguments[0] ) && is_array( $arguments[0] ) ) {
 			$vars = array_merge( $arguments[0], $vars );
 		}
 
@@ -88,10 +97,13 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 
 	/**
 	 * Load a view file based on the filename and type
-	 * @param  String  $filename The filename to load
-	 * @param  Array   $args Variables to pass to the included file
-	 * @param  Boolean $output Whether to automatically display the included file or return it's output as a String
-	 * @return String/Object           The loaded file, or WP_ERROR
+	 *
+	 * @param  string  $filename The filename to load
+	 * @param  array   $args     Variables to pass to the included file
+	 * @param  boolean $output   Whether to automatically display the included file or return it's output as a String
+	 *
+	 * @return string|WP_Error           The loaded file, or WP_ERROR
+	 *
 	 * @since 4.0
 	 */
 	final protected function load( $filename, $args = array(), $output = true ) {
@@ -103,19 +115,24 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 
 			if ( $output ) {
 				include $path;
+
 				return true;
 			} else {
 				return $this->buffer( $path, $args );
 			}
 		}
+
 		return new WP_Error( 'invalid_path', sprintf( __( 'Cannot find file %s', 'gravity-forms-pdf-extended' ), $filename ) );
 	}
 
 	/**
 	 * Store output of included file in a buffer and return
-	 * @param  String $path File path to include
-	 * @param  Array  $args Variables to pass to the included file
-	 * @return String       The contents of the included file
+	 *
+	 * @param  string $path File path to include
+	 * @param  array  $args Variables to pass to the included file
+	 *
+	 * @return string       The contents of the included file
+	 *
 	 * @since 4.0
 	 */
 	final private function buffer( $path, $args = array() ) {
@@ -124,6 +141,7 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 
 		ob_start();
 		include $path;
+
 		return ob_get_clean();
 	}
 }

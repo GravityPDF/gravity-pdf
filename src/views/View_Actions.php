@@ -40,23 +40,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Controls the Gravity PDF Actions Display
+ *
  * @since 4.0
  */
-class View_Actions extends Helper_Abstract_View
-{
+class View_Actions extends Helper_Abstract_View {
 	/**
 	 * Set the view's name
+	 *
 	 * @var string
+	 *
 	 * @since 4.0
 	 */
 	protected $ViewType = 'Actions';
 
 	/**
 	 * Add our primary button and an opt-our dismissal button
-	 * @param  String $type        The action ID
-	 * @param  String $button_text The primary button text
-	 * @param  String $dismissal   Whether the dismissal button should be shown. Valid arguments are 'enabled' or 'disabled'
-	 * @return String              The action_buttons HTML
+	 *
+	 * @param  string $type        The action ID
+	 * @param  string $button_text The primary button text
+	 * @param  string $dismissal   Whether the dismissal button should be shown. Valid arguments are 'enabled' or 'disabled'
+	 *
+	 * @return string              The action_buttons HTML
+	 *
 	 * @since 4.0
 	 */
 	public function get_action_buttons( $type, $button_text, $dismissal = 'enabled' ) {
@@ -65,20 +70,23 @@ class View_Actions extends Helper_Abstract_View
 			'type'        => $type,
 			'button_text' => $button_text,
 			'dismissal'   => $dismissal,
-		), false);
+		), false );
 
 	}
 
 	/**
 	 * Load our Review Plugin Notice
-	 * @param  String $type        The action ID
-	 * @param  String $button_text The primary button text
-	 * @return String              The notice HTML
+	 *
+	 * @param  string $type        The action ID
+	 * @param  string $button_text The primary button text
+	 *
+	 * @return string              The notice HTML
+	 *
 	 * @since 4.0
 	 */
 	public function review_plugin( $type, $button_text ) {
 
-		$html = $this->load( 'review_plugin', array(), false);
+		$html = $this->load( 'review_plugin', array(), false );
 		$html .= $this->get_action_buttons( $type, $button_text );
 
 		return $html;
@@ -86,14 +94,17 @@ class View_Actions extends Helper_Abstract_View
 
 	/**
 	 * Load our v3 to v4 Migration Notice
-	 * @param  String $type        The action ID
-	 * @param  String $button_text The primary button text
-	 * @return String              The notice HTML
+	 *
+	 * @param  string $type        The action ID
+	 * @param  string $button_text The primary button text
+	 *
+	 * @return string              The notice HTML
+	 *
 	 * @since 4.0
 	 */
 	public function migration( $type, $button_text ) {
 
-		$html = $this->load( 'migration', array(), false);
+		$html = $this->load( 'migration', array(), false );
 		$html .= $this->get_action_buttons( $type, $button_text, 'disabled' );
 
 		return $html;

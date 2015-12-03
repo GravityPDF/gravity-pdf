@@ -3,16 +3,17 @@
 /**
  * If Xdebug is installed disable stack traces for phpunit
  */
-if( function_exists('xdebug_disable') ) {
-   xdebug_disable();
+if ( function_exists( 'xdebug_disable' ) ) {
+	xdebug_disable();
 }
 
 /**
  * Override certain pluggable functions so we can unit test them correctly
+ *
  * @since 4.0
  */
 function auth_redirect() {
-    throw new Exception('Redirecting');
+	throw new Exception( 'Redirecting' );
 }
 
 /**
@@ -90,6 +91,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 
 	/**
 	 * Create our Gravity Form stubs for use in our tests
+	 *
 	 * @since 4.0
 	 */
 	public function create_stubs() {
@@ -102,10 +104,10 @@ class GravityPDF_Unit_Tests_Bootstrap {
 			'gravityform-2.json',
 		);
 
-		foreach( $forms as $json ) {
-			$form                = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/unit-tests/json/' . $json ) ), true );
-			$form_id             = GFAPI::add_form($form);
-			$this->form[ substr( $json, 0, -5 ) ] = GFAPI::get_form( $form_id );
+		foreach ( $forms as $json ) {
+			$form                                  = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/unit-tests/json/' . $json ) ), true );
+			$form_id                               = GFAPI::add_form( $form );
+			$this->form[ substr( $json, 0, - 5 ) ] = GFAPI::get_form( $form_id );
 		}
 
 		/* Import our entries */
@@ -116,18 +118,18 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		);
 
 
-		foreach( $entries as $id => $json ) {
-			$entries = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/unit-tests/json/' . $json ) ), true );
+		foreach ( $entries as $id => $json ) {
+			$entries   = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/unit-tests/json/' . $json ) ), true );
 			$entry_ids = GFAPI::add_entries( $entries, $this->form[ $id ]['id'] );
 
 			/* Loop through our new entry IDs and get the actual entries */
 			$this->entries[ $id ] = array();
-			foreach( $entry_ids as $lid ) {
-				$entry = GFAPI::get_entry( $lid );
+			foreach ( $entry_ids as $lid ) {
+				$entry                  = GFAPI::get_entry( $lid );
 				$this->entries[ $id ][] = $entry;
 
 				/* We only need to run this once */
-				if( ! isset( $this->form_data[ $id ] ) ) {
+				if ( ! isset( $this->form_data[ $id ] ) ) {
 					$this->form_data[ $id ][] = GFPDFEntryDetail::lead_detail_grid_array( $this->form[ $id ], $entry );
 				}
 			}

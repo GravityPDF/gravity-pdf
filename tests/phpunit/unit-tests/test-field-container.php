@@ -40,18 +40,20 @@ use StdClass;
  * @since 4.0
  * @group field-container
  */
-class Test_Field_Container extends WP_UnitTestCase
-{
+class Test_Field_Container extends WP_UnitTestCase {
 
 	/**
 	 * Our Helper_Field_Container
-	 * @var Object
+	 *
+	 * @var \GFPDF\Helper\Helper_Field_Container
+	 *
 	 * @since 4.0
 	 */
 	public $container;
 
 	/**
 	 * The WP Unit Test Set up function
+	 *
 	 * @since 4.0
 	 */
 	public function setUp() {
@@ -65,34 +67,42 @@ class Test_Field_Container extends WP_UnitTestCase
 
 	/**
 	 * Buffers our "generate" output and returns it for testing
-	 * @param  Object $field A mockup of the Gravity Form field
-	 * @return String
+	 *
+	 * @param  object $field A mockup of the Gravity Form field
+	 *
+	 * @return string
+	 *
 	 * @since  4.0
 	 */
 	private function generate( $field ) {
 		ob_start();
 		$this->container->generate( $field );
+
 		return ob_get_clean();
 	}
 
 	/**
 	 * Buffers our "close" output and returns it for testing
-	 * @return String
+	 *
+	 * @return string
+	 *
 	 * @since  4.0
 	 */
 	private function close() {
 		ob_start();
 		$this->container->close();
+
 		return ob_get_clean();
 	}
 
 	/**
 	 * Check that full rows give the correct output
+	 *
 	 * @since 4.0
 	 */
 	public function test_row() {
 
-		$field = new StdClass;
+		$field           = new StdClass;
 		$field->cssClass = 'normal';
 
 		/* Check it opens correctly */
@@ -100,29 +110,30 @@ class Test_Field_Container extends WP_UnitTestCase
 
 		/* Check it closes / opens correctly */
 		$this->assertEquals( '</div><div class="row-separator">', $this->generate( $field ) );
-		
+
 		/* Check it now closes correctly */
 		$this->assertEquals( '</div>', $this->close() );
 	}
 
 	/**
 	 * Check that two-columns give the correct output
+	 *
 	 * @since 4.0
 	 */
 	public function test_two_columns() {
-		
-		$field = new StdClass;
+
+		$field           = new StdClass;
 		$field->cssClass = 'gf_left_half';
 
 		/* Check it opens correctly */
 		$this->assertEquals( '<div class="row-separator">', $this->generate( $field ) );
 
-		$field = new StdClass;
+		$field           = new StdClass;
 		$field->cssClass = 'gf_right_half';
 
 		/* Check it does nothing */
 		$this->assertEquals( '', $this->generate( $field ) );
-		
+
 		/* Check the row closes / opens new row correctly */
 		$this->assertEquals( '</div><div class="row-separator">', $this->generate( $field ) );
 
@@ -132,23 +143,24 @@ class Test_Field_Container extends WP_UnitTestCase
 
 	/**
 	 * Check that three-columns give the correct output
+	 *
 	 * @since 4.0
 	 */
 	public function test_three_columns() {
-		
-		$field = new StdClass;
+
+		$field           = new StdClass;
 		$field->cssClass = 'gf_left_third';
 
 		/* Check it opens correctly */
 		$this->assertEquals( '<div class="row-separator">', $this->generate( $field ) );
 
-		$field = new StdClass;
+		$field           = new StdClass;
 		$field->cssClass = 'gf_middle_third';
 
 		/* Check it does nothing */
 		$this->assertEquals( '', $this->generate( $field ) );
-		
-		$field = new StdClass;
+
+		$field           = new StdClass;
 		$field->cssClass = 'gf_right_third';
 
 		/* Check it does nothing */
@@ -163,22 +175,23 @@ class Test_Field_Container extends WP_UnitTestCase
 
 	/**
 	 * Check that two and three column layouts can intermingle
+	 *
 	 * @since 4.0
 	 */
 	public function test_mixture() {
-		
-		$field = new StdClass;
+
+		$field           = new StdClass;
 		$field->cssClass = 'gf_left_third';
 
 		/* Check it opens correctly */
 		$this->assertEquals( '<div class="row-separator">', $this->generate( $field ) );
 
-		$field = new StdClass;
+		$field           = new StdClass;
 		$field->cssClass = 'gf_left_half';
 
 		/* Check it does nothing */
 		$this->assertEquals( '', $this->generate( $field ) );
-		
+
 		/* Check the row closes / opens new row correctly */
 		$this->assertEquals( '</div><div class="row-separator">', $this->generate( $field ) );
 
@@ -191,16 +204,16 @@ class Test_Field_Container extends WP_UnitTestCase
 	 * @since 4.0
 	 */
 	public function test_skipped_fields() {
-		$field = new StdClass;
+		$field           = new StdClass;
 		$field->cssClass = 'gf_left_third';
 
 		/* Check it opens correctly */
 		$this->assertEquals( '<div class="row-separator">', $this->generate( $field ) );
 
 		/* Create a skipped field and verify the container closes correctly */
-		$field = new StdClass;
+		$field           = new StdClass;
 		$field->cssClass = 'gf_left_third';
-		$field->type = 'html';
+		$field->type     = 'html';
 
 		$this->generate( $field );
 

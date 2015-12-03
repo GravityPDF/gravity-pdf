@@ -50,17 +50,23 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_List extends Helper_Abstract_Fields
-{
+class Field_List extends Helper_Abstract_Fields {
 
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
-	 * @param Object $field The GF_Field_* Object
-	 * @param Array  $entry The Gravity Forms Entry
+	 *
+	 * @param object               $field The GF_Field_* Object
+	 * @param array                $entry The Gravity Forms Entry
+	 *
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
+	 * @param \GFPDF\Helper\Helper_Misc          $misc
+	 *
+	 * @throws Exception
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( $field, $entry, Helper_Abstract_Form $form, Helper_Misc $misc ) {
-		
+
 		if ( ! is_object( $field ) || ! $field instanceof GF_Field_List ) {
 			throw new Exception( '$field needs to be in instance of GF_Field_List' );
 		}
@@ -71,14 +77,16 @@ class Field_List extends Helper_Abstract_Fields
 
 	/**
 	 * Return the HTML form data
-	 * @return Array
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	public function form_data() {
 
-		$data = array();
+		$data  = array();
 		$label = GFFormsModel::get_label( $this->field );
-		$html = $this->html();
+		$html  = $this->html();
 
 		/* Add our List array */
 		$data['list'][ $this->field->id ] = $this->value();
@@ -93,7 +101,12 @@ class Field_List extends Helper_Abstract_Fields
 
 	/**
 	 * Display the HTML version of this field
-	 * @return String
+	 *
+	 * @param string $value
+	 * @param bool   $label
+	 *
+	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
@@ -143,50 +156,53 @@ class Field_List extends Helper_Abstract_Fields
 		/* Start buffer and generate a list table */
 		ob_start();
 		?>
-        
-        <table autosize="1" class="gfield_list" style="<?php echo implode( ';', $css['table'] ); ?>">
 
-            <!-- Loop through the column names and output in a header (if using the advanced list) -->
-            <?php if ( $columns ) : $columns = array_keys( $value[0] ); ?>
-                <thead>
-                    <tr>
-                        <?php foreach ( $columns as $column ) : ?>
-                            <th style="<?php echo implode( ';', $css['th'] ); ?>">
-                                <?php echo esc_html( $column ); ?>
-                            </th>
-                        <?php endforeach; ?>
-                    </tr>
-                </thead>
-            <?php endif; ?>
+		<table autosize="1" class="gfield_list" style="<?php echo implode( ';', $css['table'] ); ?>">
 
-            <!-- Loop through each row -->
-            <tbody>
-                    <?php foreach ( $value as $item ) : ?>
-                        <tr>
-                            <!-- handle the basic list -->
-                            <?php if ( ! $columns ) : ?>
-                                <td style="<?php echo implode( ';', $css['td'] ); ?>"><?php echo esc_html( $item ); ?></td>
-                            <?php else : ?><!-- handle the advanced list -->
-                                <?php foreach ( $columns as $column ) : ?>
-                                    <td style="<?php echo implode( ';', $css['td'] ); ?>">
-                                        <?php echo esc_html( rgar( $item, $column ) ); ?>
-                                    </td>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </tr>
-                    <?php endforeach; ?>
-            </tbody>
+			<!-- Loop through the column names and output in a header (if using the advanced list) -->
+			<?php if ( $columns ) : $columns = array_keys( $value[0] ); ?>
+				<thead>
+				<tr>
+					<?php foreach ( $columns as $column ) : ?>
+						<th style="<?php echo implode( ';', $css['th'] ); ?>">
+							<?php echo esc_html( $column ); ?>
+						</th>
+					<?php endforeach; ?>
+				</tr>
+				</thead>
+			<?php endif; ?>
 
-        </table>
-        
-        <?php
+			<!-- Loop through each row -->
+			<tbody>
+			<?php foreach ( $value as $item ) : ?>
+				<tr>
+					<!-- handle the basic list -->
+					<?php if ( ! $columns ) : ?>
+						<td style="<?php echo implode( ';', $css['td'] ); ?>"><?php echo esc_html( $item ); ?></td>
+					<?php else : ?><!-- handle the advanced list -->
+						<?php foreach ( $columns as $column ) : ?>
+							<td style="<?php echo implode( ';', $css['td'] ); ?>">
+								<?php echo esc_html( rgar( $item, $column ) ); ?>
+							</td>
+						<?php endforeach; ?>
+					<?php endif; ?>
+				</tr>
+			<?php endforeach; ?>
+			</tbody>
+
+		</table>
+
+		<?php
 		/* get buffer and return HTML */
+
 		return parent::html( ob_get_clean() );
 	}
 
 	/**
 	 * Get the standard GF value of this field
-	 * @return String/Array
+	 *
+	 * @return string|array
+	 *
 	 * @since 4.0
 	 */
 	public function value() {
@@ -211,8 +227,11 @@ class Field_List extends Helper_Abstract_Fields
 
 	/**
 	 * Remove empty list rows
-	 * @param  Array $list The current list array
-	 * @return Array       The filtered list array
+	 *
+	 * @param  array $list The current list array
+	 *
+	 * @return array       The filtered list array
+	 *
 	 * @since 4.0
 	 */
 	private function remove_empty_list_rows( $list ) {
@@ -243,7 +262,7 @@ class Field_List extends Helper_Abstract_Fields
 
 				/* Remove row from list */
 				if ( $empty ) {
-					unset( $list[$id] );
+					unset( $list[ $id ] );
 				}
 			}
 		}

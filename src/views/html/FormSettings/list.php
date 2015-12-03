@@ -10,8 +10,8 @@
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -41,28 +41,21 @@ $list_items = $args['list_items'];
 
 <?php \GFFormSettings::page_header( $args['title'] ); ?>
 
-	<h3>
-		<span>
-		  <i class="fa fa-file-o"></i>
-		  <?php echo $args['title']; ?>
-		  <a id="add-new-pdf" class="add-new-h2" href="<?php echo $args['add_new_url'] ?>"><?php _e( 'Add New', 'gravityforms' ) ?></a>
-		</span>
-	</h3>
+<h3>
+	<span>
+		<i class="fa fa-file-o"></i>
+		<?php echo $args['title']; ?>
+		<a id="add-new-pdf" class="add-new-h2" href="<?php echo $args['add_new_url'] ?>"><?php _e( 'Add New', 'gravityforms' ) ?></a>
+	</span>
+</h3>
 
-	<form id="gfpdf_list_form" method="post">
+<form id="gfpdf_list_form" method="post">
+	<?php $list_items->display(); ?>
+</form>
 
-		<?php $list_items->display(); ?>
-
-		<!--<input id="action_argument" name="action_argument" type="hidden" />
-		<input id="action" name="action" type="hidden" />
-
-		<?php wp_nonce_field( 'gform_pdf_list_action', 'gform_pdf_list_action' ) ?>-->
-
-	</form>
-
-    <div id="delete-confirm" title="<?php _e('Delete PDF?', 'gravity-forms-pdf-extended' ); ?>" style="display: none;">
-        <?php printf(__("Warning! You are about to delete this PDF. Select 'Delete' to delete, 'Cancel' to stop.", 'gravity-forms-pdf-extended' ), '<strong>', '</strong>'); ?>
-    </div>
+<div id="delete-confirm" title="<?php _e( 'Delete PDF?', 'gravity-forms-pdf-extended' ); ?>" style="display: none;">
+	<?php printf( __( "Warning! You are about to delete this PDF. Select 'Delete' to delete, 'Cancel' to stop.", 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ); ?>
+</div>
 
 
 <?php \GFFormSettings::page_footer(); ?>

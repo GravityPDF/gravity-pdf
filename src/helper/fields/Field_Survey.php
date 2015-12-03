@@ -49,13 +49,19 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Survey extends Helper_Abstract_Fields
-{
+class Field_Survey extends Helper_Abstract_Fields {
 
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
-	 * @param Object $field The GF_Field_* Object
-	 * @param Array  $entry The Gravity Forms Entry
+	 *
+	 * @param object                             $field The GF_Field_* Object
+	 * @param array                              $entry The Gravity Forms Entry
+	 *
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
+	 * @param \GFPDF\Helper\Helper_Misc          $misc
+	 *
+	 * @throws Exception
+	 *
 	 * @since 4.0
 	 */
 	public function __construct( $field, $entry, Helper_Abstract_Form $form, Helper_Misc $misc ) {
@@ -73,11 +79,11 @@ class Field_Survey extends Helper_Abstract_Fields
 		try {
 			/* check load our class */
 			if ( class_exists( $class ) ) {
-				$this->fieldObject = new $class($field, $entry, $form, $misc);
+				$this->fieldObject = new $class( $field, $entry, $form, $misc );
 			} else {
 				throw new Exception();
 			}
-		} catch (Exception $e) {
+		} catch ( Exception $e ) {
 			/* Exception thrown. Load generic field loader */
 			$this->fieldObject = new Field_Default( $field, $entry, $form, $misc );
 		}
@@ -89,7 +95,9 @@ class Field_Survey extends Helper_Abstract_Fields
 	/**
 	 * Get the $form_data object
 	 * Survey field uses multiple field types so we need to account for that
-	 * @return Array
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
 	 */
 	private function get_form_data() {
@@ -102,8 +110,8 @@ class Field_Survey extends Helper_Abstract_Fields
 
 	/**
 	 * Used to check if the current field has a value
-	 * @since 4.0
-	 * @internal Child classes can override this method when dealing with a specific use case
+	 *
+	 * @since    4.0
 	 */
 	public function is_empty() {
 		return $this->fieldObject->is_empty();
@@ -111,13 +119,17 @@ class Field_Survey extends Helper_Abstract_Fields
 
 	/**
 	 * Return the HTML form data
-	 * @return Array
+	 *
+	 * @return array
+	 *
 	 * @since 4.0
-	 * @todo Our standard v4 array format had to be changes to be backwards compatible. The v4 version is better and we should include the format in the $form_data array
+	 *
+	 * @todo  Our standard v4 array format had to be changed to be backwards compatible with v3. The v4 version is better and in future we should include that format in the $form_data array (we might even create an all-new $data array)
 	 */
 	public function form_data() {
 
-		$data = array();
+		$data     = array();
+		$field_id = (int) $this->field->id;
 
 		/* Provide backwards compatibility fixes to certain fields */
 		switch ( $this->field->inputType ) {
@@ -130,9 +142,9 @@ class Field_Survey extends Helper_Abstract_Fields
 				/* Overriding survey radio values with name */
 				array_walk( $data['field'], function ( &$item, $key, $value ) {
 					$item = $value;
-				}, $value);
+				}, $value );
 
-			break;
+				break;
 
 			case 'checkbox':
 				$value = $this->get_value();
@@ -148,17 +160,17 @@ class Field_Survey extends Helper_Abstract_Fields
 				$value = array( $value );
 				$label = GFFormsModel::get_label( $this->field );
 
-				$data[ $this->field->id . '.' . $label ] = $value;
-				$data[ $this->field->id ] = $value;
-				$data[ $label ] = $value;
+				$data[ $field_id . '.' . $label ] = $value;
+				$data[ $field_id ]                = $value;
+				$data[ $label ]                   = $value;
 
 				$data = array( 'field' => $data );
 
-			break;
+				break;
 
 			default:
 				$data = $this->get_form_data();
-			break;
+				break;
 		}
 
 		return $data;
@@ -167,22 +179,29 @@ class Field_Survey extends Helper_Abstract_Fields
 
 	/**
 	 * Display the HTML version of this field
-	 * @return String
+	 *
+	 * @param string $value
+	 * @param bool   $label
+	 *
+	 * @return string
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
-		
+
 		/* Return early to prevent unwanted details being displayed when the plugin isn't enabled */
-		if( ! class_exists( 'GFSurvey' ) ) {
+		if ( ! class_exists( 'GFSurvey' ) ) {
 			return parent::html( '' );
 		}
 
 		echo $this->fieldObject->html();
+
+		return '';
 	}
 
 	/**
 	 * Get the standard GF value of this field
-	 * @return String/Array
+	 *
+	 * @return string|array
 	 * @since 4.0
 	 */
 	public function value() {

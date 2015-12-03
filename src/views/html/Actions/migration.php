@@ -10,8 +10,8 @@
  */
 
 /* Exit if accessed directly */
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /*
@@ -38,10 +38,10 @@ if (! defined('ABSPATH')) {
 
 <div style="font-size:15px; line-height: 25px">
 
-    <strong><?php _e( "Gravity PDF needs to migration your configuration.", 'gravity-forms-pdf-extended' ); ?></strong>
-    
-    <br>
+	<strong><?php _e( "Gravity PDF needs to migration your configuration.", 'gravity-forms-pdf-extended' ); ?></strong>
 
-    <?php _e('The migration process will import your old configuration file into the database.', 'gravity-forms-pdf-extended' ); ?>
-    
+	<br>
+
+	<?php _e( 'The migration process will import your old configuration file into the database.', 'gravity-forms-pdf-extended' ); ?>
+
 </div>
