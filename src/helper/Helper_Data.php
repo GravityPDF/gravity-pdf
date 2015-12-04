@@ -197,6 +197,8 @@ class Helper_Data {
 			'migration_complete'          => __( 'Site #%s migration complete.', 'gravity-forms-pdf-extended' ),
 			'migration_error_specific'    => __( 'Migration Error', 'gravity-forms-pdf-extended' ),
 			'migration_error_generic'     => __( 'Site #%s migration errors.', 'gravity-forms-pdf-extended' ),
+			'no_pdfs_found'               => __( "This form doesn't have any PDFs.", 'gravity-forms-pdf-extended' ),
+			'no_pdfs_found_link'          => __( "Let's go create one", 'gravity-forms-pdf-extended' ),
 		) );
 	}
 }
