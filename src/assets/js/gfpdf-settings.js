@@ -435,6 +435,22 @@
 			};
 
 			/**
+			 * Check if the last item was just deleted
+			 */
+			this.maybeShowEmptyRow = function() {
+				var $container = $('#gfpdf_list_form tbody');
+
+				if( $container.find('tr').length === 0 ) {
+					var $row = $('<tr>').addClass('no-items');
+					var $cell = $('<td>').attr('colspan', '5').addClass('colspanchange');
+					var $add_new = $('<a>').attr('href', $('#add-new-pdf').attr('href')).append(GFPDF.no_pdfs_found_link + '.');
+					$cell.append(GFPDF.no_pdfs_found).append(' ').append($add_new);
+					$row.append($cell);
+					$container.append($row);
+				}
+			}
+
+			/**
 			 * Handles the deletion of a PDF list item via AJAX
 			 * @return void
 			 * @since 4.0
@@ -461,7 +477,10 @@
 				      			if(response.msg) {
 				      				self.show_message(response.msg);
 				      				var $row = $elm.parents('tr');
-				      				$row.css('background', '#ffb8b8').fadeOut().remove();
+				      				$row.css('background', '#ffb8b8').fadeOut( 400, function() {
+										this.remove();
+										self.maybeShowEmptyRow();
+									})
 				      			}
 				      		});
 
