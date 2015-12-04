@@ -171,10 +171,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_user_capability' ), 50, 3 );
 
 		/* Tap into GF notifications */
-		add_filter( 'gform_notification', array(
-			$this->model,
-			'notifications',
-		), 9999, 3 ); /* ensure Gravity PDF is one of the last filters to be applied */
+		add_filter( 'gform_notification', array( $this->model, 'notifications', ), 9999, 3 ); /* ensure Gravity PDF is one of the last filters to be applied */
 
 		/* Modify mPDF's path locations */
 		add_filter( 'mpdf_tmp_path', array( $this->model, 'mpdf_tmp_path' ) );
