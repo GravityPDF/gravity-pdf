@@ -692,7 +692,7 @@ class Test_Options_API extends WP_UnitTestCase {
 	 */
 	public function test_get_template_headers() {
 
-		$path   = PDF_PLUGIN_DIR . 'initialisation/templates/zadani.php';
+		$path   = PDF_PLUGIN_DIR . 'src/templates/zadani.php';
 		$header = $this->options->get_template_headers( $path );
 
 		$this->assertEquals( 'Zadani', $header['template'] );

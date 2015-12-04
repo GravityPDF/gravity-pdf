@@ -325,7 +325,7 @@ class Test_Settings extends WP_UnitTestCase {
 		$this->assertFileExists( $install_path . 'zadani.php' );
 
 		/* Cleanup */
-		foreach ( glob( PDF_PLUGIN_DIR . 'initialisation/templates/*' ) as $file ) {
+		foreach ( glob( PDF_PLUGIN_DIR . 'src/templates/*' ) as $file ) {
 
 			$file = $install_path . basename( $file );
 

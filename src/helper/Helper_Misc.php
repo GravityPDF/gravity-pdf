@@ -561,7 +561,7 @@ class Helper_Misc {
 		/* Add our extension */
 		$template .= '.png';
 
-		$relative_image_path   = 'initialisation/templates/images/';
+		$relative_image_path   = 'src/templates/images/';
 		$default_template_path = PDF_PLUGIN_DIR . $relative_image_path;
 		$default_template_url  = PDF_PLUGIN_URL . $relative_image_path;
 

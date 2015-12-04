@@ -958,8 +958,8 @@ class Helper_Options implements Helper_Interface_Filters {
 			return $template;
 		}
 
-		if ( is_file( PDF_PLUGIN_DIR . 'initialisation/templates/' . $name . '.php' ) ) {
-			return $this->get_template_headers( PDF_PLUGIN_DIR . 'initialisation/templates/' . $name . '.php' );
+		if ( is_file( PDF_PLUGIN_DIR . 'src/templates/' . $name . '.php' ) ) {
+			return $this->get_template_headers( PDF_PLUGIN_DIR . 'src/templates/' . $name . '.php' );
 		}
 
 		return false;
@@ -993,7 +993,7 @@ class Helper_Options implements Helper_Interface_Filters {
 	 * @since 4.0
 	 */
 	public function get_plugin_pdf_templates() {
-		return glob( PDF_PLUGIN_DIR . 'initialisation/templates/*.php' );
+		return glob( PDF_PLUGIN_DIR . 'src/templates/*.php' );
 	}
 
 

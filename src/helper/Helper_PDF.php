@@ -649,7 +649,7 @@ class Helper_PDF {
 		 * We'll first look for a user-overridding template
 		 * Then check our default templates
 		 */
-		$default_template_path = PDF_PLUGIN_DIR . 'initialisation/templates/';
+		$default_template_path = PDF_PLUGIN_DIR . 'src/templates/';
 
 		if ( is_multisite() && is_file( $this->data->multisite_template_location . $template ) ) {
 			$this->template_path = $this->data->multisite_template_location . $template;
