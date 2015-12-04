@@ -250,7 +250,7 @@ class View_PDF extends Helper_Abstract_View {
 	public function process_html_structure( $entry, Helper_Abstract_Model $model, $config = array() ) {
 		/* Determine whether we should output or return the results */
 		$config['meta'] = ( isset( $config['meta'] ) ) ? $config['meta'] : array();
-		$echo           = ( isset( $config['echo'] ) ) ? $config['echo'] : true; /* whether to output or return the generated markup. Default is echo */
+		$echo           = ( isset( $config['meta']['echo'] ) ) ? $config['meta']['echo'] : true; /* whether to output or return the generated markup. Default is echo */
 
 		if ( ! $echo ) {
 			ob_start();
