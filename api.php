@@ -409,7 +409,7 @@ class GPDFAPI {
 	 * @param  integer $field_id The likert field ID
 	 * @param  boolean $return   Whether to output or return the HTML
 	 *
-	 * @return void    The likert table or null
+	 * @return Mixed    The likert table or null
 	 *
 	 * @since  4.0
 	 */
@@ -421,7 +421,7 @@ class GPDFAPI {
 
 		/* Check for errors */
 		if ( is_wp_error( $form ) ) {
-			return null;
+			return false;
 		}
 
 		/* Find our field ID, if any */
