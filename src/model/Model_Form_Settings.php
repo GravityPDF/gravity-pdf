@@ -628,7 +628,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		}
 
 		/* If there are no user overriding templates we'll attempt to load a config from the main plugin */
-		$file = PDF_PLUGIN_DIR . 'initialisation/templates/config/' . $template . '.php';
+		$file = PDF_PLUGIN_DIR . 'src/templates/config/' . $template . '.php';
 		if ( empty( $class ) ) {
 			$class = $this->load_template_configuration( $file );
 		}
@@ -641,7 +641,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		) );
 
 		if ( in_array( $template, $legacy_templates ) ) {
-			$class = $this->load_template_configuration( PDF_PLUGIN_DIR . 'initialisation/templates/config/legacy.php' );
+			$class = $this->load_template_configuration( PDF_PLUGIN_DIR . 'src/templates/config/legacy.php' );
 		}
 
 		return $class;
