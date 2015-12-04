@@ -48,7 +48,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <table id="pdf-system-status" class="form-table">
 	<tr>
 		<th scope="row">
-			<?php _e( 'WP Memory Available', 'gravity-forms-pdf-extended' ); ?><?php gform_tooltip( 'pdf_status_wp_memory' ); ?>
+			<?php _e( 'WP Memory Available', 'gravity-forms-pdf-extended' ); ?> <?php gform_tooltip( 'pdf_status_wp_memory' ); ?>
 		</th>
 
 		<td>
