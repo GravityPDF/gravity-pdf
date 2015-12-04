@@ -120,51 +120,18 @@ class Field_List extends Helper_Abstract_Fields {
 		$value   = $this->value();
 		$columns = is_array( $value[0] );
 
-		$css = array();
-
-		$css['table'] = array(
-			'border-collapse: collapse',
-			'border: 1px solid #DFDFDF',
-
-			'margin: 2px 0 6px',
-			'padding: 0',
-
-			'width: 100%',
-		);
-
-		$css['th'] = array(
-			'text-align:left',
-			'background-color: #F1F1F1',
-
-			'font-size: 12px',
-			'font-weight: bold',
-
-			'padding: 6px 10px',
-			'background-image: none',
-			'border: 1px solid #DFDFDF',
-		);
-
-		$css['td'] = array(
-			'font-size:12px',
-			'padding: 6px 10px',
-			'border: 1px solid #DFDFDF',
-		);
-
-		/* add filter so users can modify the default list style */
-		$css = apply_filters( 'gfpdf_field_list_css', $css );
-
 		/* Start buffer and generate a list table */
 		ob_start();
 		?>
 
-		<table autosize="1" class="gfield_list" style="<?php echo implode( ';', $css['table'] ); ?>">
+		<table autosize="1" class="gfield_list">
 
 			<!-- Loop through the column names and output in a header (if using the advanced list) -->
 			<?php if ( $columns ) : $columns = array_keys( $value[0] ); ?>
 				<thead>
 				<tr>
 					<?php foreach ( $columns as $column ) : ?>
-						<th style="<?php echo implode( ';', $css['th'] ); ?>">
+						<th>
 							<?php echo esc_html( $column ); ?>
 						</th>
 					<?php endforeach; ?>
@@ -178,10 +145,10 @@ class Field_List extends Helper_Abstract_Fields {
 				<tr>
 					<!-- handle the basic list -->
 					<?php if ( ! $columns ) : ?>
-						<td style="<?php echo implode( ';', $css['td'] ); ?>"><?php echo esc_html( $item ); ?></td>
+						<td><?php echo esc_html( $item ); ?></td>
 					<?php else : ?><!-- handle the advanced list -->
 						<?php foreach ( $columns as $column ) : ?>
-							<td style="<?php echo implode( ';', $css['td'] ); ?>">
+							<td>
 								<?php echo esc_html( rgar( $item, $column ) ); ?>
 							</td>
 						<?php endforeach; ?>

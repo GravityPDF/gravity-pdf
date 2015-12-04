@@ -84,7 +84,7 @@ class Helper_Misc {
 	/**
 	 * Store required classes locally
 	 *
-	 * @param \Monolog\Logger|LoggerInterface     $log
+	 * @param \Monolog\Logger|LoggerInterface    $log
 	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
 	 * @param \GFPDF\Helper\Helper_Data          $data
 	 *
@@ -185,6 +185,7 @@ class Helper_Misc {
 	 */
 	public function human_readable( $name ) {
 		$name = str_replace( array( '-', '_' ), ' ', $name );
+
 		return mb_convert_case( $name, MB_CASE_TITLE );
 	}
 
@@ -227,7 +228,40 @@ class Helper_Misc {
 		$b   = hexdec( substr( $hexcolor, 4, 2 ) );
 		$yiq = ( ( $r * 299 ) + ( $g * 587 ) + ( $b * 114 ) ) / 1000;
 
-		return ( $yiq >= 128 ) ? 'black' : 'white';
+		return ( $yiq >= 128 ) ? '#000' : '#FFF';
+	}
+
+	/**
+	 * Change the brightness of the passed in colour
+	 *
+	 * $diff should be negative to go darker, positive to go lighter and
+	 * is subtracted from the decimal (0-255) value of the colour
+	 *
+	 * @param         $hexcolor Hex colour to be modified
+	 * @param integer $diff amount to change the color
+	 *
+	 * @return string hex colour
+	 *
+	 * @since    4.0
+	 */
+	public function change_brightness( $hexcolor, $diff ) {
+
+		$hexcolor = trim( str_replace( '#', '', $hexcolor ) );
+
+		if ( 6 !== strlen( $hexcolor ) ) {
+			$hexcolor = str_repeat( substr( $hexcolor, 0, 1 ), 2 ) . str_repeat( substr( $hexcolor, 1, 1 ), 2 ) . str_repeat( substr( $hexcolor, 2, 1 ), 2 );
+		}
+
+		$rgb = str_split( $hexcolor, 2 );
+
+		foreach ( $rgb as &$hex ) {
+			$dec = hexdec( $hex );
+			$dec += $diff;
+			$dec = max( 0, min( 255, $dec ) );
+			$hex = str_pad( dechex( $dec ), 2, '0', STR_PAD_LEFT );
+		}
+
+		return '#' . implode( $rgb );
 	}
 
 	/**

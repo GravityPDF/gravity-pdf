@@ -81,61 +81,7 @@ class Field_Products extends Helper_Abstract_Fields {
 		/* start output buffer */
 		ob_start();
 
-		$include_styles = apply_filters( 'gfpdf_include_product_table_styles', true );
-
 		?>
-		<?php if ( $include_styles ) : ?>
-			<style>
-				table.entry-products th {
-					background-color: #F4F4F4;
-					border-bottom: 1px solid #DFDFDF;
-					border-right: 1px solid #DFDFDF !important;
-				}
-
-				table.entry-products td.textcenter, table.entry-products th.textcenter {
-					text-align: center;
-				}
-
-				table.entry-products col.entry-products-col2 {
-					width: 50px;
-				}
-
-				table.entry-products col.entry-products-col3 {
-					width: 155px;
-				}
-
-				table.entry-products col.entry-products-col4 {
-					width: 155px;
-				}
-
-				table.entry-products {
-					border: 1px solid #DFDFDF;
-					margin: 10px 0;
-				}
-
-				table.entry-products td {
-					border-bottom: 1px solid #DFDFDF;
-					border-right: 1px solid #DFDFDF !important;
-					padding: 7px 7px 8px;
-					vertical-align: top;
-				}
-
-				table.entry-products td.emptycell {
-					background-color: #F4F4F4;
-				}
-
-				table.entry-products td.totals {
-					font-size: 13px;
-					font-weight: bold;
-					padding-bottom: 8px;
-					padding-top: 7px;
-				}
-
-				table.entry-products td.textright, table.entry-products th.textright {
-					text-align: right;
-				}
-			</style>
-		<?php endif; ?>
 
 		<h3 id="product-field-title gfpdf-field">
 			<?php
