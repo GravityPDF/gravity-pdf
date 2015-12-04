@@ -364,6 +364,12 @@
 					var id = String($(this).data('id'));
 					var that = this;
 
+					/* Add spinner */
+					var $spinner = $('<img alt="' + GFPDF.spinnerAlt + '" src="' + GFPDF.spinnerUrl + '" class="gfpdf-spinner gfpdf-spinner-small" />');
+
+					/* Add our spinner */
+					$(this).after($spinner).parent().parent().css('visibility', 'visible');
+
 					if(id.length > 0) {
 						/* Set up ajax data */
 			      		var data = {
@@ -376,6 +382,10 @@
 			      		/* Do ajax call */
 			      		self.ajax(data, function(response) {
 			      			if(response.msg) {
+
+								/* Remove the spinner */
+								$(that).parent().parent().attr('style', '').find('.gfpdf-spinner').remove();
+
 			      				/* Provide feedback to use */
 			      				self.show_message(response.msg);
 
@@ -440,6 +450,7 @@
 			 * @since 4.0
 			 */
 			this.setupAJAXListDeleteListener = function() {
+
 				/* Set up our delete dialog */
 				var $deleteDialog = $( '#delete-confirm' );
 
@@ -450,6 +461,12 @@
 				      		$deleteDialog.wpdialog( 'close' );
 				      		$elm = $( $deleteDialog.data('elm') );
 
+							/* Add spinner */
+							var $spinner = $('<img alt="' + GFPDF.spinnerAlt + '" src="' + GFPDF.spinnerUrl + '" class="gfpdf-spinner gfpdf-spinner-small" />');
+
+							/* Add the spinner */
+							$elm.append($spinner).parent().parent().css('visibility', 'visible');;
+
 				      		var data = {
 				      			'action': 'gfpdf_list_delete',
 				      			'nonce': $elm.data('nonce'),
@@ -459,6 +476,9 @@
 
 				      		self.ajax(data, function(response) {
 				      			if(response.msg) {
+									/* Remove spinner */
+									$elm.parent().parent().attr('style', '').find('.gfpdf-spinner').remove();
+
 				      				self.show_message(response.msg);
 				      				var $row = $elm.parents('tr');
 				      				$row.css('background', '#ffb8b8').fadeOut().remove();
