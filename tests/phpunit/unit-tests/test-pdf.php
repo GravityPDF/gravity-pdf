@@ -1270,7 +1270,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$results = $this->create_form_and_entries();
 		$entry   = $results['entry'];
 
-		$html = $this->view->process_html_structure( $entry, $this->model, array( 'echo' => false ) );
+		$html = $this->view->process_html_structure( $entry, $this->model, array( 'meta' => array( 'echo' => false ) ) );
 
 		$this->assertNotFalse( strpos( $html, '<td class="grandtotal_amount totals">' ) );
 	}

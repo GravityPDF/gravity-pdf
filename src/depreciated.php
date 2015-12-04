@@ -334,7 +334,7 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 	 * @param  boolean $show_page_name
 	 * @param  boolean $return
 	 *
-	 * @return void
+	 * @return string  If $return is `true` the generated HTML will be returned
 	 *
 	 * @since 3.0
 	 */
@@ -350,7 +350,7 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 			),
 		);
 
-		self::do_lead_detail_grid( $form, $lead, $config );
+		return self::do_lead_detail_grid( $form, $lead, $config );
 	}
 
 	/**
@@ -360,7 +360,7 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 	 * @param  array $lead   The Gravity Form entry
 	 * @param  array $config The PDF Configuration
 	 *
-	 * @return string        The generated HTML
+	 * @return string        If $config['meta']['echo'] is false the HTML will be returned
 	 *
 	 * @since 3.7
 	 */
@@ -391,7 +391,7 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 
 		$model = new Model_PDF( $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
 		$view  = new View_PDF( array(), $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
-		$view->process_html_structure( $lead, $model, $config );
+		return $view->process_html_structure( $lead, $model, $config );
 	}
 
 	/**
