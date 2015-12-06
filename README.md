@@ -9,7 +9,7 @@ Gravity PDF is a GPLv2-licensed WordPress plugin that allows you to automaticall
 
 This Git repository is for developers who want to contribute to Gravity PDF. **Don't use it in production**. For production use, [download the Gravity PDF from the WordPress Plugin Directory](https://wordpress.org/plugins/gravity-forms-pdf-extended/).
 
-The `development` branch is our considered our bleeding edge branch, with all new changes pushed to it. The `master` branch is our latest stable version of Gravity PDF.
+The `development` branch is considered our bleeding edge branch, with all new changes pushed to it. The `master` branch is our latest stable version of Gravity PDF.
 
 # Installation
 
