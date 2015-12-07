@@ -14,8 +14,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-global $gfpdf;
-
 $font                       = ( ! empty( $settings['font'] ) ) ? $settings['font'] : 'DejavuSansCondensed';
 $font_colour                = ( ! empty( $settings['font_colour'] ) ) ? $settings['font_colour'] : '#333';
 $font_size                  = ( ! empty( $settings['font_size'] ) ) ? $settings['font_size'] : '9';

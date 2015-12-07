@@ -110,10 +110,15 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 		$path = PDF_PLUGIN_DIR . 'src/views/html/' . $this->view_type . '/' . $filename . '.php';
 
 		if ( is_readable( $path ) ) {
-			/* for backwards compatibility extract the $args variable */
-			extract( $args, EXTR_SKIP ); /* skip any arguments that would clash - i.e filename, args, output, path, this */
 
 			if ( $output ) {
+
+				/* Include our $gfpdf object automatically */
+				global $gfpdf;
+
+				/* for backwards compatibility extract the $args variable */
+				extract( $args, EXTR_SKIP ); /* skip any arguments that would clash - i.e filename, args, output, path, this */
+
 				include $path;
 
 				return true;
@@ -138,6 +143,9 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 	final private function buffer( $path, $args = array() ) {
 		/* for backwards compatibility extract the $args variable */
 		extract( $args, EXTR_SKIP ); /* skip any arguments that would clash - i.e filename, args, output, path, this */
+
+		/* Include our $gfpdf object automatically */
+		global $gfpdf;
 
 		ob_start();
 		include $path;
