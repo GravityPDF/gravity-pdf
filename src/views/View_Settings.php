@@ -61,7 +61,7 @@ class View_Settings extends Helper_Abstract_View {
 	 *
 	 * @since 4.0
 	 */
-	protected $ViewType = 'Settings';
+	protected $view_type = 'Settings';
 
 	/**
 	 * Holds abstracted functions related to the forms plugin

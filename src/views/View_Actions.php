@@ -51,7 +51,7 @@ class View_Actions extends Helper_Abstract_View {
 	 *
 	 * @since 4.0
 	 */
-	protected $ViewType = 'Actions';
+	protected $view_type = 'Actions';
 
 	/**
 	 * Add our primary button and an opt-our dismissal button

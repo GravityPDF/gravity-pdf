@@ -55,7 +55,7 @@ class View_Welcome_Screen extends Helper_Abstract_View {
 	 *
 	 * @since 4.0
 	 */
-	protected $ViewType = 'Welcome';
+	protected $view_type = 'Welcome';
 
 	/**
 	 * Holds abstracted functions related to the forms plugin
