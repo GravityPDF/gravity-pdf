@@ -125,6 +125,16 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public $misc;
 
 	/**
+	 * Makes our MVC classes sudo-singletons by allowing easy access to the original objects
+	 * through `$singleton->get_class();`
+	 *
+	 * @var \GFPDF\Helper\Helper_Singleton
+	 *
+	 * @since 4.0
+	 */
+	public $singleton;
+
+	/**
 	 * Add user depreciation notice for any methods not included in current object
 	 *
 	 * @param string $name The function name to be called
@@ -175,6 +185,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		/* Set up our options object - this is initialised on admin_init but other classes need to access its methods before this */
 		$this->options = new Helper\Helper_Options_Fields( $this->log, $this->form, $this->data, $this->misc, $this->notices );
+
+		/* Setup our Singleton object */
+		$this->singleton = new Helper\Helper_Singleton();
 
 		/* Load modules */
 		$this->installer();
@@ -679,6 +692,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		/* set up required data */
 		$class->setup_defaults();
+
+		/* Add to our singleton controller */
+		$this->singleton->add_class( $class );
+		$this->singleton->add_class( $model );
 	}
 
 	/**
@@ -697,6 +714,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		$class = new Controller\Controller_Welcome_Screen( $model, $view, $this->log, $this->data, $this->options );
 		$class->init();
+
+		/* Add to our singleton controller */
+		$this->singleton->add_class( $class );
+		$this->singleton->add_class( $model );
+		$this->singleton->add_class( $view );
 	}
 
 	/**
@@ -713,6 +735,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		$class = new Controller\Controller_Settings( $model, $view, $this->form, $this->log, $this->notices, $this->data, $this->misc );
 		$class->init();
+
+		/* Add to our singleton controller */
+		$this->singleton->add_class( $class );
+		$this->singleton->add_class( $model );
+		$this->singleton->add_class( $view );
 	}
 
 	/**
@@ -729,6 +756,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		$class = new Controller\Controller_Form_Settings( $model, $view, $this->data, $this->options, $this->misc );
 		$class->init();
+
+		/* Add to our singleton controller */
+		$this->singleton->add_class( $class );
+		$this->singleton->add_class( $model );
+		$this->singleton->add_class( $view );
 	}
 
 	/**
@@ -745,6 +777,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		$class = new Controller\Controller_PDF( $model, $view, $this->form, $this->log, $this->misc );
 		$class->init();
+
+		/* Add to our singleton controller */
+		$this->singleton->add_class( $class );
+		$this->singleton->add_class( $model );
+		$this->singleton->add_class( $view );
 	}
 
 	/**
@@ -761,6 +798,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		$class = new Controller\Controller_Shortcodes( $model, $view, $this->log );
 		$class->init();
+
+		/* Add to our singleton controller */
+		$this->singleton->add_class( $class );
+		$this->singleton->add_class( $model );
+		$this->singleton->add_class( $view );
 	}
 
 	/**
@@ -777,6 +819,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		$class = new Controller\Controller_Actions( $model, $view, $this->form, $this->log, $this->notices );
 		$class->init();
+
+		/* Add to our singleton controller */
+		$this->singleton->add_class( $class );
+		$this->singleton->add_class( $model );
+		$this->singleton->add_class( $view );
 	}
 
 	/**
