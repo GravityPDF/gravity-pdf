@@ -52,7 +52,7 @@ class View_Shortcodes extends Helper_Abstract_View {
 	 *
 	 * @since 4.0
 	 */
-	protected $ViewType = 'Shortcodes';
+	protected $view_type = 'Shortcodes';
 
 	/**
 	 * Shortcode Error: Entry ID not passed through the shortcode - directly or through the URL.

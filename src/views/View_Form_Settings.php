@@ -54,5 +54,5 @@ class View_Form_Settings extends Helper_Abstract_View {
 	 *
 	 * @since 4.0
 	 */
-	protected $ViewType = 'FormSettings';
+	protected $view_type = 'FormSettings';
 }

@@ -72,7 +72,7 @@ class View_PDF extends Helper_Abstract_View {
 	 *
 	 * @since 4.0
 	 */
-	protected $ViewType = 'PDF';
+	protected $view_type = 'PDF';
 
 	/**
 	 * Holds abstracted functions related to the forms plugin

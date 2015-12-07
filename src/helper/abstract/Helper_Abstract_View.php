@@ -51,7 +51,7 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 	 *
 	 * @since 4.0
 	 */
-	protected $ViewType = null;
+	protected $view_type = null;
 
 	/**
 	 * Enable a private data cache we can set and retrive information from
@@ -107,7 +107,7 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	final protected function load( $filename, $args = array(), $output = true ) {
-		$path = PDF_PLUGIN_DIR . 'src/views/html/' . $this->ViewType . '/' . $filename . '.php';
+		$path = PDF_PLUGIN_DIR . 'src/views/html/' . $this->view_type . '/' . $filename . '.php';
 
 		if ( is_readable( $path ) ) {
 			/* for backwards compatibility extract the $args variable */
