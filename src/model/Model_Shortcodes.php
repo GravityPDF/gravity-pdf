@@ -5,6 +5,7 @@ namespace GFPDF\Model;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Options;
+use GFPDF\Helper\Helper_Misc;
 
 use Psr\Log\LoggerInterface;
 
@@ -81,6 +82,16 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	protected $options;
 
 	/**
+	 * Holds our Helper_Misc object
+	 * Makes it easy to access common methods throughout the plugin
+	 *
+	 * @var \GFPDF\Helper\Helper_Misc
+	 *
+	 * @since 4.0
+	 */
+	protected $misc;
+
+	/**
 	 * Setup our class by injecting all our dependancies
 	 *
 	 * @param \GFPDF\Helper\Helper_Abstract_Form|\GFPDF\Helper\Helper_Form     $form    Our abstracted Gravity Forms helper functions
@@ -89,12 +100,13 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log, Helper_Options $options ) {
+	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log, Helper_Options $options, Helper_Misc $misc ) {
 
 		/* Assign our internal variables */
 		$this->form    = $form;
 		$this->log     = $log;
 		$this->options = $options;
+		$this->misc    = $misc;
 	}
 
 	/**
@@ -173,7 +185,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 			return '';
 		}
 
-		if ( isset( $config['conditionalLogic'] ) && ! GFCommon::evaluate_conditional_logic( $config['conditionalLogic'], $this->form->get_form( $entry['form_id'] ), $entry ) ) {
+		if ( isset( $config['conditionalLogic'] ) && ! $this->misc->evaluate_conditional_logic( $config['conditionalLogic'], $entry ) ) {
 			/* Only display error to users with appropriate permissions */
 			if ( $has_view_permissions ) {
 				return $controller->view->conditional_logic_not_met();

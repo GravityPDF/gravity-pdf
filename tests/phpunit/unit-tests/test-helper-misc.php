@@ -436,4 +436,20 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 				array( '#e6e6e6', '#FFF', -25),
 		);
 	}
+
+	/**
+	 * Test the basics of the evaluate_conditional_logic() method
+	 * when used with show/hide logic
+	 *
+	 * @since 4.0
+	 */
+	public function test_evaluate_conditional_logic() {
+		$logic['actionType'] = 'show';
+
+		$this->assertTrue( $this->misc->evaluate_conditional_logic( $logic, array() ) );
+
+		$logic['actionType'] = 'hide';
+
+		$this->assertFalse( $this->misc->evaluate_conditional_logic( $logic, array() ) );
+	}
 }

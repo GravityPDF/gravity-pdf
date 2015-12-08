@@ -793,7 +793,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function shortcodes() {
 
-		$model = new Model\Model_Shortcodes( $this->form, $this->log, $this->options );
+		$model = new Model\Model_Shortcodes( $this->form, $this->log, $this->options, $this->misc );
 		$view  = new View\View_Shortcodes( array() );
 
 		$class = new Controller\Controller_Shortcodes( $model, $view, $this->log );

@@ -13,12 +13,14 @@
 	$(function() {
 
 		/**
-		 * Check if the global gf_vars has been set and if so replace the .thisFormButton object with our
-		 * GFPDF.condtionalText object. This allows us to override the standard Gravity Forms conditional logic text "Enable this field if" gets turned to "Enable this PDF if"
+		 * Check if the global gf_vars has been set and if so replace the .thisFormButton, .show, .hide objects with our
+		 * customised options.
 		 * @since 4.0
 		 */
 		if(typeof gf_vars !== 'undefined') {
 			gf_vars.thisFormButton = GFPDF.conditionalText;
+			gf_vars.show = GFPDF.conditionalShow;
+			gf_vars.hide = GFPDF.conditionalHide;
 		}
 
 		/*

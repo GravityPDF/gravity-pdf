@@ -84,7 +84,7 @@ class Test_Shortcode extends WP_UnitTestCase {
 		parent::setUp();
 
 		/* Setup our test classes */
-		$this->model = new Model_Shortcodes( $gfpdf->form, $gfpdf->log, $gfpdf->options );
+		$this->model = new Model_Shortcodes( $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->misc );
 		$this->view  = new View_Shortcodes( array() );
 
 		$this->controller = new Controller_Shortcodes( $this->model, $this->view, $gfpdf->log );
