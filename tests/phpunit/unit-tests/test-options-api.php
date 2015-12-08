@@ -106,7 +106,7 @@ class Test_Options_API extends WP_UnitTestCase {
 		$this->assertEquals( 'dejavusans', $settings['default_font_type'] );
 		$this->assertEquals( 'No', $settings['default_rtl'] );
 		$this->assertEquals( 'View', $settings['default_action'] );
-		$this->assertEquals( 'No', $settings['limit_to_admin'] );
+		$this->assertEquals( 'No', $settings['default_restrict_owner'] );
 		$this->assertEquals( '20', $settings['logged_out_timeout'] );
 
 		$this->assertTrue( is_array( $settings['default_custom_pdf_size'] ) );
@@ -544,7 +544,7 @@ class Test_Options_API extends WP_UnitTestCase {
 		/* test for real values */
 		$this->assertEquals( 'custom', $this->options->get_option( 'default_pdf_size' ) );
 		$this->assertEquals( 'Awesomeness', $this->options->get_option( 'default_template' ) );
-		$this->assertEquals( 'No', $this->options->get_option( 'limit_to_admin' ) );
+		$this->assertEquals( 'No', $this->options->get_option( 'default_restrict_owner' ) );
 		$this->assertTrue( is_array( $this->options->get_option( 'admin_capabilities' ) ) );
 
 		/* test for non-existant option */
@@ -597,17 +597,17 @@ class Test_Options_API extends WP_UnitTestCase {
 
 		remove_all_filters( 'gfpdf_update_option' );
 
-		add_filter( 'gfpdf_update_option_limit_to_admin', function ( $value ) {
+		add_filter( 'gfpdf_update_option_default_restrict_owner', function ( $value ) {
 			return 'filtered admin option';
 		} );
 
 		$this->assertTrue( $this->options->update_option( 'default_pdf_size', 'new pdf size' ) );
 		$this->assertEquals( 'new pdf size', $this->options->get_option( 'default_pdf_size' ) );
 
-		$this->assertTrue( $this->options->update_option( 'limit_to_admin', 'admin' ) );
-		$this->assertEquals( 'filtered admin option', $this->options->get_option( 'limit_to_admin' ) );
+		$this->assertTrue( $this->options->update_option( 'default_restrict_owner', 'admin' ) );
+		$this->assertEquals( 'filtered admin option', $this->options->get_option( 'default_restrict_owner' ) );
 
-		remove_all_filters( 'gfpdf_update_option_limit_to_admin' );
+		remove_all_filters( 'gfpdf_update_option_default_restrict_owner' );
 	}
 
 	/**

@@ -160,7 +160,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertSame( 10, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_conditional' ) ) );
 		$this->assertSame( 20, has_filter( 'gfpdf_pdf_middleware', array(
 			$this->model,
-			'middle_logged_out_restriction',
+			'middle_owner_restriction',
 		) ) );
 		$this->assertSame( 30, has_filter( 'gfpdf_pdf_middleware', array(
 			$this->model,
@@ -342,7 +342,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertSame( 10, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_conditional' ) ) );
 		$this->assertSame( 20, has_filter( 'gfpdf_pdf_middleware', array(
 			$this->model,
-			'middle_logged_out_restriction',
+			'middle_owner_restriction',
 		) ) );
 		$this->assertSame( 30, has_filter( 'gfpdf_pdf_middleware', array(
 			$this->model,
@@ -362,7 +362,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertSame( 10, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_conditional' ) ) );
 		$this->assertFalse( has_filter( 'gfpdf_pdf_middleware', array(
 			$this->model,
-			'middle_logged_out_restriction',
+			'middle_owner_restriction',
 		) ) );
 		$this->assertFalse( has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_logged_out_timeout' ) ) );
 		$this->assertFalse( has_filter( 'gfpdf_pdf_middleware', array(
@@ -469,22 +469,16 @@ class Test_PDF extends WP_UnitTestCase {
 	 *
 	 * @since 4.0
 	 */
-	public function test_middle_logged_out_restrictions() {
+	public function test_middle_owner_restriction() {
 		global $gfpdf;
 
-		/* Disable test and check results */
-		$gfpdf->options->update_option( 'limit_to_admin', 'No' );
-
-		$this->assertTrue( $this->model->middle_logged_out_restriction( true, '', '' ) );
-		$this->assertTrue( is_wp_error( $this->model->middle_logged_out_restriction( new WP_Error( '' ), '', '' ) ) );
-
-		/* Enable our tests */
-		$gfpdf->options->update_option( 'limit_to_admin', 'Yes' );
+		$this->assertTrue( $this->model->middle_owner_restriction( true, '', array( 'restrict_owner' => 'No' ) ) );
+		$this->assertTrue( is_wp_error( $this->model->middle_owner_restriction( new WP_Error( '' ), '', array( 'restrict_owner' => 'No' ) ) ) );
 
 		/* test if we are redirecting */
 		try {
 			wp_set_current_user( 0 );
-			$this->model->middle_logged_out_restriction( true, '', '' );
+			$this->model->middle_owner_restriction( true, '', array( 'restrict_owner' => 'Yes' ) );
 		} catch ( Exception $e ) {
 			$this->assertEquals( 'Redirecting', $e->getMessage() );
 		}
@@ -493,7 +487,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$user_id = $this->factory->user->create();
 		$this->assertInternalType( 'integer', $user_id );
 		wp_set_current_user( $user_id );
-		$this->assertTrue( $this->model->middle_logged_out_restriction( true, '', '' ) );
+		$this->assertTrue( $this->model->middle_owner_restriction( true, '', array( 'restrict_owner' => 'Yes' ) ) );
 
 		wp_set_current_user( 0 );
 	}

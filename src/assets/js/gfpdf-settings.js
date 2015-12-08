@@ -208,6 +208,7 @@
 				this.setupPdfTabs();
 				this.handleSecurityConditionals();
 				this.handlePDFConditionalLogic();
+				this.handleOwnerRestriction();
 
 				/*
 				 * Workaround for Firefix TinyMCE Editor Bug NS_ERROR_UNEXPECTED (http://www.tinymce.com/develop/bugtracker_view.php?id=3152) when loading wp_editor via AJAX
@@ -299,6 +300,32 @@
 					}
 					ToggleConditionalLogic(false, 'gfpdf');
 
+				}).trigger('change');
+			};
+
+			/**
+			 * Show / Hide the Restrict Owner when `Enable Public Access` is set to "Yes"
+			 * @since 4.0
+			 */
+			this.handleOwnerRestriction = function() {
+
+				var $table        = $('#gfpdf-advanced-pdf-options');
+				var $publicAccess = $table.find('input[name="gfpdf_settings[public_access]"]');
+
+				/*
+				 * Add change event to admin restrictions to show/hide dependant fields
+				 */
+				$publicAccess.change(function() {
+
+					if( $(this).is(':checked') )  {
+						if($(this).val() === 'Yes') {
+							/* hide user restrictions  */
+							$table.find('tr:nth-child(8)').hide();
+						} else {
+							/* show user restrictions */
+							$table.find('tr:nth-child(8)').show();
+						}
+					}
 				}).trigger('change');
 			};
 
@@ -941,8 +968,7 @@
 				this.setupRequiredFields( $('#pdfextended-settings > form') );
 
 				var $table             = $('#pdf-general-security');
-				var $adminRestrictions = $table.find('input[name="gfpdf_settings[limit_to_admin]"]');
-
+				var $adminRestrictions = $table.find('input[name="gfpdf_settings[default_restrict_owner]"]');
 
 				/*
 				 * Add change event to admin restrictions to show/hide dependant fields
