@@ -108,6 +108,7 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 	 */
 	final protected function load( $filename, $args = array(), $output = true ) {
 		$path = PDF_PLUGIN_DIR . 'src/views/html/' . $this->view_type . '/' . $filename . '.php';
+		$args = array_merge( $this->data_cache, $args );
 
 		if ( is_readable( $path ) ) {
 
