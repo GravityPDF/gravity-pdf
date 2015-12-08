@@ -510,10 +510,6 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
   display: none;
 }
 
-#gfpdf_action_type {
-  display: none;
-}
-
 .gfpdf_conditional_logic {
   margin-top: 10px;
 }

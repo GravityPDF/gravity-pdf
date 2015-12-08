@@ -742,6 +742,36 @@ class Helper_Misc {
 	}
 
 	/**
+	 * Determine if the logic should show or hide the item
+	 *
+	 * @param array $logic
+	 * @param array $entry The Gravity Forms entry object
+	 *
+	 * @return boolean Will always return true if item should be shown, or false if should be hidden
+	 *
+	 * @since 4.0
+	 */
+	public function evaluate_conditional_logic( $logic, $entry ) {
+
+		/* exit early if type not found */
+		if( ! isset( $logic['actionType'] ) ) {
+			return true;
+		}
+
+		$form = $this->form->get_form( $entry['form_id'] );
+
+		/* Do the evaluation */
+		$evaluation = GFCommon::evaluate_conditional_logic( $logic, $form, $entry );
+
+		/* If the logic is to hide the item we'll invert the evaluation */
+		if( $logic['actionType'] !== 'show' ) {
+			return ! $evaluation;
+		}
+
+		return $evaluation;
+	}
+
+	/**
 	 * Bug in WordPress 3.9 (which we still support) which means wp_kses_post() doesn't pass in the allowed post tags correctly
 	 * We'll fix this by replicating this functionality
 	 *

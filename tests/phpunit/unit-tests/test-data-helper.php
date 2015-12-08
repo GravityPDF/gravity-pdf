@@ -180,6 +180,8 @@ class Test_Data_Helper extends WP_UnitTestCase {
 			'active',
 			'inactive',
 			'conditionalText',
+			'conditionalShow',
+			'conditionalHide',
 			'help_search_placeholder',
 			'ajax_error',
 			'update_success',
@@ -192,6 +194,8 @@ class Test_Data_Helper extends WP_UnitTestCase {
 			'migration_complete',
 			'migration_error_specific',
 			'migration_error_generic',
+			'no_pdfs_found',
+			'no_pdfs_found_link'
 		);
 
 		foreach ( $required_keys as $key ) {
