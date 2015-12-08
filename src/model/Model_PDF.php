@@ -199,7 +199,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		 * Our middleware authenticator
 		 * Allow users to tap into our middleware and add or remove additional authentication layers
 		 *
-		 * Default middleware includes 'middle_active', 'middle_conditional', 'middle_logged_out_restriction', 'middle_logged_out_timeout', 'middle_auth_logged_out_user', 'middle_user_capability'
+		 * Default middleware includes 'middle_active', 'middle_conditional', 'middle_owner_restriction', 'middle_logged_out_timeout', 'middle_auth_logged_out_user', 'middle_user_capability'
 		 * If WP_Error is returned the PDF won't be parsed
 		 */
 		$middleware = apply_filters( 'gfpdf_pdf_middleware', false, $entry, $settings );
@@ -288,7 +288,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function middle_public_access( $action, $entry, $settings ) {
 
 		if ( isset( $settings['public_access'] ) && 'Yes' === $settings['public_access'] ) {
-			remove_filter( 'gfpdf_pdf_middleware', array( $this, 'middle_logged_out_restriction' ), 20 );
+			remove_filter( 'gfpdf_pdf_middleware', array( $this, 'middle_owner_restriction' ), 20 );
 			remove_filter( 'gfpdf_pdf_middleware', array( $this, 'middle_logged_out_timeout' ), 30 );
 			remove_filter( 'gfpdf_pdf_middleware', array( $this, 'middle_auth_logged_out_user' ), 40 );
 			remove_filter( 'gfpdf_pdf_middleware', array( $this, 'middle_user_capability' ), 50 );
@@ -381,14 +381,14 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @since 4.0
 	 */
-	public function middle_logged_out_restriction( $action, $entry, $settings ) {
+	public function middle_owner_restriction( $action, $entry, $settings ) {
 
 		/* ensure another middleware filter hasn't already done validation */
 		if ( ! is_wp_error( $action ) ) {
 			/* get the setting */
-			$logged_out_restriction = $this->options->get_option( 'limit_to_admin', 'No' );
+			$owner_restriction = ( isset( $settings['restrict_owner'] ) ) ? $settings['restrict_owner'] : 'No';
 
-			if ( $logged_out_restriction === 'Yes' && ! is_user_logged_in() ) {
+			if ( $owner_restriction === 'Yes' && ! is_user_logged_in() ) {
 
 				$this->log->addNotice( 'Redirecting to Login.', array(
 					'entry'    => $entry,

@@ -198,8 +198,8 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 						'tooltip'     => '<h6>' . __( 'User Restriction', 'gravity-forms-pdf-extended' ) . '</h6>' . __( "Only logged in users with any selected capability can view generated PDFs they don't have ownership of. Ownership refers to an end user who completed the original Gravity Form entry.", 'gravity-forms-pdf-extended' ),
 					),
 
-					'limit_to_admin' => array(
-						'id'      => 'limit_to_admin',
+					'default_restrict_owner' => array(
+						'id'      => 'default_restrict_owner',
 						'name'    => __( 'Restrict Owner', 'gravity-forms-pdf-extended' ),
 						'desc'    => __( 'When enabled, the original entry owner will NOT be able to view the PDFs.', 'gravity-forms-pdf-extended' ),
 						'type'    => 'radio',
@@ -502,7 +502,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 
 					'public_access' => array(
 						'id'      => 'public_access',
-						'name'    => __( 'Enable Public Acccess', 'gravity-forms-pdf-extended' ),
+						'name'    => __( 'Enable Public Access', 'gravity-forms-pdf-extended' ),
 						'desc'    => sprintf( __( 'Allow %sanyone%s with a direct link to access the PDF. %sThis disables all %ssecurity protocols%s for this PDF.%s ', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>', '<em>', '<a href="#">', '</a>', '</em>' ),
 						'type'    => 'radio',
 						'options' => array(
@@ -511,6 +511,19 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 						),
 						'std'     => __( 'No', 'gravity-forms-pdf-extended' ),
 						'tooltip' => '<h6>' . __( 'Public Access', 'gravity-forms-pdf-extended' ) . '</h6>' . __( "When public access is on all security protocols are disabled and anyone worldwide can view the PDF document for ALL your form's entries. For most users the standard security measures will be adequate and public access should remain disabled.", 'gravity-forms-pdf-extended' ),
+					),
+
+					'restrict_owner' => array(
+							'id'      => 'restrict_owner',
+							'name'    => __( 'Restrict Owner', 'gravity-forms-pdf-extended' ),
+							'desc'    => __( 'When enabled, the original entry owner will NOT be able to view the PDFs.', 'gravity-forms-pdf-extended' ),
+							'type'    => 'radio',
+							'options' => array(
+									'Yes' => __( 'Yes', 'gravity-forms-pdf-extended' ),
+									'No'  => __( 'No', 'gravity-forms-pdf-extended' ),
+							),
+							'std'     => $this->get_option( 'default_restrict_owner', 'No' ),
+							'tooltip' => '<h6>' . __( 'Restrict Owner', 'gravity-forms-pdf-extended' ) . '</h6>' . __( 'Enable this setting if your PDFs should not be viewable by the end user.', 'gravity-forms-pdf-extended' ),
 					),
 				)
 			),
