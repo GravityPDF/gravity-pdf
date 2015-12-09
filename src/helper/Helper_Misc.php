@@ -457,7 +457,7 @@ class Helper_Misc {
 	 *
 	 * @param  string $url The Url to convert
 	 *
-	 * @return string|object      Path on success or WP_Error on failure
+	 * @return string|boolean      Path on success or false on failure
 	 *
 	 * @since  4.0
 	 */
@@ -506,8 +506,64 @@ class Helper_Misc {
 		}
 
 		/* If we are here we couldn't locate the file */
+		return false;
+	}
 
-		return $url;
+	/**
+	 * Attempt to convert the current path to a URL
+	 *
+	 * @param  string $path The path to convert
+	 *
+	 * @return string|boolean      Url on success or false
+	 *
+	 * @since  4.0
+	 */
+	public function convert_path_to_url( $path ) {
+
+		/* If $url is empty we'll return early */
+		if ( trim( $path ) == false ) {
+			return $path;
+		}
+
+		/* Mostly we'll be accessing files in the upload directory, so attempt that first */
+		$upload = wp_upload_dir();
+
+		$try_url = str_replace( $upload['basedir'], $upload['baseurl'], $path );
+
+		if ( $try_url !== $path ) {
+			return $try_url;
+		}
+
+		/* If WP_CONTENT_DIR and WP_CONTENT_URL are set we'll try them */
+		if ( defined( 'WP_CONTENT_DIR' ) && defined( 'WP_CONTENT_URL' ) ) {
+			$try_url = str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $path );
+
+			if ( $try_url !== $path ) {
+				return $try_url;
+			}
+		}
+
+		/* Include our get_home_path functionality */
+		if ( ! function_exists( 'get_home_path' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+		}
+
+		/* If that didn't work let's try use home_url() and get_home_path() */
+		$try_url = str_replace( get_home_path(), home_url(), $path );
+
+		if ( $try_url !== $path ) {
+			return $try_url;
+		}
+
+		/* If that didn't work let's try use site_url() and ABSPATH */
+		$try_url = str_replace( ABSPATH, site_url(), $path );
+
+		if ( $try_url !== $path ) {
+			return $try_url;
+		}
+
+		/* If we are here we couldn't locate the file */
+		return false;
 	}
 
 	/**

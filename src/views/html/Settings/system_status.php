@@ -7,6 +7,8 @@
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
+ *
+ * @todo Include correct link to the documentation about the tmp directory filter
  */
 
 /* Exit if accessed directly */
@@ -103,6 +105,33 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<td>
 			<?php echo $args['php']; ?>
+		</td>
+	</tr>
+
+	<tr>
+		<th scope="row">
+			<?php _e( 'Direct PDF Protection', 'gravity-forms-pdf-extended' ); ?> <?php gform_tooltip( 'pdf_protection' ); ?>
+		</th>
+
+		<td>
+
+			<!-- A placeholder for our JS which will do the check for us, thereby preventing any load time by checking in PHP directly -->
+			<div id="gfpdf-direct-pdf-protection-check" data-nonce="<?php echo wp_create_nonce( 'gfpdf-direct-pdf-protection' ); ?>">
+				<noscript><?php _e( 'You need JavaScript enabled to perform this check.', 'gravity-forms-pdf-extended' ); ?></noscript>
+
+				<div id="gfpdf-direct-pdf-check-protected" style="display: none">
+					Protected <span class="fa fa-check-circle"></span>
+				</div>
+
+				<div id="gfpdf-direct-pdf-check-unprotected" style="display: none">
+					<strong>Unprotected</strong> <span class="fa fa-times-circle"></span>
+
+					<span class="gf_settings_description">
+						We've detected the PDFs saved in Gravity PDF's <code>tmp</code> directory can be publically accessed.<br>
+						We recommend you use our <code>gfpdf_tmp_location</code> filter to <a href="#">move the directory outside your public website directory</a>.
+					</span>
+				</div>
+			</div>
 		</td>
 	</tr>
 

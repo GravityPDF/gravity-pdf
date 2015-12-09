@@ -195,6 +195,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		 */
 		add_action( 'wp_ajax_gfpdf_font_save', array( $this->model, 'save_font' ) );
 		add_action( 'wp_ajax_gfpdf_font_delete', array( $this->model, 'delete_font' ) );
+		add_action( 'wp_ajax_gfpdf_has_pdf_protection', array( $this->model, 'check_tmp_pdf_security' ) );
 
 	}
 

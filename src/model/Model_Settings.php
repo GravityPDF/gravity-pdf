@@ -743,4 +743,87 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		return $installation;
 	}
+
+	/**
+	 * Create a file in our tmp directory and check if it is publically accessible (i.e no .htaccess protection)
+	 *
+	 * @param $_POST ['nonce']
+	 *
+	 * @return boolean
+	 *
+	 * @since 4.0
+	 */
+	public function check_tmp_pdf_security() {
+
+		/* prevent unauthorized access */
+		if ( ! $this->form->has_capability( 'gravityforms_view_settings' ) ) {
+			/* fail */
+			$this->log->addCritical( 'Lack of User Capabilities.', array(
+				'user'      => wp_get_current_user(),
+				'user_meta' => get_user_meta( get_current_user_id() ),
+			) );
+
+			header( 'HTTP/1.1 401 Unauthorized' );
+			wp_die( '401' );
+		}
+
+		/**
+		 * Verify our nonce is valid before doing anything
+		 */
+		$nonce    = $_POST['nonce'];
+		$nonce_id = 'gfpdf-direct-pdf-protection';
+
+		if ( ! wp_verify_nonce( $nonce, $nonce_id ) ) {
+			/* fail */
+			$this->log->addWarning( 'Nonce Verification Failed.' );
+
+			header( 'HTTP/1.1 401 Unauthorized' );
+			wp_die( '401' );
+		}
+
+		/* Create our tmp file and do our actual check */
+		echo json_encode( $this->test_public_tmp_directory_access() );
+		wp_die();
+	}
+
+	/**
+	 * Create a file in our tmp directory and verify if it's protected from the public
+	 *
+	 * @return boolean
+	 *
+	 * @since 4.0
+	 */
+	public function test_public_tmp_directory_access() {
+		$tmp_dir       = $this->data->template_tmp_location;
+		$tmp_test_file = 'public_tmp_directory_test.txt';
+		$return        = true;
+
+		/* create our file */
+		@touch( $tmp_dir . $tmp_test_file );
+
+		/* verify it exists */
+		if( is_file( $tmp_dir . $tmp_test_file ) ) {
+			/* Run our test */
+			$site_url = $this->misc->convert_path_to_url( $tmp_dir );
+
+			if( $site_url !== false ) {
+
+				$response = wp_remote_get( $site_url );
+
+				if( ! is_wp_error( $response ) ) {
+
+					/* Check if the web server responded with a OK status code and fail our test */
+					if( isset( $response['response']['code'] ) && $response['response']['code'] === 200 ) {
+						$return = false;
+					}
+				}
+			}
+		}
+
+		/* Cleanup our test file */
+		@unlink( $tmp_dir . $tmp_test_file );
+
+		return $return;
+	}
+
 }
