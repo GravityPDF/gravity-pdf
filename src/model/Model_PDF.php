@@ -911,7 +911,7 @@ class Model_PDF extends Helper_Abstract_Model {
 					if ( ! is_wp_error( $filename ) ) {
 						do_action( 'gfpdf_post_pdf_save', $entry['form_id'], $entry['id'], $settings, $filename ); /* Backwards compatibility */
 						do_action( 'gfpdf_post_save_pdf', $form, $entry, $settings, $filename );
-						do_action( "gfpdf_post_save_pdf_{$form['id']}", $form, $entry, $settings, $filename );
+						do_action( 'gfpdf_post_save_pdf_' . $form['id'], $form, $entry, $settings, $filename );
 					}
 				}
 			}
@@ -1488,7 +1488,8 @@ class Model_PDF extends Helper_Abstract_Model {
 		$form_id = $form['id'];
 
 		/* Add form filter to keep in line with GF standard */
-		$form = apply_filters( "gform_form_pre_results_$form_id", apply_filters( 'gform_form_pre_results', $form ) );
+		$form = apply_filters( 'gform_form_pre_results', $form );
+		$form = apply_filters( 'gform_form_pre_results_' . $form_id, $form );
 
 		/* Initiate the results class */
 		$gf_results = new GFResults( '', $options );

@@ -233,10 +233,10 @@ class Model_Install extends Helper_Abstract_Model {
 			 * Allow user to change directory location(s)
 			 * @internal Folder location needs to be accessible from the web
 			 */
-			$this->data->multisite_template_location     = apply_filters( 'gfpdf_multisite_template_location',              $template_dir, $this->data->working_folder, $blog_id, $this->data->upload_dir );
-			$this->data->multisite_template_location_url = apply_filters( 'gfpdf_multisite_template_location_url',          $template_url, $this->data->working_folder, $blog_id, $this->data->upload_dir_url );
-			$this->data->multisite_template_location     = apply_filters( "gfpdf_multisite_template_location_$blog_id",     $template_dir, $this->data->working_folder, $blog_id, $this->data->upload_dir );
-			$this->data->multisite_template_location_url = apply_filters( "gfpdf_multisite_template_location_url_$blog_id", $template_url, $this->data->working_folder, $blog_id, $this->data->upload_dir_url );
+			$this->data->multisite_template_location     = apply_filters( 'gfpdf_multisite_template_location',                 $template_dir, $this->data->working_folder, $blog_id, $this->data->upload_dir );
+			$this->data->multisite_template_location_url = apply_filters( 'gfpdf_multisite_template_location_url',             $template_url, $this->data->working_folder, $blog_id, $this->data->upload_dir_url );
+			$this->data->multisite_template_location     = apply_filters( 'gfpdf_multisite_template_location_' . $blog_id,     $template_dir, $this->data->working_folder, $blog_id, $this->data->upload_dir );
+			$this->data->multisite_template_location_url = apply_filters( 'gfpdf_multisite_template_location_url_' . $blog_id, $template_url, $this->data->working_folder, $blog_id, $this->data->upload_dir_url );
 
 			$this->log->addNotice( 'Multisite Template Locations', array(
 				'path' => $this->data->multisite_template_location,

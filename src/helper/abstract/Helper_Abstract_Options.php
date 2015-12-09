@@ -428,7 +428,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$value = ! empty( $gfpdf_options[ $pdf_id ] ) ? $gfpdf_options[ $pdf_id ] : new WP_Error( 'invalid_pdf_id', __( 'You must pass in a valid PDF ID', 'gravity-forms-pdf-extended' ) );
 
 			if ( ! is_wp_error( $value ) ) {
-				return apply_filters( 'gfpdf_pdf_config', apply_filters( 'gfpdf_pdf_config_' . $form_id, $value ) );
+				$value = apply_filters( 'gfpdf_pdf_config', $value );
+				$value = apply_filters( 'gfpdf_pdf_config_' . $form_id, $value );
+
+				return $value;
 			}
 
 			/* return WP_Error */

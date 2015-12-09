@@ -126,8 +126,24 @@ class Field_Signature extends Helper_Abstract_Fields {
 
 		/* If we can load in the signature let's optimise the signature size for PDF display */
 		if ( is_file( $signature ) ) {
+
+			/**
+			 * [0] Is the original width
+			 * [1] Is the original height
+			 */
 			$signature_details = getimagesize( $signature );
+
+			/**
+			 * For optimal image resolution at 96dpi we'll divide the original width by 3
+			 *
+			 * Add filters to allow the user to change the signature image width in the PDF.
+			 *
+			 * @param integer The original image width divided by 3
+			 * @param integer The original image width
+			 */
 			$optimised_width   = apply_filters( 'gfpdfe_signature_width', $signature_details[0] / 3, $signature_details[0] ); /* backwards compat */
+			$optimised_width   = apply_filters( 'gfpdf_signature_width', $optimised_width, $signature_details[0] );
+
 			$optimised_height  = $signature_details[1] / 3;
 			$html              = str_replace( 'width="' . $width . '"', 'width="' . $optimised_width . '"', $html );
 
