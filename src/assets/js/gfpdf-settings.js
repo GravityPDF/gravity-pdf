@@ -167,6 +167,9 @@
 				/* Ensure the Gravity Forms settings navigation (Form Settings / Notifications / Confirmation) has the 'tab' URI stripped from it */
 				this.cleanupGFNavigation();
 
+				/* Run our direct PDF status check */
+				this.runPDFAccessCheck();
+
 				/* Run the appropriate settings page */
 				switch (this.getCurrentSettingsPage()) {
 					case 'General':
@@ -860,6 +863,46 @@
 					$(this).attr('href', href.replace(regex, ''));
 				});
 			};
+
+			/**
+			 * Do an AJAX call to verify a user is protected
+			 * @return void
+			 * @since 4.0
+			 */
+			this.runPDFAccessCheck = function() {
+				var $status = $('#gfpdf-direct-pdf-protection-check');
+
+				if( $status.length > 0 ) {
+					/* Do our AJAX call */
+
+					/* Add spinner */
+					var $spinner = $('<img alt="' + GFPDF.spinnerAlt + '" src="' + GFPDF.spinnerUrl + '" class="gfpdf-spinner" />');
+
+					/* Add our spinner */
+					$status.append($spinner);
+
+					/* Set up ajax data */
+					var data = {
+						'action': 'gfpdf_has_pdf_protection',
+						'nonce': $status.data('nonce'),
+					};
+
+					/* Do ajax call */
+					this.ajax(data, function(response) {
+
+						/* Remove our loading spinner */
+						$spinner.remove();
+
+						if( response === true ) {
+							/* enable our protected message */
+							$status.find('#gfpdf-direct-pdf-check-protected').show();
+						} else {
+							/* enable our unprotected message */
+							$status.find('#gfpdf-direct-pdf-check-unprotected').show();
+						}
+					} );
+				}
+			}
 
 			/**
 			 * Enable dynamic required fields on the Gravity Forms PDF Settings page

@@ -277,6 +277,7 @@ class View_Settings extends Helper_Abstract_View {
 	public function add_tooltips( $tooltips ) {
 
 		$tooltips['pdf_status_wp_memory'] = '<h6>' . __( 'WP Memory Available', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'Producing PDF documents is hard work and Gravity PDF requires more resources than most plugins. We strongly recommend you have at least 128MB, but you may need more.', 'gravity-forms-pdf-extended' ) );
+		$tooltips['pdf_protection']       = '<h6>' . __( 'Direct PDF Protection', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'Apache and Litespeed servers automatically disable public access to the Gravity PDF temporary directory using a %s.htaccess%s file, but other web servers like Nginx do not support this feature. We will check if your PDFs are automatically protected, and let you know what you can do to protect your data if they are not.', 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<code>', '</code>' );
 
 		return apply_filters( 'gravitypdf_registered_tooltips', $tooltips );
 	}
