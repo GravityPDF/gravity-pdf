@@ -201,6 +201,7 @@ class Helper_Data {
 			'migration_error_generic'     => __( 'Site #%s migration errors.', 'gravity-forms-pdf-extended' ),
 			'no_pdfs_found'               => __( "This form doesn't have any PDFs.", 'gravity-forms-pdf-extended' ),
 			'no_pdfs_found_link'          => __( "Let's go create one", 'gravity-forms-pdf-extended' ),
+			'no_template_preview'         => __( "No Template Preview Available", 'gravity-forms-pdf-extended' ),
 		) );
 	}
 }

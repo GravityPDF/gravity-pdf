@@ -543,6 +543,15 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
   margin-top: 5px;
 }
 
+#gfpdf-template-example p {
+  border: 1px solid #ccc;
+  display: inline-block;
+  max-width: 300px;
+  padding: 0 5px;
+  text-align: center;
+  width: 100%;
+}
+
 #gfpdf_pdf_form .gfpdf-toggle-wrapper {
   padding-top: 15px;
 }
