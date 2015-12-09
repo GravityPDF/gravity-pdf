@@ -42,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Helper_Options_Fields extends Helper_Options implements Helper_Interface_Filters {
+class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_Interface_Filters {
 
 	/**
 	 * Add our filters

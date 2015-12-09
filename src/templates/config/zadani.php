@@ -50,18 +50,18 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * This naming convension is very important, otherwise the software cannot correctly load the configuration
  *
- * @todo Write documentation on creating and using a template configuration file
+ * @since 4.0
  */
 class zadani implements Helper_Interface_Config {
 
 	/**
 	 * Return the templates configuration structure which control what extra fields will be shown in the "Template" tab when configuring a form's PDF.
 	 *
-	 * The fields key is based on our \GFPDF\Helper\Helper_Options Settings API
+	 * The fields key is based on our \GFPDF\Helper\Helper_Abstract_Options Settings API
 	 *
-	 * See the register_settings() method for the exact fields that can be passed in
+	 * See the Helper_Options_Fields::register_settings() method for the exact fields that can be passed in
 	 *
-	 * @return Array The array, split into core components and custom fields
+	 * @return array The array, split into core components and custom fields
 	 * @since 4.0
 	 */
 	public function configuration() {

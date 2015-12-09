@@ -75,7 +75,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	protected $misc;
 
 	/**
-	 * Holds our Helper_Options / Helper_Options_Fields object
+	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
 	 * @var \GFPDF\Helper\Helper_Options_Fields
@@ -87,14 +87,14 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	/**
 	 * Setup our class with appropriate data (columns, form
 	 *
-	 * @param  array                             $form A Gravity Form meta data array
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $form_plugin
-	 * @param \GFPDF\Helper\Helper_Misc          $misc
-	 * @param \GFPDF\Helper\Helper_Options       $options
+	 * @param  array                                $form A Gravity Form meta data array
+	 * @param \GFPDF\Helper\Helper_Abstract_Form    $form_plugin
+	 * @param \GFPDF\Helper\Helper_Misc             $misc
+	 * @param \GFPDF\Helper\Helper_Abstract_Options $options
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $form_array, Helper_Abstract_Form $form_plugin, Helper_Misc $misc, Helper_Options $options ) {
+	public function __construct( $form_array, Helper_Abstract_Form $form_plugin, Helper_Misc $misc, Helper_Abstract_Options $options ) {
 
 		/* Assign our internal variables */
 		$this->form_array  = $form_array;

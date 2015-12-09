@@ -159,14 +159,14 @@ class Helper_Data {
 	/**
 	 * A key-value array to be used in a localized script call for our Gravity PDF javascript files
 	 *
-	 * @param \GFPDF\Helper\Helper_Options       $options
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
+	 * @param \GFPDF\Helper\Helper_Abstract_Options $options
+	 * @param \GFPDF\Helper\Helper_Abstract_Form    $form
 	 *
 	 * @return array
 	 *
 	 * @since  4.0
 	 */
-	public function get_localised_script_data( Helper_Options $options, Helper_Abstract_Form $form ) {
+	public function get_localised_script_data( Helper_Abstract_Options $options, Helper_Abstract_Form $form ) {
 
 		$custom_fonts = array_values( $options->get_custom_fonts() );
 

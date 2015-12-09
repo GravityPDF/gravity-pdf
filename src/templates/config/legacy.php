@@ -43,16 +43,19 @@ if ( ! defined( 'ABSPATH' ) ) {
  * The class name should be the exact same as the template file name (with hyphens replaced with underscores)
  * For instance, a template called core-simple.php would have a class of "core_simple"
  * This naming convension is very important, otherwise the software cannot correctly load the configuration
+ *
+ * @since 4.0
  */
 class legacy implements Helper_Interface_Config {
 
 	/**
 	 * Return the configuration structure.
 	 *
-	 * The fields key is based on our \GFPDF\Helper\Helper_Options Settings API
+	 * The fields key is based on our \GFPDF\Helper\Helper_Abstract_Options Settings API
 	 * See the register_settings() method for the exact fields that can be passed in
 	 *
-	 * @return Array The array, split into core components and custom fields
+	 * @return array The array, split into core components and custom fields
+	 *
 	 * @since 4.0
 	 */
 	public function configuration() {
