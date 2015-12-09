@@ -129,7 +129,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 						'desc2' => 'pt',
 						'type'  => 'number',
 						'size'  => 'small',
-						'std'   => 12,
+						'std'   => 10,
 					),
 
 					'default_font_colour' => array(
@@ -380,7 +380,7 @@ class Helper_Options_Fields extends Helper_Options implements Helper_Interface_F
 						'desc2' => 'pt',
 						'type'  => 'number',
 						'size'  => 'small',
-						'std'   => $this->get_option( 'default_font_size', 12 ),
+						'std'   => $this->get_option( 'default_font_size', 10 ),
 					),
 
 					'font_colour' => array(
