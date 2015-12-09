@@ -690,7 +690,9 @@
 		      				$('#gfpdf-template-example').html('<img src="' + response.preview + '" />').find('img').load(function() {
 		      					$(this).parent().show();
 		      				});
-		      			}
+		      			} else {
+							$('#gfpdf-template-example').html('<p><em>' + GFPDF.no_template_preview + '</em></p>').show();
+						}
 		      		});
 				});
 			};
