@@ -195,7 +195,8 @@ class Test_Data_Helper extends WP_UnitTestCase {
 			'migration_error_specific',
 			'migration_error_generic',
 			'no_pdfs_found',
-			'no_pdfs_found_link'
+			'no_pdfs_found_link',
+			'no_template_preview',
 		);
 
 		foreach ( $required_keys as $key ) {
