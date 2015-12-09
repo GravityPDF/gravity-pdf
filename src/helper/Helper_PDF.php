@@ -214,7 +214,7 @@ class Helper_PDF {
 		$form = $this->form->get_form( $this->entry['form_id'] );
 
 		/* Add filter to prevent HTML being written to document when it returns true. Backwards compatibility. */
-		$prevent_html = apply_filters( "gfpdfe_pre_load_template", $form['id'], $this->entry['id'], basename( $this->template_path ), $form['id'] . $this->entry['id'], $this->backwards_compat_output( $this->output ), $this->filename, $this->backwards_compat_conversion( $this->settings ), $args ); /* Backwards Compatibility */
+		$prevent_html = apply_filters( 'gfpdfe_pre_load_template', $form['id'], $this->entry['id'], basename( $this->template_path ), $form['id'] . $this->entry['id'], $this->backwards_compat_output( $this->output ), $this->filename, $this->backwards_compat_conversion( $this->settings ), $args ); /* Backwards Compatibility */
 
 		if ( $prevent_html === true ) {
 			return;
@@ -226,8 +226,11 @@ class Helper_PDF {
 		}
 
 		/* Apply our filters */
-		$html = apply_filters( "gfpdfe_pdf_template_{$form['id']}", apply_filters( 'gfpdfe_pdf_template', $html, $form['id'], $this->entry['id'], $this->settings ), $this->entry['id'], $this->settings ); /* Backwards compat */
-		$html = apply_filters( "gfpdf_pdf_html_output_{$form['id']}", apply_filters( 'gfpdf_pdf_html_output', $html, $form, $this->entry, $this->settings ), $this->form, $this->entry, $this->settings );
+		$html = apply_filters( 'gfpdfe_pdf_template', $html, $form['id'], $this->entry['id'], $this->settings ); /* Backwards compat */
+		$html = apply_filters( 'gfpdfe_pdf_template_' . $form['id'], $html, $this->entry['id'], $this->settings ); /* Backwards compat */
+
+		$html = apply_filters( 'gfpdf_pdf_html_output', $html, $form, $this->entry, $this->settings );
+		$html = apply_filters( 'gfpdf_pdf_html_output_' . $form['id'], $html, $this->form, $this->entry, $this->settings );
 
 		/* Check if we should output the HTML to the browser, for debugging */
 		$this->maybe_display_raw_html( $html );

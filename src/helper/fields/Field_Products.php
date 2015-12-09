@@ -85,10 +85,10 @@ class Field_Products extends Helper_Abstract_Fields {
 
 		<h3 id="product-field-title gfpdf-field">
 			<?php
-			echo apply_filters( "gform_order_label_{$form_id}",
-				apply_filters( 'gform_order_label', __( 'Order', 'gravityforms' ),
-					$form_id ),
-				$form_id );
+				$label = apply_filters( 'gform_order_label', __( 'Order', 'gravityforms' ), $form_id );
+				$label = apply_filters( 'gform_order_label_' . $form_id, $label, $form_id );
+
+				echo $label;
 			?>
 		</h3>
 
@@ -104,35 +104,35 @@ class Field_Products extends Helper_Abstract_Fields {
 			<tr>
 				<th scope="col">
 					<?php
-					echo apply_filters( 'gform_product_{$form_id}',
-						apply_filters( 'gform_product', __( 'Product', 'gravityforms' ),
-							$form_id ),
-						$form_id );
+						$label = apply_filters( 'gform_product', __( 'Product', 'gravityforms' ), $form_id );
+						$label = apply_filters( 'gform_product_' . $form_id, $label, $form_id );
+
+						echo $label;
 					?>
 				</th>
 
 				<th scope="col" class='textcenter'>
 					<?php
-					echo apply_filters( 'gform_product_qty_{$form_id}',
-						apply_filters( 'gform_product_qty', __( 'Qty', 'gravityforms' ),
-							$form_id ),
-						$form_id );
+						$label = apply_filters( 'gform_product_qty', __( 'Qty', 'gravityforms' ), $form_id );
+						$label = apply_filters( 'gform_product_qty_' . $form_id, $label, $form_id );
+
+						echo $label;
 					?>
 				</th>
 				<th scope="col">
 					<?php
-					echo apply_filters( 'gform_product_unitprice_{$form_id}',
-						apply_filters( 'gform_product_unitprice', __( 'Unit Price', 'gravityforms' ),
-							$form_id ),
-						$form_id );
+						$label = apply_filters( 'gform_product_unitprice', __( 'Unit Price', 'gravityforms' ), $form_id );
+						$label = apply_filters( 'gform_product_unitprice_' . $form_id, $label, $form_id );
+
+						echo $label;
 					?>
 				</th>
 				<th scope="col">
 					<?php
-					echo apply_filters( 'gform_product_price_{$form_id}',
-						apply_filters( 'gform_product_price', __( 'Price', 'gravityforms' ),
-							$form_id ),
-						$form_id );
+						$label = apply_filters( 'gform_product_price', __( 'Price', 'gravityforms' ), $form_id );
+						$label = apply_filters( 'gform_product_price_' . $form_id, $label, $form_id );
+
+						echo $label;
 					?>
 				</th>
 			</tr>
