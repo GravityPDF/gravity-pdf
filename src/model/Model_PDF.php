@@ -11,7 +11,7 @@ use GFPDF\Helper\Fields\Field_Default;
 use GFPDF\Helper\Fields\Field_Products;
 
 use GFPDF\Helper\Helper_Abstract_Form;
-use GFPDF\Helper\Helper_Options;
+use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
@@ -92,7 +92,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	protected $log;
 
 	/**
-	 * Holds our Helper_Options / Helper_Options_Fields object
+	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
 	 * @var \GFPDF\Helper\Helper_Options_Fields
@@ -134,16 +134,16 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Setup our view with the needed data and classes
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $form    Our abstracted Gravity Forms helper functions
-	 * @param \Monolog\Logger|LoggerInterface    $log     Our logger class
-	 * @param \GFPDF\Helper\Helper_Options       $options Our options class which allows us to access any settings
-	 * @param \GFPDF\Helper\Helper_Data          $data    Our plugin data store
-	 * @param \GFPDF\Helper\Helper_Misc          $misc    Our miscellaneous class
-	 * @param \GFPDF\Helper\Helper_Notices       $notices Our notice class used to queue admin messages and errors
+	 * @param \GFPDF\Helper\Helper_Abstract_Form    $form    Our abstracted Gravity Forms helper functions
+	 * @param \Monolog\Logger|LoggerInterface       $log     Our logger class
+	 * @param \GFPDF\Helper\Helper_Abstract_Options $options Our options class which allows us to access any settings
+	 * @param \GFPDF\Helper\Helper_Data             $data    Our plugin data store
+	 * @param \GFPDF\Helper\Helper_Misc             $misc    Our miscellaneous class
+	 * @param \GFPDF\Helper\Helper_Notices          $notices Our notice class used to queue admin messages and errors
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log, Helper_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices ) {
+	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices ) {
 
 		/* Assign our internal variables */
 		$this->form    = $form;

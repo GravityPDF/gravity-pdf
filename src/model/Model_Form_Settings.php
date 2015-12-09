@@ -9,7 +9,7 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
-use GFPDF\Helper\Helper_Options;
+use GFPDF\Helper\Helper_Abstract_Options;
 
 use Psr\Log\LoggerInterface;
 
@@ -87,7 +87,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	protected $data;
 
 	/**
-	 * Holds our Helper_Options / Helper_Options_Fields object
+	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
 	 * @var \GFPDF\Helper\Helper_Options_Fields
@@ -119,16 +119,16 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	/**
 	 * Setup our class by injecting all our dependancies
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $form    Our abstracted Gravity Forms helper functions
-	 * @param \Monolog\Logger|LoggerInterface    $log     Our logger class
-	 * @param \GFPDF\Helper\Helper_Data          $data    Our plugin data store
-	 * @param \GFPDF\Helper\Helper_Options       $options Our options class which allows us to access any settings
-	 * @param \GFPDF\Helper\Helper_Misc          $misc    Our miscellaneous class
-	 * @param \GFPDF\Helper\Helper_Notices       $notices Our notice class used to queue admin messages and errors
+	 * @param \GFPDF\Helper\Helper_Abstract_Form    $form    Our abstracted Gravity Forms helper functions
+	 * @param \Monolog\Logger|LoggerInterface       $log     Our logger class
+	 * @param \GFPDF\Helper\Helper_Data             $data    Our plugin data store
+	 * @param \GFPDF\Helper\Helper_Abstract_Options $options Our options class which allows us to access any settings
+	 * @param \GFPDF\Helper\Helper_Misc             $misc    Our miscellaneous class
+	 * @param \GFPDF\Helper\Helper_Notices          $notices Our notice class used to queue admin messages and errors
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log, Helper_Data $data, Helper_Options $options, Helper_Misc $misc, Helper_Notices $notices ) {
+	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log, Helper_Data $data, Helper_Abstract_Options $options, Helper_Misc $misc, Helper_Notices $notices ) {
 
 		/* Assign our internal variables */
 		$this->form    = $form;
@@ -439,7 +439,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Similar to Helper_Options->settings_sanitize() except we don't need as robust validation and error checking
+	 * Similar to Helper_Abstract_Options->settings_sanitize() except we don't need as robust validation and error checking
 	 *
 	 * @param  array $input Fields to process
 	 *

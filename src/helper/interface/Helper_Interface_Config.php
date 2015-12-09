@@ -47,8 +47,8 @@ interface Helper_Interface_Config {
 	 * Classes should return a key => value array with the template settings
 	 * The array should be multidimensional with the top-level keys being either "core" or "fields"
 	 * The "core" array will allow boolean values to be passed to enable core features, such as "headers", "footers" or "backgrounds"
-	 * The "fields" array allows a template to load in custom fields. It is based on our \GFPDF\Helper\Helper_Options Settings API
-	 * See the Helper_Options::register_settings() method for the exact fields that can be passed in
+	 * The "fields" array allows a template to load in custom fields. It is based on our \GFPDF\Helper\Helper_Abstract_Options Settings API
+	 * See the Helper_Options_Fields::register_settings() method for the exact fields that can be passed in
 	 *
 	 * @since 4.0
 	 *

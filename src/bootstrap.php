@@ -105,7 +105,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public $data;
 
 	/**
-	 * Holds our Helper_Options / Helper_Options_Fields object
+	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
 	 * @var \GFPDF\Helper\Helper_Options_Fields
@@ -137,8 +137,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Add user depreciation notice for any methods not included in current object
 	 *
-	 * @param string $name The function name to be called
-	 * @param array $arguments An enumerated array containing the parameters passed to the $name'ed method
+	 * @param string $name      The function name to be called
+	 * @param array  $arguments An enumerated array containing the parameters passed to the $name'ed method
 	 *
 	 * @since 4.0
 	 */
@@ -149,8 +149,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Add user depreciation notice for any methods not included in current object
 	 *
-	 * @param string $name The function name to be called
-	 * @param array $arguments An enumerated array containing the parameters passed to the $name'ed method
+	 * @param string $name      The function name to be called
+	 * @param array  $arguments An enumerated array containing the parameters passed to the $name'ed method
 	 *
 	 * @since  4.0
 	 */

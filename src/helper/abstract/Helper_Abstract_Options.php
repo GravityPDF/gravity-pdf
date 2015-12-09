@@ -49,7 +49,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Helper_Options implements Helper_Interface_Filters {
+abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 	/**
 	 * Holds abstracted functions related to the forms plugin
@@ -119,7 +119,7 @@ class Helper_Options implements Helper_Interface_Filters {
 
 
 	/**
-	 * Helper_Options constructor.
+	 * Helper_Abstract_Options constructor.
 	 *
 	 * @param \Monolog\Logger|LoggerInterface    $log
 	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
@@ -138,6 +138,15 @@ class Helper_Options implements Helper_Interface_Filters {
 		$this->misc    = $misc;
 		$this->notices = $notices;
 	}
+
+	/**
+	 * Returns an array of registered fields
+	 *
+	 * @return array
+	 *
+	 * @since 4.0
+	 */
+	abstract public function get_registered_fields();
 
 	/**
 	 * Initialise the options API
@@ -1192,8 +1201,6 @@ class Helper_Options implements Helper_Interface_Filters {
 	 *
 	 * @return string $input Sanitizied value
 	 *
-	 * @todo  don't directly call get_registred_fields() which is located in the Helper_Options_Fields class (it extends this class).
-	 * @todo  alternatively, make this an abstract class which requires the get_registred_fields() class
 	 */
 	public function settings_sanitize( $input = array() ) {
 

@@ -82,7 +82,7 @@ class Test_Autoloader extends WP_UnitTestCase {
 			array( 'GFPDF\Helper\Helper_Migration' ),
 			array( 'GFPDF\Helper\Helper_Misc' ),
 			array( 'GFPDF\Helper\Helper_Notices' ),
-			array( 'GFPDF\Helper\Helper_Options' ),
+			array( 'GFPDF\Helper\Helper_Abstract_Options' ),
 			array( 'GFPDF\Helper\Helper_Options_Fields' ),
 			array( 'GFPDF\Helper\Helper_PDF' ),
 			array( 'GFPDF\Helper\Helper_PDF_List_Table' ),

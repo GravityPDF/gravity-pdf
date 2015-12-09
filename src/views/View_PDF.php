@@ -7,7 +7,7 @@ use GFPDF\Helper\Helper_Abstract_View;
 use GFPDF\Helper\Helper_Field_Container;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_PDF;
-use GFPDF\Helper\Helper_Options;
+use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 
@@ -93,10 +93,10 @@ class View_PDF extends Helper_Abstract_View {
 	protected $log;
 
 	/**
-	 * Holds our Helper_Options / Helper_Options_Fields object
+	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
-	 * @var \GFPDF\Helper\Helper_Options
+	 * @var \GFPDF\Helper\Helper_Abstract_Options
 	 * @since 4.0
 	 */
 	protected $options;
@@ -127,13 +127,13 @@ class View_PDF extends Helper_Abstract_View {
 	 * @param array                                          $data_cache An array of data to pass to the view
 	 * @param \GFPDF\Helper\Helper_Form|Helper_Abstract_Form $form       Our abstracted Gravity Forms helper functions
 	 * @param \Monolog\Logger|LoggerInterface                $log        Our logger class
-	 * @param \GFPDF\Helper\Helper_Options                   $options    Our options class which allows us to access any settings
+	 * @param \GFPDF\Helper\Helper_Abstract_Options          $options    Our options class which allows us to access any settings
 	 * @param \GFPDF\Helper\Helper_Data                      $data       Our plugin data store
 	 * @param \GFPDF\Helper\Helper_Misc                      $misc       Our miscellanious methods
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $data_cache = array(), Helper_Abstract_Form $form, LoggerInterface $log, Helper_Options $options, Helper_Data $data, Helper_Misc $misc ) {
+	public function __construct( $data_cache = array(), Helper_Abstract_Form $form, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc ) {
 
 		/* Call our parent constructor */
 		parent::__construct( $data_cache );
