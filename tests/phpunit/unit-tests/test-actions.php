@@ -86,7 +86,7 @@ class Test_Actions extends WP_UnitTestCase {
 		parent::setUp();
 
 		/* Setup our test classes */
-		$this->model = new Model_Actions( $gfpdf->form, $gfpdf->options, $gfpdf->notices );
+		$this->model = new Model_Actions( $gfpdf->data, $gfpdf->options, $gfpdf->notices );
 		$this->view  = new View_Actions( array() );
 
 		$this->controller = new Controller_Actions( $this->model, $this->view, $gfpdf->form, $gfpdf->log, $gfpdf->notices );
@@ -343,7 +343,7 @@ class Test_Actions extends WP_UnitTestCase {
 	public function test_migration_condition() {
 		global $gfpdf;
 
-		$path = ( is_multisite() ) ? $this->data->multisite_template_location : $this->data->template_location;
+		$path = ( is_multisite() ) ? $gfpdf->data->multisite_template_location : $gfpdf->data->template_location;
 
 		/* Multisite can only be run by super admins */
 		if ( is_multisite() ) {
@@ -355,6 +355,7 @@ class Test_Actions extends WP_UnitTestCase {
 		unlink( $path . 'configuration.php' );
 		$this->assertFalse( $this->model->migration_condition() );
 		touch( $path . 'configuration.php' );
+
 		$this->assertTrue( $this->model->migration_condition() );
 
 		unlink( $path . 'configuration.php' );

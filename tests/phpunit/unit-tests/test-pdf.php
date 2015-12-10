@@ -1407,7 +1407,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$field->inputType = 'page';
 
 		ob_start();
-		$this->view->display_page_name( 1, $form );
+		$this->view->display_page_name( 1, $form, new GF_Field() );
 		$html = ob_get_clean();
 
 		$this->assertNotFalse( strpos( $html, '<h3 id="field-' . $field->id . '"', $field ) );

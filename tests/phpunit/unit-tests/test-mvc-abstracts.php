@@ -88,7 +88,7 @@ class Test_MVC_Abstracts extends WP_UnitTestCase {
 
 		/* Setup out loader class */
 		$this->model      = new Model_Settings( $gfpdf->form, $gfpdf->log, $gfpdf->notices, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
-		$this->view       = new View_Settings( array() );
+		$this->view       = new View_Settings( array(), $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
 		$this->controller = new Controller_Settings( $this->model, $this->view, $gfpdf->form, $gfpdf->log, $gfpdf->notices, $gfpdf->data, $gfpdf->misc );
 	}
 
