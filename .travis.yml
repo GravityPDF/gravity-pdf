@@ -7,6 +7,7 @@ php:
   - 5.4
   - 5.5
   - 5.6
+  - 7.0
 
 env:
   - WP_VERSION=latest WP_MULTISITE=0
@@ -23,10 +24,10 @@ matrix:
     env: WP_VERSION=4.0 WP_MULTISITE=0
 
 before_script:
-  - composer install --prefer-source --no-dev --optimize-autoloader
+  - composer install --prefer-source --optimize-autoloader
   - bash tests/bin/install.sh gravitypdf_test root '' localhost $WP_VERSION
 
 script:
- - phpunit -c tests/phpunit/phpunit.xml.dist
- - phpunit -c tests/phpunit/phpunit.xml.dist --group ajax
+ - vendor/bin/phpunit -c tests/phpunit/phpunit.xml.dist
+ - vendor/bin/phpunit -c tests/phpunit/phpunit.xml.dist --group ajax
 

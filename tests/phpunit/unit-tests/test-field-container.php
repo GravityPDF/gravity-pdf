@@ -5,7 +5,7 @@ namespace GFPDF\Tests;
 use GFPDF\Helper\Helper_Field_Container;
 
 use WP_UnitTestCase;
-use StdClass;
+use GF_Field;
 
 /**
  * Test Gravity PDF Helper_Field_Container class
@@ -102,7 +102,7 @@ class Test_Field_Container extends WP_UnitTestCase {
 	 */
 	public function test_row() {
 
-		$field           = new StdClass;
+		$field           = new GF_Field();
 		$field->cssClass = 'normal';
 
 		/* Check it opens correctly */
@@ -122,13 +122,13 @@ class Test_Field_Container extends WP_UnitTestCase {
 	 */
 	public function test_two_columns() {
 
-		$field           = new StdClass;
+		$field           = new GF_Field();
 		$field->cssClass = 'gf_left_half';
 
 		/* Check it opens correctly */
 		$this->assertEquals( '<div class="row-separator">', $this->generate( $field ) );
 
-		$field           = new StdClass;
+		$field           = new GF_Field();
 		$field->cssClass = 'gf_right_half';
 
 		/* Check it does nothing */
@@ -148,19 +148,19 @@ class Test_Field_Container extends WP_UnitTestCase {
 	 */
 	public function test_three_columns() {
 
-		$field           = new StdClass;
+		$field           = new GF_Field();
 		$field->cssClass = 'gf_left_third';
 
 		/* Check it opens correctly */
 		$this->assertEquals( '<div class="row-separator">', $this->generate( $field ) );
 
-		$field           = new StdClass;
+		$field           = new GF_Field();
 		$field->cssClass = 'gf_middle_third';
 
 		/* Check it does nothing */
 		$this->assertEquals( '', $this->generate( $field ) );
 
-		$field           = new StdClass;
+		$field           = new GF_Field();
 		$field->cssClass = 'gf_right_third';
 
 		/* Check it does nothing */
@@ -180,13 +180,13 @@ class Test_Field_Container extends WP_UnitTestCase {
 	 */
 	public function test_mixture() {
 
-		$field           = new StdClass;
+		$field           = new GF_Field();
 		$field->cssClass = 'gf_left_third';
 
 		/* Check it opens correctly */
 		$this->assertEquals( '<div class="row-separator">', $this->generate( $field ) );
 
-		$field           = new StdClass;
+		$field           = new GF_Field();
 		$field->cssClass = 'gf_left_half';
 
 		/* Check it does nothing */
@@ -204,14 +204,14 @@ class Test_Field_Container extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_skipped_fields() {
-		$field           = new StdClass;
+		$field           = new GF_Field();
 		$field->cssClass = 'gf_left_third';
 
 		/* Check it opens correctly */
 		$this->assertEquals( '<div class="row-separator">', $this->generate( $field ) );
 
 		/* Create a skipped field and verify the container closes correctly */
-		$field           = new StdClass;
+		$field           = new GF_Field();
 		$field->cssClass = 'gf_left_third';
 		$field->type     = 'html';
 
