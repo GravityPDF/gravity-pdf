@@ -95,6 +95,19 @@ class Test_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Verify our API returns the correct classes
+	 *
+	 * @since 4.0
+	 */
+	public function test_get_mvc_class() {
+		$class = GPDFAPI::get_mvc_class( 'Model_Install' );
+
+		$this->assertEquals( 'GFPDF\Model\Model_Install', get_class( $class ) );
+
+		$this->assertFalse( GPDFAPI::get_mvc_class( 'Fake_Class' ) );
+	}
+
+	/**
 	 * Check we can add a new PDF
 	 *
 	 * @since 4.0

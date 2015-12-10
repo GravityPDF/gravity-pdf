@@ -165,23 +165,54 @@ class GPDFAPI {
 	}
 
 	/**
+	 * Returns the original Model/View/Controller class we initialised in our /src/bootstrap.php file
+	 *
+	 * This method acts like a faux singleton provider (but none of our classes are static or singletons themselves - hence the 'faux') as you get the originally initialised class back
+	 *
+	 * This is very useful when you want to remove any filters / actions we set in a controller's add_filters() or add_actions() methods
+	 * You can also use to to easily access any public methods in our classes
+	 *
+	 * Note: This method only returns Controller_ / Model_ / View_  classes. Use the other methods above to access our Helper_ classes
+	 *
+	 * Usage:
+	 *
+	 * $class = GPDFAPI::get_mcv_class( 'Controller_PDF' );
+	 *
+	 * //if we have a class returned
+	 * if( $class !== false ) {
+	 *     //remove a middleware filter
+	 *     remove_filter( 'gfpdf_pdf_middleware', array( $class, 'middle_active' ), 10 );
+	 * }
+	 *
+	 * @param string $class_name The name of one of our MVC classes (no namespace)
+	 *
+	 * @return object|bool Will return your object if found, otherwise false
+	 *
+	 * @since 4.0
+	 */
+	public static function get_mvc_class( $class_name ) {
+		global $gfpdf;
+
+		return $gfpdf->singleton->get_class( $class_name );
+	}
+
+	/**
 	 * Returns a new instance of one of our PDF generating code (model or view)
 	 *
 	 * @param  string $type Type of class to return. Valid options include 'view' or 'model'
 	 *
-	 * @return \GFPDF\Model\Model_PDF|\GFPDF\View\View_PDF
+	 * @return object|WP_Error
 	 *
 	 * @since  4.0
 	 */
 	public static function get_pdf_class( $type = 'view' ) {
-		global $gfpdf;
 
 		if ( $type === 'view' ) {
-			return new GFPDF\View\View_PDF( array(), $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
+			return static::get_mvc_class( 'View_PDF');
 		}
 
 		if ( $type === 'model' ) {
-			return new GFPDF\Model\Model_PDF( $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
+			return static::get_mvc_class( 'Model_PDF');
 		}
 
 		return new WP_Error( 'invalid_type', __( 'The $type parameter is invalid. Only "view" and "model" are accepted', 'gravity-forms-pdf-extended' ) );
