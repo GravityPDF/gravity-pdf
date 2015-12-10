@@ -803,12 +803,13 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		/* verify it exists */
 		if( is_file( $tmp_dir . $tmp_test_file ) ) {
+
 			/* Run our test */
 			$site_url = $this->misc->convert_path_to_url( $tmp_dir );
 
 			if( $site_url !== false ) {
 
-				$response = wp_remote_get( $site_url );
+				$response = wp_remote_get( $site_url . $tmp_test_file );
 
 				if( ! is_wp_error( $response ) ) {
 
