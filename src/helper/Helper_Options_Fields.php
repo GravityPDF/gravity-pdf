@@ -108,7 +108,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'options'    => $this->get_templates(),
 						'inputClass' => 'large',
 						'chosen'     => true,
-						'tooltip'    => '<h6>' . __( 'Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'Gravity PDF comes with %sfive completely-free and highly customisable designs%s to choose. You can also purchase additional templates from our theme shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
+						'tooltip'    => '<h6>' . __( 'Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'Gravity PDF comes with %sfive completely-free and highly customisable designs%s. You can also purchase additional templates from our theme shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
 					),
 
 					'default_font' => array(
@@ -201,20 +201,20 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'default_restrict_owner' => array(
 						'id'      => 'default_restrict_owner',
 						'name'    => __( 'Restrict Owner', 'gravity-forms-pdf-extended' ),
-						'desc'    => __( 'When enabled, the original entry owner will NOT be able to view the PDFs.', 'gravity-forms-pdf-extended' ),
+						'desc'    => __( 'Set the default PDF owner permissions. When enabled, the original entry owner will NOT be able to view the PDFs (unless they have one of the above capabilities).', 'gravity-forms-pdf-extended' ),
 						'type'    => 'radio',
 						'options' => array(
 							'Yes' => __( 'Yes', 'gravity-forms-pdf-extended' ),
 							'No'  => __( 'No', 'gravity-forms-pdf-extended' ),
 						),
 						'std'     => __( 'No', 'gravity-forms-pdf-extended' ),
-						'tooltip' => '<h6>' . __( 'Restrict Owner', 'gravity-forms-pdf-extended' ) . '</h6>' . __( 'Enable this setting if your PDFs should not be viewable by the end user.', 'gravity-forms-pdf-extended' ),
+						'tooltip' => '<h6>' . __( 'Restrict Owner', 'gravity-forms-pdf-extended' ) . '</h6>' . __( 'Enable this setting if your PDFs should not be viewable by the end user. This can be set on a per-form basis.', 'gravity-forms-pdf-extended' ),
 					),
 
 					'logged_out_timeout' => array(
 						'id'      => 'logged_out_timeout',
 						'name'    => __( 'Logged Out Timeout', 'gravity-forms-pdf-extended' ),
-						'desc'    => __( 'Limit how long a <em>logged out</em> users has direct access to the PDF after completing the form. Set to 0 to disable time limit (not recommended).', 'gravity-forms-pdf-extended' ),
+						'desc'    => sprintf( __( 'Limit how long a %slogged out%s users has direct access to the PDF after completing the form. Set to 0 to disable time limit (not recommended).', 'gravity-forms-pdf-extended' ), '<em>', '</em>' ),
 						'desc2'   => __( 'minutes', 'gravity-forms-pdf-extended' ),
 						'type'    => 'number',
 						'size'    => 'small',
@@ -225,14 +225,14 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			),
 
 			/** Extension Settings */
-			'extensions'       => apply_filters( 'gfpdf_settings_extensions',
+			'extensions'  => apply_filters( 'gfpdf_settings_extensions',
 				array()
 			),
-			'licenses'         => apply_filters( 'gfpdf_settings_licenses',
+			'licenses' => apply_filters( 'gfpdf_settings_licenses',
 				array()
 			),
 
-			'tools'                           => apply_filters( 'gfpdf_settings_tools',
+			'tools' => apply_filters( 'gfpdf_settings_tools',
 				array(
 					'setup_templates' => array(
 						'id'      => 'setup_templates',
@@ -241,7 +241,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'type'    => 'button',
 						'std'     => __( 'Run Setup', 'gravity-forms-pdf-extended' ),
 						'options' => 'copy',
-						'tooltip' => '<h6>' . __( 'Setup Custom Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . __( 'The setup will copy the plugin templates to your uploads directory so you can freely create and modify PDF templates – without the risk of overriding your modifications when the plugin updates.', 'gravity-forms-pdf-extended' ),
+						'tooltip' => '<h6>' . __( 'Setup Custom Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . __( 'The setup will copy the plugin templates to your uploads directory so you can freely create and modify PDF templates without the risk of overriding your modifications when the plugin updates.', 'gravity-forms-pdf-extended' ),
 					),
 
 					'manage_fonts' => array(
@@ -277,7 +277,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'std'        => $this->get_option( 'default_template', 'zadani' ),
 						'inputClass' => 'large',
 						'chosen'     => true,
-						'tooltip'    => '<h6>' . __( 'Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'Gravity PDF comes with %sfive completely-free and highly customisable designs%s to choose. You can also purchase additional templates from our theme shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
+						'tooltip'    => '<h6>' . __( 'Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'Gravity PDF comes with %sfive completely-free and highly customisable designs%s. You can also purchase additional templates from our theme shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
 					),
 
 					'notification' => array(
@@ -290,7 +290,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'chosen'      => true,
 						'multiple'    => true,
 						'placeholder' => __( 'Choose a Notification', 'gravity-forms-pdf-extended' ),
-						'tooltip'     => '<h6>' . __( 'Notifications', 'gravity-forms-pdf-extended' ) . '</h6>' . __( 'Automatically generate and attach the PDF to your selected notifications. Conditional Logic for both the PDF and the Notification applies.', 'gravity-forms-pdf-extended' ),
+						'tooltip'     => '<h6>' . __( 'Notifications', 'gravity-forms-pdf-extended' ) . '</h6>' . __( 'Automatically generate and attach the PDF to your selected notifications. Conditional Logic for both the PDF and the notification applies. Inactive PDFs are also not sent.', 'gravity-forms-pdf-extended' ),
 					),
 
 					'filename' => array(
@@ -298,7 +298,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'name'       => __( 'Filename', 'gravity-forms-pdf-extended' ),
 						'type'       => 'text',
 						'desc'       => 'The name used when saving a PDF. Mergetags are allowed.',
-						'tooltip'    => '<h6>' . __( 'Filename', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'Set an appropriate filename for the generated PDF. You should exclude the .pdf extension from the name. The following are invalid characters and will be converted to an underscore (_): %s', 'gravity-forms-pdf-extended' ), '<code>/ \ " * ? | : < ></code>' ),
+						'tooltip'    => '<h6>' . __( 'Filename', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'Set an appropriate filename for the generated PDF. You should exclude the .pdf extension from the name. The following are invalid characters and will be converted to an underscore %s_%s when the PDF is generated: %s', 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<code>/ \ " * ? | : < ></code>' ),
 						'inputClass' => 'merge-tag-support mt-hide_all_fields',
 						'required'   => true,
 					),
@@ -323,7 +323,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			),
 
 			/* Form (PDF) Settings Appearance */
-			'form_settings_appearance'        => apply_filters( 'gfpdf_form_settings_appearance',
+			'form_settings_appearance' => apply_filters( 'gfpdf_form_settings_appearance',
 				array(
 					'pdf_size' => array(
 						'id'         => 'pdf_size',
@@ -388,7 +388,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'name' => __( 'Font Colour', 'gravity-forms-pdf-extended' ),
 						'type' => 'color',
 						'std'  => $this->get_option( 'default_font_colour', '#000000' ),
-						'desc' => __( 'Set the font colour used in the PDF.', 'gravity-forms-pdf-extended' ),
+						'desc' => __( 'Set the font colour to use in the PDF.', 'gravity-forms-pdf-extended' ),
 					),
 
 					'rtl' => array(
@@ -419,7 +419,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			),
 
 			/* Form (PDF) Settings Advanced */
-			'form_settings_advanced'          => apply_filters( 'gfpdf_form_settings_advanced',
+			'form_settings_advanced' => apply_filters( 'gfpdf_form_settings_advanced',
 				array(
 					'format' => array(
 						'id'      => 'format',
@@ -451,7 +451,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'id'         => 'password',
 						'name'       => __( 'Password', 'gravity-forms-pdf-extended' ),
 						'type'       => 'text',
-						'desc'       => 'Password protect the PDFs, or leave blank to disable password protection.',
+						'desc'       => 'Password protect the PDF, or leave blank to disable password protection.',
 						'inputClass' => 'merge-tag-support mt-hide_all_fields',
 					),
 
@@ -541,7 +541,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 	 *
 	 * @since 4.0
 	 *
-	 * @todo  Currently not sure if this method is actually needed for our v4.x release. We will need the access key during our import process for backwards compatibility
+	 * @todo  Document this method
 	 */
 	public function get_advanced_template_field( $settings ) {
 
@@ -554,7 +554,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 		$settings['advanced_template'] = array(
 			'id'      => 'advanced_template',
 			'name'    => __( 'Enable Advanced Templating', 'gravity-forms-pdf-extended' ),
-			'desc'    => sprintf( __( 'By enabling, a PDF template will no longer be treated as HTML. %sUse wisely.%s', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
+			'desc'    => __( 'By enabling, a PDF template will no longer be treated as HTML.', 'gravity-forms-pdf-extended' ),
 			'type'    => 'radio',
 			'options' => array(
 				'Yes' => __( 'Yes', 'gravity-forms-pdf-extended' ),
@@ -598,7 +598,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 		return apply_filters( 'gfpdf_page_names_display_setting', array(
 			'id'      => 'show_page_names',
 			'name'    => __( 'Show Page Names', 'gravity-forms-pdf-extended' ),
-			'desc'    => __( 'Display form page names on the PDF when enabled (only works when using page break field).', 'gravity-forms-pdf-extended' ),
+			'desc'    => __( 'Display form page names on the PDF (only works when using page break field).', 'gravity-forms-pdf-extended' ),
 			'type'    => 'radio',
 			'options' => array(
 				'Yes' => __( 'Yes', 'gravity-forms-pdf-extended' ),
@@ -661,14 +661,14 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 		return apply_filters( 'gfpdf_conditional_display_setting', array(
 			'id'      => 'enable_conditional',
 			'name'    => __( 'Enable Conditional Logic', 'gravity-forms-pdf-extended' ),
-			'desc'    => __( 'When enabled the PDF will adhere to your form conditional logic.', 'gravity-forms-pdf-extended' ),
+			'desc'    => __( 'When enabled the PDF will adhere to the form field conditional logic.', 'gravity-forms-pdf-extended' ),
 			'type'    => 'radio',
 			'options' => array(
 				'Yes' => __( 'Yes', 'gravity-forms-pdf-extended' ),
 				'No'  => __( 'No', 'gravity-forms-pdf-extended' ),
 			),
 			'std'     => __( 'Yes', 'gravity-forms-pdf-extended' ),
-			'tooltip' => '<h6>' . __( 'Enable Conditional Logic', 'gravity-forms-pdf-extended' ) . '</h6>' . __( 'Enable this option to prevent failed conditional logic fields from being displayed in the PDF.', 'gravity-forms-pdf-extended' ),
+			'tooltip' => '<h6>' . __( 'Enable Conditional Logic', 'gravity-forms-pdf-extended' ) . '</h6>' . __( 'Enable this option to hide failed conditional logic fields in the PDF.', 'gravity-forms-pdf-extended' ),
 		) );
 	}
 
@@ -683,7 +683,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 		return apply_filters( 'gfpdf_empty_display_setting', array(
 			'id'      => 'show_empty',
 			'name'    => __( 'Show Empty Fields', 'gravity-forms-pdf-extended' ),
-			'desc'    => __( 'Display Empy fields in the PDF.', 'gravity-forms-pdf-extended' ),
+			'desc'    => __( 'Display Empty fields in the PDF.', 'gravity-forms-pdf-extended' ),
 			'type'    => 'radio',
 			'options' => array(
 				'Yes' => __( 'Yes', 'gravity-forms-pdf-extended' ),
@@ -779,10 +779,10 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 	public function get_background_color_field() {
 		return apply_filters( 'gfpdf_background_color_field_setting', array(
 			'id'   => 'background_color',
-			'name' => __( 'Background Color', 'gravity-forms-pdf-extended' ),
+			'name' => __( 'Background Colour', 'gravity-forms-pdf-extended' ),
 			'type' => 'color',
 			'std'  => '#FFF',
-			'desc' => __( 'Set the background color for all pages.', 'gravity-forms-pdf-extended' ),
+			'desc' => __( 'Set the background colour for all pages.', 'gravity-forms-pdf-extended' ),
 		) );
 	}
 

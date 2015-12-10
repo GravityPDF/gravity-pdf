@@ -673,7 +673,7 @@ class Helper_PDF {
 		if ( strlen( $headers['required_pdf_version'] ) > 0 ) {
 			/* Check if the version requirements are NOT met and throw and error */
 			if ( version_compare( $headers['required_pdf_version'], PDF_EXTENDED_VERSION, '>' ) ) {
-				throw new Exception( sprintf( __( 'The PDF Tempalte %s requires Gravity PDF version %s. Upgrade to the latest version.', 'gravity-forms-pdf-extended' ), "<em>$template</em>", "<em>{$headers['required_pdf_version']}</em>" ) );
+				throw new Exception( sprintf( __( 'The PDF Template %s requires Gravity PDF version %s. Upgrade to the latest version.', 'gravity-forms-pdf-extended' ), "<em>$template</em>", "<em>{$headers['required_pdf_version']}</em>" ) );
 			}
 		}
 
