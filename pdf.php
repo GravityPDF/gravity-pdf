@@ -201,7 +201,7 @@ class GFPDF_Major_Compatibility_Checks {
 
 		/* Gravity Forms version not compatible */
 		if ( ! class_exists( 'GFCommon' ) || ! version_compare( GFCommon::$version, $this->required_gf_version, '>=' ) ) {
-			$this->notices[] = sprintf( __( 'Gravity Forms Version %s is required.', 'gravity-forms-pdf-extended' ), $this->required_gf_version );
+			$this->notices[] = sprintf( __( '%sGravity Forms%s Version %s is required.', 'gravity-forms-pdf-extended' ), '<a href="https://www.e-junkie.com/ecom/gb.php?cl=54585&c=ib&aff=235154">', '</a>', $this->required_gf_version );
 
 			return false;
 		}
