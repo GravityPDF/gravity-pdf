@@ -109,7 +109,7 @@
 			 * Create custom validation method which will prevent a model being updated
 			 * when using .save() or .set() if the validation fails.
 			 *
-			 * Multiple custom events are also triggered to allow our views to update the DOM as needed
+			 * Multiple custom events are also triggered to allow our view to update the DOM as needed
 			 * @param  Object attrs   The new model data
 			 * @param  Object options
 			 * @return String         On error, a string is returned
@@ -366,7 +366,7 @@
 
 			/**
 			 * The ID of our Underscore HTML template
-			 * This can be found in /src/views/html/Settings/tools.php
+			 * This can be found in /src/view/html/Settings/tools.php
 			 * @type String
 			 * @since 4.0
 			 */
