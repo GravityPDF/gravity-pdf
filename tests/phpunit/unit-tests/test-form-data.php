@@ -869,7 +869,7 @@ class Test_Form_Data extends WP_UnitTestCase {
          * Standard Signature Array
          */
 		$this->assertEquals( $response, $data['signature_details_id'][25]['img'] );
-		$this->assertEquals( '/', substr( $data['signature_details_id'][25]['path'], 0, 1 ) );
+		$this->assertNotFalse( strpos( $data['signature_details_id'][25]['path'], ABSPATH ) );
 		$this->assertEquals( 'http://', substr( $data['signature_details_id'][25]['url'], 0, 7 ) );
 		$this->assertEquals( 75, $data['signature_details_id'][25]['width'] );
 		$this->assertEquals( 45, $data['signature_details_id'][25]['height'] );
@@ -879,7 +879,7 @@ class Test_Form_Data extends WP_UnitTestCase {
          * Depreciated
          */
 		$this->assertEquals( $response, $data['signature_details'][0]['img'] );
-		$this->assertEquals( '/', substr( $data['signature_details'][0]['path'], 0, 1 ) );
+		$this->assertEquals( strpos( $data['signature_details'][0]['path'], ABSPATH ) );
 		$this->assertEquals( 'http://', substr( $data['signature_details'][0]['url'], 0, 7 ) );
 		$this->assertEquals( 75, $data['signature_details'][0]['width'] );
 		$this->assertEquals( 45, $data['signature_details'][0]['height'] );
