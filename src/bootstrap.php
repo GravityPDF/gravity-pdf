@@ -293,8 +293,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @return void
 	 *
 	 * @since 4.0
-	 *
-	 * @todo  Change 'gravity-pdf' back to 'gravity-forms-pdf-extended' to match original plugin folder name
 	 */
 	private function setup_gravityforms_logging() {
 
@@ -412,7 +410,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		if ( $file == PDF_PLUGIN_BASENAME ) {
 			$row_meta = array(
 				'docs'    => '<a href="' . esc_url( '#' ) . '" title="' . esc_attr( __( 'View Gravity PDF Documentation', 'gravity-forms-pdf-extended' ) ) . '">' . __( 'Docs', 'gravity-forms-pdf-extended' ) . '</a>',
-				'support' => '<a href="' . esc_url( $gfpdf->data->settings_url . '&tab=help' ) . '" title="' . esc_attr( __( 'Get help and support', 'gravity-forms-pdf-extended' ) ) . '">' . __( 'Support', 'gravity-forms-pdf-extended' ) . '</a>',
+				'support' => '<a href="' . esc_url( $gfpdf->data->settings_url . '&tab=help' ) . '" title="' . esc_attr( __( 'Get Help and Support', 'gravity-forms-pdf-extended' ) ) . '">' . __( 'Support', 'gravity-forms-pdf-extended' ) . '</a>',
 				'shop'    => '<a href="' . esc_url( '#' ) . '" title="' . esc_attr( __( 'View Gravity PDF Theme Shop', 'gravity-forms-pdf-extended' ) ) . '">' . __( 'Theme Shop', 'gravity-forms-pdf-extended' ) . '</a>',
 			);
 

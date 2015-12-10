@@ -72,7 +72,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<?php if ( $args['memory'] < 128 && $args['memory'] !== -1 ): ?>
 				<span class="gf_settings_description">
-                    <?php echo sprintf( __( 'We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. %sFind out how to increase this limit%s.', 'gravity-forms-pdf-extended' ), '<br /><a href="#">', '</a>' ); /* @todo - UPDATE LINK - see http://docs.woothemes.com/document/increasing-the-wordpress-memory-limit/ for example */ ?>
+                    <?php echo sprintf( __( 'We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. %sFind out how to increase this limit%s.', 'gravity-forms-pdf-extended' ), '<br /><a href="#">', '</a>' ); /* @todo add link to docs */ ?>
                 </span>
 			<?php endif; ?>
 		</td>

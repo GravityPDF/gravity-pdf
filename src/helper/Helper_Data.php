@@ -195,7 +195,7 @@ class Helper_Data {
 			'no'                          => __( 'No', 'gravity-forms-pdf-extended' ),
 			'yes'                         => __( 'Yes', 'gravity-forms-pdf-extended' ),
 			'standard'                    => __( 'Standard', 'gravity-forms-pdf-extended' ),
-			'migration_start'             => __( 'Migration site #%s', 'gravity-forms-pdf-extended' ),
+			'migration_start'             => __( 'Migrating site #%s', 'gravity-forms-pdf-extended' ),
 			'migration_complete'          => __( 'Site #%s migration complete.', 'gravity-forms-pdf-extended' ),
 			'migration_error_specific'    => __( 'Migration Error', 'gravity-forms-pdf-extended' ),
 			'migration_error_generic'     => __( 'Site #%s migration errors.', 'gravity-forms-pdf-extended' ),

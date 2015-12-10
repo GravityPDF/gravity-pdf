@@ -2133,7 +2133,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @return void
 	 */
 	public function missing_callback( $args ) {
-		printf( __( 'The callback used for the <strong>%s</strong> setting is missing.', 'gravity-forms-pdf-extended' ), $args['id'] );
+		printf( __( 'The callback used for the %s setting is missing.', 'gravity-forms-pdf-extended' ), "<strong>{$args['id']}</strong>" );
 	}
 
 	/**
