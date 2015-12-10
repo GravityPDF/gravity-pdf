@@ -39,7 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 */
 
 /**
- * A simple abstract class views can extent to share similar variables
+ * A simple abstract class view can extent to share similar variables
  *
  * @since 4.0
  */
@@ -75,7 +75,7 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 
 	/**
 	 * Triggered when invoking inaccessible methods in an object context
-	 * Use it to load in our views
+	 * Use it to load in our view
 	 *
 	 * @param  string $name      Template name to load
 	 * @param  array  $arguments Pass in additional parameters to the template view if needed
@@ -107,7 +107,7 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	final protected function load( $filename, $args = array(), $output = true ) {
-		$path = PDF_PLUGIN_DIR . 'src/views/html/' . $this->view_type . '/' . $filename . '.php';
+		$path = PDF_PLUGIN_DIR . 'src/view/html/' . $this->view_type . '/' . $filename . '.php';
 		$args = array_merge( $this->data_cache, $args );
 
 		if ( is_readable( $path ) ) {
