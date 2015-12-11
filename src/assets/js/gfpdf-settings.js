@@ -400,7 +400,7 @@
 					var $spinner = $('<img alt="' + GFPDF.spinnerAlt + '" src="' + GFPDF.spinnerUrl + '" class="gfpdf-spinner gfpdf-spinner-small" />');
 
 					/* Add our spinner */
-					$(this).after($spinner).parent().parent().css('visibility', 'visible');
+					$(this).after($spinner).parent().parent().attr('style', 'position:static; visibility: visible;');
 
 					if(id.length > 0) {
 						/* Set up ajax data */
@@ -513,7 +513,7 @@
 							var $spinner = $('<img alt="' + GFPDF.spinnerAlt + '" src="' + GFPDF.spinnerUrl + '" class="gfpdf-spinner gfpdf-spinner-small" />');
 
 							/* Add the spinner */
-							$elm.append($spinner).parent().parent().css('visibility', 'visible');;
+							$elm.append($spinner).parent().parent().attr('style', 'position:static; visibility: visible;');
 
 				      		var data = {
 				      			'action': 'gfpdf_list_delete',
@@ -534,6 +534,8 @@
 										self.maybeShowEmptyRow();
 									})
 				      			}
+
+								$deleteDialog.data( 'elm', null );
 				      		});
 
 				      	}
@@ -552,7 +554,7 @@
 				/* Add live delete listener */
 				$('#gfpdf_list_form').on('click', 'a.submitdelete', function() {
 					var id = String($(this).data('id'));
-					if(id.length > 0) {
+					if(id.length > 0 && ! $deleteDialog.data('elm')) {
 						$deleteDialog.wpdialog( 'open' ).data('elm', this);
 					}
 				});
