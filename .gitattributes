@@ -4,6 +4,7 @@
 /phpunit.xml 		export-ignore
 /phpunit.xml.dist 	export-ignore
 /README.md      	export-ignore
+/CONTRIBUTING.md   	export-ignore
 /node_modules  	 	export-ignore
 /.coveralls.yml	 	export-ignore
 /.travis.yml	 	export-ignore
