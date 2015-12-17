@@ -722,7 +722,7 @@ class Helper_PDF {
 	/**
 	 * Allow site admins to view the RAW HTML if needed
 	 *
-	 * @param  string $html The HTML that should be output to the browser
+	 * @param string $html The HTML that should be output to the browser
 	 *
 	 * @return void
 	 *
@@ -731,7 +731,7 @@ class Helper_PDF {
 	protected function maybe_display_raw_html( $html ) {
 
 		if ( $this->output !== 'SAVE' && rgget( 'html' ) && $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
-			echo $html;
+			echo apply_filters( 'gfpdf_pre_html_browser_output', $html, $this->settings );
 			exit;
 		}
 	}

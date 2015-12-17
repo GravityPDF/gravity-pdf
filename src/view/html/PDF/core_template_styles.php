@@ -163,26 +163,34 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
 
 </style>
 
-<htmlpageheader name="TemplateFirstHeader">
-	<div id="first_header">
-		<?php echo $first_header; ?>
-	</div>
-</htmlpageheader>
+<?php if ( ! empty($first_header) ) : ?>
+	<htmlpageheader name="TemplateFirstHeader">
+		<div id="first_header">
+			<?php echo $first_header; ?>
+		</div>
+	</htmlpageheader>
+<?php endif; ?>
 
-<htmlpageheader name="TemplateHeader">
-	<div id="header">
-		<?php echo $header; ?>
-	</div>
-</htmlpageheader>
+<?php if ( ! empty($header) ) : ?>
+	<htmlpageheader name="TemplateHeader">
+		<div id="header">
+			<?php echo $header; ?>
+		</div>
+	</htmlpageheader>
+<?php endif; ?>
 
-<htmlpagefooter name="TemplateFirstFooter">
-	<div id="first_footer">
-		<?php echo $first_footer; ?>
-	</div>
-</htmlpagefooter>
+<?php if ( ! empty($first_footer) ) : ?>
+	<htmlpagefooter name="TemplateFirstFooter">
+		<div id="first_footer">
+			<?php echo $first_footer; ?>
+		</div>
+	</htmlpagefooter>
+<?php endif; ?>
 
-<htmlpagefooter name="TemplateFooter">
-	<div class="footer">
-		<?php echo $footer; ?>
-	</div>
-</htmlpagefooter>
+<?php if ( ! empty($footer) ) : ?>
+	<htmlpagefooter name="TemplateFooter">
+		<div class="footer">
+			<?php echo $footer; ?>
+		</div>
+	</htmlpagefooter>
+<?php endif; ?>
