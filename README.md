@@ -14,7 +14,7 @@ The `development` branch is considered our bleeding edge branch, with all new ch
 # Installation
 
 1. Clone the repository using `git clone https://github.com/GravityPDF/gravity-pdf/`
-1. Open your terminal / command prompt to the Gravity PDF root directory and run `composer install`. Here are instructions to install Composer [for Linux / Mac installation](https://getcomposer.org/doc/00-intro.md#installation-linux-unix-osx) and [Windows](https://getcomposer.org/doc/00-intro.md#installation-windows).
+1. Open your terminal / command prompt to the Gravity PDF root directory and run `composer install`. If you don't have Composer installed, here are instructions [for Linux / Mac installation](https://getcomposer.org/doc/00-intro.md#installation-linux-unix-osx) and [Windows](https://getcomposer.org/doc/00-intro.md#installation-windows).
 1. You'll need to ensure `WP_DEBUG` is set to `true` in your `wp-config.php` file so the appropriate assets are loaded. Alternatively, if you have [Node.js](https://nodejs.org/en/) and [Gulp](http://gulpjs.com/) installed you can run `npm install && gulp` from the command line.
 1. Copy the plugin to your WordPress plugin directory (if not there already) and active through your WordPress admin area.
 
@@ -47,4 +47,4 @@ The plugin uses PHPUnit as part of the development process. Installing the testi
 3. Run `bash tests/bin/install.sh gravitypdf_test root root localhost` where `root root` is substituted for your mysql username and password (VVV users can run the command as is).
 4. Upon success you can run `vendor/bin/phpunit`, `vendor/bin/phpunit --group ajax` and `vendor/bin/phpunit --group slow-pdf-processes`.
 
-__If you want to generate a code coverage report__ you can run the following `phpunit --coverage-html "./tmp/coverage"` and a report will be generated in the `/tmp/coverage/` subdirectory of the Gravity PDF plugin.
+__If you want to generate a code coverage report__ you can run the following `vendor/bin/phpunit --coverage-html "./tmp/coverage"` and a report will be generated in the `/tmp/coverage/` subdirectory of the Gravity PDF plugin.
