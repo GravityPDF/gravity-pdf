@@ -14,9 +14,8 @@ The `development` branch is considered our bleeding edge branch, with all new ch
 # Installation
 
 1. Clone the repository using `git clone https://github.com/GravityPDF/gravity-pdf/`
-1. Install Composer (skip this step if already installed). Here are instructions [for the Linux / Mac installation](https://getcomposer.org/doc/00-intro.md#installation-linux-unix-osx) and the [Windows installation](https://getcomposer.org/doc/00-intro.md#installation-windows).
-1. Open your terminal / command prompt to the Gravity PDF root directory and run `composer install`.
-1. You'll need to ensure `WP_DEBUG` is set to `true` in your `wp-config.php` file so the appropriate assets are loaded correctly. Alternatively, if you have NodeJS installed you can run `npm install` followed by `gulp`.
+1. Open your terminal / command prompt to the Gravity PDF root directory and run `composer install`. Here are instructions to install Composer [for Linux / Mac installation](https://getcomposer.org/doc/00-intro.md#installation-linux-unix-osx) and [Windows](https://getcomposer.org/doc/00-intro.md#installation-windows).
+1. You'll need to ensure `WP_DEBUG` is set to `true` in your `wp-config.php` file so the appropriate assets are loaded. Alternatively, if you have [Node.js](https://nodejs.org/en/) and [Gulp](http://gulpjs.com/) installed you can run `npm install && gulp` from the command line.
 1. Copy the plugin to your WordPress plugin directory (if not there already) and active through your WordPress admin area.
 
 # Documentation
