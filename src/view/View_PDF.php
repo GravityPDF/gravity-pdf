@@ -515,9 +515,36 @@ class View_PDF extends Helper_Abstract_View {
 			return $mpdf;
 		}
 
-		$html = $this->load( 'core_template_styles', array( 'settings' => $settings ), false );
+		$html = $this->load_core_template_styles( $settings );
 		$mpdf->WriteHTML( $html );
 
 		return $mpdf;
+	}
+
+	/**
+	 * Load our core PDF template settings
+	 *
+	 * @param $settings
+	 *
+	 * @return string|\WP_Error
+	 *
+	 * @since 4.0
+	 */
+	public function load_core_template_styles( $settings ) {
+		return $this->load( 'core_template_styles', array( 'settings' => $settings ), false );
+	}
+
+	/**
+	 * @param string $html The current HTML
+	 * @param array $settings The current PDF settings
+	 *
+	 * @return string
+	 *
+	 * @since 4.0
+	 */
+	public function show_core_html_template_on_display( $html, $settings ) {
+		$core_template_html = $this->load_core_template_styles( $settings );
+
+		return $html . $core_template_html;
 	}
 }
