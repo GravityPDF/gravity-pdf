@@ -52,7 +52,7 @@ class Helper_PDF {
 	 *
 	 * @since 4.0
 	 */
-	public $mpdf;
+	protected $mpdf;
 
 	/**
 	 * Holds our Gravity Form Entry Details
@@ -192,6 +192,7 @@ class Helper_PDF {
 		$this->set_text_direction();
 		$this->set_pdf_format();
 		$this->set_pdf_security();
+		$this->set_display_mode();
 	}
 
 	/**
@@ -229,8 +230,8 @@ class Helper_PDF {
 		$html = apply_filters( 'gfpdfe_pdf_template', $html, $form['id'], $this->entry['id'], $this->settings ); /* Backwards compat */
 		$html = apply_filters( 'gfpdfe_pdf_template_' . $form['id'], $html, $this->entry['id'], $this->settings ); /* Backwards compat */
 
-		$html = apply_filters( 'gfpdf_pdf_html_output', $html, $form, $this->entry, $this->settings );
-		$html = apply_filters( 'gfpdf_pdf_html_output_' . $form['id'], $html, $this->form, $this->entry, $this->settings );
+		$html = apply_filters( 'gfpdf_pdf_html_output', $html, $form, $this->entry, $this->settings, $this );
+		$html = apply_filters( 'gfpdf_pdf_html_output_' . $form['id'], $html, $this->form, $this->entry, $this->settings, $this );
 
 		/* Check if we should output the HTML to the browser, for debugging */
 		$this->maybe_display_raw_html( $html );
@@ -253,7 +254,7 @@ class Helper_PDF {
 		$this->set_metadata();
 
 		/* allow $mpdf object class to be modified */
-		$this->mpdf = apply_filters( 'gfpdf_mpdf_class', $this->mpdf, $this->entry, $this->settings );
+		$this->mpdf = apply_filters( 'gfpdf_mpdf_class', $this->mpdf, $this->entry, $this->settings, $this );
 
 		/* depreciated backwards compatibility filters */
 		$this->mpdf = apply_filters( 'gfpdfe_mpdf_class_pre_render', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() );
@@ -517,7 +518,7 @@ class Helper_PDF {
 		$this->mpdf = new mPDF( '', $this->paper_size, 0, '', 15, 15, 16, 16, 9, 9, $this->orientation );
 
 		/* allow $mpdf object class to be modified */
-		$this->mpdf = apply_filters( 'gfpdf_mpdf_init_class', $this->mpdf, $this->entry, $this->settings );
+		$this->mpdf = apply_filters( 'gfpdf_mpdf_init_class', $this->mpdf, $this->entry, $this->settings, $this );
 	}
 
 	/**
@@ -731,7 +732,7 @@ class Helper_PDF {
 	protected function maybe_display_raw_html( $html ) {
 
 		if ( $this->output !== 'SAVE' && rgget( 'html' ) && $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
-			echo apply_filters( 'gfpdf_pre_html_browser_output', $html, $this->settings );
+			echo apply_filters( 'gfpdf_pre_html_browser_output', $html, $this->settings, $this );
 			exit;
 		}
 	}
