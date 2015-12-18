@@ -196,6 +196,11 @@ class View_PDF extends Helper_Abstract_View {
 				$pdf->set_output_type( 'download' );
 			}
 
+			/* determine if we should show the print dialog box */
+			if( isset( $_GET['print'] ) ) {
+				$pdf->set_print_dialog(true);
+			}
+
 			$pdf->render_html( $args );
 			$this->options->increment_pdf_count();
 

@@ -667,13 +667,14 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @param  integer $pid      The PDF Form Settings ID
 	 * @param  integer $id       The Gravity Form entry ID
 	 * @param  boolean $download Whether the PDF should be downloaded or not
+	 * @param  boolean $print    Whether we should mark the PDF to be printed
 	 * @param  boolean $esc      Whether to escape the URL or not
 	 *
 	 * @return string       Direct link to the PDF
 	 *
 	 * @since  4.0
 	 */
-	public function get_pdf_url( $pid, $id, $download = false, $esc = true ) {
+	public function get_pdf_url( $pid, $id, $download = false, $print = false, $esc = true ) {
 
 		/* Check if permalinks are enabled, otherwise fall back to our ugly link structure for 4.0 (not the same as our v3 links) */
 		if ( get_option( 'permalink_structure' ) ) {
@@ -682,11 +683,19 @@ class Model_PDF extends Helper_Abstract_Model {
 			if ( $download ) {
 				$url .= 'download/';
 			}
+
+			if( $print ) {
+				$url .= '?print=1';
+			}
 		} else {
 			$url = home_url() . '/?gpdf=1&pid=' . $pid . '&lid=' . $id;
 
 			if ( $download ) {
 				$url .= '&action=download';
+			}
+
+			if( $print ) {
+				$url .= '&print=1';
 			}
 		}
 
