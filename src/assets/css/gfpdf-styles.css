@@ -25,6 +25,10 @@
 	text-rendering: optimizelegibility;
 }
 
+.gfpdf-page .about-wrap [class$="col"] .col {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1 );
+}
+
 div img.gfpdf-image {
   border: 1px solid #CCC;
   max-width: 98%;
@@ -633,6 +637,14 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
 	#gfpdf-mascot-container {
 		padding-bottom: 120px !important;
 	}
+
+    .gfpdf-page .about-wrap [class$="col"] .col {
+        border-bottom: none;
+    }
+
+    .gfpdf-page .about-wrap .feature-section {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1 );
+    }
 }
 
 @media only screen and (min-width: 900px) {
