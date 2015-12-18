@@ -744,8 +744,14 @@ class Test_PDF extends WP_UnitTestCase {
 	 * @since        4.0
 	 *
 	 * @dataProvider provider_get_pdf_url
+	 *
+	 * @param $pid
+	 * @param $id
+	 * @param $download
+	 * @param $print
+	 * @param $expected
 	 */
-	public function test_get_pdf_url( $pid, $id, $expected ) {
+	public function test_get_pdf_url( $pid, $id, $download, $print, $expected ) {
 		global $wp_rewrite;
 
 		/* Process fancy permalinks */
@@ -753,7 +759,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$wp_rewrite->set_permalink_structure( '/%postname%/' );
 		flush_rewrite_rules();
 
-		$this->assertEquals( $expected, $this->model->get_pdf_url( $pid, $id ) );
+		$this->assertEquals( $expected, $this->model->get_pdf_url( $pid, $id, $download, $print ) );
 
 		$wp_rewrite->set_permalink_structure( $old_permalink_structure );
 		flush_rewrite_rules();
@@ -766,11 +772,15 @@ class Test_PDF extends WP_UnitTestCase {
 	 */
 	public function provider_get_pdf_url() {
 		return array(
-			array( '240arkj92kda', '50', 'http://example.org/pdf/240arkj92kda/50/' ),
-			array( 'kjoai2', '25', 'http://example.org/pdf/kjoai2/25/' ),
-			array( 'AIfawjoi24012', '9992', 'http://example.org/pdf/AIfawjoi24012/9992/' ),
-			array( 'JJiawfafwwaa', '5020', 'http://example.org/pdf/JJiawfafwwaa/5020/' ),
-			array( 'fa2a20koawas', '2', 'http://example.org/pdf/fa2a20koawas/2/' ),
+			array( '240arkj92kda', '50', false, false, 'http://example.org/pdf/240arkj92kda/50/' ),
+			array( 'kjoai2', '25', false, false,'http://example.org/pdf/kjoai2/25/' ),
+			array( 'AIfawjoi24012', '9992', false, false, 'http://example.org/pdf/AIfawjoi24012/9992/' ),
+			array( 'JJiawfafwwaa', '5020', false, false, 'http://example.org/pdf/JJiawfafwwaa/5020/' ),
+			array( 'fa2a20koawas', '2', false, false, 'http://example.org/pdf/fa2a20koawas/2/' ),
+			array( 'JJiawfafwwaa', '5020', true, false, 'http://example.org/pdf/JJiawfafwwaa/5020/download/' ),
+			array( 'fa2a20koawas', '2', false, true, 'http://example.org/pdf/fa2a20koawas/2/?print=1' ),
+			array( 'kjoai2', '25', true, true, 'http://example.org/pdf/kjoai2/25/download/?print=1' ),
+			array( 'AIfawjoi24012', '9992', true, true, 'http://example.org/pdf/AIfawjoi24012/9992/download/?print=1' ),
 		);
 	}
 
@@ -780,9 +790,15 @@ class Test_PDF extends WP_UnitTestCase {
 	 * @since        4.0
 	 *
 	 * @dataProvider provider_get_pdf_url_no_perma
+	 *
+	 * @param $pid
+	 * @param $id
+	 * @param $download
+	 * @param $print
+	 * @param $expected
 	 */
-	public function test_get_pdf_url_no_perma( $pid, $id, $expected ) {
-		$this->assertEquals( $expected, $this->model->get_pdf_url( $pid, $id ) );
+	public function test_get_pdf_url_no_perma( $pid, $id, $download, $print, $expected ) {
+		$this->assertEquals( $expected, $this->model->get_pdf_url( $pid, $id, $download, $print ) );
 	}
 
 	/**
@@ -792,11 +808,15 @@ class Test_PDF extends WP_UnitTestCase {
 	 */
 	public function provider_get_pdf_url_no_perma() {
 		return array(
-			array( '240arkj92kda', '50', 'http://example.org/?gpdf=1&#038;pid=240arkj92kda&#038;lid=50' ),
-			array( 'kjoai2', '25', 'http://example.org/?gpdf=1&#038;pid=kjoai2&#038;lid=25' ),
-			array( 'AIfawjoi24012', '9992', 'http://example.org/?gpdf=1&#038;pid=AIfawjoi24012&#038;lid=9992' ),
-			array( 'JJiawfafwwaa', '5020', 'http://example.org/?gpdf=1&#038;pid=JJiawfafwwaa&#038;lid=5020' ),
-			array( 'fa2a20koawas', '2', 'http://example.org/?gpdf=1&#038;pid=fa2a20koawas&#038;lid=2' ),
+			array( '240arkj92kda', '50', false, false, 'http://example.org/?gpdf=1&#038;pid=240arkj92kda&#038;lid=50' ),
+			array( 'kjoai2', '25', false, false, 'http://example.org/?gpdf=1&#038;pid=kjoai2&#038;lid=25' ),
+			array( 'AIfawjoi24012', '9992', false, false, 'http://example.org/?gpdf=1&#038;pid=AIfawjoi24012&#038;lid=9992' ),
+			array( 'JJiawfafwwaa', '5020', false, false, 'http://example.org/?gpdf=1&#038;pid=JJiawfafwwaa&#038;lid=5020' ),
+			array( 'fa2a20koawas', '2', false, false, 'http://example.org/?gpdf=1&#038;pid=fa2a20koawas&#038;lid=2' ),
+			array( 'JJiawfafwwaa', '5020', true, false, 'http://example.org/?gpdf=1&#038;pid=JJiawfafwwaa&#038;lid=5020&#038;action=download' ),
+			array( 'fa2a20koawas', '2', false, true, 'http://example.org/?gpdf=1&#038;pid=fa2a20koawas&#038;lid=2&#038;print=1' ),
+			array( 'kjoai2', '25', true, true, 'http://example.org/?gpdf=1&#038;pid=kjoai2&#038;lid=25&#038;action=download&#038;print=1' ),
+			array( 'AIfawjoi24012', '9992', true, true, 'http://example.org/?gpdf=1&#038;pid=AIfawjoi24012&#038;lid=9992&#038;action=download&#038;print=1' ),
 		);
 	}
 

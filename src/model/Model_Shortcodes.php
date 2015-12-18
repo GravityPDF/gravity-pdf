@@ -135,6 +135,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 			'type'    => 'download',
 			'classes' => 'gravitypdf-download-link',
 			'entry'   => '',
+            'print'   => '',
 		), $attributes, 'gravitypdf' );
 
 		$attributes = apply_filters( 'gfpdf_gravityforms_shortcode_attributes', $attributes );
@@ -197,7 +198,8 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		/* Everything looks valid so let's get the URL */
 		$pdf               = new Model_PDF( $this->form, $this->log, $this->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
 		$download          = ( $attributes['type'] == 'download' ) ? true : false;
-		$attributes['url'] = $pdf->get_pdf_url( $attributes['id'], $attributes['entry'], $download );
+        $print             = ( ! empty($attributes['print']) ) ? true : false;
+        $attributes['url'] = $pdf->get_pdf_url( $attributes['id'], $attributes['entry'], $download, $print );
 
 		/* generate the markup and return */
 		$this->log->addNotice( 'Generating Shortcode Markup', array( 'attr' => $attributes ) );
@@ -353,7 +355,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 						/* generate the PDF URL */
 						$pdf      = new Model_PDF( $this->form, $this->log, $this->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
 						$download = ( ! isset( $code['attr']['type'] ) || $code['attr']['type'] == 'download' ) ? true : false;
-						$pdf_url  = $pdf->get_pdf_url( $pid, '{entry_id}', $download, false );
+						$pdf_url  = $pdf->get_pdf_url( $pid, '{entry_id}', $download, false, false );
 
 						/* override the confirmation URL submitted */
 						$_POST['form_confirmation_url'] = str_replace( $code['shortcode'], $pdf_url, $url );
