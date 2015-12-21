@@ -106,10 +106,10 @@ class Test_Field_Container extends WP_UnitTestCase {
 		$field->cssClass = 'normal';
 
 		/* Check it opens correctly */
-		$this->assertEquals( '<div class="row-separator">', $this->generate( $field ) );
+		$this->assertEquals( '<div class="row-separator odd">', $this->generate( $field ) );
 
 		/* Check it closes / opens correctly */
-		$this->assertEquals( '</div><div class="row-separator">', $this->generate( $field ) );
+		$this->assertEquals( '</div><div class="row-separator even">', $this->generate( $field ) );
 
 		/* Check it now closes correctly */
 		$this->assertEquals( '</div>', $this->close() );
@@ -126,7 +126,7 @@ class Test_Field_Container extends WP_UnitTestCase {
 		$field->cssClass = 'gf_left_half';
 
 		/* Check it opens correctly */
-		$this->assertEquals( '<div class="row-separator">', $this->generate( $field ) );
+		$this->assertEquals( '<div class="row-separator odd">', $this->generate( $field ) );
 
 		$field           = new GF_Field();
 		$field->cssClass = 'gf_right_half';
@@ -135,7 +135,7 @@ class Test_Field_Container extends WP_UnitTestCase {
 		$this->assertEquals( '', $this->generate( $field ) );
 
 		/* Check the row closes / opens new row correctly */
-		$this->assertEquals( '</div><div class="row-separator">', $this->generate( $field ) );
+		$this->assertEquals( '</div><div class="row-separator even">', $this->generate( $field ) );
 
 		/* Check it now closes correctly */
 		$this->assertEquals( '</div>', $this->close() );
@@ -152,7 +152,7 @@ class Test_Field_Container extends WP_UnitTestCase {
 		$field->cssClass = 'gf_left_third';
 
 		/* Check it opens correctly */
-		$this->assertEquals( '<div class="row-separator">', $this->generate( $field ) );
+		$this->assertEquals( '<div class="row-separator odd">', $this->generate( $field ) );
 
 		$field           = new GF_Field();
 		$field->cssClass = 'gf_middle_third';
@@ -167,7 +167,7 @@ class Test_Field_Container extends WP_UnitTestCase {
 		$this->assertEquals( '', $this->generate( $field ) );
 
 		/* Check the row closes / opens new row correctly */
-		$this->assertEquals( '</div><div class="row-separator">', $this->generate( $field ) );
+		$this->assertEquals( '</div><div class="row-separator even">', $this->generate( $field ) );
 
 		/* Check it now closes correctly */
 		$this->assertEquals( '</div>', $this->close() );
@@ -184,7 +184,7 @@ class Test_Field_Container extends WP_UnitTestCase {
 		$field->cssClass = 'gf_left_third';
 
 		/* Check it opens correctly */
-		$this->assertEquals( '<div class="row-separator">', $this->generate( $field ) );
+		$this->assertEquals( '<div class="row-separator odd">', $this->generate( $field ) );
 
 		$field           = new GF_Field();
 		$field->cssClass = 'gf_left_half';
@@ -193,7 +193,7 @@ class Test_Field_Container extends WP_UnitTestCase {
 		$this->assertEquals( '', $this->generate( $field ) );
 
 		/* Check the row closes / opens new row correctly */
-		$this->assertEquals( '</div><div class="row-separator">', $this->generate( $field ) );
+		$this->assertEquals( '</div><div class="row-separator even">', $this->generate( $field ) );
 
 		/* Check it now closes correctly */
 		$this->assertEquals( '</div>', $this->close() );
@@ -208,7 +208,7 @@ class Test_Field_Container extends WP_UnitTestCase {
 		$field->cssClass = 'gf_left_third';
 
 		/* Check it opens correctly */
-		$this->assertEquals( '<div class="row-separator">', $this->generate( $field ) );
+		$this->assertEquals( '<div class="row-separator odd">', $this->generate( $field ) );
 
 		/* Create a skipped field and verify the container closes correctly */
 		$field           = new GF_Field();

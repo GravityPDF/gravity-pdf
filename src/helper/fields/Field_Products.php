@@ -83,110 +83,107 @@ class Field_Products extends Helper_Abstract_Fields {
 
 		?>
 
-		<h3 id="product-field-title gfpdf-field">
-			<?php
-				$label = apply_filters( 'gform_order_label', __( 'Order', 'gravityforms' ), $form_id );
-				$label = apply_filters( 'gform_order_label_' . $form_id, $label, $form_id );
+		<div class="row-separator">
+			<h3 class="product-field-title gfpdf-field">
+				<?php
+					$label = apply_filters( 'gform_order_label', __( 'Order', 'gravityforms' ), $form_id );
+					$label = apply_filters( 'gform_order_label_' . $form_id, $label, $form_id );
 
-				echo $label;
-			?>
-		</h3>
+					echo $label;
+				?>
+			</h3>
+		</div>
 
-		<table class="entry-products gfpdf-field" autosize="1" cellspacing="0" width="97%">
-			<colgroup>
-				<col class="entry-products-col1"/>
-				<col class="entry-products-col2"/>
-				<col class="entry-products-col3"/>
-				<col class="entry-products-col4"/>
-			</colgroup>
+		<div class="row-separator">
+			<table class="entry-products gfpdf-field" autosize="1">
+				<thead>
+					<tr>
+						<th class="entry-products-col1">
+							<?php
+							$label = apply_filters( 'gform_product', __( 'Product', 'gravityforms' ), $form_id );
+							$label = apply_filters( 'gform_product_' . $form_id, $label, $form_id );
 
-			<thead>
-			<tr>
-				<th scope="col">
-					<?php
-						$label = apply_filters( 'gform_product', __( 'Product', 'gravityforms' ), $form_id );
-						$label = apply_filters( 'gform_product_' . $form_id, $label, $form_id );
+							echo $label;
+							?>
+						</th>
 
-						echo $label;
-					?>
-				</th>
+						<th class="textcenter entry-products-col2">
+							<?php
+							$label = apply_filters( 'gform_product_qty', __( 'Qty', 'gravityforms' ), $form_id );
+							$label = apply_filters( 'gform_product_qty_' . $form_id, $label, $form_id );
 
-				<th scope="col" class='textcenter'>
-					<?php
-						$label = apply_filters( 'gform_product_qty', __( 'Qty', 'gravityforms' ), $form_id );
-						$label = apply_filters( 'gform_product_qty_' . $form_id, $label, $form_id );
+							echo $label;
+							?>
+						</th>
+						<th class="entry-products-col3">
+							<?php
+							$label = apply_filters( 'gform_product_unitprice', __( 'Unit Price', 'gravityforms' ), $form_id );
+							$label = apply_filters( 'gform_product_unitprice_' . $form_id, $label, $form_id );
 
-						echo $label;
-					?>
-				</th>
-				<th scope="col">
-					<?php
-						$label = apply_filters( 'gform_product_unitprice', __( 'Unit Price', 'gravityforms' ), $form_id );
-						$label = apply_filters( 'gform_product_unitprice_' . $form_id, $label, $form_id );
+							echo $label;
+							?>
+						</th>
+						<th class="entry-products-col4">
+							<?php
+							$label = apply_filters( 'gform_product_price', __( 'Price', 'gravityforms' ), $form_id );
+							$label = apply_filters( 'gform_product_price_' . $form_id, $label, $form_id );
 
-						echo $label;
-					?>
-				</th>
-				<th scope="col">
-					<?php
-						$label = apply_filters( 'gform_product_price', __( 'Price', 'gravityforms' ), $form_id );
-						$label = apply_filters( 'gform_product_price_' . $form_id, $label, $form_id );
+							echo $label;
+							?>
+						</th>
+					</tr>
+				</thead>
 
-						echo $label;
-					?>
-				</th>
-			</tr>
-			</thead>
+				<tbody>
+				<?php foreach ( $products['products'] as $product ) : ?>
+					<tr>
+						<td>
+							<div class="product_name">
+								<?php echo $product['name']; ?>
+							</div>
 
-			<tbody>
-			<?php foreach ( $products['products'] as $product ) : ?>
-				<tr>
-					<td>
-						<div class="product_name">
-							<?php echo $product['name']; ?>
-						</div>
+							<?php
+							$price = $product['price_unformatted'];
 
-						<?php
-						$price = $product['price_unformatted'];
+							if ( sizeof( $product['options'] ) > 0 ) : ?>
+								<ul class="product_options">
+									<?php foreach ( $product['options'] as $option ) : $price += $option['price']; ?>
+										<li><?php echo $option['option_label']; ?></li>
+									<?php endforeach; ?>
+								</ul>
+							<?php endif; ?>
+						</td>
+						<td class="textcenter"><?php echo $product['quantity']; ?></td>
+						<td><?php echo GFCommon::format_number( $price, 'currency' ); ?></td>
+						<td><?php echo $product['subtotal_formatted'] ?></td>
+					</tr>
+				<?php endforeach; ?>
 
-						if ( sizeof( $product['options'] ) > 0 ) : ?>
-							<ul class="product_options">
-								<?php foreach ( $product['options'] as $option ) : $price += $option['price']; ?>
-									<li><?php echo $option['option_label']; ?></li>
-								<?php endforeach; ?>
-							</ul>
-						<?php endif; ?>
-					</td>
-					<td class="textcenter"><?php echo $product['quantity']; ?></td>
-					<td><?php echo GFCommon::format_number( $price, 'currency' ); ?></td>
-					<td><?php echo $product['subtotal_formatted'] ?></td>
-				</tr>
-			<?php endforeach; ?>
-
-			<?php if ( ! empty( $products['products_totals']['shipping_name'] ) ) : ?>
-				<tr>
-					<td rowspan="3" class="emptycell"></td>
-					<td colspan="2"
-					    class="textright subtotal totals"><?php _e( 'Subtotal', 'gravity-forms-pdf-extended' ); ?></td>
-					<td class="subtotal_amount totals"><?php echo $products['products_totals']['subtotal_formatted']; ?></td>
-				</tr>
-				<tr>
-					<td colspan="2"
-					    class="textright shipping totals"><?php echo sprintf( __( 'Shipping (%s)', 'gravity-forms-pdf-extended' ), $products['products_totals']['shipping_name'] ); ?></td>
-					<td class="shipping_amount totals"><?php echo $products['products_totals']['shipping_formatted']; ?></td>
-				</tr>
-			<?php endif; ?>
-
-			<tr>
-				<?php if ( empty( $products['products_totals']['shipping_name'] ) ) : ?>
-					<td class="emptycell"></td>
+				<?php if ( ! empty( $products['products_totals']['shipping_name'] ) ) : ?>
+					<tr>
+						<td rowspan="3" class="emptycell"></td>
+						<td colspan="2"
+						    class="textright subtotal totals"><?php _e( 'Subtotal', 'gravity-forms-pdf-extended' ); ?></td>
+						<td class="subtotal_amount totals"><?php echo $products['products_totals']['subtotal_formatted']; ?></td>
+					</tr>
+					<tr>
+						<td colspan="2"
+						    class="textright shipping totals"><?php echo sprintf( __( 'Shipping (%s)', 'gravity-forms-pdf-extended' ), $products['products_totals']['shipping_name'] ); ?></td>
+						<td class="shipping_amount totals"><?php echo $products['products_totals']['shipping_formatted']; ?></td>
+					</tr>
 				<?php endif; ?>
 
-				<td colspan="2" class="textright grandtotal totals"><?php _e( 'Total', 'gravityforms' ) ?></td>
-				<td class="grandtotal_amount totals"><?php echo $products['products_totals']['total_formatted']; ?></td>
-			</tr>
-			</tbody>
-		</table>
+				<tr>
+					<?php if ( empty( $products['products_totals']['shipping_name'] ) ) : ?>
+						<td class="emptycell"></td>
+					<?php endif; ?>
+
+					<td colspan="2" class="textright grandtotal totals"><?php _e( 'Total', 'gravityforms' ) ?></td>
+					<td class="grandtotal_amount totals"><?php echo $products['products_totals']['total_formatted']; ?></td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
 
 		<?php
 

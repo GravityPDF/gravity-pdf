@@ -1427,13 +1427,13 @@ class Test_PDF extends WP_UnitTestCase {
 		$field->inputType = 'page';
 
 		ob_start();
-		$this->view->display_page_name( 1, $form, new GF_Field() );
+		$this->view->display_page_name( 1, $form, new Helper_Field_Container() );
 		$html = ob_get_clean();
 
 		$this->assertNotFalse( strpos( $html, '<h3 id="field-' . $field->id . '"', $field ) );
 
 		ob_start();
-		$this->view->display_page_name( 2, $form, $field );
+		$this->view->display_page_name( 2, $form, new Helper_Field_Container() );
 		$html = ob_get_clean();
 
 		$this->assertFalse( strpos( $html, '<h3 id="field-' . $field->id . '"' ) );
