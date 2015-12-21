@@ -121,21 +121,21 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
 			text-align: center;
 		}
 
-		table.entry-products col.entry-products-col2 {
-			width: 50px;
+		table.entry-products .entry-products-col2 {
+			width: 10%;
 		}
 
-		table.entry-products col.entry-products-col3 {
-			width: 155px;
+		table.entry-products .entry-products-col3 {
+			width: 19%;
 		}
 
-		table.entry-products col.entry-products-col4 {
-			width: 155px;
+		table.entry-products .entry-products-col4 {
+			width: 19%;
 		}
 
 		table.entry-products {
 			border: 1px solid <?php echo $contrast_border_color; ?>;
-			margin: 10px 0;
+			margin: 5px 0 3px;
 		}
 
 		table.entry-products td {

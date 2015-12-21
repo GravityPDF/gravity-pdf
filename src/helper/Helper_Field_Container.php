@@ -110,6 +110,15 @@ class Helper_Field_Container {
 	);
 
 	/**
+	 * Holds the number of times a new row has been open
+	 *
+	 * @var int
+	 *
+	 * @since 4.0
+	 */
+	private $counter = 0;
+
+	/**
 	 * Set up the object
 	 *
 	 * @param array $config Allow user to override the open / close tag and which fields are skipped
@@ -248,7 +257,11 @@ class Helper_Field_Container {
 	 * @since 4.0
 	 */
 	private function open_container() {
-		echo $this->open_tag;
+
+		$class = $this->is_row_odd_or_even();
+		echo str_replace( 'row-separator', 'row-separator '. $class, $this->open_tag );
+
+		$this->increment_row_counter();
 	}
 
 	/**
@@ -320,5 +333,27 @@ class Helper_Field_Container {
 		/* no match, so assuming full width */
 
 		return 100;
+	}
+
+	/**
+	 * Checks if the row counter is currently odd or even
+	 *
+	 * @return string
+	 *
+	 * @since 4.0
+	 */
+	private function is_row_odd_or_even() {
+		return ($this->counter % 2) ? 'even' : 'odd';
+	}
+
+	/**
+	 * Increases the internal row counter
+	 *
+	 * @return void
+	 *
+	 * @since 4.0
+	 */
+	private function increment_row_counter() {
+		$this->counter++;
 	}
 }
