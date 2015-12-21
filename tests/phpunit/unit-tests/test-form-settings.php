@@ -538,7 +538,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		$settings = $this->model->setup_custom_appearance_settings( $class, array() );
 
 		$this->assertEquals( 13, sizeof( $settings ) );
-		$this->assertArrayHasKey( 'border_colour', $settings );
+		$this->assertArrayHasKey( 'zadani_border_colour', $settings );
 	}
 
 	/**
