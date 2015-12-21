@@ -38,7 +38,7 @@ if ( ! class_exists( 'GFForms' ) ) {
 /**
  * Load up our template-specific appearance settings
  */
-$value_border_colour  = ( ! empty( $settings['border_colour']) ) ? $settings['border_colour'] : '#CCCCCC';
+$value_border_colour  = ( ! empty( $settings['zadani_border_colour']) ) ? $settings['zadani_border_colour'] : '#CCCCCC';
 
 ?>
 
