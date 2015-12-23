@@ -112,6 +112,12 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
   margin: 0 12px 0 0;
 }
 
+.rtl #pdfextended-settings label, .rtl #tab_pdf label {
+    float: right;
+    margin-left: 5px;
+}
+
+
 /**
  * Tools Settings Page
  */
@@ -261,6 +267,10 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
   margin: 5px 0;
   background: #EEE;
   padding: 7.5px;
+}
+
+.rtl #font-list .css-usage input {
+    direction: ltr !important;
 }
 
 /**
@@ -557,7 +567,7 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
 }
 
 #gfpdf_pdf_form .gfpdf-toggle-wrapper {
-  padding-top: 15px;
+  padding-top: 25px;
 }
 
 #gfpdf_pdf_form .gfpdf-tab-container {
@@ -616,6 +626,11 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
 		margin: 0;
 		width: 130px;
 	}
+
+    .rtl .about-wrap .gfpdf-badge {
+        left: 0;
+        right: auto;
+    }
 }
 
 @media only screen and (min-width: 782px) {
@@ -633,6 +648,10 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
 		position: relative;
 		z-index: 100;
 	}
+
+    .rtl .gfpdf-mascot-sitting {
+        float: left;
+    }
 
 	#gfpdf-mascot-container {
 		padding-bottom: 120px !important;
