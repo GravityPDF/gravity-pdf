@@ -156,11 +156,12 @@ $value_border_colour  = ( ! empty( $settings['zadani_border_colour']) ) ? $setti
         ul, ol {
             margin: 0;
             padding-left: 1mm;
+            padding-right: 1mm;
         }
 
         li {
             margin: 0;
-            padding: 0 0.5mm 0 0;
+            padding: 0;
             list-style-position: inside;
         }
 
