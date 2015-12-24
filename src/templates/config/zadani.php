@@ -87,7 +87,7 @@ class zadani implements Helper_Interface_Config {
 			/* Create custom fields to control the look and feel of a template */
 			'fields' => array(
 				'zadani_border_colour' => array(
-					'id'   => 'border_colour',
+					'id'   => 'zadani_border_colour',
 					'name' => __( 'Field Border Colour', 'gravity-forms-pdf-extended' ),
 					'type' => 'color',
 					'desc' => __( 'Control the colour of the field border.', 'gravity-forms-pdf-extended' ),
