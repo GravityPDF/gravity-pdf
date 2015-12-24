@@ -74,7 +74,7 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
 	<?php endif; ?>
 	}
 
-	body, table th, table td, ul li, ol li {
+	body, table th, table td, ul li, ol li, a {
 		color: <?php echo $font_colour; ?>;
 		font-size: <?php echo $font_size; ?>pt;
 		font-family: <?php echo $font; ?>, sans-serif;
