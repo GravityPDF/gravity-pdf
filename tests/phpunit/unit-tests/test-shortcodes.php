@@ -167,18 +167,18 @@ class Test_Shortcode extends WP_UnitTestCase {
 			'id'      => '556690c67856b',
 			'classes' => 'my-pdf-download-link',
 		) ), 'my-pdf-download-link' ) );
-        
-        /* Test our print attribute works as intended */
-        $this->assertFalse(strpos($this->model->gravitypdf(array(
-            'entry'   => $entry['id'],
-            'id'      => '556690c67856b',
-        )), 'print=1'));
 
-        $this->assertNotFalse(strpos($this->model->gravitypdf(array(
-            'entry'   => $entry['id'],
-            'id'      => '556690c67856b',
-            'print'   => 'true',
-        )), 'print=1'));
+		/* Test our print attribute works as intended */
+		$this->assertFalse( strpos( $this->model->gravitypdf( array(
+			'entry' => $entry['id'],
+			'id'    => '556690c67856b',
+		) ), 'print=1' ) );
+
+		$this->assertNotFalse( strpos( $this->model->gravitypdf( array(
+			'entry' => $entry['id'],
+			'id'    => '556690c67856b',
+			'print' => 'true',
+		) ), 'print=1' ) );
 
 		/* Test for entry URL loading */
 		$_GET['lid'] = $entry['id'];

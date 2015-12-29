@@ -140,13 +140,13 @@ class Model_Welcome_Screen extends Helper_Abstract_Model {
 				$this->log->addNotice( 'Display Welcome Screen' );
 
 				return $this->welcome_title;
-				break;
+			break;
 
 			case 'gfpdf-update':
 				$this->log->addNotice( 'Display Update Screen' );
 
 				return $this->updated_title;
-				break;
+			break;
 		}
 
 		return $title;

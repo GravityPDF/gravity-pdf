@@ -135,7 +135,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 			'type'    => 'download',
 			'classes' => 'gravitypdf-download-link',
 			'entry'   => '',
-            'print'   => '',
+			'print'   => '',
 		), $attributes, 'gravitypdf' );
 
 		$attributes = apply_filters( 'gfpdf_gravityforms_shortcode_attributes', $attributes );
@@ -198,8 +198,8 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		/* Everything looks valid so let's get the URL */
 		$pdf               = new Model_PDF( $this->form, $this->log, $this->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
 		$download          = ( $attributes['type'] == 'download' ) ? true : false;
-        $print             = ( ! empty($attributes['print']) ) ? true : false;
-        $attributes['url'] = $pdf->get_pdf_url( $attributes['id'], $attributes['entry'], $download, $print );
+		$print             = ( ! empty( $attributes['print'] ) ) ? true : false;
+		$attributes['url'] = $pdf->get_pdf_url( $attributes['id'], $attributes['entry'], $download, $print );
 
 		/* generate the markup and return */
 		$this->log->addNotice( 'Generating Shortcode Markup', array( 'attr' => $attributes ) );

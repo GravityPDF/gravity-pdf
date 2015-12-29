@@ -219,13 +219,13 @@ class Test_Installer extends WP_UnitTestCase {
 		$this->assertTrue( is_file( $gfpdf->data->template_location . 'index.html' ) );
 
 		/* Test our directory filters */
-		add_filter( 'gfpdf_template_location', function($path, $folder) {
+		add_filter( 'gfpdf_template_location', function( $path, $folder ) {
 			return ABSPATH . $folder;
 		}, 10, 2 );
 
 		add_filter( 'gfpdf_template_location_uri', function( $url, $folder ) {
-			return home_url('/') . $folder;
-		}, 10, 2);
+			return home_url( '/' ) . $folder;
+		}, 10, 2 );
 
 		add_filter( 'gfpdf_tmp_location', function( $path ) {
 			return ABSPATH . '../tmp/';

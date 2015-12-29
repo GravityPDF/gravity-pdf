@@ -132,7 +132,7 @@ class Test_Data_Helper extends WP_UnitTestCase {
 	public function provider_setter() {
 		$object           = new StdClass();
 		$object->item     = 'This';
-		$object->function = function () {
+		$object->function = function() {
 			return false;
 		};
 

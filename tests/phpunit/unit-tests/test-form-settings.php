@@ -412,7 +412,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		/**
 		 * Set up global filters we can check
 		 */
-		add_filter( 'gfpdf_settings_form_settings_sanitize', function ( $input ) {
+		add_filter( 'gfpdf_settings_form_settings_sanitize', function( $input ) {
 			return 'form_settings sanitized';
 		} );
 
@@ -420,7 +420,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		$this->assertEquals( 'form_settings sanitized', $this->model->settings_sanitize( $input ) );
 		remove_all_filters( 'gfpdf_settings_form_settings_sanitize' );
 
-		add_filter( 'gfpdf_settings_form_settings_appearance_sanitize', function ( $input ) {
+		add_filter( 'gfpdf_settings_form_settings_appearance_sanitize', function( $input ) {
 			return 'form_settings_appearance sanitized';
 		} );
 
@@ -428,7 +428,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		$this->assertEquals( 'form_settings_appearance sanitized', $this->model->settings_sanitize( $input ) );
 		remove_all_filters( 'gfpdf_settings_form_settings_appearance_sanitize' );
 
-		add_filter( 'gfpdf_settings_form_settings_advanced_sanitize', function ( $input ) {
+		add_filter( 'gfpdf_settings_form_settings_advanced_sanitize', function( $input ) {
 			return 'form_settings_advanced sanitized';
 		} );
 
@@ -439,7 +439,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		/**
 		 * Get global input filter
 		 */
-		add_filter( 'gfpdf_form_settings_sanitize', function ( $input, $key ) {
+		add_filter( 'gfpdf_form_settings_sanitize', function( $input, $key ) {
 			return 'global input value';
 		}, 15, 2 );
 
@@ -459,7 +459,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 
 		/* set up filters to test */
 		foreach ( $types as $type ) {
-			add_filter( 'gfpdf_form_settings_sanitize_' . $type, function ( $value, $key ) use ( $type ) {
+			add_filter( 'gfpdf_form_settings_sanitize_' . $type, function( $value, $key ) use ( $type ) {
 				return $type;
 			}, 10, 2 );
 		}
@@ -479,7 +479,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 	/**
 	 * Check that .pdf is correctly removed from all filenames
 	 *
-	 * @since 4.0
+	 * @since        4.0
 	 *
 	 * @dataProvider provider_strip_filename
 	 */

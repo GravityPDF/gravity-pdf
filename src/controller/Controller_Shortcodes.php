@@ -64,7 +64,7 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 	 *
 	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_Shortcodes $model Our Shortcodes Model the controller will manage
 	 * @param Helper_Abstract_View|\GFPDF\View\View_Shortcodes    $view  Our Shortcodes View the controller will manage
-	 * @param \Monolog\Logger|LoggerInterface                    $log   Our logger class
+	 * @param \Monolog\Logger|LoggerInterface                     $log   Our logger class
 	 *
 	 * @since 4.0
 	 */

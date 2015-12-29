@@ -270,16 +270,16 @@ class Helper_PDF {
 			case 'DISPLAY':
 				$this->mpdf->Output( $this->filename, 'I' );
 				wp_die();
-				break;
+			break;
 
 			case 'DOWNLOAD':
 				$this->mpdf->Output( $this->filename, 'D' );
 				wp_die();
-				break;
+			break;
 
 			case 'SAVE':
 				return $this->mpdf->Output( '', 'S' );
-				break;
+			break;
 		}
 
 		return false;
@@ -488,7 +488,7 @@ class Helper_PDF {
 			$path = $this->data->template_tmp_location . $this->entry['form_id'] . $this->entry['id'] . '/';
 		} else {
 			/* ensure the path ends with a forward slash */
-			if ( substr( $path, - 1 ) !== '/' ) {
+			if ( substr( $path, -1 ) !== '/' ) {
 				$path .= '/';
 			}
 		}
@@ -540,7 +540,7 @@ class Helper_PDF {
 			'C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10',
 			'RA0', 'RA1', 'RA2', 'RA3', 'RA4',
 			'SRA0', 'SRA1', 'SRA2', 'SRA3', 'SRA4',
-			'LETTER', 'LEGAL', 'LEDGER', 'TABLOID', 'EXECUTIVE', 'FOILIO', 'B', 'A', 'DEMY', 'ROYAL', 'CUSTOM'
+			'LETTER', 'LEGAL', 'LEDGER', 'TABLOID', 'EXECUTIVE', 'FOILIO', 'B', 'A', 'DEMY', 'ROYAL', 'CUSTOM',
 		);
 
 		if ( ! in_array( $paper_size, $valid_paper_size ) ) {
@@ -684,7 +684,7 @@ class Helper_PDF {
 	/**
 	 * Ensure an extension is added to the end of the name
 	 *
-	 * @param  string $name The PHP template
+	 * @param  string $name      The PHP template
 	 *
 	 * @param string  $extension The extension that should be added to the filename
 	 *
@@ -693,7 +693,7 @@ class Helper_PDF {
 	 * @since  4.0
 	 */
 	protected function get_file_with_extension( $name, $extension = '.php' ) {
-		if ( substr( $name, - strlen( $extension ) ) !== $extension ) {
+		if ( substr( $name, -strlen( $extension ) ) !== $extension ) {
 			$name = $name . $extension;
 		}
 
@@ -791,12 +791,12 @@ class Helper_PDF {
 			case 'pdfa1b':
 				$this->mpdf->PDFA     = true;
 				$this->mpdf->PDFAauto = true;
-				break;
+			break;
 
 			case 'pdfx1a':
 				$this->mpdf->PDFX     = true;
 				$this->mpdf->PDFXauto = true;
-				break;
+			break;
 		}
 	}
 
@@ -831,14 +831,14 @@ class Helper_PDF {
 	protected function backwards_compat_conversion( $settings ) {
 
 		$compat                   = array();
-		$compat['premium']        = ( isset( $settings['advanced_template'] ) && $settings['advanced_template'] == 'Yes' )  ? true : false;
-		$compat['rtl']            = ( isset( $settings['rtl'] ) && $settings['rtl'] == 'Yes' )                              ? true : false;
-		$compat['dpi']            = ( isset( $settings['image_dpi'] ) )                                                     ? (int) $settings['image_dpi'] : 96;
-		$compat['security']       = ( isset( $settings['security'] ) && $settings['security'] == 'Yes' )                    ? true : false;
-		$compat['pdf_password']   = ( isset( $settings['password'] ) )                                                      ? $settings['password'] : '';
-		$compat['pdf_privileges'] = ( isset( $settings['privileges'] ) )                                                    ? $settings['privileges'] : '';
-		$compat['pdfa1b']         = ( isset( $settings['format'] ) && $settings['format'] == 'PDFA1B' )                     ? true : false;
-		$compat['pdfx1a']         = ( isset( $settings['format'] ) && $settings['format'] == 'PDFX1A' )                     ? true : false;
+		$compat['premium']        = ( isset( $settings['advanced_template'] ) && $settings['advanced_template'] == 'Yes' ) ? true : false;
+		$compat['rtl']            = ( isset( $settings['rtl'] ) && $settings['rtl'] == 'Yes' ) ? true : false;
+		$compat['dpi']            = ( isset( $settings['image_dpi'] ) ) ? (int) $settings['image_dpi'] : 96;
+		$compat['security']       = ( isset( $settings['security'] ) && $settings['security'] == 'Yes' ) ? true : false;
+		$compat['pdf_password']   = ( isset( $settings['password'] ) ) ? $settings['password'] : '';
+		$compat['pdf_privileges'] = ( isset( $settings['privileges'] ) ) ? $settings['privileges'] : '';
+		$compat['pdfa1b']         = ( isset( $settings['format'] ) && $settings['format'] == 'PDFA1B' ) ? true : false;
+		$compat['pdfx1a']         = ( isset( $settings['format'] ) && $settings['format'] == 'PDFX1A' ) ? true : false;
 
 		return $compat;
 	}
@@ -849,22 +849,22 @@ class Helper_PDF {
 	 * @param  string $type
 	 *
 	 * @return string
-	 * 
+	 *
 	 * @since 4.0
 	 */
 	protected function backwards_compat_output( $type ) {
 		switch ( strtolower( $type ) ) {
 			case 'display':
 				return 'view';
-				break;
+			break;
 
 			case 'download':
 				return 'download';
-				break;
+			break;
 
 			default:
 				return 'save';
-				break;
+			break;
 		}
 	}
 }

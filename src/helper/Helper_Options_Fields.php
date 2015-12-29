@@ -3,13 +3,18 @@
 namespace GFPDF\Helper;
 
 /**
- * Our Gravity PDF Options API Field Registration
+ * Give a standardised format to queue admin notices
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
+
+/* Exit if accessed directly */
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /*
     This file is part of Gravity PDF.
@@ -30,11 +35,6 @@ namespace GFPDF\Helper;
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-
-/* Exit if accessed directly */
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
 
 
 /**
@@ -225,7 +225,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			),
 
 			/** Extension Settings */
-			'extensions'  => apply_filters( 'gfpdf_settings_extensions',
+			'extensions' => apply_filters( 'gfpdf_settings_extensions',
 				array()
 			),
 			'licenses' => apply_filters( 'gfpdf_settings_licenses',
@@ -257,9 +257,8 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			),
 
 			/* Form (PDF) Settings */
-			'form_settings'                   => apply_filters( 'gfpdf_form_settings',
+			'form_settings' => apply_filters( 'gfpdf_form_settings',
 				array(
-
 					'name' => array(
 						'id'       => 'name',
 						'name'     => __( 'Name', 'gravity-forms-pdf-extended' ),
@@ -514,16 +513,16 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					),
 
 					'restrict_owner' => array(
-							'id'      => 'restrict_owner',
-							'name'    => __( 'Restrict Owner', 'gravity-forms-pdf-extended' ),
-							'desc'    => __( 'When enabled, the original entry owner will NOT be able to view the PDFs.', 'gravity-forms-pdf-extended' ),
-							'type'    => 'radio',
-							'options' => array(
-									'Yes' => __( 'Yes', 'gravity-forms-pdf-extended' ),
-									'No'  => __( 'No', 'gravity-forms-pdf-extended' ),
-							),
-							'std'     => $this->get_option( 'default_restrict_owner', 'No' ),
-							'tooltip' => '<h6>' . __( 'Restrict Owner', 'gravity-forms-pdf-extended' ) . '</h6>' . __( 'Enable this setting if your PDFs should not be viewable by the end user.', 'gravity-forms-pdf-extended' ),
+						'id'      => 'restrict_owner',
+						'name'    => __( 'Restrict Owner', 'gravity-forms-pdf-extended' ),
+						'desc'    => __( 'When enabled, the original entry owner will NOT be able to view the PDFs.', 'gravity-forms-pdf-extended' ),
+						'type'    => 'radio',
+						'options' => array(
+							'Yes' => __( 'Yes', 'gravity-forms-pdf-extended' ),
+							'No'  => __( 'No', 'gravity-forms-pdf-extended' ),
+						),
+						'std'     => $this->get_option( 'default_restrict_owner', 'No' ),
+						'tooltip' => '<h6>' . __( 'Restrict Owner', 'gravity-forms-pdf-extended' ) . '</h6>' . __( 'Enable this setting if your PDFs should not be viewable by the end user.', 'gravity-forms-pdf-extended' ),
 					),
 				)
 			),

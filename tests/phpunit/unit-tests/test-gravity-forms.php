@@ -341,7 +341,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 				case 'name':
 					$this->assertEquals( $field['inputs'][0]['id'], $field['id'] . '.3' );
 					$this->assertEquals( $field['inputs'][1]['id'], $field['id'] . '.6' );
-					break;
+				break;
 
 				case 'address':
 					$this->assertEquals( $field['inputs'][0]['id'], $field['id'] . '.1' );
@@ -350,25 +350,25 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 					$this->assertEquals( $field['inputs'][3]['id'], $field['id'] . '.4' );
 					$this->assertEquals( $field['inputs'][4]['id'], $field['id'] . '.5' );
 					$this->assertEquals( $field['inputs'][5]['id'], $field['id'] . '.6' );
-					break;
+				break;
 
 				case 'email':
 					$this->assertEquals( 3, $field['id'] );
-					break;
+				break;
 
 				case 'phone':
 					$this->assertEquals( 4, $field['id'] );
 					$this->assertEquals( 'standard', $field['phoneFormat'] );
-					break;
+				break;
 
 				case 'select':
 				case 'multiselect':
 					$this->assertEquals( 3, sizeof( $field['choices'] ) );
-					break;
+				break;
 
 				case 'textarea':
 					$this->assertEquals( 7, $field['id'] );
-					break;
+				break;
 			}
 		}
 

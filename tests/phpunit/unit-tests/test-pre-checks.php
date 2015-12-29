@@ -146,7 +146,7 @@ class Test_Pre_Checks extends WP_UnitTestCase {
 	 * @dataProvider provider_memory
 	 */
 	public function test_get_ram( $memory, $bytes ) {
-		$expected_mb = ( $memory === '-1' ) ? - 1 : floor( $bytes / 1024 / 1024 );
+		$expected_mb = ( $memory === '-1' ) ? -1 : floor( $bytes / 1024 / 1024 );
 		$this->assertEquals( $expected_mb, $this->gravitypdf->get_ram( $memory ) );
 	}
 

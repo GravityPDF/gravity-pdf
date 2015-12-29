@@ -141,11 +141,11 @@ class Field_Signature extends Helper_Abstract_Fields {
 			 * @param integer The original image width divided by 3
 			 * @param integer The original image width
 			 */
-			$optimised_width   = apply_filters( 'gfpdfe_signature_width', $signature_details[0] / 3, $signature_details[0] ); /* backwards compat */
-			$optimised_width   = apply_filters( 'gfpdf_signature_width', $optimised_width, $signature_details[0] );
+			$optimised_width = apply_filters( 'gfpdfe_signature_width', $signature_details[0] / 3, $signature_details[0] ); /* backwards compat */
+			$optimised_width = apply_filters( 'gfpdf_signature_width', $optimised_width, $signature_details[0] );
 
-			$optimised_height  = $signature_details[1] / 3;
-			$html              = str_replace( 'width="' . $width . '"', 'width="' . $optimised_width . '"', $html );
+			$optimised_height = $signature_details[1] / 3;
+			$html             = str_replace( 'width="' . $width . '"', 'width="' . $optimised_width . '"', $html );
 
 			/* override the default width */
 			$width  = $optimised_width;

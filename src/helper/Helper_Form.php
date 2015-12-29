@@ -183,10 +183,10 @@ class Helper_Form extends Helper_Abstract_Form {
 	/**
 	 * Get multiple entries from multiple forms based on search criteria
 	 *
-	 * @param integer|array   $form_ids        The ID's of the form or an array of ideas.
-	 * @param array           $search_criteria An array containing the search criteria
-	 * @param array           $sorting         An array containing the sort criteria
-	 * @param array           $paging          Use to limit the number of entries returned
+	 * @param integer|array $form_ids        The ID's of the form or an array of ideas.
+	 * @param array         $search_criteria An array containing the search criteria
+	 * @param array         $sorting         An array containing the sort criteria
+	 * @param array         $paging          Use to limit the number of entries returned
 	 *
 	 * @return mixed
 	 *
@@ -223,8 +223,8 @@ class Helper_Form extends Helper_Abstract_Form {
 	/**
 	 * Check if the user has the capability passed
 	 *
-	 * @param string|array   $capability
-	 * @param integer        $user_id
+	 * @param string|array $capability
+	 * @param integer      $user_id
 	 *
 	 * @return boolean            True if successful, false if failed
 	 *

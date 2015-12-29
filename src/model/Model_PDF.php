@@ -684,7 +684,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				$url .= 'download/';
 			}
 
-			if( $print ) {
+			if ( $print ) {
 				$url .= '?print=1';
 			}
 		} else {
@@ -694,7 +694,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				$url .= '&action=download';
 			}
 
-			if( $print ) {
+			if ( $print ) {
 				$url .= '&print=1';
 			}
 		}
@@ -975,7 +975,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				if ( filemtime( $file ) < time() - $max_file_age ) {
 
 					if ( $directory ) {
-						$this->misc->rmdir( substr( $file, 0, - 1 ) );
+						$this->misc->rmdir( substr( $file, 0, -1 ) );
 					} else {
 						if ( ! unlink( $file ) ) {
 							$this->log->addError( 'Filesystem Delete Error', array( 'file' => $file ) );
@@ -1107,7 +1107,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 			/* Get font shortname */
 			$font_name  = basename( $font );
-			$short_name = $this->options->get_font_short_name( substr( $font_name, 0, - 4 ) );
+			$short_name = $this->options->get_font_short_name( substr( $font_name, 0, -4 ) );
 
 			/* Check if it exists already, otherwise add it */
 			if ( ! isset( $fonts[ $short_name ] ) ) {

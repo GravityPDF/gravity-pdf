@@ -87,7 +87,7 @@ class Field_Product extends Helper_Abstract_Fields {
 			case 'product':
 				$name  = ( isset( $value['name'] ) && isset( $value['price'] ) ) ? $value['name'] . " ({$value['price']})" : '';
 				$price = ( isset( $value['price_unformatted'] ) ) ? $value['price_unformatted'] : '';
-				break;
+			break;
 
 			case 'option':
 				if ( isset( $value['options'] ) && sizeof( $value['options'] ) > 1 ) {
@@ -99,18 +99,18 @@ class Field_Product extends Helper_Abstract_Fields {
 					$name  = ( isset( $value['options'][0]['option_name'] ) ) ? $value['options'][0]['option_name'] . " ({$value['options'][0]['price_formatted']})" : '';
 					$price = ( isset( $value['options'][0]['price'] ) ) ? $value['options'][0]['price'] : '';
 				}
-				break;
+			break;
 
 			case 'shipping':
 				$name  = ( isset( $value['shipping_name'] ) ) ? $value['shipping_name'] . " ({$value['shipping_formatted']})" : '';
 				$price = ( isset( $value['shipping'] ) ) ? $value['shipping'] : '';
-				break;
+			break;
 
 			case 'quantity':
 			default:
 				$name  = $value;
 				$price = $value;
-				break;
+			break;
 		}
 
 		/* Standadised Format */
@@ -151,29 +151,29 @@ class Field_Product extends Helper_Abstract_Fields {
 					$html .= $value['name'] . ' - ' . $value['price'];
 					$html .= $this->get_option_html( $value['options'] );
 				}
-				break;
+			break;
 
 			case 'option':
 				if ( isset( $value['options'] ) ) {
 					$html .= $this->get_option_html( $value['options'] );
 				}
-				break;
+			break;
 
 			case 'quantity':
 				$html .= $value;
-				break;
+			break;
 
 			case 'shipping':
 				if ( isset( $value['shipping_formatted'] ) ) {
 					$html .= $value['shipping_formatted'];
 				}
-				break;
+			break;
 
 			case 'total':
 				if ( isset( $value['total_formatted'] ) ) {
 					$html .= $value['total_formatted'];
 				}
-				break;
+			break;
 		}
 
 		return parent::html( $html );

@@ -128,7 +128,7 @@ class Field_Multiselect extends Helper_Abstract_Fields {
 				$sanitized_option = ( $value ) ? $sanitized_value : esc_html( $item['label'] );
 
 				$html .= '<li id="field-' . $this->field->id . '-option-' . $i . '">' . $sanitized_option . '</li>';
-				$i ++;
+				$i++;
 			}
 
 			$html .= '</ul>';

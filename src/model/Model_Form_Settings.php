@@ -998,7 +998,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		if ( $type != 'gfpdf_settings[default_template]' ) {
 
 			/* add our filter to override what template gets rendered (by default it is the current selected template in the config) */
-			add_filter( 'gfpdf_form_settings_custom_appearance', function () use ( &$settings ) {
+			add_filter( 'gfpdf_form_settings_custom_appearance', function() use ( &$settings ) {
 				/* check if the template has any configuration */
 				return $settings;
 			}, 100 );

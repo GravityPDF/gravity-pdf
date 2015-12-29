@@ -88,7 +88,7 @@ class Field_CreditCard extends Helper_Abstract_Fields {
 		$data = array_filter( $this->value() ); /* remove any empty fields from the array */
 
 		/* Sanitize data */
-		array_filter( $data, function ( &$item ) {
+		array_filter( $data, function( &$item ) {
 			$item = esc_html( $item );
 		} );
 

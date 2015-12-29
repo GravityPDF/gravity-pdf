@@ -200,7 +200,7 @@ class Helper_Misc {
 	public function fix_header_footer( $html ) {
 		try {
 			/* return the modified HTML */
-			return htmlqp( $html, 'img' )->removeAttr('width')->removeAttr('height')->addClass( 'header-footer-img' )->top( 'body' )->innerHTML();
+			return htmlqp( $html, 'img' )->removeAttr( 'width' )->removeAttr( 'height' )->addClass( 'header-footer-img' )->top( 'body' )->innerHTML();
 		} catch ( Exception $e ) {
 			/* if there was any issues we'll just return the $html */
 			return $html;
@@ -238,7 +238,7 @@ class Helper_Misc {
 	 * is subtracted from the decimal (0-255) value of the colour
 	 *
 	 * @param         $hexcolor Hex colour to be modified
-	 * @param integer $diff amount to change the color
+	 * @param integer $diff     amount to change the color
 	 *
 	 * @return string hex colour
 	 *
@@ -506,6 +506,7 @@ class Helper_Misc {
 		}
 
 		/* If we are here we couldn't locate the file */
+
 		return false;
 	}
 
@@ -563,6 +564,7 @@ class Helper_Misc {
 		}
 
 		/* If we are here we couldn't locate the file */
+
 		return false;
 	}
 
@@ -695,7 +697,7 @@ class Helper_Misc {
 			$ids = explode( ',', $leads );
 
 			/* ensure all passed ids are integers */
-			array_walk( $ids, function ( &$id ) {
+			array_walk( $ids, function( &$id ) {
 				$id = (int) $id;
 			} );
 
@@ -740,8 +742,8 @@ class Helper_Misc {
 	public function remove_extension_from_string( $string, $type = '.pdf' ) {
 		$type_length = mb_strlen( $type );
 
-		if ( mb_strtolower( mb_substr( $string, - $type_length ) ) === mb_strtolower( $type ) ) {
-			$string = mb_substr( $string, 0, - $type_length );
+		if ( mb_strtolower( mb_substr( $string, -$type_length ) ) === mb_strtolower( $type ) ) {
+			$string = mb_substr( $string, 0, -$type_length );
 		}
 
 		return $string;
@@ -810,7 +812,7 @@ class Helper_Misc {
 	public function evaluate_conditional_logic( $logic, $entry ) {
 
 		/* exit early if type not found */
-		if( ! isset( $logic['actionType'] ) ) {
+		if ( ! isset( $logic['actionType'] ) ) {
 			return true;
 		}
 
@@ -820,7 +822,7 @@ class Helper_Misc {
 		$evaluation = GFCommon::evaluate_conditional_logic( $logic, $form, $entry );
 
 		/* If the logic is to hide the item we'll invert the evaluation */
-		if( $logic['actionType'] !== 'show' ) {
+		if ( $logic['actionType'] !== 'show' ) {
 			return ! $evaluation;
 		}
 

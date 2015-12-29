@@ -249,8 +249,8 @@ class Test_PDF extends WP_UnitTestCase {
 
 		/* Test our endpoint is firing correctly */
 		$_GET['gf_pdf']   = 1;
-		$_GET['fid']      = - 1;
-		$_GET['lid']      = - 1;
+		$_GET['fid']      = -1;
+		$_GET['lid']      = -1;
 		$_GET['template'] = 'test';
 
 		try {
@@ -725,13 +725,13 @@ class Test_PDF extends WP_UnitTestCase {
 
 		/* Check our filters work correctly */
 
-		add_filter( 'gfpdf_pdf_filename', function () {
+		add_filter( 'gfpdf_pdf_filename', function() {
 			return 'filter';
 		} );
 
 		$this->assertEquals( 'filter', $this->model->get_pdf_name( $pdf, $entry ) );
 
-		add_filter( 'gfpdfe_pdf_filename', function () {
+		add_filter( 'gfpdfe_pdf_filename', function() {
 			return 'filter';
 		} );
 
@@ -773,7 +773,7 @@ class Test_PDF extends WP_UnitTestCase {
 	public function provider_get_pdf_url() {
 		return array(
 			array( '240arkj92kda', '50', false, false, 'http://example.org/pdf/240arkj92kda/50/' ),
-			array( 'kjoai2', '25', false, false,'http://example.org/pdf/kjoai2/25/' ),
+			array( 'kjoai2', '25', false, false, 'http://example.org/pdf/kjoai2/25/' ),
 			array( 'AIfawjoi24012', '9992', false, false, 'http://example.org/pdf/AIfawjoi24012/9992/' ),
 			array( 'JJiawfafwwaa', '5020', false, false, 'http://example.org/pdf/JJiawfafwwaa/5020/' ),
 			array( 'fa2a20koawas', '2', false, false, 'http://example.org/pdf/fa2a20koawas/2/' ),
@@ -1463,35 +1463,35 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertSame( 0, sizeof( array_diff( $settings, $this->model->apply_backwards_compatibility_filters( $settings, $entry ) ) ) );
 
 		/* Add filters to manipulate the data */
-		add_filter( 'gfpdfe_pdf_name', function ( $item ) {
+		add_filter( 'gfpdfe_pdf_name', function( $item ) {
 			return 'big-document.pdf';
 		} );
 
-		add_filter( 'gfpdfe_template', function ( $item ) {
+		add_filter( 'gfpdfe_template', function( $item ) {
 			return 'default-template.php';
 		} );
 
-		add_filter( 'gfpdf_orientation', function ( $item ) {
+		add_filter( 'gfpdf_orientation', function( $item ) {
 			return 'landscape';
 		} );
 
-		add_filter( 'gfpdf_security', function ( $item ) {
+		add_filter( 'gfpdf_security', function( $item ) {
 			return false;
 		} );
 
-		add_filter( 'gfpdf_privilages', function ( $item ) {
+		add_filter( 'gfpdf_privilages', function( $item ) {
 			return array( 'print', 'print-highres' );
 		} );
 
-		add_filter( 'gfpdf_password', function ( $item ) {
+		add_filter( 'gfpdf_password', function( $item ) {
 			return 'pass';
 		} );
 
-		add_filter( 'gfpdf_master_password', function ( $item ) {
+		add_filter( 'gfpdf_master_password', function( $item ) {
 			return '';
 		} );
 
-		add_filter( 'gfpdf_rtl', function ( $item ) {
+		add_filter( 'gfpdf_rtl', function( $item ) {
 			return true;
 		} );
 

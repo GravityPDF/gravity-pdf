@@ -375,7 +375,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	 * @param string $hexcolor The colour to test
 	 *
 	 * @dataProvider provider_get_contrast
-	 * @since 4.0
+	 * @since        4.0
 	 */
 	public function test_get_contrast( $expected, $hexcolor ) {
 		$this->assertEquals( $expected, $this->misc->get_contrast( $hexcolor ) );
@@ -395,23 +395,23 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 			array( '#FFF', '#222' ),
 			array( '#FFF', '#068a2b' ),
 			array( '#FFF', '#a70404' ),
-			array( '#000', '#fff'),
-			array( '#000', '#FFFFFF'),
-			array( '#000', '#999'),
-			array( '#000', '#EEE'),
-			array( '#000', '#CCC'),
+			array( '#000', '#fff' ),
+			array( '#000', '#FFFFFF' ),
+			array( '#000', '#999' ),
+			array( '#000', '#EEE' ),
+			array( '#000', '#CCC' ),
 		);
 	}
 
 	/**
 	 * Check our contrast checker returns the correct contrasting colours
 	 *
-	 * @param string $expected The results we expect
-	 * @param string $hexcolor The colour to test
-	 * @param integer $diff    Whether to go lighter or darker
+	 * @param string  $expected The results we expect
+	 * @param string  $hexcolor The colour to test
+	 * @param integer $diff     Whether to go lighter or darker
 	 *
 	 * @dataProvider provider_change_brightness
-	 * @since 4.0
+	 * @since        4.0
 	 */
 	public function test_change_brightness( $expected, $hexcolor, $diff ) {
 		$this->assertEquals( $expected, $this->misc->change_brightness( $hexcolor, $diff ) );
@@ -426,14 +426,14 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	 */
 	public function provider_change_brightness() {
 		return array(
-				array( '#0a0a0a', '#000000', 10 ),
-				array( '#0a0a0a', '#000', 10 ),
-				array( '#181818', '#222', -10 ),
-				array( '#2c2c2c', '#222', 10 ),
-				array( '#fefefe', '#CCC', 50 ),
-				array( '#9a9a9a', '#CCC', -50 ),
-				array( '#ffffff', '#FFFFFF', 25),
-				array( '#e6e6e6', '#FFF', -25),
+			array( '#0a0a0a', '#000000', 10 ),
+			array( '#0a0a0a', '#000', 10 ),
+			array( '#181818', '#222', -10 ),
+			array( '#2c2c2c', '#222', 10 ),
+			array( '#fefefe', '#CCC', 50 ),
+			array( '#9a9a9a', '#CCC', -50 ),
+			array( '#ffffff', '#FFFFFF', 25 ),
+			array( '#e6e6e6', '#FFF', -25 ),
 		);
 	}
 

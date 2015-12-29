@@ -232,7 +232,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		$pdf['template'] = 'zadani';
 
 		/* Add filters to force the PDF to throw and error */
-		add_filter( 'mpdf_output_destination', function () {
+		add_filter( 'mpdf_output_destination', function() {
 			return 'O';
 		} );
 

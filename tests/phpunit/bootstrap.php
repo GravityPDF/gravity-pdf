@@ -105,9 +105,9 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		);
 
 		foreach ( $forms as $json ) {
-			$form                                  = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/unit-tests/json/' . $json ) ), true );
-			$form_id                               = GFAPI::add_form( $form );
-			$this->form[ substr( $json, 0, - 5 ) ] = GFAPI::get_form( $form_id );
+			$form                                 = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/unit-tests/json/' . $json ) ), true );
+			$form_id                              = GFAPI::add_form( $form );
+			$this->form[ substr( $json, 0, -5 ) ] = GFAPI::get_form( $form_id );
 		}
 
 		/* Import our entries */

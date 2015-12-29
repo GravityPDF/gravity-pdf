@@ -259,7 +259,7 @@ class Helper_Field_Container {
 	private function open_container() {
 
 		$class = $this->is_row_odd_or_even();
-		echo str_replace( 'row-separator', 'row-separator '. $class, $this->open_tag );
+		echo str_replace( 'row-separator', 'row-separator ' . $class, $this->open_tag );
 
 		$this->increment_row_counter();
 	}
@@ -343,7 +343,7 @@ class Helper_Field_Container {
 	 * @since 4.0
 	 */
 	private function is_row_odd_or_even() {
-		return ($this->counter % 2) ? 'even' : 'odd';
+		return ( $this->counter % 2 ) ? 'even' : 'odd';
 	}
 
 	/**

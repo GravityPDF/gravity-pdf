@@ -50,8 +50,8 @@ abstract class GFPDF_Depreciated_Abstract {
 	 *
 	 * @since  4.0
 	 *
-	 * @param string $name The function name to be called
-	 * @param array $arguments An enumerated array containing the parameters passed to the $name'ed method
+	 * @param string $name      The function name to be called
+	 * @param array  $arguments An enumerated array containing the parameters passed to the $name'ed method
 	 */
 	public function __call( $name, $arguments ) {
 		trigger_error( sprintf( __( '"%s" has been depreciated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ), E_USER_DEPRECATED );
@@ -62,8 +62,8 @@ abstract class GFPDF_Depreciated_Abstract {
 	 *
 	 * @since  4.0
 	 *
-	 * @param string $name The function name to be called
-	 * @param array $arguments An enumerated array containing the parameters passed to the $name'ed method
+	 * @param string $name      The function name to be called
+	 * @param array  $arguments An enumerated array containing the parameters passed to the $name'ed method
 	 */
 	public static function __callStatic( $name, $arguments ) {
 		trigger_error( sprintf( __( '"%s" has been depreciated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ), E_USER_DEPRECATED );
@@ -153,6 +153,7 @@ class PDFRender extends GFPDF_Depreciated_Abstract {
 		}
 
 		/* return the path to the PDF */
+
 		return $path . $filename;
 	}
 
@@ -217,6 +218,7 @@ class PDF_Common extends GFPDF_Depreciated_Abstract {
 	 */
 	public static function get_upload_dir() {
 		global $gfpdf;
+
 		return $gfpdf->misc->get_upload_details();
 	}
 
@@ -233,6 +235,7 @@ class PDF_Common extends GFPDF_Depreciated_Abstract {
 	 */
 	public static function do_mergetags( $string, $form_id, $lead_id ) {
 		global $gfpdf;
+
 		return $gfpdf->misc->do_mergetags( $string, $gfpdf->form->get_form( $form_id ), $gfpdf->form->get_entry( $lead_id ) );
 	}
 
@@ -313,6 +316,7 @@ class PDF_Common extends GFPDF_Depreciated_Abstract {
 	 */
 	public static function remove_invalid_characters( $name ) {
 		global $gfpdf;
+
 		return $gfpdf->meta->strip_invalid_characters( $name );
 	}
 }
@@ -391,6 +395,7 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 
 		$model = new Model_PDF( $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
 		$view  = new View_PDF( array(), $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
+
 		return $view->process_html_structure( $lead, $model, $config );
 	}
 
@@ -405,7 +410,8 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 	 * @since 3.0
 	 */
 	public static function lead_detail_grid_array( $form, $lead ) {
-		$model = GPDFAPI::get_pdf_class('model');
+		$model = GPDFAPI::get_pdf_class( 'model' );
+
 		return $model->get_form_data( $lead );
 	}
 
@@ -426,8 +432,8 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 	/**
 	 * Public method for outputting likert (survey addon field)
 	 *
-	 * @param array $form     The Gravity Form array
-	 * @param array $lead     The Gravity Form entry
+	 * @param array   $form     The Gravity Form array
+	 * @param array   $lead     The Gravity Form entry
 	 * @param integer $field_id The field ID to output
 	 *
 	 * @return string

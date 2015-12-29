@@ -2,17 +2,17 @@
 
 namespace GFPDF\Helper;
 
-	/**
-	 * A Sudo-Singleton Helper Class designed to hold our MVC classes
-	 * The main benefit is it more easily allows users to remove filters/actions Gravity PDF sets
-	 *
-	 * This isn't considered an actual `Singleton` pattern as we're not modifying our classes in any way (no static methods / disabling of the __construct), but it has the same objectives
-	 *
-	 * @package     Gravity PDF
-	 * @copyright   Copyright (c) 2015, Blue Liquid Designs
-	 * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
-	 * @since       4.0
-	 */
+/**
+ * A Sudo-Singleton Helper Class designed to hold our MVC classes
+ * The main benefit is it more easily allows users to remove filters/actions Gravity PDF sets
+ *
+ * This isn't considered an actual `Singleton` pattern as we're not modifying our classes in any way (no static methods / disabling of the __construct), but it has the same objectives
+ *
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2015, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       4.0
+ */
 
 /* Exit if accessed directly */
 if ( ! defined( 'ABSPATH' ) ) {

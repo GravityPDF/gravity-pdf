@@ -802,19 +802,19 @@ class Model_Settings extends Helper_Abstract_Model {
 		@touch( $tmp_dir . $tmp_test_file );
 
 		/* verify it exists */
-		if( is_file( $tmp_dir . $tmp_test_file ) ) {
+		if ( is_file( $tmp_dir . $tmp_test_file ) ) {
 
 			/* Run our test */
 			$site_url = $this->misc->convert_path_to_url( $tmp_dir );
 
-			if( $site_url !== false ) {
+			if ( $site_url !== false ) {
 
 				$response = wp_remote_get( $site_url . $tmp_test_file );
 
-				if( ! is_wp_error( $response ) ) {
+				if ( ! is_wp_error( $response ) ) {
 
 					/* Check if the web server responded with a OK status code and fail our test */
-					if( isset( $response['response']['code'] ) && $response['response']['code'] === 200 ) {
+					if ( isset( $response['response']['code'] ) && $response['response']['code'] === 200 ) {
 						$return = false;
 					}
 				}

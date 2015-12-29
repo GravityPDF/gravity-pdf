@@ -230,27 +230,27 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					'gfpdf_settings_' . $tab,
 					'gfpdf_settings_' . $tab,
 					array(
-						'id'                 => isset( $option['id'] )         	    			? $option['id']      				: null,
-						'desc'               => ! empty( $option['desc'] )      				? $option['desc']    				: '',
-						'desc2'              => ! empty( $option['desc2'] )     				? $option['desc2']   				: '',
-						'type'               => isset( $option['type'] )        				? $option['type']    				: null,
-						'name'               => isset( $option['name'] )        				? $option['name']    				: null,
-						'size'               => isset( $option['size'] )        				? $option['size']    				: null,
-						'options'            => isset( $option['options'] )     				? $option['options'] 				: '',
-						'std'                => isset( $option['std'] )         				? $option['std']     				: '',
-						'min'                => isset( $option['min'] )         				? $option['min']     				: null,
-						'max'                => isset( $option['max'] )         				? $option['max']     				: null,
-						'step'               => isset( $option['step'] )        				? $option['step']    				: null,
-						'chosen'             => isset( $option['chosen'] )      				? $option['chosen']  				: null,
-						'class'              => isset( $option['class'] )       				? $option['class']  				: null,
-						'inputClass'         => isset( $option['inputClass'] )  				? $option['inputClass']  			: null,
-						'placeholder'        => isset( $option['placeholder'] ) 				? $option['placeholder'] 			: null,
-						'tooltip'            => isset( $option['tooltip'] )     				? $option['tooltip'] 				: null,
-						'multiple'           => isset( $option['multiple'] )    				? $option['multiple'] 				: null,
-						'required'           => isset( $option['required'] )    				? $option['required'] 		 		: null,
-						'uploaderTitle'      => isset( $option['uploaderTitle'] )    			? $option['uploaderTitle'] 			: null,
-						'uploaderButtonText' => isset( $option['uploaderButtonText'] )    		? $option['uploaderButtonText'] 	: null,
-						'toggle'			 => isset( $option['toggle'] )						? $option['toggle'] 				: null,
+						'id'                 => isset( $option['id'] ) ? $option['id'] : null,
+						'desc'               => ! empty( $option['desc'] ) ? $option['desc'] : '',
+						'desc2'              => ! empty( $option['desc2'] ) ? $option['desc2'] : '',
+						'type'               => isset( $option['type'] ) ? $option['type'] : null,
+						'name'               => isset( $option['name'] ) ? $option['name'] : null,
+						'size'               => isset( $option['size'] ) ? $option['size'] : null,
+						'options'            => isset( $option['options'] ) ? $option['options'] : '',
+						'std'                => isset( $option['std'] ) ? $option['std'] : '',
+						'min'                => isset( $option['min'] ) ? $option['min'] : null,
+						'max'                => isset( $option['max'] ) ? $option['max'] : null,
+						'step'               => isset( $option['step'] ) ? $option['step'] : null,
+						'chosen'             => isset( $option['chosen'] ) ? $option['chosen'] : null,
+						'class'              => isset( $option['class'] ) ? $option['class'] : null,
+						'inputClass'         => isset( $option['inputClass'] ) ? $option['inputClass'] : null,
+						'placeholder'        => isset( $option['placeholder'] ) ? $option['placeholder'] : null,
+						'tooltip'            => isset( $option['tooltip'] ) ? $option['tooltip'] : null,
+						'multiple'           => isset( $option['multiple'] ) ? $option['multiple'] : null,
+						'required'           => isset( $option['required'] ) ? $option['required'] : null,
+						'uploaderTitle'      => isset( $option['uploaderTitle'] ) ? $option['uploaderTitle'] : null,
+						'uploaderButtonText' => isset( $option['uploaderButtonText'] ) ? $option['uploaderButtonText'] : null,
+						'toggle'             => isset( $option['toggle'] ) ? $option['toggle'] : null,
 					)
 				);
 			}
@@ -1247,13 +1247,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 						if ( ! isset( $input[ $key ] ) ) {
 							$input[ $key ] = array();
 						}
-						break;
+					break;
 
 					default:
 						if ( ! isset( $input[ $key ] ) ) {
 							$input[ $key ] = '';
 						}
-						break;
+					break;
 				}
 			}
 		}
@@ -1363,12 +1363,12 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			case 'rich_editor':
 			case 'textarea':
 				return wp_kses( $value, $this->misc->get_allowed_html_tags() );
-				break;
+			break;
 
 			/* treat as plain text */
 			default:
 				if ( is_array( $value ) ) {
-					array_walk_recursive( $value, function ( &$item ) {
+					array_walk_recursive( $value, function( &$item ) {
 						$item = wp_strip_all_tags( $item );
 					} );
 
@@ -1377,7 +1377,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					return wp_strip_all_tags( $value );
 				}
 
-				break;
+			break;
 		}
 	}
 
@@ -1405,7 +1405,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 						/* throw error */
 						add_settings_error( 'gfpdf-notices', $key, __( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
 					}
-					break;
+				break;
 
 				case 'paper_size':
 					if ( isset( $input['default_pdf_size'] ) && $input['default_pdf_size'] === 'CUSTOM' ) {
@@ -1414,14 +1414,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 							add_settings_error( 'gfpdf-notices', $key, __( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
 						}
 					}
-					break;
+				break;
 
 				default:
 					if ( strlen( trim( $value ) ) === 0 ) {
 						/* throw error */
 						add_settings_error( 'gfpdf-notices', $key, __( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
 					}
-					break;
+				break;
 			}
 		}
 
@@ -1472,7 +1472,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					return checked( 1, 1, false );
 				}
 
-				break;
+			break;
 
 			case 'multicheck':
 
@@ -1483,7 +1483,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					return $args['multi-option'];
 				}
 
-				break;
+			break;
 
 			case 'radio':
 
@@ -1497,7 +1497,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					return $args['std'];
 				}
 
-				break;
+			break;
 
 			case 'password':
 
@@ -1508,7 +1508,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					return trim( $pdf_form_settings[ $args['id'] ] );
 				}
 
-				break;
+			break;
 
 			case 'select':
 			case 'paper_size':
@@ -1521,7 +1521,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				} elseif ( isset( $args['std'] ) ) {
 					return $args['std'];
 				}
-				break;
+			break;
 
 			/* treat as a text or hidden callback */
 			default:
@@ -1534,7 +1534,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				} elseif ( isset( $args['std'] ) ) {
 					return $args['std'];
 				}
-				break;
+			break;
 		}
 
 		/* if we made it here return empty string */

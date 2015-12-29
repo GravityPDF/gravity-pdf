@@ -69,7 +69,7 @@ class blank_slate implements Helper_Interface_Config {
 		return array(
 
 			/* Enable core fields */
-			'core'   => array(
+			'core' => array(
 				'show_form_title'      => true,
 				'show_page_names'      => true,
 				'show_html'            => true,
@@ -83,7 +83,7 @@ class blank_slate implements Helper_Interface_Config {
 				'background_color'     => true,
 				'background_image'     => true,
 			),
-			
+
 		);
 	}
 }

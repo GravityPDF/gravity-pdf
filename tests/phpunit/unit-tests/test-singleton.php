@@ -97,7 +97,7 @@ class Test_Singleton_Helper extends WP_UnitTestCase {
 	/**
 	 * Ensure Gravity PDF correctly registers all our MVC classes
 	 *
-	 * @since 4.0
+	 * @since        4.0
 	 * @dataProvider provider_registered_classes
 	 */
 	public function test_registered_classes( $expected, $class ) {

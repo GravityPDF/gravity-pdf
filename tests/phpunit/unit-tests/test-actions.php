@@ -117,7 +117,7 @@ class Test_Actions extends WP_UnitTestCase {
 
 		foreach ( $routes as $route ) {
 			if ( in_array( $route['action'], $expected ) ) {
-				$counter ++;
+				$counter++;
 			}
 		}
 
@@ -135,19 +135,19 @@ class Test_Actions extends WP_UnitTestCase {
 		set_current_screen( 'edit.php' );
 
 		/* Set up a custom route */
-		add_filter( 'gfpdf_one_time_action_routes', function ( $routes ) {
+		add_filter( 'gfpdf_one_time_action_routes', function( $routes ) {
 
 			return array(
 				array(
 					'action'      => 'test_action',
 					'action_text' => 'My Test Action',
-					'condition'   => function () {
+					'condition'   => function() {
 						return true;
 					},
-					'process'     => function () {
+					'process'     => function() {
 						echo 'processing';
 					},
-					'view'        => function () {
+					'view'        => function() {
 						return 'my test view';
 					},
 					'capability'  => 'gravityforms_view_settings',
@@ -196,19 +196,19 @@ class Test_Actions extends WP_UnitTestCase {
 		global $gfpdf;
 
 		/* Set up a custom route */
-		add_filter( 'gfpdf_one_time_action_routes', function ( $routes ) {
+		add_filter( 'gfpdf_one_time_action_routes', function( $routes ) {
 
 			return array(
 				array(
 					'action'      => 'test_action',
 					'action_text' => 'My Test Action',
-					'condition'   => function () {
+					'condition'   => function() {
 						return false;
 					},
-					'process'     => function () {
+					'process'     => function() {
 						echo 'processing';
 					},
-					'view'        => function () {
+					'view'        => function() {
 						return 'my test view';
 					},
 					'capability'  => 'gravityforms_view_settings',
@@ -244,19 +244,19 @@ class Test_Actions extends WP_UnitTestCase {
 	public function test_route() {
 
 		/* Set up a custom route */
-		add_filter( 'gfpdf_one_time_action_routes', function ( $routes ) {
+		add_filter( 'gfpdf_one_time_action_routes', function( $routes ) {
 
 			return array(
 				array(
 					'action'      => 'test_action',
 					'action_text' => 'My Test Action',
-					'condition'   => function () {
+					'condition'   => function() {
 						return true;
 					},
-					'process'     => function () {
+					'process'     => function() {
 						echo 'processing';
 					},
-					'view'        => function () {
+					'view'        => function() {
 						return 'my test view';
 					},
 					'capability'  => 'gravityforms_view_settings',

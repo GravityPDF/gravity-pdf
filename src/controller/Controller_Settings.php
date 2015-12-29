@@ -245,15 +245,15 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		switch ( $page ) {
 			case 'general':
 				$this->view->general();
-				break;
+			break;
 
 			case 'tools':
 				$this->view->tools();
-				break;
+			break;
 
 			case 'help':
 				$this->view->help();
-				break;
+			break;
 		}
 	}
 

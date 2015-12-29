@@ -352,7 +352,7 @@ class Test_Settings extends WP_UnitTestCase {
 		);
 
 		/* Create our tmp font files */
-		array_walk( $font, function ( $value ) use ( $gfpdf ) {
+		array_walk( $font, function( $value ) use ( $gfpdf ) {
 			touch( $gfpdf->data->template_font_location . $value );
 		} );
 
@@ -440,7 +440,7 @@ class Test_Settings extends WP_UnitTestCase {
 		);
 
 		/* Create our tmp font files */
-		array_walk( $font, function ( $value ) use ( $uploads ) {
+		array_walk( $font, function( $value ) use ( $uploads ) {
 			touch( $uploads['path'] . '/' . basename( $value ) );
 		} );
 
@@ -490,7 +490,7 @@ class Test_Settings extends WP_UnitTestCase {
 	 */
 	public function test_latest_forum_endpoint() {
 		/* set a correct response */
-		add_filter( 'pre_http_request', function ( $return, $r, $url ) {
+		add_filter( 'pre_http_request', function( $return, $r, $url ) {
 			$r['body'] = file_get_contents( dirname( __FILE__ ) . '/json/latest-posts.json' );
 
 			return $r;
@@ -522,7 +522,7 @@ class Test_Settings extends WP_UnitTestCase {
 	 */
 	public function test_latest_forum_endpoint_error() {
 		/* check for appropriate errors */
-		add_filter( 'pre_http_request', function ( $return, $r, $url ) {
+		add_filter( 'pre_http_request', function( $return, $r, $url ) {
 			return new WP_Error( 'problem', 'Cannot load endpoint' );
 		}, 10, 3 );
 

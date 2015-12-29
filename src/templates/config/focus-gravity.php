@@ -103,16 +103,16 @@ class focus_gravity implements Helper_Interface_Config {
 				),
 
 				'focusgravity_label_format' => array(
-					'id' => 'focusgravity_label_format',
-					'name' => __( 'Format', 'gravity-forms-pdf-extended' ),
-					'type' => 'radio',
-					'desc' => __( 'Combine the field label and value or have a distinct label/value.', 'gravity-forms-pdf-extended' ),
+					'id'      => 'focusgravity_label_format',
+					'name'    => __( 'Format', 'gravity-forms-pdf-extended' ),
+					'type'    => 'radio',
+					'desc'    => __( 'Combine the field label and value or have a distinct label/value.', 'gravity-forms-pdf-extended' ),
 					'options' => array(
 						'combined_label' => __( 'Combined Label', 'gravity-forms-pdf-extended' ),
-						'split_label' => __( 'Split Label', 'gravity-forms-pdf-extended' ),
+						'split_label'    => __( 'Split Label', 'gravity-forms-pdf-extended' ),
 					),
-					'std' => 'combined_label',
-				)
+					'std'     => 'combined_label',
+				),
 			),
 		);
 	}

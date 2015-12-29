@@ -88,7 +88,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_Actions $model   Our Actions Model the controller will manage
 	 * @param Helper_Abstract_View|\GFPDF\View\View_Actions    $view    Our Actions View the controller will manage
 	 * @param \GFPDF\Helper\Helper_Abstract_Form               $form    Our abstracted Gravity Forms helper functions
-	 * @param \Monolog\Logger|LoggerInterface                         $log     Our logger class
+	 * @param \Monolog\Logger|LoggerInterface                  $log     Our logger class
 	 * @param \GFPDF\Helper\Helper_Notices                     $notices Our notice class used to queue admin messages and errors
 	 *
 	 * @since 4.0

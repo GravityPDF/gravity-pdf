@@ -54,8 +54,8 @@ class Field_Phone extends Helper_Abstract_Fields {
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
 	 *
-	 * @param object               $field The GF_Field_* Object
-	 * @param array                $entry The Gravity Forms Entry
+	 * @param object                             $field The GF_Field_* Object
+	 * @param array                              $entry The Gravity Forms Entry
 	 *
 	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
 	 * @param \GFPDF\Helper\Helper_Misc          $misc

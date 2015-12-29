@@ -473,7 +473,7 @@ class Helper_Migration {
 					if ( isset( $name[ $node['name'] ] ) ) {
 						$original_name = $node['name'];
 						$node['name'] .= ' #' . $name[ $node['name'] ];
-						$name[ $original_name ] ++;
+						$name[ $original_name ]++;
 					} else {
 						$name[ $node['name'] ] = 1;
 					}

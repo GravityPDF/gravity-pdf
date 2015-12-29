@@ -237,35 +237,35 @@ class Test_Options_API extends WP_UnitTestCase {
 		$this->assertTrue( isset( $items['form_settings_advanced'] ) );
 
 		/* Check filters work correctly */
-		add_filter( 'gfpdf_settings_general', function ( $array ) {
+		add_filter( 'gfpdf_settings_general', function( $array ) {
 			return 'General Settings';
 		} );
 
-		add_filter( 'gfpdf_settings_general_security', function ( $array ) {
+		add_filter( 'gfpdf_settings_general_security', function( $array ) {
 			return 'General Security Settings';
 		} );
 
-		add_filter( 'gfpdf_settings_extensions', function ( $array ) {
+		add_filter( 'gfpdf_settings_extensions', function( $array ) {
 			return 'Extension Settings';
 		} );
 
-		add_filter( 'gfpdf_settings_licenses', function ( $array ) {
+		add_filter( 'gfpdf_settings_licenses', function( $array ) {
 			return 'License Settings';
 		} );
 
-		add_filter( 'gfpdf_settings_tools', function ( $array ) {
+		add_filter( 'gfpdf_settings_tools', function( $array ) {
 			return 'Tools Settings';
 		} );
 
-		add_filter( 'gfpdf_form_settings', function ( $array ) {
+		add_filter( 'gfpdf_form_settings', function( $array ) {
 			return 'PDF Form Settings';
 		} );
 
-		add_filter( 'gfpdf_form_settings_appearance', function ( $array ) {
+		add_filter( 'gfpdf_form_settings_appearance', function( $array ) {
 			return 'PDF Form Settings Appearance';
 		} );
 
-		add_filter( 'gfpdf_form_settings_advanced', function ( $array ) {
+		add_filter( 'gfpdf_form_settings_advanced', function( $array ) {
 			return 'PDF Form Settings Advanced';
 		} );
 
@@ -449,7 +449,7 @@ class Test_Options_API extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_get_pdf_filter() {
-		add_filter( 'gfpdf_pdf_config', function () {
+		add_filter( 'gfpdf_pdf_config', function() {
 			return 'main filter fired';
 		} );
 
@@ -460,7 +460,7 @@ class Test_Options_API extends WP_UnitTestCase {
 		remove_all_filters( 'gfpdf_pdf_config' );
 
 		/* run individual form ID filter */
-		add_filter( 'gfpdf_pdf_config_' . $this->form_id, function () {
+		add_filter( 'gfpdf_pdf_config_' . $this->form_id, function() {
 			return 'ID filter fired';
 		} );
 
@@ -475,7 +475,7 @@ class Test_Options_API extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_add_pdf_filter() {
-		add_filter( 'gfpdf_form_add_pdf', function () {
+		add_filter( 'gfpdf_form_add_pdf', function() {
 			return array( 'name' => 'Add Filter Fired' );
 		} );
 
@@ -489,7 +489,7 @@ class Test_Options_API extends WP_UnitTestCase {
 		/* cleanup filters */
 		remove_all_filters( 'gfpdf_pdf_config' );
 
-		add_filter( 'gfpdf_form_add_pdf_' . $this->form_id, function () {
+		add_filter( 'gfpdf_form_add_pdf_' . $this->form_id, function() {
 			return array( 'name' => 'ID Add Filter Fired' );
 		} );
 
@@ -508,7 +508,7 @@ class Test_Options_API extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_update_pdf_filter() {
-		add_filter( 'gfpdf_form_update_pdf', function () {
+		add_filter( 'gfpdf_form_update_pdf', function() {
 			return array( 'name' => 'Update Filter Fired' );
 		} );
 
@@ -522,7 +522,7 @@ class Test_Options_API extends WP_UnitTestCase {
 		/* cleanup filters */
 		remove_all_filters( 'gfpdf_pdf_config' );
 
-		add_filter( 'gfpdf_form_update_pdf_' . $this->form_id, function () {
+		add_filter( 'gfpdf_form_update_pdf_' . $this->form_id, function() {
 			return array( 'name' => 'ID Update Filter Fired' );
 		} );
 
@@ -554,7 +554,7 @@ class Test_Options_API extends WP_UnitTestCase {
 		$this->assertTrue( $this->options->get_option( 'non-existant', true ) );
 
 		/* check filters */
-		add_filter( 'gfpdf_get_option', function ( $value ) {
+		add_filter( 'gfpdf_get_option', function( $value ) {
 			return 'New Value';
 		} );
 
@@ -563,7 +563,7 @@ class Test_Options_API extends WP_UnitTestCase {
 		/* clean up */
 		remove_all_filters( 'gfpdf_get_option' );
 
-		add_filter( 'gfpdf_get_option_default_rtl', function ( $value ) {
+		add_filter( 'gfpdf_get_option_default_rtl', function( $value ) {
 			return 'RTL';
 		} );
 
@@ -588,7 +588,7 @@ class Test_Options_API extends WP_UnitTestCase {
 		$this->assertEquals( 'new pdf size', $this->options->get_option( 'default_pdf_size' ) );
 
 		/* Check filters */
-		add_filter( 'gfpdf_update_option', function ( $value ) {
+		add_filter( 'gfpdf_update_option', function( $value ) {
 			return 'filtered option';
 		} );
 
@@ -597,7 +597,7 @@ class Test_Options_API extends WP_UnitTestCase {
 
 		remove_all_filters( 'gfpdf_update_option' );
 
-		add_filter( 'gfpdf_update_option_default_restrict_owner', function ( $value ) {
+		add_filter( 'gfpdf_update_option_default_restrict_owner', function( $value ) {
 			return 'filtered admin option';
 		} );
 
@@ -933,10 +933,10 @@ class Test_Options_API extends WP_UnitTestCase {
 	public function dataprovider_sanitize_paper_size() {
 		return array(
 			array( array( 200, 100, 'mm' ), array( 200, 100, 'mm' ) ),
-			array( array( 200, 100, 'mm' ), array( - 200, - 100, 'mm' ) ),
+			array( array( 200, 100, 'mm' ), array( -200, -100, 'mm' ) ),
 			array( array( 72, 210, 'inches' ), array( 72, 210, 'inches' ) ),
-			array( array( 72, 210, 'inches' ), array( - 72, - 210, 'inches' ) ),
-			array( array( - 20, - 50 ), array( - 20, - 50 ) ),
+			array( array( 72, 210, 'inches' ), array( -72, -210, 'inches' ) ),
+			array( array( -20, -50 ), array( -20, -50 ) ),
 			array( '50', '50' ),
 		);
 	}
