@@ -47,4 +47,4 @@ The plugin uses PHPUnit as part of the development process. Installing the testi
 3. Run `bash tests/bin/install.sh gravitypdf_test root root localhost` where `root root` is substituted for your mysql username and password (VVV users can run the command as is).
 4. Upon success you can run `vendor/bin/phpunit`, `vendor/bin/phpunit --group ajax` and `vendor/bin/phpunit --group slow-pdf-processes`.
 
-__If you want to generate a code coverage report__ you can run the following `vendor/bin/phpunit --coverage-html "./tmp/coverage"` and a report will be generated in the `/tmp/coverage/` subdirectory of the Gravity PDF plugin.
+If you want to generate a code coverage report you can run the following `vendor/bin/phpunit --coverage-html "./tmp/coverage"` and a report will be generated in the `/tmp/coverage/` subdirectory of the Gravity PDF plugin.
