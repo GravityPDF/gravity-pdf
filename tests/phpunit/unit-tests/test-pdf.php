@@ -1531,6 +1531,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertNotFalse( strpos( $results['settings']['header'], '<img src=' ) );
 		$this->assertNotFalse( strpos( $results['settings']['header'], 'class="my-class header-footer-img"' ) );
 		$this->assertNotFalse( strpos( $results['settings']['first_header'], 'class="header-footer-img"' ) );
+		$this->assertFalse( strpos( $results['settings']['first_header'], 'width="150"' ) );
 		$this->assertNotFalse( strpos( $results['settings']['first_header'], '<img src=' ) );
 
 		$this->assertFalse( strpos( $results['settings']['footer'], 'class="my-class header-footer-img"' ) );

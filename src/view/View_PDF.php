@@ -542,7 +542,7 @@ class View_PDF extends Helper_Abstract_View
             return $mpdf;
         }
 
-        $html = $this->load_core_template_styles($settings);
+        $html = $this->load_core_template_styles( $settings );
         $mpdf->WriteHTML($html);
 
         return $mpdf;
@@ -559,6 +559,13 @@ class View_PDF extends Helper_Abstract_View
      */
     public function load_core_template_styles($settings)
     {
+        $controller = $this->getController();
+        $model      = $controller->model;
+
+        /* Run our settings through the preprocessor which requires an array with a 'settings' key */
+        $args   = $model->preprocess_template_arguments( array( 'settings' => $settings ) );
+        $settings = $args['settings'];
+
         return $this->load('core_template_styles', array('settings' => $settings), false);
     }
 
