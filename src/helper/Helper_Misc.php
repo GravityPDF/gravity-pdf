@@ -200,7 +200,7 @@ class Helper_Misc {
 	public function fix_header_footer( $html ) {
 		try {
 			/* return the modified HTML */
-			return htmlqp( $html, 'img' )->addClass( 'header-footer-img' )->top( 'body' )->innerHTML();
+			return htmlqp( $html, 'img' )->removeAttr('width')->removeAttr('height')->addClass( 'header-footer-img' )->top( 'body' )->innerHTML();
 		} catch ( Exception $e ) {
 			/* if there was any issues we'll just return the $html */
 			return $html;
