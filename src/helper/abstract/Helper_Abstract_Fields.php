@@ -275,7 +275,8 @@ abstract class Helper_Abstract_Fields {
 
 		$type = ( ! empty( $this->field->inputType ) ) ? $this->field->inputType : $this->field->type;
 
-		$html = '<div id="field-' . $this->field->id . '" class="gfpdf-' . $type . ' gfpdf-field ' . $this->field->cssClass . '">';
+		$html = '<div id="field-' . $this->field->id . '" class="gfpdf-' . $type . ' gfpdf-field ' . $this->field->cssClass . '">
+					<div class="inner-container">';
 
 		if ( $label ) {
 			$html .= '<div class="label"><strong>' . esc_html( GFFormsModel::get_label( $this->field ) ) . '</strong></div>';
@@ -287,7 +288,8 @@ abstract class Helper_Abstract_Fields {
 		}
 
 		$html .= '<div class="value">' . $value . '</div>'
-		         . '</div>';
+           . '</div>'
+        . '</div>';
 
 		return $html;
 	}
