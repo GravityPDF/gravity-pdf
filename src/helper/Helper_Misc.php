@@ -198,6 +198,7 @@ class Helper_Misc {
 	 * @return string
 	 */
 	public function fix_header_footer( $html ) {
+
 		try {
 			/* Get the <img> from the DOM and extract required details */
 			$wrapper = htmlqp( $html );
@@ -206,7 +207,6 @@ class Helper_Misc {
 
 			/* Loop through each matching element */
 			foreach ( $images as $image ) {
-
 				/* Get the current image classes */
 				$image_classes = $image->attr( 'class' );
 
@@ -217,10 +217,9 @@ class Helper_Misc {
 					/* Wrap in a new div that includes the image classes */
 					$image->wrap( '<div class="' . $image_classes . '"></div>' );
 				}
-
 			}
 
-			return $wrapper->top( 'body' )->innerHTML();
+			return $wrapper->top( 'body' )->innerHTML5();
 
 		} catch ( Exception $e ) {
 			/* if there was any issues we'll just return the $html */
