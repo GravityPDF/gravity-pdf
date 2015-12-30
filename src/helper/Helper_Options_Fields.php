@@ -108,7 +108,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'options'    => $this->get_templates(),
 						'inputClass' => 'large',
 						'chosen'     => true,
-						'tooltip'    => '<h6>' . __( 'Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'Gravity PDF comes with %sfive completely-free and highly customisable designs%s. You can also purchase additional templates from our theme shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
+						'tooltip'    => '<h6>' . __( 'Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'Gravity PDF comes with %sfour completely-free and highly customisable designs%s. You can also purchase additional templates from our theme shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
 					),
 
 					'default_font' => array(
@@ -276,7 +276,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'std'        => $this->get_option( 'default_template', 'zadani' ),
 						'inputClass' => 'large',
 						'chosen'     => true,
-						'tooltip'    => '<h6>' . __( 'Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'Gravity PDF comes with %sfive completely-free and highly customisable designs%s. You can also purchase additional templates from our theme shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
+						'tooltip'    => '<h6>' . __( 'Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'Gravity PDF comes with %sfour completely-free and highly customisable designs%s. You can also purchase additional templates from our theme shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
 					),
 
 					'notification' => array(
