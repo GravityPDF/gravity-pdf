@@ -732,7 +732,7 @@ class Helper_PDF {
 	protected function maybe_display_raw_html( $html ) {
 
 		if ( $this->output !== 'SAVE' && rgget( 'html' ) && $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
-			echo apply_filters( 'gfpdf_pre_html_browser_output', $html, $this->settings, $this );
+			echo apply_filters( 'gfpdf_pre_html_browser_output', $html, $this->settings, $this->entry, $this->form, $this );
 			exit;
 		}
 	}
