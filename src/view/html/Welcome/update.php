@@ -92,7 +92,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</p>
 
 			<p>
-				<?php printf( __( "All v4 PDFs will support %sGravity Forms CSS Ready Classes%s. When used in your form the PDF will automatically create two and three column layouts to suit. Plus, Gravity PDF %snow comes with five free PDF templates%s out of the box.", 'gravity-forms-pdf-extended' ), '<a href="https://www.gravityhelp.com/documentation/article/css-ready-classes/">', '</a>', '<strong>', '</strong>' ); ?>
+				<?php printf( __( "All v4 PDFs will support %sGravity Forms CSS Ready Classes%s. When used in your form the PDF will automatically create two and three column layouts to suit. Plus, Gravity PDF %snow comes with four free PDF templates%s out of the box.", 'gravity-forms-pdf-extended' ), '<a href="https://www.gravityhelp.com/documentation/article/css-ready-classes/">', '</a>', '<strong>', '</strong>' ); ?>
 			</p>
 
 		</div>
