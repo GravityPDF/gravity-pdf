@@ -141,11 +141,6 @@ $value_border_colour  = ( ! empty( $settings['zadani_border_colour']) ) ? $setti
         /**
          * Table Support
          */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
         th, td {
             font-size: 9pt;
         }
