@@ -140,11 +140,6 @@ $container_background_colour = ( ! empty($settings['rubix_container_background_c
         /**
          * Table Support
          */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
         th, td {
             font-size: 95%;
         }

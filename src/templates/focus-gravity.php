@@ -145,11 +145,6 @@ $label_format              = ( ! empty($settings['focusgravity_label_format'])) 
         /**
          * Table Support
          */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
         th, td {
             font-size: 95%;
         }

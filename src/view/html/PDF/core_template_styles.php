@@ -161,6 +161,16 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
 		}
 	<?php endif; ?>
 
+	/* Add Basic Table Support */
+	table {
+		width: 100%;
+		border-collapse: collapse;
+	}
+
+	td, th {
+		vertical-align: middle;
+	}
+
 </style>
 
 <?php if ( ! empty($first_header) ) : ?>
