@@ -705,9 +705,9 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			'name'       => __( 'Header', 'gravity-forms-pdf-extended' ),
 			'type'       => 'rich_editor',
 			'size'       => 8,
-			'desc'       => sprintf( __( 'The header is included at the top of each page. For best results, keep the formatting simple.', 'gravity-forms-pdf-extended' ), '<em>', '</em>', '<em>', '</em>' ),
+			'desc'       => sprintf( __( 'The header is included at the top of each page. For simple columns %stry this HTML table snippet%s.', 'gravity-forms-pdf-extended' ), '<a href="https://gist.github.com/blueliquiddesigns/997b5dedf0a5e665e8ef">', '</a>' ),
 			'inputClass' => 'merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields',
-			'tooltip'    => '<h6>' . __( 'Header', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'When inserting images in the header ensure you select %sFull Size%s. Left and right image alignment work as expected, but to center align you need to wrap the image in a %s tag.', 'gravity-forms-pdf-extended' ), '<em>', '</em>', esc_html( '<div class="centeralign">...</div>' ) ),
+			'tooltip'    => '<h6>' . __( 'Header', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'When inserting images in the header set the size to %sLarge%s or %sFull Size%s.', 'gravity-forms-pdf-extended' ), '<em>', '</em>', '<em>', '</em>' ),
 		) );
 	}
 
