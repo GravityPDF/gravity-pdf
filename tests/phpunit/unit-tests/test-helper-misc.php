@@ -203,7 +203,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 				'<img src="my-image.jpg" alt="My Image">',
 			),
 			array(
-				'<img src="my-image.jpg" alt="My Image" class="alternate header-footer-img"/>',
+				'<div class="alternate">' . "\n" . '  <img src="my-image.jpg" alt="My Image" class="alternate header-footer-img"/>' . "\n" . '</div>',
 				'<img src="my-image.jpg" alt="My Image" class="alternate" />',
 			),
 			array( '<span>Nothing</span>', '<span>Nothing</span>' ),

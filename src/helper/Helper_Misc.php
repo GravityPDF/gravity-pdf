@@ -199,8 +199,29 @@ class Helper_Misc {
 	 */
 	public function fix_header_footer( $html ) {
 		try {
-			/* return the modified HTML */
-			return htmlqp( $html, 'img' )->removeAttr( 'width' )->removeAttr( 'height' )->addClass( 'header-footer-img' )->top( 'body' )->innerHTML();
+			/* Get the <img> from the DOM and extract required details */
+			$wrapper = htmlqp( $html );
+
+			$images = $wrapper->find( 'img' );
+
+			/* Loop through each matching element */
+			foreach ( $images as $image ) {
+
+				/* Get the current image classes */
+				$image_classes = $image->attr( 'class' );
+
+				/* Remove width/height and add a override class */
+				$image->removeAttr( 'width' )->removeAttr( 'height' )->addClass( 'header-footer-img' );
+
+				if( strlen( $image_classes ) > 0 ) {
+					/* Wrap in a new div that includes the image classes */
+					$image->wrap( '<div class="' . $image_classes . '"></div>' );
+				}
+
+			}
+
+			return $wrapper->top( 'body' )->innerHTML();
+
 		} catch ( Exception $e ) {
 			/* if there was any issues we'll just return the $html */
 			return $html;
