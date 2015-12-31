@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Template Name: BlankSlate
+ * Template Name: Blank Slate
  * Version: 1.0
  * Description: A print-friendly template focusing solely on the user-submitted data.
  * Author: Gravity PDF
