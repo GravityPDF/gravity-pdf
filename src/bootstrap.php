@@ -476,7 +476,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 *
 	 * @return void
 	 *
-	 * @todo  Limit js dependancies on particular pages (eg. form pdf settings vs global settings)
 	 */
 	private function register_scripts() {
 

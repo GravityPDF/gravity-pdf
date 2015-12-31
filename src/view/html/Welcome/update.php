@@ -47,7 +47,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<?php $this->tabs(); ?>
 
-	<!-- @todo -->
+	<!-- @todo add update video -->
 	<!--
 	<div class="headline-feature feature-video">
 		

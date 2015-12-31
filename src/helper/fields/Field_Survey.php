@@ -124,7 +124,7 @@ class Field_Survey extends Helper_Abstract_Fields {
 	 *
 	 * @since 4.0
 	 *
-	 * @todo  Our standard v4 array format had to be changed to be backwards compatible with v3. The v4 version is better and in future we should include that format in the $form_data array (we might even create an all-new $data array)
+	 * @todo  Our standard v4 array format had to be changed to be backwards compatible with v3. The v4 version is better and in future we should include that format in the $form_data array (we might even create an all-new $data object that uses a JIT field processor)
 	 */
 	public function form_data() {
 

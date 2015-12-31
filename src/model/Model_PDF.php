@@ -998,7 +998,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @since     4.0
 	 *
-	 * @todo      Add caching support and make software more performant
+	 * @todo      Add PDF caching support to make software more performant. Need to review correct triggers for a cleanup (API-based, UI actions, 3rd-party add-on compatibility)
 	 */
 	public function cleanup_pdf( $entry, $form ) {
 
