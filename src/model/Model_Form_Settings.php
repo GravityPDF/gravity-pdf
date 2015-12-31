@@ -660,7 +660,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		$namespace  = 'GFPDF\Templates\Config\\';
 		$class      = false;
-		$class_name = str_replace( '-', '_', basename( $file, '.php' ) );
+
+		$class_name = $this->misc->get_config_class_name( $file );
 		$fqcn       = $namespace . $class_name;
 
 		if ( ! class_exists( $fqcn ) && is_file( $file ) && is_readable( $file ) ) {

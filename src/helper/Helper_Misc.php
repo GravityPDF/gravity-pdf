@@ -190,6 +190,32 @@ class Helper_Misc {
 	}
 
 	/**
+	 * Takes a full path to the file and converts it to the appropriate class name
+	 * This follows the simple rules the file basename has its hyphens and spaces are converted to underscores
+	 * then gets converted to sentance case using the underscore as a delimiter
+	 *
+	 * @param string $file The path to a file
+	 *
+	 * @return string
+	 *
+	 * @since 4.0
+	 */
+	public function get_config_class_name( $file ) {
+		$file = basename( $file, '.php' );
+		$file = str_replace( array( '-', ' '), '_', $file );
+
+		/* Using a delimiter with ucwords doesn't appear to work correctly so go old school */
+		$file_array = explode( '_', $file );
+		array_walk( $file_array, function( &$item ) {
+			$item = mb_convert_case( $item, MB_CASE_TITLE, 'UTF-8' );
+		} );
+
+		$file = implode( '_', $file_array );
+
+		return $file;
+	}
+
+	/**
 	 * mPDF currently has no cascading CSS ability to target 'inline' elements. Fix image display issues in header / footer
 	 * by adding a specific class name we can target
 	 *
