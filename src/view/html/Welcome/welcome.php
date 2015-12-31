@@ -75,7 +75,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<h3><?php _e( 'Setting up a PDF', 'gravity-forms-pdf-extended' ); ?></h3>
 
 			<p>
-				<?php printf( __( 'You can setup individual PDF documents from the %sGravity Form "Forms" page%s in your admin area – located at %sForms -> Forms%s in your navigation. A new %sPDF%s option will be avaliable in the forms\' settings section. The only required fields are %sName%s – an internal identifier – and %sFilename%s – the name used when saving and emailing the PDF.', 'gravity-forms-pdf-extended' ), '<a href="' . esc_url( admin_url( 'admin.php?page=gf_edit_forms' ) ) . '">', '</a>', '<code>', '</code>', '<code>', '</code>', '<em>', '</em>', '<em>', '</em>' ); ?>
+				<?php printf( __( 'You can setup individual PDF documents from the %sGravity Form "Forms" page%s in your admin area – located at %sForms -> Forms%s in your navigation. A new %sPDF%s option will be avaliable in each forms\' settings section. The only required fields are %sName%s – an internal identifier – and %sFilename%s – the name used when saving and emailing the PDF.', 'gravity-forms-pdf-extended' ), '<a href="' . esc_url( admin_url( 'admin.php?page=gf_edit_forms' ) ) . '">', '</a>', '<code>', '</code>', '<code>', '</code>', '<em>', '</em>', '<em>', '</em>' ); ?>
 			</p>
 
 			<!-- Output a quick Gravity Forms selector so we can let users get redirected to a PDF form of their choice -->
