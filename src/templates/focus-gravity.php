@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Template Name: FocusGravity
+ * Template Name: Focus Gravity
  * Version: 1.0
- * Description: FocusGravity providing a classic layout which epitomises Gravity Forms Print Preview. It's the familiar layout you've come to love.
+ * Description: Focus Gravity providing a classic layout which epitomises Gravity Forms Print Preview. It's the familiar layout you've come to love.
  * Author: Gravity PDF
  * Group: Core
  * License: GPLv2
