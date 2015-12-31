@@ -103,7 +103,7 @@ class GFPDF_Major_Compatibility_Checks {
 	 *
 	 * @since 4.0
 	 */
-	public $required_wp_version = '4.0';
+	public $required_wp_version = '4.2';
 
 	/**
 	 * The plugin's required PHP version
