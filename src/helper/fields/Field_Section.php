@@ -122,7 +122,7 @@ class Field_Section extends Helper_Abstract_Fields {
 		$html .= '<h3>' . esc_html( $section['title'] ) . '</h3>';
 
 		if ( ! empty( $value ) ) {
-			$html .= '<div id="field-' . $this->field->id . '-desc" class="gfpdf-section-description gfpdf-field">' . wp_kses( $section['description'], $this->misc->get_allowed_html_tags() ) . '</div>';
+			$html .= '<div id="field-' . $this->field->id . '-desc" class="gfpdf-section-description gfpdf-field">' . wp_kses_post( $section['description'] ) . '</div>';
 		}
 
 		$html .= '</div>';
