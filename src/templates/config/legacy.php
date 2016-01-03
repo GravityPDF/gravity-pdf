@@ -47,7 +47,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * For instance, a template called core-simple.php or core_simple.php would have a configuration class of "Core_Simple"
  *
- * This naming convension is very important, otherwise the software cannot correctly load the configuration
+ * This naming convention is very important, otherwise the software cannot correctly load the configuration
  *
  * @since 4.0
  */
