@@ -584,10 +584,10 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		$this->assertFalse( $this->model->get_template_configuration( 'test' ) );
 
 		/* Test default template */
-		$this->assertEquals( 'GFPDF\Templates\Config\zadani', get_class( $this->model->get_template_configuration( 'zadani' ) ) );
+		$this->assertEquals( 'GFPDF\Templates\Config\Zadani', get_class( $this->model->get_template_configuration( 'zadani' ) ) );
 
 		/* Test legacy templates */
-		$this->assertEquals( 'GFPDF\Templates\Config\legacy', get_class( $this->model->get_template_configuration( 'default-template' ) ) );
+		$this->assertEquals( 'GFPDF\Templates\Config\Legacy', get_class( $this->model->get_template_configuration( 'default-template' ) ) );
 	}
 
 	/**

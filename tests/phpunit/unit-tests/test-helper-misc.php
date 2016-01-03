@@ -452,4 +452,35 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 
 		$this->assertFalse( $this->misc->evaluate_conditional_logic( $logic, array() ) );
 	}
+
+	/**
+	 * Ensure we correctly return an appropriate class name based on the file path given
+	 *
+	 * @param string $expected The expected value
+	 * @param string $file The test path
+	 *
+	 * @dataProvider provider_get_config_class_name
+	 *
+	 * @since 4.0
+	 */
+	public function test_get_config_class_name( $expected, $file ) {
+		$this->assertEquals( $expected, $this->misc->get_config_class_name( $file ) );
+	}
+
+	/**
+	 * Data provider for our get_config_class_name() test
+	 *
+	 * @return array
+	 *
+	 * @since 4.0
+	 */
+	public function provider_get_config_class_name() {
+		return array(
+			array( 'Manage_Document', '/path/to/templates/manage-document.php' ),
+			array( 'Manage_Document', '/path/to/templates/manage_document.php' ),
+			array( 'Manage_Document', '/path/to/templates/manage document.php' ),
+			array( 'Superawesome_Working_Directory', '/my/path/superawesome-working-directory.php' ),
+			array( 'Template', 'template.php' ),
+		);
+	}
 }
