@@ -1025,6 +1025,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				'dejavuserif'          => 'Dejavu Serif',
 				'dejavusansmono'       => 'Dejavu Sans Mono',
 
+				'freesans'             => 'Free Sans',
+				'freeserif'            => 'Free Serif',
+				'freemono'             => 'Free Mono',
+
 				'mph2bdamase' => 'MPH 2B Damase',
 			),
 
