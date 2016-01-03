@@ -234,6 +234,11 @@ $container_background_colour = ( ! empty($settings['rubix_container_background_c
             padding-top: 0;
         }
 
+        .gfield_list th,
+        table.entry-products th, table.entry-products td.emptycell {
+            background-color: none;
+        }
+
 
 
     </style>
