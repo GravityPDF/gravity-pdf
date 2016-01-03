@@ -192,7 +192,7 @@ class Helper_Misc {
 	/**
 	 * Takes a full path to the file and converts it to the appropriate class name
 	 * This follows the simple rules the file basename has its hyphens and spaces are converted to underscores
-	 * then gets converted to sentance case using the underscore as a delimiter
+	 * then gets converted to sentence case using the underscore as a delimiter
 	 *
 	 * @param string $file The path to a file
 	 *
