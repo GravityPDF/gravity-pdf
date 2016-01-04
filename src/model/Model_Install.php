@@ -268,6 +268,7 @@ class Model_Install extends Helper_Abstract_Model {
 		$folders = array(
 			$this->data->template_location,
 			$this->data->template_font_location,
+			$this->data->template_font_location . 'fontdata/',
 			$this->data->template_tmp_location,
 		);
 

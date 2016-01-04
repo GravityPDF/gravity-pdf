@@ -175,7 +175,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertSame( 9999, has_filter( 'gform_notification', array( $this->model, 'notifications' ), 9999 ) );
 
 		$this->assertSame( 10, has_filter( 'mpdf_tmp_path', array( $this->model, 'mpdf_tmp_path' ) ) );
-		$this->assertSame( 10, has_filter( 'mpdf_fontdata_path', array( $this->model, 'mpdf_tmp_path' ) ) );
+		$this->assertSame( 10, has_filter( 'mpdf_fontdata_path', array( $this->model, 'mpdf_tmp_font_path' ) ) );
 		$this->assertSame( 10, has_filter( 'mpdf_current_font_path', array( $this->model, 'set_current_pdf_font' ) ) );
 		$this->assertSame( 10, has_filter( 'mpdf_font_data', array(
 			$this->model,

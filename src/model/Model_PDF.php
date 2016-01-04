@@ -1032,7 +1032,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Changes mPDF's tmp and fontdata folders
+	 * Changes mPDF's tmp folder
 	 *
 	 * @param  string $path The current path
 	 *
@@ -1040,6 +1040,17 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function mpdf_tmp_path( $path ) {
 		return $this->data->template_tmp_location;
+	}
+
+	/**
+	 * Changes mPDF's fontdata folders
+	 *
+	 * @param  string $path The current path
+	 *
+	 * @return string       The new path
+	 */
+	public function mpdf_tmp_font_path( $path ) {
+		return $this->data->template_font_location . 'fontdata/';
 	}
 
 	/**
