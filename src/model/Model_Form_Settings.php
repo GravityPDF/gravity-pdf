@@ -496,7 +496,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function register_custom_appearance_settings( $settings ) {
 
-		$pid     = rgget( 'pid' );
+		$pid     = ( ! empty( $_GET['pid'] ) ) ? rgget( 'pid' ) : rgpost( 'gform_pdf_id' );
 		$form_id = ( isset( $_GET['id'] ) ) ? (int) $_GET['id'] : 0;
 
 		/* If we don't have a specific PDF we'll use the defaults */
