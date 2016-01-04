@@ -201,15 +201,15 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 
 					'default_restrict_owner' => array(
 						'id'      => 'default_restrict_owner',
-						'name'    => __( 'Restrict Owner', 'gravity-forms-pdf-extended' ),
+						'name'    => __( 'Default Owner Restrictions', 'gravity-forms-pdf-extended' ),
 						'desc'    => __( 'Set the default PDF owner permissions. When enabled, the original entry owner will NOT be able to view the PDFs (unless they have one of the above capabilities).', 'gravity-forms-pdf-extended' ),
 						'type'    => 'radio',
 						'options' => array(
-							'Yes' => __( 'Yes', 'gravity-forms-pdf-extended' ),
-							'No'  => __( 'No', 'gravity-forms-pdf-extended' ),
+							'Yes' => __( 'Enable', 'gravity-forms-pdf-extended' ),
+							'No'  => __( 'Disable', 'gravity-forms-pdf-extended' ),
 						),
 						'std'     => __( 'No', 'gravity-forms-pdf-extended' ),
-						'tooltip' => '<h6>' . __( 'Restrict Owner', 'gravity-forms-pdf-extended' ) . '</h6>' . __( 'Enable this setting if your PDFs should not be viewable by the end user. This can be set on a per-form basis.', 'gravity-forms-pdf-extended' ),
+						'tooltip' => '<h6>' . __( 'Restrict Owner', 'gravity-forms-pdf-extended' ) . '</h6>' . __( 'Enable this setting if your PDFs should not be viewable by the end user. This can be set on a per-PDF basis.', 'gravity-forms-pdf-extended' ),
 					),
 
 					'logged_out_timeout' => array(
