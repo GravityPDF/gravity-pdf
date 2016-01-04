@@ -1063,6 +1063,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				'padaukbook'       => 'Padauk Book (Myanmar / Burmese)',
 				'zawgyi-one'       => 'Zawgyi One (Myanmar / Burmese)',
 				'ayar'             => 'Ayar Myanmar (Myanmar / Burmese)',
+				'taameydavidclm'   => 'Taamey David CLM (Hebrew)',
 			),
 		);
 
