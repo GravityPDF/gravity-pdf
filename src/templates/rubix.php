@@ -38,7 +38,10 @@ if ( ! class_exists('GFForms')) {
 /**
  * Load up our template-specific appearance settings
  */
-$container_background_colour = ( ! empty($settings['rubix_container_background_colour'])) ? $settings['rubix_container_background_colour'] : '#eeeeee';
+$container_background_color = ( ! empty($settings['rubix_container_background_colour'])) ? $settings['rubix_container_background_colour'] : '#eeeeee';
+
+/* Create a constrasting border colour for our tables */
+$contrast = $gfpdf->misc->get_background_and_border_contrast( $container_background_color );
 
 ?>
 
@@ -203,7 +206,7 @@ $container_background_colour = ( ! empty($settings['rubix_container_background_c
         }
 
         .gfpdf-field .inner-container {
-            background: <?php echo $container_background_colour; ?>;
+            background: <?php echo $container_background_color; ?>;
             border-radius: 10px;
         }
 
@@ -236,10 +239,13 @@ $container_background_colour = ( ! empty($settings['rubix_container_background_c
 
         .gfield_list th,
         table.entry-products th, table.entry-products td.emptycell {
-            background-color: none;
+            background-color: <?php echo $contrast['background']; ?>;
         }
 
-
+        .gfield_list th, .gfield_list td,
+        table.entry-products th, table.entry-products td {
+            border: 1px solid <?php echo $contrast['border']; ?>;
+        }
 
     </style>
 

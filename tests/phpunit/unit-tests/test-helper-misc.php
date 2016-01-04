@@ -483,4 +483,39 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 			array( 'Template', 'template.php' ),
 		);
 	}
+
+	/**
+	 * Check we correctly parse the hex code and spit out the correct background and border values
+	 *
+	 * @param string $expected
+	 * @param string $hex
+	 *
+	 * @dataProvider provider_get_background_and_border_contrast
+	 *
+	 * @since 4.0
+	 */
+	public function test_get_background_and_border_contrast( $expected, $hex ) {
+		$contrast = $this->misc->get_background_and_border_contrast( $hex );
+
+		$this->assertEquals( $expected[0], $contrast['background'] );
+		$this->assertEquals( $expected[1], $contrast['border'] );
+	}
+
+	/**
+	 * Our test data for the get_background_and_border_contrast() method
+	 *
+	 * @return array
+	 */
+	public function provider_get_background_and_border_contrast() {
+		return array(
+			array( array( '#ebebeb', '#c3c3c3' ), '#FFFFFF' ),
+			array( array( '#ebebeb', '#c3c3c3' ), '#FFF' ),
+			array( array( '#141414', '#3c3c3c' ), '#000000' ),
+			array( array( '#141414', '#3c3c3c' ), '#000' ),
+			array( array( '#e82828', '#ff5050' ), '#d41414' ),
+			array( array( '#295399', '#517bc1' ), '#153f85' ),
+			array( array( '#5cbb50', '#349328' ), '#70cf64' ),
+			array( array( '#dfdfdf', '#b7b7b7' ), '#f3f3f3' ),
+		);
+	}
 }
