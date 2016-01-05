@@ -193,7 +193,7 @@ class Test_PDF extends WP_UnitTestCase {
 			$this->model,
 			'preprocess_template_arguments',
 		) ) );
-		$this->assertSame( 10, has_filter( 'gfpdf_mpdf_init_class', array(
+		$this->assertSame( 5, has_filter( 'gfpdf_pdf_html_output', array(
 			$this->view,
 			'autoprocess_core_template_options',
 		) ) );
