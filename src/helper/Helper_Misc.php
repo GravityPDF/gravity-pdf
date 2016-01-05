@@ -311,6 +311,38 @@ class Helper_Misc {
 	}
 
 	/**
+	 * Pass in a background colour and get the appropriate contrasting background and border colour
+	 *
+	 * @param string $background_hex Hex colour to get contrast of
+	 *
+	 * @return array
+	 *
+	 * @since 4.0
+	 */
+	public function get_background_and_border_contrast( $background_hex ) {
+
+		/* Get contrasting background colour */
+		$background_color_contrast = $this->get_contrast( $background_hex );
+
+		/* If the background isn't white we'll go down 20, otherwise go up 20 */
+		$contrast_value = ( $background_color_contrast === '#FFF' ) ? 20 : -20;
+
+		/* Get the new contrasting background colour */
+		$contrast_background_color = $this->change_brightness( $background_hex, $contrast_value );
+
+		/* Get the new border contrast based on the background contrast colour */
+		$border_contrast = ( $background_color_contrast === '#FFF' ) ? 60 : -60;
+
+		/* Finally get a contrasting border colour */
+		$contrast_border_color = $this->change_brightness( $background_hex, $border_contrast );
+
+		return array(
+			'background' => $contrast_background_color,
+			'border'     => $contrast_border_color,
+		);
+	}
+
+	/**
 	 * Push an associative array onto the beginning of an existing array
 	 *
 	 * @param  array  $array The array to push onto

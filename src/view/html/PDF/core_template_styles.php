@@ -26,12 +26,9 @@ $first_footer               = ( ! empty( $settings['first_footer'] ) ) ? $settin
 $background_color           = ( ! empty( $settings['background_color'] ) ) ? $settings['background_color'] : '#FFF';
 $background_image           = ( ! empty( $settings['background_image'] ) ) ? $settings['background_image'] : '';
 
-$background_color_contrast  = $gfpdf->misc->get_contrast( $background_color );
-$contrast_value             = ( $background_color_contrast === '#FFF' ) ? 20 : -20;
-$contrast_background_color  = $gfpdf->misc->change_brightness( $background_color, $contrast_value );
-$border_contrast            = ( $background_color_contrast === '#FFF' ) ? 60 : -60;
-$reverse_border_contrast    = ( $background_color_contrast === '#FFF' ) ? '#000' : '#FFF';
-$contrast_border_color      = $gfpdf->misc->change_brightness( $reverse_border_contrast, $border_contrast );
+$contrast                   = $gfpdf->misc->get_background_and_border_contrast( $background_color );
+$contrast_background_color  = $contrast['background'];
+$contrast_border_color      = $contrast['border'];
 
 $include_list_styles        = apply_filters( 'gfpdf_include_list_styles', true );
 $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', true );
