@@ -128,19 +128,19 @@ class Field_List extends Helper_Abstract_Fields {
 
 			<!-- Loop through the column names and output in a header (if using the advanced list) -->
 			<?php if ( $columns ) : $columns = array_keys( $value[0] ); ?>
-				<thead>
-				<tr>
-					<?php foreach ( $columns as $column ) : ?>
-						<th>
-							<?php echo esc_html( $column ); ?>
-						</th>
-					<?php endforeach; ?>
-				</tr>
-				</thead>
+				<tbody class="head">
+					<tr>
+						<?php foreach ( $columns as $column ) : ?>
+							<th>
+								<?php echo esc_html( $column ); ?>
+							</th>
+						<?php endforeach; ?>
+					</tr>
+				</tbody>
 			<?php endif; ?>
 
 			<!-- Loop through each row -->
-			<tbody>
+			<tbody class="contents">
 			<?php foreach ( $value as $item ) : ?>
 				<tr>
 					<!-- handle the basic list -->
