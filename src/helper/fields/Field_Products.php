@@ -83,7 +83,7 @@ class Field_Products extends Helper_Abstract_Fields {
 
 		?>
 
-		<div class="row-separator">
+		<div class="row-separator products-title-container">
 			<h3 class="product-field-title gfpdf-field">
 				<?php
 				$label = apply_filters( 'gform_order_label', __( 'Order', 'gravityforms' ), $form_id );
@@ -94,7 +94,7 @@ class Field_Products extends Helper_Abstract_Fields {
 			</h3>
 		</div>
 
-		<div class="row-separator">
+		<div class="row-separator products-container">
 			<div class="gfpdf-field gfpdf-products">
 				<div class="inner-container">
 					<table class="entry-products" autosize="1">
