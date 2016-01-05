@@ -231,21 +231,25 @@ class Helper_Misc {
 
 			$images = $wrapper->find( 'img' );
 
-			/* Loop through each matching element */
-			foreach ( $images as $image ) {
-				/* Get the current image classes */
-				$image_classes = $image->attr( 'class' );
+			if( sizeof( $images ) > 0 ) {
+				/* Loop through each matching element */
+				foreach ( $images as $image ) {
+					/* Get the current image classes */
+					$image_classes = $image->attr( 'class' );
 
-				/* Remove width/height and add a override class */
-				$image->removeAttr( 'width' )->removeAttr( 'height' )->addClass( 'header-footer-img' );
+					/* Remove width/height and add a override class */
+					$image->removeAttr( 'width' )->removeAttr( 'height' )->addClass( 'header-footer-img' );
 
-				if( strlen( $image_classes ) > 0 ) {
-					/* Wrap in a new div that includes the image classes */
-					$image->wrap( '<div class="' . $image_classes . '"></div>' );
+					if ( strlen( $image_classes ) > 0 ) {
+						/* Wrap in a new div that includes the image classes */
+						$image->wrap( '<div class="' . $image_classes . '"></div>' );
+					}
 				}
+
+				return $wrapper->top( 'body' )->innerHTML5();
 			}
 
-			return $wrapper->top( 'body' )->innerHTML5();
+			return $html;
 
 		} catch ( Exception $e ) {
 			/* if there was any issues we'll just return the $html */
