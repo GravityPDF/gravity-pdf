@@ -198,6 +198,14 @@ $value_border_colour  = ( ! empty( $settings['zadani_border_colour']) ) ? $setti
             padding: 1.5mm 2mm;
         }
 
+        .products-title-container, .products-container {
+            padding: 0;
+        }
+
+        .products-title-container h3 {
+            margin-bottom: -0.5mm;
+        }
+
     </style>
 
 </head>
