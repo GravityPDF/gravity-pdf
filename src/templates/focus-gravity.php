@@ -212,7 +212,7 @@ $label_format              = ( ! empty($settings['focusgravity_label_format'])) 
             border-top: 1px solid #FFF;
         }
 
-        .gfpdf-field .label, h3.product-field-title {
+        .gfpdf-field .label {
             font-weight: bold;
             border-bottom: 1px solid <?php echo $accent_colour; ?>;
             background: <?php echo $secondary_colour; ?>;
@@ -227,9 +227,13 @@ $label_format              = ( ! empty($settings['focusgravity_label_format'])) 
             border-top: 5px solid <?php echo $secondary_colour; ?>;
         }
 
-        table.gfield_list th, table.entry-products th {
+        table.gfield_list th {
             background: <?php echo $accent_colour; ?>;
             color: <?php echo $accent_contrast_colour; ?>;
+        }
+
+        table.entry-products th, table.entry-products td.emptycell {
+            background: none;
         }
 
         <?php if( $label_format == 'combined_label' ): ?>
