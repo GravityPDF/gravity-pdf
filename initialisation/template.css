@@ -57,7 +57,8 @@ h2.default, h3 {
 .no-style h3,
 .no-style .entry-view-html-value,
 .no-style .entry-view-section-break-content,
-.no-style .gfpdf-section-description {
+.no-style .gfpdf-section-description,
+.no-style .even {
     background: none;
     border: none;
 }
