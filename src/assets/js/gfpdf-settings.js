@@ -686,8 +686,9 @@
 		      				self.doMergetags();
 
 		      			} else {
-							/* Hide our template nav item as there are no fields */
+							/* Hide our template nav item as there are no fields and clear our the HTML */
 		      				$('#gfpdf-custom-appearance-nav').hide();
+							$('#pdf-custom-appearance').html('');
 		      			}
 
 		      			/* Update our template example preview and display it */
