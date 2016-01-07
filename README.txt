@@ -3,8 +3,8 @@ Contributors: blueliquiddesigns
 Donate link: https://gravitypdf.com
 Tags: gravity, forms, pdf, automation, attachment
 Requires at least: 3.9
-Tested up to: 4.3
-Stable tag: 3.7.5
+Tested up to: 4.4
+Stable tag: 3.7.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
 
@@ -85,6 +85,9 @@ All FAQs can be [viewed on the Gravity PDF website](https://gravitypdf.com/#faqs
 3. The configuration.php file allows you to easily assign PDFs to Gravity Forms
 
 == Changelog ==
+
+= 3.7.6 =
+* Bug - Resolve mPDF PHP7 image parsing error due to a change in variable handling.
 
 = 3.7.5 =
 * Housekeeping - Tweak mPDF package to be PHP7 compatible.
