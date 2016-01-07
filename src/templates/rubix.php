@@ -20,19 +20,10 @@ if ( ! class_exists('GFForms')) {
  *
  * $form (The current Gravity Form array)
  * $entry (The raw entry data)
- * $lead (alias of $entry)
  * $form_data (The processed entry data stored in an array)
  * $settings (the current PDF configuration)
  * $gfpdf (the main Gravity PDF object containing all our helper classes)
  * $args (contains an array of all variables - the ones being described right now - passed to the template)
- *
- * The following variables are avaliable for backwards compatibility purposes:
- *
- * $form_id (the current form ID)
- * $lead_ids (an array of the selected entries)
- * $lead_id (the current entry ID)
- *
- * To see the variable structure add "var_dump($variable); exit;" to your PDF template and view in your browser
  */
 
 /**
@@ -45,217 +36,212 @@ $contrast = $gfpdf->misc->get_background_and_border_contrast( $container_backgro
 
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
+<!-- Include styles needed for the PDF -->
+<style>
 
-    <style>
+    /* Handle Gravity Forms CSS Ready Classes */
+    .row-separator {
+        clear: both;
+    }
 
-        /* Handle Gravity Forms CSS Ready Classes */
-        .row-separator {
-            clear: both;
-        }
+    .gf_left_half,
+    .gf_left_third, .gf_middle_third,
+    .gf_list_2col li, .gf_list_3col li, .gf_list_4col li, .gf_list_5col li {
+        float: left;
+    }
 
-        .gf_left_half,
-        .gf_left_third, .gf_middle_third,
-        .gf_list_2col li, .gf_list_3col li, .gf_list_4col li, .gf_list_5col li {
-            float: left;
-        }
+    .gf_right_half,
+    .gf_right_third {
+        float: right;
+    }
 
-        .gf_right_half,
-        .gf_right_third {
-            float: right;
-        }
+    .gf_left_half, .gf_right_half,
+    .gf_list_2col li {
+        width: 49%;
+    }
 
-        .gf_left_half, .gf_right_half,
-        .gf_list_2col li {
-            width: 49%;
-        }
+    .gf_left_third, .gf_middle_third, .gf_right_third,
+    .gf_list_3col li {
+        width: 32.3%;
+    }
 
-        .gf_left_third, .gf_middle_third, .gf_right_third,
-        .gf_list_3col li {
-            width: 32.3%;
-        }
+    .gf_list_4col li {
+        width: 24%;
+    }
 
-        .gf_list_4col li {
-            width: 24%;
-        }
+    .gf_list_5col li {
+        width: 19%;
+    }
 
-        .gf_list_5col li {
-            width: 19%;
-        }
+    .gf_left_half, .gf_right_half {
+        padding-right: 1%;
+    }
 
-        .gf_left_half, .gf_right_half {
-            padding-right: 1%;
-        }
+    .gf_left_third, .gf_middle_third, .gf_right_third {
+        padding-right: 1.505%;
+    }
 
-        .gf_left_third, .gf_middle_third, .gf_right_third {
-            padding-right: 1.505%;
-        }
+    .gf_right_half, .gf_right_third {
+        padding-right: 0;
+    }
 
-        .gf_right_half, .gf_right_third {
-            padding-right: 0;
-        }
+    /* Don't double float the list items if already floated (mPDF does not support this ) */
+    .gf_left_half li, .gf_right_half li,
+    .gf_left_third li, .gf_middle_third li, .gf_right_third li {
+        width: 100% !important;
+        float: none !important;
+    }
 
-        /* Don't double float the list items if already floated (mPDF does not support this ) */
-        .gf_left_half li, .gf_right_half li,
-        .gf_left_third li, .gf_middle_third li, .gf_right_third li {
-            width: 100% !important;
-            float: none !important;
-        }
+    /**
+     * Headings
+     */
+    h3 {
+        margin: 1.5mm 0 0.5mm;
+        padding: 0;
+    }
 
-        /**
-         * Headings
-         */
-        h3 {
-            margin: 1.5mm 0 0.5mm;
-            padding: 0;
-        }
+    /**
+     * Quiz Style Support
+     */
+    .gquiz-field {
+        color: #666;
+    }
 
-        /**
-         * Quiz Style Support
-         */
-        .gquiz-field {
-            color: #666;
-        }
+    .gquiz-correct-choice {
+        font-weight: bold;
+        color: black;
+    }
 
-        .gquiz-correct-choice {
-            font-weight: bold;
-            color: black;
-        }
+    .gf-quiz-img {
+        padding-left: 5px !important;
+        vertical-align: middle;
+    }
 
-        .gf-quiz-img {
-            padding-left: 5px !important;
-            vertical-align: middle;
-        }
+    /**
+     * Survey Style Support
+     */
+    .gsurvey-likert-choice-label {
+        padding: 4px;
+    }
 
-        /**
-         * Survey Style Support
-         */
-        .gsurvey-likert-choice-label {
-            padding: 4px;
-        }
+    .gsurvey-likert-choice, .gsurvey-likert-choice-label {
+        text-align: center;
+    }
 
-        .gsurvey-likert-choice, .gsurvey-likert-choice-label {
-            text-align: center;
-        }
+    /**
+     * Table Support
+     */
+    th, td {
+        font-size: 95%;
+    }
 
-        /**
-         * Table Support
-         */
-        th, td {
-            font-size: 95%;
-        }
+    /**
+     * List Support
+     */
+    ul, ol {
+        margin: 0;
+        padding-left: 1mm;
+        padding-right: 1mm;
+    }
 
-        /**
-         * List Support
-         */
-        ul, ol {
-            margin: 0;
-            padding-left: 1mm;
-            padding-right: 1mm;
-        }
+    li {
+        margin: 0;
+        padding: 0;
+        list-style-position: inside;
+    }
 
-        li {
-            margin: 0;
-            padding: 0;
-            list-style-position: inside;
-        }
+    /**
+     * Header / Footer
+     */
+    .alignleft {
+        float: left;
+    }
 
-        /**
-         * Header / Footer
-         */
-        .alignleft {
-            float: left;
-        }
+    .alignright {
+        float: right;
+    }
 
-        .alignright {
-            float: right;
-        }
+    .aligncenter {
+        text-align: center;
+    }
 
-        .aligncenter {
-            text-align: center;
-        }
+    p.alignleft {
+        text-align: left;
+        float: none;
+    }
 
-        p.alignleft {
-            text-align: left;
-            float: none;
-        }
+    p.alignright {
+        text-align: right;
+        float: none;
+    }
 
-        p.alignright {
-            text-align: right;
-            float: none;
-        }
+    /**
+     * Independant Template Styles
+     */
+    #form_title {
+        text-align: center;
+        text-transform: uppercase;
+        font-size: 22px;
+    }
 
-        /**
-         * Independant Template Styles
-         */
-        #form_title {
-            text-align: center;
-            text-transform: uppercase;
-            font-size: 22px;
-        }
+    .row-separator {
+        margin-bottom: 15px;
+    }
 
-        .row-separator {
-            margin-bottom: 15px;
-        }
+    .gfpdf-page, .product-field-title {
+        margin-bottom: -13px;
+        margin-left: 10px;
+    }
 
-        .gfpdf-page, .product-field-title {
-            margin-bottom: -13px;
-            margin-left: 10px;
-        }
+    .gfpdf-field .inner-container {
+        background: <?php echo $container_background_color; ?>;
+        border-radius: 10px;
+    }
 
-        .gfpdf-field .inner-container {
-            background: <?php echo $container_background_color; ?>;
-            border-radius: 10px;
-        }
+    .gfpdf-field .label {
+        padding: 5px 10px 0;
+    }
 
-        .gfpdf-field .label {
-            padding: 5px 10px 0;
-        }
+    .gfpdf-field .value {
+        padding: 0 10px 5px;
+    }
 
-        .gfpdf-field .value {
-            padding: 0 10px 5px;
-        }
+    .gfpdf-products .inner-container,
+    div.gfpdf-html .value {
+        padding: 5px 10px;
+    }
 
-        .gfpdf-products .inner-container,
-        div.gfpdf-html .value {
-            padding: 5px 10px;
-        }
+    div.gfpdf-section-description .inner-container {
+        background: none;
+        border-radius: 0;
+    }
 
-        div.gfpdf-section-description .inner-container {
-            background: none;
-            border-radius: 0;
-        }
+    .gfpdf-section-title {
+        padding-left: 10px;
+    }
 
-        .gfpdf-section-title {
-            padding-left: 10px;
-        }
+    .gfpdf-section-title h3 {
+        margin-top: 0;
+        padding-top: 0;
+    }
 
-        .gfpdf-section-title h3 {
-            margin-top: 0;
-            padding-top: 0;
-        }
+    .gfield_list th,
+    table.entry-products th, table.entry-products td.emptycell {
+        background-color: <?php echo $contrast['background']; ?>;
+    }
 
-        .gfield_list th,
-        table.entry-products th, table.entry-products td.emptycell {
-            background-color: <?php echo $contrast['background']; ?>;
-        }
+    .gfield_list th, .gfield_list td,
+    table.entry-products th, table.entry-products td {
+        border: 1px solid <?php echo $contrast['border']; ?>;
+    }
 
-        .gfield_list th, .gfield_list td,
-        table.entry-products th, table.entry-products td {
-            border: 1px solid <?php echo $contrast['border']; ?>;
-        }
+</style>
 
-    </style>
-
-</head>
-<body>
-
+<!-- Output our HTML markup -->
 <?php
 
 /**
- * Load our core-specific styles we'll pass to our $config array below which will control the display of certain fields in our Gravity Form
+ * Load our core-specific styles from our PDF settings which will be passed to the PDF template $config array
  */
 $show_form_title      = ( ! empty($settings['show_form_title']) && $settings['show_form_title'] == 'Yes') ? true : false;
 $show_page_names      = ( ! empty($settings['show_page_names']) && $settings['show_page_names'] == 'Yes') ? true : false;
@@ -265,7 +251,7 @@ $enable_conditional   = ( ! empty($settings['enable_conditional']) && $settings[
 $show_empty           = ( ! empty($settings['show_empty']) && $settings['show_empty'] == 'Yes') ? true : false;
 
 /**
- * Set up our configuration array to control what is and is not generated
+ * Set up our configuration array to control what is and is not shown in the generated PDF
  *
  * @var array
  */
@@ -287,15 +273,7 @@ $config = array(
 /**
  * Generate our HTML markup
  *
- * Gravity PDF uses PHP Namespaces to structure its codebase.
- *
- * To keep it simplier for users the PDF template files are in PHP's global namespace, which means you have easy access to all PHP and WordPress' core classes.
- *
- * You can access Gravity PDFs common functions and classes through our API wrapper class "GPDFAPI", or use the full namespaces to references classes (GFPDF\View\View_PDF or GFPDF\Model\Model_PDF)
+ * You can access Gravity PDFs common functions and classes through our API wrapper class "GPDFAPI"
  */
 $pdf = GPDFAPI::get_pdf_class();
 $pdf->process_html_structure($entry, GPDFAPI::get_pdf_class('model'), $config);
-
-?>
-</body>
-</html>
