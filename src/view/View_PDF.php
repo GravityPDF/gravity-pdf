@@ -515,24 +515,18 @@ class View_PDF extends Helper_Abstract_View {
 	}
 
 	/**
-	 * Automatically render our core PDF fields, a styles in templates to simplify there usage for users
+	 * Automatically render our core PDF fields and add styles in templates to simplify there usage for users
 	 *
-	 * @param  \mPDF $mpdf     The mPDF object
-	 * @param  array $entry    The Gravity Form entry being processed
-	 * @param  array $settings The current PDF settings
+	 * @param  string $html The current HTML template being processed
+	 * @param  array  $form
+	 * @param  array  $entry
+	 * @param  array  $settings
 	 *
-	 * @return \mPDF
-	 *
+	 * @return string
 	 * @since 4.0
 	 */
-	public function autoprocess_core_template_options( $mpdf, $entry, $settings ) {
-		if ( ! $mpdf instanceof mPDF ) {
-			return $mpdf;
-		}
-
-		$mpdf->WriteHTML( $this->get_core_template_styles( $settings, $entry ) );
-
-		return $mpdf;
+	public function autoprocess_core_template_options( $html, $form, $entry, $settings ) {
+		return $this->get_core_template_styles( $settings, $entry ) . $html;
 	}
 
 	/**
@@ -574,22 +568,5 @@ class View_PDF extends Helper_Abstract_View {
 		$settings = $args['settings'];
 
 		return $this->load( 'core_template_styles', array( 'settings' => $settings ), false );
-	}
-
-	/**
-	 * Ensures our autoloaded core HTML gets displayed with the template HTML
-	 *
-	 * @param string $html     The current HTML
-	 * @param array  $settings The current PDF settings
-	 * @param array  $entry    The Gravity Form entry
-	 *
-	 * @return string
-	 *
-	 * @since 4.0
-	 */
-	public function show_core_html_template_on_display( $html, $settings, $entry ) {
-		$core_template_html = $this->get_core_template_styles( $settings, $entry );
-
-		return $html . $core_template_html;
 	}
 }

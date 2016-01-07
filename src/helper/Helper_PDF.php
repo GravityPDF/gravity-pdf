@@ -517,7 +517,10 @@ class Helper_PDF {
 	protected function begin_pdf() {
 		$this->mpdf = new mPDF( '', $this->paper_size, 0, '', 15, 15, 16, 16, 9, 9, $this->orientation );
 
-		/* allow $mpdf object class to be modified */
+		/**
+		 * Allow $mpdf object class to be modified
+		 * Note: in some circumstances using WriteHTML() during this filter will break headers/footers
+		 */
 		$this->mpdf = apply_filters( 'gfpdf_mpdf_init_class', $this->mpdf, $this->entry, $this->settings, $this );
 	}
 

@@ -193,8 +193,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 
 		/* Pre-process our template arguments and automatically render them in PDF */
 		add_filter( 'gfpdf_template_args', array( $this->model, 'preprocess_template_arguments' ) );
-		add_filter( 'gfpdf_mpdf_init_class', array( $this->view, 'autoprocess_core_template_options' ), 10, 3 );
-		add_filter( 'gfpdf_pre_html_browser_output', array( $this->view, 'show_core_html_template_on_display' ), 10, 3 );
+		add_filter( 'gfpdf_pdf_html_output', array( $this->view, 'autoprocess_core_template_options' ), 5, 4 );
 	}
 
 	/**
