@@ -160,6 +160,9 @@ class Helper_Migration {
 		/* Import the configuration into the database */
 		$this->import_v3_config( $config );
 
+		/* Migrate fonts for multisite */
+		$this->migrate_multisite_fonts();
+
 		/* Clean-up the old 'output' directory as we use 'tmp' now */
 		$this->cleanup_output_directory();
 
@@ -561,6 +564,30 @@ class Helper_Migration {
 
 		if ( is_file( $path . 'configuration.php' ) ) {
 			@rename( $path . 'configuration.php', $path . 'configuration.archive.php' );
+		}
+	}
+
+	/**
+	 * Search through all multisite font directories and move them to our top level font folder before cleaning up individual font directories
+	 *
+	 * @return void
+	 *
+	 * @since 4.0
+	 */
+	private function migrate_multisite_fonts() {
+		if ( is_multisite() ) {
+			$path = $this->misc->get_template_path();
+
+			/* Check if there is a fonts directory to migrate from and to */
+			if ( is_dir( $path . 'fonts' ) && is_dir( $this->data->template_font_location ) ) {
+				foreach ( glob( $path . 'fonts/' . '*.{otf,ttf,OTF,TTF}', GLOB_BRACE ) as $font ) {
+					$font_name  = basename( $font );
+					@copy( $font, $this->data->template_font_location . $font_name );
+				}
+
+				/* Delete the existing font directory */
+				$this->misc->rmdir( $path . 'fonts' );
+			}
 		}
 	}
 
