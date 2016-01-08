@@ -373,19 +373,19 @@ class Test_Migration extends WP_UnitTestCase {
 		touch( $configuration_path . 'configuration.php' );
 
 		/* Setup an output directory and fill it with files */
-		mkdir( $gfpdf->data->template_location . 'output' );
-		mkdir( $gfpdf->data->template_location . 'output/123/' );
-		touch( $gfpdf->data->template_location . 'output/file' );
-		touch( $gfpdf->data->template_location . 'output/123/file' );
+		mkdir( $configuration_path . 'output' );
+		mkdir( $configuration_path . 'output/123/' );
+		touch( $configuration_path . 'output/file' );
+		touch( $configuration_path . 'output/123/file' );
 
 		/* Verify the output folder exists */
-		$this->assertTrue( is_dir( $gfpdf->data->template_location . 'output' ) );
+		$this->assertTrue( is_dir( $configuration_path . 'output' ) );
 
 		/* Run the migration */
 		$this->assertTrue( $this->migration->begin_migration() );
 
 		/* Verify our output folder no longer exists */
-		$this->assertFalse( is_dir( $gfpdf->data->template_location . 'output' ) );
+		$this->assertFalse( is_dir( $configuration_path . 'output' ) );
 		$this->assertTrue( is_dir( $gfpdf->data->template_location ) );
 
 		/* Verify our config file was archived and clean up */

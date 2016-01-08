@@ -226,7 +226,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 */
 	public function install_templates() {
 
-		$destination = ( is_multisite() ) ? $this->data->multisite_template_location : $this->data->template_location;
+		$destination = $this->misc->get_template_path();
 		$copy        = $this->misc->copyr( PDF_PLUGIN_DIR . 'src/templates/', $destination );
 		if ( is_wp_error( $copy ) ) {
 			$this->log->addError( 'Template Installation Error.' );
