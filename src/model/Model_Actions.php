@@ -290,7 +290,7 @@ class Model_Actions extends Helper_Abstract_Model {
 		$blog_ids = array();
 
 		foreach ( $sites as $site ) {
-			$site_config = $this->data->template_location . '/' . $site['blog_id'] . '/';
+			$site_config = $this->data->template_location . $site['blog_id'] . '/';
 
 			if ( is_file( $site_config . 'configuration.php' ) ) {
 				$blog_ids[] = $site['blog_id'];
@@ -345,7 +345,7 @@ class Model_Actions extends Helper_Abstract_Model {
 		}
 
 		/* Check if we have a config file that should be migrated */
-		$path = $this->data->template_location . '/' . $blog_id . '/';
+		$path = $this->data->template_location . $blog_id . '/';
 
 		if ( ! is_file( $path . 'configuration.php' ) ) {
 
