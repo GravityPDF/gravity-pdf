@@ -87,6 +87,7 @@ class GFPDF_Core extends GFPDF_Depreciated_Abstract {
 
 		$gfpdf->init();
 		$this->setup_constants();
+		$this->setup_depreciated_paths();
 	}
 
 	/**
@@ -114,6 +115,20 @@ class GFPDF_Core extends GFPDF_Depreciated_Abstract {
 			$destination_url = ( is_multisite() ) ? $gfpdf->data->multisite_template_location_url : $gfpdf->data->template_location_url;
 			define( 'PDF_TEMPLATE_URL_LOCATION', $destination_url );
 		}
+	}
+
+	/**
+	 * Create aliases of our template path and URLs to match v3
+	 *
+	 * @since 4.0
+	 */
+	public function setup_depreciated_paths() {
+		global $gfpdf, $gfpdfe_data;
+
+		$gfpdfe_data = $gfpdf->data;
+
+		$gfpdf->data->template_site_location = $gfpdf->data->template_location_url;
+		$gfpdf->data->template_save_location = $gfpdf->data->template_tmp_location;
 	}
 }
 
