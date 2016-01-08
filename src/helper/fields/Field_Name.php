@@ -106,9 +106,10 @@ class Field_Name extends Helper_Abstract_Fields {
 
 		$value = $this->get_value();
 
-		/* check if the returned results are an array */
+		/* backwards compatible - check if the returned results are an array otherwise set to cache and return */
 		if ( ! is_array( $value ) ) {
-			$value[ $this->field->id . '.3' ] = $value; /* set to the first name */
+			$this->cache( $value );
+			return $this->cache();
 		}
 
 		$this->cache( array(
