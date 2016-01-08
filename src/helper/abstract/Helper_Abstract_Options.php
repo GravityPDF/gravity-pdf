@@ -880,11 +880,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		/**
 		 * Load the user's templates
 		 */
-		$discovered_user_templates = glob( $this->data->template_location . '*.php' );
-
-		if ( is_multisite() ) {
-			$discovered_user_templates = array_merge( $discovered_user_templates, glob( $this->data->multisite_template_location . '*.php' ) );
-		}
+		$discovered_user_templates = glob( $this->misc->get_template_path() . '*.php' );
 
 		foreach ( $discovered_user_templates as $filename ) {
 
@@ -963,10 +959,15 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function get_template_information( $name ) {
 
-		if ( is_file( $this->data->template_location . $name . '.php' ) ) {
-			$template          = $this->get_template_headers( $this->data->template_location . $name . '.php' );
-			$template['group'] = __( 'User Templates: ', 'gravity-forms-pdf-extended' ) . $template['group'];
+		/* Check if we can find the template and load the data */
+		if( is_multisite() && is_file( $this->data->multisite_template_location . $name . '.php' ) ) {
+			$template = $this->get_template_headers( $this->data->multisite_template_location . $name . '.php' );
+		} elseif ( is_file( $this->data->template_location . $name . '.php' ) ) {
+			$template = $this->get_template_headers( $this->data->template_location . $name . '.php' );
+		}
 
+		if( isset( $template ) ) {
+			$template['group'] = __( 'User Templates: ', 'gravity-forms-pdf-extended' ) . $template['group'];
 			return $template;
 		}
 

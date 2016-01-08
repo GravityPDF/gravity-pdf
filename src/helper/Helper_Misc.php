@@ -705,7 +705,6 @@ class Helper_Misc {
 		$default_template_path = PDF_PLUGIN_DIR . $relative_image_path;
 		$default_template_url  = PDF_PLUGIN_URL . $relative_image_path;
 
-
 		/* Multisite Location */
 		if ( is_multisite() && is_file( $this->data->multisite_template_location . 'images/' . $template ) ) {
 			return $this->data->multisite_template_location_url . 'images/' . $template;
@@ -909,5 +908,35 @@ class Helper_Misc {
 		}
 
 		return $evaluation;
+	}
+
+	/**
+	 * Check if running single or multisite and return the working directory path
+	 *
+	 * @return string Path to working directory
+	 *
+	 * @since 4.0
+	 */
+	public function get_template_path() {
+		if( is_multisite() ) {
+			return $this->data->multisite_template_location;
+		}
+
+		return $this->data->template_location;
+	}
+
+	/**
+	 * Check if running single or multisite and return the working directory URL
+	 *
+	 * @return string URL to working directory
+	 *
+	 * @since 4.0
+	 */
+	public function get_template_url() {
+		if( is_multisite() ) {
+			return $this->data->multisite_template_location_url;
+		}
+
+		return $this->data->template_location_url;
 	}
 }

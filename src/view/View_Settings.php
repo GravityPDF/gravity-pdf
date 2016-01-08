@@ -253,7 +253,7 @@ class View_Settings extends Helper_Abstract_View {
 			wp_die( __( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
 		}
 
-		$template_directory = ( is_multisite() ) ? $this->data->multisite_template_location : $this->data->template_location;
+		$template_directory = $this->misc->get_template_path();
 
 		$vars = array(
 			'template_directory'            => $this->misc->relative_path( $template_directory, '/' ),

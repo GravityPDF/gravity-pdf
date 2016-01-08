@@ -177,13 +177,11 @@ class Helper_Migration {
 	 */
 	private function load_old_configuration() {
 
+		$path = $this->misc->get_template_path();
+
 		/* Import our configuration files */
-		if ( ! is_multisite() && is_file( $this->data->template_location . 'configuration.php' ) ) {
-			require_once( $this->data->template_location . 'configuration.php' );
-
-		} elseif ( is_multisite() && is_file( $this->data->multisite_template_location . 'configuration.php' ) ) {
-			require_once( $this->data->multisite_template_location . 'configuration.php' );
-
+		if ( is_file( $path . 'configuration.php' ) ) {
+			require_once( $path . 'configuration.php' );
 		} else {
 			throw new Exception( 'Could not locate v3 configuration file.' );
 		}
@@ -559,13 +557,10 @@ class Helper_Migration {
 	 * @since 4.0
 	 */
 	private function archive_v3_configuration() {
-		if ( ! is_multisite() && is_file( $this->data->template_location . 'configuration.php' ) ) {
-			@rename( $this->data->template_location . 'configuration.php', $this->data->template_location . 'configuration.archive.php' );
-		}
+		$path = $this->misc->get_template_path();
 
-		/* Check multisite installation */
-		if ( is_multisite() && is_file( $this->data->multisite_template_location . 'configuration.php' ) ) {
-			@rename( $this->data->multisite_template_location . 'configuration.php', $this->data->multisite_template_location . 'configuration.archive.php' );
+		if ( is_file( $path . 'configuration.php' ) ) {
+			@rename( $path . 'configuration.php', $path . 'configuration.archive.php' );
 		}
 	}
 
@@ -577,7 +572,7 @@ class Helper_Migration {
 	 * @since 4.0
 	 */
 	private function cleanup_output_directory() {
-		$output_dir = $this->data->template_location . 'output';
+		$output_dir = $this->misc->get_template_path() . 'output';
 
 		if ( is_dir( $output_dir ) ) {
 			return $this->misc->rmdir( $output_dir );

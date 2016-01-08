@@ -107,13 +107,11 @@ class GFPDF_Core extends GFPDF_Depreciated_Abstract {
 		}
 
 		if ( ! defined( 'PDF_TEMPLATE_LOCATION' ) ) {
-			$destination_path = ( is_multisite() ) ? $gfpdf->data->multisite_template_location : $gfpdf->data->template_location;
-			define( 'PDF_TEMPLATE_LOCATION', $destination_path );
+			define( 'PDF_TEMPLATE_LOCATION', $gfpdf->misc->get_template_path() );
 		}
 
 		if ( ! defined( 'PDF_TEMPLATE_URL_LOCATION' ) ) {
-			$destination_url = ( is_multisite() ) ? $gfpdf->data->multisite_template_location_url : $gfpdf->data->template_location_url;
-			define( 'PDF_TEMPLATE_URL_LOCATION', $destination_url );
+			define( 'PDF_TEMPLATE_URL_LOCATION', $gfpdf->misc->get_template_url() );
 		}
 	}
 
@@ -127,7 +125,7 @@ class GFPDF_Core extends GFPDF_Depreciated_Abstract {
 
 		$gfpdfe_data = $gfpdf->data;
 
-		$gfpdf->data->template_site_location = $gfpdf->data->template_location_url;
+		$gfpdf->data->template_site_location = $gfpdf->misc->get_template_url();
 		$gfpdf->data->template_save_location = $gfpdf->data->template_tmp_location;
 	}
 }
