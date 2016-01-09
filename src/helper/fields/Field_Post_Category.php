@@ -157,7 +157,7 @@ class Field_Post_Category extends Helper_Abstract_Fields {
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
-		echo $this->fieldObject->html();
+		return $this->fieldObject->html();
 	}
 
 	/**

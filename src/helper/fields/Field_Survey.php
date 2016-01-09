@@ -193,9 +193,7 @@ class Field_Survey extends Helper_Abstract_Fields {
 			return parent::html( '' );
 		}
 
-		echo $this->fieldObject->html();
-
-		return '';
+		return $this->fieldObject->html();
 	}
 
 	/**
