@@ -1346,16 +1346,6 @@ class Test_PDF extends WP_UnitTestCase {
 		$html = ob_get_clean();
 
 		$this->assertNotFalse( strpos( $html, '<div class="value">&nbsp;</div>' ) );
-
-		/* Enable legacy css */
-		$config['meta']['legacy_css'] = true;
-
-		ob_start();
-		$this->view->process_field( $field, $entry, $form, $config, $products, new Helper_Field_Container(), $this->model );
-		$html = ob_get_clean();
-
-		$this->assertNotFalse( strpos( $html, 'entry-view-field-value' ) );
-
 	}
 
 	/**
@@ -1380,32 +1370,6 @@ class Test_PDF extends WP_UnitTestCase {
 		$html = ob_get_clean();
 
 		$this->assertNotFalse( strpos( $html, '<h3 id="form_title">' ) );
-	}
-
-	/**
-	 * Check our legacy (v3) classes are loaded correctly
-	 *
-	 * @since 4.0
-	 */
-	public function test_load_legacy_css() {
-
-		/* Create standard field objects */
-		$text       = new GF_Field();
-		$text->type = 'text';
-
-		$html       = new GF_Field();
-		$html->type = 'html';
-
-		$section       = new GF_Field();
-		$section->type = 'section';
-
-		$this->view->load_legacy_css( $text );
-		$this->view->load_legacy_css( $html );
-		$this->view->load_legacy_css( $section );
-
-		$this->assertNotFalse( strpos( $text->cssClass, 'entry-view-field-value' ) );
-		$this->assertNotFalse( strpos( $html->cssClass, 'entry-view-html-value' ) );
-		$this->assertNotFalse( strpos( $section->cssClass, 'entry-view-section-break-content' ) );
 	}
 
 	/**
