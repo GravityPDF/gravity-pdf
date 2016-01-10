@@ -109,7 +109,7 @@ class Field_Post_Custom_Field extends Helper_Abstract_Fields {
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
-		echo $this->fieldObject->html();
+		return $this->fieldObject->html();
 	}
 
 	/**
