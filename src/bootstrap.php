@@ -824,6 +824,19 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	}
 
 	/**
+	 * Backwards compatibility with our early v3 templates
+	 *
+	 * @param $form_id
+	 *
+	 * @return array
+	 *
+	 * @since 4.0
+	 */
+	public function get_config_data( $form_id ) {
+		return $this->get_default_config_data( $form_id );
+	}
+
+	/**
 	 * Add backwards compatbility with v3.x.x default PDF template files
 	 * This function will now pull the PDF configuration details from our query variables / or our backwards compatible URL params method
 	 *

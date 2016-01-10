@@ -2,8 +2,8 @@
 
 /* For backwards compatibility reasons this file will be in the global namespace */
 use GFPDF\Router;
-use GFPDF\Model\Model_PDF;
-use GFPDF\View\View_PDF;
+use GFPDF\Helper\Fields\Field_Products;
+
 
 /**
  * Depreciated Functionality / Classes
@@ -342,7 +342,7 @@ class PDF_Common extends GFPDF_Depreciated_Abstract {
 class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 
 	/**
-	 * Generate our PDF HTML layout
+	 * First legacy wrapper to generate our PDF HTML layout
 	 *
 	 * @param  array   $form The Gravity Form array
 	 * @param  array   $lead The Gravity Form entry
@@ -358,12 +358,10 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 	public static function lead_detail_grid( $form, $lead, $allow_display_empty_fields = false, $show_html = false, $show_page_name = false, $return = false ) {
 		$config = array(
 			'meta' => array(
-				'empty'      => $allow_display_empty_fields,
-				'echo'       => ! $return,
-				'legacy_css' => true,
-				'html_field' => $show_html,
-				'page_names' => $show_page_name,
-				'show_title' => true,
+				'empty_field' => $allow_display_empty_fields,
+				'return'      => $return,
+				'html_field'  => $show_html,
+				'page_names'  => $show_page_name,
 			),
 		);
 
@@ -371,7 +369,7 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 	}
 
 	/**
-	 * Generate our PDF HTML layout
+	 * Second legacy wrapper to generate our PDF HTML layout
 	 *
 	 * @param  array $form   The Gravity Form array
 	 * @param  array $lead   The Gravity Form entry
@@ -382,34 +380,192 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 	 * @since 3.7
 	 */
 	public static function do_lead_detail_grid( $form, $lead, $config = array() ) {
-		global $gfpdf;
 
 		/* Convert old config values to our new ones */
 		if ( ! isset( $config['meta'] ) ) {
-
-			$convert = array(
-				'empty_field' => 'empty',
-				'return'      => 'echo',
-			);
-
-			foreach ( $convert as $key => $val ) {
-				if ( isset( $config[ $key ] ) ) {
-					$config[ $val ] = $config[ $key ];
-					unset( $config[ $key ] );
-				}
-			}
-
 			$config = array( 'meta' => $config );
 		}
 
-		/* Set up any legacy configuration options needed */
-		$config['meta']['legacy_css'] = true;
-		$config['meta']['show_title'] = true;
+		return self::generate_v3_html_structure( $form, $lead, $config['meta'] );
+	}
 
-		$model = new Model_PDF( $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
-		$view  = new View_PDF( array(), $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
+	/**
+	 * Loop through our form and output the results
+	 *
+	 * @param  array $form   The Gravity Form array
+	 * @param  array $lead   The Gravity Form entry
+	 * @param  array $config The PDF Configuration
+	 *
+	 * @return array|void
+	 *
+	 * @since 4.0
+	 */
+	public static function generate_v3_html_structure( $form, $lead, $config ) {
+		global $gfpdf;
 
-		return $view->process_html_structure( $lead, $model, $config );
+		/* Setup our variables */
+		$model        = GPDFAPI::get_mvc_class( 'Model_PDF' );
+		$products     = new Field_Products( new GF_Field(), $lead, $gfpdf->form, $gfpdf->misc );
+		$has_products = false;
+		$page_number  = 0;
+
+		/* Setup field to return the form data, if needed */
+		$results = array(
+			'title' => '',
+			'field' => array(),
+		);
+
+		/* Output some legacy styles */
+		$styles = '<style>
+			div table, div ul, td table, td ul, .list {
+				width: 95%;
+			}
+
+			div ul, div ol {
+			   padding-left: 15px;
+			}
+		</style>
+		';
+
+		/* Output the form title */
+		if ( $config['return'] ) {
+			$results['title'] = $styles . '<h2 id="details" class="default">' . $form['title'] . '</h2>';
+		} else {
+			?>
+
+			<?php echo $styles ; ?>
+			<div id='container'>
+			<h2 id='details' class='default'><?php echo $form['title'] ?></h2>
+			<?php
+		}
+
+		/* Loop through our fields and output */
+		foreach ( $form['fields'] as $field ) {
+
+			/* Skip any fields with the css class 'exclude' or any hidden fields */
+			if ( strpos( $field->cssClass, 'exclude' ) || GFFormsModel::is_field_hidden( $form, $field, array(), $lead ) ) {
+				continue;
+			}
+
+			/* Skip over any product fields, if needed */
+			if ( GFCommon::is_product_field( $field->type ) ) {
+				$has_products = true;
+				continue;
+			}
+
+			/* Check if we should display the page names */
+			if ( $config['page_names'] === true && (int) $field->pageNumber !== $page_number && isset( $form['pagination']['pages'][ $page_number ] ) ) {
+				if ( $config['return'] ) {
+					$results['field'][] = '<h2 id="field-' . $field->id . '" class="default entry-view-page-break">' . $form['pagination']['pages'][ $page_number ] . '</h2>';
+				} else {
+					?>
+					<h2 id="field-<?php echo $field->id; ?>"
+					    class="default entry-view-page-break"><?php echo $form['pagination']['pages'][ $page_number ]; ?></h2>
+					<?php
+				}
+				$page_number++;
+			}
+
+			/* Output each field type */
+			$input = RGFormsModel::get_input_type( $field );
+			$excluded = array( 'captcha', 'password', 'page' );
+
+			/* Skip over any fields we don't want to include */
+			if( in_array( $input, $excluded ) ) {
+				continue;
+			}
+
+			/* Load our class */
+			$class = $model->get_field_class( $field, $form, $lead, $products );
+
+			/* Check if HTML field should be included */
+			if( $input == 'html' ) {
+
+				if( $config['html_field'] === true ) {
+					$html = $class->html();
+
+					if ( $config['return'] ) {
+						$results['field'][] = $html;
+					} else {
+						echo $html;
+					}
+				}
+
+				continue;
+			}
+
+			/* Only load our HTML if the field is NOT empty, or the 'empty_field' config option is true */
+			if ( $config['empty_field'] === true || ! $class->is_empty() ) {
+				self::load_legacy_css( $field );
+
+				$html = ( $field->type !== 'section' ) ? $class->html() : $class->html( $config['section_content'] );
+
+				if ( $config['return'] ) {
+					$results['field'][] = $html;
+				} else {
+					echo $html;
+				}
+			}
+
+		}
+
+		/* Output product table, if needed */
+		if ( $has_products && ! $products->is_empty() ) {
+			$products = $products->html();
+
+			if ( $config['return'] ) {
+				$results['field'][] = $products;
+			} else {
+				echo $products;
+			}
+		}
+
+		/* Return the HTML structure */
+		if ( $config['return'] ) {
+			return $results;
+		} else {
+			?>
+			</div><!-- Close container -->
+			<?php
+		}
+	}
+
+	/**
+	 * Our default template used a number of legacy classes.
+	 * To keep backwards compatible, we will manually assign when needed.
+	 *
+	 * @param  GF_Field $field The Gravity Form Fields
+	 *
+	 * @return void (classes are passed by reference)
+	 *
+	 * @since 4.0
+	 */
+	public static function load_legacy_css( GF_Field $field ) {
+		static $counter = 1;
+
+		/* Because multiple PDFs can be processed at the same time and will share the same field classes we'll only update the css once */
+		if ( strpos( $field->cssClass, 'gfpdf-field-processed' ) !== false ) {
+			return;
+		}
+
+		/* Add odd / even rows */
+		$field->cssClass = ( $counter++ % 2 ) ? $field->cssClass . ' odd' : ' even';
+
+		switch ( $field->type ) {
+			case 'html':
+				$field->cssClass .= ' entry-view-html-value';
+			break;
+
+			case 'section':
+				$field->cssClass .= ' entry-view-section-break-content';
+			break;
+
+			default:
+				$field->cssClass .= ' entry-view-field-value';
+			break;
+		}
+
+		$field->cssClass .= ' gfpdf-field-processed';
 	}
 
 	/**

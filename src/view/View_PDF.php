@@ -441,45 +441,6 @@ class View_PDF extends Helper_Abstract_View {
 		echo apply_filters( 'gfpdf_pdf_form_title_html', ob_get_clean(), $form );
 	}
 
-
-	/**
-	 * Our default template used a number of legacy classes.
-	 * To keep backwards compatible, we will manually assign when needed.
-	 *
-	 * @param  GF_Field $field The Gravity Form Fields
-	 *
-	 * @return void (classes are passed by reference)
-	 *
-	 * @since 4.0
-	 */
-	public function load_legacy_css( GF_Field $field ) {
-		static $counter = 1;
-
-		/* Because multiple PDFs can be processed at the same time and will share the same field classes we'll only update the css once */
-		if ( strpos( $field->cssClass, 'gfpdf-field-processed' ) !== false ) {
-			return;
-		}
-
-		/* Add odd / even rows */
-		$field->cssClass = ( $counter++ % 2 ) ? $field->cssClass . ' odd' : ' even';
-
-		switch ( $field->type ) {
-			case 'html':
-				$field->cssClass .= ' entry-view-html-value';
-			break;
-
-			case 'section':
-				$field->cssClass .= ' entry-view-section-break-content';
-			break;
-
-			default:
-				$field->cssClass .= ' entry-view-field-value';
-			break;
-		}
-
-		$field->cssClass .= ' gfpdf-field-processed';
-	}
-
 	/**
 	 * Output the current page name HTML
 	 *

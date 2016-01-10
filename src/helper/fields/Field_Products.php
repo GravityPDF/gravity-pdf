@@ -84,6 +84,7 @@ class Field_Products extends Helper_Abstract_Fields {
 		?>
 
 		<div class="row-separator products-title-container">
+			<!-- <h2>Backwards Compatible</h2> -->
 			<h3 class="product-field-title gfpdf-field">
 				<?php
 				$label = apply_filters( 'gform_order_label', __( 'Order', 'gravityforms' ), $form_id );
