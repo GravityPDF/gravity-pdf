@@ -835,7 +835,12 @@ class Model_PDF extends Helper_Abstract_Model {
 
 				if ( ! is_wp_error( $settings ) && $this->maybe_attach_to_notification( $notifications, $settings ) ) {
 
-					$filename = $this->generate_and_save_pdf( $entry, $settings );
+					/* Add backwards compatibility filter for our Tier 2 v3 Package if needed */
+					if( $settings['advanced_template'] == 'Yes' ) {
+						$tier_2_filename = apply_filters( 'gfpdfe_return_pdf_path', $form['id'], $entry['id'] );
+					}
+
+					$filename = ( isset( $tier_2_filename ) && is_file( $tier_2_filename ) ) ? $tier_2_filename : $this->generate_and_save_pdf( $entry, $settings );
 
 					if ( ! is_wp_error( $filename ) ) {
 						$this->options->increment_pdf_count();
