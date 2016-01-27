@@ -596,14 +596,13 @@ class GFPDF_Core_Model
 	/*
 	 * Get all the notifications assigned to a form so we can determine if a PDF should be attached
 	 */
-    public static function get_notifications_name($action, $form){
+    public static function get_notifications_name($form){
         if(rgempty("notifications", $form))
             return array();
 
         $notifications = array();
         foreach($form["notifications"] as $notification){
-            if(rgar($notification, "event") == $action)
-                $notifications[] = $notification['name'];
+	        $notifications[] = $notification['name'];
         }
 
         return $notifications;
@@ -627,7 +626,7 @@ class GFPDF_Core_Model
 		/*
 		 * Get all form_submission notifications and use to check if any are configured to attach a PDF
 		 */  			 
-		$notifications = self::get_notifications_name('form_submission', $form);			
+		$notifications = self::get_notifications_name($form);
 
 		$new_notifications = array();				
 

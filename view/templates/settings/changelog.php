@@ -41,7 +41,8 @@
 
   <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
   <ul>
-    <li>Resolve mPDF PHP7 image parsing error due to a change in variable handling.</li>
+    <li>Bug - Added full support for all Gravity Forms notification events (includes Payment Complete, Payment Refund, Payment Failed, Payment Pending ect)</li>
+    <li>Bug - Resolve mPDF PHP7 image parsing error due to a change in variable order parsing.</li>
   </ul>
 
 

@@ -495,7 +495,7 @@ class Test_PDFModel extends WP_UnitTestCase {
 	public function test_get_notifications_name()
 	{
 		$form = GFAPI::get_form($this->form_id[0]);
-		$notifications = GFPDF_Core_Model::get_notifications_name('form_submission', $form);	
+		$notifications = GFPDF_Core_Model::get_notifications_name($form);
 		
 		/*
 		 * Run assertions 

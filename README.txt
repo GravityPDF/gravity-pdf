@@ -87,7 +87,8 @@ All FAQs can be [viewed on the Gravity PDF website](https://gravitypdf.com/#faqs
 == Changelog ==
 
 = 3.7.6 =
-* Bug - Resolve mPDF PHP7 image parsing error due to a change in variable handling.
+* Bug - Added full support for all Gravity Forms notification events (includes Payment Complete, Payment Refund, Payment Failed, Payment Pending ect)
+* Bug - Resolve mPDF PHP7 image parsing error due to a change in variable order parsing.
 
 = 3.7.5 =
 * Housekeeping - Tweak mPDF package to be PHP7 compatible.
