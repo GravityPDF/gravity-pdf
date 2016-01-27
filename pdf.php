@@ -4,7 +4,7 @@
  * Plugin Name: Gravity PDF
  * Plugin URI: https://gravitypdf.com
  * Description: Gravity PDF allows you to save/view/download a PDF from the front- and back-end, and automate PDF creation on form submission. Our Business Plus package also allows you to overlay field onto an existing PDF.
- * Version: 3.7.5
+ * Version: 3.7.6
  * Author: Blue Liquid Designs
  * Author URI: http://www.blueliquiddesigns.com.au
  */
@@ -37,15 +37,15 @@
  {
  	error_reporting(0);
  }
- 
+
 /*
  * Define our constants
  */
-define('PDF_EXTENDED_VERSION', '3.7.5');
+define('PDF_EXTENDED_VERSION', '3.7.6');
 define('GF_PDF_EXTENDED_SUPPORTED_VERSION', '1.8');
 define('GF_PDF_EXTENDED_WP_SUPPORTED_VERSION', '3.9');
 define('GF_PDF_EXTENDED_PHP_SUPPORTED_VERSION', '5');
-  
+
 define('PDF_PLUGIN_DIR', plugin_dir_path( __FILE__ ));
 define('PDF_PLUGIN_URL', plugin_dir_url( __FILE__ ));
 define("PDF_SETTINGS_URL", site_url() .'/wp-admin/admin.php?page=gf_settings&subview=PDF');
@@ -67,12 +67,12 @@ define('GF_PDF_EXTENDED_PLUGIN_BASENAME', plugin_basename(__FILE__));
   */
    add_action('init', array('GFPDF_Core', 'pdf_init'));
    add_action('wp_ajax_support_request', array('GFPDF_Settings_Model', 'gfpdf_support_request'));
-   
+
 
 class GFPDF_Core extends PDFGenerator
 {
 	public $render;
-		
+
 	/*
 	 * Main Controller
 	 * First function fired when plugin is loaded
@@ -95,12 +95,12 @@ class GFPDF_Core extends PDFGenerator
 		 include_once PDF_PLUGIN_DIR . 'pdf-settings.php';
 		 include_once PDF_PLUGIN_DIR . 'depreciated.php';
 		 include_once PDF_PLUGIN_DIR . 'helper/pdf-entry-detail.php';
-   
+
 		/*
 		 * Set the notice type
 		 */
 		self::set_notice_type();
-   
+
 	   /*
 	    * Add localisation support
 	    */
@@ -135,12 +135,12 @@ class GFPDF_Core extends PDFGenerator
 				add_action('admin_init',  array('GFPDF_Core', 'gfe_admin_init'), 9);
 			}
 		}
-		 
+
 		/*
 		 * We'll initialise our model which will do any function checks ect
 		 */
 		 include PDF_PLUGIN_DIR . 'model/pdf.php';
-		 			 	
+
 		/*
 		* Check for any major compatibility issues early
 		*/
@@ -152,13 +152,13 @@ class GFPDF_Core extends PDFGenerator
 			 */
 			return;
 		}
-		
+
 		/*
 		* Some functions are required to monitor changes in the admin area
 		* and ensure the plugin functions smoothly
 		*/
 		add_action('admin_init', array('GFPDF_Core', 'fully_loaded_admin'), 9999); /* run later than usual to give our auto initialiser a chance to fire */
-		
+
 		/*
 		 * Only load the plugin if the following requirements are met:
 		 *  - Load on Gravity Forms Admin pages
@@ -175,14 +175,14 @@ class GFPDF_Core extends PDFGenerator
 			global $gfpdf;
 			$gfpdf = new GFPDF_Core();
 		 }
-		 
+
 		 return;
-				  
+
    }
-	
+
 	public function __construct()
 	{
-		
+
 		/*
 		 * Ensure the system is fully installed
 		 * We run this after the 'settings' page has been set up (above)
@@ -193,20 +193,20 @@ class GFPDF_Core extends PDFGenerator
 		}
 
 		global $gfpdfe_data;
-		
+
 		/*
 		* Set up the PDF configuration and indexer
 		* Accessed through $this->configuration and $this->index.
 		*/
 		parent::__construct();
-		
+
 		/*
 		* Add our main hooks
 		*/
 		add_action('gform_entries_first_column_actions', array('GFPDF_Core_Model', 'pdf_link'), 10, 4);
 		add_action("gform_entry_info", array('GFPDF_Core_Model', 'detail_pdf_link'), 10, 2);
 		add_action('wp', array('GFPDF_Core_Model', 'process_exterior_pages'));
-		
+
 		/*
 		* Apply default filters
 		*/
@@ -218,12 +218,12 @@ class GFPDF_Core extends PDFGenerator
 		{
 			wp_enqueue_script( 'gfpdfeentries', PDF_PLUGIN_URL . 'resources/javascript/entries-admin.min.js', array('jquery') );
 		}
-		
+
 		/*
 		* Register render class
 		*/
 		$this->render = new PDFRender();
-		
+
 		/*
 		* Run the notifications filter / save action hook if the web server can write to the output folder
 		*/
@@ -232,9 +232,9 @@ class GFPDF_Core extends PDFGenerator
 			add_action('gform_after_submission', array('GFPDF_Core_Model', 'gfpdfe_save_pdf'), 10, 2);
 			add_filter('gform_notification', array('GFPDF_Core_Model', 'gfpdfe_create_and_attach_pdf'), 100, 3);  /* ensure it's called later than standard so the attachment array isn't overridden */
 		}
-		
+
 	}
-	
+
 	/*
 	 * Do processes that require Wordpress Admin to be fully loaded
 	 */
@@ -250,7 +250,7 @@ class GFPDF_Core extends PDFGenerator
 	 	}
 
 	 	global $gfpdfe_data;
-	
+
 	 	/*
 	 	 * Don't run initialiser if we cannot...
 	 	 */
@@ -267,19 +267,19 @@ class GFPDF_Core extends PDFGenerator
 		* Check if we have direct write access to the server
 		*/
 		GFPDF_InstallUpdater::check_filesystem_api();
-		
+
 		/*
 		* Check if we can automatically deploy the software.
 		* 90% of sites should be able to do this as they will have 'direct' write abilities
 		* to their server files.
 		*/
 		GFPDF_InstallUpdater::maybe_deploy();
-		
+
 		/*
 		* Check if we need to deploy the software
 		*/
 		self::check_deployment();
-		
+
 		/*
 		* Check if the template folder location needs to be migrated
 		*/
@@ -288,7 +288,7 @@ class GFPDF_Core extends PDFGenerator
 			GFPDF_InstallUpdater::check_template_migration();
 		}
 	 }
-	 
+
 	 /*
 	  * Depending on what page we are on, we need to fire different notices
 	  * We've added our own custom notice to the settings page as some functions fire later than the normal 'admin_notices' action
@@ -328,7 +328,7 @@ class GFPDF_Core extends PDFGenerator
 	  		{
 	  			return;
 	  		}
-			
+
 			/*
 			 * Check if GF PDF Extended is correctly installed. If not we'll run the installer.
 			 */
@@ -358,7 +358,7 @@ class GFPDF_Core extends PDFGenerator
 				add_action($gfpdfe_data->notice_type, array("GFPDF_Notices", "gf_pdf_problem_detected"));
 			}
 	  }
-	
+
 	/**
 	 * Add our scripts and settings page to the admin area
 	 */
@@ -378,7 +378,7 @@ class GFPDF_Core extends PDFGenerator
 		  );
 
 		  wp_localize_script( 'pdfextended-settings-script', 'GFPDF', $localise_script );
-		 
+
 		 /*
 		  * Register our scripts/styles with Gravity Forms to prevent them being removed in no conflict mode
 		  */
@@ -386,9 +386,9 @@ class GFPDF_Core extends PDFGenerator
 		  add_filter('gform_noconflict_styles', array('GFPDF_Core', 'register_gravityform_styles'));
 
 		  add_filter('gform_tooltips', array('GFPDF_Notices', 'add_tooltips'));
-		  
+
 	}
-	
+
 	/*
 	 * Register our scripts with Gravity Forms so they aren't removed when no conflict mode is active
 	 */
@@ -396,7 +396,7 @@ class GFPDF_Core extends PDFGenerator
 	{
 		$scripts[] = 'pdfextended-settings-script';
 		$scripts[] = 'gfpdfeentries';
-		
+
 		return $scripts;
 	}
 
@@ -406,10 +406,10 @@ class GFPDF_Core extends PDFGenerator
 	public static function register_gravityform_styles($styles)
 	{
 		$styles[] = 'pdfextended-admin-styles';
-		
+
 		return $styles;
 	}
-	
+
 }
 
 /*

@@ -4,7 +4,7 @@
   Template: Changelog
   Module: Settings Page
   */
- 
+
 /*
     This file is part of Gravity PDF.
 
@@ -24,7 +24,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-  
+
   /*
    <li>Don't run if the correct class isn't present
    */
@@ -32,14 +32,21 @@
   {
 	 exit;
   }
-  
+
   ?>
 
     <h2><?php _e('Changelog'); ?></h2>
-    
+
     <p><strong>Current Version: <?php echo PDF_EXTENDED_VERSION; ?></strong></p>
 
   <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
+  <ul>
+    <li>Bug - Added full support for all Gravity Forms notification events (includes Payment Complete, Payment Refund, Payment Failed, Payment Pending ect)</li>
+    <li>Bug - Resolve mPDF PHP7 image parsing error due to a change in variable order parsing.</li>
+  </ul>
+
+
+  <h3>3.7.5</h3>
   <ul>
     <li>Tweak mPDF package to be PHP7 compatible.</li>
   </ul>
@@ -59,7 +66,7 @@
   <ul>
     <li>Bug - Updated $form_data['date_created'], $form_data['date_created_usa'], $form_data['misc']['date_time'], $form_data['misc']['time_24hr'] and $form_data['misc']['time_12hr'] to factor in the website's timezone settings. </li>
   </ul>
-  
+
 
   <h3>3.7.1</h3>
   <ul>
@@ -139,7 +146,7 @@
   <ul>
     <li>Bug - Fixed issue affected some users where a depreciated function was causing a fatal error </li>
   </ul>
-  
+
   <h3>3.5.7</h3>
   <ul>
     <li>Bug - Fixed issue where the PDF settings page was blank for some users</li>
@@ -303,7 +310,7 @@
       <li>Bug - Fixed path to fallback templates when not found</li>
       <li>Bug - Fixed problem with master password setting to user password</li>
     </ul>
-    
+
     <h3>3.3.4</h3>
     <ul>
     	<li>Bug - Fixed issue linking to PDF from front end</li>
@@ -315,23 +322,23 @@
         <li>Bug - Some users still reported incorrect RAM. Convert MB/KB/GB values to M/K/G as per the PHP documentation.</li>
         <li>Housekeeping - Show initilisation prompt on all admin area pages instead of only on the Gravity Forms pages</li>
     </ul>
-    
+
  	<h3>3.3.2.1</h3>
     <ul>
     	<li>Bug - Incorrectly showing assigned RAM to website</li>
     </ul>
- 
+
  	<h3>3.3.2</h3>
     <ul>
     	<li>Bug - Some hosts reported SSL certificate errors when using the support API. Disabled HTTPS for further investigation. Using hash-based verification for authentication.</li>
     	<li>Housekeeping - Forgot to disable API debug feature after completing beta</li>
     </ul>
- 
+
     <h3>3.3.1</h3>
     <ul>
     	<li>Bug - $form_data['list'] was mapped using an incremental key instead of via the field ID</li>
     </ul>
- 
+
     <h3>3.3.0</h3>
     <ul>
       <li>Feature - Overhauled  the initialisation process so that the software better reviews the host for  potential problems before initialisation. This should help debug issues and  make users aware there could be a problem <strong>before</strong> they begin using the software.</li>
@@ -352,9 +359,9 @@
       <li>Housekeeping - Fixed PHP notices in default templates related to the default template-only configuration options</li>
       <li>Housekeeping - Update core styles to match Wordpress 3.8/Gravity Forms 1.8.</li>
       <li>Housekeeping - Updated header/footer examples to use @page in example.</li>
-      
+
     </ul>
-    
+
     <h3>3.2.0</h3>
     <ul>
       <li>Feature - Can now view multiple PDFs assigned to a single form via the admin area. Note: You must provide a unique 'filename' parameter in configuration.php for multiple PDFs assigned to a single form. </li>
@@ -367,7 +374,7 @@
       <li>Bug - Fixed problem sending duplicate PDF when using mass resend notification feature</li>
       <li>Depreciated - Removed GF_FORM_ID and GF_LEAD_ID constants which were used in v2.x.x of the software. Ensure you follow <a rel="nofollow" href="https://developer.gravitypdf.com/news/version-2-3-migration-guide/">v2.x.x upgrade guide</a> to your templates before upgrading.</li>
     </ul>
-    
+
     <h3>3.1.4</h3>
     <ul>
       <li>Bug - Fixed issue with plugin breaking website's when the Gravity Forms plugin wasn't activated.</li>
@@ -375,7 +382,7 @@
       <li>Housekeeping - PDF template files can no longer be accessed directly. Instead, add &amp;html=1 to the end of your URL when viewing a PDF.</li>
       <li>Extension - Added additional filters to allow the lead ID and notifications to be overridden.</li>
     </ul>
-    
+
     <h3>3.1.3</h3>
     <ul>
       <li>Feature - Added signature_details_id to $form_data array which maps a signatures field ID to the array.</li>
@@ -386,7 +393,7 @@
       <li>Bug - Fixed issue with empty signature field not displaying when option 'default-show-empty' is set.</li>
       <li>Bug - Fixed initialisation prompt issue when the MPDF package wasn't unpacked.</li>
     </ul>
-    
+
     <h3>3.1.2</h3>
     <ul>
       <li>Feature - Added list array, file path, form ID and lead ID to $form_data array in custom templates</li>
@@ -395,7 +402,7 @@
       <li>Bug - Fixed issue with product dropdown and radio button data showing the value instead of the name field.</li>
       <li>Bug - Fixed incorrect URL pointing to signature in $form_data</li>
     </ul>
-    
+
     <h3>3.1.1</h3>
     <ul>
       <li>Bug - Users whose server only supports FTP file manipulation using the WP_Filesystem API moved the files into the wrong directory due to FTP usually being rooted to the WordPress home directory. To fix this the plugin attempts to determine the FTP directory, otherwise assumes it is the WP base directory. </li>
