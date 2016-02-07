@@ -890,7 +890,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function maybe_always_save_pdf( $settings ) {
-		if ( strtolower( $settings['save'] ) == 'yes' ) {
+		if ( isset( $settings['save'] ) && strtolower( $settings['save'] ) == 'yes' ) {
 			return true;
 		}
 
