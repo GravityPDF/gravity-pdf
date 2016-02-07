@@ -836,7 +836,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				if ( ! is_wp_error( $settings ) && $this->maybe_attach_to_notification( $notifications, $settings ) ) {
 
 					/* Add backwards compatibility filter for our Tier 2 v3 Package if needed */
-					if( $settings['advanced_template'] == 'Yes' ) {
+					if( isset( $settings['advanced_template'] ) && strtolower( $settings['advanced_template'] ) == 'yes' ) {
 						$tier_2_filename = apply_filters( 'gfpdfe_return_pdf_path', $form['id'], $entry['id'] );
 					}
 
