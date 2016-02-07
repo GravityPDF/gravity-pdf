@@ -150,8 +150,10 @@ class Field_Fileupload extends Helper_Abstract_Fields {
 		if ( ! empty( $value ) ) {
 			$paths = ( $this->field->multipleFiles ) ? json_decode( $value ) : array( $value );
 
-			foreach ( $paths as $path ) {
-				$files[] = esc_url( $path );
+			if( is_array( $paths ) && sizeof( $paths ) > 0 ) {
+				foreach ( $paths as $path ) {
+					$files[] = esc_url( $path );
+				}
 			}
 		}
 
