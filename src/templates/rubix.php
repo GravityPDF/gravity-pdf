@@ -22,6 +22,7 @@ if ( ! class_exists('GFForms')) {
  * $entry (The raw entry data)
  * $form_data (The processed entry data stored in an array)
  * $settings (the current PDF configuration)
+ * $fields (an array of Gravity Form fields which can be accessed with their ID number)
  * $gfpdf (the main Gravity PDF object containing all our helper classes)
  * $args (contains an array of all variables - the ones being described right now - passed to the template)
  */
