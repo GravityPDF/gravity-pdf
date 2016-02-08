@@ -350,20 +350,21 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		$fid     = $results['form']['id'];
 		$pid     = '555ad84787d7e';
 
-		/* Get our PDF */
-		$settings             = $gfpdf->options->get_pdf( $fid, $pid );
-		$settings['template'] = 'zadani';
-
 		/* Check for $entry error first */
-		$pdf = GPDFAPI::create_pdf( '', $settings );
+		$pdf = GPDFAPI::create_pdf( '', '' );
 		$this->assertEquals( 'invalid_entry', $pdf->get_error_code() );
 
 		/* Check for $settings error */
-		$pdf = GPDFAPI::create_pdf( $entry, '' );
+		$pdf = GPDFAPI::create_pdf( $entry['id'], '' );
 		$this->assertEquals( 'invalid_pdf_setting', $pdf->get_error_code() );
 
 		/* Create the PDF and test it was correctly generated */
-		$filename = GPDFAPI::create_pdf( $entry, $settings );
+		add_filter( 'gfpdf_pdf_config', function( $settings ) {
+			$settings['template'] = 'zadani';
+			return $settings;
+		} );
+
+		$filename = GPDFAPI::create_pdf( $entry['id'], $pid );
 
 		$this->assertTrue( is_file( $filename ) );
 
