@@ -800,6 +800,15 @@ class Model_PDF extends Helper_Abstract_Model {
 			$pdf_path = $pdf_generator->get_full_pdf_path();
 
 			if ( is_file( $pdf_path ) ) {
+
+				/* Add appropriate filters so developers can access the PDF when it is generated */
+				$form = $this->form->get_form( $entry['form_id'] );
+
+				do_action( 'gfpdf_post_pdf_save', $form['id'], $entry['id'], $settings, $pdf_path ); /* Backwards compatibility */
+
+				do_action( 'gfpdf_post_save_pdf', $form, $entry, $settings, $pdf_path );
+				do_action( 'gfpdf_post_save_pdf_' . $form['id'], $form, $entry, $settings, $pdf_path );
+
 				return $pdf_path;
 			}
 		}
@@ -918,15 +927,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 				/* Only generate if the PDF wasn't created during the notification process */
 				if ( ! is_wp_error( $settings ) && $this->maybe_always_save_pdf( $settings ) ) {
-
-					$filename = $this->generate_and_save_pdf( $entry, $settings );
-
-					/* Run an action users can tap into to manipulate the PDF */
-					if ( ! is_wp_error( $filename ) ) {
-						do_action( 'gfpdf_post_pdf_save', $entry['form_id'], $entry['id'], $settings, $filename ); /* Backwards compatibility */
-						do_action( 'gfpdf_post_save_pdf', $form, $entry, $settings, $filename );
-						do_action( 'gfpdf_post_save_pdf_' . $form['id'], $form, $entry, $settings, $filename );
-					}
+					$this->generate_and_save_pdf( $entry, $settings );
 				}
 			}
 		}
