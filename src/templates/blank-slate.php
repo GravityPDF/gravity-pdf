@@ -202,40 +202,40 @@ if ( ! class_exists( 'GFForms' ) ) {
 <!-- Output our HTML markup -->
 <?php
 
-    /**
-     * Load our core-specific styles from our PDF settings which will be passed to the PDF template $config array
-     */
-    $show_form_title      = ( ! empty( $settings['show_form_title'] ) && $settings['show_form_title'] == 'Yes' )            ? true : false;
-    $show_page_names      = ( ! empty( $settings['show_page_names'] ) && $settings['show_page_names'] == 'Yes' )            ? true : false;
-    $show_html            = ( ! empty( $settings['show_html'] ) && $settings['show_html'] == 'Yes' )                        ? true : false;
-    $show_section_content = ( ! empty( $settings['show_section_content'] ) && $settings['show_section_content'] == 'Yes' )  ? true : false;
-    $enable_conditional   = ( ! empty( $settings['enable_conditional'] ) && $settings['enable_conditional'] == 'Yes' )      ? true : false;
-    $show_empty           = ( ! empty( $settings['show_empty'] ) && $settings['show_empty'] == 'Yes' )                      ? true : false;
+/**
+ * Load our core-specific styles from our PDF settings which will be passed to the PDF template $config array
+ */
+$show_form_title      = ( ! empty( $settings['show_form_title'] ) && $settings['show_form_title'] == 'Yes' )            ? true : false;
+$show_page_names      = ( ! empty( $settings['show_page_names'] ) && $settings['show_page_names'] == 'Yes' )            ? true : false;
+$show_html            = ( ! empty( $settings['show_html'] ) && $settings['show_html'] == 'Yes' )                        ? true : false;
+$show_section_content = ( ! empty( $settings['show_section_content'] ) && $settings['show_section_content'] == 'Yes' )  ? true : false;
+$enable_conditional   = ( ! empty( $settings['enable_conditional'] ) && $settings['enable_conditional'] == 'Yes' )      ? true : false;
+$show_empty           = ( ! empty( $settings['show_empty'] ) && $settings['show_empty'] == 'Yes' )                      ? true : false;
 
-    /**
-     * Set up our configuration array to control what is and is not shown in the generated PDF
-     *
-     * @var array
-     */
-    $config = array(
-        'settings'  => $settings,
-        'meta'      => array(
-            'echo'                => true, /* whether to output the HTML or return it */
-            'exclude'             => true, /* whether we should exclude fields with a CSS value of 'exclude'. Default to true */
-            'empty'               => $show_empty, /* whether to show empty fields or not. Default is false */
-            'conditional'         => $enable_conditional, /* whether we should skip fields hidden with conditional logic. Default to true. */
-            'show_title'          => $show_form_title, /* whether we should show the form title. Default to true */
-            'section_content'     => $show_section_content, /* whether we should include a section breaks content. Default to false */
-            'page_names'          => $show_page_names, /* whether we should show the form's page names. Default to false */
-            'html_field'          => $show_html, /* whether we should show the form's html fields. Default to false */
-            'individual_products' => false, /* Whether to show individual fields in the entry. Default to false - they are grouped together at the end of the form */
-        ),
-    );
+/**
+ * Set up our configuration array to control what is and is not shown in the generated PDF
+ *
+ * @var array
+ */
+$config = array(
+    'settings'  => $settings,
+    'meta'      => array(
+        'echo'                => true, /* whether to output the HTML or return it */
+        'exclude'             => true, /* whether we should exclude fields with a CSS value of 'exclude'. Default to true */
+        'empty'               => $show_empty, /* whether to show empty fields or not. Default is false */
+        'conditional'         => $enable_conditional, /* whether we should skip fields hidden with conditional logic. Default to true. */
+        'show_title'          => $show_form_title, /* whether we should show the form title. Default to true */
+        'section_content'     => $show_section_content, /* whether we should include a section breaks content. Default to false */
+        'page_names'          => $show_page_names, /* whether we should show the form's page names. Default to false */
+        'html_field'          => $show_html, /* whether we should show the form's html fields. Default to false */
+        'individual_products' => false, /* Whether to show individual fields in the entry. Default to false - they are grouped together at the end of the form */
+    ),
+);
 
-    /**
-     * Generate our HTML markup
-     *
-     * You can access Gravity PDFs common functions and classes through our API wrapper class "GPDFAPI"
-     */
-    $pdf = GPDFAPI::get_pdf_class();
-    $pdf->process_html_structure( $entry, GPDFAPI::get_pdf_class( 'model' ), $config );
+/**
+ * Generate our HTML markup
+ *
+ * You can access Gravity PDFs common functions and classes through our API wrapper class "GPDFAPI"
+ */
+$pdf = GPDFAPI::get_pdf_class();
+$pdf->process_html_structure( $entry, GPDFAPI::get_pdf_class( 'model' ), $config );
