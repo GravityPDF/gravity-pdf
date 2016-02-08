@@ -384,27 +384,35 @@ class GPDFAPI {
 	}
 
 	/**
-	 * Provided the Gravity Form entry and PDF settings, this method will correctly generate the PDF, save it to disk
-	 * and return the absolute path to the PDF.
+	 * When provided the Gravity Form entry ID and PDF ID, this method will correctly generate the PDF, save it to disk,
+	 * trigger appropriate actions and return the absolute path to the PDF.
 	 *
-	 * @param  array $entry   The Gravity Form entry array – eg. GFAPI::get_entry( $id )
-	 * @param  array $setting The PDF configuration settings for the particular entry / form being processed – eg. GPDFAPI::get_pdf( $form_id, $pdf_id )
+	 * @param  integer $entry_id The Gravity Form entry ID
+	 * @param  string  $pdf_id   The Gravity PDF ID number (the pid number in the URL when viewing a setting in the admin area)
 	 *
 	 * @return mixed            Return the full path to the PDF, or a WP_Error on failure
 	 *
 	 * @since 4.0
 	 */
-	public static function create_pdf( $entry, $setting ) {
+	public static function create_pdf( $entry_id, $pdf_id ) {
 
-		if ( ! is_array( $entry ) || empty( $entry['id'] ) ) {
-			return new WP_Error( 'invalid_entry', 'The $entry value is not a valid Gravity Forms Entry object. Use "GFAPI::get_entry( $id )" to get the object.' );
+		$form_class = self::get_form_class();
+
+		/* Get our entry */
+		$entry = $form_class->get_entry( $entry_id );
+
+		if ( is_wp_error( $entry ) ) {
+			return new WP_Error( 'invalid_entry', 'Make sure to pass in a valid Gravity Forms Entry ID' );
 		}
 
-		if ( ! is_array( $setting ) || empty( $setting['id'] ) ) {
-			return new WP_Error( 'invalid_pdf_setting', 'The $setting value is not a valid Gravity PDF Setting object. Use "GPDFAPI::get_pdf( $form_id, $pdf_id )" to get the object.' );
+		/* Get our settings */
+		$setting = self::get_pdf( $entry['form_id'], $pdf_id );
+
+		if ( is_wp_error( $setting ) ) {
+			return new WP_Error( 'invalid_pdf_setting', 'Could not located the PDF Settings. Ensure you pass in a valid PDF ID.' );
 		}
 
-		$pdf = self::get_pdf_class( 'model' );
+		$pdf = self::get_mvc_class( 'Model_PDF' );
 
 		return $pdf->generate_and_save_pdf( $entry, $setting );
 	}
