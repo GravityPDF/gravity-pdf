@@ -197,28 +197,6 @@ class GPDFAPI {
 	}
 
 	/**
-	 * Returns a new instance of one of our PDF generating code (model or view)
-	 *
-	 * @param  string $type Type of class to return. Valid options include 'view' or 'model'
-	 *
-	 * @return object|WP_Error
-	 *
-	 * @since  4.0
-	 */
-	public static function get_pdf_class( $type = 'view' ) {
-
-		if ( $type === 'view' ) {
-			return static::get_mvc_class( 'View_PDF');
-		}
-
-		if ( $type === 'model' ) {
-			return static::get_mvc_class( 'Model_PDF');
-		}
-
-		return new WP_Error( 'invalid_type', __( 'The $type parameter is invalid. Only "view" and "model" are accepted', 'gravity-forms-pdf-extended' ) );
-	}
-
-	/**
 	 * Gets a list of current PDFs setup for a particular Gravity Form
 	 *
 	 * @param  integer $form_id The Gravity Form ID
