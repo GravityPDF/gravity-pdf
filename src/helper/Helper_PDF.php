@@ -268,11 +268,13 @@ class Helper_PDF {
 
 		switch ( $this->output ) {
 			case 'DISPLAY':
+				$this->prevent_caching();
 				$this->mpdf->Output( $this->filename, 'I' );
 				wp_die();
 			break;
 
 			case 'DOWNLOAD':
+				$this->prevent_caching();
 				$this->mpdf->Output( $this->filename, 'D' );
 				wp_die();
 			break;
@@ -868,6 +870,18 @@ class Helper_PDF {
 			default:
 				return 'save';
 			break;
+		}
+	}
+
+
+	/**
+	 * Ensure the PDF doesn't get cached
+	 *
+	 * @since 4.0
+	 */
+	protected function prevent_caching() {
+		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+			define( 'DONOTCACHEPAGE', true );
 		}
 	}
 }
