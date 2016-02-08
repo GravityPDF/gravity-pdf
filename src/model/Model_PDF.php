@@ -1620,7 +1620,8 @@ class Model_PDF extends Helper_Abstract_Model {
 					$class = apply_filters( 'gfpdf_field_product_class', $product, $field, $entry, $form );
 				} else {
 					/* Load the selected class */
-					$class = apply_filters( 'gfpdf_field_' . $field->type . '_class', new $class_name( $field, $entry, $this->form, $this->misc ), $field, $entry, $form );
+					$class = apply_filters( 'gfpdf_field_class', new $class_name( $field, $entry, $this->form, $this->misc ), $field, $entry, $form );
+					$class = apply_filters( 'gfpdf_field_class_' . $field->type, $class, $field, $entry, $form );
 				}
 			}
 

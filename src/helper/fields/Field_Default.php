@@ -44,6 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 4.0
  */
 class Field_Default extends Helper_Abstract_Fields {
+
 	/**
 	 * Display the HTML version of this field
 	 *

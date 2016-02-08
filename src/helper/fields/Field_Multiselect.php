@@ -52,6 +52,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 4.0
  */
 class Field_Multiselect extends Helper_Abstract_Fields {
+
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
 	 *

@@ -79,13 +79,14 @@ class Field_Poll extends Helper_Abstract_Fields {
 		try {
 			/* check load our class */
 			if ( class_exists( $class ) ) {
-				$this->fieldObject = new $class( $field, $entry, $form, $misc );
+				$this->fieldObject = apply_filters( 'gfpdf_field_class', new $class( $field, $entry, $form, $misc ), $field, $entry, $form );
+				$this->fieldObject = apply_filters( 'gfpdf_field_class_' . $field->inputType , $this->fieldObject, $field, $entry, $form );
 			} else {
 				throw new Exception( 'Class not found' );
 			}
 		} catch ( Exception $e ) {
 			/* Exception thrown. Load generic field loader */
-			$this->fieldObject = new Field_Default( $field, $entry, $form, $misc );
+			$this->fieldObject = apply_filters( 'gfpdf_field_default_class', new Field_Default( $field, $entry, $form, $misc ), $field, $entry, $form );
 		}
 	}
 
