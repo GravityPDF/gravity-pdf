@@ -518,4 +518,24 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 			array( array( '#dfdfdf', '#b7b7b7' ), '#f3f3f3' ),
 		);
 	}
+
+	/**
+	 * Check we are correctly getting our form fields by ID
+	 *
+	 * @since 4.0
+	 */
+	public function test_get_fields_sorted_by_id() {
+
+		/* Check for non-existent form */
+		$this->assertSame( 0, sizeof( $this->misc->get_fields_sorted_by_id( 0 ) ) );
+
+		/* Check for real form and verify the results */
+		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+
+		$fields = $this->misc->get_fields_sorted_by_id( $form['id'] );
+
+		$this->assertEquals( 54, sizeof( $fields ) );
+		$this->assertEquals( 'Section Break', $fields[10]->label );
+
+	}
 }

@@ -679,6 +679,7 @@ class Helper_Misc {
 			'entry'     => $entry,
 			'lead'      => $entry,
 			'form_data' => $pdf->get_form_data( $entry ),
+			'fields'    => $this->get_fields_sorted_by_id( $form['id'] ),
 
 			'settings' => $settings,
 
@@ -938,5 +939,27 @@ class Helper_Misc {
 		}
 
 		return $this->data->template_location_url;
+	}
+
+	/**
+	 * Takes a Gravity Form ID and returns the list of fields which can be accessed using their ID
+	 *
+	 * @param integer $form_id The Gravity Form ID
+	 *
+	 * @return array The field array ordered by the field ID
+	 *
+	 * @since 4.0
+	 */
+	public function get_fields_sorted_by_id( $form_id ) {
+		$form   = $this->form->get_form( $form_id );
+		$fields = array();
+
+		if ( isset( $form['fields'] ) && is_array( $form['fields'] ) ) {
+			foreach ( $form['fields'] as $field ) {
+				$fields[ $field->id ] = $field;
+			}
+		}
+
+		return $fields;
 	}
 }
