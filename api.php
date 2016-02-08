@@ -42,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class GPDFAPI {
+final class GPDFAPI {
 
 	/**
 	 * Returns our public logger class which uses Monolog (a PSR-3 compatible logging interface - https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md)
@@ -228,7 +228,7 @@ class GPDFAPI {
 	 * @since 4.0
 	 */
 	public static function get_form_pdfs( $form_id ) {
-		$options = self::get_options_class();
+		$options = static::get_options_class();
 
 		return $options->get_form_pdfs( $form_id );
 	}
@@ -243,7 +243,7 @@ class GPDFAPI {
 	 * @since 4.0
 	 */
 	public static function get_pdf( $form_id, $pdf_id ) {
-		$options = self::get_options_class();
+		$options = static::get_options_class();
 
 		return $options->get_pdf( $form_id, $pdf_id );
 	}
@@ -259,7 +259,7 @@ class GPDFAPI {
 	 * @since 4.0
 	 */
 	public static function add_pdf( $form_id, $settings = array() ) {
-		$options = self::get_options_class();
+		$options = static::get_options_class();
 
 		return $options->add_pdf( $form_id, $settings );
 	}
@@ -276,7 +276,7 @@ class GPDFAPI {
 	 * @since  4.0
 	 */
 	public static function update_pdf( $form_id, $pdf_id, $settings = array() ) {
-		$options = self::get_options_class();
+		$options = static::get_options_class();
 
 		return $options->update_pdf( $form_id, $pdf_id, $settings );
 	}
@@ -292,7 +292,7 @@ class GPDFAPI {
 	 * @since  4.0
 	 */
 	public static function delete_pdf( $form_id, $pdf_id ) {
-		$options = self::get_options_class();
+		$options = static::get_options_class();
 
 		return $options->delete_pdf( $form_id, $pdf_id );
 	}
@@ -305,7 +305,7 @@ class GPDFAPI {
 	 * @since 4.0
 	 */
 	public static function get_plugin_settings() {
-		$options = self::get_options_class();
+		$options = static::get_options_class();
 
 		return $options->get_settings();
 	}
@@ -321,7 +321,7 @@ class GPDFAPI {
 	 * @since 4.0
 	 */
 	public static function get_plugin_option( $key, $default = '' ) {
-		$options = self::get_options_class();
+		$options = static::get_options_class();
 
 		return $options->get_option( $key, $default );
 	}
@@ -340,14 +340,14 @@ class GPDFAPI {
 	 * @since 4.0
 	 */
 	public static function add_plugin_option( $key, $value ) {
-		$options = self::get_options_class();
+		$options = static::get_options_class();
 
 		/* Check the option doesn't already exist */
 		if ( null !== $options->get_option( $key, null ) ) {
 			return new WP_Error( 'option_exists', __( 'The option key %s already exists. Use GPDFAPI::update_plugin_option instead', 'gravity-forms-pdf-extended' ) );
 		}
 
-		return self::update_plugin_option( $key, $value );
+		return static::update_plugin_option( $key, $value );
 	}
 
 	/**
@@ -363,7 +363,7 @@ class GPDFAPI {
 	 * @since 4.0
 	 */
 	public static function update_plugin_option( $key, $value ) {
-		$options = self::get_options_class();
+		$options = static::get_options_class();
 
 		return $options->update_option( $key, $value );
 	}
@@ -378,7 +378,7 @@ class GPDFAPI {
 	 * @since 4.0
 	 */
 	public static function delete_plugin_option( $key ) {
-		$options = self::get_options_class();
+		$options = static::get_options_class();
 
 		return $options->delete_option( $key );
 	}
@@ -396,7 +396,7 @@ class GPDFAPI {
 	 */
 	public static function create_pdf( $entry_id, $pdf_id ) {
 
-		$form_class = self::get_form_class();
+		$form_class = static::get_form_class();
 
 		/* Get our entry */
 		$entry = $form_class->get_entry( $entry_id );
@@ -406,13 +406,13 @@ class GPDFAPI {
 		}
 
 		/* Get our settings */
-		$setting = self::get_pdf( $entry['form_id'], $pdf_id );
+		$setting = static::get_pdf( $entry['form_id'], $pdf_id );
 
 		if ( is_wp_error( $setting ) ) {
 			return new WP_Error( 'invalid_pdf_setting', 'Could not located the PDF Settings. Ensure you pass in a valid PDF ID.' );
 		}
 
-		$pdf = self::get_mvc_class( 'Model_PDF' );
+		$pdf = static::get_mvc_class( 'Model_PDF' );
 
 		return $pdf->generate_and_save_pdf( $entry, $setting );
 	}
