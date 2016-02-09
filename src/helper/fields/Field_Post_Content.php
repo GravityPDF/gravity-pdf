@@ -6,6 +6,8 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Abstract_Fields;
 
+use GF_Field_Post_Content;
+
 use Exception;
 
 /**
@@ -47,13 +49,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Post_Custom_Field extends Helper_Abstract_Fields {
+class Field_Post_Content extends Helper_Abstract_Fields {
 
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
 	 *
-	 * @param object                             $field The GF_Field_* Object
-	 * @param array                              $entry The Gravity Forms Entry
+	 * @param object               $field The GF_Field_* Object
+	 * @param array                $entry The Gravity Forms Entry
 	 *
 	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
 	 * @param \GFPDF\Helper\Helper_Misc          $misc
@@ -64,40 +66,12 @@ class Field_Post_Custom_Field extends Helper_Abstract_Fields {
 	 */
 	public function __construct( $field, $entry, Helper_Abstract_Form $form, Helper_Misc $misc ) {
 
-		/* call our parent method */
-		parent::__construct( $field, $entry, $form, $misc );
-
-		/*
-         * Custom Field can be any of the following field types:
-         * single line text, paragraph, dropdown, select, number, checkbox, radio, hidden,
-         * date, time, phone, website, email, file upload or list
-         */
-		$class = $this->misc->get_field_class( $field->inputType );
-
-		try {
-			/* check load our class */
-			if ( class_exists( $class ) ) {
-				$this->fieldObject = apply_filters( 'gfpdf_field_class', new $class( $field, $entry, $form, $misc ), $field, $entry, $form );
-				$this->fieldObject = apply_filters( 'gfpdf_field_class_' . $field->inputType , $this->fieldObject, $field, $entry, $form );
-			} else {
-				throw new Exception( 'Class not found' );
-			}
-		} catch ( Exception $e ) {
-			/* Exception thrown. Load generic field loader */
-			$this->fieldObject = apply_filters( 'gfpdf_field_default_class', new Field_Default( $field, $entry, $form, $misc ), $field, $entry, $form );
+		if ( ! is_object( $field ) || ! $field instanceof GF_Field_Post_Content ) {
+			throw new Exception( '$field needs to be in instance of GF_Field_Post_Content' );
 		}
 
-		/* force the fieldObject value cache */
-		$this->value();
-	}
-
-	/**
-	 * Used to check if the current field has a value
-	 *
-	 * @since 4.0
-	 */
-	public function is_empty() {
-		return $this->fieldObject->is_empty();
+		/* call our parent method */
+		parent::__construct( $field, $entry, $form, $misc );
 	}
 
 	/**
@@ -107,10 +81,13 @@ class Field_Post_Custom_Field extends Helper_Abstract_Fields {
 	 * @param bool   $label
 	 *
 	 * @return string
+	 *
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
-		return $this->fieldObject->html();
+		$value = $this->value();
+
+		return parent::html( $value );
 	}
 
 	/**
@@ -121,14 +98,12 @@ class Field_Post_Custom_Field extends Helper_Abstract_Fields {
 	 * @since 4.0
 	 */
 	public function value() {
-		if ( $this->fieldObject->has_cache() ) {
-			return $this->fieldObject->cache();
+		if ( $this->has_cache() ) {
+			return $this->cache();
 		}
 
-		$value = $this->fieldObject->value();
+		$this->cache( nl2br( esc_html( $this->get_value() ) ) );
 
-		$this->fieldObject->cache( $value );
-
-		return $this->fieldObject->cache();
+		return $this->cache();
 	}
 }

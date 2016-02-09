@@ -78,7 +78,7 @@ class Field_Section extends Helper_Abstract_Fields {
 	/**
 	 * Used to check if the current field has a value
 	 *
-	 * @since    4.0
+	 * @since 4.0
 	 */
 	public function is_empty() {
 		if ( GFCommon::is_section_empty( $this->field, $this->form, $this->entry ) ) {
