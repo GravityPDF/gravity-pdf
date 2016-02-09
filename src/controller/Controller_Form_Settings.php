@@ -160,10 +160,8 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 		add_filter( 'gfpdf_form_settings', array( $this->misc, 'add_template_image' ) );
 
 		/* Add custom field information if we have a template selected */
-		add_filter( 'gfpdf_form_settings_custom_appearance', array(
-			$this->model,
-			'register_custom_appearance_settings',
-		) );
+		add_filter( 'gfpdf_form_settings_custom_appearance', array( $this->model, 'register_custom_appearance_settings' ) );
+		add_filter( 'gfpdf_form_settings', array( $this->model, 'register_template_group' ) );
 
 		/* Add Validation Errors */
 		add_filter( 'gfpdf_form_settings', array( $this->model, 'validation_error' ) );
@@ -175,10 +173,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 		add_filter( 'gfpdf_form_settings_sanitize_text', array( $this->options, 'sanitize_trim_field' ), 15, 2 );
 		add_filter( 'gfpdf_form_settings_sanitize_hidden', array( $this->model, 'decode_json' ), 10, 2 );
 
-		add_filter( 'gfpdf_skip_highlight_errors', array(
-			$this->model,
-			'check_custom_size_error_highlighting',
-		), 10, 3 );
+		add_filter( 'gfpdf_skip_highlight_errors', array( $this->model, 'check_custom_size_error_highlighting' ), 10, 3 );
 
 		/* Store our TinyMCE Options */
 		add_filter( 'tiny_mce_before_init', array( $this, 'store_tinymce_settings' ) );
