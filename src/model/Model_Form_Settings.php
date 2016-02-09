@@ -485,16 +485,13 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * If the PDF ID exists (either POST or GET) and we have a template with a config file
-	 * we will load any fields loaded in the config file
+	 * Check if we are on the Form Settings Edit page and gets the appropriate template name
 	 *
-	 * @param  array $settings Any existing settings loaded
+	 * @return string The current saved PDF template
 	 *
-	 * @return array
-	 *
-	 * @since  4.0
+	 * @since 4.0
 	 */
-	public function register_custom_appearance_settings( $settings ) {
+	public function get_template_name_from_current_page() {
 
 		$pid     = ( ! empty( $_GET['pid'] ) ) ? rgget( 'pid' ) : rgpost( 'gform_pdf_id' );
 		$form_id = ( isset( $_GET['id'] ) ) ? (int) $_GET['id'] : 0;
@@ -513,9 +510,51 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			}
 		}
 
-		$class = $this->get_template_configuration( $template );
+		return $template;
+	}
+
+	/**
+	 * If the PDF ID exists (either POST or GET) and we have a template with a config file
+	 * we will load any fields loaded in the config file
+	 *
+	 * @param  array $settings Any existing settings loaded
+	 *
+	 * @return array
+	 *
+	 * @since  4.0
+	 */
+	public function register_custom_appearance_settings( $settings ) {
+		$template = $this->get_template_name_from_current_page();
+		$class    = $this->get_template_configuration( $template );
 
 		return $this->setup_custom_appearance_settings( $class, $settings );
+	}
+
+	/*
+	 * To allow for correct backwards compatibility with our v3 templates we need to hide the font, size and colour
+	 * information when selected. To allow this behaviour we're going to assign a 'data-template_group' attribute
+	 * to the template select box which our JS can pick up and use to toggle those fields
+	 *
+	 * @param array $settings The current PDF settings
+	 *
+	 * @return array
+	 *
+	 * @since 4.0
+	 */
+	public function register_template_group( $settings ) {
+
+		/* Add our template group */
+		if ( isset( $settings['template'] ) && is_array( $settings['template'] ) ) {
+
+			$template       = $this->get_template_name_from_current_page();
+			$template_group = $this->options->get_template_group( $template );
+
+			/* Ensure the key we want is an array, otherwise set it to one */
+			$settings['template']['data']                   = ( isset( $settings['template']['data'] ) && is_array( $settings['template']['data'] ) ) ? $settings['template']['data'] : array();
+			$settings['template']['data']['template_group'] = $template_group;
+		}
+
+		return $settings;
 	}
 
 	/**
@@ -998,6 +1037,10 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* Only handle fields when in the PDF Forms Settings, and not in the general settings */
 		if ( $type != 'gfpdf_settings[default_template]' ) {
 
+			/* Get the template type so we can return out to the browser */
+			$template_data = $this->options->get_template_information( $template );
+			$template_type = ( isset( $template_data['group'] ) ) ? mb_strtolower( $template_data['group'] ) : 'legacy';
+
 			/* add our filter to override what template gets rendered (by default it is the current selected template in the config) */
 			add_filter( 'gfpdf_form_settings_custom_appearance', function() use ( &$settings ) {
 				/* check if the template has any configuration */
@@ -1027,15 +1070,17 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			}
 		}
 
-		$editor_init = ( isset( $this->data->tiny_mce_editor_settings ) ) ? $this->data->tiny_mce_editor_settings : null;
-		$html        = ( isset( $html ) && strlen( trim( $html ) ) > 0 ) ? $html : null;
-		$editors     = ( isset( $editors ) ) ? $editors : null;
+		$editor_init   = ( isset( $this->data->tiny_mce_editor_settings ) ) ? $this->data->tiny_mce_editor_settings : null;
+		$html          = ( isset( $html ) && strlen( trim( $html ) ) > 0 ) ? $html : null;
+		$editors       = ( isset( $editors ) ) ? $editors : null;
+		$template_type = ( isset( $template_type ) ) ? $template_type : null;
 
 		$return = array(
-			'fields'      => $html,
-			'preview'     => $template_image,
-			'editors'     => $editors,
-			'editor_init' => $editor_init,
+			'fields'        => $html,
+			'preview'       => $template_image,
+			'editors'       => $editors,
+			'editor_init'   => $editor_init,
+			'template_type' => $template_type,
 		);
 
 		$this->log->addNotice( 'AJAX Endpoint Successful', $return );

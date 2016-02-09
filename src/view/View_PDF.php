@@ -487,7 +487,12 @@ class View_PDF extends Helper_Abstract_View {
 	 * @since 4.0
 	 */
 	public function autoprocess_core_template_options( $html, $form, $entry, $settings ) {
-		return $this->get_core_template_styles( $settings, $entry ) . $html;
+		/* Prevent core styles loading if a v3 template */
+		if ( $this->options->get_template_group( $settings['template'] ) !== 'legacy' ) {
+			$html = $this->get_core_template_styles( $settings, $entry ) . $html;
+		}
+
+		return $html;
 	}
 
 	/**

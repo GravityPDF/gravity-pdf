@@ -371,6 +371,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'inputClass' => 'large',
 						'chosen'     => true,
 						'tooltip'    => '<h6>' . __( 'Fonts', 'gravity-forms-pdf-extended' ) . '</h6>' . __( 'Gravity PDF comes bundled with fonts for most languages world-wide. Want to use a specific font type? Use the font installer (found in the Forms -> Settings -> Tools tab).', 'gravity-forms-pdf-extended' ),
+						'class'      => 'gfpdf_font_type',
 					),
 
 					'font_size' => array(
@@ -381,6 +382,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'type'  => 'number',
 						'size'  => 'small',
 						'std'   => $this->get_option( 'default_font_size', 10 ),
+						'class'      => 'gfpdf_font_size',
 					),
 
 					'font_colour' => array(
@@ -389,6 +391,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'type' => 'color',
 						'std'  => $this->get_option( 'default_font_colour', '#000000' ),
 						'desc' => __( 'Set the font colour to use in the PDF.', 'gravity-forms-pdf-extended' ),
+						'class'      => 'gfpdf_font_colour',
 					),
 
 					'rtl' => array(
