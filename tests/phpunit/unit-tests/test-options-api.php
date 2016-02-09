@@ -1203,4 +1203,14 @@ class Test_Options_API extends WP_UnitTestCase {
 			),
 		);
 	}
+
+	/**
+	 * Check we return the appropriate template group name
+	 *
+	 * @since 4.0
+	 */
+	public function test_get_template_group() {
+		$this->assertEquals( 'legacy', $this->options->get_template_group( 'default-template' ) );
+		$this->assertEquals( 'core', $this->options->get_template_group( 'zadani' ) );
+	}
 }

@@ -212,6 +212,7 @@
 				this.handleSecurityConditionals();
 				this.handlePDFConditionalLogic();
 				this.handleOwnerRestriction();
+				this.toggleFontAppearance( $('#gfpdf_settings\\[template\\]').data('template_group') ); /* Show/Hide the
 
 				/*
 				 * Workaround for Firefix TinyMCE Editor Bug NS_ERROR_UNEXPECTED (http://www.tinymce.com/develop/bugtracker_view.php?id=3152) when loading wp_editor via AJAX
@@ -699,9 +700,30 @@
 		      			} else {
 							$('#gfpdf-template-example').html('<p><em>' + GFPDF.no_template_preview + '</em></p>').show();
 						}
+
+						/* Check if we should hide or show our font fields */
+						if(response.template_type) {
+							self.toggleFontAppearance(response.template_type);
+						}
 		      		});
 				});
 			};
+
+			/**
+			 * Check if the template type is 'legacy' and hide the font type, size and colour, otherwise show those fields
+			 * @param type
+			 * @since 4.0
+             */
+			this.toggleFontAppearance = function(type) {
+				var $rows = $('#pdf-general-appearance').find('tr.gfpdf_font_type, tr.gfpdf_font_size, tr.gfpdf_font_colour');
+
+				/* Hide our font fields if processing a legacy template */
+				if(type == 'legacy') {
+					$rows.hide();
+				} else { /* Ensure the fields are showing */
+					$rows.show();
+				}
+			}
 
 			/**
 			 * Initialises AJAX-loaded wp_editor TinyMCE containers for use

@@ -639,4 +639,26 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		$this->assertSame( 3, sizeof( $wp_settings_fields[ $group ][ $group ][ $setting ]['args'][ $option_id ] ) );
 
 	}
+
+	/**
+	 * Check we correctly output the appropriate information
+	 *
+	 * @since 4.0
+	 */
+	public function test_register_template_group() {
+
+		/* Check it does nothing if the correct params are not set */
+		$this->assertEquals( 'test', $this->model->register_template_group( 'test' ) );
+
+		$test = array( 'template' => 'test' );
+		$this->assertEquals( $test, $this->model->register_template_group( $test ) );
+
+		/* Ensure the function works as expected */
+		$_GET['pid'] = '555ad84787d7e';
+		$_GET['id'] = $this->form_id;
+
+		$test = array( 'template' => array() );
+		$results = $this->model->register_template_group( $test );
+		$this->assertTrue( isset( $results['template']['data']['template_group'] ) );
+	}
 }
