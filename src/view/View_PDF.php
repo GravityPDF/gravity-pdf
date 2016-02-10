@@ -315,7 +315,7 @@ class View_PDF extends Helper_Abstract_View {
 		foreach ( $form['fields'] as $key => $field ) {
 
 			/* Skip any fields with the css class 'exclude', if needed */
-			if ( $skip_marked_fields !== false && strpos( $field->cssClass, 'exclude' ) ) {
+			if ( $skip_marked_fields !== false && strpos( $field->cssClass, 'exclude' ) !== false )  {
 				continue;
 			}
 

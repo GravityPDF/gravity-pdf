@@ -861,20 +861,15 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 				'WP_Error' => $settings,
 			) );
 
-			/* Set all optional config values to default */
-			$settings = array(
-				'empty'           => false,
-				'html_field'      => false,
-				'page_names'      => false,
-				'section_content' => false,
-			);
+			/* Reset the settings so it forces everything to false */
+			$settings = array();
 		}
 
 		return array(
-			'empty_field'     => ( isset( $settings['empty'] ) && $settings['empty'] == 'Yes' ) ? true : false,
-			'html_field'      => ( isset( $settings['html_field'] ) && $settings['html_field'] == 'Yes' ) ? true : false,
-			'page_names'      => ( isset( $settings['page_names'] ) && $settings['page_names'] == 'Yes' ) ? true : false,
-			'section_content' => ( isset( $settings['section_content'] ) && $settings['section_content'] == 'Yes' ) ? true : false,
+			'empty_field'     => ( isset( $settings['show_empty'] ) && $settings['show_empty'] == 'Yes' ) ? true : false,
+			'html_field'      => ( isset( $settings['show_html'] ) && $settings['show_html'] == 'Yes' ) ? true : false,
+			'page_names'      => ( isset( $settings['show_page_names'] ) && $settings['show_page_names'] == 'Yes' ) ? true : false,
+			'section_content' => ( isset( $settings['show_section_content'] ) && $settings['show_section_content'] == 'Yes' ) ? true : false,
 		);
 	}
 }

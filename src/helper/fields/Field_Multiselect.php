@@ -122,7 +122,7 @@ class Field_Multiselect extends Helper_Abstract_Fields {
 
 		if ( sizeof( $items ) > 0 ) {
 			$i    = 1;
-			$html = '<ul class="multselect">';
+			$html = '<ul class="bulleted multiselect">';
 
 			foreach ( $items as $item ) {
 				$sanitized_value  = esc_html( $item['value'] );

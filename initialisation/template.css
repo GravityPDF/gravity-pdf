@@ -1,10 +1,6 @@
 /**
- * THIS IS A LEGACY CSS FILE FOR Gravity PDF v3
- *
- * DO NOT MODIFY THIS FILE. IT'S OVERRIDDEN WHEN INITIALISING
- * Instead create another stylesheet and load it in your custom template
- *
- * The following snippet of CSS styles the legacy default templates and the example template */
+ * THIS IS A LEGACY CSS FILE FOR Gravity PDF v3 template files
+ */
 
 body {
     font-family: DejaVu Sans, Helvetica, sans-serif;
@@ -21,10 +17,9 @@ body {
     border-style: solid;
     border-width: 1px;
     margin: 0 0 16px;
-    padding: 2px;
 }
 
-h2.default, h3 {
+h2.default {
     background-color: #e3e3e3;
     font-size: 14px;
     text-align: left;
@@ -33,7 +28,7 @@ h2.default, h3 {
     padding: 7px;
 }
 
-.entry-view-field-value, .entry-view-html-value, .entry-view-section-break-content, .gfpdf-section-description {
+.entry-view-field-value, .entry-view-html-value, .entry-view-section-break-content {
     border-bottom: 1px solid #dfdfdf;
     line-height: 150%;
     padding: 6px 6px 6px 7px;
@@ -44,26 +39,25 @@ h2.default, h3 {
 }
 
 .entry-view-field-value ul {
-    margin-left: 25px;
+    margin-left: 15px;
 }
 
-.entry-view-field-value div.label {
+.entry-view-field-value div.strong {
     font-weight: bold;
 }
 
-.no-style .entry-view-field-value,
-.no-style #container,
-.no-style h2,
-.no-style h3,
-.no-style .entry-view-html-value,
-.no-style .entry-view-section-break-content,
-.no-style .gfpdf-section-description,
-.no-style .even {
+.no-style .entry-view-field-value, .no-style #container, .no-style h2, .no-style .entry-view-html-value, .no-style .entry-view-section-break-content {
     background: none;
     border: none;
 }
 
-.two_row .entry-view-field-value div.label {
+.two_row .entry-view-field-value {
+    border: 0;
+    line-height: normal;
+    padding: 0;
+}
+
+.two_row .entry-view-field-value div.strong {
     font-weight: bold;
     width: 100%;
     border-bottom: 1px solid #dfdfdf;
@@ -101,38 +95,79 @@ td.entry-view-field-value {
     margin: 0 auto;
 }
 
+table.entry-products {
+    width: 98%;
+}
+
+table.entry-products th {
+    background-color: #F4F4F4;
+    border-bottom: 1px solid #DFDFDF;
+    border-right: 1px solid #DFDFDF !important;
+}
+
+table.entry-products td.textcenter, table.entry-products th.textcenter {
+    text-align: center;
+}
+
+table.entry-products col.entry-products-col2 {
+    width: 50px;
+}
+
+table.entry-products col.entry-products-col3 {
+    width: 155px;
+}
+
+table.entry-products col.entry-products-col4 {
+    width: 155px;
+}
+
+table.entry-products {
+    border: 1px solid #DFDFDF;
+    margin: 10px 0;
+}
+
+table.entry-products td {
+    border-bottom: 1px solid #DFDFDF;
+    border-right: 1px solid #DFDFDF !important;
+    padding: 7px 7px 8px;
+    vertical-align: top;
+}
+
+table.entry-products td.emptycell {
+    background-color: #F4F4F4;
+}
+
+table.entry-products td.grandtotal, table.entry-products td.grandtotal_amount, table.entry-products td.shipping, table.entry-products td.shipping_amount {
+    font-size: 13px;
+    font-weight: bold;
+    padding-bottom: 8px;
+    padding-top: 7px;
+}
+
+table.entry-products td.textright, table.entry-products th.textright {
+    text-align: right;
+}
+
 .two_row .odd, .two_row .even {
     background: none;
 }
 
-.gsurvey-likert-choice-label {
-    padding: 4px;
-}
-
-.gsurvey-likert-choice {
-    text-align: center;
-}
-
-/* Quiz Styles */
-.gquiz-field {
-    color: #666;
-}
-
-.gquiz-correct-choice {
-    font-weight: bold;
-    color: black;
-}
+/**
+ * Quiz Style Support
+ */
 
 .gf-quiz-img {
     padding-left: 5px !important;
     vertical-align: middle;
 }
 
-.two_row .entry-view-field-value,
-.entry-view-field-value .entry-view-field-value {
-    border: 0;
-    line-height: normal;
-    padding: 0;
+/**
+ * Survey Style Support
+ */
+.gsurvey-likert-choice-label {
+    padding: 4px;
 }
 
-/* FINISHED REQUIRED CSS */
+.gsurvey-likert-choice, .gsurvey-likert-choice-label {
+    text-align: center;
+}
