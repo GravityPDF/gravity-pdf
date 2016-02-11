@@ -245,9 +245,9 @@ class Field_Products extends Helper_Abstract_Fields {
 					$option['price_formatted'] = GFCommon::format_number( $option_raw_price, 'currency' );
 
 					/* Format our option strings correctly */
-					$option['field_label']  = esc_html( $option['field_label'] );
-					$option['option_name']  = esc_html( $option['option_name'] );
-					$option['option_label'] = esc_html( $option['option_label'] );
+					$option['field_label']  = ( isset( $option['field_label'] ) ) ? esc_html( $option['field_label'] ) : '';
+					$option['option_name']  = ( isset( $option['option_name'] ) ) ? esc_html( $option['option_name'] ) : '';
+					$option['option_label'] = ( isset( $option['option_label'] ) ) ? esc_html( $option['option_label'] ) : '';
 				}
 
 				/* calculate subtotal */
