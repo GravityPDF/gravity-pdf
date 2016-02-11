@@ -342,6 +342,14 @@ class View_PDF extends Helper_Abstract_View {
 				continue;
 			}
 
+			/* Skip over any of the following blacklisted fields */
+			$blacklisted = apply_filters( 'gfpdf_blacklisted_fields', array( 'captcha', 'password', 'page' ) );
+
+			/* Skip over any fields we don't want to include */
+			if( in_array( $field->type, $blacklisted ) ) {
+				continue;
+			}
+
 			/**
 			 * Let's output our field
 			 */
