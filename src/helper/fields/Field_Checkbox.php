@@ -122,7 +122,7 @@ class Field_Checkbox extends Helper_Abstract_Fields {
 
 		/* Generate our drop down list */
 		if ( sizeof( $items ) > 0 ) {
-			$html = '<ul class="bulleted">';
+			$html = '<ul class="bulleted checkbox">';
 			$i    = 1;
 			foreach ( $items as $item ) {
 				$sanitized_value  = esc_html( $item['value'] );

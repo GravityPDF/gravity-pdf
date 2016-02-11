@@ -2,7 +2,7 @@
 
 /* For backwards compatibility reasons this file will be in the global namespace */
 use GFPDF\Router;
-use GFPDF\Helper\Fields\Field_Products;
+use GFPDF\Helper\Fields\Field_v3_Products;
 
 
 /**
@@ -166,7 +166,6 @@ class PDFRender extends GFPDF_Depreciated_Abstract {
 		}
 
 		/* return the path to the PDF */
-
 		return $path . $filename;
 	}
 
@@ -405,27 +404,19 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 
 		/* Setup our variables */
 		$model        = GPDFAPI::get_mvc_class( 'Model_PDF' );
-		$products     = new Field_Products( new GF_Field(), $lead, $gfpdf->form, $gfpdf->misc );
+		$products     = new Field_v3_Products( new GF_Field(), $lead, $gfpdf->form, $gfpdf->misc );
 		$has_products = false;
 		$page_number  = 0;
+
+		/* Change the standardised HTML field output to be v3 compatible */
+		add_filter( 'gfpdf_field_html_value', array( 'GFPDFEntryDetail', 'legacy_html_format'), 10, 4 );
+		add_filter( 'gfpdf_field_class', array( 'GFPDFEntryDetail', 'load_legacy_html_classes'), 10, 3 );
 
 		/* Setup field to return the form data, if needed */
 		$results = array(
 			'title' => '',
 			'field' => array(),
 		);
-
-		/* Output some legacy styles */
-		$styles = '<style>
-			div table, div ul, td table, td ul, .list {
-				width: 95%;
-			}
-
-			div ul, div ol {
-			   padding-left: 15px;
-			}
-		</style>
-		';
 
 		/* Output the form title */
 		if ( $config['return'] ) {
@@ -443,7 +434,7 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 		foreach ( $form['fields'] as $field ) {
 
 			/* Skip any fields with the css class 'exclude' or any hidden fields */
-			if ( strpos( $field->cssClass, 'exclude' ) || GFFormsModel::is_field_hidden( $form, $field, array(), $lead ) ) {
+			if ( strpos( $field->cssClass, 'exclude' ) !== false  || GFFormsModel::is_field_hidden( $form, $field, array(), $lead ) ) {
 				continue;
 			}
 
@@ -478,6 +469,8 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 			/* Load our class */
 			$class = $model->get_field_class( $field, $form, $lead, $products );
 
+			self::load_legacy_css( $field );
+
 			/* Check if HTML field should be included */
 			if( $input == 'html' ) {
 
@@ -496,7 +489,6 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 
 			/* Only load our HTML if the field is NOT empty, or the 'empty_field' config option is true */
 			if ( $config['empty_field'] === true || ! $class->is_empty() ) {
-				self::load_legacy_css( $field );
 
 				$html = ( $field->type !== 'section' ) ? $class->html() : $class->html( $config['section_content'] );
 
@@ -528,6 +520,62 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 			</div><!-- Close container -->
 			<?php
 		}
+	}
+
+	/**
+	 * Replaces the v4 HTML structure with the legacy v3 code to prevent backwards compatibility problems
+	 *
+	 * @param string $html The original field HTML which we'll be discarding
+	 * @param string $value The field value
+	 * @param boolean $label Whether to show or hide the field's label
+	 *
+	 * @return string
+	 *
+	 * @since 4.0
+	 */
+	public static function legacy_html_format( $html, $value, $label, $field ) {
+
+		$html = '<div id="field-' . $field->id . '" class="' . $field->cssClass . '">';
+
+		if ( $label ) {
+			$html .= '<div class="strong">' . esc_html( GFFormsModel::get_label( $field ) ) . '</div>';
+		}
+
+		/* If the field value is empty we'll add a non-breaking space to act like a character and maintain proper layout */
+		if ( strlen( trim( $value ) ) === 0 ) {
+			$value = '&nbsp;';
+		}
+
+		$html .= '<div class="value">' . $value . '</div>'
+		         . '</div>';
+
+		return $html;
+	}
+
+	/**
+	 * Replace some of our Gravity PDF fields with legacy versions to match the old HTML structure
+	 *
+	 * @param object $class The original Gravity PDF field class being processed
+	 * @param object $field The Gravity Form field object being processed
+	 * @param array $entry The current Gravity Form array of entry data
+	 *
+	 * @return object
+	 *
+	 * @since 4.0
+	 */
+	public static function load_legacy_html_classes( $class, $field, $entry ) {
+
+		switch( get_class( $field ) ) {
+			case 'GF_Field_Section':
+				$class = new GFPDF\Helper\Fields\Field_v3_Section( $field, $entry, GPDFAPI::get_form_class(), GPDFAPI::get_misc_class() );
+			break;
+
+			case 'GF_Field_List':
+				$class = new GFPDF\Helper\Fields\Field_v3_List( $field, $entry, GPDFAPI::get_form_class(), GPDFAPI::get_misc_class() );
+			break;
+		}
+
+		return $class;
 	}
 
 	/**

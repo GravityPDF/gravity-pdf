@@ -291,7 +291,7 @@ abstract class Helper_Abstract_Fields {
            . '</div>'
         . '</div>';
 
-		return $html;
+		return apply_filters( 'gfpdf_field_html_value', $html, $value, $label, $this->field, $this->form, $this->entry );
 	}
 
 	/**

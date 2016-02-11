@@ -209,7 +209,7 @@ $label_format              = ( ! empty($settings['focusgravity_label_format'])) 
         color: <?php echo $secondary_contrast_colour; ?>;
     }
 
-    .gfpdf-field .value, .gfpdf-section-description, .gfpdf-field .label, h3 {
+    .value, .gfpdf-section-description, .gfpdf-field .label, h3, .gfpdf-html .value {
         padding: 7px 6px 7px 10px;
     }
 
@@ -233,7 +233,7 @@ $label_format              = ( ! empty($settings['focusgravity_label_format'])) 
             padding-bottom: 0;
         }
 
-        .gfpdf-field .value {
+        .value {
             padding-top: 0;
         }
 

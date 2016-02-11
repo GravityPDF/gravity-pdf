@@ -118,7 +118,7 @@ class Field_Fileupload extends Helper_Abstract_Fields {
 		$html  = '';
 
 		if ( sizeof( $files ) > 0 ) {
-			$html = '<ul class="bulleted">';
+			$html = '<ul class="bulleted fileupload">';
 			$i    = 1;
 
 			foreach ( $files as $file ) {
