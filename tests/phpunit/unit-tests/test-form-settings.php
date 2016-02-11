@@ -581,7 +581,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 	public function test_get_template_configuration() {
 
 		/* Test failure first */
-		$this->assertFalse( $this->model->get_template_configuration( 'test' ) );
+		$this->assertEquals( 'stdClass', get_class( $this->model->get_template_configuration( 'test' ) ) );
 
 		/* Test default template */
 		$this->assertEquals( 'GFPDF\Templates\Config\Zadani', get_class( $this->model->get_template_configuration( 'zadani' ) ) );

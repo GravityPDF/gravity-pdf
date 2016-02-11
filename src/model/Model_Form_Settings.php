@@ -15,6 +15,10 @@ use Psr\Log\LoggerInterface;
 
 use _WP_Editors;
 
+use stdClass;
+
+
+
 /**
  * Settings Model
  *
@@ -681,6 +685,11 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		if ( in_array( $template, $legacy_templates ) ) {
 			$class = $this->load_template_configuration( PDF_PLUGIN_DIR . 'src/templates/config/legacy.php' );
+		}
+
+		/* If there is still no class loaded we'll pass along a new empty class */
+		if( empty( $class ) ) {
+			$class = new stdClass();
 		}
 
 		return $class;

@@ -8,6 +8,7 @@ use Psr\Log\LoggerInterface;
 
 use GFCommon;
 use GFMultiCurrency;
+use GPDFAPI;
 
 use WP_Error;
 use RecursiveDirectoryIterator;
@@ -666,8 +667,9 @@ class Helper_Misc {
 		/* Disable the field encryption checks which can slow down our entry queries */
 		add_filter( 'gform_is_encrypted_field', '__return_false' );
 
-		$form = $this->form->get_form( $entry['form_id'] );
-		$pdf  = new Model_PDF( $this->form, $this->log, $gfpdf->options, $this->data, $this, $gfpdf->notices );
+		$form          = $this->form->get_form( $entry['form_id'] );
+		$pdf           = GPDFAPI::get_mvc_class( 'Model_PDF' );
+		$form_settings = GPDFAPI::get_mvc_class( 'Model_Form_Settings' );
 
 		return apply_filters( 'gfpdf_template_args', array(
 
@@ -680,6 +682,7 @@ class Helper_Misc {
 			'lead'      => $entry,
 			'form_data' => $pdf->get_form_data( $entry ),
 			'fields'    => $this->get_fields_sorted_by_id( $form['id'] ),
+			'config'    => $form_settings->get_template_configuration( $settings['template'] ),
 
 			'settings' => $settings,
 
@@ -962,4 +965,5 @@ class Helper_Misc {
 
 		return $fields;
 	}
+
 }

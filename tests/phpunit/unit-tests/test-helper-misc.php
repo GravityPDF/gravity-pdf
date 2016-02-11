@@ -353,6 +353,8 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'lead', $data );
 		$this->assertArrayHasKey( 'form_data', $data );
 		$this->assertArrayHasKey( 'settings', $data );
+		$this->assertArrayHasKey( 'fields', $data );
+		$this->assertArrayHasKey( 'config', $data );
 		$this->assertArrayHasKey( 'gfpdf', $data );
 
 		/* Sniff that our keys have the correct details */
@@ -366,6 +368,9 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 		$this->assertEquals( $data['entry'], $data['lead'] );
 		$this->assertEquals( $pdf, $data['settings'] );
 		$this->assertEquals( 'GFPDF\Router', get_class( $data['gfpdf'] ) );
+		$this->assertTrue( is_array( $data['fields'] ) );
+		$this->assertEquals( 'GF_Field_Checkbox', get_class( $data['fields'][47] ) );
+		$this->assertEquals( 'GFPDF\Templates\Config\Zadani', get_class( $data['config'] ) );
 	}
 
 	/**
