@@ -498,7 +498,6 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 					echo $html;
 				}
 			}
-
 		}
 
 		/* Output product table, if needed */
