@@ -871,18 +871,55 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function get_templates() {
 
+		$templates = $legacy = array();
+
+		/* Load the user's templates */
+		if ( is_multisite() ) {
+			$template_list = $this->get_template_list( glob( $this->data->multisite_template_location . '*.php' ) );
+			$templates     = array_merge_recursive( $templates, $template_list['templates'] );
+			$legacy        = array_merge_recursive( $legacy, $template_list['legacy'] );
+		}
+
+		$template_list = $this->get_template_list( glob( $this->data->template_location . '*.php' ) );
+		$templates     = array_merge_recursive( $templates, $template_list['templates'] );
+		$legacy        = array_merge_recursive( $legacy, $template_list['legacy'] );
+
+		/**
+		 * Load templates included with Gravity PDF
+		 * We'll exclude any files overridden by the user
+		 */
+		foreach ( $this->get_plugin_pdf_templates() as $filename ) {
+			$info = $this->get_template_headers( $filename );
+			$file = basename( $filename, '.php' );
+
+			/* only add core template if not being overridden by user template */
+			if ( ! isset( $templates[ $info['group'] ][ $file ] ) ) {
+				$templates[ $info['group'] ][ $file ] = $info['template'];
+			}
+		}
+
+		/* Add our legacy array to the end of our templates array */
+		if ( sizeof( $legacy ) > 0 ) {
+			$templates[ __( 'Legacy', 'gravity-forms-pdf-extended' ) ] = $legacy;
+		}
+
+		return apply_filters( 'gfpdf_template_list', $templates );
+	}
+
+	/**
+	 * Get the list of Gravity PDF templates a user has available
+	 *
+	 * @param array $template_list Full path to PHP files (usually got using glob)
+	 *
+	 * @return array
+	 *
+	 * @since 4.0
+	 */
+	public function get_template_list( $template_list ) {
 		$templates = array();
 		$legacy    = array();
 
-		$prefix_text = __( 'User Templates: ', 'gravity-forms-pdf-extended' );
-		$legacy_text = __( 'Legacy', 'gravity-forms-pdf-extended' );
-
-		/**
-		 * Load the user's templates
-		 */
-		$discovered_user_templates = glob( $this->misc->get_template_path() . '*.php' );
-
-		foreach ( $discovered_user_templates as $filename ) {
+		foreach ( $template_list as $filename ) {
 
 			/* Get the header information to find out what group it's in and if it is compatible with our verison of Gravity PDF */
 			$info = $this->get_template_headers( $filename );
@@ -895,34 +932,16 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					$info['template'] .= ' (+ ' . _x( 'needs', 'Required', 'gravity-forms-pdf-extended' ) . ' v' . $info['required_pdf_version'] . ')';
 				}
 
-				$templates[ $prefix_text . $info['group'] ][ $file ] = $info['template'];
+				$templates[ $info['group'] ][ $file ] = $info['template'];
 			} else if ( $file !== 'configuration' && $file !== 'configuration.archive' ) { /* exclude legacy configuration file */
 				$legacy[ $file ] = $this->misc->human_readable( $file );
 			}
 		}
 
-		/**
-		 * Load templates included with Gravity PDF
-		 * We'll exclude any files overridden by the user
-		 */
-		foreach ( $this->get_plugin_pdf_templates() as $filename ) {
-			$info = $this->get_template_headers( $filename );
-			$file = basename( $filename, '.php' );
-
-			/* only add core template if not being overridden by user template */
-			if ( ! isset( $templates[ $prefix_text . $info['group'] ][ $file ] ) ) {
-				$templates[ $info['group'] ][ $file ] = $info['template'];
-			}
-		}
-
-		/*
-         * Add our legacy array to the end of our templates array
-		 */
-		if ( sizeof( $legacy ) > 0 ) {
-			$templates[ $legacy_text ] = $legacy;
-		}
-
-		return apply_filters( 'gfpdf_template_list', $templates );
+		return array(
+			'templates' => $templates,
+			'legacy'    => $legacy,
+		);
 	}
 
 	/**
