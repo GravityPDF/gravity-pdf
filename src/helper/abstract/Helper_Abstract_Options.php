@@ -326,7 +326,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$pid     = ( ! empty( $_GET['pid'] ) ) ? rgget( 'pid' ) : rgpost( 'gform_pdf_id' );
 
 		/* return early if no ID set */
-		if ( ! $form_id ) {
+		if ( ! $form_id || ! $pid ) {
 			return array();
 		}
 
@@ -344,7 +344,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		) );
 
 		/* there was an error */
-
 		return array();
 	}
 
