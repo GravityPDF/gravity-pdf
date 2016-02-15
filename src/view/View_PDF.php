@@ -314,6 +314,12 @@ class View_PDF extends Helper_Abstract_View {
 		/* Loop through the fields and output or skip if needed */
 		foreach ( $form['fields'] as $key => $field ) {
 
+			/* Load our page name, if needed */
+			if ( $show_page_names === true && $field->pageNumber !== $page_number ) {
+				$this->display_page_name( $page_number, $form, $container );
+				$page_number++;
+			}
+
 			/* Skip any fields with the css class 'exclude', if needed */
 			if ( $skip_marked_fields !== false && strpos( $field->cssClass, 'exclude' ) !== false )  {
 				continue;
@@ -332,13 +338,6 @@ class View_PDF extends Helper_Abstract_View {
 
 			/* Skip HTML fields, if needed */
 			if ( $show_html_fields === false && $field->type == 'html' ) {
-				continue;
-			}
-
-			/* Load our page name, if needed */
-			if ( $show_page_names === true && $field->pageNumber !== $page_number ) {
-				$this->display_page_name( $page_number, $form, $container );
-				$page_number++;
 				continue;
 			}
 
