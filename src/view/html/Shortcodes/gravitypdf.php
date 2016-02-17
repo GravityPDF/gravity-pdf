@@ -36,6 +36,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ?>
 
-<a href="<?php echo $args['url']; ?>" class="<?php echo $args['classes']; ?>">
-	<?php echo $args['text']; ?>
-</a>
+<a href="<?php echo $args['url']; ?>" class="<?php echo $args['class']; ?> <?php echo $args['classes']; ?>"><?php echo $args['text']; ?></a>
