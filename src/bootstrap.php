@@ -565,7 +565,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		$wp_scripts = wp_scripts();
 
-		/* set defaults we will allow to load on GF pages */
+		/**
+		 * Set defaults we will allow to load on GF pages which are needed for Gravity PDF
+		 * If any Gravity PDF modules requires WordPress-specific JS files you should add them to this list
+		 */
 		$default_scripts = array(
 			'editor',
 			'word-count',
@@ -599,7 +602,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$items = array_merge( $default_scripts, $items );
 		}
 
-		return apply_filters( 'gfpdf_autoload_gf_scripts', $items );
+		return apply_filters( 'gfpdf_gf_noconflict_scripts', $items );
 	}
 
 	/**
@@ -615,6 +618,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		$wp_styles = wp_styles();
 
+		/**
+		 * Set defaults we will allow to load on GF pages which are needed for Gravity PDF
+		 * If any Gravity PDF modules requires WordPress-specific CSS files you should add them to this list
+		 */
 		$default_styles = array(
 			'editor-buttons',
 			'wp-jquery-ui-dialog',
@@ -633,7 +640,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$items = array_merge( $default_styles, $items );
 		}
 
-		return apply_filters( 'gfpdf_autoload_gf_styles', $items );
+		return apply_filters( 'gfpdf_gf_noconflict_styles', $items );
 	}
 
 	/**
