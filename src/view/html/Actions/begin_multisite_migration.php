@@ -44,14 +44,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<h1><?php _e( 'Gravity PDF Multisite Migration', 'gravity-forms-pdf-extended' ); ?></h1>
 
-	<p>Beginning Migration... </p>
+	<p><?php _e( 'Beginning Migration...', 'gravity-forms-pdf-extended' ); ?></p>
 
 	<div id="gfpdf-multisite-migration-copy" data-nonce="<?php echo wp_create_nonce( 'gfpdf_multisite_migration' ); ?>">
 		<!-- Container for our AJAX endpoint -->
 	</div>
 
 	<div id="gfpdf-multisite-migration-complete" style="display: none">
-		<p>Migration Complete.</p>
+		<p><?php _e( 'Migration Complete.', 'gravity-forms-pdf-extended' ); ?></p>
 
 		<p><a href="<?php echo $args['current_page_url']; ?>">Return to current page</a> | <a href="<?php echo $args['gf_forms_url']; ?>">View Gravity Forms</a></p>
 	</div>
