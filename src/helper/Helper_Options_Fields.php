@@ -226,9 +226,11 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			),
 
 			/** Extension Settings */
+			/* TODO: Add documentation for this filter */
 			'extensions' => apply_filters( 'gfpdf_settings_extensions',
 				array()
 			),
+			/* TODO: Add documentation for this filter */
 			'licenses' => apply_filters( 'gfpdf_settings_licenses',
 				array()
 			),
