@@ -512,7 +512,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
         * Localise admin script
         */
 		wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $this->data->get_localised_script_data( $this->options, $this->form ) );
-		wp_localize_script( 'gfpdf_js_v3_migration', 'GFPDF', $this->data->get_localised_script_data( $this->options, $this->form ) );
 	}
 
 
