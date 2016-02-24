@@ -171,7 +171,7 @@ class View_PDF extends Helper_Abstract_View {
 		/**
 		 * Show $form_data array if requested
 		 */
-		if ( isset( $_GET['data'] ) && $this->form->has_capability( 'gravityforms_view_settings' ) ) {
+		if ( isset( $_GET['data'] ) && $this->form->has_capability( 'gravityforms_view_settings' ) && isset( $args['form_data'] ) ) {
 			echo '<pre>';
 			print_r( $args['form_data'] );
 			echo '</pre>';
