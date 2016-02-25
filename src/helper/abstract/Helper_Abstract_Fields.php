@@ -164,7 +164,7 @@ abstract class Helper_Abstract_Fields {
 	}
 
 	/**
-	 * Check if we currently have a cach
+	 * Check if we currently have a cache
 	 *
 	 * @return boolean True is we have a cache and false if we do not
 	 *
@@ -261,25 +261,27 @@ abstract class Helper_Abstract_Fields {
 	/**
 	 * Get the default HTML output for this field
 	 *
-	 * @param  string  $value The field value to be displayed
-	 * @param  boolean $label Whether or not to show the field's label
+	 * @param  string  $value      The field value to be displayed
+	 * @param  boolean $show_label Whether or not to show the field's label
 	 *
 	 * @since 4.0
 	 *
 	 * @return string
 	 */
-	public function html( $value = '', $label = true ) {
+	public function html( $value = '', $show_label = true ) {
 
 		$value = $this->encode_tags( $value, $this->field->type ); /* Prevent shortcodes being processed from user input */
 		$value = apply_filters( 'gfpdf_field_content', $value, $this->field, $value, $this->entry['id'], $this->form['id'] ); /* Backwards compat */
+
+		$label = esc_html( GFFormsModel::get_label( $this->field ) );
 
 		$type = ( ! empty( $this->field->inputType ) ) ? $this->field->inputType : $this->field->type;
 
 		$html = '<div id="field-' . $this->field->id . '" class="gfpdf-' . $type . ' gfpdf-field ' . $this->field->cssClass . '">
 					<div class="inner-container">';
 
-		if ( $label ) {
-			$html .= '<div class="label"><strong>' . esc_html( GFFormsModel::get_label( $this->field ) ) . '</strong></div>';
+		if ( $show_label ) {
+			$html .= '<div class="label"><strong>' . $label . '</strong></div>';
 		}
 
 		/* If the field value is empty we'll add a non-breaking space to act like a character and maintain proper layout */
@@ -291,7 +293,7 @@ abstract class Helper_Abstract_Fields {
            . '</div>'
         . '</div>';
 
-		return apply_filters( 'gfpdf_field_html_value', $html, $value, $label, $this->field, $this->form, $this->entry );
+		return apply_filters( 'gfpdf_field_html_value', $html, $value, $show_label, $label, $this->field, $this->form, $this->entry );
 	}
 
 	/**
