@@ -299,16 +299,24 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @return array GFPDF settings
 	 */
 	public function get_settings() {
-		$tempSettings = get_transient( 'gfpdf_settings_user_data' );
-		delete_transient( 'gfpdf_settings_user_data' );
 
-		if ( $tempSettings !== false ) {
+		/**
+		 * We are storing temporary settings in a transient when validation fails.
+		 * This allows us to keep track of the updated fields without updating main settings in the DB
+		 *
+		 * We'll check if the transient exists and use it, otherwise get the main plugin settings from the options table
+		 */
+		$tempSettings = get_transient( 'gfpdf_settings_user_data' );
+		$is_temp      = ( $tempSettings !== false ) ? true : false;
+
+		if ( $is_temp ) {
 			$settings = $tempSettings;
+			delete_transient( 'gfpdf_settings_user_data' );
 		} else {
 			$settings = ( is_array( get_option( 'gfpdf_settings' ) ) ) ? get_option( 'gfpdf_settings' ) : array();
 		}
 
-		return apply_filters( 'gfpdf_get_settings', $settings );
+		return apply_filters( 'gfpdf_get_settings', $settings, $is_temp );
 	}
 
 	/**
@@ -390,13 +398,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			/* Pull the settings from the $form object, if they exist */
 			$settings = ( isset( $form['gfpdf_form_settings'] ) ) ? $form['gfpdf_form_settings'] : array();
 
-			/* Store the settings in our data object. Run filter to allow devs to modify the object as needed */
-			$this->data->form_settings[ $form_id ] = apply_filters( 'gfpdf_get_form_settings', $settings );
-
+			$this->data->form_settings[ $form_id ] = $settings;
 		}
 
 		/* return the form meta data */
-
 		return $this->data->form_settings[ $form_id ];
 	}
 
@@ -425,22 +430,20 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		if ( ! is_wp_error( $gfpdf_options ) ) {
 
 			/* Get our PDF array if it exists */
-			$value = ! empty( $gfpdf_options[ $pdf_id ] ) ? $gfpdf_options[ $pdf_id ] : new WP_Error( 'invalid_pdf_id', __( 'You must pass in a valid PDF ID', 'gravity-forms-pdf-extended' ) );
+			$pdf = ! empty( $gfpdf_options[ $pdf_id ] ) ? $gfpdf_options[ $pdf_id ] : new WP_Error( 'invalid_pdf_id', __( 'You must pass in a valid PDF ID', 'gravity-forms-pdf-extended' ) );
 
-			if ( ! is_wp_error( $value ) ) {
-				$value = apply_filters( 'gfpdf_pdf_config', $value );
-				$value = apply_filters( 'gfpdf_pdf_config_' . $form_id, $value );
+			if ( ! is_wp_error( $pdf ) ) {
+				$pdf = apply_filters( 'gfpdf_pdf_config', $pdf, $form_id );
+				$pdf = apply_filters( 'gfpdf_pdf_config_' . $form_id, $pdf, $form_id );
 
-				return $value;
+				return $pdf;
 			}
 
 			/* return WP_Error */
-
-			return $value;
+			return $pdf;
 		}
 
 		/* return WP_Error */
-
 		return $gfpdf_options;
 	}
 
@@ -449,17 +452,17 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * Create a new PDF configuration option for that form
 	 *
 	 * @param integer $form_id The form ID
-	 * @param array   $value   The settings array
+	 * @param array   $pdf   The settings array
 	 *
 	 * @return mixed
 	 *
 	 * @since 4.0
 	 */
-	public function add_pdf( $form_id, $value = array() ) {
+	public function add_pdf( $form_id, $pdf = array() ) {
 
 		$this->log->addNotice( 'Adding Settings.', array(
 			'form_id'      => $form_id,
-			'new_settings' => $value,
+			'new_settings' => $pdf,
 		) );
 
 		/* First let's grab the current settings */
@@ -468,26 +471,26 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		if ( ! is_wp_error( $options ) ) {
 
 			/* check the ID, if any */
-			$value['id']     = ( isset( $value['id'] ) ) ? $value['id'] : uniqid();
-			$value['active'] = ( isset( $value['active'] ) ) ? $value['active'] : true;
+			$pdf['id']     = ( isset( $pdf['id'] ) ) ? $pdf['id'] : uniqid();
+			$pdf['active'] = ( isset( $pdf['active'] ) ) ? $pdf['active'] : true;
 
 			/* Let's let devs alter that value coming in */
-			$value = apply_filters( 'gfpdf_form_add_pdf', $value, $form_id );
-			$value = apply_filters( 'gfpdf_form_add_pdf_' . $form_id, $value, $form_id );
+			$pdf = apply_filters( 'gfpdf_form_add_pdf', $pdf, $form_id );
+			$pdf = apply_filters( 'gfpdf_form_add_pdf_' . $form_id, $pdf, $form_id );
 
-			$results = $this->update_pdf( $form_id, $value['id'], $value, true, false );
+			$results = $this->update_pdf( $form_id, $pdf['id'], $pdf, true, false );
 
 			if ( $results ) {
 
 				/* return the ID if successful */
-				$this->log->addNotice( 'Successfuly Added.', array( 'pdf' => $value ) );
+				$this->log->addNotice( 'Successfuly Added.', array( 'pdf' => $pdf ) );
 
-				return $value['id'];
+				return $pdf['id'];
 			}
 
 			$this->log->addError( 'Error Saving.', array(
 				'error' => $results,
-				'pdf'   => $value,
+				'pdf'   => $pdf,
 			) );
 		}
 
@@ -505,21 +508,21 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @param integer         $form_id   The Gravity Form ID
 	 * @param string          $pdf_id    The PDF Setting ID
-	 * @param bool|int|string $value     The PDF settings array
+	 * @param bool|int|string $pdf     The PDF settings array
 	 * @param bool            $update_db Whether we should just update the local PDF settings array, or update the DB as well
 	 * @param bool            $filters   Whether we should apply the update filters
 	 *
 	 * @return bool True if updated, false if not.
 	 */
-	public function update_pdf( $form_id, $pdf_id, $value = '', $update_db = true, $filters = true ) {
+	public function update_pdf( $form_id, $pdf_id, $pdf = '', $update_db = true, $filters = true ) {
 
 		$this->log->addNotice( 'Updating Settings.', array(
 			'form_id'      => $form_id,
 			'pdf_id'       => $pdf_id,
-			'new_settings' => $value,
+			'new_settings' => $pdf,
 		) );
 
-		if ( empty( $value ) || ! is_array( $value ) || sizeof( $value ) == 0 ) {
+		if ( empty( $pdf ) || ! is_array( $pdf ) || sizeof( $pdf ) == 0 ) {
 			/* No value was passed in so we will delete the PDF */
 			$remove_option = $this->delete_pdf( $form_id, $pdf_id );
 
@@ -537,12 +540,12 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				$this->log->addNotice( 'Trigger Filters.' );
 
 				/* Let's let devs alter that value coming in */
-				$value = apply_filters( 'gfpdf_form_update_pdf', $value, $form_id, $pdf_id );
-				$value = apply_filters( 'gfpdf_form_update_pdf_' . $form_id, $value, $form_id, $pdf_id );
+				$pdf = apply_filters( 'gfpdf_form_update_pdf', $pdf, $form_id, $pdf_id );
+				$pdf = apply_filters( 'gfpdf_form_update_pdf_' . $form_id, $pdf, $form_id, $pdf_id );
 			}
 
 			/* Next let's try to update the value */
-			$options[ $pdf_id ] = $value;
+			$options[ $pdf_id ] = $pdf;
 
 			/* get the up-to-date form object and merge in the results */
 			$form = $this->form->get_form( $form_id );
@@ -642,7 +645,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	}
 
 	/**
-	 * Get an option
+	 * Get a global setting option
 	 *
 	 * Looks to see if the specified setting exists, returns default if not
 	 *
@@ -657,16 +660,16 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		$gfpdf_options = $this->settings;
 
-		$value = ! empty( $gfpdf_options[ $key ] ) ? $gfpdf_options[ $key ] : $default;
+		$value = ( ! empty( $gfpdf_options[ $key ] ) ) ? $gfpdf_options[ $key ] : $default;
 		$value = apply_filters( 'gfpdf_get_option', $value, $key, $default );
 
 		return apply_filters( 'gfpdf_get_option_' . $key, $value, $key, $default );
 	}
 
 	/**
-	 * Update an option
+	 * Update a global setting option
 	 *
-	 * Updates an Gravity PDF setting value in both the db and the global variable.
+	 * Updates a Gravity PDF setting value in both the db and the global variable.
 	 * Warning: Passing in an empty, false or null string value will remove
 	 *          the key from the gfpdf_options array.
 	 *
@@ -679,7 +682,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function update_option( $key = '', $value = false ) {
 
-		// If no key, exit
 		if ( empty( $key ) ) {
 			$this->log->addError( 'Option Update Error', array(
 				'key'   => $key,
@@ -715,7 +717,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	}
 
 	/**
-	 * Remove an option
+	 * Remove a global setting option
 	 *
 	 * Removes an Gravity PDF setting value in both the db and the global variable.
 	 *
@@ -727,7 +729,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function delete_option( $key = '' ) {
 
-		// If no key, exit
 		if ( empty( $key ) ) {
 			$this->log->addError( 'Option Delete Error' );
 
@@ -768,13 +769,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$gf_caps = $this->form->get_capabilities();
 
 		foreach ( $gf_caps as $gf_cap ) {
-			$capabilities[ __( 'Gravity Forms Capabilities', 'gravity-forms-pdf-extended' ) ][ $gf_cap ] = apply_filters( 'gfpdf_capability_name', $gf_cap );
+			$capabilities[ __( 'Gravity Forms Capabilities', 'gravity-forms-pdf-extended' ) ][ $gf_cap ] = $gf_cap;
 		}
 
 		foreach ( $roles as $role ) {
 			foreach ( $role['capabilities'] as $cap => $val ) {
 				if ( ! isset( $capabilities[ $cap ] ) && ! in_array( $cap, $gf_caps ) ) {
-					$capabilities[ __( 'Active WordPress Capabilities', 'gravity-forms-pdf-extended' ) ][ $cap ] = apply_filters( 'gfpdf_capability_name', $cap );
+					$capabilities[ __( 'Active WordPress Capabilities', 'gravity-forms-pdf-extended' ) ][ $cap ] = $cap;
 				}
 			}
 		}
