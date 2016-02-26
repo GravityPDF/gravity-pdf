@@ -65,7 +65,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		tests_add_filter( 'muplugins_loaded', array( $this, 'load' ) );
 
 		/* load Gravity PDF objects */
-		tests_add_filter( 'plugins_loaded', array( $this, 'create_stubs' ), 20 );
+		tests_add_filter( 'after_setup_theme', array( $this, 'create_stubs' ), 20 );
 
 		/* load the WP testing environment */
 		require_once( $this->wp_tests_dir . '/includes/bootstrap.php' );
