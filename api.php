@@ -50,14 +50,14 @@ final class GPDFAPI {
 	 *
 	 * Log messages can be added with any of the following:
 	 *
-	 * $gfpdf->log->addDebug( $message )
-	 * $gfpdf->log->addInfo( $message )
-	 * $gfpdf->log->addNotice( $message )
-	 * $gfpdf->log->addWarning( $message )
-	 * $gfpdf->log->addError( $message )
-	 * $gfpdf->log->addCritical( $message )
-	 * $gfpdf->log->addAlert( $message )
-	 * $gfpdf->log->addEmergency( $message )
+	 * $gfpdf->log->addDebug( $message, [$parameters = array()] )
+	 * $gfpdf->log->addInfo( $message, [$parameters = array()] )
+	 * $gfpdf->log->addNotice( $message, [$parameters = array()] )
+	 * $gfpdf->log->addWarning( $message, [$parameters = array()] )
+	 * $gfpdf->log->addError( $message, [$parameters = array()] )
+	 * $gfpdf->log->addCritical( $message, [$parameters = array()] )
+	 * $gfpdf->log->addAlert( $message, [$parameters = array()] )
+	 * $gfpdf->log->addEmergency( $message, [$parameters = array()] )
 	 *
 	 * When in production Gravity PDF will only log to a file when the Gravity Forms Logging plugin is enabled and Gravity PDF is set to "Log errors only" ($log->addError() or higher) or "Log all messages" ($log->addNotice() or higher)
 	 *
@@ -282,12 +282,12 @@ final class GPDFAPI {
 	}
 
 	/**
-	 * Gets a specific Gravity Form PDF configuration
+	 * Deletes a specific Gravity Form PDF configuration
 	 *
 	 * @param  integer $form_id The Gravity Form ID
 	 * @param  string  $pdf_id  The PDF ID
 	 *
-	 * @return boolean           True on success, false on failure
+	 * @return boolean          True on success, false on failure
 	 *
 	 * @since  4.0
 	 */
@@ -327,7 +327,7 @@ final class GPDFAPI {
 	}
 
 	/**
-	 * Add a new option to Gravity PDF
+	 * Add a new Global option to Gravity PDF
 	 *
 	 * If option already exists a WP_Error is returned
 	 * In most cases you'll want to use GPDFAPI::update_plugin_option() instead
@@ -460,7 +460,7 @@ final class GPDFAPI {
 
 		/* Check for errors */
 		if ( is_wp_error( $form ) ) {
-			return false;
+			return null;
 		}
 
 		/* Find our field ID, if any */
@@ -479,5 +479,7 @@ final class GPDFAPI {
 				break;
 			}
 		}
+
+		return null;
 	}
 }
