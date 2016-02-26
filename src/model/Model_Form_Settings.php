@@ -474,13 +474,13 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				if ( isset( $settings[ $s ][ $key ] ) ) {
 					$type = isset( $settings[ $s ][ $key ]['type'] ) ? $settings[ $s ][ $key ]['type'] : false;
 
+					/* General filter */
+					$input[ $key ] = apply_filters( 'gfpdf_form_settings_sanitize', $input[ $key ], $key, $input, $settings[ $s ][ $key ] );
+
 					if ( $type ) {
 						/* Field type specific filter */
 						$input[ $key ] = apply_filters( 'gfpdf_form_settings_sanitize_' . $type, $input[ $key ], $key, $input, $settings[ $s ][ $key ] );
 					}
-
-					/* General filter */
-					$input[ $key ] = apply_filters( 'gfpdf_form_settings_sanitize', $input[ $key ], $key, $input, $settings[ $s ][ $key ] );
 				}
 			}
 		}
@@ -618,19 +618,19 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* register our core fields */
 		$core_fields = array(
-			'show_form_title'      => 'get_form_title_display_field',
-			'show_page_names'      => 'get_page_names_display_field',
-			'show_html'            => 'get_html_display_field',
-			'show_section_content' => 'get_section_content_display_field',
-			'enable_conditional'   => 'get_conditional_display_field',
-			'show_empty'           => 'get_empty_display_field',
+			'show_form_title'      => array( $this->options, 'get_form_title_display_field' ),
+			'show_page_names'      => array( $this->options, 'get_page_names_display_field' ),
+			'show_html'            => array( $this->options, 'get_html_display_field' ),
+			'show_section_content' => array( $this->options, 'get_section_content_display_field' ),
+			'enable_conditional'   => array( $this->options, 'get_conditional_display_field' ),
+			'show_empty'           => array( $this->options, 'get_empty_display_field' ),
 
-			'background_color' => 'get_background_color_field',
-			'background_image' => 'get_background_image_field',
-			'header'           => 'get_header_field',
-			'first_header'     => 'get_first_page_header_field',
-			'footer'           => 'get_footer_field',
-			'first_footer'     => 'get_first_page_footer_field',
+			'background_color' => array( $this->options, 'get_background_color_field' ),
+			'background_image' => array( $this->options, 'get_background_image_field' ),
+			'header'           => array( $this->options, 'get_header_field' ),
+			'first_header'     => array( $this->options, 'get_first_page_header_field' ),
+			'footer'           => array( $this->options, 'get_footer_field' ),
+			'first_footer'     => array( $this->options, 'get_first_page_footer_field' ),
 		);
 
 		$core_fields = apply_filters( 'gfpdf_core_template_fields_list', $core_fields, $template_settings, $class );
@@ -638,7 +638,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		foreach ( $core_fields as $id => $method ) {
 
 			if ( isset( $template_settings['core'][ $id ] ) && $template_settings['core'][ $id ] === true ) {
-				$settings[ $id ] = call_user_func( array( $this->options, $method ) );
+				$settings[ $id ] = call_user_func( $method );
 			}
 		}
 

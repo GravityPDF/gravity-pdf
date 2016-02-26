@@ -201,3 +201,5 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
 		</div>
 	</htmlpagefooter>
 <?php endif; ?>
+
+<?php do_action( 'gfpdf_core_template' ); ?>
