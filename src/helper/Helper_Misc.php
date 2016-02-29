@@ -862,13 +862,14 @@ class Helper_Misc {
 	 * @return array
 	 */
 	public function add_template_image( $settings ) {
-		global $gfpdf;
+
 
 		if ( isset( $settings['template'] ) || isset( $settings['default_template'] ) ) {
+			$options = GPDFAPI::get_options_class();
 
 			$key = ( isset( $settings['template'] ) ) ? 'template' : 'default_template';
 
-			$current_template = $gfpdf->options->get_form_value( $settings[ $key ] );
+			$current_template = $options->get_form_value( $settings[ $key ] );
 			$template_image   = $this->get_template_image( $current_template );
 
 			$settings[ $key ]['desc'] .= '<div id="gfpdf-template-example">';

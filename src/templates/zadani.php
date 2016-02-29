@@ -31,7 +31,7 @@ if ( ! class_exists( 'GFForms' ) ) {
 /**
  * Load up our template-specific appearance settings
  */
-$value_border_colour  = ( ! empty( $settings['zadani_border_colour']) ) ? $settings['zadani_border_colour'] : '#CCCCCC';
+$value_border_colour = ( ! empty( $settings['zadani_border_colour'] ) ) ? $settings['zadani_border_colour'] : '#CCCCCC';
 
 ?>
 
@@ -217,8 +217,8 @@ $show_empty           = ( ! empty( $settings['show_empty'] ) && $settings['show_
  * @var array
  */
 $config = array(
-    'settings'  => $settings,
-    'meta'      => array(
+    'settings' => $settings,
+    'meta'     => array(
         'echo'                => true, /* whether to output the HTML or return it */
         'exclude'             => true, /* whether we should exclude fields with a CSS value of 'exclude'. Default to true */
         'empty'               => $show_empty, /* whether to show empty fields or not. Default is false */

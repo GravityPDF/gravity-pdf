@@ -69,14 +69,15 @@ class Controller_Activation {
 	 * @return void
 	 */
 	public static function deactivation() {
-		global $gfpdf;
+
+		$data = GPDFAPI::get_data_class();
 
 		/**
 		 * Remove our rewrite rules
 		 * As deactivation hook fires much earlier than flush_rewrite_rules() can be called we'll manually remove our rules from the database
 		 */
 		$rules = get_option( 'rewrite_rules' );
-		unset( $rules[ $gfpdf->data->permalink ] );
+		unset( $rules[ $data->permalink ] );
 		update_option( 'rewrite_rules', $rules );
 
 		/**

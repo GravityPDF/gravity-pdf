@@ -9,6 +9,7 @@ use GFPDF\Helper\Helper_Misc;
 
 use Psr\Log\LoggerInterface;
 
+use GPDFAPI;
 use GFCommon;
 
 /**
@@ -121,7 +122,6 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function gravitypdf( $attributes ) {
-		global $gfpdf;
 
 		$this->log->addNotice( 'Generating Shortcode' );
 
@@ -197,7 +197,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		}
 
 		/* Everything looks valid so let's get the URL */
-		$pdf               = new Model_PDF( $this->form, $this->log, $this->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
+		$pdf               = new Model_PDF( $this->form, $this->log, $this->options, GPDFAPI::get_data_class(), GPDFAPI::get_misc_class(), GPDFAPI::get_notice_class() );
 		$download          = ( $attributes['type'] == 'download' ) ? true : false;
 		$print             = ( ! empty( $attributes['print'] ) ) ? true : false;
 		$attributes['url'] = $pdf->get_pdf_url( $attributes['id'], $attributes['entry'], $download, $print );
@@ -329,7 +329,6 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function gravitypdf_redirect_confirmation( $form ) {
-		global $gfpdf;
 
 		/* check if the confirmation is currently being saved */
 		if ( isset( $_POST['form_confirmation_url'] ) ) {
@@ -354,7 +353,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 					if ( ! empty( $pid ) ) {
 
 						/* generate the PDF URL */
-						$pdf      = new Model_PDF( $this->form, $this->log, $this->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
+						$pdf      = new Model_PDF( $this->form, $this->log, $this->options, GPDFAPI::get_data_class(), GPDFAPI::get_misc_class(), GPDFAPI::get_notice_class() );
 						$download = ( ! isset( $code['attr']['type'] ) || $code['attr']['type'] == 'download' ) ? true : false;
 						$pdf_url  = $pdf->get_pdf_url( $pid, '{entry_id}', $download, false, false );
 

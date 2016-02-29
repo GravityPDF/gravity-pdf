@@ -31,10 +31,11 @@ if ( ! class_exists('GFForms')) {
 /**
  * Load up our template-specific appearance settings
  */
-$container_background_color = ( ! empty($settings['rubix_container_background_colour'])) ? $settings['rubix_container_background_colour'] : '#eeeeee';
+$container_background_color = ( ! empty( $settings['rubix_container_background_colour'] ) ) ? $settings['rubix_container_background_colour'] : '#eeeeee';
 
 /* Create a constrasting border colour for our tables */
-$contrast = $gfpdf->misc->get_background_and_border_contrast( $container_background_color );
+$misc     = GPDFAPI::get_misc_class();
+$contrast = $misc->get_background_and_border_contrast( $container_background_color );
 
 ?>
 
@@ -245,12 +246,12 @@ $contrast = $gfpdf->misc->get_background_and_border_contrast( $container_backgro
 /**
  * Load our core-specific styles from our PDF settings which will be passed to the PDF template $config array
  */
-$show_form_title      = ( ! empty($settings['show_form_title']) && $settings['show_form_title'] == 'Yes') ? true : false;
-$show_page_names      = ( ! empty($settings['show_page_names']) && $settings['show_page_names'] == 'Yes') ? true : false;
-$show_html            = ( ! empty($settings['show_html']) && $settings['show_html'] == 'Yes') ? true : false;
-$show_section_content = ( ! empty($settings['show_section_content']) && $settings['show_section_content'] == 'Yes') ? true : false;
-$enable_conditional   = ( ! empty($settings['enable_conditional']) && $settings['enable_conditional'] == 'Yes') ? true : false;
-$show_empty           = ( ! empty($settings['show_empty']) && $settings['show_empty'] == 'Yes') ? true : false;
+$show_form_title      = ( ! empty( $settings['show_form_title'] ) && $settings['show_form_title'] == 'Yes' ) ?              true : false;
+$show_page_names      = ( ! empty( $settings['show_page_names'] ) && $settings['show_page_names'] == 'Yes' ) ?              true : false;
+$show_html            = ( ! empty( $settings['show_html'] ) && $settings['show_html'] == 'Yes' ) ?                          true : false;
+$show_section_content = ( ! empty( $settings['show_section_content'] ) && $settings['show_section_content'] == 'Yes' ) ?    true : false;
+$enable_conditional   = ( ! empty( $settings['enable_conditional'] ) && $settings['enable_conditional'] == 'Yes' ) ?        true : false;
+$show_empty           = ( ! empty( $settings['show_empty'] ) && $settings['show_empty'] == 'Yes' ) ?                        true : false;
 
 /**
  * Set up our configuration array to control what is and is not shown in the generated PDF
