@@ -30,8 +30,8 @@ $contrast                   = $gfpdf->misc->get_background_and_border_contrast( 
 $contrast_background_color  = $contrast['background'];
 $contrast_border_color      = $contrast['border'];
 
-$include_list_styles        = apply_filters( 'gfpdf_include_list_styles', true );
-$include_product_styles     = apply_filters( 'gfpdf_include_product_styles', true );
+$include_list_styles        = apply_filters( 'gfpdf_include_list_styles', true, $settings );
+$include_product_styles     = apply_filters( 'gfpdf_include_product_styles', true, $settings );
 
 ?>
 
