@@ -199,7 +199,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		 * Our middleware authenticator
 		 * Allow users to tap into our middleware and add or remove additional authentication layers
 		 *
-		 * Default middleware includes 'middle_active', 'middle_conditional', 'middle_owner_restriction', 'middle_logged_out_timeout', 'middle_auth_logged_out_user', 'middle_user_capability'
+		 * Default middleware includes 'middle_public_access', 'middle_active', 'middle_conditional', 'middle_owner_restriction', 'middle_logged_out_timeout', 'middle_auth_logged_out_user', 'middle_user_capability'
 		 * If WP_Error is returned the PDF won't be parsed
 		 */
 		$middleware = apply_filters( 'gfpdf_pdf_middleware', false, $entry, $settings );
@@ -288,10 +288,10 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function middle_public_access( $action, $entry, $settings ) {
 
 		if ( isset( $settings['public_access'] ) && 'Yes' === $settings['public_access'] ) {
-			remove_filter( 'gfpdf_pdf_middleware', array( $this, 'middle_owner_restriction' ), 20 );
-			remove_filter( 'gfpdf_pdf_middleware', array( $this, 'middle_logged_out_timeout' ), 30 );
-			remove_filter( 'gfpdf_pdf_middleware', array( $this, 'middle_auth_logged_out_user' ), 40 );
-			remove_filter( 'gfpdf_pdf_middleware', array( $this, 'middle_user_capability' ), 50 );
+			remove_filter( 'gfpdf_pdf_middleware', array( $this, 'middle_owner_restriction' ), 40 );
+			remove_filter( 'gfpdf_pdf_middleware', array( $this, 'middle_logged_out_timeout' ), 50 );
+			remove_filter( 'gfpdf_pdf_middleware', array( $this, 'middle_auth_logged_out_user' ), 60 );
+			remove_filter( 'gfpdf_pdf_middleware', array( $this, 'middle_user_capability' ), 70 );
 		}
 
 		return $action;
@@ -623,12 +623,12 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		if ( ! empty( $pdfs ) ) {
 
-			foreach ( $pdfs as $pdf ) {
+			foreach ( $pdfs as $settings ) {
 
 				$args[] = array(
-					'name'     => $this->get_pdf_name( $pdf, $entry ),
-					'view'     => $this->get_pdf_url( $pdf['id'], $entry['id'], false ),
-					'download' => $this->get_pdf_url( $pdf['id'], $entry['id'], true ),
+					'name'     => $this->get_pdf_name( $settings, $entry ),
+					'view'     => $this->get_pdf_url( $settings['id'], $entry['id'], false ),
+					'download' => $this->get_pdf_url( $settings['id'], $entry['id'], true ),
 				);
 			}
 		}
@@ -639,24 +639,24 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Generate the PDF Name
 	 *
-	 * @param  array $pdf   The PDF Form Settings
-	 * @param  array $entry The Gravity Form entry details
+	 * @param  array $settings The PDF Form Settings
+	 * @param  array $entry    The Gravity Form entry details
 	 *
 	 * @return string      The PDF Name
 	 *
 	 * @since  4.0
 	 */
-	public function get_pdf_name( $pdf, $entry ) {
+	public function get_pdf_name( $settings, $entry ) {
 
 		$form = $this->form->get_form( $entry['form_id'] );
-		$name = $this->misc->do_mergetags( $pdf['filename'], $form, $entry );
+		$name = $this->misc->do_mergetags( $settings['filename'], $form, $entry );
 
 		/* Remove any characters that cannot be present in a filename */
 		$name = $this->misc->strip_invalid_characters( $name );
 
 		/* add filter to modify PDF name */
-		$name = apply_filters( 'gfpdf_pdf_filename', $name, $form, $entry, $pdf );
-		$name = apply_filters( 'gfpdfe_pdf_filename', $name, $form, $entry, $pdf ); /* backwards compat */
+		$name = apply_filters( 'gfpdf_pdf_filename', $name, $form, $entry, $settings );
+		$name = apply_filters( 'gfpdfe_pdf_filename', $name, $form, $entry, $settings ); /* backwards compat */
 
 		return $name;
 	}
@@ -802,12 +802,13 @@ class Model_PDF extends Helper_Abstract_Model {
 			if ( is_file( $pdf_path ) ) {
 
 				/* Add appropriate filters so developers can access the PDF when it is generated */
-				$form = $this->form->get_form( $entry['form_id'] );
+				$form     = $this->form->get_form( $entry['form_id'] );
+				$filename = basename( $pdf_path );
 
 				do_action( 'gfpdf_post_pdf_save', $form['id'], $entry['id'], $settings, $pdf_path ); /* Backwards compatibility */
 
-				do_action( 'gfpdf_post_save_pdf', $form, $entry, $settings, $pdf_path );
-				do_action( 'gfpdf_post_save_pdf_' . $form['id'], $form, $entry, $settings, $pdf_path );
+				do_action( 'gfpdf_post_save_pdf', $pdf_path, $filename, $settings, $entry, $form );
+				do_action( 'gfpdf_post_save_pdf_' . $form['id'], $pdf_path, $filename, $settings, $entry, $form );
 
 				return $pdf_path;
 			}
