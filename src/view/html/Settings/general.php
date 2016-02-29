@@ -76,5 +76,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 		?>
 	</form>
 
-	<?php do_action( 'pdf-settings-general' ); ?>
+	<?php do_action( 'gfpdf_post_general_settings_page' ); ?>
 </div>

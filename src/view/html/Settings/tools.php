@@ -91,7 +91,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 	</div>
 
-	<?php do_action( 'pdf-settings-tools' ); ?>
+	<?php do_action( 'gfpdf_post_tools_settings_page' ); ?>
 </div>
 
 <script type="text/template" id="GravityPDFFontsEmpty">
