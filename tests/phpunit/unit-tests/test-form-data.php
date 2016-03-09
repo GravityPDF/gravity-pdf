@@ -781,13 +781,19 @@ class Test_Form_Data extends WP_UnitTestCase {
 		/*
          * Product Option Single
          */
-		$response = 'Option 2 ($30.00)';
+		$response = 'Option 2';
 		$this->assertEquals( $response, $field[37] );
 		$this->assertEquals( $response, $field['37.Product Options for Basic Product'] );
 		$this->assertEquals( $response, $field['Product Options for Basic Product'] );
 		$this->assertEquals( $response, $field['37.Product Options for Basic Product_name'] );
 		$this->assertEquals( $response, $field['37_name'] );
 		$this->assertEquals( $response, $field['Product Options for Basic Product_name'] );
+
+		$response = '30';
+
+		$this->assertEquals( $response, $field['37.Product Options for Basic Product_value'] );
+		$this->assertEquals( $response, $field['37_value'] );
+		$this->assertEquals( $response, $field['Product Options for Basic Product_value'] );
 
 		/*
          * Product Shipping Basic
