@@ -750,21 +750,36 @@ class Model_PDF extends Helper_Abstract_Model {
 			/* Get required parameters */
 			$entry    = $pdf->get_entry();
 			$settings = $pdf->get_settings();
+			$args     = $this->misc->get_template_args( $entry, $settings );
 
 			/* Add backwards compatibility support */
 			$GLOBALS['wp']->query_vars['pid'] = $settings['id'];
 			$GLOBALS['wp']->query_vars['lid'] = $entry['id'];
 
 			try {
-				$pdf->init();
-				$pdf->set_output_type( 'save' );
-				$pdf->render_html( $this->misc->get_template_args( $entry, $settings ) );
 
-				/* Generate PDF if PDF doesn't already exists (backwards compatibility support for v3 Tier 2) */
-				if ( ! $this->does_pdf_exist( $pdf ) ) {
-					$raw_pdf = $pdf->generate();
-					$pdf->save_pdf( $raw_pdf );
+				/* Initialise our PDF helper class */
+				$pdf->init();
+				$pdf->set_template();
+				$pdf->set_output_type( 'save' );
+
+				/* Increment our rudimentary PDF counter */
+				$this->options->increment_pdf_count();
+
+				/* Add Backwards compatibility support for our v3 Tier 2 Add-on */
+				if ( isset( $settings['advanced_template'] ) && strtolower( $settings['advanced_template'] ) == 'yes' ) {
+
+					/* Check if we should process this document using our legacy system */
+					if ( $this->handle_legacy_tier_2_processing( $pdf, $entry, $settings, $args ) ) {
+						return true;
+					}
 				}
+
+				/* Render the PDF template HTML */
+				$pdf->render_html( $args );
+
+				/* Generate and save the PDF */
+				$pdf->save_pdf( $pdf->generate() );
 
 				return true;
 			} catch ( Exception $e ) {
@@ -779,6 +794,35 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Handles the loading and running of our legacy Tier 2 PDF templates
+	 *
+	 * @param \GFPDF\Helper\Helper_PDF $pdf      The Helper_PDF object
+	 * @param array                    $entry    The Gravity Forms raw entry data
+	 * @param array                    $settings The Gravity PDF settings
+	 * @param array                    $args     The data that should be passed directly to a PDF template
+	 *
+	 * @return bool
+	 *
+	 * @since 4.0
+	 */
+	public function handle_legacy_tier_2_processing( Helper_PDF $pdf, $entry, $settings, $args ) {
+
+		$form = $this->form->get_form( $entry['form_id'] );
+
+		$prevent_main_pdf_loader = apply_filters( 'gfpdfe_pre_load_template',
+			$form['id'],
+			$entry['id'],
+			basename( $pdf->get_template_path() ),
+			$form['id'] . $entry['id'],
+			$this->misc->backwards_compat_output( $pdf->get_output_type() ),
+			$pdf->get_filename(),
+			$this->misc->backwards_compat_conversion( $settings )
+		); /* Backwards Compatibility */
+
+		return ( $prevent_main_pdf_loader === true ) ? true : false;
 	}
 
 	/**
@@ -839,21 +883,17 @@ class Model_PDF extends Helper_Abstract_Model {
 			$notifications['attachments'] = ( isset( $notifications['attachments'] ) ) ? $notifications['attachments'] : array();
 
 			/* Loop through each PDF config and generate */
-			foreach ( $pdfs as $pdf_config ) {
+			foreach ( $pdfs as $settings ) {
 
-				$settings = $this->options->get_pdf( $entry['form_id'], $pdf_config['id'] );
+				/* Reset the variables each loop */
+				$filename = $tier_2_filename = '';
 
-				if ( ! is_wp_error( $settings ) && $this->maybe_attach_to_notification( $notifications, $settings ) ) {
+				if ( $this->maybe_attach_to_notification( $notifications, $settings ) ) {
 
-					/* Add backwards compatibility filter for our Tier 2 v3 Package if needed */
-					if( isset( $settings['advanced_template'] ) && strtolower( $settings['advanced_template'] ) == 'yes' ) {
-						$tier_2_filename = apply_filters( 'gfpdfe_return_pdf_path', $form['id'], $entry['id'] );
-					}
-
-					$filename = ( isset( $tier_2_filename ) && is_file( $tier_2_filename ) ) ? $tier_2_filename : $this->generate_and_save_pdf( $entry, $settings );
+					/* Generate our PDF */
+					$filename = $this->generate_and_save_pdf( $entry, $settings );
 
 					if ( ! is_wp_error( $filename ) ) {
-						$this->options->increment_pdf_count();
 						$notifications['attachments'][] = $filename;
 					}
 				}
@@ -953,7 +993,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * To prevent out tmp directory getting huge we will clean it up every 24 hours
+	 * To prevent ourt tmp directory getting huge we will clean it up every 24 hours
 	 *
 	 * @return void
 	 *
@@ -1036,6 +1076,25 @@ class Model_PDF extends Helper_Abstract_Model {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Clean-up any PDFs stored on disk before we resend any notifications
+	 *
+	 * @param array $form The Gravity Forms object
+	 * @param array $leads An array of Gravity Form entry IDs
+	 *
+	 * @since 4.0
+	 *
+	 * @return array We tapped into a filter so we need to return the form object
+	 */
+	public function resend_notification_pdf_cleanup( $form, $leads ) {
+		foreach ( $leads as $entry_id ) {
+			$entry = $this->form->get_entry( $entry_id );
+			$this->cleanup_pdf( $entry, $form );
+		}
+
+		return $form;
 	}
 
 	/**

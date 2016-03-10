@@ -131,16 +131,10 @@ class Test_PDF extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_actions() {
-		$this->assertSame( 10, has_action( 'parse_request', array(
-			$this->controller,
-			'process_legacy_pdf_endpoint',
-		) ) );
+		$this->assertSame( 10, has_action( 'parse_request', array( $this->controller, 'process_legacy_pdf_endpoint' ) ) );
 		$this->assertSame( 10, has_action( 'parse_request', array( $this->controller, 'process_pdf_endpoint' ) ) );
 
-		$this->assertSame( 10, has_action( 'gform_entries_first_column_actions', array(
-			$this->model,
-			'view_pdf_entry_list',
-		) ) );
+		$this->assertSame( 10, has_action( 'gform_entries_first_column_actions', array( $this->model, 'view_pdf_entry_list' ) ) );
 		$this->assertSame( 10, has_action( 'gform_entry_info', array( $this->model, 'view_pdf_entry_detail' ) ) );
 		$this->assertSame( 10, has_action( 'gform_after_submission', array( $this->model, 'maybe_save_pdf' ) ) );
 		$this->assertSame( 9999, has_action( 'gform_after_submission', array( $this->model, 'cleanup_pdf' ) ) );
@@ -159,7 +153,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertSame( 20, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_active' ) ) );
 		$this->assertSame( 30, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_conditional' ) ) );
 		$this->assertSame( 40, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_owner_restriction' ) ) );
-		$this->assertSame( 50, has_filter( 'gfpdf_pdf_middleware', array( $this->model,	'middle_logged_out_timeout' ) ) );
+		$this->assertSame( 50, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_logged_out_timeout' ) ) );
 		$this->assertSame( 60, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_auth_logged_out_user' ) ) );
 		$this->assertSame( 70, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_user_capability' ) ) );
 
@@ -168,29 +162,18 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertSame( 10, has_filter( 'mpdf_tmp_path', array( $this->model, 'mpdf_tmp_path' ) ) );
 		$this->assertSame( 10, has_filter( 'mpdf_fontdata_path', array( $this->model, 'mpdf_tmp_font_path' ) ) );
 		$this->assertSame( 10, has_filter( 'mpdf_current_font_path', array( $this->model, 'set_current_pdf_font' ) ) );
-		$this->assertSame( 10, has_filter( 'mpdf_font_data', array(
-			$this->model,
-			'register_custom_font_data_with_mPDF',
-		) ) );
-		$this->assertSame( 20, has_filter( 'mpdf_font_data', array(
-			$this->model,
-			'add_unregistered_fonts_to_mPDF',
-		) ) );
+		$this->assertSame( 10, has_filter( 'mpdf_font_data', array( $this->model, 'register_custom_font_data_with_mPDF' ) ) );
+		$this->assertSame( 20, has_filter( 'mpdf_font_data', array( $this->model, 'add_unregistered_fonts_to_mPDF' ) ) );
 
 		$this->assertSame( 10, has_filter( 'gfpdf_pdf_html_output', array( $gfpdf->misc, 'do_mergetags' ) ) );
 		$this->assertSame( 10, has_filter( 'gfpdf_pdf_html_output', 'do_shortcode' ) );
 
-		$this->assertSame( 10, has_filter( 'gfpdf_template_args', array(
-			$this->model,
-			'preprocess_template_arguments',
-		) ) );
-		$this->assertSame( 5, has_filter( 'gfpdf_pdf_html_output', array(
-			$this->view,
-			'autoprocess_core_template_options',
-		) ) );
+		$this->assertSame( 10, has_filter( 'gfpdf_template_args', array( $this->model, 'preprocess_template_arguments' ) ) );
+		$this->assertSame( 5, has_filter( 'gfpdf_pdf_html_output', array( $this->view, 'autoprocess_core_template_options' ) ) );
 
 		/* Backwards compatiblity */
 		$this->assertSame( 1, has_filter( 'gfpdfe_pre_load_template', array( 'PDFRender', 'prepare_ids' ) ) );
+		$this->assertSame( 10, has_filter( 'gform_before_resend_notifications', array( $this->model, 'resend_notification_pdf_cleanup' ) ) );
 	}
 
 	/**
@@ -927,6 +910,94 @@ class Test_PDF extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Ensure the PDF output setting is correct
+	 *
+	 * @since 4.0
+	 */
+	public function test_get_output_type() {
+		global $gfpdf;
+
+		$pdf = new Helper_PDF( '', '', $gfpdf->form, $gfpdf->data );
+
+		$pdf->set_output_type( 'display' );
+		$this->assertEquals( 'DISPLAY', $pdf->get_output_type() );
+
+		$pdf->set_output_type( 'download' );
+		$this->assertEquals( 'DOWNLOAD', $pdf->get_output_type() );
+
+		$pdf->set_output_type( 'save' );
+		$this->assertEquals( 'SAVE', $pdf->get_output_type() );
+	}
+
+	/**
+	 * Ensure the correct template path is returned
+	 *
+	 * @since 4.0
+	 */
+	public function test_get_template_path() {
+		global $gfpdf;
+
+		$pdf = new Helper_PDF( '', array( 'template' => 'zadani' ), $gfpdf->form, $gfpdf->data );
+
+		/* Cleanup any previous tests */
+		@unlink( $gfpdf->data->template_location . 'zadani.php' );
+
+		/* Set our current PDF template */
+		$pdf->set_template();
+
+		/* Check our basic struction is correct */
+		$this->assertEquals( PDF_PLUGIN_DIR . 'src/templates/zadani.php', $pdf->get_template_path() );
+
+		/* Copy the template to our PDF_EXTENDED_TEMPLATES directory and recheck the path */
+		copy( PDF_PLUGIN_DIR . 'src/templates/zadani.php', $gfpdf->data->template_location . 'zadani.php' );
+
+		/* Set our current PDF template */
+		$pdf->set_template();
+
+		/* Run our new test */
+		$this->assertEquals( $gfpdf->data->template_location . 'zadani.php', $pdf->get_template_path() );
+		@unlink( $gfpdf->data->template_location . 'zadani.php' );
+
+		/* Check the multisite option */
+		if ( is_multisite() ) {
+			/* Copy the template to our multisite PDF_EXTENDED_TEMPLATES directory and recheck the path */
+			copy( PDF_PLUGIN_DIR . 'src/templates/zadani.php', $gfpdf->data->multisite_template_location . 'zadani.php' );
+
+			/* Set our current PDF template */
+			$pdf->set_template();
+
+			/* Run our new test */
+			$this->assertEquals( $gfpdf->data->multisite_template_location . 'zadani.php', $pdf->get_template_path() );
+			@unlink( $gfpdf->data->multisite_template_location . 'zadani.php' );
+		}
+
+		/* Check for errors */
+		$pdf = new Helper_PDF( '', array( 'template' => 'non-existant' ), $gfpdf->form, $gfpdf->data );
+
+		try {
+			/* Set our current PDF template */
+			$pdf->set_template();
+		} catch ( Exception $e ) {
+			$this->assertEquals( 'Could not find the template: non-existant.php', $e->getMessage() );
+		}
+
+		/* Check for incorrect version requirements */
+		$template = file_get_contents( PDF_PLUGIN_DIR . 'src/templates/zadani.php' );
+		$template = str_replace( 'Required PDF Version: 4.0-alpha', 'Required PDF Version: 10', $template );
+		file_put_contents( $gfpdf->data->template_location . 'zadani.php', $template );
+
+		$pdf = new Helper_PDF( '', array( 'template' => 'zadani' ), $gfpdf->form, $gfpdf->data );
+
+		try {
+			$pdf->set_template();
+		} catch ( Exception $e ) {
+			$this->assertEquals( sprintf( 'The PDF Template %s requires Gravity PDF version %s. Upgrade to the latest version.', '<em>zadani.php</em>', '<em>10</em>' ), $e->getMessage() );
+		}
+
+		@unlink( $gfpdf->data->template_location . 'zadani.php' );
+	}
+
+	/**
 	 * Check our tmp directory is being cleaned up correctly
 	 *
 	 * @since 4.0
@@ -1535,5 +1606,31 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertNotFalse( strpos( $results, 'background-image-resize: 4;' ) );
 
 		$this->assertNotFalse( strpos( $results, 'background-color: red;' ) );
+	}
+
+	/**
+	 * Check that our backwards compatible Tier 2 add-on works as expected
+	 *
+	 * @since 4.0
+	 */
+	public function test_handle_legacy_tier_2_processing() {
+		global $gfpdf;
+
+		$settings = array( 'template' => 'zadani' );
+		$entry    = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$args     = $gfpdf->misc->get_template_args( $entry, $settings );
+
+		$pdf = new Helper_PDF( '', $settings, $gfpdf->form, $gfpdf->data );
+		$pdf->set_template();
+		$pdf->set_output_type( 'save' );
+
+		$this->assertFalse( $this->model->handle_legacy_tier_2_processing( $pdf, $entry, $settings, $args ) );
+
+		/* Set a filter and ensure the test passes */
+		add_filter( 'gfpdfe_pre_load_template', function( $form_id ) {
+			return true;
+		} );
+
+		$this->assertTrue( $this->model->handle_legacy_tier_2_processing( $pdf, $entry, $settings, $args ) );
 	}
 }

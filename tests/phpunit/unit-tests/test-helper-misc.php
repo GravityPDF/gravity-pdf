@@ -7,7 +7,7 @@ use GFPDF\Helper\Helper_Misc;
 use WP_UnitTestCase;
 
 /**
- * Test Gravity PDF Hlper Misc Functionality
+ * Test Gravity PDF Helper Misc Functionality
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2015, Blue Liquid Designs
@@ -462,11 +462,11 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	 * Ensure we correctly return an appropriate class name based on the file path given
 	 *
 	 * @param string $expected The expected value
-	 * @param string $file The test path
+	 * @param string $file     The test path
 	 *
 	 * @dataProvider provider_get_config_class_name
 	 *
-	 * @since 4.0
+	 * @since        4.0
 	 */
 	public function test_get_config_class_name( $expected, $file ) {
 		$this->assertEquals( $expected, $this->misc->get_config_class_name( $file ) );
@@ -497,7 +497,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	 *
 	 * @dataProvider provider_get_background_and_border_contrast
 	 *
-	 * @since 4.0
+	 * @since        4.0
 	 */
 	public function test_get_background_and_border_contrast( $expected, $hex ) {
 		$contrast = $this->misc->get_background_and_border_contrast( $hex );
@@ -535,12 +535,65 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 		$this->assertSame( 0, sizeof( $this->misc->get_fields_sorted_by_id( 0 ) ) );
 
 		/* Check for real form and verify the results */
-		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
 
 		$fields = $this->misc->get_fields_sorted_by_id( $form['id'] );
 
 		$this->assertEquals( 54, sizeof( $fields ) );
 		$this->assertEquals( 'Section Break', $fields[10]->label );
+	}
 
+	/**
+	 * Check if our backwards compatible settings conversion works correctly
+	 */
+	public function test_backwards_compat_conversion() {
+		$settings = array(
+			'irrelivant' => 'Yes',
+		);
+
+		/* Check all the defaults work as expected */
+		$compat = $this->misc->backwards_compat_conversion( $settings );
+
+		$this->assertEquals( 8, sizeof( $compat ) );
+		$this->assertFalse( isset( $compat['irrelivant'] ) );
+		$this->assertFalse( $compat['premium'] );
+		$this->assertFalse( $compat['rtl'] );
+		$this->assertFalse( $compat['security'] );
+		$this->assertFalse( $compat['pdfa1b'] );
+		$this->assertFalse( $compat['pdfx1a'] );
+		$this->assertEquals( '', $compat['password'] );
+		$this->assertEquals( '', $compat['pdf_privileges'] );
+		$this->assertEquals( 96, $compat['dpi'] );
+
+		/* Check all the settings get correctly converted */
+		$settings = array(
+			'advanced_template' => 'Yes',
+			'rtl'               => 'Yes',
+			'image_dpi'         => 300,
+			'security'          => 'Yes',
+			'password'          => 'password',
+			'privileges'        => 'privileges',
+			'format'            => 'PDFX1A',
+		);
+
+		$compat = $this->misc->backwards_compat_conversion( $settings );
+
+		$this->assertTrue( $compat['premium'] );
+		$this->assertTrue( $compat['rtl'] );
+		$this->assertTrue( $compat['security'] );
+		$this->assertFalse( $compat['pdfa1b'] );
+		$this->assertTrue( $compat['pdfx1a'] );
+		$this->assertEquals( 'password', $compat['pdf_password'] );
+		$this->assertEquals( 'privileges', $compat['pdf_privileges'] );
+		$this->assertEquals( 300, $compat['dpi'] );
+	}
+
+	/**
+	 * Check if our backwards compatible output functions work correctly
+	 */
+	public function test_backwards_compat_output() {
+		$this->assertEquals( 'save', $this->misc->backwards_compat_output() );
+		$this->assertEquals( 'view', $this->misc->backwards_compat_output( 'display' ) );
+		$this->assertEquals( 'download', $this->misc->backwards_compat_output( 'download' ) );
 	}
 }

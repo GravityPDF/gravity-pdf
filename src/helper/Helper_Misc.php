@@ -967,4 +967,52 @@ class Helper_Misc {
 		return $fields;
 	}
 
+	/**
+	 * Converts the 4.x settings array into a compatible 3.x settings array
+	 *
+	 * @param  array $settings The 4.x settings to be converted
+	 *
+	 * @return array           The 3.x compatible settings
+	 *
+	 * @since 4.0
+	 */
+	public function backwards_compat_conversion( $settings ) {
+
+		$compat                   = array();
+		$compat['premium']        = ( isset( $settings['advanced_template'] ) && $settings['advanced_template'] == 'Yes' ) ? true : false;
+		$compat['rtl']            = ( isset( $settings['rtl'] ) && $settings['rtl'] == 'Yes' ) ? true : false;
+		$compat['dpi']            = ( isset( $settings['image_dpi'] ) ) ? (int) $settings['image_dpi'] : 96;
+		$compat['security']       = ( isset( $settings['security'] ) && $settings['security'] == 'Yes' ) ? true : false;
+		$compat['pdf_password']   = ( isset( $settings['password'] ) ) ? $settings['password'] : '';
+		$compat['pdf_privileges'] = ( isset( $settings['privileges'] ) ) ? $settings['privileges'] : '';
+		$compat['pdfa1b']         = ( isset( $settings['format'] ) && $settings['format'] == 'PDFA1B' ) ? true : false;
+		$compat['pdfx1a']         = ( isset( $settings['format'] ) && $settings['format'] == 'PDFX1A' ) ? true : false;
+
+		return $compat;
+	}
+
+	/**
+	 * Converts the 4.x output to into a compatible 3.x type
+	 *
+	 * @param  string $type
+	 *
+	 * @return string
+	 *
+	 * @since 4.0
+	 */
+	public function backwards_compat_output( $type = '' ) {
+		switch ( strtolower( $type ) ) {
+			case 'display':
+				return 'view';
+			break;
+
+			case 'download':
+				return 'download';
+			break;
+
+			default:
+				return 'save';
+			break;
+		}
+	}
 }

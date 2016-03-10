@@ -147,9 +147,9 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 
 		/* Add save PDF filter */
 		add_action( 'gform_after_submission', array( $this->model, 'maybe_save_pdf' ), 10, 2 );
-		add_action( 'gform_after_submission', array( $this->model, 'cleanup_pdf' ), 9999, 2 );
 
-		/* Setup clean-up cron */
+		/* Clean-up actions */
+		add_action( 'gform_after_submission', array( $this->model, 'cleanup_pdf' ), 9999, 2 );
 		add_action( 'gfpdf_cleanup_tmp_dir', array( $this->model, 'cleanup_tmp_dir' ) );
 	}
 
@@ -194,6 +194,9 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		/* Pre-process our template arguments and automatically render them in PDF */
 		add_filter( 'gfpdf_template_args', array( $this->model, 'preprocess_template_arguments' ) );
 		add_filter( 'gfpdf_pdf_html_output', array( $this->view, 'autoprocess_core_template_options' ), 5, 4 );
+
+		/* Cleanup filters */
+		add_filter( 'gform_before_resend_notifications', array( $this->model, 'resend_notification_pdf_cleanup' ), 10, 2 );
 	}
 
 	/**
