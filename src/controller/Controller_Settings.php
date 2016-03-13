@@ -329,8 +329,13 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 
 		$settings = rgpost( 'gfpdf_settings' );
 
+		/* Only run checks if the gfpdf_settings POST data exists */
+		if ( empty( $settings ) ) {
+			return null;
+		}
+
 		/* check if we should install the custom templates */
-		if ( isset( $settings['setup_templates']['name'] ) ) {
+		if ( isset( $settings['setup_templates']['name'] ) && isset( $settings['setup_templates']['nonce'] ) ) {
 			/* verify the nonce */
 			if ( ! wp_verify_nonce( $settings['setup_templates']['nonce'], 'gfpdf_settings[setup_templates]' ) ) {
 				$this->log->addWarning( 'Nonce Verification Failed.' );
@@ -341,6 +346,8 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 
 			return $this->model->install_templates();
 		}
+
+		do_action( 'gfpdf_tool_tab_actions', $settings );
 	}
 
 	/**
