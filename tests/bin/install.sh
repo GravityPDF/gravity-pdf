@@ -65,7 +65,7 @@ install_wp() {
 
 install_depencency() {
 	#Gravity Forms
-	wget -nv -O /tmp/gravityforms.tar.gz https://github.com/gravityforms/gravityforms/archive/develop.tar.gz
+	wget -nv -O /tmp/gravityforms.tar.gz https://github.com/GravityPDF/gravityforms/archive/master.tar.gz
 	mkdir -p $PWD/tmp/gravityforms
 	tar --strip-components=1 -zxf /tmp/gravityforms.tar.gz -C $PWD/tmp/gravityforms
 
