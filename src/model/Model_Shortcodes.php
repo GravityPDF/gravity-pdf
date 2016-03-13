@@ -133,7 +133,8 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 			'id'      => '',
 			'text'    => 'Download PDF',
 			'type'    => 'download',
-			'classes' => 'gravitypdf-download-link',
+			'class'   => 'gravitypdf-download-link',
+			'classes' => '',
 			'entry'   => '',
 			'print'   => '',
 		), $attributes, 'gravitypdf' );

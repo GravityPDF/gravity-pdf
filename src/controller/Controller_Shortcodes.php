@@ -174,10 +174,10 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 				),
 
 				array(
-					'label'       => 'Anchor Classes',
-					'attr'        => 'classes',
+					'label'       => 'Anchor Class',
+					'attr'        => 'class',
 					'type'        => 'text',
-					'description' => 'Optional. Add any classes - separated by a space - you want to apply to the PDF link.',
+					'description' => 'Optional. Add any class name – separated by a space – you want to apply to the PDF link.',
 					'meta'        => array(
 						'placeholder' => '',
 					),
