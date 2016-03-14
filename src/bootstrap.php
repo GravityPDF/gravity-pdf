@@ -6,6 +6,7 @@ use GFPDF\Controller;
 use GFPDF\Model;
 use GFPDF\View;
 use GFPDF\Helper;
+
 use GFPDF_Core;
 
 use Monolog\Formatter\LineFormatter;
@@ -159,8 +160,30 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	}
 
 	/**
+	 * Fired on the `after_setup_theme` action to initialise our plugin
+	 *
+	 * We do this on this hook instead of plugins_loaded so that users can tap into all our actions and filters
+	 * directly from their theme (usually the functions.php file).
+	 *
+	 * @since 4.0
+	 */
+	public static function initialise_plugin() {
+
+		global $gfpdf;
+
+		/* Initialise our Router class */
+		$gfpdf = new Router();
+		$gfpdf->init();
+
+		/* Add backwards compatibility support */
+		$depreciated = new GFPDF_Core();
+		$depreciated->setup_constants();
+		$depreciated->setup_depreciated_paths();
+	}
+
+	/**
 	 * Setup our plugin functionality
-	 * Note: Fires on WordPress' init hook
+	 * Note: This method runs during the `after_setup_theme` action
 	 *
 	 * @since 4.0
 	 */
@@ -883,5 +906,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 /**
  * Execute our bootstrap class
+ *
+ * We were forced to forgo initialising the plugin using an anonymous function call due to
+ * our AJAX calls in our unit testing suite failing (boo)
  */
-new GFPDF_Core();
+add_action( 'after_setup_theme', '\GFPDF\Router::initialise_plugin' );
+

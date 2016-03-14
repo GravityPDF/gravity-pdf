@@ -78,19 +78,6 @@ abstract class GFPDF_Depreciated_Abstract {
 class GFPDF_Core extends GFPDF_Depreciated_Abstract {
 
 	/**
-	 * Initialise our Gravity PDF Router and initialise
-	 */
-	public function __construct() {
-		global $gfpdf;
-
-		$gfpdf = new Router();
-
-		$gfpdf->init();
-		$this->setup_constants();
-		$this->setup_depreciated_paths();
-	}
-
-	/**
 	 * Setup our v3 template location constants
 	 *
 	 * @since 4.0

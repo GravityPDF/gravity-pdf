@@ -2,7 +2,6 @@
 
 namespace GFPDF\Tests;
 
-use GFPDF_Core;
 use PDFRender;
 use PDF_Common;
 
@@ -76,31 +75,6 @@ class Test_Depreciated extends WP_UnitTestCase {
 			array( 'GFPDFEntryDetail' ),
 			array( 'PDF_Generator' ),
 		);
-	}
-
-	/**
-	 * Check our global $gfpdf variable gets setup correctly
-	 *
-	 * @since 4.0
-	 */
-	public function test_setup() {
-
-		/* Backup our class object and remove */
-		$backup = $GLOBALS['gfpdf'];
-		unset( $GLOBALS['gfpdf'] );
-
-		/* Test it was removed */
-		$this->assertNull( $GLOBALS['gfpdf'] );
-
-		/* Verify out object is set up correctly */
-		new GFPDF_Core();
-
-		$this->assertNotNull( $GLOBALS['gfpdf'] );
-		$this->assertEquals( 'GFPDF\Router', get_class( $GLOBALS['gfpdf'] ) );
-
-		/* Reset the object */
-		unset( $GLOBALS['gfpdf'] );
-		$GLOBALS['gfpdf'] = $backup;
 	}
 
 	/**
