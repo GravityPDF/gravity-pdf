@@ -396,7 +396,7 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 		$page_number  = 0;
 
 		/* Change the standardised HTML field output to be v3 compatible */
-		add_filter( 'gfpdf_field_html_value', array( 'GFPDFEntryDetail', 'legacy_html_format'), 10, 4 );
+		add_filter( 'gfpdf_field_html_value', array( 'GFPDFEntryDetail', 'legacy_html_format'), 10, 5 );
 		add_filter( 'gfpdf_field_class', array( 'GFPDFEntryDetail', 'load_legacy_html_classes'), 10, 3 );
 
 		/* Setup field to return the form data, if needed */
@@ -519,12 +519,12 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 	 *
 	 * @since 4.0
 	 */
-	public static function legacy_html_format( $html, $value, $label, $field ) {
+	public static function legacy_html_format( $html, $value, $show_label, $label, $field ) {
 
 		$html = '<div id="field-' . $field->id . '" class="' . $field->cssClass . '">';
 
-		if ( $label ) {
-			$html .= '<div class="strong">' . esc_html( GFFormsModel::get_label( $field ) ) . '</div>';
+		if ( $show_label ) {
+			$html .= '<div class="strong">' . $label . '</div>';
 		}
 
 		/* If the field value is empty we'll add a non-breaking space to act like a character and maintain proper layout */
