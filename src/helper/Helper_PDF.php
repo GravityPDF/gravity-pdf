@@ -253,8 +253,10 @@ class Helper_PDF {
 		$this->show_print_dialog();
 		$this->set_metadata();
 
+		$form = $this->form->get_form( $this->entry['form_id'] );
+
 		/* allow $mpdf object class to be modified */
-		$this->mpdf = apply_filters( 'gfpdf_mpdf_class', $this->mpdf, $this->entry, $this->settings, $this );
+		$this->mpdf = apply_filters( 'gfpdf_mpdf_class', $this->mpdf, $form, $this->entry, $this->settings, $this );
 
 		/* depreciated backwards compatibility filters */
 		$this->mpdf = apply_filters( 'gfpdfe_mpdf_class_pre_render', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() );
@@ -519,11 +521,13 @@ class Helper_PDF {
 	protected function begin_pdf() {
 		$this->mpdf = new mPDF( '', $this->paper_size, 0, '', 15, 15, 16, 16, 9, 9, $this->orientation );
 
+		$form = $this->form->get_form( $this->entry['form_id'] );
+
 		/**
 		 * Allow $mpdf object class to be modified
 		 * Note: in some circumstances using WriteHTML() during this filter will break headers/footers
 		 */
-		$this->mpdf = apply_filters( 'gfpdf_mpdf_init_class', $this->mpdf, $this->entry, $this->settings, $this );
+		$this->mpdf = apply_filters( 'gfpdf_mpdf_init_class', $this->mpdf, $form, $this->entry, $this->settings, $this );
 	}
 
 	/**
