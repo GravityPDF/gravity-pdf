@@ -162,13 +162,13 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 */
 	public function add_filters() {
 		/* PDF authentication middleware */
-		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_public_access' ), 5, 3 );
-		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_active' ), 10, 3 );
-		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_conditional' ), 10, 3 );
-		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_owner_restriction' ), 20, 3 );
-		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_logged_out_timeout' ), 30, 3 );
-		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_auth_logged_out_user' ), 40, 3 );
-		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_user_capability' ), 50, 3 );
+		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_public_access' ), 10, 3 );
+		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_active' ), 20, 3 );
+		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_conditional' ), 30, 3 );
+		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_owner_restriction' ), 40, 3 );
+		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_logged_out_timeout' ), 50, 3 );
+		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_auth_logged_out_user' ), 60, 3 );
+		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_user_capability' ), 70, 3 );
 
 		/* Tap into GF notifications */
 		add_filter( 'gform_notification', array( $this->model, 'notifications', ), 9999, 3 ); /* ensure Gravity PDF is one of the last filters to be applied */

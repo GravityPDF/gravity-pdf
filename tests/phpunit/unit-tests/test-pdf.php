@@ -155,22 +155,13 @@ class Test_PDF extends WP_UnitTestCase {
 	public function test_filters() {
 		global $gfpdf;
 
-		$this->assertSame( 5, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_public_access' ) ) );
-		$this->assertSame( 10, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_active' ) ) );
-		$this->assertSame( 10, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_conditional' ) ) );
-		$this->assertSame( 20, has_filter( 'gfpdf_pdf_middleware', array(
-			$this->model,
-			'middle_owner_restriction',
-		) ) );
-		$this->assertSame( 30, has_filter( 'gfpdf_pdf_middleware', array(
-			$this->model,
-			'middle_logged_out_timeout',
-		) ) );
-		$this->assertSame( 40, has_filter( 'gfpdf_pdf_middleware', array(
-			$this->model,
-			'middle_auth_logged_out_user',
-		) ) );
-		$this->assertSame( 50, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_user_capability' ) ) );
+		$this->assertSame( 10, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_public_access' ) ) );
+		$this->assertSame( 20, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_active' ) ) );
+		$this->assertSame( 30, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_conditional' ) ) );
+		$this->assertSame( 40, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_owner_restriction' ) ) );
+		$this->assertSame( 50, has_filter( 'gfpdf_pdf_middleware', array( $this->model,	'middle_logged_out_timeout' ) ) );
+		$this->assertSame( 60, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_auth_logged_out_user' ) ) );
+		$this->assertSame( 70, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_user_capability' ) ) );
 
 		$this->assertSame( 9999, has_filter( 'gform_notification', array( $this->model, 'notifications' ), 9999 ) );
 
@@ -338,37 +329,22 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->model->middle_public_access( '', '', $settings );
 
 		/* Run our Tests */
-		$this->assertSame( 10, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_active' ) ) );
-		$this->assertSame( 10, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_conditional' ) ) );
-		$this->assertSame( 20, has_filter( 'gfpdf_pdf_middleware', array(
-			$this->model,
-			'middle_owner_restriction',
-		) ) );
-		$this->assertSame( 30, has_filter( 'gfpdf_pdf_middleware', array(
-			$this->model,
-			'middle_logged_out_timeout',
-		) ) );
-		$this->assertSame( 40, has_filter( 'gfpdf_pdf_middleware', array(
-			$this->model,
-			'middle_auth_logged_out_user',
-		) ) );
-		$this->assertSame( 50, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_user_capability' ) ) );
+		$this->assertSame( 20, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_active' ) ) );
+		$this->assertSame( 30, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_conditional' ) ) );
+		$this->assertSame( 40, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_owner_restriction' ) ) );
+		$this->assertSame( 50, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_logged_out_timeout' ) ) );
+		$this->assertSame( 60, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_auth_logged_out_user' ) ) );
+		$this->assertSame( 70, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_user_capability' ) ) );
 
 		/* Check if setting passes */
 		$settings['public_access'] = 'Yes';
 		$this->model->middle_public_access( '', '', $settings );
 
-		$this->assertSame( 10, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_active' ) ) );
-		$this->assertSame( 10, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_conditional' ) ) );
-		$this->assertFalse( has_filter( 'gfpdf_pdf_middleware', array(
-			$this->model,
-			'middle_owner_restriction',
-		) ) );
+		$this->assertSame( 20, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_active' ) ) );
+		$this->assertSame( 30, has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_conditional' ) ) );
+		$this->assertFalse( has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_owner_restriction' ) ) );
 		$this->assertFalse( has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_logged_out_timeout' ) ) );
-		$this->assertFalse( has_filter( 'gfpdf_pdf_middleware', array(
-			$this->model,
-			'middle_auth_logged_out_user',
-		) ) );
+		$this->assertFalse( has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_auth_logged_out_user' ) ) );
 		$this->assertFalse( has_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_user_capability' ) ) );
 
 	}

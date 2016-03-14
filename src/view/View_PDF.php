@@ -436,16 +436,15 @@ class View_PDF extends Helper_Abstract_View {
 	 * @since 4.0
 	 */
 	public function show_form_title( $show_title, $form ) {
-		ob_start();
-
 		/* Show the form title, if needed */
-		if ( $show_title !== false ) : ?>
-			<div class="row-separator">
-				<h3 id="form_title"><?php echo $form['title'] ?></h3>
-			</div>
-		<?php endif;
+		if ( $show_title !== false ) {
 
-		echo apply_filters( 'gfpdf_pdf_form_title_html', ob_get_clean(), $form );
+			/* Load our HTML */
+			$html = $this->load( 'form_title', array( 'form' => $form ), false );
+
+			/* Run it through a filter and output */
+			echo apply_filters( 'gfpdf_pdf_form_title_html', $html, $form );
+		}
 	}
 
 	/**
@@ -468,17 +467,11 @@ class View_PDF extends Helper_Abstract_View {
 			/* correctly close / cleanup the HTML container if needed */
 			$container->close();
 
-			ob_start();
+			/* Load our HTML */
+			$html = $this->load( 'page_title', array( 'form' => $form, 'page' => $page ), false );
 
-			?>
-			<div class="row-separator">
-				<h3 class="gfpdf-page gfpdf-field">
-					<?php echo $form['pagination']['pages'][ $page ]; ?>
-				</h3>
-			</div>
-			<?php
-
-			echo apply_filters( 'gfpdf_field_page_name_html', ob_get_clean(), $page, $form );
+			/* Run it through a filter and output */
+			echo apply_filters( 'gfpdf_field_page_name_html', $html, $page, $form );
 		}
 	}
 
