@@ -493,14 +493,6 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
 /**
  * PDF Form Settings List
  */
-#gfpdf_list_form .manage-column {
-  width: 23%;
-}
-
-#gfpdf_list_form .column-name {
-  width: auto;
-}
-
 #gfpdf_list_form .check-column {
   width: 50px;
 }

@@ -85,14 +85,14 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	protected $options;
 
 	/**
-	 * Setup our class with appropriate data (columns, form
+	 * Setup our class with appropriate data
 	 *
-	 * @param  array                                $form A Gravity Form meta data array
+	 * @param array                                 $form_array
 	 * @param \GFPDF\Helper\Helper_Abstract_Form    $form_plugin
 	 * @param \GFPDF\Helper\Helper_Misc             $misc
 	 * @param \GFPDF\Helper\Helper_Abstract_Options $options
 	 *
-	 * @since 4.0
+	 * @since    4.0
 	 */
 	public function __construct( $form_array, Helper_Abstract_Form $form_plugin, Helper_Misc $misc, Helper_Abstract_Options $options ) {
 
@@ -164,21 +164,19 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 		<table class="wp-list-table <?php echo implode( ' ', $this->get_table_classes() ); ?>" cellspacing="0">
 			<thead>
-			<tr>
-				<?php $this->print_column_headers(); ?>
-			</tr>
+				<tr>
+					<?php $this->print_column_headers(); ?>
+				</tr>
 			</thead>
 
-			<tbody id="the-list" <?php if ( $singular ) {
-				echo " class='list:$singular'";
-			} ?>>
-			<?php $this->display_rows_or_placeholder(); ?>
+			<tbody id="the-list" <?php if ( $singular ) { echo " class='list:$singular'"; } ?>>
+				<?php $this->display_rows_or_placeholder(); ?>
 			</tbody>
 
 			<tfoot>
-			<tr>
-				<?php $this->print_column_headers( false ); ?>
-			</tr>
+				<tr>
+					<?php $this->print_column_headers( false ); ?>
+				</tr>
 			</tfoot>
 
 		</table>
@@ -205,7 +203,10 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 	/**
 	 * Default column handler
-	 * Used when not custom column public function exists
+	 *
+	 * Used when no public method exists for the column being processed
+	 * For developers who want to include additional columns using the `gfpdf_pdf_list_columns` filter
+	 * there's also an action you can tap into to output the correct column information
 	 *
 	 * @param  array $item The table row being processed
 	 *
@@ -214,7 +215,14 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * @since 4.0
 	 */
 	public function column_default( $item, $column ) {
-		echo rgar( $item, $column );
+
+		$action = 'gfpdf_pdf_list_column_' . $column;
+
+		if( has_action( $action ) ) {
+			do_action( $action, $item );
+		} else {
+			echo rgar( $item, $column );
+		}
 	}
 
 	/**
@@ -327,13 +335,13 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$duplicate_nonce = wp_create_nonce( "gfpdf_duplicate_nonce_{$form_id}_{$item['id']}" );
 		$delete_nonce    = wp_create_nonce( "gfpdf_delete_nonce_{$form_id}_{$item['id']}" );
 
-		$actions = apply_filters(
-			'gfpdf_pdf_actions', array(
-				'edit'      => '<a title="' . __( 'Edit this PDF', 'gravity-forms-pdf-extended' ) . '" href="' . $edit_url . '">' . __( 'Edit', 'gravity-forms-pdf-extended' ) . '</a>',
-				'duplicate' => '<a title="' . __( 'Duplicate this PDF', 'gravity-forms-pdf-extended' ) . '" data-id="' . $item['id'] . '" class="submitduplicate" data-nonce="' . $duplicate_nonce . '"  data-fid="' . $form_id . '">' . __( 'Duplicate', 'gravity-forms-pdf-extended' ) . '</a>',
-				'delete'    => '<a title="' . __( 'Delete this PDF', 'gravity-forms-pdf-extended' ) . '" class="submitdelete" data-id="' . $item['id'] . '" data-nonce="' . $delete_nonce . '" data-fid="' . $form_id . '">' . __( 'Delete', 'gravity-forms-pdf-extended' ) . '</a>',
-			)
+		$actions = array(
+			'edit'      => '<a title="' . __( 'Edit this PDF', 'gravity-forms-pdf-extended' ) . '" href="' . $edit_url . '">' . __( 'Edit', 'gravity-forms-pdf-extended' ) . '</a>',
+			'duplicate' => '<a title="' . __( 'Duplicate this PDF', 'gravity-forms-pdf-extended' ) . '" data-id="' . $item['id'] . '" class="submitduplicate" data-nonce="' . $duplicate_nonce . '"  data-fid="' . $form_id . '">' . __( 'Duplicate', 'gravity-forms-pdf-extended' ) . '</a>',
+			'delete'    => '<a title="' . __( 'Delete this PDF', 'gravity-forms-pdf-extended' ) . '" class="submitdelete" data-id="' . $item['id'] . '" data-nonce="' . $delete_nonce . '" data-fid="' . $form_id . '">' . __( 'Delete', 'gravity-forms-pdf-extended' ) . '</a>',
 		);
+
+		$actions = apply_filters( 'gfpdf_pdf_actions', $actions, $item );
 
 		?>
 
