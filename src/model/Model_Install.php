@@ -191,19 +191,22 @@ class Model_Install extends Helper_Abstract_Model {
 	 */
 	public function setup_template_location() {
 
-		$template_dir = $this->data->upload_dir . '/' . $this->data->working_folder . '/';
-		$template_url = $this->data->upload_dir_url . '/' . $this->data->working_folder . '/';
+		$template_dir   = $this->data->upload_dir . '/' . $this->data->working_folder . '/';
+		$template_url   = $this->data->upload_dir_url . '/' . $this->data->working_folder . '/';
+		$working_folder = $this->data->working_folder;
+		$upload_dir     = $this->data->upload_dir;
+		$upload_dir_url = $this->data->upload_dir_url;
 
 		/* Legacy Filters */
-		$this->data->template_location     = apply_filters( 'gfpdfe_template_location', $template_dir, $this->data->working_folder, $this->data->upload_dir );
-		$this->data->template_location_url = apply_filters( 'gfpdfe_template_location_uri', $template_url, $this->data->working_folder, $this->data->upload_dir_url );
+		$this->data->template_location     = apply_filters( 'gfpdfe_template_location', $template_dir, $working_folder, $upload_dir );
+		$this->data->template_location_url = apply_filters( 'gfpdfe_template_location_uri', $template_url, $working_folder, $upload_dir_url );
 
 		/* Allow user to change directory location(s) */
-		$this->data->template_location     = apply_filters( 'gfpdf_template_location', $this->data->template_location, $this->data->working_folder, $this->data->upload_dir ); /* needs to be accessible from the web */
-		$this->data->template_location_url = apply_filters( 'gfpdf_template_location_uri', $this->data->template_location_url, $this->data->working_folder, $this->data->upload_dir_url ); /* needs to be accessible from the web */
+		$this->data->template_location     = apply_filters( 'gfpdf_template_location', $this->data->template_location, $working_folder, $upload_dir ); /* needs to be accessible from the web */
+		$this->data->template_location_url = apply_filters( 'gfpdf_template_location_uri', $this->data->template_location_url, $working_folder, $upload_dir_url ); /* needs to be accessible from the web */
 
-		$this->data->template_font_location = apply_filters( 'gfpdf_font_location', $this->data->template_location . 'fonts/', $this->data->working_folder, $this->data->upload_dir ); /* can be in a directory not accessible via the web */
-		$this->data->template_tmp_location  = apply_filters( 'gfpdf_tmp_location', $this->data->template_location . 'tmp/', $this->data->working_folder, $this->data->upload_dir ); /* encouraged to move this to a directory not accessible via the web */
+		$this->data->template_font_location = apply_filters( 'gfpdf_font_location', $this->data->template_location . 'fonts/', $working_folder, $upload_dir ); /* can be in a directory not accessible via the web */
+		$this->data->template_tmp_location  = apply_filters( 'gfpdf_tmp_location', $this->data->template_location . 'tmp/', $working_folder, $upload_dir_url ); /* encouraged to move this to a directory not accessible via the web */
 
 		$this->log->addNotice( 'Template Locations', array(
 			'path' => $this->data->template_location,
@@ -226,8 +229,11 @@ class Model_Install extends Helper_Abstract_Model {
 
 			$blog_id = get_current_blog_id();
 
-			$template_dir = $this->data->template_location . $blog_id . '/';
-			$template_url = $this->data->template_location_url . $blog_id . '/';
+			$template_dir   = $this->data->template_location . $blog_id . '/';
+			$template_url   = $this->data->template_location_url . $blog_id . '/';
+			$working_folder = $this->data->working_folder;
+			$upload_dir     = $this->data->upload_dir;
+			$upload_dir_url = $this->data->upload_dir_url;
 
 			/**
 			 * Allow user to change directory location(s)
@@ -236,12 +242,12 @@ class Model_Install extends Helper_Abstract_Model {
 			 */
 
 			/* Global filter */
-			$this->data->multisite_template_location     = apply_filters( 'gfpdf_multisite_template_location', $template_dir, $this->data->working_folder, $blog_id, $this->data->upload_dir, $blog_id );
-			$this->data->multisite_template_location_url = apply_filters( 'gfpdf_multisite_template_location_url', $template_url, $this->data->working_folder, $blog_id, $this->data->upload_dir_url, $blog_id );
+			$this->data->multisite_template_location     = apply_filters( 'gfpdf_multisite_template_location', $template_dir, $working_folder, $upload_dir, $blog_id );
+			$this->data->multisite_template_location_url = apply_filters( 'gfpdf_multisite_template_location_uri', $template_url, $working_folder, $upload_dir_url, $blog_id );
 
 			/* Per-blog filters */
-			$this->data->multisite_template_location     = apply_filters( 'gfpdf_multisite_template_location_' . $blog_id, $this->data->multisite_template_location, $this->data->working_folder, $blog_id, $this->data->upload_dir, $blog_id );
-			$this->data->multisite_template_location_url = apply_filters( 'gfpdf_multisite_template_location_url_' . $blog_id, $this->data->multisite_template_location_url, $this->data->working_folder, $blog_id, $this->data->upload_dir_url, $blog_id );
+			$this->data->multisite_template_location     = apply_filters( 'gfpdf_multisite_template_location_' . $blog_id, $this->data->multisite_template_location, $working_folder, $upload_dir, $blog_id );
+			$this->data->multisite_template_location_url = apply_filters( 'gfpdf_multisite_template_location_uri_' . $blog_id, $this->data->multisite_template_location_url, $working_folder, $upload_dir_url, $blog_id );
 
 			$this->log->addNotice( 'Multisite Template Locations', array(
 				'path' => $this->data->multisite_template_location,
@@ -455,6 +461,8 @@ class Model_Install extends Helper_Abstract_Model {
 	public function remove_folder_structure() {
 
 		$paths = apply_filters( 'gfpdf_uninstall_path', array(
+			$this->data->template_font_location,
+			$this->data->template_tmp_location,
 			$this->data->template_location,
 		) );
 
