@@ -403,8 +403,12 @@ class Test_Form_Settings extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_settings_sanitize() {
+		global $gfpdf;
+
 		/* remove validation filter on settings */
 		remove_all_filters( 'gfpdf_form_settings' );
+		remove_all_filters( 'gfpdf_form_settings_sanitize_text' );
+		remove_all_filters( 'gfpdf_form_settings_sanitize_hidden' );
 
 		/* get faux input data */
 		$input = json_decode( file_get_contents( dirname( __FILE__ ) . '/json/form-settings-sample-input.json' ), true );
@@ -445,7 +449,6 @@ class Test_Form_Settings extends WP_UnitTestCase {
 
 		$values = $this->model->settings_sanitize( $input );
 
-		/* loop through array and check results */
 		foreach ( $values as $v ) {
 			$this->assertEquals( 'global input value', $v );
 		}
