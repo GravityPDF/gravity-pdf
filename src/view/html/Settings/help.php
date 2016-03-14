@@ -89,8 +89,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div><!-- close metabox-holder -->
 	</div><!-- close wrap about-wrap -->
 
-
-	<?php do_action( 'pdf-settings-help' ); ?>
+	<?php do_action( 'gfpdf_post_help_settings_page' ); ?>
 </div><!-- close #pdfextended-settings -->
 
 <script type="text/template" id="GravityPDFSearchResultsDocumentation">

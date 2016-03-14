@@ -100,10 +100,10 @@ class Test_Settings extends WP_UnitTestCase {
 	 */
 	public function test_actions() {
 		$this->assertEquals( 10, has_action( 'current_screen', array( $this->model, 'add_meta_boxes' ) ) );
-		$this->assertEquals( 10, has_action( 'pdf-settings-general', array( $this->view, 'system_status' ) ) );
-		$this->assertEquals( 10, has_action( 'pdf-settings-tools', array( $this->view, 'system_status' ) ) );
+		$this->assertEquals( 10, has_action( 'gfpdf_post_general_settings_page', array( $this->view, 'system_status' ) ) );
+		$this->assertEquals( 10, has_action( 'gfpdf_post_tools_settings_page', array( $this->view, 'system_status' ) ) );
 		$this->assertEquals( 10, has_action( 'admin_init', array( $this->controller, 'process_tool_tab_actions' ) ) );
-		$this->assertFalse( has_action( 'pdf-settings-tools', array( $this->view, 'uninstaller' ) ) );
+		$this->assertFalse( has_action( 'gfpdf_post_tools_settings_page', array( $this->view, 'uninstaller' ) ) );
 
 		$this->assertEquals( 10, has_action( 'wp_ajax_gfpdf_font_save', array( $this->model, 'save_font' ) ) );
 		$this->assertEquals( 10, has_action( 'wp_ajax_gfpdf_font_delete', array( $this->model, 'delete_font' ) ) );

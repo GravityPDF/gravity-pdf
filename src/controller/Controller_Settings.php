@@ -171,8 +171,8 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		add_action( 'current_screen', array( $this->model, 'add_meta_boxes' ) );
 
 		/* Display our system status on general and tools pages */
-		add_action( 'pdf-settings-general', array( $this->view, 'system_status' ) );
-		add_action( 'pdf-settings-tools', array( $this->view, 'system_status' ) );
+		add_action( 'gfpdf_post_general_settings_page', array( $this->view, 'system_status' ) );
+		add_action( 'gfpdf_post_tools_settings_page', array( $this->view, 'system_status' ) );
 
 		/**
 		 * Display the uninstaller if use has the correct permissions
@@ -184,7 +184,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		if ( ( ! is_multisite() && $this->form->has_capability( 'gravityforms_uninstall' ) ) ||
 		     ( is_multisite() && is_super_admin() )
 		) {
-			add_action( 'pdf-settings-tools', array( $this->view, 'uninstaller' ), 5 );
+			add_action( 'gfpdf_post_tools_settings_page', array( $this->view, 'uninstaller' ), 5 );
 		}
 
 		/* Process the tool tab actions */
