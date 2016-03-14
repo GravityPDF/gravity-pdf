@@ -408,10 +408,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @since 4.0
 	 */
 	public function plugin_action_links( $links ) {
-		global $gfpdf;
 
 		$action_links = array(
-			'settings' => '<a href="' . esc_url( $gfpdf->data->settings_url ) . '" title="' . esc_attr( __( 'View Gravity PDF Settings', 'gravity-forms-pdf-extended' ) ) . '">' . __( 'Settings', 'gravity-forms-pdf-extended' ) . '</a>',
+			'settings' => '<a href="' . esc_url( $this->data->settings_url ) . '" title="' . esc_attr( __( 'View Gravity PDF Settings', 'gravity-forms-pdf-extended' ) ) . '">' . __( 'Settings', 'gravity-forms-pdf-extended' ) . '</a>',
 		);
 
 		return array_merge( $action_links, $links );
@@ -428,12 +427,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @since  4.0
 	 */
 	public function plugin_row_meta( $links, $file ) {
-		global $gfpdf;
 
 		if ( $file == PDF_PLUGIN_BASENAME ) {
 			$row_meta = array(
 				'docs'    => '<a href="' . esc_url( '#' ) . '" title="' . esc_attr( __( 'View Gravity PDF Documentation', 'gravity-forms-pdf-extended' ) ) . '">' . __( 'Docs', 'gravity-forms-pdf-extended' ) . '</a>',
-				'support' => '<a href="' . esc_url( $gfpdf->data->settings_url . '&tab=help' ) . '" title="' . esc_attr( __( 'Get Help and Support', 'gravity-forms-pdf-extended' ) ) . '">' . __( 'Support', 'gravity-forms-pdf-extended' ) . '</a>',
+				'support' => '<a href="' . esc_url( $this->data->settings_url . '&tab=help' ) . '" title="' . esc_attr( __( 'Get Help and Support', 'gravity-forms-pdf-extended' ) ) . '">' . __( 'Support', 'gravity-forms-pdf-extended' ) . '</a>',
 				'shop'    => '<a href="' . esc_url( '#' ) . '" title="' . esc_attr( __( 'View Gravity PDF Theme Shop', 'gravity-forms-pdf-extended' ) ) . '">' . __( 'Theme Shop', 'gravity-forms-pdf-extended' ) . '</a>',
 			);
 
@@ -876,11 +874,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @since 4.0
 	 */
 	public function get_default_config_data( $form_id ) {
-		global $gfpdf;
 
 		$pid = $GLOBALS['wp']->query_vars['pid'];
 
-		$settings = $gfpdf->options->get_pdf( $form_id, $pid );
+		$settings = $this->options->get_pdf( $form_id, $pid );
 
 		if ( is_wp_error( $settings ) ) {
 

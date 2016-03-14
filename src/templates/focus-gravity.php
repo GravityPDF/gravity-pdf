@@ -31,12 +31,14 @@ if ( ! class_exists('GFForms')) {
 /**
  * Load up our template-specific appearance settings
  */
-$accent_colour             = ( ! empty($settings['focusgravity_accent_colour'])) ? $settings['focusgravity_accent_colour'] : '#e3e3e3';
-$accent_contrast_colour    = $gfpdf->misc->get_contrast($accent_colour);
-$secondary_colour          = ( ! empty($settings['focusgravity_secondary_colour'])) ? $settings['focusgravity_secondary_colour'] : '#eaf2fa';
-$secondary_contrast_colour = $gfpdf->misc->get_contrast($secondary_colour);
+$misc = GPDFAPI::get_misc_class();
 
-$label_format              = ( ! empty($settings['focusgravity_label_format'])) ? $settings['focusgravity_label_format'] : 'combined_label';
+$accent_colour             = ( ! empty( $settings['focusgravity_accent_colour'] ) ) ? $settings['focusgravity_accent_colour'] : '#e3e3e3';
+$accent_contrast_colour    = $misc->get_contrast( $accent_colour );
+$secondary_colour          = ( ! empty( $settings['focusgravity_secondary_colour'] ) ) ? $settings['focusgravity_secondary_colour'] : '#eaf2fa';
+$secondary_contrast_colour = $misc->get_contrast( $secondary_colour );
+
+$label_format = ( ! empty( $settings['focusgravity_label_format'] ) ) ? $settings['focusgravity_label_format'] : 'combined_label';
 
 ?>
 
@@ -254,12 +256,12 @@ $label_format              = ( ! empty($settings['focusgravity_label_format'])) 
 /**
  * Load our core-specific styles from our PDF settings which will be passed to the PDF template $config array
  */
-$show_form_title      = ( ! empty($settings['show_form_title']) && $settings['show_form_title'] == 'Yes') ? true : false;
-$show_page_names      = ( ! empty($settings['show_page_names']) && $settings['show_page_names'] == 'Yes') ? true : false;
-$show_html            = ( ! empty($settings['show_html']) && $settings['show_html'] == 'Yes') ? true : false;
-$show_section_content = ( ! empty($settings['show_section_content']) && $settings['show_section_content'] == 'Yes') ? true : false;
-$enable_conditional   = ( ! empty($settings['enable_conditional']) && $settings['enable_conditional'] == 'Yes') ? true : false;
-$show_empty           = ( ! empty($settings['show_empty']) && $settings['show_empty'] == 'Yes') ? true : false;
+$show_form_title      = ( ! empty( $settings['show_form_title'] ) && $settings['show_form_title'] == 'Yes' )            ? true : false;
+$show_page_names      = ( ! empty( $settings['show_page_names'] ) && $settings['show_page_names'] == 'Yes' )            ? true : false;
+$show_html            = ( ! empty( $settings['show_html'] ) && $settings['show_html'] == 'Yes' )                        ? true : false;
+$show_section_content = ( ! empty( $settings['show_section_content'] ) && $settings['show_section_content'] == 'Yes' )  ? true : false;
+$enable_conditional   = ( ! empty( $settings['enable_conditional'] ) && $settings['enable_conditional'] == 'Yes' )      ? true : false;
+$show_empty           = ( ! empty( $settings['show_empty'] ) && $settings['show_empty'] == 'Yes' )                      ? true : false;
 
 /**
  * Set up our configuration array to control what is and is not shown in the generated PDF

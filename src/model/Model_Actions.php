@@ -8,6 +8,7 @@ use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Migration;
 
+use GPDFAPI;
 
 /**
  * Action Model
@@ -238,9 +239,8 @@ class Model_Actions extends Helper_Abstract_Model {
 	 * @since    4.0
 	 */
 	private function migrate_v3( $path ) {
-		global $gfpdf;
 
-		$migration = new Helper_Migration( $gfpdf->form, $gfpdf->log, $this->data, $this->options, $gfpdf->misc, $gfpdf->notices );
+		$migration = new Helper_Migration( GPDFAPI::get_form_class(), GPDFAPI::get_log_class(), GPDFAPI::get_data_class(), GPDFAPI::get_options_class(), GPDFAPI::get_misc_class(), GPDFAPI::get_notice_class() );
 
 		if ( $migration->begin_migration() ) {
 
@@ -309,9 +309,9 @@ class Model_Actions extends Helper_Abstract_Model {
 	 * @since    4.0
 	 */
 	public function ajax_multisite_v3_migration() {
-		global $gfpdf;
+		$log = GPDFAPI::get_log_class();
 
-		$gfpdf->log->addNotice( 'Running AJAX Endpoint', array(
+		$log->addNotice( 'Running AJAX Endpoint', array(
 			'type' => 'Multisite v3 to v4 config',
 			'post' => $_POST,
 		) );
@@ -319,7 +319,7 @@ class Model_Actions extends Helper_Abstract_Model {
 		/* prevent unauthorized access */
 		if ( ! is_multisite() || ! is_super_admin() ) {
 
-			$gfpdf->log->addCritical( 'Lack of User Capabilities.', array(
+			$log->addCritical( 'Lack of User Capabilities.', array(
 				'user'        => wp_get_current_user(),
 				'user_meta'   => get_user_meta( get_current_user_id() ),
 				'multisite'   => is_multisite(),
@@ -338,7 +338,7 @@ class Model_Actions extends Helper_Abstract_Model {
 
 		if ( ! wp_verify_nonce( $nonce, 'gfpdf_multisite_migration' ) ) {
 
-			$gfpdf->log->addWarning( 'Nonce Verification Failed.' );
+			$log->addWarning( 'Nonce Verification Failed.' );
 
 			header( 'HTTP/1.1 401 Unauthorized' );
 			wp_die( '401' );
@@ -353,7 +353,7 @@ class Model_Actions extends Helper_Abstract_Model {
 				'error' => sprintf( __( 'No configuration.php file found for site #%s', 'gravity-forms-pdf-extended' ), $blog_id ),
 			);
 
-			$gfpdf->log->addError( 'AJAX Endpoint Failed', $return );
+			$log->addError( 'AJAX Endpoint Failed', $return );
 
 			echo json_encode( array( 'results' => $return ) );
 			wp_die();
@@ -374,13 +374,13 @@ class Model_Actions extends Helper_Abstract_Model {
 				'error' => sprintf( __( 'Database import problem for site #%s', 'gravity-forms-pdf-extended' ), $blog_id ),
 			);
 
-			$gfpdf->log->addError( 'AJAX Endpoint Failed', $return );
+			$log->addError( 'AJAX Endpoint Failed', $return );
 
 			echo json_encode( array( 'results' => $return ) );
 			wp_die();
 		}
 
-		$gfpdf->log->addError( 'AJAX Endpoint Failed' );
+		$log->addError( 'AJAX Endpoint Failed' );
 		header( 'HTTP/1.1 500 Internal Server Error' );
 		wp_die( '500' );
 

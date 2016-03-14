@@ -83,22 +83,24 @@ class GFPDF_Core extends GFPDF_Depreciated_Abstract {
 	 * @since 4.0
 	 */
 	public function setup_constants() {
-		global $gfpdf;
+
+		$data = GPDFAPI:: get_data_class();
+		$misc = GPDFAPI::get_misc_class();
 
 		if ( ! defined( 'PDF_SAVE_LOCATION' ) ) {
-			define( 'PDF_SAVE_LOCATION', $gfpdf->data->template_tmp_location );
+			define( 'PDF_SAVE_LOCATION', $data->template_tmp_location );
 		}
 
 		if ( ! defined( 'PDF_FONT_LOCATION' ) ) {
-			define( 'PDF_FONT_LOCATION', $gfpdf->data->template_font_location );
+			define( 'PDF_FONT_LOCATION', $data->template_font_location );
 		}
 
 		if ( ! defined( 'PDF_TEMPLATE_LOCATION' ) ) {
-			define( 'PDF_TEMPLATE_LOCATION', $gfpdf->misc->get_template_path() );
+			define( 'PDF_TEMPLATE_LOCATION', $misc->get_template_path() );
 		}
 
 		if ( ! defined( 'PDF_TEMPLATE_URL_LOCATION' ) ) {
-			define( 'PDF_TEMPLATE_URL_LOCATION', $gfpdf->misc->get_template_url() );
+			define( 'PDF_TEMPLATE_URL_LOCATION', $misc->get_template_url() );
 		}
 	}
 
@@ -216,9 +218,8 @@ class PDF_Common extends GFPDF_Depreciated_Abstract {
 	 * @since 3.0
 	 */
 	public static function get_upload_dir() {
-		global $gfpdf;
-
-		return $gfpdf->misc->get_upload_details();
+		$misc = GPDFAPI::get_misc_class();
+		return $misc->get_upload_details();
 	}
 
 	/**
@@ -233,9 +234,10 @@ class PDF_Common extends GFPDF_Depreciated_Abstract {
 	 * @since 3.0
 	 */
 	public static function do_mergetags( $string, $form_id, $lead_id ) {
-		global $gfpdf;
+		$misc = GPDFAPI::get_misc_class();
+		$form = GPDFAPI::get_form_class();
 
-		return $gfpdf->misc->do_mergetags( $string, $gfpdf->form->get_form( $form_id ), $gfpdf->form->get_entry( $lead_id ) );
+		return $misc->do_mergetags( $string, $form->get_form( $form_id ), $form->get_entry( $lead_id ) );
 	}
 
 	/**
@@ -246,9 +248,9 @@ class PDF_Common extends GFPDF_Depreciated_Abstract {
 	 * @since 4.0
 	 */
 	public static function view_data( $form_data ) {
-		global $gfpdf;
+		$form = GPDFAPI::get_form_class();
 
-		if ( isset( $_GET['data'] ) && $gfpdf->form->has_capability( 'gravityforms_view_settings' ) ) {
+		if ( isset( $_GET['data'] ) && $form->has_capability( 'gravityforms_view_settings' ) ) {
 			print '<pre>';
 			print_r( $form_data );
 			print '</pre>';
@@ -314,9 +316,8 @@ class PDF_Common extends GFPDF_Depreciated_Abstract {
 	 * @since 4.0
 	 */
 	public static function remove_invalid_characters( $name ) {
-		global $gfpdf;
-
-		return $gfpdf->meta->strip_invalid_characters( $name );
+		$misc = GPDFAPI::get_form_class();
+		return $misc->strip_invalid_characters( $name );
 	}
 }
 
@@ -387,11 +388,10 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 	 * @since 4.0
 	 */
 	public static function generate_v3_html_structure( $form, $lead, $config ) {
-		global $gfpdf;
 
 		/* Setup our variables */
 		$model        = GPDFAPI::get_mvc_class( 'Model_PDF' );
-		$products     = new Field_v3_Products( new GF_Field(), $lead, $gfpdf->form, $gfpdf->misc );
+		$products     = new Field_v3_Products( new GF_Field(), $lead, GPDFAPI::get_form_class(), GPDFAPI::get_misc_class() );
 		$has_products = false;
 		$page_number  = 0;
 
