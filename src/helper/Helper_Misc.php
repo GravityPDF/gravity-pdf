@@ -469,29 +469,6 @@ class Helper_Misc {
 	}
 
 	/**
-	 * Check if the web server can write a file to the path specified
-	 *
-	 * @param  string $path The path to check
-	 *
-	 * @return boolean
-	 *
-	 * @since  4.0
-	 */
-	public function is_directory_writable( $path ) {
-		$tmp_file = $path . '.tmpFile';
-
-		if ( is_writable( $path ) ) {
-			if ( touch( $tmp_file ) && is_file( $tmp_file ) ) {
-				@unlink( $tmp_file );
-
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
 	 * Modified version of get_upload_path() which just focuses on the base directory
 	 * no matter if single or multisite installation
 	 * We also only needed the basedir and baseurl so stripped out all the extras
