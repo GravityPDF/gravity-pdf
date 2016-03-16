@@ -188,21 +188,36 @@ class View_PDF extends Helper_Abstract_View {
 		$pdf->set_filename( $model->get_pdf_name( $settings, $entry ) );
 
 		try {
-			$pdf->init();
 
-			/* set display type */
+			/* Initialise our PDF helper class */
+			$pdf->init();
+			$pdf->set_template();
+
+			/* Increment our rudimentary PDF counter */
+			$this->options->increment_pdf_count();
+
+			/* Set display type and allow user to override the behaviour */
 			$settings['pdf_action'] = apply_filters( 'gfpdfe_pdf_output_type', $settings['pdf_action'] ); /* Backwards compat */
 			if ( $settings['pdf_action'] == 'download' ) {
 				$pdf->set_output_type( 'download' );
 			}
 
-			/* determine if we should show the print dialog box */
+			/* Add Backwards compatibility support for our v3 Tier 2 Add-on */
+			if ( isset( $settings['advanced_template'] ) && strtolower( $settings['advanced_template'] ) == 'yes' ) {
+
+				/* Check if we should process this document using our legacy system */
+				if ( $model->handle_legacy_tier_2_processing( $pdf, $entry, $settings, $args ) ) {
+					return true;
+				}
+			}
+
+			/* Determine if we should show the print dialog box */
 			if ( isset( $_GET['print'] ) ) {
 				$pdf->set_print_dialog( true );
 			}
 
+			/* Render the PDF template HTML */
 			$pdf->render_html( $args );
-			$this->options->increment_pdf_count();
 
 			/* Generate PDF */
 			$pdf->generate();

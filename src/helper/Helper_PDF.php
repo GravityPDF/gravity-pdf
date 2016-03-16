@@ -214,13 +214,6 @@ class Helper_PDF {
 
 		$form = $this->form->get_form( $this->entry['form_id'] );
 
-		/* Add filter to prevent HTML being written to document when it returns true. Backwards compatibility. */
-		$prevent_html = apply_filters( 'gfpdfe_pre_load_template', $form['id'], $this->entry['id'], basename( $this->template_path ), $form['id'] . $this->entry['id'], $this->backwards_compat_output( $this->output ), $this->filename, $this->backwards_compat_conversion( $this->settings ), $args ); /* Backwards Compatibility */
-
-		if ( $prevent_html === true ) {
-			return;
-		}
-
 		/* Load in our PHP template */
 		if ( empty( $html ) ) {
 			$html = $this->load_html( $args );
@@ -318,6 +311,65 @@ class Helper_PDF {
 	}
 
 	/**
+	 * Get the correct path to the PHP template we should load into mPDF
+	 *
+	 * @throws Exception
+	 *
+	 * @since 4.0
+	 */
+	public function set_template() {
+
+		$template = ( isset( $this->settings['template'] ) ) ? $this->get_file_with_extension( $this->settings['template'] ) : '';
+
+		/* Allow a user to change the current template if they have the appropriate capabilities */
+		if ( rgget( 'template' ) && is_user_logged_in() && $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
+			$template = $this->get_file_with_extension( rgget( 'template' ) );
+		}
+
+		/**
+		 * Check for the template's existance
+		 * We'll first look for a user-overridding template
+		 * Then check our default templates
+		 */
+		$default_template_path = PDF_PLUGIN_DIR . 'src/templates/';
+
+		if ( is_multisite() && is_file( $this->data->multisite_template_location . $template ) ) {
+			$this->template_path = $this->data->multisite_template_location . $template;
+		} else if ( is_file( $this->data->template_location . $template ) ) {
+			$this->template_path = $this->data->template_location . $template;
+		} else if ( is_file( $default_template_path . $template ) ) {
+			$this->template_path = $default_template_path . $template;
+		} else {
+			throw new Exception( 'Could not find the template: ' . esc_html( $template ) );
+		}
+
+		/*
+		 * Check if the template version is compatible with our version of Gravity PDF
+		 */
+		$headers = get_file_data( $this->template_path, array( 'required_pdf_version' => __( 'Required PDF Version', 'gravity-forms-pdf-extended' ) ) );
+
+		/* Check if there are version requirements */
+		if ( strlen( $headers['required_pdf_version'] ) > 0 ) {
+			/* Check if the version requirements are NOT met and throw and error */
+			if ( version_compare( $headers['required_pdf_version'], PDF_EXTENDED_VERSION, '>' ) ) {
+				throw new Exception( sprintf( __( 'The PDF Template %s requires Gravity PDF version %s. Upgrade to the latest version.', 'gravity-forms-pdf-extended' ), "<em>$template</em>", "<em>{$headers['required_pdf_version']}</em>" ) );
+			}
+		}
+	}
+
+	/**
+	 * Gets the current directory template files are being included from.
+	 * This is set in the set_template() method
+	 *
+	 * @return string
+	 *
+	 * @since 4.0
+	 */
+	public function get_template_path() {
+		return $this->template_path;
+	}
+
+	/**
 	 * Public endpoint to allow users to control how the generated PDF will be displayed
 	 *
 	 * @param string $type Only display, download or save options are valid
@@ -334,6 +386,18 @@ class Helper_PDF {
 		}
 
 		$this->output = strtoupper( $type );
+	}
+
+
+	/**
+	 * Get the current PDF output type as per the set_output_type() method.
+	 *
+	 * @return string
+	 *
+	 * @since 4.0
+	 */
+	public function get_output_type() {
+		return $this->output;
 	}
 
 	/**
@@ -503,6 +567,9 @@ class Helper_PDF {
 	/**
 	 * Gets the absolute path to the PDF
 	 *
+	 * Works with our legacy Tier 2 add-on without adding a filter because we have stuck with the same naming convension
+	 *
+	 *
 	 * @return string The full path and filename of the PDF
 	 *
 	 * @since 4.0
@@ -641,54 +708,6 @@ class Helper_PDF {
 		}
 	}
 
-	/**
-	 * Get the correct path to the PHP template we should load into mPDF
-	 *
-	 * @throws Exception
-	 *
-	 * @since 4.0
-	 */
-	protected function set_template() {
-
-		$template = ( isset( $this->settings['template'] ) ) ? $this->get_file_with_extension( $this->settings['template'] ) : '';
-
-		/* Allow a user to change the current template if they have the appropriate capabilities */
-		if ( rgget( 'template' ) && is_user_logged_in() && $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
-			$template = $this->get_file_with_extension( rgget( 'template' ) );
-		}
-
-		/**
-		 * Check for the template's existance
-		 * We'll first look for a user-overridding template
-		 * Then check our default templates
-		 */
-		$default_template_path = PDF_PLUGIN_DIR . 'src/templates/';
-
-		if ( is_multisite() && is_file( $this->data->multisite_template_location . $template ) ) {
-			$this->template_path = $this->data->multisite_template_location . $template;
-		} else if ( is_file( $this->data->template_location . $template ) ) {
-			$this->template_path = $this->data->template_location . $template;
-		} else if ( is_file( $default_template_path . $template ) ) {
-			$this->template_path = $default_template_path . $template;
-		} else {
-			throw new Exception( 'Could not find the template: ' . esc_html( $template ) );
-		}
-
-		/*
-		 * Check if the template version is compatible with our version of Gravity PDF
-		 */
-		$headers = get_file_data( $this->template_path, array( 'required_pdf_version' => __( 'Required PDF Version', 'gravity-forms-pdf-extended' ) ) );
-
-		/* Check if there are version requirements */
-		if ( strlen( $headers['required_pdf_version'] ) > 0 ) {
-			/* Check if the version requirements are NOT met and throw and error */
-			if ( version_compare( $headers['required_pdf_version'], PDF_EXTENDED_VERSION, '>' ) ) {
-				throw new Exception( sprintf( __( 'The PDF Template %s requires Gravity PDF version %s. Upgrade to the latest version.', 'gravity-forms-pdf-extended' ), "<em>$template</em>", "<em>{$headers['required_pdf_version']}</em>" ) );
-			}
-		}
-
-	}
-
 
 	/**
 	 * Ensure an extension is added to the end of the name
@@ -825,55 +844,6 @@ class Helper_PDF {
 			$master_password = ( isset( $this->settings['master_password'] ) ) ? $this->settings['master_password'] : '';
 
 			$this->mpdf->SetProtection( $privileges, $password, $master_password, 128 );
-		}
-	}
-
-	/**
-	 * Converts the 4.x settings array into a compatible 3.x settings array
-	 *
-	 * @param  array $settings The 4.x settings to be converted
-	 *
-	 * @return array           The 3.x compatible settings
-	 *
-	 * @since 4.0
-	 */
-	protected function backwards_compat_conversion( $settings ) {
-
-		$compat                   = array();
-		$compat['premium']        = ( isset( $settings['advanced_template'] ) && $settings['advanced_template'] == 'Yes' ) ? true : false;
-		$compat['rtl']            = ( isset( $settings['rtl'] ) && $settings['rtl'] == 'Yes' ) ? true : false;
-		$compat['dpi']            = ( isset( $settings['image_dpi'] ) ) ? (int) $settings['image_dpi'] : 96;
-		$compat['security']       = ( isset( $settings['security'] ) && $settings['security'] == 'Yes' ) ? true : false;
-		$compat['pdf_password']   = ( isset( $settings['password'] ) ) ? $settings['password'] : '';
-		$compat['pdf_privileges'] = ( isset( $settings['privileges'] ) ) ? $settings['privileges'] : '';
-		$compat['pdfa1b']         = ( isset( $settings['format'] ) && $settings['format'] == 'PDFA1B' ) ? true : false;
-		$compat['pdfx1a']         = ( isset( $settings['format'] ) && $settings['format'] == 'PDFX1A' ) ? true : false;
-
-		return $compat;
-	}
-
-	/**
-	 * Converts the 4.x output to into a compatible 3.x type
-	 *
-	 * @param  string $type
-	 *
-	 * @return string
-	 *
-	 * @since 4.0
-	 */
-	protected function backwards_compat_output( $type ) {
-		switch ( strtolower( $type ) ) {
-			case 'display':
-				return 'view';
-			break;
-
-			case 'download':
-				return 'download';
-			break;
-
-			default:
-				return 'save';
-			break;
 		}
 	}
 
