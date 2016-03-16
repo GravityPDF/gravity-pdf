@@ -5,6 +5,7 @@ namespace GFPDF\Helper\Fields;
 use GFPDF\Helper\Helper_Abstract_Fields;
 
 use GFFormsModel;
+use GFCommon;
 
 /**
  * Gravity Forms Field
@@ -78,27 +79,62 @@ class Field_Product extends Helper_Abstract_Fields {
 	public function form_data() {
 
 		$value    = $this->value();
-		$label    = GFFormsModel::get_label( $this->field );
-		$field_id = (int) $this->field->id;
+		$field    = $this->field;
+		$label    = GFFormsModel::get_label( $field );
+		$field_id = (int) $field->id;
 		$data     = array();
 		$name     = $price = '';
 
-		switch ( $this->field->type ) {
+		switch ( $field->type ) {
 			case 'product':
 				$name  = ( isset( $value['name'] ) && isset( $value['price'] ) ) ? $value['name'] . " ({$value['price']})" : '';
 				$price = ( isset( $value['price_unformatted'] ) ) ? $value['price_unformatted'] : '';
 			break;
 
 			case 'option':
-				if ( isset( $value['options'] ) && sizeof( $value['options'] ) > 1 ) {
-					foreach ( $value['options'] as $option ) {
-						$name[]  = ( isset( $option['option_name'] ) ) ? $option['option_name'] . " ({$option['price_formatted']})" : '';
-						$price[] = ( isset( $option['price'] ) ) ? $option['price'] : '';
-					}
-				} else {
-					$name  = ( isset( $value['options'][0]['option_name'] ) ) ? $value['options'][0]['option_name'] . " ({$value['options'][0]['price_formatted']})" : '';
-					$price = ( isset( $value['options'][0]['price'] ) ) ? $value['options'][0]['price'] : '';
+
+				/**
+				 * Gravity Forms doesn't currently store the option field ID with the standard product information.
+				 * However, it does allow multiple fields to be an option for a single product.
+				 * This becomes problematic when you have multiple option fields that contains the same name and are
+				 * trying to determine which field it was selected from.
+				 *
+				 * To get around this limitation we'll process the entry option fields and make this data available.
+				 */
+
+				/* Get the current option value for this field */
+				$option_value = GFFormsModel::get_lead_field_value( $this->entry, $field );
+
+				/* Ensure this variable is an array */
+				$option_value = ( ! is_array( $option_value ) ) ? array( $option_value ) : $option_value;
+
+				/* Reset the array keys and remove any empty values */
+				$option_value = array_values( $option_value );
+				$option_value = array_filter( $option_value );
+
+				/* Get the field name ( */
+				$name = array_map( function( $value ) use ( $field ) {
+					$option_info = GFCommon::get_option_info( $value, $field, false );
+
+					return $option_info['name'];
+				}, $option_value );
+
+				/* Get the field value (the price) */
+				$price = array_map( function( $value ) use ( $field ) {
+					$option_info = GFCommon::get_option_info( $value, $field, false );
+
+					return $option_info['price'];
+				}, $option_value );
+
+				/**
+				 * Valid option fields can only be radio, checkbox and select boxes
+				 * To ensure backwards compatibility we'll remove the array if not a checkbox value
+				 */
+				if ( $field->inputType !== 'checkbox' ) {
+					$name  = array_shift( $name );
+					$price = array_shift( $price );
 				}
+
 			break;
 
 			case 'shipping':
@@ -113,7 +149,7 @@ class Field_Product extends Helper_Abstract_Fields {
 			break;
 		}
 
-		/* Standadised Format */
+		/* Backwards Compatible – Standadised Format */
 		$data['field'][ $field_id . '.' . $label ] = $name;
 		$data['field'][ $field_id ]                = $name;
 		$data['field'][ $label ]                   = $name;
@@ -123,7 +159,7 @@ class Field_Product extends Helper_Abstract_Fields {
 		$data['field'][ $field_id . '_name' ]                = $name;
 		$data['field'][ $label . '_name' ]                   = $name;
 
-		/* Value */
+		/* New to v4 $form_data format to include the prices */
 		$data['field'][ $field_id . '.' . $label . '_value' ] = $price;
 		$data['field'][ $field_id . '_value' ]                = $price;
 		$data['field'][ $label . '_value' ]                   = $price;
