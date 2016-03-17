@@ -39,6 +39,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * @since 4.0
+ *
+ * @property string  $short_title                     The plugin's short title used with Gravity Forms
+ * @property string  $title                           The plugin's main title used with Gravity Forms
+ * @property string  $slug                            The plugin's slug used with Gravity Forms
+ * @property boolean $is_installed                    If the plugin has been successfully installed
+ * @property string  $permalink                       The plugin's PDF permalink regex
+ * @property string  $working_folder                  The plugin's working directory name
+ * @property string  $settings_url                    The plugin's URL to the settings page
+ * @property string  $memory_limit                    The current PHP memory limit
+ * @property string  $upload_dir                      The current path to the WP upload directory
+ * @property string  $upload_dir_url                  The current URL to the WP upload directory
+ * @property array   $form_settings                   A cache of the current form's PDF settings
+ * @property string  $template_location               The current path to the PDF working directory
+ * @property string  $template_location_url           The current URL to the PDF working directory
+ * @property string  $template_font_location          The current path to the PDF font directory
+ * @property string  $template_tmp_location           The current path to the PDF tmp location
+ * @property string  $multisite_template_location     The current path to the multisite PDF working directory
+ * @property string  $multisite_template_location_url The current URL to the multisite PDF working directory
+ *
  */
 class Helper_Data {
 

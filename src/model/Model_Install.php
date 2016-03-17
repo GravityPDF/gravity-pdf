@@ -176,7 +176,7 @@ class Model_Install extends Helper_Abstract_Model {
 	/**
 	 * Get our current installation status
 	 *
-	 * @return  string
+	 * @return  boolean
 	 *
 	 * @since  4.0
 	 */
