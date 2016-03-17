@@ -166,6 +166,9 @@ class Helper_Migration {
 		/* Clean-up the old 'output' directory as we use 'tmp' now */
 		$this->cleanup_output_directory();
 
+		/* Remove the old font config.php file */
+		$this->cleanup_font_config();
+
 		return true;
 	}
 
@@ -603,6 +606,23 @@ class Helper_Migration {
 
 		if ( is_dir( $output_dir ) ) {
 			return $this->misc->rmdir( $output_dir );
+		}
+
+		return false;
+	}
+
+	/**
+	 * Try remove the font/config.php file during the migration
+	 *
+	 * @return boolean
+	 *
+	 * @since 4.0
+	 */
+	private function cleanup_font_config() {
+		$config = $this->data->template_font_location . 'config.php';
+
+		if ( is_file( $config ) && unlink( $config ) ) {
+			return true;
 		}
 
 		return false;
