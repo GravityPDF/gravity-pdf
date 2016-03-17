@@ -167,8 +167,8 @@ class PDFRender extends GFPDF_Depreciated_Abstract {
 	 * @param integer $id        The spliced form ID and entry ID
 	 * @param string  $output    The PDF output method
 	 * @param string  $filename  The PDF filename
-	 * @param array   $arguments Any additional arguments to be passed
-	 * @param array   $args      The same as $arguments
+	 * @param array   $arguments The v3 arguments that get passed to the template
+	 * @param array   $args      The v4 arguments that get passed to the template
 	 *
 	 * @since 4.0
 	 *
