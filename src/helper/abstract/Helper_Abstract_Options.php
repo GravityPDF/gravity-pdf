@@ -1258,7 +1258,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		$all_settings = $this->get_registered_fields();
 		$tab          = isset( $referrer['tab'] ) ? $referrer['tab'] : 'general';
-		$settings     = ( ! empty( $all_settings[ $tab ] ) ) ? $all_settings[ $tab ] : array();
+		$settings     = ( ! empty( $all_settings[ $tab ] ) && $tab !== 'tools' ) ? $all_settings[ $tab ] : array();
 
 		/*
          * Get all setting types
@@ -1330,7 +1330,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			set_transient( 'gfpdf_settings_user_data', array_merge( $gfpdf_options, $input ), 30 );
 
 			/* return nothing */
-
 			return array();
 		}
 

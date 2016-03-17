@@ -49,6 +49,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<form method="post">
 
+		<?php settings_fields( 'gfpdf_settings' ); ?>
+
 		<table id="pdf-tools" class="widefat gfpdfe_table">
 			<thead>
 				<tr>
