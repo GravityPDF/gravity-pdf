@@ -182,6 +182,7 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
 	table {
 		width: 100%;
 		border-collapse: collapse;
+		overflow: wrap;
 	}
 
 	td, th {
