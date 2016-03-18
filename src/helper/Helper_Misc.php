@@ -478,7 +478,21 @@ class Helper_Misc {
 	 * @since 4.0
 	 */
 	public function get_upload_details() {
+
 		$siteurl     = get_option( 'siteurl' );
+
+		/*
+		 * Older versions of multisite installations didn't use a standardised upload path
+		 * which messes with our folder structure. We'll switch to the initial primary blog (which did use the
+		 * /wp-content/uploads/ directory) and then restore the current blog at the end.
+		 *
+		 * Note: because BLOG_ID_CURRENT_SITE can be changed and the 'upload_path' option doesn't change with it we
+		 * opted to hardcode the ID instead.
+		 */
+		if( is_multisite() ) {
+			switch_to_blog(1);
+		}
+
 		$upload_path = trim( get_option( 'upload_path' ) );
 		$dir         = $upload_path;
 
@@ -497,13 +511,9 @@ class Helper_Misc {
 			}
 		}
 
-		/*
-         * Honor the value of UPLOADS. This happens as long as ms-files rewriting is disabled.
-         * We also sometimes obey UPLOADS when rewriting is enabled -- see the next block.
-         */
-		if ( defined( 'UPLOADS' ) && ! ( is_multisite() && get_site_option( 'ms_files_rewriting' ) ) ) {
-			$dir = ABSPATH . UPLOADS;
-			$url = trailingslashit( $siteurl ) . UPLOADS;
+		/* Resort the current multisite blog */
+		if( is_multisite() ) {
+			restore_current_blog();
 		}
 
 		return array(
