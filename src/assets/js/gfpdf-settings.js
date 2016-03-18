@@ -212,7 +212,8 @@
 				this.handleSecurityConditionals();
 				this.handlePDFConditionalLogic();
 				this.handleOwnerRestriction();
-				this.toggleFontAppearance( $('#gfpdf_settings\\[template\\]').data('template_group') ); /* Show/Hide the
+				this.toggleFontAppearance( $('#gfpdf_settings\\[template\\]').data('template_group') );
+				this.toggleAppearanceTab();
 
 				/*
 				 * Workaround for Firefix TinyMCE Editor Bug NS_ERROR_UNEXPECTED (http://www.tinymce.com/develop/bugtracker_view.php?id=3152) when loading wp_editor via AJAX
@@ -723,6 +724,24 @@
 				} else { /* Ensure the fields are showing */
 					$rows.show();
 				}
+			}
+
+			/**
+			 * Check if the current PDF template selection uses the legacy Enable Advanced Templating option
+			 * and hide the Appearance tab altogether
+			 * @since 4.0
+			 */
+			this.toggleAppearanceTab = function() {
+
+				$('input[name="gfpdf_settings[advanced_template]"]').change(function() {
+					if($(this).val() == 'Yes') {
+						$('#gfpdf-appearance-nav').hide();
+					} else {
+						$('#gfpdf-appearance-nav').show();
+					}
+				});
+
+				$('input[name="gfpdf_settings[advanced_template]"]:checked').trigger('change');
 			}
 
 			/**

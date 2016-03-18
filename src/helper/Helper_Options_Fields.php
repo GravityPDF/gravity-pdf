@@ -538,7 +538,11 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 	}
 
 	/**
-	 * Enable advanced templating field if the user has enabled it with a filter, or our premium plugin has been installed
+	 * Enable advanced templating field if the user has our legacy premium plugin installed
+	 *
+	 * Dev notice: We're going to rewrite and rename the Tier 2 premium add-on and utilise template headers to automatically handle
+	 * advanced templates without the need for user intervention, which is why this method doesn't have a filter to manually
+	 * enable it.
 	 *
 	 * @param  array $settings The 'form_settings_advanced' array
 	 *
@@ -546,13 +550,10 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 	 *
 	 * @since 4.0
 	 *
-	 * @todo  Document this method
 	 */
 	public function get_advanced_template_field( $settings ) {
 
-		$enabled = apply_filters( 'gfpdf_enable_advanced_template_field', false );
-
-		if ( $enabled !== true && ! class_exists( 'gfpdfe_business_plus' ) ) {
+		if ( ! class_exists( 'gfpdfe_business_plus' ) ) {
 			return $settings;
 		}
 
