@@ -502,8 +502,8 @@ class View_PDF extends Helper_Abstract_View {
 	 * @since 4.0
 	 */
 	public function autoprocess_core_template_options( $html, $form, $entry, $settings ) {
-		/* Prevent core styles loading if a v3 template */
-		if ( $this->options->get_template_group( $settings['template'] ) !== 'legacy' ) {
+		/* Prevent core styles loading if a v3 template or using our legacy Tier 2 add-on */
+		if ( 'legacy' !== $this->options->get_template_group( $settings['template'] ) && ( empty( $settings['advanced_template'] ) || 'Yes' !== $settings['advanced_template'] )  ) {
 			$html = $this->get_core_template_styles( $settings, $entry ) . $html;
 		}
 

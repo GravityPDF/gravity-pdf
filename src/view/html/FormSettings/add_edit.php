@@ -71,11 +71,11 @@ global $wp_settings_fields;
 
 	<div class="wp-filter gfpdf-tab-wrapper">
 		<ul class="filter-links">
-			<li>
+			<li id="gfpdf-general-nav">
 				<a href="#gfpdf-general-options" class="current"><i class="fa fa-cog"></i> General</a>
 			</li>
 
-			<li>
+			<li id="gfpdf-appearance-nav">
 				<a href="#gfpdf-appearance-options"><i class="fa fa-adjust"></i> Appearance</a>
 			</li>
 
@@ -83,7 +83,7 @@ global $wp_settings_fields;
 				<a href="#gfpdf-custom-appearance-options"><i class="fa fa-file-text-o"></i> Template</a>
 			</li>
 
-			<li>
+			<li id="gfpdf-advanced-nav">
 				<a href="#gfpdf-advanced-pdf-options"><i class="fa fa-cogs"></i> Advanced</a>
 			</li>
 		</ul>
