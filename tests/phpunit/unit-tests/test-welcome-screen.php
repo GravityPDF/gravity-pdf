@@ -87,7 +87,7 @@ class Test_Welcome_Screen extends WP_UnitTestCase {
 		$this->model = new Model_Welcome_Screen( $gfpdf->log );
 		$this->view  = new View_Welcome_Screen( array(
 			'display_version' => PDF_EXTENDED_VERSION,
-		), $gfpdf->form );
+		), $gfpdf->gform );
 
 		$this->controller = new Controller_Welcome_Screen( $this->model, $this->view, $gfpdf->log, $gfpdf->data, $gfpdf->options );
 		$this->controller->init();

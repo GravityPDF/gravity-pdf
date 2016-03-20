@@ -53,16 +53,16 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 *
 	 * @since 4.0
 	 */
-	public $form_array;
+	public $form;
 
 	/**
-	 * Holds abstracted functions related to the forms plugin
+	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
 	 * @var \GFPDF\Helper\Helper_Form
 	 *
 	 * @since 4.0
 	 */
-	protected $form_plugin;
+	protected $gform;
 
 	/**
 	 * Holds our Helper_Misc object
@@ -87,20 +87,20 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	/**
 	 * Setup our class with appropriate data
 	 *
-	 * @param array                                 $form_array
-	 * @param \GFPDF\Helper\Helper_Abstract_Form    $form_plugin
+	 * @param array                                 $form The Gravity Forms object
+	 * @param \GFPDF\Helper\Helper_Abstract_Form    $gform Our abstracted Gravity Forms API
 	 * @param \GFPDF\Helper\Helper_Misc             $misc
 	 * @param \GFPDF\Helper\Helper_Abstract_Options $options
 	 *
 	 * @since    4.0
 	 */
-	public function __construct( $form_array, Helper_Abstract_Form $form_plugin, Helper_Misc $misc, Helper_Abstract_Options $options ) {
+	public function __construct( $form, Helper_Abstract_Form $gform, Helper_Misc $misc, Helper_Abstract_Options $options ) {
 
 		/* Assign our internal variables */
-		$this->form_array  = $form_array;
-		$this->form_plugin = $form_plugin;
-		$this->misc        = $misc;
-		$this->options     = $options;
+		$this->form    = $form;
+		$this->gform   = $gform;
+		$this->misc    = $misc;
+		$this->options = $options;
 
 		/* Cache column header internally so we don't have to work with the global get_column_headers() function */
 		$this->_column_headers = array(
@@ -149,7 +149,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * @since 4.0
 	 */
 	public function prepare_items() {
-		$this->items = ( isset( $this->form_array['gfpdf_form_settings'] ) ) ? $this->form_array['gfpdf_form_settings'] : array();
+		$this->items = ( isset( $this->form['gfpdf_form_settings'] ) ) ? $this->form['gfpdf_form_settings'] : array();
 	}
 
 	/**
@@ -242,7 +242,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 		<img data-id="<?php echo $item['id'] ?>" data-nonce="<?php echo $state_nonce; ?>"
 		     data-fid="<?php echo $form_id; ?>"
-		     src="<?php echo $this->form_plugin->get_plugin_url() ?>/images/active<?php echo intval( $is_active ) ?>.png"
+		     src="<?php echo $this->gform->get_plugin_url() ?>/images/active<?php echo intval( $is_active ) ?>.png"
 		     style="cursor: pointer;margin:-1px 0 0 8px;"
 		     alt="<?php $is_active ? __( 'Active', 'gravity-forms-pdf-extended' ) : __( 'Inactive', 'gravity-forms-pdf-extended' ); ?>"
 		     title="<?php echo $is_active ? __( 'Active', 'gravity-forms-pdf-extended' ) : __( 'Inactive', 'gravity-forms-pdf-extended' ); ?>"/>
@@ -267,7 +267,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 		/* Convert our IDs to names */
 		$notification_names = array();
-		foreach ( $this->form_array['notifications'] as $notification ) {
+		foreach ( $this->form['notifications'] as $notification ) {
 			if ( in_array( $notification['id'], $item['notification'] ) ) {
 				$notification_names[] = $notification['name'];
 			}

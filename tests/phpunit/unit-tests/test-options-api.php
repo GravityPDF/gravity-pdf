@@ -76,7 +76,7 @@ class Test_Options_API extends WP_UnitTestCase {
 		parent::setUp();
 
 		/* setup our object */
-		$this->options = new Helper_Options_Fields( $gfpdf->log, $gfpdf->form, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
+		$this->options = new Helper_Options_Fields( $gfpdf->log, $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
 
 		/* load settings in database  */
 		update_option( 'gfpdf_settings', json_decode( file_get_contents( dirname( __FILE__ ) . '/json/options-settings.json' ), true ) );

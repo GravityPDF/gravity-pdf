@@ -52,13 +52,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 	/**
-	 * Holds abstracted functions related to the forms plugin
+	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
 	 * @var \GFPDF\Helper\Helper_Form
 	 *
 	 * @since 4.0
 	 */
-	protected $form;
+	protected $gform;
 
 	/**
 	 * Holds our log class
@@ -122,18 +122,18 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * Helper_Abstract_Options constructor.
 	 *
 	 * @param \Monolog\Logger|LoggerInterface    $log
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
 	 * @param \GFPDF\Helper\Helper_Data          $data
 	 * @param \GFPDF\Helper\Helper_Misc          $misc
 	 * @param \GFPDF\Helper\Helper_Notices       $notices
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( LoggerInterface $log, Helper_Abstract_Form $form, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices ) {
+	public function __construct( LoggerInterface $log, Helper_Abstract_Form $gform, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices ) {
 
 		/* Assign our internal variables */
 		$this->log     = $log;
-		$this->form    = $form;
+		$this->gform   = $gform;
 		$this->data    = $data;
 		$this->misc    = $misc;
 		$this->notices = $notices;
@@ -385,7 +385,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		/* If we haven't pulled the form meta data from the database do so now */
 		if ( ! isset( $this->data->form_settings[ $form_id ] ) ) {
 
-			$form = $this->form->get_form( $form_id );
+			$form = $this->gform->get_form( $form_id );
 
 			if ( empty( $form ) ) {
 
@@ -548,7 +548,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$options[ $pdf_id ] = $pdf;
 
 			/* get the up-to-date form object and merge in the results */
-			$form = $this->form->get_form( $form_id );
+			$form = $this->gform->get_form( $form_id );
 
 			/* Update our GFPDF settings */
 			$form['gfpdf_form_settings'] = $options;
@@ -559,7 +559,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				$this->log->addNotice( 'Update Form.', array( 'form' => $form ) );
 
 				/* Update the database, if able */
-				$did_update = $this->form->update_form( $form );
+				$did_update = $this->gform->update_form( $form );
 			}
 
 			if ( ! $update_db || $did_update !== false ) {
@@ -611,13 +611,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			}
 
 			/* get the form and merge in the results */
-			$form = $this->form->get_form( $form_id );
+			$form = $this->gform->get_form( $form_id );
 
 			/* Update our GFPDF settings */
 			$form['gfpdf_form_settings'] = $options;
 
 			/* update the database, if able */
-			$did_update = $this->form->update_form( $form );
+			$did_update = $this->gform->update_form( $form );
 
 			/* If it updated, let's update the global variable */
 			if ( $did_update !== false ) {
@@ -766,7 +766,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$capabilities = array();
 
 		/* Add Gravity Forms Capabilities */
-		$gf_caps = $this->form->get_capabilities();
+		$gf_caps = $this->gform->get_capabilities();
 
 		foreach ( $gf_caps as $gf_cap ) {
 			$capabilities[ __( 'Gravity Forms Capabilities', 'gravity-forms-pdf-extended' ) ][ $gf_cap ] = $gf_cap;

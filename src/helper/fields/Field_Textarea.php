@@ -57,21 +57,21 @@ class Field_Textarea extends Helper_Abstract_Fields {
 	 * @param object               $field The GF_Field_* Object
 	 * @param array                $entry The Gravity Forms Entry
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
 	 * @param \GFPDF\Helper\Helper_Misc          $misc
 	 *
 	 * @throws Exception
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $field, $entry, Helper_Abstract_Form $form, Helper_Misc $misc ) {
+	public function __construct( $field, $entry, Helper_Abstract_Form $gform, Helper_Misc $misc ) {
 
 		if ( ! is_object( $field ) || ! $field instanceof GF_Field_Textarea ) {
 			throw new Exception( '$field needs to be in instance of GF_Field_Textarea' );
 		}
 
 		/* call our parent method */
-		parent::__construct( $field, $entry, $form, $misc );
+		parent::__construct( $field, $entry, $gform, $misc );
 	}
 
 	public function html( $value = '', $label = true ) {

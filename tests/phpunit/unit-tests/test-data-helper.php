@@ -164,7 +164,7 @@ class Test_Data_Helper extends WP_UnitTestCase {
 	public function test_localised_script() {
 		global $gfpdf;
 
-		$localised_data = $this->data->get_localised_script_data( $gfpdf->options, $gfpdf->form );
+		$localised_data = $this->data->get_localised_script_data( $gfpdf->options, $gfpdf->gform );
 		$required_keys  = array(
 			'ajaxurl',
 			'GFbaseUrl',

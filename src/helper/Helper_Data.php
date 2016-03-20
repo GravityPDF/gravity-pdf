@@ -179,19 +179,19 @@ class Helper_Data {
 	 * A key-value array to be used in a localized script call for our Gravity PDF javascript files
 	 *
 	 * @param \GFPDF\Helper\Helper_Abstract_Options $options
-	 * @param \GFPDF\Helper\Helper_Abstract_Form    $form
+	 * @param \GFPDF\Helper\Helper_Abstract_Form    $gform
 	 *
 	 * @return array
 	 *
 	 * @since  4.0
 	 */
-	public function get_localised_script_data( Helper_Abstract_Options $options, Helper_Abstract_Form $form ) {
+	public function get_localised_script_data( Helper_Abstract_Options $options, Helper_Abstract_Form $gform ) {
 
 		$custom_fonts = array_values( $options->get_custom_fonts() );
 
 		return apply_filters( 'gfpdf_localised_script_array', array(
 			'ajaxurl'                     => admin_url( 'admin-ajax.php' ),
-			'GFbaseUrl'                   => $form->get_plugin_url(),
+			'GFbaseUrl'                   => $gform->get_plugin_url(),
 			'pluginUrl'                   => PDF_PLUGIN_URL,
 			'spinnerUrl'                  => admin_url( 'images/spinner-2x.gif' ),
 			'spinnerAlt'                  => __( 'Loading...', 'gravity-forms-pdf-extended' ),

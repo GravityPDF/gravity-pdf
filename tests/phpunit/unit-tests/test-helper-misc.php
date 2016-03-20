@@ -63,7 +63,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 		parent::setUp();
 
 		/* Setup our test classes */
-		$this->misc = new Helper_Misc( $gfpdf->log, $gfpdf->form, $gfpdf->data );
+		$this->misc = new Helper_Misc( $gfpdf->log, $gfpdf->gform, $gfpdf->data );
 	}
 
 	/**

@@ -89,7 +89,7 @@ class Test_Actions extends WP_UnitTestCase {
 		$this->model = new Model_Actions( $gfpdf->data, $gfpdf->options, $gfpdf->notices );
 		$this->view  = new View_Actions( array() );
 
-		$this->controller = new Controller_Actions( $this->model, $this->view, $gfpdf->form, $gfpdf->log, $gfpdf->notices );
+		$this->controller = new Controller_Actions( $this->model, $this->view, $gfpdf->gform, $gfpdf->log, $gfpdf->notices );
 		$this->controller->init();
 	}
 

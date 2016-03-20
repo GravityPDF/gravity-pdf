@@ -57,14 +57,15 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 4.0
  */
 class Controller_Settings extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters {
+
 	/**
-	 * Holds abstracted functions related to the forms plugin
+	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
 	 * @var \GFPDF\Helper\Helper_Form
 	 *
 	 * @since 4.0
 	 */
-	protected $form;
+	protected $gform;
 
 	/**
 	 * Holds our log class
@@ -110,7 +111,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	 *
 	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_Settings $model   Our Settings Model the controller will manage
 	 * @param Helper_Abstract_View|\GFPDF\View\View_Settings    $view    Our Settings View the controller will manage
-	 * @param \GFPDF\Helper\Helper_Abstract_Form                $form    Our abstracted Gravity Forms helper functions
+	 * @param \GFPDF\Helper\Helper_Abstract_Form                $gform   Our abstracted Gravity Forms helper functions
 	 * @param \Monolog\Logger|LoggerInterface                   $log     Our logger class
 	 * @param \GFPDF\Helper\Helper_Notices                      $notices Our notice class used to queue admin messages and errors
 	 * @param \GFPDF\Helper\Helper_Data                         $data    Our plugin data store
@@ -118,10 +119,10 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Abstract_Form $form, LoggerInterface $log, Helper_Notices $notices, Helper_Data $data, Helper_Misc $misc ) {
+	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Notices $notices, Helper_Data $data, Helper_Misc $misc ) {
 
 		/* Assign our internal variables */
-		$this->form    = $form;
+		$this->gform   = $gform;
 		$this->log     = $log;
 		$this->notices = $notices;
 		$this->data    = $data;
@@ -181,7 +182,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		 *
 		 * If multisite only the super admin can uninstall the software. This is due to how the plugin shares similar directory structures across networked sites
 		 */
-		if ( ( ! is_multisite() && $this->form->has_capability( 'gravityforms_uninstall' ) ) ||
+		if ( ( ! is_multisite() && $this->gform->has_capability( 'gravityforms_uninstall' ) ) ||
 		     ( is_multisite() && is_super_admin() )
 		) {
 			add_action( 'gfpdf_post_tools_settings_page', array( $this->view, 'uninstaller' ), 5 );
@@ -267,7 +268,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	public function edit_options_cap() {
 
 		/* because current_user_can() doesn't handle Gravity Forms permissions quite correct we'll do our checks here */
-		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
 
 			$this->log->addCritical( 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
@@ -293,7 +294,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	 */
 	public function disable_tools_on_view_cap( $nav ) {
 
-		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
 			$this->log->addNotice( 'Lack of User Capabilities' );
 
 			unset( $nav[100] ); /* remove tools tab */
@@ -317,7 +318,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		}
 
 		/* check if the user has permission to copy the templates */
-		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
 
 			$this->log->addCritical( 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),

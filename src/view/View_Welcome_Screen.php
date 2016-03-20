@@ -58,29 +58,29 @@ class View_Welcome_Screen extends Helper_Abstract_View {
 	protected $view_type = 'Welcome';
 
 	/**
-	 * Holds abstracted functions related to the forms plugin
+	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
 	 * @var \GFPDF\Helper\Helper_Form
 	 *
 	 * @since 4.0
 	 */
-	protected $form;
+	protected $gform;
 
 	/**
 	 * Setup our class by injecting all our dependancies
 	 *
 	 * @param array                                          $data_cache An array of data to pass to the view
-	 * @param \GFPDF\Helper\Helper_Form|Helper_Abstract_Form $form       Our abstracted Gravity Forms helper functions
+	 * @param \GFPDF\Helper\Helper_Form|Helper_Abstract_Form $gform      Our abstracted Gravity Forms helper functions
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $data_cache = array(), Helper_Abstract_Form $form ) {
+	public function __construct( $data_cache = array(), Helper_Abstract_Form $gform ) {
 
 		/* Call our parent constructor */
 		parent::__construct( $data_cache );
 
 		/* Assign our internal variables */
-		$this->form = $form;
+		$this->gform = $gform;
 	}
 
 	/**
@@ -108,7 +108,7 @@ class View_Welcome_Screen extends Helper_Abstract_View {
 
 		/* Load any variables we want to pass to our view */
 		$args = array(
-			'forms' => $this->form->get_forms(),
+			'forms' => $this->gform->get_forms(),
 		);
 
 		/* Render our view */

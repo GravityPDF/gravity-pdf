@@ -256,7 +256,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 
 	/**
 	 * Test Gravity Form user privlages
-	 * i.e $gfpdf->form->has_capability("gravityforms_edit_settings")
+	 * i.e $gfpdf->gform->has_capability("gravityforms_edit_settings")
 	 *
 	 * @since 4.0
 	 */
@@ -271,7 +271,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
          * Set up our users and test the privilages
          */
 		wp_set_current_user( $user_id );
-		$this->assertFalse( $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) );
+		$this->assertFalse( $gfpdf->gform->has_capability( 'gravityforms_edit_settings' ) );
 
 		/* Create second user we'll use to test out the privilage */
 		$user_id = $this->factory->user->create();
@@ -285,7 +285,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 
 		wp_set_current_user( $user_id );
 
-		$this->assertTrue( $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) );
+		$this->assertTrue( $gfpdf->gform->has_capability( 'gravityforms_edit_settings' ) );
 
 		/* Create third user we'll use to test out the privilage */
 		$user_id = $this->factory->user->create();
@@ -299,7 +299,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 
 		wp_set_current_user( $user_id );
 
-		$this->assertTrue( $gfpdf->form->has_capability( 'gravityforms_edit_settings' ) );
+		$this->assertTrue( $gfpdf->gform->has_capability( 'gravityforms_edit_settings' ) );
 
 		wp_set_current_user( 0 );
 	}

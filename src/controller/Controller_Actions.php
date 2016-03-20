@@ -55,13 +55,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Controller_Actions extends Helper_Abstract_Controller implements Helper_Interface_Actions {
 
 	/**
-	 * Holds abstracted functions related to the forms plugin
+	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
 	 * @var \GFPDF\Helper\Helper_Form
 	 *
 	 * @since 4.0
 	 */
-	protected $form;
+	protected $gform;
 
 	/**
 	 * Holds our log class
@@ -87,16 +87,16 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	 *
 	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_Actions $model   Our Actions Model the controller will manage
 	 * @param Helper_Abstract_View|\GFPDF\View\View_Actions    $view    Our Actions View the controller will manage
-	 * @param \GFPDF\Helper\Helper_Abstract_Form               $form    Our abstracted Gravity Forms helper functions
+	 * @param \GFPDF\Helper\Helper_Abstract_Form               $gform   Our abstracted Gravity Forms helper functions
 	 * @param \Monolog\Logger|LoggerInterface                  $log     Our logger class
 	 * @param \GFPDF\Helper\Helper_Notices                     $notices Our notice class used to queue admin messages and errors
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Abstract_Form $form, LoggerInterface $log, Helper_Notices $notices ) {
+	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Notices $notices ) {
 
 		/* Assign our internal variables */
-		$this->form    = $form;
+		$this->gform   = $gform;
 		$this->log     = $log;
 		$this->notices = $notices;
 
@@ -193,7 +193,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 		foreach ( $this->get_routes() as $route ) {
 
 			/* Before displaying check the user has the correct capabilities, the notice isn't already been dismissed and the route condition has been met */
-			if ( $this->form->has_capability( $route['capability'] ) &&
+			if ( $this->gform->has_capability( $route['capability'] ) &&
 			     ! $this->model->is_notice_already_dismissed( $route['action'] ) &&
 			     call_user_func( $route['condition'] )
 			) {
@@ -221,7 +221,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 			if ( rgpost( 'gfpdf_action' ) == 'gfpdf_' . $route['action'] && call_user_func( $route['condition'] ) ) {
 
 				/* Check user capability */
-				if ( ! $this->form->has_capability( $route['capability'] ) ) {
+				if ( ! $this->gform->has_capability( $route['capability'] ) ) {
 
 					$this->log->addCritical( 'Lack of User Capabilities.', array(
 						'user'      => wp_get_current_user(),

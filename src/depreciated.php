@@ -234,10 +234,10 @@ class PDF_Common extends GFPDF_Depreciated_Abstract {
 	 * @since 3.0
 	 */
 	public static function do_mergetags( $string, $form_id, $lead_id ) {
-		$misc = GPDFAPI::get_misc_class();
-		$form = GPDFAPI::get_form_class();
+		$misc  = GPDFAPI::get_misc_class();
+		$gform = GPDFAPI::get_form_class();
 
-		return $misc->do_mergetags( $string, $form->get_form( $form_id ), $form->get_entry( $lead_id ) );
+		return $misc->do_mergetags( $string, $gform->get_form( $form_id ), $gform->get_entry( $lead_id ) );
 	}
 
 	/**
@@ -248,9 +248,9 @@ class PDF_Common extends GFPDF_Depreciated_Abstract {
 	 * @since 4.0
 	 */
 	public static function view_data( $form_data ) {
-		$form = GPDFAPI::get_form_class();
+		$gform = GPDFAPI::get_form_class();
 
-		if ( isset( $_GET['data'] ) && $form->has_capability( 'gravityforms_view_settings' ) ) {
+		if ( isset( $_GET['data'] ) && $gform->has_capability( 'gravityforms_view_settings' ) ) {
 			print '<pre>';
 			print_r( $form_data );
 			print '</pre>';
@@ -316,7 +316,7 @@ class PDF_Common extends GFPDF_Depreciated_Abstract {
 	 * @since 4.0
 	 */
 	public static function remove_invalid_characters( $name ) {
-		$misc = GPDFAPI::get_form_class();
+		$misc = GPDFAPI::get_misc_class();
 		return $misc->strip_invalid_characters( $name );
 	}
 }
@@ -407,7 +407,7 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 
 		/* Output the form title */
 		if ( $config['return'] ) {
-			$results['title'] = $styles . '<h2 id="details" class="default">' . $form['title'] . '</h2>';
+			$results['title'] = '<h2 id="details" class="default">' . $form['title'] . '</h2>';
 		} else {
 			?>
 
@@ -513,7 +513,9 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 	 *
 	 * @param string $html The original field HTML which we'll be discarding
 	 * @param string $value The field value
+	 * @param boolean $show_label
 	 * @param boolean $label Whether to show or hide the field's label
+	 * @param object $field
 	 *
 	 * @return string
 	 *

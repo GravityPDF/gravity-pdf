@@ -56,13 +56,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Controller_Install extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters {
 
 	/**
-	 * Holds abstracted functions related to the forms plugin
+	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
 	 * @var \GFPDF\Helper\Helper_Form
 	 *
 	 * @since 4.0
 	 */
-	protected $form;
+	protected $gform;
 
 	/**
 	 * Holds our log class
@@ -107,7 +107,7 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	 * Setup our class by injecting all our dependancies
 	 *
 	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_Install $model   Our Install Model the controller will manage
-	 * @param \GFPDF\Helper\Helper_Abstract_Form               $form    Our Install View the controller will manage
+	 * @param \GFPDF\Helper\Helper_Abstract_Form               $gform   Our Install View the controller will manage
 	 * @param \Monolog\Logger|LoggerInterface                  $log     Our logger class
 	 * @param \GFPDF\Helper\Helper_Notices                     $notices Our notice class used to queue admin messages and errors
 	 * @param \GFPDF\Helper\Helper_Data                        $data    Our plugin data store
@@ -115,10 +115,10 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_Form $form, LoggerInterface $log, Helper_Notices $notices, Helper_Data $data, Helper_Misc $misc ) {
+	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Notices $notices, Helper_Data $data, Helper_Misc $misc ) {
 
 		/* Assign our internal variables */
-		$this->form    = $form;
+		$this->gform   = $gform;
 		$this->log     = $log;
 		$this->notices = $notices;
 		$this->data    = $data;
@@ -244,7 +244,7 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 			 *
 			 * If multisite only the super admin can uninstall the software. This is due to how the plugin shares similar directory structures across networked sites
 			 */
-			if ( ( ! is_multisite() && ! $this->form->has_capability( 'gravityforms_uninstall' ) ) ||
+			if ( ( ! is_multisite() && ! $this->gform->has_capability( 'gravityforms_uninstall' ) ) ||
 			     ( is_multisite() && ! is_super_admin() )
 			) {
 

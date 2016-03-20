@@ -74,13 +74,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Model_PDF extends Helper_Abstract_Model {
 
 	/**
-	 * Holds abstracted functions related to the forms plugin
+	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
 	 * @var \GFPDF\Helper\Helper_Form
 	 *
 	 * @since 4.0
 	 */
-	protected $form;
+	protected $gform;
 
 	/**
 	 * Holds our log class
@@ -134,7 +134,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Setup our view with the needed data and classes
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form    $form    Our abstracted Gravity Forms helper functions
+	 * @param \GFPDF\Helper\Helper_Abstract_Form    $gform   Our abstracted Gravity Forms helper functions
 	 * @param \Monolog\Logger|LoggerInterface       $log     Our logger class
 	 * @param \GFPDF\Helper\Helper_Abstract_Options $options Our options class which allows us to access any settings
 	 * @param \GFPDF\Helper\Helper_Data             $data    Our plugin data store
@@ -143,10 +143,10 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices ) {
+	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices ) {
 
 		/* Assign our internal variables */
-		$this->form    = $form;
+		$this->gform   = $gform;
 		$this->log     = $log;
 		$this->options = $options;
 		$this->data    = $data;
@@ -170,7 +170,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		/**
 		 * Check if we have a valid Gravity Form Entry and PDF Settings ID
 		 */
-		$entry = $this->form->get_entry( $lid );
+		$entry = $this->gform->get_entry( $lid );
 
 		/* not a valid entry */
 		if ( is_wp_error( $entry ) ) {
@@ -241,7 +241,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function apply_backwards_compatibility_filters( $settings, $entry ) {
 
-		$form = $this->form->get_form( $entry['form_id'] );
+		$form = $this->gform->get_form( $entry['form_id'] );
 
 		$settings['filename'] = $this->misc->remove_extension_from_string( apply_filters( 'gfpdfe_pdf_name', $settings['filename'], $form, $entry ) );
 		$settings['template'] = $this->misc->remove_extension_from_string( apply_filters( 'gfpdfe_template', $settings['template'], $form, $entry ), '.php' );
@@ -517,7 +517,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				/* loop through permissions and check if the current user has any of those capabilities */
 				$access = false;
 				foreach ( $admin_permissions as $permission ) {
-					if ( $this->form->has_capability( $permission ) ) {
+					if ( $this->gform->has_capability( $permission ) ) {
 						$access = true;
 					}
 				}
@@ -618,7 +618,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		$args = array();
 
 		/* Check if we have any PDFs */
-		$form = $this->form->get_form( $entry['form_id'] );
+		$form = $this->gform->get_form( $entry['form_id'] );
 		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : array();
 
 		if ( ! empty( $pdfs ) ) {
@@ -648,7 +648,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function get_pdf_name( $settings, $entry ) {
 
-		$form = $this->form->get_form( $entry['form_id'] );
+		$form = $this->gform->get_form( $entry['form_id'] );
 		$name = $this->misc->do_mergetags( $settings['filename'], $form, $entry );
 
 		/* Remove any characters that cannot be present in a filename */
@@ -719,7 +719,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function get_active_pdfs( $pdfs, $entry ) {
 
 		$filtered = array();
-		$form     = $this->form->get_form( $entry['form_id'] );
+		$form     = $this->gform->get_form( $entry['form_id'] );
 
 		foreach ( $pdfs as $pdf ) {
 			if ( $pdf['active'] && ( empty( $pdf['conditionalLogic'] ) || $this->misc->evaluate_conditional_logic( $pdf['conditionalLogic'], $entry ) ) ) {
@@ -810,7 +810,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function handle_legacy_tier_2_processing( Helper_PDF $pdf, $entry, $settings, $args ) {
 
-		$form = $this->form->get_form( $entry['form_id'] );
+		$form = $this->gform->get_form( $entry['form_id'] );
 
 		$prevent_main_pdf_loader = apply_filters( 'gfpdfe_pre_load_template',
 			$form['id'],
@@ -838,7 +838,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function generate_and_save_pdf( $entry, $settings ) {
 
-		$pdf_generator = new Helper_PDF( $entry, $settings, $this->form, $this->data );
+		$pdf_generator = new Helper_PDF( $entry, $settings, $this->gform, $this->data );
 		$pdf_generator->set_filename( $this->get_pdf_name( $settings, $entry ) );
 
 		if ( $this->process_and_save_pdf( $pdf_generator ) ) {
@@ -847,7 +847,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			if ( is_file( $pdf_path ) ) {
 
 				/* Add appropriate filters so developers can access the PDF when it is generated */
-				$form     = $this->form->get_form( $entry['form_id'] );
+				$form     = $this->gform->get_form( $entry['form_id'] );
 				$filename = basename( $pdf_path );
 
 				do_action( 'gfpdf_post_pdf_save', $form['id'], $entry['id'], $settings, $pdf_path ); /* Backwards compatibility */
@@ -1060,7 +1060,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 				/* Only generate if the PDF wasn't during the notification process */
 				if ( ! is_wp_error( $settings ) ) {
-					$pdf_generator = new Helper_PDF( $entry, $settings, $this->form, $this->data );
+					$pdf_generator = new Helper_PDF( $entry, $settings, $this->gform, $this->data );
 					$pdf_generator->set_filename( $this->get_pdf_name( $settings, $entry ) );
 
 					if ( $this->does_pdf_exist( $pdf_generator ) ) {
@@ -1091,7 +1091,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function resend_notification_pdf_cleanup( $form, $leads ) {
 		foreach ( $leads as $entry_id ) {
-			$entry = $this->form->get_entry( $entry_id );
+			$entry = $this->gform->get_entry( $entry_id );
 			$this->cleanup_pdf( $entry, $form );
 		}
 
@@ -1209,7 +1209,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function get_form_data( $entry ) {
 
-		$form = $this->form->get_form( $entry['form_id'] );
+		$form = $this->gform->get_form( $entry['form_id'] );
 
 		/* Setup our basic structure */
 		$data = array(
@@ -1223,7 +1223,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		 *
 		 * @var Field_Products
 		 */
-		$products = new Field_Products( new GF_Field(), $entry, $this->form, $this->misc );
+		$products = new Field_Products( new GF_Field(), $entry, $this->gform, $this->misc );
 
 		/* Get the form details */
 		$form_meta = $this->get_form_data_meta( $form, $entry );
@@ -1675,13 +1675,13 @@ class Model_PDF extends Helper_Abstract_Model {
 				if ( GFCommon::is_product_field( $field->type ) ) {
 
 					/* Product fields are handled through a single function */
-					$product = new Field_Product( $field, $entry, $this->form, $this->misc );
+					$product = new Field_Product( $field, $entry, $this->gform, $this->misc );
 					$product->set_products( $products );
 
 					$class = apply_filters( 'gfpdf_field_product_class', $product, $field, $entry, $form );
 				} else {
 					/* Load the selected class */
-					$class = apply_filters( 'gfpdf_field_class', new $class_name( $field, $entry, $this->form, $this->misc ), $field, $entry, $form );
+					$class = apply_filters( 'gfpdf_field_class', new $class_name( $field, $entry, $this->gform, $this->misc ), $field, $entry, $form );
 					$class = apply_filters( 'gfpdf_field_class_' . $field->type, $class, $field, $entry, $form );
 				}
 			}
@@ -1699,7 +1699,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			) );
 
 			/* Exception thrown. Load generic field loader */
-			$class = apply_filters( 'gfpdf_field_default_class', new Field_Default( $field, $entry, $this->form, $this->misc ), $field, $entry, $form );
+			$class = apply_filters( 'gfpdf_field_default_class', new Field_Default( $field, $entry, $this->gform, $this->misc ), $field, $entry, $form );
 		}
 
 		return $class;
