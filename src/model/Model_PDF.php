@@ -210,7 +210,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		/* Throw error */
 		if ( is_wp_error( $middleware ) ) {
 
-			$this->log->addError( 'Invalid PDF Settings.', array(
+			$this->log->addError( 'PDF Authentication Failure.', array(
 				'entry'            => $entry,
 				'settings'         => $settings,
 				'WP_Error_Message' => $middleware->get_error_message(),
