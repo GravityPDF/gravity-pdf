@@ -63,13 +63,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Model_Form_Settings extends Helper_Abstract_Model {
 
 	/**
-	 * Holds abstracted functions related to the forms plugin
+	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
 	 * @var \GFPDF\Helper\Helper_Form
 	 *
 	 * @since 4.0
 	 */
-	protected $form;
+	protected $gform;
 
 	/**
 	 * Holds our log class
@@ -123,7 +123,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	/**
 	 * Setup our class by injecting all our dependancies
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form    $form    Our abstracted Gravity Forms helper functions
+	 * @param \GFPDF\Helper\Helper_Abstract_Form    $gform   Our abstracted Gravity Forms helper functions
 	 * @param \Monolog\Logger|LoggerInterface       $log     Our logger class
 	 * @param \GFPDF\Helper\Helper_Data             $data    Our plugin data store
 	 * @param \GFPDF\Helper\Helper_Abstract_Options $options Our options class which allows us to access any settings
@@ -132,10 +132,10 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log, Helper_Data $data, Helper_Abstract_Options $options, Helper_Misc $misc, Helper_Notices $notices ) {
+	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Data $data, Helper_Abstract_Options $options, Helper_Misc $misc, Helper_Notices $notices ) {
 
 		/* Assign our internal variables */
-		$this->form    = $form;
+		$this->gform   = $gform;
 		$this->log     = $log;
 		$this->data    = $data;
 		$this->options = $options;
@@ -176,7 +176,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	public function process_list_view( $form_id ) {
 
 		/* prevent unauthorized access */
-		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
 
 			$this->log->addWarning( 'Lack of User Capabilities.' );
 			wp_die( __( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
@@ -185,10 +185,10 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$controller = $this->getController();
 
 		/* get the form object */
-		$form = $this->form->get_form( $form_id );
+		$form = $this->gform->get_form( $form_id );
 
 		/* load our list table */
-		$pdf_table = new Helper_PDF_List_Table( $form, $this->form, $this->misc, $this->options );
+		$pdf_table = new Helper_PDF_List_Table( $form, $this->gform, $this->misc, $this->options );
 		$pdf_table->prepare_items();
 
 		/* pass to view */
@@ -212,7 +212,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	public function show_edit_view( $form_id, $pdf_id ) {
 
 		/* prevent unauthorized access */
-		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
 			$this->log->addWarning( 'Lack of User Capabilities.' );
 			wp_die( __( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
 		}
@@ -220,7 +220,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$controller = $this->getController();
 
 		/* get the form object */
-		$form = $this->form->get_form( $form_id );
+		$form = $this->gform->get_form( $form_id );
 
 		/* parse input and get required information */
 		if ( ! $pdf_id ) {
@@ -267,7 +267,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	public function process_submission( $form_id, $pdf_id ) {
 
 		/* prevent unauthorized access */
-		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
 
 			$this->log->addCritical( 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
@@ -801,7 +801,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$this->log->addNotice( 'Running AJAX Endpoint', array( 'type' => 'Delete PDF Settings' ) );
 
 		/* prevent unauthorized access */
-		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
 
 			$this->log->addCritical( 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
@@ -867,7 +867,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$this->log->addNotice( 'Running AJAX Endpoint', array( 'type' => 'Duplicate PDF Settings' ) );
 
 		/* prevent unauthorized access */
-		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
 
 			$this->log->addCritical( 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
@@ -948,7 +948,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$this->log->addNotice( 'Running AJAX Endpoint', array( 'type' => 'Change PDF Settings State' ) );
 
 		/* prevent unauthorized access */
-		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
 
 			$this->log->addCritical( 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),
@@ -982,7 +982,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			/* toggle state */
 			$config['active'] = ( $config['active'] === true ) ? false : true;
 			$state            = ( $config['active'] ) ? __( 'Active', 'gravity-forms-pdf-extended' ) : __( 'Inactive', 'gravity-forms-pdf-extended' );
-			$src              = $this->form->get_plugin_url() . '/images/active' . intval( $config['active'] ) . '.png';
+			$src              = $this->gform->get_plugin_url() . '/images/active' . intval( $config['active'] ) . '.png';
 
 			$results = $this->options->update_pdf( $fid, $config['id'], $config );
 
@@ -1023,7 +1023,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$this->log->addNotice( 'Running AJAX Endpoint', array( 'type' => 'Render Template Custom Fields' ) );
 
 		/* prevent unauthorized access */
-		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
 
 			$this->log->addCritical( 'Lack of User Capabilities.', array(
 				'user'      => wp_get_current_user(),

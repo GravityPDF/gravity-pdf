@@ -55,17 +55,17 @@ class Field_Post_Custom_Field extends Helper_Abstract_Fields {
 	 * @param object                             $field The GF_Field_* Object
 	 * @param array                              $entry The Gravity Forms Entry
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
 	 * @param \GFPDF\Helper\Helper_Misc          $misc
 	 *
 	 * @throws Exception
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $field, $entry, Helper_Abstract_Form $form, Helper_Misc $misc ) {
+	public function __construct( $field, $entry, Helper_Abstract_Form $gform, Helper_Misc $misc ) {
 
 		/* call our parent method */
-		parent::__construct( $field, $entry, $form, $misc );
+		parent::__construct( $field, $entry, $gform, $misc );
 
 		/*
          * Custom Field can be any of the following field types:
@@ -77,14 +77,14 @@ class Field_Post_Custom_Field extends Helper_Abstract_Fields {
 		try {
 			/* check load our class */
 			if ( class_exists( $class ) ) {
-				$this->fieldObject = apply_filters( 'gfpdf_field_class', new $class( $field, $entry, $form, $misc ), $field, $entry, $form );
-				$this->fieldObject = apply_filters( 'gfpdf_field_class_' . $field->inputType , $this->fieldObject, $field, $entry, $form );
+				$this->fieldObject = apply_filters( 'gfpdf_field_class', new $class( $field, $entry, $gform, $misc ), $field, $entry, $gform );
+				$this->fieldObject = apply_filters( 'gfpdf_field_class_' . $field->inputType , $this->fieldObject, $field, $entry, $gform );
 			} else {
 				throw new Exception( 'Class not found' );
 			}
 		} catch ( Exception $e ) {
 			/* Exception thrown. Load generic field loader */
-			$this->fieldObject = apply_filters( 'gfpdf_field_default_class', new Field_Default( $field, $entry, $form, $misc ), $field, $entry, $form );
+			$this->fieldObject = apply_filters( 'gfpdf_field_default_class', new Field_Default( $field, $entry, $gform, $misc ), $field, $entry, $gform );
 		}
 
 		/* force the fieldObject value cache */

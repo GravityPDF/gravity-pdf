@@ -104,7 +104,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		$this->setup_form();
 
 		/* Setup our test classes */
-		$this->model = new Model_Form_Settings( $gfpdf->form, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
+		$this->model = new Model_Form_Settings( $gfpdf->gform, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
 		$this->view  = new View_Form_Settings( array() );
 
 		$this->controller = new Controller_Form_Settings( $this->model, $this->view, $gfpdf->data, $gfpdf->options, $gfpdf->misc );

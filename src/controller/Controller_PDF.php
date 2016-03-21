@@ -56,13 +56,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters {
 
 	/**
-	 * Holds abstracted functions related to the forms plugin
+	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
 	 * @var \GFPDF\Helper\Helper_Form
 	 *
 	 * @since 4.0
 	 */
-	protected $form;
+	protected $gform;
 
 	/**
 	 * Holds our log class
@@ -88,18 +88,18 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 *
 	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_PDF $model Our PDF Model the controller will manage
 	 * @param Helper_Abstract_View|\GFPDF\View\View_PDF    $view  Our PDF View the controller will manage
-	 * @param \GFPDF\Helper\Helper_Abstract_Form           $form  Our abstracted Gravity Forms helper functions
+	 * @param \GFPDF\Helper\Helper_Abstract_Form           $gform Our abstracted Gravity Forms helper functions
 	 * @param \Monolog\Logger|LoggerInterface              $log   Our logger class
 	 * @param \GFPDF\Helper\Helper_Misc                    $misc  Our miscellaneous class
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Abstract_Form $form, LoggerInterface $log, Helper_Misc $misc ) {
+	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Misc $misc ) {
 
 		/* Assign our internal variables */
-		$this->form = $form;
-		$this->log  = $log;
-		$this->misc = $misc;
+		$this->gform = $gform;
+		$this->log   = $log;
+		$this->misc  = $misc;
 
 		/* Load our model and view */
 		$this->model = $model;
@@ -296,7 +296,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 
 		/* only display detailed error to admins */
 		$whitelist_errors = array( 'timeout_expired', 'access_denied' );
-		if ( $this->form->has_capability( 'gravityforms_view_settings' ) || in_array( $error->get_error_code(), $whitelist_errors ) ) {
+		if ( $this->gform->has_capability( 'gravityforms_view_settings' ) || in_array( $error->get_error_code(), $whitelist_errors ) ) {
 			wp_die( $error->get_error_message() );
 		} else {
 			wp_die( __( 'There was a problem generating your PDF', 'gravity-forms-pdf-extended' ) );

@@ -137,13 +137,13 @@ class Helper_PDF {
 	protected $print = false;
 
 	/**
-	 * Holds abstracted functions related to the forms plugin
+	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
 	 * @var \GFPDF\Helper\Helper_Form
 	 *
 	 * @since 4.0
 	 */
-	protected $form;
+	protected $gform;
 
 	/**
 	 * Holds our Helper_Data object
@@ -161,17 +161,17 @@ class Helper_PDF {
 	 * @param array                              $entry    The Gravity Form Entry to be processed
 	 * @param array                              $settings The Gravity PDF Settings Array
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
 	 * @param \GFPDF\Helper\Helper_Data          $data
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $entry, $settings, Helper_Abstract_Form $form, Helper_Data $data ) {
+	public function __construct( $entry, $settings, Helper_Abstract_Form $gform, Helper_Data $data ) {
 
 		/* Assign our internal variables */
 		$this->entry    = $entry;
 		$this->settings = $settings;
-		$this->form     = $form;
+		$this->gform    = $gform;
 		$this->data     = $data;
 
 		$this->set_path();
@@ -212,7 +212,7 @@ class Helper_PDF {
 			$this->set_template();
 		}
 
-		$form = $this->form->get_form( $this->entry['form_id'] );
+		$form = $this->gform->get_form( $this->entry['form_id'] );
 
 		/* Load in our PHP template */
 		if ( empty( $html ) ) {
@@ -224,7 +224,7 @@ class Helper_PDF {
 		$html = apply_filters( 'gfpdfe_pdf_template_' . $form['id'], $html, $this->entry['id'], $this->settings ); /* Backwards compat */
 
 		$html = apply_filters( 'gfpdf_pdf_html_output', $html, $form, $this->entry, $this->settings, $this );
-		$html = apply_filters( 'gfpdf_pdf_html_output_' . $form['id'], $html, $this->form, $this->entry, $this->settings, $this );
+		$html = apply_filters( 'gfpdf_pdf_html_output_' . $form['id'], $html, $this->gform, $this->entry, $this->settings, $this );
 
 		/* Check if we should output the HTML to the browser, for debugging */
 		$this->maybe_display_raw_html( $html );
@@ -246,7 +246,7 @@ class Helper_PDF {
 		$this->show_print_dialog();
 		$this->set_metadata();
 
-		$form = $this->form->get_form( $this->entry['form_id'] );
+		$form = $this->gform->get_form( $this->entry['form_id'] );
 
 		/* allow $mpdf object class to be modified */
 		$this->mpdf = apply_filters( 'gfpdf_mpdf_class', $this->mpdf, $form, $this->entry, $this->settings, $this );
@@ -322,7 +322,7 @@ class Helper_PDF {
 		$template = ( isset( $this->settings['template'] ) ) ? $this->get_file_with_extension( $this->settings['template'] ) : '';
 
 		/* Allow a user to change the current template if they have the appropriate capabilities */
-		if ( rgget( 'template' ) && is_user_logged_in() && $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( rgget( 'template' ) && is_user_logged_in() && $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
 			$template = $this->get_file_with_extension( rgget( 'template' ) );
 		}
 
@@ -588,7 +588,7 @@ class Helper_PDF {
 	protected function begin_pdf() {
 		$this->mpdf = new mPDF( '', $this->paper_size, 0, '', 15, 15, 16, 16, 9, 9, $this->orientation );
 
-		$form = $this->form->get_form( $this->entry['form_id'] );
+		$form = $this->gform->get_form( $this->entry['form_id'] );
 
 		/**
 		 * Allow $mpdf object class to be modified
@@ -759,8 +759,8 @@ class Helper_PDF {
 	 */
 	protected function maybe_display_raw_html( $html ) {
 
-		if ( $this->output !== 'SAVE' && rgget( 'html' ) && $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
-			echo apply_filters( 'gfpdf_pre_html_browser_output', $html, $this->settings, $this->entry, $this->form, $this );
+		if ( $this->output !== 'SAVE' && rgget( 'html' ) && $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
+			echo apply_filters( 'gfpdf_pre_html_browser_output', $html, $this->settings, $this->entry, $this->gform, $this );
 			exit;
 		}
 	}

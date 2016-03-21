@@ -47,13 +47,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Helper_Migration {
 
 	/**
-	 * Holds abstracted functions related to the forms plugin
+	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
 	 * @var \GFPDF\Helper\Helper_Form
 	 *
 	 * @since 4.0
 	 */
-	protected $form;
+	protected $gform;
 
 	/**
 	 * Holds our log class
@@ -116,10 +116,10 @@ class Helper_Migration {
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log, Helper_Data $data, Helper_Abstract_Options $options, Helper_Misc $misc, Helper_Notices $notices ) {
+	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Data $data, Helper_Abstract_Options $options, Helper_Misc $misc, Helper_Notices $notices ) {
 
 		/* Assign our internal variables */
-		$this->form    = $form;
+		$this->gform   = $gform;
 		$this->log     = $log;
 		$this->data    = $data;
 		$this->options = $options;
@@ -374,7 +374,7 @@ class Helper_Migration {
 		if ( ( ! defined( 'GFPDF_SET_DEFAULT_TEMPLATE' ) || GFPDF_SET_DEFAULT_TEMPLATE === true ) && sizeof( $raw_config['default'] ) > 0 ) {
 
 			/* Get all forms */
-			$forms = $this->form->get_forms();
+			$forms = $this->gform->get_forms();
 
 			/* Create an index of current form IDs */
 			$form_ids = array();
@@ -439,7 +439,7 @@ class Helper_Migration {
 
 		/* Loop through forms and attempt to get the form data */
 		foreach ( $config as $form_id => $nodes ) {
-			$form = $this->form->get_form( $form_id );
+			$form = $this->gform->get_form( $form_id );
 
 			if ( ! is_wp_error( $form ) ) {
 

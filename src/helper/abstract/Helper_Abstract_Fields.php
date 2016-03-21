@@ -114,14 +114,14 @@ abstract class Helper_Abstract_Fields {
 	 * @param object                             $field The GF_Field_* Object
 	 * @param array                              $entry The Gravity Forms Entry
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
 	 * @param \GFPDF\Helper\Helper_Misc          $misc
 	 *
 	 * @throws Exception
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $field, $entry, Helper_Abstract_Form $form, Helper_Misc $misc ) {
+	public function __construct( $field, $entry, Helper_Abstract_Form $gform, Helper_Misc $misc ) {
 
 		/* Assign our internal variables */
 		$this->misc = $misc;
@@ -142,7 +142,7 @@ abstract class Helper_Abstract_Fields {
 
 		$this->field = $field;
 		$this->entry = $entry;
-		$this->form  = $form->get_form( $entry['form_id'] );
+		$this->form  = $gform->get_form( $entry['form_id'] );
 
 	}
 

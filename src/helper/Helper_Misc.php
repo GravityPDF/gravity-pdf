@@ -2,8 +2,6 @@
 
 namespace GFPDF\Helper;
 
-use GFPDF\Model\Model_PDF;
-
 use Psr\Log\LoggerInterface;
 
 use GFCommon;
@@ -55,13 +53,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Helper_Misc {
 
 	/**
-	 * Holds abstracted functions related to the forms plugin
+	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
 	 * @var \GFPDF\Helper\Helper_Form
 	 *
 	 * @since 4.0
 	 */
-	protected $form;
+	protected $gform;
 
 	/**
 	 * Holds our log class
@@ -86,17 +84,17 @@ class Helper_Misc {
 	 * Store required classes locally
 	 *
 	 * @param \Monolog\Logger|LoggerInterface    $log
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $form
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
 	 * @param \GFPDF\Helper\Helper_Data          $data
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( LoggerInterface $log, Helper_Abstract_Form $form, Helper_Data $data ) {
+	public function __construct( LoggerInterface $log, Helper_Abstract_Form $gform, Helper_Data $data ) {
 
 		/* Assign our internal variables */
-		$this->log  = $log;
-		$this->form = $form;
-		$this->data = $data;
+		$this->log   = $log;
+		$this->gform = $gform;
+		$this->data  = $data;
 	}
 
 	/**
@@ -654,7 +652,7 @@ class Helper_Misc {
 		/* Disable the field encryption checks which can slow down our entry queries */
 		add_filter( 'gform_is_encrypted_field', '__return_false' );
 
-		$form          = $this->form->get_form( $entry['form_id'] );
+		$form          = $this->gform->get_form( $entry['form_id'] );
 		$pdf           = GPDFAPI::get_mvc_class( 'Model_PDF' );
 		$form_settings = GPDFAPI::get_mvc_class( 'Model_Form_Settings' );
 
@@ -765,7 +763,7 @@ class Helper_Misc {
 		$leads    = rgget( 'lid' );
 		$override = ( isset( $settings['public_access'] ) && $settings['public_access'] == 'Yes' ) ? true : false;
 
-		if ( $leads && ( $override === true || $this->form->has_capability( 'gravityforms_view_entries' ) ) ) {
+		if ( $leads && ( $override === true || $this->gform->has_capability( 'gravityforms_view_entries' ) ) ) {
 			$ids = explode( ',', $leads );
 
 			/* ensure all passed ids are integers */
@@ -889,7 +887,7 @@ class Helper_Misc {
 			return true;
 		}
 
-		$form = $this->form->get_form( $entry['form_id'] );
+		$form = $this->gform->get_form( $entry['form_id'] );
 
 		/* Do the evaluation */
 		$evaluation = GFCommon::evaluate_conditional_logic( $logic, $form, $entry );
@@ -942,7 +940,7 @@ class Helper_Misc {
 	 * @since 4.0
 	 */
 	public function get_fields_sorted_by_id( $form_id ) {
-		$form   = $this->form->get_form( $form_id );
+		$form   = $this->gform->get_form( $form_id );
 		$fields = array();
 
 		if ( isset( $form['fields'] ) && is_array( $form['fields'] ) ) {

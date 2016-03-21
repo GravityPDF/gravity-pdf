@@ -64,13 +64,13 @@ class View_Settings extends Helper_Abstract_View {
 	protected $view_type = 'Settings';
 
 	/**
-	 * Holds abstracted functions related to the forms plugin
+	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
 	 * @var \GFPDF\Helper\Helper_Form
 	 *
 	 * @since 4.0
 	 */
-	protected $form;
+	protected $gform;
 
 	/**
 	 * Holds our log class
@@ -115,7 +115,7 @@ class View_Settings extends Helper_Abstract_View {
 	 * Setup our class by injecting all our dependancies
 	 *
 	 * @param array                                          $data_cache An array of data to pass to the view
-	 * @param \GFPDF\Helper\Helper_Form|Helper_Abstract_Form $form       Our abstracted Gravity Forms helper functions
+	 * @param \GFPDF\Helper\Helper_Form|Helper_Abstract_Form $gform      Our abstracted Gravity Forms helper functions
 	 * @param \Monolog\Logger|LoggerInterface                $log        Our logger class
 	 * @param \GFPDF\Helper\Helper_Abstract_Options          $options    Our options class which allows us to access any settings
 	 * @param \GFPDF\Helper\Helper_Data                      $data       Our plugin data store
@@ -123,13 +123,13 @@ class View_Settings extends Helper_Abstract_View {
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $data_cache = array(), Helper_Abstract_Form $form, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc ) {
+	public function __construct( $data_cache = array(), Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc ) {
 
 		/* Call our parent constructor */
 		parent::__construct( $data_cache );
 
 		/* Assign our internal variables */
-		$this->form    = $form;
+		$this->gform   = $gform;
 		$this->log     = $log;
 		$this->options = $options;
 		$this->data    = $data;
@@ -211,7 +211,7 @@ class View_Settings extends Helper_Abstract_View {
 			'memory' => $status->get_ram( $this->data->memory_limit ),
 			'wp'     => $wp_version,
 			'php'    => phpversion(),
-			'gf'     => $this->form->get_version(),
+			'gf'     => $this->gform->get_version(),
 		);
 
 		$this->log->addNotice( 'System Status', array( 'status' => $vars ) );
@@ -230,7 +230,7 @@ class View_Settings extends Helper_Abstract_View {
 	public function general() {
 
 		$vars = array(
-			'edit_cap' => $this->form->has_capability( 'gravityforms_edit_settings' ),
+			'edit_cap' => $this->gform->has_capability( 'gravityforms_edit_settings' ),
 		);
 
 		/* load the system status view */
@@ -247,7 +247,7 @@ class View_Settings extends Helper_Abstract_View {
 	public function tools() {
 
 		/* prevent unauthorized access */
-		if ( ! $this->form->has_capability( 'gravityforms_edit_settings' ) ) {
+		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
 			$this->log->addWarning( 'Lack of User Capabilities.' );
 
 			wp_die( __( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );

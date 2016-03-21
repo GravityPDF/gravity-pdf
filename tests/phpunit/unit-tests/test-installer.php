@@ -75,9 +75,9 @@ class Test_Installer extends WP_UnitTestCase {
 		parent::setUp();
 
 		/* Setup our test classes */
-		$this->model = new Model_Install( $gfpdf->form, $gfpdf->log, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
+		$this->model = new Model_Install( $gfpdf->gform, $gfpdf->log, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
 
-		$this->controller = new Controller_Install( $this->model, $gfpdf->form, $gfpdf->log, $gfpdf->notices, $gfpdf->data, $gfpdf->misc );
+		$this->controller = new Controller_Install( $this->model, $gfpdf->gform, $gfpdf->log, $gfpdf->notices, $gfpdf->data, $gfpdf->misc );
 		$this->controller->init();
 	}
 
@@ -361,7 +361,7 @@ class Test_Installer extends WP_UnitTestCase {
 		global $gfpdf;
 
 		/* Verify the form data is there */
-		$forms = $gfpdf->form->get_forms();
+		$forms = $gfpdf->gform->get_forms();
 		$found = false;
 		foreach ( $forms as $form ) {
 			if ( isset( $form['gfpdf_form_settings'] ) ) {
@@ -375,7 +375,7 @@ class Test_Installer extends WP_UnitTestCase {
 		/* Verify the form data is removed */
 		$this->model->remove_plugin_form_settings();
 
-		$forms = $gfpdf->form->get_forms();
+		$forms = $gfpdf->gform->get_forms();
 		foreach ( $forms as $form ) {
 			$this->assertFalse( isset( $form['gfpdf_form_settings'] ) );
 		}

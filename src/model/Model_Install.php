@@ -56,13 +56,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Model_Install extends Helper_Abstract_Model {
 
 	/**
-	 * Holds abstracted functions related to the forms plugin
+	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
 	 * @var \GFPDF\Helper\Helper_Form
 	 *
 	 * @since 4.0
 	 */
-	protected $form;
+	protected $gform;
 
 	/**
 	 * Holds our log class
@@ -106,7 +106,7 @@ class Model_Install extends Helper_Abstract_Model {
 	/**
 	 * Setup our class by injecting all our dependancies
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $form    Our abstracted Gravity Forms helper functions
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform   Our abstracted Gravity Forms helper functions
 	 * @param \Monolog\Logger|LoggerInterface    $log     Our logger class
 	 * @param \GFPDF\Helper\Helper_Data          $data    Our plugin data store
 	 * @param \GFPDF\Helper\Helper_Misc          $misc    Our miscellaneous class
@@ -114,10 +114,10 @@ class Model_Install extends Helper_Abstract_Model {
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices ) {
+	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices ) {
 
 		/* Assign our internal variables */
-		$this->form    = $form;
+		$this->gform   = $gform;
 		$this->log     = $log;
 		$this->data    = $data;
 		$this->misc    = $misc;
@@ -437,13 +437,13 @@ class Model_Install extends Helper_Abstract_Model {
 	 */
 	public function remove_plugin_form_settings() {
 
-		$forms = $this->form->get_forms();
+		$forms = $this->gform->get_forms();
 
 		foreach ( $forms as $form ) {
 			/* only update forms which have a PDF configuration */
 			if ( isset( $form['gfpdf_form_settings'] ) ) {
 				unset( $form['gfpdf_form_settings'] );
-				if ( $this->form->update_form( $form ) !== true ) {
+				if ( $this->gform->update_form( $form ) !== true ) {
 					$this->log->addError( 'Cannot Remove PDF Settings from Form.', array( 'form' => $form ) );
 					$this->notices->add_error( sprintf( __( 'There was a problem removing the Gravity Form "%s" PDF configuration. Try delete manually.', 'gravity-forms-pdf-extended' ), $form['id'] . ': ' . $form['title'] ) );
 				}

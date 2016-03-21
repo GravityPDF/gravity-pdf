@@ -91,10 +91,10 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		parent::setUp();
 
 		/* Setup our test classes */
-		$this->model = new Model_PDF( $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
-		$this->view  = new View_PDF( array(), $gfpdf->form, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
+		$this->model = new Model_PDF( $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
+		$this->view  = new View_PDF( array(), $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
 
-		$this->controller = new Controller_PDF( $this->model, $this->view, $gfpdf->form, $gfpdf->log, $gfpdf->misc );
+		$this->controller = new Controller_PDF( $this->model, $this->view, $gfpdf->gform, $gfpdf->log, $gfpdf->misc );
 		$this->controller->init();
 	}
 
@@ -177,7 +177,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		$settings['template'] = 'zadani';
 
 		/* Create our PDF object */
-		$pdf_generator = new Helper_PDF( $entry, $settings, $gfpdf->form, $gfpdf->data );
+		$pdf_generator = new Helper_PDF( $entry, $settings, $gfpdf->gform, $gfpdf->data );
 		$pdf_generator->set_filename( 'Unit Testing' );
 
 		/* Generate the PDF and verify it was successfull */

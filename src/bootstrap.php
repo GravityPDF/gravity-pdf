@@ -77,13 +77,13 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public $log;
 
 	/**
-	 * Holds abstracted functions related to the forms plugin
+	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
 	 * @var \GFPDF\Helper\Helper_Form
 	 *
 	 * @since 4.0
 	 */
-	public $form;
+	public $gform;
 
 	/**
 	 * Holds our Helper_Notices object
@@ -193,21 +193,21 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->setup_logger();
 
 		/* Set up our form object */
-		$this->form = new Helper\Helper_Form();
+		$this->gform = new Helper\Helper_Form();
 
 		/* Set up our data access layer */
 		$this->data = new Helper\Helper_Data();
 		$this->data->init();
 
 		/* Set up our misc object */
-		$this->misc = new Helper\Helper_Misc( $this->log, $this->form, $this->data );
+		$this->misc = new Helper\Helper_Misc( $this->log, $this->gform, $this->data );
 
 		/* Set up our notices */
 		$this->notices = new Helper\Helper_Notices();
 		$this->notices->init();
 
 		/* Set up our options object - this is initialised on admin_init but other classes need to access its methods before this */
-		$this->options = new Helper\Helper_Options_Fields( $this->log, $this->form, $this->data, $this->misc, $this->notices );
+		$this->options = new Helper\Helper_Options_Fields( $this->log, $this->gform, $this->data, $this->misc, $this->notices );
 
 		/* Setup our Singleton object */
 		$this->singleton = new Helper\Helper_Singleton();
@@ -532,7 +532,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/*
         * Localise admin script
         */
-		wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $this->data->get_localised_script_data( $this->options, $this->form ) );
+		wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $this->data->get_localised_script_data( $this->options, $this->gform ) );
 	}
 
 
@@ -710,8 +710,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @return void
 	 */
 	public function installer() {
-		$model = new Model\Model_Install( $this->form, $this->log, $this->data, $this->misc, $this->notices );
-		$class = new Controller\Controller_Install( $model, $this->form, $this->log, $this->notices, $this->data, $this->misc );
+		$model = new Model\Model_Install( $this->gform, $this->log, $this->data, $this->misc, $this->notices );
+		$class = new Controller\Controller_Install( $model, $this->gform, $this->log, $this->notices, $this->data, $this->misc );
 		$class->init();
 
 		/* set up required data */
@@ -734,7 +734,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$model = new Model\Model_Welcome_Screen( $this->log );
 		$view  = new View\View_Welcome_Screen( array(
 			'display_version' => PDF_EXTENDED_VERSION,
-		), $this->form );
+		), $this->gform );
 
 		$class = new Controller\Controller_Welcome_Screen( $model, $view, $this->log, $this->data, $this->options );
 		$class->init();
@@ -754,10 +754,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function gf_settings() {
 
-		$model = new Model\Model_Settings( $this->form, $this->log, $this->notices, $this->options, $this->data, $this->misc );
-		$view  = new View\View_Settings( array(), $this->form, $this->log, $this->options, $this->data, $this->misc );
+		$model = new Model\Model_Settings( $this->gform, $this->log, $this->notices, $this->options, $this->data, $this->misc );
+		$view  = new View\View_Settings( array(), $this->gform, $this->log, $this->options, $this->data, $this->misc );
 
-		$class = new Controller\Controller_Settings( $model, $view, $this->form, $this->log, $this->notices, $this->data, $this->misc );
+		$class = new Controller\Controller_Settings( $model, $view, $this->gform, $this->log, $this->notices, $this->data, $this->misc );
 		$class->init();
 
 		/* Add to our singleton controller */
@@ -775,7 +775,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function gf_form_settings() {
 
-		$model = new Model\Model_Form_Settings( $this->form, $this->log, $this->data, $this->options, $this->misc, $this->notices );
+		$model = new Model\Model_Form_Settings( $this->gform, $this->log, $this->data, $this->options, $this->misc, $this->notices );
 		$view  = new View\View_Form_Settings( array() );
 
 		$class = new Controller\Controller_Form_Settings( $model, $view, $this->data, $this->options, $this->misc );
@@ -796,10 +796,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function pdf() {
 
-		$model = new Model\Model_PDF( $this->form, $this->log, $this->options, $this->data, $this->misc, $this->notices );
-		$view  = new View\View_PDF( array(), $this->form, $this->log, $this->options, $this->data, $this->misc );
+		$model = new Model\Model_PDF( $this->gform, $this->log, $this->options, $this->data, $this->misc, $this->notices );
+		$view  = new View\View_PDF( array(), $this->gform, $this->log, $this->options, $this->data, $this->misc );
 
-		$class = new Controller\Controller_PDF( $model, $view, $this->form, $this->log, $this->misc );
+		$class = new Controller\Controller_PDF( $model, $view, $this->gform, $this->log, $this->misc );
 		$class->init();
 
 		/* Add to our singleton controller */
@@ -817,7 +817,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function shortcodes() {
 
-		$model = new Model\Model_Shortcodes( $this->form, $this->log, $this->options, $this->misc );
+		$model = new Model\Model_Shortcodes( $this->gform, $this->log, $this->options, $this->misc );
 		$view  = new View\View_Shortcodes( array() );
 
 		$class = new Controller\Controller_Shortcodes( $model, $view, $this->log );
@@ -841,7 +841,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$model = new Model\Model_Actions( $this->data, $this->options, $this->notices );
 		$view  = new View\View_Actions( array() );
 
-		$class = new Controller\Controller_Actions( $model, $view, $this->form, $this->log, $this->notices );
+		$class = new Controller\Controller_Actions( $model, $view, $this->gform, $this->log, $this->notices );
 		$class->init();
 
 		/* Add to our singleton controller */

@@ -117,7 +117,7 @@ class Test_Bootstrap extends WP_UnitTestCase {
 	 */
 	public function provider_dependant_helper_classes() {
 		return array(
-			array( 'GFPDF\Helper\Helper_Form', 'form' ),
+			array( 'GFPDF\Helper\Helper_Form', 'gform' ),
 			array( 'GFPDF\Helper\Helper_Data', 'data' ),
 			array( 'GFPDF\Helper\Helper_Misc', 'misc' ),
 			array( 'GFPDF\Helper\Helper_Notices', 'notices' ),

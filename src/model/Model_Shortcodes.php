@@ -55,13 +55,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Model_Shortcodes extends Helper_Abstract_Model {
 
 	/**
-	 * Holds abstracted functions related to the forms plugin
+	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
 	 * @var \GFPDF\Helper\Helper_Form
 	 *
 	 * @since 4.0
 	 */
-	protected $form;
+	protected $gform;
 
 	/**
 	 * Holds our log class
@@ -95,16 +95,16 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	/**
 	 * Setup our class by injecting all our dependancies
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form|\GFPDF\Helper\Helper_Form              $form    Our abstracted Gravity Forms helper functions
+	 * @param \GFPDF\Helper\Helper_Abstract_Form|\GFPDF\Helper\Helper_Form              $gform   Our abstracted Gravity Forms helper functions
 	 * @param \Monolog\Logger|LoggerInterface                                           $log     Our logger class
 	 * @param \GFPDF\Helper\Helper_Abstract_Options|\GFPDF\Helper\Helper_Options_Fields $options Our options class which allows us to access any settings
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Form $form, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Misc $misc ) {
+	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Misc $misc ) {
 
 		/* Assign our internal variables */
-		$this->form    = $form;
+		$this->gform   = $gform;
 		$this->log     = $log;
 		$this->options = $options;
 		$this->misc    = $misc;
@@ -126,7 +126,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		$this->log->addNotice( 'Generating Shortcode' );
 
 		$controller           = $this->getController();
-		$has_view_permissions = $this->form->has_capability( 'gravityforms_view_entries' );
+		$has_view_permissions = $this->gform->has_capability( 'gravityforms_view_entries' );
 
 		/* merge in any missing defaults */
 		$attributes = shortcode_atts( array(
@@ -164,7 +164,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		}
 
 		/* Check if we have a valid PDF configuration */
-		$entry  = $this->form->get_entry( $attributes['entry'] );
+		$entry  = $this->gform->get_entry( $attributes['entry'] );
 		$config = ( ! is_wp_error( $entry ) ) ? $this->options->get_pdf( $entry['form_id'], $attributes['id'] ) : $entry; /* if invalid entry a WP_Error will be thrown */
 
 		if ( is_wp_error( $config ) ) {
@@ -197,7 +197,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		}
 
 		/* Everything looks valid so let's get the URL */
-		$pdf               = new Model_PDF( $this->form, $this->log, $this->options, GPDFAPI::get_data_class(), GPDFAPI::get_misc_class(), GPDFAPI::get_notice_class() );
+		$pdf               = new Model_PDF( $this->gform, $this->log, $this->options, GPDFAPI::get_data_class(), GPDFAPI::get_misc_class(), GPDFAPI::get_notice_class() );
 		$download          = ( $attributes['type'] == 'download' ) ? true : false;
 		$print             = ( ! empty( $attributes['print'] ) ) ? true : false;
 		$attributes['url'] = $pdf->get_pdf_url( $attributes['id'], $attributes['entry'], $download, $print );
@@ -353,7 +353,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 					if ( ! empty( $pid ) ) {
 
 						/* generate the PDF URL */
-						$pdf      = new Model_PDF( $this->form, $this->log, $this->options, GPDFAPI::get_data_class(), GPDFAPI::get_misc_class(), GPDFAPI::get_notice_class() );
+						$pdf      = new Model_PDF( $this->gform, $this->log, $this->options, GPDFAPI::get_data_class(), GPDFAPI::get_misc_class(), GPDFAPI::get_notice_class() );
 						$download = ( ! isset( $code['attr']['type'] ) || $code['attr']['type'] == 'download' ) ? true : false;
 						$pdf_url  = $pdf->get_pdf_url( $pid, '{entry_id}', $download, false, false );
 

@@ -152,7 +152,7 @@ final class GPDFAPI {
 	 *
 	 * Usage:
 	 *
-	 * $form->get_form( $form_id );
+	 * $gform->get_form( $form_id );
 	 *
 	 * @return \GFPDF\Helper\Helper_Form
 	 *
@@ -161,7 +161,7 @@ final class GPDFAPI {
 	public static function get_form_class() {
 		global $gfpdf;
 
-		return $gfpdf->form;
+		return $gfpdf->gform;
 	}
 
 	/**
@@ -430,7 +430,7 @@ final class GPDFAPI {
 	public static function product_table( $entry, $return = false ) {
 		global $gfpdf;
 
-		$products = new GFPDF\Helper\Fields\Field_Products( new GF_Field(), $entry, $gfpdf->form, $gfpdf->misc );
+		$products = new GFPDF\Helper\Fields\Field_Products( new GF_Field(), $entry, $gfpdf->gform, $gfpdf->misc );
 
 		if ( $return ) {
 			return $products->html();
@@ -456,7 +456,7 @@ final class GPDFAPI {
 		global $gfpdf;
 
 		/* Get our form */
-		$form = $gfpdf->form->get_form( $entry['form_id'] );
+		$form = $gfpdf->gform->get_form( $entry['form_id'] );
 
 		/* Check for errors */
 		if ( is_wp_error( $form ) ) {
@@ -469,7 +469,7 @@ final class GPDFAPI {
 			if ( $field->id == $field_id && $field->inputType == 'likert' ) {
 
 				/* Output our likert */
-				$likert = new GFPDF\Helper\Fields\Field_Likert( $field, $entry, $gfpdf->form, $gfpdf->misc );
+				$likert = new GFPDF\Helper\Fields\Field_Likert( $field, $entry, $gfpdf->gform, $gfpdf->misc );
 
 				if ( $return ) {
 					return $likert->html();

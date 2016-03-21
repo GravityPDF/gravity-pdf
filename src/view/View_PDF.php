@@ -75,13 +75,13 @@ class View_PDF extends Helper_Abstract_View {
 	protected $view_type = 'PDF';
 
 	/**
-	 * Holds abstracted functions related to the forms plugin
+	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
 	 * @var \GFPDF\Helper\Helper_Form
 	 *
 	 * @since 4.0
 	 */
-	protected $form;
+	protected $gform;
 
 	/**
 	 * Holds our log class
@@ -125,7 +125,7 @@ class View_PDF extends Helper_Abstract_View {
 	 * Setup our class by injecting all our dependancies
 	 *
 	 * @param array                                          $data_cache An array of data to pass to the view
-	 * @param \GFPDF\Helper\Helper_Form|Helper_Abstract_Form $form       Our abstracted Gravity Forms helper functions
+	 * @param \GFPDF\Helper\Helper_Form|Helper_Abstract_Form $gform       Our abstracted Gravity Forms helper functions
 	 * @param \Monolog\Logger|LoggerInterface                $log        Our logger class
 	 * @param \GFPDF\Helper\Helper_Abstract_Options          $options    Our options class which allows us to access any settings
 	 * @param \GFPDF\Helper\Helper_Data                      $data       Our plugin data store
@@ -133,13 +133,13 @@ class View_PDF extends Helper_Abstract_View {
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $data_cache = array(), Helper_Abstract_Form $form, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc ) {
+	public function __construct( $data_cache = array(), Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc ) {
 
 		/* Call our parent constructor */
 		parent::__construct( $data_cache );
 
 		/* Assign our internal variables */
-		$this->form    = $form;
+		$this->gform   = $gform;
 		$this->log     = $log;
 		$this->options = $options;
 		$this->data    = $data;
@@ -171,7 +171,7 @@ class View_PDF extends Helper_Abstract_View {
 		/**
 		 * Show $form_data array if requested
 		 */
-		if ( isset( $_GET['data'] ) && $this->form->has_capability( 'gravityforms_view_settings' ) && isset( $args['form_data'] ) ) {
+		if ( isset( $_GET['data'] ) && $this->gform->has_capability( 'gravityforms_view_settings' ) && isset( $args['form_data'] ) ) {
 			echo '<pre>';
 			print_r( $args['form_data'] );
 			echo '</pre>';
@@ -184,7 +184,7 @@ class View_PDF extends Helper_Abstract_View {
 		/**
 		 * Set out our PDF abstraction class
 		 */
-		$pdf = new Helper_PDF( $entry, $settings, $this->form, $this->data );
+		$pdf = new Helper_PDF( $entry, $settings, $this->gform, $this->data );
 		$pdf->set_filename( $model->get_pdf_name( $settings, $entry ) );
 
 		try {
@@ -230,7 +230,7 @@ class View_PDF extends Helper_Abstract_View {
 				'exception' => $e->getMessage(),
 			) );
 
-			if ( $this->form->has_capability( 'gravityforms_view_entries' ) ) {
+			if ( $this->gform->has_capability( 'gravityforms_view_entries' ) ) {
 				wp_die( $e->getMessage() );
 			}
 
@@ -305,8 +305,8 @@ class View_PDF extends Helper_Abstract_View {
 	public function generate_html_structure( $entry, Helper_Abstract_Model $model, $config = array() ) {
 
 		/* Set up required variables */
-		$form         = $this->form->get_form( $entry['form_id'] );
-		$products     = new Field_Products( new GF_Field(), $entry, $this->form, $this->misc );
+		$form         = $this->gform->get_form( $entry['form_id'] );
+		$products     = new Field_Products( new GF_Field(), $entry, $this->gform, $this->misc );
 		$has_products = false;
 		$page_number  = 0;
 		$container    = new Helper_Field_Container();
@@ -521,7 +521,7 @@ class View_PDF extends Helper_Abstract_View {
 	 * @since 4.0
 	 */
 	public function get_core_template_styles( $settings, $entry ) {
-		$form = $this->form->get_form( $entry['form_id'] );
+		$form = $this->gform->get_form( $entry['form_id'] );
 
 		$html = $this->load_core_template_styles( $settings );
 
