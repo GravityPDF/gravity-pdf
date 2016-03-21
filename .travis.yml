@@ -21,6 +21,7 @@ matrix:
     env: WP_VERSION=4.2 WP_MULTISITE=0
 
 before_script:
+  - if find . -name "*.php" -exec php -l {} \; | grep "unexpected $end"; then exit 1; fi
   - composer install --prefer-source --optimize-autoloader
   - bash tests/bin/install.sh gravitypdf_test root '' localhost $WP_VERSION
 
