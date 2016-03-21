@@ -434,7 +434,7 @@ class View_PDF extends Helper_Abstract_View {
 				'field'     => $field,
 				'entry'     => $entry,
 				'config'    => $config,
-				'form'      => $form,
+				'form_id'   => $form['id'],
 				'exception' => $e->getMessage(),
 			) );
 		}

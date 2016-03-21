@@ -517,7 +517,9 @@ class Helper_Migration {
 
 					if ( $results ) {
 						/* return the ID if successful */
-						$this->log->addNotice( 'Successfully Added.', array( 'pdf' => $node ) );
+						$this->log->addNotice( 'Successfully Added.', array(
+							'pdf' => $node,
+						) );
 					} else {
 						/* Log errors */
 						$this->log->addError( 'Error Saving.', array(

@@ -177,7 +177,6 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* prevent unauthorized access */
 		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
-
 			$this->log->addWarning( 'Lack of User Capabilities.' );
 			wp_die( __( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
 		}
@@ -294,7 +293,11 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* check appropriate settings */
 		if ( ! is_array( $input ) || ! $pdf_id ) {
-			$this->log->addError( 'Invalid Data.', array( 'post' => $input, 'pid' => $pdf_id ) );
+			$this->log->addError( 'Invalid Data.', array(
+				'post' => $input,
+				'pid' => $pdf_id,
+			) );
+
 			$this->notices->add_error( __( 'There was a problem saving your PDF settings. Please try again.', 'gravity-forms-pdf-extended' ) );
 
 			return false;
@@ -577,7 +580,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		if ( ! ( $class instanceof Helper_Interface_Config ) ) {
 
 			$this->log->addWarning( 'Instanceof Failed.', array(
-				'object' => $class,
+				'object' => get_class( $class ),
 				'type'   => 'Helper_Interface_Config',
 			) );
 
@@ -598,7 +601,9 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		$settings = $this->setup_core_custom_appearance_settings( $settings, $class, $template_settings );
 
-		$this->log->addNotice( 'Setup Template-Specific Settings', array( 'settings' => $settings ) );
+		$this->log->addNotice( 'Setup Template-Specific Settings', array(
+			'settings' => $settings,
+		) );
 
 		return $settings;
 	}
@@ -715,7 +720,9 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		if ( ! class_exists( $fqcn ) && is_file( $file ) && is_readable( $file ) ) {
 			require_once( $file );
 		} else {
-			$this->log->addWarning( 'Template Configuration Failed to Load', array( 'file' => $file ) );
+			$this->log->addWarning( 'Template Configuration Failed to Load', array(
+				'file' => $file,
+			) );
 		}
 
 		/* Insure the class we are trying to load exists and impliments our Helper_Interface_Config interface */
@@ -798,7 +805,9 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function delete_gf_pdf_setting() {
 
-		$this->log->addNotice( 'Running AJAX Endpoint', array( 'type' => 'Delete PDF Settings' ) );
+		$this->log->addNotice( 'Running AJAX Endpoint', array(
+			'type' => 'Delete PDF Settings',
+		) );
 
 		/* prevent unauthorized access */
 		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
@@ -843,9 +852,15 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			wp_die();
 		}
 
-		$this->log->addError( 'AJAX Endpoint Failed', array(
-			'WP_Error' => $results,
-		) );
+		$errors = array();
+		if ( is_wp_error( $results ) ) {
+			$errors = array(
+				'WP_Error_Message' => $results->get_error_message(),
+				'WP_Error_Code'    => $results->get_error_code(),
+			);
+		}
+
+		$this->log->addError( 'AJAX Endpoint Failed', $errors );
 
 		header( 'HTTP/1.1 500 Internal Server Error' );
 		wp_die( '500' );
@@ -864,7 +879,9 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function duplicate_gf_pdf_setting() {
 
-		$this->log->addNotice( 'Running AJAX Endpoint', array( 'type' => 'Duplicate PDF Settings' ) );
+		$this->log->addNotice( 'Running AJAX Endpoint', array(
+			'type' => 'Duplicate PDF Settings',
+		) );
 
 		/* prevent unauthorized access */
 		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
@@ -925,7 +942,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		}
 
 		$this->log->addError( 'AJAX Endpoint Failed', array(
-			'WP_Error' => $config,
+			'WP_Error_Message' => $config->get_error_message(),
+			'WP_Error_Code'    => $config->get_error_code(),
 		) );
 
 		header( 'HTTP/1.1 500 Internal Server Error' );
@@ -945,7 +963,9 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function change_state_pdf_setting() {
 
-		$this->log->addNotice( 'Running AJAX Endpoint', array( 'type' => 'Change PDF Settings State' ) );
+		$this->log->addNotice( 'Running AJAX Endpoint', array(
+			'type' => 'Change PDF Settings State',
+		) );
 
 		/* prevent unauthorized access */
 		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
@@ -1002,7 +1022,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		}
 
 		$this->log->addError( 'AJAX Endpoint Failed', array(
-			'WP_Error' => $config,
+			'WP_Error_Message' => $config->get_error_message(),
+			'WP_Error_Code'    => $config->get_error_code(),
 		) );
 
 		header( 'HTTP/1.1 500 Internal Server Error' );
@@ -1020,7 +1041,9 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function render_template_fields() {
 
-		$this->log->addNotice( 'Running AJAX Endpoint', array( 'type' => 'Render Template Custom Fields' ) );
+		$this->log->addNotice( 'Running AJAX Endpoint', array(
+			'type' => 'Render Template Custom Fields',
+		) );
 
 		/* prevent unauthorized access */
 		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {

@@ -882,9 +882,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		if ( is_wp_error( $settings ) ) {
 
 			$this->log->addError( 'Invalid PDF Settings.', array(
-				'form_id'  => $form_id,
-				'pid'      => $pid,
-				'WP_Error' => $settings,
+				'form_id'          => $form_id,
+				'pid'              => $pid,
+				'WP_Error_Message' => $settings->get_error_message(),
+				'WP_Error_Code'    => $settings->get_error_code(),
 			) );
 
 			/* Reset the settings so it forces everything to false */

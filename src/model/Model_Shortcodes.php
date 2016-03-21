@@ -203,7 +203,9 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		$attributes['url'] = $pdf->get_pdf_url( $attributes['id'], $attributes['entry'], $download, $print );
 
 		/* generate the markup and return */
-		$this->log->addNotice( 'Generating Shortcode Markup', array( 'attr' => $attributes ) );
+		$this->log->addNotice( 'Generating Shortcode Markup', array(
+			'attr' => $attributes,
+		) );
 
 		return $controller->view->display_gravitypdf_shortcode( $attributes );
 	}
@@ -334,8 +336,8 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		if ( isset( $_POST['form_confirmation_url'] ) ) {
 
 			$this->log->addNotice( 'Process Redirect Confirmation Save', array(
-				'form' => $form,
-				'post' => $_POST,
+				'form_id' => $form['id'],
+				'post'    => $_POST,
 			) );
 
 			$url = stripslashes_deep( $_POST['form_confirmation_url'] );

@@ -174,7 +174,9 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		/* not a valid entry */
 		if ( is_wp_error( $entry ) ) {
-			$this->log->addError( 'Invalid Entry.', array( 'entry' => $entry ) );
+			$this->log->addError( 'Invalid Entry.', array(
+				'entry' => $entry,
+			) );
 
 			return $entry; /* return error */
 		}
@@ -185,8 +187,9 @@ class Model_PDF extends Helper_Abstract_Model {
 		if ( is_wp_error( $settings ) ) {
 
 			$this->log->addError( 'Invalid PDF Settings.', array(
-				'entry'    => $entry,
-				'WP_Error' => $settings,
+				'entry'            => $entry,
+				'WP_Error_Message' => $settings->get_error_message(),
+				'WP_Error_Code'    => $settings->get_error_code(),
 			) );
 
 			return $settings; /* return error */
@@ -208,9 +211,10 @@ class Model_PDF extends Helper_Abstract_Model {
 		if ( is_wp_error( $middleware ) ) {
 
 			$this->log->addError( 'Invalid PDF Settings.', array(
-				'entry'    => $entry,
-				'settings' => $settings,
-				'WP_Error' => $middleware,
+				'entry'            => $entry,
+				'settings'         => $settings,
+				'WP_Error_Message' => $middleware->get_error_message(),
+				'WP_Error_Code'    => $middleware->get_error_code(),
 			) );
 
 			return $middleware;
@@ -1026,7 +1030,9 @@ class Model_PDF extends Helper_Abstract_Model {
 						$this->misc->rmdir( substr( $file, 0, -1 ) );
 					} else {
 						if ( ! unlink( $file ) ) {
-							$this->log->addError( 'Filesystem Delete Error', array( 'file' => $file ) );
+							$this->log->addError( 'Filesystem Delete Error', array(
+								'file' => $file,
+							) );
 						}
 					}
 				}
@@ -1070,7 +1076,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 							$this->log->addError( 'Cleanup PDF Error', array(
 								'pdf'       => $pdf,
-								'exception' => $e,
+								'exception' => $e->getMessage(),
 							) );
 						}
 					}
@@ -1694,7 +1700,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			$this->log->addError( 'Invalid Field Class.', array(
 				'exception' => $e->getMessage(),
 				'field'     => $field,
-				'form'      => $form,
+				'form_id'   => $form['id'],
 				'entry'     => $entry,
 			) );
 
