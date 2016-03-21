@@ -370,7 +370,9 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		/* If errors were found then return */
 		if ( sizeof( $errors ) > 0 ) {
-			$this->log->addError( 'Install Error.', array( 'errors' => $errors ) );
+			$this->log->addError( 'Install Error.', array(
+				'errors' => $errors,
+			) );
 
 			return array( 'errors' => $errors );
 		} else {
@@ -595,7 +597,9 @@ class Model_Settings extends Helper_Abstract_Model {
 	 */
 	public function save_font() {
 
-		$this->log->addNotice( 'Running AJAX Endpoint', array( 'type' => 'Save Font' ) );
+		$this->log->addNotice( 'Running AJAX Endpoint', array(
+			'type' => 'Save Font',
+		) );
 
 		/* prevent unauthorized access */
 		$this->ajax_font_validation();
@@ -604,7 +608,9 @@ class Model_Settings extends Helper_Abstract_Model {
 		$results = $this->process_font( $_POST['payload'] );
 
 		/* If we reached this point the results were successful so return the new object */
-		$this->log->addNotice( 'AJAX Endpoint Successful', array( 'results' => $results ) );
+		$this->log->addNotice( 'AJAX Endpoint Successful', array(
+			'results' => $results,
+		) );
 
 		echo json_encode( $results );
 		wp_die();
@@ -619,7 +625,9 @@ class Model_Settings extends Helper_Abstract_Model {
 	 */
 	public function delete_font() {
 
-		$this->log->addNotice( 'Running AJAX Endpoint', array( 'type' => 'Delete Font' ) );
+		$this->log->addNotice( 'Running AJAX Endpoint', array( 
+			'type' => 'Delete Font', 
+		) );
 
 		/* prevent unauthorized access */
 		$this->ajax_font_validation();
@@ -649,7 +657,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			'error' => __( 'Could not delete Gravity PDF font correctly. Please try again.', 'gravity-forms-pdf-extended' ),
 		);
 
-		$this->log->addError( 'AJAX Endpoint Error', array( 'error' => $return ) );
+		$this->log->addError( 'AJAX Endpoint Error', $return );
 
 		echo json_encode( $return );
 		wp_die();

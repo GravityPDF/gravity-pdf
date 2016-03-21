@@ -415,7 +415,10 @@ class Helper_Misc {
 		try {
 			if ( ! is_dir( $destination ) ) {
 				if ( ! wp_mkdir_p( $destination ) ) {
-					$this->log->addError( 'Failed Creating Folder Structure', array( 'dir' => $destination ) );
+					$this->log->addError( 'Failed Creating Folder Structure', array(
+						'dir' => $destination,
+					) );
+
 					throw new Exception( 'Could not create folder structure at ' . $destination );
 				}
 			}
@@ -428,12 +431,17 @@ class Helper_Misc {
 			foreach ( $files as $fileinfo ) {
 				if ( $fileinfo->isDir() && ! file_exists( $destination . $files->getSubPathName() ) ) {
 					if ( ! @mkdir( $destination . $files->getSubPathName() ) ) {
-						$this->log->addError( 'Failed Creating Folder', array( 'dir' => $destination . $files->getSubPathName() ) );
+						$this->log->addError( 'Failed Creating Folder', array(
+							'dir' => $destination . $files->getSubPathName(),
+						) );
+
 						throw new Exception( 'Could not create folder at ' . $destination . $files->getSubPathName() );
 					}
 				} elseif ( ! file_exists( $destination . $files->getSubPathName() ) ) {
 					if ( ! @copy( $fileinfo, $destination . $files->getSubPathName() ) ) {
-						$this->log->addError( 'Failed Creating File', array( 'file' => $destination . $files->getSubPathName() ) );
+						$this->log->addError( 'Failed Creating File', array(
+							'file' => $destination . $files->getSubPathName(),
+						) );
 						throw new Exception( 'Could not create file at ' . $destination . $files->getSubPathName() );
 					}
 				}
@@ -443,7 +451,7 @@ class Helper_Misc {
 			$this->log->addError( 'Filesystem Copy Error', array(
 				'source'      => $source,
 				'destination' => $destination,
-				'exception'   => $e,
+				'exception'   => $e->getMessage(),
 			) );
 
 			return new WP_Error( 'recursion_copy_problem', $e );

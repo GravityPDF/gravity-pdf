@@ -346,9 +346,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		}
 
 		$this->log->addError( 'Settings Retreival Error', array(
-			'form_id'  => $form_id,
-			'pid'      => $pid,
-			'WP_Error' => $settings,
+			'form_id'          => $form_id,
+			'pid'              => $pid,
+			'WP_Error_Message' => $settings->get_error_message(),
+			'WP_Error_Code'    => $settings->get_error_code(),
 		) );
 
 		/* there was an error */
@@ -377,7 +378,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		if ( 0 === $form_id ) {
 
 			$error = new WP_Error( 'invalid_id', __( 'You must pass in a valid form ID', 'gravity-forms-pdf-extended' ) );
-			$this->log->addError( 'Error Getting Settings.', array( 'WP_Error' => $error ) );
+			$this->log->addError( 'Error Getting Settings.', array(
+				'WP_Error_Message' => $error->get_error_message(),
+				'WP_Error_Code' => $error->get_error_code(),
+			) );
 
 			return $error;
 		}
@@ -390,7 +394,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			if ( empty( $form ) ) {
 
 				$error = new WP_Error( 'invalid_id', __( 'You must pass in a valid form ID', 'gravity-forms-pdf-extended' ) );
-				$this->log->addError( 'Error Getting Settings.', array( 'WP_Error' => $error ) );
+				$this->log->addError( 'Error Getting Settings.', array(
+					'WP_Error_Message' => $error->get_error_message(),
+					'WP_Error_Code' => $error->get_error_code(),
+				) );
 
 				return $error;
 			}
@@ -483,7 +490,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			if ( $results ) {
 
 				/* return the ID if successful */
-				$this->log->addNotice( 'Successfuly Added.', array( 'pdf' => $pdf ) );
+				$this->log->addNotice( 'Successfuly Added.', array(
+					'pdf' => $pdf,
+				) );
 
 				return $pdf['id'];
 			}
@@ -556,7 +565,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$did_update = false;
 			if ( $update_db ) {
 
-				$this->log->addNotice( 'Update Form.', array( 'form' => $form ) );
+				$this->log->addNotice( 'Update Form.', array(
+					'form_id' => $form['id'],
+				) );
 
 				/* Update the database, if able */
 				$did_update = $this->gform->update_form( $form );
@@ -571,7 +582,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			}
 
 			/* true if successful, false if failed */
-
 			return $did_update;
 		}
 
@@ -605,7 +615,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			/* Next let's try to update the value */
 			if ( isset( $options[ $pdf_id ] ) ) {
 
-				$this->log->addNotice( 'Found Setting. Now deleting...', array( 'pdf' => $options[ $pdf_id ] ) );
+				$this->log->addNotice( 'Found Setting. Now deleting...', array(
+					'pdf' => $options[ $pdf_id ],
+				) );
 
 				unset( $options[ $pdf_id ] );
 			}
@@ -638,7 +650,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$this->log->addError( 'PDF Delete Failed.', array(
 			'form_id' => $form_id,
 			'pdf_id'  => $pdf_id,
-			'form'    => ( isset( $form ) ) ? $form : '',
 		) );
 
 		return false;

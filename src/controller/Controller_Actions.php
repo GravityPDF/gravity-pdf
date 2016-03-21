@@ -198,7 +198,9 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 			     call_user_func( $route['condition'] )
 			) {
 
-				$this->log->addNotice( 'Trigger Action Notification.', array( 'route' => $route ) );
+				$this->log->addNotice( 'Trigger Action Notification.', array(
+					'route' => $route,
+				) );
 
 				$class = ( isset( $route['view_class'] ) ) ? $route['view_class'] : '';
 				$this->notices->add_notice( call_user_func( $route['view'], $route['action'], $route['action_text'] ), $class );
@@ -242,10 +244,16 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 
 				/* Check if the user wants to dismiss the notice, otherwise process the route */
 				if ( isset( $_POST['gfpdf-dismiss-notice'] ) ) {
-					$this->log->addNotice( 'Dismiss Action.', array( 'route' => $route ) );
+					$this->log->addNotice( 'Dismiss Action.', array(
+						'route' => $route,
+					) );
+
 					$this->model->dismiss_notice( $route['action'] );
 				} else {
-					$this->log->addNotice( 'Trigger Action Process.', array( 'route' => $route ) );
+					$this->log->addNotice( 'Trigger Action Process.', array(
+						'route' => $route,
+					) );
+					
 					call_user_func( $route['process'], $route['action'], $route );
 				}
 			}

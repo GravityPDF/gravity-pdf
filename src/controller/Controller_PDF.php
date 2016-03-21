@@ -292,7 +292,10 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 */
 	private function pdf_error( $error ) {
 
-		$this->log->addError( 'PDF Generation Error.', array( 'WP_Error' => $error ) );
+		$this->log->addError( 'PDF Generation Error.', array(
+			'WP_Error_Message' => $error->get_error_message(),
+			'WP_Error_Code'    => $error->get_error_code(),
+		) );
 
 		/* only display detailed error to admins */
 		$whitelist_errors = array( 'timeout_expired', 'access_denied' );
