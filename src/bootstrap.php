@@ -522,7 +522,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			'wpdialogs',
 		), $version );
 		wp_register_script( 'gfpdf_js_chosen', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.jquery.min.js', array( 'jquery' ), $version );
-		wp_register_script( 'gfpdf_js_backbone_model_binder', PDF_PLUGIN_URL . 'bower_components/backbone.modelbinder/Backbone.ModelBinder.js', array(
+		wp_register_script( 'gfpdf_js_backbone_model_binder', PDF_PLUGIN_URL . 'bower_components/backbone.modelbinder/Backbone.ModelBinder.min.js', array(
 			'backbone',
 			'underscore',
 		), $version );
