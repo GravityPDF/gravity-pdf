@@ -54,7 +54,7 @@ class Model_Welcome_Screen extends Helper_Abstract_Model {
 	 *
 	 * @since 4.0
 	 */
-	public $minimum_capability = 'manage_options';
+	public $minimum_capability = 'activate_plugins';
 
 	/**
 	 * @var string The welcome page title
@@ -119,8 +119,18 @@ class Model_Welcome_Screen extends Helper_Abstract_Model {
 			'gfpdf-update',
 			array( $controller, 'update_screen' )
 		);
+	}
 
-		/* hide the new page from the menu bar */
+	/**
+	 * Hide the new dashboard pages we registered in self::admin_menus()
+	 * We had to move this to the "admin_head" action instead of all in one place
+	 * because it was causing authentication problems for some users.
+	 *
+	 * @since  4.0
+	 *
+	 * @return void
+	 */
+	public function hide_admin_menus() {
 		remove_submenu_page( 'index.php', 'gfpdf-getting-started' );
 		remove_submenu_page( 'index.php', 'gfpdf-update' );
 	}

@@ -32,6 +32,10 @@
 .gfpdf-page .about-wrap .feature-section {
     border-bottom: 1px solid rgba(0, 0, 0, 0.1 );
 }
+ 
+.gfpdf-page .about-wrap .feature-section.two-col .col {
+    vertical-align: middle;
+}
 
 div img.gfpdf-image {
   border: 1px solid #CCC;
