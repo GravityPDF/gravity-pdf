@@ -89,7 +89,10 @@ class Field_List extends Helper_Abstract_Fields {
 		$html  = $this->html();
 
 		/* Add our List array */
-		$data['list'][ $this->field->id ] = $this->value();
+		$list_array = $this->value();
+		$list_array = ( 0 < sizeof( $list_array ) ) ? $list_array : '';
+
+		$data['list'][ $this->field->id ] = $list_array;
 
 		/* Add our List HTML */
 		$data['field'][ $this->field->id . '.' . $label ] = $html;

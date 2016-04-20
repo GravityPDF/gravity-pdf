@@ -539,7 +539,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 
 		$fields = $this->misc->get_fields_sorted_by_id( $form['id'] );
 
-		$this->assertEquals( 54, sizeof( $fields ) );
+		$this->assertEquals( 56, sizeof( $fields ) );
 		$this->assertEquals( 'Section Break', $fields[10]->label );
 	}
 

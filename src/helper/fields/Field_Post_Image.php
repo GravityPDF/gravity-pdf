@@ -7,6 +7,7 @@ use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Abstract_Fields;
 
 use GF_Field_Post_Image;
+use GFFormsModel;
 
 use Exception;
 
@@ -107,6 +108,31 @@ class Field_Post_Image extends Helper_Abstract_Fields {
 		$html .= '</a>';
 
 		return parent::html( $html );
+	}
+
+	/**
+	 * Return the HTML form data
+	 *
+	 * @return array
+	 *
+	 * @since 4.0
+	 *
+	 */
+	public function form_data() {
+		$value = $this->value();
+		$label = GFFormsModel::get_label( $this->field );
+
+		if ( 0 === sizeof( $value ) ) {
+			$data = array();
+
+			$data['field'][ $this->field->id . '.' . $label ] = '';
+			$data['field'][ $this->field->id ]                = '';
+			$data['field'][ $label ]                          = '';
+
+			return $data;
+		}
+
+		return parent::form_data();
 	}
 
 	/**

@@ -264,8 +264,8 @@ class Field_Product extends Helper_Abstract_Fields {
 		}
 
 		/* Filter out the quantity field */
-		if ( $this->field->type == 'quantity' && isset( $data['products'][ $this->field->productField ]['quantity'] ) ) {
-			return $data['products'][ $this->field->productField ]['quantity'];
+		if ( $this->field->type == 'quantity' ) {
+			return ( isset( $data['products'][ $this->field->productField ]['quantity'] ) ) ? $data['products'][ $this->field->productField ]['quantity'] : '';
 		}
 
 		/* Filter out the shipping field */

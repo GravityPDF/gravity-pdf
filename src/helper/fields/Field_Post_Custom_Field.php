@@ -77,14 +77,14 @@ class Field_Post_Custom_Field extends Helper_Abstract_Fields {
 		try {
 			/* check load our class */
 			if ( class_exists( $class ) ) {
-				$this->fieldObject = apply_filters( 'gfpdf_field_class', new $class( $field, $entry, $gform, $misc ), $field, $entry, $gform );
-				$this->fieldObject = apply_filters( 'gfpdf_field_class_' . $field->inputType , $this->fieldObject, $field, $entry, $gform );
+				$this->fieldObject = apply_filters( 'gfpdf_field_class', new $class( $field, $entry, $gform, $misc ), $field, $entry, $this->form );
+				$this->fieldObject = apply_filters( 'gfpdf_field_class_' . $field->inputType , $this->fieldObject, $field, $entry, $this->form );
 			} else {
 				throw new Exception( 'Class not found' );
 			}
 		} catch ( Exception $e ) {
 			/* Exception thrown. Load generic field loader */
-			$this->fieldObject = apply_filters( 'gfpdf_field_default_class', new Field_Default( $field, $entry, $gform, $misc ), $field, $entry, $gform );
+			$this->fieldObject = apply_filters( 'gfpdf_field_default_class', new Field_Default( $field, $entry, $gform, $misc ), $field, $entry, $this->form );
 		}
 
 		/* force the fieldObject value cache */
@@ -111,6 +111,21 @@ class Field_Post_Custom_Field extends Helper_Abstract_Fields {
 	 */
 	public function html( $value = '', $label = true ) {
 		return $this->fieldObject->html();
+	}
+
+	/**
+	 * Return the correct form data information for the selected fields
+	 *
+	 * @return array
+	 *
+	 * @since 4.0
+	 */
+	public function form_data() {
+		if ( method_exists( $this->fieldObject, 'form_data') ) {
+			return $this->fieldObject->form_data();
+		}
+
+		return parent::form_data();
 	}
 
 	/**

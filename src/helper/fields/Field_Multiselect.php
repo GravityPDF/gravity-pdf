@@ -89,6 +89,18 @@ class Field_Multiselect extends Helper_Abstract_Fields {
 		$label = GFFormsModel::get_label( $this->field );
 		$data  = array();
 
+		/* Backwards compatibility support for v3 */
+		if ( 0 === sizeof( $value ) ) {
+			$data['field'][ $this->field->id . '.' . $label ] = '';
+			$data['field'][ $this->field->id ]                = '';
+			$data['field'][ $label ]                          = '';
+
+			/* Name Format */
+			$data['field'][ $this->field->id . '.' . $label . '_name' ] = '';
+			$data['field'][ $this->field->id . '_name' ]                = '';
+			$data['field'][ $label . '_name' ]                          = '';
+		}
+
 		foreach ( $value as $item ) {
 
 			/* Standadised Format */

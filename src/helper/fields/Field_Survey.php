@@ -79,14 +79,14 @@ class Field_Survey extends Helper_Abstract_Fields {
 		try {
 			/* check load our class */
 			if ( class_exists( $class ) ) {
-				$this->fieldObject = apply_filters( 'gfpdf_field_class', new $class( $field, $entry, $gform, $misc ), $field, $entry, $form );
-				$this->fieldObject = apply_filters( 'gfpdf_field_class_' . $field->inputType , $this->fieldObject, $field, $entry, $form );
+				$this->fieldObject = apply_filters( 'gfpdf_field_class', new $class( $field, $entry, $gform, $misc ), $field, $entry, $this->form );
+				$this->fieldObject = apply_filters( 'gfpdf_field_class_' . $field->inputType , $this->fieldObject, $field, $entry, $this->form );
 			} else {
 				throw new Exception();
 			}
 		} catch ( Exception $e ) {
 			/* Exception thrown. Load generic field loader */
-			$this->fieldObject = apply_filters( 'gfpdf_field_default_class', new Field_Default( $field, $entry, $gform, $misc ), $field, $entry, $form );
+			$this->fieldObject = apply_filters( 'gfpdf_field_default_class', new Field_Default( $field, $entry, $gform, $misc ), $field, $entry, $this->form );
 		}
 
 		/* force the fieldObject value cache */
@@ -125,7 +125,6 @@ class Field_Survey extends Helper_Abstract_Fields {
 	 *
 	 * @since 4.0
 	 *
-	 * @todo  Our standard v4 array format had to be changed to be backwards compatible with v3. The v4 version is better and in future we should include that format in the $form_data array (we might even create an all-new $data object that uses a JIT field processor)
 	 */
 	public function form_data() {
 
@@ -160,6 +159,11 @@ class Field_Survey extends Helper_Abstract_Fields {
 
 				$value = array( $value );
 				$label = GFFormsModel::get_label( $this->field );
+
+				/* Gravity PDF v3 backwards compatibility. Check if nothing is selected and return blank */
+				if ( 0 === sizeof( array_filter( $value[0] ) ) ) {
+					$value = '';
+				}
 
 				$data[ $field_id . '.' . $label ] = $value;
 				$data[ $field_id ]                = $value;
