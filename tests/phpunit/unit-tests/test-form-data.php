@@ -744,7 +744,6 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$response = 'post_custom_field';
 		$this->assertEquals( $response, $field[33] );
 		$this->assertEquals( $response, $field['33.Post Custom Field'] );
-		$this->assertEquals( $response, $field['Post Custom Field'] );
 	}
 
 	/**
@@ -1167,11 +1166,11 @@ class Test_Form_Data extends WP_UnitTestCase {
 
 		$data = $base['global'];
 
-		$this->assertEquals( 6, $data['entry_count'] );
+		$this->assertEquals( 7, $data['entry_count'] );
 		$this->assertEquals( 17, $data['sum'] );
-		$this->assertEquals( 50, $data['pass_rate'] );
+		$this->assertEquals( 43, $data['pass_rate'] );
 
-		$this->assertEquals( 0, $data['score_frequencies'][0] );
+		$this->assertEquals( 1, $data['score_frequencies'][0] );
 		$this->assertEquals( 2, $data['score_frequencies'][1] );
 		$this->assertEquals( 1, $data['score_frequencies'][2] );
 		$this->assertEquals( 1, $data['score_frequencies'][3] );
@@ -1182,7 +1181,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( 0, $data['grade_frequencies']['B'] );
 		$this->assertEquals( 0, $data['grade_frequencies']['C'] );
 		$this->assertEquals( 1, $data['grade_frequencies']['D'] );
-		$this->assertEquals( 3, $data['grade_frequencies']['E'] );
+		$this->assertEquals( 4, $data['grade_frequencies']['E'] );
 
 		$field = $data['field_data'][24];
 
@@ -1232,7 +1231,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 	public function test_survey_global_data() {
 		$data = $this->form_data['survey']['global'];
 
-		$this->assertEquals( 6, $data['entry_count'] );
+		$this->assertEquals( 7, $data['entry_count'] );
 
 		/*
          * Test individual likert survey field values
@@ -1386,7 +1385,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 
 		$data = $base['poll']['global'];
 
-		$this->assertEquals( 6, $data['entry_count'] );
+		$this->assertEquals( 7, $data['entry_count'] );
 
 		/*
          * Test first poll field
@@ -1417,5 +1416,83 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( 3, $field['Poll Check First Choice'] );
 		$this->assertEquals( 4, $field['Poll Check Second Choice'] );
 		$this->assertEquals( 3, $field['Poll Check Third Choice'] );
+	}
+
+	/**
+	 * Ensure the empty fields in the $form_data array produce the expected results
+	 *
+	 * @since 4.0
+	 */
+	public function test_empty_fields() {
+		$entry = $this->entries[6];
+		$form_data = GFPDFEntryDetail::lead_detail_grid_array( $this->form, $entry );
+
+		$this->assertEquals( '', $form_data['field'][1] );
+		$this->assertEquals( '', $form_data['field'][2] );
+		$this->assertEquals( '', $form_data['field'][4] );
+		$this->assertEquals( '', $form_data['field'][5] );
+		$this->assertEquals( '', $form_data['field'][6] );
+		$this->assertEquals( '', $form_data['field'][7] );
+		$this->assertEquals( '', $form_data['field'][11]['prefix'] );
+		$this->assertEquals( '', $form_data['field'][11]['first'] );
+		$this->assertEquals( '', $form_data['field'][11]['middle'] );
+		$this->assertEquals( '', $form_data['field'][11]['last'] );
+		$this->assertEquals( '', $form_data['field'][11]['suffix'] );
+		$this->assertEquals( '', $form_data['field'][12] );
+		$this->assertEquals( '', $form_data['field'][13] );
+		$this->assertEquals( '', $form_data['field'][14] );
+		$this->assertEquals( '', $form_data['field'][15]['street'] );
+		$this->assertEquals( '', $form_data['field'][15]['street2'] );
+		$this->assertEquals( '', $form_data['field'][15]['city'] );
+		$this->assertEquals( '', $form_data['field'][15]['state'] );
+		$this->assertEquals( '', $form_data['field'][15]['zip'] );
+		$this->assertEquals( '', $form_data['field'][15]['country'] );
+		$this->assertEquals( '', $form_data['field'][16] );
+		$this->assertEquals( '', $form_data['field'][17] );
+
+		$this->assertTrue( is_array( $form_data['field'][18] ) );
+		$this->assertEquals( 0, sizeof( $form_data['field'][18] ) );
+
+		$this->assertTrue( is_array( $form_data['field'][24] ) );
+		$this->assertEquals( 0, sizeof( $form_data['field'][24] ) );
+
+		$this->assertTrue( is_array( $form_data['field'][42] ) );
+		$this->assertEquals( 0, sizeof( $form_data['field'][42] ) );
+
+		$this->assertTrue( is_array( $form_data['field'][43] ) );
+		$this->assertEquals( 0, sizeof( $form_data['field'][43] ) );
+
+		$this->assertTrue( is_array( $form_data['field'][78] ) );
+		$this->assertEquals( 0, sizeof( $form_data['field'][78] ) );
+
+		$this->assertTrue( is_array( $form_data['field'][81] ) );
+		$this->assertEquals( 0, sizeof( $form_data['field'][81] ) );
+
+		$this->assertEquals( '', $form_data['field'][22] );
+		$this->assertEquals( '', $form_data['field'][23] );
+		$this->assertEquals( '', $form_data['field'][41] );
+		$this->assertEquals( '', $form_data['field'][46] );
+		$this->assertEquals( '', $form_data['field'][47] );
+		$this->assertEquals( '', $form_data['field'][48] );
+		$this->assertEquals( '', $form_data['field'][49] );
+		$this->assertEquals( '', $form_data['field'][28] );
+		$this->assertEquals( '', $form_data['field'][29] );
+		$this->assertEquals( '', $form_data['field'][30] );
+		$this->assertEquals( '', $form_data['field'][32] );
+		$this->assertEquals( '', $form_data['field'][33] );
+		$this->assertEquals( '', $form_data['field'][34] );
+		$this->assertEquals( '', $form_data['field'][51] );
+		$this->assertEquals( '', $form_data['field'][52] );
+		$this->assertEquals( '', $form_data['field'][53] );
+		$this->assertEquals( '', $form_data['field'][54] );
+		$this->assertEquals( '', $form_data['field'][36] );
+
+		$this->assertTrue( is_array( $form_data['field'][38] ) );
+		$this->assertEquals( 0, sizeof( $form_data['field'][38] ) );
+
+		$this->assertEquals( '', $form_data['list'][20] );
+		$this->assertEquals( '', $form_data['list'][21] );
+		$this->assertEquals( '', $form_data['list'][79] );
+		$this->assertEquals( '', $form_data['list'][80] );
 	}
 }

@@ -79,14 +79,14 @@ class Field_Post_Category extends Helper_Abstract_Fields {
 		try {
 			/* check load our class */
 			if ( class_exists( $class ) ) {
-				$this->fieldObject = apply_filters( 'gfpdf_field_class', new $class( $field, $entry, $gform, $misc ), $field, $entry, $form );
-				$this->fieldObject = apply_filters( 'gfpdf_field_class_' . $field->inputType , $this->fieldObject, $field, $entry, $form );
+				$this->fieldObject = apply_filters( 'gfpdf_field_class', new $class( $field, $entry, $gform, $misc ), $field, $entry, $this->form );
+				$this->fieldObject = apply_filters( 'gfpdf_field_class_' . $field->inputType , $this->fieldObject, $field, $entry, $this->form );
 			} else {
 				throw new Exception( 'Class not found' );
 			}
 		} catch ( Exception $e ) {
 			/* Exception thrown. Load generic field loader */
-			$this->fieldObject = apply_filters( 'gfpdf_field_default_class', new Field_Default( $field, $entry, $gform, $misc ), $field, $entry, $form );
+			$this->fieldObject = apply_filters( 'gfpdf_field_default_class', new Field_Default( $field, $entry, $gform, $misc ), $field, $entry, $this->form );
 		}
 
 		/* force the fieldObject value cache */
@@ -123,8 +123,8 @@ class Field_Post_Category extends Helper_Abstract_Fields {
 		if ( ! isset( $field_value[0] ) ) {
 
 			/* Set up our basic values */
-			$value['value'] = ( isset( $field_value['value'] ) ) ? $field_value['value'] : '';
-			$value['label'] = ( isset( $field_value['label'] ) ) ? $field_value['label'] : '';
+			$value['value'] = ( isset( $field_value['value'] ) && ! is_array( $field_value['value'] ) ) ? $field_value['value'] : '';
+			$value['label'] = ( isset( $field_value['label'] ) && ! is_array( $field_value['label'] ) ) ? $field_value['label'] : '';
 
 		} else { /* If Checkboxes or Multiselects */
 

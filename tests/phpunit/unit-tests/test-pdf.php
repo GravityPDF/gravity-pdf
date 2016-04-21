@@ -1254,6 +1254,10 @@ class Test_PDF extends WP_UnitTestCase {
 			38 => $namespace . 'Field_Product',
 			39 => $namespace . 'Field_Product',
 			40 => $namespace . 'Field_Product',
+			41 => $namespace . 'Field_Poll',
+			42 => $namespace . 'Field_Quiz',
+			78 => $namespace . 'Field_Post_Custom_Field',
+			81 => $namespace . 'Field_Post_Custom_Field',
 		);
 
 		foreach ( $form['fields'] as $field ) {

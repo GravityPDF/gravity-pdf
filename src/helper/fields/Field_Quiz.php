@@ -113,18 +113,37 @@ class Field_Quiz extends Helper_Abstract_Fields {
 	 * @since 4.0
 	 */
 	public function value() {
-		$value = $this->get_value();
 
-		foreach ( $this->field->choices as $choice ) {
-			if ( $choice['value'] == $value ) {
-				return array(
-					'text'      => $choice['text'],
-					'isCorrect' => $choice['gquizIsCorrect'],
-					'weight'    => ( isset( $choice['gquizWeight'] ) ) ? $choice['gquizWeight'] : '',
-				);
+		/* Get the field value */
+		$value = $this->get_value();
+		$value = ( ! is_array( $value ) ) ? array( $value ) : $value;
+
+		$formatted = array();
+
+		/* Loop through our results */
+		foreach( $value as $item ) {
+			foreach ( $this->field->choices as $choice ) {
+				if ( $choice['value'] == $item ) {
+					$formatted[] = array(
+						'text'      => $choice['text'],
+						'isCorrect' => $choice['gquizIsCorrect'],
+						'weight'    => ( isset( $choice['gquizWeight'] ) ) ? $choice['gquizWeight'] : '',
+					);
+				}
 			}
 		}
 
-		return array( 'text' => '', 'isCorrect' => '', 'weight' => '' );
+		/* Ensure results are formatted to v3 expectations */
+		if( 1 === sizeof( $formatted ) ) {
+			return $formatted[0];
+		}
+
+		/* Return our results, if we have any */
+		if( 0 < sizeof( $formatted ) ) {
+			return $formatted;
+		}
+
+		/* Return the default expected structure */
+		return array();
 	}
 }

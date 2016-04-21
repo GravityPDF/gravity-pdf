@@ -86,10 +86,20 @@ class Field_Fileupload extends Helper_Abstract_Fields {
 		$data  = array();
 		$label = GFFormsModel::get_label( $this->field );
 		$value = $this->value();
+		$field_id = $this->field->id;
+
+		/* Backwards compatibility support for v3 */
+		if ( 0 === sizeof( $value ) ) {
+			$data[ $field_id . '.' . $label ] = array();
+			$data[ $field_id ]                = array();
+			$data[ $label ]                   = array();
+
+			/* Path Format */
+			$data[ $field_id . '_path' ]                = array();
+			$data[ $field_id . '.' . $label . '_path' ] = array();
+		}
 
 		foreach ( $value as $image ) {
-
-			$field_id = (int) $this->field->id;
 
 			$data[ $field_id . '.' . $label ][] = $image;
 			$data[ $field_id ][]                = $image;
