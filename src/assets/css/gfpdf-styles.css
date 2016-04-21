@@ -292,12 +292,15 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
   margin: 0 8px 20px 0;
 }
 
+#pdfextended-settings .postbox h3.hndle {
+    padding-bottom: 12px;
+}
+
 #pdfextended-settings .postbox .hndle, #pdfextended-settings .widget .widget-top {
   cursor: default;
 }
 
 #pdfextended-settings .postbox .handlediv,
-#pdfextended-settings #row-1-sortables .postbox h3,
 #pdfextended-settings #pdf_support_hours h3 {
   display: none;
 }
@@ -305,6 +308,7 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
 #pdfextended-settings .about-wrap, #pdfextended-settings .about-wrap .about-text {
   max-width: none;
   min-height: 0;
+  line-height: 1.8em;
 }
 
 #pdfextended-settings .about-wrap h1, #pdfextended-settings .about-wrap .about-text, #pdfextended-settings .about-wrap #search-knowledgebase {
@@ -347,17 +351,6 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
   margin-bottom: 8px;
 }
 
-
-#pdfextended-settings #dashboard_primary .rss-widget ul li {
-  padding-bottom: 8px;
-  border-bottom: 1px solid #EEE;
-}
-
-#pdfextended-settings #dashboard_primary .rss-widget ul li:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
 #pdfextended-settings #dashboard_primary .rss-widget .rssSummary .continue-reading {
   display: none;
 }
@@ -367,58 +360,58 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
   margin: 0;
 }
 
-#pdfextended-settings .help-container {
-  margin: 0 auto;
+#pdfextended-settings .rss-widget ul li {
+    padding: 6px 0;
+    margin: 0;
+    border-bottom: 1px dotted #CCC;
 }
 
-#pdfextended-settings .help-container .postbox {
-  width: 100%;
-  box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  min-height: 250px;
+#pdfextended-settings .rss-widget ul li a {
+    font-size: 16px;
 }
 
-#pdfextended-settings #row-1-sortables .postbox,
-#pdfextended-settings #pdf_support_hours {
-  text-align: center;
-  padding: 15px;
+#pdfextended-settings .rss-widget ul li:first-child,
+#pdfextended-settings .rss-widget ul li:last-child {
+    border-bottom: none;
 }
 
-#pdfextended-settings #pdf_knowledgebase i {
-  color: #e74c3c;
+#pdfextended-settings .about-wrap .about-text-disclaimer {
+    font-size: 13px;
 }
 
-#pdfextended-settings #pdf_support_forum i {
-  color: #0f6ca0;
+#pdfextended-settings .about-wrap #dashboard-widgets .postbox-container a {
+    background: #f6f6f6 none repeat scroll 0 0;
+    border: 3px solid #eee;
+    border-radius: 10px;
+    color: inherit;
+    display: block;
+    min-height: 300px;
+    padding: 15px;
+    font-size: 16px;
+    text-decoration: none;
+    margin: 0 30px 30px 0;
+    transition: all 0.5s ease 0s;
 }
 
-#pdfextended-settings #pdf_direct i {
-  color: #1f1f1f;
+#pdfextended-settings .about-wrap #dashboard-widgets .postbox-container a:hover {
+    border: 3px solid #076aa4;
 }
 
-#pdfextended-settings #pdf_support_hours i {
-  color: #54a208;
+#pdfextended-settings .about-wrap #dashboard-widgets .postbox-container a span {
+    font-weight: bold;
 }
 
-#pdfextended-settings #row-1-sortables h4,
-#pdfextended-settings #pdf_support_hours h4 {
-  font-size: 18px;
-  line-height: 24px;
-  margin: 16px 0;
+#pdfextended-settings .about-wrap .center {
+    text-align: center;
 }
 
-#pdfextended-settings .help-container {
-  clear: both;
+#pdfextended-settings .about-wrap .button.button-large {
+    height: 35px;
+    line-height: 33px;
+    padding: 0 17px 9px;
 }
 
-#pdfextended-settings #row-2-sortables .rsswidget {
-  font-size: 13px;
-}
 
-#pdfextended-settings #row-2-sortables li {
-  list-style: inside disc;
-}
 
 /**
  * System status icons
@@ -656,6 +649,10 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
 	#gfpdf-mascot-container {
 		padding-bottom: 120px !important;
 	}
+
+    #pdfextended-settings .about-wrap #dashboard-widgets .postbox-container a {
+        min-height: 250px;
+    }
 }
 
 @media only screen and (min-width: 900px) {
@@ -697,6 +694,10 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
 		float: left;
 		width: 80%;
 	  }
+
+    #pdfextended-settings .about-wrap #dashboard-widgets .postbox-container a {
+        min-height: 180px;
+    }
 }
 
 
@@ -704,13 +705,13 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
 	/**
 	 * Help and Support
 	 */
-	#pdfextended-settings .about-wrap h1, #pdfextended-settings .about-wrap .about-text, #pdfextended-settings .about-wrap #search-knowledgebase,
-	#pdfextended-settings  #support-wrapper {
-	   margin-right: 200px;
-	}
 
 	#pdfextended-settings .about-wrap #search-knowledgebase input,
 	#pdfextended-settings #search-results, #pdfextended-settings .help-container{
 		width: 75%;
 	}
+
+    #pdfextended-settings .about-wrap #dashboard-widgets .postbox-container a {
+        min-height: 90px;
+    }
 }
