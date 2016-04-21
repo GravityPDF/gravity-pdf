@@ -127,6 +127,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			'notifications' => __( 'Notifications', 'gravity-forms-pdf-extended' ),
 		);
 
+		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_pdf_list_columns/ for more details about this filter */
 		$columns = apply_filters( 'gfpdf_pdf_list_columns', $columns );
 
 		return $columns;
@@ -219,6 +220,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$action = 'gfpdf_pdf_list_column_' . $column;
 
 		if( has_action( $action ) ) {
+			/* See https://gpdfv4.xyz/documentation/v4/gfpdf_pdf_list_column_id/ for more details about this action */
 			do_action( $action, $item );
 		} else {
 			echo rgar( $item, $column );
@@ -341,6 +343,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			'delete'    => '<a title="' . __( 'Delete this PDF', 'gravity-forms-pdf-extended' ) . '" class="submitdelete" data-id="' . $item['id'] . '" data-nonce="' . $delete_nonce . '" data-fid="' . $form_id . '">' . __( 'Delete', 'gravity-forms-pdf-extended' ) . '</a>',
 		);
 
+		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_pdf_actions/ for more details about this filter */
 		$actions = apply_filters( 'gfpdf_pdf_actions', $actions, $item );
 
 		?>

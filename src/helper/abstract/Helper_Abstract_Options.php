@@ -316,6 +316,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$settings = ( is_array( get_option( 'gfpdf_settings' ) ) ) ? get_option( 'gfpdf_settings' ) : array();
 		}
 
+		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_get_settings/ for more details about this filter */
 		return apply_filters( 'gfpdf_get_settings', $settings, $is_temp );
 	}
 
@@ -440,6 +441,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$pdf = ! empty( $gfpdf_options[ $pdf_id ] ) ? $gfpdf_options[ $pdf_id ] : new WP_Error( 'invalid_pdf_id', __( 'You must pass in a valid PDF ID', 'gravity-forms-pdf-extended' ) );
 
 			if ( ! is_wp_error( $pdf ) ) {
+				/* See https://gpdfv4.xyz/documentation/v4/gfpdf_pdf_config/ for more details about these filters */
 				$pdf = apply_filters( 'gfpdf_pdf_config', $pdf, $form_id );
 				$pdf = apply_filters( 'gfpdf_pdf_config_' . $form_id, $pdf, $form_id );
 
@@ -481,7 +483,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$pdf['id']     = ( isset( $pdf['id'] ) ) ? $pdf['id'] : uniqid();
 			$pdf['active'] = ( isset( $pdf['active'] ) ) ? $pdf['active'] : true;
 
-			/* Let's let devs alter that value coming in */
+			/* See https://gpdfv4.xyz/documentation/v4/gfpdf_form_add_pdf/ for more details about these filters */
 			$pdf = apply_filters( 'gfpdf_form_add_pdf', $pdf, $form_id );
 			$pdf = apply_filters( 'gfpdf_form_add_pdf_' . $form_id, $pdf, $form_id );
 
@@ -548,7 +550,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 				$this->log->addNotice( 'Trigger Filters.' );
 
-				/* Let's let devs alter that value coming in */
+				/* See https://gpdfv4.xyz/documentation/v4/gfpdf_form_update_pdf/ for more details about these filters */
 				$pdf = apply_filters( 'gfpdf_form_update_pdf', $pdf, $form_id, $pdf_id );
 				$pdf = apply_filters( 'gfpdf_form_update_pdf_' . $form_id, $pdf, $form_id, $pdf_id );
 			}
@@ -672,9 +674,12 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$gfpdf_options = $this->settings;
 
 		$value = ( ! empty( $gfpdf_options[ $key ] ) ) ? $gfpdf_options[ $key ] : $default;
-		$value = apply_filters( 'gfpdf_get_option', $value, $key, $default );
 
-		return apply_filters( 'gfpdf_get_option_' . $key, $value, $key, $default );
+		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_get_option/ for more details about these filters */
+		$value = apply_filters( 'gfpdf_get_option', $value, $key, $default );
+		$value = apply_filters( 'gfpdf_get_option_' . $key, $value, $key, $default );
+
+		return $value;
 	}
 
 	/**
@@ -711,7 +716,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		/* First let's grab the current settings */
 		$options = get_option( 'gfpdf_settings' );
 
-		/* Let's let devs alter that value coming in */
+		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_update_option/ for more details about these filters */
 		$value = apply_filters( 'gfpdf_update_option', $value, $key );
 		$value = apply_filters( 'gfpdf_update_option_' . $key, $value, $key );
 
@@ -796,8 +801,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			ksort( $val );
 		}
 
+		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_capabilities/ for more details about this filter */
 		return apply_filters( 'gfpdf_capabilities', $capabilities );
-
 	}
 
 	/**
@@ -1322,11 +1327,19 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			/* Get the setting type (checkbox, select, etc) */
 			$type = isset( $settings[ $key ]['type'] ) ? $settings[ $key ]['type'] : false;
 
-			/* General filter */
+			/*
+			 * General filter
+			 *
+			 * See https://gpdfv4.xyz/documentation/v4/gfpdf_settings_sanitize/ for more details about this filter
+			 */
 			$input[ $key ] = apply_filters( 'gfpdf_settings_sanitize', $input[ $key ], $key, $input, $settings[ $key ] );
 
 			if ( $type ) {
-				/* Field type specific filter */
+				/*
+				 * Field type specific filter
+				 *
+				 * See https://gpdfv4.xyz/documentation/v4/gfpdf_settings_sanitize/ for more details about this filter
+				 */
 				$input[ $key ] = apply_filters( 'gfpdf_settings_sanitize_' . $type, $value, $key, $input, $settings[ $key ] );
 			}
 		}

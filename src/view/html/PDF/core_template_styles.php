@@ -50,7 +50,10 @@ $contrast                   = $gfpdf->misc->get_background_and_border_contrast( 
 $contrast_background_color  = $contrast['background'];
 $contrast_border_color      = $contrast['border'];
 
+/* See https://gpdfv4.xyz/documentation/v4/gfpdf_include_list_styles/ for more details about this filter */
 $include_list_styles        = apply_filters( 'gfpdf_include_list_styles', true, $settings );
+
+/* See https://gpdfv4.xyz/documentation/v4/gfpdf_include_product_styles/ for more details about this filter */
 $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', true, $settings );
 
 ?>
@@ -223,4 +226,7 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
 	</htmlpagefooter>
 <?php endif; ?>
 
-<?php do_action( 'gfpdf_core_template' ); ?>
+<?php
+/* See https://gpdfv4.xyz/documentation/v4/gfpdf_core_template/ for more details about this hook */
+do_action( 'gfpdf_core_template' );
+?>

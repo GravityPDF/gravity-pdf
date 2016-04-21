@@ -348,6 +348,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 			return $this->model->install_templates();
 		}
 
+		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_tool_tab_actions/ for more details about this action */
 		do_action( 'gfpdf_tool_tab_actions', $settings );
 	}
 

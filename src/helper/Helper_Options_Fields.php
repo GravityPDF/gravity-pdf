@@ -75,7 +75,11 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 		 */
 		$gfpdf_settings = array(
 
-			/** General Settings */
+			/*
+			 * General Settings
+			 *
+			 * See https://gpdfv4.xyz/documentation/v4/gfpdf_settings_general/ for more details about this filter
+			 */
 			'general' => apply_filters( 'gfpdf_settings_general',
 				array(
 					'default_pdf_size' => array(
@@ -103,7 +107,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'default_template' => array(
 						'id'         => 'default_template',
 						'name'       => __( 'Default Template', 'gravity-forms-pdf-extended' ),
-						'desc'       => sprintf( __( 'Choose an existing template or purchased more %sfrom our theme shop%s. You can also %sbuild your own%s or %shire us%s to create a custom solution.', 'gravity-forms-pdf-extended' ), '<a href="#">', '</a>', '<a href="#">', '</a>', '<a href="#">', '</a>' ),
+						'desc'       => sprintf( __( 'Choose an existing template or purchased more %sfrom our theme shop%s. You can also %sbuild your own%s or %shire us%s to create a custom solution.', 'gravity-forms-pdf-extended' ), '<a href="https://gpdfv4.xyz/shop/">', '</a>', '<a href="https://gpdfv4.xyz/documentation/v4/developer-start-customising/">', '</a>', '<a href="https://gpdfv4.xyz/integration-services/">', '</a>' ),
 						'type'       => 'select',
 						'options'    => $this->get_templates(),
 						'std'        => 'zadani',
@@ -182,6 +186,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				)
 			),
 
+			/* See https://gpdfv4.xyz/documentation/v4/gfpdf_settings_general_security/ for more details about this filter */
 			'general_security' => apply_filters( 'gfpdf_settings_general_security',
 				array(
 					'admin_capabilities' => array(
@@ -225,22 +230,27 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				)
 			),
 
-			/** Extension Settings */
-			/* TODO: Add documentation for this filter */
+			/* Extension Settings */
 			'extensions' => apply_filters( 'gfpdf_settings_extensions',
 				array()
 			),
-			/* TODO: Add documentation for this filter */
+
+			/* License Settings */
 			'licenses' => apply_filters( 'gfpdf_settings_licenses',
 				array()
 			),
 
+			/*
+			 * Tools Settings
+			 *
+			 * See https://gpdfv4.xyz/documentation/v4/gfpdf_settings_tools/ for more details about this filter
+			 */
 			'tools' => apply_filters( 'gfpdf_settings_tools',
 				array(
 					'setup_templates' => array(
 						'id'      => 'setup_templates',
 						'name'    => __( 'Setup Custom Templates', 'gravity-forms-pdf-extended' ),
-						'desc'    => sprintf( __( 'Setup environment for building custom templates. %sSee docs to get started%s.', 'gravity-forms-pdf-extended' ), '<a href="#">', '</a>' ),
+						'desc'    => sprintf( __( 'Setup environment for building custom templates. %sSee docs to get started%s.', 'gravity-forms-pdf-extended' ), '<a href="https://gpdfv4.xyz/documentation/v4/developer-first-custom-pdf/">', '</a>' ),
 						'type'    => 'button',
 						'std'     => __( 'Run Setup', 'gravity-forms-pdf-extended' ),
 						'options' => 'copy',
@@ -259,7 +269,11 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				)
 			),
 
-			/* Form (PDF) Settings */
+			/*
+			 * Form (PDF) Settings
+			 *
+			 * See https://gpdfv4.xyz/documentation/v4/gfpdf_form_settings/ for more details about this filter
+			 */
 			'form_settings' => apply_filters( 'gfpdf_form_settings',
 				array(
 					'name' => array(
@@ -273,7 +287,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'template' => array(
 						'id'         => 'template',
 						'name'       => __( 'Template', 'gravity-forms-pdf-extended' ),
-						'desc'       => sprintf( __( 'Choose an existing template or purchased more %sfrom our theme shop%s. You can also %sbuild your own%s or %shire us%s to create a custom solution.', 'gravity-forms-pdf-extended' ), '<a href="#">', '</a>', '<a href="#">', '</a>', '<a href="#">', '</a>' ),
+						'desc'       => sprintf( __( 'Choose an existing template or purchased more %sfrom our theme shop%s. You can also %sbuild your own%s or %shire us%s to create a custom solution.', 'gravity-forms-pdf-extended' ), '<a href="https://gpdfv4.xyz/shop/">', '</a>', '<a href="https://gpdfv4.xyz/documentation/v4/developer-start-customising/">', '</a>', '<a href="https://gpdfv4.xyz/integration-services/">', '</a>' ),
 						'type'       => 'select',
 						'options'    => $this->get_templates(),
 						'std'        => $this->get_option( 'default_template', 'zadani' ),
@@ -324,7 +338,11 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				)
 			),
 
-			/* Form (PDF) Settings Appearance */
+			/*
+			 * Form (PDF) Settings Appearance
+			 *
+			 * See https://gpdfv4.xyz/documentation/v4/gfpdf_form_settings_appearance/ for more details about this filter
+			 */
 			'form_settings_appearance' => apply_filters( 'gfpdf_form_settings_appearance',
 				array(
 					'pdf_size' => array(
@@ -417,13 +435,17 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			 * This filter allows templates to add custom options for use specific to that template
 			 * Gravity PDF autoloads a PHP template file if it exists and loads it up with this filter
 			 *
-			 * @todo  add link to documentation on doing this
+			 * See https://gpdfv4.xyz/documentation/v4/developer-template-configuration-and-image/#template-configuration for more details
 			 */
 			'form_settings_custom_appearance' => apply_filters( 'gfpdf_form_settings_custom_appearance',
 				array()
 			),
 
-			/* Form (PDF) Settings Advanced */
+			/*
+			 * Form (PDF) Settings Advanced
+			 *
+			 * See https://gpdfv4.xyz/documentation/v4/gfpdf_form_settings_advanced/ for more details about this filter
+			 */
 			'form_settings_advanced' => apply_filters( 'gfpdf_form_settings_advanced',
 				array(
 					'format' => array(
@@ -508,7 +530,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'public_access' => array(
 						'id'      => 'public_access',
 						'name'    => __( 'Enable Public Access', 'gravity-forms-pdf-extended' ),
-						'desc'    => sprintf( __( 'Allow %sanyone%s with a direct link to access the PDF. %sThis disables all %ssecurity protocols%s for this PDF.%s ', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>', '<em>', '<a href="#">', '</a>', '</em>' ),
+						'desc'    => sprintf( __( 'Allow %sanyone%s with a direct link to access the PDF. %sThis disables all %ssecurity protocols%s for this PDF.%s ', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>', '<em>', '<a href="https://gpdfv4.xyz/documentation/v4/user-pdf-security/">', '</a>', '</em>' ),
 						'type'    => 'radio',
 						'options' => array(
 							'Yes' => __( 'Yes', 'gravity-forms-pdf-extended' ),
@@ -534,6 +556,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			),
 		);
 
+		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_registered_fields/ for more details about this filter */
 		return apply_filters( 'gfpdf_registered_fields', $gfpdf_settings );
 	}
 

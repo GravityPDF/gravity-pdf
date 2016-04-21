@@ -209,7 +209,11 @@ abstract class Helper_Abstract_Fields {
 			GFCache::set( 'GFFormsModel::get_lead_field_value_' . $this->entry['id'] . '_' . $this->field->id, false, false, 0 );
 		}
 
-		/* get the GF Value */
+		/*
+		 * Get the Gravity Forms field value
+		 *
+		 * See https://gpdfv4.xyz/documentation/v4/gfpdf_field_value/ for more details about this filter
+		 */
 		return apply_filters( 'gfpdf_field_value', GFFormsModel::get_lead_field_value( $this->entry, $this->field ), $this->field, $this->entry );
 	}
 
@@ -293,6 +297,7 @@ abstract class Helper_Abstract_Fields {
            . '</div>'
         . '</div>';
 
+		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_field_html_value/ for more details about this filter */
 		return apply_filters( 'gfpdf_field_html_value', $html, $value, $show_label, $label, $this->field, $this->form, $this->entry );
 	}
 

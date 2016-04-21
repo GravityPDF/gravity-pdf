@@ -79,6 +79,8 @@ class Field_Post_Category extends Helper_Abstract_Fields {
 		try {
 			/* check load our class */
 			if ( class_exists( $class ) ) {
+
+				/* See https://gpdfv4.xyz/documentation/v4/gfpdf_field_class/ for more details about these filters */
 				$this->fieldObject = apply_filters( 'gfpdf_field_class', new $class( $field, $entry, $gform, $misc ), $field, $entry, $this->form );
 				$this->fieldObject = apply_filters( 'gfpdf_field_class_' . $field->inputType , $this->fieldObject, $field, $entry, $this->form );
 			} else {
