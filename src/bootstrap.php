@@ -231,7 +231,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->add_actions();
 		$this->add_filters();
 
-		/* Trigger fully loaded action */
+		/*
+		 * Trigger action to signify Gravity PDF is now loaded
+		 *
+		 * See https://gpdfv4.xyz/documentation/v4/gfpdf_fully_loaded/ for more details about this action
+		 */
 		do_action( 'gfpdf_fully_loaded', $this );
 
 	}
@@ -622,6 +626,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$items = array_merge( $default_scripts, $items );
 		}
 
+		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_gf_noconflict_scripts/ for more details about this filter */
 		return apply_filters( 'gfpdf_gf_noconflict_scripts', $items );
 	}
 
@@ -660,6 +665,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$items = array_merge( $default_styles, $items );
 		}
 
+		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_gf_noconflict_styles/ for more details about this filter */
 		return apply_filters( 'gfpdf_gf_noconflict_styles', $items );
 	}
 

@@ -8,7 +8,6 @@
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  *
- * @todo Include correct link to the documentation about the tmp directory filter
  */
 
 /* Exit if accessed directly */
@@ -72,7 +71,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<?php if ( $args['memory'] < 128 && $args['memory'] !== -1 ): ?>
 				<span class="gf_settings_description">
-                    <?php echo sprintf( __( 'We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. %sFind out how to increase this limit%s.', 'gravity-forms-pdf-extended' ), '<br /><a href="#">', '</a>' ); /* @todo add link to docs */ ?>
+                    <?php echo sprintf( __( 'We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. %sFind out how to increase this limit%s.', 'gravity-forms-pdf-extended' ), '<br /><a href="https://gpdfv4.xyz/documentation/v4/user-increasing-memory-limit/">', '</a>' ); ?>
                 </span>
 			<?php endif; ?>
 		</td>
@@ -120,15 +119,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<noscript><?php _e( 'You need JavaScript enabled to perform this check.', 'gravity-forms-pdf-extended' ); ?></noscript>
 
 				<div id="gfpdf-direct-pdf-check-protected" style="display: none">
-					Protected <span class="fa fa-check-circle"></span>
+					<?php _e( 'Protected', 'gravity-forms-pdf-extended' ); ?> <span class="fa fa-check-circle"></span>
 				</div>
 
 				<div id="gfpdf-direct-pdf-check-unprotected" style="display: none">
-					<strong>Unprotected</strong> <span class="fa fa-times-circle"></span>
+					<strong><?php _e( 'Unprotected', 'gravity-forms-pdf-extended' ); ?></strong> <span class="fa fa-times-circle"></span>
 
 					<span class="gf_settings_description">
-						We've detected the PDFs saved in Gravity PDF's <code>tmp</code> directory can be publically accessed.<br>
-						We recommend you use our <code>gfpdf_tmp_location</code> filter to <a href="#">move the directory outside your public website directory</a>.
+						<?php printf( __( "We've detected the PDFs saved in Gravity PDF's %stmp%s directory can be publically accessed.", 'gravity-forms-pdf-extended' ), '<code>', '</code>' ); ?><br>
+						<?php printf( __( 'We recommend you use our %sgfpdf_tmp_location%s filter to %smove the folder outside your public website directory%s.', 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<a href="https://gpdfv4.xyz/documentation/v4/gfpdf_tmp_location/">', '</a>' ); ?>
 					</span>
 				</div>
 			</div>

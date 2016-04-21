@@ -408,7 +408,11 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 					}
 				} else {
 
-					/* If string, sanitize and add error if appropriate */
+					/*
+					 * If string, sanitize and add error if appropriate
+					 *
+					 * See https://gpdfv4.xyz/documentation/v4/gfpdf_form_settings_sanitize/ for more details about this filter
+					 */
 					$value = apply_filters( 'gfpdf_form_settings_sanitize_text', $value, $key );
 					if ( empty( $value ) ) {
 						$field['class'] .= ' gfield_error';
@@ -477,11 +481,19 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				if ( isset( $settings[ $s ][ $key ] ) ) {
 					$type = isset( $settings[ $s ][ $key ]['type'] ) ? $settings[ $s ][ $key ]['type'] : false;
 
-					/* General filter */
+					/*
+					 * General filter
+					 *
+					 * See https://gpdfv4.xyz/documentation/v4/gfpdf_form_settings_sanitize/ for more details about this filter
+					 */
 					$input[ $key ] = apply_filters( 'gfpdf_form_settings_sanitize', $input[ $key ], $key, $input, $settings[ $s ][ $key ] );
 
 					if ( $type ) {
-						/* Field type specific filter */
+						/*
+						 * Field type specific filter
+						 *
+						 * See https://gpdfv4.xyz/documentation/v4/gfpdf_form_settings_sanitize/ for more details about this filter
+						 */
 						$input[ $key ] = apply_filters( 'gfpdf_form_settings_sanitize_' . $type, $input[ $key ], $key, $input, $settings[ $s ][ $key ] );
 					}
 				}
@@ -638,6 +650,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			'first_footer'     => array( $this->options, 'get_first_page_footer_field' ),
 		);
 
+		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_core_template_fields_list/ for more details about this filter */
 		$core_fields = apply_filters( 'gfpdf_core_template_fields_list', $core_fields, $template_settings, $class );
 
 		foreach ( $core_fields as $id => $method ) {

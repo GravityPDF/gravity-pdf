@@ -137,6 +137,7 @@ class Model_Install extends Helper_Abstract_Model {
 		update_option( 'gfpdf_is_installed', true );
 		$this->data->is_installed = true;
 
+		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_plugin_installed/ for more details about this action */
 		do_action( 'gfpdf_plugin_installed' );
 	}
 
@@ -159,6 +160,7 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @since  4.0
 	 */
 	public function get_working_directory() {
+		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_working_folder_name/ for more details about this filter */
 		return apply_filters( 'gfpdf_working_folder_name', 'PDF_EXTENDED_TEMPLATES' );
 	}
 
@@ -202,10 +204,17 @@ class Model_Install extends Helper_Abstract_Model {
 		$this->data->template_location_url = apply_filters( 'gfpdfe_template_location_uri', $template_url, $working_folder, $upload_dir_url );
 
 		/* Allow user to change directory location(s) */
+
+		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_template_location/ for more details about this filter */
 		$this->data->template_location     = apply_filters( 'gfpdf_template_location', $this->data->template_location, $working_folder, $upload_dir ); /* needs to be accessible from the web */
+
+		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_template_location_uri/ for more details about this filter */
 		$this->data->template_location_url = apply_filters( 'gfpdf_template_location_uri', $this->data->template_location_url, $working_folder, $upload_dir_url ); /* needs to be accessible from the web */
 
+		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_font_location/ for more details about this filter */
 		$this->data->template_font_location = apply_filters( 'gfpdf_font_location', $this->data->template_location . 'fonts/', $working_folder, $upload_dir ); /* can be in a directory not accessible via the web */
+
+		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_tmp_location/ for more details about this filter */
 		$this->data->template_tmp_location  = apply_filters( 'gfpdf_tmp_location', $this->data->template_location . 'tmp/', $working_folder, $upload_dir_url ); /* encouraged to move this to a directory not accessible via the web */
 
 		$this->log->addNotice( 'Template Locations', array(
@@ -242,7 +251,11 @@ class Model_Install extends Helper_Abstract_Model {
 			 */
 
 			/* Global filter */
+
+			/* See https://gpdfv4.xyz/documentation/v4/gfpdf_multisite_template_location/ for more details about this filter */
 			$this->data->multisite_template_location     = apply_filters( 'gfpdf_multisite_template_location', $template_dir, $working_folder, $upload_dir, $blog_id );
+
+			/* See https://gpdfv4.xyz/documentation/v4/gfpdf_multisite_template_location_uri/ for more details about this filter */
 			$this->data->multisite_template_location_url = apply_filters( 'gfpdf_multisite_template_location_uri', $template_url, $working_folder, $upload_dir_url, $blog_id );
 
 			/* Per-blog filters */

@@ -107,21 +107,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<h3><?php _e( 'Simple PDF Download Links', 'gravity-forms-pdf-extended' ); ?></h3>
 
-			<p><?php printf( __( 'The %s[gravitypdf]%s shortcode allows you to %seasily place a PDF download link%s on any of the Gravity Forms Confirmation types.', 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<a href="#">', '</a>' ); ?></p>
+			<p><?php printf( __( 'The %s[gravitypdf]%s shortcode allows you to %seasily place a PDF download link%s on any of the Gravity Forms Confirmation types.', 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<a href="https://gpdfv4.xyz/documentation/v4/user-shortcodes/">', '</a>' ); ?></p>
 		</div>
 		<div class="col">
 			<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/welcome-notification-conditional.png' ); ?>">
 
 			<h3><?php _e( 'Automated PDF Emails', 'gravity-forms-pdf-extended' ); ?></h3>
 
-			<p><?php printf( __( 'Select a Gravity Form Notification and your PDF %swill automatically be sent as an attachment%s. Powerful conditional logic can also be used to determine if a PDF will be included.', 'gravity-forms-pdf-extended' ), '<a href="#">', '</a>' ); ?></p>
+			<p><?php _e( 'Select a Gravity Form Notification and your PDF will automatically be sent as an attachment. Powerful conditional logic can also be used to determine if a PDF will be included.', 'gravity-forms-pdf-extended' ); ?></p>
 		</div>
 		<div class="col last-feature">
 			<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/welcome-manage-fonts.png' ); ?>">
 
 			<h3><?php _e( 'Custom Fonts', 'gravity-forms-pdf-extended' ); ?></h3>
 
-			<p><?php printf( __( 'Make your documents stand out by including your favourite fonts with our %ssimple font manager%s.', 'gravity-forms-pdf-extended' ), '<a href="#">', '</a>' ); ?></p>
+			<p><?php printf( __( 'Make your documents stand out by including your favourite fonts with our %ssimple font manager%s.', 'gravity-forms-pdf-extended' ), '<a href="https://gpdfv4.xyz/documentation/v4/user-custom-fonts/">', '</a>' ); ?></p>
 		</div>
 	</div>
 

@@ -223,6 +223,7 @@ class Helper_PDF {
 		$html = apply_filters( 'gfpdfe_pdf_template', $html, $form['id'], $this->entry['id'], $this->settings ); /* Backwards compat */
 		$html = apply_filters( 'gfpdfe_pdf_template_' . $form['id'], $html, $this->entry['id'], $this->settings ); /* Backwards compat */
 
+		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_pdf_html_output/ for more details about these filters */
 		$html = apply_filters( 'gfpdf_pdf_html_output', $html, $form, $this->entry, $this->settings, $this );
 		$html = apply_filters( 'gfpdf_pdf_html_output_' . $form['id'], $html, $this->gform, $this->entry, $this->settings, $this );
 
@@ -248,7 +249,11 @@ class Helper_PDF {
 
 		$form = $this->gform->get_form( $this->entry['form_id'] );
 
-		/* allow $mpdf object class to be modified */
+		/*
+		 * Allow $mpdf object class to be modified
+		 *
+		 * See https://gpdfv4.xyz/documentation/v4/gfpdf_mpdf_class/ for more details about this filter
+		 */
 		$this->mpdf = apply_filters( 'gfpdf_mpdf_class', $this->mpdf, $form, $this->entry, $this->settings, $this );
 
 		/* depreciated backwards compatibility filters */
@@ -593,6 +598,8 @@ class Helper_PDF {
 		/**
 		 * Allow $mpdf object class to be modified
 		 * Note: in some circumstances using WriteHTML() during this filter will break headers/footers
+		 *
+		 * See https://gpdfv4.xyz/documentation/v4/gfpdf_mpdf_init_class/ for more details about this filter
 		 */
 		$this->mpdf = apply_filters( 'gfpdf_mpdf_init_class', $this->mpdf, $form, $this->entry, $this->settings, $this );
 	}
