@@ -846,16 +846,10 @@
 
 
 		/**
-		 *
-		 *
-		 *
-		 *
-		 *
-		 *
-		 *
-		 *
-		 *
-		 *
+		 * Our Documentation Search API
+		 * We'll add a search bar and output the results of the search
+		 * from our API to assist users with our software.
+		 * @since 4.0
 		 */
 		
 		var help  = {}; // create namespace for our app
@@ -965,7 +959,7 @@
 				var $container = this.$el.find('.inside ul');
 
 				$container.html(this.template({
-					collection: this.collection.first(6),
+					collection: this.collection.toJSON(),
 					url: this.url,
 				}));
 
@@ -1002,7 +996,7 @@
 			template: '#GravityPDFSearchResultsDocumentation',
 
 			initialize: function(options) {
-				this.url = 'https://developer.gravitypdf.com/wp-json/posts/?type=docs';
+				this.url = 'https://gpdfv4.xyz/wp-json/wp/v2/v4_docs/';
 				this.s   = options.s;
 				this.render();
 			},
@@ -1016,7 +1010,7 @@
 
 				/* set up view search params */
 				var s   = encodeURIComponent(this.s);
-				var url = this.url + '&s=' + s;
+				var url = this.url + '?search=' + s;
 
 				/* initialise our collection */
 				this.collection = new help.SearchCollection([], {

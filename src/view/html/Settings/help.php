@@ -41,9 +41,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div id="pdfextended-settings">
 	<div class="wrap about-wrap">
-		<h1><?php _e( 'Getting Help With Gravity PDF', 'pdfexended' ); ?></h1>
+		<h1><?php _e( 'Getting Help With Gravity PDF', 'gravity-forms-pdf-extended' ); ?></h1>
 
-		<div class="about-text"><?php _e( 'This is your portal to find quality help, support and documentation for Gravity PDF', 'gravity-forms-pdf-extended' ); ?></div>
+		<div class="about-text">
+			<?php _e( 'This is your portal to find quality help, support and documentation for Gravity PDF', 'gravity-forms-pdf-extended' ); ?>
+			<div class="about-text-disclaimer"><?php printf( __( '(This is not the place to get Gravity Forms support. %sPlease use their official support channel%s for assistance)', 'gravity-forms-pdf-extended' ), '<a href="https://www.gravityhelp.com/support/">', '</a>' ); ?></div>
+		</div>
 
 		<div id="search-knowledgebase">
 			<div id="search-results">
@@ -51,7 +54,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 					<div id="documentation-api" class="postbox">
 						<h3 class="hndle">
-							<span>Documentation</span>
+							<span><?php _e( 'Gravity PDF Documentation', 'gravity-forms-pdf-extended' ); ?></span>
 							<span class="spinner"></span>
 						</h3>
 
@@ -59,18 +62,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<ul></ul>
 						</div>
 					</div>
-
-					<div id="forum-api" class="postbox ">
-						<h3 class="hndle">
-							<span>Support Forum</span>
-							<span class="spinner"></span>
-						</h3>
-
-						<div class="inside rss-widget">
-							<ul></ul>
-						</div>
-					</div>
-
 
 				</div><!-- close #dashboard_primary -->
 			</div><!-- close #search-results -->
@@ -78,34 +69,66 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<div class="hr-divider"></div>
 
-		<div id="support-wrapper" class="metabox-holder">
-			<div class="help-container">
-				<?php do_meta_boxes( 'pdf-help-and-support', 'row-1', '' ); ?>
-			</div><!-- close postbox-container -->
+		<h2><?php printf( __( 'Find the %sanswers%s you need…', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ); ?></h2>
 
-			<div class="help-container">
-				<?php do_meta_boxes( 'pdf-help-and-support', 'row-2', '' ); ?>
-			</div><!-- close postbox-container -->
-		</div><!-- close metabox-holder -->
+		<div id="dashboard-widgets" class="columns-2">
+			<div class="postbox-container">
+				<a href="https://gpdfv4.xyz/documentation/v4/five-minute-install/">
+					<span><?php _e( 'Getting Started', 'gravity-forms-pdf-extended' ); ?></span><br>
+					<?php _e( 'Take a look at our quick-start guide and get Gravity PDF up and running in 5 minutes flat!', 'gravity-forms-pdf-extended' ); ?>
+				</a>
+			</div>
+
+			<div class="postbox-container">
+				<a href="https://gpdfv4.xyz/documentation/v4/user-installation/">
+					<span><?php _e( 'Comprehensive Documentation', 'gravity-forms-pdf-extended' ); ?></span><br>
+					<?php _e( 'We’ve got in-depth articles to help you learn the ins and outs of Gravity PDF. From the basic setup to PDF security.', 'gravity-forms-pdf-extended' ); ?>
+				</a>
+			</div>
+
+			<div class="postbox-container">
+				<a href="https://gpdfv4.xyz/documentation/v4/user-activation-errors/">
+					<span><?php _e( 'Common Problems', 'gravity-forms-pdf-extended' ); ?></span><br>
+					<?php _e( 'Find out the most common issues user’s experience and ways to resolve them.', 'gravity-forms-pdf-extended' ); ?>
+				</a>
+			</div>
+
+			<div class="postbox-container">
+				<a href="https://gpdfv4.xyz/documentation/v4/developer-start-customising/">
+					<span><?php _e( 'Developer Documentation', 'gravity-forms-pdf-extended' ); ?></span><br>
+					<?php _e( 'You’ll find all the info and examples you’ll need to create your own custom PDF templates.', 'gravity-forms-pdf-extended' ); ?>
+				</a>
+			</div>
+		</div>
+
+		<div class="center">
+			<a href="https://gpdfv4.xyz/documentation/v4/" class="button button-primary button-large"><?php _e( 'View All Documentation', 'gravity-forms-pdf-extended' ); ?></a>
+			<a href="https://gpdfv4.xyz/support/#contact-support" class="button button-primary button-large"><?php _e( 'Contact Support', 'gravity-forms-pdf-extended' ); ?></a>
+
+			<p>
+				<?php printf( __( 'Our support hours are 9:00am-5:00pm Monday to Friday, %sSydney Australia time%s (public holidays excluded).', 'gravity-forms-pdf-extended' ), '<br><a href="http://www.timeanddate.com/worldclock/australia/sydney">', '</a>' ); ?>
+			</p>
+		</div>
+
+		<?php
+		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_post_help_settings_page/ for more details about this action */
+		do_action( 'gfpdf_post_help_settings_page' );
+		?>
+
 	</div><!-- close wrap about-wrap -->
-
-	<?php
-	/* See https://gpdfv4.xyz/documentation/v4/gfpdf_post_help_settings_page/ for more details about this action */
-	do_action( 'gfpdf_post_help_settings_page' );
-	?>
 </div><!-- close #pdfextended-settings -->
 
 <script type="text/template" id="GravityPDFSearchResultsDocumentation">
-	<% _.each(collection, function (c) { %>
-	<li>
-		<a href="<%= c.get('link') %>" class="rsswidget"><%= c.get('terms').documentation_group[0].name %> - <%=
-			c.get('title') %></a>
-
-		<div class="rssSummary"><%= c.get('excerpt') %></div>
-	</li>
-	<% }); %>
-
 	<% if(collection.length === 0) { %>
-	<li>No topics found for your search.</li>
+		<li><?php _e( "It doesn't look like there are any topics related to your issue.", 'gravity-forms-pdf-extended' ); ?></li>
+	<% } else { %>
+		<li><h3><?php _e( 'Maybe one of these articles will help...', 'gravity-forms-pdf-extended' ); ?></h3></li>
 	<% } %>
+
+	<% _.each(collection, function (model) { %>
+		<li>
+			<a href="<%= model.link %>"><%= model.title.rendered %></a>
+			<div class="except"><%= model.excerpt.rendered %></div>
+		</li>
+	<% }); %>
 </script>

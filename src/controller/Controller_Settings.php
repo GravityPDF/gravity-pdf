@@ -168,9 +168,6 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	 */
 	public function add_actions() {
 
-		/* Load our settings meta boxes */
-		add_action( 'current_screen', array( $this->model, 'add_meta_boxes' ) );
-
 		/* Display our system status on general and tools pages */
 		add_action( 'gfpdf_post_general_settings_page', array( $this->view, 'system_status' ) );
 		add_action( 'gfpdf_post_tools_settings_page', array( $this->view, 'system_status' ) );
