@@ -4,6 +4,8 @@ namespace GFPDF\Helper\Fields;
 
 use GFPDF\Helper\Helper_Abstract_Fields;
 
+use GFCommon;
+
 /**
  * Gravity Forms Field
  *
@@ -73,9 +75,11 @@ class Field_Rating extends Helper_Abstract_Fields {
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
-		$value = apply_filters( 'gform_entry_field_value', $this->get_value(), $this->field, $this->entry, $this->form );
 
-		return parent::html( $value );
+		$html = GFCommon::get_lead_field_display( $this->field, $this->get_value(), $this->entry['currency'] );
+		$html = apply_filters( 'gform_entry_field_value', $html, $this->field, $this->entry, $this->form );
+
+		return parent::html( $html );
 	}
 
 	/**
