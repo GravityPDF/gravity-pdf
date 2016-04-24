@@ -196,11 +196,11 @@ class Test_API extends WP_UnitTestCase {
 		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
 
 		$table = GPDFAPI::likert_table( $entry, 26, true );
-		$this->assertNotFalse( strpos( $table, "<td class='gsurvey-likert-choice-label'>" ) );
+		$this->assertNotFalse( strpos( $table, "class='gsurvey-likert-choice-label'" ) );
 
 		ob_start();
 		GPDFAPI::likert_table( $entry, 26 );
 		$table = ob_get_clean();
-		$this->assertNotFalse( strpos( $table, "<td class='gsurvey-likert-choice-label'>" ) );
+		$this->assertNotFalse( strpos( $table, "class='gsurvey-likert-choice-label'" ) );
 	}
 }
