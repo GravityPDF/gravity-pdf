@@ -323,6 +323,9 @@ class View_PDF extends Helper_Abstract_View {
 		$show_html_fields               = ( isset( $config['meta']['html_field'] ) ) ? $config['meta']['html_field'] : false; /* whether we should show the form's html fields. Default to false */
 		$show_individual_product_fields = ( isset( $config['meta']['individual_products'] ) ) ? $config['meta']['individual_products'] : false; /* Whether to show individual fields in the entry. Default to false - they are grouped together at the end of the form */
 
+		/* Skip over any of the following blacklisted fields */
+		$blacklisted = apply_filters( 'gfpdf_blacklisted_fields', array( 'captcha', 'password', 'page' ) );
+
 		/* Display the form title, if needed */
 		$this->show_form_title( $show_title, $form );
 
@@ -355,9 +358,6 @@ class View_PDF extends Helper_Abstract_View {
 			if ( $show_html_fields === false && $field->type == 'html' ) {
 				continue;
 			}
-
-			/* Skip over any of the following blacklisted fields */
-			$blacklisted = apply_filters( 'gfpdf_blacklisted_fields', array( 'captcha', 'password', 'page' ) );
 
 			/* Skip over any fields we don't want to include */
 			if( in_array( $field->type, $blacklisted ) ) {
