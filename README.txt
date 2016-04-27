@@ -3,8 +3,8 @@ Contributors: blueliquiddesigns
 Donate link: https://gravitypdf.com
 Tags: gravity, forms, pdf, automation, attachment
 Requires at least: 3.9
-Tested up to: 4.4
-Stable tag: 3.7.6
+Tested up to: 4.5
+Stable tag: 3.7.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
 
@@ -85,6 +85,10 @@ All FAQs can be [viewed on the Gravity PDF website](https://gravitypdf.com/#faqs
 3. The configuration.php file allows you to easily assign PDFs to Gravity Forms
 
 == Changelog ==
+
+= 3.7.7 =
+* Bug - Ensure 'gfpdf_post_pdf_save' action gets triggered for all PDFs when resending notifications
+* Housekeeping - Remove compress.php from mPDF package (unneeded)
 
 = 3.7.6 =
 * Bug - Added full support for all Gravity Forms notification events (includes Payment Complete, Payment Refund, Payment Failed, Payment Pending ect)

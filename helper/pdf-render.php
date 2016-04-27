@@ -38,11 +38,6 @@ class PDFRender
 	{
 		global $gfpdfe_data;
 
-		/* 
-		 * Because we merged the create and attach functions we need a measure to only run this function once per session per lead id. 
-		 */
-		static $pdf_creator = array();	
-
 		/*
 		 * Set user-variable to output HTML instead of PDF
 		 */		
@@ -59,22 +54,6 @@ class PDFRender
 		 $filename = $arguments['pdfname'];
 		 $template = $arguments['template'];		 
 		 $output = (isset($arguments['output']) && strlen($arguments['output']) > 0) ? $arguments['output'] : 'save';
-
-		/* 
-		 * Check if the PDF exists and if this function has already run this season 
-		 */	
-		if(in_array($lead_id, $pdf_creator) && file_exists($gfpdfe_data->template_save_location . $id . '/' . $filename))
-		{					
-			/* 
-			 * Don't generate a new PDF, use the existing one 
-			 */
-			return $gfpdfe_data->template_save_location . $id . '/' . $filename;	
-		}
-		
-		/*
-		 * Add lead to PDF creation tracker
-		 */
-		$pdf_creator[] = $lead_id;
 
 		/*
 		 * Add filter before we load the template file so we can stop the main process
