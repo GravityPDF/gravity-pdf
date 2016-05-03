@@ -3,7 +3,7 @@ Gravity PDF
 
 [![Build Status](https://travis-ci.org/GravityPDF/gravity-pdf.svg?branch=development)](https://travis-ci.org/GravityPDF/gravity-pdf)
 
-Gravity PDF is a GPLv2-licensed WordPress plugin that allows you to automatically generate, email and download PDF documents using the popular form-builder plugin, [Gravity Forms](https://www.e-junkie.com/ecom/gb.php?cl=54585&c=ib&aff=235154). Find out more about Gravity PDF at [https://gravitypdf.com](http://gravitypdf.com/).
+Gravity PDF is a GPLv2-licensed WordPress plugin that allows you to automatically generate, email and download PDF documents using the popular form-builder plugin, [Gravity Forms](https://goo.gl/lsBOef). Find out more about Gravity PDF at [https://gpdfv4.xyz](https://gpdfv4.xyz/).
 
 # About
 
@@ -20,7 +20,7 @@ The `development` branch is considered our bleeding edge branch, with all new ch
 
 # Documentation
 
-All documentation can be found at [https://gravitypdf.com](http://gravitypdf.com/documentation/).
+All documentation can be found at [https://gpdfv4.xyz/documentation/](https://gpdfv4.xyz/documentation/).
 
 # Contributions
 
@@ -35,7 +35,7 @@ There are a few guidelines that need to be followed to ensure a smooth pull requ
 1. PRs that don't pass existing unit testing or do not have the proper tests to accompany the changes will not be merged.
 1. Once our team is happy with the PR we'll ask you to squash your branch into a single commit, rebase it onto the development branch and push the changes to GitHub. This ensures we keep a clean Git history.
 
-If you are uncertain whether your PR meets all these requirements: don't worry! If there are problems our friendly team will guide you in the right direction.
+If you are uncertain whether your PR meets all these requirements, don't worry! If there are problems our friendly team will guide you in the right direction.
 
 #### Run Unit Tests
 
@@ -45,5 +45,3 @@ The plugin uses PHPUnit as part of the development process. Installing the testi
 2. `cd` into the root of your Gravity PDF directory
 3. Run `bash tests/bin/install.sh gravitypdf_test root root localhost` where `root root` is substituted for your mysql username and password (VVV users can run the command as is).
 4. Upon success you can run `vendor/bin/phpunit`, `vendor/bin/phpunit --group ajax` and `vendor/bin/phpunit --group slow-pdf-processes`.
-
-If you want to generate a code coverage report you can run the following `vendor/bin/phpunit --coverage-html "./tmp/coverage"` and a report will be generated in the `/tmp/coverage/` subdirectory of the Gravity PDF plugin.

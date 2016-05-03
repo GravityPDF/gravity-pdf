@@ -1,114 +1,141 @@
 === Gravity PDF ===
-Contributors: (this should be a list of wordpress.org userid's)
-Donate link: http://example.com/
-Tags: comments, spam
-Requires at least: 3.0.1
-Tested up to: 3.4
-Stable tag: 4.3
+Contributors: blueliquiddesigns
+Plugin URI: https://gravitypdf.com/
+Donate link: https://gravitypdf.com/donate-to-plugin/
+Tags: gravity, forms, pdf, automation, attachment, email
+Requires at least: 4.2
+Tested up to: 4.4
+Stable tag: 4.0-RC3
 License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+License URI: http://www.gnu.org/licenses/gpl.txt
 
-Here is a short description of the plugin.  This should be no more than 150 characters.  No markup here.
+Automatically generate, email and download PDF documents with Gravity Forms and Gravity PDF.
 
 == Description ==
 
-This is the long description.  No limit, and you can use Markdown (as well as in the following sections).
+**Gravity PDF is the ultimate solution for generating digital PDF documents using Gravity Forms and WordPress.**
 
-For backwards compatibility, if this section is missing, the full length of the short description will be used, and
-Markdown parsed.
+https://www.youtube.com/watch?v=z8zKKrjmNjY
 
-A few notes about the sections above:
+The plugin ships with four highly-customisable PDF templates perfectly suited for displaying your user’s data. Within seconds you can personalise the documents with your company logo, change the font, size, colour and the paper size. If the templates don't suit, [have one tailor made just for you](https://gpdfv4.xyz/integration-services/) or [roll your own](https://gpdfv4.xyz/documentation/v4/developer-start-customising/).
 
-*   "Contributors" is a comma separated list of wp.org/wp-plugins.org usernames
-*   "Tags" is a comma separated list of tags that apply to the plugin
-*   "Requires at least" is the lowest version that the plugin will work on
-*   "Tested up to" is the highest version that you've *successfully used to test the plugin*. Note that it might work on
-higher versions... this is just the highest one you've verified.
-*   Stable tag should indicate the Subversion "tag" of the latest stable version, or "trunk," if you use `/trunk/` for
-stable.
+> Digital document management with WordPress just became a breeze!
 
-    Note that the `readme.txt` of the stable tag is the one that is considered the defining one for the plugin, so
-if the `/trunk/readme.txt` file says that the stable tag is `4.3`, then it is `/tags/4.3/readme.txt` that'll be used
-for displaying information about the plugin.  In this situation, the only thing considered from the trunk `readme.txt`
-is the stable tag pointer.  Thus, if you develop in trunk, you can update the trunk `readme.txt` to reflect changes in
-your in-development version, without having that information incorrectly disclosed about the current stable version
-that lacks those changes -- as long as the trunk's `readme.txt` points to the correct stable tag.
+= Feature =
 
-    If no stable tag is provided, it is assumed that trunk is stable, but you should specify "trunk" if that's where
-you put the stable version, in order to eliminate any doubt.
+* There’s no third-party APIs needed when generating your PDFs. That means no monthly fees or rate limits. You control the software and the documents it generates.
+* We support all languages, including complex symbol-based languages like Chinese and Japanese, as well as Right to Left (RTL) written languages such as Arabic and Hebrew.
+* Automatically email your PDF when a user completes a form. Have it emailed to people in your organisation, the user, or both. You can also conditionally generate and email the PDF.
+* Using Gravity Forms’ developer-licensed payment add-ons – like PayPal, Authorize.net or Stripe – you can restrict access to the PDF until after a payment is captured.
+* [Protecting your user’s sensitive information is the at the heart of Gravity PDF](https://gpdfv4.xyz/documentation/v4/user-pdf-security/). The plugin’s security settings give you granular control over who has access to the PDFs generated.
+* Our [JavaScript-powered font manager](https://gpdfv4.xyz/documentation/v4/user-custom-fonts/) allows you to install and use your favourite fonts. Now you can keep in line with your corporate style guide, or create beautiful PDF typography.
+* [The documentation](https://gpdfv4.xyz/documentation/v4/user-installation/) has everything from basic install instructions to advanced developer how-to guides. Our friendly team is also on hand to [provide FREE general support](https://gpdfv4.xyz/support/).
+* PHP, HTML and CSS come easy? [You’ll find creating your own PDF templates a breeze](https://gpdfv4.xyz/documentation/v4/developer-start-customising/). If not, [we offer PDF design services](https://gpdfv4.xyz/integration-services/) tailored just for you. We can even auto-fill existing PDFs!
+
+= Requirements =
+
+Gravity PDF can be run on most shared web hosting without any issues. It requires **PHP 5.4+** (PHP 7.0+ recommended) and at least 64MB of WP Memory (128MB+ recommended). You'll also need to be running WordPress 4.2+ and have Gravity Forms 1.9+.
+
+[Don't have Gravity Forms? Purchase a license](https://goo.gl/lsBOef) (any license type will do, although a Developer license will give you the best bang for the buck). If you aren't sure Gravity PDF will meet your needs (and haven't got a Gravity Forms license yet) you can [try out the software via our demo site](https://demo.gpdfv4.xyz).
+
+= Documentation & Support =
+
+[We have extensive documentation on using Gravity PDF](https://gpdfv4.xyz/documentation/v4/five-minute-install/), and our friendly support team provides [FREE basic support via our website](https://gpdfv4.xyz/support/#contact-support) (we also check the WordPress.org forums but submitting a ticket via GravityPDF.com will get a faster response).
+
+= Custom PDF Integration =
+
+We offer **comprehensive PDF integration services** and do all the PDF development and integration into Gravity Forms for you. You tell us what you want and our friendly and experienced developers will design, develop and install custom PDF templates tailor specifically for you. We can even auto-fill your existing PDF documents. [Find out more at GravityPDF.com](https://gpdfv4.xyz/integration-services/).
+
+= Contribute =
+
+All development for Gravity PDF [is handled via GitHub](https://github.com/GravityPDF/gravity-pdf/). Opening new issues and submitting pull requests are welcome.
+
+[Our public roadmap is available on Trello](https://trello.com/b/60YGv1J3/roadmap). We'd love it if you vote and comment on your favourite ideas.
+
+You can also keep up to date with Gravity PDF by [subscribing to our newsletter](https://gpdfv4.xyz/#signup-top), [following us on Twitter](https://twitter.com/gravitypdf) or [liking us on Facebook](https://www.facebook.com/gravitypdf).
+
+Also, if you enjoy using the software [we'd love it if you could give us a review!](https://wordpress.org/support/view/plugin-reviews/gravity-forms-pdf-extended)
 
 == Installation ==
 
-This section describes how to install the plugin and get it working.
-
-e.g.
-
-1. Upload `plugin-name.php` to the `/wp-content/plugins/` directory
-1. Activate the plugin through the 'Plugins' menu in WordPress
-1. Place `<?php do_action('plugin_name_hook'); ?>` in your templates
-
-== Frequently Asked Questions ==
-
-= A question that someone might have =
-
-An answer to that question.
-
-= What about foo bar? =
-
-Answer to foo bar dilemma.
+[You'll find detailed installation instructions on GravityPDF.com](https://gpdfv4.xyz/documentation/v4/user-installation/).
 
 == Screenshots ==
 
-1. This screen shot description corresponds to screenshot-1.(png|jpg|jpeg|gif). Note that the screenshot is taken from
-the /assets directory or the directory that contains the stable readme.txt (tags or trunk). Screenshots in the /assets
-directory take precedence. For example, `/assets/screenshot-1.png` would win over `/tags/4.3/screenshot-1.png`
-(or jpg, jpeg, gif).
-2. This is the second screen shot
+1. Our on-boarding experience will have you up and running in 5 minutes flat.
+2. Set up the global PDF settings then head straight to configuring your first PDF.
+3. Control the default paper size, PDF template and font/size/colour.
+4. Advanced security options give you granular control of PDF access.
+5. Tools like the font manager and custom PDF installer are readily accessible.
+6. Our JavaScript-powered font manager will make using custom fonts a breeze.
+7. A snapshot of your form’s PDF setup.
+8. When adding a new PDF all the important settings are up front in the “General” tab.
+9. Override the default appearance settings on a per-PDF basis.
+10. Each template has its own PDF settings for greater control of the look and feel of your document.
+11. Header and Footer support is built-in.
+12. Advanced format and security settings can be applied to individual PDFs.
+13. PDFs can be accessed from the Gravity Forms entry list page.
+14. They also appear on the individual entry pages for easy access.
+15. Zadani is a minimalist business-style template that will generate a well-spaced document great for printing.
+16. Rubix uses stylish containers to create an aesthetically pleasing design.
+17. Focus Gravity providing a classic layout which epitomises Gravity Forms Print Preview. It’s the familiar layout you’ve come to love.
+18. Blank Slate provides a print-friendly template focusing solely on the user-submitted data.
 
 == Changelog ==
 
-= 1.0 =
-* A change since the previous version.
-* Another change.
+= 4.0 =
 
-= 0.5 =
-* List versions from most recent at top to oldest at bottom.
+* Minimum PHP version changed from PHP 5.2 to PHP 5.4. ENSURE YOUR WEB SERVER IS COMPATIBLE BEFORE UPDATING (Forms -> Settings -> PDF -> System Status)
+* Minimum WordPress version changed from 3.9 to 4.2. ENSURE YOU ARE RUNNING THE MINIMUM VERISON OF WP BEFORE UPDATING (Forms -> Settings -> PDF -> System Status)
+* Minimum Gravity Forms version changed from 1.8 to 1.9. ENSURE YOU ARE RUNNING THE MINIMUM VERISON OF GRAVITY FORMS BEFORE UPDATING (Forms -> Settings -> PDF -> System Status)
+* Maintained backwards compatibility with v3 for 80% of users. Review our migration guide for additional information (https://gpdfv4.xyz/documentation/v4/v3-to-v4-migration/)
+* Created full user interface for managing plugin settings. All settings are now stored in the database
+* Overhaul PDF designs that ship with software. Now comes with 4 completely free templates (two are all-new and two are enhanced v3 favourites)
+* Added CSS Ready class support in PDFs. Two and three column classes now work in PDF
+* Users can apply conditional logic to PDFs via new UI
+* Control font, size and colour via new UI
+* Control paper size of generated PDF via new UI
+* Control advanced security settings via new UI
+* Control customisable PDF template options via new UI
+* Control PDF header / footers via UI
+* Control PDF background via UI
+* Change PDF format (PDF/A-1b or PDF/X-1a) via UI
+* Password Protect PDF via UI and change end-user privilages
+* Added [gravitypdf] shortcode to allow users to display PDF links on confirmation pages, notifications, or anywhere else
+* Allow user to change the action of the PDF link view in admin area (view or download)
+* Added timeout parameter when unauthenticated user who submitted the form (matched by IP) attempts to access PDF. Defaults to 20 minutes
+* Added ability to make a PDF "public". This disabled all security precautions on PDF. Use with caution.
+* Depreciated configuration.php and created a migration feature which users can run if that file is detected. Removes /output/ directory during migration (where v3 stored PDFs saved to disk).
+* Duplicating Gravity Form will also duplicate Gravity PDF settings assigned to that form. Importing / Exporting forms will also include PDF settings
+* Better installation and upgrade experience for users with automated redirect to landing page after install / major update (can be disabled in settings)
+* Created a font manager so users have a user interface to install and use their favourite fonts. Support for TTF and certain OTF font files
+* Allow users to enable Right to Left language support from UI
+* Created uninstaller which removes all trace of plugin from website
+* Help tab allows users to live search our documentation
+* Remove need to initialise the plugin when first installed
+* Remove need to initialise fonts when uploaded to our /fonts/ directory
+* Cleanup PDFs from disk when finished with them (also cleans up any stay files every 24 hours)
+* Detect if our /tmp/ directory is accessible by browser and suggest ways to fix
+* Allow all directories in /PDF_EXTENDED_TEMPLATES/ directory to be moved / renamed via filters (including the base directory)
+* Create GPDFAPI class to allow devs to easily build ontop of plugin
+* Cleaned up PDF template markup so developers can focus soley on their template code without any extra overhead. See our documentation for more details (https://gpdfv4.xyz/documentation/v4/developer-start-customising/)
+* Enhanced PDF templates by allowing an image and configuration class
+* Added large number of new actions and filters and provided documentation and examples for them on our website
+* Allow developers to add or remove individual security layers via filters
+* Updated mPDF from 5.7 to 6.1
+* Added support for Gravity Forms Logging plugin
+* Added better product data to $form_data['field']
+* Added PHPDocs to all classes / methods / functions
+* Fix PDF_EXTENDED_TEMPLATES location in legacy Multisite networks (WP3.5 or lower)
+* Automatically make $field array available to PDF templates (array of current form fields accessible by field ID)
+* Automatically make $settings array available to PDF templates (the current PDF configuration settigns)
+* Automatically make $config array available to PDF templates (the initialised template config class - if any)
+* Automatically make $form, $entry and $form_data available to PDF templates
+* Automatically make $gfpdf object available to PDF templates (the main Gravity PDF object containing all our helper classes)
+
+See [CHANGELOG.txt](https://github.com/GravityPDF/gravity-pdf/blob/master/CHANGELOG.txt) for v3 changelog history.
 
 == Upgrade Notice ==
 
-= 1.0 =
-Upgrade notices describe the reason a user should upgrade.  No more than 300 characters.
-
-= 0.5 =
-This version fixes a security related bug.  Upgrade immediately.
-
-== Arbitrary section ==
-
-You may provide arbitrary sections, in the same format as the ones above.  This may be of use for extremely complicated
-plugins where more information needs to be conveyed that doesn't fit into the categories of "description" or
-"installation."  Arbitrary sections will be shown below the built-in sections outlined above.
-
-== A brief Markdown Example ==
-
-Ordered list:
-
-1. Some feature
-1. Another feature
-1. Something else about the plugin
-
-Unordered list:
-
-* something
-* something else
-* third thing
-
-Here's a link to [WordPress](http://wordpress.org/ "Your favorite software") and one to [Markdown's Syntax Documentation][markdown syntax].
-Titles are optional, naturally.
-
-[markdown syntax]: http://daringfireball.net/projects/markdown/syntax
-            "Markdown is what the parser uses to process much of the readme file"
-
-Markdown uses email style notation for blockquotes and I've been told:
-> Asterisks for *emphasis*. Double it up  for **strong**.
-
-`<?php code(); // goes in backticks ?>`
+= 4.0 =
+**WARNING**: This major release is not 100% backwards compatibile with v3. [Review our upgrade guide](https://gpdfv4.xyz/documentation/v4/v3-to-v4-migration/) AND **do a full backup** before proceeding with the update.
