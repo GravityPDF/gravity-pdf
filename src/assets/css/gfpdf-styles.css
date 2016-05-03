@@ -582,6 +582,10 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
   width: 250px;
 }
 
+.gfpdf-page .merge-tag-support {
+    max-width: none;
+}
+
 /**
  * Entry List Page
  */
