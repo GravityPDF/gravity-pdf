@@ -735,7 +735,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			'name'       => __( 'Header', 'gravity-forms-pdf-extended' ),
 			'type'       => 'rich_editor',
 			'size'       => 8,
-			'desc'       => sprintf( __( 'The header is included at the top of each page. For simple columns %stry this HTML table snippet%s.', 'gravity-forms-pdf-extended' ), '<a href="https://gist.github.com/blueliquiddesigns/997b5dedf0a5e665e8ef">', '</a>' ),
+			'desc'       => sprintf( __( 'The header is included at the top of each page. For simple columns %stry this HTML table snippet%s.', 'gravity-forms-pdf-extended' ), '<a href="https://gist.github.com/jakejackson1/997b5dedf0a5e665e8ef">', '</a>' ),
 			'inputClass' => 'merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields',
 			'tooltip'    => '<h6>' . __( 'Header', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'When inserting images in the header set the size to %sLarge%s or %sFull Size%s.', 'gravity-forms-pdf-extended' ), '<em>', '</em>', '<em>', '</em>' ),
 		) );
@@ -773,7 +773,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			'name'       => __( 'Footer', 'gravity-forms-pdf-extended' ),
 			'type'       => 'rich_editor',
 			'size'       => 8,
-			'desc'       => sprintf( __( 'The footer is included at the bottom of every page. For simple columns %stry this HTML table snippet%s.', 'gravity-forms-pdf-extended' ), '<a href="https://gist.github.com/blueliquiddesigns/e6179a96cd97ef0a8457">', '</a>' ),
+			'desc'       => sprintf( __( 'The footer is included at the bottom of every page. For simple columns %stry this HTML table snippet%s.', 'gravity-forms-pdf-extended' ), '<a href="https://gist.github.com/jakejackson1/e6179a96cd97ef0a8457">', '</a>' ),
 			'inputClass' => 'merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields',
 			'tooltip'    => '<h6>' . __( 'Footer', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( __( 'For simple text footers use the left, center and right alignment buttons in the editor. You can also use the special %s{PAGENO}%s and %s{nbpg}%s tags to display page numbering.', 'gravity-forms-pdf-extended' ), '<em>', '</em>', '<em>', '</em>' ),
 		) );
