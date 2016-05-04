@@ -70,6 +70,15 @@ abstract class Helper_Abstract_Fields {
 	public $form;
 
 	/**
+	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
+	 *
+	 * @var \GFPDF\Helper\Helper_Form
+	 *
+	 * @since 4.0
+	 */
+	public $gform;
+
+	/**
 	 * Contains the entry information
 	 *
 	 * @var array
@@ -143,6 +152,7 @@ abstract class Helper_Abstract_Fields {
 		$this->field = $field;
 		$this->entry = $entry;
 		$this->form  = $gform->get_form( $entry['form_id'] );
+		$this->gform = $gform;
 
 	}
 
