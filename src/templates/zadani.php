@@ -129,6 +129,18 @@ $value_border_colour = ( ! empty( $settings['zadani_border_colour'] ) ) ? $setti
     }
 
     /**
+     * Terms of Service (Gravity Perks) Support
+     */
+    .terms-of-service-agreement {
+        padding-top: 3px;
+        font-weight: bold;
+    }
+
+    .terms-of-service-tick {
+        font-size: 150%;
+    }
+
+    /**
      * Table Support
      */
     th, td {
