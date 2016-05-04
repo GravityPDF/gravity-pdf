@@ -135,6 +135,18 @@ $label_format = ( ! empty( $settings['focusgravity_label_format'] ) ) ? $setting
     }
 
     /**
+     * Terms of Service (Gravity Perks) Support
+     */
+    .terms-of-service-agreement {
+        padding-top: 2px;
+        font-weight: bold;
+    }
+
+    .terms-of-service-tick {
+        font-size: 150%;
+    }
+
+    /**
      * Table Support
      */
     th, td {

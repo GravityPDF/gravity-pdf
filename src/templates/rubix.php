@@ -132,6 +132,18 @@ $contrast = $misc->get_background_and_border_contrast( $container_background_col
     }
 
     /**
+     * Terms of Service (Gravity Perks) Support
+     */
+    .terms-of-service-agreement {
+        padding-top: 2px;
+        font-weight: bold;
+    }
+
+    .terms-of-service-tick {
+        font-size: 150%;
+    }
+
+    /**
      * Table Support
      */
     th, td {
