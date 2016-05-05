@@ -301,9 +301,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			return;
 		}
 
-		/* If running an alpha, beta or rc version of the plugin send all logs to Loggly */
-		$this->maybe_run_remote_logging();
-
 		/* Setup our Gravity Forms local file logger, if enabled */
 		$this->setup_gravityforms_logging();
 
@@ -347,59 +344,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 				$this->log->pushHandler( $stream );
 			}
 		}
-	}
-
-	/**
-	 * Send all logs to Loggly (https://www.loggly.com/) when running a dev version
-	 * of Gravity PDF. This allows us to better track any problems a user might have when running open betas.
-	 *
-	 * @return void
-	 *
-	 * @since 4.0
-	 */
-	private function maybe_run_remote_logging() {
-
-		/* Enable remote logging */
-		if ( function_exists( 'curl_version' ) && $this->is_development_version( PDF_EXTENDED_VERSION ) ) {
-			/* Setup Loggly logging with correct format for buffer logging */
-			$formatter = new LogglyFormatter();
-			$loggly    = new LogglyHandler( '8ad317ed-213d-44c9-a2e8-f2eebd542c66/tag/gravitypdf', Logger::INFO );
-			$loggly->setFormatter( $formatter );
-
-			/* Set up our buffer logging to save multiple API calls */
-			$buffer = new BufferHandler( $loggly, 20, Logger::INFO );
-
-			/* Push additional log details about function called from, peak memory and user IP / referrer */
-			$this->log->pushProcessor( new WebProcessor );
-
-			/* Impliment our buffer */
-			$this->log->pushHandler( $buffer );
-		}
-	}
-
-	/**
-	 * Check if the current version of Gravity PDF is a development edition
-	 * Development editions contain either 'alpha', 'beta', or 'rc' in the version number
-	 *
-	 * @param  string $version The version to check
-	 *
-	 * @return boolean
-	 *
-	 * @since 4.0
-	 */
-	public function is_development_version( $version ) {
-
-		$dev_version    = array( 'alpha', 'beta', 'rc' );
-		$plugin_version = strtolower( $version );
-
-		foreach ( $dev_version as $v ) {
-			if ( strpos( $plugin_version, $v ) !== false ) {
-				return true;
-				break;
-			}
-		}
-
-		return false;
 	}
 
 	/**
