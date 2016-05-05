@@ -215,8 +215,14 @@ class Helper_Misc {
 	}
 
 	/**
-	 * mPDF currently has no cascading CSS ability to target 'inline' elements. Fix image display issues in header / footer
+	 * Manipulate images in header and footer for more consistent display in PDF
+	 *
+	 * Changes made include:
+	 *
+	 * 1. mPDF currently has no cascading CSS ability to target 'inline' elements. Fix image display issues in header / footer
 	 * by adding a specific class name we can target
+	 *
+	 * 2. Convert any URLs to local path where applicable
 	 *
 	 * @param string $html The HTML to parse
 	 *
@@ -233,6 +239,15 @@ class Helper_Misc {
 			if( sizeof( $images ) > 0 ) {
 				/* Loop through each matching element */
 				foreach ( $images as $image ) {
+
+					/* Get current image src */
+					$image_src = trim( $image->attr( 'src' ) );
+					$image_src_path = $this->convert_url_to_path( $image_src );
+
+					if( false !== $image_src_path ) {
+						$image->attr( 'src', $image_src_path );
+					}
+
 					/* Get the current image classes */
 					$image_classes = $image->attr( 'class' );
 
@@ -582,7 +597,6 @@ class Helper_Misc {
 		}
 
 		/* If we are here we couldn't locate the file */
-
 		return false;
 	}
 

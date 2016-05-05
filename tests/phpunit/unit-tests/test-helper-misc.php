@@ -212,6 +212,20 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Check if our HTML DOM manipulator correctly changes local URLs to Paths
+	 *
+	 * @since 4.0
+	 */
+	public function test_fix_header_footer_path() {
+
+		$html = $this->misc->fix_header_footer( '<img src="' . PDF_PLUGIN_URL . 'src/assets/images/cap-paws-sitting.png" alt="My Image" />' );
+		$this->assertFalse( strpos(PDF_PLUGIN_URL, $html ) );
+
+		$html = $this->misc->fix_header_footer( '<img src="http://test.com/image.png" alt="My Image" />' );
+		$this->assertEquals( '<img src="http://test.com/image.png" alt="My Image" class="header-footer-img">', $html );
+	}
+
+	/**
 	 * Check that we can push an associated array item onto the beginning of an existing array
 	 *
 	 * @since 4.0
