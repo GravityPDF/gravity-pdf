@@ -611,7 +611,12 @@
 
 						/* Remove TinyMCE Content */
 						$container.find('.wp-editor-area').each(function() {
-							tinyMCE.get( $(this).attr('id') ).setContent('');
+							var editor = tinyMCE.get( $(this).attr('id') );
+
+							if( editor !== null ) {
+								editor.setContent('');
+							}
+
 						});
 
 						/* Remove textarea content */
