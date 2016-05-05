@@ -225,9 +225,10 @@ class Model_PDF extends Helper_Abstract_Model {
 		/* Add backwards compatibility support for certain settings */
 		$settings = $this->apply_backwards_compatibility_filters( $settings, $entry );
 
-		/**
-		 * If we are here we can generate our PDF
-		 */
+		/* Ensure Gravity Forms depedancy loaded */
+		$this->misc->maybe_load_gf_entry_detail_class();
+
+		/* If we are here we can generate our PDF */
 		$controller = $this->getController();
 		$controller->view->generate_pdf( $entry, $settings );
 
@@ -755,6 +756,9 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		/* Check that the PDF hasn't already been created this session */
 		if ( ! $this->does_pdf_exist( $pdf ) ) {
+
+			/* Ensure Gravity Forms depedancy loaded */
+			$this->misc->maybe_load_gf_entry_detail_class();
 
 			/* Enable Multicurrency support */
 			$this->misc->maybe_add_multicurrency_support();
