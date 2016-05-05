@@ -234,7 +234,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/*
 		 * Trigger action to signify Gravity PDF is now loaded
 		 *
-		 * See https://gpdfv4.xyz/documentation/v4/gfpdf_fully_loaded/ for more details about this action
+		 * See https://gravitypdf.com/documentation/v4/gfpdf_fully_loaded/ for more details about this action
 		 */
 		do_action( 'gfpdf_fully_loaded', $this );
 
@@ -388,9 +388,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		if ( $file == PDF_PLUGIN_BASENAME ) {
 			$row_meta = array(
-				'docs'    => '<a href="' . esc_url( 'https://gpdfv4.xyz/documentation/v4/five-minute-install/' ) . '" title="' . esc_attr( __( 'View Gravity PDF Documentation', 'gravity-forms-pdf-extended' ) ) . '">' . __( 'Docs', 'gravity-forms-pdf-extended' ) . '</a>',
+				'docs'    => '<a href="' . esc_url( 'https://gravitypdf.com/documentation/v4/five-minute-install/' ) . '" title="' . esc_attr( __( 'View Gravity PDF Documentation', 'gravity-forms-pdf-extended' ) ) . '">' . __( 'Docs', 'gravity-forms-pdf-extended' ) . '</a>',
 				'support' => '<a href="' . esc_url( $this->data->settings_url . '&tab=help' ) . '" title="' . esc_attr( __( 'Get Help and Support', 'gravity-forms-pdf-extended' ) ) . '">' . __( 'Support', 'gravity-forms-pdf-extended' ) . '</a>',
-				'shop'    => '<a href="' . esc_url( 'https://gpdfv4.xyz/shop/' ) . '" title="' . esc_attr( __( 'View Gravity PDF Theme Shop', 'gravity-forms-pdf-extended' ) ) . '">' . __( 'Theme Shop', 'gravity-forms-pdf-extended' ) . '</a>',
+				'shop'    => '<a href="' . esc_url( 'https://gravitypdf.com/shop/' ) . '" title="' . esc_attr( __( 'View Gravity PDF Theme Shop', 'gravity-forms-pdf-extended' ) ) . '">' . __( 'Theme Shop', 'gravity-forms-pdf-extended' ) . '</a>',
 			);
 
 			return array_merge( $links, $row_meta );
@@ -580,7 +580,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$items = array_merge( $default_scripts, $items );
 		}
 
-		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_gf_noconflict_scripts/ for more details about this filter */
+		/* See https://gravitypdf.com/documentation/v4/gfpdf_gf_noconflict_scripts/ for more details about this filter */
 		return apply_filters( 'gfpdf_gf_noconflict_scripts', $items );
 	}
 
@@ -619,7 +619,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$items = array_merge( $default_styles, $items );
 		}
 
-		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_gf_noconflict_styles/ for more details about this filter */
+		/* See https://gravitypdf.com/documentation/v4/gfpdf_gf_noconflict_styles/ for more details about this filter */
 		return apply_filters( 'gfpdf_gf_noconflict_styles', $items );
 	}
 

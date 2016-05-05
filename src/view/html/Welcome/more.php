@@ -46,11 +46,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<h4><?php _e( 'PDF Template Shop', 'gravity-forms-pdf-extended' ); ?></h4>
 
-			<p><?php printf( __( "It's like a theme shop, but for Gravity PDF templates. %sHead over to our online store%s and view our growing selection of premium PDF templates.", 'gravity-forms-pdf-extended' ), '<a href="https://gpdfv4.xyz/shop/">', '</a>' ); ?></p>
+			<p><?php printf( __( "It's like a theme shop, but for Gravity PDF templates. %sHead over to our online store%s and view our growing selection of premium PDF templates.", 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/shop/">', '</a>' ); ?></p>
 
 			<h4><?php _e( 'Stay Up To Date', 'gravity-forms-pdf-extended' ); ?></h4>
 
-			<p><?php printf( __( '%sSign up to our newsletter%s to be amongst the first to receive the latest news and details on upcoming feature.', 'gravity-forms-pdf-extended' ), '<a href="https://gpdfv4.xyz/#signup-top">', '</a>' ); ?></p>
+			<p><?php printf( __( '%sSign up to our newsletter%s to be amongst the first to receive the latest news and details on upcoming feature.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/#signup-top">', '</a>' ); ?></p>
 
 		</div>
 
@@ -58,11 +58,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<h4><?php _e( 'Tailored PDFs', 'gravity-forms-pdf-extended' ); ?></h4>
 
-			<p><?php printf( __( "If the PDF Shop doesn't have what you're after %sour friendly team can build a document just for you%s. With an addon, our devs can even create templates that auto fill existing PDFs – like government and legal documents.", 'gravity-forms-pdf-extended' ), '<a href="https://gpdfv4.xyz/integration-services/">', '</a>' ); ?></p>
+			<p><?php printf( __( "If the PDF Shop doesn't have what you're after %sour friendly team can build a document just for you%s. With an addon, our devs can even create templates that auto fill existing PDFs – like government and legal documents.", 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/integration-services/">', '</a>' ); ?></p>
 
 			<h4><?php _e( 'Get Support', 'gravity-forms-pdf-extended' ); ?></h4>
 
-			<p><?php printf( __( 'Have trouble using Gravity PDF? %sContact our friendly staff%s who are avaliable 9am to 5pm Monday to Friday, %sAustralian Eastern Standard Time%s.', 'gravity-forms-pdf-extended' ), '<a href="https://gpdfv4.xyz/support/">', '</a>', '<a href="http://www.timeanddate.com/worldclock/australia/sydney">', '</a>' ); ?></p>
+			<p><?php printf( __( 'Have trouble using Gravity PDF? %sContact our friendly staff%s who are avaliable 9am to 5pm Monday to Friday, %sAustralian Eastern Standard Time%s.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/support/">', '</a>', '<a href="http://www.timeanddate.com/worldclock/australia/sydney">', '</a>' ); ?></p>
 
 		</div>
 
@@ -70,7 +70,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<h4><?php _e( 'Roll your Own', 'gravity-forms-pdf-extended' ); ?></h4>
 
-			<p><?php printf( __( "If PHP, HTML and CSS come easy to you, you'll find creating your own PDF templates a breeze. With %sextensive documentation and great examples%s you'll be up and running in no time.", 'gravity-forms-pdf-extended' ), '<a href="https://gpdfv4.xyz/documentation/v4/developer-start-customising/">', '</a>' ); ?></p>
+			<p><?php printf( __( "If PHP, HTML and CSS come easy to you, you'll find creating your own PDF templates a breeze. With %sextensive documentation and great examples%s you'll be up and running in no time.", 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v4/developer-start-customising/">', '</a>' ); ?></p>
 
 		</div>
 

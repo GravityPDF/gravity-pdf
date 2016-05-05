@@ -71,7 +71,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<?php if ( $args['memory'] < 128 && $args['memory'] !== -1 ): ?>
 				<span class="gf_settings_description">
-                    <?php echo sprintf( __( 'We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. %sFind out how to increase this limit%s.', 'gravity-forms-pdf-extended' ), '<br /><a href="https://gpdfv4.xyz/documentation/v4/user-increasing-memory-limit/">', '</a>' ); ?>
+                    <?php echo sprintf( __( 'We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. %sFind out how to increase this limit%s.', 'gravity-forms-pdf-extended' ), '<br /><a href="https://gravitypdf.com/documentation/v4/user-increasing-memory-limit/">', '</a>' ); ?>
                 </span>
 			<?php endif; ?>
 		</td>
@@ -127,7 +127,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 					<span class="gf_settings_description">
 						<?php printf( __( "We've detected the PDFs saved in Gravity PDF's %stmp%s directory can be publically accessed.", 'gravity-forms-pdf-extended' ), '<code>', '</code>' ); ?><br>
-						<?php printf( __( 'We recommend you use our %sgfpdf_tmp_location%s filter to %smove the folder outside your public website directory%s.', 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<a href="https://gpdfv4.xyz/documentation/v4/gfpdf_tmp_location/">', '</a>' ); ?>
+						<?php printf( __( 'We recommend you use our %sgfpdf_tmp_location%s filter to %smove the folder outside your public website directory%s.', 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<a href="https://gravitypdf.com/documentation/v4/gfpdf_tmp_location/">', '</a>' ); ?>
 					</span>
 				</div>
 			</div>

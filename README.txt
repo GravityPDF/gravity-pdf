@@ -17,7 +17,7 @@ Automatically generate, email and download PDF documents with Gravity Forms and 
 
 https://www.youtube.com/watch?v=z8zKKrjmNjY
 
-The plugin ships with four highly-customisable PDF templates perfectly suited for displaying your user’s data. Within seconds you can personalise the documents with your company logo, change the font, size, colour and the paper size. If the templates don't suit, [have one tailor made just for you](https://gpdfv4.xyz/integration-services/) or [roll your own](https://gpdfv4.xyz/documentation/v4/developer-start-customising/).
+The plugin ships with four highly-customisable PDF templates perfectly suited for displaying your user’s data. Within seconds you can personalise the documents with your company logo, change the font, size, colour and the paper size. If the templates don't suit, [have one tailor made just for you](https://gravitypdf.com/integration-services/) or [roll your own](https://gravitypdf.com/documentation/v4/developer-start-customising/).
 
 > Digital document management with WordPress just became a breeze!
 
@@ -27,24 +27,24 @@ The plugin ships with four highly-customisable PDF templates perfectly suited fo
 * We support all languages, including complex symbol-based languages like Chinese and Japanese, as well as Right to Left (RTL) written languages such as Arabic and Hebrew.
 * Automatically email your PDF when a user completes a form. Have it emailed to people in your organisation, the user, or both. You can also conditionally generate and email the PDF.
 * Using Gravity Forms’ developer-licensed payment add-ons – like PayPal, Authorize.net or Stripe – you can restrict access to the PDF until after a payment is captured.
-* [Protecting your user’s sensitive information is the at the heart of Gravity PDF](https://gpdfv4.xyz/documentation/v4/user-pdf-security/). The plugin’s security settings give you granular control over who has access to the PDFs generated.
-* Our [JavaScript-powered font manager](https://gpdfv4.xyz/documentation/v4/user-custom-fonts/) allows you to install and use your favourite fonts. Now you can keep in line with your corporate style guide, or create beautiful PDF typography.
-* [The documentation](https://gpdfv4.xyz/documentation/v4/user-installation/) has everything from basic install instructions to advanced developer how-to guides. Our friendly team is also on hand to [provide FREE general support](https://gpdfv4.xyz/support/).
-* PHP, HTML and CSS come easy? [You’ll find creating your own PDF templates a breeze](https://gpdfv4.xyz/documentation/v4/developer-start-customising/). If not, [we offer PDF design services](https://gpdfv4.xyz/integration-services/) tailored just for you. We can even auto-fill existing PDFs!
+* [Protecting your user’s sensitive information is the at the heart of Gravity PDF](https://gravitypdf.com/documentation/v4/user-pdf-security/). The plugin’s security settings give you granular control over who has access to the PDFs generated.
+* Our [JavaScript-powered font manager](https://gravitypdf.com/documentation/v4/user-custom-fonts/) allows you to install and use your favourite fonts. Now you can keep in line with your corporate style guide, or create beautiful PDF typography.
+* [The documentation](https://gravitypdf.com/documentation/v4/user-installation/) has everything from basic install instructions to advanced developer how-to guides. Our friendly team is also on hand to [provide FREE general support](https://gravitypdf.com/support/).
+* PHP, HTML and CSS come easy? [You’ll find creating your own PDF templates a breeze](https://gravitypdf.com/documentation/v4/developer-start-customising/). If not, [we offer PDF design services](https://gravitypdf.com/integration-services/) tailored just for you. We can even auto-fill existing PDFs!
 
 = Requirements =
 
 Gravity PDF can be run on most shared web hosting without any issues. It requires **PHP 5.4+** (PHP 7.0+ recommended) and at least 64MB of WP Memory (128MB+ recommended). You'll also need to be running WordPress 4.2+ and have Gravity Forms 1.9+.
 
-[Don't have Gravity Forms? Purchase a license](https://goo.gl/lsBOef) (any license type will do, although a Developer license will give you the best bang for the buck). If you aren't sure Gravity PDF will meet your needs (and haven't got a Gravity Forms license yet) you can [try out the software via our demo site](https://demo.gpdfv4.xyz).
+[Don't have Gravity Forms? Purchase a license](https://goo.gl/lsBOef) (any license type will do, although a Developer license will give you the best bang for the buck). If you aren't sure Gravity PDF will meet your needs (and haven't got a Gravity Forms license yet) you can [try out the software via our demo site](https://demo.gravitypdf.com).
 
 = Documentation & Support =
 
-[We have extensive documentation on using Gravity PDF](https://gpdfv4.xyz/documentation/v4/five-minute-install/), and our friendly support team provides [FREE basic support via our website](https://gpdfv4.xyz/support/#contact-support) (we also check the WordPress.org forums but submitting a ticket via GravityPDF.com will get a faster response).
+[We have extensive documentation on using Gravity PDF](https://gravitypdf.com/documentation/v4/five-minute-install/), and our friendly support team provides [FREE basic support via our website](https://gravitypdf.com/support/#contact-support) (we also check the WordPress.org forums but submitting a ticket via GravityPDF.com will get a faster response).
 
 = Custom PDF Integration =
 
-We offer **comprehensive PDF integration services** and do all the PDF development and integration into Gravity Forms for you. You tell us what you want and our friendly and experienced developers will design, develop and install custom PDF templates tailor specifically for you. We can even auto-fill your existing PDF documents. [Find out more at GravityPDF.com](https://gpdfv4.xyz/integration-services/).
+We offer **comprehensive PDF integration services** and do all the PDF development and integration into Gravity Forms for you. You tell us what you want and our friendly and experienced developers will design, develop and install custom PDF templates tailor specifically for you. We can even auto-fill your existing PDF documents. [Find out more at GravityPDF.com](https://gravitypdf.com/integration-services/).
 
 = Contribute =
 
@@ -52,13 +52,13 @@ All development for Gravity PDF [is handled via GitHub](https://github.com/Gravi
 
 [Our public roadmap is available on Trello](https://trello.com/b/60YGv1J3/roadmap). We'd love it if you vote and comment on your favourite ideas.
 
-You can also keep up to date with Gravity PDF by [subscribing to our newsletter](https://gpdfv4.xyz/#signup-top), [following us on Twitter](https://twitter.com/gravitypdf) or [liking us on Facebook](https://www.facebook.com/gravitypdf).
+You can also keep up to date with Gravity PDF by [subscribing to our newsletter](https://gravitypdf.com/#signup-top), [following us on Twitter](https://twitter.com/gravitypdf) or [liking us on Facebook](https://www.facebook.com/gravitypdf).
 
 Also, if you enjoy using the software [we'd love it if you could give us a review!](https://wordpress.org/support/view/plugin-reviews/gravity-forms-pdf-extended)
 
 == Installation ==
 
-[You'll find detailed installation instructions on GravityPDF.com](https://gpdfv4.xyz/documentation/v4/user-installation/).
+[You'll find detailed installation instructions on GravityPDF.com](https://gravitypdf.com/documentation/v4/user-installation/).
 
 == Screenshots ==
 
@@ -88,7 +88,7 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 * Minimum PHP version changed from PHP 5.2 to PHP 5.4. ENSURE YOUR WEB SERVER IS COMPATIBLE BEFORE UPDATING (Forms -> Settings -> PDF -> System Status)
 * Minimum WordPress version changed from 3.9 to 4.2. ENSURE YOU ARE RUNNING THE MINIMUM VERISON OF WP BEFORE UPDATING (Forms -> Settings -> PDF -> System Status)
 * Minimum Gravity Forms version changed from 1.8 to 1.9. ENSURE YOU ARE RUNNING THE MINIMUM VERISON OF GRAVITY FORMS BEFORE UPDATING (Forms -> Settings -> PDF -> System Status)
-* Maintained backwards compatibility with v3 for 80% of users. Review our migration guide for additional information (https://gpdfv4.xyz/documentation/v4/v3-to-v4-migration/)
+* Maintained backwards compatibility with v3 for 80% of users. Review our migration guide for additional information (https://gravitypdf.com/documentation/v4/v3-to-v4-migration/)
 * Created full user interface for managing plugin settings. All settings are now stored in the database
 * Overhaul PDF designs that ship with software. Now comes with 4 completely free templates (two are all-new and two are enhanced v3 favourites)
 * Added CSS Ready class support in PDFs. Two and three column classes now work in PDF
@@ -118,7 +118,7 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 * Detect if our /tmp/ directory is accessible by browser and suggest ways to fix
 * Allow all directories in /PDF_EXTENDED_TEMPLATES/ directory to be moved / renamed via filters (including the base directory)
 * Create GPDFAPI class to allow devs to easily build ontop of plugin
-* Cleaned up PDF template markup so developers can focus soley on their template code without any extra overhead. See our documentation for more details (https://gpdfv4.xyz/documentation/v4/developer-start-customising/)
+* Cleaned up PDF template markup so developers can focus soley on their template code without any extra overhead. See our documentation for more details (https://gravitypdf.com/documentation/v4/developer-start-customising/)
 * Enhanced PDF templates by allowing an image and configuration class
 * Added large number of new actions and filters and provided documentation and examples for them on our website
 * Allow developers to add or remove individual security layers via filters
@@ -138,4 +138,4 @@ See [CHANGELOG.txt](https://github.com/GravityPDF/gravity-pdf/blob/master/CHANGE
 == Upgrade Notice ==
 
 = 4.0 =
-**WARNING**: This major release is not 100% backwards compatibile with v3. [Review our upgrade guide](https://gpdfv4.xyz/documentation/v4/v3-to-v4-migration/) AND **DO A FULL BACKUP** before proceeding with the update.
+**WARNING**: This major release is not 100% backwards compatibile with v3. [Review our upgrade guide](https://gravitypdf.com/documentation/v4/v3-to-v4-migration/) AND **do a full backup** before proceeding with the update.

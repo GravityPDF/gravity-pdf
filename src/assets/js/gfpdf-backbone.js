@@ -996,7 +996,7 @@
 			template: '#GravityPDFSearchResultsDocumentation',
 
 			initialize: function(options) {
-				this.url = 'https://gpdfv4.xyz/wp-json/wp/v2/v4_docs/';
+				this.url = 'https://gravitypdf.com/wp-json/wp/v2/v4_docs/';
 				this.s   = options.s;
 				this.render();
 			},

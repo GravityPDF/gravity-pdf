@@ -190,7 +190,7 @@ class Helper_Data {
 
 		$custom_fonts = array_values( $options->get_custom_fonts() );
 
-		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_localised_script_array/ for more details about this filter */
+		/* See https://gravitypdf.com/documentation/v4/gfpdf_localised_script_array/ for more details about this filter */
 		return apply_filters( 'gfpdf_localised_script_array', array(
 			'ajaxurl'                     => admin_url( 'admin-ajax.php' ),
 			'GFbaseUrl'                   => $gform->get_plugin_url(),

@@ -205,7 +205,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		 * Default middleware includes 'middle_public_access', 'middle_active', 'middle_conditional', 'middle_owner_restriction', 'middle_logged_out_timeout', 'middle_auth_logged_out_user', 'middle_user_capability'
 		 * If WP_Error is returned the PDF won't be parsed
 		 *
-		 * See https://gpdfv4.xyz/documentation/v4/gfpdf_pdf_middleware/ for more details about this filter
+		 * See https://gravitypdf.com/documentation/v4/gfpdf_pdf_middleware/ for more details about this filter
 		 */
 		$middleware = apply_filters( 'gfpdf_pdf_middleware', false, $entry, $settings );
 
@@ -664,7 +664,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		/*
 		 * Add filter to modify PDF name
 		 *
-		 * See https://gpdfv4.xyz/documentation/v4/gfpdf_pdf_filename/ for more details about this filter
+		 * See https://gravitypdf.com/documentation/v4/gfpdf_pdf_filename/ for more details about this filter
 		 */
 		$name = apply_filters( 'gfpdf_pdf_filename', $name, $form, $entry, $settings );
 
@@ -868,7 +868,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 				do_action( 'gfpdf_post_pdf_save', $form['id'], $entry['id'], $settings, $pdf_path ); /* Backwards compatibility */
 
-				/* See https://gpdfv4.xyz/documentation/v4/gfpdf_post_save_pdf/ for more details about these actions */
+				/* See https://gravitypdf.com/documentation/v4/gfpdf_post_save_pdf/ for more details about these actions */
 				do_action( 'gfpdf_post_save_pdf', $pdf_path, $filename, $settings, $entry, $form );
 				do_action( 'gfpdf_post_save_pdf_' . $form['id'], $pdf_path, $filename, $settings, $entry, $form );
 
@@ -1716,7 +1716,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				} else {
 					/*
 					 * Load the selected class
-					 * See https://gpdfv4.xyz/documentation/v4/gfpdf_field_class/ for more details about these filters
+					 * See https://gravitypdf.com/documentation/v4/gfpdf_field_class/ for more details about these filters
 					 */
 					$class = apply_filters( 'gfpdf_field_class', new $class_name( $field, $entry, $this->gform, $this->misc ), $field, $entry, $form );
 					$class = apply_filters( 'gfpdf_field_class_' . $field->type, $class, $field, $entry, $form );

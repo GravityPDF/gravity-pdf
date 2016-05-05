@@ -3,7 +3,7 @@ Gravity PDF
 
 [![Build Status](https://travis-ci.org/GravityPDF/gravity-pdf.svg?branch=development)](https://travis-ci.org/GravityPDF/gravity-pdf)
 
-Gravity PDF is a GPLv2-licensed WordPress plugin that allows you to automatically generate, email and download PDF documents using the popular form-builder plugin, [Gravity Forms](https://goo.gl/lsBOef). Find out more about Gravity PDF at [https://gpdfv4.xyz](https://gpdfv4.xyz/).
+Gravity PDF is a GPLv2-licensed WordPress plugin that allows you to automatically generate, email and download PDF documents using the popular form-builder plugin, [Gravity Forms](https://goo.gl/lsBOef). Find out more about Gravity PDF at [https://gravitypdf.com](https://gravitypdf.com/).
 
 # About
 
@@ -20,7 +20,7 @@ The `development` branch is considered our bleeding edge branch, with all new ch
 
 # Documentation
 
-All documentation can be found at [https://gpdfv4.xyz/documentation/](https://gpdfv4.xyz/documentation/).
+All documentation can be found at [https://gravitypdf.com/documentation/](https://gravitypdf.com/documentation/).
 
 # Contributions
 
