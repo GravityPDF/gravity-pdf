@@ -1009,4 +1009,20 @@ class Helper_Misc {
 			break;
 		}
 	}
+
+	/**
+	 * Check if the Gravity Forms GFEntryDetail class exists, otherwise load it
+	 *
+	 * @since 4.0
+	 */
+	public function maybe_load_gf_entry_detail_class() {
+		/* Ensure Gravity Forms GFEntryDetail class is loaded */
+		if ( ! class_exists( 'GFEntryDetail' ) ) {
+			$entry_details_file = GFCommon::get_base_path() . '/entry_detail.php';
+
+			if ( is_file( $entry_details_file ) ) {
+				require_once( $entry_details_file );
+			}
+		}
+	}
 }
