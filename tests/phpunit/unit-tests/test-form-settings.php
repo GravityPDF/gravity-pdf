@@ -472,8 +472,8 @@ class Test_Form_Settings extends WP_UnitTestCase {
 
 		/* loop through array and check results */
 		foreach ( $input as $id => $field ) {
-			if ( in_array( $field['type'], $types ) ) {
-				$this->assertEquals( $field['type'], $values[ $id ] );
+			if ( isset( $values[ $id ] ) ) {
+				$this->assertTrue( in_array( $values[ $id ], $types ) );
 			}
 		}
 

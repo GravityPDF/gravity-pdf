@@ -529,6 +529,6 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
          * Do a final test to match the version number according to a set standard
          * This will validate up to a four digit version x.x.x.x
          */
-		$this->assertRegExp( '/^(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)$/', $version );
+		$this->assertRegExp( '/^(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)/', $version );
 	}
 }

@@ -1271,32 +1271,34 @@ class Model_PDF extends Helper_Abstract_Model {
 		 */
 		$has_product_fields = false;
 
-		foreach ( $form['fields'] as $field ) {
+		if ( isset( $form['fields'] ) ) {
+			foreach ( $form['fields'] as $field ) {
 
-			/* Skip over product fields as they will be grouped at the end */
-			if ( GFCommon::is_product_field( $field->type ) ) {
-				$has_product_fields = true;
+				/* Skip over product fields as they will be grouped at the end */
+				if ( GFCommon::is_product_field( $field->type ) ) {
+					$has_product_fields = true;
+				}
+
+				/* Skip over captcha, password and page fields */
+				$fields_to_skip = apply_filters( 'gfpdf_form_data_skip_fields', array(
+					'captcha',
+					'password',
+					'page',
+				) );
+
+				if ( in_array( $field->type, $fields_to_skip ) ) {
+					continue;
+				}
+
+				/* Include any field descriptions */
+				$data['field_descriptions'][ $field->id ] = ( ! empty( $field->description ) ) ? $field->description : '';
+
+				/* Get our field object */
+				$class = $this->get_field_class( $field, $form, $entry, $products );
+
+				/* Merge in the field object form_data() results */
+				$data = array_replace_recursive( $data, $class->form_data() );
 			}
-
-			/* Skip over captcha, password and page fields */
-			$fields_to_skip = apply_filters( 'gfpdf_form_data_skip_fields', array(
-				'captcha',
-				'password',
-				'page',
-			) );
-
-			if ( in_array( $field->type, $fields_to_skip ) ) {
-				continue;
-			}
-
-			/* Include any field descriptions */
-			$data['field_descriptions'][ $field->id ] = ( ! empty( $field->description ) ) ? $field->description : '';
-
-			/* Get our field object */
-			$class = $this->get_field_class( $field, $form, $entry, $products );
-
-			/* Merge in the field object form_data() results */
-			$data = array_replace_recursive( $data, $class->form_data() );
 		}
 
 		/* Load our product array if products exist */
@@ -1637,9 +1639,12 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function check_field_exists( $type, $form ) {
-		foreach ( $form['fields'] as $field ) {
-			if ( $field['type'] == $type ) {
-				return true;
+
+		if ( isset( $form['fields'] ) ) {
+			foreach ( $form['fields'] as $field ) {
+				if ( $field['type'] == $type ) {
+					return true;
+				}
 			}
 		}
 

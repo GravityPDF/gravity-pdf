@@ -329,7 +329,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		}
 
 		/* Trigger an error */
-		$error = $this->model->generate_and_save_pdf( array(), '' );
+		$error = $this->model->generate_and_save_pdf( array(), array( 'filename' => '' ) );
 
 		$this->assertTrue( is_wp_error( $error ) );
 	}

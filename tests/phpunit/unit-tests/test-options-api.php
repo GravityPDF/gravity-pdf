@@ -835,8 +835,8 @@ class Test_Options_API extends WP_UnitTestCase {
 		$initial_settings = $this->options->get_settings();
 
 		$this->assertEquals( 'custom', $initial_settings['default_pdf_size'] );
-		$this->assertEmpty( $initial_settings['default_font_size'] );
-		$this->assertEmpty( $initial_settings['other_type'] );
+		$this->assertArrayNotHasKey( 'default_font_size', $initial_settings );
+		$this->assertArrayNotHasKey( 'other_type', $initial_settings );
 
 		/* Run our settings santize function and check the results are accurate */
 		$this->options->settings_sanitize( $input );
@@ -845,9 +845,7 @@ class Test_Options_API extends WP_UnitTestCase {
 
 		$this->assertEquals( 'A5', $updated_settings['default_pdf_size'] );
 		$this->assertEquals( '15', $updated_settings['default_font_size'] );
-		$this->assertEmpty( $updated_settings['other_type'] );
-
-
+		$this->assertArrayNotHasKey( 'other_type', $updated_settings );
 	}
 
 	/**

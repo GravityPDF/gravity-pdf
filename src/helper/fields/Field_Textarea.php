@@ -92,7 +92,15 @@ class Field_Textarea extends Helper_Abstract_Fields {
 			return $this->cache();
 		}
 
-		$this->cache( nl2br( esc_html( $this->get_value() ) ) );
+		$value = $this->get_value();
+
+		if ( isset( $this->field->useRichTextEditor ) && true === $this->field->useRichTextEditor ) {
+			$html = wp_kses_post( $value );
+		} else {
+			$html = nl2br( esc_html( $value ) );
+		}
+
+		$this->cache( $html );
 
 		return $this->cache();
 	}

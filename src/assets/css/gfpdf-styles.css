@@ -59,6 +59,7 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
 #pdfextended-settings h3,
 #tab_pdf h3 {
   margin-top: 5px;
+  line-height: 1.3em;
 }
 
 #pdfextended-settings h3 i,
@@ -109,7 +110,8 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
 
 #pdfextended-settings select.large,
 #tab_pdf select.large {
-  width: 350px;
+  width: 100%;
+  max-width: 350px;
 }
  
 #tab_pdf .formSubmitted input:invalid {
@@ -125,36 +127,22 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
     margin-left: 5px;
 }
 
-
 /**
  * Tools Settings Page
  */
-#pdfextended-settings  table.gfpdfe_table thead th {
+
+#pdfextended-settings  table.gfpdf_table thead th {
   font-weight: bold;
 }
 
-#pdfextended-settings table.gfpdfe_table tr:nth-child(2n) td,
-#pdfextended-settings table.gfpdfe_table tr:nth-child(2n) th {
+#pdfextended-settings table.gfpdf_table tr:nth-child(2n) td,
+#pdfextended-settings table.gfpdf_table tr:nth-child(2n) th {
 	background: none repeat scroll 0 0 #fcfcfc;
-}
-
-#pdfextended-settings table.gfpdfe_table tbody th:first-child {
-  width: 33%;
 }
 
 #pdfextended-settings  p.submit {
   padding-bottom: 0;
   margin-bottom: 0;
-}
-
-#pdfextended-settings #pdf-system-status th {
-  padding-top: 12px;
-  padding-bottom: 12px;
-}
-
-#pdfextended-settings #pdf-system-status td {
-  padding-top: 10px;
-  padding-bottom: 10px;
 }
 
 #pdfextended-settings  span.path,
@@ -250,7 +238,6 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
 
 #manage-font-files .gf_settings_description {
   font-size: 95%;
-  margin: 0 0 6px 9.5em;
 }
 
 #manage-font-files .font-settings > label, #manage-font-files .font-selector > label {
@@ -379,17 +366,20 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
     font-size: 13px;
 }
 
+#pdfextended-settings .about-wrap #dashboard-widgets.columns-2 .postbox-container {
+    width: 100%
+}
+
 #pdfextended-settings .about-wrap #dashboard-widgets .postbox-container a {
     background: #f6f6f6 none repeat scroll 0 0;
     border: 3px solid #eee;
     border-radius: 10px;
     color: inherit;
     display: block;
-    min-height: 300px;
     padding: 15px;
     font-size: 16px;
     text-decoration: none;
-    margin: 0 30px 30px 0;
+    margin-bottom: 30px;
     transition: all 0.5s ease 0s;
 }
 
@@ -578,10 +568,6 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
   margin: 0 0 15px;
 }
 
-#gfpdf_conditional_logic_container .gf_conditional_logic_rules_container :first-child {
-  width: 250px;
-}
-
 .gfpdf-page .merge-tag-support {
     max-width: none;
 }
@@ -595,6 +581,10 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
 
 .gfpdf_submenu {
   width: 200px;
+}
+
+.gfpdf_submenu li {
+    border-bottom: 1px solid #eee;
 }
 
 /**
@@ -630,6 +620,82 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
     }
 }
 
+@media only screen and (max-width: 782px) {
+    #pdfextended-settings table.gfpdf_table th, #pdfextended-settings table.gfpdf_table td {
+        display: block;
+        vertical-align: middle;
+        width: auto;
+    }
+
+    /* Chosen Styles */
+    .gfpdf-page .chosen-container {
+        font-size: 17px;
+    }
+
+    .gfpdf-page .chosen-container-single .chosen-single {
+        height: 38px;
+        line-height: 34px;
+    }
+
+    .gfpdf-page .chosen-container-single .chosen-single div {
+        top: 7px;
+    }
+
+    .gfpdf-page .chosen-container .chosen-results li {
+        line-height: 24px;
+    }
+
+    .gfpdf-page .chosen-container-multi .chosen-choices li.search-choice {
+        line-height: 24px;
+    }
+
+    .gfpdf-page .chosen-container-multi .chosen-choices li.search-choice .search-choice-close {
+        top: 10px;
+    }
+
+    .gfpdf-page .chosen-container-multi .chosen-choices li.search-field input[type="text"] {
+        height: 38px;
+    }
+
+    /* Input Styles */
+    .gfpdf-page .form-table tbody td input[type="number"] {
+        font-size: 16px;
+        line-height: 1.5;
+        padding: 7px 10px;
+    }
+
+    .gfpdf-page .form-table tbody td label {
+        display: block;
+        font-size: 16px;
+    }
+
+    .gfpdf-page .form-table tbody td label:first-of-type {
+        margin-top: 10px;
+    }
+
+    .gfpdf-page .form-table th,
+    .gfpdf-page .form-table td,
+    .gfpdf-page .gfpdf_table th,
+    .gfpdf-page .gfpdf_table td,
+    .gf_delete_notice,
+    #manage-font-files {
+        font-size: 16px;
+    }
+
+    .gf_delete_notice,
+    #manage-font-files {
+        line-height: 21px;
+    }
+
+    .gfpdf-page .form-table tbody .conditional_logic td label {
+        display: inline;
+    }
+
+    .gfpdf-page .form-table tbody td input[type="number"] {
+        padding-right: 3px;
+    }
+}
+
 @media only screen and (min-width: 782px) {
 
 	/**
@@ -654,8 +720,42 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
 		padding-bottom: 120px !important;
 	}
 
+    #pdfextended-settings table.gfpdf_table tbody th {
+        width: 200px;
+    }
+
+    #manage-font-files .gf_settings_description {
+        margin: 0 0 6px 9.5em;
+    }
+
+    #pdfextended-settings .about-wrap #dashboard-widgets.columns-2 .postbox-container {
+        width: 49.5%;
+    }
+
     #pdfextended-settings .about-wrap #dashboard-widgets .postbox-container a {
-        min-height: 250px;
+        margin-right: 30px;
+        min-height: 245px;
+    }
+
+    #pdfextended-settings #pdf-system-status th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+
+    #pdfextended-settings #pdf-system-status td {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    /* Chosen Styles */
+    .gfpdf-page .chosen-container {
+        max-width: 300px;
+    }
+
+    /* Conditional Logic */
+    #gfpdf_conditional_logic_container .gf_conditional_logic_rules_container :first-child {
+        max-width: 250px;
+        width: 100%;
     }
 }
 

@@ -333,8 +333,8 @@ class Model_Actions extends Helper_Abstract_Model {
 		/*
          * Validate Endpoint
          */
-		$nonce   = $_POST['nonce'];
-		$blog_id = (int) $_POST['blog_id'];
+		$nonce   = ( isset( $_POST['nonce'] ) ) ? $_POST['nonce'] : '';
+		$blog_id = ( isset( $_POST['blog_id'] ) ) ? (int) $_POST['blog_id'] : 0;
 
 		if ( ! wp_verify_nonce( $nonce, 'gfpdf_multisite_migration' ) ) {
 

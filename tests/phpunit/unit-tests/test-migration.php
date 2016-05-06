@@ -135,7 +135,7 @@ class Test_Migration extends WP_UnitTestCase {
 	 *
 	 * @since 4.0
 	 */
-	public function test_imported_data( $data ) {
+	public function test_imported_data() {
 		global $gfpdf;
 
 		$main_form_id      = $this->form_id[0];
@@ -164,14 +164,14 @@ class Test_Migration extends WP_UnitTestCase {
 		}
 
 		/* Do our assertions */
-		$this->assertSame( 0, sizeof( array_diff( $settings[0], $data[0]['config'] ) ) );
-		$this->assertSame( 0, sizeof( array_diff( $settings[1], $data[1]['config'] ) ) );
-		$this->assertSame( 0, sizeof( array_diff( $settings[2], $data[2]['config'] ) ) );
-		$this->assertSame( 0, sizeof( array_diff( $settings[3], $data[3]['config'] ) ) );
-		$this->assertSame( 0, sizeof( array_diff( $settings[4], $data[4]['config'] ) ) );
-		$this->assertSame( 0, sizeof( array_diff( $settings[5], $data[5]['config'] ) ) );
-		$this->assertSame( 0, sizeof( array_diff( $settings[6], $data[6]['config'] ) ) );
-		$this->assertSame( 0, sizeof( array_diff( $settings[7], $data[7]['config'] ) ) );
+		$this->assertSame( 0, strcmp( json_encode( $settings[0] ), json_encode( $data[0]['config'] ) ) );
+		$this->assertSame( 0, strcmp( json_encode( $settings[1] ), json_encode( $data[1]['config'] ) ) );
+		$this->assertSame( 0, strcmp( json_encode( $settings[2] ), json_encode( $data[2]['config'] ) ) );
+		$this->assertSame( 0, strcmp( json_encode( $settings[3] ), json_encode( $data[3]['config'] ) ) );
+		$this->assertSame( 0, strcmp( json_encode( $settings[4] ), json_encode( $data[4]['config'] ) ) );
+		$this->assertSame( 0, strcmp( json_encode( $settings[5] ), json_encode( $data[5]['config'] ) ) );
+		$this->assertSame( 0, strcmp( json_encode( $settings[6] ), json_encode( $data[6]['config'] ) ) );
+		$this->assertSame( 0, strcmp( json_encode( $settings[7] ), json_encode( $data[7]['config'] ) ) );
 
 		/* Check our default config was imported into our second form */
 		$settings = $gfpdf->options->get_form_pdfs( $secondary_form_id );
@@ -187,7 +187,7 @@ class Test_Migration extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Data provider of expected results after an import
+	 * The config data used while testing the import
 	 *
 	 * @return array
 	 */
@@ -195,14 +195,12 @@ class Test_Migration extends WP_UnitTestCase {
 
 		return array(
 			array(
-				'id'     => 0,
 				'config' => array(
 					'template'          => 'health-care-directive',
 					'pdf_size'          => 'A4',
 					'format'            => 'Standard',
 					'notification'      => array(
-						'55598a8994685',
-						'555a9083a1cb5',
+						'5578e163413b3',
 					),
 					'advanced_template' => 'Yes',
 					'active'            => true,
@@ -213,54 +211,49 @@ class Test_Migration extends WP_UnitTestCase {
 			),
 
 			array(
-				'id'     => 1,
 				'config' => array(
-					'template'      => 'example-template',
-					'name'          => 'Example Template',
-					'filename'      => 'testman',
-					'notifications' => array(
-						'55598a8994685',
-					),
-					'public_access' => 'Yes',
-
+					'template'         => 'example-template',
 					'pdf_size'         => 'A4',
 					'format'           => 'Standard',
-					'conditionalLogic' => '',
+					'filename'         => 'testman',
+					'notification'    => array(
+						'5578e163413b3',
+					),
+					'public_access'    => 'Yes',
 					'active'           => true,
+					'name'             => 'Example Template',
+					'conditionalLogic' => '',
 				),
 			),
 
 			array(
-				'id'     => 2,
 				'config' => array(
 					'template'             => 'default-template-no-style',
-					'name'                 => 'Default Template No Style',
+					'pdf_size'             => 'A4',
+					'format'               => 'Standard',
 					'filename'             => 'Double Trouble',
 					'show_html'            => 'Yes',
 					'show_empty'           => 'Yes',
 					'show_page_names'      => 'Yes',
 					'show_section_content' => 'Yes',
-
-					'pdf_size'         => 'A4',
-					'format'           => 'Standard',
-					'conditionalLogic' => '',
-					'active'           => true,
+					'active'               => true,
+					'name'                 => 'Default Template No Style',
+					'conditionalLogic'     => '',
 				),
 			),
 
 			array(
-				'id'     => 3,
 				'config' => array(
-					'template'        => 'default-template',
-					'name'            => 'Default Template',
-					'filename'        => 'testman',
-					'notification'    => array(
-						'55598a8994685',
-						'555a9083a1cb5',
+					'template'         => 'default-template',
+					'pdf_size'         => 'A4',
+					'format'           => 'Standard',
+					'filename'         => 'testman',
+					'security'         => 'Yes',
+					'notification'     => array(
+						'5578e163413b3',
 					),
-					'security'        => 'Yes',
-					'password'        => 'myPDFpass',
-					'privileges'      => array(
+					'password'         => 'myPDFpass',
+					'privileges'       => array(
 						'copy',
 						'print',
 						'modify',
@@ -270,90 +263,77 @@ class Test_Migration extends WP_UnitTestCase {
 						'assemble',
 						'print-highres',
 					),
-					'master_password' => 'admin password',
-
-					'pdf_size'         => 'A4',
-					'format'           => 'Standard',
-					'conditionalLogic' => '',
+					'master_password'  => 'admin password',
 					'active'           => true,
+					'name'             => 'Default Template',
+					'conditionalLogic' => '',
 				),
 			),
 
 			array(
-				'id'     => 4,
 				'config' => array(
-					'template'        => 'default-template',
-					'name'            => 'Default Template #1',
-					'filename'        => 'testman2',
-					'notification'    => array(
-						'55598a8994685',
+					'template'         => 'default-template',
+					'pdf_size'         => 'A4',
+					'format'           => 'Standard',
+					'filename'         => 'testman2',
+					'security'         => 'Yes',
+					'notification'     => array(
+						'5578e163413b3',
 					),
-					'security'        => 'Yes',
-					'password'        => '',
-					'privileges'      => array( 'copy', 'print', 'extract', 'assemble', 'print-highres' ),
-					'master_password' => 'adfawfawr5q2atd',
+					'password'         => '',
+					'privileges'       => array( 'copy', 'print', 'extract', 'assemble', 'print-highres' ),
+					'master_password'  => 'adfawfawr5q2atd',
+					'active'           => true,
+					'name'             => 'Default Template #1',
+					'conditionalLogic' => '',
+				),
+			),
 
+			array(
+				'config' => array(
+					'template'         => 'default-template',
 					'pdf_size'         => 'A4',
 					'format'           => 'Standard',
-					'conditionalLogic' => '',
+					'filename'         => 'testman3',
+					'security'         => 'Yes',
+					'password'         => '',
+					'master_password'  => '',
 					'active'           => true,
+					'name'             => 'Default Template #2',
+					'conditionalLogic' => '',
 				),
 			),
 
 			array(
-				'id'     => 5,
 				'config' => array(
-					'template' => 'default-template',
-					'name'     => 'Default Template #2',
-					'filename' => 'testman3',
-
-					'security'        => 'Yes',
-					'password'        => '',
-					'master_password' => '',
-
-					'pdf_size'         => 'A4',
-					'format'           => 'Standard',
-					'conditionalLogic' => '',
+					'template'         => 'default-template',
+					'pdf_size'         => 'LETTER',
+					'format'           => 'PDFA1B',
+					'orientation'      => 'landscape',
+					'rtl'              => 'Yes',
+					'image_dpi'        => 300,
 					'active'           => true,
+					'name'             => 'Default Template #3',
+					'conditionalLogic' => '',
+					'filename'         => 'form-{form_id}-entry-{entry_id}',
 				),
 			),
 
 			array(
-				'id'     => 6,
 				'config' => array(
-					'template'    => 'default-template',
-					'name'        => 'Default Template #3',
-					'filename'    => 'form-{form_id}-entry-{entry_id}',
-					'pdf_size'    => 'LETTER',
-					'format'      => 'PDFA1B',
-					'orientation' => 'landscape',
-					'rtl'         => 'Yes',
-					'image_dpi'   => 300,
-
-					'conditionalLogic' => '',
-					'active'           => true,
-				),
-			),
-
-			array(
-				'id'     => 7,
-				'config' => array(
-					'template'     => 'default-template',
-					'name'         => 'Default Template #4',
-					'filename'     => 'form-{form_id}-entry-{entry_id}',
-					'notification' => array(
-						'55598a8994685',
+					'template'         => 'default-template',
+					'pdf_size'         => 'CUSTOM',
+					'format'           => 'PDFX1A',
+					'save'             => 'Yes',
+					'custom_pdf_size'  => array( 50, 200, 'millimeters' ),
+					'notification'     => array(
+						'5578e163413b3',
 					),
-
-					'pdf_size'        => 'CUSTOM',
-					'custom_pdf_size' => array( 50, 200, 'millimeters' ),
-					'format'          => 'PDFX1A',
-
-					'image_dpi' => 300,
-					'save'      => 'Yes',
-
-					'conditionalLogic' => '',
+					'image_dpi'        => 300,
 					'active'           => true,
+					'name'             => 'Default Template #4',
+					'conditionalLogic' => '',
+					'filename'         => 'form-{form_id}-entry-{entry_id}',
 				),
 			),
 		);
