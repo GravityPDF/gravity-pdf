@@ -55,6 +55,15 @@ class Helper_PDF {
 	protected $mpdf;
 
 	/**
+	 * Holds our Gravity Form array
+	 *
+	 * @var array
+	 *
+	 * @since 4.0
+	 */
+	protected $form;
+
+	/**
 	 * Holds our Gravity Form Entry Details
 	 *
 	 * @var array
@@ -173,6 +182,7 @@ class Helper_PDF {
 		$this->settings = $settings;
 		$this->gform    = $gform;
 		$this->data     = $data;
+		$this->form     = $this->gform->get_form( $entry['form_id'] );
 
 		$this->set_path();
 	}
@@ -212,7 +222,7 @@ class Helper_PDF {
 			$this->set_template();
 		}
 
-		$form = $this->gform->get_form( $this->entry['form_id'] );
+		$form = $this->form;
 
 		/* Load in our PHP template */
 		if ( empty( $html ) ) {
@@ -247,7 +257,7 @@ class Helper_PDF {
 		$this->show_print_dialog();
 		$this->set_metadata();
 
-		$form = $this->gform->get_form( $this->entry['form_id'] );
+		$form = $this->form;
 
 		/*
 		 * Allow $mpdf object class to be modified
@@ -593,15 +603,13 @@ class Helper_PDF {
 	protected function begin_pdf() {
 		$this->mpdf = new mPDF( '', $this->paper_size, 0, '', 15, 15, 16, 16, 9, 9, $this->orientation );
 
-		$form = $this->gform->get_form( $this->entry['form_id'] );
-
 		/**
 		 * Allow $mpdf object class to be modified
 		 * Note: in some circumstances using WriteHTML() during this filter will break headers/footers
 		 *
 		 * See https://gpdfv4.xyz/documentation/v4/gfpdf_mpdf_init_class/ for more details about this filter
 		 */
-		$this->mpdf = apply_filters( 'gfpdf_mpdf_init_class', $this->mpdf, $form, $this->entry, $this->settings, $this );
+		$this->mpdf = apply_filters( 'gfpdf_mpdf_init_class', $this->mpdf, $this->form, $this->entry, $this->settings, $this );
 	}
 
 	/**
@@ -846,9 +854,9 @@ class Helper_PDF {
 		/* Security settings cannot be applied to pdfa1b or pdfx1a formats */
 		if ( strtolower( $this->settings['format'] ) == 'standard' && strtolower( $this->settings['security'] == 'Yes' ) ) {
 
-			$password        = ( isset( $this->settings['password'] ) ) ? $this->settings['password'] : '';
+			$password        = ( isset( $this->settings['password'] ) ) ? $this->gform->process_tags( $this->settings['password'], $this->form, $this->entry ) : '';
 			$privileges      = ( isset( $this->settings['privileges'] ) ) ? $this->settings['privileges'] : array();
-			$master_password = ( isset( $this->settings['master_password'] ) ) ? $this->settings['master_password'] : '';
+			$master_password = ( isset( $this->settings['master_password'] ) ) ? $this->gform->process_tags( $this->settings['master_password'], $this->form, $this->entry ) : '';
 
 			$this->mpdf->SetProtection( $privileges, $password, $master_password, 128 );
 		}
