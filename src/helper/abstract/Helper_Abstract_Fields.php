@@ -284,7 +284,7 @@ abstract class Helper_Abstract_Fields {
 	 */
 	public function html( $value = '', $show_label = true ) {
 
-		$value = $this->encode_tags( $value, $this->field->type ); /* Prevent shortcodes being processed from user input */
+		$value = $this->encode_tags( $value, $this->field->type ); /* Prevent shortcodes and merge tags being processed from user input */
 		$value = apply_filters( 'gfpdf_field_content', $value, $this->field, GFFormsModel::get_lead_field_value( $this->entry, $this->field ), $this->entry['id'], $this->form['id'] ); /* Backwards compat */
 
 		$label = esc_html( GFFormsModel::get_label( $this->field ) );
@@ -330,7 +330,9 @@ abstract class Helper_Abstract_Fields {
 	 */
 	public function encode_tags( $value, $type ) {
 
-		if ( $type != 'html' && $type != 'signature' && $type != 'section' ) {
+		$skip_fields = array( 'html', 'signature', 'section' );
+
+		if ( ! in_array( $type, $skip_fields ) ) {
 
 			$find      = array( '[', ']', '{', '}' );
 			$converted = array( '&#91;', '&#93;', '&#123;', '&#125;' );

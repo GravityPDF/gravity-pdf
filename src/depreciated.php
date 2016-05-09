@@ -234,10 +234,9 @@ class PDF_Common extends GFPDF_Depreciated_Abstract {
 	 * @since 3.0
 	 */
 	public static function do_mergetags( $string, $form_id, $lead_id ) {
-		$misc  = GPDFAPI::get_misc_class();
 		$gform = GPDFAPI::get_form_class();
 
-		return $misc->do_mergetags( $string, $gform->get_form( $form_id ), $gform->get_entry( $lead_id ) );
+		return $gform->process_tags( $string, $gform->get_form( $form_id ), $gform->get_entry( $lead_id ) );
 	}
 
 	/**

@@ -165,7 +165,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertSame( 10, has_filter( 'mpdf_font_data', array( $this->model, 'register_custom_font_data_with_mPDF' ) ) );
 		$this->assertSame( 20, has_filter( 'mpdf_font_data', array( $this->model, 'add_unregistered_fonts_to_mPDF' ) ) );
 
-		$this->assertSame( 10, has_filter( 'gfpdf_pdf_html_output', array( $gfpdf->misc, 'do_mergetags' ) ) );
+		$this->assertSame( 10, has_filter( 'gfpdf_pdf_html_output', array( $gfpdf->gform, 'process_tags' ) ) );
 		$this->assertSame( 10, has_filter( 'gfpdf_pdf_html_output', 'do_shortcode' ) );
 
 		$this->assertSame( 10, has_filter( 'gfpdf_template_args', array( $this->model, 'preprocess_template_arguments' ) ) );
