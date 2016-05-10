@@ -211,6 +211,7 @@ class Test_Installer extends WP_UnitTestCase {
 		/* Test the results */
 		$this->assertTrue( is_dir( $gfpdf->data->template_location ) );
 		$this->assertTrue( is_dir( $gfpdf->data->template_font_location ) );
+		$this->assertTrue( is_dir( $gfpdf->data->template_fontdata_location ) );
 		$this->assertTrue( is_dir( $gfpdf->data->template_tmp_location ) );
 
 		$this->assertTrue( is_file( $gfpdf->data->template_tmp_location . '.htaccess' ) );

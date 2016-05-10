@@ -54,6 +54,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @property string  $template_location               The current path to the PDF working directory
  * @property string  $template_location_url           The current URL to the PDF working directory
  * @property string  $template_font_location          The current path to the PDF font directory
+ * @property string  $template_fontdata_location      The current path to the PDF tmp font directory
  * @property string  $template_tmp_location           The current path to the PDF tmp location
  * @property string  $multisite_template_location     The current path to the multisite PDF working directory
  * @property string  $multisite_template_location_url The current URL to the multisite PDF working directory
