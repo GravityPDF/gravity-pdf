@@ -751,27 +751,6 @@ class Helper_Misc {
 	}
 
 	/**
-	 * Replace all the merge tag fields in the string
-	 *
-	 * @param  string $string The string to process
-	 * @param  array  $form   The Gravity Form array
-	 * @param  array  $lead   The Gravity Form Entry Array
-	 *
-	 * @return string
-	 *
-	 * @since 4.0
-	 */
-	public function do_mergetags( $string, $form, $lead ) {
-		/* Unconvert { and } symbols from HTML entities and remove {all_fields} tag */
-		$find    = array( '&#123;', '&#125;', '{all_fields}' );
-		$replace = array( '{', '}', '' );
-
-		$string = str_replace( $find, $replace, $string );
-
-		return trim( GFCommon::replace_variables( $string, $form, $lead, false, false, false ) );
-	}
-
-	/**
 	 * Backwards compatibility that allows multiple IDs to be passed to the renderer
 	 *
 	 * @param  integer $entry_id The fallback ID if none present

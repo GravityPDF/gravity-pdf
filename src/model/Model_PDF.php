@@ -656,7 +656,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function get_pdf_name( $settings, $entry ) {
 
 		$form = $this->gform->get_form( $entry['form_id'] );
-		$name = $this->misc->do_mergetags( $settings['filename'], $form, $entry );
+		$name = $this->gform->process_tags( $settings['filename'], $form, $entry );
 
 		/* Remove any characters that cannot be present in a filename */
 		$name = $this->misc->strip_invalid_characters( $name );
@@ -1079,6 +1079,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 				/* Only generate if the PDF wasn't during the notification process */
 				if ( ! is_wp_error( $settings ) ) {
+					
 					$pdf_generator = new Helper_PDF( $entry, $settings, $this->gform, $this->data );
 					$pdf_generator->set_filename( $this->get_pdf_name( $settings, $entry ) );
 

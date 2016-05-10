@@ -183,10 +183,10 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		add_filter( 'mpdf_font_data', array( $this->model, 'add_unregistered_fonts_to_mPDF' ), 20 );
 
 		/* Process mergetags and shortcodes in PDF */
-		add_filter( 'gfpdf_pdf_html_output', array( $this->misc, 'do_mergetags' ), 10, 3 );
+		add_filter( 'gfpdf_pdf_html_output', array( $this->gform, 'process_tags' ), 10, 3 );
 		add_filter( 'gfpdf_pdf_html_output', 'do_shortcode' );
 
-		add_filter( 'gfpdf_pdf_core_template_html_output', array( $this->misc, 'do_mergetags' ), 10, 3 );
+		add_filter( 'gfpdf_pdf_core_template_html_output', array( $this->gform, 'process_tags' ), 10, 3 );
 
 		/* Backwards compatibility for our Tier 2 plugin */
 		add_filter( 'gfpdfe_pre_load_template', array( 'PDFRender', 'prepare_ids' ), 1, 8 );

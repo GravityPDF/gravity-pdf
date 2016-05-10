@@ -247,4 +247,22 @@ class Helper_Form extends Helper_Abstract_Form {
 
 		return $has_capability;
 	}
+
+	/**
+	 * Replace all the Merge Tag data in the string
+	 *
+	 * @param  string $string The string to process
+	 * @param  array  $form   The Gravity Form array
+	 * @param  array  $entry  The Gravity Form Entry Array
+	 *
+	 * @return string
+	 *
+	 * @since 4.0
+	 */
+	public function process_tags( $string, $form, $entry ) {
+
+		$string = str_replace( '{all_fields}', '', $string );
+
+		return trim( GFCommon::replace_variables( $string, $form, $entry, false, false, false ) );
+	}
 }
