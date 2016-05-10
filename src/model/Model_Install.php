@@ -212,16 +212,20 @@ class Model_Install extends Helper_Abstract_Model {
 		$this->data->template_location_url = apply_filters( 'gfpdf_template_location_uri', $this->data->template_location_url, $working_folder, $upload_dir_url ); /* needs to be accessible from the web */
 
 		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_font_location/ for more details about this filter */
-		$this->data->template_font_location = apply_filters( 'gfpdf_font_location', $this->data->template_location . 'fonts/', $working_folder, $upload_dir ); /* can be in a directory not accessible via the web */
+		$this->data->template_font_location     = apply_filters( 'gfpdf_font_location', $this->data->template_location . 'fonts/', $working_folder, $upload_dir ); /* can be in a directory not accessible via the web */
+
+		/* @todo add filter to change this path */
+		$this->data->template_fontdata_location = $this->data->template_font_location . 'fontdata/';
 
 		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_tmp_location/ for more details about this filter */
 		$this->data->template_tmp_location  = apply_filters( 'gfpdf_tmp_location', $this->data->template_location . 'tmp/', $working_folder, $upload_dir_url ); /* encouraged to move this to a directory not accessible via the web */
 
 		$this->log->addNotice( 'Template Locations', array(
-			'path' => $this->data->template_location,
-			'url'  => $this->data->template_location_url,
-			'font' => $this->data->template_font_location,
-			'tmp'  => $this->data->template_tmp_location,
+			'path'     => $this->data->template_location,
+			'url'      => $this->data->template_location_url,
+			'font'     => $this->data->template_font_location,
+			'fontdata' => $this->data->template_fontdata_location,
+			'tmp'      => $this->data->template_tmp_location,
 		) );
 	}
 
@@ -291,7 +295,7 @@ class Model_Install extends Helper_Abstract_Model {
 		$folders = array(
 			$this->data->template_location,
 			$this->data->template_font_location,
-			$this->data->template_font_location . 'fontdata/',
+			$this->data->template_fontdata_location,
 			$this->data->template_tmp_location,
 		);
 

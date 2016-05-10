@@ -391,7 +391,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			$this->options->update_option( 'custom_fonts', $custom_fonts );
 
 			/* Cleanup our fontdata directory to prevent caching issues with mPDF */
-			$this->misc->cleanup_dir( $this->data->template_font_location . 'fontdata/' );
+			$this->misc->cleanup_dir( $this->data->template_fontdata_location );
 
 		}
 
@@ -508,7 +508,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				unset( $fonts[ $id ] );
 
 				/* Cleanup our fontdata directory to prevent caching issues with mPDF */
-				$this->misc->cleanup_dir( $this->data->template_font_location . 'fontdata/' );
+				$this->misc->cleanup_dir( $this->data->template_fontdata_location );
 
 				if ( $this->options->update_option( 'custom_fonts', $fonts ) ) {
 					/* Success */
