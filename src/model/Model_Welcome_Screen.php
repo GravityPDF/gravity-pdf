@@ -54,7 +54,7 @@ class Model_Welcome_Screen extends Helper_Abstract_Model {
 	 *
 	 * @since 4.0
 	 */
-	public $minimum_capability = 'activate_plugins';
+	public $minimum_capability = 'gravityforms_view_settings';
 
 	/**
 	 * @var string The welcome page title
