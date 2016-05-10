@@ -886,6 +886,13 @@ class Test_PDF extends WP_UnitTestCase {
 
 		/* Clean up */
 		unlink( $notifications['attachments'][0] );
+
+		/* Check we don't process an entry not stored in the database */
+		$entry['id'] = NULL;
+
+		$notifications = $this->model->notifications( $form['notifications']['54bca349732b8'], $form, $entry );
+
+		$this->assertSame( 0, sizeof( $notifications['attachments'] ) );
 	}
 
 	/**
