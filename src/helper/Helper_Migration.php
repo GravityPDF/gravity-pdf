@@ -445,10 +445,17 @@ class Helper_Migration {
 
 				/* Get an array of all the form notification for later use */
 				$notifications = array();
-				foreach ( $form['notifications'] as $not ) {
-					$notifications[ $not['id'] ] = $not['name'];
-				}
 
+				/* Filter out the save and continue notifications */
+				$omit = array( 'form_saved', 'form_save_email_requested' );
+
+				foreach ( $form['notifications'] as $notification ) {
+					$event = ( isset( $notification['event'] ) ) ? $notification['event'] : '';
+
+					if ( ! in_array( $event, $omit ) ) {
+						$notifications[ $notification['id'] ] = $notification['name'];
+					}
+				}
 
 				/* Hold name in array so we can prevent duplicates */
 				$name = array();

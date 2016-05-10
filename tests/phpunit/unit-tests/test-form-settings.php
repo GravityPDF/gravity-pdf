@@ -641,6 +641,17 @@ class Test_Form_Settings extends WP_UnitTestCase {
 
 		$this->assertSame( 3, sizeof( $wp_settings_fields[ $group ][ $group ][ $setting ]['args'][ $option_id ] ) );
 
+		/* Check that certain notification events are ignored */
+		$notifications = array(
+			array( 'id' => 'id1', 'name' => 'Notification  1' ),
+			array( 'id' => 'id2', 'name' => 'Notification  2', 'event' => 'form_saved' ),
+			array( 'id' => 'id3', 'name' => 'Notification  3', 'event' => 'form_save_email_requested' ),
+		);
+
+		$this->model->register_notifications( $notifications );
+
+		$this->assertSame( 1, sizeof( $wp_settings_fields[ $group ][ $group ][ $setting ]['args'][ $option_id ] ) );
+
 	}
 
 	/**

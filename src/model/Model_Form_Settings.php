@@ -796,8 +796,15 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		if ( is_array( $notifications ) ) {
 			$options = array();
 
-			foreach ( $notifications as $notif ) {
-				$options[ $notif['id'] ] = $notif['name'];
+			/* Filter out the save and continue notifications */
+			$omit = array( 'form_saved', 'form_save_email_requested' );
+
+			foreach ( $notifications as $notification ) {
+				$event = ( isset( $notification['event'] ) ) ? $notification['event'] : '';
+
+				if ( ! in_array( $event, $omit ) ) {
+					$options[ $notification['id'] ] = $notification['name'];
+				}
 			}
 
 			/* Apply our settings update */

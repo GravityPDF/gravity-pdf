@@ -893,6 +893,15 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function notifications( $notifications, $form, $entry ) {
 
+		/*
+		 * Ensure our entry is stored in the database by checking it has an ID
+		 * This resolves any issues with the "Save and Continue" feature
+		 * See https://github.com/GravityPDF/gravity-pdf/issues/360
+		 */
+		if ( NULL === $entry['id'] ) {
+			return $notifications;
+		}
+
 		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : array();
 
 		if ( sizeof( $pdfs ) > 0 ) {
