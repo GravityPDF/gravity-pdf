@@ -131,20 +131,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</div>
 
 			<div class="font-selector">
-				<label><?php _e( 'Bold', 'gravity-forms-pdf-extended' ); ?></label>
-				<input type="text" value="<%- model.get('bold') %>" name="bold" class="regular-text">
+				<label><?php _e( 'Italics', 'gravity-forms-pdf-extended' ); ?></label>
+				<input type="text" value="<%- model.get('italics') %>" name="italics" class="regular-text">
 				<span>
 					<input type="button"
-				             data-uploader-button-text="<?php _e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
-				             data-uploader-title="<?php _e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
-				             value="<?php _e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
-				             class="gfpdf_settings_upload_button button-secondary">
+					       data-uploader-button-text="<?php _e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+					       data-uploader-title="<?php _e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+					       value="<?php _e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+					       class="gfpdf_settings_upload_button button-secondary">
 				</span>
 			</div>
 
 			<div class="font-selector">
-				<label><?php _e( 'Italics', 'gravity-forms-pdf-extended' ); ?></label>
-				<input type="text" value="<%- model.get('italics') %>" name="italics" class="regular-text">
+				<label><?php _e( 'Bold', 'gravity-forms-pdf-extended' ); ?></label>
+				<input type="text" value="<%- model.get('bold') %>" name="bold" class="regular-text">
 				<span>
 					<input type="button"
 				             data-uploader-button-text="<?php _e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
