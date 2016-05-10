@@ -559,6 +559,8 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 
 	/**
 	 * Check if our backwards compatible settings conversion works correctly
+	 *
+	 * @since 4.0
 	 */
 	public function test_backwards_compat_conversion() {
 		$settings = array(
@@ -604,10 +606,100 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 
 	/**
 	 * Check if our backwards compatible output functions work correctly
+	 *
+	 * @since 4.0
 	 */
 	public function test_backwards_compat_output() {
 		$this->assertEquals( 'save', $this->misc->backwards_compat_output() );
 		$this->assertEquals( 'view', $this->misc->backwards_compat_output( 'display' ) );
 		$this->assertEquals( 'download', $this->misc->backwards_compat_output( 'download' ) );
+	}
+
+	/**
+	 * Check our recursive in_array() method works as expected
+	 *
+	 * @param boolean $expected
+	 * @param boolean $strict
+	 * @param mixed $needle
+	 * @param array $haystack
+	 *
+	 * @dataProvider provider_in_array
+	 *
+	 * @since        4.0
+	 */
+	public function test_in_array( $expected, $strict, $needle, $haystack ) {
+		$this->assertSame( $expected, $this->misc->in_array( $needle, $haystack, $strict ) );
+	}
+
+	public function provider_in_array() {
+		return array(
+
+			/* basic multi-dimensional search */
+			array( true, true, 'find me', array(
+				'item 1',
+				'item 2',
+				'item 3' => array( 'test', 'find me' ),
+				'item 4',
+			) ),
+
+			/* type check (strict) */
+			array( false, true, 20, array(
+				'item 1',
+				'item 2' => array( 'stuff', 'here', array( '20' ) ),
+				'item 3'
+			) ),
+
+			/* type check (not strict) */
+			array( true, false, 20, array(
+				'item 1',
+				'item 2' => array( 'stuff', 'here', array( '20' ) ),
+				'item 3'
+			) ),
+
+			/* deep multi-dimensional array */
+			array( true, true, 'Find Me', array(
+				'item 1' => array( 'hi', 'how', 'are', array( 'you' => array( 'going' ) ) ),
+				'item 2' => array( 'stuff', 'here', array( 'Find Me' ) ),
+				'item 3'
+			) ),
+
+			/* deep multi-dimensional array */
+			array( true, true, 'Find Me', array(
+				'item 1' => array( 'hi', 'how', 'are', array( 'you' => array( 'going' => array( 'Find Me' ) ) ) ),
+				'item 2' => array( 'stuff', 'here', array( 'wow' ) ),
+				'item 3'
+			) ),
+
+			/* ensure case sensitive match */
+			array( false, true, 'find me', array(
+				'item 1',
+				'item 2' => array( 'stuff', 'here', array( 'Find Me' ) ),
+				'item 3'
+			) ),
+		);
+	}
+
+	/**
+	 * Test that the everything inside a directory gets removed
+	 *
+	 * @since 4.0
+	 */
+	public function test_cleanup_dir() {
+
+		/* Create our test data */
+		$path = ABSPATH . 'test/';
+		wp_mkdir_p( $path );
+		touch( $path . 'test' );
+
+		/* Ensure it created correctly */
+		$this->assertFileExists( $path . 'test' );
+
+		/* Run our test */
+		$this->misc->cleanup_dir( $path );
+
+		/* Check the file was deleted but the directory still exists */
+		$this->assertFileNotExists( $path . 'test' );
+		$this->assertTrue( is_dir( $path ) );
+
 	}
 }

@@ -415,6 +415,18 @@ class Helper_Misc {
 	}
 
 	/**
+	 * Wrapper function for rmdir() which ensures the directory gets automatically recreated after being deleted
+	 *
+	 * @param string $path
+	 *
+	 * @since 4.0
+	 */
+	public function cleanup_dir( $path ) {
+		$this->rmdir( $path );
+		wp_mkdir_p( $path );
+	}
+
+	/**
 	 * This function recursively copies all files and folders under a given directory
 	 * equivalent to Bash: cp -R $dir
 	 *
@@ -1017,5 +1029,26 @@ class Helper_Misc {
 				require_once( $entry_details_file );
 			}
 		}
+	}
+
+	/**
+	 * A recursive function that will search a multidimensional array for the value
+	 *
+	 * @param mixed $needle The value to search for
+	 * @param array $haystack The multidimensional array to search in
+	 * @param bool $strict Pass `true` to match for the value and type, false for just the type.
+	 *
+	 * @return bool True when found, false otherwise
+	 */
+	public function in_array( $needle, $haystack, $strict = true ) {
+		foreach ( $haystack as $item ) {
+			if ( ( $strict ? $item === $needle : $item == $needle ) ||
+			     ( is_array( $item ) && $this->in_array( $needle, $item, $strict ) )
+			) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
