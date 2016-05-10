@@ -1217,7 +1217,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			$short_name = $this->options->get_font_short_name( substr( $font_name, 0, -4 ) );
 
 			/* Check if it exists already, otherwise add it */
-			if ( ! isset( $fonts[ $short_name ] ) ) {
+			if ( ! isset( $fonts[ $short_name ] ) && ! $this->misc->in_array( $font_name, $fonts ) ) {
 				$fonts[ $short_name ] = array(
 					'R' => $font_name,
 				);
