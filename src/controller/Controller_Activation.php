@@ -77,8 +77,11 @@ class Controller_Activation {
 		 * As deactivation hook fires much earlier than flush_rewrite_rules() can be called we'll manually remove our rules from the database
 		 */
 		$rules = get_option( 'rewrite_rules' );
-		unset( $rules[ $data->permalink ] );
-		update_option( 'rewrite_rules', $rules );
+
+		if ( false !== $rules && isset( $rules[ $data->permalink ] ) ) {
+			unset( $rules[ $data->permalink ] );
+			update_option( 'rewrite_rules', $rules );
+		}
 
 		/**
 		 * Remove our scheduled tasks
