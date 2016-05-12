@@ -5,6 +5,7 @@ namespace GFPDF\View;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_View;
 use GFPDF\Helper\Helper_Field_Container;
+use GFPDF\Helper\Helper_Field_Container_Void;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Abstract_Options;
@@ -309,7 +310,7 @@ class View_PDF extends Helper_Abstract_View {
 		$products     = new Field_Products( new GF_Field(), $entry, $this->gform, $this->misc );
 		$has_products = false;
 		$page_number  = 0;
-		$container    = new Helper_Field_Container();
+		$container    = ( isset( $config['meta']['enable_css_ready_classes'] ) && false === $config['meta']['enable_css_ready_classes'] ) ? new Helper_Field_Container_Void() : new Helper_Field_Container();
 
 		/* Allow the config to be changed through a filter */
 		$config['meta'] = ( isset( $config['meta'] ) ) ? $config['meta'] : array();

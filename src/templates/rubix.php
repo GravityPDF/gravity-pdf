@@ -273,15 +273,16 @@ $show_empty           = ( ! empty( $settings['show_empty'] ) && $settings['show_
 $config = array(
     'settings' => $settings,
     'meta'     => array(
-        'echo'                => true, /* whether to output the HTML or return it */
-        'exclude'             => true, /* whether we should exclude fields with a CSS value of 'exclude'. Default to true */
-        'empty'               => $show_empty, /* whether to show empty fields or not. Default is false */
-        'conditional'         => $enable_conditional, /* whether we should skip fields hidden with conditional logic. Default to true. */
-        'show_title'          => $show_form_title, /* whether we should show the form title. Default to true */
-        'section_content'     => $show_section_content, /* whether we should include a section breaks content. Default to false */
-        'page_names'          => $show_page_names, /* whether we should show the form's page names. Default to false */
-        'html_field'          => $show_html, /* whether we should show the form's html fields. Default to false */
-        'individual_products' => false, /* Whether to show individual fields in the entry. Default to false - they are grouped together at the end of the form */
+        'echo'                     => true, /* whether to output the HTML or return it */
+        'exclude'                  => true, /* whether we should exclude fields with a CSS value of 'exclude'. Default to true */
+        'empty'                    => $show_empty, /* whether to show empty fields or not. Default is false */
+        'conditional'              => $enable_conditional, /* whether we should skip fields hidden with conditional logic. Default to true. */
+        'show_title'               => $show_form_title, /* whether we should show the form title. Default to true */
+        'section_content'          => $show_section_content, /* whether we should include a section breaks content. Default to false */
+        'page_names'               => $show_page_names, /* whether we should show the form's page names. Default to false */
+        'html_field'               => $show_html, /* whether we should show the form's html fields. Default to false */
+        'individual_products'      => false, /* Whether to show individual fields in the entry. Default to false - they are grouped together at the end of the form */
+        'enable_css_ready_classes' => true, /* Whether to enable or disable Gravity Forms CSS Ready Class support in your PDF */
     ),
 );
 
