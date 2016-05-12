@@ -70,12 +70,16 @@ class Controller_Activation {
 	 */
 	public static function deactivation() {
 
-		$data = GPDFAPI::get_data_class();
+		/* Check if Gravity PDF successfully loaded before trying to run deactivation code */
+		if ( ! class_exists( 'GPDFAPI' ) ) {
+			return null;
+		}
 
 		/**
 		 * Remove our rewrite rules
 		 * As deactivation hook fires much earlier than flush_rewrite_rules() can be called we'll manually remove our rules from the database
 		 */
+		$data  = GPDFAPI::get_data_class();
 		$rules = get_option( 'rewrite_rules' );
 
 		if ( false !== $rules && isset( $rules[ $data->permalink ] ) ) {
