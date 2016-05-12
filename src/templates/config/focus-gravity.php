@@ -5,7 +5,7 @@ namespace GFPDF\Templates\Config;
 use GFPDF\Helper\Helper_Interface_Config;
 
 /**
- * Zadani configuration file
+ * Focus Gravity configuration file
  *
  * This configuration file can be overridden by being placed in the PDF_EXTENDED_TEMPLATES/config/ folder
  *
