@@ -332,42 +332,60 @@ class View_PDF extends Helper_Abstract_View {
 
 		/* Loop through the fields and output or skip if needed */
 		foreach ( $form['fields'] as $key => $field ) {
-
+			
 			/* Load our page name, if needed */
 			if ( $show_page_names === true && $field->pageNumber !== $page_number ) {
 				$this->display_page_name( $page_number, $form, $container );
 				$page_number++;
 			}
 
+			/*
+			 * @TODO Create middleware filter to check if the field should be skipped.
+			 * This will reduce code duplication and increase plugin flexibility
+			 */
+
 			/* Skip any fields with the css class 'exclude', if needed */
 			if ( $skip_marked_fields !== false && strpos( $field->cssClass, 'exclude' ) !== false )  {
+				/* To prevent display issues we will output the column markup needed */
+				$container->maybe_display_faux_column( $field );
+
 				continue;
 			}
 
 			/* Skip over any hidden fields (usually by conditional logic), if needed */
 			if ( $skip_conditional_fields === true && GFFormsModel::is_field_hidden( $form, $field, array(), $entry ) ) {
+				/* To prevent display issues we will output the column markup needed */
+				$container->maybe_display_faux_column( $field );
+
 				continue;
 			}
 
 			/* Skip over any product fields, if needed */
 			if ( $show_individual_product_fields === false && GFCommon::is_product_field( $field->type ) ) {
 				$has_products = true;
+
+				/* To prevent display issues we will output the column markup needed */
+				$container->maybe_display_faux_column( $field );
 				continue;
 			}
 
 			/* Skip HTML fields, if needed */
 			if ( $show_html_fields === false && $field->type == 'html' ) {
+				/* To prevent display issues we will output the column markup needed */
+				$container->maybe_display_faux_column( $field );
+
 				continue;
 			}
 
 			/* Skip over any fields we don't want to include */
 			if( in_array( $field->type, $blacklisted ) ) {
+				/* To prevent display issues we will output the column markup needed */
+				$container->maybe_display_faux_column( $field );
+
 				continue;
 			}
 
-			/**
-			 * Let's output our field
-			 */
+			/* Let's output our field */
 			$this->process_field( $field, $entry, $form, $config, $products, $container, $model );
 		}
 
@@ -425,10 +443,8 @@ class View_PDF extends Helper_Abstract_View {
 
 				echo ( $field->type !== 'section' ) ? $class->html() : $class->html( $show_section_description );
 			} else {
-				/**
-				 * Close our CSS Ready Class Row, if open
-				 */
-				$container->close();
+				/* To prevent display issues we will output the column markup needed */
+				$container->maybe_display_faux_column( $field );
 			}
 		} catch ( Exception $e ) {
 			$this->log->addError( 'PDF Generation Error', array(

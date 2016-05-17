@@ -7,6 +7,8 @@ use GFPDF\Helper\Helper_Field_Container;
 use WP_UnitTestCase;
 use GF_Field;
 
+use ReflectionClass;
+
 /**
  * Test Gravity PDF Helper_Field_Container class
  *
@@ -91,6 +93,22 @@ class Test_Field_Container extends WP_UnitTestCase {
 	private function close() {
 		ob_start();
 		$this->container->close();
+
+		return ob_get_clean();
+	}
+
+	/**
+	 * Buffers our "maybe_display_faux_column" output and returns it for testing
+	 *
+	 * @param GF_Field $field
+	 *
+	 * @return string
+	 *
+	 * @since 4.0
+	 */
+	private function maybe_display_faux_column( GF_Field $field ) {
+		ob_start();
+		$this->container->maybe_display_faux_column( $field );
 
 		return ob_get_clean();
 	}
@@ -200,6 +218,7 @@ class Test_Field_Container extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Check that any skipped fields have their containers closed correctly
 	 *
 	 * @since 4.0
 	 */
@@ -217,6 +236,80 @@ class Test_Field_Container extends WP_UnitTestCase {
 
 		$this->generate( $field );
 
+		/* If the field was skipped we remove any of our column class fields (gf_left_third ect) */
 		$this->assertEquals( ' ', $field->cssClass );
+	}
+
+	/**
+	 * Check if the current field is part of a multi-column row and it will fit into that row
+	 *
+	 * @since 4.0
+	 */
+	public function test_does_fit_in_row() {
+
+		$field = new GF_Field();
+
+		/* Ensure our container is closed and check we get a false results */
+		$this->close();
+		$this->assertFalse( $this->container->does_fit_in_row( $field ) );
+
+		/* Add a column to a new row then check if we can add another one */
+		$field->cssClass = 'gf_left_third';
+		$this->generate( $field );
+
+		$this->assertTrue( $this->container->does_fit_in_row( $field ) );
+
+		/* Overload our column so it won't fit */
+		$this->generate( $field );
+		$field->cssClass = 'gf_left_half';
+
+		$this->assertFalse( $this->container->does_fit_in_row( $field ) );
+
+		$this->close();
+	}
+
+	/**
+	 * Check if we should create a placeholder column
+	 *
+	 * @since 4.0
+	 */
+	public function test_maybe_display_faux_column() {
+		$field = new GF_Field();
+
+		/* Check that nothing is output */
+		$this->assertEquals( null, $this->maybe_display_faux_column( $field ) );
+
+		/* Add a column to a new row then see if we get a faux column returned */
+		$field->cssClass = 'gf_left_third';
+		$this->generate( $field );
+
+		$this->assertNotFalse( strpos( $this->maybe_display_faux_column( $field ), 'gfpdf-column-placeholder' ) );
+
+		/* Overload our column so it won't fit */
+		$this->generate( $field );
+		$field->cssClass = 'gf_left_half';
+
+		$this->assertEquals( null, $this->maybe_display_faux_column( $field ) );
+	}
+
+	/**
+	 * Ensure our Helper_Field_Container_Void class overrides all public methods in the parent class, with the
+	 * exception of the __construct method
+	 *
+	 * @since 4.0
+	 */
+	public function test_helper_field_container_void() {
+		$reflection         = new ReflectionClass( 'GFPDF\Helper\Helper_Field_Container_Void' );
+		$methods            = $reflection->getMethods( \ReflectionMethod::IS_PUBLIC );
+		$total_methods      = sizeof( $methods ) - 1; /* Do not count the __construct public method */
+		$overridden_methods = 0;
+
+		foreach ( $methods as $method ) {
+			if ( '__construct' != $method->name && $method->class == $reflection->getName() ) {
+				$overridden_methods++;
+			}
+		}
+
+		$this->assertEquals( $total_methods, $overridden_methods, 'Helper_Field_Container_Void does not override all public methods of the parent object' );
 	}
 }

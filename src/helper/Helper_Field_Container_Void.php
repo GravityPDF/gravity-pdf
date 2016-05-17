@@ -65,4 +65,26 @@ class Helper_Field_Container_Void extends Helper_Field_Container {
 	public function close() {
 		/* Do nothing */
 	}
+
+	/**
+	 * Empty method easily disables Helper_Field_Container functionality
+	 *
+	 * @return void
+	 *
+	 * @since 4.0
+	 */
+	public function does_fit_in_row() {
+		/* Do nothing */
+	}
+
+	/**
+	 * Empty method easily disables Helper_Field_Container functionality
+	 *
+	 * @return void
+	 *
+	 * @since 4.0
+	 */
+	public function maybe_display_faux_column() {
+		/* Do nothing */
+	}
 }
