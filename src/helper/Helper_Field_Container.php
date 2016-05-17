@@ -181,6 +181,49 @@ class Helper_Field_Container {
 	}
 
 	/**
+	 * Will check if the current field will fit in the open row, or if a new row needs to be open
+	 * to accomidate the field.
+	 *
+	 * @param GF_Field $field The Gravity Form field currently being processed
+	 *
+	 * @return boolean
+	 *
+	 * @since 4.0
+	 */
+	public function does_fit_in_row( GF_Field $field ) {
+
+		if ( true === $this->currently_open ) {
+			$width = $this->get_field_width( $field->cssClass ); /* current field width */
+
+			/* Check if the new field will fit in the row */
+			if ( 100 >= ( $this->current_width + $width ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Output placeholder HTML if empty or hidden field is part of CSS Ready Class columns
+	 * and the row is currently open and the field will fit in that row without opening another row
+	 *
+	 * @param GF_Field $field The Gravity Form field currently being processed
+	 *
+	 * @return void
+	 */
+	public function maybe_display_faux_column( GF_Field $field ) {
+
+		/* Check if we should create a placeholder column */
+		if ( $this->does_fit_in_row( $field ) ) {
+			echo '<div id="field-' . $field->id . '" class="gfpdf-column-placeholder gfpdf-field ' . $field->cssClass . '"></div>';
+
+			/* Increase column width */
+			$this->increment_width( $field->cssClass );
+		}
+	}
+
+	/**
 	 * Open the container
 	 *
 	 * @param  GF_Field $field The Gravity Form field currently being processed
@@ -205,10 +248,9 @@ class Helper_Field_Container {
 	 * @since 4.0
 	 */
 	private function handle_open_container( GF_Field $field ) {
-		$width = $this->get_field_width( $field->cssClass ); /* current field width */
 
 		/* if the current field width is more than 100 we will close the container */
-		if ( 100 < ( $this->current_width + $width ) ) {
+		if ( false === $this->does_fit_in_row( $field ) ) {
 			$this->close();
 		} else {
 			$this->increment_width( $field->cssClass );
