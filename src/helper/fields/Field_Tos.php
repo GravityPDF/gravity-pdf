@@ -87,7 +87,7 @@ class Field_Tos extends Helper_Abstract_Fields {
 	public function html( $value = '', $label = true ) {
 
 		$terms = wp_kses_post( nl2br( $this->field->gwtermsofservice_terms ) );
-		$value = esc_html( $this->value() );
+		$value = $this->value();
 
 		$html = "
 			<div class='terms-of-service-text'>$terms</div>
@@ -110,7 +110,7 @@ class Field_Tos extends Helper_Abstract_Fields {
 		}
 
 		$value_array = $this->get_value();
-		$value = $value_array[ $this->field->id . '.1' ];
+		$value       = esc_html( $value_array[ $this->field->id . '.1' ] );
 
 		$this->cache( $value );
 

@@ -86,12 +86,7 @@ class Field_CreditCard extends Helper_Abstract_Fields {
 	 */
 	public function html( $value = '', $label = true ) {
 		$data = array_filter( $this->value() ); /* remove any empty fields from the array */
-
-		/* Sanitize data */
-		array_filter( $data, function( &$item ) {
-			$item = esc_html( $item );
-		} );
-
+		
 		$value = implode( '<br>', $data );
 
 		return parent::html( $value );
@@ -112,8 +107,8 @@ class Field_CreditCard extends Helper_Abstract_Fields {
 		$value = $this->get_value();
 
 		$this->cache( array(
-			'type'   => rgget( $this->field->id . '.4', $value ),
-			'number' => rgget( $this->field->id . '.1', $value ),
+			'type'   => esc_html( rgget( $this->field->id . '.4', $value ) ),
+			'number' => esc_html( rgget( $this->field->id . '.1', $value ) ),
 		) );
 
 		return $this->cache();

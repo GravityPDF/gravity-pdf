@@ -84,8 +84,7 @@ class Field_Html extends Helper_Abstract_Fields {
 	public function form_data() {
 
 		$data = array();
-
-		$html = wpautop( wp_kses_post( $this->value() ) );
+		$html = $this->value();
 
 		$data['html'][]                      = $html;
 		$data['html_id'][ $this->field->id ] = $html;
@@ -104,7 +103,7 @@ class Field_Html extends Helper_Abstract_Fields {
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
-		$html = wp_kses_post( $this->value() ); /* allow the same HTML as per the post editor */
+		$html = $this->value(); /* allow the same HTML as per the post editor */
 
 		return parent::html( $html, false );
 	}
@@ -121,7 +120,9 @@ class Field_Html extends Helper_Abstract_Fields {
 			return $this->cache();
 		}
 
-		$this->cache( $this->field->content );
+		$value = ( isset( $this->field->content ) ) ? wpautop( wp_kses_post( $this->field->content ) ) : '';
+
+		$this->cache( $value );
 
 		return $this->cache();
 	}

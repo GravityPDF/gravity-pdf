@@ -119,10 +119,10 @@ class Field_Section extends Helper_Abstract_Fields {
 		$section = $this->value(); /* allow the same HTML as per the post editor */
 
 		$html = '<div id="field-' . $this->field->id . '" class="gfpdf-section-title gfpdf-field">';
-		$html .= '<h3>' . esc_html( $section['title'] ) . '</h3>';
+		$html .= '<h3>' . $section['title'] . '</h3>';
 
 		if ( ! empty( $value ) ) {
-			$html .= '<div id="field-' . $this->field->id . '-desc" class="gfpdf-section-description gfpdf-field">' . wp_kses_post( $section['description'] ) . '</div>';
+			$html .= '<div id="field-' . $this->field->id . '-desc" class="gfpdf-section-description gfpdf-field">' . $section['description'] . '</div>';
 		}
 
 		$html .= '</div>';
@@ -143,8 +143,8 @@ class Field_Section extends Helper_Abstract_Fields {
 		}
 
 		$this->cache( array(
-			'title'       => $this->field->label,
-			'description' => $this->field->description,
+			'title'       => esc_html( $this->field->label ),
+			'description' => wp_kses_post( $this->field->description ),
 		) );
 
 		return $this->cache();

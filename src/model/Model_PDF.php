@@ -1575,7 +1575,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 					/* Check if this is the correct field */
 					if ( isset( $choice['gquizIsCorrect'] ) && $choice['gquizIsCorrect'] == 1 ) {
-						$results['field_data'][ $field->id ]['misc']['correct_option_name'][] = $choice['text'];
+						$results['field_data'][ $field->id ]['misc']['correct_option_name'][] = esc_html( $choice['text'] );
 					}
 				}
 			}

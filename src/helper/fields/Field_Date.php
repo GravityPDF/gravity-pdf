@@ -86,7 +86,7 @@ class Field_Date extends Helper_Abstract_Fields {
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
-		$value = esc_html( $this->value() );
+		$value = $this->value();
 
 		return parent::html( $value );
 	}
@@ -103,7 +103,9 @@ class Field_Date extends Helper_Abstract_Fields {
 			return $this->cache();
 		}
 
-		$this->cache( GFCommon::date_display( $this->get_value(), $this->field->dateFormat ) );
+		$value = esc_html( GFCommon::date_display( $this->get_value(), $this->field->dateFormat ) );
+
+		$this->cache( $value );
 
 		return $this->cache();
 	}

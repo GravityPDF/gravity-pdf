@@ -126,7 +126,8 @@ class Field_Post_Tags extends Helper_Abstract_Fields {
 		}
 
 		$value = explode( ',', $this->get_value() ); /* get tags and turn into array */
-		$value = array_map( 'trim', $value ); /* apply trim callback to all array elements */
+		$value = array_map( 'trim', $value );
+		$value = array_map( 'esc_html', $value );
 
 		$this->cache( $value );
 

@@ -214,19 +214,20 @@ class Field_List extends Helper_Abstract_Fields {
 		/* If single list field */
 		if ( ! is_array( $list[0] ) ) {
 			$list = array_filter( $list );
+			$list = array_map( 'esc_html', $list );
 		} else {
 
 			/* Loop through the multi-column list */
-			foreach ( $list as $id => $row ) {
+			foreach ( $list as $id => &$row ) {
 
 				$empty = true;
 
 				foreach ( $row as &$col ) {
 
 					/* Check if there is data and if so break the loop */
-					if ( trim( strlen( $col ) > 0 ) ) {
+					if ( strlen( trim( $col ) ) > 0 ) {
+						$col = esc_html( $col );
 						$empty = false;
-						break;
 					}
 				}
 

@@ -116,7 +116,6 @@ class Field_Select extends Helper_Abstract_Fields {
 		$data = $this->value();
 
 		$output = ( $value ) ? $data['value'] : $data['label'];
-		$output = esc_html( $output );
 
 		return parent::html( $output );
 	}
@@ -133,8 +132,8 @@ class Field_Select extends Helper_Abstract_Fields {
 			return $this->cache();
 		}
 
-		$label = trim( GFCommon::selection_display( $this->get_value(), $this->field, '', true ) );
-		$value = trim( GFCommon::selection_display( $this->get_value(), $this->field ) );
+		$label = esc_html( GFCommon::selection_display( $this->get_value(), $this->field, '', true ) );
+		$value = esc_html( GFCommon::selection_display( $this->get_value(), $this->field ) );
 
 		/* return value / label as an array */
 		$this->cache( array(

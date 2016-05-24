@@ -77,7 +77,7 @@ class Field_Default extends Helper_Abstract_Fields {
 			return $this->cache();
 		}
 
-		$this->cache( $this->get_value() );
+		$this->cache( esc_html( $this->get_value() ) );
 
 		return $this->cache();
 	}

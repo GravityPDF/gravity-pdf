@@ -86,7 +86,7 @@ class Field_Number extends Helper_Abstract_Fields {
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
-		$value = esc_html( $this->value() );
+		$value = $this->value();
 
 		return parent::html( $value );
 	}
@@ -103,7 +103,9 @@ class Field_Number extends Helper_Abstract_Fields {
 			return $this->cache();
 		}
 
-		$this->cache( GFCommon::format_number( $this->get_value(), $this->field->numberFormat ) );
+		$value = esc_html( GFCommon::format_number( $this->get_value(), $this->field->numberFormat ) );
+
+		$this->cache( $value );
 
 		return $this->cache();
 	}

@@ -89,20 +89,20 @@ class Field_Post_Image extends Helper_Abstract_Fields {
 		$value = $this->value();
 
 		/* Start building image link */
-		$html = '<a href="' . esc_url( $value['url'] ) . '" target="_blank">';
-		$html .= '<img width="150" src="' . esc_url( $value['url'] ) . '" />';
+		$html = '<a href="' . $value['url'] . '" target="_blank">';
+		$html .= '<img width="150" src="' . $value['url'] . '" />';
 
 		/* Include title / caption / description if needed */
 		if ( ! empty( $value['title'] ) ) {
-			$html .= '<div class="gfpdf-post-image-title">' . esc_html( $value['title'] ) . '</div>';
+			$html .= '<div class="gfpdf-post-image-title">' . $value['title'] . '</div>';
 		}
 
 		if ( ! empty( $value['caption'] ) ) {
-			$html .= '<div class="gfpdf-post-image-caption">' . esc_html( $value['caption'] ) . '</div>';
+			$html .= '<div class="gfpdf-post-image-caption">' . $value['caption'] . '</div>';
 		}
 
 		if ( ! empty( $value['description'] ) ) {
-			$html .= '<div class="gfpdf-post-image-description">' . esc_html( $value['description'] ) . '</div>';
+			$html .= '<div class="gfpdf-post-image-description">' . $value['description'] . '</div>';
 		}
 
 		$html .= '</a>';
@@ -154,11 +154,11 @@ class Field_Post_Image extends Helper_Abstract_Fields {
 		if ( strlen( $value ) > 0 ) {
 			$value = explode( '|:|', $this->get_value() );
 
-			$img['url']         = ( isset( $value[0] ) ) ? $value[0] : '';
-			$img['path']        = ( isset( $value[0] ) ) ? $value[0] : '';
-			$img['title']       = ( isset( $value[1] ) ) ? $value[1] : '';
-			$img['caption']     = ( isset( $value[2] ) ) ? $value[2] : '';
-			$img['description'] = ( isset( $value[3] ) ) ? $value[3] : '';
+			$img['url']         = ( isset( $value[0] ) ) ? esc_url( $value[0] ) : '';
+			$img['path']        = ( isset( $value[0] ) ) ? esc_url( $value[0] ) : '';
+			$img['title']       = ( isset( $value[1] ) ) ? esc_html( $value[1] ) : '';
+			$img['caption']     = ( isset( $value[2] ) ) ? esc_html( $value[2] ) : '';
+			$img['description'] = ( isset( $value[3] ) ) ? esc_html( $value[3] ) : '';
 
 			$path = ( isset( $value[0] ) ) ? $this->misc->convert_url_to_path( $value[0] ) : '';
 			if ( $path != $img['url'] ) {

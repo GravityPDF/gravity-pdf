@@ -88,7 +88,7 @@ class Field_Website extends Helper_Abstract_Fields {
 	public function html( $value = '', $label = true ) {
 		$value = $this->value();
 
-		$output = ( GFCommon::is_valid_url( $value ) ) ? '<a href="' . esc_url( $value ) . '" target="_blank">' . esc_html( $value ) . '</a>' : esc_html( $value );
+		$output = ( GFCommon::is_valid_url( $value ) ) ? '<a href="' . $value . '" target="_blank">' . $value . '</a>' : $value;
 
 		return parent::html( $output );
 	}
@@ -105,7 +105,7 @@ class Field_Website extends Helper_Abstract_Fields {
 			return $this->cache();
 		}
 
-		$this->cache( $this->get_value() );
+		$this->cache( esc_html( $this->get_value() ) );
 
 		return $this->cache();
 	}

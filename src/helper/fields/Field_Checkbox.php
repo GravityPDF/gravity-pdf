@@ -137,8 +137,8 @@ class Field_Checkbox extends Helper_Abstract_Fields {
 			$html = '<ul class="bulleted checkbox">';
 			$i    = 1;
 			foreach ( $items as $item ) {
-				$sanitized_value  = esc_html( $item['value'] );
-				$sanitized_option = ( $value ) ? $sanitized_value : esc_html( $item['label'] );
+				$sanitized_value  = $item['value'];
+				$sanitized_option = ( $value ) ? $sanitized_value : $item['label'];
 
 				$html .= '<li id="field-' . $this->field->id . '-option-' . $i . '">' . $sanitized_option . '</li>';
 				$i++;
@@ -176,8 +176,8 @@ class Field_Checkbox extends Helper_Abstract_Fields {
 		$items = array();
 
 		foreach ( $value as $key => $item ) {
-			$label = GFCommon::selection_display( $item, $this->field, '', true );
-			$value = GFCommon::selection_display( $item, $this->field );
+			$label = esc_html( GFCommon::selection_display( $item, $this->field, '', true ) );
+			$value = esc_html( GFCommon::selection_display( $item, $this->field ) );
 
 			$items[] = array(
 				'value' => $value,
