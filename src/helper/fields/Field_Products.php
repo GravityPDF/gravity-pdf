@@ -282,8 +282,9 @@ class Field_Products extends Helper_Abstract_Fields {
 				'shipping_name'      => ( isset( $products['shipping']['name'] ) ) ? preg_replace( '/(.+?) \((.+?)\)/', '$2', $products['shipping']['name'] ) : '',
 				'total'              => $order_total,
 				'total_formatted'    => GFCommon::format_number( $order_total, 'currency' ),
-
 			);
+
+			$form_array['products_totals'] = array_map( 'esc_html', $form_array['products_totals'] );
 		}
 
 		/* Save the array into the cache */

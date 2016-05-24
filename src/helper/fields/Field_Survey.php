@@ -143,7 +143,7 @@ class Field_Survey extends Helper_Abstract_Fields {
 
 				/* Overriding survey radio values with name */
 				array_walk( $data['field'], function ( &$item, $key, $value ) {
-					$item = $value;
+					$item = esc_html( $value );
 				}, $value );
 
 				break;
@@ -155,7 +155,7 @@ class Field_Survey extends Helper_Abstract_Fields {
 				foreach ( $this->field->choices as $choice ) {
 
 					if ( ( $key = array_search( $choice['value'], $value ) ) !== false ) {
-						$value[ $key ] = $choice['text'];
+						$value[ $key ] = esc_html( $choice['text'] );
 					}
 				}
 

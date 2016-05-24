@@ -85,7 +85,7 @@ class Field_Phone extends Helper_Abstract_Fields {
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
-		$value = esc_html( $this->value() );
+		$value = $this->value();
 
 		return parent::html( $value );
 	}
@@ -102,7 +102,7 @@ class Field_Phone extends Helper_Abstract_Fields {
 			return $this->cache();
 		}
 
-		$this->cache( $this->get_value() );
+		$this->cache( esc_html( $this->get_value() ) );
 
 		return $this->cache();
 	}

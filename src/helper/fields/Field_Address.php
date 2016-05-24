@@ -121,14 +121,10 @@ class Field_Address extends Helper_Abstract_Fields {
 			$address[] = $data['country'];
 		}
 
-		/* Apply sanitization to address */
-		$address = array_map( 'esc_html', $address );
-
 		/* display the address in the correct format */
 		$html = implode( '<br />', $address );
 
 		/* return the results */
-
 		return parent::html( $html );
 	}
 
@@ -152,12 +148,12 @@ class Field_Address extends Helper_Abstract_Fields {
 		}
 
 		$this->cache( array(
-			'street'  => trim( rgget( $this->field->id . '.1', $value ) ),
-			'street2' => trim( rgget( $this->field->id . '.2', $value ) ),
-			'city'    => trim( rgget( $this->field->id . '.3', $value ) ),
-			'state'   => trim( rgget( $this->field->id . '.4', $value ) ),
-			'zip'     => trim( rgget( $this->field->id . '.5', $value ) ),
-			'country' => trim( rgget( $this->field->id . '.6', $value ) ),
+			'street'  => esc_html( rgget( $this->field->id . '.1', $value ) ),
+			'street2' => esc_html( rgget( $this->field->id . '.2', $value ) ),
+			'city'    => esc_html( rgget( $this->field->id . '.3', $value ) ),
+			'state'   => esc_html( rgget( $this->field->id . '.4', $value ) ),
+			'zip'     => esc_html( rgget( $this->field->id . '.5', $value ) ),
+			'country' => esc_html( rgget( $this->field->id . '.6', $value ) ),
 		) );
 
 		return $this->cache();

@@ -134,7 +134,7 @@ class Field_Likert extends Helper_Abstract_Fields {
          * Get the column names
          */
 		foreach ( $this->field->choices as $column ) {
-			$likert['col'][ $column['value'] ] = $column['text'];
+			$likert['col'][ $column['value'] ] = esc_html( $column['text'] );
 		}
 
 		/**

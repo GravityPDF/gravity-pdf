@@ -87,7 +87,7 @@ class Field_Name extends Helper_Abstract_Fields {
 	public function html( $value = '', $label = true ) {
 		$data = array_filter( $this->value() ); /* remove any empty fields from the array */
 
-		$value = esc_html( implode( ' ', $data ) );
+		$value = implode( ' ', $data );
 
 		return parent::html( $value );
 	}
@@ -108,17 +108,21 @@ class Field_Name extends Helper_Abstract_Fields {
 
 		/* backwards compatible - check if the returned results are an array otherwise set to cache and return */
 		if ( ! is_array( $value ) ) {
-			$this->cache( $value );
+			$this->cache( esc_html( $value ) );
 			return $this->cache();
 		}
 
-		$this->cache( array(
+		$value = array(
 			'prefix' => rgget( $this->field->id . '.2', $value ),
 			'first'  => rgget( $this->field->id . '.3', $value ),
 			'middle' => rgget( $this->field->id . '.4', $value ),
 			'last'   => rgget( $this->field->id . '.6', $value ),
 			'suffix' => rgget( $this->field->id . '.8', $value ),
-		) );
+		);
+
+		$value = array_map( 'esc_html', $value );
+
+		$this->cache( $value );
 
 		return $this->cache();
 	}
