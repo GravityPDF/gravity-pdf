@@ -352,7 +352,7 @@ class Test_Actions extends WP_UnitTestCase {
 			wp_set_current_user( $user_id );
 		}
 
-		unlink( $path . 'configuration.php' );
+		@unlink( $path . 'configuration.php' );
 		$this->assertFalse( $this->model->migration_condition() );
 		touch( $path . 'configuration.php' );
 

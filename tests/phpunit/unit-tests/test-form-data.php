@@ -884,7 +884,7 @@ class Test_Form_Data extends WP_UnitTestCase {
          * Depreciated
          */
 		$this->assertEquals( $response, $data['signature_details'][0]['img'] );
-		$this->assertEquals( strpos( $data['signature_details'][0]['path'], ABSPATH ) );
+		$this->assertNotFalse( strpos( $data['signature_details'][0]['path'], ABSPATH ) );
 		$this->assertEquals( 'http://', substr( $data['signature_details'][0]['url'], 0, 7 ) );
 		$this->assertEquals( 75, $data['signature_details'][0]['width'] );
 		$this->assertEquals( 45, $data['signature_details'][0]['height'] );
@@ -1276,11 +1276,11 @@ class Test_Form_Data extends WP_UnitTestCase {
          */
 		$ranking = $data['field_data'][44];
 
-		$this->assertEquals( 26, $ranking['Rank First Choice'] );
-		$this->assertEquals( 24, $ranking['Rank Second Choice'] );
-		$this->assertEquals( 14, $ranking['Rank Third Choice'] );
-		$this->assertEquals( 15, $ranking['Rank Fourth Choce'] );
-		$this->assertEquals( 11, $ranking['Rank Fifth Choice'] );
+		$this->assertEquals( 28, $ranking['Rank First Choice'] );
+		$this->assertEquals( 27, $ranking['Rank Second Choice'] );
+		$this->assertEquals( 15, $ranking['Rank Third Choice'] );
+		$this->assertEquals( 20, $ranking['Rank Fourth Choce'] );
+		$this->assertEquals( 15, $ranking['Rank Fifth Choice'] );
 
 		/*
          * Test Rating

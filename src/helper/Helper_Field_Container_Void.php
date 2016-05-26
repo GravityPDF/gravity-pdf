@@ -73,7 +73,7 @@ class Helper_Field_Container_Void extends Helper_Field_Container {
 	 *
 	 * @since 4.0
 	 */
-	public function does_fit_in_row() {
+	public function does_fit_in_row( GF_Field $field ) {
 		/* Do nothing */
 	}
 
@@ -84,7 +84,7 @@ class Helper_Field_Container_Void extends Helper_Field_Container {
 	 *
 	 * @since 4.0
 	 */
-	public function maybe_display_faux_column() {
+	public function maybe_display_faux_column( GF_Field $field ) {
 		/* Do nothing */
 	}
 }

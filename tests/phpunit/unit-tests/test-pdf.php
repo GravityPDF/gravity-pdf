@@ -116,7 +116,6 @@ class Test_PDF extends WP_UnitTestCase {
 		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
 		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
 
-		$gfpdf->data->form_settings                = array();
 		$gfpdf->data->form_settings[ $form['id'] ] = $form['gfpdf_form_settings'];
 
 		return array(
@@ -376,7 +375,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertTrue( $this->model->middle_conditional( true, $entry, $settings ) );
 
 		/* Create a failing condition */
-		$settings['conditionalLogic']['rules']['value'] = 'test';
+		$settings['conditionalLogic']['rules'][0]['value']   = 'test';
 
 		$this->assertTrue( is_wp_error( $this->model->middle_conditional( true, $entry, $settings ) ) );
 	}
@@ -552,7 +551,7 @@ class Test_PDF extends WP_UnitTestCase {
 		wp_set_current_user( $user_id );
 
 		/* get the results */
-		$results = $this->model->middle_user_capability( true, '', '' );
+		$results = $this->model->middle_user_capability( true, array( 'created_by' => 0 ), '' );
 
 		$this->assertTrue( is_wp_error( $results ) );
 		$this->assertEquals( 'access_denied', $results->get_error_code() );
@@ -562,14 +561,14 @@ class Test_PDF extends WP_UnitTestCase {
 		$user->remove_role( 'subscriber' );
 		$user->add_role( 'administrator' );
 
-		$this->assertTrue( $this->model->middle_user_capability( true, '', '' ) );
+		$this->assertTrue( $this->model->middle_user_capability( true, array( 'created_by' => 0 ), '' ) );
 
 		/* Remove elevated user privilages and set the default capability 'gravityforms_view_entries' */
 		$user->remove_role( 'administrator' );
 		$user->add_role( 'subscriber' );
 
 		/* Double check they have been removed */
-		$results = $this->model->middle_user_capability( true, '', '' );
+		$results = $this->model->middle_user_capability( true, array( 'created_by' => 0 ), '' );
 
 		$this->assertTrue( is_wp_error( $results ) );
 		$this->assertEquals( 'access_denied', $results->get_error_code() );
@@ -578,7 +577,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$user->add_cap( 'gravityforms_view_entries' );
 		$user->get_role_caps();
 		$user->update_user_level_from_caps();
-		$this->assertTrue( $this->model->middle_user_capability( true, '', '' ) );
+		$this->assertTrue( $this->model->middle_user_capability( true, array( 'created_by' => 0 ), '' ) );
 
 		wp_set_current_user( 0 );
 	}
@@ -903,7 +902,7 @@ class Test_PDF extends WP_UnitTestCase {
 	public function test_does_pdf_exist() {
 		global $gfpdf;
 
-		$pdf = new Helper_PDF( '', '', $gfpdf->gform, $gfpdf->data );
+		$pdf = new Helper_PDF( array( 'id' => 1, 'form_id' => 1 ), '', $gfpdf->gform, $gfpdf->data );
 		$pdf->set_path( ABSPATH );
 		$pdf->set_filename( 'unittest' );
 
@@ -924,7 +923,7 @@ class Test_PDF extends WP_UnitTestCase {
 	public function test_get_output_type() {
 		global $gfpdf;
 
-		$pdf = new Helper_PDF( '', '', $gfpdf->gform, $gfpdf->data );
+		$pdf = new Helper_PDF( array( 'id' => 1, 'form_id' => 1 ), '', $gfpdf->gform, $gfpdf->data );
 
 		$pdf->set_output_type( 'display' );
 		$this->assertEquals( 'DISPLAY', $pdf->get_output_type() );
@@ -944,7 +943,7 @@ class Test_PDF extends WP_UnitTestCase {
 	public function test_get_template_path() {
 		global $gfpdf;
 
-		$pdf = new Helper_PDF( '', array( 'template' => 'zadani' ), $gfpdf->gform, $gfpdf->data );
+		$pdf = new Helper_PDF( array( 'id' => 1, 'form_id' => 1 ), array( 'template' => 'zadani' ), $gfpdf->gform, $gfpdf->data );
 
 		/* Cleanup any previous tests */
 		@unlink( $gfpdf->data->template_location . 'zadani.php' );
@@ -979,7 +978,7 @@ class Test_PDF extends WP_UnitTestCase {
 		}
 
 		/* Check for errors */
-		$pdf = new Helper_PDF( '', array( 'template' => 'non-existant' ), $gfpdf->gform, $gfpdf->data );
+		$pdf = new Helper_PDF( array( 'id' => 1, 'form_id' => 1 ), array( 'template' => 'non-existant' ), $gfpdf->gform, $gfpdf->data );
 
 		try {
 			/* Set our current PDF template */
@@ -993,7 +992,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$template = str_replace( 'Required PDF Version: 4.0-alpha', 'Required PDF Version: 10', $template );
 		file_put_contents( $gfpdf->data->template_location . 'zadani.php', $template );
 
-		$pdf = new Helper_PDF( '', array( 'template' => 'zadani' ), $gfpdf->gform, $gfpdf->data );
+		$pdf = new Helper_PDF( array( 'id' => 1, 'form_id' => 1 ), array( 'template' => 'zadani' ), $gfpdf->gform, $gfpdf->data );
 
 		try {
 			$pdf->set_template();
@@ -1079,7 +1078,7 @@ class Test_PDF extends WP_UnitTestCase {
 		global $gfpdf;
 
 		/* Check our alternate font location is bypassed */
-		unlink( $gfpdf->data->template_font_location . 'font' );
+		@unlink( $gfpdf->data->template_font_location . 'font' );
 		$this->assertEquals( ABSPATH . 'font', $this->model->set_current_pdf_font( ABSPATH . 'font', 'font' ) );
 
 		/* Create the file and ensure it isn't bypassed */
@@ -1444,21 +1443,17 @@ class Test_PDF extends WP_UnitTestCase {
 			),
 		);
 
-		$field            = new GF_Field();
-		$field->id        = 25;
-		$field->inputType = 'page';
-
 		ob_start();
 		$this->view->display_page_name( 1, $form, new Helper_Field_Container() );
 		$html = ob_get_clean();
 
-		$this->assertNotFalse( strpos( $html, '<h3 id="field-' . $field->id . '"', $field ) );
+		$this->assertNotFalse( strpos( $html, '<h3 class="gfpdf-page' ) );
 
 		ob_start();
 		$this->view->display_page_name( 2, $form, new Helper_Field_Container() );
 		$html = ob_get_clean();
 
-		$this->assertFalse( strpos( $html, '<h3 id="field-' . $field->id . '"' ) );
+		$this->assertFalse( strpos( $html, '<h3 class="gfpdf-page' ) );
 	}
 
 	/**
@@ -1631,7 +1626,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$entry    = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
 		$args     = $gfpdf->misc->get_template_args( $entry, $settings );
 
-		$pdf = new Helper_PDF( '', $settings, $gfpdf->gform, $gfpdf->data );
+		$pdf = new Helper_PDF( array( 'id' => 1, 'form_id' => 1 ), $settings, $gfpdf->gform, $gfpdf->data );
 		$pdf->set_template();
 		$pdf->set_output_type( 'save' );
 

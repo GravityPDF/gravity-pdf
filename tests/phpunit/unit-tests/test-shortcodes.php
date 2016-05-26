@@ -231,12 +231,12 @@ class Test_Shortcode extends WP_UnitTestCase {
 
 		/* Check our entry ID is being automatically added */
 		$results = $this->model->gravitypdf_notification( $notification, $form, $lead );
-		$this->assertNotFalse( strpos( $results, '[gravitypdf id="555ad84787d7e" entry="' . $lead['id'] . '"]' ) );
+		$this->assertNotFalse( strpos( $results['message'], '[gravitypdf id="555ad84787d7e" entry="' . $lead['id'] . '"]' ) );
 
 		/* Check we don't modify the ID when it already exists */
 		$notification['message'] = 'Thanks for getting in touch. [gravitypdf id="555ad84787d7e" entry="5000"]';
 		$results                 = $this->model->gravitypdf_notification( $notification, $form, $lead );
-		$this->assertNotFalse( strpos( $results, '[gravitypdf id="555ad84787d7e" entry="5000"]' ) );
+		$this->assertNotFalse( strpos( $results['message'], '[gravitypdf id="555ad84787d7e" entry="5000"]' ) );
 
 		/* Check we pass when the message key doesn't exist */
 		$results = $this->model->gravitypdf_notification( 'Test', $form, $lead );
@@ -298,13 +298,13 @@ class Test_Shortcode extends WP_UnitTestCase {
 		$_POST['form_confirmation_url'] = '[gravitypdf id="555ad84787d7e"]';
 
 		/* Run the test */
-		$this->model->gravitypdf_redirect_confirmation( '' );
+		$this->model->gravitypdf_redirect_confirmation( array( 'id' => 1 ) );
 		$this->assertEquals( home_url() . '/pdf/555ad84787d7e/{entry_id}/download/', $_POST['form_confirmation_url'] );
 
 		/* Check for viewing URL */
 		$_POST['form_confirmation_url'] = '[gravitypdf id="555ad84787d7e" type="view"]';
 
-		$this->model->gravitypdf_redirect_confirmation( '' );
+		$this->model->gravitypdf_redirect_confirmation( array( 'id' => 1 ) );
 		$this->assertEquals( home_url() . '/pdf/555ad84787d7e/{entry_id}/', $_POST['form_confirmation_url'] );
 
 		$wp_rewrite->set_permalink_structure( $old_permalink_structure );
@@ -312,13 +312,13 @@ class Test_Shortcode extends WP_UnitTestCase {
 
 		/* Run the test */
 		$_POST['form_confirmation_url'] = '[gravitypdf id="555ad84787d7e"]';
-		$this->model->gravitypdf_redirect_confirmation( '' );
+		$this->model->gravitypdf_redirect_confirmation( array( 'id' => 1 ) );
 		$this->assertEquals( home_url() . '/?gpdf=1&pid=555ad84787d7e&lid={entry_id}&action=download', $_POST['form_confirmation_url'] );
 
 		/* Check for viewing URL */
 		$_POST['form_confirmation_url'] = '[gravitypdf id="555ad84787d7e" type="view"]';
 
-		$this->model->gravitypdf_redirect_confirmation( '' );
+		$this->model->gravitypdf_redirect_confirmation( array( 'id' => 1 ) );
 		$this->assertEquals( home_url() . '/?gpdf=1&pid=555ad84787d7e&lid={entry_id}', $_POST['form_confirmation_url'] );
 
 	}
@@ -403,6 +403,6 @@ class Test_Shortcode extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_display_gravitypdf_shortcode() {
-		$this->assertNotFalse( strpos( $this->view->display_gravitypdf_shortcode(), '<a href="' ) );
+		$this->assertNotFalse( strpos( $this->view->display_gravitypdf_shortcode( array( 'url' => '', 'class' => '', 'classes' => '', 'text' => '' ) ), '<a href="' ) );
 	}
 }

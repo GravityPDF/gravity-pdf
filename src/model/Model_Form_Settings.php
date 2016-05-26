@@ -473,28 +473,30 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		}
 
 		/* Loop through each setting being saved and pass it through a sanitization filter */
-		foreach ( $input as $key => $value ) {
+		if ( is_array( $input ) && 0 < sizeof( $input ) ) {
+			foreach ( $input as $key => $value ) {
 
-			foreach ( $sections as $s ) {
+				foreach ( $sections as $s ) {
 
-				/* only process field if found in the section */
-				if ( isset( $settings[ $s ][ $key ] ) ) {
-					$type = isset( $settings[ $s ][ $key ]['type'] ) ? $settings[ $s ][ $key ]['type'] : false;
+					/* only process field if found in the section */
+					if ( isset( $settings[ $s ][ $key ] ) ) {
+						$type = isset( $settings[ $s ][ $key ]['type'] ) ? $settings[ $s ][ $key ]['type'] : false;
 
-					/*
-					 * General filter
-					 *
-					 * See https://gpdfv4.xyz/documentation/v4/gfpdf_form_settings_sanitize/ for more details about this filter
-					 */
-					$input[ $key ] = apply_filters( 'gfpdf_form_settings_sanitize', $input[ $key ], $key, $input, $settings[ $s ][ $key ] );
-
-					if ( $type ) {
 						/*
-						 * Field type specific filter
+						 * General filter
 						 *
 						 * See https://gpdfv4.xyz/documentation/v4/gfpdf_form_settings_sanitize/ for more details about this filter
 						 */
-						$input[ $key ] = apply_filters( 'gfpdf_form_settings_sanitize_' . $type, $input[ $key ], $key, $input, $settings[ $s ][ $key ] );
+						$input[ $key ] = apply_filters( 'gfpdf_form_settings_sanitize', $input[ $key ], $key, $input, $settings[ $s ][ $key ] );
+
+						if ( $type ) {
+							/*
+							 * Field type specific filter
+							 *
+							 * See https://gpdfv4.xyz/documentation/v4/gfpdf_form_settings_sanitize/ for more details about this filter
+							 */
+							$input[ $key ] = apply_filters( 'gfpdf_form_settings_sanitize_' . $type, $input[ $key ], $key, $input, $settings[ $s ][ $key ] );
+						}
 					}
 				}
 			}
@@ -844,9 +846,9 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/*
          * Validate Endpoint
          */
-		$nonce = $_POST['nonce'];
-		$fid   = (int) $_POST['fid'];
-		$pid   = $_POST['pid'];
+		$nonce = ( isset( $_POST['nonce'] ) ) ? $_POST['nonce'] : '';
+		$fid   = ( isset( $_POST['fid'] ) ) ? (int) $_POST['fid'] : 0;
+		$pid   = ( isset( $_POST['pid'] ) ) ? $_POST['pid'] : '';
 
 		$nonce_id = "gfpdf_delete_nonce_{$fid}_{$pid}";
 
@@ -918,9 +920,9 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/*
          * Validate Endpoint
          */
-		$nonce = $_POST['nonce'];
-		$fid   = (int) $_POST['fid'];
-		$pid   = $_POST['pid'];
+		$nonce = ( isset( $_POST['nonce'] ) ) ? $_POST['nonce'] : '';
+		$fid   = ( isset( $_POST['fid'] ) ) ? (int) $_POST['fid'] : 0;
+		$pid   = ( isset( $_POST['pid'] ) ) ? $_POST['pid'] : '';
 
 		$nonce_id = "gfpdf_duplicate_nonce_{$fid}_{$pid}";
 
@@ -1002,9 +1004,9 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/*
          * Validate Endpoint
          */
-		$nonce    = $_POST['nonce'];
-		$fid      = (int) $_POST['fid'];
-		$pid      = $_POST['pid'];
+		$nonce    = ( isset( $_POST['nonce'] ) ) ? $_POST['nonce'] : '';
+		$fid      = ( isset( $_POST['fid'] ) ) ? (int) $_POST['fid'] : 0;
+		$pid      = ( isset( $_POST['pid'] ) ) ? $_POST['pid'] : '';
 		$nonce_id = "gfpdf_state_nonce_{$fid}_{$pid}";
 
 		if ( ! wp_verify_nonce( $nonce, $nonce_id ) ) {
@@ -1078,8 +1080,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		}
 
 		/* get the current template */
-		$template = $_POST['template'];
-		$type     = $_POST['type'];
+		$template = ( isset( $_POST['template'] ) ) ? $_POST['template'] : '';
+		$type     = ( isset( $_POST['type'] ) ) ? $_POST['type'] : '';
 		$class    = $this->get_template_configuration( $template );
 		$settings = $this->setup_custom_appearance_settings( $class );
 

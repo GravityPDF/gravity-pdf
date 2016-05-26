@@ -557,7 +557,10 @@
 				$('#gfpdf_list_form').on('click', 'a.submitdelete', function() {
 					var id = String($(this).data('id'));
 					if(id.length > 0 && ! $deleteDialog.data('elm')) {
-						$deleteDialog.wpdialog( 'open' ).data('elm', this);
+						/* Allow responsiveness */
+						self.resizeDialogIfNeeded( $deleteDialog, 300, 175 );
+
+						$deleteDialog.wpdialog('open').data('elm', this);
 					}
 				});
 			};
@@ -1012,11 +1015,10 @@
 			 */
 			this.setupSelectBoxes = function() {
 				$('.gfpdf-chosen').each(function() {
-					var width = $(this).css('width');
 
 					$(this).chosen({
 						disable_search_threshold: 5,
-						width: width,
+						width: '100%',
 					});
 				});
 			};
@@ -1128,6 +1130,9 @@
 					this.wp_dialog($copyDialog, copyButtons, 500, 350);
 
 					$copy.click(function() {
+						/* Allow responsiveness */
+						self.resizeDialogIfNeeded( $copyDialog, 500, 350 );
+
 						$copyDialog.wpdialog('open');
 						return false;
 					});
@@ -1147,6 +1152,9 @@
 				this.wp_dialog($fontDialog, [], 500, 500);
 
 				$font.click(function() {
+					/* Allow responsiveness */
+					self.resizeDialogIfNeeded( $fontDialog, 500, 500 );
+
 					$fontDialog.wpdialog('open');
 				    return false;
 				});
@@ -1187,10 +1195,34 @@
 			    this.wp_dialog($uninstallDialog, uninstallButtons, 500, 175);
 
 				$uninstall.click(function() {
+					/* Allow responsiveness */
+					self.resizeDialogIfNeeded( $uninstallDialog, 500, 175 );
+
 					$uninstallDialog.wpdialog('open');
 				    return false;
 				});
 			};
+
+			/**
+			 * Check the current browser width and height and set the dialog box size to fit
+			 * If the size is over 500 pixels (width or height) it will default to 500
+			 *
+			 * @param $dialog an object initialised with this.wp_dialog
+			 * @param Integer maxWidth The maximum width of the dialog box, if it will fit
+			 * @param Integer maxHeight The maximum height of the dialog box, if it will fit
+			 * @return void
+			 * @since 4.0
+             */
+			this.resizeDialogIfNeeded = function( $dialog, maxWidth, maxHeight ) {
+				var windowWidth  = $(window).width();
+				var windowHeight = $(window).height();
+
+				var dialogWidth  = (windowWidth < 500) ? windowWidth - 20 : maxWidth;
+				var dialogHeight = (windowHeight < 500) ? windowHeight - 50 : maxHeight;
+
+				$dialog.wpdialog('option', 'width', dialogWidth);
+				$dialog.wpdialog('option', 'height', dialogHeight);
+			}
 
 			/**
 			 * Generate a WP Dialog box

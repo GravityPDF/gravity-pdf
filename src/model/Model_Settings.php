@@ -441,7 +441,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		/*
          * Validate Endpoint
          */
-		$nonce    = $_POST['nonce'];
+		$nonce    = ( isset( $_POST['nonce'] ) ) ? $_POST['nonce'] : '';
 		$nonce_id = 'gfpdf_font_nonce';
 
 		if ( ! wp_verify_nonce( $nonce, $nonce_id ) ) {
@@ -470,7 +470,8 @@ class Model_Settings extends Helper_Abstract_Model {
 		$this->ajax_font_validation();
 
 		/* Handle the validation and saving of the font */
-		$results = $this->process_font( $_POST['payload'] );
+		$payload = isset( $_POST['payload'] ) ? $_POST['payload'] : '';
+		$results = $this->process_font( $payload );
 
 		/* If we reached this point the results were successful so return the new object */
 		$this->log->addNotice( 'AJAX Endpoint Successful', array(
@@ -498,7 +499,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		$this->ajax_font_validation();
 
 		/* Get the required details for deleting fonts */
-		$id    = $_POST['id'];
+		$id    = ( isset( $_POST['id'] ) ) ? $_POST['id'] : '';
 		$fonts = $this->options->get_option( 'custom_fonts' );
 
 		/* Check font actually exists and remove */
@@ -646,7 +647,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		/**
 		 * Verify our nonce is valid before doing anything
 		 */
-		$nonce    = $_POST['nonce'];
+		$nonce    = ( isset( $_POST['nonce'] ) ) ? $_POST['nonce'] : '';
 		$nonce_id = 'gfpdf-direct-pdf-protection';
 
 		if ( ! wp_verify_nonce( $nonce, $nonce_id ) ) {

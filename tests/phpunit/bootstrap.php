@@ -96,6 +96,8 @@ class GravityPDF_Unit_Tests_Bootstrap {
 	 */
 	public function create_stubs() {
 
+		global $gfpdf;
+
 		/* Import all JSON forms into Gravity Forms */
 		$forms = array(
 			'all-form-fields.json',
@@ -113,7 +115,6 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		/* Import our entries */
 		$entries = array(
 			'all-form-fields' => 'all-form-fields-entries.json',
-			'form-settings'   => '',
 			'gravityform-1'   => 'gravityform-1-entries.json',
 		);
 
@@ -134,6 +135,8 @@ class GravityPDF_Unit_Tests_Bootstrap {
 				}
 			}
 		}
+
+		$gfpdf->data->form_settings = array();
 	}
 
 }
