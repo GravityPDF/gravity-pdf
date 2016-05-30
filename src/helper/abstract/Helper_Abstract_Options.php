@@ -720,9 +720,15 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$value = apply_filters( 'gfpdf_update_option', $value, $key );
 		$value = apply_filters( 'gfpdf_update_option_' . $key, $value, $key );
 
+		/* Disable default sanitization (it shouldn't be triggered through this method) */
+		remove_filter( 'sanitize_option_gfpdf_settings', array( $this, 'settings_sanitize' ) );
+
 		/* Next let's try to update the value */
 		$options[ $key ] = $value;
 		$did_update      = update_option( 'gfpdf_settings', $options );
+
+		/* Re-enable sanitization */
+		add_filter( 'sanitize_option_gfpdf_settings', array( $this, 'settings_sanitize' ) );
 
 		/* If it updated, let's update the global variable */
 		if ( $did_update ) {
