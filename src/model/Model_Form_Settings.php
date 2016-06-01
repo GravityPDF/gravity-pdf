@@ -732,12 +732,15 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$class_name = $this->misc->get_config_class_name( $file );
 		$fqcn       = $namespace . $class_name;
 
-		if ( ! class_exists( $fqcn ) && is_file( $file ) && is_readable( $file ) ) {
-			require_once( $file );
-		} else {
-			$this->log->addWarning( 'Template Configuration Failed to Load', array(
-				'file' => $file,
-			) );
+		/* Try and load the file if the class doesn't exist */
+		if ( ! class_exists( $fqcn ) ) {
+			if ( is_file( $file ) && is_readable( $file ) ) {
+				require_once( $file );
+			} else {
+				$this->log->addWarning( 'Template Configuration Failed to Load', array(
+					'file' => $file,
+				) );
+			}
 		}
 
 		/* Insure the class we are trying to load exists and impliments our Helper_Interface_Config interface */
