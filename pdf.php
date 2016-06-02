@@ -95,6 +95,7 @@ class GFPDF_Core extends PDFGenerator
 		 include_once PDF_PLUGIN_DIR . 'pdf-settings.php';
 		 include_once PDF_PLUGIN_DIR . 'depreciated.php';
 		 include_once PDF_PLUGIN_DIR . 'helper/pdf-entry-detail.php';
+		 include_once PDF_PLUGIN_DIR . 'major-upgrade-checker.php';
 
 		/*
 		 * Set the notice type
