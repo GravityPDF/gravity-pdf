@@ -40,6 +40,12 @@
     <p><strong>Current Version: <?php echo PDF_EXTENDED_VERSION; ?></strong></p>
 
   <h3><?php echo PDF_EXTENDED_VERSION; ?></h3>
+    <ul>
+        <li>Feature - Add support for Gravity Forms 2.0 Rich Text Editor field</li>
+        <li>Feature - Hide Gravity PDF major upgrade prompts when compatibility checks fail</li>
+    </ul>
+
+<h3>3.7.7</h3>
   <ul>
       <li>Bug - Ensure 'gfpdf_post_pdf_save' action gets triggered for all PDFs when resending notifications</li>
       <li>Housekeeping - Remove compress.php from mPDF package (unneeded)</li>
