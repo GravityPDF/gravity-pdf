@@ -1651,8 +1651,16 @@ if(!class_exists('GFPDFEntryDetail'))
 				default :
 					if (!is_array($value))
 					{
-						return nl2br($value);
+						/* Add support for Gravity Forms Rich Text Editor feature in 2.0 */
+						if ( isset( $field['useRichTextEditor'] ) && true === $field['useRichTextEditor'] ) {
+							return wp_kses_post( $value );
+						} else {
+							return nl2br( $value );
+						}
 					}
+
+					/* If it is an array we'll just return it as is */
+					return $value;
 				break;
 			}
 		}
@@ -2015,8 +2023,16 @@ if(!class_exists('GFPDFEntryDetail'))
 					default :
 						if (!is_array($value))
 						{
-							return nl2br($value);
+							/* Add support for Gravity Forms Rich Text Editor feature in 2.0 */
+							if ( isset( $field['useRichTextEditor'] ) && true === $field['useRichTextEditor'] ) {
+								return wp_kses_post( $value );
+							} else {
+								return nl2br( $value );
+							}
 						}
+
+						/* If it is an array we'll just return it as is */
+						return $value;
 					break;
 				}
 			}
