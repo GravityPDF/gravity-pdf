@@ -11,6 +11,7 @@ use Psr\Log\LoggerInterface;
 
 use GPDFAPI;
 use GFCommon;
+use GravityView_View;
 
 /**
  * PDF Shortcode Model
@@ -216,70 +217,87 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	 *
 	 * @param  string $confirmation The confirmation text
 	 * @param  array  $form         The Gravity Form array
-	 * @param  array  $lead         The Gravity Form entry information
+	 * @param  array  $entry         The Gravity Form entry information
 	 *
 	 * @return array               The confirmation text
 	 *
 	 * @since 4.0
 	 */
-	public function gravitypdf_confirmation( $confirmation, $form, $lead ) {
+	public function gravitypdf_confirmation( $confirmation, $form, $entry ) {
 
 		/* check if confirmation is text-based */
 		if ( ! is_array( $confirmation ) ) {
-			/* check if our shortcode exists and add the entry ID if needed */
-			$gravitypdf = $this->get_shortcode_information( 'gravitypdf', $confirmation );
-
-			if ( sizeof( $gravitypdf ) > 0 ) {
-				foreach ( $gravitypdf as $shortcode ) {
-					/* if the user hasn't explicitely defined an entry to display... */
-					if ( ! isset( $shortcode['attr']['entry'] ) ) {
-						/* get the new shortcode information */
-						$new_shortcode = $this->add_shortcode_attr( $shortcode, 'entry', $lead['id'] );
-
-						/* update our confirmation message */
-						$confirmation = str_replace( $shortcode['shortcode'], $new_shortcode['shortcode'], $confirmation );
-					}
-				}
-			}
+			$confirmation = $this->add_entry_id_to_shortcode( $confirmation, $entry['id'] );
 		}
 
 		return $confirmation;
 	}
-
 
 	/**
 	 * Update our Gravity Forms Notification Shortcode to include the current entry ID
 	 *
 	 * @param  string $notification The confirmation text
 	 * @param  array  $form         The Gravity Form array
-	 * @param  array  $lead         The Gravity Form entry information
+	 * @param  array  $entry        The Gravity Form entry information
 	 *
 	 * @return array               The confirmation text
 	 *
 	 * @since 4.0
 	 */
-	public function gravitypdf_notification( $notification, $form, $lead ) {
+	public function gravitypdf_notification( $notification, $form, $entry ) {
 
 		/* check if notification has a 'message' */
 		if ( isset( $notification['message'] ) ) {
-			/* check if our shortcode exists and add the entry ID if needed */
-			$gravitypdf = $this->get_shortcode_information( 'gravitypdf', $notification['message'] );
+			$notification['message'] = $this->add_entry_id_to_shortcode( $notification['message'], $entry['id'] );
+		}
 
-			if ( sizeof( $gravitypdf ) > 0 ) {
-				foreach ( $gravitypdf as $shortcode ) {
-					/* if the user hasn't explicitely defined an entry to display... */
-					if ( ! isset( $shortcode['attr']['entry'] ) ) {
-						/* get the new shortcode information */
-						$new_shortcode = $this->add_shortcode_attr( $shortcode, 'entry', $lead['id'] );
+		return $notification;
+	}
 
-						/* update our confirmation message */
-						$notification['message'] = str_replace( $shortcode['shortcode'], $new_shortcode['shortcode'], $notification['message'] );
-					}
+	/**
+	 * Add basic GravityView support and parse the Custom Content field for the [gravitypdf] shortcode
+	 * This means users can copy and paste our sample shortcode without having to worry about an entry ID being passed.
+	 *
+	 * @param string $html
+	 *
+	 * @return string
+	 *
+	 * @since 4.0
+	 */
+	public function gravitypdf_gravityview_custom( $html ) {
+		$gravityview_view = GravityView_View::getInstance();
+		$entry = $gravityview_view->getCurrentEntry();
+		return $this->add_entry_id_to_shortcode( $html, $entry['id'] );
+	}
+
+	/**
+	 * Check for the [gravitypdf] shortcode and add the entry ID to it
+	 *
+	 * @param $string The text to search
+	 * @param $entry_id The entry ID to add to our shortcode
+	 *
+	 * @return string
+	 *
+	 * @since 4.0
+	 */
+	private function add_entry_id_to_shortcode( $string, $entry_id ) {
+		/* Check if our shortcode exists and add the entry ID if needed */
+		$gravitypdf = $this->get_shortcode_information( 'gravitypdf', $string );
+
+		if ( sizeof( $gravitypdf ) > 0 ) {
+			foreach ( $gravitypdf as $shortcode ) {
+				/* if the user hasn't explicitely defined an entry to display... */
+				if ( ! isset( $shortcode['attr']['entry'] ) ) {
+					/* get the new shortcode information */
+					$new_shortcode = $this->add_shortcode_attr( $shortcode, 'entry', $entry_id );
+
+					/* update our confirmation message */
+					$string = str_replace( $shortcode['shortcode'], $new_shortcode['shortcode'], $string );
 				}
 			}
 		}
 
-		return $notification;
+		return $string;
 	}
 
 	/**
