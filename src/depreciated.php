@@ -670,6 +670,24 @@ class PDF_Generator extends GFPDF_Depreciated_Abstract {
 }
 
 class GFPDF_Core_Model extends GFPDF_Depreciated_Abstract {
+
+	/**
+	 * This method will save any PDFs assigned to a form to disk
+	 *
+	 * @param $entry
+	 * @param $form
+	 *
+	 * @since 3.0
+	 */
+	public static function gfpdfe_save_pdf( $entry, $form ) {
+		$pdfs = GPDFAPI::get_form_pdfs( $form['id'] );
+
+		if ( ! is_wp_error( $pdfs ) ) {
+			foreach ( $pdfs as $pdf ) {
+				GPDFAPI::create_pdf( $entry['id'], $pdf['id'] );
+			}
+		}
+	}
 }
 
 class GFPDF_Settings_Model extends GFPDF_Depreciated_Abstract {

@@ -368,9 +368,30 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 
 		$this->assertTrue( is_file( $filename ) );
 
+		unlink( $filename );
+
+	}
+
+	/**
+	 * Verify our depreciated GFPDF_Core_Model::gfpdfe_save_pdf() method
+	 * works as expected.
+	 */
+	public function test_depreciated_save_pdf() {
+		global $gfpdf;
+
+		$results = $this->create_form_and_entries();
+		$entry   = $results['entry'];
+		$form    = $results['form'];
+
+		$filename = $gfpdf->data->template_tmp_location . "11/test-{$form['id']}.pdf";
+
 		if ( is_file( $filename ) ) {
 			unlink( $filename );
 		}
 
+		\GFPDF_Core_Model::gfpdfe_save_pdf( $entry, $form );
+		$this->assertTrue( is_file( $filename ) );
+
+		unlink( $filename );
 	}
 }
