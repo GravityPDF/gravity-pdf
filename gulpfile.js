@@ -2,7 +2,9 @@
 var gulp  	  = require('gulp'),
 	minifyCss = require('gulp-minify-css'),
 	uglify    = require('gulp-uglify'),
-	rename    = require('gulp-rename');
+	rename    = require('gulp-rename'),
+	wpPot     = require('gulp-wp-pot'),
+	sort      = require('gulp-sort');
 
 /* Minify our CSS */
 gulp.task('minify', function() {
@@ -24,6 +26,18 @@ gulp.task('compress', function() {
     .pipe(gulp.dest('src/assets/js/'));
 });
 
+/* Generate the latest language files */
+gulp.task('language', function() {
+	return gulp.src('**/*.php')
+		.pipe(sort())
+		.pipe(wpPot( {
+			domain: 'gravity-forms-pdf-extended',
+			destFile:'gravity-forms-pdf-extended.pot',
+			package: 'gravity-forms-pdf-extended'
+		} ))
+		.pipe(gulp.dest('src/assets/languages'));
+});
+
 gulp.task('default', function() {
-    gulp.start('minify', 'compress');
+    gulp.start('minify', 'compress', 'language');
 });

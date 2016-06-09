@@ -1,0 +1,1784 @@
+# Copyright (C) 2016 gravity-forms-pdf-extended
+# This file is distributed under the same license as the gravity-forms-pdf-extended package.
+msgid ""
+msgstr ""
+"Project-Id-Version: gravity-forms-pdf-extended\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2016-MO-DA HO:MI+ZONE\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n\n"
+
+#: api.php:465
+msgid "The $type parameter is invalid. Only \"view\" and \"model\" are accepted"
+msgstr ""
+
+#: api.php:755
+msgid "The option key %s already exists. Use GPDFAPI::update_plugin_option instead"
+msgstr ""
+
+#: pdf.php:379
+msgid "WordPress Version %s is required. %sGet more info%s."
+msgstr ""
+
+#: pdf.php:417
+msgid "%sGravity Forms%s Version %s is required. %sGet more info%s."
+msgstr ""
+
+#: pdf.php:455
+msgid "You are running an %soutdated version of PHP%s. Contact your web hosting provider to update. %sGet more info%s."
+msgstr ""
+
+#: pdf.php:493
+msgid "The PHP Extension MB String could not be detected. Contact your web hosting provider to fix. %sGet more info%s."
+msgstr ""
+
+#: pdf.php:531
+msgid "The PHP Extension MB String does not have MB Regex enabled. Contact your web hosting provider to fix. %sGet more info%s."
+msgstr ""
+
+#: pdf.php:569
+msgid "The PHP Extension GD Image Library could not be detected. Contact your web hosting provider to fix. %sGet more info%s."
+msgstr ""
+
+#: pdf.php:607
+msgid "The PHP DOM Extension was not found. Contact your web hosting provider to fix. %sGet more info%s."
+msgstr ""
+
+#: pdf.php:621
+msgid "The PHP Extension libxml could not be detected. Contact your web hosting provider to fix. %sGet more info%s."
+msgstr ""
+
+#: pdf.php:667
+msgid "You need %s128MB%s of WP Memory (RAM) but we only found %s available. %sTry these methods to increase your memory limit%s, otherwise contact your web hosting provider to fix."
+msgstr ""
+
+#: pdf.php:801
+msgid "Gravity PDF Installation Problem"
+msgstr ""
+
+#: pdf.php:805
+msgid "The minimum requirements for Gravity PDF have not been met. Please fix the issue(s) below to continue:"
+msgstr ""
+
+#: src/bootstrap.php:293, src/bootstrap.php:317, src/depreciated.php:113, src/depreciated.php:137
+msgid "\"%s\" has been depreciated as of Gravity PDF 4.0"
+msgstr ""
+
+#: src/bootstrap.php:741
+msgid "View Gravity PDF Settings"
+msgstr ""
+
+#: src/bootstrap.php:741
+msgid "Settings"
+msgstr ""
+
+#: src/bootstrap.php:781
+msgid "View Gravity PDF Documentation"
+msgstr ""
+
+#: src/bootstrap.php:781
+msgid "Docs"
+msgstr ""
+
+#: src/bootstrap.php:783
+msgid "Get Help and Support"
+msgstr ""
+
+#: src/bootstrap.php:783
+msgid "Support"
+msgstr ""
+
+#: src/bootstrap.php:785
+msgid "View Gravity PDF Theme Shop"
+msgstr ""
+
+#: src/bootstrap.php:785
+msgid "Theme Shop"
+msgstr ""
+
+#: src/bootstrap.php:1271, src/controller/Controller_Shortcodes.php:301, src/helper/Helper_Data.php:349
+msgid "Gravity PDF"
+msgstr ""
+
+#: src/controller/Controller_Actions.php:311
+msgid "Review Submitted"
+msgstr ""
+
+#: src/controller/Controller_Actions.php:331
+msgid "Begin Migration"
+msgstr ""
+
+#: src/controller/Controller_Actions.php:467, src/model/Model_Form_Settings.php:361, src/model/Model_Form_Settings.php:431, src/model/Model_Form_Settings.php:551, src/view/View_Settings.php:509
+msgid "You do not have permission to access this page"
+msgstr ""
+
+#: src/controller/Controller_Actions.php:481, src/helper/Helper_Migration.php:295
+msgid "There was a problem processing the action. Please try again."
+msgstr ""
+
+#: src/controller/Controller_Install.php:469
+msgid "There was a problem uninstalling Gravity PDF. Please try again."
+msgstr ""
+
+#: src/controller/Controller_PDF.php:609, src/view/View_PDF.php:475
+msgid "There was a problem generating your PDF"
+msgstr ""
+
+#: src/controller/Controller_Settings.php:679
+msgid "There was a problem installing the PDF templates. Please try again."
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:761, src/helper/abstract/Helper_Abstract_Options.php:793
+msgid "You must pass in a valid form ID"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:881
+msgid "You must pass in a valid PDF ID"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1587
+msgid "Gravity Forms Capabilities"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1599
+msgid "Active WordPress Capabilities"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1645
+msgid "Common Sizes"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1647
+msgid "A4 (210 x 297mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1649
+msgid "Letter (8.5 x 11in)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1651
+msgid "Legal (8.5 x 14in)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1653
+msgid "Ledger / Tabloid (11 x 17in)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1655
+msgid "Executive (7 x 10in)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1657, src/helper/Helper_Options_Fields.php:195, src/helper/Helper_Options_Fields.php:723
+msgid "Custom Paper Size"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1663
+msgid "\"A\" Sizes"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1665
+msgid "A0 (841 x 1189mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1667
+msgid "A1 (594 x 841mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1669
+msgid "A2 (420 x 594mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1671
+msgid "A3 (297 x 420mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1673
+msgid "A5 (210 x 297mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1675
+msgid "A6 (105 x 148mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1677
+msgid "A7 (74 x 105mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1679
+msgid "A8 (52 x 74mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1681
+msgid "A9 (37 x 52mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1683
+msgid "A10 (26 x 37mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1689
+msgid "\"B\" Sizes"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1691
+msgid "B0 (1414 x 1000mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1693
+msgid "B1 (1000 x 707mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1695
+msgid "B2 (707 x 500mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1697
+msgid "B3 (500 x 353mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1699
+msgid "B4 (353 x 250mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1701
+msgid "B5 (250 x 176mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1703
+msgid "B6 (176 x 125mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1705
+msgid "B7 (125 x 88mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1707
+msgid "B8 (88 x 62mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1709
+msgid "B9 (62 x 44mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1711
+msgid "B10 (44 x 31mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1717
+msgid "\"C\" Sizes"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1719
+msgid "C0 (1297 x 917mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1721
+msgid "C1 (917 x 648mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1723
+msgid "C2 (648 x 458mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1725
+msgid "C3 (458 x 324mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1727
+msgid "C4 (324 x 229mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1729
+msgid "C5 (229 x 162mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1731
+msgid "C6 (162 x 114mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1733
+msgid "C7 (114 x 81mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1735
+msgid "C8 (81 x 57mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1737
+msgid "C9 (57 x 40mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1739
+msgid "C10 (40 x 28mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1745
+msgid "\"RA\" and \"SRA\" Sizes"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1747
+msgid "RA0 (860 x 1220mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1749
+msgid "RA1 (610 x 860mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1751
+msgid "RA2 (430 x 610mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1753
+msgid "RA3 (305 x 430mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1755
+msgid "RA4 (215 x 305mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1757
+msgid "SRA0 (900 x 1280mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1759
+msgid "SRA1 (640 x 900mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1761
+msgid "SRA2 (450 x 640mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1763
+msgid "SRA3 (320 x 450mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1765
+msgid "SRA4 (225 x 320mm)"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1851
+msgid "Legacy"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1909, src/helper/Helper_PDF_List_Table.php:637
+msgctxt "Required"
+msgid "needs"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1967
+msgid "Template Name"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1969
+msgid "Version"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1971
+msgid "Description"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1973
+msgid "Author"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1975
+msgid "Group"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:1977, src/helper/Helper_PDF.php:727
+msgid "Required PDF Version"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:2157
+msgid "Unicode"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:2185
+msgid "Indic"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:2195
+msgid "Arabic"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:2207
+msgid "Other"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:2311, src/model/Model_Settings.php:619
+msgid "User-Defined Fonts"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:2449
+msgid "Copy"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:2451
+msgid "Print - Low Resolution"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:2453
+msgid "Print - High Resolution"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:2455
+msgid "Modify"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:2457
+msgid "Annotate"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:2459
+msgid "Fill Forms"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:2461
+msgid "Extract"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:2463
+msgid "Assemble"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:2713
+msgid "Settings updated."
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:2951, src/helper/abstract/Helper_Abstract_Options.php:2967, src/helper/abstract/Helper_Abstract_Options.php:2983, tests/phpunit/unit-tests/test-settings.php:527, tests/phpunit/unit-tests/test-settings.php:529, tests/phpunit/unit-tests/test-settings.php:531
+msgid "PDF Settings could not be saved. Please enter all required information below."
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:4047, src/helper/abstract/Helper_Abstract_Options.php:4049
+msgid "Select Media"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:4051
+msgid "Upload File"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:4365
+msgid "Width"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:4367
+msgid "Height"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:4373
+msgid "mm"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:4375
+msgid "inches"
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_Options.php:4495
+msgid "The callback used for the %s setting is missing."
+msgstr ""
+
+#: src/helper/abstract/Helper_Abstract_View.php:263
+msgid "Cannot find file %s"
+msgstr ""
+
+#: src/helper/fields/Field_Products.php:333
+msgid "Subtotal"
+msgstr ""
+
+#: src/helper/fields/Field_Products.php:341
+msgid "Shipping (%s)"
+msgstr ""
+
+#: src/helper/Helper_Data.php:347
+msgid "PDF"
+msgstr ""
+
+#: src/helper/Helper_Data.php:397
+msgid "Loading..."
+msgstr ""
+
+#: src/helper/Helper_Data.php:399, src/view/html/Settings/general.php:139
+msgid "Show Advanced Options..."
+msgstr ""
+
+#: src/helper/Helper_Data.php:401
+msgid "Hide Advanced Options..."
+msgstr ""
+
+#: src/helper/Helper_Data.php:403
+msgid "Continue"
+msgstr ""
+
+#: src/helper/Helper_Data.php:405
+msgid "Uninstall"
+msgstr ""
+
+#: src/helper/Helper_Data.php:407
+msgid "Cancel"
+msgstr ""
+
+#: src/helper/Helper_Data.php:409, src/helper/Helper_PDF_List_Table.php:685
+msgid "Delete"
+msgstr ""
+
+#: src/helper/Helper_Data.php:411, src/helper/Helper_PDF_List_Table.php:497, src/helper/Helper_PDF_List_Table.php:499, src/model/Model_Form_Settings.php:2057
+msgid "Active"
+msgstr ""
+
+#: src/helper/Helper_Data.php:413, src/helper/Helper_PDF_List_Table.php:497, src/helper/Helper_PDF_List_Table.php:499, src/model/Model_Form_Settings.php:2057
+msgid "Inactive"
+msgstr ""
+
+#: src/helper/Helper_Data.php:415
+msgid "this PDF if"
+msgstr ""
+
+#: src/helper/Helper_Data.php:417, src/helper/Helper_Options_Fields.php:359, src/helper/Helper_Options_Fields.php:425
+msgid "Enable"
+msgstr ""
+
+#: src/helper/Helper_Data.php:419, src/helper/Helper_Options_Fields.php:361, src/helper/Helper_Options_Fields.php:427
+msgid "Disable"
+msgstr ""
+
+#: src/helper/Helper_Data.php:421
+msgid "Search the Gravity PDF Knowledgebase..."
+msgstr ""
+
+#: src/helper/Helper_Data.php:423
+msgid "There was an error processing your request. Please try again."
+msgstr ""
+
+#: src/helper/Helper_Data.php:425
+msgid "Successfully Updated"
+msgstr ""
+
+#: src/helper/Helper_Data.php:427
+msgid "Successfully Deleted"
+msgstr ""
+
+#: src/helper/Helper_Data.php:431, src/helper/Helper_Options_Fields.php:309, src/helper/Helper_Options_Fields.php:313, src/helper/Helper_Options_Fields.php:431, src/helper/Helper_Options_Fields.php:847, src/helper/Helper_Options_Fields.php:943, src/helper/Helper_Options_Fields.php:947, src/helper/Helper_Options_Fields.php:1047, src/helper/Helper_Options_Fields.php:1051, src/helper/Helper_Options_Fields.php:1073, src/helper/Helper_Options_Fields.php:1077, src/helper/Helper_Options_Fields.php:1099, src/helper/Helper_Options_Fields.php:1179, src/helper/Helper_Options_Fields.php:1183, src/helper/Helper_Options_Fields.php:1225, src/helper/Helper_Options_Fields.php:1229, src/helper/Helper_Options_Fields.php:1267, src/helper/Helper_Options_Fields.php:1271, src/helper/Helper_Options_Fields.php:1309, src/helper/Helper_Options_Fields.php:1313, src/helper/Helper_Options_Fields.php:1351, src/helper/Helper_Options_Fields.php:1355, src/helper/Helper_Options_Fields.php:1393, src/helper/Helper_Options_Fields.php:1437, src/helper/Helper_Options_Fields.php:1441
+msgid "No"
+msgstr ""
+
+#: src/helper/Helper_Data.php:433, src/helper/Helper_Options_Fields.php:307, src/helper/Helper_Options_Fields.php:845, src/helper/Helper_Options_Fields.php:941, src/helper/Helper_Options_Fields.php:1045, src/helper/Helper_Options_Fields.php:1071, src/helper/Helper_Options_Fields.php:1097, src/helper/Helper_Options_Fields.php:1177, src/helper/Helper_Options_Fields.php:1223, src/helper/Helper_Options_Fields.php:1265, src/helper/Helper_Options_Fields.php:1307, src/helper/Helper_Options_Fields.php:1349, src/helper/Helper_Options_Fields.php:1391, src/helper/Helper_Options_Fields.php:1397, src/helper/Helper_Options_Fields.php:1435
+msgid "Yes"
+msgstr ""
+
+#: src/helper/Helper_Data.php:435
+msgid "Standard"
+msgstr ""
+
+#: src/helper/Helper_Data.php:437
+msgid "Migrating site #%s"
+msgstr ""
+
+#: src/helper/Helper_Data.php:439
+msgid "Site #%s migration complete."
+msgstr ""
+
+#: src/helper/Helper_Data.php:441
+msgid "Migration Error"
+msgstr ""
+
+#: src/helper/Helper_Data.php:443
+msgid "Site #%s migration errors."
+msgstr ""
+
+#: src/helper/Helper_Data.php:445
+msgid "This form doesn't have any PDFs."
+msgstr ""
+
+#: src/helper/Helper_Data.php:447
+msgid "Let's go create one"
+msgstr ""
+
+#: src/helper/Helper_Data.php:449
+msgid "No Template Preview Available"
+msgstr ""
+
+#: src/helper/Helper_Migration.php:1093
+msgid "There was a problem migrating the following configuration nodes. You will need to manually setup those PDFs."
+msgstr ""
+
+#: src/helper/Helper_Migration.php:1113
+msgid "Migration Successful."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:173
+msgid "Default Paper Size"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:175
+msgid "Set the default paper size used when generating PDFs."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:197, src/helper/Helper_Options_Fields.php:725
+msgid "Control the exact paper size. Can be set in millimeters or inches."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:217
+msgid "Default Template"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:219, src/helper/Helper_Options_Fields.php:579
+msgid "Choose an existing template or purchased more %sfrom our theme shop%s. You can also %sbuild your own%s or %shire us%s to create a custom solution."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:231, src/helper/Helper_Options_Fields.php:591
+msgid "Templates"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:231, src/helper/Helper_Options_Fields.php:591
+msgid "Gravity PDF comes with %sfour completely-free and highly customisable designs%s. You can also purchase additional templates from our theme shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:241
+msgid "Default Font"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:243
+msgid "Set the default font type used in PDFs. Choose an existing font or %sinstall your own%s."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:253, src/helper/Helper_Options_Fields.php:523, src/helper/Helper_Options_Fields.php:785
+msgid "Fonts"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:253
+msgid "Gravity PDF comes bundled with fonts for most languages world-wide. Want to use a specific font type? Use the font installer (found in the Tools tab)."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:263
+msgid "Default Font Size"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:265
+msgid "Set the default font size used in PDFs."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:283
+msgid "Default Font Colour"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:289
+msgid "Set the default font colour used in PDFs."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:299, src/helper/Helper_Options_Fields.php:315, src/helper/Helper_Options_Fields.php:837, src/helper/Helper_Options_Fields.php:853
+msgid "Reverse Text (RTL)"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:301, src/helper/Helper_Options_Fields.php:839
+msgid "Script like Arabic and Hebrew are written right to left."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:315
+msgid "Enable RTL if you are writing in Arabic, Hebrew, Syriac, N'ko, Thaana, Tifinar, Urdu or other RTL languages."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:325, src/helper/Helper_Options_Fields.php:341
+msgid "Entry View"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:327
+msgid "Select the default action used when accessing a PDF from the %sGravity Forms entries list%s page."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:333, src/view/html/PDF/entry_detailed_pdf.php:89
+msgid "View"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:335, src/view/html/PDF/entry_detailed_pdf.php:91
+msgid "Download"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:341
+msgid "Choose to view the PDF in your web browser or download the document to your computer."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:351
+msgid "Show What's New"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:367
+msgid "Show What's New Page"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:367
+msgid "When upgrading Gravity PDF to a new major release (4.x) we'll automatically redirect you to our What's New page so you can see the changes. Bug fix and security releases are excluded (4.x.x)."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:387, src/helper/Helper_Options_Fields.php:407
+msgid "User Restriction"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:389
+msgid "Restrict PDF access to users with any of these capabilities. The Administrator Role always has full access."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:405
+msgid "Select Capability"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:407
+msgid "Only logged in users with any selected capability can view generated PDFs they don't have ownership of. Ownership refers to an end user who completed the original Gravity Form entry."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:417
+msgid "Default Owner Restrictions"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:419
+msgid "Set the default PDF owner permissions. When enabled, the original entry owner will NOT be able to view the PDFs (unless they have one of the above capabilities)."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:433, src/helper/Helper_Options_Fields.php:1089, src/helper/Helper_Options_Fields.php:1105
+msgid "Restrict Owner"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:433
+msgid "Enable this setting if your PDFs should not be viewable by the end user. This can be set on a per-PDF basis."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:443, src/helper/Helper_Options_Fields.php:455
+msgid "Logged Out Timeout"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:445
+msgid "Limit how long a %slogged out%s users has direct access to the PDF after completing the form. Set to 0 to disable time limit (not recommended)."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:447
+msgid "minutes"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:455
+msgid "Logged out users can view PDFs when their IP matches the one assigned to the Gravity Form entry. Because IP addresses can change, a time-based restriction also applies."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:503, src/helper/Helper_Options_Fields.php:513, src/view/html/Settings/tools.php:141
+msgid "Setup Custom Templates"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:505
+msgid "Setup environment for building custom templates. %sSee docs to get started%s."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:509
+msgid "Run Setup"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:513
+msgid "The setup will copy the plugin templates to your uploads directory so you can freely create and modify PDF templates without the risk of overriding your modifications when the plugin updates."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:525
+msgid "Add, update or remove custom fonts."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:529, src/view/html/Settings/tools.php:167
+msgid "Manage Fonts"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:533
+msgid "Install Fonts"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:533
+msgid "Custom fonts can be installed for use in your PDFs. Only %s.ttf%s and %s.otf%s font files are supported."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:561, src/helper/Helper_PDF_List_Table.php:247
+msgid "Name"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:567
+msgid "PDF Name"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:567
+msgid "Distinguish between multiple PDFs by giving it an easy-to-remember name (for internal use). Use the %sFilename%s field below to set the actual PDF name."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:577, src/helper/Helper_PDF_List_Table.php:251
+msgid "Template"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:601, src/helper/Helper_Options_Fields.php:617, src/helper/Helper_PDF_List_Table.php:253
+msgid "Notifications"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:603
+msgid "Automatically attach PDF to the selected notifications."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:615
+msgid "Choose a Notification"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:617
+msgid "Automatically generate and attach the PDF to your selected notifications. Conditional Logic for both the PDF and the notification applies. Inactive PDFs are also not sent."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:627, src/helper/Helper_Options_Fields.php:633
+msgid "Filename"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:633
+msgid "Set an appropriate filename for the generated PDF. You should exclude the .pdf extension from the name. The following are invalid characters and will be converted to an underscore %s_%s when the PDF is generated: %s"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:647, src/helper/Helper_Options_Fields.php:657
+msgid "Conditional Logic"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:651
+msgid "Enable conditional logic"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:657
+msgid "Create rules to dynamically enable or disable PDFs. This includes attaching to notifications and viewing from your admin area."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:699
+msgid "Paper Size"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:701
+msgid "Set the paper size used when generating PDFs."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:747
+msgid "Orientation"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:753
+msgid "Portrait"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:755
+msgid "Landscape"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:771
+msgid "Font"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:779
+msgid "Set the font type used in PDFs. Choose an existing font or %sinstall your own%s."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:785
+msgid "Gravity PDF comes bundled with fonts for most languages world-wide. Want to use a specific font type? Use the font installer (found in the Forms -> Settings -> Tools tab)."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:797
+msgid "Font Size"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:799
+msgid "Set the font size to use in the PDF."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:819
+msgid "Font Colour"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:825
+msgid "Set the font colour to use in the PDF."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:853
+msgid "Enable RTL if you are writing in Arabic, Hebrew, Syriac, N'ko, Thaana, Tifinar or Urdu."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:905, src/templates/config/focus-gravity.php:219
+msgid "Format"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:907
+msgid "Generate a PDF in the selected format."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:923
+msgid "PDF Format"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:923
+msgid "Generate a document adhearing to the appropriate PDF standard. When not in %sStandard%s mode, watermarks, alpha-transparent PNGs and security options can NOT be used."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:933
+msgid "Enable PDF Security"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:935
+msgid "Password protect generated PDFs, or restrict user capabilities."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:957
+msgid "Password"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:973, src/helper/Helper_Options_Fields.php:1005
+msgid "Privileges"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1005
+msgid "You can prevent the end user completing certain actions to the PDF – such as copying text, printing, adding annotations or extracting pages."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1009
+msgid "Select End User PDF Privileges"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1019, src/helper/Helper_Options_Fields.php:1027
+msgid "Image DPI"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1027
+msgid "Control the image DPI (dots per inch) in PDFs. Set to 300 when professionally printing document."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1037
+msgid "Always Save PDF"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1039
+msgid "Force a PDF to be saved to disk when a new entry is created."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1053
+msgid "Save PDF"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1053
+msgid "By default, PDFs are not automatically saved to disk. Enable this option to force the PDF to be generated and saved. Useful when using the %sgfpdf_post_pdf_save%s hook to copy the PDF to an alternate location."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1063
+msgid "Enable Public Access"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1065
+msgid "Allow %sanyone%s with a direct link to access the PDF. %sThis disables all %ssecurity protocols%s for this PDF.%s "
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1079
+msgid "Public Access"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1079
+msgid "When public access is on all security protocols are disabled and anyone worldwide can view the PDF document for ALL your form's entries. For most users the standard security measures will be adequate and public access should remain disabled."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1091
+msgid "When enabled, the original entry owner will NOT be able to view the PDFs."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1105
+msgid "Enable this setting if your PDFs should not be viewable by the end user."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1169
+msgid "Enable Advanced Templating"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1171
+msgid "By enabling, a PDF template will no longer be treated as HTML."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1215
+msgid "Show Form Title"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1217
+msgid "Display the form title at the beginning of the PDF."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1257
+msgid "Show Page Names"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1259
+msgid "Display form page names on the PDF (only works when using page break field)."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1299
+msgid "Show HTML Fields"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1301
+msgid "Display HTML fields in the PDF."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1341
+msgid "Show Section Break Description"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1343
+msgid "Display the Section Break field description in the PDF."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1383, src/helper/Helper_Options_Fields.php:1399
+msgid "Enable Conditional Logic"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1385
+msgid "When enabled the PDF will adhere to the form field conditional logic."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1399
+msgid "Enable this option to hide failed conditional logic fields in the PDF."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1427
+msgid "Show Empty Fields"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1429
+msgid "Display Empty fields in the PDF."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1469, src/helper/Helper_Options_Fields.php:1479
+msgid "Header"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1475
+msgid "The header is included at the top of each page. For simple columns %stry this HTML table snippet%s."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1479
+msgid "When inserting images in the header set the size to %sLarge%s or %sFull Size%s."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1507
+msgid "First Page Header"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1513
+msgid "Override the header on the first page of the PDF."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1517
+msgid "Use different header on first page of PDF?"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1545, src/helper/Helper_Options_Fields.php:1555
+msgid "Footer"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1551
+msgid "The footer is included at the bottom of every page. For simple columns %stry this HTML table snippet%s."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1555
+msgid "For simple text footers use the left, center and right alignment buttons in the editor. You can also use the special %s{PAGENO}%s and %s{nbpg}%s tags to display page numbering."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1583
+msgid "First Page Footer"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1589
+msgid "Override the footer on the first page of the PDF."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1593
+msgid "Use different footer on first page of PDF?"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1621
+msgid "Background Colour"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1627
+msgid "Set the background colour for all pages."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1655, src/helper/Helper_Options_Fields.php:1661
+msgid "Background Image"
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1659
+msgid "The background image is included on all pages. For optimal results, use an image the same dimensions as the paper size."
+msgstr ""
+
+#: src/helper/Helper_Options_Fields.php:1661
+msgid "For the best results, use a JPG or non-interlaced 8-Bit PNG that has the same dimensions as the paper size."
+msgstr ""
+
+#: src/helper/Helper_PDF_List_Table.php:249
+msgid "Download Shortcode"
+msgstr ""
+
+#: src/helper/Helper_PDF_List_Table.php:529
+msgid "None"
+msgstr ""
+
+#: src/helper/Helper_PDF_List_Table.php:593, src/view/html/PDF/entry_list_pdf_single.php:79
+msgid "Download PDF"
+msgstr ""
+
+#: src/helper/Helper_PDF_List_Table.php:681
+msgid "Edit this PDF"
+msgstr ""
+
+#: src/helper/Helper_PDF_List_Table.php:681
+msgid "Edit"
+msgstr ""
+
+#: src/helper/Helper_PDF_List_Table.php:683
+msgid "Duplicate this PDF"
+msgstr ""
+
+#: src/helper/Helper_PDF_List_Table.php:683
+msgid "Duplicate"
+msgstr ""
+
+#: src/helper/Helper_PDF_List_Table.php:685
+msgid "Delete this PDF"
+msgstr ""
+
+#: src/helper/Helper_PDF_List_Table.php:759
+msgid "This form doesn't have any PDFs. Let's go %screate one%s."
+msgstr ""
+
+#: src/helper/Helper_PDF.php:739
+msgid "The PDF Template %s requires Gravity PDF version %s. Upgrade to the latest version."
+msgstr ""
+
+#: src/model/Model_Actions.php:705
+msgid "No configuration.php file found for site #%s"
+msgstr ""
+
+#: src/model/Model_Actions.php:747
+msgid "Database import problem for site #%s"
+msgstr ""
+
+#: src/model/Model_Form_Settings.php:485
+msgid "Update PDF"
+msgstr ""
+
+#: src/model/Model_Form_Settings.php:485
+msgid "Add PDF"
+msgstr ""
+
+#: src/model/Model_Form_Settings.php:563, src/model/Model_Form_Settings.php:601, src/model/Model_Form_Settings.php:693, src/model/Model_Form_Settings.php:753
+msgid "There was a problem saving your PDF settings. Please try again."
+msgstr ""
+
+#: src/model/Model_Form_Settings.php:641
+msgid "PDF could not be saved. Please enter all required information below."
+msgstr ""
+
+#: src/model/Model_Form_Settings.php:681
+msgid "PDF saved successfully. %sBack to PDF list.%s"
+msgstr ""
+
+#: src/model/Model_Form_Settings.php:1745
+msgid "PDF successfully deleted."
+msgstr ""
+
+#: src/model/Model_Form_Settings.php:1911
+msgid "PDF successfully duplicated."
+msgstr ""
+
+#: src/model/Model_Install.php:633
+msgid "There was a problem creating the %s directory. Ensure you have write permissions to your uploads folder."
+msgstr ""
+
+#: src/model/Model_Install.php:651
+msgid "Gravity PDF does not have write permission to the %s directory. Contact your web hosting provider to fix the issue."
+msgstr ""
+
+#: src/model/Model_Install.php:947
+msgid "There was a problem removing the Gravity Form \"%s\" PDF configuration. Try delete manually."
+msgstr ""
+
+#: src/model/Model_Install.php:1011
+msgid "There was a problem removing the %s directory. Clean up manually via (S)FTP."
+msgstr ""
+
+#: src/model/Model_PDF.php:643
+msgid "The PDF configuration is not currently active."
+msgstr ""
+
+#: src/model/Model_PDF.php:687
+msgid "PDF conditional logic requirements have not been met."
+msgstr ""
+
+#: src/model/Model_PDF.php:891
+msgid "Your PDF is no longer accessible."
+msgstr ""
+
+#: src/model/Model_PDF.php:1067
+msgid "You do not have access to view this PDF."
+msgstr ""
+
+#: src/model/Model_PDF.php:1757
+msgid "The PDF could not be saved."
+msgstr ""
+
+#: src/model/Model_Settings.php:465
+msgid "There was a problem copying all PDF templates to %s. Please try again."
+msgstr ""
+
+#: src/model/Model_Settings.php:475
+msgid "Gravity PDF Custom Templates successfully installed to %s."
+msgstr ""
+
+#: src/model/Model_Settings.php:719
+msgid "Could not locate font on web server: %s"
+msgstr ""
+
+#: src/model/Model_Settings.php:731
+msgid "There was a problem installing the font %s. Please try again."
+msgstr ""
+
+#: src/model/Model_Settings.php:1051
+msgid "Could not delete Gravity PDF font correctly. Please try again."
+msgstr ""
+
+#: src/model/Model_Settings.php:1113
+msgid "Required fields have not been included."
+msgstr ""
+
+#: src/model/Model_Settings.php:1147
+msgid "Font name is not valid. Only alphanumeric characters and spaces are accepted."
+msgstr ""
+
+#: src/model/Model_Settings.php:1183
+msgid "A font with the same name already exists. Try a different name."
+msgstr ""
+
+#: src/model/Model_Welcome_Screen.php:185, src/view/html/Welcome/welcome.php:79
+msgid "Welcome to Gravity PDF"
+msgstr ""
+
+#: src/model/Model_Welcome_Screen.php:187
+msgid "What's new in Gravity PDF?"
+msgstr ""
+
+#: src/templates/config/focus-gravity.php:187
+msgid "Accent Colour"
+msgstr ""
+
+#: src/templates/config/focus-gravity.php:191
+msgid "The accent colour is used for the page and section titles, as well as the border."
+msgstr ""
+
+#: src/templates/config/focus-gravity.php:203
+msgid "Secondary Colour"
+msgstr ""
+
+#: src/templates/config/focus-gravity.php:207
+msgid "The secondary colour is used with the field labels and for alternate rows."
+msgstr ""
+
+#: src/templates/config/focus-gravity.php:223
+msgid "Combine the field label and value or have a distinct label/value."
+msgstr ""
+
+#: src/templates/config/focus-gravity.php:227
+msgid "Combined Label"
+msgstr ""
+
+#: src/templates/config/focus-gravity.php:229
+msgid "Split Label"
+msgstr ""
+
+#: src/templates/config/rubix.php:187
+msgid "Container Background Colour"
+msgstr ""
+
+#: src/templates/config/rubix.php:191
+msgid "Control the colour of the field background."
+msgstr ""
+
+#: src/templates/config/zadani.php:187
+msgid "Field Border Colour"
+msgstr ""
+
+#: src/templates/config/zadani.php:191
+msgid "Control the colour of the field border."
+msgstr ""
+
+#: src/view/html/Actions/action_buttons.php:93
+msgid "Dismiss Notice"
+msgstr ""
+
+#: src/view/html/Actions/begin_multisite_migration.php:89
+msgid "Gravity PDF Multisite Migration"
+msgstr ""
+
+#: src/view/html/Actions/begin_multisite_migration.php:93
+msgid "Beginning Migration..."
+msgstr ""
+
+#: src/view/html/Actions/begin_multisite_migration.php:107
+msgid "Migration Complete."
+msgstr ""
+
+#: src/view/html/Actions/migration.php:81
+msgid "Gravity PDF needs to migrate your configuration."
+msgstr ""
+
+#: src/view/html/Actions/migration.php:89
+msgid "The migration process will import your old configuration file into the database."
+msgstr ""
+
+#: src/view/html/Actions/review_plugin.php:81
+msgid "Hey, we just noticed you've generated your 100th PDF using Gravity PDF!"
+msgstr ""
+
+#: src/view/html/Actions/review_plugin.php:89
+msgid "If you love how much time you've saved using Gravity PDF then do us a big favour and %sgive it a five-star rating on WordPress.org%s."
+msgstr ""
+
+#: src/view/html/Actions/review_plugin.php:97
+msgid "%sOr let your Twitter follows know how good it is%s (or anyone else for that matter)."
+msgstr ""
+
+#: src/view/html/FormSettings/list.php:111
+msgid "Delete PDF?"
+msgstr ""
+
+#: src/view/html/FormSettings/list.php:113
+msgid "Warning! You are about to delete this PDF. Select 'Delete' to delete, 'Cancel' to stop."
+msgstr ""
+
+#: src/view/html/PDF/entry_detailed_pdf.php:77
+msgid "PDFs"
+msgstr ""
+
+#: src/view/html/PDF/entry_list_pdf_multiple.php:79
+msgid "Download PDFs"
+msgstr ""
+
+#: src/view/html/PDF/entry_list_pdf_multiple.php:79
+msgid "View PDFs"
+msgstr ""
+
+#: src/view/html/PDF/entry_list_pdf_single.php:79
+msgid "View PDF"
+msgstr ""
+
+#: src/view/html/Settings/general.php:91
+msgid "General Settings"
+msgstr ""
+
+#: src/view/html/Settings/general.php:121
+msgid "Security Settings"
+msgstr ""
+
+#: src/view/html/Settings/help.php:87
+msgid "Getting Help With Gravity PDF"
+msgstr ""
+
+#: src/view/html/Settings/help.php:93
+msgid "This is your portal to find quality help, support and documentation for Gravity PDF"
+msgstr ""
+
+#: src/view/html/Settings/help.php:95
+msgid "(This is not the place to get Gravity Forms support. %sPlease use their official support channel%s for assistance)"
+msgstr ""
+
+#: src/view/html/Settings/help.php:113
+msgid "Gravity PDF Documentation"
+msgstr ""
+
+#: src/view/html/Settings/help.php:143
+msgid "Find the %sanswers%s you need…"
+msgstr ""
+
+#: src/view/html/Settings/help.php:153, src/view/html/Welcome/tabs.php:87
+msgid "Getting Started"
+msgstr ""
+
+#: src/view/html/Settings/help.php:155
+msgid "Take a look at our quick-start guide and get Gravity PDF up and running in 5 minutes flat!"
+msgstr ""
+
+#: src/view/html/Settings/help.php:167
+msgid "Comprehensive Documentation"
+msgstr ""
+
+#: src/view/html/Settings/help.php:169
+msgid "We’ve got in-depth articles to help you learn the ins and outs of Gravity PDF. From the basic setup to PDF security."
+msgstr ""
+
+#: src/view/html/Settings/help.php:181
+msgid "Common Problems"
+msgstr ""
+
+#: src/view/html/Settings/help.php:183
+msgid "Find out the most common issues user’s experience and ways to resolve them."
+msgstr ""
+
+#: src/view/html/Settings/help.php:195
+msgid "Developer Documentation"
+msgstr ""
+
+#: src/view/html/Settings/help.php:197
+msgid "You’ll find all the info and examples you’ll need to create your own custom PDF templates."
+msgstr ""
+
+#: src/view/html/Settings/help.php:209
+msgid "View All Documentation"
+msgstr ""
+
+#: src/view/html/Settings/help.php:211
+msgid "Contact Support"
+msgstr ""
+
+#: src/view/html/Settings/help.php:217
+msgid "Our support hours are 9:00am-5:00pm Monday to Friday, %sSydney Australia time%s (public holidays excluded)."
+msgstr ""
+
+#: src/view/html/Settings/help.php:245
+msgid "It doesn't look like there are any topics related to your issue."
+msgstr ""
+
+#: src/view/html/Settings/help.php:249
+msgid "Maybe one of these articles will help..."
+msgstr ""
+
+#: src/view/html/Settings/system_status.php:89
+msgid "Installation Status"
+msgstr ""
+
+#: src/view/html/Settings/system_status.php:103, src/view/View_Settings.php:561
+msgid "WP Memory Available"
+msgstr ""
+
+#: src/view/html/Settings/system_status.php:129
+msgid "Unlimited"
+msgstr ""
+
+#: src/view/html/Settings/system_status.php:147
+msgid "We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. %sFind out how to increase this limit%s."
+msgstr ""
+
+#: src/view/html/Settings/system_status.php:163
+msgid "WordPress Version"
+msgstr ""
+
+#: src/view/html/Settings/system_status.php:183
+msgid "Gravity Forms Version"
+msgstr ""
+
+#: src/view/html/Settings/system_status.php:203
+msgid "PHP Version"
+msgstr ""
+
+#: src/view/html/Settings/system_status.php:223, src/view/View_Settings.php:563
+msgid "Direct PDF Protection"
+msgstr ""
+
+#: src/view/html/Settings/system_status.php:237
+msgid "You need JavaScript enabled to perform this check."
+msgstr ""
+
+#: src/view/html/Settings/system_status.php:243
+msgid "Protected"
+msgstr ""
+
+#: src/view/html/Settings/system_status.php:251
+msgid "Unprotected"
+msgstr ""
+
+#: src/view/html/Settings/system_status.php:257
+msgid "We've detected the PDFs saved in Gravity PDF's %stmp%s directory can be publically accessed."
+msgstr ""
+
+#: src/view/html/Settings/system_status.php:259
+msgid "We recommend you use our %sgfpdf_tmp_location%s filter to %smove the folder outside your public website directory%s."
+msgstr ""
+
+#: src/view/html/Settings/tools.php:91, src/view/html/Settings/tools.php:113, src/view/View_Settings.php:359
+msgid "Tools"
+msgstr ""
+
+#: src/view/html/Settings/tools.php:143
+msgid "During the setup process any of the following templates stored in %s will be overridden. If you have modified any of the following template or template configuration files %smake a backup before continuing%s."
+msgstr ""
+
+#: src/view/html/Settings/tools.php:169
+msgid "Manage all your custom Gravity PDF fonts in one place."
+msgstr ""
+
+#: src/view/html/Settings/tools.php:169
+msgid "Only .ttf and %s.otf font files%s are supported and they MUST be uploaded through your media library (no external links)."
+msgstr ""
+
+#: src/view/html/Settings/tools.php:207
+msgid "Looks bare in here!%s Click \"Add Font\" below to get started."
+msgstr ""
+
+#: src/view/html/Settings/tools.php:231
+msgid "Font Name"
+msgstr ""
+
+#: src/view/html/Settings/tools.php:235
+msgid "Only alphanumeric characters and spaces are accepted."
+msgstr ""
+
+#: src/view/html/Settings/tools.php:243
+msgid "Regular"
+msgstr ""
+
+#: src/view/html/Settings/tools.php:251, src/view/html/Settings/tools.php:253, src/view/html/Settings/tools.php:255, src/view/html/Settings/tools.php:275, src/view/html/Settings/tools.php:277, src/view/html/Settings/tools.php:279, src/view/html/Settings/tools.php:299, src/view/html/Settings/tools.php:301, src/view/html/Settings/tools.php:303, src/view/html/Settings/tools.php:323, src/view/html/Settings/tools.php:325, src/view/html/Settings/tools.php:327
+msgid "Select Font"
+msgstr ""
+
+#: src/view/html/Settings/tools.php:267
+msgid "Italics"
+msgstr ""
+
+#: src/view/html/Settings/tools.php:291
+msgid "Bold"
+msgstr ""
+
+#: src/view/html/Settings/tools.php:315
+msgid "Bold Italics"
+msgstr ""
+
+#: src/view/html/Settings/tools.php:339
+msgid "Save Font"
+msgstr ""
+
+#: src/view/html/Settings/tools.php:367
+msgid "Delete Font?"
+msgstr ""
+
+#: src/view/html/Settings/tools.php:369
+msgid "Warning! You are about to delete this Font. Select 'Delete' to delete, 'Cancel' to stop."
+msgstr ""
+
+#: src/view/html/Settings/uninstaller.php:87, src/view/html/Settings/uninstaller.php:115, src/view/html/Settings/uninstaller.php:123
+msgid "Uninstall Gravity PDF"
+msgstr ""
+
+#: src/view/html/Settings/uninstaller.php:103
+msgid "%sThis operation deletes ALL Gravity PDF data and deactivates the plugin.%s If you continue, all settings, configuration, custom templates and fonts will be removed."
+msgstr ""
+
+#: src/view/html/Settings/uninstaller.php:125
+msgid "Warning! ALL Gravity PDF data, %sincluding PDF configurations and ALL custom templates%s will be deleted. This cannot be undone. Select 'Uninstall' to delete, 'Cancel' to stop."
+msgstr ""
+
+#: src/view/html/Shortcodes/conditional_logic_not_met.php:79
+msgid "PDF link not displayed because conditional logic requirements have not been met."
+msgstr ""
+
+#: src/view/html/Shortcodes/conditional_logic_not_met.php:81, src/view/html/Shortcodes/invalid_pdf_config.php:81, src/view/html/Shortcodes/no_entry_id.php:81, src/view/html/Shortcodes/pdf_not_active.php:81
+msgid "(Admin Only Message)"
+msgstr ""
+
+#: src/view/html/Shortcodes/invalid_pdf_config.php:79
+msgid "Could not get Gravity PDF configuration using the PDF and Entry IDs passed."
+msgstr ""
+
+#: src/view/html/Shortcodes/no_entry_id.php:79
+msgid "No Gravity Form entry ID passed to Gravity PDF. Ensure you pass the entry ID via the confirmation url query string – using either \"entry\" or \"lid\" as the query string name – or by passing an ID directly to the shortcode."
+msgstr ""
+
+#: src/view/html/Shortcodes/pdf_not_active.php:79
+msgid "PDF link not displayed because PDF is inactive."
+msgstr ""
+
+#: src/view/html/Welcome/more.php:83
+msgid "Get more out of Gravity PDF"
+msgstr ""
+
+#: src/view/html/Welcome/more.php:93
+msgid "PDF Template Shop"
+msgstr ""
+
+#: src/view/html/Welcome/more.php:97
+msgid "It's like a theme shop, but for Gravity PDF templates. %sHead over to our online store%s and view our growing selection of premium PDF templates."
+msgstr ""
+
+#: src/view/html/Welcome/more.php:101
+msgid "Stay Up To Date"
+msgstr ""
+
+#: src/view/html/Welcome/more.php:105
+msgid "%sSign up to our newsletter%s to be amongst the first to receive the latest news and details on upcoming feature."
+msgstr ""
+
+#: src/view/html/Welcome/more.php:117
+msgid "Tailored PDFs"
+msgstr ""
+
+#: src/view/html/Welcome/more.php:121
+msgid "If the PDF Shop doesn't have what you're after %sour friendly team can build a document just for you%s. With an addon, our devs can even create templates that auto fill existing PDFs – like government and legal documents."
+msgstr ""
+
+#: src/view/html/Welcome/more.php:125
+msgid "Get Support"
+msgstr ""
+
+#: src/view/html/Welcome/more.php:129
+msgid "Have trouble using Gravity PDF? %sContact our friendly staff%s who are avaliable 9am to 5pm Monday to Friday, %sAustralian Eastern Standard Time%s."
+msgstr ""
+
+#: src/view/html/Welcome/more.php:141
+msgid "Roll your Own"
+msgstr ""
+
+#: src/view/html/Welcome/more.php:145
+msgid "If PHP, HTML and CSS come easy to you, you'll find creating your own PDF templates a breeze. With %sextensive documentation and great examples%s you'll be up and running in no time."
+msgstr ""
+
+#: src/view/html/Welcome/tabs.php:99
+msgid "What's New"
+msgstr ""
+
+#: src/view/html/Welcome/update.php:79
+msgid "Discover Gravity PDF %s"
+msgstr ""
+
+#: src/view/html/Welcome/update.php:85
+msgid "Gravity PDF has been completely rebuilt with simplicity, stability and security in mind. Our team has spent over 12 months making a great product even greater. Discover what's new..."
+msgstr ""
+
+#: src/view/html/Welcome/update.php:91, src/view/html/Welcome/welcome.php:91
+msgid "Version %s"
+msgstr ""
+
+#: src/view/html/Welcome/update.php:105
+msgid "Bringing Config Settings to WordPress"
+msgstr ""
+
+#: src/view/html/Welcome/update.php:111
+msgid "We've done away with the need to edit PHP files to configure Gravity PDF. You'll have a familiar and seamless experience controlling PDF settings direct from your WordPress Admin area."
+msgstr ""
+
+#: src/view/html/Welcome/update.php:119
+msgid "If you've ever configured a Gravity Form add-on you'll feel right at home setting up PDFs."
+msgstr ""
+
+#: src/view/html/Welcome/update.php:157
+msgid "All-New Templates with CSS Ready Class Support"
+msgstr ""
+
+#: src/view/html/Welcome/update.php:163
+msgid "We were always getting feedback for templates that look more like their Gravity Forms layouts. %sYou asked and we've delivered!%s"
+msgstr ""
+
+#: src/view/html/Welcome/update.php:171
+msgid "All v4 PDFs will support %sGravity Forms CSS Ready Classes%s. When used in your form the PDF will automatically create two and three column layouts to suit. Plus, Gravity PDF %snow comes with four free PDF templates%s out of the box."
+msgstr ""
+
+#: src/view/html/Welcome/update.php:191
+msgid "A Beautiful Font Manager"
+msgstr ""
+
+#: src/view/html/Welcome/update.php:197
+msgid "No more playing around with FTP when installing fonts, or \"guessing\" the font family name to use in your templates. Our all-new font manager makes it a breeze to upload TTF or OTF font files and use them in your PDFs."
+msgstr ""
+
+#: src/view/html/Welcome/update.php:207
+msgid "Once installed, you'll have full control over the font face, size and colour using our powerful settings interface."
+msgstr ""
+
+#: src/view/html/Welcome/update.php:247, src/view/html/Welcome/welcome.php:215
+msgid "Simple PDF Download Links"
+msgstr ""
+
+#: src/view/html/Welcome/update.php:251, src/view/html/Welcome/welcome.php:219
+msgid "The %s[gravitypdf]%s shortcode allows you to %seasily place a PDF download link%s on any of the Gravity Forms Confirmation types."
+msgstr ""
+
+#: src/view/html/Welcome/update.php:263
+msgid "PDF Conditional Logic"
+msgstr ""
+
+#: src/view/html/Welcome/update.php:267
+msgid "Enable or disable PDFs with Gravity Forms powerful conditional logic feature. Control when PDFs are attached to email notifications and disable a PDF from being viewed if your conditions aren't met."
+msgstr ""
+
+#: src/view/html/Welcome/update.php:279
+msgid "Headers and Footers"
+msgstr ""
+
+#: src/view/html/Welcome/update.php:283
+msgid "We've built in header and footer support in all our v4 templates. You can optionally have a different first page header and footer. Now that's control!"
+msgstr ""
+
+#: src/view/html/Welcome/welcome.php:85
+msgid "You're just minutes away from producing your first highly-customisable PDF document using Gravity Forms data."
+msgstr ""
+
+#: src/view/html/Welcome/welcome.php:105
+msgid "Where to Start?"
+msgstr ""
+
+#: src/view/html/Welcome/welcome.php:111
+msgid "Your first step is to review %sGravity PDF's General Settings%s which can be found by navigating to %sForms -> Settings -> PDF%s in your WordPress admin area. From here you'll be able to set defaults for paper size, font face, font colour, and select a PDF template – %swe ship with four completely-free layouts%s – which will be used for all new PDFs. There's even an easy-to-use interface for installing custom fonts."
+msgstr ""
+
+#: src/view/html/Welcome/welcome.php:117
+msgid "Configure Settings"
+msgstr ""
+
+#: src/view/html/Welcome/welcome.php:149
+msgid "Setting up a PDF"
+msgstr ""
+
+#: src/view/html/Welcome/welcome.php:155
+msgid "You can setup individual PDF documents from the %sGravity Form \"Forms\" page%s in your admin area – located at %sForms -> Forms%s in your navigation. A new %sPDF%s option will be avaliable in each forms' settings section. The only required fields are %sName%s – an internal identifier – and %sFilename%s – the name used when saving and emailing the PDF."
+msgstr ""
+
+#: src/view/html/Welcome/welcome.php:179
+msgid "Select which Form you want to setup first:"
+msgstr ""
+
+#: src/view/html/Welcome/welcome.php:193
+msgid "Create a PDF"
+msgstr ""
+
+#: src/view/html/Welcome/welcome.php:229
+msgid "Automated PDF Emails"
+msgstr ""
+
+#: src/view/html/Welcome/welcome.php:233
+msgid "Select a Gravity Form Notification and your PDF will automatically be sent as an attachment. Powerful conditional logic can also be used to determine if a PDF will be included."
+msgstr ""
+
+#: src/view/html/Welcome/welcome.php:243
+msgid "Custom Fonts"
+msgstr ""
+
+#: src/view/html/Welcome/welcome.php:247
+msgid "Make your documents stand out by including your favourite fonts with our %ssimple font manager%s."
+msgstr ""
+
+#: src/view/View_Settings.php:349
+msgid "General"
+msgstr ""
+
+#: src/view/View_Settings.php:369
+msgid "Help"
+msgstr ""
+
+#: src/view/View_Settings.php:561
+msgid "Producing PDF documents is hard work and Gravity PDF requires more resources than most plugins. We strongly recommend you have at least 128MB, but you may need more."
+msgstr ""
+
+#: src/view/View_Settings.php:563
+msgid "Apache and Litespeed servers automatically disable public access to the Gravity PDF temporary directory using a %s.htaccess%s file, but other web servers like Nginx do not support this feature. We will check if your PDFs are automatically protected, and let you know what you can do to protect your data if they are not."
+msgstr ""
+
+#: tests/phpunit/unit-tests/test-settings.php:525
+msgid "Normal Notice"
+msgstr ""
