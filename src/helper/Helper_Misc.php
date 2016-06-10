@@ -690,7 +690,7 @@ class Helper_Misc {
 		$pdf           = GPDFAPI::get_mvc_class( 'Model_PDF' );
 		$form_settings = GPDFAPI::get_mvc_class( 'Model_Form_Settings' );
 
-		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_template_args/ for more details about this filter */
+		/* See https://gravitypdf.com/documentation/v4/gfpdf_template_args/ for more details about this filter */
 		return apply_filters( 'gfpdf_template_args', array(
 
 			'form_id'  => $entry['form_id'], /* backwards compat */

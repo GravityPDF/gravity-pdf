@@ -171,7 +171,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 			),
 		);
 
-		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_one_time_action_routes/ for more details about this filter */
+		/* See https://gravitypdf.com/documentation/v4/gfpdf_one_time_action_routes/ for more details about this filter */
 		return apply_filters( 'gfpdf_one_time_action_routes', $routes );
 	}
 

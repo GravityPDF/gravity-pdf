@@ -94,7 +94,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</div>
 
 	<?php
-	/* See https://gpdfv4.xyz/documentation/v4/gfpdf_post_tools_settings_page/ for more details about this action */
+	/* See https://gravitypdf.com/documentation/v4/gfpdf_post_tools_settings_page/ for more details about this action */
 	do_action( 'gfpdf_post_tools_settings_page' );
 	?>
 </div>

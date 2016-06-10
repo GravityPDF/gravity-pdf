@@ -73,28 +73,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<div id="dashboard-widgets" class="columns-2">
 			<div class="postbox-container">
-				<a href="https://gpdfv4.xyz/documentation/v4/five-minute-install/">
+				<a href="https://gravitypdf.com/documentation/v4/five-minute-install/">
 					<span><?php _e( 'Getting Started', 'gravity-forms-pdf-extended' ); ?></span><br>
 					<?php _e( 'Take a look at our quick-start guide and get Gravity PDF up and running in 5 minutes flat!', 'gravity-forms-pdf-extended' ); ?>
 				</a>
 			</div>
 
 			<div class="postbox-container">
-				<a href="https://gpdfv4.xyz/documentation/v4/user-installation/">
+				<a href="https://gravitypdf.com/documentation/v4/user-installation/">
 					<span><?php _e( 'Comprehensive Documentation', 'gravity-forms-pdf-extended' ); ?></span><br>
 					<?php _e( 'We’ve got in-depth articles to help you learn the ins and outs of Gravity PDF. From the basic setup to PDF security.', 'gravity-forms-pdf-extended' ); ?>
 				</a>
 			</div>
 
 			<div class="postbox-container">
-				<a href="https://gpdfv4.xyz/documentation/v4/user-activation-errors/">
+				<a href="https://gravitypdf.com/documentation/v4/user-activation-errors/">
 					<span><?php _e( 'Common Problems', 'gravity-forms-pdf-extended' ); ?></span><br>
 					<?php _e( 'Find out the most common issues user’s experience and ways to resolve them.', 'gravity-forms-pdf-extended' ); ?>
 				</a>
 			</div>
 
 			<div class="postbox-container">
-				<a href="https://gpdfv4.xyz/documentation/v4/developer-start-customising/">
+				<a href="https://gravitypdf.com/documentation/v4/developer-start-customising/">
 					<span><?php _e( 'Developer Documentation', 'gravity-forms-pdf-extended' ); ?></span><br>
 					<?php _e( 'You’ll find all the info and examples you’ll need to create your own custom PDF templates.', 'gravity-forms-pdf-extended' ); ?>
 				</a>
@@ -102,8 +102,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 
 		<div class="center">
-			<a href="https://gpdfv4.xyz/documentation/v4/" class="button button-primary button-large"><?php _e( 'View All Documentation', 'gravity-forms-pdf-extended' ); ?></a>
-			<a href="https://gpdfv4.xyz/support/#contact-support" class="button button-primary button-large"><?php _e( 'Contact Support', 'gravity-forms-pdf-extended' ); ?></a>
+			<a href="https://gravitypdf.com/documentation/v4/" class="button button-primary button-large"><?php _e( 'View All Documentation', 'gravity-forms-pdf-extended' ); ?></a>
+			<a href="https://gravitypdf.com/support/#contact-support" class="button button-primary button-large"><?php _e( 'Contact Support', 'gravity-forms-pdf-extended' ); ?></a>
 
 			<p>
 				<?php printf( __( 'Our support hours are 9:00am-5:00pm Monday to Friday, %sSydney Australia time%s (public holidays excluded).', 'gravity-forms-pdf-extended' ), '<br><a href="http://www.timeanddate.com/worldclock/australia/sydney">', '</a>' ); ?>
@@ -111,7 +111,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 
 		<?php
-		/* See https://gpdfv4.xyz/documentation/v4/gfpdf_post_help_settings_page/ for more details about this action */
+		/* See https://gravitypdf.com/documentation/v4/gfpdf_post_help_settings_page/ for more details about this action */
 		do_action( 'gfpdf_post_help_settings_page' );
 		?>
 
