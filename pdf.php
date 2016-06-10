@@ -6,7 +6,7 @@ Description: Automatically generate highly-customisable PDF documents using Grav
 Author: Gravity PDF
 Author URI: https://gravitypdf.com
 Text Domain: gravity-forms-pdf-extended
-Domain Path: /src/languages
+Domain Path: /src/assets/languages
 */
 
 /* Exit if accessed directly */

@@ -96,8 +96,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<h3><?php _e( 'A Beautiful Font Manager', 'gravity-forms-pdf-extended' ); ?></h3>
 
 			<p>
-				<?php _e( 'No more playing around with FTP when installing fonts, or "guessing" the font family name to use in your templates.
-			   Our all-new font manager makes it a breeze to upload TTF or OTF font files and use them in your PDFs.', 'gravity-forms-pdf-extended' ); ?>
+				<?php _e( 'No more playing around with FTP when installing fonts, or "guessing" the font family name to use in your templates. Our all-new font manager makes it a breeze to upload TTF or OTF font files and use them in your PDFs.', 'gravity-forms-pdf-extended' ); ?>
 
 			</p>
 
