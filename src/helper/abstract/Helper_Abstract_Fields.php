@@ -233,6 +233,8 @@ abstract class Helper_Abstract_Fields {
 	 * @since 4.0
 	 *
 	 * @internal Child classes can override this method when dealing with a specific use case
+	 *
+	 * @return boolean Return true if the field is empty, false if it has a value
 	 */
 	public function is_empty() {
 		$value = $this->value();

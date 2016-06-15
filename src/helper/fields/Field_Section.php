@@ -8,6 +8,9 @@ use GFPDF\Helper\Helper_Abstract_Fields;
 
 use GFCommon;
 use GF_Field_Section;
+use GF_Field;
+
+use GPDFAPI;
 
 use Exception;
 
@@ -81,7 +84,30 @@ class Field_Section extends Helper_Abstract_Fields {
 	 * @since 4.0
 	 */
 	public function is_empty() {
+
+		/* Run default checks to see if section break contains fields with values */
 		if ( GFCommon::is_section_empty( $this->field, $this->form, $this->entry ) ) {
+			return true;
+		}
+
+		/* Run our own checks against the fields to test for issues */
+		$fields    = GFCommon::get_section_fields( $this->form, $this->field->id );
+		$PDF_model = GPDFAPI::get_mvc_class( 'Model_PDF' );
+		$products  = new Field_Products( new GF_Field(), $this->entry, $this->gform, $this->misc );
+
+		$empty = true;
+		foreach ( $fields as $field ) {
+			if( 'section' !== $field->type ) {
+				$class = $PDF_model->get_field_class( $field, $this->form, $this->entry, $products );
+				if ( ! $class->is_empty() ) {
+					$empty = false;
+					break;
+				}
+			}
+		}
+
+		/* Our custom empty checks determined the fields in the section break are infact empty */
+		if( $empty ) {
 			return true;
 		}
 

@@ -92,7 +92,9 @@ class Field_Address extends Helper_Abstract_Fields {
 		$address_display_format = apply_filters( 'gform_address_display_format', 'default' );
 
 		/* Start putting our address together */
-		$address[] = $data['street'];
+		if ( ! empty( $data['street'] ) ) {
+			$address[] = $data['street'];
+		}
 
 		if ( ! empty( $data['street2'] ) ) {
 			$address[] = $data['street2'];
@@ -104,15 +106,17 @@ class Field_Address extends Helper_Abstract_Fields {
 			$zip_string .= ( ! empty( $zip_string ) && ! empty( $data['state'] ) ) ? ", {$data['state']}" : trim( $data['state'] );
 			$zip_string .= " {$data['zip']}";
 
+			$zip_string = trim( $zip_string );
+
 			if ( ! empty( $zip_string ) ) {
-				$address[] = trim( $zip_string );
+				$address[] = $zip_string;
 			}
 		} else { /* display in the "zip, city state" format */
 			$zip_string = trim( $data['zip'] . ' ' . $data['city'] );
 			$zip_string .= ( ! empty( $zip_string ) && ! empty( $data['state'] ) ) ? ", {$data['state']}" : trim( $data['state'] );
 
 			if ( ! empty( $zip_string ) ) {
-				$address[] = trim( $zip_string );
+				$address[] = $zip_string;
 			}
 		}
 
@@ -125,7 +129,33 @@ class Field_Address extends Helper_Abstract_Fields {
 		$html = implode( '<br />', $address );
 
 		/* return the results */
+
 		return parent::html( $html );
+	}
+
+	/**
+	 * Check if the Address field is empty, based off the active sub-form fields
+	 * This prevents problems with addresses showing when country or state fields are disabled but defaults are used
+	 *
+	 * return boolean Return true if the field is empty, false if it has a value
+	 *
+	 * @since 4.0
+	 */
+	public function is_empty() {
+		$field = $this->field;
+		$value = $this->get_value();
+
+		/* Loop through active fields and determine if field should be classed as empty */
+		foreach( $field->inputs as $item ) {
+			if ( ! isset( $item['isHidden'] ) || false === $item['isHidden'] ) {
+				/* Now we know item isn't hidden, go through the values and check if there's data */
+				$item_value = trim( rgget( $item['id'], $value ) );
+				if ( ! empty( $item_value ) ) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	/**
