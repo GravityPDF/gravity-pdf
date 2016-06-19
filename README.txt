@@ -138,4 +138,4 @@ See [CHANGELOG.txt](https://github.com/GravityPDF/gravity-pdf/blob/master/CHANGE
 == Upgrade Notice ==
 
 = 4.0 =
-**WARNING**: This major release is not 100% backwards compatibile with v3. [Review our upgrade guide](https://gravitypdf.com/documentation/v4/v3-to-v4-migration/) AND **do a full backup** before proceeding with the update.
+**WARNING**: This major release is not 100% backwards compatibile with v3. Review our upgrade guide AND do a full backup before proceeding with the update (https://goo.gl/htd6CK).
