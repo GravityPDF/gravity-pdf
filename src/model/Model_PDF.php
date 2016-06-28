@@ -1210,7 +1210,10 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function add_unregistered_fonts_to_mPDF( $fonts ) {
 
-		foreach ( glob( $this->data->template_font_location . '*.{otf,ttf,OTF,TTF}', GLOB_BRACE ) as $font ) {
+		$user_fonts = glob( $this->data->template_font_location . '*.{otf,ttf,OTF,TTF}', GLOB_BRACE );
+		$user_fonts = ( is_array( $user_fonts ) ) ? $user_fonts : array();
+
+		foreach ( $user_fonts as $font ) {
 
 			/* Get font shortname */
 			$font_name  = basename( $font );

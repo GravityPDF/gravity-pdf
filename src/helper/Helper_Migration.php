@@ -592,8 +592,11 @@ class Helper_Migration {
 
 			/* Check if there is a fonts directory to migrate from and to */
 			if ( is_dir( $path . 'fonts' ) && is_dir( $this->data->template_font_location ) ) {
-				foreach ( glob( $path . 'fonts/' . '*.{otf,ttf,OTF,TTF}', GLOB_BRACE ) as $font ) {
-					$font_name  = basename( $font );
+				$fonts = glob( $path . 'fonts/' . '*.{otf,ttf,OTF,TTF}', GLOB_BRACE );
+				$fonts = ( is_array( $fonts ) ) ? $fonts : array();
+				
+				foreach ( $fonts as $font ) {
+					$font_name = basename( $font );
 					@copy( $font, $this->data->template_font_location . $font_name );
 				}
 
