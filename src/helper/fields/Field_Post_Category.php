@@ -194,15 +194,23 @@ class Field_Post_Category extends Helper_Abstract_Fields {
 
 			/* Process the category label */
 			if ( isset( $val['label'] ) ) {
-				$label        = GFCommon::prepare_post_category_value( $val['label'], $this->field );
-				$val['label'] = ( is_array( $label ) && isset( $label[0] ) ) ? $label[0] : $label;
+				$val['label'] = GFCommon::prepare_post_category_value( $val['label'], $this->field );
+
+				if ( is_array( $val['label'] ) ) {
+					$val['label'] = ( isset( $val['label'][0] ) ) ? $val['label'][0] : '';
+				}
+
 				$val['label'] = esc_html( $val['label'] );
 			}
 
 			/* process the category value */
 			if ( isset( $val['value'] ) ) {
-				$id           = GFCommon::prepare_post_category_value( $val['value'], $this->field, 'conditional_logic' );
-				$val['value'] = ( is_array( $id ) && isset( $id[0] ) ) ? $id[0] : $id;
+				$val['value']= GFCommon::prepare_post_category_value( $val['value'], $this->field, 'conditional_logic' );
+
+				if ( is_array( $val['value'] ) ) {
+					$val['value'] = ( isset( $val['value'][0] ) ) ? $val['value'][0] : '';
+				}
+
 				$val['value'] = esc_html( $val['value'] );
 			}
 		}
