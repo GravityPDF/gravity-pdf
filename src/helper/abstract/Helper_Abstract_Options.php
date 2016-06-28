@@ -942,22 +942,24 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$templates = array();
 		$legacy    = array();
 
-		foreach ( $template_list as $filename ) {
+		if( is_array( $template_list ) ) {
+			foreach ( $template_list as $filename ) {
 
-			/* Get the header information to find out what group it's in and if it is compatible with our verison of Gravity PDF */
-			$info = $this->get_template_headers( $filename );
-			$file = basename( $filename, '.php' );
+				/* Get the header information to find out what group it's in and if it is compatible with our verison of Gravity PDF */
+				$info = $this->get_template_headers( $filename );
+				$file = basename( $filename, '.php' );
 
-			if ( ! empty( $info['template'] ) ) {
+				if ( ! empty( $info['template'] ) ) {
 
-				/* Check if template compatible */
-				if ( ! empty( $info['required_pdf_version'] ) && version_compare( $info['required_pdf_version'], PDF_EXTENDED_VERSION, '>' ) ) {
-					$info['template'] .= ' (+ ' . _x( 'needs', 'Required', 'gravity-forms-pdf-extended' ) . ' v' . $info['required_pdf_version'] . ')';
+					/* Check if template compatible */
+					if ( ! empty( $info['required_pdf_version'] ) && version_compare( $info['required_pdf_version'], PDF_EXTENDED_VERSION, '>' ) ) {
+						$info['template'] .= ' (+ ' . _x( 'needs', 'Required', 'gravity-forms-pdf-extended' ) . ' v' . $info['required_pdf_version'] . ')';
+					}
+
+					$templates[ $info['group'] ][ $file ] = $info['template'];
+				} else if ( $file !== 'configuration' && $file !== 'configuration.archive' ) { /* exclude legacy configuration file */
+					$legacy[ $file ] = $this->misc->human_readable( $file );
 				}
-
-				$templates[ $info['group'] ][ $file ] = $info['template'];
-			} else if ( $file !== 'configuration' && $file !== 'configuration.archive' ) { /* exclude legacy configuration file */
-				$legacy[ $file ] = $this->misc->human_readable( $file );
 			}
 		}
 
@@ -1063,7 +1065,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @since 4.0
 	 */
 	public function get_plugin_pdf_templates() {
-		return glob( PDF_PLUGIN_DIR . 'src/templates/*.php' );
+		$templates = glob( PDF_PLUGIN_DIR . 'src/templates/*.php' );
+
+		return ( is_array( $templates ) ) ? $templates : array();
 	}
 
 
