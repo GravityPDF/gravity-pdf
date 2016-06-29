@@ -137,8 +137,8 @@ class Field_Checkbox extends Helper_Abstract_Fields {
 			$html = '<ul class="bulleted checkbox">';
 			$i    = 1;
 			foreach ( $items as $item ) {
-				$sanitized_value  = $item['value'];
-				$sanitized_option = ( $value ) ? $sanitized_value : $item['label'];
+				$sanitized_option = ( $value ) ? $item['value'] : $item['label'];
+				$sanitized_option = wp_kses_post( wp_specialchars_decode( $sanitized_option, ENT_QUOTES ) );
 
 				$html .= '<li id="field-' . $this->field->id . '-option-' . $i . '">' . $sanitized_option . '</li>';
 				$i++;

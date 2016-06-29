@@ -89,7 +89,39 @@ class Field_Radio extends Helper_Abstract_Fields {
 		$data   = $this->value();
 		$output = ( $value ) ? $data['value'] : $data['label'];
 
+		/* Allow HTML if the radio value isn't the "other" option */
+		if ( ! $this->is_user_defined_value( $data['value'] ) ) {
+			$output = wp_kses_post( wp_specialchars_decode( $output, ENT_QUOTES ) );
+		}
+
 		return parent::html( $output );
+	}
+
+	/**
+	 * Checks if the selected Radio button value is defined by the site owner (standard radio options)
+	 * or by the end user (through the "other" option).
+	 *
+	 * @param string $value The user-selected radio button value
+	 *
+	 * @return bool Returns true if value is user-defined, or false otherwise
+	 *
+	 * @since 4.0.1
+	 */
+	protected function is_user_defined_value( $value ) {
+
+		/* Check if the field has the "Other" choice enabled */
+		if ( ! isset( $this->field->enableOtherChoice ) || true !== $this->field->enableOtherChoice ) {
+			return false;
+		}
+
+		/* Loop through the values and check if we have a match */
+		foreach ( $this->field->choices as $item ) {
+			if ( wp_specialchars_decode( $value, ENT_QUOTES ) === $item['value'] ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
