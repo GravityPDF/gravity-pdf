@@ -106,7 +106,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 </script>
 
 <script type="text/template" id="GravityPDFFonts">
-	<a href="#" class="font-name"><i class="fa fa-angle-right"></i><span name="font_name"><%- model.get('font_name') %></span></a>
+	<a href="#" class="font-name"><i class="fa fa-angle-right"></i><span name="font_name">{{- model.get('font_name') }}</span></a>
 	<div class="font-settings" style="display: none">
 
 		<form method="post">
@@ -114,13 +114,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<div class="font-selector">
 				<label><?php _e( 'Font Name', 'gravity-forms-pdf-extended' ); ?> <span class="gfield_required">*</span></label>
-				<input type="text" required="required" value="<%- model.get('font_name') %>" name="font_name" class="regular-text font-name-field">
+				<input type="text" required="required" value="{{- model.get('font_name') }}" name="font_name" class="regular-text font-name-field">
 				<span class="gf_settings_description"><label><?php _e( 'Only alphanumeric characters and spaces are accepted.', 'gravity-forms-pdf-extended' ); ?></label></span>
 			</div>
 
 			<div class="font-selector">
 				<label><?php _e( 'Regular', 'gravity-forms-pdf-extended' ); ?> <span class="gfield_required">*</span></label>
-				<input type="text" value="<%- model.get('regular') %>" required="required" name="regular" class="regular-text">
+				<input type="text" value="{{- model.get('regular') }}" required="required" name="regular" class="regular-text">
 				<span>
 					<input type="button"
 				             data-uploader-button-text="<?php _e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
@@ -132,7 +132,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<div class="font-selector">
 				<label><?php _e( 'Italics', 'gravity-forms-pdf-extended' ); ?></label>
-				<input type="text" value="<%- model.get('italics') %>" name="italics" class="regular-text">
+				<input type="text" value="{{- model.get('italics') }}" name="italics" class="regular-text">
 				<span>
 					<input type="button"
 					       data-uploader-button-text="<?php _e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
@@ -144,7 +144,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<div class="font-selector">
 				<label><?php _e( 'Bold', 'gravity-forms-pdf-extended' ); ?></label>
-				<input type="text" value="<%- model.get('bold') %>" name="bold" class="regular-text">
+				<input type="text" value="{{- model.get('bold') }}" name="bold" class="regular-text">
 				<span>
 					<input type="button"
 				             data-uploader-button-text="<?php _e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
@@ -156,7 +156,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<div class="font-selector">
 				<label><?php _e( 'Bold Italics', 'gravity-forms-pdf-extended' ); ?></label>
-				<input type="text" value="<%- model.get('bolditalics') %>" name="bolditalics" class="regular-text">
+				<input type="text" value="{{- model.get('bolditalics') }}" name="bolditalics" class="regular-text">
 				<span>
 					<input type="button"
 				             data-uploader-button-text="<?php _e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"

@@ -97,6 +97,17 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Get the full path to the current view
+	 *
+	 * @return string The path
+	 *
+	 * @since 4.0.1
+	 */
+	final public function get_view_dir_path() {
+		return PDF_PLUGIN_DIR . 'src/view/html/' . $this->view_type . '/';
+	}
+
+	/**
 	 * Load a view file based on the filename and type
 	 *
 	 * @param  string  $filename The filename to load
@@ -108,7 +119,7 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	final protected function load( $filename, $args = array(), $output = true ) {
-		$path = PDF_PLUGIN_DIR . 'src/view/html/' . $this->view_type . '/' . $filename . '.php';
+		$path = $this->get_view_dir_path() . $filename . '.php';
 		$args = array_merge( $this->data_cache, $args );
 
 		if ( is_readable( $path ) ) {

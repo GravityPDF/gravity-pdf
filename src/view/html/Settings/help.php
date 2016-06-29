@@ -119,16 +119,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 </div><!-- close #pdfextended-settings -->
 
 <script type="text/template" id="GravityPDFSearchResultsDocumentation">
-	<% if(collection.length === 0) { %>
+	{{ if(collection.length === 0) { }}
 		<li><?php _e( "It doesn't look like there are any topics related to your issue.", 'gravity-forms-pdf-extended' ); ?></li>
-	<% } else { %>
+	{{ } else { }}
 		<li><h3><?php _e( 'Maybe one of these articles will help...', 'gravity-forms-pdf-extended' ); ?></h3></li>
-	<% } %>
+	{{ } }}
 
-	<% _.each(collection, function (model) { %>
+	{{ _.each(collection, function (model) { }}
 		<li>
-			<a href="<%= model.link %>"><%= model.title.rendered %></a>
-			<div class="except"><%= model.excerpt.rendered %></div>
+			<a href="{{= model.link }}">{{= model.title.rendered }}</a>
+			<div class="except">{{= model.excerpt.rendered }}</div>
 		</li>
-	<% }); %>
+	{{ }); }}
 </script>

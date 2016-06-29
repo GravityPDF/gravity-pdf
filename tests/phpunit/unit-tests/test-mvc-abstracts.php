@@ -131,11 +131,9 @@ class Test_MVC_Abstracts extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_abstract_view() {
-		/**
+		/*
 		 * Test our load function produces the correct output
 		 */
-
-		/* check we are loading data correctly  */
 		ob_start();
 		$results = $this->view->uninstaller( array() );
 		$string  = ob_get_clean();
@@ -147,5 +145,13 @@ class Test_MVC_Abstracts extends WP_UnitTestCase {
 		/* check for error */
 		$error = $this->view->load_none_existant_file( array() );
 		$this->assertTrue( is_wp_error( $error ) );
+
+		/*
+		 * Test our get_view_dir_path() string works correctly
+		 */
+		$results = $this->view->get_view_dir_path();
+
+		$this->assertFileExists( $results . 'general.php' );
+		$this->assertFileNotExists( $results . 'generic-file-that-isnt-included.php' );
 	}
 }
