@@ -9,6 +9,21 @@
 	$(function() {
 
 		/**
+		 * To prevent problems with PHP's ASP Short tags (removed in PHP 7) we'll change Underscore's delimiters to be Handlebars-ish:
+		 * {{= }}, {{- }} or {{ }}
+		 *
+		 * @see https://github.com/GravityPDF/gravity-pdf/issues/417
+		 * @type {{interpolate: RegExp, evaluate: RegExp, escape: RegExp}}
+		 * @since 4.0.1
+		 */
+		var UnderscoreSettingsOverride = {
+			evaluate: /\{\{(.+?)\}\}/gim,
+			interpolate: /\{\{=(.+?)\}\}/gim,
+			escape: /\{\{-(.+?)\}\}/gim
+		};
+
+
+		/**
 		 * Handles our Font CRUD Feature
 		 * Allows URLs to TTF and OTF font files to be passed
 		 * to a specific custom font 'group' defined by the user.
@@ -314,10 +329,8 @@
 						this.addRender(font);
 					}, this);
 				} else {
-
 					/* Display getting started message to user */
-					this.$el.html( _.template( $( '#GravityPDFFontsEmpty' ).html() ) );
-
+					this.$el.html(_.template($( '#GravityPDFFontsEmpty' ).html(), UnderscoreSettingsOverride));
 				}
 
 				/* Return for chaining purposes */
@@ -425,7 +438,7 @@
 			render: function() {
 
 				/* Set up our Underscore template file */
-				this.template = _.template( $( this.template ).html() );
+				this.template = _.template($( this.template ).html(), UnderscoreSettingsOverride);
 
 				/* Set View Element HTML to our Underscore template, passing in our model */
 				this.$el.html(this.template({
@@ -1003,7 +1016,7 @@
 
 			render: function() {
 				/* set up out template */
-				this.template = _.template($(this.template).html());
+				this.template = _.template($(this.template).html(), UnderscoreSettingsOverride);
 
 				/* show the loading spinner */
 				this.showSpinner();
