@@ -1046,7 +1046,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				}
 
 				/* Check if the file is too old and delete file / directory */
-				if ( filemtime( $file ) < time() - $max_file_age ) {
+				if ( file_exists( $file ) && filemtime( $file ) < time() - $max_file_age ) {
 
 					if ( $directory ) {
 						$this->misc->rmdir( substr( $file, 0, -1 ) );
