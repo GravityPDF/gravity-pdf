@@ -38,7 +38,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Set base constants we'll use throughout the plugin
  */
 
-define( 'PDF_EXTENDED_VERSION', '4.0' ); /* the current plugin version */
+define( 'PDF_EXTENDED_VERSION', '4.0.1' ); /* the current plugin version */
 define( 'PDF_PLUGIN_DIR', plugin_dir_path( __FILE__ ) ); /* plugin directory path */
 define( 'PDF_PLUGIN_URL', plugin_dir_url( __FILE__ ) ); /* plugin directory url */
 define( 'PDF_PLUGIN_BASENAME', plugin_basename( __FILE__ ) ); /* the plugin basename */

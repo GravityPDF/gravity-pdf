@@ -4,8 +4,8 @@ Plugin URI: https://gravitypdf.com/
 Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.2
-Tested up to: 4.4
-Stable tag: 4.0
+Tested up to: 4.5
+Stable tag: 4.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
 
@@ -82,6 +82,16 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 18. Blank Slate provides a print-friendly template focusing solely on the user-submitted data.
 
 == Changelog ==
+
+= 4.0.1 =
+* Fixes PHP notice when viewing PDF and Category field is empty (GH#419)
+* Fixes PHP notice when viewing PDF and custom font directory is empty (GH#416)
+* Fixes Font Manager / Help Search features due to Underscore.js conflict when PHP's depreciated ASP Tags enabled (GH#417)
+* Allows radio and checkbox values to show HTML in PDFs (GH#415)
+* Fixes PDF letter spacing issue with upper and lower case characters (GH#418)
+* Fixes character display problems using core Arial font in PDFs (GH#420)
+* Fixes documentation search error on PDF Help tab (GH#424)
+* Add additional check when cleaning up TMP directory (GH#427)
 
 = 4.0 =
 
