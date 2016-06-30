@@ -149,7 +149,7 @@ class Field_Address extends Helper_Abstract_Fields {
 		foreach( $field->inputs as $item ) {
 			if ( ! isset( $item['isHidden'] ) || false === $item['isHidden'] ) {
 				/* Now we know item isn't hidden, go through the values and check if there's data */
-				$item_value = trim( rgget( $item['id'], $value ) );
+				$item_value = trim( rgget( (string) $item['id'], $value ) );
 				if ( ! empty( $item_value ) ) {
 					return false;
 				}
