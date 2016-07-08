@@ -21,6 +21,7 @@ use Monolog\Processor\MemoryPeakUsageProcessor;
 use Monolog\Processor\WebProcessor;
 
 use GFFormsModel;
+use GFLogging;
 
 /**
  * Bootstrap / Router Class
@@ -304,20 +305,16 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/* Initialise our logger */
 		$this->log = new Logger( 'gravitypdf' );
 
-		/* Prevent logging in CLI mode */
-		if ( substr( php_sapi_name(), 0, 3 ) === 'cli' ) {
-			$this->log->pushHandler( new NullHandler( Logger::INFO ) ); /* throw logs away */
-
-			return;
-		}
-
 		/* Setup our Gravity Forms local file logger, if enabled */
 		$this->setup_gravityforms_logging();
 
 		/* Check if we have a handler pushed and add our Introspection and Memory Peak usage processors */
-		if ( sizeof( $this->log->getHandlers() ) > 0 ) {
+		if ( sizeof( $this->log->getHandlers() ) > 0 && substr( php_sapi_name(), 0, 3 ) !== 'cli' ) {
 			$this->log->pushProcessor( new IntrospectionProcessor );
 			$this->log->pushProcessor( new MemoryPeakUsageProcessor );
+		} else {
+			/* Disable logging if using CLI, or if Gravity Forms logging isn't enabled */
+			$this->log->pushHandler( new NullHandler( Logger::INFO ) ); /* throw logs away */
 		}
 	}
 
@@ -333,21 +330,31 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/* Check if Gravity Forms logging is enabled and push stream logging */
 		if ( class_exists( 'GFLogging' ) ) {
 
-			/* Get the current plugin logger settings and check if it's enabled */
-			$settings  = get_option( 'gf_logging_settings', array() );
-			$log_level = rgar( $settings, 'gravity-pdf' );
+			/*
+			 * Get the current plugin logger settings and check if it's enabled
+			 * The new version of the logger uses the add-on storage method, while the old one stores it in gf_logging_settings
+			 * so we'll test which settings we should use and get the appropriate log level
+			 */
+			if ( ! defined( 'GF_LOGGING_VERSION' ) || version_compare( GF_LOGGING_VERSION, '1.1', '<' ) ) {
+				$settings     = get_option( 'gf_logging_settings' );
+				$log_level    = (int) rgar( $settings, 'gravity-pdf' );
+				$log_filename = GFFormsModel::get_upload_root() . 'logs/gravity-pdf.txt';
+			} else {
+				$gf_logger          = GFLogging::get_instance();
+				$gf_logger_settings = $gf_logger->get_plugin_settings();
+				$log_level          = ( isset( $gf_logger_settings['gravity-pdf']['log_level'] ) ) ? (int) $gf_logger_settings['gravity-pdf']['log_level'] : 0;
+				$log_filename       = $gf_logger::get_log_file_name( 'gravity-pdf' );
+			}
 
+			/* Enable logging if not equivalent to empty (0) and not level 6 (which is apprently off in GF world) */
 			if ( ! empty( $log_level ) && $log_level !== 6 ) {
 
-				/* Set our log file */
-				$log_file_name = GFFormsModel::get_upload_root() . 'logs/gravity-pdf.txt';
-
 				/* Convert Gravity Forms log levels to the appropriate Monolog level */
-				$monolog_level = ( $log_level == 4 ) ? Logger::ERROR : Logger::INFO;
+				$monolog_level = ( $log_level === 4 ) ? Logger::ERROR : Logger::INFO;
 
 				/* Setup our stream and change the format to more-suit Gravity Forms */
-				$formatter = new LineFormatter( "%datetime% - %level_name% --> %message% %context% %extra%\n" );
-				$stream    = new StreamHandler( $log_file_name, $monolog_level );
+				$formatter = new LineFormatter( "%datetime% - %level_name% --> %message% %context% %extra%<br>\n" );
+				$stream    = new StreamHandler( $log_filename, $monolog_level );
 				$stream->setFormatter( $formatter );
 
 				/* Add our log file stream */
