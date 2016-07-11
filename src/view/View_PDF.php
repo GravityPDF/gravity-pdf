@@ -308,7 +308,6 @@ class View_PDF extends Helper_Abstract_View {
 		/* Set up required variables */
 		$form         = $this->gform->get_form( $entry['form_id'] );
 		$products     = new Field_Products( new GF_Field(), $entry, $this->gform, $this->misc );
-		$has_products = false;
 		$page_number  = 0;
 		$container    = ( isset( $config['meta']['enable_css_ready_classes'] ) && false === $config['meta']['enable_css_ready_classes'] ) ? new Helper_Field_Container_Void() : new Helper_Field_Container();
 
@@ -362,8 +361,6 @@ class View_PDF extends Helper_Abstract_View {
 
 			/* Skip over any product fields, if needed */
 			if ( $show_individual_product_fields === false && GFCommon::is_product_field( $field->type ) ) {
-				$has_products = true;
-
 				/* To prevent display issues we will output the column markup needed */
 				$container->maybe_display_faux_column( $field );
 				continue;
@@ -393,7 +390,7 @@ class View_PDF extends Helper_Abstract_View {
 		$container->close();
 
 		/* Output product table, if needed */
-		if ( $has_products && ! $products->is_empty() ) {
+		if ( ! $products->is_empty() ) {
 			echo $products->html();
 		}
 

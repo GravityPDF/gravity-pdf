@@ -1268,19 +1268,12 @@ class Model_PDF extends Helper_Abstract_Model {
 		/* Merge in the meta data and survey, quiz and poll data */
 		$data = array_replace_recursive( $data, $form_meta, $quiz, $survey, $poll );
 
-		/**
+		/*
 		 * Loop through the form data, call the correct field object and
 		 * save the data to our $data array
 		 */
-		$has_product_fields = false;
-
 		if ( isset( $form['fields'] ) ) {
 			foreach ( $form['fields'] as $field ) {
-
-				/* Skip over product fields as they will be grouped at the end */
-				if ( GFCommon::is_product_field( $field->type ) ) {
-					$has_product_fields = true;
-				}
 
 				/* Skip over captcha, password and page fields */
 				$fields_to_skip = apply_filters( 'gfpdf_form_data_skip_fields', array(
@@ -1305,7 +1298,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		/* Load our product array if products exist */
-		if ( $has_product_fields ) {
+		if ( ! $products->is_empty() ) {
 			$data = array_replace_recursive( $data, $products->form_data() );
 		}
 
