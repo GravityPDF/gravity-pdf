@@ -84,11 +84,11 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 == Changelog ==
 
 = 4.0.2 =
-* Fixes issue displaying address fields in v4 PDFs
-* Fixes internal logging issues and added Gravity Forms 1.1 support
-* Fixes notice when form pagination information is not available
-* Fixes notice when using GPDFAPI::product_table() on form that had no products
-* Fixes caching issue with GravityView Enable Notifications plugin that caused PDF attachment not to be updated
+* Fixes issue displaying address fields in v4 PDFs (GH#429)
+* Fixes internal logging issues and added Gravity Forms 1.1 support (GF#428)
+* Fixes notice when form pagination information is not available (GH#437)
+* Fixes notice when using GPDFAPI::product_table() on form that had no products (GH#438)
+* Fixes caching issue with GravityView Enable Notifications plugin that caused PDF attachment not to be updated (GH#436)
 
 = 4.0.1 =
 * Fixes PHP notice when viewing PDF and Category field is empty (GH#419)
