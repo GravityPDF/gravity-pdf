@@ -1109,6 +1109,17 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Triggered after the Gravity Form entry is updated
+	 *
+	 * @param array $form
+	 * @param int $entry_id
+	 */
+	public function cleanup_pdf_after_submission( $form, $entry_id ) {
+		$entry = $this->gform->get_entry( $entry_id );
+		$this->cleanup_pdf( $entry, $form );
+	}
+
+	/**
 	 * Clean-up any PDFs stored on disk before we resend any notifications
 	 *
 	 * @param array $form The Gravity Forms object

@@ -137,6 +137,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertSame( 10, has_action( 'gform_entry_info', array( $this->model, 'view_pdf_entry_detail' ) ) );
 		$this->assertSame( 10, has_action( 'gform_after_submission', array( $this->model, 'maybe_save_pdf' ) ) );
 		$this->assertSame( 9999, has_action( 'gform_after_submission', array( $this->model, 'cleanup_pdf' ) ) );
+		$this->assertSame( 9999, has_action( 'gform_after_update_entry', array( $this->model, 'cleanup_pdf_after_submission' ) ) );
 		$this->assertSame( 10, has_action( 'gfpdf_cleanup_tmp_dir', array( $this->model, 'cleanup_tmp_dir' ) ) );
 	}
 

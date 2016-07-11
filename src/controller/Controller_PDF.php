@@ -150,6 +150,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 
 		/* Clean-up actions */
 		add_action( 'gform_after_submission', array( $this->model, 'cleanup_pdf' ), 9999, 2 );
+		add_action( 'gform_after_update_entry', array( $this->model, 'cleanup_pdf_after_submission' ), 9999, 2 );
 		add_action( 'gfpdf_cleanup_tmp_dir', array( $this->model, 'cleanup_tmp_dir' ) );
 	}
 
