@@ -1371,7 +1371,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		$data['date_created_usa'] = GFCommon::format_date( $entry['date_created'], false, 'n/j/Y', false );
 
 		/* Include page names */
-		$data['pages'] = $form['pagination']['pages'];
+		$data['pages'] = ( isset( $form['pagination']['pages'] ) ? $form['pagination']['pages'] : array());
 
 		/* Add misc fields */
 		$data['misc']['date_time'] = GFCommon::format_date( $entry['date_created'], false, 'Y-m-d H:i:s', false );
