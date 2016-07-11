@@ -471,11 +471,14 @@ final class GPDFAPI {
 
 		$products = new GFPDF\Helper\Fields\Field_Products( new GF_Field(), $entry, $gfpdf->gform, $gfpdf->misc );
 
-		if ( $return ) {
-			return $products->html();
-		}
+		if( ! $products->is_empty() ) {
 
-		echo $products->html();
+			if ( $return ) {
+				return $products->html();
+			}
+
+			echo $products->html();
+		}
 
 		return null;
 	}

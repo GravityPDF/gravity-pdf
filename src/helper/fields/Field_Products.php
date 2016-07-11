@@ -51,6 +51,23 @@ require_once( GFCommon::get_base_path() . '/currency.php' );
 class Field_Products extends Helper_Abstract_Fields {
 
 	/**
+	 * Checks if the form has any products
+	 *
+	 * @return boolean
+	 *
+	 * @since 4.0.2
+	 */
+	public function is_empty() {
+		$form = $this->form;
+		foreach ( $form['fields'] as $field ) {
+			if ( GFCommon::is_product_field( $field->type ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
 	 * Return the HTML form data
 	 *
 	 * @return array
