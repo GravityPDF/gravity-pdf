@@ -1495,4 +1495,37 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( '', $form_data['list'][79] );
 		$this->assertEquals( '', $form_data['list'][80] );
 	}
+
+	/**
+	 * Ensure the Product data calculations are correct when using Euros (or similar comma/decimal swiched currency)
+	 */
+	public function test_euro_product_data() {
+		$json            = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/all-form-euro-product-entry.json' ) ), true );
+		$json['form_id'] = $this->form['id'];
+		$entry_id        = GFAPI::add_entry( $json );
+		$entry           = GFAPI::get_entry( $entry_id );
+		$form_data       = GFPDFEntryDetail::lead_detail_grid_array( $this->form['id'], $entry );
+		$products        = $form_data['products'];
+		$totals          = $form_data['products_totals'];
+
+		$this->assertEquals( '30,00 &#8364;', $products[34]['price'] );
+		$this->assertEquals( 30, $products[34]['price_unformatted'] );
+		$this->assertEquals( '180,00 &#8364;', $products[34]['subtotal_formatted'] );
+		$this->assertEquals( 180, $products[34]['subtotal'] );
+
+		$this->assertEquals( '40,00 &#8364;', $products[54]['price'] );
+		$this->assertEquals( 40, $products[54]['price_unformatted'] );
+		$this->assertEquals( '300,25 &#8364;', $products[54]['subtotal_formatted'] );
+		$this->assertEquals( 300.25, $products[54]['subtotal'] );
+
+		$this->assertEquals( 7.95, $products[54]['options'][0]['price'] );
+		$this->assertEquals( '7,95 &#8364;', $products[54]['options'][0]['price_formatted'] );
+
+		$this->assertEquals( 830.25, $totals['subtotal'] );
+		$this->assertEquals( '830,25 &#8364;', $totals['subtotal_formatted'] );
+		$this->assertEquals( 30, $totals['shipping'] );
+		$this->assertEquals( '30,00 &#8364;', $totals['shipping_formatted'] );
+		$this->assertEquals( 860.25, $totals['total'] );
+		$this->assertEquals( '860,25 &#8364;', $totals['total_formatted'] );
+	}
 }
