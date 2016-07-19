@@ -85,9 +85,14 @@ class Field_Name extends Helper_Abstract_Fields {
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
-		$data = array_filter( $this->value() ); /* remove any empty fields from the array */
+		
+		$value = $this->value();
 
-		$value = implode( ' ', $data );
+		/* Backwards compatibility check */
+		if ( is_array( $value ) ) {
+			$value = array_filter( $value ); /* remove any empty fields from the array */
+			$value = implode( ' ', $value );
+		}
 
 		return parent::html( $value );
 	}
