@@ -232,7 +232,8 @@ class Helper_Misc {
 
 		try {
 			/* Get the <img> from the DOM and extract required details */
-			$wrapper = htmlqp( $html );
+			$qp = new Helper_QueryPath();
+			$wrapper = $qp->html5( $html );
 
 			$images = $wrapper->find( 'img' );
 
@@ -260,7 +261,7 @@ class Helper_Misc {
 					}
 				}
 
-				return $wrapper->top( 'body' )->innerHTML5();
+				return $wrapper->top( 'html' )->innerHTML5();
 			}
 
 			return $html;
