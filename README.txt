@@ -34,9 +34,9 @@ The plugin ships with four highly-customisable PDF templates perfectly suited fo
 
 = Requirements =
 
-Gravity PDF can be run on most shared web hosting without any issues. It requires **PHP 5.4+** (PHP 7.0+ recommended) and at least 64MB of WP Memory (128MB+ recommended). You'll also need to be running WordPress 4.2+ and have Gravity Forms 1.9+.
+Gravity PDF can be run on most shared web hosting without any issues. It requires **PHP 5.4+** (PHP 7.0+ recommended) and at least 64MB of WP Memory (128MB+ recommended). You'll also need to be running WordPress 4.2+ and have [Gravity Forms 1.9+](http://www.gravityforms.com/).
 
-[Don't have Gravity Forms? Purchase a license](https://goo.gl/lsBOef) (any license type will do, although a Developer license will give you the best bang for the buck). If you aren't sure Gravity PDF will meet your needs (and haven't got a Gravity Forms license yet) you can [try out the software via our demo site](https://demo.gravitypdf.com).
+If you aren't sure Gravity PDF will meet your needs (and haven't got a Gravity Forms license yet) you can [try out the software via our demo site](https://demo.gravitypdf.com).
 
 = Documentation & Support =
 
@@ -55,6 +55,8 @@ All development for Gravity PDF [is handled via GitHub](https://github.com/Gravi
 You can also keep up to date with Gravity PDF by [subscribing to our newsletter](https://gravitypdf.com/#signup-top), [following us on Twitter](https://twitter.com/gravitypdf) or [liking us on Facebook](https://www.facebook.com/gravitypdf).
 
 Also, if you enjoy using the software [we'd love it if you could give us a review!](https://wordpress.org/support/view/plugin-reviews/gravity-forms-pdf-extended)
+
+*Note: When Gravity Forms isn't installed and you activate Gravity PDF we display a notice that includes an affiliate link to their website.*
 
 == Installation ==
 
