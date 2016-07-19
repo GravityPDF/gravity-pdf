@@ -696,7 +696,7 @@ class Test_Options_API extends WP_UnitTestCase {
 		$header = $this->options->get_template_headers( $path );
 
 		$this->assertEquals( 'Zadani', $header['template'] );
-		$this->assertEquals( '1.0', $header['version'] );
+		$this->assertEquals( '1.1', $header['version'] );
 		$this->assertEquals( 'A minimalist business-style template that will generate a well-spaced document great for printing.', $header['description'] );
 		$this->assertEquals( 'Gravity PDF', $header['author'] );
 		$this->assertEquals( 'Core', $header['group'] );
