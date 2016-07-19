@@ -627,7 +627,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 		return apply_filters( 'gfpdf_page_names_display_setting', array(
 			'id'      => 'show_page_names',
 			'name'    => __( 'Show Page Names', 'gravity-forms-pdf-extended' ),
-			'desc'    => __( 'Display form page names on the PDF (only works when using page break field).', 'gravity-forms-pdf-extended' ),
+			'desc'    => sprintf( __( 'Display form page names on the PDF. Requires the use of the %sPage Break field%s.', 'gravity-forms-pdf-extended' ), '<a href="https://www.gravityhelp.com/documentation/article/page-break/">', '</a>' ),
 			'type'    => 'radio',
 			'options' => array(
 				'Yes' => __( 'Yes', 'gravity-forms-pdf-extended' ),
