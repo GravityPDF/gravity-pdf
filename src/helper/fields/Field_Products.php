@@ -228,10 +228,6 @@ class Field_Products extends Helper_Abstract_Fields {
 		$form = $this->form;
 		$lead = $this->entry;
 
-		/* Set up the curreny format we should output products totals in */
-		$currency_type   = GFCommon::is_currency_decimal_dot();
-		$currency_format = $currency_type ? 'decimal_dot' : 'decimal_comma';
-
 		/* Get all products for this field */
 		$products = GFCommon::get_product_fields( $form, $lead, true );
 
@@ -246,6 +242,7 @@ class Field_Products extends Helper_Abstract_Fields {
 
 				/* Get the raw pricing data */
 				$product_raw_price = GFCommon::to_number( $product['price'] );
+				$product_unit_price = $product_raw_price;
 
 				/* Check if we should include options */
 				$options = isset( $product['options'] ) ? $product['options'] : array();
@@ -256,10 +253,10 @@ class Field_Products extends Helper_Abstract_Fields {
 					$option_raw_price = GFCommon::to_number( $option['price'] );
 
 					/* Add the options price to the products price */
-					$product_raw_price += $option_raw_price;
+					$product_unit_price += $option_raw_price;
 
 					/* add our formatted options price to the array */
-					$option['price_formatted'] = GFCommon::format_number( $option_raw_price, 'currency' );
+					$option['price_formatted'] = GFCommon::to_money( $option_raw_price, $lead['currency'] );
 
 					/* Format our option strings correctly */
 					$option['field_label']  = ( isset( $option['field_label'] ) ) ? esc_html( $option['field_label'] ) : '';
@@ -268,7 +265,7 @@ class Field_Products extends Helper_Abstract_Fields {
 				}
 
 				/* calculate subtotal */
-				$product_subtotal = floatval( $product['quantity'] ) * $product_raw_price;
+				$product_subtotal = floatval( $product['quantity'] ) * $product_unit_price;
 
 				/* increment the total */
 				$order_total += $product_subtotal;
@@ -276,12 +273,12 @@ class Field_Products extends Helper_Abstract_Fields {
 				/* Store product in $form_array array */
 				$form_array['products'][ $id ] = array(
 					'name'               => esc_html( $product['name'] ),
-					'price'              => GFCommon::format_number( GFCommon::clean_number( $product['price'], $currency_format ), 'currency' ),
-					'price_unformatted'  => GFCommon::clean_number( $product['price'], $currency_format ),
+					'price'              => GFCommon::to_money( $product_raw_price, $lead['currency'] ),
+					'price_unformatted'  => $product_raw_price,
 					'options'            => $options,
 					'quantity'           => $product['quantity'],
 					'subtotal'           => $product_subtotal,
-					'subtotal_formatted' => GFCommon::format_number( $product_subtotal, 'currency' ),
+					'subtotal_formatted' => GFCommon::to_money( $product_subtotal, $lead['currency'] ),
 				);
 			}
 
@@ -293,12 +290,12 @@ class Field_Products extends Helper_Abstract_Fields {
 			/* add totals to form data */
 			$form_array['products_totals'] = array(
 				'subtotal'           => $order_subtotal,
-				'subtotal_formatted' => GFCommon::format_number( $order_subtotal, 'currency' ),
+				'subtotal_formatted' => GFCommon::to_money( $order_subtotal, $lead['currency'] ),
 				'shipping'           => $shipping_price,
-				'shipping_formatted' => GFCommon::format_number( $shipping_price, 'currency' ),
+				'shipping_formatted' => GFCommon::to_money( $shipping_price, $lead['currency'] ),
 				'shipping_name'      => ( isset( $products['shipping']['name'] ) ) ? preg_replace( '/(.+?) \((.+?)\)/', '$2', $products['shipping']['name'] ) : '',
 				'total'              => $order_total,
-				'total_formatted'    => GFCommon::format_number( $order_total, 'currency' ),
+				'total_formatted'    => GFCommon::to_money( $order_total, $lead['currency'] ),
 			);
 
 			$form_array['products_totals'] = array_map( 'esc_html', $form_array['products_totals'] );
