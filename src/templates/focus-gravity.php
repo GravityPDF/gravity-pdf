@@ -1,8 +1,8 @@
 <?php
 
-/**
+/*
  * Template Name: Focus Gravity
- * Version: 1.0
+ * Version: 1.1
  * Description: Focus Gravity providing a classic layout which epitomises Gravity Forms Print Preview. It's the familiar layout you've come to love.
  * Author: Gravity PDF
  * Group: Core
@@ -15,7 +15,7 @@ if ( ! class_exists('GFForms')) {
     return;
 }
 
-/**
+/*
  * All Gravity PDF 4.x templates have access to the following variables:
  *
  * $form (The current Gravity Form array)
@@ -28,7 +28,7 @@ if ( ! class_exists('GFForms')) {
  * $args (contains an array of all variables - the ones being described right now - passed to the template)
  */
 
-/**
+/*
  * Load up our template-specific appearance settings
  */
 $misc = GPDFAPI::get_misc_class();
@@ -98,7 +98,7 @@ $label_format = ( ! empty( $settings['focusgravity_label_format'] ) ) ? $setting
         float: none !important;
     }
 
-    /**
+    /*
      * Headings
      */
     h3 {
@@ -106,7 +106,7 @@ $label_format = ( ! empty( $settings['focusgravity_label_format'] ) ) ? $setting
         padding: 0;
     }
 
-    /**
+    /*
      * Quiz Style Support
      */
     .gquiz-field {
@@ -123,7 +123,7 @@ $label_format = ( ! empty( $settings['focusgravity_label_format'] ) ) ? $setting
         vertical-align: middle;
     }
 
-    /**
+    /*
      * Survey Style Support
      */
     .gsurvey-likert-choice-label {
@@ -134,7 +134,7 @@ $label_format = ( ! empty( $settings['focusgravity_label_format'] ) ) ? $setting
         text-align: center;
     }
 
-    /**
+    /*
      * Terms of Service (Gravity Perks) Support
      */
     .terms-of-service-agreement {
@@ -146,14 +146,7 @@ $label_format = ( ! empty( $settings['focusgravity_label_format'] ) ) ? $setting
         font-size: 150%;
     }
 
-    /**
-     * Table Support
-     */
-    th, td {
-        font-size: 95%;
-    }
-
-    /**
+    /*
      * List Support
      */
     ul, ol {
@@ -168,7 +161,7 @@ $label_format = ( ! empty( $settings['focusgravity_label_format'] ) ) ? $setting
         list-style-position: inside;
     }
 
-    /**
+    /*
      * Header / Footer
      */
     .alignleft {
@@ -193,7 +186,7 @@ $label_format = ( ! empty( $settings['focusgravity_label_format'] ) ) ? $setting
         float: none;
     }
 
-    /**
+    /*
      * Independant Template Styles
      */
     #container {
@@ -265,7 +258,7 @@ $label_format = ( ! empty( $settings['focusgravity_label_format'] ) ) ? $setting
 <!-- Output our HTML markup -->
 <?php
 
-/**
+/*
  * Load our core-specific styles from our PDF settings which will be passed to the PDF template $config array
  */
 $show_form_title      = ( ! empty( $settings['show_form_title'] ) && $settings['show_form_title'] == 'Yes' )            ? true : false;
@@ -296,7 +289,7 @@ $config = array(
     ),
 );
 
-/**
+/*
  * Generate our HTML markup
  *
  * You can access Gravity PDFs common functions and classes through our API wrapper class "GPDFAPI"

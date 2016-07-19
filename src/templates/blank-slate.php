@@ -1,8 +1,8 @@
 <?php
 
-/**
+/*
  * Template Name: Blank Slate
- * Version: 1.0
+ * Version: 1.1
  * Description: A print-friendly template focusing solely on the user-submitted data.
  * Author: Gravity PDF
  * Group: Core
@@ -15,7 +15,7 @@ if ( ! class_exists( 'GFForms' ) ) {
     return;
 }
 
-/**
+/*
  * All Gravity PDF 4.x templates have access to the following variables:
  *
  * $form (The current Gravity Form array)
@@ -87,7 +87,7 @@ if ( ! class_exists( 'GFForms' ) ) {
         float: none !important;
     }
 
-    /**
+    /*
      * Headings
      */
     h3 {
@@ -95,7 +95,7 @@ if ( ! class_exists( 'GFForms' ) ) {
         padding: 0;
     }
 
-    /**
+    /*
      * Quiz Style Support
      */
     .gquiz-field {
@@ -112,7 +112,7 @@ if ( ! class_exists( 'GFForms' ) ) {
         vertical-align: middle;
     }
 
-    /**
+    /*
      * Survey Style Support
      */
     .gsurvey-likert-choice-label {
@@ -123,7 +123,7 @@ if ( ! class_exists( 'GFForms' ) ) {
         text-align: center;
     }
 
-    /**
+    /*
      * Terms of Service (Gravity Perks) Support
      */
     .terms-of-service-agreement {
@@ -135,14 +135,7 @@ if ( ! class_exists( 'GFForms' ) ) {
         font-size: 150%;
     }
 
-    /**
-     * Table Support
-     */
-    th, td {
-        font-size: 9pt;
-    }
-
-    /**
+    /*
      * List Support
      */
     ul, ol {
@@ -157,7 +150,7 @@ if ( ! class_exists( 'GFForms' ) ) {
         list-style-position: inside;
     }
 
-    /**
+    /*
      * Header / Footer
      */
     .alignleft {
@@ -182,7 +175,7 @@ if ( ! class_exists( 'GFForms' ) ) {
         float: none;
     }
 
-    /**
+    /*
      * Independant Template Styles
      */
     .row-separator .gfpdf-field {
@@ -215,7 +208,7 @@ if ( ! class_exists( 'GFForms' ) ) {
 <!-- Output our HTML markup -->
 <?php
 
-/**
+/*
  * Load our core-specific styles from our PDF settings which will be passed to the PDF template $config array
  */
 $show_form_title      = ( ! empty( $settings['show_form_title'] ) && $settings['show_form_title'] == 'Yes' )            ? true : false;
@@ -246,7 +239,7 @@ $config = array(
     ),
 );
 
-/**
+/*
  * Generate our HTML markup
  *
  * You can access Gravity PDFs common functions and classes through our API wrapper class "GPDFAPI"

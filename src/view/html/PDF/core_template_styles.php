@@ -94,7 +94,7 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
 	<?php endif; ?>
 	}
 
-	body, table th, table td, ul li, ol li, a {
+	body, th, td, li, a {
 		color: <?php echo $font_colour; ?>;
 		font-size: <?php echo $font_size; ?>pt;
 		font-family: <?php echo $font; ?>, sans-serif;
@@ -170,7 +170,6 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
 		}
 
 		table.entry-products td.totals {
-			font-size: 13px;
 			font-weight: bold;
 			padding-bottom: 8px;
 			padding-top: 7px;

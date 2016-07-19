@@ -1,8 +1,8 @@
 <?php
 
-/**
+/*
  * Template Name: Rubix
- * Version: 1.0
+ * Version: 1.1
  * Description: Rubix uses stylish containers to create an aesthetically pleasing design.
  * Author: Gravity PDF
  * Group: Core
@@ -15,7 +15,7 @@ if ( ! class_exists('GFForms')) {
     return;
 }
 
-/**
+/*
  * All Gravity PDF 4.x templates have access to the following variables:
  *
  * $form (The current Gravity Form array)
@@ -28,7 +28,7 @@ if ( ! class_exists('GFForms')) {
  * $args (contains an array of all variables - the ones being described right now - passed to the template)
  */
 
-/**
+/*
  * Load up our template-specific appearance settings
  */
 $container_background_color = ( ! empty( $settings['rubix_container_background_colour'] ) ) ? $settings['rubix_container_background_colour'] : '#eeeeee';
@@ -95,7 +95,7 @@ $contrast = $misc->get_background_and_border_contrast( $container_background_col
         float: none !important;
     }
 
-    /**
+    /*
      * Headings
      */
     h3 {
@@ -103,7 +103,7 @@ $contrast = $misc->get_background_and_border_contrast( $container_background_col
         padding: 0;
     }
 
-    /**
+    /*
      * Quiz Style Support
      */
     .gquiz-field {
@@ -120,7 +120,7 @@ $contrast = $misc->get_background_and_border_contrast( $container_background_col
         vertical-align: middle;
     }
 
-    /**
+    /*
      * Survey Style Support
      */
     .gsurvey-likert-choice-label {
@@ -131,7 +131,7 @@ $contrast = $misc->get_background_and_border_contrast( $container_background_col
         text-align: center;
     }
 
-    /**
+    /*
      * Terms of Service (Gravity Perks) Support
      */
     .terms-of-service-agreement {
@@ -143,14 +143,7 @@ $contrast = $misc->get_background_and_border_contrast( $container_background_col
         font-size: 150%;
     }
 
-    /**
-     * Table Support
-     */
-    th, td {
-        font-size: 95%;
-    }
-
-    /**
+    /*
      * List Support
      */
     ul, ol {
@@ -165,7 +158,7 @@ $contrast = $misc->get_background_and_border_contrast( $container_background_col
         list-style-position: inside;
     }
 
-    /**
+    /*
      * Header / Footer
      */
     .alignleft {
@@ -190,7 +183,7 @@ $contrast = $misc->get_background_and_border_contrast( $container_background_col
         float: none;
     }
 
-    /**
+    /*
      * Independant Template Styles
      */
     #form_title {
@@ -255,7 +248,7 @@ $contrast = $misc->get_background_and_border_contrast( $container_background_col
 <!-- Output our HTML markup -->
 <?php
 
-/**
+/*
  * Load our core-specific styles from our PDF settings which will be passed to the PDF template $config array
  */
 $show_form_title      = ( ! empty( $settings['show_form_title'] ) && $settings['show_form_title'] == 'Yes' ) ?              true : false;
@@ -286,7 +279,7 @@ $config = array(
     ),
 );
 
-/**
+/*
  * Generate our HTML markup
  *
  * You can access Gravity PDFs common functions and classes through our API wrapper class "GPDFAPI"

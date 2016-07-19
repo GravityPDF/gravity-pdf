@@ -1,8 +1,8 @@
 <?php
 
-/**
+/*
  * Template Name: Zadani
- * Version: 1.0
+ * Version: 1.1
  * Description: A minimalist business-style template that will generate a well-spaced document great for printing.
  * Author: Gravity PDF
  * Group: Core
@@ -15,7 +15,7 @@ if ( ! class_exists( 'GFForms' ) ) {
     return;
 }
 
-/**
+/*
  * All Gravity PDF 4.x templates have access to the following variables:
  *
  * $form (The current Gravity Form array)
@@ -28,7 +28,7 @@ if ( ! class_exists( 'GFForms' ) ) {
  * $args (contains an array of all variables - the ones being described right now - passed to the template)
  */
 
-/**
+/*
  * Load up our template-specific appearance settings
  */
 $value_border_colour = ( ! empty( $settings['zadani_border_colour'] ) ) ? $settings['zadani_border_colour'] : '#CCCCCC';
@@ -92,7 +92,7 @@ $value_border_colour = ( ! empty( $settings['zadani_border_colour'] ) ) ? $setti
         float: none !important;
     }
 
-    /**
+    /*
      * Headings
      */
     h3 {
@@ -100,7 +100,7 @@ $value_border_colour = ( ! empty( $settings['zadani_border_colour'] ) ) ? $setti
         padding: 0;
     }
 
-    /**
+    /*
      * Quiz Style Support
      */
     .gquiz-field {
@@ -117,7 +117,7 @@ $value_border_colour = ( ! empty( $settings['zadani_border_colour'] ) ) ? $setti
         vertical-align: middle;
     }
 
-    /**
+    /*
      * Survey Style Support
      */
     .gsurvey-likert-choice-label {
@@ -128,7 +128,7 @@ $value_border_colour = ( ! empty( $settings['zadani_border_colour'] ) ) ? $setti
         text-align: center;
     }
 
-    /**
+    /*
      * Terms of Service (Gravity Perks) Support
      */
     .terms-of-service-agreement {
@@ -140,14 +140,7 @@ $value_border_colour = ( ! empty( $settings['zadani_border_colour'] ) ) ? $setti
         font-size: 150%;
     }
 
-    /**
-     * Table Support
-     */
-    th, td {
-        font-size: 9pt;
-    }
-
-    /**
+    /*
      * List Support
      */
     ul, ol {
@@ -162,7 +155,7 @@ $value_border_colour = ( ! empty( $settings['zadani_border_colour'] ) ) ? $setti
         list-style-position: inside;
     }
 
-    /**
+    /*
      * Header / Footer
      */
     .alignleft {
@@ -187,12 +180,12 @@ $value_border_colour = ( ! empty( $settings['zadani_border_colour'] ) ) ? $setti
         float: none;
     }
 
-    /**
+    /*
      * Independant Template Styles
      */
     .gfpdf-field .label {
         text-transform: uppercase;
-        font-size: 8pt;
+        font-size: 90%;
     }
 
     .gfpdf-field .value {
@@ -213,7 +206,7 @@ $value_border_colour = ( ! empty( $settings['zadani_border_colour'] ) ) ? $setti
 <!-- Output our HTML markup -->
 <?php
 
-/**
+/*
  * Load our core-specific styles from our PDF settings which will be passed to the PDF template $config array
  */
 $show_form_title      = ( ! empty( $settings['show_form_title'] ) && $settings['show_form_title'] == 'Yes' )            ? true : false;
@@ -244,7 +237,7 @@ $config = array(
     ),
 );
 
-/**
+/*
  * Generate our HTML markup
  *
  * You can access Gravity PDFs common functions and classes through our API wrapper class "GPDFAPI"
