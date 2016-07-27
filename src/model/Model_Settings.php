@@ -82,6 +82,16 @@ class Model_Settings extends Helper_Abstract_Model {
 	protected $log;
 
 	/**
+	 * Holds our Helper_Notices object
+	 * which we can use to queue up admin messages for the user
+	 *
+	 * @var \GFPDF\Helper\Helper_Misc
+	 *
+	 * @since 4.0
+	 */
+	protected $notices;
+
+	/**
 	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
