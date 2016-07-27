@@ -1,22 +1,18 @@
 <?php
 
-namespace GFPDF\Helper\Fields;
+namespace GFPDF\Tests;
 
 use GFPDF\Helper\Helper_QueryPath;
+use WP_UnitTestCase;
 
 /**
- * Gravity Forms Field
+ * Test Gravity PDF Helper_QueryPath class
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2016, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
-
-/* Exit if accessed directly */
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
 
 /*
     This file is part of Gravity PDF.
@@ -39,40 +35,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 */
 
 /**
- * Controls the display and output of a Gravity Form field
- *
- * @since 4.0
+ * @since 4.0.3
+ * @group querypath
  */
-class Field_v3_Products extends Field_Products {
-
+class Test_QueryPath extends WP_UnitTestCase {
 
 	/**
-	 * Display the HTML version of this field
-	 *
-	 * @param string $value
-	 * @param bool   $label
-	 *
-	 * @return string
+	 * Ensure we get a QueryPath object returned
 	 *
 	 * @since 4.0
 	 */
-	public function html( $value = '', $label = true ) {
-		$html = parent::html( $value, $label );
-
-		/* Format the order label correctly */
-		$label = apply_filters( 'gform_order_label', __( 'Order', 'gravityforms' ), $this->form->id );
-		$label = apply_filters( 'gform_order_label_' . $this->form->id, $label, $this->form->id );
-
-		$heading = '<h2 class="default entry-view-section-break">' . $label . '</h2>';
-
-		/* Pull out the .entry-products table from the HTML using querypath */
+	public function test_QueryPath() {
 		$qp = new Helper_QueryPath();
-		$table = $qp->html5( $html, 'div.inner-container' )->innerHTML5();
-
-		$html = $heading;
-		$html .= $table;
-
-		return $html;
+		$this->assertEquals( 'QueryPath\DOMQuery', get_class( $qp->html5( '<div>Test</div>' ) ) );
 	}
 
+	public function test_utf8() {
+		$html = '<div>ã   Ã   ╚   ╔   ╩   ╦   ╠   ═   ╬   ¤</div>';
+
+		/* Check for UTF8 support using HTML5 module */
+		$qp = new Helper_QueryPath();
+		$this->assertEquals( 'ã   Ã   ╚   ╔   ╩   ╦   ╠   ═   ╬   ¤', $qp->html5( $html, 'div' )->innerHTML5() );
+
+		/* Using the standard HTML parser these characters will not be correctly displayed when output */
+		$this->assertNotEquals( 'ã   Ã   ╚   ╔   ╩   ╦   ╠   ═   ╬   ¤', htmlqp( $html, 'div' )->innerHTML5() );
+	}
 }

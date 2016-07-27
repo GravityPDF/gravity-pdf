@@ -3,6 +3,7 @@
 namespace GFPDF\Helper\Fields;
 
 use GFPDF\Helper\Helper_Abstract_Fields;
+use GFPDF\Helper\Helper_QueryPath;
 
 use GFFormsModel;
 
@@ -97,7 +98,8 @@ class Field_Quiz extends Helper_Abstract_Fields {
 		 * We'll try use our DOM reader to correctly process the HTML, otherwise use string replace
 		 */
 		try {
-			$value = htmlqp( $value, 'img' )->addClass( 'gf-quiz-img' )->top( 'body' )->innerHTML5();
+			$qp = new Helper_QueryPath();
+			$value = $qp->html5( $value, 'img' )->addClass( 'gf-quiz-img' )->top( 'html' )->innerHTML5();
 		} catch ( Exception $e ) {
 			$value = str_replace( '<img ', '<img class="gf-quiz-img" ', $value );
 		}
