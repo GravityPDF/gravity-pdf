@@ -90,8 +90,8 @@ class Model_Welcome_Screen extends Helper_Abstract_Model {
 		/* Assign our internal variables */
 		$this->log = $log;
 
-		$this->welcome_title = __( 'Welcome to Gravity PDF', 'gravity-forms-pdf-extended' );
-		$this->updated_title = __( "What's new in Gravity PDF?", 'gravity-forms-pdf-extended' );
+		$this->welcome_title = esc_html__( 'Welcome to Gravity PDF', 'gravity-forms-pdf-extended' );
+		$this->updated_title = esc_html__( "What's new in Gravity PDF?", 'gravity-forms-pdf-extended' );
 	}
 
 	/**

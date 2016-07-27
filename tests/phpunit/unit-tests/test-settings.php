@@ -188,7 +188,7 @@ class Test_Settings extends WP_UnitTestCase {
 			/* Expected */
 		}
 
-		$this->assertEquals( 'Cheatin&#8217; uh?', $e->getMessage() );
+		$this->assertEquals( 'Access Denied', $e->getMessage() );
 
 		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
 		$this->assertInternalType( 'integer', $user_id );

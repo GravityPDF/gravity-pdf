@@ -42,14 +42,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 <h3>
     <span>
         <i class="fa fa-dashboard"></i>
-        <?php _e( 'Installation Status', 'gravity-forms-pdf-extended' ); ?>
+        <?php esc_html_e( 'Installation Status', 'gravity-forms-pdf-extended' ); ?>
     </span>
 </h3>
 
 <table id="pdf-system-status" class="form-table">
 	<tr>
 		<th scope="row">
-			<?php _e( 'WP Memory Available', 'gravity-forms-pdf-extended' ); ?> <?php gform_tooltip( 'pdf_status_wp_memory' ); ?>
+			<?php esc_html_e( 'WP Memory Available', 'gravity-forms-pdf-extended' ); ?> <?php gform_tooltip( 'pdf_status_wp_memory' ); ?>
 		</th>
 
 		<td>
@@ -62,7 +62,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			?>
 
 			<?php if ( $args['memory'] === -1 ): ?>
-				<?php echo __( 'Unlimited', 'gravity-forms-pdf-extended' ); ?>
+				<?php echo esc_html__( 'Unlimited', 'gravity-forms-pdf-extended' ); ?>
 			<?php else: ?>
 				<?php echo $args['memory']; ?>MB
 			<?php endif; ?>
@@ -71,7 +71,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<?php if ( $args['memory'] < 128 && $args['memory'] !== -1 ): ?>
 				<span class="gf_settings_description">
-                    <?php echo sprintf( __( 'We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. %sFind out how to increase this limit%s.', 'gravity-forms-pdf-extended' ), '<br /><a href="https://gravitypdf.com/documentation/v4/user-increasing-memory-limit/">', '</a>' ); ?>
+                    <?php echo sprintf( esc_html__( 'We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. %sFind out how to increase this limit%s.', 'gravity-forms-pdf-extended' ), '<br /><a href="https://gravitypdf.com/documentation/v4/user-increasing-memory-limit/">', '</a>' ); ?>
                 </span>
 			<?php endif; ?>
 		</td>
@@ -79,7 +79,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<tr>
 		<th scope="row">
-			<?php _e( 'WordPress Version', 'gravity-forms-pdf-extended' ); ?>
+			<?php esc_html_e( 'WordPress Version', 'gravity-forms-pdf-extended' ); ?>
 		</th>
 
 		<td>
@@ -89,7 +89,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<tr>
 		<th scope="row">
-			<?php _e( 'Gravity Forms Version', 'gravity-forms-pdf-extended' ); ?>
+			<?php esc_html_e( 'Gravity Forms Version', 'gravity-forms-pdf-extended' ); ?>
 		</th>
 
 		<td>
@@ -99,7 +99,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<tr>
 		<th scope="row">
-			<?php _e( 'PHP Version', 'gravity-forms-pdf-extended' ); ?>
+			<?php esc_html_e( 'PHP Version', 'gravity-forms-pdf-extended' ); ?>
 		</th>
 
 		<td>
@@ -109,25 +109,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<tr>
 		<th scope="row">
-			<?php _e( 'Direct PDF Protection', 'gravity-forms-pdf-extended' ); ?> <?php gform_tooltip( 'pdf_protection' ); ?>
+			<?php esc_html_e( 'Direct PDF Protection', 'gravity-forms-pdf-extended' ); ?> <?php gform_tooltip( 'pdf_protection' ); ?>
 		</th>
 
 		<td>
 
 			<!-- A placeholder for our JS which will do the check for us, thereby preventing any load time by checking in PHP directly -->
 			<div id="gfpdf-direct-pdf-protection-check" data-nonce="<?php echo wp_create_nonce( 'gfpdf-direct-pdf-protection' ); ?>">
-				<noscript><?php _e( 'You need JavaScript enabled to perform this check.', 'gravity-forms-pdf-extended' ); ?></noscript>
+				<noscript><?php esc_html_e( 'You need JavaScript enabled to perform this check.', 'gravity-forms-pdf-extended' ); ?></noscript>
 
 				<div id="gfpdf-direct-pdf-check-protected" style="display: none">
-					<?php _e( 'Protected', 'gravity-forms-pdf-extended' ); ?> <span class="fa fa-check-circle"></span>
+					<?php esc_html_e( 'Protected', 'gravity-forms-pdf-extended' ); ?> <span class="fa fa-check-circle"></span>
 				</div>
 
 				<div id="gfpdf-direct-pdf-check-unprotected" style="display: none">
-					<strong><?php _e( 'Unprotected', 'gravity-forms-pdf-extended' ); ?></strong> <span class="fa fa-times-circle"></span>
+					<strong><?php esc_html_e( 'Unprotected', 'gravity-forms-pdf-extended' ); ?></strong> <span class="fa fa-times-circle"></span>
 
 					<span class="gf_settings_description">
-						<?php printf( __( "We've detected the PDFs saved in Gravity PDF's %stmp%s directory can be publically accessed.", 'gravity-forms-pdf-extended' ), '<code>', '</code>' ); ?><br>
-						<?php printf( __( 'We recommend you use our %sgfpdf_tmp_location%s filter to %smove the folder outside your public website directory%s.', 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<a href="https://gravitypdf.com/documentation/v4/gfpdf_tmp_location/">', '</a>' ); ?>
+						<?php printf( esc_html__( "We've detected the PDFs saved in Gravity PDF's %stmp%s directory can be publically accessed.", 'gravity-forms-pdf-extended' ), '<code>', '</code>' ); ?><br>
+						<?php printf( esc_html__( 'We recommend you use our %sgfpdf_tmp_location%s filter to %smove the folder outside your public website directory%s.', 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<a href="https://gravitypdf.com/documentation/v4/gfpdf_tmp_location/">', '</a>' ); ?>
 					</span>
 				</div>
 			</div>

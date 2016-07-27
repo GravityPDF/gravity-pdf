@@ -230,12 +230,12 @@ class Model_Settings extends Helper_Abstract_Model {
 		$copy        = $this->misc->copyr( PDF_PLUGIN_DIR . 'src/templates/', $destination );
 		if ( is_wp_error( $copy ) ) {
 			$this->log->addError( 'Template Installation Error.' );
-			$this->notices->add_error( sprintf( __( 'There was a problem copying all PDF templates to %s. Please try again.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $destination ) . '</code>' ) );
+			$this->notices->add_error( sprintf( esc_html__( 'There was a problem copying all PDF templates to %s. Please try again.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $destination ) . '</code>' ) );
 
 			return false;
 		}
 
-		$this->notices->add_notice( sprintf( __( 'Gravity PDF Custom Templates successfully installed to %s.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $destination ) . '</code>' ) );
+		$this->notices->add_notice( sprintf( esc_html__( 'Gravity PDF Custom Templates successfully installed to %s.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $destination ) . '</code>' ) );
 		$this->options->update_option( 'custom_pdf_template_files_installed', true );
 
 		return true;
@@ -307,7 +307,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		/* Loop through default fonts and check for duplicate */
 		$default_fonts = $this->options->get_installed_fonts();
 
-		unset( $default_fonts[ __( 'User-Defined Fonts', 'gravity-forms-pdf-extended' ) ] );
+		unset( $default_fonts[ esc_html__( 'User-Defined Fonts', 'gravity-forms-pdf-extended' ) ] );
 
 		/* check for exact match */
 		foreach ( $default_fonts as $group ) {
@@ -357,13 +357,13 @@ class Model_Settings extends Helper_Abstract_Model {
 
 				/* Couldn't find file so throw error */
 				if ( is_wp_error( $path ) ) {
-					$errors[] = sprintf( __( 'Could not locate font on web server: %s', 'gravity-forms-pdf-extended' ), $fonts[ $type ] );
+					$errors[] = sprintf( esc_html__( 'Could not locate font on web server: %s', 'gravity-forms-pdf-extended' ), $fonts[ $type ] );
 				}
 
 				/* Copy font to our fonts folder */
 				$filename = basename( $path );
 				if ( ! is_file( $this->data->template_font_location . $filename ) && ! copy( $path, $this->data->template_font_location . $filename ) ) {
-					$errors[] = sprintf( __( 'There was a problem installing the font %s. Please try again.', 'gravity-forms-pdf-extended' ), $filename );
+					$errors[] = sprintf( esc_html__( 'There was a problem installing the font %s. Please try again.', 'gravity-forms-pdf-extended' ), $filename );
 				}
 			}
 		}
@@ -523,7 +523,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		header( 'HTTP/1.1 400 Bad Request' );
 
 		$return = array(
-			'error' => __( 'Could not delete Gravity PDF font correctly. Please try again.', 'gravity-forms-pdf-extended' ),
+			'error' => esc_html__( 'Could not delete Gravity PDF font correctly. Please try again.', 'gravity-forms-pdf-extended' ),
 		);
 
 		$this->log->addError( 'AJAX Endpoint Error', $return );
@@ -554,7 +554,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			header( 'HTTP/1.1 400 Bad Request' );
 
 			$return = array(
-				'error' => __( 'Required fields have not been included.', 'gravity-forms-pdf-extended' ),
+				'error' => esc_html__( 'Required fields have not been included.', 'gravity-forms-pdf-extended' ),
 			);
 
 			$this->log->addWarning( 'Validation Failed.', $return );
@@ -571,7 +571,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			header( 'HTTP/1.1 400 Bad Request' );
 
 			$return = array(
-				'error' => __( 'Font name is not valid. Only alphanumeric characters and spaces are accepted.', 'gravity-forms-pdf-extended' ),
+				'error' => esc_html__( 'Font name is not valid. Only alphanumeric characters and spaces are accepted.', 'gravity-forms-pdf-extended' ),
 			);
 
 			$this->log->addWarning( 'Validation Failed.', $return );
@@ -589,7 +589,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			header( 'HTTP/1.1 400 Bad Request' );
 
 			$return = array(
-				'error' => __( 'A font with the same name already exists. Try a different name.', 'gravity-forms-pdf-extended' ),
+				'error' => esc_html__( 'A font with the same name already exists. Try a different name.', 'gravity-forms-pdf-extended' ),
 			);
 
 			$this->log->addWarning( 'Validation Failed.', $return );

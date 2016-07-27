@@ -60,7 +60,7 @@ class Field_v3_Products extends Field_Products {
 		$html = parent::html( $value, $label );
 
 		/* Format the order label correctly */
-		$label = apply_filters( 'gform_order_label', __( 'Order', 'gravityforms' ), $this->form->id );
+		$label = apply_filters( 'gform_order_label', esc_html__( 'Order', 'gravityforms' ), $this->form->id );
 		$label = apply_filters( 'gform_order_label_' . $this->form->id, $label, $this->form->id );
 
 		$heading = '<h2 class="default entry-view-section-break">' . $label . '</h2>';

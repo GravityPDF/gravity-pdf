@@ -103,7 +103,7 @@ class Field_Products extends Helper_Abstract_Fields {
 		<div class="row-separator products-title-container">
 			<h3 class="product-field-title gfpdf-field">
 				<?php
-				$label = apply_filters( 'gform_order_label', __( 'Order', 'gravityforms' ), $form_id );
+				$label = apply_filters( 'gform_order_label', esc_html__( 'Order', 'gravityforms' ), $form_id );
 				$label = apply_filters( 'gform_order_label_' . $form_id, $label, $form_id );
 
 				echo $label;
@@ -119,7 +119,7 @@ class Field_Products extends Helper_Abstract_Fields {
 							<tr>
 								<th class="entry-products-col1">
 									<?php
-									$label = apply_filters( 'gform_product', __( 'Product', 'gravityforms' ), $form_id );
+									$label = apply_filters( 'gform_product', esc_html__( 'Product', 'gravityforms' ), $form_id );
 									$label = apply_filters( 'gform_product_' . $form_id, $label, $form_id );
 
 									echo $label;
@@ -128,7 +128,7 @@ class Field_Products extends Helper_Abstract_Fields {
 
 								<th class="textcenter entry-products-col2">
 									<?php
-									$label = apply_filters( 'gform_product_qty', __( 'Qty', 'gravityforms' ), $form_id );
+									$label = apply_filters( 'gform_product_qty', esc_html__( 'Qty', 'gravityforms' ), $form_id );
 									$label = apply_filters( 'gform_product_qty_' . $form_id, $label, $form_id );
 
 									echo $label;
@@ -136,7 +136,7 @@ class Field_Products extends Helper_Abstract_Fields {
 								</th>
 								<th class="entry-products-col3">
 									<?php
-									$label = apply_filters( 'gform_product_unitprice', __( 'Unit Price', 'gravityforms' ), $form_id );
+									$label = apply_filters( 'gform_product_unitprice', esc_html__( 'Unit Price', 'gravityforms' ), $form_id );
 									$label = apply_filters( 'gform_product_unitprice_' . $form_id, $label, $form_id );
 
 									echo $label;
@@ -144,7 +144,7 @@ class Field_Products extends Helper_Abstract_Fields {
 								</th>
 								<th class="entry-products-col4">
 									<?php
-									$label = apply_filters( 'gform_product_price', __( 'Price', 'gravityforms' ), $form_id );
+									$label = apply_filters( 'gform_product_price', esc_html__( 'Price', 'gravityforms' ), $form_id );
 									$label = apply_filters( 'gform_product_price_' . $form_id, $label, $form_id );
 
 									echo $label;
@@ -181,11 +181,11 @@ class Field_Products extends Helper_Abstract_Fields {
 						<?php if ( ! empty( $products['products_totals']['shipping_name'] ) ) : ?>
 							<tr>
 								<td rowspan="3" class="emptycell"></td>
-								<td colspan="2" class="textright subtotal totals"><?php _e( 'Subtotal', 'gravity-forms-pdf-extended' ); ?></td>
+								<td colspan="2" class="textright subtotal totals"><?php esc_html_e( 'Subtotal', 'gravity-forms-pdf-extended' ); ?></td>
 								<td class="subtotal_amount totals"><?php echo $products['products_totals']['subtotal_formatted']; ?></td>
 							</tr>
 							<tr>
-								<td colspan="2" class="textright shipping totals"><?php echo sprintf( __( 'Shipping (%s)', 'gravity-forms-pdf-extended' ), $products['products_totals']['shipping_name'] ); ?></td>
+								<td colspan="2" class="textright shipping totals"><?php echo sprintf( esc_html__( 'Shipping (%s)', 'gravity-forms-pdf-extended' ), $products['products_totals']['shipping_name'] ); ?></td>
 								<td class="shipping_amount totals"><?php echo $products['products_totals']['shipping_formatted']; ?></td>
 							</tr>
 						<?php endif; ?>
@@ -195,7 +195,7 @@ class Field_Products extends Helper_Abstract_Fields {
 								<td class="emptycell"></td>
 							<?php endif; ?>
 
-							<td colspan="2" class="textright grandtotal totals"><?php _e( 'Total', 'gravityforms' ) ?></td>
+							<td colspan="2" class="textright grandtotal totals"><?php esc_html_e( 'Total', 'gravityforms' ) ?></td>
 							<td class="grandtotal_amount totals"><?php echo $products['products_totals']['total_formatted']; ?></td>
 						</tr>
 						</tbody>

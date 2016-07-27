@@ -43,7 +43,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<h3>
 		<span>
 		    <i class="fa fa-cog"></i>
-			<?php _e( 'General Settings', 'gravity-forms-pdf-extended' ); ?>
+			<?php esc_html_e( 'General Settings', 'gravity-forms-pdf-extended' ); ?>
 		</span>
 	</h3>
 
@@ -58,7 +58,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<h3>
 				<span>
 				    <i class="fa fa-lock"></i>
-					<?php _e( 'Security Settings', 'gravity-forms-pdf-extended' ); ?>
+					<?php esc_html_e( 'Security Settings', 'gravity-forms-pdf-extended' ); ?>
 				</span>
 			</h3>
 
@@ -67,7 +67,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</table>
 		</div>
 
-		<div class="gfpdf-advanced-options"><a href="#"><?php _e( 'Show Advanced Options...', 'gravity-forms-pdf-extended' ); ?></a></div>
+		<div class="gfpdf-advanced-options"><a href="#"><?php esc_html_e( 'Show Advanced Options...', 'gravity-forms-pdf-extended' ); ?></a></div>
 
 		<?php
 			if ( $args['edit_cap'] ) {

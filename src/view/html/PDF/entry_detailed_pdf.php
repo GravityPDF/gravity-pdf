@@ -36,14 +36,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ?>
 
-<strong><?php _e( 'PDFs', 'gravity-forms-pdf-extended' ); ?></strong><br/>
+<strong><?php esc_html_e( 'PDFs', 'gravity-forms-pdf-extended' ); ?></strong><br/>
 
 <?php foreach ( $args['pdfs'] as $pdf ): ?>
 	<div class="gfpdf_detailed_pdf_container">
 		<span><?php echo $pdf['name']; ?></span>
 		<div>
-			<a href="<?php echo $pdf['view']; ?>" target="_blank" class="button"><?php _e( 'View', 'gravity-forms-pdf-extended' ); ?></a>
-			<a href="<?php echo $pdf['download']; ?>" class="button"><?php _e( 'Download', 'gravity-forms-pdf-extended' ); ?></a>
+			<a href="<?php echo $pdf['view']; ?>" target="_blank" class="button"><?php esc_html_e( 'View', 'gravity-forms-pdf-extended' ); ?></a>
+			<a href="<?php echo $pdf['download']; ?>" class="button"><?php esc_html_e( 'Download', 'gravity-forms-pdf-extended' ); ?></a>
 		</div>
 	</div>
 <?php endforeach; ?>

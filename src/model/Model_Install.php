@@ -314,7 +314,7 @@ class Model_Install extends Helper_Abstract_Model {
 						'dir' => $dir,
 					) );
 
-					$this->notices->add_error( sprintf( __( 'There was a problem creating the %s directory. Ensure you have write permissions to your uploads folder.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
+					$this->notices->add_error( sprintf( esc_html__( 'There was a problem creating the %s directory. Ensure you have write permissions to your uploads folder.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
 				}
 			} else {
 				/* test the directory is currently writable by the web server, otherwise throw an error */
@@ -323,7 +323,7 @@ class Model_Install extends Helper_Abstract_Model {
 						'dir' => $dir,
 					) );
 
-					$this->notices->add_error( sprintf( __( 'Gravity PDF does not have write permission to the %s directory. Contact your web hosting provider to fix the issue.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
+					$this->notices->add_error( sprintf( esc_html__( 'Gravity PDF does not have write permission to the %s directory. Contact your web hosting provider to fix the issue.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
 				}
 			}
 		}
@@ -471,7 +471,7 @@ class Model_Install extends Helper_Abstract_Model {
 						'form_id' => $form['id'],
 					) );
 
-					$this->notices->add_error( sprintf( __( 'There was a problem removing the Gravity Form "%s" PDF configuration. Try delete manually.', 'gravity-forms-pdf-extended' ), $form['id'] . ': ' . $form['title'] ) );
+					$this->notices->add_error( sprintf( esc_html__( 'There was a problem removing the Gravity Form "%s" PDF configuration. Try delete manually.', 'gravity-forms-pdf-extended' ), $form['id'] . ': ' . $form['title'] ) );
 				}
 			}
 		}
@@ -503,7 +503,7 @@ class Model_Install extends Helper_Abstract_Model {
 						'dir'              => $dir,
 					) );
 
-					$this->notices->add_error( sprintf( __( 'There was a problem removing the %s directory. Clean up manually via (S)FTP.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
+					$this->notices->add_error( sprintf( esc_html__( 'There was a problem removing the %s directory. Clean up manually via (S)FTP.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
 				}
 			}
 		}

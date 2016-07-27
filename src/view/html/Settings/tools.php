@@ -43,7 +43,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<h3>
 		<span>
 		    <i class="fa fa-cog"></i>
-			<?php _e( 'Tools', 'gravity-forms-pdf-extended' ); ?>
+			<?php esc_html_e( 'Tools', 'gravity-forms-pdf-extended' ); ?>
 		</span>
 	</h3>
 
@@ -54,7 +54,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<table id="pdf-tools" class="widefat gfpdf_table">
 			<thead>
 				<tr>
-					<th colspan="2"><?php _e( 'Tools', 'gravity-forms-pdf-extended' ); ?></th>
+					<th colspan="2"><?php esc_html_e( 'Tools', 'gravity-forms-pdf-extended' ); ?></th>
 				</tr>
 			</thead>
 
@@ -68,8 +68,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<?php if ( $args['custom_template_setup_warning'] ): ?>
 		<!-- only show custom template warning if user has already installed them once -->
-		<div id="setup-templates-confirm" title="<?php _e( 'Setup Custom Templates', 'gravity-forms-pdf-extended' ); ?>" style="display: none;">
-			<?php printf( __( 'During the setup process any of the following templates stored in %s will be overridden. If you have modified any of the following template or template configuration files %smake a backup before continuing%s.', 'gravity-forms-pdf-extended' ), '<br><code>' . $args['template_directory'] . '</code>', '<strong>', '</strong>' ); ?>
+		<div id="setup-templates-confirm" title="<?php esc_html_e( 'Setup Custom Templates', 'gravity-forms-pdf-extended' ); ?>" style="display: none;">
+			<?php printf( esc_html__( 'During the setup process any of the following templates stored in %s will be overridden. If you have modified any of the following template or template configuration files %smake a backup before continuing%s.', 'gravity-forms-pdf-extended' ), '<br><code>' . $args['template_directory'] . '</code>', '<strong>', '</strong>' ); ?>
 
 			<?php if ( sizeof( $args['template_files'] ) > 0 ): ?>
 				<ul>
@@ -81,8 +81,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 	<?php endif; ?>
 
-	<div id="manage-font-files" title="<?php _e( 'Manage Fonts', 'gravity-forms-pdf-extended' ); ?>" style="display: none;">
-		<?php _e( 'Manage all your custom Gravity PDF fonts in one place.', 'gravity-forms-pdf-extended' ); ?> <?php printf( __( 'Only .ttf and %s.otf font files%s are supported and they MUST be uploaded through your media library (no external links).', 'gravity-forms-pdf-extended' ), '<a href="https://gpdfv4.xyz/documentation/v4/postscript-outlines-not-supported/">', '</a>' ); ?>
+	<div id="manage-font-files" title="<?php esc_html_e( 'Manage Fonts', 'gravity-forms-pdf-extended' ); ?>" style="display: none;">
+		<?php esc_html_e( 'Manage all your custom Gravity PDF fonts in one place.', 'gravity-forms-pdf-extended' ); ?> <?php printf( esc_html__( 'Only .ttf and %s.otf font files%s are supported and they MUST be uploaded through your media library (no external links).', 'gravity-forms-pdf-extended' ), '<a href="https://gpdfv4.xyz/documentation/v4/postscript-outlines-not-supported/">', '</a>' ); ?>
 
 		<div id="font-list">
 			<!-- backbone to manage font list -->
@@ -101,7 +101,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <script type="text/template" id="GravityPDFFontsEmpty">
 	<div id="font-empty">
-		<?php printf( __( 'Looks bare in here!%s Click "Add Font" below to get started.', 'gravity-forms-pdf-extended' ), '<br>' ); ?>
+		<?php printf( esc_html__( 'Looks bare in here!%s Click "Add Font" below to get started.', 'gravity-forms-pdf-extended' ), '<br>' ); ?>
 	</div>
 </script>
 
@@ -113,61 +113,61 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<input type="hidden" name="wpnonce" value="<?php echo wp_create_nonce( 'gfpdf_font_nonce' ); ?>"/>
 
 			<div class="font-selector">
-				<label><?php _e( 'Font Name', 'gravity-forms-pdf-extended' ); ?> <span class="gfield_required">*</span></label>
+				<label><?php esc_html_e( 'Font Name', 'gravity-forms-pdf-extended' ); ?> <span class="gfield_required">*</span></label>
 				<input type="text" required="required" value="{{- model.get('font_name') }}" name="font_name" class="regular-text font-name-field">
-				<span class="gf_settings_description"><label><?php _e( 'Only alphanumeric characters and spaces are accepted.', 'gravity-forms-pdf-extended' ); ?></label></span>
+				<span class="gf_settings_description"><label><?php esc_html_e( 'Only alphanumeric characters and spaces are accepted.', 'gravity-forms-pdf-extended' ); ?></label></span>
 			</div>
 
 			<div class="font-selector">
-				<label><?php _e( 'Regular', 'gravity-forms-pdf-extended' ); ?> <span class="gfield_required">*</span></label>
+				<label><?php esc_html_e( 'Regular', 'gravity-forms-pdf-extended' ); ?> <span class="gfield_required">*</span></label>
 				<input type="text" value="{{- model.get('regular') }}" required="required" name="regular" class="regular-text">
 				<span>
 					<input type="button"
-				             data-uploader-button-text="<?php _e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
-				             data-uploader-title="<?php _e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
-				             value="<?php _e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+				             data-uploader-button-text="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+				             data-uploader-title="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+				             value="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
 				             class="gfpdf_settings_upload_button button-secondary">
 				</span>
 			</div>
 
 			<div class="font-selector">
-				<label><?php _e( 'Italics', 'gravity-forms-pdf-extended' ); ?></label>
+				<label><?php esc_html_e( 'Italics', 'gravity-forms-pdf-extended' ); ?></label>
 				<input type="text" value="{{- model.get('italics') }}" name="italics" class="regular-text">
 				<span>
 					<input type="button"
-					       data-uploader-button-text="<?php _e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
-					       data-uploader-title="<?php _e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
-					       value="<?php _e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+					       data-uploader-button-text="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+					       data-uploader-title="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+					       value="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
 					       class="gfpdf_settings_upload_button button-secondary">
 				</span>
 			</div>
 
 			<div class="font-selector">
-				<label><?php _e( 'Bold', 'gravity-forms-pdf-extended' ); ?></label>
+				<label><?php esc_html_e( 'Bold', 'gravity-forms-pdf-extended' ); ?></label>
 				<input type="text" value="{{- model.get('bold') }}" name="bold" class="regular-text">
 				<span>
 					<input type="button"
-				             data-uploader-button-text="<?php _e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
-				             data-uploader-title="<?php _e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
-				             value="<?php _e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+				             data-uploader-button-text="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+				             data-uploader-title="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+				             value="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
 				             class="gfpdf_settings_upload_button button-secondary">
 				</span>
 			</div>
 
 			<div class="font-selector">
-				<label><?php _e( 'Bold Italics', 'gravity-forms-pdf-extended' ); ?></label>
+				<label><?php esc_html_e( 'Bold Italics', 'gravity-forms-pdf-extended' ); ?></label>
 				<input type="text" value="{{- model.get('bolditalics') }}" name="bolditalics" class="regular-text">
 				<span>
 					<input type="button"
-				             data-uploader-button-text="<?php _e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
-				             data-uploader-title="<?php _e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
-				             value="<?php _e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+				             data-uploader-button-text="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+				             data-uploader-title="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+				             value="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
 				             class="gfpdf_settings_upload_button button-secondary">
 				</span>
 			</div>
 
 			<div class="font-submit">
-				<button class="button button-primary"><?php _e( 'Save Font', 'gravity-forms-pdf-extended' ); ?></button>
+				<button class="button button-primary"><?php esc_html_e( 'Save Font', 'gravity-forms-pdf-extended' ); ?></button>
 			</div>
 
 		</form>
@@ -181,6 +181,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<a href="#" class="delete-font"><i class="fa fa-trash-o"></i></a>
 </script>
 
-<div id="delete-confirm" title="<?php _e( 'Delete Font?', 'gravity-forms-pdf-extended' ); ?>" style="display: none;">
-	<?php printf( __( "Warning! You are about to delete this Font. Select 'Delete' to delete, 'Cancel' to stop.", 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ); ?>
+<div id="delete-confirm" title="<?php esc_attr_e( 'Delete Font?', 'gravity-forms-pdf-extended' ); ?>" style="display: none;">
+	<?php printf( esc_html__( "Warning! You are about to delete this Font. Select 'Delete' to delete, 'Cancel' to stop.", 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ); ?>
 </div>

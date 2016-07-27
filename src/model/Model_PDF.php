@@ -319,7 +319,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		if ( ! is_wp_error( $action ) ) {
 			if ( $settings['active'] !== true ) {
-				return new WP_Error( 'inactive', __( 'The PDF configuration is not currently active.', 'gravity-forms-pdf-extended' ) );
+				return new WP_Error( 'inactive', esc_html__( 'The PDF configuration is not currently active.', 'gravity-forms-pdf-extended' ) );
 			}
 		}
 
@@ -341,7 +341,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		if ( ! is_wp_error( $action ) ) {
 			if ( isset( $settings['conditionalLogic'] ) && ! $this->misc->evaluate_conditional_logic( $settings['conditionalLogic'], $entry ) ) {
-				return new WP_Error( 'conditional_logic', __( 'PDF conditional logic requirements have not been met.', 'gravity-forms-pdf-extended' ) );
+				return new WP_Error( 'conditional_logic', esc_html__( 'PDF conditional logic requirements have not been met.', 'gravity-forms-pdf-extended' ) );
 			}
 		}
 
@@ -443,7 +443,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 						/* if there is no user account assigned to this entry throw error */
 						if ( empty( $entry['created_by'] ) ) {
-							return new WP_Error( 'timeout_expired', __( 'Your PDF is no longer accessible.', 'gravity-forms-pdf-extended' ) );
+							return new WP_Error( 'timeout_expired', esc_html__( 'Your PDF is no longer accessible.', 'gravity-forms-pdf-extended' ) );
 						} else {
 
 							$this->log->addNotice( 'Redirecting to Login.', array(
@@ -531,7 +531,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 				/* throw error if no access granted */
 				if ( ! $access ) {
-					return new WP_Error( 'access_denied', __( 'You do not have access to view this PDF.', 'gravity-forms-pdf-extended' ) );
+					return new WP_Error( 'access_denied', esc_html__( 'You do not have access to view this PDF.', 'gravity-forms-pdf-extended' ) );
 				}
 			}
 		}
@@ -876,7 +876,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			}
 		}
 
-		return new WP_Error( 'pdf_generation_failure', __( 'The PDF could not be saved.', 'gravity-forms-pdf-extended' ) );
+		return new WP_Error( 'pdf_generation_failure', esc_html__( 'The PDF could not be saved.', 'gravity-forms-pdf-extended' ) );
 
 	}
 

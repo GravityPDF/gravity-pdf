@@ -159,7 +159,7 @@ class Test_Installer extends WP_UnitTestCase {
 			/* Expected */
 		}
 
-		$this->assertEquals( 'Cheatin&#8217; uh?', $e->getMessage() );
+		$this->assertEquals( 'Access Denied', $e->getMessage() );
 	}
 
 	/**

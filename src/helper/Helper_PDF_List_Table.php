@@ -121,10 +121,10 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 		$columns = array(
 			'cb'            => '',
-			'name'          => __( 'Name', 'gravity-forms-pdf-extended' ),
-			'shortcode'     => __( 'Download Shortcode', 'gravity-forms-pdf-extended' ),
-			'template'      => __( 'Template', 'gravity-forms-pdf-extended' ),
-			'notifications' => __( 'Notifications', 'gravity-forms-pdf-extended' ),
+			'name'          => esc_html__( 'Name', 'gravity-forms-pdf-extended' ),
+			'shortcode'     => esc_html__( 'Download Shortcode', 'gravity-forms-pdf-extended' ),
+			'template'      => esc_html__( 'Template', 'gravity-forms-pdf-extended' ),
+			'notifications' => esc_html__( 'Notifications', 'gravity-forms-pdf-extended' ),
 		);
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_pdf_list_columns/ for more details about this filter */
@@ -246,8 +246,8 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		     data-fid="<?php echo $form_id; ?>"
 		     src="<?php echo $this->gform->get_plugin_url() ?>/images/active<?php echo intval( $is_active ) ?>.png"
 		     style="cursor: pointer;margin:-1px 0 0 8px;"
-		     alt="<?php $is_active ? __( 'Active', 'gravity-forms-pdf-extended' ) : __( 'Inactive', 'gravity-forms-pdf-extended' ); ?>"
-		     title="<?php echo $is_active ? __( 'Active', 'gravity-forms-pdf-extended' ) : __( 'Inactive', 'gravity-forms-pdf-extended' ); ?>"/>
+		     alt="<?php $is_active ? esc_attr__( 'Active', 'gravity-forms-pdf-extended' ) : esc_attr__( 'Inactive', 'gravity-forms-pdf-extended' ); ?>"
+		     title="<?php echo $is_active ? esc_attr__( 'Active', 'gravity-forms-pdf-extended' ) : esc_attr__( 'Inactive', 'gravity-forms-pdf-extended' ); ?>"/>
 
 		<?php
 	}
@@ -262,7 +262,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 */
 	public function column_notifications( $item ) {
 		if ( ! isset( $item['notification'] ) || sizeof( $item['notification'] ) == 0 ) {
-			_e( 'None', 'gravity-forms-pdf-extended' );
+			esc_html_e( 'None', 'gravity-forms-pdf-extended' );
 
 			return;
 		}
@@ -294,7 +294,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$name = str_replace( '"', '', $item['name'] );
 
 		/* Prepare our shortcode sample */
-		$shortcode = '[gravitypdf name="' . esc_attr( $name ) . '" id="' . esc_attr( $item['id'] ) . '" text="' . __( 'Download PDF', 'gravity-forms-pdf-extended' ) . '"]';
+		$shortcode = '[gravitypdf name="' . esc_attr( $name ) . '" id="' . esc_attr( $item['id'] ) . '" text="' . esc_attr__( 'Download PDF', 'gravity-forms-pdf-extended' ) . '"]';
 
 		/* Display in a readonly field */
 		echo '<input type="text" class="gravitypdf_shortcode" value="' . esc_attr( $shortcode ) . '" readonly="readonly" onfocus="jQuery(this).select();" onclick="jQuery(this).select();" />';
@@ -316,7 +316,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 			/* Add addendum if version is incompatible */
 			if ( ! empty( $template['required_pdf_version'] ) && version_compare( $template['required_pdf_version'], PDF_EXTENDED_VERSION, '>' ) ) {
-				echo ' (+ ' . _x( 'needs', 'Required', 'gravity-forms-pdf-extended' ) . ' v' . $template['required_pdf_version'] . ')';
+				echo ' (+ ' . esc_html_x( 'needs', 'Required', 'gravity-forms-pdf-extended' ) . ' v' . $template['required_pdf_version'] . ')';
 			}
 
 		} else {
@@ -338,9 +338,9 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$delete_nonce    = wp_create_nonce( "gfpdf_delete_nonce_{$form_id}_{$item['id']}" );
 
 		$actions = array(
-			'edit'      => '<a title="' . __( 'Edit this PDF', 'gravity-forms-pdf-extended' ) . '" href="' . $edit_url . '">' . __( 'Edit', 'gravity-forms-pdf-extended' ) . '</a>',
-			'duplicate' => '<a title="' . __( 'Duplicate this PDF', 'gravity-forms-pdf-extended' ) . '" data-id="' . $item['id'] . '" class="submitduplicate" data-nonce="' . $duplicate_nonce . '"  data-fid="' . $form_id . '">' . __( 'Duplicate', 'gravity-forms-pdf-extended' ) . '</a>',
-			'delete'    => '<a title="' . __( 'Delete this PDF', 'gravity-forms-pdf-extended' ) . '" class="submitdelete" data-id="' . $item['id'] . '" data-nonce="' . $delete_nonce . '" data-fid="' . $form_id . '">' . __( 'Delete', 'gravity-forms-pdf-extended' ) . '</a>',
+			'edit'      => '<a title="' . esc_attr__( 'Edit this PDF', 'gravity-forms-pdf-extended' ) . '" href="' . $edit_url . '">' . esc_html__( 'Edit', 'gravity-forms-pdf-extended' ) . '</a>',
+			'duplicate' => '<a title="' . esc_attr__( 'Duplicate this PDF', 'gravity-forms-pdf-extended' ) . '" data-id="' . $item['id'] . '" class="submitduplicate" data-nonce="' . $duplicate_nonce . '"  data-fid="' . $form_id . '">' . esc_html__( 'Duplicate', 'gravity-forms-pdf-extended' ) . '</a>',
+			'delete'    => '<a title="' . esc_attr__( 'Delete this PDF', 'gravity-forms-pdf-extended' ) . '" class="submitdelete" data-id="' . $item['id'] . '" data-nonce="' . $delete_nonce . '" data-fid="' . $form_id . '">' . esc_html__( 'Delete', 'gravity-forms-pdf-extended' ) . '</a>',
 		);
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_pdf_actions/ for more details about this filter */
@@ -377,6 +377,6 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * @since 4.0
 	 */
 	public function no_items() {
-		printf( __( "This form doesn't have any PDFs. Let's go %screate one%s.", 'gravity-forms-pdf-extended' ), "<a href='" . add_query_arg( array( 'pid' => 0 ) ) . "'>", '</a>' );
+		printf( esc_html__( "This form doesn't have any PDFs. Let's go %screate one%s.", 'gravity-forms-pdf-extended' ), "<a href='" . add_query_arg( array( 'pid' => 0 ) ) . "'>", '</a>' );
 	}
 }

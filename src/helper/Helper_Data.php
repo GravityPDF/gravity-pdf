@@ -171,8 +171,8 @@ class Helper_Data {
 	 * @since  4.0
 	 */
 	public function set_plugin_titles() {
-		$this->short_title = __( 'PDF', 'gravity-forms-pdf-extended' );
-		$this->title       = __( 'Gravity PDF', 'gravity-forms-pdf-extended' );
+		$this->short_title = esc_html__( 'PDF', 'gravity-forms-pdf-extended' );
+		$this->title       = esc_html__( 'Gravity PDF', 'gravity-forms-pdf-extended' );
 		$this->slug        = 'pdf';
 	}
 
@@ -196,33 +196,33 @@ class Helper_Data {
 			'GFbaseUrl'                   => $gform->get_plugin_url(),
 			'pluginUrl'                   => PDF_PLUGIN_URL,
 			'spinnerUrl'                  => admin_url( 'images/spinner-2x.gif' ),
-			'spinnerAlt'                  => __( 'Loading...', 'gravity-forms-pdf-extended' ),
-			'general_advanced_show'       => __( 'Show Advanced Options...', 'gravity-forms-pdf-extended' ),
-			'general_advanced_hide'       => __( 'Hide Advanced Options...', 'gravity-forms-pdf-extended' ),
-			'tools_template_copy_confirm' => __( 'Continue', 'gravity-forms-pdf-extended' ),
-			'tools_uninstall_confirm'     => __( 'Uninstall', 'gravity-forms-pdf-extended' ),
-			'tools_cancel'                => __( 'Cancel', 'gravity-forms-pdf-extended' ),
-			'pdf_list_delete_confirm'     => __( 'Delete', 'gravity-forms-pdf-extended' ),
-			'active'                      => __( 'Active', 'gravity-forms-pdf-extended' ),
-			'inactive'                    => __( 'Inactive', 'gravity-forms-pdf-extended' ),
-			'conditionalText'             => __( 'this PDF if', 'gravity-forms-pdf-extended' ),
-			'conditionalShow'             => __( 'Enable', 'gravity-forms-pdf-extended' ),
-			'conditionalHide'             => __( 'Disable', 'gravity-forms-pdf-extended' ),
-			'help_search_placeholder'     => __( 'Search the Gravity PDF Knowledgebase...', 'gravity-forms-pdf-extended' ),
-			'ajax_error'                  => __( 'There was an error processing your request. Please try again.', 'gravity-forms-pdf-extended' ),
-			'update_success'              => __( 'Successfully Updated', 'gravity-forms-pdf-extended' ),
-			'delete_success'              => __( 'Successfully Deleted', 'gravity-forms-pdf-extended' ),
+			'spinnerAlt'                  => esc_html__( 'Loading...', 'gravity-forms-pdf-extended' ),
+			'general_advanced_show'       => esc_html__( 'Show Advanced Options...', 'gravity-forms-pdf-extended' ),
+			'general_advanced_hide'       => esc_html__( 'Hide Advanced Options...', 'gravity-forms-pdf-extended' ),
+			'tools_template_copy_confirm' => esc_html__( 'Continue', 'gravity-forms-pdf-extended' ),
+			'tools_uninstall_confirm'     => esc_html__( 'Uninstall', 'gravity-forms-pdf-extended' ),
+			'tools_cancel'                => esc_html__( 'Cancel', 'gravity-forms-pdf-extended' ),
+			'pdf_list_delete_confirm'     => esc_html__( 'Delete', 'gravity-forms-pdf-extended' ),
+			'active'                      => esc_html__( 'Active', 'gravity-forms-pdf-extended' ),
+			'inactive'                    => esc_html__( 'Inactive', 'gravity-forms-pdf-extended' ),
+			'conditionalText'             => esc_html__( 'this PDF if', 'gravity-forms-pdf-extended' ),
+			'conditionalShow'             => esc_html__( 'Enable', 'gravity-forms-pdf-extended' ),
+			'conditionalHide'             => esc_html__( 'Disable', 'gravity-forms-pdf-extended' ),
+			'help_search_placeholder'     => esc_html__( 'Search the Gravity PDF Knowledgebase...', 'gravity-forms-pdf-extended' ),
+			'ajax_error'                  => esc_html__( 'There was an error processing your request. Please try again.', 'gravity-forms-pdf-extended' ),
+			'update_success'              => esc_html__( 'Successfully Updated', 'gravity-forms-pdf-extended' ),
+			'delete_success'              => esc_html__( 'Successfully Deleted', 'gravity-forms-pdf-extended' ),
 			'custom_fonts'                => json_encode( $custom_fonts ),
-			'no'                          => __( 'No', 'gravity-forms-pdf-extended' ),
-			'yes'                         => __( 'Yes', 'gravity-forms-pdf-extended' ),
-			'standard'                    => __( 'Standard', 'gravity-forms-pdf-extended' ),
-			'migration_start'             => __( 'Migrating site #%s', 'gravity-forms-pdf-extended' ),
-			'migration_complete'          => __( 'Site #%s migration complete.', 'gravity-forms-pdf-extended' ),
-			'migration_error_specific'    => __( 'Migration Error', 'gravity-forms-pdf-extended' ),
-			'migration_error_generic'     => __( 'Site #%s migration errors.', 'gravity-forms-pdf-extended' ),
-			'no_pdfs_found'               => __( "This form doesn't have any PDFs.", 'gravity-forms-pdf-extended' ),
-			'no_pdfs_found_link'          => __( "Let's go create one", 'gravity-forms-pdf-extended' ),
-			'no_template_preview'         => __( "No Template Preview Available", 'gravity-forms-pdf-extended' ),
+			'no'                          => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
+			'yes'                         => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
+			'standard'                    => esc_html__( 'Standard', 'gravity-forms-pdf-extended' ),
+			'migration_start'             => esc_html__( 'Migrating site #%s', 'gravity-forms-pdf-extended' ),
+			'migration_complete'          => esc_html__( 'Site #%s migration complete.', 'gravity-forms-pdf-extended' ),
+			'migration_error_specific'    => esc_html__( 'Migration Error', 'gravity-forms-pdf-extended' ),
+			'migration_error_generic'     => esc_html__( 'Site #%s migration errors.', 'gravity-forms-pdf-extended' ),
+			'no_pdfs_found'               => esc_html__( "This form doesn't have any PDFs.", 'gravity-forms-pdf-extended' ),
+			'no_pdfs_found_link'          => esc_html__( "Let's go create one", 'gravity-forms-pdf-extended' ),
+			'no_template_preview'         => esc_html__( "No Template Preview Available", 'gravity-forms-pdf-extended' ),
 		) );
 	}
 }

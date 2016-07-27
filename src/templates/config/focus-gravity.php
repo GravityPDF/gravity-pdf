@@ -91,28 +91,28 @@ class Focus_Gravity implements Helper_Interface_Config {
 			'fields' => array(
 				'focusgravity_accent_colour' => array(
 					'id'   => 'focusgravity_accent_colour',
-					'name' => __( 'Accent Colour', 'gravity-forms-pdf-extended' ),
+					'name' => esc_html__( 'Accent Colour', 'gravity-forms-pdf-extended' ),
 					'type' => 'color',
-					'desc' => __( 'The accent colour is used for the page and section titles, as well as the border.', 'gravity-forms-pdf-extended' ),
+					'desc' => esc_html__( 'The accent colour is used for the page and section titles, as well as the border.', 'gravity-forms-pdf-extended' ),
 					'std'  => '#e3e3e3',
 				),
 
 				'focusgravity_secondary_colour' => array(
 					'id'   => 'focusgravity_secondary_colour',
-					'name' => __( 'Secondary Colour', 'gravity-forms-pdf-extended' ),
+					'name' => esc_html__( 'Secondary Colour', 'gravity-forms-pdf-extended' ),
 					'type' => 'color',
-					'desc' => __( 'The secondary colour is used with the field labels and for alternate rows.', 'gravity-forms-pdf-extended' ),
+					'desc' => esc_html__( 'The secondary colour is used with the field labels and for alternate rows.', 'gravity-forms-pdf-extended' ),
 					'std'  => '#eaf2fa',
 				),
 
 				'focusgravity_label_format' => array(
 					'id'      => 'focusgravity_label_format',
-					'name'    => __( 'Format', 'gravity-forms-pdf-extended' ),
+					'name'    => esc_html__( 'Format', 'gravity-forms-pdf-extended' ),
 					'type'    => 'radio',
-					'desc'    => __( 'Combine the field label and value or have a distinct label/value.', 'gravity-forms-pdf-extended' ),
+					'desc'    => esc_html__( 'Combine the field label and value or have a distinct label/value.', 'gravity-forms-pdf-extended' ),
 					'options' => array(
-						'combined_label' => __( 'Combined Label', 'gravity-forms-pdf-extended' ),
-						'split_label'    => __( 'Split Label', 'gravity-forms-pdf-extended' ),
+						'combined_label' => esc_html__( 'Combined Label', 'gravity-forms-pdf-extended' ),
+						'split_label'    => esc_html__( 'Split Label', 'gravity-forms-pdf-extended' ),
 					),
 					'std'     => 'combined_label',
 				),
