@@ -37,5 +37,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 | <a href="<?php echo ( $args['view'] == 'download' ) ? $args['pdf']['download'] : $args['pdf']['view']; ?>" <?php echo ( $args['view'] != 'download' ) ? 'target="_blank"' : '' ?>>
-	<?php echo ( $args['view'] == 'download' ) ? __( 'Download PDF', 'gravity-forms-pdf-extended' ) : __( 'View PDF', 'gravity-forms-pdf-extended' ); ?>
+	<?php echo ( $args['view'] == 'download' ) ? esc_html__( 'Download PDF', 'gravity-forms-pdf-extended' ) : esc_html__( 'View PDF', 'gravity-forms-pdf-extended' ); ?>
 </a>

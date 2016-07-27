@@ -37,26 +37,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <div class="wrap about-wrap gfpdf-welcome-screen">
-	<h1><?php _e( 'Welcome to Gravity PDF', 'gravity-forms-pdf-extended' ); ?></h1>
+	<h1><?php esc_html_e( 'Welcome to Gravity PDF', 'gravity-forms-pdf-extended' ); ?></h1>
 
 	<div class="about-text">
-		<?php _e( "You're just minutes away from producing your first highly-customisable PDF document using Gravity Forms data.", 'gravity-forms-pdf-extended' ); ?>
+		<?php esc_html_e( "You're just minutes away from producing your first highly-customisable PDF document using Gravity Forms data.", 'gravity-forms-pdf-extended' ); ?>
 	</div>
 
-	<div class="gfpdf-badge"><?php printf( __( 'Version %s', 'gravity-forms-pdf-extended' ), $args['display_version'] ); ?></div>
+	<div class="gfpdf-badge"><?php printf( esc_html__( 'Version %s', 'gravity-forms-pdf-extended' ), $args['display_version'] ); ?></div>
 
 	<?php $this->tabs(); ?>
 
 	<div class="feature-section two-col">
 
 		<div class="col">
-			<h3><?php _e( 'Where to Start?', 'gravity-forms-pdf-extended' ); ?></h3>
+			<h3><?php esc_html_e( 'Where to Start?', 'gravity-forms-pdf-extended' ); ?></h3>
 
 			<p>
-				<?php printf( __( "Your first step is to review %sGravity PDF's General Settings%s which can be found by navigating to %sForms -> Settings -> PDF%s in your WordPress admin area. From here you'll be able to set defaults for paper size, font face, font colour, and select a PDF template – %swe ship with four completely-free layouts%s – which will be used for all new PDFs. There's even an easy-to-use interface for installing custom fonts.", 'gravity-forms-pdf-extended' ), '<a href="' . esc_url( $gfpdf->data->settings_url ) . '">', '</a>', '<code>', '</code>', '<strong>', '</strong>' ); ?>
+				<?php printf( esc_html__( "Your first step is to review %sGravity PDF's General Settings%s which can be found by navigating to %sForms -> Settings -> PDF%s in your WordPress admin area. From here you'll be able to set defaults for paper size, font face, font colour, and select a PDF template – %swe ship with four completely-free layouts%s – which will be used for all new PDFs. There's even an easy-to-use interface for installing custom fonts.", 'gravity-forms-pdf-extended' ), '<a href="' . esc_url( $gfpdf->data->settings_url ) . '">', '</a>', '<code>', '</code>', '<strong>', '</strong>' ); ?>
 			</p>
 
-			<a href="<?php echo esc_url( $gfpdf->data->settings_url ); ?>" class="button"><?php _e( 'Configure Settings', 'gravity-forms-pdf-extended' ); ?></a>
+			<a href="<?php echo esc_url( $gfpdf->data->settings_url ); ?>" class="button"><?php esc_html_e( 'Configure Settings', 'gravity-forms-pdf-extended' ); ?></a>
 		</div>
 
 		<div class="col">
@@ -72,10 +72,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 
 		<div class="col">
-			<h3><?php _e( 'Setting up a PDF', 'gravity-forms-pdf-extended' ); ?></h3>
+			<h3><?php esc_html_e( 'Setting up a PDF', 'gravity-forms-pdf-extended' ); ?></h3>
 
 			<p>
-				<?php printf( __( 'You can setup individual PDF documents from the %sGravity Form "Forms" page%s in your admin area – located at %sForms -> Forms%s in your navigation. A new %sPDF%s option will be avaliable in each forms\' settings section. The only required fields are %sName%s – an internal identifier – and %sFilename%s – the name used when saving and emailing the PDF.', 'gravity-forms-pdf-extended' ), '<a href="' . esc_url( admin_url( 'admin.php?page=gf_edit_forms' ) ) . '">', '</a>', '<code>', '</code>', '<code>', '</code>', '<em>', '</em>', '<em>', '</em>' ); ?>
+				<?php printf( esc_html__( 'You can setup individual PDF documents from the %sGravity Form "Forms" page%s in your admin area – located at %sForms -> Forms%s in your navigation. A new %sPDF%s option will be avaliable in each forms\' settings section. The only required fields are %sName%s – an internal identifier – and %sFilename%s – the name used when saving and emailing the PDF.', 'gravity-forms-pdf-extended' ), '<a href="' . esc_url( admin_url( 'admin.php?page=gf_edit_forms' ) ) . '">', '</a>', '<code>', '</code>', '<code>', '</code>', '<em>', '</em>', '<em>', '</em>' ); ?>
 			</p>
 
 			<!-- Output a quick Gravity Forms selector so we can let users get redirected to a PDF form of their choice -->
@@ -87,14 +87,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<input type="hidden" name="pid" value="0"/>
 
 					<p>
-						<strong><?php _e( 'Select which Form you want to setup first:', 'gravity-forms-pdf-extended' ); ?></strong><br>
+						<strong><?php esc_html_e( 'Select which Form you want to setup first:', 'gravity-forms-pdf-extended' ); ?></strong><br>
 						<select name="id" class="">
 							<?php foreach ( $args['forms'] as $form ): ?>
 								<option value="<?php echo $form['id']; ?>"><?php echo $form['title']; ?></option>
 							<?php endforeach; ?>
 						</select>
 
-						<button class="button" style="vertical-align: middle"><?php _e( 'Create a PDF', 'gravity-forms-pdf-extended' ); ?></button>
+						<button class="button" style="vertical-align: middle"><?php esc_html_e( 'Create a PDF', 'gravity-forms-pdf-extended' ); ?></button>
 					</p>
 				</form>
 			<?php endif; ?>
@@ -105,23 +105,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="col">
 			<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/welcome-download-shortcode.png' ); ?>">
 
-			<h3><?php _e( 'Simple PDF Download Links', 'gravity-forms-pdf-extended' ); ?></h3>
+			<h3><?php esc_html_e( 'Simple PDF Download Links', 'gravity-forms-pdf-extended' ); ?></h3>
 
-			<p><?php printf( __( 'The %s[gravitypdf]%s shortcode allows you to %seasily place a PDF download link%s on any of the Gravity Forms Confirmation types.', 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<a href="https://gravitypdf.com/documentation/v4/user-shortcodes/">', '</a>' ); ?></p>
+			<p><?php printf( esc_html__( 'The %s[gravitypdf]%s shortcode allows you to %seasily place a PDF download link%s on any of the Gravity Forms Confirmation types.', 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<a href="https://gravitypdf.com/documentation/v4/user-shortcodes/">', '</a>' ); ?></p>
 		</div>
 		<div class="col">
 			<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/welcome-notification-conditional.png' ); ?>">
 
-			<h3><?php _e( 'Automated PDF Emails', 'gravity-forms-pdf-extended' ); ?></h3>
+			<h3><?php esc_html_e( 'Automated PDF Emails', 'gravity-forms-pdf-extended' ); ?></h3>
 
-			<p><?php _e( 'Select a Gravity Form Notification and your PDF will automatically be sent as an attachment. Powerful conditional logic can also be used to determine if a PDF will be included.', 'gravity-forms-pdf-extended' ); ?></p>
+			<p><?php esc_html_e( 'Select a Gravity Form Notification and your PDF will automatically be sent as an attachment. Powerful conditional logic can also be used to determine if a PDF will be included.', 'gravity-forms-pdf-extended' ); ?></p>
 		</div>
 		<div class="col last-feature">
 			<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/welcome-manage-fonts.png' ); ?>">
 
-			<h3><?php _e( 'Custom Fonts', 'gravity-forms-pdf-extended' ); ?></h3>
+			<h3><?php esc_html_e( 'Custom Fonts', 'gravity-forms-pdf-extended' ); ?></h3>
 
-			<p><?php printf( __( 'Make your documents stand out by including your favourite fonts with our %ssimple font manager%s.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v4/user-custom-fonts/">', '</a>' ); ?></p>
+			<p><?php printf( esc_html__( 'Make your documents stand out by including your favourite fonts with our %ssimple font manager%s.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v4/user-custom-fonts/">', '</a>' ); ?></p>
 		</div>
 	</div>
 

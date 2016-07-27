@@ -350,7 +350,7 @@ class Model_Actions extends Helper_Abstract_Model {
 		if ( ! is_file( $path . 'configuration.php' ) ) {
 
 			$return = array(
-				'error' => sprintf( __( 'No configuration.php file found for site #%s', 'gravity-forms-pdf-extended' ), $blog_id ),
+				'error' => sprintf( esc_html__( 'No configuration.php file found for site #%s', 'gravity-forms-pdf-extended' ), $blog_id ),
 			);
 
 			$log->addError( 'AJAX Endpoint Failed', $return );
@@ -371,7 +371,7 @@ class Model_Actions extends Helper_Abstract_Model {
 		} else {
 
 			$return = array(
-				'error' => sprintf( __( 'Database import problem for site #%s', 'gravity-forms-pdf-extended' ), $blog_id ),
+				'error' => sprintf( esc_html__( 'Database import problem for site #%s', 'gravity-forms-pdf-extended' ), $blog_id ),
 			);
 
 			$log->addError( 'AJAX Endpoint Failed', $return );

@@ -37,6 +37,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <pre class="gravitypdf-error">
-	<?php _e( 'PDF link not displayed because PDF is inactive.', 'gravity-forms-pdf-extended' ); ?>
-	<small><?php _e( '(Admin Only Message)', 'gravity-forms-pdf-extended' ); ?></small>
+	<?php esc_html_e( 'PDF link not displayed because PDF is inactive.', 'gravity-forms-pdf-extended' ); ?>
+	<small><?php esc_html_e( '(Admin Only Message)', 'gravity-forms-pdf-extended' ); ?></small>
 </pre>

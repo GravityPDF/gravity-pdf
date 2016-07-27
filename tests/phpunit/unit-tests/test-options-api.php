@@ -650,10 +650,10 @@ class Test_Options_API extends WP_UnitTestCase {
 		$paper_size = $this->options->get_paper_size();
 
 		$this->assertTrue( isset( $paper_size['Common Sizes'] ) );
-		$this->assertTrue( isset( $paper_size['"A" Sizes'] ) );
-		$this->assertTrue( isset( $paper_size['"B" Sizes'] ) );
-		$this->assertTrue( isset( $paper_size['"C" Sizes'] ) );
-		$this->assertTrue( isset( $paper_size['"RA" and "SRA" Sizes'] ) );
+		$this->assertTrue( isset( $paper_size['&quot;A&quot; Sizes'] ) );
+		$this->assertTrue( isset( $paper_size['&quot;B&quot; Sizes'] ) );
+		$this->assertTrue( isset( $paper_size['&quot;C&quot; Sizes'] ) );
+		$this->assertTrue( isset( $paper_size['&quot;RA&quot; and &quot;SRA&quot; Sizes'] ) );
 	}
 
 	/**

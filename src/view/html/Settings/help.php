@@ -41,11 +41,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div id="pdfextended-settings">
 	<div class="wrap about-wrap">
-		<h1><?php _e( 'Getting Help With Gravity PDF', 'gravity-forms-pdf-extended' ); ?></h1>
+		<h1><?php esc_html_e( 'Getting Help With Gravity PDF', 'gravity-forms-pdf-extended' ); ?></h1>
 
 		<div class="about-text">
-			<?php _e( 'This is your portal to find quality help, support and documentation for Gravity PDF', 'gravity-forms-pdf-extended' ); ?>
-			<div class="about-text-disclaimer"><?php printf( __( '(This is not the place to get Gravity Forms support. %sPlease use their official support channel%s for assistance)', 'gravity-forms-pdf-extended' ), '<a href="https://www.gravityhelp.com/support/">', '</a>' ); ?></div>
+			<?php esc_html_e( 'This is your portal to find quality help, support and documentation for Gravity PDF', 'gravity-forms-pdf-extended' ); ?>
+			<div class="about-text-disclaimer"><?php printf( esc_html__( '(This is not the place to get Gravity Forms support. %sPlease use their official support channel%s for assistance)', 'gravity-forms-pdf-extended' ), '<a href="https://www.gravityhelp.com/support/">', '</a>' ); ?></div>
 		</div>
 
 		<div id="search-knowledgebase">
@@ -54,7 +54,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 					<div id="documentation-api" class="postbox">
 						<h3 class="hndle">
-							<span><?php _e( 'Gravity PDF Documentation', 'gravity-forms-pdf-extended' ); ?></span>
+							<span><?php esc_html_e( 'Gravity PDF Documentation', 'gravity-forms-pdf-extended' ); ?></span>
 							<span class="spinner"></span>
 						</h3>
 
@@ -69,44 +69,44 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<div class="hr-divider"></div>
 
-		<h2><?php printf( __( 'Find the %sanswers%s you need…', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ); ?></h2>
+		<h2><?php printf( esc_html__( 'Find the %sanswers%s you need…', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ); ?></h2>
 
 		<div id="dashboard-widgets" class="columns-2">
 			<div class="postbox-container">
 				<a href="https://gravitypdf.com/documentation/v4/five-minute-install/">
-					<span><?php _e( 'Getting Started', 'gravity-forms-pdf-extended' ); ?></span><br>
-					<?php _e( 'Take a look at our quick-start guide and get Gravity PDF up and running in 5 minutes flat!', 'gravity-forms-pdf-extended' ); ?>
+					<span><?php esc_html_e( 'Getting Started', 'gravity-forms-pdf-extended' ); ?></span><br>
+					<?php esc_html_e( 'Take a look at our quick-start guide and get Gravity PDF up and running in 5 minutes flat!', 'gravity-forms-pdf-extended' ); ?>
 				</a>
 			</div>
 
 			<div class="postbox-container">
 				<a href="https://gravitypdf.com/documentation/v4/user-installation/">
-					<span><?php _e( 'Comprehensive Documentation', 'gravity-forms-pdf-extended' ); ?></span><br>
-					<?php _e( 'We’ve got in-depth articles to help you learn the ins and outs of Gravity PDF. From the basic setup to PDF security.', 'gravity-forms-pdf-extended' ); ?>
+					<span><?php esc_html_e( 'Comprehensive Documentation', 'gravity-forms-pdf-extended' ); ?></span><br>
+					<?php esc_html_e( 'We’ve got in-depth articles to help you learn the ins and outs of Gravity PDF. From the basic setup to PDF security.', 'gravity-forms-pdf-extended' ); ?>
 				</a>
 			</div>
 
 			<div class="postbox-container">
 				<a href="https://gravitypdf.com/documentation/v4/user-activation-errors/">
-					<span><?php _e( 'Common Problems', 'gravity-forms-pdf-extended' ); ?></span><br>
-					<?php _e( 'Find out the most common issues user’s experience and ways to resolve them.', 'gravity-forms-pdf-extended' ); ?>
+					<span><?php esc_html_e( 'Common Problems', 'gravity-forms-pdf-extended' ); ?></span><br>
+					<?php esc_html_e( 'Find out the most common issues user’s experience and ways to resolve them.', 'gravity-forms-pdf-extended' ); ?>
 				</a>
 			</div>
 
 			<div class="postbox-container">
 				<a href="https://gravitypdf.com/documentation/v4/developer-start-customising/">
-					<span><?php _e( 'Developer Documentation', 'gravity-forms-pdf-extended' ); ?></span><br>
-					<?php _e( 'You’ll find all the info and examples you’ll need to create your own custom PDF templates.', 'gravity-forms-pdf-extended' ); ?>
+					<span><?php esc_html_e( 'Developer Documentation', 'gravity-forms-pdf-extended' ); ?></span><br>
+					<?php esc_html_e( 'You’ll find all the info and examples you’ll need to create your own custom PDF templates.', 'gravity-forms-pdf-extended' ); ?>
 				</a>
 			</div>
 		</div>
 
 		<div class="center">
-			<a href="https://gravitypdf.com/documentation/v4/" class="button button-primary button-large"><?php _e( 'View All Documentation', 'gravity-forms-pdf-extended' ); ?></a>
-			<a href="https://gravitypdf.com/support/#contact-support" class="button button-primary button-large"><?php _e( 'Contact Support', 'gravity-forms-pdf-extended' ); ?></a>
+			<a href="https://gravitypdf.com/documentation/v4/" class="button button-primary button-large"><?php esc_html_e( 'View All Documentation', 'gravity-forms-pdf-extended' ); ?></a>
+			<a href="https://gravitypdf.com/support/#contact-support" class="button button-primary button-large"><?php esc_html_e( 'Contact Support', 'gravity-forms-pdf-extended' ); ?></a>
 
 			<p>
-				<?php printf( __( 'Our support hours are 9:00am-5:00pm Monday to Friday, %sSydney Australia time%s (public holidays excluded).', 'gravity-forms-pdf-extended' ), '<br><a href="http://www.timeanddate.com/worldclock/australia/sydney">', '</a>' ); ?>
+				<?php printf( esc_html__( 'Our support hours are 9:00am-5:00pm Monday to Friday, %sSydney Australia time%s (public holidays excluded).', 'gravity-forms-pdf-extended' ), '<br><a href="http://www.timeanddate.com/worldclock/australia/sydney">', '</a>' ); ?>
 			</p>
 		</div>
 
@@ -120,9 +120,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <script type="text/template" id="GravityPDFSearchResultsDocumentation">
 	{{ if(collection.length === 0) { }}
-		<li><?php _e( "It doesn't look like there are any topics related to your issue.", 'gravity-forms-pdf-extended' ); ?></li>
+		<li><?php esc_html_e( "It doesn't look like there are any topics related to your issue.", 'gravity-forms-pdf-extended' ); ?></li>
 	{{ } else { }}
-		<li><h3><?php _e( 'Maybe one of these articles will help...', 'gravity-forms-pdf-extended' ); ?></h3></li>
+		<li><h3><?php esc_html_e( 'Maybe one of these articles will help...', 'gravity-forms-pdf-extended' ); ?></h3></li>
 	{{ } }}
 
 	{{ _.each(collection, function (model) { }}

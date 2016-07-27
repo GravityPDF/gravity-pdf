@@ -45,7 +45,7 @@ $list_items = $args['list_items'];
 	<span>
 		<i class="fa fa-file-o"></i>
 		<?php echo $args['title']; ?>
-		<a id="add-new-pdf" class="add-new-h2" href="<?php echo $args['add_new_url'] ?>"><?php _e( 'Add New', 'gravityforms' ) ?></a>
+		<a id="add-new-pdf" class="add-new-h2" href="<?php echo esc_url($args['add_new_url']); ?>"><?php esc_html_e( 'Add New', 'gravityforms' ) ?></a>
 	</span>
 </h3>
 
@@ -53,8 +53,8 @@ $list_items = $args['list_items'];
 	<?php $list_items->display(); ?>
 </form>
 
-<div id="delete-confirm" title="<?php _e( 'Delete PDF?', 'gravity-forms-pdf-extended' ); ?>" style="display: none;">
-	<?php printf( __( "Warning! You are about to delete this PDF. Select 'Delete' to delete, 'Cancel' to stop.", 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ); ?>
+<div id="delete-confirm" title="<?php esc_attr_e( 'Delete PDF?', 'gravity-forms-pdf-extended' ); ?>" style="display: none;">
+	<?php esc_html_e( "Warning! You are about to delete this PDF. Select 'Delete' to delete, 'Cancel' to stop.", 'gravity-forms-pdf-extended' ); ?>
 </div>
 
 

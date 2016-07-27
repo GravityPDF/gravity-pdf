@@ -37,6 +37,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <pre class="gravitypdf-error">
-	<?php _e( 'No Gravity Form entry ID passed to Gravity PDF. Ensure you pass the entry ID via the confirmation url query string – using either "entry" or "lid" as the query string name – or by passing an ID directly to the shortcode.', 'gravity-forms-pdf-extended' ); ?>
-	<small><?php _e( '(Admin Only Message)', 'gravity-forms-pdf-extended' ); ?></small>
+	<?php esc_html_e( 'No Gravity Form entry ID passed to Gravity PDF. Ensure you pass the entry ID via the confirmation url query string – using either "entry" or "lid" as the query string name – or by passing an ID directly to the shortcode.', 'gravity-forms-pdf-extended' ); ?>
+	<small><?php esc_html_e( '(Admin Only Message)', 'gravity-forms-pdf-extended' ); ?></small>
 </pre>

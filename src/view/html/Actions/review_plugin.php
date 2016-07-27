@@ -38,13 +38,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div style="font-size:15px; line-height: 25px">
 
-	<strong><?php _e( "Hey, we just noticed you've generated your 100th PDF using Gravity PDF!", 'gravity-forms-pdf-extended' ); ?></strong>
+	<strong><?php esc_html_e( "Hey, we just noticed you've generated your 100th PDF using Gravity PDF!", 'gravity-forms-pdf-extended' ); ?></strong>
 
 	<br>
 
-	<?php printf( __( "If you love how much time you've saved using Gravity PDF then do us a big favour and %sgive it a five-star rating on WordPress.org%s.", 'gravity-forms-pdf-extended' ), '<a href="https://wordpress.org/support/view/plugin-reviews/gravity-forms-pdf-extended">', '</a>' ); ?>
+	<?php printf( esc_html__( "If you love how much time you've saved using Gravity PDF then do us a big favour and %sgive it a five-star rating on WordPress.org%s.", 'gravity-forms-pdf-extended' ), '<a href="https://wordpress.org/support/view/plugin-reviews/gravity-forms-pdf-extended">', '</a>' ); ?>
 
 	<br>
 
-	<?php printf( __( '%sOr let your Twitter follows know how good it is%s (or anyone else for that matter).', 'gravity-forms-pdf-extended' ), '<a href="https://goo.gl/07NhJQ">', '</a>' ); ?>
+	<?php printf( esc_html__( '%sOr let your Twitter follows know how good it is%s (or anyone else for that matter).', 'gravity-forms-pdf-extended' ), '<a href="https://goo.gl/07NhJQ">', '</a>' ); ?>
 </div>

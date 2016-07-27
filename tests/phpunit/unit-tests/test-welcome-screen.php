@@ -172,6 +172,6 @@ class Test_Welcome_Screen extends WP_UnitTestCase {
 
 		/* Test update screen */
 		$_GET['page'] = 'gfpdf-update';
-		$this->assertEquals( "What's new in Gravity PDF?", $this->model->add_page_title( 'Title' ) );
+		$this->assertEquals( "What&#039;s new in Gravity PDF?", $this->model->add_page_title( 'Title' ) );
 	}
 }

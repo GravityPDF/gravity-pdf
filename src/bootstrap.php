@@ -145,7 +145,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @since 4.0
 	 */
 	public function __call( $name, $arguments ) {
-		trigger_error( sprintf( __( '"%s" has been depreciated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ), E_USER_DEPRECATED );
+		trigger_error( sprintf( esc_html__( '"%s" has been depreciated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ), E_USER_DEPRECATED );
 	}
 
 	/**
@@ -157,7 +157,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @since  4.0
 	 */
 	public static function __callStatic( $name, $arguments ) {
-		trigger_error( sprintf( __( '"%s" has been depreciated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ), E_USER_DEPRECATED );
+		trigger_error( sprintf( esc_html__( '"%s" has been depreciated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ), E_USER_DEPRECATED );
 	}
 
 	/**
@@ -375,7 +375,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function plugin_action_links( $links ) {
 
 		$action_links = array(
-			'settings' => '<a href="' . esc_url( $this->data->settings_url ) . '" title="' . esc_attr( __( 'View Gravity PDF Settings', 'gravity-forms-pdf-extended' ) ) . '">' . __( 'Settings', 'gravity-forms-pdf-extended' ) . '</a>',
+			'settings' => '<a href="' . esc_url( $this->data->settings_url ) . '" title="' . esc_attr__( 'View Gravity PDF Settings', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Settings', 'gravity-forms-pdf-extended' ) . '</a>',
 		);
 
 		return array_merge( $action_links, $links );
@@ -395,9 +395,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		if ( $file == PDF_PLUGIN_BASENAME ) {
 			$row_meta = array(
-				'docs'    => '<a href="' . esc_url( 'https://gravitypdf.com/documentation/v4/five-minute-install/' ) . '" title="' . esc_attr( __( 'View Gravity PDF Documentation', 'gravity-forms-pdf-extended' ) ) . '">' . __( 'Docs', 'gravity-forms-pdf-extended' ) . '</a>',
-				'support' => '<a href="' . esc_url( $this->data->settings_url . '&tab=help' ) . '" title="' . esc_attr( __( 'Get Help and Support', 'gravity-forms-pdf-extended' ) ) . '">' . __( 'Support', 'gravity-forms-pdf-extended' ) . '</a>',
-				'shop'    => '<a href="' . esc_url( 'https://gravitypdf.com/shop/' ) . '" title="' . esc_attr( __( 'View Gravity PDF Theme Shop', 'gravity-forms-pdf-extended' ) ) . '">' . __( 'Theme Shop', 'gravity-forms-pdf-extended' ) . '</a>',
+				'docs'    => '<a href="' . esc_url( 'https://gravitypdf.com/documentation/v4/five-minute-install/' ) . '" title="' . esc_attr__( 'View Gravity PDF Documentation', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Docs', 'gravity-forms-pdf-extended' ) . '</a>',
+				'support' => '<a href="' . esc_url( $this->data->settings_url . '&tab=help' ) . '" title="' . esc_attr__( 'Get Help and Support', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Support', 'gravity-forms-pdf-extended' ) . '</a>',
+				'shop'    => '<a href="' . esc_url( 'https://gravitypdf.com/shop/' ) . '" title="' . esc_attr__( 'View Gravity PDF Theme Shop', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Theme Shop', 'gravity-forms-pdf-extended' ) . '</a>',
 			);
 
 			return array_merge( $links, $row_meta );
@@ -640,7 +640,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @since 4.0
 	 */
 	public function add_gf_logger( $loggers ) {
-		$loggers['gravity-pdf'] = __( 'Gravity PDF', 'gravity-forms-pdf-extended' );
+		$loggers['gravity-pdf'] = esc_html__( 'Gravity PDF', 'gravity-forms-pdf-extended' );
 
 		return $loggers;
 	}

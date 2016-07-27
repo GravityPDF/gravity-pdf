@@ -140,7 +140,7 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 			}
 		}
 
-		return new WP_Error( 'invalid_path', sprintf( __( 'Cannot find file %s', 'gravity-forms-pdf-extended' ), $filename ) );
+		return new WP_Error( 'invalid_path', sprintf( esc_html__( 'Cannot find file %s', 'gravity-forms-pdf-extended' ), $filename ) );
 	}
 
 	/**

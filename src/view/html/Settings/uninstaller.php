@@ -41,7 +41,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <h3>
     <span>
         <i class="fa fa-times"></i>
-        <?php _e( 'Uninstall Gravity PDF', 'gravity-forms-pdf-extended' ); ?>
+        <?php esc_html_e( 'Uninstall Gravity PDF', 'gravity-forms-pdf-extended' ); ?>
     </span>
 </h3>
 
@@ -49,16 +49,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<h3><i class="fa fa-exclamation-triangle gf_invalid"></i> Warning</h3>
 
 	<div class="gf_delete_notice">
-		<?php printf( __( '%sThis operation deletes ALL Gravity PDF data and deactivates the plugin.%s If you continue, all settings, configuration, custom templates and fonts will be removed.', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ); ?>
+		<?php printf( esc_html__( '%sThis operation deletes ALL Gravity PDF data and deactivates the plugin.%s If you continue, all settings, configuration, custom templates and fonts will be removed.', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ); ?>
 	</div>
 
 	<form method="post">
 		<?php wp_nonce_field( 'gfpdf-uninstall-plugin', 'gfpdf-uninstall-plugin' ) ?>
 		<input type="hidden" name="gfpdf_uninstall" value="1"/>
-		<input id="gfpdf-uninstall" type="submit" class="button" value="<?php _e( 'Uninstall Gravity PDF', 'gravity-forms-pdf-extended' ); ?>" name="uninstall">
+		<input id="gfpdf-uninstall" type="submit" class="button" value="<?php esc_attr_e( 'Uninstall Gravity PDF', 'gravity-forms-pdf-extended' ); ?>" name="uninstall">
 	</form>
 </div>
 
-<div id="uninstall-confirm" title="<?php _e( 'Uninstall Gravity PDF', 'gravity-forms-pdf-extended' ); ?>" style="display: none;">
-	<?php printf( __( "Warning! ALL Gravity PDF data, %sincluding PDF configurations and ALL custom templates%s will be deleted. This cannot be undone. Select 'Uninstall' to delete, 'Cancel' to stop.", 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ); ?>
+<div id="uninstall-confirm" title="<?php esc_attr_e( 'Uninstall Gravity PDF', 'gravity-forms-pdf-extended' ); ?>" style="display: none;">
+	<?php printf( esc_html__( "Warning! ALL Gravity PDF data, %sincluding PDF configurations and ALL custom templates%s will be deleted. This cannot be undone. Select 'Uninstall' to delete, 'Cancel' to stop.", 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ); ?>
 </div>
