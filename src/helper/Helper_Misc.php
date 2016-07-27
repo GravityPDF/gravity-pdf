@@ -465,7 +465,7 @@ class Helper_Misc {
 
 						throw new Exception( 'Could not create folder at ' . $destination . $files->getSubPathName() );
 					}
-				} elseif ( ! file_exists( $destination . $files->getSubPathName() ) ) {
+				} elseif ( ! $fileinfo->isDir() ) {
 					if ( ! @copy( $fileinfo, $destination . $files->getSubPathName() ) ) {
 						$this->log->addError( 'Failed Creating File', array(
 							'file' => $destination . $files->getSubPathName(),
