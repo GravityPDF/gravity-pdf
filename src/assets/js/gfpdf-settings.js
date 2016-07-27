@@ -363,10 +363,10 @@
 
 						if (is_active) {
 							that.src = that.src.replace('active1.png', 'active0.png');
-							$(that).attr('title', GFPDF.inactive).attr('alt', GFPDF.inactive);
+							$(that).attr('title', GFPDF.inactiveName).attr('alt', GFPDF.inactiveName);
 						} else {
 							that.src = that.src.replace('active0.png', 'active1.png');
-							$(that).attr('title', GFPDF.active).attr('alt', GFPDF.active);
+							$(that).attr('title', GFPDF.activeName).attr('alt', GFPDF.activeName);
 						}
 
 						/* Set up ajax data */
@@ -469,6 +469,13 @@
 									$newRow.addClass('alternate');
 									background = '#f9f9f9';
 								}
+
+						        /* Add fix for toggle image */
+						        var toggle_src = $state.attr('src');
+						        $state
+							        .attr('title', GFPDF.inactiveName)
+							        .attr('alt', GFPDF.inactiveName)
+							        .attr('src', toggle_src.replace('active1.png', 'active0.png'));
 
 								/* Add row to node and fade in */
 								$newRow.hide().insertAfter($row).fadeIn().animate({backgroundColor: background});
