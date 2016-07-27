@@ -66,43 +66,43 @@ msgstr ""
 msgid "The minimum requirements for Gravity PDF have not been met. Please fix the issue(s) below to continue:"
 msgstr ""
 
-#: src/bootstrap.php:293, src/bootstrap.php:317, src/depreciated.php:113, src/depreciated.php:137
+#: src/bootstrap.php:295, src/bootstrap.php:319, src/depreciated.php:113, src/depreciated.php:137
 msgid "\"%s\" has been depreciated as of Gravity PDF 4.0"
 msgstr ""
 
-#: src/bootstrap.php:741
+#: src/bootstrap.php:755
 msgid "View Gravity PDF Settings"
 msgstr ""
 
-#: src/bootstrap.php:741
+#: src/bootstrap.php:755
 msgid "Settings"
 msgstr ""
 
-#: src/bootstrap.php:781
+#: src/bootstrap.php:795
 msgid "View Gravity PDF Documentation"
 msgstr ""
 
-#: src/bootstrap.php:781
+#: src/bootstrap.php:795
 msgid "Docs"
 msgstr ""
 
-#: src/bootstrap.php:783
+#: src/bootstrap.php:797
 msgid "Get Help and Support"
 msgstr ""
 
-#: src/bootstrap.php:783
+#: src/bootstrap.php:797
 msgid "Support"
 msgstr ""
 
-#: src/bootstrap.php:785
+#: src/bootstrap.php:799
 msgid "View Gravity PDF Theme Shop"
 msgstr ""
 
-#: src/bootstrap.php:785
+#: src/bootstrap.php:799
 msgid "Theme Shop"
 msgstr ""
 
-#: src/bootstrap.php:1271, src/controller/Controller_Shortcodes.php:301, src/helper/Helper_Data.php:349
+#: src/bootstrap.php:1285, src/controller/Controller_Shortcodes.php:301, src/helper/Helper_Data.php:349
 msgid "Gravity PDF"
 msgstr ""
 
@@ -126,7 +126,7 @@ msgstr ""
 msgid "There was a problem uninstalling Gravity PDF. Please try again."
 msgstr ""
 
-#: src/controller/Controller_PDF.php:609, src/view/View_PDF.php:475
+#: src/controller/Controller_PDF.php:611, src/view/View_PDF.php:475
 msgid "There was a problem generating your PDF"
 msgstr ""
 
@@ -366,132 +366,132 @@ msgstr ""
 msgid "Legacy"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1909, src/helper/Helper_PDF_List_Table.php:637
+#: src/helper/abstract/Helper_Abstract_Options.php:1911, src/helper/Helper_PDF_List_Table.php:637
 msgctxt "Required"
 msgid "needs"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1967
+#: src/helper/abstract/Helper_Abstract_Options.php:1971
 msgid "Template Name"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1969
+#: src/helper/abstract/Helper_Abstract_Options.php:1973
 msgid "Version"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1971
+#: src/helper/abstract/Helper_Abstract_Options.php:1975
 msgid "Description"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1973
+#: src/helper/abstract/Helper_Abstract_Options.php:1977
 msgid "Author"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1975
+#: src/helper/abstract/Helper_Abstract_Options.php:1979
 msgid "Group"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1977, src/helper/Helper_PDF.php:727
+#: src/helper/abstract/Helper_Abstract_Options.php:1981, src/helper/Helper_PDF.php:727
 msgid "Required PDF Version"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2157
+#: src/helper/abstract/Helper_Abstract_Options.php:2165
 msgid "Unicode"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2185
+#: src/helper/abstract/Helper_Abstract_Options.php:2193
 msgid "Indic"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2195
+#: src/helper/abstract/Helper_Abstract_Options.php:2203
 msgid "Arabic"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2207
+#: src/helper/abstract/Helper_Abstract_Options.php:2215
 msgid "Other"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2311, src/model/Model_Settings.php:619
+#: src/helper/abstract/Helper_Abstract_Options.php:2319, src/model/Model_Settings.php:639
 msgid "User-Defined Fonts"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2449
+#: src/helper/abstract/Helper_Abstract_Options.php:2457
 msgid "Copy"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2451
+#: src/helper/abstract/Helper_Abstract_Options.php:2459
 msgid "Print - Low Resolution"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2453
+#: src/helper/abstract/Helper_Abstract_Options.php:2461
 msgid "Print - High Resolution"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2455
+#: src/helper/abstract/Helper_Abstract_Options.php:2463
 msgid "Modify"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2457
+#: src/helper/abstract/Helper_Abstract_Options.php:2465
 msgid "Annotate"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2459
+#: src/helper/abstract/Helper_Abstract_Options.php:2467
 msgid "Fill Forms"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2461
+#: src/helper/abstract/Helper_Abstract_Options.php:2469
 msgid "Extract"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2463
+#: src/helper/abstract/Helper_Abstract_Options.php:2471
 msgid "Assemble"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2713
+#: src/helper/abstract/Helper_Abstract_Options.php:2721
 msgid "Settings updated."
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2951, src/helper/abstract/Helper_Abstract_Options.php:2967, src/helper/abstract/Helper_Abstract_Options.php:2983, tests/phpunit/unit-tests/test-settings.php:527, tests/phpunit/unit-tests/test-settings.php:529, tests/phpunit/unit-tests/test-settings.php:531
+#: src/helper/abstract/Helper_Abstract_Options.php:2959, src/helper/abstract/Helper_Abstract_Options.php:2975, src/helper/abstract/Helper_Abstract_Options.php:2991, tests/phpunit/unit-tests/test-settings.php:527, tests/phpunit/unit-tests/test-settings.php:529, tests/phpunit/unit-tests/test-settings.php:531
 msgid "PDF Settings could not be saved. Please enter all required information below."
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:4047, src/helper/abstract/Helper_Abstract_Options.php:4049
+#: src/helper/abstract/Helper_Abstract_Options.php:4055, src/helper/abstract/Helper_Abstract_Options.php:4057
 msgid "Select Media"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:4051
+#: src/helper/abstract/Helper_Abstract_Options.php:4059
 msgid "Upload File"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:4365
+#: src/helper/abstract/Helper_Abstract_Options.php:4373
 msgid "Width"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:4367
+#: src/helper/abstract/Helper_Abstract_Options.php:4375
 msgid "Height"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:4373
+#: src/helper/abstract/Helper_Abstract_Options.php:4381
 msgid "mm"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:4375
+#: src/helper/abstract/Helper_Abstract_Options.php:4383
 msgid "inches"
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_Options.php:4495
+#: src/helper/abstract/Helper_Abstract_Options.php:4503
 msgid "The callback used for the %s setting is missing."
 msgstr ""
 
-#: src/helper/abstract/Helper_Abstract_View.php:263
+#: src/helper/abstract/Helper_Abstract_View.php:285
 msgid "Cannot find file %s"
 msgstr ""
 
-#: src/helper/fields/Field_Products.php:333
+#: src/helper/fields/Field_Products.php:367
 msgid "Subtotal"
 msgstr ""
 
-#: src/helper/fields/Field_Products.php:341
+#: src/helper/fields/Field_Products.php:375
 msgid "Shipping (%s)"
 msgstr ""
 
@@ -527,11 +527,11 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: src/helper/Helper_Data.php:411, src/helper/Helper_PDF_List_Table.php:497, src/helper/Helper_PDF_List_Table.php:499, src/model/Model_Form_Settings.php:2057
+#: src/helper/Helper_Data.php:411, src/helper/Helper_PDF_List_Table.php:497, src/helper/Helper_PDF_List_Table.php:499, src/model/Model_Form_Settings.php:2059
 msgid "Active"
 msgstr ""
 
-#: src/helper/Helper_Data.php:413, src/helper/Helper_PDF_List_Table.php:497, src/helper/Helper_PDF_List_Table.php:499, src/model/Model_Form_Settings.php:2057
+#: src/helper/Helper_Data.php:413, src/helper/Helper_PDF_List_Table.php:497, src/helper/Helper_PDF_List_Table.php:499, src/model/Model_Form_Settings.php:2059
 msgid "Inactive"
 msgstr ""
 
@@ -1008,7 +1008,7 @@ msgid "Show Page Names"
 msgstr ""
 
 #: src/helper/Helper_Options_Fields.php:1259
-msgid "Display form page names on the PDF (only works when using page break field)."
+msgid "Display form page names on the PDF. Requires the use of the %sPage Break field%s."
 msgstr ""
 
 #: src/helper/Helper_Options_Fields.php:1299
@@ -1187,7 +1187,7 @@ msgstr ""
 msgid "PDF successfully deleted."
 msgstr ""
 
-#: src/model/Model_Form_Settings.php:1911
+#: src/model/Model_Form_Settings.php:1913
 msgid "PDF successfully duplicated."
 msgstr ""
 
@@ -1227,35 +1227,35 @@ msgstr ""
 msgid "The PDF could not be saved."
 msgstr ""
 
-#: src/model/Model_Settings.php:465
+#: src/model/Model_Settings.php:485
 msgid "There was a problem copying all PDF templates to %s. Please try again."
 msgstr ""
 
-#: src/model/Model_Settings.php:475
+#: src/model/Model_Settings.php:495
 msgid "Gravity PDF Custom Templates successfully installed to %s."
 msgstr ""
 
-#: src/model/Model_Settings.php:719
+#: src/model/Model_Settings.php:739
 msgid "Could not locate font on web server: %s"
 msgstr ""
 
-#: src/model/Model_Settings.php:731
+#: src/model/Model_Settings.php:751
 msgid "There was a problem installing the font %s. Please try again."
 msgstr ""
 
-#: src/model/Model_Settings.php:1051
+#: src/model/Model_Settings.php:1071
 msgid "Could not delete Gravity PDF font correctly. Please try again."
 msgstr ""
 
-#: src/model/Model_Settings.php:1113
+#: src/model/Model_Settings.php:1133
 msgid "Required fields have not been included."
 msgstr ""
 
-#: src/model/Model_Settings.php:1147
+#: src/model/Model_Settings.php:1167
 msgid "Font name is not valid. Only alphanumeric characters and spaces are accepted."
 msgstr ""
 
-#: src/model/Model_Settings.php:1183
+#: src/model/Model_Settings.php:1203
 msgid "A font with the same name already exists. Try a different name."
 msgstr ""
 
