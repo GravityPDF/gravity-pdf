@@ -23,7 +23,7 @@ if ( ! class_exists('GFForms')) {
  * $form_data (The processed entry data stored in an array)
  * $settings (the current PDF configuration)
  * $fields (an array of Gravity Form fields which can be accessed with their ID number)
- * $config (The initialised template config class – /config/focus-gravity.php)
+ * $config (The initialised template config class – eg. /config/focus-gravity.php)
  * $gfpdf (the main Gravity PDF object containing all our helper classes)
  * $args (contains an array of all variables - the ones being described right now - passed to the template)
  */
@@ -273,7 +273,7 @@ $show_empty           = ( ! empty( $settings['show_empty'] ) && $settings['show_
  *
  * @var array
  */
-$config = array(
+$html_config = array(
     'settings' => $settings,
     'meta'     => array(
         'echo'                     => true, /* whether to output the HTML or return it */
@@ -295,5 +295,5 @@ $config = array(
  * You can access Gravity PDFs common functions and classes through our API wrapper class "GPDFAPI"
  */
 $pdf = GPDFAPI::get_pdf_class();
-$pdf->process_html_structure($entry, GPDFAPI::get_pdf_class('model'), $config);
+$pdf->process_html_structure($entry, GPDFAPI::get_pdf_class('model'), $html_config);
 
