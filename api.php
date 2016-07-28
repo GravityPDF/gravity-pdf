@@ -230,7 +230,7 @@ final class GPDFAPI {
 			return static::get_mvc_class( 'Model_PDF');
 		}
 
-		return new WP_Error( 'invalid_type', __( 'The $type parameter is invalid. Only "view" and "model" are accepted', 'gravity-forms-pdf-extended' ) );
+		return new WP_Error( 'invalid_type', esc_html__( 'The $type parameter is invalid. Only "view" and "model" are accepted', 'gravity-forms-pdf-extended' ) );
 	}
 
 	/**
@@ -375,7 +375,7 @@ final class GPDFAPI {
 
 		/* Check the option doesn't already exist */
 		if ( null !== $options->get_option( $key, null ) ) {
-			return new WP_Error( 'option_exists', __( 'The option key %s already exists. Use GPDFAPI::update_plugin_option instead', 'gravity-forms-pdf-extended' ) );
+			return new WP_Error( 'option_exists', esc_html__( 'The option key %s already exists. Use GPDFAPI::update_plugin_option instead', 'gravity-forms-pdf-extended' ) );
 		}
 
 		return static::update_plugin_option( $key, $value );
