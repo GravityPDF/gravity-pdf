@@ -1786,7 +1786,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			}
 		}
 
-		return new WP_Error( 'pdf_configuration_error', 'Could not find PDF configuration requested' );
+		return new WP_Error( 'pdf_configuration_error', esc_html__( 'Could not find PDF configuration requested', 'gravity-forms-pdf-extended' ) );
 	}
 
 	/**
