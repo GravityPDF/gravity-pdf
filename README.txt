@@ -4,8 +4,8 @@ Plugin URI: https://gravitypdf.com/
 Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.2
-Tested up to: 4.5
-Stable tag: 4.0.2
+Tested up to: 4.6
+Stable tag: 4.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
 
@@ -85,6 +85,18 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 
 == Changelog ==
 
+= 4.0.3 =
+* Fix incorrect product calculations when using decimal comma format eg. 1.000,50 (GH#442)
+* Rename $config variable to $html_config in core templates (GH#451)
+* Don't chain CSS in our default setters or set fixed font size in templates (GH#446)
+* Fix display issues for certain characters with DejaVu Sans font family in PDFs (GH#456)
+* Ensure QueryPath produces valid UTF-8 data after processing (GH#452)
+* Re-running the Custom Template Setup will override working directory templates with same name (GH#457)
+* Fixed legacy Name field PHP warnings (GH#448)
+* Replace translations with their escaped function counterparts (GH#463)
+* Duplicating PDFs will now be inactive by default (GH#458)
+* Tweaked the "Show Page Names" field description (GH#449)
+
 = 4.0.2 =
 * Fixes issue displaying address fields in v4 PDFs (GH#429)
 * Fixes internal logging issues and added Gravity Forms 1.1 support (GF#428)
@@ -155,6 +167,9 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 See [CHANGELOG.txt](https://github.com/GravityPDF/gravity-pdf/blob/master/CHANGELOG.txt) for v3 changelog history.
 
 == Upgrade Notice ==
+
+= 4.0.3 =
+The core PDF templates have been updated to version 1.1. If you've previously run the Custom Template Setup make sure you run it again to take advantage of the changes.
 
 = 4.0 =
 **WARNING**: This major release is not 100% backwards compatibile with v3. Review our upgrade guide AND do a full backup before proceeding with the update (https://goo.gl/htd6CK).
