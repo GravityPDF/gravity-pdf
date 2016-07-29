@@ -1841,12 +1841,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			wp_editor( stripslashes( $value ), 'gfpdf_settings_' . $args['id'], apply_filters( 'gfpdf_rich_editor_settings', [
 				'textarea_name' => 'gfpdf_settings[' . $args['id'] . ']',
 				'textarea_rows' => $rows,
+				'editor_height' => $rows * 10, /* estimate row height at 10px */
 				'editor_class'  => 'gfpdf_settings_' . $args['id'] . ' ' . $class,
 				'autop'         => false,
 			] ) );
 			$html = ob_get_clean();
 		} else {
-			$html = '<textarea class="large-text" rows="10" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']">' . esc_textarea( stripslashes( $value ) ) . '</textarea>';
+			$html = '<textarea class="large-text" rows="'. $rows . '" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']">' . esc_textarea( stripslashes( $value ) ) . '</textarea>';
 		}
 
 		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
