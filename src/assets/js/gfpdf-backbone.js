@@ -330,7 +330,7 @@
 					}, this);
 				} else {
 					/* Display getting started message to user */
-					this.$el.html(_.template($( '#GravityPDFFontsEmpty' ).html(), UnderscoreSettingsOverride));
+					this.$el.html(_.template($( '#GravityPDFFontsEmpty' ).html(), null, UnderscoreSettingsOverride));
 				}
 
 				/* Return for chaining purposes */
@@ -438,7 +438,7 @@
 			render: function() {
 
 				/* Set up our Underscore template file */
-				this.template = _.template($( this.template ).html(), UnderscoreSettingsOverride);
+				this.template = _.template($( this.template ).html(), null, UnderscoreSettingsOverride);
 
 				/* Set View Element HTML to our Underscore template, passing in our model */
 				this.$el.html(this.template({
@@ -1016,7 +1016,7 @@
 
 			render: function() {
 				/* set up out template */
-				this.template = _.template($(this.template).html(), UnderscoreSettingsOverride);
+				this.template = _.template($(this.template).html(), null, UnderscoreSettingsOverride);
 
 				/* show the loading spinner */
 				this.showSpinner();
