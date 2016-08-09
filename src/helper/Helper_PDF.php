@@ -856,7 +856,7 @@ class Helper_PDF {
 
 			$password        = ( isset( $this->settings['password'] ) ) ? $this->gform->process_tags( $this->settings['password'], $this->form, $this->entry ) : '';
 			$privileges      = ( isset( $this->settings['privileges'] ) ) ? $this->settings['privileges'] : array();
-			$master_password = ( isset( $this->settings['master_password'] ) ) ? $this->gform->process_tags( $this->settings['master_password'], $this->form, $this->entry ) : '';
+			$master_password = ( isset( $this->settings['master_password'] ) ) ? $this->gform->process_tags( $this->settings['master_password'], $this->form, $this->entry ) : null;
 
 			$this->mpdf->SetProtection( $privileges, $password, $master_password, 128 );
 		}
