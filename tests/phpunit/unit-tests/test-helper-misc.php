@@ -183,7 +183,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	public function provider_test_fix_header_footer() {
 		return array(
 			array(
-				'<img src="my-image.jpg" alt="My Image" class="header-footer-img">',
+				'<p><img src="my-image.jpg" alt="My Image" class="header-footer-img"></p>',
 				'<img src="my-image.jpg" alt="My Image" />',
 			),
 			array(
@@ -191,22 +191,22 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 				'<div id="header"><img src="my-image.jpg" alt="My Image" /></div>',
 			),
 			array(
-				'<span>Intro</span> <img src="my-image.jpg" alt="My Image" class="header-footer-img"> <span>Outro</span>',
+				'<p><span>Intro</span> <img src="my-image.jpg" alt="My Image" class="header-footer-img"> <span>Outro</span></p>',
 				'<span>Intro</span> <img src="my-image.jpg" alt="My Image" /> <span>Outro</span>',
 			),
 			array(
-				'<b>This is bold</b>. <i>This is italics</i> <img src="image.jpg" class="header-footer-img">',
+				'<p><b>This is bold</b>. <i>This is italics</i> <img src="image.jpg" class="header-footer-img"></p>',
 				'<b>This is bold</b>. <i>This is italics</i> <img src="image.jpg" />',
 			),
 			array(
-				'<img src="my-image.jpg" alt="My Image" class="header-footer-img">',
+				'<p><img src="my-image.jpg" alt="My Image" class="header-footer-img"></p>',
 				'<img src="my-image.jpg" alt="My Image">',
 			),
 			array(
-				'<div class="alternate"><img src="my-image.jpg" alt="My Image" class="alternate header-footer-img"></div>',
+				'<p><div class="alternate"><img src="my-image.jpg" alt="My Image" class="alternate header-footer-img"></div></p>',
 				'<img src="my-image.jpg" alt="My Image" class="alternate" />',
 			),
-			array( '<span>Nothing</span>', '<span>Nothing</span>' ),
+			array( '<p><span>Nothing</span></p>', '<span>Nothing</span>' ),
 			array( '', '' ),
 		);
 	}
@@ -222,7 +222,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 		$this->assertFalse( strpos(PDF_PLUGIN_URL, $html ) );
 
 		$html = $this->misc->fix_header_footer( '<img src="http://test.com/image.png" alt="My Image" />' );
-		$this->assertEquals( '<img src="http://test.com/image.png" alt="My Image" class="header-footer-img">', $html );
+		$this->assertEquals( '<p><img src="http://test.com/image.png" alt="My Image" class="header-footer-img"></p>', $html );
 	}
 
 	/**

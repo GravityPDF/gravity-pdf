@@ -215,14 +215,18 @@ class Helper_Misc {
 	}
 
 	/**
-	 * Manipulate images in header and footer for more consistent display in PDF
+	 * Manipulate header and footer for more consistent display in PDF
 	 *
 	 * Changes made include:
 	 *
-	 * 1. mPDF currently has no cascading CSS ability to target 'inline' elements. Fix image display issues in header / footer
+	 * 1. Apply wpautop to content
+	 *
+	 * 2. Apply wp_kses_post to content
+	 *
+	 * 3. mPDF currently has no cascading CSS ability to target 'inline' elements. Fix image display issues in header / footer
 	 * by adding a specific class name we can target
 	 *
-	 * 2. Convert any URLs to local path where applicable
+	 * 4. Convert any image URLs to local path where applicable
 	 *
 	 * @param string $html The HTML to parse
 	 *
@@ -230,22 +234,40 @@ class Helper_Misc {
 	 */
 	public function fix_header_footer( $html ) {
 
+		$html = wp_kses_post( $html );
+		$html = trim( wpautop( $html ) );
+		$html = $this->fix_header_footer_images( $html );
+
+		return $html;
+	}
+
+	/**
+	 * Convert image URLs to local path (where able) and add specific class names to images for better
+	 * targetting in Mpdf
+	 *
+	 * @param string $html
+	 *
+	 * @return string
+	 *
+	 * @since 7.0.4
+	 */
+	public function fix_header_footer_images( $html ) {
 		try {
 			/* Get the <img> from the DOM and extract required details */
-			$qp = new Helper_QueryPath();
+			$qp      = new Helper_QueryPath();
 			$wrapper = $qp->html5( $html );
 
 			$images = $wrapper->find( 'img' );
 
-			if( sizeof( $images ) > 0 ) {
+			if ( sizeof( $images ) > 0 ) {
 				/* Loop through each matching element */
 				foreach ( $images as $image ) {
 
 					/* Get current image src */
-					$image_src = trim( $image->attr( 'src' ) );
+					$image_src      = trim( $image->attr( 'src' ) );
 					$image_src_path = $this->convert_url_to_path( $image_src );
 
-					if( false !== $image_src_path ) {
+					if ( false !== $image_src_path ) {
 						$image->attr( 'src', $image_src_path );
 					}
 
