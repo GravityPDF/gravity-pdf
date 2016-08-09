@@ -89,11 +89,6 @@ class Field_Radio extends Helper_Abstract_Fields {
 		$data   = $this->value();
 		$output = ( $value ) ? $data['value'] : $data['label'];
 
-		/* Allow HTML if the radio value isn't the "other" option */
-		if ( ! $this->is_user_defined_value( $data['value'] ) ) {
-			$output = wp_kses_post( wp_specialchars_decode( $output, ENT_QUOTES ) );
-		}
-
 		return parent::html( $output );
 	}
 
@@ -164,6 +159,12 @@ class Field_Radio extends Helper_Abstract_Fields {
 
 		$label = esc_html( GFCommon::selection_display( $this->get_value(), $this->field, '', true ) );
 		$value = esc_html( GFCommon::selection_display( $this->get_value(), $this->field ) );
+
+		/* Allow HTML if the radio value isn't the "other" option */
+		if ( ! $this->is_user_defined_value( $value ) ) {
+			$value = wp_kses_post( wp_specialchars_decode( $value, ENT_QUOTES ) );
+			$label = wp_kses_post( wp_specialchars_decode( $label, ENT_QUOTES ) );
+		}
 
 
 		/* return value / label as an array */
