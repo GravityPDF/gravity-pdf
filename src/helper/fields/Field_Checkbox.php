@@ -138,8 +138,6 @@ class Field_Checkbox extends Helper_Abstract_Fields {
 			$i    = 1;
 			foreach ( $items as $item ) {
 				$sanitized_option = ( $value ) ? $item['value'] : $item['label'];
-				$sanitized_option = wp_kses_post( wp_specialchars_decode( $sanitized_option, ENT_QUOTES ) );
-
 				$html .= '<li id="field-' . $this->field->id . '-option-' . $i . '">' . $sanitized_option . '</li>';
 				$i++;
 			}
@@ -177,7 +175,10 @@ class Field_Checkbox extends Helper_Abstract_Fields {
 
 		foreach ( $value as $key => $item ) {
 			$label = esc_html( GFCommon::selection_display( $item, $this->field, '', true ) );
+			$label = wp_kses_post( wp_specialchars_decode( $label, ENT_QUOTES ) );
+
 			$value = esc_html( GFCommon::selection_display( $item, $this->field ) );
+			$value = wp_kses_post( wp_specialchars_decode( $value, ENT_QUOTES ) );
 
 			$items[] = array(
 				'value' => $value,
