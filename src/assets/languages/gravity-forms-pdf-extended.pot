@@ -1227,6 +1227,10 @@ msgstr ""
 msgid "The PDF could not be saved."
 msgstr ""
 
+#: src/model/Model_PDF.php:3577
+msgid "Could not find PDF configuration requested"
+msgstr ""
+
 #: src/model/Model_Settings.php:485
 msgid "There was a problem copying all PDF templates to %s. Please try again."
 msgstr ""

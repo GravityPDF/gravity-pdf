@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.2
 Tested up to: 4.6
-Stable tag: 4.0.3
+Stable tag: 4.0.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
 
@@ -84,6 +84,12 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 18. Blank Slate provides a print-friendly template focusing solely on the user-submitted data.
 
 == Changelog ==
+
+= 4.0.4 =
+* Prevent Finder (Mac) and Ghostscript viewing / processing password-protected PDFs without a password (GH#467)
+* Fix Font Manager display issues for users running a version of WP lower than 4.5 (GH#470)
+* Ensure new lines in Header / Footer automatically converted to <p> or <br> tags using wpautop() (GH#472)
+* Fix issue in $form_data where Radio / Checkbox fields wouldn't display the admin HTML (GH#415)
 
 = 4.0.3 =
 * Fix incorrect product calculations when using decimal comma format eg. 1.000,50 (GH#442)
@@ -167,6 +173,9 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 See [CHANGELOG.txt](https://github.com/GravityPDF/gravity-pdf/blob/master/CHANGELOG.txt) for v3 changelog history.
 
 == Upgrade Notice ==
+
+= 4.0.4 =
+This patch fixes a PDF security by-passing issue. If you use the PDF Security settings update immediately.
 
 = 4.0.3 =
 The core PDF templates have been updated to version 1.1. If you've previously run the Custom Template Setup make sure you run it again to take advantage of the changes.
