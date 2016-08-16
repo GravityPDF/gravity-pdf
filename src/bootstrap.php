@@ -251,7 +251,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function add_actions() {
 
 		add_action( 'init', array( $this, 'register_assets' ) );
-		add_action( 'init', array( $this, 'load_assets' ), 15 );
+		add_action( 'admin_enqueue_scripts', array( $this, 'load_admin_assets' ) );
 
 		/* Cache our Gravity PDF Settings and register our settings fields with the Options API */
 		add_action( 'init', array( $this, 'init_settings_api' ), 1 );
@@ -504,11 +504,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Load any assets that are needed
 	 *
-	 * @since 4.0
+	 * @since 4.0.4
 	 *
 	 * @return void
 	 */
-	public function load_assets() {
+	public function load_admin_assets() {
 
 		if ( $this->misc->is_gfpdf_page() ) {
 			/* load styles */
