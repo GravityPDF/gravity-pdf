@@ -418,9 +418,10 @@ class Model_Install extends Helper_Abstract_Model {
 
 		/* Clean up database */
 		if ( is_multisite() ) {
-			$sites = wp_get_sites();
+			$sites = ( function_exists( 'get_sites' ) ) ? get_sites() : wp_get_sites();
 
 			foreach ( $sites as $site ) {
+				$site = (array) $site; /* Back-compat: ensure the new site object introduced in 4.6 gets converted back to an array */
 				switch_to_blog( $site['blog_id'] );
 				$this->remove_plugin_options();
 				$this->remove_plugin_form_settings();

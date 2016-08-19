@@ -175,8 +175,10 @@ class Model_Actions extends Helper_Abstract_Model {
 				return true;
 			} else {
 				/* Check other multisites for a config file */
-				$sites = wp_get_sites();
+				$sites = ( function_exists( 'get_sites' ) ) ? get_sites() : wp_get_sites();
+
 				foreach ( $sites as $site ) {
+					$site = (array) $site; /* Back-compat: ensure the new site object introduced in 4.6 gets converted back to an array */
 					if ( is_file( $this->data->template_location . '/' . $site['blog_id'] . '/configuration.php' ) ) {
 						return true;
 					}
@@ -199,10 +201,11 @@ class Model_Actions extends Helper_Abstract_Model {
 		if ( is_multisite() ) {
 
 			/* Verify we have a site to migrate */
-			$sites = wp_get_sites();
+			$sites = ( function_exists( 'get_sites' ) ) ? get_sites() : wp_get_sites();
 			$found = false;
 
 			foreach ( $sites as $site ) {
+				$site = (array) $site; /* Back-compat: ensure the new site object introduced in 4.6 gets converted back to an array */
 				$site_config = $this->data->template_location . '/' . $site['blog_id'] . '/';
 
 				if ( is_file( $site_config . 'configuration.php' ) ) {
@@ -286,10 +289,11 @@ class Model_Actions extends Helper_Abstract_Model {
 	 * @since  4.0
 	 */
 	private function get_multisite_ids_with_v3_config() {
-		$sites    = wp_get_sites();
+		$sites = ( function_exists( 'get_sites' ) ) ? get_sites() : wp_get_sites();
 		$blog_ids = array();
 
 		foreach ( $sites as $site ) {
+			$site = (array) $site; /* Back-compat: ensure the new site object introduced in 4.6 gets converted back to an array */
 			$site_config = $this->data->template_location . $site['blog_id'] . '/';
 
 			if ( is_file( $site_config . 'configuration.php' ) ) {
