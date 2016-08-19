@@ -12,8 +12,8 @@ DB_HOST=${4-localhost}
 WP_VERSION=${5-latest}
 SKIP_DB_CREATE=${6-false}
 
-WP_TESTS_DIR=${WP_TESTS_DIR-/tmp/wordpress-tests-lib}
-WP_CORE_DIR=${WP_CORE_DIR-/tmp/wordpress/}
+WP_TESTS_DIR="${PWD}/tmp/wordpress-tests-lib"
+WP_CORE_DIR="${PWD}/tmp/wordpress/"
 
 download() {
     if [ `which curl` ]; then
@@ -70,23 +70,23 @@ install_wp() {
 install_depencency() {
 	#Gravity Forms
 	wget -nv -O /tmp/gravityforms.tar.gz https://github.com/GravityPDF/gravityforms/archive/master.tar.gz
-	mkdir -p ${WP_CORE_DIR-/tmp/gravityforms}
-	tar --strip-components=1 -zxf /tmp/gravityforms.tar.gz -C ${WP_CORE_DIR-/tmp/gravityforms}
+	mkdir -p $PWD/tmp/gravityforms
+	tar --strip-components=1 -zxf /tmp/gravityforms.tar.gz -C $PWD/tmp/gravityforms
 
 	#Gravity Forms Polls
 	wget -nv -O /tmp/gravityformspolls.tar.gz https://github.com/GravityPDF/gravityformspolls/archive/master.tar.gz
-	mkdir -p ${WP_CORE_DIR-/tmp/gravityformspoll}
-	tar --strip-components=1 -zxf /tmp/gravityformspolls.tar.gz -C ${WP_CORE_DIR-/tmp/gravityformspoll}
+	mkdir -p $PWD/tmp/gravityformspoll
+	tar --strip-components=1 -zxf /tmp/gravityformspolls.tar.gz -C $PWD/tmp/gravityformspoll
 
 	#Gravity Forms Quiz
 	wget -nv -O /tmp/gravityformsquiz.tar.gz https://github.com/GravityPDF/gravityformsquiz/archive/master.tar.gz
-	mkdir -p ${WP_CORE_DIR-/tmp/gravityformsquiz}
-	tar --strip-components=1 -zxf /tmp/gravityformsquiz.tar.gz -C ${WP_CORE_DIR-/tmp/gravityformsquiz}
+	mkdir -p $PWD/tmp/gravityformsquiz
+	tar --strip-components=1 -zxf /tmp/gravityformsquiz.tar.gz -C $PWD/tmp/gravityformsquiz
 
 	#Gravity Forms Survey
 	wget -nv -O /tmp/gravityformssurvey.tar.gz https://github.com/GravityPDF/gravityformssurvey/archive/master.tar.gz
-	mkdir -p ${WP_CORE_DIR-/tmp/gravityformssurvey}
-	tar --strip-components=1 -zxf /tmp/gravityformssurvey.tar.gz -C ${WP_CORE_DIR-/tmp/gravityformssurvey}
+	mkdir -p $PWD/tmp/gravityformssurvey
+	tar --strip-components=1 -zxf /tmp/gravityformssurvey.tar.gz -C $PWD/tmp/gravityformssurvey
 }
 
 install_test_suite() {
