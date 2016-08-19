@@ -307,8 +307,11 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* Update our GFPDF settings */
 		$sanitized['id']     = $pdf_id;
-		$sanitized['active'] = true;
 		$sanitized['status'] = 'sanitizing'; /* used as a switch to tell when a record has been saved to the database, or stuck in validation */
+
+		/* Save current PDF state */
+		$pdf                 = $this->options->get_pdf( $form_id, $pdf_id );
+		$sanitized['active'] = ( ! is_wp_error( $pdf ) && isset( $pdf['active'] ) ) ? $pdf['active'] : true;
 
 		$this->options->update_pdf( $form_id, $pdf_id, $sanitized, false );
 
