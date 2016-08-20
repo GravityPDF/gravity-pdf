@@ -88,8 +88,13 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 = 4.0.4 =
 * Prevent Finder (Mac) and Ghostscript viewing / processing password-protected PDFs without a password (GH#467)
 * Fix Font Manager display issues for users running a version of WP lower than 4.5 (GH#470)
-* Ensure new lines in Header / Footer automatically converted to <p> or <br> tags using wpautop() (GH#472)
-* Fix issue in $form_data where Radio / Checkbox fields wouldn't display the admin HTML (GH#415)
+* Ensure new lines in Header / Footer automatically convert to <p> or <br> tags using wpautop() (GH#472)
+* Fix issue in $form_data where Radio / Checkbox fields wouldn't display site-owner entered HTML (GH#415)
+* Fixed conflict with Enhanced Media Library plugin (GH#433)
+* Fixed issue with encoded characters in saved PDF filename (GH#475)
+* Fixed issue where PDF settings would always set to "active" when saved (GH#477)
+* Fixed depreciation notice for multisites using WordPress 4.6 (GH#479)
+* Apply esc_html() and esc_url() to PDF name and URL in admin area (GH#484)
 
 = 4.0.3 =
 * Fix incorrect product calculations when using decimal comma format eg. 1.000,50 (GH#442)
