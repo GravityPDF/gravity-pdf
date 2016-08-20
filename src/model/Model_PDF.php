@@ -658,8 +658,8 @@ class Model_PDF extends Helper_Abstract_Model {
 		$form = $this->gform->get_form( $entry['form_id'] );
 		$name = $this->gform->process_tags( $settings['filename'], $form, $entry );
 
-		/* Remove any characters that cannot be present in a filename */
-		$name = $this->misc->strip_invalid_characters( $name );
+		/* Decode HTML entities */
+		$name = wp_specialchars_decode( $name, ENT_QUOTES );
 
 		/*
 		 * Add filter to modify PDF name
@@ -670,6 +670,9 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		/* Backwards compatible filter */
 		$name = apply_filters( 'gfpdfe_pdf_filename', $name, $form, $entry, $settings );
+
+		/* Remove any characters that cannot be present in a filename */
+		$name = $this->misc->strip_invalid_characters( $name );
 
 		return $name;
 	}
@@ -1088,7 +1091,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 				/* Only generate if the PDF wasn't during the notification process */
 				if ( ! is_wp_error( $settings ) ) {
-					
+
 					$pdf_generator = new Helper_PDF( $entry, $settings, $this->gform, $this->data );
 					$pdf_generator->set_filename( $this->get_pdf_name( $settings, $entry ) );
 
