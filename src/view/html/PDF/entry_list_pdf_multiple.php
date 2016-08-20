@@ -43,7 +43,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	    <ul>
 		    <?php foreach ( $args['pdfs'] as $pdf ): ?>
 			    <li>
-				    <a href="<?php echo ( $args['view'] == 'download' ) ? $pdf['download'] : $pdf['view']; ?>" <?php echo ( $args['view'] != 'download' ) ? 'target="_blank"' : '' ?>><?php echo $pdf['name']; ?></a>
+				    <a href="<?php echo ( $args['view'] == 'download' ) ? esc_url( $pdf['download'] ) : esc_url( $pdf['view'] ); ?>" <?php echo ( $args['view'] != 'download' ) ? 'target="_blank"' : '' ?>><?php echo esc_html( $pdf['name'] ); ?></a>
 			    </li>
 		    <?php endforeach; ?>
 	    </ul>
