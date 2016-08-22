@@ -131,37 +131,6 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Check we convert IDs into something human readable
-	 *
-	 * @param  $expected
-	 * @param  $name
-	 *
-	 * @since        4.0
-	 *
-	 * @dataProvider provider_human_readable
-	 */
-	public function test_human_readable( $expected, $name ) {
-		$this->assertEquals( $expected, $this->misc->human_readable( $name ) );
-	}
-
-	/**
-	 * Data provider for human_readable test
-	 *
-	 * @return array
-	 *
-	 * @since  4.0
-	 */
-	public function provider_human_readable() {
-		return [
-			[ 'My Pretty Name', 'my_pretty-name' ],
-			[ 'Working Title', 'worKing-title' ],
-			[ 'Easy Listening', 'Easy Listening' ],
-			[ 'Double  Trouble  Listening', 'Double--Trouble__listening' ],
-			[ 'Out Of This World', 'OUT_OF_THIS_WORLD' ],
-		];
-	}
-
-	/**
 	 * Check if our HTML DOM manipulator correctly adds the class "header-footer-img" to <img /> tags
 	 *
 	 * @param  $expected
@@ -313,81 +282,6 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Check our template image is correctly loaded
-	 *
-	 * @since 4.0
-	 */
-	public function test_add_template_image() {
-		$settings = [
-			'template' => [
-				'value' => '',
-				'desc'  => '',
-			],
-		];
-
-		$results = $this->misc->add_template_image( $settings );
-
-		/* Test for lack of an image */
-		$this->assertFalse( strpos( $results['template']['desc'], '<img' ) );
-
-		/* Test for image existance */
-		$settings['template']['value'] = 'zadani';
-		$results                       = $this->misc->add_template_image( $settings );
-
-		$this->assertNotFalse( strpos( $results['template']['desc'], '<img' ) );
-
-		/* Test skipping results */
-		$results = $this->misc->add_template_image( [] );
-
-		$this->assertEmpty( $results );
-	}
-
-	/**
-	 * Check that the appropriate array keys are returned when getting the template arguments
-	 *
-	 * @since 4.0
-	 */
-	public function test_get_template_args() {
-
-		/* Get test entry and Gravity Forms settings */
-		$results = $this->create_form_and_entries();
-
-		$entry = $results['entry'];
-		$pdf   = \GPDFAPI::get_pdf( $entry['form_id'], '556690c67856b' );
-
-		/* Pass details on to our test method */
-		$data = $this->misc->get_template_args( $entry, $pdf );
-
-		/* Check all our keys exist */
-		$this->assertArrayHasKey( 'form_id', $data );
-		$this->assertArrayHasKey( 'lead_ids', $data );
-		$this->assertArrayHasKey( 'lead_id', $data );
-		$this->assertArrayHasKey( 'form', $data );
-		$this->assertArrayHasKey( 'entry', $data );
-		$this->assertArrayHasKey( 'lead', $data );
-		$this->assertArrayHasKey( 'form_data', $data );
-		$this->assertArrayHasKey( 'settings', $data );
-		$this->assertArrayHasKey( 'fields', $data );
-		$this->assertArrayHasKey( 'config', $data );
-		$this->assertArrayHasKey( 'gfpdf', $data );
-
-		/* Sniff that our keys have the correct details */
-		$this->assertEquals( $entry['form_id'], $data['form_id'] );
-		$this->assertEquals( $entry['id'], $data['lead_id'] );
-		$this->assertEquals( [ $entry['id'] ], $data['lead_ids'] );
-		$this->assertTrue( is_array( $data['form'] ) );
-		$this->assertTrue( is_array( $data['entry'] ) );
-		$this->assertTrue( is_array( $data['lead'] ) );
-		$this->assertTrue( is_array( $data['form_data'] ) );
-		$this->assertEquals( $data['entry'], $data['lead'] );
-		$this->assertEquals( $pdf, $data['settings'] );
-		$this->assertEquals( 'GFPDF\Router', get_class( $data['gfpdf'] ) );
-		$this->assertTrue( is_array( $data['fields'] ) );
-		$this->assertEquals( 'GF_Field_Checkbox', get_class( $data['fields'][47] ) );
-		$this->assertEquals( 'GFPDF\Templates\Config\Zadani', get_class( $data['config'] ) );
-	}
-
-	/**
 	 * Check our contrast checker returns the correct contrasting colours
 	 *
 	 * @param string $expected The results we expect
@@ -483,7 +377,9 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	 * @since        4.0
 	 */
 	public function test_get_config_class_name( $expected, $file ) {
-		$this->assertEquals( $expected, $this->misc->get_config_class_name( $file ) );
+		global $gfpdf;
+
+		$this->assertEquals( $expected, $gfpdf->templates->get_config_class_name( $file ) );
 	}
 
 	/**

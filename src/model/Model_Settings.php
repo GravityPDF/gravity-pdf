@@ -8,6 +8,7 @@ use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Helper\Helper_Templates;
 
 use Psr\Log\LoggerInterface;
 
@@ -122,6 +123,16 @@ class Model_Settings extends Helper_Abstract_Model {
 	protected $misc;
 
 	/**
+	 * Holds our Helper_Templates object
+	 * used to ease access to our PDF templates
+	 *
+	 * @var \GFPDF\Helper\Helper_Templates
+	 *
+	 * @since 4.0
+	 */
+	protected $templates;
+
+	/**
 	 * Set up our dependancies
 	 *
 	 * @param \GFPDF\Helper\Helper_Abstract_Form    $gform   Our abstracted Gravity Forms helper functions
@@ -130,18 +141,20 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @param \GFPDF\Helper\Helper_Abstract_Options $options Our options class which allows us to access any settings
 	 * @param \GFPDF\Helper\Helper_Data             $data    Our plugin data store
 	 * @param \GFPDF\Helper\Helper_Misc             $misc    Our miscellaneous class
+	 * @param \GFPDF\Helper\Helper_Templates        $templates
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Notices $notices, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc ) {
+	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Notices $notices, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates ) {
 
 		/* Assign our internal variables */
-		$this->gform   = $gform;
-		$this->log     = $log;
-		$this->options = $options;
-		$this->notices = $notices;
-		$this->data    = $data;
-		$this->misc    = $misc;
+		$this->gform     = $gform;
+		$this->log       = $log;
+		$this->options   = $options;
+		$this->notices   = $notices;
+		$this->data      = $data;
+		$this->misc      = $misc;
+		$this->templates = $templates;
 	}
 
 	/**
@@ -236,7 +249,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 */
 	public function install_templates() {
 
-		$destination = $this->misc->get_template_path();
+		$destination = $this->templates->get_template_path();
 		$copy        = $this->misc->copyr( PDF_PLUGIN_DIR . 'src/templates/', $destination );
 		if ( is_wp_error( $copy ) ) {
 			$this->log->addError( 'Template Installation Error.' );
@@ -716,4 +729,34 @@ class Model_Settings extends Helper_Abstract_Model {
 		return $return;
 	}
 
+	/**
+	 * Gets all the template information for use with our JS template selector
+	 *
+	 * @param array $strings
+	 *
+	 * @return array
+	 *
+	 * @since 4.1
+	 */
+	public function get_template_data( $strings ) {
+		$strings['templateList']          = $this->templates->get_all_template_info();
+		$strings['activeDefaultTemplate'] = $this->options->get_option( 'default_template' );
+
+		$form_id = rgget( 'id' );
+
+		if ( $form_id ) {
+			$pid = ( rgget( 'pid' ) ) ? rgget( 'pid' ) : false;
+			if ( $pid == false ) {
+				$pid = ( rgpost( 'gform_pdf_id' ) ) ? rgpost( 'gform_pdf_id' ) : false;
+			}
+
+			$pdf = $this->options->get_pdf( $form_id, $pid );
+
+			if ( ! is_wp_error( $pdf ) ) {
+				$strings['activeTemplate'] = $pdf['template'];
+			}
+		}
+
+		return $strings;
+	}
 }

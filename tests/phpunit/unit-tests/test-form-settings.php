@@ -104,7 +104,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		$this->setup_form();
 
 		/* Setup our test classes */
-		$this->model = new Model_Form_Settings( $gfpdf->gform, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
+		$this->model = new Model_Form_Settings( $gfpdf->gform, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices, $gfpdf->templates );
 		$this->view  = new View_Form_Settings( [] );
 
 		$this->controller = new Controller_Form_Settings( $this->model, $this->view, $gfpdf->data, $gfpdf->options, $gfpdf->misc );
@@ -173,7 +173,6 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		global $gfpdf;
 
 		/* general filters */
-		$this->assertEquals( 10, has_filter( 'gfpdf_form_settings', [ $gfpdf->misc, 'add_template_image' ] ) );
 		$this->assertEquals( 10, has_filter( 'gfpdf_form_settings_custom_appearance', [
 			$this->model,
 			'register_custom_appearance_settings',
@@ -536,8 +535,9 @@ class Test_Form_Settings extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_setup_custom_appearance_settings() {
+		global $gfpdf;
 
-		$class    = $this->model->get_template_configuration( 'zadani' );
+		$class    = $gfpdf->templates->get_config_class( 'zadani' );
 		$settings = $this->model->setup_custom_appearance_settings( $class, [] );
 
 		$this->assertEquals( 13, sizeof( $settings ) );
@@ -550,8 +550,9 @@ class Test_Form_Settings extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_setup_core_custom_appearance_settings() {
+		global $gfpdf;
 
-		$class    = $this->model->get_template_configuration( 'zadani' );
+		$class    = $gfpdf->templates->get_config_class( 'zadani' );
 		$settings = $this->model->setup_core_custom_appearance_settings( [], $class, $class->configuration() );
 
 		$this->assertEquals( 12, sizeof( $settings ) );
@@ -574,23 +575,6 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		foreach ( $core_fields as $key ) {
 			$this->assertTrue( isset( $settings[ $key ] ) );
 		}
-	}
-
-	/**
-	 * Check if we are registering our core custom template appearance settings correctly
-	 *
-	 * @since 4.0
-	 */
-	public function test_get_template_configuration() {
-
-		/* Test failure first */
-		$this->assertEquals( 'stdClass', get_class( $this->model->get_template_configuration( 'test' ) ) );
-
-		/* Test default template */
-		$this->assertEquals( 'GFPDF\Templates\Config\Zadani', get_class( $this->model->get_template_configuration( 'zadani' ) ) );
-
-		/* Test legacy templates */
-		$this->assertEquals( 'GFPDF\Templates\Config\Legacy', get_class( $this->model->get_template_configuration( 'default-template' ) ) );
 	}
 
 	/**

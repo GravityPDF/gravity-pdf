@@ -1,0 +1,85 @@
+import React from 'react'
+import { hashHistory } from 'react-router'
+
+/**
+ * Render the button used to option our Fancy PDF template selector
+ *
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2016, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       4.1
+ */
+
+/*
+ This file is part of Gravity PDF.
+
+ Gravity PDF – Copyright (C) 2016, Blue Liquid Designs
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Found
+ */
+
+/**
+ * React Component
+ *
+ * @since 4.1
+ */
+const TemplateButton = React.createClass({
+
+  /**
+   * @since 4.1
+   */
+  propTypes: {
+    buttonText: React.PropTypes.string,
+  },
+
+  /**
+   * When the button is clicked we'll display the `/template` route
+   *
+   * @param {Object} e Event
+   *
+   * @since 4.1
+   */
+  handleClick(e) {
+    /*
+     * Handle weird bug in React where the button click event fires when enter is pressed
+     * on non-react components
+     */
+    if( document.activeElement && this.button === document.activeElement ) {
+      e.preventDefault()
+      e.stopPropagation()
+
+      /* trigger router */
+      hashHistory.push('/template')
+    }
+  },
+
+  /**
+   * @since 4.1
+   */
+  render() {
+    return (
+      <button
+        id="fancy-template-selector"
+        className="button gfpdf-button"
+        onClick={this.handleClick}
+        ref={node => this.button = node}
+      >
+        {this.props.buttonText}
+      </button>
+    )
+  }
+})
+
+export default TemplateButton

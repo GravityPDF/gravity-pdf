@@ -1,0 +1,32 @@
+import React from 'react'
+import { mount } from 'enzyme'
+import $ from 'jquery'
+import Immutable from 'immutable'
+import configureStore from 'redux-mock-store'
+import { Provider } from 'react-redux'
+const mockStore = configureStore()
+
+import { TemplateSingle } from '../../../../src/assets/js/react/components/TemplateSingle'
+
+describe('<TemplateSingle />', () => {
+
+  it('should render a single template', () => {
+    const comp = mount(<Provider store={mockStore()}>
+      <TemplateSingle
+        templates={Immutable.fromJS([ { id: 'first-id', compatible: true, path: ''  }, { id: 'middle-id', compatible: true, path: '' }, { id: 'last-id', compatible: true, path: '' } ])}
+        template={Immutable.fromJS({ id: 'first-id', compatible: true, path: '' })}
+        templateIndex={0}
+        route={ { activateText: 'Activate' }}
+      />
+    </Provider>)
+
+    $('#karam-test-container').html(comp.html())
+
+    expect($('#gfpdf-template-detail-view')).has.length(1)
+    expect($('.screenshot')).has.length(1)
+    expect($('h2.theme-name')).has.length(1)
+    expect($('p.theme-author')).has.length(2)
+    expect($('p.theme-description')).has.length(1)
+    expect($('a.activate')).has.length(1)
+  })
+})

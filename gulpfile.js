@@ -1,43 +1,42 @@
-
-var gulp  	  = require('gulp'),
-	minifyCss = require('gulp-minify-css'),
-	uglify    = require('gulp-uglify'),
-	rename    = require('gulp-rename'),
-	wpPot     = require('gulp-wp-pot'),
-	sort      = require('gulp-sort');
+var gulp = require('gulp'),
+  uglify = require('gulp-uglify'),
+  cleanCSS = require('gulp-clean-css'),
+  rename = require('gulp-rename'),
+  wpPot = require('gulp-wp-pot'),
+  sort = require('gulp-sort')
 
 /* Minify our CSS */
-gulp.task('minify', function() {
-  return gulp.src(['src/assets/css/*.css', '!src/assets/css/*.min.css'])
-    .pipe(minifyCss({compatibility: 'ie8'}))
+gulp.task('minify', function () {
+  return gulp.src([ 'src/assets/css/*.css' ])
+    .pipe(cleanCSS())
     .pipe(rename({
-        suffix: '.min'
+      suffix: '.min'
     }))
-    .pipe(gulp.dest('src/assets/css/'));
-});
+    .pipe(gulp.dest('dist/assets/css/'))
+})
 
-/* Minify our JS */
+/* Minify our non-react JS (handled by webpack) */
 gulp.task('compress', function() {
-  return gulp.src(['src/assets/js/*.js', '!src/assets/js/*.min.js'])
+  return gulp.src(['src/assets/js/*.js'])
     .pipe(uglify())
     .pipe(rename({
-        suffix: '.min'
+      suffix: '.min'
     }))
-    .pipe(gulp.dest('src/assets/js/'));
-});
+    .pipe(gulp.dest('dist/assets/js/'))
+})
 
 /* Generate the latest language files */
-gulp.task('language', function() {
-	return gulp.src('**/*.php')
-		.pipe(sort())
-		.pipe(wpPot( {
-			domain: 'gravity-forms-pdf-extended',
-			destFile:'gravity-forms-pdf-extended.pot',
-			package: 'gravity-forms-pdf-extended'
-		} ))
-		.pipe(gulp.dest('src/assets/languages'));
-});
+gulp.task('language', function () {
+  return gulp.src('**/*.php')
+    .pipe(sort())
+    .pipe(wpPot({
+      domain: 'gravity-forms-pdf-extended',
+      destFile: 'gravity-forms-pdf-extended.pot',
+      package: 'gravity-forms-pdf-extended'
+    }))
+    .pipe(gulp.dest('src/assets/languages'))
+})
 
-gulp.task('default', function() {
-    gulp.start('minify', 'compress', 'language');
-});
+gulp.task('default', function () {
+  gulp.start('language', 'minify', 'compress')
+})

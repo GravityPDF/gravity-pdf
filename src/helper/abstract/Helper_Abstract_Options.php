@@ -80,6 +80,16 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	protected $data;
 
 	/**
+	 * Holds our Helper_Templates object
+	 * used to ease access to our PDF templates
+	 *
+	 * @var \GFPDF\Helper\Helper_Templates
+	 *
+	 * @since 4.0
+	 */
+	protected $templates;
+
+	/**
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
 	 *
@@ -126,17 +136,19 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @param \GFPDF\Helper\Helper_Data          $data
 	 * @param \GFPDF\Helper\Helper_Misc          $misc
 	 * @param \GFPDF\Helper\Helper_Notices       $notices
+	 * @param \GFPDF\Helper\Helper_Templates     $templates
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( LoggerInterface $log, Helper_Abstract_Form $gform, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices ) {
+	public function __construct( LoggerInterface $log, Helper_Abstract_Form $gform, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates ) {
 
 		/* Assign our internal variables */
-		$this->log     = $log;
-		$this->gform   = $gform;
-		$this->data    = $data;
-		$this->misc    = $misc;
-		$this->notices = $notices;
+		$this->log       = $log;
+		$this->gform     = $gform;
+		$this->data      = $data;
+		$this->misc      = $misc;
+		$this->notices   = $notices;
+		$this->templates = $templates;
 	}
 
 	/**
@@ -887,191 +899,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		] );
 	}
 
-	/**
-	 * Parse our installed PDF template files
-	 *
-	 * @return array The array of templates
-	 *
-	 * @since 4.0
-	 */
-	public function get_templates() {
-
-		$templates = $legacy = [];
-
-		/* Load the user's templates */
-		if ( is_multisite() ) {
-			$template_list = $this->get_template_list( glob( $this->data->multisite_template_location . '*.php' ) );
-			$templates     = array_merge_recursive( $templates, $template_list['templates'] );
-			$legacy        = array_merge_recursive( $legacy, $template_list['legacy'] );
-		}
-
-		$template_list = $this->get_template_list( glob( $this->data->template_location . '*.php' ) );
-		$templates     = array_merge_recursive( $templates, $template_list['templates'] );
-		$legacy        = array_merge_recursive( $legacy, $template_list['legacy'] );
-
-		/**
-		 * Load templates included with Gravity PDF
-		 * We'll exclude any files overridden by the user
-		 */
-		foreach ( $this->get_plugin_pdf_templates() as $filename ) {
-			$info = $this->get_template_headers( $filename );
-			$file = basename( $filename, '.php' );
-
-			/* only add core template if not being overridden by user template */
-			if ( ! isset( $templates[ $info['group'] ][ $file ] ) ) {
-				$templates[ $info['group'] ][ $file ] = $info['template'];
-			}
-		}
-
-		/* Add our legacy array to the end of our templates array */
-		if ( sizeof( $legacy ) > 0 ) {
-			$templates[ esc_html__( 'Legacy', 'gravity-forms-pdf-extended' ) ] = $legacy;
-		}
-
-		return apply_filters( 'gfpdf_template_list', $templates );
-	}
-
-	/**
-	 * Get the list of Gravity PDF templates a user has available
-	 *
-	 * @param array $template_list Full path to PHP files (usually got using glob)
-	 *
-	 * @return array
-	 *
-	 * @since 4.0
-	 */
-	public function get_template_list( $template_list ) {
-		$templates = [];
-		$legacy    = [];
-
-		if ( is_array( $template_list ) ) {
-			foreach ( $template_list as $filename ) {
-
-				/* Get the header information to find out what group it's in and if it is compatible with our verison of Gravity PDF */
-				$info = $this->get_template_headers( $filename );
-				$file = basename( $filename, '.php' );
-
-				if ( ! empty( $info['template'] ) ) {
-
-					/* Check if template compatible */
-					if ( ! empty( $info['required_pdf_version'] ) && version_compare( $info['required_pdf_version'], PDF_EXTENDED_VERSION, '>' ) ) {
-						$info['template'] .= ' (+ ' . esc_html_x( 'needs', 'Required', 'gravity-forms-pdf-extended' ) . ' v' . $info['required_pdf_version'] . ')';
-					}
-
-					$templates[ $info['group'] ][ $file ] = $info['template'];
-				} else if ( $file !== 'configuration' && $file !== 'configuration.archive' ) { /* exclude legacy configuration file */
-					$legacy[ $file ] = $this->misc->human_readable( $file );
-				}
-			}
-		}
-
-		return [
-			'templates' => $templates,
-			'legacy'    => $legacy,
-		];
-	}
-
-	/**
-	 * An array used to parse the template headers
-	 *
-	 * @return array
-	 *
-	 * @since 4.0
-	 */
-	public function get_template_header_details() {
-		/**
-		 * We load in data from the PDF template headers
-		 *
-		 * @var array
-		 */
-		return apply_filters( 'gfpdf_template_header_details', [
-			'template'             => esc_html__( 'Template Name', 'gravity-forms-pdf-extended' ),
-			'version'              => esc_html__( 'Version', 'gravity-forms-pdf-extended' ),
-			'description'          => esc_html__( 'Description', 'gravity-forms-pdf-extended' ),
-			'author'               => esc_html__( 'Author', 'gravity-forms-pdf-extended' ),
-			'group'                => esc_html__( 'Group', 'gravity-forms-pdf-extended' ),
-			'required_pdf_version' => esc_html__( 'Required PDF Version', 'gravity-forms-pdf-extended' ),
-		] );
-	}
-
-	/**
-	 * Gets the template information based on the raw template name
-	 *
-	 * @param  string $name The template to get information for
-	 *
-	 * @return array       The template information
-	 *
-	 * @since 4.0
-	 */
-	public function get_template_information( $name ) {
-
-		/* Check if we can find the template and load the data */
-		if ( is_multisite() && is_file( $this->data->multisite_template_location . $name . '.php' ) ) {
-			$template = $this->get_template_headers( $this->data->multisite_template_location . $name . '.php' );
-		} elseif ( is_file( $this->data->template_location . $name . '.php' ) ) {
-			$template = $this->get_template_headers( $this->data->template_location . $name . '.php' );
-		}
-
-		if ( isset( $template ) ) {
-			return $template;
-		}
-
-		if ( is_file( PDF_PLUGIN_DIR . 'src/templates/' . $name . '.php' ) ) {
-			return $this->get_template_headers( PDF_PLUGIN_DIR . 'src/templates/' . $name . '.php' );
-		}
-
-		return false;
-	}
-
-	/**
-	 * Returns the current template group name
-	 *
-	 * @param $name
-	 *
-	 * @return string The template group name
-	 *
-	 * @since 4.0
-	 */
-	public function get_template_group( $name ) {
-		$template_data = $this->get_template_information( $name );
-		$template_type = ( isset( $template_data['group'] ) ) ? mb_strtolower( $template_data['group'] ) : 'legacy';
-
-		return $template_type;
-	}
-
-	/**
-	 * Get the current template headers
-	 *
-	 * @param  string $path The path to the file
-	 *
-	 * @return array        Details about the file
-	 *
-	 * @since 4.0
-	 */
-	public function get_template_headers( $path ) {
-		$info = get_file_data( $path, $this->get_template_header_details() );
-
-		/* this is a legacy template */
-		if ( empty( $info['template'] ) ) {
-			return [ 'group' => 'Legacy' ];
-		} else {
-			return $info;
-		}
-	}
-
-	/**
-	 * Returns an array of the current PDF templates shipped with Gravity PDF
-	 *
-	 * @return array
-	 *
-	 * @since 4.0
-	 */
-	public function get_plugin_pdf_templates() {
-		$templates = glob( PDF_PLUGIN_DIR . 'src/templates/*.php' );
-
-		return ( is_array( $templates ) ) ? $templates : [];
-	}
-
 
 	/**
 	 * Parse our installed font files
@@ -1443,7 +1270,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				 * See https://github.com/GravityPDF/gravity-pdf/issues/492 for more details.
 				 *
 				 * @internal Devs should run the field through wp_kses_post() on output to correctly sanitize
-				 * @since    4.0.6
+				 * @since 4.0.6
 				 */
 				return $value;
 			break;
@@ -1928,8 +1755,30 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		}
 
 		$html .= '>';
+		$html .= $this->build_options_for_select( $args['options'], $value );
+		$html .= '</select>';
+		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
 
-		foreach ( $args['options'] as $option => $name ) {
+		if ( isset( $args['tooltip'] ) ) {
+			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . wp_kses_post( $args['tooltip'] ) . '</span>';
+		}
+
+		echo $html;
+	}
+
+	/**
+	 * Build our option groups for the select box
+	 *
+	 * @param array        $options The list of options that should be displayed
+	 * @param array|string $value   The selected option
+	 *
+	 * @return string
+	 *
+	 * @since 4.1
+	 */
+	public function build_options_for_select( $options, $value ) {
+		$html = '';
+		foreach ( $options as $option => $name ) {
 			if ( ! is_array( $name ) ) {
 				if ( is_array( $value ) ) {
 					foreach ( $value as $v ) {
@@ -1964,14 +1813,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			}
 		}
 
-		$html .= '</select>';
-		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
-
-		if ( isset( $args['tooltip'] ) ) {
-			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . wp_kses_post( $args['tooltip'] ) . '</span>';
-		}
-
-		echo $html;
+		return $html;
 	}
 
 	/**

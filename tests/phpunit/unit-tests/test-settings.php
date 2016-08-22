@@ -86,8 +86,8 @@ class Test_Settings extends WP_UnitTestCase {
 		parent::setUp();
 
 		/* Setup our test classes */
-		$this->model = new Model_Settings( $gfpdf->gform, $gfpdf->log, $gfpdf->notices, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
-		$this->view  = new View_Settings( [], $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
+		$this->model = new Model_Settings( $gfpdf->gform, $gfpdf->log, $gfpdf->notices, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
+		$this->view  = new View_Settings( [], $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
 
 		$this->controller = new Controller_Settings( $this->model, $this->view, $gfpdf->gform, $gfpdf->log, $gfpdf->notices, $gfpdf->data, $gfpdf->misc );
 		$this->controller->init();
@@ -128,7 +128,6 @@ class Test_Settings extends WP_UnitTestCase {
 			'disable_tools_on_view_cap',
 		] ) );
 		$this->assertEquals( 10, has_filter( 'upload_mimes', [ $this->controller, 'allow_font_uploads' ] ) );
-		$this->assertEquals( 10, has_filter( 'gfpdf_settings_general', [ $gfpdf->misc, 'add_template_image' ] ) );
 
 		$this->assertFalse( has_filter( 'gfpdf_registered_settings', [ $gfpdf->options, 'highlight_errors' ] ) );
 		/* retest the gfpdf_register_settings filter is added when on the correct screen */

@@ -403,10 +403,11 @@ class Test_Shortcode extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_display_gravitypdf_shortcode() {
-		$this->assertNotFalse( strpos( $this->view->display_gravitypdf_shortcode( [ 'url'     => '',
-		                                                                            'class'   => '',
-		                                                                            'classes' => '',
-		                                                                            'text'    => '',
+		$this->assertNotFalse( strpos( $this->view->display_gravitypdf_shortcode( [
+			'url'     => '',
+			'class'   => '',
+			'classes' => '',
+			'text'    => '',
 		] ), '<a href="' ) );
 	}
 }

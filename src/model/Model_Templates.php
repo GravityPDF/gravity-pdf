@@ -1,0 +1,392 @@
+<?php
+
+namespace GFPDF\Model;
+
+use GFPDF\Helper\Helper_Abstract_Model;
+use GFPDF\Helper\Helper_Misc;
+use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Templates;
+
+use Upload\File;
+use Upload\Storage\FileSystem;
+use Upload\Validation\Extension;
+use Upload\Validation\Mimetype;
+use Upload\Validation\Size;
+
+use Psr\Log\LoggerInterface;
+
+use GPDFAPI;
+use Exception;
+
+/**
+ * Template Model
+ *
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2016, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       4.1
+ */
+
+/* Exit if accessed directly */
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/*
+    This file is part of Gravity PDF.
+
+    Gravity PDF – Copyright (C) 2016, Blue Liquid Designs
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
+
+/**
+ * Model_Actions
+ *
+ * Handles the grunt work for our PDF template manager
+ *
+ * @since 4.1
+ */
+class Model_Templates extends Helper_Abstract_Model {
+
+	/**
+	 * Holds our Helper_Templates object
+	 * used to ease access to our PDF templates
+	 *
+	 * @var \GFPDF\Helper\Helper_Templates
+	 *
+	 * @since 4.1
+	 */
+	protected $templates;
+
+	/**
+	 * Holds our log class
+	 *
+	 * @var \Monolog\Logger|LoggerInterface
+	 *
+	 * @since 4.1
+	 */
+	protected $log;
+
+	/**
+	 * Holds our Helper_Data object
+	 * which we can autoload with any data needed
+	 *
+	 * @var \GFPDF\Helper\Helper_Data
+	 *
+	 * @since 4.1
+	 */
+	protected $data;
+
+	/**
+	 * Holds our Helper_Misc object
+	 * Makes it easy to access common methods throughout the plugin
+	 *
+	 * @var \GFPDF\Helper\Helper_Misc
+	 *
+	 * @since 4.1
+	 */
+	protected $misc;
+
+
+	/**
+	 * Model_Templates constructor.
+	 *
+	 * @param Helper_Templates $templates
+	 * @param LoggerInterface  $log
+	 * @param Helper_Data      $data
+	 * @param Helper_Misc      $misc
+	 *
+	 * @since 4.1
+	 */
+	public function __construct( Helper_Templates $templates, LoggerInterface $log, Helper_Data $data, Helper_Misc $misc ) {
+		/* Assign our internal variables */
+		$this->templates = $templates;
+		$this->data      = $data;
+		$this->log       = $log;
+		$this->misc      = $misc;
+	}
+
+	/**
+	 * AJAX Endpoint to handle the uploading of PDF templates
+	 *
+	 * @param string $_POST ['nonce'] a valid nonce
+	 *
+	 * @since 4.1
+	 */
+	public function ajax_process_uploaded_template() {
+
+		$this->misc->handle_ajax_authentication( 'Process Uploaded Template Zip Package' );
+
+		/* Validate uploaded file */
+		try {
+			$storage  = new FileSystem( $this->data->template_tmp_location );
+			$file     = new File( 'template', $storage );
+			$zip_path = $this->move_template_to_tmp_dir( $file );
+		} catch ( Exception $e ) {
+			$this->log->addWarning( 'File validation and move failed', [
+				'file'  => $_FILES,
+				'error' => $e->getMessage(),
+			] );
+
+			header( 'HTTP/1.1 400 Bad Request' );
+			wp_die( '400' );
+		}
+
+		/* Unzip and check the PDF templates look valid */
+		try {
+			$this->unzip_and_verify_templates( $zip_path );
+		} catch ( Exception $e ) {
+			$this->cleanup_template_files( $zip_path );
+
+			$this->log->addWarning( 'File validation and move failed', [
+				'file'  => $_FILES,
+				'error' => $e->getMessage(),
+			] );
+
+			header( 'HTTP/1.1 400 Bad Request' );
+			header( 'Content-Type: application/json' );
+			echo json_encode( [
+				'error' => $e->getMessage(),
+			] );
+
+			wp_die();
+		}
+
+		/* Copy all the files to the active PDF working directory */
+		$results = $this->misc->copyr( $this->get_unzipped_dir_name( $zip_path ), $this->templates->get_template_path() );
+
+		/* Get the template headers now all the files are in the right location */
+		$headers = $this->get_template_info( glob( $this->get_unzipped_dir_name( $zip_path ) . '*.php' ) );
+
+		/* Cleanup tmp uploaded files */
+		$this->cleanup_template_files( $zip_path );
+
+		if ( is_wp_error( $results ) ) {
+			header( 'HTTP/1.1 500 Internal Server Error' );
+			wp_die( '500' );
+		}
+
+		/* Return newly-installed template headers */
+		header( 'HTTP/1.1 200 OK' );
+		header( 'Content-Type: application/json' );
+		echo json_encode( [
+			'templates' => $headers,
+		] );
+
+		wp_die();
+	}
+
+	/**
+	 * AJAX Endpoint for deleting user-uploaded PDF templates
+	 *
+	 * @param string $_POST ['nonce'] a valid nonce
+	 * @param string $_POST ['id'] a valid PDF template ID
+	 *
+	 * @since 4.1
+	 */
+	public function ajax_process_delete_template() {
+
+		$this->misc->handle_ajax_authentication( 'Delete PDF Template' );
+
+		$template_id = ( isset( $_POST['id'] ) ) ? $_POST['id'] : '';
+
+		/* Get all the necessary PDF template files to delete */
+		try {
+			$files = $this->templates->get_template_files_by_id( $template_id );
+
+			foreach ( $files as $file ) {
+				unlink( $file );
+			}
+		} catch ( Exception $e ) {
+			header( 'HTTP/1.1 400 Bad Request' );
+			wp_die('400');
+		}
+
+		header( 'HTTP/1.1 200 OK' );
+		header( 'Content-Type: application/json' );
+		echo json_encode( true );
+		wp_die();
+	}
+
+	/**
+	 * AJAX Endpoint for building the template select box options (so we don't have to recreate the logic in React)
+	 *
+	 * @param string $_POST ['nonce'] a valid nonce
+	 *
+	 * @since 4.1
+	 */
+	public function ajax_process_build_template_options_html() {
+		$this->misc->handle_ajax_authentication( 'Build Template Options HTML' );
+
+		$options_class = GPDFAPI::get_options_class();
+
+		$registered_settings = $options_class->get_registered_fields();
+		$template_settings   = $registered_settings['form_settings']['template'];
+
+		$templates = $template_settings['options'];
+		$value     = $options_class->get_form_value( $template_settings );
+
+		header( 'HTTP/1.1 200 OK' );
+		header( 'Content-Type: application/text' );
+		echo $options_class->build_options_for_select( $templates, $value );
+		wp_die();
+	}
+
+	/**
+	 * Validations, renames and moves the uploaded zip file to an appropriate location
+	 *
+	 * @param \Upload\File $file
+	 *
+	 * @return string The full path of the final resting place of the uploaded zip file
+	 *
+	 * @since 4.1
+	 */
+	public function move_template_to_tmp_dir( File $file) {
+		/* Validate our uploaded file and move to the PDF tmp directory for further processing */
+		$file->setName( uniqid() );
+
+		$file->addValidations( [
+			new Extension( 'zip' ),
+			new Mimetype( [ 'application/zip', 'application/octet-stream' ] ),
+			new Size( '2048K' ),
+		] );
+
+		$file->upload();
+
+		return $this->data->template_tmp_location . $file->getNameWithExtension();
+	}
+
+	/**
+	 * Gets the full path to a new directory which is based on the zip file's unique name
+	 *
+	 * @param string $zip_path The full path to the zip file
+	 *
+	 * @return string
+	 *
+	 * @since 4.1
+	 */
+	public function get_unzipped_dir_name( $zip_path ) {
+		return dirname( $zip_path ) . '/' . basename( $zip_path, '.zip' ) . '/';
+	}
+
+	/**
+	 * Extracts the zip file, checks there are valid PDF template files found and retreives information about them
+	 *
+	 * @param $zip_path The full path to the zip file
+	 *
+	 * @return array The PDF template headers from the valid files
+	 *
+	 * @throws Exception Thrown if a PDF template file isn't valid
+	 *
+	 * @since 4.1
+	 */
+	public function unzip_and_verify_templates( $zip_path ) {
+		$this->enable_wp_filesystem();
+
+		$dir     = $this->get_unzipped_dir_name( $zip_path );
+		$results = unzip_file( $zip_path, $dir );
+
+		/* If the unzip failed we'll throw an error */
+		if ( is_wp_error( $results ) ) {
+			throw new Exception( $results->get_error_message() );
+		}
+
+		/* Check unziped templates for a valid v4 header, or v3 string pattern */
+		$files = glob( $dir . '*.php' );
+
+		if ( ! is_array( $files ) || sizeof( $files ) === 0 ) {
+			throw new Exception( esc_html__( 'No valid PDF template found in Zip archive.', 'gravity-forms-pdf-extended' ) );
+		}
+
+		$this->check_for_valid_pdf_templates( $files );
+	}
+
+	/**
+	 * Sniffs the PHP file for signs that it's a valid Gravity PDF tempalte file
+	 *
+	 * @param array $files The full paths to the PDF templates
+	 *
+	 * @return array The PDF template header information
+	 *
+	 * @throws Exception Thrown if file found not to be valid
+	 *
+	 * @since 4.1
+	 */
+	public function check_for_valid_pdf_templates( $files = [] ) {
+		foreach ( $files as $file ) {
+
+			/* Check if we have a valid v4 template header in the file */
+			$info = get_file_data( $file, $this->templates->get_template_header_details() );
+
+			if ( ! isset( $info['template'] ) || strlen( $info['template'] ) === 0 ) {
+				/* Check if it's a v3 template */
+				$fp        = fopen( $file, 'r' );
+				$file_data = fread( $fp, 8192 );
+				fclose( $fp );
+
+				/* Check the first 8kiB contains the string RGForms or GFForms, which signifies our v3 templates */
+				if ( strpos( $file_data, 'RGForms' ) === false && strpos( $file_data, 'GFForms' ) === false ) {
+					throw new Exception( esc_html__( sprintf( 'The PHP file %s is not a valid PDF Template.', basename( $file ) ), 'gravity-forms-pdf-extended' ) );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Get the PDF template info to pass to our application
+	 *
+	 * @param array $files
+	 *
+	 * @return array
+	 *
+	 * @since 4.1
+	 */
+	public function get_template_info( $files = [] ) {
+		return array_map( function ( $file ) {
+			return $this->templates->get_template_info_by_path( $file );
+		}, $files );
+	}
+
+	/**
+	 * Remove the zip file and the unzipped directory
+	 *
+	 * @param $zip_path The full path to the zip file
+	 *
+	 * @since 4.1
+	 */
+	public function cleanup_template_files( $zip_path ) {
+		$dir = $this->get_unzipped_dir_name( $zip_path );
+
+		$this->misc->rmdir( $dir );
+		unlink( $zip_path );
+	}
+
+	/**
+	 * A hack to ensure we can use unzip_file() without worrying about
+	 * credentials being prompted.
+	 *
+	 * @since 4.1
+	 */
+	private function enable_wp_filesystem() {
+
+		/* This occurs on an AJAX call so don't need to worry about removing the filter afterwards */
+		add_filter( 'filesystem_method', function () {
+			return 'direct';
+		} );
+
+		WP_Filesystem();
+	}
+}

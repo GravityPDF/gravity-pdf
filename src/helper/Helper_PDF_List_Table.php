@@ -4,6 +4,7 @@ namespace GFPDF\Helper;
 
 use WP_List_Table;
 
+
 /**
  * WP_List_Table Helper Controller
  *
@@ -74,39 +75,35 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	protected $misc;
 
 	/**
-	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
-	 * Makes it easy to access global PDF settings and individual form PDF settings
+	 * Holds our Helper_Templates object
+	 * used to ease access to our PDF templates
 	 *
-	 * @var \GFPDF\Helper\Helper_Options_Fields
+	 * @var \GFPDF\Helper\Helper_Templates
 	 *
 	 * @since 4.0
 	 */
-	protected $options;
+	protected $templates;
 
 	/**
 	 * Setup our class with appropriate data
 	 *
-	 * @param array                                 $form  The Gravity Forms object
-	 * @param \GFPDF\Helper\Helper_Abstract_Form    $gform Our abstracted Gravity Forms API
-	 * @param \GFPDF\Helper\Helper_Misc             $misc
-	 * @param \GFPDF\Helper\Helper_Abstract_Options $options
+	 * @param array                              $form  The Gravity Forms object
+	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform Our abstracted Gravity Forms API
+	 * @param \GFPDF\Helper\Helper_Misc          $misc
+	 * @param \GFPDF\Helper\Helper_Templates     $templates
 	 *
 	 * @since    4.0
 	 */
-	public function __construct( $form, Helper_Abstract_Form $gform, Helper_Misc $misc, Helper_Abstract_Options $options ) {
+	public function __construct( $form, Helper_Abstract_Form $gform, Helper_Misc $misc, Helper_Templates $templates ) {
 
 		/* Assign our internal variables */
-		$this->form    = $form;
-		$this->gform   = $gform;
-		$this->misc    = $misc;
-		$this->options = $options;
+		$this->form      = $form;
+		$this->gform     = $gform;
+		$this->misc      = $misc;
+		$this->templates = $templates;
 
 		/* Cache column header internally so we don't have to work with the global get_column_headers() function */
-		$this->_column_headers = [
-			$this->get_columns(),
-			[],
-			[],
-		];
+		$this->_column_headers = [ $this->get_columns(), [], [] ];
 
 		parent::__construct();
 	}
@@ -310,18 +307,15 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 */
 	public function column_template( $item ) {
 
-		$template = $this->options->get_template_information( $item['template'] );
+		$template = $this->templates->get_template_info_by_id( $item['template'] );
 
-		if ( is_array( $template ) && isset( $template['template'] ) ) {
-			echo "<strong>{$template['group']} – </strong> {$template['template']}";
+		if ( isset( $template['template'] ) ) {
+			$template_group = $template['group'];
+			$template_name  = $this->templates->maybe_add_template_compatibility_notice( $template['template'], $template['required_pdf_version'] );
 
-			/* Add addendum if version is incompatible */
-			if ( ! empty( $template['required_pdf_version'] ) && version_compare( $template['required_pdf_version'], PDF_EXTENDED_VERSION, '>' ) ) {
-				echo ' (+ ' . esc_html_x( 'needs', 'Required', 'gravity-forms-pdf-extended' ) . ' v' . $template['required_pdf_version'] . ')';
-			}
-
-		} else {
-			echo "<strong>{$template['group']}</strong> – " . $this->misc->human_readable( rgar( $item, 'template' ) );
+			?>
+			<strong><?php echo $template_group; ?></strong> <?php echo $template_name; ?>
+			<?php
 		}
 	}
 

@@ -243,7 +243,15 @@ class Model_Actions extends Helper_Abstract_Model {
 	 */
 	private function migrate_v3( $path ) {
 
-		$migration = new Helper_Migration( GPDFAPI::get_form_class(), GPDFAPI::get_log_class(), GPDFAPI::get_data_class(), GPDFAPI::get_options_class(), GPDFAPI::get_misc_class(), GPDFAPI::get_notice_class() );
+		$migration = new Helper_Migration(
+			GPDFAPI::get_form_class(),
+			GPDFAPI::get_log_class(),
+			GPDFAPI::get_data_class(),
+			GPDFAPI::get_options_class(),
+			GPDFAPI::get_misc_class(),
+			GPDFAPI::get_notice_class(),
+			GPDFAPI::get_templates_class()
+		);
 
 		if ( $migration->begin_migration() ) {
 

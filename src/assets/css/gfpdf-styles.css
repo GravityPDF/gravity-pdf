@@ -76,10 +76,25 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
 	padding: 0 0.6em;
 }
 
-#pdfextended-settings div.notice, div.pdf-notice {
+.gfpdf-page #pdfextended-settings .theme div.notice,
+.gfpdf-page .theme div.notice,
+.gfpdf-page #pdfextended-settings .theme-info div.notice,
+.gfpdf-page .theme-info div.notice{
+    margin: 0;
+    z-index: 500;
+    color: #444;
+    padding: 1px 12px;
+}
+
+#pdfextended-settings div.notice, div.pdf-notice,
+#pdfextended-settings div.error, div.pdf-error{
 	background-color: #FFFFFF;
 	border-left: 4px solid #7AD03A;
 	box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);
+}
+
+#pdfextended-settings div.error, div.pdf-error {
+    border-left-color: #dc3232;
 }
 
 #pdfextended-settings div.notice, div.pdf-notice {
@@ -601,6 +616,95 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
   padding: 2px 0 2px 2px;
 }
 
+/*
+ * Fancy Template Selector
+ */
+#gfpdf-template-container .theme .theme-actions {
+    opacity: 1;
+    left: inherit;
+    border-top: none;
+    -moz-box-sizing: content-box;
+    -webkit-box-sizing: content-box;
+    box-sizing: content-box;
+}
+
+#gfpdf-template-container .wp-filter-search {
+    margin: 0 0 5px;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 1.5;
+
+    width: 100%;
+}
+
+#gfpdf-template-container .theme .theme-author {
+    display: block;
+}
+
+#gfpdf-overlay h1 {
+    float: left;
+    padding-left: 2%;
+}
+
+#gfpdf-overlay p.no-themes {
+    display: block;
+    font-size: 18px;
+}
+
+#fancy-template-selector {
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+#gpdf-advance-template-selector button {
+    vertical-align: middle;
+    margin-left: 5px;
+}
+
+#gfpdf-template-container .theme.add-new-theme a.doing-ajax span:after,
+#gfpdf-template-container .theme.add-new-theme a.doing-ajax:hover span:after{
+    font-family: 'FontAwesome', 'Open Sans', sans-serif;
+    content: '\f1ce';
+    font-size: 79px;
+    background: none;
+    width: auto;
+    height: auto;
+    left: 51.5%;
+    text-indent: 0;
+    -webkit-animation: fa-spin 1.5s infinite linear;
+    animation: fa-spin 1.5s infinite linear;
+}
+
+/*
+ * Dropzone
+ */
+.theme-browser .theme.add-new-theme.gfpdf-dropzone-active a {
+    background: rgb(0, 115, 170);
+}
+.theme-browser .theme.add-new-theme.gfpdf-dropzone-active a:after {
+    border-color: transparent;
+}
+
+.theme-browser .theme.add-new-theme.gfpdf-dropzone-active a span:after {
+    background: #FFF;
+    color: rgb(0, 115, 170);
+}
+
+#gfpdf-template-container .theme.add-new-theme a.doing-ajax:hover span:after,
+#gfpdf-template-container .theme.add-new-theme a.doing-ajax:focus span:after,
+#gfpdf-template-container .theme.add-new-theme.gfpdf-dropzone-active a.doing-ajax span:after {
+    color: #FFF;
+    background: none;
+}
+
+.theme-browser .theme.add-new-theme.gfpdf-dropzone-active .theme-name {
+    color: #FFF;
+}
+
+.gfpdf-dropzone-reject {
+    background: red;
+}
+
 @media only screen and (min-width: 500px) {
 
 	/**
@@ -620,7 +724,7 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
     }
 }
 
-@media only screen and (max-width: 782px) {
+@media only screen and (max-width: 780px) {
     #pdfextended-settings table.gfpdf_table th, #pdfextended-settings table.gfpdf_table td {
         display: block;
         vertical-align: middle;
@@ -804,6 +908,12 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
     }
 }
 
+@media only screen and (max-width: 1120px) {
+    #gfpdf-template-container .theme:nth-child(odd) {
+        margin-right: 2%;
+    }
+}
+
 
 @media only screen and (min-width: 1400px) {
 	/**
@@ -817,5 +927,15 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
 
     #pdfextended-settings .about-wrap #dashboard-widgets .postbox-container a {
         min-height: 90px;
+    }
+}
+
+@media only screen and (min-width: 1640px) {
+    #gfpdf-template-container .theme {
+        margin: 0 2% 2% 0;
+    }
+
+    #gfpdf-template-container .wp-filter-search {
+        width: 22.7%;
     }
 }

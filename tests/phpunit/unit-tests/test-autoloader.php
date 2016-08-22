@@ -86,6 +86,7 @@ class Test_Autoloader extends WP_UnitTestCase {
 			[ 'GFPDF\Helper\Helper_Options_Fields' ],
 			[ 'GFPDF\Helper\Helper_PDF' ],
 			[ 'GFPDF\Helper\Helper_PDF_List_Table' ],
+			[ 'GFPDF\Helper\Helper_Templates' ],
 
 			[ 'GFPDF\Model\Model_Actions' ],
 			[ 'GFPDF\Model\Model_Form_Settings' ],

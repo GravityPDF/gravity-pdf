@@ -84,8 +84,8 @@ class GFPDF_Core extends GFPDF_Depreciated_Abstract {
 	 */
 	public function setup_constants() {
 
-		$data = GPDFAPI:: get_data_class();
-		$misc = GPDFAPI::get_misc_class();
+		$data      = GPDFAPI::get_data_class();
+		$templates = GPDFAPI::get_templates_class();
 
 		if ( ! defined( 'PDF_SAVE_LOCATION' ) ) {
 			define( 'PDF_SAVE_LOCATION', $data->template_tmp_location );
@@ -96,11 +96,11 @@ class GFPDF_Core extends GFPDF_Depreciated_Abstract {
 		}
 
 		if ( ! defined( 'PDF_TEMPLATE_LOCATION' ) ) {
-			define( 'PDF_TEMPLATE_LOCATION', $misc->get_template_path() );
+			define( 'PDF_TEMPLATE_LOCATION', $templates->get_template_path() );
 		}
 
 		if ( ! defined( 'PDF_TEMPLATE_URL_LOCATION' ) ) {
-			define( 'PDF_TEMPLATE_URL_LOCATION', $misc->get_template_url() );
+			define( 'PDF_TEMPLATE_URL_LOCATION', $templates->get_template_url() );
 		}
 	}
 
@@ -110,12 +110,13 @@ class GFPDF_Core extends GFPDF_Depreciated_Abstract {
 	 * @since 4.0
 	 */
 	public function setup_depreciated_paths() {
-		global $gfpdf, $gfpdfe_data;
+		global $gfpdfe_data;
 
-		$gfpdfe_data = $gfpdf->data;
+		$templates   = GPDFAPI::get_templates_class();
 
-		$gfpdf->data->template_site_location = $gfpdf->misc->get_template_url();
-		$gfpdf->data->template_save_location = $gfpdf->data->template_tmp_location;
+		$gfpdfe_data = GPDFAPI::get_data_class();
+		$gfpdfe_data->template_site_location = $templates->get_template_url();
+		$gfpdfe_data->template_save_location = $gfpdfe_data->template_tmp_location;
 	}
 }
 

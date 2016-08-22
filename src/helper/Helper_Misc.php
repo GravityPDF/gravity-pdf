@@ -174,47 +174,6 @@ class Helper_Misc {
 	}
 
 	/**
-	 * Converts a name into something a human can more easily read
-	 *
-	 * @param string $name The string to convert
-	 *
-	 * @return string
-	 *
-	 * @since  4.0
-	 */
-	public function human_readable( $name ) {
-		$name = str_replace( [ '-', '_' ], ' ', $name );
-
-		return mb_convert_case( $name, MB_CASE_TITLE );
-	}
-
-	/**
-	 * Takes a full path to the file and converts it to the appropriate class name
-	 * This follows the simple rules the file basename has its hyphens and spaces are converted to underscores
-	 * then gets converted to sentence case using the underscore as a delimiter
-	 *
-	 * @param string $file The path to a file
-	 *
-	 * @return string
-	 *
-	 * @since 4.0
-	 */
-	public function get_config_class_name( $file ) {
-		$file = basename( $file, '.php' );
-		$file = str_replace( [ '-', ' ' ], '_', $file );
-
-		/* Using a delimiter with ucwords doesn't appear to work correctly so go old school */
-		$file_array = explode( '_', $file );
-		array_walk( $file_array, function ( &$item ) {
-			$item = mb_convert_case( $item, MB_CASE_TITLE, 'UTF-8' );
-		} );
-
-		$file = implode( '_', $file_array );
-
-		return $file;
-	}
-
-	/**
 	 * Manipulate header and footer for more consistent display in PDF
 	 *
 	 * Changes made include:
@@ -694,83 +653,7 @@ class Helper_Misc {
 		return false;
 	}
 
-	/**
-	 * Get the arguments array that should be passed to our PDF Template
-	 *
-	 * @param  array $entry    Gravity Form Entry
-	 * @param  array $settings PDF Settings Array
-	 *
-	 * @return array
-	 *
-	 * @since 4.0
-	 */
-	public function get_template_args( $entry, $settings ) {
-		global $gfpdf;
 
-		/* Disable the field encryption checks which can slow down our entry queries */
-		add_filter( 'gform_is_encrypted_field', '__return_false' );
-
-		$form          = $this->gform->get_form( $entry['form_id'] );
-		$pdf           = GPDFAPI::get_mvc_class( 'Model_PDF' );
-		$form_settings = GPDFAPI::get_mvc_class( 'Model_Form_Settings' );
-
-		/* See https://gravitypdf.com/documentation/v4/gfpdf_template_args/ for more details about this filter */
-
-		return apply_filters( 'gfpdf_template_args', [
-
-			'form_id'  => $entry['form_id'], /* backwards compat */
-			'lead_ids' => $this->get_legacy_ids( $entry['id'], $settings ), /* backwards compat */
-			'lead_id'  => apply_filters( 'gfpdfe_lead_id', $entry['id'], $form, $entry, $gfpdf ), /* backwards compat */
-
-			'form'      => $form,
-			'entry'     => $entry,
-			'lead'      => $entry,
-			'form_data' => $pdf->get_form_data( $entry ),
-			'fields'    => $this->get_fields_sorted_by_id( $form['id'] ),
-			'config'    => $form_settings->get_template_configuration( $settings['template'] ),
-
-			'settings' => $settings,
-
-			'gfpdf' => $gfpdf,
-
-		], $entry, $settings, $form );
-	}
-
-	/**
-	 * Do a lookup for the current template image (if any) and return the path
-	 *
-	 * @param  string $template The template name to look for
-	 *
-	 * @return string Full URL to image
-	 *
-	 * @since 4.0
-	 */
-	public function get_template_image( $template ) {
-
-		/* Add our extension */
-		$template .= '.png';
-
-		$relative_image_path   = 'src/templates/images/';
-		$default_template_path = PDF_PLUGIN_DIR . $relative_image_path;
-		$default_template_url  = PDF_PLUGIN_URL . $relative_image_path;
-
-		/* Multisite Location */
-		if ( is_multisite() && is_file( $this->data->multisite_template_location . 'images/' . $template ) ) {
-			return $this->data->multisite_template_location_url . 'images/' . $template;
-		}
-
-		/* Standard Location */
-		if ( is_file( $this->data->template_location . 'images/' . $template ) ) {
-			return $this->data->template_location_url . 'images/' . $template;
-		}
-
-		/* Core plugin file location */
-		if ( is_file( $default_template_path . $template ) ) {
-			return $default_template_url . $template;
-		}
-
-		return null;
-	}
 
 	/**
 	 * Remove any characters that are invalid in filenames (mostly on Windows systems)
@@ -819,7 +702,6 @@ class Helper_Misc {
 		}
 
 		/* if not processing legacy endpoint, or if invalid IDs were passed we'll return the original entry ID */
-
 		return [ $entry_id ];
 	}
 
@@ -877,39 +759,6 @@ class Helper_Misc {
 	}
 
 	/**
-	 * Add an image of the current selected template (if any) to the template and default_template field descriptions
-	 *
-	 * @param array $settings Any existing settings loaded
-	 *
-	 * @since 4.0
-	 *
-	 * @return array
-	 */
-	public function add_template_image( $settings ) {
-
-
-		if ( isset( $settings['template'] ) || isset( $settings['default_template'] ) ) {
-			$options = GPDFAPI::get_options_class();
-
-			$key = ( isset( $settings['template'] ) ) ? 'template' : 'default_template';
-
-			$current_template = $options->get_form_value( $settings[ $key ] );
-			$template_image   = $this->get_template_image( $current_template );
-
-			$settings[ $key ]['desc'] .= '<div id="gfpdf-template-example">';
-
-			if ( ! empty( $template_image ) ) {
-				$img = '<img src="' . esc_url( $template_image ) . '" />';
-				$settings[ $key ]['desc'] .= $img;
-			}
-
-			$settings[ $key ]['desc'] .= '</div>';
-		}
-
-		return $settings;
-	}
-
-	/**
 	 * Determine if the logic should show or hide the item
 	 *
 	 * @param array $logic
@@ -940,36 +789,6 @@ class Helper_Misc {
 	}
 
 	/**
-	 * Check if running single or multisite and return the working directory path
-	 *
-	 * @return string Path to working directory
-	 *
-	 * @since 4.0
-	 */
-	public function get_template_path() {
-		if ( is_multisite() ) {
-			return $this->data->multisite_template_location;
-		}
-
-		return $this->data->template_location;
-	}
-
-	/**
-	 * Check if running single or multisite and return the working directory URL
-	 *
-	 * @return string URL to working directory
-	 *
-	 * @since 4.0
-	 */
-	public function get_template_url() {
-		if ( is_multisite() ) {
-			return $this->data->multisite_template_location_url;
-		}
-
-		return $this->data->template_location_url;
-	}
-
-	/**
 	 * Takes a Gravity Form ID and returns the list of fields which can be accessed using their ID
 	 *
 	 * @param integer $form_id The Gravity Form ID
@@ -995,8 +814,8 @@ class Helper_Misc {
 	 * Converts the 4.x settings array into a compatible 3.x settings array
 	 *
 	 * @param  array $settings The 4.x settings to be converted
-	 * @param  array $form     (since 4.0.6) The Gravity Forms array
-	 * @param  array $entry    (since 4.0.6) The Gravity Forms entry
+	 * @param  array $form (since 4.0.6) The Gravity Forms array
+	 * @param  array $entry (since 4.0.6) The Gravity Forms entry
 	 *
 	 * @return array           The 3.x compatible settings
 	 *
@@ -1077,5 +896,67 @@ class Helper_Misc {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Ensure an extension is added to the end of the name
+	 *
+	 * @param  string $name      The PHP template
+	 *
+	 * @param string  $extension The extension that should be added to the filename
+	 *
+	 * @return string
+	 *
+	 * @since  4.1
+	 */
+	public function get_file_with_extension( $name, $extension = '.php' ) {
+		if ( substr( $name, -strlen( $extension ) ) !== $extension ) {
+			$name = $name . $extension;
+		}
+
+		return $name;
+	}
+
+	/**
+	 * Check the Nonce and any user capabilities required before all AJAX requests
+	 * If once of these fails the appropriate response code will be sent
+	 *
+	 * @param string $endpoint_desc The name of the endpoint currently being processed (for the log)
+	 * @param string|bool $capability The capability name the logged in user is required to run this endpoint, or false if no authentation needed
+	 * @param string $nonce_name The name of the Nonce our $_POST['nonce'] should be checked against
+	 *
+	 * @since 4.1
+	 */
+	public function handle_ajax_authentication( $endpoint_desc, $capability = 'gravityforms_edit_settings', $nonce_name = 'gfpdf_ajax_nonce' ) {
+
+		$this->log->addNotice( 'Running AJAX Endpoint', [
+			'type' => $endpoint_desc,
+			'post' => $_POST,
+		] );
+
+		/*
+         * Validate Endpoint
+         */
+		$nonce = ( isset( $_POST['nonce'] ) ) ? $_POST['nonce'] : '';
+		if ( ! wp_verify_nonce( $nonce, $nonce_name ) ) {
+
+			$this->log->addWarning( 'Nonce Verification Failed' );
+
+			header( 'HTTP/1.1 401 Unauthorized' );
+			wp_die( '401' );
+		}
+
+		/* prevent unauthorized access */
+		if ( $capability !== false && ! $this->gform->has_capability( $capability ) ) {
+
+			$this->log->addCritical( 'Lack of User Capabilities', [
+				'user'              => wp_get_current_user(),
+				'user_meta'         => get_user_meta( get_current_user_id() ),
+				'capability_needed' => $capability,
+			] );
+
+			header( 'HTTP/1.1 401 Unauthorized' );
+			wp_die( '401' );
+		}
 	}
 }

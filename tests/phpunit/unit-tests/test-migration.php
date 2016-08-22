@@ -74,7 +74,7 @@ class Test_Migration extends WP_UnitTestCase {
 		parent::setUp();
 
 		/* Setup our test classes */
-		$this->migration = new Helper_Migration( $gfpdf->gform, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices );
+		$this->migration = new Helper_Migration( $gfpdf->gform, $gfpdf->log, $gfpdf->data, $gfpdf->options, $gfpdf->misc, $gfpdf->notices, $gfpdf->templates );
 
 		/* Get our form ID */
 		$this->form_id[] = $gfpdf->gform->add_form( json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/migration_v3_to_v4.json' ) ), true ) );

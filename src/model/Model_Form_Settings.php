@@ -9,13 +9,12 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
+use GFPDF\Helper\Helper_Templates;
 use GFPDF\Helper\Helper_Abstract_Options;
 
 use Psr\Log\LoggerInterface;
 
 use _WP_Editors;
-
-use stdClass;
 
 /**
  * Settings Model
@@ -119,6 +118,16 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	protected $notices;
 
 	/**
+	 * Holds our Helper_Templates object
+	 * used to ease access to our PDF templates
+	 *
+	 * @var \GFPDF\Helper\Helper_Templates
+	 *
+	 * @since 4.0
+	 */
+	protected $templates;
+
+	/**
 	 * Setup our class by injecting all our dependancies
 	 *
 	 * @param \GFPDF\Helper\Helper_Abstract_Form    $gform   Our abstracted Gravity Forms helper functions
@@ -127,18 +136,20 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @param \GFPDF\Helper\Helper_Abstract_Options $options Our options class which allows us to access any settings
 	 * @param \GFPDF\Helper\Helper_Misc             $misc    Our miscellaneous class
 	 * @param \GFPDF\Helper\Helper_Notices          $notices Our notice class used to queue admin messages and errors
+	 * @param \GFPDF\Helper\Helper_Templates        $templates
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Data $data, Helper_Abstract_Options $options, Helper_Misc $misc, Helper_Notices $notices ) {
+	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Data $data, Helper_Abstract_Options $options, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates ) {
 
 		/* Assign our internal variables */
-		$this->gform   = $gform;
-		$this->log     = $log;
-		$this->data    = $data;
-		$this->options = $options;
-		$this->misc    = $misc;
-		$this->notices = $notices;
+		$this->gform     = $gform;
+		$this->log       = $log;
+		$this->data      = $data;
+		$this->options   = $options;
+		$this->misc      = $misc;
+		$this->notices   = $notices;
+		$this->templates = $templates;
 	}
 
 	/**
@@ -185,7 +196,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$form = $this->gform->get_form( $form_id );
 
 		/* load our list table */
-		$pdf_table = new Helper_PDF_List_Table( $form, $this->gform, $this->misc, $this->options );
+		$pdf_table = new Helper_PDF_List_Table( $form, $this->gform, $this->misc, $this->templates );
 		$pdf_table->prepare_items();
 
 		/* pass to view */
@@ -547,7 +558,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function register_custom_appearance_settings( $settings ) {
 		$template = $this->get_template_name_from_current_page();
-		$class    = $this->get_template_configuration( $template );
+		$class    = $this->templates->get_config_class( $template );
 
 		return $this->setup_custom_appearance_settings( $class, $settings );
 	}
@@ -568,12 +579,11 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* Add our template group */
 		if ( isset( $settings['template'] ) && is_array( $settings['template'] ) ) {
 
-			$template       = $this->get_template_name_from_current_page();
-			$template_group = $this->options->get_template_group( $template );
+			$template_info = $this->templates->get_template_info_by_id( $this->get_template_name_from_current_page() );
 
 			/* Ensure the key we want is an array, otherwise set it to one */
 			$settings['template']['data']                   = ( isset( $settings['template']['data'] ) && is_array( $settings['template']['data'] ) ) ? $settings['template']['data'] : [];
-			$settings['template']['data']['template_group'] = $template_group;
+			$settings['template']['data']['template_group'] = $template_info['group'];
 		}
 
 		return $settings;
@@ -664,92 +674,6 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		}
 
 		return $settings;
-	}
-
-	/**
-	 * Attempts to load the current template configuration (if any)
-	 * We first look in the PDF_EXTENDED_TEMPLATE directory (in case a user has overridden the file)
-	 * Then we try and load the core configuration file
-	 *
-	 * @param  string $template The template config to load
-	 *
-	 * @return object
-	 *
-	 * @since 4.0
-	 */
-	public function get_template_configuration( $template ) {
-
-		/* Try load the multisite template configuration first */
-		if ( is_multisite() ) {
-			$file  = $this->data->multisite_template_location . 'config/' . $template . '.php';
-			$class = $this->load_template_configuration( $file );
-		}
-
-		/* If no multisite class we'll try load the standard user template config */
-		if ( empty( $class ) ) {
-			$file  = $this->data->template_location . 'config/' . $template . '.php';
-			$class = $this->load_template_configuration( $file );
-		}
-
-		/* If there are no user overriding templates we'll attempt to load a config from the main plugin */
-		$file = PDF_PLUGIN_DIR . 'src/templates/config/' . $template . '.php';
-		if ( empty( $class ) ) {
-			$class = $this->load_template_configuration( $file );
-		}
-
-		/* If class still empty it's either a legacy template or doesn't have a config. Check for legacy templates which support certain fields */
-		$legacy_templates = apply_filters( 'gfpdf_legacy_templates', [
-			'default-template',
-			'default-template-two-rows',
-			'default-template-no-style',
-		] );
-
-		if ( in_array( $template, $legacy_templates ) ) {
-			$class = $this->load_template_configuration( PDF_PLUGIN_DIR . 'src/templates/config/legacy.php' );
-		}
-
-		/* If there is still no class loaded we'll pass along a new empty class */
-		if ( empty( $class ) ) {
-			$class = new stdClass();
-		}
-
-		return $class;
-	}
-
-	/**
-	 * Load our template configuration file, if it exists
-	 *
-	 * @param  string $file The file to load
-	 *
-	 * @return object
-	 *
-	 * @since 4.0
-	 */
-	public function load_template_configuration( $file ) {
-
-		$namespace = 'GFPDF\Templates\Config\\';
-		$class     = false;
-
-		$class_name = $this->misc->get_config_class_name( $file );
-		$fqcn       = $namespace . $class_name;
-
-		/* Try and load the file if the class doesn't exist */
-		if ( ! class_exists( $fqcn ) ) {
-			if ( is_file( $file ) && is_readable( $file ) ) {
-				require_once( $file );
-			} else {
-				$this->log->addWarning( 'Template Configuration Failed to Load', [
-					'file' => $file,
-				] );
-			}
-		}
-
-		/* Insure the class we are trying to load exists and impliments our Helper_Interface_Config interface */
-		if ( class_exists( $fqcn ) && in_array( 'GFPDF\Helper\Helper_Interface_Config', class_implements( $fqcn ) ) ) {
-			$class = new $fqcn();
-		}
-
-		return $class;
 	}
 
 	/**
@@ -1087,18 +1011,15 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* get the current template */
 		$template = ( isset( $_POST['template'] ) ) ? $_POST['template'] : '';
 		$type     = ( isset( $_POST['type'] ) ) ? $_POST['type'] : '';
-		$class    = $this->get_template_configuration( $template );
+		$class    = $this->templates->get_config_class( $template );
 		$settings = $this->setup_custom_appearance_settings( $class );
-
-		/* Check if the selected template has a preview */
-		$template_image = $this->misc->get_template_image( $template );
 
 		/* Only handle fields when in the PDF Forms Settings, and not in the general settings */
 		if ( $type != 'gfpdf_settings[default_template]' ) {
 
 			/* Get the template type so we can return out to the browser */
-			$template_data = $this->options->get_template_information( $template );
-			$template_type = ( isset( $template_data['group'] ) ) ? mb_strtolower( $template_data['group'] ) : 'legacy';
+			$template_data = $this->templates->get_template_info_by_id( $template );
+			$template_type = mb_strtolower( $template_data['group'] );
 
 			/* add our filter to override what template gets rendered (by default it is the current selected template in the config) */
 			add_filter( 'gfpdf_form_settings_custom_appearance', function () use ( &$settings ) {
@@ -1136,7 +1057,6 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		$return = [
 			'fields'        => $html,
-			'preview'       => $template_image,
 			'editors'       => $editors,
 			'editor_init'   => $editor_init,
 			'template_type' => $template_type,

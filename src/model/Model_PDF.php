@@ -15,6 +15,7 @@ use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
+use GFPDF\Helper\Helper_Templates;
 
 use Psr\Log\LoggerInterface;
 
@@ -132,6 +133,16 @@ class Model_PDF extends Helper_Abstract_Model {
 	protected $notices;
 
 	/**
+	 * Holds our Helper_Templates object
+	 * used to ease access to our PDF templates
+	 *
+	 * @var \GFPDF\Helper\Helper_Templates
+	 *
+	 * @since 4.0
+	 */
+	protected $templates;
+
+	/**
 	 * Setup our view with the needed data and classes
 	 *
 	 * @param \GFPDF\Helper\Helper_Abstract_Form    $gform   Our abstracted Gravity Forms helper functions
@@ -140,18 +151,20 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @param \GFPDF\Helper\Helper_Data             $data    Our plugin data store
 	 * @param \GFPDF\Helper\Helper_Misc             $misc    Our miscellaneous class
 	 * @param \GFPDF\Helper\Helper_Notices          $notices Our notice class used to queue admin messages and errors
+	 * @param \GFPDF\Helper\Helper_Templates        $templates
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices ) {
+	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates ) {
 
 		/* Assign our internal variables */
-		$this->gform   = $gform;
-		$this->log     = $log;
-		$this->options = $options;
-		$this->data    = $data;
-		$this->misc    = $misc;
-		$this->notices = $notices;
+		$this->gform     = $gform;
+		$this->log       = $log;
+		$this->options   = $options;
+		$this->data      = $data;
+		$this->misc      = $misc;
+		$this->notices   = $notices;
+		$this->templates = $templates;
 	}
 
 	/**
@@ -771,7 +784,17 @@ class Model_PDF extends Helper_Abstract_Model {
 			/* Get required parameters */
 			$entry    = $pdf->get_entry();
 			$settings = $pdf->get_settings();
-			$args     = $this->misc->get_template_args( $entry, $settings );
+			$form     = $this->gform->get_form( $entry['form_id'] );
+
+			$args     = $this->templates->get_template_arguments(
+				$form,
+				$this->misc->get_fields_sorted_by_id( $form['id'] ),
+				$entry,
+				$this->get_form_data( $entry ),
+				$settings,
+				$this->templates->get_config_class( $settings['template'] ),
+				$this->misc->get_legacy_ids( $entry['id'], $settings )
+			);
 
 			/* Add backwards compatibility support */
 			$GLOBALS['wp']->query_vars['pid'] = $settings['id'];
@@ -859,7 +882,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function generate_and_save_pdf( $entry, $settings ) {
 
-		$pdf_generator = new Helper_PDF( $entry, $settings, $this->gform, $this->data );
+		$pdf_generator = new Helper_PDF( $entry, $settings, $this->gform, $this->data, $this->misc, $this->templates );
 		$pdf_generator->set_filename( $this->get_pdf_name( $settings, $entry ) );
 
 		if ( $this->process_and_save_pdf( $pdf_generator ) ) {
@@ -1094,7 +1117,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				/* Only generate if the PDF wasn't during the notification process */
 				if ( ! is_wp_error( $settings ) ) {
 
-					$pdf_generator = new Helper_PDF( $entry, $settings, $this->gform, $this->data );
+					$pdf_generator = new Helper_PDF( $entry, $settings, $this->gform, $this->data, $this->misc, $this->templates );
 					$pdf_generator->set_filename( $this->get_pdf_name( $settings, $entry ) );
 
 					if ( $this->does_pdf_exist( $pdf_generator ) ) {
