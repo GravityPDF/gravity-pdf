@@ -156,6 +156,25 @@ final class GPDFAPI {
 	}
 
 	/**
+	 * Returns our templates methods used throughout the plugin.
+	 *
+	 * Usage:
+	 *
+	 * $templates->get_all_templates();
+	 *
+	 * See @TODO https://gravitypdf.com/documentation/v4/api_get_templates_class/ for more information about this method
+	 *
+	 * @return \GFPDF\Helper\Helper_Templates
+	 *
+	 * @since 4.1
+	 */
+	public static function get_templates_class() {
+		global $gfpdf;
+
+		return $gfpdf->templates;
+	}
+
+	/**
 	 * Returns our abstracted Gravity Forms API class we use throughout the plugin
 	 *
 	 * While you could just use the GFAPI directly, some methods in this class have been cache-optimised and are specifically tuned for Gravity PDF.

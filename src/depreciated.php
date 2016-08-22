@@ -84,8 +84,8 @@ class GFPDF_Core extends GFPDF_Depreciated_Abstract {
 	 */
 	public function setup_constants() {
 
-		$data = GPDFAPI:: get_data_class();
-		$misc = GPDFAPI::get_misc_class();
+		$data      = GPDFAPI::get_data_class();
+		$templates = GPDFAPI::get_templates_class();
 
 		if ( ! defined( 'PDF_SAVE_LOCATION' ) ) {
 			define( 'PDF_SAVE_LOCATION', $data->template_tmp_location );
@@ -96,11 +96,11 @@ class GFPDF_Core extends GFPDF_Depreciated_Abstract {
 		}
 
 		if ( ! defined( 'PDF_TEMPLATE_LOCATION' ) ) {
-			define( 'PDF_TEMPLATE_LOCATION', $misc->get_template_path() );
+			define( 'PDF_TEMPLATE_LOCATION', $templates->get_template_path() );
 		}
 
 		if ( ! defined( 'PDF_TEMPLATE_URL_LOCATION' ) ) {
-			define( 'PDF_TEMPLATE_URL_LOCATION', $misc->get_template_url() );
+			define( 'PDF_TEMPLATE_URL_LOCATION', $templates->get_template_url() );
 		}
 	}
 
@@ -110,12 +110,13 @@ class GFPDF_Core extends GFPDF_Depreciated_Abstract {
 	 * @since 4.0
 	 */
 	public function setup_depreciated_paths() {
-		global $gfpdf, $gfpdfe_data;
+		global $gfpdfe_data;
 
-		$gfpdfe_data = $gfpdf->data;
+		$templates   = GPDFAPI::get_templates_class();
 
-		$gfpdf->data->template_site_location = $gfpdf->misc->get_template_url();
-		$gfpdf->data->template_save_location = $gfpdf->data->template_tmp_location;
+		$gfpdfe_data = GPDFAPI::get_data_class();
+		$gfpdfe_data->template_site_location = $templates->get_template_url();
+		$gfpdfe_data->template_save_location = $gfpdfe_data->template_tmp_location;
 	}
 }
 
@@ -155,6 +156,7 @@ class PDFRender extends GFPDF_Depreciated_Abstract {
 		}
 
 		/* return the path to the PDF */
+
 		return $path . $filename;
 	}
 
@@ -200,7 +202,7 @@ class PDF_Common extends GFPDF_Depreciated_Abstract {
 		global $form_id, $lead_id, $lead_ids;
 
 		$form_id  = ( $form_id ) ? $form_id : absint( rgget( 'fid' ) );
-		$lead_ids = ( $lead_id ) ? array( $lead_id ) : explode( ',', rgget( 'lid' ) );
+		$lead_ids = ( $lead_id ) ? [ $lead_id ] : explode( ',', rgget( 'lid' ) );
 
 		/* If form ID and lead ID hasn't been set stop the PDF from attempting to generate */
 		if ( empty( $form_id ) || empty( $lead_ids ) ) {
@@ -219,6 +221,7 @@ class PDF_Common extends GFPDF_Depreciated_Abstract {
 	 */
 	public static function get_upload_dir() {
 		$misc = GPDFAPI::get_misc_class();
+
 		return $misc->get_upload_details();
 	}
 
@@ -316,6 +319,7 @@ class PDF_Common extends GFPDF_Depreciated_Abstract {
 	 */
 	public static function remove_invalid_characters( $name ) {
 		$misc = GPDFAPI::get_misc_class();
+
 		return $misc->strip_invalid_characters( $name );
 	}
 }
@@ -342,14 +346,14 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 	 * @since 3.0
 	 */
 	public static function lead_detail_grid( $form, $lead, $allow_display_empty_fields = false, $show_html = false, $show_page_name = false, $return = false ) {
-		$config = array(
-			'meta' => array(
+		$config = [
+			'meta' => [
 				'empty_field' => $allow_display_empty_fields,
 				'return'      => $return,
 				'html_field'  => $show_html,
 				'page_names'  => $show_page_name,
-			),
-		);
+			],
+		];
 
 		return self::do_lead_detail_grid( $form, $lead, $config );
 	}
@@ -365,11 +369,11 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 	 *
 	 * @since 3.7
 	 */
-	public static function do_lead_detail_grid( $form, $lead, $config = array() ) {
+	public static function do_lead_detail_grid( $form, $lead, $config = [] ) {
 
 		/* Convert old config values to our new ones */
 		if ( ! isset( $config['meta'] ) ) {
-			$config = array( 'meta' => $config );
+			$config = [ 'meta' => $config ];
 		}
 
 		return self::generate_v3_html_structure( $form, $lead, $config['meta'] );
@@ -395,14 +399,14 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 		$page_number  = 0;
 
 		/* Change the standardised HTML field output to be v3 compatible */
-		add_filter( 'gfpdf_field_html_value', array( 'GFPDFEntryDetail', 'legacy_html_format'), 10, 5 );
-		add_filter( 'gfpdf_field_class', array( 'GFPDFEntryDetail', 'load_legacy_html_classes'), 10, 3 );
+		add_filter( 'gfpdf_field_html_value', [ 'GFPDFEntryDetail', 'legacy_html_format' ], 10, 5 );
+		add_filter( 'gfpdf_field_class', [ 'GFPDFEntryDetail', 'load_legacy_html_classes' ], 10, 3 );
 
 		/* Setup field to return the form data, if needed */
-		$results = array(
+		$results = [
 			'title' => '',
-			'field' => array(),
-		);
+			'field' => [],
+		];
 
 		/* Output the form title */
 		if ( $config['return'] ) {
@@ -410,7 +414,7 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 		} else {
 			?>
 
-			<?php echo $styles ; ?>
+			<?php echo $styles; ?>
 			<div id='container'>
 			<h2 id='details' class='default'><?php echo $form['title'] ?></h2>
 			<?php
@@ -420,7 +424,7 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 		foreach ( $form['fields'] as $field ) {
 
 			/* Skip any fields with the css class 'exclude' or any hidden fields */
-			if ( strpos( $field->cssClass, 'exclude' ) !== false  || GFFormsModel::is_field_hidden( $form, $field, array(), $lead ) ) {
+			if ( strpos( $field->cssClass, 'exclude' ) !== false || GFFormsModel::is_field_hidden( $form, $field, [], $lead ) ) {
 				continue;
 			}
 
@@ -444,11 +448,11 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 			}
 
 			/* Output each field type */
-			$input = RGFormsModel::get_input_type( $field );
-			$excluded = array( 'captcha', 'password', 'page' );
+			$input    = RGFormsModel::get_input_type( $field );
+			$excluded = [ 'captcha', 'password', 'page' ];
 
 			/* Skip over any fields we don't want to include */
-			if( in_array( $input, $excluded ) ) {
+			if ( in_array( $input, $excluded ) ) {
 				continue;
 			}
 
@@ -458,9 +462,9 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 			self::load_legacy_css( $field );
 
 			/* Check if HTML field should be included */
-			if( $input == 'html' ) {
+			if ( $input == 'html' ) {
 
-				if( $config['html_field'] === true ) {
+				if ( $config['html_field'] === true ) {
 					$html = $class->html();
 
 					if ( $config['return'] ) {
@@ -510,11 +514,11 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 	/**
 	 * Replaces the v4 HTML structure with the legacy v3 code to prevent backwards compatibility problems
 	 *
-	 * @param string $html The original field HTML which we'll be discarding
-	 * @param string $value The field value
+	 * @param string  $html  The original field HTML which we'll be discarding
+	 * @param string  $value The field value
 	 * @param boolean $show_label
 	 * @param boolean $label Whether to show or hide the field's label
-	 * @param object $field
+	 * @param object  $field
 	 *
 	 * @return string
 	 *
@@ -544,7 +548,7 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 	 *
 	 * @param object $class The original Gravity PDF field class being processed
 	 * @param object $field The Gravity Form field object being processed
-	 * @param array $entry The current Gravity Form array of entry data
+	 * @param array  $entry The current Gravity Form array of entry data
 	 *
 	 * @return object
 	 *
@@ -552,7 +556,7 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
 	 */
 	public static function load_legacy_html_classes( $class, $field, $entry ) {
 
-		switch( get_class( $field ) ) {
+		switch ( get_class( $field ) ) {
 			case 'GF_Field_Section':
 				$class = new GFPDF\Helper\Fields\Field_v3_Section( $field, $entry, GPDFAPI::get_form_class(), GPDFAPI::get_misc_class() );
 			break;

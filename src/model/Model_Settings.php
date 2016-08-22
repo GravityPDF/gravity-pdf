@@ -8,6 +8,7 @@ use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Helper\Helper_Templates;
 
 use Psr\Log\LoggerInterface;
 
@@ -122,6 +123,16 @@ class Model_Settings extends Helper_Abstract_Model {
 	protected $misc;
 
 	/**
+	 * Holds our Helper_Templates object
+	 * used to ease access to our PDF templates
+	 *
+	 * @var \GFPDF\Helper\Helper_Templates
+	 *
+	 * @since 4.0
+	 */
+	protected $templates;
+
+	/**
 	 * Set up our dependancies
 	 *
 	 * @param \GFPDF\Helper\Helper_Abstract_Form    $gform   Our abstracted Gravity Forms helper functions
@@ -130,18 +141,20 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @param \GFPDF\Helper\Helper_Abstract_Options $options Our options class which allows us to access any settings
 	 * @param \GFPDF\Helper\Helper_Data             $data    Our plugin data store
 	 * @param \GFPDF\Helper\Helper_Misc             $misc    Our miscellaneous class
+	 * @param \GFPDF\Helper\Helper_Templates        $templates
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Notices $notices, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc ) {
+	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Notices $notices, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates ) {
 
 		/* Assign our internal variables */
-		$this->gform   = $gform;
-		$this->log     = $log;
-		$this->options = $options;
-		$this->notices = $notices;
-		$this->data    = $data;
-		$this->misc    = $misc;
+		$this->gform     = $gform;
+		$this->log       = $log;
+		$this->options   = $options;
+		$this->notices   = $notices;
+		$this->data      = $data;
+		$this->misc      = $misc;
+		$this->templates = $templates;
 	}
 
 	/**
@@ -159,7 +172,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		/* remove multiple errors for a single form */
 		if ( $this->form_settings_errors ) {
 			$set                    = false;
-			$updated_settings_error = array();
+			$updated_settings_error = [];
 
 			/* loop through current errors */
 			foreach ( $this->form_settings_errors as $error ) {
@@ -175,10 +188,10 @@ class Model_Settings extends Helper_Abstract_Model {
 			/* update transient */
 			set_transient( 'settings_errors', $updated_settings_error, 30 );
 
-			$this->log->addNotice( 'PDF Settings Errors', array(
+			$this->log->addNotice( 'PDF Settings Errors', [
 				'original' => $this->form_settings_errors,
 				'cleaned'  => $updated_settings_error,
-			) );
+			] );
 		}
 	}
 
@@ -236,7 +249,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 */
 	public function install_templates() {
 
-		$destination = $this->misc->get_template_path();
+		$destination = $this->templates->get_template_path();
 		$copy        = $this->misc->copyr( PDF_PLUGIN_DIR . 'src/templates/', $destination );
 		if ( is_wp_error( $copy ) ) {
 			$this->log->addError( 'Template Installation Error.' );
@@ -264,7 +277,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	public function remove_font_file( $fonts ) {
 
 		$fonts = array_filter( $fonts );
-		$types = array( 'regular', 'bold', 'italics', 'bolditalics' );
+		$types = [ 'regular', 'bold', 'italics', 'bolditalics' ];
 
 		foreach ( $types as $type ) {
 			if ( isset( $fonts[ $type ] ) ) {
@@ -356,8 +369,8 @@ class Model_Settings extends Helper_Abstract_Model {
 	 */
 	public function install_fonts( $fonts ) {
 
-		$types  = array( 'regular', 'bold', 'italics', 'bolditalics' );
-		$errors = array();
+		$types  = [ 'regular', 'bold', 'italics', 'bolditalics' ];
+		$errors = [];
 
 		foreach ( $types as $type ) {
 
@@ -380,11 +393,11 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		/* If errors were found then return */
 		if ( sizeof( $errors ) > 0 ) {
-			$this->log->addError( 'Install Error.', array(
+			$this->log->addError( 'Install Error.', [
 				'errors' => $errors,
-			) );
+			] );
 
-			return array( 'errors' => $errors );
+			return [ 'errors' => $errors ];
 		} else {
 			/* Insert our font into the database */
 			$custom_fonts = $this->options->get_option( 'custom_fonts' );
@@ -406,6 +419,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		}
 
 		/* Fonts sucessfully installed so return font data */
+
 		return $fonts;
 	}
 
@@ -439,10 +453,10 @@ class Model_Settings extends Helper_Abstract_Model {
 		/* prevent unauthorized access */
 		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
 			/* fail */
-			$this->log->addCritical( 'Lack of User Capabilities.', array(
+			$this->log->addCritical( 'Lack of User Capabilities.', [
 				'user'      => wp_get_current_user(),
 				'user_meta' => get_user_meta( get_current_user_id() ),
-			) );
+			] );
 
 			header( 'HTTP/1.1 401 Unauthorized' );
 			wp_die( '401' );
@@ -472,9 +486,9 @@ class Model_Settings extends Helper_Abstract_Model {
 	 */
 	public function save_font() {
 
-		$this->log->addNotice( 'Running AJAX Endpoint', array(
+		$this->log->addNotice( 'Running AJAX Endpoint', [
 			'type' => 'Save Font',
-		) );
+		] );
 
 		/* prevent unauthorized access */
 		$this->ajax_font_validation();
@@ -484,9 +498,9 @@ class Model_Settings extends Helper_Abstract_Model {
 		$results = $this->process_font( $payload );
 
 		/* If we reached this point the results were successful so return the new object */
-		$this->log->addNotice( 'AJAX Endpoint Successful', array(
+		$this->log->addNotice( 'AJAX Endpoint Successful', [
 			'results' => $results,
-		) );
+		] );
 
 		echo json_encode( $results );
 		wp_die();
@@ -501,9 +515,9 @@ class Model_Settings extends Helper_Abstract_Model {
 	 */
 	public function delete_font() {
 
-		$this->log->addNotice( 'Running AJAX Endpoint', array( 
-			'type' => 'Delete Font', 
-		) );
+		$this->log->addNotice( 'Running AJAX Endpoint', [
+			'type' => 'Delete Font',
+		] );
 
 		/* prevent unauthorized access */
 		$this->ajax_font_validation();
@@ -524,7 +538,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				if ( $this->options->update_option( 'custom_fonts', $fonts ) ) {
 					/* Success */
 					$this->log->addNotice( 'AJAX Endpoint Successful' );
-					echo json_encode( array( 'success' => true ) );
+					echo json_encode( [ 'success' => true ] );
 					wp_die();
 				}
 			}
@@ -532,9 +546,9 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		header( 'HTTP/1.1 400 Bad Request' );
 
-		$return = array(
+		$return = [
 			'error' => esc_html__( 'Could not delete Gravity PDF font correctly. Please try again.', 'gravity-forms-pdf-extended' ),
-		);
+		];
 
 		$this->log->addError( 'AJAX Endpoint Error', $return );
 
@@ -563,9 +577,9 @@ class Model_Settings extends Helper_Abstract_Model {
 
 			header( 'HTTP/1.1 400 Bad Request' );
 
-			$return = array(
+			$return = [
 				'error' => esc_html__( 'Required fields have not been included.', 'gravity-forms-pdf-extended' ),
-			);
+			];
 
 			$this->log->addWarning( 'Validation Failed.', $return );
 
@@ -580,9 +594,9 @@ class Model_Settings extends Helper_Abstract_Model {
 
 			header( 'HTTP/1.1 400 Bad Request' );
 
-			$return = array(
+			$return = [
 				'error' => esc_html__( 'Font name is not valid. Only alphanumeric characters and spaces are accepted.', 'gravity-forms-pdf-extended' ),
-			);
+			];
 
 			$this->log->addWarning( 'Validation Failed.', $return );
 
@@ -598,9 +612,9 @@ class Model_Settings extends Helper_Abstract_Model {
 
 			header( 'HTTP/1.1 400 Bad Request' );
 
-			$return = array(
+			$return = [
 				'error' => esc_html__( 'A font with the same name already exists. Try a different name.', 'gravity-forms-pdf-extended' ),
-			);
+			];
 
 			$this->log->addWarning( 'Validation Failed.', $return );
 
@@ -616,9 +630,9 @@ class Model_Settings extends Helper_Abstract_Model {
 
 			header( 'HTTP/1.1 400 Bad Request' );
 
-			$return = array(
+			$return = [
 				'error' => $installation,
-			);
+			];
 
 			$this->log->addWarning( 'Validation Failed.', $return );
 
@@ -645,10 +659,10 @@ class Model_Settings extends Helper_Abstract_Model {
 		/* prevent unauthorized access */
 		if ( ! $this->gform->has_capability( 'gravityforms_view_settings' ) ) {
 			/* fail */
-			$this->log->addCritical( 'Lack of User Capabilities.', array(
+			$this->log->addCritical( 'Lack of User Capabilities.', [
 				'user'      => wp_get_current_user(),
 				'user_meta' => get_user_meta( get_current_user_id() ),
-			) );
+			] );
 
 			header( 'HTTP/1.1 401 Unauthorized' );
 			wp_die( '401' );
@@ -714,4 +728,34 @@ class Model_Settings extends Helper_Abstract_Model {
 		return $return;
 	}
 
+	/**
+	 * Gets all the template information for use with our JS template selector
+	 *
+	 * @param array $strings
+	 *
+	 * @return array
+	 *
+	 * @since 4.1
+	 */
+	public function get_template_data( $strings ) {
+		$strings['templateList']          = $this->templates->get_all_template_info();
+		$strings['activeDefaultTemplate'] = $this->options->get_option( 'default_template' );
+
+		$form_id = rgget( 'id' );
+
+		if ( $form_id ) {
+			$pid = ( rgget( 'pid' ) ) ? rgget( 'pid' ) : false;
+			if ( $pid == false ) {
+				$pid = ( rgpost( 'gform_pdf_id' ) ) ? rgpost( 'gform_pdf_id' ) : false;
+			}
+
+			$pdf = $this->options->get_pdf( $form_id, $pid );
+
+			if ( ! is_wp_error( $pdf ) ) {
+				$strings['activeTemplate'] = $pdf['template'];
+			}
+		}
+
+		return $strings;
+	}
 }

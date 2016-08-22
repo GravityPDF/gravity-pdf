@@ -222,7 +222,9 @@ class Helper_Data {
 			'migration_error_generic'     => esc_html__( 'Site #%s migration errors.', 'gravity-forms-pdf-extended' ),
 			'no_pdfs_found'               => esc_html__( "This form doesn't have any PDFs.", 'gravity-forms-pdf-extended' ),
 			'no_pdfs_found_link'          => esc_html__( "Let's go create one", 'gravity-forms-pdf-extended' ),
-			'no_template_preview'         => esc_html__( "No Template Preview Available", 'gravity-forms-pdf-extended' ),
+			'no_templates_found'          => esc_html__( 'No templates found. Try a different search.', 'gravity-forms-pdf-extended' ),
+			'advanced_templates'          => esc_html__( 'Advanced', 'gravity-forms-pdf-extended' ),
+			'activate'                    => esc_html__( 'Activate', 'gravity-forms-pdf-extended' ),
 		) );
 	}
 }

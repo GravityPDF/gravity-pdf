@@ -80,6 +80,16 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	protected $data;
 
 	/**
+	 * Holds our Helper_Templates object
+	 * used to ease access to our PDF templates
+	 *
+	 * @var \GFPDF\Helper\Helper_Templates
+	 *
+	 * @since 4.0
+	 */
+	protected $templates;
+
+	/**
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
 	 *
@@ -106,7 +116,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @since 4.0
 	 */
-	private $settings = array();
+	private $settings = [];
 
 	/**
 	 * Holds the Gravity Form PDF Settings
@@ -115,7 +125,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @since 4.0
 	 */
-	private $form_settings = array();
+	private $form_settings = [];
 
 
 	/**
@@ -126,17 +136,19 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @param \GFPDF\Helper\Helper_Data          $data
 	 * @param \GFPDF\Helper\Helper_Misc          $misc
 	 * @param \GFPDF\Helper\Helper_Notices       $notices
+	 * @param \GFPDF\Helper\Helper_Templates     $templates
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( LoggerInterface $log, Helper_Abstract_Form $gform, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices ) {
+	public function __construct( LoggerInterface $log, Helper_Abstract_Form $gform, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates ) {
 
 		/* Assign our internal variables */
-		$this->log     = $log;
-		$this->gform   = $gform;
-		$this->data    = $data;
-		$this->misc    = $misc;
-		$this->notices = $notices;
+		$this->log       = $log;
+		$this->gform     = $gform;
+		$this->data      = $data;
+		$this->misc      = $misc;
+		$this->notices   = $notices;
+		$this->templates = $templates;
 	}
 
 	/**
@@ -171,13 +183,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	public function add_filters() {
 
 		/* Register our core santize functions */
-		add_filter( 'gfpdf_settings_sanitize', array( $this, 'sanitize_required_field' ), 10, 4 );
-		add_filter( 'gfpdf_settings_sanitize', array( $this, 'sanitize_all_fields' ), 10, 4 );
+		add_filter( 'gfpdf_settings_sanitize', [ $this, 'sanitize_required_field' ], 10, 4 );
+		add_filter( 'gfpdf_settings_sanitize', [ $this, 'sanitize_all_fields' ], 10, 4 );
 
-		add_filter( 'gfpdf_settings_sanitize_text', array( $this, 'sanitize_trim_field' ) );
-		add_filter( 'gfpdf_settings_sanitize_textarea', array( $this, 'sanitize_trim_field' ) );
-		add_filter( 'gfpdf_settings_sanitize_number', array( $this, 'sanitize_number_field' ) );
-		add_filter( 'gfpdf_settings_sanitize_paper_size', array( $this, 'sanitize_paper_size' ) );
+		add_filter( 'gfpdf_settings_sanitize_text', [ $this, 'sanitize_trim_field' ] );
+		add_filter( 'gfpdf_settings_sanitize_textarea', [ $this, 'sanitize_trim_field' ] );
+		add_filter( 'gfpdf_settings_sanitize_number', [ $this, 'sanitize_number_field' ] );
+		add_filter( 'gfpdf_settings_sanitize_paper_size', [ $this, 'sanitize_paper_size' ] );
 	}
 
 	/**
@@ -201,7 +213,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @return void
 	 */
-	public function register_settings( $fields = array() ) {
+	public function register_settings( $fields = [] ) {
 		global $wp_settings_fields;
 
 		foreach ( $fields as $tab => $settings ) {
@@ -219,13 +231,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				add_settings_field(
 					'gfpdf_settings[' . $option['id'] . ']',
 					$name,
-					method_exists( $this, $option['type'] . '_callback' ) ? array(
+					method_exists( $this, $option['type'] . '_callback' ) ? [
 						$this,
 						$option['type'] . '_callback',
-					) : array( $this, 'missing_callback' ),
+					] : [ $this, 'missing_callback' ],
 					'gfpdf_settings_' . $tab,
 					'gfpdf_settings_' . $tab,
-					array(
+					[
 						'id'                 => isset( $option['id'] ) ? $option['id'] : null,
 						'desc'               => ! empty( $option['desc'] ) ? $option['desc'] : '',
 						'desc2'              => ! empty( $option['desc2'] ) ? $option['desc2'] : '',
@@ -248,13 +260,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 						'uploaderButtonText' => isset( $option['uploaderButtonText'] ) ? $option['uploaderButtonText'] : null,
 						'toggle'             => isset( $option['toggle'] ) ? $option['toggle'] : null,
 						'data'               => isset( $option['data'] ) ? $option['data'] : null,
-					)
+					]
 				);
 			}
 		}
 
 		/* Creates our settings in the options table */
-		register_setting( 'gfpdf_settings', 'gfpdf_settings', array( $this, 'settings_sanitize' ) );
+		register_setting( 'gfpdf_settings', 'gfpdf_settings', [ $this, 'settings_sanitize' ] );
 	}
 
 	/**
@@ -309,9 +321,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			delete_transient( 'gfpdf_settings_user_data' );
 		}
 
-		$settings = ( $is_temp ) ? (array) $tmp_settings : get_option( 'gfpdf_settings', array() );
+		$settings = ( $is_temp ) ? (array) $tmp_settings : get_option( 'gfpdf_settings', [] );
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_get_settings/ for more details about this filter */
+
 		return apply_filters( 'gfpdf_get_settings', $settings, $is_temp );
 	}
 
@@ -331,7 +344,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		/* return early if no ID set */
 		if ( ! $form_id || ! $pid ) {
-			return array();
+			return [];
 		}
 
 		$settings = $this->get_pdf( $form_id, $pid );
@@ -341,15 +354,16 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			return $settings;
 		}
 
-		$this->log->addError( 'Settings Retreival Error', array(
+		$this->log->addError( 'Settings Retreival Error', [
 			'form_id'          => $form_id,
 			'pid'              => $pid,
 			'WP_Error_Message' => $settings->get_error_message(),
 			'WP_Error_Code'    => $settings->get_error_code(),
-		) );
+		] );
 
 		/* there was an error */
-		return array();
+
+		return [];
 	}
 
 	/**
@@ -366,7 +380,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	public function get_form_pdfs( $form_id ) {
 
 		if ( ! isset( $this->data->form_settings ) ) {
-			$this->data->form_settings = array();
+			$this->data->form_settings = [];
 		}
 
 		$form_id = (int) $form_id;
@@ -374,10 +388,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		if ( 0 === $form_id ) {
 
 			$error = new WP_Error( 'invalid_id', esc_html__( 'You must pass in a valid form ID', 'gravity-forms-pdf-extended' ) );
-			$this->log->addError( 'Error Getting Settings.', array(
+			$this->log->addError( 'Error Getting Settings.', [
 				'WP_Error_Message' => $error->get_error_message(),
-				'WP_Error_Code' => $error->get_error_code(),
-			) );
+				'WP_Error_Code'    => $error->get_error_code(),
+			] );
 
 			return $error;
 		}
@@ -390,21 +404,22 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			if ( empty( $form ) ) {
 
 				$error = new WP_Error( 'invalid_id', esc_html__( 'You must pass in a valid form ID', 'gravity-forms-pdf-extended' ) );
-				$this->log->addError( 'Error Getting Settings.', array(
+				$this->log->addError( 'Error Getting Settings.', [
 					'WP_Error_Message' => $error->get_error_message(),
-					'WP_Error_Code' => $error->get_error_code(),
-				) );
+					'WP_Error_Code'    => $error->get_error_code(),
+				] );
 
 				return $error;
 			}
 
 			/* Pull the settings from the $form object, if they exist */
-			$settings = ( isset( $form['gfpdf_form_settings'] ) ) ? $form['gfpdf_form_settings'] : array();
+			$settings = ( isset( $form['gfpdf_form_settings'] ) ) ? $form['gfpdf_form_settings'] : [];
 
 			$this->data->form_settings[ $form_id ] = $settings;
 		}
 
 		/* return the form meta data */
+
 		return $this->data->form_settings[ $form_id ];
 	}
 
@@ -423,10 +438,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function get_pdf( $form_id, $pdf_id ) {
 
-		$this->log->addNotice( 'Getting Settings.', array(
+		$this->log->addNotice( 'Getting Settings.', [
 			'form_id' => $form_id,
 			'pdf_id'  => $pdf_id,
-		) );
+		] );
 
 		$gfpdf_options = $this->get_form_pdfs( $form_id );
 
@@ -444,10 +459,12 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			}
 
 			/* return WP_Error */
+
 			return $pdf;
 		}
 
 		/* return WP_Error */
+
 		return $gfpdf_options;
 	}
 
@@ -456,18 +473,18 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * Create a new PDF configuration option for that form
 	 *
 	 * @param integer $form_id The form ID
-	 * @param array   $pdf   The settings array
+	 * @param array   $pdf     The settings array
 	 *
 	 * @return mixed
 	 *
 	 * @since 4.0
 	 */
-	public function add_pdf( $form_id, $pdf = array() ) {
+	public function add_pdf( $form_id, $pdf = [] ) {
 
-		$this->log->addNotice( 'Adding Settings.', array(
+		$this->log->addNotice( 'Adding Settings.', [
 			'form_id'      => $form_id,
 			'new_settings' => $pdf,
-		) );
+		] );
 
 		/* First let's grab the current settings */
 		$options = $this->get_form_pdfs( $form_id );
@@ -487,17 +504,17 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			if ( $results ) {
 
 				/* return the ID if successful */
-				$this->log->addNotice( 'Successfuly Added.', array(
+				$this->log->addNotice( 'Successfuly Added.', [
 					'pdf' => $pdf,
-				) );
+				] );
 
 				return $pdf['id'];
 			}
 
-			$this->log->addError( 'Error Saving.', array(
+			$this->log->addError( 'Error Saving.', [
 				'error' => $results,
 				'pdf'   => $pdf,
-			) );
+			] );
 		}
 
 		return false;
@@ -514,7 +531,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @param integer         $form_id   The Gravity Form ID
 	 * @param string          $pdf_id    The PDF Setting ID
-	 * @param bool|int|string $pdf     The PDF settings array
+	 * @param bool|int|string $pdf       The PDF settings array
 	 * @param bool            $update_db Whether we should just update the local PDF settings array, or update the DB as well
 	 * @param bool            $filters   Whether we should apply the update filters
 	 *
@@ -522,11 +539,11 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function update_pdf( $form_id, $pdf_id, $pdf = '', $update_db = true, $filters = true ) {
 
-		$this->log->addNotice( 'Updating Settings.', array(
+		$this->log->addNotice( 'Updating Settings.', [
 			'form_id'      => $form_id,
 			'pdf_id'       => $pdf_id,
 			'new_settings' => $pdf,
-		) );
+		] );
 
 		if ( empty( $pdf ) || ! is_array( $pdf ) || sizeof( $pdf ) == 0 ) {
 			/* No value was passed in so we will delete the PDF */
@@ -562,9 +579,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$did_update = false;
 			if ( $update_db ) {
 
-				$this->log->addNotice( 'Update Form.', array(
+				$this->log->addNotice( 'Update Form.', [
 					'form_id' => $form['id'],
-				) );
+				] );
 
 				/* Update the database, if able */
 				$did_update = $this->gform->update_form( $form );
@@ -579,6 +596,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			}
 
 			/* true if successful, false if failed */
+
 			return $did_update;
 		}
 
@@ -599,10 +617,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function delete_pdf( $form_id, $pdf_id ) {
 
-		$this->log->addNotice( 'Deleting Setting.', array(
+		$this->log->addNotice( 'Deleting Setting.', [
 			'form_id' => $form_id,
 			'pdf_id'  => $pdf_id,
-		) );
+		] );
 
 		/* First let's grab the current settings */
 		$options = $this->get_form_pdfs( $form_id );
@@ -612,9 +630,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			/* Next let's try to update the value */
 			if ( isset( $options[ $pdf_id ] ) ) {
 
-				$this->log->addNotice( 'Found Setting. Now deleting...', array(
+				$this->log->addNotice( 'Found Setting. Now deleting...', [
 					'pdf' => $options[ $pdf_id ],
-				) );
+				] );
 
 				unset( $options[ $pdf_id ] );
 			}
@@ -631,10 +649,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			/* If it updated, let's update the global variable */
 			if ( $did_update !== false ) {
 
-				$this->log->addNotice( 'Setting Deleted.', array(
+				$this->log->addNotice( 'Setting Deleted.', [
 					'form_id' => $form_id,
 					'pdf_id'  => $pdf_id,
-				) );
+				] );
 
 				$this->data->form_settings[ $form_id ] = $options;
 			}
@@ -644,10 +662,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			return $did_update;
 		}
 
-		$this->log->addError( 'PDF Delete Failed.', array(
+		$this->log->addError( 'PDF Delete Failed.', [
 			'form_id' => $form_id,
 			'pdf_id'  => $pdf_id,
-		) );
+		] );
 
 		return false;
 	}
@@ -694,10 +712,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	public function update_option( $key = '', $value = false ) {
 
 		if ( empty( $key ) ) {
-			$this->log->addError( 'Option Update Error', array(
+			$this->log->addError( 'Option Update Error', [
 				'key'   => $key,
 				'value' => $value,
-			) );
+			] );
 
 			return false;
 		}
@@ -709,21 +727,21 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		}
 
 		/* First let's grab the current settings */
-		$options = get_option( 'gfpdf_settings', array() );
+		$options = get_option( 'gfpdf_settings', [] );
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_update_option/ for more details about these filters */
 		$value = apply_filters( 'gfpdf_update_option', $value, $key );
 		$value = apply_filters( 'gfpdf_update_option_' . $key, $value, $key );
 
 		/* Disable default sanitization (it shouldn't be triggered through this method) */
-		remove_filter( 'sanitize_option_gfpdf_settings', array( $this, 'settings_sanitize' ) );
+		remove_filter( 'sanitize_option_gfpdf_settings', [ $this, 'settings_sanitize' ] );
 
 		/* Next let's try to update the value */
 		$options[ $key ] = $value;
 		$did_update      = update_option( 'gfpdf_settings', $options );
 
 		/* Re-enable sanitization */
-		add_filter( 'sanitize_option_gfpdf_settings', array( $this, 'settings_sanitize' ) );
+		add_filter( 'sanitize_option_gfpdf_settings', [ $this, 'settings_sanitize' ] );
 
 		/* If it updated, let's update the global variable */
 		if ( $did_update ) {
@@ -753,7 +771,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		}
 
 		// First let's grab the current settings
-		$options = get_option( 'gfpdf_settings', array() );
+		$options = get_option( 'gfpdf_settings', [] );
 
 		// Next let's try to update the value
 		if ( isset( $options[ $key ] ) ) {
@@ -780,7 +798,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		/* sort through all roles and fetch unique capabilities */
 		$roles        = get_editable_roles();
-		$capabilities = array();
+		$capabilities = [];
 
 		/* Add Gravity Forms Capabilities */
 		$gf_caps = $this->gform->get_capabilities();
@@ -803,6 +821,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		}
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_capabilities/ for more details about this filter */
+
 		return apply_filters( 'gfpdf_capabilities', $capabilities );
 	}
 
@@ -814,17 +833,17 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @since 4.0
 	 */
 	public function get_paper_size() {
-		return apply_filters( 'gfpdf_get_paper_size', array(
-			esc_html__( 'Common Sizes', 'gravity-forms-pdf-extended' ) => array(
+		return apply_filters( 'gfpdf_get_paper_size', [
+			esc_html__( 'Common Sizes', 'gravity-forms-pdf-extended' ) => [
 				'A4'        => esc_html__( 'A4 (210 x 297mm)', 'gravity-forms-pdf-extended' ),
 				'LETTER'    => esc_html__( 'Letter (8.5 x 11in)', 'gravity-forms-pdf-extended' ),
 				'LEGAL'     => esc_html__( 'Legal (8.5 x 14in)', 'gravity-forms-pdf-extended' ),
 				'LEDGER'    => esc_html__( 'Ledger / Tabloid (11 x 17in)', 'gravity-forms-pdf-extended' ),
 				'EXECUTIVE' => esc_html__( 'Executive (7 x 10in)', 'gravity-forms-pdf-extended' ),
 				'CUSTOM'    => esc_html__( 'Custom Paper Size', 'gravity-forms-pdf-extended' ),
-			),
+			],
 
-			esc_html__( '"A" Sizes', 'gravity-forms-pdf-extended' ) => array(
+			esc_html__( '"A" Sizes', 'gravity-forms-pdf-extended' ) => [
 				'A0'  => esc_html__( 'A0 (841 x 1189mm)', 'gravity-forms-pdf-extended' ),
 				'A1'  => esc_html__( 'A1 (594 x 841mm)', 'gravity-forms-pdf-extended' ),
 				'A2'  => esc_html__( 'A2 (420 x 594mm)', 'gravity-forms-pdf-extended' ),
@@ -835,9 +854,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				'A8'  => esc_html__( 'A8 (52 x 74mm)', 'gravity-forms-pdf-extended' ),
 				'A9'  => esc_html__( 'A9 (37 x 52mm)', 'gravity-forms-pdf-extended' ),
 				'A10' => esc_html__( 'A10 (26 x 37mm)', 'gravity-forms-pdf-extended' ),
-			),
+			],
 
-			esc_html__( '"B" Sizes', 'gravity-forms-pdf-extended' ) => array(
+			esc_html__( '"B" Sizes', 'gravity-forms-pdf-extended' ) => [
 				'B0'  => esc_html__( 'B0 (1414 x 1000mm)', 'gravity-forms-pdf-extended' ),
 				'B1'  => esc_html__( 'B1 (1000 x 707mm)', 'gravity-forms-pdf-extended' ),
 				'B2'  => esc_html__( 'B2 (707 x 500mm)', 'gravity-forms-pdf-extended' ),
@@ -849,9 +868,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				'B8'  => esc_html__( 'B8 (88 x 62mm)', 'gravity-forms-pdf-extended' ),
 				'B9'  => esc_html__( 'B9 (62 x 44mm)', 'gravity-forms-pdf-extended' ),
 				'B10' => esc_html__( 'B10 (44 x 31mm)', 'gravity-forms-pdf-extended' ),
-			),
+			],
 
-			esc_html__( '"C" Sizes', 'gravity-forms-pdf-extended' ) => array(
+			esc_html__( '"C" Sizes', 'gravity-forms-pdf-extended' ) => [
 				'C0'  => esc_html__( 'C0 (1297 x 917mm)', 'gravity-forms-pdf-extended' ),
 				'C1'  => esc_html__( 'C1 (917 x 648mm)', 'gravity-forms-pdf-extended' ),
 				'C2'  => esc_html__( 'C2 (648 x 458mm)', 'gravity-forms-pdf-extended' ),
@@ -863,9 +882,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				'C8'  => esc_html__( 'C8 (81 x 57mm)', 'gravity-forms-pdf-extended' ),
 				'C9'  => esc_html__( 'C9 (57 x 40mm)', 'gravity-forms-pdf-extended' ),
 				'C10' => esc_html__( 'C10 (40 x 28mm)', 'gravity-forms-pdf-extended' ),
-			),
+			],
 
-			esc_html__( '"RA" and "SRA" Sizes', 'gravity-forms-pdf-extended' ) => array(
+			esc_html__( '"RA" and "SRA" Sizes', 'gravity-forms-pdf-extended' ) => [
 				'RA0'  => esc_html__( 'RA0 (860 x 1220mm)', 'gravity-forms-pdf-extended' ),
 				'RA1'  => esc_html__( 'RA1 (610 x 860mm)', 'gravity-forms-pdf-extended' ),
 				'RA2'  => esc_html__( 'RA2 (430 x 610mm)', 'gravity-forms-pdf-extended' ),
@@ -876,193 +895,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				'SRA2' => esc_html__( 'SRA2 (450 x 640mm)', 'gravity-forms-pdf-extended' ),
 				'SRA3' => esc_html__( 'SRA3 (320 x 450mm)', 'gravity-forms-pdf-extended' ),
 				'SRA4' => esc_html__( 'SRA4 (225 x 320mm)', 'gravity-forms-pdf-extended' ),
-			),
-		) );
-	}
-
-	/**
-	 * Parse our installed PDF template files
-	 *
-	 * @return array The array of templates
-	 *
-	 * @since 4.0
-	 */
-	public function get_templates() {
-
-		$templates = $legacy = array();
-
-		/* Load the user's templates */
-		if ( is_multisite() ) {
-			$template_list = $this->get_template_list( glob( $this->data->multisite_template_location . '*.php' ) );
-			$templates     = array_merge_recursive( $templates, $template_list['templates'] );
-			$legacy        = array_merge_recursive( $legacy, $template_list['legacy'] );
-		}
-
-		$template_list = $this->get_template_list( glob( $this->data->template_location . '*.php' ) );
-		$templates     = array_merge_recursive( $templates, $template_list['templates'] );
-		$legacy        = array_merge_recursive( $legacy, $template_list['legacy'] );
-
-		/**
-		 * Load templates included with Gravity PDF
-		 * We'll exclude any files overridden by the user
-		 */
-		foreach ( $this->get_plugin_pdf_templates() as $filename ) {
-			$info = $this->get_template_headers( $filename );
-			$file = basename( $filename, '.php' );
-
-			/* only add core template if not being overridden by user template */
-			if ( ! isset( $templates[ $info['group'] ][ $file ] ) ) {
-				$templates[ $info['group'] ][ $file ] = $info['template'];
-			}
-		}
-
-		/* Add our legacy array to the end of our templates array */
-		if ( sizeof( $legacy ) > 0 ) {
-			$templates[ esc_html__( 'Legacy', 'gravity-forms-pdf-extended' ) ] = $legacy;
-		}
-
-		return apply_filters( 'gfpdf_template_list', $templates );
-	}
-
-	/**
-	 * Get the list of Gravity PDF templates a user has available
-	 *
-	 * @param array $template_list Full path to PHP files (usually got using glob)
-	 *
-	 * @return array
-	 *
-	 * @since 4.0
-	 */
-	public function get_template_list( $template_list ) {
-		$templates = array();
-		$legacy    = array();
-
-		if( is_array( $template_list ) ) {
-			foreach ( $template_list as $filename ) {
-
-				/* Get the header information to find out what group it's in and if it is compatible with our verison of Gravity PDF */
-				$info = $this->get_template_headers( $filename );
-				$file = basename( $filename, '.php' );
-
-				if ( ! empty( $info['template'] ) ) {
-
-					/* Check if template compatible */
-					if ( ! empty( $info['required_pdf_version'] ) && version_compare( $info['required_pdf_version'], PDF_EXTENDED_VERSION, '>' ) ) {
-						$info['template'] .= ' (+ ' . esc_html_x( 'needs', 'Required', 'gravity-forms-pdf-extended' ) . ' v' . $info['required_pdf_version'] . ')';
-					}
-
-					$templates[ $info['group'] ][ $file ] = $info['template'];
-				} else if ( $file !== 'configuration' && $file !== 'configuration.archive' ) { /* exclude legacy configuration file */
-					$legacy[ $file ] = $this->misc->human_readable( $file );
-				}
-			}
-		}
-
-		return array(
-			'templates' => $templates,
-			'legacy'    => $legacy,
-		);
-	}
-
-	/**
-	 * An array used to parse the template headers
-	 *
-	 * @return array
-	 *
-	 * @since 4.0
-	 */
-	public function get_template_header_details() {
-		/**
-		 * We load in data from the PDF template headers
-		 *
-		 * @var array
-		 */
-		return apply_filters( 'gfpdf_template_header_details', array(
-			'template'             => esc_html__( 'Template Name', 'gravity-forms-pdf-extended' ),
-			'version'              => esc_html__( 'Version', 'gravity-forms-pdf-extended' ),
-			'description'          => esc_html__( 'Description', 'gravity-forms-pdf-extended' ),
-			'author'               => esc_html__( 'Author', 'gravity-forms-pdf-extended' ),
-			'group'                => esc_html__( 'Group', 'gravity-forms-pdf-extended' ),
-			'required_pdf_version' => esc_html__( 'Required PDF Version', 'gravity-forms-pdf-extended' ),
-		) );
-	}
-
-	/**
-	 * Gets the template information based on the raw template name
-	 *
-	 * @param  string $name The template to get information for
-	 *
-	 * @return array       The template information
-	 *
-	 * @since 4.0
-	 */
-	public function get_template_information( $name ) {
-
-		/* Check if we can find the template and load the data */
-		if( is_multisite() && is_file( $this->data->multisite_template_location . $name . '.php' ) ) {
-			$template = $this->get_template_headers( $this->data->multisite_template_location . $name . '.php' );
-		} elseif ( is_file( $this->data->template_location . $name . '.php' ) ) {
-			$template = $this->get_template_headers( $this->data->template_location . $name . '.php' );
-		}
-
-		if( isset( $template ) ) {
-			return $template;
-		}
-
-		if ( is_file( PDF_PLUGIN_DIR . 'src/templates/' . $name . '.php' ) ) {
-			return $this->get_template_headers( PDF_PLUGIN_DIR . 'src/templates/' . $name . '.php' );
-		}
-
-		return false;
-	}
-
-	/**
-	 * Returns the current template group name
-	 *
-	 * @param $name
-	 *
-	 * @return string The template group name
-	 *
-	 * @since 4.0
-	 */
-	public function get_template_group( $name ) {
-		$template_data = $this->get_template_information( $name );
-		$template_type = ( isset( $template_data['group'] ) ) ? mb_strtolower( $template_data['group'] ) : 'legacy';
-
-		return $template_type;
-	}
-
-	/**
-	 * Get the current template headers
-	 *
-	 * @param  string $path The path to the file
-	 *
-	 * @return array        Details about the file
-	 *
-	 * @since 4.0
-	 */
-	public function get_template_headers( $path ) {
-		$info = get_file_data( $path, $this->get_template_header_details() );
-
-		/* this is a legacy template */
-		if ( empty( $info['template'] ) ) {
-			return array( 'group' => 'Legacy' );
-		} else {
-			return $info;
-		}
-	}
-
-	/**
-	 * Returns an array of the current PDF templates shipped with Gravity PDF
-	 *
-	 * @return array
-	 *
-	 * @since 4.0
-	 */
-	public function get_plugin_pdf_templates() {
-		$templates = glob( PDF_PLUGIN_DIR . 'src/templates/*.php' );
-
-		return ( is_array( $templates ) ) ? $templates : array();
+			],
+		] );
 	}
 
 
@@ -1074,33 +908,33 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @since 4.0
 	 */
 	public function get_installed_fonts() {
-		$fonts = array(
-			esc_html__( 'Unicode', 'gravity-forms-pdf-extended' ) => array(
+		$fonts = [
+			esc_html__( 'Unicode', 'gravity-forms-pdf-extended' ) => [
 				'dejavusanscondensed'  => 'Dejavu Sans Condensed',
 				'dejavusans'           => 'Dejavu Sans',
 				'dejavuserifcondensed' => 'Dejavu Serif Condensed',
 				'dejavuserif'          => 'Dejavu Serif',
 				'dejavusansmono'       => 'Dejavu Sans Mono',
 
-				'freesans'             => 'Free Sans',
-				'freeserif'            => 'Free Serif',
-				'freemono'             => 'Free Mono',
+				'freesans'  => 'Free Sans',
+				'freeserif' => 'Free Serif',
+				'freemono'  => 'Free Mono',
 
 				'mph2bdamase' => 'MPH 2B Damase',
-			),
+			],
 
-			esc_html__( 'Indic', 'gravity-forms-pdf-extended' ) => array(
+			esc_html__( 'Indic', 'gravity-forms-pdf-extended' ) => [
 				'lohitkannada' => 'Lohit Kannada',
 				'pothana2000'  => 'Pothana2000',
-			),
+			],
 
-			esc_html__( 'Arabic', 'gravity-forms-pdf-extended' ) => array(
+			esc_html__( 'Arabic', 'gravity-forms-pdf-extended' ) => [
 				'xbriyaz'               => 'XB Riyaz',
 				'lateef'                => 'Lateef',
 				'kfgqpcuthmantahanaskh' => 'Bahif Uthman Taha',
-			),
+			],
 
-			esc_html__( 'Other', 'gravity-forms-pdf-extended' ) => array(
+			esc_html__( 'Other', 'gravity-forms-pdf-extended' ) => [
 				'estrangeloedessa' => 'Estrangelo Edessa (Syriac)',
 				'kaputaunicode'    => 'Kaputa (Sinhala)',
 				'abyssinicasil'    => 'Abyssinica SIL (Ethiopic)',
@@ -1121,8 +955,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				'zawgyi-one'       => 'Zawgyi One (Myanmar / Burmese)',
 				'ayar'             => 'Ayar Myanmar (Myanmar / Burmese)',
 				'taameydavidclm'   => 'Taamey David CLM (Hebrew)',
-			),
-		);
+			],
+		];
 
 		$fonts = $this->add_custom_fonts( $fonts );
 
@@ -1138,13 +972,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @return array The list of custom fonts installed in a preformatted array
 	 */
-	public function add_custom_fonts( $fonts = array() ) {
+	public function add_custom_fonts( $fonts = [] ) {
 
 		$custom_fonts = $this->get_custom_fonts();
 
 		if ( sizeof( $custom_fonts ) > 0 ) {
 
-			$user_defined_fonts = array();
+			$user_defined_fonts = [];
 
 			/* Loop through our fonts and assign them to a new array in the appropriate format */
 			foreach ( $custom_fonts as $font ) {
@@ -1176,7 +1010,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			return $fonts;
 		}
 
-		return array();
+		return [];
 	}
 
 	/**
@@ -1220,7 +1054,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @since 4.0
 	 */
 	public function get_privilages() {
-		$privilages = array(
+		$privilages = [
 			'copy'          => esc_html__( 'Copy', 'gravity-forms-pdf-extended' ),
 			'print'         => esc_html__( 'Print - Low Resolution', 'gravity-forms-pdf-extended' ),
 			'print-highres' => esc_html__( 'Print - High Resolution', 'gravity-forms-pdf-extended' ),
@@ -1229,7 +1063,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			'fill-forms'    => esc_html__( 'Fill Forms', 'gravity-forms-pdf-extended' ),
 			'extract'       => esc_html__( 'Extract', 'gravity-forms-pdf-extended' ),
 			'assemble'      => esc_html__( 'Assemble', 'gravity-forms-pdf-extended' ),
-		);
+		];
 
 		return apply_filters( 'gfpdf_privilages_list', $privilages );
 	}
@@ -1267,7 +1101,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @return string $input Sanitizied value
 	 *
 	 */
-	public function settings_sanitize( $input = array() ) {
+	public function settings_sanitize( $input = [] ) {
 
 		$gfpdf_options = $this->settings;
 
@@ -1279,7 +1113,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		$all_settings = $this->get_registered_fields();
 		$tab          = isset( $referrer['tab'] ) ? $referrer['tab'] : 'general';
-		$settings     = ( ! empty( $all_settings[ $tab ] ) && $tab !== 'tools' ) ? $all_settings[ $tab ] : array();
+		$settings     = ( ! empty( $all_settings[ $tab ] ) && $tab !== 'tools' ) ? $all_settings[ $tab ] : [];
 
 		/*
          * Get all setting types
@@ -1295,7 +1129,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			}
 		}
 
-		$input = $input ? $input : array();
+		$input = $input ? $input : [];
 		$input = apply_filters( 'gfpdf_settings_' . $tab . '_sanitize', $input );
 
 		/**
@@ -1307,7 +1141,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				switch ( $value['type'] ) {
 					case 'select':
 						if ( ! isset( $input[ $key ] ) ) {
-							$input[ $key ] = array();
+							$input[ $key ] = [];
 						}
 					break;
 
@@ -1359,7 +1193,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			set_transient( 'gfpdf_settings_user_data', array_merge( $gfpdf_options, $input ), 30 );
 
 			/* return nothing */
-			return array();
+
+			return [];
 		}
 
 		return $output;
@@ -1437,7 +1272,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			/* treat as plain text */
 			default:
 				if ( is_array( $value ) ) {
-					array_walk_recursive( $value, function( &$item ) {
+					array_walk_recursive( $value, function ( &$item ) {
 						$item = wp_strip_all_tags( $item );
 					} );
 
@@ -1506,7 +1341,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @since  4.0
 	 */
-	public function get_form_value( $args = array() ) {
+	public function get_form_value( $args = [] ) {
 
 		/* If callback method called directly (and not through the Settings API) */
 		if ( isset( $args['value'] ) ) {
@@ -1733,15 +1568,15 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		/* get selected value (if any) */
 		$value      = $this->get_form_value( $args );
 		$class      = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
-		$input_data       = ( isset( $args['data'] ) && is_array( $args['data'] ) ) ? $args['data'] : array();
+		$input_data = ( isset( $args['data'] ) && is_array( $args['data'] ) ) ? $args['data'] : [];
 		$required   = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
 		$args['id'] = esc_attr( $args['id'] );
 
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? esc_attr( $args['size'] ) : 'regular';
 		$html = '<input type="text" class="' . $size . '-text ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" ' . $required;
 
-		foreach( $input_data as $data_id => $data_value ) {
-			$html .= ' data-' . $data_id . '="'. esc_html( $data_value ) .'" ';
+		foreach ( $input_data as $data_id => $data_value ) {
+			$html .= ' data-' . $data_id . '="' . esc_html( $data_value ) . '" ';
 		}
 
 		$html .= ' />';
@@ -1778,7 +1613,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		/* check if required */
 		$class      = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
 		$required   = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
-		$input_data = ( isset( $args['data'] ) && is_array( $args['data'] ) ) ? $args['data'] : array();
+		$input_data = ( isset( $args['data'] ) && is_array( $args['data'] ) ) ? $args['data'] : [];
 		$args['id'] = esc_attr( $args['id'] );
 
 		$max  = isset( $args['max'] ) ? (int) $args['max'] : 999999;
@@ -1788,8 +1623,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? esc_attr( $args['size'] ) : 'regular';
 		$html = '<input type="number" step="' . esc_attr( $step ) . '" max="' . esc_attr( $max ) . '" min="' . esc_attr( $min ) . '" class="' . $size . '-text gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" ' . $required;
 
-		foreach( $input_data as $data_id => $data_value ) {
-			$html .= ' data-' . $data_id . '="'. esc_html( $data_value ) .'" ';
+		foreach ( $input_data as $data_id => $data_value ) {
+			$html .= ' data-' . $data_id . '="' . esc_html( $data_value ) . '" ';
 		}
 
 		$html .= ' /> ' . $args['desc2'];
@@ -1819,13 +1654,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$value      = $this->get_form_value( $args );
 		$class      = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
 		$required   = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
-		$input_data = ( isset( $args['data'] ) && is_array( $args['data'] ) ) ? $args['data'] : array();
+		$input_data = ( isset( $args['data'] ) && is_array( $args['data'] ) ) ? $args['data'] : [];
 		$args['id'] = esc_attr( $args['id'] );
 
 		$html = '<textarea cols="50" rows="5" id="gfpdf_settings[' . $args['id'] . ']" class="large-text gfpdf_settings_' . $args['id'] . ' ' . $class . '" name="gfpdf_settings[' . $args['id'] . ']" ' . $required;
 
-		foreach( $input_data as $data_id => $data_value ) {
-			$html .= ' data-' . $data_id . '="'. esc_html( $data_value ) .'" ';
+		foreach ( $input_data as $data_id => $data_value ) {
+			$html .= ' data-' . $data_id . '="' . esc_html( $data_value ) . '" ';
 		}
 
 		$html .= '>' . esc_textarea( stripslashes( $value ) ) . '</textarea>';
@@ -1894,7 +1729,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$chosen      = ( isset( $args['chosen'] ) ) ? 'gfpdf-chosen' : '';
 		$class       = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
 		$required    = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
-		$input_data  = ( isset( $args['data'] ) && is_array( $args['data'] ) ) ? $args['data'] : array();
+		$input_data  = ( isset( $args['data'] ) && is_array( $args['data'] ) ) ? $args['data'] : [];
 		$args['id']  = esc_attr( $args['id'] );
 
 		$multiple = $multipleExt = '';
@@ -1905,8 +1740,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		$html = '<select id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . ' ' . $class . ' ' . $chosen . '" name="gfpdf_settings[' . $args['id'] . ']' . $multipleExt . '" data-placeholder="' . $placeholder . '" ' . $multiple . ' ' . $required;
 
-		foreach( $input_data as $data_id => $data_value ) {
-			$html .= ' data-' . $data_id . '="'. esc_html( $data_value ) .'" ';
+		foreach ( $input_data as $data_id => $data_value ) {
+			$html .= ' data-' . $data_id . '="' . esc_html( $data_value ) . '" ';
 		}
 
 		$html .= '>';
@@ -1978,12 +1813,12 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		if ( function_exists( 'wp_editor' ) ) {
 			ob_start();
 			echo '<span class="mt-gfpdf_settings_' . $args['id'] . '" style="float:right; position:relative; right: 10px; top: 90px;"></span>';
-			wp_editor( stripslashes( $value ), 'gfpdf_settings_' . $args['id'], apply_filters( 'gfpdf_rich_editor_settings', array(
+			wp_editor( stripslashes( $value ), 'gfpdf_settings_' . $args['id'], apply_filters( 'gfpdf_rich_editor_settings', [
 				'textarea_name' => 'gfpdf_settings[' . $args['id'] . ']',
 				'textarea_rows' => $rows,
 				'editor_class'  => 'gfpdf_settings_' . $args['id'] . ' ' . $class,
 				'autop'         => false,
-			) ) );
+			] ) );
 			$html = ob_get_clean();
 		} else {
 			$html = '<textarea class="large-text" rows="10" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']">' . esc_textarea( stripslashes( $value ) ) . '</textarea>';
@@ -2083,14 +1918,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function button_callback( $args ) {
 
-		$nonce       = wp_create_nonce( 'gfpdf_settings[' . $args['id'] . ']' );
-		$input_data  = ( isset( $args['data'] ) && is_array( $args['data'] ) ) ? $args['data'] : array();
-		$class       = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
+		$nonce      = wp_create_nonce( 'gfpdf_settings[' . $args['id'] . ']' );
+		$input_data = ( isset( $args['data'] ) && is_array( $args['data'] ) ) ? $args['data'] : [];
+		$class      = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
 
 		$html = '<button id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . '][name]" value="' . $args['id'] . '" class="button gfpdf-button ' . $class . '" type="submit"';
 
-		foreach( $input_data as $data_id => $data_value ) {
-			$html .= ' data-' . $data_id . '="'. esc_html( $data_value ) .'" ';
+		foreach ( $input_data as $data_id => $data_value ) {
+			$html .= ' data-' . $data_id . '="' . esc_html( $data_value ) . '" ';
 		}
 
 		$html .= '>' . esc_html( $args['std'] ) . '</button>';
@@ -2142,13 +1977,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		/* get selected value (if any) */
 		$value      = $this->get_form_value( $args );
 		$class      = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
-		$input_data = ( isset( $args['data'] ) && is_array( $args['data'] ) ) ? $args['data'] : array();
+		$input_data = ( isset( $args['data'] ) && is_array( $args['data'] ) ) ? $args['data'] : [];
 		$args['id'] = esc_attr( $args['id'] );
 
 		$html = '<input type="hidden" class="' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '"';
 
-		foreach( $input_data as $data_id => $data_value ) {
-			$html .= ' data-' . $data_id . '="'. esc_html( $data_value ) .'" ';
+		foreach ( $input_data as $data_id => $data_value ) {
+			$html .= ' data-' . $data_id . '="' . esc_html( $data_value ) . '" ';
 		}
 
 		$html .= '/>';
@@ -2171,7 +2006,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$value = $this->get_form_value( $args );
 
 		if ( empty( $value ) ) {
-			$value = array( '', '', 'mm' );
+			$value = [ '', '', 'mm' ];
 		}
 
 		$placeholder = ( isset( $args['placeholder'] ) ) ? esc_attr( $args['placeholder'] ) : '';
@@ -2182,10 +2017,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$html = '<input type="number" class="' . $size . '-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_width" min="1" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( stripslashes( $value[0] ) ) . '" required /> ' . esc_html__( 'Width', 'gravity-forms-pdf-extended' );
 		$html .= ' <input type="number" class="' . $size . '-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_height" min="1" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( stripslashes( $value[1] ) ) . '" required /> ' . esc_html__( 'Height', 'gravity-forms-pdf-extended' );
 
-		$measurement = apply_filters( 'gfpdf_paper_size_dimensions', array(
+		$measurement = apply_filters( 'gfpdf_paper_size_dimensions', [
 			'millimeters' => esc_html__( 'mm', 'gravity-forms-pdf-extended' ),
 			'inches'      => esc_html__( 'inches', 'gravity-forms-pdf-extended' ),
-		) );
+		] );
 
 		$html .= '&nbsp; — &nbsp; <select id="gfpdf_settings[' . $args['id'] . ']_measurement" style="width: 75px" class="gfpdf_settings_' . $args['id'] . ' ' . $class . ' ' . $chosen . '" name="gfpdf_settings[' . $args['id'] . '][]" data-placeholder="' . $placeholder . '">';
 

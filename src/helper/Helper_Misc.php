@@ -152,7 +152,7 @@ class Helper_Misc {
 	public function get_field_class( $type ) {
 
 		/* change our product field types to use a single master product class */
-		$convert_product_type = array( 'quantity', 'option', 'shipping', 'total' );
+		$convert_product_type = [ 'quantity', 'option', 'shipping', 'total' ];
 
 		if ( in_array( strtolower( $type ), $convert_product_type ) ) {
 			$type = 'product';
@@ -171,47 +171,6 @@ class Helper_Misc {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Converts a name into something a human can more easily read
-	 *
-	 * @param string $name The string to convert
-	 *
-	 * @return string
-	 *
-	 * @since  4.0
-	 */
-	public function human_readable( $name ) {
-		$name = str_replace( array( '-', '_' ), ' ', $name );
-
-		return mb_convert_case( $name, MB_CASE_TITLE );
-	}
-
-	/**
-	 * Takes a full path to the file and converts it to the appropriate class name
-	 * This follows the simple rules the file basename has its hyphens and spaces are converted to underscores
-	 * then gets converted to sentence case using the underscore as a delimiter
-	 *
-	 * @param string $file The path to a file
-	 *
-	 * @return string
-	 *
-	 * @since 4.0
-	 */
-	public function get_config_class_name( $file ) {
-		$file = basename( $file, '.php' );
-		$file = str_replace( array( '-', ' '), '_', $file );
-
-		/* Using a delimiter with ucwords doesn't appear to work correctly so go old school */
-		$file_array = explode( '_', $file );
-		array_walk( $file_array, function( &$item ) {
-			$item = mb_convert_case( $item, MB_CASE_TITLE, 'UTF-8' );
-		} );
-
-		$file = implode( '_', $file_array );
-
-		return $file;
 	}
 
 	/**
@@ -377,10 +336,10 @@ class Helper_Misc {
 		/* Finally get a contrasting border colour */
 		$contrast_border_color = $this->change_brightness( $background_hex, $border_contrast );
 
-		return array(
+		return [
 			'background' => $contrast_background_color,
 			'border'     => $contrast_border_color,
-		);
+		];
 	}
 
 	/**
@@ -426,10 +385,10 @@ class Helper_Misc {
 				}
 			}
 		} catch ( Exception $e ) {
-			$this->log->addError( 'Filesystem Delete Error', array(
+			$this->log->addError( 'Filesystem Delete Error', [
 				'dir'       => $dir,
 				'exception' => $e->getMessage(),
-			) );
+			] );
 
 			return new WP_Error( 'recursion_delete_problem', $e );
 		}
@@ -465,9 +424,9 @@ class Helper_Misc {
 		try {
 			if ( ! is_dir( $destination ) ) {
 				if ( ! wp_mkdir_p( $destination ) ) {
-					$this->log->addError( 'Failed Creating Folder Structure', array(
+					$this->log->addError( 'Failed Creating Folder Structure', [
 						'dir' => $destination,
-					) );
+					] );
 
 					throw new Exception( 'Could not create folder structure at ' . $destination );
 				}
@@ -481,28 +440,28 @@ class Helper_Misc {
 			foreach ( $files as $fileinfo ) {
 				if ( $fileinfo->isDir() && ! file_exists( $destination . $files->getSubPathName() ) ) {
 					if ( ! @mkdir( $destination . $files->getSubPathName() ) ) {
-						$this->log->addError( 'Failed Creating Folder', array(
+						$this->log->addError( 'Failed Creating Folder', [
 							'dir' => $destination . $files->getSubPathName(),
-						) );
+						] );
 
 						throw new Exception( 'Could not create folder at ' . $destination . $files->getSubPathName() );
 					}
 				} elseif ( ! $fileinfo->isDir() ) {
 					if ( ! @copy( $fileinfo, $destination . $files->getSubPathName() ) ) {
-						$this->log->addError( 'Failed Creating File', array(
+						$this->log->addError( 'Failed Creating File', [
 							'file' => $destination . $files->getSubPathName(),
-						) );
+						] );
 						throw new Exception( 'Could not create file at ' . $destination . $files->getSubPathName() );
 					}
 				}
 			}
 		} catch ( Exception $e ) {
 
-			$this->log->addError( 'Filesystem Copy Error', array(
+			$this->log->addError( 'Filesystem Copy Error', [
 				'source'      => $source,
 				'destination' => $destination,
 				'exception'   => $e->getMessage(),
-			) );
+			] );
 
 			return new WP_Error( 'recursion_copy_problem', $e );
 		}
@@ -535,7 +494,7 @@ class Helper_Misc {
 	 */
 	public function get_upload_details() {
 
-		$siteurl     = get_option( 'siteurl' );
+		$siteurl = get_option( 'siteurl' );
 
 		/*
 		 * Older versions of multisite installations didn't use a standardised upload path
@@ -545,8 +504,8 @@ class Helper_Misc {
 		 * Note: because BLOG_ID_CURRENT_SITE can be changed and the 'upload_path' option doesn't change with it we
 		 * opted to hardcode the ID instead.
 		 */
-		if( is_multisite() ) {
-			switch_to_blog(1);
+		if ( is_multisite() ) {
+			switch_to_blog( 1 );
 		}
 
 		$upload_path = trim( get_option( 'upload_path' ) );
@@ -568,14 +527,14 @@ class Helper_Misc {
 		}
 
 		/* Resort the current multisite blog */
-		if( is_multisite() ) {
+		if ( is_multisite() ) {
 			restore_current_blog();
 		}
 
-		return array(
+		return [
 			'path' => $dir,
 			'url'  => $url,
-		);
+		];
 	}
 
 	/**
@@ -632,6 +591,7 @@ class Helper_Misc {
 		}
 
 		/* If we are here we couldn't locate the file */
+
 		return false;
 	}
 
@@ -693,82 +653,7 @@ class Helper_Misc {
 		return false;
 	}
 
-	/**
-	 * Get the arguments array that should be passed to our PDF Template
-	 *
-	 * @param  array $entry    Gravity Form Entry
-	 * @param  array $settings PDF Settings Array
-	 *
-	 * @return array
-	 *
-	 * @since 4.0
-	 */
-	public function get_template_args( $entry, $settings ) {
-		global $gfpdf;
 
-		/* Disable the field encryption checks which can slow down our entry queries */
-		add_filter( 'gform_is_encrypted_field', '__return_false' );
-
-		$form          = $this->gform->get_form( $entry['form_id'] );
-		$pdf           = GPDFAPI::get_mvc_class( 'Model_PDF' );
-		$form_settings = GPDFAPI::get_mvc_class( 'Model_Form_Settings' );
-
-		/* See https://gravitypdf.com/documentation/v4/gfpdf_template_args/ for more details about this filter */
-		return apply_filters( 'gfpdf_template_args', array(
-
-			'form_id'  => $entry['form_id'], /* backwards compat */
-			'lead_ids' => $this->get_legacy_ids( $entry['id'], $settings ), /* backwards compat */
-			'lead_id'  => apply_filters( 'gfpdfe_lead_id', $entry['id'], $form, $entry, $gfpdf ), /* backwards compat */
-
-			'form'      => $form,
-			'entry'     => $entry,
-			'lead'      => $entry,
-			'form_data' => $pdf->get_form_data( $entry ),
-			'fields'    => $this->get_fields_sorted_by_id( $form['id'] ),
-			'config'    => $form_settings->get_template_configuration( $settings['template'] ),
-
-			'settings' => $settings,
-
-			'gfpdf' => $gfpdf,
-
-		), $entry, $settings, $form );
-	}
-
-	/**
-	 * Do a lookup for the current template image (if any) and return the path
-	 *
-	 * @param  string $template The template name to look for
-	 *
-	 * @return string Full URL to image
-	 *
-	 * @since 4.0
-	 */
-	public function get_template_image( $template ) {
-
-		/* Add our extension */
-		$template .= '.png';
-
-		$relative_image_path   = 'src/templates/images/';
-		$default_template_path = PDF_PLUGIN_DIR . $relative_image_path;
-		$default_template_url  = PDF_PLUGIN_URL . $relative_image_path;
-
-		/* Multisite Location */
-		if ( is_multisite() && is_file( $this->data->multisite_template_location . 'images/' . $template ) ) {
-			return $this->data->multisite_template_location_url . 'images/' . $template;
-		}
-
-		/* Standard Location */
-		if ( is_file( $this->data->template_location . 'images/' . $template ) ) {
-			return $this->data->template_location_url . 'images/' . $template;
-		}
-
-		/* Core plugin file location */
-		if ( is_file( $default_template_path . $template ) ) {
-			return $default_template_url . $template;
-		}
-
-		return null;
-	}
 
 	/**
 	 * Remove any characters that are invalid in filenames (mostly on Windows systems)
@@ -780,7 +665,7 @@ class Helper_Misc {
 	 * @since 4.0
 	 */
 	public function strip_invalid_characters( $name ) {
-		$characters = array( '/', '\\', '"', '*', '?', '|', ':', '<', '>' );
+		$characters = [ '/', '\\', '"', '*', '?', '|', ':', '<', '>' ];
 
 		return str_replace( $characters, '_', $name );
 	}
@@ -804,7 +689,7 @@ class Helper_Misc {
 			$ids = explode( ',', $leads );
 
 			/* ensure all passed ids are integers */
-			array_walk( $ids, function( &$id ) {
+			array_walk( $ids, function ( &$id ) {
 				$id = (int) $id;
 			} );
 
@@ -817,8 +702,7 @@ class Helper_Misc {
 		}
 
 		/* if not processing legacy endpoint, or if invalid IDs were passed we'll return the original entry ID */
-
-		return array( $entry_id );
+		return [ $entry_id ];
 	}
 
 	/**
@@ -832,7 +716,7 @@ class Helper_Misc {
 	public function maybe_add_multicurrency_support() {
 		if ( class_exists( 'GFMultiCurrency' ) && method_exists( 'GFMultiCurrency', 'admin_pre_render' ) ) {
 			$currency = GFMultiCurrency::init();
-			add_filter( 'gform_form_post_get_meta', array( $currency, 'admin_pre_render' ) );
+			add_filter( 'gform_form_post_get_meta', [ $currency, 'admin_pre_render' ] );
 		}
 	}
 
@@ -875,39 +759,6 @@ class Helper_Misc {
 	}
 
 	/**
-	 * Add an image of the current selected template (if any) to the template and default_template field descriptions
-	 *
-	 * @param array $settings Any existing settings loaded
-	 *
-	 * @since 4.0
-	 *
-	 * @return array
-	 */
-	public function add_template_image( $settings ) {
-
-
-		if ( isset( $settings['template'] ) || isset( $settings['default_template'] ) ) {
-			$options = GPDFAPI::get_options_class();
-
-			$key = ( isset( $settings['template'] ) ) ? 'template' : 'default_template';
-
-			$current_template = $options->get_form_value( $settings[ $key ] );
-			$template_image   = $this->get_template_image( $current_template );
-
-			$settings[ $key ]['desc'] .= '<div id="gfpdf-template-example">';
-
-			if ( ! empty( $template_image ) ) {
-				$img = '<img src="' . esc_url( $template_image ) . '" />';
-				$settings[ $key ]['desc'] .= $img;
-			}
-
-			$settings[ $key ]['desc'] .= '</div>';
-		}
-
-		return $settings;
-	}
-
-	/**
 	 * Determine if the logic should show or hide the item
 	 *
 	 * @param array $logic
@@ -938,36 +789,6 @@ class Helper_Misc {
 	}
 
 	/**
-	 * Check if running single or multisite and return the working directory path
-	 *
-	 * @return string Path to working directory
-	 *
-	 * @since 4.0
-	 */
-	public function get_template_path() {
-		if( is_multisite() ) {
-			return $this->data->multisite_template_location;
-		}
-
-		return $this->data->template_location;
-	}
-
-	/**
-	 * Check if running single or multisite and return the working directory URL
-	 *
-	 * @return string URL to working directory
-	 *
-	 * @since 4.0
-	 */
-	public function get_template_url() {
-		if( is_multisite() ) {
-			return $this->data->multisite_template_location_url;
-		}
-
-		return $this->data->template_location_url;
-	}
-
-	/**
 	 * Takes a Gravity Form ID and returns the list of fields which can be accessed using their ID
 	 *
 	 * @param integer $form_id The Gravity Form ID
@@ -978,7 +799,7 @@ class Helper_Misc {
 	 */
 	public function get_fields_sorted_by_id( $form_id ) {
 		$form   = $this->gform->get_form( $form_id );
-		$fields = array();
+		$fields = [];
 
 		if ( isset( $form['fields'] ) && is_array( $form['fields'] ) ) {
 			foreach ( $form['fields'] as $field ) {
@@ -1000,7 +821,7 @@ class Helper_Misc {
 	 */
 	public function backwards_compat_conversion( $settings ) {
 
-		$compat                   = array();
+		$compat                   = [];
 		$compat['premium']        = ( isset( $settings['advanced_template'] ) && $settings['advanced_template'] == 'Yes' ) ? true : false;
 		$compat['rtl']            = ( isset( $settings['rtl'] ) && $settings['rtl'] == 'Yes' ) ? true : false;
 		$compat['dpi']            = ( isset( $settings['image_dpi'] ) ) ? (int) $settings['image_dpi'] : 96;
@@ -1057,9 +878,9 @@ class Helper_Misc {
 	/**
 	 * A recursive function that will search a multidimensional array for the value
 	 *
-	 * @param mixed $needle The value to search for
+	 * @param mixed $needle   The value to search for
 	 * @param array $haystack The multidimensional array to search in
-	 * @param bool $strict Pass `true` to match for the value and type, false for just the type.
+	 * @param bool  $strict   Pass `true` to match for the value and type, false for just the type.
 	 *
 	 * @return bool True when found, false otherwise
 	 */
@@ -1073,5 +894,24 @@ class Helper_Misc {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Ensure an extension is added to the end of the name
+	 *
+	 * @param  string $name      The PHP template
+	 *
+	 * @param string  $extension The extension that should be added to the filename
+	 *
+	 * @return string
+	 *
+	 * @since  4.1
+	 */
+	public function get_file_with_extension( $name, $extension = '.php' ) {
+		if ( substr( $name, -strlen( $extension ) ) !== $extension ) {
+			$name = $name . $extension;
+		}
+
+		return $name;
 	}
 }
