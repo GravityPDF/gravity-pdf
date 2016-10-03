@@ -691,10 +691,12 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since  4.0
 	 */
 	public function get_pdf_url( $pid, $id, $download = false, $print = false, $esc = true ) {
+		global $wp_rewrite;
 
 		/* Check if permalinks are enabled, otherwise fall back to our ugly link structure for 4.0 (not the same as our v3 links) */
-		if ( get_option( 'permalink_structure' ) ) {
-			$url = home_url() . '/pdf/' . $pid . '/' . $id . '/';
+		if ( $wp_rewrite->using_permalinks() ) {
+			$url = home_url( '/' ) . $wp_rewrite->root; /* Handle "almost pretty" permalinks - fix for IIS servers without modrewrite  */
+			$url .= 'pdf/' . $pid . '/' . $id . '/';
 
 			if ( $download ) {
 				$url .= 'download/';
