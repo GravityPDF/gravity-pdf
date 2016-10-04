@@ -338,7 +338,7 @@ class Test_Shortcode extends WP_UnitTestCase {
 
 		$this->assertEquals( '[gravitypdf]', $shortcodes[0]['shortcode'] );
 		$this->assertEquals( '', $shortcodes[0]['attr_raw'] );
-		$this->assertEquals( '', $shortcodes[0]['attr'] );
+		$this->assertEquals( array(), $shortcodes[0]['attr'] );
 
 		$this->assertEquals( '[gravitypdf id="1231241221" text="View PDF" type="view"]', $shortcodes[1]['shortcode'] );
 		$this->assertEquals( ' id="1231241221" text="View PDF" type="view"', $shortcodes[1]['attr_raw'] );

@@ -312,6 +312,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function add_shortcode_attr( $code, $attr, $value ) {
+
 		/* if the attribute doesn't already exist... */
 		if ( ! isset( $code['attr'][ $attr ] ) ) {
 
@@ -412,10 +413,12 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 			if ( ! empty( $matches ) && isset( $matches[2] ) ) {
 				foreach ( $matches[2] as $key => $code ) {
 					if ( $code == $shortcode ) {
+						$attr = shortcode_parse_atts( $matches[3][ $key ] );
+
 						$shortcodes[] = array(
 							'shortcode' => $matches[0][ $key ],
 							'attr_raw'  => $matches[3][ $key ],
-							'attr'      => shortcode_parse_atts( $matches[3][ $key ] ),
+							'attr'      => ( is_array( $attr ) ) ? $attr: array(),
 						);
 					}
 				}

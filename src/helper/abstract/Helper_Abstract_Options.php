@@ -188,10 +188,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @return  void
 	 */
 	public function set_plugin_settings() {
-		if ( false == get_option( 'gfpdf_settings' ) ) {
-			add_option( 'gfpdf_settings' );
-		}
-
 		/* assign our settings */
 		$this->settings = $this->get_settings();
 	}
@@ -306,15 +302,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		 *
 		 * We'll check if the transient exists and use it, otherwise get the main plugin settings from the options table
 		 */
-		$tempSettings = get_transient( 'gfpdf_settings_user_data' );
-		$is_temp      = ( $tempSettings !== false ) ? true : false;
+		$tmp_settings = get_transient( 'gfpdf_settings_user_data' );
+		$is_temp      = ( $tmp_settings !== false ) ? true : false;
 
 		if ( $is_temp ) {
-			$settings = $tempSettings;
 			delete_transient( 'gfpdf_settings_user_data' );
-		} else {
-			$settings = ( is_array( get_option( 'gfpdf_settings' ) ) ) ? get_option( 'gfpdf_settings' ) : array();
 		}
+
+		$settings = ( $is_temp ) ? (array) $tmp_settings : get_option( 'gfpdf_settings', array() );
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_get_settings/ for more details about this filter */
 		return apply_filters( 'gfpdf_get_settings', $settings, $is_temp );
@@ -714,7 +709,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		}
 
 		/* First let's grab the current settings */
-		$options = get_option( 'gfpdf_settings' );
+		$options = get_option( 'gfpdf_settings', array() );
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_update_option/ for more details about these filters */
 		$value = apply_filters( 'gfpdf_update_option', $value, $key );
@@ -758,7 +753,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		}
 
 		// First let's grab the current settings
-		$options = get_option( 'gfpdf_settings' );
+		$options = get_option( 'gfpdf_settings', array() );
 
 		// Next let's try to update the value
 		if ( isset( $options[ $key ] ) ) {

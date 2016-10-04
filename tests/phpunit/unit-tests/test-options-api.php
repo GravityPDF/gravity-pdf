@@ -122,9 +122,9 @@ class Test_Options_API extends WP_UnitTestCase {
 		 * Check our transient user data is loaded
 		 * Used in settings_sanitize() when there are errors the user has to fix
 		 */
-		set_transient( 'gfpdf_settings_user_data', 'testing', 30 );
+		set_transient( 'gfpdf_settings_user_data', array('testing'), 30 );
 
-		$this->assertEquals( 'testing', $this->options->get_settings() );
+		$this->assertEquals( array('testing'), $this->options->get_settings() );
 	}
 
 	/**
