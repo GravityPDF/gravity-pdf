@@ -95,7 +95,7 @@ class Field_Textarea extends Helper_Abstract_Fields {
 		$value = $this->get_value();
 
 		if ( isset( $this->field->useRichTextEditor ) && true === $this->field->useRichTextEditor ) {
-			$html = wp_kses_post( $value );
+			$html = wp_kses_post( wpautop( $value ) );
 		} else {
 			$html = nl2br( esc_html( $value ) );
 		}
