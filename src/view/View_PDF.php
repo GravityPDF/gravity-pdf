@@ -390,7 +390,7 @@ class View_PDF extends Helper_Abstract_View {
 		$container->close();
 
 		/* Output product table, if needed */
-		if ( ! $products->is_empty() ) {
+		if ( $show_individual_product_fields === false && ! $products->is_empty() ) {
 			echo $products->html();
 		}
 
