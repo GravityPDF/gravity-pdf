@@ -85,6 +85,12 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 
 == Changelog ==
 
+= 4.0.5 =
+* Add support for "Almost Pretty" permalinks for web servers that don't support Mod Rewrite (IIS) (GH#488)
+* Add PHP 7.1 support – resolves two string-to-array issues (GH#495)
+* Add <p> and <br> tags to Rich Text Paragraph field in PDF – using wpautop() (GH#490)
+* Disable product table when enabling the 'individual_products' option in core templates (GH#493)
+
 = 4.0.4 =
 * Prevent Finder (Mac) and Ghostscript viewing / processing password-protected PDFs without a password (GH#467)
 * Fix Font Manager display issues for users running a version of WP lower than 4.5 (GH#470)
