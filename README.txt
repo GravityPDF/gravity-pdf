@@ -19,15 +19,15 @@ https://www.youtube.com/watch?v=z8zKKrjmNjY
 
 The plugin ships with four highly-customisable PDF templates perfectly suited for displaying your user’s data. Within seconds you can personalise the documents with your company logo, change the font, size, colour and the paper size. If the templates don't suit, [have one tailor made just for you](https://gravitypdf.com/integration-services/) or [roll your own](https://gravitypdf.com/documentation/v4/developer-start-customising/).
 
-> Digital document management with WordPress just became a breeze!
+> Digital document management with WordPress and Gravity Forms just became a breeze!
 
 = Feature =
 
-* There’s no third-party APIs needed when generating your PDFs. That means no monthly fees or rate limits. You control the software and the documents it generates.
+* There’s no third-party APIs needed when generating your PDFs. That means no chance of third-party data breaches, no monthly fees or rate limits. You control the software and the documents it generates.
 * We support all languages, including complex symbol-based languages like Chinese and Japanese, as well as Right to Left (RTL) written languages such as Arabic and Hebrew.
 * Automatically email your PDF when a user completes a form. Have it emailed to people in your organisation, the user, or both. You can also conditionally generate and email the PDF.
-* Using Gravity Forms’ developer-licensed payment add-ons – like PayPal, Authorize.net or Stripe – you can restrict access to the PDF until after a payment is captured.
-* [Protecting your user’s sensitive information is the at the heart of Gravity PDF](https://gravitypdf.com/documentation/v4/user-pdf-security/). The plugin’s security settings give you granular control over who has access to the PDFs generated.
+* Using Gravity Forms developer-licensed payment add-ons – like PayPal, Authorize.net or Stripe – you can restrict access to the PDF until after a payment is captured.
+* [Protecting your user’s sensitive information is at the heart of Gravity PDF](https://gravitypdf.com/documentation/v4/user-pdf-security/). The plugin’s security settings give you granular control over who has access to the PDFs generated.
 * Our [JavaScript-powered font manager](https://gravitypdf.com/documentation/v4/user-custom-fonts/) allows you to install and use your favourite fonts. Now you can keep in line with your corporate style guide, or create beautiful PDF typography.
 * [The documentation](https://gravitypdf.com/documentation/v4/user-installation/) has everything from basic install instructions to advanced developer how-to guides. Our friendly team is also on hand to [provide FREE general support](https://gravitypdf.com/support/).
 * PHP, HTML and CSS come easy? [You’ll find creating your own PDF templates a breeze](https://gravitypdf.com/documentation/v4/developer-start-customising/). If not, [we offer PDF design services](https://gravitypdf.com/integration-services/) tailored just for you. We can even auto-fill existing PDFs!
