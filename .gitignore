@@ -33,7 +33,7 @@ node_modules/*
 ## Plugin-specific files:
 .min.css
 .min.js
-/src/assets/app.webpack.*
+/src/assets/js/*.bundle.*
 
 # Unit tests
 /tmp

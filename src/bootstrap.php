@@ -507,7 +507,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			'wpdialogs',
 		), $version );
 
-		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'src/assets/js/app.webpack.js', array('jquery'), $version );
+		wp_register_script( 'gfpdf_js_vendors', PDF_PLUGIN_URL . 'src/assets/js/vendor.bundle.js', array('jquery'), $version );
+		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'src/assets/js/app.bundle.js', array('jquery', 'gfpdf_js_vendors'), $version );
 
 		wp_register_script( 'gfpdf_js_chosen', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.jquery.min.js', array( 'jquery' ), $version );
 		wp_register_script( 'gfpdf_js_backbone_model_binder', PDF_PLUGIN_URL . 'bower_components/backbone.modelbinder/Backbone.ModelBinder.min.js', array(
