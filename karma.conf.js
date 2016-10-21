@@ -9,6 +9,7 @@ webpackConfig.externals = {
   'react/lib/ExecutionEnvironment': true,
   'react/lib/ReactContext': true
 }
+webpackConfig.plugins = []
 
 module.exports = function (config) {
   config.set({
