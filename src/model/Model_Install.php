@@ -149,7 +149,10 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @since  4.0
 	 */
 	public function get_permalink_regex() {
-		return '^pdf\/([A-Za-z0-9]+)\/([0-9]+)\/?(download)?\/?';
+		global $wp_rewrite;
+
+		$root = str_replace( '/', '\/', $wp_rewrite->root );
+		return '^' . $root . 'pdf\/([A-Za-z0-9]+)\/([0-9]+)\/?(download)?\/?';
 	}
 
 	/**
