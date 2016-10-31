@@ -108,7 +108,7 @@ class Test_Pre_Checks extends WP_UnitTestCase {
 		$this->gravitypdf->required_wp_version = $min_version;
 
 		/* run our test */
-		$this->assertEquals( $expected, $this->gravitypdf->check_wordpress() );
+		$this->assertEquals( $expected, $this->gravitypdf->is_compatible_wordpress_version() );
 	}
 
 	/**

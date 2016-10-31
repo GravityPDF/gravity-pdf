@@ -156,7 +156,7 @@ class GFPDF_Major_Compatibility_Checks {
 	public function plugins_loaded() {
 
 		/* Check minimum requirements are met */
-		$this->check_wordpress();
+		$this->is_compatible_wordpress_version();
 		$this->check_gravity_forms();
 		$this->check_php();
 		$this->check_mb_string();
@@ -182,7 +182,7 @@ class GFPDF_Major_Compatibility_Checks {
 	 *
 	 * @since 4.0
 	 */
-	public function check_wordpress() {
+	public function is_compatible_wordpress_version() {
 		global $wp_version;
 
 		/* WordPress version not compatible */
