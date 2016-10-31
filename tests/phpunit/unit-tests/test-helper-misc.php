@@ -568,7 +568,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 		);
 
 		/* Check all the defaults work as expected */
-		$compat = $this->misc->backwards_compat_conversion( $settings );
+		$compat = $this->misc->backwards_compat_conversion( $settings, [], [] );
 
 		$this->assertEquals( 8, sizeof( $compat ) );
 		$this->assertFalse( isset( $compat['irrelivant'] ) );
@@ -592,7 +592,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 			'format'            => 'PDFX1A',
 		);
 
-		$compat = $this->misc->backwards_compat_conversion( $settings );
+		$compat = $this->misc->backwards_compat_conversion( $settings, [], [] );
 
 		$this->assertTrue( $compat['premium'] );
 		$this->assertTrue( $compat['rtl'] );

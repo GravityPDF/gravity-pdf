@@ -840,7 +840,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			$form['id'] . $entry['id'],
 			$this->misc->backwards_compat_output( $pdf->get_output_type() ),
 			$pdf->get_filename(),
-			$this->misc->backwards_compat_conversion( $settings ),
+			$this->misc->backwards_compat_conversion( $settings, $form, $entry ),
 			$args
 		); /* Backwards Compatibility */
 
