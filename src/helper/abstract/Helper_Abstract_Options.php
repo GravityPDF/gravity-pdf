@@ -1430,6 +1430,16 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		switch ( $settings['type'] ) {
 			case 'rich_editor':
+				/**
+				 * Don't do any sanitization on input, which was causing problems with merge tags in HTML attributes.
+				 * See https://github.com/GravityPDF/gravity-pdf/issues/492 for more details.
+				 *
+				 * @internal Devs should run the field through wp_kses_post() on output to correctly sanitize
+				 * @since 4.0.6
+				 */
+				return $value;
+			break;
+
 			case 'textarea':
 				return wp_kses_post( $value );
 			break;
