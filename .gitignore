@@ -42,4 +42,5 @@ node_modules/*
 _notes
 _notes/*
 Thumbs.db
+*.pot
 
