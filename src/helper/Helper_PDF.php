@@ -230,12 +230,12 @@ class Helper_PDF {
 		}
 
 		/* Apply our filters */
-		$html = apply_filters( 'gfpdfe_pdf_template', $html, $form['id'], $this->entry['id'], $this->settings ); /* Backwards compat */
-		$html = apply_filters( 'gfpdfe_pdf_template_' . $form['id'], $html, $this->entry['id'], $this->settings ); /* Backwards compat */
+		$html = apply_filters( 'gfpdfe_pdf_template', $html, $form['id'], $this->entry['id'], $args['settings'] ); /* Backwards compat */
+		$html = apply_filters( 'gfpdfe_pdf_template_' . $form['id'], $html, $this->entry['id'], $args['settings'] ); /* Backwards compat */
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_pdf_html_output/ for more details about these filters */
-		$html = apply_filters( 'gfpdf_pdf_html_output', $html, $form, $this->entry, $this->settings, $this );
-		$html = apply_filters( 'gfpdf_pdf_html_output_' . $form['id'], $html, $this->gform, $this->entry, $this->settings, $this );
+		$html = apply_filters( 'gfpdf_pdf_html_output', $html, $form, $this->entry, $args['settings'], $this );
+		$html = apply_filters( 'gfpdf_pdf_html_output_' . $form['id'], $html, $this->gform, $this->entry, $args['settings'], $this );
 
 		/* Check if we should output the HTML to the browser, for debugging */
 		$this->maybe_display_raw_html( $html );

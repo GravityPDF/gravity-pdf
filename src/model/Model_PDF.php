@@ -1806,18 +1806,22 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function preprocess_template_arguments( $args ) {
 
 		if ( isset( $args['settings']['header'] ) ) {
+			$args['settings']['header'] = $this->gform->process_tags( $args['settings']['header'], $args['form'], $args['entry'] );
 			$args['settings']['header'] = $this->misc->fix_header_footer( $args['settings']['header'] );
 		}
 
 		if ( isset( $args['settings']['first_header'] ) ) {
+			$args['settings']['first_header'] = $this->gform->process_tags( $args['settings']['first_header'], $args['form'], $args['entry'] );
 			$args['settings']['first_header'] = $this->misc->fix_header_footer( $args['settings']['first_header'] );
 		}
 
 		if ( isset( $args['settings']['footer'] ) ) {
+			$args['settings']['footer'] = $this->gform->process_tags( $args['settings']['footer'], $args['form'], $args['entry'] );
 			$args['settings']['footer'] = $this->misc->fix_header_footer( $args['settings']['footer'] );
 		}
 
 		if ( isset( $args['settings']['first_footer'] ) ) {
+			$args['settings']['first_footer'] = $this->gform->process_tags( $args['settings']['first_footer'], $args['form'], $args['entry'] );
 			$args['settings']['first_footer'] = $this->misc->fix_header_footer( $args['settings']['first_footer'] );
 		}
 
