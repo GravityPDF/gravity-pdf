@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.2
 Tested up to: 4.6
-Stable tag: 4.0.5
+Stable tag: 4.0.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
 
@@ -84,6 +84,14 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 18. Blank Slate provides a print-friendly template focusing solely on the user-submitted data.
 
 == Changelog ==
+
+= 4.0.6 =
+* Correctly register our PDF link with the WP Rewrite API when "Almost Pretty" permalinks are active (GH#502)
+* Correctly process mergetags in password field for Tier 2 PDF templates (GH#503)
+* Allow mergetags to be saved in HTML attributes in our Header / Footer settings - DEV NOTE: all Rich Text Editor settings fields should be output with `wp_kses_post( $html )` (GH#492)
+* Process mergetags before Header / Footer settings get passed to wp_kses_post() on output (GH#512)
+* Renamed `check_wordpress()` method to `is_compatible_wordpress_version()` to prevent false positive using ConfigServer eXploit Scanner (GH#500)
+* Explicitly set a forward slash after the home_url() when building PDF links (GH#511)
 
 = 4.0.5 =
 * Add support for "Almost Pretty" permalinks for web servers that don't support Mod Rewrite (IIS) (GH#488)
