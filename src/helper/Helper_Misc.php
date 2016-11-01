@@ -993,19 +993,21 @@ class Helper_Misc {
 	 * Converts the 4.x settings array into a compatible 3.x settings array
 	 *
 	 * @param  array $settings The 4.x settings to be converted
+	 * @param  array $form (since 4.0.6) The Gravity Forms array
+	 * @param  array $entry (since 4.0.6) The Gravity Forms entry
 	 *
 	 * @return array           The 3.x compatible settings
 	 *
 	 * @since 4.0
 	 */
-	public function backwards_compat_conversion( $settings ) {
+	public function backwards_compat_conversion( $settings, $form, $entry ) {
 
 		$compat                   = array();
 		$compat['premium']        = ( isset( $settings['advanced_template'] ) && $settings['advanced_template'] == 'Yes' ) ? true : false;
 		$compat['rtl']            = ( isset( $settings['rtl'] ) && $settings['rtl'] == 'Yes' ) ? true : false;
 		$compat['dpi']            = ( isset( $settings['image_dpi'] ) ) ? (int) $settings['image_dpi'] : 96;
 		$compat['security']       = ( isset( $settings['security'] ) && $settings['security'] == 'Yes' ) ? true : false;
-		$compat['pdf_password']   = ( isset( $settings['password'] ) ) ? $settings['password'] : '';
+		$compat['pdf_password']   = ( isset( $settings['password'] ) ) ? $this->gform->process_tags( $settings['password'], $form, $entry ) : '';
 		$compat['pdf_privileges'] = ( isset( $settings['privileges'] ) ) ? $settings['privileges'] : '';
 		$compat['pdfa1b']         = ( isset( $settings['format'] ) && $settings['format'] == 'PDFA1B' ) ? true : false;
 		$compat['pdfx1a']         = ( isset( $settings['format'] ) && $settings['format'] == 'PDFX1A' ) ? true : false;
