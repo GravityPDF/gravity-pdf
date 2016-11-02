@@ -92,6 +92,8 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 * Process mergetags before Header / Footer settings get passed to wp_kses_post() on output (GH#512)
 * Renamed `check_wordpress()` method to `is_compatible_wordpress_version()` to prevent false positive using ConfigServer eXploit Scanner (GH#500)
 * Explicitly set a forward slash after the home_url() when building PDF links (GH#511)
+* Resolve incorrect page numbering in Mpdf's Table of Contents
+* Change Helper_Misc->get_contrast() to choose white in more cases (GH#506)
 
 = 4.0.5 =
 * Add support for "Almost Pretty" permalinks for web servers that don't support Mod Rewrite (IIS) (GH#488)
