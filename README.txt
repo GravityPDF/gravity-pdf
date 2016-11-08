@@ -1,5 +1,5 @@
 === Gravity PDF ===
-Contributors: blueliquiddesigns
+Contributors: blue-liquid-designs
 Plugin URI: https://gravitypdf.com/
 Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
