@@ -165,6 +165,26 @@ class Helper_PDF {
 	protected $data;
 
 	/**
+	 * Holds our Helper_Misc object
+	 * Makes it easy to access common methods throughout the plugin
+	 *
+	 * @var \GFPDF\Helper\Helper_Misc
+	 *
+	 * @since 4.0
+	 */
+	protected $misc;
+
+	/**
+	 * Holds our Helper_Templates object
+	 * used to ease access to our PDF templates
+	 *
+	 * @var \GFPDF\Helper\Helper_Templates
+	 *
+	 * @since 4.0
+	 */
+	protected $templates;
+
+	/**
 	 * Initialise our class
 	 *
 	 * @param array                              $entry    The Gravity Form Entry to be processed
@@ -172,17 +192,21 @@ class Helper_PDF {
 	 *
 	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
 	 * @param \GFPDF\Helper\Helper_Data          $data
+	 * @param \GFPDF\Helper\Helper_Misc          $misc     Our miscellanious methods
+	 * @param \GFPDF\Helper\Helper_Templates     $templates
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $entry, $settings, Helper_Abstract_Form $gform, Helper_Data $data ) {
+	public function __construct( $entry, $settings, Helper_Abstract_Form $gform, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates ) {
 
 		/* Assign our internal variables */
-		$this->entry    = $entry;
-		$this->settings = $settings;
-		$this->gform    = $gform;
-		$this->data     = $data;
-		$this->form     = $this->gform->get_form( $entry['form_id'] );
+		$this->entry     = $entry;
+		$this->settings  = $settings;
+		$this->gform     = $gform;
+		$this->data      = $data;
+		$this->misc      = $misc;
+		$this->templates = $templates;
+		$this->form      = $this->gform->get_form( $entry['form_id'] );
 
 		$this->set_path();
 	}
@@ -215,7 +239,7 @@ class Helper_PDF {
 	 *
 	 * @since 4.0
 	 */
-	public function render_html( $args = array(), $html = '' ) {
+	public function render_html( $args = [], $html = '' ) {
 
 		/* Because this class can load any content we'll only set up our template if no HTML is passed */
 		if ( empty( $html ) ) {
@@ -334,41 +358,23 @@ class Helper_PDF {
 	 */
 	public function set_template() {
 
-		$template = ( isset( $this->settings['template'] ) ) ? $this->get_file_with_extension( $this->settings['template'] ) : '';
+		$template = ( isset( $this->settings['template'] ) ) ? $this->settings['template'] : '';
 
 		/* Allow a user to change the current template if they have the appropriate capabilities */
 		if ( rgget( 'template' ) && is_user_logged_in() && $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
-			$template = $this->get_file_with_extension( rgget( 'template' ) );
+			$template = rgget( 'template' );
 		}
 
-		/**
-		 * Check for the template's existance
-		 * We'll first look for a user-overridding template
-		 * Then check our default templates
-		 */
-		$default_template_path = PDF_PLUGIN_DIR . 'src/templates/';
-
-		if ( is_multisite() && is_file( $this->data->multisite_template_location . $template ) ) {
-			$this->template_path = $this->data->multisite_template_location . $template;
-		} else if ( is_file( $this->data->template_location . $template ) ) {
-			$this->template_path = $this->data->template_location . $template;
-		} else if ( is_file( $default_template_path . $template ) ) {
-			$this->template_path = $default_template_path . $template;
-		} else {
-			throw new Exception( 'Could not find the template: ' . esc_html( $template ) );
+		try {
+			$this->template_path = $this->templates->get_template_path_by_id( $template );
+		} catch ( Exception $e ) {
+			throw $e;
 		}
-
-		/*
-		 * Check if the template version is compatible with our version of Gravity PDF
-		 */
-		$headers = get_file_data( $this->template_path, array( 'required_pdf_version' => esc_html__( 'Required PDF Version', 'gravity-forms-pdf-extended' ) ) );
 
 		/* Check if there are version requirements */
-		if ( strlen( $headers['required_pdf_version'] ) > 0 ) {
-			/* Check if the version requirements are NOT met and throw and error */
-			if ( version_compare( $headers['required_pdf_version'], PDF_EXTENDED_VERSION, '>' ) ) {
-				throw new Exception( sprintf( esc_html__( 'The PDF Template %s requires Gravity PDF version %s. Upgrade to the latest version.', 'gravity-forms-pdf-extended' ), "<em>$template</em>", "<em>{$headers['required_pdf_version']}</em>" ) );
-			}
+		$template_info = $this->templates->get_template_info_by_path( $this->template_path );
+		if ( ! $this->templates->is_template_compatible( $template_info['required_pdf_version'] ) ) {
+			throw new Exception( sprintf( esc_html__( 'The PDF Template %s requires Gravity PDF version %s. Upgrade to the latest version.', 'gravity-forms-pdf-extended' ), "<em>$template</em>", "<em>{$template_info['required_pdf_version']}</em>" ) );
 		}
 	}
 
@@ -394,7 +400,7 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	public function set_output_type( $type ) {
-		$valid = array( 'DISPLAY', 'DOWNLOAD', 'SAVE' );
+		$valid = [ 'DISPLAY', 'DOWNLOAD', 'SAVE' ];
 
 		if ( ! in_array( strtoupper( $type ), $valid ) ) {
 			throw new Exception( sprintf( 'Display type not valid. Use %s', implode( ', ', $valid ) ) );
@@ -452,8 +458,8 @@ class Helper_PDF {
 	 */
 	public function set_display_mode( $mode = 'fullpage', $layout = 'continuous' ) {
 
-		$valid_mode   = array( 'fullpage', 'fullwidth', 'real', 'default' );
-		$valid_layout = array( 'single', 'continuous', 'two', 'twoleft', 'tworight', 'default' );
+		$valid_mode   = [ 'fullpage', 'fullwidth', 'real', 'default' ];
+		$valid_layout = [ 'single', 'continuous', 'two', 'twoleft', 'tworight', 'default' ];
 
 		/* check the mode */
 		if ( ! in_array( strtolower( $mode ), $valid_mode ) ) {
@@ -541,7 +547,7 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	public function set_filename( $filename ) {
-		$this->filename = $this->get_file_with_extension( $filename, '.pdf' );
+		$this->filename = $this->misc->get_file_with_extension( $filename, '.pdf' );
 	}
 
 	/**
@@ -624,15 +630,64 @@ class Helper_PDF {
 		/* Get the paper size from the settings */
 		$paper_size = ( isset( $this->settings['pdf_size'] ) ) ? strtoupper( $this->settings['pdf_size'] ) : 'A4';
 
-		$valid_paper_size = array(
-			'4A0', '2A0',
-			'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10',
-			'B0', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10',
-			'C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10',
-			'RA0', 'RA1', 'RA2', 'RA3', 'RA4',
-			'SRA0', 'SRA1', 'SRA2', 'SRA3', 'SRA4',
-			'LETTER', 'LEGAL', 'LEDGER', 'TABLOID', 'EXECUTIVE', 'FOILIO', 'B', 'A', 'DEMY', 'ROYAL', 'CUSTOM',
-		);
+		$valid_paper_size = [
+			'4A0',
+			'2A0',
+			'A0',
+			'A1',
+			'A2',
+			'A3',
+			'A4',
+			'A5',
+			'A6',
+			'A7',
+			'A8',
+			'A9',
+			'A10',
+			'B0',
+			'B1',
+			'B2',
+			'B3',
+			'B4',
+			'B5',
+			'B6',
+			'B7',
+			'B8',
+			'B9',
+			'B10',
+			'C0',
+			'C1',
+			'C2',
+			'C3',
+			'C4',
+			'C5',
+			'C6',
+			'C7',
+			'C8',
+			'C9',
+			'C10',
+			'RA0',
+			'RA1',
+			'RA2',
+			'RA3',
+			'RA4',
+			'SRA0',
+			'SRA1',
+			'SRA2',
+			'SRA3',
+			'SRA4',
+			'LETTER',
+			'LEGAL',
+			'LEDGER',
+			'TABLOID',
+			'EXECUTIVE',
+			'FOILIO',
+			'B',
+			'A',
+			'DEMY',
+			'ROYAL',
+			'CUSTOM',
+		];
 
 		if ( ! in_array( $paper_size, $valid_paper_size ) ) {
 			throw new Exception( sprintf( 'Paper size not valid. Use %s', implode( ', ', $valid_paper_size ) ) );
@@ -668,7 +723,7 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	protected function set_custom_paper_size() {
-		$custom_paper_size = ( isset( $this->settings['custom_pdf_size'] ) ) ? $this->settings['custom_pdf_size'] : array();
+		$custom_paper_size = ( isset( $this->settings['custom_pdf_size'] ) ) ? $this->settings['custom_pdf_size'] : [];
 
 		if ( sizeof( $custom_paper_size ) !== 3 ) {
 			throw new Exception( 'Custom paper size not valid. Array should contain three keys: width, height and unit type' );
@@ -723,26 +778,6 @@ class Helper_PDF {
 		}
 	}
 
-
-	/**
-	 * Ensure an extension is added to the end of the name
-	 *
-	 * @param  string $name      The PHP template
-	 *
-	 * @param string  $extension The extension that should be added to the filename
-	 *
-	 * @return string
-	 *
-	 * @since  4.0
-	 */
-	protected function get_file_with_extension( $name, $extension = '.php' ) {
-		if ( substr( $name, -strlen( $extension ) ) !== $extension ) {
-			$name = $name . $extension;
-		}
-
-		return $name;
-	}
-
 	/**
 	 * Load our PHP template file and return the buffered HTML
 	 *
@@ -752,7 +787,7 @@ class Helper_PDF {
 	 *
 	 * @since 4.0
 	 */
-	protected function load_html( $args = array() ) {
+	protected function load_html( $args = [] ) {
 		/* for backwards compatibility extract the $args variable */
 		extract( $args, EXTR_SKIP ); /* skip any arguments that would clash - i.e filename, args, output, path, this */
 
@@ -855,7 +890,7 @@ class Helper_PDF {
 		if ( strtolower( $this->settings['format'] ) == 'standard' && strtolower( $this->settings['security'] == 'Yes' ) ) {
 
 			$password        = ( isset( $this->settings['password'] ) ) ? $this->gform->process_tags( $this->settings['password'], $this->form, $this->entry ) : '';
-			$privileges      = ( isset( $this->settings['privileges'] ) ) ? $this->settings['privileges'] : array();
+			$privileges      = ( isset( $this->settings['privileges'] ) ) ? $this->settings['privileges'] : [];
 			$master_password = ( isset( $this->settings['master_password'] ) ) ? $this->gform->process_tags( $this->settings['master_password'], $this->form, $this->entry ) : null;
 
 			$this->mpdf->SetProtection( $privileges, $password, $master_password, 128 );

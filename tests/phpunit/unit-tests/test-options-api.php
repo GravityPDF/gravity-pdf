@@ -76,7 +76,7 @@ class Test_Options_API extends WP_UnitTestCase {
 		parent::setUp();
 
 		/* setup our object */
-		$this->options = new Helper_Options_Fields( $gfpdf->log, $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
+		$this->options = new Helper_Options_Fields( $gfpdf->log, $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->notices, $gfpdf->templates );
 
 		/* load settings in database  */
 		update_option( 'gfpdf_settings', json_decode( file_get_contents( dirname( __FILE__ ) . '/json/options-settings.json' ), true ) );
@@ -657,63 +657,6 @@ class Test_Options_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test the get templates functionality
-	 *
-	 * @since 4.0
-	 */
-	public function test_get_templates() {
-
-		$templates = $this->options->get_templates();
-
-		$this->assertArrayHasKey( 'Core', $templates );
-		$this->assertNotSame( 0, sizeof( $templates['Core'] ) );
-	}
-
-	/**
-	 * Test our PDF template headers are all registered
-	 *
-	 * @since 4.0
-	 */
-	public function test_get_template_header_details() {
-		$header = $this->options->get_template_header_details();
-
-		$this->assertArrayHasKey( 'template', $header );
-		$this->assertArrayHasKey( 'version', $header );
-		$this->assertArrayHasKey( 'description', $header );
-		$this->assertArrayHasKey( 'author', $header );
-		$this->assertArrayHasKey( 'group', $header );
-		$this->assertArrayHasKey( 'required_pdf_version', $header );
-	}
-
-	/**
-	 * Check we can correctly read the template headers
-	 *
-	 * @since 4.0
-	 */
-	public function test_get_template_headers() {
-
-		$path   = PDF_PLUGIN_DIR . 'src/templates/zadani.php';
-		$header = $this->options->get_template_headers( $path );
-
-		$this->assertEquals( 'Zadani', $header['template'] );
-		$this->assertEquals( '1.1', $header['version'] );
-		$this->assertEquals( 'A minimalist business-style template that will generate a well-spaced document great for printing.', $header['description'] );
-		$this->assertEquals( 'Gravity PDF', $header['author'] );
-		$this->assertEquals( 'Core', $header['group'] );
-		$this->assertEquals( '4.0-alpha', $header['required_pdf_version'] );
-	}
-
-	/**
-	 * Check we can get the core PDF templates
-	 *
-	 * @since 4.0
-	 */
-	public function test_get_plugin_pdf_templates() {
-		$this->assertNotSame( 0, sizeof( $this->options->get_plugin_pdf_templates() ) );
-	}
-
-
-	/**
 	 * Test the installed fonts getter functionality
 	 *
 	 * @since 4.0
@@ -1200,15 +1143,5 @@ class Test_Options_API extends WP_UnitTestCase {
 				'',
 			),
 		);
-	}
-
-	/**
-	 * Check we return the appropriate template group name
-	 *
-	 * @since 4.0
-	 */
-	public function test_get_template_group() {
-		$this->assertEquals( 'legacy', $this->options->get_template_group( 'default-template' ) );
-		$this->assertEquals( 'core', $this->options->get_template_group( 'zadani' ) );
 	}
 }

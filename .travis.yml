@@ -24,10 +24,12 @@ matrix:
 before_script:
   - if [[ $TRAVIS_PHP_VERSION != 7.1 ]]; then phpenv config-rm xdebug.ini; fi
   - if find . -name "*.php" -exec php -l {} \; | grep "unexpected $end"; then exit 1; fi
-  - composer install --prefer-source --optimize-autoloader
+  - composer install --prefer-source --optimize-autoloader --no-scripts
   - bash tests/bin/install.sh gravitypdf_test root '' localhost $WP_VERSION
+  - if [[ $WP_MULTISITE = 1 ]]; then nvm install 4.5 && npm install -g karma-cli && npm install; fi
 
 script:
+ - if [[ $WP_MULTISITE = 1 ]]; then npm run test; fi
  - vendor/bin/phpunit -c tests/phpunit/phpunit.xml.dist
  - vendor/bin/phpunit -c tests/phpunit/phpunit.xml.dist --group ajax
 

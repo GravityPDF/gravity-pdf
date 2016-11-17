@@ -8,6 +8,7 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Helper\Helper_Templates;
 
 use Psr\Log\LoggerInterface;
 
@@ -112,6 +113,16 @@ class View_Settings extends Helper_Abstract_View {
 	protected $misc;
 
 	/**
+	 * Holds our Helper_Templates object
+	 * used to ease access to our PDF templates
+	 *
+	 * @var \GFPDF\Helper\Helper_Templates
+	 *
+	 * @since 4.0
+	 */
+	protected $templates;
+
+	/**
 	 * Setup our class by injecting all our dependancies
 	 *
 	 * @param array                                          $data_cache An array of data to pass to the view
@@ -120,20 +131,22 @@ class View_Settings extends Helper_Abstract_View {
 	 * @param \GFPDF\Helper\Helper_Abstract_Options          $options    Our options class which allows us to access any settings
 	 * @param \GFPDF\Helper\Helper_Data                      $data       Our plugin data store
 	 * @param \GFPDF\Helper\Helper_Misc                      $misc       Our miscellaneous class
+	 * @param \GFPDF\Helper\Helper_Templates                 $templates
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $data_cache = array(), Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc ) {
+	public function __construct( $data_cache = [], Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates ) {
 
 		/* Call our parent constructor */
 		parent::__construct( $data_cache );
 
 		/* Assign our internal variables */
-		$this->gform   = $gform;
-		$this->log     = $log;
-		$this->options = $options;
-		$this->data    = $data;
-		$this->misc    = $misc;
+		$this->gform     = $gform;
+		$this->log       = $log;
+		$this->options   = $options;
+		$this->data      = $data;
+		$this->misc      = $misc;
+		$this->templates = $templates;
 	}
 
 	/**
@@ -146,11 +159,11 @@ class View_Settings extends Helper_Abstract_View {
 	public function tabs() {
 
 		/* Set up any variables we need for the view and display */
-		$vars = array(
+		$vars = [
 			'selected' => isset( $_GET['tab'] ) ? $_GET['tab'] : 'general',
 			'tabs'     => $this->get_avaliable_tabs(),
 			'data'     => $this->data,
-		);
+		];
 
 		/* load the tabs view */
 		$this->load( 'tabs', $vars );
@@ -170,22 +183,22 @@ class View_Settings extends Helper_Abstract_View {
 		 *
 		 * @var array
 		 */
-		$navigation = array(
-			5 => array(
+		$navigation = [
+			5 => [
 				'name' => esc_html__( 'General', 'gravity-forms-pdf-extended' ),
 				'id'   => 'general',
-			),
+			],
 
-			100 => array(
+			100 => [
 				'name' => esc_html__( 'Tools', 'gravity-forms-pdf-extended' ),
 				'id'   => 'tools',
-			),
+			],
 
-			120 => array(
+			120 => [
 				'name' => esc_html__( 'Help', 'gravity-forms-pdf-extended' ),
 				'id'   => 'help',
-			),
-		);
+			],
+		];
 
 		/**
 		 * Allow additional navigation to be added to the settings page
@@ -207,16 +220,16 @@ class View_Settings extends Helper_Abstract_View {
 
 		$status = new GFPDF_Major_Compatibility_Checks();
 
-		$vars = array(
+		$vars = [
 			'memory' => $status->get_ram( $this->data->memory_limit ),
 			'wp'     => $wp_version,
 			'php'    => phpversion(),
 			'gf'     => $this->gform->get_version(),
-		);
+		];
 
-		$this->log->addNotice( 'System Status', array(
+		$this->log->addNotice( 'System Status', [
 			'status' => $vars,
-		) );
+		] );
 
 		/* load the system status view */
 		$this->load( 'system_status', $vars );
@@ -231,9 +244,9 @@ class View_Settings extends Helper_Abstract_View {
 	 */
 	public function general() {
 
-		$vars = array(
+		$vars = [
 			'edit_cap' => $this->gform->has_capability( 'gravityforms_edit_settings' ),
-		);
+		];
 
 		/* load the system status view */
 		$this->load( 'general', $vars );
@@ -255,13 +268,13 @@ class View_Settings extends Helper_Abstract_View {
 			wp_die( esc_html__( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
 		}
 
-		$template_directory = $this->misc->get_template_path();
+		$template_directory = $this->templates->get_template_path();
 
-		$vars = array(
+		$vars = [
 			'template_directory'            => $this->misc->relative_path( $template_directory, '/' ),
-			'template_files'                => $this->options->get_plugin_pdf_templates(),
+			'template_files'                => $this->templates->get_core_pdf_templates(),
 			'custom_template_setup_warning' => $this->options->get_option( 'custom_pdf_template_files_installed' ),
-		);
+		];
 
 		/* load the system status view */
 		$this->load( 'tools', $vars );

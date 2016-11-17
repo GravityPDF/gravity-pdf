@@ -98,8 +98,8 @@ class Test_PDF extends WP_UnitTestCase {
 		parent::setUp();
 
 		/* Setup our test classes */
-		$this->model = new Model_PDF( $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
-		$this->view  = new View_PDF( array(), $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
+		$this->model = new Model_PDF( $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices, $gfpdf->templates );
+		$this->view  = new View_PDF( array(), $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
 
 		$this->controller = new Controller_PDF( $this->model, $this->view, $gfpdf->gform, $gfpdf->log, $gfpdf->misc );
 		$this->controller->init();
@@ -903,7 +903,7 @@ class Test_PDF extends WP_UnitTestCase {
 	public function test_does_pdf_exist() {
 		global $gfpdf;
 
-		$pdf = new Helper_PDF( array( 'id' => 1, 'form_id' => 1 ), '', $gfpdf->gform, $gfpdf->data );
+		$pdf = new Helper_PDF( array( 'id' => 1, 'form_id' => 1 ), '', $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
 		$pdf->set_path( ABSPATH );
 		$pdf->set_filename( 'unittest' );
 
@@ -924,7 +924,7 @@ class Test_PDF extends WP_UnitTestCase {
 	public function test_get_output_type() {
 		global $gfpdf;
 
-		$pdf = new Helper_PDF( array( 'id' => 1, 'form_id' => 1 ), '', $gfpdf->gform, $gfpdf->data );
+		$pdf = new Helper_PDF( array( 'id' => 1, 'form_id' => 1 ), '', $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
 
 		$pdf->set_output_type( 'display' );
 		$this->assertEquals( 'DISPLAY', $pdf->get_output_type() );
@@ -944,7 +944,7 @@ class Test_PDF extends WP_UnitTestCase {
 	public function test_get_template_path() {
 		global $gfpdf;
 
-		$pdf = new Helper_PDF( array( 'id' => 1, 'form_id' => 1 ), array( 'template' => 'zadani' ), $gfpdf->gform, $gfpdf->data );
+		$pdf = new Helper_PDF( array( 'id' => 1, 'form_id' => 1 ), array( 'template' => 'zadani' ), $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
 
 		/* Cleanup any previous tests */
 		@unlink( $gfpdf->data->template_location . 'zadani.php' );
@@ -979,7 +979,7 @@ class Test_PDF extends WP_UnitTestCase {
 		}
 
 		/* Check for errors */
-		$pdf = new Helper_PDF( array( 'id' => 1, 'form_id' => 1 ), array( 'template' => 'non-existant' ), $gfpdf->gform, $gfpdf->data );
+		$pdf = new Helper_PDF( array( 'id' => 1, 'form_id' => 1 ), array( 'template' => 'non-existant' ), $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
 
 		try {
 			/* Set our current PDF template */
@@ -993,12 +993,12 @@ class Test_PDF extends WP_UnitTestCase {
 		$template = str_replace( 'Required PDF Version: 4.0-alpha', 'Required PDF Version: 10', $template );
 		file_put_contents( $gfpdf->data->template_location . 'zadani.php', $template );
 
-		$pdf = new Helper_PDF( array( 'id' => 1, 'form_id' => 1 ), array( 'template' => 'zadani' ), $gfpdf->gform, $gfpdf->data );
+		$pdf = new Helper_PDF( array( 'id' => 1, 'form_id' => 1 ), array( 'template' => 'zadani' ), $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
 
 		try {
 			$pdf->set_template();
 		} catch ( Exception $e ) {
-			$this->assertEquals( sprintf( 'The PDF Template %s requires Gravity PDF version %s. Upgrade to the latest version.', '<em>zadani.php</em>', '<em>10</em>' ), $e->getMessage() );
+			$this->assertEquals( sprintf( 'The PDF Template %s requires Gravity PDF version %s. Upgrade to the latest version.', '<em>zadani</em>', '<em>10</em>' ), $e->getMessage() );
 		}
 
 		@unlink( $gfpdf->data->template_location . 'zadani.php' );
@@ -1623,11 +1623,23 @@ class Test_PDF extends WP_UnitTestCase {
 	public function test_handle_legacy_tier_2_processing() {
 		global $gfpdf;
 
+
 		$settings = array( 'template' => 'zadani' );
 		$entry    = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
-		$args     = $gfpdf->misc->get_template_args( $entry, $settings );
+		$form     = $gfpdf->gform->get_form( $entry['form_id'] );
+		$model_pdf = \GPDFAPI::get_mvc_class('Model_PDF');
 
-		$pdf = new Helper_PDF( array( 'id' => 1, 'form_id' => 1 ), $settings, $gfpdf->gform, $gfpdf->data );
+		$args = $gfpdf->templates->get_template_arguments(
+			$form,
+			$gfpdf->misc->get_fields_sorted_by_id( $form['id'] ),
+			$entry,
+			$model_pdf->get_form_data( $entry ),
+			$settings,
+			$gfpdf->templates->get_template_config_file( $settings['template'] ),
+			$gfpdf->misc->get_legacy_ids( $entry['id'], $settings )
+		);
+
+		$pdf = new Helper_PDF( array( 'id' => 1, 'form_id' => 1 ), $settings, $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
 		$pdf->set_template();
 		$pdf->set_output_type( 'save' );
 
