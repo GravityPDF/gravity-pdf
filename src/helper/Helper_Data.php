@@ -235,7 +235,7 @@ class Helper_Data {
 			'template_install_success'    => esc_html__( 'Template successfully installed', 'gravity-forms-pdf-extended' ),
 			'installUpdatedText'          => esc_html__( 'Template successfully updated', 'gravity-forms-pdf-extended' ),
 			'generic_upload_failure'      => esc_html__( 'There was a problem with the upload. Reload the page and try again.', 'gravity-forms-pdf-extended' ),
-			'template_confirm_delete'     => esc_html__( "Do you really want to delete this PDF template?\n\nClick 'Cancel' to go back, 'OK' to confirm the delete.", 'gravity-forms-pdf-extended' ),
+			'template_confirm_delete'     => sprintf( esc_html__( "Do you really want to delete this PDF template?%sClick 'Cancel' to go back, 'OK' to confirm the delete.", 'gravity-forms-pdf-extended' ), "\n\n" ),
 			'templateDeleteError'         => esc_html__( 'Could not delete template.', 'gravity-forms-pdf-extended' ),
 			'templateHeader'              => esc_html__( 'Installed PDFs', 'gravity-forms-pdf-extended' ),
 		] );

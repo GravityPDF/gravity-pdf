@@ -54,7 +54,7 @@ abstract class GFPDF_Depreciated_Abstract {
 	 * @param array  $arguments An enumerated array containing the parameters passed to the $name'ed method
 	 */
 	public function __call( $name, $arguments ) {
-		trigger_error( sprintf( esc_html__( '"%s" has been depreciated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ), E_USER_DEPRECATED );
+		trigger_error( sprintf( esc_html__( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ), E_USER_DEPRECATED );
 	}
 
 	/**
@@ -66,7 +66,7 @@ abstract class GFPDF_Depreciated_Abstract {
 	 * @param array  $arguments An enumerated array containing the parameters passed to the $name'ed method
 	 */
 	public static function __callStatic( $name, $arguments ) {
-		trigger_error( sprintf( esc_html__( '"%s" has been depreciated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ), E_USER_DEPRECATED );
+		trigger_error( sprintf( esc_html__( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ), E_USER_DEPRECATED );
 	}
 }
 
