@@ -4,7 +4,6 @@ namespace GFPDF\Helper;
 
 use WP_List_Table;
 
-
 /**
  * WP_List_Table Helper Controller
  *
@@ -87,7 +86,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	/**
 	 * Setup our class with appropriate data
 	 *
-	 * @param array                                 $form The Gravity Forms object
+	 * @param array                                 $form  The Gravity Forms object
 	 * @param \GFPDF\Helper\Helper_Abstract_Form    $gform Our abstracted Gravity Forms API
 	 * @param \GFPDF\Helper\Helper_Misc             $misc
 	 * @param \GFPDF\Helper\Helper_Abstract_Options $options
@@ -103,11 +102,11 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$this->options = $options;
 
 		/* Cache column header internally so we don't have to work with the global get_column_headers() function */
-		$this->_column_headers = array(
+		$this->_column_headers = [
 			$this->get_columns(),
-			array(),
-			array(),
-		);
+			[],
+			[],
+		];
 
 		parent::__construct();
 	}
@@ -119,13 +118,13 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 */
 	public function get_columns() {
 
-		$columns = array(
+		$columns = [
 			'cb'            => '',
 			'name'          => esc_html__( 'Name', 'gravity-forms-pdf-extended' ),
 			'shortcode'     => esc_html__( 'Download Shortcode', 'gravity-forms-pdf-extended' ),
 			'template'      => esc_html__( 'Template', 'gravity-forms-pdf-extended' ),
 			'notifications' => esc_html__( 'Notifications', 'gravity-forms-pdf-extended' ),
-		);
+		];
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_pdf_list_columns/ for more details about this filter */
 		$columns = apply_filters( 'gfpdf_pdf_list_columns', $columns );
@@ -150,7 +149,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * @since 4.0
 	 */
 	public function prepare_items() {
-		$this->items = ( isset( $this->form['gfpdf_form_settings'] ) ) ? $this->form['gfpdf_form_settings'] : array();
+		$this->items = ( isset( $this->form['gfpdf_form_settings'] ) ) ? $this->form['gfpdf_form_settings'] : [];
 	}
 
 	/**
@@ -165,19 +164,21 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 		<table class="wp-list-table <?php echo implode( ' ', $this->get_table_classes() ); ?>" cellspacing="0">
 			<thead>
-				<tr>
-					<?php $this->print_column_headers(); ?>
-				</tr>
+			<tr>
+				<?php $this->print_column_headers(); ?>
+			</tr>
 			</thead>
 
-			<tbody id="the-list" <?php if ( $singular ) { echo " class='list:$singular'"; } ?>>
-				<?php $this->display_rows_or_placeholder(); ?>
+			<tbody id="the-list" <?php if ( $singular ) {
+				echo " class='list:$singular'";
+			} ?>>
+			<?php $this->display_rows_or_placeholder(); ?>
 			</tbody>
 
 			<tfoot>
-				<tr>
-					<?php $this->print_column_headers( false ); ?>
-				</tr>
+			<tr>
+				<?php $this->print_column_headers( false ); ?>
+			</tr>
 			</tfoot>
 
 		</table>
@@ -219,7 +220,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 		$action = 'gfpdf_pdf_list_column_' . $column;
 
-		if( has_action( $action ) ) {
+		if ( has_action( $action ) ) {
 			/* See https://gravitypdf.com/documentation/v4/gfpdf_pdf_list_column_id/ for more details about this action */
 			do_action( $action, $item );
 		} else {
@@ -268,7 +269,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		}
 
 		/* Convert our IDs to names */
-		$notification_names = array();
+		$notification_names = [];
 		foreach ( $this->form['notifications'] as $notification ) {
 			if ( in_array( $notification['id'], $item['notification'] ) ) {
 				$notification_names[] = $notification['name'];
@@ -332,16 +333,16 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * @since 4.0
 	 */
 	public function column_name( $item ) {
-		$edit_url        = add_query_arg( array( 'pid' => $item['id'] ) );
+		$edit_url        = add_query_arg( [ 'pid' => $item['id'] ] );
 		$form_id         = rgget( 'id' );
 		$duplicate_nonce = wp_create_nonce( "gfpdf_duplicate_nonce_{$form_id}_{$item['id']}" );
 		$delete_nonce    = wp_create_nonce( "gfpdf_delete_nonce_{$form_id}_{$item['id']}" );
 
-		$actions = array(
+		$actions = [
 			'edit'      => '<a title="' . esc_attr__( 'Edit this PDF', 'gravity-forms-pdf-extended' ) . '" href="' . $edit_url . '">' . esc_html__( 'Edit', 'gravity-forms-pdf-extended' ) . '</a>',
 			'duplicate' => '<a title="' . esc_attr__( 'Duplicate this PDF', 'gravity-forms-pdf-extended' ) . '" data-id="' . $item['id'] . '" class="submitduplicate" data-nonce="' . $duplicate_nonce . '"  data-fid="' . $form_id . '">' . esc_html__( 'Duplicate', 'gravity-forms-pdf-extended' ) . '</a>',
 			'delete'    => '<a title="' . esc_attr__( 'Delete this PDF', 'gravity-forms-pdf-extended' ) . '" class="submitdelete" data-id="' . $item['id'] . '" data-nonce="' . $delete_nonce . '" data-fid="' . $form_id . '">' . esc_html__( 'Delete', 'gravity-forms-pdf-extended' ) . '</a>',
-		);
+		];
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_pdf_actions/ for more details about this filter */
 		$actions = apply_filters( 'gfpdf_pdf_actions', $actions, $item );
@@ -377,6 +378,6 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * @since 4.0
 	 */
 	public function no_items() {
-		printf( esc_html__( "This form doesn't have any PDFs. Let's go %screate one%s.", 'gravity-forms-pdf-extended' ), "<a href='" . add_query_arg( array( 'pid' => 0 ) ) . "'>", '</a>' );
+		printf( esc_html__( "This form doesn't have any PDFs. Let's go %screate one%s.", 'gravity-forms-pdf-extended' ), "<a href='" . add_query_arg( [ 'pid' => 0 ] ) . "'>", '</a>' );
 	}
 }

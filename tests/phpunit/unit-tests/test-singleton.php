@@ -117,28 +117,28 @@ class Test_Singleton_Helper extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function provider_registered_classes() {
-		return array(
-			array( 'GFPDF\Controller\Controller_Actions', 'Controller_Actions' ),
-			array( 'GFPDF\Controller\Controller_Form_Settings', 'Controller_Form_Settings' ),
-			array( 'GFPDF\Controller\Controller_Install', 'Controller_Install' ),
-			array( 'GFPDF\Controller\Controller_PDF', 'Controller_PDF' ),
-			array( 'GFPDF\Controller\Controller_Settings', 'Controller_Settings' ),
-			array( 'GFPDF\Controller\Controller_Shortcodes', 'Controller_Shortcodes' ),
-			array( 'GFPDF\Controller\Controller_Welcome_Screen', 'Controller_Welcome_Screen' ),
-			array( 'GFPDF\Model\Model_Actions', 'Model_Actions' ),
-			array( 'GFPDF\Model\Model_Form_Settings', 'Model_Form_Settings' ),
-			array( 'GFPDF\Model\Model_Install', 'Model_Install' ),
-			array( 'GFPDF\Model\Model_PDF', 'Model_PDF' ),
-			array( 'GFPDF\Model\Model_Settings', 'Model_Settings' ),
-			array( 'GFPDF\Model\Model_Shortcodes', 'Model_Shortcodes' ),
-			array( 'GFPDF\Model\Model_Welcome_Screen', 'Model_Welcome_Screen' ),
-			array( 'GFPDF\View\View_Actions', 'View_Actions' ),
-			array( 'GFPDF\View\View_Form_Settings', 'View_Form_Settings' ),
-			array( 'GFPDF\View\View_PDF', 'View_PDF' ),
-			array( 'GFPDF\View\View_Settings', 'View_Settings' ),
-			array( 'GFPDF\View\View_Shortcodes', 'View_Shortcodes' ),
-			array( 'GFPDF\View\View_Welcome_Screen', 'View_Welcome_Screen' ),
-		);
+		return [
+			[ 'GFPDF\Controller\Controller_Actions', 'Controller_Actions' ],
+			[ 'GFPDF\Controller\Controller_Form_Settings', 'Controller_Form_Settings' ],
+			[ 'GFPDF\Controller\Controller_Install', 'Controller_Install' ],
+			[ 'GFPDF\Controller\Controller_PDF', 'Controller_PDF' ],
+			[ 'GFPDF\Controller\Controller_Settings', 'Controller_Settings' ],
+			[ 'GFPDF\Controller\Controller_Shortcodes', 'Controller_Shortcodes' ],
+			[ 'GFPDF\Controller\Controller_Welcome_Screen', 'Controller_Welcome_Screen' ],
+			[ 'GFPDF\Model\Model_Actions', 'Model_Actions' ],
+			[ 'GFPDF\Model\Model_Form_Settings', 'Model_Form_Settings' ],
+			[ 'GFPDF\Model\Model_Install', 'Model_Install' ],
+			[ 'GFPDF\Model\Model_PDF', 'Model_PDF' ],
+			[ 'GFPDF\Model\Model_Settings', 'Model_Settings' ],
+			[ 'GFPDF\Model\Model_Shortcodes', 'Model_Shortcodes' ],
+			[ 'GFPDF\Model\Model_Welcome_Screen', 'Model_Welcome_Screen' ],
+			[ 'GFPDF\View\View_Actions', 'View_Actions' ],
+			[ 'GFPDF\View\View_Form_Settings', 'View_Form_Settings' ],
+			[ 'GFPDF\View\View_PDF', 'View_PDF' ],
+			[ 'GFPDF\View\View_Settings', 'View_Settings' ],
+			[ 'GFPDF\View\View_Shortcodes', 'View_Shortcodes' ],
+			[ 'GFPDF\View\View_Welcome_Screen', 'View_Welcome_Screen' ],
+		];
 	}
 
 	/**
@@ -154,11 +154,11 @@ class Test_Singleton_Helper extends WP_UnitTestCase {
 		$actions = $singleton->get_class( 'Controller_Actions' );
 
 		/* Verify action exists */
-		$this->assertEquals( 10, has_action( 'admin_init', array( $actions, 'route' ) ) );
+		$this->assertEquals( 10, has_action( 'admin_init', [ $actions, 'route' ] ) );
 
 		/* Remove the action */
-		remove_action( 'admin_init', array( $actions, 'route' ) );
+		remove_action( 'admin_init', [ $actions, 'route' ] );
 
-		$this->assertFalse( has_action( 'admin_init', array( $actions, 'route' ) ) );
+		$this->assertFalse( has_action( 'admin_init', [ $actions, 'route' ] ) );
 	}
 }

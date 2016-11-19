@@ -87,7 +87,7 @@ class Test_Actions extends WP_UnitTestCase {
 
 		/* Setup our test classes */
 		$this->model = new Model_Actions( $gfpdf->data, $gfpdf->options, $gfpdf->notices );
-		$this->view  = new View_Actions( array() );
+		$this->view  = new View_Actions( [] );
 
 		$this->controller = new Controller_Actions( $this->model, $this->view, $gfpdf->gform, $gfpdf->log, $gfpdf->notices );
 		$this->controller->init();
@@ -99,8 +99,8 @@ class Test_Actions extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_actions() {
-		$this->assertSame( 10, has_action( 'admin_init', array( $this->controller, 'route' ) ) );
-		$this->assertSame( 20, has_action( 'admin_init', array( $this->controller, 'route_notices' ) ) );
+		$this->assertSame( 10, has_action( 'admin_init', [ $this->controller, 'route' ] ) );
+		$this->assertSame( 20, has_action( 'admin_init', [ $this->controller, 'route_notices' ] ) );
 	}
 
 	/**
@@ -113,7 +113,7 @@ class Test_Actions extends WP_UnitTestCase {
 		$routes = $this->controller->get_routes();
 
 		$counter  = 0;
-		$expected = array( 'review_plugin', 'migrate_v3_to_v4' );
+		$expected = [ 'review_plugin', 'migrate_v3_to_v4' ];
 
 		foreach ( $routes as $route ) {
 			if ( in_array( $route['action'], $expected ) ) {
@@ -135,24 +135,24 @@ class Test_Actions extends WP_UnitTestCase {
 		set_current_screen( 'edit.php' );
 
 		/* Set up a custom route */
-		add_filter( 'gfpdf_one_time_action_routes', function( $routes ) {
+		add_filter( 'gfpdf_one_time_action_routes', function ( $routes ) {
 
-			return array(
-				array(
+			return [
+				[
 					'action'      => 'test_action',
 					'action_text' => 'My Test Action',
-					'condition'   => function() {
+					'condition'   => function () {
 						return true;
 					},
-					'process'     => function() {
+					'process'     => function () {
 						echo 'processing';
 					},
-					'view'        => function() {
+					'view'        => function () {
 						return 'my test view';
 					},
 					'capability'  => 'gravityforms_view_settings',
-				),
-			);
+				],
+			];
 		} );
 
 		/* Verify no notices present */
@@ -165,7 +165,7 @@ class Test_Actions extends WP_UnitTestCase {
 		$this->assertFalse( $gfpdf->notices->has_notice() );
 
 		/* Set up authorized user */
-		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
 		$this->assertInternalType( 'integer', $user_id );
 		wp_set_current_user( $user_id );
 
@@ -196,28 +196,28 @@ class Test_Actions extends WP_UnitTestCase {
 		global $gfpdf;
 
 		/* Set up a custom route */
-		add_filter( 'gfpdf_one_time_action_routes', function( $routes ) {
+		add_filter( 'gfpdf_one_time_action_routes', function ( $routes ) {
 
-			return array(
-				array(
+			return [
+				[
 					'action'      => 'test_action',
 					'action_text' => 'My Test Action',
-					'condition'   => function() {
+					'condition'   => function () {
 						return false;
 					},
-					'process'     => function() {
+					'process'     => function () {
 						echo 'processing';
 					},
-					'view'        => function() {
+					'view'        => function () {
 						return 'my test view';
 					},
 					'capability'  => 'gravityforms_view_settings',
-				),
-			);
+				],
+			];
 		} );
 
 		/* Set up authorized user */
-		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
 		$this->assertInternalType( 'integer', $user_id );
 		wp_set_current_user( $user_id );
 
@@ -244,24 +244,24 @@ class Test_Actions extends WP_UnitTestCase {
 	public function test_route() {
 
 		/* Set up a custom route */
-		add_filter( 'gfpdf_one_time_action_routes', function( $routes ) {
+		add_filter( 'gfpdf_one_time_action_routes', function ( $routes ) {
 
-			return array(
-				array(
+			return [
+				[
 					'action'      => 'test_action',
 					'action_text' => 'My Test Action',
-					'condition'   => function() {
+					'condition'   => function () {
 						return true;
 					},
-					'process'     => function() {
+					'process'     => function () {
 						echo 'processing';
 					},
-					'view'        => function() {
+					'view'        => function () {
 						return 'my test view';
 					},
 					'capability'  => 'gravityforms_view_settings',
-				),
-			);
+				],
+			];
 		} );
 
 		$_POST['gfpdf_action'] = 'gfpdf_test_action';
@@ -276,7 +276,7 @@ class Test_Actions extends WP_UnitTestCase {
 		$this->assertEquals( 'You do not have permission to access this page', $e->getMessage() );
 
 		/* Set up authorized user */
-		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
 		$this->assertInternalType( 'integer', $user_id );
 		wp_set_current_user( $user_id );
 
@@ -347,7 +347,7 @@ class Test_Actions extends WP_UnitTestCase {
 
 		/* Multisite can only be run by super admins */
 		if ( is_multisite() ) {
-			$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+			$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
 			grant_super_admin( $user_id );
 			wp_set_current_user( $user_id );
 		}

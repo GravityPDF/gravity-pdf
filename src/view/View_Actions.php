@@ -66,11 +66,11 @@ class View_Actions extends Helper_Abstract_View {
 	 */
 	public function get_action_buttons( $type, $button_text, $dismissal = 'enabled' ) {
 
-		return $this->load( 'action_buttons', array(
+		return $this->load( 'action_buttons', [
 			'type'        => $type,
 			'button_text' => $button_text,
 			'dismissal'   => $dismissal,
-		), false );
+		], false );
 
 	}
 
@@ -86,7 +86,7 @@ class View_Actions extends Helper_Abstract_View {
 	 */
 	public function review_plugin( $type, $button_text ) {
 
-		$html = $this->load( 'review_plugin', array(), false );
+		$html = $this->load( 'review_plugin', [], false );
 		$html .= $this->get_action_buttons( $type, $button_text );
 
 		return $html;
@@ -104,7 +104,7 @@ class View_Actions extends Helper_Abstract_View {
 	 */
 	public function migration( $type, $button_text ) {
 
-		$html = $this->load( 'migration', array(), false );
+		$html = $this->load( 'migration', [], false );
 		$html .= $this->get_action_buttons( $type, $button_text, 'disabled' );
 
 		return $html;

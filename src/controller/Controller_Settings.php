@@ -149,7 +149,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
          * Tell Gravity Forms to initiate our settings page
          * Using the following Class/Model
          */
-		GFForms::add_settings_page( $this->data->short_title, array( $this, 'display_page' ) );
+		GFForms::add_settings_page( $this->data->short_title, [ $this, 'display_page' ] );
 
 		/* Ensure any errors are stored correctly */
 		$this->model->setup_form_settings_errors();
@@ -169,8 +169,8 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	public function add_actions() {
 
 		/* Display our system status on general and tools pages */
-		add_action( 'gfpdf_post_general_settings_page', array( $this->view, 'system_status' ) );
-		add_action( 'gfpdf_post_tools_settings_page', array( $this->view, 'system_status' ) );
+		add_action( 'gfpdf_post_general_settings_page', [ $this->view, 'system_status' ] );
+		add_action( 'gfpdf_post_tools_settings_page', [ $this->view, 'system_status' ] );
 
 		/**
 		 * Display the uninstaller if use has the correct permissions
@@ -182,18 +182,18 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		if ( ( ! is_multisite() && $this->gform->has_capability( 'gravityforms_uninstall' ) ) ||
 		     ( is_multisite() && is_super_admin() )
 		) {
-			add_action( 'gfpdf_post_tools_settings_page', array( $this->view, 'uninstaller' ), 5 );
+			add_action( 'gfpdf_post_tools_settings_page', [ $this->view, 'uninstaller' ], 5 );
 		}
 
 		/* Process the tool tab actions */
-		add_action( 'admin_init', array( $this, 'process_tool_tab_actions' ) );
+		add_action( 'admin_init', [ $this, 'process_tool_tab_actions' ] );
 
 		/**
 		 * Add AJAX Action Endpoints
 		 */
-		add_action( 'wp_ajax_gfpdf_font_save', array( $this->model, 'save_font' ) );
-		add_action( 'wp_ajax_gfpdf_font_delete', array( $this->model, 'delete_font' ) );
-		add_action( 'wp_ajax_gfpdf_has_pdf_protection', array( $this->model, 'check_tmp_pdf_security' ) );
+		add_action( 'wp_ajax_gfpdf_font_save', [ $this->model, 'save_font' ] );
+		add_action( 'wp_ajax_gfpdf_font_delete', [ $this->model, 'delete_font' ] );
+		add_action( 'wp_ajax_gfpdf_has_pdf_protection', [ $this->model, 'check_tmp_pdf_security' ] );
 
 	}
 
@@ -207,26 +207,26 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	public function add_filters() {
 
 		/* Add tooltips */
-		add_filter( 'gform_tooltips', array( $this->view, 'add_tooltips' ) );
+		add_filter( 'gform_tooltips', [ $this->view, 'add_tooltips' ] );
 
 		/* If trying to save settings page we'll use this filter to apply any errors passed back from options.php */
 		if ( $this->misc->is_gfpdf_page() ) {
-			add_filter( 'gfpdf_registered_fields', array( $this->model, 'highlight_errors' ) );
+			add_filter( 'gfpdf_registered_fields', [ $this->model, 'highlight_errors' ] );
 			add_filter( 'admin_notices', 'settings_errors' );
 		}
 
 		/* make capability text user friendly */
-		add_filter( 'gfpdf_capability_name', array( $this->model, 'style_capabilities' ) );
+		add_filter( 'gfpdf_capability_name', [ $this->model, 'style_capabilities' ] );
 
 		/* change capability needed to edit settings page */
-		add_filter( 'option_page_capability_gfpdf_settings', array( $this, 'edit_options_cap' ) );
-		add_filter( 'gravitypdf_settings_navigation', array( $this, 'disable_tools_on_view_cap' ) );
+		add_filter( 'option_page_capability_gfpdf_settings', [ $this, 'edit_options_cap' ] );
+		add_filter( 'gravitypdf_settings_navigation', [ $this, 'disable_tools_on_view_cap' ] );
 
 		/* allow TTF and OTF uploads */
-		add_filter( 'upload_mimes', array( $this, 'allow_font_uploads' ) );
+		add_filter( 'upload_mimes', [ $this, 'allow_font_uploads' ] );
 
 		/* Add a sample image of what the template looks like */
-		add_filter( 'gfpdf_settings_general', array( $this->misc, 'add_template_image' ) );
+		add_filter( 'gfpdf_settings_general', [ $this->misc, 'add_template_image' ] );
 	}
 
 	/**
@@ -267,10 +267,10 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		/* because current_user_can() doesn't handle Gravity Forms permissions quite correct we'll do our checks here */
 		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
 
-			$this->log->addCritical( 'Lack of User Capabilities.', array(
+			$this->log->addCritical( 'Lack of User Capabilities.', [
 				'user'      => wp_get_current_user(),
 				'user_meta' => get_user_meta( get_current_user_id() ),
-			) );
+			] );
 
 			wp_die( esc_html__( 'Access Denied' ), 403 );
 		}
@@ -317,10 +317,10 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		/* check if the user has permission to copy the templates */
 		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
 
-			$this->log->addCritical( 'Lack of User Capabilities.', array(
+			$this->log->addCritical( 'Lack of User Capabilities.', [
 				'user'      => wp_get_current_user(),
 				'user_meta' => get_user_meta( get_current_user_id() ),
-			) );
+			] );
 
 			return null;
 		}
@@ -358,7 +358,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	 *
 	 * @since 4.0
 	 */
-	public function allow_font_uploads( $mime_types = array() ) {
+	public function allow_font_uploads( $mime_types = [] ) {
 		$mime_types['ttf|otf'] = 'application/octet-stream';
 
 		return $mime_types;

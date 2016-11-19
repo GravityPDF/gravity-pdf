@@ -83,20 +83,20 @@ class Field_Fileupload extends Helper_Abstract_Fields {
 	 */
 	public function form_data() {
 
-		$data  = array();
-		$label = GFFormsModel::get_label( $this->field );
-		$value = $this->value();
+		$data     = [];
+		$label    = GFFormsModel::get_label( $this->field );
+		$value    = $this->value();
 		$field_id = $this->field->id;
 
 		/* Backwards compatibility support for v3 */
 		if ( 0 === sizeof( $value ) ) {
-			$data[ $field_id . '.' . $label ] = array();
-			$data[ $field_id ]                = array();
-			$data[ $label ]                   = array();
+			$data[ $field_id . '.' . $label ] = [];
+			$data[ $field_id ]                = [];
+			$data[ $label ]                   = [];
 
 			/* Path Format */
-			$data[ $field_id . '_path' ]                = array();
-			$data[ $field_id . '.' . $label . '_path' ] = array();
+			$data[ $field_id . '_path' ]                = [];
+			$data[ $field_id . '.' . $label . '_path' ] = [];
 		}
 
 		foreach ( $value as $image ) {
@@ -111,7 +111,7 @@ class Field_Fileupload extends Helper_Abstract_Fields {
 			$data[ $field_id . '.' . $label . '_path' ][] = $path;
 		}
 
-		return array( 'field' => $data );
+		return [ 'field' => $data ];
 	}
 
 	/**
@@ -155,12 +155,12 @@ class Field_Fileupload extends Helper_Abstract_Fields {
 		}
 
 		$value = $this->get_value();
-		$files = array();
+		$files = [];
 
 		if ( ! empty( $value ) ) {
-			$paths = ( $this->field->multipleFiles ) ? json_decode( $value ) : array( $value );
+			$paths = ( $this->field->multipleFiles ) ? json_decode( $value ) : [ $value ];
 
-			if( is_array( $paths ) && sizeof( $paths ) > 0 ) {
+			if ( is_array( $paths ) && sizeof( $paths ) > 0 ) {
 				foreach ( $paths as $path ) {
 					$files[] = esc_url( $path );
 				}

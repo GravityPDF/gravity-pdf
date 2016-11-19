@@ -57,7 +57,7 @@ class Helper_Field_Container_Void extends Helper_Field_Container {
 
 	/**
 	 * Empty method easily disables Helper_Field_Container functionality
-	 * 
+	 *
 	 * @return void
 	 *
 	 * @since 4.0

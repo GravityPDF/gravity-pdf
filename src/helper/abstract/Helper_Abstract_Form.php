@@ -127,7 +127,7 @@ abstract class Helper_Abstract_Form {
 	 *
 	 * @since 4.0
 	 */
-	abstract public function get_entries( $form_ids, $search_criteria = array(), $sorting = null, $paging = null );
+	abstract public function get_entries( $form_ids, $search_criteria = [], $sorting = null, $paging = null );
 
 	/**
 	 * Update the current entry object

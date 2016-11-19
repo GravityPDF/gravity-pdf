@@ -108,12 +108,12 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 	 */
 	public function add_filters() {
 
-		add_filter( 'gform_confirmation', array( $this->model, 'gravitypdf_confirmation' ), 10, 3 );
-		add_filter( 'gform_notification', array( $this->model, 'gravitypdf_notification' ), 10, 3 );
-		add_filter( 'gform_admin_pre_render', array( $this->model, 'gravitypdf_redirect_confirmation' ) );
+		add_filter( 'gform_confirmation', [ $this->model, 'gravitypdf_confirmation' ], 10, 3 );
+		add_filter( 'gform_notification', [ $this->model, 'gravitypdf_notification' ], 10, 3 );
+		add_filter( 'gform_admin_pre_render', [ $this->model, 'gravitypdf_redirect_confirmation' ] );
 
 		/* Basic GravityView Support */
-		add_filter( 'gravityview/fields/custom/content_before', array( $this->model, 'gravitypdf_gravityview_custom' ), 10 );
+		add_filter( 'gravityview/fields/custom/content_before', [ $this->model, 'gravitypdf_gravityview_custom' ], 10 );
 	}
 
 
@@ -125,7 +125,7 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 	 * @return void
 	 */
 	public function add_shortcodes() {
-		add_shortcode( 'gravitypdf', array( $this->model, 'gravitypdf' ) );
+		add_shortcode( 'gravitypdf', [ $this->model, 'gravitypdf' ] );
 	}
 
 
@@ -147,55 +147,55 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 		$this->log->addNotice( 'Enable Shortcake support.' );
 
 		/* Enhance further */
-		shortcode_ui_register_for_shortcode( 'gravitypdf', array(
+		shortcode_ui_register_for_shortcode( 'gravitypdf', [
 			'label' => esc_html__( 'Gravity PDF', 'gravity-forms-pdf-extended' ),
 
 			'listItemImage' => 'dashicons-admin-site',
 
-			'attrs' => array(
-				array(
+			'attrs' => [
+				[
 					'label' => 'ID',
 					'attr'  => 'id',
 					'type'  => 'text',
-				),
+				],
 
-				array(
+				[
 					'label' => 'Anchor Text',
 					'attr'  => 'text',
 					'type'  => 'text',
-				),
+				],
 
-				array(
+				[
 					'label'   => 'View',
 					'attr'    => 'type',
 					'type'    => 'select',
 					'default' => 'download',
-					'options' => array(
+					'options' => [
 						'download' => 'Download',
 						'view'     => 'View',
-					),
-				),
+					],
+				],
 
-				array(
+				[
 					'label'       => 'Anchor Class',
 					'attr'        => 'class',
 					'type'        => 'text',
 					'description' => 'Optional. Add any class name – separated by a space – you want to apply to the PDF link.',
-					'meta'        => array(
+					'meta'        => [
 						'placeholder' => '',
-					),
-				),
+					],
+				],
 
-				array(
+				[
 					'label'       => 'Entry ID',
 					'attr'        => 'entry',
 					'type'        => 'text',
 					'description' => 'Optional. You can pass in a specific ID or let us auto select one.',
-					'meta'        => array(
+					'meta'        => [
 						'placeholder' => '',
-					),
-				),
-			),
-		) );
+					],
+				],
+			],
+		] );
 	}
 }

@@ -123,7 +123,7 @@ class Field_Post_Image extends Helper_Abstract_Fields {
 		$label = GFFormsModel::get_label( $this->field );
 
 		if ( 0 === sizeof( $value ) ) {
-			$data = array();
+			$data = [];
 
 			$data['field'][ $this->field->id . '.' . $label ] = '';
 			$data['field'][ $this->field->id ]                = '';
@@ -149,7 +149,7 @@ class Field_Post_Image extends Helper_Abstract_Fields {
 		}
 
 		$value = $this->get_value();
-		$img   = array();
+		$img   = [];
 
 		if ( strlen( $value ) > 0 ) {
 			$value = explode( '|:|', $this->get_value() );

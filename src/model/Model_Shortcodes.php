@@ -130,7 +130,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		$has_view_permissions = $this->gform->has_capability( 'gravityforms_view_entries' );
 
 		/* merge in any missing defaults */
-		$attributes = shortcode_atts( array(
+		$attributes = shortcode_atts( [
 			'id'      => '',
 			'text'    => 'Download PDF',
 			'type'    => 'download',
@@ -138,7 +138,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 			'classes' => '',
 			'entry'   => '',
 			'print'   => '',
-		), $attributes, 'gravitypdf' );
+		], $attributes, 'gravitypdf' );
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_gravityforms_shortcode_attributes/ for more information about this filter */
 		$attributes = apply_filters( 'gfpdf_gravityforms_shortcode_attributes', $attributes );
@@ -205,9 +205,9 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		$attributes['url'] = $pdf->get_pdf_url( $attributes['id'], $attributes['entry'], $download, $print );
 
 		/* generate the markup and return */
-		$this->log->addNotice( 'Generating Shortcode Markup', array(
+		$this->log->addNotice( 'Generating Shortcode Markup', [
 			'attr' => $attributes,
-		) );
+		] );
 
 		return $controller->view->display_gravitypdf_shortcode( $attributes );
 	}
@@ -217,7 +217,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	 *
 	 * @param  string $confirmation The confirmation text
 	 * @param  array  $form         The Gravity Form array
-	 * @param  array  $entry         The Gravity Form entry information
+	 * @param  array  $entry        The Gravity Form entry information
 	 *
 	 * @return array               The confirmation text
 	 *
@@ -266,14 +266,15 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	 */
 	public function gravitypdf_gravityview_custom( $html ) {
 		$gravityview_view = GravityView_View::getInstance();
-		$entry = $gravityview_view->getCurrentEntry();
+		$entry            = $gravityview_view->getCurrentEntry();
+
 		return $this->add_entry_id_to_shortcode( $html, $entry['id'] );
 	}
 
 	/**
 	 * Check for the [gravitypdf] shortcode and add the entry ID to it
 	 *
-	 * @param $string The text to search
+	 * @param $string   The text to search
 	 * @param $entry_id The entry ID to add to our shortcode
 	 *
 	 * @return string
@@ -355,10 +356,10 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		/* check if the confirmation is currently being saved */
 		if ( isset( $_POST['form_confirmation_url'] ) ) {
 
-			$this->log->addNotice( 'Process Redirect Confirmation Save', array(
+			$this->log->addNotice( 'Process Redirect Confirmation Save', [
 				'form_id' => $form['id'],
 				'post'    => $_POST,
-			) );
+			] );
 
 			$url = stripslashes_deep( $_POST['form_confirmation_url'] );
 
@@ -402,7 +403,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function get_shortcode_information( $shortcode, $text ) {
-		$shortcodes = array();
+		$shortcodes = [];
 
 		if ( has_shortcode( $text, $shortcode ) ) {
 
@@ -415,11 +416,11 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 					if ( $code == $shortcode ) {
 						$attr = shortcode_parse_atts( $matches[3][ $key ] );
 
-						$shortcodes[] = array(
+						$shortcodes[] = [
 							'shortcode' => $matches[0][ $key ],
 							'attr_raw'  => $matches[3][ $key ],
-							'attr'      => ( is_array( $attr ) ) ? $attr: array(),
-						);
+							'attr'      => ( is_array( $attr ) ) ? $attr : [],
+						];
 					}
 				}
 			}

@@ -83,7 +83,7 @@ class Field_Html extends Helper_Abstract_Fields {
 	 */
 	public function form_data() {
 
-		$data = array();
+		$data = [];
 		$html = $this->value();
 
 		$data['html'][]                      = $html;

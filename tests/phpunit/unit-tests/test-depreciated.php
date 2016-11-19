@@ -62,19 +62,19 @@ class Test_Depreciated extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function provider_depreciated() {
-		return array(
-			array( 'GFPDF_Core' ),
-			array( 'PDFGenerator' ),
-			array( 'GFPDF_Settings' ),
-			array( 'GFPDF_Core_Model' ),
-			array( 'GFPDF_Settings_Model' ),
-			array( 'GFPDFE_DATA' ),
-			array( 'GFPDF_InstallUpdater' ),
-			array( 'GFPDF_Notices' ),
-			array( 'PDF_Common' ),
-			array( 'GFPDFEntryDetail' ),
-			array( 'PDF_Generator' ),
-		);
+		return [
+			[ 'GFPDF_Core' ],
+			[ 'PDFGenerator' ],
+			[ 'GFPDF_Settings' ],
+			[ 'GFPDF_Core_Model' ],
+			[ 'GFPDF_Settings_Model' ],
+			[ 'GFPDFE_DATA' ],
+			[ 'GFPDF_InstallUpdater' ],
+			[ 'GFPDF_Notices' ],
+			[ 'PDF_Common' ],
+			[ 'GFPDFEntryDetail' ],
+			[ 'PDF_Generator' ],
+		];
 	}
 
 	/**
@@ -130,7 +130,7 @@ class Test_Depreciated extends WP_UnitTestCase {
 		unset( $GLOBALS['lead_ids'] );
 
 		$render  = new PDFRender();
-		$form_id = $render->prepare_ids( 'fid', '', '', '', '', '', '', array( 'lead_ids' => 'lead IDs' ) );
+		$form_id = $render->prepare_ids( 'fid', '', '', '', '', '', '', [ 'lead_ids' => 'lead IDs' ] );
 
 		$this->assertEquals( 'fid', $form_id );
 		$this->assertEquals( 'lead IDs', $GLOBALS['lead_ids'] );

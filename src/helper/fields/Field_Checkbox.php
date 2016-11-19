@@ -87,7 +87,7 @@ class Field_Checkbox extends Helper_Abstract_Fields {
 
 		$value = $this->value();
 		$label = GFFormsModel::get_label( $this->field );
-		$data  = array();
+		$data  = [];
 
 		/* Backwards compatibility support for v3 */
 		if ( 0 === sizeof( $value ) ) {
@@ -164,14 +164,14 @@ class Field_Checkbox extends Helper_Abstract_Fields {
 
 		/* if not an array, make it so */
 		if ( ! is_array( $value ) ) {
-			$value = array( $value );
+			$value = [ $value ];
 		}
 
 		/* remove any unselected fields */
 		$value = array_filter( $value );
 
 		/* loop through results and get checkbox 'labels' */
-		$items = array();
+		$items = [];
 
 		foreach ( $value as $key => $item ) {
 			$label = esc_html( GFCommon::selection_display( $item, $this->field, '', true ) );
@@ -180,10 +180,10 @@ class Field_Checkbox extends Helper_Abstract_Fields {
 			$value = esc_html( GFCommon::selection_display( $item, $this->field ) );
 			$value = wp_kses_post( wp_specialchars_decode( $value, ENT_QUOTES ) );
 
-			$items[] = array(
+			$items[] = [
 				'value' => $value,
 				'label' => $label,
-			);
+			];
 		}
 
 		$this->cache( $items );

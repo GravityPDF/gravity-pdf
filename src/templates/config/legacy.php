@@ -64,13 +64,13 @@ class Legacy implements Helper_Interface_Config {
 	 * @since 4.0
 	 */
 	public function configuration() {
-		return array(
-			'core' => array(
+		return [
+			'core' => [
 				'show_page_names'      => true,
 				'show_html'            => true,
 				'show_section_content' => true,
 				'show_empty'           => true,
-			),
-		);
+			],
+		];
 	}
 }

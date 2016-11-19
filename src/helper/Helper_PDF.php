@@ -215,7 +215,7 @@ class Helper_PDF {
 	 *
 	 * @since 4.0
 	 */
-	public function render_html( $args = array(), $html = '' ) {
+	public function render_html( $args = [], $html = '' ) {
 
 		/* Because this class can load any content we'll only set up our template if no HTML is passed */
 		if ( empty( $html ) ) {
@@ -361,7 +361,7 @@ class Helper_PDF {
 		/*
 		 * Check if the template version is compatible with our version of Gravity PDF
 		 */
-		$headers = get_file_data( $this->template_path, array( 'required_pdf_version' => esc_html__( 'Required PDF Version', 'gravity-forms-pdf-extended' ) ) );
+		$headers = get_file_data( $this->template_path, [ 'required_pdf_version' => esc_html__( 'Required PDF Version', 'gravity-forms-pdf-extended' ) ] );
 
 		/* Check if there are version requirements */
 		if ( strlen( $headers['required_pdf_version'] ) > 0 ) {
@@ -394,7 +394,7 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	public function set_output_type( $type ) {
-		$valid = array( 'DISPLAY', 'DOWNLOAD', 'SAVE' );
+		$valid = [ 'DISPLAY', 'DOWNLOAD', 'SAVE' ];
 
 		if ( ! in_array( strtoupper( $type ), $valid ) ) {
 			throw new Exception( sprintf( 'Display type not valid. Use %s', implode( ', ', $valid ) ) );
@@ -452,8 +452,8 @@ class Helper_PDF {
 	 */
 	public function set_display_mode( $mode = 'fullpage', $layout = 'continuous' ) {
 
-		$valid_mode   = array( 'fullpage', 'fullwidth', 'real', 'default' );
-		$valid_layout = array( 'single', 'continuous', 'two', 'twoleft', 'tworight', 'default' );
+		$valid_mode   = [ 'fullpage', 'fullwidth', 'real', 'default' ];
+		$valid_layout = [ 'single', 'continuous', 'two', 'twoleft', 'tworight', 'default' ];
 
 		/* check the mode */
 		if ( ! in_array( strtolower( $mode ), $valid_mode ) ) {
@@ -624,15 +624,64 @@ class Helper_PDF {
 		/* Get the paper size from the settings */
 		$paper_size = ( isset( $this->settings['pdf_size'] ) ) ? strtoupper( $this->settings['pdf_size'] ) : 'A4';
 
-		$valid_paper_size = array(
-			'4A0', '2A0',
-			'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10',
-			'B0', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10',
-			'C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10',
-			'RA0', 'RA1', 'RA2', 'RA3', 'RA4',
-			'SRA0', 'SRA1', 'SRA2', 'SRA3', 'SRA4',
-			'LETTER', 'LEGAL', 'LEDGER', 'TABLOID', 'EXECUTIVE', 'FOILIO', 'B', 'A', 'DEMY', 'ROYAL', 'CUSTOM',
-		);
+		$valid_paper_size = [
+			'4A0',
+			'2A0',
+			'A0',
+			'A1',
+			'A2',
+			'A3',
+			'A4',
+			'A5',
+			'A6',
+			'A7',
+			'A8',
+			'A9',
+			'A10',
+			'B0',
+			'B1',
+			'B2',
+			'B3',
+			'B4',
+			'B5',
+			'B6',
+			'B7',
+			'B8',
+			'B9',
+			'B10',
+			'C0',
+			'C1',
+			'C2',
+			'C3',
+			'C4',
+			'C5',
+			'C6',
+			'C7',
+			'C8',
+			'C9',
+			'C10',
+			'RA0',
+			'RA1',
+			'RA2',
+			'RA3',
+			'RA4',
+			'SRA0',
+			'SRA1',
+			'SRA2',
+			'SRA3',
+			'SRA4',
+			'LETTER',
+			'LEGAL',
+			'LEDGER',
+			'TABLOID',
+			'EXECUTIVE',
+			'FOILIO',
+			'B',
+			'A',
+			'DEMY',
+			'ROYAL',
+			'CUSTOM',
+		];
 
 		if ( ! in_array( $paper_size, $valid_paper_size ) ) {
 			throw new Exception( sprintf( 'Paper size not valid. Use %s', implode( ', ', $valid_paper_size ) ) );
@@ -668,7 +717,7 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	protected function set_custom_paper_size() {
-		$custom_paper_size = ( isset( $this->settings['custom_pdf_size'] ) ) ? $this->settings['custom_pdf_size'] : array();
+		$custom_paper_size = ( isset( $this->settings['custom_pdf_size'] ) ) ? $this->settings['custom_pdf_size'] : [];
 
 		if ( sizeof( $custom_paper_size ) !== 3 ) {
 			throw new Exception( 'Custom paper size not valid. Array should contain three keys: width, height and unit type' );
@@ -752,7 +801,7 @@ class Helper_PDF {
 	 *
 	 * @since 4.0
 	 */
-	protected function load_html( $args = array() ) {
+	protected function load_html( $args = [] ) {
 		/* for backwards compatibility extract the $args variable */
 		extract( $args, EXTR_SKIP ); /* skip any arguments that would clash - i.e filename, args, output, path, this */
 
@@ -855,7 +904,7 @@ class Helper_PDF {
 		if ( strtolower( $this->settings['format'] ) == 'standard' && strtolower( $this->settings['security'] == 'Yes' ) ) {
 
 			$password        = ( isset( $this->settings['password'] ) ) ? $this->gform->process_tags( $this->settings['password'], $this->form, $this->entry ) : '';
-			$privileges      = ( isset( $this->settings['privileges'] ) ) ? $this->settings['privileges'] : array();
+			$privileges      = ( isset( $this->settings['privileges'] ) ) ? $this->settings['privileges'] : [];
 			$master_password = ( isset( $this->settings['master_password'] ) ) ? $this->gform->process_tags( $this->settings['master_password'], $this->form, $this->entry ) : null;
 
 			$this->mpdf->SetProtection( $privileges, $password, $master_password, 128 );

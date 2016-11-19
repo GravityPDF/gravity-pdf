@@ -111,7 +111,7 @@ class Model_Actions extends Helper_Abstract_Model {
 	 */
 	public function is_notice_already_dismissed( $type ) {
 
-		$dismissed_notices = $this->options->get_option( 'action_dismissal', array() );
+		$dismissed_notices = $this->options->get_option( 'action_dismissal', [] );
 
 		if ( isset( $dismissed_notices[ $type ] ) ) {
 			return true;
@@ -131,7 +131,7 @@ class Model_Actions extends Helper_Abstract_Model {
 	 */
 	public function dismiss_notice( $type ) {
 
-		$dismissed_notices          = $this->options->get_option( 'action_dismissal', array() );
+		$dismissed_notices          = $this->options->get_option( 'action_dismissal', [] );
 		$dismissed_notices[ $type ] = $type;
 		$this->options->update_option( 'action_dismissal', $dismissed_notices );
 	}
@@ -205,7 +205,7 @@ class Model_Actions extends Helper_Abstract_Model {
 			$found = false;
 
 			foreach ( $sites as $site ) {
-				$site = (array) $site; /* Back-compat: ensure the new site object introduced in 4.6 gets converted back to an array */
+				$site        = (array) $site; /* Back-compat: ensure the new site object introduced in 4.6 gets converted back to an array */
 				$site_config = $this->data->template_location . '/' . $site['blog_id'] . '/';
 
 				if ( is_file( $site_config . 'configuration.php' ) ) {
@@ -221,7 +221,7 @@ class Model_Actions extends Helper_Abstract_Model {
 				remove_all_actions( 'all_admin_notices' );
 
 				/* We need a user interface so queue this right before the admin page runs */
-				add_action( 'all_admin_notices', array( $this, 'handle_multisite_migration' ) );
+				add_action( 'all_admin_notices', [ $this, 'handle_multisite_migration' ] );
 
 				/* Add our migration script */
 				wp_enqueue_script( 'gfpdf_js_v3_migration' );
@@ -272,11 +272,11 @@ class Model_Actions extends Helper_Abstract_Model {
 	public function handle_multisite_migration() {
 		$controller = $this->getController();
 
-		$args = array(
+		$args = [
 			'multisite_ids'    => $this->get_multisite_ids_with_v3_config(),
 			'current_page_url' => add_query_arg( null, null ),
 			'gf_forms_url'     => admin_url( 'admin.php?page=gf_edit_forms' ),
-		);
+		];
 		$controller->view->begin_multisite_migration( $args );
 		$controller->view->end_multisite_migration();
 	}
@@ -289,11 +289,11 @@ class Model_Actions extends Helper_Abstract_Model {
 	 * @since  4.0
 	 */
 	private function get_multisite_ids_with_v3_config() {
-		$sites = ( function_exists( 'get_sites' ) ) ? get_sites() : wp_get_sites();
-		$blog_ids = array();
+		$sites    = ( function_exists( 'get_sites' ) ) ? get_sites() : wp_get_sites();
+		$blog_ids = [];
 
 		foreach ( $sites as $site ) {
-			$site = (array) $site; /* Back-compat: ensure the new site object introduced in 4.6 gets converted back to an array */
+			$site        = (array) $site; /* Back-compat: ensure the new site object introduced in 4.6 gets converted back to an array */
 			$site_config = $this->data->template_location . $site['blog_id'] . '/';
 
 			if ( is_file( $site_config . 'configuration.php' ) ) {
@@ -315,20 +315,20 @@ class Model_Actions extends Helper_Abstract_Model {
 	public function ajax_multisite_v3_migration() {
 		$log = GPDFAPI::get_log_class();
 
-		$log->addNotice( 'Running AJAX Endpoint', array(
+		$log->addNotice( 'Running AJAX Endpoint', [
 			'type' => 'Multisite v3 to v4 config',
 			'post' => $_POST,
-		) );
+		] );
 
 		/* prevent unauthorized access */
 		if ( ! is_multisite() || ! is_super_admin() ) {
 
-			$log->addCritical( 'Lack of User Capabilities.', array(
+			$log->addCritical( 'Lack of User Capabilities.', [
 				'user'        => wp_get_current_user(),
 				'user_meta'   => get_user_meta( get_current_user_id() ),
 				'multisite'   => is_multisite(),
 				'super_admin' => is_super_admin(),
-			) );
+			] );
 
 			header( 'HTTP/1.1 401 Unauthorized' );
 			wp_die( '401' );
@@ -353,13 +353,13 @@ class Model_Actions extends Helper_Abstract_Model {
 
 		if ( ! is_file( $path . 'configuration.php' ) ) {
 
-			$return = array(
+			$return = [
 				'error' => sprintf( esc_html__( 'No configuration.php file found for site #%s', 'gravity-forms-pdf-extended' ), $blog_id ),
-			);
+			];
 
 			$log->addError( 'AJAX Endpoint Failed', $return );
 
-			echo json_encode( array( 'results' => $return ) );
+			echo json_encode( [ 'results' => $return ] );
 			wp_die();
 		}
 
@@ -370,17 +370,17 @@ class Model_Actions extends Helper_Abstract_Model {
 
 		/* Do migration */
 		if ( $this->migrate_v3( $path ) ) {
-			echo json_encode( array( 'results' => 'complete' ) );
+			echo json_encode( [ 'results' => 'complete' ] );
 			wp_die();
 		} else {
 
-			$return = array(
+			$return = [
 				'error' => sprintf( esc_html__( 'Database import problem for site #%s', 'gravity-forms-pdf-extended' ), $blog_id ),
-			);
+			];
 
 			$log->addError( 'AJAX Endpoint Failed', $return );
 
-			echo json_encode( array( 'results' => $return ) );
+			echo json_encode( [ 'results' => $return ] );
 			wp_die();
 		}
 

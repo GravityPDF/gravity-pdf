@@ -97,7 +97,7 @@ class Field_Section extends Helper_Abstract_Fields {
 
 		$empty = true;
 		foreach ( $fields as $field ) {
-			if( 'section' !== $field->type ) {
+			if ( 'section' !== $field->type ) {
 				$class = $PDF_model->get_field_class( $field, $this->form, $this->entry, $products );
 				if ( ! $class->is_empty() ) {
 					$empty = false;
@@ -107,7 +107,7 @@ class Field_Section extends Helper_Abstract_Fields {
 		}
 
 		/* Our custom empty checks determined the fields in the section break are infact empty */
-		if( $empty ) {
+		if ( $empty ) {
 			return true;
 		}
 
@@ -123,7 +123,7 @@ class Field_Section extends Helper_Abstract_Fields {
 	 */
 	public function form_data() {
 
-		$data = array();
+		$data = [];
 
 		$data['section_break'][ $this->field->id ] = $this->value();
 
@@ -168,10 +168,10 @@ class Field_Section extends Helper_Abstract_Fields {
 			return $this->cache();
 		}
 
-		$this->cache( array(
+		$this->cache( [
 			'title'       => esc_html( $this->field->label ),
 			'description' => wp_kses_post( $this->field->description ),
-		) );
+		] );
 
 		return $this->cache();
 	}

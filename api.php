@@ -223,11 +223,11 @@ final class GPDFAPI {
 	public static function get_pdf_class( $type = 'view' ) {
 
 		if ( $type === 'view' ) {
-			return static::get_mvc_class( 'View_PDF');
+			return static::get_mvc_class( 'View_PDF' );
 		}
 
 		if ( $type === 'model' ) {
-			return static::get_mvc_class( 'Model_PDF');
+			return static::get_mvc_class( 'Model_PDF' );
 		}
 
 		return new WP_Error( 'invalid_type', esc_html__( 'The $type parameter is invalid. Only "view" and "model" are accepted', 'gravity-forms-pdf-extended' ) );
@@ -279,7 +279,7 @@ final class GPDFAPI {
 	 *
 	 * @since 4.0
 	 */
-	public static function add_pdf( $form_id, $settings = array() ) {
+	public static function add_pdf( $form_id, $settings = [] ) {
 		$options = static::get_options_class();
 
 		return $options->add_pdf( $form_id, $settings );
@@ -298,7 +298,7 @@ final class GPDFAPI {
 	 *
 	 * @since  4.0
 	 */
-	public static function update_pdf( $form_id, $pdf_id, $settings = array() ) {
+	public static function update_pdf( $form_id, $pdf_id, $settings = [] ) {
 		$options = static::get_options_class();
 
 		return $options->update_pdf( $form_id, $pdf_id, $settings );
@@ -471,7 +471,7 @@ final class GPDFAPI {
 
 		$products = new GFPDF\Helper\Fields\Field_Products( new GF_Field(), $entry, $gfpdf->gform, $gfpdf->misc );
 
-		if( ! $products->is_empty() ) {
+		if ( ! $products->is_empty() ) {
 
 			if ( $return ) {
 				return $products->html();

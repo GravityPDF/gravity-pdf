@@ -250,12 +250,12 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function add_actions() {
 
-		add_action( 'init', array( $this, 'register_assets' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, 'load_admin_assets' ) );
+		add_action( 'init', [ $this, 'register_assets' ] );
+		add_action( 'admin_enqueue_scripts', [ $this, 'load_admin_assets' ] );
 
 		/* Cache our Gravity PDF Settings and register our settings fields with the Options API */
-		add_action( 'init', array( $this, 'init_settings_api' ), 1 );
-		add_action( 'admin_init', array( $this, 'setup_settings_fields' ), 1 );
+		add_action( 'init', [ $this, 'init_settings_api' ], 1 );
+		add_action( 'admin_init', [ $this, 'setup_settings_fields' ], 1 );
 	}
 
 	/**
@@ -268,18 +268,18 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function add_filters() {
 
 		/* Automatically handle GF noconflict mode */
-		add_filter( 'gform_noconflict_scripts', array( $this, 'auto_noconflict_scripts' ) );
-		add_filter( 'gform_noconflict_styles', array( $this, 'auto_noconflict_styles' ) );
+		add_filter( 'gform_noconflict_scripts', [ $this, 'auto_noconflict_scripts' ] );
+		add_filter( 'gform_noconflict_styles', [ $this, 'auto_noconflict_styles' ] );
 
 		/* Enable Gravity Forms Logging */
-		add_filter( 'gform_logging_supported', array( $this, 'add_gf_logger' ) );
+		add_filter( 'gform_logging_supported', [ $this, 'add_gf_logger' ] );
 
 		/* Add quick links on the plugins page */
-		add_filter( 'plugin_action_links_' . PDF_PLUGIN_BASENAME, array( $this, 'plugin_action_links' ) );
-		add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
+		add_filter( 'plugin_action_links_' . PDF_PLUGIN_BASENAME, [ $this, 'plugin_action_links' ] );
+		add_filter( 'plugin_row_meta', [ $this, 'plugin_row_meta' ], 10, 2 );
 
 		/* Add class when on Gravity PDF pages */
-		add_filter( 'admin_body_class', array( $this, 'add_body_class' ) );
+		add_filter( 'admin_body_class', [ $this, 'add_body_class' ] );
 	}
 
 
@@ -374,9 +374,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function plugin_action_links( $links ) {
 
-		$action_links = array(
+		$action_links = [
 			'settings' => '<a href="' . esc_url( $this->data->settings_url ) . '" title="' . esc_attr__( 'View Gravity PDF Settings', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Settings', 'gravity-forms-pdf-extended' ) . '</a>',
-		);
+		];
 
 		return array_merge( $action_links, $links );
 	}
@@ -394,11 +394,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function plugin_row_meta( $links, $file ) {
 
 		if ( $file == PDF_PLUGIN_BASENAME ) {
-			$row_meta = array(
+			$row_meta = [
 				'docs'    => '<a href="' . esc_url( 'https://gravitypdf.com/documentation/v4/five-minute-install/' ) . '" title="' . esc_attr__( 'View Gravity PDF Documentation', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Docs', 'gravity-forms-pdf-extended' ) . '</a>',
 				'support' => '<a href="' . esc_url( $this->data->settings_url . '&tab=help' ) . '" title="' . esc_attr__( 'Get Help and Support', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Support', 'gravity-forms-pdf-extended' ) . '</a>',
 				'shop'    => '<a href="' . esc_url( 'https://gravitypdf.com/shop/' ) . '" title="' . esc_attr__( 'View Gravity PDF Theme Shop', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Theme Shop', 'gravity-forms-pdf-extended' ) . '</a>',
-			);
+			];
 
 			return array_merge( $links, $row_meta );
 		}
@@ -450,9 +450,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$suffix = '';
 		}
 
-		wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'src/assets/css/gfpdf-styles' . $suffix . '.css', array( 'wp-color-picker' ), $version );
-		wp_register_style( 'gfpdf_css_admin_styles', PDF_PLUGIN_URL . 'src/assets/css/gfpdf-admin-styles' . $suffix . '.css', array(), $version );
-		wp_register_style( 'gfpdf_css_chosen_style', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.min.css', array( 'wp-jquery-ui-dialog' ), $version );
+		wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'src/assets/css/gfpdf-styles' . $suffix . '.css', [ 'wp-color-picker' ], $version );
+		wp_register_style( 'gfpdf_css_admin_styles', PDF_PLUGIN_URL . 'src/assets/css/gfpdf-admin-styles' . $suffix . '.css', [], $version );
+		wp_register_style( 'gfpdf_css_chosen_style', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.min.css', [ 'wp-jquery-ui-dialog' ], $version );
 	}
 
 	/**
@@ -471,28 +471,28 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$suffix = '';
 		}
 
-		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-settings' . $suffix . '.js', array(
+		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-settings' . $suffix . '.js', [
 			'wpdialogs',
 			'jquery-ui-tooltip',
 			'gform_forms',
 			'gform_form_admin',
 			'jquery-color',
 			'wp-color-picker',
-		), $version );
-		wp_register_script( 'gfpdf_js_backbone', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-backbone' . $suffix . '.js', array(
+		], $version );
+		wp_register_script( 'gfpdf_js_backbone', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-backbone' . $suffix . '.js', [
 			'gfpdf_js_settings',
 			'backbone',
 			'underscore',
 			'gfpdf_js_backbone_model_binder',
 			'wpdialogs',
-		), $version );
-		wp_register_script( 'gfpdf_js_chosen', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.jquery.min.js', array( 'jquery' ), $version );
-		wp_register_script( 'gfpdf_js_backbone_model_binder', PDF_PLUGIN_URL . 'bower_components/backbone.modelbinder/Backbone.ModelBinder.min.js', array(
+		], $version );
+		wp_register_script( 'gfpdf_js_chosen', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.jquery.min.js', [ 'jquery' ], $version );
+		wp_register_script( 'gfpdf_js_backbone_model_binder', PDF_PLUGIN_URL . 'bower_components/backbone.modelbinder/Backbone.ModelBinder.min.js', [
 			'backbone',
 			'underscore',
-		), $version );
-		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-entries' . $suffix . '.js', array( 'jquery' ), $version );
-		wp_register_script( 'gfpdf_js_v3_migration', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-migration' . $suffix . '.js', array( 'gfpdf_js_settings' ), $version );
+		], $version );
+		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-entries' . $suffix . '.js', [ 'jquery' ], $version );
+		wp_register_script( 'gfpdf_js_v3_migration', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-migration' . $suffix . '.js', [ 'gfpdf_js_settings' ], $version );
 
 		/*
         * Localise admin script
@@ -554,7 +554,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		 * Set defaults we will allow to load on GF pages which are needed for Gravity PDF
 		 * If any Gravity PDF modules requires WordPress-specific JS files you should add them to this list
 		 */
-		$default_scripts = array(
+		$default_scripts = [
 			'editor',
 			'word-count',
 			'quicktags',
@@ -575,7 +575,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			'gform_placeholder',
 			'jquery-ui-autocomplete',
 			'thickbox',
-		);
+		];
 
 		foreach ( $wp_scripts->queue as $object ) {
 			if ( substr( $object, 0, 8 ) === 'gfpdf_js' ) {
@@ -588,6 +588,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		}
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_gf_noconflict_scripts/ for more details about this filter */
+
 		return apply_filters( 'gfpdf_gf_noconflict_scripts', $items );
 	}
 
@@ -608,13 +609,13 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		 * Set defaults we will allow to load on GF pages which are needed for Gravity PDF
 		 * If any Gravity PDF modules requires WordPress-specific CSS files you should add them to this list
 		 */
-		$default_styles = array(
+		$default_styles = [
 			'editor-buttons',
 			'wp-jquery-ui-dialog',
 			'media-views',
 			'buttons',
 			'thickbox',
-		);
+		];
 
 		foreach ( $wp_styles->queue as $object ) {
 			if ( substr( $object, 0, 9 ) === 'gfpdf_css' ) {
@@ -627,6 +628,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		}
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_gf_noconflict_styles/ for more details about this filter */
+
 		return apply_filters( 'gfpdf_gf_noconflict_styles', $items );
 	}
 
@@ -699,9 +701,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function welcome_screen() {
 
 		$model = new Model\Model_Welcome_Screen( $this->log );
-		$view  = new View\View_Welcome_Screen( array(
+		$view  = new View\View_Welcome_Screen( [
 			'display_version' => PDF_EXTENDED_VERSION,
-		), $this->gform );
+		], $this->gform );
 
 		$class = new Controller\Controller_Welcome_Screen( $model, $view, $this->log, $this->data, $this->options );
 		$class->init();
@@ -722,7 +724,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function gf_settings() {
 
 		$model = new Model\Model_Settings( $this->gform, $this->log, $this->notices, $this->options, $this->data, $this->misc );
-		$view  = new View\View_Settings( array(), $this->gform, $this->log, $this->options, $this->data, $this->misc );
+		$view  = new View\View_Settings( [], $this->gform, $this->log, $this->options, $this->data, $this->misc );
 
 		$class = new Controller\Controller_Settings( $model, $view, $this->gform, $this->log, $this->notices, $this->data, $this->misc );
 		$class->init();
@@ -743,7 +745,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function gf_form_settings() {
 
 		$model = new Model\Model_Form_Settings( $this->gform, $this->log, $this->data, $this->options, $this->misc, $this->notices );
-		$view  = new View\View_Form_Settings( array() );
+		$view  = new View\View_Form_Settings( [] );
 
 		$class = new Controller\Controller_Form_Settings( $model, $view, $this->data, $this->options, $this->misc );
 		$class->init();
@@ -764,7 +766,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function pdf() {
 
 		$model = new Model\Model_PDF( $this->gform, $this->log, $this->options, $this->data, $this->misc, $this->notices );
-		$view  = new View\View_PDF( array(), $this->gform, $this->log, $this->options, $this->data, $this->misc );
+		$view  = new View\View_PDF( [], $this->gform, $this->log, $this->options, $this->data, $this->misc );
 
 		$class = new Controller\Controller_PDF( $model, $view, $this->gform, $this->log, $this->misc );
 		$class->init();
@@ -785,7 +787,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function shortcodes() {
 
 		$model = new Model\Model_Shortcodes( $this->gform, $this->log, $this->options, $this->misc );
-		$view  = new View\View_Shortcodes( array() );
+		$view  = new View\View_Shortcodes( [] );
 
 		$class = new Controller\Controller_Shortcodes( $model, $view, $this->log );
 		$class->init();
@@ -806,7 +808,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function actions() {
 
 		$model = new Model\Model_Actions( $this->data, $this->options, $this->notices );
-		$view  = new View\View_Actions( array() );
+		$view  = new View\View_Actions( [] );
 
 		$class = new Controller\Controller_Actions( $model, $view, $this->gform, $this->log, $this->notices );
 		$class->init();
@@ -848,23 +850,23 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		if ( is_wp_error( $settings ) ) {
 
-			$this->log->addError( 'Invalid PDF Settings.', array(
+			$this->log->addError( 'Invalid PDF Settings.', [
 				'form_id'          => $form_id,
 				'pid'              => $pid,
 				'WP_Error_Message' => $settings->get_error_message(),
 				'WP_Error_Code'    => $settings->get_error_code(),
-			) );
+			] );
 
 			/* Reset the settings so it forces everything to false */
-			$settings = array();
+			$settings = [];
 		}
 
-		return array(
+		return [
 			'empty_field'     => ( isset( $settings['show_empty'] ) && $settings['show_empty'] == 'Yes' ) ? true : false,
 			'html_field'      => ( isset( $settings['show_html'] ) && $settings['show_html'] == 'Yes' ) ? true : false,
 			'page_names'      => ( isset( $settings['show_page_names'] ) && $settings['show_page_names'] == 'Yes' ) ? true : false,
 			'section_content' => ( isset( $settings['show_section_content'] ) && $settings['show_section_content'] == 'Yes' ) ? true : false,
-		);
+		];
 	}
 }
 

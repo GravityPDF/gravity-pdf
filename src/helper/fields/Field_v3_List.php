@@ -84,6 +84,7 @@ class Field_v3_List extends Field_List {
 		<?php
 
 		/* get buffer and return HTML */
+
 		return Helper_Abstract_Fields::html( ob_get_clean() );
 	}
 }

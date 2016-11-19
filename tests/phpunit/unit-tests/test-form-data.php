@@ -63,7 +63,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 	 *
 	 * @since 4.0
 	 */
-	public $entries = array();
+	public $entries = [];
 
 	/**
 	 * The $form_data array
@@ -130,7 +130,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 		/*
          * Run our tests...
          */
-		$misc_array = array(
+		$misc_array = [
 			'date_time',
 			'time_24hr',
 			'time_12hr',
@@ -149,7 +149,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 			'transaction_type',
 			'user_agent',
 			'status',
-		);
+		];
 
 		foreach ( $misc_array as $key ) {
 			$this->assertArrayHasKey( $key, $data['misc'] );
@@ -728,7 +728,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$caption = 'Post Image caption';
 		$desc    = 'Post Image Description';
 
-		$keys = array( '32', '32.Post Image', 'Post Image' );
+		$keys = [ '32', '32.Post Image', 'Post Image' ];
 
 		foreach ( $keys as $key ) {
 			$this->assertEquals( 'http://', substr( $field[ $key ]['url'], 0, 7 ) );
@@ -937,7 +937,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'Fourth row', $likert[27]['rows'] );
 		$this->assertArrayHasKey( 'Fifth row', $likert[27]['rows'] );
 
-		$col_names = array( 'Strongly disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly agree' );
+		$col_names = [ 'Strongly disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly agree' ];
 		foreach ( $likert[27]['rows'] as $cols ) {
 			foreach ( $col_names as $name ) {
 				$this->assertArrayHasKey( $name, $cols );
@@ -1316,7 +1316,7 @@ class Test_Form_Data extends WP_UnitTestCase {
          */
 		$likert = $data[26];
 
-		$columns = array( 'Strongly disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly agree' );
+		$columns = [ 'Strongly disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly agree' ];
 
 		foreach ( $likert['col'] as $col ) {
 			$this->assertTrue( in_array( $col, $columns ) );
@@ -1424,7 +1424,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_empty_fields() {
-		$entry = $this->entries[6];
+		$entry     = $this->entries[6];
 		$form_data = GFPDFEntryDetail::lead_detail_grid_array( $this->form, $entry );
 
 		$this->assertEquals( '', $form_data['field'][1] );

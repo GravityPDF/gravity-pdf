@@ -61,7 +61,7 @@ class Field_Quiz extends Helper_Abstract_Fields {
 
 		$value = $this->value();
 		$label = GFFormsModel::get_label( $this->field );
-		$data  = array();
+		$data  = [];
 
 		$data['field'][ $this->field->id . '.' . $label ] = $value;
 		$data['field'][ $this->field->id ]                = $value;
@@ -98,7 +98,7 @@ class Field_Quiz extends Helper_Abstract_Fields {
 		 * We'll try use our DOM reader to correctly process the HTML, otherwise use string replace
 		 */
 		try {
-			$qp = new Helper_QueryPath();
+			$qp    = new Helper_QueryPath();
 			$value = $qp->html5( $value, 'img' )->addClass( 'gf-quiz-img' )->top( 'html' )->innerHTML5();
 		} catch ( Exception $e ) {
 			$value = str_replace( '<img ', '<img class="gf-quiz-img" ', $value );
@@ -118,34 +118,35 @@ class Field_Quiz extends Helper_Abstract_Fields {
 
 		/* Get the field value */
 		$value = $this->get_value();
-		$value = ( ! is_array( $value ) ) ? array( $value ) : $value;
+		$value = ( ! is_array( $value ) ) ? [ $value ] : $value;
 
-		$formatted = array();
+		$formatted = [];
 
 		/* Loop through our results */
-		foreach( $value as $item ) {
+		foreach ( $value as $item ) {
 			foreach ( $this->field->choices as $choice ) {
 				if ( $choice['value'] == $item ) {
-					$formatted[] = array(
+					$formatted[] = [
 						'text'      => esc_html( $choice['text'] ),
 						'isCorrect' => $choice['gquizIsCorrect'],
 						'weight'    => ( isset( $choice['gquizWeight'] ) ) ? $choice['gquizWeight'] : '',
-					);
+					];
 				}
 			}
 		}
 
 		/* Ensure results are formatted to v3 expectations */
-		if( 1 === sizeof( $formatted ) ) {
+		if ( 1 === sizeof( $formatted ) ) {
 			return $formatted[0];
 		}
 
 		/* Return our results, if we have any */
-		if( 0 < sizeof( $formatted ) ) {
+		if ( 0 < sizeof( $formatted ) ) {
 			return $formatted;
 		}
 
 		/* Return the default expected structure */
-		return array();
+
+		return [];
 	}
 }

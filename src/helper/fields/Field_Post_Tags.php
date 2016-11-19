@@ -87,14 +87,14 @@ class Field_Post_Tags extends Helper_Abstract_Fields {
 		$value    = implode( ', ', $this->value() );
 		$label    = GFFormsModel::get_label( $this->field );
 		$field_id = (int) $this->field->id;
-		$data     = array();
+		$data     = [];
 
 		/* Add HTML output */
 		$data[ $field_id . '.' . $label ] = $value;
 		$data[ $field_id ]                = $value;
 		$data[ $label ]                   = $value;
 
-		return array( 'field' => $data );
+		return [ 'field' => $data ];
 	}
 
 	/**

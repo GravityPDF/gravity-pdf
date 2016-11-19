@@ -87,7 +87,7 @@ class Field_Multiselect extends Helper_Abstract_Fields {
 
 		$value = $this->value();
 		$label = GFFormsModel::get_label( $this->field );
-		$data  = array();
+		$data  = [];
 
 		/* Backwards compatibility support for v3 */
 		if ( 0 === sizeof( $value ) ) {
@@ -173,15 +173,15 @@ class Field_Multiselect extends Helper_Abstract_Fields {
 		$value = array_filter( $value );
 
 		/* loop through array and get the correct selection display value */
-		$items = array();
+		$items = [];
 		foreach ( $value as $item ) {
 			$label = esc_html( GFCommon::selection_display( $item, $this->field, '', true ) );
 			$value = esc_html( GFCommon::selection_display( $item, $this->field ) );
 
-			$items[] = array(
+			$items[] = [
 				'value' => $value,
 				'label' => $label,
-			);
+			];
 		}
 
 		$this->cache( $items );

@@ -61,7 +61,7 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 	 *
 	 * @since 4.0
 	 */
-	protected $data_cache = array();
+	protected $data_cache = [];
 
 	/**
 	 * Automatically define our constructor which will set our data cache
@@ -70,7 +70,7 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $data = array() ) {
+	public function __construct( $data = [] ) {
 		$this->data_cache = $data;
 	}
 
@@ -93,6 +93,7 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 		}
 
 		/* load the about page view */
+
 		return $this->load( $name, $vars );
 	}
 
@@ -118,7 +119,7 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 	 *
 	 * @since 4.0
 	 */
-	final protected function load( $filename, $args = array(), $output = true ) {
+	final protected function load( $filename, $args = [], $output = true ) {
 		$path = $this->get_view_dir_path() . $filename . '.php';
 		$args = array_merge( $this->data_cache, $args );
 
@@ -153,7 +154,7 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 	 *
 	 * @since 4.0
 	 */
-	final private function buffer( $path, $args = array() ) {
+	final private function buffer( $path, $args = [] ) {
 		/* for backwards compatibility extract the $args variable */
 		extract( $args, EXTR_SKIP ); /* skip any arguments that would clash - i.e filename, args, output, path, this */
 

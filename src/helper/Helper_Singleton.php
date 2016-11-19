@@ -51,7 +51,7 @@ class Helper_Singleton {
 	 *
 	 * @since 4.0
 	 */
-	private $classes = array();
+	private $classes = [];
 
 	/**
 	 * Get the class name without the namespace

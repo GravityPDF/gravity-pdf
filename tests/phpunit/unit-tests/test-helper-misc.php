@@ -77,13 +77,13 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
 		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
 
-		$gfpdf->data->form_settings                = array();
+		$gfpdf->data->form_settings                = [];
 		$gfpdf->data->form_settings[ $form['id'] ] = $form['gfpdf_form_settings'];
 
-		return array(
+		return [
 			'form'  => $form,
 			'entry' => $entry,
-		);
+		];
 	}
 
 	/**
@@ -152,13 +152,13 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	 * @since  4.0
 	 */
 	public function provider_human_readable() {
-		return array(
-			array( 'My Pretty Name', 'my_pretty-name' ),
-			array( 'Working Title', 'worKing-title' ),
-			array( 'Easy Listening', 'Easy Listening' ),
-			array( 'Double  Trouble  Listening', 'Double--Trouble__listening' ),
-			array( 'Out Of This World', 'OUT_OF_THIS_WORLD' ),
-		);
+		return [
+			[ 'My Pretty Name', 'my_pretty-name' ],
+			[ 'Working Title', 'worKing-title' ],
+			[ 'Easy Listening', 'Easy Listening' ],
+			[ 'Double  Trouble  Listening', 'Double--Trouble__listening' ],
+			[ 'Out Of This World', 'OUT_OF_THIS_WORLD' ],
+		];
 	}
 
 	/**
@@ -181,34 +181,34 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function provider_test_fix_header_footer() {
-		return array(
-			array(
+		return [
+			[
 				'<p><img src="my-image.jpg" alt="My Image" class="header-footer-img"></p>',
 				'<img src="my-image.jpg" alt="My Image" />',
-			),
-			array(
+			],
+			[
 				'<div id="header"><img src="my-image.jpg" alt="My Image" class="header-footer-img"></div>',
 				'<div id="header"><img src="my-image.jpg" alt="My Image" /></div>',
-			),
-			array(
+			],
+			[
 				'<p><span>Intro</span> <img src="my-image.jpg" alt="My Image" class="header-footer-img"> <span>Outro</span></p>',
 				'<span>Intro</span> <img src="my-image.jpg" alt="My Image" /> <span>Outro</span>',
-			),
-			array(
+			],
+			[
 				'<p><b>This is bold</b>. <i>This is italics</i> <img src="image.jpg" class="header-footer-img"></p>',
 				'<b>This is bold</b>. <i>This is italics</i> <img src="image.jpg" />',
-			),
-			array(
+			],
+			[
 				'<p><img src="my-image.jpg" alt="My Image" class="header-footer-img"></p>',
 				'<img src="my-image.jpg" alt="My Image">',
-			),
-			array(
+			],
+			[
 				'<p><div class="alternate"><img src="my-image.jpg" alt="My Image" class="alternate header-footer-img"></div></p>',
 				'<img src="my-image.jpg" alt="My Image" class="alternate" />',
-			),
-			array( '<p><span>Nothing</span></p>', '<span>Nothing</span>' ),
-			array( '', '' ),
-		);
+			],
+			[ '<p><span>Nothing</span></p>', '<span>Nothing</span>' ],
+			[ '', '' ],
+		];
 	}
 
 	/**
@@ -219,7 +219,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	public function test_fix_header_footer_path() {
 
 		$html = $this->misc->fix_header_footer( '<img src="' . PDF_PLUGIN_URL . 'src/assets/images/cap-paws-sitting.png" alt="My Image" />' );
-		$this->assertFalse( strpos(PDF_PLUGIN_URL, $html ) );
+		$this->assertFalse( strpos( PDF_PLUGIN_URL, $html ) );
 
 		$html = $this->misc->fix_header_footer( '<img src="http://test.com/image.png" alt="My Image" />' );
 		$this->assertEquals( '<p><img src="http://test.com/image.png" alt="My Image" class="header-footer-img"></p>', $html );
@@ -231,11 +231,11 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_array_unshift_assoc() {
-		$array = array(
+		$array = [
 			'item1' => 'Yes',
 			'item2' => 'Maybe',
 			'item3' => 'I do not know',
-		);
+		];
 
 		$test = $this->misc->array_unshift_assoc( $array, 'item0', 'No' );
 
@@ -267,16 +267,16 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	 * @since  4.0
 	 */
 	public function provider_remove_extension_from_string() {
-		return array(
-			array( 'mydocument', 'mydocument.pdf', '.pdf' ),
-			array( 'mydocument', 'mydocument.jpg', '.Jpg' ),
-			array( 'mydocument.pdf', 'mydocument.pdf', '.pda' ),
-			array( 'Helper_Document', 'Helper_Document.php', '.php' ),
-			array( 'カタ_Document', 'カタ_Document.php', '.php' ),
-			array( 'カタ_Document', 'カタ_Document.excel', '.excel' ),
-			array( 'Working', 'Working.excel', '.excel' ),
-			array( 'Working_漢字', 'Working_漢字.pdf', '.pdf' ),
-		);
+		return [
+			[ 'mydocument', 'mydocument.pdf', '.pdf' ],
+			[ 'mydocument', 'mydocument.jpg', '.Jpg' ],
+			[ 'mydocument.pdf', 'mydocument.pdf', '.pda' ],
+			[ 'Helper_Document', 'Helper_Document.php', '.php' ],
+			[ 'カタ_Document', 'カタ_Document.php', '.php' ],
+			[ 'カタ_Document', 'カタ_Document.excel', '.excel' ],
+			[ 'Working', 'Working.excel', '.excel' ],
+			[ 'Working_漢字', 'Working_漢字.pdf', '.pdf' ],
+		];
 	}
 
 	/**
@@ -301,15 +301,15 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function provider_update_depreciated_config() {
-		return array(
-			array( 'Yes', true ),
-			array( 'No', false ),
-			array( null, null ),
-			array( 'Other', 'Other' ),
-			array( array( 1, 2, 3 ), array( 1, 2, 3 ) ),
-			array( 'true', 'true' ),
-			array( 'false', 'false' ),
-		);
+		return [
+			[ 'Yes', true ],
+			[ 'No', false ],
+			[ null, null ],
+			[ 'Other', 'Other' ],
+			[ [ 1, 2, 3 ], [ 1, 2, 3 ] ],
+			[ 'true', 'true' ],
+			[ 'false', 'false' ],
+		];
 	}
 
 	/**
@@ -318,12 +318,12 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_add_template_image() {
-		$settings = array(
-			'template' => array(
+		$settings = [
+			'template' => [
 				'value' => '',
 				'desc'  => '',
-			),
-		);
+			],
+		];
 
 		$results = $this->misc->add_template_image( $settings );
 
@@ -337,7 +337,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 		$this->assertNotFalse( strpos( $results['template']['desc'], '<img' ) );
 
 		/* Test skipping results */
-		$results = $this->misc->add_template_image( array() );
+		$results = $this->misc->add_template_image( [] );
 
 		$this->assertEmpty( $results );
 	}
@@ -374,7 +374,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 		/* Sniff that our keys have the correct details */
 		$this->assertEquals( $entry['form_id'], $data['form_id'] );
 		$this->assertEquals( $entry['id'], $data['lead_id'] );
-		$this->assertEquals( array( $entry['id'] ), $data['lead_ids'] );
+		$this->assertEquals( [ $entry['id'] ], $data['lead_ids'] );
 		$this->assertTrue( is_array( $data['form'] ) );
 		$this->assertTrue( is_array( $data['entry'] ) );
 		$this->assertTrue( is_array( $data['lead'] ) );
@@ -408,18 +408,18 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function provider_get_contrast() {
-		return array(
-			array( '#FFF', '#000000' ),
-			array( '#FFF', '#000' ),
-			array( '#FFF', '#222' ),
-			array( '#FFF', '#068a2b' ),
-			array( '#FFF', '#a70404' ),
-			array( '#000', '#fff' ),
-			array( '#000', '#FFFFFF' ),
-			array( '#000', '#999' ),
-			array( '#000', '#EEE' ),
-			array( '#000', '#CCC' ),
-		);
+		return [
+			[ '#FFF', '#000000' ],
+			[ '#FFF', '#000' ],
+			[ '#FFF', '#222' ],
+			[ '#FFF', '#068a2b' ],
+			[ '#FFF', '#a70404' ],
+			[ '#000', '#fff' ],
+			[ '#000', '#FFFFFF' ],
+			[ '#000', '#999' ],
+			[ '#000', '#EEE' ],
+			[ '#000', '#CCC' ],
+		];
 	}
 
 	/**
@@ -444,16 +444,16 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function provider_change_brightness() {
-		return array(
-			array( '#0a0a0a', '#000000', 10 ),
-			array( '#0a0a0a', '#000', 10 ),
-			array( '#181818', '#222', -10 ),
-			array( '#2c2c2c', '#222', 10 ),
-			array( '#fefefe', '#CCC', 50 ),
-			array( '#9a9a9a', '#CCC', -50 ),
-			array( '#ffffff', '#FFFFFF', 25 ),
-			array( '#e6e6e6', '#FFF', -25 ),
-		);
+		return [
+			[ '#0a0a0a', '#000000', 10 ],
+			[ '#0a0a0a', '#000', 10 ],
+			[ '#181818', '#222', -10 ],
+			[ '#2c2c2c', '#222', 10 ],
+			[ '#fefefe', '#CCC', 50 ],
+			[ '#9a9a9a', '#CCC', -50 ],
+			[ '#ffffff', '#FFFFFF', 25 ],
+			[ '#e6e6e6', '#FFF', -25 ],
+		];
 	}
 
 	/**
@@ -465,11 +465,11 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	public function test_evaluate_conditional_logic() {
 		$logic['actionType'] = 'show';
 
-		$this->assertTrue( $this->misc->evaluate_conditional_logic( $logic, array() ) );
+		$this->assertTrue( $this->misc->evaluate_conditional_logic( $logic, [] ) );
 
 		$logic['actionType'] = 'hide';
 
-		$this->assertFalse( $this->misc->evaluate_conditional_logic( $logic, array() ) );
+		$this->assertFalse( $this->misc->evaluate_conditional_logic( $logic, [] ) );
 	}
 
 	/**
@@ -494,13 +494,13 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function provider_get_config_class_name() {
-		return array(
-			array( 'Manage_Document', '/path/to/templates/manage-document.php' ),
-			array( 'Manage_Document', '/path/to/templates/manage_document.php' ),
-			array( 'Manage_Document', '/path/to/templates/manage document.php' ),
-			array( 'Superawesome_Working_Directory', '/my/path/superawesome-working-directory.php' ),
-			array( 'Template', 'template.php' ),
-		);
+		return [
+			[ 'Manage_Document', '/path/to/templates/manage-document.php' ],
+			[ 'Manage_Document', '/path/to/templates/manage_document.php' ],
+			[ 'Manage_Document', '/path/to/templates/manage document.php' ],
+			[ 'Superawesome_Working_Directory', '/my/path/superawesome-working-directory.php' ],
+			[ 'Template', 'template.php' ],
+		];
 	}
 
 	/**
@@ -526,16 +526,16 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	 * @return array
 	 */
 	public function provider_get_background_and_border_contrast() {
-		return array(
-			array( array( '#ebebeb', '#c3c3c3' ), '#FFFFFF' ),
-			array( array( '#ebebeb', '#c3c3c3' ), '#FFF' ),
-			array( array( '#141414', '#3c3c3c' ), '#000000' ),
-			array( array( '#141414', '#3c3c3c' ), '#000' ),
-			array( array( '#e82828', '#ff5050' ), '#d41414' ),
-			array( array( '#295399', '#517bc1' ), '#153f85' ),
-			array( array( '#5cbb50', '#349328' ), '#70cf64' ),
-			array( array( '#dfdfdf', '#b7b7b7' ), '#f3f3f3' ),
-		);
+		return [
+			[ [ '#ebebeb', '#c3c3c3' ], '#FFFFFF' ],
+			[ [ '#ebebeb', '#c3c3c3' ], '#FFF' ],
+			[ [ '#141414', '#3c3c3c' ], '#000000' ],
+			[ [ '#141414', '#3c3c3c' ], '#000' ],
+			[ [ '#e82828', '#ff5050' ], '#d41414' ],
+			[ [ '#295399', '#517bc1' ], '#153f85' ],
+			[ [ '#5cbb50', '#349328' ], '#70cf64' ],
+			[ [ '#dfdfdf', '#b7b7b7' ], '#f3f3f3' ],
+		];
 	}
 
 	/**
@@ -563,9 +563,9 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_backwards_compat_conversion() {
-		$settings = array(
+		$settings = [
 			'irrelivant' => 'Yes',
-		);
+		];
 
 		/* Check all the defaults work as expected */
 		$compat = $this->misc->backwards_compat_conversion( $settings, [], [] );
@@ -582,7 +582,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 		$this->assertEquals( 96, $compat['dpi'] );
 
 		/* Check all the settings get correctly converted */
-		$settings = array(
+		$settings = [
 			'advanced_template' => 'Yes',
 			'rtl'               => 'Yes',
 			'image_dpi'         => 300,
@@ -590,7 +590,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 			'password'          => 'password',
 			'privileges'        => 'privileges',
 			'format'            => 'PDFX1A',
-		);
+		];
 
 		$compat = $this->misc->backwards_compat_conversion( $settings, [], [] );
 
@@ -620,8 +620,8 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	 *
 	 * @param boolean $expected
 	 * @param boolean $strict
-	 * @param mixed $needle
-	 * @param array $haystack
+	 * @param mixed   $needle
+	 * @param array   $haystack
 	 *
 	 * @dataProvider provider_in_array
 	 *
@@ -632,51 +632,81 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	}
 
 	public function provider_in_array() {
-		return array(
+		return [
 
 			/* basic multi-dimensional search */
-			array( true, true, 'find me', array(
-				'item 1',
-				'item 2',
-				'item 3' => array( 'test', 'find me' ),
-				'item 4',
-			) ),
+			[
+				true,
+				true,
+				'find me',
+				[
+					'item 1',
+					'item 2',
+					'item 3' => [ 'test', 'find me' ],
+					'item 4',
+				],
+			],
 
 			/* type check (strict) */
-			array( false, true, 20, array(
-				'item 1',
-				'item 2' => array( 'stuff', 'here', array( '20' ) ),
-				'item 3'
-			) ),
+			[
+				false,
+				true,
+				20,
+				[
+					'item 1',
+					'item 2' => [ 'stuff', 'here', [ '20' ] ],
+					'item 3',
+				],
+			],
 
 			/* type check (not strict) */
-			array( true, false, 20, array(
-				'item 1',
-				'item 2' => array( 'stuff', 'here', array( '20' ) ),
-				'item 3'
-			) ),
+			[
+				true,
+				false,
+				20,
+				[
+					'item 1',
+					'item 2' => [ 'stuff', 'here', [ '20' ] ],
+					'item 3',
+				],
+			],
 
 			/* deep multi-dimensional array */
-			array( true, true, 'Find Me', array(
-				'item 1' => array( 'hi', 'how', 'are', array( 'you' => array( 'going' ) ) ),
-				'item 2' => array( 'stuff', 'here', array( 'Find Me' ) ),
-				'item 3'
-			) ),
+			[
+				true,
+				true,
+				'Find Me',
+				[
+					'item 1' => [ 'hi', 'how', 'are', [ 'you' => [ 'going' ] ] ],
+					'item 2' => [ 'stuff', 'here', [ 'Find Me' ] ],
+					'item 3',
+				],
+			],
 
 			/* deep multi-dimensional array */
-			array( true, true, 'Find Me', array(
-				'item 1' => array( 'hi', 'how', 'are', array( 'you' => array( 'going' => array( 'Find Me' ) ) ) ),
-				'item 2' => array( 'stuff', 'here', array( 'wow' ) ),
-				'item 3'
-			) ),
+			[
+				true,
+				true,
+				'Find Me',
+				[
+					'item 1' => [ 'hi', 'how', 'are', [ 'you' => [ 'going' => [ 'Find Me' ] ] ] ],
+					'item 2' => [ 'stuff', 'here', [ 'wow' ] ],
+					'item 3',
+				],
+			],
 
 			/* ensure case sensitive match */
-			array( false, true, 'find me', array(
-				'item 1',
-				'item 2' => array( 'stuff', 'here', array( 'Find Me' ) ),
-				'item 3'
-			) ),
-		);
+			[
+				false,
+				true,
+				'find me',
+				[
+					'item 1',
+					'item 2' => [ 'stuff', 'here', [ 'Find Me' ] ],
+					'item 3',
+				],
+			],
+		];
 	}
 
 	/**

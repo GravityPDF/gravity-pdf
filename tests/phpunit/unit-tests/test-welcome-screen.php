@@ -85,9 +85,9 @@ class Test_Welcome_Screen extends WP_UnitTestCase {
 
 		/* Setup our test classes */
 		$this->model = new Model_Welcome_Screen( $gfpdf->log );
-		$this->view  = new View_Welcome_Screen( array(
+		$this->view  = new View_Welcome_Screen( [
 			'display_version' => PDF_EXTENDED_VERSION,
-		), $gfpdf->gform );
+		], $gfpdf->gform );
 
 		$this->controller = new Controller_Welcome_Screen( $this->model, $this->view, $gfpdf->log, $gfpdf->data, $gfpdf->options );
 		$this->controller->init();
@@ -99,8 +99,8 @@ class Test_Welcome_Screen extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_actions() {
-		$this->assertEquals( 10, has_action( 'admin_menu', array( $this->model, 'admin_menus' ) ) );
-		$this->assertEquals( 10, has_action( 'init', array( $this->controller, 'welcome' ) ) );
+		$this->assertEquals( 10, has_action( 'admin_menu', [ $this->model, 'admin_menus' ] ) );
+		$this->assertEquals( 10, has_action( 'init', [ $this->controller, 'welcome' ] ) );
 	}
 
 	/**
@@ -109,7 +109,7 @@ class Test_Welcome_Screen extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_filters() {
-		$this->assertEquals( 10, has_filter( 'admin_title', array( $this->model, 'add_page_title' ) ) );
+		$this->assertEquals( 10, has_filter( 'admin_title', [ $this->model, 'add_page_title' ] ) );
 	}
 
 	/**

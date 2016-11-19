@@ -87,7 +87,7 @@ class Field_Select extends Helper_Abstract_Fields {
 
 		$value = $this->value();
 		$label = GFFormsModel::get_label( $this->field );
-		$data  = array();
+		$data  = [];
 
 		/* Standadised Format */
 		$data['field'][ $this->field->id . '.' . $label ] = $value['value'];
@@ -136,10 +136,10 @@ class Field_Select extends Helper_Abstract_Fields {
 		$value = esc_html( GFCommon::selection_display( $this->get_value(), $this->field ) );
 
 		/* return value / label as an array */
-		$this->cache( array(
+		$this->cache( [
 			'value' => $value,
 			'label' => $label,
-		) );
+		] );
 
 		return $this->cache();
 	}

@@ -132,28 +132,28 @@ class Test_Data_Helper extends WP_UnitTestCase {
 	public function provider_setter() {
 		$object           = new StdClass();
 		$object->item     = 'This';
-		$object->function = function() {
+		$object->function = function () {
 			return false;
 		};
 
-		return array(
-			array( 'test', 'This is my test data' ),
-			array( 'item1', 20 ),
-			array(
+		return [
+			[ 'test', 'This is my test data' ],
+			[ 'item1', 20 ],
+			[
 				'array',
-				array(
+				[
 					'one',
 					'two',
 					'three',
-				),
-			),
-			array( 'object', new StdClass() ),
-			array( 'object2', $object ),
-			array( 'boolean', true ),
-			array( 'boolean2', false ),
-			array( 'float', 12.2324 ),
-			array( 'float2', 0.24 ),
-		);
+				],
+			],
+			[ 'object', new StdClass() ],
+			[ 'object2', $object ],
+			[ 'boolean', true ],
+			[ 'boolean2', false ],
+			[ 'float', 12.2324 ],
+			[ 'float2', 0.24 ],
+		];
 	}
 
 	/**
@@ -165,7 +165,7 @@ class Test_Data_Helper extends WP_UnitTestCase {
 		global $gfpdf;
 
 		$localised_data = $this->data->get_localised_script_data( $gfpdf->options, $gfpdf->gform );
-		$required_keys  = array(
+		$required_keys  = [
 			'ajaxurl',
 			'GFbaseUrl',
 			'pluginUrl',
@@ -197,7 +197,7 @@ class Test_Data_Helper extends WP_UnitTestCase {
 			'no_pdfs_found',
 			'no_pdfs_found_link',
 			'no_template_preview',
-		);
+		];
 
 		foreach ( $required_keys as $key ) {
 			$this->assertArrayHasKey( $key, $localised_data );

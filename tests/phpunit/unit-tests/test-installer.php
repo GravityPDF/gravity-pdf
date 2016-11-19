@@ -87,10 +87,10 @@ class Test_Installer extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_actions() {
-		$this->assertEquals( 10, has_action( 'admin_init', array( $this->controller, 'maybe_uninstall' ) ) );
-		$this->assertEquals( 9999, has_action( 'wp_loaded', array( $this->controller, 'check_install_status' ) ) );
+		$this->assertEquals( 10, has_action( 'admin_init', [ $this->controller, 'maybe_uninstall' ] ) );
+		$this->assertEquals( 9999, has_action( 'wp_loaded', [ $this->controller, 'check_install_status' ] ) );
 
-		$this->assertEquals( 10, has_action( 'init', array( $this->model, 'register_rewrite_rules' ) ) );
+		$this->assertEquals( 10, has_action( 'init', [ $this->model, 'register_rewrite_rules' ] ) );
 	}
 
 	/**
@@ -99,7 +99,7 @@ class Test_Installer extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_filters() {
-		$this->assertEquals( 10, has_filter( 'query_vars', array( $this->model, 'register_rewrite_tags' ) ) );
+		$this->assertEquals( 10, has_filter( 'query_vars', [ $this->model, 'register_rewrite_tags' ] ) );
 	}
 
 	/**
@@ -117,7 +117,7 @@ class Test_Installer extends WP_UnitTestCase {
 		set_current_screen( 'edit.php' );
 
 		/* Set up authorized user */
-		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
 		$this->assertInternalType( 'integer', $user_id );
 
 		if ( is_multisite() ) {
@@ -220,19 +220,19 @@ class Test_Installer extends WP_UnitTestCase {
 		$this->assertTrue( is_file( $gfpdf->data->template_location . 'index.html' ) );
 
 		/* Test our directory filters */
-		add_filter( 'gfpdf_template_location', function( $path, $folder ) {
+		add_filter( 'gfpdf_template_location', function ( $path, $folder ) {
 			return ABSPATH . $folder;
 		}, 10, 2 );
 
-		add_filter( 'gfpdf_template_location_uri', function( $url, $folder ) {
+		add_filter( 'gfpdf_template_location_uri', function ( $url, $folder ) {
 			return home_url( '/' ) . $folder;
 		}, 10, 2 );
 
-		add_filter( 'gfpdf_tmp_location', function( $path ) {
+		add_filter( 'gfpdf_tmp_location', function ( $path ) {
 			return ABSPATH . '../tmp/';
 		} );
 
-		add_filter( 'gfpdf_font_location', function( $path ) {
+		add_filter( 'gfpdf_font_location', function ( $path ) {
 			return ABSPATH . 'wp-content/pdf-fonts/';
 		} );
 
@@ -287,7 +287,7 @@ class Test_Installer extends WP_UnitTestCase {
 		set_current_screen( 'edit.php' );
 
 		/* Set up authorized user */
-		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
 		$this->assertInternalType( 'integer', $user_id );
 
 		if ( is_multisite() ) {
@@ -329,7 +329,7 @@ class Test_Installer extends WP_UnitTestCase {
 		set_current_screen( 'edit.php' );
 
 		/* Set up authorized user */
-		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
 		$this->assertInternalType( 'integer', $user_id );
 
 		if ( is_multisite() ) {

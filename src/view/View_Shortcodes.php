@@ -62,7 +62,7 @@ class View_Shortcodes extends Helper_Abstract_View {
 	 * @since 4.0
 	 */
 	public function no_entry_id() {
-		return $this->load( 'no_entry_id', array(), false );
+		return $this->load( 'no_entry_id', [], false );
 	}
 
 	/**
@@ -73,7 +73,7 @@ class View_Shortcodes extends Helper_Abstract_View {
 	 * @since 4.0
 	 */
 	public function invalid_pdf_config() {
-		return $this->load( 'invalid_pdf_config', array(), false );
+		return $this->load( 'invalid_pdf_config', [], false );
 	}
 
 	/**
@@ -84,7 +84,7 @@ class View_Shortcodes extends Helper_Abstract_View {
 	 * @since 4.0
 	 */
 	public function pdf_not_active() {
-		return $this->load( 'pdf_not_active', array(), false );
+		return $this->load( 'pdf_not_active', [], false );
 	}
 
 	/**
@@ -95,7 +95,7 @@ class View_Shortcodes extends Helper_Abstract_View {
 	 * @since 4.0
 	 */
 	public function conditional_logic_not_met() {
-		return $this->load( 'conditional_logic_not_met', array(), false );
+		return $this->load( 'conditional_logic_not_met', [], false );
 	}
 
 	/**

@@ -66,7 +66,7 @@ class Field_v3_Products extends Field_Products {
 		$heading = '<h2 class="default entry-view-section-break">' . $label . '</h2>';
 
 		/* Pull out the .entry-products table from the HTML using querypath */
-		$qp = new Helper_QueryPath();
+		$qp    = new Helper_QueryPath();
 		$table = $qp->html5( $html, 'div.inner-container' )->innerHTML5();
 
 		$html = $heading;

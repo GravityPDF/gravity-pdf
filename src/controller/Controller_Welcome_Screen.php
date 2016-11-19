@@ -130,9 +130,9 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 	 */
 	public function add_actions() {
 		/* Load the welcome screen into the menu */
-		add_action( 'admin_menu', array( $this->model, 'admin_menus' ) );
-		add_action( 'admin_head', array( $this->model, 'hide_admin_menus' ) );
-		add_action( 'init', array( $this, 'welcome' ) );
+		add_action( 'admin_menu', [ $this->model, 'admin_menus' ] );
+		add_action( 'admin_head', [ $this->model, 'hide_admin_menus' ] );
+		add_action( 'init', [ $this, 'welcome' ] );
 	}
 
 	/**
@@ -143,7 +143,7 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 	 * @return void
 	 */
 	public function add_filters() {
-		add_filter( 'admin_title', array( $this->model, 'add_page_title' ), 10, 3 );
+		add_filter( 'admin_title', [ $this->model, 'add_page_title' ], 10, 3 );
 	}
 
 	/**

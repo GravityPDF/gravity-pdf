@@ -88,7 +88,7 @@ class Test_MVC_Abstracts extends WP_UnitTestCase {
 
 		/* Setup out loader class */
 		$this->model      = new Model_Settings( $gfpdf->gform, $gfpdf->log, $gfpdf->notices, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
-		$this->view       = new View_Settings( array(), $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
+		$this->view       = new View_Settings( [], $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
 		$this->controller = new Controller_Settings( $this->model, $this->view, $gfpdf->gform, $gfpdf->log, $gfpdf->notices, $gfpdf->data, $gfpdf->misc );
 	}
 
@@ -135,7 +135,7 @@ class Test_MVC_Abstracts extends WP_UnitTestCase {
 		 * Test our load function produces the correct output
 		 */
 		ob_start();
-		$results = $this->view->uninstaller( array() );
+		$results = $this->view->uninstaller( [] );
 		$string  = ob_get_clean();
 
 		/* check results are accurate */
@@ -143,7 +143,7 @@ class Test_MVC_Abstracts extends WP_UnitTestCase {
 		$this->assertNotEmpty( $string );
 
 		/* check for error */
-		$error = $this->view->load_none_existant_file( array() );
+		$error = $this->view->load_none_existant_file( [] );
 		$this->assertTrue( is_wp_error( $error ) );
 
 		/*

@@ -71,11 +71,11 @@ class Test_Bootstrap extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_actions() {
-		$this->assertEquals( 10, has_action( 'init', array( $this->loader, 'register_assets' ) ) );
-		$this->assertEquals( 10, has_action( 'admin_enqueue_scripts', array( $this->loader, 'load_admin_assets' ) ) );
+		$this->assertEquals( 10, has_action( 'init', [ $this->loader, 'register_assets' ] ) );
+		$this->assertEquals( 10, has_action( 'admin_enqueue_scripts', [ $this->loader, 'load_admin_assets' ] ) );
 
-		$this->assertEquals( 1, has_action( 'init', array( $this->loader, 'init_settings_api' ) ) );
-		$this->assertEquals( 1, has_action( 'admin_init', array( $this->loader, 'setup_settings_fields' ) ) );
+		$this->assertEquals( 1, has_action( 'init', [ $this->loader, 'init_settings_api' ] ) );
+		$this->assertEquals( 1, has_action( 'admin_init', [ $this->loader, 'setup_settings_fields' ] ) );
 	}
 
 	/**
@@ -84,16 +84,16 @@ class Test_Bootstrap extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_filters() {
-		$this->assertEquals( 10, has_filter( 'gform_noconflict_scripts', array(
+		$this->assertEquals( 10, has_filter( 'gform_noconflict_scripts', [
 			$this->loader,
 			'auto_noconflict_scripts',
-		) ) );
-		$this->assertEquals( 10, has_filter( 'gform_noconflict_styles', array(
+		] ) );
+		$this->assertEquals( 10, has_filter( 'gform_noconflict_styles', [
 			$this->loader,
 			'auto_noconflict_styles',
-		) ) );
+		] ) );
 
-		$this->assertEquals( 10, has_filter( 'gform_logging_supported', array( $this->loader, 'add_gf_logger' ) ) );
+		$this->assertEquals( 10, has_filter( 'gform_logging_supported', [ $this->loader, 'add_gf_logger' ] ) );
 	}
 
 	/**
@@ -116,13 +116,13 @@ class Test_Bootstrap extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function provider_dependant_helper_classes() {
-		return array(
-			array( 'GFPDF\Helper\Helper_Form', 'gform' ),
-			array( 'GFPDF\Helper\Helper_Data', 'data' ),
-			array( 'GFPDF\Helper\Helper_Misc', 'misc' ),
-			array( 'GFPDF\Helper\Helper_Notices', 'notices' ),
-			array( 'GFPDF\Helper\Helper_Options_Fields', 'options' ),
-		);
+		return [
+			[ 'GFPDF\Helper\Helper_Form', 'gform' ],
+			[ 'GFPDF\Helper\Helper_Data', 'data' ],
+			[ 'GFPDF\Helper\Helper_Misc', 'misc' ],
+			[ 'GFPDF\Helper\Helper_Notices', 'notices' ],
+			[ 'GFPDF\Helper\Helper_Options_Fields', 'options' ],
+		];
 	}
 
 	/**
@@ -132,7 +132,7 @@ class Test_Bootstrap extends WP_UnitTestCase {
 	 */
 	public function test_auto_noconflict_gfpdf_js() {
 		/* get test data */
-		$queue = array(
+		$queue = [
 			'common',
 			'gfpdf_css_chosen_style',
 			'admin-bar',
@@ -144,7 +144,7 @@ class Test_Bootstrap extends WP_UnitTestCase {
 			'gforms_locking',
 			'gfpdf_js_settings',
 			'gfwebapi_enc_base64',
-		);
+		];
 
 		/* override queue */
 		$wp_scripts        = wp_scripts();
@@ -152,7 +152,7 @@ class Test_Bootstrap extends WP_UnitTestCase {
 		$wp_scripts->queue = $queue;
 
 		/* get the results and test the expected output */
-		$results = $this->loader->auto_noconflict_scripts( array() );
+		$results = $this->loader->auto_noconflict_scripts( [] );
 
 		/* run assertions */
 		$this->assertEquals( 3, sizeof( $results ) );
@@ -171,7 +171,7 @@ class Test_Bootstrap extends WP_UnitTestCase {
 	 */
 	public function test_auto_noconflict_gfpdf_css() {
 		/* get test data */
-		$queue = array(
+		$queue = [
 			'common',
 			'gfpdf_css_chosen_style',
 			'admin-bar',
@@ -183,7 +183,7 @@ class Test_Bootstrap extends WP_UnitTestCase {
 			'gforms_locking',
 			'gfpdf_js_settings',
 			'gfwebapi_enc_base64',
-		);
+		];
 
 		/* override queue */
 		$wp_styles        = wp_styles();
@@ -191,7 +191,7 @@ class Test_Bootstrap extends WP_UnitTestCase {
 		$wp_styles->queue = $queue;
 
 		/* get the results and test the expected output */
-		$results = $this->loader->auto_noconflict_styles( array() );
+		$results = $this->loader->auto_noconflict_styles( [] );
 
 		/* run assertions */
 		$this->assertEquals( 2, sizeof( $results ) );
@@ -221,7 +221,7 @@ class Test_Bootstrap extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_add_gf_logger() {
-		$this->assertArrayHasKey( 'gravity-pdf', $this->loader->add_gf_logger( array() ) );
+		$this->assertArrayHasKey( 'gravity-pdf', $this->loader->add_gf_logger( [] ) );
 	}
 
 	/**
@@ -241,10 +241,10 @@ class Test_Bootstrap extends WP_UnitTestCase {
 		$this->assertFalse( $settings['section_content'] );
 
 		/* Test pass */
-		$form_id                                 = $GLOBALS['GFPDF_Test']->form['form-settings']['id'];
-		$pid = $GLOBALS['wp']->query_vars['pid'] = '555ad84787d7e';
+		$form_id = $GLOBALS['GFPDF_Test']->form['form-settings']['id'];
+		$pid     = $GLOBALS['wp']->query_vars['pid'] = '555ad84787d7e';
 
-		$gfpdf->data->form_settings                                   = array();
+		$gfpdf->data->form_settings                                   = [];
 		$gfpdf->data->form_settings[ $form_id ]                       = $GLOBALS['GFPDF_Test']->form['form-settings']['gfpdf_form_settings'];
 		$gfpdf->data->form_settings[ $form_id ][ $pid ]['html_field'] = 'Yes';
 

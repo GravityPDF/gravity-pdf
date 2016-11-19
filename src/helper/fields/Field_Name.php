@@ -85,7 +85,7 @@ class Field_Name extends Helper_Abstract_Fields {
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {
-		
+
 		$value = $this->value();
 
 		/* Backwards compatibility check */
@@ -114,16 +114,17 @@ class Field_Name extends Helper_Abstract_Fields {
 		/* backwards compatible - check if the returned results are an array otherwise set to cache and return */
 		if ( ! is_array( $value ) ) {
 			$this->cache( esc_html( $value ) );
+
 			return $this->cache();
 		}
 
-		$value = array(
+		$value = [
 			'prefix' => rgget( $this->field->id . '.2', $value ),
 			'first'  => rgget( $this->field->id . '.3', $value ),
 			'middle' => rgget( $this->field->id . '.4', $value ),
 			'last'   => rgget( $this->field->id . '.6', $value ),
 			'suffix' => rgget( $this->field->id . '.8', $value ),
-		);
+		];
 
 		$value = array_map( 'esc_html', $value );
 

@@ -127,11 +127,11 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	 * @return void
 	 */
 	public function add_actions() {
-		add_action( 'admin_init', array( $this, 'route' ) );
-		add_action( 'admin_init', array( $this, 'route_notices' ), 20 ); /* Run later than our route check */
+		add_action( 'admin_init', [ $this, 'route' ] );
+		add_action( 'admin_init', [ $this, 'route_notices' ], 20 ); /* Run later than our route check */
 
 		/* Add AJAX endpoints */
-		add_action( 'wp_ajax_multisite_v3_migration', array( $this->model, 'ajax_multisite_v3_migration' ) );
+		add_action( 'wp_ajax_multisite_v3_migration', [ $this->model, 'ajax_multisite_v3_migration' ] );
 	}
 
 	/**
@@ -150,28 +150,29 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	 */
 	public function get_routes() {
 
-		$routes = array(
-			array(
+		$routes = [
+			[
 				'action'      => 'review_plugin',
 				'action_text' => esc_html__( 'Review Submitted', 'gravity-forms-pdf-extended' ),
-				'condition'   => array( $this->model, 'review_condition' ),
-				'process'     => array( $this->model, 'dismiss_notice' ),
-				'view'        => array( $this->view, 'review_plugin' ),
+				'condition'   => [ $this->model, 'review_condition' ],
+				'process'     => [ $this->model, 'dismiss_notice' ],
+				'view'        => [ $this->view, 'review_plugin' ],
 				'capability'  => 'gravityforms_view_settings',
 				'view_class'  => 'gfpdf-alert-mascot',
-			),
+			],
 
-			array(
+			[
 				'action'      => 'migrate_v3_to_v4',
 				'action_text' => esc_html__( 'Begin Migration', 'gravity-forms-pdf-extended' ),
-				'condition'   => array( $this->model, 'migration_condition' ),
-				'process'     => array( $this->model, 'begin_migration' ),
-				'view'        => array( $this->view, 'migration' ),
+				'condition'   => [ $this->model, 'migration_condition' ],
+				'process'     => [ $this->model, 'begin_migration' ],
+				'view'        => [ $this->view, 'migration' ],
 				'capability'  => 'update_plugins',
-			),
-		);
+			],
+		];
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_one_time_action_routes/ for more details about this filter */
+
 		return apply_filters( 'gfpdf_one_time_action_routes', $routes );
 	}
 
@@ -199,9 +200,9 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 			     call_user_func( $route['condition'] )
 			) {
 
-				$this->log->addNotice( 'Trigger Action Notification.', array(
+				$this->log->addNotice( 'Trigger Action Notification.', [
 					'route' => $route,
-				) );
+				] );
 
 				$class = ( isset( $route['view_class'] ) ) ? $route['view_class'] : '';
 				$this->notices->add_notice( call_user_func( $route['view'], $route['action'], $route['action_text'] ), $class );
@@ -226,10 +227,10 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 				/* Check user capability */
 				if ( ! $this->gform->has_capability( $route['capability'] ) ) {
 
-					$this->log->addCritical( 'Lack of User Capabilities.', array(
+					$this->log->addCritical( 'Lack of User Capabilities.', [
 						'user'      => wp_get_current_user(),
 						'user_meta' => get_user_meta( get_current_user_id() ),
-					) );
+					] );
 
 					wp_die( esc_html__( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
 				}
@@ -245,16 +246,16 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 
 				/* Check if the user wants to dismiss the notice, otherwise process the route */
 				if ( isset( $_POST['gfpdf-dismiss-notice'] ) ) {
-					$this->log->addNotice( 'Dismiss Action.', array(
+					$this->log->addNotice( 'Dismiss Action.', [
 						'route' => $route,
-					) );
+					] );
 
 					$this->model->dismiss_notice( $route['action'] );
 				} else {
-					$this->log->addNotice( 'Trigger Action Process.', array(
+					$this->log->addNotice( 'Trigger Action Process.', [
 						'route' => $route,
-					) );
-					
+					] );
+
 					call_user_func( $route['process'], $route['action'], $route );
 				}
 			}

@@ -69,10 +69,10 @@ class Rubix implements Helper_Interface_Config {
 	 */
 	public function configuration() {
 
-		return array(
+		return [
 
 			/* Enable core fields */
-			'core'   => array(
+			'core'   => [
 				'show_form_title'      => true,
 				'show_page_names'      => true,
 				'show_html'            => true,
@@ -85,18 +85,18 @@ class Rubix implements Helper_Interface_Config {
 				'first_footer'         => true,
 				'background_color'     => true,
 				'background_image'     => true,
-			),
+			],
 
 			/* Create custom fields to control the look and feel of a template */
-			'fields' => array(
-				'rubix_container_background_colour' => array(
+			'fields' => [
+				'rubix_container_background_colour' => [
 					'id'   => 'rubix_container_background_colour',
 					'name' => esc_html__( 'Container Background Colour', 'gravity-forms-pdf-extended' ),
 					'type' => 'color',
 					'desc' => esc_html__( 'Control the colour of the field background.', 'gravity-forms-pdf-extended' ),
 					'std'  => '#EEEEEE',
-				),
-			),
-		);
+				],
+			],
+		];
 	}
 }

@@ -87,7 +87,7 @@ class Test_Settings extends WP_UnitTestCase {
 
 		/* Setup our test classes */
 		$this->model = new Model_Settings( $gfpdf->gform, $gfpdf->log, $gfpdf->notices, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
-		$this->view  = new View_Settings( array(), $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
+		$this->view  = new View_Settings( [], $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
 
 		$this->controller = new Controller_Settings( $this->model, $this->view, $gfpdf->gform, $gfpdf->log, $gfpdf->notices, $gfpdf->data, $gfpdf->misc );
 		$this->controller->init();
@@ -99,13 +99,13 @@ class Test_Settings extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_actions() {
-		$this->assertEquals( 10, has_action( 'gfpdf_post_general_settings_page', array( $this->view, 'system_status' ) ) );
-		$this->assertEquals( 10, has_action( 'gfpdf_post_tools_settings_page', array( $this->view, 'system_status' ) ) );
-		$this->assertEquals( 10, has_action( 'admin_init', array( $this->controller, 'process_tool_tab_actions' ) ) );
-		$this->assertFalse( has_action( 'gfpdf_post_tools_settings_page', array( $this->view, 'uninstaller' ) ) );
+		$this->assertEquals( 10, has_action( 'gfpdf_post_general_settings_page', [ $this->view, 'system_status' ] ) );
+		$this->assertEquals( 10, has_action( 'gfpdf_post_tools_settings_page', [ $this->view, 'system_status' ] ) );
+		$this->assertEquals( 10, has_action( 'admin_init', [ $this->controller, 'process_tool_tab_actions' ] ) );
+		$this->assertFalse( has_action( 'gfpdf_post_tools_settings_page', [ $this->view, 'uninstaller' ] ) );
 
-		$this->assertEquals( 10, has_action( 'wp_ajax_gfpdf_font_save', array( $this->model, 'save_font' ) ) );
-		$this->assertEquals( 10, has_action( 'wp_ajax_gfpdf_font_delete', array( $this->model, 'delete_font' ) ) );
+		$this->assertEquals( 10, has_action( 'wp_ajax_gfpdf_font_save', [ $this->model, 'save_font' ] ) );
+		$this->assertEquals( 10, has_action( 'wp_ajax_gfpdf_font_delete', [ $this->model, 'delete_font' ] ) );
 
 	}
 
@@ -117,26 +117,26 @@ class Test_Settings extends WP_UnitTestCase {
 	public function test_filters() {
 		global $gfpdf;
 
-		$this->assertEquals( 10, has_filter( 'gform_tooltips', array( $this->view, 'add_tooltips' ) ) );
-		$this->assertEquals( 10, has_filter( 'gfpdf_capability_name', array( $this->model, 'style_capabilities' ) ) );
-		$this->assertEquals( 10, has_filter( 'option_page_capability_gfpdf_settings', array(
+		$this->assertEquals( 10, has_filter( 'gform_tooltips', [ $this->view, 'add_tooltips' ] ) );
+		$this->assertEquals( 10, has_filter( 'gfpdf_capability_name', [ $this->model, 'style_capabilities' ] ) );
+		$this->assertEquals( 10, has_filter( 'option_page_capability_gfpdf_settings', [
 			$this->controller,
 			'edit_options_cap',
-		) ) );
-		$this->assertEquals( 10, has_filter( 'gravitypdf_settings_navigation', array(
+		] ) );
+		$this->assertEquals( 10, has_filter( 'gravitypdf_settings_navigation', [
 			$this->controller,
 			'disable_tools_on_view_cap',
-		) ) );
-		$this->assertEquals( 10, has_filter( 'upload_mimes', array( $this->controller, 'allow_font_uploads' ) ) );
-		$this->assertEquals( 10, has_filter( 'gfpdf_settings_general', array( $gfpdf->misc, 'add_template_image' ) ) );
+		] ) );
+		$this->assertEquals( 10, has_filter( 'upload_mimes', [ $this->controller, 'allow_font_uploads' ] ) );
+		$this->assertEquals( 10, has_filter( 'gfpdf_settings_general', [ $gfpdf->misc, 'add_template_image' ] ) );
 
-		$this->assertFalse( has_filter( 'gfpdf_registered_settings', array( $gfpdf->options, 'highlight_errors' ) ) );
+		$this->assertFalse( has_filter( 'gfpdf_registered_settings', [ $gfpdf->options, 'highlight_errors' ] ) );
 		/* retest the gfpdf_register_settings filter is added when on the correct screen */
 		set_current_screen( 'edit.php' );
 		$_GET['page'] = 'gfpdf-settings';
 
 		$this->controller->add_filters();
-		$this->assertEquals( 10, has_filter( 'gfpdf_registered_fields', array( $this->model, 'highlight_errors' ) ) );
+		$this->assertEquals( 10, has_filter( 'gfpdf_registered_fields', [ $this->model, 'highlight_errors' ] ) );
 	}
 
 	/**
@@ -190,7 +190,7 @@ class Test_Settings extends WP_UnitTestCase {
 
 		$this->assertEquals( 'Access Denied', $e->getMessage() );
 
-		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
 		$this->assertInternalType( 'integer', $user_id );
 		wp_set_current_user( $user_id );
 
@@ -206,17 +206,17 @@ class Test_Settings extends WP_UnitTestCase {
 	 */
 	public function test_disable_tools_on_view_cap() {
 
-		$nav = array(
+		$nav = [
 			10  => 'General',
 			100 => 'Tools',
-		);
+		];
 
 		/* Ensure tools tab isn't present when permissions aren't set */
 		$results = $this->controller->disable_tools_on_view_cap( $nav );
 		$this->assertTrue( ! isset( $results[100] ) );
 
 		/* Setup appropriate permissions and recheck */
-		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
 		$this->assertInternalType( 'integer', $user_id );
 		wp_set_current_user( $user_id );
 
@@ -284,20 +284,20 @@ class Test_Settings extends WP_UnitTestCase {
 	public function test_highlight_errors() {
 
 		/* Setup an error to match */
-		$this->model->form_settings_errors = array(
-			array( 'type' => 'error', 'code' => 'rtl' ),
-			array( 'type' => 'error', 'code' => 'name' ),
-		);
+		$this->model->form_settings_errors = [
+			[ 'type' => 'error', 'code' => 'rtl' ],
+			[ 'type' => 'error', 'code' => 'name' ],
+		];
 
 		/* Setup settings fields */
-		$settings = array(
-			'general' => array(
-				array( 'id' => 'item', 'class' => 'normal' ),
-				array( 'id' => 'rtl', 'class' => 'hello' ),
-				array( 'id' => 'item2', 'class' => '' ),
-				array( 'id' => 'name' ),
-			),
-		);
+		$settings = [
+			'general' => [
+				[ 'id' => 'item', 'class' => 'normal' ],
+				[ 'id' => 'rtl', 'class' => 'hello' ],
+				[ 'id' => 'item2', 'class' => '' ],
+				[ 'id' => 'name' ],
+			],
+		];
 
 		$results = $this->model->highlight_errors( $settings );
 
@@ -345,13 +345,13 @@ class Test_Settings extends WP_UnitTestCase {
 		global $gfpdf;
 
 		/* Create font array */
-		$font = array(
+		$font = [
 			'regular' => 'MyFont.ttf',
 			'bold'    => 'MyFont-Bold.ttf',
-		);
+		];
 
 		/* Create our tmp font files */
-		array_walk( $font, function( $value ) use ( $gfpdf ) {
+		array_walk( $font, function ( $value ) use ( $gfpdf ) {
 			touch( $gfpdf->data->template_font_location . $value );
 		} );
 
@@ -383,14 +383,14 @@ class Test_Settings extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function provider_is_font_name_valid() {
-		return array(
-			array( true, 'My font name' ),
-			array( false, 'My f@nt name' ),
-			array( false, 'Calibri-pro' ),
-			array( true, 'Calibri Pro' ),
-			array( true, '123Roman' ),
-			array( false, '123_Roman' ),
-		);
+		return [
+			[ true, 'My font name' ],
+			[ false, 'My f@nt name' ],
+			[ false, 'Calibri-pro' ],
+			[ true, 'Calibri Pro' ],
+			[ true, '123Roman' ],
+			[ false, '123_Roman' ],
+		];
 	}
 
 	/**
@@ -405,9 +405,9 @@ class Test_Settings extends WP_UnitTestCase {
 		$this->assertTrue( $this->model->is_font_name_unique( 'Calibri' ) );
 
 		/* Insert that name into the database and recheck for uniqueness */
-		$font = array(
+		$font = [
 			'font_name' => 'Calibri',
-		);
+		];
 
 		$results = $this->model->install_fonts( $font );
 
@@ -430,16 +430,16 @@ class Test_Settings extends WP_UnitTestCase {
 		$uploads = wp_upload_dir();
 
 		/* Create font array */
-		$font = array(
+		$font = [
 			'name'        => 'Custom Font',
 			'regular'     => $uploads['url'] . '/MyFont.ttf',
 			'bold'        => $uploads['url'] . '/MyFont-Bold.ttf',
 			'italics'     => $uploads['url'] . '/MyFont-Italics.otf',
 			'bolditalics' => $uploads['url'] . '/MyFont-BI.ttf',
-		);
+		];
 
 		/* Create our tmp font files */
-		array_walk( $font, function( $value ) use ( $uploads ) {
+		array_walk( $font, function ( $value ) use ( $uploads ) {
 			touch( $uploads['path'] . '/' . basename( $value ) );
 		} );
 

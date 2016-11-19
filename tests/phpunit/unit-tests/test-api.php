@@ -60,14 +60,14 @@ class Test_API extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function provider_classes() {
-		return array(
-			array( 'Monolog\Logger', 'get_log_class' ),
-			array( 'GFPDF\Helper\Helper_Notices', 'get_notice_class' ),
-			array( 'GFPDF\Helper\Helper_Data', 'get_data_class' ),
-			array( 'GFPDF\Helper\Helper_Options_Fields', 'get_options_class' ),
-			array( 'GFPDF\Helper\Helper_Misc', 'get_misc_class' ),
-			array( 'GFPDF\Helper\Helper_Form', 'get_form_class' ),
-		);
+		return [
+			[ 'Monolog\Logger', 'get_log_class' ],
+			[ 'GFPDF\Helper\Helper_Notices', 'get_notice_class' ],
+			[ 'GFPDF\Helper\Helper_Data', 'get_data_class' ],
+			[ 'GFPDF\Helper\Helper_Options_Fields', 'get_options_class' ],
+			[ 'GFPDF\Helper\Helper_Misc', 'get_misc_class' ],
+			[ 'GFPDF\Helper\Helper_Form', 'get_form_class' ],
+		];
 	}
 
 	/**
@@ -115,7 +115,7 @@ class Test_API extends WP_UnitTestCase {
 	public function test_add_update_delete() {
 
 		/* Check we can add a new PDF */
-		$id = GPDFAPI::add_pdf( $GLOBALS['GFPDF_Test']->form['form-settings']['id'], array( 'working' => 'yes' ) );
+		$id = GPDFAPI::add_pdf( $GLOBALS['GFPDF_Test']->form['form-settings']['id'], [ 'working' => 'yes' ] );
 		$this->assertNotFalse( $id );
 
 		/* Check we can get the PDF details */
@@ -123,7 +123,7 @@ class Test_API extends WP_UnitTestCase {
 		$this->assertEquals( 'yes', $pdf['working'] );
 
 		/* Check we can update the PDF details correctly */
-		GPDFAPI::update_pdf( $GLOBALS['GFPDF_Test']->form['form-settings']['id'], $id, array( 'working' => 'no' ) );
+		GPDFAPI::update_pdf( $GLOBALS['GFPDF_Test']->form['form-settings']['id'], $id, [ 'working' => 'no' ] );
 		$pdf = GPDFAPI::get_pdf( $GLOBALS['GFPDF_Test']->form['form-settings']['id'], $id );
 		$this->assertEquals( 'no', $pdf['working'] );
 

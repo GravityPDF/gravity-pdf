@@ -56,7 +56,7 @@ class Field_Rating extends Helper_Abstract_Fields {
 	 */
 	public function form_data() {
 
-		$data  = array();
+		$data  = [];
 		$value = $this->value();
 
 		$data['survey']['rating'][ $this->field->id ] = $value;
@@ -97,7 +97,7 @@ class Field_Rating extends Helper_Abstract_Fields {
 		/* Process field */
 		$items = explode( ',', $this->get_value() );
 
-		$value = array();
+		$value = [];
 
 		/* Loop through each of the user-selected items */
 		foreach ( $items as $rating ) {

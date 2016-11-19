@@ -134,17 +134,17 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	public function add_actions() {
 
 		/* Trigger our save method */
-		add_action( 'admin_init', array( $this, 'maybe_save_pdf_settings' ), 5 );
+		add_action( 'admin_init', [ $this, 'maybe_save_pdf_settings' ], 5 );
 
 		/* Tell Gravity Forms to add our form PDF settings pages */
-		add_action( 'gform_form_settings_menu', array( $this->model, 'add_form_settings_menu' ) );
-		add_action( 'gform_form_settings_page_' . $this->data->slug, array( $this, 'display_page' ) );
+		add_action( 'gform_form_settings_menu', [ $this->model, 'add_form_settings_menu' ] );
+		add_action( 'gform_form_settings_page_' . $this->data->slug, [ $this, 'display_page' ] );
 
 		/* Add AJAX endpoints */
-		add_action( 'wp_ajax_gfpdf_list_delete', array( $this->model, 'delete_gf_pdf_setting' ) );
-		add_action( 'wp_ajax_gfpdf_list_duplicate', array( $this->model, 'duplicate_gf_pdf_setting' ) );
-		add_action( 'wp_ajax_gfpdf_change_state', array( $this->model, 'change_state_pdf_setting' ) );
-		add_action( 'wp_ajax_gfpdf_get_template_fields', array( $this->model, 'render_template_fields' ) );
+		add_action( 'wp_ajax_gfpdf_list_delete', [ $this->model, 'delete_gf_pdf_setting' ] );
+		add_action( 'wp_ajax_gfpdf_list_duplicate', [ $this->model, 'duplicate_gf_pdf_setting' ] );
+		add_action( 'wp_ajax_gfpdf_change_state', [ $this->model, 'change_state_pdf_setting' ] );
+		add_action( 'wp_ajax_gfpdf_get_template_fields', [ $this->model, 'render_template_fields' ] );
 	}
 
 	/**
@@ -157,26 +157,26 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	public function add_filters() {
 
 		/* Add a sample image of what the template looks like */
-		add_filter( 'gfpdf_form_settings', array( $this->misc, 'add_template_image' ) );
+		add_filter( 'gfpdf_form_settings', [ $this->misc, 'add_template_image' ] );
 
 		/* Add custom field information if we have a template selected */
-		add_filter( 'gfpdf_form_settings_custom_appearance', array( $this->model, 'register_custom_appearance_settings' ) );
-		add_filter( 'gfpdf_form_settings', array( $this->model, 'register_template_group' ) );
+		add_filter( 'gfpdf_form_settings_custom_appearance', [ $this->model, 'register_custom_appearance_settings' ] );
+		add_filter( 'gfpdf_form_settings', [ $this->model, 'register_template_group' ] );
 
 		/* Add Validation Errors */
-		add_filter( 'gfpdf_form_settings', array( $this->model, 'validation_error' ) );
-		add_filter( 'gfpdf_form_settings_appearance', array( $this->model, 'validation_error' ) );
+		add_filter( 'gfpdf_form_settings', [ $this->model, 'validation_error' ] );
+		add_filter( 'gfpdf_form_settings_appearance', [ $this->model, 'validation_error' ] );
 
 		/* Sanitize Results */
-		add_filter( 'gfpdf_form_settings_sanitize', array( $this->options, 'sanitize_all_fields' ), 10, 4 );
-		add_filter( 'gfpdf_form_settings_sanitize_text', array( $this->model, 'parse_filename_extension' ), 15, 2 );
-		add_filter( 'gfpdf_form_settings_sanitize_text', array( $this->options, 'sanitize_trim_field' ), 15, 2 );
-		add_filter( 'gfpdf_form_settings_sanitize_hidden', array( $this->model, 'decode_json' ), 10, 2 );
+		add_filter( 'gfpdf_form_settings_sanitize', [ $this->options, 'sanitize_all_fields' ], 10, 4 );
+		add_filter( 'gfpdf_form_settings_sanitize_text', [ $this->model, 'parse_filename_extension' ], 15, 2 );
+		add_filter( 'gfpdf_form_settings_sanitize_text', [ $this->options, 'sanitize_trim_field' ], 15, 2 );
+		add_filter( 'gfpdf_form_settings_sanitize_hidden', [ $this->model, 'decode_json' ], 10, 2 );
 
-		add_filter( 'gfpdf_skip_highlight_errors', array( $this->model, 'check_custom_size_error_highlighting' ), 10, 3 );
+		add_filter( 'gfpdf_skip_highlight_errors', [ $this->model, 'check_custom_size_error_highlighting' ], 10, 3 );
 
 		/* Store our TinyMCE Options */
-		add_filter( 'tiny_mce_before_init', array( $this, 'store_tinymce_settings' ) );
+		add_filter( 'tiny_mce_before_init', [ $this, 'store_tinymce_settings' ] );
 	}
 
 	/**

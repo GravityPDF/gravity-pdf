@@ -109,7 +109,7 @@ class Model_Welcome_Screen extends Helper_Abstract_Model {
 			$this->welcome_title,
 			$this->minimum_capability,
 			'gfpdf-getting-started',
-			array( $controller, 'getting_started_screen' )
+			[ $controller, 'getting_started_screen' ]
 		);
 
 		add_dashboard_page(
@@ -117,7 +117,7 @@ class Model_Welcome_Screen extends Helper_Abstract_Model {
 			$this->updated_title,
 			$this->minimum_capability,
 			'gfpdf-update',
-			array( $controller, 'update_screen' )
+			[ $controller, 'update_screen' ]
 		);
 	}
 
