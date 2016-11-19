@@ -339,7 +339,7 @@ class Model_Templates extends Helper_Abstract_Model {
 
 				/* Check the first 8kiB contains the string RGForms or GFForms, which signifies our v3 templates */
 				if ( strpos( $file_data, 'RGForms' ) === false && strpos( $file_data, 'GFForms' ) === false ) {
-					throw new Exception( esc_html__( sprintf( 'The PHP file %s is not a valid PDF Template.', basename( $file ) ), 'gravity-forms-pdf-extended' ) );
+					throw new Exception( sprintf( esc_html__( 'The PHP file %s is not a valid PDF Template.', 'gravity-forms-pdf-extended' ), basename( $file ) ) );
 				}
 			}
 		}

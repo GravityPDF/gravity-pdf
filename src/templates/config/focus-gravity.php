@@ -91,17 +91,17 @@ class Focus_Gravity implements Helper_Interface_Config {
 			'fields' => [
 				'focusgravity_accent_colour' => [
 					'id'   => 'focusgravity_accent_colour',
-					'name' => esc_html__( 'Accent Colour', 'gravity-forms-pdf-extended' ),
+					'name' => esc_html__( 'Accent Color', 'gravity-forms-pdf-extended' ),
 					'type' => 'color',
-					'desc' => esc_html__( 'The accent colour is used for the page and section titles, as well as the border.', 'gravity-forms-pdf-extended' ),
+					'desc' => esc_html__( 'The accent color is used for the page and section titles, as well as the border.', 'gravity-forms-pdf-extended' ),
 					'std'  => '#e3e3e3',
 				],
 
 				'focusgravity_secondary_colour' => [
 					'id'   => 'focusgravity_secondary_colour',
-					'name' => esc_html__( 'Secondary Colour', 'gravity-forms-pdf-extended' ),
+					'name' => esc_html__( 'Secondary Color', 'gravity-forms-pdf-extended' ),
 					'type' => 'color',
-					'desc' => esc_html__( 'The secondary colour is used with the field labels and for alternate rows.', 'gravity-forms-pdf-extended' ),
+					'desc' => esc_html__( 'The secondary color is used with the field labels and for alternate rows.', 'gravity-forms-pdf-extended' ),
 					'std'  => '#eaf2fa',
 				],
 

@@ -113,7 +113,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'std'        => 'zadani',
 						'inputClass' => 'large',
 						'chosen'     => true,
-						'tooltip'    => '<h6>' . esc_html__( 'Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'Gravity PDF comes with %sfour completely-free and highly customisable designs%s. You can also purchase additional templates from our theme shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
+						'tooltip'    => '<h6>' . esc_html__( 'Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'Gravity PDF comes with %sfour completely-free and highly customizable designs%s. You can also purchase additional templates from our theme shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
 					],
 
 					'default_font' => [
@@ -139,10 +139,10 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 
 					'default_font_colour' => [
 						'id'   => 'default_font_colour',
-						'name' => esc_html__( 'Default Font Colour', 'gravity-forms-pdf-extended' ),
+						'name' => esc_html__( 'Default Font Color', 'gravity-forms-pdf-extended' ),
 						'type' => 'color',
 						'std'  => '#000000',
-						'desc' => esc_html__( 'Set the default font colour used in PDFs.', 'gravity-forms-pdf-extended' ),
+						'desc' => esc_html__( 'Set the default font color used in PDFs.', 'gravity-forms-pdf-extended' ),
 					],
 
 					'default_rtl' => [
@@ -293,7 +293,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'std'        => $this->get_option( 'default_template', 'zadani' ),
 						'inputClass' => 'large',
 						'chosen'     => true,
-						'tooltip'    => '<h6>' . esc_html__( 'Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'Gravity PDF comes with %sfour completely-free and highly customisable designs%s. You can also purchase additional templates from our theme shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
+						'tooltip'    => '<h6>' . esc_html__( 'Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'Gravity PDF comes with %sfour completely-free and highly customizable designs%s. You can also purchase additional templates from our theme shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
 					],
 
 					'notification' => [
@@ -407,10 +407,10 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 
 					'font_colour' => [
 						'id'    => 'font_colour',
-						'name'  => esc_html__( 'Font Colour', 'gravity-forms-pdf-extended' ),
+						'name'  => esc_html__( 'Font Color', 'gravity-forms-pdf-extended' ),
 						'type'  => 'color',
 						'std'   => $this->get_option( 'default_font_colour', '#000000' ),
-						'desc'  => esc_html__( 'Set the font colour to use in the PDF.', 'gravity-forms-pdf-extended' ),
+						'desc'  => esc_html__( 'Set the font color to use in the PDF.', 'gravity-forms-pdf-extended' ),
 						'class' => 'gfpdf_font_colour',
 					],
 
@@ -809,10 +809,10 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 	public function get_background_color_field() {
 		return apply_filters( 'gfpdf_background_color_field_setting', [
 			'id'   => 'background_color',
-			'name' => esc_html__( 'Background Colour', 'gravity-forms-pdf-extended' ),
+			'name' => esc_html__( 'Background Color', 'gravity-forms-pdf-extended' ),
 			'type' => 'color',
 			'std'  => '#FFF',
-			'desc' => esc_html__( 'Set the background colour for all pages.', 'gravity-forms-pdf-extended' ),
+			'desc' => esc_html__( 'Set the background color for all pages.', 'gravity-forms-pdf-extended' ),
 		] );
 	}
 

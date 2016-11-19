@@ -40,7 +40,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<h1><?php esc_html_e( 'Welcome to Gravity PDF', 'gravity-forms-pdf-extended' ); ?></h1>
 
 	<div class="about-text">
-		<?php esc_html_e( "You're just minutes away from producing your first highly-customisable PDF document using Gravity Forms data.", 'gravity-forms-pdf-extended' ); ?>
+		<?php esc_html_e( "You're just minutes away from producing your first highly-customizable PDF document using Gravity Forms data.", 'gravity-forms-pdf-extended' ); ?>
 	</div>
 
 	<div class="gfpdf-badge"><?php printf( esc_html__( 'Version %s', 'gravity-forms-pdf-extended' ), $args['display_version'] ); ?></div>
@@ -121,7 +121,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<h3><?php esc_html_e( 'Custom Fonts', 'gravity-forms-pdf-extended' ); ?></h3>
 
-			<p><?php printf( esc_html__( 'Make your documents stand out by including your favourite fonts with our %ssimple font manager%s.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v4/user-custom-fonts/">', '</a>' ); ?></p>
+			<p><?php printf( esc_html__( 'Make your documents stand out by including your favorite fonts with our %ssimple font manager%s.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v4/user-custom-fonts/">', '</a>' ); ?></p>
 		</div>
 	</div>
 

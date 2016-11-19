@@ -101,7 +101,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</p>
 
 			<p>
-				<?php esc_html_e( "Once installed, you'll have full control over the font face, size and colour using our powerful settings interface.", 'gravity-forms-pdf-extended' ); ?>
+				<?php esc_html_e( "Once installed, you'll have full control over the font face, size and color using our powerful settings interface.", 'gravity-forms-pdf-extended' ); ?>
 			</p>
 
 			<p></p>
