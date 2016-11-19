@@ -5,9 +5,11 @@
  * Version: 1.1
  * Description: A minimalist business-style template that will generate a well-spaced document great for printing.
  * Author: Gravity PDF
+ * Author URI: https://gravitypdf.com
  * Group: Core
  * License: GPLv2
  * Required PDF Version: 4.0-alpha
+ * Tags: Header, Footer, Background, Optional HTML Fields, Optional Page Fields, Field Border Color
  */
 
 /* Prevent direct access to the template */

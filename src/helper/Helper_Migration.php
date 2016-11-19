@@ -105,6 +105,16 @@ class Helper_Migration {
 	protected $notices;
 
 	/**
+	 * Holds our Helper_Templates object
+	 * used to ease access to our PDF templates
+	 *
+	 * @var \GFPDF\Helper\Helper_Templates
+	 *
+	 * @since 4.0
+	 */
+	protected $templates;
+
+	/**
 	 * Load our model and view and required actions
 	 *
 	 * @param \GFPDF\Helper\Helper_Abstract_Form    $form
@@ -113,10 +123,11 @@ class Helper_Migration {
 	 * @param \GFPDF\Helper\Helper_Abstract_Options $options
 	 * @param \GFPDF\Helper\Helper_Misc             $misc
 	 * @param \GFPDF\Helper\Helper_Notices          $notices
+	 * @param \GFPDF\Helper\Helper_Templates        $templates
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Data $data, Helper_Abstract_Options $options, Helper_Misc $misc, Helper_Notices $notices ) {
+	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Data $data, Helper_Abstract_Options $options, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates ) {
 
 		/* Assign our internal variables */
 		$this->gform   = $gform;
@@ -125,6 +136,7 @@ class Helper_Migration {
 		$this->options = $options;
 		$this->misc    = $misc;
 		$this->notices = $notices;
+		$this->templates = $templates;
 	}
 
 	/**
@@ -183,7 +195,7 @@ class Helper_Migration {
 	 */
 	private function load_old_configuration() {
 
-		$path = $this->misc->get_template_path();
+		$path = $this->templates->get_template_path();
 
 		/* Import our configuration files */
 		if ( is_file( $path . 'configuration.php' ) ) {
@@ -471,7 +483,7 @@ class Helper_Migration {
 					/* Set our default fields */
 					$node['id']               = uniqid();
 					$node['active']           = true;
-					$node['name']             = $this->misc->human_readable( $node['template'] );
+					$node['name']             = $this->templates->human_readable_template_name( $node['template'] );
 					$node['conditionalLogic'] = '';
 
 
@@ -572,7 +584,7 @@ class Helper_Migration {
 	 * @since 4.0
 	 */
 	private function archive_v3_configuration() {
-		$path = $this->misc->get_template_path();
+		$path = $this->templates->get_template_path();
 
 		if ( is_file( $path . 'configuration.php' ) ) {
 			@rename( $path . 'configuration.php', $path . 'configuration.archive.php' );
@@ -588,7 +600,7 @@ class Helper_Migration {
 	 */
 	private function migrate_multisite_fonts() {
 		if ( is_multisite() ) {
-			$path = $this->misc->get_template_path();
+			$path = $this->templates->get_template_path();
 
 			/* Check if there is a fonts directory to migrate from and to */
 			if ( is_dir( $path . 'fonts' ) && is_dir( $this->data->template_font_location ) ) {
@@ -614,7 +626,7 @@ class Helper_Migration {
 	 * @since 4.0
 	 */
 	private function cleanup_output_directory() {
-		$output_dir = $this->misc->get_template_path() . 'output';
+		$output_dir = $this->templates->get_template_path() . 'output';
 
 		if ( is_dir( $output_dir ) ) {
 			return $this->misc->rmdir( $output_dir );

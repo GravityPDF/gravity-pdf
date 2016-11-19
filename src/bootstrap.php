@@ -127,6 +127,16 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public $misc;
 
 	/**
+	 * Holds our Helper_Templates object
+	 * used to ease access to our PDF templates
+	 *
+	 * @var \GFPDF\Helper\Helper_Templates
+	 *
+	 * @since 4.0
+	 */
+	public $templates;
+
+	/**
 	 * Makes our MVC classes sudo-singletons by allowing easy access to the original objects
 	 * through `$singleton->get_class();`
 	 *
@@ -207,8 +217,18 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->notices = new Helper\Helper_Notices();
 		$this->notices->init();
 
+		/* Setup our template helper */
+		$this->templates = new Helper\Helper_Templates( $this->log, $this->data );
+
 		/* Set up our options object - this is initialised on admin_init but other classes need to access its methods before this */
-		$this->options = new Helper\Helper_Options_Fields( $this->log, $this->gform, $this->data, $this->misc, $this->notices );
+		$this->options = new Helper\Helper_Options_Fields(
+			$this->log,
+			$this->gform,
+			$this->data,
+			$this->misc,
+			$this->notices,
+			$this->templates
+		);
 
 		/* Setup our Singleton object */
 		$this->singleton = new Helper\Helper_Singleton();
@@ -221,6 +241,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->pdf();
 		$this->shortcodes();
 		$this->actions();
+		$this->template_manager();
 
 		/* Add localisation support */
 		$this->add_localization_support();
@@ -445,13 +466,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	private function register_styles() {
 		$version = PDF_EXTENDED_VERSION;
-		$suffix  = '.min';
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG === true ) {
-			$suffix = '';
-		}
 
-		wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'src/assets/css/gfpdf-styles' . $suffix . '.css', [ 'wp-color-picker' ], $version );
-		wp_register_style( 'gfpdf_css_admin_styles', PDF_PLUGIN_URL . 'src/assets/css/gfpdf-admin-styles' . $suffix . '.css', [], $version );
+		wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'dist/assets/css/gfpdf-styles.min.css', [ 'wp-color-picker' ], $version );
+		wp_register_style( 'gfpdf_css_admin_styles', PDF_PLUGIN_URL . 'dist/assets/css/gfpdf-admin-styles.min.css', [], $version );
 		wp_register_style( 'gfpdf_css_chosen_style', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.min.css', [ 'wp-jquery-ui-dialog' ], $version );
 	}
 
@@ -461,42 +478,40 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @since 4.0
 	 *
 	 * @return void
-	 *
 	 */
 	private function register_scripts() {
-
 		$version = PDF_EXTENDED_VERSION;
-		$suffix  = '.min';
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG === true ) {
-			$suffix = '';
-		}
 
-		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-settings' . $suffix . '.js', [
+		$pdf_settings_dependancies = [
 			'wpdialogs',
 			'jquery-ui-tooltip',
 			'gform_forms',
 			'gform_form_admin',
 			'jquery-color',
 			'wp-color-picker',
-		], $version );
-		wp_register_script( 'gfpdf_js_backbone', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-backbone' . $suffix . '.js', [
+		];
+
+		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-settings.min.js', $pdf_settings_dependancies, $version );
+
+		$pdf_backbone_dependancies = [
 			'gfpdf_js_settings',
 			'backbone',
 			'underscore',
 			'gfpdf_js_backbone_model_binder',
 			'wpdialogs',
-		], $version );
-		wp_register_script( 'gfpdf_js_chosen', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.jquery.min.js', [ 'jquery' ], $version );
-		wp_register_script( 'gfpdf_js_backbone_model_binder', PDF_PLUGIN_URL . 'bower_components/backbone.modelbinder/Backbone.ModelBinder.min.js', [
-			'backbone',
-			'underscore',
-		], $version );
-		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-entries' . $suffix . '.js', [ 'jquery' ], $version );
-		wp_register_script( 'gfpdf_js_v3_migration', PDF_PLUGIN_URL . 'src/assets/js/gfpdf-migration' . $suffix . '.js', [ 'gfpdf_js_settings' ], $version );
+		];
 
-		/*
-        * Localise admin script
-        */
+		wp_register_script( 'gfpdf_js_backbone', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-backbone.min.js', $pdf_backbone_dependancies, $version ); /* @TODO - remove backbone and use React */
+		wp_register_script( 'gfpdf_js_backbone_model_binder', PDF_PLUGIN_URL . 'bower_components/backbone.modelbinder/Backbone.ModelBinder.min.js', [ 'backbone', 'underscore' ], $version );
+		wp_register_script( 'gfpdf_js_chosen', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.jquery.min.js', [ 'jquery' ], $version ); /* @TODO - remove and use Gravity Forms version */
+
+		wp_register_script( 'gfpdf_js_vendors', PDF_PLUGIN_URL . 'dist/assets/js/vendor.bundle.min.js', [ 'jquery' ], $version );
+		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'dist/assets/js/app.bundle.min.js', [ 'jquery', 'gfpdf_js_vendors' ], $version );
+		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-entries.min.js', [ 'jquery' ], $version );
+		wp_register_script( 'gfpdf_js_v3_migration', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-migration.min.js', [ 'gfpdf_js_settings' ], $version );
+
+		/* Localise admin script */
+		wp_localize_script( 'gfpdf_js_entrypoint', 'GFPDF', $this->data->get_localised_script_data( $this->options, $this->gform ) );
 		wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $this->data->get_localised_script_data( $this->options, $this->gform ) );
 	}
 
@@ -522,6 +537,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			/* add media uploader */
 			wp_enqueue_media();
 		}
+
+		wp_enqueue_script( 'gfpdf_js_entrypoint' );
 
 		if ( $this->misc->is_gfpdf_settings_tab( 'help' ) || $this->misc->is_gfpdf_settings_tab( 'tools' ) ) {
 			wp_enqueue_script( 'gfpdf_js_backbone' );
@@ -723,8 +740,25 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function gf_settings() {
 
-		$model = new Model\Model_Settings( $this->gform, $this->log, $this->notices, $this->options, $this->data, $this->misc );
-		$view  = new View\View_Settings( [], $this->gform, $this->log, $this->options, $this->data, $this->misc );
+		$model = new Model\Model_Settings(
+			$this->gform,
+			$this->log,
+			$this->notices,
+			$this->options,
+			$this->data,
+			$this->misc,
+			$this->templates
+		);
+
+		$view = new View\View_Settings(
+			[],
+			$this->gform,
+			$this->log,
+			$this->options,
+			$this->data,
+			$this->misc,
+			$this->templates
+		);
 
 		$class = new Controller\Controller_Settings( $model, $view, $this->gform, $this->log, $this->notices, $this->data, $this->misc );
 		$class->init();
@@ -744,10 +778,26 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function gf_form_settings() {
 
-		$model = new Model\Model_Form_Settings( $this->gform, $this->log, $this->data, $this->options, $this->misc, $this->notices );
-		$view  = new View\View_Form_Settings( [] );
+		$model = new Model\Model_Form_Settings(
+			$this->gform,
+			$this->log,
+			$this->data,
+			$this->options,
+			$this->misc,
+			$this->notices,
+			$this->templates
+		);
 
-		$class = new Controller\Controller_Form_Settings( $model, $view, $this->data, $this->options, $this->misc );
+		$view = new View\View_Form_Settings( [] );
+
+		$class = new Controller\Controller_Form_Settings(
+			$model,
+			$view,
+			$this->data,
+			$this->options,
+			$this->misc
+		);
+
 		$class->init();
 
 		/* Add to our singleton controller */
@@ -765,8 +815,25 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function pdf() {
 
-		$model = new Model\Model_PDF( $this->gform, $this->log, $this->options, $this->data, $this->misc, $this->notices );
-		$view  = new View\View_PDF( [], $this->gform, $this->log, $this->options, $this->data, $this->misc );
+		$model = new Model\Model_PDF(
+			$this->gform,
+			$this->log,
+			$this->options,
+			$this->data,
+			$this->misc,
+			$this->notices,
+			$this->templates
+		);
+
+		$view = new View\View_PDF(
+			[],
+			$this->gform,
+			$this->log,
+			$this->options,
+			$this->data,
+			$this->misc,
+			$this->templates
+		);
 
 		$class = new Controller\Controller_PDF( $model, $view, $this->gform, $this->log, $this->misc );
 		$class->init();
@@ -817,6 +884,25 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->singleton->add_class( $class );
 		$this->singleton->add_class( $model );
 		$this->singleton->add_class( $view );
+	}
+
+	/**
+	 * Include template manager functionality
+	 *
+	 * @since 4.0
+	 *
+	 * @return void
+	 */
+	public function template_manager() {
+
+		$model = new Model\Model_Templates( $this->templates, $this->log, $this->data, $this->misc );
+
+		$class = new Controller\Controller_Templates( $model );
+		$class->init();
+
+		/* Add to our singleton controller */
+		$this->singleton->add_class( $class );
+		$this->singleton->add_class( $model );
 	}
 
 	/**

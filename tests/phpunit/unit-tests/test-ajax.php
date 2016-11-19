@@ -485,4 +485,120 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 
 		$this->assertTrue( $response );
 	}
+
+
+	/**
+	 * Testing Model_Templates.php wp_ajax_gfpdf_upload_template
+	 *
+	 * Because this AJAX endpoint is suppose to have a zip file POSTed,
+	 * and because we cannot mock \Upload\File directly (see test-templates.php for specific tests)
+	 * we're just testing this endpoint requires authentication AND throws an error when
+	 * no file is posted.
+	 *
+	 * @since 4.1
+	 */
+	public function test_ajax_process_uploaded_template() {
+
+		/* set up our post data and role */
+		$this->_setRole( 'administrator' );
+
+		/* Check for nonce failure */
+		try {
+			$this->_handleAjax( 'gfpdf_upload_template' );
+		} catch ( WPAjaxDieStopException $e ) {
+			/* do nothing (error expected) */
+		}
+
+		$this->assertEquals( '401', $e->getMessage() );
+
+		/* Set up a bad request by excluding required fields */
+		$_POST['nonce'] = wp_create_nonce( 'gfpdf_ajax_nonce' );
+
+		try {
+			$this->_handleAjax( 'gfpdf_upload_template' );
+		} catch ( WPAjaxDieStopException $e ) {
+			/* do nothing (error expected) */
+		}
+
+		$this->assertEquals( '400', $e->getMessage() );
+	}
+
+	/**
+	 * Check that we can succesfully delete a PDF template through this AJAX endpoint
+	 *
+	 * @since 4.1
+	 */
+	public function test_ajax_process_delete_template() {
+		global $gfpdf;
+
+		/* set up our post data and role */
+		$this->_setRole( 'administrator' );
+
+		/* Check for nonce failure */
+		try {
+			$this->_handleAjax( 'gfpdf_delete_template' );
+		} catch ( WPAjaxDieStopException $e ) {
+			/* do nothing (error expected) */
+		}
+
+		$this->assertEquals( '401', $e->getMessage() );
+
+		/* Set up a bad request by excluding required fields */
+		$_POST['nonce'] = wp_create_nonce( 'gfpdf_ajax_nonce' );
+
+		try {
+			$this->_handleAjax( 'gfpdf_delete_template' );
+		} catch ( WPAjaxDieStopException $e ) {
+			/* do nothing (error expected) */
+		}
+
+		$this->assertEquals( '400', $e->getMessage() );
+
+		/* Create a test template and actually delete it */
+		$file = $gfpdf->data->template_location . 'zadani.php';
+		touch( $file );
+
+		$_POST['id'] = 'zadani';
+
+		try {
+			$this->_handleAjax( 'gfpdf_delete_template' );
+		} catch ( WPAjaxDieContinueException $e ) {
+			/* do nothing (error expected) */
+		}
+
+		$response = json_decode( $this->_last_response, true );
+		unset( $this->_last_response );
+
+		$this->assertTrue( $response );
+		$this->assertFileNotExists( $file );
+	}
+
+	/**
+	 *
+	 * @since 4.1
+	 */
+	public function test_ajax_process_build_template_options_html() {
+		/* set up our post data and role */
+		$this->_setRole( 'administrator' );
+
+		/* Check for nonce failure */
+		try {
+			$this->_handleAjax( 'gfpdf_get_template_options' );
+		} catch ( WPAjaxDieStopException $e ) {
+			/* do nothing (error expected) */
+		}
+
+		$this->assertEquals( '401', $e->getMessage() );
+
+		/* Set up a bad request by excluding required fields */
+		$_POST['nonce'] = wp_create_nonce( 'gfpdf_ajax_nonce' );
+
+		try {
+			$this->_handleAjax( 'gfpdf_get_template_options' );
+		} catch ( WPAjaxDieContinueException $e ) {
+			/* do nothing (error expected) */
+		}
+
+		$this->assertNotFalse( $this->_last_response, '<optgroup label="Core">' );
+	}
 }

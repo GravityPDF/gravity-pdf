@@ -213,6 +213,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		if ( $this->misc->is_gfpdf_page() ) {
 			add_filter( 'gfpdf_registered_fields', [ $this->model, 'highlight_errors' ] );
 			add_filter( 'admin_notices', 'settings_errors' );
+			add_filter( 'gfpdf_localised_script_array', array( $this->model, 'get_template_data' ) );
 		}
 
 		/* make capability text user friendly */
@@ -224,9 +225,6 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 
 		/* allow TTF and OTF uploads */
 		add_filter( 'upload_mimes', [ $this, 'allow_font_uploads' ] );
-
-		/* Add a sample image of what the template looks like */
-		add_filter( 'gfpdf_settings_general', [ $this->misc, 'add_template_image' ] );
 	}
 
 	/**

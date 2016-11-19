@@ -31,8 +31,10 @@ node_modules/*
 *.iws
 
 ## Plugin-specific files:
-.min.css
-.min.js
+*.min.css
+*.min.js
+*.map
+
 
 # Unit tests
 /tmp

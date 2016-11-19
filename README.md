@@ -13,10 +13,11 @@ The `development` branch is considered our bleeding edge branch, with all new ch
 
 # Installation
 
+Before beginning, ensure you have [Git](https://git-scm.com/), [Composer](https://getcomposer.org/) and [NPM](https://docs.npmjs.com/) installed and their commands are globally accessible via the command line.
+
 1. Clone the repository using `git clone https://github.com/GravityPDF/gravity-pdf/`
-1. Open your terminal / command prompt to the Gravity PDF root directory and run `composer install`. If you don't have Composer installed, here are instructions [for Linux / Mac installation](https://getcomposer.org/doc/00-intro.md#installation-linux-unix-osx) and [Windows](https://getcomposer.org/doc/00-intro.md#installation-windows).
-1. You'll need to ensure `WP_DEBUG` is set to `true` in your `wp-config.php` file so the appropriate assets are loaded. Alternatively, if you have [Node.js](https://nodejs.org/en/) and [Gulp](http://gulpjs.com/) installed you can run `npm install && gulp` from the command line.
-1. Copy the plugin to your WordPress plugin directory (if not there already) and active through your WordPress admin area.
+1. Open your terminal / command prompt to the Gravity PDF root directory and run `composer install`. This command will automatically download all the PHP and JS packages, and run the build tools.
+1. Copy the plugin to your WordPress plugin directory (if not there already) and active through your WordPress admin area
 
 # Documentation
 
@@ -28,7 +29,7 @@ You are more than welcome to contribute to Gravity PDF but we recommend you [ope
 
 There are a few guidelines that need to be followed to ensure a smooth pull request. These include:
 
-1. Adhere to the existing code standard which follows [WordPress standards](https://make.wordpress.org/core/handbook/best-practices/coding-standards/php/).
+1. Adhere to the existing code standard which follows [WordPress standards](https://make.wordpress.org/core/handbook/best-practices/coding-standards/php/), with the exception of Yoda conditionals.
 1. All PRs must be to the `development` branch.
 1. Modifications of the existing codebase must pass all unit tests.
 1. Any additions to the plugin must have appropriate unit tests written.
@@ -37,11 +38,31 @@ There are a few guidelines that need to be followed to ensure a smooth pull requ
 
 If you are uncertain whether your PR meets all these requirements, don't worry! If there are problems our friendly team will guide you in the right direction.
 
-#### Run Unit Tests
+### Run Unit Tests
 
-The plugin uses PHPUnit as part of the development process. Installing the testing environment is best done using a flavour of Vagrant (try [Varying Vagrant Vagrants](https://github.com/Varying-Vagrant-Vagrants/VVV)).
+#### PHPUnit (PHP)
+
+We use PHPUnit to test out all the PHP we write. The tests are located in `tests/phpunit/unit-tests/`
+
+Installing the testing environment is best done using a flavour of Vagrant (try [Varying Vagrant Vagrants](https://github.com/Varying-Vagrant-Vagrants/VVV)).
 
 1. From your terminal SSH into your Vagrant box using the `vagrant ssh` command
 2. `cd` into the root of your Gravity PDF directory
 3. Run `bash tests/bin/install.sh gravitypdf_test root root localhost` where `root root` is substituted for your mysql username and password (VVV users can run the command as is).
 4. Upon success you can run `vendor/bin/phpunit`, `vendor/bin/phpunit --group ajax` and `vendor/bin/phpunit --group slow-pdf-processes`.
+
+#### Mocha (JS)
+
+We use the JS libaries, [Mocha](https://mochajs.org/), [Chai](http://chaijs.com/) and [Sinon](http://sinonjs.org/) to test our Javascript and use [Karma](https://karma-runner.github.io/1.0/index.html) to run those tests in a variety of browsers. We also use [Enzyme](https://github.com/airbnb/enzyme) to help test ReactJS.
+
+The tests are located in `tests/mocha/unit-tests/`.
+
+Running the tests can easily be done with one of the following commands:
+
+* `npm run-script test` – runs all the tests once in PhantomJS
+* `npm run-script test:watch` – watches for changes to the tests and runs in PhantomJS
+* `npm run-script test:all` – runs all tests in Firefox, Chrome and Internet Explorer
+ 
+### Building JS
+
+We use Webpack to compile our Javascript from ES6 to ES5. If you want to modify the Javascript then take advantage of `npm run-script watch` to automatically re-build the JS when changes are made.

@@ -194,7 +194,11 @@ class Helper_Data {
 
 		return apply_filters( 'gfpdf_localised_script_array', [
 			'ajaxurl'                     => admin_url( 'admin-ajax.php' ),
+			'ajaxNonce'                   => wp_create_nonce( 'gfpdf_ajax_nonce' ),
+			'currentVersion'              => PDF_EXTENDED_VERSION,
+			'pdf_working_dir'             => PDF_TEMPLATE_LOCATION,
 			'GFbaseUrl'                   => $gform->get_plugin_url(),
+			'pluginPath'                  => PDF_PLUGIN_DIR,
 			'pluginUrl'                   => PDF_PLUGIN_URL,
 			'spinnerUrl'                  => admin_url( 'images/spinner-2x.gif' ),
 			'spinnerAlt'                  => esc_html__( 'Loading...', 'gravity-forms-pdf-extended' ),
@@ -223,7 +227,17 @@ class Helper_Data {
 			'migration_error_generic'     => esc_html__( 'Site #%s migration errors.', 'gravity-forms-pdf-extended' ),
 			'no_pdfs_found'               => esc_html__( "This form doesn't have any PDFs.", 'gravity-forms-pdf-extended' ),
 			'no_pdfs_found_link'          => esc_html__( "Let's go create one", 'gravity-forms-pdf-extended' ),
-			'no_template_preview'         => esc_html__( "No Template Preview Available", 'gravity-forms-pdf-extended' ),
+			'advanced_templates'          => esc_html__( 'Advanced', 'gravity-forms-pdf-extended' ),
+			'activate'                    => esc_html__( 'Activate', 'gravity-forms-pdf-extended' ),
+			'add_new_template'            => esc_html__( 'Add New Template', 'gravity-forms-pdf-extended' ),
+			'template_filename_error'     => esc_html__( 'Upload is not a valid template. Upload a .zip file.', 'gravity-forms-pdf-extended' ),
+			'template_filesize_error'     => esc_html__( 'Upload exceeds the 2MB limit.', 'gravity-forms-pdf-extended' ),
+			'template_install_success'    => esc_html__( 'Template successfully installed', 'gravity-forms-pdf-extended' ),
+			'installUpdatedText'          => esc_html__( 'Template successfully updated', 'gravity-forms-pdf-extended' ),
+			'generic_upload_failure'      => esc_html__( 'There was a problem with the upload. Reload the page and try again.', 'gravity-forms-pdf-extended' ),
+			'template_confirm_delete'     => esc_html__( "Do you really want to delete this PDF template?\n\nClick 'Cancel' to go back, 'OK' to confirm the delete.", 'gravity-forms-pdf-extended' ),
+			'templateDeleteError'         => esc_html__( 'Could not delete template.', 'gravity-forms-pdf-extended' ),
+			'templateHeader'              => esc_html__( 'Installed PDFs', 'gravity-forms-pdf-extended' ),
 		] );
 	}
 }

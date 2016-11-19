@@ -11,6 +11,7 @@ use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Helper\Helper_Templates;
 
 use Psr\Log\LoggerInterface;
 
@@ -123,6 +124,16 @@ class View_PDF extends Helper_Abstract_View {
 	protected $misc;
 
 	/**
+	 * Holds our Helper_Templates object
+	 * used to ease access to our PDF templates
+	 *
+	 * @var \GFPDF\Helper\Helper_Templates
+	 *
+	 * @since 4.0
+	 */
+	protected $templates;
+
+	/**
 	 * Setup our class by injecting all our dependancies
 	 *
 	 * @param array                                          $data_cache An array of data to pass to the view
@@ -131,20 +142,22 @@ class View_PDF extends Helper_Abstract_View {
 	 * @param \GFPDF\Helper\Helper_Abstract_Options          $options    Our options class which allows us to access any settings
 	 * @param \GFPDF\Helper\Helper_Data                      $data       Our plugin data store
 	 * @param \GFPDF\Helper\Helper_Misc                      $misc       Our miscellanious methods
+	 * @param \GFPDF\Helper\Helper_Templates                 $templates
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $data_cache = [], Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc ) {
+	public function __construct( $data_cache = [], Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates ) {
 
 		/* Call our parent constructor */
 		parent::__construct( $data_cache );
 
 		/* Assign our internal variables */
-		$this->gform   = $gform;
-		$this->log     = $log;
-		$this->options = $options;
-		$this->data    = $data;
-		$this->misc    = $misc;
+		$this->gform     = $gform;
+		$this->log       = $log;
+		$this->options   = $options;
+		$this->data      = $data;
+		$this->misc      = $misc;
+		$this->templates = $templates;
 	}
 
 	/**
@@ -161,13 +174,22 @@ class View_PDF extends Helper_Abstract_View {
 
 		$controller = $this->getController();
 		$model      = $controller->model;
+		$form       = $this->gform->get_form( $entry['form_id'] );
 
 		/**
 		 * Load our arguments that should be accessed by our PDF template
 		 *
 		 * @var array
 		 */
-		$args = $this->misc->get_template_args( $entry, $settings );
+		$args = $this->templates->get_template_arguments(
+			$form,
+			$this->misc->get_fields_sorted_by_id( $form['id'] ),
+			$entry,
+			$model->get_form_data( $entry ),
+			$settings,
+			$this->templates->get_config_class( $settings['template'] ),
+			$this->misc->get_legacy_ids( $entry['id'], $settings )
+		);
 
 		/**
 		 * Show $form_data array if requested
@@ -185,7 +207,7 @@ class View_PDF extends Helper_Abstract_View {
 		/**
 		 * Set out our PDF abstraction class
 		 */
-		$pdf = new Helper_PDF( $entry, $settings, $this->gform, $this->data );
+		$pdf = new Helper_PDF( $entry, $settings, $this->gform, $this->data, $this->misc, $this->templates );
 		$pdf->set_filename( $model->get_pdf_name( $settings, $entry ) );
 
 		try {
@@ -517,7 +539,11 @@ class View_PDF extends Helper_Abstract_View {
 	 */
 	public function autoprocess_core_template_options( $html, $form, $entry, $settings ) {
 		/* Prevent core styles loading if a v3 template or using our legacy Tier 2 add-on */
-		if ( 'legacy' !== $this->options->get_template_group( $settings['template'] ) && ( empty( $settings['advanced_template'] ) || 'Yes' !== $settings['advanced_template'] ) ) {
+		$template_info = $this->templates->get_template_info_by_id( $settings['template'] );
+		if (
+			( esc_html__( 'Legacy', 'gravity-forms-pdf-extended' ) !== $template_info['group'] ) &&
+			( empty( $settings['advanced_template'] ) || 'Yes' !== $settings['advanced_template'] )
+		) {
 			$html = $this->get_core_template_styles( $settings, $entry ) . $html;
 		}
 
