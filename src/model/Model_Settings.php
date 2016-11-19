@@ -687,7 +687,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		$return        = true;
 
 		/* create our file */
-		@touch( $tmp_dir . $tmp_test_file );
+		file_put_contents( $tmp_dir . $tmp_test_file, 'failed-if-read' );
 
 		/* verify it exists */
 		if ( is_file( $tmp_dir . $tmp_test_file ) ) {
@@ -701,8 +701,9 @@ class Model_Settings extends Helper_Abstract_Model {
 
 				if ( ! is_wp_error( $response ) ) {
 
-					/* Check if the web server responded with a OK status code and fail our test */
-					if ( isset( $response['response']['code'] ) && $response['response']['code'] === 200 ) {
+					/* Check if the web server responded with a OK status code and we can read the contents of our file, then fail our test */
+					if ( isset( $response['response']['code'] ) && $response['response']['code'] === 200 &&
+					     isset( $response['body'] ) && $response['body'] === 'failed-if-read' ) {
 						$return = false;
 					}
 				}
