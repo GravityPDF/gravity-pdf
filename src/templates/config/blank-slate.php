@@ -69,10 +69,10 @@ class Blank_Slate implements Helper_Interface_Config {
 	 */
 	public function configuration() {
 
-		return array(
+		return [
 
 			/* Enable core fields */
-			'core' => array(
+			'core' => [
 				'show_form_title'      => true,
 				'show_page_names'      => true,
 				'show_html'            => true,
@@ -85,8 +85,8 @@ class Blank_Slate implements Helper_Interface_Config {
 				'first_footer'         => true,
 				'background_color'     => true,
 				'background_image'     => true,
-			),
+			],
 
-		);
+		];
 	}
 }

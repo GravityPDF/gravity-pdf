@@ -82,7 +82,7 @@ class Field_Survey extends Helper_Abstract_Fields {
 
 				/* See https://gravitypdf.com/documentation/v4/gfpdf_field_class/ for more details about these filters */
 				$this->fieldObject = apply_filters( 'gfpdf_field_class', new $class( $field, $entry, $gform, $misc ), $field, $entry, $this->form );
-				$this->fieldObject = apply_filters( 'gfpdf_field_class_' . $field->inputType , $this->fieldObject, $field, $entry, $this->form );
+				$this->fieldObject = apply_filters( 'gfpdf_field_class_' . $field->inputType, $this->fieldObject, $field, $entry, $this->form );
 			} else {
 				throw new Exception();
 			}
@@ -130,7 +130,7 @@ class Field_Survey extends Helper_Abstract_Fields {
 	 */
 	public function form_data() {
 
-		$data     = array();
+		$data     = [];
 		$field_id = (int) $this->field->id;
 
 		/* Provide backwards compatibility fixes to certain fields */
@@ -146,7 +146,7 @@ class Field_Survey extends Helper_Abstract_Fields {
 					$item = esc_html( $value );
 				}, $value );
 
-				break;
+			break;
 
 			case 'checkbox':
 				$value = $this->get_value();
@@ -159,7 +159,7 @@ class Field_Survey extends Helper_Abstract_Fields {
 					}
 				}
 
-				$value = array( $value );
+				$value = [ $value ];
 				$label = GFFormsModel::get_label( $this->field );
 
 				/* Gravity PDF v3 backwards compatibility. Check if nothing is selected and return blank */
@@ -171,13 +171,13 @@ class Field_Survey extends Helper_Abstract_Fields {
 				$data[ $field_id ]                = $value;
 				$data[ $label ]                   = $value;
 
-				$data = array( 'field' => $data );
+				$data = [ 'field' => $data ];
 
-				break;
+			break;
 
 			default:
 				$data = $this->get_form_data();
-				break;
+			break;
 		}
 
 		return $data;

@@ -50,7 +50,7 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 *
 	 * @since 4.0
 	 */
-	private $notices = array();
+	private $notices = [];
 
 	/**
 	 * Holds any errors that we've triggered
@@ -59,7 +59,7 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 *
 	 * @since 4.0
 	 */
-	private $errors = array();
+	private $errors = [];
 
 	/**
 	 * Initialise our class defaults
@@ -80,7 +80,7 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 * @return void
 	 */
 	public function add_actions() {
-		add_action( $this->get_notice_type(), array( $this, 'process' ) );
+		add_action( $this->get_notice_type(), [ $this, 'process' ] );
 	}
 
 	/**
@@ -176,11 +176,11 @@ class Helper_Notices implements Helper_Interface_Actions {
 	public function clear( $type = 'all' ) {
 
 		if ( 'errors' === $type || 'all' === $type ) {
-			$this->errors = array();
+			$this->errors = [];
 		}
 
 		if ( 'notices' === $type || 'all' === $type ) {
-			$this->notices = array();
+			$this->notices = [];
 		}
 	}
 

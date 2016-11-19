@@ -60,49 +60,49 @@ class Test_Autoloader extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function provider_classes() {
-		return array(
-			array( 'GFPDF\Controller\Controller_Actions' ),
-			array( 'Controller_Activation' ),
-			array( 'GFPDF\Controller\Controller_Form_Settings' ),
-			array( 'GFPDF\Controller\Controller_Install' ),
-			array( 'GFPDF\Controller\Controller_PDF' ),
-			array( 'GFPDF\Controller\Controller_Settings' ),
-			array( 'GFPDF\Controller\Controller_Shortcodes' ),
-			array( 'GFPDF\Controller\Controller_Welcome_Screen' ),
+		return [
+			[ 'GFPDF\Controller\Controller_Actions' ],
+			[ 'Controller_Activation' ],
+			[ 'GFPDF\Controller\Controller_Form_Settings' ],
+			[ 'GFPDF\Controller\Controller_Install' ],
+			[ 'GFPDF\Controller\Controller_PDF' ],
+			[ 'GFPDF\Controller\Controller_Settings' ],
+			[ 'GFPDF\Controller\Controller_Shortcodes' ],
+			[ 'GFPDF\Controller\Controller_Welcome_Screen' ],
 
-			array( 'GFPDF\Helper\Helper_Abstract_Controller' ),
-			array( 'GFPDF\Helper\Helper_Abstract_Fields' ),
-			array( 'GFPDF\Helper\Helper_Abstract_Form' ),
-			array( 'GFPDF\Helper\Helper_Abstract_Model' ),
-			array( 'GFPDF\Helper\Helper_Abstract_View' ),
+			[ 'GFPDF\Helper\Helper_Abstract_Controller' ],
+			[ 'GFPDF\Helper\Helper_Abstract_Fields' ],
+			[ 'GFPDF\Helper\Helper_Abstract_Form' ],
+			[ 'GFPDF\Helper\Helper_Abstract_Model' ],
+			[ 'GFPDF\Helper\Helper_Abstract_View' ],
 
-			array( 'GFPDF\Helper\Helper_Data' ),
-			array( 'GFPDF\Helper\Helper_Field_Container' ),
-			array( 'GFPDF\Helper\Helper_Form' ),
-			array( 'GFPDF\Helper\Helper_Migration' ),
-			array( 'GFPDF\Helper\Helper_Misc' ),
-			array( 'GFPDF\Helper\Helper_Notices' ),
-			array( 'GFPDF\Helper\Helper_Abstract_Options' ),
-			array( 'GFPDF\Helper\Helper_Options_Fields' ),
-			array( 'GFPDF\Helper\Helper_PDF' ),
-			array( 'GFPDF\Helper\Helper_PDF_List_Table' ),
+			[ 'GFPDF\Helper\Helper_Data' ],
+			[ 'GFPDF\Helper\Helper_Field_Container' ],
+			[ 'GFPDF\Helper\Helper_Form' ],
+			[ 'GFPDF\Helper\Helper_Migration' ],
+			[ 'GFPDF\Helper\Helper_Misc' ],
+			[ 'GFPDF\Helper\Helper_Notices' ],
+			[ 'GFPDF\Helper\Helper_Abstract_Options' ],
+			[ 'GFPDF\Helper\Helper_Options_Fields' ],
+			[ 'GFPDF\Helper\Helper_PDF' ],
+			[ 'GFPDF\Helper\Helper_PDF_List_Table' ],
 
-			array( 'GFPDF\Model\Model_Actions' ),
-			array( 'GFPDF\Model\Model_Form_Settings' ),
-			array( 'GFPDF\Model\Model_Install' ),
-			array( 'GFPDF\Model\Model_PDF' ),
-			array( 'GFPDF\Model\Model_Settings' ),
-			array( 'GFPDF\Model\Model_Shortcodes' ),
-			array( 'GFPDF\Model\Model_Welcome_Screen' ),
+			[ 'GFPDF\Model\Model_Actions' ],
+			[ 'GFPDF\Model\Model_Form_Settings' ],
+			[ 'GFPDF\Model\Model_Install' ],
+			[ 'GFPDF\Model\Model_PDF' ],
+			[ 'GFPDF\Model\Model_Settings' ],
+			[ 'GFPDF\Model\Model_Shortcodes' ],
+			[ 'GFPDF\Model\Model_Welcome_Screen' ],
 
-			array( 'GFPDF\View\View_Actions' ),
-			array( 'GFPDF\View\View_Form_Settings' ),
-			array( 'GFPDF\View\View_PDF' ),
-			array( 'GFPDF\View\View_Settings' ),
-			array( 'GFPDF\View\View_Shortcodes' ),
-			array( 'GFPDF\View\View_Welcome_Screen' ),
+			[ 'GFPDF\View\View_Actions' ],
+			[ 'GFPDF\View\View_Form_Settings' ],
+			[ 'GFPDF\View\View_PDF' ],
+			[ 'GFPDF\View\View_Settings' ],
+			[ 'GFPDF\View\View_Shortcodes' ],
+			[ 'GFPDF\View\View_Welcome_Screen' ],
 
-		);
+		];
 	}
 
 	/**
@@ -124,11 +124,11 @@ class Test_Autoloader extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function provider_interfaces() {
-		return array(
-			array( 'GFPDF\Helper\Helper_Interface_Actions' ),
-			array( 'GFPDF\Helper\Helper_Interface_Config' ),
-			array( 'GFPDF\Helper\Helper_Interface_Filters' ),
-		);
+		return [
+			[ 'GFPDF\Helper\Helper_Interface_Actions' ],
+			[ 'GFPDF\Helper\Helper_Interface_Config' ],
+			[ 'GFPDF\Helper\Helper_Interface_Filters' ],
+		];
 	}
 
 	/**
@@ -149,19 +149,19 @@ class Test_Autoloader extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function provider_composer_dependancies() {
-		return array(
-			array( 'mPDF' ),
-			array( 'QueryPath' ),
-			array( 'Monolog\Logger' ),
-			array( 'Monolog\Processor\IntrospectionProcessor' ),
-			array( 'Monolog\Processor\MemoryPeakUsageProcessor' ),
-			array( 'Monolog\Handler\NullHandler' ),
-			array( 'Monolog\Formatter\LineFormatter' ),
-			array( 'Monolog\Handler\StreamHandler' ),
-			array( 'Monolog\Formatter\LogglyFormatter' ),
-			array( 'Monolog\Handler\LogglyHandler' ),
-			array( 'Monolog\Handler\BufferHandler' ),
-			array( 'Monolog\Processor\WebProcessor' ),
-		);
+		return [
+			[ 'mPDF' ],
+			[ 'QueryPath' ],
+			[ 'Monolog\Logger' ],
+			[ 'Monolog\Processor\IntrospectionProcessor' ],
+			[ 'Monolog\Processor\MemoryPeakUsageProcessor' ],
+			[ 'Monolog\Handler\NullHandler' ],
+			[ 'Monolog\Formatter\LineFormatter' ],
+			[ 'Monolog\Handler\StreamHandler' ],
+			[ 'Monolog\Formatter\LogglyFormatter' ],
+			[ 'Monolog\Handler\LogglyHandler' ],
+			[ 'Monolog\Handler\BufferHandler' ],
+			[ 'Monolog\Processor\WebProcessor' ],
+		];
 	}
 }

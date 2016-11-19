@@ -90,7 +90,7 @@ class Field_Signature extends Helper_Abstract_Fields {
 	 */
 	public function form_data() {
 
-		$data = array();
+		$data = [];
 
 		$value = $this->value();
 
@@ -157,13 +157,13 @@ class Field_Signature extends Helper_Abstract_Fields {
 		/*
          * Build our signature array
          */
-		$value = array(
+		$value = [
 			'img'    => $html,
 			'path'   => $signature,
 			'url'    => $signature_upload_url . $signature_name,
 			'width'  => $width,
 			'height' => $height,
-		);
+		];
 
 		$this->cache( $value );
 

@@ -141,9 +141,9 @@ class Helper_Migration {
 			$raw_config = $this->load_old_configuration();
 		} catch ( Exception $e ) {
 
-			$this->log->addError( 'Migration Error', array(
+			$this->log->addError( 'Migration Error', [
 				'exception' => $e->getMessage(),
-			) );
+			] );
 
 			$this->notices->add_error( esc_html__( 'There was a problem processing the action. Please try again.', 'gravity-forms-pdf-extended' ) );
 
@@ -192,10 +192,10 @@ class Helper_Migration {
 			throw new Exception( 'Could not locate v3 configuration file.' );
 		}
 
-		return array(
-			'default' => ( isset( $gf_pdf_default_configuration ) && is_array( $gf_pdf_default_configuration ) ) ? $gf_pdf_default_configuration : array(),
-			'config'  => ( isset( $gf_pdf_config ) && is_array( $gf_pdf_config ) ) ? $gf_pdf_config : array(),
-		);
+		return [
+			'default' => ( isset( $gf_pdf_default_configuration ) && is_array( $gf_pdf_default_configuration ) ) ? $gf_pdf_default_configuration : [],
+			'config'  => ( isset( $gf_pdf_config ) && is_array( $gf_pdf_config ) ) ? $gf_pdf_config : [],
+		];
 	}
 
 	/**
@@ -209,7 +209,7 @@ class Helper_Migration {
 	 */
 	private function convert_v3_to_v4( $raw_config ) {
 
-		$migration_key = array(
+		$migration_key = [
 			'notifications'                => 'notification',
 			'premium'                      => 'advanced_template',
 			'access'                       => 'public_access',
@@ -221,7 +221,7 @@ class Helper_Migration {
 			'default-show-empty'           => 'show_empty',
 			'default-show-page-names'      => 'show_page_names',
 			'default-show-section-content' => 'show_section_content',
-		);
+		];
 
 		foreach ( $raw_config['config'] as &$node ) {
 			$node = $this->process_individual_v3_nodes( $node, $migration_key );
@@ -242,7 +242,7 @@ class Helper_Migration {
 	 *
 	 * @since 4.0
 	 */
-	private function process_individual_v3_nodes( $node, $migration_key = array() ) {
+	private function process_individual_v3_nodes( $node, $migration_key = [] ) {
 
 		/* Handle PDFA1B and PDFX1A separately */
 		if ( isset( $node['pdfa1b'] ) && $node['pdfa1b'] === true ) {
@@ -296,7 +296,7 @@ class Helper_Migration {
 		foreach ( $node as $id => &$val ) {
 
 			/* Convert our boolean values into 'Yes' or 'No' responses, with the exception of notification */
-			$skip_nodes = array( 'notifications', 'notification' );
+			$skip_nodes = [ 'notifications', 'notification' ];
 			if ( ! in_array( $id, $skip_nodes ) ) {
 				$val = $this->misc->update_depreciated_config( $val );
 			}
@@ -323,11 +323,11 @@ class Helper_Migration {
 	private function process_v3_configuration( $raw_config ) {
 
 		if ( ! is_array( $raw_config['config'] ) || sizeof( $raw_config['config'] ) == 0 ) {
-			return array();
+			return [];
 		}
 
 		/* Store configuration by form ID */
-		$config_by_fid = array();
+		$config_by_fid = [];
 
 		foreach ( $raw_config['config'] as $node ) {
 
@@ -377,7 +377,7 @@ class Helper_Migration {
 			$forms = $this->gform->get_forms();
 
 			/* Create an index of current form IDs */
-			$form_ids = array();
+			$form_ids = [];
 			foreach ( $raw_config['config'] as $config ) {
 
 				if ( is_array( $config['form_id'] ) ) {
@@ -395,7 +395,7 @@ class Helper_Migration {
 				/* If nothing exists we'll merge in our default parameters */
 				if ( ! isset( $form_ids[ $form['id'] ] ) ) {
 
-					$new_config             = array_merge( $raw_config['default'], array( 'form_id' => $form['id'] ) );
+					$new_config             = array_merge( $raw_config['default'], [ 'form_id' => $form['id'] ] );
 					$raw_config['config'][] = $new_config;
 				}
 			}
@@ -435,7 +435,7 @@ class Helper_Migration {
 	 */
 	private function import_v3_config( $config ) {
 
-		$errors = array();
+		$errors = [];
 
 		/* Loop through forms and attempt to get the form data */
 		foreach ( $config as $form_id => $nodes ) {
@@ -444,10 +444,10 @@ class Helper_Migration {
 			if ( ! is_wp_error( $form ) ) {
 
 				/* Get an array of all the form notification for later use */
-				$notifications = array();
+				$notifications = [];
 
 				/* Filter out the save and continue notifications */
-				$omit = array( 'form_saved', 'form_save_email_requested' );
+				$omit = [ 'form_saved', 'form_save_email_requested' ];
 
 				foreach ( $form['notifications'] as $notification ) {
 					$event = ( isset( $notification['event'] ) ) ? $notification['event'] : '';
@@ -458,7 +458,7 @@ class Helper_Migration {
 				}
 
 				/* Hold name in array so we can prevent duplicates */
-				$name = array();
+				$name = [];
 
 				/* Loop through the nodes and add to our form array */
 				foreach ( $nodes as $node ) {
@@ -499,10 +499,10 @@ class Helper_Migration {
 
 							/* Turn into array if not already */
 							if ( ! is_array( $node['notification'] ) ) {
-								$node['notification'] = array( $node['notification'] );
+								$node['notification'] = [ $node['notification'] ];
 							}
 
-							$new_notification = array();
+							$new_notification = [];
 							foreach ( $node['notification'] as $email ) {
 								$match = array_search( $email, $notifications );
 
@@ -524,15 +524,15 @@ class Helper_Migration {
 
 					if ( $results ) {
 						/* return the ID if successful */
-						$this->log->addNotice( 'Successfully Added.', array(
+						$this->log->addNotice( 'Successfully Added.', [
 							'pdf' => $node,
-						) );
+						] );
 					} else {
 						/* Log errors */
-						$this->log->addError( 'Error Saving.', array(
+						$this->log->addError( 'Error Saving.', [
 							'error' => $results,
 							'pdf'   => $node,
-						) );
+						] );
 
 						$node['form_id'] = $form_id;
 						$errors[]        = $node;
@@ -593,8 +593,8 @@ class Helper_Migration {
 			/* Check if there is a fonts directory to migrate from and to */
 			if ( is_dir( $path . 'fonts' ) && is_dir( $this->data->template_font_location ) ) {
 				$fonts = glob( $path . 'fonts/' . '*.{otf,ttf,OTF,TTF}', GLOB_BRACE );
-				$fonts = ( is_array( $fonts ) ) ? $fonts : array();
-				
+				$fonts = ( is_array( $fonts ) ) ? $fonts : [];
+
 				foreach ( $fonts as $font ) {
 					$font_name = basename( $font );
 					@copy( $font, $this->data->template_font_location . $font_name );

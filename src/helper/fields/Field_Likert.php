@@ -87,7 +87,7 @@ class Field_Likert extends Helper_Abstract_Fields {
 	 */
 	public function form_data() {
 
-		$data  = array();
+		$data  = [];
 		$value = $this->value();
 
 		$data['survey']['likert'][ $this->field->id ] = $value;
@@ -128,7 +128,7 @@ class Field_Likert extends Helper_Abstract_Fields {
 		/*
          * Process Single and Multi Column Likerts
          */
-		$likert = array();
+		$likert = [];
 
 		/*
          * Get the column names

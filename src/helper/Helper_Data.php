@@ -69,7 +69,7 @@ class Helper_Data {
 	 *
 	 * @since 4.0
 	 */
-	private $data = array();
+	private $data = [];
 
 	/**
 	 * PHP Magic Method __set()
@@ -149,7 +149,7 @@ class Helper_Data {
 	 * @since  3.8
 	 */
 	public function set_addon_details() {
-		$this->addon = array();
+		$this->addon = [];
 	}
 
 	/**
@@ -191,7 +191,8 @@ class Helper_Data {
 		$custom_fonts = array_values( $options->get_custom_fonts() );
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_localised_script_array/ for more details about this filter */
-		return apply_filters( 'gfpdf_localised_script_array', array(
+
+		return apply_filters( 'gfpdf_localised_script_array', [
 			'ajaxurl'                     => admin_url( 'admin-ajax.php' ),
 			'GFbaseUrl'                   => $gform->get_plugin_url(),
 			'pluginUrl'                   => PDF_PLUGIN_URL,
@@ -223,6 +224,6 @@ class Helper_Data {
 			'no_pdfs_found'               => esc_html__( "This form doesn't have any PDFs.", 'gravity-forms-pdf-extended' ),
 			'no_pdfs_found_link'          => esc_html__( "Let's go create one", 'gravity-forms-pdf-extended' ),
 			'no_template_preview'         => esc_html__( "No Template Preview Available", 'gravity-forms-pdf-extended' ),
-		) );
+		] );
 	}
 }

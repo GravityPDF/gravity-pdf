@@ -84,7 +84,7 @@ class Field_List extends Helper_Abstract_Fields {
 	 */
 	public function form_data() {
 
-		$data  = array();
+		$data  = [];
 		$label = GFFormsModel::get_label( $this->field );
 		$html  = $this->html();
 
@@ -132,13 +132,13 @@ class Field_List extends Helper_Abstract_Fields {
 			<!-- Loop through the column names and output in a header (if using the advanced list) -->
 			<?php if ( $columns ) : $columns = array_keys( $value[0] ); ?>
 				<tbody class="head">
-					<tr>
-						<?php foreach ( $columns as $column ) : ?>
-							<th>
-								<?php echo esc_html( $column ); ?>
-							</th>
-						<?php endforeach; ?>
-					</tr>
+				<tr>
+					<?php foreach ( $columns as $column ) : ?>
+						<th>
+							<?php echo esc_html( $column ); ?>
+						</th>
+					<?php endforeach; ?>
+				</tr>
 				</tbody>
 			<?php endif; ?>
 
@@ -184,7 +184,7 @@ class Field_List extends Helper_Abstract_Fields {
 
 		/* make sure value is an array */
 		if ( ! is_array( $value ) ) {
-			$value = array( $value );
+			$value = [ $value ];
 		}
 
 		/* Remove empty rows */
@@ -226,7 +226,7 @@ class Field_List extends Helper_Abstract_Fields {
 
 					/* Check if there is data and if so break the loop */
 					if ( strlen( trim( $col ) ) > 0 ) {
-						$col = esc_html( $col );
+						$col   = esc_html( $col );
 						$empty = false;
 					}
 				}

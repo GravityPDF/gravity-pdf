@@ -149,11 +149,11 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	 * @return void
 	 */
 	public function add_actions() {
-		add_action( 'admin_init', array( $this, 'maybe_uninstall' ) );
-		add_action( 'wp_loaded', array( $this, 'check_install_status' ), 9999 );
+		add_action( 'admin_init', [ $this, 'maybe_uninstall' ] );
+		add_action( 'wp_loaded', [ $this, 'check_install_status' ], 9999 );
 
 		/* rewrite endpoints */
-		add_action( 'init', array( $this->model, 'register_rewrite_rules' ) );
+		add_action( 'init', [ $this->model, 'register_rewrite_rules' ] );
 	}
 
 	/**
@@ -165,7 +165,7 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	 */
 	public function add_filters() {
 		/* rewrite filters */
-		add_filter( 'query_vars', array( $this->model, 'register_rewrite_tags' ) );
+		add_filter( 'query_vars', [ $this->model, 'register_rewrite_tags' ] );
 	}
 
 	/**
@@ -249,10 +249,10 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 			     ( is_multisite() && ! is_super_admin() )
 			) {
 
-				$this->log->addCritical( 'Lack of User Capabilities.', array(
+				$this->log->addCritical( 'Lack of User Capabilities.', [
 					'user'      => wp_get_current_user(),
 					'user_meta' => get_user_meta( get_current_user_id() ),
-				) );
+				] );
 
 				wp_die( esc_html__( 'Access Denied' ), 403 );
 			}

@@ -152,6 +152,7 @@ class Model_Install extends Helper_Abstract_Model {
 		global $wp_rewrite;
 
 		$root = str_replace( '/', '\/', $wp_rewrite->root );
+
 		return '^' . $root . 'pdf\/([A-Za-z0-9]+)\/([0-9]+)\/?(download)?\/?';
 	}
 
@@ -209,27 +210,27 @@ class Model_Install extends Helper_Abstract_Model {
 		/* Allow user to change directory location(s) */
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_template_location/ for more details about this filter */
-		$this->data->template_location     = apply_filters( 'gfpdf_template_location', $this->data->template_location, $working_folder, $upload_dir ); /* needs to be accessible from the web */
+		$this->data->template_location = apply_filters( 'gfpdf_template_location', $this->data->template_location, $working_folder, $upload_dir ); /* needs to be accessible from the web */
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_template_location_uri/ for more details about this filter */
 		$this->data->template_location_url = apply_filters( 'gfpdf_template_location_uri', $this->data->template_location_url, $working_folder, $upload_dir_url ); /* needs to be accessible from the web */
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_font_location/ for more details about this filter */
-		$this->data->template_font_location     = apply_filters( 'gfpdf_font_location', $this->data->template_location . 'fonts/', $working_folder, $upload_dir ); /* can be in a directory not accessible via the web */
+		$this->data->template_font_location = apply_filters( 'gfpdf_font_location', $this->data->template_location . 'fonts/', $working_folder, $upload_dir ); /* can be in a directory not accessible via the web */
 
 		/* @todo normally font and fontdata should be kept together but it may be worth adding a filter here */
 		$this->data->template_fontdata_location = $this->data->template_font_location . 'fontdata/';
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_tmp_location/ for more details about this filter */
-		$this->data->template_tmp_location  = apply_filters( 'gfpdf_tmp_location', $this->data->template_location . 'tmp/', $working_folder, $upload_dir_url ); /* encouraged to move this to a directory not accessible via the web */
+		$this->data->template_tmp_location = apply_filters( 'gfpdf_tmp_location', $this->data->template_location . 'tmp/', $working_folder, $upload_dir_url ); /* encouraged to move this to a directory not accessible via the web */
 
-		$this->log->addNotice( 'Template Locations', array(
+		$this->log->addNotice( 'Template Locations', [
 			'path'     => $this->data->template_location,
 			'url'      => $this->data->template_location_url,
 			'font'     => $this->data->template_font_location,
 			'fontdata' => $this->data->template_fontdata_location,
 			'tmp'      => $this->data->template_tmp_location,
-		) );
+		] );
 	}
 
 	/**
@@ -260,7 +261,7 @@ class Model_Install extends Helper_Abstract_Model {
 			/* Global filter */
 
 			/* See https://gravitypdf.com/documentation/v4/gfpdf_multisite_template_location/ for more details about this filter */
-			$this->data->multisite_template_location     = apply_filters( 'gfpdf_multisite_template_location', $template_dir, $working_folder, $upload_dir, $blog_id );
+			$this->data->multisite_template_location = apply_filters( 'gfpdf_multisite_template_location', $template_dir, $working_folder, $upload_dir, $blog_id );
 
 			/* See https://gravitypdf.com/documentation/v4/gfpdf_multisite_template_location_uri/ for more details about this filter */
 			$this->data->multisite_template_location_url = apply_filters( 'gfpdf_multisite_template_location_uri', $template_url, $working_folder, $upload_dir_url, $blog_id );
@@ -269,10 +270,10 @@ class Model_Install extends Helper_Abstract_Model {
 			$this->data->multisite_template_location     = apply_filters( 'gfpdf_multisite_template_location_' . $blog_id, $this->data->multisite_template_location, $working_folder, $upload_dir, $blog_id );
 			$this->data->multisite_template_location_url = apply_filters( 'gfpdf_multisite_template_location_uri_' . $blog_id, $this->data->multisite_template_location_url, $working_folder, $upload_dir_url, $blog_id );
 
-			$this->log->addNotice( 'Multisite Template Locations', array(
+			$this->log->addNotice( 'Multisite Template Locations', [
 				'path' => $this->data->multisite_template_location,
 				'url'  => $this->data->multisite_template_location_url,
-			) );
+			] );
 		}
 	}
 
@@ -295,12 +296,12 @@ class Model_Install extends Helper_Abstract_Model {
 		}
 
 		/* add folders that need to be checked */
-		$folders = array(
+		$folders = [
 			$this->data->template_location,
 			$this->data->template_font_location,
 			$this->data->template_fontdata_location,
 			$this->data->template_tmp_location,
-		);
+		];
 
 		if ( is_multisite() ) {
 			$folders[] = $this->data->multisite_template_location;
@@ -313,18 +314,18 @@ class Model_Install extends Helper_Abstract_Model {
 		foreach ( $folders as $dir ) {
 			if ( ! is_dir( $dir ) ) {
 				if ( ! wp_mkdir_p( $dir ) ) {
-					$this->log->addError( 'Failed Creating Folder Structure', array(
+					$this->log->addError( 'Failed Creating Folder Structure', [
 						'dir' => $dir,
-					) );
+					] );
 
 					$this->notices->add_error( sprintf( esc_html__( 'There was a problem creating the %s directory. Ensure you have write permissions to your uploads folder.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
 				}
 			} else {
 				/* test the directory is currently writable by the web server, otherwise throw an error */
 				if ( ! wp_is_writable( $dir ) ) {
-					$this->log->addError( 'Failed Write Permissions Check.', array(
+					$this->log->addError( 'Failed Write Permissions Check.', [
 						'dir' => $dir,
-					) );
+					] );
 
 					$this->notices->add_error( sprintf( esc_html__( 'Gravity PDF does not have write permission to the %s directory. Contact your web hosting provider to fix the issue.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
 				}
@@ -362,10 +363,10 @@ class Model_Install extends Helper_Abstract_Model {
 			$rewrite_to,
 			'top' );
 
-		$this->log->addNotice( 'Add Rewrite Rules', array(
+		$this->log->addNotice( 'Add Rewrite Rules', [
 			'query'   => $query,
 			'rewrite' => $rewrite_to,
-		) );
+		] );
 
 		/* check to see if we need to flush the rewrite rules */
 		$this->maybe_flush_rewrite_rules( $query );
@@ -471,9 +472,9 @@ class Model_Install extends Helper_Abstract_Model {
 			if ( isset( $form['gfpdf_form_settings'] ) ) {
 				unset( $form['gfpdf_form_settings'] );
 				if ( $this->gform->update_form( $form ) !== true ) {
-					$this->log->addError( 'Cannot Remove PDF Settings from Form.', array(
+					$this->log->addError( 'Cannot Remove PDF Settings from Form.', [
 						'form_id' => $form['id'],
-					) );
+					] );
 
 					$this->notices->add_error( sprintf( esc_html__( 'There was a problem removing the Gravity Form "%s" PDF configuration. Try delete manually.', 'gravity-forms-pdf-extended' ), $form['id'] . ': ' . $form['title'] ) );
 				}
@@ -490,22 +491,22 @@ class Model_Install extends Helper_Abstract_Model {
 	 */
 	public function remove_folder_structure() {
 
-		$paths = apply_filters( 'gfpdf_uninstall_path', array(
+		$paths = apply_filters( 'gfpdf_uninstall_path', [
 			$this->data->template_font_location,
 			$this->data->template_tmp_location,
 			$this->data->template_location,
-		) );
+		] );
 
 		foreach ( $paths as $dir ) {
 			if ( is_dir( $dir ) ) {
 				$results = $this->misc->rmdir( $dir );
 
 				if ( is_wp_error( $results ) || ! $results ) {
-					$this->log->addError( 'Cannot Remove Folder Structure.', array(
+					$this->log->addError( 'Cannot Remove Folder Structure.', [
 						'WP_Error_Message' => $results->get_error_message(),
 						'WP_Error_Code'    => $results->get_error_code(),
 						'dir'              => $dir,
-					) );
+					] );
 
 					$this->notices->add_error( sprintf( esc_html__( 'There was a problem removing the %s directory. Clean up manually via (S)FTP.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
 				}

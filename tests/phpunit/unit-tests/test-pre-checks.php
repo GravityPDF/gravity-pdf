@@ -91,7 +91,7 @@ class Test_Pre_Checks extends WP_UnitTestCase {
 	 */
 	public function test_init() {
 		/* test the class loaded correctly */
-		$this->assertEquals( 10, has_action( 'plugins_loaded', array( $this->gravitypdf, 'plugins_loaded' ) ) );
+		$this->assertEquals( 10, has_action( 'plugins_loaded', [ $this->gravitypdf, 'plugins_loaded' ] ) );
 	}
 
 	/**
@@ -174,7 +174,7 @@ class Test_Pre_Checks extends WP_UnitTestCase {
 		$this->gravitypdf->plugins_loaded();
 
 		/* check the notice was attached */
-		$this->assertEquals( 10, has_action( 'admin_notices', array( $this->gravitypdf, 'display_notices' ) ) );
+		$this->assertEquals( 10, has_action( 'admin_notices', [ $this->gravitypdf, 'display_notices' ] ) );
 	}
 
 	/**
@@ -185,21 +185,21 @@ class Test_Pre_Checks extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function provider_memory() {
-		return array(
-			array( '60mb', '62914560' ),
-			array( '60MB', '62914560' ),
-			array( '60m', '62914560' ),
-			array( '60M', '62914560' ),
-			array( '60kb', '61440' ),
-			array( '60KB', '61440' ),
-			array( '60k', '61440' ),
-			array( '60K', '61440' ),
-			array( '1GB', '1073741824' ),
-			array( '1G', '1073741824' ),
-			array( '1gb', '1073741824' ),
-			array( '1g', '1073741824' ),
-			array( '-1', '-1' ),
-		);
+		return [
+			[ '60mb', '62914560' ],
+			[ '60MB', '62914560' ],
+			[ '60m', '62914560' ],
+			[ '60M', '62914560' ],
+			[ '60kb', '61440' ],
+			[ '60KB', '61440' ],
+			[ '60k', '61440' ],
+			[ '60K', '61440' ],
+			[ '1GB', '1073741824' ],
+			[ '1G', '1073741824' ],
+			[ '1gb', '1073741824' ],
+			[ '1g', '1073741824' ],
+			[ '-1', '-1' ],
+		];
 	}
 
 	/**
@@ -210,19 +210,19 @@ class Test_Pre_Checks extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function provider_memory_minimum() {
-		return array(
-			array( '512M', true ),
-			array( '100M', true ),
-			array( '75M', true ),
-			array( '65M', true ),
-			array( '64M', true ),
-			array( '63M', false ),
-			array( '60M', false ),
-			array( '60k', false ),
-			array( '3G', true ),
-			array( '1G', true ),
-			array( '-1', true ),
-		);
+		return [
+			[ '512M', true ],
+			[ '100M', true ],
+			[ '75M', true ],
+			[ '65M', true ],
+			[ '64M', true ],
+			[ '63M', false ],
+			[ '60M', false ],
+			[ '60k', false ],
+			[ '3G', true ],
+			[ '1G', true ],
+			[ '-1', true ],
+		];
 	}
 
 	/**
@@ -233,22 +233,22 @@ class Test_Pre_Checks extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function provider_version() {
-		return array(
-			array( '5.5.5', '5.5.6', true ),
-			array( '5.5.5', '5.5.5', true ),
-			array( '5.5.5', '5.5.5.0', true ),
-			array( '5.5.5', '5.5.5.1', true ),
-			array( '5.5.5', '5.5.4', false ),
-			array( '5.5.5', '5.5.4.9', false ),
-			array( '4.0', '3.9.1.0', false ),
-			array( '4.0', '3.8', false ),
-			array( '4.0', '3.5.20', false ),
-			array( '4.0', '4.0.0', true ),
-			array( '4.0', '4.0.1', true ),
-			array( '4.0-RC1', '4.0', true ),
-			array( '4.0-RC1', '4.0-RC2', true ),
-			array( '4.0-RC2', '4.0-RC1', false ),
-			array( '4.0-Beta2', '4.0-Beta1', false ),
-		);
+		return [
+			[ '5.5.5', '5.5.6', true ],
+			[ '5.5.5', '5.5.5', true ],
+			[ '5.5.5', '5.5.5.0', true ],
+			[ '5.5.5', '5.5.5.1', true ],
+			[ '5.5.5', '5.5.4', false ],
+			[ '5.5.5', '5.5.4.9', false ],
+			[ '4.0', '3.9.1.0', false ],
+			[ '4.0', '3.8', false ],
+			[ '4.0', '3.5.20', false ],
+			[ '4.0', '4.0.0', true ],
+			[ '4.0', '4.0.1', true ],
+			[ '4.0-RC1', '4.0', true ],
+			[ '4.0-RC1', '4.0-RC2', true ],
+			[ '4.0-RC2', '4.0-RC1', false ],
+			[ '4.0-Beta2', '4.0-Beta1', false ],
+		];
 	}
 }

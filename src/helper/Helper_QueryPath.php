@@ -67,7 +67,7 @@ class Helper_QueryPath extends QueryPath {
 	 *
 	 * @since 4.0.3
 	 */
-	public function html5( $html = '', $selector = null, $options = [ ] ) {
+	public function html5( $html = '', $selector = null, $options = [] ) {
 		$html5  = new HTML5();
 		$source = $html5->loadHTML( $html );
 

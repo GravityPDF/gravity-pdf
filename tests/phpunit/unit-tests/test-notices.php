@@ -72,7 +72,7 @@ class Test_Notices extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_actions() {
-		$this->assertEquals( 10, has_action( 'admin_notices', array( $this->notices, 'process' ) ) );
+		$this->assertEquals( 10, has_action( 'admin_notices', [ $this->notices, 'process' ] ) );
 	}
 
 	/**

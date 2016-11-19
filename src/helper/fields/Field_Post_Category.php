@@ -82,7 +82,7 @@ class Field_Post_Category extends Helper_Abstract_Fields {
 
 				/* See https://gravitypdf.com/documentation/v4/gfpdf_field_class/ for more details about these filters */
 				$this->fieldObject = apply_filters( 'gfpdf_field_class', new $class( $field, $entry, $gform, $misc ), $field, $entry, $this->form );
-				$this->fieldObject = apply_filters( 'gfpdf_field_class_' . $field->inputType , $this->fieldObject, $field, $entry, $this->form );
+				$this->fieldObject = apply_filters( 'gfpdf_field_class_' . $field->inputType, $this->fieldObject, $field, $entry, $this->form );
 			} else {
 				throw new Exception( 'Class not found' );
 			}
@@ -115,11 +115,11 @@ class Field_Post_Category extends Helper_Abstract_Fields {
 
 		$field_value = $this->value();
 		$label       = GFFormsModel::get_label( $this->field );
-		$data        = array();
-		$value       = array(
+		$data        = [];
+		$value       = [
 			'value' => '',
 			'label' => '',
-		);
+		];
 
 		/* If Radio of Select boxes */
 		if ( ! isset( $field_value[0] ) ) {
@@ -185,7 +185,7 @@ class Field_Post_Category extends Helper_Abstract_Fields {
 		 */
 		$single_dimension = false;
 		if ( ! isset( $items[0] ) ) { /* convert single-dimensional array to multi-dimensional */
-			$items            = array( $items );
+			$items            = [ $items ];
 			$single_dimension = true;
 		}
 
@@ -205,7 +205,7 @@ class Field_Post_Category extends Helper_Abstract_Fields {
 
 			/* process the category value */
 			if ( isset( $val['value'] ) ) {
-				$val['value']= GFCommon::prepare_post_category_value( $val['value'], $this->field, 'conditional_logic' );
+				$val['value'] = GFCommon::prepare_post_category_value( $val['value'], $this->field, 'conditional_logic' );
 
 				if ( is_array( $val['value'] ) ) {
 					$val['value'] = ( isset( $val['value'][0] ) ) ? $val['value'][0] : '';

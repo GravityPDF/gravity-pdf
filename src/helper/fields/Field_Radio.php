@@ -56,8 +56,8 @@ class Field_Radio extends Helper_Abstract_Fields {
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
 	 *
-	 * @param object               $field The GF_Field_* Object
-	 * @param array                $entry The Gravity Forms Entry
+	 * @param object                             $field The GF_Field_* Object
+	 * @param array                              $entry The Gravity Forms Entry
 	 *
 	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
 	 * @param \GFPDF\Helper\Helper_Misc          $misc
@@ -130,7 +130,7 @@ class Field_Radio extends Helper_Abstract_Fields {
 
 		$value = $this->value();
 		$label = GFFormsModel::get_label( $this->field );
-		$data  = array();
+		$data  = [];
 
 		/* Standadised Format */
 		$data['field'][ $this->field->id . '.' . $label ] = $value['value'];
@@ -168,10 +168,10 @@ class Field_Radio extends Helper_Abstract_Fields {
 
 
 		/* return value / label as an array */
-		$this->cache( array(
+		$this->cache( [
 			'value' => $value,
 			'label' => $label,
-		) );
+		] );
 
 		return $this->cache();
 	}

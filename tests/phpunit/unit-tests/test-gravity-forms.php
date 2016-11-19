@@ -135,15 +135,15 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 	 */
 	public function test_rgpost() {
 		/* set up post data */
-		$_POST = array(
+		$_POST = [
 			'my_object' => 'Data here',
-			'array'     => array(
+			'array'     => [
 				'item1',
 				"item2\'s",
 				'item3',
-			),
+			],
 			'slashes'   => "How\'s it going?",
-		);
+		];
 
 		/* check string */
 		$this->assertEquals( 'Data here', rgpost( 'my_object' ) );
@@ -168,15 +168,15 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 	 */
 	public function test_rgget() {
 		/* set up post data */
-		$_GET = array(
+		$_GET = [
 			'my_object' => 'Data here',
-			'array'     => array(
+			'array'     => [
 				'item1',
 				"item2's",
 				'item3',
-			),
+			],
 			'slashes'   => "How's it going?",
-		);
+		];
 
 		/* check string */
 		$this->assertEquals( 'Data here', rgget( 'my_object' ) );
@@ -201,22 +201,22 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_rgempty() {
-		$array = array(
+		$array = [
 			'item1' => 'Test',
-		);
+		];
 
 		/* test main array functionality */
 		$this->assertFalse( rgempty( $array ) );
-		$this->assertTrue( rgempty( array() ) );
+		$this->assertTrue( rgempty( [] ) );
 
 		/* test if array item is empty */
 		$this->assertTrue( rgempty( 'item2', $array ) );
 		$this->assertFalse( rgempty( 'item1', $array ) );
 
 		/* test if post item is empty */
-		$_POST = array(
+		$_POST = [
 			'my_object' => 'Data here',
-		);
+		];
 
 		$this->assertFalse( rgempty( 'my_object' ) );
 		$this->assertTrue( rgempty( 'item1' ) );
@@ -242,11 +242,11 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_rgar() {
-		$array = array(
+		$array = [
 			'item1' => 'Test',
 			'item2' => 'Test 2',
 			'item3' => 'Test 3',
-		);
+		];
 
 		$this->assertEquals( 'Test', rgar( $array, 'item1' ) );
 		$this->assertEquals( 'Test 2', rgar( $array, 'item2' ) );
@@ -391,7 +391,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 	public function test_get_entry() {
 		$entry = RGFormsModel::get_lead( $GLOBALS['GFPDF_Test']->entries['gravityform-1'][0]['id'] );
 
-		$valid_entries = array(
+		$valid_entries = [
 			'id',
 			'form_id',
 			'date_created',
@@ -411,7 +411,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 			'transaction_type',
 			'user_agent',
 			'status',
-		);
+		];
 
 		foreach ( $valid_entries as $v ) {
 			$this->assertEquals( array_key_exists( $v, $entry ), true );
@@ -470,15 +470,15 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 	 * @since 3.6
 	 */
 	public function provider_mergetag_test() {
-		return array(
-			array( '{:1.3}', 'Jake' ),
-			array( '{:1.6}', 'Jackson' ),
-			array( '{:5}', 'Third Choice' ),
-			array( '{:7}', 'This is paragraph test!' ),
-			array( '{date_dmy}', date( 'd/m/Y' ) ),
-			array( '{date_mdy}', date( 'm/d/Y' ) ),
-			array( '{form_title}', 'Simple Form Testing' ),
-		);
+		return [
+			[ '{:1.3}', 'Jake' ],
+			[ '{:1.6}', 'Jackson' ],
+			[ '{:5}', 'Third Choice' ],
+			[ '{:7}', 'This is paragraph test!' ],
+			[ '{date_dmy}', date( 'd/m/Y' ) ],
+			[ '{date_mdy}', date( 'm/d/Y' ) ],
+			[ '{form_title}', 'Simple Form Testing' ],
+		];
 	}
 
 	/**
@@ -503,14 +503,14 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 	 * @since 3.6
 	 */
 	public function provider_ip_testing() {
-		return array(
-			array( '5.120.2.1', 'HTTP_CLIENT_IP' ),
-			array( '6.10.3.9', 'HTTP_X_FORWARDED_FOR' ),
-			array( '7.60.126.3', 'REMOTE_ADDR' ),
-			array( '240.24.12.44,5.120.2.1', 'HTTP_CLIENT_IP' ),
-			array( '10.17.54.234,6.10.3.9', 'HTTP_X_FORWARDED_FOR' ),
-			array( '7.60.126.3,65.4.69.129', 'REMOTE_ADDR' ),
-		);
+		return [
+			[ '5.120.2.1', 'HTTP_CLIENT_IP' ],
+			[ '6.10.3.9', 'HTTP_X_FORWARDED_FOR' ],
+			[ '7.60.126.3', 'REMOTE_ADDR' ],
+			[ '240.24.12.44,5.120.2.1', 'HTTP_CLIENT_IP' ],
+			[ '10.17.54.234,6.10.3.9', 'HTTP_X_FORWARDED_FOR' ],
+			[ '7.60.126.3,65.4.69.129', 'REMOTE_ADDR' ],
+		];
 	}
 
 	/**

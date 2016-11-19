@@ -82,7 +82,7 @@ class Field_Poll extends Helper_Abstract_Fields {
 
 				/* See https://gravitypdf.com/documentation/v4/gfpdf_field_class/ for more details about these filters */
 				$this->fieldObject = apply_filters( 'gfpdf_field_class', new $class( $field, $entry, $gform, $misc ), $field, $entry, $this->form );
-				$this->fieldObject = apply_filters( 'gfpdf_field_class_' . $field->inputType , $this->fieldObject, $field, $entry, $this->form );
+				$this->fieldObject = apply_filters( 'gfpdf_field_class_' . $field->inputType, $this->fieldObject, $field, $entry, $this->form );
 			} else {
 				throw new Exception( 'Class not found' );
 			}
@@ -110,14 +110,14 @@ class Field_Poll extends Helper_Abstract_Fields {
 	 */
 	public function form_data() {
 
-		$data     = array();
+		$data     = [];
 		$value    = $this->value();
 		$field_id = (int) $this->field->id;
 		$label    = GFFormsModel::get_label( $this->field );
 
 		if ( isset( $value[0] ) ) {
 
-			$field = array();
+			$field = [];
 
 			foreach ( $value as $item ) {
 				/* For backwards compatibility, we'll wrap these in their own array key */
@@ -132,7 +132,7 @@ class Field_Poll extends Helper_Abstract_Fields {
 		$data[ $field_id ]                          = $field;
 		$data[ $label ]                             = $field;
 
-		return array( 'field' => $data );
+		return [ 'field' => $data ];
 	}
 
 	/**

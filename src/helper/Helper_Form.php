@@ -133,10 +133,10 @@ class Helper_Form extends Helper_Abstract_Form {
 
 		$form_ids = GFFormsModel::get_form_ids( true, false );
 		if ( empty( $form_ids ) ) {
-			return array();
+			return [];
 		}
 
-		$forms = array();
+		$forms = [];
 		foreach ( $form_ids as $form_id ) {
 			$forms[] = GFFormsModel::get_form_meta( $form_id );
 		}
@@ -192,7 +192,7 @@ class Helper_Form extends Helper_Abstract_Form {
 	 *
 	 * @since 4.0
 	 */
-	public function get_entries( $form_ids, $search_criteria = array(), $sorting = null, $paging = null ) {
+	public function get_entries( $form_ids, $search_criteria = [], $sorting = null, $paging = null ) {
 		return GFAPI::get_entries( $form_ids, $search_criteria, $sorting, $paging );
 	}
 

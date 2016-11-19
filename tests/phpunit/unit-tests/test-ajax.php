@@ -359,10 +359,10 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 		$this->assertEquals( 'Required fields have not been included.', $response['error'] );
 
 		/* Test for invalid font name */
-		$_POST['payload'] = array(
+		$_POST['payload'] = [
 			'font_name' => 'My AJAX_Font',
 			'regular'   => 'myajaxfont.ttf',
-		);
+		];
 
 		try {
 			$this->_handleAjax( 'gfpdf_font_save' );
@@ -378,10 +378,10 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 		/* Test a valid installation */
 		touch( ABSPATH . 'myajaxfont.ttf' );
 
-		$_POST['payload'] = array(
+		$_POST['payload'] = [
 			'font_name' => 'My AJAX Font',
 			'regular'   => ABSPATH . 'myajaxfont.ttf',
-		);
+		];
 
 		try {
 			$this->_handleAjax( 'gfpdf_font_save' );

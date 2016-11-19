@@ -224,13 +224,14 @@ abstract class Helper_Abstract_Fields {
 		 *
 		 * See https://gravitypdf.com/documentation/v4/gfpdf_field_value/ for more details about this filter
 		 */
+
 		return apply_filters( 'gfpdf_field_value', GFFormsModel::get_lead_field_value( $this->entry, $this->field ), $this->field, $this->entry );
 	}
 
 	/**
 	 * Used to check if the current field has a value
 	 *
-	 * @since 4.0
+	 * @since    4.0
 	 *
 	 * @internal Child classes can override this method when dealing with a specific use case
 	 *
@@ -260,7 +261,7 @@ abstract class Helper_Abstract_Fields {
 		$value    = $this->value();
 		$label    = GFFormsModel::get_label( $this->field );
 		$field_id = (int) $this->field->id;
-		$data     = array();
+		$data     = [];
 
 		/* Add field data using standardised naming convesion */
 		$data[ $field_id . '.' . $label ] = $value;
@@ -271,7 +272,7 @@ abstract class Helper_Abstract_Fields {
 		/* Keep backwards compatibility */
 		$data[ $label ] = $value;
 
-		return array( 'field' => $data );
+		return [ 'field' => $data ];
 	}
 
 	/**
@@ -306,10 +307,11 @@ abstract class Helper_Abstract_Fields {
 		}
 
 		$html .= '<div class="value">' . $value . '</div>'
-           . '</div>'
-        . '</div>';
+		         . '</div>'
+		         . '</div>';
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_field_html_value/ for more details about this filter */
+
 		return apply_filters( 'gfpdf_field_html_value', $html, $value, $show_label, $label, $this->field, $this->form, $this->entry );
 	}
 
@@ -332,12 +334,12 @@ abstract class Helper_Abstract_Fields {
 	 */
 	public function encode_tags( $value, $type ) {
 
-		$skip_fields = array( 'html', 'signature', 'section' );
+		$skip_fields = [ 'html', 'signature', 'section' ];
 
 		if ( ! in_array( $type, $skip_fields ) ) {
 
-			$find      = array( '[', ']', '{', '}' );
-			$converted = array( '&#91;', '&#93;', '&#123;', '&#125;' );
+			$find      = [ '[', ']', '{', '}' ];
+			$converted = [ '&#91;', '&#93;', '&#123;', '&#125;' ];
 			$value     = str_replace( $find, $converted, $value );
 		}
 

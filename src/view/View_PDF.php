@@ -126,7 +126,7 @@ class View_PDF extends Helper_Abstract_View {
 	 * Setup our class by injecting all our dependancies
 	 *
 	 * @param array                                          $data_cache An array of data to pass to the view
-	 * @param \GFPDF\Helper\Helper_Form|Helper_Abstract_Form $gform       Our abstracted Gravity Forms helper functions
+	 * @param \GFPDF\Helper\Helper_Form|Helper_Abstract_Form $gform      Our abstracted Gravity Forms helper functions
 	 * @param \Monolog\Logger|LoggerInterface                $log        Our logger class
 	 * @param \GFPDF\Helper\Helper_Abstract_Options          $options    Our options class which allows us to access any settings
 	 * @param \GFPDF\Helper\Helper_Data                      $data       Our plugin data store
@@ -134,7 +134,7 @@ class View_PDF extends Helper_Abstract_View {
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $data_cache = array(), Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc ) {
+	public function __construct( $data_cache = [], Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc ) {
 
 		/* Call our parent constructor */
 		parent::__construct( $data_cache );
@@ -225,11 +225,11 @@ class View_PDF extends Helper_Abstract_View {
 
 		} catch ( Exception $e ) {
 
-			$this->log->addError( 'PDF Generation Error', array(
+			$this->log->addError( 'PDF Generation Error', [
 				'entry'     => $entry,
 				'settings'  => $settings,
 				'exception' => $e->getMessage(),
-			) );
+			] );
 
 			if ( $this->gform->has_capability( 'gravityforms_view_entries' ) ) {
 				wp_die( $e->getMessage() );
@@ -268,9 +268,9 @@ class View_PDF extends Helper_Abstract_View {
 	 *
 	 * @since 4.0
 	 */
-	public function process_html_structure( $entry, Helper_Abstract_Model $model, $config = array() ) {
+	public function process_html_structure( $entry, Helper_Abstract_Model $model, $config = [] ) {
 		/* Determine whether we should output or return the results */
-		$config['meta'] = ( isset( $config['meta'] ) ) ? $config['meta'] : array();
+		$config['meta'] = ( isset( $config['meta'] ) ) ? $config['meta'] : [];
 		$echo           = ( isset( $config['meta']['echo'] ) ) ? $config['meta']['echo'] : true; /* whether to output or return the generated markup. Default is echo */
 
 		if ( ! $echo ) {
@@ -303,16 +303,16 @@ class View_PDF extends Helper_Abstract_View {
 	 *
 	 * @since 4.0
 	 */
-	public function generate_html_structure( $entry, Helper_Abstract_Model $model, $config = array() ) {
+	public function generate_html_structure( $entry, Helper_Abstract_Model $model, $config = [] ) {
 
 		/* Set up required variables */
-		$form         = $this->gform->get_form( $entry['form_id'] );
-		$products     = new Field_Products( new GF_Field(), $entry, $this->gform, $this->misc );
-		$page_number  = 0;
-		$container    = ( isset( $config['meta']['enable_css_ready_classes'] ) && false === $config['meta']['enable_css_ready_classes'] ) ? new Helper_Field_Container_Void() : new Helper_Field_Container();
+		$form        = $this->gform->get_form( $entry['form_id'] );
+		$products    = new Field_Products( new GF_Field(), $entry, $this->gform, $this->misc );
+		$page_number = 0;
+		$container   = ( isset( $config['meta']['enable_css_ready_classes'] ) && false === $config['meta']['enable_css_ready_classes'] ) ? new Helper_Field_Container_Void() : new Helper_Field_Container();
 
 		/* Allow the config to be changed through a filter */
-		$config['meta'] = ( isset( $config['meta'] ) ) ? $config['meta'] : array();
+		$config['meta'] = ( isset( $config['meta'] ) ) ? $config['meta'] : [];
 		$config         = apply_filters( 'gfpdf_pdf_configuration', $config, $entry, $form );
 
 		/* Get the user configuration values */
@@ -324,14 +324,14 @@ class View_PDF extends Helper_Abstract_View {
 		$show_individual_product_fields = ( isset( $config['meta']['individual_products'] ) ) ? $config['meta']['individual_products'] : false; /* Whether to show individual fields in the entry. Default to false - they are grouped together at the end of the form */
 
 		/* Skip over any of the following blacklisted fields */
-		$blacklisted = apply_filters( 'gfpdf_blacklisted_fields', array( 'captcha', 'password', 'page' ) );
+		$blacklisted = apply_filters( 'gfpdf_blacklisted_fields', [ 'captcha', 'password', 'page' ] );
 
 		/* Display the form title, if needed */
 		$this->show_form_title( $show_title, $form );
 
 		/* Loop through the fields and output or skip if needed */
 		foreach ( $form['fields'] as $key => $field ) {
-			
+
 			/* Load our page name, if needed */
 			if ( $show_page_names === true && $field->pageNumber !== $page_number ) {
 				$this->display_page_name( $page_number, $form, $container );
@@ -344,7 +344,7 @@ class View_PDF extends Helper_Abstract_View {
 			 */
 
 			/* Skip any fields with the css class 'exclude', if needed */
-			if ( $skip_marked_fields !== false && strpos( $field->cssClass, 'exclude' ) !== false )  {
+			if ( $skip_marked_fields !== false && strpos( $field->cssClass, 'exclude' ) !== false ) {
 				/* To prevent display issues we will output the column markup needed */
 				$container->maybe_display_faux_column( $field );
 
@@ -352,7 +352,7 @@ class View_PDF extends Helper_Abstract_View {
 			}
 
 			/* Skip over any hidden fields (usually by conditional logic), if needed */
-			if ( $skip_conditional_fields === true && GFFormsModel::is_field_hidden( $form, $field, array(), $entry ) ) {
+			if ( $skip_conditional_fields === true && GFFormsModel::is_field_hidden( $form, $field, [], $entry ) ) {
 				/* To prevent display issues we will output the column markup needed */
 				$container->maybe_display_faux_column( $field );
 
@@ -375,7 +375,7 @@ class View_PDF extends Helper_Abstract_View {
 			}
 
 			/* Skip over any fields we don't want to include */
-			if( in_array( $field->type, $blacklisted ) ) {
+			if ( in_array( $field->type, $blacklisted ) ) {
 				/* To prevent display issues we will output the column markup needed */
 				$container->maybe_display_faux_column( $field );
 
@@ -415,7 +415,7 @@ class View_PDF extends Helper_Abstract_View {
 		/*
 		* Set up our configuration variables
 		*/
-		$config['meta']           = ( isset( $config['meta'] ) ) ? $config['meta'] : array(); /* ensure we have a meta key */
+		$config['meta']           = ( isset( $config['meta'] ) ) ? $config['meta'] : []; /* ensure we have a meta key */
 		$show_empty_fields        = ( isset( $config['meta']['empty'] ) ) ? $config['meta']['empty'] : false; /* whether to show empty fields or not. Default is false */
 		$load_legacy_css          = ( isset( $config['meta']['legacy_css'] ) ) ? $config['meta']['legacy_css'] : false; /* whether we should add our legacy field class names (v3.x.x) to our fields. Default to false */
 		$show_section_description = ( isset( $config['meta']['section_content'] ) ) ? $config['meta']['section_content'] : false; /* whether we should include a section breaks content. Default to false */
@@ -444,13 +444,13 @@ class View_PDF extends Helper_Abstract_View {
 				$container->maybe_display_faux_column( $field );
 			}
 		} catch ( Exception $e ) {
-			$this->log->addError( 'PDF Generation Error', array(
+			$this->log->addError( 'PDF Generation Error', [
 				'field'     => $field,
 				'entry'     => $entry,
 				'config'    => $config,
 				'form_id'   => $form['id'],
 				'exception' => $e->getMessage(),
-			) );
+			] );
 		}
 	}
 
@@ -469,7 +469,7 @@ class View_PDF extends Helper_Abstract_View {
 		if ( $show_title !== false ) {
 
 			/* Load our HTML */
-			$html = $this->load( 'form_title', array( 'form' => $form ), false );
+			$html = $this->load( 'form_title', [ 'form' => $form ], false );
 
 			/* Run it through a filter and output */
 			echo apply_filters( 'gfpdf_pdf_form_title_html', $html, $form );
@@ -497,7 +497,7 @@ class View_PDF extends Helper_Abstract_View {
 			$container->close();
 
 			/* Load our HTML */
-			$html = $this->load( 'page_title', array( 'form' => $form, 'page' => $page ), false );
+			$html = $this->load( 'page_title', [ 'form' => $form, 'page' => $page ], false );
 
 			/* Run it through a filter and output */
 			echo apply_filters( 'gfpdf_field_page_name_html', $html, $page, $form );
@@ -517,7 +517,7 @@ class View_PDF extends Helper_Abstract_View {
 	 */
 	public function autoprocess_core_template_options( $html, $form, $entry, $settings ) {
 		/* Prevent core styles loading if a v3 template or using our legacy Tier 2 add-on */
-		if ( 'legacy' !== $this->options->get_template_group( $settings['template'] ) && ( empty( $settings['advanced_template'] ) || 'Yes' !== $settings['advanced_template'] )  ) {
+		if ( 'legacy' !== $this->options->get_template_group( $settings['template'] ) && ( empty( $settings['advanced_template'] ) || 'Yes' !== $settings['advanced_template'] ) ) {
 			$html = $this->get_core_template_styles( $settings, $entry ) . $html;
 		}
 
@@ -559,9 +559,9 @@ class View_PDF extends Helper_Abstract_View {
 		$model      = $controller->model;
 
 		/* Run our settings through the preprocessor which requires an array with a 'settings' key */
-		$args     = $model->preprocess_template_arguments( array( 'settings' => $settings ) );
+		$args     = $model->preprocess_template_arguments( [ 'settings' => $settings ] );
 		$settings = $args['settings'];
 
-		return $this->load( 'core_template_styles', array( 'settings' => $settings ), false );
+		return $this->load( 'core_template_styles', [ 'settings' => $settings ], false );
 	}
 }

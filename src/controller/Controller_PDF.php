@@ -138,20 +138,20 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 */
 	public function add_actions() {
 		/* Process PDF if needed */
-		add_action( 'parse_request', array( $this, 'process_legacy_pdf_endpoint' ) ); /* legacy PDF endpoint */
-		add_action( 'parse_request', array( $this, 'process_pdf_endpoint' ) ); /* new PDF endpoint */
+		add_action( 'parse_request', [ $this, 'process_legacy_pdf_endpoint' ] ); /* legacy PDF endpoint */
+		add_action( 'parse_request', [ $this, 'process_pdf_endpoint' ] ); /* new PDF endpoint */
 
 		/* Display PDF links in Gravity Forms Admin Area */
-		add_action( 'gform_entries_first_column_actions', array( $this->model, 'view_pdf_entry_list' ), 10, 4 );
-		add_action( 'gform_entry_info', array( $this->model, 'view_pdf_entry_detail' ), 10, 2 );
+		add_action( 'gform_entries_first_column_actions', [ $this->model, 'view_pdf_entry_list' ], 10, 4 );
+		add_action( 'gform_entry_info', [ $this->model, 'view_pdf_entry_detail' ], 10, 2 );
 
 		/* Add save PDF filter */
-		add_action( 'gform_after_submission', array( $this->model, 'maybe_save_pdf' ), 10, 2 );
+		add_action( 'gform_after_submission', [ $this->model, 'maybe_save_pdf' ], 10, 2 );
 
 		/* Clean-up actions */
-		add_action( 'gform_after_submission', array( $this->model, 'cleanup_pdf' ), 9999, 2 );
-		add_action( 'gform_after_update_entry', array( $this->model, 'cleanup_pdf_after_submission' ), 9999, 2 );
-		add_action( 'gfpdf_cleanup_tmp_dir', array( $this->model, 'cleanup_tmp_dir' ) );
+		add_action( 'gform_after_submission', [ $this->model, 'cleanup_pdf' ], 9999, 2 );
+		add_action( 'gform_after_update_entry', [ $this->model, 'cleanup_pdf_after_submission' ], 9999, 2 );
+		add_action( 'gfpdf_cleanup_tmp_dir', [ $this->model, 'cleanup_tmp_dir' ] );
 	}
 
 	/**
@@ -163,41 +163,44 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 */
 	public function add_filters() {
 		/* PDF authentication middleware */
-		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_public_access' ), 10, 3 );
-		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_active' ), 20, 3 );
-		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_conditional' ), 30, 3 );
-		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_owner_restriction' ), 40, 3 );
-		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_logged_out_timeout' ), 50, 3 );
-		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_auth_logged_out_user' ), 60, 3 );
-		add_filter( 'gfpdf_pdf_middleware', array( $this->model, 'middle_user_capability' ), 70, 3 );
+		add_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_public_access' ], 10, 3 );
+		add_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_active' ], 20, 3 );
+		add_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_conditional' ], 30, 3 );
+		add_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_owner_restriction' ], 40, 3 );
+		add_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_logged_out_timeout' ], 50, 3 );
+		add_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_auth_logged_out_user' ], 60, 3 );
+		add_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_user_capability' ], 70, 3 );
 
 		/* Tap into GF notifications */
-		add_filter( 'gform_notification', array( $this->model, 'notifications', ), 9999, 3 ); /* ensure Gravity PDF is one of the last filters to be applied */
+		add_filter( 'gform_notification', [
+			$this->model,
+			'notifications',
+		], 9999, 3 ); /* ensure Gravity PDF is one of the last filters to be applied */
 
 		/* Modify mPDF's path locations */
-		add_filter( 'mpdf_tmp_path', array( $this->model, 'mpdf_tmp_path' ) );
-		add_filter( 'mpdf_fontdata_path', array( $this->model, 'mpdf_tmp_font_path' ) );
+		add_filter( 'mpdf_tmp_path', [ $this->model, 'mpdf_tmp_path' ] );
+		add_filter( 'mpdf_fontdata_path', [ $this->model, 'mpdf_tmp_font_path' ] );
 
 		/* Change mPDF settings */
-		add_filter( 'mpdf_current_font_path', array( $this->model, 'set_current_pdf_font' ), 10, 2 );
-		add_filter( 'mpdf_font_data', array( $this->model, 'register_custom_font_data_with_mPDF' ) );
-		add_filter( 'mpdf_font_data', array( $this->model, 'add_unregistered_fonts_to_mPDF' ), 20 );
+		add_filter( 'mpdf_current_font_path', [ $this->model, 'set_current_pdf_font' ], 10, 2 );
+		add_filter( 'mpdf_font_data', [ $this->model, 'register_custom_font_data_with_mPDF' ] );
+		add_filter( 'mpdf_font_data', [ $this->model, 'add_unregistered_fonts_to_mPDF' ], 20 );
 
 		/* Process mergetags and shortcodes in PDF */
-		add_filter( 'gfpdf_pdf_html_output', array( $this->gform, 'process_tags' ), 10, 3 );
+		add_filter( 'gfpdf_pdf_html_output', [ $this->gform, 'process_tags' ], 10, 3 );
 		add_filter( 'gfpdf_pdf_html_output', 'do_shortcode' );
 
-		add_filter( 'gfpdf_pdf_core_template_html_output', array( $this->gform, 'process_tags' ), 10, 3 );
+		add_filter( 'gfpdf_pdf_core_template_html_output', [ $this->gform, 'process_tags' ], 10, 3 );
 
 		/* Backwards compatibility for our Tier 2 plugin */
-		add_filter( 'gfpdfe_pre_load_template', array( 'PDFRender', 'prepare_ids' ), 1, 8 );
+		add_filter( 'gfpdfe_pre_load_template', [ 'PDFRender', 'prepare_ids' ], 1, 8 );
 
 		/* Pre-process our template arguments and automatically render them in PDF */
-		add_filter( 'gfpdf_template_args', array( $this->model, 'preprocess_template_arguments' ) );
-		add_filter( 'gfpdf_pdf_html_output', array( $this->view, 'autoprocess_core_template_options' ), 5, 4 );
+		add_filter( 'gfpdf_template_args', [ $this->model, 'preprocess_template_arguments' ] );
+		add_filter( 'gfpdf_pdf_html_output', [ $this->view, 'autoprocess_core_template_options' ], 5, 4 );
 
 		/* Cleanup filters */
-		add_filter( 'gform_before_resend_notifications', array( $this->model, 'resend_notification_pdf_cleanup' ), 10, 2 );
+		add_filter( 'gform_before_resend_notifications', [ $this->model, 'resend_notification_pdf_cleanup' ], 10, 2 );
 	}
 
 	/**
@@ -219,11 +222,11 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		$lid    = (int) $GLOBALS['wp']->query_vars['lid'];
 		$action = ( ( isset( $GLOBALS['wp']->query_vars['action'] ) ) && $GLOBALS['wp']->query_vars['action'] == 'download' ) ? 'download' : 'view';
 
-		$this->log->addNotice( 'Processing PDF endpoint.', array(
+		$this->log->addNotice( 'Processing PDF endpoint.', [
 			'pid'    => $pid,
 			'lid'    => $lid,
 			'action' => $action,
-		) );
+		] );
 
 		/*  Send to our model to handle validation / authentication */
 		$results = $this->model->process_pdf( $pid, $lid, $action );
@@ -249,17 +252,17 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 			return null;
 		}
 
-		$config = array(
+		$config = [
 			'lid'      => $_GET['lid'],
 			'fid'      => (int) $_GET['fid'],
 			'aid'      => ( isset( $_GET['aid'] ) ) ? (int) $_GET['aid'] : false,
 			'template' => substr( $_GET['template'], 0, -4 ), /* strip .php from the template name */
 			'action'   => ( isset( $_GET['download'] ) ) ? 'download' : 'view',
-		);
+		];
 
-		$this->log->addNotice( 'Processing Legacy PDF endpoint.', array(
+		$this->log->addNotice( 'Processing Legacy PDF endpoint.', [
 			'config' => $config,
-		) );
+		] );
 
 		/* Attempt to find a valid config */
 		$pid = $this->model->get_legacy_config( $config );
@@ -293,13 +296,13 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 */
 	private function pdf_error( $error ) {
 
-		$this->log->addError( 'PDF Generation Error.', array(
+		$this->log->addError( 'PDF Generation Error.', [
 			'WP_Error_Message' => $error->get_error_message(),
 			'WP_Error_Code'    => $error->get_error_code(),
-		) );
+		] );
 
 		/* only display detailed error to admins */
-		$whitelist_errors = array( 'timeout_expired', 'access_denied' );
+		$whitelist_errors = [ 'timeout_expired', 'access_denied' ];
 		if ( $this->gform->has_capability( 'gravityforms_view_settings' ) || in_array( $error->get_error_code(), $whitelist_errors ) ) {
 			wp_die( $error->get_error_message() );
 		} else {

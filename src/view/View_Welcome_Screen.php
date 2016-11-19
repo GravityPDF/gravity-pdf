@@ -74,7 +74,7 @@ class View_Welcome_Screen extends Helper_Abstract_View {
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $data_cache = array(), Helper_Abstract_Form $gform ) {
+	public function __construct( $data_cache = [], Helper_Abstract_Form $gform ) {
 
 		/* Call our parent constructor */
 		parent::__construct( $data_cache );
@@ -91,9 +91,9 @@ class View_Welcome_Screen extends Helper_Abstract_View {
 	public function tabs() {
 
 		/* Load any variables we want to pass to our view */
-		$args = array(
+		$args = [
 			'selected' => isset( $_GET['page'] ) ? $_GET['page'] : 'gfpdf-getting-started',
-		);
+		];
 
 		/* load the tabs view */
 		$this->load( 'tabs', $args );
@@ -107,9 +107,9 @@ class View_Welcome_Screen extends Helper_Abstract_View {
 	public function welcome() {
 
 		/* Load any variables we want to pass to our view */
-		$args = array(
+		$args = [
 			'forms' => $this->gform->get_forms(),
-		);
+		];
 
 		/* Render our view */
 		$this->load( 'welcome', $args );

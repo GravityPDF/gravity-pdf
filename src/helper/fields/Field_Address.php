@@ -86,7 +86,7 @@ class Field_Address extends Helper_Abstract_Fields {
 	 */
 	public function html( $value = '', $label = true ) {
 		$data    = $this->value(); /* remove any empty fields from the array */
-		$address = array();
+		$address = [];
 
 		/* check if we should display the zip before the city */
 		$address_display_format = apply_filters( 'gform_address_display_format', 'default' );
@@ -146,7 +146,7 @@ class Field_Address extends Helper_Abstract_Fields {
 		$value = $this->get_value();
 
 		/* Loop through active fields and determine if field should be classed as empty */
-		foreach( $field->inputs as $item ) {
+		foreach ( $field->inputs as $item ) {
 			if ( ! isset( $item['isHidden'] ) || false === $item['isHidden'] ) {
 				/* Now we know item isn't hidden, go through the values and check if there's data */
 				$item_value = trim( rgget( (string) $item['id'], $value ) );
@@ -155,6 +155,7 @@ class Field_Address extends Helper_Abstract_Fields {
 				}
 			}
 		}
+
 		return true;
 	}
 
@@ -177,14 +178,14 @@ class Field_Address extends Helper_Abstract_Fields {
 			$value[ $this->field->id . '.1' ] = $value; /* set to the street value */
 		}
 
-		$this->cache( array(
+		$this->cache( [
 			'street'  => esc_html( rgget( $this->field->id . '.1', $value ) ),
 			'street2' => esc_html( rgget( $this->field->id . '.2', $value ) ),
 			'city'    => esc_html( rgget( $this->field->id . '.3', $value ) ),
 			'state'   => esc_html( rgget( $this->field->id . '.4', $value ) ),
 			'zip'     => esc_html( rgget( $this->field->id . '.5', $value ) ),
 			'country' => esc_html( rgget( $this->field->id . '.6', $value ) ),
-		) );
+		] );
 
 		return $this->cache();
 	}

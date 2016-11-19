@@ -82,13 +82,13 @@ class Field_Product extends Helper_Abstract_Fields {
 		$field    = $this->field;
 		$label    = GFFormsModel::get_label( $field );
 		$field_id = (int) $field->id;
-		$data     = array();
+		$data     = [];
 		$name     = $price = '';
 
 		switch ( $field->type ) {
 			case 'product':
-				$name  = ( isset( $value['name'] ) && isset( $value['price'] ) ) ? $value['name'] . " ({$value['price']})" : '';
-				$name  = esc_html( $name );
+				$name = ( isset( $value['name'] ) && isset( $value['price'] ) ) ? $value['name'] . " ({$value['price']})" : '';
+				$name = esc_html( $name );
 
 				$price = ( isset( $value['price_unformatted'] ) ) ? $value['price_unformatted'] : '';
 				$price = esc_html( $price );
@@ -109,21 +109,21 @@ class Field_Product extends Helper_Abstract_Fields {
 				$option_value = GFFormsModel::get_lead_field_value( $this->entry, $field );
 
 				/* Ensure this variable is an array */
-				$option_value = ( ! is_array( $option_value ) ) ? array( $option_value ) : $option_value;
+				$option_value = ( ! is_array( $option_value ) ) ? [ $option_value ] : $option_value;
 
 				/* Reset the array keys and remove any empty values */
 				$option_value = array_values( $option_value );
 				$option_value = array_filter( $option_value );
 
 				/* Get the field name ( */
-				$name = array_map( function( $value ) use ( $field ) {
+				$name = array_map( function ( $value ) use ( $field ) {
 					$option_info = GFCommon::get_option_info( $value, $field, false );
 
 					return esc_html( $option_info['name'] );
 				}, $option_value );
 
 				/* Get the field value (the price) */
-				$price = array_map( function( $value ) use ( $field ) {
+				$price = array_map( function ( $value ) use ( $field ) {
 					$option_info = GFCommon::get_option_info( $value, $field, false );
 
 					return esc_html( $option_info['price'] );
@@ -141,8 +141,8 @@ class Field_Product extends Helper_Abstract_Fields {
 			break;
 
 			case 'shipping':
-				$name  = ( isset( $value['shipping_name'] ) ) ? $value['shipping_name'] . " ({$value['shipping_formatted']})" : '';
-				$name  = esc_html( $name );
+				$name = ( isset( $value['shipping_name'] ) ) ? $value['shipping_name'] . " ({$value['shipping_formatted']})" : '';
+				$name = esc_html( $name );
 
 				$price = ( isset( $value['shipping'] ) ) ? $value['shipping'] : '';
 				$price = esc_html( $price );
@@ -266,7 +266,7 @@ class Field_Product extends Helper_Abstract_Fields {
 
 		/* Filter out the options information we require */
 		if ( $this->field->type == 'option' && isset( $data['products'][ $this->field->productField ]['options'] ) ) {
-			return array( 'options' => $data['products'][ $this->field->productField ]['options'] );
+			return [ 'options' => $data['products'][ $this->field->productField ]['options'] ];
 		}
 
 		/* Filter out the quantity field */
@@ -276,21 +276,21 @@ class Field_Product extends Helper_Abstract_Fields {
 
 		/* Filter out the shipping field */
 		if ( $this->field->type == 'shipping' && isset( $data['products_totals']['shipping'] ) ) {
-			return array(
+			return [
 				'shipping'           => esc_html( $data['products_totals']['shipping'] ),
 				'shipping_formatted' => esc_html( $data['products_totals']['shipping_formatted'] ),
 				'shipping_name'      => esc_html( $data['products_totals']['shipping_name'] ),
-			);
+			];
 		}
 
 		/* Filter out the total field */
 		if ( $this->field->type == 'total' && isset( $data['products_totals']['total'] ) ) {
-			return array(
+			return [
 				'total'           => esc_html( $data['products_totals']['total'] ),
 				'total_formatted' => esc_html( $data['products_totals']['total_formatted'] ),
-			);
+			];
 		}
 
-		return array();
+		return [];
 	}
 }

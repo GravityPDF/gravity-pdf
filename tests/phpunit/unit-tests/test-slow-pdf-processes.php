@@ -92,7 +92,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 
 		/* Setup our test classes */
 		$this->model = new Model_PDF( $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
-		$this->view  = new View_PDF( array(), $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
+		$this->view  = new View_PDF( [], $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc );
 
 		$this->controller = new Controller_PDF( $this->model, $this->view, $gfpdf->gform, $gfpdf->log, $gfpdf->misc );
 		$this->controller->init();
@@ -109,13 +109,13 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		$form  = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
 		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
 
-		$gfpdf->data->form_settings                = array();
+		$gfpdf->data->form_settings                = [];
 		$gfpdf->data->form_settings[ $form['id'] ] = $form['gfpdf_form_settings'];
 
-		return array(
+		return [
 			'form'  => $form,
 			'entry' => $entry,
-		);
+		];
 	}
 
 	/**
@@ -232,7 +232,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		$pdf['template'] = 'zadani';
 
 		/* Add filters to force the PDF to throw and error */
-		add_filter( 'mpdf_output_destination', function() {
+		add_filter( 'mpdf_output_destination', function () {
 			return 'O';
 		} );
 
@@ -280,23 +280,23 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 	 */
 	public function provider_maybe_attach_to_notification() {
 
-		$notification = array(
+		$notification = [
 			'aasffaa2FAa2',
 			'sjfajwa124FAS',
 			'91230jfa021AF',
 			'0890afjIWFjas',
-		);
+		];
 
-		return array(
-			array( false, array( 'id' => '123afjafwij4' ), array( 'notification' => $notification ) ),
-			array( true, array( 'id' => 'aasffaa2FAa2' ), array( 'notification' => $notification ) ),
-			array( false, array( 'id' => 'koa290' ), array( 'notification' => $notification ) ),
-			array( false, array( 'id' => 'AAFwa25940359' ), array( 'notification' => $notification ) ),
-			array( true, array( 'id' => 'sjfajwa124FAS' ), array( 'notification' => $notification ) ),
-			array( true, array( 'id' => '91230jfa021AF' ), array( 'notification' => $notification ) ),
-			array( true, array( 'id' => '0890afjIWFjas' ), array( 'notification' => $notification ) ),
-			array( false, array( 'id' => 'fawfja24a90fa' ), array( 'notification' => $notification ) ),
-		);
+		return [
+			[ false, [ 'id' => '123afjafwij4' ], [ 'notification' => $notification ] ],
+			[ true, [ 'id' => 'aasffaa2FAa2' ], [ 'notification' => $notification ] ],
+			[ false, [ 'id' => 'koa290' ], [ 'notification' => $notification ] ],
+			[ false, [ 'id' => 'AAFwa25940359' ], [ 'notification' => $notification ] ],
+			[ true, [ 'id' => 'sjfajwa124FAS' ], [ 'notification' => $notification ] ],
+			[ true, [ 'id' => '91230jfa021AF' ], [ 'notification' => $notification ] ],
+			[ true, [ 'id' => '0890afjIWFjas' ], [ 'notification' => $notification ] ],
+			[ false, [ 'id' => 'fawfja24a90fa' ], [ 'notification' => $notification ] ],
+		];
 	}
 
 	/**
@@ -329,7 +329,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		}
 
 		/* Trigger an error */
-		$error = $this->model->generate_and_save_pdf( array(), array( 'filename' => '' ) );
+		$error = $this->model->generate_and_save_pdf( [], [ 'filename' => '' ] );
 
 		$this->assertTrue( is_wp_error( $error ) );
 	}
@@ -359,8 +359,9 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		$this->assertEquals( 'invalid_pdf_setting', $pdf->get_error_code() );
 
 		/* Create the PDF and test it was correctly generated */
-		add_filter( 'gfpdf_pdf_config', function( $settings ) {
+		add_filter( 'gfpdf_pdf_config', function ( $settings ) {
 			$settings['template'] = 'zadani';
+
 			return $settings;
 		} );
 

@@ -80,7 +80,7 @@ class Field_Post_Custom_Field extends Helper_Abstract_Fields {
 
 				/* See https://gravitypdf.com/documentation/v4/gfpdf_field_class/ for more details about these filters */
 				$this->fieldObject = apply_filters( 'gfpdf_field_class', new $class( $field, $entry, $gform, $misc ), $field, $entry, $this->form );
-				$this->fieldObject = apply_filters( 'gfpdf_field_class_' . $field->inputType , $this->fieldObject, $field, $entry, $this->form );
+				$this->fieldObject = apply_filters( 'gfpdf_field_class_' . $field->inputType, $this->fieldObject, $field, $entry, $this->form );
 			} else {
 				throw new Exception( 'Class not found' );
 			}
@@ -123,7 +123,7 @@ class Field_Post_Custom_Field extends Helper_Abstract_Fields {
 	 * @since 4.0
 	 */
 	public function form_data() {
-		if ( method_exists( $this->fieldObject, 'form_data') ) {
+		if ( method_exists( $this->fieldObject, 'form_data' ) ) {
 			return $this->fieldObject->form_data();
 		}
 

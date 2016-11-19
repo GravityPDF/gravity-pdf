@@ -93,7 +93,7 @@ class Test_Migration extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	private function replace_in_file( $FilePath, $OldText, $NewText ) {
-		$Result = array( 'status' => 'error', 'message' => '' );
+		$Result = [ 'status' => 'error', 'message' => '' ];
 		if ( file_exists( $FilePath ) === true ) {
 			if ( is_writeable( $FilePath ) ) {
 				try {
@@ -193,41 +193,41 @@ class Test_Migration extends WP_UnitTestCase {
 	 */
 	public function provider_imported_data() {
 
-		return array(
-			array(
-				'config' => array(
+		return [
+			[
+				'config' => [
 					'template'          => 'health-care-directive',
 					'pdf_size'          => 'A4',
 					'format'            => 'Standard',
-					'notification'      => array(
+					'notification'      => [
 						'5578e163413b3',
-					),
+					],
 					'advanced_template' => 'Yes',
 					'active'            => true,
 					'name'              => 'Health Care Directive',
 					'conditionalLogic'  => '',
 					'filename'          => 'form-{form_id}-entry-{entry_id}',
-				),
-			),
+				],
+			],
 
-			array(
-				'config' => array(
+			[
+				'config' => [
 					'template'         => 'example-template',
 					'pdf_size'         => 'A4',
 					'format'           => 'Standard',
 					'filename'         => 'testman',
-					'notification'    => array(
+					'notification'     => [
 						'5578e163413b3',
-					),
+					],
 					'public_access'    => 'Yes',
 					'active'           => true,
 					'name'             => 'Example Template',
 					'conditionalLogic' => '',
-				),
-			),
+				],
+			],
 
-			array(
-				'config' => array(
+			[
+				'config' => [
 					'template'             => 'default-template-no-style',
 					'pdf_size'             => 'A4',
 					'format'               => 'Standard',
@@ -239,21 +239,21 @@ class Test_Migration extends WP_UnitTestCase {
 					'active'               => true,
 					'name'                 => 'Default Template No Style',
 					'conditionalLogic'     => '',
-				),
-			),
+				],
+			],
 
-			array(
-				'config' => array(
+			[
+				'config' => [
 					'template'         => 'default-template',
 					'pdf_size'         => 'A4',
 					'format'           => 'Standard',
 					'filename'         => 'testman',
 					'security'         => 'Yes',
-					'notification'     => array(
+					'notification'     => [
 						'5578e163413b3',
-					),
+					],
 					'password'         => 'myPDFpass',
-					'privileges'       => array(
+					'privileges'       => [
 						'copy',
 						'print',
 						'modify',
@@ -262,35 +262,35 @@ class Test_Migration extends WP_UnitTestCase {
 						'extract',
 						'assemble',
 						'print-highres',
-					),
+					],
 					'master_password'  => 'admin password',
 					'active'           => true,
 					'name'             => 'Default Template',
 					'conditionalLogic' => '',
-				),
-			),
+				],
+			],
 
-			array(
-				'config' => array(
+			[
+				'config' => [
 					'template'         => 'default-template',
 					'pdf_size'         => 'A4',
 					'format'           => 'Standard',
 					'filename'         => 'testman2',
 					'security'         => 'Yes',
-					'notification'     => array(
+					'notification'     => [
 						'5578e163413b3',
-					),
+					],
 					'password'         => '',
-					'privileges'       => array( 'copy', 'print', 'extract', 'assemble', 'print-highres' ),
+					'privileges'       => [ 'copy', 'print', 'extract', 'assemble', 'print-highres' ],
 					'master_password'  => 'adfawfawr5q2atd',
 					'active'           => true,
 					'name'             => 'Default Template #1',
 					'conditionalLogic' => '',
-				),
-			),
+				],
+			],
 
-			array(
-				'config' => array(
+			[
+				'config' => [
 					'template'         => 'default-template',
 					'pdf_size'         => 'A4',
 					'format'           => 'Standard',
@@ -301,11 +301,11 @@ class Test_Migration extends WP_UnitTestCase {
 					'active'           => true,
 					'name'             => 'Default Template #2',
 					'conditionalLogic' => '',
-				),
-			),
+				],
+			],
 
-			array(
-				'config' => array(
+			[
+				'config' => [
 					'template'         => 'default-template',
 					'pdf_size'         => 'LETTER',
 					'format'           => 'PDFA1B',
@@ -316,27 +316,27 @@ class Test_Migration extends WP_UnitTestCase {
 					'name'             => 'Default Template #3',
 					'conditionalLogic' => '',
 					'filename'         => 'form-{form_id}-entry-{entry_id}',
-				),
-			),
+				],
+			],
 
-			array(
-				'config' => array(
+			[
+				'config' => [
 					'template'         => 'default-template',
 					'pdf_size'         => 'CUSTOM',
 					'format'           => 'PDFX1A',
 					'save'             => 'Yes',
-					'custom_pdf_size'  => array( 50, 200, 'millimeters' ),
-					'notification'     => array(
+					'custom_pdf_size'  => [ 50, 200, 'millimeters' ],
+					'notification'     => [
 						'5578e163413b3',
-					),
+					],
 					'image_dpi'        => 300,
 					'active'           => true,
 					'name'             => 'Default Template #4',
 					'conditionalLogic' => '',
 					'filename'         => 'form-{form_id}-entry-{entry_id}',
-				),
-			),
-		);
+				],
+			],
+		];
 	}
 
 	/**

@@ -70,13 +70,13 @@ class Helper_Field_Container {
 	 *
 	 * @since 4.0
 	 */
-	private $class_map = array(
+	private $class_map = [
 		'gf_left_half'    => 50,
 		'gf_right_half'   => 50,
 		'gf_left_third'   => 33.3,
 		'gf_middle_third' => 33.3,
 		'gf_right_third'  => 33.3,
-	);
+	];
 
 	/**
 	 * The HTML tag used when opening the container
@@ -103,11 +103,11 @@ class Helper_Field_Container {
 	 *
 	 * @since 4.0
 	 */
-	private $skip_fields = array(
+	private $skip_fields = [
 		'page',
 		'section',
 		'html',
-	);
+	];
 
 	/**
 	 * Holds the number of times a new row has been open
@@ -125,7 +125,7 @@ class Helper_Field_Container {
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $config = array() ) {
+	public function __construct( $config = [] ) {
 		if ( isset( $config['open_tag'] ) ) {
 			$this->open_tag = $config['open_tag'];
 		}

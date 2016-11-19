@@ -35,17 +35,17 @@ class GravityPDF_Unit_Tests_Bootstrap {
 	/**
 	 * @var array GF Form array
 	 */
-	public $form = array();
+	public $form = [];
 
 	/**
 	 * @var array GF Entry array
 	 */
-	public $entry = array();
+	public $entry = [];
 
 	/**
 	 * @var  array $form_data
 	 */
-	public $form_data = array();
+	public $form_data = [];
 
 	/**
 	 * Setup the unit testing environment
@@ -62,10 +62,10 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		require_once $this->wp_tests_dir . '/includes/functions.php';
 
 		/* load Gravity PDF */
-		tests_add_filter( 'muplugins_loaded', array( $this, 'load' ) );
+		tests_add_filter( 'muplugins_loaded', [ $this, 'load' ] );
 
 		/* load Gravity PDF objects */
-		tests_add_filter( 'after_setup_theme', array( $this, 'create_stubs' ), 20 );
+		tests_add_filter( 'after_setup_theme', [ $this, 'create_stubs' ], 20 );
 
 		/* load the WP testing environment */
 		require_once( $this->wp_tests_dir . '/includes/bootstrap.php' );
@@ -99,12 +99,12 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		global $gfpdf;
 
 		/* Import all JSON forms into Gravity Forms */
-		$forms = array(
+		$forms = [
 			'all-form-fields.json',
 			'form-settings.json',
 			'gravityform-1.json',
 			'gravityform-2.json',
-		);
+		];
 
 		foreach ( $forms as $json ) {
 			$form                                 = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/unit-tests/json/' . $json ) ), true );
@@ -113,10 +113,10 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		}
 
 		/* Import our entries */
-		$entries = array(
+		$entries = [
 			'all-form-fields' => 'all-form-fields-entries.json',
 			'gravityform-1'   => 'gravityform-1-entries.json',
-		);
+		];
 
 
 		foreach ( $entries as $id => $json ) {
@@ -124,7 +124,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 			$entry_ids = GFAPI::add_entries( $entries, $this->form[ $id ]['id'] );
 
 			/* Loop through our new entry IDs and get the actual entries */
-			$this->entries[ $id ] = array();
+			$this->entries[ $id ] = [];
 			foreach ( $entry_ids as $lid ) {
 				$entry                  = GFAPI::get_entry( $lid );
 				$this->entries[ $id ][] = $entry;
@@ -136,7 +136,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 			}
 		}
 
-		$gfpdf->data->form_settings = array();
+		$gfpdf->data->form_settings = [];
 	}
 
 }
