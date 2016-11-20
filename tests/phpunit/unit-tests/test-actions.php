@@ -331,7 +331,13 @@ class Test_Actions extends WP_UnitTestCase {
 		global $gfpdf;
 
 		$this->assertFalse( $this->model->review_condition() );
+
+		/* Change the PDF count, but not the current page */
 		$gfpdf->options->update_option( 'pdf_count', 101 );
+		$this->assertFalse( $this->model->review_condition() );
+
+		/* Change the page to a Gravity Forms page */
+		$_GET['page'] = 'gf_edit_forms';
 		$this->assertTrue( $this->model->review_condition() );
 	}
 
