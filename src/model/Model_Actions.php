@@ -9,6 +9,7 @@ use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Migration;
 
 use GPDFAPI;
+use GFForms;
 
 /**
  * Action Model
@@ -146,9 +147,8 @@ class Model_Actions extends Helper_Abstract_Model {
 	 */
 	public function review_condition() {
 
-		$total_pdf_count = (int) $this->options->get_option( 'pdf_count', 0 );
-
-		if ( 100 < $total_pdf_count ) {
+		/* Check we are on a Gravity Forms page and we have more than 100 PDFs */
+		if ( GFForms::is_gravity_page() && 100 < (int) $this->options->get_option( 'pdf_count', 0 ) ) {
 			return true;
 		}
 
