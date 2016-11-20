@@ -163,7 +163,7 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 		$version = PDF_EXTENDED_VERSION;
 
 		/* Bail if we do not have a transient set (activation hook) and the versions match */
-		if ( ! get_transient( '_gravitypdf_activation_redirect' ) && $version == get_option( 'gfpdf_current_version' ) ) {
+		if ( ! get_transient( '_gravitypdf_activation_redirect' ) && $version === get_option( 'gfpdf_current_version' ) ) {
 			return null;
 		}
 
@@ -184,13 +184,8 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 
 		/* Check if it's a fresh installation and we should display the welcome screen, or whether we should display the update screen */
 		if ( ! $this->data->is_installed && ! is_file( PDF_TEMPLATE_LOCATION . 'configuration.php' ) ) {
-
 			$this->log->addNotice( 'Redirect to Getting Started page (first time activated).' );
-
-			/* First time install */
-			wp_safe_redirect( admin_url( 'index.php?page=gfpdf-getting-started' ) );
-			exit;
-
+			$this->redirect( admin_url( 'index.php?page=gfpdf-getting-started' ) );
 		} else {
 			$this->maybe_display_update_screen( $version );
 		}
@@ -199,42 +194,56 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 	/**
 	 * Check if our Gravity PDF update screen should be displayed to the user
 	 *
-	 * @param string $version
+	 * @param string $current_version
 	 *
 	 * @return void
 	 *
 	 * @since 4.0
 	 */
-	public function maybe_display_update_screen( $version ) {
+	public function maybe_display_update_screen( $current_version ) {
 
 		/* Check we actually upgraded, otherwise don't redirect */
-		if ( $version == get_option( 'gfpdf_current_version' ) ) {
+		$preview_version = get_option( 'gfpdf_current_version' );
+
+		if ( $current_version === $preview_version ) {
 			return null;
 		}
 
-		/* Check current version is not a bug fix or security release */
-		$individual_version = explode( '.', $version );
+		/* Check current version is not a bug patch AND the old version isn't a previous major / minor release  */
+		$previous_version_breakdown = explode( '.', $preview_version );
+		$current_version_breakdown = explode( '.', $current_version );
 
-		/* Check is there is a third version identifier (4.1.x) and if so see if it's an interger or does not equal zero */
-		if ( isset( $individual_version[2] ) ) {
-			if ( ! is_int( $individual_version[2] ) || 0 !== (int) $individual_version[2] ) {
+		/*
+		 * Compare the major and minor version (if any) of the old and new versions to see if they are equal.
+		 * If they are, we know the user updated from a patch release in the current branch
+		 * and we don't want to show the update page
+		 */
+		if( (int) $previous_version_breakdown[0] === (int) $current_version_breakdown[0]
+		    && (int) $previous_version_breakdown[1] >= (int) $current_version_breakdown[1] ) {
 				/* bug fix or security release, do not redirect */
 				return null;
-			}
 		}
 
 		/* Check if the user has opted to view the What's New page */
 		$show_update_page = $this->options->get_option( 'update_screen_action', 'Enable' );
 
-		if ( 'Enable' == $show_update_page ) {
-
+		/* Redirect if correct setting is enabled */
+		if ( 'Enable' === $show_update_page ) {
 			$this->log->addNotice( 'Redirect to Update page (previously activated).' );
-
-			/* Update */
-			wp_safe_redirect( admin_url( 'index.php?page=gfpdf-update' ) );
-			exit;
+			$this->redirect( admin_url( 'index.php?page=gfpdf-update' ) ) ;
 		}
+	}
 
+	/**
+	 * Do a safe redirect
+	 *
+	 * @param string $url The URL to redirect to
+	 *
+	 * @since 4.1
+	 */
+	protected function redirect( $url ) {
+		wp_safe_redirect( $url );
+		exit;
 	}
 
 	/**
