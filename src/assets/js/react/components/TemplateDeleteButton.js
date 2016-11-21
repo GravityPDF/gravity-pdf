@@ -58,12 +58,6 @@ export const TemplateDeleteButton = React.createClass({
     templateDeleteError: React.PropTypes.string,
   },
 
-  getDefaultProps() {
-    return {
-      callbackFunction: deleteTemplate,
-    }
-  },
-
   /**
    * Display a confirmation window asking user to verify they want template deleted.
    *
@@ -115,9 +109,11 @@ export const TemplateDeleteButton = React.createClass({
    */
   render() {
 
+    const callback = (this.props.callbackFunction) ? this.props.callbackFunction : this.deleteTemplate
+
     return (
       <a
-        onClick={this.props.callbackFunction}
+        onClick={callback}
         href="#"
         tabIndex="150"
         className="button button-secondary delete-theme">
