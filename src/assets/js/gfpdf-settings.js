@@ -19,8 +19,8 @@
      */
     if (typeof gf_vars !== 'undefined') {
       gf_vars.thisFormButton = GFPDF.conditionalText
-      gf_vars.show = GFPDF.conditionalShow
-      gf_vars.hide = GFPDF.conditionalHide
+      gf_vars.show = GFPDF.enable
+      gf_vars.hide = GFPDF.disable
     }
 
     /*
@@ -365,10 +365,10 @@
 
             if (is_active) {
               that.src = that.src.replace('active1.png', 'active0.png')
-              $(that).attr('title', GFPDF.inactiveName).attr('alt', GFPDF.inactiveName)
+              $(that).attr('title', GFPDF.inactive).attr('alt', GFPDF.inactive)
             } else {
               that.src = that.src.replace('active0.png', 'active1.png')
-              $(that).attr('title', GFPDF.activeName).attr('alt', GFPDF.activeName)
+              $(that).attr('title', GFPDF.active).attr('alt', GFPDF.active)
             }
 
             /* Set up ajax data */
@@ -475,8 +475,8 @@
                 /* Add fix for toggle image */
                 var toggle_src = $state.attr('src')
                 $state
-                  .attr('title', GFPDF.inactiveName)
-                  .attr('alt', GFPDF.inactiveName)
+                  .attr('title', GFPDF.inactive)
+                  .attr('alt', GFPDF.inactive)
                   .attr('src', toggle_src.replace('active1.png', 'active0.png'))
 
                 /* Add row to node and fade in */
@@ -496,8 +496,8 @@
         if ($container.find('tr').length === 0) {
           var $row = $('<tr>').addClass('no-items')
           var $cell = $('<td>').attr('colspan', '5').addClass('colspanchange')
-          var $add_new = $('<a>').attr('href', $('#add-new-pdf').attr('href')).append(GFPDF.no_pdfs_found_link + '.')
-          $cell.append(GFPDF.no_pdfs_found).append(' ').append($add_new)
+          var $add_new = $('<a>').attr('href', $('#add-new-pdf').attr('href')).append(GFPDF.letsGoCreateOne + '.')
+          $cell.append(GFPDF.thisFormHasNoPdfs).append(' ').append($add_new)
           $row.append($cell)
           $container.append($row)
         }
@@ -514,7 +514,7 @@
         var $deleteDialog = $('#delete-confirm')
 
         var deleteButtons = [ {
-          text: GFPDF.pdf_list_delete_confirm,
+          text: GFPDF.delete,
           click: function () {
             /* handle ajax call */
             $deleteDialog.wpdialog('close')
@@ -552,7 +552,7 @@
           }
         },
           {
-            text: GFPDF.tools_cancel,
+            text: GFPDF.cancel,
             click: function () {
               /* cancel */
               $deleteDialog.wpdialog('close')
@@ -1040,7 +1040,7 @@
             /* Toggle our link text */
             var text = $(click).text()
             $(click).text(
-              text == GFPDF.general_advanced_show ? GFPDF.general_advanced_hide : GFPDF.general_advanced_show
+              text == GFPDF.showAdvancedOptions ? GFPDF.hideAdvancedOptions : GFPDF.showAdvancedOptions
             )
           })
 
@@ -1108,14 +1108,14 @@
 
         /* Set up copy dialog */
         var copyButtons = [ {
-          text: GFPDF.tools_template_copy_confirm,
+          text: GFPDF.continue,
           click: function () {
             /* submit form */
             $copy.unbind().click()
           }
         },
           {
-            text: GFPDF.tools_cancel,
+            text: GFPDF.cancel,
             click: function () {
               /* cancel */
               $copyDialog.wpdialog('close')
@@ -1175,14 +1175,14 @@
 
         /* Set up uninstall dialog */
         var uninstallButtons = [ {
-          text: GFPDF.tools_uninstall_confirm,
+          text: GFPDF.uninstall,
           click: function () {
             /* submit form */
             $uninstall.parents('form').submit()
           }
         },
           {
-            text: GFPDF.tools_cancel,
+            text: GFPDF.cancel,
             click: function () {
               /* cancel */
               $uninstallDialog.wpdialog('close')
@@ -1283,7 +1283,7 @@
         $.ajax({
           type: "post",
           dataType: "json",
-          url: GFPDF.ajaxurl,
+          url: GFPDF.ajaxUrl,
           data: post,
           success: successCallback,
           error: this.ajax_error,
@@ -1291,17 +1291,13 @@
       }
 
       /**
-       * Throw an alert when there is an ajax error
+       * Log the error to the console
        * @return void
        * @since 4.0
        */
       this.ajax_error = function (jqXHR, textStatus, errorThrown) {
         console.log(textStatus)
         console.log(errorThrown)
-
-        if (jqXHR.readyState === 4) {
-          alert.log(GFPDF.ajax_error)
-        }
       }
 
       /**
