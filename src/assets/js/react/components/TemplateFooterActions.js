@@ -53,7 +53,7 @@ const TemplateFooterActions = React.createClass({
     pdfWorkingDirPath: React.PropTypes.string,
     templateDeleteText: React.PropTypes.string,
     templateConfirmDeleteText: React.PropTypes.string,
-    templateDeleteError: React.PropTypes.string,
+    templateDeleteErrorText: React.PropTypes.string,
   },
 
   /**
@@ -94,7 +94,7 @@ const TemplateFooterActions = React.createClass({
 
             buttonText={this.props.templateDeleteText}
             templateConfirmDeleteText={this.props.templateConfirmDeleteText}
-            templateDeleteError={this.props.templateDeleteError}/>
+            templateDeleteErrorText={this.props.templateDeleteErrorText}/>
           : null
         }
       </div>

@@ -55,7 +55,7 @@ export const TemplateDeleteButton = React.createClass({
 
     buttonText: React.PropTypes.string,
     templateConfirmDeleteText: React.PropTypes.string,
-    templateDeleteError: React.PropTypes.string,
+    templateDeleteErrorText: React.PropTypes.string,
   },
 
   /**
@@ -100,7 +100,7 @@ export const TemplateDeleteButton = React.createClass({
    * @since 4.1
    */
   ajaxFailed() {
-    const errorTemplate = this.props.template.set('error', this.props.templateDeleteError)
+    const errorTemplate = this.props.template.set('error', this.props.templateDeleteErrorText)
     this.props.addTemplate(errorTemplate)
   },
 

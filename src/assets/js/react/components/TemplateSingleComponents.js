@@ -34,20 +34,19 @@ import React from 'react'
  *
  * Display the current template label
  *
- * @TODO Move text to PHP
- *
  * @since 4.1
  */
-export const CurrentTemplate = ({ isCurrentTemplate }) => {
+export const CurrentTemplate = ({ isCurrentTemplate, label }) => {
   return (isCurrentTemplate) ? (
-    <span className="current-label">Current Template</span>
+    <span className="current-label">{label}</span>
   ) : (
     <span />
   )
 }
 
 CurrentTemplate.propTypes = {
-  isCurrentTemplate: React.PropTypes.bool
+  isCurrentTemplate: React.PropTypes.bool,
+  label: React.PropTypes.string
 }
 
 /**
@@ -57,17 +56,18 @@ CurrentTemplate.propTypes = {
  *
  * @since 4.1
  */
-export const Name = ({ name, version }) => (
+export const Name = ({ name, version, versionLabel }) => (
   <h2 className="theme-name">
     {name}
 
-    <Version version={version}/>
+    <Version version={version} label={versionLabel}/>
   </h2>
 )
 
 Name.propTypes = {
   name: React.PropTypes.string,
-  version: React.PropTypes.string
+  version: React.PropTypes.string,
+  versionLabel: React.PropTypes.string
 }
 
 /**
@@ -77,15 +77,16 @@ Name.propTypes = {
  *
  * @since 4.1
  */
-export const Version = ({ version }) => {
+export const Version = ({ label, version }) => {
   return (version) ? (
-    <span className="theme-version">Version: {version}</span>
+    <span className="theme-version">{label}: {version}</span>
   ) : (
     <span />
   )
 }
 
 Version.propTypes = {
+  label: React.PropTypes.string,
   version: React.PropTypes.string
 }
 
@@ -127,13 +128,14 @@ Author.propTypes = {
  *
  * @since 4.1
  */
-export const Group = ({ group }) => (
+export const Group = ({ label, group }) => (
   <p className="theme-author">
-    <strong>Group: {group}</strong>
+    <strong>{label}: {group}</strong>
   </p>
 )
 
 Group.propTypes = {
+  label: React.PropTypes.string,
   group: React.PropTypes.string,
 }
 
@@ -161,10 +163,10 @@ Description.propTypes = {
  *
  * @since 4.1
  */
-export const Tags = ({ tags }) => {
+export const Tags = ({ label, tags }) => {
   return (tags) ? (
     <p className="theme-tags">
-      <span>Tags:</span> {tags}
+      <span>{label}:</span> {tags}
     </p>
   ) : (
     <span />
@@ -172,5 +174,6 @@ export const Tags = ({ tags }) => {
 }
 
 Tags.propTypes = {
+  label: React.PropTypes.string,
   tags: React.PropTypes.string,
 }

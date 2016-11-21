@@ -63,7 +63,9 @@ export const Routes = () => (
            ajaxUrl={GFPDF.ajaxUrl}
            ajaxNonce={GFPDF.ajaxNonce}
 
-           templateHeader={GFPDF.installedPdfs}
+           templateDetailsText={GFPDF.templateDetails}
+           templateHeaderText={GFPDF.installedPdfs}
+
            genericUploadErrorText={GFPDF.problemWithTheUpload}
            activateText={GFPDF.activate}
            addTemplateText={GFPDF.addNewTemplate}
@@ -78,12 +80,18 @@ export const Routes = () => (
 
            ajaxUrl={GFPDF.ajaxUrl}
            ajaxNonce={GFPDF.ajaxNonce}
+           pdfWorkingDirPath={GFPDF.pdfWorkingDir}
 
            activateText={GFPDF.activate}
-           pdfWorkingDirPath={GFPDF.pdfWorkingDir}
            templateDeleteText={GFPDF.delete}
            templateConfirmDeleteText={GFPDF.doYouWantToDeleteTemplate}
-           templateDeleteError={GFPDF.couldNotDeleteTemplate}
+           templateDeleteErrorText={GFPDF.couldNotDeleteTemplate}
+           currentTemplateText={GFPDF.currentTemplate}
+           versionText={GFPDF.version}
+           groupText={GFPDF.group}
+           tagsText={GFPDF.tags}
+           showPreviousTemplateText={GFPDF.showPreviousTemplate}
+           showNextTemplateText={GFPDF.showNextTemplate}
     />
 
     <Route path="*" component={Empty}/>

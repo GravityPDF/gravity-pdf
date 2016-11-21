@@ -34,13 +34,15 @@ import React from 'react'
  *
  * Display the Template Details hover
  *
- * @TODO Move text to PHP
- *
  * @since 4.1
  */
-export const TemplateDetails = () => (
-  <span className="more-details">Template Details</span>
+export const TemplateDetails = ({ label }) => (
+  <span className="more-details">{label}</span>
 )
+
+TemplateDetails.propTypes = {
+  name: React.PropTypes.string,
+}
 
 /**
  * React Stateless Component
