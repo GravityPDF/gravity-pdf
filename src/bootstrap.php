@@ -240,6 +240,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->gf_form_settings();
 		$this->pdf();
 		$this->shortcodes();
+		$this->mergetags();
 		$this->actions();
 		$this->template_manager();
 
@@ -863,6 +864,25 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->singleton->add_class( $class );
 		$this->singleton->add_class( $model );
 		$this->singleton->add_class( $view );
+	}
+
+	/**
+	 * Include PDF Mergetag functionality
+	 *
+	 * @since 4.1
+	 *
+	 * @return void
+	 */
+	public function mergetags() {
+
+		$model = new Model\Model_Mergetags( $this->options, $this->singleton->get_class( 'Model_PDF' ), $this->log, $this->misc );
+
+		$class = new Controller\Controller_Mergetags( $model );
+		$class->init();
+
+		/* Add to our singleton controller */
+		$this->singleton->add_class( $class );
+		$this->singleton->add_class( $model );
 	}
 
 	/**
