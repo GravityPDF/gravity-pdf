@@ -66,7 +66,7 @@
        * @type String
        * @since 4.0
        */
-      url: GFPDF.ajaxurl,
+      url: GFPDF.ajaxUrl,
 
       /**
        * Route save through ajax-admin.php which doesn't support standard
@@ -599,7 +599,7 @@
               this.removeSpinner();
 
               /* Display Message */
-              this.displayMessage(GFPDF.update_success);
+              this.displayMessage(GFPDF.updateSuccess);
 
               /* Keep our model in sync */
               this.model.set(model);
@@ -635,7 +635,7 @@
 
         /* Set up our dialog box buttons */
         var deleteButtons = [{
-          text: GFPDF.pdf_list_delete_confirm,
+          text: GFPDF.delete,
           click: $.proxy(function() {
 
             /* Hide the confirmation dialog */
@@ -662,7 +662,7 @@
                   this.removeSpinner();
 
                   /* Display Message */
-                  this.displayMessage(GFPDF.delete_success);
+                  this.displayMessage(GFPDF.deleteSuccess);
 
                   /* Remove from collection */
                   this.collection.remove(this.model);
@@ -693,7 +693,7 @@
           }, this)
         },
           {
-            text: GFPDF.tools_cancel,
+            text: GFPDF.cancel,
             click: function() {
 
               /* Cancel */
@@ -903,7 +903,7 @@
       addSearchBar: function() {
         /* create our search element */
         var $input = $('<input>').attr('type', 'text')
-          .attr('placeholder', '  ' + GFPDF.help_search_placeholder)
+          .attr('placeholder', '  ' + GFPDF.searchPlaceholder)
           .attr('id', 'search-help-input');
 
         /* add out search box and give it focus */
@@ -1087,8 +1087,7 @@
        */
       this.tools_settings = function() {
 
-        /* Parse our fake data - this will be swapped with data from our database */
-        var json = JSON.parse(GFPDF.custom_fonts);
+        var json = JSON.parse(GFPDF.customFontData);
 
         /* Initialise our collection and load with our font JSON data */
         var fontCollection = new Fonts.Collection.Core(json);

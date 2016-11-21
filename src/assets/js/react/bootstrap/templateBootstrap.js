@@ -59,7 +59,7 @@ export default function templateBootstrap ($templateField) {
 
   /* Render our React Component in the DOM */
   render(
-    <TemplateButton store={store} buttonText={GFPDF.advanced_templates}/>,
+    <TemplateButton store={store} buttonText={GFPDF.advanced}/>,
     document.getElementById('gpdf-advance-template-selector')
   )
 
@@ -162,7 +162,7 @@ export function templateChangeStoreListener (store, $templateField) {
 
       /* Do our AJAX call to get the new Select Box DOM */
       request
-        .post(GFPDF.ajaxurl)
+        .post(GFPDF.ajaxUrl)
         .field('action', 'gfpdf_get_template_options')
         .field('nonce', GFPDF.ajaxNonce)
         .then((response) => {

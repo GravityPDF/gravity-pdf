@@ -60,30 +60,30 @@ export const Routes = () => (
     <Route path="template"
            component={TemplateList}
 
-           ajaxUrl={GFPDF.ajaxurl}
+           ajaxUrl={GFPDF.ajaxUrl}
            ajaxNonce={GFPDF.ajaxNonce}
 
-           templateHeader={GFPDF.templateHeader}
-           genericUploadErrorText={GFPDF.generic_upload_failure}
+           templateHeader={GFPDF.installedPdfs}
+           genericUploadErrorText={GFPDF.problemWithTheUpload}
            activateText={GFPDF.activate}
-           addTemplateText={GFPDF.add_new_template}
-           filenameErrorText={GFPDF.template_filename_error}
-           filesizeErrorText={GFPDF.template_filesize_error}
-           installSuccessText={GFPDF.template_install_success}
-           installUpdatedText={GFPDF.installUpdatedText}
+           addTemplateText={GFPDF.addNewTemplate}
+           filenameErrorText={GFPDF.uploadInvalidNotZipFile}
+           filesizeErrorText={GFPDF.uploadInvalidExceedsFileSizeLimit}
+           installSuccessText={GFPDF.templateSuccessfullyInstalled}
+           installUpdatedText={GFPDF.templateSuccessfullyUpdated}
     />
 
     <Route path="template/:id"
            component={TemplateSingle}
 
-           ajaxUrl={GFPDF.ajaxurl}
+           ajaxUrl={GFPDF.ajaxUrl}
            ajaxNonce={GFPDF.ajaxNonce}
 
            activateText={GFPDF.activate}
-           pdfWorkingDirPath={GFPDF.pdf_working_dir}
-           templateDeleteText={GFPDF.pdf_list_delete_confirm}
-           templateConfirmDeleteText={GFPDF.template_confirm_delete}
-           templateDeleteError={GFPDF.templateDeleteError}
+           pdfWorkingDirPath={GFPDF.pdfWorkingDir}
+           templateDeleteText={GFPDF.delete}
+           templateConfirmDeleteText={GFPDF.doYouWantToDeleteTemplate}
+           templateDeleteError={GFPDF.couldNotDeleteTemplate}
     />
 
     <Route path="*" component={Empty}/>
