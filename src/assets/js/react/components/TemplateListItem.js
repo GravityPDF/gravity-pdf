@@ -55,9 +55,12 @@ export const TemplateListItem = React.createClass({
    */
   propTypes: {
     template: React.PropTypes.object,
+
     activeTemplate: React.PropTypes.string,
-    activateText: React.PropTypes.string,
     updateTemplateParam: React.PropTypes.func,
+
+    activateText: React.PropTypes.string,
+    templateDetailsText: React.PropTypes.string,
   },
 
   /**
@@ -114,7 +117,7 @@ export const TemplateListItem = React.createClass({
           {item.get('error') ? <ShowMessage text={item.get('error')} error={true}/> : null}
           {item.get('message') ? <ShowMessage text={item.get('message')} dismissableCallback={this.removeMessage} dismissable={true} /> : null}
 
-          <TemplateDetails />
+          <TemplateDetails name={this.props.templateDetailsText} />
           <Group group={item.get('group')}/>
           <Name name={item.get('template')}/>
 

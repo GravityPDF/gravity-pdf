@@ -217,6 +217,9 @@ class Helper_Data {
 			'standard'        => esc_html__( 'Standard', 'gravity-forms-pdf-extended' ),
 			'advanced'        => esc_html__( 'Advanced', 'gravity-forms-pdf-extended' ),
 			'activate'        => esc_html__( 'Activate', 'gravity-forms-pdf-extended' ),
+			'version'         => esc_html__( 'Version', 'gravity-forms-pdf-extended' ),
+			'group'           => esc_html__( 'Group', 'gravity-forms-pdf-extended' ),
+			'tags'            => esc_html__( 'Tags', 'gravity-forms-pdf-extended' ),
 
 			'migratingSite'         => esc_html__( 'Migrating site #%s', 'gravity-forms-pdf-extended' ),
 			'siteMigrationComplete' => esc_html__( 'Site #%s migration complete.', 'gravity-forms-pdf-extended' ),
@@ -232,13 +235,19 @@ class Helper_Data {
 
 			'searchPlaceholder' => esc_html__( 'Search the Gravity PDF Knowledgebase...', 'gravity-forms-pdf-extended' ),
 
-			'uploadInvalidNotZipFile'                 => esc_html__( 'Upload is not a valid template. Upload a .zip file.', 'gravity-forms-pdf-extended' ),
-			'uploadInvalidExceedsFileSizeLimit' => esc_html__( 'Upload exceeds the 2MB limit.', 'gravity-forms-pdf-extended' ),
-			'templateSuccessfullyInstalled'     => esc_html__( 'Template successfully installed', 'gravity-forms-pdf-extended' ),
-			'templateSuccessfullyUpdated'       => esc_html__( 'Template successfully updated', 'gravity-forms-pdf-extended' ),
-			'problemWithTheUpload'              => esc_html__( 'There was a problem with the upload. Reload the page and try again.', 'gravity-forms-pdf-extended' ),
-			'doYouWantToDeleteTemplate'         => sprintf( esc_html__( "Do you really want to delete this PDF template?%sClick 'Cancel' to go back, 'OK' to confirm the delete.", 'gravity-forms-pdf-extended' ), "\n\n" ),
-			'couldNotDeleteTemplate'            => esc_html__( 'Could not delete template.', 'gravity-forms-pdf-extended' ),
+			'requiresGravityPdfVersion'                  => esc_html__( 'Requires Gravity PDF v%s', 'gravity-forms-pdf-extended' ),
+			'templateNotCompatibleWithGravityPdfVersion' => esc_html__( 'This PDF template is not compatible with your version of Gravity PDF. This template required Gravity PDF v%s.', 'gravity-forms-pdf-extended' ),
+			'templateDetails'                            => esc_html__( 'Template Details', 'gravity-forms-pdf-extended' ),
+			'currentTemplate'                            => esc_html__( 'Current Template', 'gravity-forms-pdf-extended' ),
+			'showPreviousTemplate'                       => esc_html__( 'Show previous template', 'gravity-forms-pdf-extended' ),
+			'showNextTemplate'                           => esc_html__( 'Show next template', 'gravity-forms-pdf-extended' ),
+			'uploadInvalidNotZipFile'                    => esc_html__( 'Upload is not a valid template. Upload a .zip file.', 'gravity-forms-pdf-extended' ),
+			'uploadInvalidExceedsFileSizeLimit'          => esc_html__( 'Upload exceeds the 2MB limit.', 'gravity-forms-pdf-extended' ),
+			'templateSuccessfullyInstalled'              => esc_html__( 'Template successfully installed', 'gravity-forms-pdf-extended' ),
+			'templateSuccessfullyUpdated'                => esc_html__( 'Template successfully updated', 'gravity-forms-pdf-extended' ),
+			'problemWithTheUpload'                       => esc_html__( 'There was a problem with the upload. Reload the page and try again.', 'gravity-forms-pdf-extended' ),
+			'doYouWantToDeleteTemplate'                  => sprintf( esc_html__( "Do you really want to delete this PDF template?%sClick 'Cancel' to go back, 'OK' to confirm the delete.", 'gravity-forms-pdf-extended' ), "\n\n" ),
+			'couldNotDeleteTemplate'                     => esc_html__( 'Could not delete template.', 'gravity-forms-pdf-extended' ),
 		] );
 	}
 }

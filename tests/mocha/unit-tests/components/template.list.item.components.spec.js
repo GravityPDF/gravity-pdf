@@ -5,7 +5,7 @@ import { TemplateDetails, Group } from '../../../../src/assets/js/react/componen
 
 describe('<TemplateDetails />', () => {
   it('renders span', () => {
-    const comp = shallow(<TemplateDetails />)
+    const comp = shallow(<TemplateDetails label="Template Details" />)
     expect(comp.find('span.more-details')).to.have.length(1)
     expect(comp.text()).to.equal('Template Details')
   })

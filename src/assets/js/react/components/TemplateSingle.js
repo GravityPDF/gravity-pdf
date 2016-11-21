@@ -77,7 +77,9 @@ export const TemplateSingle = React.createClass({
     const header = <TemplateHeaderNavigation
       template={item}
       templateIndex={this.props.templateIndex}
-      templates={this.props.templates}/>
+      templates={this.props.templates}
+      showPreviousTemplateText={this.props.route.showPreviousTemplateText}
+      showNextTemplateText={this.props.route.showNextTemplateText}/>
 
     const footer = <TemplateFooterActions
       template={item}
@@ -90,7 +92,7 @@ export const TemplateSingle = React.createClass({
       pdfWorkingDirPath={this.props.route.pdfWorkingDirPath}
       templateDeleteText={this.props.route.templateDeleteText}
       templateConfirmDeleteText={this.props.route.templateConfirmDeleteText}
-      templateDeleteError={this.props.route.templateDeleteError}
+      templateDeleteErrorText={this.props.route.templateDeleteErrorText}
     />
 
     /* Display our Single Template container */
@@ -100,16 +102,16 @@ export const TemplateSingle = React.createClass({
           <TemplateScreenshots image={item.get('screenshot')}/>
 
           <div className="theme-info">
-            <CurrentTemplate isCurrentTemplate={isCurrentTemplate}/>
-            <Name name={item.get('template')} version={item.get('version')}/>
+            <CurrentTemplate isCurrentTemplate={isCurrentTemplate} label={this.props.route.currentTemplateText}/>
+            <Name name={item.get('template')} version={item.get('version')} versionLabel={this.props.route.versionText}/>
             <Author author={item.get('author')} uri={item.get('author uri')}/>
-            <Group group={item.get('group')}/>
+            <Group group={item.get('group')} label={this.props.route.groupText}/>
 
             {item.get('long_message') ? <ShowMessage text={item.get('long_message')}/> : null}
             {item.get('long_error') ? <ShowMessage text={item.get('long_error')} error={true}/> : null}
 
             <Description desc={item.get('description')}/>
-            <Tags tags={item.get('tags')}/>
+            <Tags tags={item.get('tags')} label={this.props.route.tagsText}/>
           </div>
         </div>
       </TemplateContainer>

@@ -57,7 +57,7 @@ export const TemplateList = React.createClass({
    * @since 4.1
    */
   render() {
-    const header = <TemplateHeaderTitle header={this.props.route.templateHeader} />
+    const header = <TemplateHeaderTitle header={this.props.route.templateHeaderText} />
 
     return (
       <TemplateContainer header={header} closeRoute="/">
@@ -65,7 +65,11 @@ export const TemplateList = React.createClass({
         <div>
           {
             this.props.templates.map((value, index) => {
-              return <TemplateListItem key={index} template={value} activateText={this.props.route.activateText}/>
+              return <TemplateListItem
+                key={index}
+                template={value}
+                templateDetailsText={this.props.route.templateDetailsText}
+                activateText={this.props.route.activateText}/>
             })
           }
 

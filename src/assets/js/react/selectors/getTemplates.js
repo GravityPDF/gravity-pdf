@@ -157,8 +157,8 @@ export const addCompatibilityCheck = (templates) => {
       /* Not compatible, so let's mark it */
       return template.merge({
         'compatible': false,
-        'error': 'Requires Gravity PDF v' + requiredVersion, /* @TODO - strings moved to PHP */
-        'long_error': 'This PDF template is not compatible with your version of Gravity PDF. This template required Gravity PDF v' + requiredVersion + '.' /* @TODO - strings moved to PHP */
+        'error': GFPDF.requiresGravityPdfVersion.replace(/%s/g, requiredVersion),
+        'long_error': GFPDF.templateNotCompatibleWithGravityPdfVersion.replace(/%s/g, requiredVersion)
       })
     }
     /* If versionCompare() passed we'll mark as true */

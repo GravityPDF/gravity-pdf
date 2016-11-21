@@ -55,13 +55,7 @@ export const TemplateDeleteButton = React.createClass({
 
     buttonText: React.PropTypes.string,
     templateConfirmDeleteText: React.PropTypes.string,
-    templateDeleteError: React.PropTypes.string,
-  },
-
-  getDefaultProps() {
-    return {
-      callbackFunction: deleteTemplate,
-    }
+    templateDeleteErrorText: React.PropTypes.string,
   },
 
   /**
@@ -106,7 +100,7 @@ export const TemplateDeleteButton = React.createClass({
    * @since 4.1
    */
   ajaxFailed() {
-    const errorTemplate = this.props.template.set('error', this.props.templateDeleteError)
+    const errorTemplate = this.props.template.set('error', this.props.templateDeleteErrorText)
     this.props.addTemplate(errorTemplate)
   },
 
@@ -115,9 +109,11 @@ export const TemplateDeleteButton = React.createClass({
    */
   render() {
 
+    const callback = (this.props.callbackFunction) ? this.props.callbackFunction : this.deleteTemplate
+
     return (
       <a
-        onClick={this.props.callbackFunction}
+        onClick={callback}
         href="#"
         tabIndex="150"
         className="button button-secondary delete-theme">

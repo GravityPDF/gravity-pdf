@@ -15,6 +15,8 @@ describe('<TemplateHeaderNavigation />', () => {
         templates={Immutable.fromJS([{}, {}])}
         template={Immutable.fromJS({})}
         templateIndex={0}
+        showPreviousTemplateText="Show previous template"
+        showNextTemplateText="Show next template"
       />
     </Provider>)
 

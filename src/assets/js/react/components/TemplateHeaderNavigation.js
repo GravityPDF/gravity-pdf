@@ -48,6 +48,9 @@ export const TemplateHeaderNavigation = React.createClass({
     templateIndex: React.PropTypes.number.isRequired,
     isFirst: React.PropTypes.bool,
     isLast: React.PropTypes.bool,
+
+    showPreviousTemplateText: React.PropTypes.string,
+    showNextTemplateText: React.PropTypes.string
   },
 
   /**
@@ -125,7 +128,6 @@ export const TemplateHeaderNavigation = React.createClass({
 
   /**
    * @since 4.1
-   * @TODO Move text to server site for translation
    */
   render() {
 
@@ -156,7 +158,7 @@ export const TemplateHeaderNavigation = React.createClass({
           disabled={leftDisabled}>
             <span
               className="screen-reader-text">
-              Show previous template
+              {this.props.showPreviousTemplateText}
             </span>
         </button>
 
@@ -168,7 +170,7 @@ export const TemplateHeaderNavigation = React.createClass({
           disabled={rightDisabled}>
           <span
             className="screen-reader-text">
-            Show next template
+            {this.props.showNextTemplateText}
           </span>
         </button>
       </span>
