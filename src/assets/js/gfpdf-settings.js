@@ -657,6 +657,7 @@
 
           var data = {
             'action': 'gfpdf_get_template_fields',
+            'nonce': GFPDF.ajaxNonce,
             'template': $(this).val(),
             'type': $(this).attr('id'),
             'id': $('#gform_id').val(),

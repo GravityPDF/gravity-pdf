@@ -441,43 +441,6 @@ class Model_Settings extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Check a user is authorized to make modifications via this endpoint and
-	 * that there is a valid nonce
-	 *
-	 * @return void
-	 *
-	 * @since  4.0
-	 */
-	private function ajax_font_validation() {
-
-		/* prevent unauthorized access */
-		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
-			/* fail */
-			$this->log->addCritical( 'Lack of User Capabilities.', [
-				'user'      => wp_get_current_user(),
-				'user_meta' => get_user_meta( get_current_user_id() ),
-			] );
-
-			header( 'HTTP/1.1 401 Unauthorized' );
-			wp_die( '401' );
-		}
-
-		/*
-         * Validate Endpoint
-         */
-		$nonce    = ( isset( $_POST['nonce'] ) ) ? $_POST['nonce'] : '';
-		$nonce_id = 'gfpdf_font_nonce';
-
-		if ( ! wp_verify_nonce( $nonce, $nonce_id ) ) {
-			/* fail */
-			$this->log->addWarning( 'Nonce Verification Failed.' );
-
-			header( 'HTTP/1.1 401 Unauthorized' );
-			wp_die( '401' );
-		}
-	}
-
-	/**
 	 * AJAX Endpoint for saving the custom font
 	 *
 	 * @return void
@@ -486,12 +449,8 @@ class Model_Settings extends Helper_Abstract_Model {
 	 */
 	public function save_font() {
 
-		$this->log->addNotice( 'Running AJAX Endpoint', [
-			'type' => 'Save Font',
-		] );
-
-		/* prevent unauthorized access */
-		$this->ajax_font_validation();
+		/* User / CORS validation */
+		$this->misc->handle_ajax_authentication( 'Save Font', 'gravityforms_edit_settings', 'gfpdf_font_nonce' );
 
 		/* Handle the validation and saving of the font */
 		$payload = isset( $_POST['payload'] ) ? $_POST['payload'] : '';
@@ -515,12 +474,8 @@ class Model_Settings extends Helper_Abstract_Model {
 	 */
 	public function delete_font() {
 
-		$this->log->addNotice( 'Running AJAX Endpoint', [
-			'type' => 'Delete Font',
-		] );
-
-		/* prevent unauthorized access */
-		$this->ajax_font_validation();
+		/* User / CORS validation */
+		$this->misc->handle_ajax_authentication( 'Delete Font', 'gravityforms_edit_settings', 'gfpdf_font_nonce' );
 
 		/* Get the required details for deleting fonts */
 		$id    = ( isset( $_POST['id'] ) ) ? $_POST['id'] : '';
@@ -656,31 +611,8 @@ class Model_Settings extends Helper_Abstract_Model {
 	 */
 	public function check_tmp_pdf_security() {
 
-		/* prevent unauthorized access */
-		if ( ! $this->gform->has_capability( 'gravityforms_view_settings' ) ) {
-			/* fail */
-			$this->log->addCritical( 'Lack of User Capabilities.', [
-				'user'      => wp_get_current_user(),
-				'user_meta' => get_user_meta( get_current_user_id() ),
-			] );
-
-			header( 'HTTP/1.1 401 Unauthorized' );
-			wp_die( '401' );
-		}
-
-		/**
-		 * Verify our nonce is valid before doing anything
-		 */
-		$nonce    = ( isset( $_POST['nonce'] ) ) ? $_POST['nonce'] : '';
-		$nonce_id = 'gfpdf-direct-pdf-protection';
-
-		if ( ! wp_verify_nonce( $nonce, $nonce_id ) ) {
-			/* fail */
-			$this->log->addWarning( 'Nonce Verification Failed.' );
-
-			header( 'HTTP/1.1 401 Unauthorized' );
-			wp_die( '401' );
-		}
+		/* User / CORS validation */
+		$this->misc->handle_ajax_authentication( 'Check Tmp Directory', 'gravityforms_view_settings', 'gfpdf-direct-pdf-protection' );
 
 		/* Create our tmp file and do our actual check */
 		echo json_encode( $this->test_public_tmp_directory_access() );
