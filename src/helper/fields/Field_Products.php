@@ -58,11 +58,16 @@ class Field_Products extends Helper_Abstract_Fields {
 	 * @since 4.0.2
 	 */
 	public function is_empty() {
+
+		/* Set up the form / lead information */
 		$form = $this->form;
-		foreach ( $form['fields'] as $field ) {
-			if ( GFCommon::is_product_field( $field->type ) ) {
-				return false;
-			}
+		$lead = $this->entry;
+
+		/* Get all products for this field */
+		$products = GFCommon::get_product_fields( $form, $lead, true );
+
+		if ( sizeof( $products['products'] ) > 0 ) {
+			return false; /* not empty */
 		}
 
 		return true;
