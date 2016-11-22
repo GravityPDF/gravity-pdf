@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gravity-forms-pdf-extended\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2016-11-20 09:57+1100\n"
+"PO-Revision-Date: 2016-11-22 12:16+1100\n"
 "Last-Translator: Jake Jackson <support@gravitypdf.com>\n"
 "Language-Team: \n"
 "Language: en_NZ\n"
@@ -117,39 +117,39 @@ msgstr ""
 msgid "\"%s\" has been deprecated as of Gravity PDF 4.0"
 msgstr "\"%s\" has been deprecated as of Gravity PDF 4.0"
 
-#: src/bootstrap.php:797
+#: src/bootstrap.php:799
 msgid "View Gravity PDF Settings"
 msgstr "View Gravity PDF Settings"
 
-#: src/bootstrap.php:797
+#: src/bootstrap.php:799
 msgid "Settings"
 msgstr "Settings"
 
-#: src/bootstrap.php:837
+#: src/bootstrap.php:839
 msgid "View Gravity PDF Documentation"
 msgstr "View Gravity PDF Documentation"
 
-#: src/bootstrap.php:837
+#: src/bootstrap.php:839
 msgid "Docs"
 msgstr "Docs"
 
-#: src/bootstrap.php:839
+#: src/bootstrap.php:841
 msgid "Get Help and Support"
 msgstr "Get Help and Support"
 
-#: src/bootstrap.php:839
+#: src/bootstrap.php:841
 msgid "Support"
 msgstr "Support"
 
-#: src/bootstrap.php:841
+#: src/bootstrap.php:843
 msgid "View Gravity PDF Theme Shop"
 msgstr "View Gravity PDF Theme Shop"
 
-#: src/bootstrap.php:841
+#: src/bootstrap.php:843
 msgid "Theme Shop"
 msgstr "Theme Shop"
 
-#: src/bootstrap.php:1323, src/controller/Controller_Shortcodes.php:301,
+#: src/bootstrap.php:1325, src/controller/Controller_Shortcodes.php:301,
 #: src/helper/Helper_Data.php:349
 msgid "Gravity PDF"
 msgstr "Gravity PDF"
@@ -526,81 +526,65 @@ msgstr "Subtotal"
 msgid "Shipping (%s)"
 msgstr "Shipping (%s)"
 
-#: src/helper/Helper_Data.php:347
+#: src/helper/Helper_Data.php:347, src/model/Model_Mergetags.php:269
 msgid "PDF"
 msgstr "PDF"
 
-#: src/helper/Helper_Data.php:407
+#: src/helper/Helper_Data.php:405
 msgid "Loading..."
 msgstr "Loading..."
 
-#: src/helper/Helper_Data.php:409, src/view/html/Settings/general.php:139
-msgid "Show Advanced Options..."
-msgstr "Show Advanced Options..."
-
-#: src/helper/Helper_Data.php:411
-msgid "Hide Advanced Options..."
-msgstr "Hide Advanced Options..."
-
-#: src/helper/Helper_Data.php:413
+#: src/helper/Helper_Data.php:407
 msgid "Continue"
 msgstr "Continue"
 
-#: src/helper/Helper_Data.php:415
+#: src/helper/Helper_Data.php:409
 msgid "Uninstall"
 msgstr "Uninstall"
 
-#: src/helper/Helper_Data.php:417
+#: src/helper/Helper_Data.php:411
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/helper/Helper_Data.php:419, src/helper/Helper_PDF_List_Table.php:675
+#: src/helper/Helper_Data.php:413, src/helper/Helper_PDF_List_Table.php:675
 msgid "Delete"
 msgstr "Delete"
 
-#: src/helper/Helper_Data.php:421, src/helper/Helper_PDF_List_Table.php:493,
+#: src/helper/Helper_Data.php:415, src/helper/Helper_PDF_List_Table.php:493,
 #: src/helper/Helper_PDF_List_Table.php:495,
 #: src/model/Model_Form_Settings.php:1909
 msgid "Active"
 msgstr "Active"
 
-#: src/helper/Helper_Data.php:423, src/helper/Helper_PDF_List_Table.php:493,
+#: src/helper/Helper_Data.php:417, src/helper/Helper_PDF_List_Table.php:493,
 #: src/helper/Helper_PDF_List_Table.php:495,
 #: src/model/Model_Form_Settings.php:1909
 msgid "Inactive"
 msgstr "Inactive"
 
-#: src/helper/Helper_Data.php:425
+#: src/helper/Helper_Data.php:419
 msgid "this PDF if"
 msgstr "this PDF if"
 
-#: src/helper/Helper_Data.php:427, src/helper/Helper_Options_Fields.php:359,
+#: src/helper/Helper_Data.php:421, src/helper/Helper_Options_Fields.php:359,
 #: src/helper/Helper_Options_Fields.php:425
 msgid "Enable"
 msgstr "Enable"
 
-#: src/helper/Helper_Data.php:429, src/helper/Helper_Options_Fields.php:361,
+#: src/helper/Helper_Data.php:423, src/helper/Helper_Options_Fields.php:361,
 #: src/helper/Helper_Options_Fields.php:427
 msgid "Disable"
 msgstr "Disable"
 
-#: src/helper/Helper_Data.php:431
-msgid "Search the Gravity PDF Knowledgebase..."
-msgstr "Search the Gravity PDF Knowledgebase..."
-
-#: src/helper/Helper_Data.php:433
-msgid "There was an error processing your request. Please try again."
-msgstr "There was an error processing your request. Please try again."
-
-#: src/helper/Helper_Data.php:435
+#: src/helper/Helper_Data.php:425
 msgid "Successfully Updated"
 msgstr "Successfully Updated"
 
-#: src/helper/Helper_Data.php:437
+#: src/helper/Helper_Data.php:427
 msgid "Successfully Deleted"
 msgstr "Successfully Deleted"
 
-#: src/helper/Helper_Data.php:441, src/helper/Helper_Options_Fields.php:309,
+#: src/helper/Helper_Data.php:429, src/helper/Helper_Options_Fields.php:309,
 #: src/helper/Helper_Options_Fields.php:313,
 #: src/helper/Helper_Options_Fields.php:431,
 #: src/helper/Helper_Options_Fields.php:847,
@@ -627,7 +611,7 @@ msgstr "Successfully Deleted"
 msgid "No"
 msgstr "No"
 
-#: src/helper/Helper_Data.php:443, src/helper/Helper_Options_Fields.php:307,
+#: src/helper/Helper_Data.php:431, src/helper/Helper_Options_Fields.php:307,
 #: src/helper/Helper_Options_Fields.php:845,
 #: src/helper/Helper_Options_Fields.php:941,
 #: src/helper/Helper_Options_Fields.php:1045,
@@ -644,9 +628,29 @@ msgstr "No"
 msgid "Yes"
 msgstr "Yes"
 
-#: src/helper/Helper_Data.php:445
+#: src/helper/Helper_Data.php:433
 msgid "Standard"
 msgstr "Standard"
+
+#: src/helper/Helper_Data.php:435
+msgid "Advanced"
+msgstr "Advanced"
+
+#: src/helper/Helper_Data.php:437
+msgid "Activate"
+msgstr "Activate"
+
+#: src/helper/Helper_Data.php:439, src/helper/Helper_Templates.php:817
+msgid "Version"
+msgstr "Version"
+
+#: src/helper/Helper_Data.php:441, src/helper/Helper_Templates.php:825
+msgid "Group"
+msgstr "Group"
+
+#: src/helper/Helper_Data.php:443, src/helper/Helper_Templates.php:829
+msgid "Tags"
+msgstr "Tags"
 
 #: src/helper/Helper_Data.php:447
 msgid "Migrating site #%s"
@@ -664,47 +668,89 @@ msgstr "Migration Error"
 msgid "Site #%s migration errors."
 msgstr "Site #%s migration errors."
 
-#: src/helper/Helper_Data.php:455
-msgid "This form doesn't have any PDFs."
-msgstr "This form doesn't have any PDFs."
-
 #: src/helper/Helper_Data.php:457
-msgid "Let's go create one"
-msgstr "Let's go create one"
-
-#: src/helper/Helper_Data.php:459
-msgid "Advanced"
-msgstr "Advanced"
-
-#: src/helper/Helper_Data.php:461
-msgid "Activate"
-msgstr "Activate"
-
-#: src/helper/Helper_Data.php:463
 msgid "Add New Template"
 msgstr "Add New Template"
 
+#: src/helper/Helper_Data.php:459, src/view/html/Settings/general.php:139
+msgid "Show Advanced Options..."
+msgstr "Show Advanced Options..."
+
+#: src/helper/Helper_Data.php:461
+msgid "Hide Advanced Options..."
+msgstr "Hide Advanced Options..."
+
+#: src/helper/Helper_Data.php:463
+msgid "This form doesn't have any PDFs."
+msgstr "This form doesn't have any PDFs."
+
 #: src/helper/Helper_Data.php:465
+msgid "Let's go create one"
+msgstr "Let's go create one"
+
+#: src/helper/Helper_Data.php:467
+msgid "Installed PDFs"
+msgstr "Installed PDFs"
+
+#: src/helper/Helper_Data.php:471
+msgid "Search the Gravity PDF Knowledgebase..."
+msgstr "Search the Gravity PDF Knowledgebase..."
+
+#: src/helper/Helper_Data.php:475
+#, fuzzy
+msgid "Requires Gravity PDF v%s"
+msgstr "Requires Gravity PDF v%s"
+
+#: src/helper/Helper_Data.php:477
+#, fuzzy
+msgid ""
+"This PDF template is not compatible with your version of Gravity PDF. This "
+"template required Gravity PDF v%s."
+msgstr ""
+"This PDF template is not compatible with your version of Gravity PDF. This "
+"template required Gravity PDF v%s."
+
+#: src/helper/Helper_Data.php:479
+#, fuzzy
+msgid "Template Details"
+msgstr "Template Details"
+
+#: src/helper/Helper_Data.php:481
+#, fuzzy
+msgid "Current Template"
+msgstr "Current Template"
+
+#: src/helper/Helper_Data.php:483
+#, fuzzy
+msgid "Show previous template"
+msgstr "Show previous template"
+
+#: src/helper/Helper_Data.php:485
+#, fuzzy
+msgid "Show next template"
+msgstr "Show next template"
+
+#: src/helper/Helper_Data.php:487
 msgid "Upload is not a valid template. Upload a .zip file."
 msgstr "Upload is not a valid template. Upload a .zip file."
 
-#: src/helper/Helper_Data.php:467
+#: src/helper/Helper_Data.php:489
 msgid "Upload exceeds the 2MB limit."
 msgstr "Upload exceeds the 2MB limit."
 
-#: src/helper/Helper_Data.php:469
+#: src/helper/Helper_Data.php:491
 msgid "Template successfully installed"
 msgstr "Template successfully installed"
 
-#: src/helper/Helper_Data.php:471
+#: src/helper/Helper_Data.php:493
 msgid "Template successfully updated"
 msgstr "Template successfully updated"
 
-#: src/helper/Helper_Data.php:473
+#: src/helper/Helper_Data.php:495
 msgid "There was a problem with the upload. Reload the page and try again."
 msgstr "There was a problem with the upload. Reload the page and try again."
 
-#: src/helper/Helper_Data.php:475
+#: src/helper/Helper_Data.php:497
 msgid ""
 "Do you really want to delete this PDF template?%sClick 'Cancel' to go back, "
 "'OK' to confirm the delete."
@@ -712,13 +758,9 @@ msgstr ""
 "Do you really want to delete this PDF template?%sClick 'Cancel' to go back, "
 "'OK' to confirm the delete."
 
-#: src/helper/Helper_Data.php:477
+#: src/helper/Helper_Data.php:499
 msgid "Could not delete template."
 msgstr "Could not delete template."
-
-#: src/helper/Helper_Data.php:479
-msgid "Installed PDFs"
-msgstr "Installed PDFs"
 
 #: src/helper/Helper_Migration.php:1117
 msgid ""
@@ -1507,10 +1549,6 @@ msgstr "Legacy"
 msgid "Template Name"
 msgstr "Template Name"
 
-#: src/helper/Helper_Templates.php:817
-msgid "Version"
-msgstr "Version"
-
 #: src/helper/Helper_Templates.php:819
 msgid "Description"
 msgstr "Description"
@@ -1523,17 +1561,9 @@ msgstr "Author"
 msgid "Author URI"
 msgstr "Author URI"
 
-#: src/helper/Helper_Templates.php:825
-msgid "Group"
-msgstr "Group"
-
 #: src/helper/Helper_Templates.php:827
 msgid "Required PDF Version"
 msgstr "Required PDF Version"
-
-#: src/helper/Helper_Templates.php:829
-msgid "Tags"
-msgstr "Tags"
 
 #: src/model/Model_Actions.php:729
 msgid "No configuration.php file found for site #%s"
@@ -2430,6 +2460,9 @@ msgstr ""
 #: tests/phpunit/unit-tests/test-settings.php:523
 msgid "Normal Notice"
 msgstr "Normal Notice"
+
+#~ msgid "There was an error processing your request. Please try again."
+#~ msgstr "There was an error processing your request. Please try again."
 
 #~ msgctxt "Required"
 #~ msgid "needs"
