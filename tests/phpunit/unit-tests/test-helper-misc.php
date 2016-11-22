@@ -256,20 +256,20 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	 *
 	 * @since        4.0
 	 *
-	 * @dataProvider provider_update_depreciated_config
+	 * @dataProvider provider_update_deprecated_config
 	 */
-	public function test_update_depreciated_config( $expected, $value ) {
-		$this->assertEquals( $expected, $this->misc->update_depreciated_config( $value ) );
+	public function test_update_deprecated_config( $expected, $value ) {
+		$this->assertEquals( $expected, $this->misc->update_deprecated_config( $value ) );
 	}
 
 	/**
-	 * Data provider for testing update_depreciated_config()
+	 * Data provider for testing update_deprecated_config()
 	 *
 	 * @return array
 	 *
 	 * @since 4.0
 	 */
-	public function provider_update_depreciated_config() {
+	public function provider_update_deprecated_config() {
 		return [
 			[ 'Yes', true ],
 			[ 'No', false ],

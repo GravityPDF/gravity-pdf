@@ -187,9 +187,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$gfpdf->init();
 
 		/* Add backwards compatibility support */
-		$depreciated = new GFPDF_Core();
-		$depreciated->setup_constants();
-		$depreciated->setup_depreciated_paths();
+		$deprecated = new GFPDF_Core();
+		$deprecated->setup_constants();
+		$deprecated->setup_deprecated_paths();
 	}
 
 	/**

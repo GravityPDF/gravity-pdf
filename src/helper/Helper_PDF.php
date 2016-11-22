@@ -290,7 +290,7 @@ class Helper_PDF {
 		 */
 		$this->mpdf = apply_filters( 'gfpdf_mpdf_class', $this->mpdf, $form, $this->entry, $this->settings, $this );
 
-		/* depreciated backwards compatibility filters */
+		/* deprecated backwards compatibility filters */
 		$this->mpdf = apply_filters( 'gfpdfe_mpdf_class_pre_render', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() );
 		$this->mpdf = apply_filters( 'gfpdfe_pre_render_pdf', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() );
 		$this->mpdf = apply_filters( 'gfpdfe_mpdf_class', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() );

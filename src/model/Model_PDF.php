@@ -271,7 +271,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		if ( isset( $settings['security'] ) ) {
-			$settings['security'] = $this->misc->update_depreciated_config( apply_filters( 'gfpdf_security', $settings['security'], $form, $entry ) );
+			$settings['security'] = $this->misc->update_deprecated_config( apply_filters( 'gfpdf_security', $settings['security'], $form, $entry ) );
 		}
 
 		if ( isset( $settings['privileges'] ) ) {
@@ -287,7 +287,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		if ( isset( $settings['rtl'] ) ) {
-			$settings['rtl'] = $this->misc->update_depreciated_config( apply_filters( 'gfpdf_rtl', $settings['rtl'], $form, $entry ) );
+			$settings['rtl'] = $this->misc->update_deprecated_config( apply_filters( 'gfpdf_rtl', $settings['rtl'], $form, $entry ) );
 		}
 
 		return $settings;

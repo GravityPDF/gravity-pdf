@@ -134,7 +134,7 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 = 4.0.1 =
 * Fixes PHP notice when viewing PDF and Category field is empty (GH#419)
 * Fixes PHP notice when viewing PDF and custom font directory is empty (GH#416)
-* Fixes Font Manager / Help Search features due to Underscore.js conflict when PHP's depreciated ASP Tags enabled (GH#417)
+* Fixes Font Manager / Help Search features due to Underscore.js conflict when PHP's deprecated ASP Tags enabled (GH#417)
 * Allows radio and checkbox values to show HTML in PDFs (GH#415)
 * Fixes PDF letter spacing issue with upper and lower case characters (GH#418)
 * Fixes character display problems using core Arial font in PDFs (GH#420)
@@ -163,7 +163,7 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 * Allow user to change the action of the PDF link view in admin area (view or download)
 * Added timeout parameter when unauthenticated user who submitted the form (matched by IP) attempts to access PDF. Defaults to 20 minutes
 * Added ability to make a PDF "public". This disabled all security precautions on PDF. Use with caution.
-* Depreciated configuration.php and created a migration feature which users can run if that file is detected. Removes /output/ directory during migration (where v3 stored PDFs saved to disk).
+* Deprecated configuration.php and created a migration feature which users can run if that file is detected. Removes /output/ directory during migration (where v3 stored PDFs saved to disk).
 * Duplicating Gravity Form will also duplicate Gravity PDF settings assigned to that form. Importing / Exporting forms will also include PDF settings
 * Better installation and upgrade experience for users with automated redirect to landing page after install / major update (can be disabled in settings)
 * Created a font manager so users have a user interface to install and use their favourite fonts. Support for TTF and certain OTF font files

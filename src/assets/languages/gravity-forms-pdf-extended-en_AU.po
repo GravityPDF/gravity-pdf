@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gravity-forms-pdf-extended\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2016-11-22 12:16+1100\n"
+"PO-Revision-Date: 2016-11-22 12:20+1100\n"
 "Last-Translator: Jake Jackson <support@gravitypdf.com>\n"
 "Language-Team: \n"
 "Language: en_AU\n"
@@ -112,8 +112,8 @@ msgstr ""
 "The minimum requirements for Gravity PDF have not been met. Please fix the "
 "issue(s) below to continue:"
 
-#: src/bootstrap.php:315, src/bootstrap.php:339, src/depreciated.php:113,
-#: src/depreciated.php:137
+#: src/bootstrap.php:315, src/bootstrap.php:339, src/deprecated.php:111,
+#: src/deprecated.php:135
 msgid "\"%s\" has been deprecated as of Gravity PDF 4.0"
 msgstr "\"%s\" has been deprecated as of Gravity PDF 4.0"
 
