@@ -2,7 +2,7 @@
 
 namespace GFPDF\Helper\Fields;
 
-use GFPDF\Helper\Helper_Abstract_Fields;
+use GFPDF\Abstraction\Abstract_Fields;
 
 use GFCommon;
 
@@ -48,7 +48,7 @@ require_once( GFCommon::get_base_path() . '/currency.php' );
  *
  * @since 4.0
  */
-class Field_Products extends Helper_Abstract_Fields {
+class Field_Products extends Abstract_Fields {
 
 	/**
 	 * Checks if the form has any products

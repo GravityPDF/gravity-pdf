@@ -1,6 +1,6 @@
 <?php
 
-namespace GFPDF\Helper;
+namespace GFPDF\Abstraction;
 
 /**
  * Abstract Helper Controller
@@ -41,7 +41,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-abstract class Helper_Abstract_Controller {
+abstract class Abstract_Controller {
 
 	/**
 	 * Classes will store a model object

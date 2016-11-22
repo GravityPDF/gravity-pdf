@@ -2,13 +2,13 @@
 
 namespace GFPDF\Controller;
 
-use GFPDF\Helper\Helper_Abstract_Controller;
-use GFPDF\Helper\Helper_Abstract_Model;
-use GFPDF\Helper\Helper_Abstract_View;
+use GFPDF\Abstraction\Abstract_Controller;
+use GFPDF\Abstraction\Abstract_Model;
+use GFPDF\Abstraction\Abstract_View;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
 use GFPDF\Helper\Helper_Data;
-use GFPDF\Helper\Helper_Abstract_Options;
+use GFPDF\Abstraction\Abstract_Options;
 
 use Psr\Log\LoggerInterface;
 
@@ -52,7 +52,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Controller_Welcome_Screen extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters {
+class Controller_Welcome_Screen extends Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters {
 
 	/**
 	 * Holds our log class
@@ -74,10 +74,10 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 	protected $data;
 
 	/**
-	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
+	 * Holds our Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
-	 * @var \GFPDF\Helper\Helper_Abstract_Options
+	 * @var \GFPDF\Abstraction\Abstract_Options
 	 *
 	 * @since 4.0
 	 */
@@ -86,15 +86,15 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 	/**
 	 * Setup our class by injecting all our dependancies
 	 *
-	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_Welcome_Screen $model   Our Welcome Screen Model the controller will manage
-	 * @param Helper_Abstract_View|\GFPDF\View\View_Welcome_Screen    $view    Our Welcome Screen View the controller will manage
+	 * @param Abstract_Model|\GFPDF\Model\Model_Welcome_Screen $model   Our Welcome Screen Model the controller will manage
+	 * @param Abstract_View|\GFPDF\View\View_Welcome_Screen    $view    Our Welcome Screen View the controller will manage
 	 * @param \Monolog\Logger|LoggerInterface                         $log     Our logger class
 	 * @param \GFPDF\Helper\Helper_Data                               $data    Our plugin data store
-	 * @param \GFPDF\Helper\Helper_Abstract_Options                   $options Our options class which allows us to access any settings
+	 * @param \GFPDF\Abstraction\Abstract_Options                   $options Our options class which allows us to access any settings
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, LoggerInterface $log, Helper_Data $data, Helper_Abstract_Options $options ) {
+	public function __construct( Abstract_Model $model, Abstract_View $view, LoggerInterface $log, Helper_Data $data, Abstract_Options $options ) {
 
 		/* Assign our internal variables */
 		$this->log     = $log;

@@ -2,16 +2,16 @@
 
 namespace GFPDF\Model;
 
-use GFPDF\Helper\Helper_Abstract_Model;
+use GFPDF\Abstraction\Abstract_Model;
 use GFPDF\Helper\Helper_PDF;
 
-use GFPDF\Helper\Helper_Abstract_Fields;
+use GFPDF\Abstraction\Abstract_Fields;
 use GFPDF\Helper\Fields\Field_Product;
 use GFPDF\Helper\Fields\Field_Default;
 use GFPDF\Helper\Fields\Field_Products;
 
-use GFPDF\Helper\Helper_Abstract_Form;
-use GFPDF\Helper\Helper_Abstract_Options;
+use GFPDF\Abstraction\Abstract_Form;
+use GFPDF\Abstraction\Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
@@ -72,7 +72,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Model_PDF extends Helper_Abstract_Model {
+class Model_PDF extends Abstract_Model {
 
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
@@ -93,7 +93,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	protected $log;
 
 	/**
-	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
+	 * Holds our Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
 	 * @var \GFPDF\Helper\Helper_Options_Fields
@@ -145,9 +145,9 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Setup our view with the needed data and classes
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form    $gform   Our abstracted Gravity Forms helper functions
+	 * @param \GFPDF\Abstraction\Abstract_Form    $gform   Our abstracted Gravity Forms helper functions
 	 * @param \Monolog\Logger|LoggerInterface       $log     Our logger class
-	 * @param \GFPDF\Helper\Helper_Abstract_Options $options Our options class which allows us to access any settings
+	 * @param \GFPDF\Abstraction\Abstract_Options $options Our options class which allows us to access any settings
 	 * @param \GFPDF\Helper\Helper_Data             $data    Our plugin data store
 	 * @param \GFPDF\Helper\Helper_Misc             $misc    Our miscellaneous class
 	 * @param \GFPDF\Helper\Helper_Notices          $notices Our notice class used to queue admin messages and errors
@@ -155,7 +155,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates ) {
+	public function __construct( Abstract_Form $gform, LoggerInterface $log, Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates ) {
 
 		/* Assign our internal variables */
 		$this->gform     = $gform;
@@ -1735,8 +1735,8 @@ class Model_PDF extends Helper_Abstract_Model {
 				 * Instead, if you want to change how one of the fields are displayed or output (without effecting Gravity Forms itself) you should tap
 				 * into one of the filters below and override or extend the entire class.
 				 *
-				 * Your class MUST extend the \GFPDF\Helper\Helper_Abstract_Fields abstract class - either directly or by extending an existing \GFPDF\Helper\Fields class.
-				 * eg. class Fields_New_Text extends \GFPDF\Helper\Helper_Abstract_Fields or Fields_New_Text extends \GFPDF\Helper\Fields\Field_Text
+				 * Your class MUST extend the \GFPDF\Abstraction\Abstract_Fields abstract class - either directly or by extending an existing \GFPDF\Helper\Fields class.
+				 * eg. class Fields_New_Text extends \GFPDF\Abstraction\Abstract_Fields or Fields_New_Text extends \GFPDF\Helper\Fields\Field_Text
 				 *
 				 * To make your life more simple you should either use the same namespace as the field classes (\GFPDF\Helper\Fields) or import the class directly (use \GFPDF\Helper\Fields\Field_Text)
 				 * We've tried to make the fields as modular as possible. If you have any feedback about this approach please submit a ticket on GitHub (https://github.com/GravityPDF/gravity-pdf/issues)
@@ -1758,7 +1758,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				}
 			}
 
-			if ( empty( $class ) || ! ( $class instanceof Helper_Abstract_Fields ) ) {
+			if ( empty( $class ) || ! ( $class instanceof Abstract_Fields ) ) {
 				throw new Exception( 'Class not found' );
 			}
 		} catch ( Exception $e ) {

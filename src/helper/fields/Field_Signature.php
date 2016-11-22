@@ -2,7 +2,7 @@
 
 namespace GFPDF\Helper\Fields;
 
-use GFPDF\Helper\Helper_Abstract_Fields;
+use GFPDF\Abstraction\Abstract_Fields;
 
 use GFFormsModel;
 
@@ -45,7 +45,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Signature extends Helper_Abstract_Fields {
+class Field_Signature extends Abstract_Fields {
 
 	/**
 	 * Display the HTML version of this field

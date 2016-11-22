@@ -2,6 +2,8 @@
 
 namespace GFPDF\Helper;
 
+use GFPDF\Abstraction\Abstract_Form;
+
 use GFAPI;
 use GFCommon;
 use GFFormsModel;
@@ -46,7 +48,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Helper_Form extends Helper_Abstract_Form {
+class Helper_Form extends Abstract_Form {
 
 	/**
 	 * Get the form plugins current version

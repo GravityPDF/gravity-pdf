@@ -1,6 +1,6 @@
 <?php
 
-namespace GFPDF\Helper;
+namespace GFPDF\Abstraction;
 
 use WP_Error;
 
@@ -43,7 +43,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-abstract class Helper_Abstract_View extends Helper_Abstract_Model {
+abstract class Abstract_View extends Abstract_Model {
 
 	/**
 	 * Each object should have a view name

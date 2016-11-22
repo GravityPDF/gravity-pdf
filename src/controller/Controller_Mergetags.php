@@ -2,8 +2,8 @@
 
 namespace GFPDF\Controller;
 
-use GFPDF\Helper\Helper_Abstract_Controller;
-use GFPDF\Helper\Helper_Abstract_Model;
+use GFPDF\Abstraction\Abstract_Controller;
+use GFPDF\Abstraction\Abstract_Model;
 use GFPDF\Helper\Helper_Interface_Filters;
 
 use Psr\Log\LoggerInterface;
@@ -48,16 +48,16 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.1
  */
-class Controller_Mergetags extends Helper_Abstract_Controller implements Helper_Interface_Filters {
+class Controller_Mergetags extends Abstract_Controller implements Helper_Interface_Filters {
 
 	/**
 	 * Setup our class by injecting all our dependancies
 	 *
-	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_Shortcodes $model Our Shortcodes Model the controller will manage
+	 * @param Abstract_Model|\GFPDF\Model\Model_Shortcodes $model Our Shortcodes Model the controller will manage
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Model $model ) {
+	public function __construct( Abstract_Model $model ) {
 
 		/* Load our model and view */
 		$this->model = $model;

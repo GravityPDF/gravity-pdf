@@ -2,11 +2,11 @@
 
 namespace GFPDF\Controller;
 
-use GFPDF\Helper\Helper_Abstract_Controller;
+use GFPDF\Abstraction\Abstract_Controller;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
-use GFPDF\Helper\Helper_Abstract_Model;
-use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Abstraction\Abstract_Model;
+use GFPDF\Abstraction\Abstract_Form;
 use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
@@ -53,7 +53,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Controller_Install extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters {
+class Controller_Install extends Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters {
 
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
@@ -106,8 +106,8 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	/**
 	 * Setup our class by injecting all our dependancies
 	 *
-	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_Install $model   Our Install Model the controller will manage
-	 * @param \GFPDF\Helper\Helper_Abstract_Form               $gform   Our Install View the controller will manage
+	 * @param Abstract_Model|\GFPDF\Model\Model_Install $model   Our Install Model the controller will manage
+	 * @param \GFPDF\Abstraction\Abstract_Form               $gform   Our Install View the controller will manage
 	 * @param \Monolog\Logger|LoggerInterface                  $log     Our logger class
 	 * @param \GFPDF\Helper\Helper_Notices                     $notices Our notice class used to queue admin messages and errors
 	 * @param \GFPDF\Helper\Helper_Data                        $data    Our plugin data store
@@ -115,7 +115,7 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Notices $notices, Helper_Data $data, Helper_Misc $misc ) {
+	public function __construct( Abstract_Model $model, Abstract_Form $gform, LoggerInterface $log, Helper_Notices $notices, Helper_Data $data, Helper_Misc $misc ) {
 
 		/* Assign our internal variables */
 		$this->gform   = $gform;

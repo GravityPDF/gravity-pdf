@@ -2,7 +2,7 @@
 
 namespace GFPDF\Model;
 
-use GFPDF\Helper\Helper_Abstract_Model;
+use GFPDF\Abstraction\Abstract_Model;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Templates;
@@ -59,7 +59,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.1
  */
-class Model_Templates extends Helper_Abstract_Model {
+class Model_Templates extends Abstract_Model {
 
 	/**
 	 * Holds our Helper_Templates object

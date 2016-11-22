@@ -2,7 +2,7 @@
 
 namespace GFPDF\View;
 
-use GFPDF\Helper\Helper_Abstract_View;
+use GFPDF\Abstraction\Abstract_View;
 
 /**
  * Settings View
@@ -45,7 +45,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class View_Form_Settings extends Helper_Abstract_View {
+class View_Form_Settings extends Abstract_View {
 
 	/**
 	 * Set the view's name

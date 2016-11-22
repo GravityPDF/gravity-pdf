@@ -2,13 +2,13 @@
 
 namespace GFPDF\View;
 
-use GFPDF\Helper\Helper_Abstract_Model;
-use GFPDF\Helper\Helper_Abstract_View;
+use GFPDF\Abstraction\Abstract_Model;
+use GFPDF\Abstraction\Abstract_View;
 use GFPDF\Helper\Helper_Field_Container;
 use GFPDF\Helper\Helper_Field_Container_Void;
-use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Abstraction\Abstract_Form;
 use GFPDF\Helper\Helper_PDF;
-use GFPDF\Helper\Helper_Abstract_Options;
+use GFPDF\Abstraction\Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Templates;
@@ -65,7 +65,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class View_PDF extends Helper_Abstract_View {
+class View_PDF extends Abstract_View {
 
 	/**
 	 * Set the view's name
@@ -95,10 +95,10 @@ class View_PDF extends Helper_Abstract_View {
 	protected $log;
 
 	/**
-	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
+	 * Holds our Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
-	 * @var \GFPDF\Helper\Helper_Abstract_Options
+	 * @var \GFPDF\Abstraction\Abstract_Options
 	 * @since 4.0
 	 */
 	protected $options;
@@ -137,16 +137,16 @@ class View_PDF extends Helper_Abstract_View {
 	 * Setup our class by injecting all our dependancies
 	 *
 	 * @param array                                          $data_cache An array of data to pass to the view
-	 * @param \GFPDF\Helper\Helper_Form|Helper_Abstract_Form $gform      Our abstracted Gravity Forms helper functions
+	 * @param \GFPDF\Helper\Helper_Form|Abstract_Form $gform      Our abstracted Gravity Forms helper functions
 	 * @param \Monolog\Logger|LoggerInterface                $log        Our logger class
-	 * @param \GFPDF\Helper\Helper_Abstract_Options          $options    Our options class which allows us to access any settings
+	 * @param \GFPDF\Abstraction\Abstract_Options          $options    Our options class which allows us to access any settings
 	 * @param \GFPDF\Helper\Helper_Data                      $data       Our plugin data store
 	 * @param \GFPDF\Helper\Helper_Misc                      $misc       Our miscellanious methods
 	 * @param \GFPDF\Helper\Helper_Templates                 $templates
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $data_cache = [], Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates ) {
+	public function __construct( $data_cache = [], Abstract_Form $gform, LoggerInterface $log, Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates ) {
 
 		/* Call our parent constructor */
 		parent::__construct( $data_cache );
@@ -283,14 +283,14 @@ class View_PDF extends Helper_Abstract_View {
 	 * Start the PDF HTML Generation Process
 	 *
 	 * @param  array                              $entry  The Gravity Forms Entry Array
-	 * @param \GFPDF\Helper\Helper_Abstract_Model $model
+	 * @param \GFPDF\Abstraction\Abstract_Model $model
 	 * @param  array                              $config Any configuration data passed in
 	 *
 	 * @return string The generated HTML
 	 *
 	 * @since 4.0
 	 */
-	public function process_html_structure( $entry, Helper_Abstract_Model $model, $config = [] ) {
+	public function process_html_structure( $entry, Abstract_Model $model, $config = [] ) {
 		/* Determine whether we should output or return the results */
 		$config['meta'] = ( isset( $config['meta'] ) ) ? $config['meta'] : [];
 		$echo           = ( isset( $config['meta']['echo'] ) ) ? $config['meta']['echo'] : true; /* whether to output or return the generated markup. Default is echo */
@@ -325,7 +325,7 @@ class View_PDF extends Helper_Abstract_View {
 	 *
 	 * @since 4.0
 	 */
-	public function generate_html_structure( $entry, Helper_Abstract_Model $model, $config = [] ) {
+	public function generate_html_structure( $entry, Abstract_Model $model, $config = [] ) {
 
 		/* Set up required variables */
 		$form        = $this->gform->get_form( $entry['form_id'] );
@@ -432,7 +432,7 @@ class View_PDF extends Helper_Abstract_View {
 	 *
 	 * @since 4.0
 	 */
-	public function process_field( GF_Field $field, $entry, $form, $config, Field_Products $products, Helper_Field_Container $container, Helper_Abstract_Model $model ) {
+	public function process_field( GF_Field $field, $entry, $form, $config, Field_Products $products, Helper_Field_Container $container, Abstract_Model $model ) {
 
 		/*
 		* Set up our configuration variables

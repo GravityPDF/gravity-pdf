@@ -2,7 +2,7 @@
 
 namespace GFPDF\Helper\Fields;
 
-use GFPDF\Helper\Helper_Abstract_Fields;
+use GFPDF\Abstraction\Abstract_Fields;
 
 use GFCommon;
 
@@ -45,7 +45,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Likert extends Helper_Abstract_Fields {
+class Field_Likert extends Abstract_Fields {
 
 	/**
 	 * Used to check if the current field has a value

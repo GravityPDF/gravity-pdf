@@ -2,9 +2,9 @@
 
 namespace GFPDF\Tests;
 
-use GFPDF\Helper\Helper_Abstract_Controller;
-use GFPDF\Helper\Helper_Abstract_Model;
-use GFPDF\Helper\Helper_Abstract_View;
+use GFPDF\Abstraction\Abstract_Controller;
+use GFPDF\Abstraction\Abstract_Model;
+use GFPDF\Abstraction\Abstract_View;
 use GFPDF\Controller\Controller_Settings;
 use GFPDF\Model\Model_Settings;
 use GFPDF\View\View_Settings;
@@ -102,8 +102,8 @@ class Test_MVC_Abstracts extends WP_UnitTestCase {
 		$this->assertTrue( method_exists( $this->controller, 'init' ) );
 
 		/* get if model / view uses our abstract classes */
-		$this->assertTrue( $this->controller->model instanceof Helper_Abstract_Model );
-		$this->assertTrue( $this->controller->view instanceof Helper_Abstract_View );
+		$this->assertTrue( $this->controller->model instanceof Abstract_Model );
+		$this->assertTrue( $this->controller->view instanceof Abstract_View );
 
 		/* double check the controller stored the model / view correctly */
 		$this->assertTrue( $this->controller->model instanceof Model_Settings );
@@ -121,7 +121,7 @@ class Test_MVC_Abstracts extends WP_UnitTestCase {
 		$this->assertTrue( method_exists( $this->model, 'getController' ) );
 
 		/* ensure the returned controller uses our abstract class and is stored correctly */
-		$this->assertTrue( $this->model->getController() instanceof Helper_Abstract_Controller );
+		$this->assertTrue( $this->model->getController() instanceof Abstract_Controller );
 		$this->assertTrue( $this->model->getController() instanceof Controller_Settings );
 	}
 

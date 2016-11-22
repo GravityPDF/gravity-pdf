@@ -1,6 +1,6 @@
 <?php
 
-namespace GFPDF\Helper;
+namespace GFPDF\Abstraction;
 
 /**
  * Abstract Helper Form Class
@@ -44,7 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-abstract class Helper_Abstract_Form {
+abstract class Abstract_Form {
 
 	/**
 	 * Get the form plugins current version

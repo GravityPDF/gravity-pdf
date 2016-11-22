@@ -60,7 +60,7 @@ class Focus_Gravity implements Helper_Interface_Config {
 	/**
 	 * Return the templates configuration structure which control what extra fields will be shown in the "Template" tab when configuring a form's PDF.
 	 *
-	 * The fields key is based on our \GFPDF\Helper\Helper_Abstract_Options Settings API
+	 * The fields key is based on our \GFPDF\Abstraction\Abstract_Options Settings API
 	 *
 	 * See the Helper_Options_Fields::register_settings() method for the exact fields that can be passed in
 	 *

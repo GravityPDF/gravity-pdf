@@ -2,8 +2,8 @@
 
 namespace GFPDF\View;
 
-use GFPDF\Helper\Helper_Abstract_View;
-use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Abstraction\Abstract_View;
+use GFPDF\Abstraction\Abstract_Form;
 
 /**
  * Welcome Screen View
@@ -46,7 +46,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class View_Welcome_Screen extends Helper_Abstract_View {
+class View_Welcome_Screen extends Abstract_View {
 
 	/**
 	 * Set the view's name
@@ -70,11 +70,11 @@ class View_Welcome_Screen extends Helper_Abstract_View {
 	 * Setup our class by injecting all our dependancies
 	 *
 	 * @param array                                          $data_cache An array of data to pass to the view
-	 * @param \GFPDF\Helper\Helper_Form|Helper_Abstract_Form $gform      Our abstracted Gravity Forms helper functions
+	 * @param \GFPDF\Helper\Helper_Form|Abstract_Form $gform      Our abstracted Gravity Forms helper functions
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $data_cache = [], Helper_Abstract_Form $gform ) {
+	public function __construct( $data_cache = [], Abstract_Form $gform ) {
 
 		/* Call our parent constructor */
 		parent::__construct( $data_cache );

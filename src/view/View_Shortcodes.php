@@ -2,7 +2,7 @@
 
 namespace GFPDF\View;
 
-use GFPDF\Helper\Helper_Abstract_View;
+use GFPDF\Abstraction\Abstract_View;
 
 /**
  * Shortcode View
@@ -43,7 +43,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class View_Shortcodes extends Helper_Abstract_View {
+class View_Shortcodes extends Abstract_View {
 
 	/**
 	 * Set the view's name

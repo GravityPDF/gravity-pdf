@@ -2,9 +2,9 @@
 
 namespace GFPDF\Model;
 
-use GFPDF\Helper\Helper_Abstract_Model;
-use GFPDF\Helper\Helper_Abstract_Form;
-use GFPDF\Helper\Helper_Abstract_Options;
+use GFPDF\Abstraction\Abstract_Model;
+use GFPDF\Abstraction\Abstract_Form;
+use GFPDF\Abstraction\Abstract_Options;
 use GFPDF\Helper\Helper_Misc;
 
 use Psr\Log\LoggerInterface;
@@ -53,7 +53,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Model_Shortcodes extends Helper_Abstract_Model {
+class Model_Shortcodes extends Abstract_Model {
 
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
@@ -74,7 +74,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	protected $log;
 
 	/**
-	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
+	 * Holds our Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
 	 * @var \GFPDF\Helper\Helper_Options_Fields
@@ -96,13 +96,13 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	/**
 	 * Setup our class by injecting all our dependancies
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form|\GFPDF\Helper\Helper_Form              $gform   Our abstracted Gravity Forms helper functions
+	 * @param \GFPDF\Abstraction\Abstract_Form|\GFPDF\Helper\Helper_Form              $gform   Our abstracted Gravity Forms helper functions
 	 * @param \Monolog\Logger|LoggerInterface                                           $log     Our logger class
-	 * @param \GFPDF\Helper\Helper_Abstract_Options|\GFPDF\Helper\Helper_Options_Fields $options Our options class which allows us to access any settings
+	 * @param \GFPDF\Abstraction\Abstract_Options|\GFPDF\Helper\Helper_Options_Fields $options Our options class which allows us to access any settings
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Misc $misc ) {
+	public function __construct( Abstract_Form $gform, LoggerInterface $log, Abstract_Options $options, Helper_Misc $misc ) {
 
 		/* Assign our internal variables */
 		$this->gform   = $gform;

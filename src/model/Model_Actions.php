@@ -2,8 +2,8 @@
 
 namespace GFPDF\Model;
 
-use GFPDF\Helper\Helper_Abstract_Model;
-use GFPDF\Helper\Helper_Abstract_Options;
+use GFPDF\Abstraction\Abstract_Model;
+use GFPDF\Abstraction\Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Migration;
@@ -52,7 +52,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Model_Actions extends Helper_Abstract_Model {
+class Model_Actions extends Abstract_Model {
 
 	/**
 	 * Holds our Helper_Data object
@@ -65,7 +65,7 @@ class Model_Actions extends Helper_Abstract_Model {
 	protected $data;
 
 	/**
-	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
+	 * Holds our Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
 	 * @var \GFPDF\Helper\Helper_Options_Fields
@@ -88,12 +88,12 @@ class Model_Actions extends Helper_Abstract_Model {
 	 * Setup our class by injecting all our dependancies
 	 *
 	 * @param \GFPDF\Helper\Helper_Data             $data    Our plugin data store
-	 * @param \GFPDF\Helper\Helper_Abstract_Options $options Our options class which allows us to access any settings
+	 * @param \GFPDF\Abstraction\Abstract_Options $options Our options class which allows us to access any settings
 	 * @param \GFPDF\Helper\Helper_Notices          $notices Our notice class used to queue admin messages and errors
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Data $data, Helper_Abstract_Options $options, Helper_Notices $notices ) {
+	public function __construct( Helper_Data $data, Abstract_Options $options, Helper_Notices $notices ) {
 
 		/* Assign our internal variables */
 		$this->data    = $data;

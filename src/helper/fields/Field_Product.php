@@ -2,7 +2,7 @@
 
 namespace GFPDF\Helper\Fields;
 
-use GFPDF\Helper\Helper_Abstract_Fields;
+use GFPDF\Abstraction\Abstract_Fields;
 
 use GFFormsModel;
 use GFCommon;
@@ -49,23 +49,23 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Product extends Helper_Abstract_Fields {
+class Field_Product extends Abstract_Fields {
 
 	/**
 	 * Our products class which handles all Gravity Form products fields in bulk
 	 *
-	 * @var \GFPDF\Helper\Helper_Abstract_fields
+	 * @var \GFPDF\Abstraction\Abstract_fields
 	 */
 	private $products;
 
 	/**
 	 * Store our products class for later user
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Fields $products
+	 * @param \GFPDF\Abstraction\Abstract_Fields $products
 	 *
 	 * @since 4.0
 	 */
-	public function set_products( Helper_Abstract_Fields $products ) {
+	public function set_products( Abstract_Fields $products ) {
 		$this->products = $products;
 	}
 

@@ -2,8 +2,8 @@
 
 namespace GFPDF\Model;
 
-use GFPDF\Helper\Helper_Abstract_Model;
-use GFPDF\Helper\Helper_Abstract_Options;
+use GFPDF\Abstraction\Abstract_Model;
+use GFPDF\Abstraction\Abstract_Options;
 use GFPDF\Helper\Helper_Misc;
 
 use Psr\Log\LoggerInterface;
@@ -48,7 +48,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.1
  */
-class Model_Mergetags extends Helper_Abstract_Model {
+class Model_Mergetags extends Abstract_Model {
 
 	/**
 	 * @var \GFPDF\Model\Model_PDF
@@ -58,7 +58,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	protected $pdf;
 
 	/**
-	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
+	 * Holds our Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
 	 * @var \GFPDF\Helper\Helper_Options_Fields
@@ -89,13 +89,13 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	/**
 	 * Model_Mergetags constructor.
 	 *
-	 * @param Helper_Abstract_Options         $options
+	 * @param Abstract_Options         $options
 	 * @param \GFPDF\Model\Model_PDF          $pdf
 	 * @param \Monolog\Logger|LoggerInterface $log
 	 *
 	 * @since    4.1
 	 */
-	public function __construct( Helper_Abstract_Options $options, Model_PDF $pdf, LoggerInterface $log, Helper_Misc $misc ) {
+	public function __construct( Abstract_Options $options, Model_PDF $pdf, LoggerInterface $log, Helper_Misc $misc ) {
 
 		/* Assign our internal variables */
 		$this->pdf     = $pdf;

@@ -2,6 +2,8 @@
 
 namespace GFPDF\Helper;
 
+use GFPDF\Abstraction\Abstract_Options;
+
 /**
  * Give a standardised format to queue admin notices
  *
@@ -42,7 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_Interface_Filters {
+class Helper_Options_Fields extends Abstract_Options implements Helper_Interface_Filters {
 
 	/**
 	 * Add our filters

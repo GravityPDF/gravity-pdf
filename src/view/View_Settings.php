@@ -2,10 +2,10 @@
 
 namespace GFPDF\View;
 
-use GFPDF\Helper\Helper_Abstract_View;
+use GFPDF\Abstraction\Abstract_View;
 use GFPDF_Major_Compatibility_Checks;
-use GFPDF\Helper\Helper_Abstract_Form;
-use GFPDF\Helper\Helper_Abstract_Options;
+use GFPDF\Abstraction\Abstract_Form;
+use GFPDF\Abstraction\Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Templates;
@@ -53,7 +53,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class View_Settings extends Helper_Abstract_View {
+class View_Settings extends Abstract_View {
 
 	/**
 	 * Set the view's name
@@ -83,7 +83,7 @@ class View_Settings extends Helper_Abstract_View {
 	protected $log;
 
 	/**
-	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
+	 * Holds our Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
 	 * @var \GFPDF\Helper\Helper_Options_Fields
@@ -126,16 +126,16 @@ class View_Settings extends Helper_Abstract_View {
 	 * Setup our class by injecting all our dependancies
 	 *
 	 * @param array                                          $data_cache An array of data to pass to the view
-	 * @param \GFPDF\Helper\Helper_Form|Helper_Abstract_Form $gform      Our abstracted Gravity Forms helper functions
+	 * @param \GFPDF\Helper\Helper_Form|Abstract_Form $gform      Our abstracted Gravity Forms helper functions
 	 * @param \Monolog\Logger|LoggerInterface                $log        Our logger class
-	 * @param \GFPDF\Helper\Helper_Abstract_Options          $options    Our options class which allows us to access any settings
+	 * @param \GFPDF\Abstraction\Abstract_Options          $options    Our options class which allows us to access any settings
 	 * @param \GFPDF\Helper\Helper_Data                      $data       Our plugin data store
 	 * @param \GFPDF\Helper\Helper_Misc                      $misc       Our miscellaneous class
 	 * @param \GFPDF\Helper\Helper_Templates                 $templates
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $data_cache = [], Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates ) {
+	public function __construct( $data_cache = [], Abstract_Form $gform, LoggerInterface $log, Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates ) {
 
 		/* Call our parent constructor */
 		parent::__construct( $data_cache );

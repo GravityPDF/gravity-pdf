@@ -56,7 +56,7 @@ class Legacy implements Helper_Interface_Config {
 	/**
 	 * Return the configuration structure.
 	 *
-	 * The fields key is based on our \GFPDF\Helper\Helper_Abstract_Options Settings API
+	 * The fields key is based on our \GFPDF\Abstraction\Abstract_Options Settings API
 	 * See the register_settings() method for the exact fields that can be passed in
 	 *
 	 * @return array The array, split into core components and custom fields

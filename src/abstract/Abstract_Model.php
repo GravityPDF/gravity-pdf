@@ -1,6 +1,6 @@
 <?php
 
-namespace GFPDF\Helper;
+namespace GFPDF\Abstraction;
 
 /**
  * Abstract Helper Model
@@ -41,7 +41,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-abstract class Helper_Abstract_Model {
+abstract class Abstract_Model {
 
 	/**
 	 * Classes will store a controler object to allow user access
@@ -55,11 +55,11 @@ abstract class Helper_Abstract_Model {
 	/**
 	 * Add a controller setter function with type hinting to ensure compatiiblity
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Controller $class The controller class
+	 * @param \GFPDF\Abstraction\Abstract_Controller $class The controller class
 	 *
 	 * @since 4.0
 	 */
-	final public function setController( Helper_Abstract_Controller $class ) {
+	final public function setController( Abstract_Controller $class ) {
 		$this->controller = $class;
 	}
 
@@ -68,7 +68,7 @@ abstract class Helper_Abstract_Model {
 	 *
 	 * @since 4.0
 	 *
-	 * @return \GFPDF\Helper\Helper_Abstract_Controller
+	 * @return \GFPDF\Abstraction\Abstract_Controller
 	 */
 	final public function getController() {
 		return $this->controller;

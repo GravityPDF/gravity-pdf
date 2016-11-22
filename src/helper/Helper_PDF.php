@@ -2,6 +2,7 @@
 
 namespace GFPDF\Helper;
 
+use GFPDF\Abstraction\Abstract_Form;
 use mPDF;
 
 use Exception;
@@ -190,14 +191,14 @@ class Helper_PDF {
 	 * @param array                              $entry    The Gravity Form Entry to be processed
 	 * @param array                              $settings The Gravity PDF Settings Array
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
+	 * @param \GFPDF\Abstraction\Abstract_Form $gform
 	 * @param \GFPDF\Helper\Helper_Data          $data
 	 * @param \GFPDF\Helper\Helper_Misc          $misc     Our miscellanious methods
 	 * @param \GFPDF\Helper\Helper_Templates     $templates
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $entry, $settings, Helper_Abstract_Form $gform, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates ) {
+	public function __construct( $entry, $settings, Abstract_Form $gform, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates ) {
 
 		/* Assign our internal variables */
 		$this->entry     = $entry;

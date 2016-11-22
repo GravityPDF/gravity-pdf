@@ -2,9 +2,9 @@
 
 namespace GFPDF\Helper\Fields;
 
-use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Abstraction\Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
-use GFPDF\Helper\Helper_Abstract_Fields;
+use GFPDF\Abstraction\Abstract_Fields;
 
 use GFFormsModel;
 use GF_Field_Select;
@@ -51,7 +51,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Field_Select extends Helper_Abstract_Fields {
+class Field_Select extends Abstract_Fields {
 
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
@@ -59,14 +59,14 @@ class Field_Select extends Helper_Abstract_Fields {
 	 * @param object                             $field The GF_Field_* Object
 	 * @param array                              $entry The Gravity Forms Entry
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
+	 * @param \GFPDF\Abstraction\Abstract_Form $gform
 	 * @param \GFPDF\Helper\Helper_Misc          $misc
 	 *
 	 * @throws Exception
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $field, $entry, Helper_Abstract_Form $gform, Helper_Misc $misc ) {
+	public function __construct( $field, $entry, Abstract_Form $gform, Helper_Misc $misc ) {
 
 		if ( ! is_object( $field ) || ! $field instanceof GF_Field_Select ) {
 			throw new Exception( '$field needs to be in instance of GF_Field_Select' );
