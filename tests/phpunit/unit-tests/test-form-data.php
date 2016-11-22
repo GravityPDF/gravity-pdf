@@ -881,7 +881,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 
 		/*
          * Old Signature that doesn't index by ID
-         * Depreciated
+         * Deprecated
          */
 		$this->assertEquals( $response, $data['signature_details'][0]['img'] );
 		$this->assertNotFalse( strpos( $data['signature_details'][0]['path'], ABSPATH ) );
@@ -891,7 +891,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 
 		/*
          * Basic Signature
-         * Depreciated
+         * Deprecated
          */
 		$this->assertEquals( $response, $data['signature'][0] );
 	}

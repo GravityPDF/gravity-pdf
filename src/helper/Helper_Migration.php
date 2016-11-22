@@ -310,7 +310,7 @@ class Helper_Migration {
 			/* Convert our boolean values into 'Yes' or 'No' responses, with the exception of notification */
 			$skip_nodes = [ 'notifications', 'notification' ];
 			if ( ! in_array( $id, $skip_nodes ) ) {
-				$val = $this->misc->update_depreciated_config( $val );
+				$val = $this->misc->update_deprecated_config( $val );
 			}
 
 			/* Convert to our v4 configuration names */

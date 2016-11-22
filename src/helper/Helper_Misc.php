@@ -749,7 +749,7 @@ class Helper_Misc {
 	 *
 	 * @since  4.0
 	 */
-	public function update_depreciated_config( $value ) {
+	public function update_deprecated_config( $value ) {
 
 		if ( is_bool( $value ) ) {
 			$value = ( $value ) ? 'Yes' : 'No';

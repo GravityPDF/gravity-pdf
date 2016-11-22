@@ -1,12 +1,10 @@
 <?php
 
 /* For backwards compatibility reasons this file will be in the global namespace */
-use GFPDF\Router;
 use GFPDF\Helper\Fields\Field_v3_Products;
 
-
 /**
- * Depreciated Functionality / Classes
+ * Deprecated Functionality / Classes
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2016, Blue Liquid Designs
@@ -40,13 +38,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 */
 
 /**
- * Add's an easy depreciated class abstract fallback
+ * Add's an easy deprecated class abstract fallback
  *
  * @since 4.0
  */
-abstract class GFPDF_Depreciated_Abstract {
+abstract class GFPDF_Deprecated_Abstract {
+
 	/**
-	 * Add user depreciation notice for missing methods
+	 * Add user deprecated notice for missing methods
 	 *
 	 * @since  4.0
 	 *
@@ -58,7 +57,7 @@ abstract class GFPDF_Depreciated_Abstract {
 	}
 
 	/**
-	 * Add user depreciation notice for missing methods
+	 * Add user deprecated notice for missing methods
 	 *
 	 * @since  4.0
 	 *
@@ -75,7 +74,7 @@ abstract class GFPDF_Depreciated_Abstract {
  *
  * @since 3.0
  */
-class GFPDF_Core extends GFPDF_Depreciated_Abstract {
+class GFPDF_Core extends GFPDF_Deprecated_Abstract {
 
 	/**
 	 * Setup our v3 template location constants
@@ -109,7 +108,7 @@ class GFPDF_Core extends GFPDF_Depreciated_Abstract {
 	 *
 	 * @since 4.0
 	 */
-	public function setup_depreciated_paths() {
+	public function setup_deprecated_paths() {
 		global $gfpdfe_data;
 
 		$templates   = GPDFAPI::get_templates_class();
@@ -125,7 +124,7 @@ class GFPDF_Core extends GFPDF_Depreciated_Abstract {
  *
  * @since 3.0
  */
-class PDFRender extends GFPDF_Depreciated_Abstract {
+class PDFRender extends GFPDF_Deprecated_Abstract {
 
 	/**
 	 * Saves the PDF to disk
@@ -189,7 +188,7 @@ class PDFRender extends GFPDF_Depreciated_Abstract {
  *
  * @since 3.0
  */
-class PDF_Common extends GFPDF_Depreciated_Abstract {
+class PDF_Common extends GFPDF_Deprecated_Abstract {
 
 	/**
 	 * Takes over for setup_ids() but is now called much earlier in the process
@@ -325,11 +324,11 @@ class PDF_Common extends GFPDF_Depreciated_Abstract {
 }
 
 /**
- * Add depreciated functionality for generating our standard PDF HTML
+ * Add deprecated functionality for generating our standard PDF HTML
  *
  * @since 3.0
  */
-class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
+class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 
 	/**
 	 * First legacy wrapper to generate our PDF HTML layout
@@ -658,22 +657,22 @@ class GFPDFEntryDetail extends GFPDF_Depreciated_Abstract {
  *
  * @since 3.0
  */
-class PDFGenerator extends GFPDF_Depreciated_Abstract {
+class PDFGenerator extends GFPDF_Deprecated_Abstract {
 }
 
-class GFPDFE_DATA extends GFPDF_Depreciated_Abstract {
+class GFPDFE_DATA extends GFPDF_Deprecated_Abstract {
 }
 
-class GFPDF_InstallUpdater extends GFPDF_Depreciated_Abstract {
+class GFPDF_InstallUpdater extends GFPDF_Deprecated_Abstract {
 }
 
-class GFPDF_Notices extends GFPDF_Depreciated_Abstract {
+class GFPDF_Notices extends GFPDF_Deprecated_Abstract {
 }
 
-class PDF_Generator extends GFPDF_Depreciated_Abstract {
+class PDF_Generator extends GFPDF_Deprecated_Abstract {
 }
 
-class GFPDF_Core_Model extends GFPDF_Depreciated_Abstract {
+class GFPDF_Core_Model extends GFPDF_Deprecated_Abstract {
 
 	/**
 	 * This method will save any PDFs assigned to a form to disk
@@ -694,8 +693,8 @@ class GFPDF_Core_Model extends GFPDF_Depreciated_Abstract {
 	}
 }
 
-class GFPDF_Settings_Model extends GFPDF_Depreciated_Abstract {
+class GFPDF_Settings_Model extends GFPDF_Deprecated_Abstract {
 }
 
-class GFPDF_Settings extends GFPDF_Depreciated_Abstract {
+class GFPDF_Settings extends GFPDF_Deprecated_Abstract {
 }

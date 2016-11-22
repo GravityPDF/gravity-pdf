@@ -8,7 +8,7 @@ use PDF_Common;
 use WP_UnitTestCase;
 
 /**
- * Test Gravity PDF depreciated classes / methods / functions
+ * Test Gravity PDF deprecated classes / methods / functions
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2016, Blue Liquid Designs
@@ -37,31 +37,31 @@ use WP_UnitTestCase;
 */
 
 /**
- * Test all depreciated functionality
+ * Test all deprecated functionality
  *
  * @since 4.0
- * @group depreciated
+ * @group deprecated
  */
-class Test_Depreciated extends WP_UnitTestCase {
+class Test_Deprecated extends WP_UnitTestCase {
 	/**
-	 * Ensure all depreciated classes have appropriate fallbacks
+	 * Ensure all deprecated classes have appropriate fallbacks
 	 *
 	 * @since        4.0
 	 *
-	 * @dataProvider provider_depreciated
+	 * @dataProvider provider_deprecated
 	 */
-	public function test_depreciated( $class ) {
+	public function test_deprecated( $class ) {
 		$this->assertTrue( class_exists( $class ) );
 	}
 
 	/**
-	 * Test we have appropriate depreciated classes frm our v3 version
+	 * Test we have appropriate deprecated classes frm our v3 version
 	 *
 	 * @return array
 	 *
 	 * @since 4.0
 	 */
-	public function provider_depreciated() {
+	public function provider_deprecated() {
 		return [
 			[ 'GFPDF_Core' ],
 			[ 'PDFGenerator' ],
