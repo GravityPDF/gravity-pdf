@@ -2,6 +2,9 @@
 
 namespace GFPDF\Helper;
 
+use GFPDF\Abstraction\Abstract_Form;
+use GFPDF\Abstraction\Abstract_Options;
+
 /**
  * Data overloaded Helper Class
  * Cache shared data across the plugin
@@ -179,14 +182,14 @@ class Helper_Data {
 	/**
 	 * A key-value array to be used in a localized script call for our Gravity PDF javascript files
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Options $options
-	 * @param \GFPDF\Helper\Helper_Abstract_Form    $gform
+	 * @param \GFPDF\Abstraction\Abstract_Options $options
+	 * @param \GFPDF\Abstraction\Abstract_Form    $gform
 	 *
 	 * @return array
 	 *
 	 * @since  4.0
 	 */
-	public function get_localised_script_data( Helper_Abstract_Options $options, Helper_Abstract_Form $gform ) {
+	public function get_localised_script_data( Abstract_Options $options, Abstract_Form $gform ) {
 
 		$custom_fonts = array_values( $options->get_custom_fonts() );
 

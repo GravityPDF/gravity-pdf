@@ -107,7 +107,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public $data;
 
 	/**
-	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
+	 * Holds our Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
 	 * @var \GFPDF\Helper\Helper_Options_Fields

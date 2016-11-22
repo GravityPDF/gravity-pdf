@@ -1,7 +1,12 @@
 <?php
 
-namespace GFPDF\Helper;
+namespace GFPDF\Abstraction;
 
+use GFPDF\Helper\Helper_Interface_Filters;
+use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Misc;
+use GFPDF\Helper\Helper_Notices;
+use GFPDF\Helper\Helper_Templates;
 use Psr\Log\LoggerInterface;
 
 use WP_Error;
@@ -49,7 +54,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
+abstract class Abstract_Options implements Helper_Interface_Filters {
 
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
@@ -129,18 +134,18 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 
 	/**
-	 * Helper_Abstract_Options constructor.
+	 * Abstract_Options constructor.
 	 *
-	 * @param \Monolog\Logger|LoggerInterface    $log
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
-	 * @param \GFPDF\Helper\Helper_Data          $data
-	 * @param \GFPDF\Helper\Helper_Misc          $misc
-	 * @param \GFPDF\Helper\Helper_Notices       $notices
-	 * @param \GFPDF\Helper\Helper_Templates     $templates
+	 * @param \Monolog\Logger|LoggerInterface  $log
+	 * @param \GFPDF\Abstraction\Abstract_Form $gform
+	 * @param \GFPDF\Helper\Helper_Data        $data
+	 * @param \GFPDF\Helper\Helper_Misc        $misc
+	 * @param \GFPDF\Helper\Helper_Notices     $notices
+	 * @param \GFPDF\Helper\Helper_Templates   $templates
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( LoggerInterface $log, Helper_Abstract_Form $gform, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates ) {
+	public function __construct( LoggerInterface $log, Abstract_Form $gform, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates ) {
 
 		/* Assign our internal variables */
 		$this->log       = $log;

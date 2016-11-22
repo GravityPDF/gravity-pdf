@@ -2,6 +2,7 @@
 
 namespace GFPDF\Helper;
 
+use GFPDF\Abstraction\Abstract_Form;
 use WP_List_Table;
 
 
@@ -88,13 +89,13 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * Setup our class with appropriate data
 	 *
 	 * @param array                              $form  The Gravity Forms object
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform Our abstracted Gravity Forms API
+	 * @param \GFPDF\Abstraction\Abstract_Form $gform Our abstracted Gravity Forms API
 	 * @param \GFPDF\Helper\Helper_Misc          $misc
 	 * @param \GFPDF\Helper\Helper_Templates     $templates
 	 *
 	 * @since    4.0
 	 */
-	public function __construct( $form, Helper_Abstract_Form $gform, Helper_Misc $misc, Helper_Templates $templates ) {
+	public function __construct( $form, Abstract_Form $gform, Helper_Misc $misc, Helper_Templates $templates ) {
 
 		/* Assign our internal variables */
 		$this->form      = $form;

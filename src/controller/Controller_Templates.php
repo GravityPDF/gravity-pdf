@@ -2,8 +2,8 @@
 
 namespace GFPDF\Controller;
 
-use GFPDF\Helper\Helper_Abstract_Controller;
-use GFPDF\Helper\Helper_Abstract_Model;
+use GFPDF\Abstraction\Abstract_Controller;
+use GFPDF\Abstraction\Abstract_Model;
 use GFPDF\Helper\Helper_Interface_Actions;
 
 
@@ -48,18 +48,18 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.1
  */
-class Controller_Templates extends Helper_Abstract_Controller implements Helper_Interface_Actions {
+class Controller_Templates extends Abstract_Controller implements Helper_Interface_Actions {
 
 	/**
 	 * Controller_Templates constructor.
 	 *
 	 * Setup our class by injecting all our dependancies
 	 *
-	 * @param Helper_Abstract_Model $model
+	 * @param Abstract_Model $model
 	 *
 	 * @since 4.1
 	 */
-	public function __construct( Helper_Abstract_Model $model ) {
+	public function __construct( Abstract_Model $model ) {
 		/* Load our model */
 		$this->model = $model;
 		$this->model->setController( $this );

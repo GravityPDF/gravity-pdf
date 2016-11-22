@@ -2,14 +2,14 @@
 
 namespace GFPDF\Controller;
 
-use GFPDF\Helper\Helper_Abstract_Controller;
-use GFPDF\Helper\Helper_Abstract_Model;
-use GFPDF\Helper\Helper_Abstract_View;
+use GFPDF\Abstraction\Abstract_Controller;
+use GFPDF\Abstraction\Abstract_Model;
+use GFPDF\Abstraction\Abstract_View;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
-use GFPDF\Helper\Helper_Abstract_Options;
+use GFPDF\Abstraction\Abstract_Options;
 
 /**
  * Form Settings (PDF Configuration) Controller
@@ -51,7 +51,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Controller_Form_Settings extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters {
+class Controller_Form_Settings extends Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters {
 	/**
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
@@ -63,7 +63,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	protected $data;
 
 	/**
-	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
+	 * Holds our Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
 	 * @var \GFPDF\Helper\Helper_Options_Fields
@@ -85,15 +85,15 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	/**
 	 * Setup our class by injecting all our dependancies
 	 *
-	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_Form_Settings $model   Our Form Model the controller will manage
-	 * @param Helper_Abstract_View|\GFPDF\View\View_Form_Settings    $view    Our Form View the controller will manage
+	 * @param Abstract_Model|\GFPDF\Model\Model_Form_Settings $model   Our Form Model the controller will manage
+	 * @param Abstract_View|\GFPDF\View\View_Form_Settings    $view    Our Form View the controller will manage
 	 * @param \GFPDF\Helper\Helper_Data                              $data    Our plugin data store
-	 * @param \GFPDF\Helper\Helper_Abstract_Options                  $options Our options class which allows us to access any settings
+	 * @param \GFPDF\Abstraction\Abstract_Options                  $options Our options class which allows us to access any settings
 	 * @param \GFPDF\Helper\Helper_Misc                              $misc    Our miscellaneous methods
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Data $data, Helper_Abstract_Options $options, Helper_Misc $misc ) {
+	public function __construct( Abstract_Model $model, Abstract_View $view, Helper_Data $data, Abstract_Options $options, Helper_Misc $misc ) {
 
 		/* Assign our internal variables */
 		$this->data    = $data;

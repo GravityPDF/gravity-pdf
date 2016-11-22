@@ -2,7 +2,7 @@
 
 namespace GFPDF\Helper\Fields;
 
-use GFPDF\Helper\Helper_Abstract_Fields;
+use GFPDF\Abstraction\Abstract_Fields;
 
 /**
  * Gravity Forms Field
@@ -85,6 +85,6 @@ class Field_v3_List extends Field_List {
 
 		/* get buffer and return HTML */
 
-		return Helper_Abstract_Fields::html( ob_get_clean() );
+		return Abstract_Fields::html( ob_get_clean() );
 	}
 }

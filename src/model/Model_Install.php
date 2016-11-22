@@ -2,11 +2,11 @@
 
 namespace GFPDF\Model;
 
-use GFPDF\Helper\Helper_Abstract_Model;
+use GFPDF\Abstraction\Abstract_Model;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
-use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Abstraction\Abstract_Form;
 
 use Psr\Log\LoggerInterface;
 
@@ -53,7 +53,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Model_Install extends Helper_Abstract_Model {
+class Model_Install extends Abstract_Model {
 
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
@@ -106,7 +106,7 @@ class Model_Install extends Helper_Abstract_Model {
 	/**
 	 * Setup our class by injecting all our dependancies
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform   Our abstracted Gravity Forms helper functions
+	 * @param \GFPDF\Abstraction\Abstract_Form $gform   Our abstracted Gravity Forms helper functions
 	 * @param \Monolog\Logger|LoggerInterface    $log     Our logger class
 	 * @param \GFPDF\Helper\Helper_Data          $data    Our plugin data store
 	 * @param \GFPDF\Helper\Helper_Misc          $misc    Our miscellaneous class
@@ -114,7 +114,7 @@ class Model_Install extends Helper_Abstract_Model {
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices ) {
+	public function __construct( Abstract_Form $gform, LoggerInterface $log, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices ) {
 
 		/* Assign our internal variables */
 		$this->gform   = $gform;

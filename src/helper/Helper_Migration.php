@@ -2,6 +2,8 @@
 
 namespace GFPDF\Helper;
 
+use GFPDF\Abstraction\Abstract_Form;
+use GFPDF\Abstraction\Abstract_Options;
 use Psr\Log\LoggerInterface;
 
 use Exception;
@@ -75,7 +77,7 @@ class Helper_Migration {
 	protected $data;
 
 	/**
-	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
+	 * Holds our Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
 	 * @var \GFPDF\Helper\Helper_Options_Fields
@@ -117,17 +119,17 @@ class Helper_Migration {
 	/**
 	 * Load our model and view and required actions
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form    $form
+	 * @param \GFPDF\Abstraction\Abstract_Form    $form
 	 * @param \Monolog\Logger|LoggerInterface       $log
 	 * @param \GFPDF\Helper\Helper_Data             $data
-	 * @param \GFPDF\Helper\Helper_Abstract_Options $options
+	 * @param \GFPDF\Abstraction\Abstract_Options $options
 	 * @param \GFPDF\Helper\Helper_Misc             $misc
 	 * @param \GFPDF\Helper\Helper_Notices          $notices
 	 * @param \GFPDF\Helper\Helper_Templates        $templates
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Data $data, Helper_Abstract_Options $options, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates ) {
+	public function __construct( Abstract_Form $gform, LoggerInterface $log, Helper_Data $data, Abstract_Options $options, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates ) {
 
 		/* Assign our internal variables */
 		$this->gform   = $gform;

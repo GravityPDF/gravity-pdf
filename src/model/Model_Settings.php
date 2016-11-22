@@ -2,10 +2,10 @@
 
 namespace GFPDF\Model;
 
-use GFPDF\Helper\Helper_Abstract_Model;
-use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Abstraction\Abstract_Model;
+use GFPDF\Abstraction\Abstract_Form;
 use GFPDF\Helper\Helper_Notices;
-use GFPDF\Helper\Helper_Abstract_Options;
+use GFPDF\Abstraction\Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Templates;
@@ -53,7 +53,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Model_Settings extends Helper_Abstract_Model {
+class Model_Settings extends Abstract_Model {
 
 	/**
 	 * Errors with the global form submission process are stored here
@@ -93,7 +93,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	protected $notices;
 
 	/**
-	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
+	 * Holds our Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
 	 * @var \GFPDF\Helper\Helper_Options_Fields
@@ -135,17 +135,17 @@ class Model_Settings extends Helper_Abstract_Model {
 	/**
 	 * Set up our dependancies
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form    $gform   Our abstracted Gravity Forms helper functions
+	 * @param \GFPDF\Abstraction\Abstract_Form    $gform   Our abstracted Gravity Forms helper functions
 	 * @param \Monolog\Logger|LoggerInterface       $log     Our logger class
 	 * @param \GFPDF\Helper\Helper_Notices          $notices Our notice class used to queue admin messages and errors
-	 * @param \GFPDF\Helper\Helper_Abstract_Options $options Our options class which allows us to access any settings
+	 * @param \GFPDF\Abstraction\Abstract_Options $options Our options class which allows us to access any settings
 	 * @param \GFPDF\Helper\Helper_Data             $data    Our plugin data store
 	 * @param \GFPDF\Helper\Helper_Misc             $misc    Our miscellaneous class
 	 * @param \GFPDF\Helper\Helper_Templates        $templates
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Notices $notices, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates ) {
+	public function __construct( Abstract_Form $gform, LoggerInterface $log, Helper_Notices $notices, Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates ) {
 
 		/* Assign our internal variables */
 		$this->gform     = $gform;

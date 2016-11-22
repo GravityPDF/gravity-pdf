@@ -2,6 +2,7 @@
 
 namespace GFPDF\Helper;
 
+use GFPDF\Abstraction\Abstract_Form;
 use Psr\Log\LoggerInterface;
 
 use GFCommon;
@@ -84,12 +85,12 @@ class Helper_Misc {
 	 * Store required classes locally
 	 *
 	 * @param \Monolog\Logger|LoggerInterface    $log
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
+	 * @param \GFPDF\Abstraction\Abstract_Form $gform
 	 * @param \GFPDF\Helper\Helper_Data          $data
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( LoggerInterface $log, Helper_Abstract_Form $gform, Helper_Data $data ) {
+	public function __construct( LoggerInterface $log, Abstract_Form $gform, Helper_Data $data ) {
 
 		/* Assign our internal variables */
 		$this->log   = $log;

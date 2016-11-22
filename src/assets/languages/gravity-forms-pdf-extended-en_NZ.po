@@ -186,297 +186,297 @@ msgstr "There was a problem generating your PDF"
 msgid "There was a problem installing the PDF templates. Please try again."
 msgstr "There was a problem installing the PDF templates. Please try again."
 
-#: src/helper/abstract/Helper_Abstract_Options.php:779,
-#: src/helper/abstract/Helper_Abstract_Options.php:811
+#: src/helper/abstract/Abstract_Options.php:779,
+#: src/helper/abstract/Abstract_Options.php:811
 msgid "You must pass in a valid form ID"
 msgstr "You must pass in a valid form ID"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:901
+#: src/helper/abstract/Abstract_Options.php:901
 msgid "You must pass in a valid PDF ID"
 msgstr "You must pass in a valid PDF ID"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1613
+#: src/helper/abstract/Abstract_Options.php:1613
 msgid "Gravity Forms Capabilities"
 msgstr "Gravity Forms Capabilities"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1625
+#: src/helper/abstract/Abstract_Options.php:1625
 msgid "Active WordPress Capabilities"
 msgstr "Active WordPress Capabilities"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1673
+#: src/helper/abstract/Abstract_Options.php:1673
 msgid "Common Sizes"
 msgstr "Common Sizes"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1675
+#: src/helper/abstract/Abstract_Options.php:1675
 msgid "A4 (210 x 297mm)"
 msgstr "A4 (210 x 297mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1677
+#: src/helper/abstract/Abstract_Options.php:1677
 msgid "Letter (8.5 x 11in)"
 msgstr "Letter (8.5 x 11in)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1679
+#: src/helper/abstract/Abstract_Options.php:1679
 msgid "Legal (8.5 x 14in)"
 msgstr "Legal (8.5 x 14in)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1681
+#: src/helper/abstract/Abstract_Options.php:1681
 msgid "Ledger / Tabloid (11 x 17in)"
 msgstr "Ledger / Tabloid (11 x 17in)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1683
+#: src/helper/abstract/Abstract_Options.php:1683
 msgid "Executive (7 x 10in)"
 msgstr "Executive (7 x 10in)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1685,
+#: src/helper/abstract/Abstract_Options.php:1685,
 #: src/helper/Helper_Options_Fields.php:195,
 #: src/helper/Helper_Options_Fields.php:723
 msgid "Custom Paper Size"
 msgstr "Custom Paper Size"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1691
+#: src/helper/abstract/Abstract_Options.php:1691
 msgid "\"A\" Sizes"
 msgstr "\"A\" Sizes"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1693
+#: src/helper/abstract/Abstract_Options.php:1693
 msgid "A0 (841 x 1189mm)"
 msgstr "A0 (841 x 1189mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1695
+#: src/helper/abstract/Abstract_Options.php:1695
 msgid "A1 (594 x 841mm)"
 msgstr "A1 (594 x 841mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1697
+#: src/helper/abstract/Abstract_Options.php:1697
 msgid "A2 (420 x 594mm)"
 msgstr "A2 (420 x 594mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1699
+#: src/helper/abstract/Abstract_Options.php:1699
 msgid "A3 (297 x 420mm)"
 msgstr "A3 (297 x 420mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1701
+#: src/helper/abstract/Abstract_Options.php:1701
 msgid "A5 (210 x 297mm)"
 msgstr "A5 (210 x 297mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1703
+#: src/helper/abstract/Abstract_Options.php:1703
 msgid "A6 (105 x 148mm)"
 msgstr "A6 (105 x 148mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1705
+#: src/helper/abstract/Abstract_Options.php:1705
 msgid "A7 (74 x 105mm)"
 msgstr "A7 (74 x 105mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1707
+#: src/helper/abstract/Abstract_Options.php:1707
 msgid "A8 (52 x 74mm)"
 msgstr "A8 (52 x 74mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1709
+#: src/helper/abstract/Abstract_Options.php:1709
 msgid "A9 (37 x 52mm)"
 msgstr "A9 (37 x 52mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1711
+#: src/helper/abstract/Abstract_Options.php:1711
 msgid "A10 (26 x 37mm)"
 msgstr "A10 (26 x 37mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1717
+#: src/helper/abstract/Abstract_Options.php:1717
 msgid "\"B\" Sizes"
 msgstr "\"B\" Sizes"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1719
+#: src/helper/abstract/Abstract_Options.php:1719
 msgid "B0 (1414 x 1000mm)"
 msgstr "B0 (1414 x 1000mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1721
+#: src/helper/abstract/Abstract_Options.php:1721
 msgid "B1 (1000 x 707mm)"
 msgstr "B1 (1000 x 707mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1723
+#: src/helper/abstract/Abstract_Options.php:1723
 msgid "B2 (707 x 500mm)"
 msgstr "B2 (707 x 500mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1725
+#: src/helper/abstract/Abstract_Options.php:1725
 msgid "B3 (500 x 353mm)"
 msgstr "B3 (500 x 353mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1727
+#: src/helper/abstract/Abstract_Options.php:1727
 msgid "B4 (353 x 250mm)"
 msgstr "B4 (353 x 250mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1729
+#: src/helper/abstract/Abstract_Options.php:1729
 msgid "B5 (250 x 176mm)"
 msgstr "B5 (250 x 176mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1731
+#: src/helper/abstract/Abstract_Options.php:1731
 msgid "B6 (176 x 125mm)"
 msgstr "B6 (176 x 125mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1733
+#: src/helper/abstract/Abstract_Options.php:1733
 msgid "B7 (125 x 88mm)"
 msgstr "B7 (125 x 88mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1735
+#: src/helper/abstract/Abstract_Options.php:1735
 msgid "B8 (88 x 62mm)"
 msgstr "B8 (88 x 62mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1737
+#: src/helper/abstract/Abstract_Options.php:1737
 msgid "B9 (62 x 44mm)"
 msgstr "B9 (62 x 44mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1739
+#: src/helper/abstract/Abstract_Options.php:1739
 msgid "B10 (44 x 31mm)"
 msgstr "B10 (44 x 31mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1745
+#: src/helper/abstract/Abstract_Options.php:1745
 msgid "\"C\" Sizes"
 msgstr "\"C\" Sizes"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1747
+#: src/helper/abstract/Abstract_Options.php:1747
 msgid "C0 (1297 x 917mm)"
 msgstr "C0 (1297 x 917mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1749
+#: src/helper/abstract/Abstract_Options.php:1749
 msgid "C1 (917 x 648mm)"
 msgstr "C1 (917 x 648mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1751
+#: src/helper/abstract/Abstract_Options.php:1751
 msgid "C2 (648 x 458mm)"
 msgstr "C2 (648 x 458mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1753
+#: src/helper/abstract/Abstract_Options.php:1753
 msgid "C3 (458 x 324mm)"
 msgstr "C3 (458 x 324mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1755
+#: src/helper/abstract/Abstract_Options.php:1755
 msgid "C4 (324 x 229mm)"
 msgstr "C4 (324 x 229mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1757
+#: src/helper/abstract/Abstract_Options.php:1757
 msgid "C5 (229 x 162mm)"
 msgstr "C5 (229 x 162mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1759
+#: src/helper/abstract/Abstract_Options.php:1759
 msgid "C6 (162 x 114mm)"
 msgstr "C6 (162 x 114mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1761
+#: src/helper/abstract/Abstract_Options.php:1761
 msgid "C7 (114 x 81mm)"
 msgstr "C7 (114 x 81mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1763
+#: src/helper/abstract/Abstract_Options.php:1763
 msgid "C8 (81 x 57mm)"
 msgstr "C8 (81 x 57mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1765
+#: src/helper/abstract/Abstract_Options.php:1765
 msgid "C9 (57 x 40mm)"
 msgstr "C9 (57 x 40mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1767
+#: src/helper/abstract/Abstract_Options.php:1767
 msgid "C10 (40 x 28mm)"
 msgstr "C10 (40 x 28mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1773
+#: src/helper/abstract/Abstract_Options.php:1773
 msgid "\"RA\" and \"SRA\" Sizes"
 msgstr "\"RA\" and \"SRA\" Sizes"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1775
+#: src/helper/abstract/Abstract_Options.php:1775
 msgid "RA0 (860 x 1220mm)"
 msgstr "RA0 (860 x 1220mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1777
+#: src/helper/abstract/Abstract_Options.php:1777
 msgid "RA1 (610 x 860mm)"
 msgstr "RA1 (610 x 860mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1779
+#: src/helper/abstract/Abstract_Options.php:1779
 msgid "RA2 (430 x 610mm)"
 msgstr "RA2 (430 x 610mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1781
+#: src/helper/abstract/Abstract_Options.php:1781
 msgid "RA3 (305 x 430mm)"
 msgstr "RA3 (305 x 430mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1783
+#: src/helper/abstract/Abstract_Options.php:1783
 msgid "RA4 (215 x 305mm)"
 msgstr "RA4 (215 x 305mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1785
+#: src/helper/abstract/Abstract_Options.php:1785
 msgid "SRA0 (900 x 1280mm)"
 msgstr "SRA0 (900 x 1280mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1787
+#: src/helper/abstract/Abstract_Options.php:1787
 msgid "SRA1 (640 x 900mm)"
 msgstr "SRA1 (640 x 900mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1789
+#: src/helper/abstract/Abstract_Options.php:1789
 msgid "SRA2 (450 x 640mm)"
 msgstr "SRA2 (450 x 640mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1791
+#: src/helper/abstract/Abstract_Options.php:1791
 msgid "SRA3 (320 x 450mm)"
 msgstr "SRA3 (320 x 450mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1793
+#: src/helper/abstract/Abstract_Options.php:1793
 msgid "SRA4 (225 x 320mm)"
 msgstr "SRA4 (225 x 320mm)"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1823
+#: src/helper/abstract/Abstract_Options.php:1823
 msgid "Unicode"
 msgstr "Unicode"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1851
+#: src/helper/abstract/Abstract_Options.php:1851
 msgid "Indic"
 msgstr "Indic"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1861
+#: src/helper/abstract/Abstract_Options.php:1861
 msgid "Arabic"
 msgstr "Arabic"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1873
+#: src/helper/abstract/Abstract_Options.php:1873
 msgid "Other"
 msgstr "Other"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:1977,
+#: src/helper/abstract/Abstract_Options.php:1977,
 #: src/model/Model_Settings.php:665
 msgid "User-Defined Fonts"
 msgstr "User-Defined Fonts"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2115
+#: src/helper/abstract/Abstract_Options.php:2115
 msgid "Copy"
 msgstr "Copy"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2117
+#: src/helper/abstract/Abstract_Options.php:2117
 msgid "Print - Low Resolution"
 msgstr "Print - Low Resolution"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2119
+#: src/helper/abstract/Abstract_Options.php:2119
 msgid "Print - High Resolution"
 msgstr "Print - High Resolution"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2121
+#: src/helper/abstract/Abstract_Options.php:2121
 msgid "Modify"
 msgstr "Modify"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2123
+#: src/helper/abstract/Abstract_Options.php:2123
 msgid "Annotate"
 msgstr "Annotate"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2125
+#: src/helper/abstract/Abstract_Options.php:2125
 msgid "Fill Forms"
 msgstr "Fill Forms"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2127
+#: src/helper/abstract/Abstract_Options.php:2127
 msgid "Extract"
 msgstr "Extract"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2129
+#: src/helper/abstract/Abstract_Options.php:2129
 msgid "Assemble"
 msgstr "Assemble"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2379
+#: src/helper/abstract/Abstract_Options.php:2379
 msgid "Settings updated."
 msgstr "Settings updated."
 
-#: src/helper/abstract/Helper_Abstract_Options.php:2639,
-#: src/helper/abstract/Helper_Abstract_Options.php:2655,
-#: src/helper/abstract/Helper_Abstract_Options.php:2671,
+#: src/helper/abstract/Abstract_Options.php:2639,
+#: src/helper/abstract/Abstract_Options.php:2655,
+#: src/helper/abstract/Abstract_Options.php:2671,
 #: tests/phpunit/unit-tests/test-settings.php:525,
 #: tests/phpunit/unit-tests/test-settings.php:527,
 #: tests/phpunit/unit-tests/test-settings.php:529
@@ -485,36 +485,36 @@ msgid ""
 msgstr ""
 "PDF Settings could not be saved. Please enter all required information below."
 
-#: src/helper/abstract/Helper_Abstract_Options.php:3765,
-#: src/helper/abstract/Helper_Abstract_Options.php:3767
+#: src/helper/abstract/Abstract_Options.php:3765,
+#: src/helper/abstract/Abstract_Options.php:3767
 msgid "Select Media"
 msgstr "Select Media"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:3769
+#: src/helper/abstract/Abstract_Options.php:3769
 msgid "Upload File"
 msgstr "Upload File"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:4083
+#: src/helper/abstract/Abstract_Options.php:4083
 msgid "Width"
 msgstr "Width"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:4085
+#: src/helper/abstract/Abstract_Options.php:4085
 msgid "Height"
 msgstr "Height"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:4091
+#: src/helper/abstract/Abstract_Options.php:4091
 msgid "mm"
 msgstr "mm"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:4093
+#: src/helper/abstract/Abstract_Options.php:4093
 msgid "inches"
 msgstr "inches"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:4213
+#: src/helper/abstract/Abstract_Options.php:4213
 msgid "The callback used for the %s setting is missing."
 msgstr "The callback used for the %s setting is missing."
 
-#: src/helper/abstract/Helper_Abstract_View.php:287
+#: src/helper/abstract/Abstract_View.php:287
 msgid "Cannot find file %s"
 msgstr "Cannot find file %s"
 

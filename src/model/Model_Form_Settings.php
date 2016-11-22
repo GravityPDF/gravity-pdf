@@ -2,15 +2,15 @@
 
 namespace GFPDF\Model;
 
-use GFPDF\Helper\Helper_Abstract_Model;
+use GFPDF\Abstraction\Abstract_Model;
 use GFPDF\Helper\Helper_PDF_List_Table;
 use GFPDF\Helper\Helper_Interface_Config;
-use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Abstraction\Abstract_Form;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Templates;
-use GFPDF\Helper\Helper_Abstract_Options;
+use GFPDF\Abstraction\Abstract_Options;
 
 use Psr\Log\LoggerInterface;
 
@@ -57,7 +57,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Model_Form_Settings extends Helper_Abstract_Model {
+class Model_Form_Settings extends Abstract_Model {
 
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
@@ -88,7 +88,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	protected $data;
 
 	/**
-	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
+	 * Holds our Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
 	 * @var \GFPDF\Helper\Helper_Options_Fields
@@ -130,17 +130,17 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	/**
 	 * Setup our class by injecting all our dependancies
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form    $gform   Our abstracted Gravity Forms helper functions
+	 * @param \GFPDF\Abstraction\Abstract_Form    $gform   Our abstracted Gravity Forms helper functions
 	 * @param \Monolog\Logger|LoggerInterface       $log     Our logger class
 	 * @param \GFPDF\Helper\Helper_Data             $data    Our plugin data store
-	 * @param \GFPDF\Helper\Helper_Abstract_Options $options Our options class which allows us to access any settings
+	 * @param \GFPDF\Abstraction\Abstract_Options $options Our options class which allows us to access any settings
 	 * @param \GFPDF\Helper\Helper_Misc             $misc    Our miscellaneous class
 	 * @param \GFPDF\Helper\Helper_Notices          $notices Our notice class used to queue admin messages and errors
 	 * @param \GFPDF\Helper\Helper_Templates        $templates
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Data $data, Helper_Abstract_Options $options, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates ) {
+	public function __construct( Abstract_Form $gform, LoggerInterface $log, Helper_Data $data, Abstract_Options $options, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates ) {
 
 		/* Assign our internal variables */
 		$this->gform     = $gform;
@@ -462,7 +462,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Similar to Helper_Abstract_Options->settings_sanitize() except we don't need as robust validation and error checking
+	 * Similar to Abstract_Options->settings_sanitize() except we don't need as robust validation and error checking
 	 *
 	 * @param  array $input Fields to process
 	 *

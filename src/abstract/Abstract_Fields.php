@@ -1,6 +1,8 @@
 <?php
 
-namespace GFPDF\Helper;
+namespace GFPDF\Abstraction;
+
+use \GFPDF\Helper\Helper_Misc;
 
 use GFFormsModel;
 use GF_Field;
@@ -49,7 +51,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-abstract class Helper_Abstract_Fields {
+abstract class Abstract_Fields {
 
 	/**
 	 * Contains the field array
@@ -123,14 +125,14 @@ abstract class Helper_Abstract_Fields {
 	 * @param object                             $field The GF_Field_* Object
 	 * @param array                              $entry The Gravity Forms Entry
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
+	 * @param \GFPDF\Abstraction\Abstract_Form $gform
 	 * @param \GFPDF\Helper\Helper_Misc          $misc
 	 *
 	 * @throws Exception
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $field, $entry, Helper_Abstract_Form $gform, Helper_Misc $misc ) {
+	public function __construct( $field, $entry, Abstract_Form $gform, Helper_Misc $misc ) {
 
 		/* Assign our internal variables */
 		$this->misc = $misc;

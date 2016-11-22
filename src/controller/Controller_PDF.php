@@ -2,12 +2,12 @@
 
 namespace GFPDF\Controller;
 
-use GFPDF\Helper\Helper_Abstract_Controller;
-use GFPDF\Helper\Helper_Abstract_Model;
-use GFPDF\Helper\Helper_Abstract_View;
+use GFPDF\Abstraction\Abstract_Controller;
+use GFPDF\Abstraction\Abstract_Model;
+use GFPDF\Abstraction\Abstract_View;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
-use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Abstraction\Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
 
 use Psr\Log\LoggerInterface;
@@ -53,7 +53,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters {
+class Controller_PDF extends Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters {
 
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
@@ -86,15 +86,15 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	/**
 	 * Setup our class by injecting all our dependancies
 	 *
-	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_PDF $model Our PDF Model the controller will manage
-	 * @param Helper_Abstract_View|\GFPDF\View\View_PDF    $view  Our PDF View the controller will manage
-	 * @param \GFPDF\Helper\Helper_Abstract_Form           $gform Our abstracted Gravity Forms helper functions
+	 * @param Abstract_Model|\GFPDF\Model\Model_PDF $model Our PDF Model the controller will manage
+	 * @param Abstract_View|\GFPDF\View\View_PDF    $view  Our PDF View the controller will manage
+	 * @param \GFPDF\Abstraction\Abstract_Form           $gform Our abstracted Gravity Forms helper functions
 	 * @param \Monolog\Logger|LoggerInterface              $log   Our logger class
 	 * @param \GFPDF\Helper\Helper_Misc                    $misc  Our miscellaneous class
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Misc $misc ) {
+	public function __construct( Abstract_Model $model, Abstract_View $view, Abstract_Form $gform, LoggerInterface $log, Helper_Misc $misc ) {
 
 		/* Assign our internal variables */
 		$this->gform = $gform;
