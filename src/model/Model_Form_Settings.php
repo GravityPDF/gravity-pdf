@@ -755,39 +755,14 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function delete_gf_pdf_setting() {
 
-		$this->log->addNotice( 'Running AJAX Endpoint', [
-			'type' => 'Delete PDF Settings',
-		] );
-
-		/* prevent unauthorized access */
-		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
-
-			$this->log->addCritical( 'Lack of User Capabilities.', [
-				'user'      => wp_get_current_user(),
-				'user_meta' => get_user_meta( get_current_user_id() ),
-			] );
-
-			header( 'HTTP/1.1 401 Unauthorized' );
-			wp_die( '401' );
-		}
-
-		/*
-         * Validate Endpoint
-         */
-		$nonce = ( isset( $_POST['nonce'] ) ) ? $_POST['nonce'] : '';
-		$fid   = ( isset( $_POST['fid'] ) ) ? (int) $_POST['fid'] : 0;
-		$pid   = ( isset( $_POST['pid'] ) ) ? $_POST['pid'] : '';
-
+		$fid      = ( isset( $_POST['fid'] ) ) ? (int) $_POST['fid'] : 0;
+		$pid      = ( isset( $_POST['pid'] ) ) ? $_POST['pid'] : '';
 		$nonce_id = "gfpdf_delete_nonce_{$fid}_{$pid}";
 
-		if ( ! wp_verify_nonce( $nonce, $nonce_id ) ) {
+		/* User / CORS validation */
+		$this->misc->handle_ajax_authentication( 'Delete PDF Settings', 'gravityforms_edit_settings', $nonce_id );
 
-			$this->log->addWarning( 'Nonce Verification Failed.' );
-
-			header( 'HTTP/1.1 401 Unauthorized' );
-			wp_die( '401' );
-		}
-
+		/* Delete PDF settings */
 		$results = $this->options->delete_pdf( $fid, $pid );
 
 		if ( $results && ! is_wp_error( $results ) ) {
@@ -829,39 +804,15 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function duplicate_gf_pdf_setting() {
 
-		$this->log->addNotice( 'Running AJAX Endpoint', [
-			'type' => 'Duplicate PDF Settings',
-		] );
-
-		/* prevent unauthorized access */
-		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
-
-			$this->log->addCritical( 'Lack of User Capabilities.', [
-				'user'      => wp_get_current_user(),
-				'user_meta' => get_user_meta( get_current_user_id() ),
-			] );
-
-			header( 'HTTP/1.1 401 Unauthorized' );
-			wp_die( '401' );
-		}
-
-		/*
-         * Validate Endpoint
-         */
-		$nonce = ( isset( $_POST['nonce'] ) ) ? $_POST['nonce'] : '';
 		$fid   = ( isset( $_POST['fid'] ) ) ? (int) $_POST['fid'] : 0;
 		$pid   = ( isset( $_POST['pid'] ) ) ? $_POST['pid'] : '';
 
 		$nonce_id = "gfpdf_duplicate_nonce_{$fid}_{$pid}";
 
-		if ( ! wp_verify_nonce( $nonce, $nonce_id ) ) {
+		/* User / CORS validation */
+		$this->misc->handle_ajax_authentication( 'Duplicate PDF Settings', 'gravityforms_edit_settings', $nonce_id );
 
-			$this->log->addWarning( 'Nonce Verification Failed.' );
-
-			header( 'HTTP/1.1 401 Unauthorized' );
-			wp_die( '401' );
-		}
-
+		/* Duplicate PDF config */
 		$config = $this->options->get_pdf( $fid, $pid );
 
 		if ( ! is_wp_error( $config ) ) {
@@ -874,6 +825,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			if ( $results ) {
 				$this->log->addNotice( 'AJAX Endpoint Successful' );
 
+				/* @todo just use the same nonce for all requests since WP nonces aren't one-time user (time based) */
 				$dup_nonce   = wp_create_nonce( "gfpdf_duplicate_nonce_{$fid}_{$config['id']}" );
 				$del_nonce   = wp_create_nonce( "gfpdf_delete_nonce_{$fid}_{$config['id']}" );
 				$state_nonce = wp_create_nonce( "gfpdf_state_nonce_{$fid}_{$config['id']}" );
@@ -914,38 +866,14 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function change_state_pdf_setting() {
 
-		$this->log->addNotice( 'Running AJAX Endpoint', [
-			'type' => 'Change PDF Settings State',
-		] );
-
-		/* prevent unauthorized access */
-		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
-
-			$this->log->addCritical( 'Lack of User Capabilities.', [
-				'user'      => wp_get_current_user(),
-				'user_meta' => get_user_meta( get_current_user_id() ),
-			] );
-
-			header( 'HTTP/1.1 401 Unauthorized' );
-			wp_die( '401' );
-		}
-
-		/*
-         * Validate Endpoint
-         */
-		$nonce    = ( isset( $_POST['nonce'] ) ) ? $_POST['nonce'] : '';
 		$fid      = ( isset( $_POST['fid'] ) ) ? (int) $_POST['fid'] : 0;
 		$pid      = ( isset( $_POST['pid'] ) ) ? $_POST['pid'] : '';
 		$nonce_id = "gfpdf_state_nonce_{$fid}_{$pid}";
 
-		if ( ! wp_verify_nonce( $nonce, $nonce_id ) ) {
+		/* User / CORS validation */
+		$this->misc->handle_ajax_authentication( 'Change PDF Settings State', 'gravityforms_edit_settings', $nonce_id );
 
-			$this->log->addWarning( 'Nonce Verification Failed.' );
-
-			header( 'HTTP/1.1 401 Unauthorized' );
-			wp_die( '401' );
-		}
-
+		/* Change the PDF state */
 		$config = $this->options->get_pdf( $fid, $pid );
 
 		if ( ! is_wp_error( $config ) ) {
@@ -992,21 +920,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function render_template_fields() {
 
-		$this->log->addNotice( 'Running AJAX Endpoint', [
-			'type' => 'Render Template Custom Fields',
-		] );
-
-		/* prevent unauthorized access */
-		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
-
-			$this->log->addCritical( 'Lack of User Capabilities.', [
-				'user'      => wp_get_current_user(),
-				'user_meta' => get_user_meta( get_current_user_id() ),
-			] );
-
-			header( 'HTTP/1.1 401 Unauthorized' );
-			wp_die( '401' );
-		}
+		/* User / CORS validation */
+		$this->misc->handle_ajax_authentication( 'Render Template Custom Fields', 'gravityforms_edit_settings' );
 
 		/* get the current template */
 		$template = ( isset( $_POST['template'] ) ) ? $_POST['template'] : '';

@@ -925,6 +925,8 @@ class Helper_Misc {
 	 * @param string|bool $capability The capability name the logged in user is required to run this endpoint, or false if no authentation needed
 	 * @param string $nonce_name The name of the Nonce our $_POST['nonce'] should be checked against
 	 *
+	 * @todo move this to an abstract class when we refractor the AJAX code into classes
+	 *
 	 * @since 4.1
 	 */
 	public function handle_ajax_authentication( $endpoint_desc, $capability = 'gravityforms_edit_settings', $nonce_name = 'gfpdf_ajax_nonce' ) {

@@ -321,40 +321,22 @@ class Model_Actions extends Helper_Abstract_Model {
 	 * @since    4.0
 	 */
 	public function ajax_multisite_v3_migration() {
+
+		/* @todo Dependacy inject these when we move all AJAX calls to their own class */
 		$log = GPDFAPI::get_log_class();
+		$misc = GPDFAPI::get_misc_class();
 
-		$log->addNotice( 'Running AJAX Endpoint', [
-			'type' => 'Multisite v3 to v4 config',
-			'post' => $_POST,
-		] );
-
-		/* prevent unauthorized access */
-		if ( ! is_multisite() || ! is_super_admin() ) {
-
-			$log->addCritical( 'Lack of User Capabilities.', [
-				'user'        => wp_get_current_user(),
-				'user_meta'   => get_user_meta( get_current_user_id() ),
-				'multisite'   => is_multisite(),
-				'super_admin' => is_super_admin(),
-			] );
-
+		/* Ensure multisite website */
+		if( ! is_multisite() ) {
 			header( 'HTTP/1.1 401 Unauthorized' );
 			wp_die( '401' );
 		}
 
-		/*
-         * Validate Endpoint
-         */
-		$nonce   = ( isset( $_POST['nonce'] ) ) ? $_POST['nonce'] : '';
+		/* User / CORS validation */
+		$misc->handle_ajax_authentication( 'Multisite v3 to v4 config', 'manage_sites', 'gfpdf_multisite_migration' );
+
+		/* Check there's a configuration file to migrate */
 		$blog_id = ( isset( $_POST['blog_id'] ) ) ? (int) $_POST['blog_id'] : 0;
-
-		if ( ! wp_verify_nonce( $nonce, 'gfpdf_multisite_migration' ) ) {
-
-			$log->addWarning( 'Nonce Verification Failed.' );
-
-			header( 'HTTP/1.1 401 Unauthorized' );
-			wp_die( '401' );
-		}
 
 		/* Check if we have a config file that should be migrated */
 		$path = $this->data->template_location . $blog_id . '/';
@@ -370,7 +352,6 @@ class Model_Actions extends Helper_Abstract_Model {
 			echo json_encode( [ 'results' => $return ] );
 			wp_die();
 		}
-
 
 		/* Setup correct migration settings */
 		switch_to_blog( $blog_id );
@@ -395,7 +376,5 @@ class Model_Actions extends Helper_Abstract_Model {
 		$log->addError( 'AJAX Endpoint Failed' );
 		header( 'HTTP/1.1 500 Internal Server Error' );
 		wp_die( '500' );
-
 	}
-
 }
