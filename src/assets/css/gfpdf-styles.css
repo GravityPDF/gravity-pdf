@@ -705,6 +705,22 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
     background: red;
 }
 
+/*
+ * Custom Template Field Style
+ */
+.image-radio-buttons input {
+    display: none;
+}
+
+.image-radio-buttons img {
+    padding: 6px;
+}
+
+.image-radio-buttons input:checked + img {
+    background: #2abbff;
+}
+
+
 @media only screen and (min-width: 500px) {
 
 	/**
