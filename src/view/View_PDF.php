@@ -176,6 +176,8 @@ class View_PDF extends Helper_Abstract_View {
 		$model      = $controller->model;
 		$form       = $this->gform->get_form( $entry['form_id'] );
 
+		$this->fix_wp_external_links_plugin_conflict();
+
 		/**
 		 * Load our arguments that should be accessed by our PDF template
 		 *
@@ -258,6 +260,22 @@ class View_PDF extends Helper_Abstract_View {
 			}
 
 			wp_die( esc_html__( 'There was a problem generating your PDF', 'gravity-forms-pdf-extended' ) );
+		}
+	}
+
+	/**
+	 * The WP External Links plugin conflicts with Gravity PDF when trying to display the PDF
+	 * This method disables the \WPEL_Front::scan() method which was causes the problem
+	 *
+	 * See https://github.com/GravityPDF/gravity-pdf/issues/386
+	 *
+	 * @since 4.1
+	 */
+	private function fix_wp_external_links_plugin_conflict() {
+		if ( function_exists( 'wpel_init' ) ) {
+			add_filter( 'wpel_apply_settings', function () {
+				return false;
+			} );
 		}
 	}
 
