@@ -545,4 +545,87 @@ final class GPDFAPI {
 
 		return null;
 	}
+
+	/**
+	 * Installs a PDF font on the file system
+	 *
+	 * @param array $font The font information to add.
+	 *
+	 * This array needs to be in the following format:
+	 *
+	 * Array (
+	 *   'font_name'   => 'Lato',
+	 *   'regular'     => '/full/path/to/font/Lato-Regular.ttf',
+	 *   'italics'     => '/full/path/to/font/Lato-Italic.ttf',
+	 *   'bold'        => '/full/path/to/font/Lato-Bold.ttf',
+	 *   'bolditalics' => '/full/path/to/font/Lato-BoldItalic.ttf',
+	 * )
+	 *
+	 * Only the 'font_name' and 'regular' keys are required.
+	 * All fonts should be referenced with the full server path.
+	 * Currently, only .ttf fonts are supported.
+	 * The font name can only contain alphanumeric characters, or a space
+	 *
+	 * @return bool|WP_Error
+	 *
+	 * @since 4.1
+	 */
+	public static function add_pdf_font( $font ) {
+		$settings = GPDFAPI::get_mvc_class( 'Model_Settings' );
+
+		if ( ! isset( $font['font_name'] ) || ! $settings->is_font_name_valid( $font['font_name'] ) ) {
+			return new WP_Error( 'invalid_font_name', 'Font name is not valid. Alphanumeric characters and spaces only.' );
+		}
+
+		if ( ! $settings->is_font_name_unique( $font['font_name'] ) ) {
+			return new WP_Error( 'font_name_not_unique', 'A font with the same name already exists.' );
+		}
+
+		$results = $settings->install_fonts( $font );
+
+		if ( isset( $results['errors'] ) ) {
+			return new WP_Error( 'font_installation_error', implode( "\n\n", $results['errors'] ) );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Deletes one of the v4 fonts that is installed
+	 *
+	 * @param string $font_name The font that should be deleted
+	 *
+	 * @return bool|WP_Error
+	 *
+	 * @since 4.1
+	 */
+	public static function delete_pdf_font( $font_name ) {
+		$settings = GPDFAPI::get_mvc_class( 'Model_Settings' );
+		$options  = GPDFAPI::get_options_class();
+		$misc     = GPDFAPI::get_misc_class();
+		$data     = GPDFAPI::get_data_class();
+
+		$fonts   = $options->get_option( 'custom_fonts' );
+		$font_id = $settings->get_font_id_by_name( $font_name );
+
+		if ( ! isset( $fonts[ $font_id ] ) ) {
+			return new WP_Error( 'font_not_installed', 'Font not installed.' );
+		}
+
+		/* Remove the font files */
+		if ( ! $settings->remove_font_file( $fonts[ $font_id ] ) ) {
+			return new WP_Error( 'font_delete_failure', 'There was a problem deleting the font files.' );
+		}
+
+		/* Cleanup our fontdata directory to prevent caching issues with mPDF */
+		$misc->cleanup_dir( $data->template_fontdata_location );
+
+		/* Update the database */
+		unset( $fonts[ $font_id ] );
+		if ( ! $options->update_option( 'custom_fonts', $fonts ) ) {
+			return new WP_Error( 'font_delete_db_failure', 'There was a problem deleting the font from the database.' );
+		}
+
+		return true;
+	}
 }

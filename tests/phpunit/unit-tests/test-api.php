@@ -204,4 +204,88 @@ class Test_API extends WP_UnitTestCase {
 		$table = ob_get_clean();
 		$this->assertNotFalse( strpos( $table, "class='gsurvey-likert-choice-label'" ) );
 	}
+
+	/**
+	 * Test we can add our font correctly
+	 *
+	 * @since 4.1
+	 */
+	public function test_add_pdf_font() {
+
+		$settings = GPDFAPI::get_mvc_class( 'Model_Settings' );
+
+		/* Check we get invalid font error */
+		$results = GPDFAPI::add_pdf_font( '' );
+
+		$this->assertTrue( is_wp_error( $results ) );
+		$this->assertEquals( 'invalid_font_name', $results->get_error_code() );
+
+		$results = GPDFAPI::add_pdf_font( [ 'font_name' => 'Apple%' ] );
+
+		$this->assertTrue( is_wp_error( $results ) );
+		$this->assertEquals( 'invalid_font_name', $results->get_error_code() );
+
+		/* Test we correctly install the font */
+		$ttf_file = PDF_TEMPLATE_LOCATION . 'test.ttf';
+		touch( $ttf_file );
+
+		$font = [
+			'font_name' => 'Test',
+			'regular' => $ttf_file,
+		];
+
+		$results = GPDFAPI::add_pdf_font( $font );
+
+		$this->assertFalse( is_wp_error( $results ) );
+		$this->assertTrue( $results );
+		$this->assertFileExists( PDF_FONT_LOCATION . 'test.ttf' );
+		$this->assertNotNull( $settings->get_font_id_by_name( 'Test' ) );
+
+		/* Test we get an error for not having a unique font name */
+		$results = GPDFAPI::add_pdf_font( $font );
+		$this->assertTrue( is_wp_error( $results ) );
+		$this->assertEquals( 'font_name_not_unique', $results->get_error_code() );
+
+		/* Clean up */
+		unlink( $ttf_file );
+		GPDFAPI::delete_pdf_font( 'Test' );
+	}
+
+	/**
+	 * Test we can correctly delete the font
+	 *
+	 * @since 4.1
+	 */
+	public function test_delete_pdf_font() {
+
+		$settings = GPDFAPI::get_mvc_class( 'Model_Settings' );
+
+		/* Test font not installed */
+		$results = GPDFAPI::delete_pdf_font( '' );
+
+		$this->assertTrue( is_wp_error( $results ) );
+		$this->assertEquals( 'font_not_installed', $results->get_error_code() );
+
+		/* Add a font and then see if we can remove it */
+		$ttf_file = PDF_TEMPLATE_LOCATION . 'test.ttf';
+		touch( $ttf_file );
+
+		$font = [
+			'font_name' => 'Test',
+			'regular' => $ttf_file,
+		];
+
+		$results = GPDFAPI::add_pdf_font( $font );
+		$this->assertFalse( is_wp_error( $results ) );
+
+		/* Now remove the newly added font and verify the results */
+		$results = GPDFAPI::delete_pdf_font( 'Test' );
+
+		$this->assertTrue( $results );
+		$this->assertFileNotExists( PDF_FONT_LOCATION . 'test.ttf' );
+		$this->assertNull( $settings->get_font_id_by_name( 'Test' ) );
+
+		/* Clean up */
+		unlink( $ttf_file );
+	}
 }

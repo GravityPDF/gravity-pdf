@@ -601,6 +601,27 @@ class Model_Settings extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Find the font unique ID from the font name
+	 *
+	 * @param string $font_name
+	 *
+	 * @return string The font ID, if any
+	 *
+	 * @since 4.1
+	 */
+	public function get_font_id_by_name( $font_name ) {
+		$fonts = $this->options->get_option( 'custom_fonts' );
+
+		foreach ( $fonts as $id => $font ) {
+			if ( $font['font_name'] === $font_name ) {
+				return $id;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Create a file in our tmp directory and check if it is publically accessible (i.e no .htaccess protection)
 	 *
 	 * @param $_POST ['nonce']
