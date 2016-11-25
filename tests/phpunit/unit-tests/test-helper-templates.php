@@ -100,7 +100,7 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 	 * @since 4.1
 	 */
 	public function test_get_template_path() {
-		$this->assertNotFalse( strpos( '/wp-content/uploads/PDF_EXTENDED_TEMPLATES/' ), $this->templates->get_template_path() );
+		$this->assertNotFalse( strpos( $this->templates->get_template_path(), '/wp-content/uploads/PDF_EXTENDED_TEMPLATES/' ) );
 		$this->assertTrue( is_dir( $this->templates->get_template_path() ) );
 	}
 
@@ -110,7 +110,7 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 	 * @since 4.1
 	 */
 	public function test_get_template_url() {
-		$this->assertNotFalse( strpos( '/wp-content/uploads/PDF_EXTENDED_TEMPLATES/' ), $this->templates->get_template_url() );
+		$this->assertNotFalse( strpos( $this->templates->get_template_url(), '/wp-content/uploads/PDF_EXTENDED_TEMPLATES/' ) );
 		$this->assertNotFalse( filter_var( $this->templates->get_template_url(), FILTER_VALIDATE_URL ) );
 	}
 

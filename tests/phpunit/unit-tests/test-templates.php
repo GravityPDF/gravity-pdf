@@ -183,8 +183,8 @@ class Test_Templates extends WP_UnitTestCase {
 		$this->assertNotFalse( strpos( $path, '.zip' ) );
 
 		/* Cleanup */
-		unlink( $test_file );
-		unlink( $path );
+		@unlink( $test_file );
+		@unlink( $path );
 	}
 
 
@@ -251,6 +251,7 @@ class Test_Templates extends WP_UnitTestCase {
 		}
 
 		$this->assertEquals( 'Incompatible Archive.', $e->getMessage() );
+		unset( $e );
 
 		/* Create empty archive and check an exception is thrown for no PDF templates found */
 		$test_file = $gfpdf->data->template_tmp_location . 'test-archive.zip';
@@ -268,6 +269,7 @@ class Test_Templates extends WP_UnitTestCase {
 		}
 
 		$this->assertEquals( 'No valid PDF template found in Zip archive.', $e->getMessage() );
+		unset( $e );
 
 		unlink( $test_file );
 		$gfpdf->misc->rmdir( $test_dir );
@@ -281,11 +283,11 @@ class Test_Templates extends WP_UnitTestCase {
 
 		try {
 			$this->model->unzip_and_verify_templates( $test_file );
-		} catch ( Exception $template_error ) {
+		} catch ( Exception $e ) {
 			//do nothing
 		}
 
-		$this->assertNull( $template_error );
+		$this->assertFalse( isset( $e ) );
 
 		/* Cleanup */
 		unlink( $test_file );
@@ -300,8 +302,8 @@ class Test_Templates extends WP_UnitTestCase {
 	public function test_get_template_info() {
 
 		$files = [
-			'zadani.php',
-			'rubix.php',
+			PDF_PLUGIN_DIR . 'src/templates/zadani.php',
+			PDF_PLUGIN_DIR . 'src/templates/rubix.php',
 		];
 
 		$info = $this->model->get_template_info( $files );

@@ -76,6 +76,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function setUp() {
+
 		parent::setUp();
 
 		$this->import_form();
