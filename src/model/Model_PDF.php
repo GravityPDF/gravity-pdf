@@ -1280,7 +1280,15 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function get_form_data( $entry ) {
 
+		if ( ! isset( $entry['form_id']) ) {
+			return [];
+		}
+
 		$form = $this->gform->get_form( $entry['form_id'] );
+
+		if( ! is_array( $form ) ) {
+			return [];
+		}
 
 		/* Setup our basic structure */
 		$data = [

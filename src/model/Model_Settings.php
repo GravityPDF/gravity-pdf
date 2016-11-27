@@ -610,7 +610,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @since 4.1
 	 */
 	public function get_font_id_by_name( $font_name ) {
-		$fonts = $this->options->get_option( 'custom_fonts' );
+		$fonts = $this->options->get_option( 'custom_fonts', [] );
 
 		foreach ( $fonts as $id => $font ) {
 			if ( $font['font_name'] === $font_name ) {
