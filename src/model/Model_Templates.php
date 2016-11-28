@@ -171,6 +171,9 @@ class Model_Templates extends Helper_Abstract_Model {
 		/* Get the template headers now all the files are in the right location */
 		$headers = $this->get_template_info( glob( $this->get_unzipped_dir_name( $zip_path ) . '*.php' ) );
 
+		/* Run PDF template SetUp method if required */
+		$this->maybe_run_template_setup( $headers );
+
 		/* Cleanup tmp uploaded files */
 		$this->cleanup_template_files( $zip_path );
 
@@ -190,6 +193,24 @@ class Model_Templates extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Execute the setUp method on any templates that impliment it
+	 *
+	 * @param array $headers Contains the array returned from $this->get_template_info()
+	 *
+	 * @since 4.1
+	 */
+	public function maybe_run_template_setup( $headers = [] ) {
+		foreach( $headers as $template ) {
+			$config = $this->templates->get_config_class( $template['id'] );
+
+			/* Check if the PDF config impliments our Setup/TearDown interface and run the tear down */
+			if( in_array( 'GFPDF\Helper\Helper_Interface_Setup_TearDown', class_implements( $config ) ) ) {
+				$config->setUp();
+			}
+		}
+	}
+
+	/**
 	 * AJAX Endpoint for deleting user-uploaded PDF templates
 	 *
 	 * @param string $_POST ['nonce'] a valid nonce
@@ -205,11 +226,7 @@ class Model_Templates extends Helper_Abstract_Model {
 
 		/* Get all the necessary PDF template files to delete */
 		try {
-			$files = $this->templates->get_template_files_by_id( $template_id );
-
-			foreach ( $files as $file ) {
-				unlink( $file );
-			}
+			$this->delete_template( $template_id );
 		} catch ( Exception $e ) {
 			header( 'HTTP/1.1 400 Bad Request' );
 			wp_die('400');
@@ -219,6 +236,35 @@ class Model_Templates extends Helper_Abstract_Model {
 		header( 'Content-Type: application/json' );
 		echo json_encode( true );
 		wp_die();
+	}
+
+	/**
+	 * Delete's a PDF templates files
+	 *
+	 * @param string $template_id
+	 *
+	 * @throws Exception
+	 *
+	 * @since 4.1
+	 */
+	public function delete_template( $template_id ) {
+		try {
+			$files = $this->templates->get_template_files_by_id( $template_id );
+			$config = $this->templates->get_config_class( $template_id );
+
+			/* Check if the PDF config impliments our Setup/TearDown interface and run the tear down */
+			if( in_array( 'GFPDF\Helper\Helper_Interface_Setup_TearDown', class_implements( $config ) ) ) {
+				$config->tearDown();
+			}
+
+			/* Remove the PDF template files */
+			foreach ( $files as $file ) {
+				unlink( $file );
+			}
+
+		} catch ( Exception $e ) {
+			throw $e; /* throw further down the chain */
+		}
 	}
 
 	/**
