@@ -106,7 +106,7 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
 	}
 
 	/* List Field Styles */
-	<?php if ( $include_product_styles ) : ?>
+	<?php if ( $include_list_styles ) : ?>
 		.gfield_list {
 			border-collapse: collapse;
 			border: 1px solid <?php echo $contrast_border_color; ?>;
