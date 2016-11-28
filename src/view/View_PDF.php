@@ -321,7 +321,9 @@ class View_PDF extends Helper_Abstract_View {
 		?>
 
 		<div id="container">
+            <?php echo do_action( 'gfpdf_pre_html_fields', $entry, $config ); ?>
 			<?php $this->generate_html_structure( $entry, $model, $config ); ?>
+            <?php echo do_action( 'gfpdf_post_html_fields', $entry, $config ); ?>
 		</div>
 
 		<?php
