@@ -153,7 +153,15 @@ class Field_Section extends Helper_Abstract_Fields {
 
 		$html .= '</div>';
 
-		return $html;
+		return apply_filters( 'gfpdf_field_section_break_html',
+			$html,
+			$section['title'],
+			$section['description'],
+			$value,
+			$this->field,
+			$this->form,
+			$this->entry
+		);
 	}
 
 	/**
