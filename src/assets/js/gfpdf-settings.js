@@ -13,37 +13,6 @@
   $(function () {
 
     /**
-     * Check if the global gf_vars has been set and if so replace the .thisFormButton, .show, .hide objects with our
-     * customised options.
-     * @since 4.0
-     */
-    if (typeof gf_vars !== 'undefined') {
-      gf_vars.thisFormButton = GFPDF.conditionalText
-      gf_vars.show = GFPDF.enable
-      gf_vars.hide = GFPDF.disable
-    }
-
-    /*
-     * Override the gfMergeTagsObj.getTargetElement prototype to better handle CSS special characters in selectors
-     * This is because Gravity Forms doesn't correctly espace meta-characters such a [ and ] (which we use extensively as IDs)
-     * This functionality assists with the merge tag loader
-     * @since 4.0
-     */
-    if (typeof form != 'undefined' && typeof window.gfMergeTags != 'undefined') {
-      window.gfMergeTags.getTargetElement = function (elem) {
-        console.log('Gravity PDF gfMergeTags.getTargetElement Override Running')
-
-        var $elem = $(elem)
-        var selector = $elem.parents('span.all-merge-tags').data('targetElement')
-
-        /* escape any meta-characters as per jQuery Spec http://api.jquery.com/category/selectors/ */
-        selector = selector.replace(/[!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
-
-        return $('#' + selector)
-      }
-    }
-
-    /**
      * Our Admin controller
      * Applies correct JS to our Gravity PDF pages
      * @since 4.0
@@ -87,6 +56,9 @@
        */
       this.initCommon = function () {
 
+        /* Change some Gravity Forms parameters */
+        this.setupGravityForms()
+
         /* If we have a upload field handle the logic */
         this.doUploadListener()
 
@@ -107,6 +79,34 @@
 
         /* Setup our template loader, if needed */
         this.setupDynamicTemplateFields()
+      }
+
+      /**
+       * Replace some of Gravity Forms JS variables so it functions correctly with our PDF version
+       *
+       * @since 4.1
+       */
+      this.setupGravityForms = function () {
+        /**
+         * Check if the global gf_vars has been set and if so replace the .thisFormButton, .show, .hide objects with our
+         * customised options.
+         * @since 4.0
+         */
+        if (typeof gf_vars !== 'undefined') {
+          gf_vars.thisFormButton = GFPDF.conditionalText
+          gf_vars.show = GFPDF.enable
+          gf_vars.hide = GFPDF.disable
+        }
+
+        /*
+         * Override the gfMergeTagsObj.getTargetElement prototype to better handle CSS special characters in selectors
+         * This is because Gravity Forms doesn't correctly espace meta-characters such a [ and ] (which we use extensively as IDs)
+         * This functionality assists with the merge tag loader
+         * @since 4.0
+         */
+        if (typeof form != 'undefined') {
+          window.gfMergeTags.getTargetElement = this.resetGfMergeTags
+        }
       }
 
       /**
@@ -873,7 +873,25 @@
       this.doMergetags = function () {
         if (typeof form != 'undefined') {
           window.gfMergeTags = new gfMergeTagsObj(form)
+          window.gfMergeTags.getTargetElement = this.resetGfMergeTags
         }
+      }
+
+      /**
+       * Escape any meta characters in the target element ID, as per the jQuery spec
+       *
+       * @param elem
+       * @returns {*|HTMLElement}
+       * @since 4.1
+       */
+      this.resetGfMergeTags = function (elem) {
+        var $elem = $(elem)
+        var selector = $elem.parents('span.all-merge-tags').data('targetElement')
+
+        /* escape any meta-characters as per jQuery Spec http://api.jquery.com/category/selectors/ */
+        selector = selector.replace(/[!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+
+        return $('#' + selector)
       }
 
       /**
