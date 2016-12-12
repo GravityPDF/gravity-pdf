@@ -378,11 +378,14 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 		$header = $this->templates->get_template_info_by_path( PDF_PLUGIN_DIR . 'src/templates/zadani.php' );
 
 		$this->assertEquals( 'Zadani', $header['template'] );
-		$this->assertEquals( '1.1', $header['version'] );
-		$this->assertEquals( 'A minimalist business-style template that will generate a well-spaced document great for printing.', $header['description'] );
-		$this->assertEquals( 'Gravity PDF', $header['author'] );
+		$this->assertArrayHasKey( 'version', $header );
+		$this->assertArrayHasKey( 'description', $header );
+		$this->assertArrayHasKey( 'author', $header );
+		$this->assertArrayHasKey( 'author uri', $header );
 		$this->assertEquals( 'Core', $header['group'] );
 		$this->assertEquals( '4.0-alpha', $header['required_pdf_version'] );
+		$this->assertArrayHasKey( 'tags', $header );
+		$this->assertArrayHasKey( 'screenshot', $header );
 	}
 
 	/**
