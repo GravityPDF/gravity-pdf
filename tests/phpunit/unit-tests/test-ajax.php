@@ -83,6 +83,21 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 	}
 
 	/**
+	 * Fix for WordPress 4.7 which seesm to close the MySQLi connection before
+	 * the class is correctly setup
+	 *
+	 * @since 4.1
+	 */
+	public static function setUpBeforeClass() {
+		global $wpdb;
+		$wpdb->suppress_errors = false;
+		$wpdb->show_errors = true;
+		$wpdb->db_connect();
+
+		parent::setUpBeforeClass();
+	}
+
+	/**
 	 * Load the JSON data and import it into Gravity Forms
 	 *
 	 * @since 4.0
