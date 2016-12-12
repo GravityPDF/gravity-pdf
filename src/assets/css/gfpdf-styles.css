@@ -13,7 +13,7 @@
 }
 
 .gfpdf-badge {
-	background: url("../images/gravitypdf-globe-black.png") no-repeat 50% 5px;
+	background: url("../../../src/assets/images/gravitypdf-globe-black.png") no-repeat 50% 5px;
 	color: #333;
 	display: inline-block;
 	font-size: 14px;
@@ -822,7 +822,7 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
 	 * Add out mascot on larger displays only
 	 */
 	.gfpdf-mascot-sitting {
-		background: url("../images/cap-paws-sitting.png") no-repeat 0 0;
+		background: url("../../../src/assets/images/cap-paws-sitting.png") no-repeat 0 0;
 		width: 181px;
 		height: 193px;
 		display: inline-block;
