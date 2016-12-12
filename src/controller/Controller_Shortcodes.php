@@ -108,8 +108,8 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 	 */
 	public function add_filters() {
 
-		add_filter( 'gform_confirmation', [ $this->model, 'gravitypdf_confirmation' ], 10, 3 );
-		add_filter( 'gform_notification', [ $this->model, 'gravitypdf_notification' ], 10, 3 );
+		add_filter( 'gform_confirmation', [ $this->model, 'gravitypdf_confirmation' ], 100, 3 );
+		add_filter( 'gform_notification', [ $this->model, 'gravitypdf_notification' ], 100, 3 );
 		add_filter( 'gform_admin_pre_render', [ $this->model, 'gravitypdf_redirect_confirmation' ] );
 
 		/* Basic GravityView Support */
