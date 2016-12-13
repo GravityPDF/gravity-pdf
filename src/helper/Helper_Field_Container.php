@@ -71,11 +71,15 @@ class Helper_Field_Container {
 	 * @since 4.0
 	 */
 	private $class_map = [
-		'gf_left_half'    => 50,
-		'gf_right_half'   => 50,
-		'gf_left_third'   => 33.3,
-		'gf_middle_third' => 33.3,
-		'gf_right_third'  => 33.3,
+		'gf_left_half'      => 50,
+		'gf_right_half'     => 50,
+		'gf_left_third'     => 33.3,
+		'gf_middle_third'   => 33.3,
+		'gf_right_third'    => 33.3,
+		'gf_first_quarter'  => 25,
+		'gf_second_quarter' => 25,
+		'gf_third_quarter'  => 25,
+		'gf_fourth_quarter' => 25,
 	];
 
 	/**
