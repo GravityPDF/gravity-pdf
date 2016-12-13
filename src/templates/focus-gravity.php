@@ -50,16 +50,19 @@ $label_format = ( ! empty( $settings['focusgravity_label_format'] ) ) ? $setting
     /* Handle Gravity Forms CSS Ready Classes */
     .row-separator {
         clear: both;
+        padding: 1.25mm 0;
     }
 
     .gf_left_half,
     .gf_left_third, .gf_middle_third,
+    .gf_first_quarter, .gf_second_quarter, .gf_third_quarter,
     .gf_list_2col li, .gf_list_3col li, .gf_list_4col li, .gf_list_5col li {
         float: left;
     }
 
     .gf_right_half,
-    .gf_right_third {
+    .gf_right_third,
+    .gf_fourth_quarter {
         float: right;
     }
 
@@ -71,6 +74,10 @@ $label_format = ( ! empty( $settings['focusgravity_label_format'] ) ) ? $setting
     .gf_left_third, .gf_middle_third, .gf_right_third,
     .gf_list_3col li {
         width: 32.3%;
+    }
+
+    .gf_first_quarter, .gf_second_quarter, .gf_third_quarter, .gf_fourth_quarter {
+        width: 24%;
     }
 
     .gf_list_4col li {
@@ -89,7 +96,11 @@ $label_format = ( ! empty( $settings['focusgravity_label_format'] ) ) ? $setting
         padding-right: 1.505%;
     }
 
-    .gf_right_half, .gf_right_third {
+    .gf_first_quarter, .gf_second_quarter, .gf_third_quarter, .gf_fourth_quarter {
+        padding-right: 1.333%;
+    }
+
+    .gf_right_half, .gf_right_third, .gf_fourth_quarter {
         padding-right: 0;
     }
 

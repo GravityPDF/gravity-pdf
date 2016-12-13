@@ -192,6 +192,44 @@ class Test_Field_Container extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Check that four-columns give the correct output
+	 *
+	 * @since 4.1
+	 */
+	public function test_four_columns() {
+
+		$field           = new GF_Field();
+		$field->cssClass = 'gf_first_quarter';
+
+		/* Check it opens correctly */
+		$this->assertEquals( '<div class="row-separator odd">', $this->generate( $field ) );
+
+		$field           = new GF_Field();
+		$field->cssClass = 'gf_second_quarter';
+
+		/* Check it does nothing */
+		$this->assertEquals( '', $this->generate( $field ) );
+
+		$field           = new GF_Field();
+		$field->cssClass = 'gf_third_quarter';
+
+		/* Check it does nothing */
+		$this->assertEquals( '', $this->generate( $field ) );
+
+		$field           = new GF_Field();
+		$field->cssClass = 'gf_fourth_quarter';
+
+		/* Check it does nothing */
+		$this->assertEquals( '', $this->generate( $field ) );
+
+		/* Check the row closes / opens new row correctly */
+		$this->assertEquals( '</div><div class="row-separator even">', $this->generate( $field ) );
+
+		/* Check it now closes correctly */
+		$this->assertEquals( '</div>', $this->close() );
+	}
+
+	/**
 	 * Check that two and three column layouts can intermingle
 	 *
 	 * @since 4.0
