@@ -39,7 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="gfpdf-mascot-sitting"></div>
 
 <div class="changelog">
-	<h3><?php esc_html_e( 'Get more out of Gravity PDF', 'gravity-forms-pdf-extended' ); ?></h3>
+	<h2><?php esc_html_e( 'Get more out of Gravity PDF', 'gravity-forms-pdf-extended' ); ?></h2>
 
 	<div class="feature-section three-col">
 		<div class="col gfpdf-breakdown">

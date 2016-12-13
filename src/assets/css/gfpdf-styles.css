@@ -13,7 +13,7 @@
 }
 
 .gfpdf-badge {
-	background: url("../../../src/assets/images/gravitypdf-globe-black.png") no-repeat 50% 5px;
+	background: url("../images/gravitypdf-globe-black.png") no-repeat 50% 5px;
 	color: #333;
 	display: inline-block;
 	font-size: 14px;
@@ -836,7 +836,7 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
 		height: 193px;
 		display: inline-block;
 		float: right;
-		margin-top: -188px;
+		margin-top: -149px;
 		position: relative;
 		z-index: 100;
 	}
