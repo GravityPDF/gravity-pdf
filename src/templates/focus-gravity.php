@@ -2,12 +2,14 @@
 
 /*
  * Template Name: Focus Gravity
- * Version: 1.1
- * Description: Focus Gravity providing a classic layout which epitomises Gravity Forms Print Preview. It's the familiar layout you've come to love.
+ * Version: 1.2
+ * Description: Focus Gravity providing a classic layout which epitomises Gravity Forms Print Preview. It's the familiar layout you've come to love. Through the Template tab you can control the PDF header and footer, change the background color or image, and show or hide the form title, page names, HTML fields and the Section Break descriptions.
  * Author: Gravity PDF
+ * Author URI: https://gravitypdf.com
  * Group: Core
  * License: GPLv2
  * Required PDF Version: 4.0-alpha
+ * Tags: Header, Footer, Background, Optional HTML Fields, Optional Page Fields, Combined Row, Alternate Colors
  */
 
 /* Prevent direct access to the template */

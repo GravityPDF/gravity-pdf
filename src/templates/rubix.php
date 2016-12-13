@@ -2,12 +2,14 @@
 
 /*
  * Template Name: Rubix
- * Version: 1.1
- * Description: Rubix uses stylish containers to create an aesthetically pleasing design.
+ * Version: 1.2
+ * Description: Rubix uses stylish containers to create an aesthetically pleasing design. Through the Template tab you can control the PDF header and footer, change the background color or image, and show or hide the form title, page names, HTML fields and the Section Break descriptions.
  * Author: Gravity PDF
+ * Author URI: https://gravitypdf.com
  * Group: Core
  * License: GPLv2
  * Required PDF Version: 4.0-alpha
+ * Tags: Header, Footer, Background, Optional HTML Fields, Optional Page Fields, Container Background Color
  */
 
 /* Prevent direct access to the template */
