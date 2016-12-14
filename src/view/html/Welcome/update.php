@@ -63,7 +63,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 
 		<div class="col">
-			<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/updated-new-ui.png' ); ?>">
+			<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/updating-advanced-template-selector.png' ); ?>">
 		</div>
 
 	</div>
@@ -72,7 +72,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div class="feature-section two-col">
 
 		<div class="col">
-			<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/updated-css-ready-class-templates.png' ); ?>">
+			<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/updating-merge-tags.png' ); ?>">
 		</div>
 
 		<div class="col">
@@ -110,7 +110,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<div class="col">
 			<img class="gfpdf-image"
-			     src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/updated-font-manager.png' ); ?>">
+			     src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/updating-four-columns.png' ); ?>">
 		</div>
 
 	</div>
