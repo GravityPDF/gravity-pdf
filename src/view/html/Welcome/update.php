@@ -40,7 +40,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<h1><?php printf( esc_html__( 'Discover Gravity PDF %s', 'gravity-forms-pdf-extended' ), $args['display_version'] ); ?></h1>
 
 	<div class="about-text">
-		<?php esc_html_e( 'Managing PDF templates just become a whole lot easier with our Advanced Template Manager! View, Search, Select, Install and Delete PDFs right from our UI.', 'gravity-forms-pdf-extended' ); ?>
+		<?php esc_html_e( 'Managing PDF templates just become a whole lot easier with our Advanced Template Manager! View, Search, Install and Delete PDFs right from our new UI.', 'gravity-forms-pdf-extended' ); ?>
 	</div>
 
 	<div class="gfpdf-badge"><?php printf( esc_html__( 'Version %s', 'gravity-forms-pdf-extended' ), $args['display_version'] ); ?></div>
@@ -53,11 +53,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<h3><?php esc_html_e( 'Managing PDF Templates in WordPress', 'gravity-forms-pdf-extended' ); ?></h3>
 
 			<p>
-				<?php esc_html_e( "Managing PDF templates just became 100% easier thanks to our Advanced Template Manager. Based on the WordPress' Theme Manager, you can easily search through your installed templates, see what your PDF might look like and view supported template features – all without a page reload!", 'gravity-forms-pdf-extended' ); ?>
+				<?php esc_html_e( "It's 100% easier to work with PDF Templates thanks to our Advanced Template Manager. Based on the WordPress Theme Manager, you can easily search through your installed templates, see what a PDF might look like and view supported features – all without a page reload!", 'gravity-forms-pdf-extended' ); ?>
 			</p>
 
 			<p>
-				<?php printf( esc_html__( "We've also included the ability to install PDFs via a zip file and easily remove them too. These new feature makes it very simple to install and manage the premium PDF templates %syou might purchased from our PDF Template Shop%s – which launched at the same time as Gravity PDF 4.1.", 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/shop/">', '</a>' ); ?>
+				<?php printf( esc_html__( "We've added the ability to install PDFs via a zip file and easily delete them, too. It's now very simple to install and use custom PDF templates – like the ones %syou might purchased from our PDF Template Shop%s.", 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/shop/">', '</a>' ); ?>
 			</p>
 
 		</div>
@@ -79,11 +79,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<h3><?php esc_html_e( 'Gravity PDF Merge Tags', 'gravity-forms-pdf-extended' ); ?></h3>
 
 			<p>
-				<?php printf( esc_html__( "The %s[gravitypdf]%s shortcode is an excellent way to display a PDF download link anywhere on your website. But under certain circumstances it's more useful to display the raw PDF URL, and that's where the new PDF merge tag come into play. The merge tag has the following format %s{Title:pdf:ID}%s and will only display the PDF web address – whereas the shortcode displays a full HTML link to the PDF.", 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<code>', '</code>' ); ?>
+				<?php printf( esc_html__( "The %s[gravitypdf]%s shortcode is an excellent way to display a PDF download link on your website. Sometimes it's more useful to display the raw PDF URL, and that's where the new PDF merge tag %s{Title:pdf:ID}%s comes in.", 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<code>', '</code>' ); ?>
 			</p>
 
             <p>
-				<?php printf( esc_html__( "Like the %s[gravitypdf]%s shortcode, the PDF merge tag will only show the URL if the PDF is active and the conditional logic for the current entry has been met. Unlike the shortcode, no admin message is shown in those circumstances. The new merge tag is automatically included in Gravity Forms merge tag selector and can be used anywhere Gravity Forms allows other merge tags (provided the entry has been saved).", 'gravity-forms-pdf-extended' ), '<code>', '</code>' ); ?>
+				<?php printf( esc_html__( "The PDF Merge Tag will be automatically converted to a URL if the PDF is active and the PDF conditional logic has been met. The new merge tag is automatically included in Gravity Forms merge tag selector and can be used anywhere Gravity Forms allows other merge tags (provided the entry has been saved).", 'gravity-forms-pdf-extended' ) ); ?>
             </p>
 
 		</div>
@@ -96,12 +96,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<h3><?php esc_html_e( 'Four Column Support added to Core PDF Templates!', 'gravity-forms-pdf-extended' ); ?></h3>
 
 			<p>
-				<?php printf( esc_html__( '%sThis four-column CSS code%s is becoming increasingly popular for Gravity Forms users so we have added full support for these additional classes in Gravity PDF – you will need to manually include these classes with your WordPress theme so your Gravity Form can use four columns.', 'gravity-forms-pdf-extended' ), '<a href="https://gist.github.com/WebEndevSnippets/5555354">', '</a>' ); ?>
+				<?php printf( esc_html__( '%sThis four-column CSS code%s has become increasingly popular for Gravity Forms users and so we have added full support for these classes in Gravity PDF (make sure to include the custom CSS with your theme).', 'gravity-forms-pdf-extended' ), '<a href="https://gist.github.com/WebEndevSnippets/5555354">', '</a>' ); ?>
 
 			</p>
 
 			<p>
-				<?php printf( esc_html__( "To start using in your PDF, add the classes %sgf_first_quarter%s, %sgf_second_quarter%s, %sgf_third_quarter%s and %sgf_fourth_quarter%s to your Gravity Form fields and Gravity PDF will automatically create a four column layout to match.", 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<code>', '</code>', '<code>', '</code>', '<code>', '</code>' ); ?>
+				<?php printf( esc_html__( "To start using in your PDF, add the classes %sgf_first_quarter%s, %sgf_second_quarter%s, %sgf_third_quarter%s and %sgf_fourth_quarter%s to your Gravity Form fields and support PDF templates will automatically create a four column layout to match.", 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<code>', '</code>', '<code>', '</code>', '<code>', '</code>' ); ?>
 			</p>
 
 			<p></p>
