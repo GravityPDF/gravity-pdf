@@ -504,7 +504,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		wp_register_script( 'gfpdf_js_backbone', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-backbone.min.js', $pdf_backbone_dependancies, $version ); /* @TODO - remove backbone and use React */
 		wp_register_script( 'gfpdf_js_backbone_model_binder', PDF_PLUGIN_URL . 'bower_components/backbone.modelbinder/Backbone.ModelBinder.min.js', [ 'backbone', 'underscore' ], $version );
-		wp_register_script( 'gfpdf_js_chosen', PDF_PLUGIN_URL . 'bower_components/chosen/chosen.jquery.min.js', [ 'jquery' ], $version ); /* @TODO - remove and use Gravity Forms version */
 
 		wp_register_script( 'gfpdf_js_vendors', PDF_PLUGIN_URL . 'dist/assets/js/vendor.bundle.min.js', [ 'jquery' ], $version );
 		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'dist/assets/js/app.bundle.min.js', [ 'jquery', 'gfpdf_js_vendors' ], $version );
@@ -529,11 +528,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		if ( $this->misc->is_gfpdf_page() ) {
 			/* load styles */
 			wp_enqueue_style( 'gfpdf_css_styles' );
-			wp_enqueue_style( 'gfpdf_css_chosen_style' );
+			wp_enqueue_style( 'gform_chosen', \GFCommon::get_base_url() . '/css/chosen.min.css', [], \GFCommon::$version );
 
 			/* load scripts */
 			wp_enqueue_script( 'gfpdf_js_settings' );
-			wp_enqueue_script( 'gfpdf_js_chosen' );
+			wp_enqueue_script( 'gform_chosen' );
 
 			/* add media uploader */
 			wp_enqueue_media();
