@@ -487,6 +487,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			'jquery-ui-tooltip',
 			'gform_forms',
 			'gform_form_admin',
+			'gform_chosen',
 			'jquery-color',
 			'wp-color-picker',
 		];
@@ -531,7 +532,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 			/* load scripts */
 			wp_enqueue_script( 'gfpdf_js_settings' );
-			wp_enqueue_script( 'gform_chosen' );
 
 			/* add media uploader */
 			wp_enqueue_media();
@@ -631,6 +631,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			'media-views',
 			'buttons',
 			'thickbox',
+			'gform_chosen',
 		];
 
 		foreach ( $wp_styles->queue as $object ) {
