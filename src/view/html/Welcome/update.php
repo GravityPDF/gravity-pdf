@@ -40,7 +40,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<h1><?php printf( esc_html__( 'Discover Gravity PDF %s', 'gravity-forms-pdf-extended' ), $args['display_version'] ); ?></h1>
 
 	<div class="about-text">
-		<?php esc_html_e( "Gravity PDF has been completely rebuilt with simplicity, stability and security in mind. Our team has spent over 12 months making a great product even greater. Discover what's new...", 'gravity-forms-pdf-extended' ); ?>
+		<?php esc_html_e( 'Managing PDF templates just become a whole lot easier with our Advanced Template Manager! View, Search, Install and Delete PDFs right from our new UI.', 'gravity-forms-pdf-extended' ); ?>
 	</div>
 
 	<div class="gfpdf-badge"><?php printf( esc_html__( 'Version %s', 'gravity-forms-pdf-extended' ), $args['display_version'] ); ?></div>
@@ -50,20 +50,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div class="feature-section two-col">
 
 		<div class="col">
-			<h3><?php esc_html_e( 'Bringing Config Settings to WordPress', 'gravity-forms-pdf-extended' ); ?></h3>
+			<h3><?php esc_html_e( 'Managing PDF Templates in WordPress', 'gravity-forms-pdf-extended' ); ?></h3>
 
 			<p>
-				<?php esc_html_e( "We've done away with the need to edit PHP files to configure Gravity PDF. You'll have a familiar and seamless experience controlling PDF settings direct from your WordPress Admin area.", 'gravity-forms-pdf-extended' ); ?>
+				<?php esc_html_e( "It's 100% easier to work with PDF Templates thanks to our Advanced Template Manager. Based on the WordPress Theme Manager, you can easily search through your installed templates, see what a PDF might look like and view supported features – all without a page reload!", 'gravity-forms-pdf-extended' ); ?>
 			</p>
 
 			<p>
-				<?php esc_html_e( "If you've ever configured a Gravity Form add-on you'll feel right at home setting up PDFs.", 'gravity-forms-pdf-extended' ); ?>
+				<?php printf( esc_html__( "We've added the ability to install PDFs via a zip file and easily delete them, too. It's now very simple to install and use custom PDF templates – like the ones %syou might purchased from our PDF Template Shop%s.", 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/shop/">', '</a>' ); ?>
 			</p>
 
 		</div>
 
 		<div class="col">
-			<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/updated-new-ui.png' ); ?>">
+			<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/updating-advanced-template-selector.png' ); ?>">
 		</div>
 
 	</div>
@@ -72,36 +72,36 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div class="feature-section two-col">
 
 		<div class="col">
-			<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/updated-css-ready-class-templates.png' ); ?>">
+			<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/updating-merge-tags.png' ); ?>">
 		</div>
 
 		<div class="col">
-			<h3><?php esc_html_e( 'All-New Templates with CSS Ready Class Support', 'gravity-forms-pdf-extended' ); ?></h3>
+			<h3><?php esc_html_e( 'Gravity PDF Merge Tags', 'gravity-forms-pdf-extended' ); ?></h3>
 
 			<p>
-				<?php printf( esc_html__( "We were always getting feedback for templates that look more like their Gravity Forms layouts. %sYou asked and we've delivered!%s", 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ); ?>
+				<?php printf( esc_html__( "The %s[gravitypdf]%s shortcode is an excellent way to display a PDF download link on your website. Sometimes it's more useful to display the raw PDF URL, and that's where the new PDF merge tag %s{Title:pdf:ID}%s comes in.", 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<code>', '</code>' ); ?>
 			</p>
 
-			<p>
-				<?php printf( esc_html__( "All v4 PDFs will support %sGravity Forms CSS Ready Classes%s. When used in your form the PDF will automatically create two and three column layouts to suit. Plus, Gravity PDF %snow comes with four free PDF templates%s out of the box.", 'gravity-forms-pdf-extended' ), '<a href="https://www.gravityhelp.com/documentation/article/css-ready-classes/">', '</a>', '<strong>', '</strong>' ); ?>
-			</p>
+            <p>
+				<?php printf( esc_html__( "The PDF Merge Tag will be automatically converted to a URL if the PDF is active and the PDF conditional logic has been met. The new merge tag is automatically included in Gravity Forms merge tag selector and can be used anywhere Gravity Forms allows other merge tags (provided the entry has been saved).", 'gravity-forms-pdf-extended' ) ); ?>
+            </p>
 
 		</div>
 	</div>
 
 
-	<div class="feature-section two-col">
+	<div class="feature-section two-col" id="gfpdf-mascot-container">
 
 		<div class="col">
-			<h3><?php esc_html_e( 'A Beautiful Font Manager', 'gravity-forms-pdf-extended' ); ?></h3>
+			<h3><?php esc_html_e( 'Four Column Support added to Core PDF Templates!', 'gravity-forms-pdf-extended' ); ?></h3>
 
 			<p>
-				<?php esc_html_e( 'No more playing around with FTP when installing fonts, or "guessing" the font family name to use in your templates. Our all-new font manager makes it a breeze to upload TTF or OTF font files and use them in your PDFs.', 'gravity-forms-pdf-extended' ); ?>
+				<?php printf( esc_html__( '%sThis four-column CSS code%s has become increasingly popular for Gravity Forms users and so we have added full support for these classes in Gravity PDF (make sure to include the custom CSS with your theme).', 'gravity-forms-pdf-extended' ), '<a href="https://gist.github.com/WebEndevSnippets/5555354">', '</a>' ); ?>
 
 			</p>
 
 			<p>
-				<?php esc_html_e( "Once installed, you'll have full control over the font face, size and color using our powerful settings interface.", 'gravity-forms-pdf-extended' ); ?>
+				<?php printf( esc_html__( "To start using in your PDF, add the classes %sgf_first_quarter%s, %sgf_second_quarter%s, %sgf_third_quarter%s and %sgf_fourth_quarter%s to your Gravity Form fields and support PDF templates will automatically create a four column layout to match.", 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<code>', '</code>', '<code>', '</code>', '<code>', '</code>' ); ?>
 			</p>
 
 			<p></p>
@@ -110,37 +110,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<div class="col">
 			<img class="gfpdf-image"
-			     src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/updated-font-manager.png' ); ?>">
+			     src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/updating-four-columns.png' ); ?>">
 		</div>
 
-	</div>
-
-
-	<div id="gfpdf-mascot-container" class="changelog feature-section three-col">
-		<div class="col">
-			<img class="gfpdf-image"
-			     src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/welcome-download-shortcode.png' ); ?>">
-
-			<h3><?php esc_html_e( 'Simple PDF Download Links', 'gravity-forms-pdf-extended' ); ?></h3>
-
-			<p><?php printf( esc_html__( 'The %s[gravitypdf]%s shortcode allows you to %seasily place a PDF download link%s on any of the Gravity Forms Confirmation types.', 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<a href="https://gravitypdf.com/documentation/v4/user-shortcodes/">', '</a>' ); ?></p>
-		</div>
-		<div class="col">
-			<img class="gfpdf-image"
-			     src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/welcome-notification-conditional.png' ); ?>">
-
-			<h3><?php esc_html_e( 'PDF Conditional Logic', 'gravity-forms-pdf-extended' ); ?></h3>
-
-			<p><?php esc_html_e( "Enable or disable PDFs with Gravity Forms powerful conditional logic feature. Control when PDFs are attached to email notifications and disable a PDF from being viewed if your conditions aren't met.", 'gravity-forms-pdf-extended' ); ?></p>
-		</div>
-		<div class="col last-feature">
-			<img class="gfpdf-image"
-			     src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/updating-header-footer.png' ); ?>">
-
-			<h3><?php esc_html_e( 'Headers and Footers', 'gravity-forms-pdf-extended' ); ?></h3>
-
-			<p><?php esc_html_e( "We've built in header and footer support in all our v4 templates. You can optionally have a different first page header and footer. Now that's control!", 'gravity-forms-pdf-extended' ); ?></p>
-		</div>
 	</div>
 
 	<?php $this->more(); ?>

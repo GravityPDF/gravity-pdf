@@ -8,7 +8,7 @@ var gulp = require('gulp'),
 /* Minify our CSS */
 gulp.task('minify', function () {
   return gulp.src([ 'src/assets/css/*.css' ])
-    .pipe(cleanCSS())
+    .pipe(cleanCSS( { target: 'dist/assets/css'}))
     .pipe(rename({
       suffix: '.min'
     }))
