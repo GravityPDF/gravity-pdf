@@ -27,7 +27,7 @@
     },
 
     "scripts": {
-      "post-install-cmd": [
+      "post-update-cmd": [
         "npm install --global gulp-cli",
         "npm install && gulp",
         "npm run-script build"
