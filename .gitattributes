@@ -8,5 +8,7 @@
 /node_modules  	 	export-ignore
 /.coveralls.yml	 	export-ignore
 /.travis.yml	 	export-ignore
+/karma.conf.js	 	export-ignore
+/.eslintrc  	 	export-ignore
 
 *.sh eol=lf
