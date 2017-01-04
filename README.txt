@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.2
 Tested up to: 4.6
-Stable tag: 4.0.6
+Stable tag: 4.1.0-beta1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
 
