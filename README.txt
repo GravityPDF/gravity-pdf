@@ -85,6 +85,36 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 
 == Changelog ==
 
+= 4.1.0 =
+* Feature: Advanced PDF Template Manager. Upload, View, Select and Delete PDF templates with ease (GH#486)
+* Feature: Add PDF Mergetags which output PDF URLs and compliment the [gravitypdf] shortcode which output HTML links (GH#404)
+* Feature: Add four-column CSS Ready Class support to core PDFs. Note: if you have run "Setup Custom Templates" you will need to re-run it to take advantage of this feature (GH#461)
+* Feature: Added support for the WP External Links plugin (GH#386)
+* Enhancement: Gravity PDF Review Notice now only shows up on Gravity Forms pages (#528)
+* Enhancement: Convert all strings to American format so they can be correctly translated using Glotpress (GH#525)
+* Dev Feature: Added 'Author URI' and 'Tags' headers to PDF template files which get displayed in the Advanced Template Manager (GH#558)
+* Dev Feature: Include $this as eighth parameter in 'gfpdf_field_html_value' filter (GH#549)
+* Dev Feature: Add 'gfpdf_field_section_break_html' filter to returned Section Field HTML for the PDF (GH#548)
+* Dev Feature: Add actions before and after the core template HTML is generated; 'gfpdf_pre_html_fields' and 'gfpdf_post_html_fields' respectively (GH#546)
+* Dev Feature: Template PHP Configuration files can impliment setUp and TearDown interfaces which fire when templates are installed or deleted through the Advanced Template Manager (GH#545)
+* Dev Feature: Added Font Create and Delete endpoints to API – GPDFAPI::add_pdf_font() and GPDFAPI::delete_pdf_font() (GH#541)
+* Dev Feature: Allow Rich Text Editor height to be controlled through the 'size' property when used in template config (GH#540)
+* Dev Feature: Allow images in radio buttons using the new `'class' => 'image-radio-buttons'` property when used in template config (GH#539)
+* Dev Changes: Use Gravity Forms copy of Chosen JS (GH#563)
+* Dev Changes: All production CSS and JS saved to /dest/ directory as part of Advanced Template Manager update
+* Dev Changes: Standardised all AJAX Authentication so Nonce and Capability checks are easily checked (GH#538)
+* Dev Changes: Rename all instances of "depreciated" with "deprecated" in our files and classes (GH#535)
+* Dev Changes: Contact our localised JS data to camelCase (GH#532)
+* Dev Changes: Utilised PHP5.4 array syntax in code (GH#521)
+* Bug: Reset Gravity Forms Merge Tag JS when PDF template changes (GH#551)
+* Bug: Fix incorrect variable reference to $include_list_styles which uses 'gfpdf_include_list_styles' to change the behaviour (GH#547)
+* Bug: Fix PHP notice in PDF when no products selected in form (GH#523)
+* Bug: Fix issue with Gravity PDF update screen showing and not showing at incorrect times (GH#514)
+* Bug: Fix false positive when checking if the PDF tmp directory is readable (GH#519)
+* Bug: Fix error when using GLOB_BRACE flag in glob() function (GH#562)
+* Bug: Remove OTF fonts from being uploaded due to poor support in Mpdf (GH#569)
+* Bug: Additional PHP7.1 fixes merged from upstream Mpdf package
+
 = 4.0.6 =
 * Correctly register our PDF link with the WP Rewrite API when "Almost Pretty" permalinks are active (GH#502)
 * Correctly process mergetags in password field for Tier 2 PDF templates (GH#503)
