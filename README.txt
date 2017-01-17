@@ -92,6 +92,7 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 * Feature: Added support for the WP External Links plugin (GH#386)
 * Enhancement: Gravity PDF Review Notice now only shows up on Gravity Forms pages (#528)
 * Enhancement: Convert all strings to American format so they can be correctly translated using Glotpress (GH#525)
+* Enhancement: Added Australian, New Zealand and UK language packs (GH#525)
 * Dev Feature: Added 'Author URI' and 'Tags' headers to PDF template files which get displayed in the Advanced Template Manager (GH#558)
 * Dev Feature: Include $this as eighth parameter in 'gfpdf_field_html_value' filter (GH#549)
 * Dev Feature: Add 'gfpdf_field_section_break_html' filter to returned Section Field HTML for the PDF (GH#548)
