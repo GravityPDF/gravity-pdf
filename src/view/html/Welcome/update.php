@@ -79,11 +79,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<h3><?php esc_html_e( 'Gravity PDF Merge Tags', 'gravity-forms-pdf-extended' ); ?></h3>
 
 			<p>
-				<?php printf( esc_html__( "The %s[gravitypdf]%s shortcode is an excellent way to display a PDF download link on your website. Sometimes it's more useful to display the raw PDF URL, and that's where the new PDF merge tag %s{Title:pdf:ID}%s comes in.", 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<code>', '</code>' ); ?>
+				<?php printf( esc_html__( "The %s[gravitypdf]%s shortcode is an excellent way to display a PDF download link on your website. But sometimes it's more useful to display the raw PDF URL, and that's where the new PDF merge tag %s{Title:pdf:ID}%s comes in.", 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<code>', '</code>' ); ?>
 			</p>
 
             <p>
-				<?php printf( esc_html__( "The PDF Merge Tag will be automatically converted to a URL if the PDF is active and the PDF conditional logic has been met. The new merge tag is automatically included in Gravity Forms merge tag selector and can be used anywhere Gravity Forms allows other merge tags (provided the entry has been saved).", 'gravity-forms-pdf-extended' ) ); ?>
+				<?php printf( esc_html__( "The PDF Merge Tag will be automatically converted to a URL if the PDF is active and the PDF conditional logic has been met. The new merge tag is automatically included in the Gravity Forms merge tag selector and can be used anywhere Gravity Forms allows other merge tags (provided the entry has been created).", 'gravity-forms-pdf-extended' ) ); ?>
             </p>
 
 		</div>
@@ -101,7 +101,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</p>
 
 			<p>
-				<?php printf( esc_html__( "To start using in your PDF, add the classes %sgf_first_quarter%s, %sgf_second_quarter%s, %sgf_third_quarter%s and %sgf_fourth_quarter%s to your Gravity Form fields and support PDF templates will automatically create a four column layout to match.", 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<code>', '</code>', '<code>', '</code>', '<code>', '</code>' ); ?>
+				<?php printf( esc_html__( "To start using in your PDF, add the classes %sgf_first_quarter%s, %sgf_second_quarter%s, %sgf_third_quarter%s and %sgf_fourth_quarter%s to your Gravity Form fields and supported PDF templates will automatically create a four column layout to match.", 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<code>', '</code>', '<code>', '</code>', '<code>', '</code>' ); ?>
 			</p>
 
 			<p></p>
