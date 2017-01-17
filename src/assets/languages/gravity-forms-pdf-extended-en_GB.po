@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gravity-forms-pdf-extended\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2016-11-22 12:20+1100\n"
+"PO-Revision-Date: 2017-01-17 14:59+1100\n"
 "Last-Translator: Jake Jackson <support@gravitypdf.com>\n"
 "Language-Team: \n"
 "Language: en_GB\n"
@@ -149,7 +149,7 @@ msgstr "View Gravity PDF Theme Shop"
 msgid "Theme Shop"
 msgstr "Theme Shop"
 
-#: src/bootstrap.php:1325, src/controller/Controller_Shortcodes.php:301,
+#: src/bootstrap.php:1323, src/controller/Controller_Shortcodes.php:301,
 #: src/helper/Helper_Data.php:349
 msgid "Gravity PDF"
 msgstr "Gravity PDF"
@@ -178,7 +178,7 @@ msgstr "There was a problem processing the action. Please try again."
 msgid "There was a problem uninstalling Gravity PDF. Please try again."
 msgstr "There was a problem uninstalling Gravity PDF. Please try again."
 
-#: src/controller/Controller_PDF.php:617, src/view/View_PDF.php:519
+#: src/controller/Controller_PDF.php:617, src/view/View_PDF.php:523
 msgid "There was a problem generating your PDF"
 msgstr "There was a problem generating your PDF"
 
@@ -485,32 +485,32 @@ msgid ""
 msgstr ""
 "PDF Settings could not be saved. Please enter all required information below."
 
-#: src/helper/abstract/Helper_Abstract_Options.php:3765,
-#: src/helper/abstract/Helper_Abstract_Options.php:3767
+#: src/helper/abstract/Helper_Abstract_Options.php:3767,
+#: src/helper/abstract/Helper_Abstract_Options.php:3769
 msgid "Select Media"
 msgstr "Select Media"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:3769
+#: src/helper/abstract/Helper_Abstract_Options.php:3771
 msgid "Upload File"
 msgstr "Upload File"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:4083
+#: src/helper/abstract/Helper_Abstract_Options.php:4085
 msgid "Width"
 msgstr "Width"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:4085
+#: src/helper/abstract/Helper_Abstract_Options.php:4087
 msgid "Height"
 msgstr "Height"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:4091
+#: src/helper/abstract/Helper_Abstract_Options.php:4093
 msgid "mm"
 msgstr "mm"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:4093
+#: src/helper/abstract/Helper_Abstract_Options.php:4095
 msgid "inches"
 msgstr "inches"
 
-#: src/helper/abstract/Helper_Abstract_Options.php:4213
+#: src/helper/abstract/Helper_Abstract_Options.php:4215
 msgid "The callback used for the %s setting is missing."
 msgstr "The callback used for the %s setting is missing."
 
@@ -518,11 +518,11 @@ msgstr "The callback used for the %s setting is missing."
 msgid "Cannot find file %s"
 msgstr "Cannot find file %s"
 
-#: src/helper/fields/Field_Products.php:371
+#: src/helper/fields/Field_Products.php:381
 msgid "Subtotal"
 msgstr "Subtotal"
 
-#: src/helper/fields/Field_Products.php:381
+#: src/helper/fields/Field_Products.php:391
 msgid "Shipping (%s)"
 msgstr "Shipping (%s)"
 
@@ -552,13 +552,13 @@ msgstr "Delete"
 
 #: src/helper/Helper_Data.php:415, src/helper/Helper_PDF_List_Table.php:493,
 #: src/helper/Helper_PDF_List_Table.php:495,
-#: src/model/Model_Form_Settings.php:1909
+#: src/model/Model_Form_Settings.php:1765
 msgid "Active"
 msgstr "Active"
 
 #: src/helper/Helper_Data.php:417, src/helper/Helper_PDF_List_Table.php:493,
 #: src/helper/Helper_PDF_List_Table.php:495,
-#: src/model/Model_Form_Settings.php:1909
+#: src/model/Model_Form_Settings.php:1765
 msgid "Inactive"
 msgstr "Inactive"
 
@@ -697,12 +697,10 @@ msgid "Search the Gravity PDF Knowledgebase..."
 msgstr "Search the Gravity PDF Knowledgebase..."
 
 #: src/helper/Helper_Data.php:475
-#, fuzzy
 msgid "Requires Gravity PDF v%s"
 msgstr "Requires Gravity PDF v%s"
 
 #: src/helper/Helper_Data.php:477
-#, fuzzy
 msgid ""
 "This PDF template is not compatible with your version of Gravity PDF. This "
 "template required Gravity PDF v%s."
@@ -711,22 +709,18 @@ msgstr ""
 "template required Gravity PDF v%s."
 
 #: src/helper/Helper_Data.php:479
-#, fuzzy
 msgid "Template Details"
 msgstr "Template Details"
 
 #: src/helper/Helper_Data.php:481
-#, fuzzy
 msgid "Current Template"
 msgstr "Current Template"
 
 #: src/helper/Helper_Data.php:483
-#, fuzzy
 msgid "Show previous template"
 msgstr "Show previous template"
 
 #: src/helper/Helper_Data.php:485
-#, fuzzy
 msgid "Show next template"
 msgstr "Show next template"
 
@@ -1052,11 +1046,11 @@ msgstr "Install Fonts"
 
 #: src/helper/Helper_Options_Fields.php:533
 msgid ""
-"Custom fonts can be installed for use in your PDFs. Only %s.ttf%s and %s.otf"
-"%s font files are supported."
+"Custom fonts can be installed for use in your PDFs. Only %s.ttf%s font files "
+"are supported."
 msgstr ""
-"Custom fonts can be installed for use in your PDFs. Only %s.ttf%s and %s.otf"
-"%s font files are supported."
+"Custom fonts can be installed for use in your PDFs. Only %s.ttf%s font files "
+"are supported."
 
 #: src/helper/Helper_Options_Fields.php:561,
 #: src/helper/Helper_PDF_List_Table.php:239
@@ -1541,7 +1535,7 @@ msgid "Requires Gravity PDF"
 msgstr "Requires Gravity PDF"
 
 #: src/helper/Helper_Templates.php:641, src/helper/Helper_Templates.php:761,
-#: src/view/View_PDF.php:1087
+#: src/view/View_PDF.php:1127
 msgid "Legacy"
 msgstr "Legacy"
 
@@ -1565,11 +1559,11 @@ msgstr "Author URI"
 msgid "Required PDF Version"
 msgstr "Required PDF Version"
 
-#: src/model/Model_Actions.php:729
+#: src/model/Model_Actions.php:693
 msgid "No configuration.php file found for site #%s"
 msgstr "No configuration.php file found for site #%s"
 
-#: src/model/Model_Actions.php:771
+#: src/model/Model_Actions.php:733
 msgid "Database import problem for site #%s"
 msgstr "Database import problem for site #%s"
 
@@ -1595,11 +1589,11 @@ msgstr "PDF could not be saved. Please enter all required information below."
 msgid "PDF saved successfully. %sBack to PDF list.%s"
 msgstr "PDF saved successfully. %sBack to PDF list.%s"
 
-#: src/model/Model_Form_Settings.php:1595
+#: src/model/Model_Form_Settings.php:1545
 msgid "PDF successfully deleted."
 msgstr "PDF successfully deleted."
 
-#: src/model/Model_Form_Settings.php:1763
+#: src/model/Model_Form_Settings.php:1667
 msgid "PDF successfully duplicated."
 msgstr "PDF successfully duplicated."
 
@@ -1653,7 +1647,7 @@ msgstr "You do not have access to view this PDF."
 msgid "The PDF could not be saved."
 msgstr "The PDF could not be saved."
 
-#: src/model/Model_PDF.php:3633
+#: src/model/Model_PDF.php:3649
 msgid "Could not find PDF configuration requested"
 msgstr "Could not find PDF configuration requested"
 
@@ -1673,29 +1667,29 @@ msgstr "Could not locate font on web server: %s"
 msgid "There was a problem installing the font %s. Please try again."
 msgstr "There was a problem installing the font %s. Please try again."
 
-#: src/model/Model_Settings.php:1099
+#: src/model/Model_Settings.php:1009
 msgid "Could not delete Gravity PDF font correctly. Please try again."
 msgstr "Could not delete Gravity PDF font correctly. Please try again."
 
-#: src/model/Model_Settings.php:1161
+#: src/model/Model_Settings.php:1071
 msgid "Required fields have not been included."
 msgstr "Required fields have not been included."
 
-#: src/model/Model_Settings.php:1195
+#: src/model/Model_Settings.php:1105
 msgid ""
 "Font name is not valid. Only alphanumeric characters and spaces are accepted."
 msgstr ""
 "Font name is not valid. Only alphanumeric characters and spaces are accepted."
 
-#: src/model/Model_Settings.php:1231
+#: src/model/Model_Settings.php:1141
 msgid "A font with the same name already exists. Try a different name."
 msgstr "A font with the same name already exists. Try a different name."
 
-#: src/model/Model_Templates.php:621
+#: src/model/Model_Templates.php:713
 msgid "No valid PDF template found in Zip archive."
 msgstr "No valid PDF template found in Zip archive."
 
-#: src/model/Model_Templates.php:683
+#: src/model/Model_Templates.php:775
 msgid "The PHP file %s is not a valid PDF Template."
 msgstr "The PHP file %s is not a valid PDF Template."
 
@@ -2025,11 +2019,9 @@ msgstr "Manage all your custom Gravity PDF fonts in one place."
 
 #: src/view/html/Settings/tools.php:169
 msgid ""
-"Only .ttf and %s.otf font files%s are supported and they MUST be uploaded "
-"through your media library (no external links)."
+"Only .ttf font files are supported and they MUST be uploaded through your "
+"media library (no external links)."
 msgstr ""
-"Only .ttf and %s.otf font files%s are supported and they MUST be uploaded "
-"through your media library (no external links)."
 
 #: src/view/html/Settings/tools.php:207
 msgid "Looks bare in here!%s Click \"Add Font\" below to get started."
@@ -2223,123 +2215,97 @@ msgstr "Discover Gravity PDF %s"
 
 #: src/view/html/Welcome/update.php:85
 msgid ""
-"Gravity PDF has been completely rebuilt with simplicity, stability and "
-"security in mind. Our team has spent over 12 months making a great product "
-"even greater. Discover what's new..."
+"Managing PDF templates just become a whole lot easier with our Advanced "
+"Template Manager! View, Search, Install and Delete PDFs right from our new "
+"UI."
 msgstr ""
-"Gravity PDF has been completely rebuilt with simplicity, stability and "
-"security in mind. Our team has spent over 12 months making a great product "
-"even greater. Discover what's new..."
+"Managing PDF templates just become a whole lot easier with our Advanced "
+"Template Manager! View, Search, Install and Delete PDFs right from our new "
+"UI."
 
 #: src/view/html/Welcome/update.php:91, src/view/html/Welcome/welcome.php:91
 msgid "Version %s"
 msgstr "Version %s"
 
 #: src/view/html/Welcome/update.php:105
-msgid "Bringing Config Settings to WordPress"
-msgstr "Bringing Config Settings to WordPress"
+msgid "Managing PDF Templates in WordPress"
+msgstr "Managing PDF Templates in WordPress"
 
 #: src/view/html/Welcome/update.php:111
 msgid ""
-"We've done away with the need to edit PHP files to configure Gravity PDF. "
-"You'll have a familiar and seamless experience controlling PDF settings "
-"direct from your WordPress Admin area."
+"It's 100% easier to work with PDF Templates thanks to our Advanced Template "
+"Manager. Based on the WordPress Theme Manager, you can easily search through "
+"your installed templates, see what a PDF might look like and view supported "
+"features – all without a page reload!"
 msgstr ""
-"We've done away with the need to edit PHP files to configure Gravity PDF. "
-"You'll have a familiar and seamless experience controlling PDF settings "
-"direct from your WordPress Admin area."
+"It's 100% easier to work with PDF Templates thanks to our Advanced Template "
+"Manager. Based on the WordPress Theme Manager, you can easily search through "
+"your installed templates, see what a PDF might look like and view supported "
+"features – all without a page reload!"
 
 #: src/view/html/Welcome/update.php:119
 msgid ""
-"If you've ever configured a Gravity Form add-on you'll feel right at home "
-"setting up PDFs."
+"We've added the ability to install PDFs via a zip file and easily delete "
+"them, too. It's now very simple to install and use custom PDF templates – "
+"like the ones %syou might purchased from our PDF Template Shop%s."
 msgstr ""
-"If you've ever configured a Gravity Form add-on you'll feel right at home "
-"setting up PDFs."
+"We've added the ability to install PDFs via a zip file and easily delete "
+"them, too. It's now very simple to install and use custom PDF templates – "
+"like the ones %syou might purchased from our PDF Template Shop%s."
 
 #: src/view/html/Welcome/update.php:157
-msgid "All-New Templates with CSS Ready Class Support"
-msgstr "All-New Templates with CSS Ready Class Support"
+msgid "Gravity PDF Merge Tags"
+msgstr "Gravity PDF Merge Tags"
 
 #: src/view/html/Welcome/update.php:163
 msgid ""
-"We were always getting feedback for templates that look more like their "
-"Gravity Forms layouts. %sYou asked and we've delivered!%s"
+"The %s[gravitypdf]%s shortcode is an excellent way to display a PDF download "
+"link on your website. Sometimes it's more useful to display the raw PDF URL, "
+"and that's where the new PDF merge tag %s{Title:pdf:ID}%s comes in."
 msgstr ""
-"We were always getting feedback for templates that look more like their "
-"Gravity Forms layouts. %sYou asked and we've delivered!%s"
+"The %s[gravitypdf]%s shortcode is an excellent way to display a PDF download "
+"link on your website. Sometimes it's more useful to display the raw PDF URL, "
+"and that's where the new PDF merge tag %s{Title:pdf:ID}%s comes in."
 
 #: src/view/html/Welcome/update.php:171
 msgid ""
-"All v4 PDFs will support %sGravity Forms CSS Ready Classes%s. When used in "
-"your form the PDF will automatically create two and three column layouts to "
-"suit. Plus, Gravity PDF %snow comes with four free PDF templates%s out of "
-"the box."
+"The PDF Merge Tag will be automatically converted to a URL if the PDF is "
+"active and the PDF conditional logic has been met. The new merge tag is "
+"automatically included in Gravity Forms merge tag selector and can be used "
+"anywhere Gravity Forms allows other merge tags (provided the entry has been "
+"saved)."
 msgstr ""
-"All v4 PDFs will support %sGravity Forms CSS Ready Classes%s. When used in "
-"your form the PDF will automatically create two and three column layouts to "
-"suit. Plus, Gravity PDF %snow comes with four free PDF templates%s out of "
-"the box."
+"The PDF Merge Tag will be automatically converted to a URL if the PDF is "
+"active and the PDF conditional logic has been met. The new merge tag is "
+"automatically included in Gravity Forms merge tag selector and can be used "
+"anywhere Gravity Forms allows other merge tags (provided the entry has been "
+"saved)."
 
 #: src/view/html/Welcome/update.php:191
-msgid "A Beautiful Font Manager"
-msgstr "A Beautiful Font Manager"
+msgid "Four Column Support added to Core PDF Templates!"
+msgstr "Four Column Support added to Core PDF Templates!"
 
 #: src/view/html/Welcome/update.php:197
 msgid ""
-"No more playing around with FTP when installing fonts, or \"guessing\" the "
-"font family name to use in your templates. Our all-new font manager makes it "
-"a breeze to upload TTF or OTF font files and use them in your PDFs."
+"%sThis four-column CSS code%s has become increasingly popular for Gravity "
+"Forms users and so we have added full support for these classes in Gravity "
+"PDF (make sure to include the custom CSS with your theme)."
 msgstr ""
-"No more playing around with FTP when installing fonts, or \"guessing\" the "
-"font family name to use in your templates. Our all-new font manager makes it "
-"a breeze to upload TTF or OTF font files and use them in your PDFs."
+"%sThis four-column CSS code%s has become increasingly popular for Gravity "
+"Forms users and so we have added full support for these classes in Gravity "
+"PDF (make sure to include the custom CSS with your theme)."
 
 #: src/view/html/Welcome/update.php:207
 msgid ""
-"Once installed, you'll have full control over the font face, size and color "
-"using our powerful settings interface."
+"To start using in your PDF, add the classes %sgf_first_quarter%s, "
+"%sgf_second_quarter%s, %sgf_third_quarter%s and %sgf_fourth_quarter%s to "
+"your Gravity Form fields and support PDF templates will automatically create "
+"a four column layout to match."
 msgstr ""
-"Once installed, you'll have full control over the font face, size and colour "
-"using our powerful settings interface."
-
-#: src/view/html/Welcome/update.php:247, src/view/html/Welcome/welcome.php:215
-msgid "Simple PDF Download Links"
-msgstr "Simple PDF Download Links"
-
-#: src/view/html/Welcome/update.php:251, src/view/html/Welcome/welcome.php:219
-msgid ""
-"The %s[gravitypdf]%s shortcode allows you to %seasily place a PDF download "
-"link%s on any of the Gravity Forms Confirmation types."
-msgstr ""
-"The %s[gravitypdf]%s shortcode allows you to %seasily place a PDF download "
-"link%s on any of the Gravity Forms Confirmation types."
-
-#: src/view/html/Welcome/update.php:263
-msgid "PDF Conditional Logic"
-msgstr "PDF Conditional Logic"
-
-#: src/view/html/Welcome/update.php:267
-msgid ""
-"Enable or disable PDFs with Gravity Forms powerful conditional logic "
-"feature. Control when PDFs are attached to email notifications and disable a "
-"PDF from being viewed if your conditions aren't met."
-msgstr ""
-"Enable or disable PDFs with Gravity Forms powerful conditional logic "
-"feature. Control when PDFs are attached to email notifications and disable a "
-"PDF from being viewed if your conditions aren't met."
-
-#: src/view/html/Welcome/update.php:279
-msgid "Headers and Footers"
-msgstr "Headers and Footers"
-
-#: src/view/html/Welcome/update.php:283
-msgid ""
-"We've built in header and footer support in all our v4 templates. You can "
-"optionally have a different first page header and footer. Now that's control!"
-msgstr ""
-"We've built in header and footer support in all our v4 templates. You can "
-"optionally have a different first page header and footer. Now that's control!"
+"To start using in your PDF, add the classes %sgf_first_quarter%s, "
+"%sgf_second_quarter%s, %sgf_third_quarter%s and %sgf_fourth_quarter%s to "
+"your Gravity Form fields and support PDF templates will automatically create "
+"a four column layout to match."
 
 #: src/view/html/Welcome/welcome.php:85
 msgid ""
@@ -2398,6 +2364,18 @@ msgstr "Select which Form you want to setup first:"
 #: src/view/html/Welcome/welcome.php:193
 msgid "Create a PDF"
 msgstr "Create a PDF"
+
+#: src/view/html/Welcome/welcome.php:215
+msgid "Simple PDF Download Links"
+msgstr "Simple PDF Download Links"
+
+#: src/view/html/Welcome/welcome.php:219
+msgid ""
+"The %s[gravitypdf]%s shortcode allows you to %seasily place a PDF download "
+"link%s on any of the Gravity Forms Confirmation types."
+msgstr ""
+"The %s[gravitypdf]%s shortcode allows you to %seasily place a PDF download "
+"link%s on any of the Gravity Forms Confirmation types."
 
 #: src/view/html/Welcome/welcome.php:229
 msgid "Automated PDF Emails"
@@ -2460,6 +2438,114 @@ msgstr ""
 #: tests/phpunit/unit-tests/test-settings.php:523
 msgid "Normal Notice"
 msgstr "Normal Notice"
+
+#~ msgid ""
+#~ "Custom fonts can be installed for use in your PDFs. Only %s.ttf%s and %s."
+#~ "otf%s font files are supported."
+#~ msgstr ""
+#~ "Custom fonts can be installed for use in your PDFs. Only %s.ttf%s and %s."
+#~ "otf%s font files are supported."
+
+#~ msgid ""
+#~ "Only .ttf and %s.otf font files%s are supported and they MUST be uploaded "
+#~ "through your media library (no external links)."
+#~ msgstr ""
+#~ "Only .ttf and %s.otf font files%s are supported and they MUST be uploaded "
+#~ "through your media library (no external links)."
+
+#~ msgid ""
+#~ "Gravity PDF has been completely rebuilt with simplicity, stability and "
+#~ "security in mind. Our team has spent over 12 months making a great "
+#~ "product even greater. Discover what's new..."
+#~ msgstr ""
+#~ "Gravity PDF has been completely rebuilt with simplicity, stability and "
+#~ "security in mind. Our team has spent over 12 months making a great "
+#~ "product even greater. Discover what's new..."
+
+#~ msgid "Bringing Config Settings to WordPress"
+#~ msgstr "Bringing Config Settings to WordPress"
+
+#~ msgid ""
+#~ "We've done away with the need to edit PHP files to configure Gravity PDF. "
+#~ "You'll have a familiar and seamless experience controlling PDF settings "
+#~ "direct from your WordPress Admin area."
+#~ msgstr ""
+#~ "We've done away with the need to edit PHP files to configure Gravity PDF. "
+#~ "You'll have a familiar and seamless experience controlling PDF settings "
+#~ "direct from your WordPress Admin area."
+
+#~ msgid ""
+#~ "If you've ever configured a Gravity Form add-on you'll feel right at home "
+#~ "setting up PDFs."
+#~ msgstr ""
+#~ "If you've ever configured a Gravity Form add-on you'll feel right at home "
+#~ "setting up PDFs."
+
+#~ msgid "All-New Templates with CSS Ready Class Support"
+#~ msgstr "All-New Templates with CSS Ready Class Support"
+
+#~ msgid ""
+#~ "We were always getting feedback for templates that look more like their "
+#~ "Gravity Forms layouts. %sYou asked and we've delivered!%s"
+#~ msgstr ""
+#~ "We were always getting feedback for templates that look more like their "
+#~ "Gravity Forms layouts. %sYou asked and we've delivered!%s"
+
+#~ msgid ""
+#~ "All v4 PDFs will support %sGravity Forms CSS Ready Classes%s. When used "
+#~ "in your form the PDF will automatically create two and three column "
+#~ "layouts to suit. Plus, Gravity PDF %snow comes with four free PDF "
+#~ "templates%s out of the box."
+#~ msgstr ""
+#~ "All v4 PDFs will support %sGravity Forms CSS Ready Classes%s. When used "
+#~ "in your form the PDF will automatically create two and three column "
+#~ "layouts to suit. Plus, Gravity PDF %snow comes with four free PDF "
+#~ "templates%s out of the box."
+
+#~ msgid "A Beautiful Font Manager"
+#~ msgstr "A Beautiful Font Manager"
+
+#~ msgid ""
+#~ "No more playing around with FTP when installing fonts, or \"guessing\" "
+#~ "the font family name to use in your templates. Our all-new font manager "
+#~ "makes it a breeze to upload TTF or OTF font files and use them in your "
+#~ "PDFs."
+#~ msgstr ""
+#~ "No more playing around with FTP when installing fonts, or \"guessing\" "
+#~ "the font family name to use in your templates. Our all-new font manager "
+#~ "makes it a breeze to upload TTF or OTF font files and use them in your "
+#~ "PDFs."
+
+#~ msgid ""
+#~ "Once installed, you'll have full control over the font face, size and "
+#~ "color using our powerful settings interface."
+#~ msgstr ""
+#~ "Once installed, you'll have full control over the font face, size and "
+#~ "colour using our powerful settings interface."
+
+#~ msgid "PDF Conditional Logic"
+#~ msgstr "PDF Conditional Logic"
+
+#~ msgid ""
+#~ "Enable or disable PDFs with Gravity Forms powerful conditional logic "
+#~ "feature. Control when PDFs are attached to email notifications and "
+#~ "disable a PDF from being viewed if your conditions aren't met."
+#~ msgstr ""
+#~ "Enable or disable PDFs with Gravity Forms powerful conditional logic "
+#~ "feature. Control when PDFs are attached to email notifications and "
+#~ "disable a PDF from being viewed if your conditions aren't met."
+
+#~ msgid "Headers and Footers"
+#~ msgstr "Headers and Footers"
+
+#~ msgid ""
+#~ "We've built in header and footer support in all our v4 templates. You can "
+#~ "optionally have a different first page header and footer. Now that's "
+#~ "control!"
+#~ msgstr ""
+#~ "We've built in header and footer support in all our v4 templates. You can "
+#~ "optionally have a different first page header and footer. Now that's "
+#~ "control!"
 
 #~ msgid "There was an error processing your request. Please try again."
 #~ msgstr "There was an error processing your request. Please try again."
