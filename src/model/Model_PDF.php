@@ -1249,7 +1249,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function add_unregistered_fonts_to_mPDF( $fonts ) {
 
-		$user_fonts = glob( $this->data->template_font_location . '*.{otf,ttf,OTF,TTF}', GLOB_BRACE );
+		$user_fonts = glob( $this->data->template_font_location . '*.[tT][tT][fF]' );
 		$user_fonts = ( is_array( $user_fonts ) ) ? $user_fonts : [];
 
 		foreach ( $user_fonts as $font ) {

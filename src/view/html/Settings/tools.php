@@ -82,7 +82,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php endif; ?>
 
 	<div id="manage-font-files" title="<?php esc_html_e( 'Manage Fonts', 'gravity-forms-pdf-extended' ); ?>" style="display: none;">
-		<?php esc_html_e( 'Manage all your custom Gravity PDF fonts in one place.', 'gravity-forms-pdf-extended' ); ?> <?php printf( esc_html__( 'Only .ttf and %s.otf font files%s are supported and they MUST be uploaded through your media library (no external links).', 'gravity-forms-pdf-extended' ), '<a href="https://gpdfv4.xyz/documentation/v4/postscript-outlines-not-supported/">', '</a>' ); ?>
+		<?php esc_html_e( 'Manage all your custom Gravity PDF fonts in one place.', 'gravity-forms-pdf-extended' ); ?> <?php esc_html_e( 'Only .ttf font files are supported and they MUST be uploaded through your media library (no external links).', 'gravity-forms-pdf-extended' ); ?>
 
 		<div id="font-list">
 			<!-- backbone to manage font list -->
