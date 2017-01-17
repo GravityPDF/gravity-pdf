@@ -266,7 +266,7 @@ class Model_Settings extends Helper_Abstract_Model {
 
 
 	/**
-	 * Removes the current font's TTF or OTF files from our font directory
+	 * Removes the current font's TTF files from our font directory
 	 *
 	 * @param  array $fonts The font config
 	 *

@@ -1211,7 +1211,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$fonts = $this->model->add_unregistered_fonts_to_mPDF( [] );
 
 		$this->assertArrayHasKey( 'calibri', $fonts );
-		$this->assertArrayHasKey( 'aladin', $fonts );
+		$this->assertArrayNotHasKey( 'aladin', $fonts );
 	}
 
 	/**
