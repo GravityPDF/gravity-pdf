@@ -166,10 +166,19 @@ class Model_Templates extends Helper_Abstract_Model {
 		}
 
 		/* Copy all the files to the active PDF working directory */
-		$results = $this->misc->copyr( $this->get_unzipped_dir_name( $zip_path ), $this->templates->get_template_path() );
+		$unzipped_dir_name = $this->get_unzipped_dir_name( $zip_path );
+		$template_path     = $this->templates->get_template_path();
+
+		$results = $this->misc->copyr( $unzipped_dir_name, $template_path );
 
 		/* Get the template headers now all the files are in the right location */
-		$headers = $this->get_template_info( glob( $this->get_unzipped_dir_name( $zip_path ) . '*.php' ) );
+		$headers = $this->get_template_info( glob( $unzipped_dir_name . '*.php' ) );
+
+		/* Fix template path */
+		$headers = array_map( function( $header ) use ( $unzipped_dir_name, $template_path ) {
+			$header['path'] = str_replace( $unzipped_dir_name, $template_path, $header['path'] );
+			return $header;
+		}, $headers );
 
 		/* Run PDF template SetUp method if required */
 		$this->maybe_run_template_setup( $headers );
