@@ -787,8 +787,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		$this->log->addError( 'AJAX Endpoint Failed', $errors );
 
-		header( 'HTTP/1.1 500 Internal Server Error' );
-		wp_die( '500' );
+		/* Internal Server Error */
+		wp_die( '500', 500 );
 	}
 
 	/**
@@ -849,8 +849,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			'WP_Error_Code'    => $config->get_error_code(),
 		] );
 
-		header( 'HTTP/1.1 500 Internal Server Error' );
-		wp_die( '500' );
+		/* Internal Server Error */
+		wp_die( '500', 500 );
 	}
 
 	/**
@@ -905,8 +905,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			'WP_Error_Code'    => $config->get_error_code(),
 		] );
 
-		header( 'HTTP/1.1 500 Internal Server Error' );
-		wp_die( '500' );
+		/* Internal Server Error */
+		wp_die( '500', 500 );
 	}
 
 	/**

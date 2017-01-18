@@ -944,8 +944,8 @@ class Helper_Misc {
 
 			$this->log->addWarning( 'Nonce Verification Failed' );
 
-			header( 'HTTP/1.1 401 Unauthorized' );
-			wp_die( '401' );
+			/* Unauthorized response */
+			wp_die( '401', 401 );
 		}
 
 		/* prevent unauthorized access */
@@ -957,8 +957,8 @@ class Helper_Misc {
 				'capability_needed' => $capability,
 			] );
 
-			header( 'HTTP/1.1 401 Unauthorized' );
-			wp_die( '401' );
+			/* Unauthorized response */
+			wp_die( '401', 401 );
 		}
 	}
 }

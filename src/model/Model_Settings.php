@@ -499,8 +499,6 @@ class Model_Settings extends Helper_Abstract_Model {
 			}
 		}
 
-		header( 'HTTP/1.1 400 Bad Request' );
-
 		$return = [
 			'error' => esc_html__( 'Could not delete Gravity PDF font correctly. Please try again.', 'gravity-forms-pdf-extended' ),
 		];
@@ -508,7 +506,9 @@ class Model_Settings extends Helper_Abstract_Model {
 		$this->log->addError( 'AJAX Endpoint Error', $return );
 
 		echo json_encode( $return );
-		wp_die();
+
+		/* Bad Request */
+		wp_die( '', 400 );
 	}
 
 	/**
@@ -530,8 +530,6 @@ class Model_Settings extends Helper_Abstract_Model {
 		     strlen( $font['font_name'] ) === 0 || strlen( $font['regular'] ) === 0
 		) {
 
-			header( 'HTTP/1.1 400 Bad Request' );
-
 			$return = [
 				'error' => esc_html__( 'Required fields have not been included.', 'gravity-forms-pdf-extended' ),
 			];
@@ -539,15 +537,15 @@ class Model_Settings extends Helper_Abstract_Model {
 			$this->log->addWarning( 'Validation Failed.', $return );
 
 			echo json_encode( $return );
-			wp_die();
+
+			/* Bad Request */
+			wp_die( '', 400 );
 		}
 
 		/* Check we have a valid font name */
 		$name = $font['font_name'];
 
 		if ( ! $this->is_font_name_valid( $name ) ) {
-
-			header( 'HTTP/1.1 400 Bad Request' );
 
 			$return = [
 				'error' => esc_html__( 'Font name is not valid. Only alphanumeric characters and spaces are accepted.', 'gravity-forms-pdf-extended' ),
@@ -556,7 +554,9 @@ class Model_Settings extends Helper_Abstract_Model {
 			$this->log->addWarning( 'Validation Failed.', $return );
 
 			echo json_encode( $return );
-			wp_die();
+
+			/* Bad Request */
+			wp_die( '', 400 );
 		}
 
 		/* Check the font name is unique */
@@ -565,8 +565,6 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		if ( ! $this->is_font_name_unique( $shortname, $id ) ) {
 
-			header( 'HTTP/1.1 400 Bad Request' );
-
 			$return = [
 				'error' => esc_html__( 'A font with the same name already exists. Try a different name.', 'gravity-forms-pdf-extended' ),
 			];
@@ -574,7 +572,9 @@ class Model_Settings extends Helper_Abstract_Model {
 			$this->log->addWarning( 'Validation Failed.', $return );
 
 			echo json_encode( $return );
-			wp_die();
+
+			/* Bad Request */
+			wp_die( '', 400 );
 		}
 
 		/* Move fonts to our Gravity PDF font folder */
@@ -583,8 +583,6 @@ class Model_Settings extends Helper_Abstract_Model {
 		/* Check if any errors occured installing the fonts */
 		if ( isset( $installation['errors'] ) ) {
 
-			header( 'HTTP/1.1 400 Bad Request' );
-
 			$return = [
 				'error' => $installation,
 			];
@@ -592,7 +590,9 @@ class Model_Settings extends Helper_Abstract_Model {
 			$this->log->addWarning( 'Validation Failed.', $return );
 
 			echo json_encode( $return );
-			wp_die();
+
+			/* Bad Request */
+			wp_die( '', 400 );
 		}
 
 		/* If we got here the installation was successful so return the data */

@@ -328,8 +328,8 @@ class Model_Actions extends Helper_Abstract_Model {
 
 		/* Ensure multisite website */
 		if( ! is_multisite() ) {
-			header( 'HTTP/1.1 401 Unauthorized' );
-			wp_die( '401' );
+			/* Unauthorized response */
+			wp_die( '401', 401 );
 		}
 
 		/* User / CORS validation */
@@ -374,7 +374,8 @@ class Model_Actions extends Helper_Abstract_Model {
 		}
 
 		$log->addError( 'AJAX Endpoint Failed' );
-		header( 'HTTP/1.1 500 Internal Server Error' );
-		wp_die( '500' );
+
+		/* Internal Server Error */
+		wp_die( '500', 500 );
 	}
 }
