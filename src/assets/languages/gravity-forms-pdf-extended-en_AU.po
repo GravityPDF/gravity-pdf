@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gravity-forms-pdf-extended\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2017-01-17 14:58+1100\n"
+"PO-Revision-Date: 2017-01-19 09:47+1100\n"
 "Last-Translator: Jake Jackson <support@gravitypdf.com>\n"
 "Language-Team: \n"
 "Language: en_AU\n"
@@ -1667,29 +1667,29 @@ msgstr "Could not locate font on web server: %s"
 msgid "There was a problem installing the font %s. Please try again."
 msgstr "There was a problem installing the font %s. Please try again."
 
-#: src/model/Model_Settings.php:1009
+#: src/model/Model_Settings.php:1005
 msgid "Could not delete Gravity PDF font correctly. Please try again."
 msgstr "Could not delete Gravity PDF font correctly. Please try again."
 
-#: src/model/Model_Settings.php:1071
+#: src/model/Model_Settings.php:1067
 msgid "Required fields have not been included."
 msgstr "Required fields have not been included."
 
-#: src/model/Model_Settings.php:1105
+#: src/model/Model_Settings.php:1101
 msgid ""
 "Font name is not valid. Only alphanumeric characters and spaces are accepted."
 msgstr ""
 "Font name is not valid. Only alphanumeric characters and spaces are accepted."
 
-#: src/model/Model_Settings.php:1141
+#: src/model/Model_Settings.php:1137
 msgid "A font with the same name already exists. Try a different name."
 msgstr "A font with the same name already exists. Try a different name."
 
-#: src/model/Model_Templates.php:713
+#: src/model/Model_Templates.php:735
 msgid "No valid PDF template found in Zip archive."
 msgstr "No valid PDF template found in Zip archive."
 
-#: src/model/Model_Templates.php:775
+#: src/model/Model_Templates.php:797
 msgid "The PHP file %s is not a valid PDF Template."
 msgstr "The PHP file %s is not a valid PDF Template."
 
@@ -2262,26 +2262,26 @@ msgstr "Gravity PDF Merge Tags"
 #: src/view/html/Welcome/update.php:163
 msgid ""
 "The %s[gravitypdf]%s shortcode is an excellent way to display a PDF download "
-"link on your website. Sometimes it's more useful to display the raw PDF URL, "
-"and that's where the new PDF merge tag %s{Title:pdf:ID}%s comes in."
+"link on your website. But sometimes it's more useful to display the raw PDF "
+"URL, and that's where the new PDF merge tag %s{Title:pdf:ID}%s comes in."
 msgstr ""
 "The %s[gravitypdf]%s shortcode is an excellent way to display a PDF download "
-"link on your website. Sometimes it's more useful to display the raw PDF URL, "
-"and that's where the new PDF merge tag %s{Title:pdf:ID}%s comes in."
+"link on your website. But sometimes it's more useful to display the raw PDF "
+"URL, and that's where the new PDF merge tag %s{Title:pdf:ID}%s comes in."
 
 #: src/view/html/Welcome/update.php:171
 msgid ""
 "The PDF Merge Tag will be automatically converted to a URL if the PDF is "
 "active and the PDF conditional logic has been met. The new merge tag is "
-"automatically included in Gravity Forms merge tag selector and can be used "
-"anywhere Gravity Forms allows other merge tags (provided the entry has been "
-"saved)."
+"automatically included in the Gravity Forms merge tag selector and can be "
+"used anywhere Gravity Forms allows other merge tags (provided the entry has "
+"been created)."
 msgstr ""
 "The PDF Merge Tag will be automatically converted to a URL if the PDF is "
 "active and the PDF conditional logic has been met. The new merge tag is "
-"automatically included in Gravity Forms merge tag selector and can be used "
-"anywhere Gravity Forms allows other merge tags (provided the entry has been "
-"saved)."
+"automatically included in the Gravity Forms merge tag selector and can be "
+"used anywhere Gravity Forms allows other merge tags (provided the entry has "
+"been created)."
 
 #: src/view/html/Welcome/update.php:191
 msgid "Four Column Support added to Core PDF Templates!"
@@ -2301,13 +2301,13 @@ msgstr ""
 msgid ""
 "To start using in your PDF, add the classes %sgf_first_quarter%s, "
 "%sgf_second_quarter%s, %sgf_third_quarter%s and %sgf_fourth_quarter%s to "
-"your Gravity Form fields and support PDF templates will automatically create "
-"a four column layout to match."
+"your Gravity Form fields and supported PDF templates will automatically "
+"create a four column layout to match."
 msgstr ""
 "To start using in your PDF, add the classes %sgf_first_quarter%s, "
 "%sgf_second_quarter%s, %sgf_third_quarter%s and %sgf_fourth_quarter%s to "
-"your Gravity Form fields and support PDF templates will automatically create "
-"a four column layout to match."
+"your Gravity Form fields and supported PDF templates will automatically "
+"create a four column layout to match."
 
 #: src/view/html/Welcome/welcome.php:85
 msgid ""
@@ -2440,6 +2440,41 @@ msgstr ""
 #: tests/phpunit/unit-tests/test-settings.php:523
 msgid "Normal Notice"
 msgstr "Normal Notice"
+
+#~ msgid ""
+#~ "The %s[gravitypdf]%s shortcode is an excellent way to display a PDF "
+#~ "download link on your website. Sometimes it's more useful to display the "
+#~ "raw PDF URL, and that's where the new PDF merge tag %s{Title:pdf:ID}%s "
+#~ "comes in."
+#~ msgstr ""
+#~ "The %s[gravitypdf]%s shortcode is an excellent way to display a PDF "
+#~ "download link on your website. Sometimes it's more useful to display the "
+#~ "raw PDF URL, and that's where the new PDF merge tag %s{Title:pdf:ID}%s "
+#~ "comes in."
+
+#~ msgid ""
+#~ "The PDF Merge Tag will be automatically converted to a URL if the PDF is "
+#~ "active and the PDF conditional logic has been met. The new merge tag is "
+#~ "automatically included in Gravity Forms merge tag selector and can be "
+#~ "used anywhere Gravity Forms allows other merge tags (provided the entry "
+#~ "has been saved)."
+#~ msgstr ""
+#~ "The PDF Merge Tag will be automatically converted to a URL if the PDF is "
+#~ "active and the PDF conditional logic has been met. The new merge tag is "
+#~ "automatically included in Gravity Forms merge tag selector and can be "
+#~ "used anywhere Gravity Forms allows other merge tags (provided the entry "
+#~ "has been saved)."
+
+#~ msgid ""
+#~ "To start using in your PDF, add the classes %sgf_first_quarter%s, "
+#~ "%sgf_second_quarter%s, %sgf_third_quarter%s and %sgf_fourth_quarter%s to "
+#~ "your Gravity Form fields and support PDF templates will automatically "
+#~ "create a four column layout to match."
+#~ msgstr ""
+#~ "To start using in your PDF, add the classes %sgf_first_quarter%s, "
+#~ "%sgf_second_quarter%s, %sgf_third_quarter%s and %sgf_fourth_quarter%s to "
+#~ "your Gravity Form fields and support PDF templates will automatically "
+#~ "create a four column layout to match."
 
 #~ msgid ""
 #~ "Custom fonts can be installed for use in your PDFs. Only %s.ttf%s and %s."
