@@ -86,29 +86,31 @@ export const TemplateUploader = React.createClass({
    */
   onDrop(acceptedFiles) {
     /* Handle file upload and pass in an nonce!!! */
-    if (acceptedFiles[ 0 ] !== undefined) {
+    if (acceptedFiles instanceof Array && acceptedFiles.length > 0) {
 
-      const file = acceptedFiles[ 0 ]
-      const filename = file.name
+      acceptedFiles.forEach((file) => {
+        const filename = file.name
 
-      /* Do validation */
-      if (!this.checkFilename(filename) || !this.checkFilesize(file.size)) {
-        return
-      }
+        /* Do validation */
+        if (!this.checkFilename(filename) || !this.checkFilesize(file.size)) {
+          return
+        }
 
-      /* Add our loader */
-      this.setState({
-        ajax: true,
-        error: '',
+        /* Add our loader */
+        this.setState({
+          ajax: true,
+          error: '',
+        })
+
+        /* POST the PDF template to our endpoint for processing */
+        request
+          .post(this.props.ajaxUrl)
+          .field('action', 'gfpdf_upload_template')
+          .field('nonce', this.props.ajaxNonce)
+          .attach('template', file, filename)
+          .then(this.ajaxSuccess, this.ajaxFailed)
       })
 
-      /* POST the PDF template to our endpoint for processing */
-      request
-        .post(this.props.ajaxUrl)
-        .field('action', 'gfpdf_upload_template')
-        .field('nonce', this.props.ajaxNonce)
-        .attach('template', file, filename)
-        .then(this.ajaxSuccess, this.ajaxFailed)
     }
   },
 
@@ -226,6 +228,7 @@ export const TemplateUploader = React.createClass({
       <Dropzone
         onDrop={this.onDrop}
         maxSize={5242880}
+        multiple={true}
         className="theme add-new-theme gfpdf-dropzone">
         <a href="#" onClick={this.openDropzone} className={this.state.ajax ? 'doing-ajax' : ''}>
           <div className="theme-screenshot"><span /></div>
