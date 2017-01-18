@@ -141,8 +141,8 @@ class Model_Templates extends Helper_Abstract_Model {
 				'error' => $e->getMessage(),
 			] );
 
-			header( 'HTTP/1.1 400 Bad Request' );
-			wp_die( '400' );
+			/* Bad Request */
+			wp_die( '400', 400 );
 		}
 
 		/* Unzip and check the PDF templates look valid */
@@ -156,13 +156,13 @@ class Model_Templates extends Helper_Abstract_Model {
 				'error' => $e->getMessage(),
 			] );
 
-			header( 'HTTP/1.1 400 Bad Request' );
 			header( 'Content-Type: application/json' );
 			echo json_encode( [
 				'error' => $e->getMessage(),
 			] );
 
-			wp_die();
+			/* Bad Response */
+			wp_die( '', 400 );
 		}
 
 		/* Copy all the files to the active PDF working directory */
@@ -187,18 +187,18 @@ class Model_Templates extends Helper_Abstract_Model {
 		$this->cleanup_template_files( $zip_path );
 
 		if ( is_wp_error( $results ) ) {
-			header( 'HTTP/1.1 500 Internal Server Error' );
-			wp_die( '500' );
+			/* Internal Server Error */
+			wp_die( '500', 500 );
 		}
 
 		/* Return newly-installed template headers */
-		header( 'HTTP/1.1 200 OK' );
 		header( 'Content-Type: application/json' );
 		echo json_encode( [
 			'templates' => $headers,
 		] );
 
-		wp_die();
+		/* Okay Response */
+		wp_die( '', 200 );
 	}
 
 	/**
@@ -237,14 +237,15 @@ class Model_Templates extends Helper_Abstract_Model {
 		try {
 			$this->delete_template( $template_id );
 		} catch ( Exception $e ) {
-			header( 'HTTP/1.1 400 Bad Request' );
-			wp_die('400');
+			/* Bad Request */
+			wp_die( '400', 400 );
 		}
 
-		header( 'HTTP/1.1 200 OK' );
 		header( 'Content-Type: application/json' );
 		echo json_encode( true );
-		wp_die();
+
+		/* Okay Response */
+		wp_die( '', 200 );
 	}
 
 	/**
@@ -294,10 +295,11 @@ class Model_Templates extends Helper_Abstract_Model {
 		$templates = $template_settings['options'];
 		$value     = $options_class->get_form_value( $template_settings );
 
-		header( 'HTTP/1.1 200 OK' );
 		header( 'Content-Type: application/text' );
 		echo $options_class->build_options_for_select( $templates, $value );
-		wp_die();
+
+		/* Okay Response */
+		wp_die( '', 200 );
 	}
 
 	/**
