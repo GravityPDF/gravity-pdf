@@ -204,7 +204,7 @@ export const TemplateUploader = React.createClass({
   ajaxFailed(error) {
     /* Let the user know there was a problem with the upload */
     this.setState({
-      error: (error.response.body.error !== undefined) ? error.response.body.error : this.props.genericUploadErrorText,
+      error: (error.response.body && error.response.body.error !== undefined) ? error.response.body.error : this.props.genericUploadErrorText,
       ajax: false
     })
   },
