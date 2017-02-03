@@ -216,7 +216,7 @@ class Helper_Data {
 			'yes'             => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
 			'standard'        => esc_html__( 'Standard', 'gravity-forms-pdf-extended' ),
 			'advanced'        => esc_html__( 'Advanced', 'gravity-forms-pdf-extended' ),
-			'activate'        => esc_html__( 'Activate', 'gravity-forms-pdf-extended' ),
+			'select'          => esc_html__( 'Select', 'gravity-forms-pdf-extended' ),
 			'version'         => esc_html__( 'Version', 'gravity-forms-pdf-extended' ),
 			'group'           => esc_html__( 'Group', 'gravity-forms-pdf-extended' ),
 			'tags'            => esc_html__( 'Tags', 'gravity-forms-pdf-extended' ),

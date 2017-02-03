@@ -67,7 +67,7 @@ export const Routes = () => (
            templateHeaderText={GFPDF.installedPdfs}
 
            genericUploadErrorText={GFPDF.problemWithTheUpload}
-           activateText={GFPDF.activate}
+           activateText={GFPDF.select}
            addTemplateText={GFPDF.addNewTemplate}
            filenameErrorText={GFPDF.uploadInvalidNotZipFile}
            filesizeErrorText={GFPDF.uploadInvalidExceedsFileSizeLimit}
@@ -82,7 +82,7 @@ export const Routes = () => (
            ajaxNonce={GFPDF.ajaxNonce}
            pdfWorkingDirPath={GFPDF.pdfWorkingDir}
 
-           activateText={GFPDF.activate}
+           activateText={GFPDF.select}
            templateDeleteText={GFPDF.delete}
            templateConfirmDeleteText={GFPDF.doYouWantToDeleteTemplate}
            templateDeleteErrorText={GFPDF.couldNotDeleteTemplate}
