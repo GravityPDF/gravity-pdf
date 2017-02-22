@@ -318,7 +318,7 @@ class Model_Templates extends Helper_Abstract_Model {
 		$file->addValidations( [
 			new Extension( 'zip' ),
 			new Mimetype( [ 'application/zip', 'application/octet-stream' ] ),
-			new Size( '2048K' ),
+			new Size( '10240K' ), /* allow 10MB upload – accounts for fonts, PDF and PHP files */
 		] );
 
 		$file->upload();
