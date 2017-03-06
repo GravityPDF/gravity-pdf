@@ -245,6 +245,7 @@ class Helper_Data {
 			'uploadInvalidExceedsFileSizeLimit'          => esc_html__( 'Upload exceeds the 2MB limit.', 'gravity-forms-pdf-extended' ),
 			'templateSuccessfullyInstalled'              => esc_html__( 'Template successfully installed', 'gravity-forms-pdf-extended' ),
 			'templateSuccessfullyUpdated'                => esc_html__( 'Template successfully updated', 'gravity-forms-pdf-extended' ),
+			'templateSuccessfullyInstalledUpdated'       => esc_html__( 'PDF Template(s) Successfully Installed / Updated', 'gravity-forms-pdf-extended' ),
 			'problemWithTheUpload'                       => esc_html__( 'There was a problem with the upload. Reload the page and try again.', 'gravity-forms-pdf-extended' ),
 			'doYouWantToDeleteTemplate'                  => sprintf( esc_html__( "Do you really want to delete this PDF template?%sClick 'Cancel' to go back, 'OK' to confirm the delete.", 'gravity-forms-pdf-extended' ), "\n\n" ),
 			'couldNotDeleteTemplate'                     => esc_html__( 'Could not delete template.', 'gravity-forms-pdf-extended' ),

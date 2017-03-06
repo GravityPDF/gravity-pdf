@@ -73,6 +73,7 @@ export const Routes = () => (
            filesizeErrorText={GFPDF.uploadInvalidExceedsFileSizeLimit}
            installSuccessText={GFPDF.templateSuccessfullyInstalled}
            installUpdatedText={GFPDF.templateSuccessfullyUpdated}
+           templateSuccessfullyInstalledUpdated={GFPDF.templateSuccessfullyInstalledUpdated}
            templateInstallInstructions={GFPDF.templateInstallInstructions}
     />
 

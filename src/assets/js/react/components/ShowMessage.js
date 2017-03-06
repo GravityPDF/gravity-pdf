@@ -164,7 +164,7 @@ const showMessage = React.createClass({
         <div ref={(message) => this._message = message} className={classes}>
           <p>{text}</p>
         </div>
-      ) : <span />
+      ) : <div />
   }
 })
 

@@ -71,6 +71,7 @@ export const TemplateUploader = React.createClass({
     filesizeErrorText: React.PropTypes.string,
     installSuccessText: React.PropTypes.string,
     installUpdatedText: React.PropTypes.string,
+    templateSuccessfullyInstalledUpdated: React.PropTypes.string,
     templateInstallInstructions: React.PropTypes.string,
 
     addNewTemplate: React.PropTypes.func,
@@ -101,6 +102,7 @@ export const TemplateUploader = React.createClass({
         this.setState({
           ajax: true,
           error: '',
+          message: '',
         })
 
         /* POST the PDF template to our endpoint for processing */
@@ -189,9 +191,10 @@ export const TemplateUploader = React.createClass({
       }
     })
 
-    /* Stop our AJAX spinner */
+    /* Mark as success and stop AJAX spinner */
     this.setState({
       ajax: false,
+      message: this.props.templateSuccessfullyInstalledUpdated
     })
   },
 
@@ -207,6 +210,17 @@ export const TemplateUploader = React.createClass({
     this.setState({
       error: (error.response.body && error.response.body.error !== undefined) ? error.response.body.error : this.props.genericUploadErrorText,
       ajax: false
+    })
+  },
+
+  /**
+   * Remove message from state once the timeout has finished
+   *
+   * @since 4.1
+   */
+  removeMessage() {
+    this.setState( {
+      message: ''
     })
   },
 
@@ -235,6 +249,7 @@ export const TemplateUploader = React.createClass({
           <div className="theme-screenshot"><span /></div>
 
           {this.state.error !== '' ? <ShowMessage text={this.state.error} error={true}/> : null}
+          {this.state.message !== '' ? <ShowMessage text={this.state.message} dismissable={true} dismissableCallback={this.removeMessage} /> : null}
 
           <h2 className="theme-name">{this.props.addTemplateText}</h2>
         </a>
