@@ -115,7 +115,7 @@ export const TemplateListItem = React.createClass({
 
           <TemplateScreenshot image={item.get('screenshot')}/>
           {item.get('error') ? <ShowMessage text={item.get('error')} error={true}/> : null}
-          {item.get('message') ? <ShowMessage text={item.get('message')} dismissableCallback={this.removeMessage} dismissable={true} /> : null}
+          {item.get('message') ? <ShowMessage text={item.get('message')} dismissableCallback={this.removeMessage} dismissable={true} delay={12000} /> : null}
 
           <TemplateDetails label={this.props.templateDetailsText} />
           <Group group={item.get('group')}/>
