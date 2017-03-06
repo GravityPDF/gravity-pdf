@@ -82,6 +82,7 @@ export const TemplateList = React.createClass({
             filesizeErrorText={this.props.route.filesizeErrorText}
             installSuccessText={this.props.route.installSuccessText}
             installUpdatedText={this.props.route.installUpdatedText}
+            templateSuccessfullyInstalledUpdated={this.props.route.templateSuccessfullyInstalledUpdated}
             templateInstallInstructions={this.props.route.templateInstallInstructions}
           />
 
