@@ -357,7 +357,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			 * The new version of the logger uses the add-on storage method, while the old one stores it in gf_logging_settings
 			 * so we'll test which settings we should use and get the appropriate log level
 			 */
-			if ( ! defined( 'GF_LOGGING_VERSION' ) || version_compare( GF_LOGGING_VERSION, '1.1', '<' ) ) {
+			if ( ! get_option( 'gform_enable_logging' ) && ( ! defined( 'GF_LOGGING_VERSION' ) || version_compare( GF_LOGGING_VERSION, '1.1', '<' ) ) ) {
 				$settings     = get_option( 'gf_logging_settings' );
 				$log_level    = (int) rgar( $settings, 'gravity-pdf' );
 				$log_filename = GFFormsModel::get_upload_root() . 'logs/gravity-pdf.txt';
@@ -365,7 +365,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 				$gf_logger          = GFLogging::get_instance();
 				$gf_logger_settings = $gf_logger->get_plugin_settings();
 				$log_level          = ( isset( $gf_logger_settings['gravity-pdf']['log_level'] ) ) ? (int) $gf_logger_settings['gravity-pdf']['log_level'] : 0;
-				$log_filename       = $gf_logger::get_log_file_name( 'gravity-pdf' );
+				$log_filename       = ( get_option( 'gform_enable_logging' ) ) ? $gf_logger->get_log_file_name( 'gravity-pdf' ) : $gf_logger::get_log_file_name( 'gravity-pdf' );
 			}
 
 			/* Enable logging if not equivalent to empty (0) and not level 6 (which is apprently off in GF world) */
