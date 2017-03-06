@@ -357,7 +357,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	 * @since 4.0
 	 */
 	public function allow_font_uploads( $mime_types = [] ) {
-		$mime_types['ttf'] = 'application/octet-stream';
+		$mime_types['ttf'] = 'application/x-font-ttf';
 
 		return $mime_types;
 	}
