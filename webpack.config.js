@@ -12,7 +12,7 @@ module.exports = {
     path: './dist/assets/js/',
     filename: 'app.bundle.min.js'
   },
-  devtool: PROD ? 'source-map' : 'eval',
+  devtool: PROD ? 'source-map' : 'eval-cheap-module-source-map',
   module: {
     loaders: [
       {
