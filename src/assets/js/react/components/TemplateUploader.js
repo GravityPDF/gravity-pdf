@@ -71,6 +71,7 @@ export const TemplateUploader = React.createClass({
     filesizeErrorText: React.PropTypes.string,
     installSuccessText: React.PropTypes.string,
     installUpdatedText: React.PropTypes.string,
+    templateInstallInstructions: React.PropTypes.string,
 
     addNewTemplate: React.PropTypes.func,
     updateTemplateParam: React.PropTypes.func,
@@ -237,6 +238,7 @@ export const TemplateUploader = React.createClass({
 
           <h2 className="theme-name">{this.props.addTemplateText}</h2>
         </a>
+        <div className="gfpdf-template-install-instructions">{this.props.templateInstallInstructions}</div>
       </Dropzone>
     )
   }

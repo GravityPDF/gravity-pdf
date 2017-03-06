@@ -248,6 +248,7 @@ class Helper_Data {
 			'problemWithTheUpload'                       => esc_html__( 'There was a problem with the upload. Reload the page and try again.', 'gravity-forms-pdf-extended' ),
 			'doYouWantToDeleteTemplate'                  => sprintf( esc_html__( "Do you really want to delete this PDF template?%sClick 'Cancel' to go back, 'OK' to confirm the delete.", 'gravity-forms-pdf-extended' ), "\n\n" ),
 			'couldNotDeleteTemplate'                     => esc_html__( 'Could not delete template.', 'gravity-forms-pdf-extended' ),
+			'templateInstallInstructions'                => esc_html__ ( 'If you have a PDF template in .zip format you may install it here. You can also update an existing PDF template (this will override any changes you have made).', 'gravity-forms-pdf-extended' ),
 		] );
 	}
 }
