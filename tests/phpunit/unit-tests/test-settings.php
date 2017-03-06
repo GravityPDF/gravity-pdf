@@ -247,7 +247,7 @@ class Test_Settings extends WP_UnitTestCase {
 	 */
 	public function test_allow_font_uploads() {
 		$results = $this->controller->allow_font_uploads();
-		$this->assertEquals( 'application/octet-stream', $results['ttf'] );
+		$this->assertEquals( 'application/x-font-ttf', $results['ttf'] );
 	}
 
 	/**
