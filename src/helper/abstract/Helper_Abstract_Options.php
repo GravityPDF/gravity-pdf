@@ -808,9 +808,11 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		}
 
 		foreach ( $roles as $role ) {
-			foreach ( $role['capabilities'] as $cap => $val ) {
-				if ( ! isset( $capabilities[ $cap ] ) && ! in_array( $cap, $gf_caps ) ) {
-					$capabilities[ esc_html__( 'Active WordPress Capabilities', 'gravity-forms-pdf-extended' ) ][ $cap ] = $cap;
+			if ( isset( $role['capabilities'] ) && is_array( $role['capabilities'] ) ) {
+				foreach ( $role['capabilities'] as $cap => $val ) {
+					if ( ! isset( $capabilities[ $cap ] ) && ! in_array( $cap, $gf_caps ) ) {
+						$capabilities[ esc_html__( 'Active WordPress Capabilities', 'gravity-forms-pdf-extended' ) ][ $cap ] = $cap;
+					}
 				}
 			}
 		}
@@ -821,7 +823,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		}
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_capabilities/ for more details about this filter */
-
 		return apply_filters( 'gfpdf_capabilities', $capabilities );
 	}
 
