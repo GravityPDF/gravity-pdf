@@ -677,6 +677,7 @@
 
               /* Remove any existing mergetag-marked inputs so they aren't processed twice after we add our new fields to the DOM */
               $('.merge-tag-support').removeClass('merge-tag-support')
+              $('.all-merge-tags a.open-list').off('click')
 
               /* Remove any previously loaded editors to prevent conflicts loading an editor with same name */
               $.each(response.editors, function (index, value) {
