@@ -714,6 +714,12 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
     background: red;
 }
 
+.gfpdf-template-install-instructions {
+    font-size: 85%;
+    text-align: center;
+    margin-top: 5px;
+}
+
 /*
  * Custom Template Field Style
  */
