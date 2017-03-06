@@ -555,7 +555,7 @@
             text: GFPDF.cancel,
             click: function () {
               /* cancel */
-              $deleteDialog.wpdialog('close')
+              $deleteDialog.wpdialog('close').data('elm', null)
             }
           } ]
 
