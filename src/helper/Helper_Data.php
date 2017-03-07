@@ -242,7 +242,7 @@ class Helper_Data {
 			'showPreviousTemplate'                       => esc_html__( 'Show previous template', 'gravity-forms-pdf-extended' ),
 			'showNextTemplate'                           => esc_html__( 'Show next template', 'gravity-forms-pdf-extended' ),
 			'uploadInvalidNotZipFile'                    => esc_html__( 'Upload is not a valid template. Upload a .zip file.', 'gravity-forms-pdf-extended' ),
-			'uploadInvalidExceedsFileSizeLimit'          => esc_html__( 'Upload exceeds the 2MB limit.', 'gravity-forms-pdf-extended' ),
+			'uploadInvalidExceedsFileSizeLimit'          => esc_html__( 'Upload exceeds the 10MB limit.', 'gravity-forms-pdf-extended' ),
 			'templateSuccessfullyInstalled'              => esc_html__( 'Template successfully installed', 'gravity-forms-pdf-extended' ),
 			'templateSuccessfullyUpdated'                => esc_html__( 'Template successfully updated', 'gravity-forms-pdf-extended' ),
 			'templateSuccessfullyInstalledUpdated'       => esc_html__( 'PDF Template(s) Successfully Installed / Updated', 'gravity-forms-pdf-extended' ),

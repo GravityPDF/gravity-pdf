@@ -242,7 +242,7 @@ export const TemplateUploader = React.createClass({
     return (
       <Dropzone
         onDrop={this.onDrop}
-        maxSize={5242880}
+        maxSize={10240000}
         multiple={true}
         className="theme add-new-theme gfpdf-dropzone">
         <a href="#" onClick={this.openDropzone} className={this.state.ajax ? 'doing-ajax' : ''}>
