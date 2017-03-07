@@ -144,7 +144,7 @@ class Field_Section extends Helper_Abstract_Fields {
 		/* sanitize the HTML */
 		$section = $this->value(); /* allow the same HTML as per the post editor */
 
-		$html = '<div id="field-' . $this->field->id . '" class="gfpdf-section-title gfpdf-field">';
+		$html = '<div id="field-' . $this->field->id . '" class="gfpdf-section-title gfpdf-field '. $this->field->cssClass .'">';
 		$html .= '<h3>' . $section['title'] . '</h3>';
 
 		if ( ! empty( $value ) ) {
