@@ -164,6 +164,12 @@ class Field_Multiselect extends Helper_Abstract_Fields {
 
 		$value = $this->get_value();
 
+		/* Add support for JSON stored multiselect fields (added to GF2.2) */
+		if ( $this->field->storageType === 'json' ) {
+			$value = json_decode( $value, true );
+			$value = ( $value == null ) ? [] : $value;
+		}
+
 		/* split value into an array */
 		if ( ! is_array( $value ) ) {
 			$value = explode( ',', $value );
