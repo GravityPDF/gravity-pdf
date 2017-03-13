@@ -84,7 +84,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 
 		/* set up Gravity Forms database */
 		RGFormsModel::drop_tables();
-		@GFForms::setup( true );
+		( function_exists( 'gf_upgrade' ) ) ? gf_upgrade()->maybe_upgrade() : @GFForms::setup( true );
 
 		require_once $this->plugin_dir . '/pdf.php';
 	}

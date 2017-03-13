@@ -491,7 +491,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 	 *
 	 * @since        3.6
 	 */
-	public function run_ip_test( $ip, $var ) {
+	public function test_run_ip_test( $ip, $var ) {
 		$_SERVER[ $var ] = $ip;
 		$this->assertEquals( $ip, GFFormsModel::get_ip() );
 		unset( $_SERVER[ $var ] );
@@ -507,9 +507,9 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 			[ '5.120.2.1', 'HTTP_CLIENT_IP' ],
 			[ '6.10.3.9', 'HTTP_X_FORWARDED_FOR' ],
 			[ '7.60.126.3', 'REMOTE_ADDR' ],
-			[ '240.24.12.44,5.120.2.1', 'HTTP_CLIENT_IP' ],
-			[ '10.17.54.234,6.10.3.9', 'HTTP_X_FORWARDED_FOR' ],
-			[ '7.60.126.3,65.4.69.129', 'REMOTE_ADDR' ],
+			[ '240.24.12.44', 'HTTP_CLIENT_IP' ],
+			[ '10.17.54.234', 'HTTP_X_FORWARDED_FOR' ],
+			[ '7.60.126.3', 'REMOTE_ADDR' ],
 		];
 	}
 
