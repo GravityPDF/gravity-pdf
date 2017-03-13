@@ -27,7 +27,7 @@
     "eslint": "^3.5.0",
     "eslint-plugin-react": "^6.2.2",
     "gulp": "~3.9.0",
-    "gulp-clean-css": "^2.0.12",
+    "gulp-clean-css": "^3.0.3",
     "gulp-rename": "~1.2.2",
     "gulp-sort": "^2.0.0",
     "gulp-uglify": "^2.0.0",
