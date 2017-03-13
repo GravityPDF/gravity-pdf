@@ -1858,29 +1858,4 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		return $args;
 	}
-
-	/**
-	 * Get the current user IP, accounting for proxies, which Gravity Forms utilised prior to version 2.2
-	 *
-	 * @param string $ip
-	 *
-	 * @return string
-	 *
-	 * @since 4.2
-	 */
-	public function get_current_user_ip( $ip ) {
-		$headers = [ 'HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR' ];
-
-		foreach ( $headers as $header ) {
-			$ip = rgar( $_SERVER, $header );
-			if ( $ip ) {
-				break;
-			}
-		}
-
-		/* HTTP_X_FORWARDED_FOR can return a comma separated list of IPs; using the first one */
-		$ips = explode( ',', $ip );
-
-		return $ips[0];
-	}
 }
