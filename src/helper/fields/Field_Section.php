@@ -153,6 +153,11 @@ class Field_Section extends Helper_Abstract_Fields {
 
 		$html .= '</div>';
 
+		/**
+		 * See https://gravitypdf.com/documentation/v4/gfpdf_field_section_break_html/ for more information about this filter
+		 *
+		 * @since 4.1
+		 */
 		return apply_filters( 'gfpdf_field_section_break_html',
 			$html,
 			$section['title'],
@@ -160,7 +165,8 @@ class Field_Section extends Helper_Abstract_Fields {
 			$value,
 			$this->field,
 			$this->form,
-			$this->entry
+			$this->entry,
+			$this
 		);
 	}
 

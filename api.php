@@ -549,6 +549,8 @@ final class GPDFAPI {
 	/**
 	 * Installs a PDF font on the file system
 	 *
+	 * See https://gravitypdf.com/documentation/v4/api_add_pdf_font/ for more information about this method
+	 *
 	 * @param array $font The font information to add.
 	 *
 	 * This array needs to be in the following format:
@@ -592,6 +594,8 @@ final class GPDFAPI {
 
 	/**
 	 * Deletes one of the v4 fonts that is installed
+	 *
+	 * See https://gravitypdf.com/documentation/v4/delete_pdf_font/ for more information about this method
 	 *
 	 * @param string $font_name The font that should be deleted
 	 *

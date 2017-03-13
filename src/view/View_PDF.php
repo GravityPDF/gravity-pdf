@@ -321,9 +321,23 @@ class View_PDF extends Helper_Abstract_View {
 		?>
 
 		<div id="container">
-            <?php do_action( 'gfpdf_pre_html_fields', $entry, $config ); ?>
+            <?php
+            /*
+             * See https://gravitypdf.com/documentation/v4/gfpdf_pre_html_fields/ for more details about this action
+             * @since 4.1
+             */
+            do_action( 'gfpdf_pre_html_fields', $entry, $config );
+            ?>
+
 			<?php $this->generate_html_structure( $entry, $model, $config ); ?>
-            <?php do_action( 'gfpdf_post_html_fields', $entry, $config ); ?>
+
+            <?php
+            /*
+             * See https://gravitypdf.com/documentation/v4/gfpdf_post_html_fields/ for more details about this action
+             * @since 4.1
+             */
+            do_action( 'gfpdf_post_html_fields', $entry, $config );
+            ?>
 		</div>
 
 		<?php
