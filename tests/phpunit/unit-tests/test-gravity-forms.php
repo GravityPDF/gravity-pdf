@@ -504,12 +504,12 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 	 */
 	public function provider_ip_testing() {
 		return [
-			[ '5.120.2.1', 'HTTP_CLIENT_IP' ],
-			[ '6.10.3.9', 'HTTP_X_FORWARDED_FOR' ],
+			[ '5.120.2.1', 'REMOTE_ADDR' ],
+			[ '6.10.3.9', 'REMOTE_ADDR' ],
 			[ '7.60.126.3', 'REMOTE_ADDR' ],
-			[ '240.24.12.44,5.120.2.1', 'HTTP_CLIENT_IP' ],
-			[ '10.17.54.234,6.10.3.9', 'HTTP_X_FORWARDED_FOR' ],
-			[ '7.60.126.3,65.4.69.129', 'REMOTE_ADDR' ],
+			[ '240.24.12.44', 'REMOTE_ADDR' ],
+			[ '10.17.54.234', 'REMOTE_ADDR' ],
+			[ '127.0.0.1', 'REMOTE_ADDR' ],
 		];
 	}
 

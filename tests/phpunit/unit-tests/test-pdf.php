@@ -429,7 +429,7 @@ class Test_PDF extends WP_UnitTestCase {
 
 		/* Set the IPs */
 		$entry['ip']               = '197.64.12.40';
-		$_SERVER['HTTP_CLIENT_IP'] = $entry['ip'];
+		$_SERVER['REMOTE_ADDR'] = $entry['ip'];
 
 		$this->assertTrue( $this->model->is_current_pdf_owner( $entry ) );
 		$this->assertTrue( $this->model->is_current_pdf_owner( $entry, 'logged_out' ) );
@@ -480,7 +480,7 @@ class Test_PDF extends WP_UnitTestCase {
 			'ip'           => '197.64.12.40',
 		];
 
-		$_SERVER['HTTP_CLIENT_IP'] = $entry['ip'];
+		$_SERVER['REMOTE_ADDR'] = $entry['ip'];
 
 		/* Test we get a timeout error */
 		$results = $this->model->middle_logged_out_timeout( true, $entry, '' );
@@ -501,7 +501,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertTrue( $this->model->middle_logged_out_timeout( true, $entry, '' ) );
 
 		/* Check if the test should be skipped */
-		$_SERVER['HTTP_CLIENT_IP'] = '12.123.123.124';
+		$_SERVER['REMOTE_ADDR'] = '12.123.123.124';
 		$this->assertTrue( $this->model->middle_logged_out_timeout( true, $entry, '' ) );
 		$this->assertTrue( is_wp_error( $this->model->middle_logged_out_timeout( new WP_Error(), $entry, '' ) ) );
 
@@ -538,10 +538,10 @@ class Test_PDF extends WP_UnitTestCase {
 		}
 
 		/* Test that the middleware is skipped */
-		$_SERVER['HTTP_CLIENT_IP'] = $entry['ip'];
+		$_SERVER['REMOTE_ADDR'] = $entry['ip'];
 		$this->assertTrue( $this->model->middle_auth_logged_out_user( true, $entry, '' ) );
 
-		unset( $_SERVER['HTTP_CLIENT_IP'] );
+		unset( $_SERVER['REMOTE_ADDR'] );
 		$user_id = $this->factory->user->create();
 		$this->assertInternalType( 'integer', $user_id );
 		wp_set_current_user( $user_id );
