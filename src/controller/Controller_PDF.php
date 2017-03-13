@@ -171,6 +171,9 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		add_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_auth_logged_out_user' ], 60, 3 );
 		add_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_user_capability' ], 70, 3 );
 
+		/* Re-impliment IP checking which was removed in Gravity Forms 2.2 */
+		add_filter( 'gform_ip_address', [ $this->model, 'get_current_user_ip' ], 5 );
+
 		/* Tap into GF notifications */
 		add_filter( 'gform_notification', [
 			$this->model,
