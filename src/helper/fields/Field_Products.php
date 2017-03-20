@@ -238,7 +238,8 @@ class Field_Products extends Helper_Abstract_Fields {
 		$lead = $this->entry;
 
 		/* Get all products for this field */
-		$products = GFCommon::get_product_fields( $form, $lead, true );
+		$use_value = (bool) apply_filters( 'gfpdf_show_field_value', false ); /* Set to `true` to show a field's value instead of the label */
+		$products = GFCommon::get_product_fields( $form, $lead, ! $use_value );
 
 		/* Set up the appropriate varaibles needed for our product processing */
 		$form_array  = []; /* holds the actual product data */
