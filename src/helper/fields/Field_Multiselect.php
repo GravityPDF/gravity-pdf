@@ -129,6 +129,7 @@ class Field_Multiselect extends Helper_Abstract_Fields {
 	 */
 	public function html( $value = '', $label = true ) {
 
+		$value = apply_filters( 'gfpdf_show_field_value', false ); /* Set to `true` to show a field's value instead of the label */
 		$items = $this->value();
 		$html  = '';
 

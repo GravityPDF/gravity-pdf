@@ -115,6 +115,7 @@ class Field_Select extends Helper_Abstract_Fields {
 	public function html( $value = '', $label = true ) {
 		$data = $this->value();
 
+		$value = apply_filters( 'gfpdf_show_field_value', false ); /* Set to `true` to show a field's value instead of the label */
 		$output = ( $value ) ? $data['value'] : $data['label'];
 
 		return parent::html( $output );
