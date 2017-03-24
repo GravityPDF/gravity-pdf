@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.2
 Tested up to: 4.7
-Stable tag: 4.1.0-RC1
+Stable tag: 4.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
 
@@ -90,6 +90,7 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 * Feature: Add PDF Mergetags which output PDF URLs and compliment the [gravitypdf] shortcode which output HTML links (GH#404)
 * Feature: Add four-column CSS Ready Class support to core PDFs. Note: if you have run "Setup Custom Templates" you will need to re-run it to take advantage of this feature (GH#461)
 * Feature: Added support for the WP External Links plugin (GH#386)
+* Feature: Added filter to show radio, checkbox, select, multiselect and product field values in core PDF templates (GH#600)
 * Enhancement: Gravity PDF Review Notice now only shows up on Gravity Forms pages (#528)
 * Enhancement: Convert all strings to American format so they can be correctly translated using Glotpress (GH#525)
 * Enhancement: Added Australian, New Zealand and UK language packs (GH#525)
