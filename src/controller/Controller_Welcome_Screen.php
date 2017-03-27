@@ -156,7 +156,7 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 	public function welcome() {
 
 		/* Bail if no activation redirect */
-		if ( ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ! is_admin() || ! current_user_can( 'activate_plugins' ) ) {
+		if ( headers_sent() || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ! is_admin() || ! current_user_can( 'activate_plugins' ) ) {
 			return null;
 		}
 
