@@ -132,7 +132,7 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 		/* Load the welcome screen into the menu */
 		add_action( 'admin_menu', [ $this->model, 'admin_menus' ] );
 		add_action( 'admin_head', [ $this->model, 'hide_admin_menus' ] );
-		add_action( 'init', [ $this, 'welcome' ] );
+		add_action( 'init', [ $this, 'maybe_show_welcome_screen' ] );
 	}
 
 	/**
@@ -144,6 +144,22 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 	 */
 	public function add_filters() {
 		add_filter( 'admin_title', [ $this->model, 'add_page_title' ], 10, 3 );
+	}
+
+	/**
+	 * Check if headers have already been sent and then try show the welcome screen
+	 *
+	 * @since 4.1.1
+	 *
+	 * @return void
+	 */
+	public function maybe_show_welcome_screen() {
+		/* Exit early if headers have already been sent */
+		if ( headers_sent() ) {
+			return null;
+		}
+
+		$this->welcome();
 	}
 
 	/**
