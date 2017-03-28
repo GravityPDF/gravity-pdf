@@ -52,17 +52,10 @@ const TemplateButton = React.createClass({
    * @since 4.1
    */
   handleClick(e) {
-    /*
-     * Handle weird bug in React where the button click event fires when enter is pressed
-     * on non-react components
-     */
-    if( document.activeElement && this.button === document.activeElement ) {
-      e.preventDefault()
-      e.stopPropagation()
+    e.preventDefault()
+    e.stopPropagation()
 
-      /* trigger router */
-      hashHistory.push('/template')
-    }
+    hashHistory.push('/template')
   },
 
   /**
@@ -71,6 +64,7 @@ const TemplateButton = React.createClass({
   render() {
     return (
       <button
+        type="button"
         id="fancy-template-selector"
         className="button gfpdf-button"
         onClick={this.handleClick}
