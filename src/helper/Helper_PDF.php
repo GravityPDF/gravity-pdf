@@ -363,6 +363,11 @@ class Helper_PDF {
 		/* Allow a user to change the current template if they have the appropriate capabilities */
 		if ( rgget( 'template' ) && is_user_logged_in() && $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
 			$template = rgget( 'template' );
+
+			/* Handle legacy v3 URL structure and strip .php from the end of the template */
+			if ( isset( $_GET['gf_pdf'] ) && isset( $_GET['fid'] ) && isset( $_GET['lid'] ) ) {
+				$template = substr( $template, 0, -4 );
+			}
 		}
 
 		try {
