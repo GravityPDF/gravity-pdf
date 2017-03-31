@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.2
 Tested up to: 4.7
-Stable tag: 4.1.0
+Stable tag: 4.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
 
@@ -84,6 +84,12 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 18. Blank Slate provides a print-friendly template focusing solely on the user-submitted data.
 
 == Changelog ==
+
+= 4.1.1 =
+* Bug: Add check to see if headers are already sent before trying to redirect to the welcome / update page (GH#601)
+* Bug: Fixed issue accessing the Advanced Template Manager in Safari browser (GH#603)
+* Bug: Ensure the Advanced Template Manager notice and error messages have the correct styles in the Form PDF Settings pages (GH#604)
+* Bug: Fix PDF generation problem using the legacy v3 URL structure (GH#605)
 
 = 4.1.0 =
 * Feature: Advanced PDF Template Manager. Upload, View, Select and Delete PDF templates with ease (GH#486)
