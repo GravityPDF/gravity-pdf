@@ -304,13 +304,13 @@ class Helper_PDF {
 			case 'DISPLAY':
 				$this->prevent_caching();
 				$this->mpdf->Output( $this->filename, 'I' );
-				wp_die();
+				exit;
 			break;
 
 			case 'DOWNLOAD':
 				$this->prevent_caching();
 				$this->mpdf->Output( $this->filename, 'D' );
-				wp_die();
+				exit;
 			break;
 
 			case 'SAVE':
