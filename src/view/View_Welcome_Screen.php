@@ -84,22 +84,6 @@ class View_Welcome_Screen extends Helper_Abstract_View {
 	}
 
 	/**
-	 * Load the Welcome Tab tabs
-	 *
-	 * @since 4.0
-	 */
-	public function tabs() {
-
-		/* Load any variables we want to pass to our view */
-		$args = [
-			'selected' => isset( $_GET['page'] ) ? $_GET['page'] : 'gfpdf-getting-started',
-		];
-
-		/* load the tabs view */
-		$this->load( 'tabs', $args );
-	}
-
-	/**
 	 * Output the welcome screen
 	 *
 	 * @since 4.0

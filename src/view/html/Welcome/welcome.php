@@ -45,8 +45,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<div class="gfpdf-badge"><?php printf( esc_html__( 'Version %s', 'gravity-forms-pdf-extended' ), $args['display_version'] ); ?></div>
 
-	<?php $this->tabs(); ?>
-
 	<div class="feature-section two-col">
 
 		<div class="col">

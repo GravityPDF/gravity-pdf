@@ -101,41 +101,6 @@ class Test_Welcome_Screen extends WP_UnitTestCase {
 
 		$this->controller = new Controller_Welcome_Screen( $this->model, $this->view, $gfpdf->log, $gfpdf->data, $gfpdf->options );
 		$this->controller->init();
-
-		/* Setup a new admin user */
-		$factory = new WP_UnitTest_Factory();
-		$this->user_id = $factory->user->create( array(
-			'role'   => 'administrator',
-		) );
-	}
-
-	/**
-	 * Get a mocked version of our welcome screen controller so we can test the redirect functionality
-	 *
-	 * @param int $executed_num Number of times our mocked method will be run
-	 *
-	 * @return \PHPUnit_Framework_MockObject_Builder_InvocationMocker
-	 *
-	 * @since 4.1
-	 */
-	private function get_mocked_controller( $executed_num ) {
-		global $gfpdf;
-
-		$controller = $this->getMockBuilder( '\GFPDF\Controller\Controller_Welcome_Screen' )
-		                   ->setConstructorArgs( [
-			                   $this->model,
-			                   $this->view,
-			                   $gfpdf->log,
-			                   $gfpdf->data,
-			                   $gfpdf->options,
-		                   ] )
-		                   ->setMethods( [ 'redirect' ] )
-		                   ->getMock();
-
-		$controller->expects( $this->exactly( $executed_num ) )
-		           ->method( 'redirect' );
-
-		return $controller;
 	}
 
 	/**
@@ -145,7 +110,7 @@ class Test_Welcome_Screen extends WP_UnitTestCase {
 	 */
 	public function test_actions() {
 		$this->assertEquals( 10, has_action( 'admin_menu', [ $this->model, 'admin_menus' ] ) );
-		$this->assertEquals( 10, has_action( 'init', [ $this->controller, 'maybe_show_welcome_screen' ] ) );
+		$this->assertEquals( 10, has_action( 'admin_head', [ $this->model, 'hide_admin_menus' ] ) );
 	}
 
 	/**
@@ -165,24 +130,10 @@ class Test_Welcome_Screen extends WP_UnitTestCase {
 	public function test_getting_started_screen() {
 
 		ob_start();
-		$this->controller->getting_started_screen();
+		$this->model->getting_started_screen();
 		$html = ob_get_clean();
 
 		$this->assertNotFalse( strpos( $html, 'gfpdf-welcome-screen' ) );
-	}
-
-	/**
-	 * Test the update page loads correctly
-	 *
-	 * @since 4.0
-	 */
-	public function test_update_screen() {
-
-		ob_start();
-		$this->controller->update_screen();
-		$html = ob_get_clean();
-
-		$this->assertNotFalse( strpos( $html, 'gfpdf-update-screen' ) );
 	}
 
 	/**
@@ -198,7 +149,6 @@ class Test_Welcome_Screen extends WP_UnitTestCase {
 
 		/* Test the results */
 		$this->assertTrue( isset( $_wp_submenu_nopriv['index.php']['gfpdf-getting-started'] ) );
-		$this->assertTrue( isset( $_wp_submenu_nopriv['index.php']['gfpdf-update'] ) );
 	}
 
 	/**
@@ -214,82 +164,5 @@ class Test_Welcome_Screen extends WP_UnitTestCase {
 		/* Test welcome screen */
 		$_GET['page'] = 'gfpdf-getting-started';
 		$this->assertEquals( 'Welcome to Gravity PDF', $this->model->add_page_title( 'Title' ) );
-
-		/* Test update screen */
-		$_GET['page'] = 'gfpdf-update';
-		$this->assertEquals( "What&#039;s new in Gravity PDF?", $this->model->add_page_title( 'Title' ) );
-	}
-
-	/**
-	 * @since 4.1
-	 */
-	public function test_welcome() {
-		global $gfpdf;
-
-		if( is_multisite() ) {
-			return;
-		}
-
-		/* Setup our test */
-		$controller = $this->get_mocked_controller( 2 );
-		update_option( 'gfpdf_current_version', '1.0' );
-		$gfpdf->data->is_installed = false;
-
-		$this->assertNull( $controller->welcome() );
-
-		/* ensure we are in the admin area */
-		set_current_screen('dashboard');
-		$this->assertNull( $controller->welcome() );
-
-		/* ensure the current user has the correct privilages */
-		wp_set_current_user( $this->user_id );
-		$controller->welcome();
-
-		/* Ensure if the versions are the same we get null */
-		update_option( 'gfpdf_current_version', PDF_EXTENDED_VERSION );
-		$this->assertNull( $controller->welcome() );
-
-		/* Try a different version number */
-		update_option( 'gfpdf_current_version', substr( PDF_EXTENDED_VERSION, 0, -4 ) . '.100.2' );
-		$controller->welcome();
-
-		/* If we are already on the getting started page we don't do the redirect */
-		$_GET['page'] = 'gfpdf-getting-started';
-		$this->assertNull( $controller->welcome() );
-	}
-
-	/**
-	 * Test that our update screen is correctly shown
-	 *
-	 * @since 4.1
-	 */
-	public function test_maybe_display_update_screen() {
-		global $gfpdf;
-
-		$controller = $this->get_mocked_controller( 2 );
-
-		update_option( 'gfpdf_current_version', PDF_EXTENDED_VERSION );
-		$controller->maybe_display_update_screen( PDF_EXTENDED_VERSION );
-
-		/* Check there's a failed attempt when the versions are exactly the same */
-		$this->assertNull( $controller->maybe_display_update_screen( PDF_EXTENDED_VERSION ) );
-
-		/* Check there's a failed attempt when we are just doing a patch update */
-		update_option( 'gfpdf_current_version', '2.0' );
-		$controller->maybe_display_update_screen( '2.0.1' );
-
-		update_option( 'gfpdf_current_version', '2.0.5' );
-		$controller->maybe_display_update_screen( '2.0.10' );
-
-		/* Check we are successful on major version updates */
-		update_option( 'gfpdf_current_version', '1.0' );
-		$controller->maybe_display_update_screen( '2.0' );
-
-		update_option( 'gfpdf_current_version', '1.0.5' );
-		$controller->maybe_display_update_screen( '1.2.5' );
-
-		/* Check it gets skipped when we disable the update screen option */
-		$gfpdf->options->update_option( 'update_screen_action', 'Disable' );
-		$controller->maybe_display_update_screen( '1.2.5' );
 	}
 }

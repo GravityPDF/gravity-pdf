@@ -397,7 +397,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function plugin_action_links( $links ) {
 
 		$action_links = [
-			'settings' => '<a href="' . esc_url( $this->data->settings_url ) . '" title="' . esc_attr__( 'View Gravity PDF Settings', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Settings', 'gravity-forms-pdf-extended' ) . '</a>',
+			'getting_started' => '<a href="' . esc_url( admin_url( 'index.php?page=gfpdf-getting-started' ) ) . '" title="' . esc_attr__( 'Get started with Gravity PDF', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Getting Started', 'gravity-forms-pdf-extended' ) . '</a>',
+			'settings'        => '<a href="' . esc_url( $this->data->settings_url ) . '" title="' . esc_attr__( 'View Gravity PDF Settings', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Settings', 'gravity-forms-pdf-extended' ) . '</a>',
 		];
 
 		return array_merge( $action_links, $links );
