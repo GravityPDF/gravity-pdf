@@ -170,19 +170,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'std'     => 'View',
 						'tooltip' => '<h6>' . esc_html__( 'Entry View', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Choose to view the PDF in your web browser or download the document to your computer.', 'gravity-forms-pdf-extended' ),
 					],
-
-					'update_screen_action' => [
-						'id'      => 'update_screen_action',
-						'name'    => esc_html__( "Show What's New", 'gravity-forms-pdf-extended' ),
-						'desc'    => "When updating to a new release we'll redirect you to our What's New page.",
-						'type'    => 'radio',
-						'options' => [
-							'Enable'  => esc_html__( 'Enable', 'gravity-forms-pdf-extended' ),
-							'Disable' => esc_html__( 'Disable', 'gravity-forms-pdf-extended' ),
-						],
-						'std'     => 'Enable',
-						'tooltip' => '<h6>' . esc_html__( "Show What's New Page", 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( "When upgrading Gravity PDF to a new major release (4.x) we'll automatically redirect you to our What's New page so you can see the changes. Bug fix and security releases are excluded (4.x.x).", 'gravity-forms-pdf-extended' ),
-					],
 				]
 			),
 

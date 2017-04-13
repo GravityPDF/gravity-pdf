@@ -50,18 +50,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Controller_Activation {
 	/**
-	 * Run plugin activation functionality
-	 *
-	 * @since 4.0
-	 *
-	 * @return void
-	 */
-	public static function activation() {
-		/* Add Upgraded From Option */
-		set_transient( '_gravitypdf_activation_redirect', true, 30 );
-	}
-
-	/**
 	 * Run plugin deactivation functionality
 	 *
 	 * @since 4.0

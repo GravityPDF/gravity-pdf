@@ -91,7 +91,6 @@ class Model_Welcome_Screen extends Helper_Abstract_Model {
 		$this->log = $log;
 
 		$this->welcome_title = esc_html__( 'Welcome to Gravity PDF', 'gravity-forms-pdf-extended' );
-		$this->updated_title = esc_html__( "What's new in Gravity PDF?", 'gravity-forms-pdf-extended' );
 	}
 
 	/**
@@ -102,22 +101,12 @@ class Model_Welcome_Screen extends Helper_Abstract_Model {
 	 * @return void
 	 */
 	public function admin_menus() {
-		$controller = $this->getController();
-
 		add_dashboard_page(
 			$this->welcome_title,
 			$this->welcome_title,
 			$this->minimum_capability,
 			'gfpdf-getting-started',
-			[ $controller, 'getting_started_screen' ]
-		);
-
-		add_dashboard_page(
-			$this->updated_title,
-			$this->updated_title,
-			$this->minimum_capability,
-			'gfpdf-update',
-			[ $controller, 'update_screen' ]
+			[ $this, 'getting_started_screen' ]
 		);
 	}
 
@@ -132,7 +121,6 @@ class Model_Welcome_Screen extends Helper_Abstract_Model {
 	 */
 	public function hide_admin_menus() {
 		remove_submenu_page( 'index.php', 'gfpdf-getting-started' );
-		remove_submenu_page( 'index.php', 'gfpdf-update' );
 	}
 
 	/**
@@ -151,14 +139,20 @@ class Model_Welcome_Screen extends Helper_Abstract_Model {
 
 				return $this->welcome_title;
 			break;
-
-			case 'gfpdf-update':
-				$this->log->addNotice( 'Display Update Screen' );
-
-				return $this->updated_title;
-			break;
 		}
 
 		return $title;
+	}
+
+	/**
+	 * Load our welcome screen
+	 *
+	 * @return void
+	 *
+	 * @since 4.1.2
+	 */
+	public function getting_started_screen() {
+		$controller = $this->getController();
+		$controller->view->welcome();
 	}
 }

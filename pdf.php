@@ -47,8 +47,6 @@ define( 'PDF_PLUGIN_BASENAME', plugin_basename( __FILE__ ) ); /* the plugin base
  * Add our activation hook and deactivation hooks
  */
 require_once PDF_PLUGIN_DIR . 'src/controller/Controller_Activation.php';
-
-register_activation_hook( __FILE__, array( 'Controller_Activation', 'activation' ) );
 register_deactivation_hook( __FILE__, array( 'Controller_Activation', 'deactivation' ) );
 
 /**
