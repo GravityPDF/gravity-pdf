@@ -149,11 +149,7 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @since  4.0
 	 */
 	public function get_permalink_regex() {
-		global $wp_rewrite;
-
-		$root = str_replace( '/', '\/', $wp_rewrite->root );
-
-		return '^' . $root . 'pdf\/([A-Za-z0-9]+)\/([0-9]+)\/?(download)?\/?';
+		return 'pdf/([A-Za-z0-9]+)/([0-9]+)/?(download)?/?';
 	}
 
 	/**
@@ -352,16 +348,19 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @return void
 	 */
 	public function register_rewrite_rules() {
+		global $wp_rewrite;
 
-		/* store query */
-		$query      = $this->data->permalink;
+		/* Create two regex rules to account for users with "index.php" in the URL */
+		$query = [
+			'^' . $this->data->permalink,
+			'^' . $wp_rewrite->root . $this->data->permalink,
+		];
+
 		$rewrite_to = 'index.php?gpdf=1&pid=$matches[1]&lid=$matches[2]&action=$matches[3]';
 
 		/* Add our main endpoint */
-		add_rewrite_rule(
-			$query,
-			$rewrite_to,
-			'top' );
+		add_rewrite_rule( $query[0], $rewrite_to, 'top' );
+		add_rewrite_rule( $query[1], $rewrite_to, 'top' );
 
 		$this->log->addNotice( 'Add Rewrite Rules', [
 			'query'   => $query,
@@ -393,19 +392,22 @@ class Model_Install extends Helper_Abstract_Model {
 	/**
 	 * Check if we need to force the rewrite rules to be flushed
 	 *
-	 * @param string $rule The rule to check
+	 * @param array $regex The rules to check
 	 *
 	 * @since 4.0
 	 *
 	 * @return void
 	 */
-	public function maybe_flush_rewrite_rules( $rule ) {
+	public function maybe_flush_rewrite_rules( $regex ) {
 
 		$rules = get_option( 'rewrite_rules' );
 
-		if ( ! isset( $rules[ $rule ] ) ) {
-			$this->log->addNotice( 'Flushing WordPress Rewrite Rules.' );
-			flush_rewrite_rules( false );
+		foreach( $regex as $rule ) {
+			if ( ! isset( $rules[ $rule ] ) ) {
+				$this->log->addNotice( 'Flushing WordPress Rewrite Rules.' );
+				flush_rewrite_rules( false );
+				break;
+			}
 		}
 	}
 
