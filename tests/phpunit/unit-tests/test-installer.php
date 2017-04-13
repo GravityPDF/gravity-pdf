@@ -271,9 +271,9 @@ class Test_Installer extends WP_UnitTestCase {
 	public function test_register_rewrite_rules() {
 		global $wp_rewrite, $gfpdf;
 
-		$this->assertEquals( 'index.php?gpdf=1&pid=$matches[1]&lid=$matches[2]&action=$matches[3]', $wp_rewrite->extra_rules_top[ $gfpdf->data->permalink ] );
+		$this->assertEquals( 'index.php?gpdf=1&pid=$matches[1]&lid=$matches[2]&action=$matches[3]', $wp_rewrite->extra_rules_top[ '^' . $gfpdf->data->permalink ] );
+		$this->assertEquals( 'index.php?gpdf=1&pid=$matches[1]&lid=$matches[2]&action=$matches[3]', $wp_rewrite->extra_rules_top[ '^' . $wp_rewrite->root . $gfpdf->data->permalink ] );
 	}
-
 
 	/**
 	 * Check we are uninstalling correctly

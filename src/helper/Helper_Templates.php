@@ -485,7 +485,7 @@ class Helper_Templates {
 
 			return $this->load_template_config_file( $class_path );
 		} catch ( Exception $e ) {
-			$this->log->addError( $e->getMessage() );
+			$this->log->addWarning( $e->getMessage() );
 		}
 
 		/* If class still empty it's either a legacy template or doesn't have a config. Check for legacy templates which support certain fields */
