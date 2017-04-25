@@ -142,6 +142,17 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
     margin-left: 5px;
 }
 
+/*
+ * License page
+ */
+#pdf-license .fa-exclamation-circle {
+    color: red;
+}
+
+#pdf-license .fa-check {
+    color: green;
+}
+
 /**
  * Tools Settings Page
  */

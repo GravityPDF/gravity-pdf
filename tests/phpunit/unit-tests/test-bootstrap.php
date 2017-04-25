@@ -92,8 +92,6 @@ class Test_Bootstrap extends WP_UnitTestCase {
 			$this->loader,
 			'auto_noconflict_styles',
 		] ) );
-
-		$this->assertEquals( 10, has_filter( 'gform_logging_supported', [ $this->loader, 'add_gf_logger' ] ) );
 	}
 
 	/**
@@ -216,15 +214,6 @@ class Test_Bootstrap extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Check we're registering Gravity PDF with the Gravity Forms logger
-	 *
-	 * @since 4.0
-	 */
-	public function test_add_gf_logger() {
-		$this->assertArrayHasKey( 'gravity-pdf', $this->loader->add_gf_logger( [] ) );
-	}
-
-	/**
 	 * Test backwards compatibility function for our v3 default PDF templates
 	 *
 	 * @since 4.0
@@ -254,6 +243,16 @@ class Test_Bootstrap extends WP_UnitTestCase {
 		$this->assertTrue( $settings['html_field'] );
 		$this->assertFalse( $settings['page_names'] );
 		$this->assertFalse( $settings['section_content'] );
+	}
 
+	/**
+	 * @since 4.2
+	 */
+	public function test_licensing_requirements() {
+		global $gfpdf;
+
+		$this->assertTrue( class_exists( '\GFPDF\Helper\Licensing\EDD_SL_Plugin_Updater' ) );
+		$this->assertTrue( is_array( $gfpdf->data->addon ) );
+		$this->assertNotEmpty( $gfpdf->data->store_url );
 	}
 }

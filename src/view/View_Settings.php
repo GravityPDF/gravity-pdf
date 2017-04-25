@@ -200,12 +200,34 @@ class View_Settings extends Helper_Abstract_View {
 			],
 		];
 
+		/* Add License tab if necessary */
+		if ( count( $this->data->addon ) > 0 ) {
+			$navigation[10] = [
+				'name' => esc_html__( 'License', 'gravity-forms-pdf-extended' ),
+				'id'   => 'license',
+			];
+		}
+
+		/* Add Extensions tab if necessary */
+		$settings = $this->options->get_registered_fields();
+		if ( count( $settings['extensions'] ) > 0 ) {
+			$navigation[20] = [
+				'name' => esc_html__( 'Extensions', 'gravity-forms-pdf-extended' ),
+				'id'   => 'extensions',
+			];
+		}
+
 		/**
 		 * Allow additional navigation to be added to the settings page
 		 *
 		 * @since 3.8
 		 */
-		return apply_filters( 'gfpdf_settings_navigation', $navigation );
+		$navigation = apply_filters( 'gfpdf_settings_navigation', $navigation );
+
+		/* sort the navigation by the array key */
+		ksort( $navigation, SORT_NUMERIC );
+
+		return $navigation;
 	}
 
 	/**
@@ -250,6 +272,39 @@ class View_Settings extends Helper_Abstract_View {
 
 		/* load the system status view */
 		$this->load( 'general', $vars );
+	}
+
+	/**
+	 * Pull the license details and displays
+	 *
+	 * @return void
+	 *
+	 * @since 4.2
+	 */
+	public function license() {
+
+		$vars = [
+			'edit_cap'    => $this->gform->has_capability( 'gravityforms_edit_settings' ),
+		];
+
+		/* load the system status view */
+		$this->load( 'license', $vars );
+	}
+
+	/**
+	 * Display the extensions settings page
+	 *
+	 * @return void
+	 *
+	 * @since 4.2
+	 */
+	public function extensions() {
+		$vars = [
+			'edit_cap'    => $this->gform->has_capability( 'gravityforms_edit_settings' ),
+		];
+
+		/* load the system status view */
+		$this->load( 'extensions', $vars );
 	}
 
 	/**

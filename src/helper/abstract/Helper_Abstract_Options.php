@@ -205,6 +205,19 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	}
 
 	/**
+	 * @param array $new_settings
+	 *
+	 * @Internal This option key is managed by WordPress Settings API. You cannot store info here that isn't already registered.
+	 *           through $this->register_settings()
+	 *
+	 * @since 4.2
+	 */
+	public function update_settings( $new_settings ) {
+		update_option( 'gfpdf_settings', $new_settings );
+		$this->set_plugin_settings();
+	}
+
+	/**
 	 * Add all settings sections and fields
 	 *
 	 * @param array $fields Fields that should be registered
@@ -1375,6 +1388,22 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		}
 
 		switch ( $args['type'] ) {
+			case 'license':
+				if ( isset( $options[ $args['id'] ] ) ) {
+					return [
+						'key'    => $options[ $args['id'] ],
+						'msg'    => ( isset( $options[ $args['id'] . '_message' ] ) ) ? $options[ $args['id'] . '_message' ] : '',
+						'status' => ( isset( $options[ $args['id'] . '_status' ] ) ) ? $options[ $args['id'] . '_status' ] : '',
+					];
+				} else {
+					return [
+						'key' => '',
+						'msg' => '',
+						'status' => '',
+					];
+				}
+			break;
+
 			case 'checkbox':
 
 				if ( isset( $options[ $args['id'] ] ) ) {
@@ -1596,6 +1625,49 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		if ( isset( $args['tooltip'] ) ) {
 			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . wp_kses_post( $args['tooltip'] ) . '</span>';
 		}
+
+		echo $html;
+	}
+
+	/**
+	 * License Callback
+	 *
+	 * Renders a license field.
+	 *
+	 * @since 4.2
+	 *
+	 * @param array $args Arguments passed by the setting
+	 *
+	 * @return void
+	 */
+	public function license_callback( $args ) {
+
+		/* get selected value (if any) */
+		$value      = $this->get_form_value( $args );
+		$args['id'] = esc_attr( $args['id'] );
+
+		$size = 'regular';
+		$html = '<input type="text" class="' . $size . '-text" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value['key'] ) ) . '" />';
+
+		/* Show status info */
+		if ( $value['status'] !== '' ) {
+			$status_class = ( $value['status'] === 'active' ) ? 'fa-check' : 'fa-exclamation-circle';
+			$html .= ' <i class="fa fa-lg '. $status_class.'" aria-hidden="true"></i>';
+		}
+
+		/* Add renewal info */
+		if ( $value['status'] === 'active' ) {
+			$html .= ' <a 
+				class="gfpdf-deactivate-license" 
+				data-addon-name="'. substr($args['id'], 8 ) . '" 
+				data-license="'. $value['key'] .'" 
+				data-nonce="'.  wp_create_nonce( 'gfpdf_deactivate_license' ) .'" 
+				href="#">'.
+			         esc_attr__( 'Deactivate License', 'gravity-forms-pdf-extended' ) .
+	            '</a>';
+		}
+
+		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']">' . wp_kses_post( $value['msg'] ) . '</label></span>';
 
 		echo $html;
 	}

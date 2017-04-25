@@ -194,7 +194,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		add_action( 'wp_ajax_gfpdf_font_save', [ $this->model, 'save_font' ] );
 		add_action( 'wp_ajax_gfpdf_font_delete', [ $this->model, 'delete_font' ] );
 		add_action( 'wp_ajax_gfpdf_has_pdf_protection', [ $this->model, 'check_tmp_pdf_security' ] );
-
+		add_action( 'wp_ajax_gfpdf_deactivate_license', [ $this->model, 'process_license_deactivation' ] );
 	}
 
 	/**
@@ -225,6 +225,10 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 
 		/* allow TTF uploads */
 		add_filter( 'upload_mimes', [ $this, 'allow_font_uploads' ] );
+
+		/* Register add-ons for licensing page */
+		add_filter( 'gfpdf_settings_licenses', [ $this->model, 'register_addons_for_licensing' ] );
+		add_filter( 'gfpdf_settings_license_sanitize', [ $this->model, 'maybe_active_licenses' ] );
 	}
 
 	/**
@@ -245,6 +249,14 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 
 			case 'tools':
 				$this->view->tools();
+			break;
+
+			case 'license':
+				$this->view->license();
+			break;
+
+			case 'extensions':
+				$this->view->extensions();
 			break;
 
 			case 'help':

@@ -3,12 +3,13 @@ var gulp = require('gulp'),
   cleanCSS = require('gulp-clean-css'),
   rename = require('gulp-rename'),
   wpPot = require('gulp-wp-pot'),
-  sort = require('gulp-sort')
+  sort = require('gulp-sort'),
+  watch = require('gulp-watch')
 
 /* Minify our CSS */
 gulp.task('minify', function () {
-  return gulp.src([ 'src/assets/css/*.css' ])
-    .pipe(cleanCSS( { target: 'dist/assets/css'}))
+  return gulp.src('src/assets/css/*.css')
+    .pipe(cleanCSS({target: 'dist/assets/css'}))
     .pipe(rename({
       suffix: '.min'
     }))
@@ -16,8 +17,8 @@ gulp.task('minify', function () {
 })
 
 /* Minify our non-react JS (handled by webpack) */
-gulp.task('compress', function() {
-  return gulp.src(['src/assets/js/*.js'])
+gulp.task('compress', function () {
+  return gulp.src('src/assets/js/*.js')
     .pipe(uglify())
     .pipe(rename({
       suffix: '.min'
@@ -35,6 +36,11 @@ gulp.task('language', function () {
       package: 'gravity-forms-pdf-extended'
     }))
     .pipe(gulp.dest('src/assets/languages'))
+})
+
+gulp.task('watch', function () {
+  watch('src/assets/js/*.js', function () { gulp.start('compress') })
+  watch('src/assets/css/*.css', function () { gulp.start('minify') })
 })
 
 gulp.task('default', function () {

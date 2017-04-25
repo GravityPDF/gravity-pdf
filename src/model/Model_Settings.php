@@ -9,6 +9,7 @@ use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Templates;
+use GFPDF\Helper\Helper_Abstract_Addon;
 
 use Psr\Log\LoggerInterface;
 
@@ -86,7 +87,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * Holds our Helper_Notices object
 	 * which we can use to queue up admin messages for the user
 	 *
-	 * @var \GFPDF\Helper\Helper_Misc
+	 * @var \GFPDF\Helper\Helper_Notices
 	 *
 	 * @since 4.0
 	 */
@@ -669,7 +670,8 @@ class Model_Settings extends Helper_Abstract_Model {
 
 					/* Check if the web server responded with a OK status code and we can read the contents of our file, then fail our test */
 					if ( isset( $response['response']['code'] ) && $response['response']['code'] === 200 &&
-					     isset( $response['body'] ) && $response['body'] === 'failed-if-read' ) {
+					     isset( $response['body'] ) && $response['body'] === 'failed-if-read'
+					) {
 						$return = false;
 					}
 				}
@@ -711,5 +713,218 @@ class Model_Settings extends Helper_Abstract_Model {
 		}
 
 		return $strings;
+	}
+
+	/**
+	 * Include License fields in the PDF Settings for each registered add-on
+	 *
+	 * @param array $fields The licensing fields
+	 *
+	 * @return array
+	 *
+	 * @since 4.2
+	 */
+	public function register_addons_for_licensing( $fields ) {
+
+		foreach ( $this->data->addon as $addon ) {
+			$fields[ 'license_' . $addon->get_slug() ] = [
+				'id'   => 'license_' . $addon->get_slug(),
+				'name' => trim( str_replace( 'Gravity PDF', '', $addon->get_name() ) ),
+				'type' => 'license',
+			];
+
+			$fields[ 'license_' . $addon->get_slug() . '_message' ] = [
+				'id'    => 'license_' . $addon->get_slug() . '_message',
+				'type'  => 'hidden',
+				'class' => 'gfpdf-hidden',
+			];
+
+			$fields[ 'license_' . $addon->get_slug() . '_status' ] = [
+				'id'    => 'license_' . $addon->get_slug() . '_status',
+				'type'  => 'hidden',
+				'class' => 'gfpdf-hidden',
+			];
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * Check the current add-on license key status and do an API call if the status isn't already active and the
+	 * license key has been included. Update special hidden "message" and "license" fields with API response
+	 *
+	 * @param array $input The $_POST data provided by the Settings API
+	 *
+	 * @return array
+	 *
+	 * @since 4.2
+	 */
+	public function maybe_active_licenses( $input ) {
+
+		$settings = $this->options->get_settings();
+
+		/* Check if we are submitting our settings and there's an active key */
+		foreach ( $this->data->addon as $addon ) {
+			$option_key = 'license_' . $addon->get_slug();
+
+			/* Check this add-on key was submitted, it isn't the same as previously, or it's not active */
+			if ( isset( $input[ $option_key ] )
+			     && (
+				     ( isset( $settings[ $option_key ] ) && $settings[ $option_key ] !== $input[ $option_key ] ) ||
+				     $input[ $option_key . '_status' ] !== 'active'
+			     )
+			) {
+				$results = $this->activate_license( $addon, $input[ $option_key ] );
+
+				$input[ $option_key . '_message' ] = $results['message'];
+				$input[ $option_key . '_status' ]  = $results['status'];
+			}
+
+			/* Check if the license key is now empty */
+			if ( isset( $input[ $option_key ] ) && strlen( trim( $input[ $option_key ] ) ) === 0 ) {
+				$input[ $option_key . '_message' ] = '';
+				$input[ $option_key . '_status' ]  = '';
+			}
+		}
+
+		return $input;
+	}
+
+	/**
+	 * Do API call to GravityPDF.com to activate the current add-on license key
+	 *
+	 * @param Helper_Abstract_Addon $addon       The current add-on class (stored in $data->addon)
+	 * @param string                $license_key The current license key for this add-on
+	 *
+	 * @return array The API response and license status
+	 *
+	 * @since 4.2
+	 */
+	protected function activate_license( Helper_Abstract_Addon $addon, $license_key ) {
+
+		$response = wp_remote_post( $this->data->store_url, [
+			'timeout'   => 15,
+			'sslverify' => false,
+			'body'      => [
+				'edd_action' => 'activate_license',
+				'license'    => $license_key,
+				'item_name'  => urlencode( $addon->get_name() ), // the name of our product in EDD
+				'url'        => home_url(),
+			],
+		] );
+
+		$possible_responses = $this->data->addon_license_responses( $addon->get_name() );
+
+		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
+			$message = ( is_wp_error( $response ) ) ? $response->get_error_message() : $possible_responses['generic'];
+			$status  = 'error';
+		} else {
+			$license_data = json_decode( wp_remote_retrieve_body( $response ) );
+			$message      = '';
+			$status       = 'active';
+
+			if ( ! isset( $license_data->success ) || false === $license_data->success ) {
+				$message = $possible_responses['generic'];
+				$status  = 'error';
+
+				if ( isset( $license_data->error ) && isset( $possible_responses[ $license_data->error ] ) ) {
+					$message = $possible_responses[ $license_data->error ];
+					$status  = $license_data->error;
+
+					/* Include the expiry date if license expired */
+					if ( $license_data->error === 'expired' ) {
+						$message = sprintf( $message, date_i18n( get_option( 'date_format' ), strtotime( $license_data->expires, current_time( 'timestamp' ) ) ) );
+					}
+				}
+			}
+		}
+
+		return [
+			'message' => $message,
+			'status'  => $status,
+		];
+	}
+
+	/**
+	 * An AJAX endpoint for processing license deactivations
+	 *
+	 * @Internal Expected parameters include:
+	 *           $_POST['addon_name']
+	 *           $_POST['license']
+	 *
+	 * @since 4.2
+	 */
+	public function process_license_deactivation() {
+
+		/* User / CORS validation */
+		$this->misc->handle_ajax_authentication( 'Deactivate License', 'gravityforms_edit_settings', 'gfpdf_deactivate_license' );
+
+		/* Get the required details */
+		$addon_slug = ( isset( $_POST['addon_name'] ) ) ? $_POST['addon_name'] : '';
+		$license    = ( isset( $_POST['license'] ) ) ? $_POST['license'] : '';
+
+		/* Check add-on currently installed */
+		if ( isset( $this->data->addon[ $addon_slug ] ) && $this->deactivate_license_key( $this->data->addon[ $addon_slug ], $license ) ) {
+			$this->log->addNotice( 'AJAX Endpoint Successful' );
+			echo json_encode( [
+				'success' => esc_html__( 'License deactivated.', 'gravity-forms-pdf-extended' ) ]
+			);
+
+			wp_die();
+		}
+
+		$this->log->addError( 'AJAX Endpoint Error' );
+
+		echo json_encode( [
+			'error' => esc_html__( 'An error occurred during deactivation, please try again', 'gravity-forms-pdf-extended' ),
+		] );
+
+		wp_die();
+	}
+
+	/**
+	 * Do API call to GravityPDF.com to deactivate add-on license
+	 *
+	 * @param Helper_Abstract_Addon $addon
+	 * @param string                $license_key
+	 *
+	 * @return bool
+	 *
+	 * @since 4.2
+	 */
+	public function deactivate_license_key( Helper_Abstract_Addon $addon, $license_key ) {
+
+		$response = wp_remote_post( $this->data->store_url, [
+			'timeout'   => 15,
+			'sslverify' => false,
+			'body'      => [
+				'edd_action' => 'deactivate_license',
+				'license'    => $license_key,
+				'item_name'  => urlencode( $addon->get_name() ), // the name of our product in EDD
+				'url'        => home_url(),
+			],
+		] );
+
+		/* If API error exit early */
+		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+			return false;
+		}
+
+		/* Get API response and check license is now deactivated */
+		$license_data = json_decode( wp_remote_retrieve_body( $response ) );
+
+		if ( ! isset( $license_data->license ) || $license_data->license !== 'deactivated' ) {
+			return false;
+		}
+
+		/* Remove license data from database */
+		$addon->delete_license_info();
+
+		$this->log->addNotice( 'License successfully deactivated', [
+			'slug'    => $addon->get_slug(),
+			'license' => $license_key,
+		] );
+
+		return true;
 	}
 }

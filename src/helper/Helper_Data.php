@@ -50,7 +50,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @property string  $memory_limit                    The current PHP memory limit
  * @property string  $upload_dir                      The current path to the WP upload directory
  * @property string  $upload_dir_url                  The current URL to the WP upload directory
+ * @property string  $store_url                       The URL of our online store
  * @property array   $form_settings                   A cache of the current form's PDF settings
+ * @property array   $addon                           An array of current active / registered add-ons
  * @property string  $template_location               The current path to the PDF working directory
  * @property string  $template_location_url           The current URL to the PDF working directory
  * @property string  $template_font_location          The current path to the PDF font directory
@@ -144,15 +146,6 @@ class Helper_Data {
 	}
 
 	/**
-	 * Set up addon array for use tracking active addons
-	 *
-	 * @since  3.8
-	 */
-	public function set_addon_details() {
-		$this->addon = [];
-	}
-
-	/**
 	 * Set up any default data that should be stored
 	 *
 	 * @return void
@@ -161,6 +154,7 @@ class Helper_Data {
 	 */
 	public function init() {
 		$this->set_plugin_titles();
+		$this->set_addon_details();
 	}
 
 	/**
@@ -174,6 +168,41 @@ class Helper_Data {
 		$this->short_title = esc_html__( 'PDF', 'gravity-forms-pdf-extended' );
 		$this->title       = esc_html__( 'Gravity PDF', 'gravity-forms-pdf-extended' );
 		$this->slug        = 'pdf';
+	}
+
+	/**
+	 * Set up addon array for use tracking active addons
+	 *
+	 * @since 3.8
+	 */
+	public function set_addon_details() {
+		$this->store_url = 'https://gravitypdf.com';
+		$this->addon = [];
+	}
+
+	/**
+	 * Gravity PDF add-ons should register their details with this method so we can handle the licensing centrally
+	 *
+	 * @param Helper_Abstract_Addon $class The plugin bootstrap class
+	 *
+	 * @since 4.2
+	 */
+	public function add_addon( Helper_Abstract_Addon $class ) {
+		$this->addon[ $class->get_slug() ] = $class;
+	}
+
+	public function addon_license_responses( $addon_name ) {
+		return [
+			'expired'             => __( 'Your license key expired on %s.', 'gravity-forms-pdf-extended' ),
+			'revoked'             => __( 'Your license key has been disabled', 'gravity-forms-pdf-extended' ),
+			'missing'             => __( 'Invalid license key provided', 'gravity-forms-pdf-extended' ),
+			'invalid'             => __( 'Your license is not active for this URL', 'gravity-forms-pdf-extended' ),
+			'site_inactive'       => __( 'Your license is not active for this URL', 'gravity-forms-pdf-extended' ),
+			'item_name_mismatch'  => sprintf( __( 'This appears to be an invalid license key for %s', 'gravity-forms-pdf-extended' ), $addon_name ),
+			'no_activations_left' => __( 'Your license key has reached its activation limit', 'gravity-forms-pdf-extended' ),
+			'default'             => __( 'An error occurred, please try again', 'gravity-forms-pdf-extended' ),
+			'generic'             => __( 'An error occurred during activation, please try again', 'gravity-forms-pdf-extended' ),
+		];
 	}
 
 	/**

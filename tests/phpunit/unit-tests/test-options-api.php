@@ -128,6 +128,21 @@ class Test_Options_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @since 4.2
+	 */
+	public function test_update_settings() {
+		$oldsettings = $settings = $this->options->get_settings();
+
+		$this->assertEquals( 'custom', $settings['default_pdf_size'] );
+		$settings['default_pdf_size'] = 'Letter';
+		$this->options->update_settings( $settings );
+
+		$settings = $this->options->get_settings();
+		$this->assertEquals( 'Letter', $settings['default_pdf_size'] );
+		$this->options->update_settings( $oldsettings );
+	}
+
+	/**
 	 * Check if Gravity Forms PDF settings getter function works correctly
 	 *
 	 * @since 4.0
@@ -1143,5 +1158,19 @@ class Test_Options_API extends WP_UnitTestCase {
 				'',
 			],
 		];
+	}
+
+	/**
+	 * @since 4.2
+	 */
+	public function test_get_form_value_licensing() {
+		$results = $this->options->get_form_value( [
+			'id' => 'test',
+			'type' => 'license'
+		] );
+
+		$this->assertArrayHasKey( 'key', $results );
+		$this->assertArrayHasKey( 'msg', $results );
+		$this->assertArrayHasKey( 'status', $results );
 	}
 }
