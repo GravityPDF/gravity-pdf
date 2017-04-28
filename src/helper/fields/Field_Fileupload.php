@@ -6,7 +6,6 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Abstract_Fields;
 
-use GFFormsModel;
 use GF_Field_FileUpload;
 
 use Exception;
@@ -84,7 +83,7 @@ class Field_Fileupload extends Helper_Abstract_Fields {
 	public function form_data() {
 
 		$data     = [];
-		$label    = GFFormsModel::get_label( $this->field );
+		$label    = $this->get_label();
 		$value    = $this->value();
 		$field_id = $this->field->id;
 

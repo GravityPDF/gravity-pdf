@@ -80,7 +80,7 @@ class Field_Product extends Helper_Abstract_Fields {
 
 		$value    = $this->value();
 		$field    = $this->field;
-		$label    = GFFormsModel::get_label( $field );
+		$label    = $this->get_label();
 		$field_id = (int) $field->id;
 		$data     = [];
 		$name     = $price = '';

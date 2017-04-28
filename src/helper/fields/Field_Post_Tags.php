@@ -6,7 +6,6 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Abstract_Fields;
 
-use GFFormsModel;
 use GF_Field_Post_Tags;
 
 use Exception;
@@ -85,7 +84,7 @@ class Field_Post_Tags extends Helper_Abstract_Fields {
 	public function form_data() {
 
 		$value    = implode( ', ', $this->value() );
-		$label    = GFFormsModel::get_label( $this->field );
+		$label    = $this->get_label();
 		$field_id = (int) $this->field->id;
 		$data     = [];
 

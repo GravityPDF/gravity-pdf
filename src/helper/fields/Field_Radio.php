@@ -6,7 +6,6 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Abstract_Fields;
 
-use GFFormsModel;
 use GF_Field_Radio;
 use GFCommon;
 
@@ -131,7 +130,7 @@ class Field_Radio extends Helper_Abstract_Fields {
 	public function form_data() {
 
 		$value = $this->value();
-		$label = GFFormsModel::get_label( $this->field );
+		$label = $this->get_label();
 		$data  = [];
 
 		/* Standadised Format */

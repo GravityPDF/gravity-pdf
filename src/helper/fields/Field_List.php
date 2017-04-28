@@ -6,7 +6,6 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Abstract_Fields;
 
-use GFFormsModel;
 use GF_Field_List;
 
 use Exception;
@@ -85,7 +84,7 @@ class Field_List extends Helper_Abstract_Fields {
 	public function form_data() {
 
 		$data  = [];
-		$label = GFFormsModel::get_label( $this->field );
+		$label = $this->get_label();
 		$html  = $this->html();
 
 		/* Add our List array */

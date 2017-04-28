@@ -5,8 +5,6 @@ namespace GFPDF\Helper\Fields;
 use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_QueryPath;
 
-use GFFormsModel;
-
 use Exception;
 
 /**
@@ -60,7 +58,7 @@ class Field_Quiz extends Helper_Abstract_Fields {
 	public function form_data() {
 
 		$value = $this->value();
-		$label = GFFormsModel::get_label( $this->field );
+		$label = $this->get_label();
 		$data  = [];
 
 		$data['field'][ $this->field->id . '.' . $label ] = $value;
