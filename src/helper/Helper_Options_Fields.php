@@ -55,6 +55,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 
 		/* Conditionally enable specific fields */
 		add_filter( 'gfpdf_form_settings_advanced', [ $this, 'get_advanced_template_field' ] );
+		add_filter( 'gfpdf_form_settings_advanced', [ $this, 'get_master_password_field' ] );
 
 		parent::add_filters();
 	}
@@ -321,7 +322,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'type'  => 'hidden',
 						'class' => 'gfpdf-hidden',
 					],
-
 				]
 			),
 
@@ -492,6 +492,12 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'placeholder' => esc_html__( 'Select End User PDF Privileges', 'gravity-forms-pdf-extended' ),
 					],
 
+					'master_password' => [
+						'id'    => 'master_password',
+						'type'  => 'hidden',
+						'class' => 'gfpdf-hidden',
+					],
+
 					'image_dpi' => [
 						'id'      => 'image_dpi',
 						'name'    => esc_html__( 'Image DPI', 'gravity-forms-pdf-extended' ),
@@ -578,6 +584,39 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
 			],
 			'std'     => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
+		];
+
+		return $settings;
+	}
+
+	/**
+	 * Enable the Master Password field.
+	 *
+	 * This isn't enabled by default because it's very simple for end users to bypass if needed.
+	 * If you need to prevent unauthorised access to the generated PDFs you should
+	 * use the standard password instead as that will prevent the PDF being viewed by anyone without your password.
+	 *
+	 * @param  array $settings The 'form_settings_advanced' array
+	 *
+	 * @return array
+	 *
+	 * @since 4.2
+	 */
+	public function get_master_password_field( $settings ) {
+
+		/**
+		 * Use the filter below to return 'true' which will enable the master password field
+		 */
+		if( ! apply_filters( 'gfpdf_enable_master_password_field', false, $settings ) ) {
+			return $settings;
+		}
+
+		$settings['master_password'] = [
+			'id'         => 'master_password',
+			'name'       => esc_html__( 'Master Password', 'gravity-forms-pdf-extended' ),
+			'type'       => 'text',
+			'desc'       => 'Set the PDF Owner Password which is used to prevent the PDF privileges being changed.',
+			'inputClass' => 'merge-tag-support mt-hide_all_fields',
 		];
 
 		return $settings;

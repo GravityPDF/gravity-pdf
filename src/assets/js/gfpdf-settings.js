@@ -260,10 +260,10 @@
 
             if ($(this).val() === GFPDF.no || format !== GFPDF.standard) {
               /* hide security password / privileges */
-              $secTable.find('tr:nth-child(3),tr:nth-child(4)').hide()
+              $secTable.find('tr:nth-child(3),tr:nth-child(4),tr:nth-child(5):not(.gfpdf-hidden)').hide()
             } else {
               /* show security password / privileges */
-              $secTable.find('tr:nth-child(3),tr:nth-child(4)').show()
+              $secTable.find('tr:nth-child(3),tr:nth-child(4),tr:nth-child(5):not(.gfpdf-hidden)').show()
             }
 
             if (format !== GFPDF.standard) {

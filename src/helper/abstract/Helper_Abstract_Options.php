@@ -2079,7 +2079,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$input_data = ( isset( $args['data'] ) && is_array( $args['data'] ) ) ? $args['data'] : [];
 		$args['id'] = esc_attr( $args['id'] );
 
-		$html = '<input type="hidden" class="' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '"';
+		$html = '<input type="hidden" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '"';
 
 		foreach ( $input_data as $data_id => $data_value ) {
 			$html .= ' data-' . $data_id . '="' . esc_html( $data_value ) . '" ';
