@@ -9,20 +9,6 @@ use GFPDF\Helper;
 
 use GFPDF_Core;
 
-use Monolog\Formatter\LineFormatter;
-use Monolog\Formatter\LogglyFormatter;
-use Monolog\Handler\BufferHandler;
-use Monolog\Handler\LogglyHandler;
-use Monolog\Handler\NullHandler;
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
-use Monolog\Processor\IntrospectionProcessor;
-use Monolog\Processor\MemoryPeakUsageProcessor;
-use Monolog\Processor\WebProcessor;
-
-use GFFormsModel;
-use GFLogging;
-
 /**
  * Bootstrap / Router Class
  * The bootstrap is loaded on WordPress 'plugins_loaded' functionality
@@ -201,7 +187,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function init() {
 
 		/* Set up our logger is not running via CLI (unit testing) */
-		$this->setup_logger();
+		$logger = new Helper\Helper_Logger( 'gravity-pdf', 'Gravity PDF' );
+		$this->log = $logger->get_logger();
 
 		/* Set up our form object */
 		$this->gform = new Helper\Helper_Form();
@@ -260,7 +247,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		 * See https://gravitypdf.com/documentation/v4/gfpdf_fully_loaded/ for more details about this action
 		 */
 		do_action( 'gfpdf_fully_loaded', $this );
-
 	}
 
 	/**
@@ -293,9 +279,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		add_filter( 'gform_noconflict_scripts', [ $this, 'auto_noconflict_scripts' ] );
 		add_filter( 'gform_noconflict_styles', [ $this, 'auto_noconflict_styles' ] );
 
-		/* Enable Gravity Forms Logging */
-		add_filter( 'gform_logging_supported', [ $this, 'add_gf_logger' ] );
-
 		/* Add quick links on the plugins page */
 		add_filter( 'plugin_action_links_' . PDF_PLUGIN_BASENAME, [ $this, 'plugin_action_links' ] );
 		add_filter( 'plugin_row_meta', [ $this, 'plugin_row_meta' ], 10, 2 );
@@ -312,77 +295,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	private function add_localization_support() {
 		load_plugin_textdomain( 'gravity-forms-pdf-extended', false, dirname( plugin_basename( __FILE__ ) ) . '/assets/languages/' );
-	}
-
-	/**
-	 * Initialise our logging class (we're using Monolog instead of Gravity Form's KLogger)
-	 * and set up appropriate handlers based on the logger settings
-	 *
-	 * @return void
-	 *
-	 * @since 4.0
-	 */
-	public function setup_logger() {
-
-		/* Initialise our logger */
-		$this->log = new Logger( 'gravitypdf' );
-
-		/* Setup our Gravity Forms local file logger, if enabled */
-		$this->setup_gravityforms_logging();
-
-		/* Check if we have a handler pushed and add our Introspection and Memory Peak usage processors */
-		if ( sizeof( $this->log->getHandlers() ) > 0 && substr( php_sapi_name(), 0, 3 ) !== 'cli' ) {
-			$this->log->pushProcessor( new IntrospectionProcessor );
-			$this->log->pushProcessor( new MemoryPeakUsageProcessor );
-		} else {
-			/* Disable logging if using CLI, or if Gravity Forms logging isn't enabled */
-			$this->log->pushHandler( new NullHandler( Logger::INFO ) ); /* throw logs away */
-		}
-	}
-
-	/**
-	 * Setup Gravity Forms logging, if currently enabled by the user
-	 *
-	 * @return void
-	 *
-	 * @since 4.0
-	 */
-	private function setup_gravityforms_logging() {
-
-		/* Check if Gravity Forms logging is enabled and push stream logging */
-		if ( class_exists( 'GFLogging' ) ) {
-
-			/*
-			 * Get the current plugin logger settings and check if it's enabled
-			 * The new version of the logger uses the add-on storage method, while the old one stores it in gf_logging_settings
-			 * so we'll test which settings we should use and get the appropriate log level
-			 */
-			if ( ! get_option( 'gform_enable_logging' ) && ( ! defined( 'GF_LOGGING_VERSION' ) || version_compare( GF_LOGGING_VERSION, '1.1', '<' ) ) ) {
-				$settings     = get_option( 'gf_logging_settings' );
-				$log_level    = (int) rgar( $settings, 'gravity-pdf' );
-				$log_filename = GFFormsModel::get_upload_root() . 'logs/gravity-pdf.txt';
-			} else {
-				$gf_logger          = GFLogging::get_instance();
-				$gf_logger_settings = $gf_logger->get_plugin_settings();
-				$log_level          = ( isset( $gf_logger_settings['gravity-pdf']['log_level'] ) ) ? (int) $gf_logger_settings['gravity-pdf']['log_level'] : 0;
-				$log_filename       = ( get_option( 'gform_enable_logging' ) ) ? $gf_logger->get_log_file_name( 'gravity-pdf' ) : $gf_logger::get_log_file_name( 'gravity-pdf' );
-			}
-
-			/* Enable logging if not equivalent to empty (0) and not level 6 (which is apprently off in GF world) */
-			if ( ! empty( $log_level ) && $log_level !== 6 ) {
-
-				/* Convert Gravity Forms log levels to the appropriate Monolog level */
-				$monolog_level = ( $log_level === 4 ) ? Logger::ERROR : Logger::INFO;
-
-				/* Setup our stream and change the format to more-suit Gravity Forms */
-				$formatter = new LineFormatter( "%datetime% - %level_name% --> %message% %context% %extra%<br>\n" );
-				$stream    = new StreamHandler( $log_filename, $monolog_level );
-				$stream->setFormatter( $formatter );
-
-				/* Add our log file stream */
-				$this->log->pushHandler( $stream );
-			}
-		}
 	}
 
 	/**
@@ -648,21 +560,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_gf_noconflict_styles/ for more details about this filter */
 
 		return apply_filters( 'gfpdf_gf_noconflict_styles', $items );
-	}
-
-	/**
-	 * Register our plugin with Gravity Form's Logger
-	 *
-	 * @param array $loggers
-	 *
-	 * @return array
-	 *
-	 * @since 4.0
-	 */
-	public function add_gf_logger( $loggers ) {
-		$loggers['gravity-pdf'] = esc_html__( 'Gravity PDF', 'gravity-forms-pdf-extended' );
-
-		return $loggers;
 	}
 
 	/**

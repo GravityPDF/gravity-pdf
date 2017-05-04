@@ -79,6 +79,9 @@
 
         /* Setup our template loader, if needed */
         this.setupDynamicTemplateFields()
+
+        /* Setup license deactivation, if needed */
+        this.setupLicenseDeactivation()
       }
 
       /**
@@ -716,6 +719,57 @@
               self.toggleFontAppearance(response.template_type)
             }
           })
+        })
+      }
+
+      /**
+       * Handles individual add-on license key deactivation via AJAX
+       * @since 4.2
+       */
+      this.setupLicenseDeactivation = function () {
+        $('.gfpdf-deactivate-license').click(function () {
+          /* Do AJAX call so user can deactivate license */
+          var $container = $(this).parent()
+          $container.find('.gf_settings_description label').html('')
+
+          /* Add spinner */
+          var $spinner = $('<img alt="' + GFPDF.spinnerAlt + '" src="' + GFPDF.spinnerUrl + '" class="gfpdf-spinner" />')
+
+          /* Add our spinner */
+          $(this).append($spinner)
+
+          /* Set up ajax data */
+          var slug = $(this).data('addon-name')
+
+          var data = {
+            'action': 'gfpdf_deactivate_license',
+            'addon_name': slug,
+            'license': $(this).data('license'),
+            'nonce': $(this).data('nonce'),
+          }
+
+          /* Do ajax call */
+          self.ajax(data, function (response) {
+
+            /* Remove our loading spinner */
+            $spinner.remove()
+
+            if (response.success) {
+              /* cleanup inputs */
+              $('#gfpdf_settings\\[license_' + slug + '\\]').val('')
+              $('#gfpdf_settings\\[license_' + slug + '_message\\]').val('')
+              $('#gfpdf_settings\\[license_' + slug + '_status\\]').val('')
+              $container.find('i').remove()
+              $container.find('a').remove()
+
+              $container.find('.gf_settings_description label').html(response.success)
+            } else {
+              /* Show error message */
+              $container.find('.gf_settings_description label').html(response.error)
+            }
+          })
+
+          return false
         })
       }
 

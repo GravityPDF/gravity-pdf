@@ -21,6 +21,7 @@
     		"GFPDF\\Model\\": "src/model/",
     		"GFPDF\\View\\": "src/view/",
     		"GFPDF\\Helper\\": ["src/helper/", "src/helper/abstract/", "src/helper/interface/"],
+    		"GFPDF\\Helper\\Licensing\\": "src/helper/licensing/",
     		"GFPDF\\Helper\\Fields\\": "src/helper/fields/",
     		"GFPDF\\Test\\": "tests/unit-tests/"
     	}

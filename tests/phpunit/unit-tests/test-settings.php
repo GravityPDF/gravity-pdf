@@ -3,14 +3,15 @@
 namespace GFPDF\Tests;
 
 use GFPDF\Controller\Controller_Settings;
+use GFPDF\Helper\Helper_Abstract_Addon;
+use GFPDF\Helper\Helper_Logger;
+use GFPDF\Helper\Helper_Notices;
+use GFPDF\Helper\Helper_Singleton;
 use GFPDF\Model\Model_Settings;
 use GFPDF\View\View_Settings;
 
-use GFForms;
-
+use GPDFAPI;
 use WP_UnitTestCase;
-use WP_Error;
-
 use Exception;
 
 /**
@@ -94,6 +95,46 @@ class Test_Settings extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @since 4.2
+	 */
+	private function add_addon_1() {
+		global $gfpdf;
+
+		$gfpdf->data->add_addon( new Addon1(
+			'my-custom-plugin',
+			'My Custom Plugin',
+			'Gravity PDF',
+			'1.0',
+			'/path/to/plugin/',
+			GPDFAPI::get_data_class(),
+			GPDFAPI::get_options_class(),
+			new Helper_Singleton(),
+			new Helper_Logger( 'my-custom-plugin', 'My Custom Plugin' ),
+			new Helper_Notices()
+		) );
+	}
+
+	/**
+	 * @since 4.2
+	 */
+	private function add_addon_2() {
+		global $gfpdf;
+
+		$gfpdf->data->add_addon( new Addon2(
+			'other-plugin',
+			'Other Plugin',
+			'Gravity PDF',
+			'2.0',
+			'/path/to/pluginv2/',
+			GPDFAPI::get_data_class(),
+			GPDFAPI::get_options_class(),
+			new Helper_Singleton(),
+			new Helper_Logger( 'other-plugin', 'Other Plugin' ),
+			new Helper_Notices()
+		) );
+	}
+
+	/**
 	 * Test the appropriate actions are set up
 	 *
 	 * @since 4.0
@@ -106,6 +147,10 @@ class Test_Settings extends WP_UnitTestCase {
 
 		$this->assertEquals( 10, has_action( 'wp_ajax_gfpdf_font_save', [ $this->model, 'save_font' ] ) );
 		$this->assertEquals( 10, has_action( 'wp_ajax_gfpdf_font_delete', [ $this->model, 'delete_font' ] ) );
+		$this->assertEquals( 10, has_action( 'wp_ajax_gfpdf_deactivate_license', [
+			$this->model,
+			'process_license_deactivation',
+		] ) );
 
 	}
 
@@ -136,6 +181,17 @@ class Test_Settings extends WP_UnitTestCase {
 
 		$this->controller->add_filters();
 		$this->assertEquals( 10, has_filter( 'gfpdf_registered_fields', [ $this->model, 'highlight_errors' ] ) );
+
+		/* Add licensing filter tests */
+		$this->assertEquals( 10, has_filter( 'gfpdf_settings_licenses', [
+			$this->model,
+			'register_addons_for_licensing',
+		] ) );
+
+		$this->assertEquals( 10, has_filter( 'gfpdf_settings_license_sanitize', [
+			$this->model,
+			'maybe_active_licenses',
+		] ) );
 	}
 
 	/**
@@ -350,7 +406,7 @@ class Test_Settings extends WP_UnitTestCase {
 		];
 
 		/* Create our tmp font files */
-		array_walk( $font, function ( $value ) use ( $gfpdf ) {
+		array_walk( $font, function( $value ) use ( $gfpdf ) {
 			touch( $gfpdf->data->template_font_location . $value );
 		} );
 
@@ -438,7 +494,7 @@ class Test_Settings extends WP_UnitTestCase {
 		];
 
 		/* Create our tmp font files */
-		array_walk( $font, function ( $value ) use ( $uploads ) {
+		array_walk( $font, function( $value ) use ( $uploads ) {
 			touch( $uploads['path'] . '/' . basename( $value ) );
 		} );
 
@@ -458,5 +514,242 @@ class Test_Settings extends WP_UnitTestCase {
 		/* Cleanup the fonts */
 		$this->model->remove_font_file( $font );
 
+	}
+
+	/**
+	 * @since 4.2
+	 */
+	public function test_register_addons_for_licensing() {
+		global $gfpdf;
+
+		$this->assertSame( [], $this->model->register_addons_for_licensing( [] ) );
+
+		$this->add_addon_1();
+		$this->add_addon_2();
+
+		$results = $this->model->register_addons_for_licensing( [] );
+
+		$gfpdf->data->addon = [];
+
+		$this->assertCount( 6, $results );
+		$this->assertArrayHasKey( 'license_my-custom-plugin', $results );
+		$this->assertArrayHasKey( 'license_my-custom-plugin_message', $results );
+		$this->assertArrayHasKey( 'license_my-custom-plugin_status', $results );
+	}
+
+	/**
+	 * @since 4.2
+	 */
+	public function test_maybe_activate_licenses() {
+		global $gfpdf;
+
+		$this->add_addon_1();
+		$this->add_addon_2();
+
+		$this->assertSame( [], $this->model->maybe_active_licenses( [] ) );
+
+		$ApiResponse = function() {
+			return [
+				'response' => [ 'code' => 200 ],
+				'body'     => json_encode( [
+					'error' => 'missing',
+				] ),
+			];
+		};
+
+		add_filter( 'pre_http_request', $ApiResponse );
+
+		/* Ensure our license check runs when we provide a license key */
+		$results = $this->model->maybe_active_licenses( [
+			'license_other-plugin'         => 'user license key',
+			'license_other-plugin_message' => '',
+			'license_other-plugin_status'  => '',
+		] );
+
+		$this->assertEquals( 'Invalid license key provided', $results['license_other-plugin_message'] );
+		$this->assertEquals( 'missing', $results['license_other-plugin_status'] );
+
+		/* Ensure add-on message and status are reset when license key is empty */
+		$results = $this->model->maybe_active_licenses( [
+			'license_other-plugin'         => '',
+			'license_other-plugin_message' => 'message',
+			'license_other-plugin_status'  => 'status',
+		] );
+
+		$this->assertEquals( '', $results['license_other-plugin_message'] );
+		$this->assertEquals( '', $results['license_other-plugin_status'] );
+
+		/* Check we don't do anything when the license is active */
+		$results = $this->model->maybe_active_licenses( [
+			'license_other-plugin'         => 'license key',
+			'license_other-plugin_message' => 'message',
+			'license_other-plugin_status'  => 'active',
+		] );
+
+		$this->assertEquals( 'message', $results['license_other-plugin_message'] );
+		$this->assertEquals( 'active', $results['license_other-plugin_status'] );
+
+		/* Ensure we check the license if the license key differs from the one saved */
+		$old_settings                     = $settings = $gfpdf->options->get_settings();
+		$settings['license_other-plugin'] = 'license key';
+		$gfpdf->options->update_settings( $settings );
+
+		$results = $this->model->maybe_active_licenses( [
+			'license_other-plugin'         => 'license key1',
+			'license_other-plugin_message' => 'message',
+			'license_other-plugin_status'  => 'active',
+		] );
+
+		$this->assertEquals( 'Invalid license key provided', $results['license_other-plugin_message'] );
+		$this->assertEquals( 'missing', $results['license_other-plugin_status'] );
+
+		/* Reset our work */
+		remove_filter( 'pre_http_request', $ApiResponse );
+		$gfpdf->data->addon = [];
+		$gfpdf->options->update_settings( $old_settings );
+	}
+
+	/**
+	 * @param string $expected
+	 * @param array  $api
+	 *
+	 * @since        4.2
+	 * @dataProvider providerActivateLicense
+	 */
+	public function test_activate_license( $expected, $api ) {
+		global $gfpdf;
+
+		$this->add_addon_1();
+
+		$ApiResponse = function() use ( $api ) {
+			return [
+				'response' => [ 'code' => 200 ],
+				'body'     => json_encode( $api ),
+			];
+		};
+
+		add_filter( 'pre_http_request', $ApiResponse );
+
+		$results = $this->model->maybe_active_licenses( [
+			'license_my-custom-plugin'         => 'user license key',
+			'license_my-custom-plugin_message' => '',
+			'license_my-custom-plugin_status'  => '',
+		] );
+
+		$this->assertEquals( $expected, $results['license_my-custom-plugin_message'] );
+
+		remove_filter( 'pre_http_request', $ApiResponse );
+		$gfpdf->data->addon = [];
+	}
+
+	/**
+	 * @return array
+	 *
+	 * @since 4.2
+	 */
+	public function providerActivateLicense() {
+		return [
+			[
+				'Your license key expired on ' . date_i18n( get_option( 'date_format' ), strtotime( '', current_time( 'timestamp' ) ) ) . '.',
+				[ 'error' => 'expired', 'expires' => '' ],
+			],
+
+			[
+				'Your license key has been disabled',
+				[ 'error' => 'revoked' ],
+			],
+
+			[
+				'Invalid license key provided',
+				[ 'error' => 'missing' ],
+			],
+
+			[
+				'Your license is not active for this URL',
+				[ 'error' => 'invalid' ],
+			],
+
+			[
+				'Your license is not active for this URL',
+				[ 'error' => 'site_inactive' ],
+			],
+
+			[
+				'This appears to be an invalid license key for My Custom Plugin',
+				[ 'error' => 'item_name_mismatch' ],
+			],
+
+			[
+				'Your license key has reached its activation limit',
+				[ 'error' => 'no_activations_left' ],
+			],
+
+			[
+				'An error occurred, please try again',
+				[ 'error' => 'default' ],
+			],
+
+			[
+				'An error occurred during activation, please try again',
+				[ 'error' => 'generic' ],
+			],
+
+			[
+				'',
+				[ 'success' => 'true' ],
+			],
+		];
+	}
+
+	/**
+	 * @param bool  $expected
+	 * @param array $api
+	 * @param int   $status
+	 *
+	 * @since        4.2
+	 * @dataProvider provider_deactivate_license_key
+	 */
+	public function test_deactivate_license_key( $expected, $api, $status ) {
+		global $gfpdf;
+
+		$this->add_addon_1();
+
+		$ApiResponse = function() use ( $api, $status ) {
+			return [
+				'response' => [ 'code' => $status ],
+				'body'     => json_encode( $api ),
+			];
+		};
+
+		add_filter( 'pre_http_request', $ApiResponse );
+
+		$results = $this->model->deactivate_license_key( $gfpdf->data->addon['my-custom-plugin'], '' );
+		$this->assertSame( $expected, $results );
+
+		remove_filter( 'pre_http_request', $ApiResponse );
+		$gfpdf->data->addon = [];
+	}
+
+	/**
+	 * @return array
+	 *
+	 * @since 4.2
+	 */
+	public function provider_deactivate_license_key() {
+		return [
+			[ true, [ 'license' => 'deactivated' ], 200 ],
+			[ false, [ 'license' => '' ], 200 ],
+			[ false, [ 'license' => 'deactivated' ], 500 ],
+		];
+	}
+}
+
+class Addon1 extends Helper_Abstract_Addon {
+	public function plugin_updater() {
+	}
+}
+
+class Addon2 extends Helper_Abstract_Addon {
+	public function plugin_updater() {
 	}
 }
