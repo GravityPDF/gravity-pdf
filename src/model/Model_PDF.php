@@ -653,7 +653,10 @@ class Model_PDF extends Helper_Abstract_Model {
 			}
 		}
 
-		return $args;
+		/**
+		 * @since 4.2
+		 */
+		return apply_filters( 'gfpdf_get_pdf_display_list', $args, $entry, $form );
 	}
 
 	/**
@@ -734,7 +737,10 @@ class Model_PDF extends Helper_Abstract_Model {
 			$url = esc_url( $url );
 		}
 
-		return $url;
+		/**
+		 * @since 4.2
+		 */
+		return apply_filters( 'gfpdf_get_pdf_url', $url, $pid, $id, $download, $print, $esc );
 	}
 
 	/**
@@ -758,7 +764,10 @@ class Model_PDF extends Helper_Abstract_Model {
 			}
 		}
 
-		return $filtered;
+		/**
+		 * @since 4.2
+		 */
+		return apply_filters( 'gfpdf_get_active_pdfs', $filtered, $pdfs, $entry, $form );
 	}
 
 	/**
@@ -772,8 +781,15 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function process_and_save_pdf( Helper_PDF $pdf ) {
 
+		/**
+		 * Use the filter below to return 'true' to force the PDF to be generated
+		 *
+		 * @since 4.2
+		 */
+		$pdf_override = apply_filters( 'gfpdf_override_pdf_bypass', false, $pdf );
+
 		/* Check that the PDF hasn't already been created this session */
-		if ( ! $this->does_pdf_exist( $pdf ) ) {
+		if ( $pdf_override || ! $this->does_pdf_exist( $pdf ) ) {
 
 			/* Ensure Gravity Forms depedancy loaded */
 			$this->misc->maybe_load_gf_entry_detail_class();
@@ -976,13 +992,17 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function maybe_attach_to_notification( $notification, $settings ) {
 
+		$attach = false;
 		if ( isset( $settings['notification'] ) && is_array( $settings['notification'] ) ) {
 			if ( in_array( $notification['id'], $settings['notification'] ) ) {
-				return true;
+				$attach = true;
 			}
 		}
 
-		return false;
+		/**
+		 * @since 4.2
+		 */
+		return apply_filters( 'gfpdf_maybe_attach_to_notification', $attach, $notification, $settings );
 	}
 
 	/**
@@ -995,11 +1015,16 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function maybe_always_save_pdf( $settings ) {
+
+		$save = false;
 		if ( isset( $settings['save'] ) && strtolower( $settings['save'] ) == 'yes' ) {
-			return true;
+			$save = true;
 		}
 
-		return false;
+		/**
+		 * @since 4.2
+		 */
+		return apply_filters( 'gfpdf_maybe_always_save_pdf', $save, $settings );
 	}
 
 	/**
@@ -1157,8 +1182,8 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @return array We tapped into a filter so we need to return the form object
 	 */
-	public function resend_notification_pdf_cleanup( $form, $leads ) {
-		foreach ( $leads as $entry_id ) {
+	public function resend_notification_pdf_cleanup( $form, $entries ) {
+		foreach ( $entries as $entry_id ) {
 			$entry = $this->gform->get_entry( $entry_id );
 			$this->cleanup_pdf( $entry, $form );
 		}
@@ -1202,11 +1227,8 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function set_current_pdf_font( $path, $font ) {
 
 		/* If the current font doesn't exist in mPDF core we'll look in our font folder */
-		if ( ! is_file( $path ) ) {
-
-			if ( is_file( $this->data->template_font_location . $font ) ) {
-				$path = $this->data->template_font_location . $font;
-			}
+		if ( ! is_file( $path ) && is_file( $this->data->template_font_location . $font ) ) {
+			$path = $this->data->template_font_location . $font;
 		}
 
 		return $path;
@@ -1383,7 +1405,10 @@ class Model_PDF extends Helper_Abstract_Model {
 			'data' => $data,
 		] );
 
-		return $data;
+		/**
+		 * @since 4.2
+		 */
+		return apply_filters( 'gfpdf_form_data', $data, $entry, $form );
 	}
 
 	/**
@@ -1856,6 +1881,9 @@ class Model_PDF extends Helper_Abstract_Model {
 			$args['settings']['first_footer'] = $this->misc->fix_header_footer( $args['settings']['first_footer'] );
 		}
 
-		return $args;
+		/**
+		 * @since 4.2
+		 */
+		return apply_filters( 'gfpdf_preprocess_template_arguments', $args );
 	}
 }

@@ -141,6 +141,10 @@ class Helper_Field_Container {
 		if ( isset( $config['skip_fields'] ) ) {
 			$this->skip_fields = $config['skip_fields'];
 		}
+
+		$this->open_tag    = apply_filters( 'gfpdf_container_open_tag', $this->open_tag );
+		$this->close_tag   = apply_filters( 'gfpdf_container_close_tag', $this->close_tag );
+		$this->skip_fields = apply_filters( 'gfpdf_container_skip_fields', $this->skip_fields );
 	}
 
 
