@@ -6,7 +6,6 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Abstract_Fields;
 
-use GFFormsModel;
 use GF_Field_MultiSelect;
 use GFCommon;
 
@@ -86,7 +85,7 @@ class Field_Multiselect extends Helper_Abstract_Fields {
 	public function form_data() {
 
 		$value = $this->value();
-		$label = GFFormsModel::get_label( $this->field );
+		$label = $this->get_label();
 		$data  = [];
 
 		/* Backwards compatibility support for v3 */

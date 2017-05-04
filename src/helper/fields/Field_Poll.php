@@ -6,8 +6,6 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Abstract_Fields;
 
-use GFFormsModel;
-
 use Exception;
 
 /**
@@ -113,7 +111,7 @@ class Field_Poll extends Helper_Abstract_Fields {
 		$data     = [];
 		$value    = $this->value();
 		$field_id = (int) $this->field->id;
-		$label    = GFFormsModel::get_label( $this->field );
+		$label    = $this->get_label();
 
 		if ( isset( $value[0] ) ) {
 

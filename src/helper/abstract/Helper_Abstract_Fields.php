@@ -229,6 +229,17 @@ abstract class Helper_Abstract_Fields {
 	}
 
 	/**
+	 * Return the current field label
+	 *
+	 * @return string
+	 *
+	 * @since 4.2
+	 */
+	final public function get_label() {
+		return apply_filters( 'gfpdf_field_label', $this->field->label, $this->field, $this->entry );
+	}
+
+	/**
 	 * Used to check if the current field has a value
 	 *
 	 * @since    4.0
@@ -259,7 +270,7 @@ abstract class Helper_Abstract_Fields {
 	public function form_data() {
 
 		$value    = $this->value();
-		$label    = GFFormsModel::get_label( $this->field );
+		$label    = $this->get_label();
 		$field_id = (int) $this->field->id;
 		$data     = [];
 
@@ -290,7 +301,7 @@ abstract class Helper_Abstract_Fields {
 		$value = $this->encode_tags( $value, $this->field->type ); /* Prevent shortcodes and merge tags being processed from user input */
 		$value = apply_filters( 'gfpdf_field_content', $value, $this->field, GFFormsModel::get_lead_field_value( $this->entry, $this->field ), $this->entry['id'], $this->form['id'] ); /* Backwards compat */
 
-		$label = esc_html( GFFormsModel::get_label( $this->field ) );
+		$label = esc_html( $this->get_label() );
 
 		$type = ( ! empty( $this->field->inputType ) ) ? $this->field->inputType : $this->field->type;
 

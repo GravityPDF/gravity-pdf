@@ -6,8 +6,6 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Abstract_Fields;
 
-use GFFormsModel;
-
 use Exception;
 
 /**
@@ -160,7 +158,7 @@ class Field_Survey extends Helper_Abstract_Fields {
 				}
 
 				$value = [ $value ];
-				$label = GFFormsModel::get_label( $this->field );
+				$label = $this->get_label();
 
 				/* Gravity PDF v3 backwards compatibility. Check if nothing is selected and return blank */
 				if ( 0 === sizeof( array_filter( $value[0] ) ) ) {
