@@ -301,9 +301,14 @@ abstract class Helper_Abstract_Fields {
 		$value = $this->encode_tags( $value, $this->field->type ); /* Prevent shortcodes and merge tags being processed from user input */
 		$value = apply_filters( 'gfpdf_field_content', $value, $this->field, GFFormsModel::get_lead_field_value( $this->entry, $this->field ), $this->entry['id'], $this->form['id'] ); /* Backwards compat */
 
-		$label = esc_html( $this->get_label() );
+		/**
+		 * @since 4.2
+		 */
+		$value = apply_filters( 'gfpdf_pdf_field_content', $value, $this->field, $this->entry, $this->form );
+		$value = apply_filters( 'gfpdf_pdf_field_content_' . $this->field->get_input_type(), $value, $this->field, $this->entry, $this->form );
 
-		$type = ( ! empty( $this->field->inputType ) ) ? $this->field->inputType : $this->field->type;
+		$label = esc_html( $this->get_label() );
+		$type  = $this->field->get_input_type();
 
 		$html = '<div id="field-' . $this->field->id . '" class="gfpdf-' . $type . ' gfpdf-field ' . $this->field->cssClass . '">
 					<div class="inner-container">';
