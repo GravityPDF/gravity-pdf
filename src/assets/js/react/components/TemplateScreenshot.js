@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react'
 
 /**
@@ -45,7 +46,7 @@ const TemplateScreenshot = ({ image }) => {
 }
 
 TemplateScreenshot.propTypes = {
-  image: React.PropTypes.string
+  image: PropTypes.string
 }
 
 export default TemplateScreenshot

@@ -4,7 +4,7 @@ import configureStore from 'redux-mock-store'
 import { Provider } from 'react-redux'
 const mockStore = configureStore()
 
-import DeleteButton from '../../../../src/assets/js/react/components/TemplateDeleteButton'
+import { TemplateDeleteButton as DeleteButton } from '../../../../src/assets/js/react/components/TemplateDeleteButton'
 
 describe('<DeleteButton />', () => {
 

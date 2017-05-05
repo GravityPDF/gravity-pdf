@@ -1,9 +1,7 @@
 var webpack = require("webpack")
 
 var webpackConfig = require('./webpack.config.js')
-webpackConfig.entry = {}
 webpackConfig.devtool = 'inline-source-map'
-webpackConfig.webpackMiddleware = { noInfo: true }
 webpackConfig.externals = {
   'react/addons': true,
   'react/lib/ExecutionEnvironment': true,
@@ -43,10 +41,6 @@ module.exports = function (config) {
     reporters: [ 'dots' ],
 
     webpack: webpackConfig,
-
-    webpackMiddleware: {
-      noInfo: true,
-    },
 
     // web server port
     port: 9876,

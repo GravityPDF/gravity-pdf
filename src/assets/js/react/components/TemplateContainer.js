@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react'
 import TemplateCloseDialog from './TemplateCloseDialog'
 
@@ -35,17 +36,16 @@ import TemplateCloseDialog from './TemplateCloseDialog'
  *
  * @since 4.1
  */
-const Container = React.createClass({
-
+class Container extends React.Component {
   /**
    * @since 4.1
    */
-  propTypes: {
-    header: React.PropTypes.oneOfType([ React.PropTypes.string, React.PropTypes.element ]),
-    footer: React.PropTypes.oneOfType([ React.PropTypes.string, React.PropTypes.element ]),
-    children: React.PropTypes.node.isRequired,
-    closeRoute: React.PropTypes.string,
-  },
+  static propTypes = {
+    header: PropTypes.oneOfType([ PropTypes.string, PropTypes.element ]),
+    footer: PropTypes.oneOfType([ PropTypes.string, PropTypes.element ]),
+    children: PropTypes.node.isRequired,
+    closeRoute: PropTypes.string,
+  };
 
   /**
    * On mount, add focus event to document option on mount
@@ -61,7 +61,7 @@ const Container = React.createClass({
     if (document.activeElement && document.activeElement.className !== 'wp-filter-search') {
       this.container.focus()
     }
-  },
+  }
 
   /**
    * Cleanup our document event listeners
@@ -70,7 +70,7 @@ const Container = React.createClass({
    */
   componentWillUnmount() {
     document.removeEventListener('focus', this.handleFocus, true)
-  },
+  }
 
   /**
    * When a focus event is fired and it's not apart of any DOM elements in our
@@ -81,12 +81,12 @@ const Container = React.createClass({
    *
    * @since 4.1
    */
-  handleFocus(e) {
+  handleFocus = (e) => {
     if (!this.container.contains(e.target)) {
       e.stopPropagation()
       this.container.focus()
     }
-  },
+  };
 
   /**
    * @since 4.1
@@ -117,6 +117,6 @@ const Container = React.createClass({
       </div>
     )
   }
-})
+}
 
 export default Container

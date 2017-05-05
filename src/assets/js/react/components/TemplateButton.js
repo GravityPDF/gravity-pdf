@@ -1,5 +1,5 @@
+import PropTypes from 'prop-types';
 import React from 'react'
-import { hashHistory } from 'react-router'
 
 /**
  * Render the button used to option our Fancy PDF template selector
@@ -35,14 +35,13 @@ import { hashHistory } from 'react-router'
  *
  * @since 4.1
  */
-const TemplateButton = React.createClass({
-
+class TemplateButton extends React.Component {
   /**
    * @since 4.1
    */
-  propTypes: {
-    buttonText: React.PropTypes.string,
-  },
+  static propTypes = {
+    buttonText: PropTypes.string,
+  };
 
   /**
    * When the button is clicked we'll display the `/template` route
@@ -51,12 +50,12 @@ const TemplateButton = React.createClass({
    *
    * @since 4.1
    */
-  handleClick(e) {
+  handleClick = (e) => {
     e.preventDefault()
     e.stopPropagation()
 
-    hashHistory.push('/template')
-  },
+    this.props.history.push('/template')
+  };
 
   /**
    * @since 4.1
@@ -74,6 +73,6 @@ const TemplateButton = React.createClass({
       </button>
     )
   }
-})
+}
 
 export default TemplateButton

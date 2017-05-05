@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react'
 import ReactDropzone from 'react-dropzone'
 
@@ -36,30 +37,27 @@ import ReactDropzone from 'react-dropzone'
  *
  * @since 4.1
  */
-const Dropzone = React.createClass({
+class Dropzone extends React.Component {
+  /**
+   * @since 4.1
+   */
+  static propTypes = {
+    children: PropTypes.node.isRequired,
+    onDrop: PropTypes.func.isRequired,
+    multiple: PropTypes.bool,
+    className: PropTypes.string,
+    activeClassName: PropTypes.string
+  };
 
   /**
    * @since 4.1
    */
-  propTypes: {
-    children: React.PropTypes.node.isRequired,
-    onDrop: React.PropTypes.func.isRequired,
-    multiple: React.PropTypes.bool,
-    className: React.PropTypes.string,
-    activeClassName: React.PropTypes.string
-  },
-
-  /**
-   * @since 4.1
-   */
-  getDefaultProps() {
-    return {
-      multiple: false,
-      maxSize: Infinity,
-      className: 'gfpdf-dropzone',
-      activeClassName: 'gfpdf-dropzone-active'
-    }
-  },
+  static defaultProps = {
+    multiple: false,
+    maxSize: Infinity,
+    className: 'gfpdf-dropzone',
+    activeClassName: 'gfpdf-dropzone-active'
+  };
 
   /**
    * @since 4.1
@@ -75,7 +73,7 @@ const Dropzone = React.createClass({
         {this.props.children}
       </ReactDropzone>
     )
-  },
-})
+  }
+}
 
 export default Dropzone

@@ -1,6 +1,7 @@
+import PropTypes from 'prop-types';
 import React from 'react'
 import { connect } from 'react-redux'
-import { hashHistory } from 'react-router'
+import { withRouter } from 'react-router-dom'
 import { List } from 'immutable'
 
 /**
@@ -38,20 +39,19 @@ import { List } from 'immutable'
  *
  * @since 4.1
  */
-export const TemplateHeaderNavigation = React.createClass({
-
+export class TemplateHeaderNavigation extends React.Component {
   /**
    * @since 4.1
    */
-  propTypes: {
-    templates: React.PropTypes.object.isRequired,
-    templateIndex: React.PropTypes.number.isRequired,
-    isFirst: React.PropTypes.bool,
-    isLast: React.PropTypes.bool,
+  static propTypes = {
+    templates: PropTypes.object.isRequired,
+    templateIndex: PropTypes.number.isRequired,
+    isFirst: PropTypes.bool,
+    isLast: PropTypes.bool,
 
-    showPreviousTemplateText: React.PropTypes.string,
-    showNextTemplateText: React.PropTypes.string
-  },
+    showPreviousTemplateText: PropTypes.string,
+    showNextTemplateText: PropTypes.string
+  };
 
   /**
    * Add window event listeners
@@ -60,7 +60,7 @@ export const TemplateHeaderNavigation = React.createClass({
    */
   componentDidMount() {
     window.addEventListener('keydown', this.handleKeyPress, false)
-  },
+  }
 
   /**
    * Cleanup window event listeners
@@ -69,7 +69,7 @@ export const TemplateHeaderNavigation = React.createClass({
    */
   componentWillUnmount() {
     window.removeEventListener('keydown', this.handleKeyPress, false)
-  },
+  }
 
   /**
    * Attempt to get the previous template in our Immutable list and update the URL
@@ -78,16 +78,16 @@ export const TemplateHeaderNavigation = React.createClass({
    *
    * @since 4.1
    */
-  previousTemplate(e) {
+  previousTemplate = (e) => {
     e.preventDefault()
     e.stopPropagation()
 
     const prevId = this.props.templates.get(this.props.templateIndex - 1).get('id')
 
     if (prevId) {
-      hashHistory.push('template/' + prevId)
+      this.props.history.push('/template/' + prevId)
     }
-  },
+  };
 
   /**
    * Attempt to get the next template in our Immutable list and update the URL
@@ -96,16 +96,16 @@ export const TemplateHeaderNavigation = React.createClass({
    *
    * @since 4.1
    */
-  nextTemplate(e) {
+  nextTemplate = (e) => {
     e.preventDefault()
     e.stopPropagation()
 
     const nextId = this.props.templates.get(this.props.templateIndex + 1).get('id')
 
     if (nextId) {
-      hashHistory.push('template/' + nextId)
+      this.props.history.push('/template/' + nextId)
     }
-  },
+  };
 
   /**
    * Checks if the Left or Right arrow keys are pressed and fires appropriate functions
@@ -114,7 +114,7 @@ export const TemplateHeaderNavigation = React.createClass({
    *
    * @since 4.1
    */
-  handleKeyPress(e) {
+  handleKeyPress = (e) => {
     /* Left Arrow */
     if (!this.props.isFirst && e.keyCode === 37) {
       this.previousTemplate(e)
@@ -124,7 +124,7 @@ export const TemplateHeaderNavigation = React.createClass({
     if (!this.props.isLast && e.keyCode === 39) {
       this.nextTemplate(e)
     }
-  },
+  };
 
   /**
    * @since 4.1
@@ -176,7 +176,7 @@ export const TemplateHeaderNavigation = React.createClass({
       </span>
     )
   }
-})
+}
 
 /**
  * Map state to props
@@ -206,5 +206,5 @@ const MapStateToProps = (state, props) => {
  *
  * @since 4.1
  */
-export default connect(MapStateToProps)(TemplateHeaderNavigation)
+export default withRouter(connect(MapStateToProps)(TemplateHeaderNavigation))
 

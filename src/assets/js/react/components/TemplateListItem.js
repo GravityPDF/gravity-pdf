@@ -1,6 +1,7 @@
+import PropTypes from 'prop-types';
 import React from 'react'
 import { connect } from 'react-redux'
-import { hashHistory } from 'react-router'
+import { withRouter } from 'react-router-dom'
 import { updateTemplateParam } from '../actions/templates'
 
 import TemplateScreenshot from './TemplateScreenshot'
@@ -48,20 +49,19 @@ import TemplateActivateButton from './TemplateActivateButton'
  *
  * @since 4.1
  */
-export const TemplateListItem = React.createClass({
-
+export class TemplateListItem extends React.Component {
   /**
    * @since 4.1
    */
-  propTypes: {
-    template: React.PropTypes.object,
+  static propTypes = {
+    template: PropTypes.object,
 
-    activeTemplate: React.PropTypes.string,
-    updateTemplateParam: React.PropTypes.func,
+    activeTemplate: PropTypes.string,
+    updateTemplateParam: PropTypes.func,
 
-    activateText: React.PropTypes.string,
-    templateDetailsText: React.PropTypes.string,
-  },
+    activateText: PropTypes.string,
+    templateDetailsText: PropTypes.string,
+  };
 
   /**
    * Check if the Enter key is pressed and not focused on a button
@@ -71,30 +71,30 @@ export const TemplateListItem = React.createClass({
    *
    * @since 4.1
    */
-  maybeShowDetailedTemplate(e) {
+  maybeShowDetailedTemplate = (e) => {
     /* Show detailed template when the Enter key is pressed and the active element doesn't include a 'button' class */
     if (e.keyCode === 13 && (e.target.className.indexOf('button') === -1)) {
       this.showDetailedTemplate()
     }
-  },
+  };
 
   /**
    * Update the URL to show the PDF template details page
    *
    * @since 4.1
    */
-  showDetailedTemplate() {
-    hashHistory.push('/template/' + this.props.template.get('id'))
-  },
+  showDetailedTemplate = () => {
+    this.props.history.push('/template/' + this.props.template.get('id'))
+  };
 
   /**
    * Call Redux action to remove any stored messages for this template
    *
    * @since 4.1
    */
-  removeMessage() {
+  removeMessage = () => {
     this.props.updateTemplateParam(this.props.template.get('id'), 'message', null)
-  },
+  };
 
   /**
    * @since 4.1
@@ -128,7 +128,7 @@ export const TemplateListItem = React.createClass({
         </div>
     )
   }
-})
+}
 
 /**
  * Map state to props
@@ -167,4 +167,4 @@ const mapDispatchToProps = (dispatch) => {
  *
  * @since 4.1
  */
-export default connect(mapStateToProps, mapDispatchToProps)(TemplateListItem)
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(TemplateListItem))

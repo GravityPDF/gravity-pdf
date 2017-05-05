@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react'
 
 /**
@@ -45,8 +46,8 @@ export const CurrentTemplate = ({ isCurrentTemplate, label }) => {
 }
 
 CurrentTemplate.propTypes = {
-  isCurrentTemplate: React.PropTypes.bool,
-  label: React.PropTypes.string
+  isCurrentTemplate: PropTypes.bool,
+  label: PropTypes.string
 }
 
 /**
@@ -65,9 +66,9 @@ export const Name = ({ name, version, versionLabel }) => (
 )
 
 Name.propTypes = {
-  name: React.PropTypes.string,
-  version: React.PropTypes.string,
-  versionLabel: React.PropTypes.string
+  name: PropTypes.string,
+  version: PropTypes.string,
+  versionLabel: PropTypes.string
 }
 
 /**
@@ -86,8 +87,8 @@ export const Version = ({ label, version }) => {
 }
 
 Version.propTypes = {
-  label: React.PropTypes.string,
-  version: React.PropTypes.string
+  label: PropTypes.string,
+  version: PropTypes.string
 }
 
 /**
@@ -117,8 +118,8 @@ export const Author = ({ author, uri }) => {
 }
 
 Author.propTypes = {
-  author: React.PropTypes.string,
-  uri: React.PropTypes.string
+  author: PropTypes.string,
+  uri: PropTypes.string
 }
 
 /**
@@ -135,8 +136,8 @@ export const Group = ({ label, group }) => (
 )
 
 Group.propTypes = {
-  label: React.PropTypes.string,
-  group: React.PropTypes.string,
+  label: PropTypes.string,
+  group: PropTypes.string,
 }
 
 /**
@@ -153,7 +154,7 @@ export const Description = ({ desc }) => (
 )
 
 Description.propTypes = {
-  desc: React.PropTypes.string,
+  desc: PropTypes.string,
 }
 
 /**
@@ -174,6 +175,6 @@ export const Tags = ({ label, tags }) => {
 }
 
 Tags.propTypes = {
-  label: React.PropTypes.string,
-  tags: React.PropTypes.string,
+  label: PropTypes.string,
+  tags: PropTypes.string,
 }

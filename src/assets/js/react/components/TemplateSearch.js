@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react'
 import { connect } from 'react-redux'
 import debounce from 'lodash.debounce'
@@ -38,15 +39,14 @@ import { searchTemplates } from '../actions/templates'
  *
  * @since 4.1
  */
-export const TemplateSearch = React.createClass({
-
+export class TemplateSearch extends React.Component {
   /**
    * @since 4.1
    */
-  propTypes: {
-    onSearch: React.PropTypes.func,
-    search: React.PropTypes.string
-  },
+  static propTypes = {
+    onSearch: PropTypes.func,
+    search: PropTypes.string
+  };
 
   /**
    * Debounce our runSearch function so it can only be run once every 200 milliseconds
@@ -55,7 +55,7 @@ export const TemplateSearch = React.createClass({
    */
   componentWillMount() {
     this.runSearch = debounce(this.runSearch, 200)
-  },
+  }
 
   /**
    * On mount, add focus to the search box
@@ -65,7 +65,7 @@ export const TemplateSearch = React.createClass({
   componentDidMount() {
     /* add focus to element */
     this.input.focus()
-  },
+  }
 
   /**
    * Handles our search event
@@ -77,10 +77,10 @@ export const TemplateSearch = React.createClass({
    *
    * @since 4.1
    */
-  handleSearch(e) {
+  handleSearch = (e) => {
     e.persist()
     this.runSearch(e)
-  },
+  };
 
   /**
    * Update our Redux store with the search value
@@ -89,9 +89,9 @@ export const TemplateSearch = React.createClass({
    *
    * @since 4.1
    */
-  runSearch(e) {
+  runSearch = (e) => {
     this.props.onSearch(e.target.value || '')
-  },
+  };
 
   /**
    * @since 4.1
@@ -113,7 +113,7 @@ export const TemplateSearch = React.createClass({
       </div>
     )
   }
-})
+}
 
 /**
  * Map state to props

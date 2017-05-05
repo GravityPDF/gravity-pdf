@@ -28,7 +28,7 @@ before_script:
   - if find . -name "*.php" -exec php -l {} \; | grep "unexpected $end"; then exit 1; fi
   - composer install --prefer-source --optimize-autoloader --no-scripts
   - bash tests/bin/install.sh gravitypdf_test root '' localhost $WP_VERSION
-  - if [[ $WP_MULTISITE = 1 ]]; then nvm install 4.5 && npm install -g karma-cli && npm install; fi
+  - if [[ $WP_MULTISITE = 1 ]]; then nvm install 6.10 && npm install -g karma-cli && npm install; fi
 
 script:
  - if [[ $WP_MULTISITE = 1 ]]; then npm run test; fi

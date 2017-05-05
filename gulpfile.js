@@ -29,13 +29,11 @@ gulp.task('compress', function () {
 /* Generate the latest language files */
 gulp.task('language', function () {
   return gulp.src('**/*.php')
-    .pipe(sort())
     .pipe(wpPot({
       domain: 'gravity-forms-pdf-extended',
-      destFile: 'gravity-forms-pdf-extended.pot',
-      package: 'gravity-forms-pdf-extended'
+      package: 'Gravity PDF'
     }))
-    .pipe(gulp.dest('src/assets/languages'))
+    .pipe(gulp.dest('src/assets/languages/gravity-forms-pdf-extended.pot'))
 })
 
 gulp.task('watch', function () {

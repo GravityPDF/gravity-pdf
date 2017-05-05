@@ -1,4 +1,5 @@
 import $ from 'jquery'
+import Promise from 'promise-polyfill'
 import templateBootstrap from './bootstrap/templateBootstrap'
 
 /**
@@ -44,6 +45,11 @@ $(function () {
 
   /* Initialise the Fancy Template Picker */
   if (GFPDF.templateList !== undefined) {
+
+    // To add to window
+    if (!window.Promise) {
+      window.Promise = Promise;
+    }
 
     /* Check if we should show the Fancy Template Picker */
     var templateId = '#gfpdf_settings\\[template\\], #gfpdf_settings\\[default_template\\]'
