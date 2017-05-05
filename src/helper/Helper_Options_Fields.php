@@ -171,6 +171,19 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'std'     => 'View',
 						'tooltip' => '<h6>' . esc_html__( 'Entry View', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Choose to view the PDF in your web browser or download the document to your computer.', 'gravity-forms-pdf-extended' ),
 					],
+
+					'shortcode_debug_messages' => [
+						'id'      => 'shortcode_debug_messages',
+						'name'    => esc_html__( 'Shortcode Debug Message', 'gravity-forms-pdf-extended' ),
+						'type'    => 'radio',
+						'options' => [
+							'Yes' => esc_html__( 'Enable', 'gravity-forms-pdf-extended' ),
+							'No'  => esc_html__( 'Disable', 'gravity-forms-pdf-extended' ),
+						],
+						'std'     => 'No',
+						'desc'    => esc_html__( 'When enabled, an error message is displayed to admins in place of a Gravity PDF shortcode.' ),
+						'tooltip' => '<h6>' . esc_html__( 'Shortcode Debug Message', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'Users with the %sgravityforms_view_entries%s capability (the Administrator Role by default) will be shown debug messages when the [gravitypdf] shortcode cannot be generated. When disabled, no content is shown during an error.' ), '<code>', '</code>' ),
+					],
 				]
 			),
 

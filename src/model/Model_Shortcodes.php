@@ -126,8 +126,11 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 
 		$this->log->addNotice( 'Generating Shortcode' );
 
-		$controller           = $this->getController();
-		$has_view_permissions = $this->gform->has_capability( 'gravityforms_view_entries' );
+		$controller      = $this->getController();
+
+		$global_settings                  = $this->options->get_settings();
+		$shortcode_error_messages_enabled = ( isset( $global_settings['shortcode_debug_messages'] ) && $global_settings['shortcode_debug_messages'] === 'Yes' ) ? true : false;
+		$has_view_permissions             = ( $shortcode_error_messages_enabled && $this->gform->has_capability( 'gravityforms_view_entries' ) );
 
 		/* merge in any missing defaults */
 		$attributes = shortcode_atts( [
