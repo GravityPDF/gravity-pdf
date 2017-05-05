@@ -89,6 +89,11 @@ class Test_Shortcode extends WP_UnitTestCase {
 
 		$this->controller = new Controller_Shortcodes( $this->model, $this->view, $gfpdf->log );
 		$this->controller->init();
+
+		$options                              = $gfpdf->options;
+		$settings                             = $options->get_settings();
+		$settings['shortcode_debug_messages'] = 'Yes';
+		$options->update_settings( $settings );
 	}
 
 	/**
@@ -186,6 +191,15 @@ class Test_Shortcode extends WP_UnitTestCase {
 
 		$_GET['lid'] = '5000';
 		$this->assertNotFalse( strpos( $this->model->gravitypdf( [ 'id' => '556690c67856b' ] ), '<pre class="gravitypdf-error">' ) );
+
+		/* Test we get no error when they are disabled globally */
+		global $gfpdf;
+		$options                              = $gfpdf->options;
+		$settings                             = $options->get_settings();
+		$settings['shortcode_debug_messages'] = 'No';
+		$options->update_settings( $settings );
+
+		$this->assertFalse( strpos( $this->model->gravitypdf( [ 'id' => '556690c67856b' ] ), '<pre class="gravitypdf-error">' ) );
 
 		wp_set_current_user( 0 );
 	}
@@ -405,6 +419,7 @@ class Test_Shortcode extends WP_UnitTestCase {
 	public function test_display_gravitypdf_shortcode() {
 		$this->assertNotFalse( strpos( $this->view->display_gravitypdf_shortcode( [
 			'url'     => '',
+			'type'    => '',
 			'class'   => '',
 			'classes' => '',
 			'text'    => '',
