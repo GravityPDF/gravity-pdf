@@ -406,22 +406,22 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		$shortcodes = [];
 
 		if ( has_shortcode( $text, $shortcode ) ) {
-
 			/* our shortcode exists so parse the shortcode data and return an easy-to-use array */
-			$pattern = get_shortcode_regex();
-			preg_match_all( "/$pattern/s", $text, $matches );
+			preg_match_all( '/' . get_shortcode_regex( [ $shortcode ] ) . '/', $text, $matches, PREG_SET_ORDER );
 
-			if ( ! empty( $matches ) && isset( $matches[2] ) ) {
-				foreach ( $matches[2] as $key => $code ) {
-					if ( $code == $shortcode ) {
-						$attr = shortcode_parse_atts( $matches[3][ $key ] );
+			if ( empty( $matches ) ) {
+				return $shortcodes;
+			}
 
-						$shortcodes[] = [
-							'shortcode' => $matches[0][ $key ],
-							'attr_raw'  => $matches[3][ $key ],
-							'attr'      => ( is_array( $attr ) ) ? $attr : [],
-						];
-					}
+			foreach ( $matches as $item ) {
+				if ( $shortcode === $item[2] ) {
+					$attr = shortcode_parse_atts( $item[3] );
+
+					$shortcodes[] = [
+						'shortcode' => $item[0],
+						'attr_raw'  => $item[3],
+						'attr'      => ( is_array( $attr ) ) ? $attr : [],
+					];
 				}
 			}
 		}
