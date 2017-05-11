@@ -298,8 +298,20 @@ abstract class Helper_Abstract_Fields {
 	 */
 	public function html( $value = '', $show_label = true ) {
 
-		$value = $this->encode_tags( $value, $this->field->type ); /* Prevent shortcodes and merge tags being processed from user input */
-		$value = apply_filters( 'gfpdf_field_content', $value, $this->field, GFFormsModel::get_lead_field_value( $this->entry, $this->field ), $this->entry['id'], $this->form['id'] ); /* Backwards compat */
+		/*
+		 * Prevent shortcodes and merge tags being processed from user input fields
+		 * We'll allow them in administrative fields (not hidden fields) and HTML and Section fields
+		 *
+		 * @since 4.2 Skipping Administrative fields was added
+		 */
+		$skip_fields = apply_filters( 'gfpdf_skip_encode_mergetags_on_fields', [ 'html', 'section' ], $this->field, $this->entry, $this->form );
+		if ( ( empty( $this->field->visibility ) || $this->field->visibility !== 'administrative' ) &&
+		     ! in_array( $this->field->type, $skip_fields ) ) {
+			$value = $this->encode_tags( $value );
+		}
+
+		/* Backwards compat */
+		$value = apply_filters( 'gfpdf_field_content', $value, $this->field, GFFormsModel::get_lead_field_value( $this->entry, $this->field ), $this->entry['id'], $this->form['id'] );
 
 		/**
 		 * @since 4.2
@@ -342,23 +354,15 @@ abstract class Helper_Abstract_Fields {
 	 * Prevent user-data shortcodes from being processed by the PDF templates
 	 *
 	 * @param  string $value The text to be converted
-	 * @param  string $type  The field type
 	 *
 	 * @return string
 	 *
 	 * @since 4.0
 	 */
-	public function encode_tags( $value, $type ) {
+	public function encode_tags( $value ) {
+		$find      = [ '[', ']', '{', '}' ];
+		$converted = [ '&#91;', '&#93;', '&#123;', '&#125;' ];
 
-		$skip_fields = [ 'html', 'signature', 'section' ];
-
-		if ( ! in_array( $type, $skip_fields ) ) {
-
-			$find      = [ '[', ']', '{', '}' ];
-			$converted = [ '&#91;', '&#93;', '&#123;', '&#125;' ];
-			$value     = str_replace( $find, $converted, $value );
-		}
-
-		return $value;
+		return str_replace( $find, $converted, $value );
 	}
 }
