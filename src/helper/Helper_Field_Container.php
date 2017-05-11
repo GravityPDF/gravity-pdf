@@ -114,6 +114,17 @@ class Helper_Field_Container {
 	];
 
 	/**
+	 * Classes which will automatically begin a new row
+	 *
+	 * @var array
+	 *
+	 * @since 4.2
+	 */
+	private $row_stopper_classes = [
+		'pagebreak',
+	];
+
+	/**
 	 * Holds the number of times a new row has been open
 	 *
 	 * @var int
@@ -142,9 +153,14 @@ class Helper_Field_Container {
 			$this->skip_fields = $config['skip_fields'];
 		}
 
-		$this->open_tag    = apply_filters( 'gfpdf_container_open_tag', $this->open_tag );
-		$this->close_tag   = apply_filters( 'gfpdf_container_close_tag', $this->close_tag );
-		$this->skip_fields = apply_filters( 'gfpdf_container_skip_fields', $this->skip_fields );
+		if ( isset( $config['row_stopper_classes'] ) ) {
+			$this->row_stopper_classes = $config['row_stopper_classes'];
+		}
+
+		$this->open_tag            = apply_filters( 'gfpdf_container_open_tag', $this->open_tag );
+		$this->close_tag           = apply_filters( 'gfpdf_container_close_tag', $this->close_tag );
+		$this->skip_fields         = apply_filters( 'gfpdf_container_skip_fields', $this->skip_fields );
+		$this->row_stopper_classes = apply_filters( 'gfpdf_container_row_stopper_classes', $this->row_stopper_classes );
 	}
 
 
@@ -258,7 +274,7 @@ class Helper_Field_Container {
 	private function handle_open_container( GF_Field $field ) {
 
 		/* if the current field width is more than 100 we will close the container */
-		if ( false === $this->does_fit_in_row( $field ) ) {
+		if ( false === $this->does_fit_in_row( $field ) || $this->does_field_have_stopper_class( $field ) ) {
 			$this->close();
 		} else {
 			$this->increment_width( $field->cssClass );
@@ -371,7 +387,7 @@ class Helper_Field_Container {
 	 * @since  4.0
 	 */
 	private function get_field_width( $classes ) {
-		$classes = explode( ' ', $classes );
+		$classes = $this->get_field_classes( $classes );
 
 		foreach ( $classes as $class ) {
 			if ( isset ( $this->class_map[ $class ] ) ) {
@@ -405,5 +421,39 @@ class Helper_Field_Container {
 	 */
 	private function increment_row_counter() {
 		$this->counter++;
+	}
+
+	/**
+	 * Get a list of classes assigned to the field
+	 *
+	 * @param string $classes
+	 *
+	 * @return array
+	 *
+	 * @since 4.2
+	 */
+	private function get_field_classes( $classes ) {
+		return array_filter( explode( ' ', $classes ) );
+	}
+
+	/**
+	 * Check if the field has a row stopping class
+	 *
+	 * @param GF_Field $field
+	 *
+	 * @return bool
+	 *
+	 * @since 4.2
+	 */
+	private function does_field_have_stopper_class( GF_Field $field ) {
+		$field_classes = array_flip( $this->get_field_classes( $field->cssClass ) );
+
+		foreach( $this->row_stopper_classes as $class ) {
+			if ( isset( $field_classes[ $class ] ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
