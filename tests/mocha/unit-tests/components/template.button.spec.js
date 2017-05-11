@@ -1,17 +1,19 @@
 import React from 'react'
 import { shallow, mount } from 'enzyme'
-import { hashHistory } from 'react-router'
+import createHistory from 'history/createHashHistory';
 
 import TemplateButton from '../../../../src/assets/js/react/components/TemplateButton'
 
 describe('<TemplateButton />', () => {
 
-  before(function () {
-    hashHistory.push('/')
+  let History = createHistory()
+
+  beforeEach(function () {
+    History.push('/')
   })
 
   it('a button should be displayed', () => {
-    const comp = shallow(<TemplateButton />)
+    const comp = shallow(<TemplateButton history={History} />)
     const button = comp.find('button')
 
     expect(button).to.have.length(1)
@@ -19,7 +21,7 @@ describe('<TemplateButton />', () => {
   })
 
   it('url should be updated when button clicked', () => {
-    const comp = mount(<TemplateButton />)
+    const comp = mount(<TemplateButton history={History} />)
 
     /* Append our button to the DOM and manually add focus so we can test our click event */
     document.body.appendChild(comp.find('button').at(0).node)

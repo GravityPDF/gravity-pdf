@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react'
 import { connect } from 'react-redux'
 
@@ -52,24 +53,41 @@ import {
  *
  * @since 4.1
  */
-export const TemplateSingle = React.createClass({
+export class TemplateSingle extends React.Component {
+  /**
+   * @since 4.1
+   */
+  static propTypes = {
+    route: PropTypes.object,
+
+    template: PropTypes.object,
+    activeTemplate: PropTypes.string,
+    templateIndex: PropTypes.number,
+    templates: PropTypes.object,
+  };
+
+  /**
+   * Ensure the component doesn't try and re-render when a template isn't found
+   *
+   * @param nextProps
+   * @param nextState
+   *
+   * @Internal This problem seems to be prevelant due to a race condition when deleting a template and updating the URL
+   *
+   * @since 4.2
+   */
+  shouldComponentUpdate (nextProps, nextState) {
+    if (nextProps.template == null) {
+      return false
+    }
+
+    return true
+  };
 
   /**
    * @since 4.1
    */
-  propTypes: {
-    route: React.PropTypes.object,
-
-    template: React.PropTypes.object,
-    activeTemplate: React.PropTypes.string,
-    templateIndex: React.PropTypes.number,
-    templates: React.PropTypes.object,
-  },
-
-  /**
-   * @since 4.1
-   */
-  render() {
+  render () {
     const item = this.props.template
     const isCurrentTemplate = this.props.activeTemplate === item.get('id')
 
@@ -78,21 +96,21 @@ export const TemplateSingle = React.createClass({
       template={item}
       templateIndex={this.props.templateIndex}
       templates={this.props.templates}
-      showPreviousTemplateText={this.props.route.showPreviousTemplateText}
-      showNextTemplateText={this.props.route.showNextTemplateText}/>
+      showPreviousTemplateText={this.props.showPreviousTemplateText}
+      showNextTemplateText={this.props.showNextTemplateText}/>
 
     const footer = <TemplateFooterActions
       template={item}
       isActiveTemplate={isCurrentTemplate}
 
-      ajaxUrl={this.props.route.ajaxUrl}
-      ajaxNonce={this.props.route.ajaxNonce}
+      ajaxUrl={this.props.ajaxUrl}
+      ajaxNonce={this.props.ajaxNonce}
 
-      activateText={this.props.route.activateText}
-      pdfWorkingDirPath={this.props.route.pdfWorkingDirPath}
-      templateDeleteText={this.props.route.templateDeleteText}
-      templateConfirmDeleteText={this.props.route.templateConfirmDeleteText}
-      templateDeleteErrorText={this.props.route.templateDeleteErrorText}
+      activateText={this.props.activateText}
+      pdfWorkingDirPath={this.props.pdfWorkingDirPath}
+      templateDeleteText={this.props.templateDeleteText}
+      templateConfirmDeleteText={this.props.templateConfirmDeleteText}
+      templateDeleteErrorText={this.props.templateDeleteErrorText}
     />
 
     /* Display our Single Template container */
@@ -102,22 +120,23 @@ export const TemplateSingle = React.createClass({
           <TemplateScreenshots image={item.get('screenshot')}/>
 
           <div className="theme-info">
-            <CurrentTemplate isCurrentTemplate={isCurrentTemplate} label={this.props.route.currentTemplateText}/>
-            <Name name={item.get('template')} version={item.get('version')} versionLabel={this.props.route.versionText}/>
+            <CurrentTemplate isCurrentTemplate={isCurrentTemplate} label={this.props.currentTemplateText}/>
+            <Name name={item.get('template')} version={item.get('version')}
+                  versionLabel={this.props.versionText}/>
             <Author author={item.get('author')} uri={item.get('author uri')}/>
-            <Group group={item.get('group')} label={this.props.route.groupText}/>
+            <Group group={item.get('group')} label={this.props.groupText}/>
 
             {item.get('long_message') ? <ShowMessage text={item.get('long_message')}/> : null}
             {item.get('long_error') ? <ShowMessage text={item.get('long_error')} error={true}/> : null}
 
             <Description desc={item.get('description')}/>
-            <Tags tags={item.get('tags')} label={this.props.route.tagsText}/>
+            <Tags tags={item.get('tags')} label={this.props.tagsText}/>
           </div>
         </div>
       </TemplateContainer>
     )
   }
-})
+}
 
 /**
  * Map state to props
@@ -133,7 +152,7 @@ const MapStateToProps = (state, props) => {
 
   /* found our selected template */
   const templates = getTemplates(state)
-  const id = props.params.id
+  const id = props.match.params.id
 
   const findCurrentTemplate = (item) => {
     return (item.get('id') === id)

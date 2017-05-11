@@ -1,5 +1,6 @@
 import React from 'react'
 import { render } from 'react-dom'
+import { HashRouter as Router, Route } from 'react-router-dom'
 import request from 'superagent'
 
 import { createStore, combineReducers } from 'redux'
@@ -37,7 +38,7 @@ import TemplateButton from '../components/TemplateButton'
  You should have received a copy of the GNU General Public License
  along with this program; if not, write to the Free Software
  Found
-*/
+ */
 
 /**
  * Handles the loading of our Fancy Template Selector
@@ -59,7 +60,9 @@ export default function templateBootstrap ($templateField) {
 
   /* Render our React Component in the DOM */
   render(
-    <TemplateButton store={store} buttonText={GFPDF.advanced}/>,
+    <Router>
+      <Route render={(props) => <TemplateButton {...props} store={store} buttonText={GFPDF.advanced}/>} />
+    </Router>,
     document.getElementById('gpdf-advance-template-selector')
   )
 

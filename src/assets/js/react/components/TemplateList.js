@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react'
 import { connect } from 'react-redux'
 
@@ -43,21 +44,20 @@ import TemplateUploader from './TemplateUploader'
  *
  * @since 4.1
  */
-export const TemplateList = React.createClass({
+export class TemplateList extends React.Component {
+  /**
+   * @since 4.1
+   */
+  static propTypes = {
+    templates: PropTypes.object,
+    route: PropTypes.object
+  };
 
   /**
    * @since 4.1
    */
-  propTypes: {
-    templates: React.PropTypes.object,
-    route: React.PropTypes.object
-  },
-
-  /**
-   * @since 4.1
-   */
-  render() {
-    const header = <TemplateHeaderTitle header={this.props.route.templateHeaderText} />
+  render () {
+    const header = <TemplateHeaderTitle header={this.props.templateHeaderText}/>
 
     return (
       <TemplateContainer header={header} closeRoute="/">
@@ -68,30 +68,29 @@ export const TemplateList = React.createClass({
               return <TemplateListItem
                 key={index}
                 template={value}
-                templateDetailsText={this.props.route.templateDetailsText}
-                activateText={this.props.route.activateText}/>
+                templateDetailsText={this.props.templateDetailsText}
+                activateText={this.props.activateText}/>
             })
           }
 
           <TemplateUploader
-            ajaxUrl={this.props.route.ajaxUrl}
-            ajaxNonce={this.props.route.ajaxNonce}
-            addTemplateText={this.props.route.addTemplateText}
-            genericUploadErrorText={this.props.route.genericUploadErrorText}
-            filenameErrorText={this.props.route.filenameErrorText}
-            filesizeErrorText={this.props.route.filesizeErrorText}
-            installSuccessText={this.props.route.installSuccessText}
-            installUpdatedText={this.props.route.installUpdatedText}
-            templateSuccessfullyInstalledUpdated={this.props.route.templateSuccessfullyInstalledUpdated}
-            templateInstallInstructions={this.props.route.templateInstallInstructions}
+            ajaxUrl={this.props.ajaxUrl}
+            ajaxNonce={this.props.ajaxNonce}
+            addTemplateText={this.props.addTemplateText}
+            genericUploadErrorText={this.props.genericUploadErrorText}
+            filenameErrorText={this.props.filenameErrorText}
+            filesizeErrorText={this.props.filesizeErrorText}
+            installSuccessText={this.props.installSuccessText}
+            installUpdatedText={this.props.installUpdatedText}
+            templateSuccessfullyInstalledUpdated={this.props.templateSuccessfullyInstalledUpdated}
+            templateInstallInstructions={this.props.templateInstallInstructions}
           />
 
         </div>
       </TemplateContainer>
     )
   }
-
-})
+}
 
 /**
  * Map state to props

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react'
 
 /**
@@ -42,7 +43,7 @@ const TemplateHeaderTitle = ({ header }) => (
  * @since 4.1
  */
 TemplateHeaderTitle.propTypes = {
-  header: React.PropTypes.string
+  header: PropTypes.string
 }
 
 export default TemplateHeaderTitle

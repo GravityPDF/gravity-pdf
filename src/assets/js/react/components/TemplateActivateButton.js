@@ -1,7 +1,8 @@
+import PropTypes from 'prop-types';
 import React from 'react'
 import { connect } from 'react-redux'
 import { selectTemplate } from '../actions/templates'
-import { hashHistory } from 'react-router'
+import { withRouter } from 'react-router-dom'
 
 /**
  * Renders the button used to trigger the current active PDF template
@@ -38,16 +39,15 @@ import { hashHistory } from 'react-router'
  *
  * @since 4.1
  */
-export const TemplateActivateButton = React.createClass({
-
+export class TemplateActivateButton extends React.Component {
   /**
    * @since 4.1
    */
-  propTypes: {
-    template: React.PropTypes.object,
-    onTemplateSelect: React.PropTypes.func,
-    buttonText: React.PropTypes.string,
-  },
+  static propTypes = {
+    template: PropTypes.object,
+    onTemplateSelect: PropTypes.func,
+    buttonText: PropTypes.string,
+  };
 
   /**
    * Update our route and trigger a Redux action to select the current template
@@ -56,13 +56,13 @@ export const TemplateActivateButton = React.createClass({
    *
    * @since 4.1
    */
-  selectTemplate(e) {
+  selectTemplate = (e) => {
     e.preventDefault()
     e.stopPropagation()
-    hashHistory.push('')
 
+    this.props.history.push('')
     this.props.onTemplateSelect(this.props.template.get('id'))
-  },
+  };
 
   /**
    * @since 4.1
@@ -78,7 +78,7 @@ export const TemplateActivateButton = React.createClass({
       </a>
     )
   }
-})
+}
 
 /**
  * Map actions to props
@@ -102,5 +102,5 @@ const mapDispatchToProps = (dispatch) => {
  *
  * @since 4.1
  */
-export default connect(null, mapDispatchToProps)(TemplateActivateButton)
+export default withRouter(connect(null, mapDispatchToProps)(TemplateActivateButton))
 

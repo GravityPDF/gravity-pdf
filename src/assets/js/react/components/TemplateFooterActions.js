@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react'
 import TemplateActivateButton from './TemplateActivateButton'
 import TemplateDeleteButton from './TemplateDeleteButton'
@@ -37,24 +38,23 @@ import TemplateDeleteButton from './TemplateDeleteButton'
  *
  * @since 4.1
  */
-const TemplateFooterActions = React.createClass({
-
+class TemplateFooterActions extends React.Component {
   /**
    * @since 4.1
    */
-  propTypes: {
-    template: React.PropTypes.object.isRequired,
-    isActiveTemplate: React.PropTypes.bool,
+  static propTypes = {
+    template: PropTypes.object.isRequired,
+    isActiveTemplate: PropTypes.bool,
 
-    ajaxUrl: React.PropTypes.string,
-    ajaxNonce: React.PropTypes.string,
+    ajaxUrl: PropTypes.string,
+    ajaxNonce: PropTypes.string,
 
-    activateText: React.PropTypes.string,
-    pdfWorkingDirPath: React.PropTypes.string,
-    templateDeleteText: React.PropTypes.string,
-    templateConfirmDeleteText: React.PropTypes.string,
-    templateDeleteErrorText: React.PropTypes.string,
-  },
+    activateText: PropTypes.string,
+    pdfWorkingDirPath: PropTypes.string,
+    templateDeleteText: PropTypes.string,
+    templateConfirmDeleteText: PropTypes.string,
+    templateDeleteErrorText: PropTypes.string,
+  };
 
   /**
    * Check if the current PDF template is a core template or not (i.e is shipped with Gravity PDF)
@@ -65,9 +65,9 @@ const TemplateFooterActions = React.createClass({
    *
    * @since 4.1
    */
-  notCoreTemplate(template) {
+  notCoreTemplate = (template) => {
     return template.get('path').indexOf(this.props.pdfWorkingDirPath) !== -1
-  },
+  };
 
   /**
    * @since 4.1
@@ -100,7 +100,7 @@ const TemplateFooterActions = React.createClass({
       </div>
     )
   }
-})
+}
 
 export default TemplateFooterActions
 

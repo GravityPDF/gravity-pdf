@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react'
 import { connect } from 'react-redux'
 import request from 'superagent'
@@ -41,7 +42,27 @@ import ShowMessage from './ShowMessage'
  *
  * @since 4.1
  */
-export const TemplateUploader = React.createClass({
+export class TemplateUploader extends React.Component {
+  /**
+   * @since 4.1
+   */
+  static propTypes = {
+    ajaxUrl: PropTypes.string,
+    ajaxNonce: PropTypes.string,
+
+    genericUploadErrorText: PropTypes.string,
+    addTemplateText: PropTypes.string,
+    filenameErrorText: PropTypes.string,
+    filesizeErrorText: PropTypes.string,
+    installSuccessText: PropTypes.string,
+    installUpdatedText: PropTypes.string,
+    templateSuccessfullyInstalledUpdated: PropTypes.string,
+    templateInstallInstructions: PropTypes.string,
+
+    addNewTemplate: PropTypes.func,
+    updateTemplateParam: PropTypes.func,
+    templates: PropTypes.object
+  };
 
   /**
    * Setup internal component state that doesn't need to be in Redux
@@ -50,34 +71,11 @@ export const TemplateUploader = React.createClass({
    *
    * @since 4.1
    */
-  getInitialState() {
-    return {
-      ajax: false,
-      error: '',
-      message: ''
-    }
-  },
-
-  /**
-   * @since 4.1
-   */
-  propTypes: {
-    ajaxUrl: React.PropTypes.string,
-    ajaxNonce: React.PropTypes.string,
-
-    genericUploadErrorText: React.PropTypes.string,
-    addTemplateText: React.PropTypes.string,
-    filenameErrorText: React.PropTypes.string,
-    filesizeErrorText: React.PropTypes.string,
-    installSuccessText: React.PropTypes.string,
-    installUpdatedText: React.PropTypes.string,
-    templateSuccessfullyInstalledUpdated: React.PropTypes.string,
-    templateInstallInstructions: React.PropTypes.string,
-
-    addNewTemplate: React.PropTypes.func,
-    updateTemplateParam: React.PropTypes.func,
-    templates: React.PropTypes.object
-  },
+  state = {
+    ajax: false,
+    error: '',
+    message: ''
+  };
 
   /**
    * Manages the template file upload
@@ -86,7 +84,7 @@ export const TemplateUploader = React.createClass({
    *
    * @since 4.1
    */
-  onDrop(acceptedFiles) {
+  onDrop = (acceptedFiles) => {
     /* Handle file upload and pass in an nonce!!! */
     if (acceptedFiles instanceof Array && acceptedFiles.length > 0) {
 
@@ -115,7 +113,7 @@ export const TemplateUploader = React.createClass({
       })
 
     }
-  },
+  };
 
   /**
    * Checks if the uploaded file has a .zip extension
@@ -127,7 +125,7 @@ export const TemplateUploader = React.createClass({
    *
    * @since 4.1
    */
-  checkFilename(name) {
+  checkFilename = (name) => {
     if (name.substr(name.length - 4) !== '.zip') {
 
       /* Tell use about incorrect file type */
@@ -139,7 +137,7 @@ export const TemplateUploader = React.createClass({
     }
 
     return true
-  },
+  };
 
   /**
    * Checks if the file size is larger than 5MB
@@ -150,7 +148,7 @@ export const TemplateUploader = React.createClass({
    *
    * @since 4.1
    */
-  checkFilesize(size) {
+  checkFilesize = (size) => {
     /* Check the file is no larger than 5MB (convert from bytes to KB) */
     if (size / 1024 > 5120) {
       /* Tell use about incorrect file type */
@@ -162,7 +160,7 @@ export const TemplateUploader = React.createClass({
     }
 
     return true
-  },
+  };
 
   /**
    * Update our Redux store with the new PDF template details
@@ -172,7 +170,7 @@ export const TemplateUploader = React.createClass({
    *
    * @since 4.1
    */
-  ajaxSuccess(response) {
+  ajaxSuccess = (response) => {
 
     /* Update our Redux Store with the new template(s) */
     response.body.templates.forEach((template) => {
@@ -196,7 +194,7 @@ export const TemplateUploader = React.createClass({
       ajax: false,
       message: this.props.templateSuccessfullyInstalledUpdated
     })
-  },
+  };
 
   /**
    * Show any errors to the user when AJAX request fails for any reason
@@ -205,24 +203,24 @@ export const TemplateUploader = React.createClass({
    *
    * @since 4.1
    */
-  ajaxFailed(error) {
+  ajaxFailed = (error) => {
     /* Let the user know there was a problem with the upload */
     this.setState({
       error: (error.response.body && error.response.body.error !== undefined) ? error.response.body.error : this.props.genericUploadErrorText,
       ajax: false
     })
-  },
+  };
 
   /**
    * Remove message from state once the timeout has finished
    *
    * @since 4.1
    */
-  removeMessage() {
+  removeMessage = () => {
     this.setState( {
       message: ''
     })
-  },
+  };
 
   /**
    * Prevent normal behaviour when this event fires
@@ -231,9 +229,9 @@ export const TemplateUploader = React.createClass({
    *
    * @since 4.1
    */
-  openDropzone(e) {
+  openDropzone = (e) => {
     e.preventDefault()
-  },
+  };
 
   /**
    * @since 4.1
@@ -257,8 +255,7 @@ export const TemplateUploader = React.createClass({
       </Dropzone>
     )
   }
-
-})
+}
 
 /**
  * Map state to props

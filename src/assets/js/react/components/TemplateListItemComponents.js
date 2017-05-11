@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react'
 
 /**
@@ -41,7 +42,7 @@ export const TemplateDetails = ({ label }) => (
 )
 
 TemplateDetails.propTypes = {
-  name: React.PropTypes.string,
+  name: PropTypes.string,
 }
 
 /**
@@ -56,5 +57,5 @@ export const Group = ({ group }) => (
 )
 
 Group.propTypes = {
-  group: React.PropTypes.string,
+  group: PropTypes.string,
 }

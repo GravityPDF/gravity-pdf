@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react'
 import $ from 'jquery'
 
@@ -35,8 +36,7 @@ import $ from 'jquery'
  *
  * @since 4.1
  */
-const showMessage = React.createClass({
-
+class showMessage extends React.Component {
   /**
    * Pass the "dismissable" prop to enable auto-clearing
    *
@@ -44,45 +44,41 @@ const showMessage = React.createClass({
    *
    * @since 4.1
    */
-  getDefaultProps() {
-    return {
-      delay: 4000,
-      dismissable: false,
-    }
-  },
+  static defaultProps = {
+    delay: 4000,
+    dismissable: false,
+  };
+
+  /**
+   * @since 4.1
+   */
+  static propTypes = {
+    text: PropTypes.string.isRequired,
+    error: PropTypes.bool,
+
+    delay: PropTypes.number,
+    dismissable: PropTypes.bool,
+    dismissableCallback: PropTypes.func,
+  };
 
   /**
    * @returns {{visible: boolean}}
    *
    * @since 4.1
    */
-  getInitialState() {
-    return {
-      visible: true
-    }
-  },
-
-  /**
-   * @since 4.1
-   */
-  propTypes: {
-    text: React.PropTypes.string.isRequired,
-    error: React.PropTypes.bool,
-
-    delay: React.PropTypes.number,
-    dismissable: React.PropTypes.bool,
-    dismissableCallback: React.PropTypes.func,
-  },
+  state = {
+    visible: true
+  };
 
   /**
    * Resets our state and timer when new props received
    *
    * @since 4.1
    */
-  componentWillReceiveProps: function () {
+  componentWillReceiveProps() {
     this.setState({ visible: true })
     this.shouldSetTimer()
-  },
+  }
 
   /**
    * On mount, maybe set dismissable timer
@@ -91,18 +87,18 @@ const showMessage = React.createClass({
    */
   componentDidMount() {
     this.shouldSetTimer()
-  },
+  }
 
   /**
    * Check if we should make the message auto-dismissable
    *
    * @since 4.1
    */
-  shouldSetTimer() {
+  shouldSetTimer = () => {
     if (this.props.dismissable) {
       this.setTimer()
     }
-  },
+  };
 
   /**
    * Slide message up after "X" milliseconds (see props.delay)
@@ -112,7 +108,7 @@ const showMessage = React.createClass({
    *
    * @since 4.1
    */
-  setTimer() {
+  setTimer = () => {
     // clear any existing timer
     this._timer != null ? clearTimeout(this._timer) : null
 
@@ -132,18 +128,18 @@ const showMessage = React.createClass({
         })
 
     }, this.props.delay)
-  },
+  };
 
   /**
    * Clear timeout on unmount
    *
    * @since 4.1
    */
-  componentWillUnmount: function () {
+  componentWillUnmount() {
     if (this.props.dismissable) {
       clearTimeout(this._timer)
     }
-  },
+  }
 
   /**
    * Renders our message or error
@@ -166,6 +162,6 @@ const showMessage = React.createClass({
         </div>
       ) : <div />
   }
-})
+}
 
 export default showMessage

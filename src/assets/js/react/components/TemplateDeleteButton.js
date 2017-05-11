@@ -1,7 +1,8 @@
+import PropTypes from 'prop-types';
 import React from 'react'
 import { connect } from 'react-redux'
 import { addTemplate, deleteTemplate } from '../actions/templates'
-import { hashHistory } from 'react-router'
+import { withRouter } from 'react-router-dom'
 import request from 'superagent'
 
 /**
@@ -39,24 +40,23 @@ import request from 'superagent'
  *
  * @since 4.1
  */
-export const TemplateDeleteButton = React.createClass({
-
+export class TemplateDeleteButton extends React.Component {
   /**
    * @since 4.1
    */
-  propTypes: {
-    ajaxUrl: React.PropTypes.string,
-    ajaxNonce: React.PropTypes.string,
+  static propTypes = {
+    ajaxUrl: PropTypes.string,
+    ajaxNonce: PropTypes.string,
 
-    template: React.PropTypes.object,
-    addTemplate: React.PropTypes.func,
-    onTemplateDelete: React.PropTypes.func,
-    callbackFunction: React.PropTypes.func,
+    template: PropTypes.object,
+    addTemplate: PropTypes.func,
+    onTemplateDelete: PropTypes.func,
+    callbackFunction: PropTypes.func,
 
-    buttonText: React.PropTypes.string,
-    templateConfirmDeleteText: React.PropTypes.string,
-    templateDeleteErrorText: React.PropTypes.string,
-  },
+    buttonText: PropTypes.string,
+    templateConfirmDeleteText: PropTypes.string,
+    templateDeleteErrorText: PropTypes.string,
+  };
 
   /**
    * Display a confirmation window asking user to verify they want template deleted.
@@ -69,7 +69,7 @@ export const TemplateDeleteButton = React.createClass({
    *
    * @param {Object} e Event
    */
-  deleteTemplate(e) {
+  deleteTemplate = (e) => {
     e.preventDefault()
     e.stopPropagation()
 
@@ -88,10 +88,10 @@ export const TemplateDeleteButton = React.createClass({
           this.ajaxFailed
         )
 
-      hashHistory.push('/template')
+      this.props.history.push('/template')
       this.props.onTemplateDelete(templateId)
     }
-  },
+  };
 
   /**
    * If the server cannot delete the template we re-add the template to our list
@@ -99,10 +99,10 @@ export const TemplateDeleteButton = React.createClass({
    *
    * @since 4.1
    */
-  ajaxFailed() {
+  ajaxFailed = () => {
     const errorTemplate = this.props.template.set('error', this.props.templateDeleteErrorText)
     this.props.addTemplate(errorTemplate)
-  },
+  };
 
   /**
    * @since 4.1
@@ -121,7 +121,7 @@ export const TemplateDeleteButton = React.createClass({
       </a>
     )
   }
-})
+}
 
 /**
  * Map actions to props
@@ -149,5 +149,5 @@ const mapDispatchToProps = (dispatch) => {
  *
  * @since 4.1
  */
-export default connect(null, mapDispatchToProps)(TemplateDeleteButton)
+export default withRouter(connect(null, mapDispatchToProps)(TemplateDeleteButton))
 

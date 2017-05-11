@@ -3,9 +3,7 @@ import React from 'react'
 import { render } from 'react-dom'
 import { Provider } from 'react-redux'
 
-import Route from 'react-router/lib/Route'
-import Router from 'react-router/lib/Router'
-import hashHistory from 'react-router/lib/hashHistory'
+import { HashRouter as Router, Route, Switch } from 'react-router-dom'
 
 import TemplateList from '../components/TemplateList'
 import TemplateSingle from '../components/TemplateSingle'
@@ -56,47 +54,58 @@ import Empty from '../components/Empty'
  * @since 4.1
  */
 export const Routes = () => (
-  <Router history={hashHistory}>
-    <Route path="template"
-           component={TemplateList}
+  <Router>
+    <Switch>
+      <Route path="/template"
+             exact
+             render={(props) => (
+               <TemplateList
+                 {...props}
 
-           ajaxUrl={GFPDF.ajaxUrl}
-           ajaxNonce={GFPDF.ajaxNonce}
+                 ajaxUrl={GFPDF.ajaxUrl}
+                 ajaxNonce={GFPDF.ajaxNonce}
 
-           templateDetailsText={GFPDF.templateDetails}
-           templateHeaderText={GFPDF.installedPdfs}
+                 templateDetailsText={GFPDF.templateDetails}
+                 templateHeaderText={GFPDF.installedPdfs}
 
-           genericUploadErrorText={GFPDF.problemWithTheUpload}
-           activateText={GFPDF.select}
-           addTemplateText={GFPDF.addNewTemplate}
-           filenameErrorText={GFPDF.uploadInvalidNotZipFile}
-           filesizeErrorText={GFPDF.uploadInvalidExceedsFileSizeLimit}
-           installSuccessText={GFPDF.templateSuccessfullyInstalled}
-           installUpdatedText={GFPDF.templateSuccessfullyUpdated}
-           templateSuccessfullyInstalledUpdated={GFPDF.templateSuccessfullyInstalledUpdated}
-           templateInstallInstructions={GFPDF.templateInstallInstructions}
-    />
+                 genericUploadErrorText={GFPDF.problemWithTheUpload}
+                 activateText={GFPDF.select}
+                 addTemplateText={GFPDF.addNewTemplate}
+                 filenameErrorText={GFPDF.uploadInvalidNotZipFile}
+                 filesizeErrorText={GFPDF.uploadInvalidExceedsFileSizeLimit}
+                 installSuccessText={GFPDF.templateSuccessfullyInstalled}
+                 installUpdatedText={GFPDF.templateSuccessfullyUpdated}
+                 templateSuccessfullyInstalledUpdated={GFPDF.templateSuccessfullyInstalledUpdated}
+                 templateInstallInstructions={GFPDF.templateInstallInstructions}
+               />
+             )}
+      />
 
-    <Route path="template/:id"
-           component={TemplateSingle}
+      <Route path="/template/:id"
+             render={(props) => (
+               <TemplateSingle
+                 {...props}
 
-           ajaxUrl={GFPDF.ajaxUrl}
-           ajaxNonce={GFPDF.ajaxNonce}
-           pdfWorkingDirPath={GFPDF.pdfWorkingDir}
+                 ajaxUrl={GFPDF.ajaxUrl}
+                 ajaxNonce={GFPDF.ajaxNonce}
+                 pdfWorkingDirPath={GFPDF.pdfWorkingDir}
 
-           activateText={GFPDF.select}
-           templateDeleteText={GFPDF.delete}
-           templateConfirmDeleteText={GFPDF.doYouWantToDeleteTemplate}
-           templateDeleteErrorText={GFPDF.couldNotDeleteTemplate}
-           currentTemplateText={GFPDF.currentTemplate}
-           versionText={GFPDF.version}
-           groupText={GFPDF.group}
-           tagsText={GFPDF.tags}
-           showPreviousTemplateText={GFPDF.showPreviousTemplate}
-           showNextTemplateText={GFPDF.showNextTemplate}
-    />
+                 activateText={GFPDF.select}
+                 templateDeleteText={GFPDF.delete}
+                 templateConfirmDeleteText={GFPDF.doYouWantToDeleteTemplate}
+                 templateDeleteErrorText={GFPDF.couldNotDeleteTemplate}
+                 currentTemplateText={GFPDF.currentTemplate}
+                 versionText={GFPDF.version}
+                 groupText={GFPDF.group}
+                 tagsText={GFPDF.tags}
+                 showPreviousTemplateText={GFPDF.showPreviousTemplate}
+                 showNextTemplateText={GFPDF.showNextTemplate}
+               />
+             )}
+      />
 
-    <Route path="*" component={Empty}/>
+      <Route component={Empty}/>
+    </Switch>
   </Router>)
 
 /**

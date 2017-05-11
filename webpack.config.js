@@ -9,7 +9,7 @@ module.exports = {
     vendor: Object.keys(vendors), /* auto-load all dependancies from package.json and include in our vendor bundle */
   },
   output: {
-    path: './dist/assets/js/',
+    path: __dirname + '/dist/assets/js/',
     filename: 'app.bundle.min.js'
   },
   devtool: PROD ? 'source-map' : 'eval-cheap-module-source-map',
@@ -18,11 +18,11 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /(node_modules|bower_components)/,
-        loader: 'babel'
+        loader: 'babel-loader'
       },
       {
         test: /\.json$/,
-        loader: 'json'
+        loader: 'json-loader'
       }
     ]
   },
@@ -36,13 +36,17 @@ module.exports = {
             'NODE_ENV': JSON.stringify('production')
         }
     }),
-    new webpack.optimize.CommonsChunkPlugin(/* chunkName= */"vendor", /* filename= */"vendor.bundle.min.js"),
+    new webpack.optimize.CommonsChunkPlugin({ name: 'vendor', filename: 'vendor.bundle.min.js' }),
     new webpack.optimize.UglifyJsPlugin({
       compress: {
         warnings: false
-      }
+      },
+      output: {
+        comments: false
+      },
+      sourceMap: false
     })
   ] : [
-    new webpack.optimize.CommonsChunkPlugin(/* chunkName= */"vendor", /* filename= */"vendor.bundle.min.js"),
+    new webpack.optimize.CommonsChunkPlugin({ name: 'vendor', filename: 'vendor.bundle.min.js' }),
   ]
 }

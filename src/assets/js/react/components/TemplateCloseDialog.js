@@ -1,5 +1,6 @@
+import PropTypes from 'prop-types';
 import React from 'react'
-import { hashHistory } from 'react-router'
+import { withRouter } from 'react-router-dom'
 
 /**
  * Renders our close dialog element
@@ -35,14 +36,13 @@ import { hashHistory } from 'react-router'
  *
  * @since 4.1
  */
-const TemplateCloseDialog = React.createClass({
-
+export class TemplateCloseDialog extends React.Component {
   /**
    * @since 4.1
    */
-  propTypes: {
-    closeRoute: React.PropTypes.string
-  },
+  static propTypes = {
+    closeRoute: PropTypes.string
+  };
 
   /**
    * Assign keydown listener to document on mount
@@ -51,7 +51,7 @@ const TemplateCloseDialog = React.createClass({
    */
   componentDidMount() {
     document.addEventListener('keydown', this.handleKeyPress, false)
-  },
+  }
 
   /**
    * Remove keydown listener to document on mount
@@ -60,7 +60,7 @@ const TemplateCloseDialog = React.createClass({
    */
   componentWillUnmount() {
     document.removeEventListener('keydown', this.handleKeyPress, false)
-  },
+  }
 
   /**
    * Check if Escape key pressed and current event target isn't our search box,
@@ -70,20 +70,20 @@ const TemplateCloseDialog = React.createClass({
    *
    * @since 4.1
    */
-  handleKeyPress(e) {
+  handleKeyPress = (e) => {
     /* Escape Key */
     if (e.keyCode === 27 && (e.target.className !== 'wp-filter-search' || e.target.value === '')) {
       this.closeDialog()
     }
-  },
+  };
 
   /**
    * @since 4.1
    */
-  closeDialog() {
+  closeDialog = () => {
     /* trigger router */
-    hashHistory.push(this.props.closeRoute || '/')
-  },
+    this.props.history.push(this.props.closeRoute || '/')
+  };
 
   /**
    * @since 4.1
@@ -100,6 +100,6 @@ const TemplateCloseDialog = React.createClass({
       </button>
     )
   }
-})
+}
 
-export default TemplateCloseDialog
+export default withRouter(TemplateCloseDialog)

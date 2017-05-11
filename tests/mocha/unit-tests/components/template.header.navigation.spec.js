@@ -4,21 +4,24 @@ import configureStore from 'redux-mock-store'
 import { Provider } from 'react-redux'
 const mockStore = configureStore()
 import Immutable from 'immutable'
+import { HashRouter as Router } from 'react-router-dom'
 
 import TemplateHeaderNavigation from '../../../../src/assets/js/react/components/TemplateHeaderNavigation'
 
 describe('<TemplateHeaderNavigation />', () => {
 
   it('should render two buttons with correct classes and text', () => {
-    const comp = mount(<Provider store={mockStore()}>
-      <TemplateHeaderNavigation
-        templates={Immutable.fromJS([{}, {}])}
-        template={Immutable.fromJS({})}
-        templateIndex={0}
-        showPreviousTemplateText="Show previous template"
-        showNextTemplateText="Show next template"
-      />
-    </Provider>)
+    const comp = mount(<Router>
+      <Provider store={mockStore()}>
+        <TemplateHeaderNavigation
+          templates={Immutable.fromJS([{}, {}])}
+          template={Immutable.fromJS({})}
+          templateIndex={0}
+          showPreviousTemplateText="Show previous template"
+          showNextTemplateText="Show next template"
+        />
+      </Provider>
+    </Router>)
 
     expect(comp.find('button.left')).to.have.length(1)
     expect(comp.find('button.right')).to.have.length(1)
@@ -31,13 +34,15 @@ describe('<TemplateHeaderNavigation />', () => {
   })
 
   it('should disable left button', () => {
-    const comp = mount(<Provider store={mockStore()}>
-      <TemplateHeaderNavigation
-        templates={Immutable.fromJS([{id: 'first-id'}, {id: 'middle-id'}, {id: 'last-id'}])}
-        template={Immutable.fromJS({id: 'first-id'})}
-        templateIndex={0}
-      />
-    </Provider>)
+    const comp = mount(<Router>
+      <Provider store={mockStore()}>
+        <TemplateHeaderNavigation
+          templates={Immutable.fromJS([{id: 'first-id'}, {id: 'middle-id'}, {id: 'last-id'}])}
+          template={Immutable.fromJS({id: 'first-id'})}
+          templateIndex={0}
+        />
+      </Provider>
+    </Router>)
 
     expect(comp.find('button.left.disabled')).to.have.length(1)
     expect(comp.find('button.right.disabled')).to.have.length(0)
@@ -47,13 +52,15 @@ describe('<TemplateHeaderNavigation />', () => {
   })
 
   it('should disable right button', () => {
-    const comp = mount(<Provider store={mockStore()}>
-      <TemplateHeaderNavigation
-        templates={Immutable.fromJS([{id: 'first-id'}, {id: 'middle-id'}, {id: 'last-id'}])}
-        template={Immutable.fromJS({id: 'last-id'})}
-        templateIndex={2}
-      />
-    </Provider>)
+    const comp = mount(<Router>
+      <Provider store={mockStore()}>
+        <TemplateHeaderNavigation
+          templates={Immutable.fromJS([{id: 'first-id'}, {id: 'middle-id'}, {id: 'last-id'}])}
+          template={Immutable.fromJS({id: 'last-id'})}
+          templateIndex={2}
+        />
+      </Provider>
+    </Router>)
 
     expect(comp.find('button.left.disabled')).to.have.length(0)
     expect(comp.find('button.right.disabled')).to.have.length(1)
@@ -63,13 +70,15 @@ describe('<TemplateHeaderNavigation />', () => {
   })
 
   it('both buttons should NOT be disabled', () => {
-    const comp = mount(<Provider store={mockStore()}>
-      <TemplateHeaderNavigation
-        templates={Immutable.fromJS([{id: 'first-id'}, {id: 'middle-id'}, {id: 'last-id'}])}
-        template={Immutable.fromJS({id: 'middle-id'})}
-        templateIndex={1}
-      />
-    </Provider>)
+    const comp = mount(<Router>
+      <Provider store={mockStore()}>
+        <TemplateHeaderNavigation
+          templates={Immutable.fromJS([{id: 'first-id'}, {id: 'middle-id'}, {id: 'last-id'}])}
+          template={Immutable.fromJS({id: 'middle-id'})}
+          templateIndex={1}
+        />
+      </Provider>
+    </Router>)
 
     expect(comp.find('button.left.disabled')).to.have.length(0)
     expect(comp.find('button.right.disabled')).to.have.length(0)
@@ -79,12 +88,14 @@ describe('<TemplateHeaderNavigation />', () => {
   })
 
   it('when left or right arrows pressed the route gets updated', () => {
-    const comp = mount(<Provider store={mockStore()}>
-      <TemplateHeaderNavigation
-      templates={Immutable.fromJS([{id: 'first-id'}, {id: 'middle-id'}, {id: 'last-id'}])}
-      template={Immutable.fromJS({id: 'middle-id'})}
-      templateIndex={1} />
-    </Provider>)
+    const comp = mount(<Router>
+      <Provider store={mockStore()}>
+        <TemplateHeaderNavigation
+        templates={Immutable.fromJS([{id: 'first-id'}, {id: 'middle-id'}, {id: 'last-id'}])}
+        template={Immutable.fromJS({id: 'middle-id'})}
+        templateIndex={1} />
+      </Provider>
+    </Router>)
 
     comp.find('button.left').simulate('keydown', { key: "ArrowLeft", keyCode: 37 })
     expect(window.location.hash).to.equal('#/template/first-id')

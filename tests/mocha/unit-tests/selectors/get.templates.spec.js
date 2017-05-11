@@ -56,15 +56,27 @@ describe('selector', () => {
     expect(list.first().get('id')).is.equal('adelade')
 
     //check the search works
-    state.template.search = 'default'
-    list = selector(state, state, state)
+    let state2 = {
+      template: {
+        list: templates,
+        search: 'default',
+        activeTemplate: '',
+      }
+    }
+
+    list = selector(state2, state2, state2)
     expect(list.size).is.equal(3)
 
     //check the sort and search works
-    state.template.search = 'core'
-    state.template.activeTemplate = 'zadani'
+    let state3 = {
+      template: {
+        list: templates,
+        search: 'core',
+        activeTemplate: 'zadani',
+      }
+    }
 
-    list = selector(state, state, state)
+    list = selector(state3, state3, state3)
 
     expect(list.size).is.equal(5)
     expect(list.first().get('id')).is.equal('zadani')

@@ -5,6 +5,7 @@ import Immutable from 'immutable'
 import configureStore from 'redux-mock-store'
 import { Provider } from 'react-redux'
 const mockStore = configureStore()
+import { HashRouter as Router } from 'react-router-dom'
 
 import { TemplateListItem } from '../../../../src/assets/js/react/components/TemplateListItem'
 
@@ -12,11 +13,13 @@ describe('<TemplateListItem />', () => {
 
   it('should render a template list items', () => {
 
-    const comp = mount(<Provider store={mockStore()}>
-      <TemplateListItem
-        template={Immutable.fromJS({ id: 'my-id', compatible: true })}
-      />
-    </Provider>)
+    const comp = mount(<Router>
+      <Provider store={mockStore()}>
+        <TemplateListItem
+          template={Immutable.fromJS({ id: 'my-id', compatible: true })}
+        />
+      </Provider>
+    </Router>)
 
     $('#karam-test-container').html(comp.html())
     expect($('div.theme').attr('data-slug')).is.equal('my-id')
@@ -29,12 +32,14 @@ describe('<TemplateListItem />', () => {
   })
 
   it('template should be marked as active', () => {
-    const comp = mount(<Provider store={mockStore()}>
-      <TemplateListItem
-        template={Immutable.fromJS({ id: 'my-id' })}
-        activeTemplate="my-id"
-      />
-    </Provider>)
+    const comp = mount(<Router>
+      <Provider store={mockStore()}>
+        <TemplateListItem
+          template={Immutable.fromJS({ id: 'my-id' })}
+          activeTemplate="my-id"
+        />
+      </Provider>
+    </Router>)
 
     expect(comp.find('div.theme').hasClass('active')).is.true
   })
