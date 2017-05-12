@@ -149,7 +149,7 @@ class Model_Welcome_Screen extends Helper_Abstract_Model {
 	 *
 	 * @return void
 	 *
-	 * @since 4.1.2
+	 * @since 4.2
 	 */
 	public function getting_started_screen() {
 		$controller = $this->getController();
