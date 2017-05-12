@@ -3,9 +3,9 @@ Contributors: blue-liquid-designs
 Plugin URI: https://gravitypdf.com/
 Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
-Requires at least: 4.2
+Requires at least: 4.4
 Tested up to: 4.7
-Stable tag: 4.1.1
+Stable tag: 4.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
 
@@ -84,6 +84,31 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 18. Blank Slate provides a print-friendly template focusing solely on the user-submitted data.
 
 == Changelog ==
+
+= 4.2.0 =
+* Feature: Merge tags and shortcodes are displayed in the PDF for any administrative fields (GH#633)
+* Feature: New field class 'pagebreak' forces a pagebreak in the PDF (GH#634)
+* Feature: Instead of the field not showing at all, Gravity Perks Terms of Conditions field now shows the text "Not accepted"
+when user hasn't agreed to terms (). (GH#636)
+
+* Dev Feature: Add premium add-on and licensing infrastructure (GH#619)
+* Dev Feature: [gravitypdf] shortcode debug messages can be toggled on and off for users with the 'gravityforms_view_entries' capability (GH#627)
+* Dev Feature: Add filter 'gfpdf_field_label' to modify the PDF field labels (GH#621)
+* Dev Feature: Add filter 'gfpdf_pdf_field_content' to modify the field markup before content is wrapped in the PDF markup (GH#620)
+* Dev Feature: Add filters 'gfpdf_get_pdf_display_list', 'gfpdf_get_pdf_url', 'gfpdf_get_active_pdfs', 'gfpdf_override_pdf_bypass',
+'gfpdf_maybe_attach_to_notification', 'gfpdf_maybe_always_save_pdf', 'gfpdf_form_data' and 'gfpdf_preprocess_template_arguments' for
+greater control over the core PDF functionality. (GH#622)
+* Dev Feature: Fix master password being overridden on PDF save after v3 to v4 migration (GH#624)
+* Dev Feature: Allow master password field to be shown in the UI with the 'gfpdf_enable_master_password_field' fitler (GH#624)
+* Dev Feature: Swapped 'error' log to 'warning' log when template config file not found (GH#613)
+* Dev Feature: Upgrade all NPM modules to latest versions. PDF Template Manager now renders faster (GH#631)
+* Dev Feature: Remove hard dependancy on the Helper_Interface_Config interface for the template configuration file (GH#632)
+* Dev Feature: Added 'gfpdf_field_middleware' filter to control when a field should be displayed in the core PDF templates (GH#635)
+
+* Bug: Correctly exit the script when the PDF is downloaded / sent to the browser (GH#610)
+* Bug: Don't auto-redirect to welcome / update screen on plugin install or upgrade which resolves a cached redirect issue (GH#612)
+* Bug: Register two PDF endpoints to support both pretty and almost pretty permalinks at the same time (GH#614)
+* Bug: Fix [gravitypdf] shortcode display error in GravityView when wrapped in another shortcode (GH#628)
 
 = 4.1.1 =
 * Bug: Add check to see if headers are already sent before trying to redirect to the welcome / update page (GH#601)
@@ -237,6 +262,9 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 See [CHANGELOG.txt](https://github.com/GravityPDF/gravity-pdf/blob/master/CHANGELOG.txt) for v3 changelog history.
 
 == Upgrade Notice ==
+
+= 4.2.0 =
+WARNING: The minimum WordPress version supported is now 4.4.
 
 = 4.0.4 =
 This patch fixes a PDF security by-passing issue. If you use the PDF Security settings update immediately.
