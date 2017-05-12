@@ -191,6 +191,10 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
 		vertical-align: middle;
 	}
 
+    /* Page break */
+    .pagebreak {
+        page-break-before: always;
+    }
 </style>
 
 <?php if ( ! empty($first_header) ) : ?>

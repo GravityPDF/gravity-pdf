@@ -279,6 +279,32 @@ class Test_Field_Container extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Check that the row closes when a class is present in a field
+	 *
+	 * @since 4.2
+	 */
+	public function test_row_stopper() {
+		$field           = new GF_Field();
+		$field->cssClass = 'gf_left_third';
+
+		/* Check it opens correctly */
+		$this->assertEquals( '<div class="row-separator odd">', $this->generate( $field ) );
+
+		/* Create a skipped field and verify the container closes correctly */
+		$field           = new GF_Field();
+		$field->cssClass = 'gf_middle_third pagebreak';
+
+		/* If the field was skipped we remove any of our column class fields (gf_left_third ect) */
+		$this->assertEquals( '</div><div class="row-separator even">', $this->generate( $field ) );
+
+		/* Verify the results */
+		$field           = new GF_Field();
+		$field->cssClass = 'gf_middle_third';
+
+		$this->assertEquals( '', $this->generate( $field ) );
+	}
+
+	/**
 	 * Check if the current field is part of a multi-column row and it will fit into that row
 	 *
 	 * @since 4.0
