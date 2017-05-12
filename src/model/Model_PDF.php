@@ -802,7 +802,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			$settings = $pdf->get_settings();
 			$form     = $this->gform->get_form( $entry['form_id'] );
 
-			$args     = $this->templates->get_template_arguments(
+			$args = $this->templates->get_template_arguments(
 				$form,
 				$this->misc->get_fields_sorted_by_id( $form['id'] ),
 				$entry,
@@ -1094,7 +1094,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 				/* Fix to allow filemtime to work on directories too */
 				if ( is_dir( $file ) ) {
-					$file .= '.';
+					$file      .= '.';
 					$directory = true;
 				}
 
@@ -1302,13 +1302,13 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function get_form_data( $entry ) {
 
-		if ( ! isset( $entry['form_id']) ) {
+		if ( ! isset( $entry['form_id'] ) ) {
 			return [];
 		}
 
 		$form = $this->gform->get_form( $entry['form_id'] );
 
-		if( ! is_array( $form ) ) {
+		if ( ! is_array( $form ) ) {
 			return [];
 		}
 
@@ -1885,5 +1885,127 @@ class Model_PDF extends Helper_Abstract_Model {
 		 * @since 4.2
 		 */
 		return apply_filters( 'gfpdf_preprocess_template_arguments', $args );
+	}
+
+	/**
+	 * Skip over any fields with a class of "exclude"
+	 *
+	 * @param bool     $action
+	 * @param GF_Field $field
+	 * @param array    $entry
+	 * @param array    $form
+	 * @param array    $config
+	 *
+	 * @return bool
+	 *
+	 * @since 4.2
+	 */
+	public function field_middle_exclude( $action, $field, $entry, $form, $config ) {
+		if ( $action === false ) {
+			$skip_marked_fields = ( isset( $config['meta']['exclude'] ) ) ? $config['meta']['exclude'] : true;
+
+			if ( $skip_marked_fields !== false && strpos( $field->cssClass, 'exclude' ) !== false ) {
+				return true;
+			}
+		}
+
+		return $action;
+	}
+
+	/**
+	 * Determine if we should skip fields hidden with conditional logic
+	 *
+	 * @param bool     $action
+	 * @param GF_Field $field
+	 * @param array    $entry
+	 * @param array    $form
+	 * @param array    $config
+	 *
+	 * @return bool
+	 *
+	 * @since 4.2
+	 */
+	public function field_middle_conditional_fields( $action, $field, $entry, $form, $config ) {
+		if ( $action === false ) {
+			$skip_conditional_fields = ( isset( $config['meta']['conditional'] ) ) ? $config['meta']['conditional'] : true;
+			if ( $skip_conditional_fields === true && GFFormsModel::is_field_hidden( $form, $field, [], $entry ) ) {
+				return true;
+			}
+		}
+
+		return $action;
+	}
+
+	/**
+	 * Determine if we should skip product fields (by default they are grouped at the end of the form)
+	 *
+	 * @param bool     $action
+	 * @param GF_Field $field
+	 * @param array    $entry
+	 * @param array    $form
+	 * @param array    $config
+	 *
+	 * @return bool
+	 *
+	 * @since 4.2
+	 */
+	public function field_middle_product_fields( $action, $field, $entry, $form, $config ) {
+		if ( $action === false ) {
+			$show_individual_product_fields = ( isset( $config['meta']['individual_products'] ) ) ? $config['meta']['individual_products'] : false;
+			if ( $show_individual_product_fields === false && GFCommon::is_product_field( $field->type ) ) {
+				return true;
+			}
+		}
+
+		return $action;
+	}
+
+	/**
+	 * Determine if we should skip HTML fields
+	 *
+	 * @param bool     $action
+	 * @param GF_Field $field
+	 * @param array    $entry
+	 * @param array    $form
+	 * @param array    $config
+	 *
+	 * @return bool
+	 *
+	 * @since 4.2
+	 */
+	public function field_middle_html_fields( $action, $field, $entry, $form, $config ) {
+		if ( $action === false ) {
+			$show_html_fields = ( isset( $config['meta']['html_field'] ) ) ? $config['meta']['html_field'] : false;
+			if ( $show_html_fields === false && $field->type == 'html' ) {
+				return true;
+			}
+		}
+
+		return $action;
+	}
+
+	/**
+	 * Check if the field is on our blacklist and skip
+	 *
+	 * @param bool           $action
+	 * @param GF_Field       $field
+	 * @param array          $entry
+	 * @param array          $form
+	 * @param array          $config
+	 * @param Field_Products $products
+	 * @param array          $blacklisted
+	 *
+	 * @return bool
+	 *
+	 * @since 4.2
+	 */
+	public function field_middle_blacklist( $action, $field, $entry, $form, $config, $products, $blacklisted ) {
+		if ( $action === false ) {
+			if ( in_array( $field->get_input_type(), $blacklisted ) ) {
+				return true;
+			}
+		}
+
+		return $action;
 	}
 }

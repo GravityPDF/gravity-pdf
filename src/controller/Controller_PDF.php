@@ -171,6 +171,13 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		add_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_auth_logged_out_user' ], 60, 3 );
 		add_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_user_capability' ], 70, 3 );
 
+		/* Field display middleware */
+		add_filter( 'gfpdf_field_middleware', [ $this->model, 'field_middle_exclude' ], 10, 5 );
+		add_filter( 'gfpdf_field_middleware', [ $this->model, 'field_middle_conditional_fields' ], 10, 5 );
+		add_filter( 'gfpdf_field_middleware', [ $this->model, 'field_middle_product_fields' ], 10, 5 );
+		add_filter( 'gfpdf_field_middleware', [ $this->model, 'field_middle_html_fields' ], 10, 5 );
+		add_filter( 'gfpdf_field_middleware', [ $this->model, 'field_middle_blacklist' ], 10, 7 );
+
 		/* Tap into GF notifications */
 		add_filter( 'gform_notification', [
 			$this->model,

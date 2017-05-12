@@ -372,71 +372,44 @@ class View_PDF extends Helper_Abstract_View {
 		$config         = apply_filters( 'gfpdf_pdf_configuration', $config, $entry, $form );
 
 		/* Get the user configuration values */
-		$skip_marked_fields             = ( isset( $config['meta']['exclude'] ) ) ? $config['meta']['exclude'] : true; /* whether we should exclude fields with a CSS value of 'exclude'. Default to true */
-		$skip_conditional_fields        = ( isset( $config['meta']['conditional'] ) ) ? $config['meta']['conditional'] : true; /* whether we should skip fields hidden with conditional logic. Default to true. */
 		$show_title                     = ( isset( $config['meta']['show_title'] ) ) ? $config['meta']['show_title'] : false; /* whether we should show the form title. Default to true */
 		$show_page_names                = ( isset( $config['meta']['page_names'] ) ) ? $config['meta']['page_names'] : false; /* whether we should show the form's page names. Default to false */
-		$show_html_fields               = ( isset( $config['meta']['html_field'] ) ) ? $config['meta']['html_field'] : false; /* whether we should show the form's html fields. Default to false */
 		$show_individual_product_fields = ( isset( $config['meta']['individual_products'] ) ) ? $config['meta']['individual_products'] : false; /* Whether to show individual fields in the entry. Default to false - they are grouped together at the end of the form */
 
 		/* Skip over any of the following blacklisted fields */
 		$blacklisted = apply_filters( 'gfpdf_blacklisted_fields', [ 'captcha', 'password', 'page' ] );
 
-		/* Display the form title, if needed */
+		/*
+		 * Display the form title, if needed
+		 *  Use the filter 'gfpdf_pdf_configuration' to programically disable this functionality
+		 */
 		$this->show_form_title( $show_title, $form );
 
 		/* Loop through the fields and output or skip if needed */
 		foreach ( $form['fields'] as $key => $field ) {
 
-			/* Load our page name, if needed */
+			/*
+			 * Load our page name, if needed
+			 * Use the filter 'gfpdf_pdf_configuration' to programically disable this functionality
+			 */
 			if ( $show_page_names === true && $field->pageNumber !== $page_number ) {
 				$this->display_page_name( $page_number, $form, $container );
 				$page_number++;
 			}
 
 			/*
-			 * @TODO Create middleware filter to check if the field should be skipped.
-			 * This will reduce code duplication and increase plugin flexibility
+			 * Middleware filter to check if the field should be skipped.
+			 *
+			 * If $middlware is true the field will not be displayed in the PDF
+			 *
+			 * @since 4.2
 			 */
+			$middleware = apply_filters( 'gfpdf_field_middleware', false, $field, $entry, $form, $config, $products, $blacklisted );
 
-			/* Skip any fields with the css class 'exclude', if needed */
-			if ( $skip_marked_fields !== false && strpos( $field->cssClass, 'exclude' ) !== false ) {
-				/* To prevent display issues we will output the column markup needed */
-				$container->maybe_display_faux_column( $field );
-
-				continue;
-			}
-
-			/* Skip over any hidden fields (usually by conditional logic), if needed */
-			if ( $skip_conditional_fields === true && GFFormsModel::is_field_hidden( $form, $field, [], $entry ) ) {
-				/* To prevent display issues we will output the column markup needed */
-				$container->maybe_display_faux_column( $field );
-
-				continue;
-			}
-
-			/* Skip over any product fields, if needed */
-			if ( $show_individual_product_fields === false && GFCommon::is_product_field( $field->type ) ) {
-				/* To prevent display issues we will output the column markup needed */
-				$container->maybe_display_faux_column( $field );
-				continue;
-			}
-
-			/* Skip HTML fields, if needed */
-			if ( $show_html_fields === false && $field->type == 'html' ) {
-				/* To prevent display issues we will output the column markup needed */
-				$container->maybe_display_faux_column( $field );
-
-				continue;
-			}
-
-			/* Skip over any fields we don't want to include */
-			if ( in_array( $field->type, $blacklisted ) ) {
-				/* To prevent display issues we will output the column markup needed */
-				$container->maybe_display_faux_column( $field );
-
-				continue;
-			}
+			if( $middleware ) {
+			    $container->maybe_display_faux_column( $field );
+			    continue;
+            }
 
 			/* Let's output our field */
 			$this->process_field( $field, $entry, $form, $config, $products, $container, $model );
@@ -445,11 +418,13 @@ class View_PDF extends Helper_Abstract_View {
 		/* correctly close / cleanup the HTML container if needed */
 		$container->close();
 
-		/* Output product table, if needed */
+		/*
+		 * Output product table, if needed
+		 * Use the filter 'gfpdf_pdf_configuration' to programically disable this functionality
+		 */
 		if ( $show_individual_product_fields === false && ! $products->is_empty() ) {
 			echo $products->html();
 		}
-
 	}
 
 	/**
