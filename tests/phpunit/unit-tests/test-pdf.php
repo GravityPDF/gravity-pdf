@@ -1427,6 +1427,83 @@ class Test_PDF extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @since 4.2
+	 */
+	public function test_field_middle_exclude() {
+		$field           = new GF_Field();
+		$field->cssClass = 'exclude';
+		$config          = [ 'meta' => [ 'exclude' => false ] ];
+
+		$results = $this->model->field_middle_exclude( false, $field, [], [], $config );
+		$this->assertFalse( $results );
+
+		$results = $this->model->field_middle_exclude( false, $field, [], [], [] );
+		$this->assertTrue( $results );
+	}
+
+	/**
+	 * @since 4.2
+	 */
+	public function test_field_middle_conditional_fields() {
+		$field     = new GF_Field();
+		$field->id = 2;
+		$config    = [ 'meta' => [ 'conditional' => false ] ];
+
+		$results = $this->model->field_middle_conditional_fields( false, $field, [], [], $config );
+		$this->assertFalse( $results );
+
+		GFCache::set( 'GFFormsModel::is_field_hidden_1_2', true );
+		$results = $this->model->field_middle_conditional_fields( false, $field, [], [ 'id' => 1 ], [] );
+		$this->assertTrue( $results );
+	}
+
+	/**
+	 * @since 4.2
+	 */
+	public function test_field_middle_product_fields() {
+		$field       = new GF_Field();
+		$field->id   = 2;
+		$field->type = 'product';
+		$config      = [ 'meta' => [ 'individual_products' => true ] ];
+
+		$results = $this->model->field_middle_product_fields( false, $field, [], [], $config );
+		$this->assertFalse( $results );
+
+		$results = $this->model->field_middle_product_fields( false, $field, [], [ 'id' => 1 ], [] );
+		$this->assertTrue( $results );
+	}
+
+	/**
+	 * @since 4.2
+	 */
+	public function test_field_middle_html_fields() {
+		$field       = new GF_Field();
+		$field->id   = 2;
+		$field->type = 'html';
+		$config      = [ 'meta' => [ 'html_field' => true ] ];
+
+		$results = $this->model->field_middle_html_fields( false, $field, [], [], $config );
+		$this->assertFalse( $results );
+
+		$results = $this->model->field_middle_html_fields( false, $field, [], [ 'id' => 1 ], [] );
+		$this->assertTrue( $results );
+	}
+
+	/**
+	 * @since 4.2
+	 */
+	public function test_field_middle_blacklist() {
+		$field       = new GF_Field();
+		$field->type = 'html';
+
+		$results = $this->model->field_middle_blacklist( false, $field, [], [], [], null, [] );
+		$this->assertFalse( $results );
+
+		$results = $this->model->field_middle_blacklist( false, $field, [], [], [], null, [ 'html' ] );
+		$this->assertTrue( $results );
+	}
+
+	/**
 	 * Test a single field and check if the results are valid
 	 *
 	 * @since 4.0
