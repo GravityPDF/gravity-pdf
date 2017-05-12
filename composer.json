@@ -29,9 +29,9 @@
 
     "scripts": {
       "post-update-cmd": [
-        "npm install --global gulp-cli",
-        "npm install && gulp",
-        "npm run-script build"
+        "yarn global add gulp-cli",
+        "yarn && gulp",
+        "yarn run build"
       ]
     }
 }

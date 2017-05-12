@@ -13,7 +13,7 @@ The `development` branch is considered our bleeding edge branch, with all new ch
 
 # Installation
 
-Before beginning, ensure you have [Git](https://git-scm.com/), [Composer](https://getcomposer.org/) and [NPM](https://docs.npmjs.com/) installed and their commands are globally accessible via the command line.
+Before beginning, ensure you have [Git](https://git-scm.com/), [Composer](https://getcomposer.org/) and [Yarn](https://yarnpkg.com/en/docs/install) installed and their commands are globally accessible via the command line.
 
 1. Clone the repository using `git clone https://github.com/GravityPDF/gravity-pdf/`
 1. Open your terminal / command prompt to the Gravity PDF root directory and run `composer install`. This command will automatically download all the PHP and JS packages, and run the build tools.
