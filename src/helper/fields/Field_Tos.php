@@ -75,6 +75,28 @@ class Field_Tos extends Helper_Abstract_Fields {
 	}
 
 	/**
+	 * Always display this field in the PDF
+	 *
+	 * @since    4.2
+	 *
+	 * @return bool
+	 */
+	public function is_empty() {
+		return false;
+	}
+
+	/**
+	 * Actually check if the field has a value
+	 *
+	 * @since 4.2
+	 *
+	 * @return bool
+	 */
+	public function is_field_empty() {
+		return parent::is_empty();
+	}
+
+	/**
 	 * Display the HTML version of this field
 	 *
 	 * @param string $value
@@ -86,13 +108,19 @@ class Field_Tos extends Helper_Abstract_Fields {
 	 */
 	public function html( $value = '', $label = true ) {
 
-		$terms = wp_kses_post( nl2br( $this->field->gwtermsofservice_terms ) );
+		$terms = wp_kses_post( wpautop( $this->field->gwtermsofservice_terms ) );
 		$value = $this->value();
 
 		$html = "
-			<div class='terms-of-service-text'>$terms</div>
-			<div class='terms-of-service-agreement'><span class='terms-of-service-tick' style='font-family:dejavusans;'>&#10004;</span> $value</div>
+			<div class='terms-of-service-text'>$terms</div>			
 		";
+
+		if ( ! $this->is_field_empty() ) {
+			$html .= "<div class='terms-of-service-agreement'><span class='terms-of-service-tick' style='font-family:dejavusans;'>&#10004;</span> $value</div>";
+		} else {
+			$not_accepted_text = __( 'Not accepted', 'gravity-forms-pdf-extended' );
+			$html              .= "<div class='terms-of-service-agreement'><span class='terms-of-service-tick' style='font-family:dejavusans;'>&#10006;</span> $not_accepted_text</div>";
+		}
 
 		return parent::html( $html );
 	}
