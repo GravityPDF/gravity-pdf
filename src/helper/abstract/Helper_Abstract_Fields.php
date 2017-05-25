@@ -94,7 +94,7 @@ abstract class Helper_Abstract_Fields {
 	 *
 	 * @since 4.0
 	 */
-	private $cached_results;
+	protected $cached_results;
 
 	/**
 	 * As come fields can have multiple field types we'll use $fieldObject to store the object
@@ -113,7 +113,7 @@ abstract class Helper_Abstract_Fields {
 	 *
 	 * @since 4.0
 	 */
-	protected $misc;
+	public $misc;
 
 	/**
 	 * Set up the object
