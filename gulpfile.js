@@ -9,7 +9,7 @@ var gulp = require('gulp'),
 /* Minify our CSS */
 gulp.task('minify', function () {
   return gulp.src('src/assets/css/*.css')
-    .pipe(cleanCSS({target: 'dist/assets/css'}))
+    .pipe(cleanCSS())
     .pipe(rename({
       suffix: '.min'
     }))
@@ -28,7 +28,7 @@ gulp.task('compress', function () {
 
 /* Generate the latest language files */
 gulp.task('language', function () {
-  return gulp.src('**/*.php')
+  return gulp.src(['src/**/*.php', '*.php'])
     .pipe(wpPot({
       domain: 'gravity-forms-pdf-extended',
       package: 'Gravity PDF'
@@ -41,6 +41,4 @@ gulp.task('watch', function () {
   watch('src/assets/css/*.css', function () { gulp.start('minify') })
 })
 
-gulp.task('default', function () {
-  gulp.start('language', 'minify', 'compress')
-})
+gulp.task('default', ['language', 'minify', 'compress'] )
