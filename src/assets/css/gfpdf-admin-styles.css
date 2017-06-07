@@ -9,7 +9,7 @@
 	.notice.gfpdf-alert-mascot {
 		padding-left: 145px !important;
 
-		background-image: url( ../images/paws-with-logo-small.png);
+		background-image: url(../../../src/assets/images/paws-with-logo-small.png);
 		background-position: 10px 50%;
 		background-repeat: no-repeat;
 		background-size: 125px;
