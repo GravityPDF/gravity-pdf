@@ -693,7 +693,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$view,
 			$this->data,
 			$this->options,
-			$this->misc
+			$this->misc,
+			$this->gform
 		);
 
 		$class->init();
