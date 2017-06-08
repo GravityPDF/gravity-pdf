@@ -89,7 +89,7 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 * Feature: Merge tags and shortcodes are displayed in the PDF for any administrative fields (GH#633)
 * Feature: New field class 'pagebreak' forces a pagebreak in the PDF (GH#634)
 * Feature: Instead of the field not showing at all, Gravity Perks Terms of Conditions field now shows the text "Not accepted"
-when user hasn't agreed to terms (). (GH#636)
+when user hasn't agreed to terms (GH#636)
 
 * Dev Feature: Add premium add-on and licensing infrastructure (GH#619)
 * Dev Feature: [gravitypdf] shortcode debug messages can be toggled on and off for users with the 'gravityforms_view_entries' capability (GH#627)
@@ -104,11 +104,17 @@ greater control over the core PDF functionality. (GH#622)
 * Dev Feature: Upgrade all NPM modules to latest versions. PDF Template Manager now renders faster (GH#631)
 * Dev Feature: Remove hard dependancy on the Helper_Interface_Config interface for the template configuration file (GH#632)
 * Dev Feature: Added 'gfpdf_field_middleware' filter to control when a field should be displayed in the core PDF templates (GH#635)
+* Dev Feature: Greater access to the Field_Product class internals (GH#642)
 
 * Bug: Correctly exit the script when the PDF is downloaded / sent to the browser (GH#610)
 * Bug: Don't auto-redirect to welcome / update screen on plugin install or upgrade which resolves a cached redirect issue (GH#612)
 * Bug: Register two PDF endpoints to support both pretty and almost pretty permalinks at the same time (GH#614)
 * Bug: Fix [gravitypdf] shortcode display error in GravityView when wrapped in another shortcode (GH#628)
+* Bug: Add support for Gravity Forms 2.3 Merge Tags (GH#643)
+* Bug: Fix background image relative paths (GH#645)
+* Bug: Fix GravityView display issue when view is used on the front page (GH#639)
+* Bug: Don't show selected product options in the product field when not grouping products together in PDF (GH#646)
+* Bug: Fix edge case that caused PDF settings to be overridden when the form is updated (GH#648)
 
 = 4.1.1 =
 * Bug: Add check to see if headers are already sent before trying to redirect to the welcome / update page (GH#601)
