@@ -959,7 +959,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				/* Reset the variables each loop */
 				$filename = $tier_2_filename = '';
 
-				if ( $this->maybe_attach_to_notification( $notifications, $settings ) ) {
+				if ( $this->maybe_attach_to_notification( $notifications, $settings, $entry, $form ) ) {
 
 					/* Generate our PDF */
 					$filename = $this->generate_and_save_pdf( $entry, $settings );
@@ -985,12 +985,14 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @param  array $notification The Gravity Form Notification currently being processed
 	 * @param  array $settings     The current Gravity PDF Settings
+	 * @param  array $form         Added to 4.2
+	 * @param  array $entry        Added to 4.2
 	 *
 	 * @return boolean
 	 *
 	 * @since 4.0
 	 */
-	public function maybe_attach_to_notification( $notification, $settings ) {
+	public function maybe_attach_to_notification( $notification, $settings, $entry = [], $form = [] ) {
 
 		$attach = false;
 		if ( isset( $settings['notification'] ) && is_array( $settings['notification'] ) ) {
@@ -1002,7 +1004,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		/**
 		 * @since 4.2
 		 */
-		return apply_filters( 'gfpdf_maybe_attach_to_notification', $attach, $notification, $settings );
+		return apply_filters( 'gfpdf_maybe_attach_to_notification', $attach, $notification, $settings, $entry, $form );
 	}
 
 	/**
