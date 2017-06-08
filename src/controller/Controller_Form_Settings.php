@@ -10,6 +10,7 @@ use GFPDF\Helper\Helper_Interface_Filters;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Abstract_Options;
+use GFPDF\Helper\Helper_Form;
 
 /**
  * Form Settings (PDF Configuration) Controller
@@ -83,6 +84,15 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	protected $misc;
 
 	/**
+	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
+	 *
+	 * @var \GFPDF\Helper\Helper_Form
+	 *
+	 * @since 4.2
+	 */
+	protected $gform;
+
+	/**
 	 * Setup our class by injecting all our dependancies
 	 *
 	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_Form_Settings $model   Our Form Model the controller will manage
@@ -90,15 +100,17 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	 * @param \GFPDF\Helper\Helper_Data                              $data    Our plugin data store
 	 * @param \GFPDF\Helper\Helper_Abstract_Options                  $options Our options class which allows us to access any settings
 	 * @param \GFPDF\Helper\Helper_Misc                              $misc    Our miscellaneous methods
+	 * @param \GFPDF\Helper\Helper_Form                              $form    Out Gravity Forms object
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Data $data, Helper_Abstract_Options $options, Helper_Misc $misc ) {
+	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view, Helper_Data $data, Helper_Abstract_Options $options, Helper_Misc $misc, Helper_Form $form ) {
 
 		/* Assign our internal variables */
 		$this->data    = $data;
 		$this->options = $options;
 		$this->misc    = $misc;
+		$this->gform   = $form;
 
 		/* Load our model and view */
 		$this->model = $model;
@@ -174,6 +186,9 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 
 		/* Store our TinyMCE Options */
 		add_filter( 'tiny_mce_before_init', [ $this, 'store_tinymce_settings' ] );
+
+		/* Update our PDF settings before the form gets updated */
+		add_filter( 'gform_form_update_meta', [ $this, 'clear_cached_pdf_settings'], 10, 2 );
 	}
 
 	/**
@@ -233,5 +248,28 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 		}
 
 		return $settings;
+	}
+
+	/**
+	 * Updating the form can sometimes remove the PDF configuration if the original editor begins work after the PDF is saved.
+	 * This usually occurs in a multi-user environment with multiple devs. To fix this, before the form is updated via the
+	 * form editor we will pull the latest PDF settings.
+	 *
+	 * @Internal https://github.com/GravityPDF/gravity-pdf/issues/640
+	 *
+	 * @param array $form
+	 * @param int   $form_id
+	 *
+	 * @return array
+	 *
+	 * @since 4.2
+	 */
+	public function clear_cached_pdf_settings( $form, $form_id ) {
+		if ( is_admin() && ! rgempty( 'gform_meta' ) && isset( $form['gfpdf_form_settings'] ) ) {
+			$updated_form                = $this->gform->get_form( $form_id );
+			$form['gfpdf_form_settings'] = ( isset( $updated_form['gfpdf_form_settings'] ) ) ? $updated_form['gfpdf_form_settings'] : [];
+		}
+
+		return $form;
 	}
 }
