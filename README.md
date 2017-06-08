@@ -59,10 +59,10 @@ The tests are located in `tests/mocha/unit-tests/`.
 
 Running the tests can easily be done with one of the following commands:
 
-* `npm run-script test` – runs all the tests once in PhantomJS
-* `npm run-script test:watch` – watches for changes to the tests and runs in PhantomJS
-* `npm run-script test:all` – runs all tests in Firefox, Chrome and Internet Explorer
+* `yarn run test` – runs all the tests once in PhantomJS
+* `yarn run test:watch` – watches for changes to the tests and runs in PhantomJS
+* `yarn run test:all` – runs all tests in Firefox, Chrome and Internet Explorer
  
 ### Building JS
 
-We use Webpack to compile our Javascript from ES6 to ES5. If you want to modify the Javascript then take advantage of `npm run-script watch` to automatically re-build the JS when changes are made.
+We use Webpack to compile our Javascript from ES6 to ES5. If you want to modify the Javascript then take advantage of `yarn run watch` to automatically re-build the JS when changes are made.
