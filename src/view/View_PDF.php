@@ -369,7 +369,7 @@ class View_PDF extends Helper_Abstract_View {
 
 		/* Allow the config to be changed through a filter */
 		$config['meta'] = ( isset( $config['meta'] ) ) ? $config['meta'] : [];
-		$config         = apply_filters( 'gfpdf_pdf_configuration', $config, $entry, $form );
+		$config         = apply_filters( 'gfpdf_current_pdf_configuration', $config, $entry, $form );
 
 		/* Get the user configuration values */
 		$show_title                     = ( isset( $config['meta']['show_title'] ) ) ? $config['meta']['show_title'] : false; /* whether we should show the form title. Default to true */
@@ -381,7 +381,7 @@ class View_PDF extends Helper_Abstract_View {
 
 		/*
 		 * Display the form title, if needed
-		 *  Use the filter 'gfpdf_pdf_configuration' to programically disable this functionality
+		 *  Use the filter 'gfpdf_current_pdf_configuration' to programically disable this functionality
 		 */
 		$this->show_form_title( $show_title, $form );
 
@@ -390,7 +390,7 @@ class View_PDF extends Helper_Abstract_View {
 
 			/*
 			 * Load our page name, if needed
-			 * Use the filter 'gfpdf_pdf_configuration' to programically disable this functionality
+			 * Use the filter 'gfpdf_current_pdf_configuration' to programically disable this functionality
 			 */
 			if ( $show_page_names === true && $field->pageNumber !== $page_number ) {
 				$this->display_page_name( $page_number, $form, $container );
@@ -420,7 +420,7 @@ class View_PDF extends Helper_Abstract_View {
 
 		/*
 		 * Output product table, if needed
-		 * Use the filter 'gfpdf_pdf_configuration' to programically disable this functionality
+		 * Use the filter 'gfpdf_current_pdf_configuration' to programically disable this functionality
 		 */
 		if ( $show_individual_product_fields === false && ! $products->is_empty() ) {
 			echo $products->html();
