@@ -619,6 +619,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 
 		/**
 		 * Use the filter below to return 'true' which will enable the master password field
+		 * See https://gravitypdf.com/documentation/v4/gfpdf_enable_master_password_field/ for usage
 		 */
 		if( ! apply_filters( 'gfpdf_enable_master_password_field', false, $settings ) ) {
 			return $settings;

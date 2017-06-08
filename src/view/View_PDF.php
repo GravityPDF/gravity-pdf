@@ -369,7 +369,12 @@ class View_PDF extends Helper_Abstract_View {
 
 		/* Allow the config to be changed through a filter */
 		$config['meta'] = ( isset( $config['meta'] ) ) ? $config['meta'] : [];
-		$config         = apply_filters( 'gfpdf_current_pdf_configuration', $config, $entry, $form );
+
+		/**
+		 * See https://gravitypdf.com/documentation/v4/gfpdf_current_pdf_configuration/ for usage
+		 * @since 4.2
+		 */
+		$config = apply_filters( 'gfpdf_current_pdf_configuration', $config, $entry, $form );
 
 		/* Get the user configuration values */
 		$show_title                     = ( isset( $config['meta']['show_title'] ) ) ? $config['meta']['show_title'] : false; /* whether we should show the form title. Default to true */
@@ -401,6 +406,8 @@ class View_PDF extends Helper_Abstract_View {
 			 * Middleware filter to check if the field should be skipped.
 			 *
 			 * If $middlware is true the field will not be displayed in the PDF
+			 *
+			 * See https://gravitypdf.com/documentation/v4/gfpdf_field_middleware/ for usage
 			 *
 			 * @since 4.2
 			 */

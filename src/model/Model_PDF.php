@@ -654,6 +654,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		/**
+		 * See https://gravitypdf.com/documentation/v4/gfpdf_get_pdf_display_list/ for usage
 		 * @since 4.2
 		 */
 		return apply_filters( 'gfpdf_get_pdf_display_list', $args, $entry, $form );
@@ -765,6 +766,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		/**
+		 * See https://gravitypdf.com/documentation/v4/gfpdf_get_active_pdfs/ for usage
 		 * @since 4.2
 		 */
 		return apply_filters( 'gfpdf_get_active_pdfs', $filtered, $pdfs, $entry, $form );
@@ -782,7 +784,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function process_and_save_pdf( Helper_PDF $pdf ) {
 
 		/**
-		 * Use the filter below to return 'true' to force the PDF to be generated
+		 * See https://gravitypdf.com/documentation/v4/gfpdf_override_pdf_bypass/ for usage
 		 *
 		 * @since 4.2
 		 */
@@ -1002,6 +1004,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		/**
+		 * See https://gravitypdf.com/documentation/v4/gfpdf_maybe_attach_to_notification/ for usage
 		 * @since 4.2
 		 */
 		return apply_filters( 'gfpdf_maybe_attach_to_notification', $attach, $notification, $settings, $entry, $form );
@@ -1408,6 +1411,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		] );
 
 		/**
+		 * See https://gravitypdf.com/documentation/v4/gfpdf_form_data/ for usage
 		 * @since 4.2
 		 */
 		return apply_filters( 'gfpdf_form_data', $data, $entry, $form );
