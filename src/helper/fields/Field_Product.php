@@ -200,7 +200,6 @@ class Field_Product extends Helper_Abstract_Fields {
 			case 'product':
 				if ( isset( $value['name'] ) ) {
 					$html .= esc_html( $value['name'] . ' - ' . $value['price'] );
-					$html .= $this->get_option_html( $value['options'] );
 				}
 			break;
 
