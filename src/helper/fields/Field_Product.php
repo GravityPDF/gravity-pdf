@@ -56,7 +56,7 @@ class Field_Product extends Helper_Abstract_Fields {
 	 *
 	 * @var \GFPDF\Helper\Helper_Abstract_fields
 	 */
-	private $products;
+	protected $products;
 
 	/**
 	 * Store our products class for later user
@@ -67,6 +67,15 @@ class Field_Product extends Helper_Abstract_Fields {
 	 */
 	public function set_products( Helper_Abstract_Fields $products ) {
 		$this->products = $products;
+	}
+
+	/**
+	 * @return Helper_Abstract_fields
+	 *
+	 * @since 4.2
+	 */
+	public function get_products() {
+		return $this->products;
 	}
 
 	/**
