@@ -729,7 +729,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		foreach ( $this->data->addon as $addon ) {
 			$fields[ 'license_' . $addon->get_slug() ] = [
 				'id'   => 'license_' . $addon->get_slug(),
-				'name' => trim( str_replace( 'Gravity PDF', '', $addon->get_name() ) ),
+				'name' => $addon->get_short_name(),
 				'type' => 'license',
 			];
 
@@ -808,7 +808,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			'body'      => [
 				'edd_action' => 'activate_license',
 				'license'    => $license_key,
-				'item_name'  => urlencode( $addon->get_name() ), // the name of our product in EDD
+				'item_name'  => urlencode( $addon->get_short_name() ), // the name of our product in EDD
 				'url'        => home_url(),
 			],
 		] );
@@ -900,7 +900,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			'body'      => [
 				'edd_action' => 'deactivate_license',
 				'license'    => $license_key,
-				'item_name'  => urlencode( $addon->get_name() ), // the name of our product in EDD
+				'item_name'  => urlencode( $addon->get_short_name() ), // the name of our product in EDD
 				'url'        => home_url(),
 			],
 		] );

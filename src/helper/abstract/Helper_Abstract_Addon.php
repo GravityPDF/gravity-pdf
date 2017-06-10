@@ -174,6 +174,21 @@ abstract class Helper_Abstract_Addon {
 	}
 
 	/**
+	 * @return string Return the short name for the plugin
+	 *
+	 * @since 4.2
+	 */
+	final public function get_short_name() {
+		return trim(
+			str_replace(
+				'Gravity PDF',
+				'',
+				$this->get_name()
+			)
+		);
+	}
+
+	/**
 	 * @return string Return the plugin version
 	 *
 	 * @since 4.2
@@ -453,7 +468,7 @@ abstract class Helper_Abstract_Addon {
 			'body'      => [
 				'edd_action' => 'check_license',
 				'license'    => $license_info['license'],
-				'item_name'  => urlencode( $this->get_name() ),
+				'item_name'  => urlencode( $this->get_short_name() ),
 				'url'        => home_url(),
 			],
 		] );
