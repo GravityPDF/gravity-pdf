@@ -9,7 +9,7 @@ describe('<TemplateActivateButton />', () => {
   let History = createHistory()
 
   beforeEach(function () {
-    History.push('/template')
+    History.replace('/template')
   })
 
 

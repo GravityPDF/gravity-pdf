@@ -9,7 +9,7 @@ describe('<TemplateCloseDialog />', () => {
   let History = createHistory()
 
   beforeEach(function () {
-    History.push('/templates/zadani')
+    History.replace('/templates/zadani')
   })
 
   it('a button should be displayed', () => {

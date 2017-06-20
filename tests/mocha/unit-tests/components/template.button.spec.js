@@ -9,7 +9,7 @@ describe('<TemplateButton />', () => {
   let History = createHistory()
 
   beforeEach(function () {
-    History.push('/')
+    History.replace('/')
   })
 
   it('a button should be displayed', () => {
