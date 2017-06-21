@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.4
 Tested up to: 4.8
-Stable tag: 4.2.0
+Stable tag: 4.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
 
@@ -84,6 +84,9 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 18. Blank Slate provides a print-friendly template focusing solely on the user-submitted data.
 
 == Changelog ==
+
+= 4.2.1 =
+* Bug: Fix fatal DateTimeZone error for older versions of PHP (GH#654)
 
 = 4.2.0 =
 * Feature: Merge tags and shortcodes are displayed in the PDF for any administrative fields (GH#633)
@@ -268,6 +271,9 @@ greater control over the core PDF functionality. (GH#622)
 See [CHANGELOG.txt](https://github.com/GravityPDF/gravity-pdf/blob/master/CHANGELOG.txt) for v3 changelog history.
 
 == Upgrade Notice ==
+
+= 4.2.1 =
+WARNING: The minimum WordPress version supported is now 4.4.
 
 = 4.2.0 =
 WARNING: The minimum WordPress version supported is now 4.4.
