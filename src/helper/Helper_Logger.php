@@ -10,6 +10,7 @@ use Monolog\Processor\IntrospectionProcessor;
 use Monolog\Processor\MemoryPeakUsageProcessor;
 
 use DateTimeZone;
+use Exception;
 use GFLogging;
 use GFFormsModel;
 
@@ -134,8 +135,14 @@ class Helper_Logger {
 		/* Set the logger timezone once (if needed) */
 		if ( ! $timezone ) {
 			$offset = get_option( 'gmt_offset' );
+
 			if ( $offset != 0 ) {
-				Logger::setTimezone( new DateTimeZone( ( $offset > 0 ) ? '+' . $offset : $offset ) );
+				try {
+					$timezone = new DateTimeZone( ( $offset > 0 ) ? '+' . $offset : $offset );
+					Logger::setTimezone( $timezone );
+				} catch ( Exception $e ) {
+					/* do nothing */
+				}
 			}
 			$timezone = true;
 		}
