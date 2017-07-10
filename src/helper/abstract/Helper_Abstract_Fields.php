@@ -320,8 +320,8 @@ abstract class Helper_Abstract_Fields {
 		 * See https://gravitypdf.com/documentation/v4/gfpdf_pdf_field_content/ for usage
 		 * @since 4.2
 		 */
-		$value = apply_filters( 'gfpdf_pdf_field_content', $value, $this->field, $this->entry, $this->form );
-		$value = apply_filters( 'gfpdf_pdf_field_content_' . $this->field->get_input_type(), $value, $this->field, $this->entry, $this->form );
+		$value = apply_filters( 'gfpdf_pdf_field_content', $value, $this->field, $this->entry, $this->form, $this );
+		$value = apply_filters( 'gfpdf_pdf_field_content_' . $this->field->get_input_type(), $value, $this->field, $this->entry, $this->form, $this );
 
 		$label = esc_html( $this->get_label() );
 		$type  = $this->field->get_input_type();
