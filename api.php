@@ -547,6 +547,19 @@ final class GPDFAPI {
 	}
 
 	/**
+	 * Returns an array of all installed fonts
+	 *
+	 * @return array
+	 *
+	 * @since 4.3
+	 */
+	public static function get_pdf_fonts() {
+		$options = static::get_options_class();
+
+		return $options->get_installed_fonts();
+	}
+
+	/**
 	 * Installs a PDF font on the file system
 	 *
 	 * See https://gravitypdf.com/documentation/v4/api_add_pdf_font/ for more information about this method

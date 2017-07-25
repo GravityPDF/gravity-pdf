@@ -902,6 +902,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		$pdf_generator = new Helper_PDF( $entry, $settings, $this->gform, $this->data, $this->misc, $this->templates );
 		$pdf_generator->set_filename( $this->get_pdf_name( $settings, $entry ) );
+		$pdf_generator = apply_filters( 'gfpdf_pdf_generator_pre_processing', $pdf_generator );
 
 		if ( $this->process_and_save_pdf( $pdf_generator ) ) {
 			$pdf_path = $pdf_generator->get_full_pdf_path();
@@ -1306,6 +1307,8 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function get_form_data( $entry ) {
+
+		$entry = apply_filters( 'gfpdf_entry_pre_form_data', $entry );
 
 		if ( ! isset( $entry['form_id'] ) ) {
 			return [];
