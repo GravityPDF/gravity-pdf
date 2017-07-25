@@ -142,7 +142,7 @@ class PDFRender extends GFPDF_Deprecated_Abstract {
 	public function savePDF( $raw_pdf_string, $filename, $id ) {
 
 		/* create our path */
-		$path = PDF_SAVE_LOCATION . $id . '/';
+		$path = apply_filters( 'gfpdf_legacy_save_path', PDF_SAVE_LOCATION . $id . '/', $filename, $id );
 		if ( ! is_dir( $path ) ) {
 			if ( ! wp_mkdir_p( $path ) ) {
 				throw new Exception( sprintf( 'Could not create directory: %s' ), esc_html( $path ) );
@@ -155,7 +155,6 @@ class PDFRender extends GFPDF_Deprecated_Abstract {
 		}
 
 		/* return the path to the PDF */
-
 		return $path . $filename;
 	}
 
