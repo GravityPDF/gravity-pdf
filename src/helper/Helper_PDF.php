@@ -898,7 +898,7 @@ class Helper_PDF {
 			$privileges      = ( isset( $this->settings['privileges'] ) ) ? $this->settings['privileges'] : [];
 			$master_password = ( isset( $this->settings['master_password'] ) ) ? $this->gform->process_tags( $this->settings['master_password'], $this->form, $this->entry ) : '';
 
-			/* GitHub Issue #624 - Fix issue with possibility of blank master password being set */
+			/* GitHub Issue #662 - Fix issue with possibility of blank master password being set */
 			if ( strlen( $master_password ) === 0 ) {
 				$master_password = null;
 			}
