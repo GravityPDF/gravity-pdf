@@ -405,14 +405,14 @@ class Helper_Templates {
 		 * @var array
 		 */
 		return apply_filters( 'gfpdf_template_header_details', [
-			'template'             => esc_html__( 'Template Name', 'gravity-forms-pdf-extended' ),
-			'version'              => esc_html__( 'Version', 'gravity-forms-pdf-extended' ),
-			'description'          => esc_html__( 'Description', 'gravity-forms-pdf-extended' ),
-			'author'               => esc_html__( 'Author', 'gravity-forms-pdf-extended' ),
-			'author uri'           => esc_html__( 'Author URI', 'gravity-forms-pdf-extended' ),
-			'group'                => esc_html__( 'Group', 'gravity-forms-pdf-extended' ),
-			'required_pdf_version' => esc_html__( 'Required PDF Version', 'gravity-forms-pdf-extended' ),
-			'tags'                 => esc_html__( 'Tags', 'gravity-forms-pdf-extended' ),
+			'template'             => 'Template Name',
+			'version'              => 'Version',
+			'description'          => 'Description',
+			'author'               => 'Author',
+			'author uri'           => 'Author URI',
+			'group'                => 'Group',
+			'required_pdf_version' => 'Required PDF Version',
+			'tags'                 => 'Tags',
 		] );
 	}
 
