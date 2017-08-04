@@ -1277,6 +1277,25 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$settings['type'] = '';
 		}
 
+		/*
+		 * Skip over any fields that shouldn't have sanitisation
+		 * By default, that's the JSON-encoded conditionalLogic field
+		 *
+		 * @since 4.2.2
+		 */
+		$ignored_fields = apply_filters(
+			'gfpdf_sanitize_ignored_fields',
+			[ 'conditionalLogic' ],
+			$value,
+			$key,
+			$input,
+			$settings
+		);
+
+		if ( in_array( $key, $ignored_fields ) ) {
+			return $value;
+		}
+
 		switch ( $settings['type'] ) {
 			case 'rich_editor':
 				/**
