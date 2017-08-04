@@ -157,7 +157,7 @@
        */
       this.getCurrentSettingsPage = function () {
         if (this.isSettings()) {
-          return $('.nav-tab-wrapper a.nav-tab-active:first').text()
+          return $('.nav-tab-wrapper a.nav-tab-active:first').data('id')
         }
         return ''
       }
@@ -177,11 +177,11 @@
 
         /* Run the appropriate settings page */
         switch (this.getCurrentSettingsPage()) {
-          case 'General':
+          case 'general':
             this.generalSettings()
             break
 
-          case 'Tools':
+          case 'tools':
             this.toolsSettings()
             break
         }
@@ -485,7 +485,7 @@
                   .attr('src', toggle_src.replace('active1.png', 'active0.png'))
 
                 /* Add row to node and fade in */
-                $newRow.hide().insertAfter($row).fadeIn().animate({ backgroundColor: background })
+                $newRow.hide().insertAfter($row).fadeIn().animate({backgroundColor: background})
               }
             })
           }
@@ -518,7 +518,7 @@
         /* Set up our delete dialog */
         var $deleteDialog = $('#delete-confirm')
 
-        var deleteButtons = [ {
+        var deleteButtons = [{
           text: GFPDF.delete,
           click: function () {
             /* handle ajax call */
@@ -562,7 +562,7 @@
               /* cancel */
               $deleteDialog.wpdialog('close').data('elm', null)
             }
-          } ]
+          }]
 
         /* Add our delete dialog box */
         this.wp_dialog($deleteDialog, deleteButtons, 300, 175)
@@ -826,18 +826,18 @@
           settings.body_class = 'id post-type-post post-status-publish post-format-standard'
           settings.formats = {
             alignleft: [
-              { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li', styles: { textAlign: 'left' } },
-              { selector: 'img,table,dl.wp-caption', classes: 'alignleft' }
+              {selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li', styles: {textAlign: 'left'}},
+              {selector: 'img,table,dl.wp-caption', classes: 'alignleft'}
             ],
             aligncenter: [
-              { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li', styles: { textAlign: 'center' } },
-              { selector: 'img,table,dl.wp-caption', classes: 'aligncenter' }
+              {selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li', styles: {textAlign: 'center'}},
+              {selector: 'img,table,dl.wp-caption', classes: 'aligncenter'}
             ],
             alignright: [
-              { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li', styles: { textAlign: 'right' } },
-              { selector: 'img,table,dl.wp-caption', classes: 'alignright' }
+              {selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li', styles: {textAlign: 'right'}},
+              {selector: 'img,table,dl.wp-caption', classes: 'alignright'}
             ],
-            strikethrough: { inline: 'del' }
+            strikethrough: {inline: 'del'}
           }
         }
 
@@ -855,12 +855,12 @@
 
           /* Enable WP quick tags */
           if (typeof(QTags) == 'function') {
-            QTags({ 'id': fullId })
+            QTags({'id': fullId})
             QTags._buttonsInit()
 
             /* remember last tab selected */
             if (typeof switchEditors.switchto === 'function') {
-              switchEditors.switchto(jQuery('#wp-' + fullId + '-wrap').find('.wp-switch-editor.switch-' + ( getUserSetting('editor') == 'html' ? 'html' : 'tmce' ))[ 0 ])
+              switchEditors.switchto(jQuery('#wp-' + fullId + '-wrap').find('.wp-switch-editor.switch-' + ( getUserSetting('editor') == 'html' ? 'html' : 'tmce' ))[0])
             }
           }
 
@@ -942,7 +942,7 @@
         if (!window.gfMergeTags && typeof form != 'undefined' && $('.merge-tag-support').length >= 0) {
           $('.merge-tag-support').each(function () {
             new gfMergeTagsObj(form, $(this))
-          });
+          })
         }
       }
 
@@ -1195,7 +1195,7 @@
         var $copyDialog = $('#setup-templates-confirm')
 
         /* Set up copy dialog */
-        var copyButtons = [ {
+        var copyButtons = [{
           text: GFPDF.continue,
           click: function () {
             /* submit form */
@@ -1208,7 +1208,7 @@
               /* cancel */
               $copyDialog.wpdialog('close')
             }
-          } ]
+          }]
 
         if ($copyDialog.length) {
           this.wp_dialog($copyDialog, copyButtons, 500, 350)
@@ -1262,7 +1262,7 @@
         var $uninstallDialog = $('#uninstall-confirm')
 
         /* Set up uninstall dialog */
-        var uninstallButtons = [ {
+        var uninstallButtons = [{
           text: GFPDF.uninstall,
           click: function () {
             /* submit form */
@@ -1275,7 +1275,7 @@
               /* cancel */
               $uninstallDialog.wpdialog('close')
             }
-          } ]
+          }]
 
         this.wp_dialog($uninstallDialog, uninstallButtons, 500, 175)
 
@@ -1428,14 +1428,14 @@
       this.updateURLParameter = function (url, param, paramVal) {
         var newAdditionalURL = ""
         var tempArray = url.split("?")
-        var baseURL = tempArray[ 0 ]
-        var additionalURL = tempArray[ 1 ]
+        var baseURL = tempArray[0]
+        var additionalURL = tempArray[1]
         var temp = ""
         if (additionalURL) {
           tempArray = additionalURL.split("&")
           for (i = 0; i < tempArray.length; i++) {
-            if (tempArray[ i ].split('=')[ 0 ] != param) {
-              newAdditionalURL += temp + tempArray[ i ]
+            if (tempArray[i].split('=')[0] != param) {
+              newAdditionalURL += temp + tempArray[i]
               temp = "&"
             }
           }

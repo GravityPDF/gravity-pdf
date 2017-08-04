@@ -1055,14 +1055,14 @@
       };
 
       this.processSettings = function() {
-        var active = $('.nav-tab-wrapper a.nav-tab-active:first').text();
+        var active = $('.nav-tab-wrapper a.nav-tab-active:first').data('id');
 
         switch (active) {
-          case 'Tools':
+          case 'tools':
             this.tools_settings();
             break;
 
-          case 'Help':
+          case 'help':
             this.help_settings();
             break;
         }
