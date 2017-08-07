@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.4
 Tested up to: 4.8
-Stable tag: 4.2.1
+Stable tag: 4.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
 
@@ -84,6 +84,13 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 18. Blank Slate provides a print-friendly template focusing solely on the user-submitted data.
 
 == Changelog ==
+
+= 4.2.2 =
+* Bug: Fix empty Master Sassword regression introduced in 4.2 (GH#664)
+* Bug: Fix Javascript errors when plugin translation files used (GH#667)
+* Bug: Fix PDF Conditional Logic saving problem when using 'Less than' (GH#668)
+* Bug: Fix PHP Notices when using custom font (GH#669)
+* Bug: Merge Mpdf upstream patches (includes Chrome Viewer Yellow hover fix)
 
 = 4.2.1 =
 * Bug: Fix fatal DateTimeZone error for older versions of PHP (GH#654)
