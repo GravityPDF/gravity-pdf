@@ -990,7 +990,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		$custom_fonts = $this->get_custom_fonts();
 
-		if ( sizeof( $custom_fonts ) > 0 ) {
+		if ( count( $custom_fonts ) > 0 ) {
 
 			$user_defined_fonts = [];
 
@@ -1016,9 +1016,12 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	public function get_custom_fonts() {
 		$fonts = $this->get_option( 'custom_fonts' );
 
-		if ( is_array( $fonts ) && sizeof( $fonts ) > 0 ) {
+		if ( is_array( $fonts ) && count( $fonts ) > 0 ) {
 			foreach ( $fonts as &$font ) {
-				$font['shortname'] = $this->get_font_short_name( $font['font_name'] );
+				$font['shortname']   = $this->get_font_short_name( $font['font_name'] );
+				$font['italics']     = ( isset( $font['italics'] ) ) ? $font['italics'] : '';
+				$font['bold']        = ( isset( $font['bold'] ) ) ? $font['bold'] : '';
+				$font['bolditalics'] = ( isset( $font['bolditalics'] ) ) ? $font['bolditalics'] : '';
 			}
 
 			return $fonts;
