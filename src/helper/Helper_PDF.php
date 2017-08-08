@@ -896,7 +896,12 @@ class Helper_PDF {
 
 			$password        = ( isset( $this->settings['password'] ) ) ? $this->gform->process_tags( $this->settings['password'], $this->form, $this->entry ) : '';
 			$privileges      = ( isset( $this->settings['privileges'] ) ) ? $this->settings['privileges'] : [];
-			$master_password = ( isset( $this->settings['master_password'] ) ) ? $this->gform->process_tags( $this->settings['master_password'], $this->form, $this->entry ) : null;
+			$master_password = ( isset( $this->settings['master_password'] ) ) ? $this->gform->process_tags( $this->settings['master_password'], $this->form, $this->entry ) : '';
+
+			/* GitHub Issue #662 - Fix issue with possibility of blank master password being set */
+			if ( strlen( $master_password ) === 0 ) {
+				$master_password = null;
+			}
 
 			$this->mpdf->SetProtection( $privileges, $password, $master_password, 128 );
 		}

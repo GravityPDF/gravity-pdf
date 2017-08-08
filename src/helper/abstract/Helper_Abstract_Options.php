@@ -990,7 +990,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		$custom_fonts = $this->get_custom_fonts();
 
-		if ( sizeof( $custom_fonts ) > 0 ) {
+		if ( count( $custom_fonts ) > 0 ) {
 
 			$user_defined_fonts = [];
 
@@ -1016,9 +1016,12 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	public function get_custom_fonts() {
 		$fonts = $this->get_option( 'custom_fonts' );
 
-		if ( is_array( $fonts ) && sizeof( $fonts ) > 0 ) {
+		if ( is_array( $fonts ) && count( $fonts ) > 0 ) {
 			foreach ( $fonts as &$font ) {
-				$font['shortname'] = $this->get_font_short_name( $font['font_name'] );
+				$font['shortname']   = $this->get_font_short_name( $font['font_name'] );
+				$font['italics']     = ( isset( $font['italics'] ) ) ? $font['italics'] : '';
+				$font['bold']        = ( isset( $font['bold'] ) ) ? $font['bold'] : '';
+				$font['bolditalics'] = ( isset( $font['bolditalics'] ) ) ? $font['bolditalics'] : '';
 			}
 
 			return $fonts;
@@ -1275,6 +1278,25 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		if ( ! isset( $settings['type'] ) ) {
 			$settings['type'] = '';
+		}
+
+		/*
+		 * Skip over any fields that shouldn't have sanitisation
+		 * By default, that's the JSON-encoded conditionalLogic field
+		 *
+		 * @since 4.2.2
+		 */
+		$ignored_fields = apply_filters(
+			'gfpdf_sanitize_ignored_fields',
+			[ 'conditionalLogic' ],
+			$value,
+			$key,
+			$input,
+			$settings
+		);
+
+		if ( in_array( $key, $ignored_fields ) ) {
+			return $value;
 		}
 
 		switch ( $settings['type'] ) {
@@ -2113,8 +2135,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$class       = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
 		$size        = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? esc_attr( $args['size'] ) : 'regular';
 
-		$html = '<input type="number" class="' . $size . '-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_width" min="1" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( stripslashes( $value[0] ) ) . '" required /> ' . esc_html__( 'Width', 'gravity-forms-pdf-extended' );
-		$html .= ' <input type="number" class="' . $size . '-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_height" min="1" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( stripslashes( $value[1] ) ) . '" required /> ' . esc_html__( 'Height', 'gravity-forms-pdf-extended' );
+		$html = '<input type="number" class="' . $size . '-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_width" min="0" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( stripslashes( $value[0] ) ) . '" /> ' . esc_html__( 'Width', 'gravity-forms-pdf-extended' );
+		$html .= ' <input type="number" class="' . $size . '-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_height" min="0" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( stripslashes( $value[1] ) ) . '" /> ' . esc_html__( 'Height', 'gravity-forms-pdf-extended' );
 
 		$measurement = apply_filters( 'gfpdf_paper_size_dimensions', [
 			'millimeters' => esc_html__( 'mm', 'gravity-forms-pdf-extended' ),
