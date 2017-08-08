@@ -5,7 +5,7 @@ namespace GFPDF\Helper\Fields;
 use GFPDF\Helper\Helper_Abstract_Field_Products;
 
 /**
- * Gravity Forms Single Product Field
+ * Gravity Forms Quantity Field
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2016, Blue Liquid Designs
@@ -41,7 +41,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * @since 4.3
  */
-class Field_Product extends Helper_Abstract_Field_Products {
+class Field_Quantity extends Helper_Abstract_Field_Products {
 
 	/**
 	 * Return the HTML form data
@@ -51,19 +51,15 @@ class Field_Product extends Helper_Abstract_Field_Products {
 	 * @since 4.3
 	 */
 	public function form_data() {
-		$value = $this->value();
+		$value    = $this->value();
 
-		if ( isset( $value['price'] ) ) {
-			$name = ( isset( $value['name'] ) && isset( $value['price'] ) ) ? $value['name'] . " ({$value['price']})" : '';
-			$name = esc_html( $name );
+		$name = ( isset( $value['name'] ) && isset( $value['price'] ) ) ? $value['name'] . " ({$value['price']})" : '';
+		$name = esc_html( $name );
 
-			$price = ( isset( $value['price_unformatted'] ) ) ? $value['price_unformatted'] : '';
-			$price = esc_html( $price );
+		$price = ( isset( $value['price_unformatted'] ) ) ? $value['price_unformatted'] : '';
+		$price = esc_html( $price );
 
-			return $this->set_form_data( $name, $price );
-		}
-
-		return [];
+		return $this->set_form_data( $name, $price );
 	}
 
 	/**
@@ -77,24 +73,15 @@ class Field_Product extends Helper_Abstract_Field_Products {
 	 * @since 4.3
 	 */
 	public function html( $value = '', $label = true ) {
-		$value = $this->value();
-		$html  = '';
+		$html = esc_html( $this->value() );
 
-		if ( isset( $value['price'] ) ) {
-			if ( in_array( $this->field->get_input_type(), [ 'radio', 'select' ] ) ) {
-				$html .= $value['name'] . ' - ' . $value['price'];
-			} else {
-				$html .= $value['price'];
-			}
-		}
-
-		return parent::html( esc_html( $html ) );
+		return parent::html( $html );
 	}
 
 	/**
 	 * Get the standard GF value of this field
 	 *
-	 * @return array
+	 * @return string
 	 *
 	 * @since    4.3
 	 *
@@ -106,10 +93,10 @@ class Field_Product extends Helper_Abstract_Field_Products {
 
 		$data = $this->products->value();
 
-		if ( isset( $data['products'][ $this->field->id ] ) ) {
-			$this->cache( $data['products'][ $this->field->id ] );
+		if ( isset( $data['products'][ $this->field->productField ]['quantity'] ) ) {
+			$this->cache( $data['products'][ $this->field->productField ]['quantity'] );
 		} else {
-			$this->cache( [] );
+			$this->cache( '' );
 		}
 
 		return $this->cache();
