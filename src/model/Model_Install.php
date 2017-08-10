@@ -543,4 +543,15 @@ class Model_Install extends Helper_Abstract_Model {
 		}
 		exit;
 	}
+
+	/**
+	 * In preparation for the removal of the Mpdf fonts we'll copy them all to our
+	 * PDF Working Directory during an update
+	 *
+	 * @since 4.3
+	 */
+	public function copy_fonts_to_working_directory() {
+		$mpdf_dir = PDF_PLUGIN_DIR . 'vendor/blueliquiddesigns/mpdf/ttfonts/';
+		$this->misc->copyr( $mpdf_dir, $this->data->template_font_location );
+	}
 }
