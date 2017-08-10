@@ -66,7 +66,7 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 		parent::setUp();
 
 		/* Setup out loader class */
-		$this->templates = new Helper_Templates( $gfpdf->log, $gfpdf->data );
+		$this->templates = new Helper_Templates( $gfpdf->log, $gfpdf->data, $gfpdf->gform );
 
 		/* Cleanup the PDF working directory */
 		$gfpdf->misc->rmdir( $gfpdf->data->template_location );
