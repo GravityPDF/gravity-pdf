@@ -124,6 +124,20 @@ abstract class Helper_Abstract_Addon {
 	protected $notices;
 
 	/**
+	 * Holds the Easy Digital Download add-on ID
+	 *
+	 * @since 4.3
+	 */
+	protected $edd_id = '';
+
+	/**
+	 * Holds the Plugin Documentation Slug
+	 *
+	 * @since 4.3
+	 */
+	protected $addon_documentation_slug = '';
+
+	/**
 	 * Helper_Abstract_Addon constructor.
 	 *
 	 * @param string                $addon_slug
@@ -216,6 +230,42 @@ abstract class Helper_Abstract_Addon {
 	}
 
 	/**
+	 * @param string $id
+	 *
+	 * @since 4.3
+	 */
+	final public function set_edd_download_id( $id ) {
+		$this->edd_id = $id;
+	}
+
+	/**
+	 * @return string Return the EDD add-on ID
+	 *
+	 * @since 4.3
+	 */
+	final public function get_edd_download_id() {
+		return $this->edd_id;
+	}
+
+	/**
+	 * @param string $slug
+	 *
+	 * @since 4.3
+	 */
+	final public function set_addon_documentation_slug( $slug ) {
+		$this->addon_documentation_slug = $slug;
+	}
+
+	/**
+	 * @return string
+	 *
+	 * @since 4.3
+	 */
+	final public function get_addon_documentation_slug() {
+		return $this->addon_documentation_slug;
+	}
+
+	/**
 	 * Setup the add-on licensing and initialise any classes
 	 *
 	 * @param array $classes
@@ -240,8 +290,8 @@ abstract class Helper_Abstract_Addon {
 		/*
 		 * Register add-on fields (if any) when class uses our extension interface
 		 */
-		if( $this instanceof Helper_Interface_Extension_Settings ) {
-			add_filter( 'gfpdf_settings_extensions', [ $this, 'register_addon_fields'] );
+		if ( $this instanceof Helper_Interface_Extension_Settings ) {
+			add_filter( 'gfpdf_settings_extensions', [ $this, 'register_addon_fields' ] );
 		}
 
 		/*
@@ -249,6 +299,15 @@ abstract class Helper_Abstract_Addon {
 		 */
 		add_action( 'admin_init', [ $this, 'maybe_schedule_license_check' ] );
 		add_action( 'gfpdf_' . $this->get_slug() . '_license_check', [ $this, 'schedule_license_check' ] );
+
+		/*
+		 * Include info on plugin listing
+		 */
+		add_action( 'after_plugin_row_' . plugin_basename( $this->get_main_plugin_file() ), [
+			$this,
+			'license_registration',
+		] );
+		add_filter( 'plugin_row_meta', [ $this, 'plugin_row_meta' ], 10, 2 );
 
 		/*
 		 * Run the init() method (if it exists) for the add-on classes and register them with our internal singleton
@@ -326,18 +385,19 @@ abstract class Helper_Abstract_Addon {
 		 * so we'll check the class impliments the correct interface before
 		 * doing anything.
 		 */
-		if( ! $this instanceof Helper_Interface_Extension_Settings ) {
+		if ( ! $this instanceof Helper_Interface_Extension_Settings ) {
 			return $settings;
 		}
 
 		$registered_fields = $this->get_global_addon_fields();
 
 		/* Add plugin heading before fields are included */
+
 		return array_merge( $settings, [
 			$this->get_slug() . '_heading' => [
-				'id'   => $this->get_slug() . '_heading',
-				'type' => 'descriptive_text',
-				'desc' => '<h4 class="section-title">' . $this->get_name() . '</h4>',
+				'id'    => $this->get_slug() . '_heading',
+				'type'  => 'descriptive_text',
+				'desc'  => '<h4 class="section-title">' . $this->get_name() . '</h4>',
 				'class' => 'gfpdf-no-padding',
 			],
 		], $registered_fields );
@@ -512,5 +572,72 @@ abstract class Helper_Abstract_Addon {
 		$this->update_license_info( $license_info );
 
 		return true;
+	}
+
+	/**
+	 * Include a license key prompt
+	 *
+	 * @since 4.3
+	 */
+	public function license_registration() {
+
+		$license_info = $this->get_license_info();
+		$edd_id       = $this->get_edd_download_id();
+
+		if ( $license_info['status'] === 'active' || empty( $edd_id ) ) {
+			return;
+		}
+
+		?>
+
+        <tr class="plugin-update-tr">
+            <td colspan="3" class="plugin-update colspanchange">
+                <div class="update-message">
+					<?php
+					printf(
+						esc_html__(
+							'%sRegister your copy of %s%s to receive access to automatic upgrades and support. Need a license key? %sPurchase one now%s.',
+							'gravity-forms-pdf-extended'
+						),
+						'<a href="' . admin_url( 'admin.php?page=gf_settings&subview=PDF&tab=license' ) . '">',
+						$this->get_name(),
+						'</a>',
+						'<a href="' . esc_url( 'https://gravitypdf.com/checkout/?edd_action=add_to_cart&download_id=' . $edd_id ) . '">',
+						'</a>'
+					)
+					?>
+                </div>
+            </td>
+        </tr>
+
+		<?php
+	}
+
+	/**
+	 * Show row meta on the plugin screen.
+	 *
+	 * @param    mixed $links Plugin Row Meta
+	 * @param    mixed $file  Plugin Base file
+	 *
+	 * @return    array
+	 *
+	 * @since  1.0
+	 */
+	public function plugin_row_meta( $links, $file ) {
+
+		if ( $file === plugin_basename( $this->get_main_plugin_file() ) ) {
+			$row_meta = [];
+
+			$doc_slug = $this->get_addon_documentation_slug();
+			if ( ! empty( $doc_slug ) ) {
+				$row_meta['docs'] = '<a href="' . esc_url( 'https://gravitypdf.com/documentation/v4/' . $doc_slug . '/' ) . '" title="' . esc_attr__( 'View plugin Documentation', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Docs', 'gravity-forms-pdf-extended' ) . '</a>';
+			}
+
+			$row_meta['support'] = '<a href="' . esc_url( 'https://gravitypdf.com/support/#contact-support' ) . '" title="' . esc_attr__( 'Get Help and Support', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Support', 'gravity-forms-pdf-extended' ) . '</a>';
+
+			return apply_filters( 'gfpdf_addon_row_meta', array_merge( $links, $row_meta ), $file, $this );
+		}
+
+		return (array) $links;
 	}
 }
