@@ -154,6 +154,9 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 
 		/* rewrite endpoints */
 		add_action( 'init', [ $this->model, 'register_rewrite_rules' ] );
+
+		/* prepare for Mpdf font removal */
+		add_action( 'gfpdf_version_changed', [ $this->model, 'copy_fonts_to_working_directory' ] );
 	}
 
 	/**
