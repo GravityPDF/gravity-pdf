@@ -5,7 +5,7 @@ namespace GFPDF\Helper\Fields;
 use GFPDF\Helper\Helper_Abstract_Field_Products;
 
 /**
- * Gravity Forms Single Product Field
+ * Gravity Forms Total Field
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2016, Blue Liquid Designs
@@ -41,7 +41,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * @since 4.3
  */
-class Field_Product extends Helper_Abstract_Field_Products {
+class Field_Total extends Helper_Abstract_Field_Products {
 
 	/**
 	 * Return the HTML form data
@@ -53,12 +53,9 @@ class Field_Product extends Helper_Abstract_Field_Products {
 	public function form_data() {
 		$value = $this->value();
 
-		if ( isset( $value['price'] ) ) {
-			$name = ( isset( $value['name'] ) && isset( $value['price'] ) ) ? $value['name'] . " ({$value['price']})" : '';
-			$name = esc_html( $name );
-
-			$price = ( isset( $value['price_unformatted'] ) ) ? $value['price_unformatted'] : '';
-			$price = esc_html( $price );
+		if ( isset( $value['total'] ) ) {
+			$name  = $value['total_formatted'];
+			$price = $value['total'];
 
 			return $this->set_form_data( $name, $price );
 		}
@@ -80,15 +77,11 @@ class Field_Product extends Helper_Abstract_Field_Products {
 		$value = $this->value();
 		$html  = '';
 
-		if ( isset( $value['price'] ) ) {
-			if ( in_array( $this->field->get_input_type(), [ 'radio', 'select' ] ) ) {
-				$html .= $value['name'] . ' - ' . $value['price'];
-			} else {
-				$html .= $value['price'];
-			}
+		if ( isset( $value['total_formatted'] ) ) {
+			$html .= $value['total_formatted'];
 		}
 
-		return parent::html( esc_html( $html ) );
+		return parent::html( $html );
 	}
 
 	/**
@@ -97,7 +90,6 @@ class Field_Product extends Helper_Abstract_Field_Products {
 	 * @return array
 	 *
 	 * @since    4.3
-	 *
 	 */
 	public function value() {
 		if ( $this->has_cache() ) {
@@ -106,8 +98,11 @@ class Field_Product extends Helper_Abstract_Field_Products {
 
 		$data = $this->products->value();
 
-		if ( isset( $data['products'][ $this->field->id ] ) ) {
-			$this->cache( $data['products'][ $this->field->id ] );
+		if ( isset( $data['products_totals']['total'] ) ) {
+			$this->cache( [
+				'total'           => esc_html( $data['products_totals']['total'] ),
+				'total_formatted' => esc_html( $data['products_totals']['total_formatted'] ),
+			] );
 		} else {
 			$this->cache( [] );
 		}

@@ -6,7 +6,7 @@ use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_PDF;
 
 use GFPDF\Helper\Helper_Abstract_Fields;
-use GFPDF\Helper\Fields\Field_Product;
+use GFPDF\Helper\Helper_Abstract_Field_Products;
 use GFPDF\Helper\Fields\Field_Default;
 use GFPDF\Helper\Fields\Field_Products;
 
@@ -1783,21 +1783,18 @@ class Model_PDF extends Helper_Abstract_Model {
 				 * To make your life more simple you should either use the same namespace as the field classes (\GFPDF\Helper\Fields) or import the class directly (use \GFPDF\Helper\Fields\Field_Text)
 				 * We've tried to make the fields as modular as possible. If you have any feedback about this approach please submit a ticket on GitHub (https://github.com/GravityPDF/gravity-pdf/issues)
 				 */
-				if ( GFCommon::is_product_field( $field->type ) ) {
 
-					/* Product fields are handled through a single function */
-					$product = new Field_Product( $field, $entry, $this->gform, $this->misc );
-					$product->set_products( $products );
+				$class = new $class_name( $field, $entry, $this->gform, $this->misc );
 
-					$class = apply_filters( 'gfpdf_field_product_class', $product, $field, $entry, $form );
-				} else {
-					/*
-					 * Load the selected class
-					 * See https://gravitypdf.com/documentation/v4/gfpdf_field_class/ for more details about these filters
-					 */
-					$class = apply_filters( 'gfpdf_field_class', new $class_name( $field, $entry, $this->gform, $this->misc ), $field, $entry, $form );
-					$class = apply_filters( 'gfpdf_field_class_' . $field->type, $class, $field, $entry, $form );
+				if ( $class instanceof Helper_Abstract_Field_Products ) {
+					$class->set_products( $products );
 				}
+
+				/*
+				 * See https://gravitypdf.com/documentation/v4/gfpdf_field_class/ for more details about these filters
+				 */
+				$class = apply_filters( 'gfpdf_field_class', $class, $field, $entry, $form );
+				$class = apply_filters( 'gfpdf_field_class_' . $field->type, $class, $field, $entry, $form );
 			}
 
 			if ( empty( $class ) || ! ( $class instanceof Helper_Abstract_Fields ) ) {

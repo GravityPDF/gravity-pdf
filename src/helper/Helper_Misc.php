@@ -151,13 +151,6 @@ class Helper_Misc {
 	 */
 	public function get_field_class( $type ) {
 
-		/* change our product field types to use a single master product class */
-		$convert_product_type = [ 'quantity', 'option', 'shipping', 'total' ];
-
-		if ( in_array( strtolower( $type ), $convert_product_type ) ) {
-			$type = 'product';
-		}
-
 		/* Format the type name correctly */
 		$typeArray = explode( '_', $type );
 		$typeArray = array_map( 'ucwords', $typeArray );

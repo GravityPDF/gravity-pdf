@@ -5,7 +5,7 @@ namespace GFPDF\Helper\Fields;
 use GFPDF\Helper\Helper_Abstract_Field_Products;
 
 /**
- * Gravity Forms Single Product Field
+ * Gravity Forms Subtotal
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2016, Blue Liquid Designs
@@ -41,7 +41,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * @since 4.3
  */
-class Field_Product extends Helper_Abstract_Field_Products {
+class Field_Discount extends Helper_Abstract_Field_Products {
+
+	/**
+	 * @return bool
+	 *
+	 * @since 4.3
+	 */
+	public function is_empty() {
+		if ( ! class_exists( 'GP_Ecommerce_Fields' ) ) {
+			return true;
+		}
+
+		parent::is_empty();
+	}
 
 	/**
 	 * Return the HTML form data
@@ -53,7 +66,7 @@ class Field_Product extends Helper_Abstract_Field_Products {
 	public function form_data() {
 		$value = $this->value();
 
-		if ( isset( $value['price'] ) ) {
+		if ( isset( $value['name'] ) ) {
 			$name = ( isset( $value['name'] ) && isset( $value['price'] ) ) ? $value['name'] . " ({$value['price']})" : '';
 			$name = esc_html( $name );
 
@@ -80,15 +93,11 @@ class Field_Product extends Helper_Abstract_Field_Products {
 		$value = $this->value();
 		$html  = '';
 
-		if ( isset( $value['price'] ) ) {
-			if ( in_array( $this->field->get_input_type(), [ 'radio', 'select' ] ) ) {
-				$html .= $value['name'] . ' - ' . $value['price'];
-			} else {
-				$html .= $value['price'];
-			}
+		if ( isset( $value['name'] ) ) {
+			$html .= esc_html( $value['price'] );
 		}
 
-		return parent::html( esc_html( $html ) );
+		return parent::html( $html );
 	}
 
 	/**
