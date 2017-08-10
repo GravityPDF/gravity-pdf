@@ -710,9 +710,15 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function get_pdf_url( $pid, $id, $download = false, $print = false, $esc = true ) {
 		global $wp_rewrite;
 
+		/*
+		 * Patch for WPML which can include the default language as a GET parameter
+		 * See https://github.com/GravityPDF/gravity-pdf/issues/550
+		 */
+		$home_url = strtok( home_url(), '?' );
+
 		/* Check if permalinks are enabled, otherwise fall back to our ugly link structure for 4.0 (not the same as our v3 links) */
 		if ( $wp_rewrite->using_permalinks() ) {
-			$url = home_url() . '/' . $wp_rewrite->root; /* Handle "almost pretty" permalinks - fix for IIS servers without modrewrite  */
+			$url = $home_url . '/' . $wp_rewrite->root; /* Handle "almost pretty" permalinks - fix for IIS servers without modrewrite  */
 			$url .= 'pdf/' . $pid . '/' . $id . '/';
 
 			if ( $download ) {
@@ -723,7 +729,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				$url .= '?print=1';
 			}
 		} else {
-			$url = home_url() . '/?gpdf=1&pid=' . $pid . '&lid=' . $id;
+			$url = $home_url . '/?gpdf=1&pid=' . $pid . '&lid=' . $id;
 
 			if ( $download ) {
 				$url .= '&action=download';
