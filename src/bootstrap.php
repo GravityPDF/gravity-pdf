@@ -205,7 +205,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->notices->init();
 
 		/* Setup our template helper */
-		$this->templates = new Helper\Helper_Templates( $this->log, $this->data );
+		$this->templates = new Helper\Helper_Templates( $this->log, $this->data, $this->gform );
 
 		/* Set up our options object - this is initialised on admin_init but other classes need to access its methods before this */
 		$this->options = new Helper\Helper_Options_Fields(
