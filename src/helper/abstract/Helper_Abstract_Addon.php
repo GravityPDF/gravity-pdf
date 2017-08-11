@@ -313,6 +313,13 @@ abstract class Helper_Abstract_Addon {
 		 * Run the init() method (if it exists) for the add-on classes and register them with our internal singleton
 		 */
 		array_walk( $classes, function( $class ) {
+
+		    /* Inject the logger class if using the trait Helper_Trait_Logger */
+			$trait = class_uses( $class );
+			if ( isset( $trait['GFPDF\Helper\Helper_Trait_Logger'] ) ) {
+			    $class->set_logger( $this->log );
+			}
+
 			if ( method_exists( $class, 'init' ) ) {
 				$class->init();
 			}
