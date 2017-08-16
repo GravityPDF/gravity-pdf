@@ -310,6 +310,11 @@ abstract class Helper_Abstract_Addon {
 		add_filter( 'plugin_row_meta', [ $this, 'plugin_row_meta' ], 10, 2 );
 
 		/*
+		 * Register Translation
+		 */
+		load_plugin_textdomain( $this->get_slug(), false, dirname( plugin_basename( $this->get_main_plugin_file() ) ) . '/languages' );
+
+		/*
 		 * Run the init() method (if it exists) for the add-on classes and register them with our internal singleton
 		 */
 		array_walk( $classes, function( $class ) {
