@@ -448,9 +448,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 			/* add media uploader */
 			wp_enqueue_media();
+			
+			wp_enqueue_script( 'gfpdf_js_entrypoint' );
 		}
-
-		wp_enqueue_script( 'gfpdf_js_entrypoint' );
 
 		if ( $this->misc->is_gfpdf_settings_tab( 'help' ) || $this->misc->is_gfpdf_settings_tab( 'tools' ) ) {
 			wp_enqueue_script( 'gfpdf_js_backbone' );
