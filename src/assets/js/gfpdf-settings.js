@@ -1097,12 +1097,21 @@
        * @since 4.0
        */
       this.setupSelectBoxes = function () {
-        $('.gfpdf-chosen').each(function () {
+        var $chosen = $('.gfpdf-chosen')
+        var chosenSettings = {
+          disable_search_threshold: 5,
+          width: '100%',
+        }
 
-          $(this).chosen({
-            disable_search_threshold: 5,
-            width: '100%',
-          })
+        if ($('body').hasClass('rtl')) {
+          $chosen.addClass('chosen-rtl')
+          chosenSettings.rtl = true
+        }
+
+        console.log(chosenSettings)
+
+        $chosen.each(function () {
+          $(this).chosen(chosenSettings)
         })
       }
 
