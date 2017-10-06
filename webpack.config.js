@@ -36,6 +36,7 @@ module.exports = {
             'NODE_ENV': JSON.stringify('production')
         }
     }),
+    new webpack.optimize.ModuleConcatenationPlugin(),
     new webpack.optimize.CommonsChunkPlugin({ name: 'vendor', filename: 'vendor.bundle.min.js' }),
     new webpack.optimize.UglifyJsPlugin({
       compress: {

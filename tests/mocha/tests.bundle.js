@@ -1,4 +1,15 @@
+import Map from 'core-js/es6/map'
+import Set from 'core-js/es6/set'
 import $ from 'jquery'
+import Enzyme from 'enzyme'
+import Adapter from 'enzyme-adapter-react-16'
+
+Enzyme.configure({ adapter: new Adapter() })
+
+/* React 16 Shim */
+window.requestAnimationFrame = function(callback) {
+  setTimeout(callback, 0);
+};
 
 // setup global defaults that our tests expect is present
 window.GFPDF = {

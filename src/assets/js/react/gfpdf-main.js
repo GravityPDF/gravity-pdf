@@ -1,5 +1,7 @@
 import $ from 'jquery'
-import Promise from 'promise-polyfill'
+import Map from 'core-js/es6/map'
+import Set from 'core-js/es6/set'
+import Promise from 'core-js/es6/promise'
 import templateBootstrap from './bootstrap/templateBootstrap'
 
 /**
