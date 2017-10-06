@@ -120,6 +120,11 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	 */
 	public function add_pdf_mergetags( $tags, $form_id ) {
 
+		/* Exit early if the Gravity Form could not be identified */
+		if( $form_id === 0 ) {
+			return $tags;
+		}
+
 		$pdfs = $this->options->get_form_pdfs( $form_id );
 
 		if ( is_wp_error( $pdfs ) ) {
