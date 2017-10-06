@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, mount } from 'enzyme'
+import { mount } from 'enzyme'
 import Immutable from 'immutable'
 import createHistory from 'history/createHashHistory';
 import { TemplateActivateButton } from '../../../../src/assets/js/react/components/TemplateActivateButton'
@@ -14,7 +14,7 @@ describe('<TemplateActivateButton />', () => {
 
 
   it('a button should be displayed', () => {
-    const comp = render(<TemplateActivateButton history={History} buttonText="Activate" />)
+    const comp = mount(<TemplateActivateButton history={History} buttonText="Activate" />)
     expect(comp.find('a').text()).to.equal('Activate')
   })
 

@@ -23,16 +23,8 @@ describe('<TemplateButton />', () => {
   it('url should be updated when button clicked', () => {
     const comp = mount(<TemplateButton history={History} />)
 
-    /* Append our button to the DOM and manually add focus so we can test our click event */
-    document.body.appendChild(comp.find('button').at(0).node)
-    const button = document.getElementById('fancy-template-selector')
-    button.focus()
-
     /* Click the button and run our test */
     comp.find('button').simulate('click')
     expect(window.location.hash).to.equal('#/template')
-
-    /* Remove button from DOM */
-    button.remove()
   })
 })
