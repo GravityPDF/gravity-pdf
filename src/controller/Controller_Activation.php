@@ -74,10 +74,10 @@ class Controller_Activation {
 			global $wp_rewrite;
 
 			/* Create two regex rules to account for users with "index.php" in the URL */
-			$query = [
+			$query = array(
 				'^' . $data->permalink,
 				'^' . $wp_rewrite->root . $data->permalink,
-			];
+			);
 
 			$match = false;
 			foreach ( $query as $rule ) {
