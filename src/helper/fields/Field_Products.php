@@ -191,7 +191,7 @@ class Field_Products extends Helper_Abstract_Fields {
 									<?php endif; ?>
 								</td>
 								<td class="textcenter"><?php echo $product['quantity']; ?></td>
-								<td><?php echo GFCommon::format_number( $price, 'currency' ); ?></td>
+								<td><?php echo $product['price']; ?></td>
 								<td><?php echo $product['subtotal_formatted'] ?></td>
 							</tr>
 						<?php endforeach; ?>
