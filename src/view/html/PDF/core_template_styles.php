@@ -175,7 +175,8 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
 			padding-top: 7px;
 		}
 
-		table.entry-products td.textright, table.entry-products th.textright {
+        table.entry-products td.totals,
+        table.entry-products .textright {
 			text-align: right;
 		}
 	<?php endif; ?>
