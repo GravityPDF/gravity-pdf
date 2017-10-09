@@ -9,7 +9,7 @@ describe('<TemplateContainer />', () => {
     const comp = shallow(<TemplateContainer
     header="Header Prop"
     footer="Footer Prop"
-    children="Children Prop" />)
+    children="Children Prop" />, { disableLifecycleMethods: true })
 
     expect(comp.find('div.theme-backdrop')).to.have.length(1)
     expect(comp.find('div.theme-wrap')).to.have.length(1)

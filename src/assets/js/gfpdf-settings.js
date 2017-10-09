@@ -1108,8 +1108,6 @@
           chosenSettings.rtl = true
         }
 
-        console.log(chosenSettings)
-
         $chosen.each(function () {
           $(this).chosen(chosenSettings)
         })

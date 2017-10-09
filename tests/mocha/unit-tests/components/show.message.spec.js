@@ -35,9 +35,9 @@ describe('<ShowMessage />', () => {
   it('verify the message is dismissed after a delay', () => {
     const comp = mount(<ShowMessage text="My Message" dismissable={true} delay={100}/>)
 
-    expect(comp.find('div').hasClass('inline')).to.be.true
+    expect(comp.find('div').render().hasClass('inline')).to.be.true
     clock.tick(101)
-    expect(comp.find('div').hasClass('inline')).to.be.false
+    expect(comp.find('div').render().hasClass('inline')).to.be.false
 
   })
 
