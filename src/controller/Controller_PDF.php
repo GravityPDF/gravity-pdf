@@ -201,6 +201,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 
 		/* Backwards compatibility for our Tier 2 plugin */
 		add_filter( 'gfpdfe_pre_load_template', [ 'PDFRender', 'prepare_ids' ], 1, 8 );
+		add_filter( 'gfpdfe_pre_load_template', [ 'PDFRender', 'alias_mpdf' ], 1, 8 );
 
 		/* Pre-process our template arguments and automatically render them in PDF */
 		add_filter( 'gfpdf_template_args', [ $this->model, 'preprocess_template_arguments' ] );

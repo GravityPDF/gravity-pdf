@@ -2,7 +2,7 @@
 
 namespace GFPDF\Helper;
 
-use mPDF;
+use blueliquiddesigns\Mpdf\mPDF;
 
 use Exception;
 
