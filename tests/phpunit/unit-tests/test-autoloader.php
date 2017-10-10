@@ -151,7 +151,7 @@ class Test_Autoloader extends WP_UnitTestCase {
 	 */
 	public function provider_composer_dependancies() {
 		return [
-			[ 'mPDF' ],
+			[ 'blueliquiddesigns\Mpdf\mPDF' ],
 			[ 'QueryPath' ],
 			[ 'Monolog\Logger' ],
 			[ 'Monolog\Processor\IntrospectionProcessor' ],
