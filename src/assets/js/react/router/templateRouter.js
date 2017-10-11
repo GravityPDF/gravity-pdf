@@ -5,8 +5,8 @@ import { Provider } from 'react-redux'
 
 import { HashRouter as Router, Route, Switch } from 'react-router-dom'
 
-import TemplateList from '../components/TemplateList'
-import TemplateSingle from '../components/TemplateSingle'
+import TemplateList from '../components/Template/TemplateList'
+import TemplateSingle from '../components/Template/TemplateSingle'
 import Empty from '../components/Empty'
 
 /**

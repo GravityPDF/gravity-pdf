@@ -3,13 +3,12 @@ var gulp = require('gulp'),
   cleanCSS = require('gulp-clean-css'),
   rename = require('gulp-rename'),
   wpPot = require('gulp-wp-pot'),
-  sort = require('gulp-sort'),
   watch = require('gulp-watch')
 
 /* Minify our CSS */
 gulp.task('minify', function () {
   return gulp.src('src/assets/css/*.css')
-    .pipe(cleanCSS())
+    .pipe(cleanCSS({ rebaseTo: 'dist/assets/css/'}))
     .pipe(rename({
       suffix: '.min'
     }))

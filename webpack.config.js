@@ -1,4 +1,6 @@
 var webpack = require('webpack')
+var path = require('path')
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
 var PROD = (process.env.NODE_ENV === 'production')
 var vendors = require("./package.json").dependencies
@@ -17,7 +19,11 @@ module.exports = {
     loaders: [
       {
         test: /\.js$/,
-        exclude: /(node_modules|bower_components)/,
+        include: [
+          path.resolve(__dirname, "src/assets"),
+          path.resolve(__dirname, "tests/mocha"),
+          path.resolve(__dirname, "node_modules/promise-reflect/promise-reflect.js"),
+        ],
         loader: 'babel-loader'
       },
       {
@@ -38,14 +44,14 @@ module.exports = {
     }),
     new webpack.optimize.ModuleConcatenationPlugin(),
     new webpack.optimize.CommonsChunkPlugin({ name: 'vendor', filename: 'vendor.bundle.min.js' }),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false
-      },
-      output: {
-        comments: false
-      },
-      sourceMap: false
+    new UglifyJSPlugin({
+      parallel: true,
+      sourceMap: false,
+      uglifyOptions: {
+        output: {
+          comments: false
+        }
+      }
     })
   ] : [
     new webpack.optimize.CommonsChunkPlugin({ name: 'vendor', filename: 'vendor.bundle.min.js' }),

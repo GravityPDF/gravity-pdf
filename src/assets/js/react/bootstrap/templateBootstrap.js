@@ -2,14 +2,12 @@ import React from 'react'
 import { render } from 'react-dom'
 import { HashRouter as Router, Route } from 'react-router-dom'
 import request from 'superagent'
-
-import { createStore, combineReducers } from 'redux'
 import watch from 'redux-watch'
 
+import { getStore } from '../store'
 import { selectTemplate } from '../actions/templates'
 import templateRouter from '../router/templateRouter'
-import templateReducer from '../reducers/templateReducer'
-import TemplateButton from '../components/TemplateButton'
+import TemplateButton from '../components/Template/TemplateButton'
 
 /**
  * Advanced Template Selector Bootstrap
@@ -49,11 +47,7 @@ import TemplateButton from '../components/TemplateButton'
  */
 export default function templateBootstrap ($templateField) {
 
-  /* Combine our Redux Reducers */
-  const reducers = setupReducers()
-
-  /* Create our store and enable the Redux dev tools, if they exist */
-  const store = createStore(reducers, window.devToolsExtension && window.devToolsExtension())
+  const store = getStore()
 
   /* Create our button container and render our component in it */
   createTemplateMarkup($templateField)
@@ -74,20 +68,6 @@ export default function templateBootstrap ($templateField) {
    */
   activeTemplateStoreListener(store, $templateField)
   templateChangeStoreListener(store, $templateField)
-}
-
-/**
- * Combine our Redux reducers for use in a single store
- * If you want to add new top-level keys to our store, this is the place
- *
- * @returns {Function}
- *
- * @since 4.1
- */
-export function setupReducers () {
-  return combineReducers({
-    template: templateReducer,
-  })
 }
 
 /**

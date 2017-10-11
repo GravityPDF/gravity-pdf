@@ -1215,6 +1215,19 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Change mPDF's font folder
+	 *
+	 * @param $path
+	 *
+	 * @return string
+	 *
+	 * @since 4.4
+	 */
+	public function mpdf_font_path( $path ) {
+		return $this->data->template_font_location;
+	}
+
+	/**
 	 * An mPDF filter that checks if mPDF has the font currently installed, otherwise
 	 * will look in the Gravity PDF font folder for an alternative.
 	 *

@@ -190,6 +190,35 @@ class Model_Actions extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Check if one of the core fonts exists in the fonts directory
+	 *
+	 * @return bool
+	 *
+	 * @since 4.4
+	 */
+	public function core_font_condition() {
+
+		$misc = GPDFAPI::get_misc_class();
+
+		/* Check if one of the core fonts already exists */
+		if ( ! is_file( $this->data->template_font_location . 'DejaVuSansCondensed.ttf' ) && ! $misc->is_gfpdf_settings_tab( 'tools' ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Redirect user to our font installer tool
+	 *
+	 * @since 4.4
+	 */
+	public function core_font_redirect() {
+		wp_safe_redirect( admin_url( 'admin.php?page=gf_settings&subview=PDF&tab=tools#/downloadCoreFonts' ) );
+		exit;
+	}
+
+	/**
 	 * Process our v3 to v4 migration
 	 *
 	 * @return boolean

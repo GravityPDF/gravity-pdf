@@ -267,6 +267,13 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'options' => 'install_fonts',
 						'tooltip' => '<h6>' . esc_html__( 'Install Fonts', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'Custom fonts can be installed for use in your PDFs. Only %s.ttf%s font files are supported.', 'gravity-forms-pdf-extended' ), '<code>', '</code>'  ),
 					],
+
+					'install_core_fonts' => [
+						'id'      => 'install_core_fonts',
+						'name'    => esc_html__( 'Install Core Fonts', 'gravity-forms-pdf-extended' ),
+						'type'    => 'hook',
+						'tooltip' => '<h6>' . esc_html__( 'Install Core Fonts', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'This action will automatically install the core fonts needed to run Gravity PDF. It only needs to be run once and the fonts will perpetuate after any plugin update.', 'gravity-forms-pdf-extended' ),
+					],
 				]
 			),
 

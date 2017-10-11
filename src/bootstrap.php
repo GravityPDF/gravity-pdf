@@ -230,6 +230,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->mergetags();
 		$this->actions();
 		$this->template_manager();
+		$this->load_core_font_handler();
 
 		/* Add localisation support */
 		$this->add_localization_support();
@@ -844,6 +845,22 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/* Add to our singleton controller */
 		$this->singleton->add_class( $class );
 		$this->singleton->add_class( $model );
+	}
+
+	/**
+	 * Initialise our core font AJAX handler
+	 *
+	 * @since 4.4
+	 *
+	 * @return void
+	 */
+	public function load_core_font_handler() {
+		$view  = new View\View_Save_Core_Fonts( [] );
+		$class = new Controller\Controller_Save_Core_Fonts( $view, $this->log, $this->data, $this->misc );
+
+		$class->init();
+
+		$this->singleton->add_class( $class );
 	}
 
 	/**

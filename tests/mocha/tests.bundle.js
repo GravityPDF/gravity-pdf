@@ -1,5 +1,3 @@
-import Map from 'core-js/es6/map'
-import Set from 'core-js/es6/set'
 import $ from 'jquery'
 import Enzyme from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
