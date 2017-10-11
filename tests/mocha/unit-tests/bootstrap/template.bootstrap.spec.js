@@ -5,9 +5,10 @@ import { selectTemplate } from '../../../../src/assets/js/react/actions/template
 
 import {
   createTemplateMarkup,
-  activeTemplateStoreListener,
-  setupReducers
+  activeTemplateStoreListener
 } from '../../../../src/assets/js/react/bootstrap/templateBootstrap'
+
+import { setupReducers } from '../../../../src/assets/js/react/store'
 
 describe('bootstrap.spec.js', () => {
   beforeEach(function () {

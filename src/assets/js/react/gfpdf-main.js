@@ -1,8 +1,6 @@
 import $ from 'jquery'
-import Map from 'core-js/es6/map'
-import Set from 'core-js/es6/set'
-import Promise from 'core-js/es6/promise'
 import templateBootstrap from './bootstrap/templateBootstrap'
+import coreFontBootstrap from './bootstrap/coreFontBootstrap'
 
 /**
  * JS Entry point for WebPack
@@ -61,5 +59,10 @@ $(function () {
     if ($templateField.length > 0) {
         templateBootstrap($templateField)
     }
+  }
+
+  /* Initialise the Core Font downloader */
+  if($('#gfpdf-install-core-fonts').length) {
+    coreFontBootstrap()
   }
 })

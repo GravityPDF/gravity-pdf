@@ -912,6 +912,7 @@ class Test_PDF extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_notifications() {
+		global $gfpdf;
 
 		/* Setup some test data */
 		$results = $this->create_form_and_entries();
@@ -919,15 +920,17 @@ class Test_PDF extends WP_UnitTestCase {
 		$form    = $results['form'];
 
 		/* Create PDF file so it isn't recreated */
-		$path = PDF_TEMPLATE_LOCATION . "tmp/{$form['id']}{$entry['id']}/";
+		$folder = $form['id'] . $entry['id'];
+		$path = $gfpdf->data->template_tmp_location . "$folder/";
+		$file = "test-{$form['id']}.pdf";
 
 		wp_mkdir_p( $path );
-		touch( $path . "test-{$form['id']}.pdf" );
+		touch( $path . $file );
 
 		$notifications = $this->model->notifications( $form['notifications']['54bca349732b8'], $form, $entry );
 
 		/* Check the results are successful */
-		$this->assertNotFalse( strpos( $notifications['attachments'][0], "PDF_EXTENDED_TEMPLATES/tmp/{$form['id']}{$entry['id']}/test-{$form['id']}.pdf" ) );
+		$this->assertNotFalse( strpos( $notifications['attachments'][0], "PDF_EXTENDED_TEMPLATES/tmp/$folder/$file" ) );
 
 		/* Clean up */
 		unlink( $notifications['attachments'][0] );
@@ -937,7 +940,7 @@ class Test_PDF extends WP_UnitTestCase {
 
 		$notifications = $this->model->notifications( $form['notifications']['54bca349732b8'], $form, $entry );
 
-		$this->assertSame( 0, sizeof( $notifications['attachments'] ) );
+		$this->assertArrayNotHasKey( 'attachments', $notifications );
 	}
 
 	/**

@@ -113,7 +113,7 @@ class Test_Actions extends WP_UnitTestCase {
 		$routes = $this->controller->get_routes();
 
 		$counter  = 0;
-		$expected = [ 'review_plugin', 'migrate_v3_to_v4' ];
+		$expected = [ 'review_plugin', 'migrate_v3_to_v4', 'install_core_fonts' ];
 
 		foreach ( $routes as $route ) {
 			if ( in_array( $route['action'], $expected ) ) {
@@ -121,7 +121,7 @@ class Test_Actions extends WP_UnitTestCase {
 			}
 		}
 
-		$this->assertSame( 2, $counter );
+		$this->assertSame( 3, $counter );
 	}
 
 	/**
@@ -368,6 +368,29 @@ class Test_Actions extends WP_UnitTestCase {
 
 		wp_set_current_user( 0 );
 
+	}
+
+	/**
+	 * Check the core fonts installation prompt works as expected
+	 *
+	 * @since 4.4
+	 */
+	public function test_core_fonts_condition() {
+		global $gfpdf;
+
+		$path = $gfpdf->data->template_font_location;
+		set_current_screen( 'edit.php' );
+
+		$this->assertTrue( $this->model->core_font_condition() );
+
+		touch( $path . 'DejaVuSansCondensed.ttf' );
+		$this->assertFalse( $this->model->core_font_condition() );
+		unlink( $path . 'DejaVuSansCondensed.ttf' );
+
+		$_GET['page']    = 'gfpdf-page';
+		$_GET['subview'] = 'PDF';
+		$_GET['tab']     = 'tools';
+		$this->assertFalse( $this->model->core_font_condition() );
 	}
 
 	/**
