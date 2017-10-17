@@ -231,6 +231,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->actions();
 		$this->template_manager();
 		$this->load_core_font_handler();
+		$this->async_pdfs();
 
 		/* Add localisation support */
 		$this->add_localization_support();
@@ -860,6 +861,24 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		$class->init();
 
+		$this->singleton->add_class( $class );
+	}
+
+	/**
+	 * Initialise our background PDF processing handler
+	 *
+	 * @since 4.4
+	 *
+	 * @return void
+	 */
+	public function async_pdfs() {
+		$queue = new Helper\Helper_Pdf_Queue( $this->log );
+		$model_pdf = $this->singleton->get_class( 'Model_PDF' );
+		$class = new Controller\Controller_Pdf_Queue( $queue, $model_pdf, $this->log );
+
+		$class->init();
+
+		$this->singleton->add_class( $queue );
 		$this->singleton->add_class( $class );
 	}
 
