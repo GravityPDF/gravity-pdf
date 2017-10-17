@@ -742,4 +742,49 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 
 		$this->assertEquals( 'An error occurred during deactivation, please try again', json_decode( $this->_last_response )->error );
 	}
+
+	public function test_ajax_save_core_font() {
+		/* set up our post data and role */
+		$this->_setRole( 'administrator' );
+
+		/* Check for nonce failure */
+		try {
+			$this->_handleAjax( 'gfpdf_save_core_font' );
+		} catch ( WPAjaxDieStopException $e ) {
+			/* do nothing (error expected) */
+		}
+
+		$this->assertEquals( '401', $e->getMessage() );
+
+		/* Setup a bad request */
+		$_POST['nonce'] = wp_create_nonce( 'gfpdf_ajax_nonce' );
+
+		try {
+			$this->_handleAjax( 'gfpdf_save_core_font' );
+		} catch ( WPAjaxDieContinueException $e ) {
+			/* do nothing (error expected) */
+		}
+
+		$this->assertFalse( json_decode( $this->_last_response ) );
+		$this->_last_response = '';
+
+		$ApiResponse = function() {
+			return [
+				'response' => [ 'code' => 200 ],
+				'body' => '',
+			];
+		};
+
+		add_filter( 'pre_http_request', $ApiResponse );
+
+		try {
+			$this->_handleAjax( 'gfpdf_save_core_font' );
+		} catch ( WPAjaxDieContinueException $e ) {
+			/* do nothing (error expected) */
+		}
+
+		remove_filter( 'pre_http_request', $ApiResponse );
+
+		$this->assertTrue( json_decode( $this->_last_response ) );
+	}
 }

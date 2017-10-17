@@ -169,6 +169,15 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 				'view'        => [ $this->view, 'migration' ],
 				'capability'  => 'update_plugins',
 			],
+
+			[
+				'action'      => 'install_core_fonts',
+				'action_text' => esc_html__( 'Install Core Fonts', 'gravity-forms-pdf-extended' ),
+				'condition'   => [ $this->model, 'core_font_condition' ],
+				'process'     => [ $this->model, 'core_font_redirect' ],
+				'view'        => [ $this->view, 'core_font' ],
+				'capability'  => 'gravityforms_edit_settings',
+			],
 		];
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_one_time_action_routes/ for more details about this filter */

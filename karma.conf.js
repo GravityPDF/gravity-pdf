@@ -1,7 +1,6 @@
-var webpack = require("webpack")
-
 var webpackConfig = require('./webpack.config.js')
 webpackConfig.devtool = 'inline-source-map'
+webpackConfig.entry = undefined
 webpackConfig.externals = {
   'react/addons': true,
   'react/lib/ExecutionEnvironment': true,
@@ -22,6 +21,7 @@ module.exports = function (config) {
 
     // list of files / patterns to load in the browser
     files: [
+      'node_modules/babel-polyfill/dist/polyfill.js',
       'node_modules/jquery/dist/jquery.min.js',
       'tests/mocha/tests.bundle.js'
     ],
@@ -65,6 +65,6 @@ module.exports = function (config) {
 
     // Concurrency level
     // how many browser should be started simultaneous
-    concurrency: Infinity
+    concurrency: Infinity,
   })
 }

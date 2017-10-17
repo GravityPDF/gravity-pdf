@@ -186,6 +186,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 
 		/* Modify mPDF's path locations */
 		add_filter( 'mpdf_tmp_path', [ $this->model, 'mpdf_tmp_path' ] );
+		add_filter( 'mpdf_font_path', [ $this->model, 'mpdf_font_path' ] );
 		add_filter( 'mpdf_fontdata_path', [ $this->model, 'mpdf_tmp_font_path' ] );
 
 		/* Change mPDF settings */

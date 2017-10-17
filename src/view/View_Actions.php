@@ -109,4 +109,22 @@ class View_Actions extends Helper_Abstract_View {
 
 		return $html;
 	}
+
+	/**
+	 * Load our Core Font Installer
+	 *
+	 * @param  string $type        The action ID
+	 * @param  string $button_text The primary button text
+	 *
+	 * @return string              The notice HTML
+	 *
+	 * @since 4.4
+	 */
+	public function core_font( $type, $button_text ) {
+
+		$html = $this->load( 'core_font', [], false );
+		$html .= $this->get_action_buttons( $type, $button_text, 'disabled' );
+
+		return $html;
+	}
 }
