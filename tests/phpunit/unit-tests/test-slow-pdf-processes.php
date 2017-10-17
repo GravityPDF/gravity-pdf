@@ -210,30 +210,6 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Check if the correct PDFs are saved on disk
-	 * Belongs to Model_PDF.php
-	 *
-	 * @since 4.0
-	 */
-	public function test_maybe_save_pdf() {
-		global $gfpdf;
-
-		/* Setup some test data */
-		$results = $this->create_form_and_entries();
-		$entry   = $results['entry'];
-		$form    = $results['form'];
-		$file    = $gfpdf->data->template_tmp_location . "{$form['id']}{$entry['id']}/test-{$form['id']}.pdf";
-
-		$this->model->maybe_save_pdf( $entry, $form );
-
-		/* Check the results are successful */
-		$this->assertFileExists( $file );
-
-		/* Clean up */
-		unlink( $file );
-	}
-
-	/**
 	 * Test that we can successfully generate a PDF based on an entry and settings
 	 *
 	 * Belongs to View_PDF.php

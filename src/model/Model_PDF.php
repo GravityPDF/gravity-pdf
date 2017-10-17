@@ -1040,33 +1040,6 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Creates a PDF on every submission, except when the PDF is already created during the notification hook
-	 *
-	 * @param  array $entry The GF Entry Details
-	 * @param  array $form  The Gravity Form
-	 *
-	 * @return void
-	 *
-	 * @since 4.0
-	 */
-	public function maybe_save_pdf( $entry, $form ) {
-		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : [];
-
-		if ( sizeof( $pdfs ) > 0 ) {
-
-			/* Loop through each PDF config */
-			foreach ( $pdfs as $pdf ) {
-				$settings = $this->options->get_pdf( $entry['form_id'], $pdf['id'] );
-
-				/* Only generate if the PDF wasn't created during the notification process */
-				if ( ! is_wp_error( $settings ) && $this->maybe_always_save_pdf( $settings ) ) {
-					$this->generate_and_save_pdf( $entry, $settings );
-				}
-			}
-		}
-	}
-
-	/**
 	 * Check if the current PDF to be processed already exists on disk
 	 *
 	 * @param  \GFPDF\Helper\Helper_PDF $pdf The Helper_PDF Object
