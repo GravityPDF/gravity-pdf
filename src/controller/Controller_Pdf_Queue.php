@@ -17,7 +17,7 @@ use GFCommon;
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2017, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       4.4
+ * @since       5.0
  */
 
 /* Exit if accessed directly */
@@ -50,7 +50,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @package GFPDF\Controller
  *
- * @since   4.4
+ * @since   5.0
  */
 class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_Interface_Actions, Helper_Interface_Filters {
 
@@ -59,7 +59,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 *
 	 * @var \GFPDF\Helper\Helper_Form
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	protected $gform;
 
@@ -68,21 +68,21 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 *
 	 * @var LoggerInterface
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	protected $log;
 
 	/**
 	 * @var Model_PDF|\GFPDF\Model\Model_PDF
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	protected $model_pdf;
 
 	/**
 	 * @var \GFPDF\Helper\Helper_Pdf_Queue
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	protected $queue;
 
@@ -94,7 +94,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 * @param \GFPDF\Model\Model_PDF $model_pdf
 	 * @param LoggerInterface        $log Our logger class
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function __construct( Helper_Pdf_Queue $queue, Model_PDF $model_pdf, LoggerInterface $log ) {
 		/* Assign our internal variables */
@@ -106,7 +106,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	/**
 	 * Initialise our class defaults
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 *
 	 * @return void
 	 */
@@ -120,7 +120,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	/**
 	 * Apply any actions needed for the welcome page
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 *
 	 * @return void
 	 */
@@ -132,7 +132,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	}
 
 	/**
-	 * @since 4.4
+	 * @since 5.0
 	 *
 	 * @return void
 	 */
@@ -152,7 +152,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 *
 	 * @return bool
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function maybe_disable_submission_notifications( $is_disabled, $notification, $form, $entry ) {
 		if ( empty( $notification['event'] ) || $notification['event'] !== 'form_submission' ) {
@@ -172,7 +172,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 *
 	 * @return bool
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function maybe_disable_resend_notifications( $is_disabled, $notification, $form, $entry ) {
 		return $this->do_we_disable_notification( $is_disabled, $notification, $form, $entry );
@@ -188,7 +188,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 *
 	 * @return bool
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function do_we_disable_notification( $default, $notification, $form, $entry ) {
 		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->model_pdf->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : [];
@@ -214,7 +214,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 * @param $entry
 	 * @param $form
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function queue_async_form_submission_tasks( $entry, $form ) {
 		/* Push and trigger async queue */
@@ -231,7 +231,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 * @param $form
 	 * @param $entry
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function queue_async_resend_notification_tasks( $notification, $form, $entry ) {
 		add_filter( 'gfpdf_maybe_always_save_pdf', '__return_false' );
@@ -245,7 +245,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	/**
 	 * If we have any jobs in our background process queue after resending the notifications, dispatch them
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function queue_dispatch_resend_notification_tasks() {
 		if ( count( $this->queue->get_data() ) > 0 ) {
@@ -265,7 +265,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 * @param $form
 	 * @param $notifications
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 *
 	 * @return array
 	 */
@@ -311,7 +311,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 *
 	 * @return array
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	protected function get_active_notifications( $form, $entry ) {
 		$notifications = GFCommon::get_notifications_to_send( 'form_submission', $form, $entry );
@@ -332,7 +332,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 *
 	 * @return array
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	protected function queue_pdfs( $notifications, $pdfs, $form, $entry ) {
 		$queue_data = apply_filters( 'gfpdf_queue_pre_pdf_creation', [], $entry, $form );
@@ -367,7 +367,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 *
 	 * @return array
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	protected function queue_notifications( $notifications, $pdfs, $form, $entry ) {
 
@@ -402,7 +402,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 *
 	 * @return string
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	protected function get_queue_id( $form, $entry, $pdf ) {
 		return $form['id'] . '-' . $entry['id'] . '-' . $pdf['id'];

@@ -41,7 +41,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @package GFPDF\View
  *
- * @since 4.4
+ * @since 5.0
  */
 class View_Save_Core_Fonts extends Helper_Abstract_View {
 
@@ -50,7 +50,7 @@ class View_Save_Core_Fonts extends Helper_Abstract_View {
 	 *
 	 * @var string
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	protected $view_type = 'Core_Fonts';
 
@@ -59,7 +59,7 @@ class View_Save_Core_Fonts extends Helper_Abstract_View {
 	 *
 	 * @param $args
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function core_fonts_setting( $args ) {
 		if ( isset( $args['tooltip'] ) ) {

@@ -194,7 +194,7 @@ class Model_Actions extends Helper_Abstract_Model {
 	 *
 	 * @return bool
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function core_font_condition() {
 
@@ -211,7 +211,7 @@ class Model_Actions extends Helper_Abstract_Model {
 	/**
 	 * Redirect user to our font installer tool
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function core_font_redirect() {
 		wp_safe_redirect( admin_url( 'admin.php?page=gf_settings&subview=PDF&tab=tools#/downloadCoreFonts' ) );

@@ -6,7 +6,7 @@ import ListSpacer from './CoreFontListSpacer'
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2017, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       4.4
+ * @since       5.0
  */
 
 /*
@@ -32,14 +32,14 @@ import ListSpacer from './CoreFontListSpacer'
 /**
  * Displays the Console output for our Core Font Downloader
  *
- * @since 4.4
+ * @since 5.0
  */
 export default class CoreFontListResults extends React.Component {
 
   /**
    * @returns {*}
    *
-   * @since 4.4
+   * @since 5.0
    */
   render () {
     const console = this.props.console
@@ -64,7 +64,7 @@ export default class CoreFontListResults extends React.Component {
 }
 
 /**
- * @since 4.4
+ * @since 5.0
  */
 class Retry extends React.Component {
 
@@ -73,7 +73,7 @@ class Retry extends React.Component {
    *
    * @param e
    *
-   * @since 4.4
+   * @since 5.0
    */
   triggerRetryFontDownload = (e) => {
     e.preventDefault()
@@ -85,7 +85,7 @@ class Retry extends React.Component {
    *
    * @returns {*}
    *
-   * @since 4.4
+   * @since 5.0
    */
   render () {
     return (

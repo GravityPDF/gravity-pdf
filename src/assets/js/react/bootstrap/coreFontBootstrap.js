@@ -11,7 +11,7 @@ import Routes from '../router/coreFontRouter'
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2017, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       4.4
+ * @since       5.0
  */
 
 /*
@@ -37,7 +37,7 @@ import Routes from '../router/coreFontRouter'
 /**
  * Mount our Core Font UI on the DOM
  *
- * @since 4.4
+ * @since 5.0
  */
 export default function coreFontBootstrap () {
   const container = document.getElementById('gfpdf-install-core-fonts')

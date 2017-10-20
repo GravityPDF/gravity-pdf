@@ -1205,7 +1205,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @return string
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function mpdf_font_path( $path ) {
 		return $this->data->template_font_location;

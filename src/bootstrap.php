@@ -828,7 +828,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Initialise our core font AJAX handler
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 *
 	 * @return void
 	 */
@@ -844,7 +844,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Initialise our background PDF processing handler
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 *
 	 * @return void
 	 */

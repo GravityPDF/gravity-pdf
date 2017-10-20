@@ -11,7 +11,7 @@ import {
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2017, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       4.4
+ * @since       5.0
  */
 
 /*
@@ -43,7 +43,7 @@ import {
  *
  * @returns {{type, key: *, status: *, message: *}}
  *
- * @since 4.4
+ * @since 5.0
  */
 export const addToConsole = (key, status, message) => {
   return {
@@ -59,7 +59,7 @@ export const addToConsole = (key, status, message) => {
  *
  * @returns {{type}}
  *
- * @since 4.4
+ * @since 5.0
  */
 export const clearConsole = () => {
   return {
@@ -73,7 +73,7 @@ export const clearConsole = () => {
  * @param name
  * @returns {{type, name: *}}
  *
- * @since 4.4
+ * @since 5.0
  */
 export const addToRetryList = (name) => {
   return {
@@ -87,7 +87,7 @@ export const addToRetryList = (name) => {
  *
  * @returns {{type}}
  *
- * @since 4.4
+ * @since 5.0
  */
 export const clearRetryList = () => {
   return {
