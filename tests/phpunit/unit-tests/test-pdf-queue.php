@@ -76,10 +76,10 @@ class Test_Pdf_Queue extends WP_UnitTestCase {
 		$this->queue = new Helper_Pdf_Queue( $gfpdf->log );
 		$model_pdf   = $gfpdf->singleton->get_class( 'Model_PDF' );
 
-		$this->queue_mock = $this->getMock( '\GFPDF\Helper\Helper_Pdf_Queue', [
-			'save',
-			'dispatch',
-		], [ $gfpdf->log ] );
+		$this->queue_mock = $this->getMockBuilder( '\GFPDF\Helper\Helper_Pdf_Queue' )
+		             ->setConstructorArgs( [ $gfpdf->log ] )
+		             ->setMethods( [ 'save', 'dispatch' ] )
+		             ->getMock();
 
 		$this->queue_mock->expects( $this->any() )
 		                 ->method( 'save' )
@@ -114,7 +114,11 @@ class Test_Pdf_Queue extends WP_UnitTestCase {
 	 * @since 5.0
 	 */
 	public function test_queue_tasks() {
-		$mock = $this->getMock( 'stdClass', [ 'callback' ] );
+
+		$mock = $this->getMockBuilder( 'stdClass' )
+		             ->setMethods( [ 'callback' ] )
+		             ->getMock();
+
 		$mock->expects( $this->exactly( 1 ) )
 		     ->method( 'callback' );
 
@@ -136,7 +140,10 @@ class Test_Pdf_Queue extends WP_UnitTestCase {
 	 * @since 5.0
 	 */
 	public function test_failed_queue_tasks() {
-		$mock = $this->getMock( 'stdClass', [ 'callback' ] );
+		$mock = $this->getMockBuilder( 'stdClass' )
+		             ->setMethods( [ 'callback' ] )
+		             ->getMock();
+
 		$mock->expects( $this->exactly( 3 ) )
 		     ->method( 'callback' )
 		     ->will( $this->throwException( new \Exception ) );
@@ -159,7 +166,10 @@ class Test_Pdf_Queue extends WP_UnitTestCase {
 	 * @since 5.0
 	 */
 	public function test_arguments_queue_tasks() {
-		$mock = $this->getMock( 'stdClass', [ 'callback' ] );
+		$mock = $this->getMockBuilder( 'stdClass' )
+		             ->setMethods( [ 'callback' ] )
+		             ->getMock();
+
 		$mock->expects( $this->exactly( 1 ) )
 		     ->method( 'callback' )
 		     ->with( 'item1', true, [ 1, 2, 3 ] );
