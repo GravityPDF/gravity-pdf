@@ -85,14 +85,6 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 		$this->log = $log;
 	}
 
-	public function clear() {
-		var_dump($this->is_process_running());
-		var_dump($this->is_queue_empty());
-		$this->cancel_process();
-		$this->unlock_process();
-		exit;
-	}
-
 	/**
 	 * Add a getter for the stored async data
 	 *

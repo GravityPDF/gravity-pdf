@@ -113,8 +113,6 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	public function init() {
 		$this->add_actions();
 		$this->add_filters();
-
-		//$this->queue->clear();
 	}
 
 	/**
