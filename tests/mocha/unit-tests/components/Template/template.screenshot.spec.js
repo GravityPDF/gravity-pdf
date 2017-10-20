@@ -5,13 +5,13 @@ import TemplateScreenshot from '../../../../../src/assets/js/react/components/Te
 
 describe('<TemplateScreenshot />', () => {
   it('renders a blank div', () => {
-    const comp = mount(<TemplateScreenshot />)
+    const comp = mount(<TemplateScreenshot/>)
     expect(comp.find('div.blank')).to.have.length(1)
     expect(comp.find('img')).to.have.length(0)
   })
 
   it('renders the screenshot', () => {
-    const comp = mount(<TemplateScreenshot image="myimage.jpg" />)
+    const comp = mount(<TemplateScreenshot image="myimage.jpg"/>)
     expect(comp.find('img').render().attr('src')).to.equal('myimage.jpg')
   })
 })

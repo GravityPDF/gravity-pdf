@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 import React from 'react'
 
 /**
@@ -41,7 +41,7 @@ class TemplateButton extends React.Component {
    */
   static propTypes = {
     buttonText: PropTypes.string,
-  };
+  }
 
   /**
    * When the button is clicked we'll display the `/template` route
@@ -55,12 +55,12 @@ class TemplateButton extends React.Component {
     e.stopPropagation()
 
     this.props.history.push('/template')
-  };
+  }
 
   /**
    * @since 4.1
    */
-  render() {
+  render () {
     return (
       <button
         type="button"

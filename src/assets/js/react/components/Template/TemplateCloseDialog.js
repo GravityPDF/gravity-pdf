@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 
@@ -42,14 +42,14 @@ export class TemplateCloseDialog extends React.Component {
    */
   static propTypes = {
     closeRoute: PropTypes.string
-  };
+  }
 
   /**
    * Assign keydown listener to document on mount
    *
    * @since 4.1
    */
-  componentDidMount() {
+  componentDidMount () {
     document.addEventListener('keydown', this.handleKeyPress, false)
   }
 
@@ -58,7 +58,7 @@ export class TemplateCloseDialog extends React.Component {
    *
    * @since 4.1
    */
-  componentWillUnmount() {
+  componentWillUnmount () {
     document.removeEventListener('keydown', this.handleKeyPress, false)
   }
 
@@ -75,7 +75,7 @@ export class TemplateCloseDialog extends React.Component {
     if (e.keyCode === 27 && (e.target.className !== 'wp-filter-search' || e.target.value === '')) {
       this.closeDialog()
     }
-  };
+  }
 
   /**
    * @since 4.1
@@ -83,12 +83,12 @@ export class TemplateCloseDialog extends React.Component {
   closeDialog = () => {
     /* trigger router */
     this.props.history.push(this.props.closeRoute || '/')
-  };
+  }
 
   /**
    * @since 4.1
    */
-  render() {
+  render () {
     return (
       <button
         className="close dashicons dashicons-no"

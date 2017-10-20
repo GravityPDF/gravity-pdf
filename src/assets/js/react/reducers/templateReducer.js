@@ -135,7 +135,7 @@ export default function (state = initialState, action) {
     case UPDATE_TEMPLATE_PARAM:
       return {
         ...state,
-        list: state.list.setIn([ getTemplateIndex(state.list, action.id), action.name ], action.value)
+        list: state.list.setIn([getTemplateIndex(state.list, action.id), action.name], action.value)
       }
 
     /**

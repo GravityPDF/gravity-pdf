@@ -55,7 +55,7 @@ export default function templateBootstrap ($templateField) {
   /* Render our React Component in the DOM */
   render(
     <Router>
-      <Route render={(props) => <TemplateButton {...props} store={store} buttonText={GFPDF.advanced}/>} />
+      <Route render={(props) => <TemplateButton {...props} store={store} buttonText={GFPDF.advanced}/>}/>
     </Router>,
     document.getElementById('gpdf-advance-template-selector')
   )

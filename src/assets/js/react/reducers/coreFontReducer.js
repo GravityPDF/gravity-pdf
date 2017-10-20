@@ -86,7 +86,7 @@ export default function (state = initialState, action) {
      */
     case ADD_TO_RETRY_LIST:
       /* Do not allow the same item in the retry list */
-      if( state.retry.includes(action.name) ) {
+      if (state.retry.includes(action.name)) {
         break
       }
 

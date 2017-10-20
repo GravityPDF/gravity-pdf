@@ -117,6 +117,6 @@ export const Routes = () => (
  */
 export default function TemplatesRouter (store) {
   render((<Provider store={store}>
-    <Routes />
+    <Routes/>
   </Provider>), document.getElementById('gfpdf-overlay'))
 }

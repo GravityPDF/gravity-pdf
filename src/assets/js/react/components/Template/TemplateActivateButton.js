@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 import React from 'react'
 import { connect } from 'react-redux'
 import { selectTemplate } from '../../actions/templates'
@@ -47,7 +47,7 @@ export class TemplateActivateButton extends React.Component {
     template: PropTypes.object,
     onTemplateSelect: PropTypes.func,
     buttonText: PropTypes.string,
-  };
+  }
 
   /**
    * Update our route and trigger a Redux action to select the current template
@@ -62,12 +62,12 @@ export class TemplateActivateButton extends React.Component {
 
     this.props.history.push('')
     this.props.onTemplateSelect(this.props.template.get('id'))
-  };
+  }
 
   /**
    * @since 4.1
    */
-  render() {
+  render () {
     return (
       <a
         onClick={this.selectTemplate}

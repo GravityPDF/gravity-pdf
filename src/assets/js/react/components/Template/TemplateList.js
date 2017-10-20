@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 import React from 'react'
 import { connect } from 'react-redux'
 
@@ -51,7 +51,7 @@ export class TemplateList extends React.Component {
   static propTypes = {
     templates: PropTypes.object,
     route: PropTypes.object
-  };
+  }
 
   /**
    * @since 4.1
@@ -61,7 +61,7 @@ export class TemplateList extends React.Component {
 
     return (
       <TemplateContainer header={header} closeRoute="/">
-        <TemplateSearch />
+        <TemplateSearch/>
         <div>
           {
             this.props.templates.map((value, index) => {

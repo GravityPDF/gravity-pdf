@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 import React from 'react'
 import { connect } from 'react-redux'
 import { addTemplate, deleteTemplate } from '../../actions/templates'
@@ -56,7 +56,7 @@ export class TemplateDeleteButton extends React.Component {
     buttonText: PropTypes.string,
     templateConfirmDeleteText: PropTypes.string,
     templateDeleteErrorText: PropTypes.string,
-  };
+  }
 
   /**
    * Display a confirmation window asking user to verify they want template deleted.
@@ -91,7 +91,7 @@ export class TemplateDeleteButton extends React.Component {
       this.props.history.push('/template')
       this.props.onTemplateDelete(templateId)
     }
-  };
+  }
 
   /**
    * If the server cannot delete the template we re-add the template to our list
@@ -102,12 +102,12 @@ export class TemplateDeleteButton extends React.Component {
   ajaxFailed = () => {
     const errorTemplate = this.props.template.set('error', this.props.templateDeleteErrorText)
     this.props.addTemplate(errorTemplate)
-  };
+  }
 
   /**
    * @since 4.1
    */
-  render() {
+  render () {
 
     const callback = (this.props.callbackFunction) ? this.props.callbackFunction : this.deleteTemplate
 

@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 import React from 'react'
 import { connect } from 'react-redux'
 
@@ -64,7 +64,7 @@ export class TemplateSingle extends React.Component {
     activeTemplate: PropTypes.string,
     templateIndex: PropTypes.number,
     templates: PropTypes.object,
-  };
+  }
 
   /**
    * Ensure the component doesn't try and re-render when a template isn't found

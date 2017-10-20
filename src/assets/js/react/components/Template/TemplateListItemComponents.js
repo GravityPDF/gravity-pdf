@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 import React from 'react'
 
 /**
@@ -37,7 +37,7 @@ import React from 'react'
  *
  * @since 4.1
  */
-export const TemplateDetails = ({ label }) => (
+export const TemplateDetails = ({label}) => (
   <span className="more-details">{label}</span>
 )
 
@@ -52,7 +52,7 @@ TemplateDetails.propTypes = {
  *
  * @since 4.1
  */
-export const Group = ({ group }) => (
+export const Group = ({group}) => (
   <p className="theme-author">{group}</p>
 )
 

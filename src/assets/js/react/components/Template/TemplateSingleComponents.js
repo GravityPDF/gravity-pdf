@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 import React from 'react'
 
 /**
@@ -37,11 +37,11 @@ import React from 'react'
  *
  * @since 4.1
  */
-export const CurrentTemplate = ({ isCurrentTemplate, label }) => {
+export const CurrentTemplate = ({isCurrentTemplate, label}) => {
   return (isCurrentTemplate) ? (
     <span className="current-label">{label}</span>
   ) : (
-    <span />
+    <span/>
   )
 }
 
@@ -57,7 +57,7 @@ CurrentTemplate.propTypes = {
  *
  * @since 4.1
  */
-export const Name = ({ name, version, versionLabel }) => (
+export const Name = ({name, version, versionLabel}) => (
   <h2 className="theme-name">
     {name}
 
@@ -78,11 +78,11 @@ Name.propTypes = {
  *
  * @since 4.1
  */
-export const Version = ({ label, version }) => {
+export const Version = ({label, version}) => {
   return (version) ? (
     <span className="theme-version">{label}: {version}</span>
   ) : (
-    <span />
+    <span/>
   )
 }
 
@@ -98,7 +98,7 @@ Version.propTypes = {
  *
  * @since 4.1
  */
-export const Author = ({ author, uri }) => {
+export const Author = ({author, uri}) => {
 
   if (uri) {
     return (
@@ -129,7 +129,7 @@ Author.propTypes = {
  *
  * @since 4.1
  */
-export const Group = ({ label, group }) => (
+export const Group = ({label, group}) => (
   <p className="theme-author">
     <strong>{label}: {group}</strong>
   </p>
@@ -147,7 +147,7 @@ Group.propTypes = {
  *
  * @since 4.1
  */
-export const Description = ({ desc }) => (
+export const Description = ({desc}) => (
   <p className="theme-description">
     {desc}
   </p>
@@ -164,13 +164,13 @@ Description.propTypes = {
  *
  * @since 4.1
  */
-export const Tags = ({ label, tags }) => {
+export const Tags = ({label, tags}) => {
   return (tags) ? (
     <p className="theme-tags">
       <span>{label}:</span> {tags}
     </p>
   ) : (
-    <span />
+    <span/>
   )
 }
 

@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 import React from 'react'
 
 /**
@@ -35,7 +35,7 @@ import React from 'react'
  *
  * @since 4.1
  */
-const TemplateHeaderTitle = ({ header }) => (
+const TemplateHeaderTitle = ({header}) => (
   <h1>{header}</h1>
 )
 

@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 import React from 'react'
 import { connect } from 'react-redux'
 import debounce from 'lodash.debounce'
@@ -46,14 +46,14 @@ export class TemplateSearch extends React.Component {
   static propTypes = {
     onSearch: PropTypes.func,
     search: PropTypes.string
-  };
+  }
 
   /**
    * Debounce our runSearch function so it can only be run once every 200 milliseconds
    *
    * @since 4.1
    */
-  componentWillMount() {
+  componentWillMount () {
     this.runSearch = debounce(this.runSearch, 200)
   }
 
@@ -62,7 +62,7 @@ export class TemplateSearch extends React.Component {
    *
    * @since 4.1
    */
-  componentDidMount() {
+  componentDidMount () {
     /* add focus to element */
     this.input.focus()
   }
@@ -80,7 +80,7 @@ export class TemplateSearch extends React.Component {
   handleSearch = (e) => {
     e.persist()
     this.runSearch(e)
-  };
+  }
 
   /**
    * Update our Redux store with the search value
@@ -91,12 +91,12 @@ export class TemplateSearch extends React.Component {
    */
   runSearch = (e) => {
     this.props.onSearch(e.target.value || '')
-  };
+  }
 
   /**
    * @since 4.1
    */
-  render() {
+  render () {
     return (
       <div>
         <input

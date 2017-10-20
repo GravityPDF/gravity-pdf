@@ -2,14 +2,14 @@ import Immutable from 'immutable'
 import selector, { searchTemplates, sortTemplates } from '../../../../src/assets/js/react/selectors/getTemplates'
 
 const templateObject = [
-  { id: 'zadani', group: 'Core', template: 'Zadani', description: '', author: 'Gravity PDF' },
-  { id: 'rubix', group: 'Core', template: 'Rubix', description: '', author: '' },
-  { id: 'focus-gravity', group: 'Core', template: 'Focus Gravity', description: '', author: 'William' },
-  { id: 'adelade', group: 'Core', template: 'Adelade', description: '', author: 'William' },
-  { id: 'default', group: 'Legacy', template: 'Default', description: 'Old Template', author: '' },
-  { id: 'default-template', group: 'Legacy', template: 'Default Template', description: '', author: '' },
-  { id: 'default-template', group: 'Core', template: 'Default Template', description: '', author: '' },
-  { id: 'new-template', group: 'Custom', template: 'New Template', description: '', author: '', new: true },
+  {id: 'zadani', group: 'Core', template: 'Zadani', description: '', author: 'Gravity PDF'},
+  {id: 'rubix', group: 'Core', template: 'Rubix', description: '', author: ''},
+  {id: 'focus-gravity', group: 'Core', template: 'Focus Gravity', description: '', author: 'William'},
+  {id: 'adelade', group: 'Core', template: 'Adelade', description: '', author: 'William'},
+  {id: 'default', group: 'Legacy', template: 'Default', description: 'Old Template', author: ''},
+  {id: 'default-template', group: 'Legacy', template: 'Default Template', description: '', author: ''},
+  {id: 'default-template', group: 'Core', template: 'Default Template', description: '', author: ''},
+  {id: 'new-template', group: 'Custom', template: 'New Template', description: '', author: '', new: true},
 ]
 
 const templates = Immutable.fromJS(templateObject)

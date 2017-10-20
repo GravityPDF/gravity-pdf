@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -51,14 +51,14 @@ export class TemplateHeaderNavigation extends React.Component {
 
     showPreviousTemplateText: PropTypes.string,
     showNextTemplateText: PropTypes.string
-  };
+  }
 
   /**
    * Add window event listeners
    *
    * @since 4.1
    */
-  componentDidMount() {
+  componentDidMount () {
     window.addEventListener('keydown', this.handleKeyPress, false)
   }
 
@@ -67,7 +67,7 @@ export class TemplateHeaderNavigation extends React.Component {
    *
    * @since 4.1
    */
-  componentWillUnmount() {
+  componentWillUnmount () {
     window.removeEventListener('keydown', this.handleKeyPress, false)
   }
 
@@ -87,7 +87,7 @@ export class TemplateHeaderNavigation extends React.Component {
     if (prevId) {
       this.props.history.push('/template/' + prevId)
     }
-  };
+  }
 
   /**
    * Attempt to get the next template in our Immutable list and update the URL
@@ -105,7 +105,7 @@ export class TemplateHeaderNavigation extends React.Component {
     if (nextId) {
       this.props.history.push('/template/' + nextId)
     }
-  };
+  }
 
   /**
    * Checks if the Left or Right arrow keys are pressed and fires appropriate functions
@@ -124,12 +124,12 @@ export class TemplateHeaderNavigation extends React.Component {
     if (!this.props.isLast && e.keyCode === 39) {
       this.nextTemplate(e)
     }
-  };
+  }
 
   /**
    * @since 4.1
    */
-  render() {
+  render () {
 
     /*
      * Work our the correct classes and attributes for our left and right arrows
@@ -138,7 +138,7 @@ export class TemplateHeaderNavigation extends React.Component {
     const isFirst = this.props.isFirst
     const isLast = this.props.isLast
 
-    let baseClass = List([ 'dashicons', 'dashicons-no' ])
+    let baseClass = List(['dashicons', 'dashicons-no'])
 
     let prevClass = baseClass.push('left')
     let nextClass = baseClass.push('right')
