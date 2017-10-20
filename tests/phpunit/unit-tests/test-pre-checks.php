@@ -65,7 +65,7 @@ class Test_Pre_Checks extends WP_UnitTestCase {
 
 		/* Setup out loader class */
 		$this->gravitypdf = new GFPDF_Major_Compatibility_Checks(
-			GF_PDF_EXTENDED_PLUGIN_BASENAME,
+			PDF_PLUGIN_BASENAME,
 			PDF_PLUGIN_DIR
 		);
 

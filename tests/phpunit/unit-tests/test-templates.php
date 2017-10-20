@@ -96,11 +96,10 @@ class Test_Templates extends WP_UnitTestCase {
 		$storage = new FileSystem( $gfpdf->data->template_tmp_location );
 
 		/* Mock our \Upload\File\isUploadedFile() method */
-		$file = $this->getMock(
-			'\Upload\File',
-			[ 'isUploadedFile' ],
-			[ 'template', $storage ]
-		);
+		$file = $this->getMockBuilder( '\Upload\File' )
+					->setConstructorArgs( [ 'template', $storage ] )
+		             ->setMethods( [ 'isUploadedFile' ] )
+		             ->getMock();
 
 		$file
 			->expects( $this->any() )

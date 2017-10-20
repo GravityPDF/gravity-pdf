@@ -207,7 +207,9 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 	public function test_multsite_v3_migration() {
 
 		if ( ! is_multisite() ) {
-			return;
+			$this->markTestSkipped(
+				'Not running multisite tests'
+			);
 		}
 
 		/* Check for authentication failure */

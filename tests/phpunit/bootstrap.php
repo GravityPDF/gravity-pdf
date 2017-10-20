@@ -67,6 +67,11 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		/* load Gravity PDF objects */
 		tests_add_filter( 'after_setup_theme', [ $this, 'create_stubs' ], 20 );
 
+		/* Migration fixer for PHPUnit 6 when not included in the WP Test Environment */
+		if ( ! is_file( $this->wp_tests_dir . '/includes/phpunit6-compat.php' ) && class_exists( 'PHPUnit\Runner\Version' ) ) {
+			require_once dirname( __FILE__ ) . '/phpunit6-compat.php';
+		}
+
 		/* load the WP testing environment */
 		require_once( $this->wp_tests_dir . '/includes/bootstrap.php' );
 	}
@@ -95,6 +100,9 @@ class GravityPDF_Unit_Tests_Bootstrap {
 	 * @since 4.0
 	 */
 	public function create_stubs() {
+
+		/* Disable deprecated warnings */
+		error_reporting(E_ALL ^ E_DEPRECATED);
 
 		global $gfpdf;
 

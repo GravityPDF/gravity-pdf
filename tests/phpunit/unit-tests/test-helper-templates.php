@@ -205,17 +205,17 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 	public function test_get_all_template_info() {
 
 		foreach ( $this->templates->get_all_template_info() as $template ) {
-			$this->arrayHasKey( 'template', $template );
-			$this->arrayHasKey( 'version', $template );
-			$this->arrayHasKey( 'description', $template );
-			$this->arrayHasKey( 'author', $template );
-			$this->arrayHasKey( 'author uri', $template );
-			$this->arrayHasKey( 'group', $template );
-			$this->arrayHasKey( 'required_pdf_version', $template );
-			$this->arrayHasKey( 'tags', $template );
-			$this->arrayHasKey( 'id', $template );
-			$this->arrayHasKey( 'path', $template );
-			$this->arrayHasKey( 'screenshot', $template );
+			$this->assertArrayHasKey( 'template', $template );
+			$this->assertArrayHasKey( 'version', $template );
+			$this->assertArrayHasKey( 'description', $template );
+			$this->assertArrayHasKey( 'author', $template );
+			$this->assertArrayHasKey( 'author uri', $template );
+			$this->assertArrayHasKey( 'group', $template );
+			$this->assertArrayHasKey( 'required_pdf_version', $template );
+			$this->assertArrayHasKey( 'tags', $template );
+			$this->assertArrayHasKey( 'id', $template );
+			$this->assertArrayHasKey( 'path', $template );
+			$this->assertArrayHasKey( 'screenshot', $template );
 		}
 	}
 
