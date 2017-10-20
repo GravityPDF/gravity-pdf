@@ -217,7 +217,7 @@ class Model_Install extends Helper_Abstract_Model {
 		$this->data->template_fontdata_location = $this->data->template_font_location . 'fontdata/';
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_tmp_location/ for more details about this filter */
-		$this->data->template_tmp_location = apply_filters( 'gfpdf_tmp_location', $this->data->template_location . 'tmp/', $working_folder, $upload_dir_url ); /* encouraged to move this to a directory not accessible via the web */
+		$this->data->template_tmp_location = apply_filters( 'gfpdf_tmp_location', get_temp_dir() . 'gravitypdf/', $working_folder, $upload_dir_url ); /* encouraged to move this to a directory not accessible via the web */
 	}
 
 	/**
@@ -328,6 +328,7 @@ class Model_Install extends Helper_Abstract_Model {
 			if ( ! is_file( $this->data->template_tmp_location . '.htaccess' ) ) {
 				$this->log->addNotice( 'Create Apache .htaccess Security file' );
 				file_put_contents( $this->data->template_tmp_location . '.htaccess', 'deny from all' );
+			}
 			}
 		}
 	}
