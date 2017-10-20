@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 import React from 'react'
 import $ from 'jquery'
 
@@ -47,7 +47,7 @@ class showMessage extends React.Component {
   static defaultProps = {
     delay: 4000,
     dismissable: false,
-  };
+  }
 
   /**
    * @since 4.1
@@ -59,7 +59,7 @@ class showMessage extends React.Component {
     delay: PropTypes.number,
     dismissable: PropTypes.bool,
     dismissableCallback: PropTypes.func,
-  };
+  }
 
   /**
    * @returns {{visible: boolean}}
@@ -68,15 +68,15 @@ class showMessage extends React.Component {
    */
   state = {
     visible: true
-  };
+  }
 
   /**
    * Resets our state and timer when new props received
    *
    * @since 4.1
    */
-  componentWillReceiveProps() {
-    this.setState({ visible: true })
+  componentWillReceiveProps () {
+    this.setState({visible: true})
     this.shouldSetTimer()
   }
 
@@ -85,7 +85,7 @@ class showMessage extends React.Component {
    *
    * @since 4.1
    */
-  componentDidMount() {
+  componentDidMount () {
     this.shouldSetTimer()
   }
 
@@ -98,7 +98,7 @@ class showMessage extends React.Component {
     if (this.props.dismissable) {
       this.setTimer()
     }
-  };
+  }
 
   /**
    * Slide message up after "X" milliseconds (see props.delay)
@@ -119,23 +119,23 @@ class showMessage extends React.Component {
         .removeClass('inline')
         .slideUp(400, () => {
           $(this._message).removeAttr('style')
-          this.setState({ visible: false })
+          this.setState({visible: false})
           this._timer = null
 
-          if(this.props.dismissableCallback) {
+          if (this.props.dismissableCallback) {
             this.props.dismissableCallback()
           }
         })
 
     }, this.props.delay)
-  };
+  }
 
   /**
    * Clear timeout on unmount
    *
    * @since 4.1
    */
-  componentWillUnmount() {
+  componentWillUnmount () {
     if (this.props.dismissable) {
       clearTimeout(this._timer)
     }
@@ -146,8 +146,8 @@ class showMessage extends React.Component {
    *
    * @since 4.1
    */
-  render() {
-    const { text, error } = this.props
+  render () {
+    const {text, error} = this.props
 
     let classes = 'notice inline'
 
@@ -155,12 +155,11 @@ class showMessage extends React.Component {
       classes = classes + ' error'
     }
 
-    return this.state.visible ?
-      (
-        <div ref={(message) => this._message = message} className={classes}>
-          <p>{text}</p>
-        </div>
-      ) : <div />
+    return this.state.visible ? (
+      <div ref={(message) => this._message = message} className={classes}>
+        <p>{text}</p>
+      </div>
+    ) : <div/>
   }
 }
 

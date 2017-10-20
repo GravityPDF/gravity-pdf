@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -61,7 +61,7 @@ export class TemplateListItem extends React.Component {
 
     activateText: PropTypes.string,
     templateDetailsText: PropTypes.string,
-  };
+  }
 
   /**
    * Check if the Enter key is pressed and not focused on a button
@@ -76,7 +76,7 @@ export class TemplateListItem extends React.Component {
     if (e.keyCode === 13 && (e.target.className.indexOf('button') === -1)) {
       this.showDetailedTemplate()
     }
-  };
+  }
 
   /**
    * Update the URL to show the PDF template details page
@@ -85,7 +85,7 @@ export class TemplateListItem extends React.Component {
    */
   showDetailedTemplate = () => {
     this.props.history.push('/template/' + this.props.template.get('id'))
-  };
+  }
 
   /**
    * Call Redux action to remove any stored messages for this template
@@ -94,38 +94,40 @@ export class TemplateListItem extends React.Component {
    */
   removeMessage = () => {
     this.props.updateTemplateParam(this.props.template.get('id'), 'message', null)
-  };
+  }
 
   /**
    * @since 4.1
    */
-  render() {
+  render () {
     const item = this.props.template
     const isActiveTemplate = this.props.activeTemplate === item.get('id')
     const isCompatible = item.get('compatible')
     const activeTemplate = (isActiveTemplate) ? 'active theme' : 'theme'
 
     return (
-        <div
-          onClick={this.showDetailedTemplate}
-          onKeyDown={this.maybeShowDetailedTemplate}
-          className={activeTemplate}
-          data-slug={item.get('id')}
-          tabIndex="150">
+      <div
+        onClick={this.showDetailedTemplate}
+        onKeyDown={this.maybeShowDetailedTemplate}
+        className={activeTemplate}
+        data-slug={item.get('id')}
+        tabIndex="150">
 
-          <TemplateScreenshot image={item.get('screenshot')}/>
-          {item.get('error') ? <ShowMessage text={item.get('error')} error={true}/> : null}
-          {item.get('message') ? <ShowMessage text={item.get('message')} dismissableCallback={this.removeMessage} dismissable={true} delay={12000} /> : null}
+        <TemplateScreenshot image={item.get('screenshot')}/>
+        {item.get('error') ? <ShowMessage text={item.get('error')} error={true}/> : null}
+        {item.get('message') ?
+          <ShowMessage text={item.get('message')} dismissableCallback={this.removeMessage} dismissable={true}
+                       delay={12000}/> : null}
 
-          <TemplateDetails label={this.props.templateDetailsText} />
-          <Group group={item.get('group')}/>
-          <Name name={item.get('template')}/>
+        <TemplateDetails label={this.props.templateDetailsText}/>
+        <Group group={item.get('group')}/>
+        <Name name={item.get('template')}/>
 
-          <div className="theme-actions">
-            {!isActiveTemplate && isCompatible ?
-              <TemplateActivateButton template={this.props.template} buttonText={this.props.activateText}/> : null}
-          </div>
+        <div className="theme-actions">
+          {!isActiveTemplate && isCompatible ?
+            <TemplateActivateButton template={this.props.template} buttonText={this.props.activateText}/> : null}
         </div>
+      </div>
     )
   }
 }

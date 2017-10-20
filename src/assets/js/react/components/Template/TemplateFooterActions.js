@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 import React from 'react'
 import TemplateActivateButton from './TemplateActivateButton'
 import TemplateDeleteButton from './TemplateDeleteButton'
@@ -54,7 +54,7 @@ class TemplateFooterActions extends React.Component {
     templateDeleteText: PropTypes.string,
     templateConfirmDeleteText: PropTypes.string,
     templateDeleteErrorText: PropTypes.string,
-  };
+  }
 
   /**
    * Check if the current PDF template is a core template or not (i.e is shipped with Gravity PDF)
@@ -67,26 +67,24 @@ class TemplateFooterActions extends React.Component {
    */
   notCoreTemplate = (template) => {
     return template.get('path').indexOf(this.props.pdfWorkingDirPath) !== -1
-  };
+  }
 
   /**
    * @since 4.1
    */
-  render() {
+  render () {
     const template = this.props.template
     const isCompatible = template.get('compatible')
 
     return (
       <div className="theme-actions">
-        {!this.props.isActiveTemplate && isCompatible ?
-          <TemplateActivateButton
+        {!this.props.isActiveTemplate && isCompatible ? <TemplateActivateButton
             template={template}
             buttonText={this.props.activateText}/>
           : null
         }
 
-        {!this.props.isActiveTemplate && this.notCoreTemplate(template) ?
-          <TemplateDeleteButton
+        {!this.props.isActiveTemplate && this.notCoreTemplate(template) ? <TemplateDeleteButton
             template={template}
 
             ajaxUrl={this.props.ajaxUrl}

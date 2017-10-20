@@ -5,7 +5,7 @@ import TemplateHeaderTitle from '../../../../../src/assets/js/react/components/T
 
 describe('<TemplateHeaderTitle />', () => {
   it('render a h1 tag', () => {
-    const comp = shallow(<TemplateHeaderTitle />)
+    const comp = shallow(<TemplateHeaderTitle/>)
     expect(comp.find('h1')).to.have.length(1)
   })
 })

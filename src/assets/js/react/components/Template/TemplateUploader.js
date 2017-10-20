@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 import React from 'react'
 import { connect } from 'react-redux'
 import request from 'superagent'
@@ -62,7 +62,7 @@ export class TemplateUploader extends React.Component {
     addNewTemplate: PropTypes.func,
     updateTemplateParam: PropTypes.func,
     templates: PropTypes.object
-  };
+  }
 
   /**
    * Setup internal component state that doesn't need to be in Redux
@@ -75,7 +75,7 @@ export class TemplateUploader extends React.Component {
     ajax: false,
     error: '',
     message: ''
-  };
+  }
 
   /**
    * Manages the template file upload
@@ -113,7 +113,7 @@ export class TemplateUploader extends React.Component {
       })
 
     }
-  };
+  }
 
   /**
    * Checks if the uploaded file has a .zip extension
@@ -137,7 +137,7 @@ export class TemplateUploader extends React.Component {
     }
 
     return true
-  };
+  }
 
   /**
    * Checks if the file size is larger than 5MB
@@ -160,7 +160,7 @@ export class TemplateUploader extends React.Component {
     }
 
     return true
-  };
+  }
 
   /**
    * Update our Redux store with the new PDF template details
@@ -194,7 +194,7 @@ export class TemplateUploader extends React.Component {
       ajax: false,
       message: this.props.templateSuccessfullyInstalledUpdated
     })
-  };
+  }
 
   /**
    * Show any errors to the user when AJAX request fails for any reason
@@ -209,7 +209,7 @@ export class TemplateUploader extends React.Component {
       error: (error.response.body && error.response.body.error !== undefined) ? error.response.body.error : this.props.genericUploadErrorText,
       ajax: false
     })
-  };
+  }
 
   /**
    * Remove message from state once the timeout has finished
@@ -217,10 +217,10 @@ export class TemplateUploader extends React.Component {
    * @since 4.1
    */
   removeMessage = () => {
-    this.setState( {
+    this.setState({
       message: ''
     })
-  };
+  }
 
   /**
    * Prevent normal behaviour when this event fires
@@ -231,12 +231,12 @@ export class TemplateUploader extends React.Component {
    */
   openDropzone = (e) => {
     e.preventDefault()
-  };
+  }
 
   /**
    * @since 4.1
    */
-  render() {
+  render () {
     return (
       <Dropzone
         onDrop={this.onDrop}
@@ -244,10 +244,11 @@ export class TemplateUploader extends React.Component {
         multiple={true}
         className="theme add-new-theme gfpdf-dropzone">
         <a href="#" onClick={this.openDropzone} className={this.state.ajax ? 'doing-ajax' : ''}>
-          <div className="theme-screenshot"><span /></div>
+          <div className="theme-screenshot"><span/></div>
 
           {this.state.error !== '' ? <ShowMessage text={this.state.error} error={true}/> : null}
-          {this.state.message !== '' ? <ShowMessage text={this.state.message} dismissable={true} dismissableCallback={this.removeMessage} /> : null}
+          {this.state.message !== '' ?
+            <ShowMessage text={this.state.message} dismissable={true} dismissableCallback={this.removeMessage}/> : null}
 
           <h2 className="theme-name">{this.props.addTemplateText}</h2>
         </a>

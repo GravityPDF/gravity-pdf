@@ -587,7 +587,7 @@
       this.setupPdfTabs = function () {
 
         /* Hide all containers except the first one */
-        $('.gfpdf-tab-container').not(":eq(0)").hide()
+        $('.gfpdf-tab-container').not(':eq(0)').hide()
 
         /* Add click handler when our nav is selected */
         $('.gfpdf-tab-wrapper a').click(function () {
@@ -675,7 +675,7 @@
             $spinner.remove()
 
             /* Reset our legacy Advanced Template option */
-            $('input[name="gfpdf_settings[advanced_template]"][value="No"]').prop("checked", true).trigger('change')
+            $('input[name="gfpdf_settings[advanced_template]"][value="No"]').prop('checked', true).trigger('change')
 
             /* Only process if the response is valid */
             if (response.fields) {
@@ -958,7 +958,7 @@
         var selector = $elem.parents('span.all-merge-tags').data('targetElement')
 
         /* escape any meta-characters as per jQuery Spec http://api.jquery.com/category/selectors/ */
-        selector = selector.replace(/[!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+        selector = selector.replace(/[!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, '\\$&')
 
         return $('#' + selector)
       }
@@ -1376,8 +1376,8 @@
        */
       this.ajax = function (post, successCallback) {
         $.ajax({
-          type: "post",
-          dataType: "json",
+          type: 'post',
+          dataType: 'json',
           url: GFPDF.ajaxUrl,
           data: post,
           success: successCallback,
@@ -1433,23 +1433,23 @@
        * @link http://stackoverflow.com/a/10997390/11236
        */
       this.updateURLParameter = function (url, param, paramVal) {
-        var newAdditionalURL = ""
-        var tempArray = url.split("?")
+        var newAdditionalURL = ''
+        var tempArray = url.split('?')
         var baseURL = tempArray[0]
         var additionalURL = tempArray[1]
-        var temp = ""
+        var temp = ''
         if (additionalURL) {
-          tempArray = additionalURL.split("&")
+          tempArray = additionalURL.split('&')
           for (i = 0; i < tempArray.length; i++) {
             if (tempArray[i].split('=')[0] != param) {
               newAdditionalURL += temp + tempArray[i]
-              temp = "&"
+              temp = '&'
             }
           }
         }
 
-        var rows_txt = temp + "" + param + "=" + paramVal
-        return baseURL + "?" + newAdditionalURL + rows_txt
+        var rows_txt = temp + '' + param + '=' + paramVal
+        return baseURL + '?' + newAdditionalURL + rows_txt
       }
     }
 

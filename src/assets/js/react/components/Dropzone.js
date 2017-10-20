@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 import React from 'react'
 import ReactDropzone from 'react-dropzone'
 
@@ -47,7 +47,7 @@ class Dropzone extends React.Component {
     multiple: PropTypes.bool,
     className: PropTypes.string,
     activeClassName: PropTypes.string
-  };
+  }
 
   /**
    * @since 4.1
@@ -57,12 +57,12 @@ class Dropzone extends React.Component {
     maxSize: Infinity,
     className: 'gfpdf-dropzone',
     activeClassName: 'gfpdf-dropzone-active'
-  };
+  }
 
   /**
    * @since 4.1
    */
-  render() {
+  render () {
     return (
       <ReactDropzone
         onDrop={this.props.onDrop}

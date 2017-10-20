@@ -2,6 +2,7 @@ import React from 'react'
 import { mount } from 'enzyme'
 import configureStore from 'redux-mock-store'
 import { Provider } from 'react-redux'
+
 const mockStore = configureStore()
 import Immutable from 'immutable'
 import { HashRouter as Router } from 'react-router-dom'
@@ -91,16 +92,16 @@ describe('<TemplateHeaderNavigation />', () => {
     const comp = mount(<Router>
       <Provider store={mockStore()}>
         <TemplateHeaderNavigation
-        templates={Immutable.fromJS([{id: 'first-id'}, {id: 'middle-id'}, {id: 'last-id'}])}
-        template={Immutable.fromJS({id: 'middle-id'})}
-        templateIndex={1} />
+          templates={Immutable.fromJS([{id: 'first-id'}, {id: 'middle-id'}, {id: 'last-id'}])}
+          template={Immutable.fromJS({id: 'middle-id'})}
+          templateIndex={1}/>
       </Provider>
     </Router>)
 
-    comp.find('button.left').simulate('keydown', { key: "ArrowLeft", keyCode: 37 })
+    comp.find('button.left').simulate('keydown', {key: 'ArrowLeft', keyCode: 37})
     expect(window.location.hash).to.equal('#/template/first-id')
 
-    comp.find('button.right').simulate('keydown', { key: "ArrowRight", keyCode: 39 })
+    comp.find('button.right').simulate('keydown', {key: 'ArrowRight', keyCode: 39})
     expect(window.location.hash).to.equal('#/template/last-id')
 
   })
