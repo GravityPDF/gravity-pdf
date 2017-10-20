@@ -218,7 +218,7 @@ class Model_Install extends Helper_Abstract_Model {
 		$this->data->template_fontdata_location = $this->data->template_font_location . 'fontdata/';
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_tmp_location/ for more details about this filter */
-		$this->data->template_tmp_location = apply_filters( 'gfpdf_tmp_location', $this->data->template_location . 'tmp/', $working_folder, $upload_dir_url ); /* encouraged to move this to a directory not accessible via the web */
+		$this->data->template_tmp_location = apply_filters( 'gfpdf_tmp_location', get_temp_dir() . 'gravitypdf/', $working_folder, $upload_dir_url ); /* encouraged to move this to a directory not accessible via the web */
 
 		$this->log->addNotice( 'Template Locations', [
 			'path'     => $this->data->template_location,
@@ -334,9 +334,15 @@ class Model_Install extends Helper_Abstract_Model {
 		}
 
 		/* create deny htaccess file to prevent direct access to files */
-		if ( is_dir( $this->data->template_tmp_location ) && ! is_file( $this->data->template_tmp_location . '.htaccess' ) ) {
-			$this->log->addNotice( 'Create Apache .htaccess Security' );
-			file_put_contents( $this->data->template_tmp_location . '.htaccess', 'deny from all' );
+		if ( is_dir( $this->data->template_tmp_location ) ) {
+			if ( ! is_file( $this->data->template_tmp_location . 'index.html' ) ) {
+				GFCommon::recursive_add_index_file( $this->data->template_tmp_location );
+			}
+
+			if ( ! is_file( $this->data->template_tmp_location . '.htaccess' ) ) {
+				$this->log->addNotice( 'Create Apache .htaccess Security' );
+				file_put_contents( $this->data->template_tmp_location . '.htaccess', 'deny from all' );
+			}
 		}
 	}
 
