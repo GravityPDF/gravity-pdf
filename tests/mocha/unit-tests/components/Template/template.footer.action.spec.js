@@ -14,7 +14,7 @@ describe('<TemplateFooterActions />', () => {
   it('should render a button', () => {
     const comp = mount(<Router>
       <Provider store={mockStore()}>
-        <TemplateFooterActions template={Immutable.fromJS({ path: '/my/test/path', compatible: true })} />
+        <TemplateFooterActions template={Immutable.fromJS({path: '/my/test/path', compatible: true})}/>
       </Provider>
     </Router>)
 

@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 import React from 'react'
 import TemplateCloseDialog from './TemplateCloseDialog'
 
@@ -41,11 +41,11 @@ class Container extends React.Component {
    * @since 4.1
    */
   static propTypes = {
-    header: PropTypes.oneOfType([ PropTypes.string, PropTypes.element ]),
-    footer: PropTypes.oneOfType([ PropTypes.string, PropTypes.element ]),
+    header: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
+    footer: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
     children: PropTypes.node.isRequired,
     closeRoute: PropTypes.string,
-  };
+  }
 
   /**
    * On mount, add focus event to document option on mount
@@ -54,7 +54,7 @@ class Container extends React.Component {
    *
    * @since 4.1
    */
-  componentDidMount() {
+  componentDidMount () {
     document.addEventListener('focus', this.handleFocus, true)
 
     /* Add focus if not currently applied to search box */
@@ -68,7 +68,7 @@ class Container extends React.Component {
    *
    * @since 4.1
    */
-  componentWillUnmount() {
+  componentWillUnmount () {
     document.removeEventListener('focus', this.handleFocus, true)
   }
 
@@ -86,12 +86,12 @@ class Container extends React.Component {
       e.stopPropagation()
       this.container.focus()
     }
-  };
+  }
 
   /**
    * @since 4.1
    */
-  render() {
+  render () {
     const header = this.props.header,
       footer = this.props.footer,
       children = this.props.children,

@@ -67,7 +67,7 @@ export const searchTemplates = (term, templates) => {
     const group = template.get('group').replace(/(<([^>]+)>)/ig, '')
 
     /* Check if our matching term(s) are found in the string */
-    return match.test([ name, template.get('id'), group, description, author ].toString())
+    return match.test([name, template.get('id'), group, description, author].toString())
   })
 
   return results
@@ -172,7 +172,7 @@ export const addCompatibilityCheck = (templates) => {
  * @since 4.1
  */
 export default createSelector(
-  [ getTemplates, getSearch, getActiveTemplate ],
+  [getTemplates, getSearch, getActiveTemplate],
   (templates, search, activeTemplate) => {
 
     templates = addCompatibilityCheck(templates)

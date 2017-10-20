@@ -48,7 +48,7 @@ $(function () {
 
     // To add to window
     if (!window.Promise) {
-      window.Promise = Promise;
+      window.Promise = Promise
     }
 
     /* Check if we should show the Fancy Template Picker */
@@ -57,12 +57,12 @@ $(function () {
 
     /* Run this code if the element exists */
     if ($templateField.length > 0) {
-        templateBootstrap($templateField)
+      templateBootstrap($templateField)
     }
   }
 
   /* Initialise the Core Font downloader */
-  if($('#gfpdf-install-core-fonts').length) {
+  if ($('#gfpdf-install-core-fonts').length) {
     coreFontBootstrap()
   }
 })

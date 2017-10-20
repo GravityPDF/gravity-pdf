@@ -6,7 +6,7 @@ import { TemplateUploader } from '../../../../../src/assets/js/react/components/
 describe('<TemplateUploader />', () => {
 
   it('verify the correct html is rendered', () => {
-    const comp = shallow(<TemplateUploader addTemplateText="Uploading" />)
+    const comp = shallow(<TemplateUploader addTemplateText="Uploading"/>)
 
     expect(comp.find('.gfpdf-dropzone')).to.have.length(1)
     expect(comp.find('.gfpdf-dropzone a')).to.have.length(1)

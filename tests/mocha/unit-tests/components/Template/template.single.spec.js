@@ -4,6 +4,7 @@ import $ from 'jquery'
 import Immutable from 'immutable'
 import configureStore from 'redux-mock-store'
 import { Provider } from 'react-redux'
+
 const mockStore = configureStore()
 import { HashRouter as Router } from 'react-router-dom'
 
@@ -15,10 +16,14 @@ describe('<TemplateSingle />', () => {
     const comp = mount(<Router>
       <Provider store={mockStore()}>
         <TemplateSingle
-          templates={Immutable.fromJS([ { id: 'first-id', compatible: true, path: ''  }, { id: 'middle-id', compatible: true, path: '' }, { id: 'last-id', compatible: true, path: '' } ])}
-          template={Immutable.fromJS({ id: 'first-id', compatible: true, path: '' })}
+          templates={Immutable.fromJS([{id: 'first-id', compatible: true, path: ''}, {
+            id: 'middle-id',
+            compatible: true,
+            path: ''
+          }, {id: 'last-id', compatible: true, path: ''}])}
+          template={Immutable.fromJS({id: 'first-id', compatible: true, path: ''})}
           templateIndex={0}
-          route={ { activateText: 'Activate' }}
+          route={{activateText: 'Activate'}}
         />
       </Provider>
     </Router>)

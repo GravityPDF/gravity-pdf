@@ -2,16 +2,16 @@ import $ from 'jquery'
 import Enzyme from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 
-Enzyme.configure({ adapter: new Adapter() })
+Enzyme.configure({adapter: new Adapter()})
 
 /* React 16 Shim */
-window.requestAnimationFrame = function(callback) {
-  setTimeout(callback, 0);
-};
+window.requestAnimationFrame = function (callback) {
+  setTimeout(callback, 0)
+}
 
 // setup global defaults that our tests expect is present
 window.GFPDF = {
-  templateList: [ { id: 'zadani' }, { id: 'rubix' }, { id: 'focus-gravity' } ],
+  templateList: [{id: 'zadani'}, {id: 'rubix'}, {id: 'focus-gravity'}],
   activeTemplate: ''
 }
 
@@ -22,8 +22,8 @@ Element.prototype.remove = function () {
 
 NodeList.prototype.remove = HTMLCollection.prototype.remove = function () {
   for (var i = this.length - 1; i >= 0; i--) {
-    if (this[ i ] && this[ i ].parentElement) {
-      this[ i ].parentElement.removeChild(this[ i ])
+    if (this[i] && this[i].parentElement) {
+      this[i].parentElement.removeChild(this[i])
     }
   }
 }
@@ -38,8 +38,7 @@ afterEach(function () {
   $('#karma-test-container').remove()
 })
 
-
 // require all modules ending in "_test" from the
 // current directory and all subdirectories
-var testsContext = require.context(".", true, /.+\.spec\.jsx?$/)
+var testsContext = require.context('.', true, /.+\.spec\.jsx?$/)
 testsContext.keys().forEach(testsContext)

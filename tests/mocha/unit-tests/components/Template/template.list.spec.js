@@ -13,8 +13,9 @@ describe('<TemplateList />', () => {
 
   it('our template container, search bar and single template item should be displayed', () => {
     const comp = mount(<Router>
-      <Provider store={mockStore( {template: { search: '' }})}>
-        <TemplateList templates={Immutable.fromJS([ { id: 'my-id', compatible: true, path: '' } ])} route={ { activateText: 'Activate' }}/>
+      <Provider store={mockStore({template: {search: ''}})}>
+        <TemplateList templates={Immutable.fromJS([{id: 'my-id', compatible: true, path: ''}])}
+                      route={{activateText: 'Activate'}}/>
       </Provider>
     </Router>)
 
@@ -22,6 +23,7 @@ describe('<TemplateList />', () => {
 
     expect(wrapper.find('.theme-backdrop')).has.length(1)
     expect(wrapper.find('input.wp-filter-search')).has.length(1)
-    expect(wrapper.find('.theme')).has.length(2) /* one for our theme and one for our dropzone */
+    expect(wrapper.find('.theme')).has.length(2)
+    /* one for our theme and one for our dropzone */
   })
 })

@@ -91,29 +91,29 @@ export default (v1, v2, operator) => {
   var _prepVersion = function _prepVersion (v) {
     v = ('' + v).replace(/[_\-+]/g, '.')
     v = v.replace(/([^.\d]+)/g, '.$1.').replace(/\.{2,}/g, '.')
-    return !v.length ? [ -8 ] : v.split('.')
+    return !v.length ? [-8] : v.split('.')
   }
   // This converts a version component to a number.
   // Empty component becomes 0.
   // Non-numerical component becomes a negative number.
   // Numerical component becomes itself as an integer.
   var _numVersion = function _numVersion (v) {
-    return !v ? 0 : isNaN(v) ? vm[ v ] || -7 : parseInt(v, 10)
+    return !v ? 0 : isNaN(v) ? vm[v] || -7 : parseInt(v, 10)
   }
 
   v1 = _prepVersion(v1)
   v2 = _prepVersion(v2)
   x = Math.max(v1.length, v2.length)
   for (i = 0; i < x; i++) {
-    if (v1[ i ] === v2[ i ]) {
+    if (v1[i] === v2[i]) {
       continue
     }
-    v1[ i ] = _numVersion(v1[ i ])
-    v2[ i ] = _numVersion(v2[ i ])
-    if (v1[ i ] < v2[ i ]) {
+    v1[i] = _numVersion(v1[i])
+    v2[i] = _numVersion(v2[i])
+    if (v1[i] < v2[i]) {
       compare = -1
       break
-    } else if (v1[ i ] > v2[ i ]) {
+    } else if (v1[i] > v2[i]) {
       compare = 1
       break
     }
