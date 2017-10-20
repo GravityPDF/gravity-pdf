@@ -16,7 +16,7 @@ use Psr\Log\LoggerInterface;
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2017, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       4.4
+ * @since       5.0
  */
 
 /* Exit if accessed directly */
@@ -50,14 +50,14 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @package GFPDF\Controller
  *
- * @since   4.4
+ * @since   5.0
  */
 class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements Helper_Interface_Actions {
 
 	/**
 	 * @var string
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	protected $github_repo = 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/';
 
@@ -69,7 +69,7 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 	 * @param \GFPDF\Helper\Helper_Data                             $data Our plugin data store
 	 * @param \GFPDF\Helper\Helper_Misc                             $misc Our miscellaneous class
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function __construct( Helper_Abstract_View $view, LoggerInterface $log, Helper_Data $data, Helper_Misc $misc ) {
 		/* Assign our internal variables */
@@ -84,7 +84,7 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 	/**
 	 * Initialise our class defaults
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 *
 	 * @return void
 	 */
@@ -95,7 +95,7 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 	/**
 	 * Apply any actions needed for the welcome page
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 *
 	 * @return void
 	 */
@@ -110,7 +110,7 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 	/**
 	 * An AJAX endpoint that handles authentication and downloading the core font
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 *
 	 * @return void
 	 */
@@ -133,7 +133,7 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 	 *
 	 * @param $fontname
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 *
 	 * @return bool
 	 */

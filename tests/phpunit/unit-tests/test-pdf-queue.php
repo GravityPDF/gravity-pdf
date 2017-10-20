@@ -13,7 +13,7 @@ use WP_UnitTestCase;
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2017, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       4.4
+ * @since       5.0
  */
 
 /*
@@ -39,32 +39,32 @@ use WP_UnitTestCase;
 /**
  * Test the model / controller for the Templates UI
  *
- * @since 4.4
+ * @since 5.0
  * @group queue
  */
 class Test_Pdf_Queue extends WP_UnitTestCase {
 
 	/**
 	 * @var \GFPDF\Controller\Controller_Pdf_Queue
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public $controller;
 
 	/**
 	 * @var \GFPDF\Helper\Helper_Pdf_Queue
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public $queue;
 
 	/**
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public $queue_mock;
 
 	/**
 	 * The WP Unit Test Set up function
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function setUp() {
 		global $gfpdf;
@@ -111,7 +111,7 @@ class Test_Pdf_Queue extends WP_UnitTestCase {
 	/**
 	 * Test our queue runs once when the function runs without any problems
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function test_queue_tasks() {
 		$mock = $this->getMock( 'stdClass', [ 'callback' ] );
@@ -133,7 +133,7 @@ class Test_Pdf_Queue extends WP_UnitTestCase {
 	/**
 	 * Test our queue attempts to run up to three times when a function throws an exception
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function test_failed_queue_tasks() {
 		$mock = $this->getMock( 'stdClass', [ 'callback' ] );
@@ -156,7 +156,7 @@ class Test_Pdf_Queue extends WP_UnitTestCase {
 	/**
 	 * Test our callback is passed the correct arguments
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function test_arguments_queue_tasks() {
 		$mock = $this->getMock( 'stdClass', [ 'callback' ] );
@@ -180,7 +180,7 @@ class Test_Pdf_Queue extends WP_UnitTestCase {
 	/**
 	 * Ensure we disable the standard form submission notifications when a PDF is being attached
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function test_maybe_disable_notifications() {
 		$results = $this->create_form_and_entries();
@@ -202,7 +202,7 @@ class Test_Pdf_Queue extends WP_UnitTestCase {
 	/**
 	 * Test the form submission queue works as expected
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function test_queue_async_form_submission_tasks() {
 		$results                                            = $this->create_form_and_entries();
@@ -226,7 +226,7 @@ class Test_Pdf_Queue extends WP_UnitTestCase {
 	/**
 	 * Test the resend notification queue works as expected
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function test_queue_async_resend_notification_tasks() {
 		$results                                            = $this->create_form_and_entries();
@@ -249,7 +249,7 @@ class Test_Pdf_Queue extends WP_UnitTestCase {
 	/**
 	 * Test our queue dispatch runs only when the queue has data
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function test_queue_dispatch_resend_notification_tasks() {
 		$this->queue_mock->expects( $spy = $this->any() )
@@ -271,7 +271,7 @@ class Test_Pdf_Queue extends WP_UnitTestCase {
 	/**
 	 * Test PDFs are cleaned up correctly
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function test_cleanup_pdfs() {
 		global $gfpdf;

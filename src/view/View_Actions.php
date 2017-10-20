@@ -118,7 +118,7 @@ class View_Actions extends Helper_Abstract_View {
 	 *
 	 * @return string              The notice HTML
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function core_font( $type, $button_text ) {
 

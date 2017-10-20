@@ -13,7 +13,7 @@ use Exception;
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2017, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       4.4
+ * @since       5.0
  */
 
 /* Exit if accessed directly */
@@ -61,14 +61,14 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 	 *
 	 * @var LoggerInterface
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	protected $log;
 
 	/**
 	 * @var string
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	protected $action = 'gravitypdf';
 
@@ -98,7 +98,7 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 	 *
 	 * @return array
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function get_data() {
 		return $this->data;
@@ -111,7 +111,7 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 	 *
 	 * @return array|false Return false if our queue has completed, otherwise return the remaining callbacks
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function task( $callbacks ) {
 		$callback = array_shift( $callbacks );

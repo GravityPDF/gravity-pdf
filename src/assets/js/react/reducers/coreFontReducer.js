@@ -9,7 +9,7 @@ import {
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2017, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       4.4
+ * @since       5.0
  */
 
 /*
@@ -37,7 +37,7 @@ import {
  *
  * @type {{console: {}, retry: Array}}
  *
- * @since 4.4
+ * @since 5.0
  */
 export const initialState = {
   console: {},
@@ -52,13 +52,13 @@ export const initialState = {
  *
  * @returns {*} State (whether updated or note)
  *
- * @since 4.4
+ * @since 5.0
  */
 export default function (state = initialState, action) {
   switch (action.type) {
 
     /**
-     * @since 4.4
+     * @since 5.0
      */
     case ADD_TO_CONSOLE:
       return {
@@ -73,7 +73,7 @@ export default function (state = initialState, action) {
       }
 
     /**
-     * @since 4.4
+     * @since 5.0
      */
     case CLEAR_CONSOLE:
       return {
@@ -82,7 +82,7 @@ export default function (state = initialState, action) {
       }
 
     /**
-     * @since 4.4
+     * @since 5.0
      */
     case ADD_TO_RETRY_LIST:
       /* Do not allow the same item in the retry list */
@@ -99,7 +99,7 @@ export default function (state = initialState, action) {
       }
 
     /**
-     * @since 4.4
+     * @since 5.0
      */
     case CLEAR_RETRY_LIST:
       return {

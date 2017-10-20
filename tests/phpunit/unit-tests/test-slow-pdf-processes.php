@@ -107,7 +107,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function tearDown() {
 		global $gfpdf;

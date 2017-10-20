@@ -6,7 +6,7 @@ import CoreFontContainer from '../components/CoreFonts/CoreFontContainer'
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2017, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       4.4
+ * @since       5.0
  */
 
 /*
@@ -40,7 +40,7 @@ import CoreFontContainer from '../components/CoreFonts/CoreFontContainer'
  *
  * @param button DOM Node containing the original static <button> markup (gets replaced by React)
  *
- * @since 4.4
+ * @since 5.0
  */
 const Routes = ({button}) => (
   <Router>
@@ -66,7 +66,7 @@ const Routes = ({button}) => (
  * @param history HashHistory object
  * @param button DOM Node
  *
- * @since 4.4
+ * @since 5.0
  */
 const CoreFont = ({history, button}) => (
   <CoreFontContainer

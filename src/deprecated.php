@@ -184,7 +184,7 @@ class PDFRender extends GFPDF_Deprecated_Abstract {
 	/**
 	 * Create a class alias for our namespaced Mpdf class
      *
-     * @since 4.4
+     * @since 5.0
 	 */
 	public static function alias_mpdf() {
 	    if( ! class_exists( 'mPDF' ) ) {

@@ -14,7 +14,7 @@ import { clearRetryList, addToRetryList, addToConsole, clearConsole } from '../.
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2017, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       4.4
+ * @since       5.0
  */
 
 /*
@@ -40,7 +40,7 @@ import { clearRetryList, addToRetryList, addToConsole, clearConsole } from '../.
 /**
  * Handles the grunt work for our Core Font downloader (API calls, display, state ect)
  *
- * @since 4.4
+ * @since 5.0
  */
 export class CoreFontContainer extends React.Component {
 
@@ -49,7 +49,7 @@ export class CoreFontContainer extends React.Component {
    *
    * @type {{ajax: boolean, queueLoaded: boolean}}
    *
-   * @since 4.4
+   * @since 5.0
    */
   state = {
     ajax: false,
@@ -61,7 +61,7 @@ export class CoreFontContainer extends React.Component {
    *
    * @param nextProps
    *
-   * @since 4.4
+   * @since 5.0
    */
   componentWillReceiveProps (nextProps) {
     this.maybeStartDownload(nextProps.location)
@@ -70,7 +70,7 @@ export class CoreFontContainer extends React.Component {
   /**
    * When the component is first mounted we'll check if the fonts should be downloaded
    *
-   * @since 4.4
+   * @since 5.0
    */
   componentDidMount () {
     this.maybeStartDownload(this.props.location)
@@ -81,7 +81,7 @@ export class CoreFontContainer extends React.Component {
    *
    * @param location
    *
-   * @since 4.4
+   * @since 5.0
    */
   maybeStartDownload (location) {
     if (!this.state.ajax && location.pathname === '/downloadCoreFonts') {
@@ -100,7 +100,7 @@ export class CoreFontContainer extends React.Component {
    *
    * @returns {Promise.<void>}
    *
-   * @since 4.4
+   * @since 5.0
    */
   startDownloadFonts = async (files = []) => {
     try {
@@ -133,7 +133,7 @@ export class CoreFontContainer extends React.Component {
    *
    * @returns {number}
    *
-   * @since 4.4
+   * @since 5.0
    */
   getQueueLength () {
     return (this.queue !== undefined) ? this.queue.getQueueLength() + this.queue.getPendingLength() : 0
@@ -144,7 +144,7 @@ export class CoreFontContainer extends React.Component {
    *
    * @returns {Promise.<Array>}
    *
-   * @since 4.4
+   * @since 5.0
    */
   async getFilesFromGitHub () {
     const req = await request
@@ -164,7 +164,7 @@ export class CoreFontContainer extends React.Component {
   /**
    * Show the overall status in the console once all the fonts have been downloaded (or tried to download)
    *
-   * @since 4.4
+   * @since 5.0
    */
   showDownloadCompletedStatus = () => {
     const errors = this.props.retry.length
@@ -181,7 +181,7 @@ export class CoreFontContainer extends React.Component {
    *
    * @param error
    *
-   * @since 4.4
+   * @since 5.0
    */
   handleGithubApiError (error) {
     this.setState({ajax: false, queueLoaded: false})
@@ -197,7 +197,7 @@ export class CoreFontContainer extends React.Component {
    * @param file
    * @returns {Promise.<void>}
    *
-   * @since 4.4
+   * @since 5.0
    */
   downloadFontsApiCall = async (file) => {
     this.addFontPendingMessage(file)
@@ -226,7 +226,7 @@ export class CoreFontContainer extends React.Component {
    *
    * @param string name The Font Name
    *
-   * @since 4.4
+   * @since 5.0
    */
   addFontPendingMessage (name) {
     this.props.addToConsole(name, 'pending', this.props.itemPending.replace('%s', name))
@@ -237,7 +237,7 @@ export class CoreFontContainer extends React.Component {
    *
    * @param string name The Font Name
    *
-   * @since 4.4
+   * @since 5.0
    */
   addFontSuccessMessage (name) {
     this.props.addToConsole(name, 'success', this.props.itemSuccess.replace('%s', name))
@@ -248,7 +248,7 @@ export class CoreFontContainer extends React.Component {
    *
    * @param string name The Font Name
    *
-   * @since 4.4
+   * @since 5.0
    */
   addFontErrorMessage (name) {
     this.props.addToConsole(name, 'error', this.props.itemError.replace('%s', name))
@@ -258,7 +258,7 @@ export class CoreFontContainer extends React.Component {
   /**
    * Trigger the font download by updating the Hash History
    *
-   * @since 4.4
+   * @since 5.0
    */
   triggerFontDownload = () => {
     this.props.history.replace('downloadCoreFonts')
@@ -269,7 +269,7 @@ export class CoreFontContainer extends React.Component {
    *
    * @returns {XML}
    *
-   * @since 4.4
+   * @since 5.0
    */
   render () {
     return (
@@ -296,7 +296,7 @@ export class CoreFontContainer extends React.Component {
  * @param state
  * @returns {{console, retry: (*|number|Array)}}
  *
- * @since 4.4
+ * @since 5.0
  */
 const mapStateToProps = (state) => {
   return {
@@ -311,7 +311,7 @@ const mapStateToProps = (state) => {
  * @param dispatch
  * @returns {{addToConsole: (function(*=, *=, *=)), clearConsole: (function()), addToRetryList: (function(*=)), clearRetryList: (function())}}
  *
- * @since 4.4
+ * @since 5.0
  */
 const mapDispatchToProps = (dispatch) => {
   return {

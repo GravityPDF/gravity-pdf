@@ -13,7 +13,7 @@ use Exception;
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2017, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       4.4
+ * @since       5.0
  */
 
 /* Exit if accessed directly */
@@ -46,7 +46,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @package GFPDF\Helper
  *
- * @since   4.4
+ * @since   5.0
  */
 class Queue_Callbacks {
 
@@ -58,7 +58,7 @@ class Queue_Callbacks {
 	 *
 	 * @throws Exception
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public static function create_pdf( $entry_id, $pdf_id ) {
 		$log     = GPDFAPI::get_log_class();
@@ -81,7 +81,7 @@ class Queue_Callbacks {
 	 * @param int   $entry_id
 	 * @param array $notification
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public static function send_notification( $form_id, $entry_id, $notification ) {
 		$gform = GPDFAPI::get_form_class();
@@ -95,7 +95,7 @@ class Queue_Callbacks {
 	 * @param $form_id
 	 * @param $entry_id
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public static function cleanup_pdfs( $form_id, $entry_id ) {
 		$gform     = GPDFAPI::get_form_class();

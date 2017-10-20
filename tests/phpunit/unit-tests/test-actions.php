@@ -373,7 +373,7 @@ class Test_Actions extends WP_UnitTestCase {
 	/**
 	 * Check the core fonts installation prompt works as expected
 	 *
-	 * @since 4.4
+	 * @since 5.0
 	 */
 	public function test_core_fonts_condition() {
 		global $gfpdf;
