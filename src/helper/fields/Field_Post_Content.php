@@ -105,7 +105,9 @@ class Field_Post_Content extends Helper_Abstract_Fields {
 		$value = $this->get_value();
 
 		if ( isset( $this->field->useRichTextEditor ) && true === $this->field->useRichTextEditor ) {
-			$html = wp_kses_post( $value );
+			$html = wp_kses_post(
+				$this->gform->process_tags( $value, $this->form, $this->entry )
+			);
 		} else {
 			$html = nl2br( esc_html( $value ) );
 		}

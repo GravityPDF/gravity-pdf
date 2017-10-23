@@ -108,7 +108,11 @@ class Field_Tos extends Helper_Abstract_Fields {
 	 */
 	public function html( $value = '', $label = true ) {
 
-		$terms = wp_kses_post( wpautop( $this->field->gwtermsofservice_terms ) );
+		$terms = wp_kses_post(
+			wpautop(
+				$this->gform->process_tags( $this->field->gwtermsofservice_terms , $this->form, $this->entry )
+			)
+		);
 		$value = $this->value();
 
 		$html = "

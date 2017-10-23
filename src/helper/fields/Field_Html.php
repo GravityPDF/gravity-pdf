@@ -120,7 +120,11 @@ class Field_Html extends Helper_Abstract_Fields {
 			return $this->cache();
 		}
 
-		$value = ( isset( $this->field->content ) ) ? wpautop( wp_kses_post( $this->field->content ) ) : '';
+		$value = ( isset( $this->field->content ) ) ? wpautop(
+			wp_kses_post(
+				$this->gform->process_tags( $this->field->content, $this->form, $this->entry )
+			)
+		) : '';
 
 		$this->cache( $value );
 
