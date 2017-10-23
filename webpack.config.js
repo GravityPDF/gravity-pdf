@@ -14,7 +14,7 @@ module.exports = {
     path: __dirname + '/dist/assets/js/',
     filename: 'app.bundle.min.js'
   },
-  devtool: PROD ? 'source-map' : 'eval-cheap-module-source-map',
+  devtool: PROD ? 'source-map' : 'eval-source-map',
   module: {
     loaders: [
       {
@@ -54,6 +54,6 @@ module.exports = {
       }
     })
   ] : [
-    new webpack.optimize.CommonsChunkPlugin({ name: 'vendor', filename: 'vendor.bundle.min.js' }),
+    new webpack.optimize.CommonsChunkPlugin({ name: 'vendor', filename: 'vendor.bundle.min.js' })
   ]
 }
