@@ -645,4 +645,25 @@ final class GPDFAPI {
 
 		return true;
 	}
+
+	/**
+	 * Return the $form_data array used in custom PDF templates
+	 *
+	 * @param int $entry_id
+	 *
+	 * @return array|WP_Error
+	 *
+	 * @since 5.0
+	 */
+	public static function get_form_data( $entry_id ) {
+		$gform = self::get_form_class();
+		$pdf_model = self::get_mvc_class( 'Model_PDF' );
+		$entry = $gform->get_entry( $entry_id );
+
+		if ( is_wp_error( $entry ) ) {
+			return $entry;
+		}
+
+		return $pdf_model->get_form_data( $entry );
+	}
 }
