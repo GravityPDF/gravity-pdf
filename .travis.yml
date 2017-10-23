@@ -37,9 +37,10 @@ matrix:
     env: WP_VERSION=4.5 WP_MULTISITE=0
   - php: 7.0
     env: WP_VERSION=4.4 WP_MULTISITE=0
+  - php: 7.2
+    env: WP_VERSION=nightly WP_MULTISITE=0
 
 before_script:
-  - if [[ $TRAVIS_PHP_VERSION != 7.1 ]]; then phpenv config-rm xdebug.ini; fi
   - if find . -name "*.php" -exec php -l {} \; | grep "unexpected $end"; then exit 1; fi
   - composer install --prefer-source --optimize-autoloader --no-scripts
   - bash tests/bin/install.sh gravitypdf_test root '' localhost $WP_VERSION

@@ -188,9 +188,13 @@ class Test_Installer extends WP_UnitTestCase {
 	 */
 	public function test_multisite_template_location() {
 		global $gfpdf;
-		if ( is_multisite() ) {
-			$this->assertTrue( is_dir( $gfpdf->data->multisite_template_location ) );
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped(
+				'Not running multisite tests'
+			);
 		}
+
+		$this->assertTrue( is_dir( $gfpdf->data->multisite_template_location ) );
 	}
 
 	/**
