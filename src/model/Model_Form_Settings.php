@@ -15,6 +15,7 @@ use GFPDF\Helper\Helper_Abstract_Options;
 use Psr\Log\LoggerInterface;
 
 use _WP_Editors;
+use GFFormsModel;
 
 /**
  * Settings Model
@@ -229,6 +230,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* get the form object */
 		$form = $this->gform->get_form( $form_id );
+		$form = apply_filters( 'gform_admin_pre_render', $form );
 
 		/* parse input and get required information */
 		if ( ! $pdf_id ) {
@@ -238,6 +240,9 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				$pdf_id = uniqid();
 			}
 		}
+
+		$entry_meta = GFFormsModel::get_entry_meta( $form_id );
+		$entry_meta = apply_filters( 'gform_entry_meta_conditional_logic_confirmations', $entry_meta, $form, '' );
 
 		/* re-register all our settings to show form-specific options */
 		$this->options->register_settings( $this->options->get_registered_fields() );
@@ -257,6 +262,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			'title'            => $label,
 			'button_label'     => $label,
 			'form'             => $form,
+			'entry_meta'       => $entry_meta,
 			'pdf'              => $pdf,
 			'wp_editor_loaded' => class_exists( '_WP_Editors' ),
 		] );
