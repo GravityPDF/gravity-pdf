@@ -162,6 +162,7 @@ export function templateChangeStoreListener (store, $templateField) {
     if (listCount !== list.size) {
       /* update the list size so we don't run it twice */
       listCount = list.size
+      var currentActive = $templateField.val()
 
       /* Do our AJAX call to get the new Select Box DOM */
       request
@@ -171,8 +172,8 @@ export function templateChangeStoreListener (store, $templateField) {
         .then((response) => {
           $templateField
             .html(response.text)
+            .val(currentActive)
             .trigger('chosen:updated')
-            .trigger('change')
         })
     }
   }))
