@@ -2018,4 +2018,22 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		return $ignored;
 	}
+
+	/**
+	 * Set the watermark font to the current PDF font
+	 *
+	 * @param Mpdf  $mpdf
+	 * @param array $form
+	 * @param array $entry
+	 * @param array $settings
+	 *
+	 * @return Mpdf
+	 *
+	 * @since 5.0
+	 */
+	public function set_watermark_font( $mpdf, $form, $entry, $settings ) {
+		$mpdf->watermark_font = $settings['watermark_font'];
+
+		return $mpdf;
+	}
 }
