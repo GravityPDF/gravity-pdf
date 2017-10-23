@@ -288,4 +288,24 @@ class Test_API extends WP_UnitTestCase {
 		/* Clean up */
 		unlink( $ttf_file );
 	}
+
+	/**
+	 * @since 5.0
+	 */
+	public function test_get_form_data() {
+		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+
+		$results = GPDFAPI::get_form_data( $entry['id'] );
+
+		$this->assertArrayHasKey( 'misc', $results );
+		$this->assertArrayHasKey( 'field', $results );
+		$this->assertArrayHasKey( 'list', $results );
+		$this->assertArrayHasKey( 'signature_details_id', $results );
+		$this->assertArrayHasKey( 'products', $results );
+		$this->assertArrayHasKey( 'products_totals', $results );
+		$this->assertArrayHasKey( 'poll', $results );
+		$this->assertArrayHasKey( 'survey', $results );
+
+		$this->assertEquals( 'My Single Line Response', $results['field'][1] );
+	}
 }
