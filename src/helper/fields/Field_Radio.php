@@ -163,10 +163,9 @@ class Field_Radio extends Helper_Abstract_Fields {
 
 		/* Allow HTML if the radio value isn't the "other" option */
 		if ( ! $this->is_user_defined_value( $value ) ) {
-			$value = wp_kses_post( wp_specialchars_decode( $value, ENT_QUOTES ) );
-			$label = wp_kses_post( wp_specialchars_decode( $label, ENT_QUOTES ) );
+			$value = wp_kses_post( $this->gform->process_tags( wp_specialchars_decode( $value, ENT_QUOTES ), $this->form, $this->entry ) );
+			$label = wp_kses_post( $this->gform->process_tags( wp_specialchars_decode( $label, ENT_QUOTES ), $this->form, $this->entry ) );
 		}
-
 
 		/* return value / label as an array */
 		$this->cache( [

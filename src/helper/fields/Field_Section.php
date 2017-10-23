@@ -184,7 +184,9 @@ class Field_Section extends Helper_Abstract_Fields {
 
 		$this->cache( [
 			'title'       => esc_html( $this->field->label ),
-			'description' => wp_kses_post( $this->field->description ),
+			'description' => wp_kses_post(
+				$this->gform->process_tags( $this->field->description, $this->form, $this->entry )
+			),
 		] );
 
 		return $this->cache();
