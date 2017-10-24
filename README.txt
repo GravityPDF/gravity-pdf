@@ -127,6 +127,36 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 * Bug: Fix RTL issue with Chosen Select library (GH#698)
 * Bug: Fix PDF Product table pricing issue by using the pre-calculated price field for the unit price (GH#699)
 
+= 5.0.0-alpha1 =
+
+* Breaking Change: Background process PDFs/emails on form submission and while resending notifications (see feature below)
+* Breaking Change: Decouple the fonts from the plugin (see feature below)
+* Breaking Change: Right align all prices in the product table (see bug fix below)
+
+* Feature: Include a Core Font Downloader in the PDF Tools to install all core PDF fonts [GH#709]
+* Feature: Background Process PDFs during form submission (all GF versions) and while resending notifications (GFv2.3+ only) [GH#713]
+* Feature: Add full Chained Select Add-on Support [GH#703]
+* Feature: Updated ReactJS to v16 which uses MIT license [GH#701]
+* Feature: Move the PDF temporary directory to use WordPress' `get_tmp_dir()` [GH#715]
+* Feature: Add PHP7.2 Support [GH#716]
+* Feature: Set the watermark font to use the PDF font [GH#718]
+* Feature: Include add-on mergetags and conditional logic in the PDF settings [GH#719]
+
+* Dev: Update all Packagist-managed JS files to the latest version [GH#701]
+* Dev: Update Monolog to latest version [GH#702]
+* Dev: Utilise namespaced version of Mpdf (accessed directly via `blueliquiddesigns\Mpdf\mPDF`) [GH#706]
+* Dev: Removed `Model_PDF::maybe_save_pdf()` as part of the Background Processing change (see above) [GH#713]
+* Dev: Add API endpoint to get the $form_data array [GH#717]
+
+* Bug: Right align all prices in the product table to bring it inline with the standard formatting for invoices [GH#704]
+* Bug: Prevent error being logged when new Gravity Form is created [GH#700]
+* Bug: Fix the incorrect currency showing up in the PDF Unit Price product table [GH#699]
+* Bug: Fix Chosen Drop Down display issue when WordPress using RTL display [GH#698]
+* Bug: Fix fatal errors when activating plugin on PHP5.2 [GH#697]
+* Bug: Resolve Customizer confict with the Template Manager JS [GH#693]
+* Bug: Fix multiple AJAX calls when adding / deleting templates from the PDF Template Manager [GH#720]
+* Bug: Fix mergetags being stripped when placed in attributes for HTML/Section/Textarea/Radio/Checkbox/Terms of Service/Post Content fields [#GH722]
+
 = 4.3.0 =
 * Feature: Add support for Gravity Perks E-Commerce Add-on (GH#671)
 * Dev Feature: Add GPDFAPI::get_pdf_fonts() method
