@@ -38,10 +38,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div style="font-size:15px; line-height: 25px">
 
-	<strong><?php esc_html_e( "Before use, the core Gravity PDF fonts need to be installed.", 'gravity-forms-pdf-extended' ); ?></strong>
+    <strong><?php esc_html_e( "Gravity PDF needs to download the Core PDF fonts.", 'gravity-forms-pdf-extended' ); ?></strong>
 
-	<br>
+    <br>
 
-	<?php esc_html_e( 'This action will download and save the core fonts to your server. It will only need to be done once.', 'gravity-forms-pdf-extended' ); ?>
+	<?php esc_html_e( 'Before you can generate a PDF the core fonts need to be saved to your server. This only needs to be done once.', 'gravity-forms-pdf-extended' ); ?>
 
 </div>
