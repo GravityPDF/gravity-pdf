@@ -421,8 +421,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		wp_register_script( 'gfpdf_js_backbone', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-backbone.min.js', $pdf_backbone_dependancies, $version ); /* @TODO - remove backbone and use React */
 		wp_register_script( 'gfpdf_js_backbone_model_binder', PDF_PLUGIN_URL . 'bower_components/backbone.modelbinder/Backbone.ModelBinder.min.js', [ 'backbone', 'underscore' ], $version );
 
-		wp_register_script( 'gfpdf_js_vendors', PDF_PLUGIN_URL . 'dist/assets/js/vendor.bundle.min.js', [ 'jquery' ], $version );
-		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'dist/assets/js/app.bundle.min.js', [ 'jquery', 'gfpdf_js_vendors' ], $version );
+		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'dist/assets/js/app.bundle.min.js', [ 'jquery' ], $version );
 		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-entries.min.js', [ 'jquery' ], $version );
 		wp_register_script( 'gfpdf_js_v3_migration', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-migration.min.js', [ 'gfpdf_js_settings' ], $version );
 

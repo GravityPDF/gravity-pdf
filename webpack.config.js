@@ -3,12 +3,10 @@ var path = require('path')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
 var PROD = (process.env.NODE_ENV === 'production')
-var vendors = require("./package.json").dependencies
 
 module.exports = {
   entry: {
     app: './src/assets/js/react/gfpdf-main.js',
-    vendor: Object.keys(vendors), /* auto-load all dependancies from package.json and include in our vendor bundle */
   },
   output: {
     path: __dirname + '/dist/assets/js/',
@@ -43,7 +41,6 @@ module.exports = {
         }
     }),
     new webpack.optimize.ModuleConcatenationPlugin(),
-    new webpack.optimize.CommonsChunkPlugin({ name: 'vendor', filename: 'vendor.bundle.min.js' }),
     new UglifyJSPlugin({
       parallel: true,
       sourceMap: false,
@@ -53,7 +50,5 @@ module.exports = {
         }
       }
     })
-  ] : [
-    new webpack.optimize.CommonsChunkPlugin({ name: 'vendor', filename: 'vendor.bundle.min.js' })
-  ]
+  ] : []
 }
