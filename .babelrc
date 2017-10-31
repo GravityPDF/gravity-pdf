@@ -4,15 +4,13 @@
       "env",
       {
         "targets": {
-          "node": "current",
           "browsers": [
-            "last 2 versions",
-            "IE >= 10"
-          ],
-          "modules": false,
-          "useBuiltIns": "usage"
+            "last 2 versions"
+          ]
         },
-        "forceAllTransforms": true
+        "modules": false,
+        "forceAllTransforms": true,
+        "useBuiltIns": "usage"
       }
     ],
     "react"
