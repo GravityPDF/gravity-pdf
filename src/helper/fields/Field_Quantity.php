@@ -51,15 +51,8 @@ class Field_Quantity extends Helper_Abstract_Field_Products {
 	 * @since 4.3
 	 */
 	public function form_data() {
-		$value    = $this->value();
-
-		$name = ( isset( $value['name'] ) && isset( $value['price'] ) ) ? $value['name'] . " ({$value['price']})" : '';
-		$name = esc_html( $name );
-
-		$price = ( isset( $value['price_unformatted'] ) ) ? $value['price_unformatted'] : '';
-		$price = esc_html( $price );
-
-		return $this->set_form_data( $name, $price );
+		$value    = esc_html( $this->value() );
+		return $this->set_form_data( $value, $value );
 	}
 
 	/**
