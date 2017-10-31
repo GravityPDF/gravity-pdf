@@ -804,6 +804,17 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( $response, $field['39.Shipping_name'] );
 		$this->assertEquals( $response, $field['39_name'] );
 		$this->assertEquals( $response, $field['Shipping_name'] );
+
+		/*
+		 * Quantity
+		 */
+		$response = '6';
+		$this->assertEquals( $response, $field[36] );
+		$this->assertEquals( $response, $field['36.Quantity Field for Hidden Price'] );
+		$this->assertEquals( $response, $field['Quantity Field for Hidden Price'] );
+		$this->assertEquals( $response, $field['36.Quantity Field for Hidden Price_name'] );
+		$this->assertEquals( $response, $field['36_name'] );
+		$this->assertEquals( $response, $field['Quantity Field for Hidden Price_name'] );
 	}
 
 	/**
@@ -1492,8 +1503,6 @@ class Test_Form_Data extends WP_UnitTestCase {
 
 		$this->assertEquals( '', $form_data['list'][20] );
 		$this->assertEquals( '', $form_data['list'][21] );
-		$this->assertEquals( '', $form_data['list'][79] );
-		$this->assertEquals( '', $form_data['list'][80] );
 	}
 
 	/**

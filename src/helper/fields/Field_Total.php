@@ -60,7 +60,7 @@ class Field_Total extends Helper_Abstract_Field_Products {
 			return $this->set_form_data( $name, $price );
 		}
 
-		return [];
+		return $this->set_form_data( '', '' );
 	}
 
 	/**
