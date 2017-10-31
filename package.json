@@ -2,7 +2,6 @@
   "name": "gravity-pdf",
   "private": true,
   "dependencies": {
-    "babel-polyfill": "^6.26.0",
     "immutable": "^3.8.1",
     "lodash.debounce": "^4.0.8",
     "promise-queue": "^2.2.3",
@@ -20,12 +19,13 @@
     "superagent": "^3.5.2"
   },
   "devDependencies": {
-    "babel-core": "^6.24.1",
+    "babel-polyfill": "^7.0.0-beta.3",
+    "babel-core": "^7.0.0-beta.3",
     "babel-loader": "^7.0.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-env": "^1.6.0",
-    "babel-preset-react": "^6.24.1",
+    "babel-preset-env": "^7.0.0-beta.3",
+    "babel-preset-react": "^7.0.0-beta.3",
     "chai": "^4.0.0",
     "cross-env": "^5.0.0",
     "enzyme": "^3.1.0",
