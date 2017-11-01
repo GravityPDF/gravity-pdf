@@ -43,7 +43,7 @@ module.exports = {
     new webpack.optimize.ModuleConcatenationPlugin(),
     new UglifyJSPlugin({
       parallel: true,
-      sourceMap: false,
+      sourceMap: true,
       uglifyOptions: {
         output: {
           comments: false
