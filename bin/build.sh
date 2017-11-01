@@ -42,6 +42,9 @@ do
     rm ${i}
 done
 
+rm -R "${PACKAGE_DIR}/src/assets/css"
+rm -R "${PACKAGE_DIR}/src/assets/js"
+
 # Create zip package
 cd ${TMP_DIR}
 rm -R -f ${PACKAGE_NAME}
