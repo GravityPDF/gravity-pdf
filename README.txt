@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.4
 Tested up to: 4.8
-Stable tag: 5.0.0-alpha1
+Stable tag: 5.0.0-beta1
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -86,8 +86,9 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 
 == Changelog ==
 
-= 5.0.0-alpha1 =
+= 5.0.0-beta1 =
 
+* Breaking Change: Bump minimum version of Gravity Forms from 1.9 to 2.2+
 * Breaking Change: Background process PDFs/emails on form submission and while resending notifications (see feature below)
 * Breaking Change: Decouple the fonts from the plugin (see feature below)
 * Breaking Change: Right align all prices in the product table (see bug fix below)
@@ -100,6 +101,7 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 * Feature: Add PHP7.2 Support [GH#716]
 * Feature: Set the watermark font to use the PDF font [GH#718]
 * Feature: Include add-on mergetags and conditional logic in the PDF settings [GH#719]
+* Feature: Better support (polyfill) older browsers when using modern Javascript [GH#729]
 
 * Dev: Update all Packagist-managed JS files to the latest version [GH#701]
 * Dev: Update Monolog to latest version [GH#702]
@@ -115,6 +117,8 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 * Bug: Resolve Customizer confict with the Template Manager JS [GH#693]
 * Bug: Fix multiple AJAX calls when adding / deleting templates from the PDF Template Manager [GH#720]
 * Bug: Fix mergetags being stripped when placed in attributes for HTML/Section/Textarea/Radio/Checkbox/Terms of Service/Post Content fields [#GH722]
+* Bug: Ensure Product Quantity shows correctly in $form_data['field'] [#GH727]
+* Bug: Ensure empty Product fields show up in $form_data['field'][ [#GH727]
 
 = 4.3.0 =
 * Feature: Add support for Gravity Perks E-Commerce Add-on (GH#671)
