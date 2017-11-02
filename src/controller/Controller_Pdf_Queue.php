@@ -125,8 +125,8 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	public function add_actions() {
 		add_action( 'gform_after_submission', [ $this, 'queue_async_form_submission_tasks' ], 5, 2 );
 
-		add_action( 'gform_after_resend_notification', [ $this, 'queue_async_resend_notification_tasks' ], 10, 3 );
-		add_action( 'gform_resend_notifications_complete', [ $this, 'queue_dispatch_resend_notification_tasks' ] );
+		add_action( 'gform_post_resend_notification', [ $this, 'queue_async_resend_notification_tasks' ], 10, 3 );
+		add_action( 'gform_post_resend_all_notifications', [ $this, 'queue_dispatch_resend_notification_tasks' ] );
 	}
 
 	/**
