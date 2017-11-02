@@ -74,6 +74,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 				submit_button();
 			}
 		?>
+
+        <div class="extensions-upsell">
+            <a href="https://gravitypdf.com/extension-shop/">
+				<?php esc_html_e( 'Want more features? Take a look at our Extension Shop.', 'gravity-forms-pdf-extended' ); ?>
+            </a>
+        </div>
 	</form>
 
 	<?php

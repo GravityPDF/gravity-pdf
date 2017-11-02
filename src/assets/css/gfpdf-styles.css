@@ -614,7 +614,16 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
     border-bottom: 1px solid #e6e6e6;
     clear: both;
     padding: 0 0 24px 0;
-    margin: 0 0 24px 0;
+    margin: 0 0 8px 0;
+}
+
+#gfpdf_pdf_form .extensions-upsell {
+    float: right;
+    font-style: italic;
+}
+
+#pdfextended-settings .extensions-upsell {
+    font-style: italic;
 }
 
 #gfpdf_pdf_form .nav-tab-wrapper {
@@ -884,7 +893,7 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
 		height: 193px;
 		display: inline-block;
 		float: right;
-		margin-top: -149px;
+		margin-top: -189px;
 		position: relative;
 		z-index: 100;
 	}
