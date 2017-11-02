@@ -104,7 +104,6 @@ global $wp_settings_fields;
 		<table id="pdf-form-settings" class="form-table">
 			<?php do_settings_fields( 'gfpdf_settings_form_settings', 'gfpdf_settings_form_settings' ); ?>
 		</table>
-
 	</div>
 
 	<!-- display appearance fields -->
@@ -131,6 +130,11 @@ global $wp_settings_fields;
 		</table>
 	</div>
 
+    <div class="extensions-upsell">
+        <a href="https://gravitypdf.com/extension-shop/">
+			<?php esc_html_e( 'Want more features? See the Extension Shop.', 'gravity-forms-pdf-extended' ); ?>
+        </a>
+    </div>
 
 	<p class="submit">
 		<input class="button-primary" type="submit" value="<?php echo $args['button_label']; ?>" name="save"/>
