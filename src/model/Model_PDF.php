@@ -806,6 +806,13 @@ class Model_PDF extends Helper_Abstract_Model {
 			$settings = $pdf->get_settings();
 			$form     = $this->gform->get_form( $entry['form_id'] );
 
+			do_action( 'gfpdf_pre_pdf_generation', $form, $entry, $settings, $pdf );
+
+			/**
+			 * Load our arguments that should be accessed by our PDF template
+			 *
+			 * @var array
+			 */
 			$args = $this->templates->get_template_arguments(
 				$form,
 				$this->misc->get_fields_sorted_by_id( $form['id'] ),
@@ -844,6 +851,8 @@ class Model_PDF extends Helper_Abstract_Model {
 
 				/* Generate and save the PDF */
 				$pdf->save_pdf( $pdf->generate() );
+
+				do_action( 'gfpdf_post_pdf_generation', $form, $entry, $settings, $pdf );
 
 				return true;
 			} catch ( Exception $e ) {

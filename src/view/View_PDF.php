@@ -176,7 +176,15 @@ class View_PDF extends Helper_Abstract_View {
 		$model      = $controller->model;
 		$form       = $this->gform->get_form( $entry['form_id'] );
 
+		/**
+		 * Set out our PDF abstraction class
+		 */
+		$pdf = new Helper_PDF( $entry, $settings, $this->gform, $this->data, $this->misc, $this->templates );
+		$pdf->set_filename( $model->get_pdf_name( $settings, $entry ) );
+
 		$this->fix_wp_external_links_plugin_conflict();
+
+		do_action( 'gfpdf_pre_pdf_generation', $form, $entry, $settings, $pdf );
 
 		/**
 		 * Load our arguments that should be accessed by our PDF template
@@ -205,12 +213,6 @@ class View_PDF extends Helper_Abstract_View {
 
 		/* Enable Multicurrency support */
 		$this->misc->maybe_add_multicurrency_support();
-
-		/**
-		 * Set out our PDF abstraction class
-		 */
-		$pdf = new Helper_PDF( $entry, $settings, $this->gform, $this->data, $this->misc, $this->templates );
-		$pdf->set_filename( $model->get_pdf_name( $settings, $entry ) );
 
 		try {
 
