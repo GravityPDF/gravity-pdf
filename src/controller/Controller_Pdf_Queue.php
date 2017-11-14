@@ -87,6 +87,15 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	protected $queue;
 
 	/**
+	 * Determines if our PDF queue should execute
+	 *
+	 * @var bool
+	 *
+	 * @since 5.0
+	 */
+	protected $disable_queue = false;
+
+	/**
 	 * Set up our dependancies
 	 *
 	 * @param \GFPDF\Helper\Helper_Pdf_Queue
@@ -135,8 +144,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 * @return void
 	 */
 	public function add_filters() {
-		add_filter( 'gform_disable_notification', [ $this, 'maybe_disable_submission_notifications' ], 10, 4 );
-
+		add_filter( 'gform_disable_notification', [ $this, 'maybe_disable_submission_notifications' ], 9999, 4 );
 		add_filter( 'gform_disable_resend_notification', [ $this, 'maybe_disable_resend_notifications' ], 10, 4 );
 	}
 
@@ -153,6 +161,14 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 * @since 5.0
 	 */
 	public function maybe_disable_submission_notifications( $is_disabled, $notification, $form, $entry ) {
+
+		/* If a plugin has already disabled notifications we won't queue up the notifications/PDFs as a background process */
+		if( $is_disabled ) {
+			$this->disable_queue = true;
+
+			return $is_disabled;
+		}
+
 		if ( empty( $notification['event'] ) || $notification['event'] !== 'form_submission' ) {
 			return $is_disabled;
 		}
@@ -215,11 +231,15 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 * @since 5.0
 	 */
 	public function queue_async_form_submission_tasks( $entry, $form ) {
-		/* Push and trigger async queue */
-		$this->queue
-			->push_to_queue( $this->get_queue_tasks( $entry, $form ) )
-			->save()
-			->dispatch();
+		if( ! $this->disable_queue ) {
+			/* Push and trigger async queue */
+			$this->queue
+				->push_to_queue( $this->get_queue_tasks( $entry, $form ) )
+				->save()
+				->dispatch();
+		}
+
+		$this->disable_queue = false;
 	}
 
 	/**
