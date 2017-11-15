@@ -225,7 +225,7 @@ abstract class Helper_Abstract_Fields {
 		 * See https://gravitypdf.com/documentation/v4/gfpdf_field_value/ for more details about this filter
 		 */
 
-		return apply_filters( 'gfpdf_field_value', GFFormsModel::get_lead_field_value( $this->entry, $this->field ), $this->field, $this->entry );
+		return apply_filters( 'gfpdf_field_value', GFFormsModel::get_lead_field_value( $this->entry, $this->field ), $this->field, $this->entry, $this->form, $this );
 	}
 
 	/**
