@@ -325,7 +325,7 @@ class View_PDF extends Helper_Abstract_View {
 		<div id="container">
             <?php
             /*
-             * See https://gravitypdf.com/documentation/v4/gfpdf_pre_html_fields/ for more details about this action
+             * See https://gravitypdf.com/documentation/v5/gfpdf_pre_html_fields/ for more details about this action
              * @since 4.1
              */
             do_action( 'gfpdf_pre_html_fields', $entry, $config );
@@ -335,7 +335,7 @@ class View_PDF extends Helper_Abstract_View {
 
             <?php
             /*
-             * See https://gravitypdf.com/documentation/v4/gfpdf_post_html_fields/ for more details about this action
+             * See https://gravitypdf.com/documentation/v5/gfpdf_post_html_fields/ for more details about this action
              * @since 4.1
              */
             do_action( 'gfpdf_post_html_fields', $entry, $config );
@@ -373,7 +373,7 @@ class View_PDF extends Helper_Abstract_View {
 		$config['meta'] = ( isset( $config['meta'] ) ) ? $config['meta'] : [];
 
 		/**
-		 * See https://gravitypdf.com/documentation/v4/gfpdf_current_pdf_configuration/ for usage
+		 * See https://gravitypdf.com/documentation/v5/gfpdf_current_pdf_configuration/ for usage
 		 * @since 4.2
 		 */
 		$config = apply_filters( 'gfpdf_current_pdf_configuration', $config, $entry, $form );
@@ -409,7 +409,7 @@ class View_PDF extends Helper_Abstract_View {
 			 *
 			 * If $middlware is true the field will not be displayed in the PDF
 			 *
-			 * See https://gravitypdf.com/documentation/v4/gfpdf_field_middleware/ for usage
+			 * See https://gravitypdf.com/documentation/v5/gfpdf_field_middleware/ for usage
 			 *
 			 * @since 4.2
 			 */

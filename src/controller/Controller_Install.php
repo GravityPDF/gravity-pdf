@@ -215,7 +215,7 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 		}
 
 		if ( PDF_EXTENDED_VERSION !== get_option( 'gfpdf_current_version' ) ) {
-			/* See https://gravitypdf.com/documentation/v4/gfpdf_version_changed/ for more details about this action */
+			/* See https://gravitypdf.com/documentation/v5/gfpdf_version_changed/ for more details about this action */
 			do_action( 'gfpdf_version_changed', get_option( 'gfpdf_current_version' ), PDF_EXTENDED_VERSION );
 			update_option( 'gfpdf_current_version', PDF_EXTENDED_VERSION );
 		}

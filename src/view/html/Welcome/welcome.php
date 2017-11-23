@@ -105,7 +105,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<h3><?php esc_html_e( 'Simple PDF Download Links', 'gravity-forms-pdf-extended' ); ?></h3>
 
-			<p><?php printf( esc_html__( 'The %s[gravitypdf]%s shortcode allows you to %seasily place a PDF download link%s on any of the Gravity Forms Confirmation types.', 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<a href="https://gravitypdf.com/documentation/v4/user-shortcodes/">', '</a>' ); ?></p>
+			<p><?php printf( esc_html__( 'The %s[gravitypdf]%s shortcode allows you to %seasily place a PDF download link%s on any of the Gravity Forms Confirmation types.', 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<a href="https://gravitypdf.com/documentation/v5/user-shortcodes/">', '</a>' ); ?></p>
 		</div>
 		<div class="col">
 			<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/welcome-notification-conditional.png' ); ?>">
@@ -119,7 +119,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<h3><?php esc_html_e( 'Custom Fonts', 'gravity-forms-pdf-extended' ); ?></h3>
 
-			<p><?php printf( esc_html__( 'Make your documents stand out by including your favorite fonts with our %ssimple font manager%s.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v4/user-custom-fonts/">', '</a>' ); ?></p>
+			<p><?php printf( esc_html__( 'Make your documents stand out by including your favorite fonts with our %ssimple font manager%s.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/user-custom-fonts/">', '</a>' ); ?></p>
 		</div>
 	</div>
 

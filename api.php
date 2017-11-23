@@ -40,7 +40,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * An easy-to-use API developers can use to work with Gravity PDF
  *
- * See https://gravitypdf.com/documentation/v4/developer-api-whats-it-for/ for more information about this API
+ * See https://gravitypdf.com/documentation/v5/developer-api-whats-it-for/ for more information about this API
  *
  * @since 4.0
  */
@@ -62,7 +62,7 @@ final class GPDFAPI {
 	 *
 	 * When in production Gravity PDF will only log to a file when the Gravity Forms Logging plugin is enabled and Gravity PDF is set to "Log errors only" ($log->addError() or higher) or "Log all messages" ($log->addNotice() or higher)
 	 *
-	 * See https://gravitypdf.com/documentation/v4/api_get_log_class/ for more information about this method
+	 * See https://gravitypdf.com/documentation/v5/api_get_log_class/ for more information about this method
 	 *
 	 * @return \Monolog\Logger
 	 *
@@ -83,7 +83,7 @@ final class GPDFAPI {
 	 *
 	 * This taps into the 'admin_notices' or 'network_admin_notices' WordPress hooks so you need to add your notices before then.
 	 *
-	 * See https://gravitypdf.com/documentation/v4/api_get_notice_class/ for more information about this method
+	 * See https://gravitypdf.com/documentation/v5/api_get_notice_class/ for more information about this method
 	 *
 	 * @return \GFPDF\Helper\Helper_Notices
 	 *
@@ -107,7 +107,7 @@ final class GPDFAPI {
 	 *
 	 * Note: Our __get() magic method returns variables by reference
 	 *
-	 * See https://gravitypdf.com/documentation/v4/get_data_class/ for more information about this method
+	 * See https://gravitypdf.com/documentation/v5/get_data_class/ for more information about this method
 	 *
 	 * @return \GFPDF\Helper\Helper_Data
 	 *
@@ -124,7 +124,7 @@ final class GPDFAPI {
 	 *
 	 * Note: Most relevant methods have been broken our and are avaiable through the GPDFAPI directly (GPDFAPI::get_pdf, GPDFAPI::get_plugin_settings ect)
 	 *
-	 * See https://gravitypdf.com/documentation/v4/api_get_options_class/ for more information about this method
+	 * See https://gravitypdf.com/documentation/v5/api_get_options_class/ for more information about this method
 	 *
 	 * @return \GFPDF\Helper\Helper_Options_Fields
 	 *
@@ -143,7 +143,7 @@ final class GPDFAPI {
 	 *
 	 * $misc->is_gfpdf_page();
 	 *
-	 * See https://gravitypdf.com/documentation/v4/api_get_misc_class/ for more information about this method
+	 * See https://gravitypdf.com/documentation/v5/api_get_misc_class/ for more information about this method
 	 *
 	 * @return \GFPDF\Helper\Helper_Misc
 	 *
@@ -162,7 +162,7 @@ final class GPDFAPI {
 	 *
 	 * $templates->get_all_templates();
 	 *
-	 * See @TODO https://gravitypdf.com/documentation/v4/api_get_templates_class/ for more information about this method
+	 * See @TODO https://gravitypdf.com/documentation/v5/api_get_templates_class/ for more information about this method
 	 *
 	 * @return \GFPDF\Helper\Helper_Templates
 	 *
@@ -184,7 +184,7 @@ final class GPDFAPI {
 	 *
 	 * $gform->get_form( $form_id );
 	 *
-	 * See https://gravitypdf.com/documentation/v4/api_get_form_class/ for more information about this method
+	 * See https://gravitypdf.com/documentation/v5/api_get_form_class/ for more information about this method
 	 *
 	 * @return \GFPDF\Helper\Helper_Form
 	 *
@@ -216,7 +216,7 @@ final class GPDFAPI {
 	 *     remove_filter( 'gfpdf_pdf_middleware', array( $class, 'middle_active' ), 10 );
 	 * }
 	 *
-	 * See https://gravitypdf.com/documentation/v4/api_get_mvc_class/ for more information about this method
+	 * See https://gravitypdf.com/documentation/v5/api_get_mvc_class/ for more information about this method
 	 *
 	 * @param string $class_name The name of one of our MVC classes (no namespace)
 	 *
@@ -255,7 +255,7 @@ final class GPDFAPI {
 	/**
 	 * Gets a list of current PDFs setup for a particular Gravity Form
 	 *
-	 * See https://gravitypdf.com/documentation/v4/api_get_form_pdfs/ for more information about this method
+	 * See https://gravitypdf.com/documentation/v5/api_get_form_pdfs/ for more information about this method
 	 *
 	 * @param  integer $form_id The Gravity Form ID
 	 *
@@ -272,7 +272,7 @@ final class GPDFAPI {
 	/**
 	 * Gets a specific Gravity Form PDF configuration
 	 *
-	 * See https://gravitypdf.com/documentation/v4/api_get_pdf/ for more information about this method
+	 * See https://gravitypdf.com/documentation/v5/api_get_pdf/ for more information about this method
 	 *
 	 * @param  integer $form_id The Gravity Form ID
 	 * @param  string  $pdf_id  The PDF ID
@@ -289,7 +289,7 @@ final class GPDFAPI {
 	/**
 	 * Add a new PDF to a Gravity Form
 	 *
-	 * See https://gravitypdf.com/documentation/v4/api_add_pdf/ for more information about this method
+	 * See https://gravitypdf.com/documentation/v5/api_add_pdf/ for more information about this method
 	 *
 	 * @param integer $form_id  The Gravity Form ID
 	 * @param array   $settings The settings for the PDF
@@ -307,7 +307,7 @@ final class GPDFAPI {
 	/**
 	 * Updates an existing Gravity Form PDF. Passing an empty $settings array will delete the PDF
 	 *
-	 * See https://gravitypdf.com/documentation/v4/api_update_pdf/ for more information about this method
+	 * See https://gravitypdf.com/documentation/v5/api_update_pdf/ for more information about this method
 	 *
 	 * @param  integer $form_id  The Gravity Form ID
 	 * @param  string  $pdf_id   The PDF ID
@@ -326,7 +326,7 @@ final class GPDFAPI {
 	/**
 	 * Deletes a specific Gravity Form PDF configuration
 	 *
-	 * See https://gravitypdf.com/documentation/v4/api_delete_pdf/ for more information about this method
+	 * See https://gravitypdf.com/documentation/v5/api_delete_pdf/ for more information about this method
 	 *
 	 * @param  integer $form_id The Gravity Form ID
 	 * @param  string  $pdf_id  The PDF ID
@@ -344,7 +344,7 @@ final class GPDFAPI {
 	/**
 	 * Retrieve an array of the global Gravity PDF settings (this doesn't include individual form configuration details - see GPDFAPI::get_form_pdfs)
 	 *
-	 * See https://gravitypdf.com/documentation/v4/api_get_plugin_settings/ for more information about this method
+	 * See https://gravitypdf.com/documentation/v5/api_get_plugin_settings/ for more information about this method
 	 *
 	 * @return array
 	 *
@@ -359,7 +359,7 @@ final class GPDFAPI {
 	/**
 	 * Get an option from the global Gravity PDF settings. If it doesn't exist the $default value will be returned
 	 *
-	 * See https://gravitypdf.com/documentation/v4/api_get_plugin_option/ for more information about this method
+	 * See https://gravitypdf.com/documentation/v5/api_get_plugin_option/ for more information about this method
 	 *
 	 * @param string $key     The Gravity PDF option key
 	 * @param mixed  $default What's returned if the option doesn't exist
@@ -380,7 +380,7 @@ final class GPDFAPI {
 	 * If option already exists a WP_Error is returned
 	 * In most cases you'll want to use GPDFAPI::update_plugin_option() instead
 	 *
-	 * See https://gravitypdf.com/documentation/v4/api_add_plugin_option/ for more information about this method
+	 * See https://gravitypdf.com/documentation/v5/api_add_plugin_option/ for more information about this method
 	 *
 	 * @param string $key The option key to add
 	 * @param mixed  $value
@@ -405,7 +405,7 @@ final class GPDFAPI {
 	 *
 	 * If $value is falsy (determined by empty() ) the option is deleted.
 	 *
-	 * See https://gravitypdf.com/documentation/v4/api_update_plugin_option/ for more information about this method
+	 * See https://gravitypdf.com/documentation/v5/api_update_plugin_option/ for more information about this method
 	 *
 	 * @param string $key The option key to update
 	 * @param mixed  $value
@@ -423,7 +423,7 @@ final class GPDFAPI {
 	/**
 	 * Delete's a Gravity PDF global option.
 	 *
-	 * See https://gravitypdf.com/documentation/v4/api_delete_plugin_option/ for more information about this method
+	 * See https://gravitypdf.com/documentation/v5/api_delete_plugin_option/ for more information about this method
 	 *
 	 * @param string $key The option key to delete
 	 *
@@ -441,7 +441,7 @@ final class GPDFAPI {
 	 * When provided the Gravity Form entry ID and PDF ID, this method will correctly generate the PDF, save it to disk,
 	 * trigger appropriate actions and return the absolute path to the PDF.
 	 *
-	 * See https://gravitypdf.com/documentation/v4/api_create_pdf/ for more information about this method
+	 * See https://gravitypdf.com/documentation/v5/api_create_pdf/ for more information about this method
 	 *
 	 * @param  integer $entry_id The Gravity Form entry ID
 	 * @param  string  $pdf_id   The Gravity PDF ID number (the pid number in the URL when viewing a setting in the admin area)
@@ -476,7 +476,7 @@ final class GPDFAPI {
 	/**
 	 * Generates the current entry's HTML product table
 	 *
-	 * See https://gravitypdf.com/documentation/v4/api_product_table/ for more information about this method
+	 * See https://gravitypdf.com/documentation/v5/api_product_table/ for more information about this method
 	 *
 	 * @param  array   $entry  The Gravity Form entry
 	 * @param  boolean $return Whether to output or return the HTML
@@ -505,7 +505,7 @@ final class GPDFAPI {
 	/**
 	 * Generates a likert table
 	 *
-	 * See https://gravitypdf.com/documentation/v4/likert_table/ for more information about this method
+	 * See https://gravitypdf.com/documentation/v5/likert_table/ for more information about this method
 	 *
 	 * @param  array   $entry    The Gravity Form entry
 	 * @param  integer $field_id The likert field ID
@@ -562,7 +562,7 @@ final class GPDFAPI {
 	/**
 	 * Installs a PDF font on the file system
 	 *
-	 * See https://gravitypdf.com/documentation/v4/api_add_pdf_font/ for more information about this method
+	 * See https://gravitypdf.com/documentation/v5/api_add_pdf_font/ for more information about this method
 	 *
 	 * @param array $font The font information to add.
 	 *
@@ -608,7 +608,7 @@ final class GPDFAPI {
 	/**
 	 * Deletes one of the v4 fonts that is installed
 	 *
-	 * See https://gravitypdf.com/documentation/v4/delete_pdf_font/ for more information about this method
+	 * See https://gravitypdf.com/documentation/v5/delete_pdf_font/ for more information about this method
 	 *
 	 * @param string $font_name The font that should be deleted
 	 *

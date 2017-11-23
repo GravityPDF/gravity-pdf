@@ -642,7 +642,7 @@ abstract class Helper_Abstract_Addon {
 
 			$doc_slug = $this->get_addon_documentation_slug();
 			if ( ! empty( $doc_slug ) ) {
-				$row_meta['docs'] = '<a href="' . esc_url( 'https://gravitypdf.com/documentation/v4/' . $doc_slug . '/' ) . '" title="' . esc_attr__( 'View plugin Documentation', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Docs', 'gravity-forms-pdf-extended' ) . '</a>';
+				$row_meta['docs'] = '<a href="' . esc_url( 'https://gravitypdf.com/documentation/v5/' . $doc_slug . '/' ) . '" title="' . esc_attr__( 'View plugin Documentation', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Docs', 'gravity-forms-pdf-extended' ) . '</a>';
 			}
 
 			$row_meta['support'] = '<a href="' . esc_url( 'https://gravitypdf.com/support/#contact-support' ) . '" title="' . esc_attr__( 'Get Help and Support', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Support', 'gravity-forms-pdf-extended' ) . '</a>';
