@@ -50,7 +50,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
             <h4><?php esc_html_e( 'Roll your Own', 'gravity-forms-pdf-extended' ); ?></h4>
 
-            <p><?php printf( esc_html__( "If PHP, HTML and CSS come easy to you, you'll find creating your own PDF templates a breeze. With %sextensive documentation and great examples%s you'll be up and running in no time.", 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v4/developer-start-customising/">', '</a>' ); ?></p>
+            <p><?php printf( esc_html__( "If PHP, HTML and CSS come easy to you, you'll find creating your own PDF templates a breeze. With %sextensive documentation and great examples%s you'll be up and running in no time.", 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/developer-start-customising/">', '</a>' ); ?></p>
 
 		</div>
 
