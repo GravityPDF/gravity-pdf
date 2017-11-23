@@ -49,8 +49,8 @@ before_script:
 
 script:
  - if [[ $PHPUNIT_COVERAGE_TEST ]]; then yarn run test:coverage; fi
- - if [[ $PHPUNIT_COVERAGE_TEST ]]; then ./vendor/bin/phpunit --coverage-clover=coverage/php-coverage1.xml -c tests/phpunit/phpunit.xml.dist; fi
- - if [[ $PHPUNIT_COVERAGE_TEST ]]; then ./vendor/bin/phpunit --coverage-clover=coverage/php-coverage2.xml -c tests/phpunit/phpunit.xml.dist --group ajax; fi
+ - if [[ $PHPUNIT_COVERAGE_TEST ]]; then ./vendor/bin/phpunit --coverage-clover=tmp/coverage/report-xml/php-coverage1.xml -c tests/phpunit/phpunit.xml.dist; fi
+ - if [[ $PHPUNIT_COVERAGE_TEST ]]; then ./vendor/bin/phpunit --coverage-clover=tmp/coverage/report-xml/php-coverage2.xml -c tests/phpunit/phpunit.xml.dist --group ajax; fi
  - if [[ ! $PHPUNIT_COVERAGE_TEST ]]; then ./vendor/bin/phpunit -c tests/phpunit/phpunit.xml.dist; fi
  - if [[ ! $PHPUNIT_COVERAGE_TEST ]]; then ./vendor/bin/phpunit -c tests/phpunit/phpunit.xml.dist --group ajax; fi
 

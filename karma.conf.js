@@ -73,12 +73,10 @@ module.exports = function (config) {
     _config.reporters.push('coverage')
 
     _config.coverageReporter = {
-      dir: 'coverage/',
-      reporters: [{
-        type: 'json',
-        dir: 'coverage',
-        file: 'js-coverage.json'
-      }]
+      dir: 'tmp/coverage/',
+      reporters: [
+        {type: 'json', subdir: 'report-json', file: 'js-coverage.json'}
+      ]
     }
   }
 

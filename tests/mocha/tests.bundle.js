@@ -1,4 +1,6 @@
 import $ from 'jquery'
+import Backbone from 'backbone'
+import _ from 'underscore'
 import Enzyme from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 
@@ -9,11 +11,13 @@ window.requestAnimationFrame = function (callback) {
   setTimeout(callback, 0)
 }
 
-// setup global defaults that our tests expect is present
+// setup global defaults that our tests/legacy code expect is present
 window.GFPDF = {
   templateList: [{id: 'zadani'}, {id: 'rubix'}, {id: 'focus-gravity'}],
   activeTemplate: ''
 }
+
+window.gfpdf_migration_multisite_ids = []
 
 // add IE support for remove()
 Element.prototype.remove = function () {
@@ -42,3 +46,7 @@ afterEach(function () {
 // current directory and all subdirectories
 var testsContext = require.context('.', true, /.+\.spec\.jsx?$/)
 testsContext.keys().forEach(testsContext)
+
+// Require all source files for code coverage purposes.
+const componentsContext = require.context('../../src/', true, /\.js$/)
+componentsContext.keys().forEach(componentsContext)
