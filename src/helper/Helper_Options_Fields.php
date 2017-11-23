@@ -79,7 +79,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			/*
 			 * General Settings
 			 *
-			 * See https://gravitypdf.com/documentation/v4/gfpdf_settings_general/ for more details about this filter
+			 * See https://gravitypdf.com/documentation/v5/gfpdf_settings_general/ for more details about this filter
 			 */
 			'general'                         => apply_filters( 'gfpdf_settings_general',
 				[
@@ -187,7 +187,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				]
 			),
 
-			/* See https://gravitypdf.com/documentation/v4/gfpdf_settings_general_security/ for more details about this filter */
+			/* See https://gravitypdf.com/documentation/v5/gfpdf_settings_general_security/ for more details about this filter */
 			'general_security'                => apply_filters( 'gfpdf_settings_general_security',
 				[
 					'admin_capabilities' => [
@@ -244,14 +244,14 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			/*
 			 * Tools Settings
 			 *
-			 * See https://gravitypdf.com/documentation/v4/gfpdf_settings_tools/ for more details about this filter
+			 * See https://gravitypdf.com/documentation/v5/gfpdf_settings_tools/ for more details about this filter
 			 */
 			'tools'                           => apply_filters( 'gfpdf_settings_tools',
 				[
 					'setup_templates' => [
 						'id'      => 'setup_templates',
 						'name'    => esc_html__( 'Setup Custom Templates', 'gravity-forms-pdf-extended' ),
-						'desc'    => sprintf( esc_html__( 'Setup environment for building custom templates. %sSee docs to get started%s.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v4/developer-first-custom-pdf/">', '</a>' ),
+						'desc'    => sprintf( esc_html__( 'Setup environment for building custom templates. %sSee docs to get started%s.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/developer-first-custom-pdf/">', '</a>' ),
 						'type'    => 'button',
 						'std'     => esc_html__( 'Run Setup', 'gravity-forms-pdf-extended' ),
 						'options' => 'copy',
@@ -280,7 +280,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			/*
 			 * Form (PDF) Settings
 			 *
-			 * See https://gravitypdf.com/documentation/v4/gfpdf_form_settings/ for more details about this filter
+			 * See https://gravitypdf.com/documentation/v5/gfpdf_form_settings/ for more details about this filter
 			 */
 			'form_settings'                   => apply_filters( 'gfpdf_form_settings',
 				[
@@ -348,7 +348,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			/*
 			 * Form (PDF) Settings Appearance
 			 *
-			 * See https://gravitypdf.com/documentation/v4/gfpdf_form_settings_appearance/ for more details about this filter
+			 * See https://gravitypdf.com/documentation/v5/gfpdf_form_settings_appearance/ for more details about this filter
 			 */
 			'form_settings_appearance'        => apply_filters( 'gfpdf_form_settings_appearance',
 				[
@@ -442,7 +442,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			 * This filter allows templates to add custom options for use specific to that template
 			 * Gravity PDF autoloads a PHP template file if it exists and loads it up with this filter
 			 *
-			 * See https://gravitypdf.com/documentation/v4/developer-template-configuration-and-image/#template-configuration for more details
+			 * See https://gravitypdf.com/documentation/v5/developer-template-configuration-and-image/#template-configuration for more details
 			 */
 			'form_settings_custom_appearance' => apply_filters( 'gfpdf_form_settings_custom_appearance',
 				[]
@@ -451,7 +451,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			/*
 			 * Form (PDF) Settings Advanced
 			 *
-			 * See https://gravitypdf.com/documentation/v4/gfpdf_form_settings_advanced/ for more details about this filter
+			 * See https://gravitypdf.com/documentation/v5/gfpdf_form_settings_advanced/ for more details about this filter
 			 */
 			'form_settings_advanced'          => apply_filters( 'gfpdf_form_settings_advanced',
 				[
@@ -543,7 +543,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'public_access' => [
 						'id'      => 'public_access',
 						'name'    => esc_html__( 'Enable Public Access', 'gravity-forms-pdf-extended' ),
-						'desc'    => sprintf( esc_html__( 'Allow %sanyone%s with a direct link to access the PDF. %sThis disables all %ssecurity protocols%s for this PDF.%s ', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>', '<em>', '<a href="https://gravitypdf.com/documentation/v4/user-pdf-security/">', '</a>', '</em>' ),
+						'desc'    => sprintf( esc_html__( 'Allow %sanyone%s with a direct link to access the PDF. %sThis disables all %ssecurity protocols%s for this PDF.%s ', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>', '<em>', '<a href="https://gravitypdf.com/documentation/v5/user-pdf-security/">', '</a>', '</em>' ),
 						'type'    => 'radio',
 						'options' => [
 							'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
@@ -569,7 +569,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			),
 		];
 
-		/* See https://gravitypdf.com/documentation/v4/gfpdf_registered_fields/ for more details about this filter */
+		/* See https://gravitypdf.com/documentation/v5/gfpdf_registered_fields/ for more details about this filter */
 
 		return apply_filters( 'gfpdf_registered_fields', $gfpdf_settings );
 	}
@@ -626,7 +626,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 
 		/**
 		 * Use the filter below to return 'true' which will enable the master password field
-		 * See https://gravitypdf.com/documentation/v4/gfpdf_enable_master_password_field/ for usage
+		 * See https://gravitypdf.com/documentation/v5/gfpdf_enable_master_password_field/ for usage
 		 */
 		if( ! apply_filters( 'gfpdf_enable_master_password_field', false, $settings ) ) {
 			return $settings;

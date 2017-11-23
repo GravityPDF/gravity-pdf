@@ -661,7 +661,7 @@ class Helper_Templates {
 		/* Disable the field encryption checks which can slow down our entry queries */
 		add_filter( 'gform_is_encrypted_field', '__return_false' );
 
-		/* See https://gravitypdf.com/documentation/v4/gfpdf_template_args/ for more details about this filter */
+		/* See https://gravitypdf.com/documentation/v5/gfpdf_template_args/ for more details about this filter */
 
 		return apply_filters( 'gfpdf_template_args', [
 

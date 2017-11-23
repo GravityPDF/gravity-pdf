@@ -79,7 +79,7 @@ class Field_Post_Category extends Helper_Abstract_Fields {
 			/* check load our class */
 			if ( class_exists( $class ) ) {
 
-				/* See https://gravitypdf.com/documentation/v4/gfpdf_field_class/ for more details about these filters */
+				/* See https://gravitypdf.com/documentation/v5/gfpdf_field_class/ for more details about these filters */
 				$this->fieldObject = apply_filters( 'gfpdf_field_class', new $class( $field, $entry, $gform, $misc ), $field, $entry, $this->form );
 				$this->fieldObject = apply_filters( 'gfpdf_field_class_' . $field->inputType, $this->fieldObject, $field, $entry, $this->form );
 			} else {

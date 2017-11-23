@@ -222,7 +222,7 @@ abstract class Helper_Abstract_Fields {
 		/*
 		 * Get the Gravity Forms field value
 		 *
-		 * See https://gravitypdf.com/documentation/v4/gfpdf_field_value/ for more details about this filter
+		 * See https://gravitypdf.com/documentation/v5/gfpdf_field_value/ for more details about this filter
 		 */
 
 		return apply_filters( 'gfpdf_field_value', GFFormsModel::get_lead_field_value( $this->entry, $this->field ), $this->field, $this->entry, $this->form, $this );
@@ -237,7 +237,7 @@ abstract class Helper_Abstract_Fields {
 	 */
 	final public function get_label() {
 		/*
-		 * See https://gravitypdf.com/documentation/v4/gfpdf_field_label/ for usage
+		 * See https://gravitypdf.com/documentation/v5/gfpdf_field_label/ for usage
 		 */
 		return apply_filters( 'gfpdf_field_label', $this->field->label, $this->field, $this->entry );
 	}
@@ -317,7 +317,7 @@ abstract class Helper_Abstract_Fields {
 		$value = apply_filters( 'gfpdf_field_content', $value, $this->field, GFFormsModel::get_lead_field_value( $this->entry, $this->field ), $this->entry['id'], $this->form['id'] );
 
 		/**
-		 * See https://gravitypdf.com/documentation/v4/gfpdf_pdf_field_content/ for usage
+		 * See https://gravitypdf.com/documentation/v5/gfpdf_pdf_field_content/ for usage
 		 * @since 4.2
 		 */
 		$value = apply_filters( 'gfpdf_pdf_field_content', $value, $this->field, $this->entry, $this->form, $this );
@@ -342,7 +342,7 @@ abstract class Helper_Abstract_Fields {
 		         . '</div>'
 		         . '</div>';
 
-		/* See https://gravitypdf.com/documentation/v4/gfpdf_field_html_value/ for more details about this filter */
+		/* See https://gravitypdf.com/documentation/v5/gfpdf_field_html_value/ for more details about this filter */
 
 		return apply_filters( 'gfpdf_field_html_value', $html, $value, $show_label, $label, $this->field, $this->form, $this->entry, $this );
 	}

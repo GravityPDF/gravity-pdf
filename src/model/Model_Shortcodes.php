@@ -140,7 +140,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 			'print'   => '',
 		], $attributes, 'gravitypdf' );
 
-		/* See https://gravitypdf.com/documentation/v4/gfpdf_gravityforms_shortcode_attributes/ for more information about this filter */
+		/* See https://gravitypdf.com/documentation/v5/gfpdf_gravityforms_shortcode_attributes/ for more information about this filter */
 		$attributes = apply_filters( 'gfpdf_gravityforms_shortcode_attributes', $attributes );
 
 		/* Add Shortcake preview support */
