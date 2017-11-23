@@ -1386,7 +1386,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		/* Re-order the array keys to make it more readable */
-		$order = [
+		$order = apply_filters( 'gfpdf_form_data_key_order', [
 			'misc',
 			'field',
 			'list',
@@ -1403,7 +1403,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			'signature',
 			'signature_details',
 			'html',
-		];
+		] );
 
 		foreach ( $order as $key ) {
 
