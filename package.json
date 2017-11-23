@@ -19,13 +19,15 @@
     "superagent": "^3.5.2"
   },
   "devDependencies": {
-    "babel-polyfill": "^7.0.0-beta.3",
     "babel-core": "^7.0.0-beta.3",
     "babel-loader": "^7.0.0",
+    "babel-plugin-istanbul": "^4.1.5",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-polyfill": "^7.0.0-beta.3",
     "babel-preset-env": "^7.0.0-beta.3",
     "babel-preset-react": "^7.0.0-beta.3",
+    "backbone": "^1.3.3",
     "chai": "^4.0.0",
     "cross-env": "^5.0.0",
     "enzyme": "^3.1.0",
@@ -44,6 +46,7 @@
     "karma": "^1.5",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^2.0.0",
+    "karma-coverage": "^1.1.1",
     "karma-firefox-launcher": "^1.0.0",
     "karma-ie-launcher": "^1.0.0",
     "karma-mocha": "^1.1.1",
@@ -58,11 +61,13 @@
     "standard": "^10.0.3",
     "superagent-mocker": "^0.5.2",
     "uglifyjs-webpack-plugin": "^1.0.0-beta.3",
+    "underscore": "^1.8.3",
     "webpack": "^3.7.1",
     "webpack-dev-middleware": "^1.12"
   },
   "scripts": {
     "test": "cross-env NODE_ENV=test karma start",
+    "test:coverage": "cross-env NODE_ENV=test cross-env ENABLE_CODE_COVERAGE=1 karma start",
     "test:watch": "cross-env NODE_ENV=test karma start --auto-watch --no-single-run --log-level error",
     "test:all": "cross-env NODE_ENV=test karma start --browsers Firefox,Chrome,IE",
     "watch": "cross-env NODE_ENV=development webpack --progress --colors --watch",

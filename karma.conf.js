@@ -8,16 +8,17 @@ webpackConfig.externals = {
   'jquery': 'jQuery',
 }
 webpackConfig.plugins = []
+var doCodeCoverage = (process.env.ENABLE_CODE_COVERAGE)
 
 module.exports = function (config) {
-  config.set({
+  var _config = {
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: [ 'mocha', 'chai', 'sinon' ],
+    frameworks: ['mocha', 'chai', 'sinon'],
 
     // list of files / patterns to load in the browser
     files: [
@@ -32,13 +33,13 @@ module.exports = function (config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'tests/mocha/tests.bundle.js': [ 'webpack', 'sourcemap' ]
+      'tests/mocha/tests.bundle.js': ['webpack', 'sourcemap']
     },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: [ 'dots' ],
+    reporters: ['dots'],
 
     webpack: webpackConfig,
 
@@ -57,7 +58,7 @@ module.exports = function (config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: [ 'PhantomJS' ],
+    browsers: ['PhantomJS'],
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
@@ -65,6 +66,19 @@ module.exports = function (config) {
 
     // Concurrency level
     // how many browser should be started simultaneous
-    concurrency: Infinity,
-  })
+    concurrency: Infinity
+  }
+
+  if (doCodeCoverage) {
+    _config.reporters.push('coverage')
+
+    _config.coverageReporter = {
+      dir: 'tmp/coverage/',
+      reporters: [
+        {type: 'json', subdir: 'report-json', file: 'js-coverage.json'}
+      ]
+    }
+  }
+
+  config.set(_config)
 }
