@@ -27,8 +27,8 @@ env:
 
 matrix:
   include:
-  - php: 5.4
-    env: WP_VERSION=latest WP_MULTISITE=1
+  - php: 7.1
+    env: WP_VERSION=latest WP_MULTISITE=1 PHPUNIT_COVERAGE_TEST=1
   - php: 7.0
     env: WP_VERSION=4.7 WP_MULTISITE=0
   - php: 7.0
@@ -41,13 +41,18 @@ matrix:
     env: WP_VERSION=nightly WP_MULTISITE=0
 
 before_script:
+  - if [[ ! $PHPUNIT_COVERAGE_TEST ]]; then phpenv config-rm xdebug.ini; fi
   - if find . -name "*.php" -exec php -l {} \; | grep "unexpected $end"; then exit 1; fi
   - composer install --prefer-source --optimize-autoloader --no-scripts
   - bash tests/bin/install.sh gravitypdf_test root '' localhost $WP_VERSION
   - if [[ $WP_MULTISITE = 1 ]]; then nvm install 6.10 && yarn global add karma-cli && yarn; fi
 
 script:
- - if [[ $WP_MULTISITE = 1 ]]; then yarn run test; fi
- - vendor/bin/phpunit -c tests/phpunit/phpunit.xml.dist
- - vendor/bin/phpunit -c tests/phpunit/phpunit.xml.dist --group ajax
+ - if [[ $PHPUNIT_COVERAGE_TEST ]]; then yarn run test:coverage; fi
+ - if [[ $PHPUNIT_COVERAGE_TEST ]]; then ./vendor/bin/phpunit --coverage-clover=coverage/php-coverage1.xml -c tests/phpunit/phpunit.xml.dist; fi
+ - if [[ $PHPUNIT_COVERAGE_TEST ]]; then ./vendor/bin/phpunit --coverage-clover=coverage/php-coverage2.xml -c tests/phpunit/phpunit.xml.dist --group ajax; fi
+ - if [[ ! $PHPUNIT_COVERAGE_TEST ]]; then ./vendor/bin/phpunit -c tests/phpunit/phpunit.xml.dist; fi
+ - if [[ ! $PHPUNIT_COVERAGE_TEST ]]; then ./vendor/bin/phpunit -c tests/phpunit/phpunit.xml.dist --group ajax; fi
 
+after_success:
+ - if [[ $PHPUNIT_COVERAGE_TEST ]]; then bash <(curl -s https://codecov.io/bash); fi
