@@ -66,7 +66,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 
 		<div class="col">
-			<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/welcome-pdf-settings-page.png' ); ?>">
+			<img class="gfpdf-image" src="https://resources.gravitypdf.com/uploads/2017/11/general-pdf-settings-page-full-v5-1.png">
 		</div>
 
 	</div>
@@ -74,7 +74,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div class="feature-section two-col">
 
 		<div class="col">
-			<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/welcome-individual-pdf-settings.png' ); ?>">
+			<img class="gfpdf-image" src="https://resources.gravitypdf.com/uploads/2017/11/add-new-pdf-page-full-v5-1.png">
 		</div>
 
 		<div class="col">
@@ -109,21 +109,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<div id="gfpdf-mascot-container" class="changelog feature-section three-col">
 		<div class="col">
-			<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/welcome-download-shortcode.png' ); ?>">
+			<img class="gfpdf-image" src="https://resources.gravitypdf.com/uploads/2017/11/pdf-list-page-v5.png">
 
 			<h3><?php esc_html_e( 'Simple PDF Download Links', 'gravity-forms-pdf-extended' ); ?></h3>
 
 			<p><?php printf( esc_html__( 'The %s[gravitypdf]%s shortcode allows you to %seasily place a PDF download link%s on any of the Gravity Forms Confirmation types.', 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<a href="https://gravitypdf.com/documentation/v5/user-shortcodes/">', '</a>' ); ?></p>
 		</div>
 		<div class="col">
-			<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/welcome-notification-conditional.png' ); ?>">
+			<img class="gfpdf-image" src="https://resources.gravitypdf.com/uploads/2017/11/pdf-notifications-v5.png">
 
 			<h3><?php esc_html_e( 'Automated PDF Emails', 'gravity-forms-pdf-extended' ); ?></h3>
 
 			<p><?php esc_html_e( 'Select a Gravity Form Notification and your PDF will automatically be sent as an attachment. Powerful conditional logic can also be used to determine if a PDF will be included.', 'gravity-forms-pdf-extended' ); ?></p>
 		</div>
 		<div class="col last-feature">
-			<img class="gfpdf-image" src="<?php echo esc_url( PDF_PLUGIN_URL . 'src/assets/images/welcome-manage-fonts.png' ); ?>">
+			<img class="gfpdf-image" src="https://resources.gravitypdf.com/uploads/2017/11/welcome-manage-fonts.png">
 
 			<h3><?php esc_html_e( 'Custom Fonts', 'gravity-forms-pdf-extended' ); ?></h3>
 
