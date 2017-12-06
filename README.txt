@@ -85,6 +85,12 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 
 == Changelog ==
 
+= 4.3.1 =
+* Bug: Restrict Gravity PDF JavaScript to the correct PDF pages (GH#693)
+* Bug: Fix PHP5.2 activation error (GH#697)
+* Bug: Fix RTL issue with Chosen Select library (GH#698)
+* Bug: Fix PDF Product table pricing issue by using the pre-calculated price field for the unit price (GH#699)
+
 = 4.3.0 =
 * Feature: Add support for Gravity Perks E-Commerce Add-on (GH#671)
 * Dev Feature: Add GPDFAPI::get_pdf_fonts() method
