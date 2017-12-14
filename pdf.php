@@ -91,7 +91,7 @@ class GFPDF_Major_Compatibility_Checks {
 	 *
 	 * @since 4.0
 	 */
-	public $required_gf_version = '2.2';
+	public $required_gf_version = '2.3-rc-1';
 
 	/**
 	 * The plugin's required WordPress version
