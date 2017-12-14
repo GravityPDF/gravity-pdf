@@ -652,9 +652,16 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
     opacity: 1;
     left: inherit;
     border-top: none;
+    height: 38px;
+    padding: 9px 10px 0;
+    top: auto;
+
     -moz-box-sizing: content-box;
     -webkit-box-sizing: content-box;
     box-sizing: content-box;
+    -webkit-transform: none;
+    transform: none;
+    box-shadow: none;
 }
 
 #gfpdf-template-container .wp-filter-search {
