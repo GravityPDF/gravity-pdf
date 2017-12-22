@@ -101,6 +101,15 @@ class Helper_Field_Container {
 	private $close_tag = '</div>';
 
 	/**
+	 * Whether to enable/disable the faux column feature
+	 *
+	 * @var bool
+	 *
+	 * @since 5.0
+	 */
+	private $faux_column = true;
+
+	/**
 	 * The Gravity Form fields we should not wrap in a container
 	 *
 	 * @var array
@@ -161,6 +170,7 @@ class Helper_Field_Container {
 		$this->close_tag           = apply_filters( 'gfpdf_container_close_tag', $this->close_tag );
 		$this->skip_fields         = apply_filters( 'gfpdf_container_skip_fields', $this->skip_fields );
 		$this->row_stopper_classes = apply_filters( 'gfpdf_container_row_stopper_classes', $this->row_stopper_classes );
+		$this->faux_column         = apply_filters( 'gfpdf_container_disable_faux_columns', $this->faux_column );
 	}
 
 
@@ -239,7 +249,7 @@ class Helper_Field_Container {
 	public function maybe_display_faux_column( GF_Field $field ) {
 
 		/* Check if we should create a placeholder column */
-		if ( $this->does_fit_in_row( $field ) ) {
+		if ( $this->faux_column && $this->does_fit_in_row( $field ) ) {
 			echo '<div id="field-' . $field->id . '" class="gfpdf-column-placeholder gfpdf-field ' . $field->cssClass . '"></div>';
 
 			/* Increase column width */
