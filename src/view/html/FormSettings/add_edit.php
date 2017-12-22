@@ -49,15 +49,6 @@ global $wp_settings_fields;
 	<?php GFFormSettings::output_field_scripts(); ?>
 </script>
 
-<!-- Check if a wp_editor instance has already loaded -->
-<div style="display: none">
-	<?php
-	if ( $args['wp_editor_loaded'] !== true ) {
-		wp_editor( '', 'gfpdf_settings_' );
-	}
-	?>
-</div>
-
 <?php GFFormSettings::page_header( $args['title'] ); ?>
 
 <h3>
