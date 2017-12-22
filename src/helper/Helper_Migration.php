@@ -536,12 +536,12 @@ class Helper_Migration {
 
 					if ( $results ) {
 						/* return the ID if successful */
-						$this->log->addNotice( 'Successfully Added.', [
+						$this->log->addNotice( 'Successfully Imported v3 Node', [
 							'pdf' => $node,
 						] );
 					} else {
 						/* Log errors */
-						$this->log->addError( 'Error Saving.', [
+						$this->log->addError( 'Error Importing v3 Node', [
 							'error' => $results,
 							'pdf'   => $node,
 						] );

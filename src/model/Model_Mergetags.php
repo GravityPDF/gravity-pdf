@@ -172,7 +172,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 		/* Verify we have a match */
 		if ( $results ) {
 
-			$this->log->addNotice( 'Converting PDF Mergetag', [
+			$this->log->addNotice( 'Begin Converting PDF Mergetags', [
 				'form_id'  => $form['id'],
 				'entry_id' => $entry['id'],
 
