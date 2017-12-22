@@ -510,7 +510,7 @@ class Model_PDF extends Helper_Abstract_Model {
 					] );
 
 					/* there's no returning, throw generic error */
-					return new WP_Error( 'access_denied', esc_html__( 'You do not have permission to view this PDF.', 'gravity-forms-pdf-extended' ) );
+					return new WP_Error( 'access_denied', esc_html__( 'You do not have access to view this PDF.', 'gravity-forms-pdf-extended' ) );
 				}
 			}
 		}
