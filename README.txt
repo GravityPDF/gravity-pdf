@@ -133,13 +133,13 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 
 = 5.0.0-beta1 =
 
-* Breaking Change: Bump minimum version of Gravity Forms from 1.9 to 2.2+
+* Breaking Change: Bump minimum version of Gravity Forms from 1.9 to 2.3+
 * Breaking Change: Background process PDFs/emails on form submission and while resending notifications (see feature below)
 * Breaking Change: Decouple the fonts from the plugin (see feature below)
 * Breaking Change: Right align all prices in the product table (see bug fix below)
 
 * Feature: Include a Core Font Downloader in the PDF Tools to install all core PDF fonts [GH#709]
-* Feature: Background Process PDFs during form submission (all GF versions) and while resending notifications (GFv2.3+ only) [GH#713]
+* Feature: Background Process PDFs during form submission and while resending notifications [GH#713]
 * Feature: Add full Chained Select Add-on Support [GH#703]
 * Feature: Updated ReactJS to v16 which uses MIT license [GH#701]
 * Feature: Move the PDF temporary directory to use WordPress' `get_tmp_dir()` [GH#715]
