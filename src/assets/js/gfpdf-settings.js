@@ -100,18 +100,6 @@
           gf_vars.show = GFPDF.enable
           gf_vars.hide = GFPDF.disable
         }
-
-        /*
-         * Backwards compatibility support prior to Gravity Forms 2.3
-         *
-         * Override the gfMergeTagsObj.getTargetElement prototype to better handle CSS special characters in selectors
-         * This is because Gravity Forms doesn't correctly espace meta-characters such a [ and ] (which we use extensively as IDs)
-         * This functionality assists with the merge tag loader
-         * @since 4.0
-         */
-        if (window.gfMergeTags && typeof form != 'undefined') {
-          window.gfMergeTags.getTargetElement = this.resetGfMergeTags
-        }
       }
 
       /**
@@ -680,13 +668,6 @@
             /* Only process if the response is valid */
             if (response.fields) {
 
-              /* Backwards compatibility support prior to Gravity Forms 2.3 */
-              if (window.gfMergeTags) {
-                /* Remove any existing mergetag-marked inputs so they aren't processed twice after we add our new fields to the DOM */
-                $('.merge-tag-support').removeClass('merge-tag-support')
-                $('.all-merge-tags a.open-list').off('click')
-              }
-
               /* Remove any previously loaded editors to prevent conflicts loading an editor with same name */
               $.each(response.editors, function (index, value) {
 
@@ -697,7 +678,6 @@
                     tinyMCE.remove(editor)
                   } catch (e) {}
                 }
-
               })
 
               /* Replace the custom appearance with the AJAX response fields */
@@ -931,36 +911,11 @@
        * @since 4.0
        */
       this.doMergetags = function () {
-
-        /* Backwards compatibility support prior to Gravity Forms 2.3 */
-        if (window.gfMergeTags && typeof form != 'undefined') {
-          window.gfMergeTags = new gfMergeTagsObj(form)
-          window.gfMergeTags.getTargetElement = this.resetGfMergeTags
-        }
-
-        /* Gravity Forms 2.3+ Merge tag support */
-        if (!window.gfMergeTags && typeof form != 'undefined' && $('.merge-tag-support').length >= 0) {
+        if (window.gfMergeTags && typeof form != 'undefined' && $('.merge-tag-support').length >= 0) {
           $('.merge-tag-support').each(function () {
             new gfMergeTagsObj(form, $(this))
           })
         }
-      }
-
-      /**
-       * Escape any meta characters in the target element ID, as per the jQuery spec
-       *
-       * @param elem
-       * @returns {*|HTMLElement}
-       * @since 4.1
-       */
-      this.resetGfMergeTags = function (elem) {
-        var $elem = $(elem)
-        var selector = $elem.parents('span.all-merge-tags').data('targetElement')
-
-        /* escape any meta-characters as per jQuery Spec http://api.jquery.com/category/selectors/ */
-        selector = selector.replace(/[!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, '\\$&')
-
-        return $('#' + selector)
       }
 
       /**
