@@ -87,7 +87,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</div>
 
             <div class="postbox-container">
-				<a href="https://gravitypdf.com/documentation/v5/developer-start-customising/">
+                <a href="https://gravitypdf.com/documentation/v5/developer-start-customising/">
                     <span><?php esc_html_e( 'Developer Documentation', 'gravity-forms-pdf-extended' ); ?></span><br>
 					<?php esc_html_e( 'You’ll find all the info and examples you’ll need to create your own custom PDF templates.', 'gravity-forms-pdf-extended' ); ?>
                 </a>
@@ -96,11 +96,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<div class="postbox-container">
                 <strong><?php esc_html_e( 'Common Questions', 'gravity-forms-pdf-extended' ); ?></strong><br>
                 <ul>
-                    <li><a href="https://gravitypdf.com/documentation/v4/user-setup-pdf/">How do I setup a PDF on my form?</a></li>
-                    <li><a href="https://gravitypdf.com/documentation/v4/user-setup-pdf/#notifications">How do you attach the PDF to a notification email?</a></li>
-                    <li><a href="https://gravitypdf.com/documentation/v4/user-shortcodes/">How do you add a PDF download link to the form's confirmation page?</a></li>
-                    <li><a href="https://gravitypdf.com/documentation/v4/user-managing-pdfs/">How can I add two or more PDFs to a single form?</a></li>
-                    <li><a href="https://gravitypdf.com/documentation/v4/gravityview-support/">How can I allow logged in users to download their past PDFs?</a></li>
+                    <li><a href="https://gravitypdf.com/documentation/v5/user-setup-pdf/">How do I setup a PDF on my form?</a></li>
+                    <li><a href="https://gravitypdf.com/documentation/v5/user-setup-pdf/#notifications">How do you attach the PDF to a notification email?</a></li>
+                    <li><a href="https://gravitypdf.com/documentation/v5/user-shortcodes/">How do you add a PDF download link to the form's confirmation page?</a></li>
+                    <li><a href="https://gravitypdf.com/documentation/v5/user-managing-pdfs/">How can I add two or more PDFs to a single form?</a></li>
+                    <li><a href="https://gravitypdf.com/documentation/v5/gravityview-support/">How can I allow logged in users to download their past PDFs?</a></li>
                 </ul>
 			</div>
 		</div>
