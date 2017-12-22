@@ -410,7 +410,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 			if ( $owner_restriction === 'Yes' && ! is_user_logged_in() ) {
 
-				$this->log->addNotice( 'Redirecting to Login.', [
+				$this->log->addNotice( 'Security – Owner Restrictions: Redirecting to Login.', [
 					'entry'    => $entry,
 					'settings' => $settings,
 				] );
@@ -459,7 +459,7 @@ class Model_PDF extends Helper_Abstract_Model {
 							return new WP_Error( 'timeout_expired', esc_html__( 'Your PDF is no longer accessible.', 'gravity-forms-pdf-extended' ) );
 						} else {
 
-							$this->log->addNotice( 'Redirecting to Login.', [
+							$this->log->addNotice( 'Security – Logged Out Timeout: Redirecting to Login.', [
 								'entry'    => $entry,
 								'settings' => $settings,
 							] );
@@ -495,7 +495,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				/* check if there is actually a user who owns entry */
 				if ( ! empty( $entry['created_by'] ) ) {
 
-					$this->log->addNotice( 'Redirecting to Login.', [
+					$this->log->addNotice( 'Security – Auth Logged Out User: Redirecting to Login.', [
 						'entry'    => $entry,
 						'settings' => $settings,
 					] );
@@ -575,11 +575,6 @@ class Model_PDF extends Helper_Abstract_Model {
 		$controller = $this->getController();
 		$pdf_list   = $this->get_pdf_display_list( $entry );
 
-		$this->log->addNotice( 'Display PDF Entry List.', [
-			'pdfs'  => $pdf_list,
-			'entry' => $entry,
-		] );
-
 		if ( ! empty( $pdf_list ) ) {
 
 			if ( sizeof( $pdf_list ) > 1 ) {
@@ -615,11 +610,6 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		$controller = $this->getController();
 		$pdf_list   = $this->get_pdf_display_list( $entry );
-
-		$this->log->addNotice( 'Display PDF Entry Detail List.', [
-			'pdfs'  => $pdf_list,
-			'entry' => $entry,
-		] );
 
 		if ( ! empty( $pdf_list ) ) {
 			$args = [
@@ -998,7 +988,6 @@ class Model_PDF extends Helper_Abstract_Model {
 				'attachments'  => $notifications['attachments'],
 				'notification' => $notifications,
 			] );
-
 		}
 
 		return $notifications;
@@ -1415,10 +1404,6 @@ class Model_PDF extends Helper_Abstract_Model {
 				$data[ $key ] = $item;
 			}
 		}
-
-		$this->log->addNotice( 'Form Data Array Created', [
-			'data' => $data,
-		] );
 
 		/**
 		 * See https://gravitypdf.com/documentation/v5/gfpdf_form_data/ for usage

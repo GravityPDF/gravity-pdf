@@ -282,7 +282,6 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* prevent unauthorized access */
 		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
-
 			$this->log->addCritical( 'Lack of User Capabilities.', [
 				'user'      => wp_get_current_user(),
 				'user_meta' => get_user_meta( get_current_user_id() ),
@@ -334,8 +333,6 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		if ( empty( $sanitized['name'] ) || empty( $sanitized['filename'] ) ||
 		     ( $sanitized['pdf_size'] == 'CUSTOM' && ( (int) $sanitized['custom_pdf_size'][0] === 0 || (int) $sanitized['custom_pdf_size'][1] === 0 ) )
 		) {
-
-			$this->log->addNotice( 'Validation failed.' );
 			$this->notices->add_error( esc_html__( 'PDF could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
 
 			return false;
@@ -349,8 +346,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* If it updated, let's update the global variable */
 		if ( $did_update !== false ) {
-
-			$this->log->addNotice( 'Successfully Saved.', [
+			$this->log->addNotice( 'Successfully Saved Global PDF Settings.', [
 				'form_id'  => $form_id,
 				'pdf_id'   => $pdf_id,
 				'settings' => $sanitized,
@@ -361,7 +357,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			return true;
 		}
 
-		$this->log->addError( 'Database Update Failed.' );
+		$this->log->addError( 'Failed to Save Global PDF Settings.' );
 		$this->notices->add_error( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-forms-pdf-extended' ) );
 
 		return false;
@@ -390,7 +386,6 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* Check we have a valid nonce, or throw an error */
 		if ( ! wp_verify_nonce( rgpost( 'gfpdf_save_pdf' ), 'gfpdf_save_pdf' ) ) {
-
 			$this->log->addWarning( 'Nonce Verification Failed.' );
 			$this->notices->add_error( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-forms-pdf-extended' ) );
 
@@ -632,10 +627,6 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		$settings = $this->setup_core_custom_appearance_settings( $settings, $class, $template_settings );
 
-		$this->log->addNotice( 'Setup Template-Specific Settings', [
-			'settings' => $settings,
-		] );
-
 		return $settings;
 	}
 
@@ -773,7 +764,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		if ( $results && ! is_wp_error( $results ) ) {
 
-			$this->log->addNotice( 'AJAX Endpoint Successful' );
+			$this->log->addNotice( 'AJAX – Successfully Deleted PDF Settings' );
 
 			$return = [
 				'msg' => esc_html__( 'PDF successfully deleted.', 'gravity-forms-pdf-extended' ),
@@ -829,7 +820,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			$results = $this->options->update_pdf( $fid, $config['id'], $config );
 
 			if ( $results ) {
-				$this->log->addNotice( 'AJAX Endpoint Successful' );
+				$this->log->addNotice( 'AJAX – Successfully Duplicated PDF Setting' );
 
 				/* @todo just use the same nonce for all requests since WP nonces aren't one-time user (time based) */
 				$dup_nonce   = wp_create_nonce( "gfpdf_duplicate_nonce_{$fid}_{$config['id']}" );
@@ -892,7 +883,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			$results = $this->options->update_pdf( $fid, $config['id'], $config );
 
 			if ( $results ) {
-				$this->log->addNotice( 'AJAX Endpoint Successful' );
+				$this->log->addNotice( 'AJAX – Successfully Updated PDF State' );
 
 				$return = [
 					'state' => $state,
@@ -983,7 +974,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			'template_type' => $template_type,
 		];
 
-		$this->log->addNotice( 'AJAX Endpoint Successful', $return );
+		$this->log->addNotice( 'AJAX – Successfully Rendered Template Custom Fields', $return );
 
 		echo json_encode( $return );
 
