@@ -292,8 +292,8 @@ class Field_Products extends Helper_Abstract_Fields {
 			foreach ( $products['products'] as $id => $product ) {
 
 				if ( class_exists( 'GP_Ecommerce_Fields' ) && empty( $product['name'] ) ) {
-				    continue;
-                }
+					continue;
+				}
 
 				/* Get the raw pricing data */
 				$product_raw_price  = GFCommon::to_number( $product['price'] );
