@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Gravity PDF
-Version: 5.0.0-beta1
+Version: 5.0.0-RC1
 Description: Automatically generate highly-customisable PDF documents using Gravity Forms.
 Author: Gravity PDF
 Author URI: https://gravitypdf.com
