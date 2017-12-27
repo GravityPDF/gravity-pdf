@@ -191,7 +191,7 @@ class Field_Products extends Helper_Abstract_Fields {
 									<?php endif; ?>
 								</td>
 								<td class="textcenter"><?php echo $product['quantity']; ?></td>
-								<td><?php echo $product['price']; ?></td>
+								<td><?php echo GFCommon::format_number( $price, 'currency', rgar( $this->entry, 'currency' ) ); ?></td>
 								<td><?php echo $product['subtotal_formatted'] ?></td>
 							</tr>
 						<?php endforeach; ?>
@@ -290,6 +290,10 @@ class Field_Products extends Helper_Abstract_Fields {
 		if ( sizeof( $products['products'] ) > 0 ) {
 
 			foreach ( $products['products'] as $id => $product ) {
+
+				if ( class_exists( 'GP_Ecommerce_Fields' ) && empty( $product['name'] ) ) {
+					continue;
+				}
 
 				/* Get the raw pricing data */
 				$product_raw_price  = GFCommon::to_number( $product['price'] );
