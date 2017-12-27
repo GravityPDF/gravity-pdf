@@ -128,7 +128,7 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 * Bug: Fix mergetags being stripped when placed in attributes for HTML/Section/Textarea/Radio/Checkbox/Terms of Service/Post Content fields [#GH722]
 * Bug: Ensure Product Quantity shows correctly in $form_data['field'] [#GH727]
 * Bug: Ensure empty Product fields show up in $form_data['field'] [#GH727]
-* Bug: Fix Template Manager display issue in WP 4.8 [#GH746]
+* Bug: Fix Template Manager display issue in WP 4.9 [#GH746]
 * Bug: Fix disappearing merge tags selector on Rich Text fields after changing the template [#GH755]
 
 See [CHANGELOG.txt](https://github.com/GravityPDF/gravity-pdf/blob/master/CHANGELOG.txt) for v4 and v3 changelog history.
