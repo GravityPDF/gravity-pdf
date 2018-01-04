@@ -13,7 +13,7 @@ use ReflectionClass;
  * Test Gravity PDF Helper_Field_Container class
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       1.0
  */
@@ -21,7 +21,7 @@ use ReflectionClass;
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
