@@ -1080,44 +1080,38 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * To prevent ourt tmp directory getting huge we will clean it up every 24 hours
+	 * Clean-up our tmp directory every 24 hours
 	 *
 	 * @return void
 	 *
 	 * @since 4.0
 	 */
 	public function cleanup_tmp_dir() {
-
-		$max_file_age  = 24 * 3600; /* Max age is 24 hours old */
+		$max_file_age  = time() - 24 * 3600; /* Max age is 24 hours old */
 		$tmp_directory = $this->data->template_tmp_location;
 
 		if ( is_dir( $tmp_directory ) ) {
-			/* Scan the tmp directory and get a list of files / folders */
-			$directory_list = array_diff( scandir( $tmp_directory ), [ '..', '.', '.htaccess' ] );
 
-			foreach ( $directory_list as $item ) {
-				$file      = $tmp_directory . $item;
-				$directory = false;
+			try {
+				$directory_list = new \RecursiveIteratorIterator(
+					new \RecursiveDirectoryIterator( $tmp_directory, \RecursiveDirectoryIterator::SKIP_DOTS ),
+					\RecursiveIteratorIterator::CHILD_FIRST
+				);
 
-				/* Fix to allow filemtime to work on directories too */
-				if ( is_dir( $file ) ) {
-					$file      .= '.';
-					$directory = true;
-				}
+				foreach ( $directory_list as $file ) {
+					if ( in_array( $file->getFilename(), [ '.htaccess', 'index.html' ] ) ) {
+						continue;
+					}
 
-				/* Check if the file is too old and delete file / directory */
-				if ( file_exists( $file ) && filemtime( $file ) < time() - $max_file_age ) {
-
-					if ( $directory ) {
-						$this->misc->rmdir( substr( $file, 0, -1 ) );
-					} else {
-						if ( ! unlink( $file ) ) {
-							$this->log->addError( 'Filesystem Delete Error', [
-								'file' => $file,
-							] );
-						}
+					if ( $file->isReadable() && $file->getMTime() < $max_file_age ) {
+						( $file->isDir() ) ? $this->misc->rmdir( $file->getPathName() ) : unlink( $file->getPathName() );
 					}
 				}
+			} catch ( Exception $e ) {
+				$this->log->addError( 'Filesystem Delete Error', [
+					'dir'       => $tmp_directory,
+					'exception' => $e->getMessage(),
+				] );
 			}
 		}
 	}
