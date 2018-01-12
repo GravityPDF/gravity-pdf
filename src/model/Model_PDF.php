@@ -1489,8 +1489,8 @@ class Model_PDF extends Helper_Abstract_Model {
 			$fields = GFCommon::get_fields_by_type( $form, [ 'survey' ] );
 
 			/* Include the survey score, if any */
-			if ( isset( $lead['gsurvey_score'] ) ) {
-				$data['survey']['score'] = $lead['gsurvey_score'];
+			if ( isset( $entry['gsurvey_score'] ) ) {
+				$data['survey']['score'] = $entry['gsurvey_score'];
 			}
 
 			$results = $this->get_addon_global_data( $form, [], $fields );
