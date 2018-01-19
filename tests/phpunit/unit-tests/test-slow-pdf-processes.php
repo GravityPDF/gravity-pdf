@@ -328,8 +328,10 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 			unlink( $filename );
 		}
 
+		$settings['template'] = 'doesntexist';
+
 		/* Trigger an error */
-		$error = $this->model->generate_and_save_pdf( [], [ 'filename' => '' ] );
+		$error = $this->model->generate_and_save_pdf( $entry, $settings );
 
 		$this->assertTrue( is_wp_error( $error ) );
 	}

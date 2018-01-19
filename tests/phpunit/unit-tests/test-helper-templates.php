@@ -180,9 +180,9 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 	 * @since 4.1
 	 */
 	public function test_is_template_compatible() {
-		$this->assertTrue( $this->templates->is_template_compatible( PDF_EXTENDED_VERSION - 1 ) );
+		$this->assertTrue( $this->templates->is_template_compatible( (float) PDF_EXTENDED_VERSION - 1 ) );
 		$this->assertTrue( $this->templates->is_template_compatible( PDF_EXTENDED_VERSION ) );
-		$this->assertFalse( $this->templates->is_template_compatible( PDF_EXTENDED_VERSION + 1 ) );
+		$this->assertFalse( $this->templates->is_template_compatible( (float) PDF_EXTENDED_VERSION + 1 ) );
 	}
 
 	/**
@@ -193,7 +193,7 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 	public function test_maybe_add_template_compatibility_notice() {
 		$this->assertEquals( 'Template', $this->templates->maybe_add_template_compatibility_notice( 'Template', PDF_EXTENDED_VERSION ) );
 
-		$version = PDF_EXTENDED_VERSION + 1;
+		$version = (float) PDF_EXTENDED_VERSION + 1;
 		$this->assertEquals( 'Template (Requires Gravity PDF v' . $version . ')', $this->templates->maybe_add_template_compatibility_notice( 'Template', $version ) );
 	}
 

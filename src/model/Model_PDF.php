@@ -1824,7 +1824,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		$pdfs = array_values( $pdfs );
 
 		/* Use the legacy aid to determine which PDF to load */
-		if ( $config['aid'] !== false ) {
+		if ( isset( $config['aid'] ) && $config['aid'] !== false ) {
 			$selector = $config['aid'] - 1;
 
 			if ( isset( $pdfs[ $selector ] ) && $pdfs[ $selector ]['template'] == $config['template'] ) {

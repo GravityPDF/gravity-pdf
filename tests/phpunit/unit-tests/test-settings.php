@@ -455,6 +455,7 @@ class Test_Settings extends WP_UnitTestCase {
 	 */
 	public function test_is_font_name_unique() {
 		global $gfpdf;
+		$gfpdf->options->update_option( 'custom_fonts', [] );
 
 		/* Check the name is unique */
 		$this->assertTrue( $this->model->is_font_name_unique( 'Calibri' ) );

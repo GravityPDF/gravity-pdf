@@ -491,7 +491,7 @@ class Test_Options_API extends WP_UnitTestCase {
 	 */
 	public function test_add_pdf_filter() {
 		add_filter( 'gfpdf_form_add_pdf', function () {
-			return [ 'name' => 'Add Filter Fired' ];
+			return [ 'id' => 'id', 'name' => 'Add Filter Fired' ];
 		} );
 
 		/* run our method */
@@ -505,7 +505,7 @@ class Test_Options_API extends WP_UnitTestCase {
 		remove_all_filters( 'gfpdf_pdf_config' );
 
 		add_filter( 'gfpdf_form_add_pdf_' . $this->form_id, function () {
-			return [ 'name' => 'ID Add Filter Fired' ];
+			return [ 'id' => 'id', 'name' => 'ID Add Filter Fired' ];
 		} );
 
 		/* run our method */
