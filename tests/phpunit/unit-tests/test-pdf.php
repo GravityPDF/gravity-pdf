@@ -1617,8 +1617,14 @@ class Test_PDF extends WP_UnitTestCase {
 			'rtl'             => 'No',
 		];
 
+
 		/* Test everything passes back the same */
-		$this->assertSame( 0, sizeof( array_diff( $settings, $this->model->apply_backwards_compatibility_filters( $settings, $entry ) ) ) );
+		$results = $this->model->apply_backwards_compatibility_filters( $settings, $entry );
+
+		foreach( $results as $key => $value ) {
+			$this->assertArrayHasKey( $key, $settings );
+			$this->assertEquals( $value, $settings[ $key ] );
+		}
 
 		/* Add filters to manipulate the data */
 		add_filter( 'gfpdfe_pdf_name', function ( $item ) {
@@ -1672,6 +1678,8 @@ class Test_PDF extends WP_UnitTestCase {
 	 */
 	public function test_preprocess_template_arguments() {
 
+		$data = $this->create_form_and_entries();
+
 		/* Setup the testing data */
 		$args = [
 			'settings' => [
@@ -1681,6 +1689,8 @@ class Test_PDF extends WP_UnitTestCase {
 				'first_footer' => '<img src="/this/is/my/path/image.gif" class="class1 class2" />',
 				'other_value'  => 'testing',
 			],
+			'form'  => $data['form'],
+			'entry' => $data['entry'],
 		];
 
 		$results = $this->model->preprocess_template_arguments( $args );

@@ -357,13 +357,15 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_evaluate_conditional_logic() {
+		$data = $this->create_form_and_entries();
+
 		$logic['actionType'] = 'show';
 
-		$this->assertTrue( $this->misc->evaluate_conditional_logic( $logic, [] ) );
+		$this->assertTrue( $this->misc->evaluate_conditional_logic( $logic, $data['entry'] ) );
 
 		$logic['actionType'] = 'hide';
 
-		$this->assertFalse( $this->misc->evaluate_conditional_logic( $logic, [] ) );
+		$this->assertFalse( $this->misc->evaluate_conditional_logic( $logic, $data['entry'] ) );
 	}
 
 	/**
@@ -473,7 +475,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 		$this->assertFalse( $compat['security'] );
 		$this->assertFalse( $compat['pdfa1b'] );
 		$this->assertFalse( $compat['pdfx1a'] );
-		$this->assertEquals( '', $compat['password'] );
+		$this->assertEquals( '', $compat['pdf_password'] );
 		$this->assertEquals( '', $compat['pdf_privileges'] );
 		$this->assertEquals( 96, $compat['dpi'] );
 
