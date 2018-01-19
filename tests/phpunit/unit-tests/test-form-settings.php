@@ -242,6 +242,8 @@ class Test_Form_Settings extends WP_UnitTestCase {
 	 */
 	public function test_process_list_view() {
 
+		$GLOBALS['hook_suffix'] = '';
+
 		require_once( GFCommon::get_base_path() . '/form_settings.php' );
 
 		$form_id = $this->form_id;
@@ -381,6 +383,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 
 		/* Create semi-valid post data */
 		$_POST['gfpdf_settings']['name'] = 'My New Name';
+		$_POST['gfpdf_settings']['pdf_size'] = '';
 
 		/* Fail sanitization */
 		$this->assertFalse( $this->model->process_submission( $form_id, $pid ) );
