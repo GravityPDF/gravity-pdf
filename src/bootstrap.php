@@ -584,8 +584,12 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @return 4.0
 	 */
 	public function setup_settings_fields() {
-		/* register our options settings */
-		$this->options->register_settings( $this->options->get_registered_fields() );
+		global $pagenow;
+
+		if ( $this->misc->is_gfpdf_page() || $pagenow === 'options.php' ) {
+			/* register our options settings */
+			$this->options->register_settings( $this->options->get_registered_fields() );
+		}
 	}
 
 	/**
