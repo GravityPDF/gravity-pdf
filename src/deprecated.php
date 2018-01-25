@@ -331,6 +331,13 @@ class PDF_Common extends GFPDF_Deprecated_Abstract {
 
 		return $misc->strip_invalid_characters( $name );
 	}
+
+	/**
+     * Prevent deprecated warning for legacy Tier 2 templates
+     *
+	 * @since 3.0
+	 */
+	public static function setup_ids() {}
 }
 
 /**
