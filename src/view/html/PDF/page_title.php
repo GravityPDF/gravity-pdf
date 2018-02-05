@@ -37,7 +37,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <div class="row-separator">
-	<h3 class="gfpdf-page gfpdf-field">
+	<h3 class="gfpdf-page gfpdf-field <?php echo $classes; ?>">
 		<?php echo $form['pagination']['pages'][ $page ]; ?>
 	</h3>
 </div>

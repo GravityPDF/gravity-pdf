@@ -1582,6 +1582,7 @@ class Test_PDF extends WP_UnitTestCase {
 					1 => 'My Test Page',
 				],
 			],
+			'fields' => []
 		];
 
 		ob_start();
