@@ -536,8 +536,17 @@ class View_PDF extends Helper_Abstract_View {
 			/* correctly close / cleanup the HTML container if needed */
 			$container->close();
 
+			/* Find any CSS assigned to the page */
+			$classes = '';
+			foreach( $form['fields'] as $field ) {
+			    if( $field->type === 'page' && $field->pageNumber === ($page + 1 ) ) {
+				    $classes = $field->cssClass;
+			        break;
+                }
+            }
+
 			/* Load our HTML */
-			$html = $this->load( 'page_title', [ 'form' => $form, 'page' => $page ], false );
+			$html = $this->load( 'page_title', [ 'form' => $form, 'page' => $page, 'classes' => $classes ], false );
 
 			/* Run it through a filter and output */
 			echo apply_filters( 'gfpdf_field_page_name_html', $html, $page, $form );
