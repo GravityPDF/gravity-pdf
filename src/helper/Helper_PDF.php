@@ -248,6 +248,13 @@ class Helper_PDF {
 
 		$form = $this->form;
 
+		/* Allow this method to be short circuited */
+		if ( apply_filters( 'gfpdf_skip_pdf_html_render', false, $args, $this ) ) {
+			do_action( 'gfpdf_skipped_html_render', $args, $this );
+
+			return false;
+		}
+
 		/* Load in our PHP template */
 		if ( empty( $html ) ) {
 			$html = $this->load_html( $args );
@@ -621,6 +628,13 @@ class Helper_PDF {
 		 * See https://gravitypdf.com/documentation/v4/gfpdf_mpdf_init_class/ for more details about this filter
 		 */
 		$this->mpdf = apply_filters( 'gfpdf_mpdf_init_class', $this->mpdf, $this->form, $this->entry, $this->settings, $this );
+	}
+
+	/**
+	 * @return \mPDF
+	 */
+	public function get_pdf_class() {
+		return $this->mpdf;
 	}
 
 	/**
