@@ -111,17 +111,12 @@ class Field_Subtotal extends Helper_Abstract_Field_Products {
 			return $this->cache();
 		}
 
-		if ( method_exists( $this->field, 'get_subtotal' ) ) {
-			$use_value = (bool) apply_filters( 'gfpdf_show_field_value', false ); /* Set to `true` to show a field's value instead of the label */
-			$subtotal  = $this->field->get_subtotal( GFCommon::get_product_fields( $this->form, $this->entry, ! $use_value ) );
+		$subtotal = $this->get_value();
 
-			$this->cache( [
-				'total'           => esc_html( $subtotal ),
-				'total_formatted' => esc_html( GFCommon::to_money( $subtotal ), $this->entry['currency'] ),
-			] );
-		} else {
-			$this->cache( [] );
-		}
+		$this->cache( [
+			'total'           => esc_html( $subtotal ),
+			'total_formatted' => esc_html( GFCommon::to_money( $subtotal ), $this->entry['currency'] ),
+		] );
 
 		return $this->cache();
 	}
