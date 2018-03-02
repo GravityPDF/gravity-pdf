@@ -940,6 +940,9 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				return $settings;
 			}, 100 );
 
+			/* Remove any TinyMCE custom plugins which causes loading issues */
+			remove_all_filters( 'mce_external_plugins' );
+
 			/* Ensure our new fields are registered */
 			$this->options->register_settings( $this->options->get_registered_fields() );
 
