@@ -149,8 +149,8 @@ export class TemplateUploader extends React.Component {
    * @since 4.1
    */
   checkFilesize = (size) => {
-    /* Check the file is no larger than 5MB (convert from bytes to KB) */
-    if (size / 1024 > 5120) {
+    /* Check the file is no larger than 10MB (convert from bytes to KB) */
+    if (size / 1024 > 10240) {
       /* Tell use about incorrect file type */
       this.setState({
         error: this.props.filesizeErrorText
