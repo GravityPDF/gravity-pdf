@@ -249,10 +249,6 @@ class View_Settings extends Helper_Abstract_View {
 			'gf'     => $this->gform->get_version(),
 		];
 
-		$this->log->addNotice( 'System Status', [
-			'status' => $vars,
-		] );
-
 		/* load the system status view */
 		$this->load( 'system_status', $vars );
 	}

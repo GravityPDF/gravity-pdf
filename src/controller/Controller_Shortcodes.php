@@ -144,8 +144,6 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 			return null;
 		}
 
-		$this->log->addNotice( 'Enable Shortcake support.' );
-
 		/* Enhance further */
 		shortcode_ui_register_for_shortcode( 'gravitypdf', [
 			'label' => esc_html__( 'Gravity PDF', 'gravity-forms-pdf-extended' ),

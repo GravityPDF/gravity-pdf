@@ -135,8 +135,6 @@ class Model_Welcome_Screen extends Helper_Abstract_Model {
 
 		switch ( rgget( 'page' ) ) {
 			case 'gfpdf-getting-started':
-				$this->log->addNotice( 'Display Welcome Screen' );
-
 				return $this->welcome_title;
 			break;
 		}
