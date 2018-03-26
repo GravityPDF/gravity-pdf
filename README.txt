@@ -34,7 +34,7 @@ The plugin ships with four highly-customisable PDF templates perfectly suited fo
 
 = Requirements =
 
-Gravity PDF can be run on most shared web hosting without any issues. It requires **PHP 5.4+** (PHP 7.0+ recommended) and at least 64MB of WP Memory (128MB+ recommended). You'll also need to be running WordPress 4.2+ and have [Gravity Forms 1.9+](https://www.e-junkie.com/ecom/gb.php?cl=54585&c=ib&aff=235154) (affiliate link).
+Gravity PDF can be run on most shared web hosting without any issues. It requires **PHP 5.4+** (PHP 7.0+ recommended) and at least 64MB of WP Memory (128MB+ recommended). You'll also need to be running WordPress 4.2+ and have [Gravity Forms 1.9+](https://rocketgenius.pxf.io/c/1211356/445235/7938) (affiliate link).
 
 If you aren't sure Gravity PDF will meet your needs (and haven't got a Gravity Forms license yet) you can [try out the software via our demo site](https://demo.gravitypdf.com).
 
