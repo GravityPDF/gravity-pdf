@@ -110,6 +110,7 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 * Bug: Fix the Gravity Perks E-Commerce Subtotal value in the $form_data array
 * Bug: Prevent TinyMCE error when selecting a new template and other plugins define a custom TinyMCE plugin
 * Bug: Adjust PDF Template Upload limit from 5MB to 10MB
+* Bug: Fix Product field background color issue
 
 = 4.3.2 =
 * Bug: Reverse pricing issue bug fix in 4.3.1 (under some circumstances it cause the incorrect Unit Price to be displayed in product table)
