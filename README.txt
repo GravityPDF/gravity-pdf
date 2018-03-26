@@ -88,7 +88,7 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 = 4.4.0 =
 * Feature: Add native support for Gravity Forms Chained Select
 * Feature: Include Gravity Forms add-on conditional logic in PDF Conditional Logic selector
-* Feature: `pagebreak` CSS class can now be used on Pagebreak fields (except the very first one)
+* Feature: When the "Show Page Names" PDF setting is enabled, the `pagebreak` CSS class can now be used on Named Pagebreak fields (except the very first one)
 * Feature: PDF Rich Text fields now utilise the full width of the editor
 * Dev Feature: Add $form_data API endpoint
 * Dev Feature: Add the $form and $this variables to the `gfpdf_field_value` filter
