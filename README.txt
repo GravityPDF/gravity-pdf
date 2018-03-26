@@ -93,12 +93,13 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 * Dev Feature: Add $form_data API endpoint
 * Dev Feature: Add the $form and $this variables to the `gfpdf_field_value` filter
 * Dev Feature: Add `gfpdf_form_data_key_order` filter to allow the re-ordering of the $form_data array
+* Dev Feature: Add filter `gfpdf_container_disable_faux_columns` to allow faux columns to be toggled off (useful when using a lot of conditional logic with CSS Ready Classes)
 * Housekeeping: Update Monolog to latest version
 * Housekeeping: Instead of generic error, display `You do not have permission to view this PDF` when user failed PDF security checks
 * Housekeeping: Tweak the Help page to provide more relevant information.
 * Housekeeping: Reduce the Gravity PDF log file bloat, and add more specific log messages.
 * Housekeeping: Recursively clean-up the PDF temporary directory
-* Housekeeping: Limit the registeration of PDF settings on Gravity PDF pages, and the admin options.php page
+* Housekeeping: Limit the registration of PDF settings on Gravity PDF pages, and the admin options.php page
 * Bug: Prevent multiple calls running when a new template is installed/deleted and then selected
 * Bug: Pre-process any mergetags for the Checkbox, HTML, Post Content, Radio, Section, Textarea and Terms of Service Gravity Form fields
 * Bug: Fix individual quantity field $form_data
