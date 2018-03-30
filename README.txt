@@ -113,6 +113,7 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 * Bug: Adjust PDF Template Upload limit from 5MB to 10MB
 * Bug: Fix Product field background color issue
 * Bug: Right-align prices in the product table
+* Bug: Fix PHP fatal error when PDF cannot be correctly saved to disk
 
 = 4.3.2 =
 * Bug: Reverse pricing issue bug fix in 4.3.1 (under some circumstances it cause the incorrect Unit Price to be displayed in product table)
