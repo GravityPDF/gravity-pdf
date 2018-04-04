@@ -2,8 +2,10 @@
 
 namespace GFPDF\Helper;
 
-use blueliquiddesigns\Mpdf\mPDF;
-
+use Mpdf\Mpdf;
+use Mpdf\Config\FontVariables;
+use Mpdf\Utils\UtfString;
+use Psr\Log\LoggerInterface;
 use Exception;
 
 /**
@@ -185,6 +187,15 @@ class Helper_PDF {
 	protected $templates;
 
 	/**
+	 * Holds our log class
+	 *
+	 * @var \Monolog\Logger|LoggerInterface
+	 *
+	 * @since 5.0
+	 */
+	protected $log;
+
+	/**
 	 * Initialise our class
 	 *
 	 * @param array                              $entry    The Gravity Form Entry to be processed
@@ -197,7 +208,7 @@ class Helper_PDF {
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $entry, $settings, Helper_Abstract_Form $gform, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates ) {
+	public function __construct( $entry, $settings, Helper_Abstract_Form $gform, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates, LoggerInterface $log ) {
 
 		/* Assign our internal variables */
 		$this->entry     = $entry;
@@ -206,6 +217,7 @@ class Helper_PDF {
 		$this->data      = $data;
 		$this->misc      = $misc;
 		$this->templates = $templates;
+		$this->log       = $log;
 		$this->form      = $this->gform->get_form( $entry['form_id'] );
 
 		$this->set_path();
@@ -301,6 +313,8 @@ class Helper_PDF {
 		$this->mpdf = apply_filters( 'gfpdfe_mpdf_class_pre_render', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() );
 		$this->mpdf = apply_filters( 'gfpdfe_pre_render_pdf', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() );
 		$this->mpdf = apply_filters( 'gfpdfe_mpdf_class', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() );
+
+		$this->maybe_add_stats();
 
 		/* If a developer decides to disable all security protocols we don't want the PDF indexed */
 		if ( ! headers_sent() ) {
@@ -439,8 +453,8 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	protected function set_metadata() {
-		$this->mpdf->SetTitle( strcode2utf( strip_tags( $this->get_filename() ) ) );
-		$this->mpdf->SetAuthor( strcode2utf( strip_tags( get_bloginfo( 'name' ) ) ) );
+		$this->mpdf->SetTitle( UtfString::strcode2utf( strip_tags( $this->get_filename() ) ) );
+		$this->mpdf->SetAuthor( UtfString::strcode2utf( strip_tags( get_bloginfo( 'name' ) ) ) );
 	}
 
 	/**
@@ -619,7 +633,34 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	protected function begin_pdf() {
-		$this->mpdf = new mPDF( '', $this->paper_size, 0, '', 15, 15, 16, 16, 9, 9, $this->orientation );
+		$defaultFontConfig = ( new FontVariables() )->getDefaults();
+
+		$this->mpdf = new mPDF( [
+			'fontDir' => [
+				$this->data->template_font_location,
+			],
+
+			'fontdata' => apply_filters( 'mpdf_font_data', $defaultFontConfig['fontdata'] ),
+
+			'tmpDir' => $this->data->template_tmp_location . '/mpdf/',
+
+			'allow_output_buffering' => true,
+			'autoLangToFont'         => true,
+			'useSubstitutions'       => true,
+			'ignore_invalid_utf8'    => true,
+			'setAutoTopMargin'       => 'stretch',
+			'setAutoBottomMargin'    => 'stretch',
+			'enableImports'          => true,
+			'use_kwt'                => true,
+			'keepColumns'            => true,
+			'biDirectional'          => true,
+
+
+			'format'      => $this->paper_size,
+			'orientation' => $this->orientation,
+		] );
+
+		$this->mpdf->setLogger( $this->log );
 
 		/**
 		 * Allow $mpdf object class to be modified
@@ -793,7 +834,7 @@ class Helper_PDF {
 			$this->orientation = ( $orientation == 'landscape' ) ? 'L' : 'P';
 		} else {
 			$this->orientation = ( $orientation == 'landscape' ) ? '-L' : '';
-			$this->paper_size .= $this->orientation;
+			$this->paper_size  .= $this->orientation;
 		}
 	}
 
@@ -930,6 +971,19 @@ class Helper_PDF {
 	protected function prevent_caching() {
 		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
 			define( 'DONOTCACHEPAGE', true );
+		}
+	}
+
+	/**
+	 * Add PDF stats to end of document if WP_DEBUG_DISPLAY is set to `true`
+	 *
+	 * @since 5.0
+	 */
+	protected function maybe_add_stats() {
+		if ( defined( 'WP_DEBUG' ) && defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG && WP_DEBUG_DISPLAY ) {
+			$this->mpdf->WriteHTML( '<div>Generated in ' . sprintf( '%.2F', ( microtime( true ) - $this->mpdf->time0 ) ) . ' seconds</div>' );
+			$this->mpdf->WriteHTML( '<div>Peak Memory usage ' . number_format( ( memory_get_peak_usage( true ) / ( 1024 * 1024 ) ), 2 ) . ' MB</div>' );
+			$this->mpdf->WriteHTML( '<div>Number of fonts ' . count( $this->mpdf->fonts ) . '</div>' );
 		}
 	}
 }

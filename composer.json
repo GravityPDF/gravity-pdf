@@ -5,7 +5,7 @@
     },
 
     "require": {
-        "blueliquiddesigns/mpdf": "dev-gravity-pdf-5",
+        "mpdf/mpdf": "dev-development",
         "querypath/QueryPath": ">=3.0.0",
         "monolog/monolog": "^1.23.0",
         "codeguy/upload": "^1.3"
