@@ -45,7 +45,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<div class="about-text">
 			<?php esc_html_e( 'This is your portal to find quality help, support and documentation for Gravity PDF', 'gravity-forms-pdf-extended' ); ?>
-			<div class="about-text-disclaimer"><?php printf( esc_html__( '(This is not the place to get Gravity Forms support. %sPlease use their official support channel%s for assistance)', 'gravity-forms-pdf-extended' ), '<a href="https://www.gravityforms.com/support/">', '</a>' ); ?></div>
+			<div class="about-text-disclaimer"><?php printf( esc_html__( '(This is not the place to get Gravity Forms support. %sPlease use their official support channel%s for assistance. Using the search box below will search gravitypdf.com for results.)', 'gravity-forms-pdf-extended' ), '<a href="https://www.gravityforms.com/support/">', '</a>' ); ?></div>
 		</div>
 
 		<div id="search-knowledgebase">

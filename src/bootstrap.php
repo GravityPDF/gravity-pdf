@@ -452,6 +452,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			wp_enqueue_media();
 			
 			wp_enqueue_script( 'gfpdf_js_entrypoint' );
+
+			/* Load TinyMCE styles */
+			add_filter( 'tiny_mce_before_init', [ $this, 'tinymce_styles' ] );
 		}
 
 		if ( $this->misc->is_gfpdf_settings_tab( 'help' ) || $this->misc->is_gfpdf_settings_tab( 'tools' ) ) {
@@ -466,6 +469,21 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		if ( is_admin() ) {
 			wp_enqueue_style( 'gfpdf_css_admin_styles' );
 		}
+	}
+
+	/**
+	 * Insert our own styles into the TinyMCE editor
+	 *
+	 * @param array $mceInit
+	 *
+	 * @return array
+	 *
+	 * @since 4.4
+	 */
+	public function tinymce_styles( $mceInit ) {
+		$style                    = "body#tinymce { max-width: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;}";
+		$mceInit['content_style'] = ( isset( $mceInit['content_style'] ) ) ? $mceInit['content_style'] . ' ' . $style : $style;
+		return $mceInit;
 	}
 
 	/**

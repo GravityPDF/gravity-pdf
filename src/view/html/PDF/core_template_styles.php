@@ -132,7 +132,7 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
 	/* Product Field Styles */
 	<?php if ( $include_product_styles ) : ?>
 		table.entry-products th {
-			background-color: <?php echo $contrast_background_color; ?>#F4F4F4;
+			background-color: <?php echo $contrast_background_color; ?>;
 			border-bottom: 1px solid <?php echo $contrast_border_color; ?>;
 			border-right: 1px solid <?php echo $contrast_border_color; ?> !important;
 		}

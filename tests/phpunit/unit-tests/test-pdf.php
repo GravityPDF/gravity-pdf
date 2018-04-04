@@ -929,7 +929,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$notifications = $this->model->notifications( $form['notifications']['54bca349732b8'], $form, $entry );
 
 		/* Check the results are successful */
-		$this->assertNotFalse( strpos( $notifications['attachments'][0], "/$folder/$file" ) );
+		$this->assertNotFalse( strpos( $notifications['attachments'][0], "PDF_EXTENDED_TEMPLATES/tmp/$folder/$file" ) );
 
 		/* Clean up */
 		unlink( $notifications['attachments'][0] );

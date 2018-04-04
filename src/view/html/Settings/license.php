@@ -66,7 +66,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</form>
 
 	<em>
-        – <?php esc_html_e( 'By saving your license key(s) you are giving permission for us to poll GravityPDF.com periodically for your current license status and any new plugin updates.', 'gravity-forms-pdf-extended' ); ?>
+        – <?php esc_html_e( 'By installing a Gravity PDF extension you are automatically giving permission for us to periodically poll GravityPDF.com via HTTPS for your current license status and any new plugin updates. The only personal data sent is your website domain name and license key. To opt-out you will need to deactivate all Gravity PDF extensions.', 'gravity-forms-pdf-extended' ); ?>
     </em>
 
 	<?php
