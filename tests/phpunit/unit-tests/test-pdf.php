@@ -1077,7 +1077,11 @@ class Test_PDF extends WP_UnitTestCase {
 	public function test_cleanup_tmp_dir() {
 		global $gfpdf;
 
+		$tmp_save = $gfpdf->data->template_tmp_location;
+		$gfpdf->data->template_tmp_location = $gfpdf->data->template_location . 'tmp/';
 		$tmp = $gfpdf->data->template_tmp_location;
+
+		wp_mkdir_p( $tmp );
 
 		/* Create our files to test */
 		$files = [
@@ -1109,6 +1113,8 @@ class Test_PDF extends WP_UnitTestCase {
 		foreach ( $files as $file => $modified ) {
 			@unlink( $tmp . $file, $modified );
 		}
+
+		$gfpdf->data->template_tmp_location = $tmp_save;
 	}
 
 	/**

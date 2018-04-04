@@ -44,6 +44,7 @@ global $wp_settings_fields;
 	<?php GFCommon::gf_vars(); ?>
 	var form = <?php echo json_encode( $args['form'] ); ?>;
 	var gfpdf_current_pdf = <?php echo json_encode( $args['pdf'] ); ?>;
+    var entry_meta = <?php echo json_encode( $args['entry_meta'] ); ?>;
 
 	<?php GFFormSettings::output_field_scripts(); ?>
 </script>
