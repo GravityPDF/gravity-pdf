@@ -653,7 +653,7 @@ final class GPDFAPI {
 	 *
 	 * @return array|WP_Error
 	 *
-	 * @since 5.0
+	 * @since 4.4
 	 */
 	public static function get_form_data( $entry_id ) {
 		$gform = self::get_form_class();
