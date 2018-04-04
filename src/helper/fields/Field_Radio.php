@@ -15,7 +15,7 @@ use Exception;
  * Gravity Forms Field
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
@@ -28,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -163,10 +163,9 @@ class Field_Radio extends Helper_Abstract_Fields {
 
 		/* Allow HTML if the radio value isn't the "other" option */
 		if ( ! $this->is_user_defined_value( $value ) ) {
-			$value = wp_kses_post( wp_specialchars_decode( $value, ENT_QUOTES ) );
-			$label = wp_kses_post( wp_specialchars_decode( $label, ENT_QUOTES ) );
+			$value = wp_kses_post( $this->gform->process_tags( wp_specialchars_decode( $value, ENT_QUOTES ), $this->form, $this->entry ) );
+			$label = wp_kses_post( $this->gform->process_tags( wp_specialchars_decode( $label, ENT_QUOTES ), $this->form, $this->entry ) );
 		}
-
 
 		/* return value / label as an array */
 		$this->cache( [

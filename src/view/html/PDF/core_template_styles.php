@@ -4,7 +4,7 @@
  * The styles needed to display our core PDF styles like header, footer, font and colour
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -132,7 +132,7 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
 	/* Product Field Styles */
 	<?php if ( $include_product_styles ) : ?>
 		table.entry-products th {
-			background-color: <?php echo $contrast_background_color; ?>#F4F4F4;
+			background-color: <?php echo $contrast_background_color; ?>;
 			border-bottom: 1px solid <?php echo $contrast_border_color; ?>;
 			border-right: 1px solid <?php echo $contrast_border_color; ?> !important;
 		}
@@ -175,7 +175,8 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
 			padding-top: 7px;
 		}
 
-		table.entry-products td.textright, table.entry-products th.textright {
+        table.entry-products td.totals,
+        table.entry-products .textright {
 			text-align: right;
 		}
 	<?php endif; ?>

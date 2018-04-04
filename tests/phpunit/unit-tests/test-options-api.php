@@ -13,7 +13,7 @@ use WP_UnitTestCase;
  * Test Gravity PDF Options API Class
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
@@ -21,7 +21,7 @@ use WP_UnitTestCase;
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -491,7 +491,7 @@ class Test_Options_API extends WP_UnitTestCase {
 	 */
 	public function test_add_pdf_filter() {
 		add_filter( 'gfpdf_form_add_pdf', function () {
-			return [ 'name' => 'Add Filter Fired' ];
+			return [ 'id' => 'id', 'name' => 'Add Filter Fired' ];
 		} );
 
 		/* run our method */
@@ -505,7 +505,7 @@ class Test_Options_API extends WP_UnitTestCase {
 		remove_all_filters( 'gfpdf_pdf_config' );
 
 		add_filter( 'gfpdf_form_add_pdf_' . $this->form_id, function () {
-			return [ 'name' => 'ID Add Filter Fired' ];
+			return [ 'id' => 'id', 'name' => 'ID Add Filter Fired' ];
 		} );
 
 		/* run our method */

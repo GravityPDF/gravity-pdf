@@ -16,7 +16,7 @@ use GFCommon;
  * Welcome Screen Model
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -132,7 +132,6 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function install_plugin() {
-
 		$this->log->addNotice( 'Gravity PDF Installed' );
 		update_option( 'gfpdf_is_installed', true );
 		$this->data->is_installed = true;
@@ -219,14 +218,6 @@ class Model_Install extends Helper_Abstract_Model {
 
 		/* See https://gravitypdf.com/documentation/v4/gfpdf_tmp_location/ for more details about this filter */
 		$this->data->template_tmp_location = apply_filters( 'gfpdf_tmp_location', $this->data->template_location . 'tmp/', $working_folder, $upload_dir_url ); /* encouraged to move this to a directory not accessible via the web */
-
-		$this->log->addNotice( 'Template Locations', [
-			'path'     => $this->data->template_location,
-			'url'      => $this->data->template_location_url,
-			'font'     => $this->data->template_font_location,
-			'fontdata' => $this->data->template_fontdata_location,
-			'tmp'      => $this->data->template_tmp_location,
-		] );
 	}
 
 	/**
@@ -265,11 +256,6 @@ class Model_Install extends Helper_Abstract_Model {
 			/* Per-blog filters */
 			$this->data->multisite_template_location     = apply_filters( 'gfpdf_multisite_template_location_' . $blog_id, $this->data->multisite_template_location, $working_folder, $upload_dir, $blog_id );
 			$this->data->multisite_template_location_url = apply_filters( 'gfpdf_multisite_template_location_uri_' . $blog_id, $this->data->multisite_template_location_url, $working_folder, $upload_dir_url, $blog_id );
-
-			$this->log->addNotice( 'Multisite Template Locations', [
-				'path' => $this->data->multisite_template_location,
-				'url'  => $this->data->multisite_template_location_url,
-			] );
 		}
 	}
 
@@ -334,9 +320,15 @@ class Model_Install extends Helper_Abstract_Model {
 		}
 
 		/* create deny htaccess file to prevent direct access to files */
-		if ( is_dir( $this->data->template_tmp_location ) && ! is_file( $this->data->template_tmp_location . '.htaccess' ) ) {
-			$this->log->addNotice( 'Create Apache .htaccess Security' );
-			file_put_contents( $this->data->template_tmp_location . '.htaccess', 'deny from all' );
+		if ( is_dir( $this->data->template_tmp_location ) ) {
+			if ( ! is_file( $this->data->template_tmp_location . 'index.html' ) ) {
+				GFCommon::recursive_add_index_file( $this->data->template_tmp_location );
+			}
+
+			if ( ! is_file( $this->data->template_tmp_location . '.htaccess' ) ) {
+				$this->log->addNotice( 'Create Apache .htaccess Security file' );
+				file_put_contents( $this->data->template_tmp_location . '.htaccess', 'deny from all' );
+			}
 		}
 	}
 
@@ -361,11 +353,6 @@ class Model_Install extends Helper_Abstract_Model {
 		/* Add our main endpoint */
 		add_rewrite_rule( $query[0], $rewrite_to, 'top' );
 		add_rewrite_rule( $query[1], $rewrite_to, 'top' );
-
-		$this->log->addNotice( 'Add Rewrite Rules', [
-			'query'   => $query,
-			'rewrite' => $rewrite_to,
-		] );
 
 		/* check to see if we need to flush the rewrite rules */
 		$this->maybe_flush_rewrite_rules( $query );
@@ -420,8 +407,6 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function uninstall_plugin() {
-		$this->log->addNotice( 'Uninstall Gravity PDF.' );
-
 		/* Clean up database */
 		if ( is_multisite() ) {
 			$sites = ( function_exists( 'get_sites' ) ) ? get_sites() : wp_get_sites();

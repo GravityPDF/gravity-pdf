@@ -28,7 +28,7 @@ use Exception;
  * PDF View
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
@@ -41,7 +41,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -534,8 +534,17 @@ class View_PDF extends Helper_Abstract_View {
 			/* correctly close / cleanup the HTML container if needed */
 			$container->close();
 
+			/* Find any CSS assigned to the page */
+			$classes = '';
+			foreach( $form['fields'] as $field ) {
+			    if( $field->type === 'page' && $field->pageNumber === ($page + 1 ) ) {
+				    $classes = $field->cssClass;
+			        break;
+                }
+            }
+
 			/* Load our HTML */
-			$html = $this->load( 'page_title', [ 'form' => $form, 'page' => $page ], false );
+			$html = $this->load( 'page_title', [ 'form' => $form, 'page' => $page, 'classes' => $classes ], false );
 
 			/* Run it through a filter and output */
 			echo apply_filters( 'gfpdf_field_page_name_html', $html, $page, $form );
@@ -579,7 +588,7 @@ class View_PDF extends Helper_Abstract_View {
 	public function get_core_template_styles( $settings, $entry ) {
 		$form = $this->gform->get_form( $entry['form_id'] );
 
-		$html = $this->load_core_template_styles( $settings );
+		$html = $this->load_core_template_styles( $settings, $entry, $form );
 
 		$html = apply_filters( 'gfpdf_pdf_core_template_html_output', $html, $form, $entry, $settings );
 		$html = apply_filters( 'gfpdf_pdf_core_template_html_output_' . $form['id'], $html, $form, $entry, $settings );
@@ -591,17 +600,23 @@ class View_PDF extends Helper_Abstract_View {
 	 * Load our core PDF template settings
 	 *
 	 * @param $settings
+	 * @param $entry
+	 * @param $form
 	 *
 	 * @return string|\WP_Error
 	 *
 	 * @since 4.0
 	 */
-	public function load_core_template_styles( $settings ) {
+	public function load_core_template_styles( $settings, $entry, $form ) {
 		$controller = $this->getController();
 		$model      = $controller->model;
 
 		/* Run our settings through the preprocessor which requires an array with a 'settings' key */
-		$args     = $model->preprocess_template_arguments( [ 'settings' => $settings ] );
+		$args     = $model->preprocess_template_arguments( [
+			'settings' => $settings,
+			'entry'    => $entry,
+			'form'     => $form,
+		] );
 		$settings = $args['settings'];
 
 		return $this->load( 'core_template_styles', [ 'settings' => $settings ], false );

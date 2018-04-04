@@ -18,7 +18,7 @@ use GFFormsModel;
  * Abstract Helper Logger
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.2
  */
@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -151,14 +151,18 @@ class Helper_Logger {
 		$this->log = new Logger( $this->slug );
 
 		/* Setup our Gravity Forms local file logger, if enabled */
-		$this->setup_gravityforms_logging();
+		try {
+			$this->setup_gravityforms_logging();
 
-		/* Check if we have a handler pushed and add our Introspection and Memory Peak usage processors */
-		if ( count( $this->log->getHandlers() ) > 0 && substr( php_sapi_name(), 0, 3 ) !== 'cli' ) {
-			$this->log->pushProcessor( new IntrospectionProcessor );
-			$this->log->pushProcessor( new MemoryPeakUsageProcessor );
+			/* Check if we have a handler pushed and add our Introspection and Memory Peak usage processors */
+			if ( count( $this->log->getHandlers() ) > 0 && substr( php_sapi_name(), 0, 3 ) !== 'cli' ) {
+				$this->log->pushProcessor( new IntrospectionProcessor );
+				$this->log->pushProcessor( new MemoryPeakUsageProcessor );
 
-			return;
+				return;
+			}
+		} catch( Exception $e ) {
+			/* do nothing */
 		}
 
 		/* Disable logging if using CLI, or if Gravity Forms logging isn't enabled */

@@ -18,7 +18,7 @@ use Exception;
  * Test Gravity PDF Settings Functionality
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       1.0
  */
@@ -26,7 +26,7 @@ use Exception;
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -455,6 +455,7 @@ class Test_Settings extends WP_UnitTestCase {
 	 */
 	public function test_is_font_name_unique() {
 		global $gfpdf;
+		$gfpdf->options->update_option( 'custom_fonts', [] );
 
 		/* Check the name is unique */
 		$this->assertTrue( $this->model->is_font_name_unique( 'Calibri' ) );

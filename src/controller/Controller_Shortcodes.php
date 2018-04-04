@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface;
  * PDF Shortcode Controller
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -143,8 +143,6 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 		if ( ! function_exists( 'shortcode_ui_register_for_shortcode' ) ) {
 			return null;
 		}
-
-		$this->log->addNotice( 'Enable Shortcake support.' );
 
 		/* Enhance further */
 		shortcode_ui_register_for_shortcode( 'gravitypdf', [

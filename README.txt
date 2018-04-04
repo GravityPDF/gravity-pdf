@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.4
 Tested up to: 4.9
-Stable tag: 4.3.2
+Stable tag: 4.4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
 
@@ -34,7 +34,7 @@ The plugin ships with four highly-customisable PDF templates perfectly suited fo
 
 = Requirements =
 
-Gravity PDF can be run on most shared web hosting without any issues. It requires **PHP 5.4+** (PHP 7.0+ recommended) and at least 64MB of WP Memory (128MB+ recommended). You'll also need to be running WordPress 4.2+ and have [Gravity Forms 1.9+](https://www.e-junkie.com/ecom/gb.php?cl=54585&c=ib&aff=235154) (affiliate link).
+Gravity PDF can be run on most shared web hosting without any issues. It requires **PHP 5.4+** (PHP 7.0+ recommended) and at least 64MB of WP Memory (128MB+ recommended). You'll also need to be running WordPress 4.2+ and have [Gravity Forms 1.9+](https://rocketgenius.pxf.io/c/1211356/445235/7938) (affiliate link).
 
 If you aren't sure Gravity PDF will meet your needs (and haven't got a Gravity Forms license yet) you can [try out the software via our demo site](https://demo.gravitypdf.com).
 
@@ -84,6 +84,36 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 18. Blank Slate provides a print-friendly template focusing solely on the user-submitted data.
 
 == Changelog ==
+
+= 4.4.0 =
+* Feature: Add native support for Gravity Forms Chained Select
+* Feature: Include Gravity Forms add-on conditional logic in PDF Conditional Logic selector
+* Feature: When the "Show Page Names" PDF setting is enabled, the `pagebreak` CSS class can now be used on Named Pagebreak fields (except the very first one)
+* Feature: PDF Rich Text fields now utilise the full width of the editor
+* Dev Feature: Add $form_data API endpoint
+* Dev Feature: Add the $form and $this variables to the `gfpdf_field_value` filter
+* Dev Feature: Add `gfpdf_form_data_key_order` filter to allow the re-ordering of the $form_data array
+* Dev Feature: Add filter `gfpdf_container_disable_faux_columns` to allow faux columns to be toggled off (useful when using a lot of conditional logic with CSS Ready Classes)
+* Housekeeping: Update Monolog to latest version
+* Housekeeping: Instead of generic error, display `You do not have permission to view this PDF` when user failed PDF security checks
+* Housekeeping: Tweak the Help page to provide more relevant information.
+* Housekeeping: Reduce the Gravity PDF log file bloat, and add more specific log messages.
+* Housekeeping: Recursively clean-up the PDF temporary directory
+* Housekeeping: Limit the registration of PDF settings on Gravity PDF pages, and the admin options.php page
+* Bug: Prevent multiple calls running when a new template is installed/deleted and then selected
+* Bug: Pre-process any mergetags for the Checkbox, HTML, Post Content, Radio, Section, Textarea and Terms of Service Gravity Form fields
+* Bug: Fix individual quantity field $form_data
+* Bug: Ensure individual product fields (Product, Discount, Shipping, Subtotal, Tax and Total) display an empty value in the $form_data array, when necissary
+* Bug: Fix PDF Template Manager display issues for WordPress 4.8+
+* Bug: Adjust Logged out timeout default to 20 minutes to match documentation
+* Bug: Fix PHP notice when pre-procesing the template settings
+* Bug: Fix Survey $form_data['survey']['score'] key
+* Bug: Fix the Gravity Perks E-Commerce Subtotal value in the $form_data array
+* Bug: Prevent TinyMCE error when selecting a new template and other plugins define a custom TinyMCE plugin
+* Bug: Adjust PDF Template Upload limit from 5MB to 10MB
+* Bug: Fix Product field background color issue
+* Bug: Right-align prices in the product table
+* Bug: Fix PHP fatal error when PDF cannot be correctly saved to disk
 
 = 4.3.2 =
 * Bug: Reverse pricing issue bug fix in 4.3.1 (under some circumstances it cause the incorrect Unit Price to be displayed in product table)

@@ -7,7 +7,7 @@ use GFPDF\Helper\Fields\Field_v3_Products;
  * Deprecated Functionality / Classes
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -320,6 +320,13 @@ class PDF_Common extends GFPDF_Deprecated_Abstract {
 
 		return $misc->strip_invalid_characters( $name );
 	}
+
+	/**
+     * Prevent deprecated warning for legacy Tier 2 templates
+     *
+	 * @since 3.0
+	 */
+	public static function setup_ids() {}
 }
 
 /**

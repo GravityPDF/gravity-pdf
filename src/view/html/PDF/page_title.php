@@ -4,7 +4,7 @@
  * The HTML mark-up to display our core PDF page
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <div class="row-separator">
-	<h3 class="gfpdf-page gfpdf-field">
+	<h3 class="gfpdf-page gfpdf-field <?php echo $classes; ?>">
 		<?php echo $form['pagination']['pages'][ $page ]; ?>
 	</h3>
 </div>

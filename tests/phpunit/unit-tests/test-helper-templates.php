@@ -12,7 +12,7 @@ use Exception;
  * Test Gravity PDF Templates Helper class
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.1
  */
@@ -20,7 +20,7 @@ use Exception;
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -180,9 +180,9 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 	 * @since 4.1
 	 */
 	public function test_is_template_compatible() {
-		$this->assertTrue( $this->templates->is_template_compatible( PDF_EXTENDED_VERSION - 1 ) );
+		$this->assertTrue( $this->templates->is_template_compatible( (float) PDF_EXTENDED_VERSION - 1 ) );
 		$this->assertTrue( $this->templates->is_template_compatible( PDF_EXTENDED_VERSION ) );
-		$this->assertFalse( $this->templates->is_template_compatible( PDF_EXTENDED_VERSION + 1 ) );
+		$this->assertFalse( $this->templates->is_template_compatible( (float) PDF_EXTENDED_VERSION + 1 ) );
 	}
 
 	/**
@@ -193,7 +193,7 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 	public function test_maybe_add_template_compatibility_notice() {
 		$this->assertEquals( 'Template', $this->templates->maybe_add_template_compatibility_notice( 'Template', PDF_EXTENDED_VERSION ) );
 
-		$version = PDF_EXTENDED_VERSION + 1;
+		$version = (float) PDF_EXTENDED_VERSION + 1;
 		$this->assertEquals( 'Template (Requires Gravity PDF v' . $version . ')', $this->templates->maybe_add_template_compatibility_notice( 'Template', $version ) );
 	}
 

@@ -12,7 +12,7 @@ import ShowMessage from './ShowMessage'
  * Handles the uploading of new PDF templates to the server
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.1
  */
@@ -20,7 +20,7 @@ import ShowMessage from './ShowMessage'
 /*
  This file is part of Gravity PDF.
 
- Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+ Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -149,8 +149,8 @@ export class TemplateUploader extends React.Component {
    * @since 4.1
    */
   checkFilesize = (size) => {
-    /* Check the file is no larger than 5MB (convert from bytes to KB) */
-    if (size / 1024 > 5120) {
+    /* Check the file is no larger than 10MB (convert from bytes to KB) */
+    if (size / 1024 > 10240) {
       /* Tell use about incorrect file type */
       this.setState({
         error: this.props.filesizeErrorText

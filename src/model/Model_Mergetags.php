@@ -12,7 +12,7 @@ use Psr\Log\LoggerInterface;
  * PDF Mergetags Model
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.1
  */
@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -172,7 +172,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 		/* Verify we have a match */
 		if ( $results ) {
 
-			$this->log->addNotice( 'Converting PDF Mergetag', [
+			$this->log->addNotice( 'Begin Converting PDF Mergetags', [
 				'form_id'  => $form['id'],
 				'entry_id' => $entry['id'],
 

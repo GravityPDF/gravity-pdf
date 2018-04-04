@@ -6,7 +6,7 @@ namespace GFPDF\Helper;
  * Give a standardised format to queue admin notices
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -108,13 +108,13 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'default_template' => [
 						'id'         => 'default_template',
 						'name'       => esc_html__( 'Default Template', 'gravity-forms-pdf-extended' ),
-						'desc'       => sprintf( esc_html__( 'Choose an existing template or purchased more %sfrom our theme shop%s. You can also %sbuild your own%s or %shire us%s to create a custom solution.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/shop/">', '</a>', '<a href="https://gravitypdf.com/documentation/v4/developer-start-customising/">', '</a>', '<a href="https://gravitypdf.com/integration-services/">', '</a>' ),
+						'desc'       => sprintf( esc_html__( 'Choose an existing template or purchased more %sfrom our template shop%s. You can also %sbuild your own%s or %shire us%s to create a custom solution.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/template-shop/">', '</a>', '<a href="https://gravitypdf.com/documentation/v4/developer-start-customising/">', '</a>', '<a href="https://gravitypdf.com/integration-services/">', '</a>' ),
 						'type'       => 'select',
 						'options'    => $this->templates->get_all_templates_by_group(),
 						'std'        => 'zadani',
 						'inputClass' => 'large',
 						'chosen'     => true,
-						'tooltip'    => '<h6>' . esc_html__( 'Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'Gravity PDF comes with %sfour completely-free and highly customizable designs%s. You can also purchase additional templates from our theme shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
+						'tooltip'    => '<h6>' . esc_html__( 'Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'Gravity PDF comes with %sfour completely-free and highly customizable designs%s. You can also purchase additional templates from our template shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
 					],
 
 					'default_font' => [
@@ -265,7 +265,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'type'    => 'button',
 						'std'     => esc_html__( 'Manage Fonts', 'gravity-forms-pdf-extended' ),
 						'options' => 'install_fonts',
-						'tooltip' => '<h6>' . esc_html__( 'Install Fonts', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'Custom fonts can be installed for use in your PDFs. Only %s.ttf%s font files are supported.', 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<code>', '</code>', '<code>', '</code>' ),
+						'tooltip' => '<h6>' . esc_html__( 'Install Fonts', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'Custom fonts can be installed for use in your PDFs. Only %s.ttf%s font files are supported.', 'gravity-forms-pdf-extended' ), '<code>', '</code>'  ),
 					],
 				]
 			),
@@ -288,13 +288,13 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'template' => [
 						'id'         => 'template',
 						'name'       => esc_html__( 'Template', 'gravity-forms-pdf-extended' ),
-						'desc'       => sprintf( esc_html__( 'Choose an existing template or purchased more %sfrom our theme shop%s. You can also %sbuild your own%s or %shire us%s to create a custom solution.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/shop/">', '</a>', '<a href="https://gravitypdf.com/documentation/v4/developer-start-customising/">', '</a>', '<a href="https://gravitypdf.com/integration-services/">', '</a>' ),
+						'desc'       => sprintf( esc_html__( 'Choose an existing template or purchased more %sfrom our template shop%s. You can also %sbuild your own%s or %shire us%s to create a custom solution.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/template-shop/">', '</a>', '<a href="https://gravitypdf.com/documentation/v4/developer-start-customising/">', '</a>', '<a href="https://gravitypdf.com/integration-services/">', '</a>' ),
 						'type'       => 'select',
 						'options'    => $this->templates->get_all_templates_by_group(),
 						'std'        => $this->get_option( 'default_template', 'zadani' ),
 						'inputClass' => 'large',
 						'chosen'     => true,
-						'tooltip'    => '<h6>' . esc_html__( 'Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'Gravity PDF comes with %sfour completely-free and highly customizable designs%s. You can also purchase additional templates from our theme shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
+						'tooltip'    => '<h6>' . esc_html__( 'Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'Gravity PDF comes with %sfour completely-free and highly customizable designs%s. You can also purchase additional templates from our template shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
 					],
 
 					'notification' => [
@@ -668,7 +668,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 		return apply_filters( 'gfpdf_page_names_display_setting', [
 			'id'      => 'show_page_names',
 			'name'    => esc_html__( 'Show Page Names', 'gravity-forms-pdf-extended' ),
-			'desc'    => sprintf( esc_html__( 'Display form page names on the PDF. Requires the use of the %sPage Break field%s.', 'gravity-forms-pdf-extended' ), '<a href="https://www.gravityhelp.com/documentation/article/page-break/">', '</a>' ),
+			'desc'    => sprintf( esc_html__( 'Display form page names on the PDF. Requires the use of the %sPage Break field%s.', 'gravity-forms-pdf-extended' ), '<a href="https://docs.gravityforms.com/page-break/">', '</a>' ),
 			'type'    => 'radio',
 			'options' => [
 				'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),

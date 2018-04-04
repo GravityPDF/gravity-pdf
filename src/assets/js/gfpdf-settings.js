@@ -839,6 +839,7 @@
             ],
             strikethrough: {inline: 'del'}
           }
+          settings.content_style = 'body#tinymce { max-width: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;}'
         }
 
         /* Load our new editors */

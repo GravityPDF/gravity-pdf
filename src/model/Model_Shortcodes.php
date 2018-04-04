@@ -17,7 +17,7 @@ use GravityView_View;
  * PDF Shortcode Model
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -123,10 +123,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function gravitypdf( $attributes ) {
-
-		$this->log->addNotice( 'Generating Shortcode' );
-
-		$controller      = $this->getController();
+		$controller = $this->getController();
 
 		$global_settings                  = $this->options->get_settings();
 		$shortcode_error_messages_enabled = ( isset( $global_settings['shortcode_debug_messages'] ) && $global_settings['shortcode_debug_messages'] === 'Yes' ) ? true : false;
@@ -359,7 +356,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		/* check if the confirmation is currently being saved */
 		if ( isset( $_POST['form_confirmation_url'] ) ) {
 
-			$this->log->addNotice( 'Process Redirect Confirmation Save', [
+			$this->log->addNotice( 'Begin Converting Shortcode to URL for Redirect Confirmation', [
 				'form_id' => $form['id'],
 				'post'    => $_POST,
 			] );

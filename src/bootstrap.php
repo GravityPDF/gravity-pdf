@@ -14,7 +14,7 @@ use GFPDF_Core;
  * The bootstrap is loaded on WordPress 'plugins_loaded' functionality
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -330,9 +330,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		if ( $file == PDF_PLUGIN_BASENAME ) {
 			$row_meta = [
-				'docs'    => '<a href="' . esc_url( 'https://gravitypdf.com/documentation/v4/five-minute-install/' ) . '" title="' . esc_attr__( 'View Gravity PDF Documentation', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Docs', 'gravity-forms-pdf-extended' ) . '</a>',
-				'support' => '<a href="' . esc_url( $this->data->settings_url . '&tab=help' ) . '" title="' . esc_attr__( 'Get Help and Support', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Support', 'gravity-forms-pdf-extended' ) . '</a>',
-				'shop'    => '<a href="' . esc_url( 'https://gravitypdf.com/shop/' ) . '" title="' . esc_attr__( 'View Gravity PDF Theme Shop', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Theme Shop', 'gravity-forms-pdf-extended' ) . '</a>',
+				'docs'           => '<a href="' . esc_url( 'https://gravitypdf.com/documentation/v4/five-minute-install/' ) . '" title="' . esc_attr__( 'View Gravity PDF Documentation', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Docs', 'gravity-forms-pdf-extended' ) . '</a>',
+				'support'        => '<a href="' . esc_url( $this->data->settings_url . '&tab=help' ) . '" title="' . esc_attr__( 'Get Help and Support', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Support', 'gravity-forms-pdf-extended' ) . '</a>',
+				'extension-shop' => '<a href="' . esc_url( 'https://gravitypdf.com/extension-shop/' ) . '" title="' . esc_attr__( 'View Gravity PDF Extensions Shop', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Extensions', 'gravity-forms-pdf-extended' ) . '</a>',
+				'template-shop'  => '<a href="' . esc_url( 'https://gravitypdf.com/template-shop/' ) . '" title="' . esc_attr__( 'View Gravity PDF Template Shop', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Templates', 'gravity-forms-pdf-extended' ) . '</a>',
 			];
 
 			return array_merge( $links, $row_meta );
@@ -450,6 +451,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			wp_enqueue_media();
 			
 			wp_enqueue_script( 'gfpdf_js_entrypoint' );
+
+			/* Load TinyMCE styles */
+			add_filter( 'tiny_mce_before_init', [ $this, 'tinymce_styles' ] );
 		}
 
 		if ( $this->misc->is_gfpdf_settings_tab( 'help' ) || $this->misc->is_gfpdf_settings_tab( 'tools' ) ) {
@@ -464,6 +468,21 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		if ( is_admin() ) {
 			wp_enqueue_style( 'gfpdf_css_admin_styles' );
 		}
+	}
+
+	/**
+	 * Insert our own styles into the TinyMCE editor
+	 *
+	 * @param array $mceInit
+	 *
+	 * @return array
+	 *
+	 * @since 4.4
+	 */
+	public function tinymce_styles( $mceInit ) {
+		$style                    = "body#tinymce { max-width: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;}";
+		$mceInit['content_style'] = ( isset( $mceInit['content_style'] ) ) ? $mceInit['content_style'] . ' ' . $style : $style;
+		return $mceInit;
 	}
 
 	/**
@@ -582,8 +601,12 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @return 4.0
 	 */
 	public function setup_settings_fields() {
-		/* register our options settings */
-		$this->options->register_settings( $this->options->get_registered_fields() );
+		global $pagenow;
+
+		if ( $this->misc->is_gfpdf_page() || $pagenow === 'options.php' ) {
+			/* register our options settings */
+			$this->options->register_settings( $this->options->get_registered_fields() );
+		}
 	}
 
 	/**

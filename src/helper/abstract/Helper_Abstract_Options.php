@@ -10,7 +10,7 @@ use WP_Error;
  * Our Gravity PDF Options API
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
@@ -18,7 +18,7 @@ use WP_Error;
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -450,12 +450,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @return array|WP_Error
 	 */
 	public function get_pdf( $form_id, $pdf_id ) {
-
-		$this->log->addNotice( 'Getting Settings.', [
-			'form_id' => $form_id,
-			'pdf_id'  => $pdf_id,
-		] );
-
 		$gfpdf_options = $this->get_form_pdfs( $form_id );
 
 		if ( ! is_wp_error( $gfpdf_options ) ) {
@@ -493,13 +487,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @since 4.0
 	 */
 	public function add_pdf( $form_id, $pdf = [] ) {
-
-		$this->log->addNotice( 'Adding Settings.', [
-			'form_id'      => $form_id,
-			'new_settings' => $pdf,
-		] );
-
-		/* First let's grab the current settings */
 		$options = $this->get_form_pdfs( $form_id );
 
 		if ( ! is_wp_error( $options ) ) {
@@ -517,14 +504,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			if ( $results ) {
 
 				/* return the ID if successful */
-				$this->log->addNotice( 'Successfuly Added.', [
+				$this->log->addNotice( 'Successfuly Added New PDF', [
 					'pdf' => $pdf,
 				] );
 
 				return $pdf['id'];
 			}
 
-			$this->log->addError( 'Error Saving.', [
+			$this->log->addError( 'Error Saving New PDF', [
 				'error' => $results,
 				'pdf'   => $pdf,
 			] );
@@ -552,7 +539,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function update_pdf( $form_id, $pdf_id, $pdf = '', $update_db = true, $filters = true ) {
 
-		$this->log->addNotice( 'Updating Settings.', [
+		$this->log->addNotice( 'Begin Updating PDF Settings', [
 			'form_id'      => $form_id,
 			'pdf_id'       => $pdf_id,
 			'new_settings' => $pdf,
@@ -572,8 +559,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 			/* Don't run when adding a new PDF */
 			if ( $filters ) {
-
-				$this->log->addNotice( 'Trigger Filters.' );
+				$this->log->addNotice( 'Run PDF Update Filters' );
 
 				/* See https://gravitypdf.com/documentation/v4/gfpdf_form_update_pdf/ for more details about these filters */
 				$pdf = apply_filters( 'gfpdf_form_update_pdf', $pdf, $form_id, $pdf_id );
@@ -592,7 +578,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$did_update = false;
 			if ( $update_db ) {
 
-				$this->log->addNotice( 'Update Form.', [
+				$this->log->addNotice( 'Updating PDF Settings in Form Object', [
 					'form_id' => $form['id'],
 				] );
 
@@ -601,17 +587,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			}
 
 			if ( ! $update_db || $did_update !== false ) {
-
-				/* If it updated successfully let's update the global variable */
-				$this->log->addNotice( 'Save Local Form Cache.' );
-
 				$this->data->form_settings[ $form_id ] = $options;
 			}
 
 			/* true if successful, false if failed */
-
 			return $did_update;
 		}
+
+		$this->log->addNotice( 'Completed Updating PDF Settings' );
 
 		return false;
 	}
@@ -630,7 +613,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function delete_pdf( $form_id, $pdf_id ) {
 
-		$this->log->addNotice( 'Deleting Setting.', [
+		$this->log->addNotice( 'Begin Deleting PDF Setting', [
 			'form_id' => $form_id,
 			'pdf_id'  => $pdf_id,
 		] );
@@ -642,11 +625,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 			/* Next let's try to update the value */
 			if ( isset( $options[ $pdf_id ] ) ) {
-
-				$this->log->addNotice( 'Found Setting. Now deleting...', [
-					'pdf' => $options[ $pdf_id ],
-				] );
-
 				unset( $options[ $pdf_id ] );
 			}
 
@@ -662,7 +640,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			/* If it updated, let's update the global variable */
 			if ( $did_update !== false ) {
 
-				$this->log->addNotice( 'Setting Deleted.', [
+				$this->log->addNotice( 'Completed Deleting PDF Setting', [
 					'form_id' => $form_id,
 					'pdf_id'  => $pdf_id,
 				] );
@@ -675,7 +653,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			return $did_update;
 		}
 
-		$this->log->addError( 'PDF Delete Failed.', [
+		$this->log->addError( 'Failed Deleting PDF Setting', [
 			'form_id' => $form_id,
 			'pdf_id'  => $pdf_id,
 		] );
@@ -725,8 +703,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	public function update_option( $key = '', $value = false ) {
 
 		if ( empty( $key ) ) {
-			$this->log->addError( 'Option Update Error', [
-				'key'   => $key,
+			$this->log->addError( 'Empty Option Key', [
 				'value' => $value,
 			] );
 

@@ -15,7 +15,7 @@ use WP_UnitTestCase;
  * Test our custom template $form_data array
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       1.0
  */
@@ -23,7 +23,7 @@ use WP_UnitTestCase;
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -804,6 +804,17 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( $response, $field['39.Shipping_name'] );
 		$this->assertEquals( $response, $field['39_name'] );
 		$this->assertEquals( $response, $field['Shipping_name'] );
+
+		/*
+		 * Quantity
+		 */
+		$response = '6';
+		$this->assertEquals( $response, $field[36] );
+		$this->assertEquals( $response, $field['36.Quantity Field for Hidden Price'] );
+		$this->assertEquals( $response, $field['Quantity Field for Hidden Price'] );
+		$this->assertEquals( $response, $field['36.Quantity Field for Hidden Price_name'] );
+		$this->assertEquals( $response, $field['36_name'] );
+		$this->assertEquals( $response, $field['Quantity Field for Hidden Price_name'] );
 	}
 
 	/**
@@ -1492,8 +1503,6 @@ class Test_Form_Data extends WP_UnitTestCase {
 
 		$this->assertEquals( '', $form_data['list'][20] );
 		$this->assertEquals( '', $form_data['list'][21] );
-		$this->assertEquals( '', $form_data['list'][79] );
-		$this->assertEquals( '', $form_data['list'][80] );
 	}
 
 	/**

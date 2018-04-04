@@ -10,7 +10,7 @@ use WP_UnitTestCase;
  * Test Gravity PDF Hlper Misc Functionality
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       1.0
  */
@@ -18,7 +18,7 @@ use WP_UnitTestCase;
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -287,5 +287,25 @@ class Test_API extends WP_UnitTestCase {
 
 		/* Clean up */
 		unlink( $ttf_file );
+	}
+
+	/**
+	 * @since 5.0
+	 */
+	public function test_get_form_data() {
+		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+
+		$results = GPDFAPI::get_form_data( $entry['id'] );
+
+		$this->assertArrayHasKey( 'misc', $results );
+		$this->assertArrayHasKey( 'field', $results );
+		$this->assertArrayHasKey( 'list', $results );
+		$this->assertArrayHasKey( 'signature_details_id', $results );
+		$this->assertArrayHasKey( 'products', $results );
+		$this->assertArrayHasKey( 'products_totals', $results );
+		$this->assertArrayHasKey( 'poll', $results );
+		$this->assertArrayHasKey( 'survey', $results );
+
+		$this->assertEquals( 'My Single Line Response', $results['field'][1] );
 	}
 }

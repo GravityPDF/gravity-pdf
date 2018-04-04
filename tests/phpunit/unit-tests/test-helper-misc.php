@@ -10,7 +10,7 @@ use WP_UnitTestCase;
  * Test Gravity PDF Helper Misc Functionality
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       1.0
  */
@@ -18,7 +18,7 @@ use WP_UnitTestCase;
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -357,13 +357,15 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_evaluate_conditional_logic() {
+		$data = $this->create_form_and_entries();
+
 		$logic['actionType'] = 'show';
 
-		$this->assertTrue( $this->misc->evaluate_conditional_logic( $logic, [] ) );
+		$this->assertTrue( $this->misc->evaluate_conditional_logic( $logic, $data['entry'] ) );
 
 		$logic['actionType'] = 'hide';
 
-		$this->assertFalse( $this->misc->evaluate_conditional_logic( $logic, [] ) );
+		$this->assertFalse( $this->misc->evaluate_conditional_logic( $logic, $data['entry'] ) );
 	}
 
 	/**
@@ -473,7 +475,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 		$this->assertFalse( $compat['security'] );
 		$this->assertFalse( $compat['pdfa1b'] );
 		$this->assertFalse( $compat['pdfx1a'] );
-		$this->assertEquals( '', $compat['password'] );
+		$this->assertEquals( '', $compat['pdf_password'] );
 		$this->assertEquals( '', $compat['pdf_privileges'] );
 		$this->assertEquals( 96, $compat['dpi'] );
 

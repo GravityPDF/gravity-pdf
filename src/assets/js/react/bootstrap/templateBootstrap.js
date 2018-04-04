@@ -15,7 +15,7 @@ import TemplateButton from '../components/TemplateButton'
  * Advanced Template Selector Bootstrap
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.1
  */
@@ -23,7 +23,7 @@ import TemplateButton from '../components/TemplateButton'
 /*
  This file is part of Gravity PDF.
 
- Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+ Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -162,6 +162,7 @@ export function templateChangeStoreListener (store, $templateField) {
     if (listCount !== list.size) {
       /* update the list size so we don't run it twice */
       listCount = list.size
+      var currentActive = $templateField.val()
 
       /* Do our AJAX call to get the new Select Box DOM */
       request
@@ -171,8 +172,8 @@ export function templateChangeStoreListener (store, $templateField) {
         .then((response) => {
           $templateField
             .html(response.text)
+            .val(currentActive)
             .trigger('chosen:updated')
-            .trigger('change')
         })
     }
   }))

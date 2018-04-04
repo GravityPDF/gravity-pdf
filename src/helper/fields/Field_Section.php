@@ -18,7 +18,7 @@ use Exception;
  * Gravity Forms Field
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -184,7 +184,9 @@ class Field_Section extends Helper_Abstract_Fields {
 
 		$this->cache( [
 			'title'       => esc_html( $this->field->label ),
-			'description' => wp_kses_post( $this->field->description ),
+			'description' => wp_kses_post(
+				$this->gform->process_tags( $this->field->description, $this->form, $this->entry )
+			),
 		] );
 
 		return $this->cache();

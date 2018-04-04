@@ -10,7 +10,7 @@ use GFCommon;
  * Gravity Forms Subtotal
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.3
  */
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ class Field_Subtotal extends Helper_Abstract_Field_Products {
 			return $this->set_form_data( $name, $price );
 		}
 
-		return [];
+		return $this->set_form_data( '', '' );
 	}
 
 	/**
@@ -111,17 +111,12 @@ class Field_Subtotal extends Helper_Abstract_Field_Products {
 			return $this->cache();
 		}
 
-		if ( method_exists( $this->field, 'get_subtotal' ) ) {
-			$use_value = (bool) apply_filters( 'gfpdf_show_field_value', false ); /* Set to `true` to show a field's value instead of the label */
-			$subtotal  = $this->field->get_subtotal( GFCommon::get_product_fields( $this->form, $this->entry, ! $use_value ) );
+		$subtotal = $this->get_value();
 
-			$this->cache( [
-				'total'           => esc_html( $subtotal ),
-				'total_formatted' => esc_html( GFCommon::to_money( $subtotal ), $this->entry['currency'] ),
-			] );
-		} else {
-			$this->cache( [] );
-		}
+		$this->cache( [
+			'total'           => esc_html( $subtotal ),
+			'total_formatted' => esc_html( GFCommon::to_money( $subtotal ), $this->entry['currency'] ),
+		] );
 
 		return $this->cache();
 	}

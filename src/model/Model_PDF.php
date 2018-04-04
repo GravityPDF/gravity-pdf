@@ -35,7 +35,7 @@ use Exception;
  * PDF Display Model, including the $form_data array
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
@@ -48,7 +48,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -410,7 +410,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 			if ( $owner_restriction === 'Yes' && ! is_user_logged_in() ) {
 
-				$this->log->addNotice( 'Redirecting to Login.', [
+				$this->log->addNotice( 'Security – Owner Restrictions: Redirecting to Login.', [
 					'entry'    => $entry,
 					'settings' => $settings,
 				] );
@@ -442,7 +442,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			/* only check if PDF timed out if our logged out restriction is not 'Yes' and the user is not logged in */
 			if ( ! is_user_logged_in() && $this->is_current_pdf_owner( $entry, 'logged_out' ) === true ) {
 				/* get the global PDF settings */
-				$timeout = (int) $this->options->get_option( 'logged_out_timeout', '30' );
+				$timeout = (int) $this->options->get_option( 'logged_out_timeout', '20' );
 
 				/* if '0' there is no timeout, or if the logged out restrictions are enabled we'll ignore this */
 				if ( $timeout !== 0 ) {
@@ -459,7 +459,7 @@ class Model_PDF extends Helper_Abstract_Model {
 							return new WP_Error( 'timeout_expired', esc_html__( 'Your PDF is no longer accessible.', 'gravity-forms-pdf-extended' ) );
 						} else {
 
-							$this->log->addNotice( 'Redirecting to Login.', [
+							$this->log->addNotice( 'Security – Logged Out Timeout: Redirecting to Login.', [
 								'entry'    => $entry,
 								'settings' => $settings,
 							] );
@@ -495,7 +495,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				/* check if there is actually a user who owns entry */
 				if ( ! empty( $entry['created_by'] ) ) {
 
-					$this->log->addNotice( 'Redirecting to Login.', [
+					$this->log->addNotice( 'Security – Auth Logged Out User: Redirecting to Login.', [
 						'entry'    => $entry,
 						'settings' => $settings,
 					] );
@@ -503,8 +503,14 @@ class Model_PDF extends Helper_Abstract_Model {
 					/* prompt user to login to get access */
 					auth_redirect();
 				} else {
+					$this->log->addWarning( 'Access denied.', [
+						'entry'    => $entry,
+						'settings' => $settings,
+						'SERVER'   => $_SERVER,
+					] );
+
 					/* there's no returning, throw generic error */
-					return new WP_Error( 'error' );
+					return new WP_Error( 'access_denied', esc_html__( 'You do not have access to view this PDF.', 'gravity-forms-pdf-extended' ) );
 				}
 			}
 		}
@@ -569,11 +575,6 @@ class Model_PDF extends Helper_Abstract_Model {
 		$controller = $this->getController();
 		$pdf_list   = $this->get_pdf_display_list( $entry );
 
-		$this->log->addNotice( 'Display PDF Entry List.', [
-			'pdfs'  => $pdf_list,
-			'entry' => $entry,
-		] );
-
 		if ( ! empty( $pdf_list ) ) {
 
 			if ( sizeof( $pdf_list ) > 1 ) {
@@ -609,11 +610,6 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		$controller = $this->getController();
 		$pdf_list   = $this->get_pdf_display_list( $entry );
-
-		$this->log->addNotice( 'Display PDF Entry Detail List.', [
-			'pdfs'  => $pdf_list,
-			'entry' => $entry,
-		] );
 
 		if ( ! empty( $pdf_list ) ) {
 			$args = [
@@ -983,7 +979,6 @@ class Model_PDF extends Helper_Abstract_Model {
 				'attachments'  => $notifications['attachments'],
 				'notification' => $notifications,
 			] );
-
 		}
 
 		return $notifications;
@@ -1085,44 +1080,38 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * To prevent ourt tmp directory getting huge we will clean it up every 24 hours
+	 * Clean-up our tmp directory every 24 hours
 	 *
 	 * @return void
 	 *
 	 * @since 4.0
 	 */
 	public function cleanup_tmp_dir() {
-
-		$max_file_age  = 24 * 3600; /* Max age is 24 hours old */
+		$max_file_age  = time() - 24 * 3600; /* Max age is 24 hours old */
 		$tmp_directory = $this->data->template_tmp_location;
 
 		if ( is_dir( $tmp_directory ) ) {
-			/* Scan the tmp directory and get a list of files / folders */
-			$directory_list = array_diff( scandir( $tmp_directory ), [ '..', '.', '.htaccess' ] );
 
-			foreach ( $directory_list as $item ) {
-				$file      = $tmp_directory . $item;
-				$directory = false;
+			try {
+				$directory_list = new \RecursiveIteratorIterator(
+					new \RecursiveDirectoryIterator( $tmp_directory, \RecursiveDirectoryIterator::SKIP_DOTS ),
+					\RecursiveIteratorIterator::CHILD_FIRST
+				);
 
-				/* Fix to allow filemtime to work on directories too */
-				if ( is_dir( $file ) ) {
-					$file      .= '.';
-					$directory = true;
-				}
+				foreach ( $directory_list as $file ) {
+					if ( in_array( $file->getFilename(), [ '.htaccess', 'index.html' ] ) ) {
+						continue;
+					}
 
-				/* Check if the file is too old and delete file / directory */
-				if ( file_exists( $file ) && filemtime( $file ) < time() - $max_file_age ) {
-
-					if ( $directory ) {
-						$this->misc->rmdir( substr( $file, 0, -1 ) );
-					} else {
-						if ( ! unlink( $file ) ) {
-							$this->log->addError( 'Filesystem Delete Error', [
-								'file' => $file,
-							] );
-						}
+					if ( $file->isReadable() && $file->getMTime() < $max_file_age ) {
+						( $file->isDir() ) ? $this->misc->rmdir( $file->getPathName() ) : unlink( $file->getPathName() );
 					}
 				}
+			} catch ( Exception $e ) {
+				$this->log->addError( 'Filesystem Delete Error', [
+					'dir'       => $tmp_directory,
+					'exception' => $e->getMessage(),
+				] );
 			}
 		}
 	}
@@ -1386,7 +1375,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		/* Re-order the array keys to make it more readable */
-		$order = [
+		$order = apply_filters( 'gfpdf_form_data_key_order', [
 			'misc',
 			'field',
 			'list',
@@ -1403,7 +1392,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			'signature',
 			'signature_details',
 			'html',
-		];
+		] );
 
 		foreach ( $order as $key ) {
 
@@ -1414,10 +1403,6 @@ class Model_PDF extends Helper_Abstract_Model {
 				$data[ $key ] = $item;
 			}
 		}
-
-		$this->log->addNotice( 'Form Data Array Created', [
-			'data' => $data,
-		] );
 
 		/**
 		 * See https://gravitypdf.com/documentation/v4/gfpdf_form_data/ for usage
@@ -1503,8 +1488,8 @@ class Model_PDF extends Helper_Abstract_Model {
 			$fields = GFCommon::get_fields_by_type( $form, [ 'survey' ] );
 
 			/* Include the survey score, if any */
-			if ( isset( $lead['gsurvey_score'] ) ) {
-				$data['survey']['score'] = $lead['gsurvey_score'];
+			if ( isset( $entry['gsurvey_score'] ) ) {
+				$data['survey']['score'] = $entry['gsurvey_score'];
 			}
 
 			$results = $this->get_addon_global_data( $form, [], $fields );
@@ -1844,7 +1829,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		$pdfs = array_values( $pdfs );
 
 		/* Use the legacy aid to determine which PDF to load */
-		if ( $config['aid'] !== false ) {
+		if ( isset( $config['aid'] ) && $config['aid'] !== false ) {
 			$selector = $config['aid'] - 1;
 
 			if ( isset( $pdfs[ $selector ] ) && $pdfs[ $selector ]['template'] == $config['template'] ) {
@@ -2031,5 +2016,23 @@ class Model_PDF extends Helper_Abstract_Model {
 		$ignored[] = 'action';
 
 		return $ignored;
+	}
+
+	/**
+	 * Set the watermark font to the current PDF font
+	 *
+	 * @param Mpdf  $mpdf
+	 * @param array $form
+	 * @param array $entry
+	 * @param array $settings
+	 *
+	 * @return Mpdf
+	 *
+	 * @since 5.0
+	 */
+	public function set_watermark_font( $mpdf, $form, $entry, $settings ) {
+		$mpdf->watermark_font = ( isset( $settings['watermark_font'] ) ) ? $settings['watermark_font'] : $settings['font'];
+
+		return $mpdf;
 	}
 }

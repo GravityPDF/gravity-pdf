@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Gravity PDF
-Version: 4.3.2
+Version: 4.4.0
 Description: Automatically generate highly-customisable PDF documents using Gravity Forms.
 Author: Gravity PDF
 Author URI: https://gravitypdf.com
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
     This file is part of Gravity PDF
 
-    Gravity PDF – Copyright (C) 2017 Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018 Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
  * Set base constants we'll use throughout the plugin
  */
-define( 'PDF_EXTENDED_VERSION', '4.3.2' ); /* the current plugin version */
+define( 'PDF_EXTENDED_VERSION', '4.4.0' ); /* the current plugin version */
 define( 'PDF_PLUGIN_DIR', plugin_dir_path( __FILE__ ) ); /* plugin directory path */
 define( 'PDF_PLUGIN_URL', plugin_dir_url( __FILE__ ) ); /* plugin directory url */
 define( 'PDF_PLUGIN_BASENAME', plugin_basename( __FILE__ ) ); /* the plugin basename */
@@ -203,7 +203,7 @@ class GFPDF_Major_Compatibility_Checks {
 
 		/* Gravity Forms version not compatible */
 		if ( ! class_exists( 'GFCommon' ) || ! version_compare( GFCommon::$version, $this->required_gf_version, '>=' ) ) {
-			$this->notices[] = sprintf( esc_html__( '%sGravity Forms%s Version %s is required. %sGet more info%s.', 'gravity-forms-pdf-extended' ), '<a href="https://www.e-junkie.com/ecom/gb.php?cl=54585&c=ib&aff=235154">', '</a>', $this->required_gf_version, '<a href="https://gravitypdf.com/documentation/v4/user-activation-errors/#gravityforms-version">', '</a>' );
+			$this->notices[] = sprintf( esc_html__( '%sGravity Forms%s Version %s is required. %sGet more info%s.', 'gravity-forms-pdf-extended' ), '<a href="https://rocketgenius.pxf.io/c/1211356/445235/7938">', '</a>', $this->required_gf_version, '<a href="https://gravitypdf.com/documentation/v4/user-activation-errors/#gravityforms-version">', '</a>' );
 
 			return false;
 		}

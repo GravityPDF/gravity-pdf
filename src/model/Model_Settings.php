@@ -17,7 +17,7 @@ use Psr\Log\LoggerInterface;
  * Settings Model
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -458,7 +458,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		$results = $this->process_font( $payload );
 
 		/* If we reached this point the results were successful so return the new object */
-		$this->log->addNotice( 'AJAX Endpoint Successful', [
+		$this->log->addNotice( 'AJAX – Successfully Saved Font', [
 			'results' => $results,
 		] );
 
@@ -493,7 +493,7 @@ class Model_Settings extends Helper_Abstract_Model {
 
 				if ( $this->options->update_option( 'custom_fonts', $fonts ) ) {
 					/* Success */
-					$this->log->addNotice( 'AJAX Endpoint Successful' );
+					$this->log->addNotice( 'AJAX – Successfully Deleted Font' );
 					echo json_encode( [ 'success' => true ] );
 					wp_die();
 				}
@@ -535,7 +535,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				'error' => esc_html__( 'Required fields have not been included.', 'gravity-forms-pdf-extended' ),
 			];
 
-			$this->log->addWarning( 'Validation Failed.', $return );
+			$this->log->addWarning( 'Font Validation Failed', $return );
 
 			echo json_encode( $return );
 
@@ -552,7 +552,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				'error' => esc_html__( 'Font name is not valid. Only alphanumeric characters and spaces are accepted.', 'gravity-forms-pdf-extended' ),
 			];
 
-			$this->log->addWarning( 'Validation Failed.', $return );
+			$this->log->addWarning( 'Font Validation Failed', $return );
 
 			echo json_encode( $return );
 
@@ -570,7 +570,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				'error' => esc_html__( 'A font with the same name already exists. Try a different name.', 'gravity-forms-pdf-extended' ),
 			];
 
-			$this->log->addWarning( 'Validation Failed.', $return );
+			$this->log->addWarning( 'Font Validation Failed', $return );
 
 			echo json_encode( $return );
 
@@ -588,7 +588,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				'error' => $installation,
 			];
 
-			$this->log->addWarning( 'Validation Failed.', $return );
+			$this->log->addWarning( 'Font Validation Failed', $return );
 
 			echo json_encode( $return );
 
@@ -597,7 +597,6 @@ class Model_Settings extends Helper_Abstract_Model {
 		}
 
 		/* If we got here the installation was successful so return the data */
-
 		return $installation;
 	}
 
@@ -865,7 +864,7 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		/* Check add-on currently installed */
 		if ( isset( $this->data->addon[ $addon_slug ] ) && $this->deactivate_license_key( $this->data->addon[ $addon_slug ], $license ) ) {
-			$this->log->addNotice( 'AJAX Endpoint Successful' );
+			$this->log->addNotice( 'AJAX – Successfully Deactivated License' );
 			echo json_encode( [
 				'success' => esc_html__( 'License deactivated.', 'gravity-forms-pdf-extended' ) ]
 			);

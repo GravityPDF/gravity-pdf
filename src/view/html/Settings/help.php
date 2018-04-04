@@ -4,7 +4,7 @@
  * Help Settings View
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<div class="about-text">
 			<?php esc_html_e( 'This is your portal to find quality help, support and documentation for Gravity PDF', 'gravity-forms-pdf-extended' ); ?>
-			<div class="about-text-disclaimer"><?php printf( esc_html__( '(This is not the place to get Gravity Forms support. %sPlease use their official support channel%s for assistance)', 'gravity-forms-pdf-extended' ), '<a href="https://www.gravityhelp.com/support/">', '</a>' ); ?></div>
+			<div class="about-text-disclaimer"><?php printf( esc_html__( '(This is not the place to get Gravity Forms support. %sPlease use their official support channel%s for assistance. Using the search box below will search gravitypdf.com for results.)', 'gravity-forms-pdf-extended' ), '<a href="https://www.gravityforms.com/support/">', '</a>' ); ?></div>
 		</div>
 
 		<div id="search-knowledgebase">
@@ -86,18 +86,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</a>
 			</div>
 
-			<div class="postbox-container">
-				<a href="https://gravitypdf.com/documentation/v4/user-activation-errors/">
-					<span><?php esc_html_e( 'Common Problems', 'gravity-forms-pdf-extended' ); ?></span><br>
-					<?php esc_html_e( 'Find out the most common issues user’s experience and ways to resolve them.', 'gravity-forms-pdf-extended' ); ?>
-				</a>
-			</div>
+            <div class="postbox-container">
+                <a href="https://gravitypdf.com/documentation/v4/developer-start-customising/">
+                    <span><?php esc_html_e( 'Developer Documentation', 'gravity-forms-pdf-extended' ); ?></span><br>
+					<?php esc_html_e( 'You’ll find all the info and examples you’ll need to create your own custom PDF templates.', 'gravity-forms-pdf-extended' ); ?>
+                </a>
+            </div>
 
 			<div class="postbox-container">
-				<a href="https://gravitypdf.com/documentation/v4/developer-start-customising/">
-					<span><?php esc_html_e( 'Developer Documentation', 'gravity-forms-pdf-extended' ); ?></span><br>
-					<?php esc_html_e( 'You’ll find all the info and examples you’ll need to create your own custom PDF templates.', 'gravity-forms-pdf-extended' ); ?>
-				</a>
+                <strong><?php esc_html_e( 'Common Questions', 'gravity-forms-pdf-extended' ); ?></strong><br>
+                <ul>
+                    <li><a href="https://gravitypdf.com/documentation/v4/user-setup-pdf/">How do I setup a PDF on my form?</a></li>
+                    <li><a href="https://gravitypdf.com/documentation/v4/user-setup-pdf/#notifications">How do you attach the PDF to a notification email?</a></li>
+                    <li><a href="https://gravitypdf.com/documentation/v4/user-shortcodes/">How do you add a PDF download link to the form's confirmation page?</a></li>
+                    <li><a href="https://gravitypdf.com/documentation/v4/user-managing-pdfs/">How can I add two or more PDFs to a single form?</a></li>
+                    <li><a href="https://gravitypdf.com/documentation/v4/gravityview-support/">How can I allow logged in users to download their past PDFs?</a></li>
+                </ul>
 			</div>
 		</div>
 

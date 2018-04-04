@@ -4,7 +4,7 @@
  * License Settings View
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.2
  */
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</form>
 
 	<em>
-        – <?php esc_html_e( 'By saving your license key(s) you are giving permission for us to poll GravityPDF.com periodically for your current license status and any new plugin updates.', 'gravity-forms-pdf-extended' ); ?>
+        – <?php esc_html_e( 'By installing a Gravity PDF extension you are automatically giving permission for us to periodically poll GravityPDF.com via HTTPS for your current license status and any new plugin updates. The only personal data sent is your website domain name and license key. To opt-out you will need to deactivate all Gravity PDF extensions.', 'gravity-forms-pdf-extended' ); ?>
     </em>
 
 	<?php

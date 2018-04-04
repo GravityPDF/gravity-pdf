@@ -10,7 +10,7 @@ use Exception;
  * Generates our PDF document using mPDF
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -248,6 +248,13 @@ class Helper_PDF {
 
 		$form = $this->form;
 
+		/* Allow this method to be short circuited */
+		if ( apply_filters( 'gfpdf_skip_pdf_html_render', false, $args, $this ) ) {
+			do_action( 'gfpdf_skipped_html_render', $args, $this );
+
+			return false;
+		}
+
 		/* Load in our PHP template */
 		if ( empty( $html ) ) {
 			$html = $this->load_html( $args );
@@ -337,7 +344,7 @@ class Helper_PDF {
 		/* create our path */
 		if ( ! is_dir( $this->path ) ) {
 			if ( ! wp_mkdir_p( $this->path ) ) {
-				throw new Exception( sprintf( 'Could not create directory: %s' ), esc_html( $this->path ) );
+				throw new Exception( sprintf( 'Could not create directory: %s', esc_html( $this->path ) ) );
 			}
 		}
 
@@ -621,6 +628,13 @@ class Helper_PDF {
 		 * See https://gravitypdf.com/documentation/v4/gfpdf_mpdf_init_class/ for more details about this filter
 		 */
 		$this->mpdf = apply_filters( 'gfpdf_mpdf_init_class', $this->mpdf, $this->form, $this->entry, $this->settings, $this );
+	}
+
+	/**
+	 * @return \mPDF
+	 */
+	public function get_pdf_class() {
+		return $this->mpdf;
 	}
 
 	/**

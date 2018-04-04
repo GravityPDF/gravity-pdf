@@ -10,7 +10,7 @@ use GFCommon;
  * Gravity Forms Field
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2017, Blue Liquid Designs
+ * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2017, Blue Liquid Designs
+    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -191,8 +191,8 @@ class Field_Products extends Helper_Abstract_Fields {
 									<?php endif; ?>
 								</td>
 								<td class="textcenter"><?php echo $product['quantity']; ?></td>
-								<td><?php echo GFCommon::format_number( $price, 'currency', rgar( $this->entry, 'currency' ) ); ?></td>
-								<td><?php echo $product['subtotal_formatted'] ?></td>
+								<td class="textright"><?php echo $product['price']; ?></td>
+								<td class="textright"><?php echo $product['subtotal_formatted'] ?></td>
 							</tr>
 						<?php endforeach; ?>
 
@@ -212,7 +212,7 @@ class Field_Products extends Helper_Abstract_Fields {
                                                 colspan="2"
                                                 rowspan="<?php echo $gpecommerce->get_order_summary_item_count( $order_summary ); ?>"></td>
                                         <?php endif; ?>
-                                        <td class="textright totals" style="<?php $gpecommerce->style( ".order-summary/tfoot/{$class}/td.column-3" ); ?>">
+                                        <td class="totals" style="<?php $gpecommerce->style( ".order-summary/tfoot/{$class}/td.column-3" ); ?>">
                                             <?php echo $item['name']; ?>
                                         </td>
 
@@ -227,12 +227,12 @@ class Field_Products extends Helper_Abstract_Fields {
                                 <tr>
                                     <td rowspan="3" class="emptycell"></td>
                                     <td colspan="2"
-                                        class="textright subtotal totals"><?php esc_html_e( 'Subtotal', 'gravity-forms-pdf-extended' ); ?></td>
+                                        class="subtotal totals"><?php esc_html_e( 'Subtotal', 'gravity-forms-pdf-extended' ); ?></td>
                                     <td class="subtotal_amount totals"><?php echo $products['products_totals']['subtotal_formatted']; ?></td>
                                 </tr>
                                 <tr>
                                     <td colspan="2"
-                                        class="textright shipping totals"><?php echo sprintf( esc_html__( 'Shipping (%s)', 'gravity-forms-pdf-extended' ), $products['products_totals']['shipping_name'] ); ?></td>
+                                        class="shipping totals"><?php echo sprintf( esc_html__( 'Shipping (%s)', 'gravity-forms-pdf-extended' ), $products['products_totals']['shipping_name'] ); ?></td>
                                     <td class="shipping_amount totals"><?php echo $products['products_totals']['shipping_formatted']; ?></td>
                                 </tr>
 							<?php endif; ?>
@@ -243,7 +243,7 @@ class Field_Products extends Helper_Abstract_Fields {
 								<?php endif; ?>
 
                                 <td colspan="2"
-                                    class="textright grandtotal totals"><?php esc_html_e( 'Total', 'gravityforms' ) ?></td>
+                                    class="grandtotal totals"><?php esc_html_e( 'Total', 'gravityforms' ) ?></td>
                                 <td class="grandtotal_amount totals"><?php echo $products['products_totals']['total_formatted']; ?></td>
                             </tr>
 
