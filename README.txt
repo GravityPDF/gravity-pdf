@@ -6,6 +6,7 @@ Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.4
 Tested up to: 4.9
 Stable tag: 4.4.0
+Requires PHP: 5.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
 
@@ -31,6 +32,10 @@ The plugin ships with four highly-customisable PDF templates perfectly suited fo
 * Our [JavaScript-powered font manager](https://gravitypdf.com/documentation/v4/user-custom-fonts/) allows you to install and use your favourite fonts. Now you can keep in line with your corporate style guide, or create beautiful PDF typography.
 * [The documentation](https://gravitypdf.com/documentation/v4/user-installation/) has everything from basic install instructions to advanced developer how-to guides. Our friendly team is also on hand to [provide FREE general support](https://gravitypdf.com/support/).
 * PHP, HTML and CSS come easy? [You’ll find creating your own PDF templates a breeze](https://gravitypdf.com/documentation/v4/developer-start-customising/). If not, [we offer PDF design services](https://gravitypdf.com/integration-services/) tailored just for you. We can even auto-fill existing PDFs!
+
+= Premium Extensions and Templates =
+
+[Unlock more features for Gravity PDF with one of our premium extensions](https://gravitypdf.com/extension-shop/). If one of the free PDF templates aren't working for you, [try a premium template instead](https://gravitypdf.com/template-shop/).
 
 = Requirements =
 
