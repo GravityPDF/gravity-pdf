@@ -115,7 +115,7 @@ class GFPDF_Major_Compatibility_Checks {
 	 *
 	 * @since 4.0
 	 */
-	public $required_php_version = '5.4';
+	public $required_php_version = '5.6';
 
 	/**
 	 * Set our required variables for a fallback and attempt to initialise
