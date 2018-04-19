@@ -632,9 +632,20 @@ class Helper_PDF {
 
 	/**
 	 * @return \mPDF
+	 *
+	 * @since 4.4
 	 */
 	public function get_pdf_class() {
 		return $this->mpdf;
+	}
+
+	/**
+	 * @param \mPDF $mpdf
+	 *
+	 * @since 4.5
+	 */
+	public function set_pdf_class($mpdf) {
+		$this->mpdf = $mpdf;
 	}
 
 	/**
