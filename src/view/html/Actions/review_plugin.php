@@ -42,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<br>
 
-	<?php printf( esc_html__( "If you love how much time you've saved using Gravity PDF then do us a big favor and %sgive it a five-star rating on WordPress.org%s.", 'gravity-forms-pdf-extended' ), '<a href="https://wordpress.org/support/view/plugin-reviews/gravity-forms-pdf-extended">', '</a>' ); ?>
+	<?php printf( esc_html__( "If you love how much time you've saved using Gravity PDF then do us a big favor and %sreview it on WordPress.org%s.", 'gravity-forms-pdf-extended' ), '<a href="https://wordpress.org/support/view/plugin-reviews/gravity-forms-pdf-extended">', '</a>' ); ?>
 
 	<br>
 
