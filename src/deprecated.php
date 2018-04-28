@@ -1,6 +1,7 @@
 <?php
 
 /* For backwards compatibility reasons this file will be in the global namespace */
+
 use GFPDF\Helper\Fields\Field_v3_Products;
 
 /**
@@ -111,9 +112,9 @@ class GFPDF_Core extends GFPDF_Deprecated_Abstract {
 	public function setup_deprecated_paths() {
 		global $gfpdfe_data;
 
-		$templates   = GPDFAPI::get_templates_class();
+		$templates = GPDFAPI::get_templates_class();
 
-		$gfpdfe_data = GPDFAPI::get_data_class();
+		$gfpdfe_data                         = GPDFAPI::get_data_class();
 		$gfpdfe_data->template_site_location = $templates->get_template_url();
 		$gfpdfe_data->template_save_location = $gfpdfe_data->template_tmp_location;
 	}
@@ -181,16 +182,17 @@ class PDFRender extends GFPDF_Deprecated_Abstract {
 		return $form_id;
 	}
 
+
 	/**
 	 * Create a class alias for our namespaced Mpdf class
-     *
-     * @since 5.0
+	 *
+	 * @since 5.0
 	 */
 	public static function alias_mpdf() {
-	    if( ! class_exists( 'mPDF' ) ) {
-		    class_alias( '\blueliquiddesigns\Mpdf\mPDF', 'mPDF' );
-	    }
-    }
+		if ( ! class_exists( 'mPDF' ) ) {
+			class_alias( '\Mpdf\Mpdf', 'mPDF' );
+		}
+	}
 }
 
 /**
@@ -333,11 +335,12 @@ class PDF_Common extends GFPDF_Deprecated_Abstract {
 	}
 
 	/**
-     * Prevent deprecated warning for legacy Tier 2 templates
-     *
+	 * Prevent deprecated warning for legacy Tier 2 templates
+	 *
 	 * @since 3.0
 	 */
-	public static function setup_ids() {}
+	public static function setup_ids() {
+	}
 }
 
 /**
@@ -431,8 +434,8 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 			?>
 
 			<?php echo $styles; ?>
-			<div id='container'>
-			<h2 id='details' class='default'><?php echo $form['title'] ?></h2>
+            <div id='container'>
+            <h2 id='details' class='default'><?php echo $form['title'] ?></h2>
 			<?php
 		}
 
@@ -456,8 +459,8 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 					$results['field'][] = '<h2 id="field-' . $field->id . '" class="default entry-view-page-break">' . $form['pagination']['pages'][ $page_number ] . '</h2>';
 				} else {
 					?>
-					<h2 id="field-<?php echo $field->id; ?>"
-					    class="default entry-view-page-break"><?php echo $form['pagination']['pages'][ $page_number ]; ?></h2>
+                    <h2 id="field-<?php echo $field->id; ?>"
+                        class="default entry-view-page-break"><?php echo $form['pagination']['pages'][ $page_number ]; ?></h2>
 					<?php
 				}
 				$page_number++;
@@ -522,7 +525,7 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 			return $results;
 		} else {
 			?>
-			</div><!-- Close container -->
+            </div><!-- Close container -->
 			<?php
 		}
 	}
@@ -714,4 +717,108 @@ class GFPDF_Settings_Model extends GFPDF_Deprecated_Abstract {
 }
 
 class GFPDF_Settings extends GFPDF_Deprecated_Abstract {
+}
+
+
+if ( ! class_exists( 'mPDF' ) ) {
+
+	if ( ! defined( 'AUTOFONT_ALL' ) ) {
+		define( 'AUTOFONT_ALL', 1 );
+	}
+
+	/**
+	 * Class mPDF
+     *
+     * Allow our legacy software to still function even though the \mPDF class no longer exists (see \Mpdf\Mpdf)
+     *
+     * @since 5.0
+	 */
+	class mPDF {
+		protected $mpdf;
+
+		/**
+		 * mPDF constructor.
+		 *
+		 * @param string $mode
+		 * @param string $format
+		 * @param int    $default_font_size
+		 * @param string $default_font
+		 * @param int    $mgl
+		 * @param int    $mgr
+		 * @param int    $mgt
+		 * @param int    $mgb
+		 * @param int    $mgh
+		 * @param int    $mgf
+		 * @param string $orientation
+         *
+         * @since 5.0
+		 */
+		public function __construct( $mode = '', $format = 'A4', $default_font_size = 0, $default_font = '', $mgl = 15, $mgr = 15, $mgt = 16, $mgb = 16, $mgh = 9, $mgf = 9, $orientation = 'P' ) {
+
+			$data = GPDFAPI::get_data_class();
+			$defaultFontConfig = ( new \Mpdf\Config\FontVariables() )->getDefaults();
+
+			$this->mpdf = new \Mpdf\Mpdf( [
+				'fontDir' => [
+					$data->template_font_location,
+				],
+
+				'fontdata' => apply_filters( 'mpdf_font_data', $defaultFontConfig['fontdata'] ),
+
+				'tmpDir' => $data->template_tmp_location . '/mpdf/',
+
+				'allow_output_buffering' => true,
+				'autoLangToFont'         => true,
+				'useSubstitutions'       => true,
+				'ignore_invalid_utf8'    => true,
+				'setAutoTopMargin'       => 'stretch',
+				'setAutoBottomMargin'    => 'stretch',
+				'enableImports'          => true,
+				'use_kwt'                => true,
+				'keepColumns'            => true,
+				'biDirectional'          => true,
+
+				'format'      => $format,
+				'orientation' => $orientation,
+
+				'margin_left'       => $mgl,
+				'margin_top'        => $mgt,
+				'margin_right'      => $mgr,
+				'margin_bottom'     => $mgb,
+				'margin_header'     => $mgh,
+				'margin_footer'     => $mgf,
+				'default_font_size' => $default_font_size,
+				'default_font'      => $default_font,
+				'mode'              => $mode,
+			] );
+		}
+
+		/**
+         * Allow the relaying of method calls to the new Mpdf class
+         *
+		 * @param $name
+		 * @param $arguments
+		 *
+		 * @return mixed
+         *
+         * @since 5.0
+		 */
+		public function __call( $name, $arguments ) {
+			if ( is_callable( [ $this->mpdf, $name ] ) ) {
+				return call_user_func_array( [ $this->mpdf, $name ], $arguments );
+			}
+		}
+
+		/**
+		 * @param int $type
+         *
+         * @Internal Removed from Mpdf v7
+         *
+         * @since 5.0
+		 */
+		public function SetAutoFont( $type = 0 ) {
+			$this->mpdf->autoLangToFont = $type === 1;
+			$this->mpdf->autoScriptToLang = $type === 1;
+		}
+	}
 }

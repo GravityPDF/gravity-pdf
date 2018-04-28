@@ -179,7 +179,7 @@ class View_PDF extends Helper_Abstract_View {
 		/**
 		 * Set out our PDF abstraction class
 		 */
-		$pdf = new Helper_PDF( $entry, $settings, $this->gform, $this->data, $this->misc, $this->templates );
+		$pdf = new Helper_PDF( $entry, $settings, $this->gform, $this->data, $this->misc, $this->templates, $this->log );
 		$pdf->set_filename( $model->get_pdf_name( $settings, $entry ) );
 
 		$this->fix_wp_external_links_plugin_conflict();

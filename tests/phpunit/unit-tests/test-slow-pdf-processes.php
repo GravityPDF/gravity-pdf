@@ -201,7 +201,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		$settings['template'] = 'zadani';
 
 		/* Create our PDF object */
-		$pdf_generator = new Helper_PDF( $entry, $settings, $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
+		$pdf_generator = new Helper_PDF( $entry, $settings, $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates, $gfpdf->log );
 		$pdf_generator->set_filename( 'Unit Testing' );
 
 		/* Generate the PDF and verify it was successfull */

@@ -166,7 +166,6 @@ class Test_PDF extends WP_UnitTestCase {
 
 		$this->assertSame( 10, has_filter( 'mpdf_tmp_path', [ $this->model, 'mpdf_tmp_path' ] ) );
 		$this->assertSame( 10, has_filter( 'mpdf_fontdata_path', [ $this->model, 'mpdf_tmp_font_path' ] ) );
-		$this->assertSame( 10, has_filter( 'mpdf_current_font_path', [ $this->model, 'set_current_pdf_font' ] ) );
 		$this->assertSame( 10, has_filter( 'mpdf_font_data', [
 			$this->model,
 			'register_custom_font_data_with_mPDF',
@@ -952,7 +951,7 @@ class Test_PDF extends WP_UnitTestCase {
 
 		$pdf = new Helper_PDF( [ 'id'      => 1,
 		                         'form_id' => 1,
-		], '', $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
+		], '', $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates, $gfpdf->log );
 		$pdf->set_path( ABSPATH );
 		$pdf->set_filename( 'unittest' );
 
@@ -975,7 +974,7 @@ class Test_PDF extends WP_UnitTestCase {
 
 		$pdf = new Helper_PDF( [ 'id'      => 1,
 		                         'form_id' => 1,
-		], '', $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
+		], '', $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates, $gfpdf->log );
 
 		$pdf->set_output_type( 'display' );
 		$this->assertEquals( 'DISPLAY', $pdf->get_output_type() );
@@ -997,7 +996,7 @@ class Test_PDF extends WP_UnitTestCase {
 
 		$pdf = new Helper_PDF( [ 'id'      => 1,
 		                         'form_id' => 1,
-		], [ 'template' => 'zadani' ], $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
+		], [ 'template' => 'zadani' ], $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates, $gfpdf->log );
 
 		/* Cleanup any previous tests */
 		@unlink( $gfpdf->data->template_location . 'zadani.php' );
@@ -1041,7 +1040,8 @@ class Test_PDF extends WP_UnitTestCase {
 			$gfpdf->gform,
 			$gfpdf->data,
 			$gfpdf->misc,
-			$gfpdf->templates
+			$gfpdf->templates,
+			$gfpdf->log
 		);
 
 		try {
@@ -1058,11 +1058,11 @@ class Test_PDF extends WP_UnitTestCase {
 
 		$pdf = new Helper_PDF( [ 'id'      => 1,
 		                         'form_id' => 1,
-		], [ 'template' => 'zadani' ], $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
+		], [ 'template' => 'zadani' ], $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates, $gfpdf->log );
 
 		try {
 			$pdf->set_template();
-		} catch ( Exception $e ) {
+		} catch ( \Exception $e ) {
 			$this->assertEquals( sprintf( 'The PDF Template %s requires Gravity PDF version %s. Upgrade to the latest version.', '<em>zadani</em>', '<em>10</em>' ), $e->getMessage() );
 		}
 
@@ -1139,23 +1139,6 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->model->cleanup_pdf( $entry, $form );
 
 		$this->assertFileNotExists( $file );
-	}
-
-	/**
-	 * Test our mPDF font override is working correctly
-	 *
-	 * @since 4.0
-	 */
-	public function test_set_current_pdf_font() {
-		global $gfpdf;
-
-		/* Check our alternate font location is bypassed */
-		@unlink( $gfpdf->data->template_font_location . 'font' );
-		$this->assertEquals( ABSPATH . 'font', $this->model->set_current_pdf_font( ABSPATH . 'font', 'font' ) );
-
-		/* Create the file and ensure it isn't bypassed */
-		touch( $gfpdf->data->template_font_location . 'font' );
-		$this->assertEquals( $gfpdf->data->template_font_location . 'font', $this->model->set_current_pdf_font( ABSPATH . 'font', 'font' ) );
 	}
 
 	/**
@@ -1799,7 +1782,7 @@ class Test_PDF extends WP_UnitTestCase {
 
 		$pdf = new Helper_PDF( [ 'id'      => 1,
 		                         'form_id' => 1,
-		], $settings, $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
+		], $settings, $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates, $gfpdf->log );
 		$pdf->set_template();
 		$pdf->set_output_type( 'save' );
 

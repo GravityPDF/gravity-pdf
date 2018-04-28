@@ -911,7 +911,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function generate_and_save_pdf( $entry, $settings ) {
 
-		$pdf_generator = new Helper_PDF( $entry, $settings, $this->gform, $this->data, $this->misc, $this->templates );
+		$pdf_generator = new Helper_PDF( $entry, $settings, $this->gform, $this->data, $this->misc, $this->templates, $this->log );
 		$pdf_generator->set_filename( $this->get_pdf_name( $settings, $entry ) );
 		$pdf_generator = apply_filters( 'gfpdf_pdf_generator_pre_processing', $pdf_generator );
 
@@ -1125,7 +1125,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				/* Only generate if the PDF wasn't during the notification process */
 				if ( ! is_wp_error( $settings ) ) {
 
-					$pdf_generator = new Helper_PDF( $entry, $settings, $this->gform, $this->data, $this->misc, $this->templates );
+					$pdf_generator = new Helper_PDF( $entry, $settings, $this->gform, $this->data, $this->misc, $this->templates, $this->log );
 					$pdf_generator->set_filename( $this->get_pdf_name( $settings, $entry ) );
 
 					if ( $this->does_pdf_exist( $pdf_generator ) ) {
@@ -1207,27 +1207,6 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function mpdf_font_path( $path ) {
 		return $this->data->template_font_location;
-	}
-
-	/**
-	 * An mPDF filter that checks if mPDF has the font currently installed, otherwise
-	 * will look in the Gravity PDF font folder for an alternative.
-	 *
-	 * @param string $path The current path to the font mPDF is trying to load
-	 * @param string $font The current font name trying to be loaded
-	 *
-	 * @since 4.0
-	 *
-	 * @return string
-	 */
-	public function set_current_pdf_font( $path, $font ) {
-
-		/* If the current font doesn't exist in mPDF core we'll look in our font folder */
-		if ( ! is_file( $path ) && is_file( $this->data->template_font_location . $font ) ) {
-			$path = $this->data->template_font_location . $font;
-		}
-
-		return $path;
 	}
 
 	/**
