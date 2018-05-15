@@ -7,6 +7,7 @@ use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Abstract_Fields;
 
 use GF_Field_Post_Image;
+use GF_Field_FileUpload;
 
 use Exception;
 
@@ -86,10 +87,19 @@ class Field_Post_Image extends Helper_Abstract_Fields {
 	 */
 	public function html( $value = '', $label = true ) {
 		$value = $this->value();
+		$url = $value['url'];
 
-		/* Start building image link */
-		$html = '<a href="' . $value['url'] . '" target="_blank">';
-		$html .= '<img width="150" src="' . $value['url'] . '" />';
+		/* Use secure URL, if current Gravity Forms version allows */
+		if ( method_exists( 'GF_Field_FileUpload', 'get_download_url' ) ) {
+			$file_upload = new GF_Field_FileUpload( [ 'formId' => $this->form['id'], 'id' => $this->field->id ] );
+			$url         = $file_upload->get_download_url( $url );
+		}
+
+		$html = '<a href="' . $url . '" target="_blank">';
+
+		/* Use the path if able, otherwise fallback to the original URL (the end user never sees this value) */
+		$image_url = ( isset( $value['path'] ) ) ? $value['path'] : $value['url'];
+		$html .= '<img width="150" src="' . $image_url . '" />';
 
 		/* Include title / caption / description if needed */
 		if ( ! empty( $value['title'] ) ) {
@@ -162,6 +172,13 @@ class Field_Post_Image extends Helper_Abstract_Fields {
 			$path = ( isset( $value[0] ) ) ? $this->misc->convert_url_to_path( $value[0] ) : '';
 			if ( $path != $img['url'] ) {
 				$img['path'] = $path;
+			}
+
+			/* Add secure URL, if current Gravity Forms version allows */
+			if ( method_exists( 'GF_Field_FileUpload', 'get_download_url' ) ) {
+				$file_upload = new GF_Field_FileUpload( [ 'formId' => $this->form['id'], 'id' => $this->field->id ] );
+
+				$img['secure_url'] = $file_upload->get_download_url( $img['url'] );
 			}
 		}
 

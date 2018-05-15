@@ -99,12 +99,16 @@ class Field_Fileupload extends Helper_Abstract_Fields {
 		}
 
 		foreach ( $value as $image ) {
+			$path = $this->misc->convert_url_to_path( $image );
+
+			/* Use secure URL, if current Gravity Forms version allows */
+			if ( method_exists( $this->field, 'get_download_url' ) ) {
+				$image = $this->field->get_download_url( $image );
+			}
 
 			$data[ $field_id . '.' . $label ][] = $image;
 			$data[ $field_id ][]                = $image;
 			$data[ $label ][]                   = $image;
-
-			$path = $this->misc->convert_url_to_path( $image );
 
 			$data[ $field_id . '_path' ][]                = $path;
 			$data[ $field_id . '.' . $label . '_path' ][] = $path;
@@ -132,6 +136,11 @@ class Field_Fileupload extends Helper_Abstract_Fields {
 
 			foreach ( $files as $file ) {
 				$file_info = pathinfo( $file );
+				/* Use secure URL, if current Gravity Forms version allows */
+				if ( method_exists( $this->field, 'get_download_url' ) ) {
+					$file = $this->field->get_download_url( $file );
+				}
+
 				$html .= '<li id="field-' . $this->field->id . '-option-' . $i . '"><a href="' . esc_url( $file ) . '">' . esc_html( $file_info['basename'] ) . '</a></li>';
 				$i++;
 			}
