@@ -44,6 +44,7 @@ done
 
 rm -R "${PACKAGE_DIR}/src/assets/css"
 rm -R "${PACKAGE_DIR}/src/assets/js"
+rm -R "${PACKAGE_DIR}/vendor/mpdf/mpdf/ttfonts"
 
 # Create zip package
 cd ${TMP_DIR}
