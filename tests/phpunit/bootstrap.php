@@ -88,6 +88,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		require_once $this->plugin_dir . '/tmp/gravityformssurvey/survey.php';
 
 		/* set up Gravity Forms database */
+		remove_filter( 'query', [ 'GFForms', 'filter_query' ] );
 		update_option( 'gf_db_version', GFForms::$version );
 		GFFormsModel::drop_tables();
 		gf_upgrade()->maybe_upgrade();
@@ -102,9 +103,6 @@ class GravityPDF_Unit_Tests_Bootstrap {
 	 */
 	public function create_stubs() {
 		global $gfpdf;
-
-		/* Disable deprecated warnings */
-		error_reporting(E_ALL ^ E_DEPRECATED);
 
 		/* Import all JSON forms into Gravity Forms */
 		$forms = [
