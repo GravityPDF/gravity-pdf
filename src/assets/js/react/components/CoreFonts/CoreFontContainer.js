@@ -1,7 +1,7 @@
 import React from 'react'
 import request from 'superagent'
 import Queue from 'promise-queue'
-import promiseReflect from 'promise-reflect'
+import promiseReflect from '../../utilities/promiseReflect'
 import { connect } from 'react-redux'
 
 import CoreFontListResults from './CoreFontListResults'

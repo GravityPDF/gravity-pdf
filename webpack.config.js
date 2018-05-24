@@ -20,9 +20,9 @@ module.exports = {
         include: [
           path.resolve(__dirname, "src/assets"),
           path.resolve(__dirname, "tests/mocha"),
-          path.resolve(__dirname, "node_modules/promise-reflect/promise-reflect.js"),
         ],
-        loader: 'babel-loader'
+        loader: 'babel-loader',
+        options: { babelrc: true }
       },
       {
         test: /\.json$/,
