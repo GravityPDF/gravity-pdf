@@ -40,7 +40,6 @@ module.exports = {
             'NODE_ENV': JSON.stringify('production')
         }
     }),
-    new webpack.optimize.ModuleConcatenationPlugin(),
     new UglifyJSPlugin({
       parallel: true,
       sourceMap: true,

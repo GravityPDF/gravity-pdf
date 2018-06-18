@@ -22,6 +22,7 @@
   "env": {
     "test": {
       "plugins": [
+        "./tests/mocha/arrow-function-coverage-fix.js",
         [
           "istanbul",
           {
