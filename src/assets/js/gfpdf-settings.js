@@ -320,10 +320,10 @@
           if ($(this).is(':checked')) {
             if ($(this).val() === 'Yes') {
               /* hide user restrictions  */
-              $table.find('tr:nth-child(8)').hide()
+              $table.find('tr:nth-child(9)').hide()
             } else {
               /* show user restrictions */
-              $table.find('tr:nth-child(8)').show()
+              $table.find('tr:nth-child(9)').show()
             }
           }
         }).trigger('change')
