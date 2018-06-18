@@ -172,6 +172,19 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'tooltip' => '<h6>' . esc_html__( 'Entry View', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Choose to view the PDF in your web browser or download the document to your computer.', 'gravity-forms-pdf-extended' ),
 					],
 
+					'background_processing' => [
+						'id'      => 'background_processing',
+						'name'    => esc_html__( 'Background Processing', 'gravity-forms-pdf-extended' ),
+						'desc'    => sprintf( esc_html__( 'When enable, during form submission and resending notifications PDFs will be processed and emailed in a background task. %sRequires Background tasks to be enabled%s.', 'gravity-forms-pdf-extended' ), '<a href="' . admin_url( 'admin.php?page=gf_system_status' ) . '">', '</a>' ),
+						'type'    => 'radio',
+						'options' => [
+							'Enable'  => esc_html__( 'Enable', 'gravity-forms-pdf-extended' ),
+							'Disable' => esc_html__( 'Disable', 'gravity-forms-pdf-extended' ),
+						],
+						'std'     => 'Disable',
+						'tooltip' => '<h6>' . esc_html__( 'Background Processing', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'When enabled, users will spent less time waiting during form submission as PDF generation is off-loaded to a background process. It is important to ensure Background Tasks are enabled in the Gravity Forms System Status before enabling this feature.', 'gravity-forms-pdf-extended' ),
+					],
+
 					'shortcode_debug_messages' => [
 						'id'      => 'shortcode_debug_messages',
 						'name'    => esc_html__( 'Shortcode Debug Message', 'gravity-forms-pdf-extended' ),

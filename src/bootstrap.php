@@ -875,7 +875,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$model_pdf = $this->singleton->get_class( 'Model_PDF' );
 		$class = new Controller\Controller_Pdf_Queue( $queue, $model_pdf, $this->log );
 
-		$class->init();
+		if ( $this->options->get_option( 'background_processing', 'Disable' ) === 'Disable' ) {
+			$class->init();
+		}
 
 		$this->singleton->add_class( $queue );
 		$this->singleton->add_class( $class );

@@ -145,6 +145,9 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		add_action( 'gform_entries_first_column_actions', [ $this->model, 'view_pdf_entry_list' ], 10, 4 );
 		add_action( 'gform_entry_info', [ $this->model, 'view_pdf_entry_detail' ], 10, 2 );
 
+		/* Add save PDF filter */
+		add_action( 'gform_after_submission', [ $this->model, 'maybe_save_pdf' ], 10, 2 );
+
 		/* Clean-up actions */
 		add_action( 'gform_after_submission', [ $this->model, 'cleanup_pdf' ], 9999, 2 );
 		add_action( 'gform_after_update_entry', [ $this->model, 'cleanup_pdf_after_submission' ], 9999, 2 );
