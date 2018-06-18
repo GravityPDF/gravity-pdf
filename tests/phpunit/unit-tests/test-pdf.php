@@ -138,6 +138,7 @@ class Test_PDF extends WP_UnitTestCase {
 			'view_pdf_entry_list',
 		] ) );
 		$this->assertSame( 10, has_action( 'gform_entry_info', [ $this->model, 'view_pdf_entry_detail' ] ) );
+		$this->assertSame( 10, has_action( 'gform_after_submission', [ $this->model, 'maybe_save_pdf' ] ) );
 		$this->assertSame( 9999, has_action( 'gform_after_submission', [ $this->model, 'cleanup_pdf' ] ) );
 		$this->assertSame( 9999, has_action( 'gform_after_update_entry', [
 			$this->model,

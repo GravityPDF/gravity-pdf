@@ -99,7 +99,6 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 * Set up our dependancies
 	 *
 	 * @param \GFPDF\Helper\Helper_Pdf_Queue
-	 * @param \GFPDF\Helper\_Queue_Callbacks
 	 * @param \GFPDF\Model\Model_PDF $model_pdf
 	 * @param LoggerInterface        $log Our logger class
 	 *
