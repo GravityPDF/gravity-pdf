@@ -155,7 +155,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 							'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
 							'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
 						],
-						'std'     => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
+						'std'     => 'No',
 						'tooltip' => '<h6>' . esc_html__( 'Reverse Text (RTL)', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( "Enable RTL if you are writing in Arabic, Hebrew, Syriac, N'ko, Thaana, Tifinar, Urdu or other RTL languages.", 'gravity-forms-pdf-extended' ),
 					],
 
@@ -227,7 +227,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 							'Yes' => esc_html__( 'Enable', 'gravity-forms-pdf-extended' ),
 							'No'  => esc_html__( 'Disable', 'gravity-forms-pdf-extended' ),
 						],
-						'std'     => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
+						'std'     => 'No',
 						'tooltip' => '<h6>' . esc_html__( 'Restrict Owner', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Enable this setting if your PDFs should not be viewable by the end user. This can be set on a per-PDF basis.', 'gravity-forms-pdf-extended' ),
 					],
 
@@ -491,7 +491,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 							'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
 							'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
 						],
-						'std'     => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
+						'std'     => 'No',
 					],
 
 					'password' => [
@@ -549,7 +549,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 							'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
 							'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
 						],
-						'std'     => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
+						'std'     => 'No',
 						'tooltip' => '<h6>' . esc_html__( 'Save PDF', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( "By default, PDFs are not automatically saved to disk. Enable this option to force the PDF to be generated and saved. Useful when using the %sgfpdf_post_pdf_save%s hook to copy the PDF to an alternate location.", 'gravity-forms-pdf-extended' ), '<code>', '</code>' ),
 					],
 
@@ -562,7 +562,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 							'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
 							'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
 						],
-						'std'     => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
+						'std'     => 'No',
 						'tooltip' => '<h6>' . esc_html__( 'Public Access', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( "When public access is on all security protocols are disabled and anyone worldwide can view the PDF document for ALL your form's entries. For most users the standard security measures will be adequate and public access should remain disabled.", 'gravity-forms-pdf-extended' ),
 					],
 
@@ -616,7 +616,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
 				'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
 			],
-			'std'     => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
+			'std'     => 'No',
 		];
 
 		return $settings;
@@ -673,7 +673,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
 				'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
 			],
-			'std'     => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
+			'std'     => 'No',
 		] );
 	}
 
@@ -694,7 +694,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
 				'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
 			],
-			'std'     => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
+			'std'     => 'No',
 		] );
 	}
 
@@ -715,7 +715,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
 				'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
 			],
-			'std'     => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
+			'std'     => 'No',
 		] );
 	}
 
@@ -736,7 +736,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
 				'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
 			],
-			'std'     => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
+			'std'     => 'No',
 		] );
 	}
 
@@ -757,7 +757,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
 				'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
 			],
-			'std'     => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
+			'std'     => 'Yes',
 			'tooltip' => '<h6>' . esc_html__( 'Enable Conditional Logic', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Enable this option to hide failed conditional logic fields in the PDF.', 'gravity-forms-pdf-extended' ),
 		] );
 	}
@@ -779,7 +779,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
 				'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
 			],
-			'std'     => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
+			'std'     => 'No',
 		] );
 	}
 
