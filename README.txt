@@ -39,7 +39,7 @@ The plugin ships with four highly-customisable PDF templates perfectly suited fo
 
 = Requirements =
 
-Gravity PDF can be run on most shared web hosting without any issues. It requires **PHP 5.4+** (PHP 7.0+ recommended) and at least 64MB of WP Memory (128MB+ recommended). You'll also need to be running WordPress 4.4+ and have [Gravity Forms 2.3+](https://rocketgenius.pxf.io/c/1211356/445235/7938) (affiliate link).
+Gravity PDF can be run on most shared web hosting without any issues. It requires **PHP 5.4+** (PHP 7.0+ recommended) and at least 64MB of WP Memory (128MB+ recommended). You'll also need to be running WordPress 4.4+ and have [Gravity Forms 2.3.1+](https://rocketgenius.pxf.io/c/1211356/445235/7938) (affiliate link).
 
 If you aren't sure Gravity PDF will meet your needs (and haven't got a Gravity Forms license yet) you can [try out the software via our demo site](https://demo.gravitypdf.com).
 
@@ -91,7 +91,7 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 == Changelog ==
 
 = 5.0.0-beta1 =
-* Breaking Change: Bump minimum version of Gravity Forms from 1.9 to 2.3+
+* Breaking Change: Bump minimum version of Gravity Forms from 1.9 to 2.3.1+
 * Breaking Change: Bump WordPress minimum version from 4.4 to 4.8+
 * Breaking Change: Background process PDFs/emails on form submission and while resending notifications. Requires Background tasks is enabled.
 * Breaking Change: Decouple the fonts from the plugin (see feature below)
@@ -116,7 +116,7 @@ See [CHANGELOG.txt](https://github.com/GravityPDF/gravity-pdf/blob/master/CHANGE
 == Upgrade Notice ==
 
 = 5.0.0 =
-WARNING: Breaking changes! WordPress minimum version now 4.8+. Gravity Forms minimum version now 2.3+.
+WARNING: Breaking changes! WordPress minimum version now 4.8+. Gravity Forms minimum version now 2.3.1+.
 
 = 4.2.1 =
 WARNING: The minimum WordPress version supported is now 4.4.
