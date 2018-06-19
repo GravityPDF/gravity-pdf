@@ -7,6 +7,7 @@ use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Helper_Pdf_Queue;
 
 use Psr\Log\LoggerInterface;
 
@@ -104,6 +105,13 @@ class Model_Install extends Helper_Abstract_Model {
 	protected $notices;
 
 	/**
+	 * @var Helper_Pdf_Queue
+	 *
+	 * @since 5.0
+	 */
+	protected $queue;
+
+	/**
 	 * Setup our class by injecting all our dependancies
 	 *
 	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform   Our abstracted Gravity Forms helper functions
@@ -111,10 +119,11 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @param \GFPDF\Helper\Helper_Data          $data    Our plugin data store
 	 * @param \GFPDF\Helper\Helper_Misc          $misc    Our miscellaneous class
 	 * @param \GFPDF\Helper\Helper_Notices       $notices Our notice class used to queue admin messages and errors
+	 * @param \GFPDF\Helper\Helper_Pdf_Queue     $queue
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices ) {
+	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices, Helper_Pdf_Queue $queue ) {
 
 		/* Assign our internal variables */
 		$this->gform   = $gform;
@@ -122,6 +131,7 @@ class Model_Install extends Helper_Abstract_Model {
 		$this->data    = $data;
 		$this->misc    = $misc;
 		$this->notices = $notices;
+		$this->queue   = $queue;
 	}
 
 	/**
@@ -424,6 +434,11 @@ class Model_Install extends Helper_Abstract_Model {
 			$this->remove_plugin_form_settings();
 		}
 
+		/* Removes background processes */
+		$this->queue->clear_scheduled_events();
+		$this->queue->clear_queue( true );
+		$this->queue->unlock_process();
+
 		/* Remove folder structure and deactivate */
 		$this->remove_folder_structure();
 		$this->deactivate_plugin();
@@ -527,16 +542,5 @@ class Model_Install extends Helper_Abstract_Model {
 			wp_safe_redirect( admin_url( 'index.php' ) );
 		}
 		exit;
-	}
-
-	/**
-	 * In preparation for the removal of the Mpdf fonts we'll copy them all to our
-	 * PDF Working Directory during an update
-	 *
-	 * @since 4.3
-	 */
-	public function copy_fonts_to_working_directory() {
-		$mpdf_dir = PDF_PLUGIN_DIR . 'vendor/blueliquiddesigns/mpdf/ttfonts/';
-		$this->misc->copyr( $mpdf_dir, $this->data->template_font_location );
 	}
 }

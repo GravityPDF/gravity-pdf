@@ -4,6 +4,7 @@ namespace GFPDF\Tests;
 
 use GFPDF\Controller\Controller_Install;
 use GFPDF\Model\Model_Install;
+use GFPDF\Helper\Helper_Pdf_Queue;
 
 use WP_UnitTestCase;
 
@@ -75,7 +76,7 @@ class Test_Installer extends WP_UnitTestCase {
 		parent::setUp();
 
 		/* Setup our test classes */
-		$this->model = new Model_Install( $gfpdf->gform, $gfpdf->log, $gfpdf->data, $gfpdf->misc, $gfpdf->notices );
+		$this->model = new Model_Install( $gfpdf->gform, $gfpdf->log, $gfpdf->data, $gfpdf->misc, $gfpdf->notices, new Helper_Pdf_Queue( $gfpdf->log ) );
 
 		$this->controller = new Controller_Install( $this->model, $gfpdf->gform, $gfpdf->log, $gfpdf->notices, $gfpdf->data, $gfpdf->misc );
 		$this->controller->init();

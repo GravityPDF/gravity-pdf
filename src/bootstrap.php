@@ -618,7 +618,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @return void
 	 */
 	public function installer() {
-		$model = new Model\Model_Install( $this->gform, $this->log, $this->data, $this->misc, $this->notices );
+		$model = new Model\Model_Install( $this->gform, $this->log, $this->data, $this->misc, $this->notices, new Helper\Helper_Pdf_Queue( $this->log ) );
 		$class = new Controller\Controller_Install( $model, $this->gform, $this->log, $this->notices, $this->data, $this->misc );
 		$class->init();
 
