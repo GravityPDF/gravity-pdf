@@ -231,7 +231,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->actions();
 		$this->template_manager();
 		$this->load_core_font_handler();
-		$this->async_pdfs();
 
 		/* Add localisation support */
 		$this->add_localization_support();
@@ -592,6 +591,12 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function init_settings_api() {
 		/* load our options API */
 		$this->options->init();
+
+		/*
+		 * Async PDFs are conditionally loaded based of a global setting,
+		 * so required to load after the settings have been loaded
+		 */
+		$this->async_pdfs();
 	}
 
 	/**
