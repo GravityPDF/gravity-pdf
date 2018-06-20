@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.8
 Tested up to: 4.9
-Stable tag: 5.0.0-beta1
+Stable tag: 5.0.0-RC1
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -90,7 +90,7 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 
 == Changelog ==
 
-= 5.0.0-beta1 =
+= 5.0.0-RC1 =
 * Breaking Change: Bump minimum version of Gravity Forms from 1.9 to 2.3.1+
 * Breaking Change: Bump WordPress minimum version from 4.4 to 4.8+
 * Breaking Change: Bump the PHP minimum version from 5.4 to 5.6+
