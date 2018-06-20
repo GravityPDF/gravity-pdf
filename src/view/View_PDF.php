@@ -258,7 +258,14 @@ class View_PDF extends Helper_Abstract_View {
 			] );
 
 			if ( $this->gform->has_capability( 'gravityforms_view_entries' ) ) {
-				wp_die( $e->getMessage() );
+				$message = sprintf(
+					'%s in %s on line %s',
+					$e->getMessage(),
+					$e->getFile(),
+					$e->getLine()
+				);
+
+				wp_die( $message );
 			}
 
 			wp_die( esc_html__( 'There was a problem generating your PDF', 'gravity-forms-pdf-extended' ) );
