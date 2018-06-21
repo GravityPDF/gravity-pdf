@@ -777,6 +777,7 @@ if ( ! class_exists( 'mPDF' ) ) {
 				'use_kwt'                => true,
 				'keepColumns'            => true,
 				'biDirectional'          => true,
+				'showWatermarkText'      => true,
 
 				'format'      => $format,
 				'orientation' => $orientation,

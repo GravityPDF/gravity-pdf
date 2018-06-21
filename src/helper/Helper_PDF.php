@@ -654,7 +654,7 @@ class Helper_PDF {
 			'use_kwt'                => true,
 			'keepColumns'            => true,
 			'biDirectional'          => true,
-
+			'showWatermarkText'      => true,
 
 			'format'      => $this->paper_size,
 			'orientation' => $this->orientation,
