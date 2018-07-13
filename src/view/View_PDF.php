@@ -176,6 +176,7 @@ class View_PDF extends Helper_Abstract_View {
 		$model      = $controller->model;
 		$form       = $this->gform->get_form( $entry['form_id'] );
 
+		$form = $this->add_gravity_perk_conditional_logic_date_support( $form );
 		$this->fix_wp_external_links_plugin_conflict();
 
 		/**
@@ -279,6 +280,20 @@ class View_PDF extends Helper_Abstract_View {
 		}
 	}
 
+	/**
+	 * Add Gravity Perk Conditional Logic Date Field support, if required
+	 *
+	 * @Internal Fixed an intermittent issue with the Product table not functioning correctly
+	 *
+	 * @since    4.5
+	 */
+	private function add_gravity_perk_conditional_logic_date_support( $form ) {
+		if ( method_exists( 'GWConditionalLogicDateFields', 'convert_conditional_logic_date_field_values' ) ) {
+			$form = \GWConditionalLogicDateFields::convert_conditional_logic_date_field_values( $form );
+		}
+
+		return $form;
+	}
 
 	/**
 	 * Ensure a PHP extension is added to the end of the template name
