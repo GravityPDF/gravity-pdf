@@ -710,7 +710,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		 * Patch for WPML which can include the default language as a GET parameter
 		 * See https://github.com/GravityPDF/gravity-pdf/issues/550
 		 */
-		$home_url = strtok( home_url(), '?' );
+		$home_url = untrailingslashit( strtok( home_url(), '?' ) );
 
 		/* Check if permalinks are enabled, otherwise fall back to our ugly link structure for 4.0 (not the same as our v3 links) */
 		if ( $wp_rewrite->using_permalinks() ) {
@@ -967,7 +967,9 @@ class Model_PDF extends Helper_Abstract_Model {
 				if ( $this->maybe_attach_to_notification( $notifications, $settings, $entry, $form ) ) {
 
 					/* Generate our PDF */
+					do_action( 'gfpdf_pre_generate_and_save_pdf_notification', $form, $entry, $settings , $notifications );
 					$filename = $this->generate_and_save_pdf( $entry, $settings );
+					do_action( 'gfpdf_post_generate_and_save_pdf_notification', $form, $entry, $settings, $notifications );
 
 					if ( ! is_wp_error( $filename ) ) {
 						$notifications['attachments'][] = $filename;

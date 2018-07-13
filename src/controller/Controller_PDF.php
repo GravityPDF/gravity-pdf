@@ -240,6 +240,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		] );
 
 		/*  Send to our model to handle validation / authentication */
+		do_action( 'gfpdf_pre_view_or_download_pdf', $lid, $pid, $action );
 		$results = $this->model->process_pdf( $pid, $lid, $action );
 
 		/* if error, display to user */
