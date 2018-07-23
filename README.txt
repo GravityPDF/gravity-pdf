@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.8
 Tested up to: 4.9
-Stable tag: 5.0.0-RC1
+Stable tag: 5.0.0-RC2
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -39,7 +39,7 @@ The plugin ships with four highly-customisable PDF templates perfectly suited fo
 
 = Requirements =
 
-Gravity PDF can be run on most shared web hosting without any issues. It requires **PHP 5.6+** (PHP 7.0+ recommended) and at least 64MB of WP Memory (128MB+ recommended). You'll also need to be running WordPress 4.4+ and have [Gravity Forms 2.3.1+](https://rocketgenius.pxf.io/c/1211356/445235/7938) (affiliate link).
+Gravity PDF can be run on most shared web hosting without any issues. It requires **PHP 5.6+** (PHP 7.0+ recommended) and at least 64MB of WP Memory (128MB+ recommended). You'll also need to be running WordPress 4.8+ and have [Gravity Forms 2.3.1+](https://rocketgenius.pxf.io/c/1211356/445235/7938) (affiliate link).
 
 If you aren't sure Gravity PDF will meet your needs (and haven't got a Gravity Forms license yet) you can [try out the software via our demo site](https://demo.gravitypdf.com).
 
@@ -89,6 +89,9 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 18. Blank Slate provides a print-friendly template focusing solely on the user-submitted data.
 
 == Changelog ==
+
+= 5.0.0-RC2 =
+* Merge in Gravity PDF 4.5 changes (see CHANGELOG.txt)
 
 = 5.0.0-RC1 =
 * Breaking Change: Bump minimum version of Gravity Forms from 1.9 to 2.3.1+

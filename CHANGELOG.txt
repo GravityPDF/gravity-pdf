@@ -1,3 +1,8 @@
+= 4.5.0 =
+* Feature: Added full support for the Gravity Wiz Conditional Logic Date Plugin
+* Feature: Added full support for the Slim Image Cropper for Gravity Forms Plugin
+* Dev Feature: Added additional actions that run before and after PDFs are generated.
+
 = 4.4.0 =
 * Feature: Add native support for Gravity Forms Chained Select
 * Feature: Include Gravity Forms add-on conditional logic in PDF Conditional Logic selector
