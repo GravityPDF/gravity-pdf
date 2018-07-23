@@ -94,6 +94,7 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 * Feature: Added full support for the Gravity Wiz Conditional Logic Date Plugin
 * Feature: Added full support for the Slim Image Cropper for Gravity Forms Plugin
 * Dev Feature: Added additional actions that run before and after PDFs are generated.
+* Bug: Fix Public Access toggle getting hidden incorrectly
 
 = 4.4.0 =
 * Feature: Add native support for Gravity Forms Chained Select
