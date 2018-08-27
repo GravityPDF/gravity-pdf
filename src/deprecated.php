@@ -181,18 +181,6 @@ class PDFRender extends GFPDF_Deprecated_Abstract {
 
 		return $form_id;
 	}
-
-
-	/**
-	 * Create a class alias for our namespaced Mpdf class
-	 *
-	 * @since 5.0
-	 */
-	public static function alias_mpdf() {
-		if ( ! class_exists( 'mPDF' ) ) {
-			class_alias( '\Mpdf\Mpdf', 'mPDF' );
-		}
-	}
 }
 
 /**
