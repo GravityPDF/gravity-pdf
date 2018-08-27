@@ -87,9 +87,11 @@ class Field_Post_Image extends Helper_Abstract_Fields {
 	public function html( $value = '', $label = true ) {
 		$value = $this->value();
 
-		/* Start building image link */
-		$html = '<a href="' . $value['url'] . '" target="_blank">';
-		$html .= '<img width="150" src="' . $value['url'] . '" />';
+		$html = '';
+		if( ! empty( $value['url'] ) ) {
+			$html = '<a href="' . $value['url'] . '" target="_blank">';
+			$html .= '<img width="150" src="' . $value['url'] . '" />';
+		}
 
 		/* Include title / caption / description if needed */
 		if ( ! empty( $value['title'] ) ) {
