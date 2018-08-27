@@ -839,7 +839,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				'A1'  => esc_html__( 'A1 (594 x 841mm)', 'gravity-forms-pdf-extended' ),
 				'A2'  => esc_html__( 'A2 (420 x 594mm)', 'gravity-forms-pdf-extended' ),
 				'A3'  => esc_html__( 'A3 (297 x 420mm)', 'gravity-forms-pdf-extended' ),
-				'A5'  => esc_html__( 'A5 (210 x 297mm)', 'gravity-forms-pdf-extended' ),
+				'A5'  => esc_html__( 'A5 (148 x 210mm)', 'gravity-forms-pdf-extended' ),
 				'A6'  => esc_html__( 'A6 (105 x 148mm)', 'gravity-forms-pdf-extended' ),
 				'A7'  => esc_html__( 'A7 (74 x 105mm)', 'gravity-forms-pdf-extended' ),
 				'A8'  => esc_html__( 'A8 (52 x 74mm)', 'gravity-forms-pdf-extended' ),
