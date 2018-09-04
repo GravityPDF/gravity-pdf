@@ -92,6 +92,10 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 
 = 5.0.0-RC2 =
 * Merge in Gravity PDF 4.5 changes (see CHANGELOG.txt)
+* Fix PHP Notice when Post Image field is blank
+* Correct A5 Label so it correctly references 148 x 210mm
+* Remove unneeded `alias_mpdf` method
+* Change initialisation class from mPDF to Mpdf.
 
 = 5.0.0-RC1 =
 * Breaking Change: Bump minimum version of Gravity Forms from 1.9 to 2.3.1+
