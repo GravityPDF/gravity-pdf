@@ -635,7 +635,7 @@ class Helper_PDF {
 	protected function begin_pdf() {
 		$defaultFontConfig = ( new FontVariables() )->getDefaults();
 
-		$this->mpdf = new mPDF( [
+		$this->mpdf = new Mpdf( [
 			'fontDir' => [
 				$this->data->template_font_location,
 			],
