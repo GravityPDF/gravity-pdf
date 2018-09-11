@@ -18,7 +18,7 @@ Automatically generate, email and download PDF documents with Gravity Forms and 
 
 https://www.youtube.com/watch?v=z8zKKrjmNjY
 
-The plugin ships with four highly-customisable PDF templates perfectly suited for displaying your user’s data. Within seconds you can personalise the documents with your company logo, change the font, size, colour and the paper size. If the templates don't suit, [have one tailor made just for you](https://gravitypdf.com/integration-services/) or [roll your own](https://gravitypdf.com/documentation/v5/developer-start-customising/).
+The plugin ships with four highly-customisable PDF templates perfectly suited for displaying your user’s data. Within seconds you can personalise the documents with your company logo, change the font, size, color and the paper size. If the templates don't suit, [have one tailor made just for you](https://gravitypdf.com/integration-services/) or [roll your own](https://gravitypdf.com/documentation/v5/developer-start-customising/).
 
 > Digital document management with WordPress and Gravity Forms just became a breeze!
 
@@ -29,7 +29,7 @@ The plugin ships with four highly-customisable PDF templates perfectly suited fo
 * Automatically email your PDF when a user completes a form. Have it emailed to people in your organisation, the user, or both. You can also conditionally generate and email the PDF.
 * Using Gravity Forms developer-licensed payment add-ons – like PayPal, Authorize.net or Stripe – you can restrict access to the PDF until after a payment is captured.
 * [Protecting your user’s sensitive information is at the heart of Gravity PDF](https://gravitypdf.com/documentation/v5/user-pdf-security/). The plugin’s security settings give you granular control over who has access to the PDFs generated.
-* Our [JavaScript-powered font manager](https://gravitypdf.com/documentation/v5/user-custom-fonts/) allows you to install and use your favourite fonts. Now you can keep in line with your corporate style guide, or create beautiful PDF typography.
+* Our [JavaScript-powered font manager](https://gravitypdf.com/documentation/v5/user-custom-fonts/) allows you to install and use your favorite fonts. Now you can keep in line with your corporate style guide, or create beautiful PDF typography.
 * [The documentation](https://gravitypdf.com/documentation/v5/user-installation/) has everything from basic install instructions to advanced developer how-to guides. Our friendly team is also on hand to [provide FREE general support](https://gravitypdf.com/support/).
 * PHP, HTML and CSS come easy? [You’ll find creating your own PDF templates a breeze](https://gravitypdf.com/documentation/v5/developer-start-customising/). If not, [we offer PDF design services](https://gravitypdf.com/integration-services/) tailored just for you. We can even auto-fill existing PDFs!
 
@@ -55,7 +55,7 @@ We offer **comprehensive PDF integration services** and do all the PDF developme
 
 All development for Gravity PDF [is handled via GitHub](https://github.com/GravityPDF/gravity-pdf/). Opening new issues and submitting pull requests are welcome.
 
-[Our public roadmap is available on Trello](https://trello.com/b/60YGv1J3/roadmap). We'd love it if you vote and comment on your favourite ideas.
+[Our public roadmap is available on Trello](https://trello.com/b/60YGv1J3/roadmap). We'd love it if you vote and comment on your favorite ideas.
 
 You can also keep up to date with Gravity PDF by [subscribing to our newsletter](https://gravitypdf.com/#signup-top), [following us on Twitter](https://twitter.com/gravitypdf) or [liking us on Facebook](https://www.facebook.com/gravitypdf).
 
@@ -71,7 +71,7 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 
 1. Our on-boarding experience will have you up and running in 5 minutes flat.
 2. Set up the global PDF settings then head straight to configuring your first PDF.
-3. Control the default paper size, PDF template and font/size/colour.
+3. Control the default paper size, PDF template and font/size/color.
 4. Advanced security options give you granular control of PDF access.
 5. Tools like the font manager and custom PDF installer are readily accessible.
 6. Our JavaScript-powered font manager will make using custom fonts a breeze.
@@ -95,7 +95,7 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 * Fix PHP Notice when Post Image field is blank
 * Correct A5 Label so it correctly references 148 x 210mm
 * Remove unneeded `alias_mpdf` method
-* Change initialisation class from mPDF to Mpdf.
+* Change initialization class from mPDF to Mpdf.
 
 = 5.0.0-RC1 =
 * Breaking Change: Bump minimum version of Gravity Forms from 1.9 to 2.3.1+
