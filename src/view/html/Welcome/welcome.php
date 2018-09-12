@@ -59,7 +59,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             </p>
 
 			<p>
-				<?php printf( esc_html__( "Next, you'll want to review %sGravity PDF's General Settings%s which can be found by navigating to %sForms -> Settings -> PDF%s in your WordPress admin area. From here you'll be able to set defaults for paper size, font face, font colour, and select a PDF template – %swe ship with four completely-free layouts%s – which will be used for all new PDFs. There's even an easy-to-use interface for installing custom fonts.", 'gravity-forms-pdf-extended' ), '<a href="' . esc_url( $gfpdf->data->settings_url ) . '">', '</a>', '<code>', '</code>', '<strong>', '</strong>' ); ?>
+				<?php printf( esc_html__( "Next, you'll want to review %sGravity PDF's General Settings%s which can be found by navigating to %sForms -> Settings -> PDF%s in your WordPress admin area. From here you'll be able to set defaults for paper size, font face, font color, and select a PDF template – %swe ship with four completely-free layouts%s – which will be used for all new PDFs. There's even an easy-to-use interface for installing custom fonts.", 'gravity-forms-pdf-extended' ), '<a href="' . esc_url( $gfpdf->data->settings_url ) . '">', '</a>', '<code>', '</code>', '<strong>', '</strong>' ); ?>
 			</p>
 
 			<a href="<?php echo esc_url( $gfpdf->data->settings_url ); ?>" class="button"><?php esc_html_e( 'Configure Settings', 'gravity-forms-pdf-extended' ); ?></a>
