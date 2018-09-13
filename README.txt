@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.8
 Tested up to: 4.9
-Stable tag: 5.0.0-RC2
+Stable tag: 5.0.0
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -90,14 +90,7 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 
 == Changelog ==
 
-= 5.0.0-RC2 =
-* Merge in Gravity PDF 4.5 changes (see CHANGELOG.txt)
-* Fix PHP Notice when Post Image field is blank
-* Correct A5 Label so it correctly references 148 x 210mm
-* Remove unneeded `alias_mpdf` method
-* Change initialization class from mPDF to Mpdf.
-
-= 5.0.0-RC1 =
+= 5.0.0 =
 * Breaking Change: Bump minimum version of Gravity Forms from 1.9 to 2.3.1+
 * Breaking Change: Bump WordPress minimum version from 4.4 to 4.8+
 * Breaking Change: Bump the PHP minimum version from 5.4 to 5.6+
@@ -118,6 +111,9 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 * Dev: Remove the legacy /resources/ directory
 
 * Bug: Fix Chosen Drop Down display issue when WordPress using RTL display [GH#698]
+* Bug: Fix PHP Notice when Post Image field is blank [GH#805]
+* Bug: Correct A5 Label so it correctly references 148 x 210mm [GH#811]
+* Bug: Correct default en_US localization strings [GH#815] (credit Garrett Hyde)
 
 See [CHANGELOG.txt](https://github.com/GravityPDF/gravity-pdf/blob/master/CHANGELOG.txt) for v4 and v3 changelog history.
 
