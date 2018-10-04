@@ -753,7 +753,7 @@ if ( ! class_exists( 'mPDF' ) ) {
 
 				'fontdata' => apply_filters( 'mpdf_font_data', $defaultFontConfig['fontdata'] ),
 
-				'tmpDir' => $data->template_tmp_location . '/mpdf/',
+				'tempDir' => $data->template_tmp_location . 'mpdf',
 
 				'allow_output_buffering' => true,
 				'autoLangToFont'         => true,
