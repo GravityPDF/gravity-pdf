@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.8
 Tested up to: 4.9
-Stable tag: 5.0.0
+Stable tag: 5.0.1
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -89,6 +89,9 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 18. Blank Slate provides a print-friendly template focusing solely on the user-submitted data.
 
 == Changelog ==
+
+= 5.0.1 =
+* Bug: Ensure the mPDF temporary directory is set to the PDF Working Directory `tmp` folder [GH#817]
 
 = 5.0.0 =
 * Breaking Change: Bump minimum version of Gravity Forms from 1.9 to 2.3.1+
