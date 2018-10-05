@@ -92,6 +92,7 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 
 = 5.0.1 =
 * Bug: Ensure the mPDF temporary directory is set to the PDF Working Directory `tmp` folder [GH#817]
+* Bug: Refine the Background Processing description and tooltip text [GH#818]
 
 = 5.0.0 =
 * Breaking Change: Bump minimum version of Gravity Forms from 1.9 to 2.3.1+
