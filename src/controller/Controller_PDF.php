@@ -184,11 +184,6 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 			'notifications',
 		], 9999, 3 ); /* ensure Gravity PDF is one of the last filters to be applied */
 
-		/* Modify mPDF's path locations */
-		add_filter( 'mpdf_tmp_path', [ $this->model, 'mpdf_tmp_path' ] );
-		add_filter( 'mpdf_font_path', [ $this->model, 'mpdf_font_path' ] );
-		add_filter( 'mpdf_fontdata_path', [ $this->model, 'mpdf_tmp_font_path' ] );
-
 		/* Change mPDF settings */
 		add_filter( 'mpdf_font_data', [ $this->model, 'register_custom_font_data_with_mPDF' ] );
 		add_filter( 'mpdf_font_data', [ $this->model, 'add_unregistered_fonts_to_mPDF' ], 20 );

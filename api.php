@@ -639,8 +639,8 @@ final class GPDFAPI {
 			return new WP_Error( 'font_delete_failure', 'There was a problem deleting the font files.' );
 		}
 
-		/* Cleanup our fontdata directory to prevent caching issues with mPDF */
-		$misc->cleanup_dir( $data->template_fontdata_location );
+		/* Cleanup our mPDF directory to prevent caching issues with mPDF */
+		$misc->cleanup_dir( $data->mpdf_tmp_location );
 
 		/* Update the database */
 		unset( $fonts[ $font_id ] );
