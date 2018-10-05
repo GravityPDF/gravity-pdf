@@ -60,6 +60,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @property string  $mpdf_tmp_location               The current path to the mPDF tmp directory (including fonts)
  * @property string  $multisite_template_location     The current path to the multisite PDF working directory
  * @property string  $multisite_template_location_url The current URL to the multisite PDF working directory
+ * @property string  $template_transient_cache        The ID for the template header transient cache
  *
  */
 class Helper_Data {

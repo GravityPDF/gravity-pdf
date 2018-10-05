@@ -186,6 +186,8 @@ class Model_Templates extends Helper_Abstract_Model {
 		/* Cleanup tmp uploaded files */
 		$this->cleanup_template_files( $zip_path );
 
+		$this->templates->flush_template_transient_cache();
+
 		if ( is_wp_error( $results ) ) {
 			/* Internal Server Error */
 			wp_die( '500', 500 );
@@ -240,6 +242,8 @@ class Model_Templates extends Helper_Abstract_Model {
 			/* Bad Request */
 			wp_die( '400', 400 );
 		}
+
+		$this->templates->flush_template_transient_cache();
 
 		header( 'Content-Type: application/json' );
 		echo json_encode( true );
@@ -392,7 +396,7 @@ class Model_Templates extends Helper_Abstract_Model {
 		foreach ( $files as $file ) {
 
 			/* Check if we have a valid v4 template header in the file */
-			$info = get_file_data( $file, $this->templates->get_template_header_details() );
+			$info = $this->templates->get_template_info_by_path( $file );
 
 			if ( ! isset( $info['template'] ) || strlen( $info['template'] ) === 0 ) {
 				/* Check if it's a v3 template */

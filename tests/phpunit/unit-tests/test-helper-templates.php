@@ -375,6 +375,8 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 	 * @since 4.1
 	 */
 	public function test_get_template_headers() {
+		global $gfpdf;
+
 		$header = $this->templates->get_template_info_by_path( PDF_PLUGIN_DIR . 'src/templates/zadani.php' );
 
 		$this->assertEquals( 'Zadani', $header['template'] );
@@ -386,6 +388,15 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 		$this->assertEquals( '4.0-alpha', $header['required_pdf_version'] );
 		$this->assertArrayHasKey( 'tags', $header );
 		$this->assertArrayHasKey( 'screenshot', $header );
+
+		$this->assertCount( 1, get_transient( $gfpdf->data->template_transient_cache ) );
+
+		$this->templates->flush_template_transient_cache();
+
+		$this->assertFalse( get_transient( $gfpdf->data->template_transient_cache ) );
+		$gfpdf->options->update_option( 'debug_mode', 'Yes' );
+		$this->templates->get_template_info_by_path( PDF_PLUGIN_DIR . 'src/templates/zadani.php' );
+		$this->assertFalse( get_transient( $gfpdf->data->template_transient_cache ) );
 	}
 
 	/**
