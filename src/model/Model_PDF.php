@@ -1210,41 +1210,6 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Changes mPDF's tmp folder
-	 *
-	 * @param  string $path The current path
-	 *
-	 * @return string       The new path
-	 */
-	public function mpdf_tmp_path( $path ) {
-		return $this->data->template_tmp_location;
-	}
-
-	/**
-	 * Changes mPDF's fontdata folders
-	 *
-	 * @param  string $path The current path
-	 *
-	 * @return string       The new path
-	 */
-	public function mpdf_tmp_font_path( $path ) {
-		return $this->data->template_fontdata_location;
-	}
-
-	/**
-	 * Change mPDF's font folder
-	 *
-	 * @param $path
-	 *
-	 * @return string
-	 *
-	 * @since 5.0
-	 */
-	public function mpdf_font_path( $path ) {
-		return $this->data->template_font_location;
-	}
-
-	/**
 	 * An mPDF filter which will register our custom font data with mPDF
 	 *
 	 * @param array $fonts The registered fonts

@@ -223,11 +223,10 @@ class Model_Install extends Helper_Abstract_Model {
 		/* See https://gravitypdf.com/documentation/v5/gfpdf_font_location/ for more details about this filter */
 		$this->data->template_font_location = apply_filters( 'gfpdf_font_location', $this->data->template_location . 'fonts/', $working_folder, $upload_dir ); /* can be in a directory not accessible via the web */
 
-		/* @todo normally font and fontdata should be kept together but it may be worth adding a filter here */
-		$this->data->template_fontdata_location = $this->data->template_font_location . 'fontdata/';
-
 		/* See https://gravitypdf.com/documentation/v5/gfpdf_tmp_location/ for more details about this filter */
 		$this->data->template_tmp_location = apply_filters( 'gfpdf_tmp_location', $this->data->template_location . 'tmp/', $working_folder, $upload_dir_url ); /* encouraged to move this to a directory not accessible via the web */
+
+		$this->data->mpdf_tmp_location = $this->data->template_tmp_location . 'mpdf';
 	}
 
 	/**
@@ -291,8 +290,8 @@ class Model_Install extends Helper_Abstract_Model {
 		$folders = [
 			$this->data->template_location,
 			$this->data->template_font_location,
-			$this->data->template_fontdata_location,
 			$this->data->template_tmp_location,
+			$this->data->mpdf_tmp_location,
 		];
 
 		if ( is_multisite() ) {

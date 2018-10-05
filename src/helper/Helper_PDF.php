@@ -642,7 +642,7 @@ class Helper_PDF {
 
 			'fontdata' => apply_filters( 'mpdf_font_data', $defaultFontConfig['fontdata'] ),
 
-			'tempDir' => $this->data->template_tmp_location . 'mpdf',
+			'tempDir' => $this->data->mpdf_tmp_location,
 
 			'allow_output_buffering' => true,
 			'autoLangToFont'         => true,

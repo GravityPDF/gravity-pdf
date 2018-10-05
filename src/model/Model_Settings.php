@@ -414,8 +414,8 @@ class Model_Settings extends Helper_Abstract_Model {
 			/* Update our font database */
 			$this->options->update_option( 'custom_fonts', $custom_fonts );
 
-			/* Cleanup our fontdata directory to prevent caching issues with mPDF */
-			$this->misc->cleanup_dir( $this->data->template_fontdata_location );
+			/* Cleanup the mPDF tmp directory to prevent font caching issues  */
+			$this->misc->cleanup_dir( $this->data->mpdf_tmp_location );
 
 		}
 
@@ -488,8 +488,8 @@ class Model_Settings extends Helper_Abstract_Model {
 			if ( $this->remove_font_file( $fonts[ $id ] ) ) {
 				unset( $fonts[ $id ] );
 
-				/* Cleanup our fontdata directory to prevent caching issues with mPDF */
-				$this->misc->cleanup_dir( $this->data->template_fontdata_location );
+				/* Cleanup the mPDF tmp directory to prevent font caching issues  */
+				$this->misc->cleanup_dir( $this->data->mpdf_tmp_location );
 
 				if ( $this->options->update_option( 'custom_fonts', $fonts ) ) {
 					/* Success */
