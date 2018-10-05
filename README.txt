@@ -117,7 +117,7 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 * Bug: Fix Chosen Drop Down display issue when WordPress using RTL display [GH#698]
 * Bug: Fix PHP Notice when Post Image field is blank [GH#805]
 * Bug: Correct A5 Label so it correctly references 148 x 210mm [GH#811]
-* Bug: Correct default en_US localization strings [GH#815] (credit Garrett Hyde)
+* Bug: Correct default en_US localization strings [GH#815] (credit Garrett Hyder)
 
 See [CHANGELOG.txt](https://github.com/GravityPDF/gravity-pdf/blob/master/CHANGELOG.txt) for v4 and v3 changelog history.
 
