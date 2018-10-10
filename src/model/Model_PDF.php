@@ -1116,7 +1116,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				);
 
 				foreach ( $directory_list as $file ) {
-					if ( in_array( $file->getFilename(), [ '.htaccess', 'index.html' ] ) || strpos( realpath( $file->getPathname() ), realpath( $this->data->mpdf_tmp_location ) ) !== false ) {
+					if ( in_array( $file->getFilename(), [ '.htaccess', 'index.html' ] ) ) {
 						continue;
 					}
 
