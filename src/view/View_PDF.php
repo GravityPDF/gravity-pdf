@@ -453,7 +453,8 @@ class View_PDF extends Helper_Abstract_View {
 		 * Output product table, if needed
 		 * Use the filter 'gfpdf_current_pdf_configuration' to programically disable this functionality
 		 */
-		if ( $show_individual_product_fields === false && ! $products->is_empty() ) {
+		$should_disable_product_table = apply_filters( 'gfpdf_disable_product_table', false, $entry, $form, $config, $products );
+		if ( ! $should_disable_product_table && $show_individual_product_fields === false && ! $products->is_empty() ) {
 			echo $products->html();
 		}
 	}
