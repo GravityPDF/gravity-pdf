@@ -198,8 +198,9 @@ class Field_Products extends Helper_Abstract_Fields {
 
 						<?php if ( class_exists( 'GP_Ecommerce_Fields' ) ):
 							$gpecommerce = \GP_Ecommerce_Fields::get_instance( null );
-							$use_value = (bool) apply_filters( 'gfpdf_show_field_value', false ); /* Set to `true` to show a field's value instead of the label */
-							$order = GFCommon::get_product_fields( $this->form, $this->entry, ! $use_value );
+							$use_value = (bool) apply_filters( 'gfpdf_show_field_value', false, $this->field, '' ); /* Set to `true` to show a field's value instead of the label */
+							$use_admin_label = (bool) apply_filters( 'gfpdf_use_admin_label', false, $this->field, '' ); /* Set to `true` to use the admin label */
+							$order = GFCommon::get_product_fields( $this->form, $this->entry, ! $use_value, $use_admin_label );
 							$order_summary = $gpecommerce->get_order_summary( $order, $this->form, $this->entry );
 							?>
 							<?php foreach ( $order_summary as $index => $group ): ?>
@@ -279,8 +280,9 @@ class Field_Products extends Helper_Abstract_Fields {
 		$lead = $this->entry;
 
 		/* Get all products for this field */
-		$use_value = (bool) apply_filters( 'gfpdf_show_field_value', false ); /* Set to `true` to show a field's value instead of the label */
-		$products = GFCommon::get_product_fields( $form, $lead, ! $use_value );
+		$use_value       = (bool) apply_filters( 'gfpdf_show_field_value', false, $this->field, '' ); /* Set to `true` to show a field's value instead of the label */
+		$use_admin_label = (bool) apply_filters( 'gfpdf_use_admin_label', false, $this->field, '' ); /* Set to `true` to use the admin label */
+		$products = GFCommon::get_product_fields( $form, $lead, ! $use_value, $use_admin_label );
 
 		/* Set up the appropriate varaibles needed for our product processing */
 		$form_array  = []; /* holds the actual product data */
