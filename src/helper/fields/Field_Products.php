@@ -257,7 +257,7 @@ class Field_Products extends Helper_Abstract_Fields {
 
 		<?php
 
-		return ob_get_clean();
+		return apply_filters( 'gfpdf_field_product_value', ob_get_clean(), $products, $this->field, $this->form, $this->entry, $this );
 	}
 
 	/**
