@@ -703,6 +703,8 @@
             if (response.template_type) {
               self.toggleFontAppearance(response.template_type)
             }
+
+            $(document).trigger('gfpdf_template_loaded', [response])
           })
         })
       }
