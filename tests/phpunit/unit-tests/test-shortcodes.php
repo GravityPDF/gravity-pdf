@@ -92,7 +92,7 @@ class Test_Shortcode extends WP_UnitTestCase {
 
 		$options                              = $gfpdf->options;
 		$settings                             = $options->get_settings();
-		$settings['shortcode_debug_messages'] = 'Yes';
+		$settings['debug_mode'] = 'Yes';
 		$options->update_settings( $settings );
 	}
 
@@ -196,7 +196,7 @@ class Test_Shortcode extends WP_UnitTestCase {
 		global $gfpdf;
 		$options                              = $gfpdf->options;
 		$settings                             = $options->get_settings();
-		$settings['shortcode_debug_messages'] = 'No';
+		$settings['debug_mode'] = 'No';
 		$options->update_settings( $settings );
 
 		$this->assertFalse( strpos( $this->model->gravitypdf( [ 'id' => '556690c67856b' ] ), '<pre class="gravitypdf-error">' ) );

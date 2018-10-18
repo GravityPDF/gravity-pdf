@@ -379,12 +379,26 @@ class Helper_Templates {
 	 * Gets the PDF template header information and returns it in a parsed format
 	 *
 	 * @param string $template_path The full path to the PDF template file
+	 * @param string $cache_name    The ID of the transient we should check first
+	 * @param int    $cache_time    How long in microseconds until the transient expires (default 1 week)
 	 *
 	 * @return array
 	 *
 	 * @since 4.1
 	 */
-	public function get_template_info_by_path( $template_path ) {
+	public function get_template_info_by_path( $template_path, $cache_name = '', $cache_time = 604800 ) {
+		$options = \GPDFAPI::get_options_class();
+		$debug   = $options->get_option( 'debug_mode', 'No' );
+
+		if ( $debug === 'No' ) {
+			$cache_name = ! empty( $cache_name ) ? $cache_name : $this->data->template_transient_cache;
+			$cache      = get_transient( $cache_name );
+
+			if ( isset( $cache[ $template_path ] ) ) {
+				return $cache[ $template_path ];
+			}
+		}
+
 		$info = get_file_data( $template_path, $this->get_template_header_details() );
 
 		$info['id']                   = basename( $template_path, '.php' );
@@ -399,7 +413,24 @@ class Helper_Templates {
 		$info['screenshot']           = $this->get_template_image( $info['id'] );
 		$info['required_pdf_version'] = ( strlen( 'required_pdf_version' ) > 0 ) ? $info['required_pdf_version'] : '4.0';
 
+		/* Save the results to a transient so we don't hit the disk every page load */
+		if ( $debug === 'No' ) {
+			$cache                   = is_array( $cache ) ? $cache : [];
+			$cache[ $template_path ] = $info;
+
+			set_transient( $cache_name, $cache, $cache_time );
+		}
+
 		return $info;
+	}
+
+	/**
+	 * Flush the template transient cache, when required
+	 *
+	 * @since 5.1
+	 */
+	public function flush_template_transient_cache() {
+		delete_transient( $this->data->template_transient_cache );
 	}
 
 	/**

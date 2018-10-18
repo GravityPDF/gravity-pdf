@@ -314,8 +314,6 @@ class Helper_PDF {
 		$this->mpdf = apply_filters( 'gfpdfe_pre_render_pdf', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() );
 		$this->mpdf = apply_filters( 'gfpdfe_mpdf_class', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() );
 
-		$this->maybe_add_stats();
-
 		/* If a developer decides to disable all security protocols we don't want the PDF indexed */
 		if ( ! headers_sent() ) {
 			header( 'X-Robots-Tag: noindex, nofollow', true );
@@ -971,19 +969,6 @@ class Helper_PDF {
 	protected function prevent_caching() {
 		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
 			define( 'DONOTCACHEPAGE', true );
-		}
-	}
-
-	/**
-	 * Add PDF stats to end of document if WP_DEBUG_DISPLAY is set to `true`
-	 *
-	 * @since 5.0
-	 */
-	protected function maybe_add_stats() {
-		if ( defined( 'WP_DEBUG' ) && defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG && WP_DEBUG_DISPLAY ) {
-			$this->mpdf->WriteHTML( '<div>Generated in ' . sprintf( '%.2F', ( microtime( true ) - $this->mpdf->time0 ) ) . ' seconds</div>' );
-			$this->mpdf->WriteHTML( '<div>Peak Memory usage ' . number_format( ( memory_get_peak_usage( true ) / ( 1024 * 1024 ) ), 2 ) . ' MB</div>' );
-			$this->mpdf->WriteHTML( '<div>Number of fonts ' . count( $this->mpdf->fonts ) . '</div>' );
 		}
 	}
 }

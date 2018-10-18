@@ -231,6 +231,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->actions();
 		$this->template_manager();
 		$this->load_core_font_handler();
+		$this->load_debug();
 
 		/* Add localisation support */
 		$this->add_localization_support();
@@ -449,7 +450,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 			/* add media uploader */
 			wp_enqueue_media();
-			
 			wp_enqueue_script( 'gfpdf_js_entrypoint' );
 
 			/* Load TinyMCE styles */
@@ -862,6 +862,21 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function load_core_font_handler() {
 		$view  = new View\View_Save_Core_Fonts( [] );
 		$class = new Controller\Controller_Save_Core_Fonts( $view, $this->log, $this->data, $this->misc );
+
+		$class->init();
+
+		$this->singleton->add_class( $class );
+	}
+
+	/**
+	 * Initialise our debug code
+	 *
+	 * @since 5.1
+	 *
+	 * @return void
+	 */
+	public function load_debug() {
+		$class = new Controller\Controller_Debug( $this->data, $this->options, $this->templates );
 
 		$class->init();
 

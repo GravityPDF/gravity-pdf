@@ -182,7 +182,8 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 		$this->data->working_folder = $this->model->get_working_directory();
 		$this->data->settings_url   = $this->model->get_settings_url();
 
-		$this->data->memory_limit = ini_get( 'memory_limit' );
+		$this->data->memory_limit             = ini_get( 'memory_limit' );
+		$this->data->template_transient_cache = 'gfpdf_template_info';
 
 		$upload_details             = $this->misc->get_upload_details();
 		$this->data->upload_dir     = $upload_details['path'];

@@ -125,8 +125,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	public function gravitypdf( $attributes ) {
 		$controller = $this->getController();
 
-		$global_settings                  = $this->options->get_settings();
-		$shortcode_error_messages_enabled = ( isset( $global_settings['shortcode_debug_messages'] ) && $global_settings['shortcode_debug_messages'] === 'Yes' ) ? true : false;
+		$shortcode_error_messages_enabled = ( $this->options->get_option( 'debug_mode', 'No' ) === 'Yes' ) ? true : false;
 		$has_view_permissions             = ( $shortcode_error_messages_enabled && $this->gform->has_capability( 'gravityforms_view_entries' ) );
 
 		/* merge in any missing defaults */

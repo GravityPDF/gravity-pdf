@@ -178,24 +178,24 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'desc'    => sprintf( esc_html__( 'When enable, form submission and resending notifications with PDFs are handled in a background task. %sRequires Background tasks to be enabled%s.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/background-processing/">', '</a>' ),
 						'type'    => 'radio',
 						'options' => [
-							'Enable'  => esc_html__( 'Enable', 'gravity-forms-pdf-extended' ),
-							'Disable' => esc_html__( 'Disable', 'gravity-forms-pdf-extended' ),
+							'Enable'  => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
+							'Disable' => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
 						],
 						'std'     => 'Disable',
 						'tooltip' => '<h6>' . esc_html__( 'Background Processing', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'When enabled, reduce wait time during form submission as PDF generation is off-loaded to a background process. It is important to ensure Background Tasks are enabled in the Gravity Forms System Status before enabling this feature.', 'gravity-forms-pdf-extended' ),
 					],
 
-					'shortcode_debug_messages' => [
-						'id'      => 'shortcode_debug_messages',
-						'name'    => esc_html__( 'Shortcode Debug Message', 'gravity-forms-pdf-extended' ),
+					'debug_mode' => [
+						'id'      => 'debug_mode',
+						'name'    => esc_html__( 'Debug Mode', 'gravity-forms-pdf-extended' ),
 						'type'    => 'radio',
 						'options' => [
-							'Yes' => esc_html__( 'Enable', 'gravity-forms-pdf-extended' ),
-							'No'  => esc_html__( 'Disable', 'gravity-forms-pdf-extended' ),
+							'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
+							'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
 						],
 						'std'     => 'No',
-						'desc'    => esc_html__( 'When enabled and an error occurs, admins will be shown an error message in place of the shortcode.' ),
-						'tooltip' => '<h6>' . esc_html__( 'Shortcode Debug Message', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'Users with the %sgravityforms_view_entries%s capability (the Administrator Role by default) will be shown debug messages when the [gravitypdf] shortcode cannot be generated. When disabled, no content is shown with an error.' ), '<code>', '</code>' ),
+						'desc'    => esc_html__( 'When enabled, debug information will be displayed on-screen for core features.' ),
+						'tooltip' => '<h6>' . esc_html__( 'Debug Mode', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'When enabled, template caching is turned off and flushed, shortcode errors will be displayed on-screen and generation statistics will be included in PDFs.' ),
 					],
 				]
 			),
