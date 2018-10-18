@@ -196,6 +196,15 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
     .pagebreak {
         page-break-before: always;
     }
+
+	/* Consent Field */
+	.consent-text {
+		font-size: 85%;
+	}
+
+	.consent-tick {
+		font-size: 150%;
+	}
 </style>
 
 <?php if ( ! empty($first_header) ) : ?>
