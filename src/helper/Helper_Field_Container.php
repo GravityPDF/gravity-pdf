@@ -166,10 +166,6 @@ class Helper_Field_Container {
 			$this->row_stopper_classes = $config['row_stopper_classes'];
 		}
 
-		if ( isset( $config['class_map'] ) ) {
-			$this->class_map = $config['class_map'];
-		}
-
 		$this->open_tag            = apply_filters( 'gfpdf_container_open_tag', $this->open_tag );
 		$this->close_tag           = apply_filters( 'gfpdf_container_close_tag', $this->close_tag );
 		$this->skip_fields         = apply_filters( 'gfpdf_container_skip_fields', $this->skip_fields );

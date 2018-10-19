@@ -1352,7 +1352,6 @@ class Model_PDF extends Helper_Abstract_Model {
 		$order = apply_filters( 'gfpdf_form_data_key_order', [
 			'misc',
 			'field',
-			'repeater',
 			'list',
 			'signature_details_id',
 			'products',
