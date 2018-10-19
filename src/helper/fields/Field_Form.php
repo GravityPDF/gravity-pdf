@@ -103,9 +103,7 @@ class Field_Form extends Helper_Abstract_Fields {
 			}
 
 			/* Output the entry HTML mark-up */
-			$html .= '<div class="row-separator nested-form">';
 			$html .= parent::html( $this->get_repeater_html( $form, $entry ) );
-			$html .= '</div>';
 		}
 
 		return $html;

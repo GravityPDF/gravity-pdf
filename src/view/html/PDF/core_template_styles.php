@@ -198,12 +198,15 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
     }
 
 	/* Consent Field */
-	.consent-text,
+	.consent-text {
+		font-size: 85%;
+	}
+
 	.consent-text a,
 	.consent-text li,
 	.consent-text td,
 	.consent-text th {
-		font-size: 85%;
+		font-size: 100%;
 	}
 
 	.consent-tick {
@@ -211,6 +214,11 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
 	}
 
 	/* Repeater */
+	.gfpdf-repeater,
+	.gfpdf-form {
+		margin-bottom: 1.5%;
+	}
+
 	.repeater-container {
 		margin: 1% 0;
 		padding-left: 2%;

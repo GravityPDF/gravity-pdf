@@ -144,7 +144,7 @@ class Field_Repeater extends Helper_Abstract_Fields {
 
 		ob_start();
 		$this->get_repeater_html( $value, $this->field );
-		return parent::html( ob_get_clean() );
+		return ob_get_clean();
 	}
 
 	/**
@@ -156,17 +156,22 @@ class Field_Repeater extends Helper_Abstract_Fields {
 	 * @since 5.1
 	 */
 	public function get_repeater_html( $value, $field ) {
-		$container = new Helper_Field_Container();
-		$pdf_model = \GPDFAPI::get_mvc_class( 'Model_PDF' );
-		$products  = new Field_Products( new \GF_Field(), $this->entry, $this->gform, $this->misc );
+		$is_top_level = $field === $this->field;
+		$container    = new Helper_Field_Container();
+		$pdf_model    = \GPDFAPI::get_mvc_class( 'Model_PDF' );
+		$products     = new Field_Products( new \GF_Field(), $this->entry, $this->gform, $this->misc );
 
 		/* Output the Repeater Label if a sub Repeater */
-		if ( $field !== $this->field ) {
+		if ( ! $is_top_level ) {
 			echo sprintf( '<div class="gfpdf-section-title"><h3>%s</h3></div>', $field->label );
 		}
 
 		/* Loop through the entry data for the current repeater */
 		foreach ( $value as $item ) {
+			if ( $is_top_level ) {
+				ob_start();
+			}
+
 			$item = $this->add_form_entry_ids( $item );
 
 			/* Loop through the Repeater fields */
@@ -191,6 +196,10 @@ class Field_Repeater extends Helper_Abstract_Fields {
 					echo $class->html();
 					$container->close( $sub_field );
 				}
+			}
+
+			if ( $is_top_level ) {
+				echo parent::html( ob_get_clean() );
 			}
 		}
 	}
