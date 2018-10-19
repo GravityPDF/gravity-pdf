@@ -205,6 +205,13 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
 	.consent-tick {
 		font-size: 150%;
 	}
+
+	/* Repeater */
+	.repeater-container {
+		margin: 1% 0;
+		padding-left: 2%;
+		border-left: 1px solid #000;
+	}
 </style>
 
 <?php if ( ! empty($first_header) ) : ?>
