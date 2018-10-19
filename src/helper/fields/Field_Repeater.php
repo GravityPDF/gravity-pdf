@@ -156,7 +156,7 @@ class Field_Repeater extends Helper_Abstract_Fields {
 	 * @since 5.1
 	 */
 	public function get_repeater_html( $value, $field ) {
-		$container = new Helper_Field_Container( [ 'class_map' => [] ] );
+		$container = new Helper_Field_Container();
 		$pdf_model = \GPDFAPI::get_mvc_class( 'Model_PDF' );
 		$products  = new Field_Products( new \GF_Field(), $this->entry, $this->gform, $this->misc );
 
@@ -186,6 +186,7 @@ class Field_Repeater extends Helper_Abstract_Fields {
 				/* Output a field using the standard method if not empty */
 				$class = $pdf_model->get_field_class( $sub_field, $this->form, $item, $products );
 				if ( ! $class->is_empty() ) {
+					$field->cssClass = '';
 					$container->generate( $sub_field );
 					echo $class->html();
 					$container->close( $sub_field );
