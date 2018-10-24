@@ -1640,6 +1640,14 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	private function get_addon_global_data( $form, $options, $fields ) {
+
+		/**
+		 * @since 5.1
+		 */
+		if ( apply_filters( 'gfpdf_disable_global_addon_data', false, $form, $options, $fields ) ) {
+			return [];
+		}
+
 		/* If the results class isn't loaded, load it */
 		if ( ! class_exists( 'GFResults' ) ) {
 			require_once( GFCommon::get_base_path() . '/includes/addon/class-gf-results.php' );
