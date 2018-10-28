@@ -828,7 +828,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 		/*
          * Run our tests...
          */
-		$response = '<p>This is a HTML block</p>';
+		$response = 'This is a HTML block';
 
 		$this->assertEquals( $response, trim( $data['html'][0] ) );
 		$this->assertEquals( $response, trim( $data['html_id'][9] ) );
