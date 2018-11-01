@@ -1079,8 +1079,10 @@ class Test_PDF extends WP_UnitTestCase {
 		$tmp_save = $gfpdf->data->template_tmp_location;
 		$gfpdf->data->template_tmp_location = $gfpdf->data->template_location . 'tmp/';
 		$tmp = $gfpdf->data->template_tmp_location;
+		$gfpdf->data->mpdf_tmp_location = $tmp . 'mpdf';
 
 		wp_mkdir_p( $tmp );
+		wp_mkdir_p( $gfpdf->data->mpdf_tmp_location );
 
 		/* Create our files to test */
 		$files = [
@@ -1091,6 +1093,7 @@ class Test_PDF extends WP_UnitTestCase {
 			'test5'     => time() - ( 15 * 3600 ),
 			'test6'     => time() - ( 5 * 3600 ),
 			'.htaccess' => time() - ( 48 * 3600 ),
+			'mpdf/test' => time() - ( 25 * 3600 ), /* normally deleted, but excluded */
 		];
 
 		foreach ( $files as $file => $modified ) {
@@ -1107,6 +1110,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertTrue( is_file( $tmp . 'test5' ) );
 		$this->assertTrue( is_file( $tmp . 'test6' ) );
 		$this->assertTrue( is_file( $tmp . '.htaccess' ) );
+		$this->assertTrue( is_file( $tmp . 'mpdf/test' ) );
 
 		/* Cleanup our files */
 		foreach ( $files as $file => $modified ) {
