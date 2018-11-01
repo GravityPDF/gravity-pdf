@@ -293,12 +293,13 @@ class Model_Install extends Helper_Abstract_Model {
 			$this->data->template_location,
 			$this->data->template_font_location,
 			$this->data->template_tmp_location,
-			$this->data->mpdf_tmp_location,
 		];
 
 		if ( is_multisite() ) {
 			$folders[] = $this->data->multisite_template_location;
 		}
+
+		$folders = $this->pre_test_mpdf_tmp_location($folders);
 
 		/* allow other plugins to add their own folders which should be checked */
 		$folders = apply_filters( 'gfpdf_installer_create_folders', $folders );
@@ -341,6 +342,37 @@ class Model_Install extends Helper_Abstract_Model {
 				file_put_contents( $this->data->template_tmp_location . '.htaccess', 'deny from all' );
 			}
 		}
+	}
+
+	/**
+	 * Test that the mPDF tmp directory is writable, otherwise fallback to standard tmp folder.
+	 *
+	 * @Internal Some hosts prevent writing PHP files to the PHP tmp directory, and this just adds a quick fallback
+	 *
+	 * @param array $folders
+	 *
+	 * @return array
+	 *
+	 * @since 5.1
+	 */
+	public function pre_test_mpdf_tmp_location($folders) {
+		wp_mkdir_p( $this->data->mpdf_tmp_location );
+		$mpdf_tmp_test_file = $this->data->mpdf_tmp_location . '/tmp_directory_test.php';
+
+		if (
+			! is_dir( $this->data->mpdf_tmp_location ) ||
+			file_put_contents( $mpdf_tmp_test_file, 'pass-if-read' ) === false ||
+			file_get_contents( $mpdf_tmp_test_file ) !== 'pass-if-read'
+		) {
+			$this->data->mpdf_tmp_location = $this->data->template_tmp_location . 'mpdf';
+			$folders[] = $this->data->mpdf_tmp_location;
+		}
+
+		if ( is_file( $mpdf_tmp_test_file ) ) {
+			unlink( $mpdf_tmp_test_file );
+		}
+
+		return $folders;
 	}
 
 	/**
