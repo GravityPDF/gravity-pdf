@@ -566,17 +566,17 @@ abstract class Helper_Abstract_Addon {
 		$possible_responses = $this->data->addon_license_responses( $this->get_name() );
 
 		/* Ensure we have a known error */
-		if ( ! isset( $license_check->error ) || ! isset( $possible_responses[ $license_check->error ] ) ) {
+		if ( ! isset( $license_check->license ) || ! isset( $possible_responses[ $license_check->license ] ) ) {
 			$this->log->error( 'Unknown license status returned from remote API' );
 
 			return false;
 		}
 
-		$license_info['status']  = $license_check->error;
-		$license_info['message'] = $possible_responses[ $license_check->error ];
+		$license_info['status']  = $license_check->license;
+		$license_info['message'] = $possible_responses[ $license_check->license ];
 
 		/* Include the expiry date if license expired */
-		if ( $license_check->error === 'expired' ) {
+		if ( $license_check->license === 'expired' ) {
 			$license_info['message'] = sprintf( $license_info['message'], date_i18n( get_option( 'date_format' ), strtotime( $license_check->expires, current_time( 'timestamp' ) ) ) );
 		}
 

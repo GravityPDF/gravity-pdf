@@ -254,7 +254,7 @@ class Test_Addon extends WP_UnitTestCase {
 		$ApiResponse = function() {
 			return [
 				'response' => [ 'code' => 200 ],
-				'body'     => json_encode( [ 'error' => 'revoked' ] ),
+				'body'     => json_encode( [ 'license' => 'revoked' ] ),
 			];
 		};
 
