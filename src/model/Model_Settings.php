@@ -861,15 +861,28 @@ class Model_Settings extends Helper_Abstract_Model {
 		/* Get the required details */
 		$addon_slug = ( isset( $_POST['addon_name'] ) ) ? $_POST['addon_name'] : '';
 		$license    = ( isset( $_POST['license'] ) ) ? $_POST['license'] : '';
+		$addon      = ( isset( $this->data->addon[ $addon_slug ] ) ) ? $this->data->addon[ $addon_slug ] : false;
 
 		/* Check add-on currently installed */
-		if ( isset( $this->data->addon[ $addon_slug ] ) && $this->deactivate_license_key( $this->data->addon[ $addon_slug ], $license ) ) {
-			$this->log->addNotice( 'AJAX – Successfully Deactivated License' );
-			echo json_encode( [
-				'success' => esc_html__( 'License deactivated.', 'gravity-forms-pdf-extended' ) ]
-			);
+		if ( ! empty( $addon ) ) {
+			if ( $this->deactivate_license_key( $addon, $license ) ) {
+				$this->log->addNotice( 'AJAX – Successfully Deactivated License' );
+				echo json_encode( [
+						'success' => esc_html__( 'License deactivated.', 'gravity-forms-pdf-extended' ),
+					]
+				);
 
-			wp_die();
+				wp_die();
+			} elseif( $addon->schedule_license_check() ) {
+				$license_info = $addon->get_license_info();
+
+				echo json_encode( [
+						'error' => $license_info['message'],
+					]
+				);
+
+				wp_die();
+			}
 		}
 
 		$this->log->addError( 'AJAX Endpoint Error' );
@@ -911,7 +924,6 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		/* Get API response and check license is now deactivated */
 		$license_data = json_decode( wp_remote_retrieve_body( $response ) );
-
 		if ( ! isset( $license_data->license ) || $license_data->license !== 'deactivated' ) {
 			return false;
 		}
