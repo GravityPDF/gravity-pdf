@@ -162,7 +162,9 @@ class Field_Option extends Helper_Abstract_Field_Products {
 
 		if ( isset( $data['products'][ $this->field->productField ]['options'] ) ) {
 			$this->cache( [
-				'options' => $data['products'][ $this->field->productField ]['options'],
+				'options' => array_filter( $data['products'][ $this->field->productField ]['options'], function( $option ) {
+					return ! isset( $option['id'] ) || $option['id'] === $this->field->id;
+				}),
 			] );
 		} else {
 			$this->cache( [] );
