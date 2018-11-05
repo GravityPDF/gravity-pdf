@@ -15,7 +15,10 @@ use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
+use GFPDF\Helper\Helper_Sha256_Url_Signer;
 use GFPDF\Helper\Helper_Templates;
+
+use Spatie\UrlSigner\Exceptions\InvalidSignatureKey;
 
 use Psr\Log\LoggerInterface;
 
@@ -312,6 +315,41 @@ class Model_PDF extends Helper_Abstract_Model {
 			remove_filter( 'gfpdf_pdf_middleware', [ $this, 'middle_logged_out_timeout' ], 50 );
 			remove_filter( 'gfpdf_pdf_middleware', [ $this, 'middle_auth_logged_out_user' ], 60 );
 			remove_filter( 'gfpdf_pdf_middleware', [ $this, 'middle_user_capability' ], 70 );
+		}
+
+		return $action;
+	}
+
+	/**
+	 * Check if a signed URL exists and validate. If it passes, disable the remaining middleware capabilities
+	 *
+	 * @param  boolean|object $action
+	 * @param  array          $entry    The Gravity Forms Entry
+	 * @param  array          $settings The Gravity Form PDF Settings
+	 *
+	 * @return boolean|object
+	 *
+	 * @since 5.1
+	 */
+	public function middle_signed_url_access( $action, $entry, $settings ) {
+
+		if ( isset( $_GET['expires'] ) && isset( $_GET['signature'] ) && isset( $_SERVER['REQUEST_URI'] ) ) {
+			$secret_key = $this->options->get_option( 'signed_secret_token', '' );
+
+			try {
+				$url_signer = new Helper_Sha256_Url_Signer( $secret_key );
+
+				$home_url = untrailingslashit( strtok( home_url(), '?' ) );
+				if ( $url_signer->validate($home_url . $_SERVER['REQUEST_URI'] ) ) {
+					remove_filter( 'gfpdf_pdf_middleware', [ $this, 'middle_owner_restriction' ], 40 );
+					remove_filter( 'gfpdf_pdf_middleware', [ $this, 'middle_logged_out_timeout' ], 50 );
+					remove_filter( 'gfpdf_pdf_middleware', [ $this, 'middle_auth_logged_out_user' ], 60 );
+					remove_filter( 'gfpdf_pdf_middleware', [ $this, 'middle_user_capability' ], 70 );
+				}
+
+			} catch ( InvalidSignatureKey $e ) {
+
+			}
 		}
 
 		return $action;

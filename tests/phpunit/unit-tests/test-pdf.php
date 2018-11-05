@@ -156,6 +156,7 @@ class Test_PDF extends WP_UnitTestCase {
 		global $gfpdf;
 
 		$this->assertSame( 10, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_public_access' ] ) );
+		$this->assertSame( 15, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_signed_url_access' ] ) );
 		$this->assertSame( 20, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_active' ] ) );
 		$this->assertSame( 30, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_conditional' ] ) );
 		$this->assertSame( 40, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_owner_restriction' ] ) );
@@ -342,6 +343,45 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertFalse( has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_auth_logged_out_user' ] ) );
 		$this->assertFalse( has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_user_capability' ] ) );
 
+	}
+
+	/**
+	 * Test the URL signing middleware works as expected
+	 *
+	 * @since 5.1
+	 */
+	public function test_middle_signed_url_access() {
+		/* Setup some test data */
+		$results          = $this->create_form_and_entries();
+		$entry            = $results['entry'];
+		$entry['form_id'] = $results['form']['id'];
+		$options = \GPDFAPI::get_options_class();
+
+		/* Test it does nothing by default */
+		$this->model->middle_signed_url_access( '', '', '' );
+
+		$this->assertSame( 20, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_active' ] ) );
+		$this->assertSame( 30, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_conditional' ] ) );
+		$this->assertSame( 40, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_owner_restriction' ] ) );
+		$this->assertSame( 50, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_logged_out_timeout' ] ) );
+		$this->assertSame( 60, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_auth_logged_out_user' ] ) );
+		$this->assertSame( 70, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_user_capability' ] ) );
+
+		/* Generate a signed URL and verify it validates */
+		$url = do_shortcode( '[gravitypdf id="556690c67856b" entry="' . $entry['id'] . '" raw="1" signed="1"]' );
+		$options->set_plugin_settings();
+		$_GET['expires']        = '';
+		$_GET['signature']      = '';
+		$_SERVER['REQUEST_URI'] = str_replace( home_url(), '', $url );
+
+		$this->model->middle_signed_url_access( '', '', '' );
+
+		$this->assertSame( 20, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_active' ] ) );
+		$this->assertSame( 30, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_conditional' ] ) );
+		$this->assertFalse( has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_owner_restriction' ] ) );
+		$this->assertFalse( has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_logged_out_timeout' ] ) );
+		$this->assertFalse( has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_auth_logged_out_user' ] ) );
+		$this->assertFalse( has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_user_capability' ] ) );
 	}
 
 	/**
