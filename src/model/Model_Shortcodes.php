@@ -142,13 +142,6 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		/* See https://gravitypdf.com/documentation/v5/gfpdf_gravityforms_shortcode_attributes/ for more information about this filter */
 		$attributes = apply_filters( 'gfpdf_gravityforms_shortcode_attributes', $attributes );
 
-		/* Add Shortcake preview support */
-		if ( defined( 'SHORTCODE_UI_DOING_PREVIEW' ) && SHORTCODE_UI_DOING_PREVIEW === true ) {
-			$attributes['url'] = '#';
-
-			return $controller->view->display_gravitypdf_shortcode( $attributes );
-		}
-
 		/* Check if we have an entry ID, otherwise check the GET and POST data */
 		if ( empty( $attributes['entry'] ) ) {
 			if ( isset( $_GET['lid'] ) || isset( $_GET['entry'] ) ) {
