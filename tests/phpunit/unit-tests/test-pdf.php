@@ -432,6 +432,13 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertTrue( $this->model->is_current_pdf_owner( $entry, 'logged_out' ) );
 		$this->assertFalse( $this->model->is_current_pdf_owner( $entry, 'logged_in' ) );
 
+		/* IP matches server */
+		$entry['ip']            = '10.0.0.1';
+		$_SERVER['SERVER_ADDR'] = $entry['ip'];
+		$_SERVER['REMOTE_ADDR'] = '10.0.0.10';
+
+		$this->assertFalse( $this->model->is_current_pdf_owner( $entry ) );
+
 		wp_set_current_user( 0 );
 	}
 
