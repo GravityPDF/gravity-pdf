@@ -1356,6 +1356,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			'signature_details_id',
 			'products',
 			'products_totals',
+			'repeater',
 			'poll',
 			'survey',
 			'quiz',

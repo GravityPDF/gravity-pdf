@@ -108,21 +108,21 @@ class Field_Repeater extends Helper_Abstract_Fields {
 		$pdf_model = \GPDFAPI::get_mvc_class( 'Model_PDF' );
 		$products  = new Field_Products( new \GF_Field(), $this->entry, $this->gform, $this->misc );
 
-		foreach ( $value as $item ) {
+		foreach ( $value as $id => $item ) {
 			$item = $this->add_form_entry_ids( $item );
 
 			/* Loop through the Repeater fields */
 			foreach ( $field->fields as $sub_field ) {
 				if ( $sub_field instanceof GF_Field_Repeater ) {
 					if ( isset( $item[ $sub_field->id ] ) ) {
-						$data = array_replace_recursive( $data, [ $sub_field->id => $this->get_repeater_form_data( $data, $item[ $sub_field->id ], $sub_field ) ] );
+						$data = array_replace_recursive( $data, [ $id => [ $sub_field->id => $this->get_repeater_form_data( [], $item[ $sub_field->id ], $sub_field ) ] ] );
 					}
 					continue;
 				}
 
 				$class     = $pdf_model->get_field_class( $sub_field, $this->form, $item, $products );
 				$form_data = $class->form_data();
-				$data      = array_replace_recursive( $data, $form_data['field'] );
+				$data      = array_replace_recursive( $data, [ $id => $form_data['field'] ] );
 			}
 		}
 
@@ -176,6 +176,8 @@ class Field_Repeater extends Helper_Abstract_Fields {
 
 			/* Loop through the Repeater fields */
 			foreach ( $field->fields as $sub_field ) {
+				$sub_field = \GF_Fields::create($sub_field);
+
 				if ( $sub_field instanceof GF_Field_Repeater ) {
 
 					/* Only recursively output if a value exists */

@@ -1537,4 +1537,60 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( 860.25, $totals['total'] );
 		$this->assertEquals( '860,25 &#8364;', $totals['total_formatted'] );
 	}
+
+	/**
+	 * Test the Gravity Forms Consent field form data
+	 */
+	public function test_consent_field_data() {
+		$form  = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/repeater-consent-form.json' ) ), true );
+		$entry = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/repeater-consent-entry.json' ) ), true );
+
+		$form_id          = GFAPI::add_form( $form );
+		$entry['form_id'] = $form_id;
+		$entry_id         = GFAPI::add_entry( $entry );
+
+		$form_data = \GPDFAPI::get_form_data( $entry_id );
+
+		$this->assertEquals( 1, $form_data['field'][19]['value'] );
+		$this->assertEquals( 'I agree to the privacy policy.', $form_data['field'][19]['label'] );
+		$this->assertEquals( "<p>This is the consent description text.</p>\n", $form_data['field'][19]['description'] );
+	}
+
+	/**
+	 * Test the Gravity Forms Repeater field form data
+	 */
+	public function test_repeater_field_data() {
+		$form  = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/repeater-consent-form.json' ) ), true );
+		$entry = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/repeater-consent-entry.json' ) ), true );
+
+		$form_id          = GFAPI::add_form( $form );
+		$entry['form_id'] = $form_id;
+		$entry_id         = GFAPI::add_entry( $entry );
+
+		$form_data = \GPDFAPI::get_form_data( $entry_id );
+
+		$this->assertEquals( 'Simon', $form_data['repeater'][999][0][15]['first'] );
+		$this->assertEquals( 'Wiseman', $form_data['repeater'][999][0][15]['last'] );
+		$this->assertEquals( 'simon@test.com', $form_data['repeater'][999][0][16] );
+
+		$this->assertEquals( 'Builder', $form_data['repeater'][999][0][99][0][200] );
+		$this->assertEquals( '5', $form_data['repeater'][999][0][99][0][201] );
+
+		$this->assertEquals( 'www.test.com', $form_data['repeater'][999][0][99][0][88][0][202] );
+		$this->assertEquals( 'www.test1.com', $form_data['repeater'][999][0][99][0][88][1][202] );
+		$this->assertEquals( 'www.test2.com', $form_data['repeater'][999][0][99][0][88][2][202] );
+
+		$this->assertEquals( 'Painter', $form_data['repeater'][999][0][99][1][200] );
+		$this->assertEquals( '3', $form_data['repeater'][999][0][99][1][201] );
+
+		$this->assertEquals( 'Geoff', $form_data['repeater'][999][1][15]['first'] );
+		$this->assertEquals( 'Simpson', $form_data['repeater'][999][1][15]['last'] );
+		$this->assertEquals( 'geoff@test.com', $form_data['repeater'][999][1][16] );
+
+		$this->assertEquals( 'Bricklayer', $form_data['repeater'][999][1][99][0][200] );
+		$this->assertEquals( '10', $form_data['repeater'][999][1][99][0][201] );
+
+		$this->assertEquals( 'www.test.com', $form_data['repeater'][999][1][99][0][88][0][202] );
+		$this->assertEquals( 'www.test2.com', $form_data['repeater'][999][1][99][0][88][1][202] );
+	}
 }
