@@ -89,14 +89,8 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 	 * @return void
 	 */
 	public function init() {
-
 		$this->add_filters();
 		$this->add_shortcodes();
-
-		/* Add support for the new shortcake UI currently being considered for core integration */
-		if ( is_admin() ) {
-			$this->add_shortcake_support();
-		}
 	}
 
 	/**
@@ -126,74 +120,5 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 	 */
 	public function add_shortcodes() {
 		add_shortcode( 'gravitypdf', [ $this->model, 'gravitypdf' ] );
-	}
-
-
-	/**
-	 * Register our shortcake attributes
-	 * See https://github.com/fusioneng/Shortcake for more details
-	 *
-	 * @since 4.0
-	 *
-	 * @return void
-	 */
-	public function add_shortcake_support() {
-
-		/* Exist if the shortcake function doesn't exist */
-		if ( ! function_exists( 'shortcode_ui_register_for_shortcode' ) ) {
-			return null;
-		}
-
-		/* Enhance further */
-		shortcode_ui_register_for_shortcode( 'gravitypdf', [
-			'label' => esc_html__( 'Gravity PDF', 'gravity-forms-pdf-extended' ),
-
-			'listItemImage' => 'dashicons-admin-site',
-
-			'attrs' => [
-				[
-					'label' => 'ID',
-					'attr'  => 'id',
-					'type'  => 'text',
-				],
-
-				[
-					'label' => 'Anchor Text',
-					'attr'  => 'text',
-					'type'  => 'text',
-				],
-
-				[
-					'label'   => 'View',
-					'attr'    => 'type',
-					'type'    => 'select',
-					'default' => 'download',
-					'options' => [
-						'download' => 'Download',
-						'view'     => 'View',
-					],
-				],
-
-				[
-					'label'       => 'Anchor Class',
-					'attr'        => 'class',
-					'type'        => 'text',
-					'description' => 'Optional. Add any class name – separated by a space – you want to apply to the PDF link.',
-					'meta'        => [
-						'placeholder' => '',
-					],
-				],
-
-				[
-					'label'       => 'Entry ID',
-					'attr'        => 'entry',
-					'type'        => 'text',
-					'description' => 'Optional. You can pass in a specific ID or let us auto select one.',
-					'meta'        => [
-						'placeholder' => '',
-					],
-				],
-			],
-		] );
 	}
 }
