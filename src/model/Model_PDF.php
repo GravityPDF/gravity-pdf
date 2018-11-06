@@ -381,8 +381,15 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		if ( $type === 'all' || $type === 'logged_out' ) {
-			$user_ip = trim( GFFormsModel::get_ip() );
-			if ( $entry['ip'] == $user_ip && $entry['ip'] !== '127.0.0.1' && strlen( $user_ip ) !== 0 ) { /* check if the user IP matches the entry IP */
+			$user_ip   = trim( GFFormsModel::get_ip() );
+			$server_ip = isset( $_SERVER['SERVER_ADDR'] ) ? $_SERVER['SERVER_ADDR'] : '127.0.0.1';
+
+			/* check if the user IP matches the entry IP */
+			if (
+				$entry['ip'] === $user_ip &&
+				$entry['ip'] !== $server_ip &&
+				strlen( $user_ip ) !== 0
+			) {
 				$owner = true;
 			}
 		}
