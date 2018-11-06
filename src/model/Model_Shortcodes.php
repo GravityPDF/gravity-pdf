@@ -7,11 +7,13 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Misc;
 
+use GFPDF\Helper\Helper_Sha256_Url_Signer;
 use Psr\Log\LoggerInterface;
 
 use GPDFAPI;
 use GFCommon;
 use GravityView_View;
+use Spatie\UrlSigner\MD5UrlSigner;
 
 /**
  * PDF Shortcode Model
@@ -133,10 +135,13 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 			'id'      => '',
 			'text'    => 'Download PDF',
 			'type'    => 'download',
+			'signed'  => '',
+			'expires' => '',
 			'class'   => 'gravitypdf-download-link',
 			'classes' => '',
 			'entry'   => '',
 			'print'   => '',
+			'raw'     => '',
 		], $attributes, 'gravitypdf' );
 
 		/* See https://gravitypdf.com/documentation/v5/gfpdf_gravityforms_shortcode_attributes/ for more information about this filter */
@@ -194,12 +199,40 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		$pdf               = new Model_PDF( $this->gform, $this->log, $this->options, GPDFAPI::get_data_class(), GPDFAPI::get_misc_class(), GPDFAPI::get_notice_class(), GPDFAPI::get_templates_class() );
 		$download          = ( $attributes['type'] == 'download' ) ? true : false;
 		$print             = ( ! empty( $attributes['print'] ) ) ? true : false;
-		$attributes['url'] = $pdf->get_pdf_url( $attributes['id'], $attributes['entry'], $download, $print );
+		$raw               = ( ! empty( $attributes['raw'] ) ) ? true : false;
+		$attributes['url'] = $pdf->get_pdf_url( $attributes['id'], $attributes['entry'], $download, $print, ! $raw );
+
+		/* Sign the URL to allow direct access to the PDF until it expires */
+		if ( ! empty( $attributes['signed'] ) ) {
+			$secret_key = $this->options->get_option( 'signed_secret_token', '' );
+
+			/* If no secret key exists, generate it */
+			if ( empty( $secret_key ) ) {
+				$secret_key = wp_generate_password( 64 );
+				$this->options->update_option( 'signed_secret_token', $secret_key );
+			}
+
+			$url_signer = new Helper_Sha256_Url_Signer( $secret_key );
+
+			$expires = (int) $this->options->get_option( 'logged_out_timeout', '20' ) . ' minutes';
+			if ( ! empty( $attributes['expires'] ) ) {
+				$expires = $attributes['expires'];
+			}
+
+			$date    = new \DateTime();
+			$timeout = $date->modify( $expires );
+
+			$attributes['url'] = $url_signer->sign( $attributes['url'], $timeout );
+		}
 
 		/* generate the markup and return */
 		$this->log->addNotice( 'Generating Shortcode Markup', [
 			'attr' => $attributes,
 		] );
+
+		if ( $raw ) {
+			return $attributes['url'];
+		}
 
 		return $controller->view->display_gravitypdf_shortcode( $attributes );
 	}
@@ -335,7 +368,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 
 	/**
 	 * Check if user is currently submitting a new confirmation redirect URL in the admin area,
-	 * if so replace any shortcodes with a direct link to the PDF (as Gravity Forms correctly validates the URL)
+	 * if so replace any shortcodes with a version that will be correctly saved and generated
 	 *
 	 * @param  array $form Gravity Form Array
 	 *
@@ -358,30 +391,55 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 			/* check if our shortcode exists and convert it to a URL */
 			$gravitypdf = $this->get_shortcode_information( 'gravitypdf', $url );
 
-			if ( sizeof( $gravitypdf ) > 0 ) {
+			if ( count( $gravitypdf ) > 0 ) {
+				foreach ( $gravitypdf as $shortcode ) {
+					$new_shortcode = $this->add_shortcode_attr( $shortcode, 'entry', '{entry_id}' );
+					$new_shortcode = $this->add_shortcode_attr( $new_shortcode, 'raw', '1' );
 
-				foreach ( $gravitypdf as $code ) {
-
-					/* get the PDF Settings ID */
-					$pid = ( isset( $code['attr']['id'] ) ) ? $code['attr']['id'] : '';
-
-					if ( ! empty( $pid ) ) {
-
-						/* generate the PDF URL */
-						$pdf      = new Model_PDF( $this->gform, $this->log, $this->options, GPDFAPI::get_data_class(), GPDFAPI::get_misc_class(), GPDFAPI::get_notice_class(), GPDFAPI::get_templates_class() );
-						$download = ( ! isset( $code['attr']['type'] ) || $code['attr']['type'] == 'download' ) ? true : false;
-						$pdf_url  = $pdf->get_pdf_url( $pid, '{entry_id}', $download, false, false );
-
-						/* override the confirmation URL submitted */
-						$_POST['form_confirmation_url'] = str_replace( $code['shortcode'], $pdf_url, $url );
-					}
+					/* update our confirmation message */
+					$_POST['form_confirmation_url'] = str_replace( $shortcode['shortcode'], $new_shortcode['shortcode'], $url );
 				}
 			}
 		}
 
 		/* it's a filter so return the $form array */
-
 		return $form;
+	}
+
+	/**
+	 * If a Redirect Confirmation, convert the Gravity PDF shortcode to it's URL form, if one exists
+	 *
+	 * @param string|array $confirmation
+	 * @param array $form
+	 * @param array $entry
+	 *
+	 * @return string|array
+	 *
+	 * @since 5.1
+	 */
+	public function gravitypdf_redirect_confirmation_shortcode_processing( $confirmation, $form, $entry ) {
+
+		if ( isset( $confirmation['redirect'] ) ) {
+			$gravitypdf = $this->get_shortcode_information( 'gravitypdf', $form['confirmation']['url'] );
+
+			if ( count( $gravitypdf ) > 0 ) {
+				foreach ( $gravitypdf as $shortcode ) {
+					$url = do_shortcode( str_replace( '{entry_id}', $entry['id'], $shortcode['shortcode'] ) );
+
+					/* Add Query string parameters if they exist (but not with signed URLs) */
+					$query_string = substr( $confirmation['redirect'], strrpos( $confirmation['redirect'], '?' ) + 1 );
+					if ( empty( $shortcode['attr']['signed'] ) && strlen( $query_string ) > 0 ) {
+						$url .= ( strpos( $url, '?' ) !== false ) ? '&' . $query_string : '?' . $query_string;
+					}
+
+					$form['confirmation']['url'] = str_replace( $shortcode['shortcode'], $url, $form['confirmation']['url'] );
+				}
+
+				$confirmation['redirect'] = $form['confirmation']['url'];
+			}
+		}
+
+		return $confirmation;
 	}
 
 	/**
