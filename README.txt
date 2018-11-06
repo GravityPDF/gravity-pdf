@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.8
 Tested up to: 4.9
-Stable tag: 5.0.2
+Stable tag: 5.1.0-beta1
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -89,6 +89,27 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 18. Blank Slate provides a print-friendly template focusing solely on the user-submitted data.
 
 == Changelog ==
+
+= 5.1.0-beta1 =
+* Feature: Add support for Gravity Forms Repeater Fields in PDFs [GH#833]
+* Feature: Add support for Gravity Wiz's Nested Forms Perk in PDFs
+* Feature: Add support for Gravity Forms Consent Field in PDFs [GH#832]
+* Feature: Add signed-URL authentication to [gravitypdf] shortcode using new "signed" and "expires" attributes [GH#841]
+* Feature: Add new "raw" attribute to the [gravitypdf] shortcode which will display the raw PDF URL [GH#841]
+* Feature: Added "Debug Mode" Global PDF Setting which replaces "Shortcode Debug Message" and WP_DEBUG settings [GH#823]
+
+* Dev Feature: Add `gfpdf_disable_global_addon_data` filter to disable aggrigate Survey / Poll / Quiz data in $form_data array (for performance)
+* Dev Feature: Add `gfpdf_disable_product_table` filter to disable Product table in PDF [GH#827]
+* Dev Feature: Pass additional parameters to the `gfpdf_show_field_value` filter
+* Dev Feature: Trigger `gfpdf_template_loaded` JS event after loading new PDF Template settings dynamically
+* Dev Feature: Add `gfpdf_field_product_value` filter to change Product table HTML mark-up in PDF
+
+* Bug: Enable Image Watermarks in PDF
+* Bug: Prevent HTML fields getting passed through wpautop() [GH#834]
+* Bug: Test for writability in the mPDF tmp directory and fallback to the Gravity PDF tmp directory if failed [GH#837]
+* Bug: Fix scheduled licensing status check and display better error if license deactivation fails [GH#838]
+* Bug: Correctly display the values for multiple Option fields assigned to a single Product when Product Table is ungrouped in PDF [GH#839]
+* Bug: Prevent IP-based authentication when the entry IP matches the server IP [GH#840]
 
 = 5.0.2 =
 * Bug: Resolve fatal error on WP Engine due to security in place that prevented mPDF font cache from being saved.
