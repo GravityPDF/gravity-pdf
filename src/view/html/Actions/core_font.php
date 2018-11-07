@@ -42,6 +42,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
     <br>
 
-	<?php esc_html_e( 'Before you can generate a PDF using Gravity Forms the core fonts need to be saved to your server. This only needs to be done once.', 'gravity-forms-pdf-extended' ); ?>
+	<?php esc_html_e( 'Before you can generate a PDF using Gravity Forms, the core fonts need to be saved to your server. This only needs to be done once.', 'gravity-forms-pdf-extended' ); ?>
 
 </div>

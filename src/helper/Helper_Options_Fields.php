@@ -556,14 +556,14 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'public_access' => [
 						'id'      => 'public_access',
 						'name'    => esc_html__( 'Enable Public Access', 'gravity-forms-pdf-extended' ),
-						'desc'    => sprintf( esc_html__( 'Allow %sanyone%s with a direct link to access the PDF. %sThis disables all %ssecurity protocols%s for this PDF.%s ', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>', '<em>', '<a href="https://gravitypdf.com/documentation/v5/user-pdf-security/">', '</a>', '</em>' ),
+						'desc'    => sprintf( esc_html__( 'Disable all %ssecurity protocols%s and allow %sanyone%s to access the PDFs.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/user-pdf-security/">', '</a>', '<strong>', '</strong>' ),
 						'type'    => 'radio',
 						'options' => [
 							'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
 							'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
 						],
 						'std'     => 'No',
-						'tooltip' => '<h6>' . esc_html__( 'Public Access', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( "When public access is on all security protocols are disabled and anyone worldwide can view the PDF document for ALL your form's entries. For most users the standard security measures will be adequate and public access should remain disabled.", 'gravity-forms-pdf-extended' ),
+						'tooltip' => '<h6>' . esc_html__( 'Public Access', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( "When public access is on all security protocols are disabled and anyone worldwide can view the PDF document for ALL your form's entries. For better security, %suse the signed PDF URLs feature instead%s.", 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/user-shortcodes/#signed-attribute">', '</a>' ),
 					],
 
 					'restrict_owner' => [
@@ -576,7 +576,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 							'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
 						],
 						'std'     => $this->get_option( 'default_restrict_owner', 'No' ),
-						'tooltip' => '<h6>' . esc_html__( 'Restrict Owner', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Enable this setting if your PDFs should not be viewable by the end user.', 'gravity-forms-pdf-extended' ),
+						'tooltip' => '<h6>' . esc_html__( 'Restrict Owner', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'Enable this setting if your PDFs should not be viewable by the end user. This setting is overridden %swhen using signed PDF URLs%s.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/user-shortcodes/#signed-attribute">', '</a>' ),
 					],
 				]
 			),
