@@ -124,7 +124,7 @@ class Field_Form extends Helper_Abstract_Fields {
 
 		$container = new Helper_Field_Container( [ 'class_map' => [] ] );
 		$pdf_model = \GPDFAPI::get_mvc_class( 'Model_PDF' );
-		$products  = new Field_Products( new \GF_Field(), $this->entry, $this->gform, $this->misc );
+		$products  = new Field_Products( new \GF_Field(), $entry, $this->gform, $this->misc );
 
 		/* Loop through the Repeater fields */
 		foreach ( $form['fields'] as $field ) {
