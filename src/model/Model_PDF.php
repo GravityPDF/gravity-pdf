@@ -1514,33 +1514,36 @@ class Model_PDF extends Helper_Abstract_Model {
 
 			$results = $this->get_addon_global_data( $form, [], $fields );
 
-			/* Loop through the global survey data and convert information correctly */
-			foreach ( $fields as $field ) {
+			if ( count( $results ) > 0 ) {
 
-				/* Check if we have a multifield likert and replace the row key */
-				if ( isset( $field['gsurveyLikertEnableMultipleRows'] ) && $field['gsurveyLikertEnableMultipleRows'] == 1 ) {
+				/* Loop through the global survey data and convert information correctly */
+				foreach ( $fields as $field ) {
 
-					foreach ( $field['gsurveyLikertRows'] as $row ) {
+					/* Check if we have a multifield likert and replace the row key */
+					if ( isset( $field['gsurveyLikertEnableMultipleRows'] ) && $field['gsurveyLikertEnableMultipleRows'] == 1 ) {
 
-						$results['field_data'][ $field->id ] = $this->replace_key( $results['field_data'][ $field->id ], $row['value'], $row['text'] );
+						foreach ( $field['gsurveyLikertRows'] as $row ) {
 
-						if ( isset( $field->choices ) && is_array( $field->choices ) ) {
-							foreach ( $field->choices as $choice ) {
-								$results['field_data'][ $field->id ][ $row['text'] ] = $this->replace_key( $results['field_data'][ $field->id ][ $row['text'] ], $choice['value'], $choice['text'] );
+							$results['field_data'][ $field->id ] = $this->replace_key( $results['field_data'][ $field->id ], $row['value'], $row['text'] );
+
+							if ( isset( $field->choices ) && is_array( $field->choices ) ) {
+								foreach ( $field->choices as $choice ) {
+									$results['field_data'][ $field->id ][ $row['text'] ] = $this->replace_key( $results['field_data'][ $field->id ][ $row['text'] ], $choice['value'], $choice['text'] );
+								}
 							}
+						}
+					}
+
+					/* Replace the standard row data */
+					if ( isset( $field->choices ) && is_array( $field->choices ) ) {
+						foreach ( $field->choices as $choice ) {
+							$results['field_data'][ $field->id ] = $this->replace_key( $results['field_data'][ $field->id ], $choice['value'], $choice['text'] );
 						}
 					}
 				}
 
-				/* Replace the standard row data */
-				if ( isset( $field->choices ) && is_array( $field->choices ) ) {
-					foreach ( $field->choices as $choice ) {
-						$results['field_data'][ $field->id ] = $this->replace_key( $results['field_data'][ $field->id ], $choice['value'], $choice['text'] );
-					}
-				}
+				$data['survey']['global'] = $results;
 			}
-
-			$data['survey']['global'] = $results;
 		}
 
 		return $data;
@@ -1604,19 +1607,22 @@ class Model_PDF extends Helper_Abstract_Model {
 			$fields  = GFCommon::get_fields_by_type( $form, [ 'poll' ] );
 			$results = $this->get_addon_global_data( $form, [], $fields );
 
-			/* Loop through our fields and update the results as needed */
-			foreach ( $fields as $field ) {
+			if ( count( $results ) > 0 ) {
 
-				/* Add the field name to a new 'misc' array key */
-				$results['field_data'][ $field->id ]['misc']['label'] = $field->label;
+				/* Loop through our fields and update the results as needed */
+				foreach ( $fields as $field ) {
 
-				/* Loop through the field choices */
-				foreach ( $field->choices as $choice ) {
-					$results['field_data'][ $field->id ] = $this->replace_key( $results['field_data'][ $field->id ], $choice['value'], $choice['text'] );
+					/* Add the field name to a new 'misc' array key */
+					$results['field_data'][ $field->id ]['misc']['label'] = $field->label;
+
+					/* Loop through the field choices */
+					foreach ( $field->choices as $choice ) {
+						$results['field_data'][ $field->id ] = $this->replace_key( $results['field_data'][ $field->id ], $choice['value'], $choice['text'] );
+					}
 				}
-			}
 
-			$data['poll']['global'] = $results;
+				$data['poll']['global'] = $results;
+			}
 		}
 
 		return $data;
@@ -1649,23 +1655,25 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		$results = $this->get_addon_global_data( $form, $options, $fields );
 
-		/* Loop through our fields and update our global results */
-		foreach ( $fields as $field ) {
+		if ( count( $results ) > 0 ) {
+			/* Loop through our fields and update our global results */
+			foreach ( $fields as $field ) {
 
-			/* Replace ['totals'] key with ['misc'] key */
-			$results['field_data'][ $field->id ] = $this->replace_key( $results['field_data'][ $field->id ], 'totals', 'misc' );
+				/* Replace ['totals'] key with ['misc'] key */
+				$results['field_data'][ $field->id ] = $this->replace_key( $results['field_data'][ $field->id ], 'totals', 'misc' );
 
-			/* Add the field name to the ['misc'] key */
-			$results['field_data'][ $field->id ]['misc']['label'] = $field->label;
+				/* Add the field name to the ['misc'] key */
+				$results['field_data'][ $field->id ]['misc']['label'] = $field->label;
 
-			/* Loop through the field choices */
-			if ( is_array( $field->choices ) ) {
-				foreach ( $field->choices as $choice ) {
-					$results['field_data'][ $field->id ] = $this->replace_key( $results['field_data'][ $field->id ], $choice['value'], $choice['text'] );
+				/* Loop through the field choices */
+				if ( is_array( $field->choices ) ) {
+					foreach ( $field->choices as $choice ) {
+						$results['field_data'][ $field->id ] = $this->replace_key( $results['field_data'][ $field->id ], $choice['value'], $choice['text'] );
 
-					/* Check if this is the correct field */
-					if ( isset( $choice['gquizIsCorrect'] ) && $choice['gquizIsCorrect'] == 1 ) {
-						$results['field_data'][ $field->id ]['misc']['correct_option_name'][] = esc_html( $choice['text'] );
+						/* Check if this is the correct field */
+						if ( isset( $choice['gquizIsCorrect'] ) && $choice['gquizIsCorrect'] == 1 ) {
+							$results['field_data'][ $field->id ]['misc']['correct_option_name'][] = esc_html( $choice['text'] );
+						}
 					}
 				}
 			}
