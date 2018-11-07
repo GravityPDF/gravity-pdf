@@ -172,6 +172,7 @@ class Model_Templates extends Helper_Abstract_Model {
 		$results = $this->misc->copyr( $unzipped_dir_name, $template_path );
 
 		/* Get the template headers now all the files are in the right location */
+		$this->templates->flush_template_transient_cache();
 		$headers = $this->get_template_info( glob( $unzipped_dir_name . '*.php' ) );
 
 		/* Fix template path */
@@ -185,8 +186,6 @@ class Model_Templates extends Helper_Abstract_Model {
 
 		/* Cleanup tmp uploaded files */
 		$this->cleanup_template_files( $zip_path );
-
-		$this->templates->flush_template_transient_cache();
 
 		if ( is_wp_error( $results ) ) {
 			/* Internal Server Error */
