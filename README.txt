@@ -98,7 +98,7 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 * Feature: Add new "raw" attribute to the [gravitypdf] shortcode which will display the raw PDF URL [GH#841]
 * Feature: Added "Debug Mode" Global PDF Setting which replaces "Shortcode Debug Message", WP_DEBUG settings, and caches the template headers [GH#823]
 
-* Dev Feature: Add `gfpdf_disable_global_addon_data` filter to disable aggrigate Survey / Poll / Quiz data in $form_data array (for performance)
+* Dev Feature: Add `gfpdf_disable_global_addon_data` filter to disable aggregate Survey / Poll / Quiz data in $form_data array (for performance)
 * Dev Feature: Add `gfpdf_disable_product_table` filter to disable Product table in PDF [GH#827]
 * Dev Feature: Pass additional parameters to the `gfpdf_show_field_value` filter
 * Dev Feature: Trigger `gfpdf_template_loaded` JS event after loading new PDF Template settings dynamically
