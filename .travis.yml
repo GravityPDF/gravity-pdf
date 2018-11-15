@@ -23,20 +23,12 @@ php:
   - 7.1
 
 env:
-  - WP_VERSION=latest WP_MULTISITE=0
+  - WP_VERSION=latest WP_MULTISITE=0 PLUGIN=gravity-forms-pdf-extended
 
 matrix:
   include:
-  - php: 5.4
+  - php: 7.1
     env: WP_VERSION=latest WP_MULTISITE=1
-  - php: 7.0
-    env: WP_VERSION=4.7 WP_MULTISITE=0
-  - php: 7.0
-    env: WP_VERSION=4.6 WP_MULTISITE=0
-  - php: 7.0
-    env: WP_VERSION=4.5 WP_MULTISITE=0
-  - php: 7.0
-    env: WP_VERSION=4.4 WP_MULTISITE=0
 
 before_script:
   - if [[ $TRAVIS_PHP_VERSION != 7.1 ]]; then phpenv config-rm xdebug.ini; fi
@@ -50,3 +42,13 @@ script:
  - vendor/bin/phpunit -c tests/phpunit/phpunit.xml.dist
  - vendor/bin/phpunit -c tests/phpunit/phpunit.xml.dist --group ajax
 
+before_deploy:
+  if [[ $TRAVIS_TAG ]]; then bash ./bin/build.sh $TRAVIS_TAG $TRAVIS_BRANCH; fi
+
+deploy:
+  provider: script
+  skip_cleanup: true
+  script: bash ./bin/deploy.sh
+  on:
+    tags: true
+    php: 5.4
