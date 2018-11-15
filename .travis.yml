@@ -22,7 +22,7 @@ php:
   - 7.2
 
 env:
-  - WP_VERSION=latest WP_MULTISITE=0
+  - WP_VERSION=latest WP_MULTISITE=0 PLUGIN=gravity-forms-pdf-extended
 
 matrix:
   include:
@@ -45,3 +45,14 @@ script:
 
 after_success:
  - if [[ $PHPUNIT_COVERAGE_TEST ]]; then bash <(curl -s https://codecov.io/bash); fi
+
+before_deploy:
+  if [[ $TRAVIS_TAG ]]; then bash ./bin/build.sh $TRAVIS_TAG $TRAVIS_BRANCH; fi
+
+deploy:
+ provider: script
+ skip_cleanup: true
+ script: bash ./bin/deploy.sh
+ on:
+   tags: true
+   php: 5.6
