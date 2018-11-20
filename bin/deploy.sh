@@ -28,6 +28,11 @@ if [ $error == 0 ]; then
     exit 1
 fi
 
+# Create Tags
+echo "$WP_ORG_USERNAME"
+echo "$WP_ORG_PASSWORD"
+exit 1
+
 cd "$PLUGIN_BUILDS_PATH"
 
 # Checkout the SVN repo
