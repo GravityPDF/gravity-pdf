@@ -29,18 +29,15 @@ if [ $error == 0 ]; then
 fi
 
 # Create Tags
-echo "$WP_ORG_USERNAME"
-echo "$WP_ORG_PASSWORD"
-exit 1
+svn --no-auth-cache --non-interactive --username "$WP_ORG_USERNAME" --password "$WP_ORG_PASSWORD" mkdir "https://plugins.svn.wordpress.org/$PLUGIN/tags/$TRAVIS_TAG"
 
 cd "$PLUGIN_BUILDS_PATH"
 
-# Checkout the SVN repo
-svn co -q "http://svn.wp-plugins.org/$PLUGIN" svn
+# Checkout the SVN tag
+svn co -q  "https://plugins.svn.wordpress.org/$PLUGIN/tags/$TRAVIS_TAG" svn
 
 # Add new version tag
-mkdir svn/tags/$TRAVIS_TAG
-rsync -r -p $TRAVIS_TAG/* svn/tags/$TRAVIS_TAG
+rsync -r -p $TRAVIS_TAG/* svn
 
 # Add new files to SVN
 svn stat svn | grep '^?' | awk '{print $2}' | xargs -I x svn add x@
