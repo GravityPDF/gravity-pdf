@@ -36,15 +36,15 @@ before_script:
   - bash tests/bin/install.sh gravitypdf_test root '' localhost $WP_VERSION
   - if [[ $WP_MULTISITE = 1 ]]; then nvm install 6.10 && yarn global add karma-cli && yarn; fi
 
-#script:
-# - if [[ $PHPUNIT_COVERAGE_TEST ]]; then yarn run test:coverage; fi
-# - if [[ $PHPUNIT_COVERAGE_TEST ]]; then ./vendor/bin/phpunit --coverage-clover=tmp/coverage/report-xml/php-coverage1.xml -c tests/phpunit/phpunit.xml.dist; fi
-# - if [[ $PHPUNIT_COVERAGE_TEST ]]; then ./vendor/bin/phpunit --coverage-clover=tmp/coverage/report-xml/php-coverage2.xml -c tests/phpunit/phpunit.xml.dist --group ajax; fi
-# - if [[ ! $PHPUNIT_COVERAGE_TEST ]]; then ./vendor/bin/phpunit -c tests/phpunit/phpunit.xml.dist; fi
-# - if [[ ! $PHPUNIT_COVERAGE_TEST ]]; then ./vendor/bin/phpunit -c tests/phpunit/phpunit.xml.dist --group ajax; fi
-#
-#after_success:
-# - if [[ $PHPUNIT_COVERAGE_TEST ]]; then bash <(curl -s https://codecov.io/bash); fi
+script:
+ - if [[ $PHPUNIT_COVERAGE_TEST ]]; then yarn run test:coverage; fi
+ - if [[ $PHPUNIT_COVERAGE_TEST ]]; then ./vendor/bin/phpunit --coverage-clover=tmp/coverage/report-xml/php-coverage1.xml -c tests/phpunit/phpunit.xml.dist; fi
+ - if [[ $PHPUNIT_COVERAGE_TEST ]]; then ./vendor/bin/phpunit --coverage-clover=tmp/coverage/report-xml/php-coverage2.xml -c tests/phpunit/phpunit.xml.dist --group ajax; fi
+ - if [[ ! $PHPUNIT_COVERAGE_TEST ]]; then ./vendor/bin/phpunit -c tests/phpunit/phpunit.xml.dist; fi
+ - if [[ ! $PHPUNIT_COVERAGE_TEST ]]; then ./vendor/bin/phpunit -c tests/phpunit/phpunit.xml.dist --group ajax; fi
+
+after_success:
+ - if [[ $PHPUNIT_COVERAGE_TEST ]]; then bash <(curl -s https://codecov.io/bash); fi
 
 before_deploy:
   if [[ $TRAVIS_TAG ]]; then bash ./bin/build.sh $TRAVIS_TAG $TRAVIS_BRANCH; fi
