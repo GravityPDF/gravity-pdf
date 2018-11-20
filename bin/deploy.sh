@@ -57,11 +57,11 @@ svn co -q "http://svn.wp-plugins.org/$PLUGIN/trunk" svn
 # Move out the trunk directory to a temp location
 mv svn svn-trunk
 
-# Remove the README.txt file from the plugin, which auto-deploys a new tagged release
-rm $TRAVIS_TAG/README.txt
-
 # Copy our new version of the plugin into trunk
 rsync -r -p $TRAVIS_TAG/* svn
+
+# Copy back in the old README.txt file to prevent auto release on .org
+cp svn-trunk/README.txt svn
 
 # Copy all the .svn folders from the checked out copy of trunk to the new trunk.
 # This is necessary as the Travis container runs Subversion 1.6 which has .svn dirs in every sub dir
