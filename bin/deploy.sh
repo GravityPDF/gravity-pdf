@@ -29,7 +29,7 @@ if [ $error == 0 ]; then
 fi
 
 # Create Tags
-svn --no-auth-cache --non-interactive --username "$WP_ORG_USERNAME" --password "$WP_ORG_PASSWORD" mkdir "https://plugins.svn.wordpress.org/$PLUGIN/tags/$TRAVIS_TAG"
+svn --no-auth-cache --non-interactive --username "$WP_ORG_USERNAME" --password "$WP_ORG_PASSWORD" mkdir "https://plugins.svn.wordpress.org/$PLUGIN/tags/$TRAVIS_TAG" -m "Create tag $TRAVIS_TAG"
 
 cd "$PLUGIN_BUILDS_PATH"
 
