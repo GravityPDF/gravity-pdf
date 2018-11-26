@@ -229,13 +229,24 @@ class Helper_Misc {
 					/* Remove width/height and add a override class */
 					$image->removeAttr( 'width' )->removeAttr( 'height' )->addClass( 'header-footer-img' );
 
+					/*
+					 * Wrap in a new div that includes the image classes
+					 * If the direct parent is a link, we'll wrap the link in the DIV instead
+					 */
 					if ( strlen( $image_classes ) > 0 ) {
-						/* Wrap in a new div that includes the image classes */
-						$image->wrap( '<div class="' . $image_classes . '"></div>' );
+						$parent_node = $image->parent()->get(0);
+						if( $parent_node instanceof \DOMElement && $parent_node->nodeName === 'a' ) {
+							$image->parent()->wrap( '<div class="' . $image_classes . '"></div>' );
+						} else {
+							$image->wrap( '<div class="' . $image_classes . '"></div>' );
+						}
 					}
 				}
 
-				return $wrapper->top( 'html' )->innerHTML5();
+				$html = $wrapper->top( 'html' )->innerHTML5();
+
+				/* Remove empty <p></p> tags */
+				$html = str_replace( '<p></p>', '', $html );
 			}
 
 			return $html;
