@@ -141,6 +141,10 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		add_action( 'parse_request', [ $this, 'process_legacy_pdf_endpoint' ] ); /* legacy PDF endpoint */
 		add_action( 'parse_request', [ $this, 'process_pdf_endpoint' ] ); /* new PDF endpoint */
 
+		/* Allow custom PDF tags / CSS */
+		add_action( 'gfpdf_pre_pdf_generation', [ $this, 'add_pre_pdf_hooks' ] );
+		add_action( 'gfpdf_post_pdf_generation', [ $this, 'remove_pre_pdf_hooks' ] );
+
 		/* Display PDF links in Gravity Forms Admin Area */
 		add_action( 'gform_entries_first_column_actions', [ $this->model, 'view_pdf_entry_list' ], 10, 4 );
 		add_action( 'gform_entry_info', [ $this->model, 'view_pdf_entry_detail' ], 10, 2 );
@@ -291,6 +295,22 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		if ( is_wp_error( $results ) ) {
 			$this->pdf_error( $results );
 		}
+	}
+
+	/**
+	 * @since 5.1.1
+	 */
+	public function add_pre_pdf_hooks() {
+		add_filter( 'wp_kses_allowed_html', [ $this->view, 'allow_pdf_html' ] );
+		add_filter( 'safe_style_css', [ $this->view, 'allow_pdf_css' ] );
+	}
+
+	/**
+	 * @since 5.1.1
+	 */
+	public function remove_pre_pdf_hooks() {
+		remove_filter( 'wp_kses_allowed_html', [ $this->view, 'allow_pdf_html' ] );
+		remove_filter( 'safe_style_css', [ $this->view, 'allow_pdf_css' ] );
 	}
 
 	/**
