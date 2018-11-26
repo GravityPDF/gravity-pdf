@@ -261,7 +261,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function add_actions() {
 
 		add_action( 'init', [ $this, 'register_assets' ] );
-		add_action( 'admin_enqueue_scripts', [ $this, 'load_admin_assets' ] );
+		add_action( 'admin_enqueue_scripts', [ $this, 'load_admin_assets' ], 20 );
 
 		/* Cache our Gravity PDF Settings and register our settings fields with the Options API */
 		add_action( 'init', [ $this, 'init_settings_api' ], 1 );
@@ -441,6 +441,12 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function load_admin_assets() {
 
 		if ( $this->misc->is_gfpdf_page() ) {
+			/*
+			 * If present, remove elementor scripts which are causing JS errors
+			 * @see https://github.com/GravityPDF/gravity-pdf/issues/844
+			 */
+			wp_dequeue_script( 'elementor-admin' );
+
 			/* load styles */
 			wp_enqueue_style( 'gfpdf_css_styles' );
 			wp_enqueue_style( 'gform_chosen', \GFCommon::get_base_url() . '/css/chosen.min.css', [], \GFCommon::$version );
@@ -460,14 +466,12 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			wp_enqueue_script( 'gfpdf_js_backbone' );
 		}
 
-		if ( is_admin() && rgget( 'page' ) == 'gf_entries' ) {
+		if ( rgget( 'page' ) == 'gf_entries' ) {
 			wp_enqueue_script( 'gfpdf_js_entries' );
 			wp_enqueue_style( 'gfpdf_css_styles' );
 		}
 
-		if ( is_admin() ) {
-			wp_enqueue_style( 'gfpdf_css_admin_styles' );
-		}
+		wp_enqueue_style( 'gfpdf_css_admin_styles' );
 	}
 
 	/**
