@@ -649,4 +649,62 @@ class View_PDF extends Helper_Abstract_View {
 
 		return $this->load( 'core_template_styles', [ 'settings' => $settings ], false );
 	}
+
+	/**
+	 * Allow PDF HTML Mark-up when using wp_kses_post()
+	 *
+	 * @param array $context
+	 *
+	 * @return array
+	 *
+	 * @since 5.1.1
+	 */
+	public function allow_pdf_html( $context ) {
+		/* Add Table autosize support */
+		$context['table']['autosize'] = true;
+
+		/* Add <pagebreak /> support */
+		$context['pagebreak'] = [
+			'orientation'   => true,
+			'type'          => true,
+			'resetpagenum'  => true,
+			'pagenumstyle'  => true,
+			'suppress'      => true,
+			'sheet-size'    => true,
+			'page-selector' => true,
+			'margin-left'   => true,
+			'margin-right'  => true,
+			'margin-top'    => true,
+			'margin-bottom' => true,
+		];
+
+		/* Add <barcode /> support */
+		$context['barcode'] = [
+			'code'   => true,
+			'type'   => true,
+			'text'   => true,
+			'size'   => true,
+			'height' => true,
+			'pr'     => true,
+		];
+
+		return $context;
+	}
+
+	/**
+	 * Allow PDF CSS Mark-up when using wp_kses()
+	 *
+	 * @param array $context
+	 *
+	 * @return array
+	 *
+	 * @since 5.1.1
+	 */
+	public function allow_pdf_css( $context ) {
+		$context[] = 'page-break-inside';
+		$context[] = 'page-break-before';
+		$context[] = 'page-break-after';
+
+		return $context;
+	}
 }

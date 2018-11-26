@@ -1845,4 +1845,34 @@ class Test_PDF extends WP_UnitTestCase {
 
 		$this->assertTrue( $this->model->handle_legacy_tier_2_processing( $pdf, $entry, $settings, $args ) );
 	}
+
+	/**
+	 * @since 5.1.1
+	 */
+	public function test_kses() {
+		$html = '<pagebreak orientation="landscape" />
+		<table autosize="1"></table>
+		<p style="page-break-inside: avoid"></p>
+		<barcode code="04210000526" type="UPCE" />
+		';
+
+		do_action( 'gfpdf_pre_pdf_generation' );
+
+		/* Check the PDF tags aren't stripped out during while generating a PDF */
+		$html = wp_kses_post( $html );
+		$this->assertRegExp('/\<pagebreak orientation="landscape" \/\>/', $html);
+		$this->assertRegExp('/\<table autosize="1"\>\<\/table\>/', $html);
+		$this->assertRegExp('/\<p style="page-break-inside: avoid"\>\<\/p\>/', $html);
+		$this->assertRegExp('/\<barcode code="04210000526" type="UPCE" \/\>/', $html);
+
+		do_action( 'gfpdf_post_pdf_generation' );
+
+		/* Verify they are stripped out at all other times */
+		$html = wp_kses_post( $html );
+		$this->assertNotRegExp('/\<pagebreak orientation="landscape" \/\>/', $html);
+		$this->assertNotRegExp('/\<table autosize="1"\>\<\/table\>/', $html);
+		$this->assertNotRegExp('/\<p style="page-break-inside: avoid"\>\<\/p\>/', $html);
+		$this->assertNotRegExp('/\<barcode code="04210000526" type="UPCE" \/\>/', $html);
+
+	}
 }
