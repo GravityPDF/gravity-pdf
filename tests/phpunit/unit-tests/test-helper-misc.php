@@ -175,8 +175,22 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 				'<p><div class="alternate"><img src="my-image.jpg" alt="My Image" class="alternate header-footer-img"></div></p>',
 				'<img src="my-image.jpg" alt="My Image" class="alternate" />',
 			],
-			[ '<p><span>Nothing</span></p>', '<span>Nothing</span>' ],
-			[ '', '' ],
+			[
+				'<p><span>Nothing</span></p>',
+				'<span>Nothing</span>',
+			],
+			[
+				'',
+				'',
+			],
+			[
+				'<p><a href="#"><img src="my-image.jpg" alt="My Image" class="header-footer-img"></a></p>',
+				'<a href="#"><img src="my-image.jpg" alt="My Image" /></a>',
+			],
+			[
+				'<p><div class="alternate"><a href="#"><img src="my-image.jpg" alt="My Image" class="alternate header-footer-img"></a></div></p>',
+				'<a href="#"><img src="my-image.jpg" alt="My Image" class="alternate" /></a>',
+			],
 		];
 	}
 
