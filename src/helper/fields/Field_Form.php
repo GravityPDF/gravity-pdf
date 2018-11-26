@@ -138,7 +138,7 @@ class Field_Form extends Helper_Abstract_Fields {
 			}
 		}
 
-		return ob_get_clean();
+		return $this->gform->process_tags( ob_get_clean(), $form, $entry );
 	}
 
 	/**
