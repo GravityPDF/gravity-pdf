@@ -46,6 +46,12 @@ $first_footer               = ( ! empty( $settings['first_footer'] ) ) ? $settin
 $background_color           = ( ! empty( $settings['background_color'] ) ) ? $settings['background_color'] : '#FFF';
 $background_image           = ( ! empty( $settings['background_image'] ) ) ? $settings['background_image'] : '';
 
+/* Try convert the background image URL to a local path */
+$background_image_path = $gfpdf->misc->convert_url_to_path( $background_image );
+if ( $background_image_path !== false ) {
+	$background_image = $background_image_path;
+}
+
 $contrast                   = $gfpdf->misc->get_background_and_border_contrast( $background_color );
 $contrast_background_color  = $contrast['background'];
 $contrast_border_color      = $contrast['border'];
