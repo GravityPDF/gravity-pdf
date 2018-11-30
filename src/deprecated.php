@@ -799,6 +799,23 @@ if ( ! class_exists( 'mPDF' ) ) {
 		}
 
 		/**
+		 * Allow the relaying of property calls to the new Mpdf class
+		 *
+		 * @param $name
+		 *
+		 * @return mixed
+		 *
+		 * @since 5.1.2
+		 */
+		public function __get( $name ) {
+			if ( property_exists( $this->mpdf, $name ) ) {
+				return $this->mpdf->{$name};
+			}
+
+			return null;
+		}
+
+		/**
 		 * @param int $type
          *
          * @Internal Removed from Mpdf v7
