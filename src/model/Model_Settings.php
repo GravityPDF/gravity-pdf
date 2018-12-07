@@ -671,6 +671,15 @@ class Model_Settings extends Helper_Abstract_Model {
 					if ( isset( $response['response']['code'] ) && $response['response']['code'] === 200 &&
 					     isset( $response['body'] ) && $response['body'] === 'failed-if-read'
 					) {
+						$response_object = $response['http_response'];
+						$raw_response    = $response_object->get_response_object();
+						$this->log->warning(
+							'PDF temporary directory not protected', [
+							'url'         => $raw_response->url,
+							'status_code' => $raw_response->status_code,
+							'response'    => $raw_response->raw,
+						] );
+
 						$return = false;
 					}
 				}
