@@ -30,6 +30,10 @@ matrix:
   - php: 7.2
     env: WP_VERSION=latest WP_MULTISITE=1 PHPUNIT_COVERAGE_TEST=1
 
+  allow_failures:
+    - php: 7.3
+      env: WP_VERSION=latest WP_MULTISITE=0 PLUGIN=gravity-forms-pdf-extended
+
 before_script:
   - if [[ ! $PHPUNIT_COVERAGE_TEST ]]; then phpenv config-rm xdebug.ini || true; fi
   - if find . -name "*.php" -exec php -l {} \; | grep "unexpected $end"; then exit 1; fi
