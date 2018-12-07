@@ -205,7 +205,7 @@ class Helper_Logger {
 			if ( ! empty( $log_level ) && $log_level !== 6 ) {
 
 				/* Convert Gravity Forms log levels to the appropriate Monolog level */
-				$monolog_level = ( $log_level === 4 ) ? Logger::ERROR : Logger::INFO;
+				$monolog_level = ( $log_level === 4 ) ? Logger::ERROR : Logger::DEBUG;
 
 				/* Setup our stream and change the format to more-suit Gravity Forms */
 				$formatter = new LineFormatter( "%datetime% - %level_name% --> %message% %context% %extra%\n" );
