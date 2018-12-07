@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.8
 Tested up to: 5.0
-Stable tag: 5.1.1
+Stable tag: 5.1.2
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -89,6 +89,13 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 18. Blank Slate provides a print-friendly template focusing solely on the user-submitted data.
 
 == Changelog ==
+
+= 5.1.2 =
+* Upgrade Mpdf from 7.1.6 to 7.1.7 https://github.com/mpdf/mpdf/compare/v7.1.6...v7.1.7
+* Allow Debug messages to be logged in Gravity PDF log file
+* Add log file message when the PDF Temporary Directory check fails
+* Ensure backwards compatibility with legacy templates who access Mpdf properties directly
+* When sending notifications, ensure PDF settings go through same filters as when viewing / downloading PDFs
 
 = 5.1.1 =
 * Bug: Process Merge Tags when displaying Nested Forms in Core / Universal PDFs [GH#849]
