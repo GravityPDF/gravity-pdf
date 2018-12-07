@@ -1013,7 +1013,10 @@ class Model_PDF extends Helper_Abstract_Model {
 			$notifications['attachments'] = ( isset( $notifications['attachments'] ) ) ? $notifications['attachments'] : [];
 
 			/* Loop through each PDF config and generate */
-			foreach ( $pdfs as $settings ) {
+			foreach ( $pdfs as $pdf ) {
+
+				/* Pass it through the config filters */
+				$settings = $this->options->get_pdf( $entry['form_id'], $pdf['id'] );
 
 				/* Reset the variables each loop */
 				$filename = $tier_2_filename = '';
