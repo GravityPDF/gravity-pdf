@@ -36,5 +36,11 @@
         "yarn && gulp",
         "yarn run build"
       ]
+    },
+
+    "config": {
+      "platform": {
+        "php": "5.6.39"
+      }
     }
 }
