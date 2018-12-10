@@ -1,7 +1,10 @@
 {
     "config": {
         "preferred-install": "dist",
-        "autoloader-suffix": "GravityPDFPlugin"
+        "autoloader-suffix": "GravityPDFPlugin",
+        "platform": {
+          "php": "5.6.39"
+        }
     },
 
     "require": {
@@ -31,16 +34,16 @@
     },
 
     "scripts": {
+      "post-install-cmd": [
+        "yarn global add gulp-cli",
+        "yarn && gulp",
+        "yarn run build"
+      ],
+
       "post-update-cmd": [
         "yarn global add gulp-cli",
         "yarn && gulp",
         "yarn run build"
       ]
-    },
-
-    "config": {
-      "platform": {
-        "php": "5.6.39"
-      }
     }
 }
