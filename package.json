@@ -33,7 +33,7 @@
     "enzyme-adapter-react-16": "^1.1.1",
     "eslint": "^4.0.0",
     "eslint-plugin-react": "^7.0.0",
-    "gulp": "~3.9.1",
+    "gulp": "^4.0.0",
     "gulp-clean-css": "^3.9.4",
     "gulp-rename": "~1.2.2",
     "gulp-sort": "^2.0.0",
