@@ -755,6 +755,8 @@ if ( ! class_exists( 'mPDF' ) ) {
 
 				'tempDir' => $data->mpdf_tmp_location,
 
+				'curlCaCertificate' => ABSPATH . WPINC . '/certificates/ca-bundle.crt',
+
 				'allow_output_buffering' => true,
 				'autoLangToFont'         => true,
 				'useSubstitutions'       => true,
