@@ -227,7 +227,7 @@ class Model_Install extends Helper_Abstract_Model {
 		$this->data->template_tmp_location = apply_filters( 'gfpdf_tmp_location', $this->data->template_location . 'tmp/', $working_folder, $upload_dir_url ); /* encouraged to move this to a directory not accessible via the web */
 
 		/* See https://gravitypdf.com/documentation/v5/gfpdf_mpdf_tmp_location/ for more details about this filter */
-		$mpdf_tmp_path = get_temp_dir() . 'gravitypdf-' . md5( home_url() ) . '/mpdf';
+		$mpdf_tmp_path = $this->data->template_tmp_location . 'mpdf';
 		$this->data->mpdf_tmp_location = untrailingslashit( apply_filters( 'gfpdf_mpdf_tmp_location', $mpdf_tmp_path ) );
 	}
 
