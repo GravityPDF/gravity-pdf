@@ -130,7 +130,7 @@ class Field_Form extends Helper_Abstract_Fields {
 		foreach ( $form['fields'] as $field ) {
 			/* Output a field using the standard method if not empty */
 			$class = $pdf_model->get_field_class( $field, $form, $entry, $products );
-			if ( ! $class->is_empty() ) {
+			if ( ! $class->is_empty() && strpos( $field->cssClass, 'exclude' ) === false ) {
 				$field->cssClass = '';
 				$container->generate( $field );
 				echo $class->html();
