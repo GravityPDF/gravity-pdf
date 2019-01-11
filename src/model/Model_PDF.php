@@ -38,7 +38,7 @@ use Exception;
  * PDF Display Model, including the $form_data array
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2018, Blue Liquid Designs
+ * @copyright   Copyright (c) 2019, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
  */
@@ -51,7 +51,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
     This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2018, Blue Liquid Designs
+    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
