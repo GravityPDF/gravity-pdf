@@ -90,6 +90,9 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 
 == Changelog ==
 
+= 4.5.1 =
+* Bug: Prevents an arbitrary code execution in mPDF
+
 = 4.5.0 =
 * Feature: Added full support for the Gravity Wiz Conditional Logic Date Plugin
 * Feature: Added full support for the Slim Image Cropper for Gravity Forms Plugin
