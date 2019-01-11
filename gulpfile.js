@@ -41,4 +41,4 @@ gulp.task('watch', function () {
   watch('src/assets/css/*.css', function () { gulp.start('minify') })
 })
 
-gulp.task('default', ['language', 'minify', 'compress'] )
+gulp.task('default', gulp.series(['language', 'minify', 'compress']) )
