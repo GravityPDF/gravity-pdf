@@ -5,7 +5,7 @@
     },
 
     "require": {
-        "blueliquiddesigns/mpdf": "dev-wordpress-master#cc044df8810cbac9bc1badf705d7e13b1415121a",
+        "blueliquiddesigns/mpdf": "dev-gravity-pdf-4#39a9e8ee9c34d1d5ea6a687ace719df776d47128",
         "querypath/QueryPath": ">=3.0.0",
         "monolog/monolog": "^1.23.0",
         "codeguy/upload": "^1.3"
