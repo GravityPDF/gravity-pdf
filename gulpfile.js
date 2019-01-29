@@ -36,8 +36,8 @@ gulp.task('language', function () {
 })
 
 gulp.task('watch', function () {
-  watch('src/assets/js/*.js', function () { gulp.start('compress') })
-  watch('src/assets/css/*.css', function () { gulp.start('minify') })
+  watch('src/assets/js/*.js', gulp.series('compress'))
+  watch('src/assets/css/*.css', gulp.series('compress'))
 })
 
 gulp.task('default', gulp.series(['language', 'minify', 'compress']))
