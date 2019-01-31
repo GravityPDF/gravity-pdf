@@ -850,6 +850,8 @@
       })
     }
 
+
+    
     /**
      * Our Documentation Search API
      * We'll add a search bar and output the results of the search
@@ -870,7 +872,7 @@
 
     })
 
-    
+
 
     help.ContainerView = Backbone.View.extend({
       el: '#search-knowledgebase',
