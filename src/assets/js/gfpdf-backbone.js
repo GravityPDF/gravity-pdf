@@ -451,12 +451,12 @@
          * so the user isn't confused with the live-update display of the Font Name field.
          */
         this.modelBinder.bind(this.model, this.el, {
-            font_name: [{selector: '[name=font_name]'}, {selector: '[name=usage]', converter: this.model.cssDeclaration}],
-            regular: '[name=regular]',
-            bold: '[name=bold]',
-            italics: '[name=italics]',
-            bolditalics: '[name=bolditalics]',
-          },
+          font_name: [{ selector: '[name=font_name]' }, { selector: '[name=usage]', converter: this.model.cssDeclaration }],
+          regular: '[name=regular]',
+          bold: '[name=bold]',
+          italics: '[name=italics]',
+          bolditalics: '[name=bolditalics]',
+        },
 
           {
 
@@ -589,30 +589,30 @@
           this.model.save({
             nonce: this.$el.find('input[name=wpnonce]').val()
           }, {
-            success: $.proxy(function (model, response, options) {
+              success: $.proxy(function (model, response, options) {
 
-              /* Remove saving spinner */
-              this.removeSpinner()
+                /* Remove saving spinner */
+                this.removeSpinner()
 
-              /* Display Message */
-              this.displayMessage(GFPDF.updateSuccess)
+                /* Display Message */
+                this.displayMessage(GFPDF.updateSuccess)
 
-              /* Keep our model in sync */
-              this.model.set(model)
+                /* Keep our model in sync */
+                this.model.set(model)
 
-            }, this),
+              }, this),
 
-            error: $.proxy(function (response, type, errorName) {
+              error: $.proxy(function (response, type, errorName) {
 
-              /* Remove saving spinner */
-              this.removeSpinner()
+                /* Remove saving spinner */
+                this.removeSpinner()
 
-              /* Display Error */
-              if (response.responseJSON.error) {
-                this.displayMessage(response.responseJSON.error, true)
-              }
-            }, this)
-          })
+                /* Display Error */
+                if (response.responseJSON.error) {
+                  this.displayMessage(response.responseJSON.error, true)
+                }
+              }, this)
+            })
         }
       },
 
@@ -652,34 +652,34 @@
               this.model.destroy({
                 nonce: this.$el.find('input[name=wpnonce]').val()
               }, {
-                success: $.proxy(function (model, response, options) {
+                  success: $.proxy(function (model, response, options) {
 
-                  /* Remove saving spinner */
-                  this.removeSpinner()
+                    /* Remove saving spinner */
+                    this.removeSpinner()
 
-                  /* Display Message */
-                  this.displayMessage(GFPDF.deleteSuccess)
+                    /* Display Message */
+                    this.displayMessage(GFPDF.deleteSuccess)
 
-                  /* Remove from collection */
-                  this.collection.remove(this.model)
+                    /* Remove from collection */
+                    this.collection.remove(this.model)
 
-                }, this),
+                  }, this),
 
-                error: $.proxy(function (response, type, errorName) {
+                  error: $.proxy(function (response, type, errorName) {
 
-                  /* Remove saving spinner */
-                  this.removeSpinner()
+                    /* Remove saving spinner */
+                    this.removeSpinner()
 
-                  /* Remove from collection */
-                  this.collection.remove(this.model)
+                    /* Remove from collection */
+                    this.collection.remove(this.model)
 
-                  /* Display Error */
-                  if (response.responseJSON.error) {
-                    this.displayMessage(response.responseJSON.error, true)
-                  }
+                    /* Display Error */
+                    if (response.responseJSON.error) {
+                      this.displayMessage(response.responseJSON.error, true)
+                    }
 
-                }, this)
-              })
+                  }, this)
+                })
 
               /* TODO: if destroy() is successful remove the hidden item */
             } else {
@@ -688,14 +688,14 @@
 
           }, this)
         },
-          {
-            text: GFPDF.cancel,
-            click: function () {
+        {
+          text: GFPDF.cancel,
+          click: function () {
 
-              /* Cancel */
-              $dialog.wpdialog('destroy')
-            }
-          }]
+            /* Cancel */
+            $dialog.wpdialog('destroy')
+          }
+        }]
 
         /* Set up our dialog box */
         Fonts.Misc.Dialog($dialog, deleteButtons, 300, 175)
@@ -851,192 +851,12 @@
     }
 
 
-    
-    /**
-     * Our Documentation Search API
-     * We'll add a search bar and output the results of the search
-     * from our API to assist users with our software.
-     * @since 4.0
-     */
-
-    var help = {} // create namespace for our app
-
-    help.SearchModel = Backbone.Model.extend({})
-
-    help.SearchCollection = Backbone.Collection.extend({
-      model: help.SearchModel,
-
-      initialize: function (models, options) {
-        this.url = options.url
-      },
-
-    })
-
-
-
-    help.ContainerView = Backbone.View.extend({
-      el: '#search-knowledgebase',
-
-      events: {
-        'keyup #search-help-input': 'doSearch',
-        'change #search-help-input': 'doSearch',
-      },
-
-      initialize: function () {
-        /* initialise our timer */
-        this.timer = true
-
-        /* render the container view */
-        this.render()
-      },
-
-      render: function () {
-        this.addSearchBar()
-
-        return this
-      },
-
-      addSearchBar: function () {
-        /* create our search element */
-        var $input = $('<input>').attr('type', 'text')
-          .attr('placeholder', '  ' + GFPDF.searchPlaceholder)
-          .attr('id', 'search-help-input')
-
-        /* add out search box and give it focus */
-        this.$el.prepend($input)
-
-        $input.tooltip({
-          items: 'input',
-          content: 'The search must be more than 3 characters.',
-          tooltipClass: 'ui-state-error',
-        }).tooltip('disable')
-
-        /* give our search box focus */
-        $input.focus()
-      },
-
-      doSearch: function (ev) {
-        var $search = $(ev.currentTarget)
-
-        /* clear any previous events */
-        window.clearTimeout(this.timer)
-
-        /* only trigger our search if user has entered more than 3 characters */
-        var value = $.trim($search.val())
-        var previousValue = $search.data('currentValue')
-
-        if (value.length > 3 && $search.data('previousValue') !== value) {
-          $search.tooltip('disable')
-
-          /* track the data value */
-          $search.data('currentValue', value)
-
-          this.timer = window.setTimeout(_.bind(function () {
-            this.processSearch(value)
-          }, this), 500)
-        } else if (value.length <= 3 && ev.keyCode == 13) {
-          $search.tooltip('enable').tooltip('open')
-        }
-      },
-
-      processSearch: function (search) {
-        /* Initialise our Collection and pull the data from our source */
-        console.log('Searching our collection...')
-
-        new help.DocsView({
-          s: search,
-        })
-      }
-
-    })
-
-    help.MainView = Backbone.View.extend({
-
-      callAPI: function (url) {
-        /* do our search */
-        this.collection.fetch({
-          success: _.bind(this.renderSearch, this),
-          error: _.bind(this.renderSearchError),
-        })
-      },
-
-      renderSearch: function (collection, response) {
-        console.log('Rendering Search Results')
-
-        this.hideSpinner()
-
-        var $container = this.$el.find('.inside ul')
-
-        $container.html(this.template({
-          collection: this.collection.toJSON(),
-          url: this.url,
-        }))
-
-        var $wrapper = $container.parent()
-        if (!$wrapper.is(':visible')) {
-          $wrapper.slideDown(500)
-        }
-
-      },
-
-      renderSearchError: function (collection, response) {
-        console.log('Search Failed')
-        console.log(collection)
-        console.log(response)
-      },
-
-      showSpinner: function () {
-        this.$el.find('.spinner').addClass('is-active')
-
-        if (!this.$el.is(':visible')) {
-          this.$el.slideDown(500)
-        }
-      },
-
-      hideSpinner: function () {
-        this.$el.find('.spinner').removeClass('is-active')
-      },
-    })
-
-    help.DocsView = help.MainView.extend({
-      el: '#documentation-api',
-
-      template: '#GravityPDFSearchResultsDocumentation',
-
-      initialize: function (options) {
-        this.url = 'https://gravitypdf.com/wp-json/wp/v2/v5_docs/'
-        this.s = options.s
-        this.render()
-      },
-
-      render: function () {
-        /* set up out template */
-        this.template = _.template($(this.template).html(), null, UnderscoreSettingsOverride)
-
-        /* show the loading spinner */
-        this.showSpinner()
-
-        /* set up view search params */
-        var s = encodeURIComponent(this.s)
-        var url = this.url + '?search=' + s
-
-        /* initialise our collection */
-        this.collection = new help.SearchCollection([], {
-          url: url,
-        })
-
-        /* ping api for results */
-        this.callAPI(url)
-
-        return this
-      },
-    })
 
     /**
      * Our Admin controller
      * Applies correct JS to settings pages
      */
-    function GravityPDF () {
+    function GravityPDF() {
       var self = this
 
       this.init = function () {
@@ -1072,7 +892,8 @@
         /**
          * Load our settings dependancy
          */
-        new help.ContainerView()
+
+        // new help.ContainerView() - removed and moved into React
       }
 
       /**
