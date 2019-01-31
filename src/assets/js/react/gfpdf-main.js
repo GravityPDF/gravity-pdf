@@ -1,6 +1,7 @@
 import $ from 'jquery'
 import templateBootstrap from './bootstrap/templateBootstrap'
 import coreFontBootstrap from './bootstrap/coreFontBootstrap'
+import helpBootstrap from './bootstrap/helpBootstrap'
 
 /**
  * JS Entry point for WebPack
@@ -65,4 +66,10 @@ $(function () {
   if ($('#gfpdf-install-core-fonts').length) {
     coreFontBootstrap()
   }
+
+  // Initialize the Search Bar for Help Tab
+  if ($('#search-knowledgebase').length) {
+    helpBootstrap()
+  }
+
 })
