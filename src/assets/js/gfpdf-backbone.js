@@ -870,6 +870,8 @@
 
     })
 
+    
+
     help.ContainerView = Backbone.View.extend({
       el: '#search-knowledgebase',
 
