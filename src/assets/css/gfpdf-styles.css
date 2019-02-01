@@ -419,6 +419,14 @@ box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.15);
     border-bottom: none;
 }
 
+.searchParseHTML ul li {
+    border-bottom: 1px dotted #ccc !important;
+}
+
+.searchParseHTML ul li:last-child {
+    border-bottom: none !important;
+}
+
 #pdfextended-settings .about-wrap .about-text-disclaimer {
     font-size: 13px;
 }
