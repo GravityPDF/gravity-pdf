@@ -3,6 +3,7 @@ import React from 'react'
 import { createStore, combineReducers } from 'redux'
 import templateReducer from '../reducers/templateReducer'
 import coreFontsReducer from '../reducers/coreFontReducer'
+import helpReducer from '../reducers/helpReducer'
 
 /**
  * @package     Gravity PDF
@@ -53,5 +54,6 @@ export function setupReducers () {
   return combineReducers({
     template: templateReducer,
     coreFonts: coreFontsReducer,
+    help: helpReducer
   })
 }
