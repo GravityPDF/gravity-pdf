@@ -293,6 +293,8 @@ class Model_Install extends Helper_Abstract_Model {
 			$this->data->template_location,
 			$this->data->template_font_location,
 			$this->data->template_tmp_location,
+			$this->data->mpdf_tmp_location,
+			$this->data->mpdf_tmp_location. '/ttfontdata',
 		];
 
 		if ( is_multisite() ) {
