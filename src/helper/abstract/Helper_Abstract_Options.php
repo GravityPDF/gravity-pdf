@@ -925,6 +925,11 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				'kfgqpcuthmantahanaskh' => 'Bahif Uthman Taha',
 			],
 
+			esc_html__( 'Chinese, Japanese, Korean', 'gravity-forms-pdf-extended' ) => [
+				'sun-exta' => 'Sun Ext',
+				'unbatang'  => 'Unbatang (Korean)',
+			],
+
 			esc_html__( 'Other', 'gravity-forms-pdf-extended' ) => [
 				'estrangeloedessa' => 'Estrangelo Edessa (Syriac)',
 				'kaputaunicode'    => 'Kaputa (Sinhala)',
@@ -933,6 +938,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				'jomolhari'        => 'Jomolhari (Tibetan)',
 				'sundaneseunicode' => 'Sundanese (Sundanese)',
 				'taiheritagepro'   => 'Tai Heritage Pro (Tai Viet)',
+				'aegyptus'         => 'Aegyptus (Egyptian Hieroglyphs)',
+				'akkadian'         => 'Akkadian (Cuneiform)',
 				'aegean'           => 'Aegean (Greek)',
 				'quivira'          => 'Quivira (Greek)',
 				'eeyekunicode'     => 'Eeyek (Meetei Mayek)',
