@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.8
 Tested up to: 5.0
-Stable tag: 5.1.3
+Stable tag: 5.1.4
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -89,6 +89,14 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 18. Blank Slate provides a print-friendly template focusing solely on the user-submitted data.
 
 == Changelog ==
+
+= 5.1.4 =
+* Housekeeping: Upgrade Mpdf from 7.1.8 to 7.1.9 https://github.com/mpdf/mpdf/compare/v7.1.8...v7.1.9
+* Bug: Ensure correct permissions are set on mPDF tmp directory [GH#874]
+* Bug: Fix up mPDF tmp directory writable warning [GH#873]
+* Bug: Add missing core mPDF v7 fonts to Font Selector [GH#877]
+* Bug: Fix up v3 legacy template notices [GH#875]
+* Bug: Fix up v3 legacy endpoint entry error [GH#876]
 
 = 5.1.3 =
 * Housekeeping: Upgrade Mpdf from 7.1.7 to 7.1.8 https://github.com/mpdf/mpdf/compare/v7.1.7...v7.1.8
