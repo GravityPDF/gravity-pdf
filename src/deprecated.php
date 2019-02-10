@@ -416,12 +416,10 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 		];
 
 		/* Output the form title */
-		if ( $config['return'] ) {
+		if ( isset( $config['return'] ) && $config['return'] ) {
 			$results['title'] = '<h2 id="details" class="default">' . $form['title'] . '</h2>';
 		} else {
 			?>
-
-			<?php echo $styles; ?>
             <div id='container'>
             <h2 id='details' class='default'><?php echo $form['title'] ?></h2>
 			<?php
@@ -443,7 +441,7 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 
 			/* Check if we should display the page names */
 			if ( $config['page_names'] === true && (int) $field->pageNumber !== $page_number && isset( $form['pagination']['pages'][ $page_number ] ) ) {
-				if ( $config['return'] ) {
+				if ( isset( $config['return'] ) && $config['return'] ) {
 					$results['field'][] = '<h2 id="field-' . $field->id . '" class="default entry-view-page-break">' . $form['pagination']['pages'][ $page_number ] . '</h2>';
 				} else {
 					?>
@@ -474,7 +472,7 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 				if ( $config['html_field'] === true ) {
 					$html = $class->html();
 
-					if ( $config['return'] ) {
+					if ( isset( $config['return'] ) && $config['return'] ) {
 						$results['field'][] = $html;
 					} else {
 						echo $html;
@@ -489,7 +487,7 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 
 				$html = ( $field->type !== 'section' ) ? $class->html() : $class->html( $config['section_content'] );
 
-				if ( $config['return'] ) {
+				if ( isset( $config['return'] ) && $config['return'] ) {
 					$results['field'][] = $html;
 				} else {
 					echo $html;
@@ -509,7 +507,7 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 		}
 
 		/* Return the HTML structure */
-		if ( $config['return'] ) {
+		if ( isset( $config['return'] ) && $config['return'] ) {
 			return $results;
 		} else {
 			?>
