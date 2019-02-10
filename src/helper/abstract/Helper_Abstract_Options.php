@@ -927,7 +927,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 			esc_html__( 'Chinese, Japanese, Korean', 'gravity-forms-pdf-extended' ) => [
 				'sun-exta' => 'Sun Ext',
-				'unbatang'  => 'Unbatang (Korean)',
+				'unbatang'  => 'Un Batang (Korean)',
 			],
 
 			esc_html__( 'Other', 'gravity-forms-pdf-extended' ) => [
