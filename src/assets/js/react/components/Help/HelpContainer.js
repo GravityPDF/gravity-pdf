@@ -3,6 +3,25 @@ import { connect } from 'react-redux'
 import request from 'superagent'
 import { updateResult, deleteResult } from '../../actions/help'
 
+
+export const doHandleChange = data => ({
+  searchInput: data
+});
+
+export const toggleLoadingTrue = () => ({
+  loading: true
+});
+
+export const toggleLoadingFalse = () => ({
+  loading: false
+})
+
+export const fetchData = searchInput => {
+  // Request API call
+  return request.get(`https://gravitypdf.com/wp-json/wp/v2/v5_docs/?search=${searchInput}`);
+}
+
+
 class HelpContainer extends Component {
 
   // Initialize component state
@@ -11,54 +30,45 @@ class HelpContainer extends Component {
     loading: false
   }
 
-  componentWillReceiveProps(nextProps) {
-    // Set loading Spinner to false
-    if (nextProps.help) {
-      this.setState({ loading: false });
-    }
+  onHandleChange = e => {
+    // Set loading to true
+    this.setState(doHandleChange(e.target.value));
+    // Set searchInput state value
+    this.searchInputLength(e.target.value);
   }
 
-  onHandleChange = e => {
-    // Set the current state for initial value
-    this.setState({ [e.target.name]: e.target.value });
-    // Trigger if input length is greater than 3
-    if (e.target.value.length > 3) {
-      // Set loading spinner to true
-      this.setState({ loading: true });
-      // Call function fetchHelpSearch()
-      this.fetchHelpSearch(e.target.value);
+  searchInputLength = data => {
+    if (data.length > 3) {
+      // Set loading to true
+      this.setState(toggleLoadingTrue);
+      // Request API call
+      fetchData(data)
+        // If request is successful
+      .then(res => {
+        // Pass data into redux action
+        this.props.updateResult(res.body)
+        this.setState(toggleLoadingFalse)
+      })
+      // Catch if something went wrong in the call
+      .catch(err => {
+        console.log('action err -', err)
+      });
     } else {
-      // Delete/clean old search result
       this.props.deleteResult();
     }
   }
 
-  fetchHelpSearch = (searchInput) => {
-    // Request API call
-    request
-    .get(`https://gravitypdf.com/wp-json/wp/v2/v5_docs/?search=${searchInput}`)
-    // If request is successful
-    .then(res => {
-      // Pass data into redux action
-      this.props.updateResult(res.body)
-    })
-    // Catch if something went wrong in the call
-    .catch(err => {
-      console.log('action err -', err)
-    });
-  }
-
   displayResult = () => {
     const { loading, searchInput } = this.state;
-    const { help } = this.props;
+    const { helpResult } = this.props;
     let searchResult;
     let items;
 
     // Check if search result is not emplty or loading is true
-    if (help.length > 0 || loading) {
+    if (helpResult.length > 0 || loading) {
       // map the search result
       items = (
-        help.map((item, index) => (
+        helpResult.map((item, index) => (
           <li key={index}>
             <a href={item.link} >{item.title.rendered}</a>
             <div className="except">
@@ -125,7 +135,7 @@ class HelpContainer extends Component {
 }
 
 const mapStateToProps = state => ({
-  help: state.help.results
+  helpResult: state.help.results
 })
 
 export default connect(mapStateToProps, { updateResult, deleteResult })(HelpContainer)
