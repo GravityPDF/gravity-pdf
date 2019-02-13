@@ -94,8 +94,8 @@ class HelpContainer extends Component {
             <span>Gravity PDF Documentation</span>
             { loading ? <span className="spinner is-active"></span> : null  }
           </h3>
-          <div className="inside rss-widget searchParseHTML" style={{display: 'block'}}>
-            <ul>
+          <div className="inside rss-widget" style={{display: 'block'}}>
+            <ul className="searchParseHTML">
               {items}
             </ul>
           </div>
