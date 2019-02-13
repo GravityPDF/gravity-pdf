@@ -3,9 +3,9 @@ import {
   DELETE_RESULTS
 } from '../actionTypes/help'
 
-const initialState = {
-  results: []
-};
+export const initialState = {
+  results: [],
+}
 
 
 export default function(state = initialState, action) {
