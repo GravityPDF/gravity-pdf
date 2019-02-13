@@ -28,7 +28,7 @@ describe('<HelpContainer />', () => {
   const state = { searchInput: 'setup' }
   return fetchData(state.searchInput)
    .then(response => {
-    // Response array length should be 0 since there is no available data for the 'searchInput' value
+    // Response array length should have at least 1 value since there is available data for the 'searchInput' value
     expect(response.body.length).to.be.at.least(1)
    })  
  })
