@@ -451,12 +451,12 @@
          * so the user isn't confused with the live-update display of the Font Name field.
          */
         this.modelBinder.bind(this.model, this.el, {
-          font_name: [{ selector: '[name=font_name]' }, { selector: '[name=usage]', converter: this.model.cssDeclaration }],
-          regular: '[name=regular]',
-          bold: '[name=bold]',
-          italics: '[name=italics]',
-          bolditalics: '[name=bolditalics]',
-        },
+            font_name: [{selector: '[name=font_name]'}, {selector: '[name=usage]', converter: this.model.cssDeclaration}],
+            regular: '[name=regular]',
+            bold: '[name=bold]',
+            italics: '[name=italics]',
+            bolditalics: '[name=bolditalics]',
+          },
 
           {
 
@@ -589,30 +589,30 @@
           this.model.save({
             nonce: this.$el.find('input[name=wpnonce]').val()
           }, {
-              success: $.proxy(function (model, response, options) {
+            success: $.proxy(function (model, response, options) {
 
-                /* Remove saving spinner */
-                this.removeSpinner()
+              /* Remove saving spinner */
+              this.removeSpinner()
 
-                /* Display Message */
-                this.displayMessage(GFPDF.updateSuccess)
+              /* Display Message */
+              this.displayMessage(GFPDF.updateSuccess)
 
-                /* Keep our model in sync */
-                this.model.set(model)
+              /* Keep our model in sync */
+              this.model.set(model)
 
-              }, this),
+            }, this),
 
-              error: $.proxy(function (response, type, errorName) {
+            error: $.proxy(function (response, type, errorName) {
 
-                /* Remove saving spinner */
-                this.removeSpinner()
+              /* Remove saving spinner */
+              this.removeSpinner()
 
-                /* Display Error */
-                if (response.responseJSON.error) {
-                  this.displayMessage(response.responseJSON.error, true)
-                }
-              }, this)
-            })
+              /* Display Error */
+              if (response.responseJSON.error) {
+                this.displayMessage(response.responseJSON.error, true)
+              }
+            }, this)
+          })
         }
       },
 
@@ -652,34 +652,34 @@
               this.model.destroy({
                 nonce: this.$el.find('input[name=wpnonce]').val()
               }, {
-                  success: $.proxy(function (model, response, options) {
+                success: $.proxy(function (model, response, options) {
 
-                    /* Remove saving spinner */
-                    this.removeSpinner()
+                  /* Remove saving spinner */
+                  this.removeSpinner()
 
-                    /* Display Message */
-                    this.displayMessage(GFPDF.deleteSuccess)
+                  /* Display Message */
+                  this.displayMessage(GFPDF.deleteSuccess)
 
-                    /* Remove from collection */
-                    this.collection.remove(this.model)
+                  /* Remove from collection */
+                  this.collection.remove(this.model)
 
-                  }, this),
+                }, this),
 
-                  error: $.proxy(function (response, type, errorName) {
+                error: $.proxy(function (response, type, errorName) {
 
-                    /* Remove saving spinner */
-                    this.removeSpinner()
+                  /* Remove saving spinner */
+                  this.removeSpinner()
 
-                    /* Remove from collection */
-                    this.collection.remove(this.model)
+                  /* Remove from collection */
+                  this.collection.remove(this.model)
 
-                    /* Display Error */
-                    if (response.responseJSON.error) {
-                      this.displayMessage(response.responseJSON.error, true)
-                    }
+                  /* Display Error */
+                  if (response.responseJSON.error) {
+                    this.displayMessage(response.responseJSON.error, true)
+                  }
 
-                  }, this)
-                })
+                }, this)
+              })
 
               /* TODO: if destroy() is successful remove the hidden item */
             } else {
@@ -688,14 +688,14 @@
 
           }, this)
         },
-        {
-          text: GFPDF.cancel,
-          click: function () {
+          {
+            text: GFPDF.cancel,
+            click: function () {
 
-            /* Cancel */
-            $dialog.wpdialog('destroy')
-          }
-        }]
+              /* Cancel */
+              $dialog.wpdialog('destroy')
+            }
+          }]
 
         /* Set up our dialog box */
         Fonts.Misc.Dialog($dialog, deleteButtons, 300, 175)
@@ -850,13 +850,11 @@
       })
     }
 
-
-
     /**
      * Our Admin controller
      * Applies correct JS to settings pages
      */
-    function GravityPDF() {
+    function GravityPDF () {
       var self = this
 
       this.init = function () {
@@ -892,8 +890,6 @@
         /**
          * Load our settings dependancy
          */
-
-        // new help.ContainerView() - removed and moved into React
       }
 
       /**
