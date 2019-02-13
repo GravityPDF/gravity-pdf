@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import request from 'superagent'
 import { updateResult, deleteResult } from '../../actions/help'
+import Spinner from '../Spinner'
 
 
 export const doHandleChange = data => ({
@@ -90,7 +91,8 @@ class HelpContainer extends Component {
         <>
           <h3 className="hndle">
             <span>Gravity PDF Documentation</span>
-            { loading ? <span className="spinner is-active"></span> : null  }
+            {/* { loading ? <span className="spinner is-active"></span> : null  } */}
+            { loading ? <div style={{float: 'right'}}><Spinner /></div> : null  }
           </h3>
           <div className="inside rss-widget" style={{display: 'block'}}>
             <ul className="searchParseHTML">
