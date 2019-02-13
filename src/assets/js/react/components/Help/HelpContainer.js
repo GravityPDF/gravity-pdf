@@ -72,10 +72,8 @@ class HelpContainer extends Component {
           <li key={index}>
             <a href={item.link} >{item.title.rendered}</a>
             <div className="except">
-              <div>
-                {/* Parse html */}
-                <div dangerouslySetInnerHTML={{__html: item.excerpt.rendered}} />
-              </div>
+              {/* Parse html */}
+              <div dangerouslySetInnerHTML={{__html: item.excerpt.rendered}} />
             </div>
           </li>
         ))
