@@ -87,7 +87,7 @@ class HelpContainer extends Component {
     // Check if state searchInput length is greatar than 3 then display items
     if (searchInput.length > 3) {
       searchResult = (
-        <React.Fragment>
+        <>
           <h3 className="hndle">
             <span>Gravity PDF Documentation</span>
             { loading ? <span className="spinner is-active"></span> : null  }
@@ -97,7 +97,7 @@ class HelpContainer extends Component {
               {items}
             </ul>
           </div>
-        </React.Fragment>
+        </>
       )
     } else {
       searchResult = null;
@@ -110,7 +110,7 @@ class HelpContainer extends Component {
   render() {
     const { searchInput } = this.state;
     return (
-      <React.Fragment>
+      <>
         <input 
           type="text" 
           placeholder="  Search the Gravity PDF Knowledgebase..." 
@@ -127,7 +127,7 @@ class HelpContainer extends Component {
             </div>
           </div>
         </div>
-      </React.Fragment>
+      </>
     )
   }
 }
