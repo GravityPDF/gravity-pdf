@@ -36,14 +36,14 @@ import React from 'react'
  * @since 4.1
  */
 const TemplateHeaderTitle = ({header}) => (
-  <h1>{header}</h1>
+  < h1 > {header} < / h1 >
 )
 
 /**
  * @since 4.1
  */
 TemplateHeaderTitle.propTypes = {
-  header: PropTypes.string
+	header: PropTypes.string
 }
 
 export default TemplateHeaderTitle

@@ -27,23 +27,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -130,8 +130,8 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	public function init() {
 
 		/*
-         * Tell Gravity Forms to add our form PDF settings pages
-         */
+		 * Tell Gravity Forms to add our form PDF settings pages
+		 */
 		$this->add_actions();
 		$this->add_filters();
 	}
@@ -188,7 +188,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 		add_filter( 'tiny_mce_before_init', [ $this, 'store_tinymce_settings' ] );
 
 		/* Update our PDF settings before the form gets updated */
-		add_filter( 'gform_form_update_meta', [ $this, 'clear_cached_pdf_settings'], 10, 2 );
+		add_filter( 'gform_form_update_meta', [ $this, 'clear_cached_pdf_settings' ], 10, 2 );
 	}
 
 	/**

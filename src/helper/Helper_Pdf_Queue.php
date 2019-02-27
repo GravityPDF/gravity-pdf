@@ -22,31 +22,31 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 if ( ! class_exists( 'WP_Async_Request' ) ) {
-	require_once( GFCommon::get_base_path() . '/includes/libraries/wp-async-request.php' );
+	require_once GFCommon::get_base_path() . '/includes/libraries/wp-async-request.php';
 }
 
 if ( ! class_exists( 'GF_Background_Process' ) ) {
-	require_once( GFCommon::get_base_path() . '/includes/libraries/gf-background-process.php' );
+	require_once GFCommon::get_base_path() . '/includes/libraries/gf-background-process.php';
 }
 
 /**
@@ -108,10 +108,12 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 	public function task( $callbacks ) {
 		$callback = array_shift( $callbacks );
 
-		$this->log->addNotice( sprintf(
-			'Begin async PDF task for %s',
-			$callback['id']
-		) );
+		$this->log->addNotice(
+			sprintf(
+				'Begin async PDF task for %s',
+				$callback['id']
+			)
+		);
 
 		if ( is_callable( $callback['func'] ) ) {
 			try {
@@ -121,10 +123,13 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 			} catch ( Exception $e ) {
 
 				/* Log Error */
-				$this->log->addError( sprintf(
-					'Async PDF task error for %s',
-					$callback['id']
-				), [ 'args' => ( isset( $callback['args'] ) ) ? $callback['args'] : [] ] );
+				$this->log->addError(
+					sprintf(
+						'Async PDF task error for %s',
+						$callback['id']
+					),
+					[ 'args' => ( isset( $callback['args'] ) ) ? $callback['args'] : [] ]
+				);
 
 				/* Add back to our queue to retry (up to a grand total of three times) */
 				if ( empty( $callback['retry'] ) || $callback['retry'] < 2 ) {
@@ -134,10 +139,12 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 			}
 		}
 
-		$this->log->addNotice( sprintf(
-			'End async PDF task for %s',
-			$callback['id']
-		) );
+		$this->log->addNotice(
+			sprintf(
+				'End async PDF task for %s',
+				$callback['id']
+			)
+		);
 
 		return ( count( $callbacks ) > 0 ) ? $callbacks : false;
 	}

@@ -36,19 +36,19 @@ import React from 'react'
  * @since 4.1
  */
 const TemplateScreenshots = ({image}) => {
-  const className = (image) ? 'screenshot' : 'screenshot blank'
+	const className       = (image) ? 'screenshot' : 'screenshot blank'
 
-  return (
-    <div className="theme-screenshots">
-      <div className={className}>
-        {image ? <img src={image} alt=""/> : null}
-      </div>
-    </div>
+	return (
+	< div className        = "theme-screenshots" >
+	  < div className      = {className} >
+		{image ? < img src = {image} alt = "" / > : null}
+	  < / div >
+	< / div >
   )
 }
 
 TemplateScreenshots.propTypes = {
-  image: PropTypes.string
+	image: PropTypes.string
 }
 
 export default TemplateScreenshots

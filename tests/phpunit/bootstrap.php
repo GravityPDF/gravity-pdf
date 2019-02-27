@@ -73,7 +73,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 		}
 
 		/* load the WP testing environment */
-		require_once( $this->wp_tests_dir . '/includes/bootstrap.php' );
+		require_once $this->wp_tests_dir . '/includes/bootstrap.php';
 	}
 
 	/**
@@ -123,7 +123,6 @@ class GravityPDF_Unit_Tests_Bootstrap {
 			'all-form-fields' => 'all-form-fields-entries.json',
 			'gravityform-1'   => 'gravityform-1-entries.json',
 		];
-
 
 		foreach ( $entries as $id => $json ) {
 			$entries   = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/unit-tests/json/' . $json ) ), true );

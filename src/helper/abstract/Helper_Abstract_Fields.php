@@ -24,23 +24,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -256,7 +256,7 @@ abstract class Helper_Abstract_Fields {
 
 		if ( is_array( $value ) && sizeof( array_filter( $value ) ) === 0 ) { /* check for an array */
 			return true;
-		} else if ( is_string( $value ) && strlen( trim( $value ) ) === 0 ) { /* check for a string */
+		} elseif ( is_string( $value ) && strlen( trim( $value ) ) === 0 ) { /* check for a string */
 			return true;
 		}
 
@@ -309,7 +309,7 @@ abstract class Helper_Abstract_Fields {
 		 */
 		$skip_fields = apply_filters( 'gfpdf_skip_encode_mergetags_on_fields', [ 'html', 'section' ], $this->field, $this->entry, $this->form );
 		if ( ( empty( $this->field->visibility ) || $this->field->visibility !== 'administrative' ) &&
-		     ! in_array( $this->field->type, $skip_fields ) ) {
+			 ! in_array( $this->field->type, $skip_fields ) ) {
 			$value = $this->encode_tags( $value );
 		}
 
@@ -318,6 +318,7 @@ abstract class Helper_Abstract_Fields {
 
 		/**
 		 * See https://gravitypdf.com/documentation/v5/gfpdf_pdf_field_content/ for usage
+		 *
 		 * @since 4.2
 		 */
 		$value = apply_filters( 'gfpdf_pdf_field_content', $value, $this->field, $this->entry, $this->form, $this );
@@ -339,8 +340,8 @@ abstract class Helper_Abstract_Fields {
 		}
 
 		$html .= '<div class="value">' . $value . '</div>'
-		         . '</div>'
-		         . '</div>';
+				 . '</div>'
+				 . '</div>';
 
 		/* See https://gravitypdf.com/documentation/v5/gfpdf_field_html_value/ for more details about this filter */
 

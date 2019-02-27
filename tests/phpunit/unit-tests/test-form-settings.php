@@ -24,23 +24,23 @@ use Exception;
  */
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -135,32 +135,68 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		/* standard actions */
 		$this->assertEquals( 5, has_action( 'admin_init', [ $this->controller, 'maybe_save_pdf_settings' ] ) );
 
-		$this->assertEquals( 10, has_action( 'gform_form_settings_menu', [
-			$this->model,
-			'add_form_settings_menu',
-		] ) );
-		$this->assertEquals( 10, has_action( 'gform_form_settings_page_' . $gfpdf->data->slug, [
-			$this->controller,
-			'display_page',
-		] ) );
+		$this->assertEquals(
+			10,
+			has_action(
+				'gform_form_settings_menu',
+				[
+					$this->model,
+					'add_form_settings_menu',
+				]
+			)
+		);
+		$this->assertEquals(
+			10,
+			has_action(
+				'gform_form_settings_page_' . $gfpdf->data->slug,
+				[
+					$this->controller,
+					'display_page',
+				]
+			)
+		);
 
 		/* ajax endpoints */
-		$this->assertEquals( 10, has_action( 'wp_ajax_gfpdf_list_delete', [
-			$this->model,
-			'delete_gf_pdf_setting',
-		] ) );
-		$this->assertEquals( 10, has_action( 'wp_ajax_gfpdf_list_duplicate', [
-			$this->model,
-			'duplicate_gf_pdf_setting',
-		] ) );
-		$this->assertEquals( 10, has_action( 'wp_ajax_gfpdf_change_state', [
-			$this->model,
-			'change_state_pdf_setting',
-		] ) );
-		$this->assertEquals( 10, has_action( 'wp_ajax_gfpdf_get_template_fields', [
-			$this->model,
-			'render_template_fields',
-		] ) );
+		$this->assertEquals(
+			10,
+			has_action(
+				'wp_ajax_gfpdf_list_delete',
+				[
+					$this->model,
+					'delete_gf_pdf_setting',
+				]
+			)
+		);
+		$this->assertEquals(
+			10,
+			has_action(
+				'wp_ajax_gfpdf_list_duplicate',
+				[
+					$this->model,
+					'duplicate_gf_pdf_setting',
+				]
+			)
+		);
+		$this->assertEquals(
+			10,
+			has_action(
+				'wp_ajax_gfpdf_change_state',
+				[
+					$this->model,
+					'change_state_pdf_setting',
+				]
+			)
+		);
+		$this->assertEquals(
+			10,
+			has_action(
+				'wp_ajax_gfpdf_get_template_fields',
+				[
+					$this->model,
+					'render_template_fields',
+				]
+			)
+		);
 
 	}
 
@@ -173,41 +209,83 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		global $gfpdf;
 
 		/* general filters */
-		$this->assertEquals( 10, has_filter( 'gfpdf_form_settings_custom_appearance', [
-			$this->model,
-			'register_custom_appearance_settings',
-		] ) );
+		$this->assertEquals(
+			10,
+			has_filter(
+				'gfpdf_form_settings_custom_appearance',
+				[
+					$this->model,
+					'register_custom_appearance_settings',
+				]
+			)
+		);
 
 		/* validation filters */
 		$this->assertEquals( 10, has_filter( 'gfpdf_form_settings', [ $this->model, 'validation_error' ] ) );
-		$this->assertEquals( 10, has_filter( 'gfpdf_form_settings_appearance', [
-			$this->model,
-			'validation_error',
-		] ) );
+		$this->assertEquals(
+			10,
+			has_filter(
+				'gfpdf_form_settings_appearance',
+				[
+					$this->model,
+					'validation_error',
+				]
+			)
+		);
 
 		/* sanitation functions */
-		$this->assertEquals( 10, has_filter( 'gfpdf_form_settings_sanitize', [
-			$gfpdf->options,
-			'sanitize_all_fields',
-		] ) );
-		$this->assertEquals( 15, has_filter( 'gfpdf_form_settings_sanitize_text', [
-			$this->model,
-			'parse_filename_extension',
-		] ) );
-		$this->assertEquals( 15, has_filter( 'gfpdf_form_settings_sanitize_text', [
-			$gfpdf->options,
-			'sanitize_trim_field',
-		] ) );
-		$this->assertEquals( 10, has_filter( 'gfpdf_form_settings_sanitize_hidden', [
-			$this->model,
-			'decode_json',
-		] ) );
+		$this->assertEquals(
+			10,
+			has_filter(
+				'gfpdf_form_settings_sanitize',
+				[
+					$gfpdf->options,
+					'sanitize_all_fields',
+				]
+			)
+		);
+		$this->assertEquals(
+			15,
+			has_filter(
+				'gfpdf_form_settings_sanitize_text',
+				[
+					$this->model,
+					'parse_filename_extension',
+				]
+			)
+		);
+		$this->assertEquals(
+			15,
+			has_filter(
+				'gfpdf_form_settings_sanitize_text',
+				[
+					$gfpdf->options,
+					'sanitize_trim_field',
+				]
+			)
+		);
+		$this->assertEquals(
+			10,
+			has_filter(
+				'gfpdf_form_settings_sanitize_hidden',
+				[
+					$this->model,
+					'decode_json',
+				]
+			)
+		);
 
 		/* Tiny MCE Settings for our AJAX loading TinyMCE editors */
-		$this->assertEquals( 10, has_filter( 'tiny_mce_before_init', [
-			$this->controller,
-			'store_tinymce_settings',
-		] ) );
+		$this->assertEquals(
+			10,
+			has_filter(
+				'tiny_mce_before_init',
+				[
+					$this->controller,
+					'store_tinymce_settings',
+				]
+			)
+		);
 	}
 
 	/**
@@ -244,7 +322,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 
 		$GLOBALS['hook_suffix'] = '';
 
-		require_once( GFCommon::get_base_path() . '/form_settings.php' );
+		require_once GFCommon::get_base_path() . '/form_settings.php';
 
 		$form_id = $this->form_id;
 
@@ -279,7 +357,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 	 */
 	public function test_show_edit_view() {
 
-		require_once( GFCommon::get_base_path() . '/form_settings.php' );
+		require_once GFCommon::get_base_path() . '/form_settings.php';
 
 		$form_id = $this->form_id;
 		$pid     = '555ad84787d7e';
@@ -382,7 +460,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		$_POST['gfpdf_save_pdf'] = wp_create_nonce( 'gfpdf_save_pdf' );
 
 		/* Create semi-valid post data */
-		$_POST['gfpdf_settings']['name'] = 'My New Name';
+		$_POST['gfpdf_settings']['name']     = 'My New Name';
 		$_POST['gfpdf_settings']['pdf_size'] = '';
 
 		/* Fail sanitization */
@@ -418,25 +496,34 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		/**
 		 * Set up global filters we can check
 		 */
-		add_filter( 'gfpdf_settings_form_settings_sanitize', function ( $input ) {
-			return 'form_settings sanitized';
-		} );
+		add_filter(
+			'gfpdf_settings_form_settings_sanitize',
+			function ( $input ) {
+				return 'form_settings sanitized';
+			}
+		);
 
 		/* pass input data to our sanitization function */
 		$this->assertEquals( 'form_settings sanitized', $this->model->settings_sanitize( $input ) );
 		remove_all_filters( 'gfpdf_settings_form_settings_sanitize' );
 
-		add_filter( 'gfpdf_settings_form_settings_appearance_sanitize', function ( $input ) {
-			return 'form_settings_appearance sanitized';
-		} );
+		add_filter(
+			'gfpdf_settings_form_settings_appearance_sanitize',
+			function ( $input ) {
+				return 'form_settings_appearance sanitized';
+			}
+		);
 
 		/* pass input data to our sanitization function */
 		$this->assertEquals( 'form_settings_appearance sanitized', $this->model->settings_sanitize( $input ) );
 		remove_all_filters( 'gfpdf_settings_form_settings_appearance_sanitize' );
 
-		add_filter( 'gfpdf_settings_form_settings_advanced_sanitize', function ( $input ) {
-			return 'form_settings_advanced sanitized';
-		} );
+		add_filter(
+			'gfpdf_settings_form_settings_advanced_sanitize',
+			function ( $input ) {
+				return 'form_settings_advanced sanitized';
+			}
+		);
 
 		/* pass input data to our sanitization function */
 		$this->assertEquals( 'form_settings_advanced sanitized', $this->model->settings_sanitize( $input ) );
@@ -445,9 +532,14 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		/**
 		 * Get global input filter
 		 */
-		add_filter( 'gfpdf_form_settings_sanitize', function ( $input, $key ) {
-			return 'global input value';
-		}, 15, 2 );
+		add_filter(
+			'gfpdf_form_settings_sanitize',
+			function ( $input, $key ) {
+				return 'global input value';
+			},
+			15,
+			2
+		);
 
 		$values = $this->model->settings_sanitize( $input );
 
@@ -464,9 +556,14 @@ class Test_Form_Settings extends WP_UnitTestCase {
 
 		/* set up filters to test */
 		foreach ( $types as $type ) {
-			add_filter( 'gfpdf_form_settings_sanitize_' . $type, function ( $value, $key ) use ( $type ) {
-				return $type;
-			}, 10, 2 );
+			add_filter(
+				'gfpdf_form_settings_sanitize_' . $type,
+				function ( $value, $key ) use ( $type ) {
+					return $type;
+				},
+				10,
+				2
+			);
 		}
 
 		/* get new values */
@@ -618,9 +715,18 @@ class Test_Form_Settings extends WP_UnitTestCase {
 
 		/* Setup notification data */
 		$notifications = [
-			[ 'id' => 'id1', 'name' => 'Notification  1' ],
-			[ 'id' => 'id2', 'name' => 'Notification  2' ],
-			[ 'id' => 'id3', 'name' => 'Notification  3' ],
+			[
+				'id'   => 'id1',
+				'name' => 'Notification  1',
+			],
+			[
+				'id'   => 'id2',
+				'name' => 'Notification  2',
+			],
+			[
+				'id'   => 'id3',
+				'name' => 'Notification  3',
+			],
 		];
 
 		/* Run valid test */
@@ -630,9 +736,20 @@ class Test_Form_Settings extends WP_UnitTestCase {
 
 		/* Check that certain notification events are ignored */
 		$notifications = [
-			[ 'id' => 'id1', 'name' => 'Notification  1' ],
-			[ 'id' => 'id2', 'name' => 'Notification  2', 'event' => 'form_saved' ],
-			[ 'id' => 'id3', 'name' => 'Notification  3', 'event' => 'form_save_email_requested' ],
+			[
+				'id'   => 'id1',
+				'name' => 'Notification  1',
+			],
+			[
+				'id'    => 'id2',
+				'name'  => 'Notification  2',
+				'event' => 'form_saved',
+			],
+			[
+				'id'    => 'id3',
+				'name'  => 'Notification  3',
+				'event' => 'form_save_email_requested',
+			],
 		];
 
 		$this->model->register_notifications( $notifications );

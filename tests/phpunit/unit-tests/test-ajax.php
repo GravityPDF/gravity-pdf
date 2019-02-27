@@ -20,23 +20,23 @@ use WPAjaxDieContinueException;
  */
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -48,7 +48,6 @@ use WPAjaxDieContinueException;
  *
  * @group ajax
  * @runTestsInSeparateProcesses
- *
  */
 class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 
@@ -91,7 +90,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 	public static function setUpBeforeClass() {
 		global $wpdb;
 		$wpdb->suppress_errors = false;
-		$wpdb->show_errors = true;
+		$wpdb->show_errors     = true;
 		$wpdb->db_connect();
 
 		parent::setUpBeforeClass();
@@ -236,7 +235,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 		$this->assertEquals( '401', $e->getMessage() );
 
 		/* Check for missing v3 configuration file failure */
-		$_POST['nonce'] = wp_create_nonce( "gfpdf_multisite_migration" );
+		$_POST['nonce'] = wp_create_nonce( 'gfpdf_multisite_migration' );
 
 		try {
 			$this->_handleAjax( 'multisite_v3_migration' );
@@ -282,7 +281,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 		$this->assertEquals( '401', $e->getMessage() );
 
 		/* Check for missing v3 configuration file failure */
-		$_POST['nonce'] = wp_create_nonce( "gfpdf_ajax_nonce" );
+		$_POST['nonce'] = wp_create_nonce( 'gfpdf_ajax_nonce' );
 
 		try {
 			$this->_handleAjax( 'gfpdf_get_template_fields' );
@@ -360,7 +359,6 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 		$this->assertArrayHasKey( 'dup_nonce', $response );
 		$this->assertArrayHasKey( 'del_nonce', $response );
 		$this->assertArrayHasKey( 'state_nonce', $response );
-
 
 		/* Test the function performed correctly */
 		unset( $gfpdf->data->form_settings );
@@ -773,7 +771,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 		$ApiResponse = function() {
 			return [
 				'response' => [ 'code' => 200 ],
-				'body' => '',
+				'body'     => '',
 			];
 		};
 

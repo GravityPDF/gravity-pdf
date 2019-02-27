@@ -16,23 +16,23 @@ use WP_Error;
  */
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /* Exit if accessed directly */
@@ -367,12 +367,15 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			return $settings;
 		}
 
-		$this->log->addError( 'Settings Retreival Error', [
-			'form_id'          => $form_id,
-			'pid'              => $pid,
-			'WP_Error_Message' => $settings->get_error_message(),
-			'WP_Error_Code'    => $settings->get_error_code(),
-		] );
+		$this->log->addError(
+			'Settings Retreival Error',
+			[
+				'form_id'          => $form_id,
+				'pid'              => $pid,
+				'WP_Error_Message' => $settings->get_error_message(),
+				'WP_Error_Code'    => $settings->get_error_code(),
+			]
+		);
 
 		/* there was an error */
 
@@ -401,10 +404,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		if ( 0 === $form_id ) {
 
 			$error = new WP_Error( 'invalid_id', esc_html__( 'You must pass in a valid form ID', 'gravity-forms-pdf-extended' ) );
-			$this->log->addError( 'Error Getting Settings.', [
-				'WP_Error_Message' => $error->get_error_message(),
-				'WP_Error_Code'    => $error->get_error_code(),
-			] );
+			$this->log->addError(
+				'Error Getting Settings.',
+				[
+					'WP_Error_Message' => $error->get_error_message(),
+					'WP_Error_Code'    => $error->get_error_code(),
+				]
+			);
 
 			return $error;
 		}
@@ -417,10 +423,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			if ( empty( $form ) ) {
 
 				$error = new WP_Error( 'invalid_id', esc_html__( 'You must pass in a valid form ID', 'gravity-forms-pdf-extended' ) );
-				$this->log->addError( 'Error Getting Settings.', [
-					'WP_Error_Message' => $error->get_error_message(),
-					'WP_Error_Code'    => $error->get_error_code(),
-				] );
+				$this->log->addError(
+					'Error Getting Settings.',
+					[
+						'WP_Error_Message' => $error->get_error_message(),
+						'WP_Error_Code'    => $error->get_error_code(),
+					]
+				);
 
 				return $error;
 			}
@@ -504,17 +513,23 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			if ( $results ) {
 
 				/* return the ID if successful */
-				$this->log->addNotice( 'Successfuly Added New PDF', [
-					'pdf' => $pdf,
-				] );
+				$this->log->addNotice(
+					'Successfuly Added New PDF',
+					[
+						'pdf' => $pdf,
+					]
+				);
 
 				return $pdf['id'];
 			}
 
-			$this->log->addError( 'Error Saving New PDF', [
-				'error' => $results,
-				'pdf'   => $pdf,
-			] );
+			$this->log->addError(
+				'Error Saving New PDF',
+				[
+					'error' => $results,
+					'pdf'   => $pdf,
+				]
+			);
 		}
 
 		return false;
@@ -539,11 +554,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function update_pdf( $form_id, $pdf_id, $pdf = '', $update_db = true, $filters = true ) {
 
-		$this->log->addNotice( 'Begin Updating PDF Settings', [
-			'form_id'      => $form_id,
-			'pdf_id'       => $pdf_id,
-			'new_settings' => $pdf,
-		] );
+		$this->log->addNotice(
+			'Begin Updating PDF Settings',
+			[
+				'form_id'      => $form_id,
+				'pdf_id'       => $pdf_id,
+				'new_settings' => $pdf,
+			]
+		);
 
 		if ( empty( $pdf ) || ! is_array( $pdf ) || sizeof( $pdf ) == 0 ) {
 			/* No value was passed in so we will delete the PDF */
@@ -578,9 +596,12 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$did_update = false;
 			if ( $update_db ) {
 
-				$this->log->addNotice( 'Updating PDF Settings in Form Object', [
-					'form_id' => $form['id'],
-				] );
+				$this->log->addNotice(
+					'Updating PDF Settings in Form Object',
+					[
+						'form_id' => $form['id'],
+					]
+				);
 
 				/* Update the database, if able */
 				$did_update = $this->gform->update_form( $form );
@@ -613,10 +634,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function delete_pdf( $form_id, $pdf_id ) {
 
-		$this->log->addNotice( 'Begin Deleting PDF Setting', [
-			'form_id' => $form_id,
-			'pdf_id'  => $pdf_id,
-		] );
+		$this->log->addNotice(
+			'Begin Deleting PDF Setting',
+			[
+				'form_id' => $form_id,
+				'pdf_id'  => $pdf_id,
+			]
+		);
 
 		/* First let's grab the current settings */
 		$options = $this->get_form_pdfs( $form_id );
@@ -640,10 +664,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			/* If it updated, let's update the global variable */
 			if ( $did_update !== false ) {
 
-				$this->log->addNotice( 'Completed Deleting PDF Setting', [
-					'form_id' => $form_id,
-					'pdf_id'  => $pdf_id,
-				] );
+				$this->log->addNotice(
+					'Completed Deleting PDF Setting',
+					[
+						'form_id' => $form_id,
+						'pdf_id'  => $pdf_id,
+					]
+				);
 
 				$this->data->form_settings[ $form_id ] = $options;
 			}
@@ -653,10 +680,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			return $did_update;
 		}
 
-		$this->log->addError( 'Failed Deleting PDF Setting', [
-			'form_id' => $form_id,
-			'pdf_id'  => $pdf_id,
-		] );
+		$this->log->addError(
+			'Failed Deleting PDF Setting',
+			[
+				'form_id' => $form_id,
+				'pdf_id'  => $pdf_id,
+			]
+		);
 
 		return false;
 	}
@@ -703,9 +733,12 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	public function update_option( $key = '', $value = false ) {
 
 		if ( empty( $key ) ) {
-			$this->log->addError( 'Empty Option Key', [
-				'value' => $value,
-			] );
+			$this->log->addError(
+				'Empty Option Key',
+				[
+					'value' => $value,
+				]
+			);
 
 			return false;
 		}
@@ -824,70 +857,73 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @since 4.0
 	 */
 	public function get_paper_size() {
-		return apply_filters( 'gfpdf_get_paper_size', [
-			esc_html__( 'Common Sizes', 'gravity-forms-pdf-extended' ) => [
-				'A4'        => esc_html__( 'A4 (210 x 297mm)', 'gravity-forms-pdf-extended' ),
-				'LETTER'    => esc_html__( 'Letter (8.5 x 11in)', 'gravity-forms-pdf-extended' ),
-				'LEGAL'     => esc_html__( 'Legal (8.5 x 14in)', 'gravity-forms-pdf-extended' ),
-				'LEDGER'    => esc_html__( 'Ledger / Tabloid (11 x 17in)', 'gravity-forms-pdf-extended' ),
-				'EXECUTIVE' => esc_html__( 'Executive (7 x 10in)', 'gravity-forms-pdf-extended' ),
-				'CUSTOM'    => esc_html__( 'Custom Paper Size', 'gravity-forms-pdf-extended' ),
-			],
+		return apply_filters(
+			'gfpdf_get_paper_size',
+			[
+				esc_html__( 'Common Sizes', 'gravity-forms-pdf-extended' ) => [
+					'A4'        => esc_html__( 'A4 (210 x 297mm)', 'gravity-forms-pdf-extended' ),
+					'LETTER'    => esc_html__( 'Letter (8.5 x 11in)', 'gravity-forms-pdf-extended' ),
+					'LEGAL'     => esc_html__( 'Legal (8.5 x 14in)', 'gravity-forms-pdf-extended' ),
+					'LEDGER'    => esc_html__( 'Ledger / Tabloid (11 x 17in)', 'gravity-forms-pdf-extended' ),
+					'EXECUTIVE' => esc_html__( 'Executive (7 x 10in)', 'gravity-forms-pdf-extended' ),
+					'CUSTOM'    => esc_html__( 'Custom Paper Size', 'gravity-forms-pdf-extended' ),
+				],
 
-			esc_html__( '"A" Sizes', 'gravity-forms-pdf-extended' ) => [
-				'A0'  => esc_html__( 'A0 (841 x 1189mm)', 'gravity-forms-pdf-extended' ),
-				'A1'  => esc_html__( 'A1 (594 x 841mm)', 'gravity-forms-pdf-extended' ),
-				'A2'  => esc_html__( 'A2 (420 x 594mm)', 'gravity-forms-pdf-extended' ),
-				'A3'  => esc_html__( 'A3 (297 x 420mm)', 'gravity-forms-pdf-extended' ),
-				'A5'  => esc_html__( 'A5 (148 x 210mm)', 'gravity-forms-pdf-extended' ),
-				'A6'  => esc_html__( 'A6 (105 x 148mm)', 'gravity-forms-pdf-extended' ),
-				'A7'  => esc_html__( 'A7 (74 x 105mm)', 'gravity-forms-pdf-extended' ),
-				'A8'  => esc_html__( 'A8 (52 x 74mm)', 'gravity-forms-pdf-extended' ),
-				'A9'  => esc_html__( 'A9 (37 x 52mm)', 'gravity-forms-pdf-extended' ),
-				'A10' => esc_html__( 'A10 (26 x 37mm)', 'gravity-forms-pdf-extended' ),
-			],
+				esc_html__( '"A" Sizes', 'gravity-forms-pdf-extended' ) => [
+					'A0'  => esc_html__( 'A0 (841 x 1189mm)', 'gravity-forms-pdf-extended' ),
+					'A1'  => esc_html__( 'A1 (594 x 841mm)', 'gravity-forms-pdf-extended' ),
+					'A2'  => esc_html__( 'A2 (420 x 594mm)', 'gravity-forms-pdf-extended' ),
+					'A3'  => esc_html__( 'A3 (297 x 420mm)', 'gravity-forms-pdf-extended' ),
+					'A5'  => esc_html__( 'A5 (148 x 210mm)', 'gravity-forms-pdf-extended' ),
+					'A6'  => esc_html__( 'A6 (105 x 148mm)', 'gravity-forms-pdf-extended' ),
+					'A7'  => esc_html__( 'A7 (74 x 105mm)', 'gravity-forms-pdf-extended' ),
+					'A8'  => esc_html__( 'A8 (52 x 74mm)', 'gravity-forms-pdf-extended' ),
+					'A9'  => esc_html__( 'A9 (37 x 52mm)', 'gravity-forms-pdf-extended' ),
+					'A10' => esc_html__( 'A10 (26 x 37mm)', 'gravity-forms-pdf-extended' ),
+				],
 
-			esc_html__( '"B" Sizes', 'gravity-forms-pdf-extended' ) => [
-				'B0'  => esc_html__( 'B0 (1414 x 1000mm)', 'gravity-forms-pdf-extended' ),
-				'B1'  => esc_html__( 'B1 (1000 x 707mm)', 'gravity-forms-pdf-extended' ),
-				'B2'  => esc_html__( 'B2 (707 x 500mm)', 'gravity-forms-pdf-extended' ),
-				'B3'  => esc_html__( 'B3 (500 x 353mm)', 'gravity-forms-pdf-extended' ),
-				'B4'  => esc_html__( 'B4 (353 x 250mm)', 'gravity-forms-pdf-extended' ),
-				'B5'  => esc_html__( 'B5 (250 x 176mm)', 'gravity-forms-pdf-extended' ),
-				'B6'  => esc_html__( 'B6 (176 x 125mm)', 'gravity-forms-pdf-extended' ),
-				'B7'  => esc_html__( 'B7 (125 x 88mm)', 'gravity-forms-pdf-extended' ),
-				'B8'  => esc_html__( 'B8 (88 x 62mm)', 'gravity-forms-pdf-extended' ),
-				'B9'  => esc_html__( 'B9 (62 x 44mm)', 'gravity-forms-pdf-extended' ),
-				'B10' => esc_html__( 'B10 (44 x 31mm)', 'gravity-forms-pdf-extended' ),
-			],
+				esc_html__( '"B" Sizes', 'gravity-forms-pdf-extended' ) => [
+					'B0'  => esc_html__( 'B0 (1414 x 1000mm)', 'gravity-forms-pdf-extended' ),
+					'B1'  => esc_html__( 'B1 (1000 x 707mm)', 'gravity-forms-pdf-extended' ),
+					'B2'  => esc_html__( 'B2 (707 x 500mm)', 'gravity-forms-pdf-extended' ),
+					'B3'  => esc_html__( 'B3 (500 x 353mm)', 'gravity-forms-pdf-extended' ),
+					'B4'  => esc_html__( 'B4 (353 x 250mm)', 'gravity-forms-pdf-extended' ),
+					'B5'  => esc_html__( 'B5 (250 x 176mm)', 'gravity-forms-pdf-extended' ),
+					'B6'  => esc_html__( 'B6 (176 x 125mm)', 'gravity-forms-pdf-extended' ),
+					'B7'  => esc_html__( 'B7 (125 x 88mm)', 'gravity-forms-pdf-extended' ),
+					'B8'  => esc_html__( 'B8 (88 x 62mm)', 'gravity-forms-pdf-extended' ),
+					'B9'  => esc_html__( 'B9 (62 x 44mm)', 'gravity-forms-pdf-extended' ),
+					'B10' => esc_html__( 'B10 (44 x 31mm)', 'gravity-forms-pdf-extended' ),
+				],
 
-			esc_html__( '"C" Sizes', 'gravity-forms-pdf-extended' ) => [
-				'C0'  => esc_html__( 'C0 (1297 x 917mm)', 'gravity-forms-pdf-extended' ),
-				'C1'  => esc_html__( 'C1 (917 x 648mm)', 'gravity-forms-pdf-extended' ),
-				'C2'  => esc_html__( 'C2 (648 x 458mm)', 'gravity-forms-pdf-extended' ),
-				'C3'  => esc_html__( 'C3 (458 x 324mm)', 'gravity-forms-pdf-extended' ),
-				'C4'  => esc_html__( 'C4 (324 x 229mm)', 'gravity-forms-pdf-extended' ),
-				'C5'  => esc_html__( 'C5 (229 x 162mm)', 'gravity-forms-pdf-extended' ),
-				'C6'  => esc_html__( 'C6 (162 x 114mm)', 'gravity-forms-pdf-extended' ),
-				'C7'  => esc_html__( 'C7 (114 x 81mm)', 'gravity-forms-pdf-extended' ),
-				'C8'  => esc_html__( 'C8 (81 x 57mm)', 'gravity-forms-pdf-extended' ),
-				'C9'  => esc_html__( 'C9 (57 x 40mm)', 'gravity-forms-pdf-extended' ),
-				'C10' => esc_html__( 'C10 (40 x 28mm)', 'gravity-forms-pdf-extended' ),
-			],
+				esc_html__( '"C" Sizes', 'gravity-forms-pdf-extended' ) => [
+					'C0'  => esc_html__( 'C0 (1297 x 917mm)', 'gravity-forms-pdf-extended' ),
+					'C1'  => esc_html__( 'C1 (917 x 648mm)', 'gravity-forms-pdf-extended' ),
+					'C2'  => esc_html__( 'C2 (648 x 458mm)', 'gravity-forms-pdf-extended' ),
+					'C3'  => esc_html__( 'C3 (458 x 324mm)', 'gravity-forms-pdf-extended' ),
+					'C4'  => esc_html__( 'C4 (324 x 229mm)', 'gravity-forms-pdf-extended' ),
+					'C5'  => esc_html__( 'C5 (229 x 162mm)', 'gravity-forms-pdf-extended' ),
+					'C6'  => esc_html__( 'C6 (162 x 114mm)', 'gravity-forms-pdf-extended' ),
+					'C7'  => esc_html__( 'C7 (114 x 81mm)', 'gravity-forms-pdf-extended' ),
+					'C8'  => esc_html__( 'C8 (81 x 57mm)', 'gravity-forms-pdf-extended' ),
+					'C9'  => esc_html__( 'C9 (57 x 40mm)', 'gravity-forms-pdf-extended' ),
+					'C10' => esc_html__( 'C10 (40 x 28mm)', 'gravity-forms-pdf-extended' ),
+				],
 
-			esc_html__( '"RA" and "SRA" Sizes', 'gravity-forms-pdf-extended' ) => [
-				'RA0'  => esc_html__( 'RA0 (860 x 1220mm)', 'gravity-forms-pdf-extended' ),
-				'RA1'  => esc_html__( 'RA1 (610 x 860mm)', 'gravity-forms-pdf-extended' ),
-				'RA2'  => esc_html__( 'RA2 (430 x 610mm)', 'gravity-forms-pdf-extended' ),
-				'RA3'  => esc_html__( 'RA3 (305 x 430mm)', 'gravity-forms-pdf-extended' ),
-				'RA4'  => esc_html__( 'RA4 (215 x 305mm)', 'gravity-forms-pdf-extended' ),
-				'SRA0' => esc_html__( 'SRA0 (900 x 1280mm)', 'gravity-forms-pdf-extended' ),
-				'SRA1' => esc_html__( 'SRA1 (640 x 900mm)', 'gravity-forms-pdf-extended' ),
-				'SRA2' => esc_html__( 'SRA2 (450 x 640mm)', 'gravity-forms-pdf-extended' ),
-				'SRA3' => esc_html__( 'SRA3 (320 x 450mm)', 'gravity-forms-pdf-extended' ),
-				'SRA4' => esc_html__( 'SRA4 (225 x 320mm)', 'gravity-forms-pdf-extended' ),
-			],
-		] );
+				esc_html__( '"RA" and "SRA" Sizes', 'gravity-forms-pdf-extended' ) => [
+					'RA0'  => esc_html__( 'RA0 (860 x 1220mm)', 'gravity-forms-pdf-extended' ),
+					'RA1'  => esc_html__( 'RA1 (610 x 860mm)', 'gravity-forms-pdf-extended' ),
+					'RA2'  => esc_html__( 'RA2 (430 x 610mm)', 'gravity-forms-pdf-extended' ),
+					'RA3'  => esc_html__( 'RA3 (305 x 430mm)', 'gravity-forms-pdf-extended' ),
+					'RA4'  => esc_html__( 'RA4 (215 x 305mm)', 'gravity-forms-pdf-extended' ),
+					'SRA0' => esc_html__( 'SRA0 (900 x 1280mm)', 'gravity-forms-pdf-extended' ),
+					'SRA1' => esc_html__( 'SRA1 (640 x 900mm)', 'gravity-forms-pdf-extended' ),
+					'SRA2' => esc_html__( 'SRA2 (450 x 640mm)', 'gravity-forms-pdf-extended' ),
+					'SRA3' => esc_html__( 'SRA3 (320 x 450mm)', 'gravity-forms-pdf-extended' ),
+					'SRA4' => esc_html__( 'SRA4 (225 x 320mm)', 'gravity-forms-pdf-extended' ),
+				],
+			]
+		);
 	}
 
 
@@ -907,11 +943,11 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				'dejavuserif'          => 'Dejavu Serif',
 				'dejavusansmono'       => 'Dejavu Sans Mono',
 
-				'freesans'  => 'Free Sans',
-				'freeserif' => 'Free Serif',
-				'freemono'  => 'Free Mono',
+				'freesans'             => 'Free Sans',
+				'freeserif'            => 'Free Serif',
+				'freemono'             => 'Free Mono',
 
-				'mph2bdamase' => 'MPH 2B Damase',
+				'mph2bdamase'          => 'MPH 2B Damase',
 			],
 
 			esc_html__( 'Indic', 'gravity-forms-pdf-extended' ) => [
@@ -927,7 +963,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 			esc_html__( 'Chinese, Japanese, Korean', 'gravity-forms-pdf-extended' ) => [
 				'sun-exta' => 'Sun Ext',
-				'unbatang'  => 'Un Batang (Korean)',
+				'unbatang' => 'Un Batang (Korean)',
 			],
 
 			esc_html__( 'Other', 'gravity-forms-pdf-extended' ) => [
@@ -1083,7 +1119,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$rand = rand( 1, 10 );
 
 		if ( 10 === $rand ) {
-			$total_pdf_count = (int) $this->get_option( 'pdf_count', 0 );
+			$total_pdf_count  = (int) $this->get_option( 'pdf_count', 0 );
 			$total_pdf_count += 10;
 			$this->update_option( 'pdf_count', $total_pdf_count );
 		}
@@ -1100,7 +1136,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @param array $input The value inputted in the field
 	 *
 	 * @return string $input Sanitizied value
-	 *
 	 */
 	public function settings_sanitize( $input = [] ) {
 
@@ -1117,13 +1152,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$settings     = ( ! empty( $all_settings[ $tab ] ) && $tab !== 'tools' ) ? $all_settings[ $tab ] : [];
 
 		/*
-         * Get all setting types
+		 * Get all setting types
 		 */
 		$tab_len = strlen( $tab );
 		foreach ( $all_settings as $id => $s ) {
 			/*
-             * Check if extra item(s) belongs on page but isn't the existing page
-             * Note that this requires the section ID share a similar ID to what is referenced in $tab
+			 * Check if extra item(s) belongs on page but isn't the existing page
+			 * Note that this requires the section ID share a similar ID to what is referenced in $tab
 			 */
 			if ( $tab != $id && $tab == substr( $id, 0, $tab_len ) ) {
 				$settings = array_merge( $settings, $s );
@@ -1144,13 +1179,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 						if ( ! isset( $input[ $key ] ) ) {
 							$input[ $key ] = [];
 						}
-					break;
+						break;
 
 					default:
 						if ( ! isset( $input[ $key ] ) ) {
 							$input[ $key ] = '';
 						}
-					break;
+						break;
 				}
 			}
 		}
@@ -1225,7 +1260,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @return string $input Sanitizied value
 	 */
 	public function sanitize_number_field( $input ) {
-		return (integer) $input;
+		return (int) $input;
 	}
 
 	/**
@@ -1302,16 +1337,19 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			/* treat as plain text */
 			default:
 				if ( is_array( $value ) ) {
-					array_walk_recursive( $value, function ( &$item ) {
-						$item = wp_strip_all_tags( $item );
-					} );
+					array_walk_recursive(
+						$value,
+						function ( &$item ) {
+							$item = wp_strip_all_tags( $item );
+						}
+					);
 
 					return $value;
 				} else {
 					return wp_strip_all_tags( $value );
 				}
 
-			break;
+				break;
 		}
 	}
 
@@ -1339,7 +1377,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 						/* throw error */
 						add_settings_error( 'gfpdf-notices', $key, esc_html__( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
 					}
-				break;
+					break;
 
 				case 'paper_size':
 					if ( isset( $input['default_pdf_size'] ) && $input['default_pdf_size'] === 'CUSTOM' ) {
@@ -1348,14 +1386,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 							add_settings_error( 'gfpdf-notices', $key, esc_html__( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
 						}
 					}
-				break;
+					break;
 
 				default:
 					if ( strlen( trim( $value ) ) === 0 ) {
 						/* throw error */
 						add_settings_error( 'gfpdf-notices', $key, esc_html__( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
 					}
-				break;
+					break;
 			}
 		}
 
@@ -1403,15 +1441,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					];
 				} else {
 					return [
-						'key' => '',
-						'msg' => '',
+						'key'    => '',
+						'msg'    => '',
 						'status' => '',
 					];
 				}
-			break;
+				break;
 
 			case 'checkbox':
-
 				if ( isset( $options[ $args['id'] ] ) ) {
 					return checked( 1, $options[ $args['id'] ], false );
 
@@ -1422,10 +1459,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					return checked( 1, 1, false );
 				}
 
-			break;
+				break;
 
 			case 'multicheck':
-
 				if ( isset( $options[ $args['id'] ][ $args['multi-key'] ] ) ) {
 					return $args['multi-option'];
 
@@ -1433,10 +1469,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					return $args['multi-option'];
 				}
 
-			break;
+				break;
 
 			case 'radio':
-
 				if ( isset( $options[ $args['id'] ] ) && isset( $args['options'][ $options[ $args['id'] ] ] ) ) {
 					return $options[ $args['id'] ];
 
@@ -1447,10 +1482,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					return $args['std'];
 				}
 
-			break;
+				break;
 
 			case 'password':
-
 				if ( isset( $options[ $args['id'] ] ) ) {
 					return trim( $options[ $args['id'] ] );
 
@@ -1458,7 +1492,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					return trim( $pdf_form_settings[ $args['id'] ] );
 				}
 
-			break;
+				break;
 
 			case 'select':
 			case 'paper_size':
@@ -1471,7 +1505,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				} elseif ( isset( $args['std'] ) ) {
 					return $args['std'];
 				}
-			break;
+				break;
 
 			/* treat as a text or hidden callback */
 			default:
@@ -1484,7 +1518,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				} elseif ( isset( $args['std'] ) ) {
 					return $args['std'];
 				}
-			break;
+				break;
 		}
 
 		/* if we made it here return empty string */
@@ -1511,7 +1545,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$required = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
 		$id       = ( isset( $args['idOverride'] ) ) ? esc_attr( $args['idOverride'] ) : 'gfpdf_settings[' . esc_attr( $args['id'] ) . ']';
 
-		$html = '<input type="checkbox" id="' . $id . '" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" name="gfpdf_settings[' . $args['id'] . ']" value="1" ' . $checked . ' ' . $required . ' />';
+		$html  = '<input type="checkbox" id="' . $id . '" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" name="gfpdf_settings[' . $args['id'] . ']" value="1" ' . $checked . ' ' . $required . ' />';
 		$html .= '<label for="' . $id . '"> ' . wp_kses_post( $args['desc'] ) . '</label>';
 
 		if ( isset( $args['tooltip'] ) ) {
@@ -1658,19 +1692,19 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		/* Show status info */
 		if ( $value['status'] !== '' ) {
 			$status_class = ( $value['status'] === 'active' ) ? 'fa-check' : 'fa-exclamation-circle';
-			$html .= ' <i class="fa fa-lg '. $status_class.'" aria-hidden="true"></i>';
+			$html        .= ' <i class="fa fa-lg ' . $status_class . '" aria-hidden="true"></i>';
 		}
 
 		/* Add renewal info */
 		if ( $value['status'] === 'active' ) {
 			$html .= ' <a 
 				class="gfpdf-deactivate-license" 
-				data-addon-name="'. substr($args['id'], 8 ) . '" 
-				data-license="'. $value['key'] .'" 
-				data-nonce="'.  wp_create_nonce( 'gfpdf_deactivate_license' ) .'" 
-				href="#">'.
-			         esc_attr__( 'Deactivate License', 'gravity-forms-pdf-extended' ) .
-	            '</a>';
+				data-addon-name="' . substr( $args['id'], 8 ) . '" 
+				data-license="' . $value['key'] . '" 
+				data-nonce="' . wp_create_nonce( 'gfpdf_deactivate_license' ) . '" 
+				href="#">' .
+					 esc_attr__( 'Deactivate License', 'gravity-forms-pdf-extended' ) .
+				'</a>';
 		}
 
 		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']">' . wp_kses_post( $value['msg'] ) . '</label></span>';
@@ -1788,8 +1822,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$required   = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
 		$args['id'] = esc_attr( $args['id'] );
 
-		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? esc_attr( $args['size'] ) : 'regular';
-		$html = '<input type="password" class="' . $size . '-text ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" ' . $required . ' />';
+		$size  = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? esc_attr( $args['size'] ) : 'regular';
+		$html  = '<input type="password" class="' . $size . '-text ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" ' . $required . ' />';
 		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
 
 		if ( isset( $args['tooltip'] ) ) {
@@ -1902,7 +1936,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @since 4.0
 	 *
-	 * @param array  $args       Arguments passed by the setting
+	 * @param array $args       Arguments passed by the setting
 	 *
 	 * @global float $wp_version The WordPress Version
 	 */
@@ -1917,16 +1951,23 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		if ( function_exists( 'wp_editor' ) ) {
 			ob_start();
 			echo '<span class="mt-gfpdf_settings_' . $args['id'] . '" style="float:right; position:relative; right: 10px; top: 90px;"></span>';
-			wp_editor( stripslashes( $value ), 'gfpdf_settings_' . $args['id'], apply_filters( 'gfpdf_rich_editor_settings', [
-				'textarea_name' => 'gfpdf_settings[' . $args['id'] . ']',
-				'textarea_rows' => $rows,
-				'editor_height' => $rows * 10, /* estimate row height at 10px */
-				'editor_class'  => 'gfpdf_settings_' . $args['id'] . ' ' . $class,
-				'autop'         => false,
-			] ) );
+			wp_editor(
+				stripslashes( $value ),
+				'gfpdf_settings_' . $args['id'],
+				apply_filters(
+					'gfpdf_rich_editor_settings',
+					[
+						'textarea_name' => 'gfpdf_settings[' . $args['id'] . ']',
+						'textarea_rows' => $rows,
+						'editor_height' => $rows * 10, /* estimate row height at 10px */
+						'editor_class'  => 'gfpdf_settings_' . $args['id'] . ' ' . $class,
+						'autop'         => false,
+					]
+				)
+			);
 			$html = ob_get_clean();
 		} else {
-			$html = '<textarea class="large-text" rows="'. $rows . '" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']">' . esc_textarea( stripslashes( $value ) ) . '</textarea>';
+			$html = '<textarea class="large-text" rows="' . $rows . '" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']">' . esc_textarea( stripslashes( $value ) ) . '</textarea>';
 		}
 
 		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
@@ -1968,7 +2009,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$args['id']           = esc_attr( $args['id'] );
 		$size                 = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? esc_attr( $args['size'] ) : 'regular';
 
-		$html = '<input type="text" class="' . $size . '-text gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" ' . $required . ' />';
+		$html  = '<input type="text" class="' . $size . '-text gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" ' . $required . ' />';
 		$html .= '<span>&nbsp;<input type="button" class="gfpdf_settings_upload_button button-secondary" value="' . $button_text . '" data-uploader-title="' . $uploader_title . '" data-uploader-button-text="' . $uploader_button_text . '" /></span>';
 		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
 
@@ -2000,7 +2041,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$required   = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
 		$args['id'] = esc_attr( $args['id'] );
 
-		$html = '<input type="text" class="gfpdf-color-picker gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" data-default-color="' . esc_attr( $default ) . '" ' . $required . ' />';
+		$html  = '<input type="text" class="gfpdf-color-picker gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" data-default-color="' . esc_attr( $default ) . '" ' . $required . ' />';
 		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
 
 		if ( isset( $args['tooltip'] ) ) {
@@ -2119,20 +2160,23 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$class       = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
 		$size        = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? esc_attr( $args['size'] ) : 'regular';
 
-		$html = '<input type="number" class="' . $size . '-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_width" min="0" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( stripslashes( $value[0] ) ) . '" /> ' . esc_html__( 'Width', 'gravity-forms-pdf-extended' );
+		$html  = '<input type="number" class="' . $size . '-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_width" min="0" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( stripslashes( $value[0] ) ) . '" /> ' . esc_html__( 'Width', 'gravity-forms-pdf-extended' );
 		$html .= ' <input type="number" class="' . $size . '-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_height" min="0" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( stripslashes( $value[1] ) ) . '" /> ' . esc_html__( 'Height', 'gravity-forms-pdf-extended' );
 
-		$measurement = apply_filters( 'gfpdf_paper_size_dimensions', [
-			'millimeters' => esc_html__( 'mm', 'gravity-forms-pdf-extended' ),
-			'inches'      => esc_html__( 'inches', 'gravity-forms-pdf-extended' ),
-		] );
+		$measurement = apply_filters(
+			'gfpdf_paper_size_dimensions',
+			[
+				'millimeters' => esc_html__( 'mm', 'gravity-forms-pdf-extended' ),
+				'inches'      => esc_html__( 'inches', 'gravity-forms-pdf-extended' ),
+			]
+		);
 
 		$html .= '&nbsp; — &nbsp; <select id="gfpdf_settings[' . $args['id'] . ']_measurement" style="width: 75px" class="gfpdf_settings_' . $args['id'] . ' ' . $class . ' ' . $chosen . '" name="gfpdf_settings[' . $args['id'] . '][]" data-placeholder="' . $placeholder . '">';
 
 		$measure_value = esc_attr( stripslashes( $value[2] ) );
 		foreach ( $measurement as $key => $val ) {
 			$selected = ( $measure_value === $key ) ? 'selected="selected"' : '';
-			$html .= '<option value="' . $key . '" ' . $selected . '>' . $val . '</option>';
+			$html    .= '<option value="' . $key . '" ' . $selected . '>' . $val . '</option>';
 		}
 
 		$html .= '</select> ';
@@ -2204,8 +2248,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$toggle_elm = '<label><input class="gfpdf-input-toggle" type="checkbox" value="1" ' . checked( $has_value, 1, false ) . ' /> ' . esc_attr( $toggle ) . '</label>';
 
 		$html = '<div class="gfpdf-toggle-wrapper" ' . $current_display . '>' .
-		        $html .
-		        '</div>';
+				$html .
+				'</div>';
 
 		$html = $toggle_elm . $html;
 

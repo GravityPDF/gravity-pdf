@@ -15,23 +15,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 ?>
@@ -42,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div id="pdfextended-settings">
 	<h3>
 		<span>
-		    <i class="fa fa-cog"></i>
+			<i class="fa fa-cog"></i>
 			<?php esc_html_e( 'Tools', 'gravity-forms-pdf-extended' ); ?>
 		</span>
 	</h3>
@@ -66,14 +66,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</form>
 
 
-	<?php if ( $args['custom_template_setup_warning'] ): ?>
+	<?php if ( $args['custom_template_setup_warning'] ) : ?>
 		<!-- only show custom template warning if user has already installed them once -->
 		<div id="setup-templates-confirm" title="<?php esc_html_e( 'Setup Custom Templates', 'gravity-forms-pdf-extended' ); ?>" style="display: none;">
-			<?php printf( esc_html__( 'During the setup process any of the following templates stored in %s will be overridden. If you have modified any of the following template or template configuration files %smake a backup before continuing%s.', 'gravity-forms-pdf-extended' ), '<br><code>' . $args['template_directory'] . '</code>', '<strong>', '</strong>' ); ?>
+			<?php printf( esc_html__( 'During the setup process any of the following templates stored in %1$s will be overridden. If you have modified any of the following template or template configuration files %2$smake a backup before continuing%3$s.', 'gravity-forms-pdf-extended' ), '<br><code>' . $args['template_directory'] . '</code>', '<strong>', '</strong>' ); ?>
 
-			<?php if ( sizeof( $args['template_files'] ) > 0 ): ?>
+			<?php if ( sizeof( $args['template_files'] ) > 0 ) : ?>
 				<ul>
-					<?php foreach ( $args['template_files'] as $file ): ?>
+					<?php foreach ( $args['template_files'] as $file ) : ?>
 						<li><?php echo basename( $file ); ?></li>
 					<?php endforeach; ?>
 				</ul>
@@ -123,10 +123,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<input type="text" value="{{- model.get('regular') }}" required="required" name="regular" class="regular-text">
 				<span>
 					<input type="button"
-				             data-uploader-button-text="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
-				             data-uploader-title="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
-				             value="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
-				             class="gfpdf_settings_upload_button button-secondary">
+							 data-uploader-button-text="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+							 data-uploader-title="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+							 value="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+							 class="gfpdf_settings_upload_button button-secondary">
 				</span>
 			</div>
 
@@ -135,10 +135,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<input type="text" value="{{- model.get('italics') }}" name="italics" class="regular-text">
 				<span>
 					<input type="button"
-					       data-uploader-button-text="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
-					       data-uploader-title="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
-					       value="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
-					       class="gfpdf_settings_upload_button button-secondary">
+						   data-uploader-button-text="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+						   data-uploader-title="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+						   value="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+						   class="gfpdf_settings_upload_button button-secondary">
 				</span>
 			</div>
 
@@ -147,10 +147,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<input type="text" value="{{- model.get('bold') }}" name="bold" class="regular-text">
 				<span>
 					<input type="button"
-				             data-uploader-button-text="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
-				             data-uploader-title="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
-				             value="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
-				             class="gfpdf_settings_upload_button button-secondary">
+							 data-uploader-button-text="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+							 data-uploader-title="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+							 value="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+							 class="gfpdf_settings_upload_button button-secondary">
 				</span>
 			</div>
 
@@ -159,10 +159,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<input type="text" value="{{- model.get('bolditalics') }}" name="bolditalics" class="regular-text">
 				<span>
 					<input type="button"
-				             data-uploader-button-text="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
-				             data-uploader-title="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
-				             value="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
-				             class="gfpdf_settings_upload_button button-secondary">
+							 data-uploader-button-text="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+							 data-uploader-title="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+							 value="<?php esc_attr_e( 'Select Font', 'gravity-forms-pdf-extended' ); ?>"
+							 class="gfpdf_settings_upload_button button-secondary">
 				</span>
 			</div>
 

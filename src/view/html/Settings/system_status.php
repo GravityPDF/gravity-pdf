@@ -7,7 +7,6 @@
  * @copyright   Copyright (c) 2019, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.0
- *
  */
 
 /* Exit if accessed directly */
@@ -16,23 +15,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 ?>
@@ -40,10 +39,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="hr-divider"></div>
 
 <h3>
-    <span>
-        <i class="fa fa-dashboard"></i>
-        <?php esc_html_e( 'Installation Status', 'gravity-forms-pdf-extended' ); ?>
-    </span>
+	<span>
+		<i class="fa fa-dashboard"></i>
+		<?php esc_html_e( 'Installation Status', 'gravity-forms-pdf-extended' ); ?>
+	</span>
 </h3>
 
 <table id="pdf-system-status" class="form-table">
@@ -56,23 +55,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<?php
 				$ram_icon = 'fa fa-check-circle';
-				if ( $args['memory'] < 128 && $args['memory'] !== -1 ) {
-					$ram_icon = 'fa fa-exclamation-triangle';
-				}
+			if ( $args['memory'] < 128 && $args['memory'] !== -1 ) {
+				$ram_icon = 'fa fa-exclamation-triangle';
+			}
 			?>
 
-			<?php if ( $args['memory'] === -1 ): ?>
+			<?php if ( $args['memory'] === -1 ) : ?>
 				<?php echo esc_html__( 'Unlimited', 'gravity-forms-pdf-extended' ); ?>
-			<?php else: ?>
+			<?php else : ?>
 				<?php echo $args['memory']; ?>MB
 			<?php endif; ?>
 
 			<span class="<?php echo $ram_icon; ?>"></span>
 
-			<?php if ( $args['memory'] < 128 && $args['memory'] !== -1 ): ?>
+			<?php if ( $args['memory'] < 128 && $args['memory'] !== -1 ) : ?>
 				<span class="gf_settings_description">
-                    <?php echo sprintf( esc_html__( 'We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. %sFind out how to increase this limit%s.', 'gravity-forms-pdf-extended' ), '<br /><a href="https://gravitypdf.com/documentation/v5/user-increasing-memory-limit/">', '</a>' ); ?>
-                </span>
+					<?php echo sprintf( esc_html__( 'We strongly recommend you have at least 128MB of available WP Memory (RAM) assigned to your website. %1$sFind out how to increase this limit%2$s.', 'gravity-forms-pdf-extended' ), '<br /><a href="https://gravitypdf.com/documentation/v5/user-increasing-memory-limit/">', '</a>' ); ?>
+				</span>
 			<?php endif; ?>
 		</td>
 	</tr>
@@ -126,8 +125,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<strong><?php esc_html_e( 'Unprotected', 'gravity-forms-pdf-extended' ); ?></strong> <span class="fa fa-times-circle"></span>
 
 					<span class="gf_settings_description">
-						<?php printf( esc_html__( "We've detected the PDFs saved in Gravity PDF's %stmp%s directory can be publically accessed.", 'gravity-forms-pdf-extended' ), '<code>', '</code>' ); ?><br>
-						<?php printf( esc_html__( 'We recommend you use our %sgfpdf_tmp_location%s filter to %smove the folder outside your public website directory%s.', 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<a href="https://gravitypdf.com/documentation/v5/gfpdf_tmp_location/">', '</a>' ); ?>
+						<?php printf( esc_html__( "We've detected the PDFs saved in Gravity PDF's %1\$stmp%2\$s directory can be publically accessed.", 'gravity-forms-pdf-extended' ), '<code>', '</code>' ); ?><br>
+						<?php printf( esc_html__( 'We recommend you use our %1$sgfpdf_tmp_location%2$s filter to %3$smove the folder outside your public website directory%4$s.', 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<a href="https://gravitypdf.com/documentation/v5/gfpdf_tmp_location/">', '</a>' ); ?>
 					</span>
 				</div>
 			</div>

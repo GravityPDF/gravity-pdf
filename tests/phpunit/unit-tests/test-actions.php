@@ -20,23 +20,23 @@ use Exception;
  */
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -135,25 +135,28 @@ class Test_Actions extends WP_UnitTestCase {
 		set_current_screen( 'edit.php' );
 
 		/* Set up a custom route */
-		add_filter( 'gfpdf_one_time_action_routes', function ( $routes ) {
+		add_filter(
+			'gfpdf_one_time_action_routes',
+			function ( $routes ) {
 
-			return [
-				[
-					'action'      => 'test_action',
-					'action_text' => 'My Test Action',
-					'condition'   => function () {
-						return true;
-					},
-					'process'     => function () {
-						echo 'processing';
-					},
-					'view'        => function () {
-						return 'my test view';
-					},
-					'capability'  => 'gravityforms_view_settings',
-				],
-			];
-		} );
+				return [
+					[
+						'action'      => 'test_action',
+						'action_text' => 'My Test Action',
+						'condition'   => function () {
+							return true;
+						},
+						'process'     => function () {
+							echo 'processing';
+						},
+						'view'        => function () {
+							return 'my test view';
+						},
+						'capability'  => 'gravityforms_view_settings',
+					],
+				];
+			}
+		);
 
 		/* Verify no notices present */
 		$this->assertFalse( $gfpdf->notices->has_notice() );
@@ -196,25 +199,28 @@ class Test_Actions extends WP_UnitTestCase {
 		global $gfpdf;
 
 		/* Set up a custom route */
-		add_filter( 'gfpdf_one_time_action_routes', function ( $routes ) {
+		add_filter(
+			'gfpdf_one_time_action_routes',
+			function ( $routes ) {
 
-			return [
-				[
-					'action'      => 'test_action',
-					'action_text' => 'My Test Action',
-					'condition'   => function () {
-						return false;
-					},
-					'process'     => function () {
-						echo 'processing';
-					},
-					'view'        => function () {
-						return 'my test view';
-					},
-					'capability'  => 'gravityforms_view_settings',
-				],
-			];
-		} );
+				return [
+					[
+						'action'      => 'test_action',
+						'action_text' => 'My Test Action',
+						'condition'   => function () {
+							return false;
+						},
+						'process'     => function () {
+							echo 'processing';
+						},
+						'view'        => function () {
+							return 'my test view';
+						},
+						'capability'  => 'gravityforms_view_settings',
+					],
+				];
+			}
+		);
 
 		/* Set up authorized user */
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
@@ -244,25 +250,28 @@ class Test_Actions extends WP_UnitTestCase {
 	public function test_route() {
 
 		/* Set up a custom route */
-		add_filter( 'gfpdf_one_time_action_routes', function ( $routes ) {
+		add_filter(
+			'gfpdf_one_time_action_routes',
+			function ( $routes ) {
 
-			return [
-				[
-					'action'      => 'test_action',
-					'action_text' => 'My Test Action',
-					'condition'   => function () {
-						return true;
-					},
-					'process'     => function () {
-						echo 'processing';
-					},
-					'view'        => function () {
-						return 'my test view';
-					},
-					'capability'  => 'gravityforms_view_settings',
-				],
-			];
-		} );
+				return [
+					[
+						'action'      => 'test_action',
+						'action_text' => 'My Test Action',
+						'condition'   => function () {
+							return true;
+						},
+						'process'     => function () {
+							echo 'processing';
+						},
+						'view'        => function () {
+							return 'my test view';
+						},
+						'capability'  => 'gravityforms_view_settings',
+					],
+				];
+			}
+		);
 
 		$_POST['gfpdf_action'] = 'gfpdf_test_action';
 

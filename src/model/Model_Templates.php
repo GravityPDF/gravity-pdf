@@ -33,23 +33,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -136,10 +136,13 @@ class Model_Templates extends Helper_Abstract_Model {
 			$file     = new File( 'template', $storage );
 			$zip_path = $this->move_template_to_tmp_dir( $file );
 		} catch ( Exception $e ) {
-			$this->log->addWarning( 'File validation and move failed', [
-				'file'  => $_FILES,
-				'error' => $e->getMessage(),
-			] );
+			$this->log->addWarning(
+				'File validation and move failed',
+				[
+					'file'  => $_FILES,
+					'error' => $e->getMessage(),
+				]
+			);
 
 			/* Bad Request */
 			wp_die( '400', 400 );
@@ -151,15 +154,20 @@ class Model_Templates extends Helper_Abstract_Model {
 		} catch ( Exception $e ) {
 			$this->cleanup_template_files( $zip_path );
 
-			$this->log->addWarning( 'File validation and move failed', [
-				'file'  => $_FILES,
-				'error' => $e->getMessage(),
-			] );
+			$this->log->addWarning(
+				'File validation and move failed',
+				[
+					'file'  => $_FILES,
+					'error' => $e->getMessage(),
+				]
+			);
 
 			header( 'Content-Type: application/json' );
-			echo json_encode( [
-				'error' => $e->getMessage(),
-			] );
+			echo json_encode(
+				[
+					'error' => $e->getMessage(),
+				]
+			);
 
 			/* Bad Response */
 			wp_die( '', 400 );
@@ -176,10 +184,13 @@ class Model_Templates extends Helper_Abstract_Model {
 		$headers = $this->get_template_info( glob( $unzipped_dir_name . '*.php' ) );
 
 		/* Fix template path */
-		$headers = array_map( function( $header ) use ( $unzipped_dir_name, $template_path ) {
-			$header['path'] = str_replace( $unzipped_dir_name, $template_path, $header['path'] );
-			return $header;
-		}, $headers );
+		$headers = array_map(
+			function( $header ) use ( $unzipped_dir_name, $template_path ) {
+					$header['path'] = str_replace( $unzipped_dir_name, $template_path, $header['path'] );
+					return $header;
+			},
+			$headers
+		);
 
 		/* Run PDF template SetUp method if required */
 		$this->maybe_run_template_setup( $headers );
@@ -194,9 +205,11 @@ class Model_Templates extends Helper_Abstract_Model {
 
 		/* Return newly-installed template headers */
 		header( 'Content-Type: application/json' );
-		echo json_encode( [
-			'templates' => $headers,
-		] );
+		echo json_encode(
+			[
+				'templates' => $headers,
+			]
+		);
 
 		/* Okay Response */
 		wp_die( '', 200 );
@@ -210,11 +223,11 @@ class Model_Templates extends Helper_Abstract_Model {
 	 * @since 4.1
 	 */
 	public function maybe_run_template_setup( $headers = [] ) {
-		foreach( $headers as $template ) {
+		foreach ( $headers as $template ) {
 			$config = $this->templates->get_config_class( $template['id'] );
 
 			/* Check if the PDF config impliments our Setup/TearDown interface and run the tear down */
-			if( in_array( 'GFPDF\Helper\Helper_Interface_Setup_TearDown', class_implements( $config ) ) ) {
+			if ( in_array( 'GFPDF\Helper\Helper_Interface_Setup_TearDown', class_implements( $config ) ) ) {
 				$config->setUp();
 			}
 		}
@@ -262,11 +275,11 @@ class Model_Templates extends Helper_Abstract_Model {
 	 */
 	public function delete_template( $template_id ) {
 		try {
-			$files = $this->templates->get_template_files_by_id( $template_id );
+			$files  = $this->templates->get_template_files_by_id( $template_id );
 			$config = $this->templates->get_config_class( $template_id );
 
 			/* Check if the PDF config impliments our Setup/TearDown interface and run the tear down */
-			if( in_array( 'GFPDF\Helper\Helper_Interface_Setup_TearDown', class_implements( $config ) ) ) {
+			if ( in_array( 'GFPDF\Helper\Helper_Interface_Setup_TearDown', class_implements( $config ) ) ) {
 				$config->tearDown();
 			}
 
@@ -274,7 +287,6 @@ class Model_Templates extends Helper_Abstract_Model {
 			foreach ( $files as $file ) {
 				unlink( $file );
 			}
-
 		} catch ( Exception $e ) {
 			throw $e; /* throw further down the chain */
 		}
@@ -314,20 +326,24 @@ class Model_Templates extends Helper_Abstract_Model {
 	 *
 	 * @since 4.1
 	 */
-	public function move_template_to_tmp_dir( File $file) {
+	public function move_template_to_tmp_dir( File $file ) {
 		/* Validate our uploaded file and move to the PDF tmp directory for further processing */
 		$file->setName( uniqid() );
 
-		$file->addValidations( [
-			new Extension( 'zip' ),
-			new Size( '10240K' ), /* allow 10MB upload – accounts for fonts, PDF and PHP files */
-		] );
+		$file->addValidations(
+			[
+				new Extension( 'zip' ),
+				new Size( '10240K' ), /* allow 10MB upload – accounts for fonts, PDF and PHP files */
+			]
+		);
 
 		/* Do a check to ensure fileinfo is loaded. It should be loaded by default but in some cases this isn't so */
 		if ( extension_loaded( 'fileinfo' ) ) {
-			$file->addValidations( [
-				new Mimetype( [ 'application/zip', 'application/octet-stream' ] ),
-			] );
+			$file->addValidations(
+				[
+					new Mimetype( [ 'application/zip', 'application/octet-stream' ] ),
+				]
+			);
 		}
 
 		$file->upload();
@@ -421,9 +437,12 @@ class Model_Templates extends Helper_Abstract_Model {
 	 * @since 4.1
 	 */
 	public function get_template_info( $files = [] ) {
-		return array_map( function ( $file ) {
-			return $this->templates->get_template_info_by_path( $file );
-		}, $files );
+		return array_map(
+			function ( $file ) {
+					return $this->templates->get_template_info_by_path( $file );
+			},
+			$files
+		);
 	}
 
 	/**
@@ -449,9 +468,12 @@ class Model_Templates extends Helper_Abstract_Model {
 	private function enable_wp_filesystem() {
 
 		/* This occurs on an AJAX call so don't need to worry about removing the filter afterwards */
-		add_filter( 'filesystem_method', function () {
-			return 'direct';
-		} );
+		add_filter(
+			'filesystem_method',
+			function () {
+				return 'direct';
+			}
+		);
 
 		WP_Filesystem();
 	}

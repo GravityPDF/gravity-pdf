@@ -38,11 +38,11 @@ import React from 'react'
  * @since 4.1
  */
 export const TemplateDetails = ({label}) => (
-  <span className="more-details">{label}</span>
+  < span className           = "more-details" > {label} < / span >
 )
 
 TemplateDetails.propTypes = {
-  name: PropTypes.string,
+	name: PropTypes.string,
 }
 
 /**
@@ -53,9 +53,9 @@ TemplateDetails.propTypes = {
  * @since 4.1
  */
 export const Group = ({group}) => (
-  <p className="theme-author">{group}</p>
+  < p className    = "theme-author" > {group} < / p >
 )
 
 Group.propTypes = {
-  group: PropTypes.string,
+	group: PropTypes.string,
 }

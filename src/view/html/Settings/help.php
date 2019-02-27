@@ -15,23 +15,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 ?>
@@ -45,7 +45,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<div class="about-text">
 			<?php esc_html_e( 'This is your portal to find quality help, support and documentation for Gravity PDF', 'gravity-forms-pdf-extended' ); ?>
-			<div class="about-text-disclaimer"><?php printf( esc_html__( '(This is not the place to get Gravity Forms support. %sPlease use their official support channel%s for assistance. Using the search box below will search gravitypdf.com for results.)', 'gravity-forms-pdf-extended' ), '<a href="https://www.gravityforms.com/support/">', '</a>' ); ?></div>
+			<div class="about-text-disclaimer"><?php printf( esc_html__( '(This is not the place to get Gravity Forms support. %1$sPlease use their official support channel%2$s for assistance. Using the search box below will search gravitypdf.com for results.)', 'gravity-forms-pdf-extended' ), '<a href="https://www.gravityforms.com/support/">', '</a>' ); ?></div>
 		</div>
 
 		<div id="search-knowledgebase">
@@ -69,7 +69,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<div class="hr-divider"></div>
 
-		<h2><?php printf( esc_html__( 'Find the %sanswers%s you need…', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ); ?></h2>
+		<h2><?php printf( esc_html__( 'Find the %1$sanswers%2$s you need…', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ); ?></h2>
 
 		<div id="dashboard-widgets" class="columns-2">
 			<div class="postbox-container">
@@ -86,22 +86,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</a>
 			</div>
 
-            <div class="postbox-container">
-                <a href="https://gravitypdf.com/documentation/v5/developer-start-customising/">
-                    <span><?php esc_html_e( 'Developer Documentation', 'gravity-forms-pdf-extended' ); ?></span><br>
+			<div class="postbox-container">
+				<a href="https://gravitypdf.com/documentation/v5/developer-start-customising/">
+					<span><?php esc_html_e( 'Developer Documentation', 'gravity-forms-pdf-extended' ); ?></span><br>
 					<?php esc_html_e( 'You’ll find all the info and examples you’ll need to create your own custom PDF templates.', 'gravity-forms-pdf-extended' ); ?>
-                </a>
-            </div>
+				</a>
+			</div>
 
 			<div class="postbox-container">
-                <strong><?php esc_html_e( 'Common Questions', 'gravity-forms-pdf-extended' ); ?></strong><br>
-                <ul>
-                    <li><a href="https://gravitypdf.com/documentation/v5/user-setup-pdf/">How do I setup a PDF on my form?</a></li>
-                    <li><a href="https://gravitypdf.com/documentation/v5/user-setup-pdf/#notifications">How do you attach the PDF to a notification email?</a></li>
-                    <li><a href="https://gravitypdf.com/documentation/v5/user-shortcodes/">How do you add a PDF download link to the form's confirmation page?</a></li>
-                    <li><a href="https://gravitypdf.com/documentation/v5/user-managing-pdfs/">How can I add two or more PDFs to a single form?</a></li>
-                    <li><a href="https://gravitypdf.com/documentation/v5/gravityview-support/">How can I allow logged in users to download their past PDFs?</a></li>
-                </ul>
+				<strong><?php esc_html_e( 'Common Questions', 'gravity-forms-pdf-extended' ); ?></strong><br>
+				<ul>
+					<li><a href="https://gravitypdf.com/documentation/v5/user-setup-pdf/">How do I setup a PDF on my form?</a></li>
+					<li><a href="https://gravitypdf.com/documentation/v5/user-setup-pdf/#notifications">How do you attach the PDF to a notification email?</a></li>
+					<li><a href="https://gravitypdf.com/documentation/v5/user-shortcodes/">How do you add a PDF download link to the form's confirmation page?</a></li>
+					<li><a href="https://gravitypdf.com/documentation/v5/user-managing-pdfs/">How can I add two or more PDFs to a single form?</a></li>
+					<li><a href="https://gravitypdf.com/documentation/v5/gravityview-support/">How can I allow logged in users to download their past PDFs?</a></li>
+				</ul>
 			</div>
 		</div>
 
@@ -110,7 +110,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<a href="https://gravitypdf.com/support/#contact-support" class="button button-primary button-large"><?php esc_html_e( 'Contact Support', 'gravity-forms-pdf-extended' ); ?></a>
 
 			<p>
-				<?php printf( esc_html__( 'Our support hours are 9:00am-5:00pm Monday to Friday, %sSydney Australia time%s (public holidays excluded).', 'gravity-forms-pdf-extended' ), '<br><a href="http://www.timeanddate.com/worldclock/australia/sydney">', '</a>' ); ?>
+				<?php printf( esc_html__( 'Our support hours are 9:00am-5:00pm Monday to Friday, %1$sSydney Australia time%2$s (public holidays excluded).', 'gravity-forms-pdf-extended' ), '<br><a href="http://www.timeanddate.com/worldclock/australia/sydney">', '</a>' ); ?>
 			</p>
 		</div>
 

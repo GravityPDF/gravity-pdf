@@ -39,23 +39,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -252,11 +252,14 @@ class View_PDF extends Helper_Abstract_View {
 
 		} catch ( Exception $e ) {
 
-			$this->log->addError( 'PDF Generation Error', [
-				'entry'     => $entry,
-				'settings'  => $settings,
-				'exception' => $e->getMessage(),
-			] );
+			$this->log->addError(
+				'PDF Generation Error',
+				[
+					'entry'     => $entry,
+					'settings'  => $settings,
+					'exception' => $e->getMessage(),
+				]
+			);
 
 			if ( $this->gform->has_capability( 'gravityforms_view_entries' ) ) {
 				$message = sprintf(
@@ -283,9 +286,12 @@ class View_PDF extends Helper_Abstract_View {
 	 */
 	private function fix_wp_external_links_plugin_conflict() {
 		if ( function_exists( 'wpel_init' ) ) {
-			add_filter( 'wpel_apply_settings', function () {
-				return false;
-			} );
+			add_filter(
+				'wpel_apply_settings',
+				function () {
+					return false;
+				}
+			);
 		}
 	}
 
@@ -324,9 +330,9 @@ class View_PDF extends Helper_Abstract_View {
 	/**
 	 * Start the PDF HTML Generation Process
 	 *
-	 * @param  array                              $entry  The Gravity Forms Entry Array
+	 * @param  array                               $entry  The Gravity Forms Entry Array
 	 * @param \GFPDF\Helper\Helper_Abstract_Model $model
-	 * @param  array                              $config Any configuration data passed in
+	 * @param  array                               $config Any configuration data passed in
 	 *
 	 * @return string The generated HTML
 	 *
@@ -345,23 +351,23 @@ class View_PDF extends Helper_Abstract_View {
 		?>
 
 		<div id="container">
-            <?php
-            /*
-             * See https://gravitypdf.com/documentation/v5/gfpdf_pre_html_fields/ for more details about this action
-             * @since 4.1
-             */
-            do_action( 'gfpdf_pre_html_fields', $entry, $config );
-            ?>
+			<?php
+			/*
+			 * See https://gravitypdf.com/documentation/v5/gfpdf_pre_html_fields/ for more details about this action
+			 * @since 4.1
+			 */
+			do_action( 'gfpdf_pre_html_fields', $entry, $config );
+			?>
 
 			<?php $this->generate_html_structure( $entry, $model, $config ); ?>
 
-            <?php
-            /*
-             * See https://gravitypdf.com/documentation/v5/gfpdf_post_html_fields/ for more details about this action
-             * @since 4.1
-             */
-            do_action( 'gfpdf_post_html_fields', $entry, $config );
-            ?>
+			<?php
+			/*
+			 * See https://gravitypdf.com/documentation/v5/gfpdf_post_html_fields/ for more details about this action
+			 * @since 4.1
+			 */
+			do_action( 'gfpdf_post_html_fields', $entry, $config );
+			?>
 		</div>
 
 		<?php
@@ -396,6 +402,7 @@ class View_PDF extends Helper_Abstract_View {
 
 		/**
 		 * See https://gravitypdf.com/documentation/v5/gfpdf_current_pdf_configuration/ for usage
+		 *
 		 * @since 4.2
 		 */
 		$config = apply_filters( 'gfpdf_current_pdf_configuration', $config, $entry, $form );
@@ -437,10 +444,10 @@ class View_PDF extends Helper_Abstract_View {
 			 */
 			$middleware = apply_filters( 'gfpdf_field_middleware', false, $field, $entry, $form, $config, $products, $blacklisted );
 
-			if( $middleware ) {
-			    $container->maybe_display_faux_column( $field );
-			    continue;
-            }
+			if ( $middleware ) {
+				$container->maybe_display_faux_column( $field );
+				continue;
+			}
 
 			/* Let's output our field */
 			$this->process_field( $field, $entry, $form, $config, $products, $container, $model );
@@ -510,13 +517,16 @@ class View_PDF extends Helper_Abstract_View {
 				$container->maybe_display_faux_column( $field );
 			}
 		} catch ( Exception $e ) {
-			$this->log->addError( 'PDF Generation Error', [
-				'field'     => $field,
-				'entry'     => $entry,
-				'config'    => $config,
-				'form_id'   => $form['id'],
-				'exception' => $e->getMessage(),
-			] );
+			$this->log->addError(
+				'PDF Generation Error',
+				[
+					'field'     => $field,
+					'entry'     => $entry,
+					'config'    => $config,
+					'form_id'   => $form['id'],
+					'exception' => $e->getMessage(),
+				]
+			);
 		}
 	}
 
@@ -551,7 +561,6 @@ class View_PDF extends Helper_Abstract_View {
 	 *
 	 * @return string The page HTML output
 	 *
-	 *
 	 * @since    4.0
 	 */
 	public function display_page_name( $page, $form, Helper_Field_Container $container ) {
@@ -564,15 +573,23 @@ class View_PDF extends Helper_Abstract_View {
 
 			/* Find any CSS assigned to the page */
 			$classes = '';
-			foreach( $form['fields'] as $field ) {
-			    if( $field->type === 'page' && $field->pageNumber === ($page + 1 ) ) {
-				    $classes = $field->cssClass;
-			        break;
-                }
-            }
+			foreach ( $form['fields'] as $field ) {
+				if ( $field->type === 'page' && $field->pageNumber === ( $page + 1 ) ) {
+					$classes = $field->cssClass;
+					break;
+				}
+			}
 
 			/* Load our HTML */
-			$html = $this->load( 'page_title', [ 'form' => $form, 'page' => $page, 'classes' => $classes ], false );
+			$html = $this->load(
+				'page_title',
+				[
+					'form'    => $form,
+					'page'    => $page,
+					'classes' => $classes,
+				],
+				false
+			);
 
 			/* Run it through a filter and output */
 			echo apply_filters( 'gfpdf_field_page_name_html', $html, $page, $form );

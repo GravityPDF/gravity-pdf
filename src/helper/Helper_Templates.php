@@ -22,23 +22,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -144,9 +144,15 @@ class Helper_Templates {
 			$template_list    = array_merge( $template_list, $unique_templates );
 
 			/* Keep track of all matches by their basename (template ID) */
-			$matched_templates_basename_list = array_merge( $matched_templates_basename_list, array_map( function ( $file ) {
-				return basename( $file, '.php' );
-			}, $unique_templates ) );
+			$matched_templates_basename_list = array_merge(
+				$matched_templates_basename_list,
+				array_map(
+					function ( $file ) {
+						return basename( $file, '.php' );
+					},
+					$unique_templates
+				)
+			);
 		}
 
 		return $template_list;
@@ -253,7 +259,7 @@ class Helper_Templates {
 			 * we'll include it in our template list
 			 */
 			if ( $file_name !== 'configuration' && $file_name !== 'configuration.archive'
-			     && ! in_array( $file_name, $current_template_list )
+				 && ! in_array( $file_name, $current_template_list )
 			) {
 				$template_list[] = $template;
 			}
@@ -270,9 +276,12 @@ class Helper_Templates {
 	 * @since 4.1
 	 */
 	public function get_all_template_info() {
-		return array_map( function ( $template_path ) {
-			return $this->get_template_info_by_path( $template_path );
-		}, $this->get_all_templates() );
+		return array_map(
+			function ( $template_path ) {
+					return $this->get_template_info_by_path( $template_path );
+			},
+			$this->get_all_templates()
+		);
 	}
 
 	/**
@@ -446,16 +455,19 @@ class Helper_Templates {
 		 *
 		 * @var array
 		 */
-		return apply_filters( 'gfpdf_template_header_details', [
-			'template'             => 'Template Name',
-			'version'              => 'Version',
-			'description'          => 'Description',
-			'author'               => 'Author',
-			'author uri'           => 'Author URI',
-			'group'                => 'Group',
-			'required_pdf_version' => 'Required PDF Version',
-			'tags'                 => 'Tags',
-		] );
+		return apply_filters(
+			'gfpdf_template_header_details',
+			[
+				'template'             => 'Template Name',
+				'version'              => 'Version',
+				'description'          => 'Description',
+				'author'               => 'Author',
+				'author uri'           => 'Author URI',
+				'group'                => 'Group',
+				'required_pdf_version' => 'Required PDF Version',
+				'tags'                 => 'Tags',
+			]
+		);
 	}
 
 	/**
@@ -506,7 +518,7 @@ class Helper_Templates {
 			}
 		}
 
-		throw new Exception ( sprintf( 'Could not locate configuration for "%s" template', $template_id ) );
+		throw new Exception( sprintf( 'Could not locate configuration for "%s" template', $template_id ) );
 	}
 
 	/**
@@ -541,11 +553,14 @@ class Helper_Templates {
 		}
 
 		/* If class still empty it's either a legacy template or doesn't have a config. Check for legacy templates which support certain fields */
-		$legacy_templates = apply_filters( 'gfpdf_legacy_templates', [
-			'default-template',
-			'default-template-two-rows',
-			'default-template-no-style',
-		] );
+		$legacy_templates = apply_filters(
+			'gfpdf_legacy_templates',
+			[
+				'default-template',
+				'default-template-two-rows',
+				'default-template-no-style',
+			]
+		);
 
 		if ( in_array( $template_id, $legacy_templates ) ) {
 			try {
@@ -582,7 +597,7 @@ class Helper_Templates {
 
 		/* Try and load the file if the class doesn't exist */
 		if ( ! class_exists( $fqcn ) && is_file( $file ) && is_readable( $file ) ) {
-			require_once( $file );
+			require_once $file;
 		}
 
 		/* Insure the class we are trying to load exists and impliments our Helper_Interface_Config interface */
@@ -610,9 +625,12 @@ class Helper_Templates {
 
 		/* Using a delimiter with ucwords doesn't appear to work correctly so go old school */
 		$file_array = explode( '_', $file );
-		array_walk( $file_array, function ( &$item ) {
-			$item = mb_convert_case( $item, MB_CASE_TITLE, 'UTF-8' );
-		} );
+		array_walk(
+			$file_array,
+			function ( &$item ) {
+				$item = mb_convert_case( $item, MB_CASE_TITLE, 'UTF-8' );
+			}
+		);
 
 		$file = implode( '_', $file_array );
 
@@ -694,23 +712,29 @@ class Helper_Templates {
 
 		/* See https://gravitypdf.com/documentation/v5/gfpdf_template_args/ for more details about this filter */
 
-		return apply_filters( 'gfpdf_template_args', [
+		return apply_filters(
+			'gfpdf_template_args',
+			[
 
-			'form_id'  => $form['id'], /* backwards compat */
-			'lead_ids' => $legacy_ids, /* backwards compat */
-			'lead_id'  => apply_filters( 'gfpdfe_lead_id', $entry['id'], $form, $entry, $gfpdf ), /* backwards compat */
+				'form_id'   => $form['id'], /* backwards compat */
+				'lead_ids'  => $legacy_ids, /* backwards compat */
+				'lead_id'   => apply_filters( 'gfpdfe_lead_id', $entry['id'], $form, $entry, $gfpdf ), /* backwards compat */
 
-			'form'      => $form,
-			'entry'     => $entry,
-			'lead'      => $entry,
-			'form_data' => $form_data,
-			'fields'    => $fields,
-			'config'    => $config,
+				'form'      => $form,
+				'entry'     => $entry,
+				'lead'      => $entry,
+				'form_data' => $form_data,
+				'fields'    => $fields,
+				'config'    => $config,
 
-			'settings' => $settings,
+				'settings'  => $settings,
 
-			'gfpdf' => $gfpdf,
+				'gfpdf'     => $gfpdf,
 
-		], $entry, $settings, $form );
+			],
+			$entry,
+			$settings,
+			$form
+		);
 	}
 }

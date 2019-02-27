@@ -21,23 +21,23 @@ use WP_UnitTestCase;
  */
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -103,8 +103,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$data = $this->form_data;
 
 		/*
-         * Run our tests...
-         */
+		 * Run our tests...
+		 */
 		$this->assertEquals( 'ALL FIELDS', $data['form_title'] );
 		$this->assertEquals( 'This is the form description...', $data['form_description'] );
 		$this->assertArrayHasKey( 'pages', $data );
@@ -128,8 +128,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$data = $this->form_data;
 
 		/*
-         * Run our tests...
-         */
+		 * Run our tests...
+		 */
 		$misc_array = [
 			'date_time',
 			'time_24hr',
@@ -169,8 +169,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$data = $this->form_data;
 
 		/*
-         * Run our tests...
-         */
+		 * Run our tests...
+		 */
 		$this->assertArrayHasKey( 'field_descriptions', $data );
 		$this->assertEquals( 'This is the multi select box description', $data['field_descriptions'][4] );
 		$this->assertEquals( 'Name Description', $data['field_descriptions'][11] );
@@ -197,8 +197,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$field = $this->form_data['field'];
 
 		/*
-         * Run our tests...
-         */
+		 * Run our tests...
+		 */
 		$response = 'My Single Line Response';
 		$this->assertEquals( $response, $field[1] );
 		$this->assertEquals( $response, $field['1.Single Line Text'] );
@@ -214,8 +214,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$field = $this->form_data['field'];
 
 		/*
-         * Run our tests...
-         */
+		 * Run our tests...
+		 */
 		$response = "My paragraph text response over...<br />\r\n<br />\r\nMultiple lines.";
 		$this->assertEquals( $response, $field[2] );
 		$this->assertEquals( $response, $field['2.Paragraph Text'] );
@@ -231,8 +231,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$field = $this->form_data['field'];
 
 		/*
-         * Run our tests...
-         */
+		 * Run our tests...
+		 */
 		$response = 'Option 3 Value';
 		$this->assertEquals( $response, $field[3] );
 		$this->assertEquals( $response, $field['3.Drop Down'] );
@@ -253,8 +253,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$field = $this->form_data['field'];
 
 		/*
-         * Run our tests...
-         */
+		 * Run our tests...
+		 */
 		$response = 'Second Choice';
 		$this->assertTrue( in_array( $response, $field[4] ) );
 		$this->assertTrue( in_array( $response, $field['4.Multi Select Box'] ) );
@@ -278,8 +278,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$field = $this->form_data['field'];
 
 		/*
-         * Run our tests...
-         */
+		 * Run our tests...
+		 */
 		$response = '50032145';
 		$this->assertEquals( $response, $field[5] );
 		$this->assertEquals( $response, $field['5.Number'] );
@@ -295,8 +295,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$field = $this->form_data['field'];
 
 		/*
-         * Run our tests...
-         */
+		 * Run our tests...
+		 */
 
 		$response = 'Checkbox Choice 2';
 		$this->assertTrue( in_array( $response, $field[6] ) );
@@ -330,8 +330,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$field = $this->form_data['field'];
 
 		/*
-         * Run our tests...
-         */
+		 * Run our tests...
+		 */
 		$response = 'Radio Second Choice';
 		$this->assertEquals( $response, $field[7] );
 		$this->assertEquals( $response, $field['7.Radio Button'] );
@@ -352,8 +352,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$field = $this->form_data['field'];
 
 		/*
-         * Run our tests...
-         */
+		 * Run our tests...
+		 */
 		$response = 'hidden field value';
 		$this->assertEquals( $response, $field[8] );
 		$this->assertEquals( $response, $field['8.Hidden Field'] );
@@ -369,8 +369,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$field = $this->form_data['field'];
 
 		/*
-         * Run our tests...
-         */
+		 * Run our tests...
+		 */
 		$this->assertEquals( 'Mr.', $field[11]['prefix'] );
 		$this->assertEquals( 'Jake', $field[11]['first'] );
 		$this->assertEquals( 'Middle', $field[11]['middle'] );
@@ -399,8 +399,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$field = $this->form_data['field'];
 
 		/*
-         * Run our tests...
-         */
+		 * Run our tests...
+		 */
 		$response = '01/01/2015';
 		$this->assertEquals( $response, $field[12] );
 		$this->assertEquals( $response, $field['12.Date'] );
@@ -416,8 +416,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$field = $this->form_data['field'];
 
 		/*
-         * Run our tests...
-         */
+		 * Run our tests...
+		 */
 		$response = '10:30 am';
 
 		$this->assertEquals( $response, $field[13] );
@@ -434,8 +434,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$field = $this->form_data['field'];
 
 		/*
-         * Run our tests...
-         */
+		 * Run our tests...
+		 */
 		$response = '(555) 678-1210';
 		$this->assertEquals( $response, $field[14] );
 		$this->assertEquals( $response, $field['14.Phone'] );
@@ -451,8 +451,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$field = $this->form_data['field'];
 
 		/*
-         * Run our tests...
-         */
+		 * Run our tests...
+		 */
 		$this->assertEquals( '12 Address St', $field[15]['street'] );
 		$this->assertEquals( 'Line 2', $field[15]['street2'] );
 		$this->assertEquals( 'Cityville', $field[15]['city'] );
@@ -484,8 +484,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$field = $this->form_data['field'];
 
 		/*
-         * Run our tests...
-         */
+		 * Run our tests...
+		 */
 		$response = 'https://gravitypdf.com';
 		$this->assertEquals( $response, $field[16] );
 		$this->assertEquals( $response, $field['16.Website'] );
@@ -501,8 +501,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$field = $this->form_data['field'];
 
 		/*
-         * Run our tests...
-         */
+		 * Run our tests...
+		 */
 		$response = 'support@gravitypdf.com';
 		$this->assertEquals( $response, $field[17] );
 		$this->assertEquals( $response, $field['17.Email'] );
@@ -518,8 +518,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$field = $this->form_data['field'];
 
 		/*
-         * Run our tests...
-         */
+		 * Run our tests...
+		 */
 		$this->assertEquals( 1, sizeof( $field[18] ) );
 		$this->assertEquals( 1, sizeof( $field['18.File'] ) );
 		$this->assertEquals( 1, sizeof( $field['18.File_path'] ) );
@@ -547,8 +547,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$field = $this->form_data['field'];
 
 		/*
-         * Run our tests...
-         */
+		 * Run our tests...
+		 */
 		$response = '<table autosize="1"';
 		$this->assertNotFalse( strpos( $field[20], $response ) );
 		$this->assertNotFalse( strpos( $field['20.Basic List'], $response ) );
@@ -569,8 +569,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$field = $this->form_data['field'];
 
 		/*
-         * Run our tests...
-         */
+		 * Run our tests...
+		 */
 		$response = 'Poll Dropdown - First Choice';
 		$this->assertEquals( $response, $field[22] );
 		$this->assertEquals( $response, $field['22.Poll Field - Drop Down_name'] );
@@ -604,8 +604,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$field = $this->form_data['field'];
 
 		/*
-         * Run our tests...
-         */
+		 * Run our tests...
+		 */
 		$response = 'Quiz Dropdown - Second Choice';
 
 		$this->assertEquals( $response, $field[24]['text'] );
@@ -624,17 +624,17 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$field = $this->form_data['field'];
 
 		/*
-         * Run our tests...
-         * Radio button first
-         */
+		 * Run our tests...
+		 * Radio button first
+		 */
 
 		$response = 'Survay Radio - First Choice';
 		$this->assertEquals( $response, $field[46] );
 		$this->assertEquals( $response, $field['46.Radio Survey Field_name'] );
 
 		/*
-         * Run checkbox survey test
-         */
+		 * Run checkbox survey test
+		 */
 		$this->assertEquals( 2, sizeof( array_filter( $field[47][0] ) ) );
 		$this->assertEquals( 2, sizeof( array_filter( $field['47.Checkbox Survey Field'][0] ) ) );
 		$this->assertEquals( 2, sizeof( array_filter( $field['Checkbox Survey Field'][0] ) ) );
@@ -649,24 +649,24 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( 'Check - Second Choice', $field['Checkbox Survey Field'][0]['47.2'] );
 
 		/*
-         * Run single line survey
-         */
+		 * Run single line survey
+		 */
 		$response = 'Survey Field Single Line Response';
 		$this->assertEquals( $response, $field[48] );
 		$this->assertEquals( $response, $field['48.Single Line Survey Field'] );
 		$this->assertEquals( $response, $field['Single Line Survey Field'] );
 
 		/*
-         * Run paragraph test
-         */
+		 * Run paragraph test
+		 */
 		$response = 'Paragraph survey field response...';
 		$this->assertEquals( $response, $field[49] );
 		$this->assertEquals( $response, $field['49.Paragraph Survey Field'] );
 		$this->assertEquals( $response, $field['Paragraph Survey Field'] );
 
 		/*
-         * Run Dropdown Test
-         */
+		 * Run Dropdown Test
+		 */
 		$response = 'DropDown - Second Choice';
 		$this->assertEquals( $response, $field[50] );
 		$this->assertEquals( $response, $field['50.DropDown Survey Field_name'] );
@@ -681,33 +681,33 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$field = $this->form_data['field'];
 
 		/*
-         * Run our tests...
-         * Post Title
-         */
+		 * Run our tests...
+		 * Post Title
+		 */
 		$response = 'My Post Title';
 		$this->assertEquals( $response, $field[28] );
 		$this->assertEquals( $response, $field['28.Post Title'] );
 		$this->assertEquals( $response, $field['Post Title'] );
 
 		/*
-         * Post Excerpt
-         */
+		 * Post Excerpt
+		 */
 		$response = 'My Post Excerpt';
 		$this->assertEquals( $response, $field[29] );
 		$this->assertEquals( $response, $field['29.Post Excerpt'] );
 		$this->assertEquals( $response, $field['Post Excerpt'] );
 
 		/*
-         * Post Tags
-         */
+		 * Post Tags
+		 */
 		$response = 'tag1, tag2, tag3';
 		$this->assertEquals( $response, $field[30] );
 		$this->assertEquals( $response, $field['30.Post Tags'] );
 		$this->assertEquals( $response, $field['Post Tags'] );
 
 		/*
-         * Post Category
-         */
+		 * Post Category
+		 */
 		$response = '30';
 		$this->assertEquals( $response, $field[31] );
 		$this->assertEquals( $response, $field['31.Post Category'] );
@@ -718,8 +718,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( $response, $field['31_name'] );
 
 		/*
-         * Post Image
-         */
+		 * Post Image
+		 */
 		$this->assertEquals( 5, sizeof( $field[32] ) );
 		$this->assertEquals( 5, sizeof( $field['32.Post Image'] ) );
 		$this->assertEquals( 5, sizeof( $field['Post Image'] ) );
@@ -739,8 +739,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		}
 
 		/*
-         * Post Custom Field
-         */
+		 * Post Custom Field
+		 */
 		$response = 'post_custom_field';
 		$this->assertEquals( $response, $field[33] );
 		$this->assertEquals( $response, $field['33.Post Custom Field'] );
@@ -755,9 +755,9 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$field = $this->form_data['field'];
 
 		/*
-         * Run our tests...
-         * Basic Product Drop down
-         */
+		 * Run our tests...
+		 * Basic Product Drop down
+		 */
 		$response = 'DD - Second Choice ($10.00)';
 		$this->assertEquals( $response, $field[35] );
 		$this->assertEquals( $response, $field['35.Product Name - Drop Down'] );
@@ -767,8 +767,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( $response, $field['35_name'] );
 
 		/*
-         * Product Radio Button
-         */
+		 * Product Radio Button
+		 */
 		$response = 'Radio - Second Choice ($10.00)';
 		$this->assertEquals( $response, $field[51] );
 		$this->assertEquals( $response, $field['51.Product Name - Radio Buttons'] );
@@ -778,8 +778,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( $response, $field['Product Name - Radio Buttons_name'] );
 
 		/*
-         * Product Option Single
-         */
+		 * Product Option Single
+		 */
 		$response = 'Option 2';
 		$this->assertEquals( $response, $field[37] );
 		$this->assertEquals( $response, $field['37.Product Options for Basic Product'] );
@@ -795,8 +795,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( $response, $field['Product Options for Basic Product_value'] );
 
 		/*
-         * Product Shipping Basic
-         */
+		 * Product Shipping Basic
+		 */
 		$response = 'Regular ($30.00)';
 		$this->assertEquals( $response, $field[39] );
 		$this->assertEquals( $response, $field['39.Shipping'] );
@@ -826,8 +826,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$data = $this->form_data;
 
 		/*
-         * Run our tests...
-         */
+		 * Run our tests...
+		 */
 		$response = 'This is a HTML block';
 
 		$this->assertEquals( $response, trim( $data['html'][0] ) );
@@ -844,8 +844,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$lists = $this->form_data['list'];
 
 		/*
-         * Run our tests...
-         */
+		 * Run our tests...
+		 */
 		$this->assertEquals( 2, sizeof( $lists ) );
 		$this->assertEquals( 3, sizeof( $lists[20] ) );
 		$this->assertEquals( 2, sizeof( $lists[21] ) );
@@ -853,15 +853,15 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( 3, sizeof( $lists[21][1] ) );
 
 		/*
-         * Check the basic list content
-         */
+		 * Check the basic list content
+		 */
 		$this->assertEquals( 'List Item Response 1', $lists[20][0] );
 		$this->assertEquals( 'List Item Response 2', $lists[20][1] );
 		$this->assertEquals( 'List Item Response 3', $lists[20][2] );
 
 		/*
-         * Check the multirow list content
-         */
+		 * Check the multirow list content
+		 */
 		$this->assertEquals( 'List Response Col 1', $lists[21][0]['Column 1'] );
 		$this->assertEquals( 'List Response Col 2', $lists[21][0]['Column 2'] );
 		$this->assertEquals( 'List Response Col 3', $lists[21][0]['Column 3'] );
@@ -882,8 +882,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$response = '<img src="' . ABSPATH . 'wp-content/uploads/gravity_forms/signatures/54bdac4ed24af5.01502579.png" alt="Signature" width="75" />';
 
 		/*
-         * Standard Signature Array
-         */
+		 * Standard Signature Array
+		 */
 		$this->assertEquals( $response, $data['signature_details_id'][25]['img'] );
 		$this->assertNotFalse( strpos( $data['signature_details_id'][25]['path'], ABSPATH ) );
 		$this->assertEquals( 'http://', substr( $data['signature_details_id'][25]['url'], 0, 7 ) );
@@ -891,9 +891,9 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( 45, $data['signature_details_id'][25]['height'] );
 
 		/*
-         * Old Signature that doesn't index by ID
-         * Deprecated
-         */
+		 * Old Signature that doesn't index by ID
+		 * Deprecated
+		 */
 		$this->assertEquals( $response, $data['signature_details'][0]['img'] );
 		$this->assertNotFalse( strpos( $data['signature_details'][0]['path'], ABSPATH ) );
 		$this->assertEquals( 'http://', substr( $data['signature_details'][0]['url'], 0, 7 ) );
@@ -901,9 +901,9 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( 45, $data['signature_details'][0]['height'] );
 
 		/*
-         * Basic Signature
-         * Deprecated
-         */
+		 * Basic Signature
+		 * Deprecated
+		 */
 		$this->assertEquals( $response, $data['signature'][0] );
 	}
 
@@ -916,8 +916,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$likert = $this->form_data['survey']['likert'];
 
 		/*
-         * Single-row Likert
-         */
+		 * Single-row Likert
+		 */
 		$this->assertArrayHasKey( 'col', $likert[26] );
 		$this->assertArrayHasKey( 'row', $likert[26] );
 
@@ -933,8 +933,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( 'selected', $likert[26]['row']['Strongly disagree'] );
 
 		/*
-         * Multi-Row Likert
-         */
+		 * Multi-Row Likert
+		 */
 		$this->assertArrayHasKey( 'col', $likert[27] );
 		$this->assertArrayHasKey( 'rows', $likert[27] );
 		$this->assertArrayNotHasKey( 'row', $likert[27] );
@@ -971,8 +971,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$rank = $this->form_data['survey']['rank'];
 
 		/*
-         * Test Rank field
-         */
+		 * Test Rank field
+		 */
 		$this->assertEquals( 'Rank Fourth Choce', $rank[44][0] );
 		$this->assertEquals( 'Rank Fifth Choice', $rank[44][1] );
 		$this->assertEquals( 'Rank Second Choice', $rank[44][2] );
@@ -989,8 +989,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$rating = $this->form_data['survey']['rating'];
 
 		/*
-         * Test Rating Field
-         */
+		 * Test Rating Field
+		 */
 		$this->assertEquals( 'Pretty good', $rating[45][0] );
 	}
 
@@ -1003,8 +1003,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$products = $this->form_data['products'];
 
 		/*
-         * Run first set of tests
-         */
+		 * Run first set of tests
+		 */
 		$this->assertEquals( 'Product Basic', $products[34]['name'] );
 		$this->assertEquals( '$30.00', $products[34]['price'] );
 		$this->assertEquals( '30.00', $products[34]['price_unformatted'] );
@@ -1019,8 +1019,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( '$30.00', $products[34]['options'][0]['price_formatted'] );
 
 		/*
-         * Run second set of tests
-         */
+		 * Run second set of tests
+		 */
 		$this->assertEquals( 'DD - Second Choice', $products[35]['name'] );
 		// $this->assertEquals('$10.00', $products[35]['price']);  /* this is currently incorrect */
 		// $this->assertEquals('10.00', $products[35]['price_unformatted']); /* this is currently incorrect */
@@ -1030,8 +1030,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( 0, sizeof( $products[35]['options'] ) );
 
 		/*
-         * Run third set of tests
-         */
+		 * Run third set of tests
+		 */
 		$this->assertEquals( 'Radio - Second Choice', $products[51]['name'] );
 		// $this->assertEquals('$10.00', $products[51]['price']);  /* this is currently incorrect */
 		// $this->assertEquals('10.00', $products[51]['price_unformatted']); /* this is currently incorrect */
@@ -1041,8 +1041,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( 0, sizeof( $products[51]['options'] ) );
 
 		/*
-         * Run fourth set of tests
-         */
+		 * Run fourth set of tests
+		 */
 		$this->assertEquals( 'User Defined Price', $products[52]['name'] );
 		$this->assertEquals( '$30.00', $products[52]['price'] );  /* this is currently incorrect */
 		$this->assertEquals( '30.00', $products[52]['price_unformatted'] ); /* this is currently incorrect */
@@ -1052,8 +1052,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( 0, sizeof( $products[52]['options'] ) );
 
 		/*
-         * Run fifth set of tests
-         */
+		 * Run fifth set of tests
+		 */
 		$this->assertEquals( 'Hidden Price', $products[53]['name'] );
 		$this->assertEquals( '$50.00', $products[53]['price'] );  /* this is currently incorrect */
 		$this->assertEquals( '50.00', $products[53]['price_unformatted'] ); /* this is currently incorrect */
@@ -1063,8 +1063,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( 0, sizeof( $products[53]['options'] ) );
 
 		/*
-         * Run sixth set of tests
-         */
+		 * Run sixth set of tests
+		 */
 		$this->assertEquals( 'Calculation Price', $products[54]['name'] );
 		$this->assertEquals( '$40.00', $products[54]['price'] );  /* this is currently incorrect */
 		$this->assertEquals( '40.00', $products[54]['price_unformatted'] ); /* this is currently incorrect */
@@ -1245,8 +1245,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( 7, $data['entry_count'] );
 
 		/*
-         * Test individual likert survey field values
-         */
+		 * Test individual likert survey field values
+		 */
 		$likert = $data['field_data'][26];
 
 		$this->assertEquals( 1, $likert['Strongly disagree'] );
@@ -1256,8 +1256,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( 1, $likert['Strongly agree'] );
 
 		/*
-         * Test Multi Likert Survey Field Value
-         */
+		 * Test Multi Likert Survey Field Value
+		 */
 		$likert = $data['field_data'][27]['First row'];
 
 		$this->assertEquals( 1, $likert['Strongly disagree'] );
@@ -1283,8 +1283,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( 1, $likert['Strongly agree'] );
 
 		/*
-         * Test survey ranking
-         */
+		 * Test survey ranking
+		 */
 		$ranking = $data['field_data'][44];
 
 		$this->assertEquals( 28, $ranking['Rank First Choice'] );
@@ -1294,8 +1294,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( 15, $ranking['Rank Fifth Choice'] );
 
 		/*
-         * Test Rating
-         */
+		 * Test Rating
+		 */
 		$rating = $data['field_data'][45];
 
 		$this->assertEquals( 0, $rating['Terrible'] );
@@ -1305,8 +1305,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( 1, $rating['Excellent'] );
 
 		/*
-         * Test Checkboxes
-         */
+		 * Test Checkboxes
+		 */
 		$checkboxes = $data['field_data'][47];
 
 		$this->assertEquals( 2, $checkboxes['Check - First Choice'] );
@@ -1323,8 +1323,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$data = $this->form_data['survey']['likert'];
 
 		/*
-         * Test Basic Likert
-         */
+		 * Test Basic Likert
+		 */
 		$likert = $data[26];
 
 		$columns = [ 'Strongly disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly agree' ];
@@ -1339,8 +1339,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		}
 
 		/*
-         * Test Multirow likert
-         */
+		 * Test Multirow likert
+		 */
 		$likert = $data[27];
 
 		foreach ( $likert['col'] as $col ) {
@@ -1399,8 +1399,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( 7, $data['entry_count'] );
 
 		/*
-         * Test first poll field
-         */
+		 * Test first poll field
+		 */
 		$field = $data['field_data'][22];
 
 		$this->assertEquals( 'Poll Field - Drop Down', $field['misc']['label'] );
@@ -1409,8 +1409,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( 0, $field['Poll Dropdown - Third Choice'] );
 
 		/*
-         * Test second poll field
-         */
+		 * Test second poll field
+		 */
 		$field = $data['field_data'][23];
 
 		$this->assertEquals( 'Poll Field - Radio Buttons', $field['misc']['label'] );
@@ -1419,8 +1419,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( 2, $field['Poll Radio - Third Choice'] );
 
 		/*
-         * Test third poll field
-         */
+		 * Test third poll field
+		 */
 		$field = $data['field_data'][41];
 
 		$this->assertEquals( 'Poll Field - Checkboxes', $field['misc']['label'] );

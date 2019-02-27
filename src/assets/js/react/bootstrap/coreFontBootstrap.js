@@ -40,14 +40,14 @@ import Routes from '../router/coreFontRouter'
  * @since 5.0
  */
 export default function coreFontBootstrap () {
-  const container = document.getElementById('gfpdf-install-core-fonts')
-  const button = container.getElementsByTagName('button')[0]
-  const store = getStore()
+	const container = document.getElementById( 'gfpdf-install-core-fonts' )
+	const button    = container.getElementsByTagName( 'button' )[0]
+	const store     = getStore()
 
-  render(
-    <Provider store={store}>
-      <Routes button={button}/>
-    </Provider>,
-    container
-  )
+	render(
+		< Provider store = {store} >
+		< Routes button  = {button} / >
+		< / Provider > ,
+		container
+	)
 }

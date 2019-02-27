@@ -14,23 +14,23 @@ use Exception;
  */
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /* Exit if accessed directly */
@@ -130,12 +130,12 @@ class Helper_Migration {
 	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Data $data, Helper_Abstract_Options $options, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates ) {
 
 		/* Assign our internal variables */
-		$this->gform   = $gform;
-		$this->log     = $log;
-		$this->data    = $data;
-		$this->options = $options;
-		$this->misc    = $misc;
-		$this->notices = $notices;
+		$this->gform     = $gform;
+		$this->log       = $log;
+		$this->data      = $data;
+		$this->options   = $options;
+		$this->misc      = $misc;
+		$this->notices   = $notices;
 		$this->templates = $templates;
 	}
 
@@ -153,9 +153,12 @@ class Helper_Migration {
 			$raw_config = $this->load_old_configuration();
 		} catch ( Exception $e ) {
 
-			$this->log->addError( 'Migration Error', [
-				'exception' => $e->getMessage(),
-			] );
+			$this->log->addError(
+				'Migration Error',
+				[
+					'exception' => $e->getMessage(),
+				]
+			);
 
 			$this->notices->add_error( esc_html__( 'There was a problem processing the action. Please try again.', 'gravity-forms-pdf-extended' ) );
 
@@ -199,7 +202,7 @@ class Helper_Migration {
 
 		/* Import our configuration files */
 		if ( is_file( $path . 'configuration.php' ) ) {
-			require_once( $path . 'configuration.php' );
+			require_once $path . 'configuration.php';
 		} else {
 			throw new Exception( 'Could not locate v3 configuration file.' );
 		}
@@ -300,7 +303,7 @@ class Helper_Migration {
 			} else {
 				unset( $node['pdf_size'] );
 			}
-		} else if ( isset( $node['pdf_size'] ) && ! is_array( $node['pdf_size'] ) ) {
+		} elseif ( isset( $node['pdf_size'] ) && ! is_array( $node['pdf_size'] ) ) {
 			$node['pdf_size'] = mb_strtoupper( $node['pdf_size'] );
 		}
 
@@ -486,7 +489,6 @@ class Helper_Migration {
 					$node['name']             = $this->templates->human_readable_template_name( $node['template'] );
 					$node['conditionalLogic'] = '';
 
-
 					/* Include a filename if none given */
 					if ( empty( $node['filename'] ) ) {
 						$node['filename'] = 'form-{form_id}-entry-{entry_id}';
@@ -536,15 +538,21 @@ class Helper_Migration {
 
 					if ( $results ) {
 						/* return the ID if successful */
-						$this->log->addNotice( 'Successfully Imported v3 Node', [
-							'pdf' => $node,
-						] );
+						$this->log->addNotice(
+							'Successfully Imported v3 Node',
+							[
+								'pdf' => $node,
+							]
+						);
 					} else {
 						/* Log errors */
-						$this->log->addError( 'Error Importing v3 Node', [
-							'error' => $results,
-							'pdf'   => $node,
-						] );
+						$this->log->addError(
+							'Error Importing v3 Node',
+							[
+								'error' => $results,
+								'pdf'   => $node,
+							]
+						);
 
 						$node['form_id'] = $form_id;
 						$errors[]        = $node;
@@ -556,7 +564,7 @@ class Helper_Migration {
 		/* Check for any errors */
 		if ( sizeof( $errors ) > 0 ) {
 
-			$error_msg = esc_html__( 'There was a problem migrating the following configuration nodes. You will need to manually setup those PDFs.', 'gravity-forms-pdf-extended' );
+			$error_msg  = esc_html__( 'There was a problem migrating the following configuration nodes. You will need to manually setup those PDFs.', 'gravity-forms-pdf-extended' );
 			$error_msg .= '<ul>';
 
 			foreach ( $errors as $error ) {

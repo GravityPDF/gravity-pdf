@@ -47,27 +47,27 @@ import TemplateButton from '../components/Template/TemplateButton'
  */
 export default function templateBootstrap ($templateField) {
 
-  const store = getStore()
+	const store = getStore()
 
-  /* Create our button container and render our component in it */
-  createTemplateMarkup($templateField)
+	/* Create our button container and render our component in it */
+	createTemplateMarkup( $templateField )
 
-  /* Render our React Component in the DOM */
-  render(
-    <Router>
-      <Route render={(props) => <TemplateButton {...props} store={store} buttonText={GFPDF.advanced}/>}/>
-    </Router>,
-    document.getElementById('gpdf-advance-template-selector')
-  )
+	/* Render our React Component in the DOM */
+	render(
+		< Router >
+		< Route render = {(props) => < TemplateButton {...props} store = {store} buttonText = {GFPDF.advanced} / > } / >
+		< / Router > ,
+		document.getElementById( 'gpdf-advance-template-selector' )
+	)
 
-  /* Mount our router */
-  templateRouter(store)
+	/* Mount our router */
+	templateRouter( store )
 
-  /*
-   * Listen for Redux store updates and do DOM updates
-   */
-  activeTemplateStoreListener(store, $templateField)
-  templateChangeStoreListener(store, $templateField)
+	/*
+	* Listen for Redux store updates and do DOM updates
+	*/
+	activeTemplateStoreListener( store, $templateField )
+	templateChangeStoreListener( store, $templateField )
 }
 
 /**
@@ -78,11 +78,11 @@ export default function templateBootstrap ($templateField) {
  * @since 4.1
  */
 export function createTemplateMarkup ($templateField) {
-  $templateField
-    .next()
-    .after('<span id="gpdf-advance-template-selector">')
-    .next()
-    .after('<div id="gfpdf-overlay" class="theme-overlay">')
+	$templateField
+	.next()
+	.after( '<span id="gpdf-advance-template-selector">' )
+	.next()
+	.after( '<div id="gfpdf-overlay" class="theme-overlay">' )
 }
 
 /**
@@ -97,26 +97,31 @@ export function createTemplateMarkup ($templateField) {
  */
 export function activeTemplateStoreListener (store, $templateField) {
 
-  /* Watch our store for changes */
-  let w = watch(store.getState, 'template.activeTemplate')
-  store.subscribe(w((template) => {
+	/* Watch our store for changes */
+	let w = watch( store.getState, 'template.activeTemplate' )
+	store.subscribe(
+		w(
+			(template) => {
+            /* Check store and DOM are different to prevent any update recursions */
+				if ($templateField.val() !== template) {
+					$templateField
+					.val( template )
+					.trigger( 'chosen:updated' )
+					.trigger( 'change' )
+				}
+			}
+		)
+	)
 
-    /* Check store and DOM are different to prevent any update recursions */
-    if ($templateField.val() !== template) {
-      $templateField
-        .val(template)
-        .trigger('chosen:updated')
-        .trigger('change')
-    }
-  }))
-
-  /* Watch our DOM for changes */
-  $templateField.change(function () {
-    /* Check store and DOM are different to prevent any update recursions */
-    if (this.value !== store.getState().template.activeTemplate) {
-      store.dispatch(selectTemplate(this.value))
-    }
-  })
+	/* Watch our DOM for changes */
+	$templateField.change(
+		function () {
+			/* Check store and DOM are different to prevent any update recursions */
+			if (this.value !== store.getState().template.activeTemplate) {
+				store.dispatch( selectTemplate( this.value ) )
+			}
+		}
+	)
 }
 
 /**
@@ -131,30 +136,35 @@ export function activeTemplateStoreListener (store, $templateField) {
  */
 export function templateChangeStoreListener (store, $templateField) {
 
-  /* Track the initial list size */
-  let listCount = store.getState().template.list.size
+	/* Track the initial list size */
+	let listCount = store.getState().template.list.size
 
-  /* Watch our store for changes */
-  let w = watch(store.getState, 'template.list')
-  store.subscribe(w((list) => {
+	/* Watch our store for changes */
+	let w = watch( store.getState, 'template.list' )
+	store.subscribe(
+		w(
+			(list) => {
+            /* Only update if the list size differs from what we expect */
+				if (listCount !== list.size) {
+					/* update the list size so we don't run it twice */
+					listCount         = list.size
+					var currentActive = $templateField.val()
 
-    /* Only update if the list size differs from what we expect */
-    if (listCount !== list.size) {
-      /* update the list size so we don't run it twice */
-      listCount = list.size
-      var currentActive = $templateField.val()
-
-      /* Do our AJAX call to get the new Select Box DOM */
-      request
-        .post(GFPDF.ajaxUrl)
-        .field('action', 'gfpdf_get_template_options')
-        .field('nonce', GFPDF.ajaxNonce)
-        .then((response) => {
-          $templateField
-            .html(response.text)
-            .val(currentActive)
-            .trigger('chosen:updated')
-        })
-    }
-  }))
+					/* Do our AJAX call to get the new Select Box DOM */
+					request
+					.post( GFPDF.ajaxUrl )
+					.field( 'action', 'gfpdf_get_template_options' )
+					.field( 'nonce', GFPDF.ajaxNonce )
+					.then(
+						(response) => {
+                        $templateField
+							.html( response.text )
+							.val( currentActive )
+							.trigger( 'chosen:updated' )
+						}
+					)
+				}
+			}
+		)
+	)
 }

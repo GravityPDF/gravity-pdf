@@ -36,7 +36,7 @@ import React from 'react'
  * @since 5.0
  */
 const CoreFontCounter = ({queue, text}) => (
-  <span className="gfpdf-core-font-counter">{text} {queue}</span>
+  < span className    = "gfpdf-core-font-counter" > {text} {queue} < / span >
 )
 
 export default CoreFontCounter

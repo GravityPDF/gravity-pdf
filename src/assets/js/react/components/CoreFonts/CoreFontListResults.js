@@ -36,29 +36,30 @@ import ListSpacer from './CoreFontListSpacer'
  */
 export default class CoreFontListResults extends React.Component {
 
-  /**
-   * @returns {*}
-   *
-   * @since 5.0
-   */
-  render () {
-    const console = this.props.console
-    const lines = Object.keys(console).reverse()
-    const retry = this.props.retry.length > 0
+	/**
+	 * @returns {*}
+	 *
+	 * @since 5.0
+	 */
+	render () {
+		const console = this.props.console
+		const lines   = Object.keys( console ).reverse()
+		const retry   = this.props.retry.length > 0
 
-    return (!lines.length) ? null : (
-      <div className="gfpdf-core-font-container">
-        {lines.map((key) =>
-          <div key={key} className={'gfpdf-core-font-status-' + console[key].status}>
-            {console[key].message}
-            {' '}
-            {key === 'completed' && retry && <Retry history={this.props.history} retryText={this.props.retryText}/>}
-            {key === 'completed' && <ListSpacer/>}
-          </div>
-        )}
-      </div>
-    )
-  }
+		return ( ! lines.length) ? null : (
+		< div className                                      = "gfpdf-core-font-container" >
+		{lines.map(
+			(key) =>
+			< div key                                        = {key} className = {'gfpdf-core-font-status-' + console[key].status} >
+			{console[key].message}
+			{' '}
+			{key === 'completed' && retry && < Retry history = {this.props.history} retryText = {this.props.retryText} / > }
+			{key === 'completed' && < ListSpacer / > }
+			< / div >
+		)}
+		< / div >
+		)
+	}
 }
 
 /**
@@ -66,28 +67,28 @@ export default class CoreFontListResults extends React.Component {
  */
 class Retry extends React.Component {
 
-  /**
-   * Update the navigation history when the retry link is selected
-   *
-   * @param e
-   *
-   * @since 5.0
-   */
-  triggerRetryFontDownload = (e) => {
-    e.preventDefault()
-    this.props.history.replace('retryDownloadCoreFonts')
-  }
+	/**
+	 * Update the navigation history when the retry link is selected
+	 *
+	 * @param e
+	 *
+	 * @since 5.0
+	 */
+	triggerRetryFontDownload = (e) => {
+		e.preventDefault()
+		this.props.history.replace( 'retryDownloadCoreFonts' )
+	}
 
-  /**
-   * Display a "retry" download link
-   *
-   * @returns {*}
-   *
-   * @since 5.0
-   */
-  render () {
-    return (
-      <a href="#" onClick={this.triggerRetryFontDownload}>{this.props.retryText}</a>
-    )
-  }
+	/**
+	 * Display a "retry" download link
+	 *
+	 * @returns {*}
+	 *
+	 * @since 5.0
+	 */
+	render () {
+		return (
+		< a href = "#" onClick = {this.triggerRetryFontDownload} > {this.props.retryText} < / a >
+		)
+	}
 }

@@ -23,23 +23,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -121,7 +121,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	public function add_pdf_mergetags( $tags, $form_id ) {
 
 		/* Exit early if the Gravity Form could not be identified */
-		if( $form_id === 0 ) {
+		if ( $form_id === 0 ) {
 			return $tags;
 		}
 
@@ -138,8 +138,8 @@ class Model_Mergetags extends Helper_Abstract_Model {
 					'tag'   => sprintf( '{%s:pdf:%s}', $pdf['name'], $id ),
 					/* Format "PDF: %s" - we split it up like this so we didn't have to add another translation */
 					'label' => esc_html__( 'PDF', 'gravity-forms-pdf-extended' ) .
-					           ': ' .
-					           esc_html( $pdf['name'] ),
+							   ': ' .
+							   esc_html( $pdf['name'] ),
 				];
 			}
 		}
@@ -167,18 +167,21 @@ class Model_Mergetags extends Helper_Abstract_Model {
 		}
 
 		/* Match our PDF merge tags */
-		$results = preg_match_all( "/\{(.*?):pdf:(.*?)\}/", $text, $matches, PREG_SET_ORDER );
+		$results = preg_match_all( '/\{(.*?):pdf:(.*?)\}/', $text, $matches, PREG_SET_ORDER );
 
 		/* Verify we have a match */
 		if ( $results ) {
 
-			$this->log->addNotice( 'Begin Converting PDF Mergetags', [
-				'form_id'  => $form['id'],
-				'entry_id' => $entry['id'],
+			$this->log->addNotice(
+				'Begin Converting PDF Mergetags',
+				[
+					'form_id'  => $form['id'],
+					'entry_id' => $entry['id'],
 
-				'tags' => $matches,
-				'text' => $text,
-			] );
+					'tags'     => $matches,
+					'text'     => $text,
+				]
+			);
 
 			foreach ( $matches as $tag ) {
 
@@ -187,17 +190,20 @@ class Model_Mergetags extends Helper_Abstract_Model {
 
 				/* Strip tag if config not valid, it isn't active or conditional logic is not met */
 				if ( is_wp_error( $config )
-				     || $config['active'] !== true
-				     || ( isset( $config['conditionalLogic'] ) && ! $this->misc->evaluate_conditional_logic( $config['conditionalLogic'], $entry ) )
+					 || $config['active'] !== true
+					 || ( isset( $config['conditionalLogic'] ) && ! $this->misc->evaluate_conditional_logic( $config['conditionalLogic'], $entry ) )
 				) {
-					$this->log->addError( 'PDF Mergetag is not valid', [
-						'form_id'  => $form['id'],
-						'entry_id' => $entry['id'],
-						'tag'      => $tag,
+					$this->log->addError(
+						'PDF Mergetag is not valid',
+						[
+							'form_id'  => $form['id'],
+							'entry_id' => $entry['id'],
+							'tag'      => $tag,
 
-						/* include the error, or the actual config array */
-						'config'   => ( is_wp_error( $config ) ) ? $config->get_error_messages() : $config,
-					] );
+							/* include the error, or the actual config array */
+							'config'   => ( is_wp_error( $config ) ) ? $config->get_error_messages() : $config,
+						]
+					);
 
 					/* Remove the tag and the new line if present (prevents any odd spacing issues) */
 					$text = str_replace( [ $tag[0] . '<br>', $tag[0] . '<br />', $tag[0] . "\n", $tag[0] ], '', $text );

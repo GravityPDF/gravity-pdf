@@ -17,23 +17,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -303,10 +303,13 @@ abstract class Helper_Abstract_Addon {
 		/*
 		 * Include info on plugin listing
 		 */
-		add_action( 'after_plugin_row_' . plugin_basename( $this->get_main_plugin_file() ), [
-			$this,
-			'license_registration',
-		] );
+		add_action(
+			'after_plugin_row_' . plugin_basename( $this->get_main_plugin_file() ),
+			[
+				$this,
+				'license_registration',
+			]
+		);
 		add_filter( 'plugin_row_meta', [ $this, 'plugin_row_meta' ], 10, 2 );
 
 		/*
@@ -317,20 +320,23 @@ abstract class Helper_Abstract_Addon {
 		/*
 		 * Run the init() method (if it exists) for the add-on classes and register them with our internal singleton
 		 */
-		array_walk( $classes, function( $class ) {
+		array_walk(
+			$classes,
+			function( $class ) {
 
-		    /* Inject the logger class if using the trait Helper_Trait_Logger */
-			$trait = class_uses( $class );
-			if ( isset( $trait['GFPDF\Helper\Helper_Trait_Logger'] ) ) {
-			    $class->set_logger( $this->log );
+				/* Inject the logger class if using the trait Helper_Trait_Logger */
+				$trait = class_uses( $class );
+				if ( isset( $trait['GFPDF\Helper\Helper_Trait_Logger'] ) ) {
+					$class->set_logger( $this->log );
+				}
+
+				if ( method_exists( $class, 'init' ) ) {
+					$class->init();
+				}
+
+				$this->singleton->add_class( $class );
 			}
-
-			if ( method_exists( $class, 'init' ) ) {
-				$class->init();
-			}
-
-			$this->singleton->add_class( $class );
-		} );
+		);
 
 		$this->log->notice( sprintf( '%s plugin fully loaded', $this->get_name() ) );
 	}
@@ -368,7 +374,7 @@ abstract class Helper_Abstract_Addon {
 	 *
 	 * @return void
 	 */
-	public abstract function plugin_updater();
+	abstract public function plugin_updater();
 
 	/**
 	 * Register the add-on with Gravity PDF
@@ -405,14 +411,18 @@ abstract class Helper_Abstract_Addon {
 
 		/* Add plugin heading before fields are included */
 
-		return array_merge( $settings, [
-			$this->get_slug() . '_heading' => [
-				'id'    => $this->get_slug() . '_heading',
-				'type'  => 'descriptive_text',
-				'desc'  => '<h4 class="section-title">' . $this->get_name() . '</h4>',
-				'class' => 'gfpdf-no-padding',
+		return array_merge(
+			$settings,
+			[
+				$this->get_slug() . '_heading' => [
+					'id'    => $this->get_slug() . '_heading',
+					'type'  => 'descriptive_text',
+					'desc'  => '<h4 class="section-title">' . $this->get_name() . '</h4>',
+					'class' => 'gfpdf-no-padding',
+				],
 			],
-		], $registered_fields );
+			$registered_fields
+		);
 	}
 
 	/**
@@ -426,9 +436,9 @@ abstract class Helper_Abstract_Addon {
 		$settings = $this->options->get_settings();
 
 		$slug    = $this->get_slug();
-		$license = ( isset( $settings["license_$slug"] ) ) ? $settings["license_$slug"] : '';
-		$status  = ( isset( $settings["license_{$slug}_status"] ) ) ? $settings["license_{$slug}_status"] : '';
-		$message = ( isset( $settings["license_{$slug}_message"] ) ) ? $settings["license_{$slug}_message"] : '';
+		$license = ( isset( $settings[ "license_$slug" ] ) ) ? $settings[ "license_$slug" ] : '';
+		$status  = ( isset( $settings[ "license_{$slug}_status" ] ) ) ? $settings[ "license_{$slug}_status" ] : '';
+		$message = ( isset( $settings[ "license_{$slug}_message" ] ) ) ? $settings[ "license_{$slug}_message" ] : '';
 
 		$license_details = [
 			'license' => $license,
@@ -454,9 +464,9 @@ abstract class Helper_Abstract_Addon {
 		$settings = $this->options->get_settings();
 		$slug     = $this->get_slug();
 
-		$settings["license_$slug"]           = $license_info['license'];
-		$settings["license_{$slug}_status"]  = $license_info['status'];
-		$settings["license_{$slug}_message"] = $license_info['message'];
+		$settings[ "license_$slug" ]           = $license_info['license'];
+		$settings[ "license_{$slug}_status" ]  = $license_info['status'];
+		$settings[ "license_{$slug}_message" ] = $license_info['message'];
 
 		$this->log->notice( 'Update plugin license details', $license_info );
 
@@ -472,9 +482,9 @@ abstract class Helper_Abstract_Addon {
 		$settings = $this->options->get_settings();
 		$slug     = $this->get_slug();
 
-		unset( $settings["license_$slug"] );
-		unset( $settings["license_{$slug}_status"] );
-		unset( $settings["license_{$slug}_message"] );
+		unset( $settings[ "license_$slug" ] );
+		unset( $settings[ "license_{$slug}_status" ] );
+		unset( $settings[ "license_{$slug}_message" ] );
 
 		$this->log->notice( 'Delete plugin license details' );
 
@@ -534,16 +544,19 @@ abstract class Helper_Abstract_Addon {
 
 		$license_info = $this->get_license_info();
 
-		$response = wp_remote_post( $this->data->store_url, [
-			'timeout'   => 15,
-			'sslverify' => false,
-			'body'      => [
-				'edd_action' => 'check_license',
-				'license'    => $license_info['license'],
-				'item_name'  => urlencode( $this->get_short_name() ),
-				'url'        => home_url(),
-			],
-		] );
+		$response = wp_remote_post(
+			$this->data->store_url,
+			[
+				'timeout'   => 15,
+				'sslverify' => false,
+				'body'      => [
+					'edd_action' => 'check_license',
+					'license'    => $license_info['license'],
+					'item_name'  => urlencode( $this->get_short_name() ),
+					'url'        => home_url(),
+				],
+			]
+		);
 
 		/* If there was a problem with the request we'll try again in an hour */
 		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
@@ -602,13 +615,13 @@ abstract class Helper_Abstract_Addon {
 
 		?>
 
-        <tr class="plugin-update-tr">
-            <td colspan="3" class="plugin-update colspanchange">
-                <div class="update-message">
+		<tr class="plugin-update-tr">
+			<td colspan="3" class="plugin-update colspanchange">
+				<div class="update-message">
 					<?php
 					printf(
 						esc_html__(
-							'%sRegister your copy of %s%s to receive access to automatic upgrades and support. Need a license key? %sPurchase one now%s.',
+							'%1$sRegister your copy of %2$s%3$s to receive access to automatic upgrades and support. Need a license key? %4$sPurchase one now%5$s.',
 							'gravity-forms-pdf-extended'
 						),
 						'<a href="' . admin_url( 'admin.php?page=gf_settings&subview=PDF&tab=license' ) . '">',
@@ -618,9 +631,9 @@ abstract class Helper_Abstract_Addon {
 						'</a>'
 					)
 					?>
-                </div>
-            </td>
-        </tr>
+				</div>
+			</td>
+		</tr>
 
 		<?php
 	}

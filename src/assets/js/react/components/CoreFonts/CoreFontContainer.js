@@ -44,250 +44,250 @@ import { clearRetryList, addToRetryList, addToConsole, clearConsole } from '../.
  */
 export class CoreFontContainer extends React.Component {
 
-  /**
-   * Switches to show loaders
-   *
-   * @type {{ajax: boolean, queueLoaded: boolean}}
-   *
-   * @since 5.0
-   */
-  state = {
-    ajax: false,
-    queueLoaded: false,
-  }
+	/**
+	 * Switches to show loaders
+	 *
+	 * @type {{ajax: boolean, queueLoaded: boolean}}
+	 *
+	 * @since 5.0
+	 */
+	state = {
+		ajax: false,
+		queueLoaded: false,
+	}
 
-  /**
-   * When new props are received we'll check if the fonts should be downloaded
-   *
-   * @param nextProps
-   *
-   * @since 5.0
-   */
-  componentWillReceiveProps (nextProps) {
-    this.maybeStartDownload(nextProps.location)
-  }
+	/**
+	 * When new props are received we'll check if the fonts should be downloaded
+	 *
+	 * @param nextProps
+	 *
+	 * @since 5.0
+	 */
+	componentWillReceiveProps (nextProps) {
+		this.maybeStartDownload( nextProps.location )
+	}
 
-  /**
-   * When the component is first mounted we'll check if the fonts should be downloaded
-   *
-   * @since 5.0
-   */
-  componentDidMount () {
-    this.maybeStartDownload(this.props.location)
-  }
+	/**
+	 * When the component is first mounted we'll check if the fonts should be downloaded
+	 *
+	 * @since 5.0
+	 */
+	componentDidMount () {
+		this.maybeStartDownload( this.props.location )
+	}
 
-  /**
-   * If the Hash History matches our keys (and not already loading) start the download
-   *
-   * @param location
-   *
-   * @since 5.0
-   */
-  maybeStartDownload (location) {
-    if (!this.state.ajax && location.pathname === '/downloadCoreFonts') {
-      this.startDownloadFonts()
-    }
+	/**
+	 * If the Hash History matches our keys (and not already loading) start the download
+	 *
+	 * @param location
+	 *
+	 * @since 5.0
+	 */
+	maybeStartDownload (location) {
+		if ( ! this.state.ajax && location.pathname === '/downloadCoreFonts') {
+			this.startDownloadFonts()
+		}
 
-    if (!this.state.ajax && location.pathname === '/retryDownloadCoreFonts' && this.props.retry.length > 0) {
-      this.startDownloadFonts(this.props.retry)
-    }
-  }
+		if ( ! this.state.ajax && location.pathname === '/retryDownloadCoreFonts' && this.props.retry.length > 0) {
+			this.startDownloadFonts( this.props.retry )
+		}
+	}
 
-  /**
-   * Call our server to download the fonts in batches of 5
-   *
-   * @param array files The font files to download (usually passed in from the 'retry' prop)
-   *
-   * @returns {Promise.<void>}
-   *
-   * @since 5.0
-   */
-  startDownloadFonts = async (files = []) => {
-    try {
-      this.setState({ajax: true})
-      this.props.clearConsole()
-      this.props.clearRetryList()
+	/**
+	 * Call our server to download the fonts in batches of 5
+	 *
+	 * @param array files The font files to download (usually passed in from the 'retry' prop)
+	 *
+	 * @returns {Promise.<void>}
+	 *
+	 * @since 5.0
+	 */
+	startDownloadFonts = async( files = [] ) => {
+		try {
+			this.setState( {ajax: true} )
+			this.props.clearConsole()
+			this.props.clearRetryList()
 
-      /* If not retrying, get the font list from our GitHub repo */
-      if (files.length === 0) {
-        files = await this.getFilesFromGitHub()
-      }
+			/* If not retrying, get the font list from our GitHub repo */
+			if (files.length === 0) {
+				files = await this.getFilesFromGitHub()
+			}
 
-      const tasks = []
-      this.queue = new Queue(5, Infinity)
+			const tasks = []
+			this.queue  = new Queue( 5, Infinity )
 
-      files.map(
-        (file) => tasks.push(this.queue.add(() => this.downloadFontsApiCall(file)))
-      )
+			files.map(
+				(file) => tasks.push( this.queue.add( () => this.downloadFontsApiCall( file ) ) )
+			)
 
-      Promise.all(tasks.map(promiseReflect)).then(this.showDownloadCompletedStatus)
+			Promise.all( tasks.map( promiseReflect ) ).then( this.showDownloadCompletedStatus )
 
-      this.setState({queueLoaded: true})
-    } catch (error) {
-      this.handleGithubApiError(error)
-    }
-  }
+			this.setState( {queueLoaded: true} )
+		} catch (error) {
+			this.handleGithubApiError( error )
+		}
+	}
 
-  /**
-   * Get our Promise Queue length
-   *
-   * @returns {number}
-   *
-   * @since 5.0
-   */
-  getQueueLength () {
-    return (this.queue !== undefined) ? this.queue.getQueueLength() + this.queue.getPendingLength() : 0
-  }
+	/**
+	 * Get our Promise Queue length
+	 *
+	 * @returns {number}
+	 *
+	 * @since 5.0
+	 */
+	getQueueLength () {
+		return (this.queue !== undefined) ? this.queue.getQueueLength() + this.queue.getPendingLength() : 0
+	}
 
-  /**
-   * Get the font names from GitHub we need to download
-   *
-   * @returns {Promise.<Array>}
-   *
-   * @since 5.0
-   */
-  async getFilesFromGitHub () {
-    const req = await request
-      .get(this.props.listUrl)
-      .accept('application/vnd.github.v3+json')
-      .type('json')
+	/**
+	 * Get the font names from GitHub we need to download
+	 *
+	 * @returns {Promise.<Array>}
+	 *
+	 * @since 5.0
+	 */
+	async getFilesFromGitHub () {
+		const req = await request
+		.get( this.props.listUrl )
+		.accept( 'application/vnd.github.v3+json' )
+		.type( 'json' )
 
-    let files = []
+		let files = []
 
-    req.body.map(
-      (file) => files.push(file.name)
-    )
+		req.body.map(
+			(file) => files.push( file.name )
+		)
 
-    return files
-  }
+		return files
+	}
 
-  /**
-   * Show the overall status in the console once all the fonts have been downloaded (or tried to download)
-   *
-   * @since 5.0
-   */
-  showDownloadCompletedStatus = () => {
-    const errors = this.props.retry.length
-    const status = errors ? 'error' : 'success'
-    const message = errors ? this.props.error.replace('%s', errors) : this.props.success
+	/**
+	 * Show the overall status in the console once all the fonts have been downloaded (or tried to download)
+	 *
+	 * @since 5.0
+	 */
+	showDownloadCompletedStatus = () => {
+		const errors            = this.props.retry.length
+		const status            = errors ? 'error' : 'success'
+		const message           = errors ? this.props.error.replace( '%s', errors ) : this.props.success
 
-    this.props.addToConsole('completed', status, message)
-    this.setState({ajax: false, queueLoaded: false})
-    this.props.history.replace('')
-  }
+		this.props.addToConsole( 'completed', status, message )
+		this.setState( {ajax: false, queueLoaded: false} )
+		this.props.history.replace( '' )
+	}
 
-  /**
-   * Add a GitHub API overall status to the console
-   *
-   * @param error
-   *
-   * @since 5.0
-   */
-  handleGithubApiError (error) {
-    this.setState({ajax: false, queueLoaded: false})
-    this.props.addToConsole('completed', 'error', this.props.githubError)
-    this.props.history.replace('')
+	/**
+	 * Add a GitHub API overall status to the console
+	 *
+	 * @param error
+	 *
+	 * @since 5.0
+	 */
+	handleGithubApiError (error) {
+		this.setState( {ajax: false, queueLoaded: false} )
+		this.props.addToConsole( 'completed', 'error', this.props.githubError )
+		this.props.history.replace( '' )
 
-    error && console.warn(error)
-  }
+		error && console.warn( error )
+	}
 
-  /**
-   * Tell our backend to download and save the font
-   *
-   * @param file
-   * @returns {Promise.<void>}
-   *
-   * @since 5.0
-   */
-  downloadFontsApiCall = async (file) => {
-    this.addFontPendingMessage(file)
+	/**
+	 * Tell our backend to download and save the font
+	 *
+	 * @param file
+	 * @returns {Promise.<void>}
+	 *
+	 * @since 5.0
+	 */
+	downloadFontsApiCall = async( file ) => {
+		this.addFontPendingMessage( file )
 
-    /* Do AJAX call */
-    try {
-      const req = await request
-        .post(GFPDF.ajaxUrl)
-        .field('action', 'gfpdf_save_core_font')
-        .field('nonce', GFPDF.ajaxNonce)
-        .field('font_name', file)
+		/* Do AJAX call */
+		try {
+			const req = await request
+			.post( GFPDF.ajaxUrl )
+			.field( 'action', 'gfpdf_save_core_font' )
+			.field( 'nonce', GFPDF.ajaxNonce )
+			.field( 'font_name', file )
 
-      /* API returns `true` on success and `false` on failure */
-      if (!req.body) {
-        throw true
-      }
+			/* API returns `true` on success and `false` on failure */
+			if ( ! req.body) {
+				throw true
+			}
 
-      this.addFontSuccessMessage(file)
-    } catch (e) {
-      this.addFontErrorMessage(file)
-    }
-  }
+			this.addFontSuccessMessage( file )
+		} catch (e) {
+			this.addFontErrorMessage( file )
+		}
+	}
 
-  /**
-   * Add pending message to console
-   *
-   * @param string name The Font Name
-   *
-   * @since 5.0
-   */
-  addFontPendingMessage (name) {
-    this.props.addToConsole(name, 'pending', this.props.itemPending.replace('%s', name))
-  }
+	/**
+	 * Add pending message to console
+	 *
+	 * @param string name The Font Name
+	 *
+	 * @since 5.0
+	 */
+	addFontPendingMessage (name) {
+		this.props.addToConsole( name, 'pending', this.props.itemPending.replace( '%s', name ) )
+	}
 
-  /**
-   * Add success message to console
-   *
-   * @param string name The Font Name
-   *
-   * @since 5.0
-   */
-  addFontSuccessMessage (name) {
-    this.props.addToConsole(name, 'success', this.props.itemSuccess.replace('%s', name))
-  }
+	/**
+	 * Add success message to console
+	 *
+	 * @param string name The Font Name
+	 *
+	 * @since 5.0
+	 */
+	addFontSuccessMessage (name) {
+		this.props.addToConsole( name, 'success', this.props.itemSuccess.replace( '%s', name ) )
+	}
 
-  /**
-   * Add error message to console
-   *
-   * @param string name The Font Name
-   *
-   * @since 5.0
-   */
-  addFontErrorMessage (name) {
-    this.props.addToConsole(name, 'error', this.props.itemError.replace('%s', name))
-    this.props.addToRetryList(name)
-  }
+	/**
+	 * Add error message to console
+	 *
+	 * @param string name The Font Name
+	 *
+	 * @since 5.0
+	 */
+	addFontErrorMessage (name) {
+		this.props.addToConsole( name, 'error', this.props.itemError.replace( '%s', name ) )
+		this.props.addToRetryList( name )
+	}
 
-  /**
-   * Trigger the font download by updating the Hash History
-   *
-   * @since 5.0
-   */
-  triggerFontDownload = () => {
-    this.props.history.replace('downloadCoreFonts')
-  }
+	/**
+	 * Trigger the font download by updating the Hash History
+	 *
+	 * @since 5.0
+	 */
+	triggerFontDownload = () => {
+		this.props.history.replace( 'downloadCoreFonts' )
+	}
 
-  /**
-   * Renders our Core Font downloader UI
-   *
-   * @returns {XML}
-   *
-   * @since 5.0
-   */
-  render () {
-    return (
-      <div>
-        <Button className={this.props.buttonClassName} callback={this.triggerFontDownload}
-                text={this.props.buttonText}/>
+	/**
+	 * Renders our Core Font downloader UI
+	 *
+	 * @returns {XML}
+	 *
+	 * @since 5.0
+	 */
+	render () {
+		return (
+		< div >
+		< Button className = {this.props.buttonClassName} callback = {this.triggerFontDownload}
+				text       = {this.props.buttonText} / >
 
-        {this.state.ajax && <Spinner/>}
-        {this.state.queueLoaded && <Counter text={this.props.counterText} queue={this.getQueueLength()}/>}
+		{this.state.ajax && < Spinner / > }
+		{this.state.queueLoaded && < Counter text = {this.props.counterText} queue = {this.getQueueLength()} / > }
 
-        <CoreFontListResults
-          history={this.props.history}
-          console={this.props.console}
-          retry={this.props.retry}
-          retryText={this.props.retryText}/>
-      </div>
-    )
-  }
+		< CoreFontListResults
+		  history   = {this.props.history}
+		  console   = {this.props.console}
+		  retry     = {this.props.retry}
+		  retryText = {this.props.retryText} / >
+		< / div >
+		)
+	}
 }
 
 /**
@@ -299,10 +299,10 @@ export class CoreFontContainer extends React.Component {
  * @since 5.0
  */
 const mapStateToProps = (state) => {
-  return {
-    console: state.coreFonts.console,
-    retry: state.coreFonts.retry,
-  }
+	return {
+		console: state.coreFonts.console,
+		retry: state.coreFonts.retry,
+	}
 }
 
 /**
@@ -314,23 +314,23 @@ const mapStateToProps = (state) => {
  * @since 5.0
  */
 const mapDispatchToProps = (dispatch) => {
-  return {
-    addToConsole: (key, status, message) => {
-      dispatch(addToConsole(key, status, message))
-    },
+	return {
+		addToConsole: (key, status, message) => {
+			dispatch( addToConsole( key, status, message ) )
+		},
 
-    clearConsole: () => {
-      dispatch(clearConsole())
-    },
+		clearConsole: () => {
+			dispatch( clearConsole() )
+		},
 
-    addToRetryList: (name) => {
-      dispatch(addToRetryList(name))
-    },
+		addToRetryList: (name) => {
+			dispatch( addToRetryList( name ) )
+		},
 
-    clearRetryList: () => {
-      dispatch(clearRetryList())
-    }
-  }
+		clearRetryList: () => {
+			dispatch( clearRetryList() )
+		}
+	}
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CoreFontContainer)
+export default connect( mapStateToProps, mapDispatchToProps )( CoreFontContainer )

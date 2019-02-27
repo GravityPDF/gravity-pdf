@@ -32,23 +32,23 @@ use ReflectionMethod;
  */
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -133,17 +133,29 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertSame( 10, has_action( 'parse_request', [ $this->controller, 'process_legacy_pdf_endpoint' ] ) );
 		$this->assertSame( 10, has_action( 'parse_request', [ $this->controller, 'process_pdf_endpoint' ] ) );
 
-		$this->assertSame( 10, has_action( 'gform_entries_first_column_actions', [
-			$this->model,
-			'view_pdf_entry_list',
-		] ) );
+		$this->assertSame(
+			10,
+			has_action(
+				'gform_entries_first_column_actions',
+				[
+					$this->model,
+					'view_pdf_entry_list',
+				]
+			)
+		);
 		$this->assertSame( 10, has_action( 'gform_entry_info', [ $this->model, 'view_pdf_entry_detail' ] ) );
 		$this->assertSame( 10, has_action( 'gform_after_submission', [ $this->model, 'maybe_save_pdf' ] ) );
 		$this->assertSame( 9999, has_action( 'gform_after_submission', [ $this->model, 'cleanup_pdf' ] ) );
-		$this->assertSame( 9999, has_action( 'gform_after_update_entry', [
-			$this->model,
-			'cleanup_pdf_after_submission',
-		] ) );
+		$this->assertSame(
+			9999,
+			has_action(
+				'gform_after_update_entry',
+				[
+					$this->model,
+					'cleanup_pdf_after_submission',
+				]
+			)
+		);
 		$this->assertSame( 10, has_action( 'gfpdf_cleanup_tmp_dir', [ $this->model, 'cleanup_tmp_dir' ] ) );
 	}
 
@@ -166,27 +178,45 @@ class Test_PDF extends WP_UnitTestCase {
 
 		$this->assertSame( 9999, has_filter( 'gform_notification', [ $this->model, 'notifications' ], 9999 ) );
 
-		$this->assertSame( 10, has_filter( 'mpdf_font_data', [
-			$this->model,
-			'register_custom_font_data_with_mPDF',
-		] ) );
+		$this->assertSame(
+			10,
+			has_filter(
+				'mpdf_font_data',
+				[
+					$this->model,
+					'register_custom_font_data_with_mPDF',
+				]
+			)
+		);
 		$this->assertSame( 20, has_filter( 'mpdf_font_data', [ $this->model, 'add_unregistered_fonts_to_mPDF' ] ) );
 
 		$this->assertSame( 10, has_filter( 'gfpdf_pdf_html_output', [ $gfpdf->gform, 'process_tags' ] ) );
 		$this->assertSame( 10, has_filter( 'gfpdf_pdf_html_output', 'do_shortcode' ) );
 
 		$this->assertSame( 10, has_filter( 'gfpdf_template_args', [ $this->model, 'preprocess_template_arguments' ] ) );
-		$this->assertSame( 5, has_filter( 'gfpdf_pdf_html_output', [
-			$this->view,
-			'autoprocess_core_template_options',
-		] ) );
+		$this->assertSame(
+			5,
+			has_filter(
+				'gfpdf_pdf_html_output',
+				[
+					$this->view,
+					'autoprocess_core_template_options',
+				]
+			)
+		);
 
 		/* Backwards compatiblity */
 		$this->assertSame( 1, has_filter( 'gfpdfe_pre_load_template', [ 'PDFRender', 'prepare_ids' ] ) );
-		$this->assertSame( 10, has_filter( 'gform_before_resend_notifications', [
-			$this->model,
-			'resend_notification_pdf_cleanup',
-		] ) );
+		$this->assertSame(
+			10,
+			has_filter(
+				'gform_before_resend_notifications',
+				[
+					$this->model,
+					'resend_notification_pdf_cleanup',
+				]
+			)
+		);
 	}
 
 	/**
@@ -260,7 +290,8 @@ class Test_PDF extends WP_UnitTestCase {
 
 		/* pdf_error is private but we do want to verify the different errors are showing to the correct audience without having to go through the public API */
 		$method = new ReflectionMethod(
-			'\GFPDF\Controller\Controller_PDF', 'pdf_error'
+			'\GFPDF\Controller\Controller_PDF',
+			'pdf_error'
 		);
 
 		$method->setAccessible( true );
@@ -355,7 +386,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$results          = $this->create_form_and_entries();
 		$entry            = $results['entry'];
 		$entry['form_id'] = $results['form']['id'];
-		$options = \GPDFAPI::get_options_class();
+		$options          = \GPDFAPI::get_options_class();
 
 		/* Test it does nothing by default */
 		$this->model->middle_signed_url_access( '', '', '' );
@@ -465,7 +496,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertFalse( $this->model->is_current_pdf_owner( $entry, 'logged_in' ) );
 
 		/* Set the IPs */
-		$entry['ip']               = '197.64.12.40';
+		$entry['ip']            = '197.64.12.40';
 		$_SERVER['REMOTE_ADDR'] = $entry['ip'];
 
 		$this->assertTrue( $this->model->is_current_pdf_owner( $entry ) );
@@ -743,15 +774,21 @@ class Test_PDF extends WP_UnitTestCase {
 
 		/* Check our filters work correctly */
 
-		add_filter( 'gfpdf_pdf_filename', function () {
-			return 'filter';
-		} );
+		add_filter(
+			'gfpdf_pdf_filename',
+			function () {
+				return 'filter';
+			}
+		);
 
 		$this->assertEquals( 'filter', $this->model->get_pdf_name( $pdf, $entry ) );
 
-		add_filter( 'gfpdfe_pdf_filename', function () {
-			return 'filter';
-		} );
+		add_filter(
+			'gfpdfe_pdf_filename',
+			function () {
+				return 'filter';
+			}
+		);
 
 		$this->assertEquals( 'filter', $this->model->get_pdf_name( $pdf, $entry ) );
 	}
@@ -965,8 +1002,8 @@ class Test_PDF extends WP_UnitTestCase {
 
 		/* Create PDF file so it isn't recreated */
 		$folder = $form['id'] . $entry['id'];
-		$path = $gfpdf->data->template_tmp_location . "$folder/";
-		$file = "test-{$form['id']}.pdf";
+		$path   = $gfpdf->data->template_tmp_location . "$folder/";
+		$file   = "test-{$form['id']}.pdf";
 
 		wp_mkdir_p( $path );
 		touch( $path . $file );
@@ -995,9 +1032,18 @@ class Test_PDF extends WP_UnitTestCase {
 	public function test_does_pdf_exist() {
 		global $gfpdf;
 
-		$pdf = new Helper_PDF( [ 'id'      => 1,
-		                         'form_id' => 1,
-		], '', $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates, $gfpdf->log );
+		$pdf = new Helper_PDF(
+			[
+				'id'      => 1,
+				'form_id' => 1,
+			],
+			'',
+			$gfpdf->gform,
+			$gfpdf->data,
+			$gfpdf->misc,
+			$gfpdf->templates,
+			$gfpdf->log
+		);
 		$pdf->set_path( ABSPATH );
 		$pdf->set_filename( 'unittest' );
 
@@ -1018,9 +1064,18 @@ class Test_PDF extends WP_UnitTestCase {
 	public function test_get_output_type() {
 		global $gfpdf;
 
-		$pdf = new Helper_PDF( [ 'id'      => 1,
-		                         'form_id' => 1,
-		], '', $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates, $gfpdf->log );
+		$pdf = new Helper_PDF(
+			[
+				'id'      => 1,
+				'form_id' => 1,
+			],
+			'',
+			$gfpdf->gform,
+			$gfpdf->data,
+			$gfpdf->misc,
+			$gfpdf->templates,
+			$gfpdf->log
+		);
 
 		$pdf->set_output_type( 'display' );
 		$this->assertEquals( 'DISPLAY', $pdf->get_output_type() );
@@ -1040,9 +1095,18 @@ class Test_PDF extends WP_UnitTestCase {
 	public function test_get_template_path() {
 		global $gfpdf;
 
-		$pdf = new Helper_PDF( [ 'id'      => 1,
-		                         'form_id' => 1,
-		], [ 'template' => 'zadani' ], $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates, $gfpdf->log );
+		$pdf = new Helper_PDF(
+			[
+				'id'      => 1,
+				'form_id' => 1,
+			],
+			[ 'template' => 'zadani' ],
+			$gfpdf->gform,
+			$gfpdf->data,
+			$gfpdf->misc,
+			$gfpdf->templates,
+			$gfpdf->log
+		);
 
 		/* Cleanup any previous tests */
 		@unlink( $gfpdf->data->template_location . 'zadani.php' );
@@ -1077,12 +1141,14 @@ class Test_PDF extends WP_UnitTestCase {
 		}
 
 		/* Check for errors */
-		$pdf = new Helper_PDF( [
-			'id'      => 1,
-			'form_id' => 1,
-		], [
-			'template' => 'non-existant',
-		],
+		$pdf = new Helper_PDF(
+			[
+				'id'      => 1,
+				'form_id' => 1,
+			],
+			[
+				'template' => 'non-existant',
+			],
 			$gfpdf->gform,
 			$gfpdf->data,
 			$gfpdf->misc,
@@ -1102,9 +1168,18 @@ class Test_PDF extends WP_UnitTestCase {
 		$template = str_replace( 'Required PDF Version: 4.0-alpha', 'Required PDF Version: 10', $template );
 		file_put_contents( $gfpdf->data->template_location . 'zadani.php', $template );
 
-		$pdf = new Helper_PDF( [ 'id'      => 1,
-		                         'form_id' => 1,
-		], [ 'template' => 'zadani' ], $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates, $gfpdf->log );
+		$pdf = new Helper_PDF(
+			[
+				'id'      => 1,
+				'form_id' => 1,
+			],
+			[ 'template' => 'zadani' ],
+			$gfpdf->gform,
+			$gfpdf->data,
+			$gfpdf->misc,
+			$gfpdf->templates,
+			$gfpdf->log
+		);
 
 		try {
 			$pdf->set_template();
@@ -1123,10 +1198,10 @@ class Test_PDF extends WP_UnitTestCase {
 	public function test_cleanup_tmp_dir() {
 		global $gfpdf;
 
-		$tmp_save = $gfpdf->data->template_tmp_location;
+		$tmp_save                           = $gfpdf->data->template_tmp_location;
 		$gfpdf->data->template_tmp_location = $gfpdf->data->template_location . 'tmp/';
-		$tmp = $gfpdf->data->template_tmp_location;
-		$gfpdf->data->mpdf_tmp_location = $tmp . 'mpdf';
+		$tmp                                = $gfpdf->data->template_tmp_location;
+		$gfpdf->data->mpdf_tmp_location     = $tmp . 'mpdf';
 
 		wp_mkdir_p( $tmp );
 		wp_mkdir_p( $gfpdf->data->mpdf_tmp_location );
@@ -1623,7 +1698,7 @@ class Test_PDF extends WP_UnitTestCase {
 					1 => 'My Test Page',
 				],
 			],
-			'fields' => []
+			'fields'     => [],
 		];
 
 		ob_start();
@@ -1659,47 +1734,70 @@ class Test_PDF extends WP_UnitTestCase {
 			'rtl'             => 'No',
 		];
 
-
 		/* Test everything passes back the same */
 		$results = $this->model->apply_backwards_compatibility_filters( $settings, $entry );
 
-		foreach( $results as $key => $value ) {
+		foreach ( $results as $key => $value ) {
 			$this->assertArrayHasKey( $key, $settings );
 			$this->assertEquals( $value, $settings[ $key ] );
 		}
 
 		/* Add filters to manipulate the data */
-		add_filter( 'gfpdfe_pdf_name', function ( $item ) {
-			return 'big-document.pdf';
-		} );
+		add_filter(
+			'gfpdfe_pdf_name',
+			function ( $item ) {
+				return 'big-document.pdf';
+			}
+		);
 
-		add_filter( 'gfpdfe_template', function ( $item ) {
-			return 'default-template.php';
-		} );
+		add_filter(
+			'gfpdfe_template',
+			function ( $item ) {
+				return 'default-template.php';
+			}
+		);
 
-		add_filter( 'gfpdf_orientation', function ( $item ) {
-			return 'landscape';
-		} );
+		add_filter(
+			'gfpdf_orientation',
+			function ( $item ) {
+				return 'landscape';
+			}
+		);
 
-		add_filter( 'gfpdf_security', function ( $item ) {
-			return false;
-		} );
+		add_filter(
+			'gfpdf_security',
+			function ( $item ) {
+				return false;
+			}
+		);
 
-		add_filter( 'gfpdf_privilages', function ( $item ) {
-			return [ 'print', 'print-highres' ];
-		} );
+		add_filter(
+			'gfpdf_privilages',
+			function ( $item ) {
+				return [ 'print', 'print-highres' ];
+			}
+		);
 
-		add_filter( 'gfpdf_password', function ( $item ) {
-			return 'pass';
-		} );
+		add_filter(
+			'gfpdf_password',
+			function ( $item ) {
+				return 'pass';
+			}
+		);
 
-		add_filter( 'gfpdf_master_password', function ( $item ) {
-			return '';
-		} );
+		add_filter(
+			'gfpdf_master_password',
+			function ( $item ) {
+				return '';
+			}
+		);
 
-		add_filter( 'gfpdf_rtl', function ( $item ) {
-			return true;
-		} );
+		add_filter(
+			'gfpdf_rtl',
+			function ( $item ) {
+				return true;
+			}
+		);
 
 		$test = $this->model->apply_backwards_compatibility_filters( $settings, $entry );
 
@@ -1731,8 +1829,8 @@ class Test_PDF extends WP_UnitTestCase {
 				'first_footer' => '<img src="/this/is/my/path/image.gif" class="class1 class2" />',
 				'other_value'  => 'testing',
 			],
-			'form'  => $data['form'],
-			'entry' => $data['entry'],
+			'form'     => $data['form'],
+			'entry'    => $data['entry'],
 		];
 
 		$results = $this->model->preprocess_template_arguments( $args );
@@ -1767,15 +1865,15 @@ class Test_PDF extends WP_UnitTestCase {
 
 		/* Setup the test data */
 		$settings = [
-			'font'        => 'Arial',
-			'font_colour' => '#CCC',
-			'font_size'   => '12',
+			'font'             => 'Arial',
+			'font_colour'      => '#CCC',
+			'font_size'        => '12',
 
-			'header'       => 'This is my header',
-			'first_header' => 'This is the first header',
+			'header'           => 'This is my header',
+			'first_header'     => 'This is the first header',
 
-			'footer'       => 'This is the footer',
-			'first_footer' => 'This is the first footer',
+			'footer'           => 'This is the footer',
+			'first_footer'     => 'This is the first footer',
 
 			'background_image' => '/path/image.png',
 			'background_color' => 'red',
@@ -1815,7 +1913,7 @@ class Test_PDF extends WP_UnitTestCase {
 	public function test_handle_legacy_tier_2_processing() {
 		global $gfpdf;
 
-		$settings = [ 'template' => 'zadani' ];
+		$settings  = [ 'template' => 'zadani' ];
 		$entry     = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
 		$form      = $gfpdf->gform->get_form( $entry['form_id'] );
 		$model_pdf = \GPDFAPI::get_mvc_class( 'Model_PDF' );
@@ -1830,18 +1928,30 @@ class Test_PDF extends WP_UnitTestCase {
 			$gfpdf->misc->get_legacy_ids( $entry['id'], $settings )
 		);
 
-		$pdf = new Helper_PDF( [ 'id'      => 1,
-		                         'form_id' => 1,
-		], $settings, $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates, $gfpdf->log );
+		$pdf = new Helper_PDF(
+			[
+				'id'      => 1,
+				'form_id' => 1,
+			],
+			$settings,
+			$gfpdf->gform,
+			$gfpdf->data,
+			$gfpdf->misc,
+			$gfpdf->templates,
+			$gfpdf->log
+		);
 		$pdf->set_template();
 		$pdf->set_output_type( 'save' );
 
 		$this->assertFalse( $this->model->handle_legacy_tier_2_processing( $pdf, $entry, $settings, $args ) );
 
 		/* Set a filter and ensure the test passes */
-		add_filter( 'gfpdfe_pre_load_template', function ( $form_id ) {
-			return true;
-		} );
+		add_filter(
+			'gfpdfe_pre_load_template',
+			function ( $form_id ) {
+				return true;
+			}
+		);
 
 		$this->assertTrue( $this->model->handle_legacy_tier_2_processing( $pdf, $entry, $settings, $args ) );
 	}
@@ -1860,19 +1970,19 @@ class Test_PDF extends WP_UnitTestCase {
 
 		/* Check the PDF tags aren't stripped out during while generating a PDF */
 		$html = wp_kses_post( $html );
-		$this->assertRegExp('/\<pagebreak orientation="landscape" \/\>/', $html);
-		$this->assertRegExp('/\<table autosize="1"\>\<\/table\>/', $html);
-		$this->assertRegExp('/\<p style="page-break-inside: avoid"\>\<\/p\>/', $html);
-		$this->assertRegExp('/\<barcode code="04210000526" type="UPCE" \/\>/', $html);
+		$this->assertRegExp( '/\<pagebreak orientation="landscape" \/\>/', $html );
+		$this->assertRegExp( '/\<table autosize="1"\>\<\/table\>/', $html );
+		$this->assertRegExp( '/\<p style="page-break-inside: avoid"\>\<\/p\>/', $html );
+		$this->assertRegExp( '/\<barcode code="04210000526" type="UPCE" \/\>/', $html );
 
 		do_action( 'gfpdf_post_pdf_generation' );
 
 		/* Verify they are stripped out at all other times */
 		$html = wp_kses_post( $html );
-		$this->assertNotRegExp('/\<pagebreak orientation="landscape" \/\>/', $html);
-		$this->assertNotRegExp('/\<table autosize="1"\>\<\/table\>/', $html);
-		$this->assertNotRegExp('/\<p style="page-break-inside: avoid"\>\<\/p\>/', $html);
-		$this->assertNotRegExp('/\<barcode code="04210000526" type="UPCE" \/\>/', $html);
+		$this->assertNotRegExp( '/\<pagebreak orientation="landscape" \/\>/', $html );
+		$this->assertNotRegExp( '/\<table autosize="1"\>\<\/table\>/', $html );
+		$this->assertNotRegExp( '/\<p style="page-break-inside: avoid"\>\<\/p\>/', $html );
+		$this->assertNotRegExp( '/\<barcode code="04210000526" type="UPCE" \/\>/', $html );
 
 	}
 }

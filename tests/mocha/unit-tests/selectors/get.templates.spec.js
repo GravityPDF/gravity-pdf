@@ -12,74 +12,91 @@ const templateObject = [
   {id: 'new-template', group: 'Custom', template: 'New Template', description: '', author: '', new: true},
 ]
 
-const templates = Immutable.fromJS(templateObject)
+const templates = Immutable.fromJS( templateObject )
 
-describe('sortTemplates()', () => {
-  it('check the function sorts the results correctly', () => {
-    let list = sortTemplates(templates, '')
+describe(
+	'sortTemplates()',
+	() => {
+		it(
+		'check the function sorts the results correctly',
+		() => {
+			let list = sortTemplates( templates, '' )
 
-    expect(list.first().get('id')).is.equal('adelade')
+				expect( list.first().get( 'id' ) ).is.equal( 'adelade' )
 
-    /* Check our new template is pushed to the end of the queue */
-    expect(list.last().get('id')).is.equal('new-template')
+				/* Check our new template is pushed to the end of the queue */
+				expect( list.last().get( 'id' ) ).is.equal( 'new-template' )
 
-    /* check the active template is hoisted above the rest */
-    list = sortTemplates(templates, 'zadani')
-    expect(list.first().get('id')).is.equal('zadani')
-  })
-})
+				/* check the active template is hoisted above the rest */
+				list = sortTemplates( templates, 'zadani' )
+				expect( list.first().get( 'id' ) ).is.equal( 'zadani' )
+			}
+	)
+	}
+)
 
-describe('searchTemplates()', () => {
-  it('check we get the expected results', () => {
-    expect(searchTemplates('default', templates).size).is.equal(3)
-    expect(searchTemplates('Gravity PDF', templates).size).is.equal(1)
-    expect(searchTemplates('William', templates).size).is.equal(2)
-    expect(searchTemplates('Core', templates).size).is.equal(5)
-    expect(searchTemplates('Zadani', templates).size).is.equal(1)
-    expect(searchTemplates('Old', templates).size).is.equal(1)
-  })
-})
+describe(
+	'searchTemplates()',
+	() => {
+		it(
+		'check we get the expected results',
+		() => {
+			expect( searchTemplates( 'default', templates ).size ).is.equal( 3 )
+				expect( searchTemplates( 'Gravity PDF', templates ).size ).is.equal( 1 )
+				expect( searchTemplates( 'William', templates ).size ).is.equal( 2 )
+				expect( searchTemplates( 'Core', templates ).size ).is.equal( 5 )
+				expect( searchTemplates( 'Zadani', templates ).size ).is.equal( 1 )
+				expect( searchTemplates( 'Old', templates ).size ).is.equal( 1 )
+			}
+	)
+	}
+)
 
-describe('selector', () => {
-  it('check we get the correct results back from the actual reselect function', () => {
+describe(
+	'selector',
+	() => {
+		it(
+		'check we get the correct results back from the actual reselect function',
+		() => {
+			let state = {
+				template: {
+					list: templates,
+					search: '',
+					activeTemplate: '',
+				}
+			}
 
-    let state = {
-      template: {
-        list: templates,
-        search: '',
-        activeTemplate: '',
-      }
-    }
+				// check the sort works
+				let list = selector( state, state, state )
+				expect( list.first().get( 'id' ) ).is.equal( 'adelade' )
 
-    //check the sort works
-    let list = selector(state, state, state)
-    expect(list.first().get('id')).is.equal('adelade')
+				// check the search works
+				let state2 = {
+					template: {
+						list: templates,
+						search: 'default',
+						activeTemplate: '',
+					}
+			}
 
-    //check the search works
-    let state2 = {
-      template: {
-        list: templates,
-        search: 'default',
-        activeTemplate: '',
-      }
-    }
+				list = selector( state2, state2, state2 )
+				expect( list.size ).is.equal( 3 )
 
-    list = selector(state2, state2, state2)
-    expect(list.size).is.equal(3)
+				// check the sort and search works
+				let state3 = {
+					template: {
+						list: templates,
+						search: 'core',
+						activeTemplate: 'zadani',
+					}
+			}
 
-    //check the sort and search works
-    let state3 = {
-      template: {
-        list: templates,
-        search: 'core',
-        activeTemplate: 'zadani',
-      }
-    }
+				list = selector( state3, state3, state3 )
 
-    list = selector(state3, state3, state3)
-
-    expect(list.size).is.equal(5)
-    expect(list.first().get('id')).is.equal('zadani')
-    expect(list.last().get('id')).is.equal('rubix')
-  })
-})
+				expect( list.size ).is.equal( 5 )
+				expect( list.first().get( 'id' ) ).is.equal( 'zadani' )
+				expect( list.last().get( 'id' ) ).is.equal( 'rubix' )
+			}
+	)
+	}
+)

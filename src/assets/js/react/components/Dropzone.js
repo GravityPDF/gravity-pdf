@@ -38,42 +38,42 @@ import ReactDropzone from 'react-dropzone'
  * @since 4.1
  */
 class Dropzone extends React.Component {
-  /**
-   * @since 4.1
-   */
-  static propTypes = {
-    children: PropTypes.node.isRequired,
-    onDrop: PropTypes.func.isRequired,
-    multiple: PropTypes.bool,
-    className: PropTypes.string,
-    activeClassName: PropTypes.string
-  }
+	/**
+	 * @since 4.1
+	 */
+	static propTypes = {
+		children: PropTypes.node.isRequired,
+		onDrop: PropTypes.func.isRequired,
+		multiple: PropTypes.bool,
+		className: PropTypes.string,
+		activeClassName: PropTypes.string
+	}
 
-  /**
-   * @since 4.1
-   */
-  static defaultProps = {
-    multiple: false,
-    maxSize: Infinity,
-    className: 'gfpdf-dropzone',
-    activeClassName: 'gfpdf-dropzone-active'
-  }
+	/**
+	 * @since 4.1
+	 */
+	static defaultProps = {
+		multiple: false,
+		maxSize: Infinity,
+		className: 'gfpdf-dropzone',
+		activeClassName: 'gfpdf-dropzone-active'
+	}
 
-  /**
-   * @since 4.1
-   */
-  render () {
-    return (
-      <ReactDropzone
-        onDrop={this.props.onDrop}
-        multiple={this.props.multiple}
-        disablePreview={true}
-        className={this.props.className}
-        activeClassName={this.props.activeClassName}>
-        {this.props.children}
-      </ReactDropzone>
-    )
-  }
+	/**
+	 * @since 4.1
+	 */
+	render () {
+		return (
+		< ReactDropzone
+		onDrop          = {this.props.onDrop}
+		multiple        = {this.props.multiple}
+		disablePreview  = {true}
+		className       = {this.props.className}
+		activeClassName = {this.props.activeClassName} >
+		{this.props.children}
+		< / ReactDropzone >
+		)
+	}
 }
 
 export default Dropzone

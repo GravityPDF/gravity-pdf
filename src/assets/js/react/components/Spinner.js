@@ -33,7 +33,7 @@ import React from 'react'
  * @since 5.0
  */
 const Spinner = () => (
-  <img alt={GFPDF.spinnerAlt} src={GFPDF.spinnerUrl} className="gfpdf-spinner"/>
+  < img alt   = {GFPDF.spinnerAlt} src = {GFPDF.spinnerUrl} className = "gfpdf-spinner" / >
 )
 
 export default Spinner

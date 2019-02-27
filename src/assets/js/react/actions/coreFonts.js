@@ -1,8 +1,8 @@
 import {
-  ADD_TO_CONSOLE,
-  ADD_TO_RETRY_LIST,
-  CLEAR_CONSOLE,
-  CLEAR_RETRY_LIST
+	ADD_TO_CONSOLE,
+	ADD_TO_RETRY_LIST,
+	CLEAR_CONSOLE,
+	CLEAR_RETRY_LIST
 } from '../actionTypes/coreFonts'
 
 /**
@@ -46,12 +46,12 @@ import {
  * @since 5.0
  */
 export const addToConsole = (key, status, message) => {
-  return {
-    type: ADD_TO_CONSOLE,
-    key,
-    status,
-    message
-  }
+	return {
+		type: ADD_TO_CONSOLE,
+		key,
+		status,
+		message
+	}
 }
 
 /**
@@ -62,9 +62,9 @@ export const addToConsole = (key, status, message) => {
  * @since 5.0
  */
 export const clearConsole = () => {
-  return {
-    type: CLEAR_CONSOLE,
-  }
+	return {
+		type: CLEAR_CONSOLE,
+	}
 }
 
 /**
@@ -76,10 +76,10 @@ export const clearConsole = () => {
  * @since 5.0
  */
 export const addToRetryList = (name) => {
-  return {
-    type: ADD_TO_RETRY_LIST,
-    name
-  }
+	return {
+		type: ADD_TO_RETRY_LIST,
+		name
+	}
 }
 
 /**
@@ -90,7 +90,7 @@ export const addToRetryList = (name) => {
  * @since 5.0
  */
 export const clearRetryList = () => {
-  return {
-    type: CLEAR_RETRY_LIST,
-  }
+	return {
+		type: CLEAR_RETRY_LIST,
+	}
 }

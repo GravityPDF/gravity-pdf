@@ -18,23 +18,23 @@ use WP_UnitTestCase;
  */
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -90,8 +90,8 @@ class Test_Shortcode extends WP_UnitTestCase {
 		$this->controller = new Controller_Shortcodes( $this->model, $this->view, $gfpdf->log );
 		$this->controller->init();
 
-		$options                              = $gfpdf->options;
-		$settings                             = $options->get_settings();
+		$options                = $gfpdf->options;
+		$settings               = $options->get_settings();
 		$settings['debug_mode'] = 'Yes';
 		$options->update_settings( $settings );
 	}
@@ -104,10 +104,16 @@ class Test_Shortcode extends WP_UnitTestCase {
 	public function test_filters() {
 		$this->assertEquals( 100, has_filter( 'gform_confirmation', [ $this->model, 'gravitypdf_confirmation' ] ) );
 		$this->assertEquals( 100, has_filter( 'gform_notification', [ $this->model, 'gravitypdf_notification' ] ) );
-		$this->assertEquals( 10, has_filter( 'gform_admin_pre_render', [
-			$this->model,
-			'gravitypdf_redirect_confirmation',
-		] ) );
+		$this->assertEquals(
+			10,
+			has_filter(
+				'gform_admin_pre_render',
+				[
+					$this->model,
+					'gravitypdf_redirect_confirmation',
+				]
+			)
+		);
 	}
 
 	/**
@@ -141,97 +147,180 @@ class Test_Shortcode extends WP_UnitTestCase {
 
 		/* Test for error */
 		$this->assertNotFalse( strpos( $this->model->gravitypdf( [ 'entry' => $entry['id'] ] ), '<pre class="gravitypdf-error">' ) );
-		$this->assertNotFalse( strpos( $this->model->gravitypdf( [
-			'entry' => $entry['id'],
-			'id'    => '555ad84787d7e',
-		] ), '<pre class="gravitypdf-error">' ) ); /* conditional logic error */
+		$this->assertNotFalse(
+			strpos(
+				$this->model->gravitypdf(
+					[
+						'entry' => $entry['id'],
+						'id'    => '555ad84787d7e',
+					]
+				),
+				'<pre class="gravitypdf-error">'
+			)
+		); /* conditional logic error */
 
 		/* Test for actual result */
-		$this->assertNotFalse( strpos( $this->model->gravitypdf( [
-			'entry' => $entry['id'],
-			'id'    => '556690c67856b',
-		] ), 'Download PDF' ) );
+		$this->assertNotFalse(
+			strpos(
+				$this->model->gravitypdf(
+					[
+						'entry' => $entry['id'],
+						'id'    => '556690c67856b',
+					]
+				),
+				'Download PDF'
+			)
+		);
 
-		$this->assertNotFalse( strpos( $this->model->gravitypdf( [
-			'entry' => $entry['id'],
-			'id'    => '556690c67856b',
-		] ), '<a href=' ) );
+		$this->assertNotFalse(
+			strpos(
+				$this->model->gravitypdf(
+					[
+						'entry' => $entry['id'],
+						'id'    => '556690c67856b',
+					]
+				),
+				'<a href='
+			)
+		);
 
 		/* Test for configured results */
-		$this->assertNotFalse( strpos( $this->model->gravitypdf( [
-			'entry' => $entry['id'],
-			'id'    => '556690c67856b',
-			'text'  => 'View PDF',
-		] ), 'View PDF' ) );
-		$this->assertFalse( strpos( $this->model->gravitypdf( [
-			'entry' => $entry['id'],
-			'id'    => '556690c67856b',
-			'type'  => 'view',
-		] ), 'action=download' ) );
-		$this->assertNotFalse( strpos( $this->model->gravitypdf( [
-			'entry' => $entry['id'],
-			'id'    => '556690c67856b',
-		] ), 'action=download' ) );
-		$this->assertNotFalse( strpos( $this->model->gravitypdf( [
-			'entry'   => $entry['id'],
-			'id'      => '556690c67856b',
-			'classes' => 'my-pdf-download-link',
-		] ), 'my-pdf-download-link' ) );
+		$this->assertNotFalse(
+			strpos(
+				$this->model->gravitypdf(
+					[
+						'entry' => $entry['id'],
+						'id'    => '556690c67856b',
+						'text'  => 'View PDF',
+					]
+				),
+				'View PDF'
+			)
+		);
+		$this->assertFalse(
+			strpos(
+				$this->model->gravitypdf(
+					[
+						'entry' => $entry['id'],
+						'id'    => '556690c67856b',
+						'type'  => 'view',
+					]
+				),
+				'action=download'
+			)
+		);
+		$this->assertNotFalse(
+			strpos(
+				$this->model->gravitypdf(
+					[
+						'entry' => $entry['id'],
+						'id'    => '556690c67856b',
+					]
+				),
+				'action=download'
+			)
+		);
+		$this->assertNotFalse(
+			strpos(
+				$this->model->gravitypdf(
+					[
+						'entry'   => $entry['id'],
+						'id'      => '556690c67856b',
+						'classes' => 'my-pdf-download-link',
+					]
+				),
+				'my-pdf-download-link'
+			)
+		);
 
 		/* Test our print attribute works as intended */
-		$this->assertFalse( strpos( $this->model->gravitypdf( [
-			'entry' => $entry['id'],
-			'id'    => '556690c67856b',
-		] ), 'print=1' ) );
+		$this->assertFalse(
+			strpos(
+				$this->model->gravitypdf(
+					[
+						'entry' => $entry['id'],
+						'id'    => '556690c67856b',
+					]
+				),
+				'print=1'
+			)
+		);
 
-		$this->assertNotFalse( strpos( $this->model->gravitypdf( [
-			'entry' => $entry['id'],
-			'id'    => '556690c67856b',
-			'print' => 'true',
-		] ), 'print=1' ) );
+		$this->assertNotFalse(
+			strpos(
+				$this->model->gravitypdf(
+					[
+						'entry' => $entry['id'],
+						'id'    => '556690c67856b',
+						'print' => 'true',
+					]
+				),
+				'print=1'
+			)
+		);
 
 		/* Test for raw URL */
-		$url = $this->model->gravitypdf( [
-			'entry' => $entry['id'],
-			'id'    => '556690c67856b',
-			'raw' => '1',
-		] );
+		$url = $this->model->gravitypdf(
+			[
+				'entry' => $entry['id'],
+				'id'    => '556690c67856b',
+				'raw'   => '1',
+			]
+		);
 
 		$this->assertNotFalse( strpos( $url, '?gpdf=1&pid=556690c67856b&lid=1&action=download' ) );
 		$this->assertNotTrue( strpos( $url, '<a href=' ) );
 		$this->assertNotTrue( strpos( $url, 'Download PDF' ) );
 
 		/* Test for signed URL */
-		$url1 = $this->model->gravitypdf( [
-			'entry' => $entry['id'],
-			'id'    => '556690c67856b',
-			'signed' => '1',
-		] );
+		$url1 = $this->model->gravitypdf(
+			[
+				'entry'  => $entry['id'],
+				'id'     => '556690c67856b',
+				'signed' => '1',
+			]
+		);
 
 		$this->assertNotFalse( strpos( $url1, '&signature=' ) );
 		$this->assertNotFalse( strpos( $url1, '&expires=' ) );
 
 		/* Test signed URL expiry */
-		parse_str( parse_url( $this->model->gravitypdf( [
-			'entry' => $entry['id'],
-			'id'    => '556690c67856b',
-			'signed' => '1',
-			'raw'    => '1',
-		] ), PHP_URL_QUERY ), $url );
+		parse_str(
+			parse_url(
+				$this->model->gravitypdf(
+					[
+						'entry'  => $entry['id'],
+						'id'     => '556690c67856b',
+						'signed' => '1',
+						'raw'    => '1',
+					]
+				),
+				PHP_URL_QUERY
+			),
+			$url
+		);
 
-		$this->assertGreaterThan( strtotime( '+19 minutes'),  $url['expires'] );
-		$this->assertLessThan( strtotime( '+21 minutes'), $url['expires'] );
+		$this->assertGreaterThan( strtotime( '+19 minutes' ), $url['expires'] );
+		$this->assertLessThan( strtotime( '+21 minutes' ), $url['expires'] );
 
-		parse_str( parse_url( $this->model->gravitypdf( [
-			'entry' => $entry['id'],
-			'id'    => '556690c67856b',
-			'signed' => '1',
-			'expires' => '1 day',
-			'raw'    => '1',
-		] ), PHP_URL_QUERY ), $url );
+		parse_str(
+			parse_url(
+				$this->model->gravitypdf(
+					[
+						'entry'   => $entry['id'],
+						'id'      => '556690c67856b',
+						'signed'  => '1',
+						'expires' => '1 day',
+						'raw'     => '1',
+					]
+				),
+				PHP_URL_QUERY
+			),
+			$url
+		);
 
-		$this->assertGreaterThan( strtotime( '+23 hours'), $url['expires'] );
-		$this->assertLessThan( strtotime( '+25 hours'), $url['expires'] );
+		$this->assertGreaterThan( strtotime( '+23 hours' ), $url['expires'] );
+		$this->assertLessThan( strtotime( '+25 hours' ), $url['expires'] );
 
 		/* Test for entry URL loading */
 		$_GET['lid'] = $entry['id'];
@@ -242,8 +331,8 @@ class Test_Shortcode extends WP_UnitTestCase {
 
 		/* Test we get no error when they are disabled globally */
 		global $gfpdf;
-		$options                              = $gfpdf->options;
-		$settings                             = $options->get_settings();
+		$options                = $gfpdf->options;
+		$settings               = $options->get_settings();
 		$settings['debug_mode'] = 'No';
 		$options->update_settings( $settings );
 
@@ -378,20 +467,20 @@ class Test_Shortcode extends WP_UnitTestCase {
 	 */
 	public function test_gravitypdf_redirect_confirmation_shortcode_processing() {
 
-		$form         = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
-		$form['confirmation'] = $form['confirmations']['54bca34973cdd'];
-		$form['confirmation']['url'] =  '[gravitypdf id="556690c67856b" entry="{entry_id}" raw="1"]';
+		$form                        = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form['confirmation']        = $form['confirmations']['54bca34973cdd'];
+		$form['confirmation']['url'] = '[gravitypdf id="556690c67856b" entry="{entry_id}" raw="1"]';
 
-		$entry         = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$entry = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
 
-		$this->assertTrue( $this->model->gravitypdf_redirect_confirmation_shortcode_processing(true, $form, $entry) );
+		$this->assertTrue( $this->model->gravitypdf_redirect_confirmation_shortcode_processing( true, $form, $entry ) );
 
 		$confirmation = [ 'redirect' => '' ];
-		$results = $this->model->gravitypdf_redirect_confirmation_shortcode_processing( $confirmation, $form, $entry );
+		$results      = $this->model->gravitypdf_redirect_confirmation_shortcode_processing( $confirmation, $form, $entry );
 		$this->assertNotFalse( strpos( $results['redirect'], '?gpdf=1&pid=556690c67856b&lid=1&action=download' ) );
 
-		$form['confirmation']['url'] =  '[gravitypdf id="556690c67856b" entry="{entry_id}" raw="1" signed="1"]';
-		$results = $this->model->gravitypdf_redirect_confirmation_shortcode_processing( $confirmation, $form, $entry );
+		$form['confirmation']['url'] = '[gravitypdf id="556690c67856b" entry="{entry_id}" raw="1" signed="1"]';
+		$results                     = $this->model->gravitypdf_redirect_confirmation_shortcode_processing( $confirmation, $form, $entry );
 		$this->assertNotFalse( strpos( $results['redirect'], '?gpdf=1&pid=556690c67856b&lid=1&action=download' ) );
 		$this->assertNotFalse( strpos( $results['redirect'], '&signature=' ) );
 		$this->assertNotFalse( strpos( $results['redirect'], '&expires=' ) );
@@ -477,12 +566,19 @@ class Test_Shortcode extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_display_gravitypdf_shortcode() {
-		$this->assertNotFalse( strpos( $this->view->display_gravitypdf_shortcode( [
-			'url'     => '',
-			'type'    => '',
-			'class'   => '',
-			'classes' => '',
-			'text'    => '',
-		] ), '<a href="' ) );
+		$this->assertNotFalse(
+			strpos(
+				$this->view->display_gravitypdf_shortcode(
+					[
+						'url'     => '',
+						'type'    => '',
+						'class'   => '',
+						'classes' => '',
+						'text'    => '',
+					]
+				),
+				'<a href="'
+			)
+		);
 	}
 }

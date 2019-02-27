@@ -27,7 +27,7 @@
  Found
  */
 
-export const ADD_TO_CONSOLE = 'ADD_TO_CONSOLE'
-export const CLEAR_CONSOLE = 'CLEAR_CONSOLE'
+export const ADD_TO_CONSOLE    = 'ADD_TO_CONSOLE'
+export const CLEAR_CONSOLE     = 'CLEAR_CONSOLE'
 export const ADD_TO_RETRY_LIST = 'ADD_TO_RETRY_LIST'
-export const CLEAR_RETRY_LIST = 'CLEAR_RETRY_LIST'
+export const CLEAR_RETRY_LIST  = 'CLEAR_RETRY_LIST'

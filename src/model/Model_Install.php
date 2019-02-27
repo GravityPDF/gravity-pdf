@@ -28,23 +28,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -227,7 +227,7 @@ class Model_Install extends Helper_Abstract_Model {
 		$this->data->template_tmp_location = apply_filters( 'gfpdf_tmp_location', $this->data->template_location . 'tmp/', $working_folder, $upload_dir_url ); /* encouraged to move this to a directory not accessible via the web */
 
 		/* See https://gravitypdf.com/documentation/v5/gfpdf_mpdf_tmp_location/ for more details about this filter */
-		$mpdf_tmp_path = $this->data->template_tmp_location . 'mpdf';
+		$mpdf_tmp_path                 = $this->data->template_tmp_location . 'mpdf';
 		$this->data->mpdf_tmp_location = untrailingslashit( apply_filters( 'gfpdf_mpdf_tmp_location', $mpdf_tmp_path ) );
 	}
 
@@ -283,7 +283,7 @@ class Model_Install extends Helper_Abstract_Model {
 
 		/* don't create the folder structure on our welcome page or through AJAX as an errors on the first page they see will confuse users */
 		if ( is_admin() &&
-		     ( rgget( 'page' ) == 'gfpdf-getting-started' ) || ( rgget( 'page' ) == 'gfpdf-update' ) || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || get_transient( '_gravitypdf_activation_redirect' )
+			 ( rgget( 'page' ) == 'gfpdf-getting-started' ) || ( rgget( 'page' ) == 'gfpdf-update' ) || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || get_transient( '_gravitypdf_activation_redirect' )
 		) {
 			return null;
 		}
@@ -294,7 +294,7 @@ class Model_Install extends Helper_Abstract_Model {
 			$this->data->template_font_location,
 			$this->data->template_tmp_location,
 			$this->data->mpdf_tmp_location,
-			$this->data->mpdf_tmp_location. '/ttfontdata',
+			$this->data->mpdf_tmp_location . '/ttfontdata',
 		];
 
 		if ( is_multisite() ) {
@@ -308,18 +308,24 @@ class Model_Install extends Helper_Abstract_Model {
 		foreach ( $folders as $dir ) {
 			if ( ! is_dir( $dir ) ) {
 				if ( ! wp_mkdir_p( $dir ) ) {
-					$this->log->addError( 'Failed Creating Folder Structure', [
-						'dir' => $dir,
-					] );
+					$this->log->addError(
+						'Failed Creating Folder Structure',
+						[
+							'dir' => $dir,
+						]
+					);
 
 					$this->notices->add_error( sprintf( esc_html__( 'There was a problem creating the %s directory. Ensure you have write permissions to your uploads folder.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
 				}
 			} else {
 				/* test the directory is currently writable by the web server, otherwise throw an error */
 				if ( ! wp_is_writable( $dir ) ) {
-					$this->log->addError( 'Failed Write Permissions Check.', [
-						'dir' => $dir,
-					] );
+					$this->log->addError(
+						'Failed Write Permissions Check.',
+						[
+							'dir' => $dir,
+						]
+					);
 
 					$this->notices->add_error( sprintf( esc_html__( 'Gravity PDF does not have write permission to the %s directory. Contact your web hosting provider to fix the issue.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
 				}
@@ -401,7 +407,7 @@ class Model_Install extends Helper_Abstract_Model {
 
 		$rules = get_option( 'rewrite_rules' );
 
-		foreach( $regex as $rule ) {
+		foreach ( $regex as $rule ) {
 			if ( ! isset( $rules[ $rule ] ) ) {
 				$this->log->addNotice( 'Flushing WordPress Rewrite Rules.' );
 				flush_rewrite_rules( false );
@@ -476,9 +482,12 @@ class Model_Install extends Helper_Abstract_Model {
 			if ( isset( $form['gfpdf_form_settings'] ) ) {
 				unset( $form['gfpdf_form_settings'] );
 				if ( $this->gform->update_form( $form ) !== true ) {
-					$this->log->addError( 'Cannot Remove PDF Settings from Form.', [
-						'form_id' => $form['id'],
-					] );
+					$this->log->addError(
+						'Cannot Remove PDF Settings from Form.',
+						[
+							'form_id' => $form['id'],
+						]
+					);
 
 					$this->notices->add_error( sprintf( esc_html__( 'There was a problem removing the Gravity Form "%s" PDF configuration. Try delete manually.', 'gravity-forms-pdf-extended' ), $form['id'] . ': ' . $form['title'] ) );
 				}
@@ -495,22 +504,28 @@ class Model_Install extends Helper_Abstract_Model {
 	 */
 	public function remove_folder_structure() {
 
-		$paths = apply_filters( 'gfpdf_uninstall_path', [
-			$this->data->template_font_location,
-			$this->data->template_tmp_location,
-			$this->data->template_location,
-		] );
+		$paths = apply_filters(
+			'gfpdf_uninstall_path',
+			[
+				$this->data->template_font_location,
+				$this->data->template_tmp_location,
+				$this->data->template_location,
+			]
+		);
 
 		foreach ( $paths as $dir ) {
 			if ( is_dir( $dir ) ) {
 				$results = $this->misc->rmdir( $dir );
 
 				if ( is_wp_error( $results ) || ! $results ) {
-					$this->log->addError( 'Cannot Remove Folder Structure.', [
-						'WP_Error_Message' => $results->get_error_message(),
-						'WP_Error_Code'    => $results->get_error_code(),
-						'dir'              => $dir,
-					] );
+					$this->log->addError(
+						'Cannot Remove Folder Structure.',
+						[
+							'WP_Error_Message' => $results->get_error_message(),
+							'WP_Error_Code'    => $results->get_error_code(),
+							'dir'              => $dir,
+						]
+					);
 
 					$this->notices->add_error( sprintf( esc_html__( 'There was a problem removing the %s directory. Clean up manually via (S)FTP.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
 				}

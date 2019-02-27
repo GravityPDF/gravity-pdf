@@ -1,8 +1,8 @@
 import {
-  ADD_TO_CONSOLE,
-  ADD_TO_RETRY_LIST,
-  CLEAR_RETRY_LIST,
-  CLEAR_CONSOLE
+	ADD_TO_CONSOLE,
+	ADD_TO_RETRY_LIST,
+	CLEAR_RETRY_LIST,
+	CLEAR_CONSOLE
 } from '../actionTypes/coreFonts'
 
 /**
@@ -40,8 +40,8 @@ import {
  * @since 5.0
  */
 export const initialState = {
-  console: {},
-  retry: [],
+	console: {},
+	retry: [],
 }
 
 /**
@@ -55,59 +55,59 @@ export const initialState = {
  * @since 5.0
  */
 export default function (state = initialState, action) {
-  switch (action.type) {
+	switch (action.type) {
 
-    /**
-     * @since 5.0
-     */
-    case ADD_TO_CONSOLE:
-      return {
-        ...state,
-        console: {
-          ...state.console,
-          [action.key]: {
-            status: action.status,
-            message: action.message,
-          }
-        }
-      }
+		/**
+		 * @since 5.0
+		 */
+		case ADD_TO_CONSOLE:
+		return {
+			...state,
+			console: {
+				...state.console,
+				[action.key]: {
+					status: action.status,
+					message: action.message,
+				}
+			}
+		}
 
-    /**
-     * @since 5.0
-     */
-    case CLEAR_CONSOLE:
-      return {
-        ...state,
-        console: {}
-      }
+		/**
+		 * @since 5.0
+		 */
+		case CLEAR_CONSOLE:
+		return {
+			...state,
+			console: {}
+		}
 
-    /**
-     * @since 5.0
-     */
-    case ADD_TO_RETRY_LIST:
-      /* Do not allow the same item in the retry list */
-      if (state.retry.includes(action.name)) {
-        break
-      }
+		/**
+		 * @since 5.0
+		 */
+		case ADD_TO_RETRY_LIST:
+			/* Do not allow the same item in the retry list */
+			if (state.retry.includes( action.name )) {
+				break
+			}
 
-      return {
-        ...state,
-        retry: [
-          ...state.retry,
-          action.name
-        ]
-      }
+		return {
+			...state,
+			retry: [
+			...state.retry,
+			action.name
+			]
+		}
 
-    /**
-     * @since 5.0
-     */
-    case CLEAR_RETRY_LIST:
-      return {
-        ...state,
-        retry: [],
-      }
-  }
+		/**
+		 * @since 5.0
+		 */
+		case CLEAR_RETRY_LIST:
+		return {
+			...state,
+			retry: [],
+		}
+	}
 
-  /* None of these actions fired so return state */
-  return state
+	/* None of these actions fired so return state */
+	return state
 }

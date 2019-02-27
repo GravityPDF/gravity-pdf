@@ -24,23 +24,23 @@ use Exception;
  */
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -100,18 +100,20 @@ class Test_Settings extends WP_UnitTestCase {
 	private function add_addon_1() {
 		global $gfpdf;
 
-		$gfpdf->data->add_addon( new Addon1(
-			'my-custom-plugin',
-			'My Custom Plugin',
-			'Gravity PDF',
-			'1.0',
-			'/path/to/plugin/',
-			GPDFAPI::get_data_class(),
-			GPDFAPI::get_options_class(),
-			new Helper_Singleton(),
-			new Helper_Logger( 'my-custom-plugin', 'My Custom Plugin' ),
-			new Helper_Notices()
-		) );
+		$gfpdf->data->add_addon(
+			new Addon1(
+				'my-custom-plugin',
+				'My Custom Plugin',
+				'Gravity PDF',
+				'1.0',
+				'/path/to/plugin/',
+				GPDFAPI::get_data_class(),
+				GPDFAPI::get_options_class(),
+				new Helper_Singleton(),
+				new Helper_Logger( 'my-custom-plugin', 'My Custom Plugin' ),
+				new Helper_Notices()
+			)
+		);
 	}
 
 	/**
@@ -120,18 +122,20 @@ class Test_Settings extends WP_UnitTestCase {
 	private function add_addon_2() {
 		global $gfpdf;
 
-		$gfpdf->data->add_addon( new Addon2(
-			'other-plugin',
-			'Other Plugin',
-			'Gravity PDF',
-			'2.0',
-			'/path/to/pluginv2/',
-			GPDFAPI::get_data_class(),
-			GPDFAPI::get_options_class(),
-			new Helper_Singleton(),
-			new Helper_Logger( 'other-plugin', 'Other Plugin' ),
-			new Helper_Notices()
-		) );
+		$gfpdf->data->add_addon(
+			new Addon2(
+				'other-plugin',
+				'Other Plugin',
+				'Gravity PDF',
+				'2.0',
+				'/path/to/pluginv2/',
+				GPDFAPI::get_data_class(),
+				GPDFAPI::get_options_class(),
+				new Helper_Singleton(),
+				new Helper_Logger( 'other-plugin', 'Other Plugin' ),
+				new Helper_Notices()
+			)
+		);
 	}
 
 	/**
@@ -147,10 +151,16 @@ class Test_Settings extends WP_UnitTestCase {
 
 		$this->assertEquals( 10, has_action( 'wp_ajax_gfpdf_font_save', [ $this->model, 'save_font' ] ) );
 		$this->assertEquals( 10, has_action( 'wp_ajax_gfpdf_font_delete', [ $this->model, 'delete_font' ] ) );
-		$this->assertEquals( 10, has_action( 'wp_ajax_gfpdf_deactivate_license', [
-			$this->model,
-			'process_license_deactivation',
-		] ) );
+		$this->assertEquals(
+			10,
+			has_action(
+				'wp_ajax_gfpdf_deactivate_license',
+				[
+					$this->model,
+					'process_license_deactivation',
+				]
+			)
+		);
 
 	}
 
@@ -164,14 +174,26 @@ class Test_Settings extends WP_UnitTestCase {
 
 		$this->assertEquals( 10, has_filter( 'gform_tooltips', [ $this->view, 'add_tooltips' ] ) );
 		$this->assertEquals( 10, has_filter( 'gfpdf_capability_name', [ $this->model, 'style_capabilities' ] ) );
-		$this->assertEquals( 10, has_filter( 'option_page_capability_gfpdf_settings', [
-			$this->controller,
-			'edit_options_cap',
-		] ) );
-		$this->assertEquals( 10, has_filter( 'gravitypdf_settings_navigation', [
-			$this->controller,
-			'disable_tools_on_view_cap',
-		] ) );
+		$this->assertEquals(
+			10,
+			has_filter(
+				'option_page_capability_gfpdf_settings',
+				[
+					$this->controller,
+					'edit_options_cap',
+				]
+			)
+		);
+		$this->assertEquals(
+			10,
+			has_filter(
+				'gravitypdf_settings_navigation',
+				[
+					$this->controller,
+					'disable_tools_on_view_cap',
+				]
+			)
+		);
 		$this->assertEquals( 10, has_filter( 'upload_mimes', [ $this->controller, 'allow_font_uploads' ] ) );
 
 		$this->assertFalse( has_filter( 'gfpdf_registered_settings', [ $gfpdf->options, 'highlight_errors' ] ) );
@@ -183,15 +205,27 @@ class Test_Settings extends WP_UnitTestCase {
 		$this->assertEquals( 10, has_filter( 'gfpdf_registered_fields', [ $this->model, 'highlight_errors' ] ) );
 
 		/* Add licensing filter tests */
-		$this->assertEquals( 10, has_filter( 'gfpdf_settings_licenses', [
-			$this->model,
-			'register_addons_for_licensing',
-		] ) );
+		$this->assertEquals(
+			10,
+			has_filter(
+				'gfpdf_settings_licenses',
+				[
+					$this->model,
+					'register_addons_for_licensing',
+				]
+			)
+		);
 
-		$this->assertEquals( 10, has_filter( 'gfpdf_settings_license_sanitize', [
-			$this->model,
-			'maybe_active_licenses',
-		] ) );
+		$this->assertEquals(
+			10,
+			has_filter(
+				'gfpdf_settings_license_sanitize',
+				[
+					$this->model,
+					'maybe_active_licenses',
+				]
+			)
+		);
 	}
 
 	/**
@@ -340,16 +374,31 @@ class Test_Settings extends WP_UnitTestCase {
 
 		/* Setup an error to match */
 		$this->model->form_settings_errors = [
-			[ 'type' => 'error', 'code' => 'rtl' ],
-			[ 'type' => 'error', 'code' => 'name' ],
+			[
+				'type' => 'error',
+				'code' => 'rtl',
+			],
+			[
+				'type' => 'error',
+				'code' => 'name',
+			],
 		];
 
 		/* Setup settings fields */
 		$settings = [
 			'general' => [
-				[ 'id' => 'item', 'class' => 'normal' ],
-				[ 'id' => 'rtl', 'class' => 'hello' ],
-				[ 'id' => 'item2', 'class' => '' ],
+				[
+					'id'    => 'item',
+					'class' => 'normal',
+				],
+				[
+					'id'    => 'rtl',
+					'class' => 'hello',
+				],
+				[
+					'id'    => 'item2',
+					'class' => '',
+				],
 				[ 'id' => 'name' ],
 			],
 		];
@@ -406,9 +455,12 @@ class Test_Settings extends WP_UnitTestCase {
 		];
 
 		/* Create our tmp font files */
-		array_walk( $font, function( $value ) use ( $gfpdf ) {
-			touch( $gfpdf->data->template_font_location . $value );
-		} );
+		array_walk(
+			$font,
+			function( $value ) use ( $gfpdf ) {
+				touch( $gfpdf->data->template_font_location . $value );
+			}
+		);
 
 		/* Verify they exist */
 		$this->assertFileExists( $gfpdf->data->template_font_location . 'MyFont.ttf' );
@@ -495,9 +547,12 @@ class Test_Settings extends WP_UnitTestCase {
 		];
 
 		/* Create our tmp font files */
-		array_walk( $font, function( $value ) use ( $uploads ) {
-			touch( $uploads['path'] . '/' . basename( $value ) );
-		} );
+		array_walk(
+			$font,
+			function( $value ) use ( $uploads ) {
+				touch( $uploads['path'] . '/' . basename( $value ) );
+			}
+		);
 
 		/* Install our fonts */
 		$results = $this->model->install_fonts( $font );
@@ -552,40 +607,48 @@ class Test_Settings extends WP_UnitTestCase {
 		$ApiResponse = function() {
 			return [
 				'response' => [ 'code' => 200 ],
-				'body'     => json_encode( [
-					'error' => 'missing',
-				] ),
+				'body'     => json_encode(
+					[
+						'error' => 'missing',
+					]
+				),
 			];
 		};
 
 		add_filter( 'pre_http_request', $ApiResponse );
 
 		/* Ensure our license check runs when we provide a license key */
-		$results = $this->model->maybe_active_licenses( [
-			'license_other-plugin'         => 'user license key',
-			'license_other-plugin_message' => '',
-			'license_other-plugin_status'  => '',
-		] );
+		$results = $this->model->maybe_active_licenses(
+			[
+				'license_other-plugin'         => 'user license key',
+				'license_other-plugin_message' => '',
+				'license_other-plugin_status'  => '',
+			]
+		);
 
 		$this->assertEquals( 'Invalid license key provided', $results['license_other-plugin_message'] );
 		$this->assertEquals( 'missing', $results['license_other-plugin_status'] );
 
 		/* Ensure add-on message and status are reset when license key is empty */
-		$results = $this->model->maybe_active_licenses( [
-			'license_other-plugin'         => '',
-			'license_other-plugin_message' => 'message',
-			'license_other-plugin_status'  => 'status',
-		] );
+		$results = $this->model->maybe_active_licenses(
+			[
+				'license_other-plugin'         => '',
+				'license_other-plugin_message' => 'message',
+				'license_other-plugin_status'  => 'status',
+			]
+		);
 
 		$this->assertEquals( '', $results['license_other-plugin_message'] );
 		$this->assertEquals( '', $results['license_other-plugin_status'] );
 
 		/* Check we don't do anything when the license is active */
-		$results = $this->model->maybe_active_licenses( [
-			'license_other-plugin'         => 'license key',
-			'license_other-plugin_message' => 'message',
-			'license_other-plugin_status'  => 'active',
-		] );
+		$results = $this->model->maybe_active_licenses(
+			[
+				'license_other-plugin'         => 'license key',
+				'license_other-plugin_message' => 'message',
+				'license_other-plugin_status'  => 'active',
+			]
+		);
 
 		$this->assertEquals( 'message', $results['license_other-plugin_message'] );
 		$this->assertEquals( 'active', $results['license_other-plugin_status'] );
@@ -595,11 +658,13 @@ class Test_Settings extends WP_UnitTestCase {
 		$settings['license_other-plugin'] = 'license key';
 		$gfpdf->options->update_settings( $settings );
 
-		$results = $this->model->maybe_active_licenses( [
-			'license_other-plugin'         => 'license key1',
-			'license_other-plugin_message' => 'message',
-			'license_other-plugin_status'  => 'active',
-		] );
+		$results = $this->model->maybe_active_licenses(
+			[
+				'license_other-plugin'         => 'license key1',
+				'license_other-plugin_message' => 'message',
+				'license_other-plugin_status'  => 'active',
+			]
+		);
 
 		$this->assertEquals( 'Invalid license key provided', $results['license_other-plugin_message'] );
 		$this->assertEquals( 'missing', $results['license_other-plugin_status'] );
@@ -631,11 +696,13 @@ class Test_Settings extends WP_UnitTestCase {
 
 		add_filter( 'pre_http_request', $ApiResponse );
 
-		$results = $this->model->maybe_active_licenses( [
-			'license_my-custom-plugin'         => 'user license key',
-			'license_my-custom-plugin_message' => '',
-			'license_my-custom-plugin_status'  => '',
-		] );
+		$results = $this->model->maybe_active_licenses(
+			[
+				'license_my-custom-plugin'         => 'user license key',
+				'license_my-custom-plugin_message' => '',
+				'license_my-custom-plugin_status'  => '',
+			]
+		);
 
 		$this->assertEquals( $expected, $results['license_my-custom-plugin_message'] );
 
@@ -652,7 +719,10 @@ class Test_Settings extends WP_UnitTestCase {
 		return [
 			[
 				'Your license key expired on ' . date_i18n( get_option( 'date_format' ), strtotime( '', current_time( 'timestamp' ) ) ) . '.',
-				[ 'error' => 'expired', 'expires' => '' ],
+				[
+					'error'   => 'expired',
+					'expires' => '',
+				],
 			],
 
 			[

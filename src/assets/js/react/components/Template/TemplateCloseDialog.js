@@ -37,69 +37,69 @@ import { withRouter } from 'react-router-dom'
  * @since 4.1
  */
 export class TemplateCloseDialog extends React.Component {
-  /**
-   * @since 4.1
-   */
-  static propTypes = {
-    closeRoute: PropTypes.string
-  }
+	/**
+	 * @since 4.1
+	 */
+	static propTypes = {
+		closeRoute: PropTypes.string
+	}
 
-  /**
-   * Assign keydown listener to document on mount
-   *
-   * @since 4.1
-   */
-  componentDidMount () {
-    document.addEventListener('keydown', this.handleKeyPress, false)
-  }
+	/**
+	 * Assign keydown listener to document on mount
+	 *
+	 * @since 4.1
+	 */
+	componentDidMount () {
+		document.addEventListener( 'keydown', this.handleKeyPress, false )
+	}
 
-  /**
-   * Remove keydown listener to document on mount
-   *
-   * @since 4.1
-   */
-  componentWillUnmount () {
-    document.removeEventListener('keydown', this.handleKeyPress, false)
-  }
+	/**
+	 * Remove keydown listener to document on mount
+	 *
+	 * @since 4.1
+	 */
+	componentWillUnmount () {
+		document.removeEventListener( 'keydown', this.handleKeyPress, false )
+	}
 
-  /**
-   * Check if Escape key pressed and current event target isn't our search box,
-   * or the search box is blank already
-   *
-   * @param {Object} e Event
-   *
-   * @since 4.1
-   */
-  handleKeyPress = (e) => {
-    /* Escape Key */
-    if (e.keyCode === 27 && (e.target.className !== 'wp-filter-search' || e.target.value === '')) {
-      this.closeDialog()
-    }
-  }
+	/**
+	 * Check if Escape key pressed and current event target isn't our search box,
+	 * or the search box is blank already
+	 *
+	 * @param {Object} e Event
+	 *
+	 * @since 4.1
+	 */
+	handleKeyPress = (e) => {
+		/* Escape Key */
+		if (e.keyCode === 27 && (e.target.className !== 'wp-filter-search' || e.target.value === '')) {
+			this.closeDialog()
+		}
+	}
 
-  /**
-   * @since 4.1
-   */
-  closeDialog = () => {
-    /* trigger router */
-    this.props.history.push(this.props.closeRoute || '/')
-  }
+	/**
+	 * @since 4.1
+	 */
+	closeDialog = () => {
+		/* trigger router */
+		this.props.history.push( this.props.closeRoute || '/' )
+	}
 
-  /**
-   * @since 4.1
-   */
-  render () {
-    return (
-      <button
-        className="close dashicons dashicons-no"
-        tabIndex="142"
-        onClick={this.closeDialog}
-        onKeyDown={this.handleKeyPress}
-        aria-label="close">
-        <span className="screen-reader-text">Close dialog</span>
-      </button>
-    )
-  }
+	/**
+	 * @since 4.1
+	 */
+	render () {
+		return (
+		< button
+		className        = "close dashicons dashicons-no"
+		tabIndex         = "142"
+		onClick          = {this.closeDialog}
+		onKeyDown        = {this.handleKeyPress}
+		aria - label     = "close" >
+		< span className = "screen-reader-text" > Close dialog < / span >
+		< / button >
+		)
+	}
 }
 
-export default withRouter(TemplateCloseDialog)
+export default withRouter( TemplateCloseDialog )

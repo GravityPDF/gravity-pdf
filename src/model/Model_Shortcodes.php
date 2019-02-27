@@ -30,23 +30,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -131,18 +131,22 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		$has_view_permissions             = ( $shortcode_error_messages_enabled && $this->gform->has_capability( 'gravityforms_view_entries' ) );
 
 		/* merge in any missing defaults */
-		$attributes = shortcode_atts( [
-			'id'      => '',
-			'text'    => 'Download PDF',
-			'type'    => 'download',
-			'signed'  => '',
-			'expires' => '',
-			'class'   => 'gravitypdf-download-link',
-			'classes' => '',
-			'entry'   => '',
-			'print'   => '',
-			'raw'     => '',
-		], $attributes, 'gravitypdf' );
+		$attributes = shortcode_atts(
+			[
+				'id'      => '',
+				'text'    => 'Download PDF',
+				'type'    => 'download',
+				'signed'  => '',
+				'expires' => '',
+				'class'   => 'gravitypdf-download-link',
+				'classes' => '',
+				'entry'   => '',
+				'print'   => '',
+				'raw'     => '',
+			],
+			$attributes,
+			'gravitypdf'
+		);
 
 		/* See https://gravitypdf.com/documentation/v5/gfpdf_gravityforms_shortcode_attributes/ for more information about this filter */
 		$attributes = apply_filters( 'gfpdf_gravityforms_shortcode_attributes', $attributes );
@@ -226,9 +230,12 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		}
 
 		/* generate the markup and return */
-		$this->log->addNotice( 'Generating Shortcode Markup', [
-			'attr' => $attributes,
-		] );
+		$this->log->addNotice(
+			'Generating Shortcode Markup',
+			[
+				'attr' => $attributes,
+			]
+		);
 
 		if ( $raw ) {
 			return $attributes['url'];
@@ -381,10 +388,13 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 		/* check if the confirmation is currently being saved */
 		if ( isset( $_POST['form_confirmation_url'] ) ) {
 
-			$this->log->addNotice( 'Begin Converting Shortcode to URL for Redirect Confirmation', [
-				'form_id' => $form['id'],
-				'post'    => $_POST,
-			] );
+			$this->log->addNotice(
+				'Begin Converting Shortcode to URL for Redirect Confirmation',
+				[
+					'form_id' => $form['id'],
+					'post'    => $_POST,
+				]
+			);
 
 			$url = stripslashes_deep( $_POST['form_confirmation_url'] );
 
@@ -410,8 +420,8 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 	 * If a Redirect Confirmation, convert the Gravity PDF shortcode to it's URL form, if one exists
 	 *
 	 * @param string|array $confirmation
-	 * @param array $form
-	 * @param array $entry
+	 * @param array        $form
+	 * @param array        $entry
 	 *
 	 * @return string|array
 	 *

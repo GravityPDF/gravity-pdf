@@ -36,43 +36,43 @@ import React from 'react'
  * @since 4.1
  */
 class TemplateButton extends React.Component {
-  /**
-   * @since 4.1
-   */
-  static propTypes = {
-    buttonText: PropTypes.string,
-  }
+	/**
+	 * @since 4.1
+	 */
+	static propTypes = {
+		buttonText: PropTypes.string,
+	}
 
-  /**
-   * When the button is clicked we'll display the `/template` route
-   *
-   * @param {Object} e Event
-   *
-   * @since 4.1
-   */
-  handleClick = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
+	/**
+	 * When the button is clicked we'll display the `/template` route
+	 *
+	 * @param {Object} e Event
+	 *
+	 * @since 4.1
+	 */
+	handleClick = (e) => {
+		e.preventDefault()
+		e.stopPropagation()
 
-    this.props.history.push('/template')
-  }
+		this.props.history.push( '/template' )
+	}
 
-  /**
-   * @since 4.1
-   */
-  render () {
-    return (
-      <button
-        type="button"
-        id="fancy-template-selector"
-        className="button gfpdf-button"
-        onClick={this.handleClick}
-        ref={node => this.button = node}
-      >
-        {this.props.buttonText}
-      </button>
-    )
-  }
+	/**
+	 * @since 4.1
+	 */
+	render () {
+		return (
+		< button
+		type      = "button"
+		id        = "fancy-template-selector"
+		className = "button gfpdf-button"
+		onClick   = {this.handleClick}
+		ref       = {node => this.button = node}
+		>
+		{this.props.buttonText}
+		< / button >
+		)
+	}
 }
 
 export default TemplateButton

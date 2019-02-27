@@ -22,23 +22,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -76,18 +76,24 @@ class Field_Option extends Helper_Abstract_Field_Products {
 		$option_value = array_filter( $option_value );
 
 		/* Get the field name ( */
-		$name = array_map( function( $value ) use ( $field ) {
-			$option_info = GFCommon::get_option_info( $value, $field, false );
+		$name = array_map(
+			function( $value ) use ( $field ) {
+					$option_info = GFCommon::get_option_info( $value, $field, false );
 
-			return esc_html( $option_info['name'] );
-		}, $option_value );
+					return esc_html( $option_info['name'] );
+			},
+			$option_value
+		);
 
 		/* Get the field value (the price) */
-		$price = array_map( function( $value ) use ( $field ) {
-			$option_info = GFCommon::get_option_info( $value, $field, false );
+		$price = array_map(
+			function( $value ) use ( $field ) {
+					$option_info = GFCommon::get_option_info( $value, $field, false );
 
-			return esc_html( $option_info['price'] );
-		}, $option_value );
+					return esc_html( $option_info['price'] );
+			},
+			$option_value
+		);
 
 		/**
 		 * Valid option fields can only be radio, checkbox and select boxes
@@ -161,11 +167,16 @@ class Field_Option extends Helper_Abstract_Field_Products {
 		$data = $this->products->value();
 
 		if ( isset( $data['products'][ $this->field->productField ]['options'] ) ) {
-			$this->cache( [
-				'options' => array_filter( $data['products'][ $this->field->productField ]['options'], function( $option ) {
-					return ! isset( $option['id'] ) || $option['id'] === $this->field->id;
-				}),
-			] );
+			$this->cache(
+				[
+					'options' => array_filter(
+						$data['products'][ $this->field->productField ]['options'],
+						function( $option ) {
+							return ! isset( $option['id'] ) || $option['id'] === $this->field->id;
+						}
+					),
+				]
+			);
 		} else {
 			$this->cache( [] );
 		}

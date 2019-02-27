@@ -25,23 +25,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -102,7 +102,7 @@ class Field_Address extends Helper_Abstract_Fields {
 
 		/* display in the standard "city, state zip" format */
 		if ( $address_display_format != 'zip_before_city' ) {
-			$zip_string = $data['city'];
+			$zip_string  = $data['city'];
 			$zip_string .= ( ! empty( $zip_string ) && ! empty( $data['state'] ) ) ? ", {$data['state']}" : trim( $data['state'] );
 			$zip_string .= " {$data['zip']}";
 
@@ -112,7 +112,7 @@ class Field_Address extends Helper_Abstract_Fields {
 				$address[] = $zip_string;
 			}
 		} else { /* display in the "zip, city state" format */
-			$zip_string = trim( $data['zip'] . ' ' . $data['city'] );
+			$zip_string  = trim( $data['zip'] . ' ' . $data['city'] );
 			$zip_string .= ( ! empty( $zip_string ) && ! empty( $data['state'] ) ) ? ", {$data['state']}" : trim( $data['state'] );
 
 			if ( ! empty( $zip_string ) ) {
@@ -178,14 +178,16 @@ class Field_Address extends Helper_Abstract_Fields {
 			$value[ $this->field->id . '.1' ] = $value; /* set to the street value */
 		}
 
-		$this->cache( [
-			'street'  => esc_html( rgget( $this->field->id . '.1', $value ) ),
-			'street2' => esc_html( rgget( $this->field->id . '.2', $value ) ),
-			'city'    => esc_html( rgget( $this->field->id . '.3', $value ) ),
-			'state'   => esc_html( rgget( $this->field->id . '.4', $value ) ),
-			'zip'     => esc_html( rgget( $this->field->id . '.5', $value ) ),
-			'country' => esc_html( rgget( $this->field->id . '.6', $value ) ),
-		] );
+		$this->cache(
+			[
+				'street'  => esc_html( rgget( $this->field->id . '.1', $value ) ),
+				'street2' => esc_html( rgget( $this->field->id . '.2', $value ) ),
+				'city'    => esc_html( rgget( $this->field->id . '.3', $value ) ),
+				'state'   => esc_html( rgget( $this->field->id . '.4', $value ) ),
+				'zip'     => esc_html( rgget( $this->field->id . '.5', $value ) ),
+				'country' => esc_html( rgget( $this->field->id . '.6', $value ) ),
+			]
+		);
 
 		return $this->cache();
 	}

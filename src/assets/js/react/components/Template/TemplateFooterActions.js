@@ -39,66 +39,65 @@ import TemplateDeleteButton from './TemplateDeleteButton'
  * @since 4.1
  */
 class TemplateFooterActions extends React.Component {
-  /**
-   * @since 4.1
-   */
-  static propTypes = {
-    template: PropTypes.object.isRequired,
-    isActiveTemplate: PropTypes.bool,
+	/**
+	 * @since 4.1
+	 */
+	static propTypes = {
+		template: PropTypes.object.isRequired,
+		isActiveTemplate: PropTypes.bool,
 
-    ajaxUrl: PropTypes.string,
-    ajaxNonce: PropTypes.string,
+		ajaxUrl: PropTypes.string,
+		ajaxNonce: PropTypes.string,
 
-    activateText: PropTypes.string,
-    pdfWorkingDirPath: PropTypes.string,
-    templateDeleteText: PropTypes.string,
-    templateConfirmDeleteText: PropTypes.string,
-    templateDeleteErrorText: PropTypes.string,
-  }
+		activateText: PropTypes.string,
+		pdfWorkingDirPath: PropTypes.string,
+		templateDeleteText: PropTypes.string,
+		templateConfirmDeleteText: PropTypes.string,
+		templateDeleteErrorText: PropTypes.string,
+	}
 
-  /**
-   * Check if the current PDF template is a core template or not (i.e is shipped with Gravity PDF)
-   *
-   * @param {Object} template Immutable Map
-   *
-   * @returns {boolean}
-   *
-   * @since 4.1
-   */
-  notCoreTemplate = (template) => {
-    return template.get('path').indexOf(this.props.pdfWorkingDirPath) !== -1
-  }
+	/**
+	 * Check if the current PDF template is a core template or not (i.e is shipped with Gravity PDF)
+	 *
+	 * @param {Object} template Immutable Map
+	 *
+	 * @returns {boolean}
+	 *
+	 * @since 4.1
+	 */
+	notCoreTemplate = (template) => {
+		return template.get( 'path' ).indexOf( this.props.pdfWorkingDirPath ) !== -1
+	}
 
-  /**
-   * @since 4.1
-   */
-  render () {
-    const template = this.props.template
-    const isCompatible = template.get('compatible')
+	/**
+	 * @since 4.1
+	 */
+	render () {
+		const template     = this.props.template
+		const isCompatible = template.get( 'compatible' )
 
-    return (
-      <div className="theme-actions">
-        {!this.props.isActiveTemplate && isCompatible ? <TemplateActivateButton
-            template={template}
-            buttonText={this.props.activateText}/>
-          : null
-        }
+		return (
+		< div className = "theme-actions" >
+		{ ! this.props.isActiveTemplate && isCompatible ? < TemplateActivateButton
+			template    = {template}
+			buttonText  = {this.props.activateText} / >
+			: null
+		  }
 
-        {!this.props.isActiveTemplate && this.notCoreTemplate(template) ? <TemplateDeleteButton
-            template={template}
+		{ ! this.props.isActiveTemplate && this.notCoreTemplate( template ) ? < TemplateDeleteButton
+			template = {template}
 
-            ajaxUrl={this.props.ajaxUrl}
-            ajaxNonce={this.props.ajaxNonce}
+			ajaxUrl   = {this.props.ajaxUrl}
+			ajaxNonce = {this.props.ajaxNonce}
 
-            buttonText={this.props.templateDeleteText}
-            templateConfirmDeleteText={this.props.templateConfirmDeleteText}
-            templateDeleteErrorText={this.props.templateDeleteErrorText}/>
-          : null
-        }
-      </div>
-    )
-  }
+			buttonText                = {this.props.templateDeleteText}
+			templateConfirmDeleteText = {this.props.templateConfirmDeleteText}
+			templateDeleteErrorText   = {this.props.templateDeleteErrorText} / >
+			: null
+		  }
+		< / div >
+		)
+	}
 }
 
 export default TemplateFooterActions
-

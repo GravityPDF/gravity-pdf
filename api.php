@@ -5,7 +5,6 @@
  *
  * This class is in the public namespace
  *
- *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2018 Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -18,23 +17,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2018 Blue Liquid Designs
+	Gravity PDF – Copyright (C) 2018 Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -591,7 +590,7 @@ final class GPDFAPI {
 	 * @since 4.1
 	 */
 	public static function add_pdf_font( $font ) {
-		$settings = GPDFAPI::get_mvc_class( 'Model_Settings' );
+		$settings = self::get_mvc_class( 'Model_Settings' );
 
 		if ( ! isset( $font['font_name'] ) || ! $settings->is_font_name_valid( $font['font_name'] ) ) {
 			return new WP_Error( 'invalid_font_name', 'Font name is not valid. Alphanumeric characters and spaces only.' );
@@ -622,10 +621,10 @@ final class GPDFAPI {
 	 * @since 4.1
 	 */
 	public static function delete_pdf_font( $font_name ) {
-		$settings = GPDFAPI::get_mvc_class( 'Model_Settings' );
-		$options  = GPDFAPI::get_options_class();
-		$misc     = GPDFAPI::get_misc_class();
-		$data     = GPDFAPI::get_data_class();
+		$settings = self::get_mvc_class( 'Model_Settings' );
+		$options  = self::get_options_class();
+		$misc     = self::get_misc_class();
+		$data     = self::get_data_class();
 
 		$fonts   = $options->get_option( 'custom_fonts' );
 		$font_id = $settings->get_font_id_by_name( $font_name );
@@ -661,9 +660,9 @@ final class GPDFAPI {
 	 * @since 4.4
 	 */
 	public static function get_form_data( $entry_id ) {
-		$gform = self::get_form_class();
+		$gform     = self::get_form_class();
 		$pdf_model = self::get_mvc_class( 'Model_PDF' );
-		$entry = $gform->get_entry( $entry_id );
+		$entry     = $gform->get_entry( $entry_id );
 
 		if ( is_wp_error( $entry ) ) {
 			return $entry;

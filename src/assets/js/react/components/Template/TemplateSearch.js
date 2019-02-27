@@ -40,79 +40,79 @@ import { searchTemplates } from '../../actions/templates'
  * @since 4.1
  */
 export class TemplateSearch extends React.Component {
-  /**
-   * @since 4.1
-   */
-  static propTypes = {
-    onSearch: PropTypes.func,
-    search: PropTypes.string
-  }
+	/**
+	 * @since 4.1
+	 */
+	static propTypes = {
+		onSearch: PropTypes.func,
+		search: PropTypes.string
+	}
 
-  /**
-   * Debounce our runSearch function so it can only be run once every 200 milliseconds
-   *
-   * @since 4.1
-   */
-  componentWillMount () {
-    this.runSearch = debounce(this.runSearch, 200)
-  }
+	/**
+	 * Debounce our runSearch function so it can only be run once every 200 milliseconds
+	 *
+	 * @since 4.1
+	 */
+	componentWillMount () {
+		this.runSearch = debounce( this.runSearch, 200 )
+	}
 
-  /**
-   * On mount, add focus to the search box
-   *
-   * @since 4.1
-   */
-  componentDidMount () {
-    /* add focus to element */
-    this.input.focus()
-  }
+	/**
+	 * On mount, add focus to the search box
+	 *
+	 * @since 4.1
+	 */
+	componentDidMount () {
+		/* add focus to element */
+		this.input.focus()
+	}
 
-  /**
-   * Handles our search event
-   *
-   * Because ReactJS pools SyntheticEvent and we delay the search with debounce we need
-   * to ensure the event is persisted (see https://facebook.github.io/react/docs/events.html#event-pooling)
-   *
-   * @param {Object} e Event
-   *
-   * @since 4.1
-   */
-  handleSearch = (e) => {
-    e.persist()
-    this.runSearch(e)
-  }
+	/**
+	 * Handles our search event
+	 *
+	 * Because ReactJS pools SyntheticEvent and we delay the search with debounce we need
+	 * to ensure the event is persisted (see https://facebook.github.io/react/docs/events.html#event-pooling)
+	 *
+	 * @param {Object} e Event
+	 *
+	 * @since 4.1
+	 */
+	handleSearch = (e) => {
+		e.persist()
+		this.runSearch( e )
+	}
 
-  /**
-   * Update our Redux store with the search value
-   *
-   * @param {Object} e Event
-   *
-   * @since 4.1
-   */
-  runSearch = (e) => {
-    this.props.onSearch(e.target.value || '')
-  }
+	/**
+	 * Update our Redux store with the search value
+	 *
+	 * @param {Object} e Event
+	 *
+	 * @since 4.1
+	 */
+	runSearch = (e) => {
+		this.props.onSearch( e.target.value || '' )
+	}
 
-  /**
-   * @since 4.1
-   */
-  render () {
-    return (
-      <div>
-        <input
-          className="wp-filter-search"
-          id="wp-filter-search-input"
-          ref={node => this.input = node}
-          placeholder="Search Installed Templates"
-          type="search"
-          aria-describedby="live-search-desc"
-          tabIndex="145"
-          onChange={this.handleSearch}
-          defaultValue={this.props.search}
-        />
-      </div>
-    )
-  }
+	/**
+	 * @since 4.1
+	 */
+	render () {
+		return (
+		< div >
+		< input
+		  className          = "wp-filter-search"
+		  id                 = "wp-filter-search-input"
+		  ref                = {node => this.input = node}
+		  placeholder        = "Search Installed Templates"
+		  type               = "search"
+		  aria - describedby = "live-search-desc"
+		  tabIndex           = "145"
+		  onChange           = {this.handleSearch}
+		  defaultValue       = {this.props.search}
+		/ >
+		< / div >
+		)
+	}
 }
 
 /**
@@ -125,9 +125,9 @@ export class TemplateSearch extends React.Component {
  * @since 4.1
  */
 const mapStateToProps = (state) => {
-  return {
-    search: state.template.search
-  }
+	return {
+		search: state.template.search
+	}
 }
 
 /**
@@ -140,11 +140,11 @@ const mapStateToProps = (state) => {
  * @since 4.1
  */
 const mapDispatchToProps = (dispatch) => {
-  return {
-    onSearch: (text) => {
-      dispatch(searchTemplates(text))
-    }
-  }
+	return {
+		onSearch: (text) => {
+			dispatch( searchTemplates( text ) )
+		}
+	}
 }
 
 /**
@@ -152,4 +152,4 @@ const mapDispatchToProps = (dispatch) => {
  *
  * @since 4.1
  */
-export default connect(mapStateToProps, mapDispatchToProps)(TemplateSearch)
+export default connect( mapStateToProps, mapDispatchToProps )( TemplateSearch )

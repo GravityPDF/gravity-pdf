@@ -37,9 +37,9 @@ import React from 'react'
  * @since 5.0
  */
 const CoreFontButton = ({className, callback, text}) => (
-  <button className={className} type="button" onClick={callback}>
-    {text}
-  </button>
+  < button className = {className} type = "button" onClick = {callback} >
+	{text}
+  < / button >
 )
 
 export default CoreFontButton

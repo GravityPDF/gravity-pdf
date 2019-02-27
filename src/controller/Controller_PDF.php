@@ -28,23 +28,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -118,8 +118,8 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 */
 	public function init() {
 		/*
-         * Tell Gravity Forms to add our form PDF settings pages
-         */
+		 * Tell Gravity Forms to add our form PDF settings pages
+		 */
 		$this->add_actions();
 		$this->add_filters();
 
@@ -184,10 +184,15 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		add_filter( 'gfpdf_field_middleware', [ $this->model, 'field_middle_blacklist' ], 10, 7 );
 
 		/* Tap into GF notifications */
-		add_filter( 'gform_notification', [
-			$this->model,
-			'notifications',
-		], 9999, 3 ); /* ensure Gravity PDF is one of the last filters to be applied */
+		add_filter(
+			'gform_notification',
+			[
+				$this->model,
+				'notifications',
+			],
+			9999,
+			3
+		); /* ensure Gravity PDF is one of the last filters to be applied */
 
 		/* Change mPDF settings */
 		add_filter( 'mpdf_font_data', [ $this->model, 'register_custom_font_data_with_mPDF' ] );
@@ -233,11 +238,14 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		$lid    = (int) $GLOBALS['wp']->query_vars['lid'];
 		$action = ( ( isset( $GLOBALS['wp']->query_vars['action'] ) ) && $GLOBALS['wp']->query_vars['action'] == 'download' ) ? 'download' : 'view';
 
-		$this->log->addNotice( 'Processing PDF endpoint.', [
-			'pid'    => $pid,
-			'lid'    => $lid,
-			'action' => $action,
-		] );
+		$this->log->addNotice(
+			'Processing PDF endpoint.',
+			[
+				'pid'    => $pid,
+				'lid'    => $lid,
+				'action' => $action,
+			]
+		);
 
 		/*  Send to our model to handle validation / authentication */
 		do_action( 'gfpdf_pre_view_or_download_pdf', $lid, $pid, $action );
@@ -272,9 +280,12 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 			'action'   => ( isset( $_GET['download'] ) ) ? 'download' : 'view',
 		];
 
-		$this->log->addNotice( 'Processing Legacy PDF endpoint.', [
-			'config' => $config,
-		] );
+		$this->log->addNotice(
+			'Processing Legacy PDF endpoint.',
+			[
+				'config' => $config,
+			]
+		);
 
 		/* Attempt to find a valid config */
 		$pid = $this->model->get_legacy_config( $config );
@@ -324,10 +335,13 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 */
 	private function pdf_error( $error ) {
 
-		$this->log->addError( 'PDF Generation Error.', [
-			'WP_Error_Message' => $error->get_error_message(),
-			'WP_Error_Code'    => $error->get_error_code(),
-		] );
+		$this->log->addError(
+			'PDF Generation Error.',
+			[
+				'WP_Error_Message' => $error->get_error_message(),
+				'WP_Error_Code'    => $error->get_error_code(),
+			]
+		);
 
 		/* only display detailed error to admins */
 		$whitelist_errors = [ 'timeout_expired', 'access_denied' ];

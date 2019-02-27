@@ -35,10 +35,10 @@ import coreFontsReducer from '../reducers/coreFontReducer'
 const reducers = setupReducers()
 
 /* Create our store and enable the Redux dev tools, if they exist */
-const store = createStore(reducers, window.devToolsExtension && window.devToolsExtension())
+const store = createStore( reducers, window.devToolsExtension && window.devToolsExtension() )
 
 export function getStore () {
-  return store
+	return store
 }
 
 /**
@@ -50,8 +50,10 @@ export function getStore () {
  * @since 4.1
  */
 export function setupReducers () {
-  return combineReducers({
-    template: templateReducer,
-    coreFonts: coreFontsReducer,
-  })
+	return combineReducers(
+		{
+			template: templateReducer,
+			coreFonts: coreFontsReducer,
+		}
+	)
 }

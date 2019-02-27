@@ -1,10 +1,10 @@
 import {
-  SEARCH_TEMPLATES,
-  SELECT_TEMPLATE,
-  ADD_TEMPLATE,
-  UPDATE_TEMPLATE,
-  UPDATE_TEMPLATE_PARAM,
-  DELETE_TEMPLATE,
+	SEARCH_TEMPLATES,
+	SELECT_TEMPLATE,
+	ADD_TEMPLATE,
+	UPDATE_TEMPLATE,
+	UPDATE_TEMPLATE_PARAM,
+	DELETE_TEMPLATE,
 } from '../actionTypes/templates'
 
 /**
@@ -46,10 +46,10 @@ import {
  * @since 4.1
  */
 export const searchTemplates = (text) => {
-  return {
-    type: SEARCH_TEMPLATES,
-    text
-  }
+	return {
+		type: SEARCH_TEMPLATES,
+		text
+	}
 }
 
 /**
@@ -62,10 +62,10 @@ export const searchTemplates = (text) => {
  * @since 4.1
  */
 export const selectTemplate = (id) => {
-  return {
-    type: SELECT_TEMPLATE,
-    id
-  }
+	return {
+		type: SELECT_TEMPLATE,
+		id
+	}
 }
 
 /**
@@ -78,10 +78,10 @@ export const selectTemplate = (id) => {
  * @since 4.1
  */
 export const addTemplate = (template) => {
-  return {
-    type: ADD_TEMPLATE,
-    template
-  }
+	return {
+		type: ADD_TEMPLATE,
+		template
+	}
 }
 
 /**
@@ -94,10 +94,10 @@ export const addTemplate = (template) => {
  * @since 4.1
  */
 export const updateTemplate = (template) => {
-  return {
-    type: UPDATE_TEMPLATE,
-    template
-  }
+	return {
+		type: UPDATE_TEMPLATE,
+		template
+	}
 }
 
 /**
@@ -112,12 +112,12 @@ export const updateTemplate = (template) => {
  * @since 4.1
  */
 export const updateTemplateParam = (id, name, value) => {
-  return {
-    type: UPDATE_TEMPLATE_PARAM,
-    id,
-    name,
-    value
-  }
+	return {
+		type: UPDATE_TEMPLATE_PARAM,
+		id,
+		name,
+		value
+	}
 }
 
 /**
@@ -130,8 +130,8 @@ export const updateTemplateParam = (id, name, value) => {
  * @since 4.1
  */
 export const deleteTemplate = (id) => {
-  return {
-    type: DELETE_TEMPLATE,
-    id
-  }
+	return {
+		type: DELETE_TEMPLATE,
+		id
+	}
 }

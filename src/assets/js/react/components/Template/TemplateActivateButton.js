@@ -40,44 +40,44 @@ import { withRouter } from 'react-router-dom'
  * @since 4.1
  */
 export class TemplateActivateButton extends React.Component {
-  /**
-   * @since 4.1
-   */
-  static propTypes = {
-    template: PropTypes.object,
-    onTemplateSelect: PropTypes.func,
-    buttonText: PropTypes.string,
-  }
+	/**
+	 * @since 4.1
+	 */
+	static propTypes = {
+		template: PropTypes.object,
+		onTemplateSelect: PropTypes.func,
+		buttonText: PropTypes.string,
+	}
 
-  /**
-   * Update our route and trigger a Redux action to select the current template
-   *
-   * @param {Object} e Event
-   *
-   * @since 4.1
-   */
-  selectTemplate = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
+	/**
+	 * Update our route and trigger a Redux action to select the current template
+	 *
+	 * @param {Object} e Event
+	 *
+	 * @since 4.1
+	 */
+	selectTemplate = (e) => {
+		e.preventDefault()
+		e.stopPropagation()
 
-    this.props.history.push('')
-    this.props.onTemplateSelect(this.props.template.get('id'))
-  }
+		this.props.history.push( '' )
+		this.props.onTemplateSelect( this.props.template.get( 'id' ) )
+	}
 
-  /**
-   * @since 4.1
-   */
-  render () {
-    return (
-      <a
-        onClick={this.selectTemplate}
-        href="#"
-        tabIndex="150"
-        className="button button-primary activate">
-        {this.props.buttonText}
-      </a>
-    )
-  }
+	/**
+	 * @since 4.1
+	 */
+	render () {
+		return (
+		< a
+		onClick   = {this.selectTemplate}
+		href      = "#"
+		tabIndex  = "150"
+		className = "button button-primary activate" >
+		{this.props.buttonText}
+		< / a >
+		)
+	}
 }
 
 /**
@@ -90,11 +90,11 @@ export class TemplateActivateButton extends React.Component {
  * @since 4.1
  */
 const mapDispatchToProps = (dispatch) => {
-  return {
-    onTemplateSelect: (id) => {
-      dispatch(selectTemplate(id))
-    }
-  }
+	return {
+		onTemplateSelect: (id) => {
+			dispatch( selectTemplate( id ) )
+		}
+	}
 }
 
 /**
@@ -102,5 +102,4 @@ const mapDispatchToProps = (dispatch) => {
  *
  * @since 4.1
  */
-export default withRouter(connect(null, mapDispatchToProps)(TemplateActivateButton))
-
+export default withRouter( connect( null, mapDispatchToProps )( TemplateActivateButton ) )

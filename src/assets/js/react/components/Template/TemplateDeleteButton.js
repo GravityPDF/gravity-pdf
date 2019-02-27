@@ -41,86 +41,86 @@ import request from 'superagent'
  * @since 4.1
  */
 export class TemplateDeleteButton extends React.Component {
-  /**
-   * @since 4.1
-   */
-  static propTypes = {
-    ajaxUrl: PropTypes.string,
-    ajaxNonce: PropTypes.string,
+	/**
+	 * @since 4.1
+	 */
+	static propTypes = {
+		ajaxUrl: PropTypes.string,
+		ajaxNonce: PropTypes.string,
 
-    template: PropTypes.object,
-    addTemplate: PropTypes.func,
-    onTemplateDelete: PropTypes.func,
-    callbackFunction: PropTypes.func,
+		template: PropTypes.object,
+		addTemplate: PropTypes.func,
+		onTemplateDelete: PropTypes.func,
+		callbackFunction: PropTypes.func,
 
-    buttonText: PropTypes.string,
-    templateConfirmDeleteText: PropTypes.string,
-    templateDeleteErrorText: PropTypes.string,
-  }
+		buttonText: PropTypes.string,
+		templateConfirmDeleteText: PropTypes.string,
+		templateDeleteErrorText: PropTypes.string,
+	}
 
-  /**
-   * Display a confirmation window asking user to verify they want template deleted.
-   *
-   * Once verified, we make an AJAX call to the server requesting template to be deleted.
-   *
-   * Before we receive the response we remove the PDF template automatically and update the
-   * URL to /template. If the AJAX call fails the PDF template gets restored to our list with
-   * an appropriate error message (it feels snapper this way).
-   *
-   * @param {Object} e Event
-   */
-  deleteTemplate = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
+	/**
+	 * Display a confirmation window asking user to verify they want template deleted.
+	 *
+	 * Once verified, we make an AJAX call to the server requesting template to be deleted.
+	 *
+	 * Before we receive the response we remove the PDF template automatically and update the
+	 * URL to /template. If the AJAX call fails the PDF template gets restored to our list with
+	 * an appropriate error message (it feels snapper this way).
+	 *
+	 * @param {Object} e Event
+	 */
+	deleteTemplate = (e) => {
+		e.preventDefault()
+		e.stopPropagation()
 
-    if (window.confirm(this.props.templateConfirmDeleteText)) {
+		if (window.confirm( this.props.templateConfirmDeleteText )) {
 
-      const templateId = this.props.template.get('id')
+			const templateId = this.props.template.get( 'id' )
 
-      /* POST the PDF template to our endpoint for processing */
-      request
-        .post(this.props.ajaxUrl)
-        .field('action', 'gfpdf_delete_template')
-        .field('nonce', this.props.ajaxNonce)
-        .field('id', templateId)
-        .then(
-          () => { /* success. Leave blank */},
-          this.ajaxFailed
-        )
+			/* POST the PDF template to our endpoint for processing */
+			request
+			.post( this.props.ajaxUrl )
+			.field( 'action', 'gfpdf_delete_template' )
+			.field( 'nonce', this.props.ajaxNonce )
+			.field( 'id', templateId )
+			.then(
+				() => { /* success. Leave blank */},
+				this.ajaxFailed
+			)
 
-      this.props.history.push('/template')
-      this.props.onTemplateDelete(templateId)
-    }
-  }
+			this.props.history.push( '/template' )
+			this.props.onTemplateDelete( templateId )
+		}
+	}
 
-  /**
-   * If the server cannot delete the template we re-add the template to our list
-   * and display an appropriate inline error message
-   *
-   * @since 4.1
-   */
-  ajaxFailed = () => {
-    const errorTemplate = this.props.template.set('error', this.props.templateDeleteErrorText)
-    this.props.addTemplate(errorTemplate)
-  }
+	/**
+	 * If the server cannot delete the template we re-add the template to our list
+	 * and display an appropriate inline error message
+	 *
+	 * @since 4.1
+	 */
+	ajaxFailed              = () => {
+		const errorTemplate = this.props.template.set( 'error', this.props.templateDeleteErrorText )
+		this.props.addTemplate( errorTemplate )
+	}
 
-  /**
-   * @since 4.1
-   */
-  render () {
+	/**
+	 * @since 4.1
+	 */
+	render () {
 
-    const callback = (this.props.callbackFunction) ? this.props.callbackFunction : this.deleteTemplate
+		const callback = (this.props.callbackFunction) ? this.props.callbackFunction : this.deleteTemplate
 
-    return (
-      <a
-        onClick={callback}
-        href="#"
-        tabIndex="150"
-        className="button button-secondary delete-theme">
-        {this.props.buttonText}
-      </a>
-    )
-  }
+		return (
+		< a
+		onClick   = {callback}
+		href      = "#"
+		tabIndex  = "150"
+		className = "button button-secondary delete-theme" >
+		{this.props.buttonText}
+		< / a >
+		)
+	}
 }
 
 /**
@@ -133,15 +133,15 @@ export class TemplateDeleteButton extends React.Component {
  * @since 4.1
  */
 const mapDispatchToProps = (dispatch) => {
-  return {
-    addTemplate: (template) => {
-      dispatch(addTemplate(template))
-    },
+	return {
+		addTemplate: (template) => {
+			dispatch( addTemplate( template ) )
+		},
 
-    onTemplateDelete: (id) => {
-      dispatch(deleteTemplate(id))
-    }
-  }
+		onTemplateDelete: (id) => {
+			dispatch( deleteTemplate( id ) )
+		}
+	}
 }
 
 /**
@@ -149,5 +149,4 @@ const mapDispatchToProps = (dispatch) => {
  *
  * @since 4.1
  */
-export default withRouter(connect(null, mapDispatchToProps)(TemplateDeleteButton))
-
+export default withRouter( connect( null, mapDispatchToProps )( TemplateDeleteButton ) )

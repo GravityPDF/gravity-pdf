@@ -33,5 +33,5 @@
  * @since 4.1
  */
 export default () => {
-  return false
+	return false
 }

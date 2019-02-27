@@ -39,30 +39,32 @@ import coreFontBootstrap from './bootstrap/coreFontBootstrap'
  *
  * @since 4.1
  */
-$(function () {
+$(
+	function () {
 
-  'use strict'
+		'use strict'
 
-  /* Initialise the Fancy Template Picker */
-  if (GFPDF.templateList !== undefined) {
+		/* Initialise the Fancy Template Picker */
+		if (GFPDF.templateList !== undefined) {
 
-    // To add to window
-    if (!window.Promise) {
-      window.Promise = Promise
-    }
+			// To add to window
+			if ( ! window.Promise) {
+				window.Promise = Promise
+			}
 
-    /* Check if we should show the Fancy Template Picker */
-    var templateId = '#gfpdf_settings\\[template\\], #gfpdf_settings\\[default_template\\]'
-    var $templateField = $(templateId)
+			/* Check if we should show the Fancy Template Picker */
+			var templateId     = '#gfpdf_settings\\[template\\], #gfpdf_settings\\[default_template\\]'
+			var $templateField = $( templateId )
 
-    /* Run this code if the element exists */
-    if ($templateField.length > 0) {
-      templateBootstrap($templateField)
-    }
-  }
+			/* Run this code if the element exists */
+			if ($templateField.length > 0) {
+				templateBootstrap( $templateField )
+			}
+		}
 
-  /* Initialise the Core Font downloader */
-  if ($('#gfpdf-install-core-fonts').length) {
-    coreFontBootstrap()
-  }
-})
+		/* Initialise the Core Font downloader */
+		if ($( '#gfpdf-install-core-fonts' ).length) {
+			coreFontBootstrap()
+		}
+	}
+)

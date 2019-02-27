@@ -40,142 +40,142 @@ import { List } from 'immutable'
  * @since 4.1
  */
 export class TemplateHeaderNavigation extends React.Component {
-  /**
-   * @since 4.1
-   */
-  static propTypes = {
-    templates: PropTypes.object.isRequired,
-    templateIndex: PropTypes.number.isRequired,
-    isFirst: PropTypes.bool,
-    isLast: PropTypes.bool,
+	/**
+	 * @since 4.1
+	 */
+	static propTypes = {
+		templates: PropTypes.object.isRequired,
+		templateIndex: PropTypes.number.isRequired,
+		isFirst: PropTypes.bool,
+		isLast: PropTypes.bool,
 
-    showPreviousTemplateText: PropTypes.string,
-    showNextTemplateText: PropTypes.string
-  }
+		showPreviousTemplateText: PropTypes.string,
+		showNextTemplateText: PropTypes.string
+	}
 
-  /**
-   * Add window event listeners
-   *
-   * @since 4.1
-   */
-  componentDidMount () {
-    window.addEventListener('keydown', this.handleKeyPress, false)
-  }
+	/**
+	 * Add window event listeners
+	 *
+	 * @since 4.1
+	 */
+	componentDidMount () {
+		window.addEventListener( 'keydown', this.handleKeyPress, false )
+	}
 
-  /**
-   * Cleanup window event listeners
-   *
-   * @since 4.1
-   */
-  componentWillUnmount () {
-    window.removeEventListener('keydown', this.handleKeyPress, false)
-  }
+	/**
+	 * Cleanup window event listeners
+	 *
+	 * @since 4.1
+	 */
+	componentWillUnmount () {
+		window.removeEventListener( 'keydown', this.handleKeyPress, false )
+	}
 
-  /**
-   * Attempt to get the previous template in our Immutable list and update the URL
-   *
-   * @param {Object} e Event
-   *
-   * @since 4.1
-   */
-  previousTemplate = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
+	/**
+	 * Attempt to get the previous template in our Immutable list and update the URL
+	 *
+	 * @param {Object} e Event
+	 *
+	 * @since 4.1
+	 */
+	previousTemplate = (e) => {
+		e.preventDefault()
+		e.stopPropagation()
 
-    const prevId = this.props.templates.get(this.props.templateIndex - 1).get('id')
+		const prevId = this.props.templates.get( this.props.templateIndex - 1 ).get( 'id' )
 
-    if (prevId) {
-      this.props.history.push('/template/' + prevId)
-    }
-  }
+		if (prevId) {
+			this.props.history.push( '/template/' + prevId )
+		}
+	}
 
-  /**
-   * Attempt to get the next template in our Immutable list and update the URL
-   *
-   * @param {Object} e Event
-   *
-   * @since 4.1
-   */
-  nextTemplate = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
+	/**
+	 * Attempt to get the next template in our Immutable list and update the URL
+	 *
+	 * @param {Object} e Event
+	 *
+	 * @since 4.1
+	 */
+	nextTemplate = (e) => {
+		e.preventDefault()
+		e.stopPropagation()
 
-    const nextId = this.props.templates.get(this.props.templateIndex + 1).get('id')
+		const nextId = this.props.templates.get( this.props.templateIndex + 1 ).get( 'id' )
 
-    if (nextId) {
-      this.props.history.push('/template/' + nextId)
-    }
-  }
+		if (nextId) {
+			this.props.history.push( '/template/' + nextId )
+		}
+	}
 
-  /**
-   * Checks if the Left or Right arrow keys are pressed and fires appropriate functions
-   *
-   * @param {Object} e Event
-   *
-   * @since 4.1
-   */
-  handleKeyPress = (e) => {
-    /* Left Arrow */
-    if (!this.props.isFirst && e.keyCode === 37) {
-      this.previousTemplate(e)
-    }
+	/**
+	 * Checks if the Left or Right arrow keys are pressed and fires appropriate functions
+	 *
+	 * @param {Object} e Event
+	 *
+	 * @since 4.1
+	 */
+	handleKeyPress = (e) => {
+		/* Left Arrow */
+		if ( ! this.props.isFirst && e.keyCode === 37) {
+			this.previousTemplate( e )
+		}
 
-    /* Right Arrow */
-    if (!this.props.isLast && e.keyCode === 39) {
-      this.nextTemplate(e)
-    }
-  }
+		/* Right Arrow */
+		if ( ! this.props.isLast && e.keyCode === 39) {
+			this.nextTemplate( e )
+		}
+	}
 
-  /**
-   * @since 4.1
-   */
-  render () {
+	/**
+	 * @since 4.1
+	 */
+	render () {
 
-    /*
-     * Work our the correct classes and attributes for our left and right arrows
-     * based on if we are currently showing the first or last templates
-     */
-    const isFirst = this.props.isFirst
-    const isLast = this.props.isLast
+		/*
+		* Work our the correct classes and attributes for our left and right arrows
+		* based on if we are currently showing the first or last templates
+		*/
+		const isFirst = this.props.isFirst
+		const isLast  = this.props.isLast
 
-    let baseClass = List(['dashicons', 'dashicons-no'])
+		let baseClass = List( ['dashicons', 'dashicons-no'] )
 
-    let prevClass = baseClass.push('left')
-    let nextClass = baseClass.push('right')
-    prevClass = (isFirst) ? prevClass.push('disabled') : prevClass
-    nextClass = (isLast) ? nextClass.push('disabled') : nextClass
+		let prevClass = baseClass.push( 'left' )
+		let nextClass = baseClass.push( 'right' )
+		prevClass     = (isFirst) ? prevClass.push( 'disabled' ) : prevClass
+		nextClass     = (isLast) ? nextClass.push( 'disabled' ) : nextClass
 
-    let leftDisabled = (isFirst) ? 'disabled' : ''
-    let rightDisabled = (isLast) ? 'disabled' : ''
+		let leftDisabled  = (isFirst) ? 'disabled' : ''
+		let rightDisabled = (isLast) ? 'disabled' : ''
 
-    return (
-      <span>
-        <button
-          onClick={this.previousTemplate}
-          onKeyDown={this.handleKeyPress}
-          className={prevClass.join(' ')}
-          tabIndex="141"
-          disabled={leftDisabled}>
-            <span
-              className="screen-reader-text">
-              {this.props.showPreviousTemplateText}
-            </span>
-        </button>
+		return (
+		< span >
+		< button
+		  onClick       = {this.previousTemplate}
+		  onKeyDown     = {this.handleKeyPress}
+		  className     = {prevClass.join( ' ' )}
+		  tabIndex      = "141"
+		  disabled      = {leftDisabled} >
+			< span
+			  className = "screen-reader-text" >
+			  {this.props.showPreviousTemplateText}
+			< / span >
+		< / button >
 
-        <button
-          onClick={this.nextTemplate}
-          onKeyDown={this.handleKeyPress}
-          className={nextClass.join(' ')}
-          tabIndex="141"
-          disabled={rightDisabled}>
-          <span
-            className="screen-reader-text">
-            {this.props.showNextTemplateText}
-          </span>
-        </button>
-      </span>
-    )
-  }
+		< button
+		  onClick     = {this.nextTemplate}
+		  onKeyDown   = {this.handleKeyPress}
+		  className   = {nextClass.join( ' ' )}
+		  tabIndex    = "141"
+		  disabled    = {rightDisabled} >
+		  < span
+			className = "screen-reader-text" >
+			{this.props.showNextTemplateText}
+		  < / span >
+		< / button >
+		< / span >
+		)
+	}
 }
 
 /**
@@ -189,16 +189,16 @@ export class TemplateHeaderNavigation extends React.Component {
  * @since 4.1
  */
 const MapStateToProps = (state, props) => {
-  /* Check if the current template is the first or last in our templates */
-  const templates = props.templates
-  const currentTemplateId = props.template.get('id')
-  const first = templates.first().get('id')
-  const last = templates.last().get('id')
+	/* Check if the current template is the first or last in our templates */
+	const templates         = props.templates
+	const currentTemplateId = props.template.get( 'id' )
+	const first             = templates.first().get( 'id' )
+	const last              = templates.last().get( 'id' )
 
-  return {
-    isFirst: first === currentTemplateId,
-    isLast: last === currentTemplateId,
-  }
+	return {
+		isFirst: first === currentTemplateId,
+		isLast: last === currentTemplateId,
+	}
 }
 
 /**
@@ -206,5 +206,4 @@ const MapStateToProps = (state, props) => {
  *
  * @since 4.1
  */
-export default withRouter(connect(MapStateToProps)(TemplateHeaderNavigation))
-
+export default withRouter( connect( MapStateToProps )( TemplateHeaderNavigation ) )

@@ -19,23 +19,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -51,7 +51,7 @@ class Field_Shipping extends Helper_Abstract_Field_Products {
 	 * @since 4.3
 	 */
 	public function form_data() {
-		$value    = $this->value();
+		$value = $this->value();
 
 		if ( isset( $value['shipping_formatted'] ) ) {
 			$name = ( isset( $value['shipping_name'] ) ) ? $value['shipping_name'] . " ({$value['shipping_formatted']})" : '';
@@ -102,11 +102,13 @@ class Field_Shipping extends Helper_Abstract_Field_Products {
 		$data = $this->products->value();
 
 		if ( isset( $data['products_totals']['shipping'] ) ) {
-			$this->cache( [
-				'shipping'           => esc_html( $data['products_totals']['shipping'] ),
-				'shipping_formatted' => esc_html( $data['products_totals']['shipping_formatted'] ),
-				'shipping_name'      => esc_html( $data['products_totals']['shipping_name'] ),
-			] );
+			$this->cache(
+				[
+					'shipping'           => esc_html( $data['products_totals']['shipping'] ),
+					'shipping_formatted' => esc_html( $data['products_totals']['shipping_formatted'] ),
+					'shipping_name'      => esc_html( $data['products_totals']['shipping_name'] ),
+				]
+			);
 		} else {
 			$this->cache( [] );
 		}
