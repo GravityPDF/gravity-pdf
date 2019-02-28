@@ -178,7 +178,7 @@ class Helper_Data {
 	 */
 	public function set_addon_details() {
 		$this->store_url = 'https://gravitypdf.com';
-		$this->addon = [];
+		$this->addon     = [];
 	}
 
 	/**
@@ -263,7 +263,9 @@ class Helper_Data {
 			'letsGoCreateOne'     => esc_html__( "Let's go create one", 'gravity-forms-pdf-extended' ),
 			'installedPdfs'       => esc_html__( 'Installed PDFs', 'gravity-forms-pdf-extended' ),
 
-			'searchPlaceholder' => esc_html__( 'Search the Gravity PDF Knowledgebase...', 'gravity-forms-pdf-extended' ),
+			'searchPlaceholder'       => esc_html__( 'Search the Gravity PDF Knowledgebase...', 'gravity-forms-pdf-extended' ),
+			'searchResultHeadingText' => esc_html__( 'Gravity PDF Documentation', 'gravity-forms-pdf-extended' ),
+			'noResultText'            => esc_html__( 'It doesn\'t look like there are any topics related to your issue.', 'gravity-forms-pdf-extended' ),
 
 			'requiresGravityPdfVersion'                  => esc_html__( 'Requires Gravity PDF v%s', 'gravity-forms-pdf-extended' ),
 			'templateNotCompatibleWithGravityPdfVersion' => esc_html__( 'This PDF template is not compatible with your version of Gravity PDF. This template required Gravity PDF v%s.', 'gravity-forms-pdf-extended' ),
@@ -279,7 +281,7 @@ class Helper_Data {
 			'problemWithTheUpload'                       => esc_html__( 'There was a problem with the upload. Reload the page and try again.', 'gravity-forms-pdf-extended' ),
 			'doYouWantToDeleteTemplate'                  => sprintf( esc_html__( "Do you really want to delete this PDF template?%sClick 'Cancel' to go back, 'OK' to confirm the delete.", 'gravity-forms-pdf-extended' ), "\n\n" ),
 			'couldNotDeleteTemplate'                     => esc_html__( 'Could not delete template.', 'gravity-forms-pdf-extended' ),
-			'templateInstallInstructions'                => esc_html__ ( 'If you have a PDF template in .zip format you may install it here. You can also update an existing PDF template (this will override any changes you have made).', 'gravity-forms-pdf-extended' ),
+			'templateInstallInstructions'                => esc_html__( 'If you have a PDF template in .zip format you may install it here. You can also update an existing PDF template (this will override any changes you have made).', 'gravity-forms-pdf-extended' ),
 
 			'coreFontListUrl'            => 'https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/',
 			'coreFontSuccess'            => esc_html__( 'ALL CORE FONTS SUCCESSFULLY INSTALLED', 'gravity-forms-pdf-extended' ),
