@@ -12,9 +12,10 @@ module.exports = {
     path: __dirname + '/dist/assets/js/',
     filename: 'app.bundle.min.js'
   },
+  mode: PROD ? 'production' : 'development',
   devtool: PROD ? 'source-map' : 'eval-source-map',
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.js$/,
         include: [
@@ -25,6 +26,7 @@ module.exports = {
         options: { babelrc: true }
       },
       {
+        type: "javascript/auto",
         test: /\.json$/,
         loader: 'json-loader'
       }
