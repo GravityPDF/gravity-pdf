@@ -22,23 +22,23 @@ use WP_UnitTestCase;
  */
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -131,15 +131,21 @@ class Test_Addon extends WP_UnitTestCase {
 		$sub_addon = new SubAddon();
 		$this->assertFalse( $sub_addon->run );
 
-		$this->addon->init( [ $sub_addon, ] );
+		$this->addon->init( [ $sub_addon ] );
 
 		$this->assertTrue( $sub_addon->run );
 		$this->assertEquals( 10, has_action( 'admin_init', [ $this->addon, 'plugin_updater' ] ) );
 		$this->assertEquals( 10, has_action( 'admin_init', [ $this->addon, 'maybe_schedule_license_check' ] ) );
-		$this->assertEquals( 10, has_action( 'gfpdf_' . $this->addon->get_slug() . '_license_check', [
-			$this->addon,
-			'schedule_license_check',
-		] ) );
+		$this->assertEquals(
+			10,
+			has_action(
+				'gfpdf_' . $this->addon->get_slug() . '_license_check',
+				[
+					$this->addon,
+					'schedule_license_check',
+				]
+			)
+		);
 
 		$this->assertEquals( $this->addon, $gfpdf->data->addon[ $this->addon->get_slug() ] );
 
@@ -158,11 +164,13 @@ class Test_Addon extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'status', $license );
 		$this->assertArrayHasKey( 'message', $license );
 
-		$this->addon->update_license_info( [
-			'license' => 'my key',
-			'status'  => 'active',
-			'message' => 'Success!',
-		] );
+		$this->addon->update_license_info(
+			[
+				'license' => 'my key',
+				'status'  => 'active',
+				'message' => 'Success!',
+			]
+		);
 
 		$license = $this->addon->get_license_info();
 
@@ -183,11 +191,13 @@ class Test_Addon extends WP_UnitTestCase {
 	 * @since 4.2
 	 */
 	public function test_get_license_key() {
-		$this->addon->update_license_info( [
-			'license' => 'my key',
-			'status'  => 'active',
-			'message' => 'Success!',
-		] );
+		$this->addon->update_license_info(
+			[
+				'license' => 'my key',
+				'status'  => 'active',
+				'message' => 'Success!',
+			]
+		);
 
 		$this->assertEquals( 'my key', $this->addon->get_license_key() );
 
@@ -198,11 +208,13 @@ class Test_Addon extends WP_UnitTestCase {
 	 * @since 4.2
 	 */
 	public function test_get_license_status() {
-		$this->addon->update_license_info( [
-			'license' => 'my key',
-			'status'  => 'active',
-			'message' => 'Success!',
-		] );
+		$this->addon->update_license_info(
+			[
+				'license' => 'my key',
+				'status'  => 'active',
+				'message' => 'Success!',
+			]
+		);
 
 		$this->assertEquals( 'active', $this->addon->get_license_status() );
 
@@ -213,11 +225,13 @@ class Test_Addon extends WP_UnitTestCase {
 	 * @since 4.2
 	 */
 	public function test_get_license_message() {
-		$this->addon->update_license_info( [
-			'license' => 'my key',
-			'status'  => 'active',
-			'message' => 'Success!',
-		] );
+		$this->addon->update_license_info(
+			[
+				'license' => 'my key',
+				'status'  => 'active',
+				'message' => 'Success!',
+			]
+		);
 
 		$this->assertEquals( 'Success!', $this->addon->get_license_message() );
 
@@ -237,33 +251,33 @@ class Test_Addon extends WP_UnitTestCase {
 	 * @since 4.2
 	 */
 	public function test_schedule_license_check() {
-		$ApiResponse = function() {
+		$api_response = function() {
 			return [
 				'response' => [ 'code' => 201 ],
 			];
 		};
 
-		add_filter( 'pre_http_request', $ApiResponse );
+		add_filter( 'pre_http_request', $api_response );
 
 		$this->assertFalse( wp_next_scheduled( 'gfpdf_' . $this->addon->get_slug() . '_license_check' ) );
 		$this->assertFalse( $this->addon->schedule_license_check() );
 		$this->assertNotFalse( wp_next_scheduled( 'gfpdf_' . $this->addon->get_slug() . '_license_check' ) );
 
-		remove_filter( 'pre_http_request', $ApiResponse );
+		remove_filter( 'pre_http_request', $api_response );
 
-		$ApiResponse = function() {
+		$api_response = function() {
 			return [
 				'response' => [ 'code' => 200 ],
 				'body'     => json_encode( [ 'license' => 'revoked' ] ),
 			];
 		};
 
-		add_filter( 'pre_http_request', $ApiResponse );
+		add_filter( 'pre_http_request', $api_response );
 
 		$this->assertTrue( $this->addon->schedule_license_check() );
 		$this->assertEquals( 'Your license key has been disabled', $this->addon->get_license_message() );
 
-		remove_filter( 'pre_http_request', $ApiResponse );
+		remove_filter( 'pre_http_request', $api_response );
 		$this->addon->delete_license_info();
 	}
 

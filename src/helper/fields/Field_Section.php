@@ -29,23 +29,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -92,13 +92,13 @@ class Field_Section extends Helper_Abstract_Fields {
 
 		/* Run our own checks against the fields to test for issues */
 		$fields    = GFCommon::get_section_fields( $this->form, $this->field->id );
-		$PDF_model = GPDFAPI::get_mvc_class( 'Model_PDF' );
+		$pdf_model = GPDFAPI::get_mvc_class( 'Model_PDF' );
 		$products  = new Field_Products( new GF_Field(), $this->entry, $this->gform, $this->misc );
 
 		$empty = true;
 		foreach ( $fields as $field ) {
 			if ( 'section' !== $field->type ) {
-				$class = $PDF_model->get_field_class( $field, $this->form, $this->entry, $products );
+				$class = $pdf_model->get_field_class( $field, $this->form, $this->entry, $products );
 				if ( ! $class->is_empty() ) {
 					$empty = false;
 					break;
@@ -144,7 +144,7 @@ class Field_Section extends Helper_Abstract_Fields {
 		/* sanitize the HTML */
 		$section = $this->value(); /* allow the same HTML as per the post editor */
 
-		$html = '<div id="field-' . $this->field->id . '" class="gfpdf-section-title gfpdf-field '. $this->field->cssClass .'">';
+		$html  = '<div id="field-' . $this->field->id . '" class="gfpdf-section-title gfpdf-field ' . $this->field->cssClass . '">';
 		$html .= '<h3>' . $section['title'] . '</h3>';
 
 		if ( ! empty( $value ) ) {
@@ -158,7 +158,8 @@ class Field_Section extends Helper_Abstract_Fields {
 		 *
 		 * @since 4.1
 		 */
-		return apply_filters( 'gfpdf_field_section_break_html',
+		return apply_filters(
+			'gfpdf_field_section_break_html',
 			$html,
 			$section['title'],
 			$section['description'],
@@ -182,12 +183,14 @@ class Field_Section extends Helper_Abstract_Fields {
 			return $this->cache();
 		}
 
-		$this->cache( [
-			'title'       => esc_html( $this->field->label ),
-			'description' => wp_kses_post(
-				$this->gform->process_tags( $this->field->description, $this->form, $this->entry )
-			),
-		] );
+		$this->cache(
+			[
+				'title'       => esc_html( $this->field->label ),
+				'description' => wp_kses_post(
+					$this->gform->process_tags( $this->field->description, $this->form, $this->entry )
+				),
+			]
+		);
 
 		return $this->cache();
 	}

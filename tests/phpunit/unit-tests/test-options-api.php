@@ -19,23 +19,23 @@ use WP_UnitTestCase;
  */
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -131,7 +131,8 @@ class Test_Options_API extends WP_UnitTestCase {
 	 * @since 4.2
 	 */
 	public function test_update_settings() {
-		$oldsettings = $settings = $this->options->get_settings();
+		$oldsettings = $this->options->get_settings();
+		$settings    = $oldsettings;
 
 		$this->assertEquals( 'custom', $settings['default_pdf_size'] );
 		$settings['default_pdf_size'] = 'Letter';
@@ -252,37 +253,61 @@ class Test_Options_API extends WP_UnitTestCase {
 		$this->assertTrue( isset( $items['form_settings_advanced'] ) );
 
 		/* Check filters work correctly */
-		add_filter( 'gfpdf_settings_general', function ( $array ) {
-			return 'General Settings';
-		} );
+		add_filter(
+			'gfpdf_settings_general',
+			function( $array ) {
+				return 'General Settings';
+			}
+		);
 
-		add_filter( 'gfpdf_settings_general_security', function ( $array ) {
-			return 'General Security Settings';
-		} );
+		add_filter(
+			'gfpdf_settings_general_security',
+			function( $array ) {
+				return 'General Security Settings';
+			}
+		);
 
-		add_filter( 'gfpdf_settings_extensions', function ( $array ) {
-			return 'Extension Settings';
-		} );
+		add_filter(
+			'gfpdf_settings_extensions',
+			function( $array ) {
+				return 'Extension Settings';
+			}
+		);
 
-		add_filter( 'gfpdf_settings_licenses', function ( $array ) {
-			return 'License Settings';
-		} );
+		add_filter(
+			'gfpdf_settings_licenses',
+			function( $array ) {
+				return 'License Settings';
+			}
+		);
 
-		add_filter( 'gfpdf_settings_tools', function ( $array ) {
-			return 'Tools Settings';
-		} );
+		add_filter(
+			'gfpdf_settings_tools',
+			function( $array ) {
+				return 'Tools Settings';
+			}
+		);
 
-		add_filter( 'gfpdf_form_settings', function ( $array ) {
-			return 'PDF Form Settings';
-		} );
+		add_filter(
+			'gfpdf_form_settings',
+			function( $array ) {
+				return 'PDF Form Settings';
+			}
+		);
 
-		add_filter( 'gfpdf_form_settings_appearance', function ( $array ) {
-			return 'PDF Form Settings Appearance';
-		} );
+		add_filter(
+			'gfpdf_form_settings_appearance',
+			function( $array ) {
+				return 'PDF Form Settings Appearance';
+			}
+		);
 
-		add_filter( 'gfpdf_form_settings_advanced', function ( $array ) {
-			return 'PDF Form Settings Advanced';
-		} );
+		add_filter(
+			'gfpdf_form_settings_advanced',
+			function( $array ) {
+				return 'PDF Form Settings Advanced';
+			}
+		);
 
 		/* reset items */
 		$items = $this->options->get_registered_fields();
@@ -413,21 +438,21 @@ class Test_Options_API extends WP_UnitTestCase {
 		$this->options->update_pdf( $this->form_id, $pid, $pdf );
 
 		/* check the update was successful */
-		$newPDF = $this->options->get_pdf( $this->form_id, $pid );
+		$new_pdf = $this->options->get_pdf( $this->form_id, $pid );
 
 		/* ensure everything worked correctly */
-		$this->assertEquals( 'My New Name', $newPDF['name'] );
-		$this->assertSame( false, $newPDF['active'] );
+		$this->assertEquals( 'My New Name', $new_pdf['name'] );
+		$this->assertSame( false, $new_pdf['active'] );
 
 		/* remove local cache and retest */
 		$gfpdf->data->form_settings = [];
 
 		/* retest */
-		$newPDF = $this->options->get_pdf( $this->form_id, $pid );
+		$new_pdf = $this->options->get_pdf( $this->form_id, $pid );
 
 		/* ensure everything worked correctly */
-		$this->assertEquals( 'My New Name', $newPDF['name'] );
-		$this->assertSame( false, $newPDF['active'] );
+		$this->assertEquals( 'My New Name', $new_pdf['name'] );
+		$this->assertSame( false, $new_pdf['active'] );
 
 		/* check the auto delete functionality works correctly */
 		$this->options->update_pdf( $this->form_id, $pid );
@@ -464,9 +489,12 @@ class Test_Options_API extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_get_pdf_filter() {
-		add_filter( 'gfpdf_pdf_config', function () {
-			return 'main filter fired';
-		} );
+		add_filter(
+			'gfpdf_pdf_config',
+			function() {
+				return 'main filter fired';
+			}
+		);
 
 		/* check filter was triggered */
 		$this->assertEquals( 'main filter fired', $this->options->get_pdf( $this->form_id, '555ad84787d7e' ) );
@@ -475,9 +503,12 @@ class Test_Options_API extends WP_UnitTestCase {
 		remove_all_filters( 'gfpdf_pdf_config' );
 
 		/* run individual form ID filter */
-		add_filter( 'gfpdf_pdf_config_' . $this->form_id, function () {
-			return 'ID filter fired';
-		} );
+		add_filter(
+			'gfpdf_pdf_config_' . $this->form_id,
+			function() {
+				return 'ID filter fired';
+			}
+		);
 
 		/* check filter was triggered */
 		$this->assertEquals( 'ID filter fired', $this->options->get_pdf( $this->form_id, '555ad84787d7e' ) );
@@ -490,9 +521,15 @@ class Test_Options_API extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_add_pdf_filter() {
-		add_filter( 'gfpdf_form_add_pdf', function () {
-			return [ 'id' => 'id', 'name' => 'Add Filter Fired' ];
-		} );
+		add_filter(
+			'gfpdf_form_add_pdf',
+			function() {
+				return [
+					'id'   => 'id',
+					'name' => 'Add Filter Fired',
+				];
+			}
+		);
 
 		/* run our method */
 		$id = $this->options->add_pdf( $this->form_id, [ 'name' => 'test' ] );
@@ -504,9 +541,15 @@ class Test_Options_API extends WP_UnitTestCase {
 		/* cleanup filters */
 		remove_all_filters( 'gfpdf_pdf_config' );
 
-		add_filter( 'gfpdf_form_add_pdf_' . $this->form_id, function () {
-			return [ 'id' => 'id', 'name' => 'ID Add Filter Fired' ];
-		} );
+		add_filter(
+			'gfpdf_form_add_pdf_' . $this->form_id,
+			function() {
+				return [
+					'id'   => 'id',
+					'name' => 'ID Add Filter Fired',
+				];
+			}
+		);
 
 		/* run our method */
 		$id = $this->options->add_pdf( $this->form_id, [ 'name' => 'test' ] );
@@ -523,9 +566,12 @@ class Test_Options_API extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_update_pdf_filter() {
-		add_filter( 'gfpdf_form_update_pdf', function () {
-			return [ 'name' => 'Update Filter Fired' ];
-		} );
+		add_filter(
+			'gfpdf_form_update_pdf',
+			function() {
+				return [ 'name' => 'Update Filter Fired' ];
+			}
+		);
 
 		/* run our method */
 		$this->options->update_pdf( $this->form_id, '555ad84787d7e', [ 'name' => 'test' ] );
@@ -537,9 +583,12 @@ class Test_Options_API extends WP_UnitTestCase {
 		/* cleanup filters */
 		remove_all_filters( 'gfpdf_pdf_config' );
 
-		add_filter( 'gfpdf_form_update_pdf_' . $this->form_id, function () {
-			return [ 'name' => 'ID Update Filter Fired' ];
-		} );
+		add_filter(
+			'gfpdf_form_update_pdf_' . $this->form_id,
+			function() {
+				return [ 'name' => 'ID Update Filter Fired' ];
+			}
+		);
 
 		/* run our method */
 		$this->options->update_pdf( $this->form_id, '555ad84787d7e', [ 'name' => 'test' ] );
@@ -569,18 +618,24 @@ class Test_Options_API extends WP_UnitTestCase {
 		$this->assertTrue( $this->options->get_option( 'non-existant', true ) );
 
 		/* check filters */
-		add_filter( 'gfpdf_get_option', function ( $value ) {
-			return 'New Value';
-		} );
+		add_filter(
+			'gfpdf_get_option',
+			function( $value ) {
+				return 'New Value';
+			}
+		);
 
 		$this->assertEquals( 'New Value', $this->options->get_option( 'default_pdf_size' ) );
 
 		/* clean up */
 		remove_all_filters( 'gfpdf_get_option' );
 
-		add_filter( 'gfpdf_get_option_default_rtl', function ( $value ) {
-			return 'RTL';
-		} );
+		add_filter(
+			'gfpdf_get_option_default_rtl',
+			function( $value ) {
+				return 'RTL';
+			}
+		);
 
 		$this->assertEquals( 'RTL', $this->options->get_option( 'default_rtl' ) );
 
@@ -603,18 +658,24 @@ class Test_Options_API extends WP_UnitTestCase {
 		$this->assertEquals( 'new pdf size', $this->options->get_option( 'default_pdf_size' ) );
 
 		/* Check filters */
-		add_filter( 'gfpdf_update_option', function ( $value ) {
-			return 'filtered option';
-		} );
+		add_filter(
+			'gfpdf_update_option',
+			function( $value ) {
+				return 'filtered option';
+			}
+		);
 
 		$this->assertTrue( $this->options->update_option( 'default_pdf_size', 'new pdf size' ) );
 		$this->assertEquals( 'filtered option', $this->options->get_option( 'default_pdf_size' ) );
 
 		remove_all_filters( 'gfpdf_update_option' );
 
-		add_filter( 'gfpdf_update_option_default_restrict_owner', function ( $value ) {
-			return 'filtered admin option';
-		} );
+		add_filter(
+			'gfpdf_update_option_default_restrict_owner',
+			function( $value ) {
+				return 'filtered admin option';
+			}
+		);
 
 		$this->assertTrue( $this->options->update_option( 'default_pdf_size', 'new pdf size' ) );
 		$this->assertEquals( 'new pdf size', $this->options->get_option( 'default_pdf_size' ) );
@@ -1048,7 +1109,6 @@ class Test_Options_API extends WP_UnitTestCase {
 				'Yes',
 			],
 
-
 			/* Test Blank Radio */
 			[
 				[
@@ -1062,14 +1122,13 @@ class Test_Options_API extends WP_UnitTestCase {
 				'',
 			],
 
-
 			/* Test Settings Select */
 			[
 				[
 					'id'      => 'admin_capabilities',
 					'type'    => 'select',
 					'options' => [
-						'Gravity Forms Capabilities' => [
+						'Gravity Forms Capabilities'    => [
 							'gform_view_settings',
 						],
 
@@ -1105,7 +1164,6 @@ class Test_Options_API extends WP_UnitTestCase {
 				'Yes',
 			],
 
-
 			/* Test Blank Select */
 			[
 				[
@@ -1118,7 +1176,6 @@ class Test_Options_API extends WP_UnitTestCase {
 				],
 				'',
 			],
-
 
 			/* Test Settings Text */
 			[
@@ -1148,7 +1205,6 @@ class Test_Options_API extends WP_UnitTestCase {
 				'Working',
 			],
 
-
 			/* Test Blank Text */
 			[
 				[
@@ -1164,10 +1220,12 @@ class Test_Options_API extends WP_UnitTestCase {
 	 * @since 4.2
 	 */
 	public function test_get_form_value_licensing() {
-		$results = $this->options->get_form_value( [
-			'id' => 'test',
-			'type' => 'license'
-		] );
+		$results = $this->options->get_form_value(
+			[
+				'id'   => 'test',
+				'type' => 'license',
+			]
+		);
 
 		$this->assertArrayHasKey( 'key', $results );
 		$this->assertArrayHasKey( 'msg', $results );

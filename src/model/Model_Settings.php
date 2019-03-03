@@ -28,23 +28,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -189,10 +189,13 @@ class Model_Settings extends Helper_Abstract_Model {
 			/* update transient */
 			set_transient( 'settings_errors', $updated_settings_error, 30 );
 
-			$this->log->addNotice( 'PDF Settings Errors', [
-				'original' => $this->form_settings_errors,
-				'cleaned'  => $updated_settings_error,
-			] );
+			$this->log->addNotice(
+				'PDF Settings Errors',
+				[
+					'original' => $this->form_settings_errors,
+					'cleaned'  => $updated_settings_error,
+				]
+			);
 		}
 	}
 
@@ -394,9 +397,12 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		/* If errors were found then return */
 		if ( sizeof( $errors ) > 0 ) {
-			$this->log->addError( 'Install Error.', [
-				'errors' => $errors,
-			] );
+			$this->log->addError(
+				'Install Error.',
+				[
+					'errors' => $errors,
+				]
+			);
 
 			return [ 'errors' => $errors ];
 		} else {
@@ -458,9 +464,12 @@ class Model_Settings extends Helper_Abstract_Model {
 		$results = $this->process_font( $payload );
 
 		/* If we reached this point the results were successful so return the new object */
-		$this->log->addNotice( 'AJAX – Successfully Saved Font', [
-			'results' => $results,
-		] );
+		$this->log->addNotice(
+			'AJAX – Successfully Saved Font',
+			[
+				'results' => $results,
+			]
+		);
 
 		echo json_encode( $results );
 		wp_die();
@@ -528,7 +537,7 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		/* Check we have the required data */
 		if ( ! isset( $font['font_name'] ) || ! isset( $font['regular'] ) ||
-		     strlen( $font['font_name'] ) === 0 || strlen( $font['regular'] ) === 0
+			 strlen( $font['font_name'] ) === 0 || strlen( $font['regular'] ) === 0
 		) {
 
 			$return = [
@@ -669,16 +678,18 @@ class Model_Settings extends Helper_Abstract_Model {
 
 					/* Check if the web server responded with a OK status code and we can read the contents of our file, then fail our test */
 					if ( isset( $response['response']['code'] ) && $response['response']['code'] === 200 &&
-					     isset( $response['body'] ) && $response['body'] === 'failed-if-read'
+						 isset( $response['body'] ) && $response['body'] === 'failed-if-read'
 					) {
 						$response_object = $response['http_response'];
 						$raw_response    = $response_object->get_response_object();
 						$this->log->warning(
-							'PDF temporary directory not protected', [
-							'url'         => $raw_response->url,
-							'status_code' => $raw_response->status_code,
-							'response'    => $raw_response->raw,
-						] );
+							'PDF temporary directory not protected',
+							[
+								'url'         => $raw_response->url,
+								'status_code' => $raw_response->status_code,
+								'response'    => $raw_response->raw,
+							]
+						);
 
 						$return = false;
 					}
@@ -777,10 +788,10 @@ class Model_Settings extends Helper_Abstract_Model {
 
 			/* Check this add-on key was submitted, it isn't the same as previously, or it's not active */
 			if ( isset( $input[ $option_key ] )
-			     && (
-				     ( isset( $settings[ $option_key ] ) && $settings[ $option_key ] !== $input[ $option_key ] ) ||
-				     $input[ $option_key . '_status' ] !== 'active'
-			     )
+				 && (
+					 ( isset( $settings[ $option_key ] ) && $settings[ $option_key ] !== $input[ $option_key ] ) ||
+					 $input[ $option_key . '_status' ] !== 'active'
+				 )
 			) {
 				$results = $this->activate_license( $addon, $input[ $option_key ] );
 
@@ -810,16 +821,19 @@ class Model_Settings extends Helper_Abstract_Model {
 	 */
 	protected function activate_license( Helper_Abstract_Addon $addon, $license_key ) {
 
-		$response = wp_remote_post( $this->data->store_url, [
-			'timeout'   => 15,
-			'sslverify' => false,
-			'body'      => [
-				'edd_action' => 'activate_license',
-				'license'    => $license_key,
-				'item_name'  => urlencode( $addon->get_short_name() ), // the name of our product in EDD
-				'url'        => home_url(),
-			],
-		] );
+		$response = wp_remote_post(
+			$this->data->store_url,
+			[
+				'timeout'   => 15,
+				'sslverify' => false,
+				'body'      => [
+					'edd_action' => 'activate_license',
+					'license'    => $license_key,
+					'item_name'  => urlencode( $addon->get_short_name() ), // the name of our product in EDD
+					'url'        => home_url(),
+				],
+			]
+		);
 
 		$possible_responses = $this->data->addon_license_responses( $addon->get_name() );
 
@@ -876,16 +890,18 @@ class Model_Settings extends Helper_Abstract_Model {
 		if ( ! empty( $addon ) ) {
 			if ( $this->deactivate_license_key( $addon, $license ) ) {
 				$this->log->addNotice( 'AJAX – Successfully Deactivated License' );
-				echo json_encode( [
+				echo json_encode(
+					[
 						'success' => esc_html__( 'License deactivated.', 'gravity-forms-pdf-extended' ),
 					]
 				);
 
 				wp_die();
-			} elseif( $addon->schedule_license_check() ) {
+			} elseif ( $addon->schedule_license_check() ) {
 				$license_info = $addon->get_license_info();
 
-				echo json_encode( [
+				echo json_encode(
+					[
 						'error' => $license_info['message'],
 					]
 				);
@@ -896,9 +912,11 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		$this->log->addError( 'AJAX Endpoint Error' );
 
-		echo json_encode( [
-			'error' => esc_html__( 'An error occurred during deactivation, please try again', 'gravity-forms-pdf-extended' ),
-		] );
+		echo json_encode(
+			[
+				'error' => esc_html__( 'An error occurred during deactivation, please try again', 'gravity-forms-pdf-extended' ),
+			]
+		);
 
 		wp_die();
 	}
@@ -915,16 +933,19 @@ class Model_Settings extends Helper_Abstract_Model {
 	 */
 	public function deactivate_license_key( Helper_Abstract_Addon $addon, $license_key ) {
 
-		$response = wp_remote_post( $this->data->store_url, [
-			'timeout'   => 15,
-			'sslverify' => false,
-			'body'      => [
-				'edd_action' => 'deactivate_license',
-				'license'    => $license_key,
-				'item_name'  => urlencode( $addon->get_short_name() ), // the name of our product in EDD
-				'url'        => home_url(),
-			],
-		] );
+		$response = wp_remote_post(
+			$this->data->store_url,
+			[
+				'timeout'   => 15,
+				'sslverify' => false,
+				'body'      => [
+					'edd_action' => 'deactivate_license',
+					'license'    => $license_key,
+					'item_name'  => urlencode( $addon->get_short_name() ), // the name of our product in EDD
+					'url'        => home_url(),
+				],
+			]
+		);
 
 		/* If API error exit early */
 		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
@@ -940,10 +961,13 @@ class Model_Settings extends Helper_Abstract_Model {
 		/* Remove license data from database */
 		$addon->delete_license_info();
 
-		$this->log->addNotice( 'License successfully deactivated', [
-			'slug'    => $addon->get_slug(),
-			'license' => $license_key,
-		] );
+		$this->log->addNotice(
+			'License successfully deactivated',
+			[
+				'slug'    => $addon->get_slug(),
+				'license' => $license_key,
+			]
+		);
 
 		return true;
 	}

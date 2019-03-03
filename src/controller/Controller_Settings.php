@@ -31,23 +31,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -146,9 +146,9 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	public function init() {
 
 		/*
-         * Tell Gravity Forms to initiate our settings page
-         * Using the following Class/Model
-         */
+		 * Tell Gravity Forms to initiate our settings page
+		 * Using the following Class/Model
+		 */
 		GFForms::add_settings_page( $this->data->short_title, [ $this, 'display_page' ] );
 
 		/* Ensure any errors are stored correctly */
@@ -180,7 +180,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		 * If multisite only the super admin can uninstall the software. This is due to how the plugin shares similar directory structures across networked sites
 		 */
 		if ( ( ! is_multisite() && $this->gform->has_capability( 'gravityforms_uninstall' ) ) ||
-		     ( is_multisite() && is_super_admin() )
+			 ( is_multisite() && is_super_admin() )
 		) {
 			add_action( 'gfpdf_post_tools_settings_page', [ $this->view, 'uninstaller' ], 5 );
 		}
@@ -245,23 +245,23 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		switch ( $page ) {
 			case 'general':
 				$this->view->general();
-			break;
+				break;
 
 			case 'tools':
 				$this->view->tools();
-			break;
+				break;
 
 			case 'license':
 				$this->view->license();
-			break;
+				break;
 
 			case 'extensions':
 				$this->view->extensions();
-			break;
+				break;
 
 			case 'help':
 				$this->view->help();
-			break;
+				break;
 		}
 	}
 
@@ -277,12 +277,15 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		/* because current_user_can() doesn't handle Gravity Forms permissions quite correct we'll do our checks here */
 		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
 
-			$this->log->addCritical( 'Lack of User Capabilities.', [
-				'user'      => wp_get_current_user(),
-				'user_meta' => get_user_meta( get_current_user_id() ),
-			] );
+			$this->log->addCritical(
+				'Lack of User Capabilities.',
+				[
+					'user'      => wp_get_current_user(),
+					'user_meta' => get_user_meta( get_current_user_id() ),
+				]
+			);
 
-			wp_die( esc_html__( 'Access Denied' ), 403 );
+			wp_die( esc_html__( 'Access Denied', 'default' ), 403 );
 		}
 
 		/* the user is authenticated by the above so let's pass in the lowest permissions */
@@ -327,10 +330,13 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		/* check if the user has permission to copy the templates */
 		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
 
-			$this->log->addCritical( 'Lack of User Capabilities.', [
-				'user'      => wp_get_current_user(),
-				'user_meta' => get_user_meta( get_current_user_id() ),
-			] );
+			$this->log->addCritical(
+				'Lack of User Capabilities.',
+				[
+					'user'      => wp_get_current_user(),
+					'user_meta' => get_user_meta( get_current_user_id() ),
+				]
+			);
 
 			return null;
 		}

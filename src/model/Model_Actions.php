@@ -26,23 +26,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -175,7 +175,7 @@ class Model_Actions extends Helper_Abstract_Model {
 				return true;
 			} else {
 				/* Check other multisites for a config file */
-				$sites = ( function_exists( 'get_sites' ) ) ? get_sites() : wp_get_sites();
+				$sites = get_sites();
 
 				foreach ( $sites as $site ) {
 					$site = (array) $site; /* Back-compat: ensure the new site object introduced in 4.6 gets converted back to an array */
@@ -230,7 +230,7 @@ class Model_Actions extends Helper_Abstract_Model {
 		if ( is_multisite() ) {
 
 			/* Verify we have a site to migrate */
-			$sites = ( function_exists( 'get_sites' ) ) ? get_sites() : wp_get_sites();
+			$sites = get_sites();
 			$found = false;
 
 			foreach ( $sites as $site ) {
@@ -255,8 +255,7 @@ class Model_Actions extends Helper_Abstract_Model {
 				/* Add our migration script */
 				wp_enqueue_script( 'gfpdf_js_v3_migration' );
 			}
-
-		} else if ( is_file( $this->data->template_location . 'configuration.php' ) ) {
+		} elseif ( is_file( $this->data->template_location . 'configuration.php' ) ) {
 			$this->migrate_v3( $this->data->template_location );
 		}
 	}
@@ -326,7 +325,7 @@ class Model_Actions extends Helper_Abstract_Model {
 	 * @since  4.0
 	 */
 	private function get_multisite_ids_with_v3_config() {
-		$sites    = ( function_exists( 'get_sites' ) ) ? get_sites() : wp_get_sites();
+		$sites    = get_sites();
 		$blog_ids = [];
 
 		foreach ( $sites as $site ) {
@@ -352,11 +351,11 @@ class Model_Actions extends Helper_Abstract_Model {
 	public function ajax_multisite_v3_migration() {
 
 		/* @todo Dependacy inject these when we move all AJAX calls to their own class */
-		$log = GPDFAPI::get_log_class();
+		$log  = GPDFAPI::get_log_class();
 		$misc = GPDFAPI::get_misc_class();
 
 		/* Ensure multisite website */
-		if( ! is_multisite() ) {
+		if ( ! is_multisite() ) {
 			/* Unauthorized response */
 			wp_die( '401', 401 );
 		}

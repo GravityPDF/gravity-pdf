@@ -25,23 +25,23 @@ use WP_User;
  */
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -268,8 +268,8 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 		$this->assertInternalType( 'integer', $user_id );
 
 		/*
-         * Set up our users and test the privilages
-         */
+		 * Set up our users and test the privilages
+		 */
 		wp_set_current_user( $user_id );
 		$this->assertFalse( $gfpdf->gform->has_capability( 'gravityforms_edit_settings' ) );
 
@@ -278,8 +278,8 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 		$this->assertInternalType( 'integer', $user_id );
 
 		/*
-         * Add the user capability
-         */
+		 * Add the user capability
+		 */
 		$user = new WP_User( $user_id );
 		$user->add_cap( 'gravityforms_edit_settings' );
 
@@ -292,8 +292,8 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 		$this->assertInternalType( 'integer', $user_id );
 
 		/*
-         * Add the user capability
-         */
+		 * Add the user capability
+		 */
 		$user = new WP_User( $user_id );
 		$user->add_cap( 'gform_full_access' );
 
@@ -325,23 +325,23 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 		$form = RGFormsModel::get_form_meta( $GLOBALS['GFPDF_Test']->form['gravityform-1']['id'] );
 
 		/*
-         * Check the basics
-         * Title is there, field number is correct
-         */
+		 * Check the basics
+		 * Title is there, field number is correct
+		 */
 		$this->assertEquals( 'Simple Form Testing', $form['title'] );
 		$this->assertEquals( true, is_array( $form['fields'] ) );
 		$this->assertEquals( 7, sizeof( $form['fields'] ) );
 		$this->assertEquals( 1, $form['is_active'] );
 
 		/*
-         * Run through each field type and ensure the correct data is present
-         */
+		 * Run through each field type and ensure the correct data is present
+		 */
 		foreach ( $form['fields'] as $field ) {
 			switch ( $field['type'] ) {
 				case 'name':
 					$this->assertEquals( $field['inputs'][0]['id'], $field['id'] . '.3' );
 					$this->assertEquals( $field['inputs'][1]['id'], $field['id'] . '.6' );
-				break;
+					break;
 
 				case 'address':
 					$this->assertEquals( $field['inputs'][0]['id'], $field['id'] . '.1' );
@@ -350,31 +350,31 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 					$this->assertEquals( $field['inputs'][3]['id'], $field['id'] . '.4' );
 					$this->assertEquals( $field['inputs'][4]['id'], $field['id'] . '.5' );
 					$this->assertEquals( $field['inputs'][5]['id'], $field['id'] . '.6' );
-				break;
+					break;
 
 				case 'email':
 					$this->assertEquals( 3, $field['id'] );
-				break;
+					break;
 
 				case 'phone':
 					$this->assertEquals( 4, $field['id'] );
 					$this->assertEquals( 'standard', $field['phoneFormat'] );
-				break;
+					break;
 
 				case 'select':
 				case 'multiselect':
 					$this->assertEquals( 3, sizeof( $field['choices'] ) );
-				break;
+					break;
 
 				case 'textarea':
 					$this->assertEquals( 7, $field['id'] );
-				break;
+					break;
 			}
 		}
 
 		/*
-         * Run through the notifications
-         */
+		 * Run through the notifications
+		 */
 		$this->assertEquals( 2, sizeof( $form['notifications'] ) );
 
 		$form['notifications'] = array_values( $form['notifications'] );
@@ -526,9 +526,9 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 		$this->assertEquals( true, is_string( $version ) );
 
 		/*
-         * Do a final test to match the version number according to a set standard
-         * This will validate up to a four digit version x.x.x.x
-         */
+		 * Do a final test to match the version number according to a set standard
+		 * This will validate up to a four digit version x.x.x.x
+		 */
 		$this->assertRegExp( '/^(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)/', $version );
 	}
 }

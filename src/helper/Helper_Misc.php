@@ -28,23 +28,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -107,7 +107,7 @@ class Helper_Misc {
 	public function is_gfpdf_page() {
 		if ( is_admin() ) {
 			if ( isset( $_GET['page'] ) && 'gfpdf-' === ( substr( $_GET['page'], 0, 6 ) ) ||
-			     ( isset( $_GET['subview'] ) && 'PDF' === strtoupper( $_GET['subview'] ) )
+				 ( isset( $_GET['subview'] ) && 'PDF' === strtoupper( $_GET['subview'] ) )
 			) {
 				return true;
 			}
@@ -152,9 +152,9 @@ class Helper_Misc {
 	public function get_field_class( $type ) {
 
 		/* Format the type name correctly */
-		$typeArray = explode( '_', $type );
-		$typeArray = array_map( 'ucwords', $typeArray );
-		$type      = implode( '_', $typeArray );
+		$type_array = explode( '_', $type );
+		$type_array = array_map( 'ucwords', $type_array );
+		$type       = implode( '_', $type_array );
 
 		/* See if we have a class that matches */
 		$fqns = 'GFPDF\Helper\Fields\Field_';
@@ -234,8 +234,8 @@ class Helper_Misc {
 					 * If the direct parent is a link, we'll wrap the link in the DIV instead
 					 */
 					if ( strlen( $image_classes ) > 0 ) {
-						$parent_node = $image->parent()->get(0);
-						if( $parent_node instanceof \DOMElement && $parent_node->nodeName === 'a' ) {
+						$parent_node = $image->parent()->get( 0 );
+						if ( $parent_node instanceof \DOMElement && $parent_node->nodeName === 'a' ) {
 							$image->parent()->wrap( '<div class="' . $image_classes . '"></div>' );
 						} else {
 							$image->wrap( '<div class="' . $image_classes . '"></div>' );
@@ -305,10 +305,10 @@ class Helper_Misc {
 		$rgb = str_split( $hexcolor, 2 );
 
 		foreach ( $rgb as &$hex ) {
-			$dec = hexdec( $hex );
+			$dec  = hexdec( $hex );
 			$dec += $diff;
-			$dec = max( 0, min( 255, $dec ) );
-			$hex = str_pad( dechex( $dec ), 2, '0', STR_PAD_LEFT );
+			$dec  = max( 0, min( 255, $dec ) );
+			$hex  = str_pad( dechex( $dec ), 2, '0', STR_PAD_LEFT );
 		}
 
 		return '#' . implode( $rgb );
@@ -384,15 +384,18 @@ class Helper_Misc {
 
 			foreach ( $files as $fileinfo ) {
 				$function = ( $fileinfo->isDir() ) ? 'rmdir' : 'unlink';
-				if ( ! @$function( $fileinfo->getRealPath() ) ) {
+				if ( ! $function( $fileinfo->getRealPath() ) ) {
 					throw new Exception( 'Could not run ' . $function . ' on  ' . $fileinfo->getRealPath() );
 				}
 			}
 		} catch ( Exception $e ) {
-			$this->log->addError( 'Filesystem Delete Error', [
-				'dir'       => $dir,
-				'exception' => $e->getMessage(),
-			] );
+			$this->log->addError(
+				'Filesystem Delete Error',
+				[
+					'dir'       => $dir,
+					'exception' => $e->getMessage(),
+				]
+			);
 
 			return new WP_Error( 'recursion_delete_problem', $e );
 		}
@@ -428,9 +431,12 @@ class Helper_Misc {
 		try {
 			if ( ! is_dir( $destination ) ) {
 				if ( ! wp_mkdir_p( $destination ) ) {
-					$this->log->addError( 'Failed Creating Folder Structure', [
-						'dir' => $destination,
-					] );
+					$this->log->addError(
+						'Failed Creating Folder Structure',
+						[
+							'dir' => $destination,
+						]
+					);
 
 					throw new Exception( 'Could not create folder structure at ' . $destination );
 				}
@@ -444,28 +450,37 @@ class Helper_Misc {
 			foreach ( $files as $fileinfo ) {
 				if ( $fileinfo->isDir() && ! file_exists( $destination . $files->getSubPathName() ) ) {
 					if ( ! @mkdir( $destination . $files->getSubPathName() ) ) {
-						$this->log->addError( 'Failed Creating Folder', [
-							'dir' => $destination . $files->getSubPathName(),
-						] );
+						$this->log->addError(
+							'Failed Creating Folder',
+							[
+								'dir' => $destination . $files->getSubPathName(),
+							]
+						);
 
 						throw new Exception( 'Could not create folder at ' . $destination . $files->getSubPathName() );
 					}
 				} elseif ( ! $fileinfo->isDir() ) {
-					if ( ! @copy( $fileinfo, $destination . $files->getSubPathName() ) ) {
-						$this->log->addError( 'Failed Creating File', [
-							'file' => $destination . $files->getSubPathName(),
-						] );
+					if ( ! copy( $fileinfo, $destination . $files->getSubPathName() ) ) {
+						$this->log->addError(
+							'Failed Creating File',
+							[
+								'file' => $destination . $files->getSubPathName(),
+							]
+						);
 						throw new Exception( 'Could not create file at ' . $destination . $files->getSubPathName() );
 					}
 				}
 			}
 		} catch ( Exception $e ) {
 
-			$this->log->addError( 'Filesystem Copy Error', [
-				'source'      => $source,
-				'destination' => $destination,
-				'exception'   => $e->getMessage(),
-			] );
+			$this->log->addError(
+				'Filesystem Copy Error',
+				[
+					'source'      => $source,
+					'destination' => $destination,
+					'exception'   => $e->getMessage(),
+				]
+			);
 
 			return new WP_Error( 'recursion_copy_problem', $e );
 		}
@@ -522,7 +537,8 @@ class Helper_Misc {
 			$dir = path_join( ABSPATH, $upload_path );
 		}
 
-		if ( ! $url = get_option( 'upload_url_path' ) ) {
+		$url = get_option( 'upload_url_path' );
+		if ( ! $url ) {
 			if ( empty( $upload_path ) || ( 'wp-content/uploads' == $upload_path ) || ( $upload_path == $dir ) ) {
 				$url = WP_CONTENT_URL . '/uploads';
 			} else {
@@ -693,9 +709,12 @@ class Helper_Misc {
 			$ids = explode( ',', $leads );
 
 			/* ensure all passed ids are integers */
-			array_walk( $ids, function ( &$id ) {
-				$id = (int) $id;
-			} );
+			array_walk(
+				$ids,
+				function( &$id ) {
+					$id = (int) $id;
+				}
+			);
 
 			/* filter our any zero-value ids */
 			$ids = array_filter( $ids );
@@ -893,7 +912,7 @@ class Helper_Misc {
 	public function in_array( $needle, $haystack, $strict = true ) {
 		foreach ( $haystack as $item ) {
 			if ( ( $strict ? $item === $needle : $item == $needle ) ||
-			     ( is_array( $item ) && $this->in_array( $needle, $item, $strict ) )
+				 ( is_array( $item ) && $this->in_array( $needle, $item, $strict ) )
 			) {
 				return true;
 			}
@@ -935,14 +954,17 @@ class Helper_Misc {
 	 */
 	public function handle_ajax_authentication( $endpoint_desc, $capability = 'gravityforms_edit_settings', $nonce_name = 'gfpdf_ajax_nonce' ) {
 
-		$this->log->addNotice( 'Running AJAX Endpoint', [
-			'type' => $endpoint_desc,
-			'post' => $_POST,
-		] );
+		$this->log->addNotice(
+			'Running AJAX Endpoint',
+			[
+				'type' => $endpoint_desc,
+				'post' => $_POST,
+			]
+		);
 
 		/*
-         * Validate Endpoint
-         */
+		 * Validate Endpoint
+		 */
 		$nonce = ( isset( $_POST['nonce'] ) ) ? $_POST['nonce'] : '';
 		if ( ! wp_verify_nonce( $nonce, $nonce_name ) ) {
 
@@ -955,11 +977,14 @@ class Helper_Misc {
 		/* prevent unauthorized access */
 		if ( $capability !== false && ! $this->gform->has_capability( $capability ) ) {
 
-			$this->log->addCritical( 'Lack of User Capabilities', [
-				'user'              => wp_get_current_user(),
-				'user_meta'         => get_user_meta( get_current_user_id() ),
-				'capability_needed' => $capability,
-			] );
+			$this->log->addCritical(
+				'Lack of User Capabilities',
+				[
+					'user'              => wp_get_current_user(),
+					'user_meta'         => get_user_meta( get_current_user_id() ),
+					'capability_needed' => $capability,
+				]
+			);
 
 			/* Unauthorized response */
 			wp_die( '401', 401 );

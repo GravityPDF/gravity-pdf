@@ -20,23 +20,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -166,9 +166,13 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			</tr>
 			</thead>
 
-			<tbody id="the-list" <?php if ( $singular ) {
+			<tbody id="the-list" 
+			<?php
+			if ( $singular ) {
 				echo " class='list:$singular'";
-			} ?>>
+			}
+			?>
+			>
 			<?php $this->display_rows_or_placeholder(); ?>
 			</tbody>
 
@@ -240,12 +244,12 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$state_nonce = wp_create_nonce( "gfpdf_state_nonce_{$form_id}_{$item['id']}" );
 		?>
 
-		<img data-id="<?php echo $item['id'] ?>" data-nonce="<?php echo $state_nonce; ?>"
-		     data-fid="<?php echo $form_id; ?>"
-		     src="<?php echo $this->gform->get_plugin_url() ?>/images/active<?php echo intval( $is_active ) ?>.png"
-		     style="cursor: pointer;margin:-1px 0 0 8px;"
-		     alt="<?php $is_active ? esc_attr__( 'Active', 'gravity-forms-pdf-extended' ) : esc_attr__( 'Inactive', 'gravity-forms-pdf-extended' ); ?>"
-		     title="<?php echo $is_active ? esc_attr__( 'Active', 'gravity-forms-pdf-extended' ) : esc_attr__( 'Inactive', 'gravity-forms-pdf-extended' ); ?>"/>
+		<img data-id="<?php echo $item['id']; ?>" data-nonce="<?php echo $state_nonce; ?>"
+			 data-fid="<?php echo $form_id; ?>"
+			 src="<?php echo $this->gform->get_plugin_url(); ?>/images/active<?php echo intval( $is_active ); ?>.png"
+			 style="cursor: pointer;margin:-1px 0 0 8px;"
+			 alt="<?php $is_active ? esc_attr__( 'Active', 'gravity-forms-pdf-extended' ) : esc_attr__( 'Inactive', 'gravity-forms-pdf-extended' ); ?>"
+			 title="<?php echo $is_active ? esc_attr__( 'Active', 'gravity-forms-pdf-extended' ) : esc_attr__( 'Inactive', 'gravity-forms-pdf-extended' ); ?>"/>
 
 		<?php
 	}
@@ -354,8 +358,8 @@ class Helper_PDF_List_Table extends WP_List_Table {
 					$divider = $key == $last_key ? '' : ' | ';
 					?>
 					<span class="<?php echo $key; ?>">
-                        <?php echo $html . $divider; ?>
-                    </span>
+						<?php echo $html . $divider; ?>
+					</span>
 					<?php
 				}
 			}
@@ -372,6 +376,6 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * @since 4.0
 	 */
 	public function no_items() {
-		printf( esc_html__( "This form doesn't have any PDFs. Let's go %screate one%s.", 'gravity-forms-pdf-extended' ), "<a href='" . add_query_arg( [ 'pid' => 0 ] ) . "'>", '</a>' );
+		printf( esc_html__( "This form doesn't have any PDFs. Let's go %1\$screate one%2\$s.", 'gravity-forms-pdf-extended' ), "<a href='" . add_query_arg( [ 'pid' => 0 ] ) . "'>", '</a>' );
 	}
 }

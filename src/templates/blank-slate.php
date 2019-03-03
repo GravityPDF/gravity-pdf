@@ -2,7 +2,7 @@
 
 /*
  * Template Name: Blank Slate
- * Version: 1.2
+ * Version: 1.2.1
  * Description: A print-friendly template focusing solely on the user-submitted data. Through the Template tab you can control the PDF header and footer, change the background color or image, and show or hide the form title, page names, HTML fields and the Section Break descriptions.
  * Author: Gravity PDF
  * Author URI: https://gravitypdf.com
@@ -14,7 +14,7 @@
 
 /* Prevent direct access to the template */
 if ( ! class_exists( 'GFForms' ) ) {
-    return;
+	return;
 }
 
 /*
@@ -35,185 +35,185 @@ if ( ! class_exists( 'GFForms' ) ) {
 <!-- Include styles needed for the PDF -->
 <style>
 
-    /* Handle Gravity Forms CSS Ready Classes */
-    .row-separator {
-        clear: both;
-        padding: 1.25mm 0;
-    }
+	/* Handle Gravity Forms CSS Ready Classes */
+	.row-separator {
+		clear: both;
+		padding: 1.25mm 0;
+	}
 
-    .gf_left_half,
-    .gf_left_third, .gf_middle_third,
-    .gf_first_quarter, .gf_second_quarter, .gf_third_quarter,
-    .gf_list_2col li, .gf_list_3col li, .gf_list_4col li, .gf_list_5col li {
-        float: left;
-    }
+	.gf_left_half,
+	.gf_left_third, .gf_middle_third,
+	.gf_first_quarter, .gf_second_quarter, .gf_third_quarter,
+	.gf_list_2col li, .gf_list_3col li, .gf_list_4col li, .gf_list_5col li {
+		float: left;
+	}
 
-    .gf_right_half,
-    .gf_right_third,
-    .gf_fourth_quarter {
-        float: right;
-    }
+	.gf_right_half,
+	.gf_right_third,
+	.gf_fourth_quarter {
+		float: right;
+	}
 
-    .gf_left_half, .gf_right_half,
-    .gf_list_2col li {
-        width: 49%;
-    }
+	.gf_left_half, .gf_right_half,
+	.gf_list_2col li {
+		width: 49%;
+	}
 
-    .gf_left_third, .gf_middle_third, .gf_right_third,
-    .gf_list_3col li {
-        width: 32.3%;
-    }
+	.gf_left_third, .gf_middle_third, .gf_right_third,
+	.gf_list_3col li {
+		width: 32.3%;
+	}
 
-    .gf_first_quarter, .gf_second_quarter, .gf_third_quarter, .gf_fourth_quarter {
-        width: 24%;
-    }
+	.gf_first_quarter, .gf_second_quarter, .gf_third_quarter, .gf_fourth_quarter {
+		width: 24%;
+	}
 
-    .gf_list_4col li {
-        width: 24%;
-    }
+	.gf_list_4col li {
+		width: 24%;
+	}
 
-    .gf_list_5col li {
-        width: 19%;
-    }
+	.gf_list_5col li {
+		width: 19%;
+	}
 
-    .gf_left_half, .gf_right_half {
-        padding-right: 1%;
-    }
+	.gf_left_half, .gf_right_half {
+		padding-right: 1%;
+	}
 
-    .gf_left_third, .gf_middle_third, .gf_right_third {
-        padding-right: 1.505%;
-    }
+	.gf_left_third, .gf_middle_third, .gf_right_third {
+		padding-right: 1.505%;
+	}
 
-    .gf_first_quarter, .gf_second_quarter, .gf_third_quarter, .gf_fourth_quarter {
-        padding-right: 1.333%;
-    }
+	.gf_first_quarter, .gf_second_quarter, .gf_third_quarter, .gf_fourth_quarter {
+		padding-right: 1.333%;
+	}
 
-    .gf_right_half, .gf_right_third, .gf_fourth_quarter {
-        padding-right: 0;
-    }
+	.gf_right_half, .gf_right_third, .gf_fourth_quarter {
+		padding-right: 0;
+	}
 
-    /* Don't double float the list items if already floated (mPDF does not support this ) */
-    .gf_left_half li, .gf_right_half li,
-    .gf_left_third li, .gf_middle_third li, .gf_right_third li {
-        width: 100% !important;
-        float: none !important;
-    }
+	/* Don't double float the list items if already floated (mPDF does not support this ) */
+	.gf_left_half li, .gf_right_half li,
+	.gf_left_third li, .gf_middle_third li, .gf_right_third li {
+		width: 100% !important;
+		float: none !important;
+	}
 
-    /*
-     * Headings
-     */
-    h3 {
-        margin: 1.5mm 0 0.5mm;
-        padding: 0;
-    }
+	/*
+	 * Headings
+	 */
+	h3 {
+		margin: 1.5mm 0 0.5mm;
+		padding: 0;
+	}
 
-    /*
-     * Quiz Style Support
-     */
-    .gquiz-field {
-        color: #666;
-    }
+	/*
+	 * Quiz Style Support
+	 */
+	.gquiz-field {
+		color: #666;
+	}
 
-    .gquiz-correct-choice {
-        font-weight: bold;
-        color: black;
-    }
+	.gquiz-correct-choice {
+		font-weight: bold;
+		color: black;
+	}
 
-    .gf-quiz-img {
-        padding-left: 5px !important;
-        vertical-align: middle;
-    }
+	.gf-quiz-img {
+		padding-left: 5px !important;
+		vertical-align: middle;
+	}
 
-    /*
-     * Survey Style Support
-     */
-    .gsurvey-likert-choice-label {
-        padding: 4px;
-    }
+	/*
+	 * Survey Style Support
+	 */
+	.gsurvey-likert-choice-label {
+		padding: 4px;
+	}
 
-    .gsurvey-likert-choice, .gsurvey-likert-choice-label {
-        text-align: center;
-    }
+	.gsurvey-likert-choice, .gsurvey-likert-choice-label {
+		text-align: center;
+	}
 
-    /*
-     * Terms of Service (Gravity Perks) Support
-     */
-    .terms-of-service-agreement {
-        padding-top: 2px;
-        font-weight: bold;
-    }
+	/*
+	 * Terms of Service (Gravity Perks) Support
+	 */
+	.terms-of-service-agreement {
+		padding-top: 2px;
+		font-weight: bold;
+	}
 
-    .terms-of-service-tick {
-        font-size: 150%;
-    }
+	.terms-of-service-tick {
+		font-size: 150%;
+	}
 
-    /*
-     * List Support
-     */
-    ul, ol {
-        margin: 0;
-        padding-left: 1mm;
-        padding-right: 1mm;
-    }
+	/*
+	 * List Support
+	 */
+	ul, ol {
+		margin: 0;
+		padding-left: 1mm;
+		padding-right: 1mm;
+	}
 
-    li {
-        margin: 0;
-        padding: 0;
-        list-style-position: inside;
-    }
+	li {
+		margin: 0;
+		padding: 0;
+		list-style-position: inside;
+	}
 
-    /*
-     * Header / Footer
-     */
-    .alignleft {
-        float: left;
-    }
+	/*
+	 * Header / Footer
+	 */
+	.alignleft {
+		float: left;
+	}
 
-    .alignright {
-        float: right;
-    }
+	.alignright {
+		float: right;
+	}
 
-    .aligncenter {
-        text-align: center;
-    }
+	.aligncenter {
+		text-align: center;
+	}
 
-    p.alignleft {
-        text-align: left;
-        float: none;
-    }
+	p.alignleft {
+		text-align: left;
+		float: none;
+	}
 
-    p.alignright {
-        text-align: right;
-        float: none;
-    }
+	p.alignright {
+		text-align: right;
+		float: none;
+	}
 
-    /*
-     * Independant Template Styles
-     */
-    .row-separator .gfpdf-field {
-        margin-bottom: 10px;
-    }
+	/*
+	 * Independant Template Styles
+	 */
+	.row-separator .gfpdf-field {
+		margin-bottom: 10px;
+	}
 
-    #form_title {
-        margin: 0;
-        font-size: 150%;
-    }
+	#form_title {
+		margin: 0;
+		font-size: 150%;
+	}
 
-    .product-field-title {
-        margin: 0;
-    }
+	.product-field-title {
+		margin: 0;
+	}
 
-    .gfpdf-field .label {
-       padding-bottom: 5px;
-    }
+	.gfpdf-field .label {
+	   padding-bottom: 5px;
+	}
 
-    .gfpdf-field .value {
+	.gfpdf-field .value {
 
-    }
+	}
 
-    .gfield_list th, table.entry-products td.emptycell, table.entry-products th {
-        background: none;
-    }
+	.gfield_list th, table.entry-products td.emptycell, table.entry-products th {
+		background: none;
+	}
 
 </style>
 
@@ -223,12 +223,12 @@ if ( ! class_exists( 'GFForms' ) ) {
 /*
  * Load our core-specific styles from our PDF settings which will be passed to the PDF template $config array
  */
-$show_form_title      = ( ! empty( $settings['show_form_title'] ) && $settings['show_form_title'] == 'Yes' )            ? true : false;
-$show_page_names      = ( ! empty( $settings['show_page_names'] ) && $settings['show_page_names'] == 'Yes' )            ? true : false;
-$show_html            = ( ! empty( $settings['show_html'] ) && $settings['show_html'] == 'Yes' )                        ? true : false;
-$show_section_content = ( ! empty( $settings['show_section_content'] ) && $settings['show_section_content'] == 'Yes' )  ? true : false;
-$enable_conditional   = ( ! empty( $settings['enable_conditional'] ) && $settings['enable_conditional'] == 'Yes' )      ? true : false;
-$show_empty           = ( ! empty( $settings['show_empty'] ) && $settings['show_empty'] == 'Yes' )                      ? true : false;
+$show_form_title      = ( ! empty( $settings['show_form_title'] ) && $settings['show_form_title'] == 'Yes' ) ? true : false;
+$show_page_names      = ( ! empty( $settings['show_page_names'] ) && $settings['show_page_names'] == 'Yes' ) ? true : false;
+$show_html            = ( ! empty( $settings['show_html'] ) && $settings['show_html'] == 'Yes' ) ? true : false;
+$show_section_content = ( ! empty( $settings['show_section_content'] ) && $settings['show_section_content'] == 'Yes' ) ? true : false;
+$enable_conditional   = ( ! empty( $settings['enable_conditional'] ) && $settings['enable_conditional'] == 'Yes' ) ? true : false;
+$show_empty           = ( ! empty( $settings['show_empty'] ) && $settings['show_empty'] == 'Yes' ) ? true : false;
 
 /**
  * Set up our configuration array to control what is and is not shown in the generated PDF
@@ -236,19 +236,19 @@ $show_empty           = ( ! empty( $settings['show_empty'] ) && $settings['show_
  * @var array
  */
 $html_config = array(
-    'settings'  => $settings,
-    'meta'      => array(
-        'echo'                     => true, /* whether to output the HTML or return it */
-        'exclude'                  => true, /* whether we should exclude fields with a CSS value of 'exclude'. Default to true */
-        'empty'                    => $show_empty, /* whether to show empty fields or not. Default is false */
-        'conditional'              => $enable_conditional, /* whether we should skip fields hidden with conditional logic. Default to true. */
-        'show_title'               => $show_form_title, /* whether we should show the form title. Default to true */
-        'section_content'          => $show_section_content, /* whether we should include a section breaks content. Default to false */
-        'page_names'               => $show_page_names, /* whether we should show the form's page names. Default to false */
-        'html_field'               => $show_html, /* whether we should show the form's html fields. Default to false */
-        'individual_products'      => false, /* Whether to show individual fields in the entry. Default to false - they are grouped together at the end of the form */
-        'enable_css_ready_classes' => true, /* Whether to enable or disable Gravity Forms CSS Ready Class support in your PDF */
-    ),
+	'settings' => $settings,
+	'meta'     => array(
+		'echo'                     => true, /* whether to output the HTML or return it */
+		'exclude'                  => true, /* whether we should exclude fields with a CSS value of 'exclude'. Default to true */
+		'empty'                    => $show_empty, /* whether to show empty fields or not. Default is false */
+		'conditional'              => $enable_conditional, /* whether we should skip fields hidden with conditional logic. Default to true. */
+		'show_title'               => $show_form_title, /* whether we should show the form title. Default to true */
+		'section_content'          => $show_section_content, /* whether we should include a section breaks content. Default to false */
+		'page_names'               => $show_page_names, /* whether we should show the form's page names. Default to false */
+		'html_field'               => $show_html, /* whether we should show the form's html fields. Default to false */
+		'individual_products'      => false, /* Whether to show individual fields in the entry. Default to false - they are grouped together at the end of the form */
+		'enable_css_ready_classes' => true, /* Whether to enable or disable Gravity Forms CSS Ready Class support in your PDF */
+	),
 );
 
 /*

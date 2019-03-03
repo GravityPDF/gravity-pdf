@@ -15,23 +15,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -42,13 +42,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class EDD_SL_Plugin_Updater {
 
-	private $api_url = '';
-	private $api_data = [];
-	private $name = '';
-	private $slug = '';
-	private $version = '';
+	private $api_url     = '';
+	private $api_data    = [];
+	private $name        = '';
+	private $slug        = '';
+	private $version     = '';
 	private $wp_override = false;
-	private $cache_key = '';
+	private $cache_key   = '';
 
 	private $health_check_timeout = 5;
 
@@ -141,7 +141,13 @@ class EDD_SL_Plugin_Updater {
 		$version_info = $this->get_cached_version_info();
 
 		if ( false === $version_info ) {
-			$version_info = $this->api_request( 'plugin_latest_version', [ 'slug' => $this->slug, 'beta' => $this->beta ] );
+			$version_info = $this->api_request(
+				'plugin_latest_version',
+				[
+					'slug' => $this->slug,
+					'beta' => $this->beta,
+				]
+			);
 
 			$this->set_version_info_cache( $version_info );
 
@@ -199,7 +205,13 @@ class EDD_SL_Plugin_Updater {
 			$version_info = $this->get_cached_version_info();
 
 			if ( false === $version_info ) {
-				$version_info = $this->api_request( 'plugin_latest_version', [ 'slug' => $this->slug, 'beta' => $this->beta ] );
+				$version_info = $this->api_request(
+					'plugin_latest_version',
+					[
+						'slug' => $this->slug,
+						'beta' => $this->beta,
+					]
+				);
 
 				// Since we disabled our filter for the transient, we aren't running our object conversion on banners, sections, or icons. Do this now:
 				if ( isset( $version_info->banners ) && ! is_array( $version_info->banners ) ) {
@@ -254,7 +266,7 @@ class EDD_SL_Plugin_Updater {
 
 			if ( empty( $version_info->download_link ) ) {
 				printf(
-					__( 'There is a new version of %1$s available. %2$sView version %3$s details%4$s.', 'easy-digital-downloads' ),
+					__( 'There is a new version of %1$s available. %2$sView version %3$s details%4$s.', 'gravity-forms-pdf-extended' ),
 					esc_html( $version_info->name ),
 					'<a target="_blank" class="thickbox" href="' . esc_url( $changelog_link ) . '">',
 					esc_html( $version_info->new_version ),
@@ -262,7 +274,7 @@ class EDD_SL_Plugin_Updater {
 				);
 			} else {
 				printf(
-					__( 'There is a new version of %1$s available. %2$sView version %3$s details%4$s or %5$supdate now%6$s.', 'easy-digital-downloads' ),
+					__( 'There is a new version of %1$s available. %2$sView version %3$s details%4$s or %5$supdate now%6$s.', 'gravity-forms-pdf-extended' ),
 					esc_html( $version_info->name ),
 					'<a target="_blank" class="thickbox" href="' . esc_url( $changelog_link ) . '">',
 					esc_html( $version_info->new_version ),
@@ -272,7 +284,9 @@ class EDD_SL_Plugin_Updater {
 				);
 			}
 
+			/* phpcs:disable */
 			do_action( "in_plugin_update_message-{$file}", $plugin, $version_info );
+			/* phpcs:enable */
 
 			echo '</div></td></tr>';
 		}
@@ -329,7 +343,6 @@ class EDD_SL_Plugin_Updater {
 			if ( false !== $api_response ) {
 				$_data = $api_response;
 			}
-
 		} else {
 			$_data = $edd_api_request_transient;
 		}
@@ -420,7 +433,13 @@ class EDD_SL_Plugin_Updater {
 				$edd_plugin_url_available[ $store_hash ] = false;
 			} else {
 				$test_url                                = $scheme . '://' . $host . $port;
-				$response                                = wp_remote_get( $test_url, [ 'timeout' => $this->health_check_timeout, 'sslverify' => true ] );
+				$response                                = wp_remote_get(
+					$test_url,
+					[
+						'timeout'   => $this->health_check_timeout,
+						'sslverify' => true,
+					]
+				);
 				$edd_plugin_url_available[ $store_hash ] = is_wp_error( $response ) ? false : true;
 			}
 		}
@@ -452,7 +471,14 @@ class EDD_SL_Plugin_Updater {
 		];
 
 		$verify_ssl = $this->verify_ssl();
-		$request    = wp_remote_post( $this->api_url, [ 'timeout' => 15, 'sslverify' => $verify_ssl, 'body' => $api_params ] );
+		$request    = wp_remote_post(
+			$this->api_url,
+			[
+				'timeout'   => 15,
+				'sslverify' => $verify_ssl,
+				'body'      => $api_params,
+			]
+		);
 
 		if ( ! is_wp_error( $request ) ) {
 			$request = json_decode( wp_remote_retrieve_body( $request ) );
@@ -498,7 +524,7 @@ class EDD_SL_Plugin_Updater {
 		}
 
 		if ( ! current_user_can( 'update_plugins' ) ) {
-			wp_die( __( 'You do not have permission to install plugin updates', 'easy-digital-downloads' ), __( 'Error', 'easy-digital-downloads' ), [ 'response' => 403 ] );
+			wp_die( __( 'You do not have permission to install plugin updates', 'gravity-forms-pdf-extended' ), __( 'Error', 'gravity-forms-pdf-extended' ), [ 'response' => 403 ] );
 		}
 
 		$data         = $edd_plugin_data[ $_REQUEST['slug'] ];
@@ -519,12 +545,18 @@ class EDD_SL_Plugin_Updater {
 			];
 
 			$verify_ssl = $this->verify_ssl();
-			$request    = wp_remote_post( $this->api_url, [ 'timeout' => 15, 'sslverify' => $verify_ssl, 'body' => $api_params ] );
+			$request    = wp_remote_post(
+				$this->api_url,
+				[
+					'timeout'   => 15,
+					'sslverify' => $verify_ssl,
+					'body'      => $api_params,
+				]
+			);
 
 			if ( ! is_wp_error( $request ) ) {
 				$version_info = json_decode( wp_remote_retrieve_body( $request ) );
 			}
-
 
 			if ( ! empty( $version_info ) && isset( $version_info->sections ) ) {
 				$version_info->sections = maybe_unserialize( $version_info->sections );

@@ -26,23 +26,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -162,7 +162,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	public function maybe_disable_submission_notifications( $is_disabled, $notification, $form, $entry ) {
 
 		/* If a plugin has already disabled notifications we won't queue up the notifications/PDFs as a background process */
-		if( $is_disabled ) {
+		if ( $is_disabled ) {
 			$this->disable_queue = true;
 
 			return $is_disabled;
@@ -209,10 +209,13 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 		/* Disable notification if PDF needs to be attached to it */
 		foreach ( $pdfs as $pdf ) {
 			if ( $this->model_pdf->maybe_attach_to_notification( $notification, $pdf, $entry, $form ) ) {
-				$this->log->addNotice( 'Gravity Forms Notification Delayed for Async Processing', [
-					'notification' => $notification,
-					'pdf'          => $pdf,
-				] );
+				$this->log->addNotice(
+					'Gravity Forms Notification Delayed for Async Processing',
+					[
+						'notification' => $notification,
+						'pdf'          => $pdf,
+					]
+				);
 
 				return true;
 			}
@@ -230,7 +233,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 * @since 5.0
 	 */
 	public function queue_async_form_submission_tasks( $entry, $form ) {
-		if( ! $this->disable_queue ) {
+		if ( ! $this->disable_queue ) {
 			/* Push and trigger async queue */
 			$this->queue
 				->push_to_queue( $this->get_queue_tasks( $entry, $form ) )
@@ -313,9 +316,12 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 
 		$queue_data = apply_filters( 'gfpdf_queue_pre_dispatch', $queue_data, $entry, $form );
 
-		$this->log->addNotice( 'PDF Background Processing Queue', [
-			'queue' => $queue_data,
-		] );
+		$this->log->addNotice(
+			'PDF Background Processing Queue',
+			[
+				'queue' => $queue_data,
+			]
+		);
 
 		return $queue_data;
 	}
@@ -332,9 +338,12 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 */
 	protected function get_active_notifications( $form, $entry ) {
 		$notifications = GFCommon::get_notifications_to_send( 'form_submission', $form, $entry );
-		$notifications = array_filter( $notifications, function( $notification ) {
-			return ( ! isset( $notification['isActive'] ) || $notification['isActive'] );
-		} );
+		$notifications = array_filter(
+			$notifications,
+			function( $notification ) {
+				return ( ! isset( $notification['isActive'] ) || $notification['isActive'] );
+			}
+		);
 
 		return $notifications;
 	}

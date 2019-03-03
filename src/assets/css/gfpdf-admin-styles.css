@@ -1,10 +1,7 @@
-
-/**
+/*
  * CSS file included on all WordPress Admin Pages
  * If style is targetted directly at Gravity PDF admin pages include in gfpdf-styles.css instead
  */
-
-
 @media only screen and (min-width: 600px) {
 	.notice.gfpdf-alert-mascot {
 		padding-left: 145px !important;

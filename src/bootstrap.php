@@ -25,23 +25,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /*
@@ -187,7 +187,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function init() {
 
 		/* Set up our logger is not running via CLI (unit testing) */
-		$logger = new Helper\Helper_Logger( 'gravity-pdf', 'Gravity PDF' );
+		$logger    = new Helper\Helper_Logger( 'gravity-pdf', 'Gravity PDF' );
 		$this->log = $logger->get_logger();
 
 		/* Set up our form object */
@@ -477,16 +477,16 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Insert our own styles into the TinyMCE editor
 	 *
-	 * @param array $mceInit
+	 * @param array $mce_init
 	 *
 	 * @return array
 	 *
 	 * @since 4.4
 	 */
-	public function tinymce_styles( $mceInit ) {
-		$style                    = "body#tinymce { max-width: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;}";
-		$mceInit['content_style'] = ( isset( $mceInit['content_style'] ) ) ? $mceInit['content_style'] . ' ' . $style : $style;
-		return $mceInit;
+	public function tinymce_styles( $mce_init ) {
+		$style                     = "body#tinymce { max-width: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;}";
+		$mce_init['content_style'] = ( isset( $mce_init['content_style'] ) ) ? $mce_init['content_style'] . ' ' . $style : $style;
+		return $mce_init;
 	}
 
 	/**
@@ -649,9 +649,12 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function welcome_screen() {
 
 		$model = new Model\Model_Welcome_Screen( $this->log );
-		$view  = new View\View_Welcome_Screen( [
-			'display_version' => PDF_EXTENDED_VERSION,
-		], $this->gform );
+		$view  = new View\View_Welcome_Screen(
+			[
+				'display_version' => PDF_EXTENDED_VERSION,
+			],
+			$this->gform
+		);
 
 		$class = new Controller\Controller_Welcome_Screen( $model, $view, $this->log, $this->data, $this->options );
 		$class->init();
@@ -895,9 +898,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @return void
 	 */
 	public function async_pdfs() {
-		$queue = new Helper\Helper_Pdf_Queue( $this->log );
+		$queue     = new Helper\Helper_Pdf_Queue( $this->log );
 		$model_pdf = $this->singleton->get_class( 'Model_PDF' );
-		$class = new Controller\Controller_Pdf_Queue( $queue, $model_pdf, $this->log );
+		$class     = new Controller\Controller_Pdf_Queue( $queue, $model_pdf, $this->log );
 
 		if ( $this->options->get_option( 'background_processing', 'Disable' ) === 'Enable' ) {
 			$class->init();
@@ -938,12 +941,15 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		if ( is_wp_error( $settings ) ) {
 
-			$this->log->addError( 'Invalid PDF Settings.', [
-				'form_id'          => $form_id,
-				'pid'              => $pid,
-				'WP_Error_Message' => $settings->get_error_message(),
-				'WP_Error_Code'    => $settings->get_error_code(),
-			] );
+			$this->log->addError(
+				'Invalid PDF Settings.',
+				[
+					'form_id'          => $form_id,
+					'pid'              => $pid,
+					'WP_Error_Message' => $settings->get_error_message(),
+					'WP_Error_Code'    => $settings->get_error_code(),
+				]
+			);
 
 			/* Reset the settings so it forces everything to false */
 			$settings = [];

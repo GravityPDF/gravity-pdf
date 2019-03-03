@@ -32,23 +32,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -201,11 +201,13 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$pdf_table->prepare_items();
 
 		/* pass to view */
-		$controller->view->list( [
-			'title'       => $this->data->title,
-			'add_new_url' => $add_new_url = add_query_arg( [ 'pid' => 0 ] ),
-			'list_items'  => $pdf_table,
-		] );
+		$controller->view->list(
+			[
+				'title'       => $this->data->title,
+				'add_new_url' => $add_new_url = add_query_arg( [ 'pid' => 0 ] ),
+				'list_items'  => $pdf_table,
+			]
+		);
 	}
 
 	/**
@@ -259,14 +261,16 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		wp_enqueue_editor();
 
 		/* pass to view */
-		$controller->view->add_edit( [
-			'pdf_id'           => $pdf_id,
-			'title'            => $label,
-			'button_label'     => $label,
-			'form'             => $form,
-			'entry_meta'       => $entry_meta,
-			'pdf'              => $pdf,
-		] );
+		$controller->view->add_edit(
+			[
+				'pdf_id'       => $pdf_id,
+				'title'        => $label,
+				'button_label' => $label,
+				'form'         => $form,
+				'entry_meta'   => $entry_meta,
+				'pdf'          => $pdf,
+			]
+		);
 	}
 
 	/**
@@ -283,10 +287,13 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* prevent unauthorized access */
 		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
-			$this->log->addCritical( 'Lack of User Capabilities.', [
-				'user'      => wp_get_current_user(),
-				'user_meta' => get_user_meta( get_current_user_id() ),
-			] );
+			$this->log->addCritical(
+				'Lack of User Capabilities.',
+				[
+					'user'      => wp_get_current_user(),
+					'user_meta' => get_user_meta( get_current_user_id() ),
+				]
+			);
 
 			wp_die( esc_html__( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
 		}
@@ -308,10 +315,13 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* check appropriate settings */
 		if ( ! is_array( $input ) || ! $pdf_id ) {
-			$this->log->addError( 'Invalid Data.', [
-				'post' => $input,
-				'pid'  => $pdf_id,
-			] );
+			$this->log->addError(
+				'Invalid Data.',
+				[
+					'post' => $input,
+					'pid'  => $pdf_id,
+				]
+			);
 
 			$this->notices->add_error( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-forms-pdf-extended' ) );
 
@@ -332,7 +342,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* Do validation */
 		if ( empty( $sanitized['name'] ) || empty( $sanitized['filename'] ) ||
-		     ( $sanitized['pdf_size'] == 'CUSTOM' && ( (int) $sanitized['custom_pdf_size'][0] === 0 || (int) $sanitized['custom_pdf_size'][1] === 0 ) )
+			 ( $sanitized['pdf_size'] == 'CUSTOM' && ( (int) $sanitized['custom_pdf_size'][0] === 0 || (int) $sanitized['custom_pdf_size'][1] === 0 ) )
 		) {
 			$this->notices->add_error( esc_html__( 'PDF could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
 
@@ -347,13 +357,16 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* If it updated, let's update the global variable */
 		if ( $did_update !== false ) {
-			$this->log->addNotice( 'Successfully Saved Global PDF Settings.', [
-				'form_id'  => $form_id,
-				'pdf_id'   => $pdf_id,
-				'settings' => $sanitized,
-			] );
+			$this->log->addNotice(
+				'Successfully Saved Global PDF Settings.',
+				[
+					'form_id'  => $form_id,
+					'pdf_id'   => $pdf_id,
+					'settings' => $sanitized,
+				]
+			);
 
-			$this->notices->add_notice( sprintf( esc_html__( 'PDF saved successfully. %sBack to PDF list.%s', 'gravity-forms-pdf-extended' ), '<a href="' . remove_query_arg( 'pid' ) . '">', '</a>' ) );
+			$this->notices->add_notice( sprintf( esc_html__( 'PDF saved successfully. %1$sBack to PDF list.%2$s', 'gravity-forms-pdf-extended' ), '<a href="' . remove_query_arg( 'pid' ) . '">', '</a>' ) );
 
 			return true;
 		}
@@ -499,7 +512,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 						/*
 						 * General filter
 						 *
-					 * See https://gravitypdf.com/documentation/v5/gfpdf_form_settings_sanitize/ for more details about this filter
+						* See https://gravitypdf.com/documentation/v5/gfpdf_form_settings_sanitize/ for more details about this filter
 						 */
 						$input[ $key ] = apply_filters( 'gfpdf_form_settings_sanitize', $input[ $key ], $key, $input, $settings[ $s ][ $key ] );
 
@@ -507,7 +520,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 							/*
 							 * Field type specific filter
 							 *
-						 * See https://gravitypdf.com/documentation/v5/gfpdf_form_settings_sanitize/ for more details about this filter
+							* See https://gravitypdf.com/documentation/v5/gfpdf_form_settings_sanitize/ for more details about this filter
 							 */
 							$input[ $key ] = apply_filters( 'gfpdf_form_settings_sanitize_' . $type, $input[ $key ], $key, $input, $settings[ $s ][ $key ] );
 						}
@@ -606,10 +619,13 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* If class isn't an instance of our interface return $settings */
 		if ( ! ( $class instanceof Helper_Interface_Config ) ) {
 
-			$this->log->addWarning( 'Instanceof Failed.', [
-				'object' => get_class( $class ),
-				'type'   => 'Helper_Interface_Config',
-			] );
+			$this->log->addWarning(
+				'Instanceof Failed.',
+				[
+					'object' => get_class( $class ),
+					'type'   => 'Helper_Interface_Config',
+				]
+			);
 
 			return $settings;
 		}
@@ -653,12 +669,12 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			'enable_conditional'   => [ $this->options, 'get_conditional_display_field' ],
 			'show_empty'           => [ $this->options, 'get_empty_display_field' ],
 
-			'background_color' => [ $this->options, 'get_background_color_field' ],
-			'background_image' => [ $this->options, 'get_background_image_field' ],
-			'header'           => [ $this->options, 'get_header_field' ],
-			'first_header'     => [ $this->options, 'get_first_page_header_field' ],
-			'footer'           => [ $this->options, 'get_footer_field' ],
-			'first_footer'     => [ $this->options, 'get_first_page_footer_field' ],
+			'background_color'     => [ $this->options, 'get_background_color_field' ],
+			'background_image'     => [ $this->options, 'get_background_image_field' ],
+			'header'               => [ $this->options, 'get_header_field' ],
+			'first_header'         => [ $this->options, 'get_first_page_header_field' ],
+			'footer'               => [ $this->options, 'get_footer_field' ],
+			'first_footer'         => [ $this->options, 'get_first_page_footer_field' ],
 		];
 
 		/* See https://gravitypdf.com/documentation/v5/gfpdf_core_template_fields_list/ for more details about this filter */
@@ -802,8 +818,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function duplicate_gf_pdf_setting() {
 
-		$fid   = ( isset( $_POST['fid'] ) ) ? (int) $_POST['fid'] : 0;
-		$pid   = ( isset( $_POST['pid'] ) ) ? $_POST['pid'] : '';
+		$fid = ( isset( $_POST['fid'] ) ) ? (int) $_POST['fid'] : 0;
+		$pid = ( isset( $_POST['pid'] ) ) ? $_POST['pid'] : '';
 
 		$nonce_id = "gfpdf_duplicate_nonce_{$fid}_{$pid}";
 
@@ -842,10 +858,13 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			}
 		}
 
-		$this->log->addError( 'AJAX Endpoint Failed', [
-			'WP_Error_Message' => $config->get_error_message(),
-			'WP_Error_Code'    => $config->get_error_code(),
-		] );
+		$this->log->addError(
+			'AJAX Endpoint Failed',
+			[
+				'WP_Error_Message' => $config->get_error_message(),
+				'WP_Error_Code'    => $config->get_error_code(),
+			]
+		);
 
 		/* Internal Server Error */
 		wp_die( '500', 500 );
@@ -898,10 +917,13 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			}
 		}
 
-		$this->log->addError( 'AJAX Endpoint Failed', [
-			'WP_Error_Message' => $config->get_error_message(),
-			'WP_Error_Code'    => $config->get_error_code(),
-		] );
+		$this->log->addError(
+			'AJAX Endpoint Failed',
+			[
+				'WP_Error_Message' => $config->get_error_message(),
+				'WP_Error_Code'    => $config->get_error_code(),
+			]
+		);
 
 		/* Internal Server Error */
 		wp_die( '500', 500 );
@@ -935,10 +957,14 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			$template_type = mb_strtolower( $template_data['group'] );
 
 			/* add our filter to override what template gets rendered (by default it is the current selected template in the config) */
-			add_filter( 'gfpdf_form_settings_custom_appearance', function () use ( &$settings ) {
-				/* check if the template has any configuration */
-				return $settings;
-			}, 100 );
+			add_filter(
+				'gfpdf_form_settings_custom_appearance',
+				function() use ( &$settings ) {
+					/* check if the template has any configuration */
+					return $settings;
+				},
+				100
+			);
 
 			/* Remove any TinyMCE custom plugins which causes loading issues */
 			remove_all_filters( 'mce_external_plugins' );
@@ -954,9 +980,9 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			$html = ob_get_clean();
 
 			/*
-             * Pass the required wp_editor IDs and settings in our AJAX response so the client
-             * can correctly load the instances.
-             */
+			 * Pass the required wp_editor IDs and settings in our AJAX response so the client
+			 * can correctly load the instances.
+			 */
 			$editors = [];
 
 			foreach ( $settings as $field ) {

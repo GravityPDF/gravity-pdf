@@ -2,7 +2,7 @@
 
 /* For backwards compatibility reasons this file will be in the global namespace */
 
-use GFPDF\Helper\Fields\Field_v3_Products;
+use GFPDF\Helper\Fields\Field_V3_Products;
 
 /**
  * Deprecated Functionality / Classes
@@ -19,23 +19,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -401,7 +401,7 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 
 		/* Setup our variables */
 		$model        = GPDFAPI::get_mvc_class( 'Model_PDF' );
-		$products     = new Field_v3_Products( new GF_Field(), $lead, GPDFAPI::get_form_class(), GPDFAPI::get_misc_class() );
+		$products     = new Field_V3_Products( new GF_Field(), $lead, GPDFAPI::get_form_class(), GPDFAPI::get_misc_class() );
 		$has_products = false;
 		$page_number  = 0;
 
@@ -420,8 +420,8 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 			$results['title'] = '<h2 id="details" class="default">' . $form['title'] . '</h2>';
 		} else {
 			?>
-            <div id='container'>
-            <h2 id='details' class='default'><?php echo $form['title'] ?></h2>
+			<div id='container'>
+			<h2 id='details' class='default'><?php echo $form['title']; ?></h2>
 			<?php
 		}
 
@@ -445,8 +445,8 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 					$results['field'][] = '<h2 id="field-' . $field->id . '" class="default entry-view-page-break">' . $form['pagination']['pages'][ $page_number ] . '</h2>';
 				} else {
 					?>
-                    <h2 id="field-<?php echo $field->id; ?>"
-                        class="default entry-view-page-break"><?php echo $form['pagination']['pages'][ $page_number ]; ?></h2>
+					<h2 id="field-<?php echo $field->id; ?>"
+						class="default entry-view-page-break"><?php echo $form['pagination']['pages'][ $page_number ]; ?></h2>
 					<?php
 				}
 				$page_number++;
@@ -511,7 +511,7 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 			return $results;
 		} else {
 			?>
-            </div><!-- Close container -->
+			</div><!-- Close container -->
 			<?php
 		}
 	}
@@ -543,7 +543,7 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 		}
 
 		$html .= '<div class="value">' . $value . '</div>'
-		         . '</div>';
+				 . '</div>';
 
 		return $html;
 	}
@@ -563,12 +563,12 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 
 		switch ( get_class( $field ) ) {
 			case 'GF_Field_Section':
-				$class = new GFPDF\Helper\Fields\Field_v3_Section( $field, $entry, GPDFAPI::get_form_class(), GPDFAPI::get_misc_class() );
-			break;
+				$class = new GFPDF\Helper\Fields\Field_V3_Section( $field, $entry, GPDFAPI::get_form_class(), GPDFAPI::get_misc_class() );
+				break;
 
 			case 'GF_Field_List':
-				$class = new GFPDF\Helper\Fields\Field_v3_List( $field, $entry, GPDFAPI::get_form_class(), GPDFAPI::get_misc_class() );
-			break;
+				$class = new GFPDF\Helper\Fields\Field_V3_List( $field, $entry, GPDFAPI::get_form_class(), GPDFAPI::get_misc_class() );
+				break;
 		}
 
 		return $class;
@@ -598,15 +598,15 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 		switch ( $field->type ) {
 			case 'html':
 				$field->cssClass .= ' entry-view-html-value';
-			break;
+				break;
 
 			case 'section':
 				$field->cssClass .= ' entry-view-section-break-content';
-			break;
+				break;
 
 			default:
 				$field->cssClass .= ' entry-view-field-value';
-			break;
+				break;
 		}
 
 		$field->cssClass .= ' gfpdf-field-processed';
@@ -714,12 +714,14 @@ if ( ! class_exists( 'mPDF' ) ) {
 
 	/**
 	 * Class mPDF
-     *
-     * Allow our legacy software to still function even though the \mPDF class no longer exists (see \Mpdf\Mpdf)
-     *
-     * @since 5.0
+	 *
+	 * Allow our legacy software to still function even though the \mPDF class no longer exists (see \Mpdf\Mpdf)
+	 *
+	 * @since 5.0
+     * phpcs:disable
 	 */
 	class mPDF {
+	    /* phpcs:enable */
 		protected $mpdf;
 
 		/**
@@ -736,61 +738,63 @@ if ( ! class_exists( 'mPDF' ) ) {
 		 * @param int    $mgh
 		 * @param int    $mgf
 		 * @param string $orientation
-         *
-         * @since 5.0
+		 *
+		 * @since 5.0
 		 */
 		public function __construct( $mode = '', $format = 'A4', $default_font_size = 0, $default_font = '', $mgl = 15, $mgr = 15, $mgt = 16, $mgb = 16, $mgh = 9, $mgf = 9, $orientation = 'P' ) {
 
-			$data = GPDFAPI::get_data_class();
-			$defaultFontConfig = ( new \Mpdf\Config\FontVariables() )->getDefaults();
+			$data                = GPDFAPI::get_data_class();
+			$default_font_config = ( new \Mpdf\Config\FontVariables() )->getDefaults();
 
-			$this->mpdf = new \Mpdf\Mpdf( [
-				'fontDir' => [
-					$data->template_font_location,
-				],
+			$this->mpdf = new \Mpdf\Mpdf(
+				[
+					'fontDir'                => [
+						$data->template_font_location,
+					],
 
-				'fontdata' => apply_filters( 'mpdf_font_data', $defaultFontConfig['fontdata'] ),
+					'fontdata'               => apply_filters( 'mpdf_font_data', $default_font_config['fontdata'] ),
 
-				'tempDir' => $data->mpdf_tmp_location,
+					'tempDir'                => $data->mpdf_tmp_location,
 
-				'curlCaCertificate' => ABSPATH . WPINC . '/certificates/ca-bundle.crt',
+					'curlCaCertificate'      => ABSPATH . WPINC . '/certificates/ca-bundle.crt',
 
-				'allow_output_buffering' => true,
-				'autoLangToFont'         => true,
-				'useSubstitutions'       => true,
-				'ignore_invalid_utf8'    => true,
-				'setAutoTopMargin'       => 'stretch',
-				'setAutoBottomMargin'    => 'stretch',
-				'enableImports'          => true,
-				'use_kwt'                => true,
-				'keepColumns'            => true,
-				'biDirectional'          => true,
-				'showWatermarkText'      => true,
+					'allow_output_buffering' => true,
+					'autoLangToFont'         => true,
+					'useSubstitutions'       => true,
+					'ignore_invalid_utf8'    => true,
+					'setAutoTopMargin'       => 'stretch',
+					'setAutoBottomMargin'    => 'stretch',
+					'enableImports'          => true,
+					'use_kwt'                => true,
+					'keepColumns'            => true,
+					'biDirectional'          => true,
+					'showWatermarkText'      => true,
 
-				'format'      => $format,
-				'orientation' => $orientation,
+					'format'                 => $format,
+					'orientation'            => $orientation,
 
-				'margin_left'       => $mgl,
-				'margin_top'        => $mgt,
-				'margin_right'      => $mgr,
-				'margin_bottom'     => $mgb,
-				'margin_header'     => $mgh,
-				'margin_footer'     => $mgf,
-				'default_font_size' => $default_font_size,
-				'default_font'      => $default_font,
-				'mode'              => $mode,
-			] );
+					'margin_left'            => $mgl,
+					'margin_top'             => $mgt,
+					'margin_right'           => $mgr,
+					'margin_bottom'          => $mgb,
+					'margin_header'          => $mgh,
+					'margin_footer'          => $mgf,
+					'default_font_size'      => $default_font_size,
+					'default_font'           => $default_font,
+					'mode'                   => $mode,
+				]
+			);
 		}
 
 		/**
-         * Allow the relaying of method calls to the new Mpdf class
-         *
+		 * Allow the relaying of method calls to the new Mpdf class
+		 *
 		 * @param $name
 		 * @param $arguments
 		 *
 		 * @return mixed
-         *
-         * @since 5.0
+		 *
+		 * @since 5.0
 		 */
 		public function __call( $name, $arguments ) {
 			if ( is_callable( [ $this->mpdf, $name ] ) ) {
@@ -817,13 +821,13 @@ if ( ! class_exists( 'mPDF' ) ) {
 
 		/**
 		 * @param int $type
-         *
-         * @Internal Removed from Mpdf v7
-         *
-         * @since 5.0
+		 *
+		 * @Internal Removed from Mpdf v7
+		 *
+		 * @since 5.0
 		 */
 		public function SetAutoFont( $type = 0 ) {
-			$this->mpdf->autoLangToFont = $type === 1;
+			$this->mpdf->autoLangToFont   = $type === 1;
 			$this->mpdf->autoScriptToLang = $type === 1;
 		}
 	}
