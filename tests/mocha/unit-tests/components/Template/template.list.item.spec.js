@@ -1,7 +1,6 @@
 import React from 'react'
 import { mount } from 'enzyme'
 import $ from 'jquery'
-import Immutable from 'immutable'
 import configureStore from 'redux-mock-store'
 import { Provider } from 'react-redux'
 
@@ -17,7 +16,7 @@ describe('<TemplateListItem />', () => {
     const comp = mount(<Router>
       <Provider store={mockStore()}>
         <TemplateListItem
-          template={Immutable.fromJS({id: 'my-id', compatible: true})}
+          template={{id: 'my-id', compatible: true}}
         />
       </Provider>
     </Router>)
@@ -36,7 +35,7 @@ describe('<TemplateListItem />', () => {
     const comp = mount(<Router>
       <Provider store={mockStore()}>
         <TemplateListItem
-          template={Immutable.fromJS({id: 'my-id'})}
+          template={{id: 'my-id'}}
           activeTemplate="my-id"
         />
       </Provider>

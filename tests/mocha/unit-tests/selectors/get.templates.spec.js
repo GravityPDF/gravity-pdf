@@ -1,4 +1,3 @@
-import Immutable from 'immutable'
 import selector, { searchTemplates, sortTemplates } from '../../../../src/assets/js/react/selectors/getTemplates'
 
 const templateObject = [
@@ -12,31 +11,32 @@ const templateObject = [
   {id: 'new-template', group: 'Custom', template: 'New Template', description: '', author: '', new: true},
 ]
 
-const templates = Immutable.fromJS(templateObject)
+const templates = templateObject
 
 describe('sortTemplates()', () => {
   it('check the function sorts the results correctly', () => {
     let list = sortTemplates(templates, '')
 
-    expect(list.first().get('id')).is.equal('adelade')
+    expect(list[0].id).is.equal('adelade')
 
     /* Check our new template is pushed to the end of the queue */
-    expect(list.last().get('id')).is.equal('new-template')
+    const checkLast = list.length - 1
+    expect(list[checkLast].id).is.equal('new-template')
 
     /* check the active template is hoisted above the rest */
     list = sortTemplates(templates, 'zadani')
-    expect(list.first().get('id')).is.equal('zadani')
+    expect(list[0].id).is.equal('zadani')
   })
 })
 
 describe('searchTemplates()', () => {
   it('check we get the expected results', () => {
-    expect(searchTemplates('default', templates).size).is.equal(3)
-    expect(searchTemplates('Gravity PDF', templates).size).is.equal(1)
-    expect(searchTemplates('William', templates).size).is.equal(2)
-    expect(searchTemplates('Core', templates).size).is.equal(5)
-    expect(searchTemplates('Zadani', templates).size).is.equal(1)
-    expect(searchTemplates('Old', templates).size).is.equal(1)
+    expect(searchTemplates('default', templates).length).is.equal(3)
+    expect(searchTemplates('Gravity PDF', templates).length).is.equal(1)
+    expect(searchTemplates('William', templates).length).is.equal(2)
+    expect(searchTemplates('Core', templates).length).is.equal(5)
+    expect(searchTemplates('Zadani', templates).length).is.equal(1)
+    expect(searchTemplates('Old', templates).length).is.equal(1)
   })
 })
 
@@ -53,7 +53,7 @@ describe('selector', () => {
 
     //check the sort works
     let list = selector(state, state, state)
-    expect(list.first().get('id')).is.equal('adelade')
+    expect(list[0].id).is.equal('adelade')
 
     //check the search works
     let state2 = {
@@ -65,7 +65,7 @@ describe('selector', () => {
     }
 
     list = selector(state2, state2, state2)
-    expect(list.size).is.equal(3)
+    expect(list.length).is.equal(3)
 
     //check the sort and search works
     let state3 = {
@@ -77,9 +77,10 @@ describe('selector', () => {
     }
 
     list = selector(state3, state3, state3)
+    const checkforLast = list.length - 1
 
-    expect(list.size).is.equal(5)
-    expect(list.first().get('id')).is.equal('zadani')
-    expect(list.last().get('id')).is.equal('rubix')
+    expect(list.length).is.equal(5)
+    expect(list[0].id).is.equal('zadani')
+    expect(list[checkforLast].id).is.equal('rubix')
   })
 })
