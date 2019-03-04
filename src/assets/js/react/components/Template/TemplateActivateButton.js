@@ -44,7 +44,6 @@ export class TemplateActivateButton extends React.Component {
    * @since 4.1
    */
   static propTypes = {
-    template: PropTypes.object,
     onTemplateSelect: PropTypes.func,
     buttonText: PropTypes.string,
   }
@@ -61,7 +60,7 @@ export class TemplateActivateButton extends React.Component {
     e.stopPropagation()
 
     this.props.history.push('')
-    this.props.onTemplateSelect(this.props.template.get('id'))
+    this.props.onTemplateSelect(this.props.template.id)
   }
 
   /**
@@ -103,4 +102,3 @@ const mapDispatchToProps = (dispatch) => {
  * @since 4.1
  */
 export default withRouter(connect(null, mapDispatchToProps)(TemplateActivateButton))
-

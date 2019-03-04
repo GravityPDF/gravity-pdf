@@ -1,16 +1,14 @@
-import { fromJS } from 'immutable'
 import {
   SEARCH_TEMPLATES,
   SELECT_TEMPLATE,
   ADD_TEMPLATE,
-  UPDATE_TEMPLATE,
   UPDATE_TEMPLATE_PARAM,
   DELETE_TEMPLATE,
 } from '../actionTypes/templates'
 
 /**
  * Our Redux Template Reducer that take the objects returned from our Redux Template Actions
- * and updates the template portion of our store in an immutable way
+ * and updates the template portion of our store
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2019, Blue Liquid Designs
@@ -46,28 +44,9 @@ import {
  * @since 4.1
  */
 export const initialState = {
-  list: fromJS(GFPDF.templateList),
+  list: GFPDF.templateList,
   activeTemplate: GFPDF.activeTemplate || GFPDF.activeDefaultTemplate,
   search: '',
-}
-
-/**
- * Returns the first Immutable Map in our Immutable List which
- * matches the template id passed.
- *
- * @param {Object} list The Immutable list of templates
- * @param {string} id The template ID
- *
- * @returns object Immutable Map object of our template
- *
- * @since 4.1
- */
-const getTemplateIndex = (list, id) => {
-  return list.findKey((template) => {
-    if (template.get('id') === id) {
-      return true
-    }
-  })
 }
 
 /**
@@ -106,47 +85,43 @@ export default function (state = initialState, action) {
       }
 
     /**
-     * Push a new template Immutable Map onto our Immutable List
+     * Push a new template into List
      *
      * @since 4.1
      */
     case ADD_TEMPLATE:
       return {
         ...state,
-        list: state.list.push(action.template)
+        list: [...state.list, action.template]
       }
 
     /**
-     * Replace template Immutable Map with new Map
-     *
-     * @since 4.1
-     */
-    case UPDATE_TEMPLATE:
-      return {
-        ...state,
-        list: state.list.set(getTemplateIndex(state.list, action.template.get('id')), action.template)
-      }
-
-    /**
-     * Replace single parameter in template Immutable Map with new value
+     * Update single parameter in template new value
      *
      * @since 4.1
      */
     case UPDATE_TEMPLATE_PARAM:
+      const updatedList = state.list.map(item => {
+        if (item.id == action.id) {
+          return {...item, [action.name]: action.value}
+        }
+        return item
+      })
       return {
         ...state,
-        list: state.list.setIn([getTemplateIndex(state.list, action.id), action.name], action.value)
+        list: updatedList
       }
 
     /**
-     * Remove template Immutable Map from Immutable List
+     * Remove template from List
      *
      * @since 4.1
      */
     case DELETE_TEMPLATE:
+      const list = state.list.filter(item => item.id !== action.id)
       return {
         ...state,
-        list: state.list.delete(getTemplateIndex(state.list, action.id))
+        list: [...list]
       }
   }
 

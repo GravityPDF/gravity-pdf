@@ -4,7 +4,6 @@ import configureStore from 'redux-mock-store'
 import { Provider } from 'react-redux'
 
 const mockStore = configureStore()
-import Immutable from 'immutable'
 import { HashRouter as Router } from 'react-router-dom'
 
 import TemplateHeaderNavigation from '../../../../../src/assets/js/react/components/Template/TemplateHeaderNavigation'
@@ -15,8 +14,8 @@ describe('<TemplateHeaderNavigation />', () => {
     const comp = mount(<Router>
       <Provider store={mockStore()}>
         <TemplateHeaderNavigation
-          templates={Immutable.fromJS([{}, {}])}
-          template={Immutable.fromJS({})}
+          templates={[{}, {}]}
+          template={{}}
           templateIndex={0}
           showPreviousTemplateText="Show previous template"
           showNextTemplateText="Show next template"
@@ -38,8 +37,8 @@ describe('<TemplateHeaderNavigation />', () => {
     const comp = mount(<Router>
       <Provider store={mockStore()}>
         <TemplateHeaderNavigation
-          templates={Immutable.fromJS([{id: 'first-id'}, {id: 'middle-id'}, {id: 'last-id'}])}
-          template={Immutable.fromJS({id: 'first-id'})}
+          templates={[{id: 'first-id'}, {id: 'middle-id'}, {id: 'last-id'}]}
+          template={{id: 'first-id'}}
           templateIndex={0}
         />
       </Provider>
@@ -56,8 +55,8 @@ describe('<TemplateHeaderNavigation />', () => {
     const comp = mount(<Router>
       <Provider store={mockStore()}>
         <TemplateHeaderNavigation
-          templates={Immutable.fromJS([{id: 'first-id'}, {id: 'middle-id'}, {id: 'last-id'}])}
-          template={Immutable.fromJS({id: 'last-id'})}
+          templates={[{id: 'first-id'}, {id: 'middle-id'}, {id: 'last-id'}]}
+          template={{id: 'last-id'}}
           templateIndex={2}
         />
       </Provider>
@@ -74,8 +73,8 @@ describe('<TemplateHeaderNavigation />', () => {
     const comp = mount(<Router>
       <Provider store={mockStore()}>
         <TemplateHeaderNavigation
-          templates={Immutable.fromJS([{id: 'first-id'}, {id: 'middle-id'}, {id: 'last-id'}])}
-          template={Immutable.fromJS({id: 'middle-id'})}
+          templates={[{id: 'first-id'}, {id: 'middle-id'}, {id: 'last-id'}]}
+          template={{id: 'middle-id'}}
           templateIndex={1}
         />
       </Provider>
@@ -92,8 +91,8 @@ describe('<TemplateHeaderNavigation />', () => {
     const comp = mount(<Router>
       <Provider store={mockStore()}>
         <TemplateHeaderNavigation
-          templates={Immutable.fromJS([{id: 'first-id'}, {id: 'middle-id'}, {id: 'last-id'}])}
-          template={Immutable.fromJS({id: 'middle-id'})}
+          templates={[{id: 'first-id'}, {id: 'middle-id'}, {id: 'last-id'}]}
+          template={{id: 'middle-id'}}
           templateIndex={1}/>
       </Provider>
     </Router>)

@@ -2,7 +2,6 @@
   "name": "gravity-pdf",
   "private": true,
   "dependencies": {
-    "immutable": "^3.8.1",
     "lodash.debounce": "^4.0.8",
     "promise-queue": "^2.2.3",
     "prop-types": "^15.5.8",

@@ -2,7 +2,6 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import { connect } from 'react-redux'
 import request from 'superagent'
-import { fromJS } from 'immutable'
 
 import { addTemplate, updateTemplateParam } from '../../actions/templates'
 import Dropzone from '../Dropzone'
@@ -61,7 +60,7 @@ export class TemplateUploader extends React.Component {
 
     addNewTemplate: PropTypes.func,
     updateTemplateParam: PropTypes.func,
-    templates: PropTypes.object
+    templates: PropTypes.array
   }
 
   /**
@@ -177,13 +176,13 @@ export class TemplateUploader extends React.Component {
 
       /* Check if template already in the list before adding to our store */
       const matched = this.props.templates.find((item) => {
-        return (item.get('id') === template.id)
+        return (item.id === template.id)
       })
 
       if (matched === undefined) {
         template.new = true //ensure new templates go to end of list
         template.message = this.props.installSuccessText
-        this.props.addNewTemplate(fromJS(template))
+        this.props.addNewTemplate(template)
       } else {
         this.props.updateTemplateParam(template.id, 'message', this.props.installUpdatedText)
       }
@@ -278,7 +277,7 @@ const mapStateToProps = (state) => {
  *
  * @param {func} dispatch Redux dispatcher
  *
- * @returns {{addNewTemplate: (function(template=Immutable Map)), updateTemplateParam: (function(id=string, name=string, value=*))}}
+ * @returns {{addNewTemplate: (function(template)), updateTemplateParam: (function(id=string, name=string, value=*))}}
  *
  * @since 4.1
  */
