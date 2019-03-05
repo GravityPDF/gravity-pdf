@@ -20,23 +20,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -400,7 +400,7 @@ class Helper_Field_Container {
 		$classes = $this->get_field_classes( $classes );
 
 		foreach ( $classes as $class ) {
-			if ( isset ( $this->class_map[ $class ] ) ) {
+			if ( isset( $this->class_map[ $class ] ) ) {
 				/* return field width */
 				return $this->class_map[ $class ];
 			}
@@ -458,7 +458,7 @@ class Helper_Field_Container {
 	private function does_field_have_stopper_class( GF_Field $field ) {
 		$field_classes = array_flip( $this->get_field_classes( $field->cssClass ) );
 
-		foreach( $this->row_stopper_classes as $class ) {
+		foreach ( $this->row_stopper_classes as $class ) {
 			if ( isset( $field_classes[ $class ] ) ) {
 				return true;
 			}

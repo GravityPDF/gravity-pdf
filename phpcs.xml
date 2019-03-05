@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<ruleset name="Gravity PDF">
+    <description>Customise the WordPress Coding Standard</description>
+
+    <!-- Exclude a bunch of directories -->
+    <exclude-pattern>/vendor/*</exclude-pattern>
+    <exclude-pattern>/node_modules/*</exclude-pattern>
+    <exclude-pattern>/languages/*</exclude-pattern>
+    <exclude-pattern>/bin/*</exclude-pattern>
+    <exclude-pattern>/tmp/*</exclude-pattern>
+    <exclude-pattern>/dist/*</exclude-pattern>
+    <exclude-pattern>*.js</exclude-pattern>
+    <exclude-pattern>/tests/phpunit/bootstrap.php</exclude-pattern>
+    <exclude-pattern>/tests/phpunit/phpunit6-compat.php</exclude-pattern>
+
+    <!-- Include the WordPress Core standard. -->
+    <rule ref="WordPress-Core">
+        <exclude name="WordPress.WP.I18n.MissingTranslatorsComment"/>
+        <exclude name="WordPress.Files.FileName.NotHyphenatedLowercase"/>
+        <exclude name="WordPress.PHP.YodaConditions"/>
+        <exclude name="Squiz.ControlStructures.ControlSignature.SpaceAfterCloseParenthesis"/>
+        <exclude name="WordPress.WhiteSpace.PrecisionAlignment"/>
+        <exclude name="WordPress.NamingConventions.ValidVariableName"/>
+        <exclude name="WordPress.NamingConventions.ValidFunctionName"/>
+    </rule>
+
+    <!-- Include the best parts of PSR-1 -->
+    <rule ref="PSR1.Classes.ClassDeclaration">
+        <exclude-pattern>/pdf.php</exclude-pattern>
+        <exclude-pattern>/api.php</exclude-pattern>
+        <exclude-pattern>/src/deprecated.php</exclude-pattern>
+        <exclude-pattern>/src/controller/Controller_Activation.php</exclude-pattern>
+    </rule>
+
+    <rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
+        <exclude-pattern>/tests/*</exclude-pattern>
+    </rule>
+
+    <rule ref="Generic.PHP.DisallowShortOpenTag.EchoFound">
+        <severity>0</severity>
+    </rule>
+
+    <rule ref="Generic.Files.ByteOrderMark"/>
+
+    <!-- Customise the WordPress Core Rules -->
+    <rule ref="WordPress.Files.FileName">
+        <properties>
+            <property name="strict_class_file_names" value="false"/>
+        </properties>
+    </rule>
+
+    <rule ref="WordPress.WP.DeprecatedFunctions">
+        <properties>
+            <property name="minimum_supported_version" value="4.8"/>
+        </properties>
+    </rule>
+
+    <rule ref="WordPress.WP.I18n">
+        <properties>
+            <property name="text_domain" type="array" value="gravity-forms-pdf-extended, gravityforms, default"/>
+        </properties>
+    </rule>
+
+    <rule ref="WordPress.WhiteSpace.ControlStructureSpacing">
+        <properties>
+            <property name="spaces_before_closure_open_paren" value="0"/>
+            <property name="space_before_colon" value="forbidden"/>
+        </properties>
+    </rule>
+
+    <!-- For if: else: endif: ruleset -->
+    <rule ref="WordPress.WhiteSpace.ControlStructureSpacing.SpaceBetweenStructureColon">
+        <exclude-pattern>/src/*.php</exclude-pattern>
+    </rule>
+</ruleset>

@@ -25,23 +25,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -110,7 +110,7 @@ class Field_Tos extends Helper_Abstract_Fields {
 
 		$terms = wp_kses_post(
 			wpautop(
-				$this->gform->process_tags( $this->field->gwtermsofservice_terms , $this->form, $this->entry )
+				$this->gform->process_tags( $this->field->gwtermsofservice_terms, $this->form, $this->entry )
 			)
 		);
 		$value = $this->value();
@@ -123,7 +123,7 @@ class Field_Tos extends Helper_Abstract_Fields {
 			$html .= "<div class='terms-of-service-agreement'><span class='terms-of-service-tick' style='font-family:dejavusans;'>&#10004;</span> $value</div>";
 		} else {
 			$not_accepted_text = __( 'Not accepted', 'gravity-forms-pdf-extended' );
-			$html              .= "<div class='terms-of-service-agreement'><span class='terms-of-service-tick' style='font-family:dejavusans;'>&#10006;</span> $not_accepted_text</div>";
+			$html             .= "<div class='terms-of-service-agreement'><span class='terms-of-service-tick' style='font-family:dejavusans;'>&#10006;</span> $not_accepted_text</div>";
 		}
 
 		return parent::html( $html );

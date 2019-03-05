@@ -18,23 +18,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (C) 2018 Blue Liquid Designs
+	Gravity PDF – Copyright (C) 2018 Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -534,7 +534,9 @@ final class GPDFAPI {
 		/* Find our field ID, if any */
 		foreach ( $form['fields'] as $field ) {
 
+			/* phpcs:disable */
 			if ( $field->id == $field_id && $field->inputType == 'likert' ) {
+				/* phpcs:enable */
 
 				/* Output our likert */
 				$likert = new GFPDF\Helper\Fields\Field_Likert( $field, $entry, $gfpdf->gform, $gfpdf->misc );
@@ -661,9 +663,9 @@ final class GPDFAPI {
 	 * @since 4.4
 	 */
 	public static function get_form_data( $entry_id ) {
-		$gform = self::get_form_class();
+		$gform     = self::get_form_class();
 		$pdf_model = self::get_mvc_class( 'Model_PDF' );
-		$entry = $gform->get_entry( $entry_id );
+		$entry     = $gform->get_entry( $entry_id );
 
 		if ( is_wp_error( $entry ) ) {
 			return $entry;

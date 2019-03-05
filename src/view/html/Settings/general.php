@@ -15,23 +15,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 ?>
@@ -42,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div id="pdfextended-settings">
 	<h3>
 		<span>
-		    <i class="fa fa-cog"></i>
+			<i class="fa fa-cog"></i>
 			<?php esc_html_e( 'General Settings', 'gravity-forms-pdf-extended' ); ?>
 		</span>
 	</h3>
@@ -57,7 +57,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div id="gfpdf-advanced-options">
 			<h3>
 				<span>
-				    <i class="fa fa-lock"></i>
+					<i class="fa fa-lock"></i>
 					<?php esc_html_e( 'Security Settings', 'gravity-forms-pdf-extended' ); ?>
 				</span>
 			</h3>
@@ -70,16 +70,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="gfpdf-advanced-options"><a href="#"><?php esc_html_e( 'Show Advanced Options...', 'gravity-forms-pdf-extended' ); ?></a></div>
 
 		<?php
-			if ( $args['edit_cap'] ) {
-				submit_button();
-			}
+		if ( $args['edit_cap'] ) {
+			submit_button();
+		}
 		?>
 
-        <div class="extensions-upsell">
-            <a href="https://gravitypdf.com/extension-shop/">
+		<div class="extensions-upsell">
+			<a href="https://gravitypdf.com/extension-shop/">
 				<?php esc_html_e( 'Want more features? Take a look at our Extension Shop.', 'gravity-forms-pdf-extended' ); ?>
-            </a>
-        </div>
+			</a>
+		</div>
 	</form>
 
 	<?php

@@ -23,23 +23,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -398,7 +398,7 @@ class Helper_PDF {
 		/* Check if there are version requirements */
 		$template_info = $this->templates->get_template_info_by_path( $this->template_path );
 		if ( ! $this->templates->is_template_compatible( $template_info['required_pdf_version'] ) ) {
-			throw new Exception( sprintf( esc_html__( 'The PDF Template %s requires Gravity PDF version %s. Upgrade to the latest version.', 'gravity-forms-pdf-extended' ), "<em>$template</em>", "<em>{$template_info['required_pdf_version']}</em>" ) );
+			throw new Exception( sprintf( esc_html__( 'The PDF Template %1$s requires Gravity PDF version %2$s. Upgrade to the latest version.', 'gravity-forms-pdf-extended' ), "<em>$template</em>", "<em>{$template_info['required_pdf_version']}</em>" ) );
 		}
 	}
 
@@ -525,10 +525,13 @@ class Helper_PDF {
 	 * @param string $js The PDF Javascript to execute
 	 *
 	 * @since 4.0
+	 *
+	 * phpcs:disable
 	 */
 	public function set_JS( $js ) {
 		$this->mpdf->SetJS( $js );
 	}
+	/* phpcs:enable */
 
 	/**
 	 *
@@ -631,35 +634,37 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	protected function begin_pdf() {
-		$defaultFontConfig = ( new FontVariables() )->getDefaults();
+		$default_font_config = ( new FontVariables() )->getDefaults();
 
-		$this->mpdf = new Mpdf( [
-			'fontDir' => [
-				$this->data->template_font_location,
-			],
+		$this->mpdf = new Mpdf(
+			[
+				'fontDir'                => [
+					$this->data->template_font_location,
+				],
 
-			'fontdata' => apply_filters( 'mpdf_font_data', $defaultFontConfig['fontdata'] ),
+				'fontdata'               => apply_filters( 'mpdf_font_data', $default_font_config['fontdata'] ),
 
-			'tempDir' => $this->data->mpdf_tmp_location,
+				'tempDir'                => $this->data->mpdf_tmp_location,
 
-			'curlCaCertificate' => ABSPATH . WPINC . '/certificates/ca-bundle.crt',
+				'curlCaCertificate'      => ABSPATH . WPINC . '/certificates/ca-bundle.crt',
 
-			'allow_output_buffering' => true,
-			'autoLangToFont'         => true,
-			'useSubstitutions'       => true,
-			'ignore_invalid_utf8'    => true,
-			'setAutoTopMargin'       => 'stretch',
-			'setAutoBottomMargin'    => 'stretch',
-			'enableImports'          => true,
-			'use_kwt'                => true,
-			'keepColumns'            => true,
-			'biDirectional'          => true,
-			'showWatermarkText'      => true,
-			'showWatermarkImage'     => true,
+				'allow_output_buffering' => true,
+				'autoLangToFont'         => true,
+				'useSubstitutions'       => true,
+				'ignore_invalid_utf8'    => true,
+				'setAutoTopMargin'       => 'stretch',
+				'setAutoBottomMargin'    => 'stretch',
+				'enableImports'          => true,
+				'use_kwt'                => true,
+				'keepColumns'            => true,
+				'biDirectional'          => true,
+				'showWatermarkText'      => true,
+				'showWatermarkImage'     => true,
 
-			'format'      => $this->paper_size,
-			'orientation' => $this->orientation,
-		] );
+				'format'                 => $this->paper_size,
+				'orientation'            => $this->orientation,
+			]
+		);
 
 		$this->mpdf->setLogger( $this->log );
 
@@ -835,7 +840,7 @@ class Helper_PDF {
 			$this->orientation = ( $orientation == 'landscape' ) ? 'L' : 'P';
 		} else {
 			$this->orientation = ( $orientation == 'landscape' ) ? '-L' : '';
-			$this->paper_size  .= $this->orientation;
+			$this->paper_size .= $this->orientation;
 		}
 	}
 
@@ -849,8 +854,12 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	protected function load_html( $args = [] ) {
-		/* for backwards compatibility extract the $args variable */
+		/*
+		 * for backwards compatibility extract the $args variable
+		 * phpcs:disable
+		 */
 		extract( $args, EXTR_SKIP ); /* skip any arguments that would clash - i.e filename, args, output, path, this */
+		/* phpcs:enable */
 
 		ob_start();
 		include $this->template_path;
@@ -930,12 +939,12 @@ class Helper_PDF {
 			case 'pdfa1b':
 				$this->mpdf->PDFA     = true;
 				$this->mpdf->PDFAauto = true;
-			break;
+				break;
 
 			case 'pdfx1a':
 				$this->mpdf->PDFX     = true;
 				$this->mpdf->PDFXauto = true;
-			break;
+				break;
 		}
 	}
 

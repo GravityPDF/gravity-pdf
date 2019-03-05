@@ -26,23 +26,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -196,7 +196,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 
 		/* Prevent actions being displayed on our welcome pages */
 		if ( ! is_admin() ||
-		     ( rgget( 'page' ) == 'gfpdf-getting-started' ) || ( rgget( 'page' ) == 'gfpdf-update' ) || ( defined( 'DOING_AJAX' ) && DOING_AJAX )
+			 ( rgget( 'page' ) == 'gfpdf-getting-started' ) || ( rgget( 'page' ) == 'gfpdf-update' ) || ( defined( 'DOING_AJAX' ) && DOING_AJAX )
 		) {
 			return null;
 		}
@@ -205,13 +205,16 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 
 			/* Before displaying check the user has the correct capabilities, the notice isn't already been dismissed and the route condition has been met */
 			if ( $this->gform->has_capability( $route['capability'] ) &&
-			     ! $this->model->is_notice_already_dismissed( $route['action'] ) &&
-			     call_user_func( $route['condition'] )
+				 ! $this->model->is_notice_already_dismissed( $route['action'] ) &&
+				 call_user_func( $route['condition'] )
 			) {
 
-				$this->log->addNotice( 'Trigger Action Notification.', [
-					'route' => $route,
-				] );
+				$this->log->addNotice(
+					'Trigger Action Notification.',
+					[
+						'route' => $route,
+					]
+				);
 
 				$class = ( isset( $route['view_class'] ) ) ? $route['view_class'] : '';
 				$this->notices->add_notice( call_user_func( $route['view'], $route['action'], $route['action_text'] ), $class );
@@ -236,10 +239,13 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 				/* Check user capability */
 				if ( ! $this->gform->has_capability( $route['capability'] ) ) {
 
-					$this->log->addCritical( 'Lack of User Capabilities.', [
-						'user'      => wp_get_current_user(),
-						'user_meta' => get_user_meta( get_current_user_id() ),
-					] );
+					$this->log->addCritical(
+						'Lack of User Capabilities.',
+						[
+							'user'      => wp_get_current_user(),
+							'user_meta' => get_user_meta( get_current_user_id() ),
+						]
+					);
 
 					wp_die( esc_html__( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
 				}
@@ -255,15 +261,21 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 
 				/* Check if the user wants to dismiss the notice, otherwise process the route */
 				if ( isset( $_POST['gfpdf-dismiss-notice'] ) ) {
-					$this->log->addNotice( 'Dismiss Action.', [
-						'route' => $route,
-					] );
+					$this->log->addNotice(
+						'Dismiss Action.',
+						[
+							'route' => $route,
+						]
+					);
 
 					$this->model->dismiss_notice( $route['action'] );
 				} else {
-					$this->log->addNotice( 'Trigger Action Process.', [
-						'route' => $route,
-					] );
+					$this->log->addNotice(
+						'Trigger Action Process.',
+						[
+							'route' => $route,
+						]
+					);
 
 					call_user_func( $route['process'], $route['action'], $route );
 				}

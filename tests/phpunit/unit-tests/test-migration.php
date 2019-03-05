@@ -18,23 +18,23 @@ use WP_UnitTestCase;
  */
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -84,37 +84,40 @@ class Test_Migration extends WP_UnitTestCase {
 	/**
 	 * Replaces a string in a file
 	 *
-	 * @param string $FilePath
-	 * @param string $OldText text to be replaced
-	 * @param string $NewText new text
+	 * @param string $path
+	 * @param string $old_text text to be replaced
+	 * @param string $new_text new text
 	 *
 	 * @return array $Result status (success | error) & message (file exist, file permissions)
 	 *
 	 * @since 4.0
 	 */
-	private function replace_in_file( $FilePath, $OldText, $NewText ) {
-		$Result = [ 'status' => 'error', 'message' => '' ];
-		if ( file_exists( $FilePath ) === true ) {
-			if ( is_writeable( $FilePath ) ) {
+	private function replace_in_file( $path, $old_text, $new_text ) {
+		$result = [
+			'status'  => 'error',
+			'message' => '',
+		];
+		if ( file_exists( $path ) === true ) {
+			if ( is_writeable( $path ) ) {
 				try {
-					$FileContent = file_get_contents( $FilePath );
-					$FileContent = str_replace( $OldText, $NewText, $FileContent );
-					if ( file_put_contents( $FilePath, $FileContent ) > 0 ) {
-						$Result['status'] = 'success';
+					$contents = file_get_contents( $path );
+					$contents = str_replace( $old_text, $new_text, $contents );
+					if ( file_put_contents( $path, $contents ) > 0 ) {
+						$result['status'] = 'success';
 					} else {
-						$Result['message'] = 'Error while writing file';
+						$result['message'] = 'Error while writing file';
 					}
 				} catch ( Exception $e ) {
-					$Result['message'] = 'Error : ' . $e;
+					$result['message'] = 'Error : ' . $e;
 				}
 			} else {
-				$Result['message'] = 'File ' . $FilePath . ' is not writable !';
+				$result['message'] = 'File ' . $path . ' is not writable !';
 			}
 		} else {
-			$Result['message'] = 'File ' . $FilePath . ' does not exist !';
+			$result['message'] = 'File ' . $path . ' does not exist !';
 		}
 
-		return $Result;
+		return $result;
 	}
 
 	/**

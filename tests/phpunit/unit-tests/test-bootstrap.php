@@ -16,23 +16,23 @@ use WP_UnitTestCase;
  */
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -84,14 +84,26 @@ class Test_Bootstrap extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_filters() {
-		$this->assertEquals( 10, has_filter( 'gform_noconflict_scripts', [
-			$this->loader,
-			'auto_noconflict_scripts',
-		] ) );
-		$this->assertEquals( 10, has_filter( 'gform_noconflict_styles', [
-			$this->loader,
-			'auto_noconflict_styles',
-		] ) );
+		$this->assertEquals(
+			10,
+			has_filter(
+				'gform_noconflict_scripts',
+				[
+					$this->loader,
+					'auto_noconflict_scripts',
+				]
+			)
+		);
+		$this->assertEquals(
+			10,
+			has_filter(
+				'gform_noconflict_styles',
+				[
+					$this->loader,
+					'auto_noconflict_styles',
+				]
+			)
+		);
 	}
 
 	/**
@@ -230,8 +242,9 @@ class Test_Bootstrap extends WP_UnitTestCase {
 		$this->assertFalse( $settings['section_content'] );
 
 		/* Test pass */
-		$form_id = $GLOBALS['GFPDF_Test']->form['form-settings']['id'];
-		$pid     = $GLOBALS['wp']->query_vars['pid'] = '555ad84787d7e';
+		$form_id                          = $GLOBALS['GFPDF_Test']->form['form-settings']['id'];
+		$pid                              = '555ad84787d7e';
+		$GLOBALS['wp']->query_vars['pid'] = $pid;
 
 		$gfpdf->data->form_settings                                   = [];
 		$gfpdf->data->form_settings[ $form_id ]                       = $GLOBALS['GFPDF_Test']->form['form-settings']['gfpdf_form_settings'];

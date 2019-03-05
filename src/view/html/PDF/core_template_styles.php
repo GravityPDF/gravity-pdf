@@ -15,36 +15,36 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-$font                       = ( ! empty( $settings['font'] ) ) ? $settings['font'] : 'DejavuSansCondensed';
-$font_colour                = ( ! empty( $settings['font_colour'] ) ) ? $settings['font_colour'] : '#333';
-$font_size                  = ( ! empty( $settings['font_size'] ) ) ? $settings['font_size'] : '9';
+$font        = ( ! empty( $settings['font'] ) ) ? $settings['font'] : 'DejavuSansCondensed';
+$font_colour = ( ! empty( $settings['font_colour'] ) ) ? $settings['font_colour'] : '#333';
+$font_size   = ( ! empty( $settings['font_size'] ) ) ? $settings['font_size'] : '9';
 
-$header                     = ( ! empty( $settings['header'] ) ) ? $settings['header'] : '';
-$footer                     = ( ! empty( $settings['footer'] ) ) ? $settings['footer'] : '';
-$first_header               = ( ! empty( $settings['first_header'] ) ) ? $settings['first_header'] : '';
-$first_footer               = ( ! empty( $settings['first_footer'] ) ) ? $settings['first_footer'] : '';
+$header       = ( ! empty( $settings['header'] ) ) ? $settings['header'] : '';
+$footer       = ( ! empty( $settings['footer'] ) ) ? $settings['footer'] : '';
+$first_header = ( ! empty( $settings['first_header'] ) ) ? $settings['first_header'] : '';
+$first_footer = ( ! empty( $settings['first_footer'] ) ) ? $settings['first_footer'] : '';
 
-$background_color           = ( ! empty( $settings['background_color'] ) ) ? $settings['background_color'] : '#FFF';
-$background_image           = ( ! empty( $settings['background_image'] ) ) ? $settings['background_image'] : '';
+$background_color = ( ! empty( $settings['background_color'] ) ) ? $settings['background_color'] : '#FFF';
+$background_image = ( ! empty( $settings['background_image'] ) ) ? $settings['background_image'] : '';
 
 /* Try convert the background image URL to a local path */
 $background_image_path = $gfpdf->misc->convert_url_to_path( $background_image );
@@ -52,15 +52,15 @@ if ( $background_image_path !== false ) {
 	$background_image = $background_image_path;
 }
 
-$contrast                   = $gfpdf->misc->get_background_and_border_contrast( $background_color );
-$contrast_background_color  = $contrast['background'];
-$contrast_border_color      = $contrast['border'];
+$contrast                  = $gfpdf->misc->get_background_and_border_contrast( $background_color );
+$contrast_background_color = $contrast['background'];
+$contrast_border_color     = $contrast['border'];
 
 /* See https://gravitypdf.com/documentation/v5/gfpdf_include_list_styles/ for more details about this filter */
-$include_list_styles        = apply_filters( 'gfpdf_include_list_styles', true, $settings );
+$include_list_styles = apply_filters( 'gfpdf_include_list_styles', true, $settings );
 
 /* See https://gravitypdf.com/documentation/v5/gfpdf_include_product_styles/ for more details about this filter */
-$include_product_styles     = apply_filters( 'gfpdf_include_product_styles', true, $settings );
+$include_product_styles = apply_filters( 'gfpdf_include_product_styles', true, $settings );
 
 ?>
 
@@ -68,33 +68,33 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
 	@page {
 		margin: 10mm;
 
-	<?php if ( ! empty($header) ) : ?>
+	<?php if ( ! empty( $header ) ) : ?>
 		header: html_TemplateHeader;
 		margin-header: 5mm;
 	<?php endif; ?>
 
-	<?php if ( ! empty($footer) ) : ?>
+	<?php if ( ! empty( $footer ) ) : ?>
 		footer: html_TemplateFooter;
 		margin-footer: 5mm;
 	<?php endif; ?>
 
-	<?php if ( ! empty($background_color) ) : ?>
+	<?php if ( ! empty( $background_color ) ) : ?>
 		background-color: <?php echo $background_color; ?>;
 	<?php endif; ?>
 
-	<?php if ( ! empty($background_image) ) : ?>
+	<?php if ( ! empty( $background_image ) ) : ?>
 		background-image: url(<?php echo $background_image; ?>) no-repeat 0 0;
 		background-image-resize: 4;
 	<?php endif; ?>
 	}
 
 	@page :first {
-	<?php if ( ! empty($first_header) ) : ?>
+	<?php if ( ! empty( $first_header ) ) : ?>
 		header: html_TemplateFirstHeader;
 		margin-header: 5mm;
 	<?php endif; ?>
 
-	<?php if ( ! empty($first_footer) ) : ?>
+	<?php if ( ! empty( $first_footer ) ) : ?>
 		footer: html_TemplateFirstFooter;
 		margin-footer: 5mm;
 	<?php endif; ?>
@@ -181,8 +181,8 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
 			padding-top: 7px;
 		}
 
-        table.entry-products td.totals,
-        table.entry-products .textright {
+		table.entry-products td.totals,
+		table.entry-products .textright {
 			text-align: right;
 		}
 	<?php endif; ?>
@@ -198,10 +198,10 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
 		vertical-align: middle;
 	}
 
-    /* Page break */
-    .pagebreak {
-        page-break-before: always;
-    }
+	/* Page break */
+	.pagebreak {
+		page-break-before: always;
+	}
 
 	/* Consent Field */
 	.consent-text {
@@ -232,7 +232,7 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
 	}
 </style>
 
-<?php if ( ! empty($first_header) ) : ?>
+<?php if ( ! empty( $first_header ) ) : ?>
 	<htmlpageheader name="TemplateFirstHeader">
 		<div id="first_header">
 			<?php echo $first_header; ?>
@@ -240,7 +240,7 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
 	</htmlpageheader>
 <?php endif; ?>
 
-<?php if ( ! empty($header) ) : ?>
+<?php if ( ! empty( $header ) ) : ?>
 	<htmlpageheader name="TemplateHeader">
 		<div id="header">
 			<?php echo $header; ?>
@@ -248,7 +248,7 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
 	</htmlpageheader>
 <?php endif; ?>
 
-<?php if ( ! empty($first_footer) ) : ?>
+<?php if ( ! empty( $first_footer ) ) : ?>
 	<htmlpagefooter name="TemplateFirstFooter">
 		<div id="first_footer">
 			<?php echo $first_footer; ?>
@@ -256,7 +256,7 @@ $include_product_styles     = apply_filters( 'gfpdf_include_product_styles', tru
 	</htmlpagefooter>
 <?php endif; ?>
 
-<?php if ( ! empty($footer) ) : ?>
+<?php if ( ! empty( $footer ) ) : ?>
 	<htmlpagefooter name="TemplateFooter">
 		<div class="footer">
 			<?php echo $footer; ?>

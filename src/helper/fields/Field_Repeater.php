@@ -26,23 +26,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF.
+	This file is part of Gravity PDF.
 
-    Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+	Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
@@ -86,7 +86,7 @@ class Field_Repeater extends Helper_Abstract_Fields {
 		$value = $this->get_repeater_form_data( [], $this->value(), $this->field );
 
 		/* Add our List HTML */
-		$label                                               = $this->get_label();
+		$label = $this->get_label();
 		$data['repeater'][ $this->field->id . '.' . $label ] = $value;
 		$data['repeater'][ $this->field->id ]                = $value;
 		$data['repeater'][ $label ]                          = $value;
@@ -176,7 +176,7 @@ class Field_Repeater extends Helper_Abstract_Fields {
 
 			/* Loop through the Repeater fields */
 			foreach ( $field->fields as $sub_field ) {
-				$sub_field = \GF_Fields::create($sub_field);
+				$sub_field = \GF_Fields::create( $sub_field );
 
 				if ( $sub_field instanceof GF_Field_Repeater ) {
 
