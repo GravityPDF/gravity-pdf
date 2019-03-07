@@ -209,9 +209,6 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 
 		/* Cleanup filters */
 		add_filter( 'gform_before_resend_notifications', [ $this->model, 'resend_notification_pdf_cleanup' ], 10, 2 );
-
-		/* GravityView */
-		add_filter( 'gravityview/internal/ignored_endpoints', [ $this->model, 'fix_gravityview_frontpage_conflict' ] );
 	}
 
 	/**

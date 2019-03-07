@@ -2050,18 +2050,6 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * @param array $ignored
-	 *
-	 * @since 4.2
-	 */
-	public function fix_gravityview_frontpage_conflict( $ignored ) {
-		$ignored[] = 'lid';
-		$ignored[] = 'action';
-
-		return $ignored;
-	}
-
-	/**
 	 * Set the watermark font to the current PDF font
 	 *
 	 * @param Mpdf  $mpdf
