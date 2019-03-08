@@ -239,6 +239,13 @@ class Helper_PDF {
 		$this->set_pdf_format();
 		$this->set_pdf_security();
 		$this->set_display_mode();
+
+		/*
+		 * Allow $mpdf object class to be modified after it is fully initialised
+		 *
+		 * See https://gravitypdf.com/documentation/v5/gfpdf_mpdf_post_init_class/ for more details about this filter
+		 */
+		$this->mpdf = apply_filters( 'gfpdf_mpdf_post_init_class', $this->mpdf, $this->form, $this->entry, $this->settings, $this );
 	}
 
 	/**
