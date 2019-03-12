@@ -18,7 +18,7 @@ describe('<TemplateScreenshots />', () => {
   })
 
   it('renders the screenshot', () => {
-    const comp = mount(<TemplateScreenshots image="myimage.jpg"/>)
-    expect(comp.find('img').render().attr('src')).to.equal('myimage.jpg')
+    const comp = mount(<TemplateScreenshots image="base/src/assets/images/paws-with-logo-small.png"/>)
+    expect(comp.find('img').render().attr('src')).to.equal('base/src/assets/images/paws-with-logo-small.png')
   })
 })

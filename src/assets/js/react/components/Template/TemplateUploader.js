@@ -5,7 +5,8 @@ import request from 'superagent'
 import { fromJS } from 'immutable'
 
 import { addTemplate, updateTemplateParam } from '../../actions/templates'
-import Dropzone from '../Dropzone'
+import classNames from 'classnames'
+import Dropzone from 'react-dropzone'
 import ShowMessage from '../ShowMessage'
 
 /**
@@ -171,7 +172,6 @@ export class TemplateUploader extends React.Component {
    * @since 4.1
    */
   ajaxSuccess = (response) => {
-
     /* Update our Redux Store with the new template(s) */
     response.body.templates.forEach((template) => {
 
@@ -223,37 +223,39 @@ export class TemplateUploader extends React.Component {
   }
 
   /**
-   * Prevent normal behaviour when this event fires
-   *
-   * @param {Object} e Event
-   *
-   * @since 4.1
-   */
-  openDropzone = (e) => {
-    e.preventDefault()
-  }
-
-  /**
    * @since 4.1
    */
   render () {
     return (
-      <Dropzone
-        onDrop={this.onDrop}
-        maxSize={10240000}
-        multiple={true}
-        className="theme add-new-theme gfpdf-dropzone">
-        <a href="#" onClick={this.openDropzone} className={this.state.ajax ? 'doing-ajax' : ''}>
-          <div className="theme-screenshot"><span/></div>
+      <div className="theme add-new-theme gfpdf-dropzone">
+        <Dropzone
+          onDrop={this.onDrop}
+          maxSize={10240000}
+        >
+          {({getRootProps, getInputProps, isDragActive}) => {
+            return (
+              <div
+                {...getRootProps()}
+                className={classNames('dropzone', {'dropzone--isActive': isDragActive})}
+              >
+                <input {...getInputProps()} />
+                <a href="#/template" className={this.state.ajax ? 'doing-ajax' : ''}>
 
-          {this.state.error !== '' ? <ShowMessage text={this.state.error} error={true}/> : null}
-          {this.state.message !== '' ?
-            <ShowMessage text={this.state.message} dismissable={true} dismissableCallback={this.removeMessage}/> : null}
+                  <div className="theme-screenshot"><span /></div>
 
-          <h2 className="theme-name">{this.props.addTemplateText}</h2>
-        </a>
-        <div className="gfpdf-template-install-instructions">{this.props.templateInstallInstructions}</div>
-      </Dropzone>
+                  {this.state.error !== '' ? <ShowMessage text={this.state.error} error={true} /> : null}
+                  {this.state.message !== '' ?
+                    <ShowMessage text={this.state.message} dismissable={true}
+                                 dismissableCallback={this.removeMessage} /> : null}
+
+                  <h2 className="theme-name">{this.props.addTemplateText}</h2>
+                </a>
+                <div className="gfpdf-template-install-instructions">{this.props.templateInstallInstructions}</div>
+              </div>
+            )
+          }}
+        </Dropzone>
+      </div>
     )
   }
 }

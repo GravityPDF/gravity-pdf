@@ -22,7 +22,8 @@ module.exports = function (config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'node_modules/babel-polyfill/dist/polyfill.js',
+      { pattern: 'src/assets/images/*.png', watched: false, included: false, served: true, nocache: false },
+      'node_modules/@babel/polyfill/dist/polyfill.min.js',
       'node_modules/jquery/dist/jquery.min.js',
       'tests/mocha/tests.bundle.js'
     ],
