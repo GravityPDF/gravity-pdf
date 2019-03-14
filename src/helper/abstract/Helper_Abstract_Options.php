@@ -321,23 +321,27 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function get_settings() {
 
-		/**
-		 * We are storing temporary settings in a transient when validation fails.
-		 * This allows us to keep track of the updated fields without updating main settings in the DB
-		 *
-		 * We'll check if the transient exists and use it, otherwise get the main plugin settings from the options table
-		 */
-		$tmp_settings = get_transient( 'gfpdf_settings_user_data' );
-		$is_temp      = ( $tmp_settings !== false ) ? true : false;
+		$is_temp = false;
 
-		if ( $is_temp ) {
-			delete_transient( 'gfpdf_settings_user_data' );
+		if ( $this->misc->is_gfpdf_page() ) {
+
+			/*
+			 * We are storing temporary settings in a transient when validation fails.
+			 * This allows us to keep track of the updated fields without updating main settings in the DB
+			 *
+			 * We'll check if the transient exists and use it, otherwise get the main plugin settings from the options table
+			 */
+			$tmp_settings = get_transient( 'gfpdf_settings_user_data' );
+			$is_temp      = ( $tmp_settings !== false ) ? true : false;
+
+			if ( $is_temp ) {
+				delete_transient( 'gfpdf_settings_user_data' );
+			}
 		}
 
 		$settings = ( $is_temp ) ? (array) $tmp_settings : get_option( 'gfpdf_settings', [] );
 
 		/* See https://gravitypdf.com/documentation/v5/gfpdf_get_settings/ for more details about this filter */
-
 		return apply_filters( 'gfpdf_get_settings', $settings, $is_temp );
 	}
 

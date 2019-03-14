@@ -124,6 +124,9 @@ class Test_Options_API extends WP_UnitTestCase {
 		 */
 		set_transient( 'gfpdf_settings_user_data', [ 'testing' ], 30 );
 
+		set_current_screen( 'dashboard' );
+		$_GET['page'] = 'gfpdf-';
+
 		$this->assertEquals( [ 'testing' ], $this->options->get_settings() );
 	}
 
@@ -859,6 +862,9 @@ class Test_Options_API extends WP_UnitTestCase {
 
 		/* Run our settings santize function and check the results are accurate */
 		$this->options->settings_sanitize( $input );
+
+		set_current_screen( 'dashboard' );
+		$_GET['page'] = 'gfpdf-';
 
 		$updated_settings = $this->options->get_settings();
 
