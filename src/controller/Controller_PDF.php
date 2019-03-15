@@ -214,6 +214,10 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 
 		/* Cleanup filters */
 		add_filter( 'gform_before_resend_notifications', [ $this->model, 'resend_notification_pdf_cleanup' ], 10, 2 );
+
+		/* Third Party Conflict Fixes */
+		add_filter( 'gfpdf_pre_view_or_download_pdf', [ $this, 'sgoptimizer_html_minification_fix' ] );
+		add_filter( 'gfpdf_legacy_pre_view_or_download_pdf', [ $this, 'sgoptimizer_html_minification_fix' ] );
 	}
 
 	/**
@@ -297,6 +301,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		$GLOBALS['wp']->query_vars['lid']  = $config['lid'];
 
 		/* Send to our model to handle validation / authentication */
+		do_action( 'gfpdf_legacy_pre_view_or_download_pdf', $config['lid'], $pid, $config['action'] );
 		$results = $this->model->process_pdf( $pid, $config['lid'], $config['action'] );
 
 		/* if error, display to user */
@@ -319,6 +324,26 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	public function remove_pre_pdf_hooks() {
 		remove_filter( 'wp_kses_allowed_html', [ $this->view, 'allow_pdf_html' ] );
 		remove_filter( 'safe_style_css', [ $this->view, 'allow_pdf_css' ] );
+	}
+
+	/**
+	 * Disables the Siteground HTML Minifier when generating PDFs for the browser
+	 *
+	 * @since 5.1.5
+	 *
+	 * @see   https://github.com/GravityPDF/gravity-pdf/issues/863
+	 */
+	public function sgoptimizer_html_minification_fix() {
+		if ( class_exists( '\SiteGround_Optimizer\Minifier\Minifier' ) ) {
+
+			/* Remove the shutdown buffer and manually close an open buffers */
+			$minifier = \SiteGround_Optimizer\Minifier\Minifier::get_instance();
+			remove_action( 'shutdown', [ $minifier, 'end_html_minifier_buffer' ] );
+
+			while ( ob_get_level() > 0 ) {
+				ob_end_flush();
+			}
+		}
 	}
 
 	/**
