@@ -180,6 +180,8 @@ class Helper_Misc {
 	 *
 	 * 4. Convert any image URLs to local path where applicable
 	 *
+	 * 5. Strips out page breaks
+	 *
 	 * @param string $html The HTML to parse
 	 *
 	 * @return string
@@ -189,6 +191,10 @@ class Helper_Misc {
 		$html = wp_kses_post( $html );
 		$html = trim( wpautop( $html ) );
 		$html = $this->fix_header_footer_images( $html );
+
+		/* Strip page breaks */
+		$html = preg_replace( '/<pagebreak(.+?)?\/?>/', '', $html );
+		$html = preg_replace( '/page-break-(before|after):( +)?(always|left|right|auto|avoid)/', '', $html );
 
 		return $html;
 	}
