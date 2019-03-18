@@ -380,10 +380,15 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @return array
 	 */
 	public function register_rewrite_tags( $tags ) {
-		$tags[] = 'gpdf';
-		$tags[] = 'pid';
-		$tags[] = 'lid';
-		$tags[] = 'action';
+		global $wp;
+
+		/* Conditionally register rewrite tags to prevent conflict with other plugins */
+		if ( ! empty( $_GET['gpdf'] ) || ! empty( $_GET['gf_pdf'] ) || strpos( $wp->matched_query, 'gpdf=1' ) === 0 ) {
+			$tags[] = 'gpdf';
+			$tags[] = 'pid';
+			$tags[] = 'lid';
+			$tags[] = 'action';
+		}
 
 		return $tags;
 	}

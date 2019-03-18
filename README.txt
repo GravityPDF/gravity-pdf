@@ -4,8 +4,8 @@ Plugin URI: https://gravitypdf.com/
 Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.8
-Tested up to: 5.0
-Stable tag: 5.1.4
+Tested up to: 5.1
+Stable tag: 5.1.5
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -89,6 +89,12 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 18. Blank Slate provides a print-friendly template focusing solely on the user-submitted data.
 
 == Changelog ==
+
+= 5.1.5 =
+* Housekeeping: Add filter `gfpdf_mpdf_post_init_class` to interact with mPDF right after the initial Gravity PDF object setup [GH#890]
+* Bug: Fix URL rewrite issue with plugins that use `action` GET super global [GH#892]
+* Bug: Fix conflict with the SG Optimizer plugin's Minify HTML option [GH#897]
+* Bug: Strip Page Breaks from Headers and Footers to prevent Fatal PHP Error [GH#898]
 
 = 5.1.4 =
 * Housekeeping: Upgrade Mpdf from 7.1.8 to 7.1.9 https://github.com/mpdf/mpdf/compare/v7.1.8...v7.1.9
