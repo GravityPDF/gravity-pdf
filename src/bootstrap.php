@@ -9,6 +9,10 @@ use GFPDF\Helper;
 
 use GFPDF_Core;
 
+use GFPDF\Api\Fonts\Api_Fonts;
+
+use GFPDF\Plugins\Previewer\API\RegisterPdfViewerAPIEndpoint;
+
 /**
  * Bootstrap / Router Class
  * The bootstrap is loaded on WordPress 'plugins_loaded' functionality
@@ -122,6 +126,17 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public $templates;
 
+
+	/**
+	 * Holds our Helper_Fonts object
+	 * Makes it easy to access common methods throughout the plugin
+	 *
+	 * @var \GFPDF\Api\V1\Fonts\Api_Fonts
+	 *
+	 * @since 4.0
+	 */
+	public $fonts;
+
 	/**
 	 * Makes our MVC classes sudo-singletons by allowing easy access to the original objects
 	 * through `$singleton->get_class();`
@@ -206,6 +221,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		/* Setup our template helper */
 		$this->templates = new Helper\Helper_Templates( $this->log, $this->data, $this->gform );
+
+
+		/* Setup our Api_Fonts */
+		//$this->fonts = new Api_Fonts;
+
 
 		/* Set up our options object - this is initialised on admin_init but other classes need to access its methods before this */
 		$this->options = new Helper\Helper_Options_Fields(
