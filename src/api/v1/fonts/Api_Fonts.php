@@ -59,8 +59,9 @@ class Api_Fonts {
 	 *
 	 * @since 0.1
 	 */
-	public function __construct( CallableApiResponse $response ) {
-		$this->response = $response;
+	public function __construct( ) {
+		die('here');
+		//$this->response = $response;
 	}
 
 	/**
