@@ -1,6 +1,6 @@
 <?php
 
-namespace GFPDF\Api\Fonts;
+namespace GFPDF\Api\v1\Fonts;
 
 
 // use GFPDF\Helper\Helper_Interface_Actions;

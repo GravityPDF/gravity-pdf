@@ -9,7 +9,7 @@ use GFPDF\Helper;
 
 use GFPDF_Core;
 
-use GFPDF\Api\Fonts\Api_Fonts;
+use GFPDF\Api\v1\Fonts\Api_Fonts;
 
 use GFPDF\Plugins\Previewer\API\RegisterPdfViewerAPIEndpoint;
 
@@ -224,7 +224,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 
 		/* Setup our Api_Fonts */
-		//$this->fonts = new Api_Fonts;
+		$this->fonts = new Api\v1\Fonts\Api_Fonts;
 
 
 		/* Set up our options object - this is initialised on admin_init but other classes need to access its methods before this */
