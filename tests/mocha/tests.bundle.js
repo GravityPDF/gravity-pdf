@@ -14,7 +14,10 @@ window.requestAnimationFrame = function (callback) {
 // setup global defaults that our tests/legacy code expect is present
 window.GFPDF = {
   templateList: [{id: 'zadani'}, {id: 'rubix'}, {id: 'focus-gravity'}],
-  activeTemplate: ''
+  activeTemplate: '',
+  coreFontItemPendingMessage: '%s',
+  coreFontItemSuccessMessage: '%s',
+  coreFontItemErrorMessage: '%s',
 }
 
 window.gfpdf_migration_multisite_ids = []

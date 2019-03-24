@@ -1,9 +1,12 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import { connect } from 'react-redux'
-import request from 'superagent'
-
-import { addTemplate, updateTemplateParam } from '../../actions/templates'
+import {
+  addTemplate,
+  updateTemplateParam,
+  postTemplateUploadProcessing,
+  clearTemplateUploadProcessing
+} from '../../actions/templates'
 import classNames from 'classnames'
 import Dropzone from 'react-dropzone'
 import ShowMessage from '../ShowMessage'
@@ -47,9 +50,6 @@ export class TemplateUploader extends React.Component {
    * @since 4.1
    */
   static propTypes = {
-    ajaxUrl: PropTypes.string,
-    ajaxNonce: PropTypes.string,
-
     genericUploadErrorText: PropTypes.string,
     addTemplateText: PropTypes.string,
     filenameErrorText: PropTypes.string,
@@ -61,7 +61,11 @@ export class TemplateUploader extends React.Component {
 
     addNewTemplate: PropTypes.func,
     updateTemplateParam: PropTypes.func,
-    templates: PropTypes.array
+    postTemplateUploadProcessing: PropTypes.func,
+    clearTemplateUploadProcessing: PropTypes.func,
+    templates: PropTypes.array,
+    templateUploadProcessingSuccess: PropTypes.object,
+    templateUploadProcessingError: PropTypes.object
   }
 
   /**
@@ -75,6 +79,18 @@ export class TemplateUploader extends React.Component {
     ajax: false,
     error: '',
     message: ''
+  }
+
+  /**
+   * Fires appropriate function based on Redux store data
+   *
+   * @param {Object} nextProps
+   *
+   * @since 4.1
+   */
+  componentWillReceiveProps (nextProps) {
+    Object.keys(nextProps.templateUploadProcessingSuccess).length > 0 && this.ajaxSuccess(nextProps.templateUploadProcessingSuccess)
+    Object.keys(nextProps.templateUploadProcessingError).length > 0 && this.ajaxFailed(nextProps.templateUploadProcessingError)
   }
 
   /**
@@ -104,12 +120,7 @@ export class TemplateUploader extends React.Component {
         })
 
         /* POST the PDF template to our endpoint for processing */
-        request
-          .post(this.props.ajaxUrl)
-          .field('action', 'gfpdf_upload_template')
-          .field('nonce', this.props.ajaxNonce)
-          .attach('template', file, filename)
-          .then(this.ajaxSuccess, this.ajaxFailed)
+        this.props.postTemplateUploadProcessing(file, filename)
       })
 
     }
@@ -193,6 +204,9 @@ export class TemplateUploader extends React.Component {
       ajax: false,
       message: this.props.templateSuccessfullyInstalledUpdated
     })
+
+    /* Clean/Reset our Redux Store state for templateUploadProcessing */
+    this.props.clearTemplateUploadProcessing()
   }
 
   /**
@@ -208,6 +222,9 @@ export class TemplateUploader extends React.Component {
       error: (error.response.body && error.response.body.error !== undefined) ? error.response.body.error : this.props.genericUploadErrorText,
       ajax: false
     })
+
+    /* Clean/Reset our Redux Store state for templateUploadProcessing */
+    this.props.clearTemplateUploadProcessing()
   }
 
   /**
@@ -240,12 +257,12 @@ export class TemplateUploader extends React.Component {
                 <input {...getInputProps()} />
                 <a href="#/template" className={this.state.ajax ? 'doing-ajax' : ''}>
 
-                  <div className="theme-screenshot"><span /></div>
+                  <div className="theme-screenshot"><span/></div>
 
-                  {this.state.error !== '' ? <ShowMessage text={this.state.error} error={true} /> : null}
+                  {this.state.error !== '' ? <ShowMessage text={this.state.error} error={true}/> : null}
                   {this.state.message !== '' ?
                     <ShowMessage text={this.state.message} dismissable={true}
-                                 dismissableCallback={this.removeMessage} /> : null}
+                                 dismissableCallback={this.removeMessage}/> : null}
 
                   <h2 className="theme-name">{this.props.addTemplateText}</h2>
                 </a>
@@ -260,17 +277,18 @@ export class TemplateUploader extends React.Component {
 }
 
 /**
- * Map state to props
+ * Map Redux state to props
  *
- * @param {Object} state The current Redux State
+ * @param state
+ * @returns {{templates: Array, templateUploadProcessingSuccess: Object, templateUploadProcessingError: Object}}
  *
- * @returns {{templates}}
- *
- * @since 4.1
+ * @since 5.2
  */
 const mapStateToProps = (state) => {
   return {
-    templates: state.template.list
+    templates: state.template.list,
+    templateUploadProcessingSuccess: state.template.templateUploadProcessingSuccess,
+    templateUploadProcessingError: state.template.templateUploadProcessingError
   }
 }
 
@@ -279,7 +297,7 @@ const mapStateToProps = (state) => {
  *
  * @param {func} dispatch Redux dispatcher
  *
- * @returns {{addNewTemplate: (function(template)), updateTemplateParam: (function(id=string, name=string, value=*))}}
+ * @returns {{addNewTemplate: (function(template)), updateTemplateParam: (function(id=string, name=string, value=*)), postTemplateUploadProcessing: (function(file=object, filename=string)), clearTemplateUploadProcessing: (function())}}
  *
  * @since 4.1
  */
@@ -291,6 +309,14 @@ const mapDispatchToProps = (dispatch) => {
 
     updateTemplateParam: (id, name, value) => {
       dispatch(updateTemplateParam(id, name, value))
+    },
+
+    postTemplateUploadProcessing: (file, filename) => {
+      dispatch(postTemplateUploadProcessing(file, filename))
+    },
+
+    clearTemplateUploadProcessing: () => {
+      dispatch(clearTemplateUploadProcessing())
     }
   }
 }

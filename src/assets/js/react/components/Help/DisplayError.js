@@ -1,10 +1,10 @@
+import React from 'react'
+
 /**
- * Our Redux Action Type Constants
- *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2019, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       5.0
+ * @since       5.2
  */
 
 /*
@@ -27,7 +27,18 @@
  Found
  */
 
-export const ADD_TO_CONSOLE = 'ADD_TO_CONSOLE'
-export const CLEAR_CONSOLE = 'CLEAR_CONSOLE'
-export const ADD_TO_RETRY_LIST = 'ADD_TO_RETRY_LIST'
-export const CLEAR_RETRY_LIST = 'CLEAR_RETRY_LIST'
+/**
+ * Display error
+ *
+ * @param displayError (string)
+ * @returns {*}
+ *
+ * @since 5.2
+ */
+const DisplayError = ({displayError}) => {
+  return (
+    <li className='error'>{displayError}</li>
+  )
+}
+
+export default DisplayError
