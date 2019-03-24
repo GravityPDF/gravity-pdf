@@ -1,8 +1,4 @@
-/* Our Redux Action Type Constants */
-export const GET_DATA = 'GET_DATA'
-export const RESULT_ERROR = 'RESULT_ERROR'
-export const UPDATE_RESULTS = 'UPDATE_RESULTS'
-export const DELETE_RESULTS = 'DELETE_RESULTS'
+import request from 'superagent'
 
 /**
  * @package     Gravity PDF
@@ -32,62 +28,49 @@ export const DELETE_RESULTS = 'DELETE_RESULTS'
  */
 
 /**
- * Get the latest help search input query
+ * Do AJAX call
  *
- * @param data
- *
- * @returns {{type, payload: (string)}}
+ * @returns {{method.post}}
  *
  * @since 5.2
  */
-export const getData = data => {
-  return {
-    type: GET_DATA,
-    payload: data
-  }
+export function apiPostUpdateSelectBox () {
+  return request
+    .post(GFPDF.ajaxUrl)
+    .field('action', 'gfpdf_get_template_options')
+    .field('nonce', GFPDF.ajaxNonce)
 }
 
 /**
- * Update error handling to the store
+ * Do AJAX call
  *
- * @param data
+ * @param {String} templateId
  *
- * @returns {{type, payload: (string)}}
+ * @returns {{method.post}}
  *
  * @since 5.2
  */
-export const updateError = data => {
-  return {
-    type: RESULT_ERROR,
-    payload: data
-  }
+export function apiPostTemplateProcessing (templateId) {
+  return request
+    .post(GFPDF.ajaxUrl)
+    .field('action', 'gfpdf_delete_template')
+    .field('nonce', GFPDF.ajaxNonce)
+    .field('id', templateId)
 }
 
 /**
- * Save/update the latest help search results to the store
+ * Do AJAX call
  *
- * @param data
+ * @param {{file: Object, filename: String}}
  *
- * @returns {{type, payload: (object)}}
- *
- * @since 5.2
- */
-export const updateResult = data => {
-  return {
-    type: UPDATE_RESULTS,
-    payload: data
-  }
-}
-
-/**
- * Delete the help search results from the store
- *
- * @returns {{type}}
+ * @returns {{method.post}}
  *
  * @since 5.2
  */
-export const deleteResult = () => {
-  return {
-    type: DELETE_RESULTS
-  }
+export function apiPostTemplateUploadProcessing (file, filename) {
+  return request
+    .post(GFPDF.ajaxUrl)
+    .field('action', 'gfpdf_upload_template')
+    .field('nonce', GFPDF.ajaxNonce)
+    .attach('template', file, filename)
 }

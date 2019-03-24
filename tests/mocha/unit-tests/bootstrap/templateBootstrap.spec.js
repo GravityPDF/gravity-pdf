@@ -10,7 +10,7 @@ import {
 
 import { setupReducers } from '../../../../src/assets/js/react/store'
 
-describe('bootstrap.spec.js', () => {
+describe('templateBootstrap.spec.js', () => {
   beforeEach(function () {
     $('body')
       .append('<div id="karma-test-button"><input id="test-input"><span></span></div>')
