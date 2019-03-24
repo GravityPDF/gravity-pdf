@@ -4,7 +4,6 @@
   "dependencies": {
     "classnames": "^2.2.6",
     "lodash.debounce": "^4.0.8",
-    "promise-queue": "^2.2.5",
     "prop-types": "^15.7.2",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
@@ -13,6 +12,7 @@
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "redux": "^4.0.1",
+    "redux-saga": "^1.0.2",
     "redux-watch": "^1.1.1",
     "reselect": "^4.0.0",
     "superagent": "3.8.3"
@@ -39,6 +39,7 @@
     "gulp-sort": "^2.0.0",
     "gulp-watch": "^5.0.1",
     "gulp-wp-pot": "^2.3.4",
+    "history": "^4.9.0",
     "jquery": "^3.4.1",
     "json-loader": "^0.5.7",
     "karma": "^4.0.1",
@@ -54,6 +55,7 @@
     "karma-webpack": "4.0.0-rc.6",
     "mocha": "^6.0.2",
     "react-test-renderer": "^16.8.3",
+    "redux-devtools-extension": "^2.13.8",
     "redux-mock-store": "^1.5.3",
     "sinon": "^7.2.6",
     "standard": "^12.0.1",

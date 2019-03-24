@@ -1,7 +1,9 @@
 import {
+  GET_DATA,
+  RESULT_ERROR,
   UPDATE_RESULTS,
   DELETE_RESULTS
-} from '../actionTypes/help'
+} from '../actions/help'
 
 /**
  * @package     Gravity PDF
@@ -33,12 +35,14 @@ import {
 /**
  * Setup the initial state of the "help" portion of our Redux store
  *
- * @type {{results: Array}}
+ * @type {{loading: boolean, results: array, error: string}}
  *
  * @since 5.2
  */
 export const initialState = {
-  results: []
+  loading: false,
+  results: [],
+  error: ''
 }
 
 /**
@@ -56,9 +60,29 @@ export default function (state = initialState, action) {
     /**
      * @since 5.2
      */
+    case GET_DATA:
+      return {
+        ...state,
+        loading: true
+      }
+
+    /**
+     * @since 5.2
+     */
+    case RESULT_ERROR:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload
+      }
+
+    /**
+     * @since 5.2
+     */
     case UPDATE_RESULTS:
       return {
         ...state,
+        loading: false,
         results: action.payload
       }
 

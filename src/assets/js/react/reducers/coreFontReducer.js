@@ -2,8 +2,13 @@ import {
   ADD_TO_CONSOLE,
   ADD_TO_RETRY_LIST,
   CLEAR_RETRY_LIST,
-  CLEAR_CONSOLE
-} from '../actionTypes/coreFonts'
+  CLEAR_CONSOLE,
+  GET_FILES_FROM_GITHUB_SUCCESS,
+  GET_FILES_FROM_GITHUB_FAILED,
+  REQUEST_SENT_COUNTER,
+  CLEAR_REQUEST_REMAINING_DATA,
+  RETRY_DOWNLOAD
+} from '../actions/coreFonts'
 
 /**
  * @package     Gravity PDF
@@ -35,13 +40,32 @@ import {
 /**
  * Setup the initial state of the "coreFont" portion of our Redux store
  *
- * @type {{console: {}, retry: Array}}
+ * @type {{
+ *  fontList: Array,
+ *  console: Object,
+ *  retry: Array,
+ *  getFilesFromGitHubFailed: Object,
+ *  remainingDownload: Integer,
+ *  requestDownload: String,
+ *  requestSentCounter: Array,
+ *  retry_download: Boolean,
+ *  currentDownload: Integer,
+ *  retryDownloadLength: null
+ * }}
  *
  * @since 5.0
  */
 export const initialState = {
+  fontList: [],
   console: {},
   retry: [],
+  getFilesFromGitHubFailed: {},
+  remainingDownload: 0,
+  requestDownload: '',
+  requestSentCounter: [],
+  retry_download: false,
+  currentDownload: 0,
+  retryDownloadLength: null
 }
 
 /**
@@ -56,7 +80,6 @@ export const initialState = {
  */
 export default function (state = initialState, action) {
   switch (action.type) {
-
     /**
      * @since 5.0
      */
@@ -67,7 +90,7 @@ export default function (state = initialState, action) {
           ...state.console,
           [action.key]: {
             status: action.status,
-            message: action.message,
+            message: action.message
           }
         }
       }
@@ -104,7 +127,125 @@ export default function (state = initialState, action) {
     case CLEAR_RETRY_LIST:
       return {
         ...state,
-        retry: [],
+        retry: []
+      }
+
+    /**
+     * @since 5.2
+     */
+    case GET_FILES_FROM_GITHUB_SUCCESS:
+      /* Push font names into array */
+      let files = []
+      action.payload.map((item) => {
+        files.push(item.name)
+      })
+
+      return {
+        ...state,
+        fontList: files
+      }
+
+    /**
+     * @since 5.2
+     */
+    case GET_FILES_FROM_GITHUB_FAILED:
+      return {
+        ...state,
+        getFilesFromGitHubFailed: action.payload
+      }
+
+    /**
+     * @since 5.2
+     */
+    case REQUEST_SENT_COUNTER:
+      /* Show the overall status in the console once all the fonts have been downloaded (or tried to download) */
+      const errors = state.retry.length
+      const status = errors ? 'error' : 'success'
+      const message = errors ? GFPDF.coreFontError.replace('%s', errors) : GFPDF.coreFontSuccess
+      /* Fire only if requested a retry download */
+      if (state.retry_download === true) {
+        state.retryDownloadLength--
+        if (state.retryDownloadLength === 0) {
+          state.console.completed = {}
+          return {
+            ...state,
+            console: {
+              ...state.console,
+              ['completed']: {
+                status: status,
+                message: message
+              }
+            },
+            remainingDownload: state.retryDownloadLength,
+            requestDownload: 'finished',
+            retry_download: false
+          }
+        }
+        return {
+          ...state,
+          remainingDownload: state.retryDownloadLength
+        }
+      }
+
+      /* Fire in first download request */
+      state.currentDownload++
+      if (state.currentDownload >= state.fontList.length && state.retry_download === false) {
+        /* Failed */
+        if (state.retry.length > 0) {
+          return {
+            ...state,
+            console: {
+              ...state.console,
+              ['completed']: {
+                status: status,
+                message: message
+              }
+            },
+            requestDownload: 'finished',
+            currentDownload: 0,
+            remainingDownload: 0
+          }
+        } else {
+          /* Success */
+          return {
+            ...state,
+            console: {
+              ...state.console,
+              ['completed']: {
+                status: status,
+                message: message
+              }
+            },
+            requestDownload: 'finished',
+            currentDownload: 0,
+            remainingDownload: 0
+          }
+        }
+      } else {
+        let remainingDownloadCounter = state.fontList.length - state.currentDownload
+        return {
+          ...state,
+          remainingDownload: remainingDownloadCounter
+        }
+      }
+
+    /**
+     * @since 5.2
+     */
+    case CLEAR_REQUEST_REMAINING_DATA:
+      return {
+        ...state,
+        requestDownload: ''
+      }
+
+    /**
+     * @since 5.2
+     */
+    case RETRY_DOWNLOAD:
+      return {
+        ...state,
+        retry_download: true,
+        retryDownloadLength: action.payload
       }
   }
 

@@ -13,7 +13,7 @@ describe('<TemplateCloseDialog />', () => {
   })
 
   it('a button should be displayed', () => {
-    const comp = mount(<TemplateCloseDialog history={History} />)
+    const comp = mount(<TemplateCloseDialog history={History}/>)
     const button = comp.find('button')
 
     expect(button).to.have.length(1)
@@ -21,19 +21,19 @@ describe('<TemplateCloseDialog />', () => {
   })
 
   it('when clicked it should update the route', () => {
-    const comp = mount(<TemplateCloseDialog history={History} />)
+    const comp = mount(<TemplateCloseDialog history={History}/>)
     comp.find('button').simulate('click')
     expect(window.location.hash).to.equal('#/')
   })
 
   it('when esc button pressed it should update the route', () => {
-    const comp = mount(<TemplateCloseDialog history={History} />)
+    const comp = mount(<TemplateCloseDialog history={History}/>)
     comp.simulate('keydown', {key: 'Escape', keyCode: 27})
     expect(window.location.hash).to.equal('#/')
   })
 
   it('it should redirect to a route passed by props', () => {
-    const comp = mount(<TemplateCloseDialog history={History} closeRoute="/template" />)
+    const comp = mount(<TemplateCloseDialog history={History} closeRoute="/template"/>)
     comp.simulate('keydown', {key: 'Escape', keyCode: 27})
     expect(window.location.hash).to.equal('#/template')
   })

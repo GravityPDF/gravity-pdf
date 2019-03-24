@@ -1,10 +1,10 @@
+import request from 'superagent'
+
 /**
- * Our Redux Action Type Constants
- *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2019, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       4.1
+ * @since       5.2
  */
 
 /*
@@ -27,8 +27,15 @@
  Found
  */
 
-export const SEARCH_TEMPLATES = 'SEARCH_TEMPLATES'
-export const SELECT_TEMPLATE = 'SELECT_TEMPLATE'
-export const ADD_TEMPLATE = 'ADD_TEMPLATE'
-export const UPDATE_TEMPLATE_PARAM = 'UPDATE_TEMPLATE_PARAM'
-export const DELETE_TEMPLATE = 'DELETE_TEMPLATE'
+/**
+ * Do AJAX call
+ *
+ * @param searchQuery
+ *
+ * @returns {{method.get}}
+ *
+ * @since 5.2
+ */
+export const apiGetSearchResult = searchQuery => {
+  return request.get(`https://gravitypdf.com/wp-json/wp/v2/v5_docs/?search=${searchQuery}`)
+}

@@ -269,6 +269,7 @@ class Helper_Data {
 				'searchPlaceholder'                    => esc_html__( 'Search the Gravity PDF Knowledgebase...', 'gravity-forms-pdf-extended' ),
 				'searchResultHeadingText'              => esc_html__( 'Gravity PDF Documentation', 'gravity-forms-pdf-extended' ),
 				'noResultText'                         => esc_html__( 'It doesn\'t look like there are any topics related to your issue.', 'gravity-forms-pdf-extended' ),
+				'getSearchResultError'                 => esc_html__( 'An error occurred. Please try again', 'gravity-forms-pdf-extended' ),
 
 				'requiresGravityPdfVersion'            => esc_html__( 'Requires Gravity PDF v%s', 'gravity-forms-pdf-extended' ),
 				'templateNotCompatibleWithGravityPdfVersion' => esc_html__( 'This PDF template is not compatible with your version of Gravity PDF. This template required Gravity PDF v%s.', 'gravity-forms-pdf-extended' ),
