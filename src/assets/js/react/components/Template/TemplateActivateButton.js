@@ -61,7 +61,7 @@ export class TemplateActivateButton extends React.Component {
     e.stopPropagation()
 
     this.props.history.push('')
-    this.props.onTemplateSelect(this.props.template.get('id'))
+    this.props.onTemplateSelect(this.props.template.id)
   }
 
   /**
@@ -81,6 +81,7 @@ export class TemplateActivateButton extends React.Component {
 }
 
 /**
+ * TemplateActivateButton
  * Map actions to props
  *
  * @param {func} dispatch Redux dispatcher
@@ -103,4 +104,3 @@ const mapDispatchToProps = (dispatch) => {
  * @since 4.1
  */
 export default withRouter(connect(null, mapDispatchToProps)(TemplateActivateButton))
-

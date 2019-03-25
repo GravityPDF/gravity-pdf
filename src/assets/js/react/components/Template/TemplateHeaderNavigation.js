@@ -2,7 +2,6 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { List } from 'immutable'
 
 /**
  * Renders the template navigation header that get displayed on the
@@ -44,7 +43,7 @@ export class TemplateHeaderNavigation extends React.Component {
    * @since 4.1
    */
   static propTypes = {
-    templates: PropTypes.object.isRequired,
+    templates: PropTypes.array.isRequired,
     templateIndex: PropTypes.number.isRequired,
     isFirst: PropTypes.bool,
     isLast: PropTypes.bool,
@@ -72,7 +71,7 @@ export class TemplateHeaderNavigation extends React.Component {
   }
 
   /**
-   * Attempt to get the previous template in our Immutable list and update the URL
+   * Attempt to get the previous template in our list and update the URL
    *
    * @param {Object} e Event
    *
@@ -82,7 +81,7 @@ export class TemplateHeaderNavigation extends React.Component {
     e.preventDefault()
     e.stopPropagation()
 
-    const prevId = this.props.templates.get(this.props.templateIndex - 1).get('id')
+    const prevId = this.props.templates[this.props.templateIndex - 1].id
 
     if (prevId) {
       this.props.history.push('/template/' + prevId)
@@ -90,7 +89,7 @@ export class TemplateHeaderNavigation extends React.Component {
   }
 
   /**
-   * Attempt to get the next template in our Immutable list and update the URL
+   * Attempt to get the next template in our list and update the URL
    *
    * @param {Object} e Event
    *
@@ -100,7 +99,7 @@ export class TemplateHeaderNavigation extends React.Component {
     e.preventDefault()
     e.stopPropagation()
 
-    const nextId = this.props.templates.get(this.props.templateIndex + 1).get('id')
+    const nextId = this.props.templates[this.props.templateIndex + 1].id
 
     if (nextId) {
       this.props.history.push('/template/' + nextId)
@@ -138,12 +137,8 @@ export class TemplateHeaderNavigation extends React.Component {
     const isFirst = this.props.isFirst
     const isLast = this.props.isLast
 
-    let baseClass = List(['dashicons', 'dashicons-no'])
-
-    let prevClass = baseClass.push('left')
-    let nextClass = baseClass.push('right')
-    prevClass = (isFirst) ? prevClass.push('disabled') : prevClass
-    nextClass = (isLast) ? nextClass.push('disabled') : nextClass
+    let prevClass = (isFirst) ? 'dashicons dashicons-no left disabled' : 'dashicons dashicons-no left'
+    let nextClass = (isLast) ? 'dashicons dashicons-no right disabled' : 'dashicons dashicons-no right'
 
     let leftDisabled = (isFirst) ? 'disabled' : ''
     let rightDisabled = (isLast) ? 'disabled' : ''
@@ -153,7 +148,7 @@ export class TemplateHeaderNavigation extends React.Component {
         <button
           onClick={this.previousTemplate}
           onKeyDown={this.handleKeyPress}
-          className={prevClass.join(' ')}
+          className={prevClass}
           tabIndex="141"
           disabled={leftDisabled}>
             <span
@@ -165,7 +160,7 @@ export class TemplateHeaderNavigation extends React.Component {
         <button
           onClick={this.nextTemplate}
           onKeyDown={this.handleKeyPress}
-          className={nextClass.join(' ')}
+          className={nextClass}
           tabIndex="141"
           disabled={rightDisabled}>
           <span
@@ -191,9 +186,10 @@ export class TemplateHeaderNavigation extends React.Component {
 const MapStateToProps = (state, props) => {
   /* Check if the current template is the first or last in our templates */
   const templates = props.templates
-  const currentTemplateId = props.template.get('id')
-  const first = templates.first().get('id')
-  const last = templates.last().get('id')
+  const currentTemplateId = props.template.id
+  const lastTemplate = templates.length - 1
+  const first = templates[0].id
+  const last = templates[lastTemplate].id
 
   return {
     isFirst: first === currentTemplateId,
@@ -207,4 +203,3 @@ const MapStateToProps = (state, props) => {
  * @since 4.1
  */
 export default withRouter(connect(MapStateToProps)(TemplateHeaderNavigation))
-

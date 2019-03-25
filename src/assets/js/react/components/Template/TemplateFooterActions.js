@@ -59,14 +59,14 @@ class TemplateFooterActions extends React.Component {
   /**
    * Check if the current PDF template is a core template or not (i.e is shipped with Gravity PDF)
    *
-   * @param {Object} template Immutable Map
+   * @param {Object} template
    *
    * @returns {boolean}
    *
    * @since 4.1
    */
   notCoreTemplate = (template) => {
-    return template.get('path').indexOf(this.props.pdfWorkingDirPath) !== -1
+    return template.path.indexOf(this.props.pdfWorkingDirPath) !== -1
   }
 
   /**
@@ -74,7 +74,7 @@ class TemplateFooterActions extends React.Component {
    */
   render () {
     const template = this.props.template
-    const isCompatible = template.get('compatible')
+    const isCompatible = template.compatible
 
     return (
       <div className="theme-actions">
@@ -101,4 +101,3 @@ class TemplateFooterActions extends React.Component {
 }
 
 export default TemplateFooterActions
-

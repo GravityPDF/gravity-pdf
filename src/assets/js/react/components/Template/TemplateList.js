@@ -49,7 +49,7 @@ export class TemplateList extends React.Component {
    * @since 4.1
    */
   static propTypes = {
-    templates: PropTypes.object,
+    templates: PropTypes.array,
     route: PropTypes.object
   }
 

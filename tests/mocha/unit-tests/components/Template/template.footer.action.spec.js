@@ -2,7 +2,6 @@ import React from 'react'
 import { mount } from 'enzyme'
 import configureStore from 'redux-mock-store'
 import { Provider } from 'react-redux'
-import Immutable from 'immutable'
 import { HashRouter as Router } from 'react-router-dom'
 
 const mockStore = configureStore()
@@ -14,7 +13,7 @@ describe('<TemplateFooterActions />', () => {
   it('should render a button', () => {
     const comp = mount(<Router>
       <Provider store={mockStore()}>
-        <TemplateFooterActions template={Immutable.fromJS({path: '/my/test/path', compatible: true})}/>
+        <TemplateFooterActions template={{path: '/my/test/path', compatible: true}}/>
       </Provider>
     </Router>)
 
