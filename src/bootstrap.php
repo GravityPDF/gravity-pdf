@@ -222,10 +222,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/* Setup our template helper */
 		$this->templates = new Helper\Helper_Templates( $this->log, $this->data, $this->gform );
 
-
 		/* Setup our Api_Fonts */
-		$this->fonts = new Api\v1\Fonts\Api_Fonts;
-
+		$this->fonts = new Api\v1\Fonts\Api_Fonts();
 
 		/* Set up our options object - this is initialised on admin_init but other classes need to access its methods before this */
 		$this->options = new Helper\Helper_Options_Fields(
@@ -286,6 +284,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/* Cache our Gravity PDF Settings and register our settings fields with the Options API */
 		add_action( 'init', [ $this, 'init_settings_api' ], 1 );
 		add_action( 'admin_init', [ $this, 'setup_settings_fields' ], 1 );
+		
+		//add_action( 'wp_ajax_gfpdf_font_save', [ $this->model, 'save_font' ] );
 	}
 
 	/**
@@ -296,6 +296,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @return void
 	 */
 	public function add_filters() {
+
 
 		/* Automatically handle GF noconflict mode */
 		add_filter( 'gform_noconflict_scripts', [ $this, 'auto_noconflict_scripts' ] );

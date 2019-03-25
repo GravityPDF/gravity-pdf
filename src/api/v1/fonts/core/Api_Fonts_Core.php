@@ -1,6 +1,6 @@
 <?php
 
-namespace GFPDF\Api\v1\Fonts;
+namespace GFPDF\Api\v1\core\Fonts;
 
 use GFPDF\Helper\Helper_Interface_Actions;
 
@@ -37,13 +37,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 */
 
 /**
- * Class ApiFontsEndpoint
+ * Class ApiFontsCoreEndpoint
  *
  * @package GFPDF\Plugins\GravityPDF\API
  */
-class Api_Fonts {
+class Api_Fonts_Core {
 	/**
-	 * ApiFontsEndpoint constructor.
+	 * ApiFontsCoreEndpoint constructor.
 	 *
 	 * @param CallableApiResponse $response
 	 *
@@ -64,8 +64,7 @@ class Api_Fonts {
 	/**
 	 * @since 0.1
 	 */
-	public function add_actions() {	
-		die('rest_api_init');	
+	public function add_actions() {			
 		add_action( 'rest_api_init', [ $this, 'register_endpoint' ] );
 	}
 
@@ -77,7 +76,7 @@ class Api_Fonts {
 	 * @since    0.1
 	 */
 	public function register_endpoint() {		
-		register_rest_route( '/v1/fonts/', [
+		register_rest_route( '/v1/fonts/core/', [
 			'methods'  => WP_REST_Server::READABLE,
 			'callback' => [ $this->response, 'response' ],
 		] );

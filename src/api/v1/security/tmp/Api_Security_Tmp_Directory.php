@@ -1,6 +1,6 @@
 <?php
 
-namespace GFPDF\Api\v1\Fonts;
+namespace GFPDF\Api\v1\Security\Tmp;
 
 use GFPDF\Helper\Helper_Interface_Actions;
 
@@ -37,13 +37,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 */
 
 /**
- * Class ApiFontsEndpoint
+ * Class ApiSecurityTmpDirectoryEndpoint
  *
  * @package GFPDF\Plugins\GravityPDF\API
  */
-class Api_Fonts {
+class Api_Security_Tmp_Directory {
 	/**
-	 * ApiFontsEndpoint constructor.
+	 * ApiSecurityTmpDirectoryEndpoint constructor.
 	 *
 	 * @param CallableApiResponse $response
 	 *
@@ -77,7 +77,7 @@ class Api_Fonts {
 	 * @since    0.1
 	 */
 	public function register_endpoint() {		
-		register_rest_route( '/v1/fonts/', [
+		register_rest_route( '/v1/security/tmp/', [
 			'methods'  => WP_REST_Server::READABLE,
 			'callback' => [ $this->response, 'response' ],
 		] );
