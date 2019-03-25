@@ -1,8 +1,8 @@
 <?php
 
-namespace GFPDF\Api\V1\Fonts\Core;
+namespace GFPDF\Api;
 
-use GFPDF\Api\CallableApiResponse;
+use WP_REST_Request;
 
 /**
  * @package     Gravity PDF
@@ -37,56 +37,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 */
 
 /**
- * Class Api_Fonts_Core
+ * Interface CallableApiResponse
  *
- * @package GFPDF\Api\V1\Core\Fonts
+ * For use in a class that handles the REST API callback which takes the WP_REST_Request class as a single argument
+ *
+ * @package GFPDF\Plugins\Previewer\API
+ *
+ * @since   5.2
  */
-class Api_Fonts_Core implements CallableApiResponse {
+interface CallableApiResponse {
 
 	/**
-	 * Initialise our module
+	 * The REST API callback
+	 *
+	 * @param $request
+	 *
+	 * @return mixed
 	 *
 	 * @since 5.2
 	 */
-	public function init() {
-		$this->add_actions();
-	}
-
-	/**
-	 * @since 5.2
-	 */
-	public function add_actions() {
-		add_action( 'rest_api_init', [ $this, 'register_endpoint' ] );
-	}
-
-	/**
-	 * @since 5.2
-	 */
-	public function register_endpoint() {
-		register_rest_route(
-			'gravity-pdf/v1', /* @TODO - pass `gravity-pdf` portion via __construct() */
-			'/fonts/core/',
-			[
-				'methods'  => \WP_REST_Server::READABLE,
-				'callback' => [ $this, 'response' ],
-
-				'permission_callback' => function() {
-					return current_user_can( '' );
-				},
-			]
-		);
-	}
-
-	/**
-	 * Description @todo
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return \WP_REST_Response
-	 *
-	 * @since 5.2
-	 */
-	public function response( \WP_REST_Request $request ) {
-		return new \WP_Error( 'some_error_code', 'Some error message', [ 'status' => 400 ] );
-	}
+	public function response( WP_REST_Request $request );
 }
