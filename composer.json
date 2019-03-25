@@ -29,6 +29,7 @@
     		"GFPDF\\Helper\\": ["src/helper/", "src/helper/abstract/", "src/helper/interface/", "src/helper/trait/"],
     		"GFPDF\\Helper\\Licensing\\": "src/helper/licensing/",
     		"GFPDF\\Helper\\Fields\\": "src/helper/fields/",
+    		"GFPDF\\Api\\": "src/api/",
     		"GFPDF\\Test\\": "tests/unit-tests/"
     	}
     },

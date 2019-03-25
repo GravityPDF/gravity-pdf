@@ -1,9 +1,10 @@
 <?php
 
-namespace GFPDF\Api;
+namespace GFPDF\Api\v1\Template;
 
+use GFPDF\Helper\Helper_Interface_Actions;
 
-use WP_REST_Request;
+use WP_REST_Server;
 
 /**
  * @package     Gravity PDF Previewer
@@ -36,24 +37,49 @@ if ( ! defined( 'ABSPATH' ) ) {
 */
 
 /**
- * Interface CallableApiResponse
+ * Class ApiTemplateEndpoint
  *
- * For use in a class that handles the REST API callback which takes the WP_REST_Request class as a single argument
- *
- * @package GFPDF\Plugins\Previewer\API
- *
- * @since 0.1
+ * @package GFPDF\Plugins\GravityPDF\API
  */
-interface CallableApiResponse {
-
+class Api_Template {
 	/**
-	 * The REST API callback
+	 * ApiTemplateEndpoint constructor.
 	 *
-	 * @param $request
-	 *
-	 * @return mixed
+	 * @param CallableApiResponse $response
 	 *
 	 * @since 0.1
 	 */
-	public function response( WP_REST_Request $request );
+	public function __construct() {		
+	}
+
+	/**
+	 * Initialise our module
+	 *
+	 * @since 0.1
+	 */
+	public function init() {		
+		$this->add_actions();
+	}
+
+	/**
+	 * @since 0.1
+	 */
+	public function add_actions() {	
+		die('rest_api_init');	
+		add_action( 'rest_api_init', [ $this, 'register_endpoint' ] );
+	}
+
+	/**
+	 * Register our PDF save font endpoint
+	 *
+	 * @Internal Use this endpoint to save fonts
+	 *
+	 * @since    0.1
+	 */
+	public function register_endpoint() {		
+		register_rest_route( '/v1/template/', [
+			'methods'  => WP_REST_Server::READABLE,
+			'callback' => [ $this->response, 'response' ],
+		] );
+	}
 }
