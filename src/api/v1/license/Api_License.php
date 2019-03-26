@@ -67,7 +67,7 @@ class Api_License implements CallableApiResponse {
 	public function register_endpoint() {
 		register_rest_route(
 			'gravity-pdf/v1', /* @TODO - pass `gravity-pdf` portion via __construct() */
-			'/fonlicensets/',
+			'/license/',
 			[
 				'methods'  => \WP_REST_Server::READABLE,
 				'callback' => [ $this, 'response' ],
