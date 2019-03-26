@@ -9,7 +9,12 @@ use GFPDF\Helper;
 
 use GFPDF_Core;
 
+//@todo not sure if these are needed - sag
+use GFPDF\Api\v1\Fonts\Core\Api_Fonts_Core;
 use GFPDF\Api\v1\Fonts\Api_Fonts;
+use GFPDF\Api\v1\Template\Api_Template;
+
+
 
 use GFPDF\Plugins\Previewer\API\RegisterPdfViewerAPIEndpoint;
 
@@ -901,6 +906,12 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function api() {
 		$apis = [
 			new Api\V1\Fonts\Core\Api_Fonts_Core(),
+			new Api\V1\Fonts\Api_Fonts(),			
+			new Api\V1\License\Api_License(),
+			new Api\V1\Migration\Multisite\Api_Migration_v4(),
+			new Api\V1\Pdf\Settings\Api_Pdf_Settings(),			
+			new Api\V1\Security\Tmp\Api_Security_Tmp_Directory(),
+			new Api\V1\Template\Api_Template(),
 		];
 
 		foreach ( $apis as $api ) {

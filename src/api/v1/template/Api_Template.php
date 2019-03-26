@@ -1,10 +1,8 @@
 <?php
 
-namespace GFPDF\Api\v1\Template;
+namespace GFPDF\Api\V1\Template;
 
-use GFPDF\Helper\Helper_Interface_Actions;
-
-use WP_REST_Server;
+use GFPDF\Api\CallableApiResponse;
 
 /**
  * @package     Gravity PDF Previewer
@@ -41,7 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @package GFPDF\Plugins\GravityPDF\API
  */
-class Api_Template {
+class Api_Template implements CallableApiResponse {
 	/**
 	 * ApiTemplateEndpoint constructor.
 	 *
@@ -64,8 +62,7 @@ class Api_Template {
 	/**
 	 * @since 0.1
 	 */
-	public function add_actions() {	
-		die('rest_api_init');	
+	public function add_actions() {			
 		add_action( 'rest_api_init', [ $this, 'register_endpoint' ] );
 	}
 
@@ -74,12 +71,34 @@ class Api_Template {
 	 *
 	 * @Internal Use this endpoint to save fonts
 	 *
-	 * @since    0.1
+	 * @since 5.2
 	 */
-	public function register_endpoint() {		
-		register_rest_route( '/v1/template/', [
-			'methods'  => WP_REST_Server::READABLE,
-			'callback' => [ $this->response, 'response' ],
-		] );
+	public function register_endpoint() {
+		register_rest_route(
+			'gravity-pdf/v1', /* @TODO - pass `gravity-pdf` portion via __construct() */
+			'/template/',
+			[
+				'methods'  => \WP_REST_Server::READABLE,
+				'callback' => [ $this, 'response' ],
+
+				'permission_callback' => function() {
+					return current_user_can( '' );
+				},
+			]
+		);
 	}
+
+	/**
+	 * Register our PDF save font endpoint
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return \WP_REST_Response
+	 *
+	 * @since 5.2
+	 */
+	public function response( \WP_REST_Request $request ) {
+		return new \WP_Error( 'some_error_code', 'Some error message', [ 'status' => 400 ] );
+	}	
+
 }
