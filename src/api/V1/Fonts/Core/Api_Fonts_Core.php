@@ -71,10 +71,11 @@ class Api_Fonts_Core implements CallableApiResponse {
 				'callback' => [ $this, 'response' ],
 
 				'permission_callback' => function() {
-					return current_user_can( '' );
+					return current_user_can( 'gravityforms_edit_settings' );
 				},
 			]
 		);
+
 	}
 
 	/**
