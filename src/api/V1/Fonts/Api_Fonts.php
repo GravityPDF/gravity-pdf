@@ -3,6 +3,10 @@
 namespace GFPDF\Api\V1\Fonts;
 
 use GFPDF\Api\CallableApiResponse;
+use GFPDF\Helper\Helper_Misc;
+use Psr\Log\LoggerInterface;
+use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Abstract_Options;
 
 /**
  * @package     Gravity PDF Previewer
@@ -40,6 +44,56 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package GFPDF\Plugins\GravityPDF\API
  */
 class Api_Fonts implements CallableApiResponse {
+
+	/**
+	 * Holds our Helper_Misc object
+	 * Makes it easy to access common methods throughout the plugin
+	 *
+	 * @var \GFPDF\Helper\Helper_Misc
+	 *
+	 * @since 4.0
+	 */
+	protected $misc;
+
+	/**
+	 * Holds our log class
+	 *
+	 * @var \Monolog\Logger|LoggerInterface
+	 *
+	 * @since 4.0
+	 */
+	protected $log;
+
+	/**
+	 * Holds our Helper_Data object
+	 * which we can autoload with any data needed
+	 *
+	 * @var \GFPDF\Helper\Helper_Data
+	 *
+	 * @since 4.0
+	 */
+	protected $data;
+
+	/**
+	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
+	 * Makes it easy to access global PDF settings and individual form PDF settings
+	 *
+	 * @var \GFPDF\Helper\Helper_Options_Fields
+	 *
+	 * @since 4.0
+	 */
+	protected $options;
+
+	public function __construct( LoggerInterface $log, Helper_Misc $misc, Helper_Data $data, Helper_Abstract_Options $options ) {
+
+		/* Assign our internal variables */
+
+		$this->log   = $log;
+		$this->misc  = $misc;
+		$this->data  = $data;
+		$this->options   = $options;
+
+	}
 
 	/**
 	 * Initialise our module
@@ -88,14 +142,22 @@ class Api_Fonts implements CallableApiResponse {
 	 *
 	 * @since 5.2
 	 */
-	private function response( \WP_REST_Request $request ) {
+	public function response( \WP_REST_Request $request ) {
 
 		/* User / CORS validation */
 		/* $this->misc->handle_ajax_authentication( 'Save Font', 'gravityforms_edit_settings', 'gfpdf_font_nonce' ); */
 
+		// get the json parameter
+		$params = $request->get_json_params();
+
 		/* Handle the validation and saving of the font */
-		$payload = isset( $_POST['payload'] ) ? $_POST['payload'] : '';
+		$payload = isset( $params['payload'] ) ? $params['payload'] : '';
 		$results = $this->process_font( $payload );
+
+		// There was an issue downloading and saving fonts
+		if (!$results) {
+			return new \WP_Error( '400', 'Save Font Failed', [ 'status' => 400 ] );
+		}
 
 		/* If we reached this point the results were successful so return the new object */
 		$this->log->addNotice(
@@ -105,10 +167,13 @@ class Api_Fonts implements CallableApiResponse {
 			]
 		);
 
-		echo json_encode( $results );
-		wp_die();
+//		echo json_encode( $results );
+//		wp_die();
 
-		return new \WP_Error( 'some_error_code', 'Some error message', [ 'status' => 400 ] );
+		$response = new \WP_REST_Response(array('message' => 'Font saved successfully', 'data' => array('results' => $results )));
+		$response->set_status(200);
+		return $response;
+
 	}
 
 	/**
@@ -120,7 +185,7 @@ class Api_Fonts implements CallableApiResponse {
 	 *
 	 * @since 4.0
 	 */
-	private function process_font( $font ) {
+	public function process_font( $font ) {
 
 		/* remove any empty fields */
 		$font = array_filter( $font );
@@ -198,5 +263,140 @@ class Api_Fonts implements CallableApiResponse {
 		/* If we got here the installation was successful so return the data */
 		return $installation;
 	}
+
+	/**
+	 * Check that the font name passed conforms to our expected nameing convesion
+	 *
+	 * @param  string $name The font name to check
+	 *
+	 * @return boolean       True on valid, false on failure
+	 *
+	 * @since 4.0
+	 */
+	public function is_font_name_valid( $name ) {
+
+		$regex = '^[A-Za-z0-9 ]+$';
+
+		if ( preg_match( "/$regex/", $name ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Handles the database updates required to save a new font
+	 *
+	 * @param  array $fonts
+	 *
+	 * @return array
+	 *
+	 * @since 4.0
+	 */
+	public function install_fonts( $fonts ) {
+
+		$types  = [ 'regular', 'bold', 'italics', 'bolditalics' ];
+		$errors = [];
+
+		foreach ( $types as $type ) {
+
+			/* Check if a key exists for this type and process */
+			if ( isset( $fonts[ $type ] ) ) {
+				$path = $this->misc->convert_url_to_path( $fonts[ $type ] );
+
+				/* Couldn't find file so throw error */
+				if ( is_wp_error( $path ) ) {
+					$errors[] = sprintf( esc_html__( 'Could not locate font on web server: %s', 'gravity-forms-pdf-extended' ), $fonts[ $type ] );
+				}
+
+				/* Copy font to our fonts folder */
+				$filename = basename( $path );
+				if ( ! is_file( $this->data->template_font_location . $filename ) && ! copy( $path, $this->data->template_font_location . $filename ) ) {
+					$errors[] = sprintf( esc_html__( 'There was a problem installing the font %s. Please try again.', 'gravity-forms-pdf-extended' ), $filename );
+				}
+			}
+		}
+
+		/* If errors were found then return */
+		if ( sizeof( $errors ) > 0 ) {
+			$this->log->addError(
+				'Install Error.',
+				[
+					'errors' => $errors,
+				]
+			);
+
+			return [ 'errors' => $errors ];
+		} else {
+			/* Insert our font into the database */
+			$custom_fonts = $this->options->get_option( 'custom_fonts' );
+
+			/* Prepare our font data and give it a unique id */
+			if ( empty( $fonts['id'] ) ) {
+				$id          = uniqid();
+				$fonts['id'] = $id;
+			}
+
+			$custom_fonts[ $fonts['id'] ] = $fonts;
+
+			/* Update our font database */
+			$this->options->update_option( 'custom_fonts', $custom_fonts );
+
+			/* Cleanup the mPDF tmp directory to prevent font caching issues  */
+			$this->misc->cleanup_dir( $this->data->mpdf_tmp_location );
+
+		}
+
+		/* Fonts sucessfully installed so return font data */
+
+		return $fonts;
+	}
+
+	/**
+	 * Query our custom fonts options table and check if the font name already exists
+	 *
+	 * @param  string    $name The font name to check
+	 * @param int|string $id   The configuration ID (if any)
+	 *
+	 * @return bool True if valid, false on failure
+	 *
+	 * @since 4.0
+	 */
+	public function is_font_name_unique( $name, $id = '' ) {
+
+		/* Get the shortname of the current font */
+		$name = $this->options->get_font_short_name( $name );
+
+		/* Loop through default fonts and check for duplicate */
+		$default_fonts = $this->options->get_installed_fonts();
+
+		unset( $default_fonts[ esc_html__( 'User-Defined Fonts', 'gravity-forms-pdf-extended' ) ] );
+
+		/* check for exact match */
+		foreach ( $default_fonts as $group ) {
+			if ( isset( $group[ $name ] ) ) {
+				return false;
+			}
+		}
+
+		$custom_fonts = $this->options->get_option( 'custom_fonts' );
+
+		if ( is_array( $custom_fonts ) ) {
+			foreach ( $custom_fonts as $font ) {
+
+				/* Skip over itself */
+				if ( ! empty( $id ) && $font['id'] == $id ) {
+					continue;
+				}
+
+				if ( $name == $this->options->get_font_short_name( $font['font_name'] ) ) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
 
 }

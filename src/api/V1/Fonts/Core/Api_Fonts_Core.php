@@ -3,7 +3,7 @@
 namespace GFPDF\Api\V1\Fonts\Core;
 
 use GFPDF\Api\CallableApiResponse;
-
+use Psr\Log\LoggerInterface;
 
 
 /**
@@ -45,6 +45,22 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Api_Fonts_Core implements CallableApiResponse {
 
+	/**
+	 * Holds our log class
+	 *
+	 * @var \Monolog\Logger|LoggerInterface
+	 *
+	 * @since 4.0
+	 */
+	protected $log;
+
+	protected $github_repo = 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/';
+
+	public function __construct( LoggerInterface $log ) {
+
+		/* Assign our internal variables */
+		$this->log   = $log;
+	}
 	/**
 	 * Initialise our module
 	 *
@@ -100,7 +116,6 @@ class Api_Fonts_Core implements CallableApiResponse {
 		// There was an issue downloading and saving fonts
 		if (!$results) {
 			return new \WP_Error( '400', 'Core Font Download Failed', [ 'status' => 400 ] );
-
 		}
 
 		/* Return results */
