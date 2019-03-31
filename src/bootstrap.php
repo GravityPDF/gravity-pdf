@@ -276,8 +276,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/* Cache our Gravity PDF Settings and register our settings fields with the Options API */
 		add_action( 'init', [ $this, 'init_settings_api' ], 1 );
 		add_action( 'admin_init', [ $this, 'setup_settings_fields' ], 1 );
-		
-		//add_action( 'wp_ajax_gfpdf_font_save', [ $this->model, 'save_font' ] );
+
 	}
 
 	/**
