@@ -99,7 +99,7 @@ class Api_Fonts_Core implements CallableApiResponse {
 
 		// There was an issue downloading and saving fonts
 		if (!$results) {
-			return new \WP_Error( 'some_error_code', "There was a problem saving your " . $params['font_name'], [ 'status' => 400 ] );
+			return new \WP_Error( '400', 'Core Font Download Failed', [ 'status' => 400 ] );
 
 		}
 
