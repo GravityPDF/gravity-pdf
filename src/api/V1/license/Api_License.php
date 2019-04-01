@@ -180,13 +180,16 @@ class Api_License implements CallableApiResponse {
 
 		/* If API error exit early */
 		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
-			return false;
+
+			//@todo: need to get the message in $response
+			return new \WP_Error( '400', $response, [ 'status' => 400 ] );
 		}
 
 		/* Get API response and check license is now deactivated */
 		$license_data = json_decode( wp_remote_retrieve_body( $response ) );
 		if ( ! isset( $license_data->license ) || $license_data->license !== 'deactivated' ) {
-			return false;
+			//@todo: need to get the message in $response
+			return new \WP_Error( '400', 'Failed to deactivate license', [ 'status' => 400 ] );
 		}
 
 		/* Remove license data from database */
