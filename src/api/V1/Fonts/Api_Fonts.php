@@ -144,19 +144,6 @@ class Api_Fonts implements CallableApiResponse {
 	}
 
 	/**
-	 * Description @todo
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return \WP_REST_Response
-	 *
-	 * @since 5.2
-	 */
-	public function response( \WP_REST_Request $request ) {
-		return new \WP_Error( '400', 'Core Font Download Failed', [ 'status' => 400
-	}
-
-	/**
 	 * Register our PDF save font endpoint
 	 *
 	 * @param WP_REST_Request $request
@@ -408,15 +395,16 @@ class Api_Fonts implements CallableApiResponse {
 
 
 	/**
-	 * AJAX Endpoint for deleting a custom font
+	 * Description @todo
 	 *
-	 * @return void
+	 * @param WP_REST_Request $request
 	 *
-	 * @since 4.0
+	 * @return \WP_REST_Response
+	 *
+	 * @since 5.2
 	 */
-	public function delete_font() {
+	public function delete_font(\WP_REST_Request $request) {
 
-		return 'dELETE'; die();
 		// get the json parameter
 		$params = $request->get_json_params();
 
@@ -444,8 +432,6 @@ class Api_Fonts implements CallableApiResponse {
 					$response->set_status(200);
 					return $response;
 
-//					echo json_encode( [ 'success' => true ] );
-//					wp_die();
 				}
 			}
 		}
@@ -456,51 +442,8 @@ class Api_Fonts implements CallableApiResponse {
 
 		$this->log->addError( 'AJAX Endpoint Error', $return );
 
-		// There was an issue downloading and saving fonts
-		if (!$results) {
-			return new \WP_Error( '500', 'Could not delete Gravity PDF font correctly. Please try again.', [ 'status' => 500 ] );
-		}
+		return new \WP_Error( '500', 'Could not delete Gravity PDF font correctly. Please try again.', [ 'status' => 500 ] );
 
-//		echo json_encode( $return );
-//
-//		/* Bad Request */
-//		wp_die( '', 400 );
-	}
-
-	/**
-	 * Register our PDF save font endpoint
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return \WP_REST_Response
-	 *
-	 * @since 5.2
-	 */
-	public function delete_font( \WP_REST_Request $request ) {
-		return 'dELETE'; die();
-		// get the json parameter
-		$params = $request->get_json_params();
-
-		/* Handle the validation and saving of the font */
-		$payload = isset( $params['payload'] ) ? $params['payload'] : '';
-		$results = $this->process_font( $payload );
-
-		// There was an issue downloading and saving fonts
-		if (!$results) {
-			return new \WP_Error( '500', 'Save Font Failed', [ 'status' => 500 ] );
-		}
-
-		/* If we reached this point the results were successful so return the new object */
-		$this->log->addNotice(
-			'AJAX – Successfully Saved Font',
-			[
-				'results' => $results,
-			]
-		);
-
-		$response = new \WP_REST_Response(array('message' => 'Font saved successfully', 'data' => array('results' => $results )));
-		$response->set_status(200);
-		return $response;
 
 	}
 
@@ -529,6 +472,19 @@ class Api_Fonts implements CallableApiResponse {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Description @todo
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return \WP_REST_Response
+	 *
+	 * @since 5.2
+	 */
+	public function response( \WP_REST_Request $request ) {
+		return new \WP_Error( '400', 'Core Font Download Failed', [ 'status' => 400
 	}
 
 }
