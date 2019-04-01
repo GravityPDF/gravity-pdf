@@ -904,8 +904,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 	public function api() {
 		$apis = [
-			new Api\V1\Fonts\Core\Api_Fonts_Core(),
-			new Api\V1\Fonts\Api_Fonts(),			
+			new Api\V1\Fonts\Core\Api_Fonts_Core($this->log),
+			new Api\V1\Fonts\Api_Fonts($this->log, $this->misc, $this->data, $this->options),
 			new Api\V1\License\Api_License(),
 			new Api\V1\Migration\Multisite\Api_Migration_v4(),
 			new Api\V1\Pdf\Settings\Api_Pdf_Settings(),			

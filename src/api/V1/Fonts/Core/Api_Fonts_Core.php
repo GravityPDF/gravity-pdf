@@ -105,7 +105,6 @@ class Api_Fonts_Core implements CallableApiResponse {
 	 * @since 5.2
 	 */
 	public function response( \WP_REST_Request $request ) {
-
 		// get the json parameter
 		$params = $request->get_json_params();
 

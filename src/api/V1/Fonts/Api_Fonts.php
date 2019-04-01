@@ -124,14 +124,29 @@ class Api_Fonts implements CallableApiResponse {
 			'/fonts/',
 			[
 				'methods'  => \WP_REST_Server::READABLE,
-				'callback' => [ $this, 'response' ],
-
+				'callback' => [ 'save_font' ],
 				'permission_callback' => function() {
 					return current_user_can( 'read' );
 				},
 			]
 		);
+
+		register_rest_route(
+			'gravity-pdf/v1', /* @TODO - pass `gravity-pdf` portion via __construct() */
+			'/fonts/',
+			[
+				'methods'  => \WP_REST_Server::DELETABLE,
+				'callback' => [ $this, 'delete_font' ],
+
+				'permission_callback' => function() {
+					return current_user_can( '' );
+				},
+			]
+		);
+
 	}
+
+
 
 	/**
 	 * Register our PDF save font endpoint
@@ -142,7 +157,9 @@ class Api_Fonts implements CallableApiResponse {
 	 *
 	 * @since 5.2
 	 */
-	public function response( \WP_REST_Request $request ) {
+	public function save_font( \WP_REST_Request $request ) {
+
+		return 'handle get and post?'; die('xxxx');
 
 		/* User / CORS validation */
 		/* $this->misc->handle_ajax_authentication( 'Save Font', 'gravityforms_edit_settings', 'gfpdf_font_nonce' ); */
@@ -396,6 +413,50 @@ class Api_Fonts implements CallableApiResponse {
 		}
 
 		return true;
+	}
+
+
+	/**
+	 * Register our PDF save font endpoint
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return \WP_REST_Response
+	 *
+	 * @since 5.2
+	 */
+	public function delete_font( \WP_REST_Request $request ) {
+
+		return 'hello';
+		die('xxx');
+
+		// get the json parameter
+		$params = $request->get_json_params();
+
+		/* Handle the validation and saving of the font */
+		$payload = isset( $params['payload'] ) ? $params['payload'] : '';
+		$results = $this->process_font( $payload );
+
+		// There was an issue downloading and saving fonts
+		if (!$results) {
+			return new \WP_Error( '400', 'Save Font Failed', [ 'status' => 400 ] );
+		}
+
+		/* If we reached this point the results were successful so return the new object */
+		$this->log->addNotice(
+			'AJAX – Successfully Saved Font',
+			[
+				'results' => $results,
+			]
+		);
+
+//		echo json_encode( $results );
+//		wp_die();
+
+		$response = new \WP_REST_Response(array('message' => 'Font saved successfully', 'data' => array('results' => $results )));
+		$response->set_status(200);
+		return $response;
+
 	}
 
 
