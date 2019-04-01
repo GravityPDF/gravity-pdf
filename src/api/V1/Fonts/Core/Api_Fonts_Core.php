@@ -86,9 +86,9 @@ class Api_Fonts_Core implements CallableApiResponse {
 			'/fonts/core/',
 			[
 				'methods'  => \WP_REST_Server::READABLE,
-				'callback' => [ $this, 'response' ],
+				'callback' => [ $this, 'save_core_font' ],
 				 'permission_callback' => function() {
-				 	return current_user_can( 'read' );
+				 	return current_user_can( 'gravityforms_edit_settings' );
 				 },
 			]
 		);
@@ -105,6 +105,18 @@ class Api_Fonts_Core implements CallableApiResponse {
 	 * @since 5.2
 	 */
 	public function response( \WP_REST_Request $request ) {
+		return new \WP_Error( '400', 'Some Error Message', [ 'status' => 400 ] );
+	}
+	/**
+	 * Description @todo
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return \WP_REST_Response
+	 *
+	 * @since 5.2
+	 */
+	public function save_core_font( \WP_REST_Request $request ) {
 		// get the json parameter
 		$params = $request->get_json_params();
 
