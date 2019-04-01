@@ -484,7 +484,7 @@ class Api_Fonts implements CallableApiResponse {
 	 * @since 5.2
 	 */
 	public function response( \WP_REST_Request $request ) {
-		return new \WP_Error( '400', 'Core Font Download Failed', [ 'status' => 400
+		return new \WP_Error( '400', 'Some Error Message', [ 'status' => 400 ] );
 	}
 
 }

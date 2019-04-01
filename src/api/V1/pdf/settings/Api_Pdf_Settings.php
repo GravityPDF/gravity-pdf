@@ -1,10 +1,11 @@
 <?php
 
-namespace GFPDF\Api\v1\Pdf\Settings;
+namespace GFPDF\Api\V1\Pdf\Settings;
 
-use GFPDF\Helper\Helper_Interface_Actions;
-
-use WP_REST_Server;
+use GFPDF\Api\CallableApiResponse;
+use Psr\Log\LoggerInterface;
+use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Misc;
 
 /**
  * @package     Gravity PDF Previewer
@@ -41,15 +42,43 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @package GFPDF\Plugins\GravityPDF\API
  */
-class Api_Fonts {
+class Api_Pdf_Settings implements CallableApiResponse {
+
 	/**
-	 * ApiPdfSettingEndpoint constructor.
+	 * Holds our log class
 	 *
-	 * @param CallableApiResponse $response
+	 * @var \Monolog\Logger|LoggerInterface
 	 *
-	 * @since 0.1
+	 * @since 4.0
 	 */
-	public function __construct() {		
+	protected $log;
+
+	/**
+	 * Holds our Helper_Data object
+	 * which we can autoload with any data needed
+	 *
+	 * @var \GFPDF\Helper\Helper_Data
+	 *
+	 * @since 4.0
+	 */
+	protected $data;
+
+
+	/**
+	 * Holds our Helper_Misc object
+	 * Makes it easy to access common methods throughout the plugin
+	 *
+	 * @var \GFPDF\Helper\Helper_Misc
+	 *
+	 * @since 4.0
+	 */
+	protected $misc;
+
+	public function __construct( LoggerInterface $log,  Helper_Data $data,  Helper_Misc $misc) {
+		/* Assign our internal variables */
+		$this->log   = $log;
+		$this->data  = $data;
+		$this->misc  = $misc;
 	}
 
 	/**
@@ -64,22 +93,118 @@ class Api_Fonts {
 	/**
 	 * @since 0.1
 	 */
-	public function add_actions() {	
-		die('rest_api_init');	
+	public function add_actions() {			
 		add_action( 'rest_api_init', [ $this, 'register_endpoint' ] );
 	}
 
 	/**
-	 * Register our PDF save font endpoint
-	 *
-	 * @Internal Use this endpoint to save fonts
-	 *
-	 * @since    0.1
+	 * @since 5.2
 	 */
-	public function register_endpoint() {		
-		register_rest_route( '/v1/pdf/settings', [
-			'methods'  => WP_REST_Server::READABLE,
-			'callback' => [ $this->response, 'response' ],
-		] );
+	public function register_endpoint() {
+		register_rest_route(
+			'gravity-pdf/v1', /* @TODO - pass `gravity-pdf` portion via __construct() */
+			'/pdf/settings/',
+			[
+				'methods'  => \WP_REST_Server::READABLE,
+				'callback' => [ $this, 'check_tmp_pdf_security' ],
+
+				'permission_callback' => function() {
+					return current_user_can( 'gravityforms_view_settings', 'gfpdf-direct-pdf-protection' );
+				},
+			]
+		);
 	}
+
+	/**
+	 * Create a file in our tmp directory and check if it is publically accessible (i.e no .htaccess protection)
+	 *
+	 * @param $_POST ['nonce']
+	 *
+	 * @return boolean
+	 *
+	 * @since 4.0
+	 */
+	public function check_tmp_pdf_security() {
+
+		/* Create our tmp file and do our actual check */
+		$result =  json_encode( $this->test_public_tmp_directory_access() );
+
+		if (!$result) {
+			return new \WP_Error( '400', '', [ 'status' => 400 ] );
+		}
+
+		$response = new \WP_REST_Response(array('message' => 'Tmp file successfully created '));
+		$response->set_status(200);
+
+		return $response;
+	}
+
+
+	/**
+	 * Create a file in our tmp directory and verify if it's protected from the public
+	 *
+	 * @return boolean
+	 *
+	 * @since 4.0
+	 */
+	public function test_public_tmp_directory_access() {
+		$tmp_dir       = $this->data->template_tmp_location;
+		$tmp_test_file = 'public_tmp_directory_test.txt';
+		$return        = true;
+
+		/* create our file */
+		file_put_contents( $tmp_dir . $tmp_test_file, 'failed-if-read' );
+
+		/* verify it exists */
+		if ( is_file( $tmp_dir . $tmp_test_file ) ) {
+
+			/* Run our test */
+			$site_url = $this->misc->convert_path_to_url( $tmp_dir );
+
+			if ( $site_url !== false ) {
+
+				$response = wp_remote_get( $site_url . $tmp_test_file );
+
+				if ( ! is_wp_error( $response ) ) {
+
+					/* Check if the web server responded with a OK status code and we can read the contents of our file, then fail our test */
+					if ( isset( $response['response']['code'] ) && $response['response']['code'] === 200 &&
+					     isset( $response['body'] ) && $response['body'] === 'failed-if-read'
+					) {
+						$response_object = $response['http_response'];
+						$raw_response    = $response_object->get_response_object();
+						$this->log->warning(
+							'PDF temporary directory not protected',
+							[
+								'url'         => $raw_response->url,
+								'status_code' => $raw_response->status_code,
+								'response'    => $raw_response->raw,
+							]
+						);
+
+						$return = false;
+					}
+				}
+			}
+		}
+
+		/* Cleanup our test file */
+		@unlink( $tmp_dir . $tmp_test_file );
+
+		return $return;
+	}
+
+	/**
+	 * Description @todo
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return \WP_REST_Response
+	 *
+	 * @since 5.2
+	 */
+	public function response( \WP_REST_Request $request ) {
+		return new \WP_Error( 'some_error_code', 'Some error message', [ 'status' => 400 ] );
+	}
+
 }

@@ -104,18 +104,6 @@ class Api_Fonts_Core implements CallableApiResponse {
 	 *
 	 * @since 5.2
 	 */
-	public function response( \WP_REST_Request $request ) {
-		return new \WP_Error( '400', 'Some Error Message', [ 'status' => 400 ] );
-	}
-	/**
-	 * Description @todo
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return \WP_REST_Response
-	 *
-	 * @since 5.2
-	 */
 	public function save_core_font( \WP_REST_Request $request ) {
 		// get the json parameter
 		$params = $request->get_json_params();
@@ -190,5 +178,18 @@ class Api_Fonts_Core implements CallableApiResponse {
 		/* If we got here, the call was successfull */
 
 		return true;
+	}
+
+	/**
+	 * Description @todo
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return \WP_REST_Response
+	 *
+	 * @since 5.2
+	 */
+	public function response( \WP_REST_Request $request ) {
+		return new \WP_Error( '400', 'Some Error Message', [ 'status' => 400 ] );
 	}
 }

@@ -3,11 +3,8 @@
 namespace GFPDF\Api\V1\Migration\Multisite;
 
 use GFPDF\Api\CallableApiResponse;
-
-use GFPDF\Helper\Helper_Misc;
 use Psr\Log\LoggerInterface;
 use GFPDF\Helper\Helper_Data;
-use GFPDF\Helper\Helper_Abstract_Options;
 
 /**
  * @package     Gravity PDF Previewer
@@ -47,16 +44,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Api_Migration_v4 implements CallableApiResponse {
 
 	/**
-	 * Holds our Helper_Misc object
-	 * Makes it easy to access common methods throughout the plugin
-	 *
-	 * @var \GFPDF\Helper\Helper_Misc
-	 *
-	 * @since 4.0
-	 */
-	protected $misc;
-
-	/**
 	 * Holds our log class
 	 *
 	 * @var \Monolog\Logger|LoggerInterface
@@ -75,22 +62,10 @@ class Api_Migration_v4 implements CallableApiResponse {
 	 */
 	protected $data;
 
-	/**
-	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
-	 * Makes it easy to access global PDF settings and individual form PDF settings
-	 *
-	 * @var \GFPDF\Helper\Helper_Options_Fields
-	 *
-	 * @since 4.0
-	 */
-	protected $options;
-
-	public function __construct( LoggerInterface $log, Helper_Misc $misc, Helper_Data $data, Helper_Abstract_Options $options ) {
+	public function __construct( LoggerInterface $log,  Helper_Data $data) {
 		/* Assign our internal variables */
 		$this->log   = $log;
-		$this->misc  = $misc;
 		$this->data  = $data;
-		$this->options   = $options;
 	}
 	/**
 	 * Initialise our module
@@ -146,8 +121,8 @@ class Api_Migration_v4 implements CallableApiResponse {
 
 		/* Ensure multisite website */
 		if ( ! is_multisite() ) {
-			/* Unauthorized response */
-			wp_die( '401', 401 );
+			return new \WP_Error( '401', 'You are not authorized to perform this action. Please try again.', [ 'status' => 401 ] );
+
 		}
 
 		/* User / CORS validation */
@@ -167,8 +142,7 @@ class Api_Migration_v4 implements CallableApiResponse {
 
 			$this->log->addError( 'AJAX Endpoint Failed', $return );
 
-			echo json_encode( [ 'results' => $return ] );
-			wp_die();
+			return new \WP_Error( '404', 'No configuration.php file found for site #%s', [ 'status' => 404 ] );
 		}
 
 		/* Setup correct migration settings */
@@ -177,8 +151,10 @@ class Api_Migration_v4 implements CallableApiResponse {
 
 		/* Do migration */
 		if ( $this->migrate_v3( $path ) ) {
-			echo json_encode( [ 'results' => 'complete' ] );
-			wp_die();
+
+			$response = new \WP_REST_Response(array('message' => 'Migration completed successfully '));
+			$response->set_status(200);
+
 		} else {
 
 			$return = [
@@ -187,14 +163,13 @@ class Api_Migration_v4 implements CallableApiResponse {
 
 			$this->log->addError( 'AJAX Endpoint Failed', $return );
 
-			echo json_encode( [ 'results' => $return ] );
-			wp_die();
+			return new \WP_Error( '422', 'Database import problem for site #%s', [ 'status' => 422 ] );
+
 		}
 
 		$this->log->addError( 'AJAX Endpoint Failed' );
 
-		/* Internal Server Error */
-		wp_die( '500', 500 );
+		return new \WP_Error( '500', 'Internal Server Error', [ 'status' => 500 ] );
 	}
 
 	/**

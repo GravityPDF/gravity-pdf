@@ -137,6 +137,8 @@ class Api_License implements CallableApiResponse {
 				$response = new \WP_REST_Response(array('message' => 'Successfully Deactivated License'));
 				$response->set_status(200);
 
+				return $response;
+
 			} elseif ( $addon->schedule_license_check() ) {
 
 				$license_info = $addon->get_license_info();
