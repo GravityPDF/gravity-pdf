@@ -1,6 +1,6 @@
 import React from 'react'
 import { mount } from 'enzyme'
-import createHistory from 'history/createHashHistory'
+import { createHashHistory } from 'history'
 import request from 'superagent'
 
 let mock = require('superagent-mocker')(request)
@@ -9,7 +9,7 @@ mock.timeout = 1
 import { CoreFontContainer } from '../../../../../src/assets/js/react/components/CoreFonts/CoreFontContainer'
 
 let consoleList, retry
-let History = createHistory()
+let History = createHashHistory()
 
 describe('<CoreFontContainer />', () => {
 
