@@ -341,31 +341,6 @@ class Test_Settings extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test the form errors are generated and stored correctly
-	 *
-	 * @since 4.0
-	 */
-	public function test_setup_form_settings_errors() {
-		global $wp_settings_errors;
-
-		/* Set up test data */
-		add_settings_error( 'notices', 'normal', __( 'Normal Notice', 'gravity-forms-pdf-extended' ) );
-		add_settings_error( 'gfpdf-notices', 'select', __( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
-		add_settings_error( 'gfpdf-notices', 'text', __( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
-		add_settings_error( 'gfpdf-notices', 'hidden', __( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
-
-		/* set up test transient (like in options.php) */
-		set_transient( 'settings_errors', $wp_settings_errors, 30 );
-
-		/* trigger function */
-		$this->model->setup_form_settings_errors();
-
-		/* test results */
-		$this->assertSame( 4, sizeof( $this->model->form_settings_errors ) );
-		$this->assertSame( 2, sizeof( get_transient( 'settings_errors' ) ) );
-	}
-
-	/**
 	 * Verify errors are highlighted appropriately
 	 *
 	 * @since 4.0
@@ -373,16 +348,19 @@ class Test_Settings extends WP_UnitTestCase {
 	public function test_highlight_errors() {
 
 		/* Setup an error to match */
-		$this->model->form_settings_errors = [
+		set_transient(
+			'settings_errors',
 			[
-				'type' => 'error',
-				'code' => 'rtl',
-			],
-			[
-				'type' => 'error',
-				'code' => 'name',
-			],
-		];
+				[
+					'type' => 'error',
+					'code' => 'rtl',
+				],
+				[
+					'type' => 'error',
+					'code' => 'name',
+				],
+			]
+		);
 
 		/* Setup settings fields */
 		$settings = [

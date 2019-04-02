@@ -151,9 +151,6 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		 */
 		GFForms::add_settings_page( $this->data->short_title, [ $this, 'display_page' ] );
 
-		/* Ensure any errors are stored correctly */
-		$this->model->setup_form_settings_errors();
-
 		/* run actions and filters */
 		$this->add_actions();
 		$this->add_filters();
