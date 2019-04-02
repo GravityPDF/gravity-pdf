@@ -129,6 +129,9 @@ class Field_Post_Category extends Helper_Abstract_Fields {
 
 		} else { /* If Checkboxes or Multiselects */
 
+			$value['value'] = [];
+			$value['label'] = [];
+
 			/* Loop through the results and store in array */
 			foreach ( $field_value as $item ) {
 				$value['value'][] = $item['value'];
