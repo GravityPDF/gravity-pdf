@@ -2,7 +2,6 @@
 
 namespace GFPDF\Api\V1\Migration\Multisite;
 
-use GFPDF\Api\CallableApiResponse;
 use Psr\Log\LoggerInterface;
 use GFPDF\Helper\Helper_Data;
 
@@ -41,7 +40,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @package GFPDF\Plugins\GravityPDF\API
  */
-class Api_Migration_v4 implements CallableApiResponse {
+class Api_Migration_v4 {
 
 	/**
 	 * Holds our log class
@@ -62,7 +61,17 @@ class Api_Migration_v4 implements CallableApiResponse {
 	 */
 	protected $data;
 
-	public function __construct( LoggerInterface $log,  Helper_Data $data) {
+	/**
+	 * Holds our Helper_Misc object
+	 * Makes it easy to access common methods throughout the plugin
+	 *
+	 * @var \GFPDF\Helper\Helper_Misc
+	 *
+	 * @since 4.0
+	 */
+	protected $misc;
+
+	public function __construct( LoggerInterface $log,  Helper_Data $data,  Helper_Misc $misc) {
 		/* Assign our internal variables */
 		$this->log   = $log;
 		$this->data  = $data;
@@ -95,11 +104,11 @@ class Api_Migration_v4 implements CallableApiResponse {
 			'gravity-pdf/v1', /* @TODO - pass `gravity-pdf` portion via __construct() */
 			'/migration/multisite/',
 			[
-				'methods'  => \WP_REST_Server::READABLE,
+				'methods'  => \WP_REST_Server::CREATABLE,
 				'callback' => [ $this, 'ajax_multisite_v3_migration' ],
 
 				'permission_callback' => function() {
-					return current_user_can( 'manage_sites','gfpdf_multisite_migration' );
+					return current_user_can( 'manage_sites' );
 				},
 			]
 		);
@@ -125,9 +134,6 @@ class Api_Migration_v4 implements CallableApiResponse {
 
 		}
 
-		/* User / CORS validation */
-//		$misc->handle_ajax_authentication( 'Multisite v3 to v4 config', 'manage_sites', 'gfpdf_multisite_migration' );
-
 		/* Check there's a configuration file to migrate */
 		$blog_id = ( isset( $params['blog_id'] ) ) ? (int) $params['blog_id'] : 0;
 
@@ -152,8 +158,7 @@ class Api_Migration_v4 implements CallableApiResponse {
 		/* Do migration */
 		if ( $this->migrate_v3( $path ) ) {
 
-			$response = new \WP_REST_Response(array('message' => 'Migration completed successfully '));
-			$response->set_status(200);
+			return new \WP_REST_Response(array('message' => 'Migration completed successfully '));
 
 		} else {
 
@@ -170,19 +175,6 @@ class Api_Migration_v4 implements CallableApiResponse {
 		$this->log->addError( 'AJAX Endpoint Failed' );
 
 		return new \WP_Error( '500', 'Internal Server Error', [ 'status' => 500 ] );
-	}
-
-	/**
-	 * Register our PDF save font endpoint
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return \WP_REST_Response
-	 *
-	 * @since 5.2
-	 */
-	public function response( \WP_REST_Request $request ) {
-		return new \WP_Error( 'some_error_code', 'Some error message', [ 'status' => 400 ] );
 	}
 
 }

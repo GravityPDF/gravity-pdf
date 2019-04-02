@@ -2,7 +2,6 @@
 
 namespace GFPDF\Api\V1\License;
 
-use GFPDF\Api\CallableApiResponse;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Abstract_Addon;
 use Psr\Log\LoggerInterface;
@@ -42,7 +41,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @package GFPDF\Plugins\GravityPDF\API
  */
-class Api_License implements CallableApiResponse {
+class Api_License  {
 
 	/**
 	 * Holds our log class
@@ -101,7 +100,7 @@ class Api_License implements CallableApiResponse {
 				'callback' => [ $this, 'process_license_deactivation' ],
 
 				'permission_callback' => function() {
-					return current_user_can( 'gravityforms_edit_settings', 'gfpdf_deactivate_license' );
+					return current_user_can( 'gravityforms_edit_settings' );
 				},
 			]
 		);
@@ -118,9 +117,6 @@ class Api_License implements CallableApiResponse {
 	 */
 	public function process_license_deactivation( \WP_REST_Request $request ) {
 
-		/* User / CORS validation */
-//		$this->misc->handle_ajax_authentication( 'Deactivate License', 'gravityforms_edit_settings', 'gfpdf_deactivate_license' );
-
 		// get the json parameter
 		$params = $request->get_json_params();
 
@@ -134,23 +130,20 @@ class Api_License implements CallableApiResponse {
 			if ( $this->deactivate_license_key( $addon, $license ) ) {
 				$this->log->addNotice( 'AJAX – Successfully Deactivated License' );
 
-				$response = new \WP_REST_Response(array('message' => 'Successfully Deactivated License'));
-				$response->set_status(200);
-
-				return $response;
+				return new \WP_REST_Response(array('message' => 'Successfully Deactivated License'));
 
 			} elseif ( $addon->schedule_license_check() ) {
 
 				$license_info = $addon->get_license_info();
 
-				return new \WP_Error( '400', $license_info['message'], [ 'status' => 400 ] );
+				return new \WP_Error( 'schedule_license_check', $license_info['message'], [ 'status' => 400 ] );
 
 			}
 		}
 
 		$this->log->addError( 'AJAX Endpoint Error' );
 
-		return new \WP_Error( '500', 'An error occurred during deactivation, please try again', [ 'status' => 500 ] );
+		return new \WP_Error( 'process_license_deactivation', 'An error occurred during deactivation, please try again', [ 'status' => 500 ] );
 
 	}
 
@@ -184,14 +177,15 @@ class Api_License implements CallableApiResponse {
 		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
 
 			//@todo: need to get the message in $response
-			return new \WP_Error( '400', $response, [ 'status' => 400 ] );
+			return new \WP_Error( 'deactivate_license_key', $response, [ 'status' => 400 ] );
 		}
 
 		/* Get API response and check license is now deactivated */
 		$license_data = json_decode( wp_remote_retrieve_body( $response ) );
+
 		if ( ! isset( $license_data->license ) || $license_data->license !== 'deactivated' ) {
 			//@todo: need to get the message in $response
-			return new \WP_Error( '400', 'Failed to deactivate license', [ 'status' => 400 ] );
+			return new \WP_Error( 'check_deactivate_license_key', 'Failed to deactivate license', [ 'status' => 400 ] );
 		}
 
 		/* Remove license data from database */
@@ -206,21 +200,6 @@ class Api_License implements CallableApiResponse {
 		);
 
 		return true;
-	}
-
-	/**
-	 * Register our PDF save font endpoint
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return \WP_REST_Response
-	 *
-	 * @since 5.2
-	 */
-	public function response( \WP_REST_Request $request ) {
-
-		return new \WP_Error( 'Interal Server Error', 'Internal error occurred', [ 'status' => 500 ] );
-
 	}
 
 }
