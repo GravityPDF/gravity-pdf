@@ -1,19 +1,19 @@
 import React from 'react'
 import { shallow, mount } from 'enzyme'
-import createHistory from 'history/createHashHistory'
+import { createHashHistory } from 'history'
 
 import TemplateButton from '../../../../../src/assets/js/react/components/Template/TemplateButton'
 
 describe('<TemplateButton />', () => {
 
-  let History = createHistory()
+  let History = createHashHistory()
 
   beforeEach(function () {
     History.replace('/')
   })
 
   it('a button should be displayed', () => {
-    const comp = shallow(<TemplateButton history={History}/>)
+    const comp = shallow(<TemplateButton history={History} />)
     const button = comp.find('button')
 
     expect(button).to.have.length(1)
@@ -21,7 +21,7 @@ describe('<TemplateButton />', () => {
   })
 
   it('url should be updated when button clicked', () => {
-    const comp = mount(<TemplateButton history={History}/>)
+    const comp = mount(<TemplateButton history={History} />)
 
     /* Click the button and run our test */
     comp.find('button').simulate('click')
