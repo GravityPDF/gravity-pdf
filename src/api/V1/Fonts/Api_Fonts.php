@@ -389,7 +389,6 @@ class Api_Fonts {
 		return true;
 	}
 
-
 	/**
 	 * Description @todo
 	 *
@@ -432,7 +431,7 @@ class Api_Fonts {
 
 		$this->log->addError( 'AJAX Endpoint Error', $return );
 
-		return new \WP_Error( '500', 'Could not delete Gravity PDF font correctly. Please try again.', [ 'status' => 500 ] );
+		return new \WP_Error( 'delete_font', 'Could not delete Gravity PDF font correctly. Please try again.', [ 'status' => 500 ] );
 
 
 	}
