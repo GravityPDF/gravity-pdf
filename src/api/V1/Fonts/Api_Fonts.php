@@ -2,7 +2,6 @@
 
 namespace GFPDF\Api\V1\Fonts;
 
-use GFPDF\Api\CallableApiResponse;
 use GFPDF\Helper\Helper_Misc;
 use Psr\Log\LoggerInterface;
 use GFPDF\Helper\Helper_Data;
@@ -43,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @package GFPDF\Plugins\GravityPDF\API
  */
-class Api_Fonts implements CallableApiResponse {
+class Api_Fonts {
 
 	/**
 	 * Holds our Helper_Misc object
@@ -120,7 +119,7 @@ class Api_Fonts implements CallableApiResponse {
 			'gravity-pdf/v1', /* @TODO - pass `gravity-pdf` portion via __construct() */
 			'/fonts/',
 			[
-				'methods'  => \WP_REST_Server::READABLE,
+				'methods'  => \WP_REST_Server::CREATABLE,
 				'callback' => [ $this, 'save_font' ],
 				'permission_callback' => function() {
 					return current_user_can( 'gravityforms_edit_settings' );
@@ -136,7 +135,7 @@ class Api_Fonts implements CallableApiResponse {
 				'callback' => [ $this, 'delete_font' ],
 
 				'permission_callback' => function() {
-					return current_user_can( 'gravityforms_edit_settings', 'gfpdf_font_nonce' );
+					return current_user_can(  'gravityforms_edit_settings' );
 				},
 			]
 		);
@@ -153,8 +152,6 @@ class Api_Fonts implements CallableApiResponse {
 	 * @since 5.2
 	 */
 	public function save_font( \WP_REST_Request $request ) {
-		/* User / CORS validation */
-		/* $this->misc->handle_ajax_authentication( 'Save Font', 'gravityforms_edit_settings', 'gfpdf_font_nonce' ); */
 
 		// get the json parameter
 		$params = $request->get_json_params();
@@ -165,7 +162,7 @@ class Api_Fonts implements CallableApiResponse {
 
 		// There was an issue downloading and saving fonts
 		if (!$results) {
-			return new \WP_Error( '400', 'Save Font Failed', [ 'status' => 400 ] );
+			return new \WP_Error( 'process_font', 'Save Font Failed', [ 'status' => 400 ] );
 		}
 
 		/* If we reached this point the results were successful so return the new object */
@@ -176,9 +173,7 @@ class Api_Fonts implements CallableApiResponse {
 			]
 		);
 
-		$response = new \WP_REST_Response(array('message' => 'Font saved successfully', 'data' => array('results' => $results )));
-		$response->set_status(200);
-		return $response;
+		return  new \WP_REST_Response(array('message' => 'Font saved successfully'));
 
 	}
 
@@ -206,7 +201,7 @@ class Api_Fonts implements CallableApiResponse {
 
 			$this->log->addWarning( 'Font Validation Failed', $return );
 
-			return new \WP_Error( '400', 'Required fields have not been included.', [ 'status' => 400 ] );
+			return new \WP_Error( 'required_fields_missing', 'Required fields have not been included.', [ 'status' => 402 ] );
 		}
 
 		/* Check we have a valid font name */
@@ -220,7 +215,7 @@ class Api_Fonts implements CallableApiResponse {
 
 			$this->log->addWarning( 'Font Validation Failed', $return );
 
-			return new \WP_Error( '400', 'Font name is not valid. Only alphanumeric characters and spaces are accepted.', [ 'status' => 400 ] );
+			return new \WP_Error( 'invalid_font_name', 'Font name is not valid. Only alphanumeric characters and spaces are accepted.', [ 'status' => 400 ] );
 
 		}
 
@@ -236,7 +231,7 @@ class Api_Fonts implements CallableApiResponse {
 
 			$this->log->addWarning( 'Font Validation Failed', $return );
 
-			return new \WP_Error( '422', 'A font with the same name already exists. Try a different name.', [ 'status' => 422 ] );
+			return new \WP_Error( 'font_name_exist', 'A font with the same name already exists. Try a different name.', [ 'status' => 422 ] );
 		}
 
 		/* Move fonts to our Gravity PDF font folder */
@@ -251,7 +246,7 @@ class Api_Fonts implements CallableApiResponse {
 
 			$this->log->addWarning( 'Font Validation Failed', $return );
 
-			return new \WP_Error( '500', 'Font Validation Failed.', [ 'status' => 500 ] );
+			return new \WP_Error( 'installation_error', 'Font Installation Failed.', [ 'status' => 500 ] );
 
 		}
 
@@ -321,7 +316,8 @@ class Api_Fonts implements CallableApiResponse {
 				]
 			);
 
-			return [ 'errors' => $errors ];
+			return new \WP_Error( 'font_installation_error', 'Font Installation Failed.', [ 'errors' => $errors ] );
+
 		} else {
 			/* Insert our font into the database */
 			$custom_fonts = $this->options->get_option( 'custom_fonts' );
@@ -408,9 +404,6 @@ class Api_Fonts implements CallableApiResponse {
 		// get the json parameter
 		$params = $request->get_json_params();
 
-		/* User / CORS validation */
-//		$this->misc->handle_ajax_authentication( 'Delete Font', 'gravityforms_edit_settings', 'gfpdf_font_nonce' );
-
 		/* Get the required details for deleting fonts */
 		$id    = ( isset( $params['id'] ) ) ? $params['id'] : '';
 		$fonts = $this->options->get_option( 'custom_fonts' );
@@ -428,10 +421,7 @@ class Api_Fonts implements CallableApiResponse {
 					/* Success */
 					$this->log->addNotice( 'AJAX – Successfully Deleted Font' );
 
-					$response = new \WP_REST_Response(array('message' => 'AJAX – Successfully Deleted Font'));
-					$response->set_status(200);
-					return $response;
-
+					return new \WP_REST_Response(array('message' => 'AJAX – Successfully Deleted Font'));
 				}
 			}
 		}
@@ -472,19 +462,6 @@ class Api_Fonts implements CallableApiResponse {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Description @todo
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return \WP_REST_Response
-	 *
-	 * @since 5.2
-	 */
-	public function response( \WP_REST_Request $request ) {
-		return new \WP_Error( '400', 'Some Error Message', [ 'status' => 400 ] );
 	}
 
 }

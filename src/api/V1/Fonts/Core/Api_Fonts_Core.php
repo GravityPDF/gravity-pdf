@@ -2,9 +2,7 @@
 
 namespace GFPDF\Api\V1\Fonts\Core;
 
-use GFPDF\Api\CallableApiResponse;
 use Psr\Log\LoggerInterface;
-
 
 /**
  * @package     Gravity PDF
@@ -43,7 +41,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @package GFPDF\Api\V1\Core\Fonts
  */
-class Api_Fonts_Core implements CallableApiResponse {
+class Api_Fonts_Core {
 
 	/**
 	 * Holds our log class
@@ -57,7 +55,6 @@ class Api_Fonts_Core implements CallableApiResponse {
 	protected $github_repo = 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/';
 
 	public function __construct( LoggerInterface $log ) {
-
 		/* Assign our internal variables */
 		$this->log   = $log;
 	}
@@ -85,7 +82,7 @@ class Api_Fonts_Core implements CallableApiResponse {
 			'gravity-pdf/v1', /* @TODO - pass `gravity-pdf` portion via __construct() */
 			'/fonts/core/',
 			[
-				'methods'  => \WP_REST_Server::READABLE,
+				'methods'  => \WP_REST_Server::CREATABLE,
 				'callback' => [ $this, 'save_core_font' ],
 				 'permission_callback' => function() {
 				 	return current_user_can( 'gravityforms_edit_settings' );
@@ -114,18 +111,11 @@ class Api_Fonts_Core implements CallableApiResponse {
 
 		// There was an issue downloading and saving fonts
 		if (!$results) {
-			return new \WP_Error( '400', 'Core Font Download Failed', [ 'status' => 400 ] );
+			return new \WP_Error( 'download_and_save_font', 'Core Font Download Failed', [ 'status' => 400 ] );
 		}
 
-		/* Return results */
-//		header( 'Content-Type: application/json' );
-//		echo json_encode( $results );
-//		wp_die();
-
-		$response = new \WP_REST_Response(array('message' => 'Font saved successfully', 'data' => array('status' => 200)));
-		$response->set_status(200);
-		return $response;
-
+		// Success
+		return new \WP_REST_Response(array('message' => 'Font saved successfully'));
 	}
 
 	/**
@@ -176,20 +166,6 @@ class Api_Fonts_Core implements CallableApiResponse {
 		}
 
 		/* If we got here, the call was successfull */
-
 		return true;
-	}
-
-	/**
-	 * Description @todo
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return \WP_REST_Response
-	 *
-	 * @since 5.2
-	 */
-	public function response( \WP_REST_Request $request ) {
-		return new \WP_Error( '400', 'Some Error Message', [ 'status' => 400 ] );
 	}
 }

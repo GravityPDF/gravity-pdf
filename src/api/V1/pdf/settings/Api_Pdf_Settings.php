@@ -2,7 +2,6 @@
 
 namespace GFPDF\Api\V1\Pdf\Settings;
 
-use GFPDF\Api\CallableApiResponse;
 use Psr\Log\LoggerInterface;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
@@ -42,7 +41,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @package GFPDF\Plugins\GravityPDF\API
  */
-class Api_Pdf_Settings implements CallableApiResponse {
+class Api_Pdf_Settings {
 
 	/**
 	 * Holds our log class
@@ -109,7 +108,7 @@ class Api_Pdf_Settings implements CallableApiResponse {
 				'callback' => [ $this, 'check_tmp_pdf_security' ],
 
 				'permission_callback' => function() {
-					return current_user_can( 'gravityforms_view_settings', 'gfpdf-direct-pdf-protection' );
+					return current_user_can( 'gravityforms_view_settings');
 				},
 			]
 		);
@@ -120,7 +119,7 @@ class Api_Pdf_Settings implements CallableApiResponse {
 	 *
 	 * @param $_POST ['nonce']
 	 *
-	 * @return boolean
+	 * @return WP_REST_Response
 	 *
 	 * @since 4.0
 	 */
@@ -130,13 +129,11 @@ class Api_Pdf_Settings implements CallableApiResponse {
 		$result =  json_encode( $this->test_public_tmp_directory_access() );
 
 		if (!$result) {
-			return new \WP_Error( '400', '', [ 'status' => 400 ] );
+			return new \WP_Error( 'test_public_tmp_directory_access', 'Unable to create tmp Directory', [ 'status' => 401 ] );
 		}
 
-		$response = new \WP_REST_Response(array('message' => 'Tmp file successfully created '));
-		$response->set_status(200);
+		return new \WP_REST_Response(array('message' => 'Tmp file successfully created '));
 
-		return $response;
 	}
 
 
@@ -192,19 +189,6 @@ class Api_Pdf_Settings implements CallableApiResponse {
 		@unlink( $tmp_dir . $tmp_test_file );
 
 		return $return;
-	}
-
-	/**
-	 * Description @todo
-	 *
-	 * @param WP_REST_Request $request
-	 *
-	 * @return \WP_REST_Response
-	 *
-	 * @since 5.2
-	 */
-	public function response( \WP_REST_Request $request ) {
-		return new \WP_Error( 'some_error_code', 'Some error message', [ 'status' => 400 ] );
 	}
 
 }
