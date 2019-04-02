@@ -3,7 +3,6 @@
   "private": true,
   "dependencies": {
     "classnames": "^2.2.6",
-    "immutable": "4.0.0-rc.12",
     "lodash.debounce": "^4.0.8",
     "promise-queue": "^2.2.5",
     "prop-types": "^15.7.2",

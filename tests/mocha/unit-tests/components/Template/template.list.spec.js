@@ -1,6 +1,5 @@
 import React from 'react'
 import { mount } from 'enzyme'
-import Immutable from 'immutable'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
 import { HashRouter as Router } from 'react-router-dom'
@@ -14,7 +13,7 @@ describe('<TemplateList />', () => {
   it('our template container, search bar and single template item should be displayed', () => {
     const comp = mount(<Router>
       <Provider store={mockStore({template: {search: ''}})}>
-        <TemplateList templates={Immutable.fromJS([{id: 'my-id', compatible: true, path: ''}])}
+        <TemplateList templates={[{id: 'my-id', compatible: true, path: ''}]}
                       route={{activateText: 'Activate'}}/>
       </Provider>
     </Router>)

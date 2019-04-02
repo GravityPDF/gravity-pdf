@@ -132,16 +132,16 @@ export function activeTemplateStoreListener (store, $templateField) {
 export function templateChangeStoreListener (store, $templateField) {
 
   /* Track the initial list size */
-  let listCount = store.getState().template.list.size
+  let listCount = store.getState().template.list.length
 
   /* Watch our store for changes */
   let w = watch(store.getState, 'template.list')
   store.subscribe(w((list) => {
 
     /* Only update if the list size differs from what we expect */
-    if (listCount !== list.size) {
+    if (listCount !== list.length) {
       /* update the list size so we don't run it twice */
-      listCount = list.size
+      listCount = list.length
       var currentActive = $templateField.val()
 
       /* Do our AJAX call to get the new Select Box DOM */

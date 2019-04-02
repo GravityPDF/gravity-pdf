@@ -84,7 +84,7 @@ export class TemplateListItem extends React.Component {
    * @since 4.1
    */
   showDetailedTemplate = () => {
-    this.props.history.push('/template/' + this.props.template.get('id'))
+    this.props.history.push('/template/' + this.props.template.id)
   }
 
   /**
@@ -93,7 +93,7 @@ export class TemplateListItem extends React.Component {
    * @since 4.1
    */
   removeMessage = () => {
-    this.props.updateTemplateParam(this.props.template.get('id'), 'message', null)
+    this.props.updateTemplateParam(this.props.template['id'], 'message', null)
   }
 
   /**
@@ -101,8 +101,8 @@ export class TemplateListItem extends React.Component {
    */
   render () {
     const item = this.props.template
-    const isActiveTemplate = this.props.activeTemplate === item.get('id')
-    const isCompatible = item.get('compatible')
+    const isActiveTemplate = this.props.activeTemplate === item['id']
+    const isCompatible = item['compatible']
     const activeTemplate = (isActiveTemplate) ? 'active theme' : 'theme'
 
     return (
@@ -110,18 +110,18 @@ export class TemplateListItem extends React.Component {
         onClick={this.showDetailedTemplate}
         onKeyDown={this.maybeShowDetailedTemplate}
         className={activeTemplate}
-        data-slug={item.get('id')}
+        data-slug={item['id']}
         tabIndex="150">
 
-        <TemplateScreenshot image={item.get('screenshot')}/>
-        {item.get('error') ? <ShowMessage text={item.get('error')} error={true}/> : null}
-        {item.get('message') ?
-          <ShowMessage text={item.get('message')} dismissableCallback={this.removeMessage} dismissable={true}
+        <TemplateScreenshot image={item['screenshot']}/>
+        {item['error'] ? <ShowMessage text={item['error']} error={true}/> : null}
+        {item['message'] ?
+          <ShowMessage text={item['message']} dismissableCallback={this.removeMessage} dismissable={true}
                        delay={12000}/> : null}
 
         <TemplateDetails label={this.props.templateDetailsText}/>
-        <Group group={item.get('group')}/>
-        <Name name={item.get('template')}/>
+        <Group group={item['group']}/>
+        <Name name={item['template']}/>
 
         <div className="theme-actions">
           {!isActiveTemplate && isCompatible ?

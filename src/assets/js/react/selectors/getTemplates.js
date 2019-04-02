@@ -41,9 +41,9 @@ const getActiveTemplate = (state) => state.template.activeTemplate
  * This function is adapted from the Backbone.js filter for themes
  *
  * @param {string} term
- * @param {Object} templates Immutable List of templates
+ * @param {Object} templates List of templates
  *
- * @returns {Object} Filtered Immutable list of templates
+ * @returns {Object} Filtered list of templates
  *
  * @since 4.1
  */
@@ -61,13 +61,13 @@ export const searchTemplates = (term, templates) => {
   const results = templates.filter((template) => {
 
     /* Do very basic HTML tag removal from the fields we are interested in */
-    const name = template.get('template').replace(/(<([^>]+)>)/ig, '')
-    const description = template.get('description').replace(/(<([^>]+)>)/ig, '')
-    const author = template.get('author').replace(/(<([^>]+)>)/ig, '')
-    const group = template.get('group').replace(/(<([^>]+)>)/ig, '')
+    const name = template.template.replace(/(<([^>]+)>)/ig, '')
+    const description = template.description.replace(/(<([^>]+)>)/ig, '')
+    const author = template.author.replace(/(<([^>]+)>)/ig, '')
+    const group = template.group.replace(/(<([^>]+)>)/ig, '')
 
     /* Check if our matching term(s) are found in the string */
-    return match.test([name, template.get('id'), group, description, author].toString())
+    return match.test([name, template.id, group, description, author].toString())
   })
 
   return results
@@ -83,10 +83,10 @@ export const searchTemplates = (term, templates) => {
  * 3. The templates are then sorted alphabetically by group
  * 4. Then alphabetically by name
  *
- * @param {Object} templates The Immutable list of templates
+ * @param {Object} templates The list of templates
  * @param {string} activeTemplate The current active PDF template
  *
- * @returns {Object} Sorted Immutable List
+ * @returns {Object} Sorted List
  *
  * @since 4.1
  */
@@ -95,42 +95,42 @@ export const sortTemplates = (templates, activeTemplate) => {
   return templates.sort((a, b) => {
 
     /* Shift new templates to the bottom (only on install) */
-    if (a.get('new', false) === true && a.get('new', false) === true) {
+    if (a['new'] === true && a['new'] === true) {
       return 0 //equal
     }
 
-    if (a.get('new', false) === true) {
+    if (a['new'] === true) {
       return 1
     }
 
-    if (b.get('new', false) === true) {
+    if (b['new'] === true) {
       return -1
     }
 
     /* Hoist the active template above the rest */
-    if (activeTemplate === a.get('id')) {
+    if (activeTemplate === a['id']) {
       return -1
     }
 
-    if (activeTemplate === b.get('id')) {
+    if (activeTemplate === b['id']) {
       return 1
     }
 
     /* Order alphabetically by the group name */
-    if (a.get('group') < b.get('group')) {
+    if (a['group'] < b['group']) {
       return -1 //before
     }
 
-    if (a.get('group') > b.get('group')) {
+    if (a['group'] > b['group']) {
       return 1 //after
     }
 
     /* Then order alphabetically by the template name */
-    if (a.get('template') < b.get('template')) {
+    if (a['template'] < b['template']) {
       return -1 //before
     }
 
-    if (a.get('template') > b.get('template')) {
+    if (a['template'] > b['template']) {
       return 1 //after
     }
 
@@ -142,9 +142,9 @@ export const sortTemplates = (templates, activeTemplate) => {
  * Check all PDF templates for compatibility with the current verison of Gravity PDF
  * If they don't pass we'll also dynamically apply error messages
  *
- * @param {Object} templates The Immutable list of templates
+ * @param {Object} templates The list of templates
  *
- * @returns {Object} The Immutable list of templates
+ * @returns {Object} The list of templates
  *
  * @since 4.1
  */
@@ -152,17 +152,16 @@ export const addCompatibilityCheck = (templates) => {
   /* Apply this function to all templates */
   return templates.map((template) => {
     /* Get the PDF version and check it against the Gravity PDF version */
-    const requiredVersion = template.get('required_pdf_version')
+    const requiredVersion = template['required_pdf_version']
     if (versionCompare(requiredVersion, GFPDF.currentVersion, '>')) {
       /* Not compatible, so let's mark it */
-      return template.merge({
+      return {...template,
         'compatible': false,
         'error': GFPDF.requiresGravityPdfVersion.replace(/%s/g, requiredVersion),
-        'long_error': GFPDF.templateNotCompatibleWithGravityPdfVersion.replace(/%s/g, requiredVersion)
-      })
+        'long_error': GFPDF.templateNotCompatibleWithGravityPdfVersion.replace(/%s/g, requiredVersion)}
     }
     /* If versionCompare() passed we'll mark as true */
-    return template.set('compatible', true)
+    return {...template, 'compatible': true}
   })
 }
 
@@ -171,10 +170,7 @@ export const addCompatibilityCheck = (templates) => {
  *
  * @since 4.1
  */
-export default createSelector(
-  [getTemplates, getSearch, getActiveTemplate],
-  (templates, search, activeTemplate) => {
-
+export default createSelector([getTemplates, getSearch, getActiveTemplate], (templates, search, activeTemplate) => {
     templates = addCompatibilityCheck(templates)
 
     if (search) {

@@ -63,7 +63,7 @@ export class TemplateSingle extends React.Component {
     template: PropTypes.object,
     activeTemplate: PropTypes.string,
     templateIndex: PropTypes.number,
-    templates: PropTypes.object,
+    templates: PropTypes.array,
   }
 
   /**
@@ -89,7 +89,7 @@ export class TemplateSingle extends React.Component {
    */
   render () {
     const item = this.props.template
-    const isCurrentTemplate = this.props.activeTemplate === item.get('id')
+    const isCurrentTemplate = this.props.activeTemplate === item.id
 
     /* Assign our header / footer components to constants */
     const header = <TemplateHeaderNavigation
@@ -117,20 +117,20 @@ export class TemplateSingle extends React.Component {
     return (
       <TemplateContainer header={header} footer={footer} closeRoute="/template">
         <div id="gfpdf-template-detail-view" className="gfpdf-template-detail">
-          <TemplateScreenshots image={item.get('screenshot')}/>
+          <TemplateScreenshots image={item['screenshot']}/>
 
           <div className="theme-info">
             <CurrentTemplate isCurrentTemplate={isCurrentTemplate} label={this.props.currentTemplateText}/>
-            <Name name={item.get('template')} version={item.get('version')}
+            <Name name={item['template']} version={item['version']}
                   versionLabel={this.props.versionText}/>
-            <Author author={item.get('author')} uri={item.get('author uri')}/>
-            <Group group={item.get('group')} label={this.props.groupText}/>
+            <Author author={item['author']} uri={item['author uri']}/>
+            <Group group={item['group']} label={this.props.groupText}/>
 
-            {item.get('long_message') ? <ShowMessage text={item.get('long_message')}/> : null}
-            {item.get('long_error') ? <ShowMessage text={item.get('long_error')} error={true}/> : null}
+            {item['long_message'] ? <ShowMessage text={item['long_message']}/> : null}
+            {item['long_error'] ? <ShowMessage text={item['long_error']} error={true}/> : null}
 
-            <Description desc={item.get('description')}/>
-            <Tags tags={item.get('tags')} label={this.props.tagsText}/>
+            <Description desc={item['description']}/>
+            <Tags tags={item['tags']} label={this.props.tagsText}/>
           </div>
         </div>
       </TemplateContainer>
@@ -144,7 +144,7 @@ export class TemplateSingle extends React.Component {
  * @param {Object} state The current Redux State
  * @param {Object} props The current React props
  *
- * @returns {{template: Immutable Map, templateIndex: number, templates: Immutable List, activeTemplate: string}}
+ * @returns {{template: templateIndex: number, templates: List, activeTemplate: string}}
  *
  * @since 4.1
  */
@@ -155,7 +155,7 @@ const MapStateToProps = (state, props) => {
   const id = props.match.params.id
 
   const findCurrentTemplate = (item) => {
-    return (item.get('id') === id)
+    return (item.id === id)
   }
 
   return {

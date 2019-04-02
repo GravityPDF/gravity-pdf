@@ -2,7 +2,6 @@ import {
   SEARCH_TEMPLATES,
   SELECT_TEMPLATE,
   ADD_TEMPLATE,
-  UPDATE_TEMPLATE,
   UPDATE_TEMPLATE_PARAM,
   DELETE_TEMPLATE,
 } from '../actionTypes/templates'
@@ -71,7 +70,7 @@ export const selectTemplate = (id) => {
 /**
  * Fires the Advanced Template add new template action
  *
- * @param {object} template An Immutable Map
+ * @param {object} template
  *
  * @returns {{type, template: *}}
  *
@@ -80,22 +79,6 @@ export const selectTemplate = (id) => {
 export const addTemplate = (template) => {
   return {
     type: ADD_TEMPLATE,
-    template
-  }
-}
-
-/**
- * Fires the Advanced Template update action which overrides the entire template object with a new one
- *
- * @param {object} template An Immutable Map
- *
- * @returns {{type, template: *}}
- *
- * @since 4.1
- */
-export const updateTemplate = (template) => {
-  return {
-    type: UPDATE_TEMPLATE,
     template
   }
 }
