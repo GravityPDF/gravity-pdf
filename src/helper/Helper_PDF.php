@@ -2,7 +2,6 @@
 
 namespace GFPDF\Helper;
 
-use Mpdf\Mpdf;
 use Mpdf\Config\FontVariables;
 use Mpdf\Utils\UtfString;
 use Psr\Log\LoggerInterface;
@@ -643,7 +642,7 @@ class Helper_PDF {
 	protected function begin_pdf() {
 		$default_font_config = ( new FontVariables() )->getDefaults();
 
-		$this->mpdf = new Mpdf(
+		$this->mpdf = new Helper_Mpdf(
 			[
 				'fontDir'                => [
 					$this->data->template_font_location,

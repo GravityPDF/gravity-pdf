@@ -1,11 +1,11 @@
 import React from 'react'
 import { mount } from 'enzyme'
-import createHistory from 'history/createHashHistory'
+import { createHashHistory } from 'history'
 import { TemplateActivateButton } from '../../../../../src/assets/js/react/components/Template/TemplateActivateButton'
 
 describe('<TemplateActivateButton />', () => {
 
-  let History = createHistory()
+  let History = createHashHistory()
 
   beforeEach(function () {
     History.replace('/template')
