@@ -1,8 +1,8 @@
 <?php
 
-namespace GFPDF\Api;
+namespace GFPDF\Api\V1;
 
-use WP_REST_Request;
+use GFPDF\Helper\Helper_Trait_Logger;
 
 /**
  * @package     Gravity PDF
@@ -37,24 +37,60 @@ if ( ! defined( 'ABSPATH' ) ) {
 */
 
 /**
- * Interface CallableApiResponse
+ * Class Base_Api
  *
- * For use in a class that handles the REST API callback which takes the WP_REST_Request class as a single argument
+ * @package GFPDF\Api\V1
  *
- * @package GFPDF\Plugins\Previewer\API
- *
- * @since   5.2
+ * @since 5.2
  */
-interface CallableApiResponse {
+abstract class Base_Api {
 
 	/**
-	 * The REST API callback
-	 *
-	 * @param $request
-	 *
-	 * @return mixed
+	 * @since 5.2
+	 */
+	use Helper_Trait_Logger;
+
+	/**
+	 * @since 5.2
+	 */
+	const ENTRYPOINT = 'gravitypdf';
+
+	/**
+	 * @since 5.2
+	 */
+	const VERSION = 'v1';
+
+	/**
+	 * Initialise our endpoint
 	 *
 	 * @since 5.2
 	 */
-	public function response( WP_REST_Request $request );
+	public function init() {
+		add_action( 'rest_api_init', [ $this, 'register' ] );
+	}
+
+	/**
+	 * Simple wrapper to check the current user's capabilities in the context of Gravity Forms
+	 *
+	 * @param string $capability
+	 *
+	 * @return bool
+	 *
+	 * @since 5.2
+	 */
+	protected function has_capabilities( $capability ) {
+		$gform = \GPDFAPI::get_form_class();
+		return $gform->has_capability( $capability );
+	}
+
+	/**
+	 * Register WordPress REST API endpoint(s)
+	 *
+	 * @return void
+	 *
+	 * @internal Use `register_rest_route()` to register WordPress REST API endpoint(s)
+	 *
+	 * @since 5.2
+	 */
+	abstract public function register();
 }

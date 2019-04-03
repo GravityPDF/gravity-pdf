@@ -2,7 +2,7 @@
 
 namespace GFPDF\Api\V1\Fonts\Core;
 
-use Psr\Log\LoggerInterface;
+use GFPDF\Api\V1\Base_Api;
 
 /**
  * @package     Gravity PDF
@@ -41,81 +41,78 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @package GFPDF\Api\V1\Core\Fonts
  */
-class Api_Fonts_Core {
+class Api_Fonts_Core extends Base_Api {
 
 	/**
-	 * Holds our log class
+	 * @var string
 	 *
-	 * @var \Monolog\Logger|LoggerInterface
-	 *
-	 * @since 4.0
+	 * @since 5.2
 	 */
-	protected $log;
+	protected $template_font_location;
 
+	/**
+	 * @var string
+	 *
+	 * @since 5.2
+	 */
 	protected $github_repo = 'https://raw.githubusercontent.com/GravityPDF/mpdf-core-fonts/master/';
 
-	public function __construct( LoggerInterface $log ) {
-		/* Assign our internal variables */
-		$this->log   = $log;
-	}
 	/**
-	 * Initialise our module
+	 * Api_Fonts_Core constructor.
+	 *
+	 * @param string $template_font_location The absolute path to the current PDF font directory
 	 *
 	 * @since 5.2
 	 */
-	public function init() {
-		$this->add_actions();
+	public function __construct( $template_font_location ) {
+		$this->template_font_location = $template_font_location;
 	}
 
 	/**
-	 * @since 5.2
+	 * Register WordPress REST API endpoint(s)
+	 *
+	 * @return void
+	 *
+	 * @internal Use `register_rest_route()` to register WordPress REST API endpoint(s)
+	 *
+	 * @since    5.2
 	 */
-	public function add_actions() {
-		add_action( 'rest_api_init', [ $this, 'register_endpoint' ] );
-	}
-
-	/**
-	 * @since 5.2
-	 */
-	public function register_endpoint() {
+	public function register() {
 		register_rest_route(
-			'gravity-pdf/v1', /* @TODO - pass `gravity-pdf` portion via __construct() */
+			self::ENTRYPOINT . '/' . self::VERSION,
 			'/fonts/core/',
 			[
-				'methods'  => \WP_REST_Server::CREATABLE,
-				'callback' => [ $this, 'save_core_font' ],
-				 'permission_callback' => function() {
-				 	return current_user_can( 'gravityforms_edit_settings' );
-				 },
+				'methods'             => \WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'save_core_font' ],
+				'permission_callback' => function() {
+					return $this->has_capabilities( 'gravityforms_edit_settings' );
+				},
 			]
 		);
 
 	}
 
 	/**
-	 * Description @todo
+	 * Processes the rest API endpoint
 	 *
-	 * @param WP_REST_Request $request
+	 * @param \WP_REST_Request $request
 	 *
-	 * @return \WP_REST_Response
+	 * @return array|\WP_Error
 	 *
 	 * @since 5.2
 	 */
 	public function save_core_font( \WP_REST_Request $request ) {
-		// get the json parameter
 		$params = $request->get_json_params();
 
 		/* Download and save our font */
 		$fontname = isset( $params['font_name'] ) ? $params['font_name'] : '';
 		$results  = $this->download_and_save_font( $fontname );
 
-		// There was an issue downloading and saving fonts
-		if (!$results) {
+		if ( ! $results ) {
 			return new \WP_Error( 'download_and_save_font', 'Core Font Download Failed', [ 'status' => 400 ] );
 		}
 
-		// Success
-		return new \WP_REST_Response(array('message' => 'Font saved successfully'));
+		return [ 'message' => 'Font saved successfully' ];
 	}
 
 	/**
@@ -123,42 +120,46 @@ class Api_Fonts_Core {
 	 *
 	 * @param $fontname
 	 *
-	 * @since 5.0
-	 *
 	 * @return bool
+	 *
+	 * @since 5.2
 	 */
 	protected function download_and_save_font( $fontname ) {
+
+		if ( empty( $fontname ) ) {
+			return false;
+		}
+
 		/* Only the font name is passed via AJAX. The Repo we download from is fixed (prevent security issues) */
-		$res = wp_remote_get(
+		$response = wp_remote_get(
 			$this->github_repo . $fontname,
 			[
 				'timeout'  => 60,
 				'stream'   => true,
-				'filename' => $this->data->template_font_location . $fontname,
+				'filename' => $this->template_font_location . $fontname,
 			]
 		);
 
-		$res_code = wp_remote_retrieve_response_code( $res );
-
 		/* Check for errors and log them to file */
-		if ( is_wp_error( $res ) ) {
+		if ( is_wp_error( $response ) ) {
 			$this->log->addError(
 				'Core Font Download Failed',
 				[
 					'name'             => $fontname,
-					'WP_Error_Message' => $res->get_error_message(),
-					'WP_Error_Code'    => $res->get_error_code(),
+					'WP_Error_Message' => $response->get_error_message(),
+					'WP_Error_Code'    => $response->get_error_code(),
 				]
 			);
 
 			return false;
 		}
 
-		if ( $res_code != '200' ) {
+		$response_code = wp_remote_retrieve_response_code( $response );
+		if ( $response_code !== 200 ) {
 			$this->log->addError(
 				'Core Font API Response Failed',
 				[
-					'response_code' => wp_remote_retrieve_response_code( $res ),
+					'response_code' => $response_code,
 				]
 			);
 
