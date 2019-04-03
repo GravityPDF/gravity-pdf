@@ -61,17 +61,7 @@ class Api_Migration_v4 {
 	 */
 	protected $data;
 
-	/**
-	 * Holds our Helper_Misc object
-	 * Makes it easy to access common methods throughout the plugin
-	 *
-	 * @var \GFPDF\Helper\Helper_Misc
-	 *
-	 * @since 4.0
-	 */
-	protected $misc;
-
-	public function __construct( LoggerInterface $log,  Helper_Data $data,  Helper_Misc $misc) {
+	public function __construct( LoggerInterface $log,  Helper_Data $data) {
 		/* Assign our internal variables */
 		$this->log   = $log;
 		$this->data  = $data;
