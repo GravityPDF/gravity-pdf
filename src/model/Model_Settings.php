@@ -62,6 +62,8 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @var array
 	 *
 	 * @since 4.0
+	 *
+	 * @Internal Deprecated method
 	 */
 	public $form_settings_errors;
 
@@ -159,47 +161,6 @@ class Model_Settings extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Get the form setting error and remove any duplicates
-	 *
-	 * @since 4.0
-	 *
-	 * @return  void
-	 */
-	public function setup_form_settings_errors() {
-
-		/* set up a place to access form setting validation errors */
-		$this->form_settings_errors = get_transient( 'settings_errors' );
-
-		/* remove multiple errors for a single form */
-		if ( $this->form_settings_errors ) {
-			$set                    = false;
-			$updated_settings_error = [];
-
-			/* loop through current errors */
-			foreach ( $this->form_settings_errors as $error ) {
-				if ( $error['setting'] != 'gfpdf-notices' || ! $set ) {
-					$updated_settings_error[] = $error;
-				}
-
-				if ( $error['setting'] == 'gfpdf-notices' ) {
-					$set = true;
-				}
-			}
-
-			/* update transient */
-			set_transient( 'settings_errors', $updated_settings_error, 30 );
-
-			$this->log->addNotice(
-				'PDF Settings Errors',
-				[
-					'original' => $this->form_settings_errors,
-					'cleaned'  => $updated_settings_error,
-				]
-			);
-		}
-	}
-
-	/**
 	 * If any errors have been passed back from the options.php page we will highlight the actual fields that caused them
 	 *
 	 * @param  array $settings The get_registered_fields() array
@@ -211,7 +172,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	public function highlight_errors( $settings ) {
 
 		/* We fire too late to tap into get_settings_error() so our data storage holds the details */
-		$errors = $this->form_settings_errors;
+		$errors = get_transient( 'settings_errors' );
 
 		/* Loop through errors if any and highlight the appropriate settings */
 		if ( is_array( $errors ) && sizeof( $errors ) > 0 ) {

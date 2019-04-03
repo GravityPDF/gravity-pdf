@@ -75,7 +75,7 @@ export class TemplateDeleteButton extends React.Component {
 
     if (window.confirm(this.props.templateConfirmDeleteText)) {
 
-      const templateId = this.props.template.get('id')
+      const templateId = this.props.template.id
 
       /* POST the PDF template to our endpoint for processing */
       request
@@ -100,7 +100,7 @@ export class TemplateDeleteButton extends React.Component {
    * @since 4.1
    */
   ajaxFailed = () => {
-    const errorTemplate = this.props.template.set('error', this.props.templateDeleteErrorText)
+    const errorTemplate = {...this.props.template, 'error': this.props.templateDeleteErrorText}
     this.props.addTemplate(errorTemplate)
   }
 
@@ -128,7 +128,7 @@ export class TemplateDeleteButton extends React.Component {
  *
  * @param {func} dispatch Redux dispatcher
  *
- * @returns {{addTemplate: (function(template=Immutable List)), onTemplateDelete: (function(id=string))}}
+ * @returns {{addTemplate: (function(template)), onTemplateDelete: (function(id=string))}}
  *
  * @since 4.1
  */
@@ -150,4 +150,3 @@ const mapDispatchToProps = (dispatch) => {
  * @since 4.1
  */
 export default withRouter(connect(null, mapDispatchToProps)(TemplateDeleteButton))
-

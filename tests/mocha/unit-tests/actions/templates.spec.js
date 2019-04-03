@@ -2,7 +2,6 @@ import {
   SEARCH_TEMPLATES,
   SELECT_TEMPLATE,
   ADD_TEMPLATE,
-  UPDATE_TEMPLATE,
   UPDATE_TEMPLATE_PARAM,
   DELETE_TEMPLATE,
 } from '../../../../src/assets/js/react/actionTypes/templates'
@@ -10,7 +9,6 @@ import {
   searchTemplates,
   selectTemplate,
   addTemplate,
-  updateTemplate,
   updateTemplateParam,
   deleteTemplate
 } from '../../../../src/assets/js/react/actions/templates'
@@ -36,14 +34,6 @@ describe('addTemplate', () => {
     let results = addTemplate('my-id')
     expect(results.template).is.equal('my-id')
     expect(results.type).is.equal(ADD_TEMPLATE)
-  })
-})
-
-describe('updateTemplate', () => {
-  it('check it returns the correct action', () => {
-    let results = updateTemplate('my-id')
-    expect(results.template).is.equal('my-id')
-    expect(results.type).is.equal(UPDATE_TEMPLATE)
   })
 })
 
