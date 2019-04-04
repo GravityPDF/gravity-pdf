@@ -108,11 +108,11 @@ class Api_License extends Base_Api {
 	}
 
 	/**
-	 * An AJAX endpoint for processing license deactivations
+	 * Processes the rest API endpoint
 	 *
-	 * @Internal Expected parameters include:
-	 *           $_POST['addon_name']
-	 *           $_POST['license']
+	 * @param \WP_REST_Request $request
+	 *
+	 * @return array|\WP_Error
 	 *
 	 * @since 5.2
 	 */
@@ -185,7 +185,7 @@ class Api_License extends Base_Api {
 		$license_data = json_decode( wp_remote_retrieve_body( $response ) );
 
 		if ( ! isset( $license_data->license ) || $license_data->license !== 'deactivated' ) {
-			//@todo: need to get the message in $response
+
 			return new \WP_Error( 'check_deactivate_license_key', 'Failed to deactivate license', [ 'status' => 400 ] );
 		}
 
