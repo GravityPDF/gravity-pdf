@@ -4,7 +4,6 @@ namespace GFPDF\Api\V1\Pdf\Settings;
 
 use GFPDF\Api\V1\Base_Api;
 use Psr\Log\LoggerInterface;
-use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 
 /**
@@ -61,17 +60,6 @@ class Api_Pdf_Settings extends Base_Api {
 	protected $log;
 
 	/**
-	 * Holds our Helper_Data object
-	 * which we can autoload with any data needed
-	 *
-	 * @var \GFPDF\Helper\Helper_Data
-	 *
-	 * @since 5.2
-	 */
-	protected $data;
-
-
-	/**
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
 	 *
@@ -81,10 +69,9 @@ class Api_Pdf_Settings extends Base_Api {
 	 */
 	protected $misc;
 
-	public function __construct( LoggerInterface $log,  Helper_Data $data,  Helper_Misc $misc, $template_font_location) {
+	public function __construct( LoggerInterface $log, Helper_Misc $misc, $template_font_location) {
 		/* Assign our internal variables */
-		$this->log   = $log;
-		$this->data  = $data;
+		$this->log   = $log;		
 		$this->misc  = $misc;
 		$this->template_font_location = $template_font_location;
 	}
