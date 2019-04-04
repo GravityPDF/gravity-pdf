@@ -142,7 +142,7 @@ class Api_Fonts_Core extends Base_Api {
 
 		/* Check for errors and log them to file */
 		if ( is_wp_error( $response ) ) {
-			$this->log->addError(
+			$this->logger->addError(
 				'Core Font Download Failed',
 				[
 					'name'             => $fontname,
@@ -156,7 +156,7 @@ class Api_Fonts_Core extends Base_Api {
 
 		$response_code = wp_remote_retrieve_response_code( $response );
 		if ( $response_code !== 200 ) {
-			$this->log->addError(
+			$this->logger->addError(
 				'Core Font API Response Failed',
 				[
 					'response_code' => $response_code,
