@@ -2,10 +2,11 @@
 
 namespace GFPDF\Api\V1\Fonts;
 
+use GFPDF\Api\V1\Base_Api;
 use GFPDF\Helper\Helper_Misc;
-use Psr\Log\LoggerInterface;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Abstract_Options;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF Previewer
@@ -42,7 +43,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @package GFPDF\Plugins\GravityPDF\API
  */
-class Api_Fonts {
+class Api_Fonts extends Base_Api {
 
 	/**
 	 * Holds our Helper_Misc object
@@ -50,7 +51,7 @@ class Api_Fonts {
 	 *
 	 * @var \GFPDF\Helper\Helper_Misc
 	 *
-	 * @since 4.0
+	 * @since 5.2
 	 */
 	protected $misc;
 
@@ -59,7 +60,7 @@ class Api_Fonts {
 	 *
 	 * @var \Monolog\Logger|LoggerInterface
 	 *
-	 * @since 4.0
+	 * @since 5.2
 	 */
 	protected $log;
 
@@ -69,7 +70,7 @@ class Api_Fonts {
 	 *
 	 * @var \GFPDF\Helper\Helper_Data
 	 *
-	 * @since 4.0
+	 * @since 5.2
 	 */
 	protected $data;
 
@@ -79,7 +80,7 @@ class Api_Fonts {
 	 *
 	 * @var \GFPDF\Helper\Helper_Options_Fields
 	 *
-	 * @since 4.0
+	 * @since 5.2
 	 */
 	protected $options;
 
@@ -114,28 +115,27 @@ class Api_Fonts {
 	 *
 	 * @since 5.2
 	 */
-	public function register_endpoint() {
+	public function register() {
 		register_rest_route(
-			'gravity-pdf/v1', /* @TODO - pass `gravity-pdf` portion via __construct() */
+			self::ENTRYPOINT . '/' . self::VERSION,			
 			'/fonts/',
 			[
 				'methods'  => \WP_REST_Server::CREATABLE,
 				'callback' => [ $this, 'save_font' ],
 				'permission_callback' => function() {
-					return current_user_can( 'gravityforms_edit_settings' );
+					return $this->has_capabilities( 'gravityforms_edit_settings' );
 				},
 			]
 		);
 
 		register_rest_route(
-			'gravity-pdf/v1', /* @TODO - pass `gravity-pdf` portion via __construct() */
+			self::ENTRYPOINT . '/' . self::VERSION,
 			'/fonts/',
 			[
 				'methods'  => \WP_REST_Server::DELETABLE,
 				'callback' => [ $this, 'delete_font' ],
-
 				'permission_callback' => function() {
-					return current_user_can(  'gravityforms_edit_settings' );
+					return $this->has_capabilities( 'gravityforms_edit_settings' );
 				},
 			]
 		);
@@ -173,7 +173,7 @@ class Api_Fonts {
 			]
 		);
 
-		return  new \WP_REST_Response(array('message' => 'Font saved successfully'));
+		return [ 'message' => 'Font saved successfully' ];		
 
 	}
 
@@ -184,7 +184,7 @@ class Api_Fonts {
 	 *
 	 * @return array
 	 *
-	 * @since 4.0
+	 * @since 5.2
 	 */
 	public function process_font( $font ) {
 
@@ -261,7 +261,7 @@ class Api_Fonts {
 	 *
 	 * @return boolean       True on valid, false on failure
 	 *
-	 * @since 4.0
+	 * @since 5.2
 	 */
 	public function is_font_name_valid( $name ) {
 
@@ -281,7 +281,7 @@ class Api_Fonts {
 	 *
 	 * @return array
 	 *
-	 * @since 4.0
+	 * @since 5.2
 	 */
 	public function install_fonts( $fonts ) {
 
@@ -316,7 +316,7 @@ class Api_Fonts {
 				]
 			);
 
-			return new \WP_Error( 'font_installation_error', 'Font Installation Failed.', [ 'errors' => $errors ] );
+			return new \WP_Error( 'font_installation_error', 'Font Installation Failed.', [ 'status' => 500 ] );
 
 		} else {
 			/* Insert our font into the database */
@@ -351,7 +351,7 @@ class Api_Fonts {
 	 *
 	 * @return bool True if valid, false on failure
 	 *
-	 * @since 4.0
+	 * @since 5.2
 	 */
 	public function is_font_name_unique( $name, $id = '' ) {
 
@@ -420,7 +420,8 @@ class Api_Fonts {
 					/* Success */
 					$this->log->addNotice( 'AJAX – Successfully Deleted Font' );
 
-					return new \WP_REST_Response(array('message' => 'AJAX – Successfully Deleted Font'));
+					return [ 'message' => 'Successfully Deleted Font' ];
+					
 				}
 			}
 		}
@@ -443,7 +444,7 @@ class Api_Fonts {
 	 *
 	 * @return boolean        True on success, false on failure
 	 *
-	 * @since  4.0
+	 * @since  5.2
 	 */
 	public function remove_font_file( $fonts ) {
 

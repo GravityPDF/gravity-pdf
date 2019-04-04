@@ -904,7 +904,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 	public function api() {
 		$apis = [
-			new Api\V1\Fonts\Core\Api_Fonts_Core($this->log),
+			new Api\V1\Fonts\Core\Api_Fonts_Core( $this->data->template_font_location ),			
 			new Api\V1\Fonts\Api_Fonts($this->log, $this->misc, $this->data, $this->options),
 			new Api\V1\License\Api_License($this->log, $this->data),
 			new Api\V1\Migration\Multisite\Api_Migration_v4($this->log, $this->data),
@@ -914,9 +914,16 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		];
 
 		foreach ( $apis as $api ) {
+			$trait = class_uses( $api );
+			if ( isset( $trait['GFPDF\Helper\Helper_Trait_Logger'] ) ) {
+				$api->set_logger( $this->log );
+			}
+
 			$api->init();
+
 			$this->singleton->add_class( $api );
 		}
+
 	}
 
 	/**

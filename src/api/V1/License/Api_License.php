@@ -2,6 +2,7 @@
 
 namespace GFPDF\Api\V1\License;
 
+use GFPDF\Api\V1\Base_Api;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Abstract_Addon;
 use Psr\Log\LoggerInterface;
@@ -41,14 +42,14 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @package GFPDF\Plugins\GravityPDF\API
  */
-class Api_License  {
+class Api_License extends Base_Api {
 
 	/**
 	 * Holds our log class
 	 *
 	 * @var \Monolog\Logger|LoggerInterface
 	 *
-	 * @since 4.0
+	 * @since 5.2
 	 */
 	protected $log;
 
@@ -58,7 +59,7 @@ class Api_License  {
 	 *
 	 * @var \GFPDF\Helper\Helper_Data
 	 *
-	 * @since 4.0
+	 * @since 5.2
 	 */
 	protected $data;
 
@@ -91,16 +92,16 @@ class Api_License  {
 	 *
 	 * @since 5.2
 	 */
-	public function register_endpoint() {
+	public function register() {
 		register_rest_route(
-			'gravity-pdf/v1', /* @TODO - pass `gravity-pdf` portion via __construct() */
+			self::ENTRYPOINT . '/' . self::VERSION,
 			'/license/(?P<id>\d+)/deactivate',
 			[
 				'methods'  => \WP_REST_Server::CREATABLE,
 				'callback' => [ $this, 'process_license_deactivation' ],
 
 				'permission_callback' => function() {
-					return current_user_can( 'gravityforms_edit_settings' );
+					return $this->has_capabilities( 'gravityforms_edit_settings' );
 				},
 			]
 		);
@@ -113,7 +114,7 @@ class Api_License  {
 	 *           $_POST['addon_name']
 	 *           $_POST['license']
 	 *
-	 * @since 4.2
+	 * @since 5.2
 	 */
 	public function process_license_deactivation( \WP_REST_Request $request ) {
 
@@ -130,7 +131,7 @@ class Api_License  {
 			if ( $this->deactivate_license_key( $addon, $license ) ) {
 				$this->log->addNotice( 'AJAX – Successfully Deactivated License' );
 
-				return new \WP_REST_Response(array('message' => 'Successfully Deactivated License'));
+				return [ 'message' => 'Successfully Deactivated License' ];						
 
 			} elseif ( $addon->schedule_license_check() ) {
 
@@ -155,7 +156,7 @@ class Api_License  {
 	 *
 	 * @return bool
 	 *
-	 * @since 4.2
+	 * @since 5.2
 	 */
 	public function deactivate_license_key( Helper_Abstract_Addon $addon, $license_key ) {
 
