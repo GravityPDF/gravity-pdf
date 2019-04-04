@@ -9,8 +9,8 @@ use GFPDF\Helper\Helper_Abstract_Options;
 use Psr\Log\LoggerInterface;
 
 /**
- * @package     Gravity PDF Previewer
- * @copyright   Copyright (c) 2018, Blue Liquid Designs
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2019, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       0.1
  */
@@ -21,9 +21,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF Previewer.
+    This file is part of Gravity PDF
 
-    Copyright (C) 2018, Blue Liquid Designs
+    Copyright (C) 2019, Blue Liquid Designs
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License version 3 as published
@@ -39,9 +39,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 */
 
 /**
- * Class ApiFontsEndpoint
+ * Class Api_Fonts
  *
- * @package GFPDF\Plugins\GravityPDF\API
+ * @package GFPDF\Api\V1\Fonts
  */
 class Api_Fonts extends Base_Api {
 
@@ -54,15 +54,6 @@ class Api_Fonts extends Base_Api {
 	 * @since 5.2
 	 */
 	protected $misc;
-
-	/**
-	 * Holds our log class
-	 *
-	 * @var \Monolog\Logger|LoggerInterface
-	 *
-	 * @since 5.2
-	 */
-	protected $log;
 
 	/**
 	 * Holds our Helper_Data object
@@ -84,28 +75,11 @@ class Api_Fonts extends Base_Api {
 	 */
 	protected $options;
 
-	public function __construct( LoggerInterface $log, Helper_Misc $misc, Helper_Data $data, Helper_Abstract_Options $options ) {
-		/* Assign our internal variables */
-		$this->log   = $log;
-		$this->misc  = $misc;
-		$this->data  = $data;
-		$this->options   = $options;
-	}
 
-	/**
-	 * Initialise our module
-	 *
-	 * @since 0.1
-	 */
-	public function init() {		
-		$this->add_actions();
-	}
-
-	/**
-	 * @since 0.1
-	 */
-	public function add_actions() {		
-		add_action( 'rest_api_init', [ $this, 'register_endpoint' ] );			
+	public function __construct( Helper_Misc $misc, Helper_Data $data, Helper_Abstract_Options $options ) {
+		$this->misc    = $misc;
+		$this->data    = $data;
+		$this->options = $options;
 	}
 
 	/**
@@ -113,15 +87,15 @@ class Api_Fonts extends Base_Api {
 	 *
 	 * @Internal Use this endpoint to save fonts
 	 *
-	 * @since 5.2
+	 * @since    5.2
 	 */
 	public function register() {
 		register_rest_route(
-			self::ENTRYPOINT . '/' . self::VERSION,			
+			self::ENTRYPOINT . '/' . self::VERSION,
 			'/fonts/',
 			[
-				'methods'  => \WP_REST_Server::CREATABLE,
-				'callback' => [ $this, 'save_font' ],
+				'methods'             => \WP_REST_Server::CREATABLE,
+				'callback'            => [ $this, 'save_font' ],
 				'permission_callback' => function() {
 					return $this->has_capabilities( 'gravityforms_edit_settings' );
 				},
@@ -132,14 +106,13 @@ class Api_Fonts extends Base_Api {
 			self::ENTRYPOINT . '/' . self::VERSION,
 			'/fonts/',
 			[
-				'methods'  => \WP_REST_Server::DELETABLE,
-				'callback' => [ $this, 'delete_font' ],
+				'methods'             => \WP_REST_Server::DELETABLE,
+				'callback'            => [ $this, 'delete_font' ],
 				'permission_callback' => function() {
 					return $this->has_capabilities( 'gravityforms_edit_settings' );
 				},
 			]
 		);
-
 	}
 
 	/**
@@ -153,34 +126,34 @@ class Api_Fonts extends Base_Api {
 	 */
 	public function save_font( \WP_REST_Request $request ) {
 
-		// get the json parameter
+		/* get the json parameter */
 		$params = $request->get_json_params();
 
 		/* Handle the validation and saving of the font */
 		$payload = isset( $params['payload'] ) ? $params['payload'] : '';
 		$results = $this->process_font( $payload );
 
-		// There was an issue downloading and saving fonts
-		if (!$results) {
+		/* There was an issue downloading and saving fonts */
+		if ( ! $results ) {
 			return new \WP_Error( 'process_font', 'Save Font Failed', [ 'status' => 400 ] );
 		}
 
 		/* If we reached this point the results were successful so return the new object */
-		$this->log->addNotice(
+		$this->logger->addNotice(
 			'AJAX – Successfully Saved Font',
 			[
 				'results' => $results,
 			]
 		);
 
-		return [ 'message' => 'Font saved successfully' ];		
+		return [ 'message' => 'Font saved successfully' ];
 
 	}
 
 	/**
 	 * Validate user input and save as new font
 	 *
-	 * @param  array $font The four font fields to be processed
+	 * @param array $font The four font fields to be processed
 	 *
 	 * @return array
 	 *
@@ -192,31 +165,22 @@ class Api_Fonts extends Base_Api {
 		$font = array_filter( $font );
 
 		/* Check we have the required data */
-		if ( ! isset( $font['font_name'] ) || ! isset( $font['regular'] ) ||
-		     strlen( $font['font_name'] ) === 0 || strlen( $font['regular'] ) === 0
-		) {
-			$return = [
-				'error' => esc_html__( 'Required fields have not been included.', 'gravity-forms-pdf-extended' ),
-			];
+		if ( empty( $font['font_name'] ) || empty( $font['regular'] ) ) {
+			$error = esc_html__( 'Required fields have not been included.', 'gravity-forms-pdf-extended' );
 
-			$this->log->addWarning( 'Font Validation Failed', $return );
+			$this->logger->addWarning( 'Font Validation Failed', $error );
 
-			return new \WP_Error( 'required_fields_missing', 'Required fields have not been included.', [ 'status' => 402 ] );
+			return new \WP_Error( 'required_fields_missing', $error, [ 'status' => 400 ] );
 		}
 
 		/* Check we have a valid font name */
 		$name = $font['font_name'];
-
 		if ( ! $this->is_font_name_valid( $name ) ) {
+			$error = esc_html__( 'Font name is not valid. Only alphanumeric characters and spaces are accepted.', 'gravity-forms-pdf-extended' );
 
-			$return = [
-				'error' => esc_html__( 'Font name is not valid. Only alphanumeric characters and spaces are accepted.', 'gravity-forms-pdf-extended' ),
-			];
+			$this->logger->addWarning( 'Font Validation Failed', $error );
 
-			$this->log->addWarning( 'Font Validation Failed', $return );
-
-			return new \WP_Error( 'invalid_font_name', 'Font name is not valid. Only alphanumeric characters and spaces are accepted.', [ 'status' => 400 ] );
-
+			return new \WP_Error( 'invalid_font_name', $error, [ 'status' => 400 ] );
 		}
 
 		/* Check the font name is unique */
@@ -224,14 +188,11 @@ class Api_Fonts extends Base_Api {
 		$id        = ( isset( $font['id'] ) ) ? $font['id'] : '';
 
 		if ( ! $this->is_font_name_unique( $shortname, $id ) ) {
+			$error = esc_html__( 'A font with the same name already exists. Try a different name.', 'gravity-forms-pdf-extended' );
 
-			$return = [
-				'error' => esc_html__( 'A font with the same name already exists. Try a different name.', 'gravity-forms-pdf-extended' ),
-			];
+			$this->logger->addWarning( 'Font Validation Failed', $error );
 
-			$this->log->addWarning( 'Font Validation Failed', $return );
-
-			return new \WP_Error( 'font_name_exist', 'A font with the same name already exists. Try a different name.', [ 'status' => 422 ] );
+			return new \WP_Error( 'font_name_exist', $error, [ 'status' => 422 ] );
 		}
 
 		/* Move fonts to our Gravity PDF font folder */
@@ -239,15 +200,11 @@ class Api_Fonts extends Base_Api {
 
 		/* Check if any errors occured installing the fonts */
 		if ( isset( $installation['errors'] ) ) {
+			$error = $installation['errors'];
 
-			$return = [
-				'error' => $installation,
-			];
+			$this->logger->addWarning( 'Font Validation Failed', $error );
 
-			$this->log->addWarning( 'Font Validation Failed', $return );
-
-			return new \WP_Error( 'installation_error', 'Font Installation Failed.', [ 'status' => 500 ] );
-
+			return new \WP_Error( 'installation_error', $error, [ 'status' => 500 ] );
 		}
 
 		/* If we got here the installation was successful so return the data */
@@ -257,14 +214,13 @@ class Api_Fonts extends Base_Api {
 	/**
 	 * Check that the font name passed conforms to our expected nameing convesion
 	 *
-	 * @param  string $name The font name to check
+	 * @param string $name The font name to check
 	 *
 	 * @return boolean       True on valid, false on failure
 	 *
 	 * @since 5.2
 	 */
 	public function is_font_name_valid( $name ) {
-
 		$regex = '^[A-Za-z0-9 ]+$';
 
 		if ( preg_match( "/$regex/", $name ) ) {
@@ -277,14 +233,13 @@ class Api_Fonts extends Base_Api {
 	/**
 	 * Handles the database updates required to save a new font
 	 *
-	 * @param  array $fonts
+	 * @param array $fonts
 	 *
 	 * @return array
 	 *
 	 * @since 5.2
 	 */
 	public function install_fonts( $fonts ) {
-
 		$types  = [ 'regular', 'bold', 'italics', 'bolditalics' ];
 		$errors = [];
 
@@ -308,45 +263,40 @@ class Api_Fonts extends Base_Api {
 		}
 
 		/* If errors were found then return */
-		if ( sizeof( $errors ) > 0 ) {
-			$this->log->addError(
-				'Install Error.',
-				[
-					'errors' => $errors,
-				]
-			);
+		if ( count( $errors ) > 0 ) {
+			$errors = [ 'errors' => $errors ];
 
-			return new \WP_Error( 'font_installation_error', 'Font Installation Failed.', [ 'status' => 500 ] );
+			$this->logger->addError( 'Install Error.', $errors );
 
-		} else {
-			/* Insert our font into the database */
-			$custom_fonts = $this->options->get_option( 'custom_fonts' );
-
-			/* Prepare our font data and give it a unique id */
-			if ( empty( $fonts['id'] ) ) {
-				$id          = uniqid();
-				$fonts['id'] = $id;
-			}
-
-			$custom_fonts[ $fonts['id'] ] = $fonts;
-
-			/* Update our font database */
-			$this->options->update_option( 'custom_fonts', $custom_fonts );
-
-			/* Cleanup the mPDF tmp directory to prevent font caching issues  */
-			$this->misc->cleanup_dir( $this->data->mpdf_tmp_location );
+			return new \WP_Error( 'font_installation_error', $errors, [ 'status' => 500 ] );
 
 		}
 
-		/* Fonts sucessfully installed so return font data */
+		/* Insert our font into the database */
+		$custom_fonts = $this->options->get_option( 'custom_fonts' );
 
+		/* Prepare our font data and give it a unique id */
+		if ( empty( $fonts['id'] ) ) {
+			$id          = uniqid();
+			$fonts['id'] = $id;
+		}
+
+		$custom_fonts[ $fonts['id'] ] = $fonts;
+
+		/* Update our font database */
+		$this->options->update_option( 'custom_fonts', $custom_fonts );
+
+		/* Cleanup the mPDF tmp directory to prevent font caching issues  */
+		$this->misc->cleanup_dir( $this->data->mpdf_tmp_location );
+
+		/* Fonts sucessfully installed so return font data */
 		return $fonts;
 	}
 
 	/**
 	 * Query our custom fonts options table and check if the font name already exists
 	 *
-	 * @param  string    $name The font name to check
+	 * @param string     $name The font name to check
 	 * @param int|string $id   The configuration ID (if any)
 	 *
 	 * @return bool True if valid, false on failure
@@ -390,17 +340,15 @@ class Api_Fonts extends Base_Api {
 	}
 
 	/**
-	 * Description @todo
-	 *
-	 * @param WP_REST_Request $request
+	 * Delete custom font
 	 *
 	 * @return \WP_REST_Response
 	 *
 	 * @since 5.2
 	 */
-	public function delete_font(\WP_REST_Request $request) {
+	public function delete_font( \WP_REST_Request $request ) {
 
-		// get the json parameter
+		/* get the json parameter */
 		$params = $request->get_json_params();
 
 		/* Get the required details for deleting fonts */
@@ -408,46 +356,35 @@ class Api_Fonts extends Base_Api {
 		$fonts = $this->options->get_option( 'custom_fonts' );
 
 		/* Check font actually exists and remove */
-		if ( isset( $fonts[ $id ] ) ) {
+		if ( ! isset( $fonts[ $id ] ) || ! $this->remove_font_file( $fonts[ $id ] ) ) {
+			$error = ['error' => esc_html__( 'Could not delete Gravity PDF font correctly. Please try again.', 'gravity-forms-pdf-extended' ) ];
 
-			if ( $this->remove_font_file( $fonts[ $id ] ) ) {
-				unset( $fonts[ $id ] );
+			$this->logger->addError( 'AJAX Endpoint Error', $error );
 
-				/* Cleanup the mPDF tmp directory to prevent font caching issues  */
-				$this->misc->cleanup_dir( $this->data->mpdf_tmp_location );
-
-				if ( $this->options->update_option( 'custom_fonts', $fonts ) ) {
-					/* Success */
-					$this->log->addNotice( 'AJAX – Successfully Deleted Font' );
-
-					return [ 'message' => 'Successfully Deleted Font' ];
-					
-				}
-			}
+			return new \WP_Error( 'delete_font', $error, [ 'status' => 500 ] );
 		}
 
-		$return = [
-			'error' => esc_html__( 'Could not delete Gravity PDF font correctly. Please try again.', 'gravity-forms-pdf-extended' ),
-		];
+		unset( $fonts[ $id ] );
 
-		$this->log->addError( 'AJAX Endpoint Error', $return );
+		/* Cleanup the mPDF tmp directory to prevent font caching issues  */
+		$this->misc->cleanup_dir( $this->data->mpdf_tmp_location );
 
-		return new \WP_Error( 'delete_font', 'Could not delete Gravity PDF font correctly. Please try again.', [ 'status' => 500 ] );
-
-
+		if ( $this->options->update_option( 'custom_fonts', $fonts ) ) {
+			$this->logger->addNotice( 'Successfully Deleted Font' );
+			return true;
+		}
 	}
 
 	/**
 	 * Removes the current font's TTF files from our font directory
 	 *
-	 * @param  array $fonts The font config
+	 * @param array $fonts The font config
 	 *
 	 * @return boolean        True on success, false on failure
 	 *
 	 * @since  5.2
 	 */
 	public function remove_font_file( $fonts ) {
-
 		$fonts = array_filter( $fonts );
 		$types = [ 'regular', 'bold', 'italics', 'bolditalics' ];
 
@@ -463,5 +400,4 @@ class Api_Fonts extends Base_Api {
 
 		return true;
 	}
-
 }
