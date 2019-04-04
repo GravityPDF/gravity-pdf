@@ -2,6 +2,7 @@
 
 namespace GFPDF\Api\V1\Security\Tmp;
 
+use GFPDF\Api\V1\Base_Api;
 use GFPDF\Helper\Helper_Misc;
 use Psr\Log\LoggerInterface;
 use GFPDF\Helper\Helper_Data;
@@ -19,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF Previewer.
+    This file is part of Gravity PDF.
 
     Copyright (C) 2018, Blue Liquid Designs
 
@@ -41,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @package GFPDF\Plugins\GravityPDF\API
  */
-class Api_Security_Tmp_Directory {
+class Api_Security_Tmp_Directory extends Base_Api {
 
 	/**
 	 * Holds our Helper_Misc object
@@ -49,18 +50,9 @@ class Api_Security_Tmp_Directory {
 	 *
 	 * @var \GFPDF\Helper\Helper_Misc
 	 *
-	 * @since 4.0
+	 * @since 5.2
 	 */
 	protected $misc;
-
-	/**
-	 * Holds our log class
-	 *
-	 * @var \Monolog\Logger|LoggerInterface
-	 *
-	 * @since 4.0
-	 */
-	protected $log;
 
 	/**
 	 * Holds our Helper_Data object
@@ -68,13 +60,11 @@ class Api_Security_Tmp_Directory {
 	 *
 	 * @var \GFPDF\Helper\Helper_Data
 	 *
-	 * @since 4.0
+	 * @since 5.2
 	 */
 	protected $data;
 
-	public function __construct( LoggerInterface $log, Helper_Misc $misc, Helper_Data $data ) {
-		/* Assign our internal variables */
-		$this->log   = $log;
+	public function __construct(Helper_Misc $misc, Helper_Data $data ) {
 		$this->misc  = $misc;
 		$this->data  = $data;
 
@@ -98,16 +88,15 @@ class Api_Security_Tmp_Directory {
 	/**
 	 * @since 5.2
 	 */
-	public function register_endpoint() {
+	public function register() {
 		register_rest_route(
-			'gravity-pdf/v1', /* @TODO - pass `gravity-pdf` portion via __construct() */
+			self::ENTRYPOINT . '/' . self::VERSION,
 			'/security/tmp/',
 			[
 				'methods'  => \WP_REST_Server::READABLE,
 				'callback' => [ $this, 'check_tmp_pdf_security' ],
-
 				'permission_callback' => function() {
-					return current_user_can( 'gravityforms_view_settings' );
+					return $this->has_capabilities( 'gravityforms_view_settings' );					
 				},
 			]
 		);
@@ -120,7 +109,7 @@ class Api_Security_Tmp_Directory {
 	 *
 	 * @return boolean
 	 *
-	 * @since 4.0
+	 * @since 5.2
 	 */
 	public function check_tmp_pdf_security( ) {
 
@@ -131,7 +120,7 @@ class Api_Security_Tmp_Directory {
 			return new \WP_Error( 'check_tmp_pdf_security', 'There was an error creating access to tmp directory', [ 'status' => 500 ] );
 		}
 
-		return  new \WP_REST_Response(array('message' => 'Tmp Directory Accessible'));
+		return [ 'message' => 'Tmp Directory Accessible' ];				
 	}
 
 	/**
@@ -139,7 +128,7 @@ class Api_Security_Tmp_Directory {
 	 *
 	 * @return boolean
 	 *
-	 * @since 4.0
+	 * @since 5.2
 	 */
 	public function test_public_tmp_directory_access() {
 		$tmp_dir       = $this->data->template_tmp_location;

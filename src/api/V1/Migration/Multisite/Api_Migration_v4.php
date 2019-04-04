@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF Previewer.
+    This file is part of Gravity PDF.
 
     Copyright (C) 2018, Blue Liquid Designs
 
@@ -44,15 +44,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Api_Migration_v4 extends Base_Api {
 
 	/**
-	 * Holds our log class
-	 *
-	 * @var \Monolog\Logger|LoggerInterface
-	 *
-	 * @since 5.2
-	 */
-	protected $log;
-
-	/**
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
 	 *
@@ -62,9 +53,7 @@ class Api_Migration_v4 extends Base_Api {
 	 */
 	protected $data;
 
-	public function __construct( LoggerInterface $log,  Helper_Data $data) {
-		/* Assign our internal variables */
-		$this->log   = $log;
+	public function __construct(Helper_Data $data) {		
 		$this->data  = $data;
 	}
 	/**
@@ -114,9 +103,7 @@ class Api_Migration_v4 extends Base_Api {
 	 *
 	 * @since 5.2
 	 */
-	public function ajax_multisite_v3_migration( \WP_REST_Request $request ) {
-
-		// get the json parameter
+	public function ajax_multisite_v3_migration( \WP_REST_Request $request ) {		
 		$params = $request->get_json_params();
 
 		/* Ensure multisite website */
