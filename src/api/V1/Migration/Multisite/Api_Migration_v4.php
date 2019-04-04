@@ -2,6 +2,7 @@
 
 namespace GFPDF\Api\V1\Migration\Multisite;
 
+use GFPDF\Api\V1\Base_Api;
 use Psr\Log\LoggerInterface;
 use GFPDF\Helper\Helper_Data;
 
@@ -40,14 +41,14 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @package GFPDF\Plugins\GravityPDF\API
  */
-class Api_Migration_v4 {
+class Api_Migration_v4 extends Base_Api {
 
 	/**
 	 * Holds our log class
 	 *
 	 * @var \Monolog\Logger|LoggerInterface
 	 *
-	 * @since 4.0
+	 * @since 5.2
 	 */
 	protected $log;
 
@@ -89,16 +90,16 @@ class Api_Migration_v4 {
 	 *
 	 * @since 5.2
 	 */
-	public function register_endpoint() {
+	public function register() {
 		register_rest_route(
-			'gravity-pdf/v1', /* @TODO - pass `gravity-pdf` portion via __construct() */
+			self::ENTRYPOINT . '/' . self::VERSION,
 			'/migration/multisite/',
 			[
 				'methods'  => \WP_REST_Server::CREATABLE,
 				'callback' => [ $this, 'ajax_multisite_v3_migration' ],
 
 				'permission_callback' => function() {
-					return current_user_can( 'manage_sites' );
+					return $this->has_capabilities( 'manage_sites' );
 				},
 			]
 		);
@@ -120,7 +121,7 @@ class Api_Migration_v4 {
 
 		/* Ensure multisite website */
 		if ( ! is_multisite() ) {
-			return new \WP_Error( '401', 'You are not authorized to perform this action. Please try again.', [ 'status' => 401 ] );
+			return new \WP_Error( 'ajax_multisite_v3_migration', 'You are not authorized to perform this action. Please try again.', [ 'status' => 401 ] );
 
 		}
 
@@ -138,7 +139,7 @@ class Api_Migration_v4 {
 
 			$this->log->addError( 'AJAX Endpoint Failed', $return );
 
-			return new \WP_Error( '404', 'No configuration.php file found for site #%s', [ 'status' => 404 ] );
+			return new \WP_Error( 'no_configuration_file', 'No configuration.php file found for site #%s', [ 'status' => 404 ] );
 		}
 
 		/* Setup correct migration settings */
@@ -148,7 +149,7 @@ class Api_Migration_v4 {
 		/* Do migration */
 		if ( $this->migrate_v3( $path ) ) {
 
-			return new \WP_REST_Response(array('message' => 'Migration completed successfully '));
+			return [ 'message' => 'Migration completed successfully' ];
 
 		} else {
 
@@ -158,13 +159,51 @@ class Api_Migration_v4 {
 
 			$this->log->addError( 'AJAX Endpoint Failed', $return );
 
-			return new \WP_Error( '422', 'Database import problem for site #%s', [ 'status' => 422 ] );
+			return new \WP_Error( 'unable_to_import', 'Database import problem for site #%s', [ 'status' => 422 ] );
 
 		}
 
 		$this->log->addError( 'AJAX Endpoint Failed' );
 
-		return new \WP_Error( '500', 'Internal Server Error', [ 'status' => 500 ] );
+		return new \WP_Error( 'unable_to_connect_to_server', 'Internal Server Error', [ 'status' => 500 ] );
+	}
+
+	/**
+	 * Does the migration and notice clearing (if unsuccessful)
+	 *
+	 * @param  string $path Path to the current site's template directory
+	 *
+	 * @return boolean
+	 *
+	 * @since    5.2
+	 */
+	private function migrate_v3( $path ) {
+
+		$migration = new Helper_Migration(
+			GPDFAPI::get_form_class(),
+			GPDFAPI::get_log_class(),
+			GPDFAPI::get_data_class(),
+			GPDFAPI::get_options_class(),
+			GPDFAPI::get_misc_class(),
+			GPDFAPI::get_notice_class(),
+			GPDFAPI::get_templates_class()
+		);
+
+		if ( $migration->begin_migration() ) {
+
+			/**
+			 * Migration Successful.
+			 *
+			 * If there was a problem removing the configuration file we'll automatically prevent the migration message displaying again
+			 */
+			if ( is_file( $path . 'configuration.php' ) ) {
+				$this->dismiss_notice( 'migrate_v3_to_v4' );
+			}
+
+			return true;
+		}
+
+		return false;
 	}
 
 }

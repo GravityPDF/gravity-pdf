@@ -74,14 +74,14 @@ class Api_License extends Base_Api {
 	 *
 	 * @since 0.1
 	 */
-	public function init() {		
+	public function init() {
 		$this->add_actions();
 	}
 
 	/**
 	 * @since 0.1
 	 */
-	public function add_actions() {			
+	public function add_actions() {
 		add_action( 'rest_api_init', [ $this, 'register_endpoint' ] );
 	}
 
@@ -131,7 +131,7 @@ class Api_License extends Base_Api {
 			if ( $this->deactivate_license_key( $addon, $license ) ) {
 				$this->log->addNotice( 'AJAX – Successfully Deactivated License' );
 
-				return [ 'message' => 'Successfully Deactivated License' ];						
+				return [ 'message' => 'Successfully Deactivated License' ];
 
 			} elseif ( $addon->schedule_license_check() ) {
 
