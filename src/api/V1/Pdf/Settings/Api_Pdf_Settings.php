@@ -2,6 +2,7 @@
 
 namespace GFPDF\Api\V1\Pdf\Settings;
 
+use GFPDF\Api\V1\Base_Api;
 use Psr\Log\LoggerInterface;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
@@ -41,14 +42,21 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @package GFPDF\Plugins\GravityPDF\API
  */
-class Api_Pdf_Settings {
+class Api_Pdf_Settings extends Base_Api {
 
+	/**
+	 * @var string
+	 *
+	 * @since 5.2
+	 */
+	protected $template_font_location;
+	
 	/**
 	 * Holds our log class
 	 *
 	 * @var \Monolog\Logger|LoggerInterface
 	 *
-	 * @since 4.0
+	 * @since 5.2
 	 */
 	protected $log;
 
@@ -58,7 +66,7 @@ class Api_Pdf_Settings {
 	 *
 	 * @var \GFPDF\Helper\Helper_Data
 	 *
-	 * @since 4.0
+	 * @since 5.2
 	 */
 	protected $data;
 
@@ -69,15 +77,16 @@ class Api_Pdf_Settings {
 	 *
 	 * @var \GFPDF\Helper\Helper_Misc
 	 *
-	 * @since 4.0
+	 * @since 5.2
 	 */
 	protected $misc;
 
-	public function __construct( LoggerInterface $log,  Helper_Data $data,  Helper_Misc $misc) {
+	public function __construct( LoggerInterface $log,  Helper_Data $data,  Helper_Misc $misc, $template_font_location) {
 		/* Assign our internal variables */
 		$this->log   = $log;
 		$this->data  = $data;
 		$this->misc  = $misc;
+		$this->template_font_location = $template_font_location;
 	}
 
 	/**
@@ -99,16 +108,15 @@ class Api_Pdf_Settings {
 	/**
 	 * @since 5.2
 	 */
-	public function register_endpoint() {
+	public function register() {
 		register_rest_route(
-			'gravity-pdf/v1', /* @TODO - pass `gravity-pdf` portion via __construct() */
+			self::ENTRYPOINT . '/' . self::VERSION,
 			'/pdf/settings/',
 			[
 				'methods'  => \WP_REST_Server::READABLE,
 				'callback' => [ $this, 'check_tmp_pdf_security' ],
-
 				'permission_callback' => function() {
-					return current_user_can( 'gravityforms_view_settings');
+					return $this->has_capabilities( 'gravityforms_view_settings' );					
 				},
 			]
 		);
@@ -121,9 +129,9 @@ class Api_Pdf_Settings {
 	 *
 	 * @return WP_REST_Response
 	 *
-	 * @since 4.0
+	 * @since 5.2
 	 */
-	public function check_tmp_pdf_security() {
+	public function check_tmp_pdf_security( \WP_REST_Request $request ) {
 
 		/* Create our tmp file and do our actual check */
 		$result =  json_encode( $this->test_public_tmp_directory_access() );
@@ -132,7 +140,7 @@ class Api_Pdf_Settings {
 			return new \WP_Error( 'test_public_tmp_directory_access', 'Unable to create tmp Directory', [ 'status' => 401 ] );
 		}
 
-		return new \WP_REST_Response(array('message' => 'Tmp file successfully created '));
+		return [ 'message' => 'Tmp file successfully created' ];		
 
 	}
 
@@ -142,10 +150,10 @@ class Api_Pdf_Settings {
 	 *
 	 * @return boolean
 	 *
-	 * @since 4.0
+	 * @since 5.2
 	 */
 	public function test_public_tmp_directory_access() {
-		$tmp_dir       = $this->data->template_tmp_location;
+		$tmp_dir       = $this->template_font_location;
 		$tmp_test_file = 'public_tmp_directory_test.txt';
 		$return        = true;
 
