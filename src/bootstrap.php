@@ -143,6 +143,17 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 *
 	 * @since 4.0
 	 */
+
+	/**
+	 * Holds our Helper_Migration object
+	 * which we can autoload with any data needed
+	 *
+	 * @var \GFPDF\Helper\Helper_Migration
+	 *
+	 * @since 5.2
+	 */
+	protected $migration;
+
 	public function __call( $name, $arguments ) {
 		trigger_error( sprintf( esc_html__( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ), E_USER_DEPRECATED );
 	}
@@ -209,6 +220,17 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		/* Setup our template helper */
 		$this->templates = new Helper\Helper_Templates( $this->log, $this->data, $this->gform );
+
+		/* Set up our migration object */
+		$this->migration = new Helper\Helper_Migration(
+			$this->gform,
+			$this->log,
+			$this->data,
+			$this->options,
+			$this->misc,
+			$this->notices,
+			$this->templates
+		);
 
 		/* Set up our options object - this is initialised on admin_init but other classes need to access its methods before this */
 		$this->options = new Helper\Helper_Options_Fields(
@@ -899,13 +921,13 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function api() {
 		$apis = [
 			new Api\V1\Fonts\Core\Api_Fonts_Core( $this->data->template_font_location ),
+			new Api\V1\Fonts\Api_Fonts($this->misc, $this->data, $this->options),
+			new Api\V1\License\Api_License($this->options, $this->data),
+			new Api\V1\Migration\Multisite\Api_Migration_v4($this->options, $this->data, $this->migration),
 
-			new Api\V1\Fonts\Api_Fonts($this->log, $this->misc, $this->data, $this->options),
-			new Api\V1\License\Api_License($this->log, $this->data),
-			new Api\V1\Migration\Multisite\Api_Migration_v4($this->log, $this->data),
 			new Api\V1\Pdf\Settings\Api_Pdf_Settings($this->log, $this->data, $this->misc, $this->data->template_font_location),
-////			new Api\V1\Security\Tmp\Api_Security_Tmp_Directory($this->log, $this->misc, $this->data),
-//			new Api\V1\Template\Api_Template($this->log, $this->misc, $this->data),
+			new Api\V1\Security\Tmp\Api_Security_Tmp_Directory($this->log, $this->misc, $this->data),
+			new Api\V1\Template\Api_Template($this->log, $this->misc, $this->data),
 		];
 
 		foreach ( $apis as $api ) {

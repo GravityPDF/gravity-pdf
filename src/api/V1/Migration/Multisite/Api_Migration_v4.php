@@ -3,11 +3,13 @@
 namespace GFPDF\Api\V1\Migration\Multisite;
 
 use GFPDF\Api\V1\Base_Api;
-use Psr\Log\LoggerInterface;
 use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Abstract_Options;
+
+use GFPDF\Helper\Helper_Migration;
 
 /**
- * @package     Gravity PDF Previewer
+ * @package     Gravity PDF
  * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       0.1
@@ -44,6 +46,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Api_Migration_v4 extends Base_Api {
 
 	/**
+	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
+	 * Makes it easy to access global PDF settings and individual form PDF settings
+	 *
+	 * @var \GFPDF\Helper\Helper_Options_Fields
+	 *
+	 * @since 4.0
+	 */
+	protected $options;
+
+	/**
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
 	 *
@@ -53,29 +65,48 @@ class Api_Migration_v4 extends Base_Api {
 	 */
 	protected $data;
 
-	public function __construct(Helper_Data $data) {		
+	/**
+	 * Holds our Helper_Data object
+	 * which we can autoload with any data needed
+	 *
+	 * @var \GFPDF\Helper\Helper_Migration
+	 *
+	 * @since 5.2
+	 */
+	protected $migration;
+
+	/**
+	 * Api_Migration_v4 constructor.
+	 *
+	 * @param Helper_Data $data
+	 *
+	 * @since 5.2
+	 */
+	public function __construct(Helper_Abstract_Options $options, Helper_Data $data, Helper_Migration $migration) {		
+		$this->options  = $options;
 		$this->data  = $data;
+		$this->migration  = $migration;
 	}
 	/**
 	 * Initialise our module
 	 *
-	 * @since 0.1
+	 * @since 5.2
 	 */
 	public function init() {		
 		$this->add_actions();
 	}
 
 	/**
-	 * @since 0.1
+	 * @since 5.2
 	 */
 	public function add_actions() {			
 		add_action( 'rest_api_init', [ $this, 'register_endpoint' ] );
 	}
 
 	/**
-	 * Register our PDF save font endpoint
+	 * Register our Multisite Migration endpoint
 	 *
-	 * @Internal Use this endpoint to save fonts
+	 * @Internal Use this endpoint register multisite migration
 	 *
 	 * @since 5.2
 	 */
@@ -108,8 +139,8 @@ class Api_Migration_v4 extends Base_Api {
 
 		/* Ensure multisite website */
 		if ( ! is_multisite() ) {
-			return new \WP_Error( 'ajax_multisite_v3_migration', 'You are not authorized to perform this action. Please try again.', [ 'status' => 401 ] );
 
+			return new \WP_Error( 'ajax_multisite_v3_migration', 'You are not authorized to perform this action. Please try again.', [ 'status' => 401 ] );
 		}
 
 		/* Check there's a configuration file to migrate */
@@ -120,13 +151,9 @@ class Api_Migration_v4 extends Base_Api {
 
 		if ( ! is_file( $path . 'configuration.php' ) ) {
 
-			$return = [
-				'error' => sprintf( esc_html__( 'No configuration.php file found for site #%s', 'gravity-forms-pdf-extended' ), $blog_id ),
-			];
+			$this->logger->addError( 'Configuration file not found', $path );
 
-			$this->log->addError( 'AJAX Endpoint Failed', $return );
-
-			return new \WP_Error( 'no_configuration_file', 'No configuration.php file found for site #%s', [ 'status' => 404 ] );
+			return new \WP_Error( 'no_configuration_file', 'No configuration file found for site #%s', [ 'status' => 404 ] );
 		}
 
 		/* Setup correct migration settings */
@@ -134,25 +161,15 @@ class Api_Migration_v4 extends Base_Api {
 		$this->data->multisite_template_location = $path;
 
 		/* Do migration */
-		if ( $this->migrate_v3( $path ) ) {
+		if ( ! $this->migrate_v3( $path ) ) {
 
-			return [ 'message' => 'Migration completed successfully' ];
+			$this->logger->addError( 'AJAX Endpoint Failed' );
 
-		} else {
+			return new \WP_Error( 'unable_to_connect_to_server', 'Database import problem for site #%s', [ 'status' => 500 ] );
+		} 
 
-			$return = [
-				'error' => sprintf( esc_html__( 'Database import problem for site #%s', 'gravity-forms-pdf-extended' ), $blog_id ),
-			];
-
-			$this->log->addError( 'AJAX Endpoint Failed', $return );
-
-			return new \WP_Error( 'unable_to_import', 'Database import problem for site #%s', [ 'status' => 422 ] );
-
-		}
-
-		$this->log->addError( 'AJAX Endpoint Failed' );
-
-		return new \WP_Error( 'unable_to_connect_to_server', 'Internal Server Error', [ 'status' => 500 ] );
+		/* migration successful */
+		return [ 'message' => 'Migration completed successfully' ];
 	}
 
 	/**
@@ -166,18 +183,8 @@ class Api_Migration_v4 extends Base_Api {
 	 */
 	private function migrate_v3( $path ) {
 
-		$migration = new Helper_Migration(
-			GPDFAPI::get_form_class(),
-			GPDFAPI::get_log_class(),
-			GPDFAPI::get_data_class(),
-			GPDFAPI::get_options_class(),
-			GPDFAPI::get_misc_class(),
-			GPDFAPI::get_notice_class(),
-			GPDFAPI::get_templates_class()
-		);
-
-		if ( $migration->begin_migration() ) {
-
+		/* Start migration */
+		if ( $this->migration->begin_migration() ) {
 			/**
 			 * Migration Successful.
 			 *
@@ -192,5 +199,21 @@ class Api_Migration_v4 extends Base_Api {
 
 		return false;
 	}
+
+	/**
+	 * Mark the current notice as being dismissed
+	 *
+	 * @param  string $type The current notice ID
+	 *
+	 * @return void
+	 *
+	 * @since 5.2
+	 */
+	public function dismiss_notice( $type ) {
+
+		$dismissed_notices          = $this->options->get_option( 'action_dismissal', [] );
+		$dismissed_notices[ $type ] = $type;
+		$this->options->update_option( 'action_dismissal', $dismissed_notices );
+	}	
 
 }
