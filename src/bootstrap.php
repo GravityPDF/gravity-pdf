@@ -926,7 +926,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			new Api\V1\Migration\Multisite\Api_Migration_v4( $this->options, $this->data, $this->migration ),
 			new Api\V1\Pdf\Settings\Api_Pdf_Settings( $this->misc, $this->data->template_font_location ),
 			new Api\V1\Security\Tmp\Api_Security_Tmp_Directory( $this->misc, $this->data ),
-			new Api\V1\Template\Api_Template( $this->misc, $this->data, $this->options ),
+			new Api\V1\Template\Api_Template( $this->misc, $this->data, $this->options, $this->templates ),
 		];
 
 		foreach ( $apis as $api ) {

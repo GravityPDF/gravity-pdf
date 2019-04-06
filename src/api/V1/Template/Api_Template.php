@@ -5,12 +5,14 @@ namespace GFPDF\Api\V1\Template;
 use GFPDF\Api\V1\Base_Api;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Abstract_Options;
+ use GFPDF\Helper\Helper_Templates;
 
 /**
  * @package     Gravity PDF 
  * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       0.1
+ * @since       5.2
  */
 
 /* Exit if accessed directly */
@@ -74,6 +76,16 @@ class Api_Template extends Base_Api {
 	protected $options;
 
 	/**
+	 * Holds our Helper_Templates object
+	 * used to ease access to our PDF templates
+	 *
+	 * @var \GFPDF\Helper\Helper_Templates
+	 *
+	 * @since 5.2
+	 */
+	public $templates;
+
+	/**
 	 * Api_Pdf_Settings constructor.
 	 *
 	 * @param Helper_Misc $misc
@@ -82,10 +94,11 @@ class Api_Template extends Base_Api {
 	 *
 	 * @since 5.2
 	 */
-	public function __construct( Helper_Misc $misc, Helper_Data $data, Helper_Abstract_Options $options ) {				
+	public function __construct( Helper_Misc $misc, Helper_Data $data, Helper_Abstract_Options $options, Helper_Templates $templates ) {				
 		$this->misc  = $misc;
 		$this->data  = $data;
 		$this->options = $options;
+		$this->templates = $templates;
 	}
 
 	/**
@@ -215,14 +228,10 @@ class Api_Template extends Base_Api {
 			);
 
 			header( 'Content-Type: application/json' );
-			echo json_encode(
-				[
-					'error' => $e->getMessage(),
-				]
-			);
+			$error =  json_encode( [ 'error' => $e->getMessage() ] );
 
-			/* Bad Response */
-			wp_die( '', 400 );
+			/* Bad Response */			
+			return new \WP_Error( 'validate_upload_file', $error, [ 'status' => 400 ] );	
 		}
 
 		/* Copy all the files to the active PDF working directory */
@@ -251,8 +260,8 @@ class Api_Template extends Base_Api {
 		$this->cleanup_template_files( $zip_path );
 
 		if ( is_wp_error( $results ) ) {
-			/* Internal Server Error */
-			wp_die( '500', 500 );
+			/* Internal Server Error */			
+			return new \WP_Error( 'unable_to_copy_files', $results, [ 'status' => 500 ] );
 		}
 
 		/* Return newly-installed template headers */
@@ -264,9 +273,9 @@ class Api_Template extends Base_Api {
 		);
 
 		/* Okay Response */
-		wp_die( '', 200 );
+		// wp_die( '', 200 );
+		return [ 'message' => 'Template uploaded successfully' ];
 	}
-
 
 	/**
 	 * Extracts the zip file, checks there are valid PDF template files found and retreives information about them
@@ -277,7 +286,7 @@ class Api_Template extends Base_Api {
 	 *
 	 * @throws Exception Thrown if a PDF template file isn't valid
 	 *
-	 * @since 4.1
+	 * @since 5.2
 	 */
 	public function unzip_and_verify_templates( $zip_path ) {
 		$this->enable_wp_filesystem();
@@ -286,27 +295,26 @@ class Api_Template extends Base_Api {
 		$results = unzip_file( $zip_path, $dir );
 
 		/* If the unzip failed we'll throw an error */
-		if ( is_wp_error( $results ) ) {
-			throw new Exception( $results->get_error_message() );
+		if ( is_wp_error( $results ) ) {			
+			return new \WP_Error( 'unzip_failed', $results->get_error_message(), [ 'status' => 500 ] );
 		}
 
 		/* Check unziped templates for a valid v4 header, or v3 string pattern */
 		$files = glob( $dir . '*.php' );
 
-		if ( ! is_array( $files ) || sizeof( $files ) === 0 ) {
-			throw new Exception( esc_html__( 'No valid PDF template found in Zip archive.', 'gravity-forms-pdf-extended' ) );
+		if ( ! is_array( $files ) || sizeof( $files ) === 0 ) {			
+			return new \WP_Error( 'no_valid_template_found', 'No valid PDF template found in Zip archive.', [ 'status' => 404 ] );
 		}
 
 		$this->check_for_valid_pdf_templates( $files );
 	}
-
 
 	/**
 	 * Remove the zip file and the unzipped directory
 	 *
 	 * @param $zip_path The full path to the zip file
 	 *
-	 * @since 4.1
+	 * @since 5.2
 	 */
 	public function cleanup_template_files( $zip_path ) {
 		$dir = $this->get_unzipped_dir_name( $zip_path );
@@ -315,7 +323,6 @@ class Api_Template extends Base_Api {
 		unlink( $zip_path );
 	}
 
-
 	/**
 	 * Gets the full path to a new directory which is based on the zip file's unique name
 	 *
@@ -323,12 +330,11 @@ class Api_Template extends Base_Api {
 	 *
 	 * @return string
 	 *
-	 * @since 4.1
+	 * @since 5.2
 	 */
 	public function get_unzipped_dir_name( $zip_path ) {
 		return dirname( $zip_path ) . '/' . basename( $zip_path, '.zip' ) . '/';
 	}
-
 
 	/**
 	 * Get the PDF template info to pass to our application
@@ -337,7 +343,7 @@ class Api_Template extends Base_Api {
 	 *
 	 * @return array
 	 *
-	 * @since 4.1
+	 * @since 5.2
 	 */
 	public function get_template_info( $files = [] ) {
 		return array_map(
@@ -348,13 +354,12 @@ class Api_Template extends Base_Api {
 		);
 	}
 
-
 	/**
 	 * Execute the setUp method on any templates that impliment it
 	 *
 	 * @param array $headers Contains the array returned from $this->get_template_info()
 	 *
-	 * @since 4.1
+	 * @since 5.2
 	 */
 	public function maybe_run_template_setup( $headers = [] ) {
 		foreach ( $headers as $template ) {
@@ -367,7 +372,6 @@ class Api_Template extends Base_Api {
 		}
 	}
 
-
 	/**
 	 * Sniffs the PHP file for signs that it's a valid Gravity PDF tempalte file
 	 *
@@ -377,7 +381,7 @@ class Api_Template extends Base_Api {
 	 *
 	 * @throws Exception Thrown if file found not to be valid
 	 *
-	 * @since 4.1
+	 * @since 5.2
 	 */
 	public function check_for_valid_pdf_templates( $files = [] ) {
 		foreach ( $files as $file ) {
@@ -393,46 +397,75 @@ class Api_Template extends Base_Api {
 
 				/* Check the first 8kiB contains the string RGForms or GFForms, which signifies our v3 templates */
 				if ( strpos( $file_data, 'RGForms' ) === false && strpos( $file_data, 'GFForms' ) === false ) {
-					throw new Exception( sprintf( esc_html__( 'The PHP file %s is not a valid PDF Template.', 'gravity-forms-pdf-extended' ), basename( $file ) ) );
+					// throw new Exception( sprintf( esc_html__( 'The PHP file %s is not a valid PDF Template.', 'gravity-forms-pdf-extended' ), 
+					// 					basename( $file ) ) );
+					return new \WP_Error( 'invalid_template', 'The PHP file is not a valid PDF Template.', [ 'status' => 422 ] );
 				}
 			}
 		}
 	}
 
 
-
-
-
-
 	/**
-	 * AJAX Endpoint for deleting user-uploaded PDF templates
+	 * Register our PDF save font endpoint
 	 *
-	 * @param string $_POST ['nonce'] a valid nonce
-	 * @param string $_POST ['id'] a valid PDF template ID
+	 * @param WP_REST_Request $request
+	 *
+	 * @return \WP_REST_Response
 	 *
 	 * @since 5.2
 	 */
-	public function ajax_process_delete_template() {
+	public function ajax_process_delete_template( \WP_REST_Request $request ) {
 
-		$this->misc->handle_ajax_authentication( 'Delete PDF Template' );
-
-		$template_id = ( isset( $_POST['id'] ) ) ? $_POST['id'] : '';
+		/* get the json parameter */
+		$params = $request->get_json_params();
+		
+		$template_id = ( isset( $params['id'] ) ) ? $params['id'] : '';
 
 		/* Get all the necessary PDF template files to delete */
 		try {
 			$this->delete_template( $template_id );
 		} catch ( Exception $e ) {
-			/* Bad Request */
-			wp_die( '400', 400 );
+			/* Bad Request */			
+			return new \WP_Error( 'process_delete_template', $e->getMessage(), [ 'status' => 400 ] );
 		}
 
 		$this->templates->flush_template_transient_cache();
 
-		header( 'Content-Type: application/json' );
-		echo json_encode( true );
+		// header( 'Content-Type: application/json' );
+		// echo json_encode( true );
 
-		/* Okay Response */
-		wp_die( '', 200 );
+		/* Okay Response */		
+		return [ 'message' => 'Template deleted successfully' ];
+	}
+
+	/**
+	 * Delete's a PDF templates files
+	 *
+	 * @param string $template_id
+	 *
+	 * @throws Exception
+	 *
+	 * @since 5.2
+	 */
+	public function delete_template( $template_id ) {
+		try {
+			$files  = $this->templates->get_template_files_by_id( $template_id );
+			$config = $this->templates->get_config_class( $template_id );
+
+			/* Check if the PDF config impliments our Setup/TearDown interface and run the tear down */
+			if ( in_array( 'GFPDF\Helper\Helper_Interface_Setup_TearDown', class_implements( $config ) ) ) {
+				$config->tearDown();
+			}
+
+			/* Remove the PDF template files */
+			foreach ( $files as $file ) {
+				unlink( $file );
+			}
+		} catch ( Exception $e ) {
+			// throw $e; /* throw further down the chain */
+			return new \WP_Error( 'delete_template', $e->getMessage(), [ 'status' => 500 ] );
+		}
 	}
 
 }
