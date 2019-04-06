@@ -78,11 +78,13 @@ class Api_Migration_v4 extends Base_Api {
 	/**
 	 * Api_Migration_v4 constructor.
 	 *
+	 * @param Helper_Abstract_Options $options
 	 * @param Helper_Data $data
-	 *
+	 * @param Helper_Migration $migration	 
+	 *  
 	 * @since 5.2
 	 */
-	public function __construct(Helper_Abstract_Options $options, Helper_Data $data, Helper_Migration $migration) {		
+	public function __construct( Helper_Abstract_Options $options, Helper_Data $data, Helper_Migration $migration ) {		
 		$this->options  = $options;
 		$this->data  = $data;
 		$this->migration  = $migration;

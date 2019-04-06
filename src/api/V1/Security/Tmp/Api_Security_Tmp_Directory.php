@@ -4,7 +4,6 @@ namespace GFPDF\Api\V1\Security\Tmp;
 
 use GFPDF\Api\V1\Base_Api;
 use GFPDF\Helper\Helper_Misc;
-use Psr\Log\LoggerInterface;
 use GFPDF\Helper\Helper_Data;
 
 /**
@@ -45,6 +44,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Api_Security_Tmp_Directory extends Base_Api {
 
 	/**
+	 * @var boolean
+	 *
+	 * @since 5.2
+	 */
+	protected $has_access = true;
+
+	/**
+	 * @var string the temporary text file to write to directory
+	 *
+	 * @since 5.2
+	 */
+	protected $tmp_test_file = 'public_tmp_directory_test.txt';
+
+	/**
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
 	 *
@@ -64,7 +77,14 @@ class Api_Security_Tmp_Directory extends Base_Api {
 	 */
 	protected $data;
 
-	public function __construct(Helper_Misc $misc, Helper_Data $data ) {
+	/**
+	 * Api_Security_Tmp_Directory constructor.
+	 *
+	 * @param Helper_Data $data
+	 *
+	 * @since 5.2
+	 */
+	public function __construct( Helper_Misc $misc, Helper_Data $data ) {
 		$this->misc  = $misc;
 		$this->data  = $data;
 
@@ -72,14 +92,14 @@ class Api_Security_Tmp_Directory extends Base_Api {
 	/**
 	 * Initialise our module
 	 *
-	 * @since 0.1
+	 * @since 5.2
 	 */
 	public function init() {		
 		$this->add_actions();
 	}
 
 	/**
-	 * @since 0.1
+	 * @since 5.2
 	 */
 	public function add_actions() {			
 		add_action( 'rest_api_init', [ $this, 'register_endpoint' ] );
@@ -113,6 +133,7 @@ class Api_Security_Tmp_Directory extends Base_Api {
 	 */
 	public function check_tmp_pdf_security( ) {
 
+		/* check if we can access tmp directory */
 		$result =  $this->test_public_tmp_directory_access();
 
 		if (!$result) {
@@ -131,22 +152,19 @@ class Api_Security_Tmp_Directory extends Base_Api {
 	 * @since 5.2
 	 */
 	public function test_public_tmp_directory_access() {
-		$tmp_dir       = $this->data->template_tmp_location;
-		$tmp_test_file = 'public_tmp_directory_test.txt';
-		$return        = true;
 
 		/* create our file */
-		file_put_contents( $tmp_dir . $tmp_test_file, 'failed-if-read' );
+		file_put_contents( $this->data->template_tmp_location . $this->tmp_test_file, 'failed-if-read' );
 
 		/* verify it exists */
-		if ( is_file( $tmp_dir . $tmp_test_file ) ) {
+		if ( is_file( $this->data->template_tmp_location . $this->tmp_test_file ) ) {
 
 			/* Run our test */
-			$site_url = $this->misc->convert_path_to_url( $tmp_dir );
+			$site_url = $this->misc->convert_path_to_url( $this->data->template_tmp_location );
 
 			if ( $site_url !== false ) {
 
-				$response = wp_remote_get( $site_url . $tmp_test_file );
+				$response = wp_remote_get( $site_url . $this->tmp_test_file );
 
 				if ( ! is_wp_error( $response ) ) {
 
@@ -156,7 +174,7 @@ class Api_Security_Tmp_Directory extends Base_Api {
 					) {
 						$response_object = $response['http_response'];
 						$raw_response    = $response_object->get_response_object();
-						$this->log->warning(
+						$this->logger->warning(
 							'PDF temporary directory not protected',
 							[
 								'url'         => $raw_response->url,
@@ -165,15 +183,15 @@ class Api_Security_Tmp_Directory extends Base_Api {
 							]
 						);
 
-						$return = false;
+						$this->has_access = false;
 					}
 				}
 			}
 		}
 
 		/* Cleanup our test file */
-		@unlink( $tmp_dir . $tmp_test_file );
+		@unlink( $this->data->template_tmp_location . $this->tmp_test_file );
 
-		return $return;
+		return $this->has_access;
 	}
 }

@@ -3,11 +3,10 @@
 namespace GFPDF\Api\V1\Pdf\Settings;
 
 use GFPDF\Api\V1\Base_Api;
-use Psr\Log\LoggerInterface;
 use GFPDF\Helper\Helper_Misc;
 
 /**
- * @package     Gravity PDF Previewer
+ * @package     Gravity PDF
  * @copyright   Copyright (c) 2018, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       0.1
@@ -19,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
-    This file is part of Gravity PDF Previewer.
+    This file is part of Gravity PDF.
 
     Copyright (C) 2018, Blue Liquid Designs
 
@@ -49,15 +48,20 @@ class Api_Pdf_Settings extends Base_Api {
 	 * @since 5.2
 	 */
 	protected $template_font_location;
-	
+
 	/**
-	 * Holds our log class
-	 *
-	 * @var \Monolog\Logger|LoggerInterface
+	 * @var boolean
 	 *
 	 * @since 5.2
 	 */
-	protected $log;
+	protected $has_access = true;
+
+	/**
+	 * @var string
+	 *
+	 * @since 5.2
+	 */
+	protected $tmp_test_file = 'public_tmp_directory_test.txt';
 
 	/**
 	 * Holds our Helper_Misc object
@@ -69,9 +73,16 @@ class Api_Pdf_Settings extends Base_Api {
 	 */
 	protected $misc;
 
-	public function __construct( LoggerInterface $log, Helper_Misc $misc, $template_font_location) {
-		/* Assign our internal variables */
-		$this->log   = $log;		
+	/**
+	 * Api_Pdf_Settings constructor.
+	 *
+	 * @param Helper_Misc $misc
+	 * 
+	 * @param string $template_font_location The absolute path to the current PDF font directory
+	 *
+	 * @since 5.2
+	 */
+	public function __construct( Helper_Misc $misc, $template_font_location ) {				
 		$this->misc  = $misc;
 		$this->template_font_location = $template_font_location;
 	}
@@ -79,14 +90,14 @@ class Api_Pdf_Settings extends Base_Api {
 	/**
 	 * Initialise our module
 	 *
-	 * @since 0.1
+	 * @since 5.2
 	 */
 	public function init() {		
 		$this->add_actions();
 	}
 
 	/**
-	 * @since 0.1
+	 * @since 5.2
 	 */
 	public function add_actions() {			
 		add_action( 'rest_api_init', [ $this, 'register_endpoint' ] );
@@ -128,9 +139,7 @@ class Api_Pdf_Settings extends Base_Api {
 		}
 
 		return [ 'message' => 'Tmp file successfully created' ];		
-
 	}
-
 
 	/**
 	 * Create a file in our tmp directory and verify if it's protected from the public
@@ -140,22 +149,19 @@ class Api_Pdf_Settings extends Base_Api {
 	 * @since 5.2
 	 */
 	public function test_public_tmp_directory_access() {
-		$tmp_dir       = $this->template_font_location;
-		$tmp_test_file = 'public_tmp_directory_test.txt';
-		$return        = true;
 
 		/* create our file */
-		file_put_contents( $tmp_dir . $tmp_test_file, 'failed-if-read' );
+		file_put_contents(  $this->template_font_location . $this->tmp_test_file, 'failed-if-read' );
 
 		/* verify it exists */
-		if ( is_file( $tmp_dir . $tmp_test_file ) ) {
+		if ( is_file( $this->template_font_location . $this->tmp_test_file ) ) {
 
 			/* Run our test */
-			$site_url = $this->misc->convert_path_to_url( $tmp_dir );
+			$site_url = $this->misc->convert_path_to_url( $this->template_font_location  );
 
 			if ( $site_url !== false ) {
 
-				$response = wp_remote_get( $site_url . $tmp_test_file );
+				$response = wp_remote_get( $site_url . $this->tmp_test_file );
 
 				if ( ! is_wp_error( $response ) ) {
 
@@ -165,7 +171,7 @@ class Api_Pdf_Settings extends Base_Api {
 					) {
 						$response_object = $response['http_response'];
 						$raw_response    = $response_object->get_response_object();
-						$this->log->warning(
+						$this->logger->warning(
 							'PDF temporary directory not protected',
 							[
 								'url'         => $raw_response->url,
@@ -174,16 +180,16 @@ class Api_Pdf_Settings extends Base_Api {
 							]
 						);
 
-						$return = false;
+						$this->has_access = false;
 					}
 				}
 			}
 		}
 
 		/* Cleanup our test file */
-		@unlink( $tmp_dir . $tmp_test_file );
+		@unlink( $this->template_font_location . $this->tmp_test_file );
 
-		return $return;
+		return $this->has_access;
 	}
 
 }
