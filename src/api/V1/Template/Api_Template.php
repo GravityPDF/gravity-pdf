@@ -124,7 +124,7 @@ class Api_Template extends Base_Api {
 	 *
 	 * @since 5.2
 	 */
-	public function register_endpoint() {
+	public function register() {
 		register_rest_route(
 			self::ENTRYPOINT . '/' . self::VERSION,
 			'/template/',
