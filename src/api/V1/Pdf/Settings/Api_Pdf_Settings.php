@@ -88,22 +88,6 @@ class Api_Pdf_Settings extends Base_Api {
 	}
 
 	/**
-	 * Initialise our module
-	 *
-	 * @since 5.2
-	 */
-	public function init() {		
-		$this->add_actions();
-	}
-
-	/**
-	 * @since 5.2
-	 */
-	public function add_actions() {			
-		add_action( 'rest_api_init', [ $this, 'register_endpoint' ] );
-	}
-
-	/**
 	 * @since 5.2
 	 */
 	public function register() {

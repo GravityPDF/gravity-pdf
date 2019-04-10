@@ -89,21 +89,6 @@ class Api_Migration_v4 extends Base_Api {
 		$this->data  = $data;
 		$this->migration  = $migration;
 	}
-	/**
-	 * Initialise our module
-	 *
-	 * @since 5.2
-	 */
-	public function init() {		
-		$this->add_actions();
-	}
-
-	/**
-	 * @since 5.2
-	 */
-	public function add_actions() {			
-		add_action( 'rest_api_init', [ $this, 'register_endpoint' ] );
-	}
 
 	/**
 	 * Register our Multisite Migration endpoint
