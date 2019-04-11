@@ -53,7 +53,7 @@ abstract class Base_Api {
 	/**
 	 * @since 5.2
 	 */
-	const ENTRYPOINT = 'gravitypdf';
+	const ENTRYPOINT = 'gravity-pdf';
 
 	/**
 	 * @since 5.2
@@ -78,7 +78,7 @@ abstract class Base_Api {
 	 *
 	 * @since 5.2
 	 */
-	protected function has_capabilities( $capability ) {
+	public function has_capabilities( $capability ) {
 		$gform = \GPDFAPI::get_form_class();
 		return $gform->has_capability( $capability );
 	}
