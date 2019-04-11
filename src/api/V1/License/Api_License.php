@@ -6,6 +6,8 @@ use GFPDF\Api\V1\Base_Api;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Abstract_Addon;
 
+use Psr\Log\LoggerInterface;
+
 /**
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2019, Blue Liquid Designs
@@ -46,6 +48,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Api_License extends Base_Api {
 
 	/**
+	 * Holds our log class
+	 *
+	 * @var \Monolog\Logger
+	 *
+	 * @since 4.0
+	 */
+	public $log;
+
+	/**
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
 	 *
@@ -62,7 +73,8 @@ class Api_License extends Base_Api {
 	 *
 	 * @since 5.2
 	 */
-	public function __construct( Helper_Data $data ) {
+	public function __construct( LoggerInterface $log, Helper_Data $data ) {
+		$this->log 	= $log;
 		$this->data = $data;
 	}
 
@@ -111,12 +123,13 @@ class Api_License extends Base_Api {
 		}
 
 		$was_deactivated = $this->deactivate_license_key( $addon, $license );
+		
 		if ( ! $was_deactivated ) {
 			$license_info = $addon->get_license_info();
 			return new \WP_Error( 'schedule_license_check', $license_info['message'], [ 'status' => 400 ] );
 		}
 
-		$this->logger->addNotice( 'Successfully Deactivated License' );
+		$this->log->addNotice( 'Successfully Deactivated License' );
 		return [ 'success' => esc_html__( 'License deactivated.', 'gravity-forms-pdf-extended' ) ];
 	}
 
@@ -158,7 +171,7 @@ class Api_License extends Base_Api {
 		/* Remove license data from database */
 		$addon->delete_license_info();
 
-		$this->logger->addNotice(
+		$this->log->addNotice(
 			'License successfully deactivated',
 			[
 				'slug'    => $addon->get_slug(),

@@ -5,6 +5,7 @@ namespace GFPDF\Api\V1\Security\Tmp;
 use GFPDF\Api\V1\Base_Api;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Data;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF Previewer
@@ -42,6 +43,15 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package GFPDF\Plugins\GravityPDF\API
  */
 class Api_Security_Tmp_Directory extends Base_Api {
+
+	/**
+	 * Holds our log class
+	 *
+	 * @var \Monolog\Logger
+	 *
+	 * @since 4.0
+	 */
+	public $log;
 
 	/**
 	 * @var boolean
@@ -84,7 +94,8 @@ class Api_Security_Tmp_Directory extends Base_Api {
 	 *
 	 * @since 5.2
 	 */
-	public function __construct( Helper_Misc $misc, Helper_Data $data ) {
+	public function __construct( LoggerInterface $log, Helper_Misc $misc, Helper_Data $data ) {
+		$this->log 	 = $log;
 		$this->misc  = $misc;
 		$this->data  = $data;
 
@@ -159,7 +170,7 @@ class Api_Security_Tmp_Directory extends Base_Api {
 					) {
 						$response_object = $response['http_response'];
 						$raw_response    = $response_object->get_response_object();
-						$this->logger->warning(
+						$this->log->warning(
 							'PDF temporary directory not protected',
 							[
 								'url'         => $raw_response->url,

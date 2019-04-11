@@ -5,8 +5,8 @@ namespace GFPDF\Api\V1\Migration\Multisite;
 use GFPDF\Api\V1\Base_Api;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Abstract_Options;
-
 use GFPDF\Helper\Helper_Migration;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
@@ -44,6 +44,15 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package GFPDF\Plugins\GravityPDF\API
  */
 class Api_Migration_v4 extends Base_Api {
+
+	/**
+	 * Holds our log class
+	 *
+	 * @var \Monolog\Logger
+	 *
+	 * @since 4.0
+	 */
+	public $log;
 
 	/**
 	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
@@ -84,9 +93,10 @@ class Api_Migration_v4 extends Base_Api {
 	 *  
 	 * @since 5.2
 	 */
-	public function __construct( Helper_Abstract_Options $options, Helper_Data $data, Helper_Migration $migration ) {		
-		$this->options  = $options;
-		$this->data  = $data;
+	public function __construct( LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Migration $migration ) {		
+		$this->log 	      = $log;
+		$this->options    = $options;
+		$this->data       = $data;
 		$this->migration  = $migration;
 	}
 
@@ -138,7 +148,7 @@ class Api_Migration_v4 extends Base_Api {
 
 		if ( ! is_file( $path . 'configuration.php' ) ) {
 
-			$this->logger->addError( 'Configuration file not found', $path );
+			$this->log->addError( 'Configuration file not found', $path );
 
 			return new \WP_Error( 'no_configuration_file', 'No configuration file found for site #%s', [ 'status' => 404 ] );
 		}
@@ -150,7 +160,7 @@ class Api_Migration_v4 extends Base_Api {
 		/* Do migration */
 		if ( ! $this->migrate_v3( $path ) ) {
 
-			$this->logger->addError( 'AJAX Endpoint Failed' );
+			$this->log->addError( 'AJAX Endpoint Failed' );
 
 			return new \WP_Error( 'unable_to_connect_to_server', 'Database import problem for site #%s', [ 'status' => 500 ] );
 		} 

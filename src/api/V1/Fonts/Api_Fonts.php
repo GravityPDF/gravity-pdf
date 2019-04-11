@@ -6,6 +6,7 @@ use GFPDF\Api\V1\Base_Api;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Abstract_Options;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
@@ -47,6 +48,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Api_Fonts extends Base_Api {
 
 	/**
+	 * Holds our log class
+	 *
+	 * @var \Monolog\Logger
+	 *
+	 * @since 4.0
+	 */
+	public $log;
+
+	/**
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
 	 *
@@ -77,7 +87,8 @@ class Api_Fonts extends Base_Api {
 	protected $options;
 
 
-	public function __construct( Helper_Misc $misc, Helper_Data $data, Helper_Abstract_Options $options ) {
+	public function __construct( LoggerInterface $log, Helper_Misc $misc, Helper_Data $data, Helper_Abstract_Options $options ) {
+		$this->log 	   = $log;
 		$this->misc    = $misc;
 		$this->data    = $data;
 		$this->options = $options;
@@ -140,7 +151,7 @@ class Api_Fonts extends Base_Api {
 		}
 
 		/* If we reached this point the results were successful so return the new object */
-		$this->logger->addNotice(
+		$this->log->addNotice(
 			'AJAX – Successfully Saved Font',
 			[
 				'results' => $results,
@@ -169,7 +180,7 @@ class Api_Fonts extends Base_Api {
 		if ( empty( $font['font_name'] ) || empty( $font['regular'] ) ) {
 			$error = esc_html__( 'Required fields have not been included.', 'gravity-forms-pdf-extended' );
 
-			$this->logger->addWarning( 'Font Validation Failed', $error );
+			$this->log->addWarning( 'Font Validation Failed', (array)$error );
 
 			return new \WP_Error( 'required_fields_missing', $error, [ 'status' => 400 ] );
 		}
@@ -179,7 +190,7 @@ class Api_Fonts extends Base_Api {
 		if ( ! $this->is_font_name_valid( $name ) ) {
 			$error = esc_html__( 'Font name is not valid. Only alphanumeric characters and spaces are accepted.', 'gravity-forms-pdf-extended' );
 
-			$this->logger->addWarning( 'Font Validation Failed', $error );
+			$this->log->addWarning( 'Font Validation Failed', (array)$error );
 
 			return new \WP_Error( 'invalid_font_name', $error, [ 'status' => 400 ] );
 		}
@@ -191,7 +202,7 @@ class Api_Fonts extends Base_Api {
 		if ( ! $this->is_font_name_unique( $shortname, $id ) ) {
 			$error = esc_html__( 'A font with the same name already exists. Try a different name.', 'gravity-forms-pdf-extended' );
 
-			$this->logger->addWarning( 'Font Validation Failed', $error );
+			$this->log->addWarning( 'Font Validation Failed', (array)$error );
 
 			return new \WP_Error( 'font_name_exist', $error, [ 'status' => 422 ] );
 		}
@@ -203,7 +214,7 @@ class Api_Fonts extends Base_Api {
 		if ( isset( $installation['errors'] ) ) {
 			$error = $installation['errors'];
 
-			$this->logger->addWarning( 'Font Validation Failed', $error );
+			$this->log->addWarning( 'Font Validation Failed', (array)$error );
 
 			return new \WP_Error( 'installation_error', $error, [ 'status' => 500 ] );
 		}
@@ -267,7 +278,7 @@ class Api_Fonts extends Base_Api {
 		if ( count( $errors ) > 0 ) {
 			$errors = [ 'errors' => $errors ];
 
-			$this->logger->addError( 'Install Error.', $errors );
+			$this->log->addError( 'Install Error.', $errors );
 
 			return new \WP_Error( 'font_installation_error', $errors, [ 'status' => 500 ] );
 
@@ -360,7 +371,7 @@ class Api_Fonts extends Base_Api {
 		if ( ! isset( $fonts[ $id ] ) || ! $this->remove_font_file( $fonts[ $id ] ) ) {
 			$error = ['error' => esc_html__( 'Could not delete Gravity PDF font correctly. Please try again.', 'gravity-forms-pdf-extended' ) ];
 
-			$this->logger->addError( 'AJAX Endpoint Error', $error );
+			$this->log->addError( 'AJAX Endpoint Error', $error );
 
 			return new \WP_Error( 'delete_font', $error, [ 'status' => 500 ] );
 		}
@@ -371,7 +382,7 @@ class Api_Fonts extends Base_Api {
 		$this->misc->cleanup_dir( $this->data->mpdf_tmp_location );
 
 		if ( $this->options->update_option( 'custom_fonts', $fonts ) ) {
-			$this->logger->addNotice( 'Successfully Deleted Font' );
+			$this->log->addNotice( 'Successfully Deleted Font' );
 			return true;
 		}
 	}

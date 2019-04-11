@@ -6,7 +6,8 @@ use GFPDF\Api\V1\Base_Api;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Abstract_Options;
- use GFPDF\Helper\Helper_Templates;
+use GFPDF\Helper\Helper_Templates;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF 
@@ -44,6 +45,15 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package GFPDF\Plugins\GravityPDF\API
  */
 class Api_Template extends Base_Api {
+
+	/**
+	 * Holds our log class
+	 *
+	 * @var \Monolog\Logger
+	 *
+	 * @since 4.0
+	 */
+	public $log;
 
 	/**
 	 * Holds our Helper_Misc object
@@ -94,9 +104,10 @@ class Api_Template extends Base_Api {
 	 *
 	 * @since 5.2
 	 */
-	public function __construct( Helper_Misc $misc, Helper_Data $data, Helper_Abstract_Options $options, Helper_Templates $templates ) {				
-		$this->misc  = $misc;
-		$this->data  = $data;
+	public function __construct( LoggerInterface $log, Helper_Misc $misc, Helper_Data $data, Helper_Abstract_Options $options, Helper_Templates $templates ) {				
+		$this->log 	   = $log;
+		$this->misc    = $misc;
+		$this->data    = $data;
 		$this->options = $options;
 		$this->templates = $templates;
 	}
@@ -185,7 +196,7 @@ class Api_Template extends Base_Api {
 			$file     = new File( 'template', $storage );
 			$zip_path = $this->move_template_to_tmp_dir( $file );
 		} catch ( Exception $e ) {
-			$this->logger->addWarning(
+			$this->log->addWarning(
 				'File validation and move failed',
 				[
 					'file'  => $_FILES,
@@ -203,7 +214,7 @@ class Api_Template extends Base_Api {
 		} catch ( Exception $e ) {
 			$this->cleanup_template_files( $zip_path );
 
-			$this->logger->addWarning(
+			$this->log->addWarning(
 				'File validation and move failed',
 				[
 					'file'  => $_FILES,

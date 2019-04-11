@@ -4,6 +4,7 @@ namespace GFPDF\Api\V1\Pdf\Settings;
 
 use GFPDF\Api\V1\Base_Api;
 use GFPDF\Helper\Helper_Misc;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
@@ -41,6 +42,15 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package GFPDF\Plugins\GravityPDF\API
  */
 class Api_Pdf_Settings extends Base_Api {
+
+	/**
+	 * Holds our log class
+	 *
+	 * @var \Monolog\Logger
+	 *
+	 * @since 4.0
+	 */
+	public $log;
 
 	/**
 	 * @var string
@@ -82,8 +92,9 @@ class Api_Pdf_Settings extends Base_Api {
 	 *
 	 * @since 5.2
 	 */
-	public function __construct( Helper_Misc $misc, $template_font_location ) {				
-		$this->misc  = $misc;
+	public function __construct( LoggerInterface $log, Helper_Misc $misc, $template_font_location ) {	
+		$this->log 	   = $log;			
+		$this->misc    = $misc;
 		$this->template_font_location = $template_font_location;
 	}
 
@@ -155,7 +166,7 @@ class Api_Pdf_Settings extends Base_Api {
 					) {
 						$response_object = $response['http_response'];
 						$raw_response    = $response_object->get_response_object();
-						$this->logger->warning(
+						$this->log->warning(
 							'PDF temporary directory not protected',
 							[
 								'url'         => $raw_response->url,

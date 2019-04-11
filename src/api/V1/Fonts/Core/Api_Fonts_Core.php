@@ -3,6 +3,7 @@
 namespace GFPDF\Api\V1\Fonts\Core;
 
 use GFPDF\Api\V1\Base_Api;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
@@ -44,6 +45,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Api_Fonts_Core extends Base_Api {
 
 	/**
+	 * Holds our log class
+	 *
+	 * @var \Monolog\Logger
+	 *
+	 * @since 4.0
+	 */
+	public $log;
+
+	/**
 	 * @var string
 	 *
 	 * @since 5.2
@@ -62,9 +72,12 @@ class Api_Fonts_Core extends Base_Api {
 	 *
 	 * @param string $template_font_location The absolute path to the current PDF font directory
 	 *
+	 * @param \Monolog\Logger|LoggerInterface                   $log     Our logger class
+	 * 
 	 * @since 5.2
 	 */
-	public function __construct( $template_font_location ) {
+	public function __construct( LoggerInterface $log, $template_font_location ) {		
+		$this->log = $log;
 		$this->template_font_location = $template_font_location;
 	}
 
@@ -102,6 +115,7 @@ class Api_Fonts_Core extends Base_Api {
 	 * @since 5.2
 	 */
 	public function save_core_font( \WP_REST_Request $request ) {
+
 		$params = $request->get_json_params();
 
 		/* Download and save our font */
@@ -142,7 +156,7 @@ class Api_Fonts_Core extends Base_Api {
 
 		/* Check for errors and log them to file */
 		if ( is_wp_error( $response ) ) {
-			$this->logger->addError(
+			$this->log->addError(
 				'Core Font Download Failed',
 				[
 					'name'             => $fontname,
@@ -156,7 +170,7 @@ class Api_Fonts_Core extends Base_Api {
 
 		$response_code = wp_remote_retrieve_response_code( $response );
 		if ( $response_code !== 200 ) {
-			$this->logger->addError(
+			$this->log->addError(
 				'Core Font API Response Failed',
 				[
 					'response_code' => $response_code,
