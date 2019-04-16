@@ -1,16 +1,19 @@
-var webpack = require('webpack')
-var path = require('path')
+const webpack = require('webpack')
+const path = require('path')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
-
-var PROD = (process.env.NODE_ENV === 'production')
+const PROD = (process.env.NODE_ENV === 'production')
 
 module.exports = {
   entry: {
-    app: './src/assets/js/react/gfpdf-main.js',
+    'app.bundle': './src/assets/js/react/gfpdf-main.js',
+    'gfpdf-backbone': './src/assets/js/gfpdf-backbone.js',
+    'gfpdf-entries': './src/assets/js/gfpdf-entries.js',
+    'gfpdf-migration': './src/assets/js/gfpdf-migration.js',
+    'gfpdf-settings': './src/assets/js/gfpdf-settings.js'
   },
   output: {
     path: __dirname + '/dist/assets/js/',
-    filename: 'app.bundle.min.js'
+    filename: '[name].min.js'
   },
   mode: PROD ? 'production' : 'development',
   devtool: PROD ? 'source-map' : 'eval-source-map',
