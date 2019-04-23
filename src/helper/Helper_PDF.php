@@ -320,6 +320,8 @@ class Helper_PDF {
 		$this->mpdf = apply_filters( 'gfpdfe_pre_render_pdf', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() );
 		$this->mpdf = apply_filters( 'gfpdfe_mpdf_class', $this->mpdf, $this->entry['form_id'], $this->entry['id'], $this->settings, '', $this->get_filename() );
 
+		do_action( 'gfpdf_pre_pdf_generation_output', $this->mpdf, $form, $this->entry, $this->settings, $this );
+
 		/* If a developer decides to disable all security protocols we don't want the PDF indexed */
 		if ( ! headers_sent() ) {
 			header( 'X-Robots-Tag: noindex, nofollow', true );
