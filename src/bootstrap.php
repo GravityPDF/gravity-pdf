@@ -389,7 +389,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			'wp-color-picker',
 		];
 
-		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-settings.min.js', $pdf_settings_dependancies, $version );
+		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'dist/assets/js/admin.min.js', $pdf_settings_dependancies, $version );
 
 		$pdf_backbone_dependancies = [
 			'gfpdf_js_settings',

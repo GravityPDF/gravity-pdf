@@ -518,13 +518,13 @@
       fontError: function (model, error, name) {
 
         /* Get the input that failed validation */
-        $input = this.$el.find('input[name="' + name + '"]')
+        let $input = this.$el.find('input[name="' + name + '"]')
 
         /* If error is triggered display message to user */
         if (error) {
 
           /* Set up an error message */
-          $error = $('<span class="gf_settings_description"><label>Only TTF font files are supported.</label></span>')
+          let $error = $('<span class="gf_settings_description"><label>Only TTF font files are supported.</label></span>')
 
           /* Tell user about error */
           if (!$input.hasClass('invalid')) {

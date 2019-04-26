@@ -179,7 +179,7 @@ class Test_Settings extends WP_UnitTestCase {
 		$this->assertFalse( has_filter( 'gfpdf_registered_settings', [ $gfpdf->options, 'highlight_errors' ] ) );
 		/* retest the gfpdf_register_settings filter is added when on the correct screen */
 		set_current_screen( 'edit.php' );
-		$_GET['page'] = 'gfpdf-settings';
+		$_GET['page'] = 'admin';
 
 		$this->controller->add_filters();
 		$this->assertEquals( 10, has_filter( 'gfpdf_registered_fields', [ $this->model, 'highlight_errors' ] ) );
