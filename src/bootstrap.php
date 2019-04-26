@@ -757,7 +757,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$this->data,
 			$this->misc,
 			$this->notices,
-			$this->templates
+			$this->templates,
+			new Helper\Helper_Url_Signer()
 		);
 
 		$view = new View\View_PDF(
@@ -788,7 +789,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function shortcodes() {
 
-		$model = new Model\Model_Shortcodes( $this->gform, $this->log, $this->options, $this->misc );
+		$model = new Model\Model_Shortcodes( $this->gform, $this->log, $this->options, $this->misc, new Helper\Helper_Url_Signer() );
 		$view  = new View\View_Shortcodes( [] );
 
 		$class = new Controller\Controller_Shortcodes( $model, $view, $this->log );

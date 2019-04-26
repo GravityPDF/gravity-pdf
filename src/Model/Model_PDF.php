@@ -3,6 +3,7 @@
 namespace GFPDF\Model;
 
 use GFPDF\Helper\Helper_Abstract_Model;
+use GFPDF\Helper\Helper_Interface_Url_Signer;
 use GFPDF\Helper\Helper_PDF;
 
 use GFPDF\Helper\Helper_Abstract_Fields;
@@ -155,19 +156,21 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @param \GFPDF\Helper\Helper_Misc             $misc    Our miscellaneous class
 	 * @param \GFPDF\Helper\Helper_Notices          $notices Our notice class used to queue admin messages and errors
 	 * @param \GFPDF\Helper\Helper_Templates        $templates
+	 * @param Helper_Interface_Url_Signer           $url_signer
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates ) {
+	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices, Helper_Templates $templates, Helper_Interface_Url_Signer $url_signer ) {
 
 		/* Assign our internal variables */
-		$this->gform     = $gform;
-		$this->log       = $log;
-		$this->options   = $options;
-		$this->data      = $data;
-		$this->misc      = $misc;
-		$this->notices   = $notices;
-		$this->templates = $templates;
+		$this->gform      = $gform;
+		$this->log        = $log;
+		$this->options    = $options;
+		$this->data       = $data;
+		$this->misc       = $misc;
+		$this->notices    = $notices;
+		$this->templates  = $templates;
+		$this->url_signer = $url_signer;
 	}
 
 	/**
@@ -343,13 +346,9 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function middle_signed_url_access( $action, $entry, $settings ) {
 
 		if ( isset( $_GET['expires'] ) && isset( $_GET['signature'] ) && isset( $_SERVER['REQUEST_URI'] ) ) {
-			$secret_key = $this->options->get_option( 'signed_secret_token', '' );
-
 			try {
-				$url_signer = new Helper_Sha256_Url_Signer( $secret_key );
-
 				$home_url = untrailingslashit( strtok( home_url(), '?' ) );
-				if ( $url_signer->validate( $home_url . $_SERVER['REQUEST_URI'] ) ) {
+				if ( $this->url_signer->verify( $home_url . $_SERVER['REQUEST_URI'] ) ) {
 					remove_filter( 'gfpdf_pdf_middleware', [ $this, 'middle_owner_restriction' ], 40 );
 					remove_filter( 'gfpdf_pdf_middleware', [ $this, 'middle_logged_out_timeout' ], 50 );
 					remove_filter( 'gfpdf_pdf_middleware', [ $this, 'middle_auth_logged_out_user' ], 60 );
