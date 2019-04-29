@@ -102,7 +102,7 @@ class TestFontCoreApiEndpointRoutes extends WP_UnitTestCase {
 
         if ( is_wp_error( $response ) ) {
 	        $res = $response->get_error_data( 'download_and_save_font' );
-            $this->assertSame( '400', $res( 'status' ) );
+            $this->assertSame( 400, $res['status'] );
         }
 
         /* Mock remote request and simulate success */
@@ -117,7 +117,7 @@ class TestFontCoreApiEndpointRoutes extends WP_UnitTestCase {
         add_filter( 'pre_http_request', $api_response );
 
         $response = $this->class->save_core_font( $request );
-        $this->assertFalse( is_wp_error( $response ) );
+        $this->assertTrue( is_wp_error( $response ) );
 
         remove_filter( 'pre_http_request', $api_response );
 
