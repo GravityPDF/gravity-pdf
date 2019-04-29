@@ -3,9 +3,8 @@
 namespace GFPDF\Api\V1\Fonts\Core;
 // GFPDF\Tests\GravityPDF;
 
+use GFPDF\Api\V1\Base_Api;
 use GFPDF\Api\V1\Fonts\Core;
-use Psr\Log\LoggerInterface;
-
 use WP_UnitTestCase;
 use WP_REST_Request;
 
@@ -65,17 +64,24 @@ class TestFontCoreApiEndpointRoutes extends WP_UnitTestCase {
 	protected $template_font_location;
 
 	/**
+	 * @var PdfViewerApiResponse
+	 *
+	 * @since 0.1
+	 */
+	protected $class;
+	/**
 	 * Setup the REST API CORE FONT Endpoints
 	 *
 	 * @since 5.2
 	 */
 	public function setUp() {
-		
+
 		$wp_rest_server = rest_get_server();
 
-		$this->log = $log;
+		$this->log = new \Monolog\Logger( 'test' );
 
 		$api1 = new Api_Fonts_Core( $this->log , $this->template_font_location );
+		
 		$api1->init();
 
 		parent::setUp();
@@ -89,6 +95,7 @@ class TestFontCoreApiEndpointRoutes extends WP_UnitTestCase {
 	public function test_rest_api_font_core_endpoints() {
 
 		$wp_rest_server = rest_get_server();
+
 		do_action( 'rest_api_init' );
 
 		$this->assertContains( 'gravity-pdf/v1/', $wp_rest_server->get_namespaces() );
