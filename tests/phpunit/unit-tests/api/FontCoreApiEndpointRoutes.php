@@ -8,6 +8,8 @@ use GFPDF\Api\V1\Fonts\Core;
 use WP_UnitTestCase;
 use WP_REST_Request;
 
+use GPDFAPI;
+
 /**
  * @package     Gravity PDF GravityPDF
  * @copyright   Copyright (c) 2018, Blue Liquid Designs
@@ -50,23 +52,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 class TestFontCoreApiEndpointRoutes extends WP_UnitTestCase {
 
 	/**
-	 * @var Helper_Logger
-	 *
-	 * @since 5.2
-	 */
-	private $log;
-
-	/**
-	 * @var string
-	 *
-	 * @since 5.2
-	 */
-	protected $template_font_location;
-
-	/**
 	 * @var PdfViewerApiResponse
 	 *
-	 * @since 0.1
+	 * @since 5.2
 	 */
 	protected $class;
 	/**
@@ -74,36 +62,73 @@ class TestFontCoreApiEndpointRoutes extends WP_UnitTestCase {
 	 *
 	 * @since 5.2
 	 */
-	public function setUp() {
+    public function setUp() {
 
-		$wp_rest_server = rest_get_server();
-
+    	/* \GPDFAPI::get_log_class() is giving me error. used below instead */
 		$this->log = new \Monolog\Logger( 'test' );
 
-		$api1 = new Api_Fonts_Core( $this->log , $this->template_font_location );
-		
-		$api1->init();
+        $this->class = new Api_Fonts_Core( $this->log, '' );
+        $this->class->init();
 
-		parent::setUp();
-	}
+        parent::setUp();
+    }
+
+    /**
+     * Test our endpoints are registered correctly
+     *
+     * @since 5.2
+     */
+    public function test_rest_api_font_core_endpoints() {
+        $wp_rest_server = rest_get_server();
+        do_action( 'rest_api_init' );
+
+        $this->assertContains( 'gravity-pdf/v1', $wp_rest_server->get_namespaces() );
+        $this->assertArrayHasKey( '/gravity-pdf/v1/fonts/core', $wp_rest_server->get_routes() );
+    }
 
 	/**
-	 * Test our endpoints are registered correctly
-	 *
 	 * @since 5.2
 	 */
-	public function test_rest_api_font_core_endpoints() {
+    public function test_save_core_font() {
 
-		$wp_rest_server = rest_get_server();
+        $request = new WP_REST_Request( \WP_REST_Server::CREATABLE, '/gravity-pdf/v1/fonts/core' );
 
-		do_action( 'rest_api_init' );
+        $request->set_body_params( [
+            'font_name' => '',
+        ] );
 
-		$this->assertContains( 'gravity-pdf/v1/', $wp_rest_server->get_namespaces() );
+        /* Test empty font name */
+        $response = $this->class->save_core_font( $request );
 
-		$routes = $wp_rest_server->get_routes();
+        if ( is_wp_error( $response ) ) {
+	        $res = $response->get_error_data( 'download_and_save_font' );
+            $this->assertSame( '400', $res( 'status' ) );
+        }
 
-		$this->assertArrayHasKey( '/gravity-pdf/v1/fonts/core/', $routes );
-		
-	}
+        /* Mock remote request and simulate success */
+        $request->set_body_params( [
+            'font_name' => 'Test',
+        ] );
+
+        $api_response = function() {
+            return new WP_Error();
+        };
+
+        add_filter( 'pre_http_request', $api_response );
+
+        $response = $this->class->save_core_font( $request );
+        $this->assertFalse( is_wp_error( $response ) );
+
+        remove_filter( 'pre_http_request', $api_response );
+
+    }
+
+    protected function stub_remote_request( $response ) {
+
+    }
+
+    protected function unstub_remote_request() {
+
+    }
 
 }
