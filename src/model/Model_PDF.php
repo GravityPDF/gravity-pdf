@@ -710,6 +710,9 @@ class Model_PDF extends Helper_Abstract_Model {
 					'name'     => $this->get_pdf_name( $settings, $entry ),
 					'view'     => $this->get_pdf_url( $settings['id'], $entry['id'], false ),
 					'download' => $this->get_pdf_url( $settings['id'], $entry['id'], true ),
+					'settings' => $settings,
+					'entry_id' => $entry['id'],
+					'form_id'  => $form['id'],
 				];
 			}
 		}
