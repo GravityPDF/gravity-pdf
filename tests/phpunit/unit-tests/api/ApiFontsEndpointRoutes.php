@@ -1,10 +1,14 @@
 <?php
 
-namespace GFPDF\Api\V1\Fonts\Core;
-// GFPDF\Tests\GravityPDF;
+namespace GFPDF\Api\V1\Fonts;
+
 
 use GFPDF\Api\V1\Base_Api;
-use GFPDF\Api\V1\Fonts\Core;
+use GFPDF\Api\V1\Fonts;
+use GFPDF\Helper\Helper_Misc;
+use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Abstract_Options;
+
 use WP_UnitTestCase;
 use WP_REST_Request;
 
@@ -43,13 +47,52 @@ if ( ! defined( 'ABSPATH' ) ) {
 */
 
 /**
- * Class TestFontCoreApiEndpoint
+ * Class TestApiFontsEndpoint
  *
  * @package GFPDF\Tests\GravityPDF
  *
  * @group   REST-API
  */
-class TestFontCoreApiEndpointRoutes extends WP_UnitTestCase {
+class TestApiFontsEndpointRoutes extends WP_UnitTestCase {
+
+    /**
+     * Holds our log class
+     *
+     * @var \Monolog\Logger
+     *
+     * @since 4.0
+     */
+    public $log;
+
+    /**
+     * Holds our Helper_Misc object
+     * Makes it easy to access common methods throughout the plugin
+     *
+     * @var \GFPDF\Helper\Helper_Misc
+     *
+     * @since 5.2
+     */
+    protected $misc;
+
+    /**
+     * Holds our Helper_Data object
+     * which we can autoload with any data needed
+     *
+     * @var \GFPDF\Helper\Helper_Data
+     *
+     * @since 5.2
+     */
+    protected $data;
+
+    /**
+     * Holds our Helper_Abstract_Options / Helper_Options_Fields object
+     * Makes it easy to access global PDF settings and individual form PDF settings
+     *
+     * @var \GFPDF\Helper\Helper_Options_Fields
+     *
+     * @since 5.2
+     */
+    protected $options;
 
 	/**
 	 * @var $class
@@ -62,12 +105,17 @@ class TestFontCoreApiEndpointRoutes extends WP_UnitTestCase {
 	 *
 	 * @since 5.2
 	 */
-    public function setUp() {
+    public function setUp() {        
 
     	/* \GPDFAPI::get_log_class() is giving me error. used below instead */
 		$this->log = new \Monolog\Logger( 'test' );
 
-        $this->class = new Api_Fonts_Core( $this->log, '' );
+        $this->options = \GPDFAPI::get_options_class(); 
+        $this->data = \GPDFAPI::get_data_class(); 
+        $this->misc = \GPDFAPI::get_misc_class(); 
+
+
+        $this->class = new Api_Fonts( $this->log, $this->misc, $this->data, $this->options );
         $this->class->init();
 
         parent::setUp();
@@ -78,12 +126,12 @@ class TestFontCoreApiEndpointRoutes extends WP_UnitTestCase {
      *
      * @since 5.2
      */
-    public function test_rest_api_font_core_endpoints() {
+    public function test_rest_api_fonts_endpoints() {
         $wp_rest_server = rest_get_server();
         do_action( 'rest_api_init' );
 
         $this->assertContains( 'gravity-pdf/v1', $wp_rest_server->get_namespaces() );
-        $this->assertArrayHasKey( '/gravity-pdf/v1/fonts/core', $wp_rest_server->get_routes() );
+        $this->assertArrayHasKey( '/gravity-pdf/v1/fonts', $wp_rest_server->get_routes() );
     }
 
 	/**
@@ -91,10 +139,10 @@ class TestFontCoreApiEndpointRoutes extends WP_UnitTestCase {
 	 */
     public function test_save_core_font() {
 
-        $request = new WP_REST_Request( \WP_REST_Server::CREATABLE, '/gravity-pdf/v1/fonts/core' );
+        $request = new WP_REST_Request( \WP_REST_Server::CREATABLE, '/gravity-pdf/v1/fonts/save_font' );
 
         $request->set_body_params( [
-            'font_name' => '',
+            'payload' => '',
         ] );
 
         /* Test empty font name */
@@ -107,7 +155,7 @@ class TestFontCoreApiEndpointRoutes extends WP_UnitTestCase {
 
         /* Mock remote request and simulate success */
         $request->set_body_params( [
-            'font_name' => 'Test',
+            'payload' => 'Test',
         ] );
 
         $api_response = function() {
@@ -123,11 +171,41 @@ class TestFontCoreApiEndpointRoutes extends WP_UnitTestCase {
 
     }
 
-    protected function stub_remote_request( $response ) {
 
-    }
+    /**
+     * @since 5.2
+     */
+    public function test_delete_font() {
 
-    protected function unstub_remote_request() {
+        $request = new WP_REST_Request( \WP_REST_Server::DELETABLE, '/gravity-pdf/v1/fonts/delete_font' );
+
+        $request->set_body_params( [
+            'payload' => '',
+        ] );
+
+        /* Test empty font name */
+        $response = $this->class->save_core_font( $request );
+
+        if ( is_wp_error( $response ) ) {
+            $res = $response->get_error_data( 'download_and_save_font' );
+            $this->assertSame( 400, $res['status'] );
+        }
+
+        /* Mock remote request and simulate success */
+        $request->set_body_params( [
+            'payload' => 'Test',
+        ] );
+
+        $api_response = function() {
+            return new WP_Error();
+        };
+
+        add_filter( 'pre_http_request', $api_response );
+
+        $response = $this->class->save_core_font( $request );
+        $this->assertTrue( is_wp_error( $response ) );
+
+        remove_filter( 'pre_http_request', $api_response );
 
     }
 
