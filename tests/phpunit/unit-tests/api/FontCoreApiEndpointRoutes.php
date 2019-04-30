@@ -63,9 +63,8 @@ class TestFontCoreApiEndpointRoutes extends WP_UnitTestCase {
 	 * @since 5.2
 	 */
     public function setUp() {
-
-    	/* \GPDFAPI::get_log_class() is giving me error. used below instead */
-		$this->log = new \Monolog\Logger( 'test' );
+    	
+		$this->log = GPDFAPI::get_log_class();
 
         $this->class = new Api_Fonts_Core( $this->log, '' );
         $this->class->init();

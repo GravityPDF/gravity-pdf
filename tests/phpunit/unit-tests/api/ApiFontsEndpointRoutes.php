@@ -55,45 +55,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class TestApiFontsEndpointRoutes extends WP_UnitTestCase {
 
-    // /**
-    //  * Holds our log class
-    //  *
-    //  * @var \Monolog\Logger
-    //  *
-    //  * @since 4.0
-    //  */
-    // public $log;
-
-    // /**
-    //  * Holds our Helper_Misc object
-    //  * Makes it easy to access common methods throughout the plugin
-    //  *
-    //  * @var \GFPDF\Helper\Helper_Misc
-    //  *
-    //  * @since 5.2
-    //  */
-    // protected $misc;
-
-    // *
-    //  * Holds our Helper_Data object
-    //  * which we can autoload with any data needed
-    //  *
-    //  * @var \GFPDF\Helper\Helper_Data
-    //  *
-    //  * @since 5.2
-     
-    // protected $data;
-
-    // /**
-    //  * Holds our Helper_Abstract_Options / Helper_Options_Fields object
-    //  * Makes it easy to access global PDF settings and individual form PDF settings
-    //  *
-    //  * @var \GFPDF\Helper\Helper_Options_Fields
-    //  *
-    //  * @since 5.2
-    //  */
-    // protected $options;
-
 	/**
 	 * @var $class
 	 *
@@ -105,16 +66,12 @@ class TestApiFontsEndpointRoutes extends WP_UnitTestCase {
 	 *
 	 * @since 5.2
 	 */
-    public function setUp() {        
+    public function setUp() {
 
-    	/* \GPDFAPI::get_log_class() is giving me error. used below instead */
-		$this->log = new \Monolog\Logger( 'test' );
-
-        /* Error : Class 'GPDFAPI' not found */
-        $this->options = \GPDFAPI::get_options_class(); 
-        $this->data = \GPDFAPI::get_data_class(); 
-        $this->misc = \GPDFAPI::get_misc_class(); 
-
+	    $this->log = GPDFAPI::get_log_class();
+        $this->options = GPDFAPI::get_options_class();
+        $this->data = GPDFAPI::get_data_class();
+        $this->misc = GPDFAPI::get_misc_class();
 
         $this->class = new Api_Fonts( $this->log, $this->misc, $this->data, $this->options );
         $this->class->init();
@@ -138,7 +95,7 @@ class TestApiFontsEndpointRoutes extends WP_UnitTestCase {
 	/**
 	 * @since 5.2
 	 */
-    public function test_save_core_font() {
+    public function test_save_font() {
 
         $request = new WP_REST_Request( \WP_REST_Server::CREATABLE, '/gravity-pdf/v1/fonts/save_font' );
 
@@ -147,7 +104,7 @@ class TestApiFontsEndpointRoutes extends WP_UnitTestCase {
         ] );
 
         /* Test empty font name */
-        $response = $this->class->save_core_font( $request );
+        $response = $this->class->save_font( $request );
 
         if ( is_wp_error( $response ) ) {
 	        $res = $response->get_error_data( 'download_and_save_font' );
@@ -165,7 +122,7 @@ class TestApiFontsEndpointRoutes extends WP_UnitTestCase {
 
         add_filter( 'pre_http_request', $api_response );
 
-        $response = $this->class->save_core_font( $request );
+        $response = $this->class->save_font( $request );
         $this->assertTrue( is_wp_error( $response ) );
 
         remove_filter( 'pre_http_request', $api_response );
@@ -185,7 +142,7 @@ class TestApiFontsEndpointRoutes extends WP_UnitTestCase {
         ] );
 
         /* Test empty font name */
-        $response = $this->class->save_core_font( $request );
+        $response = $this->class->delete_font( $request );
 
         if ( is_wp_error( $response ) ) {
             $res = $response->get_error_data( 'download_and_save_font' );
@@ -203,7 +160,7 @@ class TestApiFontsEndpointRoutes extends WP_UnitTestCase {
 
         add_filter( 'pre_http_request', $api_response );
 
-        $response = $this->class->save_core_font( $request );
+        $response = $this->class->delete_font( $request );
         $this->assertTrue( is_wp_error( $response ) );
 
         remove_filter( 'pre_http_request', $api_response );
