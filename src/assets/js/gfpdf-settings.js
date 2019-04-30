@@ -511,7 +511,7 @@
           click: function () {
             /* handle ajax call */
             $deleteDialog.wpdialog('close')
-            let $elm = $($deleteDialog.data('elm'))
+            $elm = $($deleteDialog.data('elm'))
 
             /* Add spinner */
             var $spinner = $('<img alt="' + GFPDF.spinnerAlt + '" src="' + GFPDF.spinnerUrl + '" class="gfpdf-spinner gfpdf-spinner-small" />')
@@ -1398,7 +1398,7 @@
         var temp = ''
         if (additionalURL) {
           tempArray = additionalURL.split('&')
-          for (let i = 0; i < tempArray.length; i++) {
+          for (i = 0; i < tempArray.length; i++) {
             if (tempArray[i].split('=')[0] != param) {
               newAdditionalURL += temp + tempArray[i]
               temp = '&'

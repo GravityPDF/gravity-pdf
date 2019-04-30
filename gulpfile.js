@@ -1,4 +1,5 @@
-let gulp = require('gulp'),
+var gulp = require('gulp'),
+  uglify = require('gulp-uglify'),
   cleanCSS = require('gulp-clean-css'),
   rename = require('gulp-rename'),
   wpPot = require('gulp-wp-pot'),
@@ -14,6 +15,16 @@ gulp.task('minify', function () {
     .pipe(gulp.dest('dist/assets/css/'))
 })
 
+/* Minify our non-react JS (handled by webpack) */
+gulp.task('compress', function () {
+  return gulp.src('src/assets/js/*.js')
+    .pipe(uglify())
+    .pipe(rename({
+      suffix: '.min'
+    }))
+    .pipe(gulp.dest('dist/assets/js/'))
+})
+
 /* Generate the latest language files */
 gulp.task('language', function () {
   return gulp.src(['src/**/*.php', '*.php'])
@@ -25,7 +36,8 @@ gulp.task('language', function () {
 })
 
 gulp.task('watch', function () {
+  watch('src/assets/js/*.js', gulp.series('compress'))
   watch('src/assets/css/*.css', gulp.series('compress'))
 })
 
-gulp.task('default', gulp.series(['language', 'minify']))
+gulp.task('default', gulp.series(['language', 'minify', 'compress']))

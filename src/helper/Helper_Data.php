@@ -178,7 +178,7 @@ class Helper_Data {
 	 * @since 3.8
 	 */
 	public function set_addon_details() {
-		$this->store_url = 'https://gravitypdf.com?api=1';
+		$this->store_url = 'https://gravitypdf.com';
 		$this->addon     = [];
 	}
 

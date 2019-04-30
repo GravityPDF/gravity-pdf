@@ -363,7 +363,7 @@ class Model_Install extends Helper_Abstract_Model {
 		/* Create two regex rules to account for users with "index.php" in the URL */
 		$query = [
 			'^' . $this->data->permalink,
-			'^' . $wp_rewrite->index . '/' . $this->data->permalink,
+			'^' . $wp_rewrite->root . $this->data->permalink,
 		];
 
 		$rewrite_to = 'index.php?gpdf=1&pid=$matches[1]&lid=$matches[2]&action=$matches[3]';
