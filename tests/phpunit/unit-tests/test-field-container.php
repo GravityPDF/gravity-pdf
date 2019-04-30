@@ -369,7 +369,7 @@ class Test_Field_Container extends WP_UnitTestCase {
 		$overridden_methods = 0;
 
 		foreach ( $methods as $method ) {
-			if ( '__construct' != $method->name && $method->class == $reflection->getName() ) {
+			if ( '__construct' !== $method->name && $method->class === $reflection->getName() ) {
 				$overridden_methods++;
 			}
 		}

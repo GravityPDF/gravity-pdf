@@ -259,7 +259,7 @@ class Helper_Templates {
 			 * we'll include it in our template list
 			 */
 			if ( $file_name !== 'configuration' && $file_name !== 'configuration.archive'
-				 && ! in_array( $file_name, $current_template_list )
+				 && ! in_array( $file_name, $current_template_list, true )
 			) {
 				$template_list[] = $template;
 			}
@@ -562,7 +562,7 @@ class Helper_Templates {
 			]
 		);
 
-		if ( in_array( $template_id, $legacy_templates ) ) {
+		if ( in_array( $template_id, $legacy_templates, true ) ) {
 			try {
 				$class = $this->load_template_config_file( PDF_PLUGIN_DIR . 'src/templates/config/legacy.php' );
 			} catch ( Exception $e ) {

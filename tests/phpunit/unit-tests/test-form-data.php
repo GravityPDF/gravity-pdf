@@ -256,14 +256,14 @@ class Test_Form_Data extends WP_UnitTestCase {
 		 * Run our tests...
 		 */
 		$response = 'Second Choice';
-		$this->assertTrue( in_array( $response, $field[4] ) );
-		$this->assertTrue( in_array( $response, $field['4.Multi Select Box'] ) );
-		$this->assertTrue( in_array( $response, $field['Multi Select Box'] ) );
+		$this->assertTrue( in_array( $response, $field[4], true ) );
+		$this->assertTrue( in_array( $response, $field['4.Multi Select Box'], true ) );
+		$this->assertTrue( in_array( $response, $field['Multi Select Box'], true ) );
 
 		$response = 'Multi Select Second Choice';
-		$this->assertTrue( in_array( $response, $field['4_name'] ) );
-		$this->assertTrue( in_array( $response, $field['4.Multi Select Box_name'] ) );
-		$this->assertTrue( in_array( $response, $field['Multi Select Box_name'] ) );
+		$this->assertTrue( in_array( $response, $field['4_name'], true ) );
+		$this->assertTrue( in_array( $response, $field['4.Multi Select Box_name'], true ) );
+		$this->assertTrue( in_array( $response, $field['Multi Select Box_name'], true ) );
 
 		$this->assertEquals( 2, sizeof( $field[4] ) );
 		$this->assertEquals( 2, sizeof( $field['4_name'] ) );
@@ -299,24 +299,24 @@ class Test_Form_Data extends WP_UnitTestCase {
 		 */
 
 		$response = 'Checkbox Choice 2';
-		$this->assertTrue( in_array( $response, $field[6] ) );
-		$this->assertTrue( in_array( $response, $field['6.Checkbox'] ) );
-		$this->assertTrue( in_array( $response, $field['Checkbox'] ) );
+		$this->assertTrue( in_array( $response, $field[6], true ) );
+		$this->assertTrue( in_array( $response, $field['6.Checkbox'], true ) );
+		$this->assertTrue( in_array( $response, $field['Checkbox'], true ) );
 
 		$response = 'Checkbox Choice 2 Text';
-		$this->assertTrue( in_array( $response, $field['6_name'] ) );
-		$this->assertTrue( in_array( $response, $field['6.Checkbox_name'] ) );
-		$this->assertTrue( in_array( $response, $field['Checkbox_name'] ) );
+		$this->assertTrue( in_array( $response, $field['6_name'], true ) );
+		$this->assertTrue( in_array( $response, $field['6.Checkbox_name'], true ) );
+		$this->assertTrue( in_array( $response, $field['Checkbox_name'], true ) );
 
 		$response = 'Checkbox Choice 3';
-		$this->assertTrue( in_array( $response, $field[6] ) );
-		$this->assertTrue( in_array( $response, $field['6.Checkbox'] ) );
-		$this->assertTrue( in_array( $response, $field['Checkbox'] ) );
+		$this->assertTrue( in_array( $response, $field[6], true ) );
+		$this->assertTrue( in_array( $response, $field['6.Checkbox'], true ) );
+		$this->assertTrue( in_array( $response, $field['Checkbox'], true ) );
 
 		$response = 'Checkbox Choice 3 Text';
-		$this->assertTrue( in_array( $response, $field['6_name'] ) );
-		$this->assertTrue( in_array( $response, $field['6.Checkbox_name'] ) );
-		$this->assertTrue( in_array( $response, $field['Checkbox_name'] ) );
+		$this->assertTrue( in_array( $response, $field['6_name'], true ) );
+		$this->assertTrue( in_array( $response, $field['6.Checkbox_name'], true ) );
+		$this->assertTrue( in_array( $response, $field['Checkbox_name'], true ) );
 
 		$this->assertEquals( 2, sizeof( $field[6] ) );
 	}
@@ -580,19 +580,19 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( $response, $field['23.Poll Field - Radio Buttons_name'] );
 
 		$this->assertTrue( is_array( $field[41][0] ) );
-		$this->assertTrue( in_array( 'Poll Check First Choice', $field[41][0] ) );
-		$this->assertTrue( in_array( 'Poll Check Second Choice', $field[41][0] ) );
-		$this->assertTrue( in_array( 'Poll Check Third Choice', $field[41][0] ) );
+		$this->assertTrue( in_array( 'Poll Check First Choice', $field[41][0], true ) );
+		$this->assertTrue( in_array( 'Poll Check Second Choice', $field[41][0], true ) );
+		$this->assertTrue( in_array( 'Poll Check Third Choice', $field[41][0], true ) );
 
 		$this->assertTrue( is_array( $field['41.Poll Field - Checkboxes'][0] ) );
-		$this->assertTrue( in_array( 'Poll Check First Choice', $field['41.Poll Field - Checkboxes'][0] ) );
-		$this->assertTrue( in_array( 'Poll Check Second Choice', $field['41.Poll Field - Checkboxes'][0] ) );
-		$this->assertTrue( in_array( 'Poll Check Third Choice', $field['41.Poll Field - Checkboxes'][0] ) );
+		$this->assertTrue( in_array( 'Poll Check First Choice', $field['41.Poll Field - Checkboxes'][0], true ) );
+		$this->assertTrue( in_array( 'Poll Check Second Choice', $field['41.Poll Field - Checkboxes'][0], true ) );
+		$this->assertTrue( in_array( 'Poll Check Third Choice', $field['41.Poll Field - Checkboxes'][0], true ) );
 
 		$this->assertTrue( is_array( $field['Poll Field - Checkboxes'][0] ) );
-		$this->assertTrue( in_array( 'Poll Check First Choice', $field['Poll Field - Checkboxes'][0] ) );
-		$this->assertTrue( in_array( 'Poll Check Second Choice', $field['Poll Field - Checkboxes'][0] ) );
-		$this->assertTrue( in_array( 'Poll Check Third Choice', $field['Poll Field - Checkboxes'][0] ) );
+		$this->assertTrue( in_array( 'Poll Check First Choice', $field['Poll Field - Checkboxes'][0], true ) );
+		$this->assertTrue( in_array( 'Poll Check Second Choice', $field['Poll Field - Checkboxes'][0], true ) );
+		$this->assertTrue( in_array( 'Poll Check Third Choice', $field['Poll Field - Checkboxes'][0], true ) );
 	}
 
 	/**
@@ -1330,7 +1330,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$columns = [ 'Strongly disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly agree' ];
 
 		foreach ( $likert['col'] as $col ) {
-			$this->assertTrue( in_array( $col, $columns ) );
+			$this->assertTrue( in_array( $col, $columns, true ) );
 		}
 
 		/* test row */
@@ -1344,7 +1344,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$likert = $data[27];
 
 		foreach ( $likert['col'] as $col ) {
-			$this->assertTrue( in_array( $col, $columns ) );
+			$this->assertTrue( in_array( $col, $columns, true ) );
 		}
 
 		/* test row */
@@ -1380,7 +1380,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 	public function test_survey_rating_data() {
 		$data = $this->form_data['survey']['rating'];
 
-		$this->assertTrue( in_array( 'Pretty good', $data[45] ) );
+		$this->assertTrue( in_array( 'Pretty good', $data[45], true ) );
 	}
 
 	/**

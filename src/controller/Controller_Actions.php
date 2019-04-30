@@ -196,7 +196,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 
 		/* Prevent actions being displayed on our welcome pages */
 		if ( ! is_admin() ||
-			 ( rgget( 'page' ) == 'gfpdf-getting-started' ) || ( rgget( 'page' ) == 'gfpdf-update' ) || ( defined( 'DOING_AJAX' ) && DOING_AJAX )
+			 ( rgget( 'page' ) === 'gfpdf-getting-started' ) || ( rgget( 'page' ) === 'gfpdf-update' ) || ( defined( 'DOING_AJAX' ) && DOING_AJAX )
 		) {
 			return null;
 		}
@@ -234,7 +234,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 		foreach ( $this->get_routes() as $route ) {
 
 			/* Check we have a valid action and the display condition is true */
-			if ( rgpost( 'gfpdf_action' ) == 'gfpdf_' . $route['action'] && call_user_func( $route['condition'] ) ) {
+			if ( rgpost( 'gfpdf_action' ) === 'gfpdf_' . $route['action'] && call_user_func( $route['condition'] ) ) {
 
 				/* Check user capability */
 				if ( ! $this->gform->has_capability( $route['capability'] ) ) {

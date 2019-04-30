@@ -434,7 +434,7 @@ class Helper_PDF {
 	public function set_output_type( $type ) {
 		$valid = [ 'DISPLAY', 'DOWNLOAD', 'SAVE' ];
 
-		if ( ! in_array( strtoupper( $type ), $valid ) ) {
+		if ( ! in_array( strtoupper( $type ), $valid, true ) ) {
 			throw new Exception( sprintf( 'Display type not valid. Use %s', implode( ', ', $valid ) ) );
 		}
 
@@ -494,7 +494,7 @@ class Helper_PDF {
 		$valid_layout = [ 'single', 'continuous', 'two', 'twoleft', 'tworight', 'default' ];
 
 		/* check the mode */
-		if ( ! in_array( strtolower( $mode ), $valid_mode ) ) {
+		if ( ! in_array( strtolower( $mode ), $valid_mode, true ) ) {
 			/* determine if the mode is an integer */
 			if ( ! is_int( $mode ) || $mode <= 10 ) {
 				throw new Exception( sprintf( 'Mode must be an number value more than 10 or one of these types: %s', implode( ', ', $valid_mode ) ) );
@@ -502,7 +502,7 @@ class Helper_PDF {
 		}
 
 		/* check the layout */
-		if ( ! in_array( strtolower( $layout ), $valid_layout ) ) {
+		if ( ! in_array( strtolower( $layout ), $valid_layout, true ) ) {
 			throw new Exception( sprintf( 'Layout must be one of these types: %s', implode( ', ', $valid_layout ) ) );
 		}
 
@@ -763,12 +763,12 @@ class Helper_PDF {
 			'CUSTOM',
 		];
 
-		if ( ! in_array( $paper_size, $valid_paper_size ) ) {
+		if ( ! in_array( $paper_size, $valid_paper_size, true ) ) {
 			throw new Exception( sprintf( 'Paper size not valid. Use %s', implode( ', ', $valid_paper_size ) ) );
 		}
 
 		/* set our paper size and orientation based on user selection */
-		if ( $paper_size == 'CUSTOM' ) {
+		if ( $paper_size === 'CUSTOM' ) {
 			$this->set_custom_paper_size();
 			$this->set_orientation( true );
 		} else {
@@ -817,8 +817,8 @@ class Helper_PDF {
 	 * @since  4.0
 	 */
 	protected function get_paper_size( $size ) {
-		$size[0] = ( $size[2] == 'inches' ) ? (int) $size[0] * 25.4 : (int) $size[0];
-		$size[1] = ( $size[2] == 'inches' ) ? (int) $size[1] * 25.4 : (int) $size[1];
+		$size[0] = ( $size[2] === 'inches' ) ? (int) $size[0] * 25.4 : (int) $size[0];
+		$size[1] = ( $size[2] === 'inches' ) ? (int) $size[1] * 25.4 : (int) $size[1];
 
 		/* tidy up custom paper size array */
 		unset( $size[2] );
@@ -845,9 +845,9 @@ class Helper_PDF {
 		 * @todo Update mPDF to be more consistent when setting portrait and landscape documentation
 		 */
 		if ( $custom ) {
-			$this->orientation = ( $orientation == 'landscape' ) ? 'L' : 'P';
+			$this->orientation = ( $orientation === 'landscape' ) ? 'L' : 'P';
 		} else {
-			$this->orientation = ( $orientation == 'landscape' ) ? '-L' : '';
+			$this->orientation = ( $orientation === 'landscape' ) ? '-L' : '';
 			$this->paper_size .= $this->orientation;
 		}
 	}
@@ -929,7 +929,7 @@ class Helper_PDF {
 	protected function set_text_direction() {
 		$rtl = ( isset( $this->settings['rtl'] ) ) ? $this->settings['rtl'] : 'No';
 
-		if ( strtolower( $rtl ) == 'yes' ) {
+		if ( strtolower( $rtl ) === 'yes' ) {
 			$this->mpdf->SetDirectionality( 'rtl' );
 		}
 	}
@@ -965,7 +965,7 @@ class Helper_PDF {
 	 */
 	protected function set_pdf_security() {
 		/* Security settings cannot be applied to pdfa1b or pdfx1a formats */
-		if ( strtolower( $this->settings['format'] ) == 'standard' && strtolower( $this->settings['security'] == 'Yes' ) ) {
+		if ( strtolower( $this->settings['format'] ) === 'standard' && strtolower( $this->settings['security'] ) === 'yes' ) {
 
 			$password        = ( isset( $this->settings['password'] ) ) ? $this->gform->process_tags( $this->settings['password'], $this->form, $this->entry ) : '';
 			$privileges      = ( isset( $this->settings['privileges'] ) ) ? $this->settings['privileges'] : [];

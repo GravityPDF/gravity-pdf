@@ -2,7 +2,7 @@
 
 /*
  * Template Name: Blank Slate
- * Version: 1.2.1
+ * Version: 1.2.2
  * Description: A print-friendly template focusing solely on the user-submitted data. Through the Template tab you can control the PDF header and footer, change the background color or image, and show or hide the form title, page names, HTML fields and the Section Break descriptions.
  * Author: Gravity PDF
  * Author URI: https://gravitypdf.com
@@ -223,12 +223,12 @@ if ( ! class_exists( 'GFForms' ) ) {
 /*
  * Load our core-specific styles from our PDF settings which will be passed to the PDF template $config array
  */
-$show_form_title      = ( ! empty( $settings['show_form_title'] ) && $settings['show_form_title'] == 'Yes' ) ? true : false;
-$show_page_names      = ( ! empty( $settings['show_page_names'] ) && $settings['show_page_names'] == 'Yes' ) ? true : false;
-$show_html            = ( ! empty( $settings['show_html'] ) && $settings['show_html'] == 'Yes' ) ? true : false;
-$show_section_content = ( ! empty( $settings['show_section_content'] ) && $settings['show_section_content'] == 'Yes' ) ? true : false;
-$enable_conditional   = ( ! empty( $settings['enable_conditional'] ) && $settings['enable_conditional'] == 'Yes' ) ? true : false;
-$show_empty           = ( ! empty( $settings['show_empty'] ) && $settings['show_empty'] == 'Yes' ) ? true : false;
+$show_form_title      = ( ! empty( $settings['show_form_title'] ) && $settings['show_form_title'] === 'Yes' ) ? true : false;
+$show_page_names      = ( ! empty( $settings['show_page_names'] ) && $settings['show_page_names'] === 'Yes' ) ? true : false;
+$show_html            = ( ! empty( $settings['show_html'] ) && $settings['show_html'] === 'Yes' ) ? true : false;
+$show_section_content = ( ! empty( $settings['show_section_content'] ) && $settings['show_section_content'] === 'Yes' ) ? true : false;
+$enable_conditional   = ( ! empty( $settings['enable_conditional'] ) && $settings['enable_conditional'] === 'Yes' ) ? true : false;
+$show_empty           = ( ! empty( $settings['show_empty'] ) && $settings['show_empty'] === 'Yes' ) ? true : false;
 
 /**
  * Set up our configuration array to control what is and is not shown in the generated PDF

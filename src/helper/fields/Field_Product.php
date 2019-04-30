@@ -81,7 +81,7 @@ class Field_Product extends Helper_Abstract_Field_Products {
 		$html  = '';
 
 		if ( isset( $value['price'] ) ) {
-			if ( in_array( $this->field->get_input_type(), [ 'radio', 'select' ] ) ) {
+			if ( in_array( $this->field->get_input_type(), [ 'radio', 'select' ], true ) ) {
 				$html .= $value['name'] . ' - ' . $value['price'];
 			} else {
 				$html .= $value['price'];

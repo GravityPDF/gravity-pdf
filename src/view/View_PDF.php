@@ -226,12 +226,12 @@ class View_PDF extends Helper_Abstract_View {
 
 			/* Set display type and allow user to override the behaviour */
 			$settings['pdf_action'] = apply_filters( 'gfpdfe_pdf_output_type', $settings['pdf_action'] ); /* Backwards compat */
-			if ( $settings['pdf_action'] == 'download' ) {
+			if ( $settings['pdf_action'] === 'download' ) {
 				$pdf->set_output_type( 'download' );
 			}
 
 			/* Add Backwards compatibility support for our v3 Tier 2 Add-on */
-			if ( isset( $settings['advanced_template'] ) && strtolower( $settings['advanced_template'] ) == 'yes' ) {
+			if ( isset( $settings['advanced_template'] ) && strtolower( $settings['advanced_template'] ) === 'yes' ) {
 
 				/* Check if we should process this document using our legacy system */
 				if ( $model->handle_legacy_tier_2_processing( $pdf, $entry, $settings, $args ) ) {

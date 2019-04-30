@@ -162,7 +162,7 @@ class Field_Post_Image extends Helper_Abstract_Fields {
 			$img['description'] = ( isset( $value[3] ) ) ? esc_html( $value[3] ) : '';
 
 			$path = ( isset( $value[0] ) ) ? $this->misc->convert_url_to_path( $value[0] ) : '';
-			if ( $path != $img['url'] ) {
+			if ( $path !== $img['url'] ) {
 				$img['path'] = $path;
 			}
 		}

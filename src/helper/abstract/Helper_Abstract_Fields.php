@@ -309,7 +309,7 @@ abstract class Helper_Abstract_Fields {
 		 */
 		$skip_fields = apply_filters( 'gfpdf_skip_encode_mergetags_on_fields', [ 'html', 'section' ], $this->field, $this->entry, $this->form );
 		if ( ( empty( $this->field->visibility ) || $this->field->visibility !== 'administrative' ) &&
-			 ! in_array( $this->field->type, $skip_fields ) ) {
+			 ! in_array( $this->field->type, $skip_fields, true ) ) {
 			$value = $this->encode_tags( $value );
 		}
 

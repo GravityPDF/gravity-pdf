@@ -276,7 +276,7 @@ class Helper_Migration {
 
 		/* Fix the public access key */
 		if ( isset( $node['access'] ) ) {
-			$node['access'] = ( $node['access'] == 'all' ) ? 'Yes' : 'No';
+			$node['access'] = ( $node['access'] === 'all' ) ? 'Yes' : 'No';
 		}
 
 		/* Remove .php from the template file */
@@ -293,7 +293,7 @@ class Helper_Migration {
 		if ( isset( $node['pdf_size'] ) && is_array( $node['pdf_size'] ) ) {
 
 			/* Ensure it's in the correct format */
-			if ( sizeof( $node['pdf_size'] ) == 2 ) {
+			if ( sizeof( $node['pdf_size'] ) === 2 ) {
 				$node['pdf_size'][0] = (int) $node['pdf_size'][0];
 				$node['pdf_size'][1] = (int) $node['pdf_size'][1];
 				$node['pdf_size'][2] = 'millimeters';
@@ -312,7 +312,7 @@ class Helper_Migration {
 
 			/* Convert our boolean values into 'Yes' or 'No' responses, with the exception of notification */
 			$skip_nodes = [ 'notifications', 'notification' ];
-			if ( ! in_array( $id, $skip_nodes ) ) {
+			if ( ! in_array( $id, $skip_nodes, true ) ) {
 				$val = $this->misc->update_deprecated_config( $val );
 			}
 
@@ -337,7 +337,7 @@ class Helper_Migration {
 	 */
 	private function process_v3_configuration( $raw_config ) {
 
-		if ( ! is_array( $raw_config['config'] ) || sizeof( $raw_config['config'] ) == 0 ) {
+		if ( ! is_array( $raw_config['config'] ) || sizeof( $raw_config['config'] ) === 0 ) {
 			return [];
 		}
 
@@ -467,7 +467,7 @@ class Helper_Migration {
 				foreach ( $form['notifications'] as $notification ) {
 					$event = ( isset( $notification['event'] ) ) ? $notification['event'] : '';
 
-					if ( ! in_array( $event, $omit ) ) {
+					if ( ! in_array( $event, $omit, true ) ) {
 						$notifications[ $notification['id'] ] = $notification['name'];
 					}
 				}
@@ -518,7 +518,7 @@ class Helper_Migration {
 
 							$new_notification = [];
 							foreach ( $node['notification'] as $email ) {
-								$match = array_search( $email, $notifications );
+								$match = array_search( $email, $notifications, true );
 
 								if ( $match !== false ) {
 									$new_notification[] = $match;

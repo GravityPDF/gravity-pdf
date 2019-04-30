@@ -170,7 +170,7 @@ class Field_Products extends Helper_Abstract_Fields {
 						foreach ( $products['products'] as $field_id => $product ) :
 
 							/* Skip over Gravity Perks Ecommerce Fields */
-							if ( class_exists( 'GP_Ecommerce_Fields' ) && in_array( $fields[ $field_id ]->type, [ 'tax', 'discount' ] ) ) {
+							if ( class_exists( 'GP_Ecommerce_Fields' ) && in_array( $fields[ $field_id ]->type, [ 'tax', 'discount' ], true ) ) {
 								continue;
 							}
 							?>

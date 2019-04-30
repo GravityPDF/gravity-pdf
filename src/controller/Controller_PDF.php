@@ -237,7 +237,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 
 		$pid    = $GLOBALS['wp']->query_vars['pid'];
 		$lid    = (int) $GLOBALS['wp']->query_vars['lid'];
-		$action = ( ( isset( $GLOBALS['wp']->query_vars['action'] ) ) && $GLOBALS['wp']->query_vars['action'] == 'download' ) ? 'download' : 'view';
+		$action = ( ( isset( $GLOBALS['wp']->query_vars['action'] ) ) && $GLOBALS['wp']->query_vars['action'] === 'download' ) ? 'download' : 'view';
 
 		$this->log->addNotice(
 			'Processing PDF endpoint.',
@@ -367,7 +367,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 
 		/* only display detailed error to admins */
 		$whitelist_errors = [ 'timeout_expired', 'access_denied' ];
-		if ( $this->gform->has_capability( 'gravityforms_view_settings' ) || in_array( $error->get_error_code(), $whitelist_errors ) ) {
+		if ( $this->gform->has_capability( 'gravityforms_view_settings' ) || in_array( $error->get_error_code(), $whitelist_errors, true ) ) {
 			wp_die( $error->get_error_message() );
 		} else {
 			wp_die( esc_html__( 'There was a problem generating your PDF', 'gravity-forms-pdf-extended' ) );

@@ -201,7 +201,7 @@ class Model_Shortcodes extends Helper_Abstract_Model {
 
 		/* Everything looks valid so let's get the URL */
 		$pdf               = new Model_PDF( $this->gform, $this->log, $this->options, GPDFAPI::get_data_class(), GPDFAPI::get_misc_class(), GPDFAPI::get_notice_class(), GPDFAPI::get_templates_class() );
-		$download          = ( $attributes['type'] == 'download' ) ? true : false;
+		$download          = ( $attributes['type'] === 'download' ) ? true : false;
 		$print             = ( ! empty( $attributes['print'] ) ) ? true : false;
 		$raw               = ( ! empty( $attributes['raw'] ) ) ? true : false;
 		$attributes['url'] = $pdf->get_pdf_url( $attributes['id'], $attributes['entry'], $download, $print, ! $raw );

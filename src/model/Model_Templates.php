@@ -227,7 +227,7 @@ class Model_Templates extends Helper_Abstract_Model {
 			$config = $this->templates->get_config_class( $template['id'] );
 
 			/* Check if the PDF config impliments our Setup/TearDown interface and run the tear down */
-			if ( in_array( 'GFPDF\Helper\Helper_Interface_Setup_TearDown', class_implements( $config ) ) ) {
+			if ( in_array( 'GFPDF\Helper\Helper_Interface_Setup_TearDown', class_implements( $config ), true ) ) {
 				$config->setUp();
 			}
 		}
@@ -279,7 +279,7 @@ class Model_Templates extends Helper_Abstract_Model {
 			$config = $this->templates->get_config_class( $template_id );
 
 			/* Check if the PDF config impliments our Setup/TearDown interface and run the tear down */
-			if ( in_array( 'GFPDF\Helper\Helper_Interface_Setup_TearDown', class_implements( $config ) ) ) {
+			if ( in_array( 'GFPDF\Helper\Helper_Interface_Setup_TearDown', class_implements( $config ), true ) ) {
 				$config->tearDown();
 			}
 

@@ -155,7 +155,7 @@ class Field_Survey extends Helper_Abstract_Fields {
 				/* Convert survey ID to real value */
 				foreach ( $this->field->choices as $choice ) {
 
-					$key = array_search( $choice['value'], $value );
+					$key = array_search( $choice['value'], $value, true );
 					if ( $key !== false ) {
 						$value[ $key ] = esc_html( $choice['text'] );
 					}

@@ -567,7 +567,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			]
 		);
 
-		if ( empty( $pdf ) || ! is_array( $pdf ) || sizeof( $pdf ) == 0 ) {
+		if ( empty( $pdf ) || ! is_array( $pdf ) || sizeof( $pdf ) === 0 ) {
 			/* No value was passed in so we will delete the PDF */
 			$remove_option = $this->delete_pdf( $form_id, $pdf_id );
 
@@ -837,7 +837,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		foreach ( $roles as $role ) {
 			if ( isset( $role['capabilities'] ) && is_array( $role['capabilities'] ) ) {
 				foreach ( $role['capabilities'] as $cap => $val ) {
-					if ( ! isset( $capabilities[ $cap ] ) && ! in_array( $cap, $gf_caps ) ) {
+					if ( ! isset( $capabilities[ $cap ] ) && ! in_array( $cap, $gf_caps, true ) ) {
 						$capabilities[ esc_html__( 'Active WordPress Capabilities', 'gravity-forms-pdf-extended' ) ][ $cap ] = $cap;
 					}
 				}
@@ -1146,7 +1146,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		$gfpdf_options = $this->settings;
 
-		if ( empty( $_POST['_wp_http_referer'] ) || empty( $_POST['option_page'] ) || $_POST['option_page'] != 'gfpdf_settings' ) {
+		if ( empty( $_POST['_wp_http_referer'] ) || empty( $_POST['option_page'] ) || $_POST['option_page'] !== 'gfpdf_settings' ) {
 			return $input;
 		}
 
@@ -1165,7 +1165,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			 * Check if extra item(s) belongs on page but isn't the existing page
 			 * Note that this requires the section ID share a similar ID to what is referenced in $tab
 			 */
-			if ( $tab != $id && $tab == substr( $id, 0, $tab_len ) ) {
+			if ( $tab !== $id && $tab === substr( $id, 0, $tab_len ) ) {
 				$settings = array_merge( $settings, $s );
 			}
 		}
@@ -1278,7 +1278,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @since 4.0
 	 */
 	public function sanitize_paper_size( $input ) {
-		if ( is_array( $input ) && sizeof( $input ) == 3 ) {
+		if ( is_array( $input ) && sizeof( $input ) === 3 ) {
 			$input[0] = abs( $input[0] );
 			$input[1] = abs( $input[1] );
 		}
@@ -1319,7 +1319,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$settings
 		);
 
-		if ( in_array( $key, $ignored_fields ) ) {
+		if ( in_array( $key, $ignored_fields, true ) ) {
 			return $value;
 		}
 
@@ -1432,7 +1432,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		}
 
 		/* Fix up our conditional logic array so it returns a string value */
-		if ( $args['id'] == 'conditionalLogic' && isset( $pdf_form_settings['conditionalLogic'] ) ) {
+		if ( $args['id'] === 'conditionalLogic' && isset( $pdf_form_settings['conditionalLogic'] ) ) {
 			$pdf_form_settings['conditionalLogic'] = json_encode( $pdf_form_settings['conditionalLogic'] );
 		}
 
@@ -1620,7 +1620,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		foreach ( $args['options'] as $key => $option ) {
 
 			$checked = false;
-			if ( $selected == $key ) {
+			if ( $selected === $key ) {
 				$checked = true;
 			}
 
@@ -1902,7 +1902,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				if ( is_array( $value ) ) {
 					foreach ( $value as $v ) {
 						$selected = selected( $option, $v, false );
-						if ( $selected != '' ) {
+						if ( $selected !== '' ) {
 							break;
 						}
 					}
@@ -1918,7 +1918,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					if ( is_array( $value ) ) {
 						foreach ( $value as $v ) {
 							$selected = selected( $op_value, $v, false );
-							if ( $selected != '' ) {
+							if ( $selected !== '' ) {
 								break;
 							}
 						}

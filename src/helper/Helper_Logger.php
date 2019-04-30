@@ -134,9 +134,9 @@ class Helper_Logger {
 
 		/* Set the logger timezone once (if needed) */
 		if ( ! $timezone ) {
-			$offset = get_option( 'gmt_offset' );
+			$offset = (float) get_option( 'gmt_offset' );
 
-			if ( $offset != 0 ) {
+			if ( $offset !== 0.0 ) {
 				try {
 					$timezone = new DateTimeZone( ( $offset > 0 ) ? '+' . $offset : $offset );
 					Logger::setTimezone( $timezone );
