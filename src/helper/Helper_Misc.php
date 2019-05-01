@@ -536,7 +536,7 @@ class Helper_Misc {
 		$upload_path = trim( get_option( 'upload_path' ) );
 		$dir         = $upload_path;
 
-		if ( empty( $upload_path ) || 'wp-content/uploads' == $upload_path ) {
+		if ( empty( $upload_path ) || 'wp-content/uploads' === $upload_path ) {
 			$dir = WP_CONTENT_DIR . '/uploads';
 		} elseif ( 0 !== strpos( $upload_path, ABSPATH ) ) {
 			/* $dir is absolute, $upload_path is (maybe) relative to ABSPATH */
@@ -545,7 +545,7 @@ class Helper_Misc {
 
 		$url = get_option( 'upload_url_path' );
 		if ( ! $url ) {
-			if ( empty( $upload_path ) || ( 'wp-content/uploads' == $upload_path ) || ( $upload_path == $dir ) ) {
+			if ( empty( $upload_path ) || ( 'wp-content/uploads' === $upload_path ) || ( $upload_path === $dir ) ) {
 				$url = WP_CONTENT_URL . '/uploads';
 			} else {
 				$url = trailingslashit( $siteurl ) . $upload_path;
@@ -575,7 +575,7 @@ class Helper_Misc {
 	public function convert_url_to_path( $url ) {
 
 		/* If $url is empty we'll return early */
-		if ( trim( $url ) == false ) {
+		if ( empty( trim( $url ) ) ) {
 			return $url;
 		}
 
@@ -633,7 +633,7 @@ class Helper_Misc {
 	public function convert_path_to_url( $path ) {
 
 		/* If $url is empty we'll return early */
-		if ( trim( $path ) == false ) {
+		if ( empty( trim( $path ) ) ) {
 			return $path;
 		}
 
@@ -709,7 +709,7 @@ class Helper_Misc {
 	public function get_legacy_ids( $entry_id, $settings ) {
 
 		$leads    = rgget( 'lid' );
-		$override = ( isset( $settings['public_access'] ) && $settings['public_access'] == 'Yes' ) ? true : false;
+		$override = ( isset( $settings['public_access'] ) && $settings['public_access'] === 'Yes' ) ? true : false;
 
 		if ( $leads && ( $override === true || $this->gform->has_capability( 'gravityforms_view_entries' ) ) ) {
 			$ids = explode( ',', $leads );
@@ -853,14 +853,14 @@ class Helper_Misc {
 	public function backwards_compat_conversion( $settings, $form, $entry ) {
 
 		$compat                   = [];
-		$compat['premium']        = ( isset( $settings['advanced_template'] ) && $settings['advanced_template'] == 'Yes' ) ? true : false;
-		$compat['rtl']            = ( isset( $settings['rtl'] ) && $settings['rtl'] == 'Yes' ) ? true : false;
+		$compat['premium']        = ( isset( $settings['advanced_template'] ) && $settings['advanced_template'] === 'Yes' ) ? true : false;
+		$compat['rtl']            = ( isset( $settings['rtl'] ) && $settings['rtl'] === 'Yes' ) ? true : false;
 		$compat['dpi']            = ( isset( $settings['image_dpi'] ) ) ? (int) $settings['image_dpi'] : 96;
-		$compat['security']       = ( isset( $settings['security'] ) && $settings['security'] == 'Yes' ) ? true : false;
+		$compat['security']       = ( isset( $settings['security'] ) && $settings['security'] === 'Yes' ) ? true : false;
 		$compat['pdf_password']   = ( isset( $settings['password'] ) ) ? $this->gform->process_tags( $settings['password'], $form, $entry ) : '';
 		$compat['pdf_privileges'] = ( isset( $settings['privileges'] ) ) ? $settings['privileges'] : '';
-		$compat['pdfa1b']         = ( isset( $settings['format'] ) && $settings['format'] == 'PDFA1B' ) ? true : false;
-		$compat['pdfx1a']         = ( isset( $settings['format'] ) && $settings['format'] == 'PDFX1A' ) ? true : false;
+		$compat['pdfa1b']         = ( isset( $settings['format'] ) && $settings['format'] === 'PDFA1B' ) ? true : false;
+		$compat['pdfx1a']         = ( isset( $settings['format'] ) && $settings['format'] === 'PDFX1A' ) ? true : false;
 
 		return $compat;
 	}
@@ -917,11 +917,13 @@ class Helper_Misc {
 	 */
 	public function in_array( $needle, $haystack, $strict = true ) {
 		foreach ( $haystack as $item ) {
+			/* phpcs:disable */
 			if ( ( $strict ? $item === $needle : $item == $needle ) ||
 				 ( is_array( $item ) && $this->in_array( $needle, $item, $strict ) )
 			) {
 				return true;
 			}
+			/* phpcs:enable */
 		}
 
 		return false;

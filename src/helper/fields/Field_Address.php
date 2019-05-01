@@ -101,7 +101,7 @@ class Field_Address extends Helper_Abstract_Fields {
 		}
 
 		/* display in the standard "city, state zip" format */
-		if ( $address_display_format != 'zip_before_city' ) {
+		if ( $address_display_format !== 'zip_before_city' ) {
 			$zip_string  = $data['city'];
 			$zip_string .= ( ! empty( $zip_string ) && ! empty( $data['state'] ) ) ? ", {$data['state']}" : trim( $data['state'] );
 			$zip_string .= " {$data['zip']}";

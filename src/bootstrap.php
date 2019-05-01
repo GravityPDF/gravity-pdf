@@ -330,7 +330,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function plugin_row_meta( $links, $file ) {
 
-		if ( $file == PDF_PLUGIN_BASENAME ) {
+		if ( $file === PDF_PLUGIN_BASENAME ) {
 			$row_meta = [
 				'docs'           => '<a href="' . esc_url( 'https://gravitypdf.com/documentation/v5/five-minute-install/' ) . '" title="' . esc_attr__( 'View Gravity PDF Documentation', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Docs', 'gravity-forms-pdf-extended' ) . '</a>',
 				'support'        => '<a href="' . esc_url( $this->data->settings_url . '&tab=help' ) . '" title="' . esc_attr__( 'Get Help and Support', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Support', 'gravity-forms-pdf-extended' ) . '</a>',
@@ -466,7 +466,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			wp_enqueue_script( 'gfpdf_js_backbone' );
 		}
 
-		if ( rgget( 'page' ) == 'gf_entries' ) {
+		if ( rgget( 'page' ) === 'gf_entries' ) {
 			wp_enqueue_script( 'gfpdf_js_entries' );
 			wp_enqueue_style( 'gfpdf_css_styles' );
 		}
@@ -956,10 +956,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		}
 
 		return [
-			'empty_field'     => ( isset( $settings['show_empty'] ) && $settings['show_empty'] == 'Yes' ) ? true : false,
-			'html_field'      => ( isset( $settings['show_html'] ) && $settings['show_html'] == 'Yes' ) ? true : false,
-			'page_names'      => ( isset( $settings['show_page_names'] ) && $settings['show_page_names'] == 'Yes' ) ? true : false,
-			'section_content' => ( isset( $settings['show_section_content'] ) && $settings['show_section_content'] == 'Yes' ) ? true : false,
+			'empty_field'     => ( isset( $settings['show_empty'] ) && $settings['show_empty'] === 'Yes' ) ? true : false,
+			'html_field'      => ( isset( $settings['show_html'] ) && $settings['show_html'] === 'Yes' ) ? true : false,
+			'page_names'      => ( isset( $settings['show_page_names'] ) && $settings['show_page_names'] === 'Yes' ) ? true : false,
+			'section_content' => ( isset( $settings['show_section_content'] ) && $settings['show_section_content'] === 'Yes' ) ? true : false,
 		];
 	}
 }

@@ -104,7 +104,7 @@ class Field_Rank extends Helper_Abstract_Fields {
 
 			/* Loop through the total choices */
 			foreach ( $this->field->choices as $choice ) {
-				if ( trim( $choice['value'] ) == trim( $rating ) ) {
+				if ( trim( $choice['value'] ) === trim( $rating ) ) {
 					$value[] = esc_html( $choice['text'] );
 					break; /* exit inner loop as soon as found */
 				}

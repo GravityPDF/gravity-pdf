@@ -197,7 +197,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	public function single_row( $item ) {
 		static $row_class = '';
 
-		$row_class = ( $row_class == '' ? 'class="alternate"' : $row_class );
+		$row_class = ( $row_class === '' ? 'class="alternate"' : $row_class );
 
 		echo '<tr id="gfpdf-' . $item['id'] . '" ' . $row_class . '>';
 		$this->single_row_columns( $item );
@@ -263,7 +263,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * @since 4.0
 	 */
 	public function column_notifications( $item ) {
-		if ( ! isset( $item['notification'] ) || sizeof( $item['notification'] ) == 0 ) {
+		if ( ! isset( $item['notification'] ) || sizeof( $item['notification'] ) === 0 ) {
 			esc_html_e( 'None', 'gravity-forms-pdf-extended' );
 
 			return;
@@ -272,7 +272,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		/* Convert our IDs to names */
 		$notification_names = [];
 		foreach ( $this->form['notifications'] as $notification ) {
-			if ( in_array( $notification['id'], $item['notification'] ) ) {
+			if ( in_array( $notification['id'], $item['notification'], true ) ) {
 				$notification_names[] = $notification['name'];
 			}
 		}
@@ -355,7 +355,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 				$keys     = array_keys( $actions );
 				$last_key = array_pop( $keys );
 				foreach ( $actions as $key => $html ) {
-					$divider = $key == $last_key ? '' : ' | ';
+					$divider = $key === $last_key ? '' : ' | ';
 					?>
 					<span class="<?php echo $key; ?>">
 						<?php echo $html . $divider; ?>

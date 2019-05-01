@@ -179,7 +179,7 @@ class Test_Options_API extends WP_UnitTestCase {
 		/* check for specific values */
 		$this->assertEquals( 'My First PDF Template', $results['name'] );
 		$this->assertEquals( 'Gravity Forms Style', $results['template'] );
-		$this->assertTrue( in_array( 'Admin Notification', $results['notification'] ) );
+		$this->assertTrue( in_array( 'Admin Notification', $results['notification'], true ) );
 	}
 
 	/**

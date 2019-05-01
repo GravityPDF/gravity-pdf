@@ -149,7 +149,7 @@ class Field_Likert extends Helper_Abstract_Fields {
 					/* check if user selected this likert value */
 					$data = rgar( $this->entry, $row['id'] );
 
-					$likert['rows'][ $row['label'] ][ $text ] = ( ( $row['name'] . ':' . $id ) == $data ) ? 'selected' : '';
+					$likert['rows'][ $row['label'] ][ $text ] = ( ( $row['name'] . ':' . $id ) === $data ) ? 'selected' : '';
 				}
 			}
 		} else { /* Handle our single-row likert */
@@ -158,7 +158,7 @@ class Field_Likert extends Helper_Abstract_Fields {
 			$data = rgar( $this->entry, $this->field->id );
 			foreach ( $likert['col'] as $id => $text ) {
 				/* check if user selected this likert value */
-				$likert['row'][ $text ] = ( $id == $data ) ? 'selected' : '';
+				$likert['row'][ $text ] = ( $id === $data ) ? 'selected' : '';
 			}
 		}
 

@@ -302,7 +302,7 @@ class Helper_Field_Container {
 	 */
 	private function process_skipped_fields( GF_Field $field ) {
 		/* if we have a skipped field and the container is open we will close it */
-		if ( in_array( $field->type, $this->skip_fields ) ) {
+		if ( in_array( $field->type, $this->skip_fields, true ) ) {
 			$this->strip_field_of_any_classmaps( $field );
 			$this->close();
 

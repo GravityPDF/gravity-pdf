@@ -599,7 +599,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		if ( ! is_wp_error( $action ) ) {
 			/* check if the user is logged in but is not the current owner */
 			if ( is_user_logged_in() &&
-				 ( ( $this->options->get_option( 'limit_to_admin', 'No' ) == 'Yes' ) || ( $this->is_current_pdf_owner( $entry, 'logged_in' ) === false ) )
+				 ( ( $this->options->get_option( 'limit_to_admin', 'No' ) === 'Yes' ) || ( $this->is_current_pdf_owner( $entry, 'logged_in' ) === false ) )
 			) {
 
 				/* Handle permissions checks */
@@ -906,7 +906,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				$this->options->increment_pdf_count();
 
 				/* Add Backwards compatibility support for our v3 Tier 2 Add-on */
-				if ( isset( $settings['advanced_template'] ) && strtolower( $settings['advanced_template'] ) == 'yes' ) {
+				if ( isset( $settings['advanced_template'] ) && strtolower( $settings['advanced_template'] ) === 'yes' ) {
 
 					/* Check if we should process this document using our legacy system */
 					if ( $this->handle_legacy_tier_2_processing( $pdf, $entry, $settings, $args ) ) {
@@ -1090,7 +1090,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		$attach = false;
 		if ( isset( $settings['notification'] ) && is_array( $settings['notification'] ) ) {
-			if ( in_array( $notification['id'], $settings['notification'] ) ) {
+			if ( in_array( $notification['id'], $settings['notification'], true ) ) {
 				$attach = true;
 			}
 		}
@@ -1114,7 +1114,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function maybe_always_save_pdf( $settings ) {
 
 		$save = false;
-		if ( isset( $settings['save'] ) && strtolower( $settings['save'] ) == 'yes' ) {
+		if ( isset( $settings['save'] ) && strtolower( $settings['save'] ) === 'yes' ) {
 			$save = true;
 		}
 
@@ -1195,7 +1195,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				);
 
 				foreach ( $directory_list as $file ) {
-					if ( in_array( $file->getFilename(), [ '.htaccess', 'index.html' ] ) || strpos( realpath( $file->getPathname() ), realpath( $this->data->mpdf_tmp_location ) ) !== false ) {
+					if ( in_array( $file->getFilename(), [ '.htaccess', 'index.html' ], true ) || strpos( realpath( $file->getPathname() ), realpath( $this->data->mpdf_tmp_location ) ) !== false ) {
 						continue;
 					}
 
@@ -1418,7 +1418,7 @@ class Model_PDF extends Helper_Abstract_Model {
 					]
 				);
 
-				if ( in_array( $field->type, $fields_to_skip ) ) {
+				if ( in_array( $field->type, $fields_to_skip, true ) ) {
 					continue;
 				}
 
@@ -1568,7 +1568,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				foreach ( $fields as $field ) {
 
 					/* Check if we have a multifield likert and replace the row key */
-					if ( isset( $field['gsurveyLikertEnableMultipleRows'] ) && $field['gsurveyLikertEnableMultipleRows'] == 1 ) {
+					if ( isset( $field['gsurveyLikertEnableMultipleRows'] ) && $field['gsurveyLikertEnableMultipleRows'] === true ) {
 
 						foreach ( $field['gsurveyLikertRows'] as $row ) {
 
@@ -1719,7 +1719,7 @@ class Model_PDF extends Helper_Abstract_Model {
 						$results['field_data'][ $field->id ] = $this->replace_key( $results['field_data'][ $field->id ], $choice['value'], $choice['text'] );
 
 						/* Check if this is the correct field */
-						if ( isset( $choice['gquizIsCorrect'] ) && $choice['gquizIsCorrect'] == 1 ) {
+						if ( isset( $choice['gquizIsCorrect'] ) && $choice['gquizIsCorrect'] === true ) {
 							$results['field_data'][ $field->id ]['misc']['correct_option_name'][] = esc_html( $choice['text'] );
 						}
 					}
@@ -1798,7 +1798,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		if ( isset( $form['fields'] ) ) {
 			foreach ( $form['fields'] as $field ) {
-				if ( $field['type'] == $type ) {
+				if ( $field['type'] === $type ) {
 					return true;
 				}
 			}
@@ -1923,14 +1923,14 @@ class Model_PDF extends Helper_Abstract_Model {
 		if ( isset( $config['aid'] ) && $config['aid'] !== false ) {
 			$selector = $config['aid'] - 1;
 
-			if ( isset( $pdfs[ $selector ] ) && $pdfs[ $selector ]['template'] == $config['template'] ) {
+			if ( isset( $pdfs[ $selector ] ) && $pdfs[ $selector ]['template'] === $config['template'] ) {
 				return $pdfs[ $selector ]['id'];
 			}
 		}
 
 		/* The aid method failed so lets load the first matching configuration */
 		foreach ( $pdfs as $pdf ) {
-			if ( $pdf['active'] === true && $pdf['template'] == $config['template'] ) {
+			if ( $pdf['active'] === true && $pdf['template'] === $config['template'] ) {
 				return $pdf['id'];
 			}
 		}
@@ -2064,7 +2064,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function field_middle_html_fields( $action, $field, $entry, $form, $config ) {
 		if ( $action === false ) {
 			$show_html_fields = ( isset( $config['meta']['html_field'] ) ) ? $config['meta']['html_field'] : false;
-			if ( $show_html_fields === false && $field->type == 'html' ) {
+			if ( $show_html_fields === false && $field->type === 'html' ) {
 				return true;
 			}
 		}
@@ -2089,7 +2089,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function field_middle_blacklist( $action, $field, $entry, $form, $config, $products, $blacklisted ) {
 		if ( $action === false ) {
-			if ( in_array( $field->get_input_type(), $blacklisted ) ) {
+			if ( in_array( $field->get_input_type(), $blacklisted, true ) ) {
 				return true;
 			}
 		}

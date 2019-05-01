@@ -310,11 +310,11 @@ class Model_Settings extends Helper_Abstract_Model {
 			foreach ( $custom_fonts as $font ) {
 
 				/* Skip over itself */
-				if ( ! empty( $id ) && $font['id'] == $id ) {
+				if ( ! empty( $id ) && $font['id'] === $id ) {
 					continue;
 				}
 
-				if ( $name == $this->options->get_font_short_name( $font['font_name'] ) ) {
+				if ( $name === $this->options->get_font_short_name( $font['font_name'] ) ) {
 					return false;
 				}
 			}
@@ -681,7 +681,7 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		if ( $form_id ) {
 			$pid = ( rgget( 'pid' ) ) ? rgget( 'pid' ) : false;
-			if ( $pid == false ) {
+			if ( $pid === false ) {
 				$pid = ( rgpost( 'gform_pdf_id' ) ) ? rgpost( 'gform_pdf_id' ) : false;
 			}
 

@@ -87,7 +87,7 @@ class Field_Quiz extends Helper_Abstract_Fields {
 		$value = apply_filters( 'gform_entry_field_value', $this->get_value(), $this->field, $this->entry, $this->form );
 
 		/* Return early to prevent any problems with when field is empty or the quiz plugin isn't enabled */
-		if ( ! class_exists( 'GFQuiz' ) || ! is_string( $value ) || trim( $value ) == false ) {
+		if ( ! class_exists( 'GFQuiz' ) || ! is_string( $value ) || trim( $value ) === false ) {
 			return parent::html( '' );
 		}
 
@@ -123,7 +123,7 @@ class Field_Quiz extends Helper_Abstract_Fields {
 		/* Loop through our results */
 		foreach ( $value as $item ) {
 			foreach ( $this->field->choices as $choice ) {
-				if ( $choice['value'] == $item ) {
+				if ( $choice['value'] === $item ) {
 					$formatted[] = [
 						'text'      => esc_html( $choice['text'] ),
 						'isCorrect' => $choice['gquizIsCorrect'],

@@ -165,7 +165,7 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 			return false;
 		}
 
-		if ( $res_code != '200' ) {
+		if ( $res_code !== 200 ) {
 			$this->log->addError(
 				'Core Font API Response Failed',
 				[

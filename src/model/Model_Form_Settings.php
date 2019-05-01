@@ -342,7 +342,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* Do validation */
 		if ( empty( $sanitized['name'] ) || empty( $sanitized['filename'] ) ||
-			 ( $sanitized['pdf_size'] == 'CUSTOM' && ( (int) $sanitized['custom_pdf_size'][0] === 0 || (int) $sanitized['custom_pdf_size'][1] === 0 ) )
+			 ( $sanitized['pdf_size'] === 'CUSTOM' && ( (int) $sanitized['custom_pdf_size'][0] === 0 || (int) $sanitized['custom_pdf_size'][1] === 0 ) )
 		) {
 			$this->notices->add_error( esc_html__( 'PDF could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
 
@@ -465,7 +465,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function check_custom_size_error_highlighting( $skip, $field, $input ) {
 
-		if ( $field['id'] == 'custom_pdf_size' ) {
+		if ( $field['id'] === 'custom_pdf_size' ) {
 
 			/* Skip if not currently being shown */
 			if ( $input['pdf_size'] !== 'CUSTOM' ) {
@@ -700,7 +700,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function parse_filename_extension( $value, $key ) {
 
-		if ( $key == 'filename' ) {
+		if ( $key === 'filename' ) {
 			$value = $this->misc->remove_extension_from_string( $value );
 		}
 
@@ -717,7 +717,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function decode_json( $value, $key ) {
 
-		if ( $key == 'conditionalLogic' ) {
+		if ( $key === 'conditionalLogic' ) {
 			return json_decode( $value, true );
 		}
 
@@ -746,7 +746,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			foreach ( $notifications as $notification ) {
 				$event = ( isset( $notification['event'] ) ) ? $notification['event'] : '';
 
-				if ( ! in_array( $event, $omit ) ) {
+				if ( ! in_array( $event, $omit, true ) ) {
 					$options[ $notification['id'] ] = $notification['name'];
 				}
 			}
@@ -950,7 +950,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$settings = $this->setup_custom_appearance_settings( $class );
 
 		/* Only handle fields when in the PDF Forms Settings, and not in the general settings */
-		if ( $type != 'gfpdf_settings[default_template]' ) {
+		if ( $type !== 'gfpdf_settings[default_template]' ) {
 
 			/* Get the template type so we can return out to the browser */
 			$template_data = $this->templates->get_template_info_by_id( $template );
@@ -986,7 +986,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			$editors = [];
 
 			foreach ( $settings as $field ) {
-				if ( isset( $field['type'] ) && $field['type'] == 'rich_editor' ) {
+				if ( isset( $field['type'] ) && $field['type'] === 'rich_editor' ) {
 					$editors[] = 'gfpdf_settings_' . $field['id'];
 				}
 			}
