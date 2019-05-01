@@ -105,7 +105,7 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 	 * @since 4.0.1
 	 */
 	final public function get_view_dir_path() {
-		return PDF_PLUGIN_DIR . 'src/view/html/' . $this->view_type . '/';
+		return PDF_PLUGIN_DIR . 'src/View/html/' . $this->view_type . '/';
 	}
 
 	/**
