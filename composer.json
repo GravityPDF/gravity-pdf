@@ -22,15 +22,7 @@
 
     "autoload": {
     	"psr-4": {
-    		"GFPDF\\": "src/",
-    		"GFPDF\\Controller\\": "src/controller/",
-    		"GFPDF\\Model\\": "src/model/",
-    		"GFPDF\\View\\": "src/view/",
-    		"GFPDF\\Statics\\": "src/statics/",
-    		"GFPDF\\Helper\\": ["src/helper/", "src/helper/abstract/", "src/helper/interface/", "src/helper/trait/"],
-    		"GFPDF\\Helper\\Licensing\\": "src/helper/licensing/",
-    		"GFPDF\\Helper\\Fields\\": "src/helper/fields/",
-    		"GFPDF\\Test\\": "tests/unit-tests/"
+    		"GFPDF\\": "src/"
     	}
     },
 
