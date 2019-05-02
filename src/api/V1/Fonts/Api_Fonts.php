@@ -259,12 +259,13 @@ class Api_Fonts extends Base_Api {
 				$path = $this->misc->convert_url_to_path( $fonts[ $type ] );
 
 				/* Couldn't find file so throw error */
-				if ( is_wp_error( $path ) ) {
-					$errors[] = sprintf( esc_html__( 'Could not locate font on web server: %s', 'gravity-forms-pdf-extended' ), $fonts[ $type ] );
+				if ( ! $path ) {
+					return new \WP_Error( "install_font", "Could not locate font on web server: " . $fonts[ 'font_name' ] .  " " .  $fonts[ $type ], [ "status" => 404 ] );
 				}
 
 				/* Copy font to our fonts folder */
 				$filename = basename( $path );
+			
 				if ( ! is_file( $this->data->template_font_location . $filename ) && ! copy( $path, $this->data->template_font_location . $filename ) ) {
 					$errors[] = sprintf( esc_html__( 'There was a problem installing the font %s. Please try again.', 'gravity-forms-pdf-extended' ), $filename );
 				}
