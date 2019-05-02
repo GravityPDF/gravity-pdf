@@ -116,7 +116,7 @@ class Test_Actions extends WP_UnitTestCase {
 		$expected = [ 'review_plugin', 'migrate_v3_to_v4', 'install_core_fonts' ];
 
 		foreach ( $routes as $route ) {
-			if ( in_array( $route['action'], $expected ) ) {
+			if ( in_array( $route['action'], $expected, true ) ) {
 				$counter++;
 			}
 		}

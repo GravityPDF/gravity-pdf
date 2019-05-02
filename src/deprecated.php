@@ -457,7 +457,7 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 			$excluded = [ 'captcha', 'password', 'page' ];
 
 			/* Skip over any fields we don't want to include */
-			if ( in_array( $input, $excluded ) ) {
+			if ( in_array( $input, $excluded, true ) ) {
 				continue;
 			}
 
@@ -467,7 +467,7 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 			self::load_legacy_css( $field );
 
 			/* Check if HTML field should be included */
-			if ( $input == 'html' ) {
+			if ( $input === 'html' ) {
 
 				if ( $config['html_field'] === true ) {
 					$html = $class->html();

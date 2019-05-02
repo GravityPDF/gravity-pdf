@@ -3,7 +3,9 @@
 namespace GFPDF\Tests;
 
 use GFPDF\Controller\Controller_PDF;
+use GFPDF\Helper\Helper_Url_Signer;
 use GFPDF\Model\Model_PDF;
+use GFPDF\Plugins\DeveloperToolkit\Loader\Helper;
 use GFPDF\View\View_PDF;
 use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Fields\Field_Products;
@@ -98,7 +100,7 @@ class Test_PDF extends WP_UnitTestCase {
 		parent::setUp();
 
 		/* Setup our test classes */
-		$this->model = new Model_PDF( $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices, $gfpdf->templates );
+		$this->model = new Model_PDF( $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->notices, $gfpdf->templates, new Helper_Url_Signer() );
 		$this->view  = new View_PDF( [], $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
 
 		$this->controller = new Controller_PDF( $this->model, $this->view, $gfpdf->gform, $gfpdf->log, $gfpdf->misc );
