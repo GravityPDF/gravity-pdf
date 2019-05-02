@@ -120,6 +120,6 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 	 * @return void
 	 */
 	public function add_shortcodes() {
-		add_shortcode( 'gravitypdf', [ $this->model, 'gravitypdf' ] );
+		add_shortcode( 'gravitypdf', [ $this->model, 'process' ] );
 	}
 }
