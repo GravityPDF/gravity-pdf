@@ -142,12 +142,13 @@ class Api_Fonts extends Base_Api {
 		$params = $request->get_json_params();
 
 		/* Handle the validation and saving of the font */
-		$payload = isset( $params['payload'] ) ? $params['payload'] : '';
+		$payload = isset( $params['payload'] ) ? $params : null;
+
 		$results = $this->process_font( $payload );
 
 		/* There was an issue downloading and saving fonts */
-		if ( ! $results ) {
-			return new \WP_Error( 'process_font', 'Save Font Failed', [ 'status' => 400 ] );
+		if ( $results->errors ) {
+			return $results ;			
 		}
 
 		/* If we reached this point the results were successful so return the new object */
@@ -177,7 +178,8 @@ class Api_Fonts extends Base_Api {
 		$font = array_filter( $font );
 
 		/* Check we have the required data */
-		if ( empty( $font['font_name'] ) || empty( $font['regular'] ) ) {
+		if ( empty( $font['payload']['font_name'] ) || empty( $font['payload']['regular'] ) ) {
+
 			$error = esc_html__( 'Required fields have not been included.', 'gravity-forms-pdf-extended' );
 
 			$this->log->addWarning( 'Font Validation Failed', (array)$error );
@@ -186,7 +188,8 @@ class Api_Fonts extends Base_Api {
 		}
 
 		/* Check we have a valid font name */
-		$name = $font['font_name'];
+		$name = $font['payload']['font_name'];
+
 		if ( ! $this->is_font_name_valid( $name ) ) {
 			$error = esc_html__( 'Font name is not valid. Only alphanumeric characters and spaces are accepted.', 'gravity-forms-pdf-extended' );
 
@@ -197,7 +200,8 @@ class Api_Fonts extends Base_Api {
 
 		/* Check the font name is unique */
 		$shortname = $this->options->get_font_short_name( $name );
-		$id        = ( isset( $font['id'] ) ) ? $font['id'] : '';
+
+		$id  = ( isset( $font['id'] ) ) ? $font['id'] : '';
 
 		if ( ! $this->is_font_name_unique( $shortname, $id ) ) {
 			$error = esc_html__( 'A font with the same name already exists. Try a different name.', 'gravity-forms-pdf-extended' );
@@ -208,18 +212,10 @@ class Api_Fonts extends Base_Api {
 		}
 
 		/* Move fonts to our Gravity PDF font folder */
-		$installation = $this->install_fonts( $font );
-
-		/* Check if any errors occured installing the fonts */
-		if ( isset( $installation['errors'] ) ) {
-			$error = $installation['errors'];
-
-			$this->log->addWarning( 'Font Validation Failed', (array)$error );
-
-			return new \WP_Error( 'installation_error', $error, [ 'status' => 500 ] );
-		}
+		$installation = $this->install_fonts( $font['payload'] );
 
 		/* If we got here the installation was successful so return the data */
+		/* Return whatever is thrown by install_fonts function */
 		return $installation;
 	}
 
@@ -259,6 +255,7 @@ class Api_Fonts extends Base_Api {
 
 			/* Check if a key exists for this type and process */
 			if ( isset( $fonts[ $type ] ) ) {
+
 				$path = $this->misc->convert_url_to_path( $fonts[ $type ] );
 
 				/* Couldn't find file so throw error */

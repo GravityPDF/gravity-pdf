@@ -100,8 +100,10 @@ class TestApiFontsEndpointRoutes extends WP_UnitTestCase {
         $request = new WP_REST_Request( \WP_REST_Server::CREATABLE, '/gravity-pdf/v1/fonts/save_font' );
 
         $request->set_body_params( [
-            'payload' => '',
+            'payload' => [],
         ] );
+
+        $res = $request->get_body_params();
 
         /* Test empty font name */
         $response = $this->class->save_font( $request );
