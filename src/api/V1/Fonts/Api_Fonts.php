@@ -260,26 +260,17 @@ class Api_Fonts extends Base_Api {
 
 				/* Couldn't find file so throw error */
 				if ( ! $path ) {
-					return new \WP_Error( "install_font", "Could not locate font on web server: " . $fonts[ 'font_name' ] .  " " .  $fonts[ $type ], [ "status" => 404 ] );
+					return new \WP_Error( "font_installation_error", "Could not locate font on web server: " . $fonts[ 'font_name' ] .  " " .  $fonts[ $type ], [ "status" => 404 ] );
 				}
 
 				/* Copy font to our fonts folder */
 				$filename = basename( $path );
 			
 				if ( ! is_file( $this->data->template_font_location . $filename ) && ! copy( $path, $this->data->template_font_location . $filename ) ) {
-					$errors[] = sprintf( esc_html__( 'There was a problem installing the font %s. Please try again.', 'gravity-forms-pdf-extended' ), $filename );
+
+					return new \WP_Error( "font_installation_error", "There was a problem installing the font: " . $filename . "Please try again.", [ "status" => 500 ] );					
 				}
 			}
-		}
-
-		/* If errors were found then return */
-		if ( count( $errors ) > 0 ) {
-			$errors = [ 'errors' => $errors ];
-
-			$this->log->addError( 'Install Error.', $errors );
-
-			return new \WP_Error( 'font_installation_error', $errors, [ 'status' => 500 ] );
-
 		}
 
 		/* Insert our font into the database */

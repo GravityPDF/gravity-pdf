@@ -103,8 +103,6 @@ class TestApiFontsEndpointRoutes extends WP_UnitTestCase {
             'payload' => [],
         ] );
 
-        $res = $request->get_body_params();
-
         /* Test empty font name */
         $response = $this->class->save_font( $request );
 
