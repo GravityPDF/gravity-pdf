@@ -3,7 +3,7 @@
 namespace GFPDF\Api\V1\License;
 
 use GFPDF\Api\V1\Base_Api;
-use GFPDF\Api\V1\Api_License;
+use GFPDF\Api\V1\License\Api_License;
 use GFPDF\Helper\Helper_Data;
 use WP_UnitTestCase;
 use WP_REST_Request;
@@ -79,6 +79,7 @@ class TestApiLicenseEndpointRoutes extends WP_UnitTestCase {
      * 
      */
     public function test_rest_api_license_endpoints() {
+
         $wp_rest_server = rest_get_server();
         do_action( 'rest_api_init' );
 
@@ -93,6 +94,8 @@ class TestApiLicenseEndpointRoutes extends WP_UnitTestCase {
      */
     public function test_rest_api_process_license_deactivation() {
 
+	    $adddon = new Helper_Abstract_Addon();
+
         $request = new WP_REST_Request( \WP_REST_Server::CREATABLE, '/gravity-pdf/v1/flicense/(?P<id>\d+)/deactivate' );
 
         $request->set_body_params( [
@@ -100,17 +103,15 @@ class TestApiLicenseEndpointRoutes extends WP_UnitTestCase {
             'license' => ''            
         ] );
 
-        $res = $request->set_body_params();
+        $res = $request->get_body_params();
 
         /* Test empty required parameters  */
-        $response = $this->class->deactivate_license_key( $request );
-
+        $response = $this->class->deactivate_license_key( $this->data->addon($res['addon_name']), $res['license']  );
 
         if ( is_wp_error( $response ) ) {
             $res = $response->get_error_data( 'required_fields_missing' );
             $this->assertSame( 400, $res['status'] );
         }
-
 
         /* Mock remote request and simulate success */
         $request->set_body_params( [
@@ -130,70 +131,6 @@ class TestApiLicenseEndpointRoutes extends WP_UnitTestCase {
 
         remove_filter( 'pre_http_request', $api_response );
 
-
-
-        // /* set up our post data and role */
-        // $this->_setRole( 'administrator' );
-
-        // /* Check for nonce failure */
-        // try {
-        //     $this->_handleAjax( 'gfpdf_deactivate_license' );
-        // } catch ( WPAjaxDieStopException $e ) {
-        //     /* do nothing (error expected) */
-        // }
-
-        // $this->assertEquals( '401', $e->getMessage() );
-
-        /* Setup a bad request */
-        // $_POST['nonce'] = wp_create_nonce( 'gfpdf_deactivate_license' );
-
-        // try {
-        //     $this->_handleAjax( 'gfpdf_deactivate_license' );
-        // } catch ( WPAjaxDieContinueException $e ) {
-        //     /* do nothing (error expected) */
-        // }
-
-        // $this->assertEquals( 'An error occurred during deactivation, please try again', json_decode( $this->_last_response )->error );
     }
-
-
-	// /**
-	//  * @since 5.2
-	//  */
- //    public function test_process_license_deactivation() {
-
- //        $request = new WP_REST_Request( \WP_REST_Server::CREATABLE, '/gravity-pdf/v1/fonts/save_font' );
-
- //        $request->set_body_params( [
- //            'payload' => [],
- //        ] );
-
- //        /* Test empty font name */
-	//     $response = $this->class->save_font( $request );
-
- //        if ( is_wp_error( $response ) ) {
-	//         $res = $response->get_error_data( 'required_fields_missing' );
- //            $this->assertSame( 400, $res['status'] );
- //        }
-
- //        /* Mock remote request and simulate success */
- //        $request->set_body_params( [
- //            'payload' => 'Test',
- //        ] );
-
- //        $api_response = function() {
- //            return new WP_Error();
- //        };
-
- //        add_filter( 'pre_http_request', $api_response );
-
- //        $response = $this->class->save_font( $request );
-
- //        $this->assertTrue( is_wp_error( $response ) );
-
- //        remove_filter( 'pre_http_request', $api_response );
-
- //    }
-
 
 }

@@ -110,19 +110,23 @@ class Api_License extends Base_Api {
 	 * @since 5.2
 	 */
 	public function process_license_deactivation( \WP_REST_Request $request ) {
+
 		$params = $request->get_json_params();
 
 		/* Get the required details */
-		$addon_slug = ( isset( $params['addon_name'] ) ) ? $params['addon_name'] : '';
-		$license    = ( isset( $params['license'] ) ) ? $params['license'] : '';
-		$addon      = ( isset( $this->data->addon[ $addon_slug ] ) ) ? $this->data->addon[ $addon_slug ] : false;
+		/* do not proceed if these are empty/null */
+		if ( empty( $params['addon_name'] ) || empty( $params['license'] ) ) {
+			return new \WP_Error( 'process_license_deactivation', 'Required Field is missing, please try again', [ 'status' => 400 ] );
+		}
+
+		$addon = $this->data->addon( $params['addon_name'] );
 
 		/* Check add-on currently installed */
 		if ( empty( $addon ) ) {
-			return new \WP_Error( 'process_license_deactivation', 'An error occurred during deactivation, please try again', [ 'status' => 500 ] );
+			return new \WP_Error( 'process_license_deactivation', 'An error occurred during deactivation, please try again', [ 'status' => 404 ] );
 		}
 
-		$was_deactivated = $this->deactivate_license_key( $addon, $license );
+		$was_deactivated = $this->deactivate_license_key( $addon, $params['license'] );
 		
 		if ( ! $was_deactivated ) {
 			$license_info = $addon->get_license_info();
