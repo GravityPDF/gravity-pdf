@@ -144,6 +144,10 @@ class Api_Fonts extends Base_Api {
 		/* Handle the validation and saving of the font */
 		$payload = isset( $params['payload'] ) ? $params : null;
 
+		if (! $payload) {
+			return new \WP_Error( 'required_fields_missing', 'Required fields have not been included', [ 'status' => 400 ] );
+		}
+
 		$results = $this->process_font( $payload );
 
 		/* There was an issue downloading and saving fonts */

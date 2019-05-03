@@ -82,7 +82,7 @@ class TestApiFontsEndpointRoutes extends WP_UnitTestCase {
     /**
      * Test our endpoints are registered correctly
      *
-     * @since 5.2
+     * @since 5.2required_fields_missing
      */
     public function test_rest_api_fonts_endpoints() {
         $wp_rest_server = rest_get_server();
@@ -104,10 +104,10 @@ class TestApiFontsEndpointRoutes extends WP_UnitTestCase {
         ] );
 
         /* Test empty font name */
-        $response = $this->class->save_font( $request );
+	    $response = $this->class->save_font( $request );
 
         if ( is_wp_error( $response ) ) {
-	        $res = $response->get_error_data( 'download_and_save_font' );
+	        $res = $response->get_error_data( 'required_fields_missing' );
             $this->assertSame( 400, $res['status'] );
         }
 
@@ -123,6 +123,7 @@ class TestApiFontsEndpointRoutes extends WP_UnitTestCase {
         add_filter( 'pre_http_request', $api_response );
 
         $response = $this->class->save_font( $request );
+
         $this->assertTrue( is_wp_error( $response ) );
 
         remove_filter( 'pre_http_request', $api_response );
@@ -145,8 +146,8 @@ class TestApiFontsEndpointRoutes extends WP_UnitTestCase {
         $response = $this->class->delete_font( $request );
 
         if ( is_wp_error( $response ) ) {
-            $res = $response->get_error_data( 'download_and_save_font' );
-            $this->assertSame( 400, $res['status'] );
+            $res = $response->get_error_data( 'delete_font' );
+            $this->assertSame( 500, $res['status'] );
         }
 
         /* Mock remote request and simulate success */
