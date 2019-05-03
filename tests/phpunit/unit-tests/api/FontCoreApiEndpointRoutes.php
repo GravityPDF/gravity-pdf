@@ -1,13 +1,11 @@
 <?php
 
 namespace GFPDF\Api\V1\Fonts\Core;
-// GFPDF\Tests\GravityPDF;
 
 use GFPDF\Api\V1\Base_Api;
 use GFPDF\Api\V1\Fonts\Core;
 use WP_UnitTestCase;
 use WP_REST_Request;
-
 use GPDFAPI;
 
 /**

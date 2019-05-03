@@ -2,16 +2,13 @@
 
 namespace GFPDF\Api\V1\Fonts;
 
-
 use GFPDF\Api\V1\Base_Api;
 use GFPDF\Api\V1\Fonts;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Abstract_Options;
-
 use WP_UnitTestCase;
 use WP_REST_Request;
-
 use GPDFAPI;
 
 /**
@@ -62,7 +59,7 @@ class TestApiFontsEndpointRoutes extends WP_UnitTestCase {
 	 */
 	protected $class;
 	/**
-	 * Setup the REST API CORE FONT Endpoints
+	 * Setup the REST API FONT Endpoints
 	 *
 	 * @since 5.2
 	 */
@@ -82,7 +79,7 @@ class TestApiFontsEndpointRoutes extends WP_UnitTestCase {
     /**
      * Test our endpoints are registered correctly
      *
-     * @since 5.2required_fields_missing
+     * @since 5.2
      */
     public function test_rest_api_fonts_endpoints() {
         $wp_rest_server = rest_get_server();
@@ -95,7 +92,7 @@ class TestApiFontsEndpointRoutes extends WP_UnitTestCase {
 	/**
 	 * @since 5.2
 	 */
-    public function test_save_font() {
+    public function test_rest_api_save_font() {
 
         $request = new WP_REST_Request( \WP_REST_Server::CREATABLE, '/gravity-pdf/v1/fonts/save_font' );
 
@@ -134,7 +131,7 @@ class TestApiFontsEndpointRoutes extends WP_UnitTestCase {
     /**
      * @since 5.2
      */
-    public function test_delete_font() {
+    public function test_rest_api_delete_font() {
 
         $request = new WP_REST_Request( \WP_REST_Server::DELETABLE, '/gravity-pdf/v1/fonts/delete_font' );
 
