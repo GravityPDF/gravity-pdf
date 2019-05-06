@@ -5,6 +5,8 @@ namespace GFPDF\Api\V1\License;
 use GFPDF\Api\V1\Base_Api;
 use GFPDF\Api\V1\License\Api_License;
 use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Abstract_Addon;
+
 use WP_UnitTestCase;
 use WP_REST_Request;
 use GPDFAPI;
@@ -94,9 +96,7 @@ class TestApiLicenseEndpointRoutes extends WP_UnitTestCase {
      */
     public function test_rest_api_process_license_deactivation() {
 
-	    $adddon = new Helper_Abstract_Addon();
-
-        $request = new WP_REST_Request( \WP_REST_Server::CREATABLE, '/gravity-pdf/v1/flicense/(?P<id>\d+)/deactivate' );
+        $request = new WP_REST_Request( \WP_REST_Server::CREATABLE, '/gravity-pdf/v1/license/(?P<id>\d+)/deactivate' );
 
         $request->set_body_params( [
             'addon_name' => '',
@@ -106,7 +106,7 @@ class TestApiLicenseEndpointRoutes extends WP_UnitTestCase {
         $res = $request->get_body_params();
 
         /* Test empty required parameters  */
-        $response = $this->class->deactivate_license_key( $this->data->addon($res['addon_name']), $res['license']  );
+        $response = $this->class->deactivate_license_key( $this->data->addon($res['addon_name']), $res['license'] );
 
         if ( is_wp_error( $response ) ) {
             $res = $response->get_error_data( 'required_fields_missing' );
