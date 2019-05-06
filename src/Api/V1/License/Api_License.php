@@ -5,8 +5,8 @@ namespace GFPDF\Api\V1\License;
 use GFPDF\Api\V1\Base_Api;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Abstract_Addon;
-
 use Psr\Log\LoggerInterface;
+use WP_Error;
 
 /**
  * @package     Gravity PDF
@@ -48,20 +48,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Api_License extends Base_Api {
 
 	/**
-	 * Holds our log class
-	 *
-	 * @var \Monolog\Logger
-	 *
-	 * @since 4.0
+	 * @var LoggerInterface
+	 * @since 5.2
 	 */
 	public $log;
 
 	/**
-	 * Holds our Helper_Data object
-	 * which we can autoload with any data needed
-	 *
 	 * @var \GFPDF\Helper\Helper_Data
-	 *
 	 * @since 5.2
 	 */
 	protected $data;
@@ -69,20 +62,17 @@ class Api_License extends Base_Api {
 	/**
 	 * Api_License constructor.
 	 *
-	 * @param Helper_Data $data
+	 * @param LoggerInterface $log
+	 * @param Helper_Data     $data
 	 *
 	 * @since 5.2
 	 */
 	public function __construct( LoggerInterface $log, Helper_Data $data ) {
-		$this->log 	= $log;
+		$this->log  = $log;
 		$this->data = $data;
 	}
 
 	/**
-	 * Register our PDF save font endpoint
-	 *
-	 * @Internal Use this endpoint to save fonts
-	 *
 	 * @since    5.2
 	 */
 	public function register() {
@@ -101,39 +91,36 @@ class Api_License extends Base_Api {
 	}
 
 	/**
-	 * Processes the rest API endpoint
+	 * Processes the REST API endpoint
 	 *
 	 * @param \WP_REST_Request $request
 	 *
-	 * @return array|\WP_Error
+	 * @return array|WP_Error
 	 *
 	 * @since 5.2
 	 */
 	public function process_license_deactivation( \WP_REST_Request $request ) {
-
 		$params = $request->get_json_params();
-
-		/* Get the required details */
-		/* do not proceed if these are empty/null */
-		if ( empty( $params['addon_name'] ) || empty( $params['license'] ) ) {
-			return new \WP_Error( 'process_license_deactivation', 'Required Field is missing, please try again', [ 'status' => 400 ] );
+		if ( ! isset( $params['addon_name'], $params['license'] ) ) {
+			return new WP_Error( 'license_deactivation_fields_missing', 'Required Field is missing, please try again', [ 'status' => 400 ] );
 		}
-
-		$addon = $this->data->addon( $params['addon_name'] );
 
 		/* Check add-on currently installed */
-		if ( empty( $addon ) ) {
-			return new \WP_Error( 'process_license_deactivation', 'An error occurred during deactivation, please try again', [ 'status' => 404 ] );
+		if ( empty( $this->data->addon[ $params['addon_name'] ] ) ) {
+			return new WP_Error( 'license_deactivation_addon_not_found', 'An error occurred during deactivation, please try again', [ 'status' => 404 ] );
 		}
 
+		$addon           = $this->data->addon[ $params['addon_name'] ];
 		$was_deactivated = $this->deactivate_license_key( $addon, $params['license'] );
-		
+
 		if ( ! $was_deactivated ) {
 			$license_info = $addon->get_license_info();
-			return new \WP_Error( 'schedule_license_check', $license_info['message'], [ 'status' => 400 ] );
+
+			return new WP_Error( 'license_deactivation_schedule_license_check', $license_info['message'], [ 'status' => 400 ] );
 		}
 
 		$this->log->addNotice( 'Successfully Deactivated License' );
+
 		return [ 'success' => esc_html__( 'License deactivated.', 'gravity-forms-pdf-extended' ) ];
 	}
 
@@ -147,7 +134,7 @@ class Api_License extends Base_Api {
 	 *
 	 * @since 5.2
 	 */
-	public function deactivate_license_key( Helper_Abstract_Addon $addon, $license_key ) {
+	protected function deactivate_license_key( Helper_Abstract_Addon $addon, $license_key ) {
 		$response = wp_remote_post(
 			$this->data->store_url,
 			[
@@ -161,18 +148,16 @@ class Api_License extends Base_Api {
 			]
 		);
 
-		/* If API error exit early */
-		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
 			return false;
 		}
 
-		/* Get API response and check license is now deactivated */
+		/* Verify license is now deactivated */
 		$license_data = json_decode( wp_remote_retrieve_body( $response ) );
 		if ( ! isset( $license_data->license ) || $license_data->license !== 'deactivated' ) {
 			return false;
 		}
 
-		/* Remove license data from database */
 		$addon->delete_license_info();
 
 		$this->log->addNotice(
