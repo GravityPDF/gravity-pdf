@@ -5,6 +5,7 @@ namespace GFPDF\Api\V1\Pdf\Settings;
 use GFPDF\Api\V1\Base_Api;
 use GFPDF\Helper\Helper_Misc;
 use Psr\Log\LoggerInterface;
+use WP_Error;
 
 /**
  * @package     Gravity PDF
@@ -116,7 +117,7 @@ class Api_Pdf_Settings extends Base_Api {
 	}
 
 	/**
-	 * Create a file in our tmp directory and check if it is publically accessible (i.e no .htaccess protection)
+	 * Create a file in our tmp directory and check if it is publicly accessible (i.e no .htaccess protection)
 	 *
 	 * @param $_POST ['nonce']
 	 *
@@ -124,44 +125,25 @@ class Api_Pdf_Settings extends Base_Api {
 	 *
 	 * @since 5.2
 	 */
-	public function check_tmp_pdf_security( \WP_REST_Request $request ) {
+	public function check_tmp_pdf_security() {
+		/* first create the test file in the tmp directory */		
+		$this->create_public_tmp_directory_test_file();
 
-		/* Create our tmp file and do our actual check */
-		$result =  json_encode( $this->test_public_tmp_directory_access() );
-
-		if (!$result) {
-			return new \WP_Error( 'test_public_tmp_directory_access', 'Unable to create tmp Directory', [ 'status' => 401 ] );
-		}
-
-		return [ 'message' => 'Tmp file successfully created' ];		
-	}
-
-	/**
-	 * Create a file in our tmp directory and verify if it's protected from the public
-	 *
-	 * @return boolean
-	 *
-	 * @since 5.2
-	 */
-	public function test_public_tmp_directory_access() {
-
-		/* create our file */
-		file_put_contents(  $this->template_font_location . $this->tmp_test_file, 'failed-if-read' );
-
-		/* verify it exists */
-		if ( is_file( $this->template_font_location . $this->tmp_test_file ) ) {
-
-			/* Run our test */
+		/* check if tmp directotyr file is publicly accessible */		
+		if ( file_exists( $this->template_font_location . $this->tmp_test_file ) ) {
 			$site_url = $this->misc->convert_path_to_url( $this->template_font_location  );
-
-			if ( $site_url !== false ) {
-
+			
+			/* file found */
+			if ( $site_url !== false ) {			
 				$response = wp_remote_get( $site_url . $this->tmp_test_file );
 
-				if ( ! is_wp_error( $response ) ) {
+				/* Cleanup our test file */
+				@unlink( $this->template_font_location . $this->tmp_test_file );
 
+				if ( ! is_wp_error( $response ) ) {
 					/* Check if the web server responded with a OK status code and we can read the contents of our file, then fail our test */
-					if ( isset( $response['response']['code'] ) && $response['response']['code'] === 200 &&
+					if ( isset( $response['response']['code'] ) && 
+							$response['response']['code'] === 200 &&
 					     isset( $response['body'] ) && $response['body'] === 'failed-if-read'
 					) {
 						$response_object = $response['http_response'];
@@ -174,17 +156,47 @@ class Api_Pdf_Settings extends Base_Api {
 								'response'    => $raw_response->raw,
 							]
 						);
-
-						$this->has_access = false;
+						//@todo which one to return
+						// success but file is publicly accessible 
+						// return [ 'message' => 'Tmp file successfully created but publicly accessible', 'has_access' => true ];		
+						return true;
 					}
+					//@todo which one to return
+					// success and file is secured
+					// return [ 'message' => 'Tmp file successfully created and not publicly accessible', 'has_access' => false ];		
+					return false;
 				}
+				/* Unable to get  url */
+				return new WP_Error( 'wp_remote_get_response', 'Response Error', [ 'status' => 400 ] );			
 			}
+			/* Unable to convert path to url */
+			return new WP_Error( 'convert_path_to_url', 'Unable to find path to convert to url', [ 'status' => 404 ] );			
 		}
+		/* file or directory not created */
+		return new WP_Error( 'create_public_tmp_directory_test_file', 'Tmp directory and test file not found', [ 'status' => 404 ] );
+	}
 
-		/* Cleanup our test file */
-		@unlink( $this->template_font_location . $this->tmp_test_file );
+	/**
+	 * Create a file in our tmp directory
+	 *
+	 * @param $_POST ['nonce']
+	 *
+	 * @return Bool
+	 * @return WP_Error
+	 * 
+	 * @since 5.2
+	 */
+	public function create_public_tmp_directory_test_file() {
+		/* create our file */
+		file_put_contents(  $this->template_font_location . $this->tmp_test_file, 'failed-if-read' );
 
-		return $this->has_access;
+		/* verify it exists */
+		if ( is_file( $this->template_font_location . $this->tmp_test_file ) ) {
+			return true;
+		}	
+
+		return new \WP_Error( 'test_public_tmp_directory_access', 'Unable to create tmp Directory', [ 'status' => 401 ] );
+	
 	}
 
 }

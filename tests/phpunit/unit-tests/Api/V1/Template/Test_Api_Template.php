@@ -1,9 +1,9 @@
 <?php
 
-namespace GFPDF\Api\V1\Template\Core;
+namespace GFPDF\Api\V1\Template;
 
 use GFPDF\Api\V1\Base_Api;
-use GFPDF\Api\V1\Template\Core;
+use GFPDF\Api\V1\Template;
 use WP_UnitTestCase;
 use WP_REST_Request;
 use GPDFAPI;
@@ -41,13 +41,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 */
 
 /**
- * Class TestApiTemplateEndpoint
+ * Class TestApiTemplate
  *
  * @package GFPDF\Tests\GravityPDF
  *
  * @group   REST-API
  */
-class TestApiTemplateEndpointRoutes extends WP_UnitTestCase {
+class TestApiTemplate extends WP_UnitTestCase {
 
 	/**
 	 * @var $class

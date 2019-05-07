@@ -43,13 +43,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 */
 
 /**
- * Class TestApiLicenseEndpoint
+ * Class TestApiLicense
  *
  * @package GFPDF\Tests\GravityPDF
  *
  * @group   REST-API
  */
-class TestApiLicenseEndpointRoutes extends WP_UnitTestCase {
+class TestApiLicense extends WP_UnitTestCase {
 
 	/**
 	 * @var Api_License
