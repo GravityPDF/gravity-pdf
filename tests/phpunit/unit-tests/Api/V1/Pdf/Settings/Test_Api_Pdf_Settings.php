@@ -74,11 +74,7 @@ class TestApiPdfSettings extends WP_UnitTestCase {
 	/**
 	 * @since 5.2
 	 */
-	public function setUp() {
-
-//		$this->template_font_location = 'tmp/gravityforms/fonts/';
-
-		// $this->data  = GPDFAPI::get_data_class();
+	public function setUp() {		
 		$this->class = new Api_Pdf_Settings( GPDFAPI::get_log_class(), GPDFAPI::get_misc_class(), $this->template_font_location );
 		$this->class->init();
 
@@ -96,7 +92,6 @@ class TestApiPdfSettings extends WP_UnitTestCase {
 		$this->assertArrayHasKey( '/gravity-pdf/v1/pdf/settings', $wp_rest_server->get_routes() );
 	}
 
-
 	/**
 	 * @since 5.2
 	 */
@@ -107,7 +102,6 @@ class TestApiPdfSettings extends WP_UnitTestCase {
 
 		/* Test unable to write to  directory */
 		// $this->assertFileExists( $this->template_font_location . $this->tmp_test_file );
-
 	}
 
 	/**
@@ -124,7 +118,6 @@ class TestApiPdfSettings extends WP_UnitTestCase {
 		$this->assertSame( 400, $response->get_error_data( 'wp_remote_get_response' )['status'] );
 
 		// Test able to read the content of file
-
 	}
 
 }
