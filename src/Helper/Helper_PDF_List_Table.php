@@ -288,6 +288,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * @since 4.0
 	 */
 	public function column_shortcode( $item ) {
+		do_action( 'gfpdf_pre_pdf_list_shortcode_column', $item, $this );
 
 		/**
 		 * While esc_attr() used below will ensure no display issues when copied the double quote will cause shortcode parse issues
@@ -300,6 +301,8 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 		/* Display in a readonly field */
 		echo '<input type="text" class="gravitypdf_shortcode" value="' . esc_attr( $shortcode ) . '" readonly="readonly" onfocus="jQuery(this).select();" onclick="jQuery(this).select();" />';
+
+		do_action( 'gfpdf_post_pdf_list_shortcode_column', $item, $this );
 	}
 
 	/**
