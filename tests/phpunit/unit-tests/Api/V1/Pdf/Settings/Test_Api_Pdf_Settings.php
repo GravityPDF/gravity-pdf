@@ -76,7 +76,7 @@ class TestApiPdfSettings extends WP_UnitTestCase {
 	 */
 	public function setUp() {
 
-		$this->template_font_location = plugin_dir_path(__FILE__) . 'tmp/gravityforms/fonts/';
+//		$this->template_font_location = 'tmp/gravityforms/fonts/';
 
 		// $this->data  = GPDFAPI::get_data_class();
 		$this->class = new Api_Pdf_Settings( GPDFAPI::get_log_class(), GPDFAPI::get_misc_class(), $this->template_font_location );
@@ -96,21 +96,35 @@ class TestApiPdfSettings extends WP_UnitTestCase {
 		$this->assertArrayHasKey( '/gravity-pdf/v1/pdf/settings', $wp_rest_server->get_routes() );
 	}
 
+
 	/**
 	 * @since 5.2
 	 */
-	public function test_check_tmp_pdf_security() {
-		
-		/* Test unable to access directory */
-		$response = $this->class->check_tmp_pdf_security();
+	public function test_create_public_tmp_directory_test_file() {
+		/* Test able to write to  directory */
+		$response = $this->class->create_public_tmp_directory_test_file();
+		$this->assertTrue( $response );
 
-		$this->assertSame( 401, $response->get_error_data( 'test_public_tmp_directory_access' )['status'] );
+		/* Test unable to write to  directory */
+		// $this->assertFileExists( $this->template_font_location . $this->tmp_test_file );
 
-		/* Test successful access on directory */
-		// $request  = $this->get_request( [ 'addon_name' => 'test', 'license' => '12345' ] );
-		$response = $this->class->test_public_tmp_directory_access();
-		$this->assertSame( 200, $response->get_error_data( 'test_public_tmp_directory_access' )['status'] );
 	}
 
+	/**
+	 * @since 5.2
+	 */
+	public function test_check_tmp_pdf_security( ) {
+
+		$response = $this->class->check_tmp_pdf_security();
+
+		/* Test unable to conver path to URL */
+		$this->assertSame( 404, $response->get_error_data( 'convert_path_to_url' )['status'] );
+
+		/* Test unable to access generated URL */
+		$this->assertSame( 400, $response->get_error_data( 'wp_remote_get_response' )['status'] );
+
+		// Test able to read the content of file
+
+	}
 
 }

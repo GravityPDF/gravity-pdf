@@ -134,7 +134,7 @@ class Api_Pdf_Settings extends Base_Api {
 			$site_url = $this->misc->convert_path_to_url( $this->template_font_location  );
 			
 			/* file found */
-			if ( $site_url !== false ) {			
+			if ( $site_url !== null ) {
 				$response = wp_remote_get( $site_url . $this->tmp_test_file );
 
 				/* Cleanup our test file */
@@ -166,7 +166,7 @@ class Api_Pdf_Settings extends Base_Api {
 					// return [ 'message' => 'Tmp file successfully created and not publicly accessible', 'has_access' => false ];		
 					return false;
 				}
-				/* Unable to get  url */
+				/* Unable to access  url */
 				return new WP_Error( 'wp_remote_get_response', 'Response Error', [ 'status' => 400 ] );			
 			}
 			/* Unable to convert path to url */
@@ -195,7 +195,7 @@ class Api_Pdf_Settings extends Base_Api {
 			return true;
 		}	
 
-		return new \WP_Error( 'test_public_tmp_directory_access', 'Unable to create tmp Directory', [ 'status' => 401 ] );
+		return new \WP_Error( 'test_public_tmp_directortest_public_tmp_directory_accessy_access', 'Unable to create tmp Directory', [ 'status' => 401 ] );
 	
 	}
 
