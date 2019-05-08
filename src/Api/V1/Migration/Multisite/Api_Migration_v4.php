@@ -113,7 +113,7 @@ class Api_Migration_v4 extends Base_Api {
 			'/migration/multisite/',
 			[
 				'methods'  => \WP_REST_Server::CREATABLE,
-				'callback' => [ $this, 'ajax_multisite_v3_migration' ],
+				'callback' => [ $this, 'multisite_v3_migration' ],
 
 				'permission_callback' => function() {
 					return $this->has_capabilities( 'manage_sites' );
@@ -131,13 +131,13 @@ class Api_Migration_v4 extends Base_Api {
 	 *
 	 * @since 5.2
 	 */
-	public function ajax_multisite_v3_migration( \WP_REST_Request $request ) {		
+	public function multisite_v3_migration( \WP_REST_Request $request ) {		
 		$params = $request->get_json_params();
 
 		/* Ensure multisite website */
 		if ( ! is_multisite() ) {
 
-			return new \WP_Error( 'ajax_multisite_v3_migration', 'You are not authorized to perform this action. Please try again.', [ 'status' => 401 ] );
+			return new \WP_Error( 'multisite_v3_migration', 'You are not authorized to perform this action. Please try again.', [ 'status' => 401 ] );
 		}
 
 		/* Check there's a configuration file to migrate */
