@@ -920,12 +920,16 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	}
 
 	public function api() {
+
+		$test_file_path = $this->data->template_font_location . 'public_tmp_directory_test.txt';
+		$test_file_url  = $this->misc->convert_path_to_url( $test_file_path );
+
 		$apis = [
 			new Api\V1\Fonts\Core\Api_Fonts_Core( $this->log, $this->data->template_font_location ),
 			new Api\V1\Fonts\Api_Fonts( $this->log, $this->misc, $this->data, $this->options ),
 			new Api\V1\License\Api_License( $this->log, $this->data ),
 			new Api\V1\Migration\Multisite\Api_Migration_v4( $this->log, $this->options, $this->data, $this->migration ),
-			new Api\V1\Pdf\Settings\Api_Pdf_Settings( $this->log, $this->misc, $this->data->template_font_location ),
+			new Api\V1\Pdf\Settings\Api_Pdf_Settings( $test_file_path, $test_file_url ),
 			new Api\V1\Security\Tmp\Api_Security_Tmp_Directory( $this->log, $this->misc, $this->data ),
 			new Api\V1\Template\Api_Template( $this->log, $this->misc, $this->data, $this->options, $this->templates ),
 		];

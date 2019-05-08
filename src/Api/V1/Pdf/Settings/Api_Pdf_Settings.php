@@ -3,8 +3,7 @@
 namespace GFPDF\Api\V1\Pdf\Settings;
 
 use GFPDF\Api\V1\Base_Api;
-use GFPDF\Helper\Helper_Misc;
-use Psr\Log\LoggerInterface;
+use GFPDF\Exceptions\GravityPdfRuntimeException;
 use WP_Error;
 
 /**
@@ -45,58 +44,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Api_Pdf_Settings extends Base_Api {
 
 	/**
-	 * Holds our log class
-	 *
-	 * @var \Monolog\Logger
-	 *
-	 * @since 4.0
+	 * @var string
+	 * @since 5.2
 	 */
-	public $log;
+	protected $test_file_path;
 
 	/**
 	 * @var string
-	 *
 	 * @since 5.2
 	 */
-	protected $template_font_location;
-
-	/**
-	 * @var boolean
-	 *
-	 * @since 5.2
-	 */
-	protected $has_access = true;
-
-	/**
-	 * @var string
-	 *
-	 * @since 5.2
-	 */
-	protected $tmp_test_file = 'public_tmp_directory_test.txt';
-
-	/**
-	 * Holds our Helper_Misc object
-	 * Makes it easy to access common methods throughout the plugin
-	 *
-	 * @var \GFPDF\Helper\Helper_Misc
-	 *
-	 * @since 5.2
-	 */
-	protected $misc;
+	protected $test_file_url;
 
 	/**
 	 * Api_Pdf_Settings constructor.
 	 *
-	 * @param Helper_Misc $misc
-	 * 
-	 * @param string $template_font_location The absolute path to the current PDF font directory
-	 *
-	 * @since 5.2
+	 * @param string $test_file_path
+	 * @param string $test_file_url
 	 */
-	public function __construct( LoggerInterface $log, Helper_Misc $misc, $template_font_location ) {	
-		$this->log 	   = $log;			
-		$this->misc    = $misc;
-		$this->template_font_location = $template_font_location;
+	public function __construct( $test_file_path, $test_file_url ) {
+		$this->test_file_path = $test_file_path;
+		$this->test_file_url  = $test_file_url;
 	}
 
 	/**
@@ -107,96 +74,64 @@ class Api_Pdf_Settings extends Base_Api {
 			self::ENTRYPOINT . '/' . self::VERSION,
 			'/pdf/settings/',
 			[
-				'methods'  => \WP_REST_Server::READABLE,
-				'callback' => [ $this, 'check_tmp_pdf_security' ],
+				'methods'             => \WP_REST_Server::READABLE,
+				'callback'            => [ $this, 'check_temporary_pdf_directory_security' ],
 				'permission_callback' => function() {
-					return $this->has_capabilities( 'gravityforms_view_settings' );					
+					return $this->has_capabilities( 'gravityforms_view_settings' );
 				},
 			]
 		);
 	}
 
 	/**
-	 * Create a file in our tmp directory and check if it is publicly accessible (i.e no .htaccess protection)
+	 * Create a test file in the temporary folder and try read its content via a remote GET request
 	 *
-	 * @param $_POST ['nonce']
-	 *
-	 * @return WP_REST_Response
+	 * @return bool|WP_Error
 	 *
 	 * @since 5.2
 	 */
-	public function check_tmp_pdf_security() {
-		/* first create the test file in the tmp directory */		
-		$this->create_public_tmp_directory_test_file();
+	public function check_temporary_pdf_directory_security() {
+		try {
+			$this->create_test_file();
 
-		/* check if tmp directotyr file is publicly accessible */		
-		if ( file_exists( $this->template_font_location . $this->tmp_test_file ) ) {
-			$site_url = $this->misc->convert_path_to_url( $this->template_font_location  );
-			
-			/* file found */
-			if ( $site_url !== null ) {
-				$response = wp_remote_get( $site_url . $this->tmp_test_file );
-
-				/* Cleanup our test file */
-				@unlink( $this->template_font_location . $this->tmp_test_file );
-
-				if ( ! is_wp_error( $response ) ) {
-					/* Check if the web server responded with a OK status code and we can read the contents of our file, then fail our test */
-					if ( isset( $response['response']['code'] ) && 
-							$response['response']['code'] === 200 &&
-					     isset( $response['body'] ) && $response['body'] === 'failed-if-read'
-					) {
-						$response_object = $response['http_response'];
-						$raw_response    = $response_object->get_response_object();
-						$this->log->warning(
-							'PDF temporary directory not protected',
-							[
-								'url'         => $raw_response->url,
-								'status_code' => $raw_response->status_code,
-								'response'    => $raw_response->raw,
-							]
-						);
-						//@todo which one to return
-						// success but file is publicly accessible 
-						// return [ 'message' => 'Tmp file successfully created but publicly accessible', 'has_access' => true ];		
-						return true;
-					}
-					//@todo which one to return
-					// success and file is secured
-					// return [ 'message' => 'Tmp file successfully created and not publicly accessible', 'has_access' => false ];		
-					return false;
-				}
-				/* Unable to access  url */
-				return new WP_Error( 'wp_remote_get_response', 'Response Error', [ 'status' => 400 ] );			
+			if ( $this->test_file_url === false ) {
+				throw new GravityPdfRuntimeException( 'Could not determine the temporary file URL' );
 			}
-			/* Unable to convert path to url */
-			return new WP_Error( 'convert_path_to_url', 'Unable to find path to convert to url', [ 'status' => 404 ] );			
+
+			$response = wp_remote_get( $this->test_file_url );
+
+			if ( is_wp_error( $response ) ) {
+				throw new GravityPdfRuntimeException( 'Remote request for temporary file URL failed' );
+			}
+
+			/* File was successfully accessed over public URL. Test failed */
+			if ( wp_remote_retrieve_response_code( $response ) === 200 && wp_remote_retrieve_response_message( $response ) === 'failed-if-read' ) {
+				return false;
+			}
+
+			return true;
+		} catch ( GravityPdfRuntimeException $e ) {
+			return new WP_Error( 'runtime_error', $e->getMessage(), [ 'status' => 500 ] );
 		}
-		/* file or directory not created */
-		return new WP_Error( 'create_public_tmp_directory_test_file', 'Tmp directory and test file not found', [ 'status' => 404 ] );
 	}
 
 	/**
-	 * Create a file in our tmp directory
+	 * Create the temporary test file
 	 *
-	 * @param $_POST ['nonce']
+	 * @return bool
+	 * @throws GravityPdfRuntimeException
 	 *
-	 * @return Bool
-	 * @return WP_Error
-	 * 
 	 * @since 5.2
 	 */
-	public function create_public_tmp_directory_test_file() {
-		/* create our file */
-		file_put_contents(  $this->template_font_location . $this->tmp_test_file, 'failed-if-read' );
+	protected function create_test_file() {
+		if ( ! is_file( $this->test_file_path ) ) {
+			file_put_contents( $this->test_file_path, 'failed-if-read' );
 
-		/* verify it exists */
-		if ( is_file( $this->template_font_location . $this->tmp_test_file ) ) {
-			return true;
-		}	
+			if ( ! is_file( $this->test_file_path ) ) {
+				throw new GravityPdfRuntimeException( 'Could not create temporary test file' );
+			}
+		}
 
-		return new \WP_Error( 'test_public_tmp_directortest_public_tmp_directory_accessy_access', 'Unable to create tmp Directory', [ 'status' => 401 ] );
-	
+		return true;
 	}
-
 }
