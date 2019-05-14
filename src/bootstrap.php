@@ -9,6 +9,9 @@ use GFPDF\Helper;
 
 use GFPDF_Core;
 
+
+use GFPDF\Plugins\Previewer\API\RegisterPdfViewerAPIEndpoint;
+
 /**
  * Bootstrap / Router Class
  * The bootstrap is loaded on WordPress 'plugins_loaded' functionality
@@ -140,6 +143,17 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 *
 	 * @since 4.0
 	 */
+
+	/**
+	 * Holds our Helper_Migration object
+	 * which we can autoload with any data needed
+	 *
+	 * @var \GFPDF\Helper\Helper_Migration
+	 *
+	 * @since 5.2
+	 */
+	protected $migration;
+
 	public function __call( $name, $arguments ) {
 		trigger_error( sprintf( esc_html__( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ), E_USER_DEPRECATED );
 	}
@@ -217,6 +231,17 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$this->templates
 		);
 
+		/* Set up our migration object */
+		$this->migration = new Helper\Helper_Migration(
+			$this->gform,
+			$this->log,
+			$this->data,
+			$this->options,
+			$this->misc,
+			$this->notices,
+			$this->templates
+		);
+		
 		/* Setup our Singleton object */
 		$this->singleton = new Helper\Helper_Singleton();
 
@@ -232,6 +257,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->template_manager();
 		$this->load_core_font_handler();
 		$this->load_debug();
+		$this->api();
 
 		/* Add localisation support */
 		$this->add_localization_support();
@@ -266,6 +292,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/* Cache our Gravity PDF Settings and register our settings fields with the Options API */
 		add_action( 'init', [ $this, 'init_settings_api' ], 1 );
 		add_action( 'admin_init', [ $this, 'setup_settings_fields' ], 1 );
+
 	}
 
 	/**
@@ -276,6 +303,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @return void
 	 */
 	public function add_filters() {
+
 
 		/* Automatically handle GF noconflict mode */
 		add_filter( 'gform_noconflict_scripts', [ $this, 'auto_noconflict_scripts' ] );
@@ -889,6 +917,34 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$class->init();
 
 		$this->singleton->add_class( $class );
+	}
+
+	public function api() {
+
+		$test_file_path = $this->data->template_font_location . 'public_tmp_directory_test.txt';
+		$test_file_url  = $this->misc->convert_path_to_url( $test_file_path );
+
+		$apis = [
+			new Api\V1\Fonts\Core\Api_Fonts_Core( $this->log, $this->data->template_font_location ),
+			new Api\V1\Fonts\Api_Fonts( $this->log, $this->misc, $this->data, $this->options ),
+			new Api\V1\License\Api_License( $this->log, $this->data ),
+			new Api\V1\Migration\Multisite\Api_Migration_v4( $this->log, $this->options, $this->data, $this->migration ),
+			new Api\V1\Pdf\Settings\Api_Pdf_Settings( $test_file_path, $test_file_url ),
+			new Api\V1\Security\Tmp\Api_Security_Tmp_Directory( $this->log, $this->misc, $this->data ),
+			new Api\V1\Template\Api_Template( $this->log, $this->misc, $this->data, $this->options, $this->templates ),
+		];
+
+		foreach ( $apis as $api ) {
+			$trait = class_uses( $api );
+			if ( isset( $trait['GFPDF\Helper\Helper_Trait_Logger'] ) ) {
+				$api->set_logger( $this->log );
+			}
+
+			$api->init();
+
+			$this->singleton->add_class( $api );
+		}
+
 	}
 
 	/**
