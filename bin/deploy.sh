@@ -10,9 +10,6 @@ if [[ -z "$WP_ORG_PASSWORD" ]]; then
 	exit 1
 fi
 
-# Ensure we use the correct version of Node
-nvm install 10.15
-
 PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 PLUGIN_BUILDS_PATH="$PROJECT_ROOT/tmp/package"
 
