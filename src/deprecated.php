@@ -746,7 +746,7 @@ if ( ! class_exists( 'mPDF' ) ) {
 			$data                = GPDFAPI::get_data_class();
 			$default_font_config = ( new \Mpdf\Config\FontVariables() )->getDefaults();
 
-			$this->mpdf = new \GFPDF\Helper\Helper_PDF(
+			$this->mpdf = new \GFPDF\Helper\Helper_Mpdf(
 				[
 					'fontDir'                => [
 						$data->template_font_location,
