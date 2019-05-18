@@ -230,6 +230,8 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	public function init() {
+		do_action( 'gfpdf_pre_pdf_generation_initilise', $this->mpdf, $this->form, $this->entry, $this->settings, $this );
+
 		$this->set_paper();
 		$this->begin_pdf();
 		$this->set_creator();
