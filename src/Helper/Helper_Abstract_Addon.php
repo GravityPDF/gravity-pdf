@@ -192,7 +192,7 @@ abstract class Helper_Abstract_Addon {
 	 *
 	 * @since 4.2
 	 */
-	final public function get_short_name() {
+	public function get_short_name() {
 		return trim(
 			str_replace(
 				'Gravity PDF',
