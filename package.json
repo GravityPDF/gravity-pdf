@@ -62,7 +62,8 @@
     "underscore": "^1.9.1",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.2.3",
-    "webpack-dev-middleware": "^3.6.0"
+    "webpack-dev-middleware": "^3.6.0",
+    "webpack-merge": "^4.2.1"
   },
   "scripts": {
     "test": "cross-env NODE_ENV=test karma start",
