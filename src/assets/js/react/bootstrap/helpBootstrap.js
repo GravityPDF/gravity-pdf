@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { lazy, Suspense } from 'react'
 import { render } from 'react-dom'
 import { Provider } from 'react-redux'
 import { getStore } from '../store'
-import HelpContainer from '../components/Help/HelpContainer'
+
+const HelpContainer = lazy(() => import('../components/Help/HelpContainer'))
 
 /**
  * @package     Gravity PDF
@@ -40,9 +41,11 @@ export default function helpBootstrap () {
   const store = getStore()
 
   render(
-    <Provider store={store}>
-      <HelpContainer/>
-    </Provider>,
+    <Suspense fallback={<div>Loading...</div>}>
+      <Provider store={store}>
+        <HelpContainer />
+      </Provider>
+    </Suspense>,
     document.getElementById('search-knowledgebase')
   )
 }

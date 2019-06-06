@@ -1,12 +1,11 @@
+import $ from 'jquery'
 import React from 'react'
 import { shallow, mount } from 'enzyme'
-import $ from 'jquery'
-
 import ShowMessage from '../../../../src/assets/js/react/components/ShowMessage'
 
-describe('<ShowMessage />', () => {
+let clock
 
-  let clock
+describe('<ShowMessage />', () => {
 
   beforeEach(() => {
     clock = sinon.useFakeTimers()
@@ -17,7 +16,7 @@ describe('<ShowMessage />', () => {
   })
 
   it('verify the correct html is rendered for messages', () => {
-    const comp = shallow(<ShowMessage text="My Message"/>)
+    const comp = shallow(<ShowMessage text='My Message' />)
     $('#karam-test-container').html(comp.html())
 
     expect($('div.notice').length).to.equal(1)
@@ -26,19 +25,19 @@ describe('<ShowMessage />', () => {
   })
 
   it('verify the correct html is rendered for errors', () => {
-    const comp = shallow(<ShowMessage text="My Error" error={true}/>)
+    const comp = shallow(<ShowMessage text='My Error' error={true} />)
     $('#karam-test-container').html(comp.html())
 
     expect($('div.error').text()).to.equal('My Error')
   })
 
   it('verify the message is dismissed after a delay', () => {
-    const comp = mount(<ShowMessage text="My Message" dismissable={true} delay={100}/>)
+    const comp = mount(<ShowMessage text='My Message' dismissable={true} delay={100} />)
 
     expect(comp.find('div').render().hasClass('inline')).to.be.true
+
     clock.tick(101)
+
     expect(comp.find('div').render().hasClass('inline')).to.be.false
-
   })
-
 })

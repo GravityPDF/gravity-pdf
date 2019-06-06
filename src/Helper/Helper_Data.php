@@ -206,6 +206,8 @@ class Helper_Data {
 				'ajaxNonce'                            => wp_create_nonce( 'gfpdf_ajax_nonce' ),
 				'currentVersion'                       => PDF_EXTENDED_VERSION,
 				'pdfWorkingDir'                        => PDF_TEMPLATE_LOCATION,
+				'pluginUrl'                            => PDF_PLUGIN_URL,
+				'pluginPath'                           => PDF_PLUGIN_DIR,
 				'customFontData'                       => json_encode( $custom_fonts ),
 
 				'spinnerUrl'                           => admin_url( 'images/spinner-2x.gif' ),

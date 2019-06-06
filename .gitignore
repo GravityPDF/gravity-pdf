@@ -30,6 +30,7 @@ node_modules/*
 ## Plugin-specific files:
 *.min.css
 *.min.js
+chunk-*.js
 *.map
 
 # Unit tests

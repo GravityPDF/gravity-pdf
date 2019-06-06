@@ -18,11 +18,11 @@ describe('Reducers templateReducer - ', () => {
 
   describe('SEARCH_TEMPLATES', () => {
     it('check the correct state gets returned when this action runs', () => {
-      let newState = reducer(initialState, {type: SEARCH_TEMPLATES, text: 'New Search Item'})
+      let newState = reducer(initialState, { type: SEARCH_TEMPLATES, text: 'New Search Item' })
 
       expect(newState.search).is.equal('New Search Item')
 
-      newState = reducer(newState, {type: SEARCH_TEMPLATES, text: 'Another Search Item'})
+      newState = reducer(newState, { type: SEARCH_TEMPLATES, text: 'Another Search Item' })
 
       expect(newState.search).is.equal('Another Search Item')
     })
@@ -30,11 +30,11 @@ describe('Reducers templateReducer - ', () => {
 
   describe('SELECT_TEMPLATE', () => {
     it('check the correct state gets returned when this action runs', () => {
-      let newState = reducer(initialState, {type: SELECT_TEMPLATE, id: 'template-id'})
+      let newState = reducer(initialState, { type: SELECT_TEMPLATE, id: 'template-id' })
 
       expect(newState.activeTemplate).is.equal('template-id')
 
-      newState = reducer(newState, {type: SELECT_TEMPLATE, id: 'new-template-id'})
+      newState = reducer(newState, { type: SELECT_TEMPLATE, id: 'new-template-id' })
 
       expect(newState.activeTemplate).is.equal('new-template-id')
     })
@@ -42,11 +42,11 @@ describe('Reducers templateReducer - ', () => {
 
   describe('ADD_TEMPLATE', () => {
     it('check the correct state gets returned when this action runs', () => {
-      let newState = reducer(initialState, {type: ADD_TEMPLATE, template: {id: 'template-id'}})
+      let newState = reducer(initialState, { type: ADD_TEMPLATE, template: { id: 'template-id' } })
 
       expect(newState.list.length).is.equal(4)
 
-      newState = reducer(newState, {type: ADD_TEMPLATE, template: {id: 'template-id1'}})
+      newState = reducer(newState, { type: ADD_TEMPLATE, template: { id: 'template-id1' } })
 
       expect(newState.list.length).is.equal(5)
     })
@@ -54,11 +54,16 @@ describe('Reducers templateReducer - ', () => {
 
   describe('UPDATE_TEMPLATE_PARAM', () => {
     it('check the correct state gets returned when this action runs', () => {
-      let newState = reducer(initialState, {type: UPDATE_TEMPLATE_PARAM, id: 'zadani', name: 'owner', value: 'Wilson'})
+      let newState = reducer(initialState, {
+        type: UPDATE_TEMPLATE_PARAM,
+        id: 'zadani',
+        name: 'owner',
+        value: 'Wilson'
+      })
 
       expect(newState.list[0].owner).is.equal('Wilson')
 
-      newState = reducer(initialState, {type: UPDATE_TEMPLATE_PARAM, id: 'zadani', name: 'owner', value: 'Billy'})
+      newState = reducer(initialState, { type: UPDATE_TEMPLATE_PARAM, id: 'zadani', name: 'owner', value: 'Billy' })
 
       expect(newState.list[0].owner).is.equal('Billy')
     })
@@ -66,11 +71,11 @@ describe('Reducers templateReducer - ', () => {
 
   describe('DELETE_TEMPLATE', () => {
     it('check the correct state gets returned when this action runs', () => {
-      let newState = reducer(initialState, {type: DELETE_TEMPLATE, id: 'zadani'})
+      let newState = reducer(initialState, { type: DELETE_TEMPLATE, id: 'zadani' })
 
       expect(newState.list.length).is.equal(2)
 
-      newState = reducer(newState, {type: DELETE_TEMPLATE, id: 'rubix'})
+      newState = reducer(newState, { type: DELETE_TEMPLATE, id: 'rubix' })
 
       expect(newState.list.length).is.equal(1)
     })
@@ -78,11 +83,11 @@ describe('Reducers templateReducer - ', () => {
 
   describe('UPDATE_SELECT_BOX_SUCCESS', () => {
     it('check the correct state gets returned when this action runs', () => {
-      let newState = reducer(initialState, {type: UPDATE_SELECT_BOX_SUCCESS, payload: 'data'})
+      let newState = reducer(initialState, { type: UPDATE_SELECT_BOX_SUCCESS, payload: 'data' })
 
       expect(newState.updateSelectBoxText).is.equal('data')
 
-      newState = reducer(newState, {type: UPDATE_SELECT_BOX_SUCCESS, payload: 'new-data'})
+      newState = reducer(newState, { type: UPDATE_SELECT_BOX_SUCCESS, payload: 'new-data' })
 
       expect(newState.updateSelectBoxText).is.equal('new-data')
     })
@@ -90,11 +95,11 @@ describe('Reducers templateReducer - ', () => {
 
   describe('TEMPLATE_PROCESSING_SUCCESS', () => {
     it('check the correct state gets returned when this action runs', () => {
-      let newState = reducer(initialState, {type: TEMPLATE_PROCESSING_SUCCESS, payload: 'data'})
+      let newState = reducer(initialState, { type: TEMPLATE_PROCESSING_SUCCESS, payload: 'data' })
 
       expect(newState.templateProcessing).is.equal('data')
 
-      newState = reducer(newState, {type: TEMPLATE_PROCESSING_SUCCESS, payload: 'new-data'})
+      newState = reducer(newState, { type: TEMPLATE_PROCESSING_SUCCESS, payload: 'new-data' })
 
       expect(newState.templateProcessing).is.equal('new-data')
     })
@@ -102,11 +107,11 @@ describe('Reducers templateReducer - ', () => {
 
   describe('TEMPLATE_PROCESSING_FAILED', () => {
     it('check the correct state gets returned when this action runs', () => {
-      let newState = reducer(initialState, {type: TEMPLATE_PROCESSING_FAILED, payload: 'data'})
+      let newState = reducer(initialState, { type: TEMPLATE_PROCESSING_FAILED, payload: 'data' })
 
       expect(newState.templateProcessing).is.equal('data')
 
-      newState = reducer(newState, {type: TEMPLATE_PROCESSING_FAILED, payload: 'new-data'})
+      newState = reducer(newState, { type: TEMPLATE_PROCESSING_FAILED, payload: 'new-data' })
 
       expect(newState.templateProcessing).is.equal('new-data')
     })
@@ -114,11 +119,11 @@ describe('Reducers templateReducer - ', () => {
 
   describe('CLEAR_TEMPLATE_PROCESSING', () => {
     it('check the correct state gets returned when this action runs', () => {
-      let newState = reducer(initialState, {type: CLEAR_TEMPLATE_PROCESSING})
+      let newState = reducer(initialState, { type: CLEAR_TEMPLATE_PROCESSING })
 
       expect(newState.templateProcessing).is.equal('')
 
-      newState = reducer(newState, {type: CLEAR_TEMPLATE_PROCESSING})
+      newState = reducer(newState, { type: CLEAR_TEMPLATE_PROCESSING })
 
       expect(newState.templateProcessing).is.equal('')
     })
@@ -126,13 +131,13 @@ describe('Reducers templateReducer - ', () => {
 
   describe('TEMPLATE_UPLOAD_PROCESSING_SUCCESS', () => {
     it('check the correct state gets returned when this action runs', () => {
-      let test = {data: 'test'}
-      let newtest = {newtest: 'new-test'}
-      let newState = reducer(initialState, {type: TEMPLATE_UPLOAD_PROCESSING_SUCCESS, payload: test})
+      let test = { data: 'test' }
+      let newtest = { newtest: 'new-test' }
+      let newState = reducer(initialState, { type: TEMPLATE_UPLOAD_PROCESSING_SUCCESS, payload: test })
 
       expect(newState.templateUploadProcessingSuccess).is.equal(test)
 
-      newState = reducer(newState, {type: TEMPLATE_UPLOAD_PROCESSING_SUCCESS, payload: newtest})
+      newState = reducer(newState, { type: TEMPLATE_UPLOAD_PROCESSING_SUCCESS, payload: newtest })
 
       expect(newState.templateUploadProcessingSuccess).is.equal(newtest)
     })
@@ -140,13 +145,13 @@ describe('Reducers templateReducer - ', () => {
 
   describe('TEMPLATE_UPLOAD_PROCESSING_FAILED', () => {
     it('check the correct state gets returned when this action runs', () => {
-      let error = {error: 'error'}
-      let newerror = {newerror: 'newerror'}
-      let newState = reducer(initialState, {type: TEMPLATE_UPLOAD_PROCESSING_FAILED, payload: error})
+      let error = { error: 'error' }
+      let newerror = { newerror: 'newerror' }
+      let newState = reducer(initialState, { type: TEMPLATE_UPLOAD_PROCESSING_FAILED, payload: error })
 
       expect(newState.templateUploadProcessingError).is.equal(error)
 
-      newState = reducer(newState, {type: TEMPLATE_UPLOAD_PROCESSING_FAILED, payload: newerror})
+      newState = reducer(newState, { type: TEMPLATE_UPLOAD_PROCESSING_FAILED, payload: newerror })
 
       expect(newState.templateUploadProcessingError).is.equal(newerror)
     })
@@ -154,12 +159,12 @@ describe('Reducers templateReducer - ', () => {
 
   describe('CLEAR_TEMPLATE_UPLOAD_PROCESSING', () => {
     it('check the correct state gets returned when this action runs', () => {
-      let newState = reducer(initialState, {type: CLEAR_TEMPLATE_UPLOAD_PROCESSING})
+      let newState = reducer(initialState, { type: CLEAR_TEMPLATE_UPLOAD_PROCESSING })
 
       expect(newState.templateUploadProcessingSuccess).to.be.eql({})
       expect(newState.templateUploadProcessingError).to.be.eql({})
 
-      newState = reducer(newState, {type: CLEAR_TEMPLATE_UPLOAD_PROCESSING})
+      newState = reducer(newState, { type: CLEAR_TEMPLATE_UPLOAD_PROCESSING })
 
       expect(newState.templateUploadProcessingSuccess).to.be.eql({})
       expect(newState.templateUploadProcessingError).to.be.eql({})
@@ -168,7 +173,7 @@ describe('Reducers templateReducer - ', () => {
 
   describe('Check state gets returned when no actions match', () => {
     it('Check the state does not change when no action matches', () => {
-      let state = reducer(undefined, {type: 'none', id: 'template-id'})
+      let state = reducer(undefined, { type: 'none', id: 'template-id' })
 
       expect(state).is.equal(initialState)
     })
