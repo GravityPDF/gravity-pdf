@@ -63,7 +63,7 @@ export class HelpContainer extends Component {
    */
   onHandleChange = event => {
     // Set loading to true
-    this.setState({searchInput: event.target.value})
+    this.setState({ searchInput: event.target.value })
     // Set searchInput state value
     this.searchInputLength(event.target.value)
   }
@@ -89,7 +89,9 @@ export class HelpContainer extends Component {
    * @since 5.2
    */
   render () {
-    const {searchInput} = this.state
+    const { searchInput } = this.state
+    const { loading, helpResult, error } = this.props
+
     return (
       <>
         <input
@@ -102,9 +104,9 @@ export class HelpContainer extends Component {
         />
         <DisplayResultContainer
           searchInput={this.state.searchInput}
-          loading={this.props.loading}
-          helpResult={this.props.helpResult}
-          error={this.props.error}
+          loading={loading}
+          helpResult={helpResult}
+          error={error}
         />
       </>
     )
@@ -132,4 +134,4 @@ const mapStateToProps = state => ({
  *
  * @since 5.2
  */
-export default connect(mapStateToProps, {getData, deleteResult})(HelpContainer)
+export default connect(mapStateToProps, { getData, deleteResult })(HelpContainer)

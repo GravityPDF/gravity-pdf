@@ -12,6 +12,7 @@ describe('Reducers helpReducer - ', () => {
     let newState = reducer(initialState, { type: GET_DATA })
 
     expect(newState.loading).to.equal(true)
+    expect(newState.error).to.equal('')
   })
 
   describe('RESULT_ERROR', () => {
