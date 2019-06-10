@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React from 'react'
 
 /**
@@ -36,10 +37,19 @@ import React from 'react'
  *
  * @since 5.0
  */
-const CoreFontButton = ({className, callback, text}) => (
-  <button className={className} type="button" onClick={callback}>
+const CoreFontButton = ({ className, callback, text }) => (
+  <button className={className} type='button' onClick={callback}>
     {text}
   </button>
 )
+
+/**
+ *  @since 5.0
+ */
+CoreFontButton.propTypes = {
+  className: PropTypes.string,
+  callback: PropTypes.func,
+  text: PropTypes.string
+}
 
 export default CoreFontButton

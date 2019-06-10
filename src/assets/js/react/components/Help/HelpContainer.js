@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import request from 'superagent'
 import debounce from 'lodash.debounce'
@@ -38,6 +39,16 @@ import DisplayResultContainer from './DisplayResultContainer'
  * @since 5.2
  */
 export class HelpContainer extends Component {
+
+  /**
+   *
+   * @since 5.2
+   */
+  static propTypes = {
+    updateResult: PropTypes.func,
+    deleteResult: PropTypes.func,
+    helpResult: PropTypes.array
+  }
 
   /**
    * Initialize component state

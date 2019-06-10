@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { createStore, combineReducers } from 'redux'
 import templateReducer from '../reducers/templateReducer'
 import coreFontsReducer from '../reducers/coreFontReducer'

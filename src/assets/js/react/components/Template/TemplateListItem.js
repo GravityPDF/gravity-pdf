@@ -1,17 +1,11 @@
-import PropTypes from 'prop-types'
 import React from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { updateTemplateParam } from '../../actions/templates'
-
 import TemplateScreenshot from './TemplateScreenshot'
 import ShowMessage from '../ShowMessage'
-
-import {
-  TemplateDetails,
-  Group
-} from './TemplateListItemComponents'
-
+import { TemplateDetails, Group } from './TemplateListItemComponents'
 import { Name } from './TemplateSingleComponents'
 import TemplateActivateButton from './TemplateActivateButton'
 
@@ -54,13 +48,12 @@ export class TemplateListItem extends React.Component {
    * @since 4.1
    */
   static propTypes = {
+    history: PropTypes.object,
     template: PropTypes.object,
-
     activeTemplate: PropTypes.string,
     updateTemplateParam: PropTypes.func,
-
     activateText: PropTypes.string,
-    templateDetailsText: PropTypes.string,
+    templateDetailsText: PropTypes.string
   }
 
   /**
@@ -113,19 +106,19 @@ export class TemplateListItem extends React.Component {
         data-slug={item['id']}
         tabIndex="150">
 
-        <TemplateScreenshot image={item['screenshot']}/>
-        {item['error'] ? <ShowMessage text={item['error']} error={true}/> : null}
+        <TemplateScreenshot image={item['screenshot']} />
+        {item['error'] ? <ShowMessage text={item['error']} error={true} /> : null}
         {item['message'] ?
           <ShowMessage text={item['message']} dismissableCallback={this.removeMessage} dismissable={true}
-                       delay={12000}/> : null}
+                       delay={12000} /> : null}
 
-        <TemplateDetails label={this.props.templateDetailsText}/>
-        <Group group={item['group']}/>
-        <Name name={item['template']}/>
+        <TemplateDetails label={this.props.templateDetailsText} />
+        <Group group={item['group']} />
+        <Name name={item['template']} />
 
         <div className="theme-actions">
           {!isActiveTemplate && isCompatible ?
-            <TemplateActivateButton template={this.props.template} buttonText={this.props.activateText}/> : null}
+            <TemplateActivateButton template={this.props.template} buttonText={this.props.activateText} /> : null}
         </div>
       </div>
     )

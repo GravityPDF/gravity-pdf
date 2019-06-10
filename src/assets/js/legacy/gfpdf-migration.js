@@ -5,7 +5,6 @@
  */
 
 (function ($) {
-
   function ajax_migration (blog_id, nonce, $container) {
     $container.append('<p>' + GFPDF.migratingSite.replace(/%s/g, blog_id) + ' <img alt="' + GFPDF.spinnerAlt + '" src="' + GFPDF.spinnerUrl + '" class="gfpdf-spinner" style="width:20px;vertical-align: middle;padding-left:5px" /></p>')
 
@@ -16,7 +15,7 @@
       data: {
         'action': 'multisite_v3_migration',
         'nonce': nonce,
-        'blog_id': blog_id,
+        'blog_id': blog_id
       },
       success: function (json) {
         /* Remove the spinner */

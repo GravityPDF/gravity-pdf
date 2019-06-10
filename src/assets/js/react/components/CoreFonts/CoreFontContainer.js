@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import request from 'superagent'
 import Queue from 'promise-queue'
 import promiseReflect from '../../utilities/promiseReflect'
@@ -45,15 +46,44 @@ import { clearRetryList, addToRetryList, addToConsole, clearConsole } from '../.
 export class CoreFontContainer extends React.Component {
 
   /**
+   *
+   * @since 5.0
+   */
+  static propTypes = {
+    location: PropTypes.object,
+    retry: PropTypes.array,
+    clearConsole: PropTypes.func,
+    clearRetryList: PropTypes.func,
+    listUrl: PropTypes.string,
+    error: PropTypes.string,
+    success: PropTypes.string,
+    addToConsole: PropTypes.func,
+    history: PropTypes.object,
+    githubError: PropTypes.string,
+    itemPending: PropTypes.string,
+    itemSuccess: PropTypes.string,
+    itemError: PropTypes.string,
+    addToRetryList: PropTypes.func,
+    buttonClassName: PropTypes.string,
+    buttonText: PropTypes.string,
+    counterText: PropTypes.string,
+    console: PropTypes.object,
+    retryText: PropTypes.string
+  }
+
+  /**
    * Switches to show loaders
    *
    * @type {{ajax: boolean, queueLoaded: boolean}}
    *
    * @since 5.0
    */
-  state = {
-    ajax: false,
-    queueLoaded: false,
+  constructor (props) {
+    super(props)
+    this.state = {
+      ajax: false,
+      queueLoaded: false
+    }
   }
 
   /**
@@ -104,7 +134,7 @@ export class CoreFontContainer extends React.Component {
    */
   startDownloadFonts = async (files = []) => {
     try {
-      this.setState({ajax: true})
+      this.setState({ ajax: true })
       this.props.clearConsole()
       this.props.clearRetryList()
 
@@ -122,7 +152,7 @@ export class CoreFontContainer extends React.Component {
 
       Promise.all(tasks.map(promiseReflect)).then(this.showDownloadCompletedStatus)
 
-      this.setState({queueLoaded: true})
+      this.setState({ queueLoaded: true })
     } catch (error) {
       this.handleGithubApiError(error)
     }
@@ -172,7 +202,7 @@ export class CoreFontContainer extends React.Component {
     const message = errors ? this.props.error.replace('%s', errors) : this.props.success
 
     this.props.addToConsole('completed', status, message)
-    this.setState({ajax: false, queueLoaded: false})
+    this.setState({ ajax: false, queueLoaded: false })
     this.props.history.replace('')
   }
 
@@ -183,12 +213,10 @@ export class CoreFontContainer extends React.Component {
    *
    * @since 5.0
    */
-  handleGithubApiError (error) {
-    this.setState({ajax: false, queueLoaded: false})
+  handleGithubApiError () {
+    this.setState({ ajax: false, queueLoaded: false })
     this.props.addToConsole('completed', 'error', this.props.githubError)
     this.props.history.replace('')
-
-    error && console.warn(error)
   }
 
   /**
@@ -275,16 +303,16 @@ export class CoreFontContainer extends React.Component {
     return (
       <div>
         <Button className={this.props.buttonClassName} callback={this.triggerFontDownload}
-                text={this.props.buttonText}/>
+                text={this.props.buttonText} />
 
-        {this.state.ajax && <Spinner/>}
-        {this.state.queueLoaded && <Counter text={this.props.counterText} queue={this.getQueueLength()}/>}
+        {this.state.ajax && <Spinner />}
+        {this.state.queueLoaded && <Counter text={this.props.counterText} queue={this.getQueueLength()} />}
 
         <CoreFontListResults
           history={this.props.history}
           console={this.props.console}
           retry={this.props.retry}
-          retryText={this.props.retryText}/>
+          retryText={this.props.retryText} />
       </div>
     )
   }
@@ -301,7 +329,7 @@ export class CoreFontContainer extends React.Component {
 const mapStateToProps = (state) => {
   return {
     console: state.coreFonts.console,
-    retry: state.coreFonts.retry,
+    retry: state.coreFonts.retry
   }
 }
 

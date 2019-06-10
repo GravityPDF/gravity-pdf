@@ -59,6 +59,7 @@ script:
    yarn run test:coverage
    ./vendor/bin/phpunit --coverage-clover=tmp/coverage/report-xml/php-coverage1.xml -c tests/phpunit/phpunit.xml.
    ./vendor/bin/phpunit --coverage-clover=tmp/coverage/report-xml/php-coverage2.xml -c tests/phpunit/phpunit.xml.dist --group ajax
+   yarn run lint
   else
    ./vendor/bin/phpunit -c tests/phpunit/phpunit.xml.dist
    ./vendor/bin/phpunit -c tests/phpunit/phpunit.xml.dist --group ajax

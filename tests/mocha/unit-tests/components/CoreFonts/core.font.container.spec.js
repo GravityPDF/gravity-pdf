@@ -21,7 +21,7 @@ describe('<CoreFontContainer />', () => {
 
     mock.post('/saveCoreFont', (req) => {
       return {
-        body: true,
+        body: true
       }
     })
   })
@@ -35,7 +35,7 @@ describe('<CoreFontContainer />', () => {
       <CoreFontContainer
         history={History}
         location={History.location}
-        listUrl="/githubList"
+        listUrl='/githubList'
 
         console={consoleList}
         retry={retry}
@@ -51,9 +51,9 @@ describe('<CoreFontContainer />', () => {
     mock.get('/githubList', (req) => {
       return {
         body: [
-          {name: 'file1'},
-          {name: 'file2'},
-        ],
+          { name: 'file1' },
+          { name: 'file2' }
+        ]
       }
     })
 
@@ -61,7 +61,7 @@ describe('<CoreFontContainer />', () => {
       <CoreFontContainer
         history={History}
         location={History.location}
-        listUrl="/githubList"
+        listUrl='/githubList'
 
         console={consoleList}
         retry={retry}
@@ -79,24 +79,24 @@ describe('<CoreFontContainer />', () => {
     GFPDF.ajaxUrl = '/font'
     GFPDF.ajaxNonce = ''
     mock.post('/font', (req) => {
-      return {body: true}
+      return { body: true }
     })
 
     const comp = mount(
       <CoreFontContainer
         history={History}
         location={History.location}
-        listUrl="/githubList"
+        listUrl='/githubList'
 
         console={consoleList}
         retry={retry}
 
-        itemPending="Pending: %s"
-        itemSuccess="Success: %s"
-        itemError="Error: %s"
+        itemPending='Pending: %s'
+        itemSuccess='Success: %s'
+        itemError='Error: %s'
 
         addToConsole={(name, status, message) => {
-          consoleList = {...consoleList, [name]: {status, message}}
+          consoleList = { ...consoleList, [name]: { status, message } }
         }}
         clearConsole={() => null}
         addToRetryList={() => null}
@@ -112,14 +112,14 @@ describe('<CoreFontContainer />', () => {
     expect(consoleList['Item 1'].status).to.equal('success')
 
     mock.post('/font', (req) => {
-      return {body: false}
+      return { body: false }
     })
 
     await instance.downloadFontsApiCall('Item 1')
     expect(consoleList['Item 1'].status).to.equal('error')
 
     mock.post('/font', (req) => {
-      return {body: true}
+      return { body: true }
     })
 
     consoleList = {}
@@ -136,20 +136,20 @@ describe('<CoreFontContainer />', () => {
       <CoreFontContainer
         history={History}
         location={History.location}
-        listUrl="/githubList"
+        listUrl='/githubList'
 
         console={consoleList}
         retry={retry}
 
-        success="Complete"
-        error="Complete Error: %s"
-        itemPending="Pending: %s"
-        itemSuccess="Success: %s"
-        itemError="Error: %s"
-        gitHubError="GitHub Error"
+        success='Complete'
+        error='Complete Error: %s'
+        itemPending='Pending: %s'
+        itemSuccess='Success: %s'
+        itemError='Error: %s'
+        gitHubError='GitHub Error'
 
         addToConsole={(name, status, message) => {
-          consoleList = {...consoleList, [name]: {status, message}}
+          consoleList = { ...consoleList, [name]: { status, message } }
         }}
         clearConsole={() => null}
         addToRetryList={() => null}
@@ -192,7 +192,7 @@ describe('<CoreFontContainer />', () => {
 
     consoleList = {}
 
-    comp.setProps({...comp.props(), retry: ['Item 1', 'Item 2']})
+    comp.setProps({ ...comp.props(), retry: ['Item 1', 'Item 2'] })
     instance.showDownloadCompletedStatus()
     expect(consoleList['completed'].status).to.equal('error')
     expect(consoleList['completed'].message).to.equal('Complete Error: 2')

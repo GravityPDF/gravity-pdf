@@ -1,5 +1,5 @@
-import PropTypes from 'prop-types'
 import React from 'react'
+import PropTypes from 'prop-types'
 import { withRouter } from 'react-router-dom'
 
 /**
@@ -41,6 +41,7 @@ export class TemplateCloseDialog extends React.Component {
    * @since 4.1
    */
   static propTypes = {
+    history: PropTypes.object,
     closeRoute: PropTypes.string
   }
 
@@ -91,12 +92,12 @@ export class TemplateCloseDialog extends React.Component {
   render () {
     return (
       <button
-        className="close dashicons dashicons-no"
-        tabIndex="142"
+        className='close dashicons dashicons-no'
+        tabIndex='142'
         onClick={this.closeDialog}
         onKeyDown={this.handleKeyPress}
-        aria-label="close">
-        <span className="screen-reader-text">Close dialog</span>
+        aria-label='close'>
+        <span className='screen-reader-text'>Close dialog</span>
       </button>
     )
   }

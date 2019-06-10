@@ -100,10 +100,10 @@ export default function (state = initialState, action) {
      *
      * @since 4.1
      */
-    case UPDATE_TEMPLATE_PARAM:
+    case UPDATE_TEMPLATE_PARAM: {
       const updatedList = state.list.map(item => {
-        if (item.id == action.id) {
-          return {...item, [action.name]: action.value}
+        if (item.id === action.id) {
+          return { ...item, [action.name]: action.value }
         }
         return item
       })
@@ -111,18 +111,20 @@ export default function (state = initialState, action) {
         ...state,
         list: updatedList
       }
+    }
 
     /**
      * Remove template from List
      *
      * @since 4.1
      */
-    case DELETE_TEMPLATE:
+    case DELETE_TEMPLATE: {
       const list = state.list.filter(item => item.id !== action.id)
       return {
         ...state,
         list: [...list]
       }
+    }
   }
 
   /* None of these actions fired so return state */

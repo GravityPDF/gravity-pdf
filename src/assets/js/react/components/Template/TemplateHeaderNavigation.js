@@ -1,5 +1,5 @@
-import PropTypes from 'prop-types'
 import React from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
@@ -45,9 +45,9 @@ export class TemplateHeaderNavigation extends React.Component {
   static propTypes = {
     templates: PropTypes.array.isRequired,
     templateIndex: PropTypes.number.isRequired,
+    history: PropTypes.object,
     isFirst: PropTypes.bool,
     isLast: PropTypes.bool,
-
     showPreviousTemplateText: PropTypes.string,
     showNextTemplateText: PropTypes.string
   }

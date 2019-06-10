@@ -1,5 +1,5 @@
 import React from 'react'
-
+import PropTypes from 'prop-types'
 import ListSpacer from './CoreFontListSpacer'
 
 /**
@@ -37,6 +37,17 @@ import ListSpacer from './CoreFontListSpacer'
 export default class CoreFontListResults extends React.Component {
 
   /**
+   *
+   * @since 5.0
+   */
+  static propTypes = {
+    console: PropTypes.object,
+    retry: PropTypes.array,
+    retryText: PropTypes.string,
+    history: PropTypes.object,
+  }
+
+  /**
    * @returns {*}
    *
    * @since 5.0
@@ -52,8 +63,8 @@ export default class CoreFontListResults extends React.Component {
           <div key={key} className={'gfpdf-core-font-status-' + console[key].status}>
             {console[key].message}
             {' '}
-            {key === 'completed' && retry && <Retry history={this.props.history} retryText={this.props.retryText}/>}
-            {key === 'completed' && <ListSpacer/>}
+            {key === 'completed' && retry && <Retry history={this.props.history} retryText={this.props.retryText} />}
+            {key === 'completed' && <ListSpacer />}
           </div>
         )}
       </div>
@@ -65,6 +76,15 @@ export default class CoreFontListResults extends React.Component {
  * @since 5.0
  */
 class Retry extends React.Component {
+
+  /**
+   *
+   * @since 5.0
+   */
+  static propTypes = {
+    history: PropTypes.object,
+    retryText: PropTypes.string
+  }
 
   /**
    * Update the navigation history when the retry link is selected

@@ -1,5 +1,5 @@
-import PropTypes from 'prop-types'
 import React from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { addTemplate, deleteTemplate } from '../../actions/templates'
 import { withRouter } from 'react-router-dom'
@@ -47,12 +47,11 @@ export class TemplateDeleteButton extends React.Component {
   static propTypes = {
     ajaxUrl: PropTypes.string,
     ajaxNonce: PropTypes.string,
-
     template: PropTypes.object,
     addTemplate: PropTypes.func,
+    history: PropTypes.object,
     onTemplateDelete: PropTypes.func,
     callbackFunction: PropTypes.func,
-
     buttonText: PropTypes.string,
     templateConfirmDeleteText: PropTypes.string,
     templateDeleteErrorText: PropTypes.string,
@@ -100,7 +99,7 @@ export class TemplateDeleteButton extends React.Component {
    * @since 4.1
    */
   ajaxFailed = () => {
-    const errorTemplate = {...this.props.template, 'error': this.props.templateDeleteErrorText}
+    const errorTemplate = { ...this.props.template, 'error': this.props.templateDeleteErrorText }
     this.props.addTemplate(errorTemplate)
   }
 
@@ -114,9 +113,9 @@ export class TemplateDeleteButton extends React.Component {
     return (
       <a
         onClick={callback}
-        href="#"
-        tabIndex="150"
-        className="button button-secondary delete-theme">
+        href='#'
+        tabIndex='150'
+        className='button button-secondary delete-theme'>
         {this.props.buttonText}
       </a>
     )

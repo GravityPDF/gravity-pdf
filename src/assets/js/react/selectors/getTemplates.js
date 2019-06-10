@@ -52,14 +52,16 @@ export const searchTemplates = (term, templates) => {
    * Escape the term string for RegExp meta characters
    * Consider spaces as word delimiters and match the whole string
    */
+
+  /* eslint-disable */
   term = term.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
   term = term.replace(/ /g, ')(?=.*')
 
   const match = new RegExp('^(?=.*' + term + ').+', 'i')
+  /* eslint-enable */
 
   /* Filter through the templates. Any templates return "true" in out match.test() statement will be included */
   const results = templates.filter((template) => {
-
     /* Do very basic HTML tag removal from the fields we are interested in */
     const name = template.template.replace(/(<([^>]+)>)/ig, '')
     const description = template.description.replace(/(<([^>]+)>)/ig, '')
@@ -93,7 +95,6 @@ export const searchTemplates = (term, templates) => {
 export const sortTemplates = (templates, activeTemplate) => {
   /* Sort out template list using our comparator function */
   return templates.sort((a, b) => {
-
     /* Shift new templates to the bottom (only on install) */
     if (a['new'] === true && a['new'] === true) {
       return 0 //equal
@@ -155,13 +156,15 @@ export const addCompatibilityCheck = (templates) => {
     const requiredVersion = template['required_pdf_version']
     if (versionCompare(requiredVersion, GFPDF.currentVersion, '>')) {
       /* Not compatible, so let's mark it */
-      return {...template,
+      return {
+        ...template,
         'compatible': false,
         'error': GFPDF.requiresGravityPdfVersion.replace(/%s/g, requiredVersion),
-        'long_error': GFPDF.templateNotCompatibleWithGravityPdfVersion.replace(/%s/g, requiredVersion)}
+        'long_error': GFPDF.templateNotCompatibleWithGravityPdfVersion.replace(/%s/g, requiredVersion)
+      }
     }
     /* If versionCompare() passed we'll mark as true */
-    return {...template, 'compatible': true}
+    return { ...template, 'compatible': true }
   })
 }
 
@@ -171,12 +174,11 @@ export const addCompatibilityCheck = (templates) => {
  * @since 4.1
  */
 export default createSelector([getTemplates, getSearch, getActiveTemplate], (templates, search, activeTemplate) => {
-    templates = addCompatibilityCheck(templates)
+  templates = addCompatibilityCheck(templates)
 
-    if (search) {
-      templates = searchTemplates(search, templates)
-    }
-
-    return sortTemplates(templates, activeTemplate)
+  if (search) {
+    templates = searchTemplates(search, templates)
   }
-)
+
+  return sortTemplates(templates, activeTemplate)
+})

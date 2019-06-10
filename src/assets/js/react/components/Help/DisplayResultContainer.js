@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import Spinner from '../Spinner'
 import DisplayResultItem from './DisplayResultItem'
 import DisplayResultEmpty from './DisplayResultEmpty'
@@ -39,37 +40,46 @@ import DisplayResultEmpty from './DisplayResultEmpty'
  *
  * @since 5.2
  */
-const DisplayResultContainer = ({searchInput, loading, helpResult}) => {
-
+const DisplayResultContainer = ({ searchInput, loading, helpResult }) => {
   if (searchInput.length <= 3) {
     return null
   }
 
-  const displayLoading = loading ? <div style={{float: 'right'}}><Spinner/></div> : null
+  const displayLoading = loading ? <div style={{ float: 'right' }}><Spinner /></div> : null
   const showEmptyResults = helpResult.length === 0 && !loading
   const searchResults = helpResult.map((item, index) => (
-    <DisplayResultItem item={item} key={index}/>
+    <DisplayResultItem item={item} key={index} />
   ))
 
   return (
     <div id='search-results'>
       <div id='dashboard_primary' className='metabox-holder'>
-        <div id='documentation-api' className='postbox' style={{display: 'block'}}>
+        <div id='documentation-api' className='postbox' style={{ display: 'block' }}>
           <h3 className='hndle'>
             <span>{GFPDF.searchResultHeadingText}</span>
             {displayLoading}
           </h3>
 
-          <div className='inside rss-widget' style={{display: 'block'}}>
+          <div className='inside rss-widget' style={{ display: 'block' }}>
             <ul className='searchParseHTML'>
               {searchResults}
-              {showEmptyResults && <DisplayResultEmpty/>}
+              {showEmptyResults && <DisplayResultEmpty />}
             </ul>
           </div>
         </div>
       </div>
     </div>
   )
+}
+
+/**
+ *
+ * @since 5.2
+ */
+DisplayResultContainer.propTypes = {
+  searchInput: PropTypes.string,
+  loading: PropTypes.bool,
+  helpResult: PropTypes.array
 }
 
 export default DisplayResultContainer

@@ -1,5 +1,5 @@
-import PropTypes from 'prop-types'
 import React from 'react'
+import PropTypes from 'prop-types'
 
 /**
  * Render the button used to option our Fancy PDF template selector
@@ -40,6 +40,7 @@ class TemplateButton extends React.Component {
    * @since 4.1
    */
   static propTypes = {
+    history: PropTypes.object,
     buttonText: PropTypes.string,
   }
 
@@ -53,7 +54,6 @@ class TemplateButton extends React.Component {
   handleClick = (e) => {
     e.preventDefault()
     e.stopPropagation()
-
     this.props.history.push('/template')
   }
 
@@ -63,9 +63,9 @@ class TemplateButton extends React.Component {
   render () {
     return (
       <button
-        type="button"
-        id="fancy-template-selector"
-        className="button gfpdf-button"
+        type='button'
+        id='fancy-template-selector'
+        className='button gfpdf-button'
         onClick={this.handleClick}
         ref={node => this.button = node}
       >

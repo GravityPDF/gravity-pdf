@@ -1,5 +1,5 @@
-import PropTypes from 'prop-types'
 import React from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { selectTemplate } from '../../actions/templates'
 import { withRouter } from 'react-router-dom'
@@ -45,6 +45,7 @@ export class TemplateActivateButton extends React.Component {
    */
   static propTypes = {
     template: PropTypes.object,
+    history: PropTypes.object,
     onTemplateSelect: PropTypes.func,
     buttonText: PropTypes.string,
   }
@@ -59,7 +60,6 @@ export class TemplateActivateButton extends React.Component {
   selectTemplate = (e) => {
     e.preventDefault()
     e.stopPropagation()
-
     this.props.history.push('')
     this.props.onTemplateSelect(this.props.template.id)
   }
@@ -71,9 +71,9 @@ export class TemplateActivateButton extends React.Component {
     return (
       <a
         onClick={this.selectTemplate}
-        href="#"
-        tabIndex="150"
-        className="button button-primary activate">
+        href='#'
+        tabIndex='150'
+        className='button button-primary activate'>
         {this.props.buttonText}
       </a>
     )

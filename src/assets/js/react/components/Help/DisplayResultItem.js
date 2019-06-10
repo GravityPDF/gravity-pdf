@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 /**
  * @package     Gravity PDF
@@ -35,13 +36,21 @@ import React from 'react'
  *
  * @since 5.2
  */
-const DisplayResultItem = ({item}) => {
+const DisplayResultItem = ({ item }) => {
   return (
-    <li className="resultExist">
+    <li className='resultExist'>
       <a href={item.link}>{item.title.rendered}</a>
-      <div dangerouslySetInnerHTML={{__html: item.excerpt.rendered}}/>
+      <div dangerouslySetInnerHTML={{ __html: item.excerpt.rendered }} />
     </li>
   )
+}
+
+/**
+ *
+ * @since 5.2
+ */
+DisplayResultItem.propTypes = {
+  item: PropTypes.object
 }
 
 export default DisplayResultItem
