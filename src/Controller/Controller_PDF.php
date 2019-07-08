@@ -317,7 +317,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 			remove_action( 'shutdown', [ $minifier, 'end_html_minifier_buffer' ] );
 
 			while ( ob_get_level() > 0 ) {
-				ob_end_flush();
+				ob_end_clean();
 			}
 		}
 	}
