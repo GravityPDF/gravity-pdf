@@ -1,0 +1,42 @@
+version: '3.1'
+
+services:
+
+  wordpress:
+    image: wordpress:5.2-php7.2
+    restart: always
+    ports:
+      - 8888:80
+    environment:
+      WORDPRESS_DB_HOST: mysql
+      WORDPRESS_DB_PASSWORD: example
+      WORDPRESS_DEBUG: 1
+    volumes:
+      - wordpress_data:/var/www/html
+      - ../:/var/www/html/wp-content/plugins/gravity-forms-pdf-extended
+      - ./mu-plugins:/var/www/html/wp-content/mu-plugins
+    depends_on:
+      - mysql
+
+  cli:
+    image: wordpress:cli
+    restart: always
+    user: xfs
+    volumes:
+      - wordpress_data:/var/www/html
+      - ../:/var/www/html/wp-content/plugins/gravity-forms-pdf-extended
+    depends_on:
+      - mysql
+      - wordpress
+    entrypoint: wp
+    command: "--info"
+
+  mysql:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: wordpress_test
+
+volumes:
+  wordpress_data:
