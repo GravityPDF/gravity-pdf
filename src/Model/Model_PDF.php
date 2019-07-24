@@ -2,38 +2,28 @@
 
 namespace GFPDF\Model;
 
-use GFPDF\Helper\Helper_Abstract_Model;
-use GFPDF\Helper\Helper_Interface_Url_Signer;
-use GFPDF\Helper\Helper_PDF;
-
-use GFPDF\Helper\Helper_Abstract_Fields;
-use GFPDF\Helper\Helper_Abstract_Field_Products;
+use Exception;
+use GF_Field;
+use GFCommon;
+use GFFormsModel;
 use GFPDF\Helper\Fields\Field_Default;
 use GFPDF\Helper\Fields\Field_Products;
-
+use GFPDF\Helper\Helper_Abstract_Field_Products;
+use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Interface_Url_Signer;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
-use GFPDF\Helper\Helper_Sha256_Url_Signer;
+use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Templates;
-
-use Spatie\UrlSigner\Exceptions\InvalidSignatureKey;
-
-use Psr\Log\LoggerInterface;
-
-use GFFormsModel;
-use GFCommon;
-use GF_Field;
 use GFQuiz;
-use GFSurvey;
-use GFPolls;
 use GFResults;
-
+use Psr\Log\LoggerInterface;
+use Spatie\UrlSigner\Exceptions\InvalidSignatureKey;
 use WP_Error;
-
-use Exception;
 
 /**
  * @package     Gravity PDF
@@ -965,19 +955,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		if ( $this->process_and_save_pdf( $pdf_generator ) ) {
 			$pdf_path = $pdf_generator->get_full_pdf_path();
-
 			if ( is_file( $pdf_path ) ) {
-
-				/* Add appropriate filters so developers can access the PDF when it is generated */
-				$form     = $this->gform->get_form( $entry['form_id'] );
-				$filename = basename( $pdf_path );
-
-				do_action( 'gfpdf_post_pdf_save', $form['id'], $entry['id'], $settings, $pdf_path ); /* Backwards compatibility */
-
-				/* See https://gravitypdf.com/documentation/v5/gfpdf_post_save_pdf/ for more details about these actions */
-				do_action( 'gfpdf_post_save_pdf', $pdf_path, $filename, $settings, $entry, $form );
-				do_action( 'gfpdf_post_save_pdf_' . $form['id'], $pdf_path, $filename, $settings, $entry, $form );
-
 				return $pdf_path;
 			}
 		}
@@ -1130,6 +1108,32 @@ class Model_PDF extends Helper_Abstract_Model {
 					$this->generate_and_save_pdf( $entry, $settings );
 				}
 			}
+		}
+	}
+
+	/**
+	 * Trigger Post PDF Generation Action
+	 *
+	 * @param array      $form     The Gravity Form
+	 * @param array      $entry    The Gravity Form Entry
+	 * @param array      $settings The Gravity PDF Settings
+	 * @param Helper_PDF $pdf      The Helper_PDF object
+	 *
+	 * @since 5.2
+	 */
+	public function trigger_post_save_pdf( $form, $entry, $settings, $pdf ) {
+		$pdf_path = $pdf->get_full_pdf_path();
+
+		if ( is_file( $pdf_path ) ) {
+			/* Add appropriate filters so developers can access the PDF when it is generated */
+			$form     = $this->gform->get_form( $entry['form_id'] );
+			$filename = basename( $pdf_path );
+
+			do_action( 'gfpdf_post_pdf_save', $form['id'], $entry['id'], $settings, $pdf_path ); /* Backwards compatibility */
+
+			/* See https://gravitypdf.com/documentation/v5/gfpdf_post_save_pdf/ for more details about these actions */
+			do_action( 'gfpdf_post_save_pdf', $pdf_path, $filename, $settings, $entry, $form );
+			do_action( 'gfpdf_post_save_pdf_' . $form['id'], $pdf_path, $filename, $settings, $entry, $form );
 		}
 	}
 

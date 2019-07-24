@@ -2,18 +2,14 @@
 
 namespace GFPDF\Tests;
 
+use Exception;
 use GFPDF\Controller\Controller_PDF;
+use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Url_Signer;
 use GFPDF\Model\Model_PDF;
 use GFPDF\View\View_PDF;
-use GFPDF\Helper\Helper_PDF;
-
-use GFForms;
-
 use GPDFAPI;
 use WP_UnitTestCase;
-
-use Exception;
 
 /**
  * Any slow PDF-generation related tests should be included here. By default, this is excluded from the usual tests
@@ -76,7 +72,6 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		$this->view  = new View_PDF( [], $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
 
 		$this->controller = new Controller_PDF( $this->model, $this->view, $gfpdf->gform, $gfpdf->log, $gfpdf->misc );
-		$this->controller->init();
 
 		$fonts = glob( dirname( __FILE__ ) . '/fonts/' . '*.[tT][tT][fF]' );
 		$fonts = ( is_array( $fonts ) ) ? $fonts : [];
@@ -344,12 +339,15 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 			unlink( $filename );
 		}
 
+		$this->assertSame( 1, did_action( 'gfpdf_post_save_pdf' ) );
+
 		$settings['template'] = 'doesntexist';
 
 		/* Trigger an error */
 		$error = $this->model->generate_and_save_pdf( $entry, $settings );
 
 		$this->assertTrue( is_wp_error( $error ) );
+		$this->assertSame( 1, did_action( 'gfpdf_post_save_pdf' ) );
 	}
 
 	/**
