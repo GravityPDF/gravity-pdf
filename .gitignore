@@ -32,7 +32,6 @@ node_modules/*
 *.min.js
 *.map
 
-
 # Unit tests
 /tmp
 /tests/bin/
@@ -42,4 +41,7 @@ _notes
 _notes/*
 Thumbs.db
 *.pot
+
+# Environment File
+.env
 

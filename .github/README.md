@@ -19,6 +19,15 @@ Before beginning, ensure you have [Git](https://git-scm.com/), [Composer](https:
 1. Open your terminal / command prompt to the Gravity PDF root directory and run `composer install`. This command will automatically download all the PHP and JS packages, and run the build tools.
 1. Copy the plugin to your WordPress plugin directory (if not there already) and active through your WordPress admin area
 
+# Setup Local Docker Environment
+
+A test site with Gravity PDF pre-configured can be automatically be built locally if you've Docker installed on available via the CLI. To setup:
+
+1. Start Docker. Note: if running Local By Flywheel (or you need to start Docker manually), first run `docker-machine start`, then `eval $(docker-machine env)`.
+1. Copy `.env.example` to `.env` and replace `0000000000000000` with a valid Elite license key in `.env`
+1. Run `./bin/setup-local-env.sh` from the command line
+1. Access test site at `http://localhost:8888`, or the domain shown in the CLI if different. The username is `admin` and the password is `password`
+
 # Documentation
 
 All documentation can be found at [https://gravitypdf.com/documentation/](https://gravitypdf.com/documentation/).
