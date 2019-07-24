@@ -2,27 +2,20 @@
 
 namespace GFPDF\Tests;
 
+use Exception;
+use GF_Field;
+use GFCache;
 use GFPDF\Controller\Controller_PDF;
+use GFPDF\Helper\Fields\Field_Products;
+use GFPDF\Helper\Helper_Field_Container;
+use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Url_Signer;
 use GFPDF\Model\Model_PDF;
 use GFPDF\Plugins\DeveloperToolkit\Loader\Helper;
 use GFPDF\View\View_PDF;
-use GFPDF\Helper\Helper_PDF;
-use GFPDF\Helper\Fields\Field_Products;
-use GFPDF\Helper\Helper_Field_Container;
-
-use GFAPI;
-use GFFormsModel;
-use GF_Field;
-use GFForms;
-use GFCache;
-
-use WP_UnitTestCase;
-use WP_Error;
-use WP_Rewrite;
-
-use Exception;
 use ReflectionMethod;
+use WP_Error;
+use WP_UnitTestCase;
 
 /**
  * Test Gravity PDF Endpoint Functionality
@@ -1957,7 +1950,24 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertRegExp( '/\<p style="page-break-inside: avoid"\>\<\/p\>/', $html );
 		$this->assertRegExp( '/\<barcode code="04210000526" type="UPCE" \/\>/', $html );
 
-		do_action( 'gfpdf_post_pdf_generation' );
+		do_action(
+			'gfpdf_post_pdf_generation',
+			[],
+			[],
+			[],
+			new Helper_PDF(
+				[
+					'id'      => 1,
+					'form_id' => 1,
+				],
+				[],
+				\GPDFAPI::get_form_class(),
+				\GPDFAPI::get_data_class(),
+				\GPDFAPI::get_misc_class(),
+				\GPDFAPI::get_templates_class(),
+				\GPDFAPI::get_log_class()
+			)
+		);
 
 		/* Verify they are stripped out at all other times */
 		$html = wp_kses_post( $html );
