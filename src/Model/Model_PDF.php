@@ -1316,6 +1316,14 @@ class Model_PDF extends Helper_Abstract_Model {
 		$user_fonts = glob( $this->data->template_font_location . '*.[tT][tT][fF]' );
 		$user_fonts = ( is_array( $user_fonts ) ) ? $user_fonts : [];
 
+		$flattened_fonts_array = [];
+		array_walk_recursive(
+			$fonts,
+			function( $val ) use ( &$array ) {
+				$array[] = $val;
+			}
+		);
+
 		foreach ( $user_fonts as $font ) {
 
 			/* Get font shortname */
@@ -1323,7 +1331,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			$short_name = $this->options->get_font_short_name( substr( $font_name, 0, -4 ) );
 
 			/* Check if it exists already, otherwise add it */
-			if ( ! isset( $fonts[ $short_name ] ) && ! $this->misc->in_array( $font_name, $fonts ) ) {
+			if ( ! isset( $fonts[ $short_name ] ) && array_search( $font_name, $flattened_fonts_array, true ) === false ) {
 				$fonts[ $short_name ] = [
 					'R' => $font_name,
 				];
