@@ -619,7 +619,7 @@ class Helper_PDF {
 		$default_font_config = ( new FontVariables() )->getDefaults();
 
 		$this->mpdf = new Helper_Mpdf(
-			array_filters( 'gfpdf_mpdf_class_config', [
+			apply_filters( 'gfpdf_mpdf_class_config', [
 				'fontDir'                => [
 					$this->data->template_font_location,
 				],
