@@ -619,7 +619,7 @@ class Helper_PDF {
 		$default_font_config = ( new FontVariables() )->getDefaults();
 
 		$this->mpdf = new Helper_Mpdf(
-			[
+			array_filters( 'gfpdf_mpdf_class_config', [
 				'fontDir'                => [
 					$this->data->template_font_location,
 				],
@@ -645,7 +645,7 @@ class Helper_PDF {
 
 				'format'                 => $this->paper_size,
 				'orientation'            => $this->orientation,
-			]
+			], $this->form, $this->entry, $this->settings, $this )
 		);
 
 		$this->mpdf->setLogger( $this->log );
