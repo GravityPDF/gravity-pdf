@@ -301,11 +301,6 @@ class Helper_PDF {
 
 		do_action( 'gfpdf_pre_pdf_generation_output', $this->mpdf, $form, $this->entry, $this->settings, $this );
 
-		/* If a developer decides to disable all security protocols we don't want the PDF indexed */
-		if ( ! headers_sent() ) {
-			header( 'X-Robots-Tag: noindex, nofollow', true );
-		}
-
 		switch ( $this->output ) {
 			case 'DISPLAY':
 				$this->prevent_caching();

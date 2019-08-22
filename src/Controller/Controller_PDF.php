@@ -212,6 +212,8 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 			return null;
 		}
 
+		$this->prevent_index();
+
 		$pid    = $GLOBALS['wp']->query_vars['pid'];
 		$lid    = (int) $GLOBALS['wp']->query_vars['lid'];
 		$action = ( ( isset( $GLOBALS['wp']->query_vars['action'] ) ) && $GLOBALS['wp']->query_vars['action'] === 'download' ) ? 'download' : 'view';
@@ -249,6 +251,8 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		if ( empty( $_GET['gf_pdf'] ) || empty( $_GET['fid'] ) || empty( $_GET['lid'] ) || empty( $_GET['template'] ) ) {
 			return null;
 		}
+
+		$this->prevent_index();
 
 		$config = [
 			'lid'      => (int) explode( ',', $_GET['lid'] )[0],
@@ -301,6 +305,17 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	public function remove_pre_pdf_hooks() {
 		remove_filter( 'wp_kses_allowed_html', [ $this->view, 'allow_pdf_html' ] );
 		remove_filter( 'safe_style_css', [ $this->view, 'allow_pdf_css' ] );
+	}
+
+	/**
+	 * Prevent the PDF Endpoints being indexed
+	 *
+	 * @since 5.2
+	 */
+	public function prevent_index() {
+		if ( ! headers_sent() ) {
+			header( 'X-Robots-Tag: noindex, nofollow', true );
+		}
 	}
 
 	/**
