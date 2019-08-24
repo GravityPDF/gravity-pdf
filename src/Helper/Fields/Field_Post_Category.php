@@ -170,28 +170,10 @@ class Field_Post_Category extends Helper_Abstract_Fields {
 
 		/* Loop through standardised array and convert the label / value to their appropriate category */
 		foreach ( $items as &$val ) {
+			$cat = explode( ':', $val['label'] );
 
-			/* Process the category label */
-			if ( isset( $val['label'] ) ) {
-				$val['label'] = GFCommon::prepare_post_category_value( $val['label'], $this->field );
-
-				if ( is_array( $val['label'] ) ) {
-					$val['label'] = ( isset( $val['label'][0] ) ) ? $val['label'][0] : '';
-				}
-
-				$val['label'] = esc_html( $val['label'] );
-			}
-
-			/* process the category value */
-			if ( isset( $val['value'] ) ) {
-				$val['value'] = GFCommon::prepare_post_category_value( $val['value'], $this->field, 'conditional_logic' );
-
-				if ( is_array( $val['value'] ) ) {
-					$val['value'] = ( isset( $val['value'][0] ) ) ? $val['value'][0] : '';
-				}
-
-				$val['value'] = esc_html( $val['value'] );
-			}
+			$val['label'] = count( $cat ) > 0 ? esc_html( $cat[0] ) : '';
+			$val['value'] = count( $cat ) > 1 ? $cat[1] : $cat[0];
 		}
 
 		/**
