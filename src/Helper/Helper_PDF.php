@@ -619,33 +619,40 @@ class Helper_PDF {
 		$default_font_config = ( new FontVariables() )->getDefaults();
 
 		$this->mpdf = new Helper_Mpdf(
-			apply_filters( 'gfpdf_mpdf_class_config', [
-				'fontDir'                => [
-					$this->data->template_font_location,
+			apply_filters(
+				'gfpdf_mpdf_class_config',
+				[
+					'fontDir'                => [
+						$this->data->template_font_location,
+					],
+
+					'fontdata'               => apply_filters( 'mpdf_font_data', $default_font_config['fontdata'] ),
+
+					'tempDir'                => $this->data->mpdf_tmp_location,
+
+					'curlCaCertificate'      => ABSPATH . WPINC . '/certificates/ca-bundle.crt',
+
+					'allow_output_buffering' => true,
+					'autoLangToFont'         => true,
+					'useSubstitutions'       => true,
+					'ignore_invalid_utf8'    => true,
+					'setAutoTopMargin'       => 'stretch',
+					'setAutoBottomMargin'    => 'stretch',
+					'enableImports'          => true,
+					'use_kwt'                => true,
+					'keepColumns'            => true,
+					'biDirectional'          => true,
+					'showWatermarkText'      => true,
+					'showWatermarkImage'     => true,
+
+					'format'                 => $this->paper_size,
+					'orientation'            => $this->orientation,
 				],
-
-				'fontdata'               => apply_filters( 'mpdf_font_data', $default_font_config['fontdata'] ),
-
-				'tempDir'                => $this->data->mpdf_tmp_location,
-
-				'curlCaCertificate'      => ABSPATH . WPINC . '/certificates/ca-bundle.crt',
-
-				'allow_output_buffering' => true,
-				'autoLangToFont'         => true,
-				'useSubstitutions'       => true,
-				'ignore_invalid_utf8'    => true,
-				'setAutoTopMargin'       => 'stretch',
-				'setAutoBottomMargin'    => 'stretch',
-				'enableImports'          => true,
-				'use_kwt'                => true,
-				'keepColumns'            => true,
-				'biDirectional'          => true,
-				'showWatermarkText'      => true,
-				'showWatermarkImage'     => true,
-
-				'format'                 => $this->paper_size,
-				'orientation'            => $this->orientation,
-			], $this->form, $this->entry, $this->settings, $this )
+				$this->form,
+				$this->entry,
+				$this->settings,
+				$this
+			)
 		);
 
 		$this->mpdf->setLogger( $this->log );
