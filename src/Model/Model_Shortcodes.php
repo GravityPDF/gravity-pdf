@@ -91,10 +91,10 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 		$attributes = apply_filters( 'gfpdf_gravityforms_shortcode_attributes', $attributes );
 
 		try {
-			$entry_id = $this->get_entry_id_if_empty( $attributes['entry'] );
+			$attributes['entry'] = $this->get_entry_id_if_empty( $attributes['entry'] );
 
 			/* Do PDF validation */
-			$this->get_pdf_config( $entry_id, $attributes['id'] );
+			$this->get_pdf_config( $attributes['entry'], $attributes['id'] );
 
 			$pdf               = GPDFAPI::get_mvc_class( 'Model_PDF' );
 			$download          = $attributes['type'] === 'download';
