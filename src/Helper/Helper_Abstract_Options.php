@@ -1201,23 +1201,23 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			}
 		}
 
-		/* check for errors */
-		if ( count( get_settings_errors() ) === 0 ) {
+		$settings_errors = get_settings_errors();
+		if ( count( $settings_errors ) === 0 ) {
 			/* Merge our new settings with the existing */
 			$output = array_merge( $gfpdf_options, $input );
 			add_settings_error( 'gfpdf-notices', '', esc_html__( 'Settings updated.', 'gravity-forms-pdf-extended' ), 'updated' );
+		} elseif ( count( $settings_errors ) === 1 && settings_errors[0]['setting'] === 'gfpdf-notices' && $settings_errors[0]['type'] === 'updated' ) {
+			/* Merge our new settings with the existing, but without the update message (prevents saving issue) */
+			$output = array_merge( $gfpdf_options, $input );
 		} else {
 			/* error is thrown. store the user data in a transient so fields are remembered */
 			set_transient( 'gfpdf_settings_user_data', array_merge( $gfpdf_options, $input ), 30 );
-
-			/* return nothing */
 
 			return [];
 		}
 
 		return $output;
 	}
-
 
 	/**
 	 * Sanitize text / textarea fields
