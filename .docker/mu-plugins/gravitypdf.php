@@ -23,6 +23,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 add_action(
 	'init',
 	function() {
+
+		if ( ! class_exists( 'GFForms' ) || ! class_exists( 'GPDFAPI' ) ) {
+			return;
+		}
+
 		include __DIR__ . '/src/Add_On_Bootstrap.php';
 
 		$name = 'Gravity PDF Core Booster';
@@ -126,3 +131,8 @@ add_filter(
 	10,
 	3
 );
+
+/* Override mPDF configuration to use the Core fonts */
+add_filter( 'gfpdf_mpdf_class_config', function( $config ) {
+	return ['mode' => 'c'];
+} );
