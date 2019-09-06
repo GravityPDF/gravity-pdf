@@ -4,7 +4,14 @@ import {
   ADD_TEMPLATE,
   UPDATE_TEMPLATE_PARAM,
   DELETE_TEMPLATE,
-} from '../actionTypes/templates'
+  UPDATE_SELECT_BOX_SUCCESS,
+  TEMPLATE_PROCESSING_SUCCESS,
+  TEMPLATE_PROCESSING_FAILED,
+  CLEAR_TEMPLATE_PROCESSING,
+  TEMPLATE_UPLOAD_PROCESSING_SUCCESS,
+  TEMPLATE_UPLOAD_PROCESSING_FAILED,
+  CLEAR_TEMPLATE_UPLOAD_PROCESSING
+} from '../actions/templates'
 
 /**
  * Our Redux Template Reducer that take the objects returned from our Redux Template Actions
@@ -47,6 +54,10 @@ export const initialState = {
   list: GFPDF.templateList,
   activeTemplate: GFPDF.activeTemplate || GFPDF.activeDefaultTemplate,
   search: '',
+  updateSelectBoxText: '',
+  templateProcessing: '',
+  templateUploadProcessingSuccess: {},
+  templateUploadProcessingError: {}
 }
 
 /**
@@ -60,7 +71,6 @@ export const initialState = {
  * @since 4.1
  */
 export default function (state = initialState, action) {
-
   switch (action.type) {
     /**
      * Update the search key
@@ -102,7 +112,7 @@ export default function (state = initialState, action) {
      */
     case UPDATE_TEMPLATE_PARAM:
       const updatedList = state.list.map(item => {
-        if (item.id == action.id) {
+        if (item.id === action.id) {
           return {...item, [action.name]: action.value}
         }
         return item
@@ -122,6 +132,84 @@ export default function (state = initialState, action) {
       return {
         ...state,
         list: [...list]
+      }
+
+    /**
+     * Update the new Select Box DOM data
+     *
+     * @since 5.2
+     */
+    case UPDATE_SELECT_BOX_SUCCESS:
+      return {
+        ...state,
+        updateSelectBoxText: action.payload
+      }
+
+    /**
+     * Remove the PDF template automatically
+     *
+     * @since 5.2
+     */
+    case TEMPLATE_PROCESSING_SUCCESS:
+      return {
+        ...state,
+        templateProcessing: action.payload
+      }
+
+    /**
+     * Fires Re-add template to our list and display an appropriate inline error message
+     *
+     * @since 5.2
+     */
+    case TEMPLATE_PROCESSING_FAILED:
+      return {
+        ...state,
+        templateProcessing: action.payload
+      }
+
+    /**
+     * Clear/reset the templateProcessing state
+     *
+     * @since 5.2
+     */
+    case CLEAR_TEMPLATE_PROCESSING:
+      return {
+        ...state,
+        templateProcessing: ''
+      }
+
+    /**
+     * Update with the new PDF template details
+     *
+     * @since 5.2
+     */
+    case TEMPLATE_UPLOAD_PROCESSING_SUCCESS:
+      return {
+        ...state,
+        templateUploadProcessingSuccess: action.payload
+      }
+
+    /**
+     * Update/Show error
+     *
+     * @since 5.2
+     */
+    case TEMPLATE_UPLOAD_PROCESSING_FAILED:
+      return {
+        ...state,
+        templateUploadProcessingError: action.payload
+      }
+
+    /**
+     * Clear/reset state of templateUploadProcessingSuccess & templateUploadProcessingError
+     *
+     * @since 5.2
+     */
+    case CLEAR_TEMPLATE_UPLOAD_PROCESSING:
+      return {
+        ...state,
+        templateUploadProcessingSuccess: {},
+        templateUploadProcessingError: {}
       }
   }
 

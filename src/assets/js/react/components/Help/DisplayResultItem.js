@@ -37,7 +37,7 @@ import React from 'react'
  */
 const DisplayResultItem = ({item}) => {
   return (
-    <li className="resultExist">
+    <li className='resultExist'>
       <a href={item.link}>{item.title.rendered}</a>
       <div dangerouslySetInnerHTML={{__html: item.excerpt.rendered}}/>
     </li>

@@ -1,9 +1,8 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import { connect } from 'react-redux'
-import { addTemplate, deleteTemplate } from '../../actions/templates'
+import { addTemplate, deleteTemplate, templateProcessing, clearTemplateProcessing } from '../../actions/templates'
 import { withRouter } from 'react-router-dom'
-import request from 'superagent'
 
 /**
  * Renders a delete button which then queries our server and
@@ -45,17 +44,29 @@ export class TemplateDeleteButton extends React.Component {
    * @since 4.1
    */
   static propTypes = {
-    ajaxUrl: PropTypes.string,
-    ajaxNonce: PropTypes.string,
-
     template: PropTypes.object,
     addTemplate: PropTypes.func,
     onTemplateDelete: PropTypes.func,
     callbackFunction: PropTypes.func,
+    templateProcessing: PropTypes.func,
+    clearTemplateProcessing: PropTypes.func,
+    getTemplateProcessing: PropTypes.string,
 
     buttonText: PropTypes.string,
     templateConfirmDeleteText: PropTypes.string,
     templateDeleteErrorText: PropTypes.string,
+  }
+
+  /**
+   * Fires appropriate action based on Redux store data
+   *
+   * @param {Object} nextProps
+   *
+   * @since 4.1
+   */
+  componentWillReceiveProps (nextProps) {
+    nextProps.getTemplateProcessing === 'success' && this.props.history.push('/template')
+    nextProps.getTemplateProcessing === 'failed' && this.ajaxFailed()
   }
 
   /**
@@ -72,24 +83,13 @@ export class TemplateDeleteButton extends React.Component {
   deleteTemplate = (e) => {
     e.preventDefault()
     e.stopPropagation()
-
     if (window.confirm(this.props.templateConfirmDeleteText)) {
 
-      const templateId = this.props.template.id
-
       /* POST the PDF template to our endpoint for processing */
-      request
-        .post(this.props.ajaxUrl)
-        .field('action', 'gfpdf_delete_template')
-        .field('nonce', this.props.ajaxNonce)
-        .field('id', templateId)
-        .then(
-          () => { /* success. Leave blank */},
-          this.ajaxFailed
-        )
+      this.props.templateProcessing(this.props.template.id)
 
-      this.props.history.push('/template')
-      this.props.onTemplateDelete(templateId)
+      this.props.getTemplateProcessing === 'success' && this.props.history.push('/template')
+      this.props.onTemplateDelete(this.props.template.id)
     }
   }
 
@@ -102,6 +102,9 @@ export class TemplateDeleteButton extends React.Component {
   ajaxFailed = () => {
     const errorTemplate = {...this.props.template, 'error': this.props.templateDeleteErrorText}
     this.props.addTemplate(errorTemplate)
+
+    this.props.history.push('/template')
+    this.props.clearTemplateProcessing()
   }
 
   /**
@@ -124,15 +127,27 @@ export class TemplateDeleteButton extends React.Component {
 }
 
 /**
+ * Map Redux state to props
+ *
+ * @param state
+ * @returns {{getTemplateProcessing: String}}
+ *
+ * @since 5.2
+ */
+const mapStateToProps = state => ({
+  getTemplateProcessing: state.template.templateProcessing
+})
+
+/**
  * Map actions to props
  *
  * @param {func} dispatch Redux dispatcher
  *
- * @returns {{addTemplate: (function(template)), onTemplateDelete: (function(id=string))}}
+ * @returns {{addTemplate: (function(template)), onTemplateDelete: (function(id=string)), templateProcessing: (function(templateId=string)), clearTemplateProcessingValue: (function())}}
  *
  * @since 4.1
  */
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
     addTemplate: (template) => {
       dispatch(addTemplate(template))
@@ -140,6 +155,14 @@ const mapDispatchToProps = (dispatch) => {
 
     onTemplateDelete: (id) => {
       dispatch(deleteTemplate(id))
+    },
+
+    templateProcessing: (templateId) => {
+      dispatch(templateProcessing(templateId))
+    },
+
+    clearTemplateProcessing: () => {
+      dispatch(clearTemplateProcessing())
     }
   }
 }
@@ -149,4 +172,4 @@ const mapDispatchToProps = (dispatch) => {
  *
  * @since 4.1
  */
-export default withRouter(connect(null, mapDispatchToProps)(TemplateDeleteButton))
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(TemplateDeleteButton))

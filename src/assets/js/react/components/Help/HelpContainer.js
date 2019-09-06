@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import request from 'superagent'
 import debounce from 'lodash.debounce'
-import { updateResult, deleteResult } from '../../actions/help'
+import { deleteResult, getData } from '../../actions/help'
 import DisplayResultContainer from './DisplayResultContainer'
 
 /**
@@ -49,8 +48,7 @@ export class HelpContainer extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      searchInput: '',
-      loading: false
+      searchInput: ''
     }
 
     this.searchInputLength = debounce(this.searchInputLength, 400)
@@ -65,7 +63,7 @@ export class HelpContainer extends Component {
    */
   onHandleChange = event => {
     // Set loading to true
-    this.setState({ searchInput: event.target.value })
+    this.setState({searchInput: event.target.value})
     // Set searchInput state value
     this.searchInputLength(event.target.value)
   }
@@ -75,33 +73,14 @@ export class HelpContainer extends Component {
    *
    * @since 5.2
    */
-  searchInputLength = async data => {
+  searchInputLength = data => {
     if (data.length > 3) {
-      /* Set loading to true */
-      this.setState({ loading: true })
       /* Request API call */
-      let result = await this.fetchData(data)
-      /* Pass data into redux action */
-      this.props.updateResult(result)
-      /* Set loading to false */
-      this.setState({ loading: false })
+      this.props.getData(data)
     } else {
       /* Call deleteResult into Redux Action */
       this.props.deleteResult()
     }
-  }
-
-  /**
-   * Do AJAX call
-   *
-   * @param searchInput
-   *
-   * @since 5.2
-   */
-  fetchData = async (searchInput) => {
-    let res = await request.get(`https://gravitypdf.com/wp-json/wp/v2/v5_docs/?search=${searchInput}`)
-    let data = await res.body
-    return data
   }
 
   /**
@@ -110,7 +89,7 @@ export class HelpContainer extends Component {
    * @since 5.2
    */
   render () {
-    const { searchInput } = this.state
+    const {searchInput} = this.state
     return (
       <>
         <input
@@ -123,8 +102,9 @@ export class HelpContainer extends Component {
         />
         <DisplayResultContainer
           searchInput={this.state.searchInput}
-          loading={this.state.loading}
+          loading={this.props.loading}
           helpResult={this.props.helpResult}
+          error={this.props.error}
         />
       </>
     )
@@ -135,12 +115,14 @@ export class HelpContainer extends Component {
  * Map Redux state to props
  *
  * @param state
- * @returns {{helpResult: (object)}}
+ * @returns {{loading: Boolean, helpResult: (object), error: String}}
  *
  * @since 5.2
  */
 const mapStateToProps = state => ({
-  helpResult: state.help.results
+  loading: state.help.loading,
+  helpResult: state.help.results,
+  error: state.help.error
 })
 
 /**
@@ -150,4 +132,4 @@ const mapStateToProps = state => ({
  *
  * @since 5.2
  */
-export default connect(mapStateToProps, { updateResult, deleteResult })(HelpContainer)
+export default connect(mapStateToProps, {getData, deleteResult})(HelpContainer)

@@ -1,6 +1,8 @@
 import React from 'react'
-
-import { createStore, combineReducers } from 'redux'
+import { composeWithDevTools } from 'redux-devtools-extension'
+import { createStore, combineReducers, applyMiddleware } from 'redux'
+import createSagaMiddleware from 'redux-saga'
+import rootSaga from '../sagas'
 import templateReducer from '../reducers/templateReducer'
 import coreFontsReducer from '../reducers/coreFontReducer'
 import helpReducer from '../reducers/helpReducer'
@@ -35,8 +37,22 @@ import helpReducer from '../reducers/helpReducer'
 /* Combine our Redux Reducers */
 const reducers = setupReducers()
 
-/* Create our store and enable the Redux dev tools, if they exist */
-const store = createStore(reducers, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
+/* Initialize Saga Middleware */
+const sagaMiddleware = createSagaMiddleware()
+const middlewares = [sagaMiddleware,]
+const middlewareEnhancer = applyMiddleware(...middlewares)
+const enhancers = [middlewareEnhancer,]
+/* Initialize Redux dev tools */
+const composedEnhancers = composeWithDevTools(...enhancers)
+
+/* Create our store and enable composedEnhancers */
+const store = createStore(
+  reducers,
+  composedEnhancers
+)
+
+/* Run Saga Middleware */
+sagaMiddleware.run(rootSaga)
 
 export function getStore () {
   return store

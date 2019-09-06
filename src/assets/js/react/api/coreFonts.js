@@ -1,6 +1,6 @@
+import request from 'superagent'
+
 /**
- * Our Redux Action Type Constants
- *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2019, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -27,5 +27,32 @@
  Found
  */
 
-export const UPDATE_RESULTS = 'UPDATE_RESULTS'
-export const DELETE_RESULTS = 'DELETE_RESULTS'
+/**
+ * Do AJAX call
+ *
+ * @returns {{method.get}}
+ *
+ * @since 5.2
+ */
+export function apiGetFilesFromGitHub () {
+  return request
+    .get(GFPDF.coreFontListUrl)
+    .accept('application/vnd.github.v3+json')
+    .type('json')
+}
+
+/**
+ * Do AJAX call
+ *
+ * @param file
+ * @returns {{method.post}}
+ *
+ * @since 5.2
+ */
+export function apiPostDownloadFonts (file) {
+  return request
+    .post(GFPDF.ajaxUrl)
+    .field('action', 'gfpdf_save_core_font')
+    .field('nonce', GFPDF.ajaxNonce)
+    .field('font_name', file)
+}
