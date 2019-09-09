@@ -9,11 +9,11 @@ const modeConfig = PROD ? production : development
 module.exports = webpackMerge(
   {
     entry: {
+      'app.bundle': './src/assets/js/react/gfpdf-main.js',
       'gfpdf-backbone': './src/assets/js/legacy/gfpdf-backbone.js',
       'gfpdf-entries': './src/assets/js/legacy/gfpdf-entries.js',
       'gfpdf-migration': './src/assets/js/legacy/gfpdf-migration.js',
-      'gfpdf-settings': './src/assets/js/legacy/gfpdf-settings.js',
-      'app.bundle': './src/assets/js/react/gfpdf-main.js'
+      'admin': './src/assets/js/admin/bootstrap.js'
     },
     output: {
       path: __dirname + '/dist/assets/js/',

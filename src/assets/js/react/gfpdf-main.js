@@ -41,14 +41,12 @@ import helpBootstrap from './bootstrap/helpBootstrap'
  * @since 4.1
  */
 $(function () {
-
   'use strict'
 
   __webpack_public_path__ = GFPDF.pluginUrl + 'dist/assets/js/'
 
   /* Initialise the Fancy Template Picker */
   if (GFPDF.templateList !== undefined) {
-
     // To add to window
     if (!window.Promise) {
       window.Promise = Promise
@@ -73,5 +71,4 @@ $(function () {
   if ($('#search-knowledgebase').length) {
     helpBootstrap()
   }
-
 })
