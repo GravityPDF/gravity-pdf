@@ -1,10 +1,13 @@
-import React from 'react'
+import { all } from 'redux-saga/effects'
+import { watchGetResults } from './help'
+import { watchUpdateSelectBox, watchTemplateProcessing, watchpostTemplateUploadProcessing } from './templates'
+import { watchGetFilesFromGitHub, watchDownloadFonts } from './coreFonts'
 
 /**
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2019, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       5.0
+ * @since       5.2
  */
 
 /*
@@ -28,18 +31,17 @@ import React from 'react'
  */
 
 /**
- * Displays the button that initialises the Core Font download
+ * Generator function that watch all the watcher sagas and run them in parallel
  *
- * @param string className
- * @param func callback
- * @param string text
- *
- * @since 5.0
+ * @since 5.2
  */
-const CoreFontButton = ({className, callback, text}) => (
-  <button className={className} type='button' onClick={callback}>
-    {text}
-  </button>
-)
-
-export default CoreFontButton
+export default function * rootSaga () {
+  yield all([
+    watchGetResults(),
+    watchUpdateSelectBox(),
+    watchTemplateProcessing(),
+    watchpostTemplateUploadProcessing(),
+    watchGetFilesFromGitHub(),
+    watchDownloadFonts()
+  ])
+}

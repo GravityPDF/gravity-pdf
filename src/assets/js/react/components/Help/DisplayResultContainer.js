@@ -2,6 +2,7 @@ import React from 'react'
 import Spinner from '../Spinner'
 import DisplayResultItem from './DisplayResultItem'
 import DisplayResultEmpty from './DisplayResultEmpty'
+import DisplayError from './DisplayError'
 
 /**
  * @package     Gravity PDF
@@ -36,20 +37,22 @@ import DisplayResultEmpty from './DisplayResultEmpty'
  * @param searchInput (string)
  * @param loading (boolean)
  * @param helpResult (object)
+ * @param error (string)
  *
  * @since 5.2
  */
-const DisplayResultContainer = ({searchInput, loading, helpResult}) => {
+const DisplayResultContainer = ({searchInput, loading, helpResult, error}) => {
 
   if (searchInput.length <= 3) {
     return null
   }
 
   const displayLoading = loading ? <div style={{float: 'right'}}><Spinner/></div> : null
-  const showEmptyResults = helpResult.length === 0 && !loading
+  const showEmptyResults = helpResult.length === 0 && !loading && error === ''
   const searchResults = helpResult.map((item, index) => (
     <DisplayResultItem item={item} key={index}/>
   ))
+  const displayError = error
 
   return (
     <div id='search-results'>
@@ -64,6 +67,7 @@ const DisplayResultContainer = ({searchInput, loading, helpResult}) => {
             <ul className='searchParseHTML'>
               {searchResults}
               {showEmptyResults && <DisplayResultEmpty/>}
+              {!!displayError && <DisplayError displayError={displayError}/>}
             </ul>
           </div>
         </div>

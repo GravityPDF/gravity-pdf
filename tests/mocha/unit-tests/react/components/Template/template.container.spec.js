@@ -1,15 +1,17 @@
 import React from 'react'
 import { shallow } from 'enzyme'
-
 import TemplateContainer from '../../../../../../src/assets/js/react/components/Template/TemplateContainer'
 
 describe('<TemplateContainer />', () => {
 
   it('the container renders correctly', () => {
-    const comp = shallow(<TemplateContainer
-      header="Header Prop"
-      footer="Footer Prop"
-      children="Children Prop"/>, {disableLifecycleMethods: true})
+    const comp = shallow(
+      <TemplateContainer
+        header='Header Prop'
+        footer='Footer Prop'
+        children='Children Prop'
+      />, { disableLifecycleMethods: true }
+    )
 
     expect(comp.find('div.theme-backdrop')).to.have.length(1)
     expect(comp.find('div.theme-wrap')).to.have.length(1)

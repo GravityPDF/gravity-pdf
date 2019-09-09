@@ -3,11 +3,10 @@ import { mount } from 'enzyme'
 import $ from 'jquery'
 import configureStore from 'redux-mock-store'
 import { Provider } from 'react-redux'
+import { HashRouter as Router } from 'react-router-dom'
+import { TemplateSingle } from '../../../../../../src/assets/js/react/components/Template/TemplateSingle'
 
 const mockStore = configureStore()
-import { HashRouter as Router } from 'react-router-dom'
-
-import { TemplateSingle } from '../../../../../../src/assets/js/react/components/Template/TemplateSingle'
 
 describe('<TemplateSingle />', () => {
 
@@ -15,18 +14,17 @@ describe('<TemplateSingle />', () => {
     const comp = mount(<Router>
       <Provider store={mockStore()}>
         <TemplateSingle
-          templates={[{id: 'first-id', compatible: true, path: ''}, {
+          templates={[{ id: 'first-id', compatible: true, path: '' }, {
             id: 'middle-id',
             compatible: true,
             path: ''
-          }, {id: 'last-id', compatible: true, path: ''}]}
-          template={{id: 'first-id', compatible: true, path: ''}}
+          }, { id: 'last-id', compatible: true, path: '' }]}
+          template={{ id: 'first-id', compatible: true, path: '' }}
           templateIndex={0}
-          route={{activateText: 'Activate'}}
+          route={{ activateText: 'Activate' }}
         />
       </Provider>
     </Router>)
-
     $('#karam-test-container').html(comp.html())
 
     expect($('#gfpdf-template-detail-view')).has.length(1)

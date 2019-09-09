@@ -1,13 +1,12 @@
-import React from 'react'
+import React, { lazy, Suspense } from 'react'
 import { render } from 'react-dom'
 import { HashRouter as Router, Route } from 'react-router-dom'
-import request from 'superagent'
 import watch from 'redux-watch'
-
 import { getStore } from '../store'
-import { selectTemplate } from '../actions/templates'
+import { selectTemplate, updateSelectBox } from '../actions/templates'
 import templateRouter from '../router/templateRouter'
-import TemplateButton from '../components/Template/TemplateButton'
+
+const TemplateButton = lazy(() => import('../components/Template/TemplateButton'))
 
 /**
  * Advanced Template Selector Bootstrap
@@ -54,9 +53,11 @@ export default function templateBootstrap ($templateField) {
 
   /* Render our React Component in the DOM */
   render(
-    <Router>
-      <Route render={(props) => <TemplateButton {...props} store={store} buttonText={GFPDF.advanced}/>}/>
-    </Router>,
+    <Suspense fallback={<div>Loading...</div>}>
+      <Router>
+        <Route render={(props) => <TemplateButton {...props} store={store} buttonText={GFPDF.advanced} />} />
+      </Router>
+    </Suspense>,
     document.getElementById('gpdf-advance-template-selector')
   )
 
@@ -142,19 +143,21 @@ export function templateChangeStoreListener (store, $templateField) {
     if (listCount !== list.length) {
       /* update the list size so we don't run it twice */
       listCount = list.length
-      var currentActive = $templateField.val()
+      let currentActive = $templateField.val()
 
-      /* Do our AJAX call to get the new Select Box DOM */
-      request
-        .post(GFPDF.ajaxUrl)
-        .field('action', 'gfpdf_get_template_options')
-        .field('nonce', GFPDF.ajaxNonce)
-        .then((response) => {
-          $templateField
-            .html(response.text)
-            .val(currentActive)
-            .trigger('chosen:updated')
-        })
+      /* Dispatch Redux Action for an AJAX call to get the new Select Box DOM */
+      store.dispatch(updateSelectBox())
+
+      /* Watch our store for changes */
+      let watchSelectBoxText = watch(store.getState, 'template.updateSelectBoxText')
+      store.subscribe(watchSelectBoxText((updateSelectBoxText) => {
+
+        /* Update $templateField */
+        $templateField
+          .html(updateSelectBoxText)
+          .val(currentActive)
+          .trigger('chosen:updated')
+      }))
     }
   }))
 }

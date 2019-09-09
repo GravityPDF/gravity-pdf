@@ -1,16 +1,14 @@
 import $ from 'jquery'
 import { createStore } from 'redux'
-
 import { selectTemplate } from '../../../../../src/assets/js/react/actions/templates'
-
 import {
   createTemplateMarkup,
   activeTemplateStoreListener
 } from '../../../../../src/assets/js/react/bootstrap/templateBootstrap'
-
 import { setupReducers } from '../../../../../src/assets/js/react/store'
 
-describe('bootstrap.spec.js', () => {
+describe('templateBootstrap.spec.js', () => {
+
   beforeEach(function () {
     $('body')
       .append('<div id="karma-test-button"><input id="test-input"><span></span></div>')
@@ -22,7 +20,6 @@ describe('bootstrap.spec.js', () => {
 
   describe('createTemplateMarkup()', () => {
     it('Check the appropriate markup is generated in the DOM', () => {
-
       createTemplateMarkup($('#test-input'))
 
       expect($('#gpdf-advance-template-selector').length).is.equal(1)

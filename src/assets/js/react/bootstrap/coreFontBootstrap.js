@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { lazy, Suspense } from 'react'
 import { render } from 'react-dom'
 import { Provider } from 'react-redux'
-
 import { getStore } from '../store'
-import Routes from '../router/coreFontRouter'
+
+const Routes = lazy(() => import('../router/coreFontRouter'))
 
 /**
  * Core Font Downloader Bootstrap
@@ -45,9 +45,11 @@ export default function coreFontBootstrap () {
   const store = getStore()
 
   render(
-    <Provider store={store}>
-      <Routes button={button}/>
-    </Provider>,
+    <Suspense fallback={<div>Loading...</div>}>
+      <Provider store={store}>
+        <Routes button={button} />
+      </Provider>
+    </Suspense>,
     container
   )
 }

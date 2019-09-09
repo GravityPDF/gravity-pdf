@@ -25,7 +25,6 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 /*
  * A simple function that forces a promise to resolve, returning an object that indicates the actual promise status
  * and the underlying object returned from the original promise.

@@ -44,6 +44,8 @@ $(function () {
 
   'use strict'
 
+  __webpack_public_path__ = GFPDF.pluginUrl + 'dist/assets/js/'
+
   /* Initialise the Fancy Template Picker */
   if (GFPDF.templateList !== undefined) {
 

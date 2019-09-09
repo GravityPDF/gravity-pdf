@@ -155,10 +155,12 @@ export const addCompatibilityCheck = (templates) => {
     const requiredVersion = template['required_pdf_version']
     if (versionCompare(requiredVersion, GFPDF.currentVersion, '>')) {
       /* Not compatible, so let's mark it */
-      return {...template,
+      return {
+        ...template,
         'compatible': false,
         'error': GFPDF.requiresGravityPdfVersion.replace(/%s/g, requiredVersion),
-        'long_error': GFPDF.templateNotCompatibleWithGravityPdfVersion.replace(/%s/g, requiredVersion)}
+        'long_error': GFPDF.templateNotCompatibleWithGravityPdfVersion.replace(/%s/g, requiredVersion)
+      }
     }
     /* If versionCompare() passed we'll mark as true */
     return {...template, 'compatible': true}
