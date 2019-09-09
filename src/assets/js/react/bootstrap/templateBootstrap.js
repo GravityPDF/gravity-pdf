@@ -1,11 +1,12 @@
-import React from 'react'
+import React, { lazy, Suspense } from 'react'
 import { render } from 'react-dom'
 import { HashRouter as Router, Route } from 'react-router-dom'
 import watch from 'redux-watch'
 import { getStore } from '../store'
 import { selectTemplate, updateSelectBox } from '../actions/templates'
 import templateRouter from '../router/templateRouter'
-import TemplateButton from '../components/Template/TemplateButton'
+
+const TemplateButton = lazy(() => import('../components/Template/TemplateButton'))
 
 /**
  * Advanced Template Selector Bootstrap
@@ -52,9 +53,11 @@ export default function templateBootstrap ($templateField) {
 
   /* Render our React Component in the DOM */
   render(
-    <Router>
-      <Route render={(props) => <TemplateButton {...props} store={store} buttonText={GFPDF.advanced}/>}/>
-    </Router>,
+    <Suspense fallback={<div>Loading...</div>}>
+      <Router>
+        <Route render={(props) => <TemplateButton {...props} store={store} buttonText={GFPDF.advanced} />} />
+      </Router>
+    </Suspense>,
     document.getElementById('gpdf-advance-template-selector')
   )
 

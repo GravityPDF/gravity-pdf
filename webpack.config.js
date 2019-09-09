@@ -1,6 +1,7 @@
 const webpackMerge = require('webpack-merge')
 const path = require('path')
 const PROD = (process.env.NODE_ENV === 'production')
+const chunkPath = __dirname + '/dist/assets/js/'
 const production = require('./webpack-configs/production')
 const development = require('./webpack-configs/development')
 const modeConfig = PROD ? production : development
@@ -16,7 +17,9 @@ module.exports = webpackMerge(
     },
     output: {
       path: __dirname + '/dist/assets/js/',
-      filename: '[name].min.js'
+      filename: '[name].min.js',
+      chunkFilename: 'chunk-[name].[contenthash].js',
+      publicPath: chunkPath
     },
     module: {
       rules: [

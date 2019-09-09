@@ -71,6 +71,7 @@ describe('Reducers coreFontReducer - ', () => {
       expect(Object.keys(newState.retry).length).is.equal(3)
 
       newState = reducer(newState, { type: ADD_TO_RETRY_LIST, name: 'Font 2' })
+
       expect(Object.keys(newState.retry).length).is.equal(3)
     })
   })

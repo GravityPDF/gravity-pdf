@@ -2,11 +2,10 @@ import React from 'react'
 import { mount } from 'enzyme'
 import configureStore from 'redux-mock-store'
 import { Provider } from 'react-redux'
+import { HashRouter as Router } from 'react-router-dom'
+import TemplateHeaderNavigation from '../../../../../src/assets/js/react/components/Template/TemplateHeaderNavigation'
 
 const mockStore = configureStore()
-import { HashRouter as Router } from 'react-router-dom'
-
-import TemplateHeaderNavigation from '../../../../../src/assets/js/react/components/Template/TemplateHeaderNavigation'
 
 describe('<TemplateHeaderNavigation />', () => {
 
@@ -17,8 +16,8 @@ describe('<TemplateHeaderNavigation />', () => {
           templates={[{}, {}]}
           template={{}}
           templateIndex={0}
-          showPreviousTemplateText="Show previous template"
-          showNextTemplateText="Show next template"
+          showPreviousTemplateText='Show previous template'
+          showNextTemplateText='Show next template'
         />
       </Provider>
     </Router>)
@@ -37,8 +36,8 @@ describe('<TemplateHeaderNavigation />', () => {
     const comp = mount(<Router>
       <Provider store={mockStore()}>
         <TemplateHeaderNavigation
-          templates={[{id: 'first-id'}, {id: 'middle-id'}, {id: 'last-id'}]}
-          template={{id: 'first-id'}}
+          templates={[{ id: 'first-id' }, { id: 'middle-id' }, { id: 'last-id' }]}
+          template={{ id: 'first-id' }}
           templateIndex={0}
         />
       </Provider>
@@ -55,8 +54,8 @@ describe('<TemplateHeaderNavigation />', () => {
     const comp = mount(<Router>
       <Provider store={mockStore()}>
         <TemplateHeaderNavigation
-          templates={[{id: 'first-id'}, {id: 'middle-id'}, {id: 'last-id'}]}
-          template={{id: 'last-id'}}
+          templates={[{ id: 'first-id' }, { id: 'middle-id' }, { id: 'last-id' }]}
+          template={{ id: 'last-id' }}
           templateIndex={2}
         />
       </Provider>
@@ -73,8 +72,8 @@ describe('<TemplateHeaderNavigation />', () => {
     const comp = mount(<Router>
       <Provider store={mockStore()}>
         <TemplateHeaderNavigation
-          templates={[{id: 'first-id'}, {id: 'middle-id'}, {id: 'last-id'}]}
-          template={{id: 'middle-id'}}
+          templates={[{ id: 'first-id' }, { id: 'middle-id' }, { id: 'last-id' }]}
+          template={{ id: 'middle-id' }}
           templateIndex={1}
         />
       </Provider>
@@ -91,18 +90,17 @@ describe('<TemplateHeaderNavigation />', () => {
     const comp = mount(<Router>
       <Provider store={mockStore()}>
         <TemplateHeaderNavigation
-          templates={[{id: 'first-id'}, {id: 'middle-id'}, {id: 'last-id'}]}
-          template={{id: 'middle-id'}}
-          templateIndex={1}/>
+          templates={[{ id: 'first-id' }, { id: 'middle-id' }, { id: 'last-id' }]}
+          template={{ id: 'middle-id' }}
+          templateIndex={1} />
       </Provider>
     </Router>)
+    comp.find('button.left').simulate('keydown', { key: 'ArrowLeft', keyCode: 37 })
 
-    comp.find('button.left').simulate('keydown', {key: 'ArrowLeft', keyCode: 37})
     expect(window.location.hash).to.equal('#/template/first-id')
 
-    comp.find('button.right').simulate('keydown', {key: 'ArrowRight', keyCode: 39})
+    comp.find('button.right').simulate('keydown', { key: 'ArrowRight', keyCode: 39 })
+
     expect(window.location.hash).to.equal('#/template/last-id')
-
   })
-
 })

@@ -14,7 +14,7 @@ describe('helpBootstrap.spec.js', () => {
 
   describe('helpBootstrap()', () => {
     it('Check the appropriate markup is generated in the DOM', () => {
-      helpBootstrap()
+      sinon.spy(helpBootstrap)
       expect($('#search-knowledgebase').find('input#search-help-input')).to.have.lengthOf(1)
     })
   })

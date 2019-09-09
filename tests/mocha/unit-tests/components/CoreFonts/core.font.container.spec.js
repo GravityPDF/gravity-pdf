@@ -20,7 +20,6 @@ describe('<CoreFontContainer />', () => {
         retry={retry}
         getFilesFromGitHub={spy}
       />)
-
     comp.find('button').simulate('click')
 
     expect(window.location.hash).to.equal('#/downloadCoreFonts')
@@ -41,7 +40,6 @@ describe('<CoreFontContainer />', () => {
         downloadFontsApiCall={spy}
       />
     )
-
     const instance = comp.instance()
     const files = instance.startDownloadFonts(data)
 
@@ -61,7 +59,6 @@ describe('<CoreFontContainer />', () => {
         githubError={'Could not download Core Font list. Try again.'}
       />
     )
-
     const instance = comp.instance()
     const files = instance.handleGithubApiError()
 
