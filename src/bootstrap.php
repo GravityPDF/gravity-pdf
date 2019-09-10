@@ -389,10 +389,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			'wp-color-picker',
 		];
 
-		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-settings.min.js', $pdf_settings_dependancies, $version );
+		wp_register_script( 'admin', PDF_PLUGIN_URL . 'dist/assets/js/admin.min.js', $pdf_settings_dependancies, $version );
 
 		$pdf_backbone_dependancies = [
-			'gfpdf_js_settings',
+			'admin',
 			'backbone',
 			'underscore',
 			'gfpdf_js_backbone_model_binder',
@@ -404,11 +404,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'dist/assets/js/app.bundle.min.js', [ 'jquery' ], $version );
 		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-entries.min.js', [ 'jquery' ], $version );
-		wp_register_script( 'gfpdf_js_v3_migration', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-migration.min.js', [ 'gfpdf_js_settings' ], $version );
+		wp_register_script( 'gfpdf_js_v3_migration', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-migration.min.js', [ 'admin' ], $version );
 
 		/* Localise admin script */
 		wp_localize_script( 'gfpdf_js_entrypoint', 'GFPDF', $this->data->get_localised_script_data( $this->options, $this->gform ) );
-		wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $this->data->get_localised_script_data( $this->options, $this->gform ) );
+		wp_localize_script( 'admin', 'GFPDF', $this->data->get_localised_script_data( $this->options, $this->gform ) );
 	}
 
 
@@ -433,7 +433,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			wp_enqueue_style( 'gform_chosen', \GFCommon::get_base_url() . '/css/chosen.min.css', [], \GFCommon::$version );
 
 			/* load scripts */
-			wp_enqueue_script( 'gfpdf_js_settings' );
+			wp_enqueue_script( 'admin' );
 
 			/* add media uploader */
 			wp_enqueue_media();
