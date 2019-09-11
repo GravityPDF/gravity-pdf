@@ -1,5 +1,5 @@
-import PropTypes from 'prop-types'
 import React from 'react'
+import PropTypes from 'prop-types'
 
 /**
  * Contains stateless React components for our Template List Items
@@ -35,14 +35,17 @@ import React from 'react'
  *
  * Display the Template Details hover
  *
+ * @param label (string)
+ * @returns {*}
+ *
  * @since 4.1
  */
-export const TemplateDetails = ({label}) => (
-  <span className="more-details">{label}</span>
+export const TemplateDetails = ({ label }) => (
+  <span className='more-details'>{label}</span>
 )
 
 TemplateDetails.propTypes = {
-  name: PropTypes.string,
+  label: PropTypes.string
 }
 
 /**
@@ -50,12 +53,15 @@ TemplateDetails.propTypes = {
  *
  * Display the template group
  *
+ * @param group (string)
+ * @returns {*}
+ *
  * @since 4.1
  */
-export const Group = ({group}) => (
-  <p className="theme-author">{group}</p>
+export const Group = ({ group }) => (
+  <p className='theme-author'>{group}</p>
 )
 
 Group.propTypes = {
-  group: PropTypes.string,
+  group: PropTypes.string
 }

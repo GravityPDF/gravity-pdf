@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 /**
  * @package     Gravity PDF
@@ -30,7 +31,7 @@ import React from 'react'
 /**
  * Displays an individual result
  *
- * @param object item
+ * @param item (object)
  * @returns {*}
  *
  * @since 5.2
@@ -44,6 +45,13 @@ const DisplayResultItem = ({ item }) => {
       <div dangerouslySetInnerHTML={{ __html: item.excerpt.rendered }} />
     </li>
   )
+}
+
+/**
+ *  @since 5.2
+ */
+DisplayResultItem.propTypes = {
+  item: PropTypes.object
 }
 
 export default DisplayResultItem

@@ -47,7 +47,9 @@ export function setupDynamicTemplateFields () {
             /* Bug Fix for Firefox - http://www.tinymce.com/develop/bugtracker_view.php?id=3152 */
             try {
               tinyMCE.remove(editor)
-            } catch (e) {}
+            } catch (e) {
+              // empty
+            }
           }
         })
 

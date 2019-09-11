@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import Spinner from '../Spinner'
 import DisplayResultItem from './DisplayResultItem'
 import DisplayResultEmpty from './DisplayResultEmpty'
@@ -73,6 +74,17 @@ const DisplayResultContainer = ({ searchInput, loading, helpResult, error }) => 
       </div>
     </div>
   )
+}
+
+/**
+ *
+ * @since 5.2
+ */
+DisplayResultContainer.propTypes = {
+  searchInput: PropTypes.string,
+  loading: PropTypes.bool,
+  helpResult: PropTypes.array,
+  error: PropTypes.string
 }
 
 export default DisplayResultContainer

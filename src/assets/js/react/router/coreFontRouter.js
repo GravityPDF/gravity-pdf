@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { HashRouter as Router, Route, Switch } from 'react-router-dom'
 import CoreFontContainer from '../components/CoreFonts/CoreFontContainer'
 
@@ -42,23 +43,31 @@ import CoreFontContainer from '../components/CoreFonts/CoreFontContainer'
  *
  * @since 5.0
  */
-const Routes = ({button}) => (
+const Routes = ({ button }) => (
   <Router>
     <Switch>
-      <Route render={(props) => <CoreFont history={props.history} button={button}/>}/>
+      <Route render={(props) => <CoreFont history={props.history} button={button} />} />
 
       <Route
-        path="/downloadCoreFonts"
+        path='/downloadCoreFonts'
         exact
-        render={(props) => <CoreFont history={props.history} button={button}/>}/>
+        render={(props) => <CoreFont history={props.history} button={button} />} />
 
       <Route
-        path="/retryDownloadCoreFonts"
+        path='/retryDownloadCoreFonts'
         exact
-        render={(props) => <CoreFont history={props.history} button={button}/>}/>
+        render={(props) => <CoreFont history={props.history} button={button} />} />
     </Switch>
   </Router>
 )
+
+/**
+ * @since 5.0
+ */
+Routes.propTypes = {
+  history: PropTypes.object,
+  button: PropTypes.object
+}
 
 /**
  * Because we used the same component multiple times above, the real component was abstracted
@@ -68,13 +77,12 @@ const Routes = ({button}) => (
  *
  * @since 5.0
  */
-const CoreFont = ({history, button}) => (
+const CoreFont = ({ history, button }) => (
   <CoreFontContainer
     history={history}
     location={history.location}
     buttonClassName={button.className}
     buttonText={button.innerText}
-
     listUrl={GFPDF.coreFontListUrl}
     success={GFPDF.coreFontSuccess}
     error={GFPDF.coreFontError}
@@ -86,5 +94,13 @@ const CoreFont = ({history, button}) => (
     retryText={GFPDF.coreFontRetry}
   />
 )
+
+/**
+ * @since 5.0
+ */
+CoreFont.propTypes = {
+  history: PropTypes.object,
+  button: PropTypes.object
+}
 
 export default Routes

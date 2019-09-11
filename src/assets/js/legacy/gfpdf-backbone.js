@@ -5,9 +5,7 @@
  */
 
 (function ($) {
-
   $(function () {
-
     /**
      * To prevent problems with PHP's ASP Short tags (removed in PHP 7) we'll change Underscore's delimiters to be Handlebars-ish:
      * {{= }}, {{- }} or {{ }}
@@ -36,7 +34,7 @@
       Model: {},
       Collection: {},
       View: {},
-      Misc: {},
+      Misc: {}
     }
 
     /**
@@ -75,7 +73,6 @@
        * @since 4.0
        */
       save: function (options, config) {
-
         var params = {
           emulateHTTP: true,
           emulateJSON: true,
@@ -101,7 +98,6 @@
        * @since 4.0
        */
       destroy: function (options, config) {
-
         var params = {
           emulateHTTP: true,
           emulateJSON: true,
@@ -128,18 +124,15 @@
        * @return String         On error, a string is returned
        * @since 4.0
        */
-      validate: function (attrs, options) {
-
+      validate: function (attrs) {
         /* Do name validation */
         var regex = new RegExp('^[A-Za-z0-9 ]+$')
 
         if (attrs.font_name.length > 0) {
           if (!regex.test(attrs.font_name)) {
-
             /* If not successful trigger error */
             return 'invalid_characters'
           } else {
-
             /* trigger successful event to disable the view error */
             this.trigger('valid_name')
           }
@@ -167,7 +160,6 @@
        * @since 4.0
        */
       validateFonts: function (attrs) {
-
         /* set validation to true and any that fail will mark as false */
         var validation = true
 
@@ -176,7 +168,7 @@
           regular: attrs.regular,
           bold: attrs.bold,
           italics: attrs.italics,
-          bolditalics: attrs.bolditalics,
+          bolditalics: attrs.bolditalics
         }
 
         /* Loop through the object and use jQuery's proxy to correct the 'this' scope */
@@ -184,7 +176,6 @@
 
           /* if there is value for the font we'll validate it */
           if (font.length > 0 && this.isValidFile(font) === false) {
-
             /* mark our global validation as false */
             validation = false
             this.trigger('invalid_font', this, true, index)
@@ -193,7 +184,6 @@
             this.trigger('valid_font', this, false, index)
             /* tell our view the font is valid */
           }
-
         }, this))
 
         return validation
@@ -208,7 +198,6 @@
        * @since 4.0
        */
       isValidFile: function (font) {
-
         /* Check if the value could contain enough characters to be valid */
         if (font.length < 5) {
           return false
@@ -219,10 +208,10 @@
 
         /* Check if they match a TTF font file */
         if (extension === '.ttf') {
-
           /* Check if we have a valid URL */
+          /* eslint-disable */
           var regex = new RegExp(/^[a-z](?:[-a-z0-9\+\.])*:(?:\/\/(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~!\$&'\(\)\*\+,;=:\xA0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[\uD800-\uD83E\uD840-\uD87E\uD880-\uD8BE\uD8C0-\uD8FE\uD900-\uD93E\uD940-\uD97E\uD980-\uD9BE\uD9C0-\uD9FE\uDA00-\uDA3E\uDA40-\uDA7E\uDA80-\uDABE\uDAC0-\uDAFE\uDB00-\uDB3E\uDB44-\uDB7E][\uDC00-\uDFFF]|[\uD83F\uD87F\uD8BF\uD8FF\uD93F\uD97F\uD9BF\uD9FF\uDA3F\uDA7F\uDABF\uDAFF\uDB3F\uDB7F][\uDC00-\uDFFD])*@)?(?:\[(?:(?:(?:[0-9a-f]{1,4}:){6}(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|::(?:[0-9a-f]{1,4}:){5}(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|(?:[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){4}(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|(?:[0-9a-f]{1,4}:[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){3}(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|(?:(?:[0-9a-f]{1,4}:){0,2}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){2}(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|(?:(?:[0-9a-f]{1,4}:){0,3}[0-9a-f]{1,4})?::[0-9a-f]{1,4}:(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|(?:(?:[0-9a-f]{1,4}:){0,4}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|(?:(?:[0-9a-f]{1,4}:){0,5}[0-9a-f]{1,4})?::[0-9a-f]{1,4}|(?:(?:[0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4})?::)|v[0-9a-f]+[-a-z0-9\._~!\$&'\(\)\*\+,;=:]+)\]|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3}|(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~!\$&'\(\)\*\+,;=@\xA0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[\uD800-\uD83E\uD840-\uD87E\uD880-\uD8BE\uD8C0-\uD8FE\uD900-\uD93E\uD940-\uD97E\uD980-\uD9BE\uD9C0-\uD9FE\uDA00-\uDA3E\uDA40-\uDA7E\uDA80-\uDABE\uDAC0-\uDAFE\uDB00-\uDB3E\uDB44-\uDB7E][\uDC00-\uDFFF]|[\uD83F\uD87F\uD8BF\uD8FF\uD93F\uD97F\uD9BF\uD9FF\uDA3F\uDA7F\uDABF\uDAFF\uDB3F\uDB7F][\uDC00-\uDFFD])*)(?::[0-9]*)?(?:\/(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~!\$&'\(\)\*\+,;=:@\xA0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[\uD800-\uD83E\uD840-\uD87E\uD880-\uD8BE\uD8C0-\uD8FE\uD900-\uD93E\uD940-\uD97E\uD980-\uD9BE\uD9C0-\uD9FE\uDA00-\uDA3E\uDA40-\uDA7E\uDA80-\uDABE\uDAC0-\uDAFE\uDB00-\uDB3E\uDB44-\uDB7E][\uDC00-\uDFFF]|[\uD83F\uD87F\uD8BF\uD8FF\uD93F\uD97F\uD9BF\uD9FF\uDA3F\uDA7F\uDABF\uDAFF\uDB3F\uDB7F][\uDC00-\uDFFD]))*)*|\/(?:(?:(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~!\$&'\(\)\*\+,;=:@\xA0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[\uD800-\uD83E\uD840-\uD87E\uD880-\uD8BE\uD8C0-\uD8FE\uD900-\uD93E\uD940-\uD97E\uD980-\uD9BE\uD9C0-\uD9FE\uDA00-\uDA3E\uDA40-\uDA7E\uDA80-\uDABE\uDAC0-\uDAFE\uDB00-\uDB3E\uDB44-\uDB7E][\uDC00-\uDFFF]|[\uD83F\uD87F\uD8BF\uD8FF\uD93F\uD97F\uD9BF\uD9FF\uDA3F\uDA7F\uDABF\uDAFF\uDB3F\uDB7F][\uDC00-\uDFFD]))+)(?:\/(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~!\$&'\(\)\*\+,;=:@\xA0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[\uD800-\uD83E\uD840-\uD87E\uD880-\uD8BE\uD8C0-\uD8FE\uD900-\uD93E\uD940-\uD97E\uD980-\uD9BE\uD9C0-\uD9FE\uDA00-\uDA3E\uDA40-\uDA7E\uDA80-\uDABE\uDAC0-\uDAFE\uDB00-\uDB3E\uDB44-\uDB7E][\uDC00-\uDFFF]|[\uD83F\uD87F\uD8BF\uD8FF\uD93F\uD97F\uD9BF\uD9FF\uDA3F\uDA7F\uDABF\uDAFF\uDB3F\uDB7F][\uDC00-\uDFFD]))*)*)?|(?:(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~!\$&'\(\)\*\+,;=:@\xA0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[\uD800-\uD83E\uD840-\uD87E\uD880-\uD8BE\uD8C0-\uD8FE\uD900-\uD93E\uD940-\uD97E\uD980-\uD9BE\uD9C0-\uD9FE\uDA00-\uDA3E\uDA40-\uDA7E\uDA80-\uDABE\uDAC0-\uDAFE\uDB00-\uDB3E\uDB44-\uDB7E][\uDC00-\uDFFF]|[\uD83F\uD87F\uD8BF\uD8FF\uD93F\uD97F\uD9BF\uD9FF\uDA3F\uDA7F\uDABF\uDAFF\uDB3F\uDB7F][\uDC00-\uDFFD]))+)(?:\/(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~!\$&'\(\)\*\+,;=:@\xA0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[\uD800-\uD83E\uD840-\uD87E\uD880-\uD8BE\uD8C0-\uD8FE\uD900-\uD93E\uD940-\uD97E\uD980-\uD9BE\uD9C0-\uD9FE\uDA00-\uDA3E\uDA40-\uDA7E\uDA80-\uDABE\uDAC0-\uDAFE\uDB00-\uDB3E\uDB44-\uDB7E][\uDC00-\uDFFF]|[\uD83F\uD87F\uD8BF\uD8FF\uD93F\uD97F\uD9BF\uD9FF\uDA3F\uDA7F\uDABF\uDAFF\uDB3F\uDB7F][\uDC00-\uDFFD]))*)*|(?!(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~!\$&'\(\)\*\+,;=:@\xA0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[\uD800-\uD83E\uD840-\uD87E\uD880-\uD8BE\uD8C0-\uD8FE\uD900-\uD93E\uD940-\uD97E\uD980-\uD9BE\uD9C0-\uD9FE\uDA00-\uDA3E\uDA40-\uDA7E\uDA80-\uDABE\uDAC0-\uDAFE\uDB00-\uDB3E\uDB44-\uDB7E][\uDC00-\uDFFF]|[\uD83F\uD87F\uD8BF\uD8FF\uD93F\uD97F\uD9BF\uD9FF\uDA3F\uDA7F\uDABF\uDAFF\uDB3F\uDB7F][\uDC00-\uDFFD])))(?:\?(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~!\$&'\(\)\*\+,;=:@\/\?\xA0-\uD7FF\uE000-\uFDCF\uFDF0-\uFFEF]|[\uD800-\uD83E\uD840-\uD87E\uD880-\uD8BE\uD8C0-\uD8FE\uD900-\uD93E\uD940-\uD97E\uD980-\uD9BE\uD9C0-\uD9FE\uDA00-\uDA3E\uDA40-\uDA7E\uDA80-\uDABE\uDAC0-\uDAFE\uDB00-\uDB3E\uDB44-\uDB7E\uDB80-\uDBBE\uDBC0-\uDBFE][\uDC00-\uDFFF]|[\uD83F\uD87F\uD8BF\uD8FF\uD93F\uD97F\uD9BF\uD9FF\uDA3F\uDA7F\uDABF\uDAFF\uDB3F\uDB7F\uDBBF\uDBFF][\uDC00-\uDFFD])*)?(?:\#(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~!\$&'\(\)\*\+,;=:@\/\?\xA0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[\uD800-\uD83E\uD840-\uD87E\uD880-\uD8BE\uD8C0-\uD8FE\uD900-\uD93E\uD940-\uD97E\uD980-\uD9BE\uD9C0-\uD9FE\uDA00-\uDA3E\uDA40-\uDA7E\uDA80-\uDABE\uDAC0-\uDAFE\uDB00-\uDB3E\uDB44-\uDB7E][\uDC00-\uDFFF]|[\uD83F\uD87F\uD8BF\uD8FF\uD93F\uD97F\uD9BF\uD9FF\uDA3F\uDA7F\uDABF\uDAFF\uDB3F\uDB7F][\uDC00-\uDFFD])*)?$/igm)
-
+          /* eslint-enable */
           if (regex.test(font)) {
             return true
           }
@@ -279,7 +268,6 @@
      * @since 4.0
      */
     Fonts.View.Container = Backbone.View.extend({
-
       /**
        * Our View Target Element
        * @type String
@@ -302,8 +290,7 @@
        * @param  Object options Any passed in parameters when the object is created
        * @since 4.0
        */
-      initialize: function (options) {
-
+      initialize: function () {
         this.listenTo(this.collection, 'add', this.addRender)
         this.listenTo(this.collection, 'remove', this.render)
         this.render()
@@ -315,10 +302,8 @@
        * @since 4.0
        */
       render: function () {
-
         /* Check if our collection has any models */
         if (this.collection.length > 0) {
-
           /* Empty our element */
           this.$el.empty()
 
@@ -372,7 +357,6 @@
      * @since 4.0
      */
     Fonts.View.Item = Backbone.View.extend({
-
       /**
        * The ID of our Underscore HTML template
        * This can be found in /src/view/html/Settings/tools.php
@@ -402,7 +386,7 @@
         'click .delete-font': 'deleteModel',
 
         /* Submit event for saving a model */
-        'submit form': 'formSubmission',
+        'submit form': 'formSubmission'
       },
 
       /**
@@ -411,7 +395,6 @@
        * @since 4.0
        */
       initialize: function () {
-
         /* Intialize our two-way data binder */
         this.modelBinder = new Backbone.ModelBinder()
 
@@ -432,13 +415,12 @@
        * @since 4.0
        */
       render: function () {
-
         /* Set up our Underscore template file */
         this.template = _.template($(this.template).html(), null, UnderscoreSettingsOverride)
 
         /* Set View Element HTML to our Underscore template, passing in our model */
         this.$el.html(this.template({
-          model: this.model,
+          model: this.model
         }))
 
         /**
@@ -450,12 +432,16 @@
          * We also want to run our validation routine on the this.model.set() command (by default this is disabled)
          * so the user isn't confused with the live-update display of the Font Name field.
          */
-        this.modelBinder.bind(this.model, this.el, {
-            font_name: [{selector: '[name=font_name]'}, {selector: '[name=usage]', converter: this.model.cssDeclaration}],
+        this.modelBinder.bind(this.model, this.el,
+          {
+            font_name: [{ selector: '[name=font_name]' }, {
+              selector: '[name=usage]',
+              converter: this.model.cssDeclaration
+            }],
             regular: '[name=regular]',
             bold: '[name=bold]',
             italics: '[name=italics]',
-            bolditalics: '[name=bolditalics]',
+            bolditalics: '[name=bolditalics]'
           },
 
           {
@@ -480,13 +466,11 @@
        * @since 4.0
        */
       toggleView: function (ev) {
-
         /* Prevent default anchor action */
         ev.preventDefault()
 
         /* Toggle our Font Manager Container */
         $(ev.currentTarget).next().toggle()
-
       },
 
       /**
@@ -496,13 +480,10 @@
        * @since 4.0
        */
       nameError: function (model, error) {
-
-        if (error && error == 'invalid_characters') {
-
+        if (error && error === 'invalid_characters') {
           /* highlight errors */
           this.$el.find('input[name="font_name"]').css('border-color', 'red')
         } else {
-
           /* un-highlight errors */
           this.$el.find('input[name="font_name"]').removeAttr('style')
         }
@@ -516,13 +497,11 @@
        * @since 4.0
        */
       fontError: function (model, error, name) {
-
         /* Get the input that failed validation */
         var $input = this.$el.find('input[name="' + name + '"]')
 
         /* If error is triggered display message to user */
         if (error) {
-
           /* Set up an error message */
           var $error = $('<span class="gf_settings_description"><label>Only TTF font files are supported.</label></span>')
 
@@ -531,7 +510,6 @@
             $input.addClass('invalid').next().after($error.clone())
           }
         } else {
-
           /* Remove validation error */
           if ($input.hasClass('invalid')) {
             $input.removeClass('invalid').next().next().remove()
@@ -546,7 +524,6 @@
        * @since 4.0
        */
       disableSubmitButton: function (model) {
-
         this.$el.find('.font-submit button').prop('disabled', true)
         model.set('disabled', true)
       },
@@ -558,7 +535,6 @@
        * @since 4.0
        */
       enableSubmitButton: function (model) {
-
         this.$el.find('.font-submit button').prop('disabled', false)
         model.set('disabled', false)
       },
@@ -569,28 +545,21 @@
        * @since 4.0
        */
       formSubmission: function (ev) {
-
         /* Allow native validation without submitting actual form to backend */
         ev.preventDefault()
 
-        var $form = $(ev.currentTarget)
-
         /* Check if the native form validation is a success */
         if (ev.currentTarget.checkValidity() && this.model.get('disabled') === false) {
-
           /* Show saving spinner */
           this.addSpinner()
 
           /* Remove previous message */
           this.removeMessage()
 
-          console.log(this.model)
-
           this.model.save({
             nonce: this.$el.find('input[name=wpnonce]').val()
           }, {
-            success: $.proxy(function (model, response, options) {
-
+            success: $.proxy(function (model) {
               /* Remove saving spinner */
               this.removeSpinner()
 
@@ -599,11 +568,9 @@
 
               /* Keep our model in sync */
               this.model.set(model)
-
             }, this),
 
-            error: $.proxy(function (response, type, errorName) {
-
+            error: $.proxy(function (response) {
               /* Remove saving spinner */
               this.removeSpinner()
 
@@ -622,7 +589,6 @@
        * @since 4.0
        */
       deleteModel: function (ev) {
-
         /* Prevent default anchor action */
         ev.preventDefault()
 
@@ -633,13 +599,11 @@
         var deleteButtons = [{
           text: GFPDF.delete,
           click: $.proxy(function () {
-
             /* Hide the confirmation dialog */
             $dialog.wpdialog('destroy')
 
             /* If an ID is set (pulled from DB) do our AJAX delete call */
             if (this.model.get('id')) {
-
               /* Show saving spinner */
               this.addSpinner()
 
@@ -652,8 +616,7 @@
               this.model.destroy({
                 nonce: this.$el.find('input[name=wpnonce]').val()
               }, {
-                success: $.proxy(function (model, response, options) {
-
+                success: $.proxy(function () {
                   /* Remove saving spinner */
                   this.removeSpinner()
 
@@ -662,11 +625,9 @@
 
                   /* Remove from collection */
                   this.collection.remove(this.model)
-
                 }, this),
 
-                error: $.proxy(function (response, type, errorName) {
-
+                error: $.proxy(function (response) {
                   /* Remove saving spinner */
                   this.removeSpinner()
 
@@ -677,7 +638,6 @@
                   if (response.responseJSON.error) {
                     this.displayMessage(response.responseJSON.error, true)
                   }
-
                 }, this)
               })
 
@@ -685,17 +645,14 @@
             } else {
               this.collection.remove(this.model)
             }
-
           }, this)
-        },
-          {
-            text: GFPDF.cancel,
-            click: function () {
-
-              /* Cancel */
-              $dialog.wpdialog('destroy')
-            }
-          }]
+        }, {
+          text: GFPDF.cancel,
+          click: function () {
+            /* Cancel */
+            $dialog.wpdialog('destroy')
+          }
+        }]
 
         /* Set up our dialog box */
         Fonts.Misc.Dialog($dialog, deleteButtons, 300, 175)
@@ -728,7 +685,6 @@
        * @since 4.0
        */
       displayMessage: function (msg, isError) {
-
         /* Generate our error template */
         var $message = $('<div class="updated notice">')
 
@@ -760,7 +716,6 @@
      * @since 4.0
      */
     Fonts.View.Add = Backbone.View.extend({
-
       /**
        * Our View Target Element
        * @type String
@@ -774,7 +729,7 @@
        * @since 4.0
        */
       events: {
-        'click': 'addFont',
+        'click': 'addFont'
       },
 
       /**
@@ -784,7 +739,6 @@
        * @since 4.0
        */
       initialize: function (options) {
-
         this.container = options.container
         this.render()
       },
@@ -802,8 +756,7 @@
        * @param  Object ev The Backbone event object
        * @since 4.0
        */
-      addFont: function (ev) {
-
+      addFont: function () {
         /* Create an empty model */
         var font = new Fonts.Model.Core()
 
@@ -855,8 +808,6 @@
      * Applies correct JS to settings pages
      */
     function GravityPDF () {
-      var self = this
-
       this.init = function () {
         if (this.is_settings()) {
           this.processSettings()
@@ -883,7 +834,6 @@
        * @since 4.0
        */
       this.tools_settings = function () {
-
         var json = JSON.parse(GFPDF.customFontData)
 
         /* Initialise our collection and load with our font JSON data */
@@ -900,11 +850,9 @@
           container: container
         })
       }
-
     }
 
     var pdf = new GravityPDF()
     pdf.init()
-
   })
 })(jQuery)

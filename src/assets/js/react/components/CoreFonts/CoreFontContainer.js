@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import CoreFontListResults from './CoreFontListResults'
 import Button from './CoreFontButton'
@@ -45,6 +46,34 @@ import {
 export class CoreFontContainer extends React.Component {
 
   /**
+   *
+   * @since 5.0
+   */
+  static propTypes = {
+    location: PropTypes.object,
+    requestDownload: PropTypes.string,
+    clearRequestRemainingData: PropTypes.func,
+    getFilesFromGitHub: PropTypes.func,
+    fontList: PropTypes.array,
+    retry: PropTypes.array,
+    retryDownload: PropTypes.func,
+    clearConsole: PropTypes.func,
+    history: PropTypes.object,
+    clearRetryList: PropTypes.func,
+    downloadFontsApiCall: PropTypes.func,
+    githubError: PropTypes.string,
+    addToConsole: PropTypes.func,
+    retry_download: PropTypes.bool,
+    retryDownloadLength: PropTypes.func,
+    remainingDownload: PropTypes.number,
+    console: PropTypes.object,
+    buttonClassName: PropTypes.string,
+    buttonText: PropTypes.string,
+    counterText: PropTypes.string,
+    retryText: PropTypes.string
+  }
+
+  /**
    * Switches to show loaders
    *
    * @type {{ajax: boolean}}
@@ -66,7 +95,7 @@ export class CoreFontContainer extends React.Component {
     this.maybeStartDownload(nextProps.location)
     /* Set ajax/loading false if request download is finished */
     nextProps.requestDownload === 'finished' && (
-      this.setState({ajax: false}), this.props.clearRequestRemainingData()
+      this.setState({ ajax: false }), this.props.clearRequestRemainingData()
     )
   }
 
@@ -115,10 +144,11 @@ export class CoreFontContainer extends React.Component {
 
     this.props.clearConsole()
     this.props.history.replace('')
-    this.setState({ajax: true})
+    this.setState({ ajax: true })
     this.props.clearRetryList()
 
     files.map((file) => this.props.downloadFontsApiCall(file))
+
     return files
   }
 
@@ -131,7 +161,8 @@ export class CoreFontContainer extends React.Component {
    */
   handleGithubApiError () {
     let error = this.props.githubError
-    this.setState({ajax: false})
+
+    this.setState({ ajax: false })
     this.props.addToConsole('completed', 'error', error)
     this.props.history.replace('')
 
@@ -170,17 +201,19 @@ export class CoreFontContainer extends React.Component {
 
     return (
       <div>
-        <Button className={this.props.buttonClassName} callback={this.triggerFontDownload}
-                text={this.props.buttonText}/>
-
-        {this.state.ajax && <Spinner/>}
-        {this.state.ajax && <Counter text={this.props.counterText} queue={queueLength}/>}
-
+        <Button
+          className={this.props.buttonClassName}
+          callback={this.triggerFontDownload}
+          text={this.props.buttonText}
+        />
+        {this.state.ajax && <Spinner />}
+        {this.state.ajax && <Counter text={this.props.counterText} queue={queueLength} />}
         <CoreFontListResults
           history={this.props.history}
           console={this.props.console}
           retry={this.props.retry}
-          retryText={this.props.retryText}/>
+          retryText={this.props.retryText}
+        />
       </div>
     )
   }

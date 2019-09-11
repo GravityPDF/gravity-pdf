@@ -1,4 +1,3 @@
-import React from 'react'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import { createStore, combineReducers, applyMiddleware } from 'redux'
 import createSagaMiddleware from 'redux-saga'
@@ -36,15 +35,13 @@ import helpReducer from '../reducers/helpReducer'
 
 /* Combine our Redux Reducers */
 const reducers = setupReducers()
-
 /* Initialize Saga Middleware */
 const sagaMiddleware = createSagaMiddleware()
-const middlewares = [sagaMiddleware,]
+const middlewares = [sagaMiddleware]
 const middlewareEnhancer = applyMiddleware(...middlewares)
-const enhancers = [middlewareEnhancer,]
+const enhancers = [middlewareEnhancer]
 /* Initialize Redux dev tools */
 const composedEnhancers = composeWithDevTools(...enhancers)
-
 /* Create our store and enable composedEnhancers */
 const store = createStore(
   reducers,

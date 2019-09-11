@@ -25,7 +25,9 @@ export function doFormSettingsEditPage () {
   $('#gfpdf_pdf_form').submit(function () {
     try {
       tinyMCE.triggerSave()
-    } catch (e) {}
+    } catch (e) {
+      // empty
+    }
   })
 
   /* Add listener on submit functionality */

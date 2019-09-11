@@ -1,9 +1,7 @@
-import PropTypes from 'prop-types'
 import React from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-
 import getTemplates from '../../selectors/getTemplates'
-
 import TemplateContainer from './TemplateContainer'
 import TemplateListItem from './TemplateListItem'
 import TemplateSearch from './TemplateSearch'
@@ -49,19 +47,31 @@ export class TemplateList extends React.Component {
    * @since 4.1
    */
   static propTypes = {
+    templateHeaderText: PropTypes.string,
     templates: PropTypes.array,
-    route: PropTypes.object
+    templateDetailsText: PropTypes.string,
+    activateText: PropTypes.string,
+    ajaxUrl: PropTypes.string,
+    ajaxNonce: PropTypes.string,
+    addTemplateText: PropTypes.string,
+    genericUploadErrorText: PropTypes.string,
+    filenameErrorText: PropTypes.string,
+    filesizeErrorText: PropTypes.string,
+    installSuccessText: PropTypes.string,
+    installUpdatedText: PropTypes.string,
+    templateSuccessfullyInstalledUpdated: PropTypes.string,
+    templateInstallInstructions: PropTypes.string
   }
 
   /**
    * @since 4.1
    */
   render () {
-    const header = <TemplateHeaderTitle header={this.props.templateHeaderText}/>
+    const header = <TemplateHeaderTitle header={this.props.templateHeaderText} />
 
     return (
       <TemplateContainer header={header} closeRoute="/">
-        <TemplateSearch/>
+        <TemplateSearch />
         <div>
           {
             this.props.templates.map((value, index) => {
@@ -69,7 +79,7 @@ export class TemplateList extends React.Component {
                 key={index}
                 template={value}
                 templateDetailsText={this.props.templateDetailsText}
-                activateText={this.props.activateText}/>
+                activateText={this.props.activateText} />
             })
           }
 
