@@ -35,11 +35,13 @@ import React from 'react'
  *
  * @since 5.2
  */
-const DisplayResultItem = ({item}) => {
+const DisplayResultItem = ({ item }) => {
   return (
     <li className='resultExist'>
-      <a href={item.link}>{item.title.rendered}</a>
-      <div dangerouslySetInnerHTML={{__html: item.excerpt.rendered}}/>
+      <a href={item.link}>
+        <div dangerouslySetInnerHTML={{ __html: item.title.rendered }} />
+      </a>
+      <div dangerouslySetInnerHTML={{ __html: item.excerpt.rendered }} />
     </li>
   )
 }

@@ -35,7 +35,7 @@ import React from 'react'
  *
  * @since 5.2
  */
-const DisplayError = ({displayError}) => {
+const DisplayError = ({ displayError }) => {
   return (
     <li className='error'>{displayError}</li>
   )

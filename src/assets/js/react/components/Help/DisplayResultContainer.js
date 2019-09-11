@@ -41,33 +41,32 @@ import DisplayError from './DisplayError'
  *
  * @since 5.2
  */
-const DisplayResultContainer = ({searchInput, loading, helpResult, error}) => {
-
+const DisplayResultContainer = ({ searchInput, loading, helpResult, error }) => {
   if (searchInput.length <= 3) {
     return null
   }
 
-  const displayLoading = loading ? <div style={{float: 'right'}}><Spinner/></div> : null
-  const showEmptyResults = helpResult.length === 0 && !loading && error === ''
+  const displayLoading = loading ? <div style={{ float: 'right' }}><Spinner /></div> : null
+  const showEmptyResults = helpResult.length === 0 && !loading
   const searchResults = helpResult.map((item, index) => (
-    <DisplayResultItem item={item} key={index}/>
+    <DisplayResultItem item={item} key={index} />
   ))
   const displayError = error
 
   return (
     <div id='search-results'>
       <div id='dashboard_primary' className='metabox-holder'>
-        <div id='documentation-api' className='postbox' style={{display: 'block'}}>
+        <div id='documentation-api' className='postbox' style={{ display: 'block' }}>
           <h3 className='hndle'>
             <span>{GFPDF.searchResultHeadingText}</span>
             {displayLoading}
           </h3>
 
-          <div className='inside rss-widget' style={{display: 'block'}}>
+          <div style={{ display: 'block' }}>
             <ul className='searchParseHTML'>
               {searchResults}
-              {showEmptyResults && <DisplayResultEmpty/>}
-              {!!displayError && <DisplayError displayError={displayError}/>}
+              {showEmptyResults && !displayError && <DisplayResultEmpty />}
+              {!!displayError && <DisplayError displayError={displayError} />}
             </ul>
           </div>
         </div>

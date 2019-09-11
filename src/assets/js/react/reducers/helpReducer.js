@@ -63,7 +63,8 @@ export default function (state = initialState, action) {
     case GET_DATA:
       return {
         ...state,
-        loading: true
+        loading: true,
+        error: ''
       }
 
     /**
