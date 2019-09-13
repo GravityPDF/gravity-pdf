@@ -43,7 +43,7 @@ import helpBootstrap from './bootstrap/helpBootstrap'
 $(function () {
   'use strict'
 
-  __webpack_public_path__ = GFPDF.pluginUrl + 'dist/assets/js/'
+  __webpack_public_path__ = GFPDF.pluginUrl + 'dist/assets/js/' // eslint-disable-line
 
   /* Initialise the Fancy Template Picker */
   if (GFPDF.templateList !== undefined) {

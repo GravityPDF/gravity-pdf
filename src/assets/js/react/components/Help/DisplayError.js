@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 /**
  * @package     Gravity PDF
@@ -39,6 +40,13 @@ const DisplayError = ({ displayError }) => {
   return (
     <li className='error'>{displayError}</li>
   )
+}
+
+/**
+ *  @since 5.2
+ */
+DisplayError.propTypes = {
+  displayError: PropTypes.string
 }
 
 export default DisplayError

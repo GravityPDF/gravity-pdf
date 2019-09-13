@@ -32,7 +32,7 @@ export function setupAJAXListStateListener () {
       }
 
       /* Do ajax call */
-      ajaxCall(data, function (response) {
+      ajaxCall(data, function () {
         /* Don't do anything with a successful response */
       })
     }

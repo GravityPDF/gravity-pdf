@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import debounce from 'lodash.debounce'
 import { deleteResult, getData } from '../../actions/help'
@@ -37,6 +38,18 @@ import DisplayResultContainer from './DisplayResultContainer'
  * @since 5.2
  */
 export class HelpContainer extends Component {
+
+  /**
+   *
+   * @since 5.2
+   */
+  static propTypes = {
+    getData: PropTypes.func,
+    deleteResult: PropTypes.func,
+    loading: PropTypes.bool,
+    helpResult: PropTypes.array,
+    error: PropTypes.string
+  }
 
   /**
    * Initialize component state
@@ -130,7 +143,7 @@ const mapStateToProps = state => ({
 /**
  * Dispatch Redux actions as props
  *
- * @returns {{updateResult: (object), deleteResult}}
+ * @returns {{ getData, deleteResult }}
  *
  * @since 5.2
  */

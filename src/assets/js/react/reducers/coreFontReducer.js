@@ -133,9 +133,10 @@ export default function (state = initialState, action) {
     /**
      * @since 5.2
      */
-    case GET_FILES_FROM_GITHUB_SUCCESS:
-      /* Push font names into array */
+    case GET_FILES_FROM_GITHUB_SUCCESS: {
       let files = []
+
+      /* Push font names into array */
       action.payload.map((item) => {
         files.push(item.name)
       })
@@ -144,6 +145,7 @@ export default function (state = initialState, action) {
         ...state,
         fontList: files
       }
+    }
 
     /**
      * @since 5.2
@@ -157,11 +159,12 @@ export default function (state = initialState, action) {
     /**
      * @since 5.2
      */
-    case REQUEST_SENT_COUNTER:
+    case REQUEST_SENT_COUNTER: {
       /* Show the overall status in the console once all the fonts have been downloaded (or tried to download) */
       const errors = state.retry.length
       const status = errors ? 'error' : 'success'
       const message = errors ? GFPDF.coreFontError.replace('%s', errors) : GFPDF.coreFontSuccess
+
       /* Fire only if requested a retry download */
       if (state.retry_download === true) {
         state.retryDownloadLength--
@@ -228,6 +231,7 @@ export default function (state = initialState, action) {
           remainingDownload: remainingDownloadCounter
         }
       }
+    }
 
     /**
      * @since 5.2

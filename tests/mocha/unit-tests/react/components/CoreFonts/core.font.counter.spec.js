@@ -5,7 +5,7 @@ import CoreFontCounter from '../../../../../../src/assets/js/react/components/Co
 describe('<CoreFontCounter />', () => {
 
   it('Render the counter', () => {
-    const comp = shallow(<CoreFontCounter text='Prefix:' queue='1' />)
+    const comp = shallow(<CoreFontCounter text='Prefix:' queue={1} />)
 
     expect(comp.text()).to.equal('Prefix: 1')
   })

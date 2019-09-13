@@ -25,6 +25,7 @@
     "@babel/polyfill": "^7.2.5",
     "@babel/preset-env": "^7.3.4",
     "@babel/preset-react": "^7.0.0",
+    "babel-eslint": "10.0.1",
     "babel-loader": "8.0.5",
     "babel-plugin-istanbul": "^5.1.1",
     "backbone": "^1.4.0",
@@ -71,6 +72,7 @@
     "webpack-merge": "^4.2.1"
   },
   "scripts": {
+    "lint": "eslint src/**/*.js",
     "test:e2e": "cross-env NODE_ENV=test testcafe chrome tests/e2e",
     "test:e2e:headless": "cross-env NODE_ENV=test testcafe chrome:headless tests/e2e",
     "test:e2e:file": "cross-env NODE_ENV=test testcafe chrome",
