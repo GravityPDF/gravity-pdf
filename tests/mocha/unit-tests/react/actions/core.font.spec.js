@@ -9,7 +9,6 @@ import {
   downloadFontsApiCall,
   currentDownload,
   clearRequestRemainingData,
-  retryDownload,
   ADD_TO_CONSOLE,
   CLEAR_CONSOLE,
   ADD_TO_RETRY_LIST,
@@ -19,8 +18,7 @@ import {
   GET_FILES_FROM_GITHUB_FAILED,
   DOWNLOAD_FONTS_API_CALL,
   REQUEST_SENT_COUNTER,
-  CLEAR_REQUEST_REMAINING_DATA,
-  RETRY_DOWNLOAD
+  CLEAR_REQUEST_REMAINING_DATA
 } from '../../../../../src/assets/js/react/actions/coreFonts'
 
 describe('Actions coreFonts -', () => {
@@ -81,7 +79,7 @@ describe('Actions coreFonts -', () => {
 
   describe('getFilesFromGitHubFailed', () => {
     it('check if it returns the correct action', () => {
-      let data = {'info': 'data1'}
+      let data = { 'info': 'data1' }
       let results = getFilesFromGitHubFailed(data)
 
       expect(results.payload).to.be.a('object')
@@ -112,16 +110,6 @@ describe('Actions coreFonts -', () => {
       let results = clearRequestRemainingData()
 
       expect(results.type).is.equal(CLEAR_REQUEST_REMAINING_DATA)
-    })
-  })
-
-  describe('retryDownload', () => {
-    it('check if it returns the correct action', () => {
-      let results = retryDownload(1)
-
-      expect(results.payload).to.satisfy(Number.isInteger)
-      expect(results.payload).is.equal(1)
-      expect(results.type).is.equal(RETRY_DOWNLOAD)
     })
   })
 })

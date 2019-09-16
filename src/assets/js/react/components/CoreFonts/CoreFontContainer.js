@@ -11,7 +11,6 @@ import {
   getFilesFromGitHub,
   downloadFontsApiCall,
   clearRequestRemainingData,
-  retryDownload,
   clearConsole
 } from '../../actions/coreFonts'
 
@@ -56,21 +55,18 @@ export class CoreFontContainer extends React.Component {
     getFilesFromGitHub: PropTypes.func,
     fontList: PropTypes.array,
     retry: PropTypes.array,
-    retryDownload: PropTypes.func,
     clearConsole: PropTypes.func,
     history: PropTypes.object,
     clearRetryList: PropTypes.func,
     downloadFontsApiCall: PropTypes.func,
     githubError: PropTypes.string,
     addToConsole: PropTypes.func,
-    retry_download: PropTypes.bool,
-    retryDownloadLength: PropTypes.func,
-    remainingDownload: PropTypes.number,
     console: PropTypes.object,
     buttonClassName: PropTypes.string,
     buttonText: PropTypes.string,
     counterText: PropTypes.string,
-    retryText: PropTypes.string
+    retryText: PropTypes.string,
+    queue: PropTypes.number
   }
 
   /**
@@ -95,7 +91,9 @@ export class CoreFontContainer extends React.Component {
     this.maybeStartDownload(nextProps.location)
     /* Set ajax/loading false if request download is finished */
     nextProps.requestDownload === 'finished' && (
-      this.setState({ ajax: false }), this.props.clearRequestRemainingData()
+      this.setState({ ajax: false }),
+        this.props.clearRequestRemainingData(),
+        this.props.history.replace('')
     )
   }
 
@@ -124,7 +122,6 @@ export class CoreFontContainer extends React.Component {
 
     if (!this.state.ajax && location.pathname === '/retryDownloadCoreFonts' && this.props.retry.length > 0) {
       this.startDownloadFonts(this.props.retry)
-      this.props.retryDownload(this.props.retry.length)
     }
   }
 
@@ -143,7 +140,6 @@ export class CoreFontContainer extends React.Component {
     }
 
     this.props.clearConsole()
-    this.props.history.replace('')
     this.setState({ ajax: true })
     this.props.clearRetryList()
 
@@ -188,31 +184,34 @@ export class CoreFontContainer extends React.Component {
    * @since 5.0
    */
   render () {
-    /* Set our Queue length value */
-    let queueLength
-    if (this.props.retry_download === true) queueLength = this.props.retryDownloadLength
-    if (this.props.remainingDownload === 0 && this.props.retry.length === 0 && this.props.retry_download === false) {
-      queueLength = this.props.fontList.length
-    } else {
-      queueLength = this.props.retryDownloadLength
-    }
-    if (!this.props.console && this.props.retry_download === false) queueLength = this.props.fontList.length
-    if (Object.keys(this.props.console).length > 5 && this.props.retry_download === false) queueLength = this.props.remainingDownload
+    const {
+      fontList,
+      buttonClassName,
+      buttonText,
+      counterText,
+      queue,
+      history,
+      console,
+      retry,
+      retryText
+    } = this.props
+    const disabled = queue < fontList.length && queue !== 0
 
     return (
       <div>
         <Button
-          className={this.props.buttonClassName}
+          className={buttonClassName}
           callback={this.triggerFontDownload}
-          text={this.props.buttonText}
+          text={buttonText}
+          disable={disabled}
         />
         {this.state.ajax && <Spinner />}
-        {this.state.ajax && <Counter text={this.props.counterText} queue={queueLength} />}
+        {this.state.ajax && <Counter text={counterText} queue={queue} />}
         <CoreFontListResults
-          history={this.props.history}
-          console={this.props.console}
-          retry={this.props.retry}
-          retryText={this.props.retryText}
+          history={history}
+          console={console}
+          retry={retry}
+          retryText={retryText}
         />
       </div>
     )
@@ -228,23 +227,19 @@ export class CoreFontContainer extends React.Component {
  *  fontList: Array,
  *  console: Object,
  *  retry: (*|number|Array),
- *  remainingDownload: Integer,
  *  requestDownload: String,
- *  retry_download: Boolean,
- *  retryDownloadLength: null
+ *  queue: boolean
  * }}
  *
  * @since 5.0
  */
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     fontList: state.coreFonts.fontList,
     console: state.coreFonts.console,
     retry: state.coreFonts.retry,
-    remainingDownload: state.coreFonts.remainingDownload,
     requestDownload: state.coreFonts.requestDownload,
-    retry_download: state.coreFonts.retry_download,
-    retryDownloadLength: state.coreFonts.retryDownloadLength
+    queue: state.coreFonts.downloadCounter
   }
 }
 
@@ -257,7 +252,7 @@ const mapStateToProps = (state) => {
  *  getFilesFromGitHub,
  *  downloadFontsApiCall,
  *  clearRequestRemainingData,
- *  retryDownload
+ *  clearConsole
  * }}
  *
  * @since 5.0
@@ -269,6 +264,5 @@ export default connect(mapStateToProps, {
   getFilesFromGitHub,
   downloadFontsApiCall,
   clearRequestRemainingData,
-  retryDownload,
   clearConsole
 })(CoreFontContainer)
