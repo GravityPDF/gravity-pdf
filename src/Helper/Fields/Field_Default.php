@@ -54,7 +54,9 @@ class Field_Default extends Helper_Abstract_Fields {
 			return $this->cache();
 		}
 
-		$this->cache( esc_html( $this->get_value() ) );
+		$value = $this->get_value();
+		$value = is_array( $value ) ? array_map( 'esc_html', $value ) : esc_html( $value );
+		$this->cache( $value );
 
 		return $this->cache();
 	}
