@@ -107,7 +107,10 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 						'Async PDF task error for %s',
 						$callback['id']
 					),
-					[ 'args' => ( isset( $callback['args'] ) ) ? $callback['args'] : [] ]
+					[
+						'args'      => ( isset( $callback['args'] ) ) ? $callback['args'] : [],
+						'exception' => $e->getMessage(),
+					]
 				);
 
 				/* Add back to our queue to retry (up to a grand total of three times) */
