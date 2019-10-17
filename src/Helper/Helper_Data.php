@@ -74,14 +74,16 @@ class Helper_Data {
 	 * @since 4.0
 	 */
 	public function &__get( $name ) {
+
 		/* Check if we actually have a key matching what was requested */
 		if ( array_key_exists( $name, $this->data ) ) {
 			/* key exists, so return */
 			return $this->data[ $name ];
 		}
 
-		/* Not found so generate error */
+		/* phpcs:disable PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection */
 		$trace = debug_backtrace();
+		/* phpcs:enable */
 		trigger_error(
 			'Undefined property via __get(): ' . $name .
 			' in ' . $trace[0]['file'] .

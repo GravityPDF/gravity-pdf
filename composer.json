@@ -1,42 +1,38 @@
 {
-    "config": {
-        "preferred-install": "dist",
-        "autoloader-suffix": "GravityPDFPlugin",
-        "platform": {
-          "php": "5.6.39"
-        }
-    },
-
-    "require": {
-        "mpdf/mpdf": "^8.0.0",
-        "querypath/querypath": ">=3.0.0",
-        "monolog/monolog": "^1.24.0",
-        "codeguy/upload": "^1.3",
-        "spatie/url-signer": "^1.0",
-        "mpdf/qrcode": "^1.0"
-    },
-
-    "require-dev": {
-        "phpunit/phpunit": ">4.0 <7"
-    },
-
-    "autoload": {
-    	"psr-4": {
-    		"GFPDF\\": "src/"
-    	}
-    },
-
-    "scripts": {
-      "post-install-cmd": [
-        "yarn global add gulp-cli",
-        "yarn && gulp",
-        "yarn run build"
-      ],
-
-      "post-update-cmd": [
-        "yarn global add gulp-cli",
-        "yarn && gulp",
-        "yarn run build"
-      ]
+  "name": "gravitypdf/gravitypdf",
+  "license": "GPL-2.0-or-later",
+  "homepage": "https://gravitypdf.com",
+  "config": {
+    "preferred-install": "dist",
+    "autoloader-suffix": "GravityPDFPlugin",
+    "platform": {
+      "php": "5.6.39"
     }
+  },
+  "require": {
+    "php": ">=5.6",
+    "mpdf/mpdf": "^8.0.0",
+    "querypath/querypath": ">=3.0.0",
+    "monolog/monolog": "^1.24.0",
+    "codeguy/upload": "^1.3",
+    "spatie/url-signer": "^1.0",
+    "mpdf/qrcode": "^1.0"
+  },
+  "require-dev": {
+    "dealerdirect/phpcodesniffer-composer-installer": "~0.5.0",
+    "wp-coding-standards/wpcs": "~2.1.0",
+    "phpcompatibility/phpcompatibility-wp": "^2.1.0",
+    "roave/security-advisories": "dev-master"
+  },
+  "autoload": {
+    "psr-4": {
+      "GFPDF\\": "src/"
+    }
+  },
+  "scripts": {
+    "compat": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs --standard=phpcompat.xml.dist",
+    "format": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcbf",
+    "lint": "@php ./vendor/squizlabs/php_codesniffer/bin/phpcs",
+    "lint:errors": "@lint -n"
+  }
 }

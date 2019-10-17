@@ -36,6 +36,7 @@ chunk-*.js
 # Unit tests
 /tmp
 /tests/bin/
+/wordpress/
 
 # Others
 _notes

@@ -2,17 +2,31 @@
 <ruleset name="Gravity PDF">
     <description>Customise the WordPress Coding Standard</description>
 
-    <!-- Exclude a bunch of directories -->
-    <exclude-pattern>/vendor/*</exclude-pattern>
-    <exclude-pattern>/node_modules/*</exclude-pattern>
-    <exclude-pattern>/languages/*</exclude-pattern>
-    <exclude-pattern>/bin/*</exclude-pattern>
-    <exclude-pattern>/tmp/*</exclude-pattern>
-    <exclude-pattern>/dist/*</exclude-pattern>
-    <exclude-pattern>*.js</exclude-pattern>
-    <exclude-pattern>/src/helper/licensing/EDD_SL_Plugin_Updater.php</exclude-pattern>
-    <exclude-pattern>/tests/phpunit/bootstrap.php</exclude-pattern>
-    <exclude-pattern>/tests/phpunit/phpunit6-compat.php</exclude-pattern>
+    <!-- Only scan PHP files. -->
+    <arg name="extensions" value="php"/>
+
+    <!-- Whenever possible, cache the scan results and re-use those for unchanged files on the next scan. -->
+    <arg name="cache"/>
+
+    <!-- Set the memory limit to 256M.
+     For most standard PHP configurations, this means the memory limit will temporarily be raised.
+     Ref: https://github.com/squizlabs/PHP_CodeSniffer/wiki/Advanced-Usage#specifying-phpini-settings
+    -->
+    <ini name="memory_limit" value="256M"/>
+
+    <!-- Strip the filepaths down to the relevant bit. -->
+    <arg name="basepath" value="./"/>
+
+    <!-- Check up to 20 files simultaneously. -->
+    <arg name="parallel" value="20"/>
+
+    <!-- Show sniff codes in all reports -->
+    <arg value="ps"/>
+
+    <file>.</file>
+
+    <!-- Add generic PHP Linting Rule -->
+    <rule ref="Generic.PHP.Syntax"/>
 
     <!-- Include the WordPress Core standard. -->
     <rule ref="WordPress-Core">
@@ -73,4 +87,11 @@
     <rule ref="WordPress.WhiteSpace.ControlStructureSpacing.SpaceBetweenStructureColon">
         <exclude-pattern>/src/*.php</exclude-pattern>
     </rule>
+
+    <!-- Exclude a bunch of directories -->
+    <exclude-pattern>/wordpress/*</exclude-pattern>
+    <exclude-pattern>/vendor/*</exclude-pattern>
+    <exclude-pattern>/node_modules/*</exclude-pattern>
+    <exclude-pattern>/src/helper/licensing/EDD_SL_Plugin_Updater.php</exclude-pattern>
+    <exclude-pattern>/tests/phpunit/bootstrap.php</exclude-pattern>
 </ruleset>

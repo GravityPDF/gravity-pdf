@@ -25,6 +25,7 @@
     "@babel/polyfill": "^7.2.5",
     "@babel/preset-env": "^7.3.4",
     "@babel/preset-react": "^7.0.0",
+    "@wordpress/scripts": "^5.1.0",
     "babel-eslint": "10.0.1",
     "babel-loader": "8.0.5",
     "babel-plugin-istanbul": "^5.1.1",
@@ -63,7 +64,7 @@
     "sinon": "^7.2.6",
     "standard": "^12.0.1",
     "superagent-mocker": "^0.5.2",
-    "testcafe": "^1.2.1",
+    "testcafe": "^1.6.0",
     "uglifyjs-webpack-plugin": "^2.1.2",
     "underscore": "^1.9.1",
     "webpack": "^4.29.6",
@@ -72,17 +73,40 @@
     "webpack-merge": "^4.2.1"
   },
   "scripts": {
-    "lint": "eslint src/**/*.js",
-    "test:e2e": "cross-env NODE_ENV=test testcafe chrome tests/e2e",
-    "test:e2e:headless": "cross-env NODE_ENV=test testcafe chrome:headless tests/e2e",
-    "test:e2e:file": "cross-env NODE_ENV=test testcafe chrome",
+    "lint:js": "eslint src/**/*.js",
+
+    "test:php": "wp-scripts env test-php",
+    "test:php:multisite": "cross-env WP_MULTISITE=1 wp-scripts env test-php",
+
+    "test:e2e": "cross-env NODE_ENV=test testcafe chrome tests/e2e -s takeOnFails=true",
+    "test:e2e:headless": "cross-env NODE_ENV=test testcafe chrome:headless tests/e2e -s takeOnFails=true",
+    "test:e2e:file": "cross-env NODE_ENV=test testcafe chrome -s takeOnFails=true",
     "test:e2e:watch": "cross-env NODE_ENV=test testcafe chrome tests/e2e -L",
     "test:e2e:file:watch": "cross-env NODE_ENV=test testcafe chrome -L",
-    "test": "cross-env NODE_ENV=test karma start",
-    "test:coverage": "cross-env NODE_ENV=test cross-env ENABLE_CODE_COVERAGE=1 karma start",
-    "test:watch": "cross-env NODE_ENV=test karma start --auto-watch --no-single-run --log-level error",
-    "test:all": "cross-env NODE_ENV=test karma start --browsers Firefox,Chrome,IE",
-    "watch": "cross-env NODE_ENV=development webpack --progress --colors --watch --mode development",
-    "build": "cross-env NODE_ENV=production webpack --mode production"
+
+    "test:js": "cross-env NODE_ENV=test karma start",
+    "test:js:coverage": "cross-env NODE_ENV=test ENABLE_CODE_COVERAGE=1 karma start",
+    "test:js:watch": "cross-env NODE_ENV=test karma start --auto-watch --no-single-run --log-level error",
+    "test:js:all": "cross-env NODE_ENV=test karma start --browsers Firefox,Chrome,IE",
+
+    "prebuild": "yarn global add gulp-cli && yarn",
+    "build:production": "gulp && cross-env NODE_ENV=production webpack --mode production",
+    "build:dev": "gulp && cross-env NODE_ENV=development webpack --mode development",
+    "build:watch": "gulp watch && cross-env NODE_ENV=development webpack --progress --colors --watch --mode development",
+
+    "check-licenses": "wp-scripts check-licenses --prod --gpl2",
+
+    "env": "wp-scripts env",
+    "env:install": "bash bin/install.sh",
+    "env:install:gf": "bash bin/install-gravityforms.sh",
+    "env:install:phpunit": "bash bin/install-phpunit.sh",
+    "env:start": "bash bin/start.sh",
+    "env:reset": "bash bin/reset.sh"
+  },
+
+  "wp-env": {
+    "plugin-dir": "gravity-forms-pdf-extended",
+    "plugin-name": "Gravity PDF",
+    "docker-template": "./.docker/docker-compose.override.yml.template"
   }
 }
