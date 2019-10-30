@@ -18,10 +18,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div class="gfpdf-mascot-sitting"></div>
 
-<div class="changelog">
+<div class="gfpdf-changelog">
 	<h2><?php esc_html_e( 'Get more out of Gravity PDF', 'gravity-forms-pdf-extended' ); ?></h2>
 
-	<div class="feature-section three-col">
+	<div class="feature-section gfpdf-three-col">
 		<div class="col gfpdf-breakdown">
 
 			<h4><?php esc_html_e( 'PDF Template Shop', 'gravity-forms-pdf-extended' ); ?></h4>
@@ -46,7 +46,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		</div>
 
-		<div class="col gfpdf-breakdown last-feature">
+		<div class="col gfpdf-breakdown gfpdf-last-feature">
 
 			<h4><?php esc_html_e( 'Tailored PDFs', 'gravity-forms-pdf-extended' ); ?></h4>
 
