@@ -3,7 +3,7 @@ Gravity PDF
 
 [![Build Status](https://travis-ci.org/GravityPDF/gravity-pdf.svg?branch=development)](https://travis-ci.org/GravityPDF/gravity-pdf) [![codecov](https://codecov.io/gh/GravityPDF/gravity-pdf/branch/development/graph/badge.svg)](https://codecov.io/gh/GravityPDF/gravity-pdf)
 
-Gravity PDF is a GPLv2-licensed WordPress plugin that allows you to automatically generate, email and download PDF documents using the popular form-builder plugin, [Gravity Forms](https://rocketgenius.pxf.io/c/1211356/445235/7938). Find out more about Gravity PDF at [https://gravitypdf.com](https://gravitypdf.com/).
+Gravity PDF is a GPLv2-licensed WordPress plugin that allows you to automatically generate, email and download PDF documents using the popular form-builder plugin, [Gravity Forms](https://rocketgenius.pxf.io/c/1211356/445235/7938) (affiliate link). Find out more about Gravity PDF at [https://gravitypdf.com](https://gravitypdf.com/).
 
 # About
 
@@ -13,20 +13,74 @@ The `development` branch is considered our bleeding edge branch, with all new ch
 
 # Installation
 
-Before beginning, ensure you have [Git](https://git-scm.com/), [Composer](https://getcomposer.org/) and [Yarn](https://yarnpkg.com/en/docs/install) installed and their commands are globally accessible via the command line.
+## Prerequisites
+
+* [Git](https://git-scm.com/)
+* [Yarn](https://yarnpkg.com/en/docs/install)
+* Docker Desktop ([Windows](https://docs.docker.com/docker-for-windows/install/) or [Mac](https://docs.docker.com/docker-for-mac/install/)) / [Docker Toolbox](https://docs.docker.com/toolbox/) or [Composer](https://getcomposer.org/)
+
+## Setup for Docker 
+
+The Docker setup will create a fully functionality development environment preconfigured for Gravity PDF. 
+
+1. Clone the repository using `git clone https://github.com/GravityPDF/gravity-pdf/` from the terminal
+1. Copy and rename `.env.example` to `.env`, then replace `00000000000000000000000000000000` with a valid Gravity Forms license key 
+1. Run `yarn prebuild` and `yarn build:production`
+1. Start Docker Desktop (or run `docker-machine start && eval $(docker-machine env)` if using Docker Toolbox)
+1. Run `yarn env:install`, then wait for the Docker environment to start-up
+1. If successful, you will now have a fully-functional development environment setup with Gravity Forms and Gravity PDF. The URL and login details will be shown in the terminal.
+
+If you shutdown Docker and want to fire up the environment later, use `yarn env:start`. You can also reset the database back to its original state with `yarn env:reset` 
+
+## Setup without Docker
+
+If you would rather use your own development environment, you can build Gravity PDF using the following commands. 
 
 1. Clone the repository using `git clone https://github.com/GravityPDF/gravity-pdf/`
-1. Open your terminal / command prompt to the Gravity PDF root directory and run `composer install`. This command will automatically download all the PHP and JS packages, and run the build tools.
-1. Copy the plugin to your WordPress plugin directory (if not there already) and active through your WordPress admin area
+1. Run `yarn prebuild` and `yarn build:production`
+1. Run `composer install`
 
-# Setup Local Docker Environment
+## Linting
 
-A test site with Gravity PDF pre-configured can be automatically be built locally if you've Docker installed on available via the CLI. To setup:
+To lint your JS code, use `yarn lint:js`. 
 
-1. Start Docker. Note: if running Local By Flywheel (or you need to start Docker manually), first run `docker-machine start`, then `eval $(docker-machine env)`.
-1. Copy `.env.example` to `.env` and replace `0000000000000000` with a valid Elite license key in `.env`
-1. Run `./bin/setup-local-env.sh` from the command line
-1. Access test site at `http://localhost:8888`, or the domain shown in the CLI if different. The username is `admin` and the password is `password`
+To lint your PHP code with Docker use:
+```
+yarn env docker-run php composer compat
+yarn env docker-run php composer lint
+yarn env docker-run php composer lint:errors
+```
+
+To automatically fix PHP lint errors, use `yarn env docker-run php composer format`
+
+If you aren't using docker, omit `yarn env docker-run php` from the beginning of each command.
+
+## Automated Tests
+
+The automated test suite can only be run using Docker. 
+
+## E2E
+
+Useful commands include:
+
+```
+yarn test:e2e
+yarn test:e2e:headless
+```
+
+## PHPUnit
+
+To succesfully run all PHPUnit tests you will need an Elite Gravity Forms license so the Survey, Poll, and Quiz plugins can be automatically installed and downloaded. To install these plugins, run `yarn env:install:phpunit`. 
+
+You can then run full suite of tests using `yarn test:php` or `yarn test:php:multisite`
+
+## JavaScript
+
+The JavaScript unit tests can be run with `yarn test:js`
+
+## Building JS
+
+If you are making changes to any of the JavaScript, run `yarn build:watch` to ensure it automatically gets built when you make changes on the file system. 
 
 # Documentation
 
@@ -40,38 +94,8 @@ There are a few guidelines that need to be followed to ensure a smooth pull requ
 
 1. Adhere to the existing code standard which follows [WordPress standards](https://make.wordpress.org/core/handbook/best-practices/coding-standards/php/), with the exception of Yoda conditionals.
 1. All PRs must be to the `development` branch.
-1. Modifications of the existing codebase must pass all unit tests.
-1. Any additions to the plugin must have appropriate unit tests written.
+1. Modifications of the existing codebase must pass unit tests.
+1. Additions to the plugin must have appropriate E2E/unit tests written.
 1. PRs that don't pass existing unit testing or do not have the proper tests to accompany the changes will not be merged.
-1. Once our team is happy with the PR we'll ask you to squash your branch into a single commit, rebase it onto the development branch and push the changes to GitHub. This ensures we keep a clean Git history.
 
 If you are uncertain whether your PR meets all these requirements, don't worry! If there are problems our friendly team will guide you in the right direction.
-
-### Run Unit Tests
-
-#### PHPUnit (PHP)
-
-We use PHPUnit to test out all the PHP we write. The tests are located in `tests/phpunit/unit-tests/`
-
-Installing the testing environment is best done using a flavour of Vagrant (try [Varying Vagrant Vagrants](https://github.com/Varying-Vagrant-Vagrants/VVV)).
-
-1. From your terminal SSH into your Vagrant box using the `vagrant ssh` command
-2. `cd` into the root of your Gravity PDF directory
-3. Run `bash tests/bin/install.sh gravitypdf_test root root localhost` where `root root` is substituted for your mysql username and password (VVV users can run the command as is).
-4. Upon success you can run `vendor/bin/phpunit`, `vendor/bin/phpunit --group ajax` and `vendor/bin/phpunit --group slow-pdf-processes`.
-
-#### Mocha (JS)
-
-We use the JS libaries, [Mocha](https://mochajs.org/), [Chai](http://chaijs.com/) and [Sinon](http://sinonjs.org/) to test our Javascript and use [Karma](https://karma-runner.github.io/1.0/index.html) to run those tests in a variety of browsers. We also use [Enzyme](https://github.com/airbnb/enzyme) to help test ReactJS.
-
-The tests are located in `tests/mocha/unit-tests/`.
-
-Running the tests can easily be done with one of the following commands:
-
-* `yarn run test` – runs all the tests once in PhantomJS
-* `yarn run test:watch` – watches for changes to the tests and runs in PhantomJS
-* `yarn run test:all` – runs all tests in Firefox, Chrome and Internet Explorer
- 
-### Building JS
-
-We use Webpack to compile our Javascript from ES6 to ES5. If you want to modify the Javascript then take advantage of `yarn run watch` to automatically re-build the JS when changes are made.

@@ -21,7 +21,9 @@ git archive ${BRANCH} --output ${PACKAGE_DIR}/package.tar.gz
 tar -zxf ${PACKAGE_DIR}/package.tar.gz --directory ${PACKAGE_DIR} && rm --force ${PACKAGE_DIR}/package.tar.gz
 
 # Run Composer
-composer install --no-dev  --prefer-dist --optimize-autoloader --working-dir ${PACKAGE_DIR}
+yarn prebuild
+yarn build:production
+yarn env docker-run php composer install --no-dev  --prefer-dist --optimize-autoloader --working-dir ${PACKAGE_DIR}
 
 # Cleanup Node JS
 rm --force -R ${PACKAGE_DIR}/node_modules
@@ -45,10 +47,3 @@ done
 rm --force -R "${PACKAGE_DIR}/src/assets/css"
 rm --force -R "${PACKAGE_DIR}/src/assets/js"
 rm --force -R "${PACKAGE_DIR}/vendor/mpdf/mpdf/ttfonts"
-
-# Create zip package
-cd ${TMP_DIR}
-rm --force -R ${PACKAGE_NAME}
-mv ${VERSION} ${PACKAGE_NAME}
-zip -r -q ${PACKAGE_NAME}-${VERSION}.zip ${PACKAGE_NAME}
-mv ${PACKAGE_NAME} ${VERSION}

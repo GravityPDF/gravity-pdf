@@ -91,19 +91,16 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 
 		/* make changes to the values */
 		$form['notifications']       = 'My Notifications';
-		$form['confirmations']       = 'My Confirmation';
 		$form['gfpdf_form_settings'] = 'My PDF settings';
 
 		/* Update the form */
 		GFFormsModel::update_form_meta( $this->form_id, $form );
 		GFFormsModel::update_form_meta( $this->form_id, $form['notifications'], 'notifications' );
-		GFFormsModel::update_form_meta( $this->form_id, $form['confirmations'], 'confirmations' );
 
 		/* check the update was successful */
 		$form = GFFormsModel::get_form_meta( $this->form_id );
 
 		$this->assertEquals( 'My Notifications', $form['notifications'] );
-		$this->assertEquals( 'My Confirmation', $form['confirmations'] );
 		$this->assertEquals( 'My PDF settings', $form['gfpdf_form_settings'] );
 	}
 

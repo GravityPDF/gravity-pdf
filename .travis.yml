@@ -1,83 +1,162 @@
-language: php
+os: linux
 
-sudo: false
+language: shell
 
 services:
-  - mysql
+  - docker
 
 addons:
   apt:
     sources:
-    - sourceline: 'deb https://dl.yarnpkg.com/debian/ stable main'
-      key_url: 'https://dl.yarnpkg.com/debian/pubkey.gpg'
+      - sourceline: 'deb https://dl.yarnpkg.com/debian/ stable main'
+        key_url: 'https://dl.yarnpkg.com/debian/pubkey.gpg'
+      - google-chrome
     packages:
-    - yarn
+      - docker-ce
+      - yarn
+      - google-chrome-stable
 
 cache:
   yarn: true
+  apt: true
   directories:
-  - $HOME/.composer/cache/files
-
-php:
-- 5.6
-- 7.0
-- 7.1
-- 7.2
-- 7.3
+    - $HOME/.composer/cache
+    - $HOME/.npm
+    - $HOME/.nvm/.cache
 
 env:
-- WP_VERSION=latest WP_MULTISITE=0 PLUGIN=gravity-forms-pdf-extended
-
-matrix:
-  include:
-  - php: 7.2
-    env: WP_VERSION=latest WP_MULTISITE=1 COVERAGE=1
-  - php: 7.2
-    env: LINT=1
+  global:
+    - WP_DEVELOP_DIR: ./wordpress
+    - INSTALL_COMPOSER: 0
+    - INSTALL_WORDPRESS: true
+    - LOCAL_WP_DEBUG: true
+    - LOCAL_WP_DEBUG_LOG: true
+    - LOCAL_WP_DEBUG_DISPLAY: false
 
 before_install:
-- |
-  if [[ "$LINT" == "1" ]]; then
-    export PHPCS_DIR=/tmp/phpcs
-    export LINTS_DIR=/tmp/lint
-    git clone -b master --depth 1 https://github.com/squizlabs/PHP_CodeSniffer.git $PHPCS_DIR
-    git clone -b master --depth 1 https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards.git $LINTS_DIR
-    $PHPCS_DIR/bin/phpcs --config-set installed_paths $LINTS_DIR
-    phpenv rehash
-  fi;
+  - nvm install --lts
+  - yarn prebuild
+  - |
+    if [[ "$INSTALL_WORDPRESS" = "true" ]]; then
+      # Upgrade docker-compose.
+      sudo rm /usr/local/bin/docker-compose
+      curl -sL https://github.com/docker/compose/releases/download/1.24.0/docker-compose-`uname -s`-`uname -m` > docker-compose
+      chmod +x docker-compose
+      sudo mv docker-compose /usr/local/bin
+    fi
 
-before_script:
-- if [[ "$COVERAGE" != "1" ]]; then phpenv config-rm xdebug.ini; fi
-- if find . -name "*.php" -exec php -l {} \; | grep "unexpected $end"; then exit 1; fi
-- composer install --prefer-source --optimize-autoloader --no-scripts
-- bash tests/bin/install.sh gravitypdf_test root '' localhost $WP_VERSION
-- if [[ "$WP_MULTISITE" = "1" ]]; then nvm install 10.15 && yarn global add karma-cli && yarn; fi
-- if [ -n "$TRAVIS_TAG" ]; then nvm install 10.15; fi
+install:
+  # Build Gravity PDF
+  - yarn build:production
+  - |
+    if [[ "$INSTALL_WORDPRESS" = "true" ]]; then
+      npm run env:install
+      npm run env:install:phpunit
+    fi
+  - |
+    if [[ "$INSTALL_COMPOSER" != "0" ]]; then
+      bash ./bin/download-wordpress.sh
+      bash ./bin/install-wordpress.sh
+      npm run env connect
+      if [[ "$INSTALL_COMPOSER" = "2" ]]; then
+        npm run env docker-run -- php composer install --no-dev
+      else
+        npm run env docker-run -- php composer install
+      fi
+    fi
 
-script:
-- |
-  if [[ "$LINT" == "1" ]]; then
-    $PHPCS_DIR/bin/phpcs -p .
-  elif [[ "$COVERAGE" == "1" ]]; then
-   yarn run test:coverage
-   ./vendor/bin/phpunit --coverage-clover=tmp/coverage/report-xml/php-coverage1.xml -c tests/phpunit/phpunit.xml.
-   ./vendor/bin/phpunit --coverage-clover=tmp/coverage/report-xml/php-coverage2.xml -c tests/phpunit/phpunit.xml.dist --group ajax
-   yarn run lint
-  else
-   ./vendor/bin/phpunit -c tests/phpunit/phpunit.xml.dist
-   ./vendor/bin/phpunit -c tests/phpunit/phpunit.xml.dist --group ajax
-  fi
+jobs:
+  fast_finish: true
+  allow_failures:
+    - name: PHP 7.4 unit tests
+
+  include:
+    - name: PHP Linting
+      env: INSTALL_WORDPRESS=false INSTALL_COMPOSER=1
+      script:
+        - |
+          npm run env docker-run -- php composer format &&
+          npm run env docker-run -- php composer lint:errors
+
+    - name: PHP Compatibility
+      env: INSTALL_WORDPRESS=false INSTALL_COMPOSER=1
+      script:
+        - npm run env docker-run -- php composer compat
+
+    - name: JS Linting
+      env: INSTALL_WORDPRESS=false
+      script:
+        - npm run lint:js
+
+    - name: E2E Testing
+      script:
+        - npm run test:e2e:headless
+
+    - name: PHP 7.3 unit tests
+      env: LOCAL_PHP=7.3-fpm
+      script:
+        - |
+          npm run test:php && npm run test:php --group ajax &&
+          npm run test:php:multisite && npm run test:php:multisite --group ajax
+
+    - name: PHP 7.2 unit tests
+      env: LOCAL_PHP=7.2-fpm
+      script:
+        - |
+          npm run test:php &&
+          npm run test:php --group ajax
+
+    - name: PHP 7.1 unit tests
+      env: LOCAL_PHP=7.1-fpm
+      script:
+        - |
+          npm run test:php &&
+          npm run test:php --group ajax
+
+    - name: PHP 7.0 unit tests
+      env: LOCAL_PHP=7.0-fpm
+      script:
+        - |
+          npm run test:php &&
+          npm run test:php --group ajax
+
+    - name: PHP 5.6 unit tests
+      env: LOCAL_PHP=5.6-fpm
+      script:
+        - |
+          npm run test:php &&
+          npm run test:php --group ajax
+
+    - name: PHP 7.4 unit tests
+      env: LOCAL_PHP=7.4-fpm
+      script:
+        - |
+          npm run test:php &&
+          npm run test:php --group ajax
+
+    - name: JS and PHP Coverage
+      env: LOCAL_PHP=7.3-fpm LOCAL_PHP_XDEBUG=true
+      script:
+        - |
+          npm run test:js:coverage &&
+          npm run test:php --coverage-clover=tmp/coverage/report-xml/php-coverage1.xml &&
+          npm run test:php --coverage-clover=tmp/coverage/report-xml/php-coverage2.xml --group ajax
+
+    - stage: Deploy
+      name: Package and Push to WordPress.org
+      env: INSTALL_WORDPRESS=false LOCAL_PHP=5.6-fpm INSTALL_COMPOSER=2
+      script:
+        - |
+          bash ./bin/package.sh $TRAVIS_TAG $TRAVIS_BRANCH &&
+          bash ./bin/deploy.sh
+      if: tag IS present
 
 after_success:
--  if [[ $PHPUNIT_COVERAGE_TEST ]]; then bash <(curl -s https://codecov.io/bash); fi
+  - |
+    if [[ "$LOCAL_PHP_XDEBUG" = "true" ]]; then
+      bash <(curl -s https://codecov.io/bash);
+    fi
 
-before_deploy:
--  if [[ $TRAVIS_TAG ]]; then bash ./bin/build.sh $TRAVIS_TAG $TRAVIS_BRANCH; fi
-
-deploy:
-  provider: script
-  skip_cleanup: true
-  script: bash ./bin/deploy.sh
-  on:
-    tags: true
-    php: 5.6
+after_failure:
+  - cat ./wordpress/src/wp-content/debug.log
+  - cat ./wordpress/src/wp-content/uploads/gravity_forms/logs/*.txt

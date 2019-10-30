@@ -227,7 +227,7 @@ class Test_Installer extends WP_UnitTestCase {
 		add_filter(
 			'gfpdf_tmp_location',
 			function( $path ) {
-				return ABSPATH . '../tmp/';
+				return ABSPATH . 'wp-content/tmp/';
 			}
 		);
 
@@ -250,7 +250,7 @@ class Test_Installer extends WP_UnitTestCase {
 		/* Test the results */
 		$this->assertTrue( is_dir( ABSPATH . 'PDF_EXTENDED_TEMPLATES' ) );
 		$this->assertTrue( is_dir( ABSPATH . 'wp-content/pdf-fonts' ) );
-		$this->assertTrue( is_dir( ABSPATH . '../tmp' ) );
+		$this->assertTrue( is_dir( ABSPATH . 'wp-content/tmp' ) );
 
 		/* Cleanup folder structure and reset the template location */
 		$gfpdf->misc->rmdir( $gfpdf->data->template_location );

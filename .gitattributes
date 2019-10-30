@@ -8,9 +8,10 @@
 /bin export-ignore
 /karma.conf.js export-ignore
 /node_modules export-ignore
-/phpcs.xml export-ignore
-/phpunit.xml export-ignore
+/phpcs.xml.dist export-ignore
+/phpcompat.xml.dist export-ignore
 /phpunit.xml.dist export-ignore
+/.env.example export-ignore
 /tests export-ignore
 
 *.sh eol=lf

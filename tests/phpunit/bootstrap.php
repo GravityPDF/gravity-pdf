@@ -56,7 +56,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 
 		$this->tests_dir    = dirname( __FILE__ );
 		$this->plugin_dir   = dirname( $this->tests_dir ) . '/..';
-		$this->wp_tests_dir = $this->plugin_dir . '/tmp/wordpress-tests-lib';
+		$this->wp_tests_dir = $this->plugin_dir . '/wordpress/tests/phpunit';
 
 		/* load test function so tests_add_filter() is available */
 		require_once $this->wp_tests_dir . '/includes/functions.php';
@@ -66,11 +66,6 @@ class GravityPDF_Unit_Tests_Bootstrap {
 
 		/* load Gravity PDF objects */
 		tests_add_filter( 'after_setup_theme', [ $this, 'create_stubs' ], 20 );
-
-		/* Migration fixer for PHPUnit 6 when not included in the WP Test Environment */
-		if ( ! is_file( $this->wp_tests_dir . '/includes/phpunit6-compat.php' ) && class_exists( 'PHPUnit\Runner\Version' ) ) {
-			require_once dirname( __FILE__ ) . '/phpunit6-compat.php';
-		}
 
 		/* load the WP testing environment */
 		require_once( $this->wp_tests_dir . '/includes/bootstrap.php' );
@@ -82,10 +77,10 @@ class GravityPDF_Unit_Tests_Bootstrap {
 	 * @since 4.0
 	 */
 	public function load() {
-		require_once $this->plugin_dir . '/tmp/gravityforms/gravityforms.php';
-		require_once $this->plugin_dir . '/tmp/gravityformspoll/polls.php';
-		require_once $this->plugin_dir . '/tmp/gravityformsquiz/quiz.php';
-		require_once $this->plugin_dir . '/tmp/gravityformssurvey/survey.php';
+		require_once $this->plugin_dir . '/wordpress/src/wp-content/plugins/gravityforms/gravityforms.php';
+		require_once $this->plugin_dir . '/wordpress/src/wp-content/plugins/gravityformspolls/polls.php';
+		require_once $this->plugin_dir . '/wordpress/src/wp-content/plugins/gravityformsquiz/quiz.php';
+		require_once $this->plugin_dir . '/wordpress/src/wp-content/plugins/gravityformssurvey/survey.php';
 
 		/* set up Gravity Forms database */
 		remove_filter( 'query', [ 'GFForms', 'filter_query' ] );
