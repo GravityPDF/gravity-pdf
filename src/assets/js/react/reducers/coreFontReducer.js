@@ -6,8 +6,7 @@ import {
   GET_FILES_FROM_GITHUB_SUCCESS,
   GET_FILES_FROM_GITHUB_FAILED,
   REQUEST_SENT_COUNTER,
-  CLEAR_REQUEST_REMAINING_DATA,
-  RETRY_DOWNLOAD
+  CLEAR_REQUEST_REMAINING_DATA
 } from '../actions/coreFonts'
 
 /**
@@ -45,12 +44,8 @@ import {
  *  console: Object,
  *  retry: Array,
  *  getFilesFromGitHubFailed: Object,
- *  remainingDownload: Integer,
  *  requestDownload: String,
- *  requestSentCounter: Array,
- *  retry_download: Boolean,
- *  currentDownload: Integer,
- *  retryDownloadLength: null
+ *  downloadCounter: Integer
  * }}
  *
  * @since 5.0
@@ -60,12 +55,8 @@ export const initialState = {
   console: {},
   retry: [],
   getFilesFromGitHubFailed: {},
-  remainingDownload: 0,
   requestDownload: '',
-  requestSentCounter: [],
-  retry_download: false,
-  currentDownload: 0,
-  retryDownloadLength: null
+  downloadCounter: 0
 }
 
 /**
@@ -143,7 +134,8 @@ export default function (state = initialState, action) {
 
       return {
         ...state,
-        fontList: files
+        fontList: files,
+        downloadCounter: files.length
       }
     }
 
@@ -165,34 +157,8 @@ export default function (state = initialState, action) {
       const status = errors ? 'error' : 'success'
       const message = errors ? GFPDF.coreFontError.replace('%s', errors) : GFPDF.coreFontSuccess
 
-      /* Fire only if requested a retry download */
-      if (state.retry_download === true) {
-        state.retryDownloadLength--
-        if (state.retryDownloadLength === 0) {
-          state.console.completed = {}
-          return {
-            ...state,
-            console: {
-              ...state.console,
-              ['completed']: {
-                status: status,
-                message: message
-              }
-            },
-            remainingDownload: state.retryDownloadLength,
-            requestDownload: 'finished',
-            retry_download: false
-          }
-        }
-        return {
-          ...state,
-          remainingDownload: state.retryDownloadLength
-        }
-      }
-
-      /* Fire in first download request */
-      state.currentDownload++
-      if (state.currentDownload >= state.fontList.length && state.retry_download === false) {
+      state.downloadCounter--
+      if (state.downloadCounter === 0) {
         /* Failed */
         if (state.retry.length > 0) {
           return {
@@ -204,31 +170,25 @@ export default function (state = initialState, action) {
                 message: message
               }
             },
-            requestDownload: 'finished',
-            currentDownload: 0,
-            remainingDownload: 0
+            downloadCounter: state.retry.length,
+            requestDownload: 'finished'
           }
         } else {
           /* Success */
-          return {
-            ...state,
-            console: {
-              ...state.console,
-              ['completed']: {
-                status: status,
-                message: message
-              }
-            },
-            requestDownload: 'finished',
-            currentDownload: 0,
-            remainingDownload: 0
+          if (state.retry.length === 0 && state.downloadCounter === 0) {
+            return {
+              ...state,
+              console: {
+                ...state.console,
+                ['completed']: {
+                  status: status,
+                  message: message
+                }
+              },
+              downloadCounter: state.fontList.length,
+              requestDownload: 'finished'
+            }
           }
-        }
-      } else {
-        let remainingDownloadCounter = state.fontList.length - state.currentDownload
-        return {
-          ...state,
-          remainingDownload: remainingDownloadCounter
         }
       }
     }
@@ -236,23 +196,15 @@ export default function (state = initialState, action) {
     /**
      * @since 5.2
      */
+    // fall through
     case CLEAR_REQUEST_REMAINING_DATA:
       return {
         ...state,
         requestDownload: ''
       }
 
-    /**
-     * @since 5.2
-     */
-    case RETRY_DOWNLOAD:
-      return {
-        ...state,
-        retry_download: true,
-        retryDownloadLength: action.payload
-      }
+    /* None of these actions fired so return state */
+    default:
+      return state
   }
-
-  /* None of these actions fired so return state */
-  return state
 }

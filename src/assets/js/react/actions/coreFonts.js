@@ -9,7 +9,6 @@ export const GET_FILES_FROM_GITHUB_FAILED = 'GET_FILES_FROM_GITHUB_FAILED'
 export const DOWNLOAD_FONTS_API_CALL = 'DOWNLOAD_FONTS_API_CALL'
 export const REQUEST_SENT_COUNTER = 'REQUEST_SENT_COUNTER'
 export const CLEAR_REQUEST_REMAINING_DATA = 'CLEAR_REQUEST_REMAINING_DATA'
-export const RETRY_DOWNLOAD = 'RETRY_DOWNLOAD'
 
 /**
  * Redux Actions - payloads of information that send data from your application to your store
@@ -182,20 +181,5 @@ export const currentDownload = () => {
 export const clearRequestRemainingData = () => {
   return {
     type: CLEAR_REQUEST_REMAINING_DATA
-  }
-}
-
-/**
- * Pass data into our Redux store to get the latest retry state length value
- *
- * @param retryLength
- * @returns {{type, payload: (Integer)}}
- *
- * @since 5.2
- */
-export const retryDownload = retryLength => {
-  return {
-    type: RETRY_DOWNLOAD,
-    payload: retryLength
   }
 }

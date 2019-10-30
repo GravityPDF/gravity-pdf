@@ -34,11 +34,12 @@ import PropTypes from 'prop-types'
  * @param string className
  * @param func callback
  * @param string text
+ * @param boolean disable
  *
  * @since 5.0
  */
-const CoreFontButton = ({ className, callback, text }) => (
-  <button className={className} type='button' onClick={callback}>
+const CoreFontButton = ({ className, callback, text, disable }) => (
+  <button className={className} type='button' onClick={callback} disabled={disable}>
     {text}
   </button>
 )
@@ -46,10 +47,18 @@ const CoreFontButton = ({ className, callback, text }) => (
 /**
  *  @since 5.0
  */
+CoreFontButton.defaultProps = {
+  disable: false
+}
+
+/**
+ *  @since 5.0
+ */
 CoreFontButton.propTypes = {
   className: PropTypes.string,
   callback: PropTypes.func,
-  text: PropTypes.string
+  text: PropTypes.string,
+  disable: PropTypes.bool
 }
 
 export default CoreFontButton
