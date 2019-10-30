@@ -1,5 +1,5 @@
 /*
- * Welcome Page
+ * Getting Started Welcome Page
  */
 
 .about-wrap .gfpdf-badge {
@@ -43,6 +43,116 @@ div img.gfpdf-image {
  -webkit-box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, 0.15);
  -moz-box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, 0.15);
  box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, 0.15);
+}
+
+.gfpdf-welcome-screen {
+ position: relative;
+ margin: 25px 40px 0 20px;
+ max-width: 1050px;
+ font-size: 15px;
+}
+
+.gfpdf-welcome-screen p {
+ line-height: 1.5;
+ font-size: 14px;
+}
+
+.gfpdf-welcome-screen h3 {
+ margin: 1.25em 0 .6em;
+ font-size: 1.4em;
+ line-height: 1.5;
+}
+
+.gfpdf-welcome-screen h1 {
+ margin: .2em 200px 0 0;
+ padding: 0;
+ line-height: 1.2em;
+ font-size: 2.8em;
+ font-weight: 400;
+}
+
+.gfpdf-two-col {
+ overflow: hidden;
+ padding: 0 0 40px;
+ display: flex;
+ -webkit-box-pack: justify;
+ justify-content: space-between;
+ -webkit-box-align: center;
+ align-items: center;
+}
+
+.gfpdf-two-col .col {
+ min-width: 47%;
+ max-width: 47%;
+ margin-top: 40px;
+ vertical-align: middle;
+}
+
+.gfpdf-two-col .col p {
+ max-width: 55em;
+ margin-top: .6em;
+ margin-left: auto;
+ margin-right: auto;
+ line-height: 1.5;
+ font-size: 14px;
+}
+
+.gfpdf-two-col .col h3 {
+ margin-top: 0;
+}
+
+.gfpdf-welcome-screen img.gfpdf-image {
+ height: auto;
+ vertical-align: middle;
+ margin-bottom: 1em;
+}
+
+.gfpdf-welcome-screen .gfpdf-three-col {
+ overflow: hidden;
+ padding: 0 0 40px;
+ display: flex;
+ justify-content: space-between;
+ -webkit-box-align: center;
+ align-items: center;
+ flex-wrap: wrap;
+}
+
+.gfpdf-three-col .col {
+ align-self: flex-start;
+ min-width: 31%;
+ max-width: 31%;
+}
+
+.gfpdf-three-col .col h3 {
+ margin: 1.33em 0;
+ font-size: 1em;
+ line-height: inherit;
+}
+
+.gfpdf-changelog {
+ margin-bottom: 40px;
+}
+
+.gfpdf-changelog h2 {
+ font-size: 1.4em;
+ font-weight: 600;
+ text-align: left;
+}
+
+.gfpdf-breakdown h4 {
+ margin: 1.4em 0 .6em;
+ font-size: 1em;
+}
+
+.gfpdf-breakdown p {
+ max-width: 55em;
+ margin-left: auto;
+ margin-right: auto;
+}
+
+.gfpdf-changelog .gfpdf-three-col {
+ overflow: hidden;
+ padding: 0 0 40px;
 }
 
 
@@ -802,6 +912,12 @@ div img.gfpdf-image {
  background: #2abbff;
 }
 
+@media only screen and (max-width: 480px) {
+ .about-wrap h1 {
+  margin-right: 0;
+ }
+}
+
 @media only screen and (min-width: 500px) {
 
  /*
@@ -821,7 +937,30 @@ div img.gfpdf-image {
  }
 }
 
-@media only screen and (max-width: 780px) {
+@media only screen and (max-width: 599px) {
+ .gfpdf-two-col {
+  display: block;
+ }
+
+ .gfpdf-two-col .col {
+  min-width: 100%;
+  max-width: 100%;
+  margin-top: 40px;
+  vertical-align: middle;
+ }
+
+ .gfpdf-welcome-screen .gfpdf-three-col {
+  display: block;
+ }
+
+ .gfpdf-three-col .col {
+  align-self: flex-start;
+  min-width: 100%;
+  max-width: 100%;
+ }
+}
+
+@media only screen and (max-width: 782px) {
  #pdfextended-settings table.gfpdf_table th, #pdfextended-settings table.gfpdf_table td {
   display: block;
   vertical-align: middle;
@@ -895,9 +1034,13 @@ div img.gfpdf-image {
  .gfpdf-page .form-table tbody td input[type="number"] {
   padding-right: 3px;
  }
+
+ #wpbody-content {
+  padding-bottom: 0px;
+ }
 }
 
-@media only screen and (min-width: 782px) {
+@media only screen and (min-width: 783px) {
 
  /*
   * Add out mascot on larger displays only

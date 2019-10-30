@@ -28,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<!-- Include Divider -->
 	<h2 class="nav-tab-wrapper wp-clearfix"></h2>
 
-	<div class="feature-section two-col">
+	<div class="feature-section gfpdf-two-col">
 
 		<div class="col">
 			<h3><?php esc_html_e( 'Where to Start?', 'gravity-forms-pdf-extended' ); ?></h3>
@@ -51,7 +51,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	</div>
 
-	<div class="feature-section two-col">
+	<div class="feature-section gfpdf-two-col">
 
 		<div class="col">
 			<img class="gfpdf-image" src="https://resources.gravitypdf.com/uploads/2017/11/add-new-pdf-page-full-v5-1.png">
@@ -87,7 +87,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 	</div>
 
-	<div id="gfpdf-mascot-container" class="changelog feature-section three-col">
+	<div id="gfpdf-mascot-container" class="changelog feature-section gfpdf-three-col">
 		<div class="col">
 			<img class="gfpdf-image" src="https://resources.gravitypdf.com/uploads/2017/11/pdf-list-page-v5.png">
 
