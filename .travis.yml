@@ -88,6 +88,10 @@ jobs:
       script:
         - npm run lint:js
 
+    - name: E2E Testing
+      script:
+        - npm run test:e2e:headless
+
     - name: PHP 7.3 unit tests
       env: LOCAL_PHP=7.3-fpm
       script:
@@ -129,10 +133,6 @@ jobs:
         - |
           npm run test:php &&
           npm run test:php --group ajax
-
-    - name: E2E Testing
-      script:
-        - npm run test:e2e:headless
 
     - name: JS and PHP Coverage
       env: LOCAL_PHP=7.3-fpm LOCAL_PHP_XDEBUG=true
