@@ -1,13 +1,13 @@
-let gulp = require('gulp'),
-  cleanCSS = require('gulp-clean-css'),
-  rename = require('gulp-rename'),
-  wpPot = require('gulp-wp-pot'),
-  watch = require('gulp-watch')
+let gulp = require('gulp')
+let cleanCSS = require('gulp-clean-css')
+let rename = require('gulp-rename')
+let wpPot = require('gulp-wp-pot')
+let watch = require('gulp-watch')
 
 /* Minify our CSS */
 gulp.task('minify', function () {
   return gulp.src('src/assets/css/*.css')
-    .pipe(cleanCSS({rebaseTo: 'dist/assets/css/'}))
+    .pipe(cleanCSS({ rebaseTo: 'dist/assets/css/' }))
     .pipe(rename({
       suffix: '.min'
     }))
@@ -25,7 +25,7 @@ gulp.task('language', function () {
 })
 
 gulp.task('watch', function () {
-  watch('src/assets/css/*.css', gulp.series('compress'))
+  watch('src/assets/css/*.css', gulp.series('minify'))
 })
 
 gulp.task('default', gulp.series(['language', 'minify']))
