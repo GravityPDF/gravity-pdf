@@ -64,20 +64,16 @@ class Field_Consent extends Helper_Abstract_Fields {
 	public function html( $value = '', $label = true ) {
 		$value = $this->value();
 
-		if ( empty( $value['value'] ) ) {
-			$html = sprintf(
-				'<span class="consent-tick consent-not-accepted" style="font-family:dejavusans;">&#10006;</span> <span class="consent-label consent-not-accepted-label">%s</span>',
-				__( 'Consent not given.', 'gravity-forms-pdf-extended' )
-			);
-		} else {
-			$html = sprintf(
-				'<span class="consent-tick consent-accepted" style="font-family:dejavusans;">&#10004;</span> <span class="consent-label consent-accepted-label">%s</span>',
-				$value['label']
-			);
-		}
+		$has_consent = ! empty( $value['value'] );
 
-		if ( strlen( $value['description'] ) > 0 ) {
-			$html .= sprintf( '<div class="consent-text">%s</div>', $value['description'] );
+		$markup      = $has_consent ? $this->get_consented_markup( $value['label'] ) : $this->get_non_concent_markup();
+		$description = strlen( $value['description'] ) > 0 ? sprintf( '<div class="consent-text">%s</div>', $value['description'] ) : '';
+
+		/* consent has been given, determine order of desription */
+		if ( empty( $value['placement'] ) || $value['placement'] === 'below' ) {
+			$html = $markup . $description;
+		} else {
+			$html = $description . $markup;
 		}
 
 		return parent::html( $html );
@@ -105,10 +101,41 @@ class Field_Consent extends Helper_Abstract_Fields {
 					$this->gform->process_tags( $this->field->get_field_description_from_revision( $value[2] ), $this->form, $this->entry )
 				)
 			),
+			'placement'   => $this->field->descriptionPlacement,
 		];
 
 		$this->cache( $consent );
 
 		return $this->cache();
+	}
+
+	/**
+	 * Get Concent Mark-up
+	 *
+	 * @param string $label
+	 *
+	 * @return string
+	 *
+	 * @since 5.2
+	 */
+	protected function get_consented_markup( $label ) {
+		return sprintf(
+			'<span class="consent-tick consent-accepted" style="font-family:dejavusans;">&#10004;</span> <span class="consent-label consent-accepted-label">%s</span>',
+			$label
+		);
+	}
+
+	/**
+	 * Get Non Concent Markup
+	 *
+	 * @return string
+	 *
+	 * @since 5.2
+	 */
+	protected function get_non_concent_markup() {
+		return sprintf(
+			'<span class="consent-tick consent-not-accepted" style="font-family:dejavusans;">&#10006;</span> <span class="consent-label consent-not-accepted-label">%s</span>',
+			__( 'Consent not given.', 'gravity-forms-pdf-extended' )
+		);
 	}
 }
