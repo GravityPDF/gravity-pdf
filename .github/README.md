@@ -80,7 +80,7 @@ The JavaScript unit tests can be run with `yarn test:js`
 
 ## Building JS
 
-If you are making changes to any of the JavaScript, run `yarn build:watch` to ensure it automatically gets built when you make changes on the file system. 
+If you are making changes to any of the JavaScript or CSS, run `yarn build:watch:js` or `yarn build:watch:css` respectively to ensure the files automatically gets built when you make changes on the file system. 
 
 # Documentation
 
