@@ -212,7 +212,6 @@ class Helper_PDF {
 		$this->set_paper();
 		$this->begin_pdf();
 		$this->set_creator();
-		$this->set_image_dpi();
 		$this->set_text_direction();
 		$this->set_pdf_format();
 		$this->set_pdf_security();
@@ -229,8 +228,8 @@ class Helper_PDF {
 	/**
 	 * Render the HTML to our PDF
 	 *
-	 * @param  array  $args Any arguments that should be passed to the PDF template
-	 * @param  string $html By pass the template  file and pass in a HTML string directly to the engine. Optional.
+	 * @param array  $args Any arguments that should be passed to the PDF template
+	 * @param string $html By pass the template  file and pass in a HTML string directly to the engine. Optional.
 	 *
 	 * @return void
 	 *
@@ -325,7 +324,7 @@ class Helper_PDF {
 	/**
 	 * Save the PDF to our tmp directory
 	 *
-	 * @param  string $raw_pdf_string The generated PDF to be saved
+	 * @param string $raw_pdf_string The generated PDF to be saved
 	 *
 	 * @return string|boolean The full path to the file or false if failed
 	 *
@@ -647,6 +646,8 @@ class Helper_PDF {
 
 					'format'                 => $this->paper_size,
 					'orientation'            => $this->orientation,
+
+					'img_dpi'                => isset( $this->settings['image_dpi'] ) ? (int) $this->settings['image_dpi'] : 96,
 				],
 				$this->form,
 				$this->entry,
@@ -791,7 +792,7 @@ class Helper_PDF {
 	/**
 	 * Ensure the custom paper size has the correct values
 	 *
-	 * @param  array $size
+	 * @param array $size
 	 *
 	 * @return array
 	 *
@@ -895,9 +896,7 @@ class Helper_PDF {
 	 * @since 4.0
 	 */
 	protected function set_image_dpi() {
-		$dpi = ( isset( $this->settings['image_dpi'] ) ) ? (int) $this->settings['image_dpi'] : 96;
-
-		$this->mpdf->img_dpi = $dpi;
+		_doing_it_wrong( __METHOD__, __( 'This method has been removed because mPDF no longer supports setting the image DPI after the class is initialised.', 'gravity-forms-pdf-extended' ), '5.2' );
 	}
 
 	/**
