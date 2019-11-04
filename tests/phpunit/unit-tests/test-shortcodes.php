@@ -6,7 +6,6 @@ use GFPDF\Controller\Controller_Shortcodes;
 use GFPDF\Helper\Helper_Url_Signer;
 use GFPDF\Model\Model_Shortcodes;
 use GFPDF\View\View_Shortcodes;
-
 use WP_UnitTestCase;
 
 /**
@@ -330,9 +329,10 @@ class Test_Shortcode extends WP_UnitTestCase {
 	public function test_gravitypdf_confirmation() {
 
 		/* Setup test data */
-		$confirmation = 'Thanks for getting in touch. [gravitypdf id="555ad84787d7e"]';
-		$form         = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
-		$lead         = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
+		$confirmation         = 'Thanks for getting in touch. [gravitypdf id="555ad84787d7e"]';
+		$form                 = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
+		$form['confirmation'] = $form['confirmations']['54bca34973cdd'];
+		$lead                 = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
 
 		/* Check our entry ID is being automatically added */
 		$results = $this->model->gravitypdf_confirmation( $confirmation, $form, $lead );
@@ -343,8 +343,9 @@ class Test_Shortcode extends WP_UnitTestCase {
 		$results      = $this->model->gravitypdf_confirmation( $confirmation, $form, $lead );
 		$this->assertNotFalse( strpos( $results, '[gravitypdf id="555ad84787d7e" entry="5000"]' ) );
 
-		/* Check we pass when confirmation is an array */
-		$results = $this->model->gravitypdf_confirmation( [ 'data' ], $form, $lead );
+		/* Check we pass when confirmation is not a message */
+		$form['confirmation']['type'] = 'redirect';
+		$results                      = $this->model->gravitypdf_confirmation( [ 'data' ], $form, $lead );
 		$this->assertEquals( 'data', $results[0] );
 	}
 
@@ -456,8 +457,9 @@ class Test_Shortcode extends WP_UnitTestCase {
 
 		$this->assertTrue( $this->model->gravitypdf_redirect_confirmation_shortcode_processing( true, $form, $entry ) );
 
-		$confirmation = [ 'redirect' => '' ];
-		$results      = $this->model->gravitypdf_redirect_confirmation_shortcode_processing( $confirmation, $form, $entry );
+		$form['confirmation']['type'] = 'redirect';
+		$confirmation                 = [ 'redirect' => '' ];
+		$results                      = $this->model->gravitypdf_redirect_confirmation_shortcode_processing( $confirmation, $form, $entry );
 		$this->assertNotFalse( strpos( $results['redirect'], '?gpdf=1&pid=556690c67856b&lid=1&action=download' ) );
 
 		$form['confirmation']['url'] = '[gravitypdf id="556690c67856b" entry="{entry_id}" raw="1" signed="1"]';

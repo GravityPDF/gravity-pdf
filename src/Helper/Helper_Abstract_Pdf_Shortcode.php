@@ -164,7 +164,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	public function gravitypdf_confirmation( $confirmation, $form, $entry ) {
 
 		/* check if confirmation is text-based */
-		if ( ! is_array( $confirmation ) ) {
+		if ( isset( $form['confirmation']['type'] ) && $form['confirmation']['type'] === 'message' ) {
 			$confirmation = $this->add_entry_id_to_shortcode( $confirmation, $entry['id'] );
 		}
 
@@ -335,17 +335,22 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 */
 	public function gravitypdf_redirect_confirmation_shortcode_processing( $confirmation, $form, $entry ) {
 
-		if ( isset( $confirmation['redirect'] ) ) {
+		if ( $form['confirmation']['type'] === 'redirect' ) {
 			$shortcode_information = $this->get_shortcode_information( static::SHORTCODE, $form['confirmation']['url'] );
 
 			if ( count( $shortcode_information ) > 0 ) {
+				$confirmation = [ 'redirect' => '' ];
+
 				foreach ( $shortcode_information as $shortcode ) {
 					$url = do_shortcode( str_replace( '{entry_id}', $entry['id'], $shortcode['shortcode'] ) );
 
 					/* Add Query string parameters if they exist (but not with signed URLs) */
-					$query_string = substr( $confirmation['redirect'], strrpos( $confirmation['redirect'], '?' ) + 1 );
-					if ( empty( $shortcode['attr']['signed'] ) && strlen( $query_string ) > 0 ) {
-						$url .= ( strpos( $url, '?' ) !== false ) ? '&' . $query_string : '?' . $query_string;
+					$has_query_string = strrpos( $form['confirmation']['url'], '?' );
+					if ( $has_query_string !== false ) {
+						$query_string = substr( $form['confirmation']['url'], $has_query_string + 1 );
+						if ( empty( $shortcode['attr']['signed'] ) && strlen( $query_string ) > 0 ) {
+							$url .= ( strpos( $url, '?' ) !== false ) ? '&' . $query_string : '?' . $query_string;
+						}
 					}
 
 					$form['confirmation']['url'] = str_replace( $shortcode['shortcode'], $url, $form['confirmation']['url'] );
