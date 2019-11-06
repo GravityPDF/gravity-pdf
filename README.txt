@@ -4,8 +4,8 @@ Plugin URI: https://gravitypdf.com/
 Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.8
-Tested up to: 5.2
-Stable tag: 5.1.5
+Tested up to: 5.3
+Stable tag: 5.2.0
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -89,6 +89,48 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 18. Blank Slate provides a print-friendly template focusing solely on the user-submitted data.
 
 == Changelog ==
+
+= 5.2.0 =
+* Bug: Prevent Fatal Error on PHP7.2 when using Category field type set to Checkboxes in Core PDFs
+* Bug: Resolve conflict with SiteGround HTML Minifier when generating PDFs in browser [GH#897] [GH#951]
+* Bug: Strip PDF page breaks from Header and Footer Rich Text Editor fields [GH#898]
+* Bug: Conditionally register WP rewrite tags to prevent third party plugin conflicts [GH#892]
+* Bug: Move noindex,nofollow header to beginning of PDF endpoint processing to prevent PDF errors getting indexed [GH#956]
+* Bug: Prevent `gfpdf_post_pdf_save` action getting triggered twice during form submission [GH#948]
+* Bug: Resolve issue with Global PDF Settings not getting updated on the initial save
+* Bug: Resolve issue displaying Category field in PDF when a category has a commas in the label/value [GH#966]
+* Bug: Add field fallback support in Core PDFs for third-party custom fields that contain subfields
+* Bug: Resolve JS error when using Redirect Confirmation with [gravitypdf] shortcode and submitting an AJAX-enabled form [GH#989]
+* Bug: Adhere to the Description placement setting when displaying the Consent Field in Core PDFs [GH#998]
+* Bug: Resolve issue setting the PDF image DPI
+* Bug: Fix display issue on Gravity PDF Getting Started Page [GH#1000]
+
+* Dev: Add End to End Tests for greater quality control [GH#949]
+* Dev: Rewrite Help Search in ReactJS [GH#882]
+* Dev: Add WordPress Linting Standard to Codebase [GH#887]
+* Dev: Add `gfpdf_mpdf_post_init_class` action to be run after the mPDF object is fully initialised [GH#890]
+* Dev: Add `gfpdf_mpdf_class_config` filter to allow the mPDF initialization array to be modified
+* Dev: Update JS Dependencies [#884]
+* Dev: Remove ImmutableJS dependency
+* Dev: Upgrade mPDF from 7.0.9 to 8.0.3 and add backwards compat to prevent breaking changes https://github.com/mpdf/mpdf/blob/development/CHANGELOG.md
+* Dev: Optimize transient usage [GH#889]
+* Dev: Move non-React JS from Gulp to Webpack bundle [GH#918]
+* Dev: Split all non-React JS into components [GH#976]
+* Dev: Add `gfpdf_pre_pdf_generation_output` action run prior to the PDF being output in the browser
+* Dev: Add `gfpdf_pre_pdf_generation_initilise` action run prior to the PDF object creation
+* Dev: Add `gfpdf_pre_pdf_list_shortcode_column` and `gfpdf_post_pdf_list_shortcode_column` actions run before and after read-only shortcode on PDF List page
+* Dev: Use WP_Rewrite `index` property instead of `root` property when registering PDF permalinks
+* Dev: Add pre and post actions for Entry Detail PDF mark-up
+* Dev: Include `settings`, `entry_id` and `form_id` to Model_PDF::get_pdf_display_list()
+* Dev: Convert PHP loose comparisons `==` to strict comparisons `===` [GH#928]
+* Dev: Convert plugin directory names to be PSR-4 compliant for simplier autoloading [#929]
+* Dev: Refractor class internals for [gravitypdf] shortcode for easier code reusability [#930]
+* Dev: Remove `final` from Helper_Abstract_Addon::get_short_name()
+* Dev: Speed up PDF generation time by converting O(n2) loop to O(n) loop [GH#934]
+* Dev: Add React Sagas for all ReactJS side effects (eg. API/AJAX calls) [GH#975]
+* Dev: Add Lazy Load ReactJS components for improved loading times on Gravity PDF admin pages [GH#938]
+* Dev: Add better error logging for Background Processing tasks
+* Dev: Refractor Core Font ReactJS code [GH#981]
 
 = 5.1.5 =
 * Housekeeping: Add filter `gfpdf_mpdf_post_init_class` to interact with mPDF right after the initial Gravity PDF object setup [GH#890]
