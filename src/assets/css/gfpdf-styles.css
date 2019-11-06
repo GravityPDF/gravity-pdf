@@ -13,16 +13,14 @@
 }
 
 .gfpdf-badge {
- background: url("../images/gravitypdf-globe-black.png") no-repeat 50% 5px;
+ background: url("../images/gravitypdf-logo.svg") no-repeat 50% 0;
+ background-size: 95%;
  color: #333;
  display: inline-block;
  font-size: 14px;
  font-weight: 600;
- height: 40px;
- margin: 5px 0 0;
- padding-top: 120px;
+ padding-top: 125px;
  text-align: center;
- text-rendering: optimizelegibility;
 }
 
 .gfpdf-page .about-wrap [class$="col"] .col {
@@ -912,14 +910,28 @@ div img.gfpdf-image {
  background: #2abbff;
 }
 
-@media only screen and (max-width: 480px) {
+@media only screen and (max-width: 389px) {
+ .gfpdf-welcome-screen {
+  margin: 25px 40px 0px 5px;
+ }
+}
+
+@media only screen and (max-width: 499px) {
  .about-wrap h1 {
+  font-size: 2.5em;
   margin-right: 0;
+ }
+
+ .about-wrap .gfpdf-badge {
+  margin-top: 1.5em;
+ }
+
+ .gfpdf-two-col .col {
+  margin-top: 0px !important;
  }
 }
 
 @media only screen and (min-width: 500px) {
-
  /*
   * Responsive Welcome Page
   */
@@ -929,6 +941,10 @@ div img.gfpdf-image {
   top: 0;
   margin: 0;
   width: 130px;
+ }
+
+ .about-wrap .about-text {
+  margin: 1em 200px 1em 0;
  }
 
  .rtl .about-wrap .gfpdf-badge {

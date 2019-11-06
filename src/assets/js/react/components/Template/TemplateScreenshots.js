@@ -35,13 +35,13 @@ import React from 'react'
  *
  * @since 4.1
  */
-const TemplateScreenshots = ({image}) => {
+const TemplateScreenshots = ({ image }) => {
   const className = (image) ? 'screenshot' : 'screenshot blank'
 
   return (
-    <div className="theme-screenshots">
+    <div className='theme-screenshots'>
       <div className={className}>
-        {image ? <img src={image} alt=""/> : null}
+        {image ? <img src={image} alt='' /> : null}
       </div>
     </div>
   )
