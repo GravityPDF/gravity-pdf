@@ -366,7 +366,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$version = PDF_EXTENDED_VERSION;
 
 		wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'dist/assets/css/gfpdf-styles.min.css', [ 'wp-color-picker', 'wp-jquery-ui-dialog' ], $version );
-		wp_register_style( 'gfpdf_css_admin_styles', PDF_PLUGIN_URL . 'dist/assets/css/gfpdf-admin-styles.min.css', [], $version );
 	}
 
 	/**
