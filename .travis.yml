@@ -6,6 +6,11 @@ services:
   - docker
 
 addons:
+  artifacts:
+    paths:
+      - $(git ls-files -o screenshots | tr "\n" ":")
+    target_paths:
+      - /${TRAVIS_BUILD_NUMBER}/${TRAVIS_JOB_NUMBER}
   apt:
     sources:
       - sourceline: 'deb https://dl.yarnpkg.com/debian/ stable main'

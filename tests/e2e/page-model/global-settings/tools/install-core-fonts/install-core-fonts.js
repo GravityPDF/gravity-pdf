@@ -4,6 +4,7 @@ import { admin, baseURL } from '../../../../auth'
 
 class InsallCoreFonts {
   constructor () {
+    this.sectionTable = Selector('#pdf-tools')
     this.downloadFailed = Selector('.gfpdf-core-font-status-error')
     this.retryDownload = Selector('a').withText('Retry Failed Downloads?')
     this.downloadButton = button('Download Core Fonts')
@@ -16,6 +17,7 @@ class InsallCoreFonts {
     await t
       .useRole(admin)
       .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
+      .click(this.sectionTable)
       .click(this.downloadButton)
   }
 }

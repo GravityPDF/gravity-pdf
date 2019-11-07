@@ -78,9 +78,9 @@
     "test:php": "wp-scripts env test-php",
     "test:php:multisite": "cross-env WP_MULTISITE=1 wp-scripts env test-php",
 
-    "test:e2e": "cross-env NODE_ENV=test testcafe chrome tests/e2e -s takeOnFails=true",
-    "test:e2e:headless": "cross-env NODE_ENV=test testcafe chrome:headless tests/e2e -s takeOnFails=true",
-    "test:e2e:file": "cross-env NODE_ENV=test testcafe chrome -s takeOnFails=true",
+    "test:e2e": "cross-env NODE_ENV=test testcafe chrome tests/e2e -s takeOnFails=true,fullPage=true",
+    "test:e2e:headless": "cross-env NODE_ENV=test testcafe chrome:headless tests/e2e -s takeOnFails=true,fullPage=true",
+    "test:e2e:file": "cross-env NODE_ENV=test testcafe chrome -s takeOnFails=true,fullPage=true",
     "test:e2e:watch": "cross-env NODE_ENV=test testcafe chrome tests/e2e -L",
     "test:e2e:file:watch": "cross-env NODE_ENV=test testcafe chrome -L",
 
