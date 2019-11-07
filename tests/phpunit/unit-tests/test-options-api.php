@@ -801,20 +801,6 @@ class Test_Options_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test our semi-cached PDF counter will increment correctly
-	 *
-	 * @since 4.0
-	 */
-	public function test_increment_pdf_count() {
-
-		while ( 100 >= $this->options->get_option( 'pdf_count' ) ) {
-			$this->options->increment_pdf_count();
-		}
-
-		$this->assertGreaterThan( 100, $this->options->get_option( 'pdf_count' ) );
-	}
-
-	/**
 	 * Test we are correctly sanitizing our settings
 	 *
 	 * @since 4.0
