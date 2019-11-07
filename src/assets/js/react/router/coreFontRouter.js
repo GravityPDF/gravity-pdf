@@ -83,7 +83,6 @@ const CoreFont = ({ history, button }) => (
     location={history.location}
     buttonClassName={button.className}
     buttonText={button.innerText}
-    listUrl={GFPDF.coreFontListUrl}
     success={GFPDF.coreFontSuccess}
     error={GFPDF.coreFontError}
     githubError={GFPDF.coreFontGithubError}
