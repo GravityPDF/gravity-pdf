@@ -163,7 +163,16 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 */
 	public function gravitypdf_confirmation( $confirmation, $form, $entry ) {
 
-		/* check if confirmation is text-based */
+		/**
+		 * Do nothing if WP_Error is passed
+		 *
+		 * This resolves a conflict with a third party GF plugin which was passing an error instead of the expected GF confirmation response
+		 * @see https://github.com/GravityPDF/gravity-pdf/issues/999
+		 */
+		if ( is_wp_error( $confirmation ) ) {
+			return $confirmation;
+		}
+
 		if ( isset( $form['confirmation']['type'] ) && $form['confirmation']['type'] === 'message' ) {
 			$confirmation = $this->add_entry_id_to_shortcode( $confirmation, $entry['id'] );
 		}
@@ -183,6 +192,17 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function gravitypdf_notification( $notification, $form, $entry ) {
+
+		/**
+		 * Do nothing if WP_Error is passed
+		 *
+		 * This resolves a conflict with a third party GF plugin which was passing an error instead of the expected GF confirmation response
+		 * @see https://github.com/GravityPDF/gravity-pdf/issues/999
+		 */
+		if ( is_wp_error( $notification ) ) {
+			return $notification;
+		}
+
 		if ( isset( $notification['message'] ) ) {
 			$notification['message'] = $this->add_entry_id_to_shortcode( $notification['message'], $entry['id'] );
 		}
@@ -334,6 +354,15 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 * @since 5.1
 	 */
 	public function gravitypdf_redirect_confirmation_shortcode_processing( $confirmation, $form, $entry ) {
+
+		/**
+		 * Do nothing if WP_Error is passed
+		 * This resolves a conflict with a third party GF plugin which was passing an error instead of the expected GF confirmation response
+		 * @see https://github.com/GravityPDF/gravity-pdf/issues/999
+		 */
+		if ( is_wp_error( $confirmation ) ) {
+			return $confirmation;
+		}
 
 		if ( $form['confirmation']['type'] === 'redirect' ) {
 			$shortcode_information = $this->get_shortcode_information( static::SHORTCODE, $form['confirmation']['url'] );
