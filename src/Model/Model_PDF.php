@@ -868,9 +868,6 @@ class Model_PDF extends Helper_Abstract_Model {
 				$pdf->set_template();
 				$pdf->set_output_type( 'save' );
 
-				/* Increment our rudimentary PDF counter */
-				$this->options->increment_pdf_count();
-
 				/* Add Backwards compatibility support for our v3 Tier 2 Add-on */
 				if ( isset( $settings['advanced_template'] ) && strtolower( $settings['advanced_template'] ) === 'yes' ) {
 

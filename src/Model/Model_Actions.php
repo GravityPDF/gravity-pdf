@@ -115,24 +115,6 @@ class Model_Actions extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Check if our review notice condition has been met
-	 * A review will only display if more than 100 PDFs have been generated
-	 *
-	 * @return boolean
-	 *
-	 * @since 4.0
-	 */
-	public function review_condition() {
-
-		/* Check we are on a Gravity Forms page and we have more than 100 PDFs */
-		if ( GFForms::is_gravity_page() && 100 < (int) $this->options->get_option( 'pdf_count', 0 ) ) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
 	 * Check if our v3 configuration file exists
 	 *
 	 * @return boolean
