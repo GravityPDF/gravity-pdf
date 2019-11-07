@@ -198,9 +198,6 @@ class View_PDF extends Helper_Abstract_View {
 			$pdf->init();
 			$pdf->set_template();
 
-			/* Increment our rudimentary PDF counter */
-			$this->options->increment_pdf_count();
-
 			/* Set display type and allow user to override the behaviour */
 			$settings['pdf_action'] = apply_filters( 'gfpdfe_pdf_output_type', $settings['pdf_action'] ); /* Backwards compat */
 			if ( $settings['pdf_action'] === 'download' ) {

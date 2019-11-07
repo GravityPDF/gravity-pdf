@@ -89,19 +89,8 @@ class Test_Actions extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_get_routes() {
-
 		$routes = $this->controller->get_routes();
-
-		$counter  = 0;
-		$expected = [ 'review_plugin', 'migrate_v3_to_v4', 'install_core_fonts' ];
-
-		foreach ( $routes as $route ) {
-			if ( in_array( $route['action'], $expected, true ) ) {
-				$counter++;
-			}
-		}
-
-		$this->assertSame( 3, $counter );
+		$this->assertGreaterThan( 0, $routes );
 	}
 
 	/**
@@ -308,26 +297,6 @@ class Test_Actions extends WP_UnitTestCase {
 		$this->assertFalse( $this->model->is_notice_already_dismissed( $type ) );
 		$this->model->dismiss_notice( $type );
 		$this->assertTrue( $this->model->is_notice_already_dismissed( $type ) );
-	}
-
-
-	/**
-	 * Check the core review action conditional works as expected
-	 *
-	 * @since 4.0
-	 */
-	public function test_review_condition() {
-		global $gfpdf;
-
-		$this->assertFalse( $this->model->review_condition() );
-
-		/* Change the PDF count, but not the current page */
-		$gfpdf->options->update_option( 'pdf_count', 101 );
-		$this->assertFalse( $this->model->review_condition() );
-
-		/* Change the page to a Gravity Forms page */
-		$_GET['page'] = 'gf_edit_forms';
-		$this->assertTrue( $this->model->review_condition() );
 	}
 
 	/**

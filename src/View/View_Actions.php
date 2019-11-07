@@ -56,24 +56,6 @@ class View_Actions extends Helper_Abstract_View {
 	}
 
 	/**
-	 * Load our Review Plugin Notice
-	 *
-	 * @param  string $type        The action ID
-	 * @param  string $button_text The primary button text
-	 *
-	 * @return string              The notice HTML
-	 *
-	 * @since 4.0
-	 */
-	public function review_plugin( $type, $button_text ) {
-
-		$html  = $this->load( 'review_plugin', [], false );
-		$html .= $this->get_action_buttons( $type, $button_text );
-
-		return $html;
-	}
-
-	/**
 	 * Load our v3 to v4 Migration Notice
 	 *
 	 * @param  string $type        The action ID

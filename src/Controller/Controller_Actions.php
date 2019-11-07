@@ -129,16 +129,6 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 
 		$routes = [
 			[
-				'action'      => 'review_plugin',
-				'action_text' => esc_html__( 'Review Submitted', 'gravity-forms-pdf-extended' ),
-				'condition'   => [ $this->model, 'review_condition' ],
-				'process'     => [ $this->model, 'dismiss_notice' ],
-				'view'        => [ $this->view, 'review_plugin' ],
-				'capability'  => 'gravityforms_view_settings',
-				'view_class'  => 'gfpdf-alert-mascot',
-			],
-
-			[
 				'action'      => 'migrate_v3_to_v4',
 				'action_text' => esc_html__( 'Begin Migration', 'gravity-forms-pdf-extended' ),
 				'condition'   => [ $this->model, 'migration_condition' ],
@@ -158,7 +148,6 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 		];
 
 		/* See https://gravitypdf.com/documentation/v5/gfpdf_one_time_action_routes/ for more details about this filter */
-
 		return apply_filters( 'gfpdf_one_time_action_routes', $routes );
 	}
 
