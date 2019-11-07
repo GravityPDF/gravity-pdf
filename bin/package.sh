@@ -46,4 +46,5 @@ done
 
 rm --force -R "${PACKAGE_DIR}/src/assets/css"
 rm --force -R "${PACKAGE_DIR}/src/assets/js"
-yarn env docker-run php rm -R vendor/mpdf/mpdf/ttfonts
+rm --force -R "${PACKAGE_DIR}/webpack-configs"
+yarn env docker-run php rm -R "${PACKAGE_DIR}/vendor/mpdf/mpdf/ttfonts"
