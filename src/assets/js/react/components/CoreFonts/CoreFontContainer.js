@@ -61,7 +61,7 @@ export class CoreFontContainer extends React.Component {
     downloadFontsApiCall: PropTypes.func,
     githubError: PropTypes.string,
     addToConsole: PropTypes.func,
-    console: PropTypes.object,
+    conSole: PropTypes.object,
     buttonClassName: PropTypes.string,
     buttonText: PropTypes.string,
     counterText: PropTypes.string,
@@ -81,14 +81,23 @@ export class CoreFontContainer extends React.Component {
   }
 
   /**
-   * When new props are received we'll check if the fonts should be downloaded
+   * When new props are received we'll check if the font list should be loaded
    *
    * @param nextProps
    *
    * @since 5.0
    */
   componentWillReceiveProps (nextProps) {
-    this.maybeStartDownload(nextProps.location)
+    /* Load current hash history location & font list */
+    if (nextProps.fontList.length > 0 && nextProps.location.pathname === '/downloadCoreFonts') {
+      this.maybeStartDownload(nextProps.location, nextProps.fontList)
+    }
+
+    /* Load current hash history location & retry font list */
+    if (nextProps.location.pathname === '/retryDownloadCoreFonts') {
+      this.maybeStartDownload(nextProps.location, nextProps.retry)
+    }
+
     /* Set ajax/loading false if request download is finished */
     nextProps.requestDownload === 'finished' && (
       this.setState({ ajax: false }),
@@ -98,30 +107,32 @@ export class CoreFontContainer extends React.Component {
   }
 
   /**
-   * When the component is first mounted we'll check if the fonts should be downloaded
+   * Check for /downloadCoreFonts redirect URL and run the installer
    *
    * @since 5.0
    */
   componentDidMount () {
-    this.maybeStartDownload(this.props.location)
-    /* Get the font names from GitHub we need to download */
-    this.props.getFilesFromGitHub()
+    if (this.props.location.pathname === '/downloadCoreFonts') {
+      this.triggerFontDownload()
+    }
   }
 
   /**
    * If the Hash History matches our keys (and not already loading) start the download
    *
    * @param location
+   * @param fontList
    *
    * @since 5.0
    */
-  maybeStartDownload = (location) => {
-    if (!this.state.ajax && location.pathname === '/downloadCoreFonts') {
-      this.startDownloadFonts(this.props.fontList)
+  maybeStartDownload = (location, fontList) => {
+    if (location.pathname === '/downloadCoreFonts') {
+      this.startDownloadFonts(fontList)
     }
 
-    if (!this.state.ajax && location.pathname === '/retryDownloadCoreFonts' && this.props.retry.length > 0) {
-      this.startDownloadFonts(this.props.retry)
+    if (location.pathname === '/retryDownloadCoreFonts') {
+      this.setState({ ajax: true })
+      this.startDownloadFonts(fontList)
     }
   }
 
@@ -140,10 +151,12 @@ export class CoreFontContainer extends React.Component {
     }
 
     this.props.clearConsole()
-    this.setState({ ajax: true })
     this.props.clearRetryList()
 
-    files.map((file) => this.props.downloadFontsApiCall(file))
+    /* Clean Hash History*/
+    this.props.history.replace('')
+
+    setTimeout(() => files.map((file) => this.props.downloadFontsApiCall(file)), 300)
 
     return files
   }
@@ -155,7 +168,7 @@ export class CoreFontContainer extends React.Component {
    *
    * @since 5.0
    */
-  handleGithubApiError () {
+  handleGithubApiError = () => {
     let error = this.props.githubError
 
     this.setState({ ajax: false })
@@ -166,12 +179,17 @@ export class CoreFontContainer extends React.Component {
   }
 
   /**
-   * Trigger the font download by updating the Hash History
+   * Request GitHub for font names & trigger the font download by updating the Hash History
    *
    * @since 5.0
    */
   triggerFontDownload = () => {
     if (this.state.ajax === false) {
+      /* Get the font names from GitHub we need to download */
+      this.setState({ ajax: true })
+      this.props.getFilesFromGitHub()
+
+      /* Update hash history */
       this.props.history.replace('downloadCoreFonts')
     }
   }
@@ -185,17 +203,15 @@ export class CoreFontContainer extends React.Component {
    */
   render () {
     const {
-      fontList,
       buttonClassName,
       buttonText,
       counterText,
       queue,
       history,
-      console,
+      conSole,
       retry,
       retryText
     } = this.props
-    const disabled = queue < fontList.length && queue !== 0
 
     return (
       <div>
@@ -203,13 +219,13 @@ export class CoreFontContainer extends React.Component {
           className={buttonClassName}
           callback={this.triggerFontDownload}
           text={buttonText}
-          disable={disabled}
+          disable={this.state.ajax}
         />
         {this.state.ajax && <Spinner />}
         {this.state.ajax && <Counter text={counterText} queue={queue} />}
         <CoreFontListResults
           history={history}
-          console={console}
+          console={conSole}
           retry={retry}
           retryText={retryText}
         />
@@ -225,7 +241,7 @@ export class CoreFontContainer extends React.Component {
  *
  * @returns {{
  *  fontList: Array,
- *  console: Object,
+ *  conSole: Object,
  *  retry: (*|number|Array),
  *  requestDownload: String,
  *  queue: boolean
@@ -236,7 +252,7 @@ export class CoreFontContainer extends React.Component {
 const mapStateToProps = state => {
   return {
     fontList: state.coreFonts.fontList,
-    console: state.coreFonts.console,
+    conSole: state.coreFonts.console,
     retry: state.coreFonts.retry,
     requestDownload: state.coreFonts.requestDownload,
     queue: state.coreFonts.downloadCounter
