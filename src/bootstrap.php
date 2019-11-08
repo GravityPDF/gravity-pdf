@@ -916,7 +916,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function get_default_config_data( $form_id ) {
 
-		$pid = $GLOBALS['wp']->query_vars['pid'];
+		$pid = isset( $GLOBALS['wp']->query_vars['pid'] ) ? $GLOBALS['wp']->query_vars['pid'] : '';
 
 		$settings = $this->options->get_pdf( $form_id, $pid );
 
