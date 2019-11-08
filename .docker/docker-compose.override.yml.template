@@ -4,15 +4,24 @@ services:
       - %PLUGIN_MOUNT_DIR%:/var/www/${LOCAL_DIR-src}/wp-content/plugins/%PLUGIN_INSTALL_DIR%
       - %PLUGIN_MOUNT_DIR%/.docker/mu-plugins:/var/www/${LOCAL_DIR-src}/wp-content/mu-plugins
   php:
+    environment:
+      XDEBUG_CONFIG: remote_enable=1 remote_host=host.docker.internal
+      PHP_IDE_CONFIG: serverName=localhost
     volumes:
       - %PLUGIN_MOUNT_DIR%:/var/www/${LOCAL_DIR-src}/wp-content/plugins/%PLUGIN_INSTALL_DIR%
       - %PLUGIN_MOUNT_DIR%/.docker/mu-plugins:/var/www/${LOCAL_DIR-src}/wp-content/mu-plugins
       - %PLUGIN_MOUNT_DIR%/.docker/xdebug-config.ini:/usr/local/etc/php/conf.d/xdebug-config.ini
   cli:
+    environment:
+      XDEBUG_CONFIG: remote_enable=1 remote_host=host.docker.internal
+      PHP_IDE_CONFIG: serverName=localhost
     volumes:
       - %PLUGIN_MOUNT_DIR%:/var/www/${LOCAL_DIR-src}/wp-content/plugins/%PLUGIN_INSTALL_DIR%
       - %PLUGIN_MOUNT_DIR%/.docker/xdebug-config.ini:/usr/local/etc/php/conf.d/xdebug-config.ini
   phpunit:
+    environment:
+      XDEBUG_CONFIG: remote_enable=1 remote_host=host.docker.internal
+      PHP_IDE_CONFIG: serverName=localhost
     volumes:
       - %PLUGIN_MOUNT_DIR%:/var/www/${LOCAL_DIR-src}/wp-content/plugins/%PLUGIN_INSTALL_DIR%
       - %PLUGIN_MOUNT_DIR%/.docker/xdebug-config.ini:/usr/local/etc/php/conf.d/xdebug-config.ini
