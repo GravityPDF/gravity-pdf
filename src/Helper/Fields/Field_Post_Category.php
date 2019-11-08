@@ -163,7 +163,7 @@ class Field_Post_Category extends Helper_Abstract_Fields {
 		 * while checkbox and multiselect will not.
 		 */
 		$single_dimension = false;
-		if ( ! isset( $items[0] ) ) { /* convert single-dimensional array to multi-dimensional */
+		if ( isset( $items['label'] ) ) { /* convert single-dimensional array to multi-dimensional */
 			$items            = [ $items ];
 			$single_dimension = true;
 		}
