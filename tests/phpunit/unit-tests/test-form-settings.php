@@ -304,7 +304,8 @@ class Test_Form_Settings extends WP_UnitTestCase {
 
 		require_once( GFCommon::get_base_path() . '/form_settings.php' );
 
-		$form_id = $this->form_id;
+		$form_id    = $this->form_id;
+		$_GET['id'] = $form_id;
 
 		/* Test capability security */
 		try {
@@ -339,8 +340,9 @@ class Test_Form_Settings extends WP_UnitTestCase {
 
 		require_once( GFCommon::get_base_path() . '/form_settings.php' );
 
-		$form_id = $this->form_id;
-		$pid     = '555ad84787d7e';
+		$form_id    = $this->form_id;
+		$_GET['id'] = $form_id;
+		$pid        = '555ad84787d7e';
 
 		/* Test capability security */
 		try {

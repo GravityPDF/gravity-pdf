@@ -74,6 +74,8 @@
   },
   "scripts": {
     "lint:js": "eslint src/**/*.js",
+    "lint:php": "npm run env docker-run -- php composer lint:errors",
+    "lint:php:format": "npm run env docker-run -- php composer format",
 
     "test:php": "wp-scripts env test-php",
     "test:php:multisite": "cross-env WP_MULTISITE=1 wp-scripts env test-php",
