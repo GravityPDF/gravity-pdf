@@ -923,7 +923,10 @@ div img.gfpdf-image {
  }
 
  .about-wrap .gfpdf-badge {
-  margin-top: 1.5em;
+  display: block;
+  margin: 1.5em auto 1.5em auto;
+  padding-top: 170px;
+  width: 180px;
  }
 
  .gfpdf-two-col .col {
