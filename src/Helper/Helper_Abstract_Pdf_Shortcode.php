@@ -30,7 +30,6 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 
 	/**
 	 * Set this constant to the Shortcode ID you're using
-	 *
 	 * @since 5.2
 	 */
 	const SHORTCODE = '';
@@ -164,11 +163,13 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 */
 	public function gravitypdf_confirmation( $confirmation, $form, $entry ) {
 
-		/* check if confirmation is text-based */
+		/* check if first parameter passed isn't a WP_Error */
+		/* https://github.com/GravityPDF/gravity-pdf/issues/999 */
 		if ( is_wp_error( $confirmation ) ) {
 			return $confirmation;
 		}
 
+		/* check if confirmation is text-based */
 		if ( ! is_array( $confirmation ) ) {
 			$confirmation = $this->add_entry_id_to_shortcode( $confirmation, $entry['id'] );
 		}
@@ -188,6 +189,9 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function gravitypdf_notification( $notification, $form, $entry ) {
+
+		/* check if first parameter passed isn't a WP_Error */
+		/* https://github.com/GravityPDF/gravity-pdf/issues/999 */
 		if ( is_wp_error( $notification ) ) {
 			return $notification;
 		}
@@ -344,6 +348,8 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 */
 	public function gravitypdf_redirect_confirmation_shortcode_processing( $confirmation, $form, $entry ) {
 
+		/* check if first parameter passed isn't a WP_Error */
+		/* https://github.com/GravityPDF/gravity-pdf/issues/999 */
 		if ( is_wp_error( $confirmation ) ) {
 			return $confirmation;
 		}
