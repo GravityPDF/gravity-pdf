@@ -267,7 +267,6 @@ class Helper_Data {
 				'couldNotDeleteTemplate'               => esc_html__( 'Could not delete template.', 'gravity-forms-pdf-extended' ),
 				'templateInstallInstructions'          => esc_html__( 'If you have a PDF template in .zip format you may install it here. You can also update an existing PDF template (this will override any changes you have made).', 'gravity-forms-pdf-extended' ),
 
-				'coreFontListUrl'                      => 'https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/',
 				'coreFontSuccess'                      => esc_html__( 'ALL CORE FONTS SUCCESSFULLY INSTALLED', 'gravity-forms-pdf-extended' ),
 				'coreFontError'                        => esc_html__( '%s CORE FONT(S) DID NOT INSTALL CORRECTLY', 'gravity-forms-pdf-extended' ),
 				'coreFontGithubError'                  => esc_html__( 'Could not download Core Font list. Try again.', 'gravity-forms-pdf-extended' ),

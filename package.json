@@ -89,7 +89,9 @@
     "test:js:watch": "cross-env NODE_ENV=test karma start --auto-watch --no-single-run --log-level error",
     "test:js:all": "cross-env NODE_ENV=test karma start --browsers Firefox,Chrome,IE",
 
-    "prebuild": "yarn global add gulp-cli && yarn",
+    "prebuild": "yarn global add gulp-cli && yarn && yarn prebuild:core-fonts",
+    "prebuild:core-fonts": "bash bin/json-payload.sh https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/ core-fonts.json",
+
     "build:production": "gulp && cross-env NODE_ENV=production webpack --mode production",
     "build:dev": "gulp && cross-env NODE_ENV=development webpack --mode development",
     "build:watch:css": "gulp watch",
