@@ -36,8 +36,8 @@ import request from 'superagent'
  */
 export function apiGetFilesFromGitHub () {
   return request
-    .get(GFPDF.coreFontListUrl)
-    .accept('application/vnd.github.v3+json')
+    .get(GFPDF.pluginUrl + 'dist/payload/core-fonts.json')
+    .accept('application/json')
     .type('json')
 }
 

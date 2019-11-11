@@ -32,6 +32,23 @@ The Docker setup will create a fully functionality development environment preco
 
 If you shutdown Docker and want to fire up the environment later, use `yarn env:start`. You can also reset the database back to its original state with `yarn env:reset` 
 
+### Enable X-Debug
+
+To enable X-Debug in the containers, set the environmental variable `export LOCAL_PHP_XDEBUG=true` before starting up Docker. If you've brought up the containers already, run `yarn env stop` and `yarn env start` to reboot after setting the variable. When you do your Path Mappings in your IDE, make sure to name your server `localhost` to do CLI debugging (including PHPUnit via `yarn test:php`). 
+
+### Switch PHP Versions
+
+By default, the latest stable version of PHP will be used when you start the Docker environment. To switch, set the environmental variable `LOCAL_PHP` to one of the following:
+
+* `php5.6-fpm`
+* `php7.0-fpm`
+* `php7.1-fpm`
+* `php7.2-fpm`
+* `php7.3-fpm`
+* `php7.4-fpm`
+
+For example, to swap to PHP 7.4 run `export LOCAL_PHP=php7.4-fpm` and then stop and start your container with `yarn env stop` and `yarn env start`.
+
 ## Setup without Docker
 
 If you would rather use your own development environment, you can build Gravity PDF using the following commands. 

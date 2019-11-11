@@ -32,6 +32,7 @@ node_modules/*
 *.min.js
 chunk-*.js
 *.map
+dist/*
 
 # Unit tests
 /tmp

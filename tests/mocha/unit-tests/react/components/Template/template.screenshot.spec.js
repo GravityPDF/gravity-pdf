@@ -12,8 +12,8 @@ describe('<TemplateScreenshot />', () => {
   })
 
   it('renders the screenshot', () => {
-    const comp = mount(<TemplateScreenshot image='base/src/assets/images/gravitypdf-logo.png' />)
+    const comp = mount(<TemplateScreenshot image='base/src/assets/images/cap-paws-sitting.png' />)
 
-    expect(comp.find('img').render().attr('src')).to.equal('base/src/assets/images/gravitypdf-logo.png')
+    expect(comp.find('img').render().attr('src')).to.equal('base/src/assets/images/cap-paws-sitting.png')
   })
 })
