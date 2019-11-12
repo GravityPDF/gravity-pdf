@@ -78,11 +78,11 @@
     "test:php": "wp-scripts env test-php",
     "test:php:multisite": "cross-env WP_MULTISITE=1 wp-scripts env test-php",
 
-    "test:e2e": "cross-env NODE_ENV=test testcafe chrome tests/e2e -s takeOnFails=true,fullPage=true --assertion-timeout 5000",
-    "test:e2e:headless": "cross-env NODE_ENV=test testcafe chrome:headless tests/e2e -s takeOnFails=true,fullPage=true --assertion-timeout 5000",
-    "test:e2e:file": "cross-env NODE_ENV=test testcafe chrome -s takeOnFails=true,fullPage=true --assertion-timeout 5000",
-    "test:e2e:watch": "cross-env NODE_ENV=test testcafe chrome tests/e2e -L --assertion-timeout 5000",
-    "test:e2e:file:watch": "cross-env NODE_ENV=test testcafe chrome -L --assertion-timeout 5000",
+    "test:e2e": "cross-env NODE_ENV=test testcafe chrome tests/e2e -s takeOnFails=true,fullPage=true",
+    "test:e2e:headless": "cross-env NODE_ENV=test testcafe chrome:headless tests/e2e -s takeOnFails=true,fullPage=true",
+    "test:e2e:file": "cross-env NODE_ENV=test testcafe chrome -s takeOnFails=true,fullPage=true",
+    "test:e2e:watch": "cross-env NODE_ENV=test testcafe chrome tests/e2e -L",
+    "test:e2e:file:watch": "cross-env NODE_ENV=test testcafe chrome -L",
 
     "test:js": "cross-env NODE_ENV=test karma start",
     "test:js:coverage": "cross-env NODE_ENV=test ENABLE_CODE_COVERAGE=1 karma start",
