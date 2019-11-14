@@ -85,7 +85,6 @@ const CoreFont = ({ history, button }) => (
     buttonText={button.innerText}
     success={GFPDF.coreFontSuccess}
     error={GFPDF.coreFontError}
-    githubError={GFPDF.coreFontGithubError}
     itemPending={GFPDF.coreFontItemPendingMessage}
     itemSuccess={GFPDF.coreFontItemSuccessMessage}
     itemError={GFPDF.coreFontItemErrorMessage}
