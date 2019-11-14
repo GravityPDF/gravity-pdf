@@ -18,7 +18,7 @@ describe('<CoreFontContainer />', () => {
         history={History}
         location={History.location}
         fontList={data}
-        conSole={consoleList}
+        console={consoleList}
         retry={retry}
         getFilesFromGitHub={spy}
       />)
@@ -33,7 +33,7 @@ describe('<CoreFontContainer />', () => {
         history={History}
         location={History.location}
         fontList={data}
-        conSole={consoleList}
+        console={consoleList}
         retry={retry}
         getFilesFromGitHub={spy}
         clearConsole={spy}
@@ -53,7 +53,7 @@ describe('<CoreFontContainer />', () => {
         history={History}
         location={History.location}
         fontList={data}
-        conSole={consoleList}
+        console={consoleList}
         retry={retry}
         getFilesFromGitHub={spy}
         clearConsole={spy}
@@ -63,7 +63,7 @@ describe('<CoreFontContainer />', () => {
         githubError={'Could not download Core Font list. Try again.'}
       />)
     const instance = comp.instance()
-    const files = instance.handleGithubApiError('Could not download Core Font list. Try again.')
+    const files = instance.handleGithubApiError()
 
     expect(files).to.equal('Could not download Core Font list. Try again.')
   })
