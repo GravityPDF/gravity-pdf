@@ -143,6 +143,7 @@ export class CoreFontContainer extends React.Component {
     }
 
     if (location.pathname === '/retryDownloadCoreFonts') {
+      this.setState({ ajax: true })
       this.startDownloadFonts(fontList, error)
     }
   }
@@ -217,6 +218,7 @@ export class CoreFontContainer extends React.Component {
     } = this.state
 
     const {
+      fontList,
       buttonClassName,
       buttonText,
       counterText,
@@ -227,13 +229,15 @@ export class CoreFontContainer extends React.Component {
       retryText
     } = this.props
 
+    const disabled = queue < fontList.length && queue !== 0 || ajax
+
     return (
       <div>
         <Button
           className={buttonClassName}
           callback={this.triggerFontDownload}
           text={buttonText}
-          disable={ajax}
+          disable={disabled}
         />
         {ajax && <Spinner />}
         {ajax && queue !== 0 && <Counter text={counterText} queue={queue} />}
