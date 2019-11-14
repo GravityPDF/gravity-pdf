@@ -21,8 +21,8 @@
     </groups>
 
     <filter>
-        <whitelist>
-            <directory>/</directory>
+        <whitelist addUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">.</directory>
             <exclude>
                 <directory suffix=".php">tests/</directory>
                 <directory suffix=".php">tmp/</directory>
