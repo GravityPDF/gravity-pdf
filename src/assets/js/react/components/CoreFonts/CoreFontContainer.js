@@ -62,7 +62,7 @@ export class CoreFontContainer extends React.Component {
     downloadFontsApiCall: PropTypes.func,
     githubError: PropTypes.string,
     addToConsole: PropTypes.func,
-    conSole: PropTypes.object,
+    console: PropTypes.object,
     buttonClassName: PropTypes.string,
     buttonText: PropTypes.string,
     counterText: PropTypes.string,
@@ -222,7 +222,7 @@ export class CoreFontContainer extends React.Component {
       counterText,
       queue,
       history,
-      conSole,
+      console: consoleList,
       retry,
       retryText
     } = this.props
@@ -239,7 +239,7 @@ export class CoreFontContainer extends React.Component {
         {ajax && queue !== 0 && <Counter text={counterText} queue={queue} />}
         <CoreFontListResults
           history={history}
-          console={conSole}
+          console={consoleList}
           retry={retry}
           retryText={retryText}
         />
@@ -256,7 +256,7 @@ export class CoreFontContainer extends React.Component {
  * @returns {{
  *  fontList: Array,
  *  getFilesFromGitHubFailed: String,
- *  conSole: Object,
+ *  console: Object,
  *  retry: (*|number|Array),
  *  requestDownload: String,
  *  queue: boolean
@@ -268,7 +268,7 @@ const mapStateToProps = state => {
   return {
     fontList: state.coreFonts.fontList,
     getFilesFromGitHubFailed: state.coreFonts.getFilesFromGitHubFailed,
-    conSole: state.coreFonts.console,
+    console: state.coreFonts.console,
     retry: state.coreFonts.retry,
     requestDownload: state.coreFonts.requestDownload,
     queue: state.coreFonts.downloadCounter
