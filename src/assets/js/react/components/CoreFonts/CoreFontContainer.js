@@ -105,7 +105,7 @@ export class CoreFontContainer extends React.Component {
     }
 
     /* Load error if something went wrong */
-    if (nextProps.getFilesFromGitHubFailed !== "") {
+    if (nextProps.getFilesFromGitHubFailed !== '') {
       this.maybeStartDownload(nextProps.location, nextProps.fontList, nextProps.getFilesFromGitHubFailed)
     }
 
