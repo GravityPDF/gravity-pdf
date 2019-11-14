@@ -54,6 +54,7 @@ export class CoreFontContainer extends React.Component {
     clearRequestRemainingData: PropTypes.func,
     getFilesFromGitHub: PropTypes.func,
     fontList: PropTypes.array,
+    getFilesFromGitHubFailed: PropTypes.string,
     retry: PropTypes.array,
     clearConsole: PropTypes.func,
     history: PropTypes.object,
@@ -93,9 +94,19 @@ export class CoreFontContainer extends React.Component {
       this.maybeStartDownload(nextProps.location, nextProps.fontList)
     }
 
+    /* Check for /downloadCoreFonts redirect URL and run the installer */
+    if (nextProps.location.pathname === '/downloadCoreFonts') {
+      this.triggerFontDownload()
+    }
+
     /* Load current hash history location & retry font list */
     if (nextProps.location.pathname === '/retryDownloadCoreFonts') {
       this.maybeStartDownload(nextProps.location, nextProps.retry)
+    }
+
+    /* Load error if something went wrong */
+    if (nextProps.getFilesFromGitHubFailed !== "") {
+      this.maybeStartDownload(nextProps.location, nextProps.fontList, nextProps.getFilesFromGitHubFailed)
     }
 
     /* Set ajax/loading false if request download is finished */
@@ -122,17 +133,17 @@ export class CoreFontContainer extends React.Component {
    *
    * @param location
    * @param fontList
+   * @param error
    *
    * @since 5.0
    */
-  maybeStartDownload = (location, fontList) => {
+  maybeStartDownload = (location, fontList, error = null) => {
     if (location.pathname === '/downloadCoreFonts') {
-      this.startDownloadFonts(fontList)
+      this.startDownloadFonts(fontList, error)
     }
 
     if (location.pathname === '/retryDownloadCoreFonts') {
-      this.setState({ ajax: true })
-      this.startDownloadFonts(fontList)
+      this.startDownloadFonts(fontList, error)
     }
   }
 
@@ -145,9 +156,9 @@ export class CoreFontContainer extends React.Component {
    *
    * @since 5.0
    */
-  startDownloadFonts = (files) => {
+  startDownloadFonts = (files, error) => {
     if (files.length === 0) {
-      return this.handleGithubApiError()
+      return this.handleGithubApiError(error)
     }
 
     this.props.clearConsole()
@@ -168,9 +179,7 @@ export class CoreFontContainer extends React.Component {
    *
    * @since 5.0
    */
-  handleGithubApiError = () => {
-    let error = this.props.githubError
-
+  handleGithubApiError = (error) => {
     this.setState({ ajax: false })
     this.props.addToConsole('completed', 'error', error)
     this.props.history.replace('')
@@ -186,11 +195,12 @@ export class CoreFontContainer extends React.Component {
   triggerFontDownload = () => {
     if (this.state.ajax === false) {
       /* Get the font names from GitHub we need to download */
-      this.setState({ ajax: true })
-      this.props.getFilesFromGitHub()
+      this.setState({ ajax: true }, () => {
+        this.props.getFilesFromGitHub()
 
-      /* Update hash history */
-      this.props.history.replace('downloadCoreFonts')
+        /* Update hash history */
+        this.props.history.replace('downloadCoreFonts')
+      })
     }
   }
 
@@ -245,6 +255,7 @@ export class CoreFontContainer extends React.Component {
  *
  * @returns {{
  *  fontList: Array,
+ *  getFilesFromGitHubFailed: String,
  *  conSole: Object,
  *  retry: (*|number|Array),
  *  requestDownload: String,
@@ -256,6 +267,7 @@ export class CoreFontContainer extends React.Component {
 const mapStateToProps = state => {
   return {
     fontList: state.coreFonts.fontList,
+    getFilesFromGitHubFailed: state.coreFonts.getFilesFromGitHubFailed,
     conSole: state.coreFonts.console,
     retry: state.coreFonts.retry,
     requestDownload: state.coreFonts.requestDownload,

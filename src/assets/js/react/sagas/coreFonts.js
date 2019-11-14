@@ -48,7 +48,7 @@ export function * getFilesFromGitHub () {
     const response = yield call(apiGetFilesFromGitHub)
     yield put(getFilesFromGitHubSuccess(response.body))
   } catch (error) {
-    yield put(getFilesFromGitHubFailed(error))
+    yield put(getFilesFromGitHubFailed(GFPDF.coreFontGithubError))
   }
 }
 

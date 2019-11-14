@@ -63,7 +63,7 @@ describe('<CoreFontContainer />', () => {
         githubError={'Could not download Core Font list. Try again.'}
       />)
     const instance = comp.instance()
-    const files = instance.handleGithubApiError()
+    const files = instance.handleGithubApiError('Could not download Core Font list. Try again.')
 
     expect(files).to.equal('Could not download Core Font list. Try again.')
   })

@@ -54,7 +54,7 @@ export const initialState = {
   fontList: [],
   console: {},
   retry: [],
-  getFilesFromGitHubFailed: {},
+  getFilesFromGitHubFailed: '',
   requestDownload: '',
   downloadCounter: 0
 }

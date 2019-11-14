@@ -35,9 +35,9 @@ describe('Sagas coreFonts -', () => {
     })
 
     it('should check that saga handles correctly to the failure of getFilesFromGitHub API call', () => {
-      expect(gen.throw('failed').value).to.deep.eql(put({
+      expect(gen.throw().value).to.deep.eql(put({
         type: GET_FILES_FROM_GITHUB_FAILED,
-        payload: 'failed'
+        payload: GFPDF.coreFontGithubError
       }))
     })
   })
