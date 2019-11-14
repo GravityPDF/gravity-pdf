@@ -203,6 +203,10 @@ export class CoreFontContainer extends React.Component {
    */
   render () {
     const {
+      ajax
+    } = this.state
+
+    const {
       buttonClassName,
       buttonText,
       counterText,
@@ -219,10 +223,10 @@ export class CoreFontContainer extends React.Component {
           className={buttonClassName}
           callback={this.triggerFontDownload}
           text={buttonText}
-          disable={this.state.ajax}
+          disable={ajax}
         />
-        {this.state.ajax && <Spinner />}
-        {this.state.ajax && <Counter text={counterText} queue={queue} />}
+        {ajax && <Spinner />}
+        {ajax && queue !== 0 && <Counter text={counterText} queue={queue} />}
         <CoreFontListResults
           history={history}
           console={conSole}

@@ -18,7 +18,7 @@ class InsallCoreFonts {
       .useRole(admin)
       .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
       .click(this.sectionTable)
-      .click(this.downloadButton)
+      .click(this.downloadButton, { speed: 1 })
   }
 }
 
