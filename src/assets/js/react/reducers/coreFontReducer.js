@@ -1,12 +1,12 @@
 import {
   ADD_TO_CONSOLE,
   ADD_TO_RETRY_LIST,
-  CLEAR_RETRY_LIST,
+  CLEAR_BUTTON_CLICKED_AND_RETRY_LIST,
   CLEAR_CONSOLE,
   GET_FILES_FROM_GITHUB_SUCCESS,
   GET_FILES_FROM_GITHUB_FAILED,
   REQUEST_SENT_COUNTER,
-  CLEAR_REQUEST_REMAINING_DATA
+  CLEAR_REQUEST_REMAINING_DATA, GET_FILES_FROM_GITHUB
 } from '../actions/coreFonts'
 
 /**
@@ -40,6 +40,7 @@ import {
  * Setup the initial state of the "coreFont" portion of our Redux store
  *
  * @type {{
+ *  buttonClicked: boolean,
  *  fontList: Array,
  *  console: Object,
  *  retry: Array,
@@ -51,6 +52,7 @@ import {
  * @since 5.0
  */
 export const initialState = {
+  buttonClicked: false,
   fontList: [],
   console: {},
   retry: [],
@@ -115,10 +117,20 @@ export default function (state = initialState, action) {
     /**
      * @since 5.0
      */
-    case CLEAR_RETRY_LIST:
+    case CLEAR_BUTTON_CLICKED_AND_RETRY_LIST:
       return {
         ...state,
-        retry: []
+        retry: [],
+        buttonClicked: false
+      }
+
+    /**
+     * @since 5.2
+     */
+    case GET_FILES_FROM_GITHUB:
+      return {
+        ...state,
+        buttonClicked: true
       }
 
     /**
