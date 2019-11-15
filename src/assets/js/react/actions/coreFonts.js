@@ -2,7 +2,7 @@
 export const ADD_TO_CONSOLE = 'ADD_TO_CONSOLE'
 export const ADD_TO_RETRY_LIST = 'ADD_TO_RETRY_LIST'
 export const CLEAR_CONSOLE = 'CLEAR_CONSOLE'
-export const CLEAR_RETRY_LIST = 'CLEAR_RETRY_LIST'
+export const CLEAR_BUTTON_CLICKED_AND_RETRY_LIST = 'CLEAR_BUTTON_CLICKED_AND_RETRY_LIST'
 export const GET_FILES_FROM_GITHUB = 'GET_FILES_FROM_GITHUB'
 export const GET_FILES_FROM_GITHUB_SUCCESS = 'GET_FILES_FROM_GITHUB_SUCCESS'
 export const GET_FILES_FROM_GITHUB_FAILED = 'GET_FILES_FROM_GITHUB_FAILED'
@@ -94,9 +94,9 @@ export const addToRetryList = (name) => {
  *
  * @since 5.0
  */
-export const clearRetryList = () => {
+export const clearButtonClickedAndRetryList = () => {
   return {
-    type: CLEAR_RETRY_LIST
+    type: CLEAR_BUTTON_CLICKED_AND_RETRY_LIST
   }
 }
 

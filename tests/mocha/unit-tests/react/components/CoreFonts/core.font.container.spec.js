@@ -8,7 +8,7 @@ const data = ['file1', 'file2', 'file3', 'file4']
 const retry = []
 const spy = sinon.spy()
 const History = createHashHistory()
-History.replace('/')
+History.replace('/downloadCoreFonts')
 
 describe('<CoreFontContainer />', () => {
 
@@ -22,7 +22,6 @@ describe('<CoreFontContainer />', () => {
         retry={retry}
         getFilesFromGitHub={spy}
       />)
-    comp.find('button').simulate('click')
 
     expect(window.location.hash).to.equal('#/downloadCoreFonts')
   })
@@ -37,7 +36,7 @@ describe('<CoreFontContainer />', () => {
         retry={retry}
         getFilesFromGitHub={spy}
         clearConsole={spy}
-        clearRetryList={spy}
+        clearButtonClickedAndRetryList={spy}
         downloadFontsApiCall={spy}
       />)
     const instance = comp.instance()
@@ -57,7 +56,7 @@ describe('<CoreFontContainer />', () => {
         retry={retry}
         getFilesFromGitHub={spy}
         clearConsole={spy}
-        clearRetryList={spy}
+        clearButtonClickedAndRetryList={spy}
         downloadFontsApiCall={spy}
         addToConsole={spy}
         githubError={'Could not download Core Font list. Try again.'}

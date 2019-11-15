@@ -2,7 +2,7 @@ import {
   addToConsole,
   clearConsole,
   addToRetryList,
-  clearRetryList,
+  clearButtonClickedAndRetryList,
   getFilesFromGitHub,
   getFilesFromGitHubSuccess,
   getFilesFromGitHubFailed,
@@ -12,7 +12,7 @@ import {
   ADD_TO_CONSOLE,
   CLEAR_CONSOLE,
   ADD_TO_RETRY_LIST,
-  CLEAR_RETRY_LIST,
+  CLEAR_BUTTON_CLICKED_AND_RETRY_LIST,
   GET_FILES_FROM_GITHUB,
   GET_FILES_FROM_GITHUB_SUCCESS,
   GET_FILES_FROM_GITHUB_FAILED,
@@ -51,10 +51,10 @@ describe('Actions coreFonts -', () => {
     })
   })
 
-  describe('clearRetryList', () => {
+  describe('clearButtonClickedAndRetryList', () => {
     it('check if it returns the correct action', () => {
-      let results = clearRetryList()
-      expect(results.type).is.equal(CLEAR_RETRY_LIST)
+      let results = clearButtonClickedAndRetryList()
+      expect(results.type).is.equal(CLEAR_BUTTON_CLICKED_AND_RETRY_LIST)
     })
   })
 

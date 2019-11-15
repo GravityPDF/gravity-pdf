@@ -1,8 +1,9 @@
 import {
   ADD_TO_CONSOLE,
   ADD_TO_RETRY_LIST,
-  CLEAR_RETRY_LIST,
+  CLEAR_BUTTON_CLICKED_AND_RETRY_LIST,
   CLEAR_CONSOLE,
+  GET_FILES_FROM_GITHUB,
   GET_FILES_FROM_GITHUB_SUCCESS,
   GET_FILES_FROM_GITHUB_FAILED,
   CLEAR_REQUEST_REMAINING_DATA,
@@ -76,14 +77,23 @@ describe('Reducers coreFontReducer - ', () => {
     })
   })
 
-  describe('CLEAR_RETRY_LIST', () => {
+  describe('CLEAR_BUTTON_CLICKED_AND_RETRY_LIST', () => {
     it('check the correct state gets returned when this action runs', () => {
       let newState = reducer(initialState, { type: ADD_TO_RETRY_LIST, name: 'Font 1' })
       newState = reducer(newState, { type: ADD_TO_RETRY_LIST, name: 'Font 2' })
       newState = reducer(newState, { type: ADD_TO_RETRY_LIST, name: 'Font 3' })
-      newState = reducer(newState, { type: CLEAR_RETRY_LIST })
+      newState = reducer(newState, { type: CLEAR_BUTTON_CLICKED_AND_RETRY_LIST })
 
       expect(Object.keys(newState.retry).length).is.equal(0)
+      expect(newState.buttonClicked).is.equal(false)
+    })
+  })
+
+  describe('GET_FILES_FROM_GITHUB', () => {
+    it('check the correct state gets returned when this action runs', () => {
+      let newState = reducer(initialState, { type: GET_FILES_FROM_GITHUB })
+
+      expect(newState.buttonClicked).is.equal(true)
     })
   })
 
