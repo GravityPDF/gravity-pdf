@@ -145,8 +145,8 @@ jobs:
       script:
         - |
           npm run test:js:coverage &&
-          npm run test:php -- --coverage-clover=../tmp/coverage/report-xml/php-coverage1.xml &&
-          npm run test:php -- --coverage-clover=../tmp/coverage/report-xml/php-coverage2.xml --group ajax
+          npm run test:php -- --coverage-clover=tmp/coverage/report-xml/php-coverage1.xml &&
+          npm run test:php -- --coverage-clover=tmp/coverage/report-xml/php-coverage2.xml --group ajax
 
     - stage: Deploy
       name: Package and Push to WordPress.org
