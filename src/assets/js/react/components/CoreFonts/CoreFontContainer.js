@@ -192,7 +192,7 @@ export class CoreFontContainer extends React.Component {
   }
 
   /**
-   * Request GitHub for font names & trigger the font download by updating the Hash History
+   * Request GitHub for font names & trigger font download
    *
    * @since 5.0
    */
