@@ -30,6 +30,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 
 	/**
 	 * Set this constant to the Shortcode ID you're using
+	 *
 	 * @since 5.2
 	 */
 	const SHORTCODE = '';
@@ -164,27 +165,14 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	public function gravitypdf_confirmation( $confirmation, $form, $entry ) {
 
 		/**
-		 * Check if first parameter passed isn't a WP_Error
-		 * https://github.com/GravityPDF/gravity-pdf/issues/999
+		 * Do nothing if WP_Error is passed
+		 *
+		 * This resolves a conflict with a third party GF plugin which was passing an error instead of the expected GF confirmation response
+		 *
+		 * @see https://github.com/GravityPDF/gravity-pdf/issues/999
 		 */
-		if ( is_wp_error( $confirmation ) ) {
+		if ( is_wp_error( $confirmation ) || is_wp_error( $form ) || is_wp_error( $entry ) ) {
 			return $confirmation;
-		}
-
-		/**
-		 * Check if second parameter passed isn't a WP_Error
-		 * https://github.com/GravityPDF/gravity-pdf/issues/999
-		 */
-		if (is_wp_error ($form)){
-			return $form;
-		}
-
-		/**
-		 * Check if third parameter passed isn't a WP_Error
-		 * https://github.com/GravityPDF/gravity-pdf/issues/999
-		 */
-		if (is_wp_error ($entry)){
-			return $entry;
 		}
 
 		/* check if confirmation is text-based */
@@ -209,27 +197,14 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	public function gravitypdf_notification( $notification, $form, $entry ) {
 
 		/**
-		 * Check if first parameter passed isn't a WP_Error
-		 * https://github.com/GravityPDF/gravity-pdf/issues/999
+		 * Do nothing if WP_Error is passed
+		 *
+		 * This resolves a conflict with a third party GF plugin which was passing an error instead of the expected GF confirmation response
+		 *
+		 * @see https://github.com/GravityPDF/gravity-pdf/issues/999
 		 */
-		if ( is_wp_error( $notification ) ) {
+		if ( is_wp_error( $notification ) || is_wp_error( $entry ) ) {
 			return $notification;
-		}
-
-		/**
-		 * Check if second parameter passed isn't a WP_Error
-		 * https://github.com/GravityPDF/gravity-pdf/issues/999
-		 */
-		if (is_wp_error ($form)){
-			return $form;
-		}
-
-		/**
-		 * Check if third parameter passed isn't a WP_Error
-		 * https://github.com/GravityPDF/gravity-pdf/issues/999
-		 */
-		if (is_wp_error ($entry)){
-			return $entry;
 		}
 
 		if ( isset( $notification['message'] ) ) {
@@ -385,10 +360,12 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	public function gravitypdf_redirect_confirmation_shortcode_processing( $confirmation, $form, $entry ) {
 
 		/**
-		 * Check if first parameter passed isn't a WP_Error
-		 * https://github.com/GravityPDF/gravity-pdf/issues/999
+		 * Do nothing if WP_Error is passed
+		 *
+		 * This resolves a conflict with a third party GF plugin which was passing an error instead of the expected GF confirmation response
+		 * @see https://github.com/GravityPDF/gravity-pdf/issues/999
 		 */
-		if ( is_wp_error( $confirmation ) ) {
+		if ( is_wp_error( $confirmation ) || is_wp_error( $form ) || is_wp_error( $entry ) ) {
 			return $confirmation;
 		}
 
@@ -396,7 +373,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 		 * Check if second parameter passed isn't a WP_Error
 		 * https://github.com/GravityPDF/gravity-pdf/issues/999
 		 */
-		if (is_wp_error ($form)){
+		if ( is_wp_error( $form ) ) {
 			return $form;
 		}
 
@@ -404,7 +381,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 		 * Check if third parameter passed isn't a WP_Error
 		 * https://github.com/GravityPDF/gravity-pdf/issues/999
 		 */
-		if (is_wp_error ($entry)){
+		if ( is_wp_error( $entry ) ) {
 			return $entry;
 		}
 
