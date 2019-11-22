@@ -169,7 +169,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 		 * This resolves a conflict with a third party GF plugin which was passing an error instead of the expected GF confirmation response
 		 * @see https://github.com/GravityPDF/gravity-pdf/issues/999
 		 */
-		if ( is_wp_error( $confirmation ) ) {
+		if ( is_wp_error( $confirmation ) || is_wp_error( $form ) || is_wp_error( $entry ) ) {
 			return $confirmation;
 		}
 
@@ -199,7 +199,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 		 * This resolves a conflict with a third party GF plugin which was passing an error instead of the expected GF confirmation response
 		 * @see https://github.com/GravityPDF/gravity-pdf/issues/999
 		 */
-		if ( is_wp_error( $notification ) ) {
+		if ( is_wp_error( $notification ) || is_wp_error( $entry ) ) {
 			return $notification;
 		}
 
@@ -360,7 +360,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 		 * This resolves a conflict with a third party GF plugin which was passing an error instead of the expected GF confirmation response
 		 * @see https://github.com/GravityPDF/gravity-pdf/issues/999
 		 */
-		if ( is_wp_error( $confirmation ) ) {
+		if ( is_wp_error( $confirmation ) || is_wp_error( $form ) || is_wp_error( $entry ) ) {
 			return $confirmation;
 		}
 
