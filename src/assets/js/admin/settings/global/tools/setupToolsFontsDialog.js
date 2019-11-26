@@ -8,9 +8,9 @@ import { resizeDialogIfNeeded } from '../../../helper/resizeDialogIfNeeded'
  * @since 4.0
  */
 export function setupToolsFontsDialog () {
-  let $font = $('#gfpdf_settings\\[manage_fonts\\]')
+  const $font = $('#gfpdf_settings\\[manage_fonts\\]')
   /* escape braces */
-  let $fontDialog = $('#manage-font-files')
+  const $fontDialog = $('#manage-font-files')
 
   /* setup fonts dialog */
   wpDialog($fontDialog, [], 500, 500)

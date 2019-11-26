@@ -14,8 +14,8 @@ export function showTooltips () {
    * @since 4.0
    */
   function getTooltip (html) {
-    let $a = $('<a>')
-    let $i = $('<i class="fa fa-question-circle">')
+    const $a = $('<a>')
+    const $i = $('<i class="fa fa-question-circle">')
 
     $a.append($i)
     $a.addClass('gf_tooltip tooltip')
@@ -28,7 +28,7 @@ export function showTooltips () {
     return $a
   }
 
-  if (typeof gform_initialize_tooltips !== 'function') {
+  if (typeof gform_initialize_tooltips !== 'function') { // eslint-disable-line
     return
   }
 

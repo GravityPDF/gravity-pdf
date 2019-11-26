@@ -11,8 +11,8 @@ import { setupAdvancedOptions } from './setupAdvancedOptions'
 export function generalSettings () {
   setupRequiredFields($('#pdfextended-settings > form'))
 
-  let $table = $('#pdf-general-security')
-  let $adminRestrictions = $table.find('input[name="gfpdf_settings[default_restrict_owner]"]')
+  const $table = $('#pdf-general-security')
+  const $adminRestrictions = $table.find('input[name="gfpdf_settings[default_restrict_owner]"]')
 
   /*
    * Add change event to admin restrictions to show/hide dependant fields

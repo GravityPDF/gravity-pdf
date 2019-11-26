@@ -5,8 +5,8 @@ import $ from 'jquery'
  * @since 4.0
  */
 export function handleOwnerRestriction () {
-  let $table = $('#gfpdf-advanced-pdf-options')
-  let $publicAccess = $table.find('input[name="gfpdf_settings[public_access]"]')
+  const $table = $('#gfpdf-advanced-pdf-options')
+  const $publicAccess = $table.find('input[name="gfpdf_settings[public_access]"]')
 
   /*
    * Add change event to admin restrictions to show/hide dependant fields

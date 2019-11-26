@@ -14,7 +14,7 @@ export function doUploadListener () {
   $('body').off('click', '.gfpdf_settings_upload_button').on('click', '.gfpdf_settings_upload_button', function (e) {
     e.preventDefault()
 
-    let $button = $(this)
+    const $button = $(this)
     window.formfield = $(this).parent().prev()
 
     /* If the media frame already exists, reopen it. */
@@ -32,13 +32,13 @@ export function doUploadListener () {
       multiple: false,
 
       library: {
-        type: [ 'font/ttf', 'application/x-font-ttf', 'application/octet-stream' ]
+        type: ['font/ttf', 'application/x-font-ttf', 'application/octet-stream']
       }
     })
 
     /* When a file is selected, run a callback. */
     fileFrame.on('select', function () {
-      let selection = fileFrame.state().get('selection')
+      const selection = fileFrame.state().get('selection')
       selection.each(function (attachment) {
         attachment = attachment.toJSON()
         window.formfield.val(attachment.url).change()

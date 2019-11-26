@@ -25,7 +25,6 @@ const TemplateButton = lazy(() => import('../components/Template/TemplateButton'
  * @since 4.1
  */
 export default function templateBootstrap ($templateField) {
-
   const store = getStore()
 
   /* Create our button container and render our component in it */
@@ -77,11 +76,9 @@ export function createTemplateMarkup ($templateField) {
  * @since 4.1
  */
 export function activeTemplateStoreListener (store, $templateField) {
-
   /* Watch our store for changes */
-  let w = watch(store.getState, 'template.activeTemplate')
+  const w = watch(store.getState, 'template.activeTemplate')
   store.subscribe(w((template) => {
-
     /* Check store and DOM are different to prevent any update recursions */
     if ($templateField.val() !== template) {
       $templateField
@@ -111,27 +108,24 @@ export function activeTemplateStoreListener (store, $templateField) {
  * @since 4.1
  */
 export function templateChangeStoreListener (store, $templateField) {
-
   /* Track the initial list size */
   let listCount = store.getState().template.list.length
 
   /* Watch our store for changes */
-  let w = watch(store.getState, 'template.list')
+  const w = watch(store.getState, 'template.list')
   store.subscribe(w((list) => {
-
     /* Only update if the list size differs from what we expect */
     if (listCount !== list.length) {
       /* update the list size so we don't run it twice */
       listCount = list.length
-      let currentActive = $templateField.val()
+      const currentActive = $templateField.val()
 
       /* Dispatch Redux Action for an AJAX call to get the new Select Box DOM */
       store.dispatch(updateSelectBox())
 
       /* Watch our store for changes */
-      let watchSelectBoxText = watch(store.getState, 'template.updateSelectBoxText')
+      const watchSelectBoxText = watch(store.getState, 'template.updateSelectBoxText')
       store.subscribe(watchSelectBoxText((updateSelectBoxText) => {
-
         /* Update $templateField */
         $templateField
           .html(updateSelectBoxText)

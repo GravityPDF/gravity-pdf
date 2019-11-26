@@ -8,7 +8,7 @@ import $ from 'jquery'
 export function doMergetags () {
   if (window.gfMergeTags && typeof form !== 'undefined' && $('.merge-tag-support').length >= 0) {
     $('.merge-tag-support').each(function () {
-      new gfMergeTagsObj(form, $(this))
+      new gfMergeTagsObj(form, $(this)) // eslint-disable-line
     })
   }
 }

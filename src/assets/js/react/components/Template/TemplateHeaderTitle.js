@@ -15,8 +15,8 @@ import React from 'react'
  *
  * @since 4.1
  */
-const TemplateHeaderTitle = ({header}) => (
-  <h1>{header}</h1>
+const TemplateHeaderTitle = ({ header }) => (
+  <h1 data-test='component-templateHeaderTitle'>{header}</h1>
 )
 
 /**

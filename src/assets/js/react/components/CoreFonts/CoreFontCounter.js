@@ -17,7 +17,12 @@ import PropTypes from 'prop-types'
  * @since 5.0
  */
 const CoreFontCounter = ({ queue, text }) => (
-  <span className='gfpdf-core-font-counter'>{text} {queue}</span>
+  <span
+    data-test='component-coreFont-counter'
+    className='gfpdf-core-font-counter'
+  >
+    {text} {queue}
+  </span>
 )
 
 /**

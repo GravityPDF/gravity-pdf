@@ -24,11 +24,11 @@ module.exports = webpackMerge(
     module: {
       rules: [
         {
-          test: /\.js$/,
+          test: /\.(js|jsx)$/,
           exclude: path.resolve(__dirname, 'src/assets/js/legacy'),
           include: [
             path.resolve(__dirname, 'src/assets'),
-            path.resolve(__dirname, 'tests/mocha')
+            path.resolve(__dirname, 'tests/js-unit')
           ],
           loader: 'babel-loader',
           options: { babelrc: true }

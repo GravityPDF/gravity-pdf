@@ -8,7 +8,7 @@ import $ from 'jquery'
  * @since 4.0
  */
 export function ajaxCall (post, responseCallback) {
-  let doAjaxcall = $.ajax({
+  const doAjaxcall = $.ajax({
     type: 'post',
     dataType: 'json',
     url: GFPDF.ajaxUrl,

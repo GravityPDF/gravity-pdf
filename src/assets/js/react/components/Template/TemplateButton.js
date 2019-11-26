@@ -44,11 +44,12 @@ class TemplateButton extends React.Component {
   render () {
     return (
       <button
-        type="button"
-        id="fancy-template-selector"
-        className="button gfpdf-button"
+        data-test='component-templateButton'
+        type='button'
+        id='fancy-template-selector'
+        className='button gfpdf-button'
         onClick={this.handleClick}
-        ref={node => this.button = node}
+        ref={node => (this.button = node)}
       >
         {this.props.buttonText}
       </button>

@@ -54,7 +54,7 @@
         bold: '',
         italics: '',
         bolditalics: '',
-        disabled: false,
+        disabled: false
       },
 
       /**
@@ -104,7 +104,7 @@
           data: {
             action: 'gfpdf_font_delete',
             nonce: options.nonce,
-            id: this.get('id'),
+            id: this.get('id')
           }
         }
 
@@ -173,7 +173,6 @@
 
         /* Loop through the object and use jQuery's proxy to correct the 'this' scope */
         $.each(fonts, $.proxy(function (index, font) {
-
           /* if there is value for the font we'll validate it */
           if (font.length > 0 && this.isValidFile(font) === false) {
             /* mark our global validation as false */
@@ -326,7 +325,6 @@
        * @since 4.0
        */
       addRender: function (font) {
-
         /* Empty our container if no models exist (as we display a welcome message if list is empty) */
         if (this.collection.length === 1) {
           this.$el.empty()
@@ -729,7 +727,7 @@
        * @since 4.0
        */
       events: {
-        'click': 'addFont'
+        click: 'addFont'
       },
 
       /**
@@ -845,7 +843,7 @@
         })
 
         /* Create a Add View so user's can add new fonts and pass in our collection and container */
-        new Fonts.View.Add({
+        new Fonts.View.Add({ // eslint-disable-line
           collection: fontCollection,
           container: container
         })

@@ -18,7 +18,7 @@ import PropTypes from 'prop-types'
  */
 const DisplayResultItem = ({ item }) => {
   return (
-    <li className='resultExist'>
+    <li data-test='component-result-item' className='resultExist'>
       <a href={item.link}>
         <div dangerouslySetInnerHTML={{ __html: item.title.rendered }} />
       </a>

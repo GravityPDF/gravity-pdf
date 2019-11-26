@@ -18,7 +18,7 @@ import PropTypes from 'prop-types'
  */
 const DisplayError = ({ displayError }) => {
   return (
-    <li className='error'>{displayError}</li>
+    <li data-test='component-error' className='error'>{displayError}</li>
   )
 }
 

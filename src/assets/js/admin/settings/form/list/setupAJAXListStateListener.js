@@ -9,11 +9,11 @@ import { ajaxCall } from '../../../helper/ajaxCall'
 export function setupAJAXListStateListener () {
   /* Add live state listener to change active / inactive value */
   $('#gfpdf_list_form').on('click', '.check-column img', function () {
-    let id = String($(this).data('id'))
-    let that = this
+    const id = String($(this).data('id'))
+    const that = this
 
     if (id.length > 0) {
-      let isActive = that.src.indexOf('active1.png') >= 0
+      const isActive = that.src.indexOf('active1.png') >= 0
 
       if (isActive) {
         that.src = that.src.replace('active1.png', 'active0.png')
@@ -24,11 +24,11 @@ export function setupAJAXListStateListener () {
       }
 
       /* Set up ajax data */
-      let data = {
-        'action': 'gfpdf_change_state',
-        'nonce': $(this).data('nonce'),
-        'fid': $(this).data('fid'),
-        'pid': $(this).data('id')
+      const data = {
+        action: 'gfpdf_change_state',
+        nonce: $(this).data('nonce'),
+        fid: $(this).data('fid'),
+        pid: $(this).data('id')
       }
 
       /* Do ajax call */

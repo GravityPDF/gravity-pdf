@@ -96,7 +96,7 @@ jobs:
     - name: E2E Testing
       env: LOCAL_PHP=7.4-fpm
       script:
-        - npm run test:e2e:headless
+        - npm run test:js-e2e:headless
 
     - name: PHP 7.4 unit tests
       env: LOCAL_PHP=7.4-fpm
@@ -144,7 +144,7 @@ jobs:
       env: LOCAL_PHP=7.3-fpm LOCAL_PHP_XDEBUG=true
       script:
         - |
-          npm run test:js:coverage &&
+          npm run test:js-unit:coverage &&
           npm run test:php -- --coverage-clover=tmp/coverage/report-xml/php-coverage1.xml &&
           npm run test:php -- --coverage-clover=tmp/coverage/report-xml/php-coverage2.xml --group ajax
 

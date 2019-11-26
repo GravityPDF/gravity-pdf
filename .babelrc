@@ -1,4 +1,11 @@
 {
+  "env": {
+    "production": {
+      "plugins": [
+        ["react-remove-properties", {"properties": ["data-test"]}]
+      ]
+    }
+  },
   "presets": [
     [
       "@babel/preset-env",
@@ -8,7 +15,6 @@
             "last 2 versions"
           ]
         },
-        "modules": false,
         "forceAllTransforms": true,
         "useBuiltIns": "usage",
         "corejs": 2
@@ -20,20 +26,5 @@
     "@babel/plugin-syntax-dynamic-import",
     "@babel/plugin-proposal-object-rest-spread",
     "@babel/plugin-proposal-class-properties"
-  ],
-  "env": {
-    "test": {
-      "plugins": [
-        "./tests/mocha/arrow-function-coverage-fix.js",
-        [
-          "istanbul",
-          {
-            "exclude": [
-              "tests/**"
-            ]
-          }
-        ]
-      ]
-    }
-  }
+  ]
 }

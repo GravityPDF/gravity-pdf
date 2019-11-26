@@ -3,21 +3,21 @@ import { ajaxCall } from '../../helper/ajaxCall'
 import { spinner } from '../../helper/spinner'
 
 export function runPDFAccessCheck () {
-  let $status = $('#gfpdf-direct-pdf-protection-check')
+  const $status = $('#gfpdf-direct-pdf-protection-check')
 
   if ($status.length > 0) {
     /* Do our AJAX call */
 
     /* Add spinner */
-    let $spinner = spinner('gfpdf-spinner')
+    const $spinner = spinner('gfpdf-spinner')
 
     /* Add our spinner */
     $status.append($spinner)
 
     /* Set up ajax data */
-    let data = {
-      'action': 'gfpdf_has_pdf_protection',
-      'nonce': $status.data('nonce'),
+    const data = {
+      action: 'gfpdf_has_pdf_protection',
+      nonce: $status.data('nonce')
     }
 
     /* Do ajax call */

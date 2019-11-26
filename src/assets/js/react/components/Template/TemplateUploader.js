@@ -38,7 +38,6 @@ export class TemplateUploader extends React.Component {
     installUpdatedText: PropTypes.string,
     templateSuccessfullyInstalledUpdated: PropTypes.string,
     templateInstallInstructions: PropTypes.string,
-
     addNewTemplate: PropTypes.func,
     updateTemplateParam: PropTypes.func,
     postTemplateUploadProcessing: PropTypes.func,
@@ -62,15 +61,28 @@ export class TemplateUploader extends React.Component {
   }
 
   /**
-   * Fires appropriate function based on Redux store data
+   * If component did update, fires appropriate function based on Redux store data
    *
-   * @param {Object} nextProps
+   * @param {Object} prevProps
    *
    * @since 4.1
    */
-  componentWillReceiveProps (nextProps) {
-    Object.keys(nextProps.templateUploadProcessingSuccess).length > 0 && this.ajaxSuccess(nextProps.templateUploadProcessingSuccess)
-    Object.keys(nextProps.templateUploadProcessingError).length > 0 && this.ajaxFailed(nextProps.templateUploadProcessingError)
+  componentDidUpdate (prevProps) {
+    const { templateUploadProcessingSuccess, templateUploadProcessingError } = this.props
+
+    if (
+      prevProps.templateUploadProcessingSuccess !== templateUploadProcessingSuccess &&
+      Object.keys(templateUploadProcessingSuccess).length > 0
+    ) {
+      this.ajaxSuccess(templateUploadProcessingSuccess)
+    }
+
+    if (
+      prevProps.templateUploadProcessingError !== templateUploadProcessingError &&
+      Object.keys(templateUploadProcessingError).length > 0
+    ) {
+      this.ajaxFailed(templateUploadProcessingError)
+    }
   }
 
   /**
@@ -80,10 +92,9 @@ export class TemplateUploader extends React.Component {
    *
    * @since 4.1
    */
-  onDrop = (acceptedFiles) => {
+  handleOndrop = (acceptedFiles) => {
     /* Handle file upload and pass in an nonce!!! */
     if (acceptedFiles instanceof Array && acceptedFiles.length > 0) {
-
       acceptedFiles.forEach((file) => {
         const filename = file.name
 
@@ -96,13 +107,12 @@ export class TemplateUploader extends React.Component {
         this.setState({
           ajax: true,
           error: '',
-          message: '',
+          message: ''
         })
 
         /* POST the PDF template to our endpoint for processing */
         this.props.postTemplateUploadProcessing(file, filename)
       })
-
     }
   }
 
@@ -118,7 +128,6 @@ export class TemplateUploader extends React.Component {
    */
   checkFilename = (name) => {
     if (name.substr(name.length - 4) !== '.zip') {
-
       /* Tell use about incorrect file type */
       this.setState({
         error: this.props.filenameErrorText
@@ -164,14 +173,13 @@ export class TemplateUploader extends React.Component {
   ajaxSuccess = (response) => {
     /* Update our Redux Store with the new template(s) */
     response.body.templates.forEach((template) => {
-
       /* Check if template already in the list before adding to our store */
       const matched = this.props.templates.find((item) => {
         return (item.id === template.id)
       })
 
       if (matched === undefined) {
-        template.new = true //ensure new templates go to end of list
+        template.new = true // ensure new templates go to end of list
         template.message = this.props.installSuccessText
         this.props.addNewTemplate(template)
       } else {
@@ -223,30 +231,47 @@ export class TemplateUploader extends React.Component {
    */
   render () {
     return (
-      <div className="theme add-new-theme gfpdf-dropzone">
+      <div
+        data-test='component-templateUploader'
+        className='theme add-new-theme gfpdf-dropzone'
+      >
         <Dropzone
-          onDrop={this.onDrop}
+          data-test='component-dropzone'
+          onDrop={this.handleOndrop}
           maxSize={10240000}
         >
-          {({getRootProps, getInputProps, isDragActive}) => {
+          {({ getRootProps, getInputProps, isDragActive }) => {
             return (
               <div
                 {...getRootProps()}
-                className={classNames('dropzone', {'dropzone--isActive': isDragActive})}
+                className={classNames('dropzone', { 'dropzone--isActive': isDragActive })}
               >
                 <input {...getInputProps()} />
-                <a href="#/template" className={this.state.ajax ? 'doing-ajax' : ''}>
+                <a href='#/template' className={this.state.ajax ? 'doing-ajax' : ''}>
 
-                  <div className="theme-screenshot"><span/></div>
+                  <div className='theme-screenshot'><span /></div>
 
-                  {this.state.error !== '' ? <ShowMessage text={this.state.error} error={true}/> : null}
-                  {this.state.message !== '' ?
-                    <ShowMessage text={this.state.message} dismissable={true}
-                                 dismissableCallback={this.removeMessage}/> : null}
+                  {this.state.error !== '' ? (
+                    <ShowMessage
+                      data-test='component-stateError-showMessage'
+                      text={this.state.error}
+                      error
+                    />
+                  ) : null}
+                  {this.state.message !== '' ? (
+                    <ShowMessage
+                      data-test='component-stateMessage-showMessage'
+                      text={this.state.message}
+                      dismissable
+                      dismissableCallback={this.removeMessage}
+                    />
+                  ) : null}
 
-                  <h2 className="theme-name">{this.props.addTemplateText}</h2>
+                  <h2 className='theme-name'>{this.props.addTemplateText}</h2>
                 </a>
-                <div className="gfpdf-template-install-instructions">{this.props.templateInstallInstructions}</div>
+                <div className='gfpdf-template-install-instructions'>
+                  {this.props.templateInstallInstructions}
+                </div>
               </div>
             )
           }}
@@ -281,7 +306,7 @@ const mapStateToProps = (state) => {
  *
  * @since 4.1
  */
-const mapDispatchToProps = (dispatch) => {
+export const mapDispatchToProps = (dispatch) => {
   return {
     addNewTemplate: (template) => {
       dispatch(addTemplate(template))

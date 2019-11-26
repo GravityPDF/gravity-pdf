@@ -15,23 +15,21 @@ import { toggleFontAppearance } from '../pdf/toggleFontAppearance'
 export function setupDynamicTemplateFields () {
   /* Add change listener to our template */
   $('#gfpdf_settings\\[template\\]').off('change').change(function () {
-
     /* Add spinner */
-    let $spinner = spinner('gfpdf-spinner')
+    const $spinner = spinner('gfpdf-spinner')
 
     $(this).next().after($spinner)
 
-    let data = {
-      'action': 'gfpdf_get_template_fields',
-      'nonce': GFPDF.ajaxNonce,
-      'template': $(this).val(),
-      'type': $(this).attr('id'),
-      'id': $('#gform_id').val(),
-      'gform_pdf_id': $('#gform_pdf_id').val()
+    const data = {
+      action: 'gfpdf_get_template_fields',
+      nonce: GFPDF.ajaxNonce,
+      template: $(this).val(),
+      type: $(this).attr('id'),
+      id: $('#gform_id').val(),
+      gform_pdf_id: $('#gform_pdf_id').val()
     }
 
     ajaxCall(data, function (response) {
-
       /* Remove our UI loader */
       $spinner.remove()
 
@@ -42,7 +40,7 @@ export function setupDynamicTemplateFields () {
       if (response.fields) {
         /* Remove any previously loaded editors to prevent conflicts loading an editor with same name */
         $.each(response.editors, function (index, value) {
-          let editor = tinyMCE.get(value)
+          const editor = tinyMCE.get(value)
           if (editor !== null) {
             /* Bug Fix for Firefox - http://www.tinymce.com/develop/bugtracker_view.php?id=3152 */
             try {

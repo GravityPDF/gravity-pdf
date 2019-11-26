@@ -38,15 +38,20 @@ export class TemplateDeleteButton extends React.Component {
   }
 
   /**
-   * Fires appropriate action based on Redux store data
-   *
-   * @param {Object} nextProps
+   * If component did update, fires appropriate action based on Redux store data
    *
    * @since 4.1
    */
-  componentWillReceiveProps (nextProps) {
-    nextProps.getTemplateProcessing === 'success' && this.props.history.push('/template')
-    nextProps.getTemplateProcessing === 'failed' && this.ajaxFailed()
+  componentDidUpdate () {
+    const { getTemplateProcessing, history } = this.props
+
+    if (getTemplateProcessing === 'success') {
+      history.push('/template')
+    }
+
+    if (getTemplateProcessing === 'failed') {
+      this.ajaxFailed()
+    }
   }
 
   /**
@@ -64,7 +69,6 @@ export class TemplateDeleteButton extends React.Component {
     e.preventDefault()
     e.stopPropagation()
     if (window.confirm(this.props.templateConfirmDeleteText)) {
-
       /* POST the PDF template to our endpoint for processing */
       this.props.templateProcessing(this.props.template.id)
 
@@ -80,7 +84,7 @@ export class TemplateDeleteButton extends React.Component {
    * @since 4.1
    */
   ajaxFailed = () => {
-    const errorTemplate = { ...this.props.template, 'error': this.props.templateDeleteErrorText }
+    const errorTemplate = { ...this.props.template, error: this.props.templateDeleteErrorText }
     this.props.addTemplate(errorTemplate)
 
     this.props.history.push('/template')
@@ -91,15 +95,16 @@ export class TemplateDeleteButton extends React.Component {
    * @since 4.1
    */
   render () {
-
     const callback = (this.props.callbackFunction) ? this.props.callbackFunction : this.deleteTemplate
 
     return (
       <a
+        data-test='component-templateDeleteButton'
         onClick={callback}
-        href="#"
-        tabIndex="150"
-        className="button button-secondary delete-theme">
+        href='#'
+        tabIndex='150'
+        className='button button-secondary delete-theme'
+      >
         {this.props.buttonText}
       </a>
     )
@@ -127,7 +132,7 @@ const mapStateToProps = state => ({
  *
  * @since 4.1
  */
-const mapDispatchToProps = dispatch => {
+export const mapDispatchToProps = dispatch => {
   return {
     addTemplate: (template) => {
       dispatch(addTemplate(template))

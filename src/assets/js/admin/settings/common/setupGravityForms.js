@@ -9,7 +9,7 @@ export function setupGravityForms () {
    * customised options.
    * @since 4.0
    */
-  if (typeof gf_vars !== 'undefined') {
+  if (typeof gf_vars !== 'undefined') { // eslint-disable-line
     gf_vars.thisFormButton = GFPDF.conditionalText
     gf_vars.show = GFPDF.enable
     gf_vars.hide = GFPDF.disable

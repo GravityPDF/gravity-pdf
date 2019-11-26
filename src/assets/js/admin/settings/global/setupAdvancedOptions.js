@@ -7,20 +7,20 @@ import $ from 'jquery'
  * @since 4.0
  */
 export function setupAdvancedOptions () {
-  let $advancedOptionsToggleContainer = $('.gfpdf-advanced-options')
-  let $advancedOptionsContainer = $advancedOptionsToggleContainer.prev()
-  let $advancedOptions = $advancedOptionsToggleContainer.find('a')
+  const $advancedOptionsToggleContainer = $('.gfpdf-advanced-options')
+  const $advancedOptionsContainer = $advancedOptionsToggleContainer.prev()
+  const $advancedOptions = $advancedOptionsToggleContainer.find('a')
 
   /*
    * Show / Hide Advanced options
    */
   $advancedOptions.click(function () {
-    let click = this
+    const click = this
 
     /* toggle our slider */
     $advancedOptionsContainer.slideToggle(600, function () {
       /* Toggle our link text */
-      let text = $(click).text()
+      const text = $(click).text()
       $(click).text(
         text === GFPDF.showAdvancedOptions ? GFPDF.hideAdvancedOptions : GFPDF.showAdvancedOptions
       )

@@ -10,8 +10,8 @@
 export function updateURLParameter (url, param, paramVal) {
   let newAdditionalURL = ''
   let tempArray = url.split('?')
-  let baseURL = tempArray[0]
-  let additionalURL = tempArray[1]
+  const baseURL = tempArray[0]
+  const additionalURL = tempArray[1]
   let temp = ''
   if (additionalURL) {
     tempArray = additionalURL.split('&')
@@ -23,6 +23,6 @@ export function updateURLParameter (url, param, paramVal) {
     }
   }
 
-  let rowsTxt = temp + '' + param + '=' + paramVal
+  const rowsTxt = temp + '' + param + '=' + paramVal
   return baseURL + '?' + newAdditionalURL + rowsTxt
 }

@@ -41,13 +41,13 @@ export function loadTinyMCEEditor (editors, settings) {
     tinyMCE.execCommand('mceAddEditor', false, fullId)
 
     /* Enable WP quick tags */
-    if (typeof (QTags) == 'function') {
-      QTags({ 'id': fullId })
+    if (typeof (QTags) === 'function') {
+      QTags({ id: fullId })
       QTags._buttonsInit()
 
       /* remember last tab selected */
       if (typeof switchEditors.switchto === 'function') {
-        switchEditors.switchto(jQuery('#wp-' + fullId + '-wrap').find('.wp-switch-editor.switch-' + (getUserSetting('editor') == 'html' ? 'html' : 'tmce'))[0])
+        switchEditors.switchto(jQuery('#wp-' + fullId + '-wrap').find('.wp-switch-editor.switch-' + (getUserSetting('editor') === 'html' ? 'html' : 'tmce'))[0])
       }
     }
   })

@@ -77,41 +77,67 @@ export class TemplateSingle extends React.Component {
   render () {
     const item = this.props.template
     const isCurrentTemplate = this.props.activeTemplate === item.id
-    /* Assign our header / footer components to constants */
-    const header = <TemplateHeaderNavigation
-      template={item}
-      templateIndex={this.props.templateIndex}
-      templates={this.props.templates}
-      showPreviousTemplateText={this.props.showPreviousTemplateText}
-      showNextTemplateText={this.props.showNextTemplateText}
-    />
-    const footer = <TemplateFooterActions
-      template={item}
-      isActiveTemplate={isCurrentTemplate}
-      ajaxUrl={this.props.ajaxUrl}
-      ajaxNonce={this.props.ajaxNonce}
-      activateText={this.props.activateText}
-      pdfWorkingDirPath={this.props.pdfWorkingDirPath}
-      templateDeleteText={this.props.templateDeleteText}
-      templateConfirmDeleteText={this.props.templateConfirmDeleteText}
-      templateDeleteErrorText={this.props.templateDeleteErrorText}
-    />
 
     /* Display our Single Template container */
     return (
-      <TemplateContainer header={header} footer={footer} closeRoute="/template">
-        <div id="gfpdf-template-detail-view" className="gfpdf-template-detail">
-          <TemplateScreenshots image={item['screenshot']} />
-          <div className="theme-info">
-            <CurrentTemplate isCurrentTemplate={isCurrentTemplate} label={this.props.currentTemplateText} />
-            <Name name={item['template']} version={item['version']}
-                  versionLabel={this.props.versionText} />
-            <Author author={item['author']} uri={item['author uri']} />
-            <Group group={item['group']} label={this.props.groupText} />
-            {item['long_message'] ? <ShowMessage text={item['long_message']} /> : null}
-            {item['long_error'] ? <ShowMessage text={item['long_error']} error={true} /> : null}
-            <Description desc={item['description']} />
-            <Tags tags={item['tags']} label={this.props.tagsText} />
+      <TemplateContainer
+        data-test='component-templateSingle'
+        header={
+          <TemplateHeaderNavigation
+            template={item}
+            templateIndex={this.props.templateIndex}
+            templates={this.props.templates}
+            showPreviousTemplateText={this.props.showPreviousTemplateText}
+            showNextTemplateText={this.props.showNextTemplateText}
+          />
+        }
+        footer={
+          <TemplateFooterActions
+            template={item}
+            isActiveTemplate={isCurrentTemplate}
+            ajaxUrl={this.props.ajaxUrl}
+            ajaxNonce={this.props.ajaxNonce}
+            activateText={this.props.activateText}
+            pdfWorkingDirPath={this.props.pdfWorkingDirPath}
+            templateDeleteText={this.props.templateDeleteText}
+            templateConfirmDeleteText={this.props.templateConfirmDeleteText}
+            templateDeleteErrorText={this.props.templateDeleteErrorText}
+          />
+        }
+        closeRoute='/template'
+      >
+        <div
+          id='gfpdf-template-detail-view'
+          className='gfpdf-template-detail'
+        >
+          <TemplateScreenshots image={item.screenshot} />
+          <div className='theme-info'>
+            <CurrentTemplate
+              isCurrentTemplate={isCurrentTemplate}
+              label={this.props.currentTemplateText}
+            />
+            <Name
+              name={item.template}
+              version={item.version}
+              versionLabel={this.props.versionText}
+            />
+            <Author author={item.author} uri={item['author uri']} />
+            <Group group={item.group} label={this.props.groupText} />
+            {item.long_message ? (
+              <ShowMessage
+                data-test='component-showMessageLong_message'
+                text={item.long_message}
+              />
+            ) : null}
+            {item.long_error ? (
+              <ShowMessage
+                data-test='component-showMessageLong_error'
+                text={item.long_error}
+                error
+              />
+            ) : null}
+            <Description desc={item.description} />
+            <Tags tags={item.tags} label={this.props.tagsText} />
           </div>
         </div>
       </TemplateContainer>
