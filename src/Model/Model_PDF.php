@@ -2106,4 +2106,44 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		return $mpdf;
 	}
+
+	/**
+	 * At the start of the PDF generation, filter all Gravity Perk Populate Anything merge tag replacement calls
+	 *
+	 * @since 5.3
+	 */
+	public function enable_gp_populate_anything() {
+		remove_filter( 'gppa_allow_all_lmts', '__return_true' );
+		add_filter( 'gform_pre_replace_merge_tags', [ $this, 'process_gp_populate_anything' ], 10, 3 );
+	}
+
+	/**
+	 * Replace any Gravity Perk Populate Anything live merge tags with their standard equivilant (i.e without the @ symbol)
+	 * Include support for the `fallback` option
+	 *
+	 * @param string $text
+	 *
+	 * @return string
+	 *
+	 * @since 5.3
+	 */
+	public function process_gp_populate_anything( $text, $form, $entry ) {
+		$gp = \GP_Populate_Anything_Live_Merge_Tags::get_instance();
+
+		$this->disable_gp_populate_anything();
+		$text = $gp->replace_live_merge_tags_static( $text, $form, $entry );
+		$this->enable_gp_populate_anything();
+
+		return $text;
+	}
+
+	/**
+	 * At the end of the PDF generation, remove filter to replace merge tags for Gravity Perk Populate Anything
+	 *
+	 * @since 5.3
+	 */
+	public function disable_gp_populate_anything() {
+		add_filter( 'gppa_allow_all_lmts', '__return_true' );
+		remove_filter( 'gform_pre_replace_merge_tags', [ $this, 'process_gp_populate_anything' ] );
+	}
 }

@@ -133,6 +133,12 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		add_action( 'gform_after_submission', [ $this->model, 'cleanup_pdf' ], 9999, 2 );
 		add_action( 'gform_after_update_entry', [ $this->model, 'cleanup_pdf_after_submission' ], 9999, 2 );
 		add_action( 'gfpdf_cleanup_tmp_dir', [ $this->model, 'cleanup_tmp_dir' ] );
+
+		/* Add Gravity Perk Population Anything Support */
+		if ( class_exists( '\GP_Populate_Anything_Live_Merge_Tags' ) ) {
+			add_action( 'gfpdf_pre_pdf_generation_initilise', [ $this->model, 'enable_gp_populate_anything' ] );
+			add_action( 'gfpdf_pre_pdf_generation_output', [ $this->model, 'disable_gp_populate_anything' ] );
+		}
 	}
 
 	/**
