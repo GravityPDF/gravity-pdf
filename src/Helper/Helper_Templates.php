@@ -293,6 +293,11 @@ class Helper_Templates {
 			return $path_to_test;
 		}
 
+		$fallback_template = apply_filters( 'gfpdf_fallback_template_path_by_id', false, $template_id );
+		if ( is_string( $fallback_template ) ) {
+			return $fallback_template;
+		}
+
 		throw new Exception( sprintf( 'Could not find the template: %s.php', $template_id ) );
 	}
 
