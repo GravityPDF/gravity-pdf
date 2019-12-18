@@ -154,7 +154,7 @@ class Helper_Templates {
 		$raw_templates[] = glob( $this->data->template_location . '*.php' );
 		$raw_templates[] = $this->get_core_pdf_templates();
 
-		return $raw_templates;
+		return apply_filters( 'gfpdf_unfiltered_template_list', $raw_templates );
 	}
 
 	/**
