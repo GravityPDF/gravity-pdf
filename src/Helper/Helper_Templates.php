@@ -480,19 +480,21 @@ class Helper_Templates {
 	public function get_config_path_by_id( $template_id, $include_core = true ) {
 
 		/* Check if there's a configuration class in the following directories */
-		$test_config_paths = [
+		$config_paths = [
 			$this->data->template_location . 'config/',
 		];
 
 		if ( is_multisite() ) {
-			array_unshift( $test_config_paths, $this->data->multisite_template_location . 'config/' );
+			array_unshift( $config_paths, $this->data->multisite_template_location . 'config/' );
 		}
 
 		if ( $include_core ) {
-			array_push( $test_config_paths, PDF_PLUGIN_DIR . 'src/templates/config/' );
+			array_push( $config_paths, PDF_PLUGIN_DIR . 'src/templates/config/' );
 		}
 
-		foreach ( $test_config_paths as $path ) {
+		$config_paths = apply_filters( 'gfpdf_template_config_paths', $config_paths );
+
+		foreach ( $config_paths as $path ) {
 			$file = $path . $template_id . '.php';
 
 			if ( is_file( $file ) ) {
@@ -648,21 +650,23 @@ class Helper_Templates {
 	public function get_template_image( $template, $type = 'url', $include_core = true ) {
 
 		/* Check if there's an image in the following directories */
-		$test_image_paths = [
+		$image_paths = [
 			$this->data->template_location_url . 'images/' => $this->data->template_location . 'images/',
 		];
 
 		if ( is_multisite() ) {
-			$test_image_paths = [ $this->data->multisite_template_location_url . 'images/' => $this->data->multisite_template_location . 'images/' ] + $test_image_paths;
+			$image_paths = [ $this->data->multisite_template_location_url . 'images/' => $this->data->multisite_template_location . 'images/' ] + $image_paths;
 		}
 
 		if ( $include_core ) {
-			$test_image_paths[ PDF_PLUGIN_URL . 'src/templates/images/' ] = PDF_PLUGIN_DIR . 'src/templates/images/';
+			$image_paths[ PDF_PLUGIN_URL . 'src/templates/images/' ] = PDF_PLUGIN_DIR . 'src/templates/images/';
 		}
+
+		$image_paths = apply_filters( 'gfpdf_template_image_paths', $image_paths );
 
 		/* Check if our image exists in one of our directories and return the URL */
 		$template .= '.png';
-		foreach ( $test_image_paths as $url => $path ) {
+		foreach ( $image_paths as $url => $path ) {
 			if ( is_file( $path . $template ) ) {
 				return ( $type === 'url' ) ? $url . $template : $path . $template;
 			}
