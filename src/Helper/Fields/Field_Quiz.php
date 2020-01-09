@@ -103,7 +103,7 @@ class Field_Quiz extends Helper_Abstract_Fields {
 				if ( $choice['value'] === $item ) {
 					$formatted[] = [
 						'text'      => esc_html( $choice['text'] ),
-						'isCorrect' => $choice['gquizIsCorrect'],
+						'isCorrect' => isset( $choice['gquizIsCorrect'] ) ? $choice['gquizIsCorrect'] : '',
 						'weight'    => ( isset( $choice['gquizWeight'] ) ) ? $choice['gquizWeight'] : '',
 					];
 				}
