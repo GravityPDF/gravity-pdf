@@ -4,7 +4,7 @@ import { button, link } from './field'
 
 class Page {
   constructor () {
-    this.closePopupButton = Selector('button').withAttribute('aria-label', 'Close dialog')
+    this.closePopupButton = Selector('button').withAttribute('aria-label', 'Disable tips')
     this.titleField = Selector('.editor-post-title').find('textarea').withAttribute('placeholder', 'Add title')
     this.addBlockIcon = Selector('button').withAttribute('aria-label', 'Add block')
     this.searchBlock = Selector('input').withAttribute('placeholder', 'Search for a block')
