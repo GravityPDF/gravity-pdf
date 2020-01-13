@@ -2,11 +2,11 @@
 
 # Download and unpack WordPress.
 mkdir tmp > /dev/null 2>&1
-rm -Rf wordpress && rm -Rf tmp/WordPress-master && rm -Rf tmp/wordpress-develop-master > /dev/null 2>&1
-curl -L https://github.com/WordPress/WordPress/archive/master.zip -o ./tmp/wordpress-latest.zip
-unzip -q ./tmp/wordpress-latest.zip -d ./tmp
+rm -Rf wordpress && rm -Rf tmp/wordpress-develop-master > /dev/null 2>&1
+curl -L https://wordpress.org/latest.zip -o ./tmp/latest.zip
+unzip -q ./tmp/latest.zip -d ./tmp
 mkdir -p wordpress/src
-mv ./tmp/WordPress-master/* wordpress/src
+mv ./tmp/wordpress/* wordpress/src
 
 # Create the upload/wp-config.php directory with permissions that Travis can handle.
 mkdir -p wordpress/src/wp-content/uploads
