@@ -90,6 +90,11 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 
 == Changelog ==
 
+= 5.2.1 =
+* Bug: Fix PHP Notice when using Quiz Add-on without a correct answer selected
+* Bug: Fix image display issues in PDF when URL has a redirect
+* Bug: Allow HTML in Consent field label (those supported in wp_kses_post)
+
 = 5.2.0 =
 * Bug: Prevent Fatal Error on PHP7.2 when using Category field type set to Checkboxes in Core PDFs
 * Bug: Resolve conflict with SiteGround HTML Minifier when generating PDFs in browser [GH#897] [GH#951]
