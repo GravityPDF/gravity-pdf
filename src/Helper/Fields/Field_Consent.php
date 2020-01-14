@@ -95,7 +95,7 @@ class Field_Consent extends Helper_Abstract_Fields {
 
 		$consent = [
 			'value'       => $value[0],
-			'label'       => esc_html( $value[1] ),
+			'label'       => wp_kses_post( $this->gform->process_tags( $value[1], $this->form, $this->entry ) ),
 			'description' => wp_kses_post(
 				wpautop(
 					$this->gform->process_tags( $this->field->get_field_description_from_revision( $value[2] ), $this->form, $this->entry )
