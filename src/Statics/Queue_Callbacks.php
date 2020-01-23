@@ -2,12 +2,10 @@
 
 namespace GFPDF\Statics;
 
-use GFPDF\Helper\Helper_PDF;
-
-use Psr\Log\LoggerInterface;
-use GFCommon;
-use GPDFAPI;
 use Exception;
+use GFCommon;
+use GFPDF\Helper\Helper_PDF;
+use GPDFAPI;
 
 /**
  * @package     Gravity PDF
@@ -63,12 +61,35 @@ class Queue_Callbacks {
 	 * @param int   $entry_id
 	 * @param array $notification
 	 *
+	 * @throws Exception
 	 * @since 5.0
 	 */
 	public static function send_notification( $form_id, $entry_id, $notification ) {
+		$log   = GPDFAPI::get_log_class();
 		$gform = GPDFAPI::get_form_class();
 
-		GFCommon::send_notification( $notification, $gform->get_form( $form_id ), $gform->get_entry( $entry_id ) );
+		$form  = $gform->get_form( $form_id );
+		$entry = $gform->get_entry( $entry_id );
+
+		if ( $form === null ) {
+			$log->addError( 'Could not locate form', [ 'id' => $form_id, ] );
+
+			throw new Exception();
+		}
+
+		if ( is_wp_error( $entry ) ) {
+			$log->addError(
+				'Entry Error',
+				[
+					'code'    => $entry->get_error_code(),
+					'message' => $entry->get_error_message(),
+				]
+			);
+
+			throw new Exception();
+		}
+
+		GFCommon::send_notification( $notification, $form, $entry );
 	}
 
 	/**
@@ -89,7 +110,26 @@ class Queue_Callbacks {
 
 		$form  = $gform->get_form( $form_id );
 		$entry = $gform->get_entry( $entry_id );
-		$pdfs  = ( isset( $form['gfpdf_form_settings'] ) ) ? $model_pdf->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : [];
+
+		if ( $form === null ) {
+			$log->addError( 'Could not locate form', [ 'id' => $form_id, ] );
+
+			throw new Exception();
+		}
+
+		if ( is_wp_error( $entry ) ) {
+			$log->addError(
+				'Entry Error',
+				[
+					'code'    => $entry->get_error_code(),
+					'message' => $entry->get_error_message(),
+				]
+			);
+
+			throw new Exception();
+		}
+
+		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $model_pdf->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : [];
 
 		foreach ( $pdfs as $pdf ) {
 			$notification = ( isset( $pdf['notification'] ) && is_array( $pdf['notification'] ) ) ? $pdf['notification'] : [];
