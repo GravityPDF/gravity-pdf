@@ -15,7 +15,8 @@ addons:
     sources:
       - sourceline: 'deb https://dl.yarnpkg.com/debian/ stable main'
         key_url: 'https://dl.yarnpkg.com/debian/pubkey.gpg'
-      - google-chrome
+      - sourceline: 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main'
+        key_url: 'https://dl.google.com/linux/linux_signing_key.pub'
     packages:
       - docker-ce
       - yarn
