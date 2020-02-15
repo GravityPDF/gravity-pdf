@@ -72,7 +72,7 @@ class Queue_Callbacks {
 		$entry = $gform->get_entry( $entry_id );
 
 		if ( $form === null ) {
-			$log->addError( 'Could not locate form', [ 'id' => $form_id, ] );
+			$log->addError( 'Could not locate form', [ 'id' => $form_id ] );
 
 			throw new Exception();
 		}
@@ -98,6 +98,8 @@ class Queue_Callbacks {
 	 * @param $form_id
 	 * @param $entry_id
 	 *
+	 * @throws Exception
+	 *
 	 * @since 5.0
 	 */
 	public static function cleanup_pdfs( $form_id, $entry_id ) {
@@ -112,7 +114,7 @@ class Queue_Callbacks {
 		$entry = $gform->get_entry( $entry_id );
 
 		if ( $form === null ) {
-			$log->addError( 'Could not locate form', [ 'id' => $form_id, ] );
+			$log->addError( 'Could not locate form', [ 'id' => $form_id ] );
 
 			throw new Exception();
 		}
