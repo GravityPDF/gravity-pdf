@@ -37,6 +37,7 @@
         <exclude name="WordPress.WhiteSpace.PrecisionAlignment"/>
         <exclude name="WordPress.NamingConventions.ValidVariableName"/>
         <exclude name="WordPress.NamingConventions.ValidFunctionName"/>
+        <exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
     </rule>
 
     <!-- Include the best parts of PSR-1 -->
