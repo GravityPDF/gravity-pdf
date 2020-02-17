@@ -16,8 +16,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ?>
 
-<a rel="nofollow" href="<?php echo $args['url']; ?>" class="<?php echo $args['class']; ?> <?php echo $args['classes']; ?>"
+<a href="<?php echo $args['url']; ?>" class="<?php echo $args['class']; ?> <?php echo $args['classes']; ?>"
 					<?php
 					if ( 'view' === $args['type'] ):
 						?>
-	target="_blank"<?php endif; ?>><?php echo $args['text']; ?></a>
+	target="_blank"<?php endif; ?> rel="nofollow"><?php echo $args['text']; ?></a>
