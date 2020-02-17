@@ -2,15 +2,14 @@
 
 namespace GFPDF\Model;
 
-use GFPDF\Helper\Helper_Abstract_Model;
+use GFPDF\Helper\Helper_Abstract_Addon;
 use GFPDF\Helper\Helper_Abstract_Form;
-use GFPDF\Helper\Helper_Notices;
+use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Templates;
-use GFPDF\Helper\Helper_Abstract_Addon;
-
 use Psr\Log\LoggerInterface;
 
 /**
@@ -778,6 +777,13 @@ class Model_Settings extends Helper_Abstract_Model {
 		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
 			$message = ( is_wp_error( $response ) ) ? $response->get_error_message() : $possible_responses['generic'];
 			$status  = 'error';
+
+			$this->log->error(
+				'License activation failure',
+				[
+					'data' => $message,
+				]
+			);
 		} else {
 			$license_data = json_decode( wp_remote_retrieve_body( $response ) );
 			$message      = '';
@@ -796,6 +802,13 @@ class Model_Settings extends Helper_Abstract_Model {
 						$message = sprintf( $message, date_i18n( get_option( 'date_format' ), strtotime( $license_data->expires, current_time( 'timestamp' ) ) ) );
 					}
 				}
+
+				$this->log->error(
+					'License activation failure',
+					[
+						'data' => $license_data,
+					]
+				);
 			}
 		}
 
