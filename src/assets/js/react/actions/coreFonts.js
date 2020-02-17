@@ -14,7 +14,7 @@ export const CLEAR_REQUEST_REMAINING_DATA = 'CLEAR_REQUEST_REMAINING_DATA'
  * Redux Actions - payloads of information that send data from your application to your store
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2019, Blue Liquid Designs
+ * @copyright   Copyright (c) 2020, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       5.0
  */
@@ -22,7 +22,7 @@ export const CLEAR_REQUEST_REMAINING_DATA = 'CLEAR_REQUEST_REMAINING_DATA'
 /*
  This file is part of Gravity PDF.
 
- Gravity PDF – Copyright (c) 2019, Blue Liquid Designs
+ Gravity PDF – Copyright (c) 2020, Blue Liquid Designs
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
