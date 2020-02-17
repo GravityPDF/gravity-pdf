@@ -210,6 +210,11 @@ $include_product_styles = apply_filters( 'gfpdf_include_product_styles', true, $
 		padding-left: 2%;
 		border-left: 1px solid #000;
 	}
+
+	/* Chained Select */
+	.gfpdf-chainedselect td:nth-child(1) {
+		width: 30%;
+	}
 </style>
 
 <?php if ( ! empty( $first_header ) ) : ?>
