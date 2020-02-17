@@ -211,7 +211,7 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 			/* Check Nonce is valid */
 			if ( ! wp_verify_nonce( rgpost( 'gfpdf-uninstall-plugin' ), 'gfpdf-uninstall-plugin' ) ) {
 				$this->notices->add_error( esc_html__( 'There was a problem uninstalling Gravity PDF. Please try again.', 'gravity-forms-pdf-extended' ) );
-				$this->log->addWarning( 'Nonce Verification Failed.' );
+				$this->log->warning( 'Nonce Verification Failed.' );
 
 				return null;
 			}
@@ -227,7 +227,7 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 				 ( is_multisite() && ! is_super_admin() )
 			) {
 
-				$this->log->addCritical(
+				$this->log->critical(
 					'Lack of User Capabilities.',
 					[
 						'user'      => wp_get_current_user(),

@@ -186,7 +186,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 		/* Disable notification if PDF needs to be attached to it */
 		foreach ( $pdfs as $pdf ) {
 			if ( $this->model_pdf->maybe_attach_to_notification( $notification, $pdf, $entry, $form ) ) {
-				$this->log->addNotice(
+				$this->log->notice(
 					'Gravity Forms Notification Delayed for Async Processing',
 					[
 						'notification' => $notification,
@@ -293,7 +293,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 
 		$queue_data = apply_filters( 'gfpdf_queue_pre_dispatch', $queue_data, $entry, $form );
 
-		$this->log->addNotice(
+		$this->log->notice(
 			'PDF Background Processing Queue',
 			[
 				'queue' => $queue_data,

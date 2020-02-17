@@ -251,7 +251,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		/* because current_user_can() doesn't handle Gravity Forms permissions quite correct we'll do our checks here */
 		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
 
-			$this->log->addCritical(
+			$this->log->critical(
 				'Lack of User Capabilities.',
 				[
 					'user'      => wp_get_current_user(),
@@ -279,7 +279,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	public function disable_tools_on_view_cap( $nav ) {
 
 		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
-			$this->log->addNotice( 'Lack of User Capabilities' );
+			$this->log->notice( 'Lack of User Capabilities' );
 
 			unset( $nav[100] ); /* remove tools tab */
 		}
@@ -304,7 +304,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		/* check if the user has permission to copy the templates */
 		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
 
-			$this->log->addCritical(
+			$this->log->critical(
 				'Lack of User Capabilities.',
 				[
 					'user'      => wp_get_current_user(),
@@ -326,7 +326,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		if ( isset( $settings['setup_templates']['name'] ) && isset( $settings['setup_templates']['nonce'] ) ) {
 			/* verify the nonce */
 			if ( ! wp_verify_nonce( $settings['setup_templates']['nonce'], 'gfpdf_settings[setup_templates]' ) ) {
-				$this->log->addWarning( 'Nonce Verification Failed.' );
+				$this->log->warning( 'Nonce Verification Failed.' );
 				$this->notices->add_error( esc_html__( 'There was a problem installing the PDF templates. Please try again.', 'gravity-forms-pdf-extended' ) );
 
 				return null;

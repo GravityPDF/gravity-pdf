@@ -194,7 +194,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		$destination = $this->templates->get_template_path();
 		$copy        = $this->misc->copyr( PDF_PLUGIN_DIR . 'src/templates/', $destination );
 		if ( is_wp_error( $copy ) ) {
-			$this->log->addError( 'Template Installation Error.' );
+			$this->log->error( 'Template Installation Error.' );
 			$this->notices->add_error( sprintf( esc_html__( 'There was a problem copying all PDF templates to %s. Please try again.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $destination ) . '</code>' ) );
 
 			return false;
@@ -335,7 +335,7 @@ class Model_Settings extends Helper_Abstract_Model {
 
 		/* If errors were found then return */
 		if ( sizeof( $errors ) > 0 ) {
-			$this->log->addError(
+			$this->log->error(
 				'Install Error.',
 				[
 					'errors' => $errors,
@@ -402,7 +402,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		$results = $this->process_font( $payload );
 
 		/* If we reached this point the results were successful so return the new object */
-		$this->log->addNotice(
+		$this->log->notice(
 			'AJAX – Successfully Saved Font',
 			[
 				'results' => $results,
@@ -440,7 +440,7 @@ class Model_Settings extends Helper_Abstract_Model {
 
 				if ( $this->options->update_option( 'custom_fonts', $fonts ) ) {
 					/* Success */
-					$this->log->addNotice( 'AJAX – Successfully Deleted Font' );
+					$this->log->notice( 'AJAX – Successfully Deleted Font' );
 					echo json_encode( [ 'success' => true ] );
 					wp_die();
 				}
@@ -451,7 +451,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			'error' => esc_html__( 'Could not delete Gravity PDF font correctly. Please try again.', 'gravity-forms-pdf-extended' ),
 		];
 
-		$this->log->addError( 'AJAX Endpoint Error', $return );
+		$this->log->error( 'AJAX Endpoint Error', $return );
 
 		echo json_encode( $return );
 
@@ -482,7 +482,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				'error' => esc_html__( 'Required fields have not been included.', 'gravity-forms-pdf-extended' ),
 			];
 
-			$this->log->addWarning( 'Font Validation Failed', $return );
+			$this->log->warning( 'Font Validation Failed', $return );
 
 			echo json_encode( $return );
 
@@ -499,7 +499,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				'error' => esc_html__( 'Font name is not valid. Only alphanumeric characters and spaces are accepted.', 'gravity-forms-pdf-extended' ),
 			];
 
-			$this->log->addWarning( 'Font Validation Failed', $return );
+			$this->log->warning( 'Font Validation Failed', $return );
 
 			echo json_encode( $return );
 
@@ -517,7 +517,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				'error' => esc_html__( 'A font with the same name already exists. Try a different name.', 'gravity-forms-pdf-extended' ),
 			];
 
-			$this->log->addWarning( 'Font Validation Failed', $return );
+			$this->log->warning( 'Font Validation Failed', $return );
 
 			echo json_encode( $return );
 
@@ -535,7 +535,7 @@ class Model_Settings extends Helper_Abstract_Model {
 				'error' => $installation,
 			];
 
-			$this->log->addWarning( 'Font Validation Failed', $return );
+			$this->log->warning( 'Font Validation Failed', $return );
 
 			echo json_encode( $return );
 
@@ -827,7 +827,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		/* Check add-on currently installed */
 		if ( ! empty( $addon ) ) {
 			if ( $this->deactivate_license_key( $addon, $license ) ) {
-				$this->log->addNotice( 'AJAX – Successfully Deactivated License' );
+				$this->log->notice( 'AJAX – Successfully Deactivated License' );
 				echo json_encode(
 					[
 						'success' => esc_html__( 'License deactivated.', 'gravity-forms-pdf-extended' ),
@@ -848,7 +848,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			}
 		}
 
-		$this->log->addError( 'AJAX Endpoint Error' );
+		$this->log->error( 'AJAX Endpoint Error' );
 
 		echo json_encode(
 			[
@@ -899,7 +899,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		/* Remove license data from database */
 		$addon->delete_license_info();
 
-		$this->log->addNotice(
+		$this->log->notice(
 			'License successfully deactivated',
 			[
 				'slug'    => $addon->get_slug(),

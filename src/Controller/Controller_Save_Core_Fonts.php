@@ -129,7 +129,7 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 
 		/* Check for errors and log them to file */
 		if ( is_wp_error( $res ) ) {
-			$this->log->addError(
+			$this->log->error(
 				'Core Font Download Failed',
 				[
 					'name'             => $fontname,
@@ -142,7 +142,7 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 		}
 
 		if ( $res_code !== 200 ) {
-			$this->log->addError(
+			$this->log->error(
 				'Core Font API Response Failed',
 				[
 					'response_code' => wp_remote_retrieve_response_code( $res ),

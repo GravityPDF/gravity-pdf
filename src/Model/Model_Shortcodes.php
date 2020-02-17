@@ -107,7 +107,7 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 				$attributes['url'] = $this->url_signer->sign( $attributes['url'], $attributes['expires'] );
 			}
 
-			$this->log->addNotice( 'Generating Shortcode Markup', [ 'attr' => $attributes ] );
+			$this->log->notice( 'Generating Shortcode Markup', [ 'attr' => $attributes ] );
 
 			if ( $raw ) {
 				return $attributes['url'];

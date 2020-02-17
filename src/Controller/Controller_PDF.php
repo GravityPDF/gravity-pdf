@@ -218,7 +218,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		$lid    = (int) $GLOBALS['wp']->query_vars['lid'];
 		$action = ( ( isset( $GLOBALS['wp']->query_vars['action'] ) ) && $GLOBALS['wp']->query_vars['action'] === 'download' ) ? 'download' : 'view';
 
-		$this->log->addNotice(
+		$this->log->notice(
 			'Processing PDF endpoint.',
 			[
 				'pid'    => $pid,
@@ -262,7 +262,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 			'action'   => ( isset( $_GET['download'] ) ) ? 'download' : 'view',
 		];
 
-		$this->log->addNotice(
+		$this->log->notice(
 			'Processing Legacy PDF endpoint.',
 			[
 				'config' => $config,
@@ -349,7 +349,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 */
 	private function pdf_error( $error ) {
 
-		$this->log->addError(
+		$this->log->error(
 			'PDF Generation Error.',
 			[
 				'WP_Error_Message' => $error->get_error_message(),

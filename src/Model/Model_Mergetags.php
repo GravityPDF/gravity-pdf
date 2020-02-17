@@ -149,7 +149,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 		/* Verify we have a match */
 		if ( $results ) {
 
-			$this->log->addNotice(
+			$this->log->notice(
 				'Begin Converting PDF Mergetags',
 				[
 					'form_id'  => $form['id'],
@@ -170,7 +170,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 					 || $config['active'] !== true
 					 || ( isset( $config['conditionalLogic'] ) && ! $this->misc->evaluate_conditional_logic( $config['conditionalLogic'], $entry ) )
 				) {
-					$this->log->addError(
+					$this->log->error(
 						'PDF Mergetag is not valid',
 						[
 							'form_id'  => $form['id'],

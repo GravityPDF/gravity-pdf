@@ -119,7 +119,7 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function install_plugin() {
-		$this->log->addNotice( 'Gravity PDF Installed' );
+		$this->log->notice( 'Gravity PDF Installed' );
 		update_option( 'gfpdf_is_installed', true );
 		$this->data->is_installed = true;
 
@@ -285,7 +285,7 @@ class Model_Install extends Helper_Abstract_Model {
 		foreach ( $folders as $dir ) {
 			if ( ! is_dir( $dir ) ) {
 				if ( ! wp_mkdir_p( $dir ) ) {
-					$this->log->addError(
+					$this->log->error(
 						'Failed Creating Folder Structure',
 						[
 							'dir' => $dir,
@@ -297,7 +297,7 @@ class Model_Install extends Helper_Abstract_Model {
 			} else {
 				/* test the directory is currently writable by the web server, otherwise throw an error */
 				if ( ! wp_is_writable( $dir ) ) {
-					$this->log->addError(
+					$this->log->error(
 						'Failed Write Permissions Check.',
 						[
 							'dir' => $dir,
@@ -321,7 +321,7 @@ class Model_Install extends Helper_Abstract_Model {
 			}
 
 			if ( ! is_file( $this->data->template_tmp_location . '.htaccess' ) ) {
-				$this->log->addNotice( 'Create Apache .htaccess Security file' );
+				$this->log->notice( 'Create Apache .htaccess Security file' );
 				file_put_contents( $this->data->template_tmp_location . '.htaccess', 'deny from all' );
 			}
 		}
@@ -391,7 +391,7 @@ class Model_Install extends Helper_Abstract_Model {
 
 		foreach ( $regex as $rule ) {
 			if ( ! isset( $rules[ $rule ] ) ) {
-				$this->log->addNotice( 'Flushing WordPress Rewrite Rules.' );
+				$this->log->notice( 'Flushing WordPress Rewrite Rules.' );
 				flush_rewrite_rules( false );
 				break;
 			}
@@ -464,7 +464,7 @@ class Model_Install extends Helper_Abstract_Model {
 			if ( isset( $form['gfpdf_form_settings'] ) ) {
 				unset( $form['gfpdf_form_settings'] );
 				if ( $this->gform->update_form( $form ) !== true ) {
-					$this->log->addError(
+					$this->log->error(
 						'Cannot Remove PDF Settings from Form.',
 						[
 							'form_id' => $form['id'],
@@ -500,7 +500,7 @@ class Model_Install extends Helper_Abstract_Model {
 				$results = $this->misc->rmdir( $dir );
 
 				if ( is_wp_error( $results ) || ! $results ) {
-					$this->log->addError(
+					$this->log->error(
 						'Cannot Remove Folder Structure.',
 						[
 							'WP_Error_Message' => $results->get_error_message(),

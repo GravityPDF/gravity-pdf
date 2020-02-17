@@ -334,7 +334,7 @@ class Model_Actions extends Helper_Abstract_Model {
 				'error' => sprintf( esc_html__( 'No configuration.php file found for site #%s', 'gravity-forms-pdf-extended' ), $blog_id ),
 			];
 
-			$log->addError( 'AJAX Endpoint Failed', $return );
+			$log->error( 'AJAX Endpoint Failed', $return );
 
 			echo json_encode( [ 'results' => $return ] );
 			wp_die();
@@ -354,13 +354,13 @@ class Model_Actions extends Helper_Abstract_Model {
 				'error' => sprintf( esc_html__( 'Database import problem for site #%s', 'gravity-forms-pdf-extended' ), $blog_id ),
 			];
 
-			$log->addError( 'AJAX Endpoint Failed', $return );
+			$log->error( 'AJAX Endpoint Failed', $return );
 
 			echo json_encode( [ 'results' => $return ] );
 			wp_die();
 		}
 
-		$log->addError( 'AJAX Endpoint Failed' );
+		$log->error( 'AJAX Endpoint Failed' );
 
 		/* Internal Server Error */
 		wp_die( '500', 500 );
