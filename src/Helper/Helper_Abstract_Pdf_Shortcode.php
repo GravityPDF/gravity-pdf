@@ -315,7 +315,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 		/* check if the confirmation is currently being saved */
 		if ( isset( $_POST['form_confirmation_url'] ) ) {
 
-			$this->log->addNotice(
+			$this->log->notice(
 				'Begin Converting Shortcode to URL for Redirect Confirmation',
 				[
 					'form_id' => $form['id'],

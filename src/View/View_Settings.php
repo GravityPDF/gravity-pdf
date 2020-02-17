@@ -291,7 +291,7 @@ class View_Settings extends Helper_Abstract_View {
 
 		/* prevent unauthorized access */
 		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
-			$this->log->addWarning( 'Lack of User Capabilities.' );
+			$this->log->warning( 'Lack of User Capabilities.' );
 
 			wp_die( esc_html__( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
 		}

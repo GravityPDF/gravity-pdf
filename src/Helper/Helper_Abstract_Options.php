@@ -348,7 +348,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			return $settings;
 		}
 
-		$this->log->addError(
+		$this->log->error(
 			'Settings Retreival Error',
 			[
 				'form_id'          => $form_id,
@@ -385,7 +385,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		if ( 0 === $form_id ) {
 
 			$error = new WP_Error( 'invalid_id', esc_html__( 'You must pass in a valid form ID', 'gravity-forms-pdf-extended' ) );
-			$this->log->addError(
+			$this->log->error(
 				'Error Getting Settings.',
 				[
 					'WP_Error_Message' => $error->get_error_message(),
@@ -404,7 +404,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			if ( empty( $form ) ) {
 
 				$error = new WP_Error( 'invalid_id', esc_html__( 'You must pass in a valid form ID', 'gravity-forms-pdf-extended' ) );
-				$this->log->addError(
+				$this->log->error(
 					'Error Getting Settings.',
 					[
 						'WP_Error_Message' => $error->get_error_message(),
@@ -494,7 +494,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			if ( $results ) {
 
 				/* return the ID if successful */
-				$this->log->addNotice(
+				$this->log->notice(
 					'Successfuly Added New PDF',
 					[
 						'pdf' => $pdf,
@@ -504,7 +504,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				return $pdf['id'];
 			}
 
-			$this->log->addError(
+			$this->log->error(
 				'Error Saving New PDF',
 				[
 					'error' => $results,
@@ -535,7 +535,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function update_pdf( $form_id, $pdf_id, $pdf = '', $update_db = true, $filters = true ) {
 
-		$this->log->addNotice(
+		$this->log->notice(
 			'Begin Updating PDF Settings',
 			[
 				'form_id'      => $form_id,
@@ -558,7 +558,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 			/* Don't run when adding a new PDF */
 			if ( $filters ) {
-				$this->log->addNotice( 'Run PDF Update Filters' );
+				$this->log->notice( 'Run PDF Update Filters' );
 
 				/* See https://gravitypdf.com/documentation/v5/gfpdf_form_update_pdf/ for more details about these filters */
 				$pdf = apply_filters( 'gfpdf_form_update_pdf', $pdf, $form_id, $pdf_id );
@@ -577,7 +577,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$did_update = false;
 			if ( $update_db ) {
 
-				$this->log->addNotice(
+				$this->log->notice(
 					'Updating PDF Settings in Form Object',
 					[
 						'form_id' => $form['id'],
@@ -596,7 +596,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			return $did_update;
 		}
 
-		$this->log->addNotice( 'Completed Updating PDF Settings' );
+		$this->log->notice( 'Completed Updating PDF Settings' );
 
 		return false;
 	}
@@ -615,7 +615,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function delete_pdf( $form_id, $pdf_id ) {
 
-		$this->log->addNotice(
+		$this->log->notice(
 			'Begin Deleting PDF Setting',
 			[
 				'form_id' => $form_id,
@@ -645,7 +645,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			/* If it updated, let's update the global variable */
 			if ( $did_update !== false ) {
 
-				$this->log->addNotice(
+				$this->log->notice(
 					'Completed Deleting PDF Setting',
 					[
 						'form_id' => $form_id,
@@ -661,7 +661,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			return $did_update;
 		}
 
-		$this->log->addError(
+		$this->log->error(
 			'Failed Deleting PDF Setting',
 			[
 				'form_id' => $form_id,
@@ -714,7 +714,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	public function update_option( $key = '', $value = false ) {
 
 		if ( empty( $key ) ) {
-			$this->log->addError(
+			$this->log->error(
 				'Empty Option Key',
 				[
 					'value' => $value,
@@ -769,7 +769,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	public function delete_option( $key = '' ) {
 
 		if ( empty( $key ) ) {
-			$this->log->addError( 'Option Delete Error' );
+			$this->log->error( 'Option Delete Error' );
 
 			return false;
 		}

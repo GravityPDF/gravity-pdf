@@ -132,7 +132,7 @@ class Helper_Migration {
 			$raw_config = $this->load_old_configuration();
 		} catch ( Exception $e ) {
 
-			$this->log->addError(
+			$this->log->error(
 				'Migration Error',
 				[
 					'exception' => $e->getMessage(),
@@ -517,7 +517,7 @@ class Helper_Migration {
 
 					if ( $results ) {
 						/* return the ID if successful */
-						$this->log->addNotice(
+						$this->log->notice(
 							'Successfully Imported v3 Node',
 							[
 								'pdf' => $node,
@@ -525,7 +525,7 @@ class Helper_Migration {
 						);
 					} else {
 						/* Log errors */
-						$this->log->addError(
+						$this->log->error(
 							'Error Importing v3 Node',
 							[
 								'error' => $results,

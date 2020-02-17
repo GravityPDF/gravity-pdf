@@ -372,7 +372,7 @@ class Helper_Misc {
 				}
 			}
 		} catch ( Exception $e ) {
-			$this->log->addError(
+			$this->log->error(
 				'Filesystem Delete Error',
 				[
 					'dir'       => $dir,
@@ -414,7 +414,7 @@ class Helper_Misc {
 		try {
 			if ( ! is_dir( $destination ) ) {
 				if ( ! wp_mkdir_p( $destination ) ) {
-					$this->log->addError(
+					$this->log->error(
 						'Failed Creating Folder Structure',
 						[
 							'dir' => $destination,
@@ -433,7 +433,7 @@ class Helper_Misc {
 			foreach ( $files as $fileinfo ) {
 				if ( $fileinfo->isDir() && ! file_exists( $destination . $files->getSubPathName() ) ) {
 					if ( ! @mkdir( $destination . $files->getSubPathName() ) ) {
-						$this->log->addError(
+						$this->log->error(
 							'Failed Creating Folder',
 							[
 								'dir' => $destination . $files->getSubPathName(),
@@ -444,7 +444,7 @@ class Helper_Misc {
 					}
 				} elseif ( ! $fileinfo->isDir() ) {
 					if ( ! copy( $fileinfo, $destination . $files->getSubPathName() ) ) {
-						$this->log->addError(
+						$this->log->error(
 							'Failed Creating File',
 							[
 								'file' => $destination . $files->getSubPathName(),
@@ -456,7 +456,7 @@ class Helper_Misc {
 			}
 		} catch ( Exception $e ) {
 
-			$this->log->addError(
+			$this->log->error(
 				'Filesystem Copy Error',
 				[
 					'source'      => $source,
@@ -939,7 +939,7 @@ class Helper_Misc {
 	 */
 	public function handle_ajax_authentication( $endpoint_desc, $capability = 'gravityforms_edit_settings', $nonce_name = 'gfpdf_ajax_nonce' ) {
 
-		$this->log->addNotice(
+		$this->log->notice(
 			'Running AJAX Endpoint',
 			[
 				'type' => $endpoint_desc,
@@ -953,7 +953,7 @@ class Helper_Misc {
 		$nonce = ( isset( $_POST['nonce'] ) ) ? $_POST['nonce'] : '';
 		if ( ! wp_verify_nonce( $nonce, $nonce_name ) ) {
 
-			$this->log->addWarning( 'Nonce Verification Failed' );
+			$this->log->warning( 'Nonce Verification Failed' );
 
 			/* Unauthorized response */
 			wp_die( '401', 401 );
@@ -962,7 +962,7 @@ class Helper_Misc {
 		/* prevent unauthorized access */
 		if ( $capability !== false && ! $this->gform->has_capability( $capability ) ) {
 
-			$this->log->addCritical(
+			$this->log->critical(
 				'Lack of User Capabilities',
 				[
 					'user'              => wp_get_current_user(),

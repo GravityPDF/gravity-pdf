@@ -160,7 +160,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		/* not a valid entry */
 		if ( is_wp_error( $entry ) ) {
-			$this->log->addError(
+			$this->log->error(
 				'Invalid Entry.',
 				[
 					'entry' => $entry,
@@ -175,7 +175,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		/* Not valid settings */
 		if ( is_wp_error( $settings ) ) {
 
-			$this->log->addError(
+			$this->log->error(
 				'Invalid PDF Settings.',
 				[
 					'entry'            => $entry,
@@ -204,7 +204,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		/* Throw error */
 		if ( is_wp_error( $middleware ) ) {
 
-			$this->log->addError(
+			$this->log->error(
 				'PDF Authentication Failure.',
 				[
 					'entry'            => $entry,
@@ -429,7 +429,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 			if ( $owner_restriction === 'Yes' && ! is_user_logged_in() ) {
 
-				$this->log->addNotice(
+				$this->log->notice(
 					'Security – Owner Restrictions: Redirecting to Login.',
 					[
 						'entry'    => $entry,
@@ -481,7 +481,7 @@ class Model_PDF extends Helper_Abstract_Model {
 							return new WP_Error( 'timeout_expired', esc_html__( 'Your PDF is no longer accessible.', 'gravity-forms-pdf-extended' ) );
 						} else {
 
-							$this->log->addNotice(
+							$this->log->notice(
 								'Security – Logged Out Timeout: Redirecting to Login.',
 								[
 									'entry'    => $entry,
@@ -520,7 +520,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				/* check if there is actually a user who owns entry */
 				if ( ! empty( $entry['created_by'] ) ) {
 
-					$this->log->addNotice(
+					$this->log->notice(
 						'Security – Auth Logged Out User: Redirecting to Login.',
 						[
 							'entry'    => $entry,
@@ -531,7 +531,7 @@ class Model_PDF extends Helper_Abstract_Model {
 					/* prompt user to login to get access */
 					auth_redirect();
 				} else {
-					$this->log->addWarning(
+					$this->log->warning(
 						'Access denied.',
 						[
 							'entry'    => $entry,
@@ -888,7 +888,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				return true;
 			} catch ( Exception $e ) {
 
-				$this->log->addError(
+				$this->log->error(
 					'PDF Generation Error',
 					[
 						'pdf'       => $pdf,
@@ -1013,7 +1013,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				}
 			}
 
-			$this->log->addNotice(
+			$this->log->notice(
 				'Gravity Forms Attachments',
 				[
 					'attachments'  => $notifications['attachments'],
@@ -1181,7 +1181,7 @@ class Model_PDF extends Helper_Abstract_Model {
 					}
 				}
 			} catch ( Exception $e ) {
-				$this->log->addError(
+				$this->log->error(
 					'Filesystem Delete Error',
 					[
 						'dir'       => $tmp_directory,
@@ -1227,7 +1227,7 @@ class Model_PDF extends Helper_Abstract_Model {
 							$this->misc->rmdir( $pdf_generator->get_path() );
 						} catch ( Exception $e ) {
 
-							$this->log->addError(
+							$this->log->error(
 								'Cleanup PDF Error',
 								[
 									'pdf'       => $pdf,
@@ -1866,7 +1866,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			}
 		} catch ( Exception $e ) {
 
-			$this->log->addError(
+			$this->log->error(
 				'Invalid Field Class.',
 				[
 					'exception' => $e->getMessage(),

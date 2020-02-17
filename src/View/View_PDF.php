@@ -226,7 +226,7 @@ class View_PDF extends Helper_Abstract_View {
 
 		} catch ( Exception $e ) {
 
-			$this->log->addError(
+			$this->log->error(
 				'PDF Generation Error',
 				[
 					'entry'     => $entry,
@@ -490,7 +490,7 @@ class View_PDF extends Helper_Abstract_View {
 				$container->maybe_display_faux_column( $field );
 			}
 		} catch ( Exception $e ) {
-			$this->log->addError(
+			$this->log->error(
 				'PDF Generation Error',
 				[
 					'field'     => $field,

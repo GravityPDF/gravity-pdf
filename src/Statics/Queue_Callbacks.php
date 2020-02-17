@@ -42,7 +42,7 @@ class Queue_Callbacks {
 		$results = GPDFAPI::create_pdf( $entry_id, $pdf_id );
 
 		if ( is_wp_error( $results ) ) {
-			$log->addError(
+			$log->error(
 				'PDF Generation Error',
 				[
 					'code'    => $results->get_error_code(),
@@ -72,13 +72,13 @@ class Queue_Callbacks {
 		$entry = $gform->get_entry( $entry_id );
 
 		if ( $form === null ) {
-			$log->addError( 'Could not locate form', [ 'id' => $form_id ] );
+			$log->error( 'Could not locate form', [ 'id' => $form_id ] );
 
 			throw new Exception();
 		}
 
 		if ( is_wp_error( $entry ) ) {
-			$log->addError(
+			$log->error(
 				'Entry Error',
 				[
 					'code'    => $entry->get_error_code(),
@@ -114,13 +114,13 @@ class Queue_Callbacks {
 		$entry = $gform->get_entry( $entry_id );
 
 		if ( $form === null ) {
-			$log->addError( 'Could not locate form', [ 'id' => $form_id ] );
+			$log->error( 'Could not locate form', [ 'id' => $form_id ] );
 
 			throw new Exception();
 		}
 
 		if ( is_wp_error( $entry ) ) {
-			$log->addError(
+			$log->error(
 				'Entry Error',
 				[
 					'code'    => $entry->get_error_code(),

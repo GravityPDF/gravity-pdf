@@ -312,7 +312,7 @@ class Helper_Templates {
 
 			return $this->get_template_info_by_path( $template_path );
 		} catch ( Exception $e ) {
-			$this->log->addWarning( $e->getMessage() );
+			$this->log->warning( $e->getMessage() );
 
 			return [
 				'group' => esc_html__( 'Legacy', 'gravity-forms-pdf-extended' ),
@@ -526,7 +526,7 @@ class Helper_Templates {
 
 			return $this->load_template_config_file( $class_path );
 		} catch ( Exception $e ) {
-			$this->log->addWarning( $e->getMessage() );
+			$this->log->warning( $e->getMessage() );
 		}
 
 		/* If class still empty it's either a legacy template or doesn't have a config. Check for legacy templates which support certain fields */
@@ -543,7 +543,7 @@ class Helper_Templates {
 			try {
 				$class = $this->load_template_config_file( PDF_PLUGIN_DIR . 'src/templates/config/legacy.php' );
 			} catch ( Exception $e ) {
-				$this->log->addError( 'Legacy Template Configuration Failed to Load' );
+				$this->log->error( 'Legacy Template Configuration Failed to Load' );
 			}
 		}
 

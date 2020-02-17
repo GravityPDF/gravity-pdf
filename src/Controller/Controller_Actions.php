@@ -175,7 +175,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 				 call_user_func( $route['condition'] )
 			) {
 
-				$this->log->addNotice(
+				$this->log->notice(
 					'Trigger Action Notification.',
 					[
 						'route' => $route,
@@ -205,7 +205,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 				/* Check user capability */
 				if ( ! $this->gform->has_capability( $route['capability'] ) ) {
 
-					$this->log->addCritical(
+					$this->log->critical(
 						'Lack of User Capabilities.',
 						[
 							'user'      => wp_get_current_user(),
@@ -219,7 +219,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 				/* Check nonce is valid */
 				if ( ! wp_verify_nonce( rgpost( 'gfpdf_action_' . $route['action'] ), 'gfpdf_action_' . $route['action'] ) ) {
 
-					$this->log->addWarning( 'Nonce Verification Failed.' );
+					$this->log->warning( 'Nonce Verification Failed.' );
 					$this->notices->add_error( esc_html__( 'There was a problem processing the action. Please try again.', 'gravity-forms-pdf-extended' ) );
 
 					continue;
@@ -227,7 +227,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 
 				/* Check if the user wants to dismiss the notice, otherwise process the route */
 				if ( isset( $_POST['gfpdf-dismiss-notice'] ) ) {
-					$this->log->addNotice(
+					$this->log->notice(
 						'Dismiss Action.',
 						[
 							'route' => $route,
@@ -236,7 +236,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 
 					$this->model->dismiss_notice( $route['action'] );
 				} else {
-					$this->log->addNotice(
+					$this->log->notice(
 						'Trigger Action Process.',
 						[
 							'route' => $route,

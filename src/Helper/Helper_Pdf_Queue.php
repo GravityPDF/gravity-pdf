@@ -87,7 +87,7 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 	public function task( $callbacks ) {
 		$callback = array_shift( $callbacks );
 
-		$this->log->addNotice(
+		$this->log->notice(
 			sprintf(
 				'Begin async PDF task for %s',
 				$callback['id']
@@ -102,7 +102,7 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 			} catch ( Exception $e ) {
 
 				/* Log Error */
-				$this->log->addError(
+				$this->log->error(
 					sprintf(
 						'Async PDF task error for %s',
 						$callback['id']
@@ -121,7 +121,7 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 			}
 		}
 
-		$this->log->addNotice(
+		$this->log->notice(
 			sprintf(
 				'End async PDF task for %s',
 				$callback['id']

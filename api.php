@@ -31,14 +31,14 @@ final class GPDFAPI {
 	 *
 	 * Log messages can be added with any of the following:
 	 *
-	 * $gfpdf->log->addDebug( $message, [$parameters = array()] )
-	 * $gfpdf->log->addInfo( $message, [$parameters = array()] )
-	 * $gfpdf->log->addNotice( $message, [$parameters = array()] )
-	 * $gfpdf->log->addWarning( $message, [$parameters = array()] )
-	 * $gfpdf->log->addError( $message, [$parameters = array()] )
-	 * $gfpdf->log->addCritical( $message, [$parameters = array()] )
-	 * $gfpdf->log->addAlert( $message, [$parameters = array()] )
-	 * $gfpdf->log->addEmergency( $message, [$parameters = array()] )
+	 * $gfpdf->log->debug( $message, [$parameters = array()] )
+	 * $gfpdf->log->info( $message, [$parameters = array()] )
+	 * $gfpdf->log->notice( $message, [$parameters = array()] )
+	 * $gfpdf->log->warning( $message, [$parameters = array()] )
+	 * $gfpdf->log->error( $message, [$parameters = array()] )
+	 * $gfpdf->log->critical( $message, [$parameters = array()] )
+	 * $gfpdf->log->alert( $message, [$parameters = array()] )
+	 * $gfpdf->log->emergency( $message, [$parameters = array()] )
 	 *
 	 * When in production Gravity PDF will only log to a file when the Gravity Forms Logging plugin is enabled and Gravity PDF is set to "Log errors only" ($log->addError() or higher) or "Log all messages" ($log->addNotice() or higher)
 	 *
