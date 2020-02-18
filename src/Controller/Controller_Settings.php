@@ -2,19 +2,20 @@
 
 namespace GFPDF\Controller;
 
+use GFForms;
 use GFPDF\Helper\Helper_Abstract_Controller;
+use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_View;
+use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
-use GFPDF\Helper\Helper_Notices;
-use GFPDF\Helper\Helper_Data;
-use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
-
+use GFPDF\Helper\Helper_Notices;
+use Mpdf\Cache;
+use Mpdf\Fonts\FontCache;
+use Mpdf\TTFontFile;
 use Psr\Log\LoggerInterface;
-
-use GFForms;
 
 /**
  * @package     Gravity PDF
@@ -198,7 +199,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		add_filter( 'gravitypdf_settings_navigation', [ $this, 'disable_tools_on_view_cap' ] );
 
 		/* allow TTF uploads */
-		add_filter( 'upload_mimes', [ $this, 'allow_font_uploads' ] );
+		add_filter( 'wp_check_filetype_and_ext', [ $this, 'validate_font_uploads' ], 10, 3 );
 
 		/* Register add-ons for licensing page */
 		add_filter( 'gfpdf_settings_licenses', [ $this->model, 'register_addons_for_licensing' ] );
@@ -349,8 +350,51 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	 * @since 4.0
 	 */
 	public function allow_font_uploads( $mime_types = [] ) {
+		_deprecated_function( __METHOD__, '5.2.2' );
+
 		$mime_types['ttf'] = 'application/x-font-ttf';
 
 		return $mime_types;
+	}
+
+	/**
+	 * Validate any TTF file uploads and allow in media library if valid
+	 *
+	 * @param array $mime
+	 * @param string $file
+	 * @param string $filename
+	 *
+	 * @return array
+	 *
+	 * @since 5.2.2
+	 */
+	public function validate_font_uploads( $mime, $file, $filename ) {
+
+		/* Skip over if user doesn't have appropriate capabilities */
+		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
+			return $mime;
+		}
+
+		/* Skip over any files that don't claim to be a TTF font file */
+		if ( substr( $filename, -4 ) !== '.ttf' || ! is_file( $file ) ) {
+			return $mime;
+		}
+
+		/* Load TTF file and validate via mPDF */
+		try {
+			$ttf = new TTFontFile( new FontCache( new Cache( dirname( $file ) ) ), null );
+			$ttf->getMetrics( $file, basename( $filename, '.ttf' ) );
+			if ( strlen( $ttf->familyName ) > 0 ) {
+				return [
+					'ext'             => 'ttf',
+					'type'            => 'application/x-font-ttf',
+					'proper_filename' => false,
+				];
+			}
+		} catch ( \Mpdf\MpdfException $e ) {
+
+		}
+
+		return $mime;
 	}
 }
