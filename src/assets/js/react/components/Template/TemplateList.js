@@ -48,6 +48,7 @@ export class TemplateList extends React.Component {
    */
   render () {
     const header = <TemplateHeaderTitle header={this.props.templateHeaderText} />
+    const hasUserPrivs = GFPDF.userCapabilities.administrator || GFPDF.userCapabilities.gravityforms_edit_settings || false
 
     return (
       <TemplateContainer header={header} closeRoute="/">
@@ -63,18 +64,21 @@ export class TemplateList extends React.Component {
             })
           }
 
-          <TemplateUploader
-            ajaxUrl={this.props.ajaxUrl}
-            ajaxNonce={this.props.ajaxNonce}
-            addTemplateText={this.props.addTemplateText}
-            genericUploadErrorText={this.props.genericUploadErrorText}
-            filenameErrorText={this.props.filenameErrorText}
-            filesizeErrorText={this.props.filesizeErrorText}
-            installSuccessText={this.props.installSuccessText}
-            installUpdatedText={this.props.installUpdatedText}
-            templateSuccessfullyInstalledUpdated={this.props.templateSuccessfullyInstalledUpdated}
-            templateInstallInstructions={this.props.templateInstallInstructions}
-          />
+          {
+            hasUserPrivs &&
+            <TemplateUploader
+              ajaxUrl={this.props.ajaxUrl}
+              ajaxNonce={this.props.ajaxNonce}
+              addTemplateText={this.props.addTemplateText}
+              genericUploadErrorText={this.props.genericUploadErrorText}
+              filenameErrorText={this.props.filenameErrorText}
+              filesizeErrorText={this.props.filesizeErrorText}
+              installSuccessText={this.props.installSuccessText}
+              installUpdatedText={this.props.installUpdatedText}
+              templateSuccessfullyInstalledUpdated={this.props.templateSuccessfullyInstalledUpdated}
+              templateInstallInstructions={this.props.templateInstallInstructions}
+            />
+          }
 
         </div>
       </TemplateContainer>
