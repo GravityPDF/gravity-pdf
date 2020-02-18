@@ -94,8 +94,16 @@ jobs:
         - npm run lint:js
 
     - name: E2E Testing
+      env: LOCAL_PHP=7.4-fpm
       script:
         - npm run test:e2e:headless
+
+    - name: PHP 7.4 unit tests
+      env: LOCAL_PHP=7.4-fpm
+      script:
+        - |
+          npm run test:php &&
+          npm run test:php -- --group ajax
 
     - name: PHP 7.3 unit tests
       env: LOCAL_PHP=7.3-fpm
@@ -127,13 +135,6 @@ jobs:
 
     - name: PHP 5.6 unit tests
       env: LOCAL_PHP=5.6-fpm
-      script:
-        - |
-          npm run test:php &&
-          npm run test:php -- --group ajax
-
-    - name: PHP 7.4 unit tests
-      env: LOCAL_PHP=7.4-fpm
       script:
         - |
           npm run test:php &&
