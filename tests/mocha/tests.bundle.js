@@ -18,6 +18,9 @@ window.GFPDF = {
   coreFontItemPendingMessage: '%s',
   coreFontItemSuccessMessage: '%s',
   coreFontItemErrorMessage: '%s',
+  userCapabilities: {
+    administrator: true
+  }
 }
 
 window.gfpdf_migration_multisite_ids = []
