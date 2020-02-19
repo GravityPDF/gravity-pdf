@@ -2,6 +2,7 @@
 
 namespace GFPDF\Tests;
 
+use Exception;
 use GFPDF\Controller\Controller_Settings;
 use GFPDF\Helper\Helper_Abstract_Addon;
 use GFPDF\Helper\Helper_Logger;
@@ -9,10 +10,8 @@ use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Singleton;
 use GFPDF\Model\Model_Settings;
 use GFPDF\View\View_Settings;
-
 use GPDFAPI;
 use WP_UnitTestCase;
-use Exception;
 
 /**
  * Test Gravity PDF Settings Functionality
@@ -174,7 +173,7 @@ class Test_Settings extends WP_UnitTestCase {
 				]
 			)
 		);
-		$this->assertEquals( 10, has_filter( 'upload_mimes', [ $this->controller, 'allow_font_uploads' ] ) );
+		$this->assertEquals( 10, has_filter( 'wp_check_filetype_and_ext', [ $this->controller, 'validate_font_uploads' ] ) );
 
 		$this->assertFalse( has_filter( 'gfpdf_registered_settings', [ $gfpdf->options, 'highlight_errors' ] ) );
 		/* retest the gfpdf_register_settings filter is added when on the correct screen */
@@ -311,13 +310,43 @@ class Test_Settings extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Verify our font mime types are added to the allowed upload list
+	 * Verify TTF font file is validated correctly
 	 *
 	 * @since 4.0
 	 */
-	public function test_allow_font_uploads() {
-		$results = $this->controller->allow_font_uploads();
-		$this->assertEquals( 'application/x-font-ttf', $results['ttf'] );
+	public function test_validate_font_uploads() {
+		global $gfpdf;
+
+		/* Create subscriber */
+		$user_id = $this->factory->user->create();
+		$this->assertInternalType( 'integer', $user_id );
+		wp_set_current_user( $user_id );
+
+		$font = $gfpdf->data->template_tmp_location . '/DejaVuSans.ttf';
+		copy( __DIR__ . '/fonts/DejaVuSans.ttf', $gfpdf->data->template_tmp_location . '/DejaVuSans.ttf' );
+
+		/* Test .ttf filename failure */
+		$this->assertFalse( $this->controller->validate_font_uploads( false, $font, 'test.txt' ) );
+
+		/* Test not exist failure */
+		$this->assertFalse( $this->controller->validate_font_uploads( false, 'test', 'DejaVuSans.ttf' ) );
+
+		/* Test invalid font file failure */
+		$this->assertFalse( $this->controller->validate_font_uploads( false, __DIR__ . '/json/form-settings.json', 'DejaVuSans.ttf' ) );
+
+		/* Test for invalid capabilities */
+		$this->assertFalse( $this->controller->validate_font_uploads( false, $font, 'DejaVuSans.ttf' ) );
+
+		/* Elevate user to administrator */
+		$user = wp_get_current_user();
+		$user->remove_role( 'subscriber' );
+		$user->add_role( 'administrator' );
+
+		/* Do valid font check */
+		$results = $this->controller->validate_font_uploads( false, $font, 'DejaVuSans.ttf' );
+
+		$this->assertEquals( 'ttf', $results['ext'] );
+		$this->assertEquals( 'application/x-font-ttf', $results['type'] );
 	}
 
 	/**
