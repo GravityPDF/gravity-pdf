@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.8
 Tested up to: 5.3
-Stable tag: 5.2.0
+Stable tag: 5.2.2
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -89,6 +89,17 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 18. Blank Slate provides a print-friendly template focusing solely on the user-submitted data.
 
 == Changelog ==
+
+= 5.2.2 =
+* Bug: Add additional error handling to Background Processing when a form / entry is deleted
+* Bug: Adjust logging code to adhere to PSR-3 (forward compatibility with Monolog v2)
+* Bug: Add fixed width to first column in Chained Select output for Core / Universal PDFs
+* Bug: Add nofollow attribute to PDF Download Link to prevent attempted indexing
+* Bug: Disable UI for PDF Template Installer when user doesn't have appropriate capabilities
+* Bug: Fix font upload issues to Media Library
+
+* Dev: Add additional logging when license activation failure occurs
+* Dev: Update dependencies: Monolog 1.25.1 -> 1.25.3, Mpdf 8.0.3 -> 8.0.5
 
 = 5.2.1 =
 * Bug: Fix PHP Notice when using Quiz Add-on without a correct answer selected
