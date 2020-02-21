@@ -162,7 +162,9 @@ class Helper_Field_Container {
 	public function generate( GF_Field $field ) {
 
 		/* Check if we are processing a field that should not be floated and treat it as a 100% field */
-		$this->process_skipped_fields( $field );
+		if( $this->process_skipped_fields( $field ) ) {
+			return;
+		}
 
 		/* Check if we need to close the container */
 		if ( $this->currently_open ) {
