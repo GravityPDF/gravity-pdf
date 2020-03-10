@@ -2,17 +2,16 @@
 
 namespace GFPDF\Helper;
 
+use DateTimeZone;
+use Exception;
+use GFFormsModel;
+use GFLogging;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Monolog\Processor\IntrospectionProcessor;
 use Monolog\Processor\MemoryPeakUsageProcessor;
-
-use DateTimeZone;
-use Exception;
-use GFLogging;
-use GFFormsModel;
 
 /**
  * @package     Gravity PDF
@@ -107,25 +106,24 @@ class Helper_Logger {
 	 * @since 4.2
 	 */
 	protected function setup_logger() {
-		static $timezone;
-
-		/* Set the logger timezone once (if needed) */
-		if ( ! $timezone ) {
-			$offset = (float) get_option( 'gmt_offset' );
-
-			if ( $offset !== 0.0 ) {
-				try {
-					$timezone = new DateTimeZone( ( $offset > 0 ) ? '+' . $offset : $offset );
-					Logger::setTimezone( $timezone );
-				} catch ( Exception $e ) {
-					/* do nothing */
-				}
-			}
-			$timezone = true;
-		}
 
 		/* Initialise our logger */
 		$this->log = new Logger( $this->slug );
+
+		/* Set the logger timezone */
+		$offset = (float) get_option( 'gmt_offset' );
+
+		try {
+			$timezone = new DateTimeZone( ( $offset >= 0 ) ? '+' . $offset : $offset );
+
+			if ( Logger::API > 1 ) {
+				$this->log->setTimezone( $timezone );
+			} else {
+				Logger::setTimezone( $timezone );
+			}
+		} catch ( Exception $e ) {
+			/* do nothing */
+		}
 
 		/* Setup our Gravity Forms local file logger, if enabled */
 		try {
@@ -185,7 +183,7 @@ class Helper_Logger {
 				$monolog_level = ( $log_level === 4 ) ? Logger::ERROR : Logger::DEBUG;
 
 				/* Setup our stream and change the format to more-suit Gravity Forms */
-				$formatter = new LineFormatter( "%datetime% - %level_name% --> %message% %context% %extra%\n" );
+				$formatter = new LineFormatter( "%datetime% - %level_name% --> %message%\n|--> %context%\n|--> %extra%\n", 'Y-m-d H:i:s (P)' );
 				$stream    = new StreamHandler( $log_filename, $monolog_level );
 				$stream->setFormatter( $formatter );
 
