@@ -2,14 +2,12 @@
 
 namespace GFPDF\Helper\Fields;
 
+use Exception;
+use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Field_Container;
 use GFPDF\Helper\Helper_Misc;
-use GFPDF\Helper\Helper_Abstract_Fields;
-
 use GP_Field_Nested_Form;
-
-use Exception;
 
 /**
  * @package     Gravity PDF
@@ -100,6 +98,8 @@ class Field_Form extends Helper_Abstract_Fields {
 		ob_start();
 
 		$container = new Helper_Field_Container( [ 'class_map' => [] ] );
+		$container = apply_filters( 'gfpdf_field_container_class', $container );
+
 		$pdf_model = \GPDFAPI::get_mvc_class( 'Model_PDF' );
 		$products  = new Field_Products( new \GF_Field(), $entry, $this->gform, $this->misc );
 
