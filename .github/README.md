@@ -34,7 +34,14 @@ If you shutdown Docker and want to fire up the environment later, use `yarn env:
 
 ### Enable X-Debug
 
-To enable X-Debug in the containers, set the environmental variable `export LOCAL_PHP_XDEBUG=true` before starting up Docker. If you've brought up the containers already, run `yarn env stop` and `yarn env start` to reboot after setting the variable. When you do your Path Mappings in your IDE, make sure to name your server `localhost` to do CLI debugging (including PHPUnit via `yarn test:php`). 
+To enable X-Debug in the containers, you need to set the environmental variables before starting up Docker:
+
+* `export LOCAL_PHP_XDEBUG=true`
+* `export XDEBUG_HOST_IP=10.0.0.1`
+
+Note: change the IP `10.0.0.1` to the value of `$_SERVER['REMOTE_ADDR']` when you load up the Docker-powered site.
+
+If you've brought up the containers already, run `yarn env stop` and `yarn env start` to reboot after setting the variable. When you do your Path Mappings in your IDE, make sure to name your server `localhost` to do CLI debugging (including PHPUnit via `yarn test:php`). 
 
 ### Switch PHP Versions
 
