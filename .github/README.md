@@ -33,15 +33,29 @@ The Docker setup will create a fully functionality development environment preco
 If you shutdown Docker and want to fire up the environment later, use `yarn env:start`. You can also reset the database back to its original state with `yarn env:reset` 
 
 ### Enable X-Debug
+- For Windows users: 
 
-To enable X-Debug in the containers, you need to set the environmental variables before starting up Docker:
-
+To enable X-Debug in the containers. You need to set the environmental variables before starting up Docker:
 * `export LOCAL_PHP_XDEBUG=true`
 * `export XDEBUG_HOST_IP=10.0.0.1`
+NOTE: Change the IP `10.0.0.1` to the value of`$_SERVER['REMOTE_ADDR']` when you load up the Docker-powered site.
 
-Note: change the IP `10.0.0.1` to the value of `$_SERVER['REMOTE_ADDR']` when you load up the Docker-powered site.
+If you’ve brought up the containers already, run `yarn env stop` and `yarn env start` to reboot after setting the variable.
 
-If you've brought up the containers already, run `yarn env stop` and `yarn env start` to reboot after setting the variable. When you do your Path Mappings in your IDE, make sure to name your server `localhost` to do CLI debugging (including PHPUnit via `yarn test:php`). 
+- For Linux users:
+
+Run the command `ip a` and find the `docker0` network inteface. Copy the inet value.
+e.g. `inet 172.17.0.1/16`, and you need to include these variables every time you run your docker machine.
+
+* e.g `sudo LOCAL_PHP_XDEBUG=true XDEBUG_HOST_IP=172.17.0.1 yarn env start`.
+
+
+When you do your Path Mappings in your IDE, make sure to name your server `localhost` to do CLI debugging (including PHPUnit via `yarn test:php`).
+
+- NOTE: Set the server path mapping to the following:
+* `/*your-path-to-gravity-pdf-folder* => /var/www/src/wp-content/plugins/gravity-forms-pdf-extended`
+* `/*your-path-to-gravity-pdf-folder*/wordpress/ => var/www`
+
 
 ### Switch PHP Versions
 
