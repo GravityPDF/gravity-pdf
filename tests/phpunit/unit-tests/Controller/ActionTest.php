@@ -1,14 +1,11 @@
 <?php
 
-namespace GFPDF\Tests;
+namespace GFPDF\Tests\Controller;
 
 use GFPDF\Controller\Controller_Actions;
 use GFPDF\Model\Model_Actions;
 use GFPDF\View\View_Actions;
 
-use WP_UnitTestCase;
-
-use Exception;
 
 /**
  * Test Gravity PDF Actions functionality
@@ -26,7 +23,7 @@ use Exception;
  *
  * @group actions
  */
-class Test_Actions extends WP_UnitTestCase {
+class ActionTest extends \WP_UnitTestCase {
 	/**
 	 * Our Controller
 	 *
@@ -78,9 +75,10 @@ class Test_Actions extends WP_UnitTestCase {
 	 *
 	 * @since 4.0
 	 */
-	public function test_actions() {
+	public function test_add_actions() {
 		$this->assertSame( 10, has_action( 'admin_init', [ $this->controller, 'route' ] ) );
 		$this->assertSame( 20, has_action( 'admin_init', [ $this->controller, 'route_notices' ] ) );
+
 	}
 
 	/**
@@ -247,7 +245,7 @@ class Test_Actions extends WP_UnitTestCase {
 		/* Fail capability check */
 		try {
 			$this->controller->route();
-		} catch ( Exception $e ) {
+		} catch ( \Exception $e ) {
 			/* Expected */
 		}
 
