@@ -43,6 +43,7 @@ dist/*
 _notes
 _notes/*
 Thumbs.db
+composer.lock
 *.pot
 
 # Environment File

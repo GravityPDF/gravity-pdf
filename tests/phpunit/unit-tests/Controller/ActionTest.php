@@ -1,6 +1,6 @@
 <?php
 
-namespace GFPDF\Tests\Controller;
+namespace GFPDF\Src\Controller;
 
 use GFPDF\Controller\Controller_Actions;
 use GFPDF\Model\Model_Actions;
@@ -100,30 +100,8 @@ class ActionTest extends \WP_UnitTestCase {
 		global $gfpdf;
 
 		set_current_screen( 'edit.php' );
-
-		/* Set up a custom route */
-		add_filter(
-			'gfpdf_one_time_action_routes',
-			function( $routes ) {
-
-				return [
-					[
-						'action'      => 'test_action',
-						'action_text' => 'My Test Action',
-						'condition'   => function() {
-							return true;
-						},
-						'process'     => function() {
-							echo 'processing';
-						},
-						'view'        => function() {
-							return 'my test view';
-						},
-						'capability'  => 'gravityforms_view_settings',
-					],
-				];
-			}
-		);
+		/* Set test routes */
+		$this->set_test_routes();
 
 		/* Verify no notices present */
 		$this->assertFalse( $gfpdf->notices->has_notice() );
@@ -134,8 +112,18 @@ class ActionTest extends \WP_UnitTestCase {
 		/* Verify no notices present */
 		$this->assertFalse( $gfpdf->notices->has_notice() );
 
+
+	}
+	/**
+	 * Test route notices are displayed correctly (verfiy capability, check for dismissal, check condition met) for admin
+	 *
+	 * @since 5.2
+	 */
+	public function test_route_notices_admin() {
+		global $gfpdf;
 		/* Set up authorized user */
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
+
 		$this->assertInternalType( 'integer', $user_id );
 		wp_set_current_user( $user_id );
 
@@ -165,29 +153,8 @@ class ActionTest extends \WP_UnitTestCase {
 	public function test_route_notices_fail_condition() {
 		global $gfpdf;
 
-		/* Set up a custom route */
-		add_filter(
-			'gfpdf_one_time_action_routes',
-			function( $routes ) {
-
-				return [
-					[
-						'action'      => 'test_action',
-						'action_text' => 'My Test Action',
-						'condition'   => function() {
-							return false;
-						},
-						'process'     => function() {
-							echo 'processing';
-						},
-						'view'        => function() {
-							return 'my test view';
-						},
-						'capability'  => 'gravityforms_view_settings',
-					],
-				];
-			}
-		);
+		/* Set test routes */
+		$this->set_test_routes();
 
 		/* Set up authorized user */
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
@@ -215,41 +182,10 @@ class ActionTest extends \WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_route() {
-
-		/* Set up a custom route */
-		add_filter(
-			'gfpdf_one_time_action_routes',
-			function( $routes ) {
-
-				return [
-					[
-						'action'      => 'test_action',
-						'action_text' => 'My Test Action',
-						'condition'   => function() {
-							return true;
-						},
-						'process'     => function() {
-							echo 'processing';
-						},
-						'view'        => function() {
-							return 'my test view';
-						},
-						'capability'  => 'gravityforms_view_settings',
-					],
-				];
-			}
-		);
+		/* Set test routes */
+		$this->set_test_routes();
 
 		$_POST['gfpdf_action'] = 'gfpdf_test_action';
-
-		/* Fail capability check */
-		try {
-			$this->controller->route();
-		} catch ( \Exception $e ) {
-			/* Expected */
-		}
-
-		$this->assertEquals( 'You do not have permission to access this page', $e->getMessage() );
 
 		/* Set up authorized user */
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
@@ -281,6 +217,20 @@ class ActionTest extends \WP_UnitTestCase {
 		$this->assertTrue( $this->model->is_notice_already_dismissed( 'test_action' ) );
 
 		wp_set_current_user( 0 );
+
+	}
+
+	/**
+	 * @expectedException WPDieException
+	 */
+	public function test_route_exception_permission() {
+		/* Set test routes */
+		$this->set_test_routes();
+
+		$_POST['gfpdf_action'] = 'gfpdf_test_action';
+
+		$this->controller->route();
+
 
 	}
 
@@ -332,13 +282,22 @@ class ActionTest extends \WP_UnitTestCase {
 	 * @since 5.0
 	 */
 	public function test_core_fonts_condition() {
-		global $gfpdf;
 
-		$path = $gfpdf->data->template_font_location;
 		set_current_screen( 'edit.php' );
 
 		$this->assertTrue( $this->model->core_font_condition() );
 
+	}
+
+	/**
+	 * Check the core fonts installation prompt works as expected
+	 *
+	 * @since 5.2
+	 */
+	public function test_core_fonts_condition_false() {
+		global $gfpdf;
+
+		$path = $gfpdf->data->template_font_location;
 		touch( $path . 'DejaVuSansCondensed.ttf' );
 		$this->assertFalse( $this->model->core_font_condition() );
 		unlink( $path . 'DejaVuSansCondensed.ttf' );
@@ -347,6 +306,7 @@ class ActionTest extends \WP_UnitTestCase {
 		$_GET['subview'] = 'PDF';
 		$_GET['tab']     = 'tools';
 		$this->assertFalse( $this->model->core_font_condition() );
+
 	}
 
 	/**
@@ -366,5 +326,35 @@ class ActionTest extends \WP_UnitTestCase {
 
 		$this->assertNotFalse( strpos( $html, 'Review</button>' ) );
 		$this->assertFalse( strpos( $html, 'name="gfpdf-dismiss-notice"' ) );
+	}
+
+	/* Set test routes
+	 *
+	 * @since 5.2
+	 */
+	public function set_test_routes() {
+		/* Set up a custom route */
+		add_filter(
+			'gfpdf_one_time_action_routes',
+			function( $routes ) {
+
+				return [
+					[
+						'action'      => 'test_action',
+						'action_text' => 'My Test Action',
+						'condition'   => function() {
+							return true;
+						},
+						'process'     => function() {
+							echo 'processing';
+						},
+						'view'        => function() {
+							return 'my test view';
+						},
+						'capability'  => 'gravityforms_view_settings',
+					],
+				];
+			}
+		);
 	}
 }
