@@ -228,10 +228,7 @@ class ActionTest extends \WP_UnitTestCase {
 		$this->set_test_routes();
 
 		$_POST['gfpdf_action'] = 'gfpdf_test_action';
-
 		$this->controller->route();
-
-
 	}
 
 	/**
