@@ -1,6 +1,6 @@
 <?php
 
-namespace GFPDF\Tests;
+namespace GFPDF\Src\Controller;
 
 use GFPDF\Helper\Helper_Abstract_Addon;
 use GFPDF\Helper\Helper_Interface_Extension_Settings;
@@ -10,7 +10,6 @@ use GFPDF\Helper\Helper_Singleton;
 
 use GPDFAPI;
 
-use WP_UnitTestCase;
 
 /**
  * Test Gravity PDF Abstract Addon functionality
@@ -30,7 +29,7 @@ use WP_UnitTestCase;
  *
  * @group   addon
  */
-class Test_Addon extends WP_UnitTestCase {
+class AddonTest extends \WP_UnitTestCase {
 
 	/**
 	 * Our test class
@@ -136,27 +135,32 @@ class Test_Addon extends WP_UnitTestCase {
 	 * @since 4.2
 	 */
 	public function test_license_info() {
-		global $gfpdf;
-
 		$license = $this->addon->get_license_info();
 
 		$this->assertArrayHasKey( 'license', $license );
 		$this->assertArrayHasKey( 'status', $license );
 		$this->assertArrayHasKey( 'message', $license );
 
-		$this->addon->update_license_info(
-			[
-				'license' => 'my key',
-				'status'  => 'active',
-				'message' => 'Success!',
-			]
-		);
+	}
+
+	/*
+	 *@since 5.2
+	 */
+	public function test_license_info_update(){
+		$this->updateLicenseInfo();
 
 		$license = $this->addon->get_license_info();
 
 		$this->assertEquals( 'my key', $license['license'] );
 		$this->assertEquals( 'active', $license['status'] );
 		$this->assertEquals( 'Success!', $license['message'] );
+	}
+
+	/*
+	 *@since 5.2
+	 */
+	public function test_license_info_removed(){
+		global $gfpdf;
 
 		$this->addon->delete_license_info();
 
@@ -171,13 +175,7 @@ class Test_Addon extends WP_UnitTestCase {
 	 * @since 4.2
 	 */
 	public function test_get_license_key() {
-		$this->addon->update_license_info(
-			[
-				'license' => 'my key',
-				'status'  => 'active',
-				'message' => 'Success!',
-			]
-		);
+		$this->updateLicenseInfo();
 
 		$this->assertEquals( 'my key', $this->addon->get_license_key() );
 
@@ -188,13 +186,7 @@ class Test_Addon extends WP_UnitTestCase {
 	 * @since 4.2
 	 */
 	public function test_get_license_status() {
-		$this->addon->update_license_info(
-			[
-				'license' => 'my key',
-				'status'  => 'active',
-				'message' => 'Success!',
-			]
-		);
+		$this->updateLicenseInfo();
 
 		$this->assertEquals( 'active', $this->addon->get_license_status() );
 
@@ -205,13 +197,7 @@ class Test_Addon extends WP_UnitTestCase {
 	 * @since 4.2
 	 */
 	public function test_get_license_message() {
-		$this->addon->update_license_info(
-			[
-				'license' => 'my key',
-				'status'  => 'active',
-				'message' => 'Success!',
-			]
-		);
+		$this->updateLicenseInfo();
 
 		$this->assertEquals( 'Success!', $this->addon->get_license_message() );
 
@@ -289,6 +275,19 @@ class Test_Addon extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'addon_field', $settings['extensions'] );
 
 		$gfpdf->data->addon = [];
+	}
+
+	/*
+	 * @since 5.2
+	 */
+	public function updateLicenseInfo(){
+		$this->addon->update_license_info(
+			[
+				'license' => 'my key',
+				'status'  => 'active',
+				'message' => 'Success!',
+			]
+		);
 	}
 }
 
