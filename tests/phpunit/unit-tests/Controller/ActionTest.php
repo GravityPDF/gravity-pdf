@@ -101,7 +101,7 @@ class ActionTest extends \WP_UnitTestCase {
 
 		set_current_screen( 'edit.php' );
 		/* Set test routes */
-		$this->set_test_routes();
+		$this->setTestRoutes();
 
 		/* Verify no notices present */
 		$this->assertFalse( $gfpdf->notices->has_notice() );
@@ -114,6 +114,7 @@ class ActionTest extends \WP_UnitTestCase {
 
 
 	}
+
 	/**
 	 * Test route notices are displayed correctly (verfiy capability, check for dismissal, check condition met) for admin
 	 *
@@ -154,7 +155,7 @@ class ActionTest extends \WP_UnitTestCase {
 		global $gfpdf;
 
 		/* Set test routes */
-		$this->set_test_routes();
+		$this->setTestRoutes();
 
 		/* Set up authorized user */
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
@@ -181,23 +182,12 @@ class ActionTest extends \WP_UnitTestCase {
 	 *
 	 * @since 4.0
 	 */
-	public function test_route() {
+	public function test_route_success() {
 		/* Set test routes */
-		$this->set_test_routes();
+		$this->setTestRoutes();
+		$this->setUpAuthorizedUser();
 
 		$_POST['gfpdf_action'] = 'gfpdf_test_action';
-
-		/* Set up authorized user */
-		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		$this->assertInternalType( 'integer', $user_id );
-		wp_set_current_user( $user_id );
-
-		/* Force nonce fail */
-		ob_start();
-		$this->controller->route();
-		$html = ob_get_clean();
-
-		$this->assertSame( '', $html );
 
 		/* Check action runs correctly */
 		$_POST['gfpdf_action_test_action'] = wp_create_nonce( 'gfpdf_action_test_action' );
@@ -207,8 +197,25 @@ class ActionTest extends \WP_UnitTestCase {
 
 		$this->assertSame( 'processing', $html );
 
+		wp_set_current_user( 0 );
+
+	}
+
+	/**
+	 * Test the route actions dismiss notice
+	 *
+	 * @since 5.2
+	 */
+	public function test_route_dismiss_notice() {
+		/* Set test routes */
+		$this->setTestRoutes();
+		$this->setUpAuthorizedUser();
+
+		$_POST['gfpdf_action']             = 'gfpdf_test_action';
+		$_POST['gfpdf_action_test_action'] = wp_create_nonce( 'gfpdf_action_test_action' );
+		$_POST['gfpdf-dismiss-notice']     = 'yes';
+
 		/* Dismiss the notice */
-		$_POST['gfpdf-dismiss-notice'] = 'yes';
 		ob_start();
 		$this->controller->route();
 		$html = ob_get_clean();
@@ -221,14 +228,36 @@ class ActionTest extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Test the route actions nonce fail
+	 *
+	 * @since 5.2
+	 */
+	public function test_route_nonce_fail() {
+		$this->setTestRoutes();
+		$this->setUpAuthorizedUser();
+
+		$_POST['gfpdf_action'] = 'gfpdf_test_action';
+		/* Force nonce fail */
+		ob_start();
+		$this->controller->route();
+		$html = ob_get_clean();
+
+		$this->assertSame( '', $html );
+
+		wp_set_current_user( 0 );
+
+	}
+
+	/**
 	 * @expectedException WPDieException
 	 */
 	public function test_route_exception_permission() {
 		/* Set test routes */
-		$this->set_test_routes();
+		$this->setTestRoutes();
 
 		$_POST['gfpdf_action'] = 'gfpdf_test_action';
 		$this->controller->route();
+
 	}
 
 	/**
@@ -242,6 +271,7 @@ class ActionTest extends \WP_UnitTestCase {
 		$this->assertFalse( $this->model->is_notice_already_dismissed( $type ) );
 		$this->model->dismiss_notice( $type );
 		$this->assertTrue( $this->model->is_notice_already_dismissed( $type ) );
+
 	}
 
 	/**
@@ -256,9 +286,7 @@ class ActionTest extends \WP_UnitTestCase {
 
 		/* Multisite can only be run by super admins */
 		if ( is_multisite() ) {
-			$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-			grant_super_admin( $user_id );
-			wp_set_current_user( $user_id );
+			$this->setUpAuthorizedUser( true );
 		}
 
 		@unlink( $path . 'configuration.php' );
@@ -323,13 +351,14 @@ class ActionTest extends \WP_UnitTestCase {
 
 		$this->assertNotFalse( strpos( $html, 'Review</button>' ) );
 		$this->assertFalse( strpos( $html, 'name="gfpdf-dismiss-notice"' ) );
+
 	}
 
 	/* Set test routes
 	 *
 	 * @since 5.2
 	 */
-	public function set_test_routes() {
+	public function setTestRoutes() {
 		/* Set up a custom route */
 		add_filter(
 			'gfpdf_one_time_action_routes',
@@ -353,5 +382,17 @@ class ActionTest extends \WP_UnitTestCase {
 				];
 			}
 		);
+	}
+
+	public function setUpAuthorizedUser( $super_admin = false ) {
+		/* Set up authorized user */
+		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
+		$this->assertInternalType( 'integer', $user_id );
+		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
+		if ( $super_admin ) {
+			grant_super_admin( $user_id );
+		}
+		wp_set_current_user( $user_id );
+
 	}
 }
