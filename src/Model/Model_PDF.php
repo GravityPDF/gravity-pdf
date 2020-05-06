@@ -1553,7 +1553,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				foreach ( $fields as $field ) {
 
 					/* Check if we have a multifield likert and replace the row key */
-					if ( isset( $field['gsurveyLikertEnableMultipleRows'] ) && $field['gsurveyLikertEnableMultipleRows'] === true ) {
+					if ( $field->get_input_type() === 'likert' && isset( $field['gsurveyLikertEnableMultipleRows'] ) && $field['gsurveyLikertEnableMultipleRows'] === true ) {
 
 						foreach ( $field['gsurveyLikertRows'] as $row ) {
 
