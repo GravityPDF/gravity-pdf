@@ -979,7 +979,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		 * This resolves any issues with the "Save and Continue" feature
 		 * See https://github.com/GravityPDF/gravity-pdf/issues/360
 		 */
-		if ( null === $entry['id'] ) {
+		if ( empty( $entry['id'] ) ) {
 			return $notifications;
 		}
 
@@ -1477,24 +1477,26 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function get_form_data_meta( $form, $entry ) {
 		$data = [];
 
-		/* Add form_id and entry_id for convinience */
-		$data['form_id']  = $entry['form_id'];
-		$data['entry_id'] = $entry['id'];
+		/* Add form_id and entry_id for convenience */
+		$data['form_id']  = isset( $entry['form_id'] ) ? $entry['form_id'] : 0;
+		$data['entry_id'] = isset( $entry['id'] ) ? $entry['id'] : 0;
 
-		/* Set title and dates (both US and international) */
-		$data['form_title'] = ( isset( $form['title'] ) ) ? $form['title'] : '';
-
-		$data['form_description'] = ( isset( $form['description'] ) ) ? $form['description'] : '';
-		$data['date_created']     = GFCommon::format_date( $entry['date_created'], false, 'j/n/Y', false );
-		$data['date_created_usa'] = GFCommon::format_date( $entry['date_created'], false, 'n/j/Y', false );
+		/* Set title and description */
+		$data['form_title']       = isset( $form['title'] ) ? $form['title'] : '';
+		$data['form_description'] = isset( $form['description'] ) ? $form['description'] : '';
 
 		/* Include page names */
-		$data['pages'] = ( isset( $form['pagination']['pages'] ) ? $form['pagination']['pages'] : [] );
+		$data['pages'] = isset( $form['pagination']['pages'] ) ? $form['pagination']['pages'] : [];
 
-		/* Add misc fields */
-		$data['misc']['date_time'] = GFCommon::format_date( $entry['date_created'], false, 'Y-m-d H:i:s', false );
-		$data['misc']['time_24hr'] = GFCommon::format_date( $entry['date_created'], false, 'H:i', false );
-		$data['misc']['time_12hr'] = GFCommon::format_date( $entry['date_created'], false, 'g:ia', false );
+		/* Add date fields */
+		if ( isset( $entry['date_created'] ) ) {
+			$data['date_created']     = GFCommon::format_date( $entry['date_created'], false, 'j/n/Y', false );
+			$data['date_created_usa'] = GFCommon::format_date( $entry['date_created'], false, 'n/j/Y', false );
+
+			$data['misc']['date_time'] = GFCommon::format_date( $entry['date_created'], false, 'Y-m-d H:i:s', false );
+			$data['misc']['time_24hr'] = GFCommon::format_date( $entry['date_created'], false, 'H:i', false );
+			$data['misc']['time_12hr'] = GFCommon::format_date( $entry['date_created'], false, 'g:ia', false );
+		}
 
 		$include = [
 			'is_starred',
