@@ -80,7 +80,7 @@ class Field_Number extends Helper_Abstract_Fields {
 			return $this->cache();
 		}
 
-		$value = esc_html( GFCommon::format_number( $this->get_value(), $this->field->numberFormat ) );
+		$value = esc_html( GFCommon::format_number( $this->get_value(), $this->field->numberFormat, $this->entry['currency'] ) );
 
 		$this->cache( $value );
 

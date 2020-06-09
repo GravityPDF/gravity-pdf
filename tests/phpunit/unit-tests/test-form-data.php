@@ -2,13 +2,8 @@
 
 namespace GFPDF\Tests;
 
-use GFPDFEntryDetail;
-
-use GFFormsModel;
 use GFAPI;
-use GFCommon;
-use GFForms;
-
+use GFPDFEntryDetail;
 use WP_UnitTestCase;
 
 /**
@@ -264,6 +259,48 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( $response, $field[5] );
 		$this->assertEquals( $response, $field['5.Number'] );
 		$this->assertEquals( $response, $field['Number'] );
+	}
+
+	/**
+	 * Test that number fields will use the local currency set in the entry
+	 *
+	 * @since 5.2.3
+	 */
+	public function test_field_number_currency() {
+		$form_json = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/number-fields.json' ) ), true );
+		$form_id   = \GFAPI::add_form( $form_json );
+
+		$entry_id = \GFAPI::add_entry(
+			[
+				'form_id'  => $form_id,
+				'currency' => 'EUR',
+				'1'        => 1000.10,
+				'2'        => 2000.10,
+				'3'        => 3000.10,
+			]
+		);
+
+		$form_data = \GPDFAPI::get_form_data( $entry_id );
+
+		$this->assertEquals( '1000.1', $form_data['field'][1] );
+		$this->assertEquals( '2000,1', $form_data['field'][2] );
+		$this->assertEquals( '3.000,10 &#8364;', $form_data['field'][3] );
+
+		$entry_id = \GFAPI::add_entry(
+			[
+				'form_id'  => $form_id,
+				'currency' => 'AUD',
+				'1'        => 1000.10,
+				'2'        => 2000.10,
+				'3'        => 3000.10,
+			]
+		);
+
+		$form_data = \GPDFAPI::get_form_data( $entry_id );
+
+		$this->assertEquals( '1000.1', $form_data['field'][1] );
+		$this->assertEquals( '2000,1', $form_data['field'][2] );
+		$this->assertEquals( '$ 3,000.10', $form_data['field'][3] );
 	}
 
 	/**
