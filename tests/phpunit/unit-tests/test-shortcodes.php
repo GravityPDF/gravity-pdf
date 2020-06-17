@@ -477,10 +477,12 @@ class Test_Shortcode extends WP_UnitTestCase {
 	public function test_get_shortcode_information() {
 		$content = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/shortcode-data.json' ) ), true );
 
+		$this->assertCount( 0, $this->model->get_shortcode_information( 'gravitypdf', [] ) );
+
 		$shortcodes = $this->model->get_shortcode_information( 'gravitypdf', $content );
 
 		/* Test the results */
-		$this->assertSame( 4, sizeof( $shortcodes ) );
+		$this->assertCount( 4, $shortcodes );
 
 		$this->assertEquals( '[gravitypdf]', $shortcodes[0]['shortcode'] );
 		$this->assertEquals( '', $shortcodes[0]['attr_raw'] );

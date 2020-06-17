@@ -405,6 +405,18 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	public function get_shortcode_information( $shortcode, $text ) {
 		$shortcodes = [];
 
+		if ( ! is_string( $text ) ) {
+			$this->log->error(
+				'The $text parameter is not a string',
+				[
+					'shortcode' => $shortcode,
+					'text'      => $text,
+				]
+			);
+
+			return $shortcodes;
+		}
+
 		if ( has_shortcode( $text, $shortcode ) ) {
 			/* our shortcode exists so parse the shortcode data and return an easy-to-use array */
 			preg_match_all( '/' . get_shortcode_regex( [ $shortcode ] ) . '/', $text, $matches, PREG_SET_ORDER );
