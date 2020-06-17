@@ -105,7 +105,6 @@
     "env:install": "bash bin/install.sh",
     "env:install:gf": "bash bin/install-gravityforms.sh",
     "env:install:phpunit": "bash bin/install-phpunit.sh",
-    "env:start": "bash bin/start.sh",
     "env:reset": "bash bin/reset.sh"
   },
 

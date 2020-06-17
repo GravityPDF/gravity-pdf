@@ -30,7 +30,7 @@ The Docker setup will create a fully functionality development environment preco
 1. Run `yarn env:install`, then wait for the Docker environment to start-up
 1. If successful, you will now have a fully-functional development environment setup with Gravity Forms and Gravity PDF. The URL and login details will be shown in the terminal.
 
-If you shutdown Docker and want to fire up the environment later, use `yarn env:start`. You can also reset the database back to its original state with `yarn env:reset` 
+If you shutdown Docker and want to fire up the environment later, use `yarn env start`. You can also reset the database back to its original state with `yarn env:reset`. 
 
 ### Enable X-Debug
 - For Windows users: 
