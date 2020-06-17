@@ -197,8 +197,10 @@ class Helper_Data {
 	 */
 	public function get_localised_script_data( Helper_Abstract_Options $options, Helper_Abstract_Form $gform ) {
 
-		$custom_fonts = array_values( $options->get_custom_fonts() );
-		$user_data    = get_userdata( get_current_user_id() );
+		$custom_fonts      = array_values( $options->get_custom_fonts() );
+		$user_data         = get_userdata( get_current_user_id() );
+		$user_capabilities = is_object( $user_data ) ? $user_data->allcaps : [];
+		$user_capabilities = is_super_admin() ? [ 'administrator' => true ] : $user_capabilities;
 
 		/* See https://gravitypdf.com/documentation/v5/gfpdf_localised_script_array/ for more details about this filter */
 
@@ -212,7 +214,7 @@ class Helper_Data {
 				'pluginUrl'                            => PDF_PLUGIN_URL,
 				'pluginPath'                           => PDF_PLUGIN_DIR,
 				'customFontData'                       => json_encode( $custom_fonts ),
-				'userCapabilities'                     => is_object( $user_data ) ? $user_data->allcaps : [],
+				'userCapabilities'                     => $user_capabilities,
 
 				'spinnerUrl'                           => admin_url( 'images/spinner-2x.gif' ),
 				'spinnerAlt'                           => esc_html__( 'Loading...', 'gravity-forms-pdf-extended' ),
