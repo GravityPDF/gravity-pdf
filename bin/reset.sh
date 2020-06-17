@@ -26,6 +26,7 @@ cd ..
 rm wordpress/docker-compose.override.yml > /dev/null 2>&1
 npm run env connect
 npm run env cli plugin activate gravityforms gravity-forms-pdf-extended
+npm run env cli option add rg_gforms_key $GF_LICENSE
 
 # Misc
 bash ./bin/db.sh
