@@ -2,14 +2,12 @@
 
 namespace GFPDF\Helper\Fields;
 
+use Exception;
+use GF_Field_Repeater;
+use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Field_Container;
 use GFPDF\Helper\Helper_Misc;
-use GFPDF\Helper\Helper_Abstract_Fields;
-
-use GF_Field_Repeater;
-
-use Exception;
 
 /**
  * @package     Gravity PDF
@@ -134,9 +132,12 @@ class Field_Repeater extends Helper_Abstract_Fields {
 	 */
 	public function get_repeater_html( $value, $field ) {
 		$is_top_level = $field === $this->field;
-		$container    = new Helper_Field_Container();
-		$pdf_model    = \GPDFAPI::get_mvc_class( 'Model_PDF' );
-		$products     = new Field_Products( new \GF_Field(), $this->entry, $this->gform, $this->misc );
+
+		$container = new Helper_Field_Container();
+		$container = apply_filters( 'gfpdf_field_container_class', $container );
+
+		$pdf_model = \GPDFAPI::get_mvc_class( 'Model_PDF' );
+		$products  = new Field_Products( new \GF_Field(), $this->entry, $this->gform, $this->misc );
 
 		/* Output the Repeater Label if a sub Repeater */
 		if ( ! $is_top_level ) {
