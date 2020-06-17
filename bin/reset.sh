@@ -23,6 +23,7 @@ npm run env:install
 cd ..
 
 # Connect Gravity PDF to WordPress.
+rm wordpress/docker-compose.override.yml > /dev/null 2>&1
 npm run env connect
 npm run env cli plugin activate gravityforms gravity-forms-pdf-extended
 
