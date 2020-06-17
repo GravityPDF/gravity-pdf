@@ -390,6 +390,49 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertFalse( has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_user_capability' ] ) );
 	}
 
+	public function test_multisite_signed_url_access() {
+		if ( ! is_multisite() ) {
+			$this->markTestSkipped(
+				'Not running multisite tests'
+			);
+		}
+
+		switch_to_blog( $this->factory()->blog->create() );
+		gf_upgrade()->install();
+
+		/* Setup some test data */
+		$results          = $this->create_form_and_entries();
+		$entry            = $results['entry'];
+		$entry['form_id'] = $results['form']['id'];
+
+		$form_id          = \GFAPI::add_form( $results['form'] );
+		$entry            = $results['entry'];
+		$entry['form_id'] = $form_id;
+		$entry_id         = \GFAPI::add_entry( $entry );
+
+		$options = \GPDFAPI::get_options_class();
+		$options->set_plugin_settings();
+
+		$url = do_shortcode( '[gravitypdf id="556690c67856b" entry="' . $entry_id . '" raw="1" signed="1"]' );
+
+		$_GET['expires']   = '';
+		$_GET['signature'] = '';
+
+		$protocol = isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
+		$domain   = $_SERVER['HTTP_HOST'];
+
+		$_SERVER['REQUEST_URI'] = str_replace( $protocol . $domain, '', $url );
+
+		$this->model->middle_signed_url_access( '', '', '' );
+
+		$this->assertSame( 20, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_active' ] ) );
+		$this->assertSame( 30, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_conditional' ] ) );
+		$this->assertFalse( has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_owner_restriction' ] ) );
+		$this->assertFalse( has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_logged_out_timeout' ] ) );
+		$this->assertFalse( has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_auth_logged_out_user' ] ) );
+		$this->assertFalse( has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_user_capability' ] ) );
+	}
+
 	/**
 	 * Test if our active PDF middleware works correctly
 	 *
@@ -697,6 +740,9 @@ class Test_PDF extends WP_UnitTestCase {
 		$form    = $results['form'];
 		$entry   = $results['entry'];
 
+		$wp_rewrite->set_permalink_structure( '' );
+		flush_rewrite_rules();
+
 		$pdfs = $this->model->get_pdf_display_list( $entry );
 
 		$this->assertArrayHasKey( 'name', $pdfs[0] );
@@ -708,7 +754,6 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertNotFalse( strpos( $pdfs[0]['download'], 'http://example.org/?gpdf=1&#038;pid=556690c67856b&#038;lid=1&#038;action=download' ) );
 
 		/* Process fancy permalinks */
-		$old_permalink_structure = get_option( 'permalink_structure' );
 		$wp_rewrite->set_permalink_structure( '/%postname%/' );
 		flush_rewrite_rules();
 
@@ -717,7 +762,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertNotFalse( strpos( $pdfs[0]['view'], 'http://example.org/pdf/556690c67856b/' ) );
 		$this->assertNotFalse( strpos( $pdfs[0]['download'], '/download/' ) );
 
-		$wp_rewrite->set_permalink_structure( $old_permalink_structure );
+		$wp_rewrite->set_permalink_structure( '' );
 		flush_rewrite_rules();
 	}
 

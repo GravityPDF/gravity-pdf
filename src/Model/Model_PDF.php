@@ -312,10 +312,15 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function middle_signed_url_access( $action, $entry, $settings ) {
 
-		if ( isset( $_GET['expires'] ) && isset( $_GET['signature'] ) && isset( $_SERVER['REQUEST_URI'] ) ) {
+		if ( isset( $_GET['expires'] ) && isset( $_GET['signature'] ) && isset( $_SERVER['HTTP_HOST'] ) && isset( $_SERVER['REQUEST_URI'] ) ) {
 			try {
-				$home_url = untrailingslashit( strtok( home_url(), '?' ) );
-				if ( $this->url_signer->verify( $home_url . $_SERVER['REQUEST_URI'] ) ) {
+				$protocol = isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
+				$domain   = $_SERVER['HTTP_HOST'];
+				$request  = $_SERVER['REQUEST_URI'];
+
+				$url = $protocol . $domain . $request;
+
+				if ( $this->url_signer->verify( $url ) ) {
 					remove_filter( 'gfpdf_pdf_middleware', [ $this, 'middle_owner_restriction' ], 40 );
 					remove_filter( 'gfpdf_pdf_middleware', [ $this, 'middle_logged_out_timeout' ], 50 );
 					remove_filter( 'gfpdf_pdf_middleware', [ $this, 'middle_auth_logged_out_user' ], 60 );
