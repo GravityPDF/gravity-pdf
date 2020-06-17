@@ -948,9 +948,9 @@ class Helper_PDF {
 		/* Security settings cannot be applied to pdfa1b or pdfx1a formats */
 		if ( strtolower( $this->settings['format'] ) === 'standard' && strtolower( $this->settings['security'] ) === 'yes' ) {
 
-			$password        = ( isset( $this->settings['password'] ) ) ? $this->gform->process_tags( $this->settings['password'], $this->form, $this->entry ) : '';
+			$password        = ( isset( $this->settings['password'] ) ) ? wp_specialchars_decode( $this->gform->process_tags( $this->settings['password'], $this->form, $this->entry ), ENT_QUOTES ) : '';
 			$privileges      = ( isset( $this->settings['privileges'] ) ) ? $this->settings['privileges'] : [];
-			$master_password = ( isset( $this->settings['master_password'] ) ) ? $this->gform->process_tags( $this->settings['master_password'], $this->form, $this->entry ) : '';
+			$master_password = ( isset( $this->settings['master_password'] ) ) ? wp_specialchars_decode( $this->gform->process_tags( $this->settings['master_password'], $this->form, $this->entry ), ENT_QUOTES ) : '';
 
 			/* GitHub Issue #662 - Fix issue with possibility of blank master password being set */
 			if ( strlen( $master_password ) === 0 ) {
