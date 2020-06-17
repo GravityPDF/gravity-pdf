@@ -407,6 +407,8 @@ class Model_Install extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	public function uninstall_plugin() {
+		do_action( 'gfpdf_pre_uninstall_plugin' );
+
 		/* Clean up database */
 		if ( is_multisite() ) {
 			$sites = get_sites();
@@ -431,6 +433,9 @@ class Model_Install extends Helper_Abstract_Model {
 
 		/* Remove folder structure and deactivate */
 		$this->remove_folder_structure();
+
+		do_action( 'gfpdf_post_uninstall_plugin' );
+
 		$this->deactivate_plugin();
 	}
 
