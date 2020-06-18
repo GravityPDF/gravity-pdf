@@ -263,8 +263,6 @@ class Test_Form_Data extends WP_UnitTestCase {
 
 	/**
 	 * Test that number fields will use the local currency set in the entry
-	 *
-	 * @since 5.2.3
 	 */
 	public function test_field_number_currency() {
 		$form_json = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/number-fields.json' ) ), true );
