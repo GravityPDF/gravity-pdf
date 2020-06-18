@@ -160,6 +160,7 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 		$this->data->settings_url   = $this->model->get_settings_url();
 
 		$this->data->memory_limit             = ini_get( 'memory_limit' );
+		$this->data->allow_url_fopen          = (bool) ini_get( 'allow_url_fopen' );
 		$this->data->template_transient_cache = 'gfpdf_template_info';
 
 		$upload_details             = $this->misc->get_upload_details();

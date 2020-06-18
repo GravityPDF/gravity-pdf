@@ -33,9 +33,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</th>
 
 		<td>
-
 			<?php
-				$ram_icon = 'fa fa-check-circle';
+			$ram_icon = 'fa fa-check-circle';
 			if ( $args['memory'] < 128 && $args['memory'] !== -1 ) {
 				$ram_icon = 'fa fa-exclamation-triangle';
 			}
@@ -84,6 +83,32 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<td>
 			<?php echo $args['php']; ?>
+		</td>
+	</tr>
+
+	<tr>
+		<th scope="row">
+			<?php esc_html_e( 'allow_url_fopen', 'gravity-forms-pdf-extended' ); ?> <?php gform_tooltip( 'pdf_allow_url_fopen' ); ?>
+		</th>
+
+		<td>
+			<?php
+			$allow_url_fopen_icon = 'fa fa-check-circle';
+			if ( ! $args['allow_url'] ) {
+				$allow_url_fopen_icon = 'fa fa-exclamation-triangle';
+			}
+			?>
+
+			<?= $args['allow_url'] ? esc_html__( 'Enabled', 'gravity-forms-pdf-extended' ) : esc_html__( 'Disabled', 'gravity-forms-pdf-extended' ) ?>
+
+			<span class="<?php echo $allow_url_fopen_icon; ?>"></span>
+
+			<?php if ( ! $args['allow_url'] ): ?>
+				<span class="gf_settings_description">
+					<?php echo sprintf( esc_html__( 'We detected the PHP runtime configuration setting %1$sallow_url_fopen%2$s is disabled.', 'gravity-forms-pdf-extended' ), '<a href="https://www.php.net/manual/en/filesystem.configuration.php#ini.allow-url-fopen"><code>', '</code></a>' ); ?> <br>
+					<?php echo esc_html__( 'You may notice image display issues in your PDFs. Contact your web hosting provider for assistance enabling this feature.', 'gravity-forms-pdf-extended' ); ?>
+				</span>
+			<?php endif; ?>
 		</td>
 	</tr>
 

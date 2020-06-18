@@ -213,6 +213,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->template_manager();
 		$this->load_core_font_handler();
 		$this->load_debug();
+		$this->check_system_status();
 
 		/* Add localisation support */
 		$this->add_localization_support();
@@ -866,6 +867,20 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function load_debug() {
 		$class = new Controller\Controller_Debug( $this->data, $this->options, $this->templates );
 
+		$class->init();
+
+		$this->singleton->add_class( $class );
+	}
+
+	/**
+	 * Initialise our system status code
+	 *
+	 * @since 5.3
+	 *
+	 * @return void
+	 */
+	public function check_system_status() {
+		$class = new Controller\Controller_System_Report( $this->data->allow_url_fopen );
 		$class->init();
 
 		$this->singleton->add_class( $class );

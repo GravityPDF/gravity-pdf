@@ -37,6 +37,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @property string  $multisite_template_location     The current path to the multisite PDF working directory
  * @property string  $multisite_template_location_url The current URL to the multisite PDF working directory
  * @property string  $template_transient_cache        The ID for the template header transient cache
+ * @property bool    $allow_url_fopen                 The current PHP allow_url_fopen ini setting status
  *
  */
 class Helper_Data {
