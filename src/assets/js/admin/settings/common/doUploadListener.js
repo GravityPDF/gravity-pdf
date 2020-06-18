@@ -29,7 +29,11 @@ export function doUploadListener () {
       button: {
         text: $button.data('uploader-button-text')
       },
-      multiple: false
+      multiple: false,
+
+      library: {
+        type: [ 'font/ttf', 'application/x-font-ttf', 'application/octet-stream' ]
+      }
     })
 
     /* When a file is selected, run a callback. */

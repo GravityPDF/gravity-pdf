@@ -346,7 +346,7 @@ class Test_Settings extends WP_UnitTestCase {
 		$results = $this->controller->validate_font_uploads( false, $font, 'DejaVuSans.ttf' );
 
 		$this->assertEquals( 'ttf', $results['ext'] );
-		$this->assertEquals( 'application/x-font-ttf', $results['type'] );
+		$this->assertEquals( 'font/ttf', $results['type'] );
 	}
 
 	/**
