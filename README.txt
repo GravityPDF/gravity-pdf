@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.8
 Tested up to: 5.4
-Stable tag: 5.2.2
+Stable tag: 5.3.0
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -89,6 +89,23 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 18. Blank Slate provides a print-friendly template focusing solely on the user-submitted data.
 
 == Changelog ==
+
+= 5.3.0 =
+* Feature: Add support for Gravity Perk Populate Anything plugin
+* Feature: Add support for Gravity Plus Multi-Currency Selector plugin
+* Feature: Add `allow_url_fopen` PHP setting check to Gravity Forms and Gravity PDF System Statuses
+
+* Bug: Decode special characters for processed mergetags used in PDF Password or Master Password settings
+* Bug: Fix issue uploading TTF files via the Font Manager
+* Bug: Fix PHP Notices when processing [gravitypdf] shortcode under specific conditions
+* Bug: Fix validation issue with signed PDF URLs on sub-directory multisites
+* Bug: Fix problem displaying PDF Template Upload dropzone for Super Admins on multsite installations
+
+* Dev: Add `gfpdf_pre_uninstall_plugin` and `gfpdf_post_uninstall_plugin` actions
+* Dev: Add `gfpdf_field_container_class` filter to swap out the Helper_Field_Container class with your own
+* Dev: Add `gfpdf_unfiltered_template_list`, `gfpdf_fallback_template_path_by_id`, `gfpdf_template_config_paths`, and `gfpdf_template_image_paths` filters
+* Dev: Rewrite Monolog timezone logic to support both v1 and v2, which places nice with other plugins that use this library
+
 
 = 5.2.2 =
 * Bug: Add additional error handling to Background Processing when a form / entry is deleted

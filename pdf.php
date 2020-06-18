@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Gravity PDF
-Version: 5.2.2
+Version: 5.3.0
 Description: Automatically generate highly-customisable PDF documents using Gravity Forms.
 Author: Gravity PDF
 Author URI: https://gravitypdf.com
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
  * Set base constants we'll use throughout the plugin
  */
-define( 'PDF_EXTENDED_VERSION', '5.2.2' ); /* the current plugin version */
+define( 'PDF_EXTENDED_VERSION', '5.3.0' ); /* the current plugin version */
 define( 'PDF_PLUGIN_DIR', plugin_dir_path( __FILE__ ) ); /* plugin directory path */
 define( 'PDF_PLUGIN_URL', plugin_dir_url( __FILE__ ) ); /* plugin directory url */
 define( 'PDF_PLUGIN_BASENAME', plugin_basename( __FILE__ ) ); /* the plugin basename */
