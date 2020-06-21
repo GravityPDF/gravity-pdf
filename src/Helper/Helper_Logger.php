@@ -106,24 +106,25 @@ class Helper_Logger {
 	 * @since 4.2
 	 */
 	protected function setup_logger() {
+		static $timezone;
+
+		/* Set the logger timezone once (if needed) */
+		if ( ! $timezone ) {
+			$offset = (float) get_option( 'gmt_offset' );
+
+			if ( $offset !== 0.0 ) {
+				try {
+					$timezone = new DateTimeZone( ( $offset > 0 ) ? '+' . $offset : $offset );
+					Logger::setTimezone( $timezone );
+				} catch ( Exception $e ) {
+					/* do nothing */
+				}
+			}
+			$timezone = true;
+		}
 
 		/* Initialise our logger */
 		$this->log = new Logger( $this->slug );
-
-		/* Set the logger timezone */
-		$offset = (float) get_option( 'gmt_offset' );
-
-		try {
-			$timezone = new DateTimeZone( ( $offset >= 0 ) ? '+' . $offset : $offset );
-
-			if ( Logger::API > 1 ) {
-				$this->log->setTimezone( $timezone );
-			} else {
-				Logger::setTimezone( $timezone );
-			}
-		} catch ( Exception $e ) {
-			/* do nothing */
-		}
 
 		/* Setup our Gravity Forms local file logger, if enabled */
 		try {
