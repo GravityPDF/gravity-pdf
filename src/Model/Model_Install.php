@@ -2,16 +2,14 @@
 
 namespace GFPDF\Model;
 
+use GFCommon;
+use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
-use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Pdf_Queue;
-
 use Psr\Log\LoggerInterface;
-
-use GFCommon;
 
 /**
  * @package     Gravity PDF
@@ -45,7 +43,7 @@ class Model_Install extends Helper_Abstract_Model {
 	/**
 	 * Holds our log class
 	 *
-	 * @var \Monolog\Logger|LoggerInterface
+	 * @var LoggerInterface
 	 *
 	 * @since 4.0
 	 */
@@ -89,10 +87,10 @@ class Model_Install extends Helper_Abstract_Model {
 	protected $queue;
 
 	/**
-	 * Setup our class by injecting all our dependancies
+	 * Setup our class by injecting all our dependencies
 	 *
 	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform   Our abstracted Gravity Forms helper functions
-	 * @param \Monolog\Logger|LoggerInterface    $log     Our logger class
+	 * @param LoggerInterface                    $log     Our logger class
 	 * @param \GFPDF\Helper\Helper_Data          $data    Our plugin data store
 	 * @param \GFPDF\Helper\Helper_Misc          $misc    Our miscellaneous class
 	 * @param \GFPDF\Helper\Helper_Notices       $notices Our notice class used to queue admin messages and errors

@@ -41,7 +41,7 @@ class Test_API extends WP_UnitTestCase {
 	 */
 	public function provider_classes() {
 		return [
-			[ 'Monolog\Logger', 'get_log_class' ],
+			[ 'GFPDF\Vendor\Monolog\Logger', 'get_log_class' ],
 			[ 'GFPDF\Helper\Helper_Notices', 'get_notice_class' ],
 			[ 'GFPDF\Helper\Helper_Data', 'get_data_class' ],
 			[ 'GFPDF\Helper\Helper_Options_Fields', 'get_options_class' ],

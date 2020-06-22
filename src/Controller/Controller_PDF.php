@@ -3,13 +3,12 @@
 namespace GFPDF\Controller;
 
 use GFPDF\Helper\Helper_Abstract_Controller;
+use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_View;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
-use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
-
 use Psr\Log\LoggerInterface;
 
 /**
@@ -43,7 +42,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	/**
 	 * Holds our log class
 	 *
-	 * @var \Monolog\Logger|LoggerInterface
+	 * @var LoggerInterface
 	 *
 	 * @since 4.0
 	 */
@@ -60,12 +59,12 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	protected $misc;
 
 	/**
-	 * Setup our class by injecting all our dependancies
+	 * Setup our class by injecting all our dependencies
 	 *
 	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_PDF $model Our PDF Model the controller will manage
 	 * @param Helper_Abstract_View|\GFPDF\View\View_PDF    $view  Our PDF View the controller will manage
 	 * @param \GFPDF\Helper\Helper_Abstract_Form           $gform Our abstracted Gravity Forms helper functions
-	 * @param \Monolog\Logger|LoggerInterface              $log   Our logger class
+	 * @param LoggerInterface                              $log   Our logger class
 	 * @param \GFPDF\Helper\Helper_Misc                    $misc  Our miscellaneous class
 	 *
 	 * @since 4.0

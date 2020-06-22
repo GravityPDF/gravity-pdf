@@ -3,7 +3,6 @@
 namespace GFPDF\Helper;
 
 use Psr\Log\LoggerInterface;
-
 use WP_Error;
 
 /**
@@ -40,7 +39,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	/**
 	 * Holds our log class
 	 *
-	 * @var \Monolog\Logger|LoggerInterface
+	 * @var LoggerInterface
 	 *
 	 * @since 4.0
 	 */
@@ -108,7 +107,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	/**
 	 * Helper_Abstract_Options constructor.
 	 *
-	 * @param \Monolog\Logger|LoggerInterface    $log
+	 * @param LoggerInterface                    $log
 	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
 	 * @param \GFPDF\Helper\Helper_Data          $data
 	 * @param \GFPDF\Helper\Helper_Misc          $misc

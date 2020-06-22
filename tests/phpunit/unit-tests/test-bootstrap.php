@@ -202,7 +202,7 @@ class Test_Bootstrap extends WP_UnitTestCase {
 		$logger = $this->loader->log->getHandlers();
 
 		$this->assertSame( 1, sizeof( $logger ) );
-		$this->assertEquals( 'Monolog\Handler\NullHandler', get_class( $logger[0] ) );
+		$this->assertEquals( 'GFPDF\Vendor\Monolog\Handler\NullHandler', get_class( $logger[0] ) );
 	}
 
 	/**

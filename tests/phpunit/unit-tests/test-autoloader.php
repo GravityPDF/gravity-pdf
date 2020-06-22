@@ -133,16 +133,16 @@ class Test_Autoloader extends WP_UnitTestCase {
 		return [
 			[ 'Mpdf\Mpdf' ],
 			[ 'QueryPath' ],
-			[ 'Monolog\Logger' ],
-			[ 'Monolog\Processor\IntrospectionProcessor' ],
-			[ 'Monolog\Processor\MemoryPeakUsageProcessor' ],
-			[ 'Monolog\Handler\NullHandler' ],
-			[ 'Monolog\Formatter\LineFormatter' ],
-			[ 'Monolog\Handler\StreamHandler' ],
-			[ 'Monolog\Formatter\LogglyFormatter' ],
-			[ 'Monolog\Handler\LogglyHandler' ],
-			[ 'Monolog\Handler\BufferHandler' ],
-			[ 'Monolog\Processor\WebProcessor' ],
+			[ 'GFPDF\Vendor\Monolog\Logger' ],
+			[ 'GFPDF\Vendor\Monolog\Processor\IntrospectionProcessor' ],
+			[ 'GFPDF\Vendor\Monolog\Processor\MemoryPeakUsageProcessor' ],
+			[ 'GFPDF\Vendor\Monolog\Handler\NullHandler' ],
+			[ 'GFPDF\Vendor\Monolog\Formatter\LineFormatter' ],
+			[ 'GFPDF\Vendor\Monolog\Handler\StreamHandler' ],
+			[ 'GFPDF\Vendor\Monolog\Formatter\LogglyFormatter' ],
+			[ 'GFPDF\Vendor\Monolog\Handler\LogglyHandler' ],
+			[ 'GFPDF\Vendor\Monolog\Handler\BufferHandler' ],
+			[ 'GFPDF\Vendor\Monolog\Processor\WebProcessor' ],
 		];
 	}
 }

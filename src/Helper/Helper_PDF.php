@@ -165,7 +165,7 @@ class Helper_PDF {
 	/**
 	 * Holds our log class
 	 *
-	 * @var \Monolog\Logger|LoggerInterface
+	 * @var LoggerInterface
 	 *
 	 * @since 5.0
 	 */

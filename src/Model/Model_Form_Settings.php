@@ -2,20 +2,17 @@
 
 namespace GFPDF\Model;
 
-use GFPDF\Helper\Helper_Abstract_Model;
-use GFPDF\Helper\Helper_PDF_List_Table;
-use GFPDF\Helper\Helper_Interface_Config;
+use GFFormsModel;
 use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Helper_Abstract_Model;
+use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Interface_Config;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
+use GFPDF\Helper\Helper_PDF_List_Table;
 use GFPDF\Helper\Helper_Templates;
-use GFPDF\Helper\Helper_Abstract_Options;
-
 use Psr\Log\LoggerInterface;
-
-use _WP_Editors;
-use GFFormsModel;
 
 /**
  * @package     Gravity PDF
@@ -49,7 +46,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	/**
 	 * Holds our log class
 	 *
-	 * @var \Monolog\Logger|LoggerInterface
+	 * @var LoggerInterface
 	 *
 	 * @since 4.0
 	 */
@@ -106,10 +103,10 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	protected $templates;
 
 	/**
-	 * Setup our class by injecting all our dependancies
+	 * Setup our class by injecting all our dependencies
 	 *
 	 * @param \GFPDF\Helper\Helper_Abstract_Form    $gform   Our abstracted Gravity Forms helper functions
-	 * @param \Monolog\Logger|LoggerInterface       $log     Our logger class
+	 * @param LoggerInterface                       $log     Our logger class
 	 * @param \GFPDF\Helper\Helper_Data             $data    Our plugin data store
 	 * @param \GFPDF\Helper\Helper_Abstract_Options $options Our options class which allows us to access any settings
 	 * @param \GFPDF\Helper\Helper_Misc             $misc    Our miscellaneous class

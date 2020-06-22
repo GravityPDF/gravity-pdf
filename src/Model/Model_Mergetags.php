@@ -5,7 +5,6 @@ namespace GFPDF\Model;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Misc;
-
 use Psr\Log\LoggerInterface;
 
 /**
@@ -47,7 +46,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	/**
 	 * Holds our log class
 	 *
-	 * @var \Monolog\Logger|LoggerInterface
+	 * @var LoggerInterface
 	 *
 	 * @since 4.1
 	 */
@@ -66,9 +65,9 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	/**
 	 * Model_Mergetags constructor.
 	 *
-	 * @param Helper_Abstract_Options         $options
-	 * @param \GFPDF\Model\Model_PDF          $pdf
-	 * @param \Monolog\Logger|LoggerInterface $log
+	 * @param Helper_Abstract_Options $options
+	 * @param \GFPDF\Model\Model_PDF  $pdf
+	 * @param LoggerInterface         $log
 	 *
 	 * @since    4.1
 	 */

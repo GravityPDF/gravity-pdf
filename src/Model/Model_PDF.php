@@ -57,7 +57,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Holds our log class
 	 *
-	 * @var \Monolog\Logger|LoggerInterface
+	 * @var LoggerInterface
 	 *
 	 * @since 4.0
 	 */
@@ -117,7 +117,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * Setup our view with the needed data and classes
 	 *
 	 * @param \GFPDF\Helper\Helper_Abstract_Form    $gform   Our abstracted Gravity Forms helper functions
-	 * @param \Monolog\Logger|LoggerInterface       $log     Our logger class
+	 * @param LoggerInterface                       $log     Our logger class
 	 * @param \GFPDF\Helper\Helper_Abstract_Options $options Our options class which allows us to access any settings
 	 * @param \GFPDF\Helper\Helper_Data             $data    Our plugin data store
 	 * @param \GFPDF\Helper\Helper_Misc             $misc    Our miscellaneous class

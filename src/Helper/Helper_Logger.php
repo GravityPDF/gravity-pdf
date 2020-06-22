@@ -6,12 +6,13 @@ use DateTimeZone;
 use Exception;
 use GFFormsModel;
 use GFLogging;
-use Monolog\Formatter\LineFormatter;
-use Monolog\Handler\NullHandler;
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
-use Monolog\Processor\IntrospectionProcessor;
-use Monolog\Processor\MemoryPeakUsageProcessor;
+use GFPDF\Vendor\Monolog\Formatter\LineFormatter;
+use GFPDF\Vendor\Monolog\Handler\NullHandler;
+use GFPDF\Vendor\Monolog\Handler\StreamHandler;
+use GFPDF\Vendor\Monolog\Logger;
+use GFPDF\Vendor\Monolog\Processor\IntrospectionProcessor;
+use GFPDF\Vendor\Monolog\Processor\MemoryPeakUsageProcessor;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
@@ -46,7 +47,7 @@ class Helper_Logger {
 	/**
 	 * Holds our log class
 	 *
-	 * @var \Monolog\Logger
+	 * @var LoggerInterface
 	 *
 	 * @since 4.2
 	 */

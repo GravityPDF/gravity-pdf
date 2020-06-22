@@ -8,6 +8,7 @@ use GFPDF\View;
 use GFPDF\Helper;
 
 use GFPDF_Core;
+use Psr\Log\LoggerInterface;
 
 /*
  * Bootstrap / Router Class
@@ -38,7 +39,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Holds our log class
 	 *
-	 * @var \Monolog\Logger
+	 * @var LoggerInterface
 	 *
 	 * @since 4.0
 	 */

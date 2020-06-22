@@ -2,9 +2,8 @@
 
 namespace GFPDF\Helper;
 
-use Psr\Log\LoggerInterface;
-
 use Exception;
+use Psr\Log\LoggerInterface;
 use stdClass;
 
 /**
@@ -30,7 +29,7 @@ class Helper_Templates {
 	/**
 	 * Holds our log class
 	 *
-	 * @var \Monolog\Logger|LoggerInterface
+	 * @var LoggerInterface
 	 *
 	 * @since 4.1
 	 */
@@ -56,9 +55,9 @@ class Helper_Templates {
 	protected $gform;
 
 	/**
-	 * Setup our class by injecting all our dependancies
+	 * Setup our class by injecting all our dependencies
 	 *
-	 * @param \Monolog\Logger|LoggerInterface    $log  Our logger class
+	 * @param LoggerInterface                    $log  Our logger class
 	 * @param \GFPDF\Helper\Helper_Data          $data Our plugin data store
 	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
 	 *
