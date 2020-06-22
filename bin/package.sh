@@ -11,6 +11,7 @@ VERSION=$1
 BRANCH=${2-development}
 TMP_DIR="./tmp/package/"
 PACKAGE_DIR="${TMP_DIR}${VERSION}"
+WORKING_DIR=$PWD
 PACKAGE_NAME="gravity-forms-pdf-extended"
 
 # Create the working directory
@@ -24,7 +25,10 @@ tar -zxf ${PACKAGE_DIR}/package.tar.gz --directory ${PACKAGE_DIR} && rm --force 
 yarn --cwd ${PACKAGE_DIR} prebuild
 yarn --cwd ${PACKAGE_DIR} build:production
 yarn env docker-run php composer install --no-dev  --prefer-dist --optimize-autoloader --working-dir ${PACKAGE_DIR}
-bash ${PACKAGE_DIR}/bin/vendor-prefix.sh
+
+cd "$PACKAGE_DIR"
+bash ./bin/vendor-prefix.sh
+cd "$WORKING_DIR"
 
 # Cleanup Node JS
 rm --force -R ${PACKAGE_DIR}/node_modules
