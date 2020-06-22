@@ -32,9 +32,7 @@
 	<file>./src/</file>
 
 	<!-- Code which doesn't go into production may have different requirements. -->
+	<exclude-pattern>/.php-scoper/*</exclude-pattern>
+	<exclude-pattern>/src/Vendor/*</exclude-pattern>
 	<exclude-pattern>/node_modules/*</exclude-pattern>
-	<exclude-pattern>/wp-coding-standards/*</exclude-pattern>
-	<exclude-pattern>/squizlabs/*</exclude-pattern>
-	<exclude-pattern>/phpcompatibility/*</exclude-pattern>
-	<exclude-pattern>/dealerdirect/*</exclude-pattern>
 </ruleset>

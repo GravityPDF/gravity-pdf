@@ -6,7 +6,6 @@ use GFPDF\Helper\Helper_Abstract_Controller;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_View;
 use GFPDF\Helper\Helper_Interface_Filters;
-
 use Psr\Log\LoggerInterface;
 
 /**
@@ -31,17 +30,17 @@ class Controller_Shortcodes extends Helper_Abstract_Controller implements Helper
 	/**
 	 * Holds our log class
 	 *
-	 * @var \Monolog\Logger|LoggerInterface
+	 * @var LoggerInterface
 	 * @since 4.0
 	 */
 	protected $log;
 
 	/**
-	 * Setup our class by injecting all our dependancies
+	 * Setup our class by injecting all our dependencies
 	 *
 	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_Shortcodes $model Our Shortcodes Model the controller will manage
 	 * @param Helper_Abstract_View|\GFPDF\View\View_Shortcodes    $view  Our Shortcodes View the controller will manage
-	 * @param \Monolog\Logger|LoggerInterface                     $log   Our logger class
+	 * @param LoggerInterface                                     $log   Our logger class
 	 *
 	 * @since 4.0
 	 */

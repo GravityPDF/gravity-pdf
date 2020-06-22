@@ -2,16 +2,13 @@
 
 namespace GFPDF\Helper;
 
-use Psr\Log\LoggerInterface;
-
+use Exception;
 use GFCommon;
 use GFMultiCurrency;
-use GPDFAPI;
-
-use WP_Error;
+use Psr\Log\LoggerInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use Exception;
+use WP_Error;
 
 /**
  * @package     Gravity PDF
@@ -41,7 +38,7 @@ class Helper_Misc {
 	/**
 	 * Holds our log class
 	 *
-	 * @var \Monolog\Logger|LoggerInterface
+	 * @var LoggerInterface
 	 *
 	 * @since 4.0
 	 */
@@ -60,7 +57,7 @@ class Helper_Misc {
 	/**
 	 * Store required classes locally
 	 *
-	 * @param \Monolog\Logger|LoggerInterface    $log
+	 * @param LoggerInterface                    $log
 	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
 	 * @param \GFPDF\Helper\Helper_Data          $data
 	 *

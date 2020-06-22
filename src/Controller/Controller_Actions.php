@@ -3,12 +3,11 @@
 namespace GFPDF\Controller;
 
 use GFPDF\Helper\Helper_Abstract_Controller;
-use GFPDF\Helper\Helper_Interface_Actions;
+use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_View;
-use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Notices;
-
 use Psr\Log\LoggerInterface;
 
 /**
@@ -43,7 +42,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	/**
 	 * Holds our log class
 	 *
-	 * @var \Monolog\Logger|LoggerInterface
+	 * @var LoggerInterface
 	 *
 	 * @since 4.0
 	 */
@@ -60,12 +59,12 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	protected $notices;
 
 	/**
-	 * Setup our class by injecting all our dependancies
+	 * Setup our class by injecting all our dependencies
 	 *
 	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_Actions $model   Our Actions Model the controller will manage
 	 * @param Helper_Abstract_View|\GFPDF\View\View_Actions    $view    Our Actions View the controller will manage
 	 * @param \GFPDF\Helper\Helper_Abstract_Form               $gform   Our abstracted Gravity Forms helper functions
-	 * @param \Monolog\Logger|LoggerInterface                  $log     Our logger class
+	 * @param LoggerInterface                                  $log     Our logger class
 	 * @param \GFPDF\Helper\Helper_Notices                     $notices Our notice class used to queue admin messages and errors
 	 *
 	 * @since 4.0

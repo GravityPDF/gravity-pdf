@@ -55,7 +55,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	/**
 	 * Holds our log class
 	 *
-	 * @var \Monolog\Logger|LoggerInterface
+	 * @var LoggerInterface
 	 *
 	 * @since 4.0
 	 */
@@ -112,10 +112,10 @@ class Model_Settings extends Helper_Abstract_Model {
 	protected $templates;
 
 	/**
-	 * Set up our dependancies
+	 * Set up our dependencies
 	 *
 	 * @param \GFPDF\Helper\Helper_Abstract_Form    $gform   Our abstracted Gravity Forms helper functions
-	 * @param \Monolog\Logger|LoggerInterface       $log     Our logger class
+	 * @param LoggerInterface                       $log     Our logger class
 	 * @param \GFPDF\Helper\Helper_Notices          $notices Our notice class used to queue admin messages and errors
 	 * @param \GFPDF\Helper\Helper_Abstract_Options $options Our options class which allows us to access any settings
 	 * @param \GFPDF\Helper\Helper_Data             $data    Our plugin data store

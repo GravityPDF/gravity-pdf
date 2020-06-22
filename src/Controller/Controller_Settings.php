@@ -48,7 +48,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	/**
 	 * Holds our log class
 	 *
-	 * @var \Monolog\Logger|LoggerInterface
+	 * @var LoggerInterface
 	 *
 	 * @since 4.0
 	 */
@@ -85,12 +85,12 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	protected $misc;
 
 	/**
-	 * Setup our class by injecting all our dependancies
+	 * Setup our class by injecting all our dependencies
 	 *
 	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_Settings $model   Our Settings Model the controller will manage
 	 * @param Helper_Abstract_View|\GFPDF\View\View_Settings    $view    Our Settings View the controller will manage
 	 * @param \GFPDF\Helper\Helper_Abstract_Form                $gform   Our abstracted Gravity Forms helper functions
-	 * @param \Monolog\Logger|LoggerInterface                   $log     Our logger class
+	 * @param LoggerInterface                                   $log     Our logger class
 	 * @param \GFPDF\Helper\Helper_Notices                      $notices Our notice class used to queue admin messages and errors
 	 * @param \GFPDF\Helper\Helper_Data                         $data    Our plugin data store
 	 * @param \GFPDF\Helper\Helper_Misc                         $misc    Our miscellaneous class

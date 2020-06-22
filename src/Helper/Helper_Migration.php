@@ -2,9 +2,8 @@
 
 namespace GFPDF\Helper;
 
-use Psr\Log\LoggerInterface;
-
 use Exception;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
@@ -37,7 +36,7 @@ class Helper_Migration {
 	/**
 	 * Holds our log class
 	 *
-	 * @var \Monolog\Logger|LoggerInterface
+	 * @var LoggerInterface
 	 *
 	 * @since 4.0
 	 */
@@ -97,7 +96,7 @@ class Helper_Migration {
 	 * Load our model and view and required actions
 	 *
 	 * @param \GFPDF\Helper\Helper_Abstract_Form    $form
-	 * @param \Monolog\Logger|LoggerInterface       $log
+	 * @param LoggerInterface                       $log
 	 * @param \GFPDF\Helper\Helper_Data             $data
 	 * @param \GFPDF\Helper\Helper_Abstract_Options $options
 	 * @param \GFPDF\Helper\Helper_Misc             $misc

@@ -2,14 +2,13 @@
 
 namespace GFPDF\View;
 
-use GFPDF\Helper\Helper_Abstract_View;
-use GFPDF_Major_Compatibility_Checks;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Options;
+use GFPDF\Helper\Helper_Abstract_View;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Templates;
-
+use GFPDF_Major_Compatibility_Checks;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -53,7 +52,7 @@ class View_Settings extends Helper_Abstract_View {
 	/**
 	 * Holds our log class
 	 *
-	 * @var \Monolog\Logger|LoggerInterface
+	 * @var LoggerInterface
 	 *
 	 * @since 4.0
 	 */
@@ -100,11 +99,11 @@ class View_Settings extends Helper_Abstract_View {
 	protected $templates;
 
 	/**
-	 * Setup our class by injecting all our dependancies
+	 * Setup our class by injecting all our dependencies
 	 *
 	 * @param array                                          $data_cache An array of data to pass to the view
 	 * @param \GFPDF\Helper\Helper_Form|Helper_Abstract_Form $gform      Our abstracted Gravity Forms helper functions
-	 * @param \Monolog\Logger|LoggerInterface                $log        Our logger class
+	 * @param LoggerInterface                                $log        Our logger class
 	 * @param \GFPDF\Helper\Helper_Abstract_Options          $options    Our options class which allows us to access any settings
 	 * @param \GFPDF\Helper\Helper_Data                      $data       Our plugin data store
 	 * @param \GFPDF\Helper\Helper_Misc                      $misc       Our miscellaneous class

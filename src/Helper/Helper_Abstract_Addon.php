@@ -2,6 +2,8 @@
 
 namespace GFPDF\Helper;
 
+use Psr\Log\LoggerInterface;
+
 /**
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2020, Blue Liquid Designs
@@ -85,7 +87,7 @@ abstract class Helper_Abstract_Addon {
 	/**
 	 * Holds our log class
 	 *
-	 * @var \Monolog\Logger
+	 * @var LoggerInterface
 	 *
 	 * @since 4.2
 	 */

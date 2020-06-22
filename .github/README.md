@@ -60,14 +60,14 @@ When you do your Path Mappings in your IDE, make sure to name your server `local
 
 By default, the latest stable version of PHP will be used when you start the Docker environment. To switch, set the environmental variable `LOCAL_PHP` to one of the following:
 
-* `php5.6-fpm`
-* `php7.0-fpm`
-* `php7.1-fpm`
-* `php7.2-fpm`
-* `php7.3-fpm`
-* `php7.4-fpm`
+* `5.6-fpm`
+* `7.0-fpm`
+* `7.1-fpm`
+* `7.2-fpm`
+* `7.3-fpm`
+* `7.4-fpm`
 
-For example, to swap to PHP 7.4 run `export LOCAL_PHP=php7.4-fpm` and then stop and start your container with `yarn env stop` and `yarn env start`.
+For example, to swap to PHP 7.4 run `export LOCAL_PHP=7.4-fpm` and then stop and start your container with `yarn env stop` and `yarn env start`.
 
 ## Setup without Docker
 
@@ -76,6 +76,7 @@ If you would rather use your own development environment, you can build Gravity 
 1. Clone the repository using `git clone https://github.com/GravityPDF/gravity-pdf/`
 1. Run `yarn prebuild` and `yarn build:production`
 1. Run `composer install`
+1. Run `NO_DOCKER=true bash ./bin/vendor-prefix.sh`
 
 ## Linting
 

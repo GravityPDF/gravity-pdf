@@ -4,12 +4,11 @@ namespace GFPDF\Controller;
 
 use GFPDF\Helper\Helper_Abstract_Controller;
 use GFPDF\Helper\Helper_Abstract_Model;
+use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Abstract_View;
+use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
-use GFPDF\Helper\Helper_Data;
-use GFPDF\Helper\Helper_Abstract_Options;
-
 use Psr\Log\LoggerInterface;
 
 /**
@@ -34,7 +33,7 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 	/**
 	 * Holds our log class
 	 *
-	 * @var \Monolog\Logger|LoggerInterface
+	 * @var LoggerInterface
 	 *
 	 * @since 4.0
 	 */
@@ -61,11 +60,11 @@ class Controller_Welcome_Screen extends Helper_Abstract_Controller implements He
 	protected $options;
 
 	/**
-	 * Setup our class by injecting all our dependancies
+	 * Setup our class by injecting all our dependencies
 	 *
 	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_Welcome_Screen $model   Our Welcome Screen Model the controller will manage
 	 * @param Helper_Abstract_View|\GFPDF\View\View_Welcome_Screen    $view    Our Welcome Screen View the controller will manage
-	 * @param \Monolog\Logger|LoggerInterface                         $log     Our logger class
+	 * @param LoggerInterface                                         $log     Our logger class
 	 * @param \GFPDF\Helper\Helper_Data                               $data    Our plugin data store
 	 * @param \GFPDF\Helper\Helper_Abstract_Options                   $options Our options class which allows us to access any settings
 	 *

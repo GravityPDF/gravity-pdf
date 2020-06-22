@@ -2,7 +2,8 @@
 
 namespace GFPDF\Helper;
 
-use Monolog\Logger;
+use GFPDF\Vendor\Monolog\Logger;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
@@ -23,7 +24,7 @@ trait Helper_Trait_Logger {
 	/**
 	 * Holds our log class
 	 *
-	 * @var \Monolog\Logger
+	 * @var LoggerInterface
 	 *
 	 * @since 4.3
 	 */

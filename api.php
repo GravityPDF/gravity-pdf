@@ -44,7 +44,7 @@ final class GPDFAPI {
 	 *
 	 * See https://gravitypdf.com/documentation/v5/api_get_log_class/ for more information about this method
 	 *
-	 * @return \Monolog\Logger
+	 * @return \Psr\Log\LoggerInterface
 	 *
 	 * @since 4.0
 	 */
