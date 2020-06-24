@@ -28,15 +28,17 @@ else
 fi
 
 if exists php && ! isTravis; then
+  PHP_DOCKER=""
   PHP="php"
   COMPOSER="composer"
 else
-  PHP="LOCAL_PHP=7.4-fpm yarn env docker-run php php"
-  COMPOSER="yarn env docker-run php composer"
+  PHP_DOCKER="yarn env docker-run php "
+  PHP="LOCAL_PHP=7.4-fpm ${PHP_DOCKER}php"
+  COMPOSER="${PHP_DOCKER}composer"
 fi
 
 eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}src/Vendor/Monolog --config=${PLUGIN_DIR}.php-scoper/monolog.php --force --quiet"
 cp ${PLUGIN_DIR}vendor/monolog/monolog/* ${PLUGIN_DIR}src/Vendor/Monolog 2>/dev/null
-rm -R ${PLUGIN_DIR}vendor/monolog
+eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/monolog"
 
 eval "$COMPOSER dump-autoload --working-dir ${PLUGIN_DIR}"
