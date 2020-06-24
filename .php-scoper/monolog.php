@@ -4,6 +4,11 @@ declare( strict_types=1 );
 
 use Isolated\Symfony\Component\Finder\Finder;
 
+$path = './';
+if ( isset( $_SERVER['argv'][0] ) ) {
+	$path = dirname( $_SERVER['argv'][0] ) . '/';
+}
+
 return [
 
 	'prefix'    => 'GFPDF\\Vendor',
@@ -16,7 +21,7 @@ return [
 	 * For more see: https://github.com/humbug/php-scoper#finders-and-paths
 	 */
 	'finders'   => [
-		Finder::create()->files()->in( 'vendor/monolog/monolog/src' )->name( [ '*.php', 'LICENSE', 'composer.json' ] ),
+		Finder::create()->files()->in( $path . 'vendor/monolog/monolog/src' )->name( [ '*.php', 'LICENSE', 'composer.json' ] ),
 	],
 
 	/*

@@ -26,9 +26,7 @@ yarn --cwd ${PACKAGE_DIR} prebuild
 yarn --cwd ${PACKAGE_DIR} build:production
 yarn env docker-run php composer install --no-dev  --prefer-dist --optimize-autoloader --working-dir ${PACKAGE_DIR}
 
-cd "$PACKAGE_DIR"
-bash ./bin/vendor-prefix.sh
-cd "$WORKING_DIR"
+PLUGIN_DIR="$PACKAGE_DIR/" bash ./bin/vendor-prefix.sh
 
 # Cleanup Node JS
 rm --force -R ${PACKAGE_DIR}/node_modules
