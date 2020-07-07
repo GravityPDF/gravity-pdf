@@ -168,12 +168,8 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				'debug_mode'              => [
 					'id'      => 'debug_mode',
 					'name'    => esc_html__( 'Debug Mode', 'gravity-forms-pdf-extended' ),
-					'type'    => 'radio',
-					'options' => [
-						'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
-						'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
-					],
-					'std'     => 'No',
+					'type'    => 'toggle',
+					'std'     => '0',
 					'desc'    => esc_html__( 'When enabled, debug information will be displayed on-screen for core features.', 'gravity-forms-pdf-extended' ),
 					'tooltip' => '<h6>' . esc_html__( 'Debug Mode', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'When enabled, template caching is turned off and flushed, shortcode errors will be displayed on-screen and generation statistics will be included in PDFs.', 'gravity-forms-pdf-extended' ),
 				],
@@ -183,34 +179,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			'general_security'                => apply_filters(
 				'gfpdf_settings_general_security',
 				[
-					'admin_capabilities'     => [
-						'id'          => 'admin_capabilities',
-						'name'        => esc_html__( 'User Restriction', 'gravity-forms-pdf-extended' ),
-						'desc'        => esc_html__( 'Restrict PDF access to users with any of these capabilities. The Administrator Role always has full access.', 'gravity-forms-pdf-extended' ),
-						'type'        => 'select',
-						'options'     => $this->get_capabilities(),
-						'std'         => 'gravityforms_view_entries',
-						'inputClass'  => 'large',
-						'chosen'      => true,
-						'multiple'    => true,
-						'required'    => true,
-						'placeholder' => esc_html__( 'Select Capability', 'gravity-forms-pdf-extended' ),
-						'tooltip'     => '<h6>' . esc_html__( 'User Restriction', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( "Only logged in users with any selected capability can view generated PDFs they don't have ownership of. Ownership refers to an end user who completed the original Gravity Form entry.", 'gravity-forms-pdf-extended' ),
-					],
-
-					'default_restrict_owner' => [
-						'id'      => 'default_restrict_owner',
-						'name'    => esc_html__( 'Default Owner Restrictions', 'gravity-forms-pdf-extended' ),
-						'desc'    => esc_html__( 'Set the default PDF owner permissions. When enabled, the original entry owner will NOT be able to view the PDFs (unless they have one of the above capabilities).', 'gravity-forms-pdf-extended' ),
-						'type'    => 'radio',
-						'options' => [
-							'Yes' => esc_html__( 'Enable', 'gravity-forms-pdf-extended' ),
-							'No'  => esc_html__( 'Disable', 'gravity-forms-pdf-extended' ),
-						],
-						'std'     => 'No',
-						'tooltip' => '<h6>' . esc_html__( 'Restrict Owner', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Enable this setting if your PDFs should not be viewable by the end user. This can be set on a per-PDF basis.', 'gravity-forms-pdf-extended' ),
-					],
-
 					'logged_out_timeout'     => [
 						'id'      => 'logged_out_timeout',
 						'name'    => esc_html__( 'Logged Out Timeout', 'gravity-forms-pdf-extended' ),
@@ -220,6 +188,26 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'size'    => 'small',
 						'std'     => 20,
 						'tooltip' => '<h6>' . esc_html__( 'Logged Out Timeout', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Logged out users can view PDFs when their IP matches the one assigned to the Gravity Form entry. Because IP addresses can change, a time-based restriction also applies.', 'gravity-forms-pdf-extended' ),
+					],
+
+					'default_restrict_owner' => [
+						'id'      => 'default_restrict_owner',
+						'name'    => esc_html__( 'Default Owner Restrictions', 'gravity-forms-pdf-extended' ),
+						'desc'    => esc_html__( 'Set the default PDF owner permissions. When enabled, the original entry owner will NOT be able to view the PDFs (unless they have a User Restriction capability).', 'gravity-forms-pdf-extended' ),
+						'type'    => 'toggle',
+						'std'     => '0',
+						'tooltip' => '<h6>' . esc_html__( 'Restrict Owner', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Enable this setting if your PDFs should not be viewable by the end user. This can be set on a per-PDF basis.', 'gravity-forms-pdf-extended' ),
+					],
+
+					'admin_capabilities'     => [
+						'id'          => 'admin_capabilities',
+						'name'        => esc_html__( 'User Restriction', 'gravity-forms-pdf-extended' ),
+						'class'   => 'gform-settings-panel--full',
+						'desc'        => esc_html__( 'Restrict PDF access to users with any of these capabilities. The Administrator Role always has full access.', 'gravity-forms-pdf-extended' ),
+						'type'        => 'multicheck',
+						'options'     => $this->get_capabilities(),
+						'std'         => 'gravityforms_view_entries',
+						'tooltip'     => '<h6>' . esc_html__( 'User Restriction', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( "Only logged in users with any selected capability can view generated PDFs they don't have ownership of. Ownership refers to an end user who completed the original Gravity Form entry.", 'gravity-forms-pdf-extended' ),
 					],
 				]
 			),

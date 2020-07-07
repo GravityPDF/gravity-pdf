@@ -1,4 +1,17 @@
 /*
+ * Gravity Forms 2.5 Styles
+ */
+.gform-settings-panel--full {
+ grid-column: span 2;
+}
+
+.gfpdf-settings-multicheck-wrapper {
+ float: left;
+ width: 33%;
+}
+
+
+/*
  * Getting Started Welcome Page
  */
 

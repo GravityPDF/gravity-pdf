@@ -52,7 +52,7 @@ $settings = function( $id, $output_title = false ) {
 			</header>
 
 			<div class="gform-settings-panel__content gform_settings_form">
-				<div class="gform-settings-description" style="grid-column: span 2">Control the default settings to use when you create new PDFs on your forms.</div>
+				<div class="gform-settings-description gform-settings-panel--full">Control the default settings to use when you create new PDFs on your forms.</div>
 				<?php $settings( 'gfpdf_settings_general', true ); ?>
 			</div>
 		</fieldset>
@@ -90,22 +90,20 @@ $settings = function( $id, $output_title = false ) {
 		</fieldset>
 
 
+		<fieldset id="" class="gform-settings-panel gform-settings-panel--full gform-settings-panel--collapsed">
+			<header class="gform-settings-panel__header">
+				<legend class="gform-settings-panel__title">Security</legend>
 
-		<div id="gfpdf-advanced-options">
-			<h3>
-				<span>
-					<i class="fa fa-lock"></i>
-					<?php esc_html_e( 'Security Settings', 'gravity-forms-pdf-extended' ); ?>
+				<span class="gform-settings-panel__collapsible-control">
+					<input type="checkbox" name="gform_settings_section_collapsed_security" id="form_settings_section_collapsed_security" value="1" onclick="this.checked ? this.closest( '.gform-settings-panel' ).classList.add( 'gform-settings-panel--collapsed' ) : this.closest( '.gform-settings-panel' ).classList.remove( 'gform-settings-panel--collapsed' )" checked="">
+					<label class="gform-settings-panel__collapsible-toggle" for="form_settings_section_collapsed_security"><span class="screen-reader-text">Toggle Security Section</span></label>
 				</span>
-			</h3>
+			</header>
 
-			<table id="pdf-general-security" class="form-table">
-				<?php do_settings_fields( 'gfpdf_settings_general_security', 'gfpdf_settings_general_security' ); ?>
-			</table>
-		</div>
-
-		<div class="gfpdf-advanced-options">
-			<a href="#"><?php esc_html_e( 'Show Advanced Options...', 'gravity-forms-pdf-extended' ); ?></a></div>
+			<div class="gform-settings-panel__content gform_settings_form">
+				<?php $settings( 'gfpdf_settings_general_security', true ); ?>
+			</div>
+		</fieldset>
 
 		<?php
 		if ( $args['edit_cap'] ) {
