@@ -1534,6 +1534,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$args['id'] = esc_attr( $args['id'] );
 
 		if ( ! empty( $args['options'] ) ) {
+			echo '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
+
 			foreach ( $args['options'] as $key => $option ) {
 
 				/* Set up multi-select option to pass to our form value getter */
@@ -1545,8 +1547,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				echo '<input name="gfpdf_settings[' . $args['id'] . '][' . esc_attr( $key ) . ']" id="gfpdf_settings[' . $args['id'] . '][' . esc_attr( $key ) . ']" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" type="checkbox" value="' . $option . '" ' . checked( $option, $enabled, false ) . ' ' . $required . ' />&nbsp;';
 				echo '<label for="gfpdf_settings[' . $args['id'] . '][' . esc_attr( $key ) . ']">' . $option . '</label><br />';
 			}
-
-			echo '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
 
 			if ( isset( $args['tooltip'] ) ) {
 				echo '<span class="gf_hidden_tooltip" style="display: none;">' . wp_kses_post( $args['tooltip'] ) . '</span>';
@@ -1571,7 +1571,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$selected   = $this->get_form_value( $args );
 		$required   = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
 		$args['id'] = esc_attr( $args['id'] );
-		$html       = '';
+		$html = '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
 
 		foreach ( $args['options'] as $key => $option ) {
 
@@ -1583,8 +1583,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$html .= '<label for="gfpdf_settings[' . $args['id'] . '][' . esc_attr( $key ) . ']"><input name="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . '][' . esc_attr( $key ) . ']" type="radio" value="' . esc_attr( $key ) . '" ' . checked( true, $checked, false ) . ' ' . $required . ' />';
 			$html .= $option . '</label> &nbsp;&nbsp;';
 		}
-
-		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
 
 		if ( isset( $args['tooltip'] ) ) {
 			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . wp_kses_post( $args['tooltip'] ) . '</span>';
@@ -1614,14 +1612,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$args['id'] = esc_attr( $args['id'] );
 
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? esc_attr( $args['size'] ) : 'regular';
-		$html = '<input type="text" class="' . $size . '-text ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" ' . $required;
+		$html = '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
+		$html .= '<input type="text" class="' . $size . '-text ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" ' . $required;
 
 		foreach ( $input_data as $data_id => $data_value ) {
 			$html .= ' data-' . $data_id . '="' . esc_html( $data_value ) . '" ';
 		}
 
 		$html .= ' />';
-		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
 
 		if ( isset( $args['tooltip'] ) ) {
 			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . wp_kses_post( $args['tooltip'] ) . '</span>';
@@ -1648,7 +1646,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$args['id'] = esc_attr( $args['id'] );
 
 		$size = 'regular';
-		$html = '<input type="text" class="' . $size . '-text" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value['key'] ) ) . '" />';
+		$html = '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']">' . wp_kses_post( $value['msg'] ) . '</label></span>';
+		$html .= '<input type="text" class="' . $size . '-text" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value['key'] ) ) . '" />';
 
 		/* Show status info */
 		if ( $value['status'] !== '' ) {
@@ -1667,8 +1666,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					 esc_attr__( 'Deactivate License', 'gravity-forms-pdf-extended' ) .
 				'</a>';
 		}
-
-		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']">' . wp_kses_post( $value['msg'] ) . '</label></span>';
 
 		echo $html;
 	}
@@ -1705,14 +1702,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$step = isset( $args['step'] ) ? (int) $args['step'] : 1;
 
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? esc_attr( $args['size'] ) : 'regular';
-		$html = '<input type="number" step="' . esc_attr( $step ) . '" max="' . esc_attr( $max ) . '" min="' . esc_attr( $min ) . '" class="' . $size . '-text gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" ' . $required;
+		$html = '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
+		$html .= '<input type="number" step="' . esc_attr( $step ) . '" max="' . esc_attr( $max ) . '" min="' . esc_attr( $min ) . '" class="' . $size . '-text gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" ' . $required;
 
 		foreach ( $input_data as $data_id => $data_value ) {
 			$html .= ' data-' . $data_id . '="' . esc_html( $data_value ) . '" ';
 		}
 
 		$html .= ' /> ' . $args['desc2'];
-		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
 
 		if ( isset( $args['tooltip'] ) ) {
 			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . wp_kses_post( $args['tooltip'] ) . '</span>';
@@ -1741,14 +1738,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$input_data = ( isset( $args['data'] ) && is_array( $args['data'] ) ) ? $args['data'] : [];
 		$args['id'] = esc_attr( $args['id'] );
 
-		$html = '<textarea cols="50" rows="5" id="gfpdf_settings[' . $args['id'] . ']" class="large-text gfpdf_settings_' . $args['id'] . ' ' . $class . '" name="gfpdf_settings[' . $args['id'] . ']" ' . $required;
+		$html = '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
+		$html .= '<textarea cols="50" rows="5" id="gfpdf_settings[' . $args['id'] . ']" class="large-text gfpdf_settings_' . $args['id'] . ' ' . $class . '" name="gfpdf_settings[' . $args['id'] . ']" ' . $required;
 
 		foreach ( $input_data as $data_id => $data_value ) {
 			$html .= ' data-' . $data_id . '="' . esc_html( $data_value ) . '" ';
 		}
 
 		$html .= '>' . esc_textarea( stripslashes( $value ) ) . '</textarea>';
-		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
 
 		if ( isset( $args['tooltip'] ) ) {
 			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . wp_kses_post( $args['tooltip'] ) . '</span>';
@@ -1783,9 +1780,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$required   = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
 		$args['id'] = esc_attr( $args['id'] );
 
-		$size  = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? esc_attr( $args['size'] ) : 'regular';
-		$html  = '<input type="password" class="' . $size . '-text ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" ' . $required . ' />';
-		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
+		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? esc_attr( $args['size'] ) : 'regular';
+		$html = '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
+		$html .= '<input type="password" class="' . $size . '-text ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" ' . $required . ' />';
 
 		if ( isset( $args['tooltip'] ) ) {
 			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . wp_kses_post( $args['tooltip'] ) . '</span>';
@@ -1823,7 +1820,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$multiple_ext = '[]';
 		}
 
-		$html = '<select id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . ' ' . $class . ' ' . $chosen . '" name="gfpdf_settings[' . $args['id'] . ']' . $multiple_ext . '" data-placeholder="' . $placeholder . '" ' . $multiple . ' ' . $required;
+		$html = '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
+		$html .= '<select id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . ' ' . $class . ' ' . $chosen . '" name="gfpdf_settings[' . $args['id'] . ']' . $multiple_ext . '" data-placeholder="' . $placeholder . '" ' . $multiple . ' ' . $required;
 
 		foreach ( $input_data as $data_id => $data_value ) {
 			$html .= ' data-' . $data_id . '="' . esc_html( $data_value ) . '" ';
@@ -1832,7 +1830,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$html .= '>';
 		$html .= $this->build_options_for_select( $args['options'], $value );
 		$html .= '</select>';
-		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
 
 		if ( isset( $args['tooltip'] ) ) {
 			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . wp_kses_post( $args['tooltip'] ) . '</span>';
@@ -1910,6 +1907,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$args['id'] = esc_attr( $args['id'] );
 		$class      = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
 
+		$html = '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
+
 		if ( function_exists( 'wp_editor' ) ) {
 			ob_start();
 			echo '<span class="mt-gfpdf_settings_' . $args['id'] . '" style="float:right; position:relative; right: 10px; top: 90px;"></span>';
@@ -1927,12 +1926,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					]
 				)
 			);
-			$html = ob_get_clean();
+			$html .= ob_get_clean();
 		} else {
-			$html = '<textarea class="large-text" rows="' . $rows . '" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']">' . esc_textarea( stripslashes( $value ) ) . '</textarea>';
+			$html .= '<textarea class="large-text" rows="' . $rows . '" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']">' . esc_textarea( stripslashes( $value ) ) . '</textarea>';
 		}
-
-		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
 
 		if ( isset( $args['tooltip'] ) ) {
 			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . wp_kses_post( $args['tooltip'] ) . '</span>';
@@ -1971,9 +1968,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$args['id']           = esc_attr( $args['id'] );
 		$size                 = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? esc_attr( $args['size'] ) : 'regular';
 
-		$html  = '<input type="text" class="' . $size . '-text gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" ' . $required . ' />';
+		$html = '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
+		$html .= '<input type="text" class="' . $size . '-text gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" ' . $required . ' />';
 		$html .= '<span>&nbsp;<input type="button" class="gfpdf_settings_upload_button button-secondary" value="' . $button_text . '" data-uploader-title="' . $uploader_title . '" data-uploader-button-text="' . $uploader_button_text . '" /></span>';
-		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
 
 		if ( isset( $args['tooltip'] ) ) {
 			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . wp_kses_post( $args['tooltip'] ) . '</span>';
@@ -2003,8 +2000,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$required   = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
 		$args['id'] = esc_attr( $args['id'] );
 
-		$html  = '<input type="text" class="gfpdf-color-picker gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" data-default-color="' . esc_attr( $default ) . '" ' . $required . ' />';
-		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
+		$html = '<span class="gf_settings_description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span><div>';
+		$html .= '<input type="text" class="gfpdf-color-picker gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" data-default-color="' . esc_attr( $default ) . '" ' . $required . ' /></div>';
 
 		if ( isset( $args['tooltip'] ) ) {
 			$html .= '<span class="gf_hidden_tooltip" style="display: none;">' . wp_kses_post( $args['tooltip'] ) . '</span>';
@@ -2030,14 +2027,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$input_data = ( isset( $args['data'] ) && is_array( $args['data'] ) ) ? $args['data'] : [];
 		$class      = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
 
-		$html = '<button id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . '][name]" value="' . $args['id'] . '" class="button gfpdf-button ' . $class . '" type="submit"';
+		$html = '<span class="gf_settings_description">' . wp_kses_post( $args['desc'] ) . '</span>';
+		$html .= '<button id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . '][name]" value="' . $args['id'] . '" class="button gfpdf-button ' . $class . '" type="submit"';
 
 		foreach ( $input_data as $data_id => $data_value ) {
 			$html .= ' data-' . $data_id . '="' . esc_html( $data_value ) . '" ';
 		}
 
 		$html .= '>' . esc_html( $args['std'] ) . '</button>';
-		$html .= '<span class="gf_settings_description">' . wp_kses_post( $args['desc'] ) . '</span>';
 		$html .= '<input type="hidden" name="gfpdf_settings[' . $args['id'] . '][nonce]" value="' . $nonce . '" />';
 
 		if ( isset( $args['tooltip'] ) ) {
@@ -2045,6 +2042,33 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		}
 
 		echo $html;
+	}
+
+	public function toggle_callback( $args ) {
+		$value      = $this->get_form_value( $args );
+
+		if( in_array( $value, [ '', '' ], true ) ) {
+
+		}
+
+		$class      = isset( $args['inputClass'] ) ? esc_attr( $args['inputClass'] ) : '';
+		$args['id'] = esc_attr( $args['id'] );
+		$name = isset( $args['name'] ) ? $args['name'] : '';
+
+		?>
+		<div class="gform-settings-field gform-settings-field__toggle <?= $class ?>">
+			<span class="gform-settings-input__container">
+				<input type="checkbox" id="gfpdf_settings[<?= $args['id'] ?>]" name="gfpdf_settings[<?= $args['id'] ?>]" value="1" toggle_label="<?= esc_attr( $name ) ?>">
+				<label class="gform-settings-field__toggle-container" for="gfpdf_settings[<?= $args['id'] ?>]">
+					<?php if ( strlen( $name ) > 0 ): ?>
+						<span class="screen-reader-text"><?= $name ?></span>
+					<?php endif; ?>
+
+					<span class="gform-settings-field__toggle-switch"></span>
+				</label>
+			</span>
+		</div>
+		<?php
 	}
 
 	/**
@@ -2122,7 +2146,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$class       = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
 		$size        = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? esc_attr( $args['size'] ) : 'regular';
 
-		$html  = '<input type="number" class="' . $size . '-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_width" min="0" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( stripslashes( $value[0] ) ) . '" /> ' . esc_html__( 'Width', 'gravity-forms-pdf-extended' );
+		$html = '<span class="gf_settings_description"><label for="gfpdf_settings[' . esc_attr( $args['id'] ) . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
+		$html .= '<input type="number" class="' . $size . '-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_width" min="0" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( stripslashes( $value[0] ) ) . '" /> ' . esc_html__( 'Width', 'gravity-forms-pdf-extended' );
 		$html .= ' <input type="number" class="' . $size . '-text gfpdf_settings_' . $args['id'] . '" id="gfpdf_settings[' . $args['id'] . ']_height" min="0" name="gfpdf_settings[' . $args['id'] . '][]" value="' . esc_attr( stripslashes( $value[1] ) ) . '" /> ' . esc_html__( 'Height', 'gravity-forms-pdf-extended' );
 
 		$measurement = apply_filters(
@@ -2142,8 +2167,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		}
 
 		$html .= '</select> ';
-
-		$html .= '<span class="gf_settings_description"><label for="gfpdf_settings[' . esc_attr( $args['id'] ) . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
 
 		echo $html;
 	}

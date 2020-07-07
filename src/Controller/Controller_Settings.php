@@ -127,7 +127,14 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		 * Tell Gravity Forms to initiate our settings page
 		 * Using the following Class/Model
 		 */
-		GFForms::add_settings_page( $this->data->short_title, [ $this, 'display_page' ] );
+		GFForms::add_settings_page(
+			[
+				'name'    => $this->data->short_title,
+				'icon'    => 'dashicons-media-document',
+				'handler' => [ $this, 'display_page' ],
+			],
+			''
+		);
 
 		/* run actions and filters */
 		$this->add_actions();
@@ -143,9 +150,10 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	 */
 	public function add_actions() {
 
-		/* Display our system status on general and tools pages */
-		add_action( 'gfpdf_post_general_settings_page', [ $this->view, 'system_status' ] );
-		add_action( 'gfpdf_post_tools_settings_page', [ $this->view, 'system_status' ] );
+		/* Add our PDF Settings submenu navigation */
+		if ( \GFForms::get_page( 'settings' ) && $this->misc->is_gfpdf_page() ) {
+			add_action( 'gform_page_header_bar_after', [ $this->view, 'tabs' ] );
+		}
 
 		/**
 		 * Display the uninstaller if use has the correct permissions

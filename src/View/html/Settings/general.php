@@ -14,25 +14,82 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+$settings = function( $id, $output_title = false ) {
+	global $wp_settings_fields;
+
+	if ( ! isset( $wp_settings_fields[ $id ][ $id ] ) ) {
+		return;
+	}
+
+	foreach ( (array) $wp_settings_fields[ $id ][ $id ] as $field ) {
+		$class = '';
+		if ( ! empty( $field['args']['class'] ) ) {
+			$class = ' class="' . esc_attr( $field['args']['class'] ) . '"';
+		}
+		?>
+
+		<div<?= $class ?>>
+			<?php if ( $output_title ): ?>
+				<div class='gform-settings-panel__title'><?= $field['title'] ?></div>
+			<?php endif; ?>
+
+			<?php call_user_func( $field['callback'], $field['args'] ) ?>
+		</div>
+		<?php
+	}
+};
+
 ?>
 
-<?php $this->tabs(); ?>
-
-
 <div id="pdfextended-settings">
-	<h3>
-		<span>
-			<i class="fa fa-cog"></i>
-			<?php esc_html_e( 'General Settings', 'gravity-forms-pdf-extended' ); ?>
-		</span>
-	</h3>
 
-	<form method="post" action="options.php">
+	<form class="gform_settings_form" method="post" action="options.php">
 		<?php settings_fields( 'gfpdf_settings' ); ?>
 
-		<table id="pdf-general" class="form-table">
-			<?php do_settings_fields( 'gfpdf_settings_general', 'gfpdf_settings_general' ); ?>
-		</table>
+		<fieldset id="" class="gform-settings-panel gform-settings-panel--full">
+			<header class="gform-settings-panel__header">
+				<legend class="gform-settings-panel__title">Default PDF Options</legend>
+			</header>
+
+			<div class="gform-settings-panel__content gform_settings_form">
+				<div class="gform-settings-description" style="grid-column: span 2">Control the default settings to use when you create new PDFs on your forms.</div>
+				<?php $settings( 'gfpdf_settings_general', true ); ?>
+			</div>
+		</fieldset>
+
+		<fieldset id="" class="gform-settings-panel gform-settings-panel--full">
+			<header class="gform-settings-panel__header">
+				<legend class="gform-settings-panel__title">Entry View</legend>
+			</header>
+
+			<div class="gform-settings-panel__content">
+				<?php $settings( 'gfpdf_settings_general_view' ); ?>
+			</div>
+		</fieldset>
+
+		<fieldset id="" class="gform-settings-panel gform-settings-panel--half">
+			<header class="gform-settings-panel__header">
+				<legend class="gform-settings-panel__title">
+					<?= esc_html__( 'Background Processing', 'gravity-forms-pdf-extended' ) ?>
+				</legend>
+			</header>
+
+			<div class="gform-settings-panel__content">
+				<?php $settings( 'gfpdf_settings_general_background_processing' ); ?>
+			</div>
+		</fieldset>
+
+		<fieldset id="" class="gform-settings-panel gform-settings-panel--half">
+			<header class="gform-settings-panel__header">
+				<legend class="gform-settings-panel__title">Debug Mode</legend>
+			</header>
+
+			<div class="gform-settings-panel__content">
+				<?php $settings( 'gfpdf_settings_general_debug_mode' ); ?>
+			</div>
+		</fieldset>
+
+
 
 		<div id="gfpdf-advanced-options">
 			<h3>
@@ -47,7 +104,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</table>
 		</div>
 
-		<div class="gfpdf-advanced-options"><a href="#"><?php esc_html_e( 'Show Advanced Options...', 'gravity-forms-pdf-extended' ); ?></a></div>
+		<div class="gfpdf-advanced-options">
+			<a href="#"><?php esc_html_e( 'Show Advanced Options...', 'gravity-forms-pdf-extended' ); ?></a></div>
 
 		<?php
 		if ( $args['edit_cap'] ) {
@@ -56,8 +114,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 		?>
 
 		<div class="extensions-upsell">
-			<a href="https://gravitypdf.com/extension-shop/">
-				<?php esc_html_e( 'Want more features? Take a look at our Extension Shop.', 'gravity-forms-pdf-extended' ); ?>
+			<a href="https://gravitypdf.com/store/">
+				<?php esc_html_e( 'Want more features? Take a look at our addons.', 'gravity-forms-pdf-extended' ); ?>
 			</a>
 		</div>
 	</form>

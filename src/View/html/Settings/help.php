@@ -16,9 +16,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ?>
 
-<?php $this->tabs(); ?>
-
-
 <div id="pdfextended-settings">
 	<div class="wrap about-wrap">
 		<h1><?php esc_html_e( 'Getting Help With Gravity PDF', 'gravity-forms-pdf-extended' ); ?></h1>

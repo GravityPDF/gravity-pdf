@@ -128,9 +128,9 @@ class View_Settings extends Helper_Abstract_View {
 	/**
 	 * Load the Welcome Tab tabs
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function tabs() {
 
@@ -153,15 +153,11 @@ class View_Settings extends Helper_Abstract_View {
 	 * @since 4.0
 	 */
 	public function get_avaliable_tabs() {
-		/**
-		 * Store the setting navigation
-		 * The array key is the settings order
-		 *
-		 * @var array
-		 */
+
+		/* The array key is the settings order */
 		$navigation = [
-			5   => [
-				'name' => esc_html__( 'General', 'gravity-forms-pdf-extended' ),
+			5 => [
+				'name' => esc_html__( 'Settings', 'gravity-forms-pdf-extended' ),
 				'id'   => 'general',
 			],
 
@@ -238,7 +234,6 @@ class View_Settings extends Helper_Abstract_View {
 	 * @since 4.0
 	 */
 	public function general() {
-
 		$vars = [
 			'edit_cap' => $this->gform->has_capability( 'gravityforms_edit_settings' ),
 		];
@@ -313,9 +308,9 @@ class View_Settings extends Helper_Abstract_View {
 	 *
 	 * @param array $tooltips The existing tooltips
 	 *
+	 * @return string
 	 * @since 4.0
 	 *
-	 * @return string
 	 */
 	public function add_tooltips( $tooltips ) {
 

@@ -16,8 +16,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ?>
 
-<h2 class="nav-tab-wrapper">
-	<?php foreach ( $args['tabs'] as $tab ): ?>
-		<a data-id="<?php echo esc_attr( $tab['id'] ); ?>" class="nav-tab <?php echo ( $args['selected'] === $tab['id'] ) ? 'nav-tab-active' : ''; ?>" href="<?php echo $args['data']->settings_url . '&amp;tab=' . $tab['id']; ?>"><?php echo $tab['name']; ?></a>
-	<?php endforeach; ?>
-</h2>
+<div id="gform-form-toolbar">
+	<div class="gform-settings__wrapper" style="padding: 0">
+		<div></div><!-- Grid override -->
+		<ul id="gform-form-toolbar__menu">
+			<?php foreach ( $args['tabs'] as $tab ): ?>
+				<li><a data-id="<?php echo esc_attr( $tab['id'] ); ?>" class="<?= $args['selected'] === $tab['id'] ? 'gf_toolbar_active' : ''; ?>" href="<?php echo $args['data']->settings_url . '&amp;tab=' . $tab['id']; ?>"><?= esc_html( $tab['name'] ); ?></a></li>
+			<?php endforeach; ?>
+		</ul>
+	</div>
+</div>

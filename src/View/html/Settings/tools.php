@@ -16,9 +16,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ?>
 
-<?php $this->tabs(); ?>
-
-
 <div id="pdfextended-settings">
 	<h3>
 		<span>

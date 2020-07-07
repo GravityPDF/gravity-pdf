@@ -509,6 +509,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			'gform_placeholder',
 			'jquery-ui-autocomplete',
 			'thickbox',
+			'gform_selectwoo'
 		];
 
 		foreach ( $wp_scripts->queue as $object ) {

@@ -105,6 +105,19 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'tooltip'    => '<h6>' . esc_html__( 'Fonts', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Gravity PDF comes bundled with fonts for most languages world-wide. Want to use a specific font type? Use the font installer (found in the Tools tab).', 'gravity-forms-pdf-extended' ),
 					],
 
+					'default_rtl'             => [
+						'id'      => 'default_rtl',
+						'name'    => esc_html__( 'Reverse Text (RTL)', 'gravity-forms-pdf-extended' ),
+						'desc'    => esc_html__( 'Script like Arabic and Hebrew are written right to left.', 'gravity-forms-pdf-extended' ),
+						'type'    => 'radio',
+						'options' => [
+							'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
+							'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
+						],
+						'std'     => 'No',
+						'tooltip' => '<h6>' . esc_html__( 'Reverse Text (RTL)', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( "Enable RTL if you are writing in Arabic, Hebrew, Syriac, N'ko, Thaana, Tifinar, Urdu or other RTL languages.", 'gravity-forms-pdf-extended' ),
+					],
+
 					'default_font_size'       => [
 						'id'    => 'default_font_size',
 						'name'  => esc_html__( 'Default Font Size', 'gravity-forms-pdf-extended' ),
@@ -122,60 +135,49 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'std'  => '#000000',
 						'desc' => esc_html__( 'Set the default font color used in PDFs.', 'gravity-forms-pdf-extended' ),
 					],
-
-					'default_rtl'             => [
-						'id'      => 'default_rtl',
-						'name'    => esc_html__( 'Reverse Text (RTL)', 'gravity-forms-pdf-extended' ),
-						'desc'    => esc_html__( 'Script like Arabic and Hebrew are written right to left.', 'gravity-forms-pdf-extended' ),
-						'type'    => 'radio',
-						'options' => [
-							'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
-							'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
-						],
-						'std'     => 'No',
-						'tooltip' => '<h6>' . esc_html__( 'Reverse Text (RTL)', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( "Enable RTL if you are writing in Arabic, Hebrew, Syriac, N'ko, Thaana, Tifinar, Urdu or other RTL languages.", 'gravity-forms-pdf-extended' ),
-					],
-
-					'default_action'          => [
-						'id'      => 'default_action',
-						'name'    => esc_html__( 'Entry View', 'gravity-forms-pdf-extended' ),
-						'desc'    => sprintf( esc_html__( 'Select the default action used when accessing a PDF from the %1$sGravity Forms entries list%2$s page.', 'gravity-forms-pdf-extended' ), '<a href="' . admin_url( 'admin.php?page=gf_entries' ) . '">', '</a>' ),
-						'type'    => 'radio',
-						'options' => [
-							'View'     => esc_html__( 'View', 'gravity-forms-pdf-extended' ),
-							'Download' => esc_html__( 'Download', 'gravity-forms-pdf-extended' ),
-						],
-						'std'     => 'View',
-						'tooltip' => '<h6>' . esc_html__( 'Entry View', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Choose to view the PDF in your web browser or download the document to your computer.', 'gravity-forms-pdf-extended' ),
-					],
-
-					'background_processing'   => [
-						'id'      => 'background_processing',
-						'name'    => esc_html__( 'Background Processing', 'gravity-forms-pdf-extended' ),
-						'desc'    => sprintf( esc_html__( 'When enable, form submission and resending notifications with PDFs are handled in a background task. %1$sRequires Background tasks to be enabled%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/background-processing/">', '</a>' ),
-						'type'    => 'radio',
-						'options' => [
-							'Enable'  => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
-							'Disable' => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
-						],
-						'std'     => 'Disable',
-						'tooltip' => '<h6>' . esc_html__( 'Background Processing', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'When enabled, reduce wait time during form submission as PDF generation is off-loaded to a background process. It is important to ensure Background Tasks are enabled in the Gravity Forms System Status before enabling this feature.', 'gravity-forms-pdf-extended' ),
-					],
-
-					'debug_mode'              => [
-						'id'      => 'debug_mode',
-						'name'    => esc_html__( 'Debug Mode', 'gravity-forms-pdf-extended' ),
-						'type'    => 'radio',
-						'options' => [
-							'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
-							'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
-						],
-						'std'     => 'No',
-						'desc'    => esc_html__( 'When enabled, debug information will be displayed on-screen for core features.', 'gravity-forms-pdf-extended' ),
-						'tooltip' => '<h6>' . esc_html__( 'Debug Mode', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'When enabled, template caching is turned off and flushed, shortcode errors will be displayed on-screen and generation statistics will be included in PDFs.', 'gravity-forms-pdf-extended' ),
-					],
 				]
 			),
+
+			'general_view' => [
+				'default_action'          => [
+					'id'      => 'default_action',
+					'name'    => esc_html__( 'Entry View', 'gravity-forms-pdf-extended' ),
+					'desc'    => sprintf( esc_html__( 'Select the default action used when accessing a PDF from the %1$sGravity Forms entries list%2$s page.', 'gravity-forms-pdf-extended' ), '<a href="' . admin_url( 'admin.php?page=gf_entries' ) . '">', '</a>' ),
+					'type'    => 'radio',
+					'options' => [
+						'View'     => esc_html__( 'View', 'gravity-forms-pdf-extended' ),
+						'Download' => esc_html__( 'Download', 'gravity-forms-pdf-extended' ),
+					],
+					'std'     => 'View',
+					'tooltip' => '<h6>' . esc_html__( 'Entry View', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Choose to view the PDF in your web browser or download the document to your computer.', 'gravity-forms-pdf-extended' ),
+				],
+			],
+
+			'general_background_processing' => [
+				'background_processing'   => [
+					'id'      => 'background_processing',
+					'name'    => esc_html__( 'Background Processing', 'gravity-forms-pdf-extended' ),
+					'desc'    => sprintf( esc_html__( 'When enable, form submission and resending notifications with PDFs are handled in a background task. %1$sRequires Background tasks to be enabled%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/background-processing/">', '</a>' ),
+					'type'    => 'toggle',
+					'std'     => '0',
+					'tooltip' => '<h6>' . esc_html__( 'Background Processing', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'When enabled, reduce wait time during form submission as PDF generation is off-loaded to a background process. It is important to ensure Background Tasks are enabled in the Gravity Forms System Status before enabling this feature.', 'gravity-forms-pdf-extended' ),
+				],
+			],
+
+			'general_debug_mode' => [
+				'debug_mode'              => [
+					'id'      => 'debug_mode',
+					'name'    => esc_html__( 'Debug Mode', 'gravity-forms-pdf-extended' ),
+					'type'    => 'radio',
+					'options' => [
+						'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
+						'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
+					],
+					'std'     => 'No',
+					'desc'    => esc_html__( 'When enabled, debug information will be displayed on-screen for core features.', 'gravity-forms-pdf-extended' ),
+					'tooltip' => '<h6>' . esc_html__( 'Debug Mode', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'When enabled, template caching is turned off and flushed, shortcode errors will be displayed on-screen and generation statistics will be included in PDFs.', 'gravity-forms-pdf-extended' ),
+				],
+			],
 
 			/* See https://gravitypdf.com/documentation/v5/gfpdf_settings_general_security/ for more details about this filter */
 			'general_security'                => apply_filters(
