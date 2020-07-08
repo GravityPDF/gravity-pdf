@@ -67,7 +67,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'type'       => 'select',
 						'options'    => $this->get_paper_size(),
 						'inputClass' => 'large',
-						'chosen'     => true,
 						'class'      => 'gfpdf_paper_size',
 					],
 
@@ -77,8 +76,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'desc'     => esc_html__( 'Control the exact paper size. Can be set in millimeters or inches.', 'gravity-forms-pdf-extended' ),
 						'type'     => 'paper_size',
 						'size'     => 'small',
-						'chosen'   => true,
-						'required' => true,
 						'class'    => 'gfpdf-hidden gfpdf_paper_size_other',
 					],
 
@@ -90,7 +87,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'options'    => $this->templates->get_all_templates_by_group(),
 						'std'        => 'zadani',
 						'inputClass' => 'large',
-						'chosen'     => true,
 						'tooltip'    => '<h6>' . esc_html__( 'Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'Gravity PDF comes with %1$sfour completely-free and highly customizable designs%2$s. You can also purchase additional templates from our template shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
 					],
 
@@ -101,7 +97,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'type'       => 'select',
 						'options'    => $this->get_installed_fonts(),
 						'inputClass' => 'large',
-						'chosen'     => true,
 						'tooltip'    => '<h6>' . esc_html__( 'Fonts', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Gravity PDF comes bundled with fonts for most languages world-wide. Want to use a specific font type? Use the font installer (found in the Tools tab).', 'gravity-forms-pdf-extended' ),
 					],
 

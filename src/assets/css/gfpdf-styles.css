@@ -10,6 +10,37 @@
  width: 33%;
 }
 
+.gform-settings-panel .gform-settings-panel__content .gform-settings-panel__title {
+ font-weight: bold;
+}
+
+.gform-settings-panel__content input[type="number"].small-text {
+ width: 5rem;
+}
+
+.gform-settings-field__select-enhanced-container .select2-results__options .select2-results__options {
+ overflow-y: initial;
+ max-height: initial;
+}
+
+/*
+ * Color Picker
+ */
+.gform-settings-panel__content .wp-color-result-text,
+.gform-settings-panel__content .wp-picker-container input[type="text"].wp-color-picker {
+ font-size: .875rem;
+}
+
+.gform-settings-panel__content .wp-picker-container input[type="text"].wp-color-picker {
+ width: 6rem;
+ padding-top: 1px;
+ padding-bottom: 1px;
+}
+
+.gform-settings-panel__content .wp-picker-container .wp-color-result.button {
+ padding-left: 35px;
+ border: 1px solid #9092B2;
+}
 
 /*
  * Getting Started Welcome Page
@@ -241,11 +272,7 @@ div img.gfpdf-image {
  display: none;
 }
 
-#pdfextended-settings select.large,
-#tab_pdf select.large {
- width: 100%;
- max-width: 350px;
-}
+
 
 #tab_pdf .formSubmitted input:invalid {
  border: 1px solid red;
@@ -847,14 +874,10 @@ div img.gfpdf-image {
  font-size: 18px;
 }
 
-#fancy-template-selector {
- margin-left: 5px;
- vertical-align: middle;
-}
-
-#gpdf-advance-template-selector button {
- vertical-align: middle;
- margin-left: 5px;
+#gpdf-advance-template-selector {
+ display: inline-block;
+ margin: 0.25rem;
+ vertical-align: top;
 }
 
 #gfpdf-template-container .theme.add-new-theme a.doing-ajax span:after,
@@ -999,36 +1022,6 @@ div img.gfpdf-image {
   width: auto;
  }
 
- /* Chosen Styles */
- .gfpdf-page .chosen-container {
-  font-size: 17px;
- }
-
- .gfpdf-page .chosen-container-single .chosen-single {
-  height: 38px;
-  line-height: 34px;
- }
-
- .gfpdf-page .chosen-container-single .chosen-single div {
-  top: 7px;
- }
-
- .gfpdf-page .chosen-container .chosen-results li {
-  line-height: 24px;
- }
-
- .gfpdf-page .chosen-container-multi .chosen-choices li.search-choice {
-  line-height: 24px;
- }
-
- .gfpdf-page .chosen-container-multi .chosen-choices li.search-choice .search-choice-close {
-  top: 10px;
- }
-
- .gfpdf-page .chosen-container-multi .chosen-choices li.search-field input[type="text"] {
-  height: 38px;
- }
-
  /* Input Styles */
  .gfpdf-page .form-table tbody td input[type="number"] {
   font-size: 16px;
@@ -1121,11 +1114,6 @@ div img.gfpdf-image {
  #pdfextended-settings #pdf-system-status td {
   padding-top: 10px;
   padding-bottom: 10px;
- }
-
- /* Chosen Styles */
- .gfpdf-page .chosen-container {
-  max-width: 300px;
  }
 
  /* Conditional Logic */
