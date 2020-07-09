@@ -151,7 +151,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	public function add_actions() {
 
 		/* Add our PDF Settings submenu navigation */
-		if ( \GFForms::get_page( 'settings' ) && $this->misc->is_gfpdf_page() ) {
+		if ( \GFForms::get_page() === 'settings' && $this->misc->is_gfpdf_page() ) {
 			add_action( 'gform_page_header_bar_after', [ $this->view, 'tabs' ] );
 		}
 

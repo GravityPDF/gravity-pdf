@@ -1425,6 +1425,17 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					return $args['multi-option'];
 				}
 
+				/* Add support for switching setting from (multi)select to multicheck */
+				$options = isset( $options[ $args['id'] ] ) ? array_flip( $options[ $args['id'] ] ) : [];
+				if ( isset( $options[ $args['multi-option'] ] ) ) {
+					return $args['multi-option'];
+				}
+
+				$options = isset( $pdf_form_settings[ $args['id'] ] ) ? array_flip( $pdf_form_settings[ $args['id'] ] ) : [];
+				if ( isset( $options[ $args['multi-option'] ] ) ) {
+					return $args['multi-option'];
+				}
+
 				break;
 
 			case 'radio':
@@ -1833,7 +1844,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 			$select .= '<script type="text/javascript">
 					jQuery( document ).ready( function () {
-						jQuery( "#gfpdf_settings\\\\[' . esc_attr( $args['id'] ) . '\\\\]" ).selectWoo( {
+						jQuery( "#gfpdf_settings\\\\[' . esc_attr( $args['id'] ) . '\\\\]" ).select2( {
 							minimumResultsForSearch: Infinity,
 							dropdownCssClass: "gform-settings-field__select-enhanced-container",
 							dropdownParent: jQuery( "#gfpdf_settings\\\\[' . esc_attr( $args['id'] ) . '\\\\]" ).parent(),

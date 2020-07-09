@@ -234,8 +234,53 @@ class View_Settings extends Helper_Abstract_View {
 	 * @since 4.0
 	 */
 	public function general() {
+
+		$markup = new View_GravityForm_Settings_Markup();
+
+		$sections = [
+			[
+				'id'            => 'gfpdf_settings_general',
+				'width'         => 'full',
+				'title'         => __( 'Default PDF Options', 'gravity-forms-pdf-extended' ),
+				'desc'          => __( 'Control the default settings to use when you create new PDFs on your forms.', 'gravity-forms-pdf-extended' ),
+				'content'       => $markup->do_settings_fields( 'gfpdf_settings_general', $markup::ENABLE_PANEL_TITLE ),
+				'content_class' => 'gform_settings_form',
+			],
+
+			[
+				'id'      => 'gfpdf_settings_general_view',
+				'width'   => 'full',
+				'title'   => __( 'Entry View', 'gravity-forms-pdf-extended' ),
+				'content' => $markup->do_settings_fields( 'gfpdf_settings_general_view', $markup::DISABLE_PANEL_TITLE ),
+			],
+
+			[
+				'id'      => 'gfpdf_settings_general_background_processing',
+				'width'   => 'half',
+				'title'   => __( 'Background Processing', 'gravity-forms-pdf-extended' ),
+				'content' => $markup->do_settings_fields( 'gfpdf_settings_general_background_processing', $markup::DISABLE_PANEL_TITLE ),
+			],
+
+			[
+				'id'      => 'gfpdf_settings_general_debug_mode',
+				'width'   => 'half',
+				'title'   => __( 'Debug Mode', 'gravity-forms-pdf-extended' ),
+				'content' => $markup->do_settings_fields( 'gfpdf_settings_general_debug_mode', $markup::DISABLE_PANEL_TITLE ),
+			],
+
+			[
+				'id'            => 'gfpdf_settings_general_security',
+				'width'         => 'full',
+				'collapsable'   => true,
+				'title'         => __( 'Security', 'gravity-forms-pdf-extended' ),
+				'content'       => $markup->do_settings_fields( 'gfpdf_settings_general_security', $markup::ENABLE_PANEL_TITLE ),
+				'content_class' => 'gform_settings_form',
+			],
+		];
+
 		$vars = [
 			'edit_cap' => $this->gform->has_capability( 'gravityforms_edit_settings' ),
+			'content'  => $markup->do_settings_sections( $sections ),
 		];
 
 		/* load the system status view */

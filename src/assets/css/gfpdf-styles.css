@@ -8,6 +8,7 @@
 .gfpdf-settings-multicheck-wrapper {
  float: left;
  width: 33%;
+ padding-bottom: 3px;
 }
 
 .gform-settings-panel .gform-settings-panel__content .gform-settings-panel__title {
@@ -40,6 +41,11 @@
 .gform-settings-panel__content .wp-picker-container .wp-color-result.button {
  padding-left: 35px;
  border: 1px solid #9092B2;
+}
+
+.rtl .gform-settings-panel__content .wp-picker-container .wp-color-result.button {
+ padding-lefT: 0;
+ padding-right: 35px;
 }
 
 /*
@@ -197,12 +203,17 @@ div img.gfpdf-image {
  padding: 0 0 40px;
 }
 
-
 /*
  * General Settings Page
  */
 #pdfextended-settings {
  margin-top: 20px;
+}
+
+#submit-and-promo-container {
+ display: flex;
+ justify-content: space-between;
+ grid-column: span 2;
 }
 
 #pdfextended-settings h3,
@@ -282,7 +293,12 @@ div img.gfpdf-image {
  margin: 0 12px 0 0;
 }
 
-.rtl #pdfextended-settings label, .rtl #tab_pdf label {
+.rtl .gform-settings-panel__content .gform-settings-description {
+ float: right;
+ width: 100%;
+}
+
+.rtl .gform-settings-panel__content label {
  float: right;
  margin-left: 5px;
 }
@@ -839,8 +855,8 @@ div img.gfpdf-image {
  opacity: 1;
  left: inherit;
  border-top: none;
- height: 38px;
- padding: 9px 10px 0;
+ height: 41px;
+ padding: 6px 3px 0;
  top: auto;
 
  -moz-box-sizing: content-box;
@@ -849,6 +865,11 @@ div img.gfpdf-image {
  -webkit-transform: none;
  transform: none;
  box-shadow: none;
+}
+
+.rtl #gfpdf-template-container .theme .theme-actions {
+ right: inherit;
+ left: 0;
 }
 
 #gfpdf-template-container .wp-filter-search {
@@ -867,6 +888,12 @@ div img.gfpdf-image {
 #gfpdf-overlay h1 {
  float: left;
  padding-left: 2%;
+}
+
+.rtl #gfpdf-overlay h1 {
+ float: right;
+ padding-left: 0;
+ padding-right: 2%;
 }
 
 #gfpdf-overlay p.no-themes {
