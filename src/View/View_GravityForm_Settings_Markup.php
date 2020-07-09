@@ -67,11 +67,31 @@ class View_GravityForm_Settings_Markup extends Helper_Abstract_View {
 
 			if ( $output_title === self::ENABLE_PANEL_TITLE ) {
 				$args['title'] = $field['title'];
+
+				if ( ! empty( $field['args']['tooltip'] ) ) {
+					$args['tooltip'] = $this->get_tooltip_markup( $field['args']['tooltip'] );
+				}
 			}
 
 			$this->load( 'settings_field', $args );
 		}
 
 		return ob_get_clean();
+	}
+
+	public function get_tooltip_markup( $html ) {
+		$name = 'gfpdf_tooltip';
+
+		$register = function( $tooltips ) use ( $name, $html ) {
+			$tooltips[ $name ] = $html;
+
+			return $tooltips;
+		};
+
+		add_filter( 'gform_tooltips', $register );
+		$tooltip = gform_tooltip( $name, 'gfpdf-tooltip', true );
+		remove_filter( 'gform_tooltips', $register );
+
+		return $tooltip;
 	}
 }

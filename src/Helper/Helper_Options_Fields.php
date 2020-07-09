@@ -144,7 +144,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'Download' => esc_html__( 'Download', 'gravity-forms-pdf-extended' ),
 					],
 					'std'     => 'View',
-					'tooltip' => '<h6>' . esc_html__( 'Entry View', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Choose to view the PDF in your web browser or download the document to your computer.', 'gravity-forms-pdf-extended' ),
 				],
 			],
 
@@ -155,7 +154,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'desc'    => sprintf( esc_html__( 'When enable, form submission and resending notifications with PDFs are handled in a background task. %1$sRequires Background tasks to be enabled%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/background-processing/">', '</a>' ),
 					'type'    => 'toggle',
 					'std'     => '0',
-					'tooltip' => '<h6>' . esc_html__( 'Background Processing', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'When enabled, reduce wait time during form submission as PDF generation is off-loaded to a background process. It is important to ensure Background Tasks are enabled in the Gravity Forms System Status before enabling this feature.', 'gravity-forms-pdf-extended' ),
 				],
 			],
 
@@ -166,7 +164,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'type'    => 'toggle',
 					'std'     => '0',
 					'desc'    => esc_html__( 'When enabled, debug information will be displayed on-screen for core features.', 'gravity-forms-pdf-extended' ),
-					'tooltip' => '<h6>' . esc_html__( 'Debug Mode', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'When enabled, template caching is turned off and flushed, shortcode errors will be displayed on-screen and generation statistics will be included in PDFs.', 'gravity-forms-pdf-extended' ),
 				],
 			],
 

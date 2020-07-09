@@ -16,7 +16,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div class="<?= esc_attr( $args['class'] ) ?>">
 	<?php if ( ! empty( $args['title'] ) ): ?>
-		<div class='gform-settings-panel__title'><?= esc_html( $args['title'] ) ?></div>
+		<div class='gform-settings-panel__title'>
+			<?= esc_html( $args['title'] ) ?>
+
+			<?php if ( ! empty( $args['tooltip'] ) ): ?>
+				<?= $args['tooltip'] ?>
+			<?php endif; ?>
+		</div>
 	<?php endif; ?>
 
 	<?php call_user_func( $args['callback'], $args['callback_args'] ) ?>

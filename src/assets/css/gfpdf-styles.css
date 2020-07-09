@@ -214,6 +214,7 @@ div img.gfpdf-image {
  display: flex;
  justify-content: space-between;
  grid-column: span 2;
+ margin-top: 0.5rem;
 }
 
 #pdfextended-settings h3,
