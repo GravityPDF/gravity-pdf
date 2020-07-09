@@ -219,7 +219,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/* Add localisation support */
 		$this->add_localization_support();
 
-		/**
+		/*
 		 * Run generic actions and filters needed to get the plugin functional
 		 * The controllers will set more specific actions / filters as needed
 		 */
@@ -597,6 +597,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		if ( $this->misc->is_gfpdf_page() || $pagenow === 'options.php' ) {
 			/* register our options settings */
 			$this->options->register_settings( $this->options->get_registered_fields() );
+			$this->add_admin_messages();
 		}
 	}
 
@@ -884,6 +885,14 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$class->init();
 
 		$this->singleton->add_class( $class );
+	}
+
+	public function add_admin_messages() {
+		$messages = get_settings_errors( 'gfpdf-notices' );
+
+		foreach( $messages as $message ) {
+			\GFCommon::add_message( $message['message'], $message['type'] !== 'updated' );
+		}
 	}
 
 	/**

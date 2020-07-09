@@ -195,7 +195,6 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		/* If trying to save settings page we'll use this filter to apply any errors passed back from options.php */
 		if ( $this->misc->is_gfpdf_page() ) {
 			add_filter( 'gfpdf_registered_fields', [ $this->model, 'highlight_errors' ] );
-			add_filter( 'admin_notices', 'settings_errors' );
 			add_filter( 'gfpdf_localised_script_array', array( $this->model, 'get_template_data' ) );
 		}
 

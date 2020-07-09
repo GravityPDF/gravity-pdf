@@ -14,6 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+\GFCommon::display_admin_message();
+
 ?>
 
 <div id="pdfextended-settings">
@@ -25,11 +27,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<?= $content ?>
 
 		<div id="submit-and-promo-container">
-			<?php
-			if ( $args['edit_cap'] ) {
-				submit_button( null, 'primary', 'submit', false );
-			}
-			?>
+			<?php if ( $args['edit_cap'] ): ?>
+				<input type="submit" name="submit" id="submit" value="<?= __( 'Save Settings  →', 'gravityforms' ) ?>" class="button primary large">
+			<?php endif; ?>
 
 			<div class="extensions-upsell">
 				<a href="https://gravitypdf.com/store/">
