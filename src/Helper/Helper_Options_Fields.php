@@ -57,8 +57,8 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			 *
 			 * See https://gravitypdf.com/documentation/v5/gfpdf_settings_general/ for more details about this filter
 			 */
-			'general'                         => apply_filters(
-				'gfpdf_settings_general',
+			'general_defaults'                         => apply_filters(
+				'gfpdf_settings_general_defaults',
 				[
 					'default_pdf_size'        => [
 						'id'         => 'default_pdf_size',
@@ -133,40 +133,37 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				]
 			),
 
-			/* @TODO - merge into single group */
-			'general_view' => [
-				'default_action'          => [
-					'id'      => 'default_action',
-					'name'    => esc_html__( 'Entry View', 'gravity-forms-pdf-extended' ),
-					'desc'    => sprintf( esc_html__( 'Select the default action used when accessing a PDF from the %1$sGravity Forms entries list%2$s page.', 'gravity-forms-pdf-extended' ), '<a href="' . admin_url( 'admin.php?page=gf_entries' ) . '">', '</a>' ),
-					'type'    => 'radio',
-					'options' => [
-						'View'     => esc_html__( 'View', 'gravity-forms-pdf-extended' ),
-						'Download' => esc_html__( 'Download', 'gravity-forms-pdf-extended' ),
+			'general' => apply_filters(
+				'gfpdf_settings_general', [
+					'default_action' => [
+						'id'      => 'default_action',
+						'name'    => esc_html__( 'Entry View', 'gravity-forms-pdf-extended' ),
+						'desc'    => sprintf( esc_html__( 'Select the default action used when accessing a PDF from the %1$sGravity Forms entries list%2$s page.', 'gravity-forms-pdf-extended' ), '<a href="' . admin_url( 'admin.php?page=gf_entries' ) . '">', '</a>' ),
+						'type'    => 'radio',
+						'options' => [
+							'View'     => esc_html__( 'View', 'gravity-forms-pdf-extended' ),
+							'Download' => esc_html__( 'Download', 'gravity-forms-pdf-extended' ),
+						],
+						'std'     => 'View',
 					],
-					'std'     => 'View',
-				],
-			],
 
-			'general_background_processing' => [
-				'background_processing'   => [
-					'id'      => 'background_processing',
-					'name'    => esc_html__( 'Background Processing', 'gravity-forms-pdf-extended' ),
-					'desc'    => sprintf( esc_html__( 'When enable, form submission and resending notifications with PDFs are handled in a background task. %1$sRequires Background tasks to be enabled%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/background-processing/">', '</a>' ),
-					'type'    => 'toggle',
-					'std'     => '0',
-				],
-			],
+					'background_processing' => [
+						'id'   => 'background_processing',
+						'name' => esc_html__( 'Background Processing', 'gravity-forms-pdf-extended' ),
+						'desc' => sprintf( esc_html__( 'When enable, form submission and resending notifications with PDFs are handled in a background task. %1$sRequires Background tasks to be enabled%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/background-processing/">', '</a>' ),
+						'type' => 'toggle',
+						'std'  => '0',
+					],
 
-			'general_debug_mode' => [
-				'debug_mode'              => [
-					'id'      => 'debug_mode',
-					'name'    => esc_html__( 'Debug Mode', 'gravity-forms-pdf-extended' ),
-					'type'    => 'toggle',
-					'std'     => '0',
-					'desc'    => esc_html__( 'When enabled, debug information will be displayed on-screen for core features.', 'gravity-forms-pdf-extended' ),
-				],
-			],
+					'debug_mode' => [
+						'id'   => 'debug_mode',
+						'name' => esc_html__( 'Debug Mode', 'gravity-forms-pdf-extended' ),
+						'type' => 'toggle',
+						'std'  => '0',
+						'desc' => esc_html__( 'When enabled, debug information will be displayed on-screen for core features.', 'gravity-forms-pdf-extended' ),
+					],
+				]
+			),
 
 			/* See https://gravitypdf.com/documentation/v5/gfpdf_settings_general_security/ for more details about this filter */
 			'general_security'                => apply_filters(
@@ -199,7 +196,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'desc'        => esc_html__( 'Restrict PDF access to users with any of these capabilities. The Administrator Role always has full access.', 'gravity-forms-pdf-extended' ),
 						'type'        => 'multicheck',
 						'options'     => $this->get_capabilities(),
-						'std'         => 'gravityforms_view_entries',
+						'std'         => [ 'gravityforms_view_entries' ],
 						'tooltip'     => '<h6>' . esc_html__( 'User Restriction', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( "Only logged in users with any selected capability can view generated PDFs they don't have ownership of. Ownership refers to an end user who completed the original Gravity Form entry.", 'gravity-forms-pdf-extended' ),
 					],
 				]

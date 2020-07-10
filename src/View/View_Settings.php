@@ -243,42 +243,27 @@ class View_Settings extends Helper_Abstract_View {
 				'width'         => 'full',
 				'title'         => __( 'Default PDF Options', 'gravity-forms-pdf-extended' ),
 				'desc'          => __( 'Control the default settings to use when you create new PDFs on your forms.', 'gravity-forms-pdf-extended' ),
-				'content'       => $markup->do_settings_fields( 'gfpdf_settings_general', $markup::ENABLE_PANEL_TITLE ),
+				'content'       => $markup->do_settings_fields( 'gfpdf_settings_general_defaults', $markup::ENABLE_PANEL_TITLE ),
 				'content_class' => 'gform_settings_form',
 			],
+		];
 
+		$sections = array_merge( $sections, $markup->do_settings_fields_as_individual_fieldset(
+			'gfpdf_settings_general',
 			[
-				'id'      => 'gfpdf_settings_general_view',
-				'width'   => 'full',
-				'title'   => __( 'Entry View', 'gravity-forms-pdf-extended' ),
-				'content' => $markup->do_settings_fields( 'gfpdf_settings_general_view', $markup::DISABLE_PANEL_TITLE ),
-				'tooltip' => $markup->get_tooltip_markup( '<h6>' . esc_html__( 'Entry View', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Choose to view the PDF in your web browser or download the document to your computer.', 'gravity-forms-pdf-extended' ) ),
-			],
+				'default_action' => [
+					'width' => 'full',
+				],
+			]
+		) );
 
-			[
-				'id'      => 'gfpdf_settings_general_background_processing',
-				'width'   => 'half',
-				'title'   => __( 'Background Processing', 'gravity-forms-pdf-extended' ),
-				'content' => $markup->do_settings_fields( 'gfpdf_settings_general_background_processing', $markup::DISABLE_PANEL_TITLE ),
-				'tooltip' => $markup->get_tooltip_markup( '<h6>' . esc_html__( 'Background Processing', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'When enabled, reduce wait time during form submission as PDF generation is off-loaded to a background process. It is important to ensure Background Tasks are enabled in the Gravity Forms System Status before enabling this feature.', 'gravity-forms-pdf-extended' ) ),
-			],
-
-			[
-				'id'      => 'gfpdf_settings_general_debug_mode',
-				'width'   => 'half',
-				'title'   => __( 'Debug Mode', 'gravity-forms-pdf-extended' ),
-				'content' => $markup->do_settings_fields( 'gfpdf_settings_general_debug_mode', $markup::DISABLE_PANEL_TITLE ),
-				'tooltip' => $markup->get_tooltip_markup( '<h6>' . esc_html__( 'Debug Mode', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'When enabled, template caching is turned off and flushed, shortcode errors will be displayed on-screen and generation statistics will be included in PDFs.', 'gravity-forms-pdf-extended' ) ),
-			],
-
-			[
-				'id'            => 'gfpdf_settings_general_security',
-				'width'         => 'full',
-				'collapsible'   => true,
-				'title'         => __( 'Security', 'gravity-forms-pdf-extended' ),
-				'content'       => $markup->do_settings_fields( 'gfpdf_settings_general_security', $markup::ENABLE_PANEL_TITLE ),
-				'content_class' => 'gform_settings_form',
-			],
+		$sections[] = [
+			'id'            => 'gfpdf_settings_general_security',
+			'width'         => 'full',
+			'collapsible'   => true,
+			'title'         => __( 'Security', 'gravity-forms-pdf-extended' ),
+			'content'       => $markup->do_settings_fields( 'gfpdf_settings_general_security', $markup::ENABLE_PANEL_TITLE ),
+			'content_class' => 'gform_settings_form',
 		];
 
 		$vars = [

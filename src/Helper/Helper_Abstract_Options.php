@@ -1436,6 +1436,15 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					return $args['multi-option'];
 				}
 
+				/* Add default support */
+				if ( empty( $options[ $args['id'] ] ) && isset( $args['std'] ) ) {
+					$args['std'] = is_array( $args['std'] ) ? $args['std'] : [ $args['std' ] ];
+
+					if( in_array( $args['multi-key'], $args['std'], true ) ) {
+						return $args['multi-option'];
+					}
+				}
+
 				break;
 
 			case 'radio':
@@ -1445,7 +1454,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				} elseif ( isset( $pdf_form_settings[ $args['id'] ] ) && isset( $args['options'][ $pdf_form_settings[ $args['id'] ] ] ) ) {
 					return $pdf_form_settings[ $args['id'] ];
 
-				} elseif ( isset( $args['std'] ) && isset( $args['std'] ) ) {
+				} elseif ( isset( $args['std'] ) ) {
 					return $args['std'];
 				}
 
