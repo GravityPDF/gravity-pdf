@@ -24,6 +24,14 @@
  max-height: initial;
 }
 
+.gform-settings-panel__content input + .alert {
+ margin-top: 1rem;
+}
+
+.gform-settings-panel__content input + button.primary {
+ margin-top: 0.5rem;
+}
+
 /*
  * Color Picker
  */
@@ -232,37 +240,6 @@ div img.gfpdf-image {
  padding: 4px 8px;
 }
 
-#pdfextended-settings div.notice, div.pdf-notice {
- margin: 5px 15px 2px;
- padding: 0 0.6em;
-}
-
-.gfpdf-page #pdfextended-settings .theme div.notice,
-.gfpdf-page .theme div.notice,
-.gfpdf-page #pdfextended-settings .theme-info div.notice,
-.gfpdf-page .theme-info div.notice {
- margin: 0;
- z-index: 500;
- color: #444;
- padding: 1px 12px;
-}
-
-.gfpdf-page div.notice, div.pdf-notice,
-.gfpdf-page div.error, div.pdf-error {
- background-color: #FFFFFF;
- border-left: 4px solid #7AD03A;
- box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);
-}
-
-.gfpdf-page div.error, div.pdf-error {
- border-left-color: #dc3232;
-}
-
-.gfpdf-page div.notice, div.pdf-notice {
- margin: 5px 0 15px;
- padding: 1px 12px;
-}
-
 #pdfextended-settings #gfpdf-advanced-options,
 #tab_pdf #gfpdf-advanced-options {
  display: none;
@@ -283,8 +260,6 @@ div img.gfpdf-image {
 .no-js #tab_pdf .gfpdf-advanced-options {
  display: none;
 }
-
-
 
 #tab_pdf .formSubmitted input:invalid {
  border: 1px solid red;

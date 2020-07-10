@@ -242,7 +242,7 @@ class View_Settings extends Helper_Abstract_View {
 				'id'            => 'gfpdf_settings_general',
 				'width'         => 'full',
 				'title'         => __( 'Default PDF Options', 'gravity-forms-pdf-extended' ),
-				'desc'          => __( 'Control the default settings to use when you create new PDFs on your forms.', 'gravity-forms-pdf-extended' ),
+				'description'   => __( 'Control the default settings to use when you create new PDFs on your forms.', 'gravity-forms-pdf-extended' ),
 				'content'       => $markup->do_settings_fields( 'gfpdf_settings_general', $markup::ENABLE_PANEL_TITLE ),
 				'content_class' => 'gform_settings_form',
 			],
@@ -299,12 +299,47 @@ class View_Settings extends Helper_Abstract_View {
 	 */
 	public function license() {
 
+		$markup = new View_GravityForm_Settings_Markup();
+
+		$sections = [
+			[
+				'id'      => 'gfpdf_settings_general_view',
+				'width'   => 'full',
+				'title'   => __( 'Licensing', 'gravity-forms-pdf-extended' ),
+				'content' => $this->load( 'licence-info', [], false ),
+			],
+		];
+
+		/* Group the common license settings together in the one container (every 3 settings) */
+		$i = 1;
+		foreach ( $markup->get_section_fields( 'gfpdf_settings_licenses' ) as $field ) {
+
+			if ( empty( $args ) ) {
+				$args = [
+					'id'      => $field['args']['id'],
+					'width'   => 'half',
+					'title'   => $field['title'],
+					'content' => $markup->get_field_content( $field, $markup::DISABLE_PANEL_TITLE ),
+				];
+			} else {
+				$args['content'] .= $markup->get_field_content( $field, $markup::DISABLE_PANEL_TITLE );
+			}
+
+			if ( $i % 3 == 0 ) {
+				$sections[] = $args;
+				$args       = [];
+			}
+
+			$i++;
+		}
+
 		$vars = [
 			'edit_cap' => $this->gform->has_capability( 'gravityforms_edit_settings' ),
+			'content'  => $markup->do_settings_sections( $sections ),
 		];
 
 		/* load the system status view */
-		$this->load( 'license', $vars );
+		$this->load( 'licence', $vars );
 	}
 
 	/**

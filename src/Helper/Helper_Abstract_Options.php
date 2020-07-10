@@ -1637,26 +1637,26 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$value      = $this->get_form_value( $args );
 		$args['id'] = esc_attr( $args['id'] );
 
-		$size = 'regular';
-		$html = '<span class="gform-settings-description"><label for="gfpdf_settings[' . $args['id'] . ']">' . wp_kses_post( $value['msg'] ) . '</label></span>';
-		$html .= '<input type="text" class="' . $size . '-text" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value['key'] ) ) . '" />';
+		$html = '<input autocomplete="off" type="text" class="regular-text" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value['key'] ) ) . '" />';
+
+		$is_error = ! in_array( $value['status'], [ '', 'active' ], true );
+		$is_active = $value['status'] === 'active';
 
 		/* Show status info */
-		if ( $value['status'] !== '' ) {
-			$status_class = ( $value['status'] === 'active' ) ? 'fa-check' : 'fa-exclamation-circle';
-			$html        .= ' <i class="fa fa-lg ' . $status_class . '" aria-hidden="true"></i>';
+		if ( ! empty ( $value['msg'] ) ) {
+			$alert = $is_error ? '<div class="alert error">%s</div>' : '<div id="message" class="alert success">%s</div>';
+			$html  .= sprintf( $alert, wp_kses_post( $value['msg'] ) );
 		}
 
 		/* Add renewal info */
-		if ( $value['status'] === 'active' ) {
-			$html .= ' <a 
-				class="gfpdf-deactivate-license" 
+		if ( $is_active ) {
+			$html .= ' <button 
+				class="button primary white gfpdf-deactivate-license" 
 				data-addon-name="' . substr( $args['id'], 8 ) . '" 
 				data-license="' . $value['key'] . '" 
-				data-nonce="' . wp_create_nonce( 'gfpdf_deactivate_license' ) . '" 
-				href="#">' .
+				data-nonce="' . wp_create_nonce( 'gfpdf_deactivate_license' ) . '">' .
 					 esc_attr__( 'Deactivate License', 'gravity-forms-pdf-extended' ) .
-				'</a>';
+				'</button>';
 		}
 
 		echo $html;

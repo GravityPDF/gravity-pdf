@@ -38,8 +38,7 @@ export function setupLicenseDeactivation () {
         $('#gfpdf_settings\\[license_' + slug + '\\]').val('')
         $('#gfpdf_settings\\[license_' + slug + '_message\\]').val('')
         $('#gfpdf_settings\\[license_' + slug + '_status\\]').val('')
-        $container.find('i').remove()
-        $container.find('a').remove()
+        $container.find('button').remove()
 
         $container.find('.gf_settings_description label').html(response.success)
       } else {
