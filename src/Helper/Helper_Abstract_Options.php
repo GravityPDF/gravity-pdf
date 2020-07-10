@@ -2008,13 +2008,15 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$class      = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
 
 		$html = '<span class="gform-settings-description">' . wp_kses_post( $args['desc'] ) . '</span>';
+
+		$html .= '<div id="gfpdf-button-wrapper-' . esc_attr( $args['id'] ) . '">';
 		$html .= '<button id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . '][name]" value="' . $args['id'] . '" class="button gfpdf-button ' . $class . '" type="submit"';
 
 		foreach ( $input_data as $data_id => $data_value ) {
 			$html .= ' data-' . $data_id . '="' . esc_html( $data_value ) . '" ';
 		}
 
-		$html .= '>' . esc_html( $args['std'] ) . '</button>';
+		$html .= '>' . esc_html( $args['std'] ) . '</button></div>';
 		$html .= '<input type="hidden" name="gfpdf_settings[' . $args['id'] . '][nonce]" value="' . $nonce . '" />';
 
 		echo $html;

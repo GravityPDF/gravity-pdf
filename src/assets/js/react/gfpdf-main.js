@@ -43,7 +43,7 @@ $(function () {
   }
 
   /* Initialise the Core Font downloader */
-  if ($('#gfpdf-install-core-fonts').length) {
+  if ($('#gfpdf-button-wrapper-install_core_fonts').length) {
     coreFontBootstrap()
   }
 

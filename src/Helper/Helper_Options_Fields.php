@@ -133,6 +133,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				]
 			),
 
+			/* @TODO - merge into single group */
 			'general_view' => [
 				'default_action'          => [
 					'id'      => 'default_action',
@@ -224,34 +225,42 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			'tools'                           => apply_filters(
 				'gfpdf_settings_tools',
 				[
-					'setup_templates'    => [
-						'id'      => 'setup_templates',
-						'name'    => esc_html__( 'Setup Custom Templates', 'gravity-forms-pdf-extended' ),
-						'desc'    => sprintf( esc_html__( 'Setup environment for building custom templates. %1$sSee docs to get started%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/developer-first-custom-pdf/">', '</a>' ),
-						'type'    => 'button',
-						'std'     => esc_html__( 'Run Setup', 'gravity-forms-pdf-extended' ),
-						'options' => 'copy',
-						'tooltip' => '<h6>' . esc_html__( 'Setup Custom Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'The setup will copy the plugin templates to your uploads directory so you can freely create and modify PDF templates without the risk of overriding your modifications when the plugin updates.', 'gravity-forms-pdf-extended' ),
+					'install_core_fonts' => [
+						'id'   => 'install_core_fonts',
+						'name' => esc_html__( 'Install Core Fonts', 'gravity-forms-pdf-extended' ),
+						'desc' => esc_html__( 'Automatically install the core fonts needed to generate PDF documents. This action only needs to be run once, as the fonts are preserved during plugin updates.', 'gravity-forms-pdf-extended' ),
+						'type' => 'button',
+						'std'  => __( 'Download Core Fonts', 'gravity-forms-pdf-extended' ),
 					],
 
-					'manage_fonts'       => [
+					'manage_fonts' => [
 						'id'      => 'manage_fonts',
 						'name'    => esc_html__( 'Fonts', 'gravity-forms-pdf-extended' ),
-						'desc'    => esc_html__( 'Add, update or remove custom fonts.', 'gravity-forms-pdf-extended' ),
+						'desc'    => sprintf( esc_html__( 'Install custom fonts for use in your PDF documents. Only %1$s.ttf%2$s font files are supported.', 'gravity-forms-pdf-extended' ), '<code>', '</code>' ),
 						'type'    => 'button',
 						'std'     => esc_html__( 'Manage Fonts', 'gravity-forms-pdf-extended' ),
 						'options' => 'install_fonts',
-						'tooltip' => '<h6>' . esc_html__( 'Install Fonts', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'Custom fonts can be installed for use in your PDFs. Only %1$s.ttf%2$s font files are supported.', 'gravity-forms-pdf-extended' ), '<code>', '</code>' ),
 					],
 
-					'install_core_fonts' => [
-						'id'      => 'install_core_fonts',
-						'name'    => esc_html__( 'Install Core Fonts', 'gravity-forms-pdf-extended' ),
-						'type'    => 'hook',
-						'tooltip' => '<h6>' . esc_html__( 'Install Core Fonts', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'This action will automatically install the core fonts needed to run Gravity PDF. It only needs to be run once and the fonts will perpetuate after any plugin update.', 'gravity-forms-pdf-extended' ),
+					'setup_templates' => [
+						'id'      => 'setup_templates',
+						'name'    => esc_html__( 'Setup Custom Templates', 'gravity-forms-pdf-extended' ),
+						'desc'    => sprintf( esc_html__( 'Setup environment for building custom templates. This tool will copy the core templates to the PDF Working Directory so you can freely create and modify PDF templates without the risk of overriding your modifications when doing plugin updates. %1$sView the developer documentation to get started%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/developer-first-custom-pdf/">', '</a>' ),
+						'type'    => 'button',
+						'std'     => esc_html__( 'Run Setup', 'gravity-forms-pdf-extended' ),
 					],
 				]
 			),
+
+			'tools_uninstaller' => [
+				'uninstaller' => [
+					'id' => 'uninstaller',
+					'name' => esc_html__( 'Uninstall Gravity PDF', 'gravity-forms-pdf-extended' ),
+					'desc' => '<p class="alert error">' . esc_html__( 'This operation deletes ALL Gravity PDF settings and deactivates the plugin. If you continue, all settings, configuration, custom templates and fonts will be removed.', 'gravity-forms-pdf-extended' ) . '</p>',
+					'type' => 'button',
+					'std' => esc_html__( 'Uninstall Gravity PDF', 'gravity-forms-pdf-extended' ),
+				]
+			],
 
 			/*
 			 * Form (PDF) Settings

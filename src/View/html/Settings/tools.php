@@ -17,29 +17,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <div id="pdfextended-settings">
-	<h3>
-		<span>
-			<i class="fa fa-cog"></i>
-			<?php esc_html_e( 'Tools', 'gravity-forms-pdf-extended' ); ?>
-		</span>
-	</h3>
 
-	<form method="post">
+	<!-- Prevent Firefox auto-filling fields on refresh. @see https://stackoverflow.com/a/44504822/1614565 -->
+	<form name="gfpdf-settings-form-<?=rand() ?>" method="post" class="gform_settings_form">
 
 		<?php settings_fields( 'gfpdf_settings' ); ?>
 
-		<table id="pdf-tools" class="widefat gfpdf_table">
-			<thead>
-				<tr>
-					<th colspan="2"><?php esc_html_e( 'Tools', 'gravity-forms-pdf-extended' ); ?></th>
-				</tr>
-			</thead>
-
-			<tbody>
-				<?php do_settings_fields( 'gfpdf_settings_tools', 'gfpdf_settings_tools' ); ?>
-			</tbody>
-		</table>
-
+		<?= $content ?>
 	</form>
 
 
@@ -48,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div id="setup-templates-confirm" title="<?php esc_html_e( 'Setup Custom Templates', 'gravity-forms-pdf-extended' ); ?>" style="display: none;">
 			<?php printf( esc_html__( 'During the setup process any of the following templates stored in %1$s will be overridden. If you have modified any of the following template or template configuration files %2$smake a backup before continuing%3$s.', 'gravity-forms-pdf-extended' ), '<br><code>' . $args['template_directory'] . '</code>', '<strong>', '</strong>' ); ?>
 
-			<?php if ( sizeof( $args['template_files'] ) > 0 ): ?>
+			<?php if ( count( $args['template_files'] ) > 0 ): ?>
 				<ul>
 					<?php foreach ( $args['template_files'] as $file ): ?>
 						<li><?php echo basename( $file ); ?></li>

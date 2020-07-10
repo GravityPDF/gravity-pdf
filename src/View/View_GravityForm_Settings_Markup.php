@@ -70,15 +70,15 @@ class View_GravityForm_Settings_Markup extends Helper_Abstract_View {
 	}
 
 	/**
-	 * @param       $id
+	 * @param       $section_id
 	 * @param array $overrides
 	 *
 	 * @return array
 	 */
-	public function do_settings_fields_as_individual_fieldset( $id, $overrides = [] ) {
+	public function do_settings_fields_as_individual_fieldset( $section_id, $overrides = [] ) {
 
 		$section = [];
-		foreach ( $this->get_section_fields( $id ) as $field ) {
+		foreach ( $this->get_section_fields( $section_id ) as $field ) {
 			$id      = $field['args']['id'];
 			$content = $this->get_field_content( $field );
 
@@ -86,11 +86,11 @@ class View_GravityForm_Settings_Markup extends Helper_Abstract_View {
 				'id'            => $id,
 				'width'         => isset( $overrides[ $id ]['width'] ) ? $overrides[ $id ]['width'] : 'half',
 				'title'         => $field['title'],
-				'description'   => isset( $overrides[ $id ]['description'] ) ? $overrides[ $id ]['description'] : '',
+				'desc'          => isset( $overrides[ $id ]['desc'] ) ? $overrides[ $id ]['desc'] : '',
 				'content'       => $content,
 				'content_class' => isset( $overrides[ $id ]['content_class'] ) ? $overrides[ $id ]['content_class'] : '',
 				'tooltip'       => ! empty( $field['args']['tooltip'] ) ? $this->get_tooltip_markup( $field['args']['tooltip'] ) : '',
-				'collapsable'   => isset( $overrides[ $id ]['collapsable'] ) ? (bool) $overrides[ $id ]['collapsable'] : false,
+				'collapsible'   => isset( $overrides[ $id ]['collapsible'] ) ? (bool) $overrides[ $id ]['collapsible'] : false,
 			];
 		}
 

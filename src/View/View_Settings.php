@@ -137,7 +137,7 @@ class View_Settings extends Helper_Abstract_View {
 		/* Set up any variables we need for the view and display */
 		$vars = [
 			'selected' => isset( $_GET['tab'] ) ? $_GET['tab'] : 'general',
-			'tabs'     => $this->get_avaliable_tabs(),
+			'tabs'     => $this->get_available_tabs(),
 			'data'     => $this->data,
 		];
 
@@ -152,7 +152,7 @@ class View_Settings extends Helper_Abstract_View {
 	 *
 	 * @since 4.0
 	 */
-	public function get_avaliable_tabs() {
+	public function get_available_tabs() {
 
 		/* The array key is the settings order */
 		$navigation = [
@@ -242,7 +242,7 @@ class View_Settings extends Helper_Abstract_View {
 				'id'            => 'gfpdf_settings_general',
 				'width'         => 'full',
 				'title'         => __( 'Default PDF Options', 'gravity-forms-pdf-extended' ),
-				'description'   => __( 'Control the default settings to use when you create new PDFs on your forms.', 'gravity-forms-pdf-extended' ),
+				'desc'          => __( 'Control the default settings to use when you create new PDFs on your forms.', 'gravity-forms-pdf-extended' ),
 				'content'       => $markup->do_settings_fields( 'gfpdf_settings_general', $markup::ENABLE_PANEL_TITLE ),
 				'content_class' => 'gform_settings_form',
 			],
@@ -274,7 +274,7 @@ class View_Settings extends Helper_Abstract_View {
 			[
 				'id'            => 'gfpdf_settings_general_security',
 				'width'         => 'full',
-				'collapsable'   => true,
+				'collapsible'   => true,
 				'title'         => __( 'Security', 'gravity-forms-pdf-extended' ),
 				'content'       => $markup->do_settings_fields( 'gfpdf_settings_general_security', $markup::ENABLE_PANEL_TITLE ),
 				'content_class' => 'gform_settings_form',
@@ -374,16 +374,41 @@ class View_Settings extends Helper_Abstract_View {
 			wp_die( esc_html__( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
 		}
 
+		$markup             = new View_GravityForm_Settings_Markup();
 		$template_directory = $this->templates->get_template_path();
+		$sections           = $markup->do_settings_fields_as_individual_fieldset( 'gfpdf_settings_tools' );
 
 		$vars = [
 			'template_directory'            => $this->misc->relative_path( $template_directory, '/' ),
 			'template_files'                => $this->templates->get_core_pdf_templates(),
 			'custom_template_setup_warning' => $this->options->get_option( 'custom_pdf_template_files_installed' ),
+			'content'                       => $markup->do_settings_sections( $sections ),
 		];
 
 		/* load the system status view */
 		$this->load( 'tools', $vars );
+	}
+
+	/**
+	 * @since 6.0
+	 */
+	public function uninstaller() {
+		$markup = new View_GravityForm_Settings_Markup();
+
+		$sections = $markup->do_settings_fields_as_individual_fieldset(
+			'gfpdf_settings_tools_uninstaller',
+			[
+				'uninstaller' => [
+					'width'       => 'full',
+					'collapsible' => true,
+				],
+			] );
+
+		$vars = [
+			'content' => $markup->do_settings_sections( $sections ),
+		];
+
+		$this->load( 'uninstaller', $vars );
 	}
 
 	/**

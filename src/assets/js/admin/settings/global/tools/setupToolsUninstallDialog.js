@@ -8,7 +8,7 @@ import { resizeDialogIfNeeded } from '../../../helper/resizeDialogIfNeeded'
  * @since 4.0
  */
 export function setupToolsUninstallDialog () {
-  const $uninstall = $('#gfpdf-uninstall')
+  const $uninstall = $('#gfpdf_settings\\[uninstaller\\]')
   const $uninstallDialog = $('#uninstall-confirm')
 
   /* Set up uninstall dialog */

@@ -32,6 +32,14 @@
  margin-top: 0.5rem;
 }
 
+.gform-settings__content form + form {
+ margin-top: 2rem;
+}
+
+.gform-settings__wrapper .gform-settings-description p.alert {
+ margin-top: 0;
+}
+
 /*
  * Color Picker
  */
@@ -214,10 +222,6 @@ div img.gfpdf-image {
 /*
  * General Settings Page
  */
-#pdfextended-settings {
- margin-top: 20px;
-}
-
 #submit-and-promo-container {
  display: flex;
  justify-content: space-between;
@@ -277,17 +281,6 @@ div img.gfpdf-image {
 .rtl .gform-settings-panel__content label {
  float: right;
  margin-left: 5px;
-}
-
-/*
- * License page
- */
-#pdf-license .fa-exclamation-circle {
- color: red;
-}
-
-#pdf-license .fa-check {
- color: green;
 }
 
 /*
@@ -442,25 +435,26 @@ div img.gfpdf-image {
 }
 
 .gfpdf-core-font-container {
- border: 1px solid #CCC;
- margin-top: 10px;
- padding: 5px 10px;
- height: 150px;
+ border: 1px solid #E3E6EF;
+ border-radius: 6px;
+ box-shadow: 0 1px 4px rgba( 18, 25, 97, 0.0779552 );
+ margin-top: 1rem;
+ padding: 0.75rem;
+ height: 200px;
  overflow: auto;
  font-family: "Courier New", Courier, monospace;
 }
 
 .gfpdf-core-font-status-success {
- color: #008000;
+ color: #048935;
 }
 
 .gfpdf-core-font-status-error {
- color: #d10b0b;
+ color: #DD301D;
 }
 
 .gfpdf-core-font-counter {
  display: inline-block;
- padding-left: 5px;
 }
 
 /*
@@ -701,10 +695,6 @@ div img.gfpdf-image {
  outline: none;
 }
 
-#gfpdf_list_form .gravitypdf_shortcode:focus {
-
-}
-
 /*
  * PDF Form Settings (individual)
  */
@@ -728,9 +718,9 @@ div img.gfpdf-image {
 #pdfextended-settings .gfpdf-spinner,
 .wp-dialog .gfpdf-spinner,
 #gfpdf_list_form .gfpdf-spinner {
- padding-left: 5px;
+ padding: 5px;
  vertical-align: middle;
- width: 20px;
+ width: 27px;
 }
 
 #gfpdf_list_form .gfpdf-spinner-small {

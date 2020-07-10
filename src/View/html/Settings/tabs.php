@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <div id="gform-form-toolbar">
-	<div class="gform-settings__wrapper" style="padding: 0">
+	<div id="gfpdf-global-settings-navigation" class="gform-settings__wrapper" style="padding: 0">
 		<div></div><!-- Grid override -->
 		<ul id="gform-form-toolbar__menu">
 			<?php foreach ( $args['tabs'] as $tab ): ?>

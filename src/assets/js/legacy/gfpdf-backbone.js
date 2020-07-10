@@ -813,11 +813,11 @@
       }
 
       this.is_settings = function () {
-        return $('#tab_PDF').length
+        return $('#gfpdf-global-settings-navigation').length
       }
 
       this.processSettings = function () {
-        var active = $('.nav-tab-wrapper a.nav-tab-active:first').data('id')
+        var active = $('#gfpdf-global-settings-navigation a.gf_toolbar_active:first').data('id')
 
         switch (active) {
           case 'tools':

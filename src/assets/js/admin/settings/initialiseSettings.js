@@ -37,7 +37,7 @@ class InitialiseSettings {
    */
   getCurrentSettingsPage () {
     if (pages.isSettings()) {
-      return $('.nav-tab-wrapper a.nav-tab-active:first').data('id')
+      return $('#gfpdf-global-settings-navigation a.gf_toolbar_active:first').data('id')
     }
     return ''
   }

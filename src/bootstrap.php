@@ -850,9 +850,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * @return void
 	 */
 	public function load_core_font_handler() {
-		$view  = new View\View_Save_Core_Fonts( [] );
-		$class = new Controller\Controller_Save_Core_Fonts( $view, $this->log, $this->data, $this->misc );
-
+		$class = new Controller\Controller_Save_Core_Fonts( $this->log, $this->data, $this->misc );
 		$class->init();
 
 		$this->singleton->add_class( $class );

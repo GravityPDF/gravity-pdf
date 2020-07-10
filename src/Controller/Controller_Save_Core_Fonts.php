@@ -39,21 +39,17 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 	/**
 	 * Set up our dependencies
 	 *
-	 * @param Helper_Abstract_View|\GFPDF\View\View_Save_Core_Fonts $view Our Actions View the controller will manage
 	 * @param LoggerInterface                                       $log  Our logger class
 	 * @param \GFPDF\Helper\Helper_Data                             $data Our plugin data store
 	 * @param \GFPDF\Helper\Helper_Misc                             $misc Our miscellaneous class
 	 *
 	 * @since 5.0
 	 */
-	public function __construct( Helper_Abstract_View $view, LoggerInterface $log, Helper_Data $data, Helper_Misc $misc ) {
+	public function __construct( LoggerInterface $log, Helper_Data $data, Helper_Misc $misc ) {
 		/* Assign our internal variables */
 		$this->log  = $log;
 		$this->data = $data;
 		$this->misc = $misc;
-
-		$this->view = $view;
-		$this->view->setController( $this );
 	}
 
 	/**
@@ -77,9 +73,6 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 	public function add_actions() {
 		/* Register our AJAX event */
 		add_action( 'wp_ajax_gfpdf_save_core_font', [ $this, 'save_core_font' ] );
-
-		/* Add custom setting callbacks */
-		add_action( 'gfpdf_install_core_fonts', [ $this->view, 'core_fonts_setting' ] );
 	}
 
 	/**
@@ -151,7 +144,7 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 			return false;
 		}
 
-		/* If we got here, the call was successfull */
+		/* If we got here, the call was successful */
 
 		return true;
 	}

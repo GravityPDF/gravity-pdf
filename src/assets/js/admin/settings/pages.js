@@ -7,7 +7,7 @@ class Pages {
    * @since 4.0
    */
   isSettings () {
-    return $('#tab_PDF').length
+    return $('#gfpdf-global-settings-navigation').length
   }
 
   /**
