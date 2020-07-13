@@ -23,9 +23,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<?php settings_fields( 'gfpdf_settings' ); ?>
 
-		<?= $content ?>
+		<?= $args['menu'] ?>
+		<?= $args['content'] ?>
 	</form>
 
+	<?php
+	/* See https://gravitypdf.com/documentation/v5/gfpdf_post_tools_settings_page/ for more details about this action */
+	do_action( 'gfpdf_post_tools_settings_page' );
+	?>
 
 	<?php if ( $args['custom_template_setup_warning'] ): ?>
 		<!-- only show custom template warning if user has already installed them once -->
@@ -53,11 +58,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<!-- backbone managed -->
 		</div>
 	</div>
-
-	<?php
-	/* See https://gravitypdf.com/documentation/v5/gfpdf_post_tools_settings_page/ for more details about this action */
-	do_action( 'gfpdf_post_tools_settings_page' );
-	?>
 </div>
 
 <script type="text/template" id="GravityPDFFontsEmpty">

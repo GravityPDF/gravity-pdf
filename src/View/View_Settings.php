@@ -128,7 +128,7 @@ class View_Settings extends Helper_Abstract_View {
 	/**
 	 * Load the Welcome Tab tabs
 	 *
-	 * @return void
+	 * @return string
 	 * @since 4.0
 	 *
 	 */
@@ -142,7 +142,7 @@ class View_Settings extends Helper_Abstract_View {
 		];
 
 		/* load the tabs view */
-		$this->load( 'tabs', $vars );
+		return $this->load( 'tabs', $vars, false );
 	}
 
 	/**
@@ -269,6 +269,7 @@ class View_Settings extends Helper_Abstract_View {
 		$vars = [
 			'edit_cap' => $this->gform->has_capability( 'gravityforms_edit_settings' ),
 			'content'  => $markup->do_settings_sections( $sections ),
+			'menu'     => $this->tabs(),
 		];
 
 		/* load the system status view */
@@ -292,6 +293,7 @@ class View_Settings extends Helper_Abstract_View {
 				'width'   => 'full',
 				'title'   => __( 'Licensing', 'gravity-forms-pdf-extended' ),
 				'content' => $this->load( 'licence-info', [], false ),
+				'menu'    => $this->tabs(),
 			],
 		];
 
@@ -321,6 +323,7 @@ class View_Settings extends Helper_Abstract_View {
 		$vars = [
 			'edit_cap' => $this->gform->has_capability( 'gravityforms_edit_settings' ),
 			'content'  => $markup->do_settings_sections( $sections ),
+			'menu'     => $this->tabs(),
 		];
 
 		/* load the system status view */
@@ -368,6 +371,7 @@ class View_Settings extends Helper_Abstract_View {
 			'template_files'                => $this->templates->get_core_pdf_templates(),
 			'custom_template_setup_warning' => $this->options->get_option( 'custom_pdf_template_files_installed' ),
 			'content'                       => $markup->do_settings_sections( $sections ),
+			'menu'                          => $this->tabs(),
 		];
 
 		/* load the system status view */

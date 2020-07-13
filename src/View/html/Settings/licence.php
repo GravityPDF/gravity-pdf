@@ -20,11 +20,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<form method="post" class="gform_settings_form" action="options.php">
 		<?php settings_fields( 'gfpdf_settings' ); ?>
 
-		<?= $content ?>
+		<?= $args['menu'] ?>
+		<?= $args['content'] ?>
 
 		<?php if ( $args['edit_cap'] ): ?>
 			<div id="submit-and-promo-container">
-				<input type="submit" name="submit" id="submit" value="<?= __( 'Save Settings  →', 'gravityforms' ) ?>" class="button primary large">
+				<input type="submit" name="submit" id="submit" value="<?= esc_html__( 'Save Settings  →', 'gravityforms' ) ?>" class="button primary large">
 			</div>
 		<?php endif; ?>
 	</form>

@@ -24,7 +24,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<form name="gfpdf-settings-form-<?=rand() ?>" class="gform_settings_form" method="post" action="options.php">
 		<?php settings_fields( 'gfpdf_settings' ); ?>
 
-		<?= $content ?>
+		<?= $args['menu'] ?>
+		<?= $args['content'] ?>
 
 		<div id="submit-and-promo-container">
 			<?php if ( $args['edit_cap'] ): ?>

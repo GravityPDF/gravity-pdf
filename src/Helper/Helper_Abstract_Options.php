@@ -1437,7 +1437,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				}
 
 				/* Add default support */
-				if ( empty( $options[ $args['id'] ] ) && isset( $args['std'] ) ) {
+				if ( empty( $options[ $args['id'] ] ) && empty( $pdf_form_settings[ $args['id'] ] ) && isset( $args['std'] ) ) {
 					$args['std'] = is_array( $args['std'] ) ? $args['std'] : [ $args['std' ] ];
 
 					if( in_array( $args['multi-key'], $args['std'], true ) ) {

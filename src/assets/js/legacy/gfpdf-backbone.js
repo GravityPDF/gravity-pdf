@@ -813,11 +813,11 @@
       }
 
       this.is_settings = function () {
-        return $('#gfpdf-global-settings-navigation').length
+        return $('#gfpdf-horizontal-settings-menu').length
       }
 
       this.processSettings = function () {
-        var active = $('#gfpdf-global-settings-navigation a.gf_toolbar_active:first').data('id')
+        var active = $('#gfpdf-horizontal-settings-menu a.gf_toolbar_active:first').data('id')
 
         switch (active) {
           case 'tools':

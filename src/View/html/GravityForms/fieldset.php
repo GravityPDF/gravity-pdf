@@ -48,7 +48,7 @@ $collapsible_name  = 'gform_settings_section_collapsed_' . $args['id'];
 	</header>
 
 	<div class="gform-settings-panel__content <?= isset( $args['content_class'] ) ? esc_attr( $args['content_class'] ) : '' ?>">
-		<?php if ( isset( $args['desc'] ) ): ?>
+		<?php if ( ! empty( $args['desc'] ) ): ?>
 			<div class="gform-settings-description gform-settings-panel--full"><?= wp_kses_post( $args['desc'] ) ?></div>
 		<?php endif; ?>
 
