@@ -16,10 +16,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ?>
 
-<div id="gfpdf-horizontal-settings-menu" class="gform-settings-panel gform-settings-panel--full">
-		<ul id="gform-form-toolbar__menu">
-			<?php foreach ( $args['tabs'] as $tab ): ?>
-				<li><a data-id="<?php echo esc_attr( $tab['id'] ); ?>" class="<?= $args['selected'] === $tab['id'] ? 'gf_toolbar_active' : ''; ?>" href="<?php echo $args['data']->settings_url . '&amp;tab=' . $tab['id']; ?>"><?= esc_html( $tab['name'] ); ?></a></li>
-			<?php endforeach; ?>
-		</ul>
-</div>
+<nav class="gform-settings-tabs__navigation" role="tablist">
+	<?php foreach ( $args['tabs'] as $tab ): ?>
+		<a
+				role="tab"
+				aria-selected="<?= $args['selected'] === $tab['id'] ? 'true' : 'false' ?>"
+				data-id="<?= esc_attr( $tab['id'] ); ?>"
+				class="<?= $args['selected'] === $tab['id'] ? 'active' : ''; ?>"
+				href="<?php echo $args['data']->settings_url . '&amp;tab=' . esc_attr( $tab['id'] ); ?>">
+			<?= esc_html( $tab['name'] ); ?>
+		</a>
+	<?php endforeach; ?>
+</nav>
