@@ -140,9 +140,11 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 */
 	public function add_form_settings_menu( $tabs ) {
 		$tabs[] = [
-			'name'  => $this->data->slug,
-			'label' => $this->data->short_title,
-			'query' => [ 'pid' => null ],
+			'name'         => $this->data->slug,
+			'label'        => $this->data->short_title,
+			'query'        => [ 'pid' => null ],
+			'icon'         => 'dashicons-media-document',
+			'capabilities' => [ 'gravityforms_edit_settings' ],
 		];
 
 		return $tabs;

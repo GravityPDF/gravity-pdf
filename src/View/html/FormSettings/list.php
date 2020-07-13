@@ -21,21 +21,28 @@ $list_items = $args['list_items'];
 
 <?php \GFFormSettings::page_header( $args['title'] ); ?>
 
-<h3>
-	<span>
-		<i class="fa fa-file-o"></i>
-		<?php echo $args['title']; ?>
-		<a id="add-new-pdf" class="add-new-h2" href="<?php echo esc_url( $args['add_new_url'] ); ?>"><?php esc_html_e( 'Add New', 'gravityforms' ); ?></a>
-	</span>
-</h3>
+<div class="gform-settings__content">
+	<div class="gform-settings-panel">
+		<header class="gform-settings-panel__header">
+			<h4 class="gform-settings-panel__title"><?= esc_html( $args['title'] ); ?></h4>
+		</header>
 
-<form id="gfpdf_list_form" method="post">
-	<?php $list_items->display(); ?>
-</form>
+		<div class="gform-settings-panel__content">
+			<form id="gfpdf_list_form" method="post">
+				<div class="tablenav top">
+					<div class="alignleft actions bulkactions"></div>
+					<div class="alignright"><a class="button" href="<?= esc_url( $args['add_new_url'] ) ?>"><?php esc_html_e( 'Add New', 'gravityforms' ); ?></a></div>
+					<br class="clear">
+				</div>
+
+				<?php $list_items->display(); ?>
+			</form>
+		</div>
+	</div>
+</div>
 
 <div id="delete-confirm" title="<?php esc_attr_e( 'Delete PDF?', 'gravity-forms-pdf-extended' ); ?>" style="display: none;">
 	<?php esc_html_e( "Warning! You are about to delete this PDF. Select 'Delete' to delete, 'Cancel' to stop.", 'gravity-forms-pdf-extended' ); ?>
 </div>
-
 
 <?php \GFFormSettings::page_footer(); ?>
