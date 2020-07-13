@@ -2085,7 +2085,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		$this->checkbox_callback( $args );
 
-		$html = '<div id="gfpdf_conditional_logic_container" class="gfpdf_conditional_logic">
+		$html = '<div id="gfpdf_conditional_logic_container" class="gform-settings-field__conditional-logic" style="display: none">
 			<!-- content dynamically created from form_admin.js -->
 		</div>';
 

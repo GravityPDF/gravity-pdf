@@ -6,7 +6,7 @@ import $ from 'jquery'
  * @since 4.0
  */
 export function toggleFontAppearance (type) {
-  const $rows = $('#pdf-general-appearance').find('tr.gfpdf_font_type, tr.gfpdf_font_size, tr.gfpdf_font_colour')
+  const $rows = $('#gfpdf-settings-field-wrapper-font, #gfpdf-settings-field-wrapper-font_size, #gfpdf-settings-field-wrapper-font_colour')
 
   /* Hide our font fields if processing a legacy template */
   if (type === 'legacy') {

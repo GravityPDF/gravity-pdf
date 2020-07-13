@@ -16,10 +16,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ?>
 
-<fieldset id="gfpdf-horizontal-settings-menu" class="gform-settings-panel gform-settings-panel--full">
+<div id="gfpdf-horizontal-settings-menu" class="gform-settings-panel gform-settings-panel--full">
 		<ul id="gform-form-toolbar__menu">
 			<?php foreach ( $args['tabs'] as $tab ): ?>
 				<li><a data-id="<?php echo esc_attr( $tab['id'] ); ?>" class="<?= $args['selected'] === $tab['id'] ? 'gf_toolbar_active' : ''; ?>" href="<?php echo $args['data']->settings_url . '&amp;tab=' . $tab['id']; ?>"><?= esc_html( $tab['name'] ); ?></a></li>
 			<?php endforeach; ?>
 		</ul>
-</fieldset>
+</div>

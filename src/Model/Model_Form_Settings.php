@@ -12,6 +12,7 @@ use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_PDF_List_Table;
 use GFPDF\Helper\Helper_Templates;
+use GFPDF\View\View_GravityForm_Settings_Markup;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -949,11 +950,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			$this->options->register_settings( $this->options->get_registered_fields() );
 
 			/* generate the HTML */
-			ob_start();
-
-			do_settings_fields( 'gfpdf_settings_form_settings_custom_appearance', 'gfpdf_settings_form_settings_custom_appearance' );
-
-			$html = ob_get_clean();
+			$markup = new View_GravityForm_Settings_Markup();
+			$html = $markup->do_settings_fields( 'gfpdf_settings_form_settings_custom_appearance', $markup::ENABLE_PANEL_TITLE );
 
 			/*
 			 * Pass the required wp_editor IDs and settings in our AJAX response so the client

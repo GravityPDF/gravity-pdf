@@ -7,30 +7,30 @@ import $ from 'jquery'
  */
 export function handleSecurityConditionals () {
   /* Get the appropriate elements for use */
-  const $secTable = $('#pdf-general-advanced')
+  const $secTable = $('#gfpdf-fieldset-gfpdf_form_settings_advanced')
   const $pdfSecurity = $secTable.find('input[name="gfpdf_settings[security]"]')
   const $format = $secTable.find('input[name="gfpdf_settings[format]"]')
+  const $securityQuestion = $secTable.find('#gfpdf-settings-field-wrapper-security')
+  const $securityFields = $secTable.find('#gfpdf-settings-field-wrapper-password,#gfpdf-settings-field-wrapper-privileges,gfpdf-settings-field-wrapper-master_password:not(.gfpdf-hidden)')
 
   /* Add change event to admin restrictions to show/hide dependant fields */
   $pdfSecurity.change(function () {
-    if ($(this).is(':checked')) {
-      /* Get the format dependancy */
+      /* Get the format dependency */
       const format = $format.filter(':checked').val()
 
-      if ($(this).val() === GFPDF.no || format !== GFPDF.standard) {
+      if (!$(this).is(':checked') || format !== GFPDF.standard) {
         /* hide security password / privileges */
-        $secTable.find('tr:nth-child(3),tr:nth-child(4),tr:nth-child(5):not(.gfpdf-hidden)').hide()
+        $securityFields.hide()
       } else {
         /* show security password / privileges */
-        $secTable.find('tr:nth-child(3),tr:nth-child(4),tr:nth-child(5):not(.gfpdf-hidden)').show()
+        $securityFields.show()
       }
 
       if (format !== GFPDF.standard) {
-        $secTable.find('tr:nth-child(2)').hide()
+        $securityQuestion.hide()
       } else {
-        $secTable.find('tr:nth-child(2)').show()
+        $securityQuestion.show()
       }
-    }
   }).trigger('change')
 
   /* The format field effects the security field. When it changes it triggers the security field as changed */

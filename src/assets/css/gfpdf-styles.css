@@ -13,7 +13,12 @@
 
 .gform-settings-panel .gform-settings-panel__content .gform-settings-panel__title {
  font-weight: bold;
+ color: #23282D;
+ margin-bottom: .625rem;
+ font-size: .8125rem;
 }
+
+.gform-settings-panel .gform-settings-panel__content .gform-settings-panel__title
 
 .gform-settings-panel__content input[type="number"].small-text {
  width: 5rem;
@@ -62,6 +67,12 @@
 .rtl .gform-settings-panel__content .wp-picker-container .wp-color-result.button {
  padding-lefT: 0;
  padding-right: 35px;
+}
+
+.gfpdf-settings-field-wrapper:after {
+ content: '';
+ display: table;
+ clear: both;
 }
 
 /*
@@ -700,18 +711,6 @@ div img.gfpdf-image {
  */
 .gfpdf-hidden {
  display: none;
-}
-
-.gfpdf_conditional_logic {
- margin-top: 10px;
-}
-
-#pdf-form-settings .conditional_logic th {
- padding-top: 15px;
-}
-
-#pdf-form-settings .conditional_logic td {
- vertical-align: top;
 }
 
 #pdf-form-settings .gfpdf-spinner,

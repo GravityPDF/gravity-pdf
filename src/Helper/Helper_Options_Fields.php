@@ -66,7 +66,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'desc'       => esc_html__( 'Set the default paper size used when generating PDFs.', 'gravity-forms-pdf-extended' ),
 						'type'       => 'select',
 						'options'    => $this->get_paper_size(),
-						'inputClass' => 'large',
 						'class'      => 'gfpdf_paper_size',
 					],
 
@@ -75,7 +74,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'name'     => esc_html__( 'Custom Paper Size', 'gravity-forms-pdf-extended' ),
 						'desc'     => esc_html__( 'Control the exact paper size. Can be set in millimeters or inches.', 'gravity-forms-pdf-extended' ),
 						'type'     => 'paper_size',
-						'size'     => 'small',
 						'class'    => 'gfpdf-hidden gfpdf_paper_size_other',
 					],
 
@@ -86,7 +84,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'type'       => 'select',
 						'options'    => $this->templates->get_all_templates_by_group(),
 						'std'        => 'zadani',
-						'inputClass' => 'large',
 						'tooltip'    => '<h6>' . esc_html__( 'Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'Gravity PDF comes with %1$sfour completely-free and highly customizable designs%2$s. You can also purchase additional templates from our template shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
 					],
 
@@ -96,7 +93,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'desc'       => sprintf( esc_html__( 'Set the default font type used in PDFs. Choose an existing font or %1$sinstall your own%2$s.', 'gravity-forms-pdf-extended' ), '<a href="' . $this->data->settings_url . '&tab=tools#manage_fonts">', '</a>' ),
 						'type'       => 'select',
 						'options'    => $this->get_installed_fonts(),
-						'inputClass' => 'large',
 						'tooltip'    => '<h6>' . esc_html__( 'Fonts', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Gravity PDF comes bundled with fonts for most languages world-wide. Want to use a specific font type? Use the font installer (found in the Tools tab).', 'gravity-forms-pdf-extended' ),
 					],
 
@@ -104,12 +100,8 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'id'      => 'default_rtl',
 						'name'    => esc_html__( 'Reverse Text (RTL)', 'gravity-forms-pdf-extended' ),
 						'desc'    => esc_html__( 'Script like Arabic and Hebrew are written right to left.', 'gravity-forms-pdf-extended' ),
-						'type'    => 'radio',
-						'options' => [
-							'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
-							'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
-						],
-						'std'     => 'No',
+						'type' => 'toggle',
+						'std'  => '0',
 						'tooltip' => '<h6>' . esc_html__( 'Reverse Text (RTL)', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( "Enable RTL if you are writing in Arabic, Hebrew, Syriac, N'ko, Thaana, Tifinar, Urdu or other RTL languages.", 'gravity-forms-pdf-extended' ),
 					],
 
@@ -283,7 +275,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'options'    => $this->templates->get_all_templates_by_group(),
 						'std'        => $this->get_option( 'default_template', 'zadani' ),
 						'inputClass' => 'large',
-						'chosen'     => true,
 						'tooltip'    => '<h6>' . esc_html__( 'Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'Gravity PDF comes with %1$sfour completely-free and highly customizable designs%2$s. You can also purchase additional templates from our template shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
 					],
 
@@ -291,11 +282,8 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'id'          => 'notification',
 						'name'        => esc_html__( 'Notifications', 'gravity-forms-pdf-extended' ),
 						'desc'        => esc_html__( 'Automatically attach PDF to the selected notifications.', 'gravity-forms-pdf-extended' ),
-						'type'        => 'select',
+						'type'        => 'multicheck',
 						'options'     => [],
-						'inputClass'  => 'large',
-						'chosen'      => true,
-						'multiple'    => true,
 						'placeholder' => esc_html__( 'Choose a Notification', 'gravity-forms-pdf-extended' ),
 						'tooltip'     => '<h6>' . esc_html__( 'Notifications', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Automatically generate and attach the PDF to your selected notifications. Conditional Logic for both the PDF and the notification applies. Inactive PDFs are also not sent.', 'gravity-forms-pdf-extended' ),
 					],
@@ -343,9 +331,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'type'       => 'select',
 						'options'    => $this->get_paper_size(),
 						'std'        => $this->get_option( 'default_pdf_size', 'A4' ),
-						'inputClass' => 'large',
 						'class'      => 'gfpdf_paper_size',
-						'chosen'     => true,
 					],
 
 					'custom_pdf_size' => [
@@ -354,8 +340,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'desc'     => esc_html__( 'Control the exact paper size. Can be set in millimeters or inches.', 'gravity-forms-pdf-extended' ),
 						'type'     => 'paper_size',
 						'size'     => 'small',
-						'chosen'   => true,
-						'required' => true,
 						'class'    => 'gfpdf-hidden gfpdf_paper_size_other',
 						'std'      => $this->get_option( 'default_custom_pdf_size' ),
 					],
@@ -369,7 +353,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 							'landscape' => esc_html__( 'Landscape', 'gravity-forms-pdf-extended' ),
 						],
 						'inputClass' => 'large',
-						'chosen'     => true,
 					],
 
 					'font'            => [
@@ -379,8 +362,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'options'    => $this->get_installed_fonts(),
 						'std'        => $this->get_option( 'default_font' ),
 						'desc'       => sprintf( esc_html__( 'Set the font type used in PDFs. Choose an existing font or %1$sinstall your own%2$s.', 'gravity-forms-pdf-extended' ), '<a href="' . $this->data->settings_url . '&tab=tools#manage_fonts">', '</a>' ),
-						'inputClass' => 'large',
-						'chosen'     => true,
 						'tooltip'    => '<h6>' . esc_html__( 'Fonts', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Gravity PDF comes bundled with fonts for most languages world-wide. Want to use a specific font type? Use the font installer (found in the Forms -> Settings -> Tools tab).', 'gravity-forms-pdf-extended' ),
 						'class'      => 'gfpdf_font_type',
 					],
@@ -410,11 +391,8 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'name'    => esc_html__( 'Reverse Text (RTL)', 'gravity-forms-pdf-extended' ),
 						'desc'    => esc_html__( 'Script like Arabic and Hebrew are written right to left.', 'gravity-forms-pdf-extended' ),
 						'type'    => 'radio',
-						'options' => [
-							'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
-							'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
-						],
-						'std'     => $this->get_option( 'default_rtl', 'No' ),
+						'type' => 'toggle',
+						'std'  => $this->get_option( 'default_rtl', '0' ),
 						'tooltip' => '<h6>' . esc_html__( 'Reverse Text (RTL)', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( "Enable RTL if you are writing in Arabic, Hebrew, Syriac, N'ko, Thaana, Tifinar or Urdu.", 'gravity-forms-pdf-extended' ),
 					],
 
@@ -459,12 +437,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'id'      => 'security',
 						'name'    => esc_html__( 'Enable PDF Security', 'gravity-forms-pdf-extended' ),
 						'desc'    => esc_html__( 'Password protect generated PDFs, or restrict user capabilities.', 'gravity-forms-pdf-extended' ),
-						'type'    => 'radio',
-						'options' => [
-							'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
-							'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
-						],
-						'std'     => 'No',
+						'type' => 'toggle',
 					],
 
 					'password'        => [
@@ -479,7 +452,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'id'          => 'privileges',
 						'name'        => esc_html__( 'Privileges', 'gravity-forms-pdf-extended' ),
 						'desc'        => 'Restrict end user capabilities by removing privileges.',
-						'type'        => 'select',
+						'type'        => 'multicheck',
 						'options'     => $this->get_privilages(),
 						'std'         => [
 							'copy',
@@ -491,10 +464,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 							'extract',
 							'assemble',
 						],
-						'inputClass'  => 'large',
-						'chosen'      => true,
 						'tooltip'     => '<h6>' . esc_html__( 'Privileges', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'You can prevent the end user completing certain actions to the PDF – such as copying text, printing, adding annotations or extracting pages.', 'gravity-forms-pdf-extended' ),
-						'multiple'    => true,
 						'placeholder' => esc_html__( 'Select End User PDF Privileges', 'gravity-forms-pdf-extended' ),
 					],
 
@@ -518,11 +488,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'name'    => esc_html__( 'Always Save PDF', 'gravity-forms-pdf-extended' ),
 						'desc'    => esc_html__( 'Force a PDF to be saved to disk when a new entry is created.', 'gravity-forms-pdf-extended' ),
 						'type'    => 'radio',
-						'options' => [
-							'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
-							'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
-						],
-						'std'     => 'No',
+						'type' => 'toggle',
 						'tooltip' => '<h6>' . esc_html__( 'Save PDF', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'By default, PDFs are not automatically saved to disk. Enable this option to force the PDF to be generated and saved. Useful when using the %1$sgfpdf_post_pdf_save%2$s hook to copy the PDF to an alternate location.', 'gravity-forms-pdf-extended' ), '<code>', '</code>' ),
 					],
 
@@ -531,11 +497,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'name'    => esc_html__( 'Enable Public Access', 'gravity-forms-pdf-extended' ),
 						'desc'    => sprintf( esc_html__( 'Disable all %1$ssecurity protocols%2$s and allow %3$sanyone%4$s to access the PDFs.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/user-pdf-security/">', '</a>', '<strong>', '</strong>' ),
 						'type'    => 'radio',
-						'options' => [
-							'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
-							'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
-						],
-						'std'     => 'No',
+						'type' => 'toggle',
 						'tooltip' => '<h6>' . esc_html__( 'Public Access', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( "When public access is on all security protocols are disabled and anyone worldwide can view the PDF document for ALL your form's entries. For better security, %1\$suse the signed PDF URLs feature instead%2\$s.", 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/user-shortcodes/#signed-attribute">', '</a>' ),
 					],
 
@@ -543,12 +505,8 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'id'      => 'restrict_owner',
 						'name'    => esc_html__( 'Restrict Owner', 'gravity-forms-pdf-extended' ),
 						'desc'    => esc_html__( 'When enabled, the original entry owner will NOT be able to view the PDFs.', 'gravity-forms-pdf-extended' ),
-						'type'    => 'radio',
-						'options' => [
-							'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
-							'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
-						],
-						'std'     => $this->get_option( 'default_restrict_owner', 'No' ),
+						'type' => 'toggle',
+						'std'     => $this->get_option( 'default_restrict_owner', '0' ),
 						'tooltip' => '<h6>' . esc_html__( 'Restrict Owner', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'Enable this setting if your PDFs should not be viewable by the end user. This setting is overridden %1$swhen using signed PDF URLs%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/user-shortcodes/#signed-attribute">', '</a>' ),
 					],
 				]
@@ -584,12 +542,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			'id'      => 'advanced_template',
 			'name'    => esc_html__( 'Enable Advanced Templating', 'gravity-forms-pdf-extended' ),
 			'desc'    => esc_html__( 'By enabling, a PDF template will no longer be treated as HTML.', 'gravity-forms-pdf-extended' ),
-			'type'    => 'radio',
-			'options' => [
-				'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
-				'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
-			],
-			'std'     => 'No',
+			'type' => 'toggle',
 		];
 
 		return $settings;
@@ -643,12 +596,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				'id'      => 'show_form_title',
 				'name'    => esc_html__( 'Show Form Title', 'gravity-forms-pdf-extended' ),
 				'desc'    => esc_html__( 'Display the form title at the beginning of the PDF.', 'gravity-forms-pdf-extended' ),
-				'type'    => 'radio',
-				'options' => [
-					'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
-					'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
-				],
-				'std'     => 'No',
+				'type' => 'toggle',
 			]
 		);
 	}
@@ -667,12 +615,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				'id'      => 'show_page_names',
 				'name'    => esc_html__( 'Show Page Names', 'gravity-forms-pdf-extended' ),
 				'desc'    => sprintf( esc_html__( 'Display form page names on the PDF. Requires the use of the %1$sPage Break field%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://docs.gravityforms.com/page-break/">', '</a>' ),
-				'type'    => 'radio',
-				'options' => [
-					'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
-					'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
-				],
-				'std'     => 'No',
+				'type' => 'toggle',
 			]
 		);
 	}
@@ -691,12 +634,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				'id'      => 'show_html',
 				'name'    => esc_html__( 'Show HTML Fields', 'gravity-forms-pdf-extended' ),
 				'desc'    => esc_html__( 'Display HTML fields in the PDF.', 'gravity-forms-pdf-extended' ),
-				'type'    => 'radio',
-				'options' => [
-					'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
-					'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
-				],
-				'std'     => 'No',
+				'type' => 'toggle',
 			]
 		);
 	}
@@ -715,12 +653,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				'id'      => 'show_section_content',
 				'name'    => esc_html__( 'Show Section Break Description', 'gravity-forms-pdf-extended' ),
 				'desc'    => esc_html__( 'Display the Section Break field description in the PDF.', 'gravity-forms-pdf-extended' ),
-				'type'    => 'radio',
-				'options' => [
-					'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
-					'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
-				],
-				'std'     => 'No',
+				'type' => 'toggle',
 			]
 		);
 	}
@@ -740,11 +673,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				'name'    => esc_html__( 'Enable Conditional Logic', 'gravity-forms-pdf-extended' ),
 				'desc'    => esc_html__( 'When enabled the PDF will adhere to the form field conditional logic.', 'gravity-forms-pdf-extended' ),
 				'type'    => 'radio',
-				'options' => [
-					'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
-					'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
-				],
-				'std'     => 'Yes',
+				'type' => 'toggle',
 				'tooltip' => '<h6>' . esc_html__( 'Enable Conditional Logic', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Enable this option to hide failed conditional logic fields in the PDF.', 'gravity-forms-pdf-extended' ),
 			]
 		);
@@ -764,12 +693,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				'id'      => 'show_empty',
 				'name'    => esc_html__( 'Show Empty Fields', 'gravity-forms-pdf-extended' ),
 				'desc'    => esc_html__( 'Display Empty fields in the PDF.', 'gravity-forms-pdf-extended' ),
-				'type'    => 'radio',
-				'options' => [
-					'Yes' => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
-					'No'  => esc_html__( 'No', 'gravity-forms-pdf-extended' ),
-				],
-				'std'     => 'No',
+				'type' => 'toggle',
 			]
 		);
 	}

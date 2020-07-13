@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ?>
 
-<div class="<?= esc_attr( $args['class'] ) ?>">
+<div id="<?= esc_attr( $args['id'] ) ?>" class="<?= esc_attr( $args['class'] ) ?>">
 	<?php if ( ! empty( $args['title'] ) ): ?>
 		<div class='gform-settings-panel__title'>
 			<?= esc_html( $args['title'] ) ?>

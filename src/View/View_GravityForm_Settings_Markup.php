@@ -98,8 +98,12 @@ class View_GravityForm_Settings_Markup extends Helper_Abstract_View {
 	}
 
 	public function get_field_content( $field, $output_title = self::DISABLE_PANEL_TITLE ) {
+
+		$class = 'gform-settings-field gfpdf-settings-field-wrapper';
+
 		$args = [
-			'class'         => isset( $field['args']['class'] ) ? $field['args']['class'] : '',
+			'id'            => 'gfpdf-settings-field-wrapper-' . $field['args']['id'],
+			'class'         => isset( $field['args']['class'] ) ? $field['args']['class'] . ' ' . $class : $class,
 			'callback'      => $field['callback'],
 			'callback_args' => $field['args'],
 		];

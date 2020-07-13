@@ -1,6 +1,5 @@
 import $ from 'jquery'
 import { setupRequiredFields } from './setupRequiredFields'
-import { setupPdfTabs } from './setupPdfTabs'
 import { handleSecurityConditionals } from './handleSecurityConditionals'
 import { handlePDFConditionalLogic } from './handlePDFConditionalLogic'
 import { handleOwnerRestriction } from './handleOwnerRestriction'
@@ -11,12 +10,18 @@ export function doFormSettingsEditPage () {
   setupRequiredFields($('#gfpdf_pdf_form'))
 
   /* highlight which fields are required and disable in-browser validation */
-  setupPdfTabs()
   handleSecurityConditionals()
   handlePDFConditionalLogic()
   handleOwnerRestriction()
   toggleFontAppearance($('#gfpdf_settings\\[template\\]').data('template_group'))
   toggleAppearanceTab()
+
+  /* Add better merge tag support */
+  $('.gform-settings-field').each(function() {
+    $(this)
+      .find('.merge-tag-support, .merge-tag-support + span')
+      .wrapAll('<div class="gform-settings-input__container gform-settings-input__container--with-merge-tag"></div>')
+  })
 
   /*
    * Workaround for Firefix TinyMCE Editor Bug NS_ERROR_UNEXPECTED (http://www.tinymce.com/develop/bugtracker_view.php?id=3152) when loading wp_editor via AJAX
