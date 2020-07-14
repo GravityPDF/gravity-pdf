@@ -95,7 +95,7 @@ class Helper_Field_Container {
 	protected $skip_fields = [
 		'page',
 		'section',
-		'html',
+		'hidden'
 	];
 
 	/**
@@ -160,6 +160,8 @@ class Helper_Field_Container {
 	 * @since 4.0
 	 */
 	public function generate( GF_Field $field ) {
+		echo $field->layoutGridColumnSpan .'<br>';
+		echo $field->layoutSpacerGridColumnSpan .'<br>';
 
 		/* Check if we are processing a field that should not be floated and treat it as a 100% field */
 		$this->process_skipped_fields( $field );
