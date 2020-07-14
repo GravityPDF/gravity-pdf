@@ -184,7 +184,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'admin_capabilities'     => [
 						'id'          => 'admin_capabilities',
 						'name'        => esc_html__( 'User Restriction', 'gravity-forms-pdf-extended' ),
-						'class'   => 'gform-settings-panel--full',
+						'class'   => 'gform-settings-panel--full col-1-3',
 						'desc'        => esc_html__( 'Restrict PDF access to users with any of these capabilities. The Administrator Role always has full access.', 'gravity-forms-pdf-extended' ),
 						'type'        => 'multicheck',
 						'options'     => $this->get_capabilities(),

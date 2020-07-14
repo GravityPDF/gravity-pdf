@@ -6,9 +6,12 @@
 }
 
 .gfpdf-settings-multicheck-wrapper {
+ padding-bottom: 3px;
+}
+
+.col-1-3 .gfpdf-settings-multicheck-wrapper {
  float: left;
  width: 33%;
- padding-bottom: 3px;
 }
 
 .gform-settings-panel .gform-settings-panel__content .gform-settings-panel__title {
