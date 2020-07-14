@@ -19,9 +19,15 @@ $collapsible       = ! empty( $args['collapsible'] );
 $collapsible_class = '';
 
 if ( $collapsible ) {
+	$collapsible_name = 'gform_settings_section_collapsed_' . $args['id'];
+
+	/* Force open the collapsible section if user had it open during submission */
+	if ( isset( $_POST['gfpdf_settings'] ) ) {
+		$args['collapsible-open'] = empty( $_POST[ $collapsible_name ] );
+	}
+
 	$collapsible_class = 'gform-settings-panel--collapsible';
 	$collapsible_class .= empty( $args['collapsible-open'] ) ? ' gform-settings-panel--collapsed' : '';
-	$collapsible_name  = 'gform_settings_section_collapsed_' . $args['id'];
 }
 
 ?>
