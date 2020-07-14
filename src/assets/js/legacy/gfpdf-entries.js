@@ -5,34 +5,43 @@
  */
 
 (function ($) {
-  var GFPDF = {
-
-    /**
-     * Do a better hover when accessing the PDF submenu
-     * This allows for a longer timeout before the submenu is hidden again
-     * @since 4.0
-     */
-    PDFSubmenuHover: function () {
-      $('table .gf_form_action_has_submenu').hover(function () {
-        clearTimeout($(this).data('timeout'))
-
-        $(this).find('.gf_submenu').show()
-      }, function () {
-        var self = this
-        var t = setTimeout(function () {
-          $(self).find('.gf_submenu').hide()
-        }, 350)
-
-        $(this).data('timeout', t)
-      })
-    }
-  }
-
   /**
-   * Fires on the Document Ready Event (the same as $(document).ready(function() { ... });)
-   * @since 4.0
+   * Fires on the Document Ready Event
    */
   $(function () {
-    GFPDF.PDFSubmenuHover()
+
+    let timer = null
+    $('.gfpdf_form_action_has_submenu > a')
+      /* Handle keyboard navigation */
+      .on( 'click', function() {
+        if( $(this).attr('aria-expanded') === 'false') {
+          $(this).parent().addClass('open')
+          $(this).attr('aria-expanded', 'true')
+        } else {
+          $(this).parent().removeClass('open')
+          $(this).attr('aria-expanded', 'false')
+        }
+
+        return false
+      })
+      .parent()
+      /* Hide submenu after a delay */
+      .on('mouseover', function() {
+        clearTimeout(timer)
+
+        $(this)
+          .addClass('open')
+          .find('> a')
+          .attr('aria-expanded', 'true')
+    })
+      .on('mouseout', function() {
+        let $submenu = $(this)
+        timer = setTimeout(function() {
+          $submenu
+            .removeClass('open')
+            .find('> a')
+            .attr('aria-expanded', 'false')
+        }, 1000 )
+      })
   })
 })(jQuery)

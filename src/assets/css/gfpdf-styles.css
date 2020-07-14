@@ -792,19 +792,22 @@ div img.gfpdf-image {
  */
 .gfpdf_form_action_has_submenu {
  position: relative;
+ display: inline-block;
 }
 
-.gfpdf_submenu {
- width: 200px;
+.gfpdf_form_action_has_submenu.open .gform-form-toolbar__submenu {
+ display: block;
+ max-width: 300px;
 }
 
-.gfpdf_submenu li {
- border-bottom: 1px solid #eee;
+.gfpdf_form_action_has_submenu.open .gform-form-toolbar__submenu a:focus {
+ box-shadow: inset 0 0 0 1px #5b9dd9, 0 0 2px 1px rgba(30, 140, 190, 0.8);
 }
 
-/*
- * Gravity Forms Entry Details Page
- */
+
+ /*
+  * Gravity Forms Entry Details Page
+  */
 .gfpdf_detailed_pdf_container_pdf {
  clear: left;
  margin-bottom: 3px;
