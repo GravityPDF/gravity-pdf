@@ -52,5 +52,4 @@ global $wp_settings_fields;
 	</div>
 </form>
 
-
 <?php GFFormSettings::page_footer(); ?>

@@ -1523,6 +1523,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		$html  = '<input type="checkbox" id="' . $id . '" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" name="gfpdf_settings[' . $args['id'] . ']" value="1" ' . $checked . ' ' . $required . ' />';
 		$html .= '<label for="' . $id . '"> ' . wp_kses_post( $args['desc'] ) . '</label>';
+		$html .= wp_kses_post( $args['desc2'] );
 
 		echo $html;
 	}
@@ -1560,6 +1561,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				echo '<label for="gfpdf_settings[' . $args['id'] . '][' . esc_attr( $key ) . ']">' . $option . '</label>';
 				echo '</div>';
 			}
+
+			echo wp_kses_post( $args['desc2'] );
 		}
 	}
 
@@ -1593,6 +1596,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$html .= $option . '</label> &nbsp;&nbsp;';
 		}
 
+		$html .= wp_kses_post( $args['desc2'] );
+
 		echo $html;
 	}
 
@@ -1625,6 +1630,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		}
 
 		$html .= ' />';
+
+		$html .= wp_kses_post( $args['desc2'] );
 
 		echo $html;
 	}
@@ -1668,6 +1675,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				'</button>';
 		}
 
+		$html .= wp_kses_post( $args['desc2'] );
+
 		echo $html;
 	}
 
@@ -1710,7 +1719,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$html .= ' data-' . $data_id . '="' . esc_html( $data_value ) . '" ';
 		}
 
-		$html .= ' /> ' . $args['desc2'];
+		$html .= ' /> ';
+
+		$html .= wp_kses_post( $args['desc2'] );
 
 		echo $html;
 	}
@@ -1751,6 +1762,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$html = $this->create_toggle_input( $toggle, $html, $value );
 		}
 
+		$html .= wp_kses_post( $args['desc2'] );
+
 		echo $html;
 	}
 
@@ -1776,6 +1789,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$size = ( isset( $args['size'] ) && ! is_null( $args['size'] ) ) ? esc_attr( $args['size'] ) : 'regular';
 		$html = '<span class="gform-settings-description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
 		$html .= '<input type="password" class="' . $size . '-text ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( $value ) . '" ' . $required . ' />';
+		$html .= wp_kses_post( $args['desc2'] );
 
 		echo $html;
 	}
@@ -1835,6 +1849,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		}
 
 		$html .= $select;
+		$html .= wp_kses_post( $args['desc2'] );
 
 		echo $html;
 	}
@@ -1939,6 +1954,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$html = $this->create_toggle_input( $toggle, $html, $value );
 		}
 
+		$html .= wp_kses_post( $args['desc2'] );
+
 		echo $html;
 	}
 
@@ -1968,6 +1985,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$html = '<span class="gform-settings-description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
 		$html .= '<input type="text" class="' . $size . '-text gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" ' . $required . ' />';
 		$html .= '<span>&nbsp;<input type="button" class="gfpdf_settings_upload_button button-secondary" value="' . $button_text . '" data-uploader-title="' . $uploader_title . '" data-uploader-button-text="' . $uploader_button_text . '" /></span>';
+		$html .= wp_kses_post( $args['desc2'] );
 
 		echo $html;
 	}
@@ -2064,6 +2082,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					<span class="gform-settings-field__toggle-switch"></span>
 				</label>
 			</span>
+
+			<?= wp_kses_post( $args['desc2'] ) ?>
 		</div>
 		<?php
 	}
@@ -2163,6 +2183,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		}
 
 		$html .= '</select> ';
+		$html .= wp_kses_post( $args['desc2'] );
 
 		echo $html;
 	}

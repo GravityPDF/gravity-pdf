@@ -23,6 +23,9 @@ export function doFormSettingsEditPage () {
       .wrapAll('<div class="gform-settings-input__container gform-settings-input__container--with-merge-tag"></div>')
   })
 
+  /* Move alert inline */
+  $( '.gform-settings__wrapper > .alert').detach().prependTo('#tab_pdf')
+
   /*
    * Workaround for Firefix TinyMCE Editor Bug NS_ERROR_UNEXPECTED (http://www.tinymce.com/develop/bugtracker_view.php?id=3152) when loading wp_editor via AJAX
    * Manual save TinyMCE editors on form submission

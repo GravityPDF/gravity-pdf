@@ -278,7 +278,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* Check Nonce is valid */
 		if ( ! wp_verify_nonce( rgpost( 'gfpdf_save_pdf' ), 'gfpdf_save_pdf' ) ) {
 			$this->log->warning( 'Nonce Verification Failed.' );
-			$this->notices->add_error( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-forms-pdf-extended' ) );
+			\GFCommon::add_error_message( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-forms-pdf-extended' ) );
 
 			return false;
 		}
@@ -300,7 +300,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				]
 			);
 
-			$this->notices->add_error( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-forms-pdf-extended' ) );
+			\GFCommon::add_error_message( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-forms-pdf-extended' ) );
 
 			return false;
 		}
@@ -321,7 +321,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		if ( empty( $sanitized['name'] ) || empty( $sanitized['filename'] ) ||
 			 ( $sanitized['pdf_size'] === 'CUSTOM' && ( (int) $sanitized['custom_pdf_size'][0] === 0 || (int) $sanitized['custom_pdf_size'][1] === 0 ) )
 		) {
-			$this->notices->add_error( esc_html__( 'PDF could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
+			\GFCommon::add_error_message( esc_html__( 'PDF could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
 
 			return false;
 		}
@@ -335,7 +335,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* If it updated, let's update the global variable */
 		if ( $did_update !== false ) {
 			$this->log->notice(
-				'Successfully Saved Global PDF Settings.',
+				'Successfully Saved Form PDF Settings.',
 				[
 					'form_id'  => $form_id,
 					'pdf_id'   => $pdf_id,
@@ -343,13 +343,13 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				]
 			);
 
-			$this->notices->add_notice( sprintf( esc_html__( 'PDF saved successfully. %1$sBack to PDF list.%2$s', 'gravity-forms-pdf-extended' ), '<a href="' . remove_query_arg( 'pid' ) . '">', '</a>' ) );
+			\GFCommon::add_message( sprintf( esc_html__( 'PDF saved successfully. %1$sBack to PDF list.%2$s', 'gravity-forms-pdf-extended' ), '<a href="' . remove_query_arg( 'pid' ) . '">', '</a>' ) );
 
 			return true;
 		}
 
-		$this->log->error( 'Failed to Save Global PDF Settings.' );
-		$this->notices->add_error( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-forms-pdf-extended' ) );
+		$this->log->error( 'Failed to Save Form PDF Settings.' );
+		\GFCommon::add_error_message( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-forms-pdf-extended' ) );
 
 		return false;
 	}
@@ -378,7 +378,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* Check we have a valid nonce, or throw an error */
 		if ( ! wp_verify_nonce( rgpost( 'gfpdf_save_pdf' ), 'gfpdf_save_pdf' ) ) {
 			$this->log->warning( 'Nonce Verification Failed.' );
-			$this->notices->add_error( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-forms-pdf-extended' ) );
+			\GFCommon::add_error_message( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-forms-pdf-extended' ) );
 
 			return false;
 		}
@@ -405,10 +405,9 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 				/* If the value is an array ensure all items have values */
 				if ( is_array( $value ) ) {
-
-					$size = sizeof( $value );
-					if ( sizeof( array_filter( $value ) ) !== $size ) {
-						$field['class'] .= ' gfield_error';
+					if ( count( array_filter( $value ) ) !== count( $value ) ) {
+						$field['class'] .= ' gform-settings-input__container--invalid';
+						$field['desc2'] = '<div class="gform-settings-validation__error">' . esc_html__( 'This field is required.', 'gravityforms' ) . '</div>';
 					}
 				} else {
 
@@ -419,7 +418,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 					 */
 					$value = apply_filters( 'gfpdf_form_settings_sanitize_text', $value, $key );
 					if ( empty( $value ) ) {
-						$field['class'] .= ' gfield_error';
+						$field['class'] .= ' gform-settings-input__container--invalid';
+						$field['desc2'] = '<div class="gform-settings-validation__error">' . esc_html__( 'This field is required.', 'gravityforms' ) . '</div>';
 					}
 				}
 			}
