@@ -7,7 +7,7 @@ class Pages {
    * @since 4.0
    */
   isSettings () {
-    return $('#gfpdf-horizontal-settings-menu').length
+    return $('#pdfextended-settings').length
   }
 
   /**
