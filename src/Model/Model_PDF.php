@@ -546,6 +546,7 @@ class Model_PDF extends Helper_Abstract_Model {
 					);
 
 					/* there's no returning, throw generic error */
+
 					return new WP_Error( 'access_denied', esc_html__( 'You do not have access to view this PDF.', 'gravity-forms-pdf-extended' ) );
 				}
 			}
@@ -635,7 +636,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Display the PDF links on the entry detailed section of the admin area
 	 *
-	 * @param array   $args   Combined form and entry array
+	 * @param array $args Combined form and entry array
 	 *
 	 * @return void
 	 *
@@ -664,15 +665,22 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @return array
 	 */
 	public function register_pdf_meta_box( $meta_boxes, $entry, $form ) {
-		$meta_boxes['pdfs'] = [
-			'title'         => 'PDfs',
-			'callback'      => [ $this, 'view_pdf_entry_detail' ],
-			'context'       => 'side',
-			'priority'      => 'high',
-			'callback_args' => [ 'form' => $form, 'entry' => $entry ]
+		$meta = [
+			'pdfs' => [
+				'title'         => esc_html__( 'PDFs', 'gravity-forms-pdf-extended' ),
+				'callback'      => [ $this, 'view_pdf_entry_detail' ],
+				'context'       => 'side',
+				'callback_args' => [ 'form' => $form, 'entry' => $entry ],
+			],
 		];
 
-		return $meta_boxes;
+		/* Ensure the PDF meta box is inserted right after the Entry box */
+
+		return array_merge(
+			array_slice( $meta_boxes, 0, 1 ),
+			$meta,
+			array_slice( $meta_boxes, 1 )
+		);
 	}
 
 	/**

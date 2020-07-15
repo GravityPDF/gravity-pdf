@@ -201,7 +201,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		add_filter( 'gfpdf_legacy_pre_view_or_download_pdf', [ $this, 'sgoptimizer_html_minification_fix' ] );
 
 		/* Meta boxes */
-		add_filter( 'gform_entry_detail_meta_boxes', [$this->model,'register_pdf_meta_box'], 5,4);
+		add_filter( 'gform_entry_detail_meta_boxes', [ $this->model, 'register_pdf_meta_box' ], 10, 3 );
 	}
 
 	/**
