@@ -204,7 +204,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		/* Load modules */
 		$this->installer();
-		$this->welcome_screen();
 		$this->gf_settings();
 		$this->gf_form_settings();
 		$this->pdf();
@@ -294,7 +293,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function plugin_action_links( $links ) {
 
 		$action_links = [
-			'getting_started' => '<a href="' . esc_url( admin_url( 'index.php?page=gfpdf-getting-started' ) ) . '" title="' . esc_attr__( 'Get started with Gravity PDF', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Getting Started', 'gravity-forms-pdf-extended' ) . '</a>',
 			'settings'        => '<a href="' . esc_url( $this->data->settings_url ) . '" title="' . esc_attr__( 'View Gravity PDF Settings', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Settings', 'gravity-forms-pdf-extended' ) . '</a>',
 		];
 
@@ -619,32 +617,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/* Add to our singleton controller */
 		$this->singleton->add_class( $class );
 		$this->singleton->add_class( $model );
-	}
-
-	/**
-	 * Include Welcome Screen functionality for installation / upgrades
-	 *
-	 * @since 4.0
-	 *
-	 * @return void
-	 */
-	public function welcome_screen() {
-
-		$model = new Model\Model_Welcome_Screen( $this->log );
-		$view  = new View\View_Welcome_Screen(
-			[
-				'display_version' => PDF_EXTENDED_VERSION,
-			],
-			$this->gform
-		);
-
-		$class = new Controller\Controller_Welcome_Screen( $model, $view, $this->log, $this->data, $this->options );
-		$class->init();
-
-		/* Add to our singleton controller */
-		$this->singleton->add_class( $class );
-		$this->singleton->add_class( $model );
-		$this->singleton->add_class( $view );
 	}
 
 	/**
