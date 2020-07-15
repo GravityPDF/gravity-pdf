@@ -11,6 +11,7 @@ use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Abstract_View;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Field_Container;
+use GFPDF\Helper\Helper_Field_Container_Gf25;
 use GFPDF\Helper\Helper_Field_Container_Void;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_PDF;
@@ -363,7 +364,13 @@ class View_PDF extends Helper_Abstract_View {
 		$products    = new Field_Products( new GF_Field(), $entry, $this->gform, $this->misc );
 		$page_number = 0;
 
-		$container = ( isset( $config['meta']['enable_css_ready_classes'] ) && false === $config['meta']['enable_css_ready_classes'] ) ? new Helper_Field_Container_Void() : new Helper_Field_Container();
+		$enable_columns = ! isset( $config['meta']['enable_css_ready_classes'] ) || $config['meta']['enable_css_ready_classes'];
+		if ( $enable_columns ) {
+			$container = ! \GFCommon::is_legacy_markup_enabled( $form['id'] ) ? new Helper_Field_Container_Gf25() : new Helper_Field_Container();
+		} else {
+			$container = new Helper_Field_Container_Void();
+		}
+
 		$container = apply_filters( 'gfpdf_field_container_class', $container );
 
 		/* Allow the config to be changed through a filter */

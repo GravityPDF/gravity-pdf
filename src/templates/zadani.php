@@ -2,7 +2,7 @@
 
 /*
  * Template Name: Zadani
- * Version: 1.2.2
+ * Version: 2.0.0
  * Description: A minimalist business-style template that will generate a well-spaced document great for printing. Through the Template tab you can control the PDF header and footer, change the background color or image, and show or hide the form title, page names, HTML fields and the Section Break descriptions.
  * Author: Gravity PDF
  * Author URI: https://gravitypdf.com
@@ -46,6 +46,56 @@ $value_border_colour = ( ! empty( $settings['zadani_border_colour'] ) ) ? $setti
 		padding: 1.25mm 0;
 	}
 
+	/* Handle GF2.5+ Columns */
+	.grid {
+		float: left;
+	}
+
+	.grid-3 {
+		width: 25%;
+	}
+
+	.grid-4 {
+		width: 33.33%;
+	}
+
+	.grid-5 {
+		width: 41.66%;
+	}
+
+	.grid-6 {
+		width: 50%;
+	}
+
+	.grid-7 {
+		width: 58.33%;
+	}
+
+	.grid-8 {
+		width: 66.66%;
+	}
+
+	.grid-9 {
+		width: 75%
+	}
+
+	.grid-10 {
+		width: 83.33%;
+	}
+
+	.grid-11 {
+		width: 91.66%;
+	}
+
+	.grid-12 {
+		width: 100%;
+	}
+
+	.inner-container {
+		width: 95%;
+	}
+
+	/* Handle Legacy Columns */
 	.gf_left_half,
 	.gf_left_third, .gf_middle_third,
 	.gf_first_quarter, .gf_second_quarter, .gf_third_quarter,
