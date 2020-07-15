@@ -230,14 +230,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'std'     => esc_html__( 'Manage Fonts', 'gravity-forms-pdf-extended' ),
 						'options' => 'install_fonts',
 					],
-
-					'setup_templates' => [
-						'id'      => 'setup_templates',
-						'name'    => esc_html__( 'Setup Custom Templates', 'gravity-forms-pdf-extended' ),
-						'desc'    => sprintf( esc_html__( 'Setup environment for building custom templates. This tool will copy the core templates to the PDF Working Directory so you can freely create and modify PDF templates without the risk of overriding your modifications when doing plugin updates. %1$sView the developer documentation to get started%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/developer-first-custom-pdf/">', '</a>' ),
-						'type'    => 'button',
-						'std'     => esc_html__( 'Run Setup', 'gravity-forms-pdf-extended' ),
-					],
 				]
 			),
 

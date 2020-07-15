@@ -32,21 +32,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	do_action( 'gfpdf_post_tools_settings_page' );
 	?>
 
-	<?php if ( $args['custom_template_setup_warning'] ): ?>
-		<!-- only show custom template warning if user has already installed them once -->
-		<div id="setup-templates-confirm" title="<?php esc_html_e( 'Setup Custom Templates', 'gravity-forms-pdf-extended' ); ?>" style="display: none;">
-			<?php printf( esc_html__( 'During the setup process any of the following templates stored in %1$s will be overridden. If you have modified any of the following template or template configuration files %2$smake a backup before continuing%3$s.', 'gravity-forms-pdf-extended' ), '<br><code>' . $args['template_directory'] . '</code>', '<strong>', '</strong>' ); ?>
-
-			<?php if ( count( $args['template_files'] ) > 0 ): ?>
-				<ul>
-					<?php foreach ( $args['template_files'] as $file ): ?>
-						<li><?php echo basename( $file ); ?></li>
-					<?php endforeach; ?>
-				</ul>
-			<?php endif; ?>
-		</div>
-	<?php endif; ?>
-
 	<div id="manage-font-files" title="<?php esc_html_e( 'Manage Fonts', 'gravity-forms-pdf-extended' ); ?>" style="display: none;">
 		<?php esc_html_e( 'Manage all your custom Gravity PDF fonts in one place.', 'gravity-forms-pdf-extended' ); ?> <?php esc_html_e( 'Only .ttf font files are supported and they MUST be uploaded through your media library (no external links).', 'gravity-forms-pdf-extended' ); ?>
 

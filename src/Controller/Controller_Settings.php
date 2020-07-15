@@ -163,9 +163,6 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 			add_action( 'gfpdf_post_tools_settings_page', [ $this->view, 'uninstaller' ], 5 );
 		}
 
-		/* Process the tool tab actions */
-		add_action( 'admin_init', [ $this, 'process_tool_tab_actions' ] );
-
 		/**
 		 * Add AJAX Action Endpoints
 		 */
@@ -289,58 +286,6 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		}
 
 		return $nav;
-	}
-
-	/**
-	 * Check if any of the tool tab actions have been triggered and process
-	 *
-	 * @return void|boolean
-	 *
-	 * @since 4.0
-	 */
-	public function process_tool_tab_actions() {
-
-		/* check if we are on the tools settings page */
-		if ( ! $this->misc->is_gfpdf_settings_tab( 'tools' ) ) {
-			return null;
-		}
-
-		/* check if the user has permission to copy the templates */
-		if ( ! $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
-
-			$this->log->critical(
-				'Lack of User Capabilities.',
-				[
-					'user'      => wp_get_current_user(),
-					'user_meta' => get_user_meta( get_current_user_id() ),
-				]
-			);
-
-			return null;
-		}
-
-		$settings = rgpost( 'gfpdf_settings' );
-
-		/* Only run checks if the gfpdf_settings POST data exists */
-		if ( empty( $settings ) ) {
-			return null;
-		}
-
-		/* check if we should install the custom templates */
-		if ( isset( $settings['setup_templates']['name'] ) && isset( $settings['setup_templates']['nonce'] ) ) {
-			/* verify the nonce */
-			if ( ! wp_verify_nonce( $settings['setup_templates']['nonce'], 'gfpdf_settings[setup_templates]' ) ) {
-				$this->log->warning( 'Nonce Verification Failed.' );
-				$this->notices->add_error( esc_html__( 'There was a problem installing the PDF templates. Please try again.', 'gravity-forms-pdf-extended' ) );
-
-				return null;
-			}
-
-			return $this->model->install_templates();
-		}
-
-		/* See https://gravitypdf.com/documentation/v5/gfpdf_tool_tab_actions/ for more details about this action */
-		do_action( 'gfpdf_tool_tab_actions', $settings );
 	}
 
 	/**
