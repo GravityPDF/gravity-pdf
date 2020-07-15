@@ -9,30 +9,12 @@ import { resizeDialogIfNeeded } from '../../../helper/resizeDialogIfNeeded'
  */
 export function setupToolsUninstallDialog () {
   const $uninstall = $('#gfpdf_settings\\[uninstaller\\]')
-  const $uninstallDialog = $('#uninstall-confirm')
-
-  /* Set up uninstall dialog */
-  const uninstallButtons = [{
-    text: GFPDF.uninstall,
-    click: function () {
-      /* submit form */
-      $uninstall.parents('form').submit()
-    }
-  }, {
-    text: GFPDF.cancel,
-    click: function () {
-      /* cancel */
-      $uninstallDialog.wpdialog('close')
-    }
-  }]
-
-  wpDialog($uninstallDialog, uninstallButtons, 500, 175)
 
   $uninstall.click(function () {
-    /* Allow responsiveness */
-    resizeDialogIfNeeded($uninstallDialog, 500, 175)
+    if(window.confirm(GFPDF.uninstallWarning)) {
+      $uninstall.parents('form').submit()
+    }
 
-    $uninstallDialog.wpdialog('open')
     return false
   })
 }

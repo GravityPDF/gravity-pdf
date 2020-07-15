@@ -23,7 +23,3 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<?= $args['content'] ?>
 </form>
-
-<div id="uninstall-confirm" title="<?php esc_attr_e( 'Uninstall Gravity PDF', 'gravity-forms-pdf-extended' ); ?>" style="display: none;">
-	<?php printf( esc_html__( "Warning! ALL Gravity PDF data, %1\$sincluding PDF configurations and ALL custom templates%2\$s will be deleted. This cannot be undone. Select 'Uninstall' to delete, 'Cancel' to stop.", 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ); ?>
-</div>
