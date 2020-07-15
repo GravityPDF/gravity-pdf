@@ -18,8 +18,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <?php do_action( 'gfpdf_entry_detail_pre_pdf_title_markup', $args['pdfs'] ); ?>
 
-<strong><?php esc_html_e( 'PDFs', 'gravity-forms-pdf-extended' ); ?></strong><br />
-
 <?php do_action( 'gfpdf_entry_detail_post_pdf_title_markup', $args['pdfs'] ); ?>
 
 <?php foreach ( $args['pdfs'] as $pdf ): ?>

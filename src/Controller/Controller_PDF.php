@@ -122,7 +122,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 
 		/* Display PDF links in Gravity Forms Admin Area */
 		add_action( 'gform_entries_first_column_actions', [ $this->model, 'view_pdf_entry_list' ], 10, 4 );
-		add_action( 'gform_entry_info', [ $this->model, 'view_pdf_entry_detail' ], 10, 2 );
+		//add_action( 'gform_entry_info', [ $this->model, 'view_pdf_entry_detail' ], 10, 2 );
 
 		/* Add save PDF actions */
 		add_action( 'gform_after_submission', [ $this->model, 'maybe_save_pdf' ], 10, 2 );
@@ -200,6 +200,9 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		/* Third Party Conflict Fixes */
 		add_filter( 'gfpdf_pre_view_or_download_pdf', [ $this, 'sgoptimizer_html_minification_fix' ] );
 		add_filter( 'gfpdf_legacy_pre_view_or_download_pdf', [ $this, 'sgoptimizer_html_minification_fix' ] );
+
+		/* Meta boxes */
+		add_filter( 'gform_entry_detail_meta_boxes', [$this->model,'register_pdf_meta_box'], 5,4);
 	}
 
 	/**
