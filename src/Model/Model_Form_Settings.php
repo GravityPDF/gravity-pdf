@@ -278,7 +278,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* Check Nonce is valid */
 		if ( ! wp_verify_nonce( rgpost( 'gfpdf_save_pdf' ), 'gfpdf_save_pdf' ) ) {
 			$this->log->warning( 'Nonce Verification Failed.' );
-			\GFCommon::add_error_message( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-forms-pdf-extended' ) );
+			$this->notices->add_error( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-forms-pdf-extended' ) );
 
 			return false;
 		}
@@ -300,7 +300,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				]
 			);
 
-			\GFCommon::add_error_message( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-forms-pdf-extended' ) );
+			$this->notices->add_error( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-forms-pdf-extended' ) );
 
 			return false;
 		}
@@ -321,7 +321,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		if ( empty( $sanitized['name'] ) || empty( $sanitized['filename'] ) ||
 			 ( $sanitized['pdf_size'] === 'CUSTOM' && ( (int) $sanitized['custom_pdf_size'][0] === 0 || (int) $sanitized['custom_pdf_size'][1] === 0 ) )
 		) {
-			\GFCommon::add_error_message( esc_html__( 'PDF could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
+			$this->notices->add_error( esc_html__( 'PDF could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
 
 			return false;
 		}
@@ -343,13 +343,13 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				]
 			);
 
-			\GFCommon::add_message( sprintf( esc_html__( 'PDF saved successfully. %1$sBack to PDF list.%2$s', 'gravity-forms-pdf-extended' ), '<a href="' . remove_query_arg( 'pid' ) . '">', '</a>' ) );
+			$this->notices->add_notice( sprintf( esc_html__( 'PDF saved successfully. %1$sBack to PDF list.%2$s', 'gravity-forms-pdf-extended' ), '<a href="' . remove_query_arg( 'pid' ) . '">', '</a>' ) );
 
 			return true;
 		}
 
 		$this->log->error( 'Failed to Save Form PDF Settings.' );
-		\GFCommon::add_error_message( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-forms-pdf-extended' ) );
+		$this->notices->add_error( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-forms-pdf-extended' ) );
 
 		return false;
 	}
@@ -378,7 +378,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* Check we have a valid nonce, or throw an error */
 		if ( ! wp_verify_nonce( rgpost( 'gfpdf_save_pdf' ), 'gfpdf_save_pdf' ) ) {
 			$this->log->warning( 'Nonce Verification Failed.' );
-			\GFCommon::add_error_message( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-forms-pdf-extended' ) );
+			$this->notices->add_error( esc_html__( 'There was a problem saving your PDF settings. Please try again.', 'gravity-forms-pdf-extended' ) );
 
 			return false;
 		}
