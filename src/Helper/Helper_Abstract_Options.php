@@ -1124,14 +1124,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$input = $input ? $input : [];
 		$input = apply_filters( 'gfpdf_settings_' . $tab . '_sanitize', $input );
 
-		/**
-		 * Loop through the settings whitelist and add any missing required fields to the $input
-		 * Prevalant with Select boxes
+		/*
+		 * Loop through the settings whitelist and add any missing fields to the $input
+		 * (prevalent with Select boxes)
 		 */
 		foreach ( $settings as $key => $value ) {
-			if ( isset( $value['required'] ) && $value['required'] ) {
 				switch ( $value['type'] ) {
 					case 'select':
+					case 'multicheck':
 						if ( ! isset( $input[ $key ] ) ) {
 							$input[ $key ] = [];
 						}
@@ -1143,7 +1143,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 						}
 						break;
 				}
-			}
 		}
 
 		/* Loop through each setting being saved and pass it through a sanitization filter */
@@ -1426,21 +1425,21 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				}
 
 				/* Add support for switching setting from (multi)select to multicheck */
-				$options = isset( $options[ $args['id'] ] ) ? array_flip( $options[ $args['id'] ] ) : [];
-				if ( isset( $options[ $args['multi-option'] ] ) ) {
+				$legacy_options = isset( $options[ $args['id'] ] ) ? array_flip( $options[ $args['id'] ] ) : [];
+				if ( isset( $legacy_options[ $args['multi-option'] ] ) ) {
 					return $args['multi-option'];
 				}
 
-				$options = isset( $pdf_form_settings[ $args['id'] ] ) ? array_flip( $pdf_form_settings[ $args['id'] ] ) : [];
-				if ( isset( $options[ $args['multi-option'] ] ) ) {
+				$legacy_options = isset( $pdf_form_settings[ $args['id'] ] ) ? array_flip( $pdf_form_settings[ $args['id'] ] ) : [];
+				if ( isset( $legacy_options[ $args['multi-option'] ] ) ) {
 					return $args['multi-option'];
 				}
 
 				/* Add default support */
-				if ( empty( $options[ $args['id'] ] ) && empty( $pdf_form_settings[ $args['id'] ] ) && isset( $args['std'] ) ) {
+				if ( ! isset( $options[ $args['id'] ] ) && ! isset( $pdf_form_settings[ $args['id'] ] ) && isset( $args['std'] ) ) {
 					$args['std'] = is_array( $args['std'] ) ? $args['std'] : [ $args['std' ] ];
 
-					if( in_array( $args['multi-key'], $args['std'], true ) ) {
+					if ( in_array( $args['multi-key'], $args['std'], true ) ) {
 						return $args['multi-option'];
 					}
 				}
