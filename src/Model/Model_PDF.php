@@ -663,10 +663,12 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @param array $form       The form object used to process the current entry.
 	 *
 	 * @return array
+	 *
+	 * @since 6.0
 	 */
 	public function register_pdf_meta_box( $meta_boxes, $entry, $form ) {
 		$meta = [
-			'pdfs' => [
+			'gfpdf-entry-details-list' => [
 				'title'         => esc_html__( 'PDFs', 'gravity-forms-pdf-extended' ),
 				'callback'      => [ $this, 'view_pdf_entry_detail' ],
 				'context'       => 'side',
