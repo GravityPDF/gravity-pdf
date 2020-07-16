@@ -698,6 +698,14 @@ class Model_Settings extends Helper_Abstract_Model {
 		foreach ( $this->data->addon as $addon ) {
 			$option_key = 'license_' . $addon->get_slug();
 
+			/* Check if the license key is now empty */
+			if ( isset( $input[ $option_key ] ) && strlen( trim( $input[ $option_key ] ) ) === 0 ) {
+				$input[ $option_key . '_message' ] = '';
+				$input[ $option_key . '_status' ]  = '';
+
+				continue;
+			}
+
 			/* Check this add-on key was submitted, it isn't the same as previously, or it's not active */
 			if ( isset( $input[ $option_key ] )
 				 && (
@@ -709,12 +717,6 @@ class Model_Settings extends Helper_Abstract_Model {
 
 				$input[ $option_key . '_message' ] = $results['message'];
 				$input[ $option_key . '_status' ]  = $results['status'];
-			}
-
-			/* Check if the license key is now empty */
-			if ( isset( $input[ $option_key ] ) && strlen( trim( $input[ $option_key ] ) ) === 0 ) {
-				$input[ $option_key . '_message' ] = '';
-				$input[ $option_key . '_status' ]  = '';
 			}
 		}
 
@@ -761,7 +763,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			);
 		} else {
 			$license_data = json_decode( wp_remote_retrieve_body( $response ) );
-			$message      = '';
+			$message      = __( 'Your support license key has been successfully validated.', 'gravityforms' );
 			$status       = 'active';
 
 			if ( ! isset( $license_data->success ) || false === $license_data->success ) {

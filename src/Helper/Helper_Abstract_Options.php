@@ -1653,7 +1653,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$value      = $this->get_form_value( $args );
 		$args['id'] = esc_attr( $args['id'] );
 
-		$html = '<input autocomplete="off" type="text" class="regular-text" id="gfpdf_settings[' . $args['id'] . ']" class="gfpdf_settings_' . $args['id'] . '" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value['key'] ) ) . '" />';
+		$html = '';
 
 		$is_error = ! in_array( $value['status'], [ '', 'active' ], true );
 		$is_active = $value['status'] === 'active';
@@ -1664,12 +1664,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$html  .= sprintf( $alert, wp_kses_post( $value['msg'] ) );
 		}
 
+		$html .= '<input autocomplete="off" type="text" class="regular-text" id="gfpdf_settings[' . esc_attr( $args['id'] ) . ']" class="gfpdf_settings_' . esc_attr( $args['id'] ) . '" name="gfpdf_settings[' . esc_attr( $args['id'] ) . ']" value="' . esc_attr( stripslashes( $value['key'] ) ) . '" />';
+
 		/* Add renewal info */
 		if ( $is_active ) {
 			$html .= ' <button 
 				class="button primary white gfpdf-deactivate-license" 
-				data-addon-name="' . substr( $args['id'], 8 ) . '" 
-				data-license="' . $value['key'] . '" 
+				data-addon-name="' . esc_attr( substr( $args['id'], 8 ) ) . '" 
+				data-license="' . esc_attr( $value['key'] ) . '" 
 				data-nonce="' . wp_create_nonce( 'gfpdf_deactivate_license' ) . '">' .
 					 esc_attr__( 'Deactivate License', 'gravity-forms-pdf-extended' ) .
 				'</button>';

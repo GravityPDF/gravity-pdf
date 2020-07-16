@@ -10,7 +10,6 @@ export function setupLicenseDeactivation () {
   $('.gfpdf-deactivate-license').click(function () {
     /* Do AJAX call so user can deactivate license */
     const $container = $(this).parent()
-    $container.find('.gf_settings_description label').html('')
 
     /* Add spinner */
     const $spinner = spinner('gfpdf-spinner')
@@ -40,10 +39,18 @@ export function setupLicenseDeactivation () {
         $('#gfpdf_settings\\[license_' + slug + '_status\\]').val('')
         $container.find('button').remove()
 
-        $container.find('.gf_settings_description label').html(response.success)
+        $container
+          .find('#message')
+          .removeClass('error')
+          .addClass('success')
+          .html(response.success)
       } else {
         /* Show error message */
-        $container.find('.gf_settings_description label').html(response.error)
+        $container
+          .find('#message')
+          .removeClass('success')
+          .addClass('error')
+          .html(response.error)
       }
     })
 

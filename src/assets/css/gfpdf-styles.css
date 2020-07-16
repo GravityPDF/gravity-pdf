@@ -720,7 +720,7 @@ div img.gfpdf-image {
 #pdfextended-settings .gfpdf-spinner,
 .wp-dialog .gfpdf-spinner,
 #gfpdf_list_form .gfpdf-spinner {
- padding: 5px;
+ padding: 0 5px;
  vertical-align: middle;
  width: 27px;
 }
