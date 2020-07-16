@@ -6,7 +6,8 @@ import {
   GET_FILES_FROM_GITHUB_SUCCESS,
   GET_FILES_FROM_GITHUB_FAILED,
   REQUEST_SENT_COUNTER,
-  CLEAR_REQUEST_REMAINING_DATA, GET_FILES_FROM_GITHUB
+  CLEAR_REQUEST_REMAINING_DATA,
+  GET_FILES_FROM_GITHUB
 } from '../actions/coreFonts'
 
 /**
@@ -117,7 +118,7 @@ export default function (state = initialState, action) {
      * @since 5.2
      */
     case GET_FILES_FROM_GITHUB_SUCCESS: {
-      let files = []
+      const files = []
 
       /* Push font names into array */
       action.payload.map((item) => {
@@ -157,7 +158,7 @@ export default function (state = initialState, action) {
             ...state,
             console: {
               ...state.console,
-              ['completed']: {
+              completed: {
                 status: status,
                 message: message
               }
@@ -172,7 +173,7 @@ export default function (state = initialState, action) {
               ...state,
               console: {
                 ...state.console,
-                ['completed']: {
+                completed: {
                   status: status,
                   message: message
                 }

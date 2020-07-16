@@ -16,7 +16,7 @@ import React from 'react'
  */
 const DisplayResultEmpty = () => {
   return (
-    <li className='noResult'>{GFPDF.noResultText}</li>
+    <li data-test='component-result-empty' className='noResult'>{GFPDF.noResultText}</li>
   )
 }
 

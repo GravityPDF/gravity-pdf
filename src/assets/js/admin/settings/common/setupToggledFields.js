@@ -7,7 +7,7 @@ import $ from 'jquery'
  */
 export function setupToggledFields () {
   $('form').off('change', '.gfpdf-input-toggle').on('change', '.gfpdf-input-toggle', function () {
-    let $container = $(this).parent().next()
+    const $container = $(this).parent().next()
 
     /* Currently checked so hide out input and if cotains rich_text, textarea or input we will delete values */
     if ($(this).prop('checked')) {
@@ -17,7 +17,7 @@ export function setupToggledFields () {
 
       /* Remove TinyMCE Content */
       $container.find('.wp-editor-area').each(function () {
-        let editor = tinyMCE.get($(this).attr('id'))
+        const editor = tinyMCE.get($(this).attr('id'))
 
         if (editor !== null) {
           editor.setContent('')

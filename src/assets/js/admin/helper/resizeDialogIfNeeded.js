@@ -11,11 +11,11 @@ import $ from 'jquery'
  * @since 4.0
  */
 export function resizeDialogIfNeeded ($dialog, maxWidth, maxHeight) {
-  let windowWidth = $(window).width()
-  let windowHeight = $(window).height()
+  const windowWidth = $(window).width()
+  const windowHeight = $(window).height()
 
-  let dialogWidth = (windowWidth < 500) ? windowWidth - 20 : maxWidth
-  let dialogHeight = (windowHeight < 500) ? windowHeight - 50 : maxHeight
+  const dialogWidth = (windowWidth < 500) ? windowWidth - 20 : maxWidth
+  const dialogHeight = (windowHeight < 500) ? windowHeight - 50 : maxHeight
 
   $dialog.wpdialog('option', 'width', dialogWidth)
   $dialog.wpdialog('option', 'height', dialogHeight)

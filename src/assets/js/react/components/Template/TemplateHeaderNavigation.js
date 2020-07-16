@@ -57,7 +57,7 @@ export class TemplateHeaderNavigation extends React.Component {
    *
    * @since 4.1
    */
-  previousTemplate = (e) => {
+  handlePreviousTemplate = (e) => {
     e.preventDefault()
     e.stopPropagation()
 
@@ -75,7 +75,7 @@ export class TemplateHeaderNavigation extends React.Component {
    *
    * @since 4.1
    */
-  nextTemplate = (e) => {
+  handleNextTemplate = (e) => {
     e.preventDefault()
     e.stopPropagation()
 
@@ -96,12 +96,12 @@ export class TemplateHeaderNavigation extends React.Component {
   handleKeyPress = (e) => {
     /* Left Arrow */
     if (!this.props.isFirst && e.keyCode === 37) {
-      this.previousTemplate(e)
+      this.handlePreviousTemplate(e)
     }
 
     /* Right Arrow */
     if (!this.props.isLast && e.keyCode === 39) {
-      this.nextTemplate(e)
+      this.handleNextTemplate(e)
     }
   }
 
@@ -109,7 +109,6 @@ export class TemplateHeaderNavigation extends React.Component {
    * @since 4.1
    */
   render () {
-
     /*
      * Work our the correct classes and attributes for our left and right arrows
      * based on if we are currently showing the first or last templates
@@ -117,34 +116,40 @@ export class TemplateHeaderNavigation extends React.Component {
     const isFirst = this.props.isFirst
     const isLast = this.props.isLast
 
-    let prevClass = (isFirst) ? 'dashicons dashicons-no left disabled' : 'dashicons dashicons-no left'
-    let nextClass = (isLast) ? 'dashicons dashicons-no right disabled' : 'dashicons dashicons-no right'
+    const prevClass = (isFirst) ? 'dashicons dashicons-no left disabled' : 'dashicons dashicons-no left'
+    const nextClass = (isLast) ? 'dashicons dashicons-no right disabled' : 'dashicons dashicons-no right'
 
-    let leftDisabled = (isFirst) ? 'disabled' : ''
-    let rightDisabled = (isLast) ? 'disabled' : ''
+    const leftDisabled = (isFirst) ? 'disabled' : ''
+    const rightDisabled = (isLast) ? 'disabled' : ''
 
     return (
-      <span>
+      <span data-test='component-templateHeaderNavigation'>
         <button
-          onClick={this.previousTemplate}
+          data-test='component-showPreviousTemplateButton'
+          onClick={this.handlePreviousTemplate}
           onKeyDown={this.handleKeyPress}
           className={prevClass}
-          tabIndex="141"
-          disabled={leftDisabled}>
-            <span
-              className="screen-reader-text">
-              {this.props.showPreviousTemplateText}
-            </span>
+          tabIndex='141'
+          disabled={leftDisabled}
+        >
+          <span
+            className='screen-reader-text'
+          >
+            {this.props.showPreviousTemplateText}
+          </span>
         </button>
 
         <button
-          onClick={this.nextTemplate}
+          data-test='component-showNextTemplateButton'
+          onClick={this.handleNextTemplate}
           onKeyDown={this.handleKeyPress}
           className={nextClass}
-          tabIndex="141"
-          disabled={rightDisabled}>
+          tabIndex='141'
+          disabled={rightDisabled}
+        >
           <span
-            className="screen-reader-text">
+            className='screen-reader-text'
+          >
             {this.props.showNextTemplateText}
           </span>
         </button>

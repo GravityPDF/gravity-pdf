@@ -7,17 +7,15 @@ import $ from 'jquery'
  */
 export function handleSecurityConditionals () {
   /* Get the appropriate elements for use */
-  let $secTable = $('#pdf-general-advanced')
-  let $pdfSecurity = $secTable.find('input[name="gfpdf_settings[security]"]')
-  let $format = $secTable.find('input[name="gfpdf_settings[format]"]')
+  const $secTable = $('#pdf-general-advanced')
+  const $pdfSecurity = $secTable.find('input[name="gfpdf_settings[security]"]')
+  const $format = $secTable.find('input[name="gfpdf_settings[format]"]')
 
   /* Add change event to admin restrictions to show/hide dependant fields */
   $pdfSecurity.change(function () {
-
     if ($(this).is(':checked')) {
-
       /* Get the format dependancy */
-      let format = $format.filter(':checked').val()
+      const format = $format.filter(':checked').val()
 
       if ($(this).val() === GFPDF.no || format !== GFPDF.standard) {
         /* hide security password / privileges */

@@ -63,7 +63,7 @@ export function * getDownloadFonts (chan) {
       const response = yield call(apiPostDownloadFonts, payload)
 
       if (!response.body) {
-        throw true
+        throw response
       }
 
       yield put(addToConsole(payload, 'success', GFPDF.coreFontItemSuccessMessage.replace('%s', payload)))
@@ -110,7 +110,7 @@ export function * watchDownloadFonts () {
   }
 
   while (true) {
-    const {payload} = yield take(DOWNLOAD_FONTS_API_CALL)
+    const { payload } = yield take(DOWNLOAD_FONTS_API_CALL)
     yield put(chan, payload)
   }
 }

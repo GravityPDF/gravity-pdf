@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
  * @since 4.1
  */
 export const TemplateDetails = ({ label }) => (
-  <span className='more-details'>{label}</span>
+  <span data-test='component-templateDetails' className='more-details'>{label}</span>
 )
 
 TemplateDetails.propTypes = {
@@ -39,7 +39,7 @@ TemplateDetails.propTypes = {
  * @since 4.1
  */
 export const Group = ({ group }) => (
-  <p className='theme-author'>{group}</p>
+  <p data-test='component-group' className='theme-author'>{group}</p>
 )
 
 Group.propTypes = {

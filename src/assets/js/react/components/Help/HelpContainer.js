@@ -18,7 +18,6 @@ import DisplayResultContainer from './DisplayResultContainer'
  * @since 5.2
  */
 export class HelpContainer extends Component {
-
   /**
    *
    * @since 5.2
@@ -54,7 +53,7 @@ export class HelpContainer extends Component {
    *
    * @since 5.2
    */
-  onHandleChange = event => {
+  handleChange = event => {
     // Set loading to true
     this.setState({ searchInput: event.target.value })
     // Set searchInput state value
@@ -86,14 +85,15 @@ export class HelpContainer extends Component {
     const { loading, helpResult, error } = this.props
 
     return (
-      <>
+      <div data-test='component-help-container'>
         <input
-          type="text"
+          data-test='component-input'
+          type='text'
           placeholder={'  ' + GFPDF.searchPlaceholder}
-          id="search-help-input"
-          name="searchInput"
+          id='search-help-input'
+          name='searchInput'
           value={searchInput}
-          onChange={this.onHandleChange}
+          onChange={this.handleChange}
         />
         <DisplayResultContainer
           searchInput={this.state.searchInput}
@@ -101,7 +101,7 @@ export class HelpContainer extends Component {
           helpResult={helpResult}
           error={error}
         />
-      </>
+      </div>
     )
   }
 }

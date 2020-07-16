@@ -8,11 +8,11 @@ import { resizeDialogIfNeeded } from '../../../helper/resizeDialogIfNeeded'
  * @since 4.0
  */
 export function setupToolsUninstallDialog () {
-  let $uninstall = $('#gfpdf-uninstall')
-  let $uninstallDialog = $('#uninstall-confirm')
+  const $uninstall = $('#gfpdf-uninstall')
+  const $uninstallDialog = $('#uninstall-confirm')
 
   /* Set up uninstall dialog */
-  let uninstallButtons = [{
+  const uninstallButtons = [{
     text: GFPDF.uninstall,
     click: function () {
       /* submit form */

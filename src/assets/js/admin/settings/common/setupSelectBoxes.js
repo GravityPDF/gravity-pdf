@@ -6,8 +6,8 @@ import $ from 'jquery'
  * @since 4.0
  */
 export function setupSelectBoxes () {
-  let $chosen = $('.gfpdf-chosen')
-  let chosenSettings = {
+  const $chosen = $('.gfpdf-chosen')
+  const chosenSettings = {
     disable_search_threshold: 5,
     width: '100%'
   }

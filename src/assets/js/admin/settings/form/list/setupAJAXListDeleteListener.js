@@ -15,12 +15,12 @@ export function setupAJAXListDeleteListener () {
    * Check if the last item was just deleted
    */
   function maybeShowEmptyRow () {
-    let $container = $('#gfpdf_list_form tbody')
+    const $container = $('#gfpdf_list_form tbody')
 
     if ($container.find('tr').length === 0) {
-      let $row = $('<tr>').addClass('no-items')
-      let $cell = $('<td>').attr('colspan', '5').addClass('colspanchange')
-      let $addNew = $('<a>').attr('href', $('#add-new-pdf').attr('href')).append(GFPDF.letsGoCreateOne + '.')
+      const $row = $('<tr>').addClass('no-items')
+      const $cell = $('<td>').attr('colspan', '5').addClass('colspanchange')
+      const $addNew = $('<a>').attr('href', $('#add-new-pdf').attr('href')).append(GFPDF.letsGoCreateOne + '.')
       $cell.append(GFPDF.thisFormHasNoPdfs).append(' ').append($addNew)
       $row.append($cell)
       $container.append($row)
@@ -28,23 +28,23 @@ export function setupAJAXListDeleteListener () {
   }
 
   /* Set up our delete dialog */
-  let $deleteDialog = $('#delete-confirm')
+  const $deleteDialog = $('#delete-confirm')
 
-  let deleteButtons = [{
+  const deleteButtons = [{
     text: GFPDF.delete,
     click: function () {
       /* handle ajax call */
       $deleteDialog.wpdialog('close')
-      let $elm = $($deleteDialog.data('elm'))
+      const $elm = $($deleteDialog.data('elm'))
 
       /* Add the spinner */
       $elm.append(spinner('gfpdf-spinner gfpdf-spinner-small')).parent().parent().attr('style', 'position:static; visibility: visible;')
 
-      let data = {
-        'action': 'gfpdf_list_delete',
-        'nonce': $elm.data('nonce'),
-        'fid': $elm.data('fid'),
-        'pid': $elm.data('id')
+      const data = {
+        action: 'gfpdf_list_delete',
+        nonce: $elm.data('nonce'),
+        fid: $elm.data('fid'),
+        pid: $elm.data('id')
       }
 
       ajaxCall(data, function (response) {
@@ -53,7 +53,7 @@ export function setupAJAXListDeleteListener () {
           $elm.parent().parent().attr('style', '').find('.gfpdf-spinner').remove()
 
           showMessage(response.msg)
-          let $row = $elm.parents('tr')
+          const $row = $elm.parents('tr')
           $row.css('background', '#ffb8b8').fadeOut(400, function () {
             this.remove()
             maybeShowEmptyRow()
@@ -75,7 +75,7 @@ export function setupAJAXListDeleteListener () {
 
   /* Add live delete listener */
   $('#gfpdf_list_form').on('click', 'a.submitdelete', function () {
-    let id = String($(this).data('id'))
+    const id = String($(this).data('id'))
     if (id.length > 0 && !$deleteDialog.data('elm')) {
       /* Allow responsiveness */
       resizeDialogIfNeeded($deleteDialog, 300, 175)

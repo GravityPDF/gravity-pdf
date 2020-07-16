@@ -44,10 +44,10 @@ export class TemplateListItem extends React.Component {
    *
    * @since 4.1
    */
-  maybeShowDetailedTemplate = (e) => {
+  handleMaybeShowDetailedTemplate = (e) => {
     /* Show detailed template when the Enter key is pressed and the active element doesn't include a 'button' class */
     if (e.keyCode === 13 && (e.target.className.indexOf('button') === -1)) {
-      this.showDetailedTemplate()
+      this.handleShowDetailedTemplate()
     }
   }
 
@@ -56,7 +56,7 @@ export class TemplateListItem extends React.Component {
    *
    * @since 4.1
    */
-  showDetailedTemplate = () => {
+  handleShowDetailedTemplate = () => {
     this.props.history.push('/template/' + this.props.template.id)
   }
 
@@ -66,7 +66,7 @@ export class TemplateListItem extends React.Component {
    * @since 4.1
    */
   removeMessage = () => {
-    this.props.updateTemplateParam(this.props.template['id'], 'message', null)
+    this.props.updateTemplateParam(this.props.template.id, 'message', null)
   }
 
   /**
@@ -74,31 +74,56 @@ export class TemplateListItem extends React.Component {
    */
   render () {
     const item = this.props.template
-    const isActiveTemplate = this.props.activeTemplate === item['id']
-    const isCompatible = item['compatible']
+    const isActiveTemplate = this.props.activeTemplate === item.id
+    const isCompatible = item.compatible
     const activeTemplate = (isActiveTemplate) ? 'active theme' : 'theme'
 
     return (
       <div
-        onClick={this.showDetailedTemplate}
-        onKeyDown={this.maybeShowDetailedTemplate}
+        data-test='component-templateListItem'
+        onClick={this.handleShowDetailedTemplate}
+        onKeyDown={this.handleMaybeShowDetailedTemplate}
         className={activeTemplate}
-        data-slug={item['id']}
-        tabIndex="150">
+        data-slug={item.id}
+        tabIndex='150'
+      >
 
-        <TemplateScreenshot image={item['screenshot']} />
-        {item['error'] ? <ShowMessage text={item['error']} error={true} /> : null}
-        {item['message'] ?
-          <ShowMessage text={item['message']} dismissableCallback={this.removeMessage} dismissable={true}
-                       delay={12000} /> : null}
+        <TemplateScreenshot
+          data-test='component-templateScreenshot'
+          image={item.screenshot}
+        />
+        {item.error ? (
+          <ShowMessage
+            data-test='component-showMessage'
+            text={item.error}
+            error
+          />
+        ) : null}
+        {item.message ? (
+          <ShowMessage
+            data-test='component-showMessage'
+            text={item.message}
+            dismissableCallback={this.removeMessage}
+            dismissable
+            delay={12000}
+          />
+        ) : null}
 
-        <TemplateDetails label={this.props.templateDetailsText} />
-        <Group group={item['group']} />
-        <Name name={item['template']} />
+        <TemplateDetails
+          data-test='component-templateDetails'
+          label={this.props.templateDetailsText}
+        />
+        <Group data-test='component-group' group={item.group} />
+        <Name data-test='component-name' name={item.template} />
 
-        <div className="theme-actions">
-          {!isActiveTemplate && isCompatible ?
-            <TemplateActivateButton template={this.props.template} buttonText={this.props.activateText} /> : null}
+        <div className='theme-actions'>
+          {!isActiveTemplate && isCompatible ? (
+            <TemplateActivateButton
+              data-test='component-templateActivateButton'
+              template={this.props.template}
+              buttonText={this.props.activateText}
+            />
+          ) : null}
         </div>
       </div>
     )
@@ -129,7 +154,7 @@ const mapStateToProps = (state) => {
  *
  * @since 4.1
  */
-const mapDispatchToProps = (dispatch) => {
+export const mapDispatchToProps = (dispatch) => {
   return {
     updateTemplateParam: (id, name, value) => {
       dispatch(updateTemplateParam(id, name, value))

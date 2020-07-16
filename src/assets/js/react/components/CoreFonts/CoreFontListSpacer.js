@@ -13,7 +13,7 @@ import React from 'react'
  * @since 5.0
  */
 const CoreFontListSpacer = () => (
-  <div className='gfpdf-core-font-spacer'>---</div>
+  <div data-test='component-coreFontList-spacer' className='gfpdf-core-font-spacer'>---</div>
 )
 
 export default CoreFontListSpacer

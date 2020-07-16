@@ -19,7 +19,7 @@ const TemplateScreenshots = ({ image }) => {
   const className = (image) ? 'screenshot' : 'screenshot blank'
 
   return (
-    <div className='theme-screenshots'>
+    <div data-test='component-templateScreenshots' className='theme-screenshots'>
       <div className={className}>
         {image ? <img src={image} alt='' /> : null}
       </div>

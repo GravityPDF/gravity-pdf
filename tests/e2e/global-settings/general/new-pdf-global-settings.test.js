@@ -33,7 +33,6 @@ test('should check that a new added PDF has the updated global settings set', as
     .click(newFontColorGreen)
     .click(radioItem('gfpdf_settings', 'default_rtl', 'Yes'))
     .click(run.saveButton)
-    .expect(run.successUpdateMessage.exists).ok()
   await pdf.navigateAddPdf('gf_edit_forms&view=settings&subview=pdf&id=2')
   await pdf.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=2')
   await t
@@ -79,7 +78,6 @@ test('should reset the new set global settings back to the default global settin
     .click(fontColorDefaultButton)
     .click(radioItem('gfpdf_settings', 'default_rtl', 'No'))
     .click(run.saveButton)
-    .expect(run.successUpdateMessage.exists).ok()
     .expect(defaultValue('A4 (210 x 297mm)').exists).ok()
     .expect(defaultValue('Zadani').exists).ok()
     .expect(defaultValue('Dejavu Sans Condensed').exists).ok()

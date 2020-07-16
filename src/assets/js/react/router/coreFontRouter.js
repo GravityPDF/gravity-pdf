@@ -31,12 +31,14 @@ const Routes = ({ button }) => (
       <Route
         path='/downloadCoreFonts'
         exact
-        render={(props) => <CoreFont history={props.history} button={button} />} />
+        render={(props) => <CoreFont history={props.history} button={button} />}
+      />
 
       <Route
         path='/retryDownloadCoreFonts'
         exact
-        render={(props) => <CoreFont history={props.history} button={button} />} />
+        render={(props) => <CoreFont history={props.history} button={button} />}
+      />
     </Switch>
   </Router>
 )

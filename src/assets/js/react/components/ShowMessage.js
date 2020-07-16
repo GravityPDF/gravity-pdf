@@ -16,7 +16,7 @@ import $ from 'jquery'
  *
  * @since 4.1
  */
-class showMessage extends React.Component {
+export class ShowMessage extends React.Component {
   /**
    * Pass the "dismissable" prop to enable auto-clearing
    *
@@ -26,7 +26,7 @@ class showMessage extends React.Component {
    */
   static defaultProps = {
     delay: 4000,
-    dismissable: false,
+    dismissable: false
   }
 
   /**
@@ -35,10 +35,9 @@ class showMessage extends React.Component {
   static propTypes = {
     text: PropTypes.string.isRequired,
     error: PropTypes.bool,
-
     delay: PropTypes.number,
     dismissable: PropTypes.bool,
-    dismissableCallback: PropTypes.func,
+    dismissableCallback: PropTypes.func
   }
 
   /**
@@ -51,13 +50,17 @@ class showMessage extends React.Component {
   }
 
   /**
-   * Resets our state and timer when new props received
+   * If component did update, call reset state function
+   *
+   * @param prevProps
+   * @param prevState
    *
    * @since 4.1
    */
-  componentWillReceiveProps () {
-    this.setState({visible: true})
-    this.shouldSetTimer()
+  componentDidUpdate (prevProps, prevState) {
+    if (!prevState.visible) {
+      this.resetState()
+    }
   }
 
   /**
@@ -67,6 +70,17 @@ class showMessage extends React.Component {
    */
   componentDidMount () {
     this.shouldSetTimer()
+  }
+
+  /**
+   * Clear timeout on unmount
+   *
+   * @since 4.1
+   */
+  componentWillUnmount () {
+    if (this.props.dismissable) {
+      clearTimeout(this._timer)
+    }
   }
 
   /**
@@ -90,35 +104,32 @@ class showMessage extends React.Component {
    */
   setTimer = () => {
     // clear any existing timer
-    this._timer != null ? clearTimeout(this._timer) : null
+    this._timer = this._timer !== null ? clearTimeout(this._timer) : null
 
     // hide after `delay` milliseconds
     this._timer = setTimeout(() => {
-
       $(this._message)
         .removeClass('inline')
         .slideUp(400, () => {
           $(this._message).removeAttr('style')
-          this.setState({visible: false})
+          this.setState({ visible: false })
           this._timer = null
 
           if (this.props.dismissableCallback) {
             this.props.dismissableCallback()
           }
         })
-
     }, this.props.delay)
   }
 
   /**
-   * Clear timeout on unmount
+   * Resets our state and timer
    *
    * @since 4.1
    */
-  componentWillUnmount () {
-    if (this.props.dismissable) {
-      clearTimeout(this._timer)
-    }
+  resetState = () => {
+    this.setState({ visible: true })
+    this.shouldSetTimer()
   }
 
   /**
@@ -127,7 +138,7 @@ class showMessage extends React.Component {
    * @since 4.1
    */
   render () {
-    const {text, error} = this.props
+    const { text, error } = this.props
 
     let classes = 'notice inline'
 
@@ -136,11 +147,15 @@ class showMessage extends React.Component {
     }
 
     return this.state.visible ? (
-      <div ref={(message) => this._message = message} className={classes}>
+      <div
+        data-test='component-showMessage'
+        ref={message => (this._message = message)}
+        className={classes}
+      >
         <p>{text}</p>
       </div>
-    ) : <div/>
+    ) : <div />
   }
 }
 
-export default showMessage
+export default ShowMessage

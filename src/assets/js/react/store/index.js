@@ -17,7 +17,7 @@ import helpReducer from '../reducers/helpReducer'
 const reducers = setupReducers()
 /* Initialize Saga Middleware */
 const sagaMiddleware = createSagaMiddleware()
-const middlewares = [sagaMiddleware]
+export const middlewares = [sagaMiddleware]
 const middlewareEnhancer = applyMiddleware(...middlewares)
 const enhancers = [middlewareEnhancer]
 /* Initialize Redux dev tools */

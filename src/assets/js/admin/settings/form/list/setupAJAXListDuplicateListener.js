@@ -10,22 +10,21 @@ import { showMessage } from '../../../helper/showMessage'
  * @since 4.0
  */
 export function setupAJAXListDuplicateListener () {
-
   /* Add live duplicate listener */
   $('#gfpdf_list_form').on('click', 'a.submitduplicate', function () {
-    let id = String($(this).data('id'))
-    let that = this
+    const id = String($(this).data('id'))
+    const that = this
 
     /* Add our spinner */
     $(this).after(spinner('gfpdf-spinner gfpdf-spinner-small')).parent().parent().attr('style', 'position:static; visibility: visible;')
 
     if (id.length > 0) {
       /* Set up ajax data */
-      let data = {
-        'action': 'gfpdf_list_duplicate',
-        'nonce': $(this).data('nonce'),
-        'fid': $(this).data('fid'),
-        'pid': $(this).data('id')
+      const data = {
+        action: 'gfpdf_list_duplicate',
+        nonce: $(this).data('nonce'),
+        fid: $(this).data('fid'),
+        pid: $(this).data('id')
       }
 
       /* Do ajax call */
@@ -38,8 +37,8 @@ export function setupAJAXListDuplicateListener () {
           showMessage(response.msg)
 
           /* Clone the row to be duplicated */
-          let $row = $(that).parents('tr')
-          let $newRow = $row.clone().css('background', '#baffb8')
+          const $row = $(that).parents('tr')
+          const $newRow = $row.clone().css('background', '#baffb8')
 
           /* Update the edit links to point to the new location */
           $newRow.find('.column-name > a, .edit a').each(function () {
@@ -52,10 +51,10 @@ export function setupAJAXListDuplicateListener () {
           $newRow.find('.column-name > a').html(response.name)
 
           /* Find duplicate and delete elements */
-          let $duplicate = $newRow.find('.duplicate a')
-          let $delete = $newRow.find('.delete a')
-          let $state = $newRow.find('.check-column img')
-          let $shortcode = $newRow.find('.column-shortcode input')
+          const $duplicate = $newRow.find('.duplicate a')
+          const $delete = $newRow.find('.delete a')
+          const $state = $newRow.find('.check-column img')
+          const $shortcode = $newRow.find('.column-shortcode input')
 
           /* Update duplicate ID and nonce pointers so the actions are valid */
           $duplicate.data('id', response.pid)
@@ -85,7 +84,7 @@ export function setupAJAXListDuplicateListener () {
           }
 
           /* Add fix for toggle image */
-          let toggleSrc = $state.attr('src')
+          const toggleSrc = $state.attr('src')
           $state
             .attr('title', GFPDF.inactive)
             .attr('alt', GFPDF.inactive)

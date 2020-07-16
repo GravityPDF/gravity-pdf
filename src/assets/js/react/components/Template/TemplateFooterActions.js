@@ -18,22 +18,20 @@ import TemplateDeleteButton from './TemplateDeleteButton'
  *
  * @since 4.1
  */
-class TemplateFooterActions extends React.Component {
+export class TemplateFooterActions extends React.Component {
   /**
    * @since 4.1
    */
   static propTypes = {
     template: PropTypes.object.isRequired,
     isActiveTemplate: PropTypes.bool,
-
     ajaxUrl: PropTypes.string,
     ajaxNonce: PropTypes.string,
-
     activateText: PropTypes.string,
     pdfWorkingDirPath: PropTypes.string,
     templateDeleteText: PropTypes.string,
     templateConfirmDeleteText: PropTypes.string,
-    templateDeleteErrorText: PropTypes.string,
+    templateDeleteErrorText: PropTypes.string
   }
 
   /**
@@ -57,24 +55,27 @@ class TemplateFooterActions extends React.Component {
     const isCompatible = template.compatible
 
     return (
-      <div className="theme-actions">
-        {!this.props.isActiveTemplate && isCompatible ? <TemplateActivateButton
+      <div
+        data-test='component-templateFooterActions'
+        className='theme-actions'
+      >
+        {!this.props.isActiveTemplate && isCompatible ? (
+          <TemplateActivateButton
             template={template}
-            buttonText={this.props.activateText}/>
-          : null
-        }
+            buttonText={this.props.activateText}
+          />
+        ) : null}
 
-        {!this.props.isActiveTemplate && this.notCoreTemplate(template) ? <TemplateDeleteButton
+        {!this.props.isActiveTemplate && this.notCoreTemplate(template) ? (
+          <TemplateDeleteButton
             template={template}
-
             ajaxUrl={this.props.ajaxUrl}
             ajaxNonce={this.props.ajaxNonce}
-
             buttonText={this.props.templateDeleteText}
             templateConfirmDeleteText={this.props.templateConfirmDeleteText}
-            templateDeleteErrorText={this.props.templateDeleteErrorText}/>
-          : null
-        }
+            templateDeleteErrorText={this.props.templateDeleteErrorText}
+          />
+        ) : null}
       </div>
     )
   }

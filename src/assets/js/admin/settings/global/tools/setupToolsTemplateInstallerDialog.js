@@ -8,12 +8,12 @@ import { resizeDialogIfNeeded } from '../../../helper/resizeDialogIfNeeded'
  * @since 4.0
  */
 export function setupToolsTemplateInstallerDialog () {
-  let $copy = $('#gfpdf_settings\\[setup_templates\\]')
+  const $copy = $('#gfpdf_settings\\[setup_templates\\]')
   /* escape braces */
-  let $copyDialog = $('#setup-templates-confirm')
+  const $copyDialog = $('#setup-templates-confirm')
 
   /* Set up copy dialog */
-  let copyButtons = [{
+  const copyButtons = [{
     text: GFPDF.continue,
     click: function () {
       /* submit form */

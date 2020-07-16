@@ -76,42 +76,42 @@ export const sortTemplates = (templates, activeTemplate) => {
   /* Sort out template list using our comparator function */
   return templates.sort((a, b) => {
     /* Shift new templates to the bottom (only on install) */
-    if (a['new'] === true && a['new'] === true) {
+    if (a.new === true && a.new === true) {
       return 0 // equal
     }
 
-    if (a['new'] === true) {
+    if (a.new === true) {
       return 1
     }
 
-    if (b['new'] === true) {
+    if (b.new === true) {
       return -1
     }
 
     /* Hoist the active template above the rest */
-    if (activeTemplate === a['id']) {
+    if (activeTemplate === a.id) {
       return -1
     }
 
-    if (activeTemplate === b['id']) {
+    if (activeTemplate === b.id) {
       return 1
     }
 
     /* Order alphabetically by the group name */
-    if (a['group'] < b['group']) {
+    if (a.group < b.group) {
       return -1 // before
     }
 
-    if (a['group'] > b['group']) {
+    if (a.group > b.group) {
       return 1 // after
     }
 
     /* Then order alphabetically by the template name */
-    if (a['template'] < b['template']) {
+    if (a.template < b.template) {
       return -1 // before
     }
 
-    if (a['template'] > b['template']) {
+    if (a.template > b.template) {
       return 1 // after
     }
 
@@ -133,18 +133,18 @@ export const addCompatibilityCheck = (templates) => {
   /* Apply this function to all templates */
   return templates.map((template) => {
     /* Get the PDF version and check it against the Gravity PDF version */
-    const requiredVersion = template['required_pdf_version']
+    const requiredVersion = template.required_pdf_version
     if (versionCompare(requiredVersion, GFPDF.currentVersion, '>')) {
       /* Not compatible, so let's mark it */
       return {
         ...template,
-        'compatible': false,
-        'error': GFPDF.requiresGravityPdfVersion.replace(/%s/g, requiredVersion),
-        'long_error': GFPDF.templateNotCompatibleWithGravityPdfVersion.replace(/%s/g, requiredVersion)
+        compatible: false,
+        error: GFPDF.requiresGravityPdfVersion.replace(/%s/g, requiredVersion),
+        long_error: GFPDF.templateNotCompatibleWithGravityPdfVersion.replace(/%s/g, requiredVersion)
       }
     }
     /* If versionCompare() passed we'll mark as true */
-    return { ...template, 'compatible': true }
+    return { ...template, compatible: true }
   })
 }
 

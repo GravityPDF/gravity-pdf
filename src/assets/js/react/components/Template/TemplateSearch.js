@@ -2,7 +2,6 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import { connect } from 'react-redux'
 import debounce from 'lodash.debounce'
-
 import { searchTemplates } from '../../actions/templates'
 
 /**
@@ -33,7 +32,9 @@ export class TemplateSearch extends React.Component {
    *
    * @since 4.1
    */
-  componentWillMount () {
+  constructor (props) {
+    super(props)
+
     this.runSearch = debounce(this.runSearch, 200)
   }
 
@@ -78,15 +79,15 @@ export class TemplateSearch extends React.Component {
    */
   render () {
     return (
-      <div>
+      <div data-test='component-templateSearch'>
         <input
-          className="wp-filter-search"
-          id="wp-filter-search-input"
-          ref={node => this.input = node}
-          placeholder="Search Installed Templates"
-          type="search"
-          aria-describedby="live-search-desc"
-          tabIndex="145"
+          className='wp-filter-search'
+          id='wp-filter-search-input'
+          ref={node => (this.input = node)}
+          placeholder='Search Installed Templates'
+          type='search'
+          aria-describedby='live-search-desc'
+          tabIndex='145'
           onChange={this.handleSearch}
           defaultValue={this.props.search}
         />
@@ -119,7 +120,7 @@ const mapStateToProps = (state) => {
  *
  * @since 4.1
  */
-const mapDispatchToProps = (dispatch) => {
+export const mapDispatchToProps = (dispatch) => {
   return {
     onSearch: (text) => {
       dispatch(searchTemplates(text))

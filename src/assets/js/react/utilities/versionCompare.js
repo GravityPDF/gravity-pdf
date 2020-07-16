@@ -67,16 +67,16 @@ export default (v1, v2, operator) => {
   // If a non-numerical value can't be mapped to this table, it receives
   // -7 as its value.
   var vm = {
-    'dev': -6,
-    'alpha': -5,
-    'a': -5,
-    'beta': -4,
-    'b': -4,
-    'RC': -3,
-    'rc': -3,
+    dev: -6,
+    alpha: -5,
+    a: -5,
+    beta: -4,
+    b: -4,
+    RC: -3,
+    rc: -3,
     '#': -2,
-    'p': 1,
-    'pl': 1
+    p: 1,
+    pl: 1
   }
 
   // This function will be called to prepare each version argument.

@@ -9,23 +9,23 @@ import { spinner } from '../../helper/spinner'
 export function setupLicenseDeactivation () {
   $('.gfpdf-deactivate-license').click(function () {
     /* Do AJAX call so user can deactivate license */
-    let $container = $(this).parent()
+    const $container = $(this).parent()
     $container.find('.gf_settings_description label').html('')
 
     /* Add spinner */
-    let $spinner = spinner('gfpdf-spinner')
+    const $spinner = spinner('gfpdf-spinner')
 
     /* Add our spinner */
     $(this).append($spinner)
 
     /* Set up ajax data */
-    let slug = $(this).data('addon-name')
+    const slug = $(this).data('addon-name')
 
-    let data = {
-      'action': 'gfpdf_deactivate_license',
-      'addon_name': slug,
-      'license': $(this).data('license'),
-      'nonce': $(this).data('nonce')
+    const data = {
+      action: 'gfpdf_deactivate_license',
+      addon_name: slug,
+      license: $(this).data('license'),
+      nonce: $(this).data('nonce')
     }
 
     /* Do ajax call */

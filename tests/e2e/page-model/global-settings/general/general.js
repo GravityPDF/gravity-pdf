@@ -21,7 +21,6 @@ class General {
     this.paperSizeField = Selector('#gfpdf_settings_default_pdf_size__chosen')
     this.fontField = Selector('#gfpdf_settings_default_font__chosen')
     this.fontSize = Selector('#gfpdf_settings\\[default_font_size\\]')
-    this.successUpdateMessage = Selector('p').withText('Settings updated.')
     this.entryItem = Selector('a').withAttribute('aria-label', 'View this entry')
     this.addNewTemplate = Selector('input').withAttribute('type', 'file')
     this.saveButton = Selector('div').find('[class^="button button-primary"][value="Save Changes"]')

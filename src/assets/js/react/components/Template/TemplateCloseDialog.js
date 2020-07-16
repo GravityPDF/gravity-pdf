@@ -51,17 +51,17 @@ export class TemplateCloseDialog extends React.Component {
    *
    * @since 4.1
    */
-  handleKeyPress = (e) => {
+  handleKeyPress = e => {
     /* Escape Key */
     if (e.keyCode === 27 && (e.target.className !== 'wp-filter-search' || e.target.value === '')) {
-      this.closeDialog()
+      this.handleCloseDialog()
     }
   }
 
   /**
    * @since 4.1
    */
-  closeDialog = () => {
+  handleCloseDialog = () => {
     /* trigger router */
     this.props.history.push(this.props.closeRoute || '/')
   }
@@ -72,12 +72,14 @@ export class TemplateCloseDialog extends React.Component {
   render () {
     return (
       <button
-        className="close dashicons dashicons-no"
-        tabIndex="142"
-        onClick={this.closeDialog}
+        data-test='component-templateCloseDialog'
+        className='close dashicons dashicons-no'
+        tabIndex='142'
+        onClick={this.handleCloseDialog}
         onKeyDown={this.handleKeyPress}
-        aria-label="close">
-        <span className="screen-reader-text">Close dialog</span>
+        aria-label='close'
+      >
+        <span className='screen-reader-text'>Close dialog</span>
       </button>
     )
   }

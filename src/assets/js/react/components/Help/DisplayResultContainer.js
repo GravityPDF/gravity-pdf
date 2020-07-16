@@ -35,7 +35,7 @@ const DisplayResultContainer = ({ searchInput, loading, helpResult, error }) => 
   const displayError = error
 
   return (
-    <div id='search-results'>
+    <div data-test='component-search-results' id='search-results'>
       <div id='dashboard_primary' className='metabox-holder'>
         <div id='documentation-api' className='postbox' style={{ display: 'block' }}>
           <h3 className='hndle'>

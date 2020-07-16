@@ -17,11 +17,16 @@ import React from 'react'
  *
  * @since 4.1
  */
-export const CurrentTemplate = ({isCurrentTemplate, label}) => {
+export const CurrentTemplate = ({ isCurrentTemplate, label }) => {
   return (isCurrentTemplate) ? (
-    <span className="current-label">{label}</span>
+    <span
+      data-test='component-currentTemplate'
+      className='current-label'
+    >
+      {label}
+    </span>
   ) : (
-    <span/>
+    <span />
   )
 }
 
@@ -37,11 +42,14 @@ CurrentTemplate.propTypes = {
  *
  * @since 4.1
  */
-export const Name = ({name, version, versionLabel}) => (
-  <h2 className="theme-name">
+export const Name = ({ name, version, versionLabel }) => (
+  <h2
+    data-test='component-name'
+    className='theme-name'
+  >
     {name}
 
-    <Version version={version} label={versionLabel}/>
+    <Version version={version} label={versionLabel} />
   </h2>
 )
 
@@ -58,11 +66,11 @@ Name.propTypes = {
  *
  * @since 4.1
  */
-export const Version = ({label, version}) => {
+export const Version = ({ label, version }) => {
   return (version) ? (
-    <span className="theme-version">{label}: {version}</span>
+    <span data-test='component-version' className='theme-version'>{label}: {version}</span>
   ) : (
-    <span/>
+    <span />
   )
 }
 
@@ -78,11 +86,10 @@ Version.propTypes = {
  *
  * @since 4.1
  */
-export const Author = ({author, uri}) => {
-
+export const Author = ({ author, uri }) => {
   if (uri) {
     return (
-      <p className="theme-author">
+      <p data-test='component-author' className='theme-author'>
         <a href={uri}>
           {author}
         </a>
@@ -90,7 +97,7 @@ export const Author = ({author, uri}) => {
     )
   } else {
     return (
-      <p className="theme-author">
+      <p data-test='component-author' className='theme-author'>
         {author}
       </p>
     )
@@ -109,15 +116,15 @@ Author.propTypes = {
  *
  * @since 4.1
  */
-export const Group = ({label, group}) => (
-  <p className="theme-author">
+export const Group = ({ label, group }) => (
+  <p data-test='component-group' className='theme-author'>
     <strong>{label}: {group}</strong>
   </p>
 )
 
 Group.propTypes = {
   label: PropTypes.string,
-  group: PropTypes.string,
+  group: PropTypes.string
 }
 
 /**
@@ -127,14 +134,14 @@ Group.propTypes = {
  *
  * @since 4.1
  */
-export const Description = ({desc}) => (
-  <p className="theme-description">
+export const Description = ({ desc }) => (
+  <p data-test='component-description' className='theme-description'>
     {desc}
   </p>
 )
 
 Description.propTypes = {
-  desc: PropTypes.string,
+  desc: PropTypes.string
 }
 
 /**
@@ -144,17 +151,17 @@ Description.propTypes = {
  *
  * @since 4.1
  */
-export const Tags = ({label, tags}) => {
+export const Tags = ({ label, tags }) => {
   return (tags) ? (
-    <p className="theme-tags">
+    <p data-test='component-tags' className='theme-tags'>
       <span>{label}:</span> {tags}
     </p>
   ) : (
-    <span/>
+    <span />
   )
 }
 
 Tags.propTypes = {
   label: PropTypes.string,
-  tags: PropTypes.string,
+  tags: PropTypes.string
 }

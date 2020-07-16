@@ -12,7 +12,7 @@ export function showMessage (msg, timeout, error) {
   timeout = typeof timeout !== 'undefined' ? timeout : 4500
   error = typeof error !== 'undefined' ? error : false
 
-  let $elm = $('<div id="message">').html('<p>' + msg + '</p>')
+  const $elm = $('<div id="message">').html('<p>' + msg + '</p>')
 
   if (error === true) {
     $elm.addClass('error')
