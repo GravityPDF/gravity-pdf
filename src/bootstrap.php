@@ -857,6 +857,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->singleton->add_class( $class );
 	}
 
+	/**
+	 * Detect any Gravity PDF messages and convert to Gravity Forms message system
+	 *
+	 * @since 6.0
+	 */
 	public function add_admin_messages() {
 		$messages = get_settings_errors( 'gfpdf-notices' );
 
