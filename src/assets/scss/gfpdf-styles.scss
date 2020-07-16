@@ -1,3 +1,6 @@
+@use 'react/components/CoreFonts/core-fonts';
+@use 'react/components/Help/help';
+
 /*
  * Getting Started Welcome Page
  */
@@ -400,180 +403,16 @@ div img.gfpdf-image {
  direction: ltr !important;
 }
 
-/*
- * Core Fonts Download
- */
-#gfpdf-install-core-fonts > div,
-#gfpdf-install-core-fonts > div > img,
-#gfpdf-install-core-fonts > div > span {
- vertical-align: middle;
-}
 
-.gfpdf-core-font-container {
- border: 1px solid #CCC;
- margin-top: 10px;
- padding: 5px 10px;
- height: 150px;
- overflow: auto;
- font-family: "Courier New", Courier, monospace;
-}
 
-.gfpdf-core-font-status-success {
- color: #008000;
-}
 
-.gfpdf-core-font-status-error {
- color: #d10b0b;
-}
 
-.gfpdf-core-font-counter {
- display: inline-block;
- padding-left: 5px;
-}
 
-/*
- * Help Settings Page
- */
-#pdfextended-settings .metabox-holder h3 {
- font-size: 14px;
-}
 
-#pdfextended-settings .postbox-container .postbox {
- margin: 0 8px 20px 0;
-}
 
-#pdfextended-settings .postbox h3.hndle {
- padding-bottom: 12px;
-}
 
-#pdfextended-settings .postbox .hndle, #pdfextended-settings .widget .widget-top {
- cursor: default;
-}
 
-#pdfextended-settings .postbox .handlediv,
-#pdfextended-settings #pdf_support_hours h3 {
- display: none;
-}
 
-#pdfextended-settings .about-wrap, #pdfextended-settings .about-wrap .about-text {
- max-width: none;
- min-height: 0;
- line-height: 1.8em;
-}
-
-#pdfextended-settings .about-wrap h1, #pdfextended-settings .about-wrap .about-text, #pdfextended-settings .about-wrap #search-knowledgebase {
- text-align: center;
- margin-right: 0;
-}
-
-#pdfextended-settings .postbox .inside {
- margin-bottom: 0;
-}
-
-#pdfextended-settings .about-wrap h1 {
- margin-top: 40px;
-}
-
-#pdfextended-settings .about-wrap #search-knowledgebase input {
- font-family: 'FontAwesome', 'Open Sans', sans-serif;
- font-size: 22px;
- margin: 10px 0 0;
- padding: 16px 20px;
- line-height: 25px;
- width: 100%;
-}
-
-#pdfextended-settings #search-results {
- text-align: left;
- margin: 0 auto;
- width: 100%;
-}
-
-#pdfextended-settings #search-results .postbox, #search-results .postbox .inside {
- display: none;
-}
-
-#pdfextended-settings #search-results .postbox h3 {
- margin-bottom: 0;
-}
-
-#pdfextended-settings #search-results .postbox.is-active h3 {
- margin-bottom: 8px;
-}
-
-#pdfextended-settings .spinner.is-active {
- visibility: visible;
- margin: 0;
-}
-
-#pdfextended-settings .about-wrap .about-text-disclaimer {
- font-size: 13px;
-}
-
-#pdfextended-settings .about-wrap #dashboard-widgets:after {
- content: "";
- display: block;
- clear: both;
-}
-
-#pdfextended-settings .about-wrap #dashboard-widgets {
- margin-bottom: 30px;
-}
-
-#pdfextended-settings .about-wrap #dashboard-widgets.columns-2 .postbox-container {
- width: 100%
-}
-
-#pdfextended-settings .about-wrap #dashboard-widgets .postbox-container > a {
- background: #f6f6f6 none repeat scroll 0 0;
- border: 3px solid #eee;
- border-radius: 10px;
- color: inherit;
- display: block;
- padding: 15px;
- font-size: 16px;
- text-decoration: none;
- margin-bottom: 30px;
- transition: all 0.5s ease 0s;
-}
-
-#pdfextended-settings .about-wrap #dashboard-widgets .postbox-container > a:hover {
- border: 3px solid #076aa4;
-}
-
-#pdfextended-settings .about-wrap #dashboard-widgets .postbox-container > a span {
- font-weight: bold;
-}
-
-#pdfextended-settings .about-wrap #dashboard-widgets .postbox-container li {
- margin: 0;
- padding: 0;
- list-style-type: disc;
- list-style-position: inside;
-}
-
-#pdfextended-settings .about-wrap .center {
- text-align: center;
-}
-
-#pdfextended-settings .about-wrap .button.button-large {
- height: 35px;
- line-height: 33px;
- padding: 0 17px 9px;
-}
-
-#pdfextended-settings li.resultExist {
- padding: 18px 14px 5px 14px;
- border-bottom: 1px dotted #ccc;
-}
-
-#pdfextended-settings li.resultExist:last-child {
- border-bottom: 0px;
-}
-
-#pdfextended-settings li.noResult, li.error {
- padding: 14px 14px 10px 14px;
-}
 
 
 /*

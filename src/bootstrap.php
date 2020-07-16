@@ -367,7 +367,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	private function register_styles() {
 		$version = PDF_EXTENDED_VERSION;
 
-		wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'dist/assets/css/gfpdf-styles.min.css', [ 'wp-color-picker', 'wp-jquery-ui-dialog' ], $version );
+		wp_register_style( 'gfpdf_css_styles', PDF_PLUGIN_URL . 'dist/css/gfpdf-styles.min.css', [ 'wp-color-picker', 'wp-jquery-ui-dialog' ], $version );
 	}
 
 	/**
@@ -390,7 +390,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			'wp-color-picker',
 		];
 
-		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'dist/assets/js/admin.min.js', $pdf_settings_dependancies, $version );
+		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'dist/js/admin.min.js', $pdf_settings_dependancies, $version );
 
 		$pdf_backbone_dependancies = [
 			'gfpdf_js_settings',
@@ -400,12 +400,12 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			'wpdialogs',
 		];
 
-		wp_register_script( 'gfpdf_js_backbone', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-backbone.min.js', $pdf_backbone_dependancies, $version ); /* @TODO - remove backbone and use React */
+		wp_register_script( 'gfpdf_js_backbone', PDF_PLUGIN_URL . 'dist/js/gfpdf-backbone.min.js', $pdf_backbone_dependancies, $version ); /* @TODO - remove backbone and use React */
 		wp_register_script( 'gfpdf_js_backbone_model_binder', PDF_PLUGIN_URL . 'bower_components/backbone.modelbinder/Backbone.ModelBinder.min.js', [ 'backbone', 'underscore' ], $version );
 
-		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'dist/assets/js/app.bundle.min.js', [ 'jquery' ], $version );
-		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-entries.min.js', [ 'jquery' ], $version );
-		wp_register_script( 'gfpdf_js_v3_migration', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-migration.min.js', [ 'gfpdf_js_settings' ], $version );
+		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'dist/js/app.bundle.min.js', [ 'jquery' ], $version );
+		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'dist/js/gfpdf-entries.min.js', [ 'jquery' ], $version );
+		wp_register_script( 'gfpdf_js_v3_migration', PDF_PLUGIN_URL . 'dist/js/gfpdf-migration.min.js', [ 'gfpdf_js_settings' ], $version );
 
 		/* Localise admin script */
 		wp_localize_script( 'gfpdf_js_entrypoint', 'GFPDF', $this->data->get_localised_script_data( $this->options, $this->gform ) );
@@ -969,4 +969,3 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
  * our AJAX calls in our unit testing suite failing (boo)
  */
 add_action( 'after_setup_theme', '\GFPDF\Router::initialise_plugin' );
-
