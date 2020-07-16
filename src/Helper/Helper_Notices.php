@@ -87,6 +87,11 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 */
 	public function add_notice( $notice, $class = '' ) {
 
+		if ( \GFForms::is_gravity_page() ) {
+			\GFCommon::add_message( $notice );
+			return;
+		}
+
 		if ( empty( $class ) ) {
 			$this->notices[] = $notice;
 		} else {
@@ -105,6 +110,11 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 * @since    4.0
 	 */
 	public function add_error( $error, $class = '' ) {
+
+		if ( \GFForms::is_gravity_page() ) {
+			\GFCommon::add_error_message( $error );
+			return;
+		}
 
 		if ( empty( $class ) ) {
 			$this->errors[] = $error;
