@@ -41,8 +41,4 @@ $list_items = $args['list_items'];
 	</div>
 </div>
 
-<div id="delete-confirm" title="<?php esc_attr_e( 'Delete PDF?', 'gravity-forms-pdf-extended' ); ?>" style="display: none;">
-	<?php esc_html_e( "Warning! You are about to delete this PDF. Select 'Delete' to delete, 'Cancel' to stop.", 'gravity-forms-pdf-extended' ); ?>
-</div>
-
 <?php \GFFormSettings::page_footer(); ?>

@@ -281,7 +281,8 @@ class Helper_Data {
 				'coreFontCounter'                      => esc_html__( 'Fonts remaining:', 'gravity-forms-pdf-extended' ),
 				'coreFontRetry'                        => esc_html__( 'Retry Failed Downloads?', 'gravity-forms-pdf-extended' ),
 
-				'uninstallWarning'                     => esc_html__( "Warning! ALL Gravity PDF data, including templates, will be deleted. This cannot be undone. 'OK' to delete, 'Cancel' to stop.", 'gravity-forms-pdf-extended' )
+				'uninstallWarning'                     => esc_html__( "Warning! ALL Gravity PDF data, including templates, will be deleted. This cannot be undone. 'OK' to delete, 'Cancel' to stop.", 'gravity-forms-pdf-extended' ),
+				'pdfDeleteWarning'                     => esc_html__( "WARNING: You are about to delete this PDF. 'Cancel' to stop, 'OK' to delete.", 'gravity-forms-pdf-extended' ),
 			]
 		);
 	}
