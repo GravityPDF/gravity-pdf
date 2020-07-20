@@ -321,7 +321,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		if ( empty( $sanitized['name'] ) || empty( $sanitized['filename'] ) ||
 			 ( $sanitized['pdf_size'] === 'CUSTOM' && ( (int) $sanitized['custom_pdf_size'][0] === 0 || (int) $sanitized['custom_pdf_size'][1] === 0 ) )
 		) {
-			$this->notices->add_error( esc_html__( 'PDF could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
+			$this->notices->add_error( esc_html__( 'PDF could not be saved. Please enter a valid Custom Paper Size.', 'gravity-forms-pdf-extended' ) );
 
 			return false;
 		}
@@ -473,11 +473,31 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		];
 
 		foreach ( $sections as $s ) {
+			/*
+		     * Loop through the settings whitelist and add any missing fields to the $input
+		     */
+			foreach ( $settings[ $s ] as $key => $value ) {
+				switch ( $value['type'] ) {
+					case 'select':
+					case 'multicheck':
+						if ( ! isset( $input[ $key ] ) ) {
+							$input[ $key ] = [];
+						}
+					break;
+
+					default:
+						if ( ! isset( $input[ $key ] ) ) {
+							$input[ $key ] = '';
+						}
+					break;
+				}
+			}
+
 			$input = apply_filters( 'gfpdf_settings_' . $s . '_sanitize', $input );
 		}
 
 		/* Loop through each setting being saved and pass it through a sanitization filter */
-		if ( is_array( $input ) && 0 < sizeof( $input ) ) {
+		if ( is_array( $input ) && 0 < count( $input ) ) {
 			foreach ( $input as $key => $value ) {
 
 				foreach ( $sections as $s ) {
@@ -489,7 +509,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 						/*
 						 * General filter
 						 *
-						* See https://gravitypdf.com/documentation/v5/gfpdf_form_settings_sanitize/ for more details about this filter
+						 * See https://gravitypdf.com/documentation/v5/gfpdf_form_settings_sanitize/ for more details about this filter
 						 */
 						$input[ $key ] = apply_filters( 'gfpdf_form_settings_sanitize', $input[ $key ], $key, $input, $settings[ $s ][ $key ] );
 
@@ -497,7 +517,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 							/*
 							 * Field type specific filter
 							 *
-							* See https://gravitypdf.com/documentation/v5/gfpdf_form_settings_sanitize/ for more details about this filter
+							 * See https://gravitypdf.com/documentation/v5/gfpdf_form_settings_sanitize/ for more details about this filter
 							 */
 							$input[ $key ] = apply_filters( 'gfpdf_form_settings_sanitize_' . $type, $input[ $key ], $key, $input, $settings[ $s ][ $key ] );
 						}

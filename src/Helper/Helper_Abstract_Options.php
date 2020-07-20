@@ -1551,13 +1551,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 				/* Set up multi-select option to pass to our form value getter */
 				$args['multi-key']    = esc_attr( $key );
-				$args['multi-option'] = $option;
+				$args['multi-option'] = $key;
 
 				$enabled = $this->get_form_value( $args );
 
 				echo '<div class="gfpdf-settings-multicheck-wrapper">';
-				echo '<input name="gfpdf_settings[' . $args['id'] . '][' . esc_attr( $key ) . ']" id="gfpdf_settings[' . $args['id'] . '][' . esc_attr( $key ) . ']" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" type="checkbox" value="' . $option . '" ' . checked( $option, $enabled, false ) . ' ' . $required . ' />&nbsp;';
-				echo '<label for="gfpdf_settings[' . $args['id'] . '][' . esc_attr( $key ) . ']">' . $option . '</label>';
+				echo '<input name="gfpdf_settings[' . $args['id'] . '][' . $args['multi-key'] . ']" id="gfpdf_settings[' . $args['id'] . '][' . $args['multi-key'] . ']" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" type="checkbox" value="' . $args['multi-key'] . '" ' . checked( $key, $enabled, false ) . ' ' . $required . ' />&nbsp;';
+				echo '<label for="gfpdf_settings[' . $args['id'] . '][' . $args['multi-key'] . ']">' . esc_html( $option ) . '</label>';
 				echo '</div>';
 			}
 
@@ -2059,10 +2059,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$value = $this->get_form_value( $args );
 
 		/* Auto-upgrade routine */
-		if ( in_array( $value, [ 'Yes', 'Enable' ], true ) ) {
-			$value = 1;
-		} elseif ( in_array( $value, [ 'No', 'Disable' ], true ) ) {
-			$value = 0;
+		if ( in_array( $value, [ 'Enable' ], true ) ) {
+			$value = 'Yes';
 		}
 
 		$class      = isset( $args['inputClass'] ) ? esc_attr( $args['inputClass'] ) : '';
@@ -2074,7 +2072,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			<span class="gform-settings-description"><?= wp_kses_post( $args['desc'] ) ?></span>
 
 			<span class="gform-settings-input__container">
-				<input type="checkbox" id="gfpdf_settings[<?= $args['id'] ?>]" name="gfpdf_settings[<?= $args['id'] ?>]" value="1" <?= checked( $value, 1, false ) ?> />
+				<input type="checkbox" id="gfpdf_settings[<?= $args['id'] ?>]" name="gfpdf_settings[<?= $args['id'] ?>]" value="Yes" <?= checked( $value, 'Yes', false ) ?> />
 				<label class="gform-settings-field__toggle-container" for="gfpdf_settings[<?= $args['id'] ?>]">
 					<?php if ( strlen( $name ) > 0 ): ?>
 						<span class="screen-reader-text"><?= $name ?></span>
