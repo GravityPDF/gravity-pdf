@@ -6,7 +6,7 @@ Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.8
 Tested up to: 5.4
 Stable tag: 5.3.1
-Requires PHP: 5.6
+Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
 
