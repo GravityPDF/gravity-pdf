@@ -48,7 +48,11 @@ $value_border_colour = ( ! empty( $settings['zadani_border_colour'] ) ) ? $setti
 
 	/* Handle GF2.5+ Columns */
 	.grid {
-		float: left;
+		float: <?= $settings['rtl'] === 'Yes' ? 'right' : 'left' ?>;
+	}
+
+	.grid .inner-container {
+		width: 95%;
 	}
 
 	.grid-3 {
@@ -87,12 +91,9 @@ $value_border_colour = ( ! empty( $settings['zadani_border_colour'] ) ) ? $setti
 		width: 91.66%;
 	}
 
-	.grid-12 {
+	.grid-12,
+	.grid-12 .inner-container {
 		width: 100%;
-	}
-
-	.inner-container {
-		width: 95%;
 	}
 
 	/* Handle Legacy Columns */

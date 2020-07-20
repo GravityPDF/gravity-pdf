@@ -52,7 +52,11 @@ $contrast = $misc->get_background_and_border_contrast( $container_background_col
 
 	/* Handle GF2.5+ Columns */
 	.grid {
-		float: left;
+		float: <?= $settings['rtl'] === 'Yes' ? 'right' : 'left' ?>;
+	}
+
+	.grid .inner-container {
+		width: 95%;
 	}
 
 	.grid-3 {
@@ -91,16 +95,12 @@ $contrast = $misc->get_background_and_border_contrast( $container_background_col
 		width: 91.66%;
 	}
 
-	.grid-12 {
+	.grid-12,
+	.grid-12 .inner-container {
 		width: 100%;
 	}
 
-	.inner-container {
-		width: 95%;
-	}
-
 	/* Handle Legacy Columns */
-
 	.gf_left_half,
 	.gf_left_third, .gf_middle_third,
 	.gf_first_quarter, .gf_second_quarter, .gf_third_quarter,

@@ -43,7 +43,11 @@ if ( ! class_exists( 'GFForms' ) ) {
 
 	/* Handle GF2.5+ Columns */
 	.grid {
-		float: left;
+		float: <?= $settings['rtl'] === 'Yes' ? 'right' : 'left' ?>;
+	}
+
+	.grid .inner-container {
+		width: 95%;
 	}
 
 	.grid-3 {
@@ -82,12 +86,9 @@ if ( ! class_exists( 'GFForms' ) ) {
 		width: 91.66%;
 	}
 
-	.grid-12 {
+	.grid-12,
+	.grid-12 .inner-container {
 		width: 100%;
-	}
-
-	.inner-container {
-		width: 95%;
 	}
 
 	/* Handle Legacy Columns */
