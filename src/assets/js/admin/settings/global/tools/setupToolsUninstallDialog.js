@@ -1,6 +1,4 @@
 import $ from 'jquery'
-import { wpDialog } from '../../../helper/wpDialog'
-import { resizeDialogIfNeeded } from '../../../helper/resizeDialogIfNeeded'
 
 /**
  * Handles the Uninstall Dialog Box
