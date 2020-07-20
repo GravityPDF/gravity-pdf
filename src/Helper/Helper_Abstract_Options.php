@@ -1869,6 +1869,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$html = '';
 		foreach ( $options as $option => $name ) {
 			if ( ! is_array( $name ) ) {
+				$selected = '';
 				if ( is_array( $value ) ) {
 					foreach ( $value as $v ) {
 						$selected = selected( $option, $v, false );
