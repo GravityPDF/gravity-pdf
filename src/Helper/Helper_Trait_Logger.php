@@ -2,7 +2,7 @@
 
 namespace GFPDF\Helper;
 
-use GFPDF\Vendor\Monolog\Logger;
+use GFPDF_Vendor\Monolog\Logger;
 use Psr\Log\LoggerInterface;
 
 /**

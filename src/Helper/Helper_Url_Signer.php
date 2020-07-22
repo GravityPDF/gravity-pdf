@@ -2,7 +2,7 @@
 
 namespace GFPDF\Helper;
 
-use Spatie\UrlSigner\Exceptions\InvalidSignatureKey;
+use GFPDF_Vendor\Spatie\UrlSigner\Exceptions\InvalidSignatureKey;
 
 /**
  * @package     Gravity PDF
@@ -29,7 +29,7 @@ class Helper_Url_Signer implements Helper_Interface_Url_Signer {
 	 * @param string $expiration
 	 *
 	 * @return string
-	 * @throws \Spatie\UrlSigner\Exceptions\InvalidSignatureKey
+	 * @throws InvalidSignatureKey
 	 *
 	 * @since 5.2
 	 */

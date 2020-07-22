@@ -2,16 +2,15 @@
 
 namespace GFPDF\Helper;
 
-use DateTimeZone;
 use Exception;
 use GFFormsModel;
 use GFLogging;
-use GFPDF\Vendor\Monolog\Formatter\LineFormatter;
-use GFPDF\Vendor\Monolog\Handler\NullHandler;
-use GFPDF\Vendor\Monolog\Handler\StreamHandler;
-use GFPDF\Vendor\Monolog\Logger;
-use GFPDF\Vendor\Monolog\Processor\IntrospectionProcessor;
-use GFPDF\Vendor\Monolog\Processor\MemoryPeakUsageProcessor;
+use GFPDF_Vendor\Monolog\Formatter\LineFormatter;
+use GFPDF_Vendor\Monolog\Handler\NullHandler;
+use GFPDF_Vendor\Monolog\Handler\StreamHandler;
+use GFPDF_Vendor\Monolog\Logger;
+use GFPDF_Vendor\Monolog\Processor\IntrospectionProcessor;
+use GFPDF_Vendor\Monolog\Processor\MemoryPeakUsageProcessor;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -107,28 +106,12 @@ class Helper_Logger {
 	 * @since 4.2
 	 */
 	protected function setup_logger() {
-		static $timezone;
-
-		/* Set the logger timezone once (if needed) */
-		if ( ! $timezone ) {
-			$offset = (float) get_option( 'gmt_offset' );
-
-			if ( $offset !== 0.0 ) {
-				try {
-					$timezone = new DateTimeZone( ( $offset > 0 ) ? '+' . $offset : $offset );
-					Logger::setTimezone( $timezone );
-				} catch ( Exception $e ) {
-					/* do nothing */
-				}
-			}
-			$timezone = true;
-		}
-
-		/* Initialise our logger */
-		$this->log = new Logger( $this->slug );
 
 		/* Setup our Gravity Forms local file logger, if enabled */
 		try {
+			$this->log = new Logger( $this->slug );
+			$this->log->setTimezone( wp_timezone() );
+
 			$this->setup_gravityforms_logging();
 
 			/* Check if we have a handler pushed and add our Introspection and Memory Peak usage processors */

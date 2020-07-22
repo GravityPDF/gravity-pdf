@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*
- * Load dependancies
+ * Load dependencies
  */
 require_once( PDF_PLUGIN_DIR . 'src/autoload.php' );
 

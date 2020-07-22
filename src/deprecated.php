@@ -695,7 +695,7 @@ if ( ! class_exists( 'mPDF' ) ) {
 	/**
 	 * Class mPDF
 	 *
-	 * Allow our legacy software to still function even though the \mPDF class no longer exists (see \Mpdf\Mpdf)
+	 * Allow our legacy software to still function even though the \mPDF class no longer exists (see \GFPDF_Vendor\Mpdf\Mpdf)
 	 *
 	 * @since 5.0
      * phpcs:disable
@@ -724,7 +724,7 @@ if ( ! class_exists( 'mPDF' ) ) {
 		public function __construct( $mode = '', $format = 'A4', $default_font_size = 0, $default_font = '', $mgl = 15, $mgr = 15, $mgt = 16, $mgb = 16, $mgh = 9, $mgf = 9, $orientation = 'P' ) {
 
 			$data                = GPDFAPI::get_data_class();
-			$default_font_config = ( new \Mpdf\Config\FontVariables() )->getDefaults();
+			$default_font_config = ( new \GFPDF_Vendor\Mpdf\Config\FontVariables() )->getDefaults();
 
 			$this->mpdf = new \GFPDF\Helper\Helper_Mpdf(
 				[

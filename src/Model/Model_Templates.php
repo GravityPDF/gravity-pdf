@@ -7,11 +7,11 @@ use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Templates;
 
-use Upload\File;
-use Upload\Storage\FileSystem;
-use Upload\Validation\Extension;
-use Upload\Validation\Mimetype;
-use Upload\Validation\Size;
+use GFPDF_Vendor\Upload\File;
+use GFPDF_Vendor\Upload\Storage\FileSystem;
+use GFPDF_Vendor\Upload\Validation\Extension;
+use GFPDF_Vendor\Upload\Validation\Mimetype;
+use GFPDF_Vendor\Upload\Validation\Size;
 
 use Psr\Log\LoggerInterface;
 
@@ -297,7 +297,7 @@ class Model_Templates extends Helper_Abstract_Model {
 	/**
 	 * Validations, renames and moves the uploaded zip file to an appropriate location
 	 *
-	 * @param \Upload\File $file
+	 * @param \GFPDF_Vendor\Upload\File $file
 	 *
 	 * @return string The full path of the final resting place of the uploaded zip file
 	 *

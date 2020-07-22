@@ -26,8 +26,8 @@ use GFResults;
 use GP_Populate_Anything_Live_Merge_Tags;
 use Psr\Log\LoggerInterface;
 use RecursiveDirectoryIterator;
+use GFPDF_Vendor\Spatie\UrlSigner\Exceptions\InvalidSignatureKey;
 use RecursiveIteratorIterator;
-use Spatie\UrlSigner\Exceptions\InvalidSignatureKey;
 use WP_Error;
 
 /**

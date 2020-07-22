@@ -15,7 +15,7 @@
 
 ### Libraries ###
 vendor/*
-src/Vendor/*
+vendor_prefixed/*
 
 ### Grunt ###
 node_modules/*

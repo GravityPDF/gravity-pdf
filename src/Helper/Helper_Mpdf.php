@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * @since 5.2
  */
-class Helper_Mpdf extends \Mpdf\Mpdf {
+class Helper_Mpdf extends \GFPDF_Vendor\Mpdf\Mpdf {
 
 	/**
 	 * Added for backwards compatibility as it was removed in mPDF 8.0
@@ -36,12 +36,12 @@ class Helper_Mpdf extends \Mpdf\Mpdf {
 	 * @param string $boxName    The page boundary to import.
 	 *
 	 * @return string A unique string identifying the imported page.
-	 * @throws \Mpdf\MpdfException
-	 * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
-	 * @throws \setasign\Fpdi\PdfParser\Filter\FilterException
-	 * @throws \setasign\Fpdi\PdfParser\PdfParserException
-	 * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
-	 * @throws \setasign\Fpdi\PdfReader\PdfReaderException
+	 * @throws \GFPDF_Vendor\Mpdf\MpdfException
+	 * @throws \GFPDF_Vendor\setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
+	 * @throws \GFPDF_Vendor\setasign\Fpdi\PdfParser\Filter\FilterException
+	 * @throws \GFPDF_Vendor\setasign\Fpdi\PdfParser\PdfParserException
+	 * @throws \GFPDF_Vendor\setasign\Fpdi\PdfParser\Type\PdfTypeException
+	 * @throws \GFPDF_Vendor\setasign\Fpdi\PdfReader\PdfReaderException
 	 *
 	 * @since 5.2
 	 */
@@ -73,7 +73,7 @@ class Helper_Mpdf extends \Mpdf\Mpdf {
 	 * @see   Fpdi::getTemplateSize()
 	 *
 	 * @since 5.2
-	 * @throws \Mpdf\MpdfException
+	 * @throws \GFPDF_Vendor\Mpdf\MpdfException
 	 */
 	public function useTemplate( $tpl, $x = 0, $y = 0, $width = null, $height = null, $adjustPageSize = false ) {
 		$template = parent::useTemplate( $tpl, $x, $y, $width, $height, $adjustPageSize );
@@ -96,13 +96,13 @@ class Helper_Mpdf extends \Mpdf\Mpdf {
 	 * @param bool   $close If false leaves buffers etc. in current state, so that it can continue a block etc.
 	 *
 	 * @since 5.2
-	 * @throws \Mpdf\MpdfException
+	 * @throws \GFPDF_Vendor\Mpdf\MpdfException
 	 */
-	public function WriteHTML( $html, $mode = \Mpdf\HTMLParserMode::DEFAULT_MODE, $init = true, $close = true ) {
+	public function WriteHTML( $html, $mode = \GFPDF_Vendor\Mpdf\HTMLParserMode::DEFAULT_MODE, $init = true, $close = true ) {
 
 		/* Prevent error if incorrect mode is passed */
-		if ( in_array( $mode, \Mpdf\HTMLParserMode::getAllModes(), true ) === false ) {
-			$mode = \Mpdf\HTMLParserMode::DEFAULT_MODE;
+		if ( in_array( $mode, \GFPDF_Vendor\Mpdf\HTMLParserMode::getAllModes(), true ) === false ) {
+			$mode = \GFPDF_Vendor\Mpdf\HTMLParserMode::DEFAULT_MODE;
 		}
 
 		/*

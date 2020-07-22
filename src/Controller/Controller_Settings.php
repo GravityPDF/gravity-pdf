@@ -339,7 +339,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 					'proper_filename' => false,
 				];
 			}
-		} catch ( \Mpdf\MpdfException $e ) {
+		} catch ( \GFPDF_Vendor\Mpdf\MpdfException $e ) {
 
 		}
 

@@ -2,8 +2,8 @@
 
 namespace GFPDF\Helper;
 
-use Mpdf\Config\FontVariables;
-use Mpdf\Utils\UtfString;
+use GFPDF_Vendor\Mpdf\Config\FontVariables;
+use GFPDF_Vendor\Mpdf\Utils\UtfString;
 use Psr\Log\LoggerInterface;
 use Exception;
 
@@ -26,7 +26,7 @@ class Helper_PDF {
 	/**
 	 * Holds our PDF Object
 	 *
-	 * @var \mPDF
+	 * @var \GFPDF_Vendor\Mpdf\Mpdf
 	 *
 	 * @since 4.0
 	 */
@@ -669,7 +669,7 @@ class Helper_PDF {
 	}
 
 	/**
-	 * @return \mPDF
+	 * @return \GFPDF_Vendor\Mpdf\Mpdf
 	 */
 	public function get_pdf_class() {
 		return $this->mpdf;

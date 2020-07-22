@@ -21,7 +21,10 @@ return [
 	 * For more see: https://github.com/humbug/php-scoper#finders-and-paths
 	 */
 	'finders'   => [
-		Finder::create()->files()->in( $path . 'vendor/monolog/monolog/' )->name( [ '*.php', 'LICENSE' ] ),
+		Finder::create()->files()->in( $path . 'vendor/spatie/url-signer/' )->exclude('tests')->name( [ '*.php', 'LICENSE.md' ] ),
+		Finder::create()->files()->in( $path . 'vendor/league/uri/' )->name( [ '*.php', 'LICENSE' ] ),
+		Finder::create()->files()->in( $path . 'vendor/league/uri-components/' )->name( [ '*.php', 'LICENSE' ] ),
+		Finder::create()->files()->in( $path . 'vendor/league/uri-interfaces/' )->name( [ '*.php', 'LICENSE' ] ),
 	],
 
 	/*

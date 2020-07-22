@@ -37,8 +37,31 @@ else
   COMPOSER="${PHP_DOCKER}composer"
 fi
 
-eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}src/Vendor/Monolog --config=${PLUGIN_DIR}.php-scoper/monolog.php --force --quiet"
-cp ${PLUGIN_DIR}vendor/monolog/monolog/* ${PLUGIN_DIR}src/Vendor/Monolog 2>/dev/null
+rm -R "${PLUGIN_DIR}vendor_prefixed"
+mkdir "${PLUGIN_DIR}vendor_prefixed"
+
+# Monolog
+eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed/monolog --config=${PLUGIN_DIR}.php-scoper/monolog.php --quiet"
 eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/monolog"
+
+# URL Signer
+eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed --config=${PLUGIN_DIR}.php-scoper/url-signer.php --quiet"
+eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/spatie"
+eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/league"
+
+# Querypath
+eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed --config=${PLUGIN_DIR}.php-scoper/querypath.php --quiet"
+eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/querypath"
+eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/masterminds"
+
+# Codeguy
+eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed/upload --config=${PLUGIN_DIR}.php-scoper/upload.php --quiet"
+eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/codeguy"
+
+# Mpdf
+eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed --config=${PLUGIN_DIR}.php-scoper/mpdf.php --quiet"
+eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/mpdf"
+eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/setasign"
+eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/myclabs"
 
 eval "$COMPOSER dump-autoload --working-dir ${PLUGIN_DIR}"

@@ -2,9 +2,9 @@
 
 namespace GFPDF\Helper;
 
-use \Masterminds\HTML5;
-use \QueryPath\DOMQuery;
-use \QueryPath;
+use \GFPDF_Vendor\Masterminds\HTML5;
+use \GFPDF_Vendor\QueryPath\DOMQuery;
+use \GFPDF_Vendor\QueryPath;
 
 /**
  * @package     Gravity PDF

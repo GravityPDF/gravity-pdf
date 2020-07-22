@@ -21,7 +21,7 @@ return [
 	 * For more see: https://github.com/humbug/php-scoper#finders-and-paths
 	 */
 	'finders'   => [
-		Finder::create()->files()->in( $path . 'vendor/monolog/monolog/' )->name( [ '*.php', 'LICENSE' ] ),
+		Finder::create()->files()->in( $path . 'vendor/codeguy/upload/' )->exclude('tests')->name( [ '*.php', 'LICENSE' ] ),
 	],
 
 	/*
