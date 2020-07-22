@@ -1,0 +1,151 @@
+/*
+ * Help Tab
+ */
+@mixin set-about {
+  max-width: none;
+  min-height: 0;
+  line-height: 1.8em;
+}
+
+@mixin align-center {
+  text-align: center;
+  margin-right: 0;
+}
+
+#pdfextended-settings {
+
+  .about-wrap {
+    @include set-about;
+
+    h1 {
+      @include align-center;
+      margin-top: 40px;
+    }
+
+    .about-text {
+      @include align-center;
+      @include set-about;
+
+      .about-text-disclaimer {
+        font-size: 13px;
+      }
+    }
+
+    #search-knowledgebase {
+      @include align-center;
+
+      input {
+        font-family: 'FontAwesome', 'Open Sans', sans-serif;
+        font-size: 22px;
+        margin: 10px 0 0;
+        padding: 16px 20px;
+        line-height: 25px;
+        width: 100%;
+      }
+
+      #search-results {
+        text-align: left;
+        margin: 0 auto;
+
+        .postbox {
+          display: none;
+
+          h3 {
+            margin-bottom: 0;
+
+            .hndle {
+              padding-bottom: 12px;
+
+              .spinner {
+
+                .is-active {
+                  visibility: visible;
+                  margin: 0;
+                }
+              }
+            }
+          }
+
+          .is-active {
+
+            h3 {
+              margin-bottom: 8px;
+            }
+          }
+
+          .resultExist {
+            padding: 18px 14px 5px 14px;
+            border-bottom: 1px dotted #ccc;
+
+            &:last-child {
+              border-bottom: 0px;
+            }
+          }
+
+          .noResult {
+            padding: 14px 14px 10px 14px;
+          }
+
+          .error {
+            padding: 14px 14px 10px 14px;
+          }
+        }
+      }
+    }
+
+    #dashboard-widgets {
+      margin-bottom: 30px;
+
+      &:after {
+        content: "";
+        display: block;
+        clear: both;
+      }
+
+      .postbox-container {
+        width: 100%;
+
+        > a {
+          background: #f6f6f6 none repeat scroll 0 0;
+          border: 3px solid #eee;
+          border-radius: 10px;
+          color: inherit;
+          display: block;
+          padding: 15px;
+          font-size: 16px;
+          text-decoration: none;
+          margin-bottom: 30px;
+          transition: all 0.5s ease 0s;
+
+          &:hover {
+            border: 3px solid #076aa4;
+          }
+
+          span {
+            font-weight: bold;
+          }
+        }
+
+        ul {
+
+          li {
+            margin: 0;
+            padding: 0;
+            list-style-type: disc;
+            list-style-position: inside;
+          }
+        }
+      }
+    }
+
+    .center {
+      text-align: center;
+
+      .button-large {
+        height: 35px;
+        line-height: 33px;
+        padding: 0 17px 9px;
+      }
+    }
+  }
+}

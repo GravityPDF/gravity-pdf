@@ -14,9 +14,9 @@ export function handleOwnerRestriction () {
    */
   $publicAccess.change(function () {
     if ($(this).is(':checked')) {
-        $restrictOwner.hide()
-      } else {
-        $restrictOwner.show()
-      }
+      $restrictOwner.hide()
+    } else {
+      $restrictOwner.show()
+    }
   }).trigger('change')
 }

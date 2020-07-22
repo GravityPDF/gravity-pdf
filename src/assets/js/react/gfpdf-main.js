@@ -2,6 +2,7 @@ import $ from 'jquery'
 import templateBootstrap from './bootstrap/templateBootstrap'
 import coreFontBootstrap from './bootstrap/coreFontBootstrap'
 import helpBootstrap from './bootstrap/helpBootstrap'
+import '../../scss/gfpdf-styles.scss'
 
 /**
  * JS Entry point for WebPack
@@ -23,7 +24,7 @@ import helpBootstrap from './bootstrap/helpBootstrap'
 $(function () {
   'use strict'
 
-  __webpack_public_path__ = GFPDF.pluginUrl + 'dist/assets/js/' // eslint-disable-line
+  __webpack_public_path__ = GFPDF.pluginUrl + 'dist/' // eslint-disable-line
 
   /* Initialise the Fancy Template Picker */
   if (GFPDF.templateList !== undefined) {

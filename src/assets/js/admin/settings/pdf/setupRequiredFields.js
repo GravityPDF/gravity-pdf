@@ -16,10 +16,9 @@ export function setupRequiredFields ($elm) {
   })
 
   /* add the required star to make it easier for users */
-  const $required = $( '<span class="gfield_required">(required)</span>' )
   $elm.find(':input[required=""], :input[required]').each(function () {
     const $container = $(this).parent()
-    if( $container.find('.gform-settings-panel__title a').length ) {
+    if ($container.find('.gform-settings-panel__title a').length) {
       $container.find('.gform-settings-panel__title a').before('<span class="gfield_required">(required)</span>')
     } else {
       $container.find('.gform-settings-panel__title a').append('<span class="gfield_required">(required)</span>')

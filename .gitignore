@@ -42,6 +42,7 @@ dist/*
 
 # Coverage report
 /coverage
+/screenshots
 
 # Others
 _notes

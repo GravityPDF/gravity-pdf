@@ -7,7 +7,7 @@ import $ from 'jquery'
  */
 export function doColorPicker () {
   $('.gfpdf-color-picker').each(function () {
-    $(this).wpColorPicker( {
+    $(this).wpColorPicker({
       width: 300
     })
     $(this).parents('.wp-picker-container').find('.wp-color-result').addClass('ed_button')

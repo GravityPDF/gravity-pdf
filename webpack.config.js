@@ -1,9 +1,8 @@
 const webpackMerge = require('webpack-merge')
-const path = require('path')
-const PROD = (process.env.NODE_ENV === 'production')
-const chunkPath = __dirname + '/dist/assets/js/'
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const production = require('./webpack-configs/production')
 const development = require('./webpack-configs/development')
+const PROD = process.env.NODE_ENV === 'production'
 const modeConfig = PROD ? production : development
 
 module.exports = webpackMerge(
@@ -16,20 +15,16 @@ module.exports = webpackMerge(
       'admin': './src/assets/js/admin/bootstrap.js'
     },
     output: {
-      path: __dirname + '/dist/assets/js/',
-      filename: '[name].min.js',
-      chunkFilename: 'chunk-[name].[contenthash].js',
-      publicPath: chunkPath
+      path: __dirname + '/dist/',
+      filename: 'assets/js/[name].min.js',
+      chunkFilename: 'assets/js/chunk-[name].[contenthash].js',
+      publicPath: __dirname + '/dist/'
     },
     module: {
       rules: [
         {
-          test: /\.(js|jsx)$/,
-          exclude: path.resolve(__dirname, 'src/assets/js/legacy'),
-          include: [
-            path.resolve(__dirname, 'src/assets'),
-            path.resolve(__dirname, 'tests/js-unit')
-          ],
+          test: /\.m?js$/,
+          exclude: /(node_modules|bower_components)/,
           loader: 'babel-loader',
           options: { babelrc: true }
         },
@@ -37,12 +32,37 @@ module.exports = webpackMerge(
           type: 'javascript/auto',
           test: /\.json$/,
           loader: 'json-loader'
+        },
+        {
+          test: /\.s[ac]ss$/i,
+          use: [
+            MiniCssExtractPlugin.loader,
+            'css-loader',
+            {
+              loader: 'sass-loader',
+              options: {
+                implementation: require('sass'),
+                sassOptions: { fiber: require('fibers') }
+              }
+            }
+          ]
+        },
+        {
+          test: /\.(jp(e?)g|png|svg|gif)$/,
+          use: [
+            {
+              loader: 'url-loader',
+              options: {
+                limit: 8192,
+                name: 'assets/images/[name].[ext]',
+                publicPath: '../../dist/'
+              }
+            }
+          ]
         }
       ]
     },
-    externals: {
-      'jquery': 'jQuery'
-    }
+    externals: { jquery: 'jQuery' }
   },
   modeConfig
 )

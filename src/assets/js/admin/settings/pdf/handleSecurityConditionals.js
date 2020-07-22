@@ -15,22 +15,22 @@ export function handleSecurityConditionals () {
 
   /* Add change event to admin restrictions to show/hide dependant fields */
   $pdfSecurity.change(function () {
-      /* Get the format dependency */
-      const format = $format.filter(':checked').val()
+    /* Get the format dependency */
+    const format = $format.filter(':checked').val()
 
-      if (!$(this).is(':checked') || format !== GFPDF.standard) {
-        /* hide security password / privileges */
-        $securityFields.hide()
-      } else {
-        /* show security password / privileges */
-        $securityFields.show()
-      }
+    if (!$(this).is(':checked') || format !== GFPDF.standard) {
+      /* hide security password / privileges */
+      $securityFields.hide()
+    } else {
+      /* show security password / privileges */
+      $securityFields.show()
+    }
 
-      if (format !== GFPDF.standard) {
-        $securityQuestion.hide()
-      } else {
-        $securityQuestion.show()
-      }
+    if (format !== GFPDF.standard) {
+      $securityQuestion.hide()
+    } else {
+      $securityQuestion.show()
+    }
   }).trigger('change')
 
   /* The format field effects the security field. When it changes it triggers the security field as changed */

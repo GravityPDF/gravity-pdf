@@ -25,7 +25,7 @@ export function setupAJAXListDeleteListener () {
     }
   }
 
-  function deletePdf($elm) {
+  function deletePdf ($elm) {
     $elm
       .append(spinner('gfpdf-spinner gfpdf-spinner-small'))
       .closest('.row-actions')
@@ -53,9 +53,9 @@ export function setupAJAXListDeleteListener () {
           .parents('tr')
           .css('background', '#ffb8b8')
           .fadeOut(400, function () {
-          this.remove()
-          maybeShowEmptyRow()
-        })
+            this.remove()
+            maybeShowEmptyRow()
+          })
       }
     })
   }
@@ -64,7 +64,7 @@ export function setupAJAXListDeleteListener () {
   $('#gfpdf_list_form').on('click', 'a.submitdelete', function () {
     const id = String($(this).data('id'))
     if (id.length > 0 && window.confirm(GFPDF.pdfDeleteWarning)) {
-      const $elm = $(this);
+      const $elm = $(this)
       deletePdf($elm)
     }
 

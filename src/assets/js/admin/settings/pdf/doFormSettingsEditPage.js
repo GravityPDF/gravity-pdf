@@ -17,14 +17,14 @@ export function doFormSettingsEditPage () {
   toggleAppearanceTab()
 
   /* Add better merge tag support */
-  $('.gform-settings-field').each(function() {
+  $('.gform-settings-field').each(function () {
     $(this)
       .find('.merge-tag-support, .merge-tag-support + span')
       .wrapAll('<div class="gform-settings-input__container gform-settings-input__container--with-merge-tag"></div>')
   })
 
   /* Move alert inline */
-  $( '.gform-settings__wrapper > .alert').detach().prependTo('#tab_pdf')
+  $('.gform-settings__wrapper > .alert').detach().prependTo('#tab_pdf')
 
   /*
    * Workaround for Firefix TinyMCE Editor Bug NS_ERROR_UNEXPECTED (http://www.tinymce.com/develop/bugtracker_view.php?id=3152) when loading wp_editor via AJAX
