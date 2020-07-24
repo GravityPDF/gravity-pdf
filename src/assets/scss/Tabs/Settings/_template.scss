@@ -1,0 +1,64 @@
+/**
+ * Fancy template selector section
+ */
+.theme-wrap {
+
+  /**
+   * Header section
+   */
+  .theme-header {
+
+    h1 {
+      float: left;
+      padding-left: 2%;
+    }
+  }
+
+  /**
+   * Container section
+   */
+  #gfpdf-template-container {
+
+    .wp-filter-search {
+      margin: 0 0 5px;
+      font-size: 16px;
+      font-weight: 300;
+      line-height: 1.5;
+      width: 100%;
+    }
+
+    .theme {
+
+      .theme-author {
+        display: block;
+      }
+
+      .theme-actions {
+        opacity: 1;
+        left: inherit;
+        border-top: none;
+        height: 41px;
+        padding: 6px 3px 0;
+        top: auto;
+        -moz-box-sizing: content-box;
+        -webkit-box-sizing: content-box;
+        box-sizing: content-box;
+        -webkit-transform: none;
+        transform: none;
+        box-shadow: none;
+      }
+    }
+
+    .gfpdf-dropzone {
+
+      .dropzone {
+
+        .gfpdf-template-install-instructions {
+          font-size: 85%;
+          text-align: center;
+          margin-top: 5px;
+        }
+      }
+    }
+  }
+}

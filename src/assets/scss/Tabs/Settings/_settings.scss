@@ -1,0 +1,78 @@
+@use 'template';
+
+/**
+ * General settings tab
+ */
+.gform-settings__content {
+
+  .gform_settings_form {
+
+    .gform-settings-panel--full {
+      grid-column: span 2;
+
+      div {
+
+        .gfpdf-settings-field-wrapper {
+
+          .gform-settings-panel__title {
+            font-weight: bold;
+            color: #23282D;
+            margin-bottom: 0.625rem;
+            font-size: 0.8125rem;
+          }
+
+          #gpdf-advance-template-selector {
+            display: inline-block;
+            margin: 0.25rem;
+            vertical-align: top;
+          }
+
+          /*
+           * Color picker
+           */
+          .wp-picker-container {
+
+            button {
+              padding-left: 35px;
+              border-width: 1px;
+              border-style: solid;
+              border-color: rgb(144, 146, 178);
+              border-image: initial;
+
+              .wp-color-result-text {
+                font-size: 0.875rem;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .gform-settings-panel--collapsible {
+
+      div {
+
+        .gform-settings-panel--full {
+          grid-column: span 2;
+
+          .gfpdf-settings-multicheck-wrapper {
+            float: left;
+            width: 33%;
+            padding-bottom: 3px;
+          }
+        }
+      }
+    }
+
+    #submit-and-promo-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.5rem;
+      grid-column: span 2 / auto;
+
+      .extensions-upsell {
+        font-style: italic;
+      }
+    }
+  }
+}
