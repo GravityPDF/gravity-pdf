@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
  * Set base constants we'll use throughout the plugin
  */
-define( 'PDF_EXTENDED_VERSION', '6.0.0' ); /* the current plugin version */
+define( 'PDF_EXTENDED_VERSION', '6.0.0-beta1' ); /* the current plugin version */
 define( 'PDF_PLUGIN_DIR', plugin_dir_path( __FILE__ ) ); /* plugin directory path */
 define( 'PDF_PLUGIN_URL', plugin_dir_url( __FILE__ ) ); /* plugin directory url */
 define( 'PDF_PLUGIN_BASENAME', plugin_basename( __FILE__ ) ); /* the plugin basename */
@@ -101,7 +101,7 @@ class GFPDF_Major_Compatibility_Checks {
 	 *
 	 * @since 4.0
 	 */
-	public $required_php_version = '5.6';
+	public $required_php_version = '7.3';
 
 	/**
 	 * Set our required variables for a fallback and attempt to initialise
