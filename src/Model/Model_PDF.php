@@ -835,7 +835,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function register_pdf_meta_box( $meta_boxes, $entry, $form ) {
 		/* If gfpdf_form_settings is empty hide PDFs metabox */
-		if( empty( $form['gfpdf_form_settings'] )){
+		if ( empty( $form['gfpdf_form_settings'] ) ) {
 			return $meta_boxes;
 		}
 
