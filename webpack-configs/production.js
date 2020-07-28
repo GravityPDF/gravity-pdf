@@ -20,7 +20,7 @@ module.exports = {
     }),
     new webpack.SourceMapDevToolPlugin({
       filename: '[name].js.map',
-      exclude: ['gfpdf-backbone.min.js', 'gfpdf-entries.min.js', 'gfpdf-migration.min.js']
+      exclude: ['gfpdf-entries.min.js']
     })
   ],
   optimization: {

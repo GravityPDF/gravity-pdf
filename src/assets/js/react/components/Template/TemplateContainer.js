@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import TemplateCloseDialog from './TemplateCloseDialog'
+import CloseDialog from '../../utilities/CloseDialog'
 
 /**
  * Renders our Advanced Template Selector container which is shared amongst the components
@@ -23,8 +23,7 @@ export class Container extends React.Component {
   static propTypes = {
     header: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
     footer: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-    children: PropTypes.node.isRequired,
-    closeRoute: PropTypes.string
+    children: PropTypes.node.isRequired
   }
 
   /**
@@ -83,7 +82,6 @@ export class Container extends React.Component {
     const header = this.props.header
     const footer = this.props.footer
     const children = this.props.children
-    const closeRoute = this.props.closeRoute
 
     return (
       <div
@@ -95,7 +93,7 @@ export class Container extends React.Component {
         <div className='container theme-wrap'>
           <div className='theme-header'>
             {header}
-            <TemplateCloseDialog closeRoute={closeRoute} />
+            <CloseDialog />
           </div>
 
           <div

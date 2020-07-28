@@ -3,7 +3,7 @@ import { initialiseSettings } from './settings/initialiseSettings'
 
 /**
  * Gravity PDF Settings JS Logic
- * Dependancies: backbone, underscore, jquery
+ * Dependancies: jQuery
  * @since 4.0
  */
 

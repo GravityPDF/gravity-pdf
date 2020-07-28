@@ -9,9 +9,7 @@ module.exports = webpackMerge(
   {
     entry: {
       'app.bundle': './src/assets/js/react/gfpdf-main.js',
-      'gfpdf-backbone': './src/assets/js/legacy/gfpdf-backbone.js',
       'gfpdf-entries': './src/assets/js/legacy/gfpdf-entries.js',
-      'gfpdf-migration': './src/assets/js/legacy/gfpdf-migration.js',
       'admin': './src/assets/js/admin/bootstrap.js'
     },
     output: {

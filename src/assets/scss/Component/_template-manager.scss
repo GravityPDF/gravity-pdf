@@ -1,50 +1,23 @@
-@use '../Variables/colors';
-@use '../Mixins/button';
+@use '../base';
 
 #tab_pdf, #tab_PDF {
-
   #gfpdf_settings\[template\], #gfpdf_settings\[default_template\] {
     margin: 0 0.2rem 0.2rem 0;
   }
 
-  #gpdf-advance-template-selector {
-    display: inline-block;
-    vertical-align: top;
-
-    button {
-      @include button.reset;
-      line-height: 2.95;
-    }
-  }
-
   .theme-wrap {
 
-    /**
-     * Header section
-     */
+    /* Header section */
     .theme-header {
-
       h1 {
         float: left;
         padding-left: 2%;
       }
     }
 
-    /*
-     * Container section
-     */
+    /* Container section */
     #gfpdf-template-container {
-
-      .wp-filter-search {
-        margin: 0 0 5px;
-        font-size: 16px;
-        font-weight: 300;
-        line-height: 1.5;
-        width: 100%;
-      }
-
       .theme {
-
         .theme-author {
           display: block;
         }
@@ -87,9 +60,7 @@
       }
 
       .gfpdf-dropzone {
-
         .dropzone {
-
           .gfpdf-template-install-instructions {
             font-size: 85%;
             text-align: center;
@@ -99,10 +70,10 @@
       }
 
       .notice {
-        border-color: colors.$success-color;
+        border-color: base.$core-font--status-success;
 
         &.error {
-          border-color: colors.$error-color;
+          border-color: base.$core-font-status-error;
         }
       }
     }

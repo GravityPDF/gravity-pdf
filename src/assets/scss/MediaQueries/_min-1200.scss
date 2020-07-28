@@ -1,0 +1,52 @@
+/* 1200px and up */
+@media (min-width: 1200px) {
+
+  /* Popup - Font manager */
+  #tab_PDF {
+    .font-manager {
+      width: 80%;
+      height: 82%;
+      margin: 0 auto;
+
+      .font-manager-body {
+        flex-direction: row;
+
+        .two-columns {
+          &:first-child {
+            width: 55%;
+            height: 80%;
+          }
+
+          &:last-child {
+            width: 45%;
+            padding: 5px 50px 0px 30px;
+          }
+
+          .font-list {
+            .font-list-items {
+              height: 92%;
+            }
+          }
+
+          .add-font {
+            input {
+              width: 100%;
+            }
+
+            .font-files {
+              .variants {
+                .drop-zone {
+                  margin-right: 40px;
+                }
+              }
+            }
+          }
+        }
+
+        p {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+}

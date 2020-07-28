@@ -1,15 +1,15 @@
 import React from 'react'
 import { shallow } from 'enzyme'
-import { findByTestAttr } from '../../testUtils'
-import { TemplateCloseDialog } from '../../../../../src/assets/js/react/components/Template/TemplateCloseDialog'
+import { findByTestAttr } from '../testUtils'
+import { CloseDialog } from '../../../../src/assets/js/react/utilities/CloseDialog'
 
-describe('Template - TemplateCloseDialog.js', () => {
+describe('CloseDialog - CloseDialog.js', () => {
 
   const historyMock = { push: jest.fn() }
 
   describe('Component functions', () => {
 
-    const wrapper = shallow(<TemplateCloseDialog history={historyMock} />)
+    const wrapper = shallow(<CloseDialog history={historyMock} />)
     const instance = wrapper.instance()
 
     test('handleKeyPress() - Check if Escape key pressed and current event target isn\'t our search box or the search box is blank already', () => {
@@ -33,7 +33,7 @@ describe('Template - TemplateCloseDialog.js', () => {
       document.addEventListener = jest.fn((event, cb) => {
         map[event] = cb
       })
-      const wrapper = shallow(<TemplateCloseDialog history={historyMock} />)
+      const wrapper = shallow(<CloseDialog history={historyMock} />)
       const instance = wrapper.instance()
       const handleKeyPress = jest.spyOn(wrapper.instance(), 'handleKeyPress')
       instance.componentDidMount()
@@ -49,7 +49,7 @@ describe('Template - TemplateCloseDialog.js', () => {
       document.removeEventListener = jest.fn((event, cb) => {
         map[event] = cb
       })
-      const wrapper = shallow(<TemplateCloseDialog history={historyMock} />)
+      const wrapper = shallow(<CloseDialog history={historyMock} />)
       const instance = wrapper.instance()
       const handleKeyPress = jest.spyOn(wrapper.instance(), 'handleKeyPress')
       instance.componentWillUnmount()
@@ -61,28 +61,28 @@ describe('Template - TemplateCloseDialog.js', () => {
     })
   })
 
-  test('renders <TemplateCloseDialog /> component', () => {
-    const wrapper = shallow(<TemplateCloseDialog />)
-    const component = findByTestAttr(wrapper, 'component-templateCloseDialog')
+  test('renders <CloseDialog /> component', () => {
+    const wrapper = shallow(<CloseDialog />)
+    const component = findByTestAttr(wrapper, 'component-CloseDialog')
 
     expect(component.length).toBe(1)
   })
 
   test('renders button screen reader text', () => {
-    const wrapper = shallow(<TemplateCloseDialog />)
+    const wrapper = shallow(<CloseDialog />)
 
     expect(wrapper.find('span').text()).toBe('Close dialog')
   })
 
   test('check button click', () => {
-    const wrapper = shallow(<TemplateCloseDialog history={historyMock} />)
+    const wrapper = shallow(<CloseDialog history={historyMock} />)
     wrapper.simulate('click')
 
     expect(historyMock.push.mock.calls.length).toBe(1)
   })
 
   test('check button keyPress', () => {
-    const wrapper = shallow(<TemplateCloseDialog history={historyMock} />)
+    const wrapper = shallow(<CloseDialog history={historyMock} />)
     wrapper.simulate('keydown', { keyCode: 27, target: { className: '', value: '' } })
 
     expect(historyMock.push.mock.calls.length).toBe(1)

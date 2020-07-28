@@ -1,4 +1,4 @@
-@use '../Variables/colors';
+@use '../base';
 
 #tab_pdf, #tab_PDF {
   .gfpdf-core-font-counter {
@@ -16,11 +16,11 @@
     font-family: "Courier New", Courier, monospace;
 
     .gfpdf-core-font-status-success {
-      color: colors.$success-color;
+      color: base.$core-font--status-success;
     }
 
     .gfpdf-core-font-status-error {
-      color: colors.$error-color;
+      color: base.$core-font-status-error;
     }
   }
 }
