@@ -43,12 +43,6 @@
     "eslint-config-standard-react": "^9.2.0",
     "fibers": "^5.0.0",
     "file-loader": "6.0.0",
-    "gulp": "^4.0.0",
-    "gulp-clean-css": "^4.0.0",
-    "gulp-rename": "^1.4.0",
-    "gulp-sort": "^2.0.0",
-    "gulp-watch": "^5.0.1",
-    "gulp-wp-pot": "^2.3.4",
     "jest": "^24.9.0",
     "jest-enzyme": "^7.1.2",
     "jquery": "^3.4.1",
@@ -86,11 +80,11 @@
     "test:js:coverage": "jest --coverage --verbose",
     "test:js:watch": "jest --watchAll",
 
-    "prebuild": "yarn global add gulp-cli && yarn && yarn prebuild:core-fonts",
+    "prebuild": "yarn && yarn prebuild:core-fonts",
     "prebuild:core-fonts": "bash bin/json-payload.sh https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/ core-fonts.json",
 
-    "build:dev": "gulp && cross-env NODE_ENV=development webpack --progress --colors --watch --mode development",
-    "build:production": "gulp && cross-env NODE_ENV=production webpack --mode production",
+    "build:dev": "cross-env NODE_ENV=development webpack --progress --colors --watch --mode development",
+    "build:production": "cross-env NODE_ENV=production webpack --mode production",
 
     "check-licenses": "wp-scripts check-licenses --prod --gpl2",
 
