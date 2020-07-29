@@ -23,6 +23,12 @@ export function doFormSettingsEditPage () {
       .wrapAll('<div class="gform-settings-input__container gform-settings-input__container--with-merge-tag"></div>')
   })
 
+  /* Hide Template section, if empty */
+  const $templateSection = $('#gfpdf-fieldset-gfpdf_form_settings_template')
+  if($templateSection.find('.gform-settings-panel__content').children().length === 0) {
+    $templateSection.hide()
+  }
+
   /* Move alert inline */
   $('.gform-settings__wrapper > .alert').detach().prependTo('#tab_pdf')
 
