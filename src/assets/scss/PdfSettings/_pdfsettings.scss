@@ -30,5 +30,24 @@
       margin: -0.25rem 0 0;
     }
 
+    /* Upload Field */
+    .gfpdf-upload-setting-container {
+      display: flex;
+
+      input:first-of-type {
+        border-bottom-right-radius: 0;
+        border-right: none;
+        border-top-right-radius: 0;
+      }
+
+      button {
+        background: #FDFDFF;
+        border: 1px solid #9092B2;
+        border-radius: 0 5px 5px 0;
+        height: 2.75rem;
+        margin-left: 0;
+      }
+    }
+
   }
 }
