@@ -21,6 +21,11 @@ export function doFormSettingsEditPage () {
     $(this)
       .find('.merge-tag-support, .merge-tag-support + span')
       .wrapAll('<div class="gform-settings-input__container gform-settings-input__container--with-merge-tag"></div>')
+
+    $(this)
+      .find('.all-merge-tags.textarea')
+      .parent()
+      .wrapAll('<div class="gform-settings-input__container gform-settings-input__container--with-merge-tag gfpdf-merge-tag-container"></div>')
   })
 
   /* Hide Template section, if empty */

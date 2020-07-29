@@ -1929,7 +1929,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		if ( function_exists( 'wp_editor' ) ) {
 			ob_start();
-			echo '<span class="mt-gfpdf_settings_' . $args['id'] . '" style="float:right; position:relative; right: 10px; top: 90px;"></span>';
+			echo '<span class="mt-gfpdf_settings_' . $args['id'] . ' mt-gfpdf-merge-tag-selector-container"></span>';
 			wp_editor(
 				stripslashes( $value ),
 				'gfpdf_settings_' . $args['id'],

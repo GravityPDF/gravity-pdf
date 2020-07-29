@@ -5,8 +5,29 @@
 
   .gfpdf-settings-field-wrapper {
 
+    /* Multi Checkbox field */
     .gfpdf-settings-multicheck-wrapper {
       margin-bottom: 0.25rem;
+    }
+
+    /* Rich Text field */
+    .gform-settings-input__container--with-merge-tag.gfpdf-merge-tag-container {
+      display: block;
+
+      .all-merge-tags a.open-list {
+        border-left: none;
+        border-color: #e5e5e5;
+      }
+
+      .mt-gfpdf-merge-tag-selector-container {
+        position: relative;
+        float: right;
+        top: 90px;
+      }
+    }
+
+    .wp-media-buttons button {
+      margin: -0.25rem 0 0;
     }
 
   }
