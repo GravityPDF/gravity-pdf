@@ -21,7 +21,7 @@ export function setupRequiredFields ($elm) {
     if ($container.find('.gform-settings-panel__title a').length) {
       $container.find('.gform-settings-panel__title a').before('<span class="gfield_required">(required)</span>')
     } else {
-      $container.find('.gform-settings-panel__title a').append('<span class="gfield_required">(required)</span>')
+      $container.find('.gform-settings-panel__title').append('<span class="gfield_required">(required)</span>')
     }
   })
 }
