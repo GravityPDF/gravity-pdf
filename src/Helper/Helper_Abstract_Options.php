@@ -1520,9 +1520,9 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$required = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
 		$id       = ( isset( $args['idOverride'] ) ) ? esc_attr( $args['idOverride'] ) : 'gfpdf_settings[' . esc_attr( $args['id'] ) . ']';
 
-		$html  = '<input type="checkbox" id="' . $id . '" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" name="gfpdf_settings[' . $args['id'] . ']" value="1" ' . $checked . ' ' . $required . ' />';
+		$html = '<span class="gform-settings-description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc2'] ) . '</label></span>';
+		$html .= '<input type="checkbox" id="' . $id . '" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" name="gfpdf_settings[' . $args['id'] . ']" value="1" ' . $checked . ' ' . $required . ' />';
 		$html .= '<label for="' . $id . '"> ' . wp_kses_post( $args['desc'] ) . '</label>';
-		$html .= wp_kses_post( $args['desc2'] );
 
 		echo $html;
 	}

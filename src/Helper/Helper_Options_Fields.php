@@ -253,39 +253,36 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				[
 					'name'             => [
 						'id'       => 'name',
-						'name'     => esc_html__( 'Name', 'gravity-forms-pdf-extended' ),
+						'name'     => esc_html__( 'Label', 'gravity-forms-pdf-extended' ),
 						'type'     => 'text',
 						'required' => true,
-						'tooltip'  => '<h6>' . esc_html__( 'PDF Name', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'Distinguish between multiple PDFs by giving it an easy-to-remember name (for internal use). Use the %1$sFilename%2$s field below to set the actual PDF name.', 'gravity-forms-pdf-extended' ), '<em>', '</em>' ),
+						'desc'     => esc_html__( 'Add a descriptive label to help you  differentiate between multiple PDF settings.', 'gravity-forms-pdf-extended' ),
 					],
 
 					'template'         => [
 						'id'         => 'template',
 						'name'       => esc_html__( 'Template', 'gravity-forms-pdf-extended' ),
-						'desc'       => sprintf( esc_html__( 'Choose an existing template or purchased more %1$sfrom our template shop%2$s. You can also %3$sbuild your own%4$s or %5$shire us%6$s to create a custom solution.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/template-shop/">', '</a>', '<a href="https://gravitypdf.com/documentation/v5/developer-start-customising/">', '</a>', '<a href="https://gravitypdf.com/integration-services/">', '</a>' ),
+						'desc'       => sprintf( esc_html__( 'Templates control the overall look and feel of the PDFs, and additional templates can be %1$spurchased from the online store%4$s. If you want to digitize and automate your existing documents, %2$suse our Bespoke PDF service%4$s. Developers can also %3$sbuild their own templates%4$s.', 'gravity-forms-pdf-extended' ),'<a href="https://gravitypdf.com/store/#templates">', '<a href="https://gravitypdf.com/bespoke/">', '<a href="https://gravitypdf.com/documentation/v5/developer-start-customising/">', '</a>' ),
 						'type'       => 'select',
 						'options'    => $this->templates->get_all_templates_by_group(),
 						'std'        => $this->get_option( 'default_template', 'zadani' ),
 						'inputClass' => 'large',
-						'tooltip'    => '<h6>' . esc_html__( 'Templates', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'Gravity PDF comes with %1$sfour completely-free and highly customizable designs%2$s. You can also purchase additional templates from our template shop, hire us to integrate existing PDFs or, with a bit of technical know-how, build your own.', 'gravity-forms-pdf-extended' ), '<strong>', '</strong>' ),
 					],
 
 					'notification'     => [
 						'id'          => 'notification',
 						'name'        => esc_html__( 'Notifications', 'gravity-forms-pdf-extended' ),
-						'desc'        => esc_html__( 'Automatically attach PDF to the selected notifications.', 'gravity-forms-pdf-extended' ),
+						'desc'        => sprintf( esc_html__( 'Send the PDF as an email attachment for the selected notification(s). %1$sPassword protect the PDF%3$s if security is a concern. Alternatively, %2$suse the [gravitypdf] shortcode%3$s directly in your Notification message.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/user-setup-pdf/#password">', '<a href="https://gravitypdf.com/documentation/v5/user-shortcodes/">', '</a>' ),
 						'type'        => 'multicheck',
 						'options'     => [],
 						'placeholder' => esc_html__( 'Choose a Notification', 'gravity-forms-pdf-extended' ),
-						'tooltip'     => '<h6>' . esc_html__( 'Notifications', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Automatically generate and attach the PDF to your selected notifications. Conditional Logic for both the PDF and the notification applies. Inactive PDFs are also not sent.', 'gravity-forms-pdf-extended' ),
 					],
 
 					'filename'         => [
 						'id'         => 'filename',
 						'name'       => esc_html__( 'Filename', 'gravity-forms-pdf-extended' ),
 						'type'       => 'text',
-						'desc'       => 'The name used when saving a PDF. Mergetags are allowed.',
-						'tooltip'    => '<h6>' . esc_html__( 'Filename', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'Set an appropriate filename for the generated PDF. You should exclude the .pdf extension from the name. The following are invalid characters and will be converted to an underscore %1$s_%2$s when the PDF is generated: %3$s', 'gravity-forms-pdf-extended' ), '<code>', '</code>', '<code>/ \ " * ? | : < ></code>' ),
+						'desc'       => sprintf( esc_html__( 'Set the filename for the generated PDF (excluding the .pdf extension). Mergetags are supported, and invalid characters %s are automatically converted to an underscore.', 'gravity-forms-pdf-extended' ), '<code>/ \ " * ? | : &lt; &gt;</code>' ),
 						'inputClass' => 'merge-tag-support mt-hide_all_fields',
 						'required'   => true,
 					],
@@ -297,7 +294,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'desc'       => esc_html__( 'Enable conditional logic', 'gravity-forms-pdf-extended' ),
 						'class'      => 'conditional_logic',
 						'inputClass' => 'conditional_logic_listener',
-						'tooltip'    => '<h6>' . esc_html__( 'Conditional Logic', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Create rules to dynamically enable or disable PDFs. This includes attaching to notifications and viewing from your admin area.', 'gravity-forms-pdf-extended' ),
+						'desc2'    => esc_html__( 'Add rules to dynamically enable or disable the PDF. When disabled, PDFs do not show up in the admin area, cannot be viewed, and will not be attached to notifications.', 'gravity-forms-pdf-extended' ),
 					],
 
 					'conditionalLogic' => [
@@ -338,7 +335,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 
 					'orientation'     => [
 						'id'         => 'orientation',
-						'name'       => esc_html__( 'Orientation', 'gravity-forms-pdf-extended' ),
+						'name'       => esc_html__( 'Paper Orientation', 'gravity-forms-pdf-extended' ),
 						'type'       => 'select',
 						'options'    => [
 							'portrait'  => esc_html__( 'Portrait', 'gravity-forms-pdf-extended' ),
@@ -353,8 +350,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'type'       => 'select',
 						'options'    => $this->get_installed_fonts(),
 						'std'        => $this->get_option( 'default_font' ),
-						'desc'       => sprintf( esc_html__( 'Set the font type used in PDFs. Choose an existing font or %1$sinstall your own%2$s.', 'gravity-forms-pdf-extended' ), '<a href="' . $this->data->settings_url . '&tab=tools#manage_fonts">', '</a>' ),
-						'tooltip'    => '<h6>' . esc_html__( 'Fonts', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Gravity PDF comes bundled with fonts for most languages world-wide. Want to use a specific font type? Use the font installer (found in the Forms -> Settings -> Tools tab).', 'gravity-forms-pdf-extended' ),
+						'desc'       => sprintf( esc_html__( 'Set the primary font used in PDFs. You can also %1$sinstall your own%2$s.', 'gravity-forms-pdf-extended' ), '<a href="' . $this->data->settings_url . '&tab=tools#manage_fonts">', '</a>' ),
 						'class'      => 'gfpdf_font_type',
 					],
 
@@ -381,11 +377,10 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'rtl'             => [
 						'id'      => 'rtl',
 						'name'    => esc_html__( 'Reverse Text (RTL)', 'gravity-forms-pdf-extended' ),
-						'desc'    => esc_html__( 'Script like Arabic and Hebrew are written right to left.', 'gravity-forms-pdf-extended' ),
+						'desc'    => esc_html__( 'Script like Arabic, Hebrew, Syriac (and many others) are written right to left.', 'gravity-forms-pdf-extended' ),
 						'type'    => 'radio',
 						'type' => 'toggle',
 						'std'  => $this->get_option( 'default_rtl', '0' ),
-						'tooltip' => '<h6>' . esc_html__( 'Reverse Text (RTL)', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( "Enable RTL if you are writing in Arabic, Hebrew, Syriac, N'ko, Thaana, Tifinar or Urdu.", 'gravity-forms-pdf-extended' ),
 					],
 
 				]
@@ -414,7 +409,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'format'          => [
 						'id'      => 'format',
 						'name'    => esc_html__( 'Format', 'gravity-forms-pdf-extended' ),
-						'desc'    => esc_html__( 'Generate a PDF in the selected format.', 'gravity-forms-pdf-extended' ),
+						'desc'    => esc_html__( 'Generate a document adhering to the selected PDF format. Watermarks, alpha-transparency, and PDF Security are automatically disabled when using PDF/A-1b or PDF/X-1a formats.', 'gravity-forms-pdf-extended' ),
 						'type'    => 'radio',
 						'options' => [
 							'Standard' => 'Standard',
@@ -422,13 +417,12 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 							'PDFX1A'   => 'PDF/X-1a',
 						],
 						'std'     => 'Standard',
-						'tooltip' => '<h6>' . esc_html__( 'PDF Format', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'Generate a document adhearing to the appropriate PDF standard. When not in %1$sStandard%2$s mode, watermarks, alpha-transparent PNGs and security options can NOT be used.', 'gravity-forms-pdf-extended' ), '<em>', '</em>' ),
 					],
 
 					'security'        => [
 						'id'      => 'security',
 						'name'    => esc_html__( 'Enable PDF Security', 'gravity-forms-pdf-extended' ),
-						'desc'    => esc_html__( 'Password protect generated PDFs, or restrict user capabilities.', 'gravity-forms-pdf-extended' ),
+						'desc'    => esc_html__( 'Password protect generated PDFs, and/or restrict user capabilities.', 'gravity-forms-pdf-extended' ),
 						'type' => 'toggle',
 					],
 
@@ -436,14 +430,14 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'id'         => 'password',
 						'name'       => esc_html__( 'Password', 'gravity-forms-pdf-extended' ),
 						'type'       => 'text',
-						'desc'       => 'Password protect the PDF, or leave blank to disable password protection.',
+						'desc'       => 'Password protect the PDF, or leave blank to disable. Mergetags are supported.',
 						'inputClass' => 'merge-tag-support mt-hide_all_fields',
 					],
 
 					'privileges'      => [
 						'id'          => 'privileges',
 						'name'        => esc_html__( 'Privileges', 'gravity-forms-pdf-extended' ),
-						'desc'        => 'Restrict end user capabilities by removing privileges.',
+						'desc'        => 'Deselect privileges to restrict end user capabilities in the PDF. Privileges are trivial to bypass and are only suitable to specify your intentions to the user (and not as a means of access control or security).',
 						'type'        => 'multicheck',
 						'options'     => $this->get_privilages(),
 						'std'         => [
@@ -456,7 +450,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 							'extract',
 							'assemble',
 						],
-						'tooltip'     => '<h6>' . esc_html__( 'Privileges', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'You can prevent the end user completing certain actions to the PDF – such as copying text, printing, adding annotations or extracting pages.', 'gravity-forms-pdf-extended' ),
 						'placeholder' => esc_html__( 'Select End User PDF Privileges', 'gravity-forms-pdf-extended' ),
 					],
 
@@ -472,34 +465,31 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'type'    => 'number',
 						'size'    => 'small',
 						'std'     => 96,
-						'tooltip' => '<h6>' . esc_html__( 'Image DPI', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Control the image DPI (dots per inch) in PDFs. Set to 300 when professionally printing document.', 'gravity-forms-pdf-extended' ),
+						'desc' => esc_html__( 'Control the image DPI (dots per inch) in PDFs. Set to 300 when professionally printing document.', 'gravity-forms-pdf-extended' ),
 					],
 
 					'save'            => [
 						'id'      => 'save',
 						'name'    => esc_html__( 'Always Save PDF', 'gravity-forms-pdf-extended' ),
-						'desc'    => esc_html__( 'Force a PDF to be saved to disk when a new entry is created.', 'gravity-forms-pdf-extended' ),
 						'type'    => 'radio',
 						'type' => 'toggle',
-						'tooltip' => '<h6>' . esc_html__( 'Save PDF', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'By default, PDFs are not automatically saved to disk. Enable this option to force the PDF to be generated and saved. Useful when using the %1$sgfpdf_post_pdf_save%2$s hook to copy the PDF to an alternate location.', 'gravity-forms-pdf-extended' ), '<code>', '</code>' ),
+						'desc' => sprintf( esc_html__( 'Enable this option to force the PDF to be saved to disk during form submission (by default, this only occurs when PDFs are attached to notifications). This is useful when using the %1$sgfpdf_post_pdf_save%2$s hook to copy the PDF to an alternate location on the filesystem.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/gfpdf_post_save_pdf/"><code>', '</code></a>' ),
 					],
 
 					'public_access'   => [
 						'id'      => 'public_access',
 						'name'    => esc_html__( 'Enable Public Access', 'gravity-forms-pdf-extended' ),
-						'desc'    => sprintf( esc_html__( 'Disable all %1$ssecurity protocols%2$s and allow %3$sanyone%4$s to access the PDFs.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/user-pdf-security/">', '</a>', '<strong>', '</strong>' ),
 						'type'    => 'radio',
 						'type' => 'toggle',
-						'tooltip' => '<h6>' . esc_html__( 'Public Access', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( "When public access is on all security protocols are disabled and anyone worldwide can view the PDF document for ALL your form's entries. For better security, %1\$suse the signed PDF URLs feature instead%2\$s.", 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/user-shortcodes/#signed-attribute">', '</a>' ),
+						'desc' => sprintf( esc_html__( "When public access is on all security protocols are disabled and %3\$sanyone can view the PDF document for ALL your form's entries%4\$s. For better security, %1\$suse the signed PDF urls feature instead%2\$s.", 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/user-shortcodes/#signed-attribute">', '</a>', '<strong>', '</strong>' ),
 					],
 
 					'restrict_owner'  => [
 						'id'      => 'restrict_owner',
 						'name'    => esc_html__( 'Restrict Owner', 'gravity-forms-pdf-extended' ),
-						'desc'    => esc_html__( 'When enabled, the original entry owner will NOT be able to view the PDFs.', 'gravity-forms-pdf-extended' ),
+						'desc'    => sprintf( esc_html__( 'When enabled, the original entry owner will NOT be able to view the PDFs. This setting is overridden %1$swhen using signed PDF urls%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/user-shortcodes/#signed-attribute">', '</a>' ),
 						'type' => 'toggle',
 						'std'     => $this->get_option( 'default_restrict_owner', '0' ),
-						'tooltip' => '<h6>' . esc_html__( 'Restrict Owner', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'Enable this setting if your PDFs should not be viewable by the end user. This setting is overridden %1$swhen using signed PDF URLs%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/user-shortcodes/#signed-attribute">', '</a>' ),
 					],
 				]
 			),
@@ -533,7 +523,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 		$settings['advanced_template'] = [
 			'id'      => 'advanced_template',
 			'name'    => esc_html__( 'Enable Advanced Templating', 'gravity-forms-pdf-extended' ),
-			'desc'    => esc_html__( 'By enabling, a PDF template will no longer be treated as HTML.', 'gravity-forms-pdf-extended' ),
+			'desc'    => esc_html__( 'A legacy setting used that enables a template to be treated as PHP, with direct access to the PDF engine.', 'gravity-forms-pdf-extended' ),
 			'type' => 'toggle',
 		];
 
@@ -663,10 +653,9 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			[
 				'id'      => 'enable_conditional',
 				'name'    => esc_html__( 'Enable Conditional Logic', 'gravity-forms-pdf-extended' ),
-				'desc'    => esc_html__( 'When enabled the PDF will adhere to the form field conditional logic.', 'gravity-forms-pdf-extended' ),
+				'desc'    => esc_html__( 'When enabled the PDF will adhere to the form field conditional logic and show/hide fields.', 'gravity-forms-pdf-extended' ),
 				'type'    => 'radio',
 				'type' => 'toggle',
-				'tooltip' => '<h6>' . esc_html__( 'Enable Conditional Logic', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Enable this option to hide failed conditional logic fields in the PDF.', 'gravity-forms-pdf-extended' ),
 			]
 		);
 	}
@@ -707,7 +696,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				'size'       => 8,
 				'desc'       => sprintf( esc_html__( 'The header is included at the top of each page. For simple columns %1$stry this HTML table snippet%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://gist.github.com/jakejackson1/997b5dedf0a5e665e8ef">', '</a>' ),
 				'inputClass' => 'merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields',
-				'tooltip'    => '<h6>' . esc_html__( 'Header', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'When inserting images in the header set the size to %1$sLarge%2$s or %3$sFull Size%4$s.', 'gravity-forms-pdf-extended' ), '<em>', '</em>', '<em>', '</em>' ),
 			]
 		);
 	}
@@ -749,9 +737,8 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				'name'       => esc_html__( 'Footer', 'gravity-forms-pdf-extended' ),
 				'type'       => 'rich_editor',
 				'size'       => 8,
-				'desc'       => sprintf( esc_html__( 'The footer is included at the bottom of every page. For simple columns %1$stry this HTML table snippet%2$s.', 'gravity-forms-pdf-extended' ), '<a href="https://gist.github.com/jakejackson1/e6179a96cd97ef0a8457">', '</a>' ),
+				'desc'       => sprintf( esc_html__( 'The footer is included at the bottom of every page. For simple text footers use the left, center and right alignment buttons in the editor. For simple columns %1$stry this HTML table snippet%2$s. Use the special %3$s{PAGENO}%4$s and %3$s{nbpg}%4$s tags to display page numbering. ', 'gravity-forms-pdf-extended' ), '<a href="https://gist.github.com/jakejackson1/e6179a96cd97ef0a8457">', '</a>', '<em>', '</em>' ),
 				'inputClass' => 'merge-tag-support mt-wp_editor mt-manual_position mt-position-right mt-hide_all_fields',
-				'tooltip'    => '<h6>' . esc_html__( 'Footer', 'gravity-forms-pdf-extended' ) . '</h6>' . sprintf( esc_html__( 'For simple text footers use the left, center and right alignment buttons in the editor. You can also use the special %1$s{PAGENO}%2$s and %3$s{nbpg}%4$s tags to display page numbering.', 'gravity-forms-pdf-extended' ), '<em>', '</em>', '<em>', '</em>' ),
 			]
 		);
 	}
@@ -812,8 +799,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				'id'      => 'background_image',
 				'name'    => esc_html__( 'Background Image', 'gravity-forms-pdf-extended' ),
 				'type'    => 'upload',
-				'desc'    => esc_html__( 'The background image is included on all pages. For optimal results, use an image the same dimensions as the paper size.', 'gravity-forms-pdf-extended' ),
-				'tooltip' => '<h6>' . esc_html__( 'Background Image', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'For the best results, use a JPG or non-interlaced 8-Bit PNG that has the same dimensions as the paper size.', 'gravity-forms-pdf-extended' ),
+				'desc'    => esc_html__( 'The background image is included on all pages. For optimal results, use an image the same dimensions as the paper size and run it through an image optimization tool before upload.', 'gravity-forms-pdf-extended' ),
 			]
 		);
 	}
