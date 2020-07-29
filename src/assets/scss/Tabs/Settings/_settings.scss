@@ -1,6 +1,6 @@
 @use 'template';
 
-/**
+/*
  * General settings tab
  */
 .gform-settings__content {
@@ -13,11 +13,12 @@
       div {
 
         .gfpdf-settings-field-wrapper {
+          margin-bottom: 1.25rem;
 
           .gform-settings-panel__title {
             font-weight: bold;
             color: #23282D;
-            margin-bottom: 0.625rem;
+            margin-bottom: 0.25rem;
             font-size: 0.8125rem;
           }
 

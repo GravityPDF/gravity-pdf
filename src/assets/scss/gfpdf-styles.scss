@@ -2,6 +2,7 @@
 @use 'Tabs/License/license';
 @use 'Tabs/Tools/tools';
 @use 'Tabs/Help/help';
+@use 'PdfSettings/pdfsettings';
 
 .gform_settings_form {
 
@@ -15,8 +16,8 @@
  */
 .gfpdf-spinner {
   padding: 0 5px;
-  vertical-align: middle !important;
-  width: 24px !important;
+  vertical-align: middle;
+  width: 27px;
 }
 
 /**
