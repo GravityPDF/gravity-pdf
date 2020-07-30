@@ -1978,7 +1978,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$value                = $this->get_form_value( $args );
 		$uploader_title       = ( isset( $args['uploaderTitle'] ) ) ? esc_attr( $args['uploaderTitle'] ) : esc_attr__( 'Select Media', 'gravity-forms-pdf-extended' );
 		$uploader_button_text = ( isset( $args['uploaderButtonText'] ) ) ? esc_attr( $args['uploaderButtonText'] ) : esc_attr__( 'Select Media', 'gravity-forms-pdf-extended' );
-		$button_text          = ( isset( $args['buttonText'] ) ) ? esc_html( $args['buttonText'] ) : esc_html__( 'Upload File', 'gravity-forms-pdf-extended' );
+		$button_text          = ( isset( $args['buttonText'] ) ) ? esc_attr( $args['buttonText'] ) : esc_attr__( 'Upload File', 'gravity-forms-pdf-extended' );
 		$class                = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
 		$required             = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
 		$args['id']           = esc_attr( $args['id'] );
@@ -1986,7 +1986,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		$html = '<span class="gform-settings-description"><label for="gfpdf_settings[' . $args['id'] . ']"> ' . wp_kses_post( $args['desc'] ) . '</label></span>';
 		$html .= '<div class="gfpdf-upload-setting-container"><input type="text" class="' . $size . '-text gfpdf_settings_' . $args['id'] . ' ' . $class . '" id="gfpdf_settings[' . $args['id'] . ']" name="gfpdf_settings[' . $args['id'] . ']" value="' . esc_attr( stripslashes( $value ) ) . '" ' . $required . ' />';
-		$html .= '<button class="gfpdf_settings_upload_button button-secondary" data-uploader-title="' . $uploader_title . '" data-uploader-button-text="' . $uploader_button_text . '">' . $button_text . '</button></div>';
+		$html .= '<input type="button" class="gfpdf_settings_upload_button button-secondary" data-uploader-title="' . $uploader_title . '" data-uploader-button-text="' . $uploader_button_text . '" value="'. $button_text . '" /></div>';
 		$html .= wp_kses_post( $args['desc2'] );
 
 		echo $html;
