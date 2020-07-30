@@ -218,14 +218,18 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$is_active   = isset( $item['active'] ) ? $item['active'] : true;
 		$form_id     = rgget( 'id' );
 		$state_nonce = wp_create_nonce( "gfpdf_state_nonce_{$form_id}_{$item['id']}" );
+
+		$active_label   = esc_attr__( 'Active', 'gravity-forms-pdf-extended' );
+		$inactive_label = esc_attr__( 'Inactive', 'gravity-forms-pdf-extended' );
+		$label          = $is_active ? $active_label : $inactive_label;
 		?>
 
-		<img data-id="<?php echo $item['id']; ?>" data-nonce="<?php echo $state_nonce; ?>"
-			 data-fid="<?php echo $form_id; ?>"
-			 src="<?php echo $this->gform->get_plugin_url(); ?>/images/active<?php echo intval( $is_active ); ?>.png"
-			 style="cursor: pointer;margin:-1px 0 0 8px;"
-			 alt="<?php $is_active ? esc_attr__( 'Active', 'gravity-forms-pdf-extended' ) : esc_attr__( 'Inactive', 'gravity-forms-pdf-extended' ); ?>"
-			 title="<?php echo $is_active ? esc_attr__( 'Active', 'gravity-forms-pdf-extended' ) : esc_attr__( 'Inactive', 'gravity-forms-pdf-extended' ); ?>"/>
+		<img data-id="<?= $item['id'] ?>" data-nonce="<?= $state_nonce ?>"
+			 data-fid="<?= $form_id ?>"
+			 src="<?= $this->gform->get_plugin_url() ?>/images/active<?= intval( $is_active ) ?>.png"
+			 style="margin:1px 0 0 2px"
+			 alt="<?= $label  ?>"
+			 title="<?= $label  ?>"/>
 
 		<?php
 	}
@@ -239,7 +243,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * @since 4.0
 	 */
 	public function column_notifications( $item ) {
-		if ( ! isset( $item['notification'] ) || sizeof( $item['notification'] ) === 0 ) {
+		if ( ! isset( $item['notification'] ) || count( $item['notification'] ) === 0 ) {
 			esc_html_e( 'None', 'gravity-forms-pdf-extended' );
 
 			return;
@@ -317,8 +321,8 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 		$actions = [
 			'edit'      => '<a title="' . esc_attr__( 'Edit this PDF', 'gravity-forms-pdf-extended' ) . '" href="' . $edit_url . '">' . esc_html__( 'Edit', 'gravity-forms-pdf-extended' ) . '</a>',
-			'duplicate' => '<a title="' . esc_attr__( 'Duplicate this PDF', 'gravity-forms-pdf-extended' ) . '" data-id="' . $item['id'] . '" class="submitduplicate" data-nonce="' . $duplicate_nonce . '"  data-fid="' . $form_id . '">' . esc_html__( 'Duplicate', 'gravity-forms-pdf-extended' ) . '</a>',
-			'delete'    => '<a title="' . esc_attr__( 'Delete this PDF', 'gravity-forms-pdf-extended' ) . '" class="submitdelete" data-id="' . $item['id'] . '" data-nonce="' . $delete_nonce . '" data-fid="' . $form_id . '">' . esc_html__( 'Delete', 'gravity-forms-pdf-extended' ) . '</a>',
+			'duplicate' => '<a title="' . esc_attr__( 'Duplicate this PDF', 'gravity-forms-pdf-extended' ) . '" data-id="' . $item['id'] . '" class="submitduplicate" data-nonce="' . $duplicate_nonce . '"  data-fid="' . $form_id . '" href="#">' . esc_html__( 'Duplicate', 'gravity-forms-pdf-extended' ) . '</a>',
+			'delete'    => '<a title="' . esc_attr__( 'Delete this PDF', 'gravity-forms-pdf-extended' ) . '" class="submitdelete" data-id="' . $item['id'] . '" data-nonce="' . $delete_nonce . '" data-fid="' . $form_id . '" href="#">' . esc_html__( 'Delete', 'gravity-forms-pdf-extended' ) . '</a>',
 		];
 
 		/* See https://gravitypdf.com/documentation/v5/gfpdf_pdf_actions/ for more details about this filter */
