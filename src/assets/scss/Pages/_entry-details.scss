@@ -1,0 +1,32 @@
+/*
+ * Form -> Entries -> Individual Entry
+ */
+
+/*
+ * PDF Meta Box
+ */
+div.gf_entry_wrap div#gfpdf-entry-details-list {
+
+  .inside {
+    margin: 0;
+    padding: 0;
+    max-height: 18rem;
+    overflow-y: auto;
+  }
+
+  .gfpdf_detailed_pdf_container {
+    margin-bottom: 0.25rem;
+    border-bottom: 1px solid #EBEBF2;
+    padding: 0.5rem 0.75rem;
+
+    &:last-of-type {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+  }
+
+  .gfpdf_detailed_pdf_cta {
+    color: #ddd;
+  }
+
+}

@@ -1,0 +1,28 @@
+#tab_pdf, #tab_PDF {
+
+  .gfpdf-spinner {
+    padding: 0 5px;
+    vertical-align: middle;
+    width: 27px;
+  }
+
+  /* PDF List Page */
+  #gfpdf_list_form, button {
+
+    .gfpdf-spinner {
+      width: 20px;
+    }
+
+  }
+
+  /* Inside a button */
+  button .gfpdf-spinner {
+    padding-right: 0;
+  }
+
+  /* Core Font Installer */
+  #gfpdf-button-wrapper-install_core_fonts .gfpdf-spinner {
+    padding: 5px;
+  }
+
+}

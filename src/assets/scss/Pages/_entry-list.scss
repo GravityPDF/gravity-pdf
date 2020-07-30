@@ -1,0 +1,24 @@
+/*
+ * Form -> Entries
+ */
+
+/*
+ * Multi PDF Submenu
+ */
+.gfpdf_form_action_has_submenu {
+
+  position: relative;
+  display: inline-block;
+
+  &.open {
+    .gform-form-toolbar__submenu {
+      display: block;
+      min-width: 10rem;
+      max-width: 30rem;
+
+      a:focus {
+        box-shadow: inset 0 0 0 1px #5b9dd9, 0 0 2px 1px rgba(30, 140, 190, 0.8);
+      }
+    }
+  }
+}

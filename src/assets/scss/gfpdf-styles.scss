@@ -1,70 +1,25 @@
-@use 'Tabs/Settings/settings';
-@use 'Tabs/License/license';
-@use 'Tabs/Tools/tools';
-@use 'Tabs/Help/help';
-@use 'PdfSettings/pdfsettings';
-@use 'PdfSettings/list';
+@use 'Component/color-picker';
+@use 'Component/core-fonts';
+@use 'Component/gf-settings-containers';
+@use 'Component/license';
+@use 'Component/multicheck';
+@use 'Component/number';
+@use 'Component/rich_text';
+@use 'Component/spinner';
+@use 'Component/submit';
+@use 'Component/template-manager';
+@use 'Component/uninstaller';
+@use 'Component/upload';
 
-.gform_settings_form {
+@use 'Pages/pdf-list';
+@use 'Pages/entry-list';
+@use 'Pages/entry-details';
+@use 'Pages/help'; /* @TODO - rework and/or remove */
 
-  + form {
-    margin-top: 2rem;
-  }
-}
+@use 'rtl'; /* @TODO - rework */
 
-/**
- * Spinner
- */
-.gfpdf-spinner {
-  padding: 0 5px;
-  vertical-align: middle;
-  width: 27px;
-}
-
-/**
+/*
  * Media queries
  */
-@media only screen and (min-width: 783px) {
-
-  /**
-   * Help tab section
-   */
-  #pdfextended-settings {
-
-    .about-wrap {
-
-      #dashboard-widgets {
-
-        .postbox-container {
-          width: 49.5%;
-
-          a {
-            margin-right: 30px;
-            min-height: 245px;
-          }
-        }
-      }
-    }
-  }
-}
-@media only screen and (min-width: 1000px) {
-
-  /**
-   * Help tab section
-   */
-  #pdfextended-settings {
-
-    .about-wrap {
-
-      #dashboard-widgets {
-
-        .postbox-container {
-
-          a {
-            min-height: 180px;
-          }
-        }
-      }
-    }
-  }
-}
+@use 'MediaQueries/min-783'; /* @TODO - rework and/or remove */
+@use 'MediaQueries/min-1000'; /* @TODO - rework and/or remove */
