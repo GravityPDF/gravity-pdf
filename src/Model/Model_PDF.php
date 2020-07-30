@@ -811,15 +811,17 @@ class Model_PDF extends Helper_Abstract_Model {
 		$controller = $this->getController();
 		$pdf_list   = $this->get_pdf_display_list( $args['entry'] );
 
-		if ( ! empty( $pdf_list ) ) {
-			$pdfs = [
-				'pdfs' => $pdf_list,
-			];
-
-			$controller->view->entry_detailed_pdf( $pdfs );
-		}else{
+		if ( empty( $pdf_list ) ) {
 			$controller->view->entry_no_valid_pdf();
+
+			return;
 		}
+
+		$pdfs = [
+			'pdfs' => $pdf_list,
+		];
+
+		$controller->view->entry_detailed_pdf( $pdfs );
 	}
 
 	/**

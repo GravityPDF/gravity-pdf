@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Shows a warning message once there's no valid pdfs that passed its conditional logic
+ * Shows a warning message when all the PDF conditional logic doesn't pass for the current entry
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2020, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       4.0
+ * @since       6.0
  */
 
 /* Exit if accessed directly */
@@ -17,5 +17,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <div class="gfpdf_detailed_pdf_container">
-	<?= esc_html__( 'No valid PDFs found.', 'gravity-forms-pdf-extended' ); ?>
+	<?= esc_html__( 'No PDFs available for this entry.', 'gravity-forms-pdf-extended' ); ?>
 </div>
