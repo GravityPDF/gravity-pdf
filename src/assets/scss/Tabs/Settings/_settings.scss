@@ -34,14 +34,29 @@
           .wp-picker-container {
 
             button {
-              padding-left: 35px;
+              padding: 0 0 0 35px;
               border-width: 1px;
               border-style: solid;
               border-color: rgb(144, 146, 178);
               border-image: initial;
+              height: auto;
 
               .wp-color-result-text {
                 font-size: 0.875rem;
+              }
+            }
+
+            .wp-picker-input-wrap {
+              .button-small, .button-small:hover {
+                font-size: 0.9rem;
+                padding: 0 0.75rem;
+                height: auto;
+                line-height: 2.54545455;
+              }
+
+              input[type="text"] {
+                width: 5.25rem;
+                font-size: 1rem;
               }
             }
           }
