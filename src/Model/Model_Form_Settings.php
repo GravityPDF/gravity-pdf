@@ -235,7 +235,12 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		$pdf = $this->options->get_pdf( $form_id, $pdf_id );
 
 		/* prepare our data */
-		$label = ( ! is_wp_error( $pdf ) && ( ! isset( $pdf['status'] ) || $_POST['submit'] === 'Update PDF' ) ) ? esc_html__( 'Update PDF', 'gravity-forms-pdf-extended' ) : esc_html__( 'Add PDF', 'gravity-forms-pdf-extended' );
+		$update_pdf_text = esc_html__( 'Update PDF', 'gravity-forms-pdf-extended' );
+		$label           = esc_html__( 'Add PDF', 'gravity-forms-pdf-extended' );
+
+		if ( ( $_POST['submit'] ?? '' ) === $update_pdf_text || ( ! is_wp_error( $pdf ) && ! isset( $pdf['status'] ) ) ) {
+			$label = $update_pdf_text;
+		}
 
 		wp_enqueue_editor();
 
