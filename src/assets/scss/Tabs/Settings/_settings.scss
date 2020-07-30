@@ -1,5 +1,11 @@
 @use 'template';
 
+@mixin button-reset {
+  font-size: 0.9rem;
+  padding: 0 0.75rem;
+  height: auto;
+}
+
 /*
  * General settings tab
  */
@@ -22,10 +28,18 @@
             font-size: 0.8125rem;
           }
 
+          #gfpdf_settings\[template\], #gfpdf_settings\[default_template\] {
+            margin: 0 0.2rem 0.2rem 0;
+          }
+
           #gpdf-advance-template-selector {
             display: inline-block;
-            margin: 0.25rem;
             vertical-align: top;
+
+            button {
+              @include button-reset;
+              line-height: 2.95;
+            }
           }
 
           /*
@@ -48,9 +62,7 @@
 
             .wp-picker-input-wrap {
               .button-small, .button-small:hover {
-                font-size: 0.9rem;
-                padding: 0 0.75rem;
-                height: auto;
+                @include button-reset;
                 line-height: 2.54545455;
               }
 
