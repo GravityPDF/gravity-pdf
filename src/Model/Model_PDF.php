@@ -834,16 +834,12 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 6.0
 	 */
 	public function register_pdf_meta_box( $meta_boxes, $entry, $form ) {
-		/* If gfpdf_form_settings is empty hide PDFs metabox */
-		if ( empty( $form['gfpdf_form_settings'] ) ) {
-			return $meta_boxes;
-		}
 
-		$active_pdfs = array_filter( $form['gfpdf_form_settings'], function( $pdf ) {
+		$active_pdfs = array_filter( $form['gfpdf_form_settings'] ?? [], function( $pdf ) {
 			return $pdf['active'] === true;
 		} );
 
-		/* Don't display meta box if no active or valid  PDFs for the form */
+		/* Don't display meta box if no active or valid PDFs for the form */
 		if ( count( $active_pdfs ) === 0  ) {
 			return $meta_boxes;
 		}
