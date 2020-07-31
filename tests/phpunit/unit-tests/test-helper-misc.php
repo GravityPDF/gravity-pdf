@@ -3,7 +3,6 @@
 namespace GFPDF\Tests;
 
 use GFPDF\Helper\Helper_Misc;
-
 use WP_UnitTestCase;
 
 /**
@@ -25,7 +24,7 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	/**
 	 * Our test class
 	 *
-	 * @var \GFPDF\Helper\Helper_Misc
+	 * @var Helper_Misc
 	 *
 	 * @since 4.0
 	 */
@@ -438,14 +437,14 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	public function test_get_fields_sorted_by_id() {
 
 		/* Check for non-existent form */
-		$this->assertSame( 0, sizeof( $this->misc->get_fields_sorted_by_id( 0 ) ) );
+		$this->assertSame( 0, count( $this->misc->get_fields_sorted_by_id( 0 ) ) );
 
 		/* Check for real form and verify the results */
 		$form = $GLOBALS['GFPDF_Test']->form['all-form-fields'];
 
 		$fields = $this->misc->get_fields_sorted_by_id( $form['id'] );
 
-		$this->assertEquals( 56, sizeof( $fields ) );
+		$this->assertEquals( 56, count( $fields ) );
 		$this->assertEquals( 'Section Break', $fields[10]->label );
 	}
 
@@ -456,14 +455,14 @@ class Test_Helper_Misc extends WP_UnitTestCase {
 	 */
 	public function test_backwards_compat_conversion() {
 		$settings = [
-			'irrelivant' => 'Yes',
+			'irrelevant' => 'Yes',
 		];
 
 		/* Check all the defaults work as expected */
 		$compat = $this->misc->backwards_compat_conversion( $settings, [], [] );
 
-		$this->assertEquals( 8, sizeof( $compat ) );
-		$this->assertFalse( isset( $compat['irrelivant'] ) );
+		$this->assertCount( 8, $compat );
+		$this->assertArrayNotHasKey( 'irrelevant', $compat );
 		$this->assertFalse( $compat['premium'] );
 		$this->assertFalse( $compat['rtl'] );
 		$this->assertFalse( $compat['security'] );

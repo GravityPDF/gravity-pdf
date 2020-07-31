@@ -2,9 +2,8 @@
 
 namespace GFPDF\Helper\Fields;
 
-use GFPDF\Helper\Helper_Abstract_Field_Products;
-
 use GFCommon;
+use GFPDF\Helper\Helper_Abstract_Field_Products;
 
 /**
  * @package     Gravity PDF
@@ -32,7 +31,7 @@ class Field_Subtotal extends Helper_Abstract_Field_Products {
 			return true;
 		}
 
-		parent::is_empty();
+		return parent::is_empty();
 	}
 
 	/**
@@ -93,7 +92,7 @@ class Field_Subtotal extends Helper_Abstract_Field_Products {
 		$this->cache(
 			[
 				'total'           => esc_html( $subtotal ),
-				'total_formatted' => esc_html( GFCommon::to_money( $subtotal ), $this->entry['currency'] ),
+				'total_formatted' => esc_html( GFCommon::to_money( $subtotal, $this->entry['currency'] ) ),
 			]
 		);
 

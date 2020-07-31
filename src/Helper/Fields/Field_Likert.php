@@ -2,9 +2,8 @@
 
 namespace GFPDF\Helper\Fields;
 
-use GFPDF\Helper\Helper_Abstract_Fields;
-
 use GFCommon;
+use GFPDF\Helper\Helper_Abstract_Fields;
 
 /**
  * @package     Gravity PDF
@@ -34,7 +33,7 @@ class Field_Likert extends Helper_Abstract_Fields {
 		$value = $this->value();
 
 		if ( isset( $value['row'] ) ) { /* Check for single row likerts */
-			if ( sizeof( array_filter( $value['row'] ) ) === 0 ) { /* if empty */
+			if ( count( array_filter( $value['row'] ) ) === 0 ) { /* if empty */
 				return true;
 			}
 		} else { /*
@@ -43,7 +42,7 @@ class Field_Likert extends Helper_Abstract_Fields {
 			$empty = true;
 
 			foreach ( $value['rows'] as $row ) {
-				if ( sizeof( array_filter( $row ) ) > 0 ) {
+				if ( count( array_filter( $row ) ) > 0 ) {
 					$empty = false;
 					break;
 				}
@@ -117,7 +116,7 @@ class Field_Likert extends Helper_Abstract_Fields {
 		/**
 		 * Build our Likert Array
 		 */
-		if ( is_array( $this->field->inputs ) && sizeof( $this->field->inputs ) > 0 ) { /* Handle our multirow likert */
+		if ( is_array( $this->field->inputs ) && count( $this->field->inputs ) > 0 ) { /* Handle our multirow likert */
 
 			/* loop through each row */
 			foreach ( $this->field->inputs as $row ) {

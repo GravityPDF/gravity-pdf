@@ -69,7 +69,7 @@ class Helper_Singleton {
 	}
 
 	/**
-	 * Retreive the desired class
+	 * Retrieve the desired class
 	 *
 	 * @param string $name
 	 *

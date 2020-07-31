@@ -6,6 +6,7 @@ use GFCommon;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Pdf_Queue;
@@ -34,7 +35,7 @@ class Model_Install extends Helper_Abstract_Model {
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
-	 * @var \GFPDF\Helper\Helper_Form
+	 * @var Helper_Form
 	 *
 	 * @since 4.0
 	 */
@@ -53,7 +54,7 @@ class Model_Install extends Helper_Abstract_Model {
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
 	 *
-	 * @var \GFPDF\Helper\Helper_Data
+	 * @var Helper_Data
 	 *
 	 * @since 4.0
 	 */
@@ -63,7 +64,7 @@ class Model_Install extends Helper_Abstract_Model {
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
 	 *
-	 * @var \GFPDF\Helper\Helper_Misc
+	 * @var Helper_Misc
 	 *
 	 * @since 4.0
 	 */
@@ -73,7 +74,7 @@ class Model_Install extends Helper_Abstract_Model {
 	 * Holds our Helper_Notices object
 	 * which we can use to queue up admin messages for the user
 	 *
-	 * @var \GFPDF\Helper\Helper_Notices
+	 * @var Helper_Notices
 	 *
 	 * @since 4.0
 	 */
@@ -89,12 +90,12 @@ class Model_Install extends Helper_Abstract_Model {
 	/**
 	 * Setup our class by injecting all our dependencies
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform   Our abstracted Gravity Forms helper functions
-	 * @param LoggerInterface                    $log     Our logger class
-	 * @param \GFPDF\Helper\Helper_Data          $data    Our plugin data store
-	 * @param \GFPDF\Helper\Helper_Misc          $misc    Our miscellaneous class
-	 * @param \GFPDF\Helper\Helper_Notices       $notices Our notice class used to queue admin messages and errors
-	 * @param \GFPDF\Helper\Helper_Pdf_Queue     $queue
+	 * @param Helper_Abstract_Form $gform   Our abstracted Gravity Forms helper functions
+	 * @param LoggerInterface      $log     Our logger class
+	 * @param Helper_Data          $data    Our plugin data store
+	 * @param Helper_Misc          $misc    Our miscellaneous class
+	 * @param Helper_Notices       $notices Our notice class used to queue admin messages and errors
+	 * @param Helper_Pdf_Queue     $queue
 	 *
 	 * @since 4.0
 	 */
@@ -209,9 +210,9 @@ class Model_Install extends Helper_Abstract_Model {
 	/**
 	 * If running a multisite we'll setup the path to the current multisite folder
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function setup_multisite_template_location() {
 
@@ -247,12 +248,12 @@ class Model_Install extends Helper_Abstract_Model {
 
 	/**
 	 * Create the appropriate folder structure automatically
-	 * The upload directory should have all appropriate permissions to allow this kind of maniupulation
-	 * but devs who tap into the gfpdfe_template_location filter will need to ensure we can write to the appropraite folder
-	 *
-	 * @since 4.0
+	 * The upload directory should have all appropriate permissions to allow this kind of manipulation
+	 * but devs who tap into the gfpdfe_template_location filter will need to ensure we can write to the appropriate folder
 	 *
 	 * @return void
+	 * @since 4.0
+	 *
 	 */
 	public function create_folder_structures() {
 
@@ -328,9 +329,9 @@ class Model_Install extends Helper_Abstract_Model {
 	/**
 	 * Register our PDF custom rewrite rules
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function register_rewrite_rules() {
 		global $wp_rewrite;
@@ -354,11 +355,11 @@ class Model_Install extends Helper_Abstract_Model {
 	/**
 	 * Register our PDF custom rewrite rules
 	 *
-	 * @since 4.0
-	 *
 	 * @param array $tags
 	 *
 	 * @return array
+	 * @since 4.0
+	 *
 	 */
 	public function register_rewrite_tags( $tags ) {
 		global $wp;
@@ -379,9 +380,9 @@ class Model_Install extends Helper_Abstract_Model {
 	 *
 	 * @param array $regex The rules to check
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function maybe_flush_rewrite_rules( $regex ) {
 

@@ -289,7 +289,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Validate, Sanatize and Update PDF settings
+	 * Validate, Sanitize and Update PDF settings
 	 *
 	 * @param integer $form_id The Gravity Form ID
 	 * @param integer $pdf_id  The PDF configuration ID
@@ -357,7 +357,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		/* Do validation */
 		if ( empty( $sanitized['name'] ) || empty( $sanitized['filename'] ) ||
-		     ( $sanitized['pdf_size'] === 'CUSTOM' && ( (int) $sanitized['custom_pdf_size'][0] === 0 || (int) $sanitized['custom_pdf_size'][1] === 0 ) )
+			 ( $sanitized['pdf_size'] === 'CUSTOM' && ( (int) $sanitized['custom_pdf_size'][0] === 0 || (int) $sanitized['custom_pdf_size'][1] === 0 ) )
 		) {
 			$this->notices->add_error( esc_html__( 'PDF could not be saved. Please enter a valid Custom Paper Size.', 'gravity-forms-pdf-extended' ) );
 
@@ -413,8 +413,8 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 		foreach ( $sections as $s ) {
 			/*
-		     * Loop through the settings whitelist and add any missing fields to the $input
-		     */
+			 * Loop through the settings whitelist and add any missing fields to the $input
+			 */
 			foreach ( $settings[ $s ] as $key => $value ) {
 				switch ( $value['type'] ) {
 					case 'select':
@@ -422,13 +422,13 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 						if ( ! isset( $input[ $key ] ) ) {
 							$input[ $key ] = [];
 						}
-					break;
+						break;
 
 					default:
 						if ( ! isset( $input[ $key ] ) ) {
 							$input[ $key ] = '';
 						}
-					break;
+						break;
 				}
 			}
 
@@ -473,7 +473,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 *
 	 * @param array $fields Array of fields to process
 	 *
-	 * @return array         Modified list of fields
+	 * @return array|false         Modified list of fields
 	 *
 	 * @since 4.0
 	 */
@@ -504,16 +504,11 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 			if ( isset( $field['required'] ) && $field['required'] === true ) {
 
-				/* Get field value */
-				$value = ( isset( $input[ $field['id'] ] ) ) ? $input[ $field['id'] ] : '';
-
-				/* Set a class if it doesn't exist */
-				$field['class'] = ( isset( $field['class'] ) ) ? $field['class'] : '';
+				$value          = $input[ $field['id'] ] ?? '';
+				$field['class'] = $field['class'] ?? '';
 
 				/* Add way to skip the highlighting of errors */
-				$skip_errors = apply_filters( 'gfpdf_skip_highlight_errors', false, $field, $input );
-
-				if ( $skip_errors ) {
+				if ( apply_filters( 'gfpdf_skip_highlight_errors', false, $field, $input ) ) {
 					continue;
 				}
 
@@ -521,20 +516,21 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 				if ( is_array( $value ) ) {
 					if ( count( array_filter( $value ) ) !== count( $value ) ) {
 						$field['class'] .= ' gform-settings-input__container--invalid';
-						$field['desc2'] = '<div class="gform-settings-validation__error">' . esc_html__( 'This field is required.', 'gravityforms' ) . '</div>';
+						$field['desc2']  = '<div class="gform-settings-validation__error">' . esc_html__( 'This field is required.', 'gravityforms' ) . '</div>';
 					}
-				} else {
 
-					/*
-					 * If string, sanitize and add error if appropriate
-					 *
-					 * See https://gravitypdf.com/documentation/v5/gfpdf_form_settings_sanitize/ for more details about this filter
-					 */
-					$value = apply_filters( 'gfpdf_form_settings_sanitize_text', $value, $key );
-					if ( empty( $value ) ) {
-						$field['class'] .= ' gform-settings-input__container--invalid';
-						$field['desc2'] = '<div class="gform-settings-validation__error">' . esc_html__( 'This field is required.', 'gravityforms' ) . '</div>';
-					}
+					continue;
+				}
+
+				/*
+				 * If string, sanitize and add error if appropriate
+				 *
+				 * See https://gravitypdf.com/documentation/v5/gfpdf_form_settings_sanitize/ for more details about this filter
+				 */
+				$value = apply_filters( 'gfpdf_form_settings_sanitize_text', $value, $key );
+				if ( empty( $value ) ) {
+					$field['class'] .= ' gform-settings-input__container--invalid';
+					$field['desc2']  = '<div class="gform-settings-validation__error">' . esc_html__( 'This field is required.', 'gravityforms' ) . '</div>';
 				}
 			}
 		}
@@ -679,7 +675,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 *
 	 * @since 4.0
 	 */
-	public function setup_core_custom_appearance_settings( $settings = [], Helper_Interface_Config $class, $template_settings ) {
+	public function setup_core_custom_appearance_settings( array $settings, Helper_Interface_Config $class, array $template_settings ) {
 
 		/* register our core fields */
 		$core_fields = [
@@ -690,12 +686,12 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			'enable_conditional'   => [ $this->options, 'get_conditional_display_field' ],
 			'show_empty'           => [ $this->options, 'get_empty_display_field' ],
 
-			'background_color' => [ $this->options, 'get_background_color_field' ],
-			'background_image' => [ $this->options, 'get_background_image_field' ],
-			'header'           => [ $this->options, 'get_header_field' ],
-			'first_header'     => [ $this->options, 'get_first_page_header_field' ],
-			'footer'           => [ $this->options, 'get_footer_field' ],
-			'first_footer'     => [ $this->options, 'get_first_page_footer_field' ],
+			'background_color'     => [ $this->options, 'get_background_color_field' ],
+			'background_image'     => [ $this->options, 'get_background_image_field' ],
+			'header'               => [ $this->options, 'get_header_field' ],
+			'first_header'         => [ $this->options, 'get_first_page_header_field' ],
+			'footer'               => [ $this->options, 'get_footer_field' ],
+			'first_footer'         => [ $this->options, 'get_first_page_footer_field' ],
 		];
 
 		/* See https://gravitypdf.com/documentation/v5/gfpdf_core_template_fields_list/ for more details about this filter */
@@ -749,7 +745,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 * @param string $value The value entered by the user
 	 * @param string $key   The field to be parsed
 	 *
-	 * @return string        The sanitized data
+	 * @return array|string        The sanitized data
 	 */
 	public function decode_json( $value, $key ) {
 

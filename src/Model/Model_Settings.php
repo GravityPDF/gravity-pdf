@@ -7,8 +7,10 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
+use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Helper\Helper_Templates;
 use Psr\Log\LoggerInterface;
 
@@ -37,7 +39,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 *
 	 * @var array
 	 *
-	 * @since 4.0
+	 * @since    4.0
 	 *
 	 * @Internal Deprecated method
 	 */
@@ -46,7 +48,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
-	 * @var \GFPDF\Helper\Helper_Form
+	 * @var Helper_Form
 	 *
 	 * @since 4.0
 	 */
@@ -65,7 +67,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * Holds our Helper_Notices object
 	 * which we can use to queue up admin messages for the user
 	 *
-	 * @var \GFPDF\Helper\Helper_Notices
+	 * @var Helper_Notices
 	 *
 	 * @since 4.0
 	 */
@@ -75,7 +77,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
-	 * @var \GFPDF\Helper\Helper_Options_Fields
+	 * @var Helper_Options_Fields
 	 *
 	 * @since 4.0
 	 */
@@ -85,7 +87,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
 	 *
-	 * @var \GFPDF\Helper\Helper_Data
+	 * @var Helper_Data
 	 *
 	 * @since 4.0
 	 */
@@ -95,7 +97,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
 	 *
-	 * @var \GFPDF\Helper\Helper_Misc
+	 * @var Helper_Misc
 	 *
 	 * @since 4.0
 	 */
@@ -105,7 +107,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * Holds our Helper_Templates object
 	 * used to ease access to our PDF templates
 	 *
-	 * @var \GFPDF\Helper\Helper_Templates
+	 * @var Helper_Templates
 	 *
 	 * @since 4.0
 	 */
@@ -114,13 +116,13 @@ class Model_Settings extends Helper_Abstract_Model {
 	/**
 	 * Set up our dependencies
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form    $gform   Our abstracted Gravity Forms helper functions
-	 * @param LoggerInterface                       $log     Our logger class
-	 * @param \GFPDF\Helper\Helper_Notices          $notices Our notice class used to queue admin messages and errors
-	 * @param \GFPDF\Helper\Helper_Abstract_Options $options Our options class which allows us to access any settings
-	 * @param \GFPDF\Helper\Helper_Data             $data    Our plugin data store
-	 * @param \GFPDF\Helper\Helper_Misc             $misc    Our miscellaneous class
-	 * @param \GFPDF\Helper\Helper_Templates        $templates
+	 * @param Helper_Abstract_Form    $gform   Our abstracted Gravity Forms helper functions
+	 * @param LoggerInterface         $log     Our logger class
+	 * @param Helper_Notices          $notices Our notice class used to queue admin messages and errors
+	 * @param Helper_Abstract_Options $options Our options class which allows us to access any settings
+	 * @param Helper_Data             $data    Our plugin data store
+	 * @param Helper_Misc             $misc    Our miscellaneous class
+	 * @param Helper_Templates        $templates
 	 *
 	 * @since 4.0
 	 */
@@ -139,7 +141,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	/**
 	 * If any errors have been passed back from the options.php page we will highlight the actual fields that caused them
 	 *
-	 * @param  array $settings The get_registered_fields() array
+	 * @param array $settings The get_registered_fields() array
 	 *
 	 * @return array
 	 *
@@ -151,7 +153,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		$errors = get_transient( 'settings_errors' );
 
 		/* Loop through errors if any and highlight the appropriate settings */
-		if ( is_array( $errors ) && sizeof( $errors ) > 0 ) {
+		if ( is_array( $errors ) && count( $errors ) > 0 ) {
 			foreach ( $errors as $error ) {
 
 				/* Skip over if not an error */
@@ -184,7 +186,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	/**
 	 * Removes the current font's TTF files from our font directory
 	 *
-	 * @param  array $fonts The font config
+	 * @param array $fonts The font config
 	 *
 	 * @return boolean        True on success, false on failure
 	 *
@@ -209,9 +211,9 @@ class Model_Settings extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Check that the font name passed conforms to our expected nameing convesion
+	 * Check that the font name passed conforms to our expected naming convention
 	 *
-	 * @param  string $name The font name to check
+	 * @param string $name The font name to check
 	 *
 	 * @return boolean       True on valid, false on failure
 	 *
@@ -231,7 +233,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	/**
 	 * Query our custom fonts options table and check if the font name already exists
 	 *
-	 * @param  string    $name The font name to check
+	 * @param string     $name The font name to check
 	 * @param int|string $id   The configuration ID (if any)
 	 *
 	 * @return bool True if valid, false on failure
@@ -277,7 +279,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	/**
 	 * Handles the database updates required to save a new font
 	 *
-	 * @param  array $fonts
+	 * @param array $fonts
 	 *
 	 * @return array
 	 *
@@ -308,7 +310,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		}
 
 		/* If errors were found then return */
-		if ( sizeof( $errors ) > 0 ) {
+		if ( count( $errors ) > 0 ) {
 			$this->log->error(
 				'Install Error.',
 				[
@@ -345,7 +347,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	/**
 	 * Turn capabilities into more friendly strings
 	 *
-	 * @param  string $cap The wordpress-style capability
+	 * @param string $cap The wordpress-style capability
 	 *
 	 * @return string
 	 *
@@ -436,7 +438,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	/**
 	 * Validate user input and save as new font
 	 *
-	 * @param  array $font The four font fields to be processed
+	 * @param array $font The four font fields to be processed
 	 *
 	 * @return array
 	 *
@@ -502,7 +504,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		/* Move fonts to our Gravity PDF font folder */
 		$installation = $this->install_fonts( $font );
 
-		/* Check if any errors occured installing the fonts */
+		/* Check if any errors occurred installing the fonts */
 		if ( isset( $installation['errors'] ) ) {
 
 			$return = [
@@ -518,6 +520,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		}
 
 		/* If we got here the installation was successful so return the data */
+
 		return $installation;
 	}
 
@@ -543,11 +546,11 @@ class Model_Settings extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Create a file in our tmp directory and check if it is publically accessible (i.e no .htaccess protection)
+	 * Create a file in our tmp directory and check if it is publicly accessible (i.e no .htaccess protection)
 	 *
-	 * @param $_POST ['nonce']
+	 * @return void
 	 *
-	 * @return boolean
+	 * @global $_POST ['nonce']
 	 *
 	 * @since 4.0
 	 */
@@ -776,7 +779,11 @@ class Model_Settings extends Helper_Abstract_Model {
 
 					/* Include the expiry date if license expired */
 					if ( $license_data->error === 'expired' ) {
-						$message = sprintf( $message, date_i18n( get_option( 'date_format' ), strtotime( $license_data->expires, current_time( 'timestamp' ) ) ) );
+						$date_format = get_option( 'date_format' );
+						$dt          = new \DateTimeImmutable( $license_data->expires, wp_timezone() );
+						$date        = $dt === false ? gmdate( $date_format, false ) : $dt->format( $date_format );
+
+						$message = sprintf( $message, $date );
 					}
 				}
 
@@ -802,7 +809,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 *           $_POST['addon_name']
 	 *           $_POST['license']
 	 *
-	 * @since 4.2
+	 * @since    4.2
 	 */
 	public function process_license_deactivation() {
 

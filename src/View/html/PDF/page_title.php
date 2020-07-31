@@ -14,10 +14,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * @var $form    array
+ * @var $classes string
+ * @var $page    string
+ */
+
 ?>
 
 <div class="row-separator">
-	<h3 class="gfpdf-page gfpdf-field <?php echo $classes; ?>">
-		<?php echo $form['pagination']['pages'][ $page ]; ?>
+	<h3 class="gfpdf-page gfpdf-field <?= $classes; ?>">
+		<?= $form['pagination']['pages'][ $page ]; ?>
 	</h3>
 </div>

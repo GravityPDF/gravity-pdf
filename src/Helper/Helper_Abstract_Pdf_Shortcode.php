@@ -6,6 +6,8 @@ use GFPDF\Exceptions\GravityPdfShortcodeEntryIdException;
 use GFPDF\Exceptions\GravityPdfShortcodePdfConditionalLogicFailedException;
 use GFPDF\Exceptions\GravityPdfShortcodePdfConfigNotFoundException;
 use GFPDF\Exceptions\GravityPdfShortcodePdfInactiveException;
+use GPDFAPI;
+use GravityView_View;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -30,6 +32,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 
 	/**
 	 * Set this constant to the Shortcode ID you're using
+	 *
 	 * @since 5.2
 	 */
 	const SHORTCODE = '';
@@ -133,7 +136,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	 */
 	protected function get_pdf_config( $entry_id, $pdf_id ) {
 		$entry    = $this->gform->get_entry( $entry_id );
-		$settings = ! is_wp_error( $entry ) ? \GPDFAPI::get_pdf( $entry['form_id'], $pdf_id ) : $entry;
+		$settings = ! is_wp_error( $entry ) ? GPDFAPI::get_pdf( $entry['form_id'], $pdf_id ) : $entry;
 
 		if ( is_wp_error( $settings ) ) {
 			throw new GravityPdfShortcodePdfConfigNotFoundException();
@@ -167,6 +170,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 		 * Do nothing if WP_Error is passed
 		 *
 		 * This resolves a conflict with a third party GF plugin which was passing an error instead of the expected GF confirmation response
+		 *
 		 * @see https://github.com/GravityPDF/gravity-pdf/issues/999
 		 */
 		if ( is_wp_error( $confirmation ) || is_wp_error( $form ) || is_wp_error( $entry ) ) {
@@ -197,6 +201,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 		 * Do nothing if WP_Error is passed
 		 *
 		 * This resolves a conflict with a third party GF plugin which was passing an error instead of the expected GF confirmation response
+		 *
 		 * @see https://github.com/GravityPDF/gravity-pdf/issues/999
 		 */
 		if ( is_wp_error( $notification ) || is_wp_error( $entry ) || empty( $entry['id'] ) ) {
@@ -226,7 +231,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 			return $html;
 		}
 
-		$gravityview_view = \GravityView_View::getInstance();
+		$gravityview_view = GravityView_View::getInstance();
 		$entry            = $gravityview_view->getCurrentEntry();
 
 		return $this->add_entry_id_to_shortcode( $html, $entry['id'] );
@@ -248,7 +253,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 
 		if ( count( $shortcode_information ) > 0 ) {
 			foreach ( $shortcode_information as $shortcode ) {
-				/* if the user hasn't explicitely defined an entry to display... */
+				/* if the user hasn't explicitly defined an entry to display... */
 				if ( ! isset( $shortcode['attr']['entry'] ) ) {
 					/* get the new shortcode information and update confirmation message */
 					$new_shortcode = $this->add_shortcode_attr( $shortcode, 'entry', $entry_id );
@@ -358,6 +363,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 		/**
 		 * Do nothing if WP_Error is passed
 		 * This resolves a conflict with a third party GF plugin which was passing an error instead of the expected GF confirmation response
+		 *
 		 * @see https://github.com/GravityPDF/gravity-pdf/issues/999
 		 */
 		if ( is_wp_error( $confirmation ) || is_wp_error( $form ) || is_wp_error( $entry ) ) {

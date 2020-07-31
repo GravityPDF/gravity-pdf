@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @package GFPDF\Controller
  *
- * @since 5.3
+ * @since   5.3
  */
 class Controller_System_Report extends Helper_Abstract_Controller {
 
@@ -36,9 +36,10 @@ class Controller_System_Report extends Helper_Abstract_Controller {
 	/**
 	 * Setup our class by injecting our dependencies
 	 *
+	 * @param boolean $allow_url_fopen
+	 *
 	 * @since 5.3
 	 *
-	 * @param boolean $allow_url_fopen
 	 */
 	public function __construct( $allow_url_fopen ) {
 		$this->allow_url_data = $allow_url_fopen;
@@ -65,11 +66,11 @@ class Controller_System_Report extends Helper_Abstract_Controller {
 	/**
 	 * Include the add-on table in the PHP Server Environment system status.
 	 *
-	 * @since 5.3
-	 *
 	 * @param array $system_report
 	 *
 	 * @return array
+	 * @since 5.3
+	 *
 	 */
 	public function system_report( $system_report ) {
 
@@ -92,11 +93,11 @@ class Controller_System_Report extends Helper_Abstract_Controller {
 	/**
 	 * Yes or No status for allow_url_fopen
 	 *
-	 * @since 5.3
-	 *
 	 * @param $allow_url_fopen
 	 *
 	 * @return string
+	 * @since 5.3
+	 *
 	 */
 	protected function is_allow_url_fopen_enabled( $allow_url_fopen ) {
 		return isset( $allow_url_fopen ) ? esc_html__( 'Yes', 'gravity-forms-pdf-extended' ) : esc_html__( 'No', 'gravity-forms-pdf-extended' );

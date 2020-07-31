@@ -5,6 +5,7 @@ namespace GFPDF\Model;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Helper\Helper_Options_Fields;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -27,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Model_Mergetags extends Helper_Abstract_Model {
 
 	/**
-	 * @var \GFPDF\Model\Model_PDF
+	 * @var Model_PDF
 	 *
 	 * @since 4.1
 	 */
@@ -37,7 +38,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
-	 * @var \GFPDF\Helper\Helper_Options_Fields
+	 * @var Helper_Options_Fields
 	 *
 	 * @since 4.1
 	 */
@@ -56,7 +57,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
 	 *
-	 * @var \GFPDF\Helper\Helper_Misc
+	 * @var Helper_Misc
 	 *
 	 * @since 4.1
 	 */
@@ -66,7 +67,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 	 * Model_Mergetags constructor.
 	 *
 	 * @param Helper_Abstract_Options $options
-	 * @param \GFPDF\Model\Model_PDF  $pdf
+	 * @param Model_PDF               $pdf
 	 * @param LoggerInterface         $log
 	 *
 	 * @since    4.1
@@ -143,7 +144,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 		}
 
 		/* Match our PDF merge tags */
-		$results = preg_match_all( '/\{(.*?):pdf:(.*?)\}/', $text, $matches, PREG_SET_ORDER );
+		$results = preg_match_all( '/{(.*?):pdf:(.*?)}/', $text, $matches, PREG_SET_ORDER );
 
 		/* Verify we have a match */
 		if ( $results ) {

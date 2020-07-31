@@ -3,7 +3,6 @@
 namespace GFPDF\Controller;
 
 use GFPDF\Helper\Helper_Abstract_Controller;
-use GFPDF\Helper\Helper_Abstract_View;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Misc;
@@ -30,6 +29,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements Helper_Interface_Actions {
 
 	/**
+	 * Holds our log class
+	 *
+	 * @var LoggerInterface
+	 *
+	 * @since 5.0
+	 */
+	protected $log;
+
+	/**
+	 * Holds our Helper_Data object
+	 * which we can autoload with any data needed
+	 *
+	 * @var Helper_Data
+	 *
+	 * @since 5.0
+	 */
+	protected $data;
+
+	/**
+	 * Holds our Helper_Misc object
+	 * Makes it easy to access common methods throughout the plugin
+	 *
+	 * @var Helper_Misc
+	 *
+	 * @since 5.0
+	 */
+	protected $misc;
+
+	/**
 	 * @var string
 	 *
 	 * @since 5.0
@@ -39,9 +67,9 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 	/**
 	 * Set up our dependencies
 	 *
-	 * @param LoggerInterface                                       $log  Our logger class
-	 * @param \GFPDF\Helper\Helper_Data                             $data Our plugin data store
-	 * @param \GFPDF\Helper\Helper_Misc                             $misc Our miscellaneous class
+	 * @param LoggerInterface $log  Our logger class
+	 * @param Helper_Data     $data Our plugin data store
+	 * @param Helper_Misc     $misc Our miscellaneous class
 	 *
 	 * @since 5.0
 	 */
@@ -55,9 +83,9 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 	/**
 	 * Initialise our class defaults
 	 *
+	 * @return void
 	 * @since 5.0
 	 *
-	 * @return void
 	 */
 	public function init() {
 		$this->add_actions();
@@ -66,9 +94,9 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 	/**
 	 * Apply any actions needed for the welcome page
 	 *
+	 * @return void
 	 * @since 5.0
 	 *
-	 * @return void
 	 */
 	public function add_actions() {
 		/* Register our AJAX event */
@@ -78,9 +106,9 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 	/**
 	 * An AJAX endpoint that handles authentication and downloading the core font
 	 *
+	 * @return void
 	 * @since 5.0
 	 *
-	 * @return void
 	 */
 	public function save_core_font() {
 		/* User / CORS validation */
@@ -101,9 +129,9 @@ class Controller_Save_Core_Fonts extends Helper_Abstract_Controller implements H
 	 *
 	 * @param $fontname
 	 *
+	 * @return bool
 	 * @since 5.0
 	 *
-	 * @return bool
 	 */
 	protected function download_and_save_font( $fontname ) {
 

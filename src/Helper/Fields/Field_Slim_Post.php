@@ -3,7 +3,6 @@
 namespace GFPDF\Helper\Fields;
 
 use GFPDF\Helper\Helper_Abstract_Fields;
-use GF_Field_FileUpload;
 
 /**
  * @package     Gravity PDF

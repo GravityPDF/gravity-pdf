@@ -14,14 +14,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-\GFCommon::display_admin_message();
+/** @var $args array */
+
+GFCommon::display_admin_message();
 
 ?>
 
 <div id="pdfextended-settings">
 
 	<!-- Prevent Firefox auto-filling fields on refresh. @see https://stackoverflow.com/a/44504822/1614565 -->
-	<form name="gfpdf-settings-form-<?=rand() ?>" class="gform_settings_form" method="post" action="options.php">
+	<form name="gfpdf-settings-form-<?= rand() ?>" class="gform_settings_form" method="post" action="options.php">
 		<?php settings_fields( 'gfpdf_settings' ); ?>
 
 		<?= $args['menu'] ?>

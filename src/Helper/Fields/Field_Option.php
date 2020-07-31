@@ -2,10 +2,9 @@
 
 namespace GFPDF\Helper\Fields;
 
-use GFPDF\Helper\Helper_Abstract_Field_Products;
-
-use GFFormsModel;
 use GFCommon;
+use GFFormsModel;
+use GFPDF\Helper\Helper_Abstract_Field_Products;
 
 /**
  * @package     Gravity PDF
@@ -55,9 +54,9 @@ class Field_Option extends Helper_Abstract_Field_Products {
 		/* Get the field name ( */
 		$name = array_map(
 			function( $value ) use ( $field ) {
-					$option_info = GFCommon::get_option_info( $value, $field, false );
+				$option_info = GFCommon::get_option_info( $value, $field, false );
 
-					return esc_html( $option_info['name'] );
+				return esc_html( $option_info['name'] );
 			},
 			$option_value
 		);
@@ -65,9 +64,9 @@ class Field_Option extends Helper_Abstract_Field_Products {
 		/* Get the field value (the price) */
 		$price = array_map(
 			function( $value ) use ( $field ) {
-					$option_info = GFCommon::get_option_info( $value, $field, false );
+				$option_info = GFCommon::get_option_info( $value, $field, false );
 
-					return esc_html( $option_info['price'] );
+				return esc_html( $option_info['price'] );
 			},
 			$option_value
 		);
@@ -108,8 +107,8 @@ class Field_Option extends Helper_Abstract_Field_Products {
 	/**
 	 * Get a HTML list of the product's selected options
 	 *
-	 * @param  array  $options A list of the selected products
-	 * @param  string $html    Pass in an existing HTML, or default to blank
+	 * @param array  $options A list of the selected products
+	 * @param string $html    Pass in an existing HTML, or default to blank
 	 *
 	 * @return string         The finalised HTML
 	 *

@@ -190,7 +190,7 @@ class GFPDF_Major_Compatibility_Checks {
 			return false;
 		}
 
-		if( ! version_compare( \GFCommon::$version, $this->required_gf_version, '>=' ) ) {
+		if ( ! version_compare( GFCommon::$version, $this->required_gf_version, '>=' ) ) {
 			$this->notices[] = sprintf( esc_html__( '%1$sGravity Forms%2$s Version %3$s or higher is required. %4$sGet more info%5$s.', 'gravity-forms-pdf-extended' ), '<a href="https://rocketgenius.pxf.io/c/1211356/445235/7938">', '</a>', $this->required_gf_version, '<a href="https://gravitypdf.com/documentation/v5/user-activation-errors/#gravityforms-version">', '</a>' );
 
 			return false;

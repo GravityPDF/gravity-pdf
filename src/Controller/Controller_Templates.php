@@ -28,7 +28,7 @@ class Controller_Templates extends Helper_Abstract_Controller implements Helper_
 	/**
 	 * Controller_Templates constructor.
 	 *
-	 * Setup our class by injecting all our dependancies
+	 * Setup our class by injecting all our dependencies
 	 *
 	 * @param Helper_Abstract_Model $model
 	 *

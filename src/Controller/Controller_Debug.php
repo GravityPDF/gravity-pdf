@@ -4,10 +4,12 @@ namespace GFPDF\Controller;
 
 use GFPDF\Helper\Helper_Abstract_Controller;
 use GFPDF\Helper\Helper_Abstract_Options;
+use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
-use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Templates;
+use GFPDF_Vendor\Mpdf\Mpdf;
+use GFPDF_Vendor\Mpdf\MpdfException;
 
 /**
  * @package     Gravity PDF
@@ -34,7 +36,7 @@ class Controller_Debug extends Helper_Abstract_Controller implements Helper_Inte
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
 	 *
-	 * @var \GFPDF\Helper\Helper_Data
+	 * @var Helper_Data
 	 *
 	 * @since 5.1
 	 */
@@ -44,7 +46,7 @@ class Controller_Debug extends Helper_Abstract_Controller implements Helper_Inte
 	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
-	 * @var \GFPDF\Helper\Helper_Abstract_Options
+	 * @var Helper_Abstract_Options
 	 *
 	 * @since 5.1
 	 */
@@ -54,7 +56,7 @@ class Controller_Debug extends Helper_Abstract_Controller implements Helper_Inte
 	 * Holds our Helper_Templates object
 	 * used to ease access to our PDF templates
 	 *
-	 * @var \GFPDF\Helper\Helper_Templates
+	 * @var Helper_Templates
 	 *
 	 * @since 5.1
 	 */
@@ -118,6 +120,7 @@ class Controller_Debug extends Helper_Abstract_Controller implements Helper_Inte
 	 *
 	 * @return Mpdf
 	 *
+	 * @throws MpdfException
 	 * @since 5.1
 	 */
 	public function maybe_add_pdf_stats( $mpdf ) {

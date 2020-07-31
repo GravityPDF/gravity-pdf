@@ -2,6 +2,7 @@
 
 namespace GFPDF\View;
 
+use GFCommon;
 use WP_UnitTestCase;
 
 /**
@@ -34,7 +35,7 @@ class TestViewSettings extends WP_UnitTestCase {
 	public function test_allow_url_fopen_status() {
 		global $gfpdf;
 
-		require_once( \GFCommon::get_base_path() . '/tooltips.php' );
+		require_once( GFCommon::get_base_path() . '/tooltips.php' );
 
 		ob_start();
 		$gfpdf->data->allow_url_fopen = false;

@@ -5,6 +5,7 @@ namespace GFPDF\Helper;
 use GFAPI;
 use GFCommon;
 use GFFormsModel;
+use WP_Error;
 
 /**
  * @package     Gravity PDF
@@ -58,26 +59,26 @@ class Helper_Form extends Helper_Abstract_Form {
 	}
 
 	/**
-	 * Add's a new form and returns the newly-added form ID
+	 * Adds a new form and returns the newly-added form ID
 	 *
 	 * @param array $form The form object to add
 	 *
+	 * @return integer|object The ID if successful, or a WP_Error
 	 * @since 4.0
 	 *
-	 * @return integer|object The ID if successful, or a WP_Error
 	 */
 	public function add_form( $form ) {
 		return GFAPI::add_form( $form );
 	}
 
 	/**
-	 * Delete's a form by ID
+	 * Deletes a form by ID
 	 *
 	 * @param integer $form_id The form ID to remove
 	 *
+	 * @return boolean|WP_Error
 	 * @since 4.0
 	 *
-	 * @return boolean|\WP_Error
 	 */
 	public function delete_form( $form_id ) {
 		return GFAPI::delete_form( $form_id );
@@ -161,8 +162,8 @@ class Helper_Form extends Helper_Abstract_Form {
 	 *
 	 * @param integer|array $form_ids        The ID's of the form or an array of ideas.
 	 * @param array         $search_criteria An array containing the search criteria
-	 * @param array         $sorting         An array containing the sort criteria
-	 * @param array         $paging          Use to limit the number of entries returned
+	 * @param array|null    $sorting         An array containing the sort criteria
+	 * @param array|null    $paging          Use to limit the number of entries returned
 	 *
 	 * @return mixed
 	 *
@@ -200,7 +201,7 @@ class Helper_Form extends Helper_Abstract_Form {
 	 * Check if the user has the capability passed
 	 *
 	 * @param string|array $capability
-	 * @param integer      $user_id
+	 * @param integer|null $user_id
 	 *
 	 * @return boolean            True if successful, false if failed
 	 *
@@ -227,9 +228,9 @@ class Helper_Form extends Helper_Abstract_Form {
 	/**
 	 * Replace all the Merge Tag data in the string
 	 *
-	 * @param  string $string The string to process
-	 * @param  array  $form   The Gravity Form array
-	 * @param  array  $entry  The Gravity Form Entry Array
+	 * @param string $string The string to process
+	 * @param array  $form   The Gravity Form array
+	 * @param array  $entry  The Gravity Form Entry Array
 	 *
 	 * @return string
 	 *

@@ -21,12 +21,13 @@ use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Templates;
+use GFPDF_Vendor\Mpdf\Mpdf;
+use GFPDF_Vendor\Spatie\UrlSigner\Exceptions\InvalidSignatureKey;
 use GFQuiz;
 use GFResults;
 use GP_Populate_Anything_Live_Merge_Tags;
 use Psr\Log\LoggerInterface;
 use RecursiveDirectoryIterator;
-use GFPDF_Vendor\Spatie\UrlSigner\Exceptions\InvalidSignatureKey;
 use RecursiveIteratorIterator;
 use WP_Error;
 
@@ -117,6 +118,13 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @since 4.0
 	 */
 	protected $templates;
+
+	/**
+	 * @var Helper_Interface_Url_Signer
+	 *
+	 * @since 5.2
+	 */
+	protected $url_signer;
 
 	/**
 	 * Setup our view with the needed data and classes
@@ -225,7 +233,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		/* Add backwards compatibility support for certain settings */
 		$settings = $this->apply_backwards_compatibility_filters( $settings, $entry );
 
-		/* Ensure Gravity Forms depedancy loaded */
+		/* Ensure Gravity Forms dependency loaded */
 		$this->misc->maybe_load_gf_entry_detail_class();
 
 		/* If we are here we can generate our PDF */
@@ -392,6 +400,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @return boolean|object
 	 *
+	 * @throws Exception
 	 * @since 4.0
 	 */
 	public function middle_owner_restriction( $action, $entry, $settings ) {
@@ -428,6 +437,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @return boolean|object
 	 *
+	 * @throws Exception
 	 * @since 4.0
 	 */
 	public function middle_logged_out_timeout( $action, $entry, $settings ) {
@@ -519,6 +529,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @return boolean|object
 	 *
+	 * @throws Exception
 	 * @since 4.0
 	 */
 	public function middle_auth_logged_out_user( $action, $entry, $settings ) {
@@ -576,7 +587,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		if ( ! is_wp_error( $action ) ) {
 			/* check if the user is logged in but is not the current owner */
 			if ( is_user_logged_in() &&
-			     ( ( $this->options->get_option( 'limit_to_admin', 'No' ) === 'Yes' ) || ( $this->is_current_pdf_owner( $entry, 'logged_in' ) === false ) )
+				 ( ( $this->options->get_option( 'limit_to_admin', 'No' ) === 'Yes' ) || ( $this->is_current_pdf_owner( $entry, 'logged_in' ) === false ) )
 			) {
 
 				/* Handle permissions checks */
@@ -619,7 +630,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		if ( ! empty( $pdf_list ) ) {
 
-			if ( sizeof( $pdf_list ) > 1 ) {
+			if ( count( $pdf_list ) > 1 ) {
 				$args = [
 					'pdfs' => $pdf_list,
 					'view' => strtolower( $this->options->get_option( 'default_action' ) ),
@@ -766,7 +777,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		/* Check if permalinks are enabled, otherwise fall back to our ugly link structure for 4.0 (not the same as our v3 links) */
 		if ( $wp_rewrite->using_permalinks() ) {
-			$url = $home_url . '/' . $wp_rewrite->root; /* Handle "almost pretty" permalinks - fix for IIS servers without modrewrite  */
+			$url  = $home_url . '/' . $wp_rewrite->root; /* Handle "almost pretty" permalinks - fix for IIS servers without modrewrite  */
 			$url .= 'pdf/' . $pid . '/' . $id . '/';
 
 			if ( $download ) {
@@ -837,12 +848,15 @@ class Model_PDF extends Helper_Abstract_Model {
 	 */
 	public function register_pdf_meta_box( $meta_boxes, $entry, $form ) {
 
-		$active_pdfs = array_filter( $form['gfpdf_form_settings'] ?? [], function( $pdf ) {
-			return $pdf['active'] === true;
-		} );
+		$active_pdfs = array_filter(
+			$form['gfpdf_form_settings'] ?? [],
+			function( $pdf ) {
+				return $pdf['active'] === true;
+			}
+		);
 
 		/* Don't display meta box if no active or valid PDFs for the form */
-		if ( count( $active_pdfs ) === 0  ) {
+		if ( count( $active_pdfs ) === 0 ) {
 			return $meta_boxes;
 		}
 
@@ -851,7 +865,10 @@ class Model_PDF extends Helper_Abstract_Model {
 				'title'         => esc_html__( 'PDFs', 'gravity-forms-pdf-extended' ),
 				'callback'      => [ $this, 'view_pdf_entry_detail' ],
 				'context'       => 'side',
-				'callback_args' => [ 'form' => $form, 'entry' => $entry ],
+				'callback_args' => [
+					'form'  => $form,
+					'entry' => $entry,
+				],
 			],
 		];
 
@@ -873,6 +890,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @return array
 	 *
+	 * @throws Exception
 	 * @since 4.0
 	 */
 	public function notifications( $notifications, $form, $entry ) {
@@ -888,7 +906,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : [];
 
-		if ( sizeof( $pdfs ) > 0 ) {
+		if ( count( $pdfs ) > 0 ) {
 
 			/* Ensure our notification has an array setup for the attachments key */
 			$notifications['attachments'] = ( isset( $notifications['attachments'] ) ) ? $notifications['attachments'] : [];
@@ -965,6 +983,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @return string|WP_Error           Return the full path to the PDF, or a WP_Error on failure
 	 *
+	 * @throws Exception
 	 * @since 4.0
 	 */
 	public function generate_and_save_pdf( $entry, $settings ) {
@@ -991,6 +1010,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @return boolean
 	 *
+	 * @throws Exception
 	 * @since 4.0
 	 */
 	public function process_and_save_pdf( Helper_PDF $pdf ) {
@@ -1005,7 +1025,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		/* Check that the PDF hasn't already been created this session */
 		if ( $pdf_override || ! $this->does_pdf_exist( $pdf ) ) {
 
-			/* Ensure Gravity Forms depedancy loaded */
+			/* Ensure Gravity Forms dependency loaded */
 			$this->misc->maybe_load_gf_entry_detail_class();
 
 			/* Enable Multicurrency support */
@@ -1104,6 +1124,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @return array        The $data array
 	 *
+	 * @throws Exception
 	 * @since 4.0
 	 */
 	public function get_form_data( $entry ) {
@@ -1252,7 +1273,7 @@ class Model_PDF extends Helper_Abstract_Model {
 			$args
 		); /* Backwards Compatibility */
 
-		return ( $prevent_main_pdf_loader === true ) ? true : false;
+		return $prevent_main_pdf_loader === true;
 	}
 
 	/**
@@ -1464,6 +1485,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @return object        Gravity PDF Field Object
 	 *
+	 * @throws Exception
 	 * @since 4.0
 	 */
 	public function get_field_class( $field, $form, $entry, Field_Products $products ) {
@@ -1614,7 +1636,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	private function get_addon_global_data( $form, $options, $fields ) {
 
 		/**
-		 * Disable aggrigate addon data (speeds up PDF generation time)
+		 * Disable aggregate addon data (speeds up PDF generation time)
 		 *
 		 * See https://gravitypdf.com/documentation/v5/gfpdf_disable_global_addon_data/
 		 *
@@ -1684,6 +1706,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 *
 	 * @return void
 	 *
+	 * @throws Exception
 	 * @since 4.0
 	 */
 	public function maybe_save_pdf( $entry, $form ) {
@@ -1826,7 +1849,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : [];
 
-		if ( sizeof( $pdfs ) > 0 ) {
+		if ( count( $pdfs ) > 0 ) {
 
 			/* loop through each PDF config */
 			foreach ( $pdfs as $pdf ) {
@@ -1860,8 +1883,8 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Clean-up any PDFs stored on disk before we resend any notifications
 	 *
-	 * @param array $form  The Gravity Forms object
-	 * @param array $leads An array of Gravity Form entry IDs
+	 * @param array $form    The Gravity Forms object
+	 * @param array $entries An array of Gravity Form entry IDs
 	 *
 	 * @return array We tapped into a filter so we need to return the form object
 	 * @since 4.0
@@ -2161,10 +2184,12 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Replace any Gravity Perk Populate Anything live merge tags with their standard equivilant (i.e without the @ symbol)
+	 * Replace any Gravity Perk Populate Anything live merge tags with their standard equivalent (i.e without the @ symbol)
 	 * Include support for the `fallback` option
 	 *
 	 * @param string $text
+	 * @param array  $form
+	 * @param array  $entry
 	 *
 	 * @return string
 	 *

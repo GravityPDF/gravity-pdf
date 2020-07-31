@@ -2,10 +2,10 @@
 
 namespace GFPDF\Tests;
 
+use Exception;
 use GFPDF\Controller\Controller_Pdf_Queue;
 use GFPDF\Helper\Helper_Pdf_Queue;
 use GFPDF\Statics\Queue_Callbacks;
-
 use WP_UnitTestCase;
 
 /**
@@ -25,13 +25,13 @@ use WP_UnitTestCase;
 class Test_Pdf_Queue extends WP_UnitTestCase {
 
 	/**
-	 * @var \GFPDF\Controller\Controller_Pdf_Queue
+	 * @var Controller_Pdf_Queue
 	 * @since 5.0
 	 */
 	public $controller;
 
 	/**
-	 * @var \GFPDF\Helper\Helper_Pdf_Queue
+	 * @var Helper_Pdf_Queue
 	 * @since 5.0
 	 */
 	public $queue;
@@ -57,9 +57,9 @@ class Test_Pdf_Queue extends WP_UnitTestCase {
 		$model_pdf   = $gfpdf->singleton->get_class( 'Model_PDF' );
 
 		$this->queue_mock = $this->getMockBuilder( '\GFPDF\Helper\Helper_Pdf_Queue' )
-					 ->setConstructorArgs( [ $gfpdf->log ] )
-					 ->setMethods( [ 'save', 'dispatch' ] )
-					 ->getMock();
+								 ->setConstructorArgs( [ $gfpdf->log ] )
+								 ->setMethods( [ 'save', 'dispatch' ] )
+								 ->getMock();
 
 		$this->queue_mock->expects( $this->any() )
 						 ->method( 'save' )
@@ -126,7 +126,7 @@ class Test_Pdf_Queue extends WP_UnitTestCase {
 
 		$mock->expects( $this->exactly( 3 ) )
 			 ->method( 'callback' )
-			 ->will( $this->throwException( new \Exception ) );
+			 ->will( $this->throwException( new Exception ) );
 
 		$callback = [
 			[

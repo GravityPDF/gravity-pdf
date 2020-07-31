@@ -8,6 +8,7 @@ use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Url_Signer;
 use GFPDF\Model\Model_PDF;
 use GFPDF\View\View_PDF;
+use GFPDF_Core_Model;
 use GPDFAPI;
 use WP_UnitTestCase;
 
@@ -32,7 +33,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 	/**
 	 * Our Settings Controller
 	 *
-	 * @var \GFPDF\Controller\Controller_PDF
+	 * @var Controller_PDF
 	 *
 	 * @since 4.0
 	 */
@@ -41,7 +42,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 	/**
 	 * Our Settings Model
 	 *
-	 * @var \GFPDF\Model\Model_PDF
+	 * @var Model_PDF
 	 *
 	 * @since 4.0
 	 */
@@ -50,7 +51,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 	/**
 	 * Our Settings View
 	 *
-	 * @var \GFPDF\View\View_PDF
+	 * @var View_PDF
 	 *
 	 * @since 4.0
 	 */
@@ -151,7 +152,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		remove_all_filters( 'gfpdf_pdf_middleware' );
 
 		try {
-			$results = $this->model->process_pdf( $pid, $lid );
+			$this->model->process_pdf( $pid, $lid );
 		} catch ( Exception $e ) {
 			$this->assertEquals( 'There was a problem generating your PDF', $e->getMessage() );
 
@@ -182,7 +183,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		$pdf_generator = new Helper_PDF( $entry, $settings, $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->templates, $gfpdf->log );
 		$pdf_generator->set_filename( 'Unit Testing' );
 
-		/* Generate the PDF and verify it was successfull */
+		/* Generate the PDF and verify it was successful */
 		$this->assertTrue( $this->model->process_and_save_pdf( $pdf_generator ) );
 		$this->assertFileExists( $pdf_generator->get_full_pdf_path() );
 	}
@@ -275,6 +276,10 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 	/**
 	 * Check if we should attach a PDF to the current notification
 	 *
+	 * @param bool $expectation
+	 * @param array $notification
+	 * @param array $settings
+	 *
 	 * @since        4.0
 	 *
 	 * @dataProvider provider_maybe_attach_to_notification
@@ -358,12 +363,9 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_create_pdf() {
-		global $gfpdf;
-
 		/* Setup our form and entries */
 		$results = $this->create_form_and_entries();
 		$entry   = $results['entry'];
-		$fid     = $results['form']['id'];
 		$pid     = '555ad84787d7e';
 
 		/* Check for $entry error first */
@@ -409,7 +411,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 			unlink( $filename );
 		}
 
-		\GFPDF_Core_Model::gfpdfe_save_pdf( $entry, $form );
+		GFPDF_Core_Model::gfpdfe_save_pdf( $entry, $form );
 		$this->assertTrue( is_file( $filename ) );
 
 		unlink( $filename );

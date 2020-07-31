@@ -2,13 +2,11 @@
 
 namespace GFPDF\Helper\Fields;
 
+use Exception;
+use GF_Field_List;
+use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
-use GFPDF\Helper\Helper_Abstract_Fields;
-
-use GF_Field_List;
-
-use Exception;
 
 /**
  * @package     Gravity PDF
@@ -31,11 +29,11 @@ class Field_List extends Helper_Abstract_Fields {
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
 	 *
-	 * @param object                             $field The GF_Field_* Object
-	 * @param array                              $entry The Gravity Forms Entry
+	 * @param object               $field The GF_Field_* Object
+	 * @param array                $entry The Gravity Forms Entry
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
-	 * @param \GFPDF\Helper\Helper_Misc          $misc
+	 * @param Helper_Abstract_Form $gform
+	 * @param Helper_Misc          $misc
 	 *
 	 * @throws Exception
 	 *
@@ -66,7 +64,7 @@ class Field_List extends Helper_Abstract_Fields {
 
 		/* Add our List array */
 		$list_array = $this->value();
-		$list_array = ( 0 < sizeof( $list_array ) ) ? $list_array : '';
+		$list_array = ( 0 < count( $list_array ) ) ? $list_array : '';
 
 		$data['list'][ $this->field->id ] = $list_array;
 
@@ -114,7 +112,7 @@ class Field_List extends Helper_Abstract_Fields {
 				<tr>
 					<?php foreach ( $columns as $column ) : ?>
 						<th>
-							<?php echo esc_html( $column ); ?>
+							<?= esc_html( $column ); ?>
 						</th>
 					<?php endforeach; ?>
 				</tr>
@@ -127,16 +125,16 @@ class Field_List extends Helper_Abstract_Fields {
 				<tr>
 					<!-- handle the basic list -->
 					<?php if ( ! $columns ) : ?>
-						<td><?php echo esc_html( $item ); ?></td>
+						<td><?= esc_html( $item ); ?></td>
 						<?php
 					else :
 						?>
 						<!-- handle the advanced list -->
 						<?php foreach ( $columns as $column ) : ?>
-							<td>
-								<?php echo esc_html( rgar( $item, $column ) ); ?>
-							</td>
-						<?php endforeach; ?>
+						<td>
+							<?= esc_html( rgar( $item, $column ) ); ?>
+						</td>
+					<?php endforeach; ?>
 					<?php endif; ?>
 				</tr>
 			<?php endforeach; ?>
@@ -180,7 +178,7 @@ class Field_List extends Helper_Abstract_Fields {
 	/**
 	 * Remove empty list rows
 	 *
-	 * @param  array $list The current list array
+	 * @param array $list The current list array
 	 *
 	 * @return array       The filtered list array
 	 *
@@ -189,7 +187,7 @@ class Field_List extends Helper_Abstract_Fields {
 	private function remove_empty_list_rows( $list ) {
 
 		/* if list field empty return early */
-		if ( ! is_array( $list ) || sizeof( $list ) === 0 ) {
+		if ( ! is_array( $list ) || count( $list ) === 0 ) {
 			return $list;
 		}
 

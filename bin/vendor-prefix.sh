@@ -59,7 +59,7 @@ eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}ven
 eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/codeguy"
 
 # Mpdf
-eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed --config=${PLUGIN_DIR}.php-scoper/mpdf.php --quiet"
+eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed --config=${PLUGIN_DIR}.php-scoper/mpdf.php" --quiet
 eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/mpdf"
 eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/setasign"
 eval "${PHP_DOCKER}rm -Rf ${PLUGIN_DIR}vendor/myclabs"

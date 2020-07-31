@@ -5,11 +5,10 @@ namespace GFPDF\Model;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
-use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Migration;
-
+use GFPDF\Helper\Helper_Notices;
+use GFPDF\Helper\Helper_Options_Fields;
 use GPDFAPI;
-use GFForms;
 
 /**
  * @package     Gravity PDF
@@ -35,7 +34,7 @@ class Model_Actions extends Helper_Abstract_Model {
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
 	 *
-	 * @var \GFPDF\Helper\Helper_Data
+	 * @var Helper_Data
 	 *
 	 * @since 4.0
 	 */
@@ -45,7 +44,7 @@ class Model_Actions extends Helper_Abstract_Model {
 	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
-	 * @var \GFPDF\Helper\Helper_Options_Fields
+	 * @var Helper_Options_Fields
 	 *
 	 * @since 4.0
 	 */
@@ -55,18 +54,18 @@ class Model_Actions extends Helper_Abstract_Model {
 	 * Holds our Helper_Notices object
 	 * which we can use to queue up admin messages for the user
 	 *
-	 * @var \GFPDF\Helper\Helper_Notices
+	 * @var Helper_Notices
 	 *
 	 * @since 4.0
 	 */
 	protected $notices;
 
 	/**
-	 * Setup our class by injecting all our dependancies
+	 * Setup our class by injecting all our dependencies
 	 *
-	 * @param \GFPDF\Helper\Helper_Data             $data    Our plugin data store
-	 * @param \GFPDF\Helper\Helper_Abstract_Options $options Our options class which allows us to access any settings
-	 * @param \GFPDF\Helper\Helper_Notices          $notices Our notice class used to queue admin messages and errors
+	 * @param Helper_Data             $data    Our plugin data store
+	 * @param Helper_Abstract_Options $options Our options class which allows us to access any settings
+	 * @param Helper_Notices          $notices Our notice class used to queue admin messages and errors
 	 *
 	 * @since 4.0
 	 */
@@ -81,7 +80,7 @@ class Model_Actions extends Helper_Abstract_Model {
 	/**
 	 * Check if the current notice has already been dismissed
 	 *
-	 * @param  string $type The current notice ID
+	 * @param string $type The current notice ID
 	 *
 	 * @return boolean       True if dismissed, false otherwise
 	 *
@@ -101,7 +100,7 @@ class Model_Actions extends Helper_Abstract_Model {
 	/**
 	 * Mark the current notice as being dismissed
 	 *
-	 * @param  string $type The current notice ID
+	 * @param string $type The current notice ID
 	 *
 	 * @return void
 	 *
@@ -180,8 +179,6 @@ class Model_Actions extends Helper_Abstract_Model {
 	/**
 	 * Process our v3 to v4 migration
 	 *
-	 * @return boolean
-	 *
 	 * @since 4.0
 	 */
 	public function begin_migration() {
@@ -222,7 +219,7 @@ class Model_Actions extends Helper_Abstract_Model {
 	/**
 	 * Does the migration and notice clearing (if unsuccessful)
 	 *
-	 * @param  string $path Path to the current site's template directory
+	 * @param string $path Path to the current site's template directory
 	 *
 	 * @return boolean
 	 *
@@ -309,7 +306,7 @@ class Model_Actions extends Helper_Abstract_Model {
 	 */
 	public function ajax_multisite_v3_migration() {
 
-		/* @todo Dependacy inject these when we move all AJAX calls to their own class */
+		/* @todo Dependency inject these when we move all AJAX calls to their own class */
 		$log  = GPDFAPI::get_log_class();
 		$misc = GPDFAPI::get_misc_class();
 

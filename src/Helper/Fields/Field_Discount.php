@@ -30,7 +30,7 @@ class Field_Discount extends Helper_Abstract_Field_Products {
 			return true;
 		}
 
-		parent::is_empty();
+		return parent::is_empty();
 	}
 
 	/**

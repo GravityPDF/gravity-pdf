@@ -23,9 +23,9 @@ interface Helper_Interface_Actions {
 	/**
 	 * Apply any actions needed for the settings page
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function add_actions();
 }

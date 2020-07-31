@@ -2,12 +2,11 @@
 
 namespace GFPDF\Tests;
 
-use GFPDF\Helper\Helper_Field_Container;
-
-use WP_UnitTestCase;
 use GF_Field;
-
+use GFPDF\Helper\Helper_Field_Container;
 use ReflectionClass;
+use ReflectionMethod;
+use WP_UnitTestCase;
 
 /**
  * Test Gravity PDF Helper_Field_Container class
@@ -27,7 +26,7 @@ class Test_Field_Container extends WP_UnitTestCase {
 	/**
 	 * Our Helper_Field_Container
 	 *
-	 * @var \GFPDF\Helper\Helper_Field_Container
+	 * @var Helper_Field_Container
 	 *
 	 * @since 4.0
 	 */
@@ -50,7 +49,7 @@ class Test_Field_Container extends WP_UnitTestCase {
 	/**
 	 * Buffers our "generate" output and returns it for testing
 	 *
-	 * @param  object $field A mockup of the Gravity Form field
+	 * @param GF_Field $field A mockup of the Gravity Form field
 	 *
 	 * @return string
 	 *
@@ -344,8 +343,8 @@ class Test_Field_Container extends WP_UnitTestCase {
 	 */
 	public function test_helper_field_container_void() {
 		$reflection         = new ReflectionClass( 'GFPDF\Helper\Helper_Field_Container_Void' );
-		$methods            = $reflection->getMethods( \ReflectionMethod::IS_PUBLIC );
-		$total_methods      = sizeof( $methods ) - 1; /* Do not count the __construct public method */
+		$methods            = $reflection->getMethods( ReflectionMethod::IS_PUBLIC );
+		$total_methods      = count( $methods ) - 1; /* Do not count the __construct public method */
 		$overridden_methods = 0;
 
 		foreach ( $methods as $method ) {

@@ -6,7 +6,9 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Abstract_View;
 use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Helper\Helper_Templates;
 use GFPDF_Major_Compatibility_Checks;
 use Psr\Log\LoggerInterface;
@@ -43,7 +45,7 @@ class View_Settings extends Helper_Abstract_View {
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
-	 * @var \GFPDF\Helper\Helper_Form
+	 * @var Helper_Form
 	 *
 	 * @since 4.0
 	 */
@@ -62,7 +64,7 @@ class View_Settings extends Helper_Abstract_View {
 	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
-	 * @var \GFPDF\Helper\Helper_Options_Fields
+	 * @var Helper_Options_Fields
 	 *
 	 * @since 4.0
 	 */
@@ -72,7 +74,7 @@ class View_Settings extends Helper_Abstract_View {
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
 	 *
-	 * @var \GFPDF\Helper\Helper_Data
+	 * @var Helper_Data
 	 *
 	 * @since 4.0
 	 */
@@ -82,7 +84,7 @@ class View_Settings extends Helper_Abstract_View {
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
 	 *
-	 * @var \GFPDF\Helper\Helper_Misc
+	 * @var Helper_Misc
 	 *
 	 * @since 4.0
 	 */
@@ -92,7 +94,7 @@ class View_Settings extends Helper_Abstract_View {
 	 * Holds our Helper_Templates object
 	 * used to ease access to our PDF templates
 	 *
-	 * @var \GFPDF\Helper\Helper_Templates
+	 * @var Helper_Templates
 	 *
 	 * @since 4.0
 	 */
@@ -101,17 +103,17 @@ class View_Settings extends Helper_Abstract_View {
 	/**
 	 * Setup our class by injecting all our dependencies
 	 *
-	 * @param array                                          $data_cache An array of data to pass to the view
-	 * @param \GFPDF\Helper\Helper_Form|Helper_Abstract_Form $gform      Our abstracted Gravity Forms helper functions
-	 * @param LoggerInterface                                $log        Our logger class
-	 * @param \GFPDF\Helper\Helper_Abstract_Options          $options    Our options class which allows us to access any settings
-	 * @param \GFPDF\Helper\Helper_Data                      $data       Our plugin data store
-	 * @param \GFPDF\Helper\Helper_Misc                      $misc       Our miscellaneous class
-	 * @param \GFPDF\Helper\Helper_Templates                 $templates
+	 * @param array                            $data_cache An array of data to pass to the view
+	 * @param Helper_Form|Helper_Abstract_Form $gform      Our abstracted Gravity Forms helper functions
+	 * @param LoggerInterface                  $log        Our logger class
+	 * @param Helper_Abstract_Options          $options    Our options class which allows us to access any settings
+	 * @param Helper_Data                      $data       Our plugin data store
+	 * @param Helper_Misc                      $misc       Our miscellaneous class
+	 * @param Helper_Templates                 $templates
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $data_cache = [], Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates ) {
+	public function __construct( array $data_cache, Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates ) {
 
 		/* Call our parent constructor */
 		parent::__construct( $data_cache );
@@ -156,7 +158,7 @@ class View_Settings extends Helper_Abstract_View {
 
 		/* The array key is the settings order */
 		$navigation = [
-			5 => [
+			5   => [
 				'name' => esc_html__( 'Settings', 'gravity-forms-pdf-extended' ),
 				'id'   => 'general',
 			],
@@ -248,14 +250,17 @@ class View_Settings extends Helper_Abstract_View {
 			],
 		];
 
-		$sections = array_merge( $sections, $markup->do_settings_fields_as_individual_fieldset(
-			'gfpdf_settings_general',
-			[
-				'default_action' => [
-					'width' => 'full',
-				],
-			]
-		) );
+		$sections = array_merge(
+			$sections,
+			$markup->do_settings_fields_as_individual_fieldset(
+				'gfpdf_settings_general',
+				[
+					'default_action' => [
+						'width' => 'full',
+					],
+				]
+			)
+		);
 
 		$sections[] = [
 			'id'            => 'gfpdf_settings_general_security',
@@ -312,7 +317,7 @@ class View_Settings extends Helper_Abstract_View {
 				$args['content'] .= $markup->get_field_content( $field, $markup::DISABLE_PANEL_TITLE );
 			}
 
-			if ( $i % 3 == 0 ) {
+			if ( $i % 3 === 0 ) {
 				$sections[] = $args;
 				$args       = [];
 			}
@@ -391,7 +396,8 @@ class View_Settings extends Helper_Abstract_View {
 					'width'       => 'full',
 					'collapsible' => true,
 				],
-			] );
+			]
+		);
 
 		$vars = [
 			'content' => $markup->do_settings_sections( $sections ),

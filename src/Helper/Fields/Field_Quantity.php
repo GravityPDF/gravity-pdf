@@ -29,6 +29,7 @@ class Field_Quantity extends Helper_Abstract_Field_Products {
 	 */
 	public function form_data() {
 		$value = esc_html( $this->value() );
+
 		return $this->set_form_data( $value, $value );
 	}
 

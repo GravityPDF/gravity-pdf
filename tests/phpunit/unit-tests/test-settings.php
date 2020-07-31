@@ -2,6 +2,7 @@
 
 namespace GFPDF\Tests;
 
+use DateTimeImmutable;
 use Exception;
 use GFPDF\Controller\Controller_Settings;
 use GFPDF\Helper\Helper_Abstract_Addon;
@@ -33,7 +34,7 @@ class Test_Settings extends WP_UnitTestCase {
 	/**
 	 * Our Settings Controller
 	 *
-	 * @var \GFPDF\Controller\Controller_Settings
+	 * @var Controller_Settings
 	 * @since 4.0
 	 */
 	public $controller;
@@ -41,7 +42,7 @@ class Test_Settings extends WP_UnitTestCase {
 	/**
 	 * Our Settings Model
 	 *
-	 * @var \GFPDF\Model\Model_Settings
+	 * @var Model_Settings
 	 * @since 4.0
 	 */
 	public $model;
@@ -49,7 +50,7 @@ class Test_Settings extends WP_UnitTestCase {
 	/**
 	 * Our Settings View
 	 *
-	 * @var \GFPDF\View\View_Settings
+	 * @var View_Settings
 	 * @since 4.0
 	 */
 	public $view;
@@ -123,9 +124,6 @@ class Test_Settings extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_actions() {
-		$this->assertEquals( 10, has_action( 'gfpdf_post_general_settings_page', [ $this->view, 'system_status' ] ) );
-		$this->assertEquals( 10, has_action( 'gfpdf_post_tools_settings_page', [ $this->view, 'system_status' ] ) );
-		$this->assertEquals( 10, has_action( 'admin_init', [ $this->controller, 'process_tool_tab_actions' ] ) );
 		$this->assertFalse( has_action( 'gfpdf_post_tools_settings_page', [ $this->view, 'uninstaller' ] ) );
 
 		$this->assertEquals( 10, has_action( 'wp_ajax_gfpdf_font_save', [ $this->model, 'save_font' ] ) );
@@ -259,7 +257,7 @@ class Test_Settings extends WP_UnitTestCase {
 		$this->assertEquals( 'Access Denied', $e->getMessage() );
 
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		$this->assertInternalType( 'integer', $user_id );
+		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
 
 		$this->assertEquals( 'read', $this->controller->edit_options_cap() );
@@ -285,28 +283,13 @@ class Test_Settings extends WP_UnitTestCase {
 
 		/* Setup appropriate permissions and recheck */
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		$this->assertInternalType( 'integer', $user_id );
+		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
 
 		$results = $this->controller->disable_tools_on_view_cap( $nav );
 		$this->assertTrue( isset( $results[100] ) );
 
 		wp_set_current_user( 0 );
-	}
-
-	/**
-	 * Check this can't be executed if permissions are wrong
-	 *
-	 * @since 4.0
-	 */
-	public function test_process_tool_tab_actions() {
-
-		/* Show we're on the tools tab */
-		$_GET['page']    = 'gfpdf-';
-		$_GET['subview'] = 'PDF';
-		$_GET['tab']     = 'tools';
-
-		$this->assertNull( $this->controller->process_tool_tab_actions() );
 	}
 
 	/**
@@ -319,23 +302,23 @@ class Test_Settings extends WP_UnitTestCase {
 
 		/* Create subscriber */
 		$user_id = $this->factory->user->create();
-		$this->assertInternalType( 'integer', $user_id );
+		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
 
 		$font = $gfpdf->data->template_tmp_location . '/DejaVuSans.ttf';
 		copy( __DIR__ . '/fonts/DejaVuSans.ttf', $gfpdf->data->template_tmp_location . '/DejaVuSans.ttf' );
 
 		/* Test .ttf filename failure */
-		$this->assertFalse( $this->controller->validate_font_uploads( false, $font, 'test.txt' ) );
+		$this->assertEmpty( $this->controller->validate_font_uploads( [], $font, 'test.txt' ) );
 
 		/* Test not exist failure */
-		$this->assertFalse( $this->controller->validate_font_uploads( false, 'test', 'DejaVuSans.ttf' ) );
+		$this->assertEmpty( $this->controller->validate_font_uploads( [], 'test', 'DejaVuSans.ttf' ) );
 
 		/* Test invalid font file failure */
-		$this->assertFalse( $this->controller->validate_font_uploads( false, __DIR__ . '/json/form-settings.json', 'DejaVuSans.ttf' ) );
+		$this->assertEmpty( $this->controller->validate_font_uploads( [], __DIR__ . '/json/form-settings.json', 'DejaVuSans.ttf' ) );
 
 		/* Test for invalid capabilities */
-		$this->assertFalse( $this->controller->validate_font_uploads( false, $font, 'DejaVuSans.ttf' ) );
+		$this->assertEmpty( $this->controller->validate_font_uploads( [], $font, 'DejaVuSans.ttf' ) );
 
 		/* Elevate user to administrator */
 		$user = wp_get_current_user();
@@ -343,7 +326,7 @@ class Test_Settings extends WP_UnitTestCase {
 		$user->add_role( 'administrator' );
 
 		/* Do valid font check */
-		$results = $this->controller->validate_font_uploads( false, $font, 'DejaVuSans.ttf' );
+		$results = $this->controller->validate_font_uploads( [], $font, 'DejaVuSans.ttf' );
 
 		$this->assertEquals( 'ttf', $results['ext'] );
 		$this->assertEquals( 'font/ttf', $results['type'] );
@@ -399,35 +382,6 @@ class Test_Settings extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Check our template installer functions correctly
-	 *
-	 * @since 4.0
-	 */
-	public function test_install_template() {
-		global $gfpdf;
-
-		$install_path = ( is_multisite() ) ? $gfpdf->data->multisite_template_location : $gfpdf->data->template_location;
-
-		$this->assertFileNotExists( $install_path . 'zadani.php' );
-
-		$this->model->install_templates();
-
-		$this->assertFileExists( $install_path . 'zadani.php' );
-
-		/* Cleanup */
-		foreach ( glob( PDF_PLUGIN_DIR . 'src/templates/*' ) as $file ) {
-
-			$file = $install_path . basename( $file );
-
-			if ( is_dir( $file ) ) {
-				$gfpdf->misc->rmdir( $file );
-			} else {
-				unlink( $file );
-			}
-		}
-	}
-
-	/**
 	 * Check the font removal method works
 	 *
 	 * @since 4.0
@@ -462,6 +416,9 @@ class Test_Settings extends WP_UnitTestCase {
 
 	/**
 	 * Check if we have a valid font name
+	 *
+	 * @param bool $expected
+	 * @param string $name
 	 *
 	 * @since        4.0
 	 *
@@ -701,12 +658,17 @@ class Test_Settings extends WP_UnitTestCase {
 	/**
 	 * @return array
 	 *
+	 * @throws Exception
 	 * @since 4.2
 	 */
 	public function providerActivateLicense() {
+		$date_format = get_option( 'date_format' );
+		$dt          = new DateTimeImmutable( '', wp_timezone() );
+		$date        = $dt === false ? gmdate( $date_format, false ) : $dt->format( $date_format );
+
 		return [
 			[
-				'Your license key expired on ' . date_i18n( get_option( 'date_format' ), strtotime( '', current_time( 'timestamp' ) ) ) . '.',
+				'Your license key expired on ' . $date . '.',
 				[
 					'error'   => 'expired',
 					'expires' => '',
@@ -754,7 +716,7 @@ class Test_Settings extends WP_UnitTestCase {
 			],
 
 			[
-				'',
+				'Your support license key has been successfully validated.',
 				[ 'success' => 'true' ],
 			],
 		];

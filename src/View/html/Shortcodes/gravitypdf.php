@@ -14,10 +14,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/** @var $args array */
+
 ?>
 
-<a href="<?php echo $args['url']; ?>" class="<?php echo $args['class']; ?> <?php echo $args['classes']; ?>"
-					<?php
-					if ( 'view' === $args['type'] ):
-						?>
-	target="_blank"<?php endif; ?> rel="nofollow"><?php echo $args['text']; ?></a>
+<a
+		href="<?= $args['url']; ?>"
+		class="<?= $args['class']; ?> <?= $args['classes']; ?>"
+		<?php
+		if ( 'view' === $args['type'] ):
+			?>
+			target="_blank"<?php endif; ?>
+		rel="nofollow">
+	<?= $args['text']; ?>
+</a>

@@ -2,11 +2,8 @@
 
 namespace GFPDF\Tests;
 
-use GFPDF\Helper\Helper_Options_Fields;
-
 use GFAPI;
-use GFForms;
-
+use GFPDF\Helper\Helper_Options_Fields;
 use WP_UnitTestCase;
 
 /**
@@ -19,7 +16,7 @@ use WP_UnitTestCase;
  */
 
 /**
- * Test the WordPress Options API Implimentation
+ * Test the WordPress Options API Implementation
  *
  * @since 4.0
  * @group options-api
@@ -29,7 +26,7 @@ class Test_Options_API extends WP_UnitTestCase {
 	/**
 	 * Our Gravity PDF Options API Object
 	 *
-	 * @var \GFPDF\Helper\Helper_Options_Fields
+	 * @var Helper_Options_Fields
 	 *
 	 * @since 4.0
 	 */
@@ -209,7 +206,7 @@ class Test_Options_API extends WP_UnitTestCase {
 		$option_id = 'options';
 
 		/* Run false test */
-		$this->assertSame( 0, sizeof( $wp_settings_fields[ $group ][ $group ][ $setting ]['args'][ $option_id ] ) );
+		$this->assertSame( 0, count( $wp_settings_fields[ $group ][ $group ][ $setting ]['args'][ $option_id ] ) );
 
 		/* Run valid test */
 		$this->options->update_registered_field( 'form_settings', 'notification', 'options', 'working' );
@@ -326,18 +323,18 @@ class Test_Options_API extends WP_UnitTestCase {
 
 		/* check basic expected results */
 		$this->assertTrue( is_array( $settings ) );
-		$this->assertEquals( 3, sizeof( $settings ) );
+		$this->assertEquals( 3, count( $settings ) );
 
-		/* check values are avaliable */
+		/* check values are available */
 		$pdf = $settings['555ad84787d7e'];
 
 		$this->assertEquals( 'My First PDF Template', $pdf['name'] );
 		$this->assertEquals( 'Gravity Forms Style', $pdf['template'] );
 		$this->assertTrue( is_array( $pdf['notification'] ) );
-		$this->assertEquals( 2, sizeof( $pdf['notification'] ) );
+		$this->assertEquals( 2, count( $pdf['notification'] ) );
 		$this->assertEquals( 'test', $pdf['filename'] );
 		$this->assertTrue( is_array( $pdf['conditionalLogic'] ) );
-		$this->assertEquals( 3, sizeof( $pdf['conditionalLogic'] ) );
+		$this->assertEquals( 3, count( $pdf['conditionalLogic'] ) );
 		$this->assertEquals( 'custom', $pdf['pdf_size'] );
 		$this->assertEquals( '150', $pdf['custom_pdf_size'][0] );
 		$this->assertEquals( '300', $pdf['custom_pdf_size'][1] );
@@ -349,7 +346,7 @@ class Test_Options_API extends WP_UnitTestCase {
 		$this->assertEquals( 'Yes', $pdf['security'] );
 		$this->assertEquals( 'my password', $pdf['password'] );
 		$this->assertTrue( is_array( $pdf['privileges'] ) );
-		$this->assertEquals( 8, sizeof( $pdf['privileges'] ) );
+		$this->assertEquals( 8, count( $pdf['privileges'] ) );
 		$this->assertEquals( '300', $pdf['image_dpi'] );
 		$this->assertEquals( 'No', $pdf['save'] );
 		$this->assertEquals( '555ad84787d7e', $pdf['id'] );
@@ -594,11 +591,11 @@ class Test_Options_API extends WP_UnitTestCase {
 		$this->assertEquals( 'No', $this->options->get_option( 'default_restrict_owner' ) );
 		$this->assertTrue( is_array( $this->options->get_option( 'admin_capabilities' ) ) );
 
-		/* test for non-existant option */
-		$this->assertFalse( $this->options->get_option( 'non-existant' ) );
+		/* test for non-existent option */
+		$this->assertFalse( $this->options->get_option( 'non-existent' ) );
 
-		/* test default when non-existant option */
-		$this->assertTrue( $this->options->get_option( 'non-existant', true ) );
+		/* test default when non-existent option */
+		$this->assertTrue( $this->options->get_option( 'non-existent', true ) );
 
 		/* check filters */
 		add_filter(
@@ -693,11 +690,8 @@ class Test_Options_API extends WP_UnitTestCase {
 	public function test_get_capabilities() {
 		$capabilities = $this->options->get_capabilities();
 
-		$this->assertTrue( isset( $capabilities['Gravity Forms Capabilities'] ) );
-		$this->assertTrue( isset( $capabilities['Active WordPress Capabilities'] ) );
-
-		$this->assertNotSame( 0, sizeof( $capabilities['Gravity Forms Capabilities'] ) );
-		$this->assertNotSame( 0, sizeof( $capabilities['Active WordPress Capabilities'] ) );
+		$this->assertArrayHasKey( 'gravityforms_edit_forms', $capabilities );
+		$this->assertArrayHasKey( 'manage_options', $capabilities );
 	}
 
 	/**
@@ -758,8 +752,8 @@ class Test_Options_API extends WP_UnitTestCase {
 		$this->assertTrue( isset( $get_fonts['Unicode'] ) );
 		$this->assertTrue( isset( $get_fonts['User-Defined Fonts'] ) );
 
-		$this->assertSame( 2, sizeof( $get_fonts['Unicode'] ) );
-		$this->assertSame( 2, sizeof( $get_fonts['User-Defined Fonts'] ) );
+		$this->assertSame( 2, count( $get_fonts['Unicode'] ) );
+		$this->assertSame( 2, count( $get_fonts['User-Defined Fonts'] ) );
 	}
 
 	/**
@@ -792,11 +786,11 @@ class Test_Options_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test the privilages getter
+	 * Test the privileges getter
 	 *
 	 * @since 4.0
 	 */
-	public function test_get_privilages() {
+	public function test_get_privileges() {
 		$this->assertTrue( is_array( $this->options->get_privilages() ) );
 	}
 
@@ -826,13 +820,8 @@ class Test_Options_API extends WP_UnitTestCase {
 		$this->assertArrayNotHasKey( 'default_font_size', $initial_settings );
 		$this->assertArrayNotHasKey( 'other_type', $initial_settings );
 
-		/* Run our settings santize function and check the results are accurate */
-		$this->options->settings_sanitize( $input );
-
-		set_current_screen( 'dashboard' );
-		$_GET['page'] = 'gfpdf-';
-
-		$updated_settings = $this->options->get_settings();
+		/* Run our settings sanitize function and check the results are accurate */
+		$updated_settings = $this->options->settings_sanitize( $input );
 
 		$this->assertEquals( 'A5', $updated_settings['default_pdf_size'] );
 		$this->assertEquals( '15', $updated_settings['default_font_size'] );
@@ -840,7 +829,10 @@ class Test_Options_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test the trim sanitisation function
+	 * Test the trim sanitization function
+	 *
+	 * @param string $expected
+	 * @param string $input
 	 *
 	 * @since        4.0
 	 *
@@ -873,7 +865,10 @@ class Test_Options_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test the number sanitisation function
+	 * Test the number sanitization function
+	 *
+	 * @param int $expected
+	 * @param string $input
 	 *
 	 * @since        4.0
 	 *
@@ -902,7 +897,10 @@ class Test_Options_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test the paper size sanitisation function
+	 * Test the paper size sanitization function
+	 *
+	 * @param array $expected
+	 * @param array $input
 	 *
 	 * @since        4.0
 	 *
@@ -931,14 +929,18 @@ class Test_Options_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test our global sanitisation function
+	 * Test our global sanitization function
+	 *
+	 * @param string $type
+	 * @param string $value
+	 * @param string $expected
 	 *
 	 * @since        4.0
 	 *
 	 * @dataProvider provider_sanitize_all_fields
 	 */
 	public function test_sanitize_all_fields( $type, $value, $expected ) {
-		$this->assertEquals( $expected, $this->options->sanitize_all_fields( $value, '', '', [ 'type' => $type ] ) );
+		$this->assertEquals( $expected, $this->options->sanitize_all_fields( $value, '', [], [ 'type' => $type ] ) );
 	}
 
 	/**
@@ -968,6 +970,10 @@ class Test_Options_API extends WP_UnitTestCase {
 	/**
 	 * Test our required sanitized field errors trigger
 	 *
+	 * @param string $type
+	 * @param array $value
+	 * @param bool $expected
+	 *
 	 * @since        4.0
 	 *
 	 * @dataProvider provider_sanitize_required_field
@@ -990,7 +996,7 @@ class Test_Options_API extends WP_UnitTestCase {
 		$this->options->sanitize_required_field( $value, $type, $input, $settings );
 
 		/* Check the results */
-		$this->assertEquals( $expected, sizeof( $wp_settings_errors ) );
+		$this->assertEquals( $expected, count( $wp_settings_errors ) );
 	}
 
 	/**
@@ -1016,6 +1022,9 @@ class Test_Options_API extends WP_UnitTestCase {
 
 	/**
 	 * Test we can correctly get the field details
+	 *
+	 * @param array $input
+	 * @param string $expected
 	 *
 	 * @since        4.0
 	 *

@@ -78,7 +78,7 @@ class View_Shortcodes extends Helper_Abstract_View {
 	/**
 	 * Generate the Gravity PDF link
 	 *
-	 * @param  array $attr The parameters
+	 * @param array $attr The parameters
 	 *
 	 * @return string       The Shortcode Markup
 	 *

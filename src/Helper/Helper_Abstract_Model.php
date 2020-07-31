@@ -14,25 +14,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * A simple abstract class controlers can extent to share similar variables
+ * A simple abstract class controllers can extent to share similar variables
  *
  * @since 4.0
  */
 abstract class Helper_Abstract_Model {
 
 	/**
-	 * Classes will store a controler object to allow user access
+	 * Classes will store a controller object to allow user access
 	 *
-	 * @var object
+	 * @var Helper_Abstract_Controller
 	 *
 	 * @since 4.0
 	 */
 	private $controller = null;
 
 	/**
-	 * Add a controller setter function with type hinting to ensure compatiiblity
+	 * Add a controller setter function with type hinting to ensure compatibility
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Controller $class The controller class
+	 * @param Helper_Abstract_Controller $class The controller class
 	 *
 	 * @since 4.0
 	 */
@@ -43,9 +43,9 @@ abstract class Helper_Abstract_Model {
 	/**
 	 * Get the controller
 	 *
+	 * @return Helper_Abstract_Controller
 	 * @since 4.0
 	 *
-	 * @return \GFPDF\Helper\Helper_Abstract_Controller
 	 */
 	final public function getController() {
 		return $this->controller;

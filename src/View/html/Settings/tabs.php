@@ -14,6 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/** @var $args array */
+
 ?>
 
 <nav class="gform-settings-tabs__navigation" role="tablist">
@@ -23,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				aria-selected="<?= $args['selected'] === $tab['id'] ? 'true' : 'false' ?>"
 				data-id="<?= esc_attr( $tab['id'] ); ?>"
 				class="<?= $args['selected'] === $tab['id'] ? 'active' : ''; ?>"
-				href="<?php echo $args['data']->settings_url . '&amp;tab=' . esc_attr( $tab['id'] ); ?>">
+				href="<?= $args['data']->settings_url . '&amp;tab=' . esc_attr( $tab['id'] ); ?>">
 			<?= esc_html( $tab['name'] ); ?>
 		</a>
 	<?php endforeach; ?>

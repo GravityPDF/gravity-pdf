@@ -6,10 +6,12 @@ use GFPDF\Helper\Helper_Abstract_Controller;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
+use GFPDF\Model\Model_Install;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -34,7 +36,7 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
-	 * @var \GFPDF\Helper\Helper_Form
+	 * @var Helper_Form
 	 *
 	 * @since 4.0
 	 */
@@ -53,7 +55,7 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	 * Holds our Helper_Notices object
 	 * which we can use to queue up admin messages for the user
 	 *
-	 * @var \GFPDF\Helper\Helper_Notices
+	 * @var Helper_Notices
 	 *
 	 * @since 4.0
 	 */
@@ -63,7 +65,7 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
 	 *
-	 * @var \GFPDF\Helper\Helper_Data
+	 * @var Helper_Data
 	 *
 	 * @since 4.0
 	 */
@@ -73,7 +75,7 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
 	 *
-	 * @var \GFPDF\Helper\Helper_Misc
+	 * @var Helper_Misc
 	 *
 	 * @since 4.0
 	 */
@@ -82,12 +84,12 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	/**
 	 * Setup our class by injecting all our dependencies
 	 *
-	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_Install $model   Our Install Model the controller will manage
-	 * @param \GFPDF\Helper\Helper_Abstract_Form               $gform   Our Install View the controller will manage
-	 * @param LoggerInterface                                  $log     Our logger class
-	 * @param \GFPDF\Helper\Helper_Notices                     $notices Our notice class used to queue admin messages and errors
-	 * @param \GFPDF\Helper\Helper_Data                        $data    Our plugin data store
-	 * @param \GFPDF\Helper\Helper_Misc                        $misc    Our miscellaneous methods
+	 * @param Helper_Abstract_Model|Model_Install $model   Our Install Model the controller will manage
+	 * @param Helper_Abstract_Form                $gform   Our Install View the controller will manage
+	 * @param LoggerInterface                     $log     Our logger class
+	 * @param Helper_Notices                      $notices Our notice class used to queue admin messages and errors
+	 * @param Helper_Data                         $data    Our plugin data store
+	 * @param Helper_Misc                         $misc    Our miscellaneous methods
 	 *
 	 * @since 4.0
 	 */
@@ -108,9 +110,9 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	/**
 	 * Initialise our class defaults
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function init() {
 		$this->add_actions();
@@ -120,9 +122,9 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	/**
 	 * Apply any actions needed for the settings page
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function add_actions() {
 		add_action( 'admin_init', [ $this, 'maybe_uninstall' ] );
@@ -135,9 +137,9 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	/**
 	 * Apply any filters needed for the settings page
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function add_filters() {
 		/* rewrite filters */

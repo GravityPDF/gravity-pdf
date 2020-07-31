@@ -14,12 +14,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/** @var $args array */
+
 /* assign list_items object to variable for easier access */
 $list_items = $args['list_items'];
 
 ?>
 
-<?php \GFFormSettings::page_header( $args['title'] ); ?>
+<?php GFFormSettings::page_header( $args['title'] ); ?>
 
 <div class="gform-settings__content">
 	<div class="gform-settings-panel">
@@ -31,7 +33,9 @@ $list_items = $args['list_items'];
 			<form id="gfpdf_list_form" method="post">
 				<div class="tablenav top">
 					<div class="alignleft actions bulkactions"></div>
-					<div class="alignright"><a class="button" href="<?= esc_url( $args['add_new_url'] ) ?>"><?php esc_html_e( 'Add New', 'gravityforms' ); ?></a></div>
+					<div class="alignright">
+						<a class="button" href="<?= esc_url( $args['add_new_url'] ) ?>"><?php esc_html_e( 'Add New', 'gravityforms' ); ?></a>
+					</div>
 					<br class="clear">
 				</div>
 
@@ -41,4 +45,4 @@ $list_items = $args['list_items'];
 	</div>
 </div>
 
-<?php \GFFormSettings::page_footer(); ?>
+<?php GFFormSettings::page_footer(); ?>

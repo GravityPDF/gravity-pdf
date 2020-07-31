@@ -2,11 +2,10 @@
 
 namespace GFPDF\Helper\Fields;
 
+use Exception;
+use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
-use GFPDF\Helper\Helper_Abstract_Fields;
-
-use Exception;
 
 /**
  * @package     Gravity PDF
@@ -29,11 +28,11 @@ class Field_Post_Custom_Field extends Helper_Abstract_Fields {
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
 	 *
-	 * @param object                             $field The GF_Field_* Object
-	 * @param array                              $entry The Gravity Forms Entry
+	 * @param object               $field The GF_Field_* Object
+	 * @param array                $entry The Gravity Forms Entry
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
-	 * @param \GFPDF\Helper\Helper_Misc          $misc
+	 * @param Helper_Abstract_Form $gform
+	 * @param Helper_Misc          $misc
 	 *
 	 * @throws Exception
 	 *

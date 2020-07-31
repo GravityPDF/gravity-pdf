@@ -12,6 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/** @var $args array */
+
 ?>
 
 <div id="<?= esc_attr( $args['id'] ) ?>" class="<?= esc_attr( $args['class'] ) ?>">
@@ -25,5 +27,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 	<?php endif; ?>
 
-	<?php call_user_func( $args['callback'], $args['callback_args'] ) ?>
+	<?php call_user_func( $args['callback'], $args['callback_args'] ); ?>
 </div>
