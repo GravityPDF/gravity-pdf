@@ -1,3 +1,4 @@
+@use '../Variables/colors';
 @use '../Mixins/button';
 
 #tab_pdf, #tab_PDF {
@@ -62,6 +63,27 @@
           transform: none;
           box-shadow: none;
         }
+
+        .doing-ajax span:after,
+        .doing-ajax:hover span:after {
+          font-family: 'FontAwesome', 'Open Sans', sans-serif;
+          content: '\f1ce';
+          font-size: 79px;
+          background: none;
+          width: auto;
+          height: auto;
+          left: 51.5%;
+          text-indent: 0;
+          -webkit-animation: fa-spin 1.5s infinite linear;
+          animation: fa-spin 1.5s infinite linear;
+        }
+
+        &.gfpdf-dropzone-active .doing-ajax span:after,
+        .doing-ajax:hover span:after,
+        .doing-ajax:focus span:after {
+          color: #FFF;
+          background: none;
+        }
       }
 
       .gfpdf-dropzone {
@@ -73,6 +95,14 @@
             text-align: center;
             margin-top: 5px;
           }
+        }
+      }
+
+      .notice {
+        border-color: colors.$success-color;
+
+        &.error {
+          border-color: colors.$error-color;
         }
       }
     }
