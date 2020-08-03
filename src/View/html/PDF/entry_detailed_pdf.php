@@ -14,6 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/** @var $args array */
+
 ?>
 
 <?php do_action( 'gfpdf_entry_detail_pre_markup', $args['pdfs'] ); ?>
@@ -25,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<?php do_action( 'gfpdf_entry_detail_pre_pdf_name_markup', $pdf, $args['pdfs'] ); ?>
 
-		<div><?php echo esc_html( $pdf['name'] ); ?></div>
+		<div><?= esc_html( $pdf['name'] ); ?></div>
 
 		<?php do_action( 'gfpdf_entry_detail_post_pdf_name_markup', $pdf, $args['pdfs'] ); ?>
 

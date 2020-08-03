@@ -3,11 +3,10 @@
 namespace GFPDF\Tests;
 
 use GPDFAPI;
-
 use WP_UnitTestCase;
 
 /**
- * Test Gravity PDF Hlper Misc Functionality
+ * Test Gravity PDF Helper Misc Functionality
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2020, Blue Liquid Designs
@@ -26,6 +25,9 @@ class Test_API extends WP_UnitTestCase {
 	/**
 	 * Check the correct class is returned
 	 *
+	 * @param string $expected
+	 * @param string $method
+	 *
 	 * @since        4.0
 	 *
 	 * @dataProvider provider_classes
@@ -41,7 +43,7 @@ class Test_API extends WP_UnitTestCase {
 	 */
 	public function provider_classes() {
 		return [
-			[ 'GFPDF\Vendor\Monolog\Logger', 'get_log_class' ],
+			[ 'GFPDF_Vendor\Monolog\Logger', 'get_log_class' ],
 			[ 'GFPDF\Helper\Helper_Notices', 'get_notice_class' ],
 			[ 'GFPDF\Helper\Helper_Data', 'get_data_class' ],
 			[ 'GFPDF\Helper\Helper_Options_Fields', 'get_options_class' ],
@@ -147,7 +149,7 @@ class Test_API extends WP_UnitTestCase {
 		GPDFAPI::delete_plugin_option( 'item1' );
 
 		/* Verify cleanup */
-		$this->assertSame( 0, sizeof( GPDFAPI::get_plugin_settings() ) );
+		$this->assertSame( 0, count( GPDFAPI::get_plugin_settings() ) );
 	}
 
 	/**

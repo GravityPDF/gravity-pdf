@@ -2,6 +2,8 @@
 
 namespace GFPDF\Controller;
 
+use GF_System_Report;
+use GFCommon;
 use WP_UnitTestCase;
 
 /**
@@ -34,11 +36,11 @@ class TestControllerSystemReport extends WP_UnitTestCase {
 	}
 
 	public function test_system_report() {
-		require_once( \GFCommon::get_base_path() . '/includes/system-status/class-gf-system-status.php' );
-		require_once( \GFCommon::get_base_path() . '/includes/system-status/class-gf-system-report.php' );
-		require_once( \GFCommon::get_base_path() . '/includes/system-status/class-gf-update.php' );
+		require_once( GFCommon::get_base_path() . '/includes/system-status/class-gf-system-status.php' );
+		require_once( GFCommon::get_base_path() . '/includes/system-status/class-gf-system-report.php' );
+		require_once( GFCommon::get_base_path() . '/includes/system-status/class-gf-update.php' );
 
-		$system_report = \GF_System_Report::get_system_report();
+		$system_report = GF_System_Report::get_system_report();
 
 		$this->assertEquals( 'allow_url_fopen', $system_report[2]['tables'][1]['items'][11]['label'] );
 	}

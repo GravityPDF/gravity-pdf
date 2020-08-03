@@ -4,6 +4,7 @@ namespace GFPDF\Tests;
 
 use GFAPI;
 use GFPDFEntryDetail;
+use GPDFAPI;
 use WP_UnitTestCase;
 
 /**
@@ -25,7 +26,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 	/**
 	 * The Gravity Form
 	 *
-	 * @var integer
+	 * @var array
 	 *
 	 * @since 4.0
 	 */
@@ -34,7 +35,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 	/**
 	 * The Gravity Form entries imported
 	 *
-	 * @var integer
+	 * @var array
 	 *
 	 * @since 4.0
 	 */
@@ -240,8 +241,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertTrue( in_array( $response, $field['4.Multi Select Box_name'], true ) );
 		$this->assertTrue( in_array( $response, $field['Multi Select Box_name'], true ) );
 
-		$this->assertEquals( 2, sizeof( $field[4] ) );
-		$this->assertEquals( 2, sizeof( $field['4_name'] ) );
+		$this->assertEquals( 2, count( $field[4] ) );
+		$this->assertEquals( 2, count( $field['4_name'] ) );
 	}
 
 	/**
@@ -266,9 +267,9 @@ class Test_Form_Data extends WP_UnitTestCase {
 	 */
 	public function test_field_number_currency() {
 		$form_json = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/number-fields.json' ) ), true );
-		$form_id   = \GFAPI::add_form( $form_json );
+		$form_id   = GFAPI::add_form( $form_json );
 
-		$entry_id = \GFAPI::add_entry(
+		$entry_id = GFAPI::add_entry(
 			[
 				'form_id'  => $form_id,
 				'currency' => 'EUR',
@@ -278,13 +279,13 @@ class Test_Form_Data extends WP_UnitTestCase {
 			]
 		);
 
-		$form_data = \GPDFAPI::get_form_data( $entry_id );
+		$form_data = GPDFAPI::get_form_data( $entry_id );
 
 		$this->assertEquals( '1000.1', $form_data['field'][1] );
 		$this->assertEquals( '2000,1', $form_data['field'][2] );
 		$this->assertEquals( '3.000,10 &#8364;', $form_data['field'][3] );
 
-		$entry_id = \GFAPI::add_entry(
+		$entry_id = GFAPI::add_entry(
 			[
 				'form_id'  => $form_id,
 				'currency' => 'AUD',
@@ -294,7 +295,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 			]
 		);
 
-		$form_data = \GPDFAPI::get_form_data( $entry_id );
+		$form_data = GPDFAPI::get_form_data( $entry_id );
 
 		$this->assertEquals( '1000.1', $form_data['field'][1] );
 		$this->assertEquals( '2000,1', $form_data['field'][2] );
@@ -333,7 +334,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertTrue( in_array( $response, $field['6.Checkbox_name'], true ) );
 		$this->assertTrue( in_array( $response, $field['Checkbox_name'], true ) );
 
-		$this->assertEquals( 2, sizeof( $field[6] ) );
+		$this->assertEquals( 2, count( $field[6] ) );
 	}
 
 	/**
@@ -535,15 +536,15 @@ class Test_Form_Data extends WP_UnitTestCase {
 		/*
 		 * Run our tests...
 		 */
-		$this->assertEquals( 1, sizeof( $field[18] ) );
-		$this->assertEquals( 1, sizeof( $field['18.File'] ) );
-		$this->assertEquals( 1, sizeof( $field['18.File_path'] ) );
-		$this->assertEquals( 1, sizeof( $field['18_path'] ) );
+		$this->assertEquals( 1, count( $field[18] ) );
+		$this->assertEquals( 1, count( $field['18.File'] ) );
+		$this->assertEquals( 1, count( $field['18.File_path'] ) );
+		$this->assertEquals( 1, count( $field['18_path'] ) );
 
-		$this->assertEquals( 2, sizeof( $field[19] ) );
-		$this->assertEquals( 2, sizeof( $field['19.File'] ) );
-		$this->assertEquals( 2, sizeof( $field['19.File_path'] ) );
-		$this->assertEquals( 2, sizeof( $field['19_path'] ) );
+		$this->assertEquals( 2, count( $field[19] ) );
+		$this->assertEquals( 2, count( $field['19.File'] ) );
+		$this->assertEquals( 2, count( $field['19.File_path'] ) );
+		$this->assertEquals( 2, count( $field['19_path'] ) );
 
 		$this->assertEquals( 'http://', substr( $field[18][0], 0, 7 ) );
 		$this->assertEquals( 'http://', substr( $field['18.File'][0], 0, 7 ) );
@@ -650,9 +651,9 @@ class Test_Form_Data extends WP_UnitTestCase {
 		/*
 		 * Run checkbox survey test
 		 */
-		$this->assertEquals( 2, sizeof( array_filter( $field[47][0] ) ) );
-		$this->assertEquals( 2, sizeof( array_filter( $field['47.Checkbox Survey Field'][0] ) ) );
-		$this->assertEquals( 2, sizeof( array_filter( $field['Checkbox Survey Field'][0] ) ) );
+		$this->assertEquals( 2, count( array_filter( $field[47][0] ) ) );
+		$this->assertEquals( 2, count( array_filter( $field['47.Checkbox Survey Field'][0] ) ) );
+		$this->assertEquals( 2, count( array_filter( $field['Checkbox Survey Field'][0] ) ) );
 
 		$this->assertEquals( 'Check - First Choice', $field[47][0]['47.1'] );
 		$this->assertEquals( 'Check - Second Choice', $field[47][0]['47.2'] );
@@ -735,9 +736,9 @@ class Test_Form_Data extends WP_UnitTestCase {
 		/*
 		 * Post Image
 		 */
-		$this->assertEquals( 5, sizeof( $field[32] ) );
-		$this->assertEquals( 5, sizeof( $field['32.Post Image'] ) );
-		$this->assertEquals( 5, sizeof( $field['Post Image'] ) );
+		$this->assertEquals( 5, count( $field[32] ) );
+		$this->assertEquals( 5, count( $field['32.Post Image'] ) );
+		$this->assertEquals( 5, count( $field['Post Image'] ) );
 
 		$title   = 'Post Image Title';
 		$caption = 'Post Image caption';
@@ -861,11 +862,11 @@ class Test_Form_Data extends WP_UnitTestCase {
 		/*
 		 * Run our tests...
 		 */
-		$this->assertEquals( 2, sizeof( $lists ) );
-		$this->assertEquals( 3, sizeof( $lists[20] ) );
-		$this->assertEquals( 2, sizeof( $lists[21] ) );
-		$this->assertEquals( 3, sizeof( $lists[21][0] ) );
-		$this->assertEquals( 3, sizeof( $lists[21][1] ) );
+		$this->assertEquals( 2, count( $lists ) );
+		$this->assertEquals( 3, count( $lists[20] ) );
+		$this->assertEquals( 2, count( $lists[21] ) );
+		$this->assertEquals( 3, count( $lists[21][0] ) );
+		$this->assertEquals( 3, count( $lists[21][1] ) );
 
 		/*
 		 * Check the basic list content
@@ -936,8 +937,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'col', $likert[26] );
 		$this->assertArrayHasKey( 'row', $likert[26] );
 
-		$this->assertEquals( 5, sizeof( $likert[26]['col'] ) );
-		$this->assertEquals( 5, sizeof( $likert[26]['row'] ) );
+		$this->assertEquals( 5, count( $likert[26]['col'] ) );
+		$this->assertEquals( 5, count( $likert[26]['row'] ) );
 
 		$this->assertArrayHasKey( 'Strongly disagree', $likert[26]['row'] );
 		$this->assertArrayHasKey( 'Disagree', $likert[26]['row'] );
@@ -954,8 +955,8 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'rows', $likert[27] );
 		$this->assertArrayNotHasKey( 'row', $likert[27] );
 
-		$this->assertEquals( 5, sizeof( $likert[27]['col'] ) );
-		$this->assertEquals( 5, sizeof( $likert[27]['rows'] ) );
+		$this->assertEquals( 5, count( $likert[27]['col'] ) );
+		$this->assertEquals( 5, count( $likert[27]['rows'] ) );
 
 		$this->assertArrayHasKey( 'First row', $likert[27]['rows'] );
 		$this->assertArrayHasKey( 'Second row', $likert[27]['rows'] );
@@ -1042,7 +1043,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( '1', $products[35]['quantity'] );
 		$this->assertEquals( '10', $products[35]['subtotal'] );
 		$this->assertEquals( '$10.00', $products[35]['subtotal_formatted'] );
-		$this->assertEquals( 0, sizeof( $products[35]['options'] ) );
+		$this->assertEquals( 0, count( $products[35]['options'] ) );
 
 		/*
 		 * Run third set of tests
@@ -1053,7 +1054,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( '1', $products[51]['quantity'] );
 		$this->assertEquals( '10', $products[51]['subtotal'] );
 		$this->assertEquals( '$10.00', $products[51]['subtotal_formatted'] );
-		$this->assertEquals( 0, sizeof( $products[51]['options'] ) );
+		$this->assertEquals( 0, count( $products[51]['options'] ) );
 
 		/*
 		 * Run fourth set of tests
@@ -1064,7 +1065,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( '1', $products[52]['quantity'] );
 		$this->assertEquals( '30', $products[52]['subtotal'] );
 		$this->assertEquals( '$30.00', $products[52]['subtotal_formatted'] );
-		$this->assertEquals( 0, sizeof( $products[52]['options'] ) );
+		$this->assertEquals( 0, count( $products[52]['options'] ) );
 
 		/*
 		 * Run fifth set of tests
@@ -1075,7 +1076,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( '6', $products[53]['quantity'] );
 		$this->assertEquals( '300', $products[53]['subtotal'] );
 		$this->assertEquals( '$300.00', $products[53]['subtotal_formatted'] );
-		$this->assertEquals( 0, sizeof( $products[53]['options'] ) );
+		$this->assertEquals( 0, count( $products[53]['options'] ) );
 
 		/*
 		 * Run sixth set of tests
@@ -1144,7 +1145,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( 'letter', $data['grading'] );
 		$this->assertEquals( '50', $data['passPercent'] );
 
-		$this->assertEquals( 5, sizeof( $data['grades'] ) );
+		$this->assertEquals( 5, count( $data['grades'] ) );
 
 		$this->assertEquals( 'A', $data['grades'][0]['text'] );
 		$this->assertEquals( '90', $data['grades'][0]['value'] );
@@ -1477,22 +1478,22 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( '', $form_data['field'][17] );
 
 		$this->assertTrue( is_array( $form_data['field'][18] ) );
-		$this->assertEquals( 0, sizeof( $form_data['field'][18] ) );
+		$this->assertEquals( 0, count( $form_data['field'][18] ) );
 
 		$this->assertTrue( is_array( $form_data['field'][24] ) );
-		$this->assertEquals( 0, sizeof( $form_data['field'][24] ) );
+		$this->assertEquals( 0, count( $form_data['field'][24] ) );
 
 		$this->assertTrue( is_array( $form_data['field'][42] ) );
-		$this->assertEquals( 0, sizeof( $form_data['field'][42] ) );
+		$this->assertEquals( 0, count( $form_data['field'][42] ) );
 
 		$this->assertTrue( is_array( $form_data['field'][43] ) );
-		$this->assertEquals( 0, sizeof( $form_data['field'][43] ) );
+		$this->assertEquals( 0, count( $form_data['field'][43] ) );
 
 		$this->assertTrue( is_array( $form_data['field'][78] ) );
-		$this->assertEquals( 0, sizeof( $form_data['field'][78] ) );
+		$this->assertEquals( 0, count( $form_data['field'][78] ) );
 
 		$this->assertTrue( is_array( $form_data['field'][81] ) );
-		$this->assertEquals( 0, sizeof( $form_data['field'][81] ) );
+		$this->assertEquals( 0, count( $form_data['field'][81] ) );
 
 		$this->assertEquals( '', $form_data['field'][22] );
 		$this->assertEquals( '', $form_data['field'][23] );
@@ -1514,14 +1515,14 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$this->assertEquals( '', $form_data['field'][36] );
 
 		$this->assertTrue( is_array( $form_data['field'][38] ) );
-		$this->assertEquals( 0, sizeof( $form_data['field'][38] ) );
+		$this->assertEquals( 0, count( $form_data['field'][38] ) );
 
 		$this->assertEquals( '', $form_data['list'][20] );
 		$this->assertEquals( '', $form_data['list'][21] );
 	}
 
 	/**
-	 * Ensure the Product data calculations are correct when using Euros (or similar comma/decimal swiched currency)
+	 * Ensure the Product data calculations are correct when using Euros (or similar comma/decimal switched currency)
 	 */
 	public function test_euro_product_data() {
 		$json            = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/json/all-form-euro-product-entry.json' ) ), true );
@@ -1564,7 +1565,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$entry['form_id'] = $form_id;
 		$entry_id         = GFAPI::add_entry( $entry );
 
-		$form_data = \GPDFAPI::get_form_data( $entry_id );
+		$form_data = GPDFAPI::get_form_data( $entry_id );
 
 		$this->assertEquals( 1, $form_data['field'][19]['value'] );
 		$this->assertEquals( 'I agree to the privacy policy.', $form_data['field'][19]['label'] );
@@ -1582,7 +1583,7 @@ class Test_Form_Data extends WP_UnitTestCase {
 		$entry['form_id'] = $form_id;
 		$entry_id         = GFAPI::add_entry( $entry );
 
-		$form_data = \GPDFAPI::get_form_data( $entry_id );
+		$form_data = GPDFAPI::get_form_data( $entry_id );
 
 		$this->assertEquals( 'Simon', $form_data['repeater'][999][0][15]['first'] );
 		$this->assertEquals( 'Wiseman', $form_data['repeater'][999][0][15]['last'] );

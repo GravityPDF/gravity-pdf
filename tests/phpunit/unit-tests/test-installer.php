@@ -2,13 +2,11 @@
 
 namespace GFPDF\Tests;
 
-use GFPDF\Controller\Controller_Install;
-use GFPDF\Model\Model_Install;
-use GFPDF\Helper\Helper_Pdf_Queue;
-
-use WP_UnitTestCase;
-
 use Exception;
+use GFPDF\Controller\Controller_Install;
+use GFPDF\Helper\Helper_Pdf_Queue;
+use GFPDF\Model\Model_Install;
+use WP_UnitTestCase;
 
 /**
  * Test Gravity PDF Installer functionality
@@ -29,7 +27,7 @@ class Test_Installer extends WP_UnitTestCase {
 	/**
 	 * Our Controller
 	 *
-	 * @var \GFPDF\Controller\Controller_Install
+	 * @var Controller_Install
 	 *
 	 * @since 4.0
 	 */
@@ -38,7 +36,7 @@ class Test_Installer extends WP_UnitTestCase {
 	/**
 	 * Our Model
 	 *
-	 * @var \GFPDF\Model\Model_Install
+	 * @var Model_Install
 	 *
 	 * @since 4.0
 	 */
@@ -99,7 +97,7 @@ class Test_Installer extends WP_UnitTestCase {
 
 		/* Set up authorized user */
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		$this->assertInternalType( 'integer', $user_id );
+		$this->assertIsInt( $user_id );
 
 		if ( is_multisite() ) {
 			grant_super_admin( $user_id );
@@ -124,8 +122,6 @@ class Test_Installer extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_maybe_uninstall() {
-		global $gfpdf;
-
 		$_POST['gfpdf_uninstall'] = true;
 
 		/* Verify nonce checks work */
@@ -189,7 +185,7 @@ class Test_Installer extends WP_UnitTestCase {
 		/* Remove folder structure */
 		$gfpdf->misc->rmdir( $gfpdf->data->template_location );
 
-		/* Verify folder structure is nonexistant and then create */
+		/* Verify folder structure is nonexistent and then create */
 		$this->assertFileNotExists( $gfpdf->data->template_location );
 		$this->model->create_folder_structures();
 
@@ -290,7 +286,7 @@ class Test_Installer extends WP_UnitTestCase {
 
 		/* Set up authorized user */
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		$this->assertInternalType( 'integer', $user_id );
+		$this->assertIsInt( $user_id );
 
 		if ( is_multisite() ) {
 			grant_super_admin( $user_id );
@@ -332,7 +328,7 @@ class Test_Installer extends WP_UnitTestCase {
 
 		/* Set up authorized user */
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		$this->assertInternalType( 'integer', $user_id );
+		$this->assertIsInt( $user_id );
 
 		if ( is_multisite() ) {
 			grant_super_admin( $user_id );

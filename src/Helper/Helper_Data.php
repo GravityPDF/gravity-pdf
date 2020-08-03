@@ -55,7 +55,7 @@ class Helper_Data {
 	 * PHP Magic Method __set()
 	 * Run when writing data to inaccessible properties
 	 *
-	 * @param string $name  Name of the peroperty being interacted with
+	 * @param string $name  Name of the property being interacted with
 	 * @param mixed  $value Data to assign to the $name property
 	 *
 	 * @since 4.0
@@ -102,7 +102,7 @@ class Helper_Data {
 	 * PHP Magic Method __isset()
 	 * Triggered when isset() or empty() is called on inaccessible properties
 	 *
-	 * @param  string $name Name of the property being interacted with
+	 * @param string $name Name of the property being interacted with
 	 *
 	 * @return boolean       Whether property exists
 	 *
@@ -116,7 +116,7 @@ class Helper_Data {
 	 * PHP Magic Method __isset()
 	 * Triggered when unset() is called on inaccessible properties
 	 *
-	 * @param  string $name Name of the property being interacted with
+	 * @param string $name Name of the property being interacted with
 	 *
 	 * @return void
 	 *
@@ -189,8 +189,8 @@ class Helper_Data {
 	/**
 	 * A key-value array to be used in a localized script call for our Gravity PDF javascript files
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Options $options
-	 * @param \GFPDF\Helper\Helper_Abstract_Form    $gform
+	 * @param Helper_Abstract_Options $options
+	 * @param Helper_Abstract_Form    $gform
 	 *
 	 * @return array
 	 *

@@ -25,8 +25,8 @@ class Helper_Sha256_Url_Signer extends BaseUrlSigner {
 	/**
 	 * Generate a token to identify the secure action.
 	 *
-	 * @param \GFPDF_Vendor\League\Url\UrlImmutable|string $url
-	 * @param string                          $expiration
+	 * @param string $url
+	 * @param string $expiration
 	 *
 	 * @return string
 	 */

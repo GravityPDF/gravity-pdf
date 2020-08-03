@@ -2,16 +2,14 @@
 
 namespace GFPDF\Tests;
 
+use Exception;
 use GFPDF\Controller\Controller_Templates;
 use GFPDF\Model\Model_Templates;
-
-use Upload\Storage\FileSystem;
-use Upload\Exception\UploadException;
-
+use GFPDF_Vendor\Upload\Exception\UploadException;
+use GFPDF_Vendor\Upload\Storage\FileSystem;
+use PHPUnit\Framework\MockObject\MockObject;
 use WP_UnitTestCase;
 use ZipArchive;
-
-use Exception;
 
 /**
  * Test Gravity PDF Templates Functionality
@@ -33,7 +31,7 @@ class Test_Templates extends WP_UnitTestCase {
 	/**
 	 * Our Templates Controller
 	 *
-	 * @var \GFPDF\Controller\Controller_Templates
+	 * @var Controller_Templates
 	 * @since 4.1
 	 */
 	public $controller;
@@ -41,7 +39,7 @@ class Test_Templates extends WP_UnitTestCase {
 	/**
 	 * Our Templates Model
 	 *
-	 * @var \GFPDF\Model\Model_Templates
+	 * @var Model_Templates
 	 * @since 4.1
 	 */
 	public $model;
@@ -66,7 +64,7 @@ class Test_Templates extends WP_UnitTestCase {
 	/**
 	 * Get a stub we can use for testing
 	 *
-	 * @return \PHPUnit_Framework_MockObject_MockObject
+	 * @return MockObject
 	 *
 	 * @since 4.1
 	 */
@@ -76,7 +74,7 @@ class Test_Templates extends WP_UnitTestCase {
 		$storage = new FileSystem( $gfpdf->data->template_tmp_location );
 
 		/* Mock our \Upload\File\isUploadedFile() method */
-		$file = $this->getMockBuilder( '\Upload\File' )
+		$file = $this->getMockBuilder( '\GFPDF_Vendor\Upload\File' )
 					 ->setConstructorArgs( [ 'template', $storage ] )
 					 ->setMethods( [ 'isUploadedFile' ] )
 					 ->getMock();
@@ -176,8 +174,8 @@ class Test_Templates extends WP_UnitTestCase {
 			//do nothing
 		}
 
-		$this->assertNotFalse( strpos( $path, $gfpdf->data->template_tmp_location ) );
-		$this->assertNotFalse( strpos( $path, '.zip' ) );
+		$this->assertStringContainsString( $gfpdf->data->template_tmp_location, $path );
+		$this->assertStringContainsString( '.zip', $path );
 
 		/* Cleanup */
 		@unlink( $test_file );
@@ -188,7 +186,8 @@ class Test_Templates extends WP_UnitTestCase {
 	/**
 	 * Get if we get the expected results
 	 *
-	 * @since        4.1
+	 * @param string $expected
+	 * @param string $zip_path
 	 *
 	 * @since        4.1
 	 *
@@ -305,7 +304,7 @@ class Test_Templates extends WP_UnitTestCase {
 
 		$info = $this->model->get_template_info( $files );
 
-		$this->assertSame( 2, sizeof( $info ) );
+		$this->assertSame( 2, count( $info ) );
 		$this->assertArrayHasKey( 'version', $info[0] );
 		$this->assertArrayHasKey( 'version', $info[1] );
 		$this->assertEquals( 'Zadani', $info[0]['template'] );
@@ -328,7 +327,7 @@ class Test_Templates extends WP_UnitTestCase {
 		$this->assertFileExists( $test_dir . 'test.txt' );
 
 		/* Run our method being tested and check it correctly cleaned up files */
-		$this->cleanup_template_files( substr( $test_dir, 0, -1 ) . '.zip' );
+		$this->cleanup_template_files();
 
 		$this->assertFileNotExists( $test_dir . 'test.txt' );
 		$this->assertFileNotExists( $test_dir );

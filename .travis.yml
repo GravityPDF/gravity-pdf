@@ -67,8 +67,10 @@ install:
       npm run env connect
       if [[ "$INSTALL_COMPOSER" = "2" ]]; then
         npm run env docker-run -- php composer install --no-dev
+        bash ./bin/vendor-prefix.sh
       else
         npm run env docker-run -- php composer install
+        bash ./bin/vendor-prefix.sh
       fi
     fi
 
@@ -80,7 +82,6 @@ jobs:
       env: INSTALL_WORDPRESS=false INSTALL_COMPOSER=1
       script:
         - |
-          npm run lint:php:format &&
           npm run lint:php
 
     - name: PHP Compatibility

@@ -2,12 +2,10 @@
 
 namespace GFPDF\Helper;
 
-use Psr\Log\LoggerInterface;
-
-use GFCommon;
-use GF_Background_Process;
-
 use Exception;
+use GF_Background_Process;
+use GFCommon;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF

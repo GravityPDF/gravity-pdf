@@ -18,29 +18,30 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Allows plugins to use their own update API.
  *
  * @author  Easy Digital Downloads
- * @version 1.6.17
+ * @version 1.7.1
  */
 class EDD_SL_Plugin_Updater {
 
-	private $api_url     = '';
-	private $api_data    = [];
-	private $name        = '';
-	private $slug        = '';
-	private $version     = '';
+	private $api_url = '';
+	private $api_data = [];
+	private $name = '';
+	private $slug = '';
+	private $version = '';
 	private $wp_override = false;
-	private $cache_key   = '';
+	private $cache_key = '';
 
 	private $health_check_timeout = 5;
 
 	/**
 	 * Class constructor.
 	 *
-	 * @uses plugin_basename()
-	 * @uses hook()
-	 *
 	 * @param string $_api_url     The URL pointing to the custom API endpoint.
 	 * @param string $_plugin_file Path to the plugin file.
 	 * @param array  $_api_data    Optional data to send with API calls.
+	 *
+	 * @uses hook()
+	 *
+	 * @uses plugin_basename()
 	 */
 	public function __construct( $_api_url, $_plugin_file, $_api_data = null ) {
 
@@ -60,9 +61,10 @@ class EDD_SL_Plugin_Updater {
 		/**
 		 * Fires after the $edd_plugin_data is setup.
 		 *
+		 * @param array $edd_plugin_data Array of EDD SL plugin data.
+		 *
 		 * @since x.x.x
 		 *
-		 * @param array $edd_plugin_data Array of EDD SL plugin data.
 		 */
 		do_action( 'post_edd_sl_plugin_updater_setup', $edd_plugin_data );
 
@@ -74,9 +76,9 @@ class EDD_SL_Plugin_Updater {
 	/**
 	 * Set up WordPress filters to hook into WP's update process.
 	 *
+	 * @return void
 	 * @uses add_filter()
 	 *
-	 * @return void
 	 */
 	public function init() {
 
@@ -96,11 +98,11 @@ class EDD_SL_Plugin_Updater {
 	 * It is reassembled from parts of the native WordPress plugin update code.
 	 * See wp-includes/update.php line 121 for the original wp_update_plugins() function.
 	 *
-	 * @uses api_request()
-	 *
 	 * @param array $_transient_data Update array build by WordPress.
 	 *
 	 * @return array Modified update array with custom plugin data.
+	 * @uses api_request()
+	 *
 	 */
 	public function check_update( $_transient_data ) {
 
@@ -121,13 +123,7 @@ class EDD_SL_Plugin_Updater {
 		$version_info = $this->get_cached_version_info();
 
 		if ( false === $version_info ) {
-			$version_info = $this->api_request(
-				'plugin_latest_version',
-				[
-					'slug' => $this->slug,
-					'beta' => $this->beta,
-				]
-			);
+			$version_info = $this->api_request( 'plugin_latest_version', [ 'slug' => $this->slug, 'beta' => $this->beta ] );
 
 			$this->set_version_info_cache( $version_info );
 
@@ -135,15 +131,33 @@ class EDD_SL_Plugin_Updater {
 
 		if ( false !== $version_info && is_object( $version_info ) && isset( $version_info->new_version ) ) {
 
+			$no_update = false;
 			if ( version_compare( $this->version, $version_info->new_version, '<' ) ) {
 
 				$_transient_data->response[ $this->name ] = $version_info;
 
+				// Make sure the plugin property is set to the plugin's name/location. See issue 1463 on Software Licensing's GitHub repo.
+				$_transient_data->response[ $this->name ]->plugin = $this->name;
+
+			} else {
+				$no_update              = new stdClass();
+				$no_update->id          = '';
+				$no_update->slug        = $this->slug;
+				$no_update->plugin      = $this->name;
+				$no_update->new_version = $version_info->new_version;
+				$no_update->url         = $version_info->homepage;
+				$no_update->package     = $version_info->package;
+				$no_update->icons       = $version_info->icons;
+				$no_update->banners     = $version_info->banners;
+				$no_update->banners_rtl = [];
 			}
 
 			$_transient_data->last_checked           = time();
 			$_transient_data->checked[ $this->name ] = $this->version;
 
+			if ( $no_update ) {
+				$_transient_data->no_update[ $this->name ] = $no_update;
+			}
 		}
 
 		return $_transient_data;
@@ -185,13 +199,7 @@ class EDD_SL_Plugin_Updater {
 			$version_info = $this->get_cached_version_info();
 
 			if ( false === $version_info ) {
-				$version_info = $this->api_request(
-					'plugin_latest_version',
-					[
-						'slug' => $this->slug,
-						'beta' => $this->beta,
-					]
-				);
+				$version_info = $this->api_request( 'plugin_latest_version', [ 'slug' => $this->slug, 'beta' => $this->beta ] );
 
 				// Since we disabled our filter for the transient, we aren't running our object conversion on banners, sections, or icons. Do this now:
 				if ( isset( $version_info->banners ) && ! is_array( $version_info->banners ) ) {
@@ -206,6 +214,10 @@ class EDD_SL_Plugin_Updater {
 					$version_info->icons = $this->convert_object_to_array( $version_info->icons );
 				}
 
+				if ( isset( $version_info->contributors ) && ! is_array( $version_info->contributors ) ) {
+					$version_info->contributors = $this->convert_object_to_array( $version_info->contributors );
+				}
+
 				$this->set_version_info_cache( $version_info );
 			}
 
@@ -213,14 +225,29 @@ class EDD_SL_Plugin_Updater {
 				return;
 			}
 
+			$no_update = false;
 			if ( version_compare( $this->version, $version_info->new_version, '<' ) ) {
 
 				$update_cache->response[ $this->name ] = $version_info;
 
+			} else {
+				$no_update              = new stdClass();
+				$no_update->id          = '';
+				$no_update->slug        = $this->slug;
+				$no_update->plugin      = $this->name;
+				$no_update->new_version = $version_info->new_version;
+				$no_update->url         = $version_info->homepage;
+				$no_update->package     = $version_info->package;
+				$no_update->icons       = $version_info->icons;
+				$no_update->banners     = $version_info->banners;
+				$no_update->banners_rtl = [];
 			}
 
 			$update_cache->last_checked           = time();
 			$update_cache->checked[ $this->name ] = $this->version;
+			if ( $no_update ) {
+				$update_cache->no_update[ $this->name ] = $no_update;
+			}
 
 			set_site_transient( 'update_plugins', $update_cache );
 
@@ -264,9 +291,7 @@ class EDD_SL_Plugin_Updater {
 				);
 			}
 
-			/* phpcs:disable */
 			do_action( "in_plugin_update_message-{$file}", $plugin, $version_info );
-			/* phpcs:enable */
 
 			echo '</div></td></tr>';
 		}
@@ -275,13 +300,13 @@ class EDD_SL_Plugin_Updater {
 	/**
 	 * Updates information on the "View version x.x details" page with custom data.
 	 *
-	 * @uses api_request()
-	 *
 	 * @param mixed  $_data
 	 * @param string $_action
 	 * @param object $_args
 	 *
 	 * @return object $_data
+	 * @uses api_request()
+	 *
 	 */
 	public function plugins_api_filter( $_data, $_action = '', $_args = null ) {
 
@@ -307,10 +332,8 @@ class EDD_SL_Plugin_Updater {
 			],
 		];
 
-		$cache_key = 'edd_api_request_' . md5( serialize( $this->slug . $this->api_data['license'] . $this->beta ) );
-
 		// Get the transient where we store the api request for this plugin for 24 hours
-		$edd_api_request_transient = $this->get_cached_version_info( $cache_key );
+		$edd_api_request_transient = $this->get_cached_version_info();
 
 		//If we have no transient-saved value, run the API, set a fresh transient with the API value, and return that value too right now.
 		if ( empty( $edd_api_request_transient ) ) {
@@ -318,11 +341,12 @@ class EDD_SL_Plugin_Updater {
 			$api_response = $this->api_request( 'plugin_information', $to_send );
 
 			// Expires in 3 hours
-			$this->set_version_info_cache( $api_response, $cache_key );
+			$this->set_version_info_cache( $api_response );
 
 			if ( false !== $api_response ) {
 				$_data = $api_response;
 			}
+
 		} else {
 			$_data = $edd_api_request_transient;
 		}
@@ -342,6 +366,15 @@ class EDD_SL_Plugin_Updater {
 			$_data->icons = $this->convert_object_to_array( $_data->icons );
 		}
 
+		// Convert contributors into an associative array, since we're getting an object, but Core expects an array.
+		if ( isset( $_data->contributors ) && ! is_array( $_data->contributors ) ) {
+			$_data->contributors = $this->convert_object_to_array( $_data->contributors );
+		}
+
+		if ( ! isset( $_data->plugin ) ) {
+			$_data->plugin = $this->name;
+		}
+
 		return $_data;
 	}
 
@@ -351,16 +384,16 @@ class EDD_SL_Plugin_Updater {
 	 * Some data like sections, banners, and icons are expected to be an associative array, however due to the JSON
 	 * decoding, they are objects. This method allows us to pass in the object and return an associative array.
 	 *
-	 * @since 3.6.5
-	 *
 	 * @param stdClass $data
 	 *
 	 * @return array
+	 * @since 3.6.5
+	 *
 	 */
 	private function convert_object_to_array( $data ) {
 		$new_data = [];
 		foreach ( $data as $key => $value ) {
-			$new_data[ $key ] = $value;
+			$new_data[ $key ] = is_object( $value ) ? $this->convert_object_to_array( $value ) : $value;
 		}
 
 		return $new_data;
@@ -380,6 +413,7 @@ class EDD_SL_Plugin_Updater {
 		if ( strpos( $url, 'https://' ) !== false && strpos( $url, 'edd_action=package_download' ) ) {
 			$args['sslverify'] = $verify_ssl;
 		}
+
 		return $args;
 
 	}
@@ -387,18 +421,20 @@ class EDD_SL_Plugin_Updater {
 	/**
 	 * Calls the API and, if successfull, returns the object delivered by the API.
 	 *
-	 * @uses get_bloginfo()
-	 * @uses wp_remote_post()
-	 * @uses is_wp_error()
-	 *
 	 * @param string $_action The requested action.
 	 * @param array  $_data   Parameters for the API action.
 	 *
 	 * @return false|object
+	 * @uses get_bloginfo()
+	 * @uses wp_remote_post()
+	 * @uses is_wp_error()
+	 *
 	 */
 	private function api_request( $_action, $_data ) {
 
 		global $wp_version, $edd_plugin_url_available;
+
+		$verify_ssl = $this->verify_ssl();
 
 		// Do a quick status check on this domain if we haven't already checked it.
 		$store_hash = md5( $this->api_url );
@@ -413,13 +449,7 @@ class EDD_SL_Plugin_Updater {
 				$edd_plugin_url_available[ $store_hash ] = false;
 			} else {
 				$test_url                                = $scheme . '://' . $host . $port;
-				$response                                = wp_remote_get(
-					$test_url,
-					[
-						'timeout'   => $this->health_check_timeout,
-						'sslverify' => true,
-					]
-				);
+				$response                                = wp_remote_get( $test_url, [ 'timeout' => $this->health_check_timeout, 'sslverify' => $verify_ssl ] );
 				$edd_plugin_url_available[ $store_hash ] = is_wp_error( $response ) ? false : true;
 			}
 		}
@@ -450,15 +480,7 @@ class EDD_SL_Plugin_Updater {
 			'beta'       => ! empty( $data['beta'] ),
 		];
 
-		$verify_ssl = $this->verify_ssl();
-		$request    = wp_remote_post(
-			$this->api_url,
-			[
-				'timeout'   => 15,
-				'sslverify' => $verify_ssl,
-				'body'      => $api_params,
-			]
-		);
+		$request = wp_remote_post( $this->api_url, [ 'timeout' => 15, 'sslverify' => $verify_ssl, 'body' => $api_params ] );
 
 		if ( ! is_wp_error( $request ) ) {
 			$request = json_decode( wp_remote_retrieve_body( $request ) );
@@ -487,6 +509,9 @@ class EDD_SL_Plugin_Updater {
 		return $request;
 	}
 
+	/**
+	 * If available, show the changelog for sites in a multisite install.
+	 */
 	public function show_changelog() {
 
 		global $edd_plugin_data;
@@ -508,9 +533,7 @@ class EDD_SL_Plugin_Updater {
 		}
 
 		$data         = $edd_plugin_data[ $_REQUEST['slug'] ];
-		$beta         = ! empty( $data['beta'] ) ? true : false;
-		$cache_key    = md5( 'edd_plugin_' . sanitize_key( $_REQUEST['plugin'] ) . '_' . $beta . '_version_info' );
-		$version_info = $this->get_cached_version_info( $cache_key );
+		$version_info = $this->get_cached_version_info();
 
 		if ( false === $version_info ) {
 
@@ -525,14 +548,7 @@ class EDD_SL_Plugin_Updater {
 			];
 
 			$verify_ssl = $this->verify_ssl();
-			$request    = wp_remote_post(
-				$this->api_url,
-				[
-					'timeout'   => 15,
-					'sslverify' => $verify_ssl,
-					'body'      => $api_params,
-				]
-			);
+			$request    = wp_remote_post( $this->api_url, [ 'timeout' => 15, 'sslverify' => $verify_ssl, 'body' => $api_params ] );
 
 			if ( ! is_wp_error( $request ) ) {
 				$version_info = json_decode( wp_remote_retrieve_body( $request ) );
@@ -550,17 +566,29 @@ class EDD_SL_Plugin_Updater {
 				}
 			}
 
-			$this->set_version_info_cache( $version_info, $cache_key );
+			$this->set_version_info_cache( $version_info );
 
+			// Delete the unneeded option
+			delete_option( md5( 'edd_plugin_' . sanitize_key( $_REQUEST['plugin'] ) . '_' . $this->beta . '_version_info' ) );
 		}
 
-		if ( ! empty( $version_info ) && isset( $version_info->sections['changelog'] ) ) {
-			echo '<div style="background:#fff;padding:10px;">' . $version_info->sections['changelog'] . '</div>';
+		if ( isset( $version_info->sections ) ) {
+			$sections = $this->convert_object_to_array( $version_info->sections );
+			if ( ! empty( $sections['changelog'] ) ) {
+				echo '<div style="background:#fff;padding:10px;">' . wp_kses_post( $sections['changelog'] ) . '</div>';
+			}
 		}
 
 		exit;
 	}
 
+	/**
+	 * Gets the plugin's cached version information from the database.
+	 *
+	 * @param string $cache_key
+	 *
+	 * @return boolean|string
+	 */
 	public function get_cached_version_info( $cache_key = '' ) {
 
 		if ( empty( $cache_key ) ) {
@@ -583,6 +611,12 @@ class EDD_SL_Plugin_Updater {
 
 	}
 
+	/**
+	 * Adds the plugin version information to the database.
+	 *
+	 * @param string $value
+	 * @param string $cache_key
+	 */
 	public function set_version_info_cache( $value = '', $cache_key = '' ) {
 
 		if ( empty( $cache_key ) ) {
@@ -596,13 +630,15 @@ class EDD_SL_Plugin_Updater {
 
 		update_option( $cache_key, $data, 'no' );
 
+		// Delete the duplicate option
+		delete_option( 'edd_api_request_' . md5( serialize( $this->slug . $this->api_data['license'] . $this->beta ) ) );
 	}
 
 	/**
 	 * Returns if the SSL of the store should be verified.
 	 *
-	 * @since  1.6.13
 	 * @return bool
+	 * @since  1.6.13
 	 */
 	private function verify_ssl() {
 		return (bool) apply_filters( 'edd_sl_api_request_verify_ssl', true, $this );

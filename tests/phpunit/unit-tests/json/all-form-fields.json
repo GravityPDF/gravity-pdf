@@ -1,1 +1,3089 @@
-{"title":"ALL FIELDS","description":"This is the form description...","labelPlacement":"top_label","descriptionPlacement":"below","button":{"type":"text","text":"Submit","imageUrl":""},"fields":[{"type":"text","id":1,"label":"Single Line Text","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"formId":58,"pageNumber":1,"choices":"","conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"description":"This is the single line text description","cssClass":"exclude","inputType":""},{"type":"textarea","id":2,"label":"Paragraph Text","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"formId":58,"pageNumber":1,"choices":"","conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"description":"This is the paragraph text description","inputType":""},{"type":"select","id":3,"label":"Drop Down","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"choices":[{"text":"Option 1","value":"Option 1","isSelected":false,"price":""},{"text":"Option 2","value":"Option 2","isSelected":true,"price":""},{"text":"Option 3","value":"Option 3 Value","isSelected":false,"price":""}],"formId":58,"pageNumber":1,"conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"description":"This is the drop down description","inputType":""},{"type":"multiselect","id":4,"label":"Multi Select Box","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"choices":[{"text":"First Choice","value":"First Choice","isSelected":false,"price":""},{"text":"Multi Select Second Choice","value":"Second Choice","isSelected":false,"price":""},{"text":"Third Choice","value":"Third Choice","isSelected":false,"price":""}],"formId":58,"pageNumber":1,"conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"description":"This is the multi select box description","inputType":""},{"type":"number","id":5,"label":"Number","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"numberFormat":"decimal_dot","formId":58,"pageNumber":1,"choices":"","conditionalLogic":"","displayOnly":"","inputType":""},{"type":"checkbox","id":6,"label":"Checkbox","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","choices":[{"text":"Checkbox Choice 1","value":"Checkbox Choice 1","isSelected":false,"price":""},{"text":"Checkbox Choice 2 Text","value":"Checkbox Choice 2","isSelected":false,"price":""},{"text":"Checkbox Choice 3 Text","value":"Checkbox Choice 3","isSelected":false,"price":""}],"inputs":[{"id":"6.1","label":"Checkbox Choice 1","name":""},{"id":"6.2","label":"Checkbox Choice 2","name":""},{"id":"6.3","label":"Checkbox Choice 3","name":""}],"formId":58,"pageNumber":1,"conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"description":"Checkbox description"},{"type":"radio","id":7,"label":"Radio Button","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"choices":[{"text":"Radio First Choice","value":"Radio First Choice","isSelected":false,"price":""},{"text":"Radio Second Choice Name","value":"Radio Second Choice","isSelected":false,"price":""},{"text":"Radio Third Choice","value":"Radio Third Choice","isSelected":false,"price":""}],"formId":58,"pageNumber":1,"conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"description":"Radio button description","enableOtherChoice":true},{"type":"hidden","id":8,"label":"Hidden Field","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"formId":58,"pageNumber":1,"choices":"","conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"defaultValue":"hidden field value"},{"type":"html","id":9,"label":"HTML Block","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"displayOnly":true,"formId":58,"pageNumber":1,"choices":"","conditionalLogic":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"content":"This is a HTML block"},{"type":"section","id":10,"label":"Section Break","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"displayOnly":true,"formId":58,"pageNumber":1,"choices":"","conditionalLogic":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"description":"Section Break Description"},{"type":"name","id":11,"label":"Name","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","nameFormat":"advanced","inputs":[{"id":"11.2","label":"Prefix","name":"","choices":[{"text":"Mr.","value":"Mr.","isSelected":false,"price":""},{"text":"Mrs.","value":"Mrs.","isSelected":false,"price":""},{"text":"Miss","value":"Miss","isSelected":false,"price":""},{"text":"Ms.","value":"Ms.","isSelected":false,"price":""},{"text":"Dr.","value":"Dr.","isSelected":false,"price":""},{"text":"Prof.","value":"Prof.","isSelected":false,"price":""},{"text":"Rev.","value":"Rev.","isSelected":false,"price":""}],"isHidden":false,"inputType":"radio"},{"id":"11.3","label":"First","name":""},{"id":"11.4","label":"Middle","name":"","isHidden":false},{"id":"11.6","label":"Last","name":""},{"id":"11.8","label":"Suffix","name":"","isHidden":false}],"formId":58,"pageNumber":1,"choices":"","conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"description":"Name Description"},{"type":"date","id":12,"label":"Date","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"formId":58,"pageNumber":1,"choices":"","conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","dateType":"datepicker","calendarIconType":"none","calendarIconUrl":"","allowsPrepopulate":false,"description":"Date Description","dateFormat":"dmy"},{"type":"time","id":13,"label":"Time","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":[{"id":"13.1","label":"HH","name":""},{"id":"13.2","label":"MM","name":""},{"id":"13.3","label":"AM/PM","name":""}],"formId":58,"pageNumber":1,"choices":"","conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"timeFormat":"12"},{"type":"phone","id":14,"label":"Phone","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"phoneFormat":"standard","formId":58,"pageNumber":1,"choices":"","conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false},{"type":"address","id":15,"label":"Address","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":[{"id":15.1,"label":"Street Address","name":""},{"id":15.2,"label":"Address Line 2","name":""},{"id":15.3,"label":"City","name":""},{"id":15.4,"label":"State / Province","name":""},{"id":15.5,"label":"ZIP / Postal Code","name":""},{"id":15.6,"label":"Country","name":""}],"formId":58,"pageNumber":1,"choices":"","conditionalLogic":"","displayOnly":""},{"type":"website","id":16,"label":"Website","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"formId":58,"pageNumber":1,"choices":"","conditionalLogic":"","displayOnly":""},{"type":"email","id":17,"label":"Email","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"formId":58,"pageNumber":1,"choices":"","conditionalLogic":"","displayOnly":""},{"type":"fileupload","id":18,"label":"File","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"formId":58,"pageNumber":1,"choices":"","conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false},{"type":"fileupload","id":19,"label":"File","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"formId":58,"pageNumber":1,"choices":"","conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":true,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"inputType":"","defaultValue":"","description":""},{"type":"list","id":20,"label":"Basic List","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"formId":58,"pageNumber":1,"choices":"","conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false},{"type":"list","id":21,"label":"Extended List","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"formId":58,"pageNumber":1,"choices":[{"text":"Column 1","value":"Column 1","isSelected":false,"price":""},{"text":"Column 2","value":"Column 2","isSelected":false,"price":""},{"text":"Column 3","value":"Column 3","isSelected":false,"price":""}],"conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"enableColumns":true},{"type":"poll","id":22,"label":"Poll Field - Drop Down","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"poll_field_type":"select","inputType":"select","enableChoiceValue":true,"enablePrice":false,"enableRandomizeChoices":false,"choices":[{"text":"Poll Dropdown - First Choice","value":"gpoll22daaa4947","isSelected":false,"price":""},{"text":"Poll Dropdown - Second Choice","value":"gpoll220a301dd5","isSelected":false,"price":""},{"text":"Poll Dropdown - Third Choice","value":"gpoll22175a8601","isSelected":false,"price":""}],"formId":58,"pageNumber":1,"conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"defaultValue":"","description":""},{"type":"poll","id":23,"label":"Poll Field - Radio Buttons","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"poll_field_type":"radio","inputType":"radio","enableChoiceValue":true,"enablePrice":false,"enableRandomizeChoices":false,"choices":[{"text":"Poll Radio - First Choice","value":"gpoll23517d6a14","isSelected":false,"price":""},{"text":"Poll Radio - Second Choice","value":"gpoll23ee2a7382","isSelected":false,"price":""},{"text":"Poll Radio - Third Choice","value":"gpoll232553ed18","isSelected":false,"price":""}],"formId":58,"pageNumber":1,"conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false},{"type":"poll","id":41,"label":"Poll Field - Checkboxes","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":[{"id":"41.1","label":"Poll Check First Choice","name":""},{"id":"41.2","label":"Poll Check Second Choice","name":""},{"id":"41.3","label":"Poll Check Third Choice","name":""}],"poll_field_type":"checkbox","inputType":"checkbox","enableChoiceValue":true,"enablePrice":false,"enableRandomizeChoices":false,"choices":[{"text":"Poll Check First Choice","value":"gpoll23517d6a14","isSelected":false,"price":""},{"text":"Poll Check Second Choice","value":"gpoll23ee2a7382","isSelected":false,"price":""},{"text":"Poll Check Third Choice","value":"gpoll232553ed18","isSelected":false,"price":""}],"formId":58,"pageNumber":1,"conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"defaultValue":"","description":""},{"type":"quiz","id":24,"label":"Quiz Dropdown","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"gquizFieldType":"select","inputType":"select","enableChoiceValue":true,"enablePrice":false,"gquizEnableRandomizeQuizChoices":false,"gquizShowAnswerExplanation":false,"gquizAnswerExplanation":"","gquizWeightedScoreEnabled":true,"choices":[{"text":"Quiz Dropdown - First Choice","value":"gquiz24c91cc7af","isSelected":false,"price":"","gquizIsCorrect":true,"gquizWeight":"3"},{"text":"Quiz Dropdown - Second Choice","value":"gquiz240836e68a","isSelected":false,"price":"","gquizIsCorrect":false,"gquizWeight":"2"},{"text":"Quiz Dropdown - Third Choice","value":"gquiz24a1a78951","isSelected":false,"price":"","gquizIsCorrect":false,"gquizWeight":"1"}],"formId":58,"pageNumber":1,"conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"defaultValue":"","description":""},{"type":"quiz","id":42,"label":"Quiz Radio","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"gquizFieldType":"radio","inputType":"radio","enableChoiceValue":true,"enablePrice":false,"gquizEnableRandomizeQuizChoices":false,"gquizShowAnswerExplanation":false,"gquizAnswerExplanation":"","gquizWeightedScoreEnabled":false,"choices":[{"text":"Quiz Radio - First Choice","value":"gquiz24c91cc7af","isSelected":false,"price":"","gquizIsCorrect":false,"gquizWeight":"0"},{"text":"Quiz Radio - Second Choice","value":"gquiz240836e68a","isSelected":false,"price":"","gquizIsCorrect":true,"gquizWeight":"0"},{"text":"Quiz Radio - Third Choice","value":"gquiz24a1a78951","isSelected":false,"price":"","gquizIsCorrect":false,"gquizWeight":"0"}],"formId":58,"pageNumber":1,"conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"defaultValue":"","description":""},{"type":"quiz","id":43,"label":"Quiz Checkbox","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":[{"id":"43.1","label":"Quiz Checkbox - First Choice","name":""},{"id":"43.2","label":"Quiz Checkbox - Second Choice","name":""},{"id":"43.3","label":"Quiz Checkbox - Third Choice","name":""}],"gquizFieldType":"checkbox","inputType":"checkbox","enableChoiceValue":true,"enablePrice":false,"gquizEnableRandomizeQuizChoices":false,"gquizShowAnswerExplanation":false,"gquizAnswerExplanation":"","gquizWeightedScoreEnabled":false,"choices":[{"text":"Quiz Checkbox - First Choice","value":"gquiz24c91cc7af","isSelected":false,"price":"","gquizIsCorrect":false,"gquizWeight":"0"},{"text":"Quiz Checkbox - Second Choice","value":"gquiz240836e68a","isSelected":false,"price":"","gquizIsCorrect":true,"gquizWeight":"0"},{"text":"Quiz Checkbox - Third Choice","value":"gquiz24a1a78951","isSelected":false,"price":"","gquizIsCorrect":true,"gquizWeight":"0"}],"formId":58,"pageNumber":1,"conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"defaultValue":"","description":""},{"id":25,"label":"Signature","adminLabel":"","type":"signature","isRequired":false,"size":"medium","errorMessage":"","formId":58,"pageNumber":1,"choices":"","inputs":"","conditionalLogic":"","displayOnly":""},{"id":26,"label":"Likert Survey Field","adminLabel":"","type":"survey","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"enableChoiceValue":true,"enablePrice":false,"gsurveyLikertEnableMultipleRows":false,"gsurveyLikertEnableScoring":false,"choices":[{"text":"Strongly disagree","value":"glikertcol2636762f85","isSelected":false,"score":1},{"text":"Disagree","value":"glikertcol26a40c345c","isSelected":false,"score":2},{"text":"Neutral","value":"glikertcol26114a03dd","isSelected":false,"score":3},{"text":"Agree","value":"glikertcol26d3452ed6","isSelected":false,"score":4},{"text":"Strongly agree","value":"glikertcol2648e6c579","isSelected":false,"score":5}],"gsurveyLikertRows":[{"text":"First row","value":"glikertrowd6ee998c"},{"text":"Second row","value":"glikertrow3ba9477d"},{"text":"Third row","value":"glikertrowbfdd8b2d"},{"text":"Fourth row","value":"glikertrowb042f1a8"},{"text":"Fifth row","value":"glikertrow4770db3e"}],"inputType":"likert","formId":58,"pageNumber":1,"conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false},{"id":27,"label":"Likert Survey Field Extended","adminLabel":"","type":"survey","isRequired":false,"size":"medium","errorMessage":"","inputs":[{"id":"27.1","label":"First row","name":"glikertrowb9cfdef9"},{"id":"27.2","label":"Second row","name":"glikertrow5b6e1800"},{"id":"27.3","label":"Third row","name":"glikertrowa5b5f578"},{"id":"27.4","label":"Fourth row","name":"glikertrow27a6d5ef"},{"id":"27.5","label":"Fifth row","name":"glikertrowd17a261b"}],"enableChoiceValue":true,"enablePrice":false,"gsurveyLikertEnableMultipleRows":true,"gsurveyLikertEnableScoring":false,"choices":[{"text":"Strongly disagree","value":"glikertcol27573469fe","isSelected":false,"score":1},{"text":"Disagree","value":"glikertcol27114a23c1","isSelected":false,"score":2},{"text":"Neutral","value":"glikertcol27c274ea49","isSelected":false,"score":3},{"text":"Agree","value":"glikertcol27cb066f8a","isSelected":false,"score":4},{"text":"Strongly agree","value":"glikertcol275bb3ab84","isSelected":false,"score":5}],"gsurveyLikertRows":[{"text":"First row","value":"glikertrowb9cfdef9"},{"text":"Second row","value":"glikertrow5b6e1800"},{"text":"Third row","value":"glikertrowa5b5f578"},{"text":"Fourth row","value":"glikertrow27a6d5ef"},{"text":"Fifth row","value":"glikertrowd17a261b"}],"inputType":"likert","formId":58,"pageNumber":1,"conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false},{"id":44,"label":"Rank Survey Field","adminLabel":"","type":"survey","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"enableChoiceValue":true,"enablePrice":false,"gsurveyLikertEnableMultipleRows":false,"gsurveyLikertEnableScoring":false,"choices":[{"text":"Rank First Choice","value":"grank44ef548e7b","isSelected":false,"price":""},{"text":"Rank Second Choice","value":"grank440c3f3227","isSelected":false,"price":""},{"text":"Rank Third Choice","value":"grank444f7bdfe0","isSelected":false,"price":""},{"text":"Rank Fourth Choce","value":"grank44902be0db","isSelected":false,"price":""},{"text":"Rank Fifth Choice","value":"grank447f27daf1","isSelected":false,"price":""}],"gsurveyLikertRows":[{"text":"First row","value":"glikertrow2471ee53"},{"text":"Second row","value":"glikertrow5ccf6d45"},{"text":"Third row","value":"glikertrow4ec600ab"},{"text":"Fourth row","value":"glikertrowa520c792"},{"text":"Fifth row","value":"glikertrow04dbdbf7"}],"inputType":"rank","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"defaultValue":"","description":"","formId":58,"pageNumber":1,"conditionalLogic":"","displayOnly":""},{"id":45,"label":"Rating Survey Field","adminLabel":"","type":"survey","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"enableChoiceValue":true,"enablePrice":false,"gsurveyLikertEnableMultipleRows":false,"gsurveyLikertEnableScoring":false,"choices":[{"text":"Terrible","value":"grating45ed195d17","isSelected":false,"price":""},{"text":"Not so great","value":"grating4594b2edee","isSelected":false,"price":""},{"text":"Neutral","value":"grating4506fdbb76","isSelected":false,"price":""},{"text":"Pretty good","value":"grating45c8a62ee6","isSelected":false,"price":""},{"text":"Excellent","value":"grating4581a9f8d2","isSelected":false,"price":""}],"gsurveyLikertRows":[{"text":"First row","value":"glikertrow2471ee53"},{"text":"Second row","value":"glikertrow5ccf6d45"},{"text":"Third row","value":"glikertrow4ec600ab"},{"text":"Fourth row","value":"glikertrowa520c792"},{"text":"Fifth row","value":"glikertrow04dbdbf7"}],"inputType":"rating","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"defaultValue":"","description":"","reversed":true,"formId":58,"pageNumber":1,"conditionalLogic":"","displayOnly":""},{"type":"survey","id":46,"label":"Radio Survey Field","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"enableChoiceValue":true,"enablePrice":false,"gsurveyLikertEnableMultipleRows":false,"gsurveyLikertEnableScoring":false,"choices":[{"text":"Survay Radio - First Choice","value":"gsurvey46baa416f0","isSelected":false,"price":""},{"text":"Survay Radio - Second Choice","value":"gsurvey4603c12a75","isSelected":false,"price":""},{"text":"Survay Radio - Third Choice","value":"gsurvey4641726850","isSelected":false,"price":""}],"gsurveyLikertRows":[{"text":"First row","value":"glikertrow2471ee53"},{"text":"Second row","value":"glikertrow5ccf6d45"},{"text":"Third row","value":"glikertrow4ec600ab"},{"text":"Fourth row","value":"glikertrowa520c792"},{"text":"Fifth row","value":"glikertrow04dbdbf7"}],"inputType":"radio","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"defaultValue":"","description":"","reversed":true,"formId":58,"pageNumber":1,"conditionalLogic":"","displayOnly":""},{"type":"survey","id":47,"label":"Checkbox Survey Field","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":[{"id":"47.1","label":"Check - First Choice","name":""},{"id":"47.2","label":"Check - Second Choice","name":""},{"id":"47.3","label":"Check - Third Choice","name":""}],"enableChoiceValue":true,"enablePrice":false,"gsurveyLikertEnableMultipleRows":false,"gsurveyLikertEnableScoring":false,"choices":[{"text":"Check - First Choice","value":"gsurvey47526e8c41","isSelected":false,"price":""},{"text":"Check - Second Choice","value":"gsurvey47b70bdcfd","isSelected":false,"price":""},{"text":"Check - Third Choice","value":"gsurvey47faae3091","isSelected":false,"price":""}],"gsurveyLikertRows":[{"text":"First row","value":"glikertrow2471ee53"},{"text":"Second row","value":"glikertrow5ccf6d45"},{"text":"Third row","value":"glikertrow4ec600ab"},{"text":"Fourth row","value":"glikertrowa520c792"},{"text":"Fifth row","value":"glikertrow04dbdbf7"}],"inputType":"checkbox","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"defaultValue":"","description":"","reversed":true,"formId":58,"pageNumber":1,"conditionalLogic":"","displayOnly":""},{"type":"survey","id":48,"label":"Single Line Survey Field","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"enableChoiceValue":true,"enablePrice":false,"gsurveyLikertEnableMultipleRows":false,"gsurveyLikertEnableScoring":false,"choices":null,"gsurveyLikertRows":[{"text":"First row","value":"glikertrow2471ee53"},{"text":"Second row","value":"glikertrow5ccf6d45"},{"text":"Third row","value":"glikertrow4ec600ab"},{"text":"Fourth row","value":"glikertrowa520c792"},{"text":"Fifth row","value":"glikertrow04dbdbf7"}],"inputType":"text","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"defaultValue":"","description":"","reversed":true,"customFieldTemplate":"","customFieldTemplateEnabled":false,"formId":58,"pageNumber":1,"conditionalLogic":"","displayOnly":""},{"type":"survey","id":49,"label":"Paragraph Survey Field","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"enableChoiceValue":true,"enablePrice":false,"gsurveyLikertEnableMultipleRows":false,"gsurveyLikertEnableScoring":false,"choices":null,"gsurveyLikertRows":[{"text":"First row","value":"glikertrow2471ee53"},{"text":"Second row","value":"glikertrow5ccf6d45"},{"text":"Third row","value":"glikertrow4ec600ab"},{"text":"Fourth row","value":"glikertrowa520c792"},{"text":"Fifth row","value":"glikertrow04dbdbf7"}],"inputType":"textarea","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"defaultValue":"","description":"","reversed":true,"customFieldTemplate":"","customFieldTemplateEnabled":false,"formId":58,"pageNumber":1,"conditionalLogic":"","displayOnly":""},{"type":"survey","id":50,"label":"DropDown Survey Field","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"enableChoiceValue":true,"enablePrice":false,"gsurveyLikertEnableMultipleRows":false,"gsurveyLikertEnableScoring":false,"choices":[{"text":"DropDown - First Choice","value":"gsurvey50e71aa478","isSelected":false,"price":""},{"text":"DropDown - Second Choice","value":"gsurvey50792465b4","isSelected":false,"price":""},{"text":"DropDown - Third Choice","value":"gsurvey50d4b6b7b1","isSelected":false,"price":""}],"gsurveyLikertRows":[{"text":"First row","value":"glikertrow2471ee53"},{"text":"Second row","value":"glikertrow5ccf6d45"},{"text":"Third row","value":"glikertrow4ec600ab"},{"text":"Fourth row","value":"glikertrowa520c792"},{"text":"Fifth row","value":"glikertrow04dbdbf7"}],"inputType":"select","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"defaultValue":"","description":"","reversed":true,"customFieldTemplate":"","customFieldTemplateEnabled":false,"formId":58,"pageNumber":1,"conditionalLogic":"","displayOnly":""},{"type":"post_title","id":28,"label":"Post Title","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"formId":58,"pageNumber":1,"choices":"","conditionalLogic":"","displayOnly":""},{"type":"post_excerpt","id":29,"label":"Post Excerpt","adminLabel":"","isRequired":false,"size":"small","errorMessage":"","inputs":null,"formId":58,"pageNumber":1,"choices":"","conditionalLogic":"","displayOnly":""},{"type":"post_tags","id":30,"label":"Post Tags","adminLabel":"","isRequired":false,"size":"large","errorMessage":"","inputs":null,"formId":58,"pageNumber":1,"choices":"","conditionalLogic":"","displayOnly":""},{"type":"post_category","id":31,"label":"Post Category","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"choices":[],"displayAllCategories":true,"inputType":"select","formId":58,"pageNumber":1,"conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false},{"type":"post_image","id":32,"label":"Post Image","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"allowedExtensions":"jpg, jpeg, png, gif","formId":58,"pageNumber":1,"choices":"","conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"displayTitle":true,"displayCaption":true,"displayDescription":true},{"type":"post_custom_field","id":33,"label":"Post Custom Field","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"inputType":"text","formId":58,"pageNumber":1,"choices":"","conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"postCustomFieldName":"Payer first name","customFieldTemplate":"","customFieldTemplateEnabled":false},{"type":"product","id":34,"label":"Product Basic","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":[{"id":34.1,"label":"Name","name":""},{"id":34.2,"label":"Price","name":""},{"id":34.3,"label":"Quantity","name":""}],"inputType":"singleproduct","enablePrice":null,"formId":58,"pageNumber":1,"choices":"","conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","basePrice":"$30.00","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false},{"type":"product","id":35,"label":"Product Name - Drop Down","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"inputType":"select","enablePrice":true,"formId":58,"pageNumber":1,"choices":[{"text":"DD - First Choice","value":"DD - First Choice","isSelected":false,"price":"$5.00"},{"text":"DD - Second Choice","value":"DD - Second Choice","isSelected":false,"price":"$10.00"},{"text":"DD - Third Choice","value":"DD - Third Choice","isSelected":false,"price":"$15.00"}],"conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","basePrice":"$0.00","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"defaultValue":"","description":""},{"type":"product","id":51,"label":"Product Name - Radio Buttons","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"inputType":"radio","enablePrice":true,"formId":58,"pageNumber":1,"choices":[{"text":"Radio - First Choice","value":"Radio - First Choice","isSelected":false,"price":"$5.00"},{"text":"Radio - Second Choice","value":"Radio - Second Choice","isSelected":false,"price":"$10.00"},{"text":"Radio - Third Choice","value":"Radio - Third Choice","isSelected":false,"price":"$15.00"}],"conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","basePrice":"$0.00","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"defaultValue":"","description":""},{"type":"product","id":52,"label":"User Defined Price","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"inputType":"price","enablePrice":null,"formId":58,"pageNumber":1,"choices":[{"text":"Radio - First Choice","value":"Radio - First Choice","isSelected":false,"price":"$5.00"},{"text":"Radio - Second Choice","value":"Radio - Second Choice","isSelected":false,"price":"$10.00"},{"text":"Radio - Third Choice","value":"Radio - Third Choice","isSelected":false,"price":"$15.00"}],"conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","basePrice":"$0.00","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"defaultValue":"","description":""},{"type":"product","id":53,"label":"Hidden Price","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":[{"id":53.1,"label":"Name","name":""},{"id":53.2,"label":"Price","name":""},{"id":53.3,"label":"Quantity","name":""}],"inputType":"hiddenproduct","enablePrice":null,"formId":58,"pageNumber":1,"choices":[{"text":"Radio - First Choice","value":"Radio - First Choice","isSelected":false,"price":"$5.00"},{"text":"Radio - Second Choice","value":"Radio - Second Choice","isSelected":false,"price":"$10.00"},{"text":"Radio - Third Choice","value":"Radio - Third Choice","isSelected":false,"price":"$15.00"}],"conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","basePrice":"$50.00","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"defaultValue":"","description":""},{"type":"product","id":54,"label":"Calculation Price","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":[{"id":54.1,"label":"Name","name":""},{"id":54.2,"label":"Price","name":""},{"id":54.3,"label":"Quantity","name":""}],"inputType":"calculation","enablePrice":null,"formId":58,"pageNumber":1,"choices":[{"text":"Radio - First Choice","value":"Radio - First Choice","isSelected":false,"price":"$5.00"},{"text":"Radio - Second Choice","value":"Radio - Second Choice","isSelected":false,"price":"$10.00"},{"text":"Radio - Third Choice","value":"Radio - Third Choice","isSelected":false,"price":"$15.00"}],"conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"20 + 20","calculationRounding":"","enableCalculation":true,"basePrice":"$0.00","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"defaultValue":"","description":""},{"type":"quantity","id":36,"label":"Quantity Field for Hidden Price","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputType":"number","productField":"53","numberFormat":"decimal_dot","formId":58,"pageNumber":1,"choices":"","inputs":"","conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false},{"type":"option","id":37,"label":"Product Options for Basic Product","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputType":"select","choices":[{"text":"Option 1","value":"Option 1","isSelected":false,"price":"$20.00"},{"text":"Option 2","value":"Option 2","isSelected":false,"price":"$30.00"},{"text":"Option 3","value":"Option 3","isSelected":false,"price":"$40.00"}],"enablePrice":true,"productField":34,"formId":58,"pageNumber":1,"inputs":"","conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false},{"type":"option","id":38,"label":"Option for Calculation Price","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputType":"checkbox","choices":[{"text":"Cal - Option 1","value":"Cal - Option 1","isSelected":false,"price":"$7.95"},{"text":"Cal - Option 2","value":"Cal - Option 2","isSelected":false,"price":"$12.10"},{"text":"Cal - Option 3","value":"Cal - Option 3","isSelected":false,"price":"$9.05"}],"enablePrice":true,"productField":"54","formId":58,"pageNumber":1,"inputs":[{"id":"38.1","label":"Cal - Option 1","name":""},{"id":"38.2","label":"Cal - Option 2","name":""},{"id":"38.3","label":"Cal - Option 3","name":""}],"conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"defaultValue":"","description":""},{"type":"shipping","id":39,"label":"Shipping","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"inputType":"select","enablePrice":true,"formId":58,"pageNumber":1,"choices":[{"text":"Express","value":"Express","isSelected":false,"price":"$20.00"},{"text":"Regular","value":"Regular","isSelected":false,"price":"$30.00"}],"conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","basePrice":"$0.00","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"defaultValue":"","description":""},{"type":"total","id":40,"label":"Total","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"formId":58,"pageNumber":1,"choices":"","conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false},{"type":"post_custom_field","id":78,"label":"Post Custom Field","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"inputType":"fileupload","formId":58,"choices":[{"text":"First Choice","value":"First Choice","isSelected":false,"price":""},{"text":"Second Choice","value":"Second Choice","isSelected":false,"price":""},{"text":"Third Choice","value":"Third Choice","isSelected":false,"price":""}],"conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"postCustomFieldName":"Payer first name","customFieldTemplate":"","customFieldTemplateEnabled":false,"defaultValue":"","description":"","numberFormat":"decimal_dot","calendarIconUrl":"","phoneFormat":"standard"},{"type":"post_custom_field","id":81,"label":"Post Custom Field","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","inputs":null,"inputType":"fileupload","formId":58,"choices":[{"text":"First Choice","value":"First Choice","isSelected":false,"price":""},{"text":"Second Choice","value":"Second Choice","isSelected":false,"price":""},{"text":"Third Choice","value":"Third Choice","isSelected":false,"price":""}],"conditionalLogic":"","displayOnly":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","multipleFiles":true,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"inputMask":false,"inputMaskValue":"","allowsPrepopulate":false,"postCustomFieldName":"Payer first name","customFieldTemplate":"","customFieldTemplateEnabled":false,"defaultValue":"","description":"","numberFormat":"decimal_dot","calendarIconUrl":"","phoneFormat":"standard"}],"id":58,"subLabelPlacement":"below","cssClass":"","enableHoneypot":"","enableAnimation":"","save":{"enabled":"","button":{"type":"link","text":"Save and Continue Later"}},"limitEntries":"","limitEntriesCount":"","limitEntriesPeriod":"","limitEntriesMessage":"","scheduleForm":"","scheduleStart":"","scheduleStartHour":"","scheduleStartMinute":"","scheduleStartAmpm":"","scheduleEnd":"","scheduleEndHour":"","scheduleEndMinute":"","scheduleEndAmpm":"","schedulePendingMessage":"","scheduleMessage":"","requireLogin":"","requireLoginMessage":"","useCurrentUserAsAuthor":true,"postContentTemplateEnabled":false,"postTitleTemplateEnabled":false,"postTitleTemplate":"","postContentTemplate":"","lastPageButton":null,"pagination":null,"firstPageCssClass":null,"postAuthor":"3","postCategory":"26","postFormat":"0","postStatus":"draft","gfpdf_form_settings":{"555ad84787d7e":{"name":"My First PDF Template","template":"Gravity Forms Style","notification":["Admin Notification","User Notification"],"filename":"test","conditional":"1","conditionalLogic":{"actionType":"show","logicType":"any","rules":[{"fieldId":"7","operator":"is","value":"Albania"},{"fieldId":"1","operator":"is","value":"5"}]},"pdf_size":"custom","custom_pdf_size":["150","300","millimeters"],"orientation":"landscape","font":"dejavusans","rtl":"No","format":"Standard","security":"Yes","password":"my password","privileges":["copy","print","print-highres","modify","annot-forms","fill-forms","extract","assemble"],"image_dpi":"300","save":"No","id":"555ad84787d7e","active":true},"556690c67856b":{"name":"My First PDF Template (copy)","template":"zadani","filename":"test-{form_id}","notification":["54bca349732b8"],"conditionalLogic":null,"pdf_size":"A4","custom_pdf_size":["150","300","millimeters"],"orientation":"portrait","font":"dejavusans","rtl":"No","format":"Standard","security":"No","password":"my password","privileges":["copy","print","print-highres","modify","annot-forms","fill-forms","extract","assemble"],"image_dpi":"300","save":"Yes","id":"556690c67856b","active":true},"fawf90c678523b":{"name":"My First PDF Template (copy)","template":"Gravity Forms Style","filename":"test-{form_id}","notification":["54bca349732b8"],"conditionalLogic":null,"pdf_size":"A4","custom_pdf_size":["150","300","millimeters"],"orientation":"portrait","font":"dejavusans","rtl":"No","format":"Standard","security":"No","password":"my password","privileges":["copy","print","print-highres","modify","annot-forms","fill-forms","extract","assemble"],"image_dpi":"300","save":"No","id":"fawf90c678523b","active":true},"556690c8d7f82":{"name":"Disable PDF Template","template":"Gravity Forms Style","notification":["Admin Notification","User Notification"],"filename":"test","conditional":"1","conditionalLogic":{"actionType":"show","logicType":"any","rules":[{"fieldId":"7","operator":"is","value":"Albania"},{"fieldId":"1","operator":"is","value":"5"}]},"pdf_size":"custom","custom_pdf_size":["150","300","millimeters"],"orientation":"landscape","font":"dejavusans","rtl":"No","format":"Standard","security":"Yes","password":"my password","privileges":["copy","print","print-highres","modify","annot-forms","fill-forms","extract","assemble"],"image_dpi":"300","save":"No","id":"556690c8d7f82","active":false}},"notifications":{"54bca349732b8":{"id":"54bca349732b8","to":"{admin_email}","name":"Admin Notification","event":"form_submission","toType":"email","subject":"New submission from {form_title}","message":"{all_fields}","isActive":false}},"confirmations":{"54bca34973cdd":{"id":"54bca34973cdd","name":"Default Confirmation","isDefault":true,"type":"message","message":"Thanks for contacting us! We will get in touch with you shortly.","url":"","pageId":"","queryString":""}},"gravityformsquiz":{"shuffleFields":"0","instantFeedback":"0","grades":[{"text":"A","value":90},{"text":"B","value":80},{"text":"C","value":70},{"text":"D","value":60},{"text":"E","value":0}],"grading":"letter","passPercent":"50","passfailDisplayConfirmation":"1","passConfirmationMessage":"<strong>Quiz Results:</strong> You Passed!\\n<strong>Score:</strong> {quiz_score}\\n<strong>Percentage:</strong> {quiz_percent}%","passConfirmationDisableAutoformat":"0","failConfirmationMessage":"<strong>Quiz Results:</strong> You Failed!\\n<strong>Score:</strong> {quiz_score}\\n<strong>Percentage:</strong> {quiz_percent}%","failConfirmationDisableAutoformat":"0","letterDisplayConfirmation":"1","letterConfirmationMessage":"<strong>Quiz Grade:</strong> {quiz_grade}\\n<strong>Score:</strong> {quiz_score}\\n<strong>Percentage:</strong> {quiz_percent}%","letterConfirmationDisableAutoformat":"0"},"is_active":"1","date_created":"2015-01-19 06:25:13","is_trash":"0"}
+{
+  "title": "ALL FIELDS",
+  "description": "This is the form description...",
+  "labelPlacement": "top_label",
+  "descriptionPlacement": "below",
+  "button": {
+    "type": "text",
+    "text": "Submit",
+    "imageUrl": ""
+  },
+  "fields": [
+    {
+      "type": "text",
+      "id": 1,
+      "label": "Single Line Text",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "description": "This is the single line text description",
+      "cssClass": "exclude",
+      "inputType": ""
+    },
+    {
+      "type": "textarea",
+      "id": 2,
+      "label": "Paragraph Text",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "description": "This is the paragraph text description",
+      "inputType": ""
+    },
+    {
+      "type": "select",
+      "id": 3,
+      "label": "Drop Down",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "choices": [
+        {
+          "text": "Option 1",
+          "value": "Option 1",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Option 2",
+          "value": "Option 2",
+          "isSelected": true,
+          "price": ""
+        },
+        {
+          "text": "Option 3",
+          "value": "Option 3 Value",
+          "isSelected": false,
+          "price": ""
+        }
+      ],
+      "formId": 58,
+      "pageNumber": 1,
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "description": "This is the drop down description",
+      "inputType": ""
+    },
+    {
+      "type": "multiselect",
+      "id": 4,
+      "label": "Multi Select Box",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "choices": [
+        {
+          "text": "First Choice",
+          "value": "First Choice",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Multi Select Second Choice",
+          "value": "Second Choice",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Third Choice",
+          "value": "Third Choice",
+          "isSelected": false,
+          "price": ""
+        }
+      ],
+      "formId": 58,
+      "pageNumber": 1,
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "description": "This is the multi select box description",
+      "inputType": ""
+    },
+    {
+      "type": "number",
+      "id": 5,
+      "label": "Number",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "numberFormat": "decimal_dot",
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "inputType": ""
+    },
+    {
+      "type": "checkbox",
+      "id": 6,
+      "label": "Checkbox",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "choices": [
+        {
+          "text": "Checkbox Choice 1",
+          "value": "Checkbox Choice 1",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Checkbox Choice 2 Text",
+          "value": "Checkbox Choice 2",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Checkbox Choice 3 Text",
+          "value": "Checkbox Choice 3",
+          "isSelected": false,
+          "price": ""
+        }
+      ],
+      "inputs": [
+        {
+          "id": "6.1",
+          "label": "Checkbox Choice 1",
+          "name": ""
+        },
+        {
+          "id": "6.2",
+          "label": "Checkbox Choice 2",
+          "name": ""
+        },
+        {
+          "id": "6.3",
+          "label": "Checkbox Choice 3",
+          "name": ""
+        }
+      ],
+      "formId": 58,
+      "pageNumber": 1,
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "description": "Checkbox description"
+    },
+    {
+      "type": "radio",
+      "id": 7,
+      "label": "Radio Button",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "choices": [
+        {
+          "text": "Radio First Choice",
+          "value": "Radio First Choice",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Radio Second Choice Name",
+          "value": "Radio Second Choice",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Radio Third Choice",
+          "value": "Radio Third Choice",
+          "isSelected": false,
+          "price": ""
+        }
+      ],
+      "formId": 58,
+      "pageNumber": 1,
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "description": "Radio button description",
+      "enableOtherChoice": true
+    },
+    {
+      "type": "hidden",
+      "id": 8,
+      "label": "Hidden Field",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "defaultValue": "hidden field value"
+    },
+    {
+      "type": "html",
+      "id": 9,
+      "label": "HTML Block",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "displayOnly": true,
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "conditionalLogic": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "content": "This is a HTML block"
+    },
+    {
+      "type": "section",
+      "id": 10,
+      "label": "Section Break",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "displayOnly": true,
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "conditionalLogic": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "description": "Section Break Description"
+    },
+    {
+      "type": "name",
+      "id": 11,
+      "label": "Name",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "nameFormat": "advanced",
+      "inputs": [
+        {
+          "id": "11.2",
+          "label": "Prefix",
+          "name": "",
+          "choices": [
+            {
+              "text": "Mr.",
+              "value": "Mr.",
+              "isSelected": false,
+              "price": ""
+            },
+            {
+              "text": "Mrs.",
+              "value": "Mrs.",
+              "isSelected": false,
+              "price": ""
+            },
+            {
+              "text": "Miss",
+              "value": "Miss",
+              "isSelected": false,
+              "price": ""
+            },
+            {
+              "text": "Ms.",
+              "value": "Ms.",
+              "isSelected": false,
+              "price": ""
+            },
+            {
+              "text": "Dr.",
+              "value": "Dr.",
+              "isSelected": false,
+              "price": ""
+            },
+            {
+              "text": "Prof.",
+              "value": "Prof.",
+              "isSelected": false,
+              "price": ""
+            },
+            {
+              "text": "Rev.",
+              "value": "Rev.",
+              "isSelected": false,
+              "price": ""
+            }
+          ],
+          "isHidden": false,
+          "inputType": "radio"
+        },
+        {
+          "id": "11.3",
+          "label": "First",
+          "name": ""
+        },
+        {
+          "id": "11.4",
+          "label": "Middle",
+          "name": "",
+          "isHidden": false
+        },
+        {
+          "id": "11.6",
+          "label": "Last",
+          "name": ""
+        },
+        {
+          "id": "11.8",
+          "label": "Suffix",
+          "name": "",
+          "isHidden": false
+        }
+      ],
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "description": "Name Description"
+    },
+    {
+      "type": "date",
+      "id": 12,
+      "label": "Date",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "dateType": "datepicker",
+      "calendarIconType": "none",
+      "calendarIconUrl": "",
+      "allowsPrepopulate": false,
+      "description": "Date Description",
+      "dateFormat": "dmy"
+    },
+    {
+      "type": "time",
+      "id": 13,
+      "label": "Time",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": [
+        {
+          "id": "13.1",
+          "label": "HH",
+          "name": ""
+        },
+        {
+          "id": "13.2",
+          "label": "MM",
+          "name": ""
+        },
+        {
+          "id": "13.3",
+          "label": "AM/PM",
+          "name": ""
+        }
+      ],
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "timeFormat": "12"
+    },
+    {
+      "type": "phone",
+      "id": 14,
+      "label": "Phone",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "phoneFormat": "standard",
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false
+    },
+    {
+      "type": "address",
+      "id": 15,
+      "label": "Address",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": [
+        {
+          "id": 15.1,
+          "label": "Street Address",
+          "name": ""
+        },
+        {
+          "id": 15.2,
+          "label": "Address Line 2",
+          "name": ""
+        },
+        {
+          "id": 15.3,
+          "label": "City",
+          "name": ""
+        },
+        {
+          "id": 15.4,
+          "label": "State / Province",
+          "name": ""
+        },
+        {
+          "id": 15.5,
+          "label": "ZIP / Postal Code",
+          "name": ""
+        },
+        {
+          "id": 15.6,
+          "label": "Country",
+          "name": ""
+        }
+      ],
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "conditionalLogic": "",
+      "displayOnly": ""
+    },
+    {
+      "type": "website",
+      "id": 16,
+      "label": "Website",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "conditionalLogic": "",
+      "displayOnly": ""
+    },
+    {
+      "type": "email",
+      "id": 17,
+      "label": "Email",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "conditionalLogic": "",
+      "displayOnly": ""
+    },
+    {
+      "type": "fileupload",
+      "id": 18,
+      "label": "File",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false
+    },
+    {
+      "type": "fileupload",
+      "id": 19,
+      "label": "File",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": true,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "inputType": "",
+      "defaultValue": "",
+      "description": ""
+    },
+    {
+      "type": "list",
+      "id": 20,
+      "label": "Basic List",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false
+    },
+    {
+      "type": "list",
+      "id": 21,
+      "label": "Extended List",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": [
+        {
+          "text": "Column 1",
+          "value": "Column 1",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Column 2",
+          "value": "Column 2",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Column 3",
+          "value": "Column 3",
+          "isSelected": false,
+          "price": ""
+        }
+      ],
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "enableColumns": true
+    },
+    {
+      "type": "poll",
+      "id": 22,
+      "label": "Poll Field - Drop Down",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "poll_field_type": "select",
+      "inputType": "select",
+      "enableChoiceValue": true,
+      "enablePrice": false,
+      "enableRandomizeChoices": false,
+      "choices": [
+        {
+          "text": "Poll Dropdown - First Choice",
+          "value": "gpoll22daaa4947",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Poll Dropdown - Second Choice",
+          "value": "gpoll220a301dd5",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Poll Dropdown - Third Choice",
+          "value": "gpoll22175a8601",
+          "isSelected": false,
+          "price": ""
+        }
+      ],
+      "formId": 58,
+      "pageNumber": 1,
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "defaultValue": "",
+      "description": ""
+    },
+    {
+      "type": "poll",
+      "id": 23,
+      "label": "Poll Field - Radio Buttons",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "poll_field_type": "radio",
+      "inputType": "radio",
+      "enableChoiceValue": true,
+      "enablePrice": false,
+      "enableRandomizeChoices": false,
+      "choices": [
+        {
+          "text": "Poll Radio - First Choice",
+          "value": "gpoll23517d6a14",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Poll Radio - Second Choice",
+          "value": "gpoll23ee2a7382",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Poll Radio - Third Choice",
+          "value": "gpoll232553ed18",
+          "isSelected": false,
+          "price": ""
+        }
+      ],
+      "formId": 58,
+      "pageNumber": 1,
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false
+    },
+    {
+      "type": "poll",
+      "id": 41,
+      "label": "Poll Field - Checkboxes",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": [
+        {
+          "id": "41.1",
+          "label": "Poll Check First Choice",
+          "name": ""
+        },
+        {
+          "id": "41.2",
+          "label": "Poll Check Second Choice",
+          "name": ""
+        },
+        {
+          "id": "41.3",
+          "label": "Poll Check Third Choice",
+          "name": ""
+        }
+      ],
+      "poll_field_type": "checkbox",
+      "inputType": "checkbox",
+      "enableChoiceValue": true,
+      "enablePrice": false,
+      "enableRandomizeChoices": false,
+      "choices": [
+        {
+          "text": "Poll Check First Choice",
+          "value": "gpoll23517d6a14",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Poll Check Second Choice",
+          "value": "gpoll23ee2a7382",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Poll Check Third Choice",
+          "value": "gpoll232553ed18",
+          "isSelected": false,
+          "price": ""
+        }
+      ],
+      "formId": 58,
+      "pageNumber": 1,
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "defaultValue": "",
+      "description": ""
+    },
+    {
+      "type": "quiz",
+      "id": 24,
+      "label": "Quiz Dropdown",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "gquizFieldType": "select",
+      "inputType": "select",
+      "enableChoiceValue": true,
+      "enablePrice": false,
+      "gquizEnableRandomizeQuizChoices": false,
+      "gquizShowAnswerExplanation": false,
+      "gquizAnswerExplanation": "",
+      "gquizWeightedScoreEnabled": true,
+      "choices": [
+        {
+          "text": "Quiz Dropdown - First Choice",
+          "value": "gquiz24c91cc7af",
+          "isSelected": false,
+          "price": "",
+          "gquizIsCorrect": true,
+          "gquizWeight": "3"
+        },
+        {
+          "text": "Quiz Dropdown - Second Choice",
+          "value": "gquiz240836e68a",
+          "isSelected": false,
+          "price": "",
+          "gquizIsCorrect": false,
+          "gquizWeight": "2"
+        },
+        {
+          "text": "Quiz Dropdown - Third Choice",
+          "value": "gquiz24a1a78951",
+          "isSelected": false,
+          "price": "",
+          "gquizIsCorrect": false,
+          "gquizWeight": "1"
+        }
+      ],
+      "formId": 58,
+      "pageNumber": 1,
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "defaultValue": "",
+      "description": ""
+    },
+    {
+      "type": "quiz",
+      "id": 42,
+      "label": "Quiz Radio",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "gquizFieldType": "radio",
+      "inputType": "radio",
+      "enableChoiceValue": true,
+      "enablePrice": false,
+      "gquizEnableRandomizeQuizChoices": false,
+      "gquizShowAnswerExplanation": false,
+      "gquizAnswerExplanation": "",
+      "gquizWeightedScoreEnabled": false,
+      "choices": [
+        {
+          "text": "Quiz Radio - First Choice",
+          "value": "gquiz24c91cc7af",
+          "isSelected": false,
+          "price": "",
+          "gquizIsCorrect": false,
+          "gquizWeight": "0"
+        },
+        {
+          "text": "Quiz Radio - Second Choice",
+          "value": "gquiz240836e68a",
+          "isSelected": false,
+          "price": "",
+          "gquizIsCorrect": true,
+          "gquizWeight": "0"
+        },
+        {
+          "text": "Quiz Radio - Third Choice",
+          "value": "gquiz24a1a78951",
+          "isSelected": false,
+          "price": "",
+          "gquizIsCorrect": false,
+          "gquizWeight": "0"
+        }
+      ],
+      "formId": 58,
+      "pageNumber": 1,
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "defaultValue": "",
+      "description": ""
+    },
+    {
+      "type": "quiz",
+      "id": 43,
+      "label": "Quiz Checkbox",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": [
+        {
+          "id": "43.1",
+          "label": "Quiz Checkbox - First Choice",
+          "name": ""
+        },
+        {
+          "id": "43.2",
+          "label": "Quiz Checkbox - Second Choice",
+          "name": ""
+        },
+        {
+          "id": "43.3",
+          "label": "Quiz Checkbox - Third Choice",
+          "name": ""
+        }
+      ],
+      "gquizFieldType": "checkbox",
+      "inputType": "checkbox",
+      "enableChoiceValue": true,
+      "enablePrice": false,
+      "gquizEnableRandomizeQuizChoices": false,
+      "gquizShowAnswerExplanation": false,
+      "gquizAnswerExplanation": "",
+      "gquizWeightedScoreEnabled": false,
+      "choices": [
+        {
+          "text": "Quiz Checkbox - First Choice",
+          "value": "gquiz24c91cc7af",
+          "isSelected": false,
+          "price": "",
+          "gquizIsCorrect": false,
+          "gquizWeight": "0"
+        },
+        {
+          "text": "Quiz Checkbox - Second Choice",
+          "value": "gquiz240836e68a",
+          "isSelected": false,
+          "price": "",
+          "gquizIsCorrect": true,
+          "gquizWeight": "0"
+        },
+        {
+          "text": "Quiz Checkbox - Third Choice",
+          "value": "gquiz24a1a78951",
+          "isSelected": false,
+          "price": "",
+          "gquizIsCorrect": true,
+          "gquizWeight": "0"
+        }
+      ],
+      "formId": 58,
+      "pageNumber": 1,
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "defaultValue": "",
+      "description": ""
+    },
+    {
+      "id": 25,
+      "label": "Signature",
+      "adminLabel": "",
+      "type": "signature",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "inputs": "",
+      "conditionalLogic": "",
+      "displayOnly": ""
+    },
+    {
+      "id": 26,
+      "label": "Likert Survey Field",
+      "adminLabel": "",
+      "type": "survey",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "enableChoiceValue": true,
+      "enablePrice": false,
+      "gsurveyLikertEnableMultipleRows": false,
+      "gsurveyLikertEnableScoring": false,
+      "choices": [
+        {
+          "text": "Strongly disagree",
+          "value": "glikertcol2636762f85",
+          "isSelected": false,
+          "score": 1
+        },
+        {
+          "text": "Disagree",
+          "value": "glikertcol26a40c345c",
+          "isSelected": false,
+          "score": 2
+        },
+        {
+          "text": "Neutral",
+          "value": "glikertcol26114a03dd",
+          "isSelected": false,
+          "score": 3
+        },
+        {
+          "text": "Agree",
+          "value": "glikertcol26d3452ed6",
+          "isSelected": false,
+          "score": 4
+        },
+        {
+          "text": "Strongly agree",
+          "value": "glikertcol2648e6c579",
+          "isSelected": false,
+          "score": 5
+        }
+      ],
+      "gsurveyLikertRows": [
+        {
+          "text": "First row",
+          "value": "glikertrowd6ee998c"
+        },
+        {
+          "text": "Second row",
+          "value": "glikertrow3ba9477d"
+        },
+        {
+          "text": "Third row",
+          "value": "glikertrowbfdd8b2d"
+        },
+        {
+          "text": "Fourth row",
+          "value": "glikertrowb042f1a8"
+        },
+        {
+          "text": "Fifth row",
+          "value": "glikertrow4770db3e"
+        }
+      ],
+      "inputType": "likert",
+      "formId": 58,
+      "pageNumber": 1,
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false
+    },
+    {
+      "id": 27,
+      "label": "Likert Survey Field Extended",
+      "adminLabel": "",
+      "type": "survey",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": [
+        {
+          "id": "27.1",
+          "label": "First row",
+          "name": "glikertrowb9cfdef9"
+        },
+        {
+          "id": "27.2",
+          "label": "Second row",
+          "name": "glikertrow5b6e1800"
+        },
+        {
+          "id": "27.3",
+          "label": "Third row",
+          "name": "glikertrowa5b5f578"
+        },
+        {
+          "id": "27.4",
+          "label": "Fourth row",
+          "name": "glikertrow27a6d5ef"
+        },
+        {
+          "id": "27.5",
+          "label": "Fifth row",
+          "name": "glikertrowd17a261b"
+        }
+      ],
+      "enableChoiceValue": true,
+      "enablePrice": false,
+      "gsurveyLikertEnableMultipleRows": true,
+      "gsurveyLikertEnableScoring": false,
+      "choices": [
+        {
+          "text": "Strongly disagree",
+          "value": "glikertcol27573469fe",
+          "isSelected": false,
+          "score": 1
+        },
+        {
+          "text": "Disagree",
+          "value": "glikertcol27114a23c1",
+          "isSelected": false,
+          "score": 2
+        },
+        {
+          "text": "Neutral",
+          "value": "glikertcol27c274ea49",
+          "isSelected": false,
+          "score": 3
+        },
+        {
+          "text": "Agree",
+          "value": "glikertcol27cb066f8a",
+          "isSelected": false,
+          "score": 4
+        },
+        {
+          "text": "Strongly agree",
+          "value": "glikertcol275bb3ab84",
+          "isSelected": false,
+          "score": 5
+        }
+      ],
+      "gsurveyLikertRows": [
+        {
+          "text": "First row",
+          "value": "glikertrowb9cfdef9"
+        },
+        {
+          "text": "Second row",
+          "value": "glikertrow5b6e1800"
+        },
+        {
+          "text": "Third row",
+          "value": "glikertrowa5b5f578"
+        },
+        {
+          "text": "Fourth row",
+          "value": "glikertrow27a6d5ef"
+        },
+        {
+          "text": "Fifth row",
+          "value": "glikertrowd17a261b"
+        }
+      ],
+      "inputType": "likert",
+      "formId": 58,
+      "pageNumber": 1,
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false
+    },
+    {
+      "id": 44,
+      "label": "Rank Survey Field",
+      "adminLabel": "",
+      "type": "survey",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "enableChoiceValue": true,
+      "enablePrice": false,
+      "gsurveyLikertEnableMultipleRows": false,
+      "gsurveyLikertEnableScoring": false,
+      "choices": [
+        {
+          "text": "Rank First Choice",
+          "value": "grank44ef548e7b",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Rank Second Choice",
+          "value": "grank440c3f3227",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Rank Third Choice",
+          "value": "grank444f7bdfe0",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Rank Fourth Choce",
+          "value": "grank44902be0db",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Rank Fifth Choice",
+          "value": "grank447f27daf1",
+          "isSelected": false,
+          "price": ""
+        }
+      ],
+      "gsurveyLikertRows": [
+        {
+          "text": "First row",
+          "value": "glikertrow2471ee53"
+        },
+        {
+          "text": "Second row",
+          "value": "glikertrow5ccf6d45"
+        },
+        {
+          "text": "Third row",
+          "value": "glikertrow4ec600ab"
+        },
+        {
+          "text": "Fourth row",
+          "value": "glikertrowa520c792"
+        },
+        {
+          "text": "Fifth row",
+          "value": "glikertrow04dbdbf7"
+        }
+      ],
+      "inputType": "rank",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "defaultValue": "",
+      "description": "",
+      "formId": 58,
+      "pageNumber": 1,
+      "conditionalLogic": "",
+      "displayOnly": ""
+    },
+    {
+      "id": 45,
+      "label": "Rating Survey Field",
+      "adminLabel": "",
+      "type": "survey",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "enableChoiceValue": true,
+      "enablePrice": false,
+      "gsurveyLikertEnableMultipleRows": false,
+      "gsurveyLikertEnableScoring": false,
+      "choices": [
+        {
+          "text": "Terrible",
+          "value": "grating45ed195d17",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Not so great",
+          "value": "grating4594b2edee",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Neutral",
+          "value": "grating4506fdbb76",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Pretty good",
+          "value": "grating45c8a62ee6",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Excellent",
+          "value": "grating4581a9f8d2",
+          "isSelected": false,
+          "price": ""
+        }
+      ],
+      "gsurveyLikertRows": [
+        {
+          "text": "First row",
+          "value": "glikertrow2471ee53"
+        },
+        {
+          "text": "Second row",
+          "value": "glikertrow5ccf6d45"
+        },
+        {
+          "text": "Third row",
+          "value": "glikertrow4ec600ab"
+        },
+        {
+          "text": "Fourth row",
+          "value": "glikertrowa520c792"
+        },
+        {
+          "text": "Fifth row",
+          "value": "glikertrow04dbdbf7"
+        }
+      ],
+      "inputType": "rating",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "defaultValue": "",
+      "description": "",
+      "reversed": true,
+      "formId": 58,
+      "pageNumber": 1,
+      "conditionalLogic": "",
+      "displayOnly": ""
+    },
+    {
+      "type": "survey",
+      "id": 46,
+      "label": "Radio Survey Field",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "enableChoiceValue": true,
+      "enablePrice": false,
+      "gsurveyLikertEnableMultipleRows": false,
+      "gsurveyLikertEnableScoring": false,
+      "choices": [
+        {
+          "text": "Survay Radio - First Choice",
+          "value": "gsurvey46baa416f0",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Survay Radio - Second Choice",
+          "value": "gsurvey4603c12a75",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Survay Radio - Third Choice",
+          "value": "gsurvey4641726850",
+          "isSelected": false,
+          "price": ""
+        }
+      ],
+      "gsurveyLikertRows": [
+        {
+          "text": "First row",
+          "value": "glikertrow2471ee53"
+        },
+        {
+          "text": "Second row",
+          "value": "glikertrow5ccf6d45"
+        },
+        {
+          "text": "Third row",
+          "value": "glikertrow4ec600ab"
+        },
+        {
+          "text": "Fourth row",
+          "value": "glikertrowa520c792"
+        },
+        {
+          "text": "Fifth row",
+          "value": "glikertrow04dbdbf7"
+        }
+      ],
+      "inputType": "radio",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "defaultValue": "",
+      "description": "",
+      "reversed": true,
+      "formId": 58,
+      "pageNumber": 1,
+      "conditionalLogic": "",
+      "displayOnly": ""
+    },
+    {
+      "type": "survey",
+      "id": 47,
+      "label": "Checkbox Survey Field",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": [
+        {
+          "id": "47.1",
+          "label": "Check - First Choice",
+          "name": ""
+        },
+        {
+          "id": "47.2",
+          "label": "Check - Second Choice",
+          "name": ""
+        },
+        {
+          "id": "47.3",
+          "label": "Check - Third Choice",
+          "name": ""
+        }
+      ],
+      "enableChoiceValue": true,
+      "enablePrice": false,
+      "gsurveyLikertEnableMultipleRows": false,
+      "gsurveyLikertEnableScoring": false,
+      "choices": [
+        {
+          "text": "Check - First Choice",
+          "value": "gsurvey47526e8c41",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Check - Second Choice",
+          "value": "gsurvey47b70bdcfd",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Check - Third Choice",
+          "value": "gsurvey47faae3091",
+          "isSelected": false,
+          "price": ""
+        }
+      ],
+      "gsurveyLikertRows": [
+        {
+          "text": "First row",
+          "value": "glikertrow2471ee53"
+        },
+        {
+          "text": "Second row",
+          "value": "glikertrow5ccf6d45"
+        },
+        {
+          "text": "Third row",
+          "value": "glikertrow4ec600ab"
+        },
+        {
+          "text": "Fourth row",
+          "value": "glikertrowa520c792"
+        },
+        {
+          "text": "Fifth row",
+          "value": "glikertrow04dbdbf7"
+        }
+      ],
+      "inputType": "checkbox",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "defaultValue": "",
+      "description": "",
+      "reversed": true,
+      "formId": 58,
+      "pageNumber": 1,
+      "conditionalLogic": "",
+      "displayOnly": ""
+    },
+    {
+      "type": "survey",
+      "id": 48,
+      "label": "Single Line Survey Field",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "enableChoiceValue": true,
+      "enablePrice": false,
+      "gsurveyLikertEnableMultipleRows": false,
+      "gsurveyLikertEnableScoring": false,
+      "choices": null,
+      "gsurveyLikertRows": [
+        {
+          "text": "First row",
+          "value": "glikertrow2471ee53"
+        },
+        {
+          "text": "Second row",
+          "value": "glikertrow5ccf6d45"
+        },
+        {
+          "text": "Third row",
+          "value": "glikertrow4ec600ab"
+        },
+        {
+          "text": "Fourth row",
+          "value": "glikertrowa520c792"
+        },
+        {
+          "text": "Fifth row",
+          "value": "glikertrow04dbdbf7"
+        }
+      ],
+      "inputType": "text",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "defaultValue": "",
+      "description": "",
+      "reversed": true,
+      "customFieldTemplate": "",
+      "customFieldTemplateEnabled": false,
+      "formId": 58,
+      "pageNumber": 1,
+      "conditionalLogic": "",
+      "displayOnly": ""
+    },
+    {
+      "type": "survey",
+      "id": 49,
+      "label": "Paragraph Survey Field",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "enableChoiceValue": true,
+      "enablePrice": false,
+      "gsurveyLikertEnableMultipleRows": false,
+      "gsurveyLikertEnableScoring": false,
+      "choices": null,
+      "gsurveyLikertRows": [
+        {
+          "text": "First row",
+          "value": "glikertrow2471ee53"
+        },
+        {
+          "text": "Second row",
+          "value": "glikertrow5ccf6d45"
+        },
+        {
+          "text": "Third row",
+          "value": "glikertrow4ec600ab"
+        },
+        {
+          "text": "Fourth row",
+          "value": "glikertrowa520c792"
+        },
+        {
+          "text": "Fifth row",
+          "value": "glikertrow04dbdbf7"
+        }
+      ],
+      "inputType": "textarea",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "defaultValue": "",
+      "description": "",
+      "reversed": true,
+      "customFieldTemplate": "",
+      "customFieldTemplateEnabled": false,
+      "formId": 58,
+      "pageNumber": 1,
+      "conditionalLogic": "",
+      "displayOnly": ""
+    },
+    {
+      "type": "survey",
+      "id": 50,
+      "label": "DropDown Survey Field",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "enableChoiceValue": true,
+      "enablePrice": false,
+      "gsurveyLikertEnableMultipleRows": false,
+      "gsurveyLikertEnableScoring": false,
+      "choices": [
+        {
+          "text": "DropDown - First Choice",
+          "value": "gsurvey50e71aa478",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "DropDown - Second Choice",
+          "value": "gsurvey50792465b4",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "DropDown - Third Choice",
+          "value": "gsurvey50d4b6b7b1",
+          "isSelected": false,
+          "price": ""
+        }
+      ],
+      "gsurveyLikertRows": [
+        {
+          "text": "First row",
+          "value": "glikertrow2471ee53"
+        },
+        {
+          "text": "Second row",
+          "value": "glikertrow5ccf6d45"
+        },
+        {
+          "text": "Third row",
+          "value": "glikertrow4ec600ab"
+        },
+        {
+          "text": "Fourth row",
+          "value": "glikertrowa520c792"
+        },
+        {
+          "text": "Fifth row",
+          "value": "glikertrow04dbdbf7"
+        }
+      ],
+      "inputType": "select",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "defaultValue": "",
+      "description": "",
+      "reversed": true,
+      "customFieldTemplate": "",
+      "customFieldTemplateEnabled": false,
+      "formId": 58,
+      "pageNumber": 1,
+      "conditionalLogic": "",
+      "displayOnly": ""
+    },
+    {
+      "type": "post_title",
+      "id": 28,
+      "label": "Post Title",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "conditionalLogic": "",
+      "displayOnly": ""
+    },
+    {
+      "type": "post_excerpt",
+      "id": 29,
+      "label": "Post Excerpt",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "small",
+      "errorMessage": "",
+      "inputs": null,
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "conditionalLogic": "",
+      "displayOnly": ""
+    },
+    {
+      "type": "post_tags",
+      "id": 30,
+      "label": "Post Tags",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "large",
+      "errorMessage": "",
+      "inputs": null,
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "conditionalLogic": "",
+      "displayOnly": ""
+    },
+    {
+      "type": "post_category",
+      "id": 31,
+      "label": "Post Category",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "choices": [],
+      "displayAllCategories": true,
+      "inputType": "select",
+      "formId": 58,
+      "pageNumber": 1,
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false
+    },
+    {
+      "type": "post_image",
+      "id": 32,
+      "label": "Post Image",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "allowedExtensions": "jpg, jpeg, png, gif",
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "displayTitle": true,
+      "displayCaption": true,
+      "displayDescription": true
+    },
+    {
+      "type": "post_custom_field",
+      "id": 33,
+      "label": "Post Custom Field",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "inputType": "text",
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "postCustomFieldName": "Payer first name",
+      "customFieldTemplate": "",
+      "customFieldTemplateEnabled": false
+    },
+    {
+      "type": "product",
+      "id": 34,
+      "label": "Product Basic",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": [
+        {
+          "id": 34.1,
+          "label": "Name",
+          "name": ""
+        },
+        {
+          "id": 34.2,
+          "label": "Price",
+          "name": ""
+        },
+        {
+          "id": 34.3,
+          "label": "Quantity",
+          "name": ""
+        }
+      ],
+      "inputType": "singleproduct",
+      "enablePrice": null,
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "basePrice": "$30.00",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false
+    },
+    {
+      "type": "product",
+      "id": 35,
+      "label": "Product Name - Drop Down",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "inputType": "select",
+      "enablePrice": true,
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": [
+        {
+          "text": "DD - First Choice",
+          "value": "DD - First Choice",
+          "isSelected": false,
+          "price": "$5.00"
+        },
+        {
+          "text": "DD - Second Choice",
+          "value": "DD - Second Choice",
+          "isSelected": false,
+          "price": "$10.00"
+        },
+        {
+          "text": "DD - Third Choice",
+          "value": "DD - Third Choice",
+          "isSelected": false,
+          "price": "$15.00"
+        }
+      ],
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "basePrice": "$0.00",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "defaultValue": "",
+      "description": ""
+    },
+    {
+      "type": "product",
+      "id": 51,
+      "label": "Product Name - Radio Buttons",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "inputType": "radio",
+      "enablePrice": true,
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": [
+        {
+          "text": "Radio - First Choice",
+          "value": "Radio - First Choice",
+          "isSelected": false,
+          "price": "$5.00"
+        },
+        {
+          "text": "Radio - Second Choice",
+          "value": "Radio - Second Choice",
+          "isSelected": false,
+          "price": "$10.00"
+        },
+        {
+          "text": "Radio - Third Choice",
+          "value": "Radio - Third Choice",
+          "isSelected": false,
+          "price": "$15.00"
+        }
+      ],
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "basePrice": "$0.00",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "defaultValue": "",
+      "description": ""
+    },
+    {
+      "type": "product",
+      "id": 52,
+      "label": "User Defined Price",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "inputType": "price",
+      "enablePrice": null,
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": [
+        {
+          "text": "Radio - First Choice",
+          "value": "Radio - First Choice",
+          "isSelected": false,
+          "price": "$5.00"
+        },
+        {
+          "text": "Radio - Second Choice",
+          "value": "Radio - Second Choice",
+          "isSelected": false,
+          "price": "$10.00"
+        },
+        {
+          "text": "Radio - Third Choice",
+          "value": "Radio - Third Choice",
+          "isSelected": false,
+          "price": "$15.00"
+        }
+      ],
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "basePrice": "$0.00",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "defaultValue": "",
+      "description": ""
+    },
+    {
+      "type": "product",
+      "id": 53,
+      "label": "Hidden Price",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": [
+        {
+          "id": 53.1,
+          "label": "Name",
+          "name": ""
+        },
+        {
+          "id": 53.2,
+          "label": "Price",
+          "name": ""
+        },
+        {
+          "id": 53.3,
+          "label": "Quantity",
+          "name": ""
+        }
+      ],
+      "inputType": "hiddenproduct",
+      "enablePrice": null,
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": [
+        {
+          "text": "Radio - First Choice",
+          "value": "Radio - First Choice",
+          "isSelected": false,
+          "price": "$5.00"
+        },
+        {
+          "text": "Radio - Second Choice",
+          "value": "Radio - Second Choice",
+          "isSelected": false,
+          "price": "$10.00"
+        },
+        {
+          "text": "Radio - Third Choice",
+          "value": "Radio - Third Choice",
+          "isSelected": false,
+          "price": "$15.00"
+        }
+      ],
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "basePrice": "$50.00",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "defaultValue": "",
+      "description": ""
+    },
+    {
+      "type": "product",
+      "id": 54,
+      "label": "Calculation Price",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": [
+        {
+          "id": 54.1,
+          "label": "Name",
+          "name": ""
+        },
+        {
+          "id": 54.2,
+          "label": "Price",
+          "name": ""
+        },
+        {
+          "id": 54.3,
+          "label": "Quantity",
+          "name": ""
+        }
+      ],
+      "inputType": "calculation",
+      "enablePrice": null,
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": [
+        {
+          "text": "Radio - First Choice",
+          "value": "Radio - First Choice",
+          "isSelected": false,
+          "price": "$5.00"
+        },
+        {
+          "text": "Radio - Second Choice",
+          "value": "Radio - Second Choice",
+          "isSelected": false,
+          "price": "$10.00"
+        },
+        {
+          "text": "Radio - Third Choice",
+          "value": "Radio - Third Choice",
+          "isSelected": false,
+          "price": "$15.00"
+        }
+      ],
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "20 + 20",
+      "calculationRounding": "",
+      "enableCalculation": true,
+      "basePrice": "$0.00",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "defaultValue": "",
+      "description": ""
+    },
+    {
+      "type": "quantity",
+      "id": 36,
+      "label": "Quantity Field for Hidden Price",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputType": "number",
+      "productField": "53",
+      "numberFormat": "decimal_dot",
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "inputs": "",
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false
+    },
+    {
+      "type": "option",
+      "id": 37,
+      "label": "Product Options for Basic Product",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputType": "select",
+      "choices": [
+        {
+          "text": "Option 1",
+          "value": "Option 1",
+          "isSelected": false,
+          "price": "$20.00"
+        },
+        {
+          "text": "Option 2",
+          "value": "Option 2",
+          "isSelected": false,
+          "price": "$30.00"
+        },
+        {
+          "text": "Option 3",
+          "value": "Option 3",
+          "isSelected": false,
+          "price": "$40.00"
+        }
+      ],
+      "enablePrice": true,
+      "productField": 34,
+      "formId": 58,
+      "pageNumber": 1,
+      "inputs": "",
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false
+    },
+    {
+      "type": "option",
+      "id": 38,
+      "label": "Option for Calculation Price",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputType": "checkbox",
+      "choices": [
+        {
+          "text": "Cal - Option 1",
+          "value": "Cal - Option 1",
+          "isSelected": false,
+          "price": "$7.95"
+        },
+        {
+          "text": "Cal - Option 2",
+          "value": "Cal - Option 2",
+          "isSelected": false,
+          "price": "$12.10"
+        },
+        {
+          "text": "Cal - Option 3",
+          "value": "Cal - Option 3",
+          "isSelected": false,
+          "price": "$9.05"
+        }
+      ],
+      "enablePrice": true,
+      "productField": "54",
+      "formId": 58,
+      "pageNumber": 1,
+      "inputs": [
+        {
+          "id": "38.1",
+          "label": "Cal - Option 1",
+          "name": ""
+        },
+        {
+          "id": "38.2",
+          "label": "Cal - Option 2",
+          "name": ""
+        },
+        {
+          "id": "38.3",
+          "label": "Cal - Option 3",
+          "name": ""
+        }
+      ],
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "defaultValue": "",
+      "description": ""
+    },
+    {
+      "type": "shipping",
+      "id": 39,
+      "label": "Shipping",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "inputType": "select",
+      "enablePrice": true,
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": [
+        {
+          "text": "Express",
+          "value": "Express",
+          "isSelected": false,
+          "price": "$20.00"
+        },
+        {
+          "text": "Regular",
+          "value": "Regular",
+          "isSelected": false,
+          "price": "$30.00"
+        }
+      ],
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "basePrice": "$0.00",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "defaultValue": "",
+      "description": ""
+    },
+    {
+      "type": "total",
+      "id": 40,
+      "label": "Total",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "formId": 58,
+      "pageNumber": 1,
+      "choices": "",
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false
+    },
+    {
+      "type": "post_custom_field",
+      "id": 78,
+      "label": "Post Custom Field",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "inputType": "fileupload",
+      "formId": 58,
+      "choices": [
+        {
+          "text": "First Choice",
+          "value": "First Choice",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Second Choice",
+          "value": "Second Choice",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Third Choice",
+          "value": "Third Choice",
+          "isSelected": false,
+          "price": ""
+        }
+      ],
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "postCustomFieldName": "Payer first name",
+      "customFieldTemplate": "",
+      "customFieldTemplateEnabled": false,
+      "defaultValue": "",
+      "description": "",
+      "numberFormat": "decimal_dot",
+      "calendarIconUrl": "",
+      "phoneFormat": "standard"
+    },
+    {
+      "type": "post_custom_field",
+      "id": 81,
+      "label": "Post Custom Field",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "inputs": null,
+      "inputType": "fileupload",
+      "formId": 58,
+      "choices": [
+        {
+          "text": "First Choice",
+          "value": "First Choice",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Second Choice",
+          "value": "Second Choice",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Third Choice",
+          "value": "Third Choice",
+          "isSelected": false,
+          "price": ""
+        }
+      ],
+      "conditionalLogic": "",
+      "displayOnly": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "multipleFiles": true,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "allowsPrepopulate": false,
+      "postCustomFieldName": "Payer first name",
+      "customFieldTemplate": "",
+      "customFieldTemplateEnabled": false,
+      "defaultValue": "",
+      "description": "",
+      "numberFormat": "decimal_dot",
+      "calendarIconUrl": "",
+      "phoneFormat": "standard"
+    }
+  ],
+  "id": 58,
+  "subLabelPlacement": "below",
+  "cssClass": "",
+  "enableHoneypot": "",
+  "enableAnimation": "",
+  "save": {
+    "enabled": "",
+    "button": {
+      "type": "link",
+      "text": "Save and Continue Later"
+    }
+  },
+  "limitEntries": "",
+  "limitEntriesCount": "",
+  "limitEntriesPeriod": "",
+  "limitEntriesMessage": "",
+  "scheduleForm": "",
+  "scheduleStart": "",
+  "scheduleStartHour": "",
+  "scheduleStartMinute": "",
+  "scheduleStartAmpm": "",
+  "scheduleEnd": "",
+  "scheduleEndHour": "",
+  "scheduleEndMinute": "",
+  "scheduleEndAmpm": "",
+  "schedulePendingMessage": "",
+  "scheduleMessage": "",
+  "requireLogin": "",
+  "requireLoginMessage": "",
+  "useCurrentUserAsAuthor": true,
+  "postContentTemplateEnabled": false,
+  "postTitleTemplateEnabled": false,
+  "postTitleTemplate": "",
+  "postContentTemplate": "",
+  "lastPageButton": null,
+  "pagination": null,
+  "firstPageCssClass": null,
+  "postAuthor": "3",
+  "postCategory": "26",
+  "postFormat": "0",
+  "postStatus": "draft",
+  "gfpdf_form_settings": {
+    "555ad84787d7e": {
+      "name": "My First PDF Template",
+      "template": "Gravity Forms Style",
+      "notification": [
+        "Admin Notification",
+        "User Notification"
+      ],
+      "filename": "test",
+      "conditional": "1",
+      "conditionalLogic": {
+        "actionType": "show",
+        "logicType": "any",
+        "rules": [
+          {
+            "fieldId": "7",
+            "operator": "is",
+            "value": "Albania"
+          },
+          {
+            "fieldId": "1",
+            "operator": "is",
+            "value": "5"
+          }
+        ]
+      },
+      "pdf_size": "custom",
+      "custom_pdf_size": [
+        "150",
+        "300",
+        "millimeters"
+      ],
+      "orientation": "landscape",
+      "font": "dejavusans",
+      "rtl": "No",
+      "format": "Standard",
+      "security": "Yes",
+      "password": "my password",
+      "privileges": [
+        "copy",
+        "print",
+        "print-highres",
+        "modify",
+        "annot-forms",
+        "fill-forms",
+        "extract",
+        "assemble"
+      ],
+      "image_dpi": "300",
+      "save": "No",
+      "id": "555ad84787d7e",
+      "active": true
+    },
+    "556690c67856b": {
+      "name": "My First PDF Template (copy)",
+      "template": "zadani",
+      "filename": "test-{form_id}",
+      "notification": [
+        "54bca349732b8"
+      ],
+      "conditionalLogic": null,
+      "pdf_size": "A4",
+      "custom_pdf_size": [
+        "150",
+        "300",
+        "millimeters"
+      ],
+      "orientation": "portrait",
+      "font": "dejavusans",
+      "rtl": "No",
+      "format": "Standard",
+      "security": "No",
+      "password": "my password",
+      "privileges": [
+        "copy",
+        "print",
+        "print-highres",
+        "modify",
+        "annot-forms",
+        "fill-forms",
+        "extract",
+        "assemble"
+      ],
+      "image_dpi": "300",
+      "save": "Yes",
+      "id": "556690c67856b",
+      "active": true
+    },
+    "fawf90c678523b": {
+      "name": "My First PDF Template (copy)",
+      "template": "Gravity Forms Style",
+      "filename": "test-{form_id}",
+      "notification": [
+        "54bca349732b8"
+      ],
+      "conditionalLogic": null,
+      "pdf_size": "A4",
+      "custom_pdf_size": [
+        "150",
+        "300",
+        "millimeters"
+      ],
+      "orientation": "portrait",
+      "font": "dejavusans",
+      "rtl": "No",
+      "format": "Standard",
+      "security": "No",
+      "password": "my password",
+      "privileges": [
+        "copy",
+        "print",
+        "print-highres",
+        "modify",
+        "annot-forms",
+        "fill-forms",
+        "extract",
+        "assemble"
+      ],
+      "image_dpi": "300",
+      "save": "No",
+      "id": "fawf90c678523b",
+      "active": true
+    },
+    "556690c8d7f82": {
+      "name": "Disable PDF Template",
+      "template": "Gravity Forms Style",
+      "notification": [
+        "Admin Notification",
+        "User Notification"
+      ],
+      "filename": "test",
+      "conditional": "1",
+      "conditionalLogic": {
+        "actionType": "show",
+        "logicType": "any",
+        "rules": [
+          {
+            "fieldId": "7",
+            "operator": "is",
+            "value": "Albania"
+          },
+          {
+            "fieldId": "1",
+            "operator": "is",
+            "value": "5"
+          }
+        ]
+      },
+      "pdf_size": "custom",
+      "custom_pdf_size": [
+        "150",
+        "300",
+        "millimeters"
+      ],
+      "orientation": "landscape",
+      "font": "dejavusans",
+      "rtl": "No",
+      "format": "Standard",
+      "security": "Yes",
+      "password": "my password",
+      "privileges": [
+        "copy",
+        "print",
+        "print-highres",
+        "modify",
+        "annot-forms",
+        "fill-forms",
+        "extract",
+        "assemble"
+      ],
+      "image_dpi": "300",
+      "save": "No",
+      "id": "556690c8d7f82",
+      "active": false
+    }
+  },
+  "notifications": {
+    "54bca349732b8": {
+      "id": "54bca349732b8",
+      "to": "{admin_email}",
+      "name": "Admin Notification",
+      "event": "form_submission",
+      "toType": "email",
+      "subject": "New submission from {form_title}",
+      "message": "{all_fields}",
+      "isActive": false
+    }
+  },
+  "confirmations": {
+    "54bca34973cdd": {
+      "id": "54bca34973cdd",
+      "name": "Default Confirmation",
+      "isDefault": true,
+      "type": "message",
+      "message": "Thanks for contacting us! We will get in touch with you shortly.",
+      "url": "",
+      "pageId": "",
+      "queryString": ""
+    }
+  },
+  "gravityformsquiz": {
+    "shuffleFields": "0",
+    "instantFeedback": "0",
+    "grades": [
+      {
+        "text": "A",
+        "value": 90
+      },
+      {
+        "text": "B",
+        "value": 80
+      },
+      {
+        "text": "C",
+        "value": 70
+      },
+      {
+        "text": "D",
+        "value": 60
+      },
+      {
+        "text": "E",
+        "value": 0
+      }
+    ],
+    "grading": "letter",
+    "passPercent": "50",
+    "passfailDisplayConfirmation": "1",
+    "passConfirmationMessage": "<strong>Quiz Results:</strong> You Passed!\\n<strong>Score:</strong> {quiz_score}\\n<strong>Percentage:</strong> {quiz_percent}%",
+    "passConfirmationDisableAutoformat": "0",
+    "failConfirmationMessage": "<strong>Quiz Results:</strong> You Failed!\\n<strong>Score:</strong> {quiz_score}\\n<strong>Percentage:</strong> {quiz_percent}%",
+    "failConfirmationDisableAutoformat": "0",
+    "letterDisplayConfirmation": "1",
+    "letterConfirmationMessage": "<strong>Quiz Grade:</strong> {quiz_grade}\\n<strong>Score:</strong> {quiz_score}\\n<strong>Percentage:</strong> {quiz_percent}%",
+    "letterConfirmationDisableAutoformat": "0"
+  },
+  "is_active": "1",
+  "date_created": "2015-01-19 06:25:13",
+  "is_trash": "0"
+}

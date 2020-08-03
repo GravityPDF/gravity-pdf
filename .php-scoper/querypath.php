@@ -21,9 +21,9 @@ return [
 	 * For more see: https://github.com/humbug/php-scoper#finders-and-paths
 	 */
 	'finders'   => [
-		Finder::create()->files()->in( $path . 'vendor/querypath/querypath/' )->depth('== 0')->name( [ 'CREDITS', 'COPYING-MIT.txt' ] ),
+		Finder::create()->files()->in( $path . 'vendor/querypath/querypath/' )->depth( '== 0' )->name( [ 'CREDITS', 'COPYING-MIT.txt' ] ),
 		Finder::create()->files()->in( $path . 'vendor/querypath/querypath/src/' )->name( [ '*.php' ] ),
-		Finder::create()->files()->in( $path . 'vendor/masterminds/html5/' )->depth('== 0')->name( [ 'LICENSE.txt', 'CREDITS' ] ),
+		Finder::create()->files()->in( $path . 'vendor/masterminds/html5/' )->depth( '== 0' )->name( [ 'LICENSE.txt', 'CREDITS' ] ),
 		Finder::create()->files()->in( $path . 'vendor/masterminds/html5/src/' )->name( [ '*.php' ] ),
 	],
 
@@ -36,7 +36,7 @@ return [
 	 * For more see: https://github.com/humbug/php-scoper#patchers
 	 */
 	'patchers'  => [
-		function (string $filePath, string $prefix, string $content): string {
+		function( string $filePath, string $prefix, string $content ): string {
 
 			if ( basename( $filePath ) === 'DOMTraverser.php' ) {
 				$content = str_replace( "\\$prefix\SPLObjectStorage", '\SPLObjectStorage', $content );

@@ -3,6 +3,7 @@
 namespace GFPDF\Helper\Fields;
 
 use GFPDF\Helper\Helper_QueryPath;
+use GFPDF_Vendor\QueryPath\Exception;
 
 /**
  * @package     Gravity PDF
@@ -31,6 +32,7 @@ class Field_V3_Products extends Field_Products {
 	 *
 	 * @return string
 	 *
+	 * @throws Exception
 	 * @since 4.0
 	 */
 	public function html( $value = '', $label = true ) {

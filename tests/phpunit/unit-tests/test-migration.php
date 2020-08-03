@@ -3,9 +3,6 @@
 namespace GFPDF\Tests;
 
 use GFPDF\Helper\Helper_Migration;
-
-use GFForms;
-
 use WP_UnitTestCase;
 
 /**
@@ -27,7 +24,7 @@ class Test_Migration extends WP_UnitTestCase {
 	/**
 	 * Our migration object
 	 *
-	 * @var \GFPDF\Helper\Helper_Migration
+	 * @var Helper_Migration
 	 *
 	 * @since 4.0
 	 */

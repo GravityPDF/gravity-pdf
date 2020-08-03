@@ -3,10 +3,8 @@
 namespace GFPDF\Tests;
 
 use GFPDF\Helper\Helper_Data;
-
-use WP_UnitTestCase;
-
 use StdClass;
+use WP_UnitTestCase;
 
 /**
  * Test Gravity PDF Data Helper Class
@@ -18,7 +16,7 @@ use StdClass;
  */
 
 /**
- * Test the PSR-4 Autoloader Implimentation
+ * Test the PSR-4 Autoloader Implementation
  *
  * @since 4.0
  * @group data-helper
@@ -27,7 +25,7 @@ class Test_Data_Helper extends WP_UnitTestCase {
 	/**
 	 * Our Gravity PDF Data object
 	 *
-	 * @var \GFPDF\Helper\Helper_Data
+	 * @var Helper_Data
 	 *
 	 * @since 4.0
 	 */
@@ -49,6 +47,9 @@ class Test_Data_Helper extends WP_UnitTestCase {
 	/**
 	 * Check if our getter / setter is functional with different data types
 	 *
+	 * @param string $key
+	 * @param string $val
+	 *
 	 * @since        4.0
 	 *
 	 * @dataProvider provider_setter
@@ -63,6 +64,9 @@ class Test_Data_Helper extends WP_UnitTestCase {
 
 	/**
 	 * Check if our isset and unset magic methods work correctly
+	 *
+	 * @param string $key
+	 * @param string $val
 	 *
 	 * @since        4.0
 	 *

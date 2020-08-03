@@ -23,7 +23,15 @@ class Test_Helper_Mpdf extends WP_UnitTestCase {
 	 * @since 5.2
 	 */
 	public function test_extends() {
-		$this->assertInstanceOf( '\Mpdf\Mpdf', new Helper_Mpdf( [ 'tempDir' => sys_get_temp_dir() ] ) );
+		$this->assertInstanceOf(
+			'\Mpdf\Mpdf',
+			new Helper_Mpdf(
+				[
+					'mode'    => 'c',
+					'tempDir' => sys_get_temp_dir(),
+				]
+			)
+		);
 	}
 
 	/**
@@ -38,7 +46,12 @@ class Test_Helper_Mpdf extends WP_UnitTestCase {
 	 */
 	public function test_write_html() {
 		$e   = null;
-		$pdf = new Helper_Mpdf( [ 'tempDir' => sys_get_temp_dir() ] );
+		$pdf = new Helper_Mpdf(
+			[
+				'mode'    => 'c',
+				'tempDir' => sys_get_temp_dir(),
+			]
+		);
 		try {
 			$pdf->WriteHTML( 'test', 10 );
 		} catch ( \Exception $e ) {

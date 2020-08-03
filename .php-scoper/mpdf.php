@@ -22,9 +22,9 @@ return [
 	 */
 	'finders'   => [
 		Finder::create()->files()->in( $path . 'vendor/mpdf/mpdf/src' )->name( [ '*.php' ] ),
-		Finder::create()->files()->in( $path . 'vendor/mpdf/mpdf/' )->depth('==0')->name( [ 'LICENSE.txt' ] ),
+		Finder::create()->files()->in( $path . 'vendor/mpdf/mpdf/' )->depth( '==0' )->name( [ 'LICENSE.txt' ] ),
 		Finder::create()->files()->in( $path . 'vendor/mpdf/mpdf/data' )->name( [ '*' ] ),
-		Finder::create()->files()->in( $path . 'vendor/mpdf/qrcode/' )->exclude('tests')->name( [ '*.php', 'LICENSE', '*.dat' ] ),
+		Finder::create()->files()->in( $path . 'vendor/mpdf/qrcode/' )->exclude( 'tests' )->name( [ '*.php', 'LICENSE', '*.dat' ] ),
 		Finder::create()->files()->in( $path . 'vendor/setasign/fpdi' )->name( [ '*.php', 'LICENSE.txt' ] ),
 		Finder::create()->files()->in( $path . 'vendor/myclabs/deep-copy' )->name( [ '*.php', 'LICENSE' ] ),
 	],
@@ -38,7 +38,7 @@ return [
 	 * For more see: https://github.com/humbug/php-scoper#patchers
 	 */
 	'patchers'  => [
-		function (string $filePath, string $prefix, string $content): string {
+		function( string $filePath, string $prefix, string $content ): string {
 
 			if ( basename( $filePath ) === 'Tag.php' ) {
 				$content = str_replace( "'Mpdf\\\\Tag\\\\'", "'$prefix\\\\Mpdf\\\\Tag\\\\'", $content );

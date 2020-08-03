@@ -6,10 +6,14 @@ use GFPDF\Helper\Helper_Abstract_Controller;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_View;
+use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Model\Model_PDF;
+use GFPDF\View\View_PDF;
 use Psr\Log\LoggerInterface;
+use SiteGround_Optimizer\Minifier\Minifier;
 
 /**
  * @package     Gravity PDF
@@ -33,7 +37,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
-	 * @var \GFPDF\Helper\Helper_Form
+	 * @var Helper_Form
 	 *
 	 * @since 4.0
 	 */
@@ -52,7 +56,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
 	 *
-	 * @var \GFPDF\Helper\Helper_Misc
+	 * @var Helper_Misc
 	 *
 	 * @since 4.0
 	 */
@@ -61,11 +65,11 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	/**
 	 * Setup our class by injecting all our dependencies
 	 *
-	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_PDF $model Our PDF Model the controller will manage
-	 * @param Helper_Abstract_View|\GFPDF\View\View_PDF    $view  Our PDF View the controller will manage
-	 * @param \GFPDF\Helper\Helper_Abstract_Form           $gform Our abstracted Gravity Forms helper functions
-	 * @param LoggerInterface                              $log   Our logger class
-	 * @param \GFPDF\Helper\Helper_Misc                    $misc  Our miscellaneous class
+	 * @param Helper_Abstract_Model|Model_PDF $model Our PDF Model the controller will manage
+	 * @param Helper_Abstract_View|View_PDF   $view  Our PDF View the controller will manage
+	 * @param Helper_Abstract_Form            $gform Our abstracted Gravity Forms helper functions
+	 * @param LoggerInterface                 $log   Our logger class
+	 * @param Helper_Misc                     $misc  Our miscellaneous class
 	 *
 	 * @since 4.0
 	 */
@@ -87,9 +91,9 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	/**
 	 * Initialise our class defaults
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function init() {
 		/*
@@ -107,9 +111,9 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	/**
 	 * Apply any actions needed for the settings page
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function add_actions() {
 		/* Process PDF if needed */
@@ -142,9 +146,9 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	/**
 	 * Apply any filters needed for the settings page
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function add_filters() {
 		/* PDF authentication middleware */
@@ -208,9 +212,9 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 * Determines if we should process the PDF at this stage
 	 * Fires just before the main WP_Query is executed (we don't need it)
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function process_pdf_endpoint() {
 
@@ -248,9 +252,9 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	 * Determines if we should process the legacy PDF endpoint at this stage (the one with $_GET variables)
 	 * Fires just before the main WP_Query is executed (we don't need it)
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function process_legacy_pdf_endpoint() {
 
@@ -280,7 +284,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		$pid = $this->model->get_legacy_config( $config );
 
 		if ( is_wp_error( $pid ) ) {
-			return $this->pdf_error( $pid );
+			$this->pdf_error( $pid );
 		}
 
 		/* Store our ids in the WP query_vars object */
@@ -336,7 +340,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 		if ( class_exists( '\SiteGround_Optimizer\Minifier\Minifier' ) ) {
 
 			/* Remove the shutdown buffer and manually close an open buffers */
-			$minifier = \SiteGround_Optimizer\Minifier\Minifier::get_instance();
+			$minifier = Minifier::get_instance();
 			remove_action( 'shutdown', [ $minifier, 'end_html_minifier_buffer' ] );
 
 			while ( ob_get_level() > 0 ) {
@@ -348,9 +352,7 @@ class Controller_PDF extends Helper_Abstract_Controller implements Helper_Interf
 	/**
 	 * Output PDF error to user
 	 *
-	 * @param  Object $error The WP_Error object
-	 *
-	 * @return void
+	 * @param Object $error The WP_Error object
 	 *
 	 * @since 4.0
 	 */

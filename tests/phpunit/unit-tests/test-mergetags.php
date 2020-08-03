@@ -3,10 +3,11 @@
 namespace GFPDF\Tests;
 
 use GFPDF\Controller\Controller_Mergetags;
+use GFPDF\Controller\Controller_Shortcodes;
 use GFPDF\Model\Model_Mergetags;
-
-use WP_UnitTestCase;
+use GFPDF\Model\Model_Shortcodes;
 use GPDFAPI;
+use WP_UnitTestCase;
 
 /**
  * Test Gravity PDF Mergetag functionality
@@ -28,7 +29,7 @@ class Test_Mergetags extends WP_UnitTestCase {
 	/**
 	 * Our Controller
 	 *
-	 * @var \GFPDF\Controller\Controller_Shortcodes
+	 * @var Controller_Shortcodes
 	 *
 	 * @since 4.1
 	 */
@@ -37,7 +38,7 @@ class Test_Mergetags extends WP_UnitTestCase {
 	/**
 	 * Our Model
 	 *
-	 * @var \GFPDF\Model\Model_Shortcodes
+	 * @var Model_Shortcodes
 	 *
 	 * @since 4.1
 	 */
@@ -81,7 +82,7 @@ class Test_Mergetags extends WP_UnitTestCase {
 
 		$tags = $this->model->add_pdf_mergetags( [], $form['id'] );
 
-		$this->assertSame( 3, sizeof( $tags ) );
+		$this->assertSame( 3, count( $tags ) );
 
 		$this->assertEquals( 'PDF: My First PDF Template', $tags[0]['label'] );
 		$this->assertEquals( '{My First PDF Template:pdf:555ad84787d7e}', $tags[0]['tag'] );
@@ -94,7 +95,7 @@ class Test_Mergetags extends WP_UnitTestCase {
 	 *
 	 * @param string $expected
 	 * @param string $text
-	 * @param bool $encode
+	 * @param bool   $encode
 	 *
 	 * @dataProvider provider_process_pdf_mergetags
 	 *

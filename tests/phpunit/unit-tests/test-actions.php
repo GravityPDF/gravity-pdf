@@ -2,13 +2,11 @@
 
 namespace GFPDF\Tests;
 
+use Exception;
 use GFPDF\Controller\Controller_Actions;
 use GFPDF\Model\Model_Actions;
 use GFPDF\View\View_Actions;
-
 use WP_UnitTestCase;
-
-use Exception;
 
 /**
  * Test Gravity PDF Actions functionality
@@ -30,7 +28,7 @@ class Test_Actions extends WP_UnitTestCase {
 	/**
 	 * Our Controller
 	 *
-	 * @var \GFPDF\Controller\Controller_Actions
+	 * @var Controller_Actions
 	 *
 	 * @since 4.0
 	 */
@@ -39,7 +37,7 @@ class Test_Actions extends WP_UnitTestCase {
 	/**
 	 * Our Model
 	 *
-	 * @var \GFPDF\Model\Model_Actions
+	 * @var Model_Actions
 	 *
 	 * @since 4.0
 	 */
@@ -48,7 +46,7 @@ class Test_Actions extends WP_UnitTestCase {
 	/**
 	 * Our View
 	 *
-	 * @var \GFPDF\View\View_Actions
+	 * @var View_Actions
 	 *
 	 * @since 4.0
 	 */
@@ -94,7 +92,7 @@ class Test_Actions extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test route notices are displayed correctly (verfiy capability, check for dismissal, check condition met)
+	 * Test route notices are displayed correctly (verify capability, check for dismissal, check condition met)
 	 *
 	 * @since 4.0
 	 */
@@ -138,7 +136,7 @@ class Test_Actions extends WP_UnitTestCase {
 
 		/* Set up authorized user */
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		$this->assertInternalType( 'integer', $user_id );
+		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
 
 		/* Verify notice now present */
@@ -160,7 +158,7 @@ class Test_Actions extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test route notices are displayed correctly (verfiy capability, check for dismissal, check condition met)
+	 * Test route notices are displayed correctly (verify capability, check for dismissal, check condition met)
 	 *
 	 * @since 4.0
 	 */
@@ -193,7 +191,7 @@ class Test_Actions extends WP_UnitTestCase {
 
 		/* Set up authorized user */
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		$this->assertInternalType( 'integer', $user_id );
+		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
 
 		/* Verify no notices present */
@@ -255,7 +253,7 @@ class Test_Actions extends WP_UnitTestCase {
 
 		/* Set up authorized user */
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		$this->assertInternalType( 'integer', $user_id );
+		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
 
 		/* Force nonce fail */
@@ -287,7 +285,7 @@ class Test_Actions extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Check if the notice dismisal checker is accurate
+	 * Check if the notice dismissal checker is accurate
 	 *
 	 * @since 4.0
 	 */

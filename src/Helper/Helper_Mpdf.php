@@ -2,6 +2,13 @@
 
 namespace GFPDF\Helper;
 
+use GFPDF_Vendor\Mpdf\HTMLParserMode;
+use GFPDF_Vendor\Mpdf\Mpdf;
+use GFPDF_Vendor\Mpdf\MpdfException;
+use GFPDF_Vendor\setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
+use GFPDF_Vendor\setasign\Fpdi\PdfParser\PdfParserException;
+use GFPDF_Vendor\setasign\Fpdi\PdfParser\Type\PdfTypeException;
+
 /**
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2020, Blue Liquid Designs
@@ -16,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * @since 5.2
  */
-class Helper_Mpdf extends \GFPDF_Vendor\Mpdf\Mpdf {
+class Helper_Mpdf extends Mpdf {
 
 	/**
 	 * Added for backwards compatibility as it was removed in mPDF 8.0
@@ -36,12 +43,9 @@ class Helper_Mpdf extends \GFPDF_Vendor\Mpdf\Mpdf {
 	 * @param string $boxName    The page boundary to import.
 	 *
 	 * @return string A unique string identifying the imported page.
-	 * @throws \GFPDF_Vendor\Mpdf\MpdfException
-	 * @throws \GFPDF_Vendor\setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
-	 * @throws \GFPDF_Vendor\setasign\Fpdi\PdfParser\Filter\FilterException
-	 * @throws \GFPDF_Vendor\setasign\Fpdi\PdfParser\PdfParserException
-	 * @throws \GFPDF_Vendor\setasign\Fpdi\PdfParser\Type\PdfTypeException
-	 * @throws \GFPDF_Vendor\setasign\Fpdi\PdfReader\PdfReaderException
+	 * @throws CrossReferenceException
+	 * @throws PdfParserException
+	 * @throws PdfTypeException
 	 *
 	 * @since 5.2
 	 */
@@ -52,6 +56,7 @@ class Helper_Mpdf extends \GFPDF_Vendor\Mpdf\Mpdf {
 		}
 
 		/* The signature of this method has changed */
+
 		return parent::importPage( $pageNumber, $boxName );
 	}
 
@@ -73,7 +78,6 @@ class Helper_Mpdf extends \GFPDF_Vendor\Mpdf\Mpdf {
 	 * @see   Fpdi::getTemplateSize()
 	 *
 	 * @since 5.2
-	 * @throws \GFPDF_Vendor\Mpdf\MpdfException
 	 */
 	public function useTemplate( $tpl, $x = 0, $y = 0, $width = null, $height = null, $adjustPageSize = false ) {
 		$template = parent::useTemplate( $tpl, $x, $y, $width, $height, $adjustPageSize );
@@ -95,14 +99,14 @@ class Helper_Mpdf extends \GFPDF_Vendor\Mpdf\Mpdf {
 	 * @param bool   $init  Clears and sets buffers to Top level block etc.
 	 * @param bool   $close If false leaves buffers etc. in current state, so that it can continue a block etc.
 	 *
+	 * @throws MpdfException
 	 * @since 5.2
-	 * @throws \GFPDF_Vendor\Mpdf\MpdfException
 	 */
-	public function WriteHTML( $html, $mode = \GFPDF_Vendor\Mpdf\HTMLParserMode::DEFAULT_MODE, $init = true, $close = true ) {
+	public function WriteHTML( $html, $mode = HTMLParserMode::DEFAULT_MODE, $init = true, $close = true ) {
 
 		/* Prevent error if incorrect mode is passed */
-		if ( in_array( $mode, \GFPDF_Vendor\Mpdf\HTMLParserMode::getAllModes(), true ) === false ) {
-			$mode = \GFPDF_Vendor\Mpdf\HTMLParserMode::DEFAULT_MODE;
+		if ( in_array( $mode, HTMLParserMode::getAllModes(), true ) === false ) {
+			$mode = HTMLParserMode::DEFAULT_MODE;
 		}
 
 		/*

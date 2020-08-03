@@ -2,11 +2,18 @@
 
 namespace GFPDF;
 
+use GFCommon;
 use GFPDF\Controller;
+use GFPDF\Helper;
+use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Form;
+use GFPDF\Helper\Helper_Misc;
+use GFPDF\Helper\Helper_Notices;
+use GFPDF\Helper\Helper_Options_Fields;
+use GFPDF\Helper\Helper_Singleton;
+use GFPDF\Helper\Helper_Templates;
 use GFPDF\Model;
 use GFPDF\View;
-use GFPDF\Helper;
-
 use GFPDF_Core;
 use Psr\Log\LoggerInterface;
 
@@ -48,7 +55,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
-	 * @var \GFPDF\Helper\Helper_Form
+	 * @var Helper_Form
 	 *
 	 * @since 4.0
 	 */
@@ -58,7 +65,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * Holds our Helper_Notices object
 	 * which we can use to queue up admin messages for the user
 	 *
-	 * @var \GFPDF\Helper\Helper_Notices
+	 * @var Helper_Notices
 	 *
 	 * @since 4.0
 	 */
@@ -68,7 +75,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
 	 *
-	 * @var \GFPDF\Helper\Helper_Data
+	 * @var Helper_Data
 	 *
 	 * @since 4.0
 	 */
@@ -78,7 +85,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
-	 * @var \GFPDF\Helper\Helper_Options_Fields
+	 * @var Helper_Options_Fields
 	 *
 	 * @since 4.0
 	 */
@@ -88,7 +95,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
 	 *
-	 * @var \GFPDF\Helper\Helper_Misc
+	 * @var Helper_Misc
 	 *
 	 * @since 4.0
 	 */
@@ -98,7 +105,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * Holds our Helper_Templates object
 	 * used to ease access to our PDF templates
 	 *
-	 * @var \GFPDF\Helper\Helper_Templates
+	 * @var Helper_Templates
 	 *
 	 * @since 4.0
 	 */
@@ -108,7 +115,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 * Makes our MVC classes sudo-singletons by allowing easy access to the original objects
 	 * through `$singleton->get_class();`
 	 *
-	 * @var \GFPDF\Helper\Helper_Singleton
+	 * @var Helper_Singleton
 	 *
 	 * @since 4.0
 	 */
@@ -173,24 +180,24 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->log = $logger->get_logger();
 
 		/* Set up our form object */
-		$this->gform = new Helper\Helper_Form();
+		$this->gform = new Helper_Form();
 
 		/* Set up our data access layer */
-		$this->data = new Helper\Helper_Data();
+		$this->data = new Helper_Data();
 		$this->data->init();
 
 		/* Set up our misc object */
-		$this->misc = new Helper\Helper_Misc( $this->log, $this->gform, $this->data );
+		$this->misc = new Helper_Misc( $this->log, $this->gform, $this->data );
 
 		/* Set up our notices */
-		$this->notices = new Helper\Helper_Notices();
+		$this->notices = new Helper_Notices();
 		$this->notices->init();
 
 		/* Setup our template helper */
-		$this->templates = new Helper\Helper_Templates( $this->log, $this->data, $this->gform );
+		$this->templates = new Helper_Templates( $this->log, $this->data, $this->gform );
 
 		/* Set up our options object - this is initialised on admin_init but other classes need to access its methods before this */
-		$this->options = new Helper\Helper_Options_Fields(
+		$this->options = new Helper_Options_Fields(
 			$this->log,
 			$this->gform,
 			$this->data,
@@ -200,7 +207,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		);
 
 		/* Setup our Singleton object */
-		$this->singleton = new Helper\Helper_Singleton();
+		$this->singleton = new Helper_Singleton();
 
 		/* Load modules */
 		$this->installer();
@@ -236,9 +243,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Add required plugin actions
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function add_actions() {
 
@@ -253,9 +260,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Add required plugin filters
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function add_filters() {
 
@@ -284,7 +291,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Show action links on the plugin screen.
 	 *
-	 * @param    mixed $links Plugin Action links
+	 * @param mixed $links Plugin Action links
 	 *
 	 * @return    array
 	 *
@@ -293,7 +300,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function plugin_action_links( $links ) {
 
 		$action_links = [
-			'settings'        => '<a href="' . esc_url( $this->data->settings_url ) . '" title="' . esc_attr__( 'View Gravity PDF Settings', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Settings', 'gravity-forms-pdf-extended' ) . '</a>',
+			'settings' => '<a href="' . esc_url( $this->data->settings_url ) . '" title="' . esc_attr__( 'View Gravity PDF Settings', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Settings', 'gravity-forms-pdf-extended' ) . '</a>',
 		];
 
 		return array_merge( $action_links, $links );
@@ -302,8 +309,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Show row meta on the plugin screen.
 	 *
-	 * @param    mixed $links Plugin Row Meta
-	 * @param    mixed $file  Plugin Base file
+	 * @param mixed $links Plugin Row Meta
+	 * @param mixed $file  Plugin Base file
 	 *
 	 * @return    array
 	 *
@@ -330,9 +337,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 *
 	 * @param array $classes
 	 *
+	 * @return string
 	 * @since 4.0
 	 *
-	 * @return string
 	 */
 	public function add_body_class( $classes ) {
 
@@ -346,9 +353,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Register all css and js which can be enqueued when needed
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function register_assets() {
 		$this->register_styles();
@@ -358,9 +365,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Register requrired CSS
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	private function register_styles() {
 		$version = PDF_EXTENDED_VERSION;
@@ -371,14 +378,14 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Register requrired JS
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	private function register_scripts() {
 		$version = PDF_EXTENDED_VERSION;
 
-		$pdf_settings_dependancies = [
+		$pdf_settings_dependencies = [
 			'wpdialogs',
 			'jquery-ui-tooltip',
 			'gform_forms',
@@ -388,9 +395,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			'wp-color-picker',
 		];
 
-		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'dist/assets/js/admin.min.js', $pdf_settings_dependancies, $version );
+		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'dist/assets/js/admin.min.js', $pdf_settings_dependencies, $version );
 
-		$pdf_backbone_dependancies = [
+		$pdf_backbone_dependencies = [
 			'gfpdf_js_settings',
 			'backbone',
 			'underscore',
@@ -398,7 +405,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			'wpdialogs',
 		];
 
-		wp_register_script( 'gfpdf_js_backbone', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-backbone.min.js', $pdf_backbone_dependancies, $version ); /* @TODO - remove backbone and use React */
+		wp_register_script( 'gfpdf_js_backbone', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-backbone.min.js', $pdf_backbone_dependencies, $version );
+		/* @TODO - remove backbone and use React */
 		wp_register_script( 'gfpdf_js_backbone_model_binder', PDF_PLUGIN_URL . 'bower_components/backbone.modelbinder/Backbone.ModelBinder.min.js', [ 'backbone', 'underscore' ], $version );
 
 		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'dist/assets/js/app.bundle.min.js', [ 'jquery' ], $version );
@@ -414,9 +422,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Load any assets that are needed
 	 *
+	 * @return void
 	 * @since 4.0.4
 	 *
-	 * @return void
 	 */
 	public function load_admin_assets() {
 
@@ -465,17 +473,18 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function tinymce_styles( $mce_init ) {
 		$style                     = "body#tinymce { max-width: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;}";
 		$mce_init['content_style'] = ( isset( $mce_init['content_style'] ) ) ? $mce_init['content_style'] . ' ' . $style : $style;
+
 		return $mce_init;
 	}
 
 	/**
 	 * Auto no-conflict any preloaded scripts that begin with 'gfpdf_'
 	 *
-	 * @since 4.0
-	 *
 	 * @param array $items The current list of no-conflict scripts
 	 *
 	 * @return array
+	 * @since 4.0
+	 *
 	 */
 	public function auto_noconflict_scripts( $items ) {
 
@@ -506,7 +515,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			'gform_placeholder',
 			'jquery-ui-autocomplete',
 			'thickbox',
-			'gform_selectwoo'
+			'gform_selectwoo',
 		];
 
 		foreach ( $wp_scripts->queue as $object ) {
@@ -527,11 +536,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Auto no-conflict any preloaded styles that begin with 'gfpdf_'
 	 *
-	 * @since 4.0
-	 *
 	 * @param array $items The current list of no-conflict styles
 	 *
 	 * @return array
+	 * @since 4.0
+	 *
 	 */
 	public function auto_noconflict_styles( $items ) {
 
@@ -602,9 +611,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Loads our Gravity PDF installer classes
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function installer() {
 		$model = new Model\Model_Install( $this->gform, $this->log, $this->data, $this->misc, $this->notices, new Helper\Helper_Pdf_Queue( $this->log ) );
@@ -622,9 +631,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Include Settings Page functionality
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function gf_settings() {
 
@@ -660,9 +669,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Include Form Settings (PDF) functionality
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function gf_form_settings() {
 
@@ -698,9 +707,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Include PDF Display functionality
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function pdf() {
 
@@ -737,9 +746,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Include PDF Shortcodes functionality
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function shortcodes() {
 
@@ -758,9 +767,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Include PDF Mergetag functionality
 	 *
+	 * @return void
 	 * @since 4.1
 	 *
-	 * @return void
 	 */
 	public function mergetags() {
 
@@ -777,9 +786,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Include one-time actions functionality
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function actions() {
 
@@ -798,9 +807,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Include template manager functionality
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function template_manager() {
 
@@ -817,9 +826,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Initialise our core font AJAX handler
 	 *
+	 * @return void
 	 * @since 5.0
 	 *
-	 * @return void
 	 */
 	public function load_core_font_handler() {
 		$class = new Controller\Controller_Save_Core_Fonts( $this->log, $this->data, $this->misc );
@@ -831,9 +840,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Initialise our debug code
 	 *
+	 * @return void
 	 * @since 5.1
 	 *
-	 * @return void
 	 */
 	public function load_debug() {
 		$class = new Controller\Controller_Debug( $this->data, $this->options, $this->templates );
@@ -846,9 +855,9 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	/**
 	 * Initialise our system status code
 	 *
+	 * @return void
 	 * @since 5.3
 	 *
-	 * @return void
 	 */
 	public function check_system_status() {
 		$class = new Controller\Controller_System_Report( $this->data->allow_url_fopen );
@@ -865,17 +874,17 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	public function add_admin_messages() {
 		$messages = get_settings_errors( 'gfpdf-notices' );
 
-		foreach( $messages as $message ) {
-			\GFCommon::add_message( $message['message'], $message['type'] !== 'updated' );
+		foreach ( $messages as $message ) {
+			GFCommon::add_message( $message['message'], $message['type'] !== 'updated' );
 		}
 	}
 
 	/**
 	 * Initialise our background PDF processing handler
 	 *
+	 * @return void
 	 * @since 5.0
 	 *
-	 * @return void
 	 */
 	public function async_pdfs() {
 		$queue     = new Helper\Helper_Pdf_Queue( $this->log );
@@ -904,7 +913,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	}
 
 	/**
-	 * Add backwards compatbility with v3.x.x default PDF template files
+	 * Add backwards compatibility with v3.x.x default PDF template files
 	 * This function will now pull the PDF configuration details from our query variables / or our backwards compatible URL params method
 	 *
 	 * @param integer $form_id The Gravity Form ID
@@ -936,10 +945,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		}
 
 		return [
-			'empty_field'     => ( isset( $settings['show_empty'] ) && $settings['show_empty'] === 'Yes' ) ? true : false,
-			'html_field'      => ( isset( $settings['show_html'] ) && $settings['show_html'] === 'Yes' ) ? true : false,
-			'page_names'      => ( isset( $settings['show_page_names'] ) && $settings['show_page_names'] === 'Yes' ) ? true : false,
-			'section_content' => ( isset( $settings['show_section_content'] ) && $settings['show_section_content'] === 'Yes' ) ? true : false,
+			'empty_field'     => ( $settings['show_empty'] ?? '' ) === 'Yes',
+			'html_field'      => ( $settings['show_html'] ?? '' ) === 'Yes',
+			'page_names'      => ( $settings['show_page_names'] ?? '' ) === 'Yes',
+			'section_content' => ( $settings['show_section_content'] ?? '' ) === 'Yes',
 		];
 	}
 }

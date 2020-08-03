@@ -2,14 +2,14 @@
 
 namespace GFPDF\Controller;
 
-use GFPDF\Model\Model_PDF;
+use GFCommon;
 use GFPDF\Helper\Helper_Abstract_Controller;
+use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
 use GFPDF\Helper\Helper_Pdf_Queue;
-
+use GFPDF\Model\Model_PDF;
 use Psr\Log\LoggerInterface;
-use GFCommon;
 
 /**
  * @package     Gravity PDF
@@ -34,7 +34,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
-	 * @var \GFPDF\Helper\Helper_Form
+	 * @var Helper_Form
 	 *
 	 * @since 5.0
 	 */
@@ -50,14 +50,14 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	protected $log;
 
 	/**
-	 * @var Model_PDF|\GFPDF\Model\Model_PDF
+	 * @var Model_PDF
 	 *
 	 * @since 5.0
 	 */
 	protected $model_pdf;
 
 	/**
-	 * @var \GFPDF\Helper\Helper_Pdf_Queue
+	 * @var Helper_Pdf_Queue
 	 *
 	 * @since 5.0
 	 */
@@ -73,11 +73,11 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	protected $disable_queue = false;
 
 	/**
-	 * Set up our dependancies
+	 * Set up our dependencies
 	 *
-	 * @param \GFPDF\Helper\Helper_Pdf_Queue
-	 * @param \GFPDF\Model\Model_PDF $model_pdf
-	 * @param LoggerInterface        $log Our logger class
+	 * @param Helper_Pdf_Queue $queue
+	 * @param Model_PDF        $model_pdf
+	 * @param LoggerInterface  $log Our logger class
 	 *
 	 * @since 5.0
 	 */
@@ -91,9 +91,9 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	/**
 	 * Initialise our class defaults
 	 *
+	 * @return void
 	 * @since 5.0
 	 *
-	 * @return void
 	 */
 	public function init() {
 		$this->add_actions();
@@ -103,9 +103,9 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	/**
 	 * Apply any actions needed for the welcome page
 	 *
+	 * @return void
 	 * @since 5.0
 	 *
-	 * @return void
 	 */
 	public function add_actions() {
 		add_action( 'gform_after_submission', [ $this, 'queue_async_form_submission_tasks' ], 5, 2 );
@@ -115,9 +115,9 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	}
 
 	/**
+	 * @return void
 	 * @since 5.0
 	 *
-	 * @return void
 	 */
 	public function add_filters() {
 		add_filter( 'gform_disable_notification', [ $this, 'maybe_disable_submission_notifications' ], 9999, 4 );
@@ -262,9 +262,9 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 	 * @param $form
 	 * @param $notifications
 	 *
+	 * @return array
 	 * @since 5.0
 	 *
-	 * @return array
 	 */
 	protected function get_queue_tasks( $entry, $form, $notifications = [] ) {
 		/* Check if the PDF should be generated  */

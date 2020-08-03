@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * A simple abstract class controlers can extent to share similar variables
+ * A simple abstract class controllers can extent to share similar variables
  *
  * @since 4.0
  */
@@ -34,7 +34,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
-	 * @var \GFPDF\Helper\Helper_Form
+	 * @var Helper_Form
 	 *
 	 * @since 4.0
 	 */
@@ -44,7 +44,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
 	 *
-	 * @var \GFPDF\Helper\Helper_Misc
+	 * @var Helper_Misc
 	 *
 	 * @since 4.0
 	 */
@@ -54,7 +54,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * Holds our Helper_Templates object
 	 * used to ease access to our PDF templates
 	 *
-	 * @var \GFPDF\Helper\Helper_Templates
+	 * @var Helper_Templates
 	 *
 	 * @since 4.0
 	 */
@@ -63,10 +63,10 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	/**
 	 * Setup our class with appropriate data
 	 *
-	 * @param array                              $form  The Gravity Forms object
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform Our abstracted Gravity Forms API
-	 * @param \GFPDF\Helper\Helper_Misc          $misc
-	 * @param \GFPDF\Helper\Helper_Templates     $templates
+	 * @param array                $form  The Gravity Forms object
+	 * @param Helper_Abstract_Form $gform Our abstracted Gravity Forms API
+	 * @param Helper_Misc          $misc
+	 * @param Helper_Templates     $templates
 	 *
 	 * @since    4.0
 	 */
@@ -135,19 +135,19 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$singular = rgar( $this->_args, 'singular' );
 		?>
 
-		<table class="wp-list-table <?php echo implode( ' ', $this->get_table_classes() ); ?>" cellspacing="0">
+		<table class="wp-list-table <?= implode( ' ', $this->get_table_classes() ); ?>" cellspacing="0">
 			<thead>
 			<tr>
 				<?php $this->print_column_headers(); ?>
 			</tr>
 			</thead>
 
-			<tbody id="the-list" 
-			<?php
-			if ( $singular ) {
-				echo " class='list:$singular'";
-			}
-			?>
+			<tbody id="the-list"
+				<?php
+				if ( $singular ) {
+					echo " class='list:$singular'";
+				}
+				?>
 			>
 			<?php $this->display_rows_or_placeholder(); ?>
 			</tbody>
@@ -166,7 +166,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	/**
 	 * Output the single table row
 	 *
-	 * @param  object $item The table row being processed
+	 * @param object $item The table row being processed
 	 *
 	 * @since 4.0
 	 */
@@ -187,7 +187,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * For developers who want to include additional columns using the `gfpdf_pdf_list_columns` filter
 	 * there's also an action you can tap into to output the correct column information
 	 *
-	 * @param  array $item The table row being processed
+	 * @param array  $item The table row being processed
 	 *
 	 * @param string $column
 	 *
@@ -209,7 +209,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * Custom public function for displaying the 'cb' column
 	 * Used to handle active / inactive PDFs
 	 *
-	 * @param  array $item The table row being processed
+	 * @param array $item The table row being processed
 	 *
 	 * @since 4.0
 	 */
@@ -228,8 +228,8 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			 data-fid="<?= $form_id ?>"
 			 src="<?= $this->gform->get_plugin_url() ?>/images/active<?= intval( $is_active ) ?>.png"
 			 style="margin:1px 0 0 2px"
-			 alt="<?= $label  ?>"
-			 title="<?= $label  ?>"/>
+			 alt="<?= $label ?>"
+			 title="<?= $label ?>" />
 
 		<?php
 	}
@@ -238,7 +238,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * Custom public function for displaying the 'notifications' column
 	 * Display comma separated list of active notifications, otherwise display 'None'
 	 *
-	 * @param  array $item The table row being processed
+	 * @param array $item The table row being processed
 	 *
 	 * @since 4.0
 	 */
@@ -263,7 +263,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	/**
 	 * Translates the template raw name to a user-friendly name
 	 *
-	 * @param  array $item The table row being processed
+	 * @param array $item The table row being processed
 	 *
 	 * @since 4.0
 	 */
@@ -288,7 +288,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	/**
 	 * Translates the template raw name to a user-friendly name
 	 *
-	 * @param  array $item The table row being processed
+	 * @param array $item The table row being processed
 	 *
 	 * @since 4.0
 	 */
@@ -301,7 +301,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			$template_name  = $this->templates->maybe_add_template_compatibility_notice( $template['template'], $template['required_pdf_version'] );
 
 			?>
-			<strong><?php echo $template_group; ?></strong> <?php echo $template_name; ?>
+			<strong><?= $template_group; ?></strong> <?= $template_name; ?>
 			<?php
 		}
 	}
@@ -309,7 +309,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	/**
 	 * Add column actions to allow edit, duplication and deletion
 	 *
-	 * @param  array $item The table row being processed
+	 * @param array $item The table row being processed
 	 *
 	 * @since 4.0
 	 */
@@ -330,7 +330,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 		?>
 
-		<a href="<?php echo $edit_url; ?>"><strong><?php echo rgar( $item, 'name' ); ?></strong></a>
+		<a href="<?= $edit_url; ?>"><strong><?= rgar( $item, 'name' ); ?></strong></a>
 		<div class="row-actions">
 
 			<?php
@@ -340,8 +340,8 @@ class Helper_PDF_List_Table extends WP_List_Table {
 				foreach ( $actions as $key => $html ) {
 					$divider = $key === $last_key ? '' : ' | ';
 					?>
-					<span class="<?php echo $key; ?>">
-						<?php echo $html . $divider; ?>
+					<span class="<?= $key; ?>">
+						<?= $html . $divider; ?>
 					</span>
 					<?php
 				}

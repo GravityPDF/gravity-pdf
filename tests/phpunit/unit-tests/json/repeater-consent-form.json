@@ -1,1 +1,527 @@
-{"title":"Repeater Field Example","description":"","labelPlacement":"top_label","descriptionPlacement":"below","button":{"type":"text","text":"Submit","imageUrl":""},"fields":[{"type":"consent","checked_indicator_url":"https:\/\/pdf44.local\/wp-content\/plugins\/gravityforms\/images\/tick.png","checked_indicator_markup":"<img src=\"https:\/\/pdf44.local\/wp-content\/plugins\/gravityforms\/images\/tick.png\" \/>","id":19,"label":"Consent","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","visibility":"visible","inputs":[{"id":"19.1","label":"Consent","name":""},{"id":"19.2","label":"Text","name":"","isHidden":true},{"id":"19.3","label":"Description","name":"","isHidden":true}],"checkboxLabel":"I agree to the privacy policy.","descriptionPlaceholder":"Enter consent agreement text here.  The Consent Field will store this agreement text with the form entry in order to track what the user has consented to.","choices":[{"text":"Checked","value":"1","isSelected":false,"price":""},{"text":"Not Checked","value":"0","isSelected":false,"price":""}],"formId":194,"description":"This is the consent description text.","allowsPrepopulate":false,"inputMask":false,"inputMaskValue":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","cssClass":"","inputName":"","noDuplicates":false,"defaultValue":"","conditionalLogic":"","productField":"","multipleFiles":false,"maxFiles":"","calculationFormula":"","calculationRounding":"","enableCalculation":"","disableQuantity":false,"displayAllCategories":false,"useRichTextEditor":false,"fields":""},{"type":"repeater","displayLabelsInHeader":true,"id":999,"formId":194,"label":"Team","addButtonText":"Add team member","removeButtonText":"Remove team member","maxItems":3,"fields":[{"type":"name","id":15,"label":"Name","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","visibility":"visible","nameFormat":"advanced","inputs":[{"id":"15.2","label":"Prefix","name":"","choices":[{"text":"Mr.","value":"Mr.","isSelected":false,"price":""},{"text":"Mrs.","value":"Mrs.","isSelected":false,"price":""},{"text":"Miss","value":"Miss","isSelected":false,"price":""},{"text":"Ms.","value":"Ms.","isSelected":false,"price":""},{"text":"Dr.","value":"Dr.","isSelected":false,"price":""},{"text":"Prof.","value":"Prof.","isSelected":false,"price":""},{"text":"Rev.","value":"Rev.","isSelected":false,"price":""}],"isHidden":true,"inputType":"radio"},{"id":"15.3","label":"First","name":""},{"id":"15.4","label":"Middle","name":"","isHidden":true},{"id":"15.6","label":"Last","name":""},{"id":"15.8","label":"Suffix","name":"","isHidden":true}],"formId":194,"description":"","allowsPrepopulate":false,"inputMask":false,"inputMaskValue":"","inputType":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","cssClass":"","inputName":"","noDuplicates":false,"defaultValue":"","choices":"","conditionalLogic":"","productField":"","pageNumber":1,"displayOnly":"","fields":""},{"type":"email","id":16,"label":"Email","adminLabel":"","isRequired":false,"size":"medium","errorMessage":"","visibility":"visible","inputs":null,"formId":194,"description":"","allowsPrepopulate":false,"inputMask":false,"inputMaskValue":"","inputType":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","cssClass":"","inputName":"","noDuplicates":false,"defaultValue":"","choices":"","conditionalLogic":"","productField":"","emailConfirmEnabled":"","pageNumber":1,"fields":""},{"type":"repeater","displayLabelsInHeader":true,"id":99,"formId":194,"label":"Experience","addButtonText":"Add expertise","removeButtonText":"Remove expertise","fields":[{"type":"text","isRequired":true,"id":200,"formId":194,"label":"Expertise","pageNumber":1,"fields":"","inputs":"","choices":""},{"type":"text","id":201,"formId":194,"label":"Years","pageNumber":1,"fields":"","inputs":"","choices":""},{"type":"repeater","displayLabelsInHeader":true,"id":88,"formId":194,"label":"Example URLs","addButtonText":"Add URL","removeButtonText":"Remove URL","maxItems":3,"fields":[{"type":"text","id":202,"formId":194,"label":"URL","pageNumber":1,"fields":"","inputs":"","choices":""}],"pageNumber":1,"nestingLevel":2,"inputs":""}],"pageNumber":1,"nestingLevel":1,"inputs":""}],"visibility":"visible","inputType":"","nestingLevel":0,"displayOnly":"","inputs":"","isRequired":false,"adminLabel":"","description":"","allowsPrepopulate":false,"inputMask":false,"inputMaskValue":"","size":"","errorMessage":"","labelPlacement":"","descriptionPlacement":"","subLabelPlacement":"","placeholder":"","cssClass":"","inputName":"","noDuplicates":false,"defaultValue":"","choices":"","conditionalLogic":""}],"version":"2.4-beta-2","id":194,"useCurrentUserAsAuthor":true,"postContentTemplateEnabled":false,"postTitleTemplateEnabled":false,"postTitleTemplate":"","postContentTemplate":"","lastPageButton":null,"pagination":null,"firstPageCssClass":null,"subLabelPlacement":"below","cssClass":"","enableHoneypot":false,"enableAnimation":false,"save":{"enabled":true,"button":{"type":"link","text":"Save and Continue Later"}},"limitEntries":false,"limitEntriesCount":"","limitEntriesPeriod":"","limitEntriesMessage":"","scheduleForm":false,"scheduleStart":"","scheduleStartHour":"","scheduleStartMinute":"","scheduleStartAmpm":"","scheduleEnd":"","scheduleEndHour":"","scheduleEndMinute":"","scheduleEndAmpm":"","schedulePendingMessage":"","scheduleMessage":"","requireLogin":false,"requireLoginMessage":"","nextFieldId":20,"is_active":"1","date_created":"2018-10-17 23:43:21","is_trash":"0","gfpdf_form_settings":{"5bc7cc1373121":{"name":"Zadani","template":"gpdf-tritan","filename":"Zadani","conditionalLogic":null,"pdf_size":"A4","custom_pdf_size":["0","0","millimeters"],"orientation":"portrait","font":"gothambook","font_size":"10","font_colour":"#000000","rtl":"No","pdf_main_heading":"{form_title}","tritan_primary_colour":"#8224e3","tritan_secondary_colour":"#ea25da","tritan_footer_left":"","tritan_footer_right":"{PAGENO} of {nbpg}","tritan_logo":"","tritan_additional_content":"","tritan_sidebar_font_colour":"#444444","show_page_names":"No","show_html":"No","show_section_content":"No","enable_conditional":"Yes","show_empty":"No","form_field_selector":["999"],"field_label_display":"Standard","option_label_or_value":"Label","include_field_description":"No","group_product_fields":"Yes","display_entry_notes":"No","format":"Standard","security":"No","password":"","privileges":["copy","print","print-highres","modify","annot-forms","fill-forms","extract","assemble"],"master_password":"","image_dpi":"96","save":"No","public_access":"No","restrict_owner":"No","advanced_template":"No","id":"5bc7cc1373121","active":true}},"confirmations":[{"id":"5b1e751b69177","name":"Default Confirmation","isDefault":true,"type":"message","message":"{all_fields}\r\n","url":"","pageId":0,"queryString":"","disableAutoformat":false,"conditionalLogic":[]},{"id":"sc15b1e83786d681","event":"form_saved","name":"Save and Continue Confirmation","isDefault":true,"type":"message","message":"<p>Please use the following link to return and complete this form from any computer.<\/p><p class=\"resume_form_link_wrapper\"> {save_link} <\/p><p> Note: This link will expire after 30 days.<br \/>Enter your email address to if you would like to receive the link via email.<\/p><\/p> {save_email_input}<\/p>","url":"","pageId":"","queryString":""},{"id":"sc25b1e83786d6f1","event":"form_save_email_sent","name":"Save and Continue Email Sent Confirmation","isDefault":true,"type":"message","message":"<span class=\"saved_message_success\">Success!<\/span>The link was sent to the following email address: <span class=\"saved_message_email\">{save_email}<\/span>","url":"","pageId":"","queryString":""}],"notifications":[{"isActive":true,"id":"5b1e751b68145","name":"Admin Notification","service":"wordpress","event":"form_submission","to":"{admin_email}","toType":"email","cc":"","bcc":"","subject":"New submission from {form_title}","message":"{all_fields}\r\n\r\nguests:\r\n{Guests:999}","from":"{admin_email}","fromName":"","replyTo":"","routing":null,"conditionalLogic":null,"disableAutoformat":false,"enableAttachments":false},{"id":"5b1e83786c9f0","isDefault":true,"name":"Save and Continue Email","event":"form_save_email_requested","toType":"hidden","from":"{admin_email}","subject":"Link to continue {form_title}","message":"Thank you for saving {form_title}. Please use the unique link below to return to the form from any computer. <br \/><br \/> {save_link} <br \/><br \/> Remember that the link will expire after 30 days so please return via the provided link to complete your form submission."},{"isActive":true,"id":"5b8d3d5754021","name":"Admin Notification - AutoFormatting disabled","service":"wordpress","event":"form_submission","to":"{admin_email}","toType":"email","cc":"","bcc":"","subject":"New submission from {form_title}","message":"{all_fields}\r\n\r\nguests:\r\n{Guests:999}","from":"{admin_email}","fromName":"","replyTo":"","routing":null,"conditionalLogic":null,"disableAutoformat":true,"enableAttachments":false},{"isActive":true,"id":"5b8d727f8df82","name":"Text Notification","service":"wordpress","event":"form_submission","to":"{admin_email}","toType":"email","cc":"","bcc":"","subject":"New submission from {form_title}","message":"{all_fields}\r\n\r\nguests:\r\n{Guests:999}","from":"{admin_email}","fromName":"","replyTo":"","routing":null,"conditionalLogic":null,"disableAutoformat":false,"enableAttachments":false}]}
+{
+  "title": "Repeater Field Example",
+  "description": "",
+  "labelPlacement": "top_label",
+  "descriptionPlacement": "below",
+  "button": {
+    "type": "text",
+    "text": "Submit",
+    "imageUrl": ""
+  },
+  "fields": [
+    {
+      "type": "consent",
+      "checked_indicator_url": "https:\/\/pdf44.local\/wp-content\/plugins\/gravityforms\/images\/tick.png",
+      "checked_indicator_markup": "<img src=\"https:\/\/pdf44.local\/wp-content\/plugins\/gravityforms\/images\/tick.png\" \/>",
+      "id": 19,
+      "label": "Consent",
+      "adminLabel": "",
+      "isRequired": false,
+      "size": "medium",
+      "errorMessage": "",
+      "visibility": "visible",
+      "inputs": [
+        {
+          "id": "19.1",
+          "label": "Consent",
+          "name": ""
+        },
+        {
+          "id": "19.2",
+          "label": "Text",
+          "name": "",
+          "isHidden": true
+        },
+        {
+          "id": "19.3",
+          "label": "Description",
+          "name": "",
+          "isHidden": true
+        }
+      ],
+      "checkboxLabel": "I agree to the privacy policy.",
+      "descriptionPlaceholder": "Enter consent agreement text here.  The Consent Field will store this agreement text with the form entry in order to track what the user has consented to.",
+      "choices": [
+        {
+          "text": "Checked",
+          "value": "1",
+          "isSelected": false,
+          "price": ""
+        },
+        {
+          "text": "Not Checked",
+          "value": "0",
+          "isSelected": false,
+          "price": ""
+        }
+      ],
+      "formId": 194,
+      "description": "This is the consent description text.",
+      "allowsPrepopulate": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "cssClass": "",
+      "inputName": "",
+      "noDuplicates": false,
+      "defaultValue": "",
+      "conditionalLogic": "",
+      "productField": "",
+      "multipleFiles": false,
+      "maxFiles": "",
+      "calculationFormula": "",
+      "calculationRounding": "",
+      "enableCalculation": "",
+      "disableQuantity": false,
+      "displayAllCategories": false,
+      "useRichTextEditor": false,
+      "fields": ""
+    },
+    {
+      "type": "repeater",
+      "displayLabelsInHeader": true,
+      "id": 999,
+      "formId": 194,
+      "label": "Team",
+      "addButtonText": "Add team member",
+      "removeButtonText": "Remove team member",
+      "maxItems": 3,
+      "fields": [
+        {
+          "type": "name",
+          "id": 15,
+          "label": "Name",
+          "adminLabel": "",
+          "isRequired": false,
+          "size": "medium",
+          "errorMessage": "",
+          "visibility": "visible",
+          "nameFormat": "advanced",
+          "inputs": [
+            {
+              "id": "15.2",
+              "label": "Prefix",
+              "name": "",
+              "choices": [
+                {
+                  "text": "Mr.",
+                  "value": "Mr.",
+                  "isSelected": false,
+                  "price": ""
+                },
+                {
+                  "text": "Mrs.",
+                  "value": "Mrs.",
+                  "isSelected": false,
+                  "price": ""
+                },
+                {
+                  "text": "Miss",
+                  "value": "Miss",
+                  "isSelected": false,
+                  "price": ""
+                },
+                {
+                  "text": "Ms.",
+                  "value": "Ms.",
+                  "isSelected": false,
+                  "price": ""
+                },
+                {
+                  "text": "Dr.",
+                  "value": "Dr.",
+                  "isSelected": false,
+                  "price": ""
+                },
+                {
+                  "text": "Prof.",
+                  "value": "Prof.",
+                  "isSelected": false,
+                  "price": ""
+                },
+                {
+                  "text": "Rev.",
+                  "value": "Rev.",
+                  "isSelected": false,
+                  "price": ""
+                }
+              ],
+              "isHidden": true,
+              "inputType": "radio"
+            },
+            {
+              "id": "15.3",
+              "label": "First",
+              "name": ""
+            },
+            {
+              "id": "15.4",
+              "label": "Middle",
+              "name": "",
+              "isHidden": true
+            },
+            {
+              "id": "15.6",
+              "label": "Last",
+              "name": ""
+            },
+            {
+              "id": "15.8",
+              "label": "Suffix",
+              "name": "",
+              "isHidden": true
+            }
+          ],
+          "formId": 194,
+          "description": "",
+          "allowsPrepopulate": false,
+          "inputMask": false,
+          "inputMaskValue": "",
+          "inputType": "",
+          "labelPlacement": "",
+          "descriptionPlacement": "",
+          "subLabelPlacement": "",
+          "placeholder": "",
+          "cssClass": "",
+          "inputName": "",
+          "noDuplicates": false,
+          "defaultValue": "",
+          "choices": "",
+          "conditionalLogic": "",
+          "productField": "",
+          "pageNumber": 1,
+          "displayOnly": "",
+          "fields": ""
+        },
+        {
+          "type": "email",
+          "id": 16,
+          "label": "Email",
+          "adminLabel": "",
+          "isRequired": false,
+          "size": "medium",
+          "errorMessage": "",
+          "visibility": "visible",
+          "inputs": null,
+          "formId": 194,
+          "description": "",
+          "allowsPrepopulate": false,
+          "inputMask": false,
+          "inputMaskValue": "",
+          "inputType": "",
+          "labelPlacement": "",
+          "descriptionPlacement": "",
+          "subLabelPlacement": "",
+          "placeholder": "",
+          "cssClass": "",
+          "inputName": "",
+          "noDuplicates": false,
+          "defaultValue": "",
+          "choices": "",
+          "conditionalLogic": "",
+          "productField": "",
+          "emailConfirmEnabled": "",
+          "pageNumber": 1,
+          "fields": ""
+        },
+        {
+          "type": "repeater",
+          "displayLabelsInHeader": true,
+          "id": 99,
+          "formId": 194,
+          "label": "Experience",
+          "addButtonText": "Add expertise",
+          "removeButtonText": "Remove expertise",
+          "fields": [
+            {
+              "type": "text",
+              "isRequired": true,
+              "id": 200,
+              "formId": 194,
+              "label": "Expertise",
+              "pageNumber": 1,
+              "fields": "",
+              "inputs": "",
+              "choices": ""
+            },
+            {
+              "type": "text",
+              "id": 201,
+              "formId": 194,
+              "label": "Years",
+              "pageNumber": 1,
+              "fields": "",
+              "inputs": "",
+              "choices": ""
+            },
+            {
+              "type": "repeater",
+              "displayLabelsInHeader": true,
+              "id": 88,
+              "formId": 194,
+              "label": "Example URLs",
+              "addButtonText": "Add URL",
+              "removeButtonText": "Remove URL",
+              "maxItems": 3,
+              "fields": [
+                {
+                  "type": "text",
+                  "id": 202,
+                  "formId": 194,
+                  "label": "URL",
+                  "pageNumber": 1,
+                  "fields": "",
+                  "inputs": "",
+                  "choices": ""
+                }
+              ],
+              "pageNumber": 1,
+              "nestingLevel": 2,
+              "inputs": ""
+            }
+          ],
+          "pageNumber": 1,
+          "nestingLevel": 1,
+          "inputs": ""
+        }
+      ],
+      "visibility": "visible",
+      "inputType": "",
+      "nestingLevel": 0,
+      "displayOnly": "",
+      "inputs": "",
+      "isRequired": false,
+      "adminLabel": "",
+      "description": "",
+      "allowsPrepopulate": false,
+      "inputMask": false,
+      "inputMaskValue": "",
+      "size": "",
+      "errorMessage": "",
+      "labelPlacement": "",
+      "descriptionPlacement": "",
+      "subLabelPlacement": "",
+      "placeholder": "",
+      "cssClass": "",
+      "inputName": "",
+      "noDuplicates": false,
+      "defaultValue": "",
+      "choices": "",
+      "conditionalLogic": ""
+    }
+  ],
+  "version": "2.4-beta-2",
+  "id": 194,
+  "useCurrentUserAsAuthor": true,
+  "postContentTemplateEnabled": false,
+  "postTitleTemplateEnabled": false,
+  "postTitleTemplate": "",
+  "postContentTemplate": "",
+  "lastPageButton": null,
+  "pagination": null,
+  "firstPageCssClass": null,
+  "subLabelPlacement": "below",
+  "cssClass": "",
+  "enableHoneypot": false,
+  "enableAnimation": false,
+  "save": {
+    "enabled": true,
+    "button": {
+      "type": "link",
+      "text": "Save and Continue Later"
+    }
+  },
+  "limitEntries": false,
+  "limitEntriesCount": "",
+  "limitEntriesPeriod": "",
+  "limitEntriesMessage": "",
+  "scheduleForm": false,
+  "scheduleStart": "",
+  "scheduleStartHour": "",
+  "scheduleStartMinute": "",
+  "scheduleStartAmpm": "",
+  "scheduleEnd": "",
+  "scheduleEndHour": "",
+  "scheduleEndMinute": "",
+  "scheduleEndAmpm": "",
+  "schedulePendingMessage": "",
+  "scheduleMessage": "",
+  "requireLogin": false,
+  "requireLoginMessage": "",
+  "nextFieldId": 20,
+  "is_active": "1",
+  "date_created": "2018-10-17 23:43:21",
+  "is_trash": "0",
+  "gfpdf_form_settings": {
+    "5bc7cc1373121": {
+      "name": "Zadani",
+      "template": "gpdf-tritan",
+      "filename": "Zadani",
+      "conditionalLogic": null,
+      "pdf_size": "A4",
+      "custom_pdf_size": [
+        "0",
+        "0",
+        "millimeters"
+      ],
+      "orientation": "portrait",
+      "font": "gothambook",
+      "font_size": "10",
+      "font_colour": "#000000",
+      "rtl": "No",
+      "pdf_main_heading": "{form_title}",
+      "tritan_primary_colour": "#8224e3",
+      "tritan_secondary_colour": "#ea25da",
+      "tritan_footer_left": "",
+      "tritan_footer_right": "{PAGENO} of {nbpg}",
+      "tritan_logo": "",
+      "tritan_additional_content": "",
+      "tritan_sidebar_font_colour": "#444444",
+      "show_page_names": "No",
+      "show_html": "No",
+      "show_section_content": "No",
+      "enable_conditional": "Yes",
+      "show_empty": "No",
+      "form_field_selector": [
+        "999"
+      ],
+      "field_label_display": "Standard",
+      "option_label_or_value": "Label",
+      "include_field_description": "No",
+      "group_product_fields": "Yes",
+      "display_entry_notes": "No",
+      "format": "Standard",
+      "security": "No",
+      "password": "",
+      "privileges": [
+        "copy",
+        "print",
+        "print-highres",
+        "modify",
+        "annot-forms",
+        "fill-forms",
+        "extract",
+        "assemble"
+      ],
+      "master_password": "",
+      "image_dpi": "96",
+      "save": "No",
+      "public_access": "No",
+      "restrict_owner": "No",
+      "advanced_template": "No",
+      "id": "5bc7cc1373121",
+      "active": true
+    }
+  },
+  "confirmations": [
+    {
+      "id": "5b1e751b69177",
+      "name": "Default Confirmation",
+      "isDefault": true,
+      "type": "message",
+      "message": "{all_fields}\r\n",
+      "url": "",
+      "pageId": 0,
+      "queryString": "",
+      "disableAutoformat": false,
+      "conditionalLogic": []
+    },
+    {
+      "id": "sc15b1e83786d681",
+      "event": "form_saved",
+      "name": "Save and Continue Confirmation",
+      "isDefault": true,
+      "type": "message",
+      "message": "<p>Please use the following link to return and complete this form from any computer.<\/p><p class=\"resume_form_link_wrapper\"> {save_link} <\/p><p> Note: This link will expire after 30 days.<br \/>Enter your email address to if you would like to receive the link via email.<\/p><\/p> {save_email_input}<\/p>",
+      "url": "",
+      "pageId": "",
+      "queryString": ""
+    },
+    {
+      "id": "sc25b1e83786d6f1",
+      "event": "form_save_email_sent",
+      "name": "Save and Continue Email Sent Confirmation",
+      "isDefault": true,
+      "type": "message",
+      "message": "<span class=\"saved_message_success\">Success!<\/span>The link was sent to the following email address: <span class=\"saved_message_email\">{save_email}<\/span>",
+      "url": "",
+      "pageId": "",
+      "queryString": ""
+    }
+  ],
+  "notifications": [
+    {
+      "isActive": true,
+      "id": "5b1e751b68145",
+      "name": "Admin Notification",
+      "service": "wordpress",
+      "event": "form_submission",
+      "to": "{admin_email}",
+      "toType": "email",
+      "cc": "",
+      "bcc": "",
+      "subject": "New submission from {form_title}",
+      "message": "{all_fields}\r\n\r\nguests:\r\n{Guests:999}",
+      "from": "{admin_email}",
+      "fromName": "",
+      "replyTo": "",
+      "routing": null,
+      "conditionalLogic": null,
+      "disableAutoformat": false,
+      "enableAttachments": false
+    },
+    {
+      "id": "5b1e83786c9f0",
+      "isDefault": true,
+      "name": "Save and Continue Email",
+      "event": "form_save_email_requested",
+      "toType": "hidden",
+      "from": "{admin_email}",
+      "subject": "Link to continue {form_title}",
+      "message": "Thank you for saving {form_title}. Please use the unique link below to return to the form from any computer. <br \/><br \/> {save_link} <br \/><br \/> Remember that the link will expire after 30 days so please return via the provided link to complete your form submission."
+    },
+    {
+      "isActive": true,
+      "id": "5b8d3d5754021",
+      "name": "Admin Notification - AutoFormatting disabled",
+      "service": "wordpress",
+      "event": "form_submission",
+      "to": "{admin_email}",
+      "toType": "email",
+      "cc": "",
+      "bcc": "",
+      "subject": "New submission from {form_title}",
+      "message": "{all_fields}\r\n\r\nguests:\r\n{Guests:999}",
+      "from": "{admin_email}",
+      "fromName": "",
+      "replyTo": "",
+      "routing": null,
+      "conditionalLogic": null,
+      "disableAutoformat": true,
+      "enableAttachments": false
+    },
+    {
+      "isActive": true,
+      "id": "5b8d727f8df82",
+      "name": "Text Notification",
+      "service": "wordpress",
+      "event": "form_submission",
+      "to": "{admin_email}",
+      "toType": "email",
+      "cc": "",
+      "bcc": "",
+      "subject": "New submission from {form_title}",
+      "message": "{all_fields}\r\n\r\nguests:\r\n{Guests:999}",
+      "from": "{admin_email}",
+      "fromName": "",
+      "replyTo": "",
+      "routing": null,
+      "conditionalLogic": null,
+      "disableAutoformat": false,
+      "enableAttachments": false
+    }
+  ]
+}

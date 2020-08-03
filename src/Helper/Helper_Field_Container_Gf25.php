@@ -71,7 +71,7 @@ class Helper_Field_Container_Gf25 extends Helper_Field_Container {
 
 	/**
 	 * Will check if the current field will fit in the open row, or if a new row needs to be open
-	 * to accomidate the field.
+	 * to accommodate the field.
 	 *
 	 * @param GF_Field $field The Gravity Form field currently being processed
 	 *

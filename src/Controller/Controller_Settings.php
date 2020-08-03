@@ -8,13 +8,17 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_View;
 use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
-use Mpdf\Cache;
-use Mpdf\Fonts\FontCache;
-use Mpdf\TTFontFile;
+use GFPDF\Model\Model_Settings;
+use GFPDF\View\View_Settings;
+use GFPDF_Vendor\Mpdf\Cache;
+use GFPDF_Vendor\Mpdf\Fonts\FontCache;
+use GFPDF_Vendor\Mpdf\MpdfException;
+use GFPDF_Vendor\Mpdf\TTFontFile;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -39,7 +43,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
-	 * @var \GFPDF\Helper\Helper_Form
+	 * @var Helper_Form
 	 *
 	 * @since 4.0
 	 */
@@ -58,7 +62,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	 * Holds our Helper_Notices object
 	 * which we can use to queue up admin messages for the user
 	 *
-	 * @var \GFPDF\Helper\Helper_Notices
+	 * @var Helper_Notices
 	 *
 	 * @since 4.0
 	 */
@@ -68,7 +72,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
 	 *
-	 * @var \GFPDF\Helper\Helper_Data
+	 * @var Helper_Data
 	 *
 	 * @since 4.0
 	 */
@@ -78,7 +82,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
 	 *
-	 * @var \GFPDF\Helper\Helper_Misc
+	 * @var Helper_Misc
 	 *
 	 * @since 4.0
 	 */
@@ -87,13 +91,13 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	/**
 	 * Setup our class by injecting all our dependencies
 	 *
-	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_Settings $model   Our Settings Model the controller will manage
-	 * @param Helper_Abstract_View|\GFPDF\View\View_Settings    $view    Our Settings View the controller will manage
-	 * @param \GFPDF\Helper\Helper_Abstract_Form                $gform   Our abstracted Gravity Forms helper functions
-	 * @param LoggerInterface                                   $log     Our logger class
-	 * @param \GFPDF\Helper\Helper_Notices                      $notices Our notice class used to queue admin messages and errors
-	 * @param \GFPDF\Helper\Helper_Data                         $data    Our plugin data store
-	 * @param \GFPDF\Helper\Helper_Misc                         $misc    Our miscellaneous class
+	 * @param Helper_Abstract_Model|Model_Settings $model   Our Settings Model the controller will manage
+	 * @param Helper_Abstract_View|View_Settings   $view    Our Settings View the controller will manage
+	 * @param Helper_Abstract_Form                 $gform   Our abstracted Gravity Forms helper functions
+	 * @param LoggerInterface                      $log     Our logger class
+	 * @param Helper_Notices                       $notices Our notice class used to queue admin messages and errors
+	 * @param Helper_Data                          $data    Our plugin data store
+	 * @param Helper_Misc                          $misc    Our miscellaneous class
 	 *
 	 * @since 4.0
 	 */
@@ -117,9 +121,9 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	/**
 	 * Initialise our class defaults
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function init() {
 
@@ -144,9 +148,9 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	/**
 	 * Apply any actions needed for the settings page
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function add_actions() {
 
@@ -175,9 +179,9 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	/**
 	 * Apply any filters needed for the settings page
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function add_filters() {
 
@@ -187,7 +191,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 		/* If trying to save settings page we'll use this filter to apply any errors passed back from options.php */
 		if ( $this->misc->is_gfpdf_page() ) {
 			add_filter( 'gfpdf_registered_fields', [ $this->model, 'highlight_errors' ] );
-			add_filter( 'gfpdf_localised_script_array', array( $this->model, 'get_template_data' ) );
+			add_filter( 'gfpdf_localised_script_array', [ $this->model, 'get_template_data' ] );
 		}
 
 		/* make capability text user friendly */
@@ -209,9 +213,9 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	/**
 	 * Display the settings page for Gravity PDF
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function display_page() {
 
@@ -243,9 +247,9 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	/**
 	 * Check our current user has the correct capability
 	 *
+	 * @return string
 	 * @since 4.0
 	 *
-	 * @return string
 	 */
 	public function edit_options_cap() {
 
@@ -273,9 +277,9 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	 *
 	 * @param array $nav The existing settings navigation
 	 *
+	 * @return array
 	 * @since 4.0
 	 *
-	 * @return array
 	 */
 	public function disable_tools_on_view_cap( $nav ) {
 
@@ -291,7 +295,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	/**
 	 * Add .ttf to upload whitelist
 	 *
-	 * @param  array $mime_types
+	 * @param array $mime_types
 	 *
 	 * @return array
 	 *
@@ -308,7 +312,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 	/**
 	 * Validate any TTF file uploads and allow in media library if valid
 	 *
-	 * @param array $mime
+	 * @param array  $mime
 	 * @param string $file
 	 * @param string $filename
 	 *
@@ -339,7 +343,7 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 					'proper_filename' => false,
 				];
 			}
-		} catch ( \GFPDF_Vendor\Mpdf\MpdfException $e ) {
+		} catch ( MpdfException $e ) {
 
 		}
 

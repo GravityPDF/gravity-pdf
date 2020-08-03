@@ -4,13 +4,16 @@ namespace GFPDF\Controller;
 
 use GFPDF\Helper\Helper_Abstract_Controller;
 use GFPDF\Helper\Helper_Abstract_Model;
+use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Abstract_View;
+use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
-use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
-use GFPDF\Helper\Helper_Abstract_Options;
-use GFPDF\Helper\Helper_Form;
+use GFPDF\Helper\Helper_Options_Fields;
+use GFPDF\Model\Model_Form_Settings;
+use GFPDF\View\View_Form_Settings;
 
 /**
  * @package     Gravity PDF
@@ -34,7 +37,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
 	 *
-	 * @var \GFPDF\Helper\Helper_Data
+	 * @var Helper_Data
 	 *
 	 * @since 4.0
 	 */
@@ -44,7 +47,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
-	 * @var \GFPDF\Helper\Helper_Options_Fields
+	 * @var Helper_Options_Fields
 	 *
 	 * @since 4.0
 	 */
@@ -54,7 +57,7 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
 	 *
-	 * @var \GFPDF\Helper\Helper_Misc
+	 * @var Helper_Misc
 	 *
 	 * @since 4.0
 	 */
@@ -63,21 +66,21 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
-	 * @var \GFPDF\Helper\Helper_Form
+	 * @var Helper_Form
 	 *
 	 * @since 4.2
 	 */
 	protected $gform;
 
 	/**
-	 * Setup our class by injecting all our dependancies
+	 * Setup our class by injecting all our dependencies
 	 *
-	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_Form_Settings $model   Our Form Model the controller will manage
-	 * @param Helper_Abstract_View|\GFPDF\View\View_Form_Settings    $view    Our Form View the controller will manage
-	 * @param \GFPDF\Helper\Helper_Data                              $data    Our plugin data store
-	 * @param \GFPDF\Helper\Helper_Abstract_Options                  $options Our options class which allows us to access any settings
-	 * @param \GFPDF\Helper\Helper_Misc                              $misc    Our miscellaneous methods
-	 * @param \GFPDF\Helper\Helper_Form                              $form    Out Gravity Forms object
+	 * @param Helper_Abstract_Model|Model_Form_Settings $model   Our Form Model the controller will manage
+	 * @param Helper_Abstract_View|View_Form_Settings   $view    Our Form View the controller will manage
+	 * @param Helper_Data                               $data    Our plugin data store
+	 * @param Helper_Abstract_Options                   $options Our options class which allows us to access any settings
+	 * @param Helper_Misc                               $misc    Our miscellaneous methods
+	 * @param Helper_Form                               $form    Out Gravity Forms object
 	 *
 	 * @since 4.0
 	 */
@@ -100,9 +103,9 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	/**
 	 * Initialise our class defaults
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function init() {
 
@@ -116,9 +119,9 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	/**
 	 * Apply any actions needed for the settings page
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function add_actions() {
 
@@ -139,9 +142,9 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	/**
 	 * Apply any filters needed for the settings page
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function add_filters() {
 
@@ -171,8 +174,6 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	/**
 	 * Determine if we should be saving the PDF settings
 	 *
-	 * @return void
-	 *
 	 * @since 4.0
 	 */
 	public function maybe_save_pdf_settings() {
@@ -188,9 +189,9 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 	/**
 	 * Processes / Setup the form settings page.
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function display_page() {
 

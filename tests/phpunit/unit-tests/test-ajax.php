@@ -3,11 +3,9 @@
 namespace GFPDF\Tests;
 
 use GFAPI;
-use GFForms;
-
 use WP_Ajax_UnitTestCase;
-use WPAjaxDieStopException;
 use WPAjaxDieContinueException;
+use WPAjaxDieStopException;
 
 
 /**
@@ -63,7 +61,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 	}
 
 	/**
-	 * Fix for WordPress 4.7 which seesm to close the MySQLi connection before
+	 * Fix for WordPress 4.7 which seems to close the MySQLi connection before
 	 * the class is correctly setup
 	 *
 	 * @since 4.1
@@ -184,7 +182,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 	 *
 	 * @since 4.1
 	 */
-	public function test_multsite_v3_migration() {
+	public function test_multisite_v3_migration() {
 
 		if ( ! is_multisite() ) {
 			$this->markTestSkipped(
@@ -495,8 +493,8 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 	/**
 	 * Test we can do the process of deleting a font via AJAX
 	 * Because the database state never changes between requests we cannot
-	 * correctly install a font and then do an AJAX request (two seperate processes).
-	 * Instead, we'll just mimick a failed attempt and test the actual font removal function elsewhere
+	 * correctly install a font and then do an AJAX request (two separate processes).
+	 * Instead, we'll just mimic a failed attempt and test the actual font removal function elsewhere
 	 *
 	 * @class Model_Form_Settings
 	 *
@@ -621,7 +619,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 	}
 
 	/**
-	 * Check that we can succesfully delete a PDF template through this AJAX endpoint
+	 * Check that we can successfully delete a PDF template through this AJAX endpoint
 	 *
 	 * @since 4.1
 	 */

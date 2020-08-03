@@ -26,7 +26,7 @@ if ( $collapsible ) {
 		$args['collapsible-open'] = empty( $_POST[ $collapsible_name ] );
 	}
 
-	$collapsible_class = 'gform-settings-panel--collapsible';
+	$collapsible_class  = 'gform-settings-panel--collapsible';
 	$collapsible_class .= empty( $args['collapsible-open'] ) ? ' gform-settings-panel--collapsed' : '';
 }
 
@@ -44,10 +44,10 @@ if ( $collapsible ) {
 			</legend>
 
 			<span class="gform-settings-panel__collapsible-control">
-				<input type="checkbox" class="gform-settings-panel__collapsible-toggle-checkbox" name="<?= esc_attr( $collapsible_name ) ?>" id="<?= esc_attr( $collapsible_name ) ?>" value="1" onclick="this.checked ? this.closest( '.gform-settings-panel' ).classList.add( 'gform-settings-panel--collapsed' ) : this.closest( '.gform-settings-panel' ).classList.remove( 'gform-settings-panel--collapsed' )" <?php checked( empty( $args['collapsible-open'] ) ) ?>>
+				<input type="checkbox" class="gform-settings-panel__collapsible-toggle-checkbox" name="<?= esc_attr( $collapsible_name ) ?>" id="<?= esc_attr( $collapsible_name ) ?>" value="1" onclick="this.checked ? this.closest( '.gform-settings-panel' ).classList.add( 'gform-settings-panel--collapsed' ) : this.closest( '.gform-settings-panel' ).classList.remove( 'gform-settings-panel--collapsed' )" <?php checked( empty( $args['collapsible-open'] ) ); ?>>
 				<label class="gform-settings-panel__collapsible-toggle" for="<?= esc_attr( $collapsible_name ) ?>"><span class="screen-reader-text"><?= sprintf( __( 'Toggle %s Section', 'gravity-forms-pdf-extended' ), esc_html( $args['title'] ) ) ?></span></label>
 			</span>
-		<?php else: ?>
+		<?php else : ?>
 			<legend class="gform-settings-panel__title">
 				<?= esc_html( $args['title'] ) ?>
 

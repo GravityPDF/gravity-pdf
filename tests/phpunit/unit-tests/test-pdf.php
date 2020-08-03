@@ -4,6 +4,7 @@ namespace GFPDF\Tests;
 
 use Exception;
 use GF_Field;
+use GFAPI;
 use GFCache;
 use GFPDF\Controller\Controller_PDF;
 use GFPDF\Helper\Fields\Field_Products;
@@ -13,6 +14,7 @@ use GFPDF\Helper\Helper_Url_Signer;
 use GFPDF\Model\Model_PDF;
 use GFPDF\Plugins\DeveloperToolkit\Loader\Helper;
 use GFPDF\View\View_PDF;
+use GPDFAPI;
 use ReflectionMethod;
 use WP_Error;
 use WP_UnitTestCase;
@@ -37,7 +39,7 @@ class Test_PDF extends WP_UnitTestCase {
 	/**
 	 * Our Settings Controller
 	 *
-	 * @var \GFPDF\Controller\Controller_PDF
+	 * @var Controller_PDF
 	 *
 	 * @since 4.0
 	 */
@@ -46,7 +48,7 @@ class Test_PDF extends WP_UnitTestCase {
 	/**
 	 * Our Settings Model
 	 *
-	 * @var \GFPDF\Model\Model_PDF
+	 * @var Model_PDF
 	 *
 	 * @since 4.0
 	 */
@@ -55,7 +57,7 @@ class Test_PDF extends WP_UnitTestCase {
 	/**
 	 * Our Settings View
 	 *
-	 * @var \GFPDF\View\View_PDF
+	 * @var View_PDF
 	 *
 	 * @since 4.0
 	 */
@@ -118,7 +120,6 @@ class Test_PDF extends WP_UnitTestCase {
 				]
 			)
 		);
-		$this->assertSame( 10, has_action( 'gform_entry_info', [ $this->model, 'view_pdf_entry_detail' ] ) );
 		$this->assertSame( 10, has_action( 'gform_after_submission', [ $this->model, 'maybe_save_pdf' ] ) );
 		$this->assertSame( 9999, has_action( 'gform_after_submission', [ $this->model, 'cleanup_pdf' ] ) );
 		$this->assertSame(
@@ -151,7 +152,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertSame( 60, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_auth_logged_out_user' ] ) );
 		$this->assertSame( 70, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_user_capability' ] ) );
 
-		$this->assertSame( 9999, has_filter( 'gform_notification', [ $this->model, 'notifications' ], 9999 ) );
+		$this->assertSame( 9999, has_filter( 'gform_notification', [ $this->model, 'notifications' ] ) );
 
 		$this->assertSame(
 			10,
@@ -180,7 +181,7 @@ class Test_PDF extends WP_UnitTestCase {
 			)
 		);
 
-		/* Backwards compatiblity */
+		/* Backwards compatibility */
 		$this->assertSame( 1, has_filter( 'gfpdfe_pre_load_template', [ 'PDFRender', 'prepare_ids' ] ) );
 		$this->assertSame(
 			10,
@@ -303,7 +304,7 @@ class Test_PDF extends WP_UnitTestCase {
 
 		/* Authorise the current user and check the message is displayed correctly */
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		$this->assertInternalType( 'integer', $user_id );
+		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
 
 		try {
@@ -328,7 +329,7 @@ class Test_PDF extends WP_UnitTestCase {
 
 		/* Check if error correctly triggered */
 		$settings['public_access'] = 'No';
-		$this->model->middle_public_access( '', '', $settings );
+		$this->model->middle_public_access( '', [], $settings );
 
 		/* Run our Tests */
 		$this->assertSame( 20, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_active' ] ) );
@@ -340,7 +341,7 @@ class Test_PDF extends WP_UnitTestCase {
 
 		/* Check if setting passes */
 		$settings['public_access'] = 'Yes';
-		$this->model->middle_public_access( '', '', $settings );
+		$this->model->middle_public_access( '', [], $settings );
 
 		$this->assertSame( 20, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_active' ] ) );
 		$this->assertSame( 30, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_conditional' ] ) );
@@ -361,10 +362,10 @@ class Test_PDF extends WP_UnitTestCase {
 		$results          = $this->create_form_and_entries();
 		$entry            = $results['entry'];
 		$entry['form_id'] = $results['form']['id'];
-		$options          = \GPDFAPI::get_options_class();
+		$options          = GPDFAPI::get_options_class();
 
 		/* Test it does nothing by default */
-		$this->model->middle_signed_url_access( '', '', '' );
+		$this->model->middle_signed_url_access( '', [], [] );
 
 		$this->assertSame( 20, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_active' ] ) );
 		$this->assertSame( 30, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_conditional' ] ) );
@@ -380,7 +381,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$_GET['signature']      = '';
 		$_SERVER['REQUEST_URI'] = str_replace( home_url(), '', $url );
 
-		$this->model->middle_signed_url_access( '', '', '' );
+		$this->model->middle_signed_url_access( '', [], [] );
 
 		$this->assertSame( 20, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_active' ] ) );
 		$this->assertSame( 30, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_conditional' ] ) );
@@ -405,12 +406,12 @@ class Test_PDF extends WP_UnitTestCase {
 		$entry            = $results['entry'];
 		$entry['form_id'] = $results['form']['id'];
 
-		$form_id          = \GFAPI::add_form( $results['form'] );
+		$form_id          = GFAPI::add_form( $results['form'] );
 		$entry            = $results['entry'];
 		$entry['form_id'] = $form_id;
-		$entry_id         = \GFAPI::add_entry( $entry );
+		$entry_id         = GFAPI::add_entry( $entry );
 
-		$options = \GPDFAPI::get_options_class();
+		$options = GPDFAPI::get_options_class();
 		$options->set_plugin_settings();
 
 		$url = do_shortcode( '[gravitypdf id="556690c67856b" entry="' . $entry_id . '" raw="1" signed="1"]' );
@@ -423,7 +424,7 @@ class Test_PDF extends WP_UnitTestCase {
 
 		$_SERVER['REQUEST_URI'] = str_replace( $protocol . $domain, '', $url );
 
-		$this->model->middle_signed_url_access( '', '', '' );
+		$this->model->middle_signed_url_access( '', [], [] );
 
 		$this->assertSame( 20, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_active' ] ) );
 		$this->assertSame( 30, has_filter( 'gfpdf_pdf_middleware', [ $this->model, 'middle_conditional' ] ) );
@@ -442,11 +443,11 @@ class Test_PDF extends WP_UnitTestCase {
 
 		/* Check if error correctly triggered */
 		$settings['active'] = false;
-		$this->assertTrue( is_wp_error( $this->model->middle_active( '', '', $settings ) ) );
+		$this->assertTrue( is_wp_error( $this->model->middle_active( '', [], $settings ) ) );
 
 		/* Check if setting passes */
 		$settings['active'] = true;
-		$this->assertTrue( $this->model->middle_active( true, '', $settings ) );
+		$this->assertTrue( $this->model->middle_active( true, [], $settings ) );
 	}
 
 	/**
@@ -490,7 +491,7 @@ class Test_PDF extends WP_UnitTestCase {
 	public function test_is_current_pdf_owner() {
 		/* set up a user to test its privilages */
 		$user_id = $this->factory->user->create();
-		$this->assertInternalType( 'integer', $user_id );
+		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
 
 		/* Set up a blank entry array */
@@ -537,24 +538,22 @@ class Test_PDF extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_middle_owner_restriction() {
-		global $gfpdf;
-
-		$this->assertTrue( $this->model->middle_owner_restriction( true, '', [ 'restrict_owner' => 'No' ] ) );
-		$this->assertTrue( is_wp_error( $this->model->middle_owner_restriction( new WP_Error( '' ), '', [ 'restrict_owner' => 'No' ] ) ) );
+		$this->assertTrue( $this->model->middle_owner_restriction( true, [], [ 'restrict_owner' => 'No' ] ) );
+		$this->assertTrue( is_wp_error( $this->model->middle_owner_restriction( new WP_Error( '' ), [], [ 'restrict_owner' => 'No' ] ) ) );
 
 		/* test if we are redirecting */
 		try {
 			wp_set_current_user( 0 );
-			$this->model->middle_owner_restriction( true, '', [ 'restrict_owner' => 'Yes' ] );
+			$this->model->middle_owner_restriction( true, [], [ 'restrict_owner' => 'Yes' ] );
 		} catch ( Exception $e ) {
 			$this->assertEquals( 'Redirecting', $e->getMessage() );
 		}
 
 		/* Test if logged in users are ignored */
 		$user_id = $this->factory->user->create();
-		$this->assertInternalType( 'integer', $user_id );
+		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
-		$this->assertTrue( $this->model->middle_owner_restriction( true, '', [ 'restrict_owner' => 'Yes' ] ) );
+		$this->assertTrue( $this->model->middle_owner_restriction( true, [], [ 'restrict_owner' => 'Yes' ] ) );
 
 		wp_set_current_user( 0 );
 	}
@@ -569,14 +568,14 @@ class Test_PDF extends WP_UnitTestCase {
 
 		/* Set up our testing data */
 		$entry = [
-			'date_created' => date( 'Y-m-d H:i:s', strtotime( '-32 minutes' ) ),
+			'date_created' => gmdate( 'Y-m-d H:i:s', strtotime( '-32 minutes' ) ),
 			'ip'           => '197.64.12.40',
 		];
 
 		$_SERVER['REMOTE_ADDR'] = $entry['ip'];
 
 		/* Test we get a timeout error */
-		$results = $this->model->middle_logged_out_timeout( true, $entry, '' );
+		$results = $this->model->middle_logged_out_timeout( true, $entry, [] );
 		$this->assertTrue( is_wp_error( $results ) );
 		$this->assertEquals( 'timeout_expired', $results->get_error_code() );
 
@@ -584,24 +583,24 @@ class Test_PDF extends WP_UnitTestCase {
 		$entry['created_by'] = 5;
 
 		try {
-			$this->model->middle_logged_out_timeout( true, $entry, '' );
+			$this->model->middle_logged_out_timeout( true, $entry, [] );
 		} catch ( Exception $e ) {
 			$this->assertEquals( 'Redirecting', $e->getMessage() );
 		}
 
 		/* Update timeout settings and check again */
 		$gfpdf->options->update_option( 'logged_out_timeout', '33' );
-		$this->assertTrue( $this->model->middle_logged_out_timeout( true, $entry, '' ) );
+		$this->assertTrue( $this->model->middle_logged_out_timeout( true, $entry, [] ) );
 
 		/* Check if the test should be skipped */
 		$_SERVER['REMOTE_ADDR'] = '12.123.123.124';
-		$this->assertTrue( $this->model->middle_logged_out_timeout( true, $entry, '' ) );
-		$this->assertTrue( is_wp_error( $this->model->middle_logged_out_timeout( new WP_Error(), $entry, '' ) ) );
+		$this->assertTrue( $this->model->middle_logged_out_timeout( true, $entry, [] ) );
+		$this->assertTrue( is_wp_error( $this->model->middle_logged_out_timeout( new WP_Error(), $entry, [] ) ) );
 
 		$user_id = $this->factory->user->create();
-		$this->assertInternalType( 'integer', $user_id );
+		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
-		$this->assertTrue( $this->model->middle_logged_out_timeout( true, $entry, '' ) );
+		$this->assertTrue( $this->model->middle_logged_out_timeout( true, $entry, [] ) );
 
 		wp_set_current_user( 0 );
 	}
@@ -619,26 +618,26 @@ class Test_PDF extends WP_UnitTestCase {
 		];
 
 		/* Check for WP Error */
-		$this->assertTrue( is_wp_error( $this->model->middle_auth_logged_out_user( true, $entry, '' ) ) );
+		$this->assertTrue( is_wp_error( $this->model->middle_auth_logged_out_user( true, $entry, [] ) ) );
 
 		/* Check for redirect */
 		$entry['created_by'] = 5;
 
 		try {
-			$this->model->middle_auth_logged_out_user( true, $entry, '' );
+			$this->model->middle_auth_logged_out_user( true, $entry, [] );
 		} catch ( Exception $e ) {
 			$this->assertEquals( 'Redirecting', $e->getMessage() );
 		}
 
 		/* Test that the middleware is skipped */
 		$_SERVER['REMOTE_ADDR'] = $entry['ip'];
-		$this->assertTrue( $this->model->middle_auth_logged_out_user( true, $entry, '' ) );
+		$this->assertTrue( $this->model->middle_auth_logged_out_user( true, $entry, [] ) );
 
 		unset( $_SERVER['REMOTE_ADDR'] );
 		$user_id = $this->factory->user->create();
-		$this->assertInternalType( 'integer', $user_id );
+		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
-		$this->assertTrue( $this->model->middle_auth_logged_out_user( true, $entry, '' ) );
+		$this->assertTrue( $this->model->middle_auth_logged_out_user( true, $entry, [] ) );
 
 		wp_set_current_user( 0 );
 	}
@@ -649,18 +648,16 @@ class Test_PDF extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_middle_user_capability() {
-		global $current_user;
-
 		/* Check for WP Error */
-		$this->assertTrue( is_wp_error( $this->model->middle_user_capability( new WP_Error(), '', '' ) ) );
+		$this->assertTrue( is_wp_error( $this->model->middle_user_capability( new WP_Error(), [], [] ) ) );
 
 		/* create subscriber and test access */
 		$user_id = $this->factory->user->create();
-		$this->assertInternalType( 'integer', $user_id );
+		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
 
 		/* get the results */
-		$results = $this->model->middle_user_capability( true, [ 'created_by' => 0 ], '' );
+		$results = $this->model->middle_user_capability( true, [ 'created_by' => 0 ], [] );
 
 		$this->assertTrue( is_wp_error( $results ) );
 		$this->assertEquals( 'access_denied', $results->get_error_code() );
@@ -670,14 +667,14 @@ class Test_PDF extends WP_UnitTestCase {
 		$user->remove_role( 'subscriber' );
 		$user->add_role( 'administrator' );
 
-		$this->assertTrue( $this->model->middle_user_capability( true, [ 'created_by' => 0 ], '' ) );
+		$this->assertTrue( $this->model->middle_user_capability( true, [ 'created_by' => 0 ], [] ) );
 
 		/* Remove elevated user privilages and set the default capability 'gravityforms_view_entries' */
 		$user->remove_role( 'administrator' );
 		$user->add_role( 'subscriber' );
 
 		/* Double check they have been removed */
-		$results = $this->model->middle_user_capability( true, [ 'created_by' => 0 ], '' );
+		$results = $this->model->middle_user_capability( true, [ 'created_by' => 0 ], [] );
 
 		$this->assertTrue( is_wp_error( $results ) );
 		$this->assertEquals( 'access_denied', $results->get_error_code() );
@@ -686,7 +683,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$user->add_cap( 'gravityforms_view_entries' );
 		$user->get_role_caps();
 		$user->update_user_level_from_caps();
-		$this->assertTrue( $this->model->middle_user_capability( true, [ 'created_by' => 0 ], '' ) );
+		$this->assertTrue( $this->model->middle_user_capability( true, [ 'created_by' => 0 ], [] ) );
 
 		wp_set_current_user( 0 );
 	}
@@ -715,16 +712,7 @@ class Test_PDF extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_view_pdf_entry_detail() {
-
-		$results = $this->create_form_and_entries();
-		$form_id = $results['form']['id'];
-		$entry   = $results['entry'];
-
-		ob_start();
-		$this->model->view_pdf_entry_detail( $form_id, $entry );
-		$html = ob_get_clean();
-
-		$this->assertNotFalse( strpos( $html, '<strong>PDFs</strong>' ) );
+		$this->markTestIncomplete( 'To be implemented' );
 	}
 
 	/**
@@ -733,11 +721,10 @@ class Test_PDF extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_get_pdf_display_list() {
-		global $wp_rewrite, $gfpdf;
+		global $wp_rewrite;
 
 		/* Setup some test data */
 		$results = $this->create_form_and_entries();
-		$form    = $results['form'];
 		$entry   = $results['entry'];
 
 		$wp_rewrite->set_permalink_structure( '' );
@@ -768,7 +755,7 @@ class Test_PDF extends WP_UnitTestCase {
 
 	/**
 	 * Check that our PDF name gets processed correctly
-	 * We'll unit test in more detail do_mergetags and strip_invalid_characters separetly so just a quick run through here
+	 * We'll unit test in more detail do_mergetags and strip_invalid_characters separately so just a quick run through here
 	 *
 	 * @since 4.0
 	 */
@@ -816,15 +803,16 @@ class Test_PDF extends WP_UnitTestCase {
 	/**
 	 * Check that the returned PDF URL is correct
 	 *
-	 * @since        4.0
-	 *
-	 * @dataProvider provider_get_pdf_url
-	 *
 	 * @param $pid
 	 * @param $id
 	 * @param $download
 	 * @param $print
 	 * @param $expected
+	 *
+	 * @since        4.0
+	 *
+	 * @dataProvider provider_get_pdf_url
+	 *
 	 */
 	public function test_get_pdf_url( $pid, $id, $download, $print, $expected ) {
 		global $wp_rewrite;
@@ -862,15 +850,16 @@ class Test_PDF extends WP_UnitTestCase {
 	/**
 	 * Check that the returned PDF URL is correct
 	 *
-	 * @since        4.0
-	 *
-	 * @dataProvider provider_get_pdf_url_no_perma
-	 *
 	 * @param $pid
 	 * @param $id
 	 * @param $download
 	 * @param $print
 	 * @param $expected
+	 *
+	 * @since        4.0
+	 *
+	 * @dataProvider provider_get_pdf_url_no_perma
+	 *
 	 */
 	public function test_get_pdf_url_no_perma( $pid, $id, $download, $print, $expected ) {
 		$this->assertEquals( $expected, $this->model->get_pdf_url( $pid, $id, $download, $print ) );
@@ -928,6 +917,9 @@ class Test_PDF extends WP_UnitTestCase {
 	/**
 	 * Check if we are determining active PDFs correctly
 	 *
+	 * @param bool $expected
+	 * @param array $pdf
+	 *
 	 * @since        4.0
 	 *
 	 * @dataProvider provider_get_active_pdfs
@@ -939,7 +931,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$entry   = $results['entry'];
 
 		$result = ( $expected ) ? 1 : 0;
-		$this->assertSame( $result, sizeof( $this->model->get_active_pdfs( [ $pdf ], $entry ) ) );
+		$this->assertSame( $result, count( $this->model->get_active_pdfs( [ $pdf ], $entry ) ) );
 	}
 
 	/**
@@ -1057,7 +1049,7 @@ class Test_PDF extends WP_UnitTestCase {
 				'id'      => 1,
 				'form_id' => 1,
 			],
-			'',
+			[],
 			$gfpdf->gform,
 			$gfpdf->data,
 			$gfpdf->misc,
@@ -1089,7 +1081,7 @@ class Test_PDF extends WP_UnitTestCase {
 				'id'      => 1,
 				'form_id' => 1,
 			],
-			'',
+			[],
 			$gfpdf->gform,
 			$gfpdf->data,
 			$gfpdf->misc,
@@ -1203,7 +1195,7 @@ class Test_PDF extends WP_UnitTestCase {
 
 		try {
 			$pdf->set_template();
-		} catch ( \Exception $e ) {
+		} catch ( Exception $e ) {
 			$this->assertEquals( sprintf( 'The PDF Template %s requires Gravity PDF version %s. Upgrade to the latest version.', '<em>zadani</em>', '<em>10</em>' ), $e->getMessage() );
 		}
 
@@ -1295,7 +1287,7 @@ class Test_PDF extends WP_UnitTestCase {
 		global $gfpdf;
 
 		/* Check our data is being returned correctly */
-		$this->assertSame( 2, sizeof( $this->model->register_custom_font_data_with_mPDF( [ '1', '2' ] ) ) );
+		$this->assertSame( 2, count( $this->model->register_custom_font_data_with_mPDF( [ '1', '2' ] ) ) );
 
 		/* Add font data to test */
 		$fonts = [
@@ -1320,7 +1312,7 @@ class Test_PDF extends WP_UnitTestCase {
 
 		/* Check the results are accurate */
 		$results = $this->model->register_custom_font_data_with_mPDF( [ '1', '2' ] );
-		$this->assertSame( 4, sizeof( $results ) );
+		$this->assertSame( 4, count( $results ) );
 
 		$this->assertArrayHasKey( 'R', $results['arial'] );
 		$this->assertArrayHasKey( 'B', $results['arial'] );
@@ -1334,7 +1326,7 @@ class Test_PDF extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Check that any unregistred fonts will be autoloaded into mPDF
+	 * Check that any unregistered fonts will be autoloaded into mPDF
 	 *
 	 * @since 4.0
 	 */
@@ -1379,13 +1371,13 @@ class Test_PDF extends WP_UnitTestCase {
 		/* Check the array remains untouched when the key and replacement key are the same */
 		$results = $this->model->replace_key( $array, 'item', 'item' );
 
-		$this->assertSame( 1, sizeof( $results ) );
+		$this->assertSame( 1, count( $results ) );
 		$this->assertEquals( 'value', $results['item'] );
 
 		/* Replace the array key and verify the results */
 		$results = $this->model->replace_key( $array, 'item', 'donkey' );
 
-		$this->assertSame( 1, sizeof( $results ) );
+		$this->assertSame( 1, count( $results ) );
 		$this->assertEquals( 'value', $results['donkey'] );
 
 	}
@@ -1429,9 +1421,7 @@ class Test_PDF extends WP_UnitTestCase {
 			21 => $namespace . 'Field_List',
 			22 => $namespace . 'Field_Poll',
 			23 => $namespace . 'Field_Poll',
-			41 => $namespace . 'Field_Poll',
 			24 => $namespace . 'Field_Quiz',
-			42 => $namespace . 'Field_Quiz',
 			43 => $namespace . 'Field_Quiz',
 			25 => $namespace . 'Field_Signature',
 			26 => $namespace . 'Field_Survey',
@@ -1825,7 +1815,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertEquals( 'default-template', $test['template'] );
 		$this->assertEquals( 'landscape', $test['orientation'] );
 		$this->assertEquals( 'No', $test['security'] );
-		$this->assertEquals( 2, sizeof( $test['privileges'] ) );
+		$this->assertEquals( 2, count( $test['privileges'] ) );
 		$this->assertEquals( 'pass', $test['password'] );
 		$this->assertEquals( '', $test['master_password'] );
 		$this->assertEquals( 'Yes', $test['rtl'] );
@@ -1869,11 +1859,8 @@ class Test_PDF extends WP_UnitTestCase {
 		$this->assertEquals( 'testing', $results['settings']['other_value'] );
 
 		/* Test non-related array */
-		$args = [ 'other_array' ];
-
-		$results = $this->model->preprocess_template_arguments( $args );
-
-		$this->assertEquals( 'other_array', $args[0] );
+		$results = $this->model->preprocess_template_arguments( [ 'other_array' ] );
+		$this->assertEquals( 'other_array', $results[0] );
 	}
 
 	/**
@@ -1936,7 +1923,7 @@ class Test_PDF extends WP_UnitTestCase {
 		$settings  = [ 'template' => 'zadani' ];
 		$entry     = $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0];
 		$form      = $gfpdf->gform->get_form( $entry['form_id'] );
-		$model_pdf = \GPDFAPI::get_mvc_class( 'Model_PDF' );
+		$model_pdf = GPDFAPI::get_mvc_class( 'Model_PDF' );
 
 		$args = $gfpdf->templates->get_template_arguments(
 			$form,
@@ -2006,11 +1993,11 @@ class Test_PDF extends WP_UnitTestCase {
 					'form_id' => 1,
 				],
 				[],
-				\GPDFAPI::get_form_class(),
-				\GPDFAPI::get_data_class(),
-				\GPDFAPI::get_misc_class(),
-				\GPDFAPI::get_templates_class(),
-				\GPDFAPI::get_log_class()
+				GPDFAPI::get_form_class(),
+				GPDFAPI::get_data_class(),
+				GPDFAPI::get_misc_class(),
+				GPDFAPI::get_templates_class(),
+				GPDFAPI::get_log_class()
 			)
 		);
 

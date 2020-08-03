@@ -2,17 +2,13 @@
 
 namespace GFPDF\Tests;
 
+use Exception;
+use GFCommon;
+use GFForms;
 use GFPDF\Controller\Controller_Form_Settings;
 use GFPDF\Model\Model_Form_Settings;
 use GFPDF\View\View_Form_Settings;
-
-use GFAPI;
-use GFForms;
-use GFCommon;
-
 use WP_UnitTestCase;
-
-use Exception;
 
 /**
  * Test Gravity PDF Form Settings Functionality
@@ -34,7 +30,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 	/**
 	 * Our Forms Settings Controller
 	 *
-	 * @var \GFPDF\Controller\Controller_Form_Settings
+	 * @var Controller_Form_Settings
 	 *
 	 * @since 4.0
 	 */
@@ -43,7 +39,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 	/**
 	 * Our Form Settings Model
 	 *
-	 * @var \GFPDF\Model\Model_Form_Settings
+	 * @var Model_Form_Settings
 	 *
 	 * @since 4.0
 	 */
@@ -52,7 +48,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 	/**
 	 * Our Form Settings View
 	 *
-	 * @var \GFPDF\View\View_Form_Settings
+	 * @var View_Form_Settings
 	 *
 	 * @since 4.0
 	 */
@@ -276,7 +272,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 	public function test_maybe_save_pdf_settings() {
 
 		/* Don't run the submission process */
-		$this->assertSame( null, $this->controller->maybe_save_pdf_settings() );
+		$this->assertNull( $this->controller->maybe_save_pdf_settings() );
 
 		/* Test running the submission process */
 		$_GET['id']              = 1;
@@ -318,7 +314,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 
 		/* Authorise the current user and check correct output */
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		$this->assertInternalType( 'integer', $user_id );
+		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
 
 		ob_start();
@@ -355,14 +351,14 @@ class Test_Form_Settings extends WP_UnitTestCase {
 
 		/* Authorise the current user and check correct output */
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		$this->assertInternalType( 'integer', $user_id );
+		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
 
 		ob_start();
 		$this->model->show_edit_view( $form_id, $pid );
 		$html = ob_get_clean();
 
-		$this->assertNotFalse( strpos( $html, '<form method="post" id="gfpdf_pdf_form">' ) );
+		$this->assertNotFalse( strpos( $html, 'method="post" id="gfpdf_pdf_form"' ) );
 
 		wp_set_current_user( 0 );
 	}
@@ -396,8 +392,8 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		$validated_fields = $this->model->validation_error( $fields );
 
 		/* check error is applied when no value is present in the $_POST['gfpdf_settings'] key */
-		$this->assertNotFalse( strstr( $validated_fields['name']['class'], 'gfield_error' ) );
-		$this->assertNotFalse( strstr( $validated_fields['filename']['class'], 'gfield_error' ) );
+		$this->assertStringContainsString( 'gform-settings-input__container--invalid', $validated_fields['name']['class'] );
+		$this->assertStringContainsString( 'gform-settings-input__container--invalid', $validated_fields['filename']['class'] );
 
 		/* now ensure no error is applied when the POST data does exist */
 		$_POST['gfpdf_settings']['filename'] = 'My PDF';
@@ -406,8 +402,8 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		$validated_fields = $this->model->validation_error( $fields );
 
 		/* check appropriate response */
-		$this->assertNotFalse( strstr( $validated_fields['name']['class'], 'gfield_error' ) );
-		$this->assertFalse( strstr( $validated_fields['filename']['class'], 'gfield_error' ) );
+		$this->assertStringContainsString( 'gform-settings-input__container--invalid', $validated_fields['name']['class'] );
+		$this->assertStringNotContainsString( 'gform-settings-input__container--invalid', $validated_fields['filename']['class'] );
 	}
 
 	/**
@@ -432,7 +428,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 
 		/* Authorise the current user and check correct output */
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		$this->assertInternalType( 'integer', $user_id );
+		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
 
 		/* Fail the nonce */
@@ -465,8 +461,6 @@ class Test_Form_Settings extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_settings_sanitize() {
-		global $gfpdf;
-
 		/* remove validation filter on settings */
 		remove_all_filters( 'gfpdf_form_settings' );
 		remove_all_filters( 'gfpdf_form_settings_sanitize_text' );
@@ -475,40 +469,44 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		/* get faux input data */
 		$input = json_decode( file_get_contents( dirname( __FILE__ ) . '/json/form-settings-sample-input.json' ), true );
 
-		/**
-		 * Set up global filters we can check
-		 */
+		/* Set up global filters we can check */
 		add_filter(
 			'gfpdf_settings_form_settings_sanitize',
 			function( $input ) {
-				return 'form_settings sanitized';
+				$input['form_settings_sanitized'] = '';
+
+				return $input;
 			}
 		);
 
 		/* pass input data to our sanitization function */
-		$this->assertEquals( 'form_settings sanitized', $this->model->settings_sanitize( $input ) );
+		$this->assertArrayHasKey( 'form_settings_sanitized', $this->model->settings_sanitize( $input ) );
 		remove_all_filters( 'gfpdf_settings_form_settings_sanitize' );
 
 		add_filter(
 			'gfpdf_settings_form_settings_appearance_sanitize',
 			function( $input ) {
-				return 'form_settings_appearance sanitized';
+				$input['form_settings_appearance_sanitized'] = '';
+
+				return $input;
 			}
 		);
 
 		/* pass input data to our sanitization function */
-		$this->assertEquals( 'form_settings_appearance sanitized', $this->model->settings_sanitize( $input ) );
+		$this->assertArrayHasKey( 'form_settings_appearance_sanitized', $this->model->settings_sanitize( $input ) );
 		remove_all_filters( 'gfpdf_settings_form_settings_appearance_sanitize' );
 
 		add_filter(
 			'gfpdf_settings_form_settings_advanced_sanitize',
 			function( $input ) {
-				return 'form_settings_advanced sanitized';
+				$input['form_settings_advanced_sanitized'] = '';
+
+				return $input;
 			}
 		);
 
 		/* pass input data to our sanitization function */
-		$this->assertEquals( 'form_settings_advanced sanitized', $this->model->settings_sanitize( $input ) );
+		$this->assertArrayHasKey( 'form_settings_advanced_sanitized', $this->model->settings_sanitize( $input ) );
 		remove_all_filters( 'gfpdf_settings_form_settings_advanced_sanitize' );
 
 		/**
@@ -534,7 +532,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		/**
 		 * Get specific input filters
 		 */
-		$types = [ 'text', 'select', 'conditional_logic', 'hidden', 'paper_size', 'radio', 'number' ];
+		$types = [ 'text', 'select', 'conditional_logic', 'hidden', 'paper_size', 'radio', 'number', 'multicheck', 'toggle' ];
 
 		/* set up filters to test */
 		foreach ( $types as $type ) {
@@ -563,6 +561,9 @@ class Test_Form_Settings extends WP_UnitTestCase {
 	/**
 	 * Check that .pdf is correctly removed from all filenames
 	 *
+	 * @param string $expected
+	 * @param string $string
+	 *
 	 * @since        4.0
 	 *
 	 * @dataProvider provider_strip_filename
@@ -574,7 +575,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 	/**
 	 * A data provider for our strip filename test
 	 *
-	 * @return Array Our test data
+	 * @return array Our test data
 	 * @since 4.0
 	 */
 	public function provider_strip_filename() {
@@ -610,7 +611,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 
 		$results = $this->model->register_custom_appearance_settings( [] );
 
-		$this->assertSame( 13, sizeof( $results ) );
+		$this->assertSame( 13, count( $results ) );
 	}
 
 	/**
@@ -624,7 +625,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		$class    = $gfpdf->templates->get_config_class( 'zadani' );
 		$settings = $this->model->setup_custom_appearance_settings( $class, [] );
 
-		$this->assertEquals( 13, sizeof( $settings ) );
+		$this->assertEquals( 13, count( $settings ) );
 		$this->assertArrayHasKey( 'zadani_border_colour', $settings );
 	}
 
@@ -639,7 +640,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		$class    = $gfpdf->templates->get_config_class( 'zadani' );
 		$settings = $this->model->setup_core_custom_appearance_settings( [], $class, $class->configuration() );
 
-		$this->assertEquals( 12, sizeof( $settings ) );
+		$this->assertEquals( 12, count( $settings ) );
 
 		$core_fields = [
 			'show_form_title',
@@ -674,7 +675,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		$data = $this->model->decode_json( $json, 'conditionalLogic' );
 
 		$this->assertArrayHasKey( 'conditionalLogic', $data );
-		$this->assertSame( 2, sizeof( $data['conditionalLogic'] ) );
+		$this->assertCount( 2, $data['conditionalLogic'] );
 
 		/* Test pass result */
 		$this->assertEquals( $json, $this->model->decode_json( $json, 'other' ) );
@@ -695,7 +696,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		$option_id = 'options';
 
 		/* Run false test */
-		$this->assertSame( 0, sizeof( $wp_settings_fields[ $group ][ $group ][ $setting ]['args'][ $option_id ] ) );
+		$this->assertSame( 0, count( $wp_settings_fields[ $group ][ $group ][ $setting ]['args'][ $option_id ] ) );
 
 		/* Setup notification data */
 		$notifications = [
@@ -716,7 +717,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 		/* Run valid test */
 		$this->model->register_notifications( $notifications );
 
-		$this->assertSame( 3, sizeof( $wp_settings_fields[ $group ][ $group ][ $setting ]['args'][ $option_id ] ) );
+		$this->assertSame( 3, count( $wp_settings_fields[ $group ][ $group ][ $setting ]['args'][ $option_id ] ) );
 
 		/* Check that certain notification events are ignored */
 		$notifications = [
@@ -738,7 +739,7 @@ class Test_Form_Settings extends WP_UnitTestCase {
 
 		$this->model->register_notifications( $notifications );
 
-		$this->assertSame( 1, sizeof( $wp_settings_fields[ $group ][ $group ][ $setting ]['args'][ $option_id ] ) );
+		$this->assertSame( 1, count( $wp_settings_fields[ $group ][ $group ][ $setting ]['args'][ $option_id ] ) );
 
 	}
 

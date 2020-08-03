@@ -3,6 +3,7 @@
 namespace GFPDF\Helper;
 
 use Exception;
+use GPDFAPI;
 use Psr\Log\LoggerInterface;
 use stdClass;
 
@@ -39,7 +40,7 @@ class Helper_Templates {
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
 	 *
-	 * @var \GFPDF\Helper\Helper_Data
+	 * @var Helper_Data
 	 *
 	 * @since 4.1
 	 */
@@ -48,7 +49,7 @@ class Helper_Templates {
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
-	 * @var \GFPDF\Helper\Helper_Form
+	 * @var Helper_Form
 	 *
 	 * @since 4.3
 	 */
@@ -57,9 +58,9 @@ class Helper_Templates {
 	/**
 	 * Setup our class by injecting all our dependencies
 	 *
-	 * @param LoggerInterface                    $log  Our logger class
-	 * @param \GFPDF\Helper\Helper_Data          $data Our plugin data store
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
+	 * @param LoggerInterface      $log  Our logger class
+	 * @param Helper_Data          $data Our plugin data store
+	 * @param Helper_Abstract_Form $gform
 	 *
 	 * @since 4.1
 	 */
@@ -254,7 +255,7 @@ class Helper_Templates {
 	public function get_all_template_info() {
 		return array_map(
 			function( $template_path ) {
-					return $this->get_template_info_by_path( $template_path );
+				return $this->get_template_info_by_path( $template_path );
 			},
 			$this->get_all_templates()
 		);
@@ -377,7 +378,7 @@ class Helper_Templates {
 	 * @since 4.1
 	 */
 	public function get_template_info_by_path( $template_path, $cache_name = '', $cache_time = 604800 ) {
-		$options = \GPDFAPI::get_options_class();
+		$options = GPDFAPI::get_options_class();
 		$debug   = $options->get_option( 'debug_mode', 'No' );
 
 		if ( $debug === 'No' ) {
@@ -405,7 +406,7 @@ class Helper_Templates {
 
 		/* Save the results to a transient so we don't hit the disk every page load */
 		if ( $debug === 'No' ) {
-			$cache                   = is_array( $cache ) ? $cache : [];
+			$cache                   = $cache ?? [];
 			$cache[ $template_path ] = $info;
 
 			set_transient( $cache_name, $cache, $cache_time );
@@ -509,7 +510,7 @@ class Helper_Templates {
 	 * We first look in the PDF_EXTENDED_TEMPLATE directory (in case a user has overridden the file)
 	 * Then we try and load the core configuration file
 	 *
-	 * @param  string $template_id The template config to load
+	 * @param string $template_id The template config to load
 	 *
 	 * @return object
 	 *
@@ -517,7 +518,7 @@ class Helper_Templates {
 	 */
 	public function get_config_class( $template_id ) {
 
-		/* Allow a user to change the current tempalte configuration file if they have the appropriate capabilities */
+		/* Allow a user to change the current template configuration file if they have the appropriate capabilities */
 		if ( rgget( 'template' ) && is_user_logged_in() && $this->gform->has_capability( 'gravityforms_edit_settings' ) ) {
 			$template_id = rgget( 'template' );
 
@@ -564,13 +565,13 @@ class Helper_Templates {
 	/**
 	 * Load our template configuration file, if it exists
 	 *
-	 * @param  string $file The file to load
+	 * @param string $file The file to load
 	 *
 	 * @return object
 	 *
+	 * @throws Exception
 	 * @since 4.1
 	 *
-	 * @throws Exception
 	 */
 	public function load_template_config_file( $file ) {
 
@@ -583,7 +584,7 @@ class Helper_Templates {
 			require_once( $file );
 		}
 
-		/* Insure the class we are trying to load exists and impliments our Helper_Interface_Config interface */
+		/* Insure the class we are trying to load exists and implements our Helper_Interface_Config interface */
 		if ( class_exists( $fqcn ) ) {
 			return new $fqcn();
 		}
@@ -677,13 +678,13 @@ class Helper_Templates {
 	/**
 	 * Get the arguments array that should be passed to our PDF Template
 	 *
-	 * @param  array  $form       The Gravity Form array
-	 * @param  array  $fields     The Gravity Form fields array, with the field ID as the array key
-	 * @param  array  $entry      Gravity Form Entry The Gravity Forms entry array
-	 * @param  array  $form_data  The form data array, formatted form the $entry array
-	 * @param  array  $settings   PDF Settings The current PDF settings
-	 * @param  object $config     The current PDF template configuration class
-	 * @param  array  $legacy_ids An array of multiple entry IDs for legacy templates only
+	 * @param array  $form       The Gravity Form array
+	 * @param array  $fields     The Gravity Form fields array, with the field ID as the array key
+	 * @param array  $entry      Gravity Form Entry The Gravity Forms entry array
+	 * @param array  $form_data  The form data array, formatted form the $entry array
+	 * @param array  $settings   PDF Settings The current PDF settings
+	 * @param object $config     The current PDF template configuration class
+	 * @param array  $legacy_ids An array of multiple entry IDs for legacy templates only
 	 *
 	 * @return array
 	 *

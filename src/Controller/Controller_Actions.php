@@ -6,8 +6,11 @@ use GFPDF\Helper\Helper_Abstract_Controller;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_View;
+use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Notices;
+use GFPDF\Model\Model_Actions;
+use GFPDF\View\View_Actions;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -33,7 +36,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
-	 * @var \GFPDF\Helper\Helper_Form
+	 * @var Helper_Form
 	 *
 	 * @since 4.0
 	 */
@@ -52,7 +55,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	 * Holds our Helper_Notices object
 	 * which we can use to queue up admin messages for the user
 	 *
-	 * @var \GFPDF\Helper\Helper_Notices
+	 * @var Helper_Notices
 	 *
 	 * @since 4.0
 	 */
@@ -61,11 +64,11 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	/**
 	 * Setup our class by injecting all our dependencies
 	 *
-	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_Actions $model   Our Actions Model the controller will manage
-	 * @param Helper_Abstract_View|\GFPDF\View\View_Actions    $view    Our Actions View the controller will manage
-	 * @param \GFPDF\Helper\Helper_Abstract_Form               $gform   Our abstracted Gravity Forms helper functions
-	 * @param LoggerInterface                                  $log     Our logger class
-	 * @param \GFPDF\Helper\Helper_Notices                     $notices Our notice class used to queue admin messages and errors
+	 * @param Helper_Abstract_Model|Model_Actions $model   Our Actions Model the controller will manage
+	 * @param Helper_Abstract_View|View_Actions   $view    Our Actions View the controller will manage
+	 * @param Helper_Abstract_Form                $gform   Our abstracted Gravity Forms helper functions
+	 * @param LoggerInterface                     $log     Our logger class
+	 * @param Helper_Notices                      $notices Our notice class used to queue admin messages and errors
 	 *
 	 * @since 4.0
 	 */
@@ -87,9 +90,9 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	/**
 	 * Initialise our class defaults
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function init() {
 		$this->add_actions();
@@ -98,9 +101,9 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	/**
 	 * Apply any actions
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function add_actions() {
 		add_action( 'admin_init', [ $this, 'route' ] );
@@ -147,6 +150,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 		];
 
 		/* See https://gravitypdf.com/documentation/v5/gfpdf_one_time_action_routes/ for more details about this filter */
+
 		return apply_filters( 'gfpdf_one_time_action_routes', $routes );
 	}
 
@@ -188,7 +192,7 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	}
 
 	/**
-	 * Run approprate events
+	 * Run appropriate events
 	 *
 	 * @return void
 	 *

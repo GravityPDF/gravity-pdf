@@ -14,25 +14,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/** @var $args array */
+
 $download         = $args['view'] === 'download';
 $parent_link_text = $download ? esc_html__( 'Download PDFs', 'gravity-forms-pdf-extended' ) : esc_html__( 'View PDFs', 'gravity-forms-pdf-extended' );
 
 ?>
 
-<span class="gfpdf_form_action_has_submenu">
-   | <a href="#" aria-haspopup="true" aria-expanded="false"><?= $parent_link_text ?></a>
-		<div class="gform-form-toolbar__submenu">
-			<ul>
-				<?php foreach ( $args['pdfs'] as $pdf ): ?>
-					<li>
-						<a href="<?= $download ? esc_url( $pdf['download'] ) : esc_url( $pdf['view'] ); ?>"
-							<?= ! $download ? 'target="_blank"' : ''; ?>
-								data-label="<?= esc_attr( $pdf['name'] ) ?>"
-						>
-							<?= esc_html( $pdf['name'] ); ?>
-						</a>
-					</li>
-				<?php endforeach; ?>
-			</ul>
-		</div>
-</span>
+<div class="gfpdf_form_action_has_submenu">
+	| <a href="#" aria-haspopup="true" aria-expanded="false"><?= $parent_link_text ?></a>
+	<div class="gform-form-toolbar__submenu">
+		<ul>
+			<?php foreach ( $args['pdfs'] as $pdf ): ?>
+				<li>
+					<a href="<?= $download ? esc_url( $pdf['download'] ) : esc_url( $pdf['view'] ); ?>"
+						<?= ! $download ? 'target="_blank"' : ''; ?>
+					   data-label="<?= esc_attr( $pdf['name'] ) ?>"
+					>
+						<?= esc_html( $pdf['name'] ); ?>
+					</a>
+				</li>
+			<?php endforeach; ?>
+		</ul>
+	</div>
+</div>

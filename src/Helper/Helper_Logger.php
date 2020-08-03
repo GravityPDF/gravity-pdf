@@ -157,11 +157,11 @@ class Helper_Logger {
 
 				if ( isset( $gf_logger_settings[ $this->slug ]['enable'] ) && $gf_logger_settings[ $this->slug ]['enable'] ) {
 					$log_level    = ( isset( $gf_logger_settings[ $this->slug ]['log_level'] ) ) ? (int) $gf_logger_settings[ $this->slug ]['log_level'] : 0;
-					$log_filename = ( get_option( 'gform_enable_logging' ) ) ? $gf_logger->get_log_file_name( $this->slug ) : $gf_logger::get_log_file_name( $this->slug );
+					$log_filename = get_option( 'gform_enable_logging' ) ? $gf_logger->get_log_file_name( $this->slug ) : $gf_logger::get_log_file_name( $this->slug );
 				}
 			}
 
-			/* Enable logging if not equivalent to 0 or non-existant and not level 6 (which is apprently off in GF world) */
+			/* Enable logging if not equivalent to 0 or non-existent and not level 6 ("off" in GF world) */
 			if ( ! empty( $log_level ) && $log_level !== 6 ) {
 
 				/* Convert Gravity Forms log levels to the appropriate Monolog level */

@@ -5,8 +5,7 @@ namespace GFPDF\Controller;
 use GFPDF\Helper\Helper_Abstract_Controller;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Interface_Filters;
-
-use Psr\Log\LoggerInterface;
+use GFPDF\Model\Model_Shortcodes;
 
 /**
  * @package     Gravity PDF
@@ -28,9 +27,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Controller_Mergetags extends Helper_Abstract_Controller implements Helper_Interface_Filters {
 
 	/**
-	 * Setup our class by injecting all our dependancies
+	 * Setup our class by injecting all our dependencies
 	 *
-	 * @param Helper_Abstract_Model|\GFPDF\Model\Model_Shortcodes $model Our Shortcodes Model the controller will manage
+	 * @param Helper_Abstract_Model|Model_Shortcodes $model Our Shortcodes Model the controller will manage
 	 *
 	 * @since 4.0
 	 */
@@ -44,9 +43,9 @@ class Controller_Mergetags extends Helper_Abstract_Controller implements Helper_
 	/**
 	 * Initialise our class defaults
 	 *
+	 * @return void
 	 * @since 4.1
 	 *
-	 * @return void
 	 */
 	public function init() {
 		$this->add_filters();
@@ -55,9 +54,9 @@ class Controller_Mergetags extends Helper_Abstract_Controller implements Helper_
 	/**
 	 * Apply any filters needed for the settings page
 	 *
+	 * @return void
 	 * @since 4.1
 	 *
-	 * @return void
 	 */
 	public function add_filters() {
 		add_filter( 'gform_replace_merge_tags', [ $this->model, 'process_pdf_mergetags' ], 10, 4 );

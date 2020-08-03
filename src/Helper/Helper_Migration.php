@@ -27,7 +27,7 @@ class Helper_Migration {
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
-	 * @var \GFPDF\Helper\Helper_Form
+	 * @var Helper_Form
 	 *
 	 * @since 4.0
 	 */
@@ -46,7 +46,7 @@ class Helper_Migration {
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
 	 *
-	 * @var \GFPDF\Helper\Helper_Data
+	 * @var Helper_Data
 	 *
 	 * @since 4.0
 	 */
@@ -56,7 +56,7 @@ class Helper_Migration {
 	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
-	 * @var \GFPDF\Helper\Helper_Options_Fields
+	 * @var Helper_Options_Fields
 	 *
 	 * @since 4.0
 	 */
@@ -66,7 +66,7 @@ class Helper_Migration {
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
 	 *
-	 * @var \GFPDF\Helper\Helper_Misc
+	 * @var Helper_Misc
 	 *
 	 * @since 4.0
 	 */
@@ -76,7 +76,7 @@ class Helper_Migration {
 	 * Holds our Helper_Notices object
 	 * which we can use to queue up admin messages for the user
 	 *
-	 * @var \GFPDF\Helper\Helper_Notices
+	 * @var Helper_Notices
 	 *
 	 * @since 4.0
 	 */
@@ -86,7 +86,7 @@ class Helper_Migration {
 	 * Holds our Helper_Templates object
 	 * used to ease access to our PDF templates
 	 *
-	 * @var \GFPDF\Helper\Helper_Templates
+	 * @var Helper_Templates
 	 *
 	 * @since 4.0
 	 */
@@ -95,13 +95,13 @@ class Helper_Migration {
 	/**
 	 * Load our model and view and required actions
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form    $form
-	 * @param LoggerInterface                       $log
-	 * @param \GFPDF\Helper\Helper_Data             $data
-	 * @param \GFPDF\Helper\Helper_Abstract_Options $options
-	 * @param \GFPDF\Helper\Helper_Misc             $misc
-	 * @param \GFPDF\Helper\Helper_Notices          $notices
-	 * @param \GFPDF\Helper\Helper_Templates        $templates
+	 * @param Helper_Abstract_Form    $gform
+	 * @param LoggerInterface         $log
+	 * @param Helper_Data             $data
+	 * @param Helper_Abstract_Options $options
+	 * @param Helper_Misc             $misc
+	 * @param Helper_Notices          $notices
+	 * @param Helper_Templates        $templates
 	 *
 	 * @since 4.0
 	 */
@@ -226,7 +226,7 @@ class Helper_Migration {
 	}
 
 	/**
-	 * Pass in an individual v3 configuration node and conver to our v4 format
+	 * Pass in an individual v3 configuration node and convert to our v4 format
 	 *
 	 * @param array $node          The configuration to be converted
 	 * @param array $migration_key A migration mapping key to convert the previous config keys
@@ -271,7 +271,7 @@ class Helper_Migration {
 		if ( isset( $node['pdf_size'] ) && is_array( $node['pdf_size'] ) ) {
 
 			/* Ensure it's in the correct format */
-			if ( sizeof( $node['pdf_size'] ) === 2 ) {
+			if ( count( $node['pdf_size'] ) === 2 ) {
 				$node['pdf_size'][0] = (int) $node['pdf_size'][0];
 				$node['pdf_size'][1] = (int) $node['pdf_size'][1];
 				$node['pdf_size'][2] = 'millimeters';
@@ -315,7 +315,7 @@ class Helper_Migration {
 	 */
 	private function process_v3_configuration( $raw_config ) {
 
-		if ( ! is_array( $raw_config['config'] ) || sizeof( $raw_config['config'] ) === 0 ) {
+		if ( ! is_array( $raw_config['config'] ) || count( $raw_config['config'] ) === 0 ) {
 			return [];
 		}
 
@@ -355,7 +355,7 @@ class Helper_Migration {
 	/**
 	 * Add the default configuration to any missing forms
 	 *
-	 * @param  array $raw_config The semi-processed configuration
+	 * @param array $raw_config The semi-processed configuration
 	 *
 	 * @return array
 	 *
@@ -364,7 +364,7 @@ class Helper_Migration {
 	private function process_default_configuration( $raw_config ) {
 
 		/* Only handle when enabled */
-		if ( ( ! defined( 'GFPDF_SET_DEFAULT_TEMPLATE' ) || GFPDF_SET_DEFAULT_TEMPLATE === true ) && sizeof( $raw_config['default'] ) > 0 ) {
+		if ( ( ! defined( 'GFPDF_SET_DEFAULT_TEMPLATE' ) || GFPDF_SET_DEFAULT_TEMPLATE === true ) && count( $raw_config['default'] ) > 0 ) {
 
 			/* Get all forms */
 			$forms = $this->gform->get_forms();
@@ -398,7 +398,7 @@ class Helper_Migration {
 	}
 
 	/**
-	 * Merge the configuration node with the default options, ensuring the config node takes precendent
+	 * Merge the configuration node with the default options, ensuring the config node takes precedent
 	 *
 	 * @param array $defaults The default data loaded from our v3 configuration file
 	 * @param array $node     The individual PDF node
@@ -422,7 +422,7 @@ class Helper_Migration {
 	 *
 	 * @param array $config The config data loaded from our v3 configuration file
 	 *
-	 * @return array
+	 * @return bool
 	 *
 	 * @since 4.0
 	 */
@@ -505,7 +505,7 @@ class Helper_Migration {
 
 							$node['notification'] = $new_notification;
 
-							if ( sizeof( $node['notification'] ) === 0 ) {
+							if ( count( $node['notification'] ) === 0 ) {
 								unset( $node['notification'] );
 							}
 						}
@@ -540,7 +540,7 @@ class Helper_Migration {
 		}
 
 		/* Check for any errors */
-		if ( sizeof( $errors ) > 0 ) {
+		if ( count( $errors ) > 0 ) {
 
 			$error_msg  = esc_html__( 'There was a problem migrating the following configuration nodes. You will need to manually setup those PDFs.', 'gravity-forms-pdf-extended' );
 			$error_msg .= '<ul>';

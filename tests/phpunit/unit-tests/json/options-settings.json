@@ -1,1 +1,17 @@
-{"default_pdf_size":"custom","default_custom_pdf_size":["30","50","millimeters"],"default_template":"Awesomeness","default_font_type":"dejavusans","default_rtl":"No","default_action":"View","admin_capabilities":["gravityforms_create_form"],"default_restrict_owner":"No","logged_out_timeout":"20"}
+{
+  "default_pdf_size": "custom",
+  "default_custom_pdf_size": [
+    "30",
+    "50",
+    "millimeters"
+  ],
+  "default_template": "Awesomeness",
+  "default_font_type": "dejavusans",
+  "default_rtl": "No",
+  "default_action": "View",
+  "admin_capabilities": [
+    "gravityforms_create_form"
+  ],
+  "default_restrict_owner": "No",
+  "logged_out_timeout": "20"
+}

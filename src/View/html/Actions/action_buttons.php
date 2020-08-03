@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The Dismisal Button
+ * The Dismissal Button
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2020, Blue Liquid Designs
@@ -14,17 +14,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/** @var $args array */
+
 ?>
 
 <form method="post">
-	<input type="hidden" name="gfpdf_action" value="gfpdf_<?php echo $args['type']; ?>"/>
-	<input type="hidden" name="gfpdf_action_<?php echo $args['type']; ?>" value="<?php echo wp_create_nonce( 'gfpdf_action_' . $args['type'] ); ?>"/>
+	<input type="hidden" name="gfpdf_action" value="gfpdf_<?= $args['type']; ?>" />
+	<input type="hidden" name="gfpdf_action_<?= $args['type']; ?>" value="<?= wp_create_nonce( 'gfpdf_action_' . $args['type'] ); ?>" />
 
 	<p>
-		<button class="button button-primary"><?php echo $args['button_text']; ?></button>
+		<button class="button button-primary"><?= $args['button_text']; ?></button>
 
 		<?php if ( $args['dismissal'] === 'enabled' ): ?>
-			<input class="button" type="submit" value="<?php esc_attr_e( 'Dismiss Notice', 'gravity-forms-pdf-extended' ); ?>" name="gfpdf-dismiss-notice"/>
+			<input class="button" type="submit" value="<?php esc_attr_e( 'Dismiss Notice', 'gravity-forms-pdf-extended' ); ?>" name="gfpdf-dismiss-notice" />
 		<?php endif; ?>
 	</p>
 

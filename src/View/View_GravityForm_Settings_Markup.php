@@ -3,6 +3,7 @@
 namespace GFPDF\View;
 
 use GFPDF\Helper\Helper_Abstract_View;
+use WP_Error;
 
 /**
  * @package     Gravity PDF
@@ -21,11 +22,19 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package GFPDF\View
  */
 class View_GravityForm_Settings_Markup extends Helper_Abstract_View {
-	const ENABLE_PANEL_TITLE = 1;
+	const ENABLE_PANEL_TITLE  = 1;
 	const DISABLE_PANEL_TITLE = 0;
 
+	/**
+	 * @var string
+	 */
 	protected $view_type = 'GravityForms';
 
+	/**
+	 * @param $sections
+	 *
+	 * @return string
+	 */
 	public function do_settings_sections( $sections ) {
 		$markup = '';
 		foreach ( $sections as $section ) {
@@ -59,6 +68,11 @@ class View_GravityForm_Settings_Markup extends Helper_Abstract_View {
 		return ob_get_clean();
 	}
 
+	/**
+	 * @param $id
+	 *
+	 * @return array|mixed
+	 */
 	public function get_section_fields( $id ) {
 		global $wp_settings_fields;
 
@@ -97,6 +111,12 @@ class View_GravityForm_Settings_Markup extends Helper_Abstract_View {
 		return $section;
 	}
 
+	/**
+	 * @param     $field
+	 * @param int $output_title
+	 *
+	 * @return bool|string|WP_Error
+	 */
 	public function get_field_content( $field, $output_title = self::DISABLE_PANEL_TITLE ) {
 
 		$class = 'gform-settings-field gfpdf-settings-field-wrapper';
@@ -119,6 +139,11 @@ class View_GravityForm_Settings_Markup extends Helper_Abstract_View {
 		return $this->load( 'settings_field', $args, false );
 	}
 
+	/**
+	 * @param $html
+	 *
+	 * @return string
+	 */
 	public function get_tooltip_markup( $html ) {
 		$name = 'gfpdf_tooltip';
 

@@ -27,7 +27,7 @@ class Test_QueryPath extends WP_UnitTestCase {
 	 */
 	public function test_QueryPath() {
 		$qp = new Helper_QueryPath();
-		$this->assertEquals( 'QueryPath\DOMQuery', get_class( $qp->html5( '<div>Test</div>' ) ) );
+		$this->assertEquals( 'GFPDF_Vendor\QueryPath\DOMQuery', get_class( $qp->html5( '<div>Test</div>' ) ) );
 	}
 
 	public function test_utf8() {

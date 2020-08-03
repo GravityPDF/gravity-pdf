@@ -50,7 +50,7 @@ abstract class Helper_Abstract_Form {
 	/**
 	 * Get form plugin's form array
 	 *
-	 * @param  integer $form_id
+	 * @param integer $form_id
 	 *
 	 * @return mixed
 	 *
@@ -70,7 +70,7 @@ abstract class Helper_Abstract_Form {
 	/**
 	 * Get form plugin's form array
 	 *
-	 * @param  array|object $form The form object to be updated
+	 * @param array|object $form The form object to be updated
 	 *
 	 * @return mixed
 	 *
@@ -81,7 +81,7 @@ abstract class Helper_Abstract_Form {
 	/**
 	 * Get the entry based on the ID
 	 *
-	 * @param  integer $entry_id
+	 * @param integer $entry_id
 	 *
 	 * @return mixed
 	 *
@@ -92,10 +92,10 @@ abstract class Helper_Abstract_Form {
 	/**
 	 * Get multiple entries from multiple forms based on search criteria
 	 *
-	 * @param  integer|array $form_ids        The ID's of the form or an array of ideas.
-	 * @param  array         $search_criteria An array containing the search criteria
-	 * @param  array         $sorting         An array containing the sort criteria
-	 * @param  array         $paging          Use to limit the number of entries returned
+	 * @param integer|array $form_ids        The ID's of the form or an array of ideas.
+	 * @param array         $search_criteria An array containing the search criteria
+	 * @param array|null    $sorting         An array containing the sort criteria
+	 * @param array|null    $paging          Use to limit the number of entries returned
 	 *
 	 * @return mixed
 	 *
@@ -106,7 +106,7 @@ abstract class Helper_Abstract_Form {
 	/**
 	 * Update the current entry object
 	 *
-	 * @param  object $entry The entry to be updated
+	 * @param object $entry The entry to be updated
 	 *
 	 * @return mixed
 	 *
@@ -126,8 +126,8 @@ abstract class Helper_Abstract_Form {
 	/**
 	 * Check if the user has the capability passed
 	 *
-	 * @param  string  $capability
-	 * @param  integer $user_id
+	 * @param string       $capability
+	 * @param integer|null $user_id
 	 *
 	 * @return boolean            True if successful, false if failed
 	 *
@@ -138,9 +138,9 @@ abstract class Helper_Abstract_Form {
 	/**
 	 * Replace all the tag fields (that represent the field data) in the string
 	 *
-	 * @param  string $string The string to process
-	 * @param  array  $form   The Gravity Form array
-	 * @param  array  $entry  The Gravity Form Entry Array
+	 * @param string $string The string to process
+	 * @param array  $form   The Gravity Form array
+	 * @param array  $entry  The Gravity Form Entry Array
 	 *
 	 * @return string
 	 *

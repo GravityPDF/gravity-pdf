@@ -2,13 +2,11 @@
 
 namespace GFPDF\Helper\Fields;
 
+use Exception;
+use GF_Field_Checkbox;
+use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
-use GFPDF\Helper\Helper_Abstract_Fields;
-
-use GF_Field_Checkbox;
-
-use Exception;
 
 /**
  * @package     Gravity PDF
@@ -31,11 +29,11 @@ class Field_Tos extends Helper_Abstract_Fields {
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
 	 *
-	 * @param object                             $field The GF_Field_* Object
-	 * @param array                              $entry The Gravity Forms Entry
+	 * @param object               $field The GF_Field_* Object
+	 * @param array                $entry The Gravity Forms Entry
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
-	 * @param \GFPDF\Helper\Helper_Misc          $misc
+	 * @param Helper_Abstract_Form $gform
+	 * @param Helper_Misc          $misc
 	 *
 	 * @throws Exception
 	 *
@@ -54,9 +52,9 @@ class Field_Tos extends Helper_Abstract_Fields {
 	/**
 	 * Always display this field in the PDF
 	 *
+	 * @return bool
 	 * @since    4.2
 	 *
-	 * @return bool
 	 */
 	public function is_empty() {
 		return false;
@@ -65,9 +63,9 @@ class Field_Tos extends Helper_Abstract_Fields {
 	/**
 	 * Actually check if the field has a value
 	 *
+	 * @return bool
 	 * @since 4.2
 	 *
-	 * @return bool
 	 */
 	public function is_field_empty() {
 		return parent::is_empty();
@@ -97,10 +95,10 @@ class Field_Tos extends Helper_Abstract_Fields {
 		";
 
 		if ( ! $this->is_field_empty() ) {
-			$html .= "<div class='terms-of-service-agreement'><span class='terms-of-service-tick' style='font-family:dejavusans;'>&#10004;</span> $value</div>";
+			$html .= "<div class='terms-of-service-agreement'><span class='terms-of-service-tick' style='font-family:dejavusans,sans-serif;'>&#10004;</span> $value</div>";
 		} else {
 			$not_accepted_text = __( 'Not accepted', 'gravity-forms-pdf-extended' );
-			$html             .= "<div class='terms-of-service-agreement'><span class='terms-of-service-tick' style='font-family:dejavusans;'>&#10006;</span> $not_accepted_text</div>";
+			$html             .= "<div class='terms-of-service-agreement'><span class='terms-of-service-tick' style='font-family:dejavusans,sans-serif;'>&#10006;</span> $not_accepted_text</div>";
 		}
 
 		return parent::html( $html );

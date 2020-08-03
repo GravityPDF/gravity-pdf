@@ -2,21 +2,18 @@
 
 namespace GFPDF\Model;
 
+use Exception;
 use GFPDF\Helper\Helper_Abstract_Model;
-use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Templates;
-
 use GFPDF_Vendor\Upload\File;
 use GFPDF_Vendor\Upload\Storage\FileSystem;
 use GFPDF_Vendor\Upload\Validation\Extension;
 use GFPDF_Vendor\Upload\Validation\Mimetype;
 use GFPDF_Vendor\Upload\Validation\Size;
-
-use Psr\Log\LoggerInterface;
-
 use GPDFAPI;
-use Exception;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
@@ -42,7 +39,7 @@ class Model_Templates extends Helper_Abstract_Model {
 	 * Holds our Helper_Templates object
 	 * used to ease access to our PDF templates
 	 *
-	 * @var \GFPDF\Helper\Helper_Templates
+	 * @var Helper_Templates
 	 *
 	 * @since 4.1
 	 */
@@ -61,7 +58,7 @@ class Model_Templates extends Helper_Abstract_Model {
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
 	 *
-	 * @var \GFPDF\Helper\Helper_Data
+	 * @var Helper_Data
 	 *
 	 * @since 4.1
 	 */
@@ -71,7 +68,7 @@ class Model_Templates extends Helper_Abstract_Model {
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
 	 *
-	 * @var \GFPDF\Helper\Helper_Misc
+	 * @var Helper_Misc
 	 *
 	 * @since 4.1
 	 */
@@ -99,7 +96,7 @@ class Model_Templates extends Helper_Abstract_Model {
 	/**
 	 * AJAX Endpoint to handle the uploading of PDF templates
 	 *
-	 * @param string $_POST ['nonce'] a valid nonce
+	 * @global string $_POST ['nonce'] a valid nonce
 	 *
 	 * @since 4.1
 	 */
@@ -163,8 +160,9 @@ class Model_Templates extends Helper_Abstract_Model {
 		/* Fix template path */
 		$headers = array_map(
 			function( $header ) use ( $unzipped_dir_name, $template_path ) {
-					$header['path'] = str_replace( $unzipped_dir_name, $template_path, $header['path'] );
-					return $header;
+				$header['path'] = str_replace( $unzipped_dir_name, $template_path, $header['path'] );
+
+				return $header;
 			},
 			$headers
 		);
@@ -193,7 +191,7 @@ class Model_Templates extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Execute the setUp method on any templates that impliment it
+	 * Execute the setUp method on any templates that implement it
 	 *
 	 * @param array $headers Contains the array returned from $this->get_template_info()
 	 *
@@ -203,7 +201,7 @@ class Model_Templates extends Helper_Abstract_Model {
 		foreach ( $headers as $template ) {
 			$config = $this->templates->get_config_class( $template['id'] );
 
-			/* Check if the PDF config impliments our Setup/TearDown interface and run the tear down */
+			/* Check if the PDF config implements our Setup/TearDown interface and run the tear down */
 			if ( in_array( 'GFPDF\Helper\Helper_Interface_Setup_TearDown', class_implements( $config ), true ) ) {
 				$config->setUp();
 			}
@@ -213,8 +211,8 @@ class Model_Templates extends Helper_Abstract_Model {
 	/**
 	 * AJAX Endpoint for deleting user-uploaded PDF templates
 	 *
-	 * @param string $_POST ['nonce'] a valid nonce
-	 * @param string $_POST ['id'] a valid PDF template ID
+	 * @global string $_POST ['nonce'] a valid nonce
+	 * @global string $_POST ['id'] a valid PDF template ID
 	 *
 	 * @since 4.1
 	 */
@@ -242,7 +240,7 @@ class Model_Templates extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Delete's a PDF templates files
+	 * Deletes a PDF templates files
 	 *
 	 * @param string $template_id
 	 *
@@ -255,7 +253,7 @@ class Model_Templates extends Helper_Abstract_Model {
 			$files  = $this->templates->get_template_files_by_id( $template_id );
 			$config = $this->templates->get_config_class( $template_id );
 
-			/* Check if the PDF config impliments our Setup/TearDown interface and run the tear down */
+			/* Check if the PDF config implements our Setup/TearDown interface and run the tear down */
 			if ( in_array( 'GFPDF\Helper\Helper_Interface_Setup_TearDown', class_implements( $config ), true ) ) {
 				$config->tearDown();
 			}
@@ -272,7 +270,7 @@ class Model_Templates extends Helper_Abstract_Model {
 	/**
 	 * AJAX Endpoint for building the template select box options (so we don't have to recreate the logic in React)
 	 *
-	 * @param string $_POST ['nonce'] a valid nonce
+	 * @global string $_POST ['nonce'] a valid nonce
 	 *
 	 * @since 4.1
 	 */
@@ -297,7 +295,7 @@ class Model_Templates extends Helper_Abstract_Model {
 	/**
 	 * Validations, renames and moves the uploaded zip file to an appropriate location
 	 *
-	 * @param \GFPDF_Vendor\Upload\File $file
+	 * @param File $file
 	 *
 	 * @return string The full path of the final resting place of the uploaded zip file
 	 *
@@ -342,11 +340,9 @@ class Model_Templates extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Extracts the zip file, checks there are valid PDF template files found and retreives information about them
+	 * Extracts the zip file, checks there are valid PDF template files found and retrieves information about them
 	 *
-	 * @param $zip_path The full path to the zip file
-	 *
-	 * @return array The PDF template headers from the valid files
+	 * @param string $zip_path The full path to the zip file
 	 *
 	 * @throws Exception Thrown if a PDF template file isn't valid
 	 *
@@ -363,10 +359,10 @@ class Model_Templates extends Helper_Abstract_Model {
 			throw new Exception( $results->get_error_message() );
 		}
 
-		/* Check unziped templates for a valid v4 header, or v3 string pattern */
+		/* Check unzipped templates for a valid v4 header, or v3 string pattern */
 		$files = glob( $dir . '*.php' );
 
-		if ( ! is_array( $files ) || sizeof( $files ) === 0 ) {
+		if ( ! is_array( $files ) || count( $files ) === 0 ) {
 			throw new Exception( esc_html__( 'No valid PDF template found in Zip archive.', 'gravity-forms-pdf-extended' ) );
 		}
 
@@ -374,11 +370,9 @@ class Model_Templates extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Sniffs the PHP file for signs that it's a valid Gravity PDF tempalte file
+	 * Sniffs the PHP file for signs that it's a valid Gravity PDF template file
 	 *
 	 * @param array $files The full paths to the PDF templates
-	 *
-	 * @return array The PDF template header information
 	 *
 	 * @throws Exception Thrown if file found not to be valid
 	 *
@@ -416,7 +410,7 @@ class Model_Templates extends Helper_Abstract_Model {
 	public function get_template_info( $files = [] ) {
 		return array_map(
 			function( $file ) {
-					return $this->templates->get_template_info_by_path( $file );
+				return $this->templates->get_template_info_by_path( $file );
 			},
 			$files
 		);
@@ -425,7 +419,7 @@ class Model_Templates extends Helper_Abstract_Model {
 	/**
 	 * Remove the zip file and the unzipped directory
 	 *
-	 * @param $zip_path The full path to the zip file
+	 * @param string $zip_path The full path to the zip file
 	 *
 	 * @since 4.1
 	 */
