@@ -219,6 +219,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->actions();
 		$this->template_manager();
 		$this->load_core_font_handler();
+		$this->load_custom_font_handler();
 		$this->load_debug();
 		$this->check_system_status();
 
@@ -809,6 +810,20 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$class = new Controller\Controller_Save_Core_Fonts( $this->log, $this->data, $this->misc );
 		$class->init();
 
+		$this->singleton->add_class( $class );
+	}
+
+	/**
+	 * Initialise our custom font handler
+	 * @since 5.0
+	 *
+	 */
+	public function load_custom_font_handler(): void {
+		$model = new Model\Model_Custom_Fonts( $this->options );
+		$class = new Controller\Controller_Custom_Fonts( $model, $this->log, $this->gform, $this->options, $this->data->template_font_location );
+		$class->init();
+
+		$this->singleton->add_class( $model );
 		$this->singleton->add_class( $class );
 	}
 

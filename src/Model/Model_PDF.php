@@ -1916,10 +1916,12 @@ class Model_PDF extends Helper_Abstract_Model {
 
 			$fonts[ $font['shortname'] ] = array_filter(
 				[
-					'R'  => basename( $font['regular'] ),
-					'B'  => basename( $font['bold'] ),
-					'I'  => basename( $font['italics'] ),
-					'BI' => basename( $font['bolditalics'] ),
+					'R'          => basename( $font['regular'] ),
+					'B'          => basename( $font['bold'] ),
+					'I'          => basename( $font['italics'] ),
+					'BI'         => basename( $font['bolditalics'] ),
+					'useOTL'     => $font['useOTL'] ?? 0x00,
+					'useKashida' => $font['useKashida'] ?? 0,
 				]
 			);
 		}
