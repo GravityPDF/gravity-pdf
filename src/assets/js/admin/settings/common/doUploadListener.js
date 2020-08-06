@@ -30,10 +30,6 @@ export function doUploadListener () {
         text: $button.data('uploader-button-text')
       },
       multiple: false,
-
-      library: {
-        type: [ 'font/ttf', 'application/x-font-ttf', 'application/octet-stream' ]
-      }
     })
 
     /* When a file is selected, run a callback. */
