@@ -19,6 +19,7 @@ export function handleSecurityConditionals () {
     const format = $format.filter(':checked').val()
 
     if (!$(this).is(':checked') || format !== GFPDF.standard) {
+      if ($(this).val() === 'No' || format !== 'Standard') {
       /* hide security password / privileges */
       $securityFields.hide()
     } else {
@@ -26,7 +27,7 @@ export function handleSecurityConditionals () {
       $securityFields.show()
     }
 
-    if (format !== GFPDF.standard) {
+      if (format !== 'Standard') {
       $securityQuestion.hide()
     } else {
       $securityQuestion.show()
