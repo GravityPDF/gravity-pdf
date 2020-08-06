@@ -2,6 +2,8 @@
 
 namespace GFPDF\Helper\Licensing;
 
+use stdClass;
+
 /**
  * @package     Gravity PDF
  * @author      Easy Digital Downloads
