@@ -1,0 +1,46 @@
+/* 961px and up */
+@media (min-width: 961px) {
+
+  /* Popup - Font manager */
+  #tab_PDF {
+    .font-manager {
+      .font-manager-body {
+        .two-columns {
+          .add-font {
+            input {
+              width: 600px;
+            }
+
+            .font-files {
+              .variants {
+                .drop-zone {
+                  width: 250px;
+                }
+              }
+            }
+          }
+        }
+
+        p {
+          font-size: 11px;
+        }
+      }
+    }
+  }
+
+  /* Help tab section */
+  #pdfextended-settings {
+    .about-wrap {
+      #dashboard-widgets {
+        .postbox-container {
+          width: 49.5%;
+
+          a {
+            margin-right: 30px;
+            min-height: 245px;
+          }
+        }
+      }
+    }
+  }
+}

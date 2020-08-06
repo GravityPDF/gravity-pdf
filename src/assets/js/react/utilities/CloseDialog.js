@@ -8,17 +8,17 @@ import { withRouter } from 'react-router-dom'
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2020, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       4.1
+ * @since       6.0
  */
 
 /**
  * React Component
  *
- * @since 4.1
+ * @since 6.0
  */
-export class TemplateCloseDialog extends React.Component {
+export class CloseDialog extends React.Component {
   /**
-   * @since 4.1
+   * @since 6.0
    */
   static propTypes = {
     history: PropTypes.object
@@ -27,7 +27,7 @@ export class TemplateCloseDialog extends React.Component {
   /**
    * Assign keydown listener to document on mount
    *
-   * @since 4.1
+   * @since 6.0
    */
   componentDidMount () {
     document.addEventListener('keydown', this.handleKeyPress, false)
@@ -36,7 +36,7 @@ export class TemplateCloseDialog extends React.Component {
   /**
    * Remove keydown listener to document on mount
    *
-   * @since 4.1
+   * @since 6.0
    */
   componentWillUnmount () {
     document.removeEventListener('keydown', this.handleKeyPress, false)
@@ -48,7 +48,7 @@ export class TemplateCloseDialog extends React.Component {
    *
    * @param {Object} e Event
    *
-   * @since 4.1
+   * @since 6.0
    */
   handleKeyPress = e => {
     /* Escape Key */
@@ -58,7 +58,7 @@ export class TemplateCloseDialog extends React.Component {
   }
 
   /**
-   * @since 4.1
+   * @since 6.0
    */
   handleCloseDialog = () => {
     /* trigger router */
@@ -66,12 +66,12 @@ export class TemplateCloseDialog extends React.Component {
   }
 
   /**
-   * @since 4.1
+   * @since 6.0
    */
   render () {
     return (
       <button
-        data-test='component-templateCloseDialog'
+        data-test='component-CloseDialog'
         className='close dashicons dashicons-no'
         tabIndex='142'
         onClick={this.handleCloseDialog}
@@ -84,4 +84,4 @@ export class TemplateCloseDialog extends React.Component {
   }
 }
 
-export default withRouter(TemplateCloseDialog)
+export default withRouter(CloseDialog)

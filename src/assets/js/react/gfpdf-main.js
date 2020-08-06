@@ -1,5 +1,6 @@
 import $ from 'jquery'
 import templateBootstrap from './bootstrap/templateBootstrap'
+import { fontManagerBootstrap } from './bootstrap/fontManagerBootstrap'
 import coreFontBootstrap from './bootstrap/coreFontBootstrap'
 import helpBootstrap from './bootstrap/helpBootstrap'
 import '../../scss/gfpdf-styles.scss'
@@ -26,7 +27,7 @@ $(function () {
 
   __webpack_public_path__ = GFPDF.pluginUrl + 'dist/' // eslint-disable-line
 
-  /* Initialise the Fancy Template Picker */
+  /* Initialize the Fancy Template Picker */
   if (GFPDF.templateList !== undefined) {
     // To add to window
     if (!window.Promise) {
@@ -43,13 +44,25 @@ $(function () {
     }
   }
 
-  /* Initialise the Core Font downloader */
+  /* Initialize the Core Font downloader */
   if ($('#gfpdf-button-wrapper-install_core_fonts').length) {
     coreFontBootstrap()
   }
 
-  // Initialize the Search Bar for Help Tab
+  /* Initialize the Search Bar for Help Tab */
   if ($('#search-knowledgebase').length) {
     helpBootstrap()
+  }
+
+  /* Initialize Font Manager */
+  const defaultFontField = document.querySelector('#gfpdf-settings-field-wrapper-default_font')
+  const manageFonts = document.querySelector('#gfpdf-settings-field-wrapper-manage_fonts')
+
+  if (defaultFontField !== null) {
+    fontManagerBootstrap(defaultFontField)
+  }
+
+  if (manageFonts !== null) {
+    fontManagerBootstrap(manageFonts)
   }
 })

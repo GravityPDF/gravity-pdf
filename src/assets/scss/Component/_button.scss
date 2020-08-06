@@ -1,0 +1,15 @@
+@use '../Mixins/button';
+
+#tab_pdf, #tab_PDF {
+
+  /* Template and Font Manager Advanced Button */
+  #gpdf-advance-template-selector, #gpdf-advance-font-manager-selector {
+    display: inline-block;
+    vertical-align: top;
+
+    button {
+      @include button.reset;
+      line-height: 2.95;
+    }
+  }
+}

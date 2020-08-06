@@ -1,25 +1,33 @@
+/* Components */
+@use 'Component/button';
 @use 'Component/color-picker';
 @use 'Component/core-fonts';
+@use 'Component/font-manager';
 @use 'Component/gf-settings-containers';
 @use 'Component/license';
 @use 'Component/multicheck';
 @use 'Component/number';
+@use 'Component/popup';
 @use 'Component/rich_text';
+@use 'Component/search-bar';
 @use 'Component/spinner';
 @use 'Component/submit';
 @use 'Component/template-manager';
 @use 'Component/uninstaller';
 @use 'Component/upload';
 
-@use 'Pages/pdf-list';
-@use 'Pages/entry-list';
+/* Pages */
 @use 'Pages/entry-details';
-@use 'Pages/help'; /* @TODO - rework and/or remove */
+@use 'Pages/entry-list';
+@use 'Pages/pdf-list';
+@use 'Pages/help';
 
-@use 'rtl'; /* @TODO - rework */
+/* RTL */
+@use 'rtl';
 
-/*
- * Media queries
- */
-@use 'MediaQueries/min-783'; /* @TODO - rework and/or remove */
-@use 'MediaQueries/min-1000'; /* @TODO - rework and/or remove */
+/* Media queries */
+@use 'MediaQueries/min-576';
+@use 'MediaQueries/min-781';
+@use 'MediaQueries/min-961';
+@use 'MediaQueries/min-1200';
+@use 'MediaQueries/min-1680';

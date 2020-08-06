@@ -386,7 +386,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$version = PDF_EXTENDED_VERSION;
 
 		$pdf_settings_dependencies = [
-			'wpdialogs',
 			'jquery-ui-tooltip',
 			'gform_forms',
 			'gform_form_admin',
@@ -397,27 +396,13 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		wp_register_script( 'gfpdf_js_settings', PDF_PLUGIN_URL . 'dist/assets/js/admin.min.js', $pdf_settings_dependencies, $version );
 
-		$pdf_backbone_dependencies = [
-			'gfpdf_js_settings',
-			'backbone',
-			'underscore',
-			'gfpdf_js_backbone_model_binder',
-			'wpdialogs',
-		];
-
-		wp_register_script( 'gfpdf_js_backbone', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-backbone.min.js', $pdf_backbone_dependencies, $version );
-		/* @TODO - remove backbone and use React */
-		wp_register_script( 'gfpdf_js_backbone_model_binder', PDF_PLUGIN_URL . 'bower_components/backbone.modelbinder/Backbone.ModelBinder.min.js', [ 'backbone', 'underscore' ], $version );
-
 		wp_register_script( 'gfpdf_js_entrypoint', PDF_PLUGIN_URL . 'dist/assets/js/app.bundle.min.js', [ 'jquery' ], $version );
 		wp_register_script( 'gfpdf_js_entries', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-entries.min.js', [ 'jquery' ], $version );
-		wp_register_script( 'gfpdf_js_v3_migration', PDF_PLUGIN_URL . 'dist/assets/js/gfpdf-migration.min.js', [ 'gfpdf_js_settings' ], $version );
 
 		/* Localise admin script */
 		wp_localize_script( 'gfpdf_js_entrypoint', 'GFPDF', $this->data->get_localised_script_data( $this->options, $this->gform ) );
 		wp_localize_script( 'gfpdf_js_settings', 'GFPDF', $this->data->get_localised_script_data( $this->options, $this->gform ) );
 	}
-
 
 	/**
 	 * Load any assets that are needed
@@ -447,10 +432,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 			/* Load TinyMCE styles */
 			add_filter( 'tiny_mce_before_init', [ $this, 'tinymce_styles' ] );
-		}
-
-		if ( $this->misc->is_gfpdf_settings_tab( 'help' ) || $this->misc->is_gfpdf_settings_tab( 'tools' ) ) {
-			wp_enqueue_script( 'gfpdf_js_backbone' );
 		}
 
 		if ( rgget( 'page' ) === 'gf_entries' ) {
@@ -498,11 +479,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			'editor',
 			'word-count',
 			'quicktags',
-			'wpdialogs-popup',
 			'media-upload',
 			'wplink',
-			'backbone',
-			'underscore',
 			'media-editor',
 			'media-models',
 			'media-views',
@@ -514,7 +492,6 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			'wp-plupload',
 			'gform_placeholder',
 			'jquery-ui-autocomplete',
-			'thickbox',
 			'gform_selectwoo',
 		];
 
@@ -552,10 +529,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		 */
 		$default_styles = [
 			'editor-buttons',
-			'wp-jquery-ui-dialog',
 			'media-views',
 			'buttons',
-			'thickbox',
 		];
 
 		foreach ( $wp_styles->queue as $object ) {

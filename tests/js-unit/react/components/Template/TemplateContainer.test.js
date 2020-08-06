@@ -78,7 +78,7 @@ describe('Template - TemplateContainer.js', () => {
     })
   })
 
-  const wrapper = shallow(<Container closeRoute={'/template'} children={[]} />)
+  const wrapper = shallow(<Container children={[]} />)
 
   test('renders <Container /> component', () => {
     const component = findByTestAttr(wrapper, 'component-templateContainer')
@@ -86,7 +86,7 @@ describe('Template - TemplateContainer.js', () => {
     expect(component.length).toBe(1)
   })
 
-  test('renders <TemplateCloseDialog /> component', () => {
-    expect(wrapper.find('withRouter(TemplateCloseDialog)').length).toBe(1)
+  test('renders <CloseDialog /> component', () => {
+    expect(wrapper.find('withRouter(CloseDialog)').length).toBe(1)
   })
 })
