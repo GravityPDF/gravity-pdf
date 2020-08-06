@@ -19,7 +19,7 @@ export function handleSecurityConditionals () {
       /* Get the format dependancy */
       let format = $format.filter(':checked').val()
 
-      if ($(this).val() === GFPDF.no || format !== GFPDF.standard) {
+      if ($(this).val() === 'No' || format !== 'Standard') {
         /* hide security password / privileges */
         $secTable.find('tr:nth-child(3),tr:nth-child(4),tr:nth-child(5):not(.gfpdf-hidden)').hide()
       } else {
@@ -27,7 +27,7 @@ export function handleSecurityConditionals () {
         $secTable.find('tr:nth-child(3),tr:nth-child(4),tr:nth-child(5):not(.gfpdf-hidden)').show()
       }
 
-      if (format !== GFPDF.standard) {
+      if (format !== 'Standard') {
         $secTable.find('tr:nth-child(2)').hide()
       } else {
         $secTable.find('tr:nth-child(2)').show()
