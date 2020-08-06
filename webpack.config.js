@@ -22,7 +22,7 @@ module.exports = webpackMerge(
       rules: [
         {
           test: /\.m?js$/,
-          exclude: /(node_modules|bower_components)/,
+          exclude: /(node_modules)/,
           loader: 'babel-loader',
           options: { babelrc: true }
         },
