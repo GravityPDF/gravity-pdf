@@ -707,60 +707,6 @@ class Test_PDF extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Check our PDF detail list is displaying correctly
-	 *
-	 * @since 4.0
-	 */
-	public function test_view_pdf_entry_detail() {
-
-		/* Setup some test data */
-		$results = $this->create_form_and_entries();
-
-		ob_start();
-		$this->model->view_pdf_entry_detail( [ 'entry' => [ 'form_id' => 0 ] ] );
-		$html = ob_get_clean();
-		$this->assertNotFalse( strpos( $html, 'No PDFs available for this entry.' ) );
-
-		ob_start();
-		$this->model->view_pdf_entry_detail( $results );
-		$html = ob_get_clean();
-		$this->assertNotFalse( strpos( $html, '<div class="gfpdf_detailed_pdf_cta">' ) );
-	}
-
-	/**
-	 * Check if Metabox registration is working properly
-	 *
-	 * @since 6.0
-	 */
-	public function test_register_pdf_meta_box(){
-
-		/* Setup some test data */
-		$results = $this->create_form_and_entries();
-		$form    = $results['form'];
-		$entry   = $results['entry'];
-
-		$this->assertSame( true, array_key_exists( 'gfpdf-entry-details-list', $this->model->register_pdf_meta_box( [], $entry, $form ) ) );
-		/*  Set all pdfs to inactive */
-		$pdf_ids = array_keys( $form['gfpdf_form_settings'] );
-
-		/* Test if metabox is not registered when there is no active PDFs */
-		foreach ( $pdf_ids as $id ) {
-			$form['gfpdf_form_settings'][ $id ]['active'] = false;
-		}
-
-		$this->assertSame( true, empty( $this->model->register_pdf_meta_box( [], $entry, $form ) ) );
-
-		/* Test if metabox is  registered when there is atleast 2 active PDFs */
-		$active_pdfs = array_rand( $pdf_ids, 2);
-
-		foreach ( $active_pdfs as $id ) {
-			$form['gfpdf_form_settings'][ $pdf_ids[ $id ] ]['active'] = true;
-		}
-
-		$this->assertSame( true, array_key_exists( 'gfpdf-entry-details-list', $this->model->register_pdf_meta_box( [], $entry, $form ) ) );
-	}
-
-	/**
 	 * Check that an array of PDFs gets correctly returned in the right format
 	 *
 	 * @since 4.0
