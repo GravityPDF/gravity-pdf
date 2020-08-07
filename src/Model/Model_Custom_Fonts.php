@@ -59,7 +59,7 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	public function add_font( array $font ): bool {
 		$fonts = $this->get_custom_fonts();
 
-		if ( isset( $font['shortname'] ) ) {
+		if ( isset( $fonts[ $font[ 'shortname'] ] ) ) {
 			throw new \Exception();
 		}
 

@@ -182,6 +182,12 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 
 			/* Handle uploads */
 			$files = $this->get_uploaded_font_files( $request );
+
+			/* Ensure the regular font file has been uploaded (required field) */
+			if ( ! isset( $files['regular'] ) ) {
+				throw new UploadException( 'The Regular font is required' );
+			}
+
 			$files = $this->move_fonts_to_font_dir( $files );
 
 			/* Determine if font files support OTF data and auto register */
@@ -249,9 +255,12 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 			 * Then update the $font key
 			 */
 			$files = $this->get_uploaded_font_files( $request );
-			$files = $this->move_fonts_to_font_dir( $files );
-			foreach ( $files as $font_id => $file ) {
-				$font[ $font_id ] = $this->get_absolute_font_path( $file['name'] );
+
+			if ( count( $files ) > 0 ) {
+				$files = $this->move_fonts_to_font_dir( $files );
+				foreach ( $files as $font_id => $file ) {
+					$font[ $font_id ] = $this->get_absolute_font_path( $file['name'] );
+				}
 			}
 
 			/*
@@ -330,11 +339,6 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 	/* @TODO - migrate to Helper class */
 	protected function move_fonts_to_font_dir( $files ) {
 		$storage = new FileSystem( $this->font_dir_path );
-
-		/* Ensure the regular font file has been uploaded (required field) */
-		if ( ! isset( $files['regular'] ) ) {
-			throw new UploadException( 'The Regular font is required' );
-		}
 
 		foreach ( $files as $id => $file ) {
 			$file = new File( $id, $storage );
