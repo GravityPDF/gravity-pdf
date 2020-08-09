@@ -77,6 +77,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'type'    => 'select',
 						'options' => $this->get_installed_fonts(),
 						'tooltip' => '<h6>' . esc_html__( 'Fonts', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Gravity PDF comes bundled with fonts for most languages world-wide. Want to use a specific font type? Use the font installer (found in the Tools tab).', 'gravity-forms-pdf-extended' ),
+						'class'   => 'gfpdf-font-manager',
 					],
 
 					'default_pdf_size'        => [
@@ -352,7 +353,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'options' => $this->get_installed_fonts(),
 						'std'     => $this->get_option( 'default_font' ),
 						'desc'    => sprintf( esc_html__( 'Set the primary font used in PDFs. You can also %1$sinstall your own%2$s.', 'gravity-forms-pdf-extended' ), '<a href="' . $this->data->settings_url . '&tab=tools#manage_fonts">', '</a>' ),
-						'class'   => 'gfpdf_font_type',
+						'class'   => 'gfpdf_font_type gfpdf-font-manager',
 					],
 
 					'font_size'       => [

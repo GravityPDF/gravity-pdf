@@ -70,10 +70,10 @@
       }
 
       .notice {
-        border-color: base.$core-font--status-success;
+        border-color: base.$success-color;
 
         &.error {
-          border-color: base.$core-font-status-error;
+          border-color: base.$error-color;
         }
       }
     }

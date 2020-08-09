@@ -530,7 +530,7 @@ class Helper_Templates {
 
 		try {
 			$class_path = $this->get_config_path_by_id( $template_id );
-		} catch( Exception $e ) {
+		} catch ( Exception $e ) {
 			$this->log->notice( $e->getMessage() );
 		}
 

@@ -1,35 +1,63 @@
+@use '../base';
+
+//@media only screen and (max-width: 960px) {
+//  #tab_pdf, #tab_PDF {
+//
+//    /* Font manager modal */
+//    #font-manager-overlay {
+//      .font-manager {
+//        #gfpdf-font-manager-container {
+//          display: flex;
+//          flex-direction: column;
+//        }
+//      }
+//    }
+//  }
+//}
+
 /* 961px and up */
-@media (min-width: 961px) {
+@media only screen and (min-width: 961px) {
 
-  /* Popup - Font manager */
-  #tab_PDF {
-    .font-manager {
-      .font-manager-body {
-        .two-columns {
-          .add-font {
-            input {
-              width: 600px;
-            }
+  #tab_pdf, #tab_PDF {
 
-            .font-files {
-              .variants {
-                .drop-zone {
-                  width: 250px;
-                }
-              }
-            }
-          }
-        }
-
-        p {
-          font-size: 11px;
-        }
-      }
+    /* Font manager modal */
+    #font-manager-overlay {
+      //.font-manager {
+      //  .theme-about {
+      //    #gfpdf-font-manager-container {
+      //      display: grid;
+      //      grid-template-columns: 1fr 1fr;
+      //      gap: 2rem;
+      //      color: base.$default-text-color;
+      //
+      //      /* Font list */
+      //      .font-list-column {
+      //        .font-list {
+      //          max-height: 600px;
+      //          box-shadow: unset;
+      //        }
+      //      }
+      //
+      //      /* Add font */
+      //      .add-font-column {
+      //        padding-top: 0;
+      //
+      //        form {
+      //          .footer {
+      //            .msg {
+      //              display: inline-block;
+      //              padding-top: 8px;
+      //              vertical-align: middle;
+      //            }
+      //          }
+      //        }
+      //      }
+      //    }
+      //  }
+      //}
     }
-  }
 
-  /* Help tab section */
-  #pdfextended-settings {
+    /* Help tab section */
     .about-wrap {
       #dashboard-widgets {
         .postbox-container {

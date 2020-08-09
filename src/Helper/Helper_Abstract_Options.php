@@ -2,6 +2,8 @@
 
 namespace GFPDF\Helper;
 
+use GFPDF\Controller\Controller_Custom_Fonts;
+use GFPDF\Model\Model_Custom_Fonts;
 use Psr\Log\LoggerInterface;
 use WP_Error;
 
@@ -977,8 +979,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @param array $fonts Current font list
 	 *
 	 * @return array The list of custom fonts installed in a preformatted array
-	 * @since 4.0
 	 *
+	 * @since 4.0
 	 */
 	public function add_custom_fonts( $fonts = [] ) {
 
@@ -990,7 +992,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 			/* Loop through our fonts and assign them to a new array in the appropriate format */
 			foreach ( $custom_fonts as $font ) {
-				$user_defined_fonts[ $font['shortname'] ] = $font['font_name'];
+				$user_defined_fonts[ $font['id'] ] = $font['font_name'];
 			}
 
 			/* Merge the new fonts at the beginning of the $fonts array */
@@ -1006,22 +1008,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @return array
 	 *
 	 * @since 4.0
+	 *
+	 * @deprecated
 	 */
 	public function get_custom_fonts() {
-		$fonts = $this->get_option( 'custom_fonts' );
+		/** @var Controller_Custom_Fonts $custom_font_controller */
+		$custom_font_controller = \GPDFAPI::get_mvc_class( 'Controller_Custom_Fonts' );
 
-		if ( is_array( $fonts ) && count( $fonts ) > 0 ) {
-			foreach ( $fonts as &$font ) {
-				$font['shortname']   = $this->get_font_short_name( $font['font_name'] );
-				$font['italics']     = ( isset( $font['italics'] ) ) ? $font['italics'] : '';
-				$font['bold']        = ( isset( $font['bold'] ) ) ? $font['bold'] : '';
-				$font['bolditalics'] = ( isset( $font['bolditalics'] ) ) ? $font['bolditalics'] : '';
-			}
-
-			return $fonts;
-		}
-
-		return [];
+		return $custom_font_controller->get_all_items();
 	}
 
 	/**
@@ -1029,12 +1023,15 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @param string $name The font name to convert
 	 *
-	 * @return string       Shortname of font
-	 *
 	 * @since  4.0
+	 *
+	 * @deprecated
 	 */
 	public function get_font_short_name( $name ) {
-		return mb_strtolower( str_replace( ' ', '', $name ), 'UTF-8' );
+		/** @var Model_Custom_Fonts $custom_font_model */
+		$custom_font_model = \GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' );
+
+		return $custom_font_model->get_font_short_name( $name );
 	}
 
 	/**

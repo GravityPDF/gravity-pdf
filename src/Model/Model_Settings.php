@@ -191,6 +191,8 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @return boolean        True on success, false on failure
 	 *
 	 * @since  4.0
+	 *
+	 * @deprecated
 	 */
 	public function remove_font_file( $fonts ) {
 
@@ -218,6 +220,8 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @return boolean       True on valid, false on failure
 	 *
 	 * @since 4.0
+	 *
+	 * @deprecated
 	 */
 	public function is_font_name_valid( $name ) {
 
@@ -239,6 +243,8 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @return bool True if valid, false on failure
 	 *
 	 * @since 4.0
+	 *
+	 * @deprecated
 	 */
 	public function is_font_name_unique( $name, $id = '' ) {
 
@@ -284,6 +290,8 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @return array
 	 *
 	 * @since 4.0
+	 *
+	 * @deprecated
 	 */
 	public function install_fonts( $fonts ) {
 
@@ -367,6 +375,8 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @return void
 	 *
 	 * @since 4.0
+	 *
+	 * @deprecated
 	 */
 	public function save_font() {
 
@@ -395,6 +405,8 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @return void
 	 *
 	 * @since 4.0
+	 *
+	 * @deprecated
 	 */
 	public function delete_font() {
 
@@ -443,6 +455,8 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @return array
 	 *
 	 * @since 4.0
+	 *
+	 * @deprecated
 	 */
 	public function process_font( $font ) {
 
@@ -532,6 +546,8 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @return string The font ID, if any
 	 *
 	 * @since 4.1
+	 *
+	 * @deprecated
 	 */
 	public function get_font_id_by_name( $font_name ) {
 		$fonts = $this->options->get_option( 'custom_fonts', [] );

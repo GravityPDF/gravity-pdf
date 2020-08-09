@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 /**
  * @package     Gravity PDF
@@ -12,8 +13,12 @@ import React from 'react'
  *
  * @since 5.0
  */
-const Spinner = () => (
-  <img alt={GFPDF.spinnerAlt} src={GFPDF.spinnerUrl} className='gfpdf-spinner' />
+const Spinner = ({ style }) => (
+  <img alt={GFPDF.spinnerAlt} src={GFPDF.spinnerUrl} className={'gfpdf-spinner ' + style} />
 )
+
+Spinner.propTypes = {
+  style: PropTypes.string
+}
 
 export default Spinner

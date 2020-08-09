@@ -1,50 +1,41 @@
+@use '../base';
+
 /* 1200px and up */
-@media (min-width: 1200px) {
+@media only screen and (min-width: 1200px) {
 
-  /* Popup - Font manager */
-  #tab_PDF {
-    .font-manager {
-      width: 80%;
-      height: 82%;
-      margin: 0 auto;
+  #tab_pdf, #tab_PDF {
 
-      .font-manager-body {
-        flex-direction: row;
+    /* Font manager modal */
+    #font-manager-overlay {
+      .font-manager {
+        .theme-about {
+          #gfpdf-font-manager-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            color: base.$default-text-color;
 
-        .two-columns {
-          &:first-child {
-            width: 55%;
-            height: 80%;
-          }
-
-          &:last-child {
-            width: 45%;
-            padding: 5px 50px 0px 30px;
-          }
-
-          .font-list {
-            .font-list-items {
-              height: 92%;
-            }
-          }
-
-          .add-font {
-            input {
-              width: 100%;
+            /* Font list */
+            .font-list-column {
+              .font-list {
+                max-height: 600px;
+                box-shadow: unset;
+              }
             }
 
-            .font-files {
-              .variants {
-                .drop-zone {
-                  margin-right: 40px;
+            /* Add font */
+            .add-font-column {
+              padding-top: 0;
+
+              form {
+                .footer {
+                  .msg {
+                    font-size: 13px;
+                  }
                 }
               }
             }
           }
-        }
-
-        p {
-          font-size: 12px;
         }
       }
     }

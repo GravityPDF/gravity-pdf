@@ -58,6 +58,7 @@ export class TemplateList extends React.Component {
             header={this.props.templateHeaderText}
           />
         }
+        closeRoute='/'
       >
         <TemplateSearch data-test='component-templateSearch' />
         <div>

@@ -8,9 +8,8 @@ export class AdvancedButton extends React.Component {
 
   handleClick = e => {
     e.preventDefault()
-    e.stopPropagation()
 
-    this.props.history.push('/fontmanager')
+    this.props.history.push('/fontmanager/')
   }
 
   render () {

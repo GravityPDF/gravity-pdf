@@ -1,7 +1,7 @@
 import React from 'react'
 import { shallow } from 'enzyme'
-import { findByTestAttr } from '../testUtils'
-import { CloseDialog } from '../../../../src/assets/js/react/utilities/CloseDialog'
+import { findByTestAttr } from '../../testUtils'
+import { CloseDialog } from '../../../../../src/assets/js/react/components/Modal/CloseDialog'
 
 describe('CloseDialog - CloseDialog.js', () => {
 

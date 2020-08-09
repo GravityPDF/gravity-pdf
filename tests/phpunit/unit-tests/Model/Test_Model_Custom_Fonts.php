@@ -98,17 +98,17 @@ class Test_Model_Custom_Fonts extends WP_UnitTestCase {
 	}
 
 	public function test_get_custom_fonts() {
-		$this->model->add_font( [ 'shortname' => 'font1' ] );
-		$this->model->add_font( [ 'shortname' => 'font2' ] );
-		$this->model->add_font( [ 'shortname' => 'font3' ] );
+		$this->model->add_font( [ 'id' => 'font1' ] );
+		$this->model->add_font( [ 'id' => 'font2' ] );
+		$this->model->add_font( [ 'id' => 'font3' ] );
 
 		$this->assertCount( 3, $this->model->get_custom_fonts() );
 	}
 
 	public function test_get_font_by_id_success() {
-		$this->model->add_font( [ 'shortname' => 'font1' ] );
+		$this->model->add_font( [ 'id' => 'font1' ] );
 
-		$this->assertArrayHasKey( 'shortname', $this->model->get_font_by_id( 'font1' ) );
+		$this->assertArrayHasKey( 'id', $this->model->get_font_by_id( 'font1' ) );
 	}
 
 
@@ -121,8 +121,8 @@ class Test_Model_Custom_Fonts extends WP_UnitTestCase {
 	public function test_update_font() {
 		$this->model->add_font(
 			[
-				'shortname' => 'font1',
-				'name'      => 'Font',
+				'id'   => 'font1',
+				'name' => 'Font',
 			]
 		);
 
@@ -139,8 +139,8 @@ class Test_Model_Custom_Fonts extends WP_UnitTestCase {
 	public function test_delete_font_success() {
 		$this->model->add_font(
 			[
-				'shortname' => 'font1',
-				'name'      => 'Font',
+				'id'   => 'font1',
+				'name' => 'Font',
 			]
 		);
 
@@ -166,7 +166,7 @@ class Test_Model_Custom_Fonts extends WP_UnitTestCase {
 		$this->assertSame( 'font1', $this->model->get_unique_id( 'font1' ) );
 		$this->model->add_font(
 			[
-				'shortname' => 'font1',
+				'id'        => 'font1',
 				'font_name' => 'Font Name',
 			]
 		);
