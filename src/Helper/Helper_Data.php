@@ -215,6 +215,8 @@ class Helper_Data {
 			[
 				'ajaxUrl'                              => admin_url( 'admin-ajax.php' ),
 				'ajaxNonce'                            => wp_create_nonce( 'gfpdf_ajax_nonce' ),
+				'restUrl'                              => rest_url( 'gravity-pdf/v1/' ),
+				'restNonce'                            => wp_create_nonce( 'wp_rest' ),
 				'currentVersion'                       => PDF_EXTENDED_VERSION,
 				'pdfWorkingDir'                        => PDF_TEMPLATE_LOCATION,
 				'pluginUrl'                            => PDF_PLUGIN_URL,

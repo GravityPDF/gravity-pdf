@@ -1,14 +1,5 @@
 @use '../base';
 
-@mixin variants {
-  width: 15%;
-  text-align: center;
-}
-
-@mixin installed-fonts {
-  width: 40%;
-}
-
 @mixin font-color-regular {
   color: #434563;
 }
@@ -58,11 +49,12 @@
             font-weight: 500;
 
             .installed-fonts {
-              @include installed-fonts;
+              width: 40%;
             }
 
             .variants {
-              @include variants;
+              width: 15%;
+              text-align: center;
             }
           }
 
@@ -71,37 +63,30 @@
             height: 80%;
 
             .font-list-item {
+              cursor: pointer;
               display: flex;
               border-top: 1px solid #e8e8eb;
               padding: 7px 0px;
 
-              &:hover {
-                background-color: base.$primary-color;
-
-                .dashicons {
-                  color: #ffffff;
-                }
+              .column2 {
+                display: flex;
+                width: 100%;
+                padding-left: 15px;
 
                 .font-name {
-                  color: #ffffff;
-                }
-              }
-
-              .installed-font {
-                @include installed-fonts;
-
-                .font-name {
-                  margin-left: 10px;
+                  width: 40%;
                 }
               }
 
               .variants {
-                @include variants;
+                width: 17%;
+                text-align: center;
               }
 
               /* Icons */
               .dashicons-trash {
                 color: base.$primary-color;
+                margin-top: -1px;
               }
 
               .dashicons-yes {
@@ -110,6 +95,18 @@
 
               .dashicons-no-alt {
                 color: #949597;
+              }
+            }
+
+            .active {
+              background-color: base.$primary-color;
+
+              .dashicons {
+                color: #ffffff;
+              }
+
+              .font-name {
+                color: #ffffff;
               }
             }
           }
@@ -142,6 +139,12 @@
           input {
             width: 90%;
             margin-top: -7px;
+
+            &.gfpdf-button {
+              width: 120px;
+              height: 40px;
+              margin-top: 10px;
+            }
           }
 
           .font-files {
@@ -159,7 +162,7 @@
                 height: 160px;
                 margin-right: 25px;
 
-                &:hover {
+                &.active {
                   background-color: base.$primary-color;
                   border: 5px solid base.$primary-color !important;
 

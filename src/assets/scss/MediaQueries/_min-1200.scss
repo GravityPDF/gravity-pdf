@@ -25,6 +25,12 @@
           .font-list {
             .font-list-items {
               height: 92%;
+
+              .font-list-item {
+                .variants {
+                  width: 18%;
+                }
+              }
             }
           }
 

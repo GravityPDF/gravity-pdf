@@ -2,14 +2,14 @@ import React from 'react'
 import Header from './Header'
 import Body from './Body'
 
-const FontManagerContainer = () => (
+const FontManager = props => (
   <div>
     <div className='backdrop theme-backdrop' />
     <div className='container theme-wrap font-manager'>
       <Header />
-      <Body />
+      <Body {...props} />
     </div>
   </div>
 )
 
-export default FontManagerContainer
+export default FontManager

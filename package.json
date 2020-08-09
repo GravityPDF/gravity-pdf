@@ -5,6 +5,7 @@
     "classnames": "^2.2.6",
     "core-js": "3.6.5",
     "lodash.debounce": "^4.0.8",
+    "object-to-formdata": "^4.1.0",
     "prop-types": "^15.7.2",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
