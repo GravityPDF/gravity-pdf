@@ -20,7 +20,7 @@ use WP_UnitTestCase;
  *
  * @group   pdf
  */
-class TestModelPDFMetaBox extends WP_UnitTestCase {
+class TestModelPdfMetaBox extends WP_UnitTestCase {
 
 	/**
 	 * @var Controller_PDF
@@ -39,13 +39,10 @@ class TestModelPDFMetaBox extends WP_UnitTestCase {
 
 	/**
 	 * The WP Unit Test Set up function
-	 *
-	 * @since 6.0
 	 */
 	public function setUp() {
 		global $gfpdf;
 
-		/* run parent method */
 		parent::setUp();
 
 		/* Setup our test classes */
@@ -57,8 +54,6 @@ class TestModelPDFMetaBox extends WP_UnitTestCase {
 
 	/**
 	 * Create our testing data
-	 *
-	 * @since 4.0
 	 */
 	protected function create_form_and_entries() {
 		global $gfpdf;
@@ -73,16 +68,12 @@ class TestModelPDFMetaBox extends WP_UnitTestCase {
 
 	/**
 	 * Check our PDF detail list is displaying correctly
-	 *
-	 * @since 4.0
 	 */
 	public function test_view_pdf_entry_detail_success() {
-
-		/* Setup some test data */
-		[ $form, $entry['entry'] ] = $this->create_form_and_entries();
+		[ ,$entry ] = $this->create_form_and_entries();
 
 		ob_start();
-		$this->model->view_pdf_entry_detail( $entry );
+		$this->model->view_pdf_entry_detail( [ 'entry' => $entry ] );
 		$html = ob_get_clean();
 
 		$this->assertStringContainsString( '<div class="gfpdf_detailed_pdf_cta">', $html );
@@ -90,8 +81,6 @@ class TestModelPDFMetaBox extends WP_UnitTestCase {
 
 	/**
 	 * Check our PDF detail list is displaying correctly when there is no entry passed
-	 *
-	 * @since 4.0
 	 */
 	public function test_view_pdf_entry_detail_fail() {
 
@@ -104,24 +93,15 @@ class TestModelPDFMetaBox extends WP_UnitTestCase {
 
 	/**
 	 * Check if Metabox registration is working properly
-	 *
-	 * @since 6.0
 	 */
 	public function test_register_pdf_meta_box_success() {
-
-		/* Setup some test data */
 		[ $form, $entry ] = $this->create_form_and_entries();
 
 		$this->assertArrayHasKey( 'gfpdf-entry-details-list', $this->model->register_pdf_meta_box( [], $entry, $form ) );
 
-		/*  Get all PDFs ID */
-		$pdf_ids = array_keys( $form['gfpdf_form_settings'] );
-
-		/* Test if metabox is  registered when there is atleast 2 active PDFs */
-		$active_pdfs = array_rand( $pdf_ids, 2 );
-
-		foreach ( $active_pdfs as $id ) {
-			$form['gfpdf_form_settings'][ $pdf_ids[ $id ] ]['active'] = false;
+		/* Disable two (out of four) PDFs and verify the meta box is still displayed */
+		foreach ( array_rand( array_keys( $form['gfpdf_form_settings'] ), 2 ) as $id ) {
+			$form['gfpdf_form_settings'][ $id ]['active'] = false;
 		}
 
 		$this->assertArrayHasKey( 'gfpdf-entry-details-list', $this->model->register_pdf_meta_box( [], $entry, $form ) );
@@ -129,19 +109,12 @@ class TestModelPDFMetaBox extends WP_UnitTestCase {
 
 	/**
 	 * Check if Metabox registration is working properly when there is no active PDFs
-	 *
-	 * @since 6.0
 	 */
 	public function test_register_pdf_meta_box_fail() {
-
-		/* Setup some test data */
 		[ $form, $entry ] = $this->create_form_and_entries();
 
-		/*  Set all pdfs to inactive */
-		$pdf_ids = array_keys( $form['gfpdf_form_settings'] );
-
-		/* Test if metabox is not registered when there is no active PDFs */
-		foreach ( $pdf_ids as $id ) {
+		/* Disable two (out of four) PDFs and verify the meta box is still displayed */
+		foreach ( array_keys( $form['gfpdf_form_settings'] ) as $id ) {
 			$form['gfpdf_form_settings'][ $id ]['active'] = false;
 		}
 
