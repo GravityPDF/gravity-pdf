@@ -172,7 +172,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 
 
 	public function get_all_items(): array {
-		return $this->model->get_custom_fonts();
+		return array_values( $this->model->get_custom_fonts() );
 	}
 
 	public function add_item( WP_REST_Request $request ) {
