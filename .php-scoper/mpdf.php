@@ -48,6 +48,15 @@ return [
 				$content = str_replace( 'use \\setasign\\', "use \\$prefix\\setasign\\", $content );
 			}
 
+			if ( basename( $filePath ) === 'Svg.php' ) {
+				$content = str_replace( "$prefix\\\\<svg\\\\1", '<svg\\\\1', $content );
+			}
+
+			if ( basename( $filePath ) === 'Mpdf.php' ) {
+				$content = str_replace( "$prefix\\\\r\\\\n", '\\r\\n', $content );
+				$content = str_replace( "$prefix\\\\</t\\\\1", '</t\\\\1', $content );
+			}
+
 			return $content;
 		},
 	],

@@ -39,6 +39,7 @@ fi
 
 rm -R "${PLUGIN_DIR}vendor_prefixed"
 mkdir "${PLUGIN_DIR}vendor_prefixed"
+touch "${PLUGIN_DIR}vendor_prefixed/.gitkeep"
 
 # Monolog
 eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}vendor_prefixed/monolog --config=${PLUGIN_DIR}.php-scoper/monolog.php --quiet"
