@@ -749,7 +749,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function mergetags() {
 
-		$model = new Model\Model_Mergetags( $this->options, $this->singleton->get_class( 'Model_PDF' ), $this->log, $this->misc );
+		$model = new Model\Model_Mergetags( $this->options, $this->singleton->get_class( 'Model_PDF' ), $this->log, $this->misc, new Helper\Helper_Url_Signer() );
 
 		$class = new Controller\Controller_Mergetags( $model );
 		$class->init();
