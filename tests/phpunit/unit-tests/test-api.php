@@ -60,6 +60,33 @@ class Test_API extends WP_UnitTestCase {
 	 */
 	public function test_get_form_pdfs() {
 		$this->assertTrue( is_wp_error( GPDFAPI::get_form_pdfs( null ) ) );
+
+		$pdfs = GPDFAPI::get_form_pdfs( $GLOBALS['GFPDF_Test']->form['all-form-fields']['id'] );
+		$this->assertCount( 4, $pdfs );
+
+		$this->assertArrayHasKey( 'id', $pdfs['555ad84787d7e'] );
+		$this->assertArrayHasKey( 'filename', $pdfs['555ad84787d7e'] );
+		$this->assertArrayHasKey( 'template', $pdfs['555ad84787d7e'] );
+		$this->assertArrayHasKey( 'notification', $pdfs['555ad84787d7e'] );
+		$this->assertArrayHasKey( 'conditionalLogic', $pdfs['555ad84787d7e'] );
+	}
+
+	/**
+	 * Check we can get a form's PDF settings
+	 *
+	 * @since 6.0
+	 */
+	public function test_get_entry_pdfs() {
+		$this->assertTrue( is_wp_error( GPDFAPI::get_entry_pdfs( null ) ) );
+
+		$pdfs = GPDFAPI::get_entry_pdfs( $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0]['id'] );
+		$this->assertCount( 2, $pdfs );
+
+		$this->assertArrayHasKey( 'id', $pdfs['fawf90c678523b'] );
+		$this->assertArrayHasKey( 'filename', $pdfs['fawf90c678523b'] );
+		$this->assertArrayHasKey( 'template', $pdfs['fawf90c678523b'] );
+		$this->assertArrayHasKey( 'notification', $pdfs['fawf90c678523b'] );
+		$this->assertArrayHasKey( 'conditionalLogic', $pdfs['fawf90c678523b'] );
 	}
 
 	/**
