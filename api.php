@@ -237,7 +237,7 @@ final class GPDFAPI {
 	 *
 	 * See https://gravitypdf.com/documentation/v5/api_get_form_pdfs/ for more information about this method
 	 *
-	 * @param  integer $form_id The Gravity Form ID
+	 * @param  int $form_id The Gravity Form ID
 	 *
 	 * @return array|WP_Error Array of PDF settings or WP_Error
 	 *
@@ -247,6 +247,36 @@ final class GPDFAPI {
 		$options = static::get_options_class();
 
 		return $options->get_form_pdfs( $form_id );
+	}
+
+	/**
+	 * Gets a list of current PDFs setup for a particular Entry
+	 * This differs from \GPDFAPI::get_form_pdfs() as it'll filter out any PDFs that don't pass the conditional logic
+	 * for the current entry.
+	 *
+	 * See https://gravitypdf.com/documentation/v5/@TODO/ for more information about this method
+	 *
+	 * @param int $entry_id The Gravity Forms Entry ID
+	 *
+	 * @return array|WP_Error Array of PDFs available to the entry or WP_Error
+	 *
+	 * @since 6.0
+	 */
+	public static function get_entry_pdfs( $entry_id ) {
+		$form_class = static::get_form_class();
+
+		/* Get our entry */
+		$entry = $form_class->get_entry( $entry_id );
+
+		if ( is_wp_error( $entry ) ) {
+			return new WP_Error( 'invalid_entry', esc_html__( 'Make sure to pass in a valid Gravity Forms Entry ID', 'gravity-forms-pdf-extended' ) );
+		}
+
+		/** @var \GFPDF\Model\Model_PDF $model_pdf */
+		$model_pdf = static::get_mvc_class( 'Model_PDF' );
+		$pdfs      = static::get_form_pdfs( $entry['form_id'] );
+
+		return $model_pdf->get_active_pdfs( $pdfs, $entry );
 	}
 
 	/**
