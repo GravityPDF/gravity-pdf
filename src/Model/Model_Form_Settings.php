@@ -1008,24 +1008,4 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		/* end AJAX function */
 		wp_die();
 	}
-
-	/**
-	 * Include the Gravity PDF URLs in the "All Fields" Webhook request
-	 *
-	 * @since 6.0
-	 */
-	public function webhook_request_data( array $request_data, array $feed, array $entry ): array {
-		if ( $feed['meta']['requestBodyType'] !== 'all_fields' ) {
-			return $request_data;
-		}
-
-		$model_pdf = \GPDFAPI::get_mvc_class( 'Model_PDF' );
-		$pdfs      = $model_pdf->get_pdf_display_list( $entry );
-
-		foreach ( $pdfs as $pdf ) {
-			$request_data[ 'gpdf_' . $pdf['settings']['id'] ] = $pdf['view'];
-		}
-
-		return $request_data;
-	}
 }

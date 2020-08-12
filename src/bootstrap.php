@@ -223,6 +223,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->load_debug();
 		$this->check_system_status();
 		$this->export();
+		$this->webhooks();
 
 		/* Add localisation support */
 		$this->add_localization_support();
@@ -862,6 +863,16 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function export(): void {
 		$class = new Controller\Controller_Export_Entries();
+		$class->init();
+
+		$this->singleton->add_class( $class );
+	}
+
+	/**
+	 * @since 6.0
+	 */
+	public function webhooks(): void {
+		$class = new Controller\Controller_Webhooks();
 		$class->init();
 
 		$this->singleton->add_class( $class );

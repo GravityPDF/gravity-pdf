@@ -169,9 +169,6 @@ class Controller_Form_Settings extends Helper_Abstract_Controller implements Hel
 
 		/* Update our PDF settings before the form gets updated */
 		add_filter( 'gform_form_update_meta', [ $this, 'clear_cached_pdf_settings' ], 10, 2 );
-
-		/* Integrate PDFs into Addon Settings */
-		add_filter( 'gform_webhooks_request_data', [ $this->model, 'webhook_request_data' ], 10, 3 );
 	}
 
 	/**

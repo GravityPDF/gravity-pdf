@@ -1,6 +1,8 @@
 <?php
 
-namespace GFPDF\Model;
+namespace GFPDF\Controller;
+
+use WP_UnitTestCase;
 
 /**
  * @package     Gravity PDF
@@ -9,14 +11,14 @@ namespace GFPDF\Model;
  */
 
 /**
- * Class TestWebhook
+ * Class TestControllerWebhooks
  *
- * @package GFPDF\Model\Model_Form_Settings
+ * @package GFPDF\Controller
  *
- * @group   model
- * @group   form-settings
+ * @group   controller
+ * @group   webhook
  */
-class TestWebhook extends \WP_UnitTestCase {
+class TestControllerWebhooks extends WP_UnitTestCase {
 
 	/**
 	 * Test we add the PDF URLs to the Webhook request data when the request type is "all_fields"
@@ -48,5 +50,4 @@ class TestWebhook extends \WP_UnitTestCase {
 		$this->assertSame( $entry, $request_data );
 		$this->assertArrayNotHasKey( 'gpdf_556690c67856b', $request_data );
 	}
-
 }
