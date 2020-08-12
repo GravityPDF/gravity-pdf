@@ -222,6 +222,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->load_custom_font_handler();
 		$this->load_debug();
 		$this->check_system_status();
+		$this->export();
 
 		/* Add localisation support */
 		$this->add_localization_support();
@@ -851,6 +852,16 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function check_system_status() {
 		$class = new Controller\Controller_System_Report( $this->data->allow_url_fopen );
+		$class->init();
+
+		$this->singleton->add_class( $class );
+	}
+
+	/**
+	 * @since 6.0
+	 */
+	public function export(): void {
+		$class = new Controller\Controller_Export_Entries();
 		$class->init();
 
 		$this->singleton->add_class( $class );
