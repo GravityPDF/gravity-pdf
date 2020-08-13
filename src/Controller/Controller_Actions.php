@@ -108,9 +108,6 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	public function add_actions() {
 		add_action( 'admin_init', [ $this, 'route' ] );
 		add_action( 'admin_init', [ $this, 'route_notices' ], 20 ); /* Run later than our route check */
-
-		/* Add AJAX endpoints */
-		add_action( 'wp_ajax_multisite_v3_migration', [ $this->model, 'ajax_multisite_v3_migration' ] );
 	}
 
 	/**
@@ -130,15 +127,6 @@ class Controller_Actions extends Helper_Abstract_Controller implements Helper_In
 	public function get_routes() {
 
 		$routes = [
-			[
-				'action'      => 'migrate_v3_to_v4',
-				'action_text' => esc_html__( 'Begin Migration', 'gravity-forms-pdf-extended' ),
-				'condition'   => [ $this->model, 'migration_condition' ],
-				'process'     => [ $this->model, 'begin_migration' ],
-				'view'        => [ $this->view, 'migration' ],
-				'capability'  => 'update_plugins',
-			],
-
 			[
 				'action'      => 'install_core_fonts',
 				'action_text' => esc_html__( 'Install Core Fonts', 'gravity-forms-pdf-extended' ),

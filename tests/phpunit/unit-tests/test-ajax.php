@@ -178,60 +178,6 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 	/**
 	 * Ensure we correctly authorise the end user
 	 *
-	 * @class Model_Actions
-	 *
-	 * @since 4.1
-	 */
-	public function test_multisite_v3_migration() {
-
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped(
-				'Not running multisite tests'
-			);
-		}
-
-		/* Check for authentication failure */
-		try {
-			$this->_handleAjax( 'multisite_v3_migration' );
-		} catch ( WPAjaxDieStopException $e ) {
-			/* do nothing (error expected) */
-		}
-
-		$this->assertEquals( '401', $e->getMessage() );
-
-		/* become super admin */
-		$this->_setRole( 'administrator' );
-		grant_super_admin( get_current_user_id() );
-		$_POST['blog_id'] = 1;
-
-		/* Check for nonce failure */
-		try {
-			$this->_handleAjax( 'multisite_v3_migration' );
-		} catch ( WPAjaxDieStopException $e ) {
-			/* do nothing (error expected) */
-		}
-
-		$this->assertEquals( '401', $e->getMessage() );
-
-		/* Check for missing v3 configuration file failure */
-		$_POST['nonce'] = wp_create_nonce( 'gfpdf_multisite_migration' );
-
-		try {
-			$this->_handleAjax( 'multisite_v3_migration' );
-		} catch ( WPAjaxDieContinueException $e ) {
-			/* do nothing (error expected) */
-		}
-
-		/* Get the response */
-		$response = json_decode( $this->_last_response, true );
-
-		$this->assertArrayHasKey( 'results', $response );
-		$this->assertArrayHasKey( 'error', $response['results'] );
-	}
-
-	/**
-	 * Ensure we correctly authorise the end user
-	 *
 	 * @class Model_Form_Settings
 	 *
 	 * @since 4.1
