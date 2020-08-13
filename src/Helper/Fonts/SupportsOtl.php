@@ -29,7 +29,7 @@ class SupportsOtl {
 
 	public function __construct( string $font_directory_path, string $cache_path ) {
 		$this->font_directory_path = $font_directory_path;
-		$this->cache_path = $cache_path;
+		$this->cache_path          = $cache_path;
 	}
 
 	public function supports_otl( $file ): bool {

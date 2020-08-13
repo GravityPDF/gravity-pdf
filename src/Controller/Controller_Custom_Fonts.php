@@ -127,25 +127,25 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 					/*'permission_callback' => \Closure::fromCallable( [ $this, 'check_permissions' ] ),*/
 					'permissions_callback' => '__return_true',
 					'args'                 => [
-						'label' => [
+						'label'       => [
 							'description'       => __( 'The font label used for the object', 'gravity-forms-pdf-extended' ),
 							'type'              => 'string',
 							'validate_callback' => [ $this->model, 'check_font_name_valid' ],
 						],
 
-						'regular' => [
+						'regular'     => [
 							'description'       => __( 'The path to the regular font file. Pass empty value if it should be deleted', 'gravity-forms-pdf-extended' ),
 							'type'              => 'string',
 							'validate_callback' => \Closure::fromCallable( [ $this, 'check_empty_string' ] ),
 						],
 
-						'italics' => [
+						'italics'     => [
 							'description'       => __( 'The path to the italics font file. Pass empty value if it should be deleted', 'gravity-forms-pdf-extended' ),
 							'type'              => 'string',
 							'validate_callback' => \Closure::fromCallable( [ $this, 'check_empty_string' ] ),
 						],
 
-						'bold' => [
+						'bold'        => [
 							'description'       => __( 'The path to the bold font file. Pass empty value if it should be deleted', 'gravity-forms-pdf-extended' ),
 							'type'              => 'string',
 							'validate_callback' => \Closure::fromCallable( [ $this, 'check_empty_string' ] ),
@@ -331,9 +331,13 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 	}
 
 	protected function get_uploaded_font_files( WP_REST_Request $request ): array {
-		return array_filter( $request->get_file_params(), function( $id ) {
-			return in_array( $id, $this->font_keys, true );
-		}, ARRAY_FILTER_USE_KEY );
+		return array_filter(
+			$request->get_file_params(),
+			function( $id ) {
+				return in_array( $id, $this->font_keys, true );
+			},
+			ARRAY_FILTER_USE_KEY
+		);
 	}
 
 	/* @TODO - migrate to Helper class */
@@ -344,10 +348,12 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 			$file = new File( $id, $storage );
 
 			/* Add validation checks */
-			$file->addValidations( [
-				new Extension( 'ttf' ),
-				new TtfFontValidation(),
-			] );
+			$file->addValidations(
+				[
+					new Extension( 'ttf' ),
+					new TtfFontValidation(),
+				]
+			);
 
 			/* Give file a unique name, if already exists */
 			while ( is_file( $this->font_dir_path . $file->getNameWithExtension() ) ) {

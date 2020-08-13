@@ -707,9 +707,9 @@ class Helper_Templates {
 			'gfpdf_template_args',
 			[
 
-				'form_id'  => $form['id'], /* backwards compat */
-				'lead_ids' => $legacy_ids, /* backwards compat */
-				'lead_id'  => apply_filters( 'gfpdfe_lead_id', $entry['id'], $form, $entry, $gfpdf ), /* backwards compat */
+				'form_id'   => $form['id'], /* backwards compat */
+				'lead_ids'  => $legacy_ids, /* backwards compat */
+				'lead_id'   => apply_filters( 'gfpdfe_lead_id', $entry['id'], $form, $entry, $gfpdf ), /* backwards compat */
 
 				'form'      => $form,
 				'entry'     => $entry,
