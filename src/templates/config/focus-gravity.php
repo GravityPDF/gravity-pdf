@@ -2,6 +2,7 @@
 
 namespace GFPDF\Templates\Config;
 
+use GFPDF\Helper\Helper_Abstract_Config_Settings;
 use GFPDF\Helper\Helper_Interface_Config;
 
 /**
@@ -35,7 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Focus_Gravity implements Helper_Interface_Config {
+class Focus_Gravity extends Helper_Abstract_Config_Settings implements Helper_Interface_Config {
 
 	/**
 	 * Return the templates configuration structure which control what extra fields will be shown in the "Template" tab when configuring a form's PDF.
@@ -69,7 +70,7 @@ class Focus_Gravity implements Helper_Interface_Config {
 
 			/* Create custom fields to control the look and feel of a template */
 			'fields' => [
-				'focusgravity_accent_colour'    => [
+				'focusgravity_accent_colour' => [
 					'id'   => 'focusgravity_accent_colour',
 					'name' => esc_html__( 'Accent Color', 'gravity-forms-pdf-extended' ),
 					'type' => 'color',
@@ -85,7 +86,7 @@ class Focus_Gravity implements Helper_Interface_Config {
 					'std'  => '#eaf2fa',
 				],
 
-				'focusgravity_label_format'     => [
+				'focusgravity_label_format' => [
 					'id'      => 'focusgravity_label_format',
 					'name'    => esc_html__( 'Format', 'gravity-forms-pdf-extended' ),
 					'type'    => 'radio',
