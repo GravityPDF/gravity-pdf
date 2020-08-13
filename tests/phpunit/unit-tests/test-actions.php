@@ -298,35 +298,6 @@ class Test_Actions extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Check the core migration action conditional works as expected
-	 *
-	 * @since 4.0
-	 */
-	public function test_migration_condition() {
-		global $gfpdf;
-
-		$path = ( is_multisite() ) ? $gfpdf->data->multisite_template_location : $gfpdf->data->template_location;
-
-		/* Multisite can only be run by super admins */
-		if ( is_multisite() ) {
-			$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-			grant_super_admin( $user_id );
-			wp_set_current_user( $user_id );
-		}
-
-		@unlink( $path . 'configuration.php' );
-		$this->assertFalse( $this->model->migration_condition() );
-		touch( $path . 'configuration.php' );
-
-		$this->assertTrue( $this->model->migration_condition() );
-
-		unlink( $path . 'configuration.php' );
-
-		wp_set_current_user( 0 );
-
-	}
-
-	/**
 	 * Check the core fonts installation prompt works as expected
 	 *
 	 * @since 5.0

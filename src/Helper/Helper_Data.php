@@ -239,11 +239,6 @@ class Helper_Data {
 				'group'                                => esc_html__( 'Group', 'gravity-forms-pdf-extended' ),
 				'tags'                                 => esc_html__( 'Tags', 'gravity-forms-pdf-extended' ),
 
-				'migratingSite'                        => esc_html__( 'Migrating site #%s', 'gravity-forms-pdf-extended' ),
-				'siteMigrationComplete'                => esc_html__( 'Site #%s migration complete.', 'gravity-forms-pdf-extended' ),
-				'migrationError'                       => esc_html__( 'Migration Error', 'gravity-forms-pdf-extended' ),
-				'siteMigrationErrors'                  => esc_html__( 'Site #%s migration errors.', 'gravity-forms-pdf-extended' ),
-
 				'addNewTemplate'                       => esc_html__( 'Add New Template', 'gravity-forms-pdf-extended' ),
 				'showAdvancedOptions'                  => esc_html__( 'Show Advanced Options...', 'gravity-forms-pdf-extended' ),
 				'hideAdvancedOptions'                  => esc_html__( 'Hide Advanced Options...', 'gravity-forms-pdf-extended' ),
