@@ -15,6 +15,8 @@ use WP_UnitTestCase;
  * Class TestViewSettings
  *
  * @package GFPDF\Viewr
+ *
+ * @use     view
  */
 class TestViewSettings extends WP_UnitTestCase {
 

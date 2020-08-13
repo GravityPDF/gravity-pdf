@@ -17,6 +17,7 @@ use WP_UnitTestCase;
  *
  * @package GFPDF\Controller
  *
+ * @group   controller
  * @group   system-report
  */
 class TestControllerSystemReport extends WP_UnitTestCase {

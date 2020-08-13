@@ -24,7 +24,7 @@ class Test_Helper_Mpdf extends WP_UnitTestCase {
 	 */
 	public function test_extends() {
 		$this->assertInstanceOf(
-			'\Mpdf\Mpdf',
+			'\GFPDF_Vendor\Mpdf\Mpdf',
 			new Helper_Mpdf(
 				[
 					'mode'    => 'c',

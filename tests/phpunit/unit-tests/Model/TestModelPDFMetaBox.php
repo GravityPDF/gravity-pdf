@@ -18,6 +18,7 @@ use WP_UnitTestCase;
  *
  * @package GFPDF\Model
  *
+ * @group   model
  * @group   pdf
  */
 class TestModelPdfMetaBox extends WP_UnitTestCase {

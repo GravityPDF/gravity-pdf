@@ -375,9 +375,14 @@ class Test_Installer extends WP_UnitTestCase {
 		/* Verify the form data is removed */
 		$this->model->remove_plugin_form_settings();
 
-		$forms = $gfpdf->gform->get_forms();
-		foreach ( $forms as $form ) {
+		$new_forms = $gfpdf->gform->get_forms();
+		foreach ( $new_forms as $form ) {
 			$this->assertFalse( isset( $form['gfpdf_form_settings'] ) );
+		}
+
+		/* Reset forms */
+		foreach ( $forms as $form ) {
+			$gfpdf->gform->update_form( $form );
 		}
 	}
 }

@@ -17,9 +17,10 @@ use WP_UnitTestCase;
 /**
  * Class TestModelMergetags
  *
- * @package GFPDF\Model
+ * @package   GFPDF\Model
  *
- * @use     tags
+ * @group     model
+ * @group     tags
  */
 class TestModelMergetags extends WP_UnitTestCase {
 
