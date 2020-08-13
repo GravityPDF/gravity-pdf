@@ -498,17 +498,20 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 
 		/* Sniff that our keys have the correct details */
 		$this->assertEquals( $entry['form_id'], $data['form_id'] );
-		$this->assertEquals( $entry['id'], $data['lead_id'] );
-		$this->assertEquals( [ $entry['id'] ], $data['lead_ids'] );
-		$this->assertTrue( is_array( $data['form'] ) );
-		$this->assertTrue( is_array( $data['entry'] ) );
-		$this->assertTrue( is_array( $data['lead'] ) );
-		$this->assertTrue( is_array( $data['form_data'] ) );
-		$this->assertEquals( $data['entry'], $data['lead'] );
-		$this->assertEquals( $pdf, $data['settings'] );
-		$this->assertEquals( 'GFPDF\Router', get_class( $data['gfpdf'] ) );
-		$this->assertTrue( is_array( $data['fields'] ) );
-		$this->assertEquals( 'GF_Field_Checkbox', get_class( $data['fields'][47] ) );
-		$this->assertEquals( 'GFPDF\Templates\Config\Zadani', get_class( $data['config'] ) );
+		$this->assertSame( $entry['id'], $data['lead_id'] );
+		$this->assertSame( [ $entry['id'] ], $data['lead_ids'] );
+		$this->assertIsArray( $data['form'] );
+		$this->assertIsArray( $data['entry'] );
+		$this->assertIsArray( $data['lead'] );
+		$this->assertIsArray( $data['form_data'] );
+		$this->assertSame( $data['entry'], $data['lead'] );
+		$this->assertSame( $pdf, $data['settings'] );
+		$this->assertInstanceOf( 'GFPDF\Router', $data['gfpdf'] );
+		$this->assertIsArray( $data['fields'] );
+		$this->assertInstanceOf( 'GF_Field_Checkbox', $data['fields'][47] );
+		$this->assertInstanceOf( 'GFPDF\Templates\Config\Zadani', $data['config'] );
+
+		/* Check our config class has the settings populated */
+		$this->assertSame( $data['settings'], $data['config']->get_settings() );
 	}
 }

@@ -584,7 +584,7 @@ class Helper_Templates {
 			require_once( $file );
 		}
 
-		/* Insure the class we are trying to load exists and implements our Helper_Interface_Config interface */
+		/* Insure the class we are trying to load exists */
 		if ( class_exists( $fqcn ) ) {
 			return new $fqcn();
 		}
@@ -696,15 +696,20 @@ class Helper_Templates {
 		/* Disable the field encryption checks which can slow down our entry queries */
 		add_filter( 'gform_is_encrypted_field', '__return_false' );
 
+		/* Inject the settings into our config object, if requested */
+		if ( $config instanceof Helper_Interface_Config_Settings ) {
+			$config->set_settings( $settings );
+		}
+
 		/* See https://gravitypdf.com/documentation/v5/gfpdf_template_args/ for more details about this filter */
 
 		return apply_filters(
 			'gfpdf_template_args',
 			[
 
-				'form_id'   => $form['id'], /* backwards compat */
-				'lead_ids'  => $legacy_ids, /* backwards compat */
-				'lead_id'   => apply_filters( 'gfpdfe_lead_id', $entry['id'], $form, $entry, $gfpdf ), /* backwards compat */
+				'form_id'  => $form['id'], /* backwards compat */
+				'lead_ids' => $legacy_ids, /* backwards compat */
+				'lead_id'  => apply_filters( 'gfpdfe_lead_id', $entry['id'], $form, $entry, $gfpdf ), /* backwards compat */
 
 				'form'      => $form,
 				'entry'     => $entry,
