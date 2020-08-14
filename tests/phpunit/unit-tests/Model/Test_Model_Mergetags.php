@@ -15,14 +15,14 @@ use WP_UnitTestCase;
  */
 
 /**
- * Class TestModelMergetags
+ * Class Test_Model_Mergetags
  *
  * @package   GFPDF\Model
  *
  * @group     model
  * @group     tags
  */
-class TestModelMergetags extends WP_UnitTestCase {
+class Test_Model_Mergetags extends WP_UnitTestCase {
 
 	/**
 	 * @var Controller_Shortcodes

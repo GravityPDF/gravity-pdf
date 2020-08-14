@@ -13,14 +13,14 @@ use WP_UnitTestCase;
  */
 
 /**
- * Class TestControllerSystemReport
+ * Class Test_Controller_System_Report
  *
  * @package GFPDF\Controller
  *
  * @group   controller
  * @group   system-report
  */
-class TestControllerSystemReport extends WP_UnitTestCase {
+class Test_Controller_System_Report extends WP_UnitTestCase {
 
 	/**
 	 * @var Controller_System_Report

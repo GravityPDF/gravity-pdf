@@ -12,13 +12,13 @@ use WP_UnitTestCase;
  */
 
 /**
- * Class TestViewSettings
+ * Class Test_View_Settings
  *
  * @package GFPDF\Viewr
  *
  * @use     view
  */
-class TestViewSettings extends WP_UnitTestCase {
+class Test_View_Settings extends WP_UnitTestCase {
 
 	/**
 	 * @var View_Settings

@@ -14,14 +14,14 @@ use WP_UnitTestCase;
  */
 
 /**
- * Class TestModelPDFSuccess
+ * Class Test_Model_Pdf_Meta_Box
  *
  * @package GFPDF\Model
  *
  * @group   model
  * @group   pdf
  */
-class TestModelPdfMetaBox extends WP_UnitTestCase {
+class Test_Model_Pdf_Meta_Box extends WP_UnitTestCase {
 
 	/**
 	 * @var Controller_PDF

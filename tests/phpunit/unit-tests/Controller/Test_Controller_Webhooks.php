@@ -11,14 +11,14 @@ use WP_UnitTestCase;
  */
 
 /**
- * Class TestControllerWebhooks
+ * Class Test_Controller_Webhooks
  *
  * @package GFPDF\Controller
  *
  * @group   controller
  * @group   webhook
  */
-class TestControllerWebhooks extends WP_UnitTestCase {
+class Test_Controller_Webhooks extends WP_UnitTestCase {
 
 	/**
 	 * Test we add the PDF URLs to the Webhook request data when the request type is "all_fields"

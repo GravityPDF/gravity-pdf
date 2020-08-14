@@ -11,14 +11,14 @@ use WP_UnitTestCase;
  */
 
 /**
- * Class TestControllerSystemReport
+ * Class Test_Controller_Export_Entries
  *
  * @package GFPDF\Controller
  *
  * @group   controller
  * @group   export
  */
-class TestControllerExportEntries extends WP_UnitTestCase {
+class Test_Controller_Export_Entries extends WP_UnitTestCase {
 	public function test_add_pdfs_to_export_fields() {
 		$form = apply_filters( 'gform_export_fields', $GLOBALS['GFPDF_Test']->form['all-form-fields'] );
 
