@@ -335,7 +335,7 @@ class Test_Installer extends WP_UnitTestCase {
 		}
 
 		wp_set_current_user( $user_id );
-		update_option( 'gfpdf_settings', 'test' );
+		update_option( 'gfpdf_settings', [] );
 
 		$this->controller->check_install_status();
 

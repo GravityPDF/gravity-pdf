@@ -38,6 +38,6 @@ class Test_QueryPath extends WP_UnitTestCase {
 		$this->assertEquals( 'ã   Ã   ╚   ╔   ╩   ╦   ╠   ═   ╬   ¤', $qp->html5( $html, 'div' )->innerHTML5() );
 
 		/* Using the standard HTML parser these characters will not be correctly displayed when output */
-		$this->assertNotEquals( 'ã   Ã   ╚   ╔   ╩   ╦   ╠   ═   ╬   ¤', htmlqp( $html, 'div' )->innerHTML5() );
+		$this->assertNotEquals( 'ã   Ã   ╚   ╔   ╩   ╦   ╠   ═   ╬   ¤', \GFPDF_Vendor\htmlqp( $html, 'div' )->innerHTML5() );
 	}
 }
