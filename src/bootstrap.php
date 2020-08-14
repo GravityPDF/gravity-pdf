@@ -211,6 +211,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		/* Load modules */
 		$this->installer();
+		$this->upgrade_routine();
 		$this->gf_settings();
 		$this->gf_form_settings();
 		$this->pdf();
@@ -604,6 +605,16 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/* Add to our singleton controller */
 		$this->singleton->add_class( $class );
 		$this->singleton->add_class( $model );
+	}
+
+	/**
+	 * @since 6.0
+	 */
+	public function upgrade_routine(): void {
+		$class = new Controller\Controller_Upgrade_Routines( $this->options );
+		$class->init();
+
+		$this->singleton->add_class( $class );
 	}
 
 	/**
