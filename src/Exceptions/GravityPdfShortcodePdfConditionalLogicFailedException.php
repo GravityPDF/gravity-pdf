@@ -2,8 +2,6 @@
 
 namespace GFPDF\Exceptions;
 
-use Exception;
-
 /**
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2020, Blue Liquid Designs
@@ -22,5 +20,5 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since   5.2
  */
-class GravityPdfShortcodePdfConditionalLogicFailedException extends Exception {
+class GravityPdfShortcodePdfConditionalLogicFailedException extends GravityPdfException {
 }
