@@ -298,8 +298,7 @@ class Helper_Field_Container {
 	 * @since  4.0
 	 */
 	protected function strip_field_of_any_classmaps( GF_Field $field ) {
-		$class_map = apply_filters("gfpdf_field_width_class_map", $this->class_map);
-		$field->cssClass = str_replace( array_keys( $class_map ), ' ', $field->cssClass );
+		$field->cssClass = str_replace( array_keys( apply_filters("gfpdf_field_width_class_map", $this->class_map) ), ' ', $field->cssClass );
 	}
 
 	/**
