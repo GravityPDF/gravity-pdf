@@ -833,7 +833,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function load_custom_font_handler(): void {
 		$model = new Model\Model_Custom_Fonts( $this->options );
-		$class = new Controller\Controller_Custom_Fonts( $model, $this->log, $this->gform, $this->options, $this->data->template_font_location );
+		$class = new Controller\Controller_Custom_Fonts( $model, $this->log, $this->gform, $this->data->template_font_location );
 		$class->init();
 
 		$this->singleton->add_class( $model );

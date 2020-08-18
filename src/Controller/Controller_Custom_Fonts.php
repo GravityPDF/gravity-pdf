@@ -4,16 +4,21 @@ declare( strict_types=1 );
 
 namespace GFPDF\Controller;
 
+use Closure;
+use Exception;
+use GFPDF\Exceptions\GravityPdfDatabaseUpdateException;
+use GFPDF\Exceptions\GravityPdfFontNotFoundException;
+use GFPDF\Exceptions\GravityPdfIdException;
+use GFPDF\Exceptions\GravityPdfModelNotUpdatedException;
 use GFPDF\Helper\Fonts\FlushCache;
 use GFPDF\Helper\Fonts\SupportsOtl;
 use GFPDF\Helper\Fonts\TtfFontValidation;
 use GFPDF\Helper\Helper_Abstract_Controller;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Options;
+use GFPDF\Helper\Helper_Data;
 use GFPDF\Model\Model_Custom_Fonts;
 use GFPDF_Vendor\Upload\Exception\UploadException;
-use GFPDF_Vendor\Upload\File;
-use GFPDF_Vendor\Upload\Storage\FileSystem;
 use GFPDF_Vendor\Upload\Validation\Extension;
 use Psr\Log\LoggerInterface;
 use WP_Error;
@@ -35,8 +40,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class Controller_Custom_Fonts
  *
  * @package GFPDF\Controller
- *
- * @since   6.0
  */
 class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 
@@ -54,49 +57,72 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 
 	/**
 	 * @var Helper_Abstract_Options
+	 * @since 6.0
 	 */
 	protected $options;
 
 	/**
-	 * @var string
+	 * @var string The absolute path to the Custom Fonts directory on the server
+	 * @since 6.0
 	 */
 	protected $font_dir_path;
 
 	/**
-	 * @var string[]
+	 * @var string
+	 * @since 6.0
+	 */
+	protected $filesystem;
+
+	/**
+	 * @var string
+	 * @since 6.0
+	 */
+	protected $file;
+
+	/**
+	 * @var string[] List of the standard font keys used when saving settings
+	 * @since 6.0
 	 */
 	protected $font_keys = [ 'regular', 'italics', 'bold', 'bolditalics' ];
 
-	public function __construct( Model_Custom_Fonts $model, LoggerInterface $log, Helper_Abstract_Form $gform, Helper_Abstract_Options $options, $font_dir_path ) {
+	public function __construct( Model_Custom_Fonts $model, LoggerInterface $log, Helper_Abstract_Form $gform, string $font_dir_path, string $filesystem = 'GFPDF_Vendor\\Upload\\Storage\\FileSystem', string $file = 'GFPDF_Vendor\\Upload\\File' ) {
 		$this->model         = $model;
 		$this->log           = $log;
 		$this->gform         = $gform;
-		$this->options       = $options;
 		$this->font_dir_path = $font_dir_path;
+
+		$this->filesystem = $filesystem;
+		$this->file       = $file;
 	}
 
+	/**
+	 * @since 6.0
+	 */
 	public function init(): void {
 		add_action( 'rest_api_init', [ $this, 'register_endpoints' ] );
 	}
 
-	public function register_endpoints() {
+	/**
+	 * Register the Font CRUD REST API endpoints
+	 *
+	 * @since 6.0
+	 */
+	public function register_endpoints(): void {
 		register_rest_route(
-			'gravity-pdf/v1',
+			Helper_Data::REST_API_BASENAME . 'v1',
 			'/fonts/',
 			[
 				[
-					'methods'              => WP_REST_Server::READABLE,
-					'callback'             => [ $this, 'get_all_items' ],
-					/*'permission_callback' => \Closure::fromCallable( [ $this, 'check_permissions' ] ),*/
-					'permissions_callback' => '__return_true',
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'get_all_items' ],
+					'permission_callback' => Closure::fromCallable( [ $this, 'check_permissions' ] ),
 				],
 
 				[
-					'methods'              => WP_REST_Server::CREATABLE,
-					'callback'             => [ $this, 'add_item' ],
-					/*'permission_callback' => \Closure::fromCallable( [ $this, 'check_permissions' ] ),*/
-					'permissions_callback' => '__return_true',
-					'args'                 => [
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ $this, 'add_item' ],
+					'permission_callback' => Closure::fromCallable( [ $this, 'check_permissions' ] ),
+					'args'                => [
 						'label' => [
 							'description'       => __( 'The font label used for the object', 'gravity-forms-pdf-extended' ),
 							'type'              => 'string',
@@ -109,7 +135,7 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 		);
 
 		register_rest_route(
-			'gravity-pdf/v1',
+			Helper_Data::REST_API_BASENAME . 'v1',
 			'/fonts/(?P<id>[a-z0-9]+)',
 			[
 				'args' => [
@@ -122,11 +148,10 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 				],
 
 				[
-					'methods'              => WP_REST_Server::CREATABLE,
-					'callback'             => [ $this, 'update_item' ],
-					/*'permission_callback' => \Closure::fromCallable( [ $this, 'check_permissions' ] ),*/
-					'permissions_callback' => '__return_true',
-					'args'                 => [
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ $this, 'update_item' ],
+					'permission_callback' => Closure::fromCallable( [ $this, 'check_permissions' ] ),
+					'args'                => [
 						'label'       => [
 							'description'       => __( 'The font label used for the object', 'gravity-forms-pdf-extended' ),
 							'type'              => 'string',
@@ -134,51 +159,61 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 						],
 
 						'regular'     => [
-							'description'       => __( 'The path to the regular font file. Pass empty value if it should be deleted', 'gravity-forms-pdf-extended' ),
+							'description'       => __( 'The path to the `regular` font file. Pass empty value if it should be deleted', 'gravity-forms-pdf-extended' ),
 							'type'              => 'string',
-							'validate_callback' => \Closure::fromCallable( [ $this, 'check_empty_string' ] ),
+							'validate_callback' => Closure::fromCallable( [ $this, 'check_empty_string' ] ),
 						],
 
 						'italics'     => [
-							'description'       => __( 'The path to the italics font file. Pass empty value if it should be deleted', 'gravity-forms-pdf-extended' ),
+							'description'       => __( 'The path to the `italics` font file. Pass empty value if it should be deleted', 'gravity-forms-pdf-extended' ),
 							'type'              => 'string',
-							'validate_callback' => \Closure::fromCallable( [ $this, 'check_empty_string' ] ),
+							'validate_callback' => Closure::fromCallable( [ $this, 'check_empty_string' ] ),
 						],
 
 						'bold'        => [
-							'description'       => __( 'The path to the bold font file. Pass empty value if it should be deleted', 'gravity-forms-pdf-extended' ),
+							'description'       => __( 'The path to the `bold` font file. Pass empty value if it should be deleted', 'gravity-forms-pdf-extended' ),
 							'type'              => 'string',
-							'validate_callback' => \Closure::fromCallable( [ $this, 'check_empty_string' ] ),
+							'validate_callback' => Closure::fromCallable( [ $this, 'check_empty_string' ] ),
 						],
 
 						'bolditalics' => [
-							'description'       => __( 'The path to the bolditalics font file. Pass empty value if it should be deleted', 'gravity-forms-pdf-extended' ),
+							'description'       => __( 'The path to the `bolditalics` font file. Pass empty value if it should be deleted', 'gravity-forms-pdf-extended' ),
 							'type'              => 'string',
-							'validate_callback' => \Closure::fromCallable( [ $this, 'check_empty_string' ] ),
+							'validate_callback' => Closure::fromCallable( [ $this, 'check_empty_string' ] ),
 						],
 					],
 				],
 
 				[
-					'methods'              => WP_REST_Server::DELETABLE,
-					'callback'             => [ $this, 'delete_item' ],
-					/*'permission_callback' => Closure::fromCallable( [ $this, 'check_permissions' ] ),*/
-					'permissions_callback' => '__return_true',
-					'validate_callback'    => [ $this->model, 'check_font_id_valid' ],
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => [ $this, 'delete_item' ],
+					'permission_callback' => Closure::fromCallable( [ $this, 'check_permissions' ] ),
+					'validate_callback'   => [ $this->model, 'check_font_id_valid' ],
 				],
 			]
 		);
 	}
 
-
+	/**
+	 * Get a numerical array of all custom installed fonts
+	 *
+	 * @since 6.0
+	 */
 	public function get_all_items(): array {
 		return array_values( $this->model->get_custom_fonts() );
 	}
 
+	/**
+	 * Our `Create` CRUD for custom fonts
+	 *
+	 * @return array|WP_Error
+	 *
+	 * @since 6.0
+	 */
 	public function add_item( WP_REST_Request $request ) {
 		try {
 			$label = $request->get_param( 'label' );
-			$id    = $this->model->get_unique_id( $this->options->get_font_short_name( $label ) );
+			$id    = $this->model->get_unique_id( $this->model->get_font_short_name( $label ) );
 
 			/* Handle uploads */
 			$files = $this->get_uploaded_font_files( $request );
@@ -207,41 +242,56 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 			];
 
 			if ( ! $this->model->add_font( $font ) ) {
-				throw new \Exception();
+				throw new GravityPdfDatabaseUpdateException();
 			}
 
-			/* Flush mPDF cache */
 			FlushCache::flush();
 
 			return $font;
-		} catch ( \Exception $e ) {
-			return new WP_Error( 'something', '', [ 'status' => 500 ] );
+		} catch ( UploadException $e ) {
+			return new WP_Error( 'font_validation_error', '', [ 'status' => 400 ] );
+		} catch ( GravityPdfFontNotFoundException $e ) {
+			return new WP_Error( 'font_file_gone_missing', '', [ 'status' => 500 ] );
+		} catch ( GravityPdfDatabaseUpdateException $e ) {
+			return new WP_Error( 'database_error', '', [ 'status' => 500 ] );
+		} catch ( GravityPdfIdException $e ) {
+			return new WP_Error( 'invalid_font_id', $e->getMessage(), [ 'status' => 500 ] );
+		} catch ( Exception $e ) {
+			return new WP_Error( 'unknown_error', $e->getMessage(), [ 'status' => 500 ] );
+		} finally {
+			if ( isset( $e ) ) {
+				$this->log->error( $e->getMessage() );
+			}
 		}
 	}
 
+	/**
+	 * Our `Update` CRUD for custom fonts
+	 *
+	 * This endpoint acts like a PATCH request, and data that isn't passed won't be updated
+	 *
+	 * @return array|WP_Error
+	 *
+	 * @since 6.0
+	 */
 	public function update_item( WP_REST_Request $request ) {
 		try {
 			$id = $request->get_param( 'id' );
-			if ( ! $this->model->has_custom_font_id( $id ) ) {
-				throw new \Exception();
-				/* @TODO */
+			if ( ! $this->model->matches_custom_font_id( $id ) ) {
+				throw new GravityPdfIdException();
 			}
 
 			$font = $this->model->get_font_by_id( $id );
 
-			/*
-			 * Compare params to font key.
-			 * Any that are different will be considered "deleted"
-			 * Will need to delete file from disk and then update $font key
-			 */
-			if ( $label = $request->get_param( 'label' ) ) {
+			$label = $request->get_param( 'label' );
+			if ( ! empty( $label ) ) {
 				$font['font_name'] = $label;
 			}
 
-			/* Delete any font files needed */
+			/* Delete any font files needed (any font key passed as a body param) */
 			$params = $request->get_body_params();
-			foreach ( $params as $font_id => $val ) {
-				if ( ! isset( $font[ $font_id ] ) ) {
+			foreach ( $this->font_keys as $font_id ) {
+				if ( ! isset( $params[ $font_id ] ) || empty( $font[ $font_id ] ) ) {
 					continue;
 				}
 
@@ -251,11 +301,9 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 
 			/*
 			 * Handle newly-uploaded files
-			 * If we are to replace an existing font we will need to delete it first
-			 * Then update the $font key
+			 * If we are to replace an existing font we will need to delete it first and then update the $font key
 			 */
 			$files = $this->get_uploaded_font_files( $request );
-
 			if ( count( $files ) > 0 ) {
 				$files = $this->move_fonts_to_font_dir( $files );
 				foreach ( $files as $font_id => $file ) {
@@ -281,28 +329,49 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 			$font['useOTL']     = $supports_otl ? 0xFF : 0x00;
 			$font['useKashida'] = $supports_otl ? 75 : 0;
 
-			/*
-			 * Insert into database
-			 */
-			if ( ! $this->model->update_font( $font ) ) {
-				throw new \Exception();
+			/* If nothing has been changed, throw error */
+			if ( $this->model->get_custom_fonts()[ $font['shortname'] ] === $font ) {
+				throw new GravityPdfModelNotUpdatedException();
 			}
 
-			/*
-			 * Flush cache
-			 */
+			if ( ! $this->model->update_font( $font ) ) {
+				throw new GravityPdfDatabaseUpdateException();
+			}
+
 			FlushCache::flush();
-		} catch ( \Exception $e ) {
-			return new WP_Error( 'something', '', [ 'status' => 500 ] );
+
+			return $font;
+		} catch ( UploadException $e ) {
+			return new WP_Error( 'font_validation_error', '', [ 'status' => 400 ] );
+		} catch ( GravityPdfFontNotFoundException $e ) {
+			return new WP_Error( 'font_file_gone_missing', '', [ 'status' => 500 ] );
+		} catch ( GravityPdfModelNotUpdatedException $e ) {
+			return new WP_Error( 'no_changes_found', '', [ 'status' => 400 ] );
+		} catch ( GravityPdfDatabaseUpdateException $e ) {
+			return new WP_Error( 'database_error', '', [ 'status' => 500 ] );
+		} catch ( GravityPdfIdException $e ) {
+			return new WP_Error( 'invalid_font_id', $e->getMessage(), [ 'status' => 400 ] );
+		} catch ( Exception $e ) {
+			return new WP_Error( 'unknown_error', $e->getMessage(), [ 'status' => 500 ] );
+		} finally {
+			if ( isset( $e ) ) {
+				$this->log->error( $e->getMessage() );
+			}
 		}
 	}
 
+	/**
+	 * @param WP_REST_Request $request
+	 *
+	 * @return void|WP_Error
+	 *
+	 * @since 6.0
+	 */
 	public function delete_item( WP_REST_Request $request ) {
 		try {
 			$id = $request->get_param( 'id' );
-			if ( ! $this->model->has_custom_font_id( $id ) ) {
-				throw new \Exception();
-				/* @TODO */
+			if ( ! $this->model->matches_custom_font_id( $id ) ) {
+				throw new GravityPdfIdException();
 			}
 
 			/* Delete TTF files from disk */
@@ -316,20 +385,39 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 			}
 
 			/* Update DB */
-			$this->model->delete_font( $id );
+			if ( ! $this->model->delete_font( $id ) ) {
+				throw new GravityPdfDatabaseUpdateException();
+			}
 
-			/* Flush mPDF cache */
 			FlushCache::flush();
 
-		} catch ( \Exception $e ) {
-			return new WP_Error( 'something', '', [ 'status' => 500 ] );
+			return;
+
+		} catch ( GravityPdfDatabaseUpdateException $e ) {
+			return new WP_Error( 'database_error', '', [ 'status' => 500 ] );
+		} catch ( GravityPdfIdException $e ) {
+			return new WP_Error( 'invalid_font_id', $e->getMessage(), [ 'status' => 400 ] );
+		} catch ( Exception $e ) {
+			return new WP_Error( 'unknown_error', $e->getMessage(), [ 'status' => 500 ] );
+		} finally {
+			if ( isset( $e ) ) {
+				$this->log->error( $e->getMessage() );
+			}
 		}
 	}
 
-	public function get_absolute_font_path( $name ) {
+	/**
+	 * @since 6.0
+	 */
+	public function get_absolute_font_path( string $name ): string {
 		return ! empty( $name ) ? $this->font_dir_path . $name : '';
 	}
 
+	/**
+	 * Return any uploaded file details with a key matching the `font_keys`
+	 *
+	 * @since 6.0
+	 */
 	protected function get_uploaded_font_files( WP_REST_Request $request ): array {
 		return array_filter(
 			$request->get_file_params(),
@@ -340,12 +428,20 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 		);
 	}
 
-	/* @TODO - migrate to Helper class */
-	protected function move_fonts_to_font_dir( $files ) {
-		$storage = new FileSystem( $this->font_dir_path );
+	/**
+	 * Validate font files and move from tmp to custom font directory
+	 *
+	 * @param array $files Accepts array returned by self::get_uploaded_font_files()
+	 *
+	 * @return array New font file details (may include a renamed font file)
+	 *
+	 * @since 6.0
+	 */
+	protected function move_fonts_to_font_dir( array $files ): array {
+		$storage = new $this->filesystem( $this->font_dir_path );
 
 		foreach ( $files as $id => $file ) {
-			$file = new File( $id, $storage );
+			$file = new $this->file( $id, $storage );
 
 			/* Add validation checks */
 			$file->addValidations(
@@ -368,8 +464,13 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 		return $files;
 	}
 
-	/* @TODO - migrate to Helper class */
-	protected function delete_font_file( $file ) {
+	/**
+	 * @param string $file The filename of the font to be deleted
+	 *
+	 * @return bool
+	 * @since 6.0
+	 */
+	protected function delete_font_file( string $file ): bool {
 		if ( is_file( $this->font_dir_path . $file ) && ! unlink( $this->font_dir_path . $file ) ) {
 			return false;
 		}
@@ -377,10 +478,20 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 		return true;
 	}
 
+	/**
+	 * A validation callback for the REST API
+	 *
+	 * @since 6.0
+	 */
 	protected function check_empty_string( string $input ): bool {
 		return empty( $input );
 	}
 
+	/**
+	 * A permissions callback for the REST API endpoints
+	 *
+	 * @since 6.0
+	 */
 	protected function check_permissions(): bool {
 		$capabilities = $this->gform->has_capability( 'gravityforms_view_entries' );
 		if ( ! $capabilities ) {
@@ -390,14 +501,21 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 		return $capabilities;
 	}
 
+	/**
+	 * Checks through all the font files for OTL support
+	 *
+	 * @param array $files Accepts array returned by self::get_uploaded_font_files()
+	 *
+	 * @return bool If supported for all fonts return true, false otherwise.
+	 */
 	protected function does_fonts_support_otl( array $files ): bool {
-		$data         = \GPDFAPI::get_data_class();
+		$otl = new SupportsOtl( $this->font_dir_path );
+
 		$supports_otl = true;
-		$otl          = new SupportsOtl( $this->font_dir_path, $data->mpdf_tmp_location );
 
 		foreach ( $files as $file ) {
 			if ( ! isset( $file['name'] ) || ! is_file( $this->font_dir_path . $file['name'] ) ) {
-				throw new \Exception();
+				throw new GravityPdfFontNotFoundException();
 			}
 
 			if ( ! $otl->supports_otl( $file['name'] ) ) {
@@ -408,5 +526,4 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 
 		return $supports_otl;
 	}
-
 }

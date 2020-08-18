@@ -4,6 +4,8 @@ declare( strict_types=1 );
 
 namespace GFPDF\Helper\Fonts;
 
+use GPDFAPI;
+
 /**
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2020, Blue Liquid Designs
@@ -17,8 +19,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class FlushCache {
 	public static function flush(): void {
-		$misc = \GPDFAPI::get_misc_class();
-		$data = \GPDFAPI::get_data_class();
+		$misc = GPDFAPI::get_misc_class();
+		$data = GPDFAPI::get_data_class();
 		$misc->cleanup_dir( $data->mpdf_tmp_location );
 	}
 }

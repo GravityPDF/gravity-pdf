@@ -14,11 +14,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class GravityPdfShortcodePdfConfigNotFoundException
+ * Class GravityPdfModelNotUpdatedException
  *
  * @package GFPDF\Exceptions
  *
- * @since   5.2
+ * @since 6.0
  */
-class GravityPdfShortcodePdfConfigNotFoundException extends GravityPdfException {
+class GravityPdfModelNotUpdatedException extends GravityPdfException {
 }

@@ -40,7 +40,7 @@ class TtfFontValidation extends Base {
 	 */
 	public function validate( File $file ) {
 		try {
-			$ttf = new TTFontFile( new FontCache( new Cache( dirname( $file->getPath() ) ) ), null );
+			$ttf = new TTFontFile( new FontCache( new Cache( get_temp_dir() . 'mpdf' ) ), null );
 			$ttf->getMetrics( $file->getPathname(), $file->getName() );
 
 			return strlen( $ttf->familyName ) > 0;

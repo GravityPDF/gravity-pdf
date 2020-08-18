@@ -25,16 +25,14 @@ class SupportsOtl {
 	 * @var string
 	 */
 	protected $font_directory_path;
-	protected $cache_path;
 
-	public function __construct( string $font_directory_path, string $cache_path ) {
+	public function __construct( string $font_directory_path ) {
 		$this->font_directory_path = $font_directory_path;
-		$this->cache_path          = $cache_path;
 	}
 
 	public function supports_otl( $file ): bool {
 		try {
-			$ttf = new TTFontFile( new FontCache( new Cache( $this->cache_path ) ), null );
+			$ttf = new TTFontFile( new FontCache( new Cache( get_temp_dir() . 'mpdf' ) ), null );
 			$ttf->getMetrics( $this->font_directory_path . $file, (string) time(), 0, false, false, 1 );
 
 			return strlen( $ttf->familyName ) > 0;

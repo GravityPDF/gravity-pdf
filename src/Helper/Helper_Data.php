@@ -43,6 +43,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Helper_Data {
 
 	/**
+	 * @since 6.0
+	 */
+	public const REST_API_BASENAME = 'gravity-pdf/';
+
+	/**
 	 * Location for the overloaded data
 	 *
 	 * @var array
