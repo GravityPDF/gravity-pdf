@@ -10,7 +10,7 @@ export const Routes = () => (
     <Switch>
       <Route
         exact
-        path='/fontmanager'
+        path='/fontmanager/'
         render={props => <FontManager {...props} />}
       />
       <Route

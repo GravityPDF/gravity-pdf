@@ -77,11 +77,15 @@ export class Body extends Component {
   }
 
   handleDeleteFont = id => {
+    const { deleteFont, history } = this.props
+
     if (window.confirm('Are you sure you want to delete this font?')) {
-      this.props.deleteFont(id)
+      deleteFont(id)
     }
 
-    this.props.history.push('/fontmanager/')
+    if (history.location.pathname !== '/fontmanager/') {
+      history.push('/fontmanager/')
+    }
   }
 
   handleDeleteFontStyle = (e, fontType) => {
