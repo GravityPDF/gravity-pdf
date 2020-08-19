@@ -16,6 +16,7 @@ use GFPDF\Model;
 use GFPDF\View;
 use GFPDF_Core;
 use Psr\Log\LoggerInterface;
+use GFPDF_Major_Compatibility_Checks;
 
 /*
  * Bootstrap / Router Class
@@ -863,10 +864,14 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 *
 	 */
 	public function check_system_status() {
-		$class = new Controller\Controller_System_Report( $this->data->allow_url_fopen );
+		$view  = new View\View_System_Report();
+		$model = new Model\Model_System_Report( $this->options, $this->data, new GFPDF_Major_Compatibility_Checks );
+		$class = new Controller\Controller_System_Report( $model, $view );
 		$class->init();
 
 		$this->singleton->add_class( $class );
+		$this->singleton->add_class( $model );
+		$this->singleton->add_class( $view );
 	}
 
 	/**

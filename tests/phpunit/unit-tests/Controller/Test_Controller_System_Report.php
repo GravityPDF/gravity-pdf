@@ -2,8 +2,6 @@
 
 namespace GFPDF\Controller;
 
-use GF_System_Report;
-use GFCommon;
 use WP_UnitTestCase;
 
 /**
@@ -23,26 +21,38 @@ use WP_UnitTestCase;
 class Test_Controller_System_Report extends WP_UnitTestCase {
 
 	/**
-	 * @var Controller_System_Report
+	 * @dataProvider data_gfpdf_system_status_items_php
 	 */
-	protected $controller;
+	public function test_system_report_php( $table_index, $key ) {
+		$system_report = apply_filters( 'gform_system_report', [] );
+		$this->assertArrayHasKey( $key, $system_report[0]['tables'][ $table_index ]['items'] );
 
-	public function setUp() {
-		$this->controller = new Controller_System_Report( false );
-		$this->controller->init();
+		/* Test that our data is spliced into the correct location in the array */
+		$system_report = apply_filters( 'gform_system_report', [ [] ] );
+		$this->assertArrayHasKey( $key, $system_report[1]['tables'][ $table_index ]['items'] );
 	}
 
-	public function test_filters() {
-		$this->assertSame( 10, has_filter( 'gform_system_report', [ $this->controller, 'system_report' ] ) );
-	}
+	public function data_gfpdf_system_status_items_php() {
+		return [
+			[ 0, 'memory' ],
+			[ 0, 'allow_url_fopen' ],
+			[ 0, 'default_charset' ],
+			[ 0, 'internal_encoding' ],
 
-	public function test_system_report() {
-		require_once( GFCommon::get_base_path() . '/includes/system-status/class-gf-system-status.php' );
-		require_once( GFCommon::get_base_path() . '/includes/system-status/class-gf-system-report.php' );
-		require_once( GFCommon::get_base_path() . '/includes/system-status/class-gf-update.php' );
+			[ 1, 'pdf_working_directory' ],
+			[ 1, 'pdf_working_directory_url' ],
+			[ 1, 'font_folder_location' ],
+			[ 1, 'temp_folder_location' ],
+			[ 1, 'temp_folder_permission' ],
+			[ 1, 'temp_folder_protected' ],
+			[ 1, 'mpdf_temp_folder_location' ],
 
-		$system_report = GF_System_Report::get_system_report();
+			[ 2, 'pdf_entry_list_action' ],
+			[ 2, 'background_processing_enabled' ],
+			[ 2, 'debug_mode_enabled' ],
 
-		$this->assertEquals( 'allow_url_fopen', $system_report[2]['tables'][1]['items'][11]['label'] );
+			[ 3, 'user_restrictions' ],
+			[ 3, 'logged_out_timeout' ],
+		];
 	}
 }

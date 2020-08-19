@@ -101,7 +101,6 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 
 		$gfpdf->misc->cleanup_dir( $this->tmp_font_location );
 
-
 		foreach ( $this->test_fonts as $font ) {
 			if ( is_file( $font ) ) {
 				unlink( $font );

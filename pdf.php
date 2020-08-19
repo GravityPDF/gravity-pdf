@@ -5,6 +5,7 @@ Version: 6.0.0
 Description: Automatically generate highly-customisable PDF documents using Gravity Forms.
 Author: Gravity PDF
 Author URI: https://gravitypdf.com
+Plugin URI: https://wordpress.org/plugins/gravity-forms-pdf-extended/
 Text Domain: gravity-forms-pdf-extended
 Domain Path: /src/assets/languages
 */
