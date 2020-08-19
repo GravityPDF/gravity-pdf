@@ -2,6 +2,6 @@
 .theme-overlay {
   .theme-backdrop {
     position: fixed;
-    left: 160px;
+    z-index: 0;
   }
 }
