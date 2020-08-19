@@ -22,7 +22,7 @@ export const FontList = ({ onHandleFontClick, onHandleDeleteFont, match, fontLis
           <div>
             <span
               className='dashicons dashicons-trash'
-              onClick={() => onHandleDeleteFont(font.id)}
+              onClick={e => onHandleDeleteFont(e, font.id)}
               tabIndex='0'
             />
           </div>

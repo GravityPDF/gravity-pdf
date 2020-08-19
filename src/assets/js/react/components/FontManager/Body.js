@@ -76,7 +76,8 @@ export class Body extends Component {
     })
   }
 
-  handleDeleteFont = id => {
+  handleDeleteFont = (e, id) => {
+    e.stopPropagation()
     const { deleteFont, history } = this.props
 
     if (window.confirm('Are you sure you want to delete this font?')) {
