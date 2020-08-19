@@ -1,32 +1,5 @@
 /* 961px and up */
-@media (min-width: 961px) {
-
-  /* Popup - Font manager */
-  #tab_PDF {
-    .font-manager {
-      .font-manager-body {
-        .two-columns {
-          .add-font {
-            input {
-              width: 600px;
-            }
-
-            .font-files {
-              .variants {
-                .drop-zone {
-                  width: 250px;
-                }
-              }
-            }
-          }
-        }
-
-        p {
-          font-size: 11px;
-        }
-      }
-    }
-  }
+@media only screen and (min-width: 961px) {
 
   /* Help tab section */
   #pdfextended-settings {

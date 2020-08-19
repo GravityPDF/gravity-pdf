@@ -1,14 +1,14 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
 export const FontList = ({ onHandleFontClick, onHandleDeleteFont, match, fontList }) => (
   <div className='font-list'>
     <div className='font-list-header'>
-      <div className='installed-fonts'>Installed Fonts</div>
-      <div className='variants'>Regular</div>
-      <div className='variants'>Italics</div>
-      <div className='variants'>Bold</div>
-      <div className='variants'>Bold Italics</div>
+      <div />
+      <div className='font-name'>Installed Fonts</div>
+      <div>Regular</div>
+      <div>Italics</div>
+      <div>Bold</div>
+      <div>Bold Italics</div>
     </div>
 
     <div className='font-list-items'>
@@ -16,30 +16,30 @@ export const FontList = ({ onHandleFontClick, onHandleDeleteFont, match, fontLis
         <div
           key={font.id}
           className={'font-list-item' + (font.id === match.params.id ? ' active' : '')}
+          onClick={() => onHandleFontClick(font.id)}
+          tabIndex='0'
         >
-          <div className='column1'>
+          <div>
             <span
               className='dashicons dashicons-trash'
               onClick={() => onHandleDeleteFont(font.id)}
+              tabIndex='0'
             />
           </div>
-          <div
-            className='column2'
-            onClick={() => onHandleFontClick(font.id)}
-          >
-            <span className='font-name'>{font.font_name}</span>
-            <div className='variants regular'>
-              <span className={'dashicons dashicons-' + (font.regular ? 'yes' : 'no-alt')} />
-            </div>
-            <div className='variants italics'>
-              <span className={'dashicons dashicons-' + (font.italics ? 'yes' : 'no-alt')} />
-            </div>
-            <div className='variants bold'>
-              <span className={'dashicons dashicons-' + (font.bold ? 'yes' : 'no-alt')} />
-            </div>
-            <div className='variants bold-italics'>
-              <span className={'dashicons dashicons-' + (font.bolditalics ? 'yes' : 'no-alt')} />
-            </div>
+
+          <span className='font-name'>{font.font_name}</span>
+
+          <div>
+            <span className={'dashicons dashicons-' + (font.regular ? 'yes' : 'no-alt')} />
+          </div>
+          <div>
+            <span className={'dashicons dashicons-' + (font.italics ? 'yes' : 'no-alt')} />
+          </div>
+          <div>
+            <span className={'dashicons dashicons-' + (font.bold ? 'yes' : 'no-alt')} />
+          </div>
+          <div>
+            <span className={'dashicons dashicons-' + (font.bolditalics ? 'yes' : 'no-alt')} />
           </div>
         </div>
       ))}

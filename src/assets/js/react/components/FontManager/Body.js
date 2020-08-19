@@ -183,8 +183,8 @@ export class Body extends Component {
 
   render () {
     return (
-      <div className='wp-clearfix theme-browser font-manager-body' id='gfpdf-font-manager-container'>
-        <div className='two-columns'>
+      <div className='wp-clearfix theme-about font-manager-body' id='gfpdf-font-manager-container'>
+        <div>
           <SearchBox />
 
           <FontList
@@ -194,7 +194,7 @@ export class Body extends Component {
           />
         </div>
 
-        <div className='two-columns'>
+        <div>
           <AddFontName
             onHandleInputChange={this.handleInputChange}
             onHandleUpload={this.handleUpload}

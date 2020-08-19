@@ -13,12 +13,15 @@ export const AddFontName = (
   }
 ) => (
   <form className='add-font' onSubmit={onHandleSubmit}>
-    <h1>Add Font</h1>
-    <p>Install new fonts for use in your PDF documents.</p>
+    <h2>{id ? 'Update Font' : 'Add Font'}</h2>
+    <p>
+      {id ? 'Once saved, PDFs configured to use this font will have your changes applied automatically for newly-generated documents.' : 'Install new fonts for use in your PDF documents.'}
+    </p>
 
-    <h2>Font Name <span className='required'>*</span></h2>
-    <p>The font name must be unique and only contain alphanumeric characters.</p>
+    <label htmlFor='gfpdf-add-font-name-input'>Font Name <span className='required'>(required)</span></label>
+    <p>The font name can only contain alphanumeric characters or spaces.</p>
     <input
+      id='gfpdf-add-font-name-input'
       type='text'
       name='label'
       value={label}
@@ -26,26 +29,18 @@ export const AddFontName = (
       required
     />
 
-    <div className='font-files'>
-      <h2>Font Files</h2>
-      <p>
-        Select or drag and drop your .ttf font file into one of the font variants.
-        <br />
-        Only the Regular variant is required.
-      </p>
+    <label>Font Files <span className='required'>(required: Regular)</span></label>
+    <p>
+    Select or drag and drop your .ttf font file for the variants below. Only the Regular type is required.
+    </p>
 
-      <FontVariant
-        fontStyles={fontStyles}
-        onHandleUpload={onHandleUpload}
-        onHandleDeleteFontStyle={onHandleDeleteFontStyle}
-      />
+    <FontVariant
+      fontStyles={fontStyles}
+      onHandleUpload={onHandleUpload}
+      onHandleDeleteFontStyle={onHandleDeleteFontStyle}
+    />
 
-      <input
-        className='button gfpdf-button'
-        type='submit'
-        value={id ? 'Update Font' : 'Save Font'}
-      />
-    </div>
+    <button className='button gfpdf-button primary'>{id ? 'Update Font  →' : 'Add Font  →'}</button>
   </form>
 )
 
