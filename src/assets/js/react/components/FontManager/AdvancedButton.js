@@ -9,7 +9,7 @@ export class AdvancedButton extends React.Component {
   handleClick = e => {
     e.preventDefault()
 
-    this.props.history.push('/fontmanager')
+    this.props.history.push('/fontmanager/')
   }
 
   render () {
