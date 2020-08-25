@@ -252,7 +252,8 @@ $value_border_colour = $settings['zadani_border_colour'] ?? '#CCCCCC';
 	}
 
 	.gfpdf-field .value {
-		border: 1px solid<?= $value_border_colour; ?>;
+		border: 1px solid #000;
+		border-color: <?= $value_border_colour; ?>;
 		padding: 1.5mm 2mm;
 	}
 

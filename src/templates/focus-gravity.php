@@ -255,7 +255,8 @@ $label_format = $settings['focusgravity_label_format'] ?? 'combined_label';
 	 */
 	#container {
 		border-radius: 5px;
-		border: 1px solid<?= $accent_colour; ?>;
+		border: 1px solid #000;
+		border-color: <?= $accent_colour; ?>;
 	}
 
 	#form_title {
@@ -275,7 +276,8 @@ $label_format = $settings['focusgravity_label_format'] ?? 'combined_label';
 
 	.gfpdf-field .label {
 		font-weight: bold;
-		border-bottom: 1px solid<?= $accent_colour; ?>;
+		border-bottom: 1px solid #000;
+		border-bottom-color: <?= $accent_colour; ?>;
 		background: <?= $secondary_colour; ?>;
 		color: <?= $secondary_contrast_colour; ?>;
 	}
@@ -285,7 +287,8 @@ $label_format = $settings['focusgravity_label_format'] ?? 'combined_label';
 	}
 
 	.gfpdf-html {
-		border-top: 5px solid<?= $secondary_colour; ?>;
+		border-top: 5px solid #000;
+		border-top-color: <?= $secondary_colour; ?>;
 	}
 
 	table.gfield_list th {
@@ -314,7 +317,8 @@ $label_format = $settings['focusgravity_label_format'] ?? 'combined_label';
 
 	<?php else : ?>
 	.gfpdf-html .value {
-		border-top: 1px solid<?= $accent_colour; ?>;
+		border-top: 1px solid #000;
+		border-top-color: <?= $accent_colour; ?>;
 	}
 
 	<?php endif; ?>

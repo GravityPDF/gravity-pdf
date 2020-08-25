@@ -304,7 +304,8 @@ $contrast = $misc->get_background_and_border_contrast( $container_background_col
 
 	.gfield_list th, .gfield_list td,
 	table.entry-products th, table.entry-products td {
-		border: 1px solid<?= $contrast['border']; ?>;
+		border: 1px solid #000;
+		border-color: <?= $contrast['border']; ?>;
 	}
 
 </style>
