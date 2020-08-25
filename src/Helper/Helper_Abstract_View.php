@@ -135,7 +135,7 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 	 *
 	 * @since 4.0
 	 */
-	final private function buffer( $path, $args = [] ) {
+	private function buffer( $path, $args = [] ) {
 		/*
 		 * for backwards compatibility extract the $args variable
 		 * phpcs:disable -- disable warning about `extract`
