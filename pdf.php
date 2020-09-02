@@ -91,12 +91,6 @@ class GFPDF_Major_Compatibility_Checks {
 	/**
 	 * The plugin's required PHP version
 	 *
-	 * Gravity PDF 4.0 is such a major release that we can afford to also bump up the version requirements.
-	 * We really wanted to bump this up to an actively supported version of PHP (http://php.net/supported-versions.php)
-	 * but with WordPress supporting PHP5.2+ (and making no moves to increase this) we had to strike a balance.
-	 *
-	 * The initial release will require PHP 5.4 which will strike a better balance.
-	 *
 	 * @var string
 	 *
 	 * @since 4.0
