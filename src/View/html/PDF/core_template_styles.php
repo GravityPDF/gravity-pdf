@@ -100,7 +100,8 @@ $include_product_styles = apply_filters( 'gfpdf_include_product_styles', true, $
 	<?php if ( $include_list_styles ) : ?>
 	.gfield_list {
 		border-collapse: collapse;
-		border: 1px solid<?= $contrast_border_color; ?>;
+		border: 1px solid #000;
+		border-color: <?= $contrast_border_color; ?>;
 		margin: 2px 0 6px;
 		padding: 0;
 		width: 100%;
@@ -109,14 +110,16 @@ $include_product_styles = apply_filters( 'gfpdf_include_product_styles', true, $
 	.gfield_list th {
 		text-align: left;
 		background-color: <?= $contrast_background_color; ?>;
-		border: 1px solid<?= $contrast_border_color; ?>;
+		border: 1px solid #000;
+		border-color: <?= $contrast_border_color; ?>;
 		font-weight: bold;
 		padding: 6px 10px;
 	}
 
 	.gfield_list td {
 		padding: 6px 10px;
-		border: 1px solid<?= $contrast_border_color; ?>;
+		border: 1px solid #000;
+		border-color: <?= $contrast_border_color; ?>;
 	}
 
 	<?php endif; ?>
@@ -125,8 +128,10 @@ $include_product_styles = apply_filters( 'gfpdf_include_product_styles', true, $
 	<?php if ( $include_product_styles ) : ?>
 	table.entry-products th {
 		background-color: <?= $contrast_background_color; ?>;
-		border-bottom: 1px solid<?= $contrast_border_color; ?>;
-		border-right: 1px solid <?= $contrast_border_color; ?> !important;
+		border-bottom: 1px solid #000;
+		border-right: 1px solid #000 !important;
+		border-bottom-color: <?= $contrast_border_color; ?>;
+		border-right-color: <?= $contrast_border_color; ?>;
 	}
 
 	table.entry-products td.textcenter, table.entry-products th.textcenter {
@@ -151,8 +156,10 @@ $include_product_styles = apply_filters( 'gfpdf_include_product_styles', true, $
 	}
 
 	table.entry-products td {
-		border-bottom: 1px solid<?= $contrast_border_color; ?>;
-		border-right: 1px solid <?= $contrast_border_color; ?> !important;
+        border-bottom: 1px solid #000;
+        border-right: 1px solid #000 !important;
+        border-bottom-color: <?= $contrast_border_color; ?>;
+        border-right-color: <?= $contrast_border_color; ?>;
 		padding: 7px 7px 8px;
 		vertical-align: top;
 	}
