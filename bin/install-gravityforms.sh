@@ -9,5 +9,5 @@ if [ -f ".env" ]; then
     set +a
 fi
 
-npm run env cli --quiet plugin install gravityformscli -- --activate --quiet
-npm run env cli --quiet gf install -- --key=$GF_LICENSE --activate --force
+npm run env cli --quiet plugin install https://github.com/gravityforms/gravityformscli/archive/master.zip -- --activate --quiet
+npm run env cli --quiet gf install -- --key=$GF_LICENSE --activate --version=beta --force
