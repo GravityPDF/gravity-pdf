@@ -12,7 +12,7 @@ test('should display \'Reverse Text (RTL)\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Reverse Text (RTL)').exists).ok()
-    .expect(fieldDescription('Script like Arabic, Hebrew, Syriac (and many others) are written right to left.', 'span').exists).ok()
+    .expect(fieldDescription('Script like Arabic, Hebrew, Syriac (and many others) are written right to left.').exists).ok()
     .expect(run.rtlCheckbox.exists).ok()
 })
 

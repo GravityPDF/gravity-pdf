@@ -325,6 +325,11 @@ class Helper_Data {
 
 				'uninstallWarning'                     => esc_html__( "Warning! ALL Gravity PDF data, including templates, will be deleted. This cannot be undone. 'OK' to delete, 'Cancel' to stop.", 'gravity-forms-pdf-extended' ),
 				'pdfDeleteWarning'                     => esc_html__( "WARNING: You are about to delete this PDF. 'Cancel' to stop, 'OK' to delete.", 'gravity-forms-pdf-extended' ),
+
+				/* Help page */
+				'searchBoxPlaceHolderText'             => esc_html__( 'Search the Gravity PDF Documentation...', 'gravity-forms-pdf-extended' ),
+				'searchBoxSubmitTitle'                 => esc_html__( 'Submit your search query.', 'gravity-forms-pdf-extended' ),
+				'searchBoxResetTitle'                  => esc_html__( 'Clear your search query.', 'gravity-forms-pdf-extended' ),
 			]
 		);
 	}

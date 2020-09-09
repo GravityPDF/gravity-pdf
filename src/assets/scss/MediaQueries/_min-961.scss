@@ -33,14 +33,18 @@
   #tab_PDF {
 
     /* Help tab section */
-    .about-wrap {
-      #dashboard-widgets {
-        .postbox-container {
-          width: 49.5%;
+    #pdfextended-settings {
 
-          a {
-            margin-right: 30px;
-            min-height: 245px;
+      .about-wrap {
+        #dashboard-widgets {
+          .postbox-container {
+            width: 49.5%;
+
+            a {
+              margin-right: 30px;
+              min-height: 90px;
+              line-height: 1.8em;
+            }
           }
         }
       }

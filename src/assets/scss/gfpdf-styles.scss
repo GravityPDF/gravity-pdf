@@ -9,6 +9,7 @@
 @use 'Component/FontManager/font-manager';
 @use 'Component/FontManager/footer';
 @use 'Component/FontManager/font-manager-skeleton';
+@use 'Component/HelpTab/help-tab';
 @use 'Component/gf-settings-containers';
 @use 'Component/license';
 @use 'Component/multicheck';
@@ -29,7 +30,6 @@
 @use 'Pages/entry-list';
 @use 'Pages/pdf-list';
 @use 'Pages/pdf-settings';
-@use 'Pages/help';
 
 /* Media queries */
 @use 'MediaQueries/min-961';

@@ -52,7 +52,7 @@ $(function () {
   }
 
   /* Initialize the Search Bar for Help Tab */
-  if ($('#search-knowledgebase').length) {
+  if ($('#gpdf-search').length) {
     helpBootstrap()
   }
 

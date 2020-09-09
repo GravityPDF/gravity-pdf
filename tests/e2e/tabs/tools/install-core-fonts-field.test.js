@@ -18,7 +18,7 @@ test('should display \'Install Core Fonts\' field', async t => {
   // Assertions
   await t
     .expect(fieldHeaderTitle('Install Core Fonts').exists).ok()
-    .expect(fieldDescription('Automatically install the core fonts needed to generate PDF documents. This action only needs to be run once, as the fonts are preserved during plugin updates.', 'span').exists).ok()
+    .expect(fieldDescription('Automatically install the core fonts needed to generate PDF documents. This action only needs to be run once, as the fonts are preserved during plugin updates.').exists).ok()
     .expect(run.downloadCoreFontsButton.exists).ok()
 })
 

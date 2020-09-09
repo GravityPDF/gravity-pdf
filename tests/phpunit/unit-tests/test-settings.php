@@ -223,7 +223,7 @@ class Test_Settings extends WP_UnitTestCase {
 		$this->controller->display_page();
 		$html = ob_get_clean();
 
-		$this->assertNotFalse( strpos( $html, '<div id="search-knowledgebase">' ) );
+		$this->assertNotFalse( strpos( $html, '<div id="gpdf-search">' ) );
 
 		/* test help tab */
 		$_GET['tab'] = 'tools';
