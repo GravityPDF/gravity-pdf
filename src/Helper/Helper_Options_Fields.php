@@ -60,23 +60,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			'general_defaults'                => apply_filters(
 				'gfpdf_settings_general_defaults',
 				[
-					'default_pdf_size'        => [
-						'id'      => 'default_pdf_size',
-						'name'    => esc_html__( 'Default Paper Size', 'gravity-forms-pdf-extended' ),
-						'desc'    => esc_html__( 'Set the default paper size used when generating PDFs.', 'gravity-forms-pdf-extended' ),
-						'type'    => 'select',
-						'options' => $this->get_paper_size(),
-						'class'   => 'gfpdf_paper_size',
-					],
-
-					'default_custom_pdf_size' => [
-						'id'    => 'default_custom_pdf_size',
-						'name'  => esc_html__( 'Custom Paper Size', 'gravity-forms-pdf-extended' ),
-						'desc'  => esc_html__( 'Control the exact paper size. Can be set in millimeters or inches.', 'gravity-forms-pdf-extended' ),
-						'type'  => 'paper_size',
-						'class' => 'gfpdf-hidden gfpdf_paper_size_other',
-					],
-
 					'default_template'        => [
 						'id'      => 'default_template',
 						'name'    => esc_html__( 'Default Template', 'gravity-forms-pdf-extended' ),
@@ -94,6 +77,23 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'type'    => 'select',
 						'options' => $this->get_installed_fonts(),
 						'tooltip' => '<h6>' . esc_html__( 'Fonts', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Gravity PDF comes bundled with fonts for most languages world-wide. Want to use a specific font type? Use the font installer (found in the Tools tab).', 'gravity-forms-pdf-extended' ),
+					],
+
+					'default_pdf_size'        => [
+						'id'      => 'default_pdf_size',
+						'name'    => esc_html__( 'Default Paper Size', 'gravity-forms-pdf-extended' ),
+						'desc'    => esc_html__( 'Set the default paper size used when generating PDFs.', 'gravity-forms-pdf-extended' ),
+						'type'    => 'select',
+						'options' => $this->get_paper_size(),
+						'class'   => 'gfpdf_paper_size',
+					],
+
+					'default_custom_pdf_size' => [
+						'id'    => 'default_custom_pdf_size',
+						'name'  => esc_html__( 'Custom Paper Size', 'gravity-forms-pdf-extended' ),
+						'desc'  => esc_html__( 'Control the exact paper size. Can be set in millimeters or inches.', 'gravity-forms-pdf-extended' ),
+						'type'  => 'paper_size',
+						'class' => 'gfpdf-hidden gfpdf_paper_size_other',
 					],
 
 					'default_rtl'             => [
