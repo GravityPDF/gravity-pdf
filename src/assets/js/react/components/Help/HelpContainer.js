@@ -12,6 +12,37 @@ import DisplayResultContainer from './DisplayResultContainer'
  * @since       5.2
  */
 
+import algoliasearch from 'algoliasearch/lite';
+import { InstantSearch, connectAutoComplete, SearchBox, Hits  } from 'react-instantsearch-dom';
+
+const searchClient = algoliasearch(
+  'BH4D9OD16A',
+  '3f8f81a078907e98ed8d3a5bedc3c61c'
+);
+
+const Hit = ({ hit }) => <p>{hit.name}</p>;
+
+const Autocomplete = ({ hits, currentRefinement, refine }) => (
+  <InstantSearch
+    indexName="gravitypdf"
+    searchClient={searchClient}
+  >
+    <SearchBox
+      focusShortcuts={['s']}
+      searchAsYouType={true}
+      autoFocus={true}
+      translations={{
+        submitTitle: 'Submit your search query.',
+        resetTitle: 'Clear your search query.',
+        placeholder: 'Search your website.',
+      }}
+    />
+
+    <Hits hitComponent={Hit} />
+  </InstantSearch>
+);
+
+
 /**
  * Handles the grunt work for our Help Page Search Input (API calls, display, state ect)
  *
@@ -83,6 +114,10 @@ export class HelpContainer extends Component {
   render () {
     const { searchInput } = this.state
     const { loading, helpResult, error } = this.props
+
+    return (
+      <Autocomplete />
+    )
 
     return (
       <div data-test='component-help-container'>
