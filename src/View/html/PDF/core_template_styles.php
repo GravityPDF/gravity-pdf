@@ -156,10 +156,10 @@ $include_product_styles = apply_filters( 'gfpdf_include_product_styles', true, $
 	}
 
 	table.entry-products td {
-        border-bottom: 1px solid #000;
-        border-right: 1px solid #000 !important;
-        border-bottom-color: <?= $contrast_border_color; ?>;
-        border-right-color: <?= $contrast_border_color; ?>;
+		border-bottom: 1px solid #000;
+		border-right: 1px solid #000 !important;
+		border-bottom-color: <?= $contrast_border_color; ?>;
+		border-right-color: <?= $contrast_border_color; ?>;
 		padding: 7px 7px 8px;
 		vertical-align: top;
 	}
