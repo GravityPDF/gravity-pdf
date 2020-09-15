@@ -865,7 +865,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 */
 	public function check_system_status() {
 		$view  = new View\View_System_Report();
-		$model = new Model\Model_System_Report( $this->options, $this->data, new GFPDF_Major_Compatibility_Checks );
+		$model = new Model\Model_System_Report( $this->options, $this->data, $this->log, $this->misc, new GFPDF_Major_Compatibility_Checks );
 		$class = new Controller\Controller_System_Report( $model, $view );
 		$class->init();
 

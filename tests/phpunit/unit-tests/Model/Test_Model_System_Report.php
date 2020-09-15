@@ -36,7 +36,7 @@ class Test_Model_System_Report extends WP_UnitTestCase {
 		parent::setUp();
 
 		/* Setup our test classes */
-		$this->model = new Model_System_Report( $gfpdf->options, $gfpdf->data, new GFPDF_Major_Compatibility_Checks );
+		$this->model = new Model_System_Report( $gfpdf->options, $gfpdf->data, $gfpdf->log, $gfpdf->misc, new GFPDF_Major_Compatibility_Checks );
 	}
 
 	public function test_get_report_structure() {
@@ -46,7 +46,6 @@ class Test_Model_System_Report extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'title_export', $structure );
 		$this->assertArrayHasKey( 'tables', $structure );
 		$this->assertCount( 4, $structure['tables'] );
-
 	}
 
 	public function test_move_gravitypdf_active_plugins_to_gf_addons() {
@@ -61,7 +60,6 @@ class Test_Model_System_Report extends WP_UnitTestCase {
 
 		$this->assertCount( 3, $addons[0]['tables'][1]['items'] );
 		$this->assertCount( 2, $addons[1]['tables'][2]['items'] );
-
 	}
 
 	protected function data_test_move_gravitypdf_active_plugins_to_gf_addons() {
@@ -72,7 +70,10 @@ class Test_Model_System_Report extends WP_UnitTestCase {
 			'Gravity PDF Bulk Generator',
 			'Gravity PDF Something Plugin',
 		];
+	}
 
+	public function test_public_tmp_directory_access() {
+		$this->assertTrue( $this->model->test_public_tmp_directory_access() );
 	}
 
 }

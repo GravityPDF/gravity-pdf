@@ -7,8 +7,10 @@ namespace GFPDF\Model;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Misc;
 use GFPDF_Major_Compatibility_Checks;
 use GPDFAPI;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
@@ -45,15 +47,31 @@ class Model_System_Report extends Helper_Abstract_Model {
 	protected $data;
 
 	/**
+	 * @var LoggerInterface
+	 *
+	 * @since 6.0
+	 */
+	protected $log;
+
+	/**
+	 * @var Helper_Misc
+	 *
+	 * @since 6.0
+	 */
+	protected $misc;
+
+	/**
 	 * @var GFPDF_Major_Compatibility_Checks
 	 *
 	 * @since 6.0
 	 */
 	protected $status;
 
-	public function __construct( Helper_Abstract_Options $options, Helper_Data $data, GFPDF_Major_Compatibility_Checks $status ) {
+	public function __construct( Helper_Abstract_Options $options, Helper_Data $data, LoggerInterface $log, Helper_Misc $misc, GFPDF_Major_Compatibility_Checks $status ) {
 		$this->options = $options;
 		$this->data    = $data;
+		$this->log     = $log;
+		$this->misc    = $misc;
 		$this->status  = $status;
 	}
 
@@ -118,7 +136,7 @@ class Model_System_Report extends Helper_Abstract_Model {
 	 *
 	 * @since 6.0
 	 */
-	public function move_gravitypdf_active_plugins_to_gf_addons( array  $system_report ): array {
+	public function move_gravitypdf_active_plugins_to_gf_addons( array $system_report ): array {
 		$active_plugins = $system_report[1]['tables'][2]['items'] ?? [];
 
 		/* Find any active Gravity PDF plugins and move to GF addons */
@@ -282,14 +300,69 @@ class Model_System_Report extends Helper_Abstract_Model {
 	 * @since 6.0
 	 */
 	protected function check_temp_folder_permission(): array {
-		/** @var Model_Settings $settings */
-		$settings   = GPDFAPI::get_mvc_class( 'Model_Settings' );
-		$permission = $settings->test_public_tmp_directory_access();
+		$permission = $this->test_public_tmp_directory_access();
 
 		return [
 			'value'        => $this->getController()->view->get_temp_folder_protected( $permission ),
 			'value_export' => $permission ? 'Yes' : 'No',
 		];
+	}
+
+	/**
+	 * Check if we can publicly access a file in the PDF Temporary folder
+	 *
+	 * @since 6.0
+	 */
+	public function test_public_tmp_directory_access(): bool {
+		$tmp_dir       = $this->data->template_tmp_location;
+		$tmp_test_file = 'public_tmp_directory_test.txt';
+		$return        = true;
+
+		/* create our file */
+		file_put_contents( $tmp_dir . $tmp_test_file, 'failed-if-read' );
+
+		/* verify text file exists */
+		if ( is_file( $tmp_dir . $tmp_test_file ) ) {
+
+			$site_url = $this->misc->convert_path_to_url( $tmp_dir );
+			if ( $site_url !== false ) {
+
+				$response = wp_remote_get( $site_url . $tmp_test_file );
+
+				if ( ! is_wp_error( $response ) ) {
+
+					/*
+					 * Check if the web server responded with a OK status code.
+					 * If we can read the contents of the file, then mark as failed
+					 */
+					if (
+						isset( $response['response']['code'] ) &&
+						$response['response']['code'] === 200 &&
+						isset( $response['body'] ) &&
+						$response['body'] === 'failed-if-read'
+					) {
+						$response_object = $response['http_response'];
+						$raw_response    = $response_object->get_response_object();
+
+						$this->log->warning(
+							'PDF temporary directory not protected',
+							[
+								'url'         => $raw_response->url,
+								'status_code' => $raw_response->status_code,
+								'response'    => $raw_response->raw,
+							]
+						);
+
+						$return = false;
+					}
+				}
+			}
+
+			/* Cleanup our test file */
+			@unlink( $tmp_dir . $tmp_test_file );
+		}
+
+		return $return;
 	}
 
 	/**
