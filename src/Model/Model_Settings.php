@@ -548,21 +548,11 @@ class Model_Settings extends Helper_Abstract_Model {
 	/**
 	 * Create a file in our tmp directory and check if it is publicly accessible (i.e no .htaccess protection)
 	 *
-	 * @return void
-	 *
-	 * @global $_POST ['nonce']
-	 *
 	 * @since 4.0
+	 *
+	 * @deprecated Functionality removed in 6.0
 	 */
-	public function check_tmp_pdf_security() {
-
-		/* User / CORS validation */
-		$this->misc->handle_ajax_authentication( 'Check Tmp Directory', 'gravityforms_view_settings', 'gfpdf-direct-pdf-protection' );
-
-		/* Create our tmp file and do our actual check */
-		echo json_encode( $this->test_public_tmp_directory_access() );
-		wp_die();
-	}
+	public function check_tmp_pdf_security() {}
 
 	/**
 	 * Create a file in our tmp directory and verify if it's protected from the public
@@ -570,52 +560,14 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @return boolean
 	 *
 	 * @since 4.0
+	 *
+	 * @deprecated Test moved in 6.0. Use Model_System_Report::test_public_tmp_directory_access()
 	 */
 	public function test_public_tmp_directory_access() {
-		$tmp_dir       = $this->data->template_tmp_location;
-		$tmp_test_file = 'public_tmp_directory_test.txt';
-		$return        = true;
+		/** @var Model_System_Report $model_system_report */
+		$model_system_report = \GPDFAPI::get_mvc_class( 'Model_System_Report' );
 
-		/* create our file */
-		file_put_contents( $tmp_dir . $tmp_test_file, 'failed-if-read' );
-
-		/* verify it exists */
-		if ( is_file( $tmp_dir . $tmp_test_file ) ) {
-
-			/* Run our test */
-			$site_url = $this->misc->convert_path_to_url( $tmp_dir );
-
-			if ( $site_url !== false ) {
-
-				$response = wp_remote_get( $site_url . $tmp_test_file );
-
-				if ( ! is_wp_error( $response ) ) {
-
-					/* Check if the web server responded with a OK status code and we can read the contents of our file, then fail our test */
-					if ( isset( $response['response']['code'] ) && $response['response']['code'] === 200 &&
-						 isset( $response['body'] ) && $response['body'] === 'failed-if-read'
-					) {
-						$response_object = $response['http_response'];
-						$raw_response    = $response_object->get_response_object();
-						$this->log->warning(
-							'PDF temporary directory not protected',
-							[
-								'url'         => $raw_response->url,
-								'status_code' => $raw_response->status_code,
-								'response'    => $raw_response->raw,
-							]
-						);
-
-						$return = false;
-					}
-				}
-			}
-		}
-
-		/* Cleanup our test file */
-		@unlink( $tmp_dir . $tmp_test_file );
-
-		return $return;
+		return $model_system_report->test_public_tmp_directory_access();
 	}
 
 	/**

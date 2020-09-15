@@ -366,58 +366,6 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 	}
 
 	/**
-	 * Test our security has been implimented correctly
-	 *
-	 * @class Model_Settings
-	 *
-	 * @since 4.0
-	 */
-	public function test_check_tmp_pdf_security() {
-
-		/**
-		 * Check for authentication failure
-		 */
-		try {
-			$this->_handleAjax( 'gfpdf_has_pdf_protection' );
-		} catch ( WPAjaxDieStopException $e ) {
-			/* do nothing (error expected) */
-		}
-
-		$this->assertEquals( '401', $e->getMessage() );
-
-		/* set up our role */
-		$this->_setRole( 'administrator' );
-
-		/**
-		 * Check for nonce failure
-		 */
-		try {
-			$this->_handleAjax( 'gfpdf_has_pdf_protection' );
-		} catch ( WPAjaxDieStopException $e ) {
-			/* do nothing (error expected) */
-		}
-
-		$this->assertEquals( '401', $e->getMessage() );
-
-		/*
-		 * Do successful test
-		 */
-		$_POST['nonce'] = wp_create_nonce( 'gfpdf-direct-pdf-protection' );
-
-		try {
-			$this->_handleAjax( 'gfpdf_has_pdf_protection' );
-		} catch ( WPAjaxDieContinueException $e ) {
-			/* do nothing (error expected) */
-		}
-
-		$response = json_decode( $this->_last_response, true );
-		unset( $this->_last_response );
-
-		$this->assertTrue( $response );
-	}
-
-
-	/**
 	 * Testing Model_Templates.php wp_ajax_gfpdf_upload_template
 	 *
 	 * Because this AJAX endpoint is suppose to have a zip file POSTed,

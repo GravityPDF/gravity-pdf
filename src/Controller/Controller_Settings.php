@@ -167,10 +167,9 @@ class Controller_Settings extends Helper_Abstract_Controller implements Helper_I
 			add_action( 'gfpdf_post_tools_settings_page', [ $this->view, 'uninstaller' ], 5 );
 		}
 
-		/**
+		/*
 		 * Add AJAX Action Endpoints
 		 */
-		add_action( 'wp_ajax_gfpdf_has_pdf_protection', [ $this->model, 'check_tmp_pdf_security' ] );
 		add_action( 'wp_ajax_gfpdf_deactivate_license', [ $this->model, 'process_license_deactivation' ] );
 	}
 

@@ -3,6 +3,10 @@
 namespace GFPDF\Controller;
 
 use GFPDF\Helper\Helper_Abstract_Controller;
+use GFPDF\Helper\Helper_Abstract_Model;
+use GFPDF\Helper\Helper_Abstract_View;
+use GFPDF\Model\Model_System_Report;
+use GFPDF\View\View_System_Report;
 
 /**
  * @package     Gravity PDF
@@ -25,24 +29,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Controller_System_Report extends Helper_Abstract_Controller {
 
 	/**
-	 * Holds our $allow_url_fopen value
-	 *
-	 * @since 5.3
-	 *
-	 * @var bool $allow_url_data
+	 * @var Model_System_Report
 	 */
-	protected $allow_url_data;
+	public $model;
 
 	/**
-	 * Setup our class by injecting our dependencies
-	 *
-	 * @param boolean $allow_url_fopen
-	 *
-	 * @since 5.3
-	 *
+	 * @var View_System_Report
 	 */
-	public function __construct( $allow_url_fopen ) {
-		$this->allow_url_data = $allow_url_fopen;
+	public $view;
+
+	public function __construct( Helper_Abstract_Model $model, Helper_Abstract_View $view ) {
+		$this->model = $model;
+		$this->model->setController( $this );
+
+		$this->view = $view;
+		$this->view->setController( $this );
 	}
 
 	/**
@@ -70,36 +71,16 @@ class Controller_System_Report extends Helper_Abstract_Controller {
 	 *
 	 * @return array
 	 * @since 5.3
-	 *
 	 */
 	public function system_report( $system_report ) {
 
-		if ( isset( $system_report[2]['tables'][1]['items'] ) && is_array( $system_report[2]['tables'][1]['items'] ) ) {
-			$is_enabled = $this->is_allow_url_fopen_enabled( $this->allow_url_data );
+		if ( is_array( $system_report ) ) {
+			$gravitypdf_report = $this->model->build_gravitypdf_report();
+			$system_report     = $this->model->move_gravitypdf_active_plugins_to_gf_addons( $system_report );
 
-			$insert_val[] = [
-				'label'        => 'allow_url_fopen',
-				'label_export' => 'allow_url_fopen',
-				'value'        => $is_enabled,
-				'value_export' => $is_enabled,
-			];
-
-			array_splice( $system_report[2]['tables'][1]['items'], 11, 0, $insert_val );
+			array_splice( $system_report, 1, 0, $gravitypdf_report );
 		}
 
 		return $system_report;
-	}
-
-	/**
-	 * Yes or No status for allow_url_fopen
-	 *
-	 * @param $allow_url_fopen
-	 *
-	 * @return string
-	 * @since 5.3
-	 *
-	 */
-	protected function is_allow_url_fopen_enabled( $allow_url_fopen ) {
-		return isset( $allow_url_fopen ) ? esc_html__( 'Yes', 'gravity-forms-pdf-extended' ) : esc_html__( 'No', 'gravity-forms-pdf-extended' );
 	}
 }
