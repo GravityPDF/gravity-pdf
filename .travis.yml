@@ -113,36 +113,8 @@ jobs:
           npm run test:php && npm run test:php -- --group ajax &&
           npm run test:php:multisite && npm run test:php:multisite -- --group ajax
 
-    - name: PHP 7.2 unit tests
-      env: LOCAL_PHP=7.2-fpm
-      script:
-        - |
-          npm run test:php &&
-          npm run test:php -- --group ajax
-
-    - name: PHP 7.1 unit tests
-      env: LOCAL_PHP=7.1-fpm
-      script:
-        - |
-          npm run test:php &&
-          npm run test:php -- --group ajax
-
-    - name: PHP 7.0 unit tests
-      env: LOCAL_PHP=7.0-fpm
-      script:
-        - |
-          npm run test:php &&
-          npm run test:php -- --group ajax
-
-    - name: PHP 5.6 unit tests
-      env: LOCAL_PHP=5.6-fpm
-      script:
-        - |
-          npm run test:php &&
-          npm run test:php -- --group ajax
-
     - name: JS and PHP Coverage
-      env: LOCAL_PHP=7.3-fpm LOCAL_PHP_XDEBUG=true
+      env: LOCAL_PHP=7.4-fpm LOCAL_PHP_XDEBUG=true
       script:
         - |
           npm run test:js:coverage &&
@@ -151,7 +123,7 @@ jobs:
 
     - stage: Deploy
       name: Package and Push to WordPress.org
-      env: INSTALL_WORDPRESS=false LOCAL_PHP=5.6-fpm INSTALL_COMPOSER=2
+      env: INSTALL_WORDPRESS=false LOCAL_PHP=7.3-fpm INSTALL_COMPOSER=2
       script:
         - |
           bash ./bin/package.sh $TRAVIS_TAG $TRAVIS_BRANCH &&

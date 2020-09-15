@@ -26,7 +26,7 @@ use WPAjaxDieStopException;
  *
  * @group ajax
  * @runTestsInSeparateProcesses
- *
+ * @preserveGlobalState disabled
  */
 class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 
