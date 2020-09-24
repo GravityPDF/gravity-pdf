@@ -1712,7 +1712,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function maybe_save_pdf( $entry, $form ) {
 
 		/* Exit early if background processing is enabled */
-		if ( $this->options->get_option( 'background_processing', 'Disable' ) === 'Enable' ) {
+		if ( $this->options->get_option( 'background_processing', 'No' ) === 'Yes' ) {
 			return;
 		}
 

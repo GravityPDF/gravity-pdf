@@ -212,7 +212,7 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		unlink( $file );
 
 		/* Ensure function doesn't run when background processing enabled */
-		$gfpdf->options->update_option( 'background_processing', 'Enable' );
+		$gfpdf->options->update_option( 'background_processing', 'Yes' );
 
 		$this->model->maybe_save_pdf( $entry, $form );
 		$this->assertFileNotExists( $file );

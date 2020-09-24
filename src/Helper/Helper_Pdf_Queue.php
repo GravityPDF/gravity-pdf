@@ -115,6 +115,24 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 				if ( empty( $callback['retry'] ) || $callback['retry'] < 2 ) {
 					$callback['retry'] = isset( $callback['retry'] ) ? $callback['retry'] + 1 : 1;
 					array_unshift( $callbacks, $callback );
+				} else {
+					$this->log->error(
+						sprintf(
+							'Async PDF task retry limit reached for %s.',
+							$callback['id']
+						)
+					);
+
+					if ( $callback['unrecoverable'] ?? false ) {
+						$this->log->critical(
+							'Cancel async queue due to retry limit reached on unrecoverable callback.',
+							[
+								'callbacks' => $callbacks,
+							]
+						);
+
+						$callbacks = [];
+					}
 				}
 			}
 		}
