@@ -324,13 +324,14 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					],
 
 					'custom_pdf_size' => [
-						'id'    => 'custom_pdf_size',
-						'name'  => esc_html__( 'Custom Paper Size', 'gravity-forms-pdf-extended' ),
-						'desc'  => esc_html__( 'Control the exact paper size. Can be set in millimeters or inches.', 'gravity-forms-pdf-extended' ),
-						'type'  => 'paper_size',
-						'size'  => 'small',
-						'class' => 'gfpdf-hidden gfpdf_paper_size_other',
-						'std'   => $this->get_option( 'default_custom_pdf_size' ),
+						'id'       => 'custom_pdf_size',
+						'name'     => esc_html__( 'Custom Paper Size', 'gravity-forms-pdf-extended' ),
+						'desc'     => esc_html__( 'Control the exact paper size. Can be set in millimeters or inches.', 'gravity-forms-pdf-extended' ),
+						'type'     => 'paper_size',
+						'size'     => 'small',
+						'class'    => 'gfpdf-hidden gfpdf_paper_size_other',
+						'std'      => $this->get_option( 'default_custom_pdf_size' ),
+						'required' => true,
 					],
 
 					'orientation'     => [

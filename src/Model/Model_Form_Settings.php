@@ -359,7 +359,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 		if ( empty( $sanitized['name'] ) || empty( $sanitized['filename'] ) ||
 			 ( $sanitized['pdf_size'] === 'CUSTOM' && ( (int) $sanitized['custom_pdf_size'][0] === 0 || (int) $sanitized['custom_pdf_size'][1] === 0 ) )
 		) {
-			$this->notices->add_error( esc_html__( 'PDF could not be saved. Please enter a valid Custom Paper Size.', 'gravity-forms-pdf-extended' ) );
+			$this->notices->add_error( esc_html__( 'PDF could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
 
 			return false;
 		}
