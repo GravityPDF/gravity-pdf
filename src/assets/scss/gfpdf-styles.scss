@@ -15,6 +15,7 @@
 @use 'Component/template-manager';
 @use 'Component/uninstaller';
 @use 'Component/upload';
+@use 'Component/hidden';
 
 /* Pages */
 @use 'Pages/entry-details';
