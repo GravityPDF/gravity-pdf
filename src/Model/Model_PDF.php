@@ -1478,7 +1478,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Pass in a Gravity Form Field Object and get back a Gravity PDF Field Object
 	 *
-	 * @param object         $field    Gravity Form Field Object
+	 * @param GF_Field         $field    Gravity Form Field Object
 	 * @param array          $form     The Gravity Form Array
 	 * @param array          $entry    The Gravity Form Entry
 	 * @param Field_Products $products A Field_Products Object
@@ -1528,13 +1528,13 @@ class Model_PDF extends Helper_Abstract_Model {
 			}
 		} catch ( Exception $e ) {
 
-			$this->log->error(
-				'Invalid Field Class.',
+			$this->log->warning(
+				sprintf(
+					'Gravity PDF does not have native support for this field type "%s". Falling back to default Gravity Forms output.',
+					$field->type
+				),
 				[
-					'exception' => $e->getMessage(),
-					'field'     => $field,
-					'form_id'   => $form['id'],
-					'entry'     => $entry,
+					'field' => $field,
 				]
 			);
 
