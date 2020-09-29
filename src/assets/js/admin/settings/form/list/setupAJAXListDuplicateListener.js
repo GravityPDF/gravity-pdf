@@ -88,7 +88,7 @@ export function setupAJAXListDuplicateListener () {
           $state
             .attr('title', GFPDF.inactive)
             .attr('alt', GFPDF.inactive)
-            .attr('src', toggleSrc.replace('active1.png', 'active0.png'))
+            .attr('src', toggleSrc.replace('active1.svg', 'active0.svg'))
 
           /* Add row to node and fade in */
           $newRow.hide().insertAfter($row).fadeIn().animate({ backgroundColor: background })

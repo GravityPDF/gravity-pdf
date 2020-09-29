@@ -226,8 +226,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 		<img data-id="<?= $item['id'] ?>" data-nonce="<?= $state_nonce ?>"
 			 data-fid="<?= $form_id ?>"
-			 src="<?= $this->gform->get_plugin_url() ?>/images/active<?= intval( $is_active ) ?>.png"
-			 style="margin:1px 0 0 2px"
+			 src="<?= $this->gform->get_plugin_url() ?>/images/active<?= intval( $is_active ) ?>.svg"
 			 alt="<?= $label ?>"
 			 title="<?= $label ?>" />
 
