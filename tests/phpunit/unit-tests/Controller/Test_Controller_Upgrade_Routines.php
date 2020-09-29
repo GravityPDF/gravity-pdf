@@ -54,4 +54,20 @@ class Test_Controller_Upgrade_Routines extends WP_UnitTestCase {
 		];
 	}
 
+	public function test_6_0_0_background_process_upgrade_routine() {
+		/* Check for enabled status */
+		$this->options->update_option( 'background_processing', 'Enable' );
+
+		do_action( 'gfpdf_version_changed', '5.3', '6.0.0-beta1' );
+
+		$this->assertSame( 'Yes', $this->options->get_option( 'background_processing' ) );
+
+		/* Check for disabled status */
+		$this->options->update_option( 'background_processing', 'Disable' );
+
+		do_action( 'gfpdf_version_changed', '5.3', '6.0.0-beta1' );
+
+		$this->assertSame( 'No', $this->options->get_option( 'background_processing' ) );
+	}
+
 }

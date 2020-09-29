@@ -44,6 +44,7 @@ class Controller_Upgrade_Routines {
 	public function maybe_run_upgrade( string $old_version, string $current_version ): void {
 		if ( version_compare( $current_version, '6.0.0-beta1', '>=' ) && version_compare( $old_version, '6.0.0-beta1', '<' ) ) {
 			$this->enable_vendor_aliasing();
+			$this->update_background_processing_values();
 		}
 	}
 
@@ -54,6 +55,18 @@ class Controller_Upgrade_Routines {
 	 */
 	protected function enable_vendor_aliasing(): void {
 		$this->options->update_option( 'vendor_aliasing', true );
+	}
+
+	/**
+	 * Update Background Processing values to new Toggle button format
+	 *
+	 * @since 6.0
+	 */
+	protected function update_background_processing_values(): void {
+		$value     = $this->options->get_option( 'background_processing' );
+		$new_value = $value === 'Enable' ? 'Yes' : 'No';
+
+		$this->options->update_option( 'background_processing', $new_value );
 	}
 
 }
