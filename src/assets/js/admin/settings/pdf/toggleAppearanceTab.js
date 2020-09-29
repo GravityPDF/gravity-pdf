@@ -7,7 +7,7 @@ import $ from 'jquery'
  */
 export function toggleAppearanceTab () {
   const $appearanceSection = $('#gfpdf-fieldset-gfpdf_form_settings_appearance')
-  $('input[name="gfpdf_settings[advanced_template]"]').change(function () {
+  $('input[name="gfpdf_settings[advanced_template]"]').on('change', function () {
     if ($(this).val() === 'Yes') {
       $appearanceSection.hide()
     } else {
