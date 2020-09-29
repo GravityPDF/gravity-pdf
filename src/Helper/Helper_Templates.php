@@ -501,7 +501,7 @@ class Helper_Templates {
 			}
 		}
 
-		throw new Exception( sprintf( 'Could not locate configuration for "%s" template', $template_id ) );
+		throw new Exception( sprintf( 'No optional configuration file exists for %s.php', $template_id ) );
 	}
 
 	/**
@@ -529,8 +529,14 @@ class Helper_Templates {
 
 		try {
 			$class_path = $this->get_config_path_by_id( $template_id );
+		} catch( Exception $e ) {
+			$this->log->notice( $e->getMessage() );
+		}
 
-			return $this->load_template_config_file( $class_path );
+		try {
+			if ( ! empty( $class_path ) ) {
+				return $this->load_template_config_file( $class_path );
+			}
 		} catch ( Exception $e ) {
 			$this->log->warning( $e->getMessage() );
 		}
@@ -588,7 +594,7 @@ class Helper_Templates {
 			return new $fqcn();
 		}
 
-		throw new Exception( 'Template Configuration Failed to Load' );
+		throw new Exception( 'Template configuration failed to load: ' . $fqcn );
 	}
 
 	/**
