@@ -83,6 +83,8 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 			@copy( $font, $gfpdf->data->template_font_location . $font_name );
 			/* phpcs:enable */
 		}
+
+		error_reporting( E_ALL & ~E_NOTICE );
 	}
 
 	/**
@@ -99,6 +101,8 @@ class Test_Slow_PDF_Processes extends WP_UnitTestCase {
 		}
 
 		parent::tearDown();
+
+		error_reporting( E_ALL );
 	}
 
 	/**

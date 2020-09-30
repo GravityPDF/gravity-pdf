@@ -53,7 +53,7 @@ class Test_Options_API extends WP_UnitTestCase {
 		parent::setUp();
 
 		/* setup our object */
-		$this->options = new Helper_Options_Fields( $gfpdf->log, $gfpdf->gform, $gfpdf->data, $gfpdf->misc, $gfpdf->notices, $gfpdf->templates );
+		$this->options = \GPDFAPI::get_options_class();
 
 		/* load settings in database  */
 		update_option( 'gfpdf_settings', json_decode( file_get_contents( dirname( __FILE__ ) . '/json/options-settings.json' ), true ) );
@@ -165,7 +165,7 @@ class Test_Options_API extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_register_settings() {
-		global $wp_settings_fields, $new_whitelist_options;
+		global $wp_settings_fields, $new_allowed_options;
 
 		$fields = [
 			'general' => [
@@ -185,7 +185,7 @@ class Test_Options_API extends WP_UnitTestCase {
 		$this->assertEquals( 'Test Item', $wp_settings_fields['gfpdf_settings_general']['gfpdf_settings_general']['gfpdf_settings[my_test_item]']['title'] );
 
 		/* Test our registered settings were added */
-		$this->assertTrue( isset( $new_whitelist_options['gfpdf_settings'] ) );
+		$this->assertArrayHasKey( 'gfpdf_settings', $new_allowed_options );
 
 		/* clean up filter */
 		remove_all_filters( 'gfpdf_registered_fields' );
@@ -734,8 +734,14 @@ class Test_Options_API extends WP_UnitTestCase {
 	public function test_add_custom_fonts() {
 
 		$fonts = [
-			[ 'font_name' => 'Helvetica' ],
-			[ 'font_name' => 'Calibri Bold' ],
+			[
+				'id'        => 'hel',
+				'font_name' => 'Helvetica',
+			],
+			[
+				'id'        => 'cal',
+				'font_name' => 'Calibri Bold',
+			],
 		];
 
 		$this->options->update_option( 'custom_fonts', $fonts );
@@ -764,16 +770,22 @@ class Test_Options_API extends WP_UnitTestCase {
 	public function test_get_custom_fonts() {
 
 		$fonts = [
-			[ 'font_name' => 'Helvetica' ],
-			[ 'font_name' => 'Calibri Bold' ],
+			[
+				'id'        => 'hel',
+				'font_name' => 'Helvetica',
+			],
+			[
+				'id'        => 'cal',
+				'font_name' => 'Calibri Bold',
+			],
 		];
 
 		$this->options->update_option( 'custom_fonts', $fonts );
 
 		$get_fonts = $this->options->get_custom_fonts();
 
-		$this->assertEquals( 'helvetica', $get_fonts[0]['shortname'] );
-		$this->assertEquals( 'calibribold', $get_fonts[1]['shortname'] );
+		$this->assertEquals( 'hel', $get_fonts[0]['id'] );
+		$this->assertEquals( 'cal', $get_fonts[1]['id'] );
 	}
 
 	/**

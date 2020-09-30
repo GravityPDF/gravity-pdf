@@ -104,6 +104,7 @@ export class TemplateSingle extends React.Component {
             templateDeleteErrorText={this.props.templateDeleteErrorText}
           />
         }
+        closeRoute='/template'
       >
         <div
           id='gfpdf-template-detail-view'

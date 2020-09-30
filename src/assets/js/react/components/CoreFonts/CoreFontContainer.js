@@ -206,9 +206,7 @@ export class CoreFontContainer extends React.Component {
    * @since 5.0
    */
   render () {
-    const {
-      ajax
-    } = this.state
+    const { ajax } = this.state
 
     const {
       fontList,

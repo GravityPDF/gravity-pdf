@@ -2,6 +2,7 @@ import { all } from 'redux-saga/effects'
 import { watchGetResults } from './help'
 import { watchUpdateSelectBox, watchTemplateProcessing, watchpostTemplateUploadProcessing } from './templates'
 import { watchGetFilesFromGitHub, watchDownloadFonts } from './coreFonts'
+import { watchGetCustomFontList, watchAddFont, watchEditFont, watchDeleteFont } from './fontManager'
 
 /**
  * @package     Gravity PDF
@@ -22,6 +23,10 @@ export default function * rootSaga () {
     watchTemplateProcessing(),
     watchpostTemplateUploadProcessing(),
     watchGetFilesFromGitHub(),
-    watchDownloadFonts()
+    watchDownloadFonts(),
+    watchGetCustomFontList(),
+    watchAddFont(),
+    watchEditFont(),
+    watchDeleteFont()
   ])
 }

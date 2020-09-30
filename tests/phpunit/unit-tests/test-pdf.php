@@ -1283,6 +1283,7 @@ class Test_PDF extends WP_UnitTestCase {
 		/* Add font data to test */
 		$fonts = [
 			[
+				'id'          => 'arialc',
 				'font_name'   => 'Arial',
 				'regular'     => 'arial',
 				'bold'        => 'arialB',
@@ -1291,6 +1292,7 @@ class Test_PDF extends WP_UnitTestCase {
 			],
 
 			[
+				'id'          => 'courierc',
 				'font_name'   => 'Courier',
 				'regular'     => 'courier',
 				'bold'        => '',
@@ -1303,17 +1305,12 @@ class Test_PDF extends WP_UnitTestCase {
 
 		/* Check the results are accurate */
 		$results = $this->model->register_custom_font_data_with_mPDF( [ '1', '2' ] );
-		$this->assertSame( 4, count( $results ) );
+		$this->assertCount( 4, $results );
 
-		$this->assertArrayHasKey( 'R', $results['arial'] );
-		$this->assertArrayHasKey( 'B', $results['arial'] );
-		$this->assertArrayHasKey( 'I', $results['arial'] );
-		$this->assertArrayHasKey( 'BI', $results['arial'] );
-
-		$this->assertEquals( 'arial', $results['arial']['R'] );
-		$this->assertEquals( 'arialB', $results['arial']['B'] );
-		$this->assertEquals( 'arialI', $results['arial']['I'] );
-		$this->assertEquals( 'arialBI', $results['arial']['BI'] );
+		$this->assertEquals( 'arial', $results['arialc']['R'] );
+		$this->assertEquals( 'arialB', $results['arialc']['B'] );
+		$this->assertEquals( 'arialI', $results['arialc']['I'] );
+		$this->assertEquals( 'arialBI', $results['arialc']['BI'] );
 	}
 
 	/**

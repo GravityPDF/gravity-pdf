@@ -2,11 +2,12 @@ import React from 'react'
 
 const FontListHeader = () => (
   <div className='font-list-header'>
-    <div className='installed-fonts'>Installed Fonts</div>
-    <div className='variants'>Regular</div>
-    <div className='variants'>Italics</div>
-    <div className='variants'>Bold</div>
-    <div className='variants'>Bold Italics</div>
+    <div />
+    <div className='font-name'>{GFPDF.fontListInstalledFonts}</div>
+    <div>{GFPDF.fontListRegular}</div>
+    <div>{GFPDF.fontListItalics}</div>
+    <div>{GFPDF.fontListBold}</div>
+    <div>{GFPDF.fontListBoldItalics}</div>
   </div>
 )
 

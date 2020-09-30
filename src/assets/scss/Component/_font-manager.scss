@@ -1,201 +1,348 @@
 @use '../base';
 
-@mixin variants {
-  width: 15%;
-  text-align: center;
-}
-
-@mixin installed-fonts {
-  width: 40%;
-}
-
-@mixin font-color-regular {
-  color: #434563;
-}
-
 #tab_pdf, #tab_PDF {
 
   /* Settings Tab -> Default Font section -> Selector box */
-  #gfpdf_settings\[default_font\] {
+  #gfpdf_settings\[default_font\], #gfpdf_settings\[font\] {
     margin: 0 0.2rem 0.2rem 0;
   }
 
-  .font-manager {
-    .font-manager-body {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      padding: 0%;
-      overflow: auto;
+  #font-manager-overlay {
+    .font-manager {
+      overflow: hidden;
 
-      .two-columns {
-        &:first-child {
-          width: 90%;
-          height: 50%;
-          padding: 0px 0px 15px 25px;
+      .theme-about {
+        background-color: #ffffff;
+        bottom: 0;
+        padding: 2% 4% 0% 4%;
+      }
+
+      #gfpdf-font-manager-container {
+        //background-color: #ffffff;
+        //display: flex;
+        //flex-direction: column;
+        //height: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        color: base.$default-text-color;
+        //padding: 0% 0% 0% 4%;
+
+        //.container {
+        //  padding: 4% 0%;
+        //}
+
+        .wp-filter-search {
+          width: 60%;
         }
 
-        &:last-child {
-          width: 90%;
-          padding: 0px 0px 15px 25px;
-        }
-
-        /* Search box */
-        #font-manager-search-box {
-          width: 66%;
+        .input-label-validation-error {
+          border-color: base.$error-color;
         }
 
         /* Font list */
-        .font-list {
-          margin-top: 25px;
-          height: 90%;
+        .font-list-column {
+          //width: 95%;
+          z-index: 2;
+          background-color: #ffffff;
+          //margin-bottom: 1rem;
 
-          .font-list-header {
-            @include font-color-regular;
-            display: flex;
-            margin-bottom: 8px;
-            font-size: 14px;
-            font-weight: 500;
-
-            .installed-fonts {
-              @include installed-fonts;
-            }
-
-            .variants {
-              @include variants;
-            }
-          }
-
-          .font-list-items {
+          .font-list {
+            margin-top: 1rem;
             overflow: auto;
-            height: 80%;
+            //max-height: 350px;
+            max-height: 600px;
+            box-shadow: 0 1px 1px rgba(0,0,0,.04);
 
+            .alert-message {
+              border: 0;
+              text-align: center;
+              margin: 40px 0;
+              box-shadow: unset;
+
+              .link {
+                color: base.$link-color;
+                cursor: pointer;
+                text-decoration: underline;
+              }
+            }
+
+            .font-list-header,
             .font-list-item {
-              display: flex;
-              border-top: 1px solid #e8e8eb;
-              padding: 7px 0px;
+              display: grid;
+              grid-template-columns: 0.75fr 4fr 1.5fr 1.5fr 1.5fr 2fr;
+              gap: 1rem;
+              padding: 0.325rem 0;
+              text-align: center;
 
-              &:hover {
-                background-color: base.$primary-color;
+              .font-name {
+                text-align: left;
+                word-break: break-all;
 
-                .dashicons {
-                  color: #ffffff;
-                }
-
-                .font-name {
-                  color: #ffffff;
-                }
-              }
-
-              .installed-font {
-                @include installed-fonts;
-
-                .font-name {
-                  margin-left: 10px;
+                #selectFontName {
+                  width: 1rem;
+                  height: 1rem;
+                  margin-right: 0.5rem;
                 }
               }
+            }
 
-              .variants {
-                @include variants;
+            .font-list-header {
+              font-weight: 600;
+            }
+
+            .font-list-items {
+              .font-list-item {
+                border-top: 1px solid base.$lighter-highlight-color;
+
+                &:hover {
+                  cursor: pointer;
+                  background: base.$lighter-highlight-color;
+                }
+
+                &.active {
+                  background-color: base.$lighter-highlight-color;
+                }
+
+                &:focus {
+                  border: 1px dotted base.$highlight-color;
+                }
               }
 
               /* Icons */
               .dashicons-trash {
-                color: base.$primary-color;
+                color: base.$highlight-color;
+                text-align: center;
+                transition: color 0.25s ease;
+                margin-left: 5px;
+
+                &:focus,
+                &:hover {
+                  color: base.$error-color;
+                }
+              }
+
+              .dashicons-yes,
+              .dashicons-no-alt {
+                font-size: 22px;
               }
 
               .dashicons-yes {
-                color: #386e0d;
+                color: base.$success-color;
               }
 
               .dashicons-no-alt {
-                color: #949597;
+                color: base.$highlight-color;
               }
             }
           }
         }
 
         /* Add font */
-        .add-font {
-          @include font-color-regular;
+        .add-font-column {
+          display: flex;
+          position: relative;
+          //width: 90%;
+          //padding-top: 1rem;
+          //overflow: hidden;
+          //
+          //&.overflow {
+          //  overflow: unset;
+          //}
+          width: 100%;
+          //overflow: auto;
+          //overflow: hidden;
 
-          h1 {
-            @include font-color-regular;
-            font-size: 1.8em;
+          #gfpdf-font-name-input {
+            width: 100%;
           }
 
-          h2 {
-            @include font-color-regular;
-            font-size: 1.2em;
-            padding-top: 8px;
+          .add-font {
+            width: 79%;
+            margin-left: 1px;
           }
 
-          h3 {
-            @include font-color-regular;
-            font-size: 1.1em;
+          .update-font {
+            background-color: #ffffff;
+            position: absolute;
+            left: -720px;
+            transition: 0.5s;
+            width: 100%;
+            z-index: -1;
+            width: 80%;
+
+            &.show {
+              left: 0;
+              transition: 0.5s;
+              z-index: 1;
+            }
           }
 
-          p {
-            margin-top: -10px;
-          }
+          form {
+            h2 {
+              font-size: 1.8em;
+              margin: 0.5rem 0;
 
-          input {
-            width: 90%;
-            margin-top: -7px;
-          }
+              & + p {
+                margin: 0;
+              }
+            }
 
-          .font-files {
-            .variants {
-              display: flex;
-              padding-bottom: 20px;
+            label {
+              display: block;
+              margin-top: 1rem;
+              font-size: 1rem;
+              font-weight: 600;
+
+              & + p {
+                margin: 0.325rem 0;
+              }
+            }
+
+            .required {
+              color: base.$validation-error-color;
+              font-size: 0.8rem;
+            }
+
+            #gfpdf-font-files-setting {
+              display: grid;
+              grid-template-columns: 50% 50%;
+              grid-template-rows: 1fr 1fr;
+              gap: 1rem;
+              margin: 0.75rem 0;
+              width: 95%;
+
+              a {
+                color: unset;
+
+                &:focus {
+                  box-shadow: unset;
+                }
+              }
 
               .drop-zone {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                border: 5px dashed rgba(0,0,0,.1);
-                width: 100%;
+                border: 5px dashed base.$lighter-highlight-color;
                 height: 160px;
-                margin-right: 25px;
+                transition: all 0.3s ease-out;
 
-                &:hover {
-                  background-color: base.$primary-color;
-                  border: 5px solid base.$primary-color !important;
-
-                  h3 {
-                    color: #ffffff
-                  }
+                &:hover,
+                &.active {
+                  background-color: base.$lighter-highlight-color;
+                  border: 5px solid base.$lighter-highlight-color;
 
                   .dashicons {
                     background-color: #ffffff;
-                    color: base.$primary-color;
+                    color: base.$highlight-color;
                   }
+                }
+
+                &:focus {
+                  outline: none;
+                  border: 5px dashed base.$default-text-color;
+                }
+
+                &.required {
+                  border: 5px dashed base.$error-color;
+
+                  .dashicons {
+                    background-color: base.$error-color;
+                    color: #ffffff;
+                  }
+
+                  &:focus {
+                    border-color: base.$default-text-color;
+                  }
+                }
+
+                &.error {
+                  background-color: base.$validation-error-color;
+                  border-color: base.$validation-error-color;
+                  color: #ffffff;
                 }
 
                 input {
                   display: none;
                 }
 
+                .gfpdf-font-filename {
+                  //width: 100%;
+                  //white-space: nowrap;
+                  overflow: hidden;
+                  text-align: center;
+
+                  &.required {
+                    color: base.$validation-error-color;
+                  }
+                }
+
                 .dashicons {
-                  background-color: #f5f5f5;
-                  border-radius: 50%;
-                  color: #9a9a9a;
-                  font-size: 3.2rem;
                   width: 70px;
                   height: 70px;
-                  margin-top: 30px;
+                  margin: 0.675rem;
+                  background-color: base.$lighter-highlight-color;
+                  border-radius: 50%;
+                  font-size: 3.2rem;
+                  color: base.$highlight-color;
+                  cursor: pointer;
 
                   &:before {
+                    margin-left: -1px;
                     vertical-align: middle;
+                  }
+                }
+
+                .dashicons-trash {
+                  font-size: 2.9rem;
+
+                  &:before {
+                    margin-left: 3px;
                   }
                 }
               }
             }
 
-            button {
-              margin-top: 10px;
-              min-height: 40px;
+            .footer {
+              padding-bottom: 40px;
+
+              .gfpdf-spinner {
+                padding-left: 0;
+              }
+
+              &.cancel {
+                button {
+                  margin-bottom: 0;
+                }
+              }
+
+              .button {
+                height: 35px;
+                margin-right: 8px;
+              }
+
+              .msg {
+                display: block;
+
+                &.success {
+                  color: base.$success-color;
+                }
+
+                &.error {
+                  color: base.$error-color;
+                }
+
+              }
+            }
+          }
+
+          .kashida {
+            margin-bottom: 20px;
+
+            .kashida-input {
+              width: 5rem;
             }
           }
         }

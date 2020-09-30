@@ -1,8 +1,13 @@
+/* Reset default */
+@use 'reset';
+
 /* Components */
+@use 'Component/alert';
 @use 'Component/button';
 @use 'Component/color-picker';
 @use 'Component/core-fonts';
 @use 'Component/font-manager';
+@use 'Component/font-manager-skeleton';
 @use 'Component/gf-settings-containers';
 @use 'Component/license';
 @use 'Component/multicheck';
@@ -27,8 +32,5 @@
 @use 'rtl';
 
 /* Media queries */
-@use 'MediaQueries/min-576';
-@use 'MediaQueries/min-781';
 @use 'MediaQueries/min-961';
-@use 'MediaQueries/min-1200';
-@use 'MediaQueries/min-1680';
+//@use 'MediaQueries/min-1200';

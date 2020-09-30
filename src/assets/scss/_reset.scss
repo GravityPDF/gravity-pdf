@@ -1,0 +1,13 @@
+/* WP left sidebar */
+div#adminmenuback {
+  z-index: 2;
+}
+
+.wp-clearfix:after {
+  content: unset;
+}
+
+/* Always show up/down arrows for input (number) */
+input[type=number]::-webkit-inner-spin-button {
+  opacity: 1
+}

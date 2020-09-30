@@ -30,7 +30,7 @@ export function doFormSettingsEditPage () {
 
   /* Hide Template section, if empty */
   const $templateSection = $('#gfpdf-fieldset-gfpdf_form_settings_template')
-  if($templateSection.find('.gform-settings-panel__content').children().length === 0) {
+  if ($templateSection.find('.gform-settings-panel__content').children().length === 0) {
     $templateSection.hide()
   }
 

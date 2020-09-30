@@ -3,6 +3,8 @@
 namespace GFPDF\Controller;
 
 use GFPDF\Helper\Helper_Abstract_Options;
+use GFPDF\Helper\Helper_Data;
+use GFPDF\Model\Model_Custom_Fonts;
 
 /**
  * @package     Gravity PDF
@@ -27,8 +29,14 @@ class Controller_Upgrade_Routines {
 	 */
 	protected $options;
 
-	public function __construct( Helper_Abstract_Options $options ) {
+	/**
+	 * @var Helper_Data
+	 */
+	protected $data;
+
+	public function __construct( Helper_Abstract_Options $options, Helper_Data $data ) {
 		$this->options = $options;
+		$this->data    = $data;
 	}
 
 	/**
@@ -45,6 +53,7 @@ class Controller_Upgrade_Routines {
 		if ( version_compare( $current_version, '6.0.0-beta1', '>=' ) && version_compare( $old_version, '6.0.0-beta1', '<' ) ) {
 			$this->enable_vendor_aliasing();
 			$this->update_background_processing_values();
+			$this->upgrade_custom_fonts();
 		}
 	}
 
@@ -69,4 +78,25 @@ class Controller_Upgrade_Routines {
 		$this->options->update_option( 'background_processing', $new_value );
 	}
 
+	/**
+	 * Remove legacy settings in the custom fonts data
+	 *
+	 * @since 6.0
+	 */
+	protected function upgrade_custom_fonts() {
+		/** @var Model_Custom_Fonts $custom_font_model */
+		$custom_font_model = \GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' );
+
+		$fonts = $this->options->get_option( 'custom_fonts', [] );
+
+		foreach ( $fonts as &$font ) {
+			if ( isset( $font['shortname'] ) ) {
+				unset( $font['shortname'] );
+			}
+
+			$font['id'] = $custom_font_model->get_font_short_name( $font['font_name'] );
+		}
+
+		$this->options->update_option( 'custom_fonts', $fonts );
+	}
 }

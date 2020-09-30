@@ -57,7 +57,7 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Get a list of the custom fonts installed, indexed by the `shortname`
+	 * Get a list of the custom fonts installed, indexed by the `id`
 	 *
 	 * @since 6.0
 	 */
@@ -70,8 +70,14 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 
 		$font_list = [];
 		foreach ( $fonts as $font ) {
-			$font['shortname']               = $font['shortname'] ?? $this->get_font_short_name( $font['font_name'] );
-			$font_list[ $font['shortname'] ] = $font;
+			/* Set defaults for all the non-required fields */
+			$font['italics']     = $font['italics'] ?? '';
+			$font['bold']        = $font['bold'] ?? '';
+			$font['bolditalics'] = $font['bolditalics'] ?? '';
+			$font['useOTL']      = $font['useOTL'] ?? 0x00;
+			$font['useKashida']  = $font['useKashida'] ?? 0;
+
+			$font_list[ $font['id'] ] = $font;
 		}
 
 		return $font_list;
@@ -99,18 +105,18 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	 * @param array $font An individual font setting like you'd find from the self::get_custom_fonts() method
 	 *
 	 * @return bool
-	 * @throws GravityPdfIdException Triggered if `shortname` already exists
+	 * @throws GravityPdfIdException Triggered if `id` already exists
 	 *
 	 * @since 6.0
 	 */
 	public function add_font( array $font ): bool {
 		$fonts = $this->get_custom_fonts();
 
-		if ( isset( $fonts[ $font['shortname'] ] ) ) {
+		if ( isset( $fonts[ $font['id'] ] ) ) {
 			throw new GravityPdfIdException();
 		}
 
-		$fonts[ $font['shortname'] ] = $font;
+		$fonts[ $font['id'] ] = $font;
 
 		return $this->options->update_option( 'custom_fonts', $fonts );
 	}
@@ -123,17 +129,17 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	 * @since 6.0
 	 */
 	public function update_font( array $font ): bool {
-		$fonts                       = $this->get_custom_fonts();
-		$fonts[ $font['shortname'] ] = $font;
+		$fonts                = $this->get_custom_fonts();
+		$fonts[ $font['id'] ] = $font;
 
 		return $this->options->update_option( 'custom_fonts', $fonts );
 	}
 
 	/**
-	 * @param string $id The unique ID/shortname of the font to delete
+	 * @param string $id The unique ID of the font to delete
 	 *
 	 * @return bool
-	 * @throws GravityPdfIdException Triggered if `id`/`shortname` already exists
+	 * @throws GravityPdfIdException Triggered if `id` already exists
 	 */
 	public function delete_font( string $id ): bool {
 		$fonts = $this->get_custom_fonts();
@@ -245,7 +251,7 @@ class Model_Custom_Fonts extends Helper_Abstract_Model {
 	 * @since 6.0
 	 */
 	public function matches_custom_font_id( string $id ): bool {
-		return in_array( $id, array_column( $this->get_custom_fonts(), 'shortname' ), true );
+		return in_array( $id, array_column( $this->get_custom_fonts(), 'id' ), true );
 	}
 
 	/**

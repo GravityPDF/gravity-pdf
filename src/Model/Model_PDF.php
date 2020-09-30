@@ -1905,8 +1905,8 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @param array $fonts The registered fonts
 	 *
 	 * @return array
-	 * @since 4.0
 	 *
+	 * @since 4.0
 	 */
 	public function register_custom_font_data_with_mPDF( $fonts ) {
 
@@ -1914,7 +1914,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		foreach ( $custom_fonts as $font ) {
 
-			$fonts[ $font['shortname'] ] = array_filter(
+			$fonts[ $font['id'] ] = array_filter(
 				[
 					'R'          => basename( $font['regular'] ),
 					'B'          => basename( $font['bold'] ),
@@ -1937,6 +1937,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * @return array
 	 * @since 4.0
 	 *
+	 * @TODO Work out how to handle this for 6.0
 	 */
 	public function add_unregistered_fonts_to_mPDF( $fonts ) {
 

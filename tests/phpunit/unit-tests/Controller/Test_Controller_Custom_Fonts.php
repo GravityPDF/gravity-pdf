@@ -6,8 +6,6 @@ namespace GFPDF\Controller;
 
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Model\Model_Custom_Fonts;
-use GFPDF_Vendor\Upload\File;
-use GFPDF_Vendor\Upload\Storage\FileSystem;
 use GPDFAPI;
 use WP_REST_Request;
 use WP_UnitTestCase;
@@ -62,7 +60,7 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 
 		/* Setup our test classes */
 		$this->model      = new Model_Custom_Fonts( $gfpdf->options );
-		$this->controller = new Controller_Custom_Fonts( $this->model, $gfpdf->log, $gfpdf->gform, $this->tmp_font_location, 'GFPDF\\Controller\\StubbedFilesystem', 'GFPDF\\Controller\\StubbedFile' );
+		$this->controller = new Controller_Custom_Fonts( $this->model, $gfpdf->log, $gfpdf->gform, $this->tmp_font_location, 'GFPDF\\Helper\\Fonts\\LocalFilesystem', 'GFPDF\\Helper\\Fonts\\LocalFile' );
 
 		$this->controller->init();
 
@@ -92,6 +90,8 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 			copy( __DIR__ . '/../fonts/' . $font, $tmp_font );
 			$this->test_fonts[] = $tmp_font;
 		}
+
+		error_reporting( E_ALL & ~E_NOTICE );
 	}
 
 	public function tearDown(): void {
@@ -110,6 +110,8 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 		$gfpdf->options->update_option( 'custom_fonts', [] );
 
 		parent::tearDown();
+
+		error_reporting( E_ALL );
 	}
 
 	public function test_register_endpoints() {
@@ -123,9 +125,9 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 	public function test_get_all_items() {
 		$this->assertCount( 0, $this->controller->get_all_items() );
 
-		$this->model->add_font( [ 'shortname' => 'font1' ] );
-		$this->model->add_font( [ 'shortname' => 'font2' ] );
-		$this->model->add_font( [ 'shortname' => 'font3' ] );
+		$this->model->add_font( [ 'id' => 'font1' ] );
+		$this->model->add_font( [ 'id' => 'font2' ] );
+		$this->model->add_font( [ 'id' => 'font3' ] );
 
 		$this->assertCount( 3, $this->controller->get_all_items() );
 	}
@@ -142,7 +144,6 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 
 		$this->assertIsArray( $font );
 		$this->assertSame( 'Font', $font['font_name'] );
-		$this->assertSame( 'font', $font['shortname'] );
 		$this->assertSame( 'font', $font['id'] );
 		$this->assertSame( 255, $font['useOTL'] );
 		$this->assertSame( 75, $font['useKashida'] );
@@ -238,7 +239,7 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 		GPDFAPI::add_pdf_font(
 			[
 				'font_name' => 'Lato',
-				'regular'   => __DIR__ . '/../fonts/DejaVuSans.ttf',
+				'regular'   => $this->test_fonts[0],
 			]
 		);
 
@@ -254,8 +255,7 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 
 		$this->assertIsArray( $font );
 		$this->assertSame( 'Font', $font['font_name'] );
-		$this->assertSame( 'lato', $font['shortname'] );
-		//@TODO - enable after fixing GPDFAPI $this->assertSame( 'lato', $font['id'] );
+		$this->assertSame( 'lato', $font['id'] );
 		$this->assertSame( 255, $font['useOTL'] );
 		$this->assertSame( 75, $font['useKashida'] );
 		$this->assertRegExp( '/DejaVuSans([0-9]{5})\.ttf$$/', $font['regular'] );
@@ -272,8 +272,7 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 		$font     = $response->get_data();
 
 		$this->assertSame( 'Lato2', $font['font_name'] );
-		$this->assertSame( 'lato', $font['shortname'] );
-		//@TODO - enable after fixing GPDFAPI $this->assertSame( 'lato', $font['id'] );
+		$this->assertSame( 'lato', $font['id'] );
 		$this->assertSame( 255, $font['useOTL'] );
 		$this->assertSame( 75, $font['useKashida'] );
 		$this->assertRegExp( '/DejaVuSans([0-9]{5})\.ttf$$/', $font['regular'] );
@@ -289,21 +288,13 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 		$font     = $response->get_data();
 
 		$this->assertSame( 'Lato2', $font['font_name'] );
-		$this->assertSame( 'lato', $font['shortname'] );
-		//@TODO - enable after fixing GPDFAPI $this->assertSame( 'lato', $font['id'] );
+		$this->assertSame( 'lato', $font['id'] );
 		$this->assertSame( 255, $font['useOTL'] );
 		$this->assertSame( 75, $font['useKashida'] );
 		$this->assertRegExp( '/DejaVuSans([0-9]{5})\.ttf$$/', $font['regular'] );
 		$this->assertSame( '', $font['bold'] );
 		$this->assertSame( '', $font['italics'] );
 		$this->assertStringEndsWith( 'DejaVuSerifCondensed.ttf', $font['bolditalics'] );
-
-		/* Test without any parameters which will result in a failed DB update due to the same config data */
-		$request = new WP_REST_Request( 'POST', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/lato' );
-
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertSame( 400, $response->get_status() );
 	}
 
 	public function test_update_item_permission_failed() {
@@ -417,7 +408,7 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 		$font     = $response->get_data();
 
 		/* Delete font */
-		$request  = new WP_REST_Request( 'DELETE', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/' . $font['shortname'] );
+		$request  = new WP_REST_Request( 'DELETE', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/' . $font['id'] );
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( 200, $response->get_status() );
@@ -434,7 +425,9 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 			]
 		);
 
-		unlink( $this->test_fonts[0] );
+		$options = GPDFAPI::get_options_class();
+		$fonts   = $options->get_option( 'custom_fonts' );
+		unlink( $fonts['lato']['regular'] );
 
 		/* Delete font */
 		$request  = new WP_REST_Request( 'DELETE', '/' . Helper_Data::REST_API_BASENAME . 'v1/fonts/lato' );
@@ -496,17 +489,5 @@ class Test_Controller_Custom_Fonts extends WP_UnitTestCase {
 		$this->assertEmpty( $this->controller->get_absolute_font_path( '' ) );
 
 		$this->assertSame( $this->tmp_font_location . 'font.ttf', $this->controller->get_absolute_font_path( 'font.ttf' ) );
-	}
-}
-
-class StubbedFile extends File {
-	public function isUploadedFile() {
-		return true;
-	}
-}
-
-class StubbedFilesystem extends FileSystem {
-	protected function moveUploadedFile( $source, $destination ) {
-		return rename( $source, $destination );
 	}
 }

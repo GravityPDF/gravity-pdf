@@ -1,9 +1,22 @@
 #tab_pdf, #tab_PDF {
 
+  /* Font manager */
   .gfpdf-spinner {
     padding: 0 5px;
     vertical-align: middle;
     width: 27px;
+
+    &.add-update-font {
+      width: 20px;
+      height: 20px;
+      padding: 10px 0px 0px 10px;
+    }
+
+    &.delete-font {
+      width: 17px;
+      height: 17px;
+      padding: 1px 0px 0px 8px;
+    }
   }
 
   /* PDF List Page */

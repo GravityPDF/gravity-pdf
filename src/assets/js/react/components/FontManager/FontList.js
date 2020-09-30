@@ -1,46 +1,47 @@
-import React, { Component } from 'react'
+import React from 'react'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import FontListHeader from './FontListHeader'
-import FontListItem from './FontListItem'
+import FontListItems from './FontListItems'
+import FontListSkeleton from './FontListSkeleton'
+import FontListAlertMessage from './FontListAlertMessage'
 
-export class FontList extends Component {
-  state = {
-    items: [
-      1,
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9,
-      10,
-      11,
-      12,
-      13,
-      14,
-      15,
-      16,
-      17,
-      18,
-      19,
-      20
-    ]
-  }
+const FontList = ({ id, loading, fontList, searchResult, msg: { error }, history }) => {
+  const fontListError = error && error.fontList
+  const fontListEmpty = fontList.length === 0 && !searchResult
+  const checkSearchResult = (searchResult && searchResult.length === 0) || !searchResult
+  const latestData = fontList.length > 0 && !searchResult
+  const emptySearchResult = (!fontListError && !loading) && (!latestData && checkSearchResult)
 
-  render () {
-    return (
-      <div className='font-list'>
-        <FontListHeader />
+  return (
+    <div className='font-list'>
+      <FontListHeader />
 
-        <div className='font-list-items'>
-          {
-            this.state.items.map(item => <FontListItem key={item} />)
-          }
-        </div>
-      </div>
-    )
-  }
+      {loading ? <FontListSkeleton /> : <FontListItems id={id} history={history} />}
+
+      {fontListEmpty && emptySearchResult && <FontListAlertMessage empty={fontListEmpty} />}
+
+      {!fontListEmpty && emptySearchResult && <FontListAlertMessage />}
+
+      {fontListError && <FontListAlertMessage error={error.fontList} />}
+    </div>
+  )
 }
 
-export default FontList
+const mapStateToProps = state => ({
+  loading: state.fontManager.loading,
+  fontList: state.fontManager.fontList,
+  searchResult: state.fontManager.searchResult,
+  msg: state.fontManager.msg
+})
+
+FontList.propTypes = {
+  id: PropTypes.string,
+  loading: PropTypes.bool.isRequired,
+  fontList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  searchResult: PropTypes.array,
+  msg: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired
+}
+
+export default connect(mapStateToProps, {})(FontList)

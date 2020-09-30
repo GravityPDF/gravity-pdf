@@ -16,11 +16,11 @@
     font-family: "Courier New", Courier, monospace;
 
     .gfpdf-core-font-status-success {
-      color: base.$core-font--status-success;
+      color: base.$success-color;
     }
 
     .gfpdf-core-font-status-error {
-      color: base.$core-font-status-error;
+      color: base.$error-color;
     }
   }
 }

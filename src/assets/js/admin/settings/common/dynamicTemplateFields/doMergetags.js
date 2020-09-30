@@ -7,7 +7,6 @@ import $ from 'jquery'
  */
 export function doMergetags () {
   if (window.gfMergeTags && typeof form !== 'undefined' && $('#gfpdf-fieldset-gfpdf_form_settings_template .merge-tag-support').length >= 0) {
-
     /* Initialise */
     $('#gfpdf-fieldset-gfpdf_form_settings_template .merge-tag-support').each(function () {
       new gfMergeTagsObj(form, $(this)) // eslint-disable-line

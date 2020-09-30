@@ -603,20 +603,36 @@ final class GPDFAPI {
 	 * @since 4.1
 	 */
 	public static function add_pdf_font( $font ) {
-		$settings = GPDFAPI::get_mvc_class( 'Model_Settings' );
 
-		if ( ! isset( $font['font_name'] ) || ! $settings->is_font_name_valid( $font['font_name'] ) ) {
-			return new WP_Error( 'invalid_font_name', esc_html__( 'Font name is not valid. Alphanumeric characters and spaces only.', 'gravity-forms-pdf-extended' ) );
+		$files_backup = $_FILES;
+		$_FILES       = [];
+
+		$data       = self::get_data_class();
+		$model      = new \GFPDF\Model\Model_Custom_Fonts( self::get_options_class() );
+		$controller = new \GFPDF\Controller\Controller_Custom_Fonts( $model, self::get_log_class(), self::get_form_class(), $data->template_font_location, '\GFPDF\Helper\Fonts\LocalFilesystem', '\GFPDF\Helper\Fonts\LocalFile' );
+
+		$request = new WP_REST_Request();
+		$request->set_param( 'label', $font['font_name'] ?? '' );
+
+		foreach ( $controller->get_font_keys() as $id ) {
+			if ( isset( $font[ $id ] ) && is_file( $font[ $id ] ) ) {
+				$_FILES[ $id ] = [
+					'file'     => file_get_contents( $font[ $id ] ),
+					'name'     => basename( $font[ $id ] ),
+					'size'     => filesize( $font[ $id ] ),
+					'tmp_name' => $font[ $id ],
+					'error'    => UPLOAD_ERR_OK,
+				];
+			}
 		}
 
-		if ( ! $settings->is_font_name_unique( $font['font_name'] ) ) {
-			return new WP_Error( 'font_name_not_unique', esc_html__( 'A font with the same name already exists.', 'gravity-forms-pdf-extended' ) );
-		}
+		$request->set_file_params( $_FILES );
+		$response = $controller->add_item( $request );
 
-		$results = $settings->install_fonts( $font );
+		$_FILES = $files_backup;
 
-		if ( isset( $results['errors'] ) ) {
-			return new WP_Error( 'font_installation_error', implode( "\n\n", $results['errors'] ) );
+		if ( is_wp_error( $response ) ) {
+			return $response;
 		}
 
 		return true;
@@ -627,37 +643,25 @@ final class GPDFAPI {
 	 *
 	 * See https://gravitypdf.com/documentation/v5/delete_pdf_font/ for more information about this method
 	 *
-	 * @param string $font_name The font that should be deleted
+	 * @param string $font_id The font that should be deleted
 	 *
 	 * @return bool|WP_Error
 	 *
-	 * @since 4.1
+	 * @Internal In 6.0 the method signature was changed from $font_name to $font_id. This ensures accuracy, as multiple
+	 * fonts can now contain the same name in the 6.0 release.
+	 *
+	 * @since    4.1
 	 */
-	public static function delete_pdf_font( $font_name ) {
-		$settings = GPDFAPI::get_mvc_class( 'Model_Settings' );
-		$options  = GPDFAPI::get_options_class();
-		$misc     = GPDFAPI::get_misc_class();
-		$data     = GPDFAPI::get_data_class();
+	public static function delete_pdf_font( $font_id ) {
+		$request = new WP_REST_Request();
+		$request->set_param( 'id', $font_id );
 
-		$fonts   = $options->get_option( 'custom_fonts' );
-		$font_id = $settings->get_font_id_by_name( $font_name );
+		/** @var \GFPDF\Controller\Controller_Custom_Fonts $controller */
+		$controller = self::get_mvc_class( 'Controller_Custom_Fonts' );
 
-		if ( ! isset( $fonts[ $font_id ] ) ) {
-			return new WP_Error( 'font_not_installed', esc_html__( 'Font not installed.', 'gravity-forms-pdf-extended' ) );
-		}
-
-		/* Remove the font files */
-		if ( ! $settings->remove_font_file( $fonts[ $font_id ] ) ) {
-			return new WP_Error( 'font_delete_failure', esc_html__( 'There was a problem deleting the font files.', 'gravity-forms-pdf-extended' ) );
-		}
-
-		/* Cleanup our mPDF directory to prevent caching issues with mPDF */
-		$misc->cleanup_dir( $data->mpdf_tmp_location );
-
-		/* Update the database */
-		unset( $fonts[ $font_id ] );
-		if ( ! $options->update_option( 'custom_fonts', $fonts ) ) {
-			return new WP_Error( 'font_delete_db_failure', esc_html__( 'There was a problem deleting the font from the database.', 'gravity-forms-pdf-extended' ) );
+		$response = $controller->delete_item( $request );
+		if ( is_wp_error( $response ) ) {
+			return $response;
 		}
 
 		return true;
