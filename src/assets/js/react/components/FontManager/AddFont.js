@@ -1,9 +1,37 @@
+/* Dependencies */
 import React from 'react'
 import PropTypes from 'prop-types'
+import { sprintf } from 'sprintf-js'
+/* Components */
 import FontVariant from './FontVariant'
 import AddFontFooter from './AddFontFooter'
-import { sprintf } from 'sprintf-js'
 
+/**
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2020, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       6.0
+ */
+
+/**
+ * Display add font panel UI
+ *
+ * @param label
+ * @param onHandleInputChange
+ * @param onHandleUpload
+ * @param onHandleDeleteFontStyle
+ * @param onHandleSubmit
+ * @param fontStyles
+ * @param validateLabel
+ * @param validateRegular
+ * @param msg
+ * @param loading
+ * @param tabIndexFontName
+ * @param tabIndexFontFiles
+ * @param tabIndexFooterButtons
+ *
+ * @since 6.0
+ */
 export const AddFont = (
   {
     label,
@@ -36,7 +64,7 @@ export const AddFont = (
 
         <input
           type='text'
-          id='gfpdf-font-name-input'
+          id='gfpdf-add-font-name-input'
           className={!validateLabel ? 'input-label-validation-error' : ''}
           aria-describedby='gfpdf-font-name-desc'
           name='label'
@@ -77,6 +105,11 @@ export const AddFont = (
   )
 }
 
+/**
+ * PropTypes
+ *
+ * @since 6.0
+ */
 AddFont.propTypes = {
   label: PropTypes.string.isRequired,
   onHandleInputChange: PropTypes.func.isRequired,

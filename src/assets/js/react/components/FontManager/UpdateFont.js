@@ -1,10 +1,46 @@
+/* Dependencies */
 import React from 'react'
 import PropTypes from 'prop-types'
+import { sprintf } from 'sprintf-js'
+/* Components */
 import FontVariant from './FontVariant'
 import Kashida from './Kashida'
 import AddFontFooter from './AddFontFooter'
-import { sprintf } from 'sprintf-js'
 
+/**
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2020, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       6.0
+ */
+
+/**
+ * Display update font panel UI
+ *
+ * @param id
+ * @param fontList
+ * @param label
+ * @param onHandleInputChange
+ * @param onHandleKashidaChange
+ * @param onHandleUpload
+ * @param onHandleDeleteFontStyle
+ * @param onHandleCancelEditFont
+ * @param onHandleCancelEditFontKeypress
+ * @param onHandleSubmit
+ * @param fontStyles
+ * @param kashida
+ * @param validateLabel
+ * @param validateRegular
+ * @param disableUpdateButton
+ * @param msg
+ * @param loading
+ * @param tabIndexFontName
+ * @param tabIndexFontFiles
+ * @param tabIndexKashida
+ * @param tabIndexFooterButtons
+ *
+ * @since 6.0
+ */
 export const UpdateFont = (
   {
     id,
@@ -15,6 +51,7 @@ export const UpdateFont = (
     onHandleUpload,
     onHandleDeleteFontStyle,
     onHandleCancelEditFont,
+    onHandleCancelEditFontKeypress,
     onHandleSubmit,
     fontStyles,
     kashida,
@@ -46,7 +83,7 @@ export const UpdateFont = (
 
         <input
           type='text'
-          id='gfpdf-font-name-input'
+          id='gfpdf-update-font-name-input'
           className={!validateLabel ? 'input-label-validation-error' : ''}
           aria-describedby='gfpdf-font-name-desc'
           name='label'
@@ -88,6 +125,7 @@ export const UpdateFont = (
           id={id}
           disabled={disableUpdateButton}
           onHandleCancelEditFont={onHandleCancelEditFont}
+          onHandleCancelEditFontKeypress={onHandleCancelEditFontKeypress}
           msg={msg}
           loading={loading}
           tabIndex={tabIndexFooterButtons}
@@ -97,6 +135,11 @@ export const UpdateFont = (
   )
 }
 
+/**
+ * PropTypes
+ *
+ * @since 6.0
+ */
 UpdateFont.propTypes = {
   id: PropTypes.string,
   fontList: PropTypes.arrayOf(PropTypes.object),
@@ -106,6 +149,7 @@ UpdateFont.propTypes = {
   onHandleUpload: PropTypes.func.isRequired,
   onHandleDeleteFontStyle: PropTypes.func.isRequired,
   onHandleCancelEditFont: PropTypes.func.isRequired,
+  onHandleCancelEditFontKeypress: PropTypes.func.isRequired,
   onHandleSubmit: PropTypes.func.isRequired,
   validateLabel: PropTypes.bool.isRequired,
   validateRegular: PropTypes.bool.isRequired,

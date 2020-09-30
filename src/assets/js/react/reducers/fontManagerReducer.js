@@ -1,4 +1,6 @@
+/* Dependencies */
 import { sprintf } from 'sprintf-js'
+/* Redux action types */
 import {
   GET_CUSTOM_FONT_LIST,
   GET_CUSTOM_FONT_LIST_SUCCESS,
@@ -20,14 +22,37 @@ import {
   SEARCH_FONT_LIST,
   SELECT_FONT
 } from '../actions/fontManager'
+/* Utilities */
 import {
   findAndUpdate,
   findAndRemove,
   reduceFontFileName,
   checkFontListIncludes,
   clearMsg
-} from '../utilities/fontManagerReducer'
+} from '../utilities/FontManager/fontManagerReducer'
 
+/**
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2020, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       6.0
+ */
+
+/**
+ * Initial state setup for the "fontManager" portion of our redux store
+ *
+ * @type {{
+ *  loading: boolean,
+ *  addFontLoading: boolean,
+ *  deleteFontLoading: boolean,
+ *  fontList: array,
+ *  searchResult: null,
+ *  selectedFont: string,
+ *  msg: object
+ * }}
+ *
+ * @since 6.0
+ */
 export const initialState = {
   loading: false,
   addFontLoading: false,
@@ -38,10 +63,25 @@ export const initialState = {
   msg: {}
 }
 
+/**
+ * The action for "fontManager" reducer which updates its state
+ *
+ * @param state: object
+ * @param action: object
+ *
+ * @returns {{ updated state }}
+ *
+ * @since 6.0
+ */
 export default function (state = initialState, action) {
   const { payload } = action
 
   switch (action.type) {
+    /**
+     * Process GET_CUSTOM_FONT_LIST
+     *
+     * @since 6.0
+     */
     case GET_CUSTOM_FONT_LIST: {
       return {
         ...state,
@@ -50,6 +90,11 @@ export default function (state = initialState, action) {
       }
     }
 
+    /**
+     * Process GET_CUSTOM_FONT_LIST_SUCCESS
+     *
+     * @since 6.0
+     */
     case GET_CUSTOM_FONT_LIST_SUCCESS:
       return {
         ...state,
@@ -57,6 +102,11 @@ export default function (state = initialState, action) {
         fontList: payload
       }
 
+    /**
+     * Process GET_CUSTOM_FONT_LIST_ERROR
+     *
+     * @since 6.0
+     */
     case GET_CUSTOM_FONT_LIST_ERROR:
       return {
         ...state,
@@ -64,6 +114,11 @@ export default function (state = initialState, action) {
         msg: { error: { fontList: payload } }
       }
 
+    /**
+     * Process ADD_FONT
+     *
+     * @since 6.0
+     */
     case ADD_FONT: {
       const msg = { ...state.msg }
 
@@ -79,6 +134,11 @@ export default function (state = initialState, action) {
       }
     }
 
+    /**
+     * Process ADD_FONT_SUCCESS
+     *
+     * @since 6.0
+     */
     case ADD_FONT_SUCCESS: {
       if (state.msg.error && state.msg.error.fontList) {
         return {
@@ -99,6 +159,11 @@ export default function (state = initialState, action) {
       }
     }
 
+    /**
+     * Process ADD_FONT_ERROR & EDIT_FONT_ERROR
+     *
+     * @since 6.0
+     */
     case ADD_FONT_ERROR:
     case EDIT_FONT_ERROR: {
       let msg
@@ -128,6 +193,11 @@ export default function (state = initialState, action) {
       }
     }
 
+    /**
+     * Process EDIT_FONT
+     *
+     * @since 6.0
+     */
     case EDIT_FONT: {
       const msg = { ...state.msg }
 
@@ -154,7 +224,11 @@ export default function (state = initialState, action) {
     }
 
     /**
+     * Process EDIT_FONT_SUCCESS
+     *
      * Update fontList state with the new font details
+     *
+     * @since 6.0
      */
     case EDIT_FONT_SUCCESS: {
       const msg = { success: { addFont: payload.msg } }
@@ -178,6 +252,11 @@ export default function (state = initialState, action) {
       }
     }
 
+    /**
+     * Process VALIDATION_ERROR
+     *
+     * @since 6.0
+     */
     case VALIDATION_ERROR:
       return {
         ...state,
@@ -189,6 +268,11 @@ export default function (state = initialState, action) {
         }
       }
 
+    /**
+     * Process DELETE_VARIANT_ERROR
+     *
+     * @since 6.0
+     */
     case DELETE_VARIANT_ERROR: {
       const addFont = { ...state.msg.error.addFont }
       delete addFont[payload]
@@ -199,6 +283,11 @@ export default function (state = initialState, action) {
       }
     }
 
+    /**
+     * Process DELETE_FONT
+     *
+     * @since 6.0
+     */
     case DELETE_FONT: {
       const msg = { ...state.msg }
 
@@ -219,6 +308,11 @@ export default function (state = initialState, action) {
       }
     }
 
+    /**
+     * Process DELETE_FONT_SUCCESS
+     *
+     * @since 6.0
+     */
     case DELETE_FONT_SUCCESS: {
       /* Delete from the list during active search */
       if (state.searchResult) {
@@ -237,6 +331,11 @@ export default function (state = initialState, action) {
       }
     }
 
+    /**
+     * Process DELETE_FONT_ERROR
+     *
+     * @since 6.0
+     */
     case DELETE_FONT_ERROR:
       return {
         ...state,
@@ -244,12 +343,22 @@ export default function (state = initialState, action) {
         msg: { ...state.msg, error: { ...state.msg.error, deleteFont: payload } }
       }
 
+    /**
+     * Process CLEAR_ADD_FONT_MSG
+     *
+     * @since 6.0
+     */
     case CLEAR_ADD_FONT_MSG:
       return {
         ...state,
         msg: clearMsg({ ...state.msg })
       }
 
+    /**
+     * Process CLEAR_DROPZONE_ERROR
+     *
+     * @since 6.0
+     */
     case CLEAR_DROPZONE_ERROR: {
       const addFont = state.msg.error.addFont
       typeof addFont === 'object' && delete addFont[payload]
@@ -260,12 +369,22 @@ export default function (state = initialState, action) {
       }
     }
 
+    /**
+     * Process RESET_SEARCH_RESULT
+     *
+     * @since 6.0
+     */
     case RESET_SEARCH_RESULT:
       return {
         ...state,
         searchResult: null
       }
 
+    /**
+     * Process SEARCH_FONT_LIST
+     *
+     * @since 6.0
+     */
     case SEARCH_FONT_LIST: {
       const fontList = [...state.fontList]
 
@@ -323,13 +442,17 @@ export default function (state = initialState, action) {
       }
     }
 
+    /**
+     * Process SELECT_FONT
+     *
+     * @since 6.0
+     */
     case SELECT_FONT:
       return {
         ...state,
         selectedFont: payload
       }
-
-    default:
-      return state
   }
+
+  return state
 }

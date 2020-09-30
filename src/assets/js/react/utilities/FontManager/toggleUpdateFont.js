@@ -1,3 +1,18 @@
+/**
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2020, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       6.0
+ */
+
+/**
+ * Toggle show or hide update font panel
+ *
+ * @param history: object
+ * @param fontId: string
+ *
+ * @since 6.0
+ */
 export function toggleUpdateFont (history, fontId) {
   const editFontColumn = document.querySelector('.update-font')
 

@@ -1,10 +1,13 @@
+/* Dependencies */
 import { call, put, takeLatest } from 'redux-saga/effects'
+/* APIs */
 import {
   apiGetCustomFontList,
   apiAddFont,
   apiEditFont,
   apiDeleteFont
 } from '../api/fontManager'
+/* Redux action types */
 import {
   GET_CUSTOM_FONT_LIST,
   GET_CUSTOM_FONT_LIST_SUCCESS,
@@ -20,10 +23,27 @@ import {
   DELETE_FONT_ERROR
 } from '../actions/fontManager'
 
+/**
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2020, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       6.0
+ */
+
+/**
+ * A watcher that get triggered when custom font list is requested
+ *
+ * @since 6.0
+ */
 export function * watchGetCustomFontList () {
   yield takeLatest(GET_CUSTOM_FONT_LIST, getCustomFontList)
 }
 
+/**
+ * Generate response for custom font list request
+ *
+ * @since 6.0
+ */
 export function * getCustomFontList () {
   try {
     const response = yield call(apiGetCustomFontList)
@@ -46,10 +66,22 @@ export function * getCustomFontList () {
   }
 }
 
+/**
+ * A watcher that get triggered when a new add font request is submitted
+ *
+ * @since 6.0
+ */
 export function * watchAddFont () {
   yield takeLatest(ADD_FONT, addFont)
 }
 
+/**
+ * Generate response for add font request
+ *
+ * @param payload: object
+ *
+ * @since 6.0
+ */
 export function * addFont ({ payload }) {
   try {
     const response = yield call(apiAddFont, payload)
@@ -93,10 +125,22 @@ export function * addFont ({ payload }) {
   }
 }
 
+/**
+ * A watcher that get triggered when a new edit font request is submitted
+ *
+ * @since 6.0
+ */
 export function * watchEditFont () {
   yield takeLatest(EDIT_FONT, editFont)
 }
 
+/**
+ * Generate response for edit font request
+ *
+ * @param payload: object
+ *
+ * @since 6.0
+ */
 export function * editFont ({ payload }) {
   try {
     const response = yield call(apiEditFont, payload)
@@ -140,10 +184,22 @@ export function * editFont ({ payload }) {
   }
 }
 
+/**
+ * A watcher that get triggered when a delete font request has been made
+ *
+ * @since 6.0
+ */
 export function * watchDeleteFont () {
   yield takeLatest(DELETE_FONT, deleteFont)
 }
 
+/**
+ * Generate response for delete font request
+ *
+ * @param payload: string
+ *
+ * @since 6.0
+ */
 export function * deleteFont ({ payload }) {
   try {
     const response = yield call(apiDeleteFont, payload)

@@ -1,14 +1,15 @@
+/* Dependencies */
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
+/* Redux actions */
 import { getCustomFontList, clearAddFontMsg } from '../../actions/fontManager'
-import { toggleUpdateFont } from '../../utilities/toggleUpdateFont'
-import associatedFontManagerSelectBox from '../../utilities/associatedFontManagerSelectBox'
+/* Utilities */
+import { toggleUpdateFont } from '../../utilities/FontManager/toggleUpdateFont'
+import associatedFontManagerSelectBox from '../../utilities/FontManager/associatedFontManagerSelectBox'
 
 /**
- * Renders our close dialog element
- *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2020, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -16,12 +17,14 @@ import associatedFontManagerSelectBox from '../../utilities/associatedFontManage
  */
 
 /**
- * React Component
+ * CloseDialog component
  *
  * @since 6.0
  */
 export class CloseDialog extends React.Component {
   /**
+   * PropTypes
+   *
    * @since 6.0
    */
   static propTypes = {
@@ -49,7 +52,9 @@ export class CloseDialog extends React.Component {
    * Check for new added template and fetch new fontList to trigger a request of
    * updated font manager select box
    *
-   * @param prevProps
+   * @param prevProps: object
+   *
+   * @since 6.0
    */
   componentDidUpdate (prevProps) {
     const { templateList, getCustomFontList } = this.props
@@ -80,7 +85,7 @@ export class CloseDialog extends React.Component {
    * Check if Escape key pressed and current event target isn't our search box,
    * or the search box is blank already
    *
-   * @param {Object} e Event
+   * @param e: object
    *
    * @since 6.0
    */
@@ -104,6 +109,8 @@ export class CloseDialog extends React.Component {
   }
 
   /**
+   * Close the modal
+   *
    * @since 6.0
    */
   handleCloseDialog = () => {
@@ -112,6 +119,8 @@ export class CloseDialog extends React.Component {
   }
 
   /**
+   * Display the modal close dialog UI
+   *
    * @since 6.0
    */
   render () {
@@ -129,6 +138,20 @@ export class CloseDialog extends React.Component {
   }
 }
 
+/**
+ * Map redux state to props
+ *
+ * @param state: object
+ *
+ * @returns {{
+ *  templateList: array of object,
+ *  fontList: array of object,
+ *  selectedFont: string,
+ *  msg: object
+ * }}
+ *
+ * @since 6.0
+ */
 const mapStateToProps = state => ({
   templateList: state.template.list,
   fontList: state.fontManager.fontList,
@@ -136,6 +159,11 @@ const mapStateToProps = state => ({
   msg: state.fontManager.msg
 })
 
+/**
+ * Connect and dispatch redux actions as props
+ *
+ * @since 6.0
+ */
 export default withRouter(connect(mapStateToProps, {
   getCustomFontList,
   clearAddFontMsg
