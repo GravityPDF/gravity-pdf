@@ -52,7 +52,6 @@ rm --force -R "${PACKAGE_DIR}/src/assets/js"
 rm --force -R "${PACKAGE_DIR}/bin"
 rm --force -R "${PACKAGE_DIR}/.php-scoper"
 rm --force -R "${PACKAGE_DIR}/webpack-configs"
-yarn env docker-run php rm -R "${PACKAGE_DIR}/vendor/mpdf/mpdf/ttfonts"
 
 # Generate translation file
 cd ${PACKAGE_DIR}
