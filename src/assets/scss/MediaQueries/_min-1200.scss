@@ -1,39 +1,39 @@
 @use '../base';
 
-/* 1200px and up */
-@media only screen and (min-width: 1200px) {
-
+/* 961px up to 1200px*/
+@media only screen and (min-width: 961px) and (max-width: 1200px) {
   #tab_pdf, #tab_PDF {
 
     /* Font manager modal */
     #font-manager-overlay {
       .font-manager {
-        .theme-about {
-          #gfpdf-font-manager-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            color: base.$default-text-color;
+        #gfpdf-font-manager-container {
 
-            /* Font list */
-            .font-list-column {
-              .font-list {
-                max-height: 600px;
-                box-shadow: unset;
-              }
+          /* Add font */
+          .add-font-column {
+            .update-font {
+              left: -450px;
             }
+          }
+        }
+      }
+    }
+  }
+}
 
-            /* Add font */
-            .add-font-column {
-              padding-top: 0;
+/* 1201px up to 1470px */
+@media only screen and (min-width: 1201px) and (max-width: 1470px) {
+  #tab_pdf, #tab_PDF {
 
-              form {
-                .footer {
-                  .msg {
-                    font-size: 13px;
-                  }
-                }
-              }
+    /* Font manager modal */
+    #font-manager-overlay {
+      .font-manager {
+        #gfpdf-font-manager-container {
+
+          /* Add font */
+          .add-font-column {
+            .update-font {
+              left: -590px;
             }
           }
         }

@@ -1,7 +1,23 @@
+/* Dependencies */
 import React from 'react'
 import PropTypes from 'prop-types'
 import { sprintf } from 'sprintf-js'
 
+/**
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2020, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       6.0
+ */
+
+/**
+ * Display information for drop box font variant label
+ *
+ * @param label
+ * @param font
+ *
+ * @since 6.0
+ */
 const FontVariantLabel = ({ label, font }) => (
   <div htmlFor={'gfpdf-font-variant-' + label}>
     {(label === 'regular' && font === 'false') && (
@@ -18,6 +34,11 @@ const FontVariantLabel = ({ label, font }) => (
   </div>
 )
 
+/**
+ * PropTypes
+ *
+ * @since 6.0
+ */
 FontVariantLabel.propTypes = {
   label: PropTypes.string.isRequired,
   font: PropTypes.string

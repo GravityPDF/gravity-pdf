@@ -1,8 +1,30 @@
+/* Dependencies */
 import React from 'react'
 import PropTypes from 'prop-types'
 import Dropzone from 'react-dropzone'
+/* Components */
 import FontVariantLabel from './FontVariantLabel'
 
+/**
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2020, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       6.0
+ */
+
+/**
+ * Display font variant drop box UI
+ *
+ * @param state
+ * @param fontStyles
+ * @param validateRegular
+ * @param onHandleUpload
+ * @param onHandleDeleteFontStyle
+ * @param error
+ * @param tabIndex
+ *
+ * @since 6.0
+ */
 export const FontVariant = ({
   state,
   fontStyles,
@@ -14,7 +36,7 @@ export const FontVariant = ({
 }) => (
   <div id='gfpdf-font-files-setting'>
     {Object.entries(fontStyles).map(([key, font]) => {
-      const id = 'gfpdf-font-variant-' + key
+      const id = 'gfpdf-font-variant-' + key + ' ' + state
       const ariaLabelledby = id + ' gfpdf-font-files-label'
       const ariaDescribedby = 'gfpdf-font-files-description'
       const currentUploadFontName = font !== '' && typeof font !== 'object'
@@ -74,6 +96,11 @@ export const FontVariant = ({
   </div>
 )
 
+/**
+ * PropTypes
+ *
+ * @since 6.0
+ */
 FontVariant.propTypes = {
   state: PropTypes.string.isRequired,
   fontStyles: PropTypes.object.isRequired,

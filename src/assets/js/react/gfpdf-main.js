@@ -54,22 +54,22 @@ $(function () {
     helpBootstrap()
   }
 
-  const FmGeneralSettingsTab = document.querySelector('#gfpdf-settings-field-wrapper-default_font')
-  const FmToolsTab = document.querySelector('#gfpdf-settings-field-wrapper-manage_fonts')
-  const FmPdfSettings = document.querySelector('#gfpdf-settings-field-wrapper-font')
+  const fmGeneralSettingsTab = document.querySelector('#gfpdf-settings-field-wrapper-default_font')
+  const fmToolsTab = document.querySelector('#gfpdf-settings-field-wrapper-manage_fonts')
+  const fmPdfSettings = document.querySelector('#gfpdf-settings-field-wrapper-font')
 
   /* Initialize font manager under general settings tab */
-  if (FmGeneralSettingsTab !== null) {
-    fontManagerBootstrap(FmGeneralSettingsTab)
+  if (fmGeneralSettingsTab !== null) {
+    fontManagerBootstrap(fmGeneralSettingsTab)
   }
 
   /* Initialize font manager under tools tab  */
-  if (FmToolsTab !== null) {
-    fontManagerBootstrap(FmToolsTab)
+  if (fmToolsTab !== null) {
+    fontManagerBootstrap(fmToolsTab, 'prevent-button-reset')
   }
 
   /* Initialize font manager under PDF settings */
-  if (FmPdfSettings !== null) {
-    fontManagerBootstrap(FmPdfSettings)
+  if (fmPdfSettings !== null) {
+    fontManagerBootstrap(fmPdfSettings)
   }
 })

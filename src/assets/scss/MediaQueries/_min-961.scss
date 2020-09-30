@@ -1,61 +1,38 @@
 @use '../base';
 
-//@media only screen and (max-width: 960px) {
-//  #tab_pdf, #tab_PDF {
-//
-//    /* Font manager modal */
-//    #font-manager-overlay {
-//      .font-manager {
-//        #gfpdf-font-manager-container {
-//          display: flex;
-//          flex-direction: column;
-//        }
-//      }
-//    }
-//  }
-//}
-
-/* 961px and up */
-@media only screen and (min-width: 961px) {
-
+/* 960px and below */
+@media only screen and (max-width: 960px) {
   #tab_pdf, #tab_PDF {
 
     /* Font manager modal */
     #font-manager-overlay {
-      //.font-manager {
-      //  .theme-about {
-      //    #gfpdf-font-manager-container {
-      //      display: grid;
-      //      grid-template-columns: 1fr 1fr;
-      //      gap: 2rem;
-      //      color: base.$default-text-color;
-      //
-      //      /* Font list */
-      //      .font-list-column {
-      //        .font-list {
-      //          max-height: 600px;
-      //          box-shadow: unset;
-      //        }
-      //      }
-      //
-      //      /* Add font */
-      //      .add-font-column {
-      //        padding-top: 0;
-      //
-      //        form {
-      //          .footer {
-      //            .msg {
-      //              display: inline-block;
-      //              padding-top: 8px;
-      //              vertical-align: middle;
-      //            }
-      //          }
-      //        }
-      //      }
-      //    }
-      //  }
-      //}
+      .font-manager {
+        #gfpdf-font-manager-container {
+          display: flex;
+          flex-direction: column;
+
+          /* Font list */
+          .font-list-column {
+            .font-list {
+              width: 85%;
+            }
+          }
+
+          /* Add font */
+          .add-font-column {
+            .update-font {
+              left: -800px;
+            }
+          }
+        }
+      }
     }
+  }
+}
+
+/* 961px and up */
+@media only screen and (min-width: 961px) {
+  #tab_pdf, #tab_PDF {
 
     /* Help tab section */
     .about-wrap {

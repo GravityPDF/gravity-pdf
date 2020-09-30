@@ -1,5 +1,7 @@
-import { api } from './api'
+/* Dependencies */
 import { serialize } from 'object-to-formdata'
+/* APIs */
+import { api } from './api'
 
 /**
  * @package     Gravity PDF
@@ -8,6 +10,13 @@ import { serialize } from 'object-to-formdata'
  * @since       6.0
  */
 
+/**
+ * Fetch API request to obtain custom font list (GET)
+ *
+ * @returns Promise response
+ *
+ * @since 6.0
+ */
 export const apiGetCustomFontList = () => {
   const url = GFPDF.restUrl + 'fonts/'
 
@@ -19,6 +28,15 @@ export const apiGetCustomFontList = () => {
   })
 }
 
+/**
+ * Fetch API request to add new font (POST)
+ *
+ * @param font: object
+ *
+ * @returns Promise response
+ *
+ * @since 6.0
+ */
 export const apiAddFont = font => {
   const url = GFPDF.restUrl + 'fonts/'
   const formData = serialize(font)
@@ -32,6 +50,16 @@ export const apiAddFont = font => {
   })
 }
 
+/**
+ * Fetch API request to edit font details (POST)
+ *
+ * @param id: string
+ * @param font: object
+ *
+ * @returns Promise response
+ *
+ * @since 6.0
+ */
 export const apiEditFont = ({ id, font }) => {
   const url = GFPDF.restUrl + 'fonts/' + id
   const data = { ...font }
@@ -46,6 +74,15 @@ export const apiEditFont = ({ id, font }) => {
   })
 }
 
+/**
+ * Fetch API request to delete existing font (DELETE)
+ *
+ * @param id: string
+ *
+ * @returns Promise response
+ *
+ * @since 6.0
+ */
 export const apiDeleteFont = id => {
   const url = GFPDF.restUrl + 'fonts/' + id
 

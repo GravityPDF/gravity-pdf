@@ -18,19 +18,10 @@
       }
 
       #gfpdf-font-manager-container {
-        //background-color: #ffffff;
-        //display: flex;
-        //flex-direction: column;
-        //height: 100%;
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 2rem;
         color: base.$default-text-color;
-        //padding: 0% 0% 0% 4%;
-
-        //.container {
-        //  padding: 4% 0%;
-        //}
 
         .wp-filter-search {
           width: 60%;
@@ -42,15 +33,12 @@
 
         /* Font list */
         .font-list-column {
-          //width: 95%;
           z-index: 2;
           background-color: #ffffff;
-          //margin-bottom: 1rem;
 
           .font-list {
             margin-top: 1rem;
             overflow: auto;
-            //max-height: 350px;
             max-height: 600px;
             box-shadow: 0 1px 1px rgba(0,0,0,.04);
 
@@ -142,18 +130,10 @@
         .add-font-column {
           display: flex;
           position: relative;
-          //width: 90%;
-          //padding-top: 1rem;
-          //overflow: hidden;
-          //
-          //&.overflow {
-          //  overflow: unset;
-          //}
           width: 100%;
-          //overflow: auto;
-          //overflow: hidden;
 
-          #gfpdf-font-name-input {
+          #gfpdf-add-font-name-input,
+          #gfpdf-update-font-name-input {
             width: 100%;
           }
 
@@ -164,6 +144,7 @@
 
           .update-font {
             background-color: #ffffff;
+            padding-right: 0.5rem;
             position: absolute;
             left: -720px;
             transition: 0.5s;
@@ -269,8 +250,6 @@
                 }
 
                 .gfpdf-font-filename {
-                  //width: 100%;
-                  //white-space: nowrap;
                   overflow: hidden;
                   text-align: center;
 
