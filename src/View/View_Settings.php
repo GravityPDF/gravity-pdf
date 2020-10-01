@@ -168,10 +168,10 @@ class View_Settings extends Helper_Abstract_View {
 				'id'   => 'tools',
 			],
 
-//			120 => [
-//				'name' => esc_html__( 'Help', 'gravity-forms-pdf-extended' ),
-//				'id'   => 'help',
-//			],
+			//          120 => [
+			//              'name' => esc_html__( 'Help', 'gravity-forms-pdf-extended' ),
+			//              'id'   => 'help',
+			//          ],
 		];
 
 		/* Add License tab if necessary */
