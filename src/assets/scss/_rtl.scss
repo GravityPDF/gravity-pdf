@@ -1,0 +1,47 @@
+
+.rtl {
+
+  /*
+   * Setting Description
+   */
+  .gform-settings-panel__content {
+
+    .gform-settings-description {
+      float: right;
+      width: 100%;
+    }
+
+    label {
+      float: right;
+      margin-left: 5px;
+    }
+
+  }
+
+  /*
+   * Color Picker
+   */
+  .wp-picker-container {
+
+    .wp-color-result.button {
+      padding-left: 0;
+      padding-right: 35px;
+    }
+
+  }
+
+  /*
+   * Template Manager
+   */
+  #gfpdf-template-container .theme .theme-actions {
+    right: inherit;
+    left: 0;
+  }
+
+  #gfpdf-overlay h1 {
+    float: right;
+    padding-left: 0;
+    padding-right: 2%;
+  }
+
+}

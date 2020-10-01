@@ -41,7 +41,7 @@ env:
 
 before_install:
   - nvm install --lts
-  - yarn global add gulp-cli && yarn
+  - yarn
   - yarn prebuild:core-fonts $GITHUB_CREDENTIALS
   - |
     if [[ "$INSTALL_WORDPRESS" = "true" ]]; then
@@ -67,8 +67,10 @@ install:
       npm run env connect
       if [[ "$INSTALL_COMPOSER" = "2" ]]; then
         npm run env docker-run -- php composer install --no-dev
+        bash ./bin/vendor-prefix.sh
       else
         npm run env docker-run -- php composer install
+        bash ./bin/vendor-prefix.sh
       fi
     fi
 
@@ -80,7 +82,6 @@ jobs:
       env: INSTALL_WORDPRESS=false INSTALL_COMPOSER=1
       script:
         - |
-          npm run lint:php:format &&
           npm run lint:php
 
     - name: PHP Compatibility
@@ -96,7 +97,7 @@ jobs:
     - name: E2E Testing
       env: LOCAL_PHP=7.4-fpm
       script:
-        - npm run test:js-e2e:headless
+        - npm run test:e2e:headless
 
     - name: PHP 7.4 unit tests
       env: LOCAL_PHP=7.4-fpm
@@ -112,45 +113,17 @@ jobs:
           npm run test:php && npm run test:php -- --group ajax &&
           npm run test:php:multisite && npm run test:php:multisite -- --group ajax
 
-    - name: PHP 7.2 unit tests
-      env: LOCAL_PHP=7.2-fpm
-      script:
-        - |
-          npm run test:php &&
-          npm run test:php -- --group ajax
-
-    - name: PHP 7.1 unit tests
-      env: LOCAL_PHP=7.1-fpm
-      script:
-        - |
-          npm run test:php &&
-          npm run test:php -- --group ajax
-
-    - name: PHP 7.0 unit tests
-      env: LOCAL_PHP=7.0-fpm
-      script:
-        - |
-          npm run test:php &&
-          npm run test:php -- --group ajax
-
-    - name: PHP 5.6 unit tests
-      env: LOCAL_PHP=5.6-fpm
-      script:
-        - |
-          npm run test:php &&
-          npm run test:php -- --group ajax
-
     - name: JS and PHP Coverage
-      env: LOCAL_PHP=7.3-fpm LOCAL_PHP_XDEBUG=true
+      env: LOCAL_PHP=7.4-fpm LOCAL_PHP_XDEBUG=true
       script:
         - |
-          npm run test:js-unit:coverage &&
+          npm run test:js:coverage &&
           npm run test:php -- --coverage-clover=tmp/coverage/report-xml/php-coverage1.xml &&
           npm run test:php -- --coverage-clover=tmp/coverage/report-xml/php-coverage2.xml --group ajax
 
     - stage: Deploy
       name: Package and Push to WordPress.org
-      env: INSTALL_WORDPRESS=false LOCAL_PHP=5.6-fpm INSTALL_COMPOSER=2
+      env: INSTALL_WORDPRESS=false LOCAL_PHP=7.3-fpm INSTALL_COMPOSER=2
       script:
         - |
           bash ./bin/package.sh $TRAVIS_TAG $TRAVIS_BRANCH &&

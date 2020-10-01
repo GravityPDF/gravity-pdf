@@ -27,9 +27,9 @@ interface Helper_Interface_Config {
 	 * The "fields" array allows a template to load in custom fields. It is based on our \GFPDF\Helper\Helper_Abstract_Options Settings API
 	 * See the Helper_Options_Fields::register_settings() method for the exact fields that can be passed in
 	 *
+	 * @return array
 	 * @since 4.0
 	 *
-	 * @return array
 	 */
 	public function configuration();
 }

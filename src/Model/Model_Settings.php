@@ -7,8 +7,10 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
+use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Helper\Helper_Templates;
 use Psr\Log\LoggerInterface;
 
@@ -37,7 +39,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 *
 	 * @var array
 	 *
-	 * @since 4.0
+	 * @since    4.0
 	 *
 	 * @Internal Deprecated method
 	 */
@@ -46,7 +48,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
-	 * @var \GFPDF\Helper\Helper_Form
+	 * @var Helper_Form
 	 *
 	 * @since 4.0
 	 */
@@ -65,7 +67,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * Holds our Helper_Notices object
 	 * which we can use to queue up admin messages for the user
 	 *
-	 * @var \GFPDF\Helper\Helper_Notices
+	 * @var Helper_Notices
 	 *
 	 * @since 4.0
 	 */
@@ -75,7 +77,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
-	 * @var \GFPDF\Helper\Helper_Options_Fields
+	 * @var Helper_Options_Fields
 	 *
 	 * @since 4.0
 	 */
@@ -85,7 +87,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
 	 *
-	 * @var \GFPDF\Helper\Helper_Data
+	 * @var Helper_Data
 	 *
 	 * @since 4.0
 	 */
@@ -95,7 +97,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
 	 *
-	 * @var \GFPDF\Helper\Helper_Misc
+	 * @var Helper_Misc
 	 *
 	 * @since 4.0
 	 */
@@ -105,7 +107,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * Holds our Helper_Templates object
 	 * used to ease access to our PDF templates
 	 *
-	 * @var \GFPDF\Helper\Helper_Templates
+	 * @var Helper_Templates
 	 *
 	 * @since 4.0
 	 */
@@ -114,13 +116,13 @@ class Model_Settings extends Helper_Abstract_Model {
 	/**
 	 * Set up our dependencies
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form    $gform   Our abstracted Gravity Forms helper functions
-	 * @param LoggerInterface                       $log     Our logger class
-	 * @param \GFPDF\Helper\Helper_Notices          $notices Our notice class used to queue admin messages and errors
-	 * @param \GFPDF\Helper\Helper_Abstract_Options $options Our options class which allows us to access any settings
-	 * @param \GFPDF\Helper\Helper_Data             $data    Our plugin data store
-	 * @param \GFPDF\Helper\Helper_Misc             $misc    Our miscellaneous class
-	 * @param \GFPDF\Helper\Helper_Templates        $templates
+	 * @param Helper_Abstract_Form    $gform   Our abstracted Gravity Forms helper functions
+	 * @param LoggerInterface         $log     Our logger class
+	 * @param Helper_Notices          $notices Our notice class used to queue admin messages and errors
+	 * @param Helper_Abstract_Options $options Our options class which allows us to access any settings
+	 * @param Helper_Data             $data    Our plugin data store
+	 * @param Helper_Misc             $misc    Our miscellaneous class
+	 * @param Helper_Templates        $templates
 	 *
 	 * @since 4.0
 	 */
@@ -139,7 +141,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	/**
 	 * If any errors have been passed back from the options.php page we will highlight the actual fields that caused them
 	 *
-	 * @param  array $settings The get_registered_fields() array
+	 * @param array $settings The get_registered_fields() array
 	 *
 	 * @return array
 	 *
@@ -151,7 +153,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		$errors = get_transient( 'settings_errors' );
 
 		/* Loop through errors if any and highlight the appropriate settings */
-		if ( is_array( $errors ) && sizeof( $errors ) > 0 ) {
+		if ( is_array( $errors ) && count( $errors ) > 0 ) {
 			foreach ( $errors as $error ) {
 
 				/* Skip over if not an error */
@@ -182,38 +184,15 @@ class Model_Settings extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Install the files stored in /src/templates/ to the user's template directory
-	 *
-	 * @return boolean
-	 *
-	 * @since 4.0
-	 */
-	public function install_templates() {
-
-		$destination = $this->templates->get_template_path();
-		$copy        = $this->misc->copyr( PDF_PLUGIN_DIR . 'src/templates/', $destination );
-		if ( is_wp_error( $copy ) ) {
-			$this->log->error( 'Template Installation Error.' );
-			$this->notices->add_error( sprintf( esc_html__( 'There was a problem copying all PDF templates to %s. Please try again.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $destination ) . '</code>' ) );
-
-			return false;
-		}
-
-		$this->notices->add_notice( sprintf( esc_html__( 'Gravity PDF Custom Templates successfully installed to %s.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $destination ) . '</code>' ) );
-		$this->options->update_option( 'custom_pdf_template_files_installed', true );
-
-		return true;
-	}
-
-
-	/**
 	 * Removes the current font's TTF files from our font directory
 	 *
-	 * @param  array $fonts The font config
+	 * @param array $fonts The font config
 	 *
 	 * @return boolean        True on success, false on failure
 	 *
 	 * @since  4.0
+	 *
+	 * @deprecated
 	 */
 	public function remove_font_file( $fonts ) {
 
@@ -234,13 +213,15 @@ class Model_Settings extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Check that the font name passed conforms to our expected nameing convesion
+	 * Check that the font name passed conforms to our expected naming convention
 	 *
-	 * @param  string $name The font name to check
+	 * @param string $name The font name to check
 	 *
 	 * @return boolean       True on valid, false on failure
 	 *
 	 * @since 4.0
+	 *
+	 * @deprecated
 	 */
 	public function is_font_name_valid( $name ) {
 
@@ -256,12 +237,14 @@ class Model_Settings extends Helper_Abstract_Model {
 	/**
 	 * Query our custom fonts options table and check if the font name already exists
 	 *
-	 * @param  string    $name The font name to check
+	 * @param string     $name The font name to check
 	 * @param int|string $id   The configuration ID (if any)
 	 *
 	 * @return bool True if valid, false on failure
 	 *
 	 * @since 4.0
+	 *
+	 * @deprecated
 	 */
 	public function is_font_name_unique( $name, $id = '' ) {
 
@@ -302,11 +285,13 @@ class Model_Settings extends Helper_Abstract_Model {
 	/**
 	 * Handles the database updates required to save a new font
 	 *
-	 * @param  array $fonts
+	 * @param array $fonts
 	 *
 	 * @return array
 	 *
 	 * @since 4.0
+	 *
+	 * @deprecated
 	 */
 	public function install_fonts( $fonts ) {
 
@@ -333,7 +318,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		}
 
 		/* If errors were found then return */
-		if ( sizeof( $errors ) > 0 ) {
+		if ( count( $errors ) > 0 ) {
 			$this->log->error(
 				'Install Error.',
 				[
@@ -370,7 +355,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	/**
 	 * Turn capabilities into more friendly strings
 	 *
-	 * @param  string $cap The wordpress-style capability
+	 * @param string $cap The wordpress-style capability
 	 *
 	 * @return string
 	 *
@@ -390,6 +375,8 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @return void
 	 *
 	 * @since 4.0
+	 *
+	 * @deprecated
 	 */
 	public function save_font() {
 
@@ -418,6 +405,8 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @return void
 	 *
 	 * @since 4.0
+	 *
+	 * @deprecated
 	 */
 	public function delete_font() {
 
@@ -461,11 +450,13 @@ class Model_Settings extends Helper_Abstract_Model {
 	/**
 	 * Validate user input and save as new font
 	 *
-	 * @param  array $font The four font fields to be processed
+	 * @param array $font The four font fields to be processed
 	 *
 	 * @return array
 	 *
 	 * @since 4.0
+	 *
+	 * @deprecated
 	 */
 	public function process_font( $font ) {
 
@@ -527,7 +518,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		/* Move fonts to our Gravity PDF font folder */
 		$installation = $this->install_fonts( $font );
 
-		/* Check if any errors occured installing the fonts */
+		/* Check if any errors occurred installing the fonts */
 		if ( isset( $installation['errors'] ) ) {
 
 			$return = [
@@ -543,6 +534,7 @@ class Model_Settings extends Helper_Abstract_Model {
 		}
 
 		/* If we got here the installation was successful so return the data */
+
 		return $installation;
 	}
 
@@ -554,6 +546,8 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @return string The font ID, if any
 	 *
 	 * @since 4.1
+	 *
+	 * @deprecated
 	 */
 	public function get_font_id_by_name( $font_name ) {
 		$fonts = $this->options->get_option( 'custom_fonts', [] );
@@ -568,23 +562,13 @@ class Model_Settings extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Create a file in our tmp directory and check if it is publically accessible (i.e no .htaccess protection)
-	 *
-	 * @param $_POST ['nonce']
-	 *
-	 * @return boolean
+	 * Create a file in our tmp directory and check if it is publicly accessible (i.e no .htaccess protection)
 	 *
 	 * @since 4.0
+	 *
+	 * @deprecated Functionality removed in 6.0
 	 */
-	public function check_tmp_pdf_security() {
-
-		/* User / CORS validation */
-		$this->misc->handle_ajax_authentication( 'Check Tmp Directory', 'gravityforms_view_settings', 'gfpdf-direct-pdf-protection' );
-
-		/* Create our tmp file and do our actual check */
-		echo json_encode( $this->test_public_tmp_directory_access() );
-		wp_die();
-	}
+	public function check_tmp_pdf_security() {}
 
 	/**
 	 * Create a file in our tmp directory and verify if it's protected from the public
@@ -592,52 +576,14 @@ class Model_Settings extends Helper_Abstract_Model {
 	 * @return boolean
 	 *
 	 * @since 4.0
+	 *
+	 * @deprecated Test moved in 6.0. Use Model_System_Report::test_public_tmp_directory_access()
 	 */
 	public function test_public_tmp_directory_access() {
-		$tmp_dir       = $this->data->template_tmp_location;
-		$tmp_test_file = 'public_tmp_directory_test.txt';
-		$return        = true;
+		/** @var Model_System_Report $model_system_report */
+		$model_system_report = \GPDFAPI::get_mvc_class( 'Model_System_Report' );
 
-		/* create our file */
-		file_put_contents( $tmp_dir . $tmp_test_file, 'failed-if-read' );
-
-		/* verify it exists */
-		if ( is_file( $tmp_dir . $tmp_test_file ) ) {
-
-			/* Run our test */
-			$site_url = $this->misc->convert_path_to_url( $tmp_dir );
-
-			if ( $site_url !== false ) {
-
-				$response = wp_remote_get( $site_url . $tmp_test_file );
-
-				if ( ! is_wp_error( $response ) ) {
-
-					/* Check if the web server responded with a OK status code and we can read the contents of our file, then fail our test */
-					if ( isset( $response['response']['code'] ) && $response['response']['code'] === 200 &&
-						 isset( $response['body'] ) && $response['body'] === 'failed-if-read'
-					) {
-						$response_object = $response['http_response'];
-						$raw_response    = $response_object->get_response_object();
-						$this->log->warning(
-							'PDF temporary directory not protected',
-							[
-								'url'         => $raw_response->url,
-								'status_code' => $raw_response->status_code,
-								'response'    => $raw_response->raw,
-							]
-						);
-
-						$return = false;
-					}
-				}
-			}
-		}
-
-		/* Cleanup our test file */
-		@unlink( $tmp_dir . $tmp_test_file );
-
-		return $return;
+		return $model_system_report->test_public_tmp_directory_access();
 	}
 
 	/**
@@ -723,6 +669,14 @@ class Model_Settings extends Helper_Abstract_Model {
 		foreach ( $this->data->addon as $addon ) {
 			$option_key = 'license_' . $addon->get_slug();
 
+			/* Check if the license key is now empty */
+			if ( isset( $input[ $option_key ] ) && strlen( trim( $input[ $option_key ] ) ) === 0 ) {
+				$input[ $option_key . '_message' ] = '';
+				$input[ $option_key . '_status' ]  = '';
+
+				continue;
+			}
+
 			/* Check this add-on key was submitted, it isn't the same as previously, or it's not active */
 			if ( isset( $input[ $option_key ] )
 				 && (
@@ -734,12 +688,6 @@ class Model_Settings extends Helper_Abstract_Model {
 
 				$input[ $option_key . '_message' ] = $results['message'];
 				$input[ $option_key . '_status' ]  = $results['status'];
-			}
-
-			/* Check if the license key is now empty */
-			if ( isset( $input[ $option_key ] ) && strlen( trim( $input[ $option_key ] ) ) === 0 ) {
-				$input[ $option_key . '_message' ] = '';
-				$input[ $option_key . '_status' ]  = '';
 			}
 		}
 
@@ -786,7 +734,7 @@ class Model_Settings extends Helper_Abstract_Model {
 			);
 		} else {
 			$license_data = json_decode( wp_remote_retrieve_body( $response ) );
-			$message      = '';
+			$message      = __( 'Your support license key has been successfully validated.', 'gravityforms' );
 			$status       = 'active';
 
 			if ( ! isset( $license_data->success ) || false === $license_data->success ) {
@@ -799,7 +747,11 @@ class Model_Settings extends Helper_Abstract_Model {
 
 					/* Include the expiry date if license expired */
 					if ( $license_data->error === 'expired' ) {
-						$message = sprintf( $message, date_i18n( get_option( 'date_format' ), strtotime( $license_data->expires, current_time( 'timestamp' ) ) ) );
+						$date_format = get_option( 'date_format' );
+						$dt          = new \DateTimeImmutable( $license_data->expires, wp_timezone() );
+						$date        = $dt === false ? gmdate( $date_format, false ) : $dt->format( $date_format );
+
+						$message = sprintf( $message, $date );
 					}
 				}
 
@@ -825,7 +777,7 @@ class Model_Settings extends Helper_Abstract_Model {
 	 *           $_POST['addon_name']
 	 *           $_POST['license']
 	 *
-	 * @since 4.2
+	 * @since    4.2
 	 */
 	public function process_license_deactivation() {
 

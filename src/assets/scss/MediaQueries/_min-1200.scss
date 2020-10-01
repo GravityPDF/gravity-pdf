@@ -1,0 +1,43 @@
+@use '../base';
+
+/* 1200px and up */
+@media only screen and (min-width: 1200px) {
+
+  #tab_pdf, #tab_PDF {
+
+    /* Font manager modal */
+    #font-manager-overlay {
+      .font-manager {
+        .theme-about {
+          #gfpdf-font-manager-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            color: base.$default-text-color;
+
+            /* Font list */
+            .font-list-column {
+              .font-list {
+                max-height: 600px;
+                box-shadow: unset;
+              }
+            }
+
+            /* Add font */
+            .add-font-column {
+              padding-top: 0;
+
+              form {
+                .footer {
+                  .msg {
+                    font-size: 13px;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

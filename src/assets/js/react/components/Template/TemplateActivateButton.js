@@ -55,7 +55,7 @@ export class TemplateActivateButton extends React.Component {
         onClick={this.handleSelectTemplate}
         href='#'
         tabIndex='150'
-        className='button button-primary activate'
+        className='button activate'
       >
         {this.props.buttonText}
       </a>

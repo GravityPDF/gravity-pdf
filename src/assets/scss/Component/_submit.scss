@@ -1,0 +1,12 @@
+#tab_pdf, #tab_PDF {
+  #submit-and-promo-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    grid-column: span 2 / auto;
+
+    .extensions-upsell {
+      font-style: italic;
+    }
+  }
+}

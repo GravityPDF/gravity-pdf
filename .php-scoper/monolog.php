@@ -11,7 +11,7 @@ if ( isset( $_SERVER['argv'][0] ) ) {
 
 return [
 
-	'prefix'    => 'GFPDF\\Vendor',
+	'prefix'    => 'GFPDF_Vendor',
 
 	/*
 	 * By default when running php-scoper add-prefix, it will prefix all relevant code found in the current working
@@ -21,7 +21,7 @@ return [
 	 * For more see: https://github.com/humbug/php-scoper#finders-and-paths
 	 */
 	'finders'   => [
-		Finder::create()->files()->in( $path . 'vendor/monolog/monolog/src' )->name( [ '*.php', 'LICENSE', 'composer.json' ] ),
+		Finder::create()->files()->in( $path . 'vendor/monolog/monolog/' )->name( [ '*.php', 'LICENSE' ] ),
 	],
 
 	/*

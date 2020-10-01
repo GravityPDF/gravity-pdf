@@ -37,7 +37,7 @@ class InitialiseSettings {
    */
   getCurrentSettingsPage () {
     if (pages.isSettings()) {
-      return $('.nav-tab-wrapper a.nav-tab-active:first').data('id')
+      return $('.gform-settings-tabs__navigation a.active:first').data('id')
     }
     return ''
   }

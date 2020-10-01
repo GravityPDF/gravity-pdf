@@ -1,5 +1,3 @@
-import { setupToolsTemplateInstallerDialog } from './tools/setupToolsTemplateInstallerDialog'
-import { setupToolsFontsDialog } from './tools/setupToolsFontsDialog'
 import { setupToolsUninstallDialog } from './tools/setupToolsUninstallDialog'
 
 /**
@@ -9,8 +7,6 @@ import { setupToolsUninstallDialog } from './tools/setupToolsUninstallDialog'
  */
 class ToolsSettings {
   runSetup () {
-    setupToolsTemplateInstallerDialog()
-    setupToolsFontsDialog()
     setupToolsUninstallDialog()
   }
 }

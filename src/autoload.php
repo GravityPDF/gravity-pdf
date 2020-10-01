@@ -1,7 +1,5 @@
 <?php
 
-namespace GFPDF;
-
 /**
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2020, Blue Liquid Designs
@@ -16,3 +14,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 require_once( PDF_PLUGIN_DIR . 'vendor/autoload.php' );
 require_once( PDF_PLUGIN_DIR . 'src/deprecated.php' );
 require_once( PDF_PLUGIN_DIR . 'api.php' );
+
+add_action( 'init', '\GFPDF\Deprecated\Vendor_Aliasing::maybe_alias_vendor_packages', 9999 );

@@ -13,13 +13,13 @@ export function setupAJAXListStateListener () {
     const that = this
 
     if (id.length > 0) {
-      const isActive = that.src.indexOf('active1.png') >= 0
+      const isActive = that.src.indexOf('active1.svg') >= 0
 
       if (isActive) {
-        that.src = that.src.replace('active1.png', 'active0.png')
+        that.src = that.src.replace('active1.svg', 'active0.svg')
         $(that).attr('title', GFPDF.inactive).attr('alt', GFPDF.inactive)
       } else {
-        that.src = that.src.replace('active0.png', 'active1.png')
+        that.src = that.src.replace('active0.svg', 'active1.svg')
         $(that).attr('title', GFPDF.active).attr('alt', GFPDF.active)
       }
 

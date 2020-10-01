@@ -1,7 +1,11 @@
 <?php
 
 /* For backwards compatibility reasons this file will be in the global namespace */
+
 use GFPDF\Helper\Fields\Field_V3_Products;
+use GFPDF\Helper\Helper_Mpdf;
+use GFPDF_Vendor\Mpdf\Config\FontVariables;
+use GFPDF_Vendor\Mpdf\MpdfException;
 
 /*
  * Deprecated Functionality / Classes
@@ -28,10 +32,11 @@ abstract class GFPDF_Deprecated_Abstract {
 	/**
 	 * Add user deprecated notice for missing methods
 	 *
-	 * @since  4.0
-	 *
 	 * @param string $name      The function name to be called
 	 * @param array  $arguments An enumerated array containing the parameters passed to the $name'ed method
+	 *
+	 * @since  4.0
+	 *
 	 */
 	public function __call( $name, $arguments ) {
 		trigger_error( sprintf( esc_html__( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ), E_USER_DEPRECATED );
@@ -40,10 +45,11 @@ abstract class GFPDF_Deprecated_Abstract {
 	/**
 	 * Add user deprecated notice for missing methods
 	 *
-	 * @since  4.0
-	 *
 	 * @param string $name      The function name to be called
 	 * @param array  $arguments An enumerated array containing the parameters passed to the $name'ed method
+	 *
+	 * @since  4.0
+	 *
 	 */
 	public static function __callStatic( $name, $arguments ) {
 		trigger_error( sprintf( esc_html__( '"%s" has been deprecated as of Gravity PDF 4.0', 'gravity-forms-pdf-extended' ), $name ), E_USER_DEPRECATED );
@@ -136,6 +142,7 @@ class PDFRender extends GFPDF_Deprecated_Abstract {
 		}
 
 		/* return the path to the PDF */
+
 		return $path . $filename;
 	}
 
@@ -151,9 +158,9 @@ class PDFRender extends GFPDF_Deprecated_Abstract {
 	 * @param array   $arguments The v3 arguments that get passed to the template
 	 * @param array   $args      The v4 arguments that get passed to the template
 	 *
+	 * @return integer The Gravity Form ID
 	 * @since 4.0
 	 *
-	 * @return integer The Gravity Form ID
 	 */
 	public static function prepare_ids( $form_id, $lead_id, $template, $id, $output, $filename, $arguments, $args ) {
 		global $lead_ids;
@@ -207,9 +214,9 @@ class PDF_Common extends GFPDF_Deprecated_Abstract {
 	/**
 	 * Convert merge tags to real Gravity Form values
 	 *
-	 * @param  string  $string
-	 * @param  integer $form_id
-	 * @param  integer $lead_id
+	 * @param string  $string
+	 * @param integer $form_id
+	 * @param integer $lead_id
 	 *
 	 * @return string
 	 *
@@ -321,15 +328,16 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 	/**
 	 * First legacy wrapper to generate our PDF HTML layout
 	 *
-	 * @param  array   $form The Gravity Form array
-	 * @param  array   $lead The Gravity Form entry
-	 * @param  boolean $allow_display_empty_fields
-	 * @param  boolean $show_html
-	 * @param  boolean $show_page_name
-	 * @param  boolean $return
+	 * @param array   $form The Gravity Form array
+	 * @param array   $lead The Gravity Form entry
+	 * @param boolean $allow_display_empty_fields
+	 * @param boolean $show_html
+	 * @param boolean $show_page_name
+	 * @param boolean $return
 	 *
 	 * @return string  If $return is `true` the generated HTML will be returned
 	 *
+	 * @throws Exception
 	 * @since 3.0
 	 */
 	public static function lead_detail_grid( $form, $lead, $allow_display_empty_fields = false, $show_html = false, $show_page_name = false, $return = false ) {
@@ -348,12 +356,13 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 	/**
 	 * Second legacy wrapper to generate our PDF HTML layout
 	 *
-	 * @param  array $form   The Gravity Form array
-	 * @param  array $lead   The Gravity Form entry
-	 * @param  array $config The PDF Configuration
+	 * @param array $form   The Gravity Form array
+	 * @param array $lead   The Gravity Form entry
+	 * @param array $config The PDF Configuration
 	 *
 	 * @return string        If $config['meta']['echo'] is false the HTML will be returned
 	 *
+	 * @throws Exception
 	 * @since 3.7
 	 */
 	public static function do_lead_detail_grid( $form, $lead, $config = [] ) {
@@ -369,12 +378,13 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 	/**
 	 * Loop through our form and output the results
 	 *
-	 * @param  array $form   The Gravity Form array
-	 * @param  array $lead   The Gravity Form entry
-	 * @param  array $config The PDF Configuration
+	 * @param array $form   The Gravity Form array
+	 * @param array $lead   The Gravity Form entry
+	 * @param array $config The PDF Configuration
 	 *
 	 * @return array|void
 	 *
+	 * @throws Exception
 	 * @since 4.0
 	 */
 	public static function generate_v3_html_structure( $form, $lead, $config ) {
@@ -401,7 +411,7 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 		} else {
 			?>
 			<div id='container'>
-			<h2 id='details' class='default'><?php echo $form['title']; ?></h2>
+			<h2 id='details' class='default'><?= $form['title']; ?></h2>
 			<?php
 		}
 
@@ -425,8 +435,8 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 					$results['field'][] = '<h2 id="field-' . $field->id . '" class="default entry-view-page-break">' . $form['pagination']['pages'][ $page_number ] . '</h2>';
 				} else {
 					?>
-					<h2 id="field-<?php echo $field->id; ?>"
-						class="default entry-view-page-break"><?php echo $form['pagination']['pages'][ $page_number ]; ?></h2>
+					<h2 id="field-<?= $field->id; ?>"
+						class="default entry-view-page-break"><?= $form['pagination']['pages'][ $page_number ]; ?></h2>
 					<?php
 				}
 				$page_number++;
@@ -537,6 +547,7 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 	 *
 	 * @return object
 	 *
+	 * @throws Exception
 	 * @since 4.0
 	 */
 	public static function load_legacy_html_classes( $class, $field, $entry ) {
@@ -558,7 +569,7 @@ class GFPDFEntryDetail extends GFPDF_Deprecated_Abstract {
 	 * Our default template used a number of legacy classes.
 	 * To keep backwards compatible, we will manually assign when needed.
 	 *
-	 * @param  GF_Field $field The Gravity Form Fields
+	 * @param GF_Field $field The Gravity Form Fields
 	 *
 	 * @return void (classes are passed by reference)
 	 *
@@ -695,13 +706,13 @@ if ( ! class_exists( 'mPDF' ) ) {
 	/**
 	 * Class mPDF
 	 *
-	 * Allow our legacy software to still function even though the \mPDF class no longer exists (see \Mpdf\Mpdf)
+	 * Allow our legacy software to still function even though the \mPDF class no longer exists (see \GFPDF_Vendor\Mpdf\Mpdf)
 	 *
 	 * @since 5.0
-     * phpcs:disable
+	 * phpcs:disable
 	 */
 	class mPDF {
-	    /* phpcs:enable */
+		/* phpcs:enable */
 		protected $mpdf;
 
 		/**
@@ -719,14 +730,15 @@ if ( ! class_exists( 'mPDF' ) ) {
 		 * @param int    $mgf
 		 * @param string $orientation
 		 *
+		 * @throws MpdfException
 		 * @since 5.0
 		 */
 		public function __construct( $mode = '', $format = 'A4', $default_font_size = 0, $default_font = '', $mgl = 15, $mgr = 15, $mgt = 16, $mgb = 16, $mgh = 9, $mgf = 9, $orientation = 'P' ) {
 
 			$data                = GPDFAPI::get_data_class();
-			$default_font_config = ( new \Mpdf\Config\FontVariables() )->getDefaults();
+			$default_font_config = ( new FontVariables() )->getDefaults();
 
-			$this->mpdf = new \GFPDF\Helper\Helper_Mpdf(
+			$this->mpdf = new Helper_Mpdf(
 				[
 					'fontDir'                => [
 						$data->template_font_location,
@@ -805,7 +817,7 @@ if ( ! class_exists( 'mPDF' ) ) {
 		 *
 		 * @Internal Removed from Mpdf v7
 		 *
-		 * @since 5.0
+		 * @since    5.0
 		 */
 		public function SetAutoFont( $type = 0 ) {
 			$this->mpdf->autoLangToFont   = $type === 1;

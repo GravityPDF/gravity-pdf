@@ -1,0 +1,81 @@
+@use '../base';
+
+#tab_pdf, #tab_PDF {
+  #gfpdf_settings\[template\], #gfpdf_settings\[default_template\] {
+    margin: 0 0.2rem 0.2rem 0;
+  }
+
+  .theme-wrap {
+
+    /* Header section */
+    .theme-header {
+      h1 {
+        float: left;
+        padding-left: 2%;
+      }
+    }
+
+    /* Container section */
+    #gfpdf-template-container {
+      .theme {
+        .theme-author {
+          display: block;
+        }
+
+        .theme-actions {
+          opacity: 1;
+          left: inherit;
+          border-top: none;
+          height: 41px;
+          padding: 6px 3px 0;
+          top: auto;
+          -moz-box-sizing: content-box;
+          -webkit-box-sizing: content-box;
+          box-sizing: content-box;
+          -webkit-transform: none;
+          transform: none;
+          box-shadow: none;
+        }
+
+        .doing-ajax span:after,
+        .doing-ajax:hover span:after {
+          font-family: 'FontAwesome', 'Open Sans', sans-serif;
+          content: '\f1ce';
+          font-size: 79px;
+          background: none;
+          width: auto;
+          height: auto;
+          left: 51.5%;
+          text-indent: 0;
+          -webkit-animation: fa-spin 1.5s infinite linear;
+          animation: fa-spin 1.5s infinite linear;
+        }
+
+        &.gfpdf-dropzone-active .doing-ajax span:after,
+        .doing-ajax:hover span:after,
+        .doing-ajax:focus span:after {
+          color: #FFF;
+          background: none;
+        }
+      }
+
+      .gfpdf-dropzone {
+        .dropzone {
+          .gfpdf-template-install-instructions {
+            font-size: 85%;
+            text-align: center;
+            margin-top: 5px;
+          }
+        }
+      }
+
+      .notice {
+        border-color: base.$success-color;
+
+        &.error {
+          border-color: base.$error-color;
+        }
+      }
+    }
+  }
+}

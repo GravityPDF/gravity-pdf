@@ -2,8 +2,9 @@
 
 namespace GFPDF\Tests;
 
-
 use GFPDF\Helper\Helper_Url_Signer;
+use GFPDF_Vendor\Spatie\UrlSigner\Exceptions\InvalidExpiration;
+use GFPDF_Vendor\Spatie\UrlSigner\Exceptions\InvalidSignatureKey;
 use WP_UnitTestCase;
 
 /**
@@ -20,7 +21,7 @@ use WP_UnitTestCase;
 class Test_Url_Signer extends WP_UnitTestCase {
 
 	/**
-	 * @throws \Spatie\UrlSigner\Exceptions\InvalidSignatureKey
+	 * @throws InvalidExpiration|InvalidSignatureKey
 	 *
 	 * @since 5.2
 	 */

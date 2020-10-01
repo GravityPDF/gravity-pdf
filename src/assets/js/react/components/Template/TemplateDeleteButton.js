@@ -103,7 +103,7 @@ export class TemplateDeleteButton extends React.Component {
         onClick={callback}
         href='#'
         tabIndex='150'
-        className='button button-secondary delete-theme'
+        className='button button-secondary delete-theme ed_button'
       >
         {this.props.buttonText}
       </a>

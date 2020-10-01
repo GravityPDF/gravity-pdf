@@ -1,8 +1,6 @@
 import { setupGravityForms } from './setupGravityForms'
 import { doUploadListener } from './doUploadListener'
 import { doColorPicker } from './doColorPicker'
-import { setupSelectBoxes } from './setupSelectBoxes'
-import { showTooltips } from './showTooltips'
 import { setupCustomPaperSize } from './setupCustomPaperSize'
 import { setupToggledFields } from './setupToggledFields'
 import { setupDynamicTemplateFields } from './setupDynamicTemplateFields'
@@ -23,12 +21,6 @@ class InitialiseCommonElements {
 
     /* If we have a colour picker handle the logic */
     doColorPicker()
-
-    /* If we have any select boxes to handle */
-    setupSelectBoxes()
-
-    /* Enable tooltips, if needed */
-    showTooltips()
 
     /* Setup custom paper size, if needed */
     setupCustomPaperSize()

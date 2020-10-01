@@ -45,6 +45,8 @@ class Helper_Field_Container_Void extends Helper_Field_Container {
 	/**
 	 * Empty method easily disables Helper_Field_Container functionality
 	 *
+	 * @param GF_Field $field
+	 *
 	 * @return void
 	 *
 	 * @since 4.0
@@ -55,6 +57,8 @@ class Helper_Field_Container_Void extends Helper_Field_Container {
 
 	/**
 	 * Empty method easily disables Helper_Field_Container functionality
+	 *
+	 * @param GF_Field $field
 	 *
 	 * @return void
 	 *

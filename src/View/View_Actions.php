@@ -33,9 +33,9 @@ class View_Actions extends Helper_Abstract_View {
 	/**
 	 * Add our primary button and an opt-our dismissal button
 	 *
-	 * @param  string $type        The action ID
-	 * @param  string $button_text The primary button text
-	 * @param  string $dismissal   Whether the dismissal button should be shown. Valid arguments are 'enabled' or 'disabled'
+	 * @param string $type        The action ID
+	 * @param string $button_text The primary button text
+	 * @param string $dismissal   Whether the dismissal button should be shown. Valid arguments are 'enabled' or 'disabled'
 	 *
 	 * @return string              The action_buttons HTML
 	 *
@@ -56,28 +56,10 @@ class View_Actions extends Helper_Abstract_View {
 	}
 
 	/**
-	 * Load our v3 to v4 Migration Notice
-	 *
-	 * @param  string $type        The action ID
-	 * @param  string $button_text The primary button text
-	 *
-	 * @return string              The notice HTML
-	 *
-	 * @since 4.0
-	 */
-	public function migration( $type, $button_text ) {
-
-		$html  = $this->load( 'migration', [], false );
-		$html .= $this->get_action_buttons( $type, $button_text, 'disabled' );
-
-		return $html;
-	}
-
-	/**
 	 * Load our Core Font Installer
 	 *
-	 * @param  string $type        The action ID
-	 * @param  string $button_text The primary button text
+	 * @param string $type        The action ID
+	 * @param string $button_text The primary button text
 	 *
 	 * @return string              The notice HTML
 	 *

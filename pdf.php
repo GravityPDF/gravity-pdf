@@ -1,10 +1,11 @@
 <?php
 /*
 Plugin Name: Gravity PDF
-Version: 5.3.1
+Version: 6.0.0-beta1
 Description: Automatically generate highly-customisable PDF documents using Gravity Forms.
 Author: Gravity PDF
 Author URI: https://gravitypdf.com
+Plugin URI: https://wordpress.org/plugins/gravity-forms-pdf-extended/
 Text Domain: gravity-forms-pdf-extended
 Domain Path: /src/assets/languages
 */
@@ -23,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*
  * Set base constants we'll use throughout the plugin
  */
-define( 'PDF_EXTENDED_VERSION', '5.3.1' ); /* the current plugin version */
+define( 'PDF_EXTENDED_VERSION', '6.0.0-beta1' ); /* the current plugin version */
 define( 'PDF_PLUGIN_DIR', plugin_dir_path( __FILE__ ) ); /* plugin directory path */
 define( 'PDF_PLUGIN_URL', plugin_dir_url( __FILE__ ) ); /* plugin directory url */
 define( 'PDF_PLUGIN_BASENAME', plugin_basename( __FILE__ ) ); /* the plugin basename */
@@ -77,7 +78,7 @@ class GFPDF_Major_Compatibility_Checks {
 	 *
 	 * @since 4.0
 	 */
-	public $required_gf_version = '2.3.1';
+	public $required_gf_version = '2.5-beta-1';
 
 	/**
 	 * The plugin's required WordPress version
@@ -86,22 +87,16 @@ class GFPDF_Major_Compatibility_Checks {
 	 *
 	 * @since 4.0
 	 */
-	public $required_wp_version = '4.8';
+	public $required_wp_version = '5.3';
 
 	/**
 	 * The plugin's required PHP version
-	 *
-	 * Gravity PDF 4.0 is such a major release that we can afford to also bump up the version requirements.
-	 * We really wanted to bump this up to an actively supported version of PHP (http://php.net/supported-versions.php)
-	 * but with WordPress supporting PHP5.2+ (and making no moves to increase this) we had to strike a balance.
-	 *
-	 * The initial release will require PHP 5.4 which will strike a better balance.
 	 *
 	 * @var string
 	 *
 	 * @since 4.0
 	 */
-	public $required_php_version = '5.6';
+	public $required_php_version = '7.3';
 
 	/**
 	 * Set our required variables for a fallback and attempt to initialise
@@ -121,8 +116,6 @@ class GFPDF_Major_Compatibility_Checks {
 	/**
 	 * Load the plugin
 	 *
-	 * @return void
-	 *
 	 * @since 4.0
 	 */
 	public function init() {
@@ -130,9 +123,7 @@ class GFPDF_Major_Compatibility_Checks {
 	}
 
 	/**
-	 * Check if dependancies are met and load plugin, otherwise display errors
-	 *
-	 * @return void
+	 * Check if dependencies are met and load plugin, otherwise display errors
 	 *
 	 * @since 4.0
 	 */
@@ -149,10 +140,10 @@ class GFPDF_Major_Compatibility_Checks {
 		$this->check_ram( ini_get( 'memory_limit' ) );
 
 		/* Check if any errors were thrown, enqueue them and exit early */
-		if ( sizeof( $this->notices ) > 0 ) {
+		if ( count( $this->notices ) > 0 ) {
 			add_action( 'admin_notices', array( $this, 'display_notices' ) );
 
-			return null;
+			return;
 		}
 
 		require_once $this->path . 'src/bootstrap.php';
@@ -188,8 +179,14 @@ class GFPDF_Major_Compatibility_Checks {
 	public function check_gravity_forms() {
 
 		/* Gravity Forms version not compatible */
-		if ( ! class_exists( 'GFCommon' ) || ! version_compare( GFCommon::$version, $this->required_gf_version, '>=' ) ) {
-			$this->notices[] = sprintf( esc_html__( '%1$sGravity Forms%2$s Version %3$s is required. %4$sGet more info%5$s.', 'gravity-forms-pdf-extended' ), '<a href="https://rocketgenius.pxf.io/c/1211356/445235/7938">', '</a>', $this->required_gf_version, '<a href="https://gravitypdf.com/documentation/v5/user-activation-errors/#gravityforms-version">', '</a>' );
+		if ( ! class_exists( 'GFCommon' ) ) {
+			$this->notices[] = sprintf( esc_html__( '%1$sGravity Forms%2$s is required to use Gravity PDF. %4$sGet more info%5$s.', 'gravity-forms-pdf-extended' ), '<a href="https://rocketgenius.pxf.io/c/1211356/445235/7938">', '</a>', $this->required_gf_version, '<a href="https://gravitypdf.com/documentation/v5/user-activation-errors/#gravityforms-not-installed">', '</a>' );
+
+			return false;
+		}
+
+		if ( ! version_compare( GFCommon::$version, $this->required_gf_version, '>=' ) ) {
+			$this->notices[] = sprintf( esc_html__( '%1$sGravity Forms%2$s Version %3$s or higher is required. %4$sGet more info%5$s.', 'gravity-forms-pdf-extended' ), '<a href="https://rocketgenius.pxf.io/c/1211356/445235/7938">', '</a>', $this->required_gf_version, '<a href="https://gravitypdf.com/documentation/v5/user-activation-errors/#gravityforms-version">', '</a>' );
 
 			return false;
 		}
@@ -377,8 +374,6 @@ class GFPDF_Major_Compatibility_Checks {
 
 	/**
 	 * Helper function to easily display error messages
-	 *
-	 * @return void
 	 *
 	 * @since 4.0
 	 */

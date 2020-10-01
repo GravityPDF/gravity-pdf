@@ -37,7 +37,6 @@ FILES=(
 "${PACKAGE_DIR}/composer.lock"
 "${PACKAGE_DIR}/package.json"
 "${PACKAGE_DIR}/yarn.lock"
-"${PACKAGE_DIR}/gulpfile.js"
 "${PACKAGE_DIR}/.babelrc"
 "${PACKAGE_DIR}/webpack.config.js"
 "${PACKAGE_DIR}/php-scoper.phar"
@@ -53,4 +52,8 @@ rm --force -R "${PACKAGE_DIR}/src/assets/js"
 rm --force -R "${PACKAGE_DIR}/bin"
 rm --force -R "${PACKAGE_DIR}/.php-scoper"
 rm --force -R "${PACKAGE_DIR}/webpack-configs"
-yarn env docker-run php rm -R "${PACKAGE_DIR}/vendor/mpdf/mpdf/ttfonts"
+
+# Generate translation file
+cd ${PACKAGE_DIR}
+npm install --global wp-pot-cli
+wp-pot --domain gravity-forms-pdf-extended --src 'src/**/*.php' --src 'pdf.php' --src 'api.php' --package 'Gravity PDF' --dest-file src/assets/languages/gravity-forms-pdf-extended.pot > /dev/null

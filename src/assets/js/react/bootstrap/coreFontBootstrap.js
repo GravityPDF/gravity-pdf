@@ -20,7 +20,7 @@ const Routes = lazy(() => import('../router/coreFontRouter'))
  * @since 5.0
  */
 export default function coreFontBootstrap () {
-  const container = document.getElementById('gfpdf-install-core-fonts')
+  const container = document.getElementById('gfpdf-button-wrapper-install_core_fonts')
   const button = container.getElementsByTagName('button')[0]
   const store = getStore()
 

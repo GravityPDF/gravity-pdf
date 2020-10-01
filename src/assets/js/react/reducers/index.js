@@ -2,6 +2,7 @@ import { combineReducers } from 'redux'
 import templateReducer from './templateReducer'
 import coreFontsReducer from './coreFontReducer'
 import helpReducer from './helpReducer'
+import fontManagerReducer from './fontManagerReducer'
 
 /**
  * Combine our Redux reducers for use in a single store
@@ -9,8 +10,11 @@ import helpReducer from './helpReducer'
  *
  * @since 4.1
  */
-export default combineReducers({
-  template: templateReducer,
-  coreFonts: coreFontsReducer,
-  help: helpReducer
-})
+export function setupReducers () {
+  return combineReducers({
+    template: templateReducer,
+    coreFonts: coreFontsReducer,
+    help: helpReducer,
+    fontManager: fontManagerReducer
+  })
+}

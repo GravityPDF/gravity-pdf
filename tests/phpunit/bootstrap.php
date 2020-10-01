@@ -119,7 +119,6 @@ class GravityPDF_Unit_Tests_Bootstrap {
 			'gravityform-1'   => 'gravityform-1-entries.json',
 		];
 
-
 		foreach ( $entries as $id => $json ) {
 			$entries   = json_decode( trim( file_get_contents( dirname( __FILE__ ) . '/unit-tests/json/' . $json ) ), true );
 			$entry_ids = GFAPI::add_entries( $entries, $this->form[ $id ]['id'] );
@@ -132,7 +131,7 @@ class GravityPDF_Unit_Tests_Bootstrap {
 
 				/* We only need to run this once */
 				if ( ! isset( $this->form_data[ $id ] ) ) {
-					$this->form_data[ $id ][] = GFPDFEntryDetail::lead_detail_grid_array( $this->form[ $id ], $entry );
+					$this->form_data[ $id ][] = GPDFAPI::get_form_data( $entry['id'] );
 				}
 			}
 		}

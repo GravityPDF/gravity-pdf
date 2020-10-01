@@ -39,7 +39,7 @@ export default class CoreFontListResults extends React.Component {
     return (!lines.length) ? null : (
       <div
         data-test='component-coreFont-container'
-        className='gfpdf-core-font-container'
+        className='gfpdf-core-font-list-results-container'
       >
         {lines.map((key) =>
           <div

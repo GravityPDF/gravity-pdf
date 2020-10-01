@@ -2,12 +2,12 @@
 
 namespace GFPDF\Model;
 
-use GFPDF\Helper\Helper_Abstract_Pdf_Shortcode;
+use Exception;
 use GFPDF\Exceptions\GravityPdfShortcodeEntryIdException;
 use GFPDF\Exceptions\GravityPdfShortcodePdfConditionalLogicFailedException;
 use GFPDF\Exceptions\GravityPdfShortcodePdfConfigNotFoundException;
 use GFPDF\Exceptions\GravityPdfShortcodePdfInactiveException;
-
+use GFPDF\Helper\Helper_Abstract_Pdf_Shortcode;
 use GPDFAPI;
 
 /**
@@ -47,7 +47,7 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 	 * @internal Deprecated in 5.2. Use self::process()
 	 */
 	public function gravitypdf( $attributes ) {
-		_doing_it_wrong( __METHOD__, __( 'This method has been superceeded by self::process()', 'gravity-forms-pdf-extended' ), '5.2' );
+		_doing_it_wrong( __METHOD__, __( 'This method has been superseded by self::process()', 'gravity-forms-pdf-extended' ), '5.2' );
 
 		return $this->process( $attributes );
 	}
@@ -66,7 +66,7 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 	public function process( $attributes ) {
 		$controller = $this->getController();
 
-		$shortcode_error_messages_enabled = $this->options->get_option( 'debug_mode', 'No' ) === 'Yes' ? true : false;
+		$shortcode_error_messages_enabled = $this->options->get_option( 'debug_mode', 'No' ) === 'Yes';
 		$has_view_permissions             = $shortcode_error_messages_enabled && $this->gform->has_capability( 'gravityforms_view_entries' );
 
 		/* merge in any missing defaults */
@@ -123,7 +123,7 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 			return $has_view_permissions ? $controller->view->pdf_not_active() : '';
 		} catch ( GravityPdfShortcodePdfConditionalLogicFailedException $e ) {
 			return $has_view_permissions ? $controller->view->conditional_logic_not_met() : '';
-		} catch ( \Exception $e ) {
+		} catch ( Exception $e ) {
 			return $has_view_permissions ? $e->getMessage() : '';
 		}
 	}

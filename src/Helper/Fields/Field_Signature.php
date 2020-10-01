@@ -2,9 +2,8 @@
 
 namespace GFPDF\Helper\Fields;
 
-use GFPDF\Helper\Helper_Abstract_Fields;
-
 use GFFormsModel;
+use GFPDF\Helper\Helper_Abstract_Fields;
 
 /**
  * @package     Gravity PDF
@@ -37,7 +36,7 @@ class Field_Signature extends Helper_Abstract_Fields {
 	public function html( $value = '', $label = true ) {
 		$value = $this->value();
 
-		$output = ( ! $this->is_empty() ) ? $value['img'] : ''; /* prevents image loading error when non existant */
+		$output = ( ! $this->is_empty() ) ? $value['img'] : ''; /* prevents image loading error when non existent */
 
 		return parent::html( $output );
 	}

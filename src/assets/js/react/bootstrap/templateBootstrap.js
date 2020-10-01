@@ -59,10 +59,9 @@ export default function templateBootstrap ($templateField) {
  */
 export function createTemplateMarkup ($templateField) {
   $templateField
-    .next()
-    .after('<span id="gpdf-advance-template-selector">')
-    .next()
-    .after('<div id="gfpdf-overlay" class="theme-overlay">')
+    .parent()
+    .append('<span id="gpdf-advance-template-selector">')
+    .append('<div id="gfpdf-overlay" class="theme-overlay">')
 }
 
 /**
@@ -83,7 +82,6 @@ export function activeTemplateStoreListener (store, $templateField) {
     if ($templateField.val() !== template) {
       $templateField
         .val(template)
-        .trigger('chosen:updated')
         .trigger('change')
     }
   }))

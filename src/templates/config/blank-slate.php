@@ -2,6 +2,7 @@
 
 namespace GFPDF\Templates\Config;
 
+use GFPDF\Helper\Helper_Abstract_Config_Settings;
 use GFPDF\Helper\Helper_Interface_Config;
 
 /**
@@ -35,7 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 4.0
  */
-class Blank_Slate implements Helper_Interface_Config {
+class Blank_Slate extends Helper_Abstract_Config_Settings implements Helper_Interface_Config {
 
 	/**
 	 * Return the templates configuration structure which control what extra fields will be shown in the "Template" tab when configuring a form's PDF.

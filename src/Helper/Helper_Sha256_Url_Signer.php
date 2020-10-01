@@ -2,7 +2,7 @@
 
 namespace GFPDF\Helper;
 
-use Spatie\UrlSigner\BaseUrlSigner;
+use GFPDF_Vendor\Spatie\UrlSigner\BaseUrlSigner;
 
 /**
  * @package     Gravity PDF
@@ -25,8 +25,8 @@ class Helper_Sha256_Url_Signer extends BaseUrlSigner {
 	/**
 	 * Generate a token to identify the secure action.
 	 *
-	 * @param \League\Url\UrlImmutable|string $url
-	 * @param string                          $expiration
+	 * @param string $url
+	 * @param string $expiration
 	 *
 	 * @return string
 	 */

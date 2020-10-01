@@ -2,9 +2,8 @@
 
 namespace GFPDF\Tests;
 
-use WP_UnitTestCase;
-
 use ReflectionClass;
+use WP_UnitTestCase;
 
 /**
  * Test Gravity PDF Interfaces

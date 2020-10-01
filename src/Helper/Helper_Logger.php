@@ -2,16 +2,15 @@
 
 namespace GFPDF\Helper;
 
-use DateTimeZone;
 use Exception;
 use GFFormsModel;
 use GFLogging;
-use GFPDF\Vendor\Monolog\Formatter\LineFormatter;
-use GFPDF\Vendor\Monolog\Handler\NullHandler;
-use GFPDF\Vendor\Monolog\Handler\StreamHandler;
-use GFPDF\Vendor\Monolog\Logger;
-use GFPDF\Vendor\Monolog\Processor\IntrospectionProcessor;
-use GFPDF\Vendor\Monolog\Processor\MemoryPeakUsageProcessor;
+use GFPDF_Vendor\Monolog\Formatter\LineFormatter;
+use GFPDF_Vendor\Monolog\Handler\NullHandler;
+use GFPDF_Vendor\Monolog\Handler\StreamHandler;
+use GFPDF_Vendor\Monolog\Logger;
+use GFPDF_Vendor\Monolog\Processor\IntrospectionProcessor;
+use GFPDF_Vendor\Monolog\Processor\MemoryPeakUsageProcessor;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -107,28 +106,12 @@ class Helper_Logger {
 	 * @since 4.2
 	 */
 	protected function setup_logger() {
-		static $timezone;
-
-		/* Set the logger timezone once (if needed) */
-		if ( ! $timezone ) {
-			$offset = (float) get_option( 'gmt_offset' );
-
-			if ( $offset !== 0.0 ) {
-				try {
-					$timezone = new DateTimeZone( ( $offset > 0 ) ? '+' . $offset : $offset );
-					Logger::setTimezone( $timezone );
-				} catch ( Exception $e ) {
-					/* do nothing */
-				}
-			}
-			$timezone = true;
-		}
-
-		/* Initialise our logger */
-		$this->log = new Logger( $this->slug );
 
 		/* Setup our Gravity Forms local file logger, if enabled */
 		try {
+			$this->log = new Logger( $this->slug );
+			$this->log->setTimezone( wp_timezone() );
+
 			$this->setup_gravityforms_logging();
 
 			/* Check if we have a handler pushed and add our Introspection and Memory Peak usage processors */
@@ -174,11 +157,11 @@ class Helper_Logger {
 
 				if ( isset( $gf_logger_settings[ $this->slug ]['enable'] ) && $gf_logger_settings[ $this->slug ]['enable'] ) {
 					$log_level    = ( isset( $gf_logger_settings[ $this->slug ]['log_level'] ) ) ? (int) $gf_logger_settings[ $this->slug ]['log_level'] : 0;
-					$log_filename = ( get_option( 'gform_enable_logging' ) ) ? $gf_logger->get_log_file_name( $this->slug ) : $gf_logger::get_log_file_name( $this->slug );
+					$log_filename = get_option( 'gform_enable_logging' ) ? $gf_logger->get_log_file_name( $this->slug ) : $gf_logger::get_log_file_name( $this->slug );
 				}
 			}
 
-			/* Enable logging if not equivalent to 0 or non-existant and not level 6 (which is apprently off in GF world) */
+			/* Enable logging if not equivalent to 0 or non-existent and not level 6 ("off" in GF world) */
 			if ( ! empty( $log_level ) && $log_level !== 6 ) {
 
 				/* Convert Gravity Forms log levels to the appropriate Monolog level */

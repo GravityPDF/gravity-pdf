@@ -3,11 +3,9 @@
 namespace GFPDF\Tests;
 
 use GFAPI;
-use GFForms;
-
 use WP_Ajax_UnitTestCase;
-use WPAjaxDieStopException;
 use WPAjaxDieContinueException;
+use WPAjaxDieStopException;
 
 
 /**
@@ -28,7 +26,7 @@ use WPAjaxDieContinueException;
  *
  * @group ajax
  * @runTestsInSeparateProcesses
- *
+ * @preserveGlobalState disabled
  */
 class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 
@@ -63,7 +61,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 	}
 
 	/**
-	 * Fix for WordPress 4.7 which seesm to close the MySQLi connection before
+	 * Fix for WordPress 4.7 which seems to close the MySQLi connection before
 	 * the class is correctly setup
 	 *
 	 * @since 4.1
@@ -175,60 +173,6 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 		unset( $gfpdf->data->form_settings );
 		$pdf = $gfpdf->options->get_pdf( $this->form_id, $this->pid );
 		$this->assertTrue( $pdf['active'] );
-	}
-
-	/**
-	 * Ensure we correctly authorise the end user
-	 *
-	 * @class Model_Actions
-	 *
-	 * @since 4.1
-	 */
-	public function test_multsite_v3_migration() {
-
-		if ( ! is_multisite() ) {
-			$this->markTestSkipped(
-				'Not running multisite tests'
-			);
-		}
-
-		/* Check for authentication failure */
-		try {
-			$this->_handleAjax( 'multisite_v3_migration' );
-		} catch ( WPAjaxDieStopException $e ) {
-			/* do nothing (error expected) */
-		}
-
-		$this->assertEquals( '401', $e->getMessage() );
-
-		/* become super admin */
-		$this->_setRole( 'administrator' );
-		grant_super_admin( get_current_user_id() );
-		$_POST['blog_id'] = 1;
-
-		/* Check for nonce failure */
-		try {
-			$this->_handleAjax( 'multisite_v3_migration' );
-		} catch ( WPAjaxDieStopException $e ) {
-			/* do nothing (error expected) */
-		}
-
-		$this->assertEquals( '401', $e->getMessage() );
-
-		/* Check for missing v3 configuration file failure */
-		$_POST['nonce'] = wp_create_nonce( 'gfpdf_multisite_migration' );
-
-		try {
-			$this->_handleAjax( 'multisite_v3_migration' );
-		} catch ( WPAjaxDieContinueException $e ) {
-			/* do nothing (error expected) */
-		}
-
-		/* Get the response */
-		$response = json_decode( $this->_last_response, true );
-
-		$this->assertArrayHasKey( 'results', $response );
-		$this->assertArrayHasKey( 'error', $response['results'] );
 	}
 
 	/**
@@ -422,169 +366,6 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 	}
 
 	/**
-	 * Test we can save the font via AJAX
-	 *
-	 * @class Model_Form_Settings
-	 *
-	 * @since 4.0
-	 */
-	public function test_save_font() {
-
-		/* set up our post data and role */
-		$this->_setRole( 'administrator' );
-
-		/* Check for nonce failure */
-		try {
-			$this->_handleAjax( 'gfpdf_font_save' );
-		} catch ( WPAjaxDieStopException $e ) {
-			/* do nothing (error expected) */
-		}
-
-		$this->assertEquals( '401', $e->getMessage() );
-
-		/* Set up a bad request by excluding required fields */
-		$_POST['nonce'] = wp_create_nonce( 'gfpdf_font_nonce' );
-
-		try {
-			$this->_handleAjax( 'gfpdf_font_save' );
-		} catch ( WPAjaxDieContinueException $e ) {
-			/* do nothing (error expected) */
-		}
-
-		$response = json_decode( $this->_last_response, true );
-		unset( $this->_last_response );
-		$this->assertEquals( 'Required fields have not been included.', $response['error'] );
-
-		/* Test for invalid font name */
-		$_POST['payload'] = [
-			'font_name' => 'My AJAX_Font',
-			'regular'   => 'myajaxfont.ttf',
-		];
-
-		try {
-			$this->_handleAjax( 'gfpdf_font_save' );
-		} catch ( WPAjaxDieContinueException $e ) {
-			/* do nothing (error expected) */
-		}
-
-		$response = json_decode( $this->_last_response, true );
-		unset( $this->_last_response );
-
-		$this->assertEquals( 'Font name is not valid. Only alphanumeric characters and spaces are accepted.', $response['error'] );
-
-		/* Test a valid installation */
-		touch( ABSPATH . 'myajaxfont.ttf' );
-
-		$_POST['payload'] = [
-			'font_name' => 'My AJAX Font',
-			'regular'   => ABSPATH . 'myajaxfont.ttf',
-		];
-
-		try {
-			$this->_handleAjax( 'gfpdf_font_save' );
-		} catch ( WPAjaxDieContinueException $e ) {
-			/* do nothing (error expected) */
-		}
-
-		$response = json_decode( $this->_last_response, true );
-
-		$this->assertArrayHasKey( 'id', $response );
-
-	}
-
-	/**
-	 * Test we can do the process of deleting a font via AJAX
-	 * Because the database state never changes between requests we cannot
-	 * correctly install a font and then do an AJAX request (two seperate processes).
-	 * Instead, we'll just mimick a failed attempt and test the actual font removal function elsewhere
-	 *
-	 * @class Model_Form_Settings
-	 *
-	 * @since 4.0
-	 */
-	public function test_delete_font() {
-
-		/* set up our post data and role */
-		$this->_setRole( 'administrator' );
-
-		/* Check for nonce failure */
-		try {
-			$this->_handleAjax( 'gfpdf_font_delete' );
-		} catch ( WPAjaxDieStopException $e ) {
-			/* do nothing (error expected) */
-		}
-
-		$this->assertEquals( '401', $e->getMessage() );
-
-		/* Set up a real delete request */
-		$_POST['nonce'] = wp_create_nonce( 'gfpdf_font_nonce' );
-		$_POST['id']    = '';
-
-		try {
-			$this->_handleAjax( 'gfpdf_font_delete' );
-		} catch ( WPAjaxDieContinueException $e ) {
-			/* do nothing (error expected) */
-		}
-
-		$response = json_decode( $this->_last_response, true );
-		unset( $this->_last_response );
-
-		$this->assertEquals( 'Could not delete Gravity PDF font correctly. Please try again.', $response['error'] );
-	}
-
-	/**
-	 * Test our security has been implimented correctly
-	 *
-	 * @class Model_Settings
-	 *
-	 * @since 4.0
-	 */
-	public function test_check_tmp_pdf_security() {
-
-		/**
-		 * Check for authentication failure
-		 */
-		try {
-			$this->_handleAjax( 'gfpdf_has_pdf_protection' );
-		} catch ( WPAjaxDieStopException $e ) {
-			/* do nothing (error expected) */
-		}
-
-		$this->assertEquals( '401', $e->getMessage() );
-
-		/* set up our role */
-		$this->_setRole( 'administrator' );
-
-		/**
-		 * Check for nonce failure
-		 */
-		try {
-			$this->_handleAjax( 'gfpdf_has_pdf_protection' );
-		} catch ( WPAjaxDieStopException $e ) {
-			/* do nothing (error expected) */
-		}
-
-		$this->assertEquals( '401', $e->getMessage() );
-
-		/*
-		 * Do successful test
-		 */
-		$_POST['nonce'] = wp_create_nonce( 'gfpdf-direct-pdf-protection' );
-
-		try {
-			$this->_handleAjax( 'gfpdf_has_pdf_protection' );
-		} catch ( WPAjaxDieContinueException $e ) {
-			/* do nothing (error expected) */
-		}
-
-		$response = json_decode( $this->_last_response, true );
-		unset( $this->_last_response );
-
-		$this->assertTrue( $response );
-	}
-
-
-	/**
 	 * Testing Model_Templates.php wp_ajax_gfpdf_upload_template
 	 *
 	 * Because this AJAX endpoint is suppose to have a zip file POSTed,
@@ -621,7 +402,7 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 	}
 
 	/**
-	 * Check that we can succesfully delete a PDF template through this AJAX endpoint
+	 * Check that we can successfully delete a PDF template through this AJAX endpoint
 	 *
 	 * @since 4.1
 	 */

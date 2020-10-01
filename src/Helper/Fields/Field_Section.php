@@ -2,17 +2,14 @@
 
 namespace GFPDF\Helper\Fields;
 
+use Exception;
+use GF_Field;
+use GF_Field_Section;
+use GFCommon;
+use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Misc;
-use GFPDF\Helper\Helper_Abstract_Fields;
-
-use GFCommon;
-use GF_Field_Section;
-use GF_Field;
-
 use GPDFAPI;
-
-use Exception;
 
 /**
  * @package     Gravity PDF
@@ -35,11 +32,11 @@ class Field_Section extends Helper_Abstract_Fields {
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
 	 *
-	 * @param object                             $field The GF_Field_* Object
-	 * @param array                              $entry The Gravity Forms Entry
+	 * @param object               $field The GF_Field_* Object
+	 * @param array                $entry The Gravity Forms Entry
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
-	 * @param \GFPDF\Helper\Helper_Misc          $misc
+	 * @param Helper_Abstract_Form $gform
+	 * @param Helper_Misc          $misc
 	 *
 	 * @throws Exception
 	 *
@@ -58,6 +55,7 @@ class Field_Section extends Helper_Abstract_Fields {
 	/**
 	 * Used to check if the current field has a value
 	 *
+	 * @throws Exception
 	 * @since 4.0
 	 */
 	public function is_empty() {
@@ -83,7 +81,7 @@ class Field_Section extends Helper_Abstract_Fields {
 			}
 		}
 
-		/* Our custom empty checks determined the fields in the section break are infact empty */
+		/* Our custom empty checks determined the fields in the section break are in fact empty */
 		if ( $empty ) {
 			return true;
 		}

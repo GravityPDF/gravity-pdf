@@ -6,7 +6,9 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Abstract_View;
 use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Helper\Helper_Templates;
 use GFPDF_Major_Compatibility_Checks;
 use Psr\Log\LoggerInterface;
@@ -43,7 +45,7 @@ class View_Settings extends Helper_Abstract_View {
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
-	 * @var \GFPDF\Helper\Helper_Form
+	 * @var Helper_Form
 	 *
 	 * @since 4.0
 	 */
@@ -62,7 +64,7 @@ class View_Settings extends Helper_Abstract_View {
 	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
-	 * @var \GFPDF\Helper\Helper_Options_Fields
+	 * @var Helper_Options_Fields
 	 *
 	 * @since 4.0
 	 */
@@ -72,7 +74,7 @@ class View_Settings extends Helper_Abstract_View {
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
 	 *
-	 * @var \GFPDF\Helper\Helper_Data
+	 * @var Helper_Data
 	 *
 	 * @since 4.0
 	 */
@@ -82,7 +84,7 @@ class View_Settings extends Helper_Abstract_View {
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
 	 *
-	 * @var \GFPDF\Helper\Helper_Misc
+	 * @var Helper_Misc
 	 *
 	 * @since 4.0
 	 */
@@ -92,7 +94,7 @@ class View_Settings extends Helper_Abstract_View {
 	 * Holds our Helper_Templates object
 	 * used to ease access to our PDF templates
 	 *
-	 * @var \GFPDF\Helper\Helper_Templates
+	 * @var Helper_Templates
 	 *
 	 * @since 4.0
 	 */
@@ -101,17 +103,17 @@ class View_Settings extends Helper_Abstract_View {
 	/**
 	 * Setup our class by injecting all our dependencies
 	 *
-	 * @param array                                          $data_cache An array of data to pass to the view
-	 * @param \GFPDF\Helper\Helper_Form|Helper_Abstract_Form $gform      Our abstracted Gravity Forms helper functions
-	 * @param LoggerInterface                                $log        Our logger class
-	 * @param \GFPDF\Helper\Helper_Abstract_Options          $options    Our options class which allows us to access any settings
-	 * @param \GFPDF\Helper\Helper_Data                      $data       Our plugin data store
-	 * @param \GFPDF\Helper\Helper_Misc                      $misc       Our miscellaneous class
-	 * @param \GFPDF\Helper\Helper_Templates                 $templates
+	 * @param array                            $data_cache An array of data to pass to the view
+	 * @param Helper_Form|Helper_Abstract_Form $gform      Our abstracted Gravity Forms helper functions
+	 * @param LoggerInterface                  $log        Our logger class
+	 * @param Helper_Abstract_Options          $options    Our options class which allows us to access any settings
+	 * @param Helper_Data                      $data       Our plugin data store
+	 * @param Helper_Misc                      $misc       Our miscellaneous class
+	 * @param Helper_Templates                 $templates
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $data_cache = [], Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates ) {
+	public function __construct( array $data_cache, Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates ) {
 
 		/* Call our parent constructor */
 		parent::__construct( $data_cache );
@@ -128,21 +130,21 @@ class View_Settings extends Helper_Abstract_View {
 	/**
 	 * Load the Welcome Tab tabs
 	 *
+	 * @return string
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function tabs() {
 
 		/* Set up any variables we need for the view and display */
 		$vars = [
 			'selected' => isset( $_GET['tab'] ) ? $_GET['tab'] : 'general',
-			'tabs'     => $this->get_avaliable_tabs(),
+			'tabs'     => $this->get_available_tabs(),
 			'data'     => $this->data,
 		];
 
 		/* load the tabs view */
-		$this->load( 'tabs', $vars );
+		return $this->load( 'tabs', $vars, false );
 	}
 
 	/**
@@ -152,16 +154,12 @@ class View_Settings extends Helper_Abstract_View {
 	 *
 	 * @since 4.0
 	 */
-	public function get_avaliable_tabs() {
-		/**
-		 * Store the setting navigation
-		 * The array key is the settings order
-		 *
-		 * @var array
-		 */
+	public function get_available_tabs() {
+
+		/* The array key is the settings order */
 		$navigation = [
 			5   => [
-				'name' => esc_html__( 'General', 'gravity-forms-pdf-extended' ),
+				'name' => esc_html__( 'Settings', 'gravity-forms-pdf-extended' ),
 				'id'   => 'general',
 			],
 
@@ -170,10 +168,10 @@ class View_Settings extends Helper_Abstract_View {
 				'id'   => 'tools',
 			],
 
-			120 => [
-				'name' => esc_html__( 'Help', 'gravity-forms-pdf-extended' ),
-				'id'   => 'help',
-			],
+//			120 => [
+//				'name' => esc_html__( 'Help', 'gravity-forms-pdf-extended' ),
+//				'id'   => 'help',
+//			],
 		];
 
 		/* Add License tab if necessary */
@@ -239,8 +237,44 @@ class View_Settings extends Helper_Abstract_View {
 	 */
 	public function general() {
 
+		$markup = new View_GravityForm_Settings_Markup();
+
+		$sections = [
+			[
+				'id'            => 'gfpdf_settings_general',
+				'width'         => 'full',
+				'title'         => __( 'Default PDF Options', 'gravity-forms-pdf-extended' ),
+				'desc'          => __( 'Control the default settings to use when you create new PDFs on your forms.', 'gravity-forms-pdf-extended' ),
+				'content'       => $markup->do_settings_fields( 'gfpdf_settings_general_defaults', $markup::ENABLE_PANEL_TITLE ),
+				'content_class' => 'gform_settings_form',
+			],
+		];
+
+		$sections = array_merge(
+			$sections,
+			$markup->do_settings_fields_as_individual_fieldset(
+				'gfpdf_settings_general',
+				[
+					'default_action' => [
+						'width' => 'full',
+					],
+				]
+			)
+		);
+
+		$sections[] = [
+			'id'            => 'gfpdf_settings_general_security',
+			'width'         => 'full',
+			'collapsible'   => true,
+			'title'         => __( 'Security', 'gravity-forms-pdf-extended' ),
+			'content'       => $markup->do_settings_fields( 'gfpdf_settings_general_security', $markup::ENABLE_PANEL_TITLE ),
+			'content_class' => 'gform_settings_form',
+		];
+
 		$vars = [
 			'edit_cap' => $this->gform->has_capability( 'gravityforms_edit_settings' ),
+			'content'  => $markup->do_settings_sections( $sections ),
+			'menu'     => $this->tabs(),
 		];
 
 		/* load the system status view */
@@ -256,12 +290,49 @@ class View_Settings extends Helper_Abstract_View {
 	 */
 	public function license() {
 
+		$markup = new View_GravityForm_Settings_Markup();
+
+		$sections = [
+			[
+				'id'      => 'gfpdf_settings_general_view',
+				'width'   => 'full',
+				'title'   => __( 'Licensing', 'gravity-forms-pdf-extended' ),
+				'content' => $this->load( 'licence-info', [], false ),
+				'menu'    => $this->tabs(),
+			],
+		];
+
+		/* Group the common license settings together in the one container (every 3 settings) */
+		$i = 1;
+		foreach ( $markup->get_section_fields( 'gfpdf_settings_licenses' ) as $field ) {
+
+			if ( empty( $args ) ) {
+				$args = [
+					'id'      => $field['args']['id'],
+					'width'   => 'half',
+					'title'   => $field['title'],
+					'content' => $markup->get_field_content( $field, $markup::DISABLE_PANEL_TITLE ),
+				];
+			} else {
+				$args['content'] .= $markup->get_field_content( $field, $markup::DISABLE_PANEL_TITLE );
+			}
+
+			if ( $i % 3 === 0 ) {
+				$sections[] = $args;
+				$args       = [];
+			}
+
+			$i++;
+		}
+
 		$vars = [
 			'edit_cap' => $this->gform->has_capability( 'gravityforms_edit_settings' ),
+			'content'  => $markup->do_settings_sections( $sections ),
+			'menu'     => $this->tabs(),
 		];
 
 		/* load the system status view */
-		$this->load( 'license', $vars );
+		$this->load( 'licence', $vars );
 	}
 
 	/**
@@ -296,12 +367,16 @@ class View_Settings extends Helper_Abstract_View {
 			wp_die( esc_html__( 'You do not have permission to access this page', 'gravity-forms-pdf-extended' ) );
 		}
 
+		$markup             = new View_GravityForm_Settings_Markup();
 		$template_directory = $this->templates->get_template_path();
+		$sections           = $markup->do_settings_fields_as_individual_fieldset( 'gfpdf_settings_tools' );
 
 		$vars = [
 			'template_directory'            => $this->misc->relative_path( $template_directory, '/' ),
 			'template_files'                => $this->templates->get_core_pdf_templates(),
 			'custom_template_setup_warning' => $this->options->get_option( 'custom_pdf_template_files_installed' ),
+			'content'                       => $markup->do_settings_sections( $sections ),
+			'menu'                          => $this->tabs(),
 		];
 
 		/* load the system status view */
@@ -309,13 +384,36 @@ class View_Settings extends Helper_Abstract_View {
 	}
 
 	/**
+	 * @since 6.0
+	 */
+	public function uninstaller() {
+		$markup = new View_GravityForm_Settings_Markup();
+
+		$sections = $markup->do_settings_fields_as_individual_fieldset(
+			'gfpdf_settings_tools_uninstaller',
+			[
+				'uninstaller' => [
+					'width'       => 'full',
+					'collapsible' => true,
+				],
+			]
+		);
+
+		$vars = [
+			'content' => $markup->do_settings_sections( $sections ),
+		];
+
+		$this->load( 'uninstaller', $vars );
+	}
+
+	/**
 	 * Add Gravity Forms Tooltips
 	 *
 	 * @param array $tooltips The existing tooltips
 	 *
+	 * @return string
 	 * @since 4.0
 	 *
-	 * @return string
 	 */
 	public function add_tooltips( $tooltips ) {
 

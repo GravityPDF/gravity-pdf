@@ -2,9 +2,8 @@
 
 namespace GFPDF\Tests;
 
-use GFPDF\Helper\Helper_Singleton;
 use GFPDF\Helper\Helper_Data;
-
+use GFPDF\Helper\Helper_Singleton;
 use WP_UnitTestCase;
 
 /**
@@ -25,7 +24,7 @@ class Test_Singleton_Helper extends WP_UnitTestCase {
 	/**
 	 * Our Gravity PDF Data object
 	 *
-	 * @var \GFPDF\Helper\Helper_Singleton
+	 * @var Helper_Singleton
 	 *
 	 * @since 4.0
 	 */
@@ -70,12 +69,15 @@ class Test_Singleton_Helper extends WP_UnitTestCase {
 		$this->assertEquals( 'yes', $singleton_data->working );
 		$this->assertEquals( 'completed', $singleton_data->stuff );
 
-		/* Check for class that doens't exist */
-		$this->assertFalse( $this->singleton->get_class( 'non_existant' ) );
+		/* Check for class that doesn't exist */
+		$this->assertFalse( $this->singleton->get_class( 'non_existent' ) );
 	}
 
 	/**
 	 * Ensure Gravity PDF correctly registers all our MVC classes
+	 *
+	 * @param string $expected
+	 * @param string $class
 	 *
 	 * @since        4.0
 	 * @dataProvider provider_registered_classes
@@ -104,20 +106,17 @@ class Test_Singleton_Helper extends WP_UnitTestCase {
 			[ 'GFPDF\Controller\Controller_PDF', 'Controller_PDF' ],
 			[ 'GFPDF\Controller\Controller_Settings', 'Controller_Settings' ],
 			[ 'GFPDF\Controller\Controller_Shortcodes', 'Controller_Shortcodes' ],
-			[ 'GFPDF\Controller\Controller_Welcome_Screen', 'Controller_Welcome_Screen' ],
 			[ 'GFPDF\Model\Model_Actions', 'Model_Actions' ],
 			[ 'GFPDF\Model\Model_Form_Settings', 'Model_Form_Settings' ],
 			[ 'GFPDF\Model\Model_Install', 'Model_Install' ],
 			[ 'GFPDF\Model\Model_PDF', 'Model_PDF' ],
 			[ 'GFPDF\Model\Model_Settings', 'Model_Settings' ],
 			[ 'GFPDF\Model\Model_Shortcodes', 'Model_Shortcodes' ],
-			[ 'GFPDF\Model\Model_Welcome_Screen', 'Model_Welcome_Screen' ],
 			[ 'GFPDF\View\View_Actions', 'View_Actions' ],
 			[ 'GFPDF\View\View_Form_Settings', 'View_Form_Settings' ],
 			[ 'GFPDF\View\View_PDF', 'View_PDF' ],
 			[ 'GFPDF\View\View_Settings', 'View_Settings' ],
 			[ 'GFPDF\View\View_Shortcodes', 'View_Shortcodes' ],
-			[ 'GFPDF\View\View_Welcome_Screen', 'View_Welcome_Screen' ],
 		];
 	}
 

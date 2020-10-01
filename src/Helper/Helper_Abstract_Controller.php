@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * A simple abstract class controlers can extent to share similar variables
+ * A simple abstract class controllers can extent to share similar variables
  *
  * @since 4.0
  */

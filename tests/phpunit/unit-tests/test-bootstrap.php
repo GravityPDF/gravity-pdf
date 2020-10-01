@@ -3,7 +3,6 @@
 namespace GFPDF\Tests;
 
 use GFPDF\Router;
-
 use WP_UnitTestCase;
 
 /**
@@ -25,7 +24,7 @@ class Test_Bootstrap extends WP_UnitTestCase {
 	/**
 	 * Our Gravity PDF Router object
 	 *
-	 * @var \GFPDF\Router
+	 * @var Router
 	 *
 	 * @since 4.0
 	 */
@@ -89,6 +88,9 @@ class Test_Bootstrap extends WP_UnitTestCase {
 	/**
 	 * Check the required helper classes are loaded into the Router
 	 *
+	 * @param string $expected
+	 * @param string $property
+	 *
 	 * @since        4.0
 	 *
 	 * @dataProvider provider_dependant_helper_classes
@@ -145,7 +147,7 @@ class Test_Bootstrap extends WP_UnitTestCase {
 		$results = $this->loader->auto_noconflict_scripts( [] );
 
 		/* run assertions */
-		$this->assertEquals( 3, sizeof( $results ) );
+		$this->assertCount( 3, $results );
 		$this->assertContains( 'gfpdf_js_chosen', $results );
 		$this->assertContains( 'gfpdf_js_settings', $results );
 		$this->assertContains( 'gfpdf_jsapples', $results );
@@ -184,7 +186,7 @@ class Test_Bootstrap extends WP_UnitTestCase {
 		$results = $this->loader->auto_noconflict_styles( [] );
 
 		/* run assertions */
-		$this->assertEquals( 2, sizeof( $results ) );
+		$this->assertCount( 2, $results );
 		$this->assertContains( 'gfpdf_css_chosen_style', $results );
 		$this->assertContains( 'gfpdf_css_styles', $results );
 
@@ -201,8 +203,8 @@ class Test_Bootstrap extends WP_UnitTestCase {
 
 		$logger = $this->loader->log->getHandlers();
 
-		$this->assertSame( 1, sizeof( $logger ) );
-		$this->assertEquals( 'GFPDF\Vendor\Monolog\Handler\NullHandler', get_class( $logger[0] ) );
+		$this->assertCount( 1, $logger );
+		$this->assertEquals( 'GFPDF_Vendor\Monolog\Handler\NullHandler', get_class( $logger[0] ) );
 	}
 
 	/**

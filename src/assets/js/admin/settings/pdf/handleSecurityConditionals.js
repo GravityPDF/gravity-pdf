@@ -7,29 +7,29 @@ import $ from 'jquery'
  */
 export function handleSecurityConditionals () {
   /* Get the appropriate elements for use */
-  const $secTable = $('#pdf-general-advanced')
+  const $secTable = $('#gfpdf-fieldset-gfpdf_form_settings_advanced')
   const $pdfSecurity = $secTable.find('input[name="gfpdf_settings[security]"]')
   const $format = $secTable.find('input[name="gfpdf_settings[format]"]')
+  const $securityQuestion = $secTable.find('#gfpdf-settings-field-wrapper-security')
+  const $securityFields = $secTable.find('#gfpdf-settings-field-wrapper-password,#gfpdf-settings-field-wrapper-privileges,gfpdf-settings-field-wrapper-master_password:not(.gfpdf-hidden)')
 
   /* Add change event to admin restrictions to show/hide dependant fields */
   $pdfSecurity.change(function () {
-    if ($(this).is(':checked')) {
-      /* Get the format dependancy */
-      const format = $format.filter(':checked').val()
+    /* Get the format dependency */
+    const format = $format.filter(':checked').val()
 
-      if ($(this).val() === GFPDF.no || format !== GFPDF.standard) {
-        /* hide security password / privileges */
-        $secTable.find('tr:nth-child(3),tr:nth-child(4),tr:nth-child(5):not(.gfpdf-hidden)').hide()
-      } else {
-        /* show security password / privileges */
-        $secTable.find('tr:nth-child(3),tr:nth-child(4),tr:nth-child(5):not(.gfpdf-hidden)').show()
-      }
+    if ($(this).val() === 'No' || format !== 'Standard') {
+      /* hide security password / privileges */
+      $securityFields.hide()
+    } else {
+      /* show security password / privileges */
+      $securityFields.show()
+    }
 
-      if (format !== GFPDF.standard) {
-        $secTable.find('tr:nth-child(2)').hide()
-      } else {
-        $secTable.find('tr:nth-child(2)').show()
-      }
+    if (format !== 'Standard') {
+      $securityQuestion.hide()
+    } else {
+      $securityQuestion.show()
     }
   }).trigger('change')
 
