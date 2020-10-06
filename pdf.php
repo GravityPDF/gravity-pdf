@@ -8,6 +8,8 @@ Author URI: https://gravitypdf.com
 Plugin URI: https://wordpress.org/plugins/gravity-forms-pdf-extended/
 Text Domain: gravity-forms-pdf-extended
 Domain Path: /src/assets/languages
+Requires at least: 5.3
+Requires PHP: 7.3
 */
 
 /**
