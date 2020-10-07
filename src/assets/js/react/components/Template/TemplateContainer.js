@@ -16,7 +16,7 @@ import CloseDialog from '../Modal/CloseDialog'
  *
  * @since 4.1
  */
-export class Container extends React.Component {
+export class TemplateContainer extends React.Component {
   /**
    * @since 4.1
    */
@@ -112,4 +112,4 @@ export class Container extends React.Component {
   }
 }
 
-export default Container
+export default TemplateContainer

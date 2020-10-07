@@ -13,7 +13,7 @@
  *
  * @since 6.0
  */
-export default (fontList, id) => {
+export function associatedFontManagerSelectBox (fontList, id) {
   const fontManagerSelectBox = document.querySelector('.gfpdf-font-manager select')
   const definedFontsOptgroup = document.querySelector('optgroup[label="User-Defined Fonts"]')
   const selectedValue = fontManagerSelectBox.options[fontManagerSelectBox.selectedIndex].value

@@ -52,7 +52,7 @@ export const AddFont = (
   const fontNameLabel = sprintf(GFPDF.fontManagerFontNameLabel, "<span class='required'>", '</span>')
 
   return (
-    <div className='add-font'>
+    <div data-test='component-AddFont' className='add-font'>
       <form onSubmit={onHandleSubmit}>
         <h2>{GFPDF.fontManagerAddTitle}</h2>
 

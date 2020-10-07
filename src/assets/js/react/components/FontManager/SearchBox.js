@@ -122,6 +122,7 @@ export class SearchBox extends Component {
     return (
       <div role='form'>
         <input
+          data-test='component-SearchBox'
           type='search'
           id='font-manager-search-box'
           className='wp-filter-search'

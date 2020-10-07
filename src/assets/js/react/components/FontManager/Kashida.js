@@ -19,7 +19,7 @@ import PropTypes from 'prop-types'
  * @since 6.0
  */
 export const Kashida = ({ kashida, onHandleKashidaChange, tabIndex }) => (
-  <div className='kashida'>
+  <div data-test='component-Kashida' className='kashida'>
     <label htmlFor='gfpdf-kashida-input'>{GFPDF.fontManagerKashidaLabel}</label>
 
     <p id='gfpdf-kashida-input-desc'>{GFPDF.fontManagerKashidaDesc}</p>

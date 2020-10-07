@@ -71,7 +71,7 @@ export const UpdateFont = (
   const fontNameLabel = sprintf(GFPDF.fontManagerFontNameLabel, "<span class='required'>", '</span>')
 
   return (
-    <div className='update-font'>
+    <div data-test='component-UpdateFont' className='update-font'>
       <form onSubmit={onHandleSubmit}>
         <h2>{GFPDF.fontManagerUpdateTitle}</h2>
 

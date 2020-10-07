@@ -10,11 +10,9 @@ import fontManagerReducer from './fontManagerReducer'
  *
  * @since 4.1
  */
-export function setupReducers () {
-  return combineReducers({
-    template: templateReducer,
-    coreFonts: coreFontsReducer,
-    help: helpReducer,
-    fontManager: fontManagerReducer
-  })
-}
+export default combineReducers({
+  template: templateReducer,
+  coreFonts: coreFontsReducer,
+  help: helpReducer,
+  fontManager: fontManagerReducer
+})

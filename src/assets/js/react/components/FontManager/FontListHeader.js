@@ -14,7 +14,7 @@ import React from 'react'
  * @since 6.0
  */
 const FontListHeader = () => (
-  <div className='font-list-header'>
+  <div data-test='component-FontListHeader' className='font-list-header'>
     <div />
     <div className='font-name'>{GFPDF.fontListInstalledFonts}</div>
     <div>{GFPDF.fontListRegular}</div>

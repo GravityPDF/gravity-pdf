@@ -1,21 +1,24 @@
 module.exports = {
-  "clearMocks": true,
-  "coverageDirectory": "coverage",
-  "roots": [
-    "./tests/js-unit"
+  clearMocks: true,
+  collectCoverageFrom: [
+    'src/assets/js/react/**/*.{js,jsx}',
+    '!src/assets/js/react/api/*.{js,jsx}'
   ],
-  "transform": {
-    "^.+\\.js?$": "babel-jest"
+  roots: [
+    './tests/js-unit'
+  ],
+  transform: {
+    '^.+\\.js?$': 'babel-jest'
   },
-  "coverageThreshold": {
-    "global": {
-      "branches": 78,
-      "functions": 90,
-      "lines": 90,
-      "statements": 90
+  coverageThreshold: {
+    global: {
+      branches: 78,
+      functions: 90,
+      lines: 90,
+      statements: 90
     }
   },
-  "setupFiles": [
-    "./tests/js-unit/setupTests.js"
+  setupFiles: [
+    './tests/js-unit/setupTests.js'
   ]
 }

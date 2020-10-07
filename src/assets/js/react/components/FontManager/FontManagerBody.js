@@ -20,8 +20,8 @@ import AddFont from './AddFont'
 import UpdateFont from './UpdateFont'
 import initialState from './InitialAddUpdateState'
 /* Utilities */
-import adjustFontListHeight from '../../utilities/FontManager/adjustFontListHeight'
-import { toggleUpdateFont } from '../../utilities/FontManager/toggleUpdateFont'
+import { adjustFontListHeight } from '../../utilities/FontManager/adjustFontListHeight'
+import { toggleUpdateFont, addClass } from '../../utilities/FontManager/toggleUpdateFont'
 
 /**
  * @package     Gravity PDF
@@ -92,7 +92,14 @@ export class FontManagerBody extends Component {
    * @since 6.0
    */
   componentDidMount () {
-    this.props.getCustomFontList()
+    const { getCustomFontList, id, history } = this.props
+
+    getCustomFontList()
+
+    /* Auto slide 'update font' panel if refreshed */
+    if (id) {
+      addClass(document.querySelector('.update-font'), history, id)
+    }
   }
 
   /**
@@ -106,10 +113,7 @@ export class FontManagerBody extends Component {
   componentDidUpdate (prevProps) {
     const { id, fontList, msg, history } = this.props
 
-    /*
-     * If font name did update and font name is selected call the method handleRequestFontDetails() and
-     * adjustFontListHeight()
-    */
+    /* If font name did update and font name is selected call the method handleRequestFontDetails() */
     if (prevProps.id !== id && id) {
       /* Perform check if the accessed ID is valid, if not prevent fatal error event */
       if (!this.handleCheckValidId(fontList, id)) {
@@ -117,7 +121,6 @@ export class FontManagerBody extends Component {
       }
 
       this.handleRequestFontDetails()
-      setTimeout(() => adjustFontListHeight(), 100)
     }
 
     /* If font list did update and font name is selected, call the method handleRequestFontDetails() */
@@ -186,6 +189,8 @@ export class FontManagerBody extends Component {
         disableUpdateButton: true
       }
     })
+
+    setTimeout(() => adjustFontListHeight(), 100)
   }
 
   /**
@@ -194,7 +199,10 @@ export class FontManagerBody extends Component {
    * @since 6.0
    */
   handleSetDefaultState = () => {
-    this.setState({ addFont: initialState, updateFont: initialState })
+    this.setState({
+      addFont: initialState,
+      updateFont: initialState
+    })
   }
 
   /**
@@ -272,7 +280,7 @@ export class FontManagerBody extends Component {
    */
   handleInputChange = (e, state) => {
     const { addFont, updateFont } = this.state
-    const defaultState = state === 'addFont' ? addFont : updateFont
+    const defaultState = (state === 'addFont') ? addFont : updateFont
 
     this.setState({
       [state]: {
@@ -345,8 +353,11 @@ export class FontManagerBody extends Component {
    * @since 6.0
    */
   handleValidateInputFields = (state, label, regular) => {
-    const defaultState = state === 'addFont' ? this.state.addFont : this.state.updateFont
-    const validate = { validateLabel: true, validateRegular: true }
+    const defaultState = (state === 'addFont') ? this.state.addFont : this.state.updateFont
+    const validate = {
+      validateLabel: true,
+      validateRegular: true
+    }
     let labelField = false
     let regularField = false
 
@@ -405,10 +416,20 @@ export class FontManagerBody extends Component {
         activeFont.bolditalics === fontStyles.bolditalics &&
         activeFont.useKashida === kashida
       ) {
-        return this.setState({ updateFont: { ...this.state.updateFont, disableUpdateButton: true } })
+        return this.setState({
+          updateFont: {
+            ...this.state.updateFont,
+            disableUpdateButton: true
+          }
+        })
       }
 
-      this.setState({ updateFont: { ...this.state.updateFont, disableUpdateButton: false } })
+      this.setState({
+        updateFont: {
+          ...this.state.updateFont,
+          disableUpdateButton: false
+        }
+      })
     }
   }
 
@@ -473,7 +494,13 @@ export class FontManagerBody extends Component {
     }
 
     /* Call redux action editFont() */
-    editFont({ id, font: { label, useKashida: kashida, ...data } })
+    editFont({
+      id,
+      font: {
+        label,
+        useKashida: kashida, ...data
+      }
+    })
   }
 
   /**
@@ -539,7 +566,11 @@ export class FontManagerBody extends Component {
     const { id, fontList, msg, loading, history } = this.props
 
     return (
-      <div id='gfpdf-font-manager-container' className='wp-clearfix theme-about'>
+      <div
+        data-test='component-FontManagerBody'
+        id='gfpdf-font-manager-container'
+        className='wp-clearfix theme-about'
+      >
         <div className='font-list-column container'>
           <SearchBox id={id} />
 
