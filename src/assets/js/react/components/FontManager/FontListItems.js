@@ -140,20 +140,11 @@ export class FontListItems extends Component {
     /* If location not under Global/General settings */
     if (location !== 'PDF' && location !== 'general') {
       fontManagerSelectBoxValue = document.querySelector('#gfpdf_settings\\[font\\]').value
-
-      /* Check if select box selected value exist in font manager fontList */
-      if (!this.handleCheckSelectBoxValue(fontList, fontManagerSelectBoxValue)) {
-        /* Call redux action selectFont() */
-        return selectFont('')
-      }
-
-      /* Call redux action selectFont() */
-      return selectFont(fontManagerSelectBoxValue)
+    } else {
+      fontManagerSelectBoxValue = document.querySelector('#gfpdf_settings\\[default_font\\]').value
     }
 
-    fontManagerSelectBoxValue = document.querySelector('#gfpdf_settings\\[default_font\\]').value
-
-    /* Check if select box selected value exist in font manager fontList */
+    /* Do nothing if selected value doesn't exist on font manager fontList */
     if (!this.handleCheckSelectBoxValue(fontList, fontManagerSelectBoxValue)) {
       /* Call redux action selectFont() */
       return selectFont('')
@@ -217,7 +208,7 @@ export class FontListItems extends Component {
   }
 
   /**
-   * Listen to an 'enter' keyboard event in a font list item
+   * Listen to an 'enter' keyboard event on font list item
    *
    * @param e: object
    * @param fontId: string
@@ -323,7 +314,7 @@ export class FontListItems extends Component {
     const list = !searchResult ? fontList : searchResult
 
     return (
-      <div className='font-list-items'>
+      <div data-test='component-FontListItems' className='font-list-items'>
         {list && list.map(font => {
           return (
             <div

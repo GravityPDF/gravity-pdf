@@ -28,7 +28,7 @@ import FontListAlertMessage from './FontListAlertMessage'
  *
  * @since 6.0
  */
-const FontList = ({ id, loading, fontList, searchResult, msg: { error }, history }) => {
+export const FontList = ({ id, loading, fontList, searchResult, msg: { error }, history }) => {
   const fontListError = error && error.fontList
   const fontListEmpty = fontList.length === 0 && !searchResult
   const checkSearchResult = (searchResult && searchResult.length === 0) || !searchResult
@@ -36,7 +36,7 @@ const FontList = ({ id, loading, fontList, searchResult, msg: { error }, history
   const emptySearchResult = (!fontListError && !loading) && (!latestData && checkSearchResult)
 
   return (
-    <div className='font-list'>
+    <div data-test='component-FontList' className='font-list'>
       <FontListHeader />
 
       {loading ? <FontListSkeleton /> : <FontListItems id={id} history={history} />}

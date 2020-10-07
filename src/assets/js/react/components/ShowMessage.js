@@ -50,6 +50,15 @@ export class ShowMessage extends React.Component {
   }
 
   /**
+   * On mount, maybe set dismissable timer
+   *
+   * @since 4.1
+   */
+  componentDidMount () {
+    this.shouldSetTimer()
+  }
+
+  /**
    * If component did update, call reset state function
    *
    * @param prevProps
@@ -61,15 +70,6 @@ export class ShowMessage extends React.Component {
     if (!prevState.visible) {
       this.resetState()
     }
-  }
-
-  /**
-   * On mount, maybe set dismissable timer
-   *
-   * @since 4.1
-   */
-  componentDidMount () {
-    this.shouldSetTimer()
   }
 
   /**

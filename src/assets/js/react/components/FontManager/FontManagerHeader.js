@@ -19,7 +19,7 @@ import CloseDialog from '../Modal/CloseDialog'
  * @since 6.0
  */
 const FontManagerHeader = ({ id }) => (
-  <div className='theme-header'>
+  <div data-test='component-FontManagerHeader' className='theme-header'>
     <h1>Font Manager</h1>
 
     <CloseDialog id={id} />

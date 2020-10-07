@@ -11,7 +11,7 @@
  *
  * @since 6.0
  */
-export default () => {
+export function adjustFontListHeight () {
   const fontListColumn = document.querySelector('.font-list-column')
   const updateFont = document.querySelector('.update-font.show')
 

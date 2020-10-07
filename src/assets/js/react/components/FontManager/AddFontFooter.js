@@ -50,7 +50,10 @@ const AddFontFooter = ({
   const displayGenericErrorMessage = errorAddFont && !errorFontValidation
 
   return (
-    <footer className={'footer' + (cancelButton ? ' cancel' : '')}>
+    <footer
+      data-test='component-AddFontFooter'
+      className={'footer' + (cancelButton ? ' cancel' : '')}
+    >
       {id && (
         <div
           className='button gfpdf-button primary cancel'

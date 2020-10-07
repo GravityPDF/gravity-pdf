@@ -19,6 +19,24 @@ import FontManagerBody from './FontManagerBody'
  */
 export class FontManager extends Component {
   /**
+   * PropTypes
+   *
+   * @since 6.0
+   */
+  static propTypes = {
+    id: PropTypes.string,
+    history: PropTypes.object.isRequired
+  }
+
+  /**
+   * @since 6.0
+   */
+  constructor (props) {
+    super(props)
+    this.handleFocus = this.handleFocus.bind(this)
+  }
+
+  /**
    * On mount, add focus event to document option on mount
    * Also, if focus isn't currently applied to the search box we'll apply it
    * to our container to help with tabbing between elements
@@ -52,7 +70,7 @@ export class FontManager extends Component {
    *
    * @since 6.0
    */
-  handleFocus = e => {
+  handleFocus (e) {
     if (!this.container.contains(e.target)) {
       e.stopPropagation()
       this.container.focus()
@@ -68,7 +86,11 @@ export class FontManager extends Component {
     const { id, history } = this.props
 
     return (
-      <div ref={node => (this.container = node)} tabIndex='140'>
+      <div
+        data-test='component-FontManager'
+        ref={node => (this.container = node)}
+        tabIndex='140'
+      >
         <div className='backdrop theme-backdrop' />
         <div className='container theme-wrap font-manager'>
           <FontManagerHeader id={id} />
@@ -78,16 +100,6 @@ export class FontManager extends Component {
       </div>
     )
   }
-}
-
-/**
- * PropTypes
- *
- * @since 6.0
- */
-FontManager.propTypes = {
-  id: PropTypes.string,
-  history: PropTypes.object.isRequired
 }
 
 export default FontManager

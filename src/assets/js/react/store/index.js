@@ -2,7 +2,7 @@ import { composeWithDevTools } from 'redux-devtools-extension'
 import { createStore, applyMiddleware } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 import rootSaga from '../sagas'
-import { setupReducers } from '../reducers'
+import rootReducer from '../reducers/index'
 
 /**
  * @package     Gravity PDF
@@ -12,7 +12,7 @@ import { setupReducers } from '../reducers'
  */
 
 /* Combine our Redux Reducers */
-const reducers = setupReducers()
+const reducers = rootReducer
 /* Initialize Saga Middleware */
 const sagaMiddleware = createSagaMiddleware()
 export const middlewares = [sagaMiddleware]

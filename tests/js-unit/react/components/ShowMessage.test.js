@@ -8,18 +8,16 @@ describe('Components - ShowMessage.js', () => {
   let wrapper
   let component
 
-  describe('Component functions', () => {
-
-    test('shouldSetTimer() - Check if we should make the message auto-dismissable', () => {
+  describe('RUN LIFECYCLE METHODS', () => {
+    test('componentDidMount() - On mount, maybe set dismissable timer', () => {
       wrapper = shallow(<ShowMessage text='text' dismissable={true} />)
+      const shouldSetTimer = jest.spyOn(wrapper.instance(), 'shouldSetTimer')
       const setTimer = jest.spyOn(wrapper.instance(), 'setTimer')
-      wrapper.instance().shouldSetTimer()
+      wrapper.instance().componentDidMount()
 
+      expect(shouldSetTimer).toHaveBeenCalledTimes(1)
       expect(setTimer).toHaveBeenCalledTimes(1)
     })
-  })
-
-  describe('Run Lifecycle methods', () => {
 
     test('componentDidUpdate() - Resets our state and timer when new props received', () => {
       const prevState = { visible: false }
@@ -31,30 +29,54 @@ describe('Components - ShowMessage.js', () => {
       expect(wrapper.state('visible')).toBe(true)
     })
 
-    test('componentDidMount() - On mount, maybe set dismissable timer', () => {
+    test('componentWillUnmount() - Clear timeout on unmount', () => {
       wrapper = shallow(<ShowMessage text='text' dismissable={true} />)
-      const shouldSetTimer = jest.spyOn(wrapper.instance(), 'shouldSetTimer')
-      const setTimer = jest.spyOn(wrapper.instance(), 'setTimer')
-      wrapper.instance().componentDidMount()
 
-      expect(shouldSetTimer).toHaveBeenCalledTimes(1)
-      expect(setTimer).toHaveBeenCalledTimes(1)
+      const clearTimeout = jest.spyOn(window, 'clearTimeout')
+
+      wrapper.instance().componentWillUnmount()
+
+      expect(clearTimeout).toHaveBeenCalledTimes(1)
     })
   })
 
-  test('renders <ShowMessage /> component', () => {
-    wrapper = shallow(<ShowMessage text='text' error={true} />)
-    component = findByTestAttr(wrapper, 'component-showMessage')
+  describe('RUN COMPONENT METHODS', () => {
+    test('shouldSetTimer() - Check if we should make the message auto-dismissable', () => {
+      wrapper = shallow(<ShowMessage text='text' dismissable={true} />)
+      const setTimer = jest.spyOn(wrapper.instance(), 'setTimer')
+      wrapper.instance().shouldSetTimer()
 
-    expect(component.length).toBe(1)
-    expect(component.text()).toBe('text')
-    expect(component.hasClass('notice inline error')).toEqual(true)
+      expect(setTimer).toHaveBeenCalledTimes(1)
+    })
+
+    test('resetState() - Resets our state and timer', () => {
+      wrapper = shallow(<ShowMessage text='text' dismissable={true} />)
+
+      const instance = wrapper.instance()
+      const shouldSetTimer = jest.spyOn(instance, 'shouldSetTimer')
+
+      instance.resetState()
+
+      expect(wrapper.state('visible')).toBe(true)
+      expect(shouldSetTimer).toHaveBeenCalledTimes(1)
+    })
   })
 
-  test('renders <ShowMessage /> component with an empty <div />', () => {
-    wrapper = shallow(<ShowMessage text='text' />)
-    wrapper.setState({ visible: false })
+  describe('RENDERS COMPONENT', () => {
+    test('renders <ShowMessage /> component', () => {
+      wrapper = shallow(<ShowMessage text='text' error={true} />)
+      component = findByTestAttr(wrapper, 'component-showMessage')
 
-    expect(wrapper.html()).toEqual('<div></div>')
+      expect(component.length).toBe(1)
+      expect(component.text()).toBe('text')
+      expect(component.hasClass('notice inline error')).toEqual(true)
+    })
+
+    test('renders <ShowMessage /> component with an empty <div />', () => {
+      wrapper = shallow(<ShowMessage text='text' />)
+      wrapper.setState({ visible: false })
+
+      expect(wrapper.html()).toEqual('<div></div>')
+    })
   })
 })

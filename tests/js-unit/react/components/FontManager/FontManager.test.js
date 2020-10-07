@@ -1,25 +1,26 @@
 import React from 'react'
 import { shallow } from 'enzyme'
 import { findByTestAttr } from '../../testUtils'
-import TemplateContainer from '../../../../../src/assets/js/react/components/Template/TemplateContainer'
+import FontManager from '../../../../../src/assets/js/react/components/FontManager/FontManager'
 
-describe('Template - TemplateContainer.js', () => {
+describe('FontManager - FontManager.js', () => {
+
+  const props = { history: {} }
+  const wrapper = shallow(<FontManager {...props} />)
 
   describe('RUN LIFECYCLE METHODS', () => {
     test('componentDidMount() - Add focus event to document option on mount', () => {
-      TemplateContainer.prototype.container = { focus: jest.fn() }
+      FontManager.prototype.container = { focus: jest.fn() }
 
       const map = {}
 
-      document.addEventListener = jest.fn((event, cb) => {
-        map[event] = cb
-      })
+      document.addEventListener = jest.fn((event, cb) => { map[event] = cb })
 
-      const focus = jest.spyOn(TemplateContainer.prototype.container, 'focus')
+      const focus = jest.spyOn(FontManager.prototype.container, 'focus')
       const handleFocus = jest
-        .spyOn(TemplateContainer.prototype, 'handleFocus')
+        .spyOn(FontManager.prototype, 'handleFocus')
         .mockImplementation(() => jest.fn())
-      const wrapper = shallow(<TemplateContainer children={[]} />)
+      const wrapper = shallow(<FontManager {...props} />)
 
       // Call componentDidMount()
       wrapper.instance().componentDidMount()
@@ -30,20 +31,18 @@ describe('Template - TemplateContainer.js', () => {
       expect(handleFocus).toHaveBeenCalledTimes(1)
     })
 
-    test('componentWillUnmount() - Cleanup our document event listeners', () => {
-      TemplateContainer.prototype.container = { focus: jest.fn() }
+    test('componentWillUnmount - Cleanup our document event listeners', () => {
+      FontManager.prototype.container = { focus: jest.fn() }
 
       const map = {}
 
-      document.removeEventListener = jest.fn((event, cb) => {
-        map[event] = cb
-      })
+      document.removeEventListener = jest.fn((event, cb) => { map[event] = cb })
 
-      const focus = jest.spyOn(TemplateContainer.prototype.container, 'focus')
+      const focus = jest.spyOn(FontManager.prototype.container, 'focus')
       const handleFocus = jest
-        .spyOn(TemplateContainer.prototype, 'handleFocus')
+        .spyOn(FontManager.prototype, 'handleFocus')
         .mockImplementation(() => jest.fn())
-      const wrapper = shallow(<TemplateContainer children={[]} />)
+      const wrapper = shallow(<FontManager {...props} />)
 
       // Call componentDidMount()
       wrapper.instance().componentWillUnmount()
@@ -58,9 +57,9 @@ describe('Template - TemplateContainer.js', () => {
   describe('RUN COMPONENT METHODS', () => {
     test('handleFocus() - When a focus event is fired and it\'s not apart of any DOM elements in our container we will focus the container instead.', () => {
       const handleFocus = jest
-        .spyOn(TemplateContainer.prototype, 'handleFocus')
+        .spyOn(FontManager.prototype, 'handleFocus')
         .mockImplementation(() => jest.fn())
-      const wrapper = shallow(<TemplateContainer children={[]} />)
+      const wrapper = shallow(<FontManager {...props} />)
 
       // Call handleFocus()
       wrapper.instance().handleFocus()
@@ -70,16 +69,18 @@ describe('Template - TemplateContainer.js', () => {
   })
 
   describe('RENDERS COMPONENT', () => {
-    const wrapper = shallow(<TemplateContainer children={[]} />)
-
-    test('render <Container /> component', () => {
-      const component = findByTestAttr(wrapper, 'component-templateContainer')
+    test('render <FontManager /> component', () => {
+      const component = findByTestAttr(wrapper, 'component-FontManager')
 
       expect(component.length).toBe(1)
     })
 
-    test('render <CloseDialog /> component', () => {
-      expect(wrapper.find('withRouter(Connect(CloseDialog))').length).toBe(1)
+    test('render <FontManagerHeader /> component', () => {
+      expect(wrapper.find('FontManagerHeader').length).toBe(1)
+    })
+
+    test('render <FontManagerBody /> component', () => {
+      expect(wrapper.find('Connect(FontManagerBody)').length).toBe(1)
     })
   })
 })

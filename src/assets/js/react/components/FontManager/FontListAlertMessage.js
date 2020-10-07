@@ -22,7 +22,7 @@ import { getCustomFontList, resetSearchResult } from '../../actions/fontManager'
  *
  * @since 6.0
  */
-const FontListAlertMessage = ({ empty, error, getCustomFontList, resetSearchResult }) => {
+export const FontListAlertMessage = ({ empty, error, getCustomFontList, resetSearchResult }) => {
   const fontListEmpty = <span>{GFPDF.fontListEmpty}</span>
   const searchResultEmpty = (
     <span>
@@ -33,7 +33,7 @@ const FontListAlertMessage = ({ empty, error, getCustomFontList, resetSearchResu
   const displayContent = empty ? fontListEmpty : !error ? searchResultEmpty : apiError
 
   return (
-    <div className='alert-message'>
+    <div data-test='component-FontListAlertMessage' className='alert-message'>
       {displayContent}
     </div>
   )
