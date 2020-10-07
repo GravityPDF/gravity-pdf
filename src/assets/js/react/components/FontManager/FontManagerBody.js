@@ -1,10 +1,8 @@
+/* Dependencies */
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import SearchBox from './SearchBox'
-import FontList from './FontList'
-import AddFont from './AddFont'
-import UpdateFont from './UpdateFont'
+/* Redux actions */
 import {
   getCustomFontList,
   addFont,
@@ -14,11 +12,35 @@ import {
   clearAddFontMsg,
   clearDropzoneError
 } from '../../actions/fontManager'
+/* Components */
 import Alert from '../Alert/Alert'
-import { toggleUpdateFont } from '../../utilities/toggleUpdateFont'
-import initialState from './AddUpdateState'
+import SearchBox from './SearchBox'
+import FontList from './FontList'
+import AddFont from './AddFont'
+import UpdateFont from './UpdateFont'
+import initialState from './InitialAddUpdateState'
+/* Utilities */
+import adjustFontListHeight from '../../utilities/FontManager/adjustFontListHeight'
+import { toggleUpdateFont } from '../../utilities/FontManager/toggleUpdateFont'
 
+/**
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2020, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       6.0
+ */
+
+/**
+ * FontManagerBody component
+ *
+ * @since 6.0
+ */
 export class FontManagerBody extends Component {
+  /**
+   * PropTypes
+   *
+   * @since 6.0
+   */
   static propTypes = {
     getCustomFontList: PropTypes.func.isRequired,
     id: PropTypes.string,
@@ -34,45 +56,81 @@ export class FontManagerBody extends Component {
     history: PropTypes.object.isRequired
   }
 
+  /**
+   * Initialize component state
+   *
+   * @type {{
+   * addFont: {
+   *  fontStyles: { italics: string, bold: string, bolditalics: string, regular: string },
+   *  disableUpdateButton: boolean,
+   *  id: string,
+   *  label: string,
+   *  validateLabel: boolean,
+   *  validateRegular: boolean,
+   *  kashida: number
+   * },
+   * updateFont: {
+   *  fontStyles: { italics: string, bold: string, bolditalics: string, regular: string },
+   *  disableUpdateButton: boolean,
+   *  id: string,
+   *  label: string,
+   *  validateLabel: boolean,
+   *  validateRegular: boolean,
+   *  kashida: number
+   * }}}
+   *
+   * @since 6.0
+   */
   state = {
     addFont: initialState,
     updateFont: initialState
   }
 
+  /**
+   * On mount, Request custom font list by calling redux action getCustomFontList()
+   *
+   * @since 6.0
+   */
   componentDidMount () {
     this.props.getCustomFontList()
   }
 
-  componentDidUpdate (prevProps, prevState, snapshot) {
+  /**
+   * If component did update and new props are received,
+   * fires appropriate action based on redux store data
+   *
+   * @param prevProps: object
+   *
+   * @since 6.0
+   */
+  componentDidUpdate (prevProps) {
     const { id, fontList, msg, history } = this.props
 
-    /* If component did update and ID is active call the method handleRequestFontDetails() */
+    /*
+     * If font name did update and font name is selected call the method handleRequestFontDetails() and
+     * adjustFontListHeight()
+    */
     if (prevProps.id !== id && id) {
-      const checkValidId = fontList.filter(font => font.id === id)[0]
-
-      /* Handle fatal error event */
-      if (!checkValidId) {
+      /* Perform check if the accessed ID is valid, if not prevent fatal error event */
+      if (!this.handleCheckValidId(fontList, id)) {
         return history.push('/fontmanager/')
       }
 
       this.handleRequestFontDetails()
-      setTimeout(() => this.handleAdjustFontListHeight(), 100)
+      setTimeout(() => adjustFontListHeight(), 100)
     }
 
-    /* If component did update and ID & fontList is active call the method handleRequestFontDetails() */
+    /* If font list did update and font name is selected, call the method handleRequestFontDetails() */
     if (prevProps.fontList !== fontList && id && fontList) {
-      const checkValidId = fontList.filter(font => font.id === id)[0]
-
-      /* Handle fatal error event */
-      if (!checkValidId) {
+      /* Perform check if the accessed ID is valid, if not prevent fatal error event */
+      if (!this.handleCheckValidId(fontList, id)) {
         return history.push('/fontmanager/')
       }
 
-      /* Auto slide the 'Update Font' form */
-      document.querySelector('.update-font').classList.add('show')
       this.handleRequestFontDetails()
     }
 
+    /* If there's a new success message and font name is not selected, auto slide the new added font name */
     if (prevProps.msg !== msg && msg.success && !id) {
       /* Check if there's a response message error for fontList */
       if (msg.error && msg.error.fontList) {
@@ -84,13 +142,29 @@ export class FontManagerBody extends Component {
     }
   }
 
-  handleAdjustFontListHeight = () => {
-    const fontListColumn = document.querySelector('.font-list-column')
-    const updateFont = document.querySelector('.update-font.show')
+  /**
+   * Handle check if the current accessed ID is valid/active or not
+   *
+   * @param fontList: array of object
+   * @param id: string
+   *
+   * @since 6.0
+   */
+  handleCheckValidId = (fontList, id) => {
+    const checkValidId = fontList.filter(font => font.id === id)[0]
 
-    fontListColumn.style.height = window.getComputedStyle(updateFont).height
+    if (!checkValidId) {
+      return false
+    }
+
+    return true
   }
 
+  /**
+   * Map current font details from our redux store to component state (updateFont)
+   *
+   * @since 6.0
+   */
   handleRequestFontDetails = () => {
     const { fontList, id } = this.props
     const font = fontList.filter(font => font.id === id)[0]
@@ -114,10 +188,23 @@ export class FontManagerBody extends Component {
     })
   }
 
+  /**
+   * Set component state back to its default state
+   *
+   * @since 6.0
+   */
   handleSetDefaultState = () => {
     this.setState({ addFont: initialState, updateFont: initialState })
   }
 
+  /**
+   * Auto select/open update font panel
+   *
+   * @param history: object
+   * @param fontList: array of object
+   *
+   * @since 6.0
+   */
   handleAutoSelectNewAddedFont = (history, fontList) => {
     const newFontIndex = Object.keys(fontList).slice(-1).pop()
     const newFont = fontList[newFontIndex]
@@ -125,12 +212,30 @@ export class FontManagerBody extends Component {
     toggleUpdateFont(history, newFont.id)
   }
 
+  /**
+   * Return current active state (addFont or updateFont)
+   *
+   * @param column: string
+   *
+   * @returns {{ state: object }}
+   *
+   * @since 6.0
+   */
   handleGetCurrentColumnState = column => {
-    const state = column === 'addFont' ? this.state.addFont : this.state.updateFont
+    const state = (column === 'addFont') ? this.state.addFont : this.state.updateFont
 
     return state
   }
 
+  /**
+   * Handle deletion process of a font variant (font files drop box)
+   *
+   * @param e: class
+   * @param key: string
+   * @param state: string
+   *
+   * @since 6.0
+   */
   handleDeleteFontStyle = (e, key, state) => {
     e.preventDefault()
 
@@ -142,6 +247,7 @@ export class FontManagerBody extends Component {
       const dropZone = document.querySelector(`div[for=${forValue}]`)
 
       dropZone.classList.remove('error')
+      /* Call redux action clearDropzoneError() */
       clearDropzoneError(key)
     }
 
@@ -156,6 +262,14 @@ export class FontManagerBody extends Component {
     this.handleUpdateFontState()
   }
 
+  /**
+   * Listen to font name input box field change
+   *
+   * @param e: object
+   * @param state: string
+   *
+   * @since 6.0
+   */
   handleInputChange = (e, state) => {
     const { addFont, updateFont } = this.state
     const defaultState = state === 'addFont' ? addFont : updateFont
@@ -168,6 +282,13 @@ export class FontManagerBody extends Component {
     }, () => this.handleUpdateFontState())
   }
 
+  /**
+   * Listen to kashida field change on update font panel
+   *
+   * @param e: object
+   *
+   * @since 6.0
+   */
   handleKashidaChange = e => {
     this.setState({
       updateFont: {
@@ -177,6 +298,15 @@ export class FontManagerBody extends Component {
     }, () => this.handleUpdateFontState())
   }
 
+  /**
+   * Handle process for uploading font variant
+   *
+   * @param fontVariant: string
+   * @param file: file
+   * @param state: string
+   *
+   * @since 6.0
+   */
   handleUpload = (fontVariant, file, state) => {
     const { msg: { error } } = this.props
     const fontFileMissing = (error && typeof error.addFont === 'object') && error.addFont
@@ -184,6 +314,7 @@ export class FontManagerBody extends Component {
     /* If error exist delete it first to enable dropping */
     fontFileMissing && Object.entries(fontFileMissing).map(([key]) => {
       if (fontVariant === key) {
+        /* Call redux action deleteVariantError() */
         this.props.deleteVariantError(fontVariant)
       }
     })
@@ -202,6 +333,17 @@ export class FontManagerBody extends Component {
     }, () => this.handleUpdateFontState())
   }
 
+  /**
+   * Check validation for font name input box field and font files drop box field
+   *
+   * @param state: string
+   * @param label: string
+   * @param regular: string
+   *
+   * @returns { boolean }
+   *
+   * @since 6.0
+   */
   handleValidateInputFields = (state, label, regular) => {
     const defaultState = state === 'addFont' ? this.state.addFont : this.state.updateFont
     const validate = { validateLabel: true, validateRegular: true }
@@ -237,10 +379,17 @@ export class FontManagerBody extends Component {
     }
 
     this.setState({ [state]: { ...defaultState, ...validate } })
+    /* Call redux action validationError() */
     this.props.validationError()
     return false
   }
 
+  /**
+   * Check the update font panel state and disable or enable the update button based on
+   * new field change
+   *
+   * @since 6.0
+   */
   handleUpdateFontState = () => {
     const { fontList, id } = this.props
 
@@ -263,21 +412,36 @@ export class FontManagerBody extends Component {
     }
   }
 
+  /**
+   * Handle our add font process and call our addFont redux action
+   *
+   * @since 6.0
+   */
   handleAddFont = () => {
     const { label, fontStyles } = this.state.addFont
 
+    /* Check if all fields are valid */
     if (!this.handleValidateInputFields('addFont', label, fontStyles.regular)) {
       return
     }
 
+    /* Call redux action addFont() */
     this.props.addFont({ label, ...fontStyles })
   }
 
+  /**
+   * Handle our edit font process and call our editFont redux action
+   *
+   * @param id: string
+   *
+   * @since 6.0
+   */
   handleEditFont = id => {
     const { label, fontStyles, kashida } = this.state.updateFont
     const { fontList, editFont, clearAddFontMsg } = this.props
     const data = {}
 
+    /* Check if all fields are valid */
     if (!this.handleValidateInputFields('updateFont', label, fontStyles.regular)) {
       return
     }
@@ -304,26 +468,56 @@ export class FontManagerBody extends Component {
       kashida === currentKashida &&
       JSON.stringify(fontStyles) === JSON.stringify(currentFontStyles)
     ) {
+      /* Call redux action clearAddFontMsg() */
       return clearAddFontMsg()
     }
 
-    editFont({
-      id,
-      font: {
-        label,
-        useKashida: kashida,
-        ...data
-      }
-    })
+    /* Call redux action editFont() */
+    editFont({ id, font: { label, useKashida: kashida, ...data } })
   }
 
+  /**
+   * Listen to cancel button click event
+   *
+   * @since 6.0
+   */
   handleCancelEditFont = () => {
     const { history, clearAddFontMsg } = this.props
 
     toggleUpdateFont(history)
+    /* Call redux action clearAddFontMsg() */
     clearAddFontMsg()
   }
 
+  /**
+   * Listen to cancel button keyboard press event (space and enter)
+   *
+   * @param e: class
+   *
+   * @since 6.0
+   */
+  handleCancelEditFontKeypress = e => {
+    const enter = 13
+    const space = 32
+
+    if (e.keyCode === enter || e.keyCode === space) {
+      const { history, clearAddFontMsg } = this.props
+
+      toggleUpdateFont(history)
+      /* Call redux action clearAddFontMsg() */
+      clearAddFontMsg()
+    }
+  }
+
+  /**
+   * Listen to form submit event and distinguish if it's add or edit request
+   *
+   * @param e: object
+   *
+   * @returns { component method }
+   *
+   * @since 6.0
+   */
   handleSubmit = e => {
     e.preventDefault()
     const { id } = this.props
@@ -335,6 +529,11 @@ export class FontManagerBody extends Component {
     this.handleAddFont()
   }
 
+  /**
+   * Display the font manager body UI
+   *
+   * @since 6.0
+   */
   render () {
     const updateFontVisible = document.querySelector('.update-font.show')
     const { id, fontList, msg, loading, history } = this.props
@@ -369,6 +568,7 @@ export class FontManagerBody extends Component {
             onHandleUpload={this.handleUpload}
             onHandleDeleteFontStyle={this.handleDeleteFontStyle}
             onHandleCancelEditFont={this.handleCancelEditFont}
+            onHandleCancelEditFontKeypress={this.handleCancelEditFontKeypress}
             onHandleSubmit={this.handleSubmit}
             fontList={fontList}
             msg={msg}
@@ -385,13 +585,26 @@ export class FontManagerBody extends Component {
   }
 }
 
+/**
+ * Map redux state to props
+ *
+ * @param state: object
+ *
+ * @returns {{ loading: boolean, fontList: array of object, msg: object }}
+ *
+ * @since 6.0
+ */
 const mapStateToProps = state => ({
   loading: state.fontManager.addFontLoading,
   fontList: state.fontManager.fontList,
-  searchResult: state.fontManager.searchResult,
   msg: state.fontManager.msg
 })
 
+/**
+ * Connect and dispatch redux actions as props
+ *
+ * @since 6.0
+ */
 export default connect(mapStateToProps, {
   getCustomFontList,
   addFont,

@@ -1,3 +1,18 @@
+/**
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2020, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       6.0
+ */
+
+/**
+ * This function is used to update font manager "dropdown select box" selected value
+ *
+ * @param fontList: array of object
+ * @param id string
+ *
+ * @since 6.0
+ */
 export default (fontList, id) => {
   const fontManagerSelectBox = document.querySelector('.gfpdf-font-manager select')
   const definedFontsOptgroup = document.querySelector('optgroup[label="User-Defined Fonts"]')

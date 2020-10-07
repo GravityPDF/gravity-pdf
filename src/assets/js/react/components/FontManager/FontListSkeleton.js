@@ -1,5 +1,18 @@
+/* Dependencies */
 import React from 'react'
 
+/**
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2020, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       6.0
+ */
+
+/**
+ * Display font list loading skeleton UI
+ *
+ * @since 6.0
+ */
 const FontListSkeleton = () => {
   const fontList = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 

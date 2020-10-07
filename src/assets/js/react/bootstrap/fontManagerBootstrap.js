@@ -1,28 +1,57 @@
+/* Dependencies */
 import React from 'react'
 import { render } from 'react-dom'
 import { HashRouter as Router, Route } from 'react-router-dom'
-import { getStore } from '../store'
-import fontManagerRouter from '../router/fontManagerRouter'
+/* Components */
 import AdvancedButton from '../components/FontManager/AdvancedButton'
+/* Routes */
+import fontManagerRouter from '../router/fontManagerRouter'
+/* Redux store */
+import { getStore } from '../store'
 
-export function fontManagerBootstrap (defaultFontField) {
+/**
+ * @package     Gravity PDF
+ * @copyright   Copyright (c) 2020, Blue Liquid Designs
+ * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since       6.0
+ */
+
+/**
+ * Mount our font manager advanced button on the DOM
+ *
+ * @param defaultFontField: div element
+ * @param buttonStyle: string
+ *
+ * @since 6.0
+ */
+export function fontManagerBootstrap (defaultFontField, buttonStyle) {
   const store = getStore()
+  /* Prevent button reset styling on tools tab */
+  const preventButtonReset = !buttonStyle ? '' : buttonStyle
 
-  createAdvancedButton(defaultFontField)
+  createAdvancedButtonWrapper(defaultFontField, preventButtonReset)
 
   render(
     <Router>
       <Route render={props => <AdvancedButton {...props} store={store} />} />
     </Router>,
-    document.querySelector('#gpdf-advance-font-manager-selector')
+    document.querySelector('#gpdf-advance-font-manager-selector' + preventButtonReset)
   )
 
   fontManagerRouter(store)
 }
 
-export function createAdvancedButton (defaultFontField) {
+/**
+ * Create html element wrapper for our font manager advanced button
+ *
+ * @param defaultFontField: div element
+ * @param preventButtonReset: string
+ *
+ * @since 6.0
+ */
+export function createAdvancedButtonWrapper (defaultFontField, preventButtonReset) {
   const wrapper = document.createElement('span')
-  wrapper.setAttribute('id', 'gpdf-advance-font-manager-selector')
+  wrapper.setAttribute('id', 'gpdf-advance-font-manager-selector' + preventButtonReset)
 
   const popupWrapper = document.createElement('div')
   popupWrapper.setAttribute('id', 'font-manager-overlay')
