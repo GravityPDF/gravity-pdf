@@ -1,51 +1,44 @@
-import { button, radioItem, link } from '../page-model/helpers/field'
-import Pdf from '../page-model/helpers/pdf'
-import DebugModeShortcode from '../page-model/advanced-checks/debug-mode-shortcode'
-import ConfirmationShortcodes from '../page-model/advanced-checks/confirmation-shortcode'
-import PdfTemplateEntries from '../page-model/form-settings/pdf-template-entries'
+import AdvancedCheck from '../utilities/page-model/helpers/advanced-check'
+import General from '../utilities/page-model/tabs/general-settings'
 
-const pdf = new Pdf()
-const run = new DebugModeShortcode()
-const cs = new ConfirmationShortcodes()
-const pte = new PdfTemplateEntries()
-let shorcodeHolder
+let shortcodeHolder
+const advancedCheck = new AdvancedCheck()
+const general = new General()
 
-fixture`Debug Mode - PDF Shortcode Test`
+fixture`Debug mode - PDF shortcode test`
 
 test('should enable debug mode and throw error when PDF is inactive', async t => {
   // Actions & Assertions
-  await pdf.navigatePdfSection('gf_settings&subview=PDF&tab=general#')
+  await advancedCheck.navigateSection('gf_settings&subview=PDF&tab=general#')
   await t
-    .click(radioItem('gfpdf_settings', 'debug_mode', 'Yes'))
-    .click(run.saveButton)
-    .wait(1000)
-  await cs.copyDownloadShortcode('gf_edit_forms&view=settings&subview=pdf&id=3')
-  shorcodeHolder = await cs.shortcodeField.value
-  await t.click(pte.toggleSwitch)
-  await cs.navigateConfirmationsSection('gf_edit_forms&view=settings&subview=confirmation&id=3')
+    .click(advancedCheck.debugModeCheckbox)
+    .click(general.saveSettings)
+  await advancedCheck.copyDownloadShortcode('gf_edit_forms&view=settings&subview=pdf&id=3')
+  shortcodeHolder = await advancedCheck.shortcodeInputBox.value
+  await t.click(advancedCheck.toggleSwitch)
+  await advancedCheck.navigateConfirmationSection('gf_edit_forms&view=settings&subview=confirmation&id=3')
   await t
-    .click(cs.confirmationText)
-    .click(button('Text'))
+    .click(advancedCheck.confirmationTextCheckbox)
+    .click(advancedCheck.wsiwigEditor)
     .pressKey('ctrl+a')
     .pressKey('backspace')
-    .typeText(cs.wsiwigEditor, shorcodeHolder, { paste: true })
-    .click(cs.saveButton)
-    .click(link('#gf_form_toolbar', 'Preview'))
-    .typeText(cs.formInputField, 'test', { paste: true })
-    .click(cs.submitButton)
-    .expect(run.errorMessage.exists).ok()
+    .typeText(advancedCheck.wsiwigEditor, shortcodeHolder, { paste: true })
+    .click(advancedCheck.saveConfirmationButton)
+    .click(advancedCheck.previewLink)
+    .typeText(advancedCheck.formInputField, 'test', { paste: true })
+    .click(advancedCheck.submitButton)
+    .expect(advancedCheck.debugModeErrorMessage.exists).ok()
 })
 
 test('should reset/clean PDF back to active and debug mode back to disabled for the next test', async t => {
   // Actions & Assertions
-  await pdf.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=3')
+  await advancedCheck.navigateSection('gf_edit_forms&view=settings&subview=pdf&id=3')
   await t
-    .click(pte.toggleSwitch)
-    .expect(run.activePDF.exists).ok()
-  await run.navigateLink('gf_settings&subview=PDF&tab=general#')
+    .click(advancedCheck.toggleSwitch)
+    .expect(advancedCheck.activePdfTemplate.exists).ok()
+  await advancedCheck.navigateLink('gf_settings&subview=PDF&tab=general#')
   await t
-    .click(radioItem('gfpdf_settings', 'debug_mode', 'No'))
-    .click(run.saveButton)
-    .wait(1000)
-    .expect(run.noSelected.exists).ok()
+    .click(advancedCheck.debugModeCheckbox)
+    .click(general.saveSettings())
+    .expect(advancedCheck.debugModeCheckbox.checked).notOk()
 })
