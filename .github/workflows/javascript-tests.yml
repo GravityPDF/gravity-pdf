@@ -50,5 +50,5 @@ jobs:
       - name: Install Dependencies
         run: yarn install
 
-      - name: Run Karma tests
+      - name: Run Jest tests
         run: yarn test:js

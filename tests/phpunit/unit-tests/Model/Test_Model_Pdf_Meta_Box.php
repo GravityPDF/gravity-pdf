@@ -77,7 +77,7 @@ class Test_Model_Pdf_Meta_Box extends WP_UnitTestCase {
 		$this->model->view_pdf_entry_detail( [ 'entry' => $entry ] );
 		$html = ob_get_clean();
 
-		$this->assertStringContainsString( '<div class="gfpdf_detailed_pdf_cta">', $html );
+		$this->assertStringContainsString( '<div class="gfpdf_detailed_pdf_cta"', $html );
 	}
 
 	/**

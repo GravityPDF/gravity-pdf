@@ -4,7 +4,7 @@ import { button } from './field'
 
 class FontManager {
   constructor () {
-    this.advancedButton = Selector('#gfpdf-settings-field-wrapper-font-container').find('button').withText('Advanced')
+    this.advancedButton = Selector('#gfpdf-settings-field-wrapper-font-container').find('button').withText('Manage')
     this.fontManagerPopup = Selector('div').find('[class^="container theme-wrap font-manager"]')
 
     // Header section
@@ -55,7 +55,7 @@ class FontManager {
       .useRole(admin)
       .setNativeDialogHandler(() => true)
       .navigateTo(`${baseURL}/wp-admin/admin.php?page=${address}`)
-      .click(button('Advanced'))
+      .click(button('Manage'))
   }
 }
 

@@ -20,8 +20,7 @@ class TemplateButton extends React.Component {
    * @since 4.1
    */
   static propTypes = {
-    history: PropTypes.object,
-    buttonText: PropTypes.string
+    history: PropTypes.object
   }
 
   /**
@@ -50,8 +49,9 @@ class TemplateButton extends React.Component {
         className='button gfpdf-button'
         onClick={this.handleClick}
         ref={node => (this.button = node)}
+        aria-label={GFPDF.manageTemplates}
       >
-        {this.props.buttonText}
+        {GFPDF.manage}
       </button>
     )
   }

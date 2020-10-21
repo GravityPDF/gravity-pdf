@@ -32,7 +32,8 @@ window.GFPDF = {
   fontManagerTemplateTooltipLabel: 'View template usage',
   addUpdateFontSuccess: 'Your font has been saved.',
   addFatalError: 'A problem occurred. Reload the page and try again.',
-  fontFileInvalid: 'Font file(s) are malformed and cannot be used with Gravity PDF'
+  fontFileInvalid: 'Font file(s) are malformed and cannot be used with Gravity PDF',
+  manage: 'Advanced',
 }
 
 window.gfpdf_migration_multisite_ids = []

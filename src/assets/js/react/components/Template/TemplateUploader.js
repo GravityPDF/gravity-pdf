@@ -247,7 +247,7 @@ export class TemplateUploader extends React.Component {
                 className={classNames('dropzone', { 'dropzone--isActive': isDragActive })}
               >
                 <input {...getInputProps()} />
-                <a href='#/template' className={this.state.ajax ? 'doing-ajax' : ''}>
+                <a href='#/template' className={this.state.ajax ? 'doing-ajax' : ''} aria-labelledby='gfpdf-template-install-instructions'>
 
                   <div className='theme-screenshot'><span /></div>
 
@@ -269,7 +269,7 @@ export class TemplateUploader extends React.Component {
 
                   <h2 className='theme-name'>{this.props.addTemplateText}</h2>
                 </a>
-                <div className='gfpdf-template-install-instructions'>
+                <div className='gfpdf-template-install-instructions' id='gfpdf-template-install-instructions'>
                   {this.props.templateInstallInstructions}
                 </div>
               </div>

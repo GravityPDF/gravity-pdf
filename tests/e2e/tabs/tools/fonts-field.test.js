@@ -15,7 +15,7 @@ test('should display \'Fonts\' field', async t => {
   await t
     .expect(fieldHeaderTitle('Fonts').exists).ok()
     .expect(fieldDescription('Install custom fonts for use in your PDF documents. Only .ttf font files are supported.', 'span').exists).ok()
-    .expect(button('Advanced').exists).ok()
+    .expect(button('Manage').exists).ok()
 })
 
 test('should check that font manager popup exist', async t => {

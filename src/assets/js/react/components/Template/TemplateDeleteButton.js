@@ -104,6 +104,7 @@ export class TemplateDeleteButton extends React.Component {
         href='#'
         tabIndex='150'
         className='button button-secondary delete-theme ed_button'
+        aria-label={this.props.buttonText + ' ' + GFPDF.template}
       >
         {this.props.buttonText}
       </a>

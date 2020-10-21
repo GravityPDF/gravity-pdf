@@ -56,6 +56,7 @@ export class TemplateActivateButton extends React.Component {
         href='#'
         tabIndex='150'
         className='button activate'
+        aria-label={this.props.buttonText + ' ' + GFPDF.template}
       >
         {this.props.buttonText}
       </a>

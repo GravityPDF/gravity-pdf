@@ -37,12 +37,13 @@ export default class CoreFontListResults extends React.Component {
     const retry = this.props.retry.length > 0
 
     return (!lines.length) ? null : (
-      <div
+      <ul
         data-test='component-coreFont-container'
         className='gfpdf-core-font-list-results-container'
+        aria-label={GFPDF.coreFontAriaLabel}
       >
         {lines.map((key) =>
-          <div
+          <li
             data-test={console[key].status}
             key={key}
             className={'gfpdf-core-font-status-' + console[key].status}
@@ -51,9 +52,9 @@ export default class CoreFontListResults extends React.Component {
             {' '}
             {key === 'completed' && retry && <Retry history={this.props.history} retryText={this.props.retryText} />}
             {key === 'completed' && <ListSpacer />}
-          </div>
+          </li>
         )}
-      </div>
+      </ul>
     )
   }
 }
@@ -96,6 +97,8 @@ export class Retry extends React.Component {
         data-test='component-retry-link'
         href='#'
         onClick={this.handleTriggerRetryFontDownload}
+        aria-live='polite'
+        role='dialog'
       >
         {this.props.retryText}
       </a>
