@@ -232,7 +232,6 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			<svg viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="2" r="1" stroke-width="2"/></svg>
 			<span class="gform-status-indicator-status"><?php echo esc_html( $text ); ?></span>
 		</button>
-
 		<?php
 	}
 
