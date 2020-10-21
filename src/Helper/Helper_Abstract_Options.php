@@ -1656,6 +1656,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$html .= sprintf( $alert, wp_kses_post( $value['msg'] ) );
 		}
 
+		$html .= '<label for="gfpdf_settings[' . esc_attr( $args['id'] ) . ']" class="screen-reader-text"> ' . esc_html( $args['name'] ) . ' ' . esc_html__( 'license key', 'gravity-forms-pdf-extended' ) . '</label>';
 		$html .= '<input autocomplete="off" type="text" class="regular-text" id="gfpdf_settings[' . esc_attr( $args['id'] ) . ']" class="gfpdf_settings_' . esc_attr( $args['id'] ) . '" name="gfpdf_settings[' . esc_attr( $args['id'] ) . ']" value="' . esc_attr( stripslashes( $value['key'] ) ) . '" />';
 
 		/* Add renewal info */

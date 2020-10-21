@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ?>
 
-<div style="font-size:15px; line-height: 25px">
+<div style="font-size:15px; line-height: 25px" role="alert" aria-live="polite">
 
 	<strong><?php esc_html_e( 'Gravity PDF needs to download the Core PDF fonts.', 'gravity-forms-pdf-extended' ); ?></strong>
 

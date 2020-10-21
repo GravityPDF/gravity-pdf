@@ -49,25 +49,25 @@ describe('CoreFonts - CoreFontListResults.js', () => {
     test('renders console pending output for our core font downloader', () => {
       const wrapper = shallow(<CoreFontListResults console={dataPending} retry={[]} />)
 
-      expect(wrapper.find('div.gfpdf-core-font-status-pending').length).toEqual(2)
-      expect(wrapper.find('div.gfpdf-core-font-status-pending').at(0).text()).toBe('Downloading Abyssinica_SIL.ttf... ')
-      expect(wrapper.find('div.gfpdf-core-font-status-pending').at(1).text()).toBe('Downloading AboriginalSansREGULAR.ttf... ')
+      expect(wrapper.find('.gfpdf-core-font-status-pending').length).toEqual(2)
+      expect(wrapper.find('.gfpdf-core-font-status-pending').at(0).text()).toBe('Downloading Abyssinica_SIL.ttf... ')
+      expect(wrapper.find('.gfpdf-core-font-status-pending').at(1).text()).toBe('Downloading AboriginalSansREGULAR.ttf... ')
     })
 
     test('renders console success output for our core font downloader', () => {
       const wrapper = shallow(<CoreFontListResults console={dataSuccess} retry={[]} />)
 
-      expect(wrapper.find('div.gfpdf-core-font-status-success').length).toEqual(2)
-      expect(wrapper.find('div.gfpdf-core-font-status-success').at(0).text()).toBe('Completed installation of Abyssinica_SIL.ttf ')
-      expect(wrapper.find('div.gfpdf-core-font-status-success').at(1).text()).toBe('Completed installation of AboriginalSansREGULAR.ttf ')
+      expect(wrapper.find('.gfpdf-core-font-status-success').length).toEqual(2)
+      expect(wrapper.find('.gfpdf-core-font-status-success').at(0).text()).toBe('Completed installation of Abyssinica_SIL.ttf ')
+      expect(wrapper.find('.gfpdf-core-font-status-success').at(1).text()).toBe('Completed installation of AboriginalSansREGULAR.ttf ')
     })
 
     test('renders list spacer container component <ListSpacer />', () => {
       const wrapper = shallow(<CoreFontListResults console={dataCompleted} retry={[]} />)
 
-      expect(wrapper.find('div.gfpdf-core-font-status-success').length).toEqual(2)
-      expect(wrapper.find('div.gfpdf-core-font-status-success').at(0).text()).toBe('ALL CORE FONTS SUCCESSFULLY INSTALLED <CoreFontListSpacer />')
-      expect(wrapper.find('div.gfpdf-core-font-status-success').at(1).text()).toBe('Completed installation of Abyssinica_SIL.ttf ')
+      expect(wrapper.find('.gfpdf-core-font-status-success').length).toEqual(2)
+      expect(wrapper.find('.gfpdf-core-font-status-success').at(0).text()).toBe('ALL CORE FONTS SUCCESSFULLY INSTALLED <CoreFontListSpacer />')
+      expect(wrapper.find('.gfpdf-core-font-status-success').at(1).text()).toBe('Completed installation of Abyssinica_SIL.ttf ')
     })
 
     test('renders retry component <Retry />', () => {

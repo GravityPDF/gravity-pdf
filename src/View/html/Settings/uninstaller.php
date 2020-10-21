@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <!-- Prevent Firefox auto-filling fields on refresh. @see https://stackoverflow.com/a/44504822/1614565 -->
-<form name="gfpdf-settings-form-<?= rand() ?>" method="post" class="gform_settings_form">
+<form name="gfpdf-settings-form-<?= rand() ?>" aria-labelledby="uninstall-gfpdf-description" method="post"  class="gform_settings_form">
 	<?php wp_nonce_field( 'gfpdf-uninstall-plugin', 'gfpdf-uninstall-plugin' ); ?>
 	<input type="hidden" name="gfpdf_uninstall" value="1" />
 

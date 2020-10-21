@@ -36,7 +36,7 @@ export const FontList = ({ id, loading, fontList, searchResult, msg: { error }, 
   const emptySearchResult = (!fontListError && !loading) && (!latestData && checkSearchResult)
 
   return (
-    <div data-test='component-FontList' className='font-list'>
+    <div data-test='component-FontList' className='font-list' aria-live='polite'>
       <FontListHeader />
 
       {loading ? <FontListSkeleton /> : <FontListItems id={id} history={history} />}

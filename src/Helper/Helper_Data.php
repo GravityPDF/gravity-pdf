@@ -241,11 +241,15 @@ class Helper_Data {
 				'yes'                                  => esc_html__( 'Yes', 'gravity-forms-pdf-extended' ),
 				'standard'                             => esc_html__( 'Standard', 'gravity-forms-pdf-extended' ),
 				'advanced'                             => esc_html__( 'Advanced', 'gravity-forms-pdf-extended' ),
+				'manage'                               => esc_html__( 'Manage', 'gravity-forms-pdf-extended' ),
+				'details'                              => esc_html__( 'Details', 'gravity-forms-pdf-extended' ),
 				'select'                               => esc_html__( 'Select', 'gravity-forms-pdf-extended' ),
 				'version'                              => esc_html__( 'Version', 'gravity-forms-pdf-extended' ),
 				'group'                                => esc_html__( 'Group', 'gravity-forms-pdf-extended' ),
 				'tags'                                 => esc_html__( 'Tags', 'gravity-forms-pdf-extended' ),
 
+				'template'                             => esc_html__( 'Template', 'gravity-forms-pdf-extended' ),
+				'manageTemplates'                      => esc_html__( 'Manage PDF Templates', 'gravity-forms-pdf-extended' ),
 				'addNewTemplate'                       => esc_html__( 'Add New Template', 'gravity-forms-pdf-extended' ),
 				'thisFormHasNoPdfs'                    => esc_html__( "This form doesn't have any PDFs.", 'gravity-forms-pdf-extended' ),
 				'letsGoCreateOne'                      => esc_html__( "Let's go create one", 'gravity-forms-pdf-extended' ),
@@ -280,6 +284,7 @@ class Helper_Data {
 				'coreFontItemErrorMessage'             => esc_html__( 'Failed installation of %s', 'gravity-forms-pdf-extended' ),
 				'coreFontCounter'                      => esc_html__( 'Fonts remaining:', 'gravity-forms-pdf-extended' ),
 				'coreFontRetry'                        => esc_html__( 'Retry Failed Downloads?', 'gravity-forms-pdf-extended' ),
+				'coreFontAriaLabel'                    => esc_html__( 'Core font installation', 'gravity-forms-pdf-extended' ),
 
 				/* Font Manager */
 				'fontManagerSearchPlaceHolder'         => esc_html__( 'Search installed fonts', 'gravity-forms-pdf-extended' ),

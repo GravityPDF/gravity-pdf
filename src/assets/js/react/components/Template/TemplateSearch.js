@@ -79,7 +79,7 @@ export class TemplateSearch extends React.Component {
    */
   render () {
     return (
-      <div data-test='component-templateSearch'>
+      <div data-test='component-templateSearch' role="form">
         <input
           className='wp-filter-search'
           id='wp-filter-search-input'

@@ -323,7 +323,7 @@ export class FontListItems extends Component {
     const tabIndex = updateFontVisible ? '-1' : '144'
 
     return (
-      <div data-test='component-FontListItems' className='font-list-items'>
+      <div data-test='component-FontListItems' className='font-list-items' role='listbox' aria-label={GFPDF.fontListInstalledFonts} aria-live='polite'>
         {list && list.map(font => {
           return (
             <div
@@ -332,6 +332,7 @@ export class FontListItems extends Component {
               onClick={() => this.handleFontClick(font.id)}
               onKeyDown={e => this.handleFontClickKeypress(e, font.id)}
               tabIndex={tabIndex}
+              role="option"
             >
               <span className='font-name'>
                 {!disableSelectFontName && (
