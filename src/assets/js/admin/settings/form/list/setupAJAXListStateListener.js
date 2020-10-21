@@ -17,10 +17,10 @@ export function setupAJAXListStateListener () {
 
       if (isActive) {
         that.src = that.src.replace('active1.svg', 'active0.svg')
-        $(that).attr('title', GFPDF.inactive).attr('alt', GFPDF.inactive)
+        $(that).attr('title', GFPDF.inactive).attr('alt', GFPDF.inactive).attr('aria-label', GFPDF.inactive).attr('role','img')
       } else {
         that.src = that.src.replace('active0.svg', 'active1.svg')
-        $(that).attr('title', GFPDF.active).attr('alt', GFPDF.active)
+        $(that).attr('title', GFPDF.active).attr('alt', GFPDF.active).attr('aria-label', GFPDF.active).attr('role','img')
       }
 
       /* Set up ajax data */

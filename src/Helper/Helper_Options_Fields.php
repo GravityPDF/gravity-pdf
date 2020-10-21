@@ -77,7 +77,6 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'type'    => 'select',
 						'options' => $this->get_installed_fonts(),
 						'tooltip' => '<h6>' . esc_html__( 'Fonts', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Gravity PDF comes bundled with fonts for most languages world-wide. Want to use a specific font type? Use the font installer (found in the Tools tab).', 'gravity-forms-pdf-extended' ),
-						'class'   => 'gfpdf-font-manager',
 					],
 
 					'default_pdf_size'        => [
@@ -237,7 +236,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				'uninstaller' => [
 					'id'         => 'uninstaller',
 					'name'       => esc_html__( 'Uninstall Gravity PDF', 'gravity-forms-pdf-extended' ),
-					'desc'       => '<p class="alert error">' . esc_html__( 'This operation deletes ALL Gravity PDF settings and deactivates the plugin. If you continue, all settings, configuration, custom templates and fonts will be removed.', 'gravity-forms-pdf-extended' ) . '</p>',
+					'desc'       => '<p class="alert error" role="dialog">' . esc_html__( 'This operation deletes ALL Gravity PDF settings and deactivates the plugin. If you continue, all settings, configuration, custom templates and fonts will be removed.', 'gravity-forms-pdf-extended' ) . '</p>',
 					'type'       => 'button',
 					'inputClass' => 'primary',
 					'std'        => esc_html__( 'Uninstall Gravity PDF', 'gravity-forms-pdf-extended' ),
@@ -325,14 +324,13 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					],
 
 					'custom_pdf_size' => [
-						'id'       => 'custom_pdf_size',
-						'name'     => esc_html__( 'Custom Paper Size', 'gravity-forms-pdf-extended' ),
-						'desc'     => esc_html__( 'Control the exact paper size. Can be set in millimeters or inches.', 'gravity-forms-pdf-extended' ),
-						'type'     => 'paper_size',
-						'size'     => 'small',
-						'class'    => 'gfpdf-hidden gfpdf_paper_size_other',
-						'std'      => $this->get_option( 'default_custom_pdf_size' ),
-						'required' => true,
+						'id'    => 'custom_pdf_size',
+						'name'  => esc_html__( 'Custom Paper Size', 'gravity-forms-pdf-extended' ),
+						'desc'  => esc_html__( 'Control the exact paper size. Can be set in millimeters or inches.', 'gravity-forms-pdf-extended' ),
+						'type'  => 'paper_size',
+						'size'  => 'small',
+						'class' => 'gfpdf-hidden gfpdf_paper_size_other',
+						'std'   => $this->get_option( 'default_custom_pdf_size' ),
 					],
 
 					'orientation'     => [
@@ -353,7 +351,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'options' => $this->get_installed_fonts(),
 						'std'     => $this->get_option( 'default_font' ),
 						'desc'    => sprintf( esc_html__( 'Set the primary font used in PDFs. You can also %1$sinstall your own%2$s.', 'gravity-forms-pdf-extended' ), '<a href="' . $this->data->settings_url . '&tab=tools#manage_fonts">', '</a>' ),
-						'class'   => 'gfpdf_font_type gfpdf-font-manager',
+						'class'   => 'gfpdf_font_type',
 					],
 
 					'font_size'       => [

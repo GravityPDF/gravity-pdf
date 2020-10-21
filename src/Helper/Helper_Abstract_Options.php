@@ -2,8 +2,6 @@
 
 namespace GFPDF\Helper;
 
-use GFPDF\Controller\Controller_Custom_Fonts;
-use GFPDF\Model\Model_Custom_Fonts;
 use Psr\Log\LoggerInterface;
 use WP_Error;
 
@@ -206,7 +204,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function register_settings( $fields = [] ) {
 		global $wp_settings_fields;
-
 		foreach ( $fields as $tab => $settings ) {
 
 			/* Clear all previously set types */
@@ -250,7 +247,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 						'uploaderTitle'      => isset( $option['uploaderTitle'] ) ? $option['uploaderTitle'] : null,
 						'uploaderButtonText' => isset( $option['uploaderButtonText'] ) ? $option['uploaderButtonText'] : null,
 						'toggle'             => isset( $option['toggle'] ) ? $option['toggle'] : null,
-						'data'               => isset( $option['data'] ) ? $option['data'] : null,
+						'data'               => isset( $option['data'] ) ? $option['data'] : null
 					]
 				);
 			}
@@ -805,7 +802,6 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		/* Add Gravity Forms Capabilities */
 		$gf_caps = $this->gform->get_capabilities();
-
 		foreach ( $gf_caps as $gf_cap ) {
 			$capabilities[ $gf_cap ] = $gf_cap;
 		}
@@ -979,8 +975,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @param array $fonts Current font list
 	 *
 	 * @return array The list of custom fonts installed in a preformatted array
-	 *
 	 * @since 4.0
+	 *
 	 */
 	public function add_custom_fonts( $fonts = [] ) {
 
@@ -992,7 +988,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 			/* Loop through our fonts and assign them to a new array in the appropriate format */
 			foreach ( $custom_fonts as $font ) {
-				$user_defined_fonts[ $font['id'] ] = $font['font_name'];
+				$user_defined_fonts[ $font['shortname'] ] = $font['font_name'];
 			}
 
 			/* Merge the new fonts at the beginning of the $fonts array */
@@ -1008,14 +1004,22 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @return array
 	 *
 	 * @since 4.0
-	 *
-	 * @deprecated
 	 */
 	public function get_custom_fonts() {
-		/** @var Controller_Custom_Fonts $custom_font_controller */
-		$custom_font_controller = \GPDFAPI::get_mvc_class( 'Controller_Custom_Fonts' );
+		$fonts = $this->get_option( 'custom_fonts' );
 
-		return $custom_font_controller->get_all_items();
+		if ( is_array( $fonts ) && count( $fonts ) > 0 ) {
+			foreach ( $fonts as &$font ) {
+				$font['shortname']   = $this->get_font_short_name( $font['font_name'] );
+				$font['italics']     = ( isset( $font['italics'] ) ) ? $font['italics'] : '';
+				$font['bold']        = ( isset( $font['bold'] ) ) ? $font['bold'] : '';
+				$font['bolditalics'] = ( isset( $font['bolditalics'] ) ) ? $font['bolditalics'] : '';
+			}
+
+			return $fonts;
+		}
+
+		return [];
 	}
 
 	/**
@@ -1023,15 +1027,12 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @param string $name The font name to convert
 	 *
-	 * @since  4.0
+	 * @return string       Shortname of font
 	 *
-	 * @deprecated
+	 * @since  4.0
 	 */
 	public function get_font_short_name( $name ) {
-		/** @var Model_Custom_Fonts $custom_font_model */
-		$custom_font_model = \GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' );
-
-		return $custom_font_model->get_font_short_name( $name );
+		return mb_strtolower( str_replace( ' ', '', $name ), 'UTF-8' );
 	}
 
 	/**
@@ -1131,13 +1132,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					if ( ! isset( $input[ $key ] ) ) {
 						$input[ $key ] = [];
 					}
-					break;
+				break;
 
 				default:
 					if ( ! isset( $input[ $key ] ) ) {
 						$input[ $key ] = '';
 					}
-					break;
+				break;
 			}
 		}
 
@@ -1324,7 +1325,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 						/* throw error */
 						add_settings_error( 'gfpdf-notices', $key, esc_html__( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
 					}
-					break;
+				break;
 
 				case 'paper_size':
 					if ( isset( $input['default_pdf_size'] ) && $input['default_pdf_size'] === 'CUSTOM' ) {
@@ -1333,14 +1334,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 							add_settings_error( 'gfpdf-notices', $key, esc_html__( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
 						}
 					}
-					break;
+				break;
 
 				default:
 					if ( strlen( trim( $value ) ) === 0 ) {
 						/* throw error */
 						add_settings_error( 'gfpdf-notices', $key, esc_html__( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
 					}
-					break;
+				break;
 			}
 		}
 
@@ -1405,7 +1406,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					return checked( 1, 1, false );
 				}
 
-				break;
+			break;
 
 			case 'multicheck':
 				if ( isset( $options[ $args['id'] ][ $args['multi-key'] ] ) ) {
@@ -1435,7 +1436,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					}
 				}
 
-				break;
+			break;
 
 			case 'radio':
 				if ( isset( $options[ $args['id'] ] ) && isset( $args['options'][ $options[ $args['id'] ] ] ) ) {
@@ -1448,7 +1449,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					return $args['std'];
 				}
 
-				break;
+			break;
 
 			case 'password':
 				if ( isset( $options[ $args['id'] ] ) ) {
@@ -1458,7 +1459,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					return trim( $pdf_form_settings[ $args['id'] ] );
 				}
 
-				break;
+			break;
 
 			case 'select':
 			case 'paper_size':
@@ -1471,7 +1472,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				} elseif ( isset( $args['std'] ) ) {
 					return $args['std'];
 				}
-				break;
+			break;
 
 			/* treat as a text or hidden callback */
 			default:
@@ -1484,7 +1485,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				} elseif ( isset( $args['std'] ) ) {
 					return $args['std'];
 				}
-				break;
+			break;
 		}
 
 		/* if we made it here return empty string */
@@ -1545,10 +1546,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				$args['multi-option'] = $key;
 
 				$enabled = $this->get_form_value( $args );
+				$label = esc_html( $option ) ;
+				$aria_checked = !empty( $enabled ) ? 'aria-checked="true"' : 'aria-checked="false"';
+				$aria_label = str_replace( '_', ' ',$label );
 
 				echo '<div class="gfpdf-settings-multicheck-wrapper">';
-				echo '<input name="gfpdf_settings[' . $args['id'] . '][' . $args['multi-key'] . ']" id="gfpdf_settings[' . $args['id'] . '][' . $args['multi-key'] . ']" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" type="checkbox" value="' . $args['multi-key'] . '" ' . checked( $key, $enabled, false ) . ' ' . $required . ' />&nbsp;';
-				echo '<label for="gfpdf_settings[' . $args['id'] . '][' . $args['multi-key'] . ']">' . esc_html( $option ) . '</label>';
+				echo '<input name="gfpdf_settings[' . $args['id'] . '][' . $args['multi-key'] . ']" id="gfpdf_settings[' . $args['id'] . '][' . $args['multi-key'] . ']" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" type="checkbox" value="' . $args['multi-key'] . '" ' . checked( $key, $enabled, false ) . ' ' . $required . ' role="checkbox" ' . $aria_checked . ' />&nbsp;';
+				echo '<label for="gfpdf_settings[' . $args['id'] . '][' . $args['multi-key'] . ']" aria-label="'. $aria_label .'">' . $label . '</label>';
 				echo '</div>';
 			}
 
@@ -1663,8 +1667,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				data-addon-name="' . esc_attr( substr( $args['id'], 8 ) ) . '" 
 				data-license="' . esc_attr( $value['key'] ) . '" 
 				data-nonce="' . wp_create_nonce( 'gfpdf_deactivate_license' ) . '">' .
-					 esc_attr__( 'Deactivate License', 'gravity-forms-pdf-extended' ) .
-					 '</button>';
+			         esc_attr__( 'Deactivate License', 'gravity-forms-pdf-extended' ) .
+			         '</button>';
 		}
 
 		$html .= wp_kses_post( $args['desc2'] );
@@ -2241,8 +2245,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$toggle_elm = '<label><input class="gfpdf-input-toggle" type="checkbox" value="1" ' . checked( $has_value, 1, false ) . ' /> ' . esc_attr( $toggle ) . '</label>';
 
 		$html = '<div class="gfpdf-toggle-wrapper" ' . $current_display . '>' .
-				$html .
-				'</div>';
+		        $html .
+		        '</div>';
 
 		$html = $toggle_elm . $html;
 
