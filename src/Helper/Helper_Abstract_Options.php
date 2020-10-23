@@ -247,7 +247,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 						'uploaderTitle'      => isset( $option['uploaderTitle'] ) ? $option['uploaderTitle'] : null,
 						'uploaderButtonText' => isset( $option['uploaderButtonText'] ) ? $option['uploaderButtonText'] : null,
 						'toggle'             => isset( $option['toggle'] ) ? $option['toggle'] : null,
-						'data'               => isset( $option['data'] ) ? $option['data'] : null,
+						'data'               => isset( $option['data'] ) ? $option['data'] : null
 					]
 				);
 			}
@@ -1533,7 +1533,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	public function multicheck_callback( $args ) {
 
 		$class      = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
-		$required   = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required ' : '';
+		$required   = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
 		$args['id'] = esc_attr( $args['id'] );
 
 		if ( ! empty( $args['options'] ) ) {
