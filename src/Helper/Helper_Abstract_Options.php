@@ -247,7 +247,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 						'uploaderTitle'      => isset( $option['uploaderTitle'] ) ? $option['uploaderTitle'] : null,
 						'uploaderButtonText' => isset( $option['uploaderButtonText'] ) ? $option['uploaderButtonText'] : null,
 						'toggle'             => isset( $option['toggle'] ) ? $option['toggle'] : null,
-						'data'               => isset( $option['data'] ) ? $option['data'] : null
+						'data'               => isset( $option['data'] ) ? $option['data'] : null,
 					]
 				);
 			}
@@ -1533,7 +1533,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	public function multicheck_callback( $args ) {
 
 		$class      = ( isset( $args['inputClass'] ) ) ? esc_attr( $args['inputClass'] ) : '';
-		$required   = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required' : '';
+		$required   = ( isset( $args['required'] ) && $args['required'] === true ) ? 'required ' : '';
 		$args['id'] = esc_attr( $args['id'] );
 
 		if ( ! empty( $args['options'] ) ) {
@@ -1546,13 +1546,10 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				$args['multi-option'] = $key;
 
 				$enabled = $this->get_form_value( $args );
-				$label = esc_html( $option ) ;
-				$aria_checked = !empty( $enabled ) ? 'aria-checked="true"' : 'aria-checked="false"';
-				$aria_label = str_replace( '_', ' ',$label );
 
 				echo '<div class="gfpdf-settings-multicheck-wrapper">';
-				echo '<input name="gfpdf_settings[' . $args['id'] . '][' . $args['multi-key'] . ']" id="gfpdf_settings[' . $args['id'] . '][' . $args['multi-key'] . ']" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" type="checkbox" value="' . $args['multi-key'] . '" ' . checked( $key, $enabled, false ) . ' ' . $required . ' role="checkbox" ' . $aria_checked . ' />&nbsp;';
-				echo '<label for="gfpdf_settings[' . $args['id'] . '][' . $args['multi-key'] . ']" aria-label="'. $aria_label .'">' . $label . '</label>';
+				echo '<input name="gfpdf_settings[' . $args['id'] . '][' . $args['multi-key'] . ']" id="gfpdf_settings[' . $args['id'] . '][' . $args['multi-key'] . ']" class="gfpdf_settings_' . $args['id'] . ' ' . $class . '" type="checkbox" value="' . $args['multi-key'] . '" ' . checked( $key, $enabled, false ) . ' ' . $required . '/>&nbsp;';
+				echo '<label for="gfpdf_settings[' . $args['id'] . '][' . $args['multi-key'] . ']">' . esc_html( $option ) . '</label>';
 				echo '</div>';
 			}
 
@@ -2065,7 +2062,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		?>
 		<div class="gform-settings-field gform-settings-field__toggle <?= $class ?>">
-			<span class="gform-settings-description"><?= wp_kses_post( $args['desc'] ) ?></span>
+			<span class="gform-settings-description" id="gfpdf-settings-field-wrapper-<?= $args['id'] ?>__description"><?= wp_kses_post( $args['desc'] ) ?></span>
 
 			<span class="gform-settings-input__container">
 				<input type="checkbox" id="gfpdf_settings[<?= $args['id'] ?>]" name="gfpdf_settings[<?= $args['id'] ?>]" value="Yes" <?= checked( $value, 'Yes', false ) ?> />
