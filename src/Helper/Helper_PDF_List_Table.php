@@ -219,16 +219,19 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$form_id     = rgget( 'id' );
 		$state_nonce = wp_create_nonce( "gfpdf_state_nonce_{$form_id}_{$item['id']}" );
 
-		$active_label   = esc_attr__( 'Active', 'gravity-forms-pdf-extended' );
-		$inactive_label = esc_attr__( 'Inactive', 'gravity-forms-pdf-extended' );
-		$label          = $is_active ? $active_label : $inactive_label;
+		if ( $is_active ) {
+			$class = 'gform-status--active';
+			$text  = esc_html__( 'Active', 'gravity-forms-pdf-extended' );
+		} else {
+			$class = 'gform-status--inactive';
+			$text  = esc_html__( 'Inactive', 'gravity-forms-pdf-extended' );
+		}
 		?>
 
-		<img data-id="<?= $item['id'] ?>" data-nonce="<?= $state_nonce ?>"
-			 data-fid="<?= $form_id ?>"
-			 src="<?= $this->gform->get_plugin_url() ?>/images/active<?= intval( $is_active ) ?>.svg"
-			 alt="<?= $label ?>"
-			 title="<?= $label ?>" />
+		<button type="button" class="gform-status-indicator <?php echo esc_attr( $class ); ?>" data-id="<?= $item['id'] ?>" data-nonce="<?= $state_nonce ?>" data-fid="<?= $form_id ?>" data-status="<?= $is_active ? 'active' : 'inactive' ?>">
+			<svg viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="2" r="1" stroke-width="2"/></svg>
+			<span class="gform-status-indicator-status"><?php echo esc_html( $text ); ?></span>
+		</button>
 
 		<?php
 	}
