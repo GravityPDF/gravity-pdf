@@ -898,7 +898,6 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 			/* toggle state */
 			$config['active'] = ( $config['active'] === true ) ? false : true;
 			$state            = ( $config['active'] ) ? esc_attr__( 'Active', 'gravity-forms-pdf-extended' ) : esc_attr__( 'Inactive', 'gravity-forms-pdf-extended' );
-			$src              = $this->gform->get_plugin_url() . '/images/active' . intval( $config['active'] ) . '.png';
 
 			$results = $this->options->update_pdf( $fid, $config['id'], $config );
 
@@ -907,7 +906,6 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 
 				$return = [
 					'state' => $state,
-					'src'   => $src,
 					'fid'   => $fid,
 					'pid'   => $config['id'],
 				];
