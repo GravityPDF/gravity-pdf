@@ -135,7 +135,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$singular = rgar( $this->_args, 'singular' );
 		?>
 
-		<table class="wp-list-table <?= implode( ' ', $this->get_table_classes() ); ?>" cellspacing="0">
+		<table class="wp-list-table <?= implode( ' ', $this->get_table_classes() ); ?>" cellspacing="0" aria-label="PDF List">
 			<thead>
 			<tr>
 				<?php $this->print_column_headers(); ?>
@@ -243,7 +243,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 */
 	public function column_notifications( $item ) {
 		if ( ! isset( $item['notification'] ) || count( $item['notification'] ) === 0 ) {
-			esc_html_e( 'None', 'gravity-forms-pdf-extended' );
+			printf( '<span aria-label="None">%s</span>', esc_html( 'None', 'gravity-forms-pdf-extended' ) );
 
 			return;
 		}
@@ -256,7 +256,8 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			}
 		}
 
-		echo implode( ', ', $notification_names );
+		echo sprintf( '<span aria-label="%1$s" >%1$s</span>', implode( ', ', $notification_names ) );
+
 	}
 
 	/**
@@ -299,9 +300,8 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			$template_group = $template['group'];
 			$template_name  = $this->templates->maybe_add_template_compatibility_notice( $template['template'], $template['required_pdf_version'] );
 
-			?>
-			<strong><?= $template_group; ?></strong> <?= $template_name; ?>
-			<?php
+			echo sprintf( '<span aria-label="%1$s %2$s"><strong>%1$s</strong> %2$s</span>', $template_group, $template_name );
+
 		}
 	}
 
@@ -315,6 +315,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	public function column_name( $item ) {
 		$edit_url        = add_query_arg( [ 'pid' => $item['id'] ] );
 		$form_id         = rgget( 'id' );
+		$pdf_name        = rgar( $item, 'name' );
 		$duplicate_nonce = wp_create_nonce( "gfpdf_duplicate_nonce_{$form_id}_{$item['id']}" );
 		$delete_nonce    = wp_create_nonce( "gfpdf_delete_nonce_{$form_id}_{$item['id']}" );
 
@@ -329,7 +330,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 		?>
 
-		<a href="<?= $edit_url; ?>"><strong><?= rgar( $item, 'name' ); ?></strong></a>
+		<a href="<?= $edit_url; ?>" aria-label="<?= $pdf_name ?> PDF"><strong><?= $pdf_name ?></strong></a>
 		<div class="row-actions">
 
 			<?php
@@ -339,7 +340,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 				foreach ( $actions as $key => $html ) {
 					$divider = $key === $last_key ? '' : ' | ';
 					?>
-					<span class="<?= $key; ?>">
+					<span class="<?= $key; ?>" aria-labelledby="pdf_<?= $form_id ?>">
 						<?= $html . $divider; ?>
 					</span>
 					<?php
@@ -358,6 +359,6 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 * @since 4.0
 	 */
 	public function no_items() {
-		printf( esc_html__( "This form doesn't have any PDFs. Let's go %1\$screate one%2\$s.", 'gravity-forms-pdf-extended' ), "<a href='" . add_query_arg( [ 'pid' => 0 ] ) . "'>", '</a>' );
+		printf( esc_html__( "%3\$sThis form doesn't have any PDFs. Let's go %1\$screate one%2\$s.%4\$s", 'gravity-forms-pdf-extended' ), "<a href='" . add_query_arg( [ 'pid' => 0 ] ) . "'>", '</a>', '<label>', '</label>' );
 	}
 }
