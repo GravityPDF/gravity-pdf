@@ -27,4 +27,5 @@ mv \
 ./tmp/wordpress-develop-$LATEST_VERSION/docker-compose.yml \
 ./tmp/wordpress-develop-$LATEST_VERSION/wp-cli.yml \
 ./tmp/wordpress-develop-$LATEST_VERSION/*config-sample.php \
-./tmp/wordpress-develop-$LATEST_VERSION/package.json wordpress
+./tmp/wordpress-develop-$LATEST_VERSION/package.json wordpress \
+./tmp/wordpress-develop-$LATEST_VERSION/package-lock.json wordpress
