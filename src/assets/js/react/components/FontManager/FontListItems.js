@@ -323,7 +323,7 @@ export class FontListItems extends Component {
     const list = !searchResult ? fontList : searchResult
 
     return (
-      <div className='font-list-items'>
+      <div className='font-list-items' role='listbox' aria-label='Installed fonts.'>
         {list && list.map(font => {
           return (
             <div

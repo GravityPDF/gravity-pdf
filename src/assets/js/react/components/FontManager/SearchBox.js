@@ -120,17 +120,19 @@ export class SearchBox extends Component {
    */
   render () {
     return (
-      <input
-        type='search'
-        id='font-manager-search-box'
-        className='wp-filter-search'
-        placeholder={GFPDF.fontManagerSearchPlaceHolder}
-        value={this.state.searchInput}
-        onChange={this.handleSearch}
-        onKeyDown={e => e.keyCode === 13 && e.preventDefault()}
-        ref={node => (this.input = node)}
-        tabIndex='143'
-      />
+      <div role='form'>
+        <input
+          type='search'
+          id='font-manager-search-box'
+          className='wp-filter-search'
+          placeholder={GFPDF.fontManagerSearchPlaceHolder}
+          value={this.state.searchInput}
+          onChange={this.handleSearch}
+          onKeyDown={e => e.keyCode === 13 && e.preventDefault()}
+          ref={node => (this.input = node)}
+          tabIndex='143'
+        />
+      </div>
     )
   }
 }
