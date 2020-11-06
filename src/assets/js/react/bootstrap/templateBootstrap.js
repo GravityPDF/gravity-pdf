@@ -87,7 +87,7 @@ export function activeTemplateStoreListener (store, $templateField) {
   }))
 
   /* Watch our DOM for changes */
-  $templateField.change(function () {
+  $templateField.on('change', function () {
     /* Check store and DOM are different to prevent any update recursions */
     if (this.value !== store.getState().template.activeTemplate) {
       store.dispatch(selectTemplate(this.value))
