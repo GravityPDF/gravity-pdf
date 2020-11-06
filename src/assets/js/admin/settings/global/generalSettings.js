@@ -1,6 +1,5 @@
 import $ from 'jquery'
 import { setupRequiredFields } from '../pdf/setupRequiredFields'
-import { setupAdvancedOptions } from './setupAdvancedOptions'
 
 /**
  * The general settings model method
@@ -29,6 +28,4 @@ export function generalSettings () {
     }
   }).trigger('change')
 
-  /* setup advanced options */
-  setupAdvancedOptions()
 }
