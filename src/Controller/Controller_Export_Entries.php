@@ -41,6 +41,10 @@ class Controller_Export_Entries {
 		}
 
 		foreach ( $pdfs as $pdf ) {
+			if ( ! $pdf['active'] ) {
+				continue;
+			}
+
 			$form['fields'][] = [
 				'id'    => 'gpdf_' . $pdf['id'],
 				'label' => sprintf( __( 'PDF: %s', 'gravity-forms-pdf-extended' ), $pdf['name'] ),
