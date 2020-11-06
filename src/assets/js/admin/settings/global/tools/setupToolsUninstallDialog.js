@@ -8,9 +8,9 @@ import $ from 'jquery'
 export function setupToolsUninstallDialog () {
   const $uninstall = $('#gfpdf_settings\\[uninstaller\\]')
 
-  $uninstall.click(function () {
+  $uninstall.on('click', function () {
     if (window.confirm(GFPDF.uninstallWarning)) {
-      $uninstall.parents('form').submit()
+      $uninstall.parents('form').trigger('submit')
     }
 
     return false

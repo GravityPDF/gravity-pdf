@@ -7,7 +7,7 @@ import { spinner } from '../../helper/spinner'
  * @since 4.2
  */
 export function setupLicenseDeactivation () {
-  $('.gfpdf-deactivate-license').click(function () {
+  $('.gfpdf-deactivate-license').on('click', function () {
     /* Do AJAX call so user can deactivate license */
     const $container = $(this).parent()
 
