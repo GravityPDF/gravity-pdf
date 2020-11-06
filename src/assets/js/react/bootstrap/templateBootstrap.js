@@ -59,6 +59,7 @@ export default function templateBootstrap ($templateField) {
  */
 export function createTemplateMarkup ($templateField) {
   $templateField
+    .wrap('<div id="gfpdf-settings-field-wrapper-template-container" />')
     .parent()
     .append('<span id="gpdf-advance-template-selector">')
     .append('<div id="gfpdf-overlay" class="theme-overlay">')

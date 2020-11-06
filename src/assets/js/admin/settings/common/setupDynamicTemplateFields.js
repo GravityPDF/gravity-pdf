@@ -16,7 +16,7 @@ export function setupDynamicTemplateFields () {
   /* Add change listener to our template */
   $('#gfpdf_settings\\[template\\]').off('change').on('change', function () {
     /* Add spinner */
-    const $spinner = spinner('gfpdf-spinner')
+    const $spinner = spinner('gfpdf-spinner-template')
 
     $(this).next().after($spinner)
 
