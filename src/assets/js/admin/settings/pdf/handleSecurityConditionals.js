@@ -14,7 +14,7 @@ export function handleSecurityConditionals () {
   const $securityFields = $secTable.find('#gfpdf-settings-field-wrapper-password,#gfpdf-settings-field-wrapper-privileges,gfpdf-settings-field-wrapper-master_password:not(.gfpdf-hidden)')
 
   /* Add change event to admin restrictions to show/hide dependant fields */
-  $pdfSecurity.change(function () {
+  $pdfSecurity.on('change', function () {
     /* Get the format dependency */
     const format = $format.filter(':checked').val()
 
@@ -34,7 +34,7 @@ export function handleSecurityConditionals () {
   }).trigger('change')
 
   /* The format field effects the security field. When it changes it triggers the security field as changed */
-  $format.change(function () {
+  $format.on('change', function () {
     if ($(this).is(':checked')) {
       $pdfSecurity.trigger('change')
     }
