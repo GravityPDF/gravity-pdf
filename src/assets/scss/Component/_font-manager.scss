@@ -7,6 +7,10 @@
     margin: 0 0.2rem 0.2rem 0;
   }
 
+  #gfpdf_pdf_form #gfpdf-settings-field-wrapper-font-container {
+    display: flex;
+  }
+
   #font-manager-overlay {
     .font-manager {
       overflow: hidden;
