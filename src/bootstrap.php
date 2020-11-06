@@ -489,6 +489,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			'media-editor',
 			'media-models',
 			'media-views',
+			'media-audiovideo',
 			'plupload',
 			'plupload-flash',
 			'plupload-html4',
