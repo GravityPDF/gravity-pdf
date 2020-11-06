@@ -404,23 +404,25 @@ class Test_Shortcode extends WP_UnitTestCase {
 	public function test_gravitypdf_redirect_confirmation() {
 		global $wp_rewrite;
 
+		$_POST['confirmation_id'] = '';
+
 		/* Process fancy permalinks */
 		$old_permalink_structure = get_option( 'permalink_structure' );
 		$wp_rewrite->set_permalink_structure( '/%postname%/' );
 		flush_rewrite_rules();
 
 		/* Setup our redirect confirmation value */
-		$_POST['form_confirmation_url'] = '[gravitypdf id="555ad84787d7e"]';
+		$_POST['_gform_setting_url'] = '[gravitypdf id="555ad84787d7e"]';
 
 		/* Run the test */
 		$this->model->gravitypdf_redirect_confirmation( [ 'id' => 1 ] );
-		$this->assertEquals( '[gravitypdf id="555ad84787d7e" entry="{entry_id}" raw="1"]', $_POST['form_confirmation_url'] );
+		$this->assertEquals( '[gravitypdf id="555ad84787d7e" entry="{entry_id}" raw="1"]', $_POST['_gform_setting_url'] );
 
 		/* Check for viewing URL */
-		$_POST['form_confirmation_url'] = '[gravitypdf id="555ad84787d7e" type="view"]';
+		$_POST['_gform_setting_url'] = '[gravitypdf id="555ad84787d7e" type="view"]';
 
 		$this->model->gravitypdf_redirect_confirmation( [ 'id' => 1 ] );
-		$this->assertEquals( '[gravitypdf id="555ad84787d7e" type="view" entry="{entry_id}" raw="1"]', $_POST['form_confirmation_url'] );
+		$this->assertEquals( '[gravitypdf id="555ad84787d7e" type="view" entry="{entry_id}" raw="1"]', $_POST['_gform_setting_url'] );
 
 		$wp_rewrite->set_permalink_structure( $old_permalink_structure );
 		flush_rewrite_rules();

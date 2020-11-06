@@ -318,7 +318,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 	public function gravitypdf_redirect_confirmation( $form ) {
 
 		/* check if the confirmation is currently being saved */
-		if ( isset( $_POST['form_confirmation_url'] ) ) {
+		if ( isset( $_POST['confirmation_id'] ) ) {
 
 			$this->log->notice(
 				'Begin Converting Shortcode to URL for Redirect Confirmation',
@@ -328,7 +328,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 				]
 			);
 
-			$url = stripslashes_deep( $_POST['form_confirmation_url'] );
+			$url = stripslashes_deep( $_POST['_gform_setting_url'] );
 
 			/* check if our shortcode exists and convert it to a URL */
 			$shortcode_information = $this->get_shortcode_information( static::SHORTCODE, $url );
@@ -339,7 +339,7 @@ abstract class Helper_Abstract_Pdf_Shortcode extends Helper_Abstract_Model {
 					$new_shortcode = $this->add_shortcode_attr( $new_shortcode, 'raw', '1' );
 
 					/* update our confirmation message */
-					$_POST['form_confirmation_url'] = str_replace( $shortcode['shortcode'], $new_shortcode['shortcode'], $url );
+					$_POST['_gform_setting_url'] = str_replace( $shortcode['shortcode'], $new_shortcode['shortcode'], $url );
 				}
 			}
 		}
