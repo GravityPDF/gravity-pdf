@@ -30,7 +30,7 @@ export function setupAJAXListStateListener () {
       ajaxCall(data, function (data) {
         label.html(data.state)
 
-        if(button.data('status') === 'active') {
+        if (button.data('status') === 'active') {
           button
             .data('status', 'inactive')
             .removeClass('gform_status--pending')

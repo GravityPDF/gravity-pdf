@@ -851,6 +851,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 					'dup_nonce'   => $dup_nonce,
 					'del_nonce'   => $del_nonce,
 					'state_nonce' => $state_nonce,
+					'status'      => esc_html__( 'Inactive', 'gravity-forms-pdf-extended' ),
 				];
 
 				echo json_encode( $return );
