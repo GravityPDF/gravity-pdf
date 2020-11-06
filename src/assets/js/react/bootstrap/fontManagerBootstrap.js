@@ -50,13 +50,22 @@ export function fontManagerBootstrap (defaultFontField, buttonStyle) {
  * @since 6.0
  */
 export function createAdvancedButtonWrapper (defaultFontField, preventButtonReset) {
-  const wrapper = document.createElement('span')
-  wrapper.setAttribute('id', 'gpdf-advance-font-manager-selector' + preventButtonReset)
+  const fontWrapper = document.createElement('span')
+  fontWrapper.setAttribute('id', 'gpdf-advance-font-manager-selector' + preventButtonReset)
 
   const popupWrapper = document.createElement('div')
   popupWrapper.setAttribute('id', 'font-manager-overlay')
   popupWrapper.setAttribute('class', 'theme-overlay')
 
-  defaultFontField.appendChild(wrapper)
-  defaultFontField.appendChild(popupWrapper)
+  if (defaultFontField.nodeName === 'SELECT') {
+    const wrapper = document.createElement('div')
+    wrapper.setAttribute('id', 'gfpdf-settings-field-wrapper-font-container')
+    wrapper.innerHTML = defaultFontField.outerHTML
+    wrapper.appendChild(fontWrapper)
+    wrapper.appendChild(popupWrapper)
+    defaultFontField.outerHTML = wrapper.outerHTML
+  } else {
+    defaultFontField.appendChild(fontWrapper)
+    defaultFontField.appendChild(popupWrapper)
+  }
 }
