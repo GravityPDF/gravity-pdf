@@ -247,8 +247,6 @@ class Helper_Data {
 				'tags'                                 => esc_html__( 'Tags', 'gravity-forms-pdf-extended' ),
 
 				'addNewTemplate'                       => esc_html__( 'Add New Template', 'gravity-forms-pdf-extended' ),
-				'showAdvancedOptions'                  => esc_html__( 'Show Advanced Options...', 'gravity-forms-pdf-extended' ),
-				'hideAdvancedOptions'                  => esc_html__( 'Hide Advanced Options...', 'gravity-forms-pdf-extended' ),
 				'thisFormHasNoPdfs'                    => esc_html__( "This form doesn't have any PDFs.", 'gravity-forms-pdf-extended' ),
 				'letsGoCreateOne'                      => esc_html__( "Let's go create one", 'gravity-forms-pdf-extended' ),
 				'installedPdfs'                        => esc_html__( 'Installed PDFs', 'gravity-forms-pdf-extended' ),
