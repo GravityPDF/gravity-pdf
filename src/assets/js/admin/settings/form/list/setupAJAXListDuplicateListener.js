@@ -11,7 +11,9 @@ import { showMessage } from '../../../helper/showMessage'
  */
 export function setupAJAXListDuplicateListener () {
   /* Add live duplicate listener */
-  $('#gfpdf_list_form').on('click', 'a.submitduplicate', function () {
+  $('#gfpdf_list_form').on('click', 'a.submitduplicate', function (e) {
+    e.preventDefault()
+
     const id = String($(this).data('id'))
     const that = this
 
@@ -53,7 +55,7 @@ export function setupAJAXListDuplicateListener () {
           /* Find duplicate and delete elements */
           const $duplicate = $newRow.find('.duplicate a')
           const $delete = $newRow.find('.delete a')
-          const $state = $newRow.find('.check-column img')
+          const $state = $newRow.find('.check-column button')
           const $shortcode = $newRow.find('.column-shortcode input')
 
           /* Update duplicate ID and nonce pointers so the actions are valid */
@@ -73,25 +75,13 @@ export function setupAJAXListDuplicateListener () {
           shortcodeValue = shortcodeValue.replace(id, response.pid)
           $shortcode.val(shortcodeValue)
 
-          /* Add fix for alternate row background */
-          let background = ''
-          if ($row.hasClass('alternate')) {
-            $newRow.removeClass('alternate')
-            background = '#FFF'
-          } else {
-            $newRow.addClass('alternate')
-            background = '#f9f9f9'
-          }
-
-          /* Add fix for toggle image */
-          const toggleSrc = $state.attr('src')
-          $state
-            .attr('title', GFPDF.inactive)
-            .attr('alt', GFPDF.inactive)
-            .attr('src', toggleSrc.replace('active1.svg', 'active0.svg'))
+          $state.removeClass('gform-status--active')
+            .addClass('gform-status--inactive')
+            .find('.gform-status-indicator-status')
+            .html(response.status)
 
           /* Add row to node and fade in */
-          $newRow.hide().insertAfter($row).fadeIn().animate({ backgroundColor: background })
+          $newRow.hide().insertAfter($row).fadeIn().animate({ backgroundColor: '#F6F9FC' })
         }
       })
     }
