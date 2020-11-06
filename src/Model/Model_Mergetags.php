@@ -160,8 +160,8 @@ class Model_Mergetags extends Helper_Abstract_Model {
 			$this->log->notice(
 				'Begin Converting PDF Mergetags',
 				[
-					'form_id'  => $form['id'],
-					'entry_id' => $entry['id'],
+					'form_id'  => $form['id'] ?? 0,
+					'entry_id' => $entry['id'] ?? 0,
 
 					'tags'     => $matches,
 					'text'     => $text,
@@ -169,6 +169,12 @@ class Model_Mergetags extends Helper_Abstract_Model {
 			);
 
 			foreach ( $matches as $tag ) {
+
+				/* If no valid form or entry, convert tag to empty string */
+				if ( $form === false || $entry === false ) {
+					$text = str_replace( $tag[0], '', $text );
+					continue;
+				}
 
 				/* Get the PDF configuration */
 				$config = $this->options->get_pdf( $form['id'], $tag[1] );
