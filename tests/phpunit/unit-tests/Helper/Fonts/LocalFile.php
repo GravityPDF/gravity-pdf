@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class LocalFile extends File {
-	public function isUploadedFile() {
+	public function isUploadedFile(): bool {
 		return true;
 	}
 }

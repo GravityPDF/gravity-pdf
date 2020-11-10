@@ -182,7 +182,6 @@ class Controller_Custom_Fonts extends Helper_Abstract_Controller {
 					'methods'             => WP_REST_Server::DELETABLE,
 					'callback'            => [ $this, 'delete_item' ],
 					'permission_callback' => Closure::fromCallable( [ $this, 'check_permissions' ] ),
-					'validate_callback'   => [ $this->model, 'check_font_id_valid' ],
 				],
 			]
 		);
