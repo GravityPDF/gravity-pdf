@@ -19,7 +19,7 @@ import { sprintf } from 'sprintf-js'
  * @since 6.0
  */
 const FontVariantLabel = ({ label, font }) => (
-  <div htmlFor={'gfpdf-font-variant-' + label}>
+  <div data-test='component-FontVariantLabel' htmlFor={'gfpdf-font-variant-' + label}>
     {(label === 'regular' && font === 'false') && (
       <span
         dangerouslySetInnerHTML={{

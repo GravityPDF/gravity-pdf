@@ -17,7 +17,7 @@ import PropTypes from 'prop-types'
  * @since 6.0
  */
 export const Alert = ({ msg }) => (
-  <div id='gf-admin-notices-wrapper'>
+  <div data-test='component-Alert' id='gf-admin-notices-wrapper'>
     <div
       className='notice notice-error gf-notice'
       dangerouslySetInnerHTML={{ __html: msg }}

@@ -17,7 +17,7 @@ import PropTypes from 'prop-types'
  * @since 6.0
  */
 const FontListIcon = ({ font }) => (
-  <div>
+  <div data-test='component-FontListIcon'>
     <span className={'dashicons dashicons-' + (font ? 'yes' : 'no-alt')} />
   </div>
 )

@@ -121,6 +121,7 @@ export class SearchBox extends Component {
   render () {
     return (
       <input
+        data-test='component-SearchBox'
         type='search'
         id='font-manager-search-box'
         className='wp-filter-search'

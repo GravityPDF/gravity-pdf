@@ -34,7 +34,7 @@ export const FontVariant = ({
   msg: { error },
   tabIndex
 }) => (
-  <div id='gfpdf-font-files-setting'>
+  <div data-test='component-FontVariant' id='gfpdf-font-files-setting'>
     {Object.entries(fontStyles).map(([key, font]) => {
       const id = 'gfpdf-font-variant-' + key + ' ' + state
       const ariaLabelledby = id + ' gfpdf-font-files-label'
@@ -52,6 +52,7 @@ export const FontVariant = ({
 
       return (
         <Dropzone
+          data-test='component-Dropzone'
           key={key}
           accept='.ttf'
           onDrop={acceptedFiles => onHandleUpload(key, acceptedFiles[0], state)}
@@ -64,6 +65,7 @@ export const FontVariant = ({
             >
               {font ? (
                 <input
+                  data-test='input-delete'
                   id={id}
                   aria-labelledby={ariaLabelledby}
                   aria-describedby={ariaDescribedby}
@@ -71,6 +73,7 @@ export const FontVariant = ({
                 />
               ) : (
                 <input
+                  data-test='input-add'
                   id={id}
                   aria-labelledby={ariaLabelledby}
                   aria-describedby={ariaDescribedby}

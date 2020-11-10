@@ -176,7 +176,7 @@ export default function (state = initialState, action) {
           error: {
             ...state.msg.error,
             addFont: payload.msg,
-            fontValidationError: sprintf(GFPDF.fontFileInvalid, '<strong>', '</strong>')
+            fontValidationError: sprintf(payload.fontValidationError, '<strong>', '</strong>')
           }
         }
       }

@@ -17,7 +17,7 @@ const FontListSkeleton = () => {
   const fontList = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
   return (
-    <div className='font-list-items-skeleton'>
+    <div data-test='component-FontListSkeleton' className='font-list-items-skeleton'>
       {fontList.map(font => (
         <div key={font} className='font-list-item'>
           <div>

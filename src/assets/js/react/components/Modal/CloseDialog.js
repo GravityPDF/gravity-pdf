@@ -6,8 +6,8 @@ import { withRouter } from 'react-router-dom'
 /* Redux actions */
 import { getCustomFontList, clearAddFontMsg } from '../../actions/fontManager'
 /* Utilities */
+import { associatedFontManagerSelectBox } from '../../utilities/FontManager/associatedFontManagerSelectBox'
 import { toggleUpdateFont } from '../../utilities/FontManager/toggleUpdateFont'
-import associatedFontManagerSelectBox from '../../utilities/FontManager/associatedFontManagerSelectBox'
 
 /**
  * @package     Gravity PDF
