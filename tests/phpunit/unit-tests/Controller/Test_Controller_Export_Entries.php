@@ -27,7 +27,6 @@ class Test_Controller_Export_Entries extends WP_UnitTestCase {
 		$this->assertContains( 'gpdf_555ad84787d7e', $field_ids );
 		$this->assertContains( 'gpdf_556690c67856b', $field_ids );
 		$this->assertContains( 'gpdf_fawf90c678523b', $field_ids );
-		$this->assertContains( 'gpdf_556690c8d7f82', $field_ids );
 	}
 
 	public function test_no_add_pdfs_to_export_fields() {
