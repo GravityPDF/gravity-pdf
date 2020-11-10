@@ -227,7 +227,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'manage_fonts'       => [
 						'id'   => 'manage_fonts',
 						'name' => esc_html__( 'Fonts', 'gravity-forms-pdf-extended' ),
-						'desc' => '<p>' . sprintf( esc_html__( 'Install custom fonts for use in your PDF documents. Only %1$s.ttf%2$s font files are supported.', 'gravity-forms-pdf-extended' ), '<code>', '</code>' ) . '</p>',
+						'desc' => '<span class="gform-settings-description">' . sprintf( esc_html__( 'Install custom fonts for use in your PDF documents. Only %1$s.ttf%2$s font files are supported.', 'gravity-forms-pdf-extended' ), '<code>', '</code>' ) . '</span>',
 						'type' => 'descriptive_text',
 					],
 				]

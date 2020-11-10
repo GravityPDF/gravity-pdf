@@ -65,7 +65,7 @@ $(function () {
 
   /* Initialize font manager under tools tab  */
   if (fmToolsTab !== null) {
-    fontManagerBootstrap(fmToolsTab, 'prevent-button-reset')
+    fontManagerBootstrap(fmToolsTab, '-prevent-button-reset')
   }
 
   /* Initialize font manager under PDF settings */
