@@ -20,6 +20,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Class SupportsOtl
+ *
+ * @package GFPDF\Helper\Fonts
+ *
+ * @since 6.0
+ */
 class SupportsOtl {
 	/**
 	 * @var string
@@ -30,9 +37,16 @@ class SupportsOtl {
 		$this->font_directory_path = $font_directory_path;
 	}
 
-	public function supports_otl( $file ): bool {
+	/**
+	 * Processes the font file to see if it supports OTL tables
+	 *
+	 * @param string $file The filename of a font file to check
+	 *
+	 * @since 6.0
+	 */
+	public function supports_otl( string $file ): bool {
 		try {
-			$ttf = new TTFontFile( new FontCache( new Cache( get_temp_dir() . 'mpdf' ) ), null );
+			$ttf = new TTFontFile( new FontCache( new Cache( get_temp_dir() . 'mpdf' ) ), apply_filters( 'gpdf_mpdf_font_descriptor', 'win' ) );
 			$ttf->getMetrics( $this->font_directory_path . $file, (string) time(), 0, false, false, 0xFF );
 
 			return strlen( $ttf->familyName ) > 0;

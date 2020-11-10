@@ -28,19 +28,21 @@ class TtfFontValidation extends Base {
 	 * Error message
 	 *
 	 * @var string
+	 *
+	 * @since 6.0
 	 */
 	protected $message = 'Invalid ttf font file: %s';
 
 	/**
-	 * Validate
+	 * Validate the uploaded file is a valid, readable, TTF font file
 	 *
 	 * @param File $file
 	 *
-	 * @return bool
+	 * @since 6.0
 	 */
-	public function validate( File $file ) {
+	public function validate( File $file ): bool {
 		try {
-			$ttf = new TTFontFile( new FontCache( new Cache( get_temp_dir() . 'mpdf' ) ), null );
+			$ttf = new TTFontFile( new FontCache( new Cache( get_temp_dir() . 'mpdf' ) ), apply_filters( 'gpdf_mpdf_font_descriptor', 'win' ) );
 			$ttf->getMetrics( $file->getPathname(), $file->getName() );
 
 			return strlen( $ttf->familyName ) > 0;
