@@ -19,7 +19,6 @@ export default {
     bold: '',
     bolditalics: ''
   },
-  kashida: 0,
   validateLabel: true,
   validateRegular: true,
   disableUpdateButton: false

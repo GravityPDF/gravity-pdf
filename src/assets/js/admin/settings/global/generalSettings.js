@@ -27,5 +27,4 @@ export function generalSettings () {
       }
     }
   }).trigger('change')
-
 }

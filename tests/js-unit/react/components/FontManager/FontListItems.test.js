@@ -20,8 +20,6 @@ describe('FontManager - FontListItems.js', () => {
       {
         font_name: 'Fira Sans Light',
         id: 'firasanslight',
-        useOTL: 255,
-        useKashida: 75,
         regular: 'FiraSans-Light.ttf',
         italics: 'FiraSans-LightItalic.ttf',
         bold: 'FiraSans-Medium.ttf',
@@ -68,8 +66,6 @@ describe('FontManager - FontListItems.js', () => {
           {
             font_name: 'Arial',
             id: 'arial',
-            useOTL: 255,
-            useKashida: 75,
             regular: 'Arial.ttf',
             italics: 'Arial-Italic.ttf',
             bold: 'Arial-Bold.ttf',
