@@ -12,7 +12,6 @@ describe('Utilities/FontManager - fontManagerReducer.js', () => {
     {
       font_name: 'roboto',
       id: 'roboto',
-      useKashida: 75,
       regular: 'roboto-regular.ttf',
       italics: 'roboto-italics.ttf',
       bold: 'roboto-bold.ttf',
@@ -21,7 +20,6 @@ describe('Utilities/FontManager - fontManagerReducer.js', () => {
     {
       font_name: 'gotham',
       id: 'gotham',
-      useKashida: 75,
       regular: 'gotham-regular.ttf',
       italics: 'gotham-italics.ttf',
       bold: 'gotham-bold.ttf',
@@ -34,7 +32,6 @@ describe('Utilities/FontManager - fontManagerReducer.js', () => {
       font: {
         font_name: 'gotham',
         id: 'gotham',
-        useKashida: 75,
         regular: 'gotham-regular.ttf',
         italics: 'gotham-italics.ttf',
         bold: 'gotham-bold.ttf',

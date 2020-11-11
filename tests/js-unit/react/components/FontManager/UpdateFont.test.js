@@ -10,18 +10,14 @@ describe('FontManager - UpdateFont.js', () => {
     id: 'firasanslight',
     fontList: [{
       font_name: 'Fira Sans Light',
-      id: 'firasanslight',
-      useOTL: 255,
-      useKashida: 75
+      id: 'firasanslight'
     }],
     label: '',
-    kashida: 75,
     onHandleInputChange: jest.fn(),
     onHandleUpload: jest.fn(),
     onHandleDeleteFontStyle: jest.fn(),
     onHandleCancelEditFont: jest.fn(),
     onHandleCancelEditFontKeypress: jest.fn(),
-    onHandleKashidaChange: jest.fn(),
     onHandleSubmit: jest.fn(),
     validateLabel: false,
     validateRegular: false,
@@ -31,7 +27,6 @@ describe('FontManager - UpdateFont.js', () => {
     loading: false,
     tabIndexFontName: '',
     tabIndexFontFiles: '',
-    tabIndexKashida: '',
     tabIndexFooterButtons: ''
   }
   const wrapper = shallow(<UpdateFont {...props} />)
@@ -53,10 +48,6 @@ describe('FontManager - UpdateFont.js', () => {
 
     test('render <FontVariant /> component', () => {
       expect(wrapper.find('FontVariant').length).toBe(1)
-    })
-
-    test('render <Kashida /> component', () => {
-      expect(wrapper.find('Kashida').length).toBe(1)
     })
 
     test('render <AddFontFooter /> component', () => {

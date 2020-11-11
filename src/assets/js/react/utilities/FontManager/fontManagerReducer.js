@@ -23,7 +23,6 @@ export function findAndUpdate (data, payload) {
   list.map(font => {
     if (font.id === payload.font.id) {
       font.font_name = payload.font.font_name
-      font.useKashida = payload.font.useKashida
       font.regular = payload.font.regular
       font.italics = payload.font.italics
       font.bold = payload.font.bold

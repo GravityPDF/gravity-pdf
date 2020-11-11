@@ -38,8 +38,6 @@ describe('Reducers - fontManagerReducer.js', () => {
     const data = [{
       font_name: 'Arial',
       id: 'arial',
-      useOTL: 255,
-      useKashida: 75,
       regular: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-regular.ttf',
       italics: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-italics.ttf',
       bold: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-bold.ttf',
@@ -83,8 +81,6 @@ describe('Reducers - fontManagerReducer.js', () => {
       font: {
         font_name: 'Arial',
         id: 'arial',
-        useOTL: 255,
-        useKashida: 75,
         regular: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-regular.ttf',
         italics: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-italics.ttf',
         bold: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-bold.ttf',
@@ -149,8 +145,6 @@ describe('Reducers - fontManagerReducer.js', () => {
         font: {
           font_name: 'Arial',
           id: 'arial',
-          useOTL: 255,
-          useKashida: 75,
           regular: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-regular.ttf',
           italics: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-italics.ttf',
           bold: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-bold.ttf',
@@ -238,8 +232,6 @@ describe('Reducers - fontManagerReducer.js', () => {
         {
           font_name: 'Arial',
           id: 'arial',
-          useOTL: 255,
-          useKashida: 75,
           regular: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-regular.ttf',
           italics: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-italics.ttf',
           bold: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-bold.ttf',
@@ -248,8 +240,6 @@ describe('Reducers - fontManagerReducer.js', () => {
         {
           font_name: 'Roboto',
           id: 'roboto',
-          useOTL: 255,
-          useKashida: 75,
           regular: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/roboto.ttf',
           italics: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/roboto.ttf',
           bold: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/roboto.ttf',
@@ -331,8 +321,6 @@ describe('Reducers - fontManagerReducer.js', () => {
           {
             font_name: 'Arial',
             id: 'arial',
-            useOTL: 255,
-            useKashida: 75,
             regular: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-regular.ttf',
             italics: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-italics.ttf',
             bold: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-bold.ttf',
@@ -341,8 +329,6 @@ describe('Reducers - fontManagerReducer.js', () => {
           {
             font_name: 'Roboto',
             id: 'roboto',
-            useOTL: 255,
-            useKashida: 75,
             regular: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/roboto.ttf',
             italics: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/roboto.ttf',
             bold: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/roboto.ttf',

@@ -66,8 +66,7 @@ export class FontManagerBody extends Component {
    *  id: string,
    *  label: string,
    *  validateLabel: boolean,
-   *  validateRegular: boolean,
-   *  kashida: number
+   *  validateRegular: boolean
    * },
    * updateFont: {
    *  fontStyles: { italics: string, bold: string, bolditalics: string, regular: string },
@@ -75,8 +74,7 @@ export class FontManagerBody extends Component {
    *  id: string,
    *  label: string,
    *  validateLabel: boolean,
-   *  validateRegular: boolean,
-   *  kashida: number
+   *  validateRegular: boolean
    * }}}
    *
    * @since 6.0
@@ -183,7 +181,6 @@ export class FontManagerBody extends Component {
           bold: font.bold,
           bolditalics: font.bolditalics
         },
-        kashida: font.useKashida,
         validateLabel: true,
         validateRegular: true,
         disableUpdateButton: true
@@ -291,22 +288,6 @@ export class FontManagerBody extends Component {
   }
 
   /**
-   * Listen to kashida field change on update font panel
-   *
-   * @param e: object
-   *
-   * @since 6.0
-   */
-  handleKashidaChange = e => {
-    this.setState({
-      updateFont: {
-        ...this.state.updateFont,
-        kashida: Number(e.target.value)
-      }
-    }, () => this.handleUpdateFontState())
-  }
-
-  /**
    * Handle process for uploading font variant
    *
    * @param fontVariant: string
@@ -405,7 +386,7 @@ export class FontManagerBody extends Component {
     const { fontList, id } = this.props
 
     if (id) {
-      const { label, fontStyles, kashida } = this.state.updateFont
+      const { label, fontStyles } = this.state.updateFont
       const activeFont = fontList.filter(font => font.id === id)[0]
 
       if (
@@ -413,8 +394,7 @@ export class FontManagerBody extends Component {
         activeFont.regular === fontStyles.regular &&
         activeFont.italics === fontStyles.italics &&
         activeFont.bold === fontStyles.bold &&
-        activeFont.bolditalics === fontStyles.bolditalics &&
-        activeFont.useKashida === kashida
+        activeFont.bolditalics === fontStyles.bolditalics
       ) {
         return this.setState({
           updateFont: {
@@ -458,7 +438,7 @@ export class FontManagerBody extends Component {
    * @since 6.0
    */
   handleEditFont = id => {
-    const { label, fontStyles, kashida } = this.state.updateFont
+    const { label, fontStyles } = this.state.updateFont
     const { fontList, editFont, clearAddFontMsg } = this.props
     const data = {}
 
@@ -475,7 +455,6 @@ export class FontManagerBody extends Component {
     })
 
     const currentFont = fontList.filter(font => font.id === id)[0]
-    const currentKashida = currentFont.useKashida
     const currentFontStyles = {
       regular: currentFont.regular,
       italics: currentFont.italics,
@@ -486,7 +465,6 @@ export class FontManagerBody extends Component {
     /* Check if there's no changes in current font data */
     if (
       label === currentFont.font_name &&
-      kashida === currentKashida &&
       JSON.stringify(fontStyles) === JSON.stringify(currentFontStyles)
     ) {
       /* Call redux action clearAddFontMsg() */
@@ -494,13 +472,7 @@ export class FontManagerBody extends Component {
     }
 
     /* Call redux action editFont() */
-    editFont({
-      id,
-      font: {
-        label,
-        useKashida: kashida, ...data
-      }
-    })
+    editFont({ id, font: { label, ...data } })
   }
 
   /**
@@ -595,7 +567,6 @@ export class FontManagerBody extends Component {
 
           <UpdateFont
             onHandleInputChange={this.handleInputChange}
-            onHandleKashidaChange={this.handleKashidaChange}
             onHandleUpload={this.handleUpload}
             onHandleDeleteFontStyle={this.handleDeleteFontStyle}
             onHandleCancelEditFont={this.handleCancelEditFont}
@@ -606,8 +577,7 @@ export class FontManagerBody extends Component {
             loading={loading}
             tabIndexFontName={updateFontVisible ? '145' : '0'}
             tabIndexFontFiles={updateFontVisible ? '146' : '0'}
-            tabIndexKashida={updateFontVisible ? '147' : '0'}
-            tabIndexFooterButtons={updateFontVisible ? '148' : '0'}
+            tabIndexFooterButtons={updateFontVisible ? '147' : '0'}
             {...this.state.updateFont}
           />
         </div>

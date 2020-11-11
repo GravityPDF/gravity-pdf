@@ -39,8 +39,6 @@ export class FontListItems extends Component {
       PropTypes.shape({
         font_name: PropTypes.string.isRequired,
         id: PropTypes.string.isRequired,
-        useOTL: PropTypes.number.isRequired,
-        useKashida: PropTypes.number.isRequired,
         regular: PropTypes.string.isRequired,
         italics: PropTypes.string.isRequired,
         bold: PropTypes.string.isRequired,
@@ -53,8 +51,6 @@ export class FontListItems extends Component {
         PropTypes.shape({
           font_name: PropTypes.string.isRequired,
           id: PropTypes.string.isRequired,
-          useOTL: PropTypes.number.isRequired,
-          useKashida: PropTypes.number.isRequired,
           regular: PropTypes.string.isRequired,
           italics: PropTypes.string.isRequired,
           bold: PropTypes.string.isRequired,

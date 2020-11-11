@@ -16,8 +16,6 @@ describe('FontManager - FontManagerBody.js', () => {
       {
         font_name: 'Fira Sans Light',
         id: 'firasanslight',
-        useOTL: 255,
-        useKashida: 75,
         regular: 'FiraSans-Light.ttf',
         italics: 'FiraSans-LightItalic.ttf',
         bold: 'FiraSans-Medium.ttf',
@@ -100,8 +98,6 @@ describe('FontManager - FontManagerBody.js', () => {
           {
             font_name: 'Roboto',
             id: 'roboto',
-            useOTL: 255,
-            useKashida: 75,
             regular: 'Roboto.ttf',
             italics: 'Roboto-Italic.ttf',
             bold: 'Roboto-Bold.ttf',
@@ -158,8 +154,7 @@ describe('FontManager - FontManagerBody.js', () => {
         regular,
         italics,
         bold,
-        bolditalics,
-        useKashida
+        bolditalics
       } = props.fontList[0]
       const wrapper = shallow(<FontManagerBody {...props} />)
       const adjustFontListHeight = jest.spyOn(utilitiesA, 'adjustFontListHeight')
@@ -179,7 +174,6 @@ describe('FontManager - FontManagerBody.js', () => {
           bold: bold,
           bolditalics: bolditalics
         },
-        kashida: useKashida,
         validateLabel: true,
         validateRegular: true,
         disableUpdateButton: true
@@ -231,16 +225,6 @@ describe('FontManager - FontManagerBody.js', () => {
       const e = { target: { value: 'Fira Sans Light' } }
 
       instance.handleInputChange(e, 'addFont')
-
-      expect(handleUpdateFontState).toHaveBeenCalledTimes(1)
-    })
-
-    test('handleKashidaChange() - Listen to kashida field change on update font panel', () => {
-      const instance = wrapper.instance()
-      const handleUpdateFontState = jest.spyOn(instance, 'handleUpdateFontState')
-      const e = { target: { value: 80 } }
-
-      instance.handleKashidaChange(e)
 
       expect(handleUpdateFontState).toHaveBeenCalledTimes(1)
     })
@@ -301,8 +285,7 @@ describe('FontManager - FontManagerBody.js', () => {
         regular,
         italics,
         bold,
-        bolditalics,
-        useKashida
+        bolditalics
       } = props.fontList[0]
 
       wrapper.setState({
@@ -315,7 +298,6 @@ describe('FontManager - FontManagerBody.js', () => {
             bold: bold,
             bolditalics: bolditalics
           },
-          kashida: useKashida,
           validateLabel: true,
           validateRegular: true,
           disableUpdateButton: false
@@ -333,8 +315,7 @@ describe('FontManager - FontManagerBody.js', () => {
         regular,
         italics,
         bold,
-        bolditalics,
-        useKashida
+        bolditalics
       } = props.fontList[0]
 
       wrapper.setState({
@@ -347,7 +328,6 @@ describe('FontManager - FontManagerBody.js', () => {
             bold: bold,
             bolditalics: bolditalics
           },
-          kashida: useKashida,
           validateLabel: true,
           validateRegular: true,
           disableUpdateButton: false
@@ -389,7 +369,6 @@ describe('FontManager - FontManagerBody.js', () => {
       const {
         id,
         font_name,
-        useKashida,
         regular,
         italics,
         bold,
@@ -406,7 +385,6 @@ describe('FontManager - FontManagerBody.js', () => {
             bold: bold,
             bolditalics: bolditalics
           },
-          kashida: useKashida,
           validateLabel: true,
           validateRegular: true,
           disableUpdateButton: false
@@ -421,7 +399,6 @@ describe('FontManager - FontManagerBody.js', () => {
     test('handleEditFont() - Handle our edit font process and call our editFont redux action - ', () => {
       const {
         id,
-        useKashida,
         regular,
         italics,
         bold,
@@ -438,7 +415,6 @@ describe('FontManager - FontManagerBody.js', () => {
             bold: bold,
             bolditalics: bolditalics
           },
-          kashida: useKashida,
           validateLabel: true,
           validateRegular: true,
           disableUpdateButton: false
