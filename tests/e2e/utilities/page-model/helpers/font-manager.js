@@ -1,5 +1,5 @@
 import { Selector, t } from 'testcafe'
-import { admin, baseURL } from '../../../auth'
+import { baseURL } from '../../../auth'
 import { button } from './field'
 
 class FontManager {
@@ -29,7 +29,6 @@ class FontManager {
     this.addNewFontBoldItalics = Selector('#gfpdf-font-files-setting').find('input').withAttribute('aria-labelledby', 'gfpdf-font-variant-bolditalics updateFont gfpdf-font-files-label')
     this.updateFontPanel = Selector('#gfpdf-font-manager-container').find('[class^="update-font show"]')
     this.updateFontNameInputField = Selector('#gfpdf-update-font-name-input')
-    this.kashida = Selector('.kashida').find('input')
     this.cancelButton = Selector('.footer').find('[class^="button gfpdf-button primary cancel"]')
 
     // Success and error message

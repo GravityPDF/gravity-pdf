@@ -168,9 +168,6 @@ test('should successfully edit existing font', async t => {
     .setFilesToUpload(fontManager.addNewFontItalics, fontManager.robotoFontItalics)
     .setFilesToUpload(fontManager.addNewFontBold, fontManager.robotoFontBold)
     .setFilesToUpload(fontManager.addNewFontBoldItalics, fontManager.robotoFontBoldItalics)
-    .click(fontManager.kashida)
-    .pressKey('ctrl+a')
-    .typeText(fontManager.kashida, '77', { paste: true })
     .click(button('Update Font →'))
 
   // Assertions

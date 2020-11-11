@@ -4,7 +4,6 @@ import PropTypes from 'prop-types'
 import { sprintf } from 'sprintf-js'
 /* Components */
 import FontVariant from './FontVariant'
-import Kashida from './Kashida'
 import AddFontFooter from './AddFontFooter'
 
 /**
@@ -21,14 +20,12 @@ import AddFontFooter from './AddFontFooter'
  * @param fontList
  * @param label
  * @param onHandleInputChange
- * @param onHandleKashidaChange
  * @param onHandleUpload
  * @param onHandleDeleteFontStyle
  * @param onHandleCancelEditFont
  * @param onHandleCancelEditFontKeypress
  * @param onHandleSubmit
  * @param fontStyles
- * @param kashida
  * @param validateLabel
  * @param validateRegular
  * @param disableUpdateButton
@@ -36,7 +33,6 @@ import AddFontFooter from './AddFontFooter'
  * @param loading
  * @param tabIndexFontName
  * @param tabIndexFontFiles
- * @param tabIndexKashida
  * @param tabIndexFooterButtons
  *
  * @since 6.0
@@ -44,17 +40,14 @@ import AddFontFooter from './AddFontFooter'
 export const UpdateFont = (
   {
     id,
-    fontList,
     label,
     onHandleInputChange,
-    onHandleKashidaChange,
     onHandleUpload,
     onHandleDeleteFontStyle,
     onHandleCancelEditFont,
     onHandleCancelEditFontKeypress,
     onHandleSubmit,
     fontStyles,
-    kashida,
     validateLabel,
     validateRegular,
     disableUpdateButton,
@@ -62,13 +55,10 @@ export const UpdateFont = (
     loading,
     tabIndexFontName,
     tabIndexFontFiles,
-    tabIndexKashida,
     tabIndexFooterButtons
   }
 ) => {
-  const font = fontList && fontList.filter(font => font.id === id)[0]
-  const useOTL = font && font.useOTL
-  const fontNameLabel = sprintf(GFPDF.fontManagerFontNameLabel, "<span class='required'>", '</span>')
+  const fontNameLabel = sprintf(GFPDF.fontManagerFontNameLabel, '<span class=\'required\'>', '</span>')
 
   return (
     <div data-test='component-UpdateFont' className='update-font'>
@@ -113,14 +103,6 @@ export const UpdateFont = (
           tabIndex={tabIndexFontFiles}
         />
 
-        {useOTL > 0 && (
-          <Kashida
-            kashida={kashida}
-            onHandleKashidaChange={onHandleKashidaChange}
-            tabIndex={tabIndexKashida}
-          />
-        )}
-
         <AddFontFooter
           id={id}
           disabled={disableUpdateButton}
@@ -142,10 +124,8 @@ export const UpdateFont = (
  */
 UpdateFont.propTypes = {
   id: PropTypes.string,
-  fontList: PropTypes.arrayOf(PropTypes.object),
   label: PropTypes.string.isRequired,
   onHandleInputChange: PropTypes.func.isRequired,
-  onHandleKashidaChange: PropTypes.func,
   onHandleUpload: PropTypes.func.isRequired,
   onHandleDeleteFontStyle: PropTypes.func.isRequired,
   onHandleCancelEditFont: PropTypes.func.isRequired,
@@ -155,12 +135,10 @@ UpdateFont.propTypes = {
   validateRegular: PropTypes.bool.isRequired,
   disableUpdateButton: PropTypes.bool.isRequired,
   fontStyles: PropTypes.object.isRequired,
-  kashida: PropTypes.number,
   msg: PropTypes.object.isRequired,
   loading: PropTypes.bool.isRequired,
   tabIndexFontName: PropTypes.string.isRequired,
   tabIndexFontFiles: PropTypes.string.isRequired,
-  tabIndexKashida: PropTypes.string.isRequired,
   tabIndexFooterButtons: PropTypes.string.isRequired
 }
 
