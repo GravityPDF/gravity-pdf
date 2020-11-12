@@ -47,6 +47,7 @@ test('should save selected template', async t => {
     .click(run.defaultTemplateSelectBox)
     .click(dropdownOption('Rubix'))
     .click(run.saveSettings)
+    .wait(500)
 
   // Assertions
   await t
