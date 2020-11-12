@@ -15,6 +15,9 @@ class General {
     // General Settings - Default Paper Size field
     this.defaultPaperSizeSelectBox = Selector('#gfpdf-settings-field-wrapper-default_pdf_size').find('[id="gfpdf_settings[default_pdf_size]"]')
 
+    // General Settings - Custom Paper Size field
+    this.customPaperSizeLabel = Selector('#gfpdf-settings-field-wrapper-default_custom_pdf_size').find('[class^="gform-settings-panel__title"]').withText('Custom Paper Size')
+
     // General Settings - Reverse Text (RTL) field
     this.reverseTextRtlCheckbox = Selector('#gfpdf-settings-field-wrapper-default_rtl').find('[id="gfpdf_settings[default_rtl]"]')
 
@@ -63,6 +66,7 @@ class General {
       .typeText('#user_login', 'admin', { paste: true })
       .typeText('#user_pass', 'password', { paste: true })
       .click('#wp-submit')
+      .wait(500)
   }
 
   async navigatePdfEntries (text) {

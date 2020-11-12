@@ -30,6 +30,9 @@ class Pdf {
     // Appearance - Paper Orientation field
     this.paperOrientationSelectBox = selectBox('gfpdf_settings_orientation large', 'gfpdf_settings[orientation]')
 
+    // Appearance - Custom Paper Size field
+    this.customPaperSizeLabel = Selector('#gfpdf-settings-field-wrapper-custom_pdf_size').find('[class^="gform-settings-panel__title"]').withText('Custom Paper Size')
+
     // Appearance - Font field
     this.fontSelectBox = selectBox('gfpdf_settings_font ', 'gfpdf_settings[font]')
 

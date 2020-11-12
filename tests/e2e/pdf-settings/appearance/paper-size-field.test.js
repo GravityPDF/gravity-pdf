@@ -87,7 +87,7 @@ test('should save selected custom paper size', async t => {
   // Assertions
   await t
     .expect(run.paperSizeSelectBox.value).eql('CUSTOM')
-    .expect(fieldLabel('Custom Paper Size').exists).ok()
+    .expect(run.customPaperSizeLabel.exists).ok()
     .expect(fieldDescription('Control the exact paper size. Can be set in millimeters or inches.', 'label').exists).ok()
     .expect(widthInputBox.value).eql('2')
     .expect(heightInputBox.value).eql('5')
