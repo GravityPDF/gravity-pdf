@@ -46,8 +46,15 @@ export function associatedFontManagerSelectBox (fontList, id) {
 
   let updateSelectBoxValue
 
+  if (list.length > 0 && list.includes(id)) {
+    fontManagerSelectBox.insertBefore(optgroup, fontManagerSelectBox.childNodes[0])
+    updateSelectBoxValue = fontManagerSelectBox.value = id
+
+    return updateSelectBoxValue
+  }
+
   /* Assign default value if selected item is deleted */
-  if (userDefinedFonts.includes(selectedValue) && list.length !== 0 && !list.includes(selectedValue)) {
+  if (list.length > 0 && !list.includes(id)) {
     fontManagerSelectBox.insertBefore(optgroup, fontManagerSelectBox.childNodes[0])
     updateSelectBoxValue = fontManagerSelectBox.selectedIndex = '0'
 
