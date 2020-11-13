@@ -18,6 +18,7 @@ export const CLEAR_DROPZONE_ERROR = 'CLEAR_DROPZONE_ERROR'
 export const RESET_SEARCH_RESULT = 'RESET_SEARCH_RESULT'
 export const SEARCH_FONT_LIST = 'SEARCH_FONT_LIST'
 export const SELECT_FONT = 'SELECT_FONT'
+export const MOVE_SELECTED_FONT_TO_TOP = 'MOVE_SELECTED_FONT_TO_TOP'
 
 /**
  * @package     Gravity PDF
@@ -186,6 +187,20 @@ export const resetSearchResult = () => {
 export const selectFont = fontId => {
   return {
     type: SELECT_FONT,
+    payload: fontId
+  }
+}
+
+/**
+ * Move selected font to top
+ *
+ * @param fontId
+ *
+ * @returns {{ payload: string, type: string }}
+ */
+export const moveSelectedFontToTop = fontId => {
+  return {
+    type: MOVE_SELECTED_FONT_TO_TOP,
     payload: fontId
   }
 }
