@@ -20,7 +20,8 @@ import {
   CLEAR_DROPZONE_ERROR,
   RESET_SEARCH_RESULT,
   SEARCH_FONT_LIST,
-  SELECT_FONT
+  SELECT_FONT,
+  MOVE_SELECTED_FONT_TO_TOP
 } from '../actions/fontManager'
 /* Utilities */
 import {
@@ -452,6 +453,23 @@ export default function (state = initialState, action) {
         ...state,
         selectedFont: payload
       }
+
+    /**
+     * Process MOVE_SELECTED_FONT_TO_TOP
+     *
+     * @since 6.0
+     */
+    case MOVE_SELECTED_FONT_TO_TOP: {
+      const fontList = [...state.fontList]
+      const filterFontList = fontList.filter(item => item.id !== payload)
+      const getPayloadItem = fontList.filter(item => item.id === payload)
+      const list = [...getPayloadItem, ...filterFontList]
+
+      return {
+        ...state,
+        fontList: list
+      }
+    }
   }
 
   return state

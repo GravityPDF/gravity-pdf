@@ -16,6 +16,7 @@ describe('FontManager - FontListItems.js', () => {
     msg: { success: { addFont: 'success' } },
     deleteFont: jest.fn(),
     selectFont: jest.fn(),
+    moveSelectedFontToTop: jest.fn(),
     fontList: [
       {
         font_name: 'Fira Sans Light',
@@ -27,7 +28,7 @@ describe('FontManager - FontListItems.js', () => {
       }
     ],
     searchResult: null,
-    selectedFont: '',
+    selectedFont: 'roboto',
     loading: true
   }
   const wrapper = shallow(<FontListItems {...props} />)
@@ -51,7 +52,27 @@ describe('FontManager - FontListItems.js', () => {
       expect(handleDisableSelectFields).toHaveBeenCalledTimes(1)
     })
 
-    test('componentDidUpdate() - Call the method handleResetLoadingState()', () => {
+    test('componentDidMount() - Call the method handleMoveSelectedFontAtTheTopOfTheList()', () => {
+      // Mock font manager select box DOM
+      document.body.innerHTML =
+        '<select id="gfpdf_settings[font]" name="gfpdf_settings[font]">' +
+        ' <optgroup label="User-Defined Fonts">' +
+        '   <option value="z" />' +
+        '   <option value="c" />' +
+        ' </optgroup>' +
+        '</select>'
+
+      const wrapper = shallow(<FontListItems {...props} selectedFont='roboto' />)
+      const instance = wrapper.instance()
+      const handleMoveSelectedFontAtTheTopOfTheList = jest.spyOn(instance, 'handleMoveSelectedFontAtTheTopOfTheList')
+
+      instance.componentDidMount()
+
+      expect(handleMoveSelectedFontAtTheTopOfTheList).toHaveBeenCalledTimes(1)
+      expect(props.moveSelectedFontToTop).toHaveBeenCalledTimes(1)
+    })
+
+    test('componentDidUpdate() - Call the method handleResetLoadingState() and handleMoveSelectedFontAtTheTopOfTheList()', () => {
       // Mock update font panel DOM
       document.body.innerHTML =
         '<div class="update-font show">' +
@@ -61,6 +82,7 @@ describe('FontManager - FontListItems.js', () => {
       const instance = wrapper.instance()
       const toggleUpdateFont = jest.spyOn(utilities, 'toggleUpdateFont')
       const handleResetLoadingState = jest.spyOn(instance, 'handleResetLoadingState')
+      const handleMoveSelectedFontAtTheTopOfTheList = jest.spyOn(instance, 'handleMoveSelectedFontAtTheTopOfTheList')
       const prevProps = {
         fontList: [
           {
@@ -72,13 +94,15 @@ describe('FontManager - FontListItems.js', () => {
             bolditalics: 'Arial-BoldItalics.ttf'
           }
         ],
-        loading: true
+        loading: true,
+        selectedFont: ''
       }
 
       instance.componentDidUpdate(prevProps)
 
       expect(handleResetLoadingState).toHaveBeenCalledTimes(1)
       expect(toggleUpdateFont).toHaveBeenCalledTimes(1)
+      expect(handleMoveSelectedFontAtTheTopOfTheList).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -154,6 +178,14 @@ describe('FontManager - FontListItems.js', () => {
       instance.handleResetLoadingState()
 
       expect(wrapper.state('deleteId')).toBe('')
+    })
+
+    test('handleMoveSelectedFontAtTheTopOfTheList() - Move selected font at the very top of the font list', () => {
+      const instance = wrapper.instance()
+
+      instance.handleMoveSelectedFontAtTheTopOfTheList('roboto')
+
+      expect(props.moveSelectedFontToTop).toHaveBeenCalledTimes(1)
     })
 
     test('handleFontClick() - Display or hide update font panel', () => {

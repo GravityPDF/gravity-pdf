@@ -20,7 +20,9 @@ import {
   resetSearchResult,
   RESET_SEARCH_RESULT,
   selectFont,
-  SELECT_FONT
+  SELECT_FONT,
+  moveSelectedFontToTop,
+  MOVE_SELECTED_FONT_TO_TOP
 } from '../../../../src/assets/js/react/actions/fontManager'
 
 describe('Redux actions - fontManager.js', () => {
@@ -98,5 +100,12 @@ describe('Redux actions - fontManager.js', () => {
 
     expect(results.type).toEqual(SELECT_FONT)
     expect(results.payload).toBe('gotham')
+  })
+
+  test('moveSelectedFontToTop - check if it returns the correct action', () => {
+    results = moveSelectedFontToTop('roboto')
+
+    expect(results.type).toEqual('MOVE_SELECTED_FONT_TO_TOP')
+    expect(results.payload).toBe('roboto')
   })
 })

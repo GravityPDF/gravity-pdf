@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 /* Redux actions */
-import { clearAddFontMsg, deleteFont, selectFont } from '../../actions/fontManager'
+import { clearAddFontMsg, deleteFont, selectFont, moveSelectedFontToTop } from '../../actions/fontManager'
 /* Components */
 import FontListIcon from './FontListIcon'
 import Spinner from '../Spinner'
@@ -35,6 +35,7 @@ export class FontListItems extends Component {
     msg: PropTypes.object.isRequired,
     deleteFont: PropTypes.func.isRequired,
     selectFont: PropTypes.func.isRequired,
+    moveSelectedFontToTop: PropTypes.func.isRequired,
     fontList: PropTypes.arrayOf(
       PropTypes.shape({
         font_name: PropTypes.string.isRequired,
@@ -80,7 +81,14 @@ export class FontListItems extends Component {
    * @since 6.0
    */
   componentDidMount () {
+    const { selectedFont } = this.props
+
     this.handleDisableSelectFields()
+
+    /* Move selected font at the top of the list */
+    if (selectedFont) {
+      this.handleMoveSelectedFontAtTheTopOfTheList(selectedFont)
+    }
   }
 
   /**
@@ -92,7 +100,7 @@ export class FontListItems extends Component {
    * @since 6.0
    */
   componentDidUpdate (prevProps) {
-    const { history, loading, fontList } = this.props
+    const { history, loading, fontList, selectedFont } = this.props
     const updateFontVisible = document.querySelector('.update-font.show')
 
     /* Reset/Clear deleteId loading state */
@@ -103,6 +111,11 @@ export class FontListItems extends Component {
     /* Remove update font panel after font is successfully deleted */
     if (prevProps.loading !== loading && prevProps.fontList !== fontList && updateFontVisible) {
       toggleUpdateFont(history)
+    }
+
+    /* Move selected font at the top of the list */
+    if (prevProps.selectedFont === '' && selectedFont) {
+      this.handleMoveSelectedFontAtTheTopOfTheList(selectedFont)
     }
   }
 
@@ -178,6 +191,17 @@ export class FontListItems extends Component {
    */
   handleResetLoadingState = () => {
     this.setState({ deleteId: '' })
+  }
+
+  /**
+   * Move selected font at the very top of the font list
+   *
+   * @param selectedFont: string
+   *
+   * @since 6.0
+   */
+  handleMoveSelectedFontAtTheTopOfTheList = selectedFont => {
+    this.props.moveSelectedFontToTop(selectedFont)
   }
 
   /**
@@ -390,5 +414,6 @@ const mapStateToProps = state => ({
 export default connect(mapStateToProps, {
   clearAddFontMsg,
   deleteFont,
-  selectFont
+  selectFont,
+  moveSelectedFontToTop
 })(FontListItems)
