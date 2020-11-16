@@ -604,6 +604,11 @@ final class GPDFAPI {
 	 */
 	public static function add_pdf_font( $font ) {
 
+		$installed_fonts = static::get_pdf_fonts();
+		if ( array_search( $font['font_name'] ?? '', $installed_fonts[ esc_html__( 'User-Defined Fonts', 'gravity-forms-pdf-extended' ) ] ?? [], true ) !== false ) {
+			return true;
+		}
+
 		$files_backup = $_FILES;
 		$_FILES       = [];
 
