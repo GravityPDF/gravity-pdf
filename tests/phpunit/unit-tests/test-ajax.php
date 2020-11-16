@@ -141,7 +141,6 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 
 		/* Test the response is accurate */
 		$this->assertArrayHasKey( 'state', $response );
-		$this->assertArrayHasKey( 'src', $response );
 		$this->assertEquals( 'Inactive', $response['state'] );
 
 		/* Test the function performed correctly */
@@ -166,7 +165,6 @@ class Test_PDF_Ajax extends WP_Ajax_UnitTestCase {
 
 		/* Test the response is accurate */
 		$this->assertArrayHasKey( 'state', $response );
-		$this->assertArrayHasKey( 'src', $response );
 		$this->assertEquals( 'Active', $response['state'] );
 
 		/* Test the function performed correctly */
