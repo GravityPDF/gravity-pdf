@@ -33,7 +33,7 @@ The Docker setup will create a fully functionality development environment preco
 If you shutdown Docker and want to fire up the environment later, use `yarn env start`. You can also reset the database back to its original state with `yarn env:reset`. 
 
 ### Enable X-Debug
-- For Windows users: 
+#### For Windows users: 
 
 To enable X-Debug in the containers. You need to set the environmental variables before starting up Docker:
 * `export LOCAL_PHP_XDEBUG=true`
@@ -42,7 +42,7 @@ NOTE: Change the IP `10.0.0.1` to the value of`$_SERVER['REMOTE_ADDR']` when you
 
 If you’ve brought up the containers already, run `yarn env stop` and `yarn env start` to reboot after setting the variable.
 
-- For Linux users:
+#### For Linux users:
 
 Run the command `ip a` and find the `docker0` network interface. Copy the inet value.
 e.g. `inet 172.17.0.1/16`, and then include these variables when you start your docker machine.
@@ -60,10 +60,6 @@ When you do your Path Mappings in your IDE, make sure to name your server `local
 
 By default, the latest stable version of PHP will be used when you start the Docker environment. To switch, set the environmental variable `LOCAL_PHP` to one of the following:
 
-* `5.6-fpm`
-* `7.0-fpm`
-* `7.1-fpm`
-* `7.2-fpm`
 * `7.3-fpm`
 * `7.4-fpm`
 
