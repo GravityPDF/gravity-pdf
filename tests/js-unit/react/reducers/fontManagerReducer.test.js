@@ -16,7 +16,8 @@ import {
   CLEAR_DROPZONE_ERROR,
   RESET_SEARCH_RESULT,
   SEARCH_FONT_LIST,
-  SELECT_FONT
+  SELECT_FONT,
+  MOVE_SELECTED_FONT_TO_TOP
 } from '../../../../src/assets/js/react/actions/fontManager'
 import reducer, { initialState } from '../../../../src/assets/js/react/reducers/fontManagerReducer'
 
@@ -140,7 +141,7 @@ describe('Reducers - fontManagerReducer.js', () => {
 
   describe('EDIT_FONT_SUCCESS', () => {
     test('check the correct state gets returned when this action runs', () => {
-      let initialstate
+      let newInitialState
       const data = {
         font: {
           font_name: 'Arial',
@@ -152,7 +153,7 @@ describe('Reducers - fontManagerReducer.js', () => {
         },
         msg: 'success'
       }
-      initialstate = {
+      newInitialState = {
         loading: false,
         addFontLoading: false,
         deleteFontLoading: false,
@@ -162,7 +163,7 @@ describe('Reducers - fontManagerReducer.js', () => {
         msg: {}
       }
 
-      state = reducer(initialstate, {
+      state = reducer(newInitialState, {
         type: EDIT_FONT_SUCCESS,
         payload: data
       })
@@ -171,7 +172,7 @@ describe('Reducers - fontManagerReducer.js', () => {
       expect(state.fontList).toEqual([data.font])
       expect(state.msg.success.addFont).toBe('success')
 
-      initialstate = {
+      newInitialState = {
         loading: false,
         addFontLoading: false,
         deleteFontLoading: false,
@@ -181,7 +182,7 @@ describe('Reducers - fontManagerReducer.js', () => {
         msg: {}
       }
 
-      newState = reducer(initialstate, {
+      newState = reducer(newInitialState, {
         type: EDIT_FONT_SUCCESS,
         payload: data
       })
@@ -316,7 +317,7 @@ describe('Reducers - fontManagerReducer.js', () => {
 
   describe('SEARCH_FONT_LIST', () => {
     test('check the correct state gets returned when this action runs', () => {
-      const initialstate = {
+      const newInitialState = {
         fontList: [
           {
             font_name: 'Arial',
@@ -337,19 +338,19 @@ describe('Reducers - fontManagerReducer.js', () => {
         ]
       }
 
-      state = reducer(initialstate, {
+      state = reducer(newInitialState, {
         type: SEARCH_FONT_LIST,
         payload: 'robot'
       })
 
-      expect(state.searchResult).toEqual([initialstate.fontList[1]])
+      expect(state.searchResult).toEqual([newInitialState.fontList[1]])
 
-      newState = reducer(initialstate, {
+      newState = reducer(newInitialState, {
         type: SEARCH_FONT_LIST,
         payload: ''
       })
 
-      expect(newState.searchResult).toEqual(initialstate.fontList)
+      expect(newState.searchResult).toEqual(newInitialState.fontList)
     })
   })
 
@@ -361,6 +362,55 @@ describe('Reducers - fontManagerReducer.js', () => {
       })
 
       expect(state.selectedFont).toBe('roboto')
+    })
+  })
+
+  describe('MOVE_SELECTED_FONT_TO_TOP', () => {
+    test('check the correct state gets returned when this action runs', () => {
+      const newInitialState = {
+        fontList: [
+          {
+            font_name: 'Arial',
+            id: 'arial',
+            regular: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-regular.ttf',
+            italics: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-italics.ttf',
+            bold: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-bold.ttf',
+            bolditalics: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-bolditalics.ttf'
+          },
+          {
+            font_name: 'Roboto',
+            id: 'roboto',
+            regular: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/roboto.ttf',
+            italics: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/roboto.ttf',
+            bold: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/roboto.ttf',
+            bolditalics: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/aroboto.ttf'
+          }
+        ]
+      }
+
+      state = reducer(newInitialState, {
+        type: MOVE_SELECTED_FONT_TO_TOP,
+        payload: 'roboto'
+      })
+
+      expect(state.fontList).toEqual([
+        {
+          font_name: 'Roboto',
+          id: 'roboto',
+          regular: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/roboto.ttf',
+          italics: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/roboto.ttf',
+          bold: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/roboto.ttf',
+          bolditalics: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/aroboto.ttf'
+        },
+        {
+          font_name: 'Arial',
+          id: 'arial',
+          regular: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-regular.ttf',
+          italics: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-italics.ttf',
+          bold: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-bold.ttf',
+          bolditalics: 'wp-content/uploads/PDF_EXTENDED_TEMPLATES/fonts/arial-bolditalics.ttf'
+        }
+      ])
     })
   })
 })
