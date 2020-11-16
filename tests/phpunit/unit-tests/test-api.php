@@ -253,6 +253,20 @@ class Test_API extends WP_UnitTestCase {
 		GPDFAPI::delete_pdf_font( 'test' );
 	}
 
+	public function test_add_pdf_font_duplicate() {
+		$ttf_file = __DIR__ . '/fonts/Chewy.ttf';
+
+		$font = [
+			'font_name' => 'Test',
+			'regular'   => $ttf_file,
+		];
+
+		$this->assertTrue( GPDFAPI::add_pdf_font( $font ) );
+		$this->assertTrue( GPDFAPI::add_pdf_font( $font ) );
+
+		$this->assertCount( 1, GPDFAPI::get_pdf_fonts()['User-Defined Fonts'] ?? [] );
+	}
+
 	/**
 	 * Test we can correctly delete the font
 	 *
