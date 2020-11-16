@@ -1031,8 +1031,11 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 *
 	 * @since  4.0
 	 */
-	public function get_font_short_name( $name ) {
-		return mb_strtolower( str_replace( ' ', '', $name ), 'UTF-8' );
+	public function get_font_short_name( $name ): string {
+		/** @var Model_Custom_Fonts $custom_font_model */
+		$custom_font_model = \GPDFAPI::get_mvc_class( 'Model_Custom_Fonts' );
+
+		return $custom_font_model->get_font_short_name( $name );
 	}
 
 	/**
@@ -1043,6 +1046,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 * @return mixed (String / Object)           The font display name or WP_Error
 	 *
 	 * @since 4.0
+	 *
+	 * @deprecated
 	 */
 	public function get_font_display_name( $font_key ) {
 

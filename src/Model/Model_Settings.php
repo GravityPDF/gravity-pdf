@@ -184,175 +184,6 @@ class Model_Settings extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Removes the current font's TTF files from our font directory
-	 *
-	 * @param array $fonts The font config
-	 *
-	 * @return boolean        True on success, false on failure
-	 *
-	 * @since  4.0
-	 *
-	 * @deprecated
-	 */
-	public function remove_font_file( $fonts ) {
-
-		$fonts = array_filter( $fonts );
-		$types = [ 'regular', 'bold', 'italics', 'bolditalics' ];
-
-		foreach ( $types as $type ) {
-			if ( isset( $fonts[ $type ] ) ) {
-				$filename = basename( $fonts[ $type ] );
-
-				if ( is_file( $this->data->template_font_location . $filename ) && ! unlink( $this->data->template_font_location . $filename ) ) {
-					return false;
-				}
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * Check that the font name passed conforms to our expected naming convention
-	 *
-	 * @param string $name The font name to check
-	 *
-	 * @return boolean       True on valid, false on failure
-	 *
-	 * @since 4.0
-	 *
-	 * @deprecated
-	 */
-	public function is_font_name_valid( $name ) {
-
-		$regex = '^[A-Za-z0-9 ]+$';
-
-		if ( preg_match( "/$regex/", $name ) ) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Query our custom fonts options table and check if the font name already exists
-	 *
-	 * @param string     $name The font name to check
-	 * @param int|string $id   The configuration ID (if any)
-	 *
-	 * @return bool True if valid, false on failure
-	 *
-	 * @since 4.0
-	 *
-	 * @deprecated
-	 */
-	public function is_font_name_unique( $name, $id = '' ) {
-
-		/* Get the shortname of the current font */
-		$name = $this->options->get_font_short_name( $name );
-
-		/* Loop through default fonts and check for duplicate */
-		$default_fonts = $this->options->get_installed_fonts();
-
-		unset( $default_fonts[ esc_html__( 'User-Defined Fonts', 'gravity-forms-pdf-extended' ) ] );
-
-		/* check for exact match */
-		foreach ( $default_fonts as $group ) {
-			if ( isset( $group[ $name ] ) ) {
-				return false;
-			}
-		}
-
-		$custom_fonts = $this->options->get_option( 'custom_fonts' );
-
-		if ( is_array( $custom_fonts ) ) {
-			foreach ( $custom_fonts as $font ) {
-
-				/* Skip over itself */
-				if ( ! empty( $id ) && $font['id'] === $id ) {
-					continue;
-				}
-
-				if ( $name === $this->options->get_font_short_name( $font['font_name'] ) ) {
-					return false;
-				}
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * Handles the database updates required to save a new font
-	 *
-	 * @param array $fonts
-	 *
-	 * @return array
-	 *
-	 * @since 4.0
-	 *
-	 * @deprecated
-	 */
-	public function install_fonts( $fonts ) {
-
-		$types  = [ 'regular', 'bold', 'italics', 'bolditalics' ];
-		$errors = [];
-
-		foreach ( $types as $type ) {
-
-			/* Check if a key exists for this type and process */
-			if ( isset( $fonts[ $type ] ) ) {
-				$path = $this->misc->convert_url_to_path( $fonts[ $type ] );
-
-				/* Couldn't find file so throw error */
-				if ( is_wp_error( $path ) ) {
-					$errors[] = sprintf( esc_html__( 'Could not locate font on web server: %s', 'gravity-forms-pdf-extended' ), $fonts[ $type ] );
-				}
-
-				/* Copy font to our fonts folder */
-				$filename = basename( $path );
-				if ( ! is_file( $this->data->template_font_location . $filename ) && ! copy( $path, $this->data->template_font_location . $filename ) ) {
-					$errors[] = sprintf( esc_html__( 'There was a problem installing the font %s. Please try again.', 'gravity-forms-pdf-extended' ), $filename );
-				}
-			}
-		}
-
-		/* If errors were found then return */
-		if ( count( $errors ) > 0 ) {
-			$this->log->error(
-				'Install Error.',
-				[
-					'errors' => $errors,
-				]
-			);
-
-			return [ 'errors' => $errors ];
-		} else {
-			/* Insert our font into the database */
-			$custom_fonts = $this->options->get_option( 'custom_fonts' );
-
-			/* Prepare our font data and give it a unique id */
-			if ( empty( $fonts['id'] ) ) {
-				$id          = uniqid();
-				$fonts['id'] = $id;
-			}
-
-			$custom_fonts[ $fonts['id'] ] = $fonts;
-
-			/* Update our font database */
-			$this->options->update_option( 'custom_fonts', $custom_fonts );
-
-			/* Cleanup the mPDF tmp directory to prevent font caching issues  */
-			$this->misc->cleanup_dir( $this->data->mpdf_tmp_location );
-
-		}
-
-		/* Fonts sucessfully installed so return font data */
-
-		return $fonts;
-	}
-
-	/**
 	 * Turn capabilities into more friendly strings
 	 *
 	 * @param string $cap The wordpress-style capability
@@ -367,223 +198,6 @@ class Model_Settings extends Helper_Abstract_Model {
 		$cap = ucwords( $cap );
 
 		return $cap;
-	}
-
-	/**
-	 * AJAX Endpoint for saving the custom font
-	 *
-	 * @return void
-	 *
-	 * @since 4.0
-	 *
-	 * @deprecated
-	 */
-	public function save_font() {
-
-		/* User / CORS validation */
-		$this->misc->handle_ajax_authentication( 'Save Font', 'gravityforms_edit_settings', 'gfpdf_font_nonce' );
-
-		/* Handle the validation and saving of the font */
-		$payload = isset( $_POST['payload'] ) ? $_POST['payload'] : '';
-		$results = $this->process_font( $payload );
-
-		/* If we reached this point the results were successful so return the new object */
-		$this->log->notice(
-			'AJAX – Successfully Saved Font',
-			[
-				'results' => $results,
-			]
-		);
-
-		echo json_encode( $results );
-		wp_die();
-	}
-
-	/**
-	 * AJAX Endpoint for deleting a custom font
-	 *
-	 * @return void
-	 *
-	 * @since 4.0
-	 *
-	 * @deprecated
-	 */
-	public function delete_font() {
-
-		/* User / CORS validation */
-		$this->misc->handle_ajax_authentication( 'Delete Font', 'gravityforms_edit_settings', 'gfpdf_font_nonce' );
-
-		/* Get the required details for deleting fonts */
-		$id    = ( isset( $_POST['id'] ) ) ? $_POST['id'] : '';
-		$fonts = $this->options->get_option( 'custom_fonts' );
-
-		/* Check font actually exists and remove */
-		if ( isset( $fonts[ $id ] ) ) {
-
-			if ( $this->remove_font_file( $fonts[ $id ] ) ) {
-				unset( $fonts[ $id ] );
-
-				/* Cleanup the mPDF tmp directory to prevent font caching issues  */
-				$this->misc->cleanup_dir( $this->data->mpdf_tmp_location );
-
-				if ( $this->options->update_option( 'custom_fonts', $fonts ) ) {
-					/* Success */
-					$this->log->notice( 'AJAX – Successfully Deleted Font' );
-					echo json_encode( [ 'success' => true ] );
-					wp_die();
-				}
-			}
-		}
-
-		$return = [
-			'error' => esc_html__( 'Could not delete Gravity PDF font correctly. Please try again.', 'gravity-forms-pdf-extended' ),
-		];
-
-		$this->log->error( 'AJAX Endpoint Error', $return );
-
-		echo json_encode( $return );
-
-		/* Bad Request */
-		wp_die( '', 400 );
-	}
-
-	/**
-	 * Validate user input and save as new font
-	 *
-	 * @param array $font The four font fields to be processed
-	 *
-	 * @return array
-	 *
-	 * @since 4.0
-	 *
-	 * @deprecated
-	 */
-	public function process_font( $font ) {
-
-		/* remove any empty fields */
-		$font = array_filter( $font );
-
-		/* Check we have the required data */
-		if ( ! isset( $font['font_name'] ) || ! isset( $font['regular'] ) ||
-			 strlen( $font['font_name'] ) === 0 || strlen( $font['regular'] ) === 0
-		) {
-
-			$return = [
-				'error' => esc_html__( 'Required fields have not been included.', 'gravity-forms-pdf-extended' ),
-			];
-
-			$this->log->warning( 'Font Validation Failed', $return );
-
-			echo json_encode( $return );
-
-			/* Bad Request */
-			wp_die( '', 400 );
-		}
-
-		/* Check we have a valid font name */
-		$name = $font['font_name'];
-
-		if ( ! $this->is_font_name_valid( $name ) ) {
-
-			$return = [
-				'error' => esc_html__( 'Font name is not valid. Only alphanumeric characters and spaces are accepted.', 'gravity-forms-pdf-extended' ),
-			];
-
-			$this->log->warning( 'Font Validation Failed', $return );
-
-			echo json_encode( $return );
-
-			/* Bad Request */
-			wp_die( '', 400 );
-		}
-
-		/* Check the font name is unique */
-		$shortname = $this->options->get_font_short_name( $name );
-		$id        = ( isset( $font['id'] ) ) ? $font['id'] : '';
-
-		if ( ! $this->is_font_name_unique( $shortname, $id ) ) {
-
-			$return = [
-				'error' => esc_html__( 'A font with the same name already exists. Try a different name.', 'gravity-forms-pdf-extended' ),
-			];
-
-			$this->log->warning( 'Font Validation Failed', $return );
-
-			echo json_encode( $return );
-
-			/* Bad Request */
-			wp_die( '', 400 );
-		}
-
-		/* Move fonts to our Gravity PDF font folder */
-		$installation = $this->install_fonts( $font );
-
-		/* Check if any errors occurred installing the fonts */
-		if ( isset( $installation['errors'] ) ) {
-
-			$return = [
-				'error' => $installation,
-			];
-
-			$this->log->warning( 'Font Validation Failed', $return );
-
-			echo json_encode( $return );
-
-			/* Bad Request */
-			wp_die( '', 400 );
-		}
-
-		/* If we got here the installation was successful so return the data */
-
-		return $installation;
-	}
-
-	/**
-	 * Find the font unique ID from the font name
-	 *
-	 * @param string $font_name
-	 *
-	 * @return string The font ID, if any
-	 *
-	 * @since 4.1
-	 *
-	 * @deprecated
-	 */
-	public function get_font_id_by_name( $font_name ) {
-		$fonts = $this->options->get_option( 'custom_fonts', [] );
-
-		foreach ( $fonts as $id => $font ) {
-			if ( $font['font_name'] === $font_name ) {
-				return $id;
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Create a file in our tmp directory and check if it is publicly accessible (i.e no .htaccess protection)
-	 *
-	 * @since 4.0
-	 *
-	 * @deprecated Functionality removed in 6.0
-	 */
-	public function check_tmp_pdf_security() {}
-
-	/**
-	 * Create a file in our tmp directory and verify if it's protected from the public
-	 *
-	 * @return boolean
-	 *
-	 * @since 4.0
-	 *
-	 * @deprecated Test moved in 6.0. Use Model_System_Report::test_public_tmp_directory_access()
-	 */
-	public function test_public_tmp_directory_access() {
-		/** @var Model_System_Report $model_system_report */
-		$model_system_report = \GPDFAPI::get_mvc_class( 'Model_System_Report' );
-
-		return $model_system_report->test_public_tmp_directory_access();
 	}
 
 	/**
@@ -873,5 +487,115 @@ class Model_Settings extends Helper_Abstract_Model {
 		);
 
 		return true;
+	}
+
+	/**
+	 * Removes the current font's TTF files from our font directory
+	 *
+	 * @param array $fonts The font config
+	 *
+	 * @since  4.0
+	 *
+	 * @deprecated Removed in 6.0. Use GPDFAPI::delete_pdf_font()
+	 */
+	public function remove_font_file( $fonts ) {}
+
+	/**
+	 * Check that the font name passed conforms to our expected naming convention
+	 *
+	 * @param string $name The font name to check
+	 *
+	 * @since 4.0
+	 *
+	 * @deprecated Moved in 6.0. Use Model_Custom_Fonts::check_font_name_valid()
+	 */
+	public function is_font_name_valid( $name ) {}
+
+	/**
+	 * Query our custom fonts options table and check if the font name already exists
+	 *
+	 * @param string     $name The font name to check
+	 * @param int|string $id   The configuration ID (if any)
+	 *
+	 * @since 4.0
+	 *
+	 * @deprecated Removed in 6.0. Font names no longer need to be unique
+	 */
+	public function is_font_name_unique( $name, $id = '' ) {}
+
+	/**
+	 * Handles the database updates required to save a new font
+	 *
+	 * @param array $fonts
+	 *
+	 * @since 4.0
+	 *
+	 * @deprecated Moved in 6.0 to Model_Custom_Fonts::add_font()
+	 */
+	public function install_fonts( $fonts ) {}
+
+	/**
+	 * AJAX Endpoint for saving the custom font
+	 *
+	 * @since 4.0
+	 *
+	 * @deprecated Moved in 6.0. Use GPDFAPI::add_pdf_font()
+	 */
+	public function save_font() {}
+
+	/**
+	 * AJAX Endpoint for deleting a custom font
+	 *
+	 * @since 4.0
+	 *
+	 * @deprecated Moved in 6.0. Use GPDFAPI::delete_pdf_font()
+	 */
+	public function delete_font() {}
+
+	/**
+	 * Validate user input and save as new font
+	 *
+	 * @param array $font The four font fields to be processed
+	 *
+	 * @since 4.0
+	 *
+	 * @deprecated Removed in 6.0. Use GPDFAPI::add_pdf_font()
+	 */
+	public function process_font( $font ) {}
+
+	/**
+	 * Find the font unique ID from the font name
+	 *
+	 * @param string $font_name
+	 *
+	 * @since 4.1
+	 *
+	 * @deprecated Removed in 6.0. Font names no longer linked to IDs.
+	 */
+	public function get_font_id_by_name( $font_name ) {}
+
+	/**
+	 * Create a file in our tmp directory and check if it is publicly accessible (i.e no .htaccess protection)
+	 *
+	 * @since 4.0
+	 *
+	 * @deprecated Functionality removed in 6.0
+	 */
+	public function check_tmp_pdf_security() {}
+
+	/**
+	 * Create a file in our tmp directory and verify if it's protected from the public
+	 *
+	 * @return boolean
+	 *
+	 * @since 4.0
+	 *
+	 * @deprecated Moved in 6.0. Use Model_System_Report::test_public_tmp_directory_access()
+	 */
+	public function test_public_tmp_directory_access() {
+		/** @var Model_System_Report $model_system_report */
+		$model_system_report = \GPDFAPI::get_mvc_class( 'Model_System_Report' );
+
+		return $model_system_report->test_public_tmp_directory_access();
 	}
 }
