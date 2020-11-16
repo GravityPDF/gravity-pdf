@@ -9,7 +9,7 @@ class FontManager {
 
     // Header section
     this.popupHeaderText = Selector('h1').withText('Font Manager')
-    this.closeDialog = button('Close dialog')
+    this.closeDialog = Selector('.theme-header').find('button').withText('Close dialog')
 
     // Search bar section
     this.searchBar = Selector('#font-manager-search-box')
@@ -29,6 +29,8 @@ class FontManager {
     this.addNewFontBoldItalics = Selector('#gfpdf-font-files-setting').find('input').withAttribute('aria-labelledby', 'gfpdf-font-variant-bolditalics updateFont gfpdf-font-files-label')
     this.updateFontPanel = Selector('#gfpdf-font-manager-container').find('[class^="update-font show"]')
     this.updateFontNameInputField = Selector('#gfpdf-update-font-name-input')
+    this.addFontButton = Selector('.footer').find('button').withText('Add Font →')
+    this.updateFontButton = Selector('.footer').find('button').withText('Update Font →')
     this.cancelButton = Selector('.footer').find('[class^="button gfpdf-button primary cancel"]')
 
     // Success and error message

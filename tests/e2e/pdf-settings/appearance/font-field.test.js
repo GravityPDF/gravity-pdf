@@ -2,8 +2,7 @@ import {
   fieldLabel,
   fieldDescription,
   dropdownOptionGroup,
-  dropdownOption,
-  button
+  dropdownOption
 } from '../../utilities/page-model/helpers/field'
 import Pdf from '../../utilities/page-model/helpers/pdf'
 import FontManager from '../../utilities/page-model/helpers/font-manager'
@@ -86,7 +85,7 @@ test('should display font manager error validation', async t => {
   await t
     .click(run.appearanceCollapsiblePanel)
     .click(fontManager.advancedButton)
-    .click(button('Add Font →'))
+    .click(fontManager.addFontButton)
 
   // Assertions
   await t
@@ -105,11 +104,11 @@ test('should successfully add new font', async t => {
     .click(fontManager.advancedButton)
     .typeText(fontManager.addFontNameInputField, 'Gotham', { paste: true })
     .setFilesToUpload(fontManager.addNewFontRegular, fontManager.gothamFontRegular)
-    .click(button('Add Font →'))
+    .click(fontManager.addFontButton)
     .click(fontManager.fontListItem.nth(0))
     .typeText(fontManager.addFontNameInputField, 'Roboto', { paste: true })
     .setFilesToUpload(fontManager.addNewFontRegular, fontManager.robotoFontRegular)
-    .click(button('Add Font →'))
+    .click(fontManager.addFontButton)
 
   // Assertions
   await t
@@ -124,9 +123,9 @@ test('should successfully check toggled state for disabled \'Update Font\' butto
     .click(run.appearanceCollapsiblePanel)
     .click(fontManager.advancedButton)
     .click(fontManager.fontListItem.nth(0))
-    .expect(button('Update Font →').hasAttribute('disabled')).ok()
+    .expect(fontManager.updateFontButton.hasAttribute('disabled')).ok()
     .typeText(fontManager.updateFontNameInputField, ' new', { paste: true })
-    .expect(button('Update Font →').hasAttribute('disabled')).notOk()
+    .expect(fontManager.updateFontButton.hasAttribute('disabled')).notOk()
 })
 
 test('should successfully close \'update font\' panel using cancel button', async t => {
@@ -148,6 +147,7 @@ test('should successfully perform font search', async t => {
   await t
     .click(run.appearanceCollapsiblePanel)
     .click(fontManager.advancedButton)
+    .wait(300)
     .typeText(fontManager.searchBar, 'Roboto', { paste: true })
 
   // Assertions
@@ -168,7 +168,7 @@ test('should successfully edit existing font', async t => {
     .setFilesToUpload(fontManager.addNewFontItalics, fontManager.robotoFontItalics)
     .setFilesToUpload(fontManager.addNewFontBold, fontManager.robotoFontBold)
     .setFilesToUpload(fontManager.addNewFontBoldItalics, fontManager.robotoFontBoldItalics)
-    .click(button('Update Font →'))
+    .click(fontManager.updateFontButton)
 
   // Assertions
   await t
