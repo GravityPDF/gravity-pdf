@@ -15,10 +15,6 @@ use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
 use GFPDF\Model\Model_Settings;
 use GFPDF\View\View_Settings;
-use GFPDF_Vendor\Mpdf\Cache;
-use GFPDF_Vendor\Mpdf\Fonts\FontCache;
-use GFPDF_Vendor\Mpdf\MpdfException;
-use GFPDF_Vendor\Mpdf\TTFontFile;
 use Psr\Log\LoggerInterface;
 
 /**

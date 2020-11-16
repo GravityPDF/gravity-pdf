@@ -1947,8 +1947,8 @@ class Model_PDF extends Helper_Abstract_Model {
 		$flattened_fonts_array = [];
 		array_walk_recursive(
 			$fonts,
-			function( $val ) use ( &$array ) {
-				$array[] = $val;
+			function( $val ) use ( &$flattened_fonts_array ) {
+				$flattened_fonts_array[] = $val;
 			}
 		);
 
