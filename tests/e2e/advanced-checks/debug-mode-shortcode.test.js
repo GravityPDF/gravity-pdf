@@ -19,10 +19,11 @@ test('should enable debug mode and throw error when PDF is inactive', async t =>
   await advancedCheck.navigateConfirmationSection('gf_edit_forms&view=settings&subview=confirmation&id=3')
   await t
     .click(advancedCheck.confirmationTextCheckbox)
-    .click(advancedCheck.wsiwigEditor)
+    .click(advancedCheck.wysiwgEditorTextTab)
+    .click(advancedCheck.wysiwgEditor)
     .pressKey('ctrl+a')
     .pressKey('backspace')
-    .typeText(advancedCheck.wsiwigEditor, shortcodeHolder, { paste: true })
+    .typeText(advancedCheck.wysiwgEditor, shortcodeHolder, { paste: true })
     .click(advancedCheck.saveConfirmationButton)
     .click(advancedCheck.previewLink)
     .typeText(advancedCheck.formInputField, 'test', { paste: true })

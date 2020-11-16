@@ -9,6 +9,7 @@ import {
   editFont,
   validationError,
   deleteVariantError,
+  selectFont,
   clearAddFontMsg,
   clearDropzoneError
 } from '../../actions/fontManager'
@@ -52,6 +53,7 @@ export class FontManagerBody extends Component {
     editFont: PropTypes.func.isRequired,
     validationError: PropTypes.func.isRequired,
     deleteVariantError: PropTypes.func.isRequired,
+    selectFont: PropTypes.func.isRequired,
     addFont: PropTypes.func.isRequired,
     history: PropTypes.object.isRequired
   }
@@ -109,7 +111,7 @@ export class FontManagerBody extends Component {
    * @since 6.0
    */
   componentDidUpdate (prevProps) {
-    const { id, fontList, msg, history } = this.props
+    const { id, fontList, msg, history, selectFont } = this.props
 
     /* If font name did update and font name is selected call the method handleRequestFontDetails() */
     if (prevProps.id !== id && id) {
@@ -117,6 +119,9 @@ export class FontManagerBody extends Component {
       if (!this.handleCheckValidId(fontList, id)) {
         return history.push('/fontmanager/')
       }
+
+      /* Auto select newly installed font */
+      selectFont(id)
 
       this.handleRequestFontDetails()
     }
@@ -612,6 +617,7 @@ export default connect(mapStateToProps, {
   editFont,
   validationError,
   deleteVariantError,
+  selectFont,
   clearAddFontMsg,
   clearDropzoneError
 })(FontManagerBody)

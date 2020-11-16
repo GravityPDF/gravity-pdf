@@ -10,7 +10,8 @@ test('should check if form merge tags is working properly', async t => {
   await advancedCheck.navigateConfirmationSection('gf_edit_forms&view=settings&subview=confirmation&id=4')
   await t
     .click(advancedCheck.confirmationTextCheckbox)
-    .click(advancedCheck.wsiwigEditor)
+    .click(advancedCheck.wysiwgEditorTextTab)
+    .click(advancedCheck.wysiwgEditor)
     .pressKey('ctrl+a')
     .pressKey('backspace')
   await advancedCheck.pickMergeTag('Text')
