@@ -50,10 +50,9 @@ test('should display a dropdown of paper sizes option', async t => {
 test('should save selected paper size', async t => {
   // Actions
   await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
-  await t
-    .click(run.defaultPaperSizeSelectBox)
-    .click(dropdownOption('Letter (8.5 x 11in)'))
-    .click(run.saveSettings)
+  await t.click(run.defaultPaperSizeSelectBox)
+  await t.click(dropdownOption('Letter (8.5 x 11in)'))
+  await t.click(run.saveSettings)
 
   // Assertions
   await t.expect(run.defaultPaperSizeSelectBox.value).eql('LETTER')

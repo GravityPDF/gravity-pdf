@@ -87,11 +87,10 @@ describe('FontManager - FontManagerBody.js', () => {
 
       instance.componentDidUpdate(prevPops)
 
-      expect(props.selectFont).toHaveBeenCalledTimes(1)
       expect(handleRequestFontDetails).toHaveBeenCalled()
     })
 
-    test('componentDidUpdate() - If font list did update and font name is selected, call the method handleRequestFontDetails()', () => {
+    test('componentDidUpdate() - If font list did update, call the method handleRequestFontDetails()', () => {
       const wrapper = shallow(<FontManagerBody {...props} />)
       const instance = wrapper.instance()
       const handleRequestFontDetails = jest.spyOn(instance, 'handleRequestFontDetails')
@@ -128,7 +127,7 @@ describe('FontManager - FontManagerBody.js', () => {
       expect(handleSetDefaultState).toHaveBeenCalled()
     })
 
-    test('componentDidUpdate() - Auto select new added font after a successful submission', () => {
+    test('componentDidUpdate() - If font is successfully installed, auto select the new added font and slide update font panel', () => {
       const wrapper = shallow(<FontManagerBody {...props} id='' />)
       const instance = wrapper.instance()
       const handleAutoSelectNewAddedFont = jest.spyOn(instance, 'handleAutoSelectNewAddedFont')

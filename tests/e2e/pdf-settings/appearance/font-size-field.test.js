@@ -22,12 +22,13 @@ test('should save selected font size', async t => {
   await t
     .click(run.appearanceCollapsiblePanel)
     .click(run.fontSizeInputBox)
+  await t
     .pressKey('ctrl+a')
     .pressKey('backspace')
+  await t
     .typeText(run.fontSizeInputBox, '15', { paste: true })
     .click(run.saveSettings)
 
   // Assertions
-  await t
-    .expect(run.fontSizeInputBox.value).eql('15')
+  await t.expect(run.fontSizeInputBox.value).eql('15')
 })

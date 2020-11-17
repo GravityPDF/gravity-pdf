@@ -100,7 +100,7 @@ export class FontListItems extends Component {
    * @since 6.0
    */
   componentDidUpdate (prevProps) {
-    const { history, loading, fontList, selectedFont } = this.props
+    const { history, loading, fontList } = this.props
     const updateFontVisible = document.querySelector('.update-font.show')
 
     /* Reset/Clear deleteId loading state */
@@ -111,11 +111,6 @@ export class FontListItems extends Component {
     /* Remove update font panel after font is successfully deleted */
     if (prevProps.loading !== loading && prevProps.fontList !== fontList && updateFontVisible) {
       toggleUpdateFont(history)
-    }
-
-    /* Move selected font at the top of the list */
-    if (prevProps.selectedFont === '' && selectedFont) {
-      this.handleMoveSelectedFontAtTheTopOfTheList(selectedFont)
     }
   }
 

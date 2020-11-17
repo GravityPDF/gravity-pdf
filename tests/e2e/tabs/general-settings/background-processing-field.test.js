@@ -22,8 +22,9 @@ test('should save toggled \'Background Processing\' value', async t => {
   await t
     .click(run.backgroundProcessingCheckbox)
     .click(run.saveSettings)
-    .expect(run.backgroundProcessingCheckbox.checked).ok()
+  await t.expect(run.backgroundProcessingCheckbox.checked).ok()
+  await t
     .click(run.backgroundProcessingCheckbox)
     .click(run.saveSettings)
-    .expect(run.backgroundProcessingCheckbox.checked).notOk()
+  await t.expect(run.backgroundProcessingCheckbox.checked).notOk()
 })

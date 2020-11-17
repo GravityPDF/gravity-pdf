@@ -111,23 +111,20 @@ export class FontManagerBody extends Component {
    * @since 6.0
    */
   componentDidUpdate (prevProps) {
-    const { id, fontList, msg, history, selectFont } = this.props
+    const { id, fontList, msg, history } = this.props
 
-    /* If font name did update and font name is selected call the method handleRequestFontDetails() */
+    /* If font name is selected call the method handleRequestFontDetails() */
     if (prevProps.id !== id && id) {
       /* Perform check if the accessed ID is valid, if not prevent fatal error event */
       if (!this.handleCheckValidId(fontList, id)) {
         return history.push('/fontmanager/')
       }
 
-      /* Auto select newly installed font */
-      selectFont(id)
-
       this.handleRequestFontDetails()
     }
 
-    /* If font list did update and font name is selected, call the method handleRequestFontDetails() */
-    if (prevProps.fontList !== fontList && id && fontList) {
+    /* If font list did update, call the method handleRequestFontDetails() */
+    if (prevProps.fontList !== fontList && fontList && id) {
       /* Perform check if the accessed ID is valid, if not prevent fatal error event */
       if (!this.handleCheckValidId(fontList, id)) {
         return history.push('/fontmanager/')
@@ -136,7 +133,7 @@ export class FontManagerBody extends Component {
       this.handleRequestFontDetails()
     }
 
-    /* If there's a new success message and font name is not selected, auto slide the new added font name */
+    /* If font is successfully installed, auto select the new added font and slide update font panel */
     if (prevProps.msg !== msg && msg.success && !id) {
       /* Check if there's a response message error for fontList */
       if (msg.error && msg.error.fontList) {
@@ -208,7 +205,7 @@ export class FontManagerBody extends Component {
   }
 
   /**
-   * Auto select/open update font panel
+   * Auto select new added font and slide update font panel
    *
    * @param history: object
    * @param fontList: array of object
@@ -219,6 +216,7 @@ export class FontManagerBody extends Component {
     const newFontIndex = Object.keys(fontList).slice(-1).pop()
     const newFont = fontList[newFontIndex]
 
+    this.props.selectFont(newFont.id)
     toggleUpdateFont(history, newFont.id)
   }
 
@@ -477,7 +475,10 @@ export class FontManagerBody extends Component {
     }
 
     /* Call redux action editFont() */
-    editFont({ id, font: { label, ...data } })
+    editFont({
+      id,
+      font: { label, ...data }
+    })
   }
 
   /**
