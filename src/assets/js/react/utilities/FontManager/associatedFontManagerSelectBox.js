@@ -19,6 +19,11 @@ export function associatedFontManagerSelectBox (fontList, id) {
   const selectedValue = fontManagerSelectBox.options[fontManagerSelectBox.selectedIndex].value
   const userDefinedFonts = []
 
+  /* Return default font value if selected font is not under user custom/defined font list */
+  if (!id) {
+    return
+  }
+
   /* Get current User-Defined Fonts items */
   Array.from(document.querySelectorAll('optgroup[label="User-Defined Fonts"] > option')).map(item => userDefinedFonts.push(item.value))
 

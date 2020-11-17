@@ -25,7 +25,7 @@ class Pdf {
     this.conditionalLogicCheckbox = Selector('#gfpdf-settings-field-wrapper-conditional').find('[id="gfpdf_conditional_logic"]')
 
     // Appearance - Paper Size field
-    this.paperSizeSelectBox = selectBox('gfpdf_settings_pdf_size ', 'gfpdf_settings[pdf_size]')
+    this.paperSizeSelectBox = Selector('#gfpdf-settings-field-wrapper-pdf_size').find('[id="gfpdf_settings[pdf_size]"]')
 
     // Appearance - Paper Orientation field
     this.paperOrientationSelectBox = selectBox('gfpdf_settings_orientation large', 'gfpdf_settings[orientation]')

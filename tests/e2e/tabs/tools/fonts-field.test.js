@@ -86,9 +86,7 @@ test('should successfully close \'update font\' panel using cancel button', asyn
 test('should successfully perform font search', async t => {
   // Actions
   await fontManager.navigateFontManager('gf_settings&subview=PDF&tab=tools#')
-  await t
-    .wait(300)
-    .typeText(fontManager.searchBar, 'Roboto', { paste: true })
+  await t.typeText(fontManager.searchBar, 'Roboto', { paste: true })
 
   // Assertions
   await t.expect(fontManager.fontListItem.count).eql(1)

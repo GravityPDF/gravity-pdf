@@ -19,14 +19,14 @@ test('should display \'Default Font Size\' field', async t => {
 test('should save selected font size', async t => {
   // Actions
   await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
+  await t.click(run.defaultFontSizeInputBox)
   await t
-    .click(run.defaultFontSizeInputBox)
     .pressKey('ctrl+a')
     .pressKey('backspace')
+  await t
     .typeText(run.defaultFontSizeInputBox, '15', { paste: true })
     .click(run.saveSettings)
 
   // Assertions
-  await t
-    .expect(run.defaultFontSizeInputBox.value).eql('15')
+  await t.expect(run.defaultFontSizeInputBox.value).eql('15')
 })

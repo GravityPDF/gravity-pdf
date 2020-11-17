@@ -57,6 +57,7 @@ class FontManager {
       .typeText('#user_login', 'admin', { paste: true })
       .typeText('#user_pass', 'password', { paste: true })
       .click('#wp-submit')
+      .wait(500)
       .click(button('Advanced'))
   }
 }
