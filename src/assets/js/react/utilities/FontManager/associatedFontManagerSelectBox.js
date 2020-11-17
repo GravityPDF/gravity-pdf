@@ -46,6 +46,7 @@ export function associatedFontManagerSelectBox (fontList, id) {
 
   let updateSelectBoxValue
 
+  /* Set current selected font value */
   if (list.length > 0 && list.includes(id)) {
     fontManagerSelectBox.insertBefore(optgroup, fontManagerSelectBox.childNodes[0])
     updateSelectBoxValue = fontManagerSelectBox.value = id

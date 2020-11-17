@@ -33,7 +33,7 @@ test('should check that font manager popup exist', async t => {
 test('should display error validation', async t => {
   // Actions
   await fontManager.navigateFontManager('gf_settings&subview=PDF&tab=tools#')
-  await t.click(button('Add Font →'))
+  await t.click(fontManager.addFontButton)
 
   // Assertions
   await t
@@ -50,11 +50,11 @@ test('should successfully add new font', async t => {
   await t
     .typeText(fontManager.addFontNameInputField, 'Gotham', { paste: true })
     .setFilesToUpload(fontManager.addNewFontRegular, fontManager.gothamFontRegular)
-    .click(button('Add Font →'))
+    .click(fontManager.addFontButton)
     .click(fontManager.fontListItem.nth(0))
     .typeText(fontManager.addFontNameInputField, 'Roboto', { paste: true })
     .setFilesToUpload(fontManager.addNewFontRegular, fontManager.robotoFontRegular)
-    .click(button('Add Font →'))
+    .click(fontManager.addFontButton)
 
   // Assertions
   await t
@@ -67,9 +67,9 @@ test('should successfully check toggled state for disabled \'Update Font\' butto
   await fontManager.navigateFontManager('gf_settings&subview=PDF&tab=tools#')
   await t
     .click(fontManager.fontListItem.nth(0))
-    .expect(button('Update Font →').hasAttribute('disabled')).ok()
+    .expect(fontManager.updateFontButton.hasAttribute('disabled')).ok()
     .typeText(fontManager.updateFontNameInputField, ' new', { paste: true })
-    .expect(button('Update Font →').hasAttribute('disabled')).notOk()
+    .expect(fontManager.updateFontButton.hasAttribute('disabled')).notOk()
 })
 
 test('should successfully close \'update font\' panel using cancel button', async t => {
@@ -86,7 +86,9 @@ test('should successfully close \'update font\' panel using cancel button', asyn
 test('should successfully perform font search', async t => {
   // Actions
   await fontManager.navigateFontManager('gf_settings&subview=PDF&tab=tools#')
-  await t.typeText(fontManager.searchBar, 'Roboto', { paste: true })
+  await t
+    .wait(300)
+    .typeText(fontManager.searchBar, 'Roboto', { paste: true })
 
   // Assertions
   await t.expect(fontManager.fontListItem.count).eql(1)
@@ -104,7 +106,7 @@ test('should successfully edit existing font', async t => {
     .setFilesToUpload(fontManager.addNewFontItalics, fontManager.robotoFontItalics)
     .setFilesToUpload(fontManager.addNewFontBold, fontManager.robotoFontBold)
     .setFilesToUpload(fontManager.addNewFontBoldItalics, fontManager.robotoFontBoldItalics)
-    .click(button('Update Font →'))
+    .click(fontManager.updateFontButton)
 
   // Assertions
   await t

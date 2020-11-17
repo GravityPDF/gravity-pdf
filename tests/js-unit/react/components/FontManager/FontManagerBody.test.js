@@ -31,6 +31,7 @@ describe('FontManager - FontManagerBody.js', () => {
     editFont: jest.fn(),
     validationError: jest.fn(),
     deleteVariantError: jest.fn(),
+    selectFont: jest.fn(),
     addFont: jest.fn(),
     history: {
       push: jest.fn(),
@@ -86,6 +87,7 @@ describe('FontManager - FontManagerBody.js', () => {
 
       instance.componentDidUpdate(prevPops)
 
+      expect(props.selectFont).toHaveBeenCalledTimes(1)
       expect(handleRequestFontDetails).toHaveBeenCalled()
     })
 

@@ -19,10 +19,11 @@ test('should check shortcode confirmation type TEXT is working correctly', async
   await run.navigateConfirmationSection('gf_edit_forms&view=settings&subview=confirmation&id=3')
   await t
     .click(run.confirmationTextCheckbox)
-    .click(run.wsiwigEditor)
+    .click(run.wysiwgEditorTextTab)
+    .click(run.wysiwgEditor)
     .pressKey('ctrl+a')
     .pressKey('backspace')
-    .typeText(run.wsiwigEditor, shortcodeHolder, { paste: true })
+    .typeText(run.wysiwgEditor, shortcodeHolder, { paste: true })
     .click(run.saveConfirmationButton)
     .click(run.previewLink)
     .typeText(run.formInputField, 'test', { paste: true })
