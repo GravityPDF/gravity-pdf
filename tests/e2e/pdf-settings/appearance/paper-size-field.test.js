@@ -53,8 +53,8 @@ test('should save selected paper size', async t => {
   await t
     .click(run.appearanceCollapsiblePanel)
     .click(run.paperSizeSelectBox)
-    .click(dropdownOption('Letter (8.5 x 11in)'))
-    .click(run.saveSettings)
+  await t.click(dropdownOption('Letter (8.5 x 11in)'))
+  await t.click(run.saveSettings)
 
   // Assertions
   await t.expect(run.paperSizeSelectBox.value).eql('LETTER')

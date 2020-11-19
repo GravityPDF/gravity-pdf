@@ -147,8 +147,7 @@ test('should successfully perform font search', async t => {
   await t
     .click(run.appearanceCollapsiblePanel)
     .click(fontManager.advancedButton)
-    .wait(300)
-    .typeText(fontManager.searchBar, 'Roboto', { paste: true })
+  await t.typeText(fontManager.searchBar, 'Roboto', { paste: true })
 
   // Assertions
   await t.expect(fontManager.fontListItem.count).eql(1)

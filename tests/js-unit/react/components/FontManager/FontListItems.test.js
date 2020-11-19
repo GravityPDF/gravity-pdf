@@ -82,7 +82,6 @@ describe('FontManager - FontListItems.js', () => {
       const instance = wrapper.instance()
       const toggleUpdateFont = jest.spyOn(utilities, 'toggleUpdateFont')
       const handleResetLoadingState = jest.spyOn(instance, 'handleResetLoadingState')
-      const handleMoveSelectedFontAtTheTopOfTheList = jest.spyOn(instance, 'handleMoveSelectedFontAtTheTopOfTheList')
       const prevProps = {
         fontList: [
           {
@@ -102,7 +101,6 @@ describe('FontManager - FontListItems.js', () => {
 
       expect(handleResetLoadingState).toHaveBeenCalledTimes(1)
       expect(toggleUpdateFont).toHaveBeenCalledTimes(1)
-      expect(handleMoveSelectedFontAtTheTopOfTheList).toHaveBeenCalledTimes(1)
     })
   })
 
