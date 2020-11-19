@@ -43,7 +43,7 @@ class Pdf {
     this.fontColorSelectButton = Selector('#gfpdf-settings-field-wrapper-font_colour').find('button').withText('Select Color')
     this.fontColorWpPickerContainerActive = Selector('#gfpdf-settings-field-wrapper-font_colour').find('[class^="wp-picker-container wp-picker-active"]')
     this.fontColorWpColorPickerBox = Selector('#gfpdf-settings-field-wrapper-font_colour').find('[class^="iris-picker iris-border"]')
-    this.fontColorInputBox = selectBox('gfpdf-color-picker gfpdf_settings_font_colour  wp-color-picker', 'gfpdf_settings[font_colour]')
+    this.fontColorInputBox = Selector('#gfpdf-settings-field-wrapper-font_colour').find('[id="gfpdf_settings[font_colour]"]')
 
     // Appearance - Reverse Text (RTL) field
     this.rtlCheckbox = Selector('#gfpdf-settings-field-wrapper-rtl').find('[id="gfpdf_settings[rtl]"]')
@@ -67,14 +67,14 @@ class Pdf {
     this.showEmptyFieldsCheckbox = Selector('#gfpdf-settings-field-wrapper-show_empty').find('[id="gfpdf_settings[show_empty]"]')
 
     // Template - Background Color field
-    this.backgroundColorInputBox = selectBox('gfpdf-color-picker gfpdf_settings_background_color  wp-color-picker', 'gfpdf_settings[background_color]')
+    this.backgroundColorInputBox = Selector('#gfpdf-settings-field-wrapper-background_color').find('[id="gfpdf_settings[background_color]"]')
     this.backgroundColorWpPickerContainerActive = Selector('#gfpdf-settings-field-wrapper-background_color').find('[class^="wp-picker-container wp-picker-active"]')
     this.backgroundColorWpColorPickerBox = Selector('#gfpdf-settings-field-wrapper-font_colour').find('[class^="iris-picker iris-border"]')
     this.backgroundColorSelectButton = Selector('#gfpdf-settings-field-wrapper-background_color').find('button').withText('Select Color')
 
     // Template - Container Background Color field
     this.rubixContainerBackgroundColorSelectButton = Selector('#gfpdf-settings-field-wrapper-rubix_container_background_colour').find('button').withText('Select Color')
-    this.rubixContainerBackgroundColorInputBox = selectBox('gfpdf-color-picker gfpdf_settings_rubix_container_background_colour  wp-color-picker', 'gfpdf_settings[rubix_container_background_colour]')
+    this.rubixContainerBackgroundColorInputBox = selectBox('gfpdf-color-picker gfpdf_settings_rubix_container_background_colour wp-color-picker', 'gfpdf_settings[rubix_container_background_colour]')
     this.rubixContainerBackgroundColorWpPickerContainerActive = Selector('#gfpdf-settings-field-wrapper-rubix_container_background_colour').find('[class^="wp-picker-container wp-picker-active"]')
     this.rubixContainerBackgroundColorWpColorPickerBox = Selector('#gfpdf-settings-field-wrapper-rubix_container_background_colour').find('[class^="iris-picker iris-border"]')
     this.rubixContainerBackgroundColorPicker = Selector('#gfpdf-settings-field-wrapper-rubix_container_background_colour').find('a').withAttribute('class', 'iris-palette')
@@ -110,6 +110,7 @@ class Pdf {
     this.formatPdfA1bCheckbox = Selector('#gfpdf-settings-field-wrapper-format').find('[id="gfpdf_settings[format][PDFA1B]"]')
     this.formatPdfX1aCheckbox = Selector('#gfpdf-settings-field-wrapper-format').find('[id="gfpdf_settings[format][PDFX1A]"]')
     this.enablePdfSecurityField = Selector('#gfpdf-settings-field-wrapper-security')
+    this.enablePdfSecurityCheckbox = Selector('#gfpdf-settings-field-wrapper-security').find('[id="gfpdf_settings[security]"]')
     this.passwordField = Selector('#gfpdf-settings-field-wrapper-password')
     this.privilegesField = Selector('#gfpdf-settings-field-wrapper-privileges')
 

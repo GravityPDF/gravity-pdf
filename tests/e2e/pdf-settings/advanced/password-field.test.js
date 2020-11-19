@@ -26,6 +26,7 @@ test('should check that merge tags list option exist', async t => {
   await t
     .click(run.advancedCollapsiblePanel)
     .click(run.formatStandardCheckbox)
+    .click(run.enablePdfSecurityCheckbox)
     .click(run.passwordMergeTagsOptionList)
 
   // Assertions
@@ -47,6 +48,7 @@ test('should save selected merge tags', async t => {
   await t
     .click(run.advancedCollapsiblePanel)
     .click(run.formatStandardCheckbox)
+    .click(run.enablePdfSecurityCheckbox)
     .click(run.passwordMergeTagsOptionList)
     .click(run.optionA)
     .click(run.passwordMergeTagsOptionList)
@@ -64,4 +66,18 @@ test('should save selected merge tags', async t => {
     .pressKey('backspace')
     .click(run.saveSettings)
     .expect(run.passwordInputBox.value).eql('')
+})
+
+test('should disable/reset PDF security field and hide password field', async t => {
+  // Actions
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await t
+    .click(run.advancedCollapsiblePanel)
+    .click(run.formatStandardCheckbox)
+    .click(run.enablePdfSecurityCheckbox)
+    .click(run.saveSettings)
+
+  // Assertions
+  await t
+    .expect(run.passwordField.visible).notOk()
 })

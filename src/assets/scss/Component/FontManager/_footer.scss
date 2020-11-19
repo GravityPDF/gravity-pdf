@@ -1,0 +1,81 @@
+@use '../../base';
+
+#tab_pdf, #tab_PDF {
+
+  #font-manager-overlay {
+    .font-manager {
+      #gfpdf-font-manager-container {
+        .add-update-font-column {
+          .footer {
+            padding-bottom: 40px;
+
+            .dashicons {
+              border: 1px solid base.$lighter-highlight-color;
+              border-radius: 3px;
+              margin-right: 0.3rem;
+              padding: 0.4rem;
+
+              &:hover {
+                cursor: pointer;
+              }
+
+              &.dashicons-yes {
+                &:hover {
+                  background-color: base.$lighter-highlight-color;
+                  color: white;
+                }
+
+                &.checked {
+                  background-color: base.$success-color;
+                  color: white;
+
+                  &:hover {
+                    background-color: base.$lighter-highlight-color;
+                    color: base.$highlight-color;
+                  }
+                }
+              }
+
+              &.dashicons-trash {
+                color: base.$highlight-color;
+
+                &:hover {
+                  background-color: base.$error-color;
+                  color: white;
+                }
+              }
+            }
+
+            .gfpdf-spinner {
+              padding-left: 0;
+            }
+
+            &.cancel {
+              button {
+                margin-bottom: 0;
+              }
+            }
+
+            .button {
+              height: 35px;
+              margin-right: 8px;
+            }
+
+            .msg {
+              display: block;
+
+              &.success {
+                color: base.$success-color;
+              }
+
+              &.error {
+                color: base.$error-color;
+              }
+
+            }
+          }
+        }
+      }
+    }
+  }
+}

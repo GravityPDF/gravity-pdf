@@ -18,23 +18,10 @@ export function associatedFontManagerSelectBox (fontList, id) {
   const definedFontsOptgroup = document.querySelector('optgroup[label="User-Defined Fonts"]')
   const selectedValue = fontManagerSelectBox.options[fontManagerSelectBox.selectedIndex].value
   const userDefinedFonts = []
-
-  /* Return default font value if selected font is not under user custom/defined font list */
-  if (!id) {
-    return
-  }
-
-  /* Get current User-Defined Fonts items */
-  Array.from(document.querySelectorAll('optgroup[label="User-Defined Fonts"] > option')).map(item => userDefinedFonts.push(item.value))
-
-  if (definedFontsOptgroup !== null) {
-    /* Remove optgroup */
-    definedFontsOptgroup.remove()
-  }
-
   const optgroup = document.createElement('optgroup')
   optgroup.setAttribute('label', 'User-Defined Fonts')
 
+  /* Update User-Defined Fonts optgroup option list */
   fontList.map(font => {
     const option = document.createElement('option')
     option.text = font.font_name
@@ -43,13 +30,30 @@ export function associatedFontManagerSelectBox (fontList, id) {
     optgroup.appendChild(option)
   })
 
+  let updateSelectBoxValue
+
+  /* Set the default font value if no selected font is selected under 'User-Defined Fonts' list */
+  if (!id) {
+    if (definedFontsOptgroup !== null) {
+      definedFontsOptgroup.remove()
+      fontManagerSelectBox.insertBefore(optgroup, fontManagerSelectBox.childNodes[0])
+      updateSelectBoxValue = fontManagerSelectBox.selectedIndex = '0'
+    }
+  }
+
+  /* Get current 'User-Defined Fonts' items */
+  Array.from(document.querySelectorAll('optgroup[label="User-Defined Fonts"] > option')).map(item => userDefinedFonts.push(item.value))
+
+  if (definedFontsOptgroup !== null) {
+    /* Remove optgroup */
+    definedFontsOptgroup.remove()
+  }
+
   const list = []
 
   if (fontList.length > 0) {
     fontList.map(font => list.push(font.id))
   }
-
-  let updateSelectBoxValue
 
   /* Set current selected font value */
   if (list.length > 0 && list.includes(id)) {
@@ -77,8 +81,9 @@ export function associatedFontManagerSelectBox (fontList, id) {
   fontManagerSelectBox.insertBefore(optgroup, fontManagerSelectBox.childNodes[0])
   fontManagerSelectBox.value = !id ? selectedValue : id
 
-  /* Remove User-Defined Fonts field if empty */
+  /* Remove 'User-Defined Fonts' field if empty and select default value */
   if (userDefinedFonts.length === 0 && list.length === 0) {
     fontManagerSelectBox.querySelector('optgroup[label="User-Defined Fonts"]').remove()
+    fontManagerSelectBox.selectedIndex = '0'
   }
 }

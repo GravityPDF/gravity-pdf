@@ -32,6 +32,7 @@ test('should save toggled checkboxes value', async t => {
   await t
     .click(run.advancedCollapsiblePanel)
     .click(run.formatStandardCheckbox)
+    .click(run.enablePdfSecurityCheckbox)
     .click(run.copyCheckbox)
     .click(run.printLowResolutionCheckbox)
     .click(run.printHighResolutionCheckbox)
@@ -66,4 +67,18 @@ test('should save toggled checkboxes value', async t => {
     .expect(run.fillFormsCheckbox.checked).ok()
     .expect(run.extractCheckbox.checked).ok()
     .expect(run.assembleCheckbox.checked).ok()
+})
+
+test('should disable/reset PDF security field and hide privileges field', async t => {
+  // Actions
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await t
+    .click(run.advancedCollapsiblePanel)
+    .click(run.formatStandardCheckbox)
+    .click(run.enablePdfSecurityCheckbox)
+    .click(run.saveSettings)
+
+  // Assertions
+  await t
+    .expect(run.privilegesField.visible).notOk()
 })

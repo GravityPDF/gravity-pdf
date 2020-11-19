@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { sprintf } from 'sprintf-js'
 /* Components */
 import FontVariant from './FontVariant'
-import AddFontFooter from './AddFontFooter'
+import AddUpdateFontFooter from './AddUpdateFontFooter'
 
 /**
  * @package     Gravity PDF
@@ -103,7 +103,7 @@ export const UpdateFont = (
           tabIndex={tabIndexFontFiles}
         />
 
-        <AddFontFooter
+        <AddUpdateFontFooter
           id={id}
           disabled={disableUpdateButton}
           onHandleCancelEditFont={onHandleCancelEditFont}

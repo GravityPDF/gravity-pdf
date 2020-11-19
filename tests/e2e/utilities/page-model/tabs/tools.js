@@ -1,5 +1,5 @@
 import { Selector, t } from 'testcafe'
-import { baseURL } from '../../../auth'
+import { admin, baseURL } from '../../../auth'
 
 class Tools {
   constructor () {
@@ -18,13 +18,11 @@ class Tools {
     this.uninstallGravityPdfButton = Selector('#gfpdf-fieldset-uninstaller').find('button').withText('Uninstall Gravity PDF')
   }
 
-  async navigateSettingsTab (text) {
+  async navigateSettingsTab (address) {
     await t
+      .useRole(admin)
       .setNativeDialogHandler(() => true)
-      .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
-      .typeText('#user_login', 'admin', { paste: true })
-      .typeText('#user_pass', 'password', { paste: true })
-      .click('#wp-submit')
+      .navigateTo(`${baseURL}/wp-admin/admin.php?page=${address}`)
   }
 }
 

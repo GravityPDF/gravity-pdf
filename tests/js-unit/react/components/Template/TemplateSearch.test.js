@@ -46,7 +46,7 @@ describe('Template - TemplateSearch.js', () => {
       setTimeout(() => {
         expect(onSearchMock.mock.calls.length).toBe(1)
         done()
-      }, 200)
+      }, 300)
     })
 
     test('runSearch() - Update our Redux store with the search value', done => {
@@ -57,7 +57,7 @@ describe('Template - TemplateSearch.js', () => {
       setTimeout(() => {
         expect(onSearchMock.mock.calls.length).toBe(1)
         done()
-      }, 200)
+      }, 300)
     })
   })
 

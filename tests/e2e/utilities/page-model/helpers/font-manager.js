@@ -1,10 +1,10 @@
 import { Selector, t } from 'testcafe'
-import { baseURL } from '../../../auth'
+import { admin, baseURL } from '../../../auth'
 import { button } from './field'
 
 class FontManager {
   constructor () {
-    this.advancedButton = Selector('#gpdf-advance-font-manager-selector').find('button').withText('Advanced')
+    this.advancedButton = Selector('#gfpdf-settings-field-wrapper-font-container').find('button').withText('Advanced')
     this.fontManagerPopup = Selector('div').find('[class^="container theme-wrap font-manager"]')
 
     // Header section
@@ -21,7 +21,7 @@ class FontManager {
     this.fontVariantsCheck = Selector('.font-list-item').nth(0).find('[class^="dashicons dashicons-yes"]')
 
     // Add and update font panel section
-    this.addFontColumn = Selector('.add-font-column')
+    this.addFontColumn = Selector('.add-update-font-column')
     this.addFontNameInputField = Selector('#gfpdf-add-font-name-input')
     this.addNewFontRegular = Selector('#gfpdf-font-files-setting').find('input').withAttribute('aria-labelledby', 'gfpdf-font-variant-regular addFont gfpdf-font-files-label')
     this.addNewFontItalics = Selector('#gfpdf-font-files-setting').find('input').withAttribute('aria-labelledby', 'gfpdf-font-variant-italics updateFont gfpdf-font-files-label')
@@ -52,12 +52,9 @@ class FontManager {
 
   async navigateFontManager (address) {
     await t
+      .useRole(admin)
       .setNativeDialogHandler(() => true)
       .navigateTo(`${baseURL}/wp-admin/admin.php?page=${address}`)
-      .typeText('#user_login', 'admin', { paste: true })
-      .typeText('#user_pass', 'password', { paste: true })
-      .click('#wp-submit')
-      .wait(500)
       .click(button('Advanced'))
   }
 }

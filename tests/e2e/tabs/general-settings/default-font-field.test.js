@@ -53,6 +53,8 @@ test('should save selected font', async t => {
   await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
   await t
     .click(run.defaultFontSelectBox)
+    .click(dropdownOption('Pothana2000'))
+    .click(run.defaultFontSelectBox)
     .click(dropdownOption('Lohit Kannada'))
     .click(run.saveSettings)
 
@@ -78,7 +80,6 @@ test('should display font manager error validation', async t => {
   await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
   await t
     .click(fontManager.advancedButton)
-    .wait(300)
     .click(fontManager.addFontButton)
 
   // Assertions
@@ -135,8 +136,9 @@ test('should successfully close \'update font\' panel using cancel button', asyn
 test('should successfully perform font search', async t => {
   // Actions
   await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
-  await t.click(fontManager.advancedButton)
-  await t.typeText(fontManager.searchBar, 'Roboto', { paste: true })
+  await t
+    .click(fontManager.advancedButton)
+    .typeText(fontManager.searchBar, 'Roboto', { paste: true })
 
   // Assertions
   await t.expect(fontManager.fontListItem.count).eql(1)

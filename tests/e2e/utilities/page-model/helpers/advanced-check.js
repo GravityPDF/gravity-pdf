@@ -27,7 +27,7 @@ class AdvancedCheck {
     this.getContentType = null
 
     // General Settings - Debug Mode field
-    this.debugModeCheckbox = Selector('#gfpdf-fieldset-debug_mode').find('[id="gfpdf_settings[debug_mode]"]')
+    this.debugModeCheckbox = Selector('#gfpdf-fieldset-debug_mode').find('[class^="gform-field__toggle-container"]')
     this.debugModeErrorMessage = Selector('div').withText('PDF link not displayed because PDF is inactive.')
 
     // Merge tags section

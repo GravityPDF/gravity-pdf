@@ -264,6 +264,8 @@ describe('FontManager - FontListItems.js', () => {
 
       instance.handleSelectFontKeypress(e)
 
+      expect(e.preventDefault).toHaveBeenCalledTimes(1)
+      expect(e.stopPropagation).toHaveBeenCalledTimes(1)
       expect(handleSelectFont).toHaveBeenCalledTimes(1)
     })
   })

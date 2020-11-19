@@ -9,6 +9,7 @@ fixture`Debug mode - PDF shortcode test`
 
 test('should enable debug mode and throw error when PDF is inactive', async t => {
   // Actions & Assertions
+  await t.setTestSpeed(0.4)
   await advancedCheck.navigateSection('gf_settings&subview=PDF&tab=general#')
   await t
     .click(advancedCheck.debugModeCheckbox)
@@ -40,6 +41,6 @@ test('should reset/clean PDF back to active and debug mode back to disabled for 
   await advancedCheck.navigateLink('gf_settings&subview=PDF&tab=general#')
   await t
     .click(advancedCheck.debugModeCheckbox)
-    .click(general.saveSettings())
+    .click(general.saveSettings)
     .expect(advancedCheck.debugModeCheckbox.checked).notOk()
 })

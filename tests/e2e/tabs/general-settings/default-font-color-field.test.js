@@ -8,7 +8,6 @@ fixture`General settings tab - Default font color field test`
 
 test('should display \'Default Font Color\' field', async t => {
   // Selectors
-  const defaultFontColorWpPickerContainerActive = Selector('#gfpdf-settings-field-wrapper-default_font_colour').find('[class^="wp-picker-container wp-picker-active"]')
   const defaultFontColorWpColorPickerBox = Selector('#gfpdf-settings-field-wrapper-default_font_colour').find('[class^="iris-picker iris-border"]')
 
   // Actions
@@ -21,7 +20,6 @@ test('should display \'Default Font Color\' field', async t => {
     .expect(fieldDescription('Set the default font color used in PDFs.', 'label').exists).ok()
     .expect(run.defaultFontColorSelectButton.exists).ok()
     .expect(run.defaultFontColorInputBox.exists).ok()
-    .expect(defaultFontColorWpPickerContainerActive.exists).ok()
     .expect(defaultFontColorWpColorPickerBox.exists).ok()
 })
 
