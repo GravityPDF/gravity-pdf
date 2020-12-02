@@ -98,7 +98,7 @@ export class Retry extends React.Component {
         href='#'
         onClick={this.handleTriggerRetryFontDownload}
         aria-live='polite'
-        role='dialog'
+        role='log'
       >
         {this.props.retryText}
 
