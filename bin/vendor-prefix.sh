@@ -4,8 +4,8 @@ exists() {
   command -v "$1" >/dev/null 2>&1
 }
 
-isTravis() {
-  if [ "$TRAVIS" = "true" ]; then
+isCI() {
+  if [ "$CI" = "true" ]; then
     return 0
   fi
 
@@ -27,15 +27,19 @@ else
   chmod -R 777 vendor
 fi
 
-if exists php && ! isTravis; then
-  PHP_DOCKER=""
-  PHP="php"
-  COMPOSER="composer"
-else
-  PHP_DOCKER="yarn env docker-run php "
-  PHP="LOCAL_PHP=7.4-fpm ${PHP_DOCKER}php"
-  COMPOSER="${PHP_DOCKER}composer"
-fi
+PHP_DOCKER=""
+PHP="php"
+COMPOSER="composer"
+
+#if exists php && ! isCI; then
+#  PHP_DOCKER=""
+#  PHP="php"
+#  COMPOSER="composer"
+#else
+#  PHP_DOCKER="yarn wp-scripts env docker-run php "
+#  PHP="LOCAL_PHP=7.4-fpm ${PHP_DOCKER}php"
+#  COMPOSER="${PHP_DOCKER}composer"
+#fi
 
 eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}src/Vendor/Monolog --config=${PLUGIN_DIR}.php-scoper/monolog.php --force --quiet"
 cp ${PLUGIN_DIR}vendor/monolog/monolog/* ${PLUGIN_DIR}src/Vendor/Monolog 2>/dev/null

@@ -1,0 +1,139 @@
+name: End-to-end Tests
+
+on:
+  push:
+    branches:
+      - development
+  pull_request:
+  # Once weekly On Sundays at 00:00 UTC.
+  schedule:
+    - cron: '0 0 * * 0'
+
+env:
+  WP_DEVELOP_DIR: ./wordpress
+  GF_LICENSE: ${{ secrets.GF_LICENSE }}
+  GH_CREDENTIALS: ${{ secrets.GH_CREDENTIALS }}
+
+jobs:
+  # Runs the end-to-end test suite.
+  #
+  # Performs the following steps:
+  # - Cancels all previous workflow runs for pull requests that have not completed.
+  # - Set environment variables.
+  # - Checks out the repository.
+  # - Logs debug information about the runner container.
+  # - Installs NodeJS 1
+  # - Sets up caching for NPM.
+  # _ Installs NPM dependencies using install-changed to hash the `package.json` file.
+  # - Builds WordPress to run from the `build` directory.
+  # - Starts the WordPress Docker container.
+  # - Logs general debug information.
+  # - Logs the running Docker containers.
+  # - Logs Docker debug information (about both the Docker installation within the runner and the WordPress container).
+  # - Install WordPress within the Docker container.
+  # - Run the E2E tests.
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel previous runs of this workflow (pull requests only)
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: styfle/cancel-workflow-action@0.5.0
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Configure environment variables
+        run: |
+          echo "PHP_FPM_UID=$(id -u)" >> $GITHUB_ENV
+          echo "PHP_FPM_GID=$(id -g)" >> $GITHUB_ENV
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Log debug information
+        run: |
+          yarn --version
+          node --version
+          curl --version
+          git --version
+          svn --version
+          php --version
+          php -i
+          locale -a
+
+      - name: Install NodeJS
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - name: Cache NodeJS modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-modules-
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install Dependencies
+        run: |
+          yarn install
+          yarn prebuild:core-fonts
+
+      - name: Build Gravity PDF
+        run: yarn build:production
+
+      - name: Install / Setup Gravity PDF + WordPress
+        run: |
+          yarn env:install
+          yarn env:install:phpunit
+
+      - name: General debug information
+        run: |
+          npm --version
+          node --version
+          curl --version
+          git --version
+          svn --version
+
+      - name: Log running Docker containers
+        run: docker ps -a
+
+      - name: Docker debug information
+        run: |
+          docker -v
+          docker-compose -v
+          docker-compose -f $WP_DEVELOP_DIR/docker-compose.yml run --rm mysql mysql --version
+          docker-compose -f $WP_DEVELOP_DIR/docker-compose.yml run --rm php php --version
+          docker-compose -f $WP_DEVELOP_DIR/docker-compose.yml run --rm php php -m
+          docker-compose -f $WP_DEVELOP_DIR/docker-compose.yml run --rm php php -i
+          docker-compose -f $WP_DEVELOP_DIR/docker-compose.yml run --rm php locale -a
+
+      - name: Run E2E tests
+        run: yarn test:e2e:headless
+
+      - name: Dump log files on failure
+        if: failure()
+        run: |
+          cp ./wordpress/src/wp-content/debug.log screenshots/debug.log
+          cp -R ./wordpress/src/wp-content/uploads/gravity_forms/logs/ screenshots/logs/
+
+      - name: Upload artifacts on failure
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: my-artifact
+          path: screenshots/
