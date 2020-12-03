@@ -24,7 +24,7 @@ tar -zxf ${PACKAGE_DIR}/package.tar.gz --directory ${PACKAGE_DIR} && rm --force 
 # Run Composer
 yarn --cwd ${PACKAGE_DIR} prebuild
 yarn --cwd ${PACKAGE_DIR} build:production
-yarn env docker-run php composer install --no-dev  --prefer-dist --optimize-autoloader --working-dir ${PACKAGE_DIR}
+composer install --no-dev  --prefer-dist --optimize-autoloader --working-dir ${PACKAGE_DIR}
 
 PLUGIN_DIR="$PACKAGE_DIR/" bash ./bin/vendor-prefix.sh
 
@@ -52,8 +52,8 @@ rm --force -R "${PACKAGE_DIR}/src/assets/js"
 rm --force -R "${PACKAGE_DIR}/bin"
 rm --force -R "${PACKAGE_DIR}/.php-scoper"
 rm --force -R "${PACKAGE_DIR}/webpack-configs"
+rm -R "${PACKAGE_DIR}/vendor/mpdf/mpdf/ttfonts"
 
-# Generate translation file
 cd ${PACKAGE_DIR}
 npm install --global wp-pot-cli
 wp-pot --domain gravity-forms-pdf-extended --src 'src/**/*.php' --src 'pdf.php' --src 'api.php' --package 'Gravity PDF' --dest-file src/assets/languages/gravity-forms-pdf-extended.pot > /dev/null

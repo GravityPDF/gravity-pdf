@@ -4,14 +4,6 @@ exists() {
   command -v "$1" >/dev/null 2>&1
 }
 
-isTravis() {
-  if [ "$TRAVIS" = "true" ]; then
-    return 0
-  fi
-
-  return 1
-}
-
 if [ -z "$PLUGIN_DIR" ]; then
   PLUGIN_DIR="./"
 fi
@@ -27,15 +19,9 @@ else
   chmod -R 777 vendor
 fi
 
-if exists php && ! isTravis; then
-  PHP_DOCKER=""
-  PHP="php"
-  COMPOSER="composer"
-else
-  PHP_DOCKER="yarn env docker-run php "
-  PHP="LOCAL_PHP=7.4-fpm ${PHP_DOCKER}php"
-  COMPOSER="${PHP_DOCKER}composer"
-fi
+PHP_DOCKER=""
+PHP="php"
+COMPOSER="composer"
 
 rm -R "${PLUGIN_DIR}vendor_prefixed"
 mkdir "${PLUGIN_DIR}vendor_prefixed"
