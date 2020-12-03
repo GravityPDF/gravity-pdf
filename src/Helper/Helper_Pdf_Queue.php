@@ -125,7 +125,7 @@ class Helper_Pdf_Queue extends GF_Background_Process {
 						)
 					);
 
-					if ( $callback['unrecoverable'] ?? false ) {
+					if ( isset( $callback['unrecoverable'] ) && $callback['unrecoverable'] ) {
 						$this->log->critical(
 							'Cancel async queue due to retry limit reached on unrecoverable callback.',
 							[
