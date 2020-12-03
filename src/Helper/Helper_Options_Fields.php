@@ -236,7 +236,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				'uninstaller' => [
 					'id'         => 'uninstaller',
 					'name'       => esc_html__( 'Uninstall Gravity PDF', 'gravity-forms-pdf-extended' ),
-					'desc'       => '<p class="alert error">' . esc_html__( 'This operation deletes ALL Gravity PDF settings and deactivates the plugin. If you continue, all settings, configuration, custom templates and fonts will be removed.', 'gravity-forms-pdf-extended' ) . '</p>',
+					'desc'       => '<p class="alert error" id="uninstall-gfpdf-description">' . esc_html__( 'This operation deletes ALL Gravity PDF settings and deactivates the plugin. If you continue, all settings, configuration, custom templates and fonts will be removed.', 'gravity-forms-pdf-extended' ) . '</p>',
 					'type'       => 'button',
 					'inputClass' => 'primary',
 					'std'        => esc_html__( 'Uninstall Gravity PDF', 'gravity-forms-pdf-extended' ),
