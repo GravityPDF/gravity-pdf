@@ -44,7 +44,7 @@ export class TemplateSearch extends React.Component {
    */
   componentDidMount () {
     /* add focus to element */
-    this.input.focus()
+    this.input.trigger('focus')
   }
 
   /**

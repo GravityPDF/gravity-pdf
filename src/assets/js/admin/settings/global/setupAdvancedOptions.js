@@ -14,7 +14,7 @@ export function setupAdvancedOptions () {
   /*
    * Show / Hide Advanced options
    */
-  $advancedOptions.click(function () {
+  $advancedOptions.on('click', function () {
     let click = this
 
     /* toggle our slider */

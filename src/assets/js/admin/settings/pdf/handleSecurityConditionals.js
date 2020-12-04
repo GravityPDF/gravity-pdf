@@ -12,7 +12,7 @@ export function handleSecurityConditionals () {
   let $format = $secTable.find('input[name="gfpdf_settings[format]"]')
 
   /* Add change event to admin restrictions to show/hide dependant fields */
-  $pdfSecurity.change(function () {
+  $pdfSecurity.on('change', function () {
 
     if ($(this).is(':checked')) {
 
@@ -36,7 +36,7 @@ export function handleSecurityConditionals () {
   }).trigger('change')
 
   /* The format field effects the security field. When it changes it triggers the security field as changed */
-  $format.change(function () {
+  $format.on('change', function () {
     if ($(this).is(':checked')) {
       $pdfSecurity.trigger('change')
     }

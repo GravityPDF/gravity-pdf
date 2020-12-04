@@ -21,7 +21,7 @@ export function wpDialog ($elm, buttonsList, boxWidth, boxHeight) {
     zIndex: 300000,
     buttons: buttonsList,
     open: function () {
-      $(this).siblings('.ui-dialog-buttonpane').find('button:eq(1)').focus()
+      $(this).siblings('.ui-dialog-buttonpane').find('button:eq(1)').trigger('focus')
 
       $('.ui-widget-overlay').bind('click', function () {
         $elm.wpdialog('close')

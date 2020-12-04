@@ -765,7 +765,7 @@
 
         /* Toggle the new model's font manager and set focus to our name field */
         this.container.$el.find('li:last .font-settings').toggle()
-          .find('input[type="text"]:first').focus()
+          .find('input[type="text"]:first').trigger('focus')
       }
     })
 
@@ -794,7 +794,7 @@
          * Also add an event listener to close the dialog when the background is clicked
          */
         open: function () {
-          $(this).siblings('.ui-dialog-buttonpane').find('button:eq(1)').focus()
+          $(this).siblings('.ui-dialog-buttonpane').find('button:eq(1)').trigger('focus')
 
           $('.ui-widget-overlay').bind('click', function () {
             $elm.wpdialog('close')

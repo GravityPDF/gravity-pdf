@@ -11,7 +11,7 @@ export function handleOwnerRestriction () {
   /*
    * Add change event to admin restrictions to show/hide dependant fields
    */
-  $publicAccess.change(function () {
+  $publicAccess.on('change', function () {
     if ($(this).is(':checked')) {
       if ($(this).val() === 'Yes') {
         /* hide user restrictions  */

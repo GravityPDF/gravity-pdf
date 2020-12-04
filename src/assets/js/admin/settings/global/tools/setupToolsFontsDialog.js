@@ -15,7 +15,7 @@ export function setupToolsFontsDialog () {
   /* setup fonts dialog */
   wpDialog($fontDialog, [], 500, 500)
 
-  $font.click(function () {
+  $font.on('click', function () {
     /* Allow responsiveness */
     resizeDialogIfNeeded($fontDialog, 500, 500)
 
@@ -25,6 +25,6 @@ export function setupToolsFontsDialog () {
 
   /* Check if our manage_fonts hash and open the dialog */
   if (window.location.hash === '#manage_fonts') {
-    $font.click()
+    $font.trigger('click')
   }
 }

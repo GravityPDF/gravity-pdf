@@ -17,7 +17,7 @@ export function setupToolsTemplateInstallerDialog () {
     text: GFPDF.continue,
     click: function () {
       /* submit form */
-      $copy.unbind().click()
+      $copy.unbind().trigger('click')
     }
   }, {
     text: GFPDF.cancel,
@@ -30,7 +30,7 @@ export function setupToolsTemplateInstallerDialog () {
   if ($copyDialog.length) {
     wpDialog($copyDialog, copyButtons, 500, 350)
 
-    $copy.click(function () {
+    $copy.on('click', function () {
       /* Allow responsiveness */
       resizeDialogIfNeeded($copyDialog, 500, 350)
 

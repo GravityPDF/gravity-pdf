@@ -10,12 +10,12 @@ export function setupPdfTabs () {
   $('.gfpdf-tab-container').not(':eq(0)').hide()
 
   /* Add click handler when our nav is selected */
-  $('.gfpdf-tab-wrapper a').click(function () {
+  $('.gfpdf-tab-wrapper a').on('click', function () {
     /* Reset the active class */
     $(this).parents('ul').find('a').removeClass('current')
 
     /* Add the new active class */
-    $(this).addClass('current').blur()
+    $(this).addClass('current').trigger('blur')
 
     /* Hide all containers */
     $('.gfpdf-tab-container').hide()
