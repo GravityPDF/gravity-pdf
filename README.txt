@@ -90,6 +90,17 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 
 == Changelog ==
 
+= 5.3.3 =
+* Bug: Fix PHP notice when no valid form or entry passed when processing merge tags
+* Bug: Make PDF generation background processing task unrecoverable so rest of the queue isn't executed
+* Bug: always parse Core Font payload as JSON
+* Bug: fix a PHP 8 notice (note: the plugin is not guaranteed to be 100% PHP 8-compatible at this time)
+* Housekeeping: adjust log level to 'notice' for optional template configuration file not found
+* Housekeeping: replace most deprecated jQuery code with new recommendations
+* Housekeeping: update EDD licensing class to v1.8 for premium add-ons
+* Housekeeping: update composer-managed dependencies
+* Housekeeping: Make API error messages translatable
+
 = 5.3.2 =
 * Bug: Fix Media Manager so it shows all file types on Gravity PDF pages
 * Bug: Fix Security PDF settings JS toggle when using translated text
