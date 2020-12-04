@@ -15,7 +15,7 @@ export function doUploadListener () {
     e.preventDefault()
 
     const $button = $(this)
-    window.formfield = $(this).parent().prev()
+    window.formfield = $(this).prev()
 
     /* If the media frame already exists, reopen it. */
     if (fileFrame) {
@@ -29,11 +29,7 @@ export function doUploadListener () {
       button: {
         text: $button.data('uploader-button-text')
       },
-      multiple: false,
-
-      library: {
-        type: ['font/ttf', 'application/x-font-ttf', 'application/octet-stream']
-      }
+      multiple: false
     })
 
     /* When a file is selected, run a callback. */
@@ -41,7 +37,7 @@ export function doUploadListener () {
       const selection = fileFrame.state().get('selection')
       selection.each(function (attachment) {
         attachment = attachment.toJSON()
-        window.formfield.val(attachment.url).change()
+        window.formfield.val(attachment.url).trigger('change')
       })
     })
 

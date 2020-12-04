@@ -1,10 +1,8 @@
 import { composeWithDevTools } from 'redux-devtools-extension'
-import { createStore, combineReducers, applyMiddleware } from 'redux'
+import { createStore, applyMiddleware } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 import rootSaga from '../sagas'
-import templateReducer from '../reducers/templateReducer'
-import coreFontsReducer from '../reducers/coreFontReducer'
-import helpReducer from '../reducers/helpReducer'
+import rootReducer from '../reducers/index'
 
 /**
  * @package     Gravity PDF
@@ -14,7 +12,7 @@ import helpReducer from '../reducers/helpReducer'
  */
 
 /* Combine our Redux Reducers */
-const reducers = setupReducers()
+const reducers = rootReducer
 /* Initialize Saga Middleware */
 const sagaMiddleware = createSagaMiddleware()
 export const middlewares = [sagaMiddleware]
@@ -33,20 +31,4 @@ sagaMiddleware.run(rootSaga)
 
 export function getStore () {
   return store
-}
-
-/**
- * Combine our Redux reducers for use in a single store
- * If you want to add new top-level keys to our store, this is the place
- *
- * @returns {Function}
- *
- * @since 4.1
- */
-export function setupReducers () {
-  return combineReducers({
-    template: templateReducer,
-    coreFonts: coreFontsReducer,
-    help: helpReducer
-  })
 }

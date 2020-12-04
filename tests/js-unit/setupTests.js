@@ -16,7 +16,21 @@ window.GFPDF = {
   noResultText: "It doesn\'t look like there are any topics related to your issue.",
   coreFontGithubError: 'Could not download Core Font list. Try again.',
   getSearchResultError: 'An error occurred. Please try again',
-  userCapabilities: { administrator: true }
+  userCapabilities: { administrator: true },
+  // Font manager component
+  fontListInstalledFonts: 'Installed Fonts',
+  fontListRegular: 'Regular',
+  fontListItalics: 'Italics',
+  fontListBold: 'Bold',
+  fontListBoldItalics: 'Bold Italics',
+  fontManagerAddTitle: 'Add Font',
+  fontManagerUpdateTitle: 'Update Font',
+  fontListRegularRequired: 'Regular',
+  searchResultEmpty: 'No fonts matching your search found.',
+  fontListEmpty: 'Font list empty.',
+  addUpdateFontSuccess: 'Your font has been saved.',
+  addFatalError: 'A problem occurred. Reload the page and try again.',
+  fontFileInvalid: 'Font file(s) are malformed and cannot be used with Gravity PDF'
 }
 
 window.gfpdf_migration_multisite_ids = []

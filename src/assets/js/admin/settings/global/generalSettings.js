@@ -1,6 +1,5 @@
 import $ from 'jquery'
 import { setupRequiredFields } from '../pdf/setupRequiredFields'
-import { setupAdvancedOptions } from './setupAdvancedOptions'
 
 /**
  * The general settings model method
@@ -17,7 +16,7 @@ export function generalSettings () {
   /*
    * Add change event to admin restrictions to show/hide dependant fields
    */
-  $adminRestrictions.change(function () {
+  $adminRestrictions.on('change', function () {
     if ($(this).is(':checked')) {
       if ($(this).val() === 'Yes') {
         /* hide user restrictions and logged out user timeout */
@@ -28,7 +27,4 @@ export function generalSettings () {
       }
     }
   }).trigger('change')
-
-  /* setup advanced options */
-  setupAdvancedOptions()
 }

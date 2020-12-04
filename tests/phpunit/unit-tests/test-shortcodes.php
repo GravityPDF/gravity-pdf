@@ -28,7 +28,7 @@ class Test_Shortcode extends WP_UnitTestCase {
 	/**
 	 * Our Controller
 	 *
-	 * @var \GFPDF\Controller\Controller_Shortcodes
+	 * @var Controller_Shortcodes
 	 *
 	 * @since 4.0
 	 */
@@ -37,7 +37,7 @@ class Test_Shortcode extends WP_UnitTestCase {
 	/**
 	 * Our Model
 	 *
-	 * @var \GFPDF\Model\Model_Shortcodes
+	 * @var Model_Shortcodes
 	 *
 	 * @since 4.0
 	 */
@@ -46,7 +46,7 @@ class Test_Shortcode extends WP_UnitTestCase {
 	/**
 	 * Our View
 	 *
-	 * @var \GFPDF\View\View_Shortcodes
+	 * @var View_Shortcodes
 	 *
 	 * @since 4.0
 	 */
@@ -122,121 +122,103 @@ class Test_Shortcode extends WP_UnitTestCase {
 
 		/* Authorise the current user */
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		$this->assertInternalType( 'integer', $user_id );
+		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
 
 		/* Test for error */
-		$this->assertNotFalse( strpos( $this->model->process( [ 'entry' => $entry['id'] ] ), '<pre class="gravitypdf-error">' ) );
-		$this->assertNotFalse(
-			strpos(
-				$this->model->process(
-					[
-						'entry' => $entry['id'],
-						'id'    => '555ad84787d7e',
-					]
-				),
-				'<pre class="gravitypdf-error">'
+		$this->assertStringContainsString( '<pre class="gravitypdf-error">', $this->model->process( [ 'entry' => $entry['id'] ] ) );
+		$this->assertStringContainsString(
+			'<pre class="gravitypdf-error">',
+			$this->model->process(
+				[
+					'entry' => $entry['id'],
+					'id'    => '555ad84787d7e',
+				]
 			)
 		); /* conditional logic error */
 
 		/* Test for actual result */
-		$this->assertNotFalse(
-			strpos(
-				$this->model->process(
-					[
-						'entry' => $entry['id'],
-						'id'    => '556690c67856b',
-					]
-				),
-				'Download PDF'
+		$this->assertStringContainsString(
+			'Download PDF',
+			$this->model->process(
+				[
+					'entry' => $entry['id'],
+					'id'    => '556690c67856b',
+				]
 			)
 		);
 
-		$this->assertNotFalse(
-			strpos(
-				$this->model->process(
-					[
-						'entry' => $entry['id'],
-						'id'    => '556690c67856b',
-					]
-				),
-				'<a href='
+		$this->assertStringContainsString(
+			'href="',
+			$this->model->process(
+				[
+					'entry' => $entry['id'],
+					'id'    => '556690c67856b',
+				]
 			)
 		);
 
 		/* Test for configured results */
-		$this->assertNotFalse(
-			strpos(
-				$this->model->process(
-					[
-						'entry' => $entry['id'],
-						'id'    => '556690c67856b',
-						'text'  => 'View PDF',
-					]
-				),
-				'View PDF'
+		$this->assertStringContainsString(
+			'View PDF',
+			$this->model->process(
+				[
+					'entry' => $entry['id'],
+					'id'    => '556690c67856b',
+					'text'  => 'View PDF',
+				]
 			)
 		);
-		$this->assertFalse(
-			strpos(
-				$this->model->process(
-					[
-						'entry' => $entry['id'],
-						'id'    => '556690c67856b',
-						'type'  => 'view',
-					]
-				),
-				'action=download'
+		$this->assertStringNotContainsString(
+			'action=download',
+			$this->model->process(
+				[
+					'entry' => $entry['id'],
+					'id'    => '556690c67856b',
+					'type'  => 'view',
+				]
 			)
 		);
-		$this->assertNotFalse(
-			strpos(
-				$this->model->process(
-					[
-						'entry' => $entry['id'],
-						'id'    => '556690c67856b',
-					]
-				),
-				'action=download'
+		$this->assertStringContainsString(
+			'action=download',
+			$this->model->process(
+				[
+					'entry' => $entry['id'],
+					'id'    => '556690c67856b',
+				]
 			)
 		);
-		$this->assertNotFalse(
-			strpos(
-				$this->model->process(
-					[
-						'entry'   => $entry['id'],
-						'id'      => '556690c67856b',
-						'classes' => 'my-pdf-download-link',
-					]
-				),
-				'my-pdf-download-link'
+		$this->assertStringContainsString(
+			'my-pdf-download-link',
+			$this->model->process(
+				[
+					'entry'   => $entry['id'],
+					'id'      => '556690c67856b',
+					'classes' => 'my-pdf-download-link',
+				]
 			)
 		);
 
 		/* Test our print attribute works as intended */
-		$this->assertFalse(
-			strpos(
-				$this->model->process(
-					[
-						'entry' => $entry['id'],
-						'id'    => '556690c67856b',
-					]
-				),
-				'print=1'
+		$this->assertStringNotContainsString(
+			'print=1',
+			$this->model->process(
+				[
+					'entry' => $entry['id'],
+					'id'    => '556690c67856b',
+				]
 			)
 		);
 
-		$this->assertNotFalse(
-			strpos(
-				$this->model->process(
-					[
-						'entry' => $entry['id'],
-						'id'    => '556690c67856b',
-						'print' => 'true',
-					]
-				),
-				'print=1'
-			)
+		$this->assertStringContainsString(
+			'print=1',
+			$this->model->process(
+				[
+					'entry' => $entry['id'],
+					'id'    => '556690c67856b',
+					'print' => 'true',
+				]
+			),
 		);
 
 		/* Test for raw URL */
@@ -248,9 +230,9 @@ class Test_Shortcode extends WP_UnitTestCase {
 			]
 		);
 
-		$this->assertNotFalse( strpos( $url, '?gpdf=1&pid=556690c67856b&lid=1&action=download' ) );
-		$this->assertNotTrue( strpos( $url, '<a href=' ) );
-		$this->assertNotTrue( strpos( $url, 'Download PDF' ) );
+		$this->assertStringContainsString( '?gpdf=1&pid=556690c67856b&lid=1&action=download', $url );
+		$this->assertStringNotContainsString( '<a href=', $url );
+		$this->assertStringNotContainsString( 'Download PDF', $url );
 
 		/* Test for signed URL */
 		$url1 = $this->model->process(
@@ -261,8 +243,8 @@ class Test_Shortcode extends WP_UnitTestCase {
 			]
 		);
 
-		$this->assertNotFalse( strpos( $url1, '&signature=' ) );
-		$this->assertNotFalse( strpos( $url1, '&expires=' ) );
+		$this->assertStringContainsString( '&signature=', $url1 );
+		$this->assertStringContainsString( '&expires=', $url1 );
 
 		/* Test signed URL expiry */
 		parse_str(
@@ -304,10 +286,10 @@ class Test_Shortcode extends WP_UnitTestCase {
 
 		/* Test for entry URL loading */
 		$_GET['lid'] = $entry['id'];
-		$this->assertNotFalse( strpos( $this->model->process( [ 'id' => '556690c67856b' ] ), 'Download PDF' ) );
+		$this->assertStringContainsString( 'Download PDF', $this->model->process( [ 'id' => '556690c67856b' ] ) );
 
 		$_GET['lid'] = '5000';
-		$this->assertNotFalse( strpos( $this->model->process( [ 'id' => '556690c67856b' ] ), '<pre class="gravitypdf-error">' ) );
+		$this->assertStringContainsString( '<pre class="gravitypdf-error">', $this->model->process( [ 'id' => '556690c67856b' ] ) );
 
 		/* Test we get no error when they are disabled globally */
 		global $gfpdf;
@@ -316,7 +298,7 @@ class Test_Shortcode extends WP_UnitTestCase {
 		$settings['debug_mode'] = 'No';
 		$options->update_settings( $settings );
 
-		$this->assertFalse( strpos( $this->model->process( [ 'id' => '556690c67856b' ] ), '<pre class="gravitypdf-error">' ) );
+		$this->assertStringNotContainsString( '<pre class="gravitypdf-error">', $this->model->process( [ 'id' => '556690c67856b' ] ) );
 
 		wp_set_current_user( 0 );
 	}
@@ -336,12 +318,12 @@ class Test_Shortcode extends WP_UnitTestCase {
 
 		/* Check our entry ID is being automatically added */
 		$results = $this->model->gravitypdf_confirmation( $confirmation, $form, $lead );
-		$this->assertNotFalse( strpos( $results, '[gravitypdf id="555ad84787d7e" entry="' . $lead['id'] . '"]' ) );
+		$this->assertStringContainsString( '[gravitypdf id="555ad84787d7e" entry="' . $lead['id'] . '"]', $results );
 
 		/* Check we don't modify the ID when it already exists */
 		$confirmation = 'Thanks for getting in touch. [gravitypdf id="555ad84787d7e" entry="5000"]';
 		$results      = $this->model->gravitypdf_confirmation( $confirmation, $form, $lead );
-		$this->assertNotFalse( strpos( $results, '[gravitypdf id="555ad84787d7e" entry="5000"]' ) );
+		$this->assertStringContainsString( '[gravitypdf id="555ad84787d7e" entry="5000"]', $results );
 
 		/* Check we pass when confirmation is not a message */
 		$form['confirmation']['type'] = 'redirect';
@@ -364,12 +346,12 @@ class Test_Shortcode extends WP_UnitTestCase {
 
 		/* Check our entry ID is being automatically added */
 		$results = $this->model->gravitypdf_notification( $notification, $form, $lead );
-		$this->assertNotFalse( strpos( $results['message'], '[gravitypdf id="555ad84787d7e" entry="' . $lead['id'] . '"]' ) );
+		$this->assertStringContainsString( '[gravitypdf id="555ad84787d7e" entry="' . $lead['id'] . '"]', $results['message'] );
 
 		/* Check we don't modify the ID when it already exists */
 		$notification['message'] = 'Thanks for getting in touch. [gravitypdf id="555ad84787d7e" entry="5000"]';
 		$results                 = $this->model->gravitypdf_notification( $notification, $form, $lead );
-		$this->assertNotFalse( strpos( $results['message'], '[gravitypdf id="555ad84787d7e" entry="5000"]' ) );
+		$this->assertStringContainsString( '[gravitypdf id="555ad84787d7e" entry="5000"]', $results['message'] );
 
 		/* Check we pass when the message key doesn't exist */
 		$results = $this->model->gravitypdf_notification( 'Test', $form, $lead );
@@ -422,23 +404,25 @@ class Test_Shortcode extends WP_UnitTestCase {
 	public function test_gravitypdf_redirect_confirmation() {
 		global $wp_rewrite;
 
+		$_POST['confirmation_id'] = '';
+
 		/* Process fancy permalinks */
 		$old_permalink_structure = get_option( 'permalink_structure' );
 		$wp_rewrite->set_permalink_structure( '/%postname%/' );
 		flush_rewrite_rules();
 
 		/* Setup our redirect confirmation value */
-		$_POST['form_confirmation_url'] = '[gravitypdf id="555ad84787d7e"]';
+		$_POST['_gform_setting_url'] = '[gravitypdf id="555ad84787d7e"]';
 
 		/* Run the test */
 		$this->model->gravitypdf_redirect_confirmation( [ 'id' => 1 ] );
-		$this->assertEquals( '[gravitypdf id="555ad84787d7e" entry="{entry_id}" raw="1"]', $_POST['form_confirmation_url'] );
+		$this->assertEquals( '[gravitypdf id="555ad84787d7e" entry="{entry_id}" raw="1"]', $_POST['_gform_setting_url'] );
 
 		/* Check for viewing URL */
-		$_POST['form_confirmation_url'] = '[gravitypdf id="555ad84787d7e" type="view"]';
+		$_POST['_gform_setting_url'] = '[gravitypdf id="555ad84787d7e" type="view"]';
 
 		$this->model->gravitypdf_redirect_confirmation( [ 'id' => 1 ] );
-		$this->assertEquals( '[gravitypdf id="555ad84787d7e" type="view" entry="{entry_id}" raw="1"]', $_POST['form_confirmation_url'] );
+		$this->assertEquals( '[gravitypdf id="555ad84787d7e" type="view" entry="{entry_id}" raw="1"]', $_POST['_gform_setting_url'] );
 
 		$wp_rewrite->set_permalink_structure( $old_permalink_structure );
 		flush_rewrite_rules();
@@ -460,13 +444,13 @@ class Test_Shortcode extends WP_UnitTestCase {
 		$form['confirmation']['type'] = 'redirect';
 		$confirmation                 = [ 'redirect' => '' ];
 		$results                      = $this->model->gravitypdf_redirect_confirmation_shortcode_processing( $confirmation, $form, $entry );
-		$this->assertNotFalse( strpos( $results['redirect'], '?gpdf=1&pid=556690c67856b&lid=1&action=download' ) );
+		$this->assertStringContainsString( '?gpdf=1&pid=556690c67856b&lid=1&action=download', $results['redirect'] );
 
 		$form['confirmation']['url'] = '[gravitypdf id="556690c67856b" entry="{entry_id}" raw="1" signed="1"]';
 		$results                     = $this->model->gravitypdf_redirect_confirmation_shortcode_processing( $confirmation, $form, $entry );
-		$this->assertNotFalse( strpos( $results['redirect'], '?gpdf=1&pid=556690c67856b&lid=1&action=download' ) );
-		$this->assertNotFalse( strpos( $results['redirect'], '&signature=' ) );
-		$this->assertNotFalse( strpos( $results['redirect'], '&expires=' ) );
+		$this->assertStringContainsString( '?gpdf=1&pid=556690c67856b&lid=1&action=download', $results['redirect'] );
+		$this->assertStringContainsString( '&signature=', $results['redirect'] );
+		$this->assertStringContainsString( '&expires=', $results['redirect'] );
 	}
 
 	/**
@@ -515,7 +499,7 @@ class Test_Shortcode extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_no_entry_id() {
-		$this->assertNotFalse( strpos( $this->view->no_entry_id(), 'No Gravity Form entry ID' ) );
+		$this->assertStringContainsString( 'No Gravity Form entry ID', $this->view->no_entry_id() );
 	}
 
 	/**
@@ -524,7 +508,7 @@ class Test_Shortcode extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_invalid_pdf_config() {
-		$this->assertNotFalse( strpos( $this->view->invalid_pdf_config(), 'Could not get Gravity PDF configuration' ) );
+		$this->assertStringContainsString( 'Could not get Gravity PDF configuration', $this->view->invalid_pdf_config() );
 	}
 
 	/**
@@ -533,7 +517,7 @@ class Test_Shortcode extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_pdf_not_active() {
-		$this->assertNotFalse( strpos( $this->view->pdf_not_active(), 'PDF link not displayed because PDF is inactive.' ) );
+		$this->assertStringContainsString( 'PDF link not displayed because PDF is inactive.', $this->view->pdf_not_active() );
 	}
 
 	/**
@@ -542,7 +526,7 @@ class Test_Shortcode extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_conditional_logic_not_met() {
-		$this->assertNotFalse( strpos( $this->view->conditional_logic_not_met(), 'PDF link not displayed because conditional logic requirements have not been met.' ) );
+		$this->assertStringContainsString( 'PDF link not displayed because conditional logic requirements have not been met.', $this->view->conditional_logic_not_met() );
 	}
 
 	/**
@@ -551,18 +535,16 @@ class Test_Shortcode extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_display_gravitypdf_shortcode() {
-		$this->assertNotFalse(
-			strpos(
-				$this->view->display_gravitypdf_shortcode(
-					[
-						'url'     => '',
-						'type'    => '',
-						'class'   => '',
-						'classes' => '',
-						'text'    => '',
-					]
-				),
-				'<a href="'
+		$this->assertStringContainsString(
+			'href="',
+			$this->view->display_gravitypdf_shortcode(
+				[
+					'url'     => '',
+					'type'    => '',
+					'class'   => '',
+					'classes' => '',
+					'text'    => '',
+				]
 			)
 		);
 	}

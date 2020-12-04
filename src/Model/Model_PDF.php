@@ -14,15 +14,21 @@ use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
+use GFPDF\Helper\Helper_Form;
 use GFPDF\Helper\Helper_Interface_Url_Signer;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
+use GFPDF\Helper\Helper_Options_Fields;
 use GFPDF\Helper\Helper_PDF;
 use GFPDF\Helper\Helper_Templates;
+use GFPDF_Vendor\Mpdf\Mpdf;
+use GFPDF_Vendor\Spatie\UrlSigner\Exceptions\InvalidSignatureKey;
 use GFQuiz;
 use GFResults;
+use GP_Populate_Anything_Live_Merge_Tags;
 use Psr\Log\LoggerInterface;
-use Spatie\UrlSigner\Exceptions\InvalidSignatureKey;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use WP_Error;
 
 /**
@@ -48,7 +54,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
 	 *
-	 * @var \GFPDF\Helper\Helper_Form
+	 * @var Helper_Form
 	 *
 	 * @since 4.0
 	 */
@@ -67,7 +73,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * Holds our Helper_Abstract_Options / Helper_Options_Fields object
 	 * Makes it easy to access global PDF settings and individual form PDF settings
 	 *
-	 * @var \GFPDF\Helper\Helper_Options_Fields
+	 * @var Helper_Options_Fields
 	 *
 	 * @since 4.0
 	 */
@@ -77,7 +83,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * Holds our Helper_Data object
 	 * which we can autoload with any data needed
 	 *
-	 * @var \GFPDF\Helper\Helper_Data
+	 * @var Helper_Data
 	 *
 	 * @since 4.0
 	 */
@@ -87,7 +93,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * Holds our Helper_Misc object
 	 * Makes it easy to access common methods throughout the plugin
 	 *
-	 * @var \GFPDF\Helper\Helper_Misc
+	 * @var Helper_Misc
 	 *
 	 * @since 4.0
 	 */
@@ -97,7 +103,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * Holds our Helper_Notices object
 	 * which we can use to queue up admin messages for the user
 	 *
-	 * @var \GFPDF\Helper\Helper_Notices
+	 * @var Helper_Notices
 	 *
 	 * @since 4.0
 	 */
@@ -107,23 +113,30 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * Holds our Helper_Templates object
 	 * used to ease access to our PDF templates
 	 *
-	 * @var \GFPDF\Helper\Helper_Templates
+	 * @var Helper_Templates
 	 *
 	 * @since 4.0
 	 */
 	protected $templates;
 
 	/**
+	 * @var Helper_Interface_Url_Signer
+	 *
+	 * @since 5.2
+	 */
+	protected $url_signer;
+
+	/**
 	 * Setup our view with the needed data and classes
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form    $gform   Our abstracted Gravity Forms helper functions
-	 * @param LoggerInterface                       $log     Our logger class
-	 * @param \GFPDF\Helper\Helper_Abstract_Options $options Our options class which allows us to access any settings
-	 * @param \GFPDF\Helper\Helper_Data             $data    Our plugin data store
-	 * @param \GFPDF\Helper\Helper_Misc             $misc    Our miscellaneous class
-	 * @param \GFPDF\Helper\Helper_Notices          $notices Our notice class used to queue admin messages and errors
-	 * @param \GFPDF\Helper\Helper_Templates        $templates
-	 * @param Helper_Interface_Url_Signer           $url_signer
+	 * @param Helper_Abstract_Form        $gform   Our abstracted Gravity Forms helper functions
+	 * @param LoggerInterface             $log     Our logger class
+	 * @param Helper_Abstract_Options     $options Our options class which allows us to access any settings
+	 * @param Helper_Data                 $data    Our plugin data store
+	 * @param Helper_Misc                 $misc    Our miscellaneous class
+	 * @param Helper_Notices              $notices Our notice class used to queue admin messages and errors
+	 * @param Helper_Templates            $templates
+	 * @param Helper_Interface_Url_Signer $url_signer
 	 *
 	 * @since 4.0
 	 */
@@ -143,13 +156,13 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Our Middleware used to handle the authentication process
 	 *
-	 * @param  string  $pid    The Gravity Form PDF Settings ID
-	 * @param  integer $lid    The Gravity Form Entry ID
-	 * @param  string  $action Whether the PDF should be viewed or downloaded
-	 *
-	 * @since 4.0
+	 * @param string  $pid    The Gravity Form PDF Settings ID
+	 * @param integer $lid    The Gravity Form Entry ID
+	 * @param string  $action Whether the PDF should be viewed or downloaded
 	 *
 	 * @return WP_Error
+	 * @since 4.0
+	 *
 	 */
 	public function process_pdf( $pid, $lid, $action = 'view' ) {
 
@@ -220,7 +233,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		/* Add backwards compatibility support for certain settings */
 		$settings = $this->apply_backwards_compatibility_filters( $settings, $entry );
 
-		/* Ensure Gravity Forms depedancy loaded */
+		/* Ensure Gravity Forms dependency loaded */
 		$this->misc->maybe_load_gf_entry_detail_class();
 
 		/* If we are here we can generate our PDF */
@@ -234,8 +247,8 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * Apply filters to particular settings to maintain backwards compatibility
 	 * Note: If you want to modify the $settings array you should use the new "gfpdf_pdf_config" filter instead
 	 *
-	 * @param  array $settings The PDF settings array
-	 * @param  array $entry
+	 * @param array $settings The PDF settings array
+	 * @param array $entry
 	 *
 	 * @return array           The $settings array
 	 *
@@ -279,9 +292,9 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * Check if the current PDF trying to be viewed has public access enabled
 	 * If it does, we'll remove some of our middleware filters to allow this feature
 	 *
-	 * @param  boolean|object $action
-	 * @param  array          $entry    The Gravity Forms Entry
-	 * @param  array          $settings The Gravity Form PDF Settings
+	 * @param boolean|object $action
+	 * @param array          $entry    The Gravity Forms Entry
+	 * @param array          $settings The Gravity Form PDF Settings
 	 *
 	 * @return boolean|object
 	 *
@@ -302,9 +315,9 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Check if a signed URL exists and validate. If it passes, disable the remaining middleware capabilities
 	 *
-	 * @param  boolean|object $action
-	 * @param  array          $entry    The Gravity Forms Entry
-	 * @param  array          $settings The Gravity Form PDF Settings
+	 * @param boolean|object $action
+	 * @param array          $entry    The Gravity Forms Entry
+	 * @param array          $settings The Gravity Form PDF Settings
 	 *
 	 * @return boolean|object
 	 *
@@ -337,9 +350,9 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Check if the current PDF trying to be viewed is active
 	 *
-	 * @param  boolean|object $action
-	 * @param  array          $entry    The Gravity Forms Entry
-	 * @param  array          $settings The Gravity Form PDF Settings
+	 * @param boolean|object $action
+	 * @param array          $entry    The Gravity Forms Entry
+	 * @param array          $settings The Gravity Form PDF Settings
 	 *
 	 * @return boolean|object
 	 *
@@ -359,9 +372,9 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Check if the current PDF trying to be viewed has conditional logic which passes
 	 *
-	 * @param  boolean|object $action
-	 * @param  array          $entry    The Gravity Forms Entry
-	 * @param  array          $settings The Gravity Form PDF Settings
+	 * @param boolean|object $action
+	 * @param array          $entry    The Gravity Forms Entry
+	 * @param array          $settings The Gravity Form PDF Settings
 	 *
 	 * @return boolean|object
 	 *
@@ -379,50 +392,15 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Check if the current user attempting to access is the PDF owner
-	 *
-	 * @param  array  $entry The Gravity Forms Entry
-	 * @param  string $type  The authentication type we should use
-	 *
-	 * @return boolean
-	 *
-	 * @since 4.0
-	 */
-	public function is_current_pdf_owner( $entry, $type = 'all' ) {
-		$owner = false;
-		/* check if the user is logged in and the entry is assigned to them */
-		if ( $type === 'all' || $type === 'logged_in' ) {
-			if ( is_user_logged_in() && (int) $entry['created_by'] === get_current_user_id() ) {
-				$owner = true;
-			}
-		}
-
-		if ( $type === 'all' || $type === 'logged_out' ) {
-			$user_ip   = trim( GFFormsModel::get_ip() );
-			$server_ip = isset( $_SERVER['SERVER_ADDR'] ) ? $_SERVER['SERVER_ADDR'] : '127.0.0.1';
-
-			/* check if the user IP matches the entry IP */
-			if (
-				$entry['ip'] === $user_ip &&
-				$entry['ip'] !== $server_ip &&
-				strlen( $user_ip ) !== 0
-			) {
-				$owner = true;
-			}
-		}
-
-		return $owner;
-	}
-
-	/**
 	 * Check the "Restrict Logged Out User" global setting and validate it against the current user
 	 *
-	 * @param  boolean|object $action
-	 * @param  array          $entry    The Gravity Forms Entry
-	 * @param  array          $settings The Gravity Form PDF Settings
+	 * @param boolean|object $action
+	 * @param array          $entry    The Gravity Forms Entry
+	 * @param array          $settings The Gravity Form PDF Settings
 	 *
 	 * @return boolean|object
 	 *
+	 * @throws Exception
 	 * @since 4.0
 	 */
 	public function middle_owner_restriction( $action, $entry, $settings ) {
@@ -453,12 +431,13 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Check the "Logged Out Timeout" global setting and validate it against the current user
 	 *
-	 * @param  boolean|object $action
-	 * @param  array          $entry    The Gravity Forms Entry
-	 * @param  array          $settings The Gravity Form PDF Settings
+	 * @param boolean|object $action
+	 * @param array          $entry    The Gravity Forms Entry
+	 * @param array          $settings The Gravity Form PDF Settings
 	 *
 	 * @return boolean|object
 	 *
+	 * @throws Exception
 	 * @since 4.0
 	 */
 	public function middle_logged_out_timeout( $action, $entry, $settings ) {
@@ -506,14 +485,51 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Check if the current user attempting to access is the PDF owner
+	 *
+	 * @param array  $entry The Gravity Forms Entry
+	 * @param string $type  The authentication type we should use
+	 *
+	 * @return boolean
+	 *
+	 * @since 4.0
+	 */
+	public function is_current_pdf_owner( $entry, $type = 'all' ) {
+		$owner = false;
+		/* check if the user is logged in and the entry is assigned to them */
+		if ( $type === 'all' || $type === 'logged_in' ) {
+			if ( is_user_logged_in() && (int) $entry['created_by'] === get_current_user_id() ) {
+				$owner = true;
+			}
+		}
+
+		if ( $type === 'all' || $type === 'logged_out' ) {
+			$user_ip   = trim( GFFormsModel::get_ip() );
+			$server_ip = isset( $_SERVER['SERVER_ADDR'] ) ? $_SERVER['SERVER_ADDR'] : '127.0.0.1';
+
+			/* check if the user IP matches the entry IP */
+			if (
+				$entry['ip'] === $user_ip &&
+				$entry['ip'] !== $server_ip &&
+				strlen( $user_ip ) !== 0
+			) {
+				$owner = true;
+			}
+		}
+
+		return $owner;
+	}
+
+	/**
 	 * Check if the user is logged out and authenticate as needed
 	 *
-	 * @param  boolean|object $action
-	 * @param  array          $entry    The Gravity Forms Entry
-	 * @param  array          $settings The Gravity Form PDF Settings
+	 * @param boolean|object $action
+	 * @param array          $entry    The Gravity Forms Entry
+	 * @param array          $settings The Gravity Form PDF Settings
 	 *
 	 * @return boolean|object
 	 *
+	 * @throws Exception
 	 * @since 4.0
 	 */
 	public function middle_auth_logged_out_user( $action, $entry, $settings ) {
@@ -546,6 +562,7 @@ class Model_PDF extends Helper_Abstract_Model {
 					);
 
 					/* there's no returning, throw generic error */
+
 					return new WP_Error( 'access_denied', esc_html__( 'You do not have access to view this PDF.', 'gravity-forms-pdf-extended' ) );
 				}
 			}
@@ -557,9 +574,9 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Check the "User Restriction" global setting and validate it against the current user
 	 *
-	 * @param  boolean|object $action
-	 * @param  array          $entry    The Gravity Forms Entry
-	 * @param  array          $settings The Gravity Form PDF Settings
+	 * @param boolean|object $action
+	 * @param array          $entry    The Gravity Forms Entry
+	 * @param array          $settings The Gravity Form PDF Settings
 	 *
 	 * @return boolean|object
 	 *
@@ -597,10 +614,10 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Display PDF on Gravity Form entry list page
 	 *
-	 * @param  integer $form_id  Gravity Form ID
-	 * @param  integer $field_id Current field ID
-	 * @param  mixed   $value    Current value of field
-	 * @param  array   $entry    Entry Information
+	 * @param integer $form_id  Gravity Form ID
+	 * @param integer $field_id Current field ID
+	 * @param mixed   $value    Current value of field
+	 * @param array   $entry    Entry Information
 	 *
 	 * @return void
 	 *
@@ -613,7 +630,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		if ( ! empty( $pdf_list ) ) {
 
-			if ( sizeof( $pdf_list ) > 1 ) {
+			if ( count( $pdf_list ) > 1 ) {
 				$args = [
 					'pdfs' => $pdf_list,
 					'view' => strtolower( $this->options->get_option( 'default_action' ) ),
@@ -629,29 +646,6 @@ class Model_PDF extends Helper_Abstract_Model {
 
 				$controller->view->entry_list_pdf_single( $args );
 			}
-		}
-	}
-
-	/**
-	 * Display the PDF links on the entry detailed section of the admin area
-	 *
-	 * @param  integer $form_id Gravity Form ID
-	 * @param  array   $entry   The entry information
-	 *
-	 * @return void
-	 *
-	 * @since  4.0
-	 */
-	public function view_pdf_entry_detail( $form_id, $entry ) {
-
-		$controller = $this->getController();
-		$pdf_list   = $this->get_pdf_display_list( $entry );
-
-		if ( ! empty( $pdf_list ) ) {
-			$args = [
-				'pdfs' => $pdf_list,
-			];
-			$controller->view->entry_detailed_pdf( $args );
 		}
 	}
 
@@ -690,16 +684,46 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		/**
 		 * See https://gravitypdf.com/documentation/v5/gfpdf_get_pdf_display_list/ for usage
+		 *
 		 * @since 4.2
 		 */
 		return apply_filters( 'gfpdf_get_pdf_display_list', $args, $entry, $form );
 	}
 
 	/**
+	 * Filter out inactive PDFs and those who don't meet the conditional logic
+	 *
+	 * @param array $pdfs  The PDF settings array
+	 * @param array $entry The current entry information
+	 *
+	 * @return array       The filtered PDFs
+	 *
+	 * @since 4.0
+	 */
+	public function get_active_pdfs( $pdfs, $entry ) {
+
+		$filtered = [];
+		$form     = $this->gform->get_form( $entry['form_id'] );
+
+		foreach ( $pdfs as $pdf ) {
+			if ( $pdf['active'] && ( empty( $pdf['conditionalLogic'] ) || $this->misc->evaluate_conditional_logic( $pdf['conditionalLogic'], $entry ) ) ) {
+				$filtered[ $pdf['id'] ] = $pdf;
+			}
+		}
+
+		/**
+		 * See https://gravitypdf.com/documentation/v5/gfpdf_get_active_pdfs/ for usage
+		 *
+		 * @since 4.2
+		 */
+		return apply_filters( 'gfpdf_get_active_pdfs', $filtered, $pdfs, $entry, $form );
+	}
+
+	/**
 	 * Generate the PDF Name
 	 *
-	 * @param  array $settings The PDF Form Settings
-	 * @param  array $entry    The Gravity Form entry details
+	 * @param array $settings The PDF Form Settings
+	 * @param array $entry    The Gravity Form entry details
 	 *
 	 * @return string      The PDF Name
 	 *
@@ -732,11 +756,11 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Create a PDF Link based on the current PDF settings and entry
 	 *
-	 * @param  integer $pid      The PDF Form Settings ID
-	 * @param  integer $id       The Gravity Form entry ID
-	 * @param  boolean $download Whether the PDF should be downloaded or not
-	 * @param  boolean $print    Whether we should mark the PDF to be printed
-	 * @param  boolean $esc      Whether to escape the URL or not
+	 * @param integer $pid      The PDF Form Settings ID
+	 * @param integer $id       The Gravity Form entry ID
+	 * @param boolean $download Whether the PDF should be downloaded or not
+	 * @param boolean $print    Whether we should mark the PDF to be printed
+	 * @param boolean $esc      Whether to escape the URL or not
 	 *
 	 * @return string       Direct link to the PDF
 	 *
@@ -786,40 +810,207 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Filter out inactive PDFs and those who don't meet the conditional logic
+	 * Display the PDF links on the entry detailed section of the admin area
 	 *
-	 * @param  array $pdfs  The PDF settings array
-	 * @param  array $entry The current entry information
+	 * @param array $args Combined form and entry array
 	 *
-	 * @return array       The filtered PDFs
+	 * @return void
+	 *
+	 * @since  4.0
+	 */
+	public function view_pdf_entry_detail( $args ) {
+		$controller = $this->getController();
+		$pdf_list   = $this->get_pdf_display_list( $args['entry'] );
+
+		if ( empty( $pdf_list ) ) {
+			$controller->view->entry_no_valid_pdf();
+
+			return;
+		}
+
+		$pdfs = [
+			'pdfs' => $pdf_list,
+		];
+
+		$controller->view->entry_detailed_pdf( $pdfs );
+	}
+
+	/**
+	 * Add the pdf meta box to the entry detail page.
+	 *
+	 * @param array $meta_boxes The properties for the meta boxes.
+	 * @param array $entry      The entry currently being viewed/edited.
+	 * @param array $form       The form object used to process the current entry.
+	 *
+	 * @return array
+	 *
+	 * @since 6.0
+	 */
+	public function register_pdf_meta_box( $meta_boxes, $entry, $form ) {
+
+		$active_pdfs = array_filter(
+			$form['gfpdf_form_settings'] ?? [],
+			function( $pdf ) {
+				return $pdf['active'] === true;
+			}
+		);
+
+		/* Don't display meta box if no active or valid PDFs for the form */
+		if ( count( $active_pdfs ) === 0 ) {
+			return $meta_boxes;
+		}
+
+		$meta = [
+			'gfpdf-entry-details-list' => [
+				'title'         => esc_html__( 'PDFs', 'gravity-forms-pdf-extended' ),
+				'callback'      => [ $this, 'view_pdf_entry_detail' ],
+				'context'       => 'side',
+				'callback_args' => [
+					'form'  => $form,
+					'entry' => $entry,
+				],
+			],
+		];
+
+		/* Ensure the PDF meta box is inserted right after the Entry box */
+
+		return array_merge(
+			array_slice( $meta_boxes, 0, 1 ),
+			$meta,
+			array_slice( $meta_boxes, 1 )
+		);
+	}
+
+	/**
+	 * Check if the form has any PDFs, generate them and attach to the notification
+	 *
+	 * @param array $notifications Gravity Forms Notification Array
+	 * @param array $form
+	 * @param array $entry
+	 *
+	 * @return array
+	 *
+	 * @throws Exception
+	 * @since 4.0
+	 */
+	public function notifications( $notifications, $form, $entry ) {
+
+		/*
+		 * Ensure our entry is stored in the database by checking it has an ID
+		 * This resolves any issues with the "Save and Continue" feature
+		 * See https://github.com/GravityPDF/gravity-pdf/issues/360
+		 */
+		if ( empty( $entry['id'] ) ) {
+			return $notifications;
+		}
+
+		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : [];
+
+		if ( count( $pdfs ) > 0 ) {
+
+			/* Ensure our notification has an array setup for the attachments key */
+			$notifications['attachments'] = ( isset( $notifications['attachments'] ) ) ? $notifications['attachments'] : [];
+
+			/* Loop through each PDF config and generate */
+			foreach ( $pdfs as $pdf ) {
+
+				/* Pass it through the config filters */
+				$settings = $this->options->get_pdf( $entry['form_id'], $pdf['id'] );
+
+				/* Reset the variables each loop */
+				$filename        = '';
+				$tier_2_filename = '';
+
+				if ( $this->maybe_attach_to_notification( $notifications, $settings, $entry, $form ) ) {
+
+					/* Generate our PDF */
+					do_action( 'gfpdf_pre_generate_and_save_pdf_notification', $form, $entry, $settings, $notifications );
+					$filename = $this->generate_and_save_pdf( $entry, $settings );
+					do_action( 'gfpdf_post_generate_and_save_pdf_notification', $form, $entry, $settings, $notifications );
+
+					if ( ! is_wp_error( $filename ) ) {
+						$notifications['attachments'][] = $filename;
+					}
+				}
+			}
+
+			$this->log->notice(
+				'Gravity Forms Attachments',
+				[
+					'attachments'  => $notifications['attachments'],
+					'notification' => $notifications,
+				]
+			);
+		}
+
+		return $notifications;
+	}
+
+	/**
+	 * Determine if the PDF should be attached to the current notification
+	 *
+	 * @param array $notification The Gravity Form Notification currently being processed
+	 * @param array $settings     The current Gravity PDF Settings
+	 * @param array $form         Added to 4.2
+	 * @param array $entry        Added to 4.2
+	 *
+	 * @return boolean
 	 *
 	 * @since 4.0
 	 */
-	public function get_active_pdfs( $pdfs, $entry ) {
+	public function maybe_attach_to_notification( $notification, $settings, $entry = [], $form = [] ) {
 
-		$filtered = [];
-		$form     = $this->gform->get_form( $entry['form_id'] );
-
-		foreach ( $pdfs as $pdf ) {
-			if ( $pdf['active'] && ( empty( $pdf['conditionalLogic'] ) || $this->misc->evaluate_conditional_logic( $pdf['conditionalLogic'], $entry ) ) ) {
-				$filtered[ $pdf['id'] ] = $pdf;
+		$attach = false;
+		if ( isset( $settings['notification'] ) && is_array( $settings['notification'] ) ) {
+			if ( in_array( $notification['id'], $settings['notification'], true ) ) {
+				$attach = true;
 			}
 		}
 
 		/**
-		 * See https://gravitypdf.com/documentation/v5/gfpdf_get_active_pdfs/ for usage
+		 * See https://gravitypdf.com/documentation/v5/gfpdf_maybe_attach_to_notification/ for usage
+		 *
 		 * @since 4.2
 		 */
-		return apply_filters( 'gfpdf_get_active_pdfs', $filtered, $pdfs, $entry, $form );
+		return apply_filters( 'gfpdf_maybe_attach_to_notification', $attach, $notification, $settings, $entry, $form );
+	}
+
+	/**
+	 * Generate and save the PDF to disk
+	 *
+	 * @param array $entry    The Gravity Form entry array (usually passed in as a filter or pulled using GFAPI::get_entry( $id ) )
+	 * @param array $settings The PDF configuration settings for the particular entry / form being processed
+	 *
+	 * @return string|WP_Error           Return the full path to the PDF, or a WP_Error on failure
+	 *
+	 * @throws Exception
+	 * @since 4.0
+	 */
+	public function generate_and_save_pdf( $entry, $settings ) {
+
+		$pdf_generator = new Helper_PDF( $entry, $settings, $this->gform, $this->data, $this->misc, $this->templates, $this->log );
+		$pdf_generator->set_filename( $this->get_pdf_name( $settings, $entry ) );
+		$pdf_generator = apply_filters( 'gfpdf_pdf_generator_pre_processing', $pdf_generator );
+
+		if ( $this->process_and_save_pdf( $pdf_generator ) ) {
+			$pdf_path = $pdf_generator->get_full_pdf_path();
+			if ( is_file( $pdf_path ) ) {
+				return $pdf_path;
+			}
+		}
+
+		return new WP_Error( 'pdf_generation_failure', esc_html__( 'The PDF could not be saved.', 'gravity-forms-pdf-extended' ) );
+
 	}
 
 	/**
 	 * Generate and save PDF to disk
 	 *
-	 * @param \GFPDF\Helper\Helper_PDF $pdf The Helper_PDF object
+	 * @param Helper_PDF $pdf The Helper_PDF object
 	 *
 	 * @return boolean
 	 *
+	 * @throws Exception
 	 * @since 4.0
 	 */
 	public function process_and_save_pdf( Helper_PDF $pdf ) {
@@ -834,7 +1025,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		/* Check that the PDF hasn't already been created this session */
 		if ( $pdf_override || ! $this->does_pdf_exist( $pdf ) ) {
 
-			/* Ensure Gravity Forms depedancy loaded */
+			/* Ensure Gravity Forms dependency loaded */
 			$this->misc->maybe_load_gf_entry_detail_class();
 
 			/* Enable Multicurrency support */
@@ -909,240 +1100,9 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Handles the loading and running of our legacy Tier 2 PDF templates
-	 *
-	 * @param \GFPDF\Helper\Helper_PDF $pdf      The Helper_PDF object
-	 * @param array                    $entry    The Gravity Forms raw entry data
-	 * @param array                    $settings The Gravity PDF settings
-	 * @param array                    $args     The data that should be passed directly to a PDF template
-	 *
-	 * @return bool
-	 *
-	 * @since 4.0
-	 */
-	public function handle_legacy_tier_2_processing( Helper_PDF $pdf, $entry, $settings, $args ) {
-
-		$form = $this->gform->get_form( $entry['form_id'] );
-
-		$prevent_main_pdf_loader = apply_filters(
-			'gfpdfe_pre_load_template',
-			$form['id'],
-			$entry['id'],
-			basename( $pdf->get_template_path() ),
-			$form['id'] . $entry['id'],
-			$this->misc->backwards_compat_output( $pdf->get_output_type() ),
-			$pdf->get_filename(),
-			$this->misc->backwards_compat_conversion( $settings, $form, $entry ),
-			$args
-		); /* Backwards Compatibility */
-
-		return ( $prevent_main_pdf_loader === true ) ? true : false;
-	}
-
-	/**
-	 * Generate and save the PDF to disk
-	 *
-	 * @param  array $entry    The Gravity Form entry array (usually passed in as a filter or pulled using GFAPI::get_entry( $id ) )
-	 * @param  array $settings The PDF configuration settings for the particular entry / form being processed
-	 *
-	 * @return string|WP_Error           Return the full path to the PDF, or a WP_Error on failure
-	 *
-	 * @since 4.0
-	 */
-	public function generate_and_save_pdf( $entry, $settings ) {
-
-		$pdf_generator = new Helper_PDF( $entry, $settings, $this->gform, $this->data, $this->misc, $this->templates, $this->log );
-		$pdf_generator->set_filename( $this->get_pdf_name( $settings, $entry ) );
-		$pdf_generator = apply_filters( 'gfpdf_pdf_generator_pre_processing', $pdf_generator );
-
-		if ( $this->process_and_save_pdf( $pdf_generator ) ) {
-			$pdf_path = $pdf_generator->get_full_pdf_path();
-			if ( is_file( $pdf_path ) ) {
-				return $pdf_path;
-			}
-		}
-
-		return new WP_Error( 'pdf_generation_failure', esc_html__( 'The PDF could not be saved.', 'gravity-forms-pdf-extended' ) );
-
-	}
-
-	/**
-	 * Check if the form has any PDFs, generate them and attach to the notification
-	 *
-	 * @param  array $notifications Gravity Forms Notification Array
-	 * @param  array $form
-	 * @param  array $entry
-	 *
-	 * @return array
-	 *
-	 * @since 4.0
-	 */
-	public function notifications( $notifications, $form, $entry ) {
-
-		/*
-		 * Ensure our entry is stored in the database by checking it has an ID
-		 * This resolves any issues with the "Save and Continue" feature
-		 * See https://github.com/GravityPDF/gravity-pdf/issues/360
-		 */
-		if ( empty( $entry['id'] ) ) {
-			return $notifications;
-		}
-
-		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : [];
-
-		if ( sizeof( $pdfs ) > 0 ) {
-
-			/* Ensure our notification has an array setup for the attachments key */
-			$notifications['attachments'] = ( isset( $notifications['attachments'] ) ) ? $notifications['attachments'] : [];
-
-			/* Loop through each PDF config and generate */
-			foreach ( $pdfs as $pdf ) {
-
-				/* Pass it through the config filters */
-				$settings = $this->options->get_pdf( $entry['form_id'], $pdf['id'] );
-
-				/* Reset the variables each loop */
-				$filename        = '';
-				$tier_2_filename = '';
-
-				if ( $this->maybe_attach_to_notification( $notifications, $settings, $entry, $form ) ) {
-
-					/* Generate our PDF */
-					do_action( 'gfpdf_pre_generate_and_save_pdf_notification', $form, $entry, $settings, $notifications );
-					$filename = $this->generate_and_save_pdf( $entry, $settings );
-					do_action( 'gfpdf_post_generate_and_save_pdf_notification', $form, $entry, $settings, $notifications );
-
-					if ( ! is_wp_error( $filename ) ) {
-						$notifications['attachments'][] = $filename;
-					}
-				}
-			}
-
-			$this->log->notice(
-				'Gravity Forms Attachments',
-				[
-					'attachments'  => $notifications['attachments'],
-					'notification' => $notifications,
-				]
-			);
-		}
-
-		return $notifications;
-	}
-
-	/**
-	 * Determine if the PDF should be attached to the current notification
-	 *
-	 * @param  array $notification The Gravity Form Notification currently being processed
-	 * @param  array $settings     The current Gravity PDF Settings
-	 * @param  array $form         Added to 4.2
-	 * @param  array $entry        Added to 4.2
-	 *
-	 * @return boolean
-	 *
-	 * @since 4.0
-	 */
-	public function maybe_attach_to_notification( $notification, $settings, $entry = [], $form = [] ) {
-
-		$attach = false;
-		if ( isset( $settings['notification'] ) && is_array( $settings['notification'] ) ) {
-			if ( in_array( $notification['id'], $settings['notification'], true ) ) {
-				$attach = true;
-			}
-		}
-
-		/**
-		 * See https://gravitypdf.com/documentation/v5/gfpdf_maybe_attach_to_notification/ for usage
-		 * @since 4.2
-		 */
-		return apply_filters( 'gfpdf_maybe_attach_to_notification', $attach, $notification, $settings, $entry, $form );
-	}
-
-	/**
-	 * Determine if the PDF should be saved to disk
-	 *
-	 * @param  array $settings The current Gravity PDF Settings
-	 *
-	 * @return boolean
-	 *
-	 * @since 4.0
-	 */
-	public function maybe_always_save_pdf( $settings ) {
-
-		$save = false;
-		if ( isset( $settings['save'] ) && strtolower( $settings['save'] ) === 'yes' ) {
-			$save = true;
-		}
-
-		/**
-		 * @since 4.2
-		 */
-		return apply_filters( 'gfpdf_maybe_always_save_pdf', $save, $settings );
-	}
-
-	/**
-	 * Creates a PDF on every submission, except when the PDF is already created during the notification hook
-	 *
-	 * @param  array $entry The GF Entry Details
-	 * @param  array $form  The Gravity Form
-	 *
-	 * @return void
-	 *
-	 * @since 4.0
-	 */
-	public function maybe_save_pdf( $entry, $form ) {
-
-		/* Exit early if background processing is enabled */
-		if ( $this->options->get_option( 'background_processing', 'Disable' ) === 'Enable' ) {
-			return;
-		}
-
-		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : [];
-
-		if ( count( $pdfs ) > 0 ) {
-
-			/* Loop through each PDF config */
-			foreach ( $pdfs as $pdf ) {
-				$settings = $this->options->get_pdf( $entry['form_id'], $pdf['id'] );
-
-				/* Only generate if the PDF wasn't created during the notification process */
-				if ( ! is_wp_error( $settings ) && $this->maybe_always_save_pdf( $settings ) ) {
-					$this->generate_and_save_pdf( $entry, $settings );
-				}
-			}
-		}
-	}
-
-	/**
-	 * Trigger Post PDF Generation Action
-	 *
-	 * @param array      $form     The Gravity Form
-	 * @param array      $entry    The Gravity Form Entry
-	 * @param array      $settings The Gravity PDF Settings
-	 * @param Helper_PDF $pdf      The Helper_PDF object
-	 *
-	 * @since 5.2
-	 */
-	public function trigger_post_save_pdf( $form, $entry, $settings, $pdf ) {
-		$pdf_path = $pdf->get_full_pdf_path();
-
-		if ( is_file( $pdf_path ) ) {
-			/* Add appropriate filters so developers can access the PDF when it is generated */
-			$form     = $this->gform->get_form( $entry['form_id'] );
-			$filename = basename( $pdf_path );
-
-			do_action( 'gfpdf_post_pdf_save', $form['id'], $entry['id'], $settings, $pdf_path ); /* Backwards compatibility */
-
-			/* See https://gravitypdf.com/documentation/v5/gfpdf_post_save_pdf/ for more details about these actions */
-			do_action( 'gfpdf_post_save_pdf', $pdf_path, $filename, $settings, $entry, $form );
-			do_action( 'gfpdf_post_save_pdf_' . $form['id'], $pdf_path, $filename, $settings, $entry, $form );
-		}
-	}
-
-	/**
 	 * Check if the current PDF to be processed already exists on disk
 	 *
-	 * @param  \GFPDF\Helper\Helper_PDF $pdf The Helper_PDF Object
+	 * @param Helper_PDF $pdf The Helper_PDF Object
 	 *
 	 * @return boolean
 	 *
@@ -1158,198 +1118,13 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Clean-up our tmp directory every 24 hours
-	 *
-	 * @return void
-	 *
-	 * @since 4.0
-	 */
-	public function cleanup_tmp_dir() {
-		$max_file_age  = time() - 24 * 3600; /* Max age is 24 hours old */
-		$tmp_directory = $this->data->template_tmp_location;
-
-		if ( is_dir( $tmp_directory ) ) {
-
-			try {
-				$directory_list = new \RecursiveIteratorIterator(
-					new \RecursiveDirectoryIterator( $tmp_directory, \RecursiveDirectoryIterator::SKIP_DOTS ),
-					\RecursiveIteratorIterator::CHILD_FIRST
-				);
-
-				foreach ( $directory_list as $file ) {
-					if ( in_array( $file->getFilename(), [ '.htaccess', 'index.html' ], true ) || strpos( realpath( $file->getPathname() ), realpath( $this->data->mpdf_tmp_location ) ) !== false ) {
-						continue;
-					}
-
-					if ( $file->isReadable() && $file->getMTime() < $max_file_age ) {
-						( $file->isDir() ) ? $this->misc->rmdir( $file->getPathName() ) : unlink( $file->getPathName() );
-					}
-				}
-			} catch ( Exception $e ) {
-				$this->log->error(
-					'Filesystem Delete Error',
-					[
-						'dir'       => $tmp_directory,
-						'exception' => $e->getMessage(),
-					]
-				);
-			}
-		}
-	}
-
-	/**
-	 * Remove the generated PDF from the server to save disk space
-	 *
-	 * @internal  In future we may give the option to cache PDFs to save on processing power
-	 *
-	 * @param  array $entry The GF Entry Data
-	 * @param  array $form  The Gravity Form
-	 *
-	 * @return void
-	 *
-	 * @since     4.0
-	 *
-	 * @todo      Add PDF caching support to make software more performant. Need to review correct triggers for a cleanup (API-based, UI actions, 3rd-party add-on compatibility)
-	 */
-	public function cleanup_pdf( $entry, $form ) {
-
-		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : [];
-
-		if ( sizeof( $pdfs ) > 0 ) {
-
-			/* loop through each PDF config */
-			foreach ( $pdfs as $pdf ) {
-				$settings = $this->options->get_pdf( $entry['form_id'], $pdf['id'] );
-
-				/* Only generate if the PDF wasn't during the notification process */
-				if ( ! is_wp_error( $settings ) ) {
-
-					$pdf_generator = new Helper_PDF( $entry, $settings, $this->gform, $this->data, $this->misc, $this->templates, $this->log );
-					$pdf_generator->set_filename( $this->get_pdf_name( $settings, $entry ) );
-
-					if ( $this->does_pdf_exist( $pdf_generator ) ) {
-						try {
-							$this->misc->rmdir( $pdf_generator->get_path() );
-						} catch ( Exception $e ) {
-
-							$this->log->error(
-								'Cleanup PDF Error',
-								[
-									'pdf'       => $pdf,
-									'exception' => $e->getMessage(),
-								]
-							);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Triggered after the Gravity Form entry is updated
-	 *
-	 * @param array $form
-	 * @param int   $entry_id
-	 */
-	public function cleanup_pdf_after_submission( $form, $entry_id ) {
-		$entry = $this->gform->get_entry( $entry_id );
-		$this->cleanup_pdf( $entry, $form );
-	}
-
-	/**
-	 * Clean-up any PDFs stored on disk before we resend any notifications
-	 *
-	 * @param array $form  The Gravity Forms object
-	 * @param array $leads An array of Gravity Form entry IDs
-	 *
-	 * @since 4.0
-	 *
-	 * @return array We tapped into a filter so we need to return the form object
-	 */
-	public function resend_notification_pdf_cleanup( $form, $entries ) {
-		foreach ( $entries as $entry_id ) {
-			$entry = $this->gform->get_entry( $entry_id );
-			$this->cleanup_pdf( $entry, $form );
-		}
-
-		return $form;
-	}
-
-	/**
-	 * An mPDF filter which will register our custom font data with mPDF
-	 *
-	 * @param array $fonts The registered fonts
-	 *
-	 * @since 4.0
-	 *
-	 * @return array
-	 */
-	public function register_custom_font_data_with_mPDF( $fonts ) {
-
-		$custom_fonts = $this->options->get_custom_fonts();
-
-		foreach ( $custom_fonts as $font ) {
-
-			$fonts[ $font['shortname'] ] = array_filter(
-				[
-					'R'  => basename( $font['regular'] ),
-					'B'  => basename( $font['bold'] ),
-					'I'  => basename( $font['italics'] ),
-					'BI' => basename( $font['bolditalics'] ),
-				]
-			);
-		}
-
-		return $fonts;
-	}
-
-	/**
-	 * Read all fonts from our fonts directory and auto-load them into mPDF if they are not found
-	 *
-	 * @param array $fonts The registered fonts
-	 *
-	 * @since 4.0
-	 *
-	 * @return array
-	 */
-	public function add_unregistered_fonts_to_mPDF( $fonts ) {
-
-		$user_fonts = glob( $this->data->template_font_location . '*.[tT][tT][fF]' );
-		$user_fonts = ( is_array( $user_fonts ) ) ? $user_fonts : [];
-
-		$flattened_fonts_array = [];
-		array_walk_recursive(
-			$fonts,
-			function( $val ) use ( &$array ) {
-				$array[] = $val;
-			}
-		);
-
-		foreach ( $user_fonts as $font ) {
-
-			/* Get font shortname */
-			$font_name  = basename( $font );
-			$short_name = $this->options->get_font_short_name( substr( $font_name, 0, -4 ) );
-
-			/* Check if it exists already, otherwise add it */
-			if ( ! isset( $fonts[ $short_name ] ) && array_search( $font_name, $flattened_fonts_array, true ) === false ) {
-				$fonts[ $short_name ] = [
-					'R' => $font_name,
-				];
-			}
-		}
-
-		return $fonts;
-	}
-
-	/**
 	 * Generates our $data array
 	 *
-	 * @param  array $entry The Gravity Form Entry
+	 * @param array $entry The Gravity Form Entry
 	 *
 	 * @return array        The $data array
 	 *
+	 * @throws Exception
 	 * @since 4.0
 	 */
 	public function get_form_data( $entry ) {
@@ -1464,16 +1239,48 @@ class Model_PDF extends Helper_Abstract_Model {
 
 		/**
 		 * See https://gravitypdf.com/documentation/v5/gfpdf_form_data/ for usage
+		 *
 		 * @since 4.2
 		 */
 		return apply_filters( 'gfpdf_form_data', $data, $entry, $form );
 	}
 
 	/**
+	 * Handles the loading and running of our legacy Tier 2 PDF templates
+	 *
+	 * @param Helper_PDF $pdf      The Helper_PDF object
+	 * @param array      $entry    The Gravity Forms raw entry data
+	 * @param array      $settings The Gravity PDF settings
+	 * @param array      $args     The data that should be passed directly to a PDF template
+	 *
+	 * @return bool
+	 *
+	 * @since 4.0
+	 */
+	public function handle_legacy_tier_2_processing( Helper_PDF $pdf, $entry, $settings, $args ) {
+
+		$form = $this->gform->get_form( $entry['form_id'] );
+
+		$prevent_main_pdf_loader = apply_filters(
+			'gfpdfe_pre_load_template',
+			$form['id'],
+			$entry['id'],
+			basename( $pdf->get_template_path() ),
+			$form['id'] . $entry['id'],
+			$this->misc->backwards_compat_output( $pdf->get_output_type() ),
+			$pdf->get_filename(),
+			$this->misc->backwards_compat_conversion( $settings, $form, $entry ),
+			$args
+		); /* Backwards Compatibility */
+
+		return $prevent_main_pdf_loader === true;
+	}
+
+	/**
 	 * Return our general $data information
 	 *
-	 * @param  array $form  The Gravity Form
-	 * @param  array $entry The Gravity Form Entry
+	 * @param array $form  The Gravity Form
+	 * @param array $entry The Gravity Form Entry
 	 *
 	 * @return array        The $data array
 	 *
@@ -1529,10 +1336,48 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Pull the Quiz Results into the $form_data array
+	 *
+	 * @param array $form  The Gravity Form
+	 * @param array $entry The Gravity Form Entry
+	 *
+	 * @return array        The results
+	 *
+	 * @since  4.0
+	 */
+	public function get_quiz_results( $form, $entry ) {
+
+		$data = [];
+
+		if ( class_exists( 'GFQuiz' ) && $this->check_field_exists( 'quiz', $form ) ) {
+
+			/* Get quiz fields */
+			$fields = GFCommon::get_fields_by_type( $form, [ 'quiz' ] );
+
+			/* Store the quiz pass configuration */
+			$data['quiz']['config']['grading']     = ( isset( $form['gravityformsquiz']['grading'] ) ) ? $form['gravityformsquiz']['grading'] : '';
+			$data['quiz']['config']['passPercent'] = ( isset( $form['gravityformsquiz']['passPercent'] ) ) ? $form['gravityformsquiz']['passPercent'] : '';
+			$data['quiz']['config']['grades']      = ( isset( $form['gravityformsquiz']['grades'] ) ) ? $form['gravityformsquiz']['grades'] : '';
+
+			/* Store the user's quiz results */
+			$data['quiz']['results']['score']   = rgar( $entry, 'gquiz_score' );
+			$data['quiz']['results']['percent'] = rgar( $entry, 'gquiz_percent' );
+			$data['quiz']['results']['is_pass'] = rgar( $entry, 'gquiz_is_pass' );
+			$data['quiz']['results']['grade']   = rgar( $entry, 'gquiz_grade' );
+
+			/* Poll for the global quiz overall results */
+			$data['quiz']['global'] = $this->get_quiz_overall_data( $form, $fields );
+
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Pull the Survey Results into the $form_data array
 	 *
-	 * @param  array $form  The Gravity Form
-	 * @param  array $entry The Gravity Form Entry
+	 * @param array $form  The Gravity Form
+	 * @param array $entry The Gravity Form Entry
 	 *
 	 * @return array        The results
 	 *
@@ -1590,48 +1435,10 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Pull the Quiz Results into the $form_data array
-	 *
-	 * @param  array $form  The Gravity Form
-	 * @param  array $entry The Gravity Form Entry
-	 *
-	 * @return array        The results
-	 *
-	 * @since  4.0
-	 */
-	public function get_quiz_results( $form, $entry ) {
-
-		$data = [];
-
-		if ( class_exists( 'GFQuiz' ) && $this->check_field_exists( 'quiz', $form ) ) {
-
-			/* Get quiz fields */
-			$fields = GFCommon::get_fields_by_type( $form, [ 'quiz' ] );
-
-			/* Store the quiz pass configuration */
-			$data['quiz']['config']['grading']     = ( isset( $form['gravityformsquiz']['grading'] ) ) ? $form['gravityformsquiz']['grading'] : '';
-			$data['quiz']['config']['passPercent'] = ( isset( $form['gravityformsquiz']['passPercent'] ) ) ? $form['gravityformsquiz']['passPercent'] : '';
-			$data['quiz']['config']['grades']      = ( isset( $form['gravityformsquiz']['grades'] ) ) ? $form['gravityformsquiz']['grades'] : '';
-
-			/* Store the user's quiz results */
-			$data['quiz']['results']['score']   = rgar( $entry, 'gquiz_score' );
-			$data['quiz']['results']['percent'] = rgar( $entry, 'gquiz_percent' );
-			$data['quiz']['results']['is_pass'] = rgar( $entry, 'gquiz_is_pass' );
-			$data['quiz']['results']['grade']   = rgar( $entry, 'gquiz_grade' );
-
-			/* Poll for the global quiz overall results */
-			$data['quiz']['global'] = $this->get_quiz_overall_data( $form, $fields );
-
-		}
-
-		return $data;
-	}
-
-	/**
 	 * Pull the Poll Results into the $form_data array
 	 *
-	 * @param  array $form  The Gravity Form
-	 * @param  array $entry The Gravity Form Entry
+	 * @param array $form  The Gravity Form
+	 * @param array $entry The Gravity Form Entry
 	 *
 	 * @return array        The results
 	 *
@@ -1669,10 +1476,103 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
+	 * Pass in a Gravity Form Field Object and get back a Gravity PDF Field Object
+	 *
+	 * @param GF_Field         $field    Gravity Form Field Object
+	 * @param array          $form     The Gravity Form Array
+	 * @param array          $entry    The Gravity Form Entry
+	 * @param Field_Products $products A Field_Products Object
+	 *
+	 * @return object        Gravity PDF Field Object
+	 *
+	 * @throws Exception
+	 * @since 4.0
+	 */
+	public function get_field_class( $field, $form, $entry, Field_Products $products ) {
+
+		$class_name = $this->misc->get_field_class( $field->type );
+
+		try {
+			/* if we have a valid class name... */
+			if ( class_exists( $class_name ) ) {
+
+				/**
+				 * Developer Note
+				 *
+				 * We've purposefully not added any filters to the Field_* child classes directly.
+				 * Instead, if you want to change how one of the fields are displayed or output (without effecting Gravity Forms itself) you should tap
+				 * into one of the filters below and override or extend the entire class.
+				 *
+				 * Your class MUST extend the \GFPDF\Helper\Helper_Abstract_Fields abstract class - either directly or by extending an existing \GFPDF\Helper\Fields class.
+				 * eg. class Fields_New_Text extends \GFPDF\Helper\Helper_Abstract_Fields or Fields_New_Text extends \GFPDF\Helper\Fields\Field_Text
+				 *
+				 * To make your life more simple you should either use the same namespace as the field classes (\GFPDF\Helper\Fields) or import the class directly (use \GFPDF\Helper\Fields\Field_Text)
+				 * We've tried to make the fields as modular as possible. If you have any feedback about this approach please submit a ticket on GitHub (https://github.com/GravityPDF/gravity-pdf/issues)
+				 */
+
+				$class = new $class_name( $field, $entry, $this->gform, $this->misc );
+
+				if ( $class instanceof Helper_Abstract_Field_Products ) {
+					$class->set_products( $products );
+				}
+
+				/*
+				 * See https://gravitypdf.com/documentation/v5/gfpdf_field_class/ for more details about these filters
+				 */
+				$class = apply_filters( 'gfpdf_field_class', $class, $field, $entry, $form );
+				$class = apply_filters( 'gfpdf_field_class_' . $field->type, $class, $field, $entry, $form );
+			}
+
+			if ( empty( $class ) || ! ( $class instanceof Helper_Abstract_Fields ) ) {
+				throw new Exception( 'Class not found' );
+			}
+		} catch ( Exception $e ) {
+
+			$this->log->warning(
+				sprintf(
+					'Gravity PDF does not have native support for this field type "%s". Falling back to default Gravity Forms output.',
+					$field->type
+				),
+				[
+					'field' => $field,
+				]
+			);
+
+			/* Exception thrown. Load generic field loader */
+			$class = apply_filters( 'gfpdf_field_default_class', new Field_Default( $field, $entry, $this->gform, $this->misc ), $field, $entry, $form );
+		}
+
+		return $class;
+	}
+
+	/**
+	 * Sniff the form fields and determine if there are any of the $type available
+	 *
+	 * @param string $type the field type we are looking for
+	 * @param array  $form the form array
+	 *
+	 * @return boolean       Whether there is a match or not
+	 *
+	 * @since 4.0
+	 */
+	public function check_field_exists( $type, $form ) {
+
+		if ( isset( $form['fields'] ) ) {
+			foreach ( $form['fields'] as $field ) {
+				if ( $field['type'] === $type ) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Parse the Quiz Overall Results
 	 *
-	 * @param  array $form   The Gravity Form
-	 * @param  array $fields The quiz fields
+	 * @param array $form   The Gravity Form
+	 * @param array $fields The quiz fields
 	 *
 	 * @return array         The parsed results
 	 *
@@ -1725,9 +1625,9 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Pull Gravity Forms global results Data
 	 *
-	 * @param  array $form    The Gravity Form array
-	 * @param  array $options The global query options
-	 * @param  array $fields  The field array to use in our query
+	 * @param array $form    The Gravity Form array
+	 * @param array $options The global query options
+	 * @param array $fields  The field array to use in our query
 	 *
 	 * @return array          The results
 	 *
@@ -1736,7 +1636,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	private function get_addon_global_data( $form, $options, $fields ) {
 
 		/**
-		 * Disable aggrigate addon data (speeds up PDF generation time)
+		 * Disable aggregate addon data (speeds up PDF generation time)
 		 *
 		 * See https://gravitypdf.com/documentation/v5/gfpdf_disable_global_addon_data/
 		 *
@@ -1777,34 +1677,11 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Sniff the form fields and determine if there are any of the $type available
-	 *
-	 * @param  string $type the field type we are looking for
-	 * @param  array  $form the form array
-	 *
-	 * @return boolean       Whether there is a match or not
-	 *
-	 * @since 4.0
-	 */
-	public function check_field_exists( $type, $form ) {
-
-		if ( isset( $form['fields'] ) ) {
-			foreach ( $form['fields'] as $field ) {
-				if ( $field['type'] === $type ) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	/**
 	 * Swap out the array key
 	 *
-	 * @param  array  $array           The array to be modified
-	 * @param  string $key             The key to remove
-	 * @param  string $replacement_key The new array key
+	 * @param array  $array           The array to be modified
+	 * @param string $key             The key to remove
+	 * @param string $replacement_key The new array key
 	 *
 	 * @return array        The modified array
 	 *
@@ -1822,78 +1699,280 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * Pass in a Gravity Form Field Object and get back a Gravity PDF Field Object
+	 * Creates a PDF on every submission, except when the PDF is already created during the notification hook
 	 *
-	 * @param  object                              $field    Gravity Form Field Object
-	 * @param  array                               $form     The Gravity Form Array
-	 * @param  array                               $entry    The Gravity Form Entry
-	 * @param  \GFPDF\Helper\Fields\Field_Products $products A Field_Products Object
+	 * @param array $entry The GF Entry Details
+	 * @param array $form  The Gravity Form
 	 *
-	 * @return object        Gravity PDF Field Object
+	 * @return void
+	 *
+	 * @throws Exception
+	 * @since 4.0
+	 */
+	public function maybe_save_pdf( $entry, $form ) {
+
+		/* Exit early if background processing is enabled */
+		if ( $this->options->get_option( 'background_processing', 'No' ) === 'Yes' ) {
+			return;
+		}
+
+		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : [];
+
+		if ( count( $pdfs ) > 0 ) {
+
+			/* Loop through each PDF config */
+			foreach ( $pdfs as $pdf ) {
+				$settings = $this->options->get_pdf( $entry['form_id'], $pdf['id'] );
+
+				/* Only generate if the PDF wasn't created during the notification process */
+				if ( ! is_wp_error( $settings ) && $this->maybe_always_save_pdf( $settings ) ) {
+					$this->generate_and_save_pdf( $entry, $settings );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Determine if the PDF should be saved to disk
+	 *
+	 * @param array $settings The current Gravity PDF Settings
+	 *
+	 * @return boolean
 	 *
 	 * @since 4.0
 	 */
-	public function get_field_class( $field, $form, $entry, Field_Products $products ) {
+	public function maybe_always_save_pdf( $settings ) {
 
-		$class_name = $this->misc->get_field_class( $field->type );
-
-		try {
-			/* if we have a valid class name... */
-			if ( class_exists( $class_name ) ) {
-
-				/**
-				 * Developer Note
-				 *
-				 * We've purposefully not added any filters to the Field_* child classes directly.
-				 * Instead, if you want to change how one of the fields are displayed or output (without effecting Gravity Forms itself) you should tap
-				 * into one of the filters below and override or extend the entire class.
-				 *
-				 * Your class MUST extend the \GFPDF\Helper\Helper_Abstract_Fields abstract class - either directly or by extending an existing \GFPDF\Helper\Fields class.
-				 * eg. class Fields_New_Text extends \GFPDF\Helper\Helper_Abstract_Fields or Fields_New_Text extends \GFPDF\Helper\Fields\Field_Text
-				 *
-				 * To make your life more simple you should either use the same namespace as the field classes (\GFPDF\Helper\Fields) or import the class directly (use \GFPDF\Helper\Fields\Field_Text)
-				 * We've tried to make the fields as modular as possible. If you have any feedback about this approach please submit a ticket on GitHub (https://github.com/GravityPDF/gravity-pdf/issues)
-				 */
-
-				$class = new $class_name( $field, $entry, $this->gform, $this->misc );
-
-				if ( $class instanceof Helper_Abstract_Field_Products ) {
-					$class->set_products( $products );
-				}
-
-				/*
-				 * See https://gravitypdf.com/documentation/v5/gfpdf_field_class/ for more details about these filters
-				 */
-				$class = apply_filters( 'gfpdf_field_class', $class, $field, $entry, $form );
-				$class = apply_filters( 'gfpdf_field_class_' . $field->type, $class, $field, $entry, $form );
-			}
-
-			if ( empty( $class ) || ! ( $class instanceof Helper_Abstract_Fields ) ) {
-				throw new Exception( 'Class not found' );
-			}
-		} catch ( Exception $e ) {
-
-			$this->log->error(
-				'Invalid Field Class.',
-				[
-					'exception' => $e->getMessage(),
-					'field'     => $field,
-					'form_id'   => $form['id'],
-					'entry'     => $entry,
-				]
-			);
-
-			/* Exception thrown. Load generic field loader */
-			$class = apply_filters( 'gfpdf_field_default_class', new Field_Default( $field, $entry, $this->gform, $this->misc ), $field, $entry, $form );
+		$save = false;
+		if ( isset( $settings['save'] ) && strtolower( $settings['save'] ) === 'yes' ) {
+			$save = true;
 		}
 
-		return $class;
+		/**
+		 * @since 4.2
+		 */
+		return apply_filters( 'gfpdf_maybe_always_save_pdf', $save, $settings );
+	}
+
+	/**
+	 * Trigger Post PDF Generation Action
+	 *
+	 * @param array      $form     The Gravity Form
+	 * @param array      $entry    The Gravity Form Entry
+	 * @param array      $settings The Gravity PDF Settings
+	 * @param Helper_PDF $pdf      The Helper_PDF object
+	 *
+	 * @since 5.2
+	 */
+	public function trigger_post_save_pdf( $form, $entry, $settings, $pdf ) {
+		$pdf_path = $pdf->get_full_pdf_path();
+
+		if ( is_file( $pdf_path ) ) {
+			/* Add appropriate filters so developers can access the PDF when it is generated */
+			$form     = $this->gform->get_form( $entry['form_id'] );
+			$filename = basename( $pdf_path );
+
+			do_action( 'gfpdf_post_pdf_save', $form['id'], $entry['id'], $settings, $pdf_path ); /* Backwards compatibility */
+
+			/* See https://gravitypdf.com/documentation/v5/gfpdf_post_save_pdf/ for more details about these actions */
+			do_action( 'gfpdf_post_save_pdf', $pdf_path, $filename, $settings, $entry, $form );
+			do_action( 'gfpdf_post_save_pdf_' . $form['id'], $pdf_path, $filename, $settings, $entry, $form );
+		}
+	}
+
+	/**
+	 * Clean-up our tmp directory every 24 hours
+	 *
+	 * @return void
+	 *
+	 * @since 4.0
+	 */
+	public function cleanup_tmp_dir() {
+		$max_file_age  = time() - 24 * 3600; /* Max age is 24 hours old */
+		$tmp_directory = $this->data->template_tmp_location;
+
+		if ( is_dir( $tmp_directory ) ) {
+
+			try {
+				$directory_list = new RecursiveIteratorIterator(
+					new RecursiveDirectoryIterator( $tmp_directory, RecursiveDirectoryIterator::SKIP_DOTS ),
+					RecursiveIteratorIterator::CHILD_FIRST
+				);
+
+				foreach ( $directory_list as $file ) {
+					if ( in_array( $file->getFilename(), [ '.htaccess', 'index.html' ], true ) || strpos( realpath( $file->getPathname() ), realpath( $this->data->mpdf_tmp_location ) ) !== false ) {
+						continue;
+					}
+
+					if ( $file->isReadable() && $file->getMTime() < $max_file_age ) {
+						( $file->isDir() ) ? $this->misc->rmdir( $file->getPathName() ) : unlink( $file->getPathName() );
+					}
+				}
+			} catch ( Exception $e ) {
+				$this->log->error(
+					'Filesystem Delete Error',
+					[
+						'dir'       => $tmp_directory,
+						'exception' => $e->getMessage(),
+					]
+				);
+			}
+		}
+	}
+
+	/**
+	 * Triggered after the Gravity Form entry is updated
+	 *
+	 * @param array $form
+	 * @param int   $entry_id
+	 */
+	public function cleanup_pdf_after_submission( $form, $entry_id ) {
+		$entry = $this->gform->get_entry( $entry_id );
+		$this->cleanup_pdf( $entry, $form );
+	}
+
+	/**
+	 * Remove the generated PDF from the server to save disk space
+	 *
+	 * @param array $entry The GF Entry Data
+	 * @param array $form  The Gravity Form
+	 *
+	 * @return void
+	 *
+	 * @internal  In future we may give the option to cache PDFs to save on processing power
+	 *
+	 * @since     4.0
+	 *
+	 * @todo      Add PDF caching support to make software more performant. Need to review correct triggers for a cleanup (API-based, UI actions, 3rd-party add-on compatibility)
+	 */
+	public function cleanup_pdf( $entry, $form ) {
+
+		$pdfs = ( isset( $form['gfpdf_form_settings'] ) ) ? $this->get_active_pdfs( $form['gfpdf_form_settings'], $entry ) : [];
+
+		if ( count( $pdfs ) > 0 ) {
+
+			/* loop through each PDF config */
+			foreach ( $pdfs as $pdf ) {
+				$settings = $this->options->get_pdf( $entry['form_id'], $pdf['id'] );
+
+				/* Only generate if the PDF wasn't during the notification process */
+				if ( ! is_wp_error( $settings ) ) {
+
+					$pdf_generator = new Helper_PDF( $entry, $settings, $this->gform, $this->data, $this->misc, $this->templates, $this->log );
+					$pdf_generator->set_filename( $this->get_pdf_name( $settings, $entry ) );
+
+					if ( $this->does_pdf_exist( $pdf_generator ) ) {
+						try {
+							$this->misc->rmdir( $pdf_generator->get_path() );
+						} catch ( Exception $e ) {
+
+							$this->log->error(
+								'Cleanup PDF Error',
+								[
+									'pdf'       => $pdf,
+									'exception' => $e->getMessage(),
+								]
+							);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Clean-up any PDFs stored on disk before we resend any notifications
+	 *
+	 * @param array $form    The Gravity Forms object
+	 * @param array $entries An array of Gravity Form entry IDs
+	 *
+	 * @return array We tapped into a filter so we need to return the form object
+	 * @since 4.0
+	 *
+	 */
+	public function resend_notification_pdf_cleanup( $form, $entries ) {
+		foreach ( $entries as $entry_id ) {
+			$entry = $this->gform->get_entry( $entry_id );
+			$this->cleanup_pdf( $entry, $form );
+		}
+
+		return $form;
+	}
+
+	/**
+	 * An mPDF filter which will register our custom font data with mPDF
+	 *
+	 * @param array $fonts The registered fonts
+	 *
+	 * @return array
+	 *
+	 * @since 4.0
+	 */
+	public function register_custom_font_data_with_mPDF( $fonts ) {
+
+		$custom_fonts = $this->options->get_custom_fonts();
+
+		foreach ( $custom_fonts as $font ) {
+
+			$fonts[ $font['id'] ] = array_filter(
+				[
+					'R'          => basename( $font['regular'] ),
+					'B'          => basename( $font['bold'] ),
+					'I'          => basename( $font['italics'] ),
+					'BI'         => basename( $font['bolditalics'] ),
+					'useOTL'     => $font['useOTL'] ?? 0x00,
+					'useKashida' => $font['useKashida'] ?? 0,
+				]
+			);
+		}
+
+		return $fonts;
+	}
+
+	/**
+	 * Read all fonts from our fonts directory and auto-load them into mPDF if they are not found
+	 *
+	 * @param array $fonts The registered fonts
+	 *
+	 * @return array
+	 * @since 4.0
+	 *
+	 * @TODO Work out how to handle this for 6.0
+	 */
+	public function add_unregistered_fonts_to_mPDF( $fonts ) {
+
+		$user_fonts = glob( $this->data->template_font_location . '*.[tT][tT][fF]' );
+		$user_fonts = ( is_array( $user_fonts ) ) ? $user_fonts : [];
+
+		$flattened_fonts_array = [];
+		array_walk_recursive(
+			$fonts,
+			function( $val ) use ( &$flattened_fonts_array ) {
+				$flattened_fonts_array[] = $val;
+			}
+		);
+
+		foreach ( $user_fonts as $font ) {
+
+			/* Get font shortname */
+			$font_name  = basename( $font );
+			$short_name = $this->options->get_font_short_name( substr( $font_name, 0, -4 ) );
+
+			/* Check if it exists already, otherwise add it */
+			if ( ! isset( $fonts[ $short_name ] ) && array_search( $font_name, $flattened_fonts_array, true ) === false ) {
+				$fonts[ $short_name ] = [
+					'R' => $font_name,
+				];
+			}
+		}
+
+		return $fonts;
 	}
 
 	/**
 	 * Attempts to find a configuration which matches the legacy routing method
 	 *
-	 * @param  array $config
+	 * @param array $config
 	 *
 	 * @return mixed
 	 *
@@ -1933,7 +2012,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	/**
 	 * Do any preprocessing to our arguments before they are sent to the template
 	 *
-	 * @param  array $args
+	 * @param array $args
 	 *
 	 * @return array
 	 *
@@ -2108,27 +2187,19 @@ class Model_PDF extends Helper_Abstract_Model {
 	}
 
 	/**
-	 * At the start of the PDF generation, filter all Gravity Perk Populate Anything merge tag replacement calls
-	 *
-	 * @since 5.3
-	 */
-	public function enable_gp_populate_anything() {
-		remove_filter( 'gppa_allow_all_lmts', '__return_true' );
-		add_filter( 'gform_pre_replace_merge_tags', [ $this, 'process_gp_populate_anything' ], 10, 3 );
-	}
-
-	/**
-	 * Replace any Gravity Perk Populate Anything live merge tags with their standard equivilant (i.e without the @ symbol)
+	 * Replace any Gravity Perk Populate Anything live merge tags with their standard equivalent (i.e without the @ symbol)
 	 * Include support for the `fallback` option
 	 *
 	 * @param string $text
+	 * @param array  $form
+	 * @param array  $entry
 	 *
 	 * @return string
 	 *
 	 * @since 5.3
 	 */
 	public function process_gp_populate_anything( $text, $form, $entry ) {
-		$gp = \GP_Populate_Anything_Live_Merge_Tags::get_instance();
+		$gp = GP_Populate_Anything_Live_Merge_Tags::get_instance();
 
 		$this->disable_gp_populate_anything();
 		$text = $gp->replace_live_merge_tags_static( $text, $form, $entry );
@@ -2145,5 +2216,15 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function disable_gp_populate_anything() {
 		add_filter( 'gppa_allow_all_lmts', '__return_true' );
 		remove_filter( 'gform_pre_replace_merge_tags', [ $this, 'process_gp_populate_anything' ] );
+	}
+
+	/**
+	 * At the start of the PDF generation, filter all Gravity Perk Populate Anything merge tag replacement calls
+	 *
+	 * @since 5.3
+	 */
+	public function enable_gp_populate_anything() {
+		remove_filter( 'gppa_allow_all_lmts', '__return_true' );
+		add_filter( 'gform_pre_replace_merge_tags', [ $this, 'process_gp_populate_anything' ], 10, 3 );
 	}
 }

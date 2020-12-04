@@ -3,7 +3,6 @@
 namespace GFPDF\Tests;
 
 use GFPDF\Helper\Helper_Notices;
-
 use WP_UnitTestCase;
 
 /**
@@ -12,7 +11,7 @@ use WP_UnitTestCase;
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2020, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since       1.0
+ * @since       4.0
  */
 
 /**
@@ -25,7 +24,7 @@ class Test_Notices extends WP_UnitTestCase {
 	/**
 	 * Our notice object
 	 *
-	 * @var \GFPDF\Helper\Helper_Notices
+	 * @var Helper_Notices
 	 *
 	 * @since 4.0
 	 */
@@ -119,7 +118,7 @@ class Test_Notices extends WP_UnitTestCase {
 		$this->assertTrue( $this->notices->has_notice() );
 		$this->assertFalse( $this->notices->has_error() );
 
-		/* Test clearning notices only */
+		/* Test clearing notices only */
 		$this->notices->add_notice( 'My First Notice' );
 		$this->notices->add_notice( 'My First Notice' );
 		$this->notices->add_error( 'My First Error' );

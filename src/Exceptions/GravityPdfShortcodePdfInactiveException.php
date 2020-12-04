@@ -20,5 +20,5 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since   5.2
  */
-class GravityPdfShortcodePdfInactiveException extends \Exception {
+class GravityPdfShortcodePdfInactiveException extends GravityPdfException {
 }

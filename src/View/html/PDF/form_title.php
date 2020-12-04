@@ -14,8 +14,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/** @var $form array */
+
 ?>
 
 <div class="row-separator">
-	<h3 id="form_title"><?php echo $form['title']; ?></h3>
+	<h3 id="form_title"><?= $form['title']; ?></h3>
 </div>

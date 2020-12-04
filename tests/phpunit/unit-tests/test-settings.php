@@ -2,6 +2,7 @@
 
 namespace GFPDF\Tests;
 
+use DateTimeImmutable;
 use Exception;
 use GFPDF\Controller\Controller_Settings;
 use GFPDF\Helper\Helper_Abstract_Addon;
@@ -33,7 +34,7 @@ class Test_Settings extends WP_UnitTestCase {
 	/**
 	 * Our Settings Controller
 	 *
-	 * @var \GFPDF\Controller\Controller_Settings
+	 * @var Controller_Settings
 	 * @since 4.0
 	 */
 	public $controller;
@@ -41,7 +42,7 @@ class Test_Settings extends WP_UnitTestCase {
 	/**
 	 * Our Settings Model
 	 *
-	 * @var \GFPDF\Model\Model_Settings
+	 * @var Model_Settings
 	 * @since 4.0
 	 */
 	public $model;
@@ -49,7 +50,7 @@ class Test_Settings extends WP_UnitTestCase {
 	/**
 	 * Our Settings View
 	 *
-	 * @var \GFPDF\View\View_Settings
+	 * @var View_Settings
 	 * @since 4.0
 	 */
 	public $view;
@@ -123,13 +124,8 @@ class Test_Settings extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_actions() {
-		$this->assertEquals( 10, has_action( 'gfpdf_post_general_settings_page', [ $this->view, 'system_status' ] ) );
-		$this->assertEquals( 10, has_action( 'gfpdf_post_tools_settings_page', [ $this->view, 'system_status' ] ) );
-		$this->assertEquals( 10, has_action( 'admin_init', [ $this->controller, 'process_tool_tab_actions' ] ) );
 		$this->assertFalse( has_action( 'gfpdf_post_tools_settings_page', [ $this->view, 'uninstaller' ] ) );
 
-		$this->assertEquals( 10, has_action( 'wp_ajax_gfpdf_font_save', [ $this->model, 'save_font' ] ) );
-		$this->assertEquals( 10, has_action( 'wp_ajax_gfpdf_font_delete', [ $this->model, 'delete_font' ] ) );
 		$this->assertEquals(
 			10,
 			has_action(
@@ -173,7 +169,6 @@ class Test_Settings extends WP_UnitTestCase {
 				]
 			)
 		);
-		$this->assertEquals( 10, has_filter( 'wp_check_filetype_and_ext', [ $this->controller, 'validate_font_uploads' ] ) );
 
 		$this->assertFalse( has_filter( 'gfpdf_registered_settings', [ $gfpdf->options, 'highlight_errors' ] ) );
 		/* retest the gfpdf_register_settings filter is added when on the correct screen */
@@ -259,7 +254,7 @@ class Test_Settings extends WP_UnitTestCase {
 		$this->assertEquals( 'Access Denied', $e->getMessage() );
 
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		$this->assertInternalType( 'integer', $user_id );
+		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
 
 		$this->assertEquals( 'read', $this->controller->edit_options_cap() );
@@ -285,68 +280,13 @@ class Test_Settings extends WP_UnitTestCase {
 
 		/* Setup appropriate permissions and recheck */
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		$this->assertInternalType( 'integer', $user_id );
+		$this->assertIsInt( $user_id );
 		wp_set_current_user( $user_id );
 
 		$results = $this->controller->disable_tools_on_view_cap( $nav );
 		$this->assertTrue( isset( $results[100] ) );
 
 		wp_set_current_user( 0 );
-	}
-
-	/**
-	 * Check this can't be executed if permissions are wrong
-	 *
-	 * @since 4.0
-	 */
-	public function test_process_tool_tab_actions() {
-
-		/* Show we're on the tools tab */
-		$_GET['page']    = 'gfpdf-';
-		$_GET['subview'] = 'PDF';
-		$_GET['tab']     = 'tools';
-
-		$this->assertNull( $this->controller->process_tool_tab_actions() );
-	}
-
-	/**
-	 * Verify TTF font file is validated correctly
-	 *
-	 * @since 4.0
-	 */
-	public function test_validate_font_uploads() {
-		global $gfpdf;
-
-		/* Create subscriber */
-		$user_id = $this->factory->user->create();
-		$this->assertInternalType( 'integer', $user_id );
-		wp_set_current_user( $user_id );
-
-		$font = $gfpdf->data->template_tmp_location . '/DejaVuSans.ttf';
-		copy( __DIR__ . '/fonts/DejaVuSans.ttf', $gfpdf->data->template_tmp_location . '/DejaVuSans.ttf' );
-
-		/* Test .ttf filename failure */
-		$this->assertFalse( $this->controller->validate_font_uploads( false, $font, 'test.txt' ) );
-
-		/* Test not exist failure */
-		$this->assertFalse( $this->controller->validate_font_uploads( false, 'test', 'DejaVuSans.ttf' ) );
-
-		/* Test invalid font file failure */
-		$this->assertFalse( $this->controller->validate_font_uploads( false, __DIR__ . '/json/form-settings.json', 'DejaVuSans.ttf' ) );
-
-		/* Test for invalid capabilities */
-		$this->assertFalse( $this->controller->validate_font_uploads( false, $font, 'DejaVuSans.ttf' ) );
-
-		/* Elevate user to administrator */
-		$user = wp_get_current_user();
-		$user->remove_role( 'subscriber' );
-		$user->add_role( 'administrator' );
-
-		/* Do valid font check */
-		$results = $this->controller->validate_font_uploads( false, $font, 'DejaVuSans.ttf' );
-
-		$this->assertEquals( 'ttf', $results['ext'] );
-		$this->assertEquals( 'font/ttf', $results['type'] );
 	}
 
 	/**
@@ -396,167 +336,6 @@ class Test_Settings extends WP_UnitTestCase {
 		$this->assertEquals( 'hello gfield_error', $results['general'][1]['class'] );
 		$this->assertEquals( '', $results['general'][2]['class'] );
 		$this->assertEquals( 'gfield_error', $results['general'][3]['class'] );
-	}
-
-	/**
-	 * Check our template installer functions correctly
-	 *
-	 * @since 4.0
-	 */
-	public function test_install_template() {
-		global $gfpdf;
-
-		$install_path = ( is_multisite() ) ? $gfpdf->data->multisite_template_location : $gfpdf->data->template_location;
-
-		$this->assertFileNotExists( $install_path . 'zadani.php' );
-
-		$this->model->install_templates();
-
-		$this->assertFileExists( $install_path . 'zadani.php' );
-
-		/* Cleanup */
-		foreach ( glob( PDF_PLUGIN_DIR . 'src/templates/*' ) as $file ) {
-
-			$file = $install_path . basename( $file );
-
-			if ( is_dir( $file ) ) {
-				$gfpdf->misc->rmdir( $file );
-			} else {
-				unlink( $file );
-			}
-		}
-	}
-
-	/**
-	 * Check the font removal method works
-	 *
-	 * @since 4.0
-	 */
-	public function test_remove_font_file() {
-		global $gfpdf;
-
-		/* Create font array */
-		$font = [
-			'regular' => 'MyFont.ttf',
-			'bold'    => 'MyFont-Bold.ttf',
-		];
-
-		/* Create our tmp font files */
-		array_walk(
-			$font,
-			function( $value ) use ( $gfpdf ) {
-				touch( $gfpdf->data->template_font_location . $value );
-			}
-		);
-
-		/* Verify they exist */
-		$this->assertFileExists( $gfpdf->data->template_font_location . 'MyFont.ttf' );
-		$this->assertFileExists( $gfpdf->data->template_font_location . 'MyFont-Bold.ttf' );
-
-		/* Remove the fonts and verify they are both removed */
-		$this->model->remove_font_file( $font );
-
-		$this->assertFileNotExists( $gfpdf->data->template_font_location . 'MyFont.ttf' );
-		$this->assertFileNotExists( $gfpdf->data->template_font_location . 'MyFont-Bold.ttf' );
-	}
-
-	/**
-	 * Check if we have a valid font name
-	 *
-	 * @since        4.0
-	 *
-	 * @dataProvider provider_is_font_name_valid
-	 */
-	public function test_is_font_name_valid( $expected, $name ) {
-		$this->assertSame( $expected, $this->model->is_font_name_valid( $name ) );
-	}
-
-	/**
-	 * Dataprovider for test_is_font_name_valid
-	 *
-	 * @since 4.0
-	 */
-	public function provider_is_font_name_valid() {
-		return [
-			[ true, 'My font name' ],
-			[ false, 'My f@nt name' ],
-			[ false, 'Calibri-pro' ],
-			[ true, 'Calibri Pro' ],
-			[ true, '123Roman' ],
-			[ false, '123_Roman' ],
-		];
-	}
-
-	/**
-	 * Verify we have a unique font name
-	 *
-	 * @since 4.0
-	 */
-	public function test_is_font_name_unique() {
-		global $gfpdf;
-		$gfpdf->options->update_option( 'custom_fonts', [] );
-
-		/* Check the name is unique */
-		$this->assertTrue( $this->model->is_font_name_unique( 'Calibri' ) );
-
-		/* Insert that name into the database and recheck for uniqueness */
-		$font = [
-			'font_name' => 'Calibri',
-		];
-
-		$results = $this->model->install_fonts( $font );
-
-		$this->assertFalse( $this->model->is_font_name_unique( 'Calibri' ) );
-
-		/* Ensure we skip over itself */
-		$id = $results['id'];
-
-		$this->assertTrue( $this->model->is_font_name_unique( 'Calibri', $id ) );
-	}
-
-	/**
-	 * Test the install_fonts() method
-	 *
-	 * @since 4.0
-	 */
-	public function test_install_fonts() {
-		global $gfpdf;
-
-		$uploads = wp_upload_dir();
-
-		/* Create font array */
-		$font = [
-			'name'        => 'Custom Font',
-			'regular'     => $uploads['url'] . '/MyFont.ttf',
-			'bold'        => $uploads['url'] . '/MyFont-Bold.ttf',
-			'italics'     => $uploads['url'] . '/MyFont-Italics.otf',
-			'bolditalics' => $uploads['url'] . '/MyFont-BI.ttf',
-		];
-
-		/* Create our tmp font files */
-		array_walk(
-			$font,
-			function( $value ) use ( $uploads ) {
-				touch( $uploads['path'] . '/' . basename( $value ) );
-			}
-		);
-
-		/* Install our fonts */
-		$results = $this->model->install_fonts( $font );
-
-		/* Verify the results */
-		$this->assertFileExists( $gfpdf->data->template_font_location . 'MyFont.ttf' );
-		$this->assertFileExists( $gfpdf->data->template_font_location . 'MyFont-Bold.ttf' );
-		$this->assertFileExists( $gfpdf->data->template_font_location . 'MyFont-Italics.otf' );
-		$this->assertFileExists( $gfpdf->data->template_font_location . 'MyFont-BI.ttf' );
-
-		$default_fonts = $gfpdf->options->get_option( 'custom_fonts' );
-
-		$this->assertEquals( 'Custom Font', $default_fonts[ $results['id'] ]['name'] );
-
-		/* Cleanup the fonts */
-		$this->model->remove_font_file( $font );
-
 	}
 
 	/**
@@ -701,12 +480,17 @@ class Test_Settings extends WP_UnitTestCase {
 	/**
 	 * @return array
 	 *
+	 * @throws Exception
 	 * @since 4.2
 	 */
 	public function providerActivateLicense() {
+		$date_format = get_option( 'date_format' );
+		$dt          = new DateTimeImmutable( '', wp_timezone() );
+		$date        = $dt === false ? gmdate( $date_format, false ) : $dt->format( $date_format );
+
 		return [
 			[
-				'Your license key expired on ' . date_i18n( get_option( 'date_format' ), strtotime( '', current_time( 'timestamp' ) ) ) . '.',
+				'Your license key expired on ' . $date . '.',
 				[
 					'error'   => 'expired',
 					'expires' => '',
@@ -754,7 +538,7 @@ class Test_Settings extends WP_UnitTestCase {
 			],
 
 			[
-				'',
+				'Your support license key has been successfully validated.',
 				[ 'success' => 'true' ],
 			],
 		];

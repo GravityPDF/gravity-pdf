@@ -2,7 +2,7 @@
 
 /*
  * Template Name: Zadani
- * Version: 1.2.2
+ * Version: 2.0.0
  * Description: A minimalist business-style template that will generate a well-spaced document great for printing. Through the Template tab you can control the PDF header and footer, change the background color or image, and show or hide the form title, page names, HTML fields and the Section Break descriptions.
  * Author: Gravity PDF
  * Author URI: https://gravitypdf.com
@@ -17,23 +17,23 @@ if ( ! class_exists( 'GFForms' ) ) {
 	return;
 }
 
-/*
- * All Gravity PDF 4.x templates have access to the following variables:
+/**
+ * All Gravity PDF templates have access to the following variables:
  *
- * $form (The current Gravity Form array)
- * $entry (The raw entry data)
- * $form_data (The processed entry data stored in an array)
- * $settings (the current PDF configuration)
- * $fields (an array of Gravity Form fields which can be accessed with their ID number)
- * $config (The initialised template config class – eg. /config/zadani.php)
- * $gfpdf (the main Gravity PDF object containing all our helper classes)
- * $args (contains an array of all variables - the ones being described right now - passed to the template)
+ * @var array  $form      The current Gravity Form array
+ * @var array  $entry     The raw entry data
+ * @var array  $form_data The processed entry data stored in an array
+ * @var array  $settings  The current PDF configuration
+ * @var array  $fields    An array of Gravity Form fields which can be accessed with their ID number
+ * @var array  $config    The initialised template config class – eg. /config/zadani.php
+ * @var object $gfpdf     The main Gravity PDF object containing all our helper classes
+ * @var array  $args      Contains an array of all variables - the ones being described right now - passed to the template
  */
 
 /*
  * Load up our template-specific appearance settings
  */
-$value_border_colour = ( ! empty( $settings['zadani_border_colour'] ) ) ? $settings['zadani_border_colour'] : '#CCCCCC';
+$value_border_colour = $settings['zadani_border_colour'] ?? '#CCCCCC';
 
 ?>
 
@@ -46,6 +46,57 @@ $value_border_colour = ( ! empty( $settings['zadani_border_colour'] ) ) ? $setti
 		padding: 1.25mm 0;
 	}
 
+	/* Handle GF2.5+ Columns */
+	.grid {
+		float: <?= $settings['rtl'] === 'Yes' ? 'right' : 'left' ?>;
+	}
+
+	.grid .inner-container {
+		width: 95%;
+	}
+
+	.grid-3 {
+		width: 25%;
+	}
+
+	.grid-4 {
+		width: 33.33%;
+	}
+
+	.grid-5 {
+		width: 41.66%;
+	}
+
+	.grid-6 {
+		width: 50%;
+	}
+
+	.grid-7 {
+		width: 58.33%;
+	}
+
+	.grid-8 {
+		width: 66.66%;
+	}
+
+	.grid-9 {
+		width: 75%
+	}
+
+	.grid-10 {
+		width: 83.33%;
+	}
+
+	.grid-11 {
+		width: 91.66%;
+	}
+
+	.grid-12,
+	.grid-12 .inner-container {
+		width: 100%;
+	}
+
+	/* Handle Legacy Columns */
 	.gf_left_half,
 	.gf_left_third, .gf_middle_third,
 	.gf_first_quarter, .gf_second_quarter, .gf_third_quarter,
@@ -201,7 +252,8 @@ $value_border_colour = ( ! empty( $settings['zadani_border_colour'] ) ) ? $setti
 	}
 
 	.gfpdf-field .value {
-		border: 1px solid <?php echo $value_border_colour; ?>;
+		border: 1px solid #000;
+		border-color: <?= $value_border_colour; ?>;
 		padding: 1.5mm 2mm;
 	}
 
@@ -221,21 +273,21 @@ $value_border_colour = ( ! empty( $settings['zadani_border_colour'] ) ) ? $setti
 /*
  * Load our core-specific styles from our PDF settings which will be passed to the PDF template $config array
  */
-$show_form_title      = ( ! empty( $settings['show_form_title'] ) && $settings['show_form_title'] === 'Yes' ) ? true : false;
-$show_page_names      = ( ! empty( $settings['show_page_names'] ) && $settings['show_page_names'] === 'Yes' ) ? true : false;
-$show_html            = ( ! empty( $settings['show_html'] ) && $settings['show_html'] === 'Yes' ) ? true : false;
-$show_section_content = ( ! empty( $settings['show_section_content'] ) && $settings['show_section_content'] === 'Yes' ) ? true : false;
-$enable_conditional   = ( ! empty( $settings['enable_conditional'] ) && $settings['enable_conditional'] === 'Yes' ) ? true : false;
-$show_empty           = ( ! empty( $settings['show_empty'] ) && $settings['show_empty'] === 'Yes' ) ? true : false;
+$show_form_title      = ( $settings['show_form_title'] ?? '' ) === 'Yes';
+$show_page_names      = ( $settings['show_page_names'] ?? '' ) === 'Yes';
+$show_html            = ( $settings['show_html'] ?? '' ) === 'Yes';
+$show_section_content = ( $settings['show_section_content'] ?? '' ) === 'Yes';
+$enable_conditional   = ( $settings['enable_conditional'] ?? '' ) === 'Yes';
+$show_empty           = ( $settings['show_empty'] ?? '' ) === 'Yes';
 
 /**
  * Set up our configuration array to control what is and is not shown in the generated PDF
  *
  * @var array
  */
-$html_config = array(
+$html_config = [
 	'settings' => $settings,
-	'meta'     => array(
+	'meta'     => [
 		'echo'                     => true, /* whether to output the HTML or return it */
 		'exclude'                  => true, /* whether we should exclude fields with a CSS value of 'exclude'. Default to true */
 		'empty'                    => $show_empty, /* whether to show empty fields or not. Default is false */
@@ -246,8 +298,8 @@ $html_config = array(
 		'html_field'               => $show_html, /* whether we should show the form's html fields. Default to false */
 		'individual_products'      => false, /* Whether to show individual fields in the entry. Default to false - they are grouped together at the end of the form */
 		'enable_css_ready_classes' => true, /* Whether to enable or disable Gravity Forms CSS Ready Class support in your PDF */
-	),
-);
+	],
+];
 
 /*
  * Generate our HTML markup

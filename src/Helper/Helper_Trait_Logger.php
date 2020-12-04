@@ -2,7 +2,6 @@
 
 namespace GFPDF\Helper;
 
-use GFPDF\Vendor\Monolog\Logger;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -31,16 +30,16 @@ trait Helper_Trait_Logger {
 	protected $logger;
 
 	/**
-	 * @param Logger $log
+	 * @param LoggerInterface $log
 	 *
 	 * @since 4.3
 	 */
-	public function set_logger( Logger $log ) {
+	public function set_logger( LoggerInterface $log ) {
 		$this->logger = $log;
 	}
 
 	/**
-	 * @return Logger
+	 * @return LoggerInterface
 	 *
 	 * @since 4.3
 	 */

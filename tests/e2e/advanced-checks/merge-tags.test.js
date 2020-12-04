@@ -1,33 +1,31 @@
-import { infoText, button, link } from '../page-model/helpers/field'
-import ConfirmationShortcodes from '../page-model/advanced-checks/confirmation-shortcode'
-import MergeTags from '../page-model/advanced-checks/merge-tags'
+import { infoText } from '../utilities/page-model/helpers/field'
+import AdvancedCheck from '../utilities/page-model/helpers/advanced-check'
 
-const cs = new ConfirmationShortcodes()
-const run = new MergeTags()
+const advancedCheck = new AdvancedCheck()
 
-fixture`Form Merge Tags Test`
+fixture`Form merge tags test`
 
 test('should check if form merge tags is working properly', async t => {
   // Actions
-  await cs.navigateConfirmationsSection('gf_edit_forms&view=settings&subview=confirmation&id=4')
+  await advancedCheck.navigateConfirmationSection('gf_edit_forms&view=settings&subview=confirmation&id=4')
   await t
-    .click(cs.confirmationText)
-    .click(button('Text'))
-    .click(cs.wsiwigEditor)
+    .click(advancedCheck.confirmationTextCheckbox)
+    .click(advancedCheck.wysiwgEditorTextTab)
+    .click(advancedCheck.wysiwgEditor)
     .pressKey('ctrl+a')
     .pressKey('backspace')
-  await run.pickMergeTag('Text')
-  await run.pickMergeTag('Name (First)')
-  await run.pickMergeTag('Name (Last)')
-  await run.pickMergeTag('Email')
+  await advancedCheck.pickMergeTag('Text')
+  await advancedCheck.pickMergeTag('Name (First)')
+  await advancedCheck.pickMergeTag('Name (Last)')
+  await advancedCheck.pickMergeTag('Email')
   await t
-    .click(cs.saveButton)
-    .click(link('#gf_form_toolbar', 'Preview'))
-    .typeText(run.textInputField, 'texttest', { paste: true })
-    .typeText(run.fNameInputField, 'firstnametest', { paste: true })
-    .typeText(run.lNameInputField, 'lastnametest', { paste: true })
-    .typeText(run.emailInputField, 'email@test.com', { paste: true })
-    .click(cs.submitButton)
+    .click(advancedCheck.saveConfirmationButton)
+    .click(advancedCheck.previewLink)
+    .typeText(advancedCheck.textInputField, 'texttest', { paste: true })
+    .typeText(advancedCheck.fNameInputField, 'firstnametest', { paste: true })
+    .typeText(advancedCheck.lNameInputField, 'lastnametest', { paste: true })
+    .typeText(advancedCheck.emailInputField, 'email@test.com', { paste: true })
+    .click(advancedCheck.submitButton)
 
   // Assertions
   await t

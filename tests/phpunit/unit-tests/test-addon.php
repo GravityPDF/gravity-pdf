@@ -7,9 +7,7 @@ use GFPDF\Helper\Helper_Interface_Extension_Settings;
 use GFPDF\Helper\Helper_Logger;
 use GFPDF\Helper\Helper_Notices;
 use GFPDF\Helper\Helper_Singleton;
-
 use GPDFAPI;
-
 use WP_UnitTestCase;
 
 /**
@@ -47,8 +45,6 @@ class Test_Addon extends WP_UnitTestCase {
 	 * @since 4.2
 	 */
 	public function setUp() {
-		global $gfpdf;
-
 		/* run parent method */
 		parent::setUp();
 
@@ -114,7 +110,7 @@ class Test_Addon extends WP_UnitTestCase {
 		$this->addon->init( [ $sub_addon ] );
 
 		$this->assertTrue( $sub_addon->run );
-		$this->assertEquals( 10, has_action( 'admin_init', [ $this->addon, 'plugin_updater' ] ) );
+		$this->assertEquals( 10, has_action( 'init', [ $this->addon, 'plugin_updater' ] ) );
 		$this->assertEquals( 10, has_action( 'admin_init', [ $this->addon, 'maybe_schedule_license_check' ] ) );
 		$this->assertEquals(
 			10,

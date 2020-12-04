@@ -2,14 +2,12 @@
 
 namespace GFPDF\Helper\Fields;
 
-use GFPDF\Helper\Helper_Abstract_Form;
-use GFPDF\Helper\Helper_Misc;
-use GFPDF\Helper\Helper_Abstract_Fields;
-
+use Exception;
 use GF_Field_Radio;
 use GFCommon;
-
-use Exception;
+use GFPDF\Helper\Helper_Abstract_Fields;
+use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Helper_Misc;
 
 /**
  * @package     Gravity PDF
@@ -32,11 +30,11 @@ class Field_Radio extends Helper_Abstract_Fields {
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
 	 *
-	 * @param object                             $field The GF_Field_* Object
-	 * @param array                              $entry The Gravity Forms Entry
+	 * @param object               $field The GF_Field_* Object
+	 * @param array                $entry The Gravity Forms Entry
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
-	 * @param \GFPDF\Helper\Helper_Misc          $misc
+	 * @param Helper_Abstract_Form $gform
+	 * @param Helper_Misc          $misc
 	 *
 	 * @throws Exception
 	 *
@@ -109,7 +107,7 @@ class Field_Radio extends Helper_Abstract_Fields {
 		$label = $this->get_label();
 		$data  = [];
 
-		/* Standadised Format */
+		/* Standardised Format */
 		$data['field'][ $this->field->id . '.' . $label ] = $value['value'];
 		$data['field'][ $this->field->id ]                = $value['value'];
 		$data['field'][ $label ]                          = $value['value'];

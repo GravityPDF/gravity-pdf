@@ -14,10 +14,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/** @var $args array */
+
 ?>
-
-<?php $this->tabs(); ?>
-
 
 <div id="pdfextended-settings">
 	<div class="wrap about-wrap">
@@ -101,18 +100,3 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	</div><!-- close wrap about-wrap -->
 </div><!-- close #pdfextended-settings -->
-
-<script type="text/template" id="GravityPDFSearchResultsDocumentation">
-	{{ if(collection.length === 0) { }}
-		<li><?php esc_html_e( "It doesn't look like there are any topics related to your issue.", 'gravity-forms-pdf-extended' ); ?></li>
-	{{ } else { }}
-		<li><h3><?php esc_html_e( 'Maybe one of these articles will help...', 'gravity-forms-pdf-extended' ); ?></h3></li>
-	{{ } }}
-
-	{{ _.each(collection, function (model) { }}
-		<li>
-			<a href="{{= model.link }}">{{= model.title.rendered }}</a>
-			<div class="except">{{= model.excerpt.rendered }}</div>
-		</li>
-	{{ }); }}
-</script>

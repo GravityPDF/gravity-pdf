@@ -55,7 +55,7 @@ class Field_V3_List extends Field_List {
 
 		<ul class="bulleted single-column-list">
 			<?php foreach ( $value as $item ) : ?>
-				<li><?php echo $item; ?></li>
+				<li><?= $item; ?></li>
 			<?php endforeach; ?>
 		</ul>
 		<?php

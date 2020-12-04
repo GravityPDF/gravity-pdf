@@ -19,6 +19,7 @@ export function apiGetFilesFromGitHub () {
     .get(GFPDF.pluginUrl + 'dist/payload/core-fonts.json')
     .accept('application/json')
     .type('json')
+    .parse(response => JSON.parse(response.text))
 }
 
 /**

@@ -3,11 +3,13 @@
 namespace GFPDF\Helper\Fields;
 
 use Exception;
+use GF_Field;
 use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Field_Container;
 use GFPDF\Helper\Helper_Misc;
 use GP_Field_Nested_Form;
+use GPDFAPI;
 
 /**
  * @package     Gravity PDF
@@ -30,11 +32,11 @@ class Field_Form extends Helper_Abstract_Fields {
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
 	 *
-	 * @param object                             $field The GF_Field_* Object
-	 * @param array                              $entry The Gravity Forms Entry
+	 * @param object               $field The GF_Field_* Object
+	 * @param array                $entry The Gravity Forms Entry
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
-	 * @param \GFPDF\Helper\Helper_Misc          $misc
+	 * @param Helper_Abstract_Form $gform
+	 * @param Helper_Misc          $misc
 	 *
 	 * @throws Exception
 	 *
@@ -58,6 +60,7 @@ class Field_Form extends Helper_Abstract_Fields {
 	 *
 	 * @return string
 	 *
+	 * @throws Exception
 	 * @since 5.1
 	 */
 	public function html( $value = '', $label = true ) {
@@ -92,6 +95,7 @@ class Field_Form extends Helper_Abstract_Fields {
 	 *
 	 * @return false|string
 	 *
+	 * @throws Exception
 	 * @since 5.1
 	 */
 	public function get_repeater_html( $form, $entry ) {
@@ -100,8 +104,8 @@ class Field_Form extends Helper_Abstract_Fields {
 		$container = new Helper_Field_Container( [ 'class_map' => [] ] );
 		$container = apply_filters( 'gfpdf_field_container_class', $container );
 
-		$pdf_model = \GPDFAPI::get_mvc_class( 'Model_PDF' );
-		$products  = new Field_Products( new \GF_Field(), $entry, $this->gform, $this->misc );
+		$pdf_model = GPDFAPI::get_mvc_class( 'Model_PDF' );
+		$products  = new Field_Products( new GF_Field(), $entry, $this->gform, $this->misc );
 
 		/* Loop through the Repeater fields */
 		foreach ( $form['fields'] as $field ) {

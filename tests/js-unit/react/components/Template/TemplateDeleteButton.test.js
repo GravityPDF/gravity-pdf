@@ -2,11 +2,11 @@ import React from 'react'
 import { shallow, mount } from 'enzyme'
 import { storeFactory, findByTestAttr } from '../../testUtils'
 import { MemoryRouter } from 'react-router-dom'
-import ConnectedTemplateDeleteButton, { TemplateDeleteButton } from '../../../../../src/assets/js/react/components/Template/TemplateDeleteButton'
-import { mapDispatchToProps } from '../../../../../src/assets/js/react/components/Template/TemplateDeleteButton'
+import ConnectedTemplateDeleteButton, {
+  TemplateDeleteButton, mapDispatchToProps
+} from '../../../../../src/assets/js/react/components/Template/TemplateDeleteButton'
 
 describe('Template - TemplateDeleteButton.js', () => {
-
   const historyMock = { push: jest.fn(), pathname: '/' }
   const templateProcessingMock = jest.fn()
   const onTemplateDeleteMock = jest.fn()
@@ -14,7 +14,6 @@ describe('Template - TemplateDeleteButton.js', () => {
   const clearTemplateProcessingMock = jest.fn()
 
   describe('Check for redux properties', () => {
-
     const setup = (state = {}) => {
       const store = storeFactory(state)
       const wrapper = mount(
@@ -61,7 +60,7 @@ describe('Template - TemplateDeleteButton.js', () => {
     })
   })
 
-  describe('Component functions', () => {
+  describe('Component methods', () => {
 
     const wrapper = shallow(
       <TemplateDeleteButton
@@ -95,7 +94,7 @@ describe('Template - TemplateDeleteButton.js', () => {
     })
   })
 
-  describe('Run Lifecycle methods', () => {
+  describe('Run lifecycle methods', () => {
 
     test('componentDidUpdate() - Fires appropriate action based on (success) Redux store data', () => {
       const props = { getTemplateProcessing: 'success' }
@@ -132,34 +131,36 @@ describe('Template - TemplateDeleteButton.js', () => {
     })
   })
 
-  let wrapper = shallow(<TemplateDeleteButton buttonText={'Delete'} />)
+  describe('Renders component', () => {
+    let wrapper = shallow(<TemplateDeleteButton buttonText={'Delete'} />)
 
-  test('renders <TemplateDeleteButton /> component', () => {
-    const component = findByTestAttr(wrapper, 'component-templateDeleteButton')
+    test('renders <TemplateDeleteButton /> component', () => {
+      const component = findByTestAttr(wrapper, 'component-templateDeleteButton')
 
-    expect(component.length).toBe(1)
-  })
+      expect(component.length).toBe(1)
+    })
 
-  test('display button text', () => {
-    expect(wrapper.find('a').text()).toBe('Delete')
-  })
+    test('display button text', () => {
+      expect(wrapper.find('a').text()).toBe('Delete')
+    })
 
-  test('check button click', () => {
-    window.confirm = jest.fn().mockImplementation(() => true)
-    wrapper = shallow(
-      <TemplateDeleteButton
-        template={{}}
-        templateProcessing={templateProcessingMock}
-        getTemplateProcessing='success'
-        history={historyMock}
-        onTemplateDelete={onTemplateDeleteMock}
-      />
-    )
-    const button = findByTestAttr(wrapper, 'component-templateDeleteButton')
-    button.simulate('click', { preventDefault() {}, stopPropagation() {} })
+    test('check button click', () => {
+      window.confirm = jest.fn().mockImplementation(() => true)
+      wrapper = shallow(
+        <TemplateDeleteButton
+          template={{}}
+          templateProcessing={templateProcessingMock}
+          getTemplateProcessing='success'
+          history={historyMock}
+          onTemplateDelete={onTemplateDeleteMock}
+        />
+      )
+      const button = findByTestAttr(wrapper, 'component-templateDeleteButton')
+      button.simulate('click', { preventDefault() {}, stopPropagation() {} })
 
-    expect(templateProcessingMock.mock.calls.length).toBe(1)
-    expect(historyMock.push.mock.calls.length).toBe(1)
-    expect(onTemplateDeleteMock.mock.calls.length).toBe(1)
+      expect(templateProcessingMock.mock.calls.length).toBe(1)
+      expect(historyMock.push.mock.calls.length).toBe(1)
+      expect(onTemplateDeleteMock.mock.calls.length).toBe(1)
+    })
   })
 })

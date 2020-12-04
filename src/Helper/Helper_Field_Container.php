@@ -154,7 +154,7 @@ class Helper_Field_Container {
 	/**
 	 * Handles the opening and closing of our container
 	 *
-	 * @param  GF_Field $field The Gravity Form field currently being processed
+	 * @param GF_Field $field The Gravity Form field currently being processed
 	 *
 	 * @return void
 	 *
@@ -178,7 +178,7 @@ class Helper_Field_Container {
 
 	/**
 	 * Close the current container if still open.
-	 * This is usually called publically after the form loop
+	 * This is usually called publicly after the form loop
 	 *
 	 * @return void
 	 *
@@ -193,7 +193,7 @@ class Helper_Field_Container {
 
 	/**
 	 * Will check if the current field will fit in the open row, or if a new row needs to be open
-	 * to accomidate the field.
+	 * to accommodate the field.
 	 *
 	 * @param GF_Field $field The Gravity Form field currently being processed
 	 *
@@ -237,7 +237,7 @@ class Helper_Field_Container {
 	/**
 	 * Open the container
 	 *
-	 * @param  GF_Field $field The Gravity Form field currently being processed
+	 * @param GF_Field $field The Gravity Form field currently being processed
 	 *
 	 * @return void
 	 *
@@ -252,7 +252,7 @@ class Helper_Field_Container {
 	/**
 	 * Determine if we should close a container based on its classes
 	 *
-	 * @param  GF_Field $field The Gravity Form field currently being processed
+	 * @param GF_Field $field The Gravity Form field currently being processed
 	 *
 	 * @return void
 	 *
@@ -271,7 +271,7 @@ class Helper_Field_Container {
 	/**
 	 * Process our skipped Gravity Form fields (close the container if needed)
 	 *
-	 * @param  GF_Field $field The Gravity Form field currently being processed
+	 * @param GF_Field $field The Gravity Form field currently being processed
 	 *
 	 * @return boolean true if we processed a skipped field, false otherwise
 	 *
@@ -292,7 +292,7 @@ class Helper_Field_Container {
 	/**
 	 * Remove any mapped classes from our skipped fields
 	 *
-	 * @param  GF_Field $field The Gravity Form field currently being processed
+	 * @param GF_Field $field The Gravity Form field currently being processed
 	 *
 	 * @return void
 	 *
@@ -367,7 +367,7 @@ class Helper_Field_Container {
 	/**
 	 * Loop through all classes and return our class map if found, or 100
 	 *
-	 * @param  String $classes The field classes
+	 * @param String $classes The field classes
 	 *
 	 * @return integer The field width based on assigned class
 	 *

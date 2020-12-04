@@ -1,7 +1,6 @@
 import $ from 'jquery'
 import { initialiseCommonElements } from './common/initialiseCommonElements'
 import { cleanupGFNavigation } from './global/cleanupGFNavigation'
-import { runPDFAccessCheck } from './global/runPDFAccessCheck'
 import { generalSettings } from './global/generalSettings'
 import { toolsSettings } from './global/toolsSettings'
 import { doFormSettingsListPage } from './form/doFormSettingsListPage'
@@ -37,7 +36,7 @@ class InitialiseSettings {
    */
   getCurrentSettingsPage () {
     if (pages.isSettings()) {
-      return $('.nav-tab-wrapper a.nav-tab-active:first').data('id')
+      return $('.gform-settings-tabs__navigation a.active:first').data('id')
     }
     return ''
   }
@@ -50,9 +49,6 @@ class InitialiseSettings {
   processSettings () {
     /* Ensure the Gravity Forms settings navigation (Form Settings / Notifications / Confirmation) has the 'tab' URI stripped from it */
     cleanupGFNavigation()
-
-    /* Run our direct PDF status check */
-    runPDFAccessCheck()
 
     /* Run the appropriate settings page */
     switch (this.getCurrentSettingsPage()) {

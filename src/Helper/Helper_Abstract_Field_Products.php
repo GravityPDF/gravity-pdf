@@ -2,12 +2,7 @@
 
 namespace GFPDF\Helper;
 
-use GFFormsModel;
-use GF_Field;
-use GFCache;
-use GFCommon;
-
-use Exception;
+use GFPDF\Helper\Fields\Field_Products;
 
 /**
  * @package     Gravity PDF
@@ -30,23 +25,23 @@ abstract class Helper_Abstract_Field_Products extends Helper_Abstract_Fields {
 	/**
 	 * Our products class which handles all Gravity Form products fields in bulk
 	 *
-	 * @var \GFPDF\Helper\Helper_Abstract_Fields
+	 * @var Field_Products
 	 */
 	protected $products;
 
 	/**
 	 * Store our products class for later user
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Fields $products
+	 * @param Field_Products $products
 	 *
 	 * @since 4.3
 	 */
-	public function set_products( Helper_Abstract_Fields $products ) {
+	public function set_products( Field_Products $products ) {
 		$this->products = $products;
 	}
 
 	/**
-	 * @return Helper_Abstract_Field_Products
+	 * @return Field_Products
 	 *
 	 * @since 4.3
 	 */
@@ -72,7 +67,7 @@ abstract class Helper_Abstract_Field_Products extends Helper_Abstract_Fields {
 		$label    = $this->get_label();
 		$field_id = (int) $this->field->id;
 
-		/* Backwards Compatible – Standadised Format */
+		/* Backwards Compatible – Standardised Format */
 		$data['field'][ $field_id . '.' . $label ] = $name;
 		$data['field'][ $field_id ]                = $name;
 		$data['field'][ $label ]                   = $name;

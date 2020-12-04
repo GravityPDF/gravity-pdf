@@ -14,51 +14,31 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/** @var $args array */
+
+GFCommon::display_admin_message();
+
 ?>
 
-<?php $this->tabs(); ?>
-
-
 <div id="pdfextended-settings">
-	<h3>
-		<span>
-			<i class="fa fa-cog"></i>
-			<?php esc_html_e( 'General Settings', 'gravity-forms-pdf-extended' ); ?>
-		</span>
-	</h3>
 
-	<form method="post" action="options.php">
+	<!-- Prevent Firefox auto-filling fields on refresh. @see https://stackoverflow.com/a/44504822/1614565 -->
+	<form name="gfpdf-settings-form-<?= rand() ?>" class="gform_settings_form" method="post" action="options.php">
 		<?php settings_fields( 'gfpdf_settings' ); ?>
 
-		<table id="pdf-general" class="form-table">
-			<?php do_settings_fields( 'gfpdf_settings_general', 'gfpdf_settings_general' ); ?>
-		</table>
+		<?= $args['menu'] ?>
+		<?= $args['content'] ?>
 
-		<div id="gfpdf-advanced-options">
-			<h3>
-				<span>
-					<i class="fa fa-lock"></i>
-					<?php esc_html_e( 'Security Settings', 'gravity-forms-pdf-extended' ); ?>
-				</span>
-			</h3>
+		<div id="submit-and-promo-container">
+			<?php if ( $args['edit_cap'] ): ?>
+				<input type="submit" name="submit" id="submit" value="<?= __( 'Save Settings  →', 'gravityforms' ) ?>" class="button primary large">
+			<?php endif; ?>
 
-			<table id="pdf-general-security" class="form-table">
-				<?php do_settings_fields( 'gfpdf_settings_general_security', 'gfpdf_settings_general_security' ); ?>
-			</table>
-		</div>
-
-		<div class="gfpdf-advanced-options"><a href="#"><?php esc_html_e( 'Show Advanced Options...', 'gravity-forms-pdf-extended' ); ?></a></div>
-
-		<?php
-		if ( $args['edit_cap'] ) {
-			submit_button();
-		}
-		?>
-
-		<div class="extensions-upsell">
-			<a href="https://gravitypdf.com/extension-shop/">
-				<?php esc_html_e( 'Want more features? Take a look at our Extension Shop.', 'gravity-forms-pdf-extended' ); ?>
-			</a>
+			<div class="extensions-upsell">
+				<a href="https://gravitypdf.com/store/">
+					<?php esc_html_e( 'Want more features? Take a look at our addons.', 'gravity-forms-pdf-extended' ); ?>
+				</a>
+			</div>
 		</div>
 	</form>
 

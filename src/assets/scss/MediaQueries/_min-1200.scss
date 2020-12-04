@@ -1,0 +1,48 @@
+@use '../base';
+
+/* 961px up to 1200px*/
+@media only screen and (min-width: 961px) and (max-width: 1200px) {
+  #tab_pdf, #tab_PDF {
+
+    /* Font manager modal */
+    #font-manager-overlay {
+      .font-manager {
+        #gfpdf-font-manager-container {
+
+          /* Add font */
+          .add-font-column {
+            .update-font {
+              left: -450px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* 1201px up */
+@media only screen and (min-width: 1201px) {
+  #tab_pdf, #tab_PDF {
+
+    #gfpdf-settings-field-wrapper-template-container,
+    #gfpdf-settings-field-wrapper-font-container {
+      display: flex;
+    }
+
+    /* Font manager modal */
+    #font-manager-overlay {
+      .font-manager {
+        #gfpdf-font-manager-container {
+
+          /* Add font */
+          .add-font-column {
+            .update-font {
+              left: -590px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

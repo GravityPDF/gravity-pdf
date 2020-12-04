@@ -14,10 +14,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/** @var $args array */
+
 ?>
-
-<?php $this->tabs(); ?>
-
 
 <div id="pdfextended-settings">
 	<h3>

@@ -14,9 +14,9 @@ import { toggleFontAppearance } from '../pdf/toggleFontAppearance'
  */
 export function setupDynamicTemplateFields () {
   /* Add change listener to our template */
-  $('#gfpdf_settings\\[template\\]').off('change').change(function () {
+  $('#gfpdf_settings\\[template\\]').off('change').on('change', function () {
     /* Add spinner */
-    const $spinner = spinner('gfpdf-spinner')
+    const $spinner = spinner('gfpdf-spinner-template')
 
     $(this).next().after($spinner)
 
@@ -52,10 +52,10 @@ export function setupDynamicTemplateFields () {
         })
 
         /* Replace the custom appearance with the AJAX response fields */
-        $('#pdf-custom-appearance').hide().html(response.fields).fadeIn()
-
-        /* Ensure our template nav item isn't hidden */
-        $('#gfpdf-custom-appearance-nav').show()
+        $('#gfpdf-fieldset-gfpdf_form_settings_template')
+          .show()
+          .find('.gform-settings-panel__content')
+          .html(response.fields)
 
         /* Load our new editors */
         loadTinyMCEEditor(response.editors, response.editor_init)
@@ -63,10 +63,13 @@ export function setupDynamicTemplateFields () {
         /* reinitialise new dom elements */
         initialiseCommonElements.runElements()
         doMergetags()
+        gform_initialize_tooltips()
       } else {
         /* Hide our template nav item as there are no fields and clear our the HTML */
-        $('#gfpdf-custom-appearance-nav').hide()
-        $('#pdf-custom-appearance').html('')
+        $('#gfpdf-fieldset-gfpdf_form_settings_template')
+          .hide()
+          .find('.gform-settings-panel__content')
+          .html('')
       }
 
       /* Check if we should hide or show our font fields */

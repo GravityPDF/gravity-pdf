@@ -2,16 +2,10 @@
 
 namespace GFPDF\Tests;
 
-use GFFormsModel;
-use GFAPI;
-use GFForms;
-use GFEntryDetail;
-use GFFormDisplay;
-use RGFormsModel;
 use GFCommon;
-
+use GFFormsModel;
 use PDF_Common;
-
+use RGFormsModel;
 use WP_UnitTestCase;
 use WP_User;
 
@@ -242,7 +236,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 
 		/* create user using WP Unit Factory functions */
 		$user_id = $this->factory->user->create();
-		$this->assertInternalType( 'integer', $user_id );
+		$this->assertIsInt( $user_id );
 
 		/*
 		 * Set up our users and test the privilages
@@ -252,7 +246,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 
 		/* Create second user we'll use to test out the privilage */
 		$user_id = $this->factory->user->create();
-		$this->assertInternalType( 'integer', $user_id );
+		$this->assertIsInt( $user_id );
 
 		/*
 		 * Add the user capability
@@ -266,7 +260,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 
 		/* Create third user we'll use to test out the privilage */
 		$user_id = $this->factory->user->create();
-		$this->assertInternalType( 'integer', $user_id );
+		$this->assertIsInt( $user_id );
 
 		/*
 		 * Add the user capability
@@ -307,7 +301,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 		 */
 		$this->assertEquals( 'Simple Form Testing', $form['title'] );
 		$this->assertEquals( true, is_array( $form['fields'] ) );
-		$this->assertEquals( 7, sizeof( $form['fields'] ) );
+		$this->assertEquals( 7, count( $form['fields'] ) );
 		$this->assertEquals( 1, $form['is_active'] );
 
 		/*
@@ -340,7 +334,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 
 				case 'select':
 				case 'multiselect':
-					$this->assertEquals( 3, sizeof( $field['choices'] ) );
+					$this->assertEquals( 3, count( $field['choices'] ) );
 					break;
 
 				case 'textarea':
@@ -352,7 +346,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 		/*
 		 * Run through the notifications
 		 */
-		$this->assertEquals( 2, sizeof( $form['notifications'] ) );
+		$this->assertEquals( 2, count( $form['notifications'] ) );
 
 		$form['notifications'] = array_values( $form['notifications'] );
 
@@ -391,7 +385,7 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 		];
 
 		foreach ( $valid_entries as $v ) {
-			$this->assertEquals( array_key_exists( $v, $entry ), true );
+			$this->assertEquals( true, array_key_exists( $v, $entry ) );
 		}
 
 		$this->assertEquals( 'My', $entry['1.3'] );
@@ -433,6 +427,9 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 	 * Test GF replace variables function (merge tags)
 	 * i.e GFCommon::replace_variables
 	 *
+	 * @param string $mergetag
+	 * @param string $value
+	 *
 	 * @since        3.6
 	 *
 	 * @dataProvider provider_mergetag_test
@@ -452,8 +449,8 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 			[ '{:1.6}', 'Jackson' ],
 			[ '{:5}', 'Third Choice' ],
 			[ '{:7}', 'This is paragraph test!' ],
-			[ '{date_dmy}', date( 'd/m/Y' ) ],
-			[ '{date_mdy}', date( 'm/d/Y' ) ],
+			[ '{date_dmy}', gmdate( 'd/m/Y' ) ],
+			[ '{date_mdy}', gmdate( 'm/d/Y' ) ],
 			[ '{form_title}', 'Simple Form Testing' ],
 		];
 	}

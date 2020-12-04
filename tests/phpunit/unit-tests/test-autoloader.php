@@ -14,7 +14,7 @@ use WP_UnitTestCase;
  */
 
 /**
- * Test the PSR-4 Autoloader Implimentation
+ * Test the PSR-4 Autoloader Implementation
  *
  * @since 4.0
  * @group autoloader
@@ -22,7 +22,9 @@ use WP_UnitTestCase;
 class Test_Autoloader extends WP_UnitTestCase {
 
 	/**
-	 * Ensure our auto initialiser is firing correctly
+	 * Ensure our auto initializer is firing correctly
+	 *
+	 * @param string $class
 	 *
 	 * @since        4.0
 	 *
@@ -48,7 +50,6 @@ class Test_Autoloader extends WP_UnitTestCase {
 			[ 'GFPDF\Controller\Controller_PDF' ],
 			[ 'GFPDF\Controller\Controller_Settings' ],
 			[ 'GFPDF\Controller\Controller_Shortcodes' ],
-			[ 'GFPDF\Controller\Controller_Welcome_Screen' ],
 
 			[ 'GFPDF\Helper\Helper_Abstract_Controller' ],
 			[ 'GFPDF\Helper\Helper_Abstract_Fields' ],
@@ -59,7 +60,6 @@ class Test_Autoloader extends WP_UnitTestCase {
 			[ 'GFPDF\Helper\Helper_Data' ],
 			[ 'GFPDF\Helper\Helper_Field_Container' ],
 			[ 'GFPDF\Helper\Helper_Form' ],
-			[ 'GFPDF\Helper\Helper_Migration' ],
 			[ 'GFPDF\Helper\Helper_Misc' ],
 			[ 'GFPDF\Helper\Helper_Notices' ],
 			[ 'GFPDF\Helper\Helper_Abstract_Options' ],
@@ -74,20 +74,19 @@ class Test_Autoloader extends WP_UnitTestCase {
 			[ 'GFPDF\Model\Model_PDF' ],
 			[ 'GFPDF\Model\Model_Settings' ],
 			[ 'GFPDF\Model\Model_Shortcodes' ],
-			[ 'GFPDF\Model\Model_Welcome_Screen' ],
 
 			[ 'GFPDF\View\View_Actions' ],
 			[ 'GFPDF\View\View_Form_Settings' ],
 			[ 'GFPDF\View\View_PDF' ],
 			[ 'GFPDF\View\View_Settings' ],
 			[ 'GFPDF\View\View_Shortcodes' ],
-			[ 'GFPDF\View\View_Welcome_Screen' ],
-
 		];
 	}
 
 	/**
-	 * Ensure our auto initialiser is firing correctly and loading any interfaces
+	 * Ensure our auto initializer is firing correctly and loading any interfaces
+	 *
+	 * @param string $class
 	 *
 	 * @since        4.0
 	 *
@@ -115,10 +114,12 @@ class Test_Autoloader extends WP_UnitTestCase {
 	/**
 	 * Check our composer files are loaded correctly
 	 *
+	 * @param string $class
+	 *
 	 * @since        4.0
-	 * @dataProvider provider_composer_dependancies
+	 * @dataProvider provider_composer_dependencies
 	 */
-	public function test_composer_dependancies( $class ) {
+	public function test_composer_dependencies( $class ) {
 		$this->assertTrue( class_exists( $class ) );
 	}
 
@@ -129,20 +130,13 @@ class Test_Autoloader extends WP_UnitTestCase {
 	 *
 	 * @since 4.0
 	 */
-	public function provider_composer_dependancies() {
+	public function provider_composer_dependencies() {
 		return [
-			[ 'Mpdf\Mpdf' ],
-			[ 'QueryPath' ],
-			[ 'GFPDF\Vendor\Monolog\Logger' ],
-			[ 'GFPDF\Vendor\Monolog\Processor\IntrospectionProcessor' ],
-			[ 'GFPDF\Vendor\Monolog\Processor\MemoryPeakUsageProcessor' ],
-			[ 'GFPDF\Vendor\Monolog\Handler\NullHandler' ],
-			[ 'GFPDF\Vendor\Monolog\Formatter\LineFormatter' ],
-			[ 'GFPDF\Vendor\Monolog\Handler\StreamHandler' ],
-			[ 'GFPDF\Vendor\Monolog\Formatter\LogglyFormatter' ],
-			[ 'GFPDF\Vendor\Monolog\Handler\LogglyHandler' ],
-			[ 'GFPDF\Vendor\Monolog\Handler\BufferHandler' ],
-			[ 'GFPDF\Vendor\Monolog\Processor\WebProcessor' ],
+			[ 'GFPDF_Vendor\Mpdf\Mpdf' ],
+			[ 'GFPDF_Vendor\Monolog\Logger' ],
+			[ 'GFPDF_Vendor\QueryPath' ],
+			[ 'GFPDF_Vendor\QueryPath' ],
+			[ 'GFPDF_Vendor\Upload\File' ],
 		];
 	}
 }

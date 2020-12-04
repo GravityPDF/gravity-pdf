@@ -2,12 +2,12 @@
 
 namespace GFPDF\Tests;
 
+use GFPDF\Model\Model_Settings;
 use GPDFAPI;
-
 use WP_UnitTestCase;
 
 /**
- * Test Gravity PDF Hlper Misc Functionality
+ * Test Gravity PDF Helper Misc Functionality
  *
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2020, Blue Liquid Designs
@@ -26,6 +26,9 @@ class Test_API extends WP_UnitTestCase {
 	/**
 	 * Check the correct class is returned
 	 *
+	 * @param string $expected
+	 * @param string $method
+	 *
 	 * @since        4.0
 	 *
 	 * @dataProvider provider_classes
@@ -41,7 +44,7 @@ class Test_API extends WP_UnitTestCase {
 	 */
 	public function provider_classes() {
 		return [
-			[ 'GFPDF\Vendor\Monolog\Logger', 'get_log_class' ],
+			[ 'GFPDF_Vendor\Monolog\Logger', 'get_log_class' ],
 			[ 'GFPDF\Helper\Helper_Notices', 'get_notice_class' ],
 			[ 'GFPDF\Helper\Helper_Data', 'get_data_class' ],
 			[ 'GFPDF\Helper\Helper_Options_Fields', 'get_options_class' ],
@@ -58,6 +61,33 @@ class Test_API extends WP_UnitTestCase {
 	 */
 	public function test_get_form_pdfs() {
 		$this->assertTrue( is_wp_error( GPDFAPI::get_form_pdfs( null ) ) );
+
+		$pdfs = GPDFAPI::get_form_pdfs( $GLOBALS['GFPDF_Test']->form['all-form-fields']['id'] );
+		$this->assertCount( 4, $pdfs );
+
+		$this->assertArrayHasKey( 'id', $pdfs['555ad84787d7e'] );
+		$this->assertArrayHasKey( 'filename', $pdfs['555ad84787d7e'] );
+		$this->assertArrayHasKey( 'template', $pdfs['555ad84787d7e'] );
+		$this->assertArrayHasKey( 'notification', $pdfs['555ad84787d7e'] );
+		$this->assertArrayHasKey( 'conditionalLogic', $pdfs['555ad84787d7e'] );
+	}
+
+	/**
+	 * Check we can get a form's PDF settings
+	 *
+	 * @since 6.0
+	 */
+	public function test_get_entry_pdfs() {
+		$this->assertTrue( is_wp_error( GPDFAPI::get_entry_pdfs( null ) ) );
+
+		$pdfs = GPDFAPI::get_entry_pdfs( $GLOBALS['GFPDF_Test']->entries['all-form-fields'][0]['id'] );
+		$this->assertCount( 2, $pdfs );
+
+		$this->assertArrayHasKey( 'id', $pdfs['fawf90c678523b'] );
+		$this->assertArrayHasKey( 'filename', $pdfs['fawf90c678523b'] );
+		$this->assertArrayHasKey( 'template', $pdfs['fawf90c678523b'] );
+		$this->assertArrayHasKey( 'notification', $pdfs['fawf90c678523b'] );
+		$this->assertArrayHasKey( 'conditionalLogic', $pdfs['fawf90c678523b'] );
 	}
 
 	/**
@@ -147,7 +177,7 @@ class Test_API extends WP_UnitTestCase {
 		GPDFAPI::delete_plugin_option( 'item1' );
 
 		/* Verify cleanup */
-		$this->assertSame( 0, sizeof( GPDFAPI::get_plugin_settings() ) );
+		$this->assertSame( 0, count( GPDFAPI::get_plugin_settings() ) );
 	}
 
 	/**
@@ -198,16 +228,15 @@ class Test_API extends WP_UnitTestCase {
 		$results = GPDFAPI::add_pdf_font( '' );
 
 		$this->assertTrue( is_wp_error( $results ) );
-		$this->assertEquals( 'invalid_font_name', $results->get_error_code() );
+		$this->assertEquals( 'font_validation_error', $results->get_error_code() );
 
 		$results = GPDFAPI::add_pdf_font( [ 'font_name' => 'Apple%' ] );
 
 		$this->assertTrue( is_wp_error( $results ) );
-		$this->assertEquals( 'invalid_font_name', $results->get_error_code() );
+		$this->assertEquals( 'font_validation_error', $results->get_error_code() );
 
 		/* Test we correctly install the font */
-		$ttf_file = PDF_TEMPLATE_LOCATION . 'test.ttf';
-		touch( $ttf_file );
+		$ttf_file = __DIR__ . '/fonts/Chewy.ttf';
 
 		$font = [
 			'font_name' => 'Test',
@@ -218,17 +247,24 @@ class Test_API extends WP_UnitTestCase {
 
 		$this->assertFalse( is_wp_error( $results ) );
 		$this->assertTrue( $results );
-		$this->assertFileExists( PDF_FONT_LOCATION . 'test.ttf' );
-		$this->assertNotNull( $settings->get_font_id_by_name( 'Test' ) );
-
-		/* Test we get an error for not having a unique font name */
-		$results = GPDFAPI::add_pdf_font( $font );
-		$this->assertTrue( is_wp_error( $results ) );
-		$this->assertEquals( 'font_name_not_unique', $results->get_error_code() );
+		$this->assertFileExists( PDF_FONT_LOCATION . 'Chewy.ttf' );
 
 		/* Clean up */
-		unlink( $ttf_file );
-		GPDFAPI::delete_pdf_font( 'Test' );
+		GPDFAPI::delete_pdf_font( 'test' );
+	}
+
+	public function test_add_pdf_font_duplicate() {
+		$ttf_file = __DIR__ . '/fonts/Chewy.ttf';
+
+		$font = [
+			'font_name' => 'Test',
+			'regular'   => $ttf_file,
+		];
+
+		$this->assertTrue( GPDFAPI::add_pdf_font( $font ) );
+		$this->assertTrue( GPDFAPI::add_pdf_font( $font ) );
+
+		$this->assertCount( 1, GPDFAPI::get_pdf_fonts()['User-Defined Fonts'] ?? [] );
 	}
 
 	/**
@@ -238,17 +274,17 @@ class Test_API extends WP_UnitTestCase {
 	 */
 	public function test_delete_pdf_font() {
 
+		/** @var Model_Settings $settings */
 		$settings = GPDFAPI::get_mvc_class( 'Model_Settings' );
 
 		/* Test font not installed */
 		$results = GPDFAPI::delete_pdf_font( '' );
 
 		$this->assertTrue( is_wp_error( $results ) );
-		$this->assertEquals( 'font_not_installed', $results->get_error_code() );
+		$this->assertEquals( 'invalid_font_id', $results->get_error_code() );
 
 		/* Add a font and then see if we can remove it */
-		$ttf_file = PDF_TEMPLATE_LOCATION . 'test.ttf';
-		touch( $ttf_file );
+		$ttf_file = __DIR__ . '/fonts/Chewy.ttf';
 
 		$font = [
 			'font_name' => 'Test',
@@ -259,14 +295,10 @@ class Test_API extends WP_UnitTestCase {
 		$this->assertFalse( is_wp_error( $results ) );
 
 		/* Now remove the newly added font and verify the results */
-		$results = GPDFAPI::delete_pdf_font( 'Test' );
+		$results = GPDFAPI::delete_pdf_font( 'test' );
 
 		$this->assertTrue( $results );
-		$this->assertFileNotExists( PDF_FONT_LOCATION . 'test.ttf' );
-		$this->assertNull( $settings->get_font_id_by_name( 'Test' ) );
-
-		/* Clean up */
-		unlink( $ttf_file );
+		$this->assertFileNotExists( PDF_FONT_LOCATION . 'Chewy.ttf' );
 	}
 
 	/**

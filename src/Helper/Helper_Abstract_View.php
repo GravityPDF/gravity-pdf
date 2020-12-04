@@ -32,7 +32,7 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 	protected $view_type = null;
 
 	/**
-	 * Enable a private data cache we can set and retrive information from
+	 * Enable a private data cache we can set and retrieve information from
 	 *
 	 * @var array
 	 *
@@ -55,8 +55,8 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 	 * Triggered when invoking inaccessible methods in an object context
 	 * Use it to load in our view
 	 *
-	 * @param  string $name      Template name to load
-	 * @param  array  $arguments Pass in additional parameters to the template view if needed
+	 * @param string $name      Template name to load
+	 * @param array  $arguments Pass in additional parameters to the template view if needed
 	 *
 	 * @return string
 	 *
@@ -88,9 +88,9 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 	/**
 	 * Load a view file based on the filename and type
 	 *
-	 * @param  string  $filename The filename to load
-	 * @param  array   $args     Variables to pass to the included file
-	 * @param  boolean $output   Whether to automatically display the included file or return it's output as a String
+	 * @param string  $filename The filename to load
+	 * @param array   $args     Variables to pass to the included file
+	 * @param boolean $output   Whether to automatically display the included file or return it's output as a String
 	 *
 	 * @return string|WP_Error           The loaded file, or WP_ERROR
 	 *
@@ -128,14 +128,14 @@ abstract class Helper_Abstract_View extends Helper_Abstract_Model {
 	/**
 	 * Store output of included file in a buffer and return
 	 *
-	 * @param  string $path File path to include
-	 * @param  array  $args Variables to pass to the included file
+	 * @param string $path File path to include
+	 * @param array  $args Variables to pass to the included file
 	 *
 	 * @return string       The contents of the included file
 	 *
 	 * @since 4.0
 	 */
-	final private function buffer( $path, $args = [] ) {
+	private function buffer( $path, $args = [] ) {
 		/*
 		 * for backwards compatibility extract the $args variable
 		 * phpcs:disable -- disable warning about `extract`

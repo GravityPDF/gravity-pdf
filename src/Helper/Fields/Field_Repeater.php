@@ -3,11 +3,14 @@
 namespace GFPDF\Helper\Fields;
 
 use Exception;
+use GF_Field;
 use GF_Field_Repeater;
+use GF_Fields;
 use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Field_Container;
 use GFPDF\Helper\Helper_Misc;
+use GPDFAPI;
 
 /**
  * @package     Gravity PDF
@@ -30,11 +33,11 @@ class Field_Repeater extends Helper_Abstract_Fields {
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
 	 *
-	 * @param object                             $field The GF_Field_* Object
-	 * @param array                              $entry The Gravity Forms Entry
+	 * @param object               $field The GF_Field_* Object
+	 * @param array                $entry The Gravity Forms Entry
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
-	 * @param \GFPDF\Helper\Helper_Misc          $misc
+	 * @param Helper_Abstract_Form $gform
+	 * @param Helper_Misc          $misc
 	 *
 	 * @throws Exception
 	 *
@@ -55,6 +58,7 @@ class Field_Repeater extends Helper_Abstract_Fields {
 	 *
 	 * @return array
 	 *
+	 * @throws Exception
 	 * @since 5.1
 	 */
 	public function form_data() {
@@ -77,11 +81,12 @@ class Field_Repeater extends Helper_Abstract_Fields {
 	 * @param array $field The current Repeater Field
 	 *
 	 * @return array
+	 * @throws Exception
 	 * @since 5.1
 	 */
 	public function get_repeater_form_data( $data, $value, $field ) {
-		$pdf_model = \GPDFAPI::get_mvc_class( 'Model_PDF' );
-		$products  = new Field_Products( new \GF_Field(), $this->entry, $this->gform, $this->misc );
+		$pdf_model = GPDFAPI::get_mvc_class( 'Model_PDF' );
+		$products  = new Field_Products( new GF_Field(), $this->entry, $this->gform, $this->misc );
 
 		foreach ( $value as $id => $item ) {
 			$item = $this->add_form_entry_ids( $item );
@@ -112,6 +117,7 @@ class Field_Repeater extends Helper_Abstract_Fields {
 	 *
 	 * @return string
 	 *
+	 * @throws Exception
 	 * @since 5.1
 	 */
 	public function html( $value = '', $label = true ) {
@@ -119,6 +125,7 @@ class Field_Repeater extends Helper_Abstract_Fields {
 
 		ob_start();
 		$this->get_repeater_html( $value, $this->field );
+
 		return ob_get_clean();
 	}
 
@@ -128,6 +135,7 @@ class Field_Repeater extends Helper_Abstract_Fields {
 	 * @param array $value The current Repeater entry data
 	 * @param array $field The current Repeater Field
 	 *
+	 * @throws Exception
 	 * @since 5.1
 	 */
 	public function get_repeater_html( $value, $field ) {
@@ -136,8 +144,8 @@ class Field_Repeater extends Helper_Abstract_Fields {
 		$container = new Helper_Field_Container();
 		$container = apply_filters( 'gfpdf_field_container_class', $container );
 
-		$pdf_model = \GPDFAPI::get_mvc_class( 'Model_PDF' );
-		$products  = new Field_Products( new \GF_Field(), $this->entry, $this->gform, $this->misc );
+		$pdf_model = GPDFAPI::get_mvc_class( 'Model_PDF' );
+		$products  = new Field_Products( new GF_Field(), $this->entry, $this->gform, $this->misc );
 
 		/* Output the Repeater Label if a sub Repeater */
 		if ( ! $is_top_level ) {
@@ -154,7 +162,7 @@ class Field_Repeater extends Helper_Abstract_Fields {
 
 			/* Loop through the Repeater fields */
 			foreach ( $field->fields as $sub_field ) {
-				$sub_field = \GF_Fields::create( $sub_field );
+				$sub_field = GF_Fields::create( $sub_field );
 
 				if ( $sub_field instanceof GF_Field_Repeater ) {
 

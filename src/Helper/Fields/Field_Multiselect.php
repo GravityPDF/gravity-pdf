@@ -2,14 +2,12 @@
 
 namespace GFPDF\Helper\Fields;
 
-use GFPDF\Helper\Helper_Abstract_Form;
-use GFPDF\Helper\Helper_Misc;
-use GFPDF\Helper\Helper_Abstract_Fields;
-
+use Exception;
 use GF_Field_MultiSelect;
 use GFCommon;
-
-use Exception;
+use GFPDF\Helper\Helper_Abstract_Fields;
+use GFPDF\Helper\Helper_Abstract_Form;
+use GFPDF\Helper\Helper_Misc;
 
 /**
  * @package     Gravity PDF
@@ -32,11 +30,11 @@ class Field_Multiselect extends Helper_Abstract_Fields {
 	/**
 	 * Check the appropriate variables are parsed in send to the parent construct
 	 *
-	 * @param object                             $field The GF_Field_* Object
-	 * @param array                              $entry The Gravity Forms Entry
+	 * @param object               $field The GF_Field_* Object
+	 * @param array                $entry The Gravity Forms Entry
 	 *
-	 * @param \GFPDF\Helper\Helper_Abstract_Form $gform
-	 * @param \GFPDF\Helper\Helper_Misc          $misc
+	 * @param Helper_Abstract_Form $gform
+	 * @param Helper_Misc          $misc
 	 *
 	 * @throws Exception
 	 *
@@ -66,7 +64,7 @@ class Field_Multiselect extends Helper_Abstract_Fields {
 		$data  = [];
 
 		/* Backwards compatibility support for v3 */
-		if ( 0 === sizeof( $value ) ) {
+		if ( 0 === count( $value ) ) {
 			$data['field'][ $this->field->id . '.' . $label ] = '';
 			$data['field'][ $this->field->id ]                = '';
 			$data['field'][ $label ]                          = '';
@@ -79,7 +77,7 @@ class Field_Multiselect extends Helper_Abstract_Fields {
 
 		foreach ( $value as $item ) {
 
-			/* Standadised Format */
+			/* Standardised Format */
 			$data['field'][ $this->field->id . '.' . $label ][] = $item['value'];
 			$data['field'][ $this->field->id ][]                = $item['value'];
 			$data['field'][ $label ][]                          = $item['value'];
@@ -109,7 +107,7 @@ class Field_Multiselect extends Helper_Abstract_Fields {
 		$value = apply_filters( 'gfpdf_show_field_value', false, $this->field, $items ); /* Set to `true` to show a field's value instead of the label */
 		$html  = '';
 
-		if ( sizeof( $items ) > 0 ) {
+		if ( count( $items ) > 0 ) {
 			$i    = 1;
 			$html = '<ul class="bulleted multiselect">';
 

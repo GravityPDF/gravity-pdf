@@ -2,11 +2,10 @@
 
 namespace GFPDF\Tests;
 
+use Exception;
 use GFPDF\Helper\Helper_Templates;
 use GPDFAPI;
-
 use WP_UnitTestCase;
-use Exception;
 
 /**
  * Test Gravity PDF Templates Helper class
@@ -28,7 +27,7 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 	 * Holds our Helper_Templates object
 	 * used to ease access to our PDF templates
 	 *
-	 * @var \GFPDF\Helper\Helper_Templates
+	 * @var Helper_Templates
 	 *
 	 * @since 4.1
 	 */
@@ -106,39 +105,39 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 		$templates = $this->templates->get_all_templates();
 
 		/* Test the standard templates */
-		$this->assertEquals( 4, sizeof( $templates ) );
+		$this->assertEquals( 4, count( $templates ) );
 
 		/* Test for additional templates in PDF working directory */
 		touch( $gfpdf->data->template_location . 'test.php' );
 		touch( $gfpdf->data->template_location . 'test2.php' );
 
 		$templates = $this->templates->get_all_templates();
-		$this->assertEquals( 6, sizeof( $templates ) );
+		$this->assertEquals( 6, count( $templates ) );
 
 		/* Test for override */
 		$templates = $this->templates->get_all_templates();
 		touch( $gfpdf->data->template_location . 'zadani.php' );
 
-		$this->assertEquals( 6, sizeof( $templates ) );
+		$this->assertEquals( 6, count( $templates ) );
 
 		/* Check that a configuration.php or configuration.archive.php file don't count */
 		touch( $gfpdf->data->template_location . 'configuration.php' );
 		touch( $gfpdf->data->template_location . 'configuration.archive.php' );
 
 		$templates = $this->templates->get_all_templates();
-		$this->assertEquals( 6, sizeof( $templates ) );
+		$this->assertEquals( 6, count( $templates ) );
 
 		/* Test for multisite templates */
 		if ( is_multisite() ) {
 			touch( $gfpdf->data->multisite_template_location . 'test3.php' );
 			$templates = $this->templates->get_all_templates();
-			$this->assertEquals( 7, sizeof( $templates ) );
+			$this->assertEquals( 7, count( $templates ) );
 
 			/* Check for override */
 			touch( $gfpdf->data->multisite_template_location . 'zadani.php' );
 
 			$templates = $this->templates->get_all_templates();
-			$this->assertEquals( 7, sizeof( $templates ) );
+			$this->assertEquals( 7, count( $templates ) );
 		}
 	}
 
@@ -151,7 +150,7 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 		$templates = $this->templates->get_all_templates_by_group();
 
 		$this->assertArrayHasKey( 'Core', $templates );
-		$this->assertSame( 4, sizeof( $templates['Core'] ) );
+		$this->assertSame( 4, count( $templates['Core'] ) );
 	}
 
 	/**
@@ -300,7 +299,7 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 			//do nothing
 		}
 
-		$this->assertEquals( 1, sizeof( $files ) );
+		$this->assertEquals( 1, count( $files ) );
 
 		/* Test for an exception */
 		unlink( $test_template );
@@ -386,7 +385,7 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 	 */
 	public function test_get_plugin_pdf_templates() {
 		$core_templates = $this->templates->get_core_pdf_templates();
-		$this->assertNotSame( 0, sizeof( $core_templates ) );
+		$this->assertNotSame( 0, count( $core_templates ) );
 		$this->assertNotSame( false, strpos( $core_templates[0], 'blank-slate.php' ) );
 	}
 
@@ -465,13 +464,13 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 
 		/* Get test entry and Gravity Forms settings */
 		$results   = $this->create_form_and_entries();
-		$model_pdf = \GPDFAPI::get_mvc_class( 'Model_PDF' );
-		$misc      = \GPDFAPI::get_misc_class();
-		$gform     = \GPDFAPI::get_form_class();
+		$model_pdf = GPDFAPI::get_mvc_class( 'Model_PDF' );
+		$misc      = GPDFAPI::get_misc_class();
+		$gform     = GPDFAPI::get_form_class();
 
 		$entry = $results['entry'];
 		$form  = $gform->get_form( $entry['form_id'] );
-		$pdf   = \GPDFAPI::get_pdf( $entry['form_id'], '556690c67856b' );
+		$pdf   = GPDFAPI::get_pdf( $entry['form_id'], '556690c67856b' );
 
 		/* Pass details on to our test method */
 		$data = $this->templates->get_template_arguments(
@@ -499,17 +498,20 @@ class Test_Templates_Helper extends WP_UnitTestCase {
 
 		/* Sniff that our keys have the correct details */
 		$this->assertEquals( $entry['form_id'], $data['form_id'] );
-		$this->assertEquals( $entry['id'], $data['lead_id'] );
-		$this->assertEquals( [ $entry['id'] ], $data['lead_ids'] );
-		$this->assertTrue( is_array( $data['form'] ) );
-		$this->assertTrue( is_array( $data['entry'] ) );
-		$this->assertTrue( is_array( $data['lead'] ) );
-		$this->assertTrue( is_array( $data['form_data'] ) );
-		$this->assertEquals( $data['entry'], $data['lead'] );
-		$this->assertEquals( $pdf, $data['settings'] );
-		$this->assertEquals( 'GFPDF\Router', get_class( $data['gfpdf'] ) );
-		$this->assertTrue( is_array( $data['fields'] ) );
-		$this->assertEquals( 'GF_Field_Checkbox', get_class( $data['fields'][47] ) );
-		$this->assertEquals( 'GFPDF\Templates\Config\Zadani', get_class( $data['config'] ) );
+		$this->assertSame( $entry['id'], $data['lead_id'] );
+		$this->assertSame( [ $entry['id'] ], $data['lead_ids'] );
+		$this->assertIsArray( $data['form'] );
+		$this->assertIsArray( $data['entry'] );
+		$this->assertIsArray( $data['lead'] );
+		$this->assertIsArray( $data['form_data'] );
+		$this->assertSame( $data['entry'], $data['lead'] );
+		$this->assertSame( $pdf, $data['settings'] );
+		$this->assertInstanceOf( 'GFPDF\Router', $data['gfpdf'] );
+		$this->assertIsArray( $data['fields'] );
+		$this->assertInstanceOf( 'GF_Field_Checkbox', $data['fields'][47] );
+		$this->assertInstanceOf( 'GFPDF\Templates\Config\Zadani', $data['config'] );
+
+		/* Check our config class has the settings populated */
+		$this->assertSame( $data['settings'], $data['config']->get_settings() );
 	}
 }

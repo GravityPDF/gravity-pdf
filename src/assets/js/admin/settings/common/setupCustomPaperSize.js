@@ -11,7 +11,7 @@ export function setupCustomPaperSize () {
     const $paperSize = $(this).find('select')
 
     /* Add our change event */
-    $paperSize.off('change').change(function () {
+    $paperSize.off('change').on('change', function () {
       if ($(this).val() === 'CUSTOM') {
         $customPaperSize.fadeIn()
       } else {

@@ -14,7 +14,7 @@ export function handlePDFConditionalLogic () {
   })
 
   /* Add change event to conditional logic field */
-  $('#gfpdf_conditional_logic').change(function () {
+  $('#gfpdf_conditional_logic').on('change', function () {
     /* Only set up a .conditionalLogic object if it doesn't exist */
     if (typeof window.gfpdf_current_pdf.conditionalLogic === 'undefined' && $(this).prop('checked')) {
       window.gfpdf_current_pdf.conditionalLogic = new ConditionalLogic()

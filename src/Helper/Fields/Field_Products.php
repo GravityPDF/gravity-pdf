@@ -2,9 +2,9 @@
 
 namespace GFPDF\Helper\Fields;
 
-use GFPDF\Helper\Helper_Abstract_Fields;
-
 use GFCommon;
+use GFPDF\Helper\Helper_Abstract_Fields;
+use GP_Ecommerce_Fields;
 
 /**
  * @package     Gravity PDF
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/* Include any dependancies */
+/* Include any dependencies */
 require_once( GFCommon::get_base_path() . '/currency.php' );
 
 /**
@@ -43,7 +43,7 @@ class Field_Products extends Helper_Abstract_Fields {
 		/* Get all products for this field */
 		$products = GFCommon::get_product_fields( $form, $lead, true );
 
-		if ( sizeof( $products['products'] ) > 0 ) {
+		if ( count( $products['products'] ) > 0 ) {
 			return false; /* not empty */
 		}
 
@@ -58,10 +58,7 @@ class Field_Products extends Helper_Abstract_Fields {
 	 * @since 4.0
 	 */
 	public function form_data() {
-
-		$data = $this->value();
-
-		return $data;
+		return $this->value();
 	}
 
 	/**
@@ -154,7 +151,7 @@ class Field_Products extends Helper_Abstract_Fields {
 							<tr>
 								<td>
 									<div class="product_name">
-										<?php echo $product['name']; ?>
+										<?= $product['name']; ?>
 									</div>
 
 									<?php
@@ -167,20 +164,20 @@ class Field_Products extends Helper_Abstract_Fields {
 											foreach ( $product['options'] as $option ) :
 												$price += $option['price'];
 												?>
-												<li><?php echo $option['option_label']; ?></li>
+												<li><?= $option['option_label']; ?></li>
 											<?php endforeach; ?>
 										</ul>
 									<?php endif; ?>
 								</td>
-								<td class="textcenter"><?php echo $product['quantity']; ?></td>
-								<td class="textright"><?php echo GFCommon::format_number( $price, 'currency', rgar( $this->entry, 'currency' ) ); ?></td>
-								<td class="textright"><?php echo $product['subtotal_formatted']; ?></td>
+								<td class="textcenter"><?= $product['quantity']; ?></td>
+								<td class="textright"><?= GFCommon::format_number( $price, 'currency', rgar( $this->entry, 'currency' ) ); ?></td>
+								<td class="textright"><?= $product['subtotal_formatted']; ?></td>
 							</tr>
 						<?php endforeach; ?>
 
 						<?php
 						if ( class_exists( 'GP_Ecommerce_Fields' ) ):
-							$gpecommerce     = \GP_Ecommerce_Fields::get_instance( null );
+							$gpecommerce     = GP_Ecommerce_Fields::get_instance( null );
 							$use_value       = (bool) apply_filters( 'gfpdf_show_field_value', false, $this->field, '' ); /* Set to `true` to show a field's value instead of the label */
 							$use_admin_label = (bool) apply_filters( 'gfpdf_use_admin_label', false, $this->field, '' ); /* Set to `true` to use the admin label */
 							$order           = GFCommon::get_product_fields( $this->form, $this->entry, ! $use_value, $use_admin_label );
@@ -191,34 +188,34 @@ class Field_Products extends Helper_Abstract_Fields {
 								foreach ( $group as $item ):
 									$class = rgar( $item, 'class' ) ? '.' . rgar( $item, 'class' ) : '';
 									?>
-									<tr style="<?php $gpecommerce->style( '.order-summary/tfoot/tr' . $class ); ?>">
-										<?php if ( $index === 0 ): ?>
-											<td class="emptycell"
-												colspan="2"
-												rowspan="<?php echo $gpecommerce->get_order_summary_item_count( $order_summary ); ?>"></td>
-										<?php endif; ?>
-										<td class="totals" style="<?php $gpecommerce->style( ".order-summary/tfoot/{$class}/td.column-3" ); ?>">
-											<?php echo $item['name']; ?>
-										</td>
+								<tr style="<?php $gpecommerce->style( '.order-summary/tfoot/tr' . $class ); ?>">
+									<?php if ( $index === 0 ): ?>
+										<td class="emptycell"
+											colspan="2"
+											rowspan="<?= $gpecommerce->get_order_summary_item_count( $order_summary ); ?>"></td>
+									<?php endif; ?>
+									<td class="totals" style="<?php $gpecommerce->style( ".order-summary/tfoot/{$class}/td.column-3" ); ?>">
+										<?= $item['name']; ?>
+									</td>
 
-										<td class="totals" style="<?php $gpecommerce->style( ".order-summary/tfoot/{$class}/td.column-4" ); ?>">
-											<?php echo GFCommon::to_money( $item['price'], $this->entry['currency'] ); ?>
-										</td>
-									</tr>
+									<td class="totals" style="<?php $gpecommerce->style( ".order-summary/tfoot/{$class}/td.column-4" ); ?>">
+										<?= GFCommon::to_money( $item['price'], $this->entry['currency'] ); ?>
+									</td>
+								</tr>
 								<?php endforeach; ?>
-							<?php endforeach; ?>
+						<?php endforeach; ?>
 						<?php else : ?>
 							<?php if ( ! empty( $products['products_totals']['shipping_name'] ) ) : ?>
 								<tr>
 									<td rowspan="3" class="emptycell"></td>
 									<td colspan="2"
 										class="subtotal totals"><?php esc_html_e( 'Subtotal', 'gravity-forms-pdf-extended' ); ?></td>
-									<td class="subtotal_amount totals"><?php echo $products['products_totals']['subtotal_formatted']; ?></td>
+									<td class="subtotal_amount totals"><?= $products['products_totals']['subtotal_formatted']; ?></td>
 								</tr>
 								<tr>
 									<td colspan="2"
-										class="shipping totals"><?php echo sprintf( esc_html__( 'Shipping (%s)', 'gravity-forms-pdf-extended' ), $products['products_totals']['shipping_name'] ); ?></td>
-									<td class="shipping_amount totals"><?php echo $products['products_totals']['shipping_formatted']; ?></td>
+										class="shipping totals"><?= sprintf( esc_html__( 'Shipping (%s)', 'gravity-forms-pdf-extended' ), $products['products_totals']['shipping_name'] ); ?></td>
+									<td class="shipping_amount totals"><?= $products['products_totals']['shipping_formatted']; ?></td>
 								</tr>
 							<?php endif; ?>
 
@@ -229,7 +226,7 @@ class Field_Products extends Helper_Abstract_Fields {
 
 								<td colspan="2"
 									class="grandtotal totals"><?php esc_html_e( 'Total', 'gravityforms' ); ?></td>
-								<td class="grandtotal_amount totals"><?php echo $products['products_totals']['total_formatted']; ?></td>
+								<td class="grandtotal_amount totals"><?= $products['products_totals']['total_formatted']; ?></td>
 							</tr>
 
 						<?php endif; ?>
@@ -268,12 +265,12 @@ class Field_Products extends Helper_Abstract_Fields {
 		$use_admin_label = (bool) apply_filters( 'gfpdf_use_admin_label', false, $this->field, '' ); /* Set to `true` to use the admin label */
 		$products        = GFCommon::get_product_fields( $form, $lead, ! $use_value, $use_admin_label );
 
-		/* Set up the appropriate varaibles needed for our product processing */
+		/* Set up the appropriate variables needed for our product processing */
 		$form_array  = []; /* holds the actual product data */
 		$order_total = 0; /* holds the total cost of the order */
 
 		/* check that there are actual product fields to process */
-		if ( sizeof( $products['products'] ) > 0 ) {
+		if ( count( $products['products'] ) > 0 ) {
 
 			foreach ( $products['products'] as $id => $product ) {
 

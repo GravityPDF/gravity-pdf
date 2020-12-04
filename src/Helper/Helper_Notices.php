@@ -2,6 +2,9 @@
 
 namespace GFPDF\Helper;
 
+use GFCommon;
+use GFForms;
+
 /**
  * @package     Gravity PDF
  * @copyright   Copyright (c) 2020, Blue Liquid Designs
@@ -41,9 +44,9 @@ class Helper_Notices implements Helper_Interface_Actions {
 	/**
 	 * Initialise our class defaults
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function init() {
 		$this->add_actions();
@@ -52,9 +55,9 @@ class Helper_Notices implements Helper_Interface_Actions {
 	/**
 	 * Apply any actions needed to implement notices
 	 *
+	 * @return void
 	 * @since 4.0
 	 *
-	 * @return void
 	 */
 	public function add_actions() {
 		add_action( $this->get_notice_type(), [ $this, 'process' ] );
@@ -87,6 +90,12 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 */
 	public function add_notice( $notice, $class = '' ) {
 
+		if ( GFForms::is_gravity_page() ) {
+			GFCommon::add_message( $notice );
+
+			return;
+		}
+
 		if ( empty( $class ) ) {
 			$this->notices[] = $notice;
 		} else {
@@ -106,6 +115,12 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 */
 	public function add_error( $error, $class = '' ) {
 
+		if ( GFForms::is_gravity_page() ) {
+			GFCommon::add_error_message( $error );
+
+			return;
+		}
+
 		if ( empty( $class ) ) {
 			$this->errors[] = $error;
 		} else {
@@ -121,7 +136,7 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 * @since 4.0
 	 */
 	public function has_notice() {
-		if ( sizeof( $this->notices ) > 0 ) {
+		if ( count( $this->notices ) > 0 ) {
 			return true;
 		}
 
@@ -136,7 +151,7 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 * @since 4.0
 	 */
 	public function has_error() {
-		if ( sizeof( $this->errors ) > 0 ) {
+		if ( count( $this->errors ) > 0 ) {
 			return true;
 		}
 
@@ -146,7 +161,7 @@ class Helper_Notices implements Helper_Interface_Actions {
 	/**
 	 * Remove all notices / errors
 	 *
-	 * @param  string $type Switch to remove all messages, errors or just notices. Valid arguments are 'all', 'notices', 'errors'
+	 * @param string $type Switch to remove all messages, errors or just notices. Valid arguments are 'all', 'notices', 'errors'
 	 *
 	 * @since 4.0
 	 */
@@ -183,8 +198,8 @@ class Helper_Notices implements Helper_Interface_Actions {
 	/**
 	 * Generate the HTML used to display the notice / error
 	 *
-	 * @param  string $text  The message to be displayed
-	 * @param  string $class The class name (updated / error)
+	 * @param string $text  The message to be displayed
+	 * @param string $class The class name (updated / error)
 	 *
 	 * @return void
 	 *
@@ -192,8 +207,8 @@ class Helper_Notices implements Helper_Interface_Actions {
 	 */
 	private function html( $text, $class = 'updated' ) {
 		?>
-		<div class="<?php echo $class; ?> notice">
-			<p><?php echo $text; ?></p>
+		<div class="<?= $class; ?> notice">
+			<p><?= $text; ?></p>
 		</div>
 		<?php
 	}

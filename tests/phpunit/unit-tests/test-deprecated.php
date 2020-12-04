@@ -2,9 +2,8 @@
 
 namespace GFPDF\Tests;
 
-use PDFRender;
 use PDF_Common;
-
+use PDFRender;
 use WP_UnitTestCase;
 
 /**
@@ -110,7 +109,7 @@ class Test_Deprecated extends WP_UnitTestCase {
 		unset( $GLOBALS['lead_ids'] );
 
 		$render  = new PDFRender();
-		$form_id = $render->prepare_ids( 'fid', '', '', '', '', '', '', [ 'lead_ids' => 'lead IDs' ] );
+		$form_id = $render->prepare_ids( 'fid', '', '', '', '', '', [], [ 'lead_ids' => 'lead IDs' ] );
 
 		$this->assertEquals( 'fid', $form_id );
 		$this->assertEquals( 'lead IDs', $GLOBALS['lead_ids'] );

@@ -1,22 +1,13 @@
 import React from 'react'
-import { shallow, mount } from 'enzyme'
-import { Provider } from 'react-redux'
+import { shallow } from 'enzyme'
 import { storeFactory, findByTestAttr } from '../../testUtils'
-import { MemoryRouter } from 'react-router-dom'
-import configureMockStore from 'redux-mock-store'
 import ConnectedTemplateSingle, { TemplateSingle } from '../../../../../src/assets/js/react/components/Template/TemplateSingle'
 
 describe('Template - TemplateSingle.js', () => {
 
-  let wrapper
-  let component
-  let props
-
-  describe('Check for redux properties', () => {
+  describe('CHECK FOR REDUX PROPERTIES', () => {
     const setup = (state = {}) => {
-
-      props = { match: { params: { id: 'rubix' } } }
-
+      const props = { match: { params: { id: 'rubix' } } }
       const store = storeFactory(state)
       const wrapper = shallow(<ConnectedTemplateSingle store={store} {...props} />).dive().dive()
 
@@ -26,7 +17,7 @@ describe('Template - TemplateSingle.js', () => {
     setup()
 
     test('has access to `list` state', () => {
-      wrapper = setup()
+      const wrapper = setup()
       const listProp = wrapper.instance().props.templates
 
       expect(listProp).toBeInstanceOf(Array)
@@ -34,125 +25,142 @@ describe('Template - TemplateSingle.js', () => {
 
     test('has access to `activeTemplate` state', () => {
       const templates = [
-        { id: 'zadani', compatible: true },
-        { id: 'rubix', compatible: true },
-        { id: 'focus-gravity', compatible: true }
-       ]
-      wrapper = setup({ template: { list: templates, activeTemplate: 'focus-gravity' } })
+        {
+          id: 'zadani',
+          compatible: true
+        },
+        {
+          id: 'rubix',
+          compatible: true
+        },
+        {
+          id: 'focus-gravity',
+          compatible: true
+        }
+      ]
+      const wrapper = setup({
+        template: {
+          list: templates,
+          activeTemplate: 'focus-gravity'
+        }
+      })
       const activeTemplateProp = wrapper.instance().props.activeTemplate
 
       expect(activeTemplateProp).toBe('focus-gravity')
     })
   })
 
-  describe('Run Lifecycle methods', () => {
-
+  describe('RUN LIFECYCLE METHODS', () => {
     test('shouldComponentUpdate() - Ensure the component doesn\'t try and re-render when a template isn\'t found', () => {
-      props = { template: { template: 'Rubix' } }
+      const props = { template: { template: 'Rubix' } }
       let nextProps
       let shouldComponentUpdate
 
-      nextProps = {
-        template: null
-      }
-
-      wrapper = shallow(<TemplateSingle {...props} />)
+      nextProps = { template: null }
+      const wrapper = shallow(<TemplateSingle {...props} />)
       shouldComponentUpdate = wrapper.instance().shouldComponentUpdate(nextProps)
 
       expect(shouldComponentUpdate).toBe(false)
 
-      nextProps = {
-        template: 'rubix'
-      }
-
+      nextProps = { template: 'rubix' }
       shouldComponentUpdate = wrapper.instance().shouldComponentUpdate(nextProps)
 
       expect(shouldComponentUpdate).toBe(true)
     })
   })
 
-  describe('<TemplateHeaderNavigation /> and <TemplateFooterActions /> components', () => {
-
-    const setup = () => {
-      const mockStore = configureMockStore()
-      const store = mockStore({})
-
-      props = {
-        templates: [{ id: 3, template: 'Rubix' }],
-        template: { id: 3, template: 'Rubix', path: '/rubix',  },
-        templateIndex: 3
+  describe('RENDERS COMPONENT', () => {
+    describe('<TemplateHeaderNavigation /> and <TemplateFooterActions /> components', () => {
+      const props = {
+        template: {
+          id: 3,
+          template: 'Rubix',
+          path: '/rubix'
+        }
       }
+      const wrapper = shallow(<TemplateSingle {...props} />).dive()
 
-      wrapper = mount(
-        <Provider store={store} >
-          <MemoryRouter>
-            <TemplateSingle {...props} />
-          </MemoryRouter>
-        </Provider>
+      test('renders <TemplateHeaderNavigation /> component', () => {
+        expect(wrapper.find('withRouter(Connect(TemplateHeaderNavigation))').length).toBe(1)
+      })
+
+      test('renders <TemplateFooterActions /> component', () => {
+        expect(wrapper.find('TemplateFooterActions').length).toBe(1)
+      })
+    })
+
+    // Mock props
+    const props = { template: { template: 'Rubix' } }
+
+    test('render <TemplateSingle /> component', () => {
+      const wrapper = shallow(<TemplateSingle {...props} />)
+      const component = findByTestAttr(wrapper, 'component-templateSingle')
+
+      expect(component.length).toBe(1)
+    })
+
+    test('render <TemplateScreenshots /> component', () => {
+      const wrapper = shallow(<TemplateSingle {...props} />)
+
+      expect(wrapper.find('TemplateScreenshots').length).toBe(1)
+    })
+
+    test('render <CurrentTemplate /> component', () => {
+      const wrapper = shallow(<TemplateSingle {...props} />)
+
+      expect(wrapper.find('CurrentTemplate').length).toBe(1)
+    })
+
+    test('render <Name /> component', () => {
+      const wrapper = shallow(<TemplateSingle {...props} />)
+
+      expect(wrapper.find('Name').length).toBe(1)
+    })
+
+    test('render <Author /> component', () => {
+      const wrapper = shallow(<TemplateSingle {...props} />)
+
+      expect(wrapper.find('Author').length).toBe(1)
+    })
+
+    test('render <Group /> component', () => {
+      const wrapper = shallow(<TemplateSingle {...props} />)
+
+      expect(wrapper.find('Group').length).toBe(1)
+    })
+
+    test('render <ShowMessage /> component if long_message is found', () => {
+      const wrapper = shallow(
+        <TemplateSingle template={{
+          template: 'Rubix',
+          long_message: 'text'
+        }} />
       )
+      const component = findByTestAttr(wrapper, 'component-showMessageLong_message')
 
-      return wrapper
-    }
-
-    component = setup()
-
-    test('renders <TemplateHeaderNavigation /> component', () => {
-      expect(component.find('TemplateHeaderNavigation').length).toBe(1)
+      expect(component.length).toBe(1)
     })
 
-    test('renders <TemplateFooterActions /> component', () => {
-      expect(component.find('TemplateFooterActions').length).toBe(1)
+    test('render <ShowMessage /> component if long_error is found', () => {
+      const wrapper = shallow(<TemplateSingle template={{
+        template: 'Rubix',
+        long_error: 'text'
+      }} />)
+      const component = findByTestAttr(wrapper, 'component-showMessageLong_error')
+
+      expect(component.length).toBe(1)
     })
-  })
 
-  props = { template: { template: 'Rubix' } }
-  wrapper = shallow(<TemplateSingle {...props} />)
+    test('render <Description /> component', () => {
+      const wrapper = shallow(<TemplateSingle {...props} />)
 
-  test('renders <TemplateSingle /> component', () => {
-    component = findByTestAttr(wrapper, 'component-templateSingle')
+      expect(wrapper.find('Description').length).toBe(1)
+    })
 
-    expect(component.length).toBe(1)
-  })
+    test('render <Tags /> component', () => {
+      const wrapper = shallow(<TemplateSingle {...props} />)
 
-  test('renders <TemplateScreenshots /> component', () => {
-    expect(wrapper.find('TemplateScreenshots').length).toBe(1)
-  })
-
-  test('renders <CurrentTemplate /> component', () => {
-    expect(wrapper.find('CurrentTemplate').length).toBe(1)
-  })
-
-  test('renders <Name /> component', () => {
-    expect(wrapper.find('Name').length).toBe(1)
-  })
-
-  test('renders <Author /> component', () => {
-    expect(wrapper.find('Author').length).toBe(1)
-  })
-
-  test('renders <Group /> component', () => {
-    expect(wrapper.find('Group').length).toBe(1)
-  })
-
-  test('renders <ShowMessage /> component if long_message is found', () => {
-    wrapper = shallow(<TemplateSingle template={{ template: 'Rubix', long_message: 'text' }} />)
-    component = findByTestAttr(wrapper, 'component-showMessageLong_message')
-
-    expect(component.length).toBe(1)
-  })
-
-  test('renders <ShowMessage /> component if long_error is found', () => {
-    wrapper = shallow(<TemplateSingle template={{ template: 'Rubix', long_error: 'text' }} />)
-    component = findByTestAttr(wrapper, 'component-showMessageLong_error')
-
-    expect(component.length).toBe(1)
-  })
-
-  test('renders <Description /> component', () => {
-    expect(wrapper.find('Description').length).toBe(1)
-  })
-
-  test('renders <Tags /> component', () => {
-    expect(wrapper.find('Tags').length).toBe(1)
+      expect(wrapper.find('Tags').length).toBe(1)
+    })
   })
 })

@@ -2,15 +2,14 @@
 
 namespace GFPDF\Tests;
 
+use GFPDF\Controller\Controller_Settings;
 use GFPDF\Helper\Helper_Abstract_Controller;
 use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_View;
-use GFPDF\Controller\Controller_Settings;
 use GFPDF\Model\Model_Settings;
 use GFPDF\View\View_Settings;
-
-
 use WP_UnitTestCase;
+
 
 /**
  * Test Gravity PDF MVC Abstraction classes
@@ -31,7 +30,7 @@ class Test_MVC_Abstracts extends WP_UnitTestCase {
 	/**
 	 * Our Gravity PDF controller object
 	 *
-	 * @var \GFPDF\Controller\Controller_Settings
+	 * @var Controller_Settings
 	 *
 	 * @since 4.0
 	 */
@@ -40,7 +39,7 @@ class Test_MVC_Abstracts extends WP_UnitTestCase {
 	/**
 	 * Our Gravity PDF model object
 	 *
-	 * @var \GFPDF\Model\Model_Settings
+	 * @var Model_Settings
 	 *
 	 * @since 4.0
 	 */
@@ -49,7 +48,7 @@ class Test_MVC_Abstracts extends WP_UnitTestCase {
 	/**
 	 * Our Gravity PDF view object
 	 *
-	 * @var \GFPDF\View\View_Settings
+	 * @var View_Settings
 	 *
 	 * @since 4.0
 	 */
@@ -69,7 +68,7 @@ class Test_MVC_Abstracts extends WP_UnitTestCase {
 		/* Setup out loader class */
 		$this->model      = new Model_Settings( $gfpdf->gform, $gfpdf->log, $gfpdf->notices, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
 		$this->view       = new View_Settings( [], $gfpdf->gform, $gfpdf->log, $gfpdf->options, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
-		$this->controller = new Controller_Settings( $this->model, $this->view, $gfpdf->gform, $gfpdf->log, $gfpdf->notices, $gfpdf->data, $gfpdf->misc, $gfpdf->templates );
+		$this->controller = new Controller_Settings( $this->model, $this->view, $gfpdf->gform, $gfpdf->log, $gfpdf->notices, $gfpdf->data, $gfpdf->misc );
 	}
 
 	/**
@@ -114,13 +113,7 @@ class Test_MVC_Abstracts extends WP_UnitTestCase {
 		/*
 		 * Test our load function produces the correct output
 		 */
-		ob_start();
-		$results = $this->view->uninstaller( [] );
-		$string  = ob_get_clean();
-
-		/* check results are accurate */
-		$this->assertTrue( $results );
-		$this->assertNotEmpty( $string );
+		$this->assertNotEmpty( $this->view->tabs() );
 
 		/* check for error */
 		$error = $this->view->load_none_existant_file( [] );

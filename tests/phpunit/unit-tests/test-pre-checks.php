@@ -2,10 +2,8 @@
 
 namespace GFPDF\Tests;
 
-use GFPDF_Major_Compatibility_Checks;
-
 use GFCommon;
-
+use GFPDF_Major_Compatibility_Checks;
 use WP_UnitTestCase;
 
 /**
@@ -18,7 +16,7 @@ use WP_UnitTestCase;
  */
 
 /**
- * Test the initial bootup plugin phase
+ * Test the initial boot-up plugin phase
  *
  * @since 4.0
  * @group pre-checks
@@ -28,7 +26,7 @@ class Test_Pre_Checks extends WP_UnitTestCase {
 	/**
 	 * Our Gravity PDF object used in tests
 	 *
-	 * @var \GFPDF_Major_Compatibility_Checks
+	 * @var GFPDF_Major_Compatibility_Checks
 	 *
 	 * @since 4.0
 	 */
@@ -65,7 +63,7 @@ class Test_Pre_Checks extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Ensure our auto initialiser is firing correctly
+	 * Ensure our auto initializer is firing correctly
 	 *
 	 * @since 4.0
 	 */
@@ -76,6 +74,10 @@ class Test_Pre_Checks extends WP_UnitTestCase {
 
 	/**
 	 * Test our min WordPress version is working correctly
+	 *
+	 * @param string $min_version
+	 * @param string $test_wp_version
+	 * @param bool $expected
 	 *
 	 * @since        4.0
 	 *
@@ -94,6 +96,10 @@ class Test_Pre_Checks extends WP_UnitTestCase {
 	/**
 	 * Test our min Gravity Forms version is working correctly
 	 *
+	 * @param string $min_version
+	 * @param string $test_gf_version
+	 * @param bool $expected
+	 *
 	 * @since        4.0
 	 *
 	 * @dataProvider provider_version
@@ -110,6 +116,9 @@ class Test_Pre_Checks extends WP_UnitTestCase {
 	/**
 	 * Ensure we are getting the correct memory (in bytes) based on the PHP ini setting
 	 *
+	 * @param string $memory
+	 * @param string $bytes
+	 *
 	 * @since        4.0
 	 *
 	 * @dataProvider provider_memory
@@ -120,6 +129,9 @@ class Test_Pre_Checks extends WP_UnitTestCase {
 
 	/**
 	 * Ensure we are getting the correct memory (in mb) based on the PHP ini setting
+	 *
+	 * @param string $memory
+	 * @param string $bytes
 	 *
 	 * @since        4.0
 	 *
@@ -132,6 +144,9 @@ class Test_Pre_Checks extends WP_UnitTestCase {
 
 	/**
 	 * Check if we meet the minimum RAM requirements
+	 *
+	 * @param string $memory
+	 * @param bool $expected
 	 *
 	 * @since        4.0
 	 *

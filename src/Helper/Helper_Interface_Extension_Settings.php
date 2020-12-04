@@ -21,14 +21,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 interface Helper_Interface_Extension_Settings {
 
 	/**
-	 * Return an array of fields that should be registered in the addon. See Helper_OPtions_Fields for examples of
+	 * Return an array of fields that should be registered in the addon. See Helper_Options_Fields for examples of
 	 * defining fields
 	 *
 	 * @Internal All fields should be prefixed with the add-on slug.
 	 *
-	 * @since 4.2
-	 *
 	 * @return array
+	 * @since    4.2
+	 *
 	 */
 	public function get_global_addon_fields();
 }

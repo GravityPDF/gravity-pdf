@@ -1,0 +1,51 @@
+@use '../base';
+
+/* 960px and below */
+@media only screen and (max-width: 960px) {
+  #tab_pdf, #tab_PDF {
+
+    /* Font manager modal */
+    #font-manager-overlay {
+      .font-manager {
+        #gfpdf-font-manager-container {
+          display: flex;
+          flex-direction: column;
+
+          /* Font list */
+          .font-list-column {
+            .font-list {
+              width: 85%;
+            }
+          }
+
+          /* Add font */
+          .add-font-column {
+            .update-font {
+              left: -800px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* 961px and up */
+@media only screen and (min-width: 961px) {
+  #tab_pdf, #tab_PDF {
+
+    /* Help tab section */
+    .about-wrap {
+      #dashboard-widgets {
+        .postbox-container {
+          width: 49.5%;
+
+          a {
+            margin-right: 30px;
+            min-height: 245px;
+          }
+        }
+      }
+    }
+  }
+}

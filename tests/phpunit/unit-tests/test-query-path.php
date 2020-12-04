@@ -27,7 +27,7 @@ class Test_QueryPath extends WP_UnitTestCase {
 	 */
 	public function test_QueryPath() {
 		$qp = new Helper_QueryPath();
-		$this->assertEquals( 'QueryPath\DOMQuery', get_class( $qp->html5( '<div>Test</div>' ) ) );
+		$this->assertEquals( 'GFPDF_Vendor\QueryPath\DOMQuery', get_class( $qp->html5( '<div>Test</div>' ) ) );
 	}
 
 	public function test_utf8() {
@@ -38,6 +38,6 @@ class Test_QueryPath extends WP_UnitTestCase {
 		$this->assertEquals( 'ã   Ã   ╚   ╔   ╩   ╦   ╠   ═   ╬   ¤', $qp->html5( $html, 'div' )->innerHTML5() );
 
 		/* Using the standard HTML parser these characters will not be correctly displayed when output */
-		$this->assertNotEquals( 'ã   Ã   ╚   ╔   ╩   ╦   ╠   ═   ╬   ¤', htmlqp( $html, 'div' )->innerHTML5() );
+		$this->assertNotEquals( 'ã   Ã   ╚   ╔   ╩   ╦   ╠   ═   ╬   ¤', \GFPDF_Vendor\htmlqp( $html, 'div' )->innerHTML5() );
 	}
 }
