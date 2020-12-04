@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 
-echo $0 $1 $2
+echo $0 $1
 
 if [ $# -lt 1 ]; then
-	echo "usage: $0 <version> [branch]"
+	echo "usage: $0 <version>"
 	exit 1
 fi
 
 VERSION=$1
-BRANCH=${2-development}
 TMP_DIR="./tmp/package/"
 PACKAGE_DIR="${TMP_DIR}${VERSION}"
 WORKING_DIR=$PWD
@@ -18,7 +17,7 @@ PACKAGE_NAME="gravity-forms-pdf-extended"
 mkdir -p ${PACKAGE_DIR}
 
 # Get an archive of our plugin
-git archive ${BRANCH} --output ${PACKAGE_DIR}/package.tar.gz
+git archive HEAD ${BRANCH} --output ${PACKAGE_DIR}/package.tar.gz
 tar -zxf ${PACKAGE_DIR}/package.tar.gz --directory ${PACKAGE_DIR} && rm --force ${PACKAGE_DIR}/package.tar.gz
 
 # Run Composer
