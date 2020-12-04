@@ -438,14 +438,14 @@ final class GPDFAPI {
 		$entry = $form_class->get_entry( $entry_id );
 
 		if ( is_wp_error( $entry ) ) {
-			return new WP_Error( 'invalid_entry', 'Make sure to pass in a valid Gravity Forms Entry ID' );
+			return new WP_Error( 'invalid_entry', esc_html__( 'Make sure to pass in a valid Gravity Forms Entry ID', 'gravity-forms-pdf-extended' ) );
 		}
 
 		/* Get our settings */
 		$setting = static::get_pdf( $entry['form_id'], $pdf_id );
 
 		if ( is_wp_error( $setting ) ) {
-			return new WP_Error( 'invalid_pdf_setting', 'Could not located the PDF Settings. Ensure you pass in a valid PDF ID.' );
+			return new WP_Error( 'invalid_pdf_setting', esc_html__( 'Could not located the PDF Settings. Ensure you pass in a valid PDF ID.', 'gravity-forms-pdf-extended' ) );
 		}
 
 		$pdf  = static::get_mvc_class( 'Model_PDF' );
@@ -576,11 +576,11 @@ final class GPDFAPI {
 		$settings = GPDFAPI::get_mvc_class( 'Model_Settings' );
 
 		if ( ! isset( $font['font_name'] ) || ! $settings->is_font_name_valid( $font['font_name'] ) ) {
-			return new WP_Error( 'invalid_font_name', 'Font name is not valid. Alphanumeric characters and spaces only.' );
+			return new WP_Error( 'invalid_font_name', esc_html__( 'Font name is not valid. Alphanumeric characters and spaces only.', 'gravity-forms-pdf-extended' ) );
 		}
 
 		if ( ! $settings->is_font_name_unique( $font['font_name'] ) ) {
-			return new WP_Error( 'font_name_not_unique', 'A font with the same name already exists.' );
+			return new WP_Error( 'font_name_not_unique', esc_html__( 'A font with the same name already exists.', 'gravity-forms-pdf-extended' ) );
 		}
 
 		$results = $settings->install_fonts( $font );
@@ -613,12 +613,12 @@ final class GPDFAPI {
 		$font_id = $settings->get_font_id_by_name( $font_name );
 
 		if ( ! isset( $fonts[ $font_id ] ) ) {
-			return new WP_Error( 'font_not_installed', 'Font not installed.' );
+			return new WP_Error( 'font_not_installed', esc_html__( 'Font not installed.', 'gravity-forms-pdf-extended' ) );
 		}
 
 		/* Remove the font files */
 		if ( ! $settings->remove_font_file( $fonts[ $font_id ] ) ) {
-			return new WP_Error( 'font_delete_failure', 'There was a problem deleting the font files.' );
+			return new WP_Error( 'font_delete_failure', esc_html__( 'There was a problem deleting the font files.', 'gravity-forms-pdf-extended' ) );
 		}
 
 		/* Cleanup our mPDF directory to prevent caching issues with mPDF */
@@ -627,7 +627,7 @@ final class GPDFAPI {
 		/* Update the database */
 		unset( $fonts[ $font_id ] );
 		if ( ! $options->update_option( 'custom_fonts', $fonts ) ) {
-			return new WP_Error( 'font_delete_db_failure', 'There was a problem deleting the font from the database.' );
+			return new WP_Error( 'font_delete_db_failure', esc_html__( 'There was a problem deleting the font from the database.', 'gravity-forms-pdf-extended' ) );
 		}
 
 		return true;

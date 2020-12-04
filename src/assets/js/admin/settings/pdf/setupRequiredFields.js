@@ -11,7 +11,7 @@ export function setupRequiredFields ($elm) {
   $elm.attr('novalidate', 'novalidate')
 
   /* gf compatibility + disable automatic field validation */
-  $elm.find('tr input[type="submit"]').click(function () {
+  $elm.find('tr input[type="submit"]').on('click', function () {
     $elm.addClass('formSubmitted')
   })
 

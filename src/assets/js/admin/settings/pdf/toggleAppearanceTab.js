@@ -6,7 +6,7 @@ import $ from 'jquery'
  * @since 4.0
  */
 export function toggleAppearanceTab () {
-  $('input[name="gfpdf_settings[advanced_template]"]').change(function () {
+  $('input[name="gfpdf_settings[advanced_template]"]').on('change', function () {
     if ($(this).val() === 'Yes') {
       $('#gfpdf-appearance-nav').hide()
     } else {

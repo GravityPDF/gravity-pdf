@@ -14,7 +14,7 @@ import { toggleFontAppearance } from '../pdf/toggleFontAppearance'
  */
 export function setupDynamicTemplateFields () {
   /* Add change listener to our template */
-  $('#gfpdf_settings\\[template\\]').off('change').change(function () {
+  $('#gfpdf_settings\\[template\\]').off('change').on('change', function () {
 
     /* Add spinner */
     let $spinner = spinner('gfpdf-spinner')

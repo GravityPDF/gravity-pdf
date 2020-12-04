@@ -114,7 +114,7 @@ class Test_Addon extends WP_UnitTestCase {
 		$this->addon->init( [ $sub_addon ] );
 
 		$this->assertTrue( $sub_addon->run );
-		$this->assertEquals( 10, has_action( 'admin_init', [ $this->addon, 'plugin_updater' ] ) );
+		$this->assertEquals( 10, has_action( 'init', [ $this->addon, 'plugin_updater' ] ) );
 		$this->assertEquals( 10, has_action( 'admin_init', [ $this->addon, 'maybe_schedule_license_check' ] ) );
 		$this->assertEquals(
 			10,

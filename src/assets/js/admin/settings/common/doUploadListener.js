@@ -37,7 +37,7 @@ export function doUploadListener () {
       let selection = fileFrame.state().get('selection')
       selection.each(function (attachment) {
         attachment = attachment.toJSON()
-        window.formfield.val(attachment.url).change()
+        window.formfield.val(attachment.url).trigger('change')
       })
     })
 

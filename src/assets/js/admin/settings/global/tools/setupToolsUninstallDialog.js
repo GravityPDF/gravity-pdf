@@ -16,7 +16,7 @@ export function setupToolsUninstallDialog () {
     text: GFPDF.uninstall,
     click: function () {
       /* submit form */
-      $uninstall.parents('form').submit()
+      $uninstall.parents('form').trigger('submit')
     }
   }, {
     text: GFPDF.cancel,
@@ -28,7 +28,7 @@ export function setupToolsUninstallDialog () {
 
   wpDialog($uninstallDialog, uninstallButtons, 500, 175)
 
-  $uninstall.click(function () {
+  $uninstall.on('click', function () {
     /* Allow responsiveness */
     resizeDialogIfNeeded($uninstallDialog, 500, 175)
 

@@ -19,7 +19,7 @@ export function showTooltips () {
 
     $a.append($i)
     $a.addClass('gf_tooltip tooltip')
-    $a.click(function () {
+    $a.on('click', function () {
       return false
     })
 

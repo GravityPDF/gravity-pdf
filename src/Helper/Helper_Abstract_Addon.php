@@ -259,7 +259,7 @@ abstract class Helper_Abstract_Addon {
 		 * @Internal Due to WordPress.org rules we cannot initialisation the updater code in the core plugin
 		 *           Add-ons have to initialise this functionality via GFPDF\Helper\Licensing\EDD_SL_Plugin_Updater
 		 */
-		add_action( 'admin_init', [ $this, 'plugin_updater' ] );
+		add_action( 'init', [ $this, 'plugin_updater' ] );
 
 		/*
 		 * Automatically register our addon with the main plugin to enable license management in the UI

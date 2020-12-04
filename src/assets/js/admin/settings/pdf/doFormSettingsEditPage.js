@@ -22,7 +22,7 @@ export function doFormSettingsEditPage () {
    * Workaround for Firefix TinyMCE Editor Bug NS_ERROR_UNEXPECTED (http://www.tinymce.com/develop/bugtracker_view.php?id=3152) when loading wp_editor via AJAX
    * Manual save TinyMCE editors on form submission
    */
-  $('#gfpdf_pdf_form').submit(function () {
+  $('#gfpdf_pdf_form').on('submit', function () {
     try {
       tinyMCE.triggerSave()
     } catch (e) {
@@ -31,7 +31,7 @@ export function doFormSettingsEditPage () {
   })
 
   /* Add listener on submit functionality */
-  $('#gfpdf_pdf_form').submit(function () {
+  $('#gfpdf_pdf_form').on('submit', function () {
     /* JSONify the conditional logic so we can pass it through the form and use it in PHP (after running json_decode) */
     $('#gfpdf_settings\\[conditionalLogic\\]').val($.toJSON(window.gfpdf_current_pdf.conditionalLogic))
   })

@@ -4,8 +4,8 @@ Plugin URI: https://gravitypdf.com/
 Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.8
-Tested up to: 5.5
-Stable tag: 5.3.2
+Tested up to: 5.6
+Stable tag: 5.3.3
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -89,6 +89,17 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 18. Blank Slate provides a print-friendly template focusing solely on the user-submitted data.
 
 == Changelog ==
+
+= 5.3.3 =
+* Bug: Fix PHP notice when no valid form or entry passed when processing merge tags
+* Bug: Make PDF generation background processing task unrecoverable so rest of the queue isn't executed
+* Bug: always parse Core Font payload as JSON
+* Bug: fix a PHP 8 notice (note: the plugin is not guaranteed to be 100% PHP 8-compatible at this time)
+* Housekeeping: adjust log level to 'notice' for optional template configuration file not found
+* Housekeeping: replace most deprecated jQuery code with new recommendations
+* Housekeeping: update EDD licensing class to v1.8 for premium add-ons
+* Housekeeping: update composer-managed dependencies
+* Housekeeping: Make API error messages translatable
 
 = 5.3.2 =
 * Bug: Fix Media Manager so it shows all file types on Gravity PDF pages
