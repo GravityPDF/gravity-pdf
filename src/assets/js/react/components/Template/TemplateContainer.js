@@ -39,7 +39,7 @@ class Container extends React.Component {
 
     /* Add focus if not currently applied to search box */
     if (document.activeElement && document.activeElement.className !== 'wp-filter-search') {
-      this.container.trigger('focus')
+      this.container.focus()
     }
   }
 
@@ -64,7 +64,7 @@ class Container extends React.Component {
   handleFocus = (e) => {
     if (!this.container.contains(e.target)) {
       e.stopPropagation()
-      this.container.trigger('focus')
+      this.container.focus()
     }
   }
 
