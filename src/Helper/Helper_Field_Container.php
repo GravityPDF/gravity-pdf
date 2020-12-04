@@ -147,6 +147,7 @@ class Helper_Field_Container {
 		$this->skip_fields         = apply_filters( 'gfpdf_container_skip_fields', $this->skip_fields );
 		$this->row_stopper_classes = apply_filters( 'gfpdf_container_row_stopper_classes', $this->row_stopper_classes );
 		$this->faux_column         = apply_filters( 'gfpdf_container_disable_faux_columns', $this->faux_column );
+		$this->class_map           = apply_filters( 'gfpdf_field_width_class_map', $this->class_map );
 	}
 
 
@@ -298,7 +299,7 @@ class Helper_Field_Container {
 	 * @since  4.0
 	 */
 	protected function strip_field_of_any_classmaps( GF_Field $field ) {
-		$field->cssClass = str_replace( array_keys( apply_filters( 'gfpdf_field_width_class_map', $this->class_map ) ), ' ', $field->cssClass );
+		$field->cssClass = str_replace( array_keys( $this->class_map ), ' ', $field->cssClass );
 	}
 
 	/**
@@ -374,12 +375,11 @@ class Helper_Field_Container {
 	 */
 	protected function get_field_width( $classes ) {
 		$classes = $this->get_field_classes( $classes );
-		$class_map = apply_filters( 'gfpdf_field_width_class_map', $this->class_map );
 
 		foreach ( $classes as $class ) {
-			if ( isset( $class_map[ $class ] ) ) {
+			if ( isset( $this->class_map[ $class ] ) ) {
 				/* return field width */
-				return $class_map[ $class ];
+				return $this->class_map[ $class ];
 			}
 		}
 
