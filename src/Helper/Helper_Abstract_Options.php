@@ -247,7 +247,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 						'uploaderTitle'      => isset( $option['uploaderTitle'] ) ? $option['uploaderTitle'] : null,
 						'uploaderButtonText' => isset( $option['uploaderButtonText'] ) ? $option['uploaderButtonText'] : null,
 						'toggle'             => isset( $option['toggle'] ) ? $option['toggle'] : null,
-						'data'               => isset( $option['data'] ) ? $option['data'] : null
+						'data'               => isset( $option['data'] ) ? $option['data'] : null,
 					]
 				);
 			}
@@ -1132,13 +1132,13 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					if ( ! isset( $input[ $key ] ) ) {
 						$input[ $key ] = [];
 					}
-				break;
+					break;
 
 				default:
 					if ( ! isset( $input[ $key ] ) ) {
 						$input[ $key ] = '';
 					}
-				break;
+					break;
 			}
 		}
 
@@ -1325,7 +1325,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 						/* throw error */
 						add_settings_error( 'gfpdf-notices', $key, esc_html__( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
 					}
-				break;
+					break;
 
 				case 'paper_size':
 					if ( isset( $input['default_pdf_size'] ) && $input['default_pdf_size'] === 'CUSTOM' ) {
@@ -1334,14 +1334,14 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 							add_settings_error( 'gfpdf-notices', $key, esc_html__( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
 						}
 					}
-				break;
+					break;
 
 				default:
 					if ( strlen( trim( $value ) ) === 0 ) {
 						/* throw error */
 						add_settings_error( 'gfpdf-notices', $key, esc_html__( 'PDF Settings could not be saved. Please enter all required information below.', 'gravity-forms-pdf-extended' ) );
 					}
-				break;
+					break;
 			}
 		}
 
@@ -1406,7 +1406,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					return checked( 1, 1, false );
 				}
 
-			break;
+				break;
 
 			case 'multicheck':
 				if ( isset( $options[ $args['id'] ][ $args['multi-key'] ] ) ) {
@@ -1436,7 +1436,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					}
 				}
 
-			break;
+				break;
 
 			case 'radio':
 				if ( isset( $options[ $args['id'] ] ) && isset( $args['options'][ $options[ $args['id'] ] ] ) ) {
@@ -1449,7 +1449,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					return $args['std'];
 				}
 
-			break;
+				break;
 
 			case 'password':
 				if ( isset( $options[ $args['id'] ] ) ) {
@@ -1459,7 +1459,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 					return trim( $pdf_form_settings[ $args['id'] ] );
 				}
 
-			break;
+				break;
 
 			case 'select':
 			case 'paper_size':
@@ -1472,7 +1472,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				} elseif ( isset( $args['std'] ) ) {
 					return $args['std'];
 				}
-			break;
+				break;
 
 			/* treat as a text or hidden callback */
 			default:
@@ -1485,7 +1485,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				} elseif ( isset( $args['std'] ) ) {
 					return $args['std'];
 				}
-			break;
+				break;
 		}
 
 		/* if we made it here return empty string */
@@ -1654,7 +1654,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 			$alert = $is_error ? '<div class="alert error">%s</div>' : '<div id="message" class="alert success">%s</div>';
 			$html .= sprintf( $alert, wp_kses_post( $value['msg'] ) );
 		}
-
+		$html .= '<label for="gfpdf_settings[' . $args['id'] . ']" class="screen-reader-text"> ' . $args['name'] . '  license key</label>';
 		$html .= '<input autocomplete="off" type="text" class="regular-text" id="gfpdf_settings[' . esc_attr( $args['id'] ) . ']" class="gfpdf_settings_' . esc_attr( $args['id'] ) . '" name="gfpdf_settings[' . esc_attr( $args['id'] ) . ']" value="' . esc_attr( stripslashes( $value['key'] ) ) . '" />';
 
 		/* Add renewal info */
@@ -1664,8 +1664,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 				data-addon-name="' . esc_attr( substr( $args['id'], 8 ) ) . '" 
 				data-license="' . esc_attr( $value['key'] ) . '" 
 				data-nonce="' . wp_create_nonce( 'gfpdf_deactivate_license' ) . '">' .
-			         esc_attr__( 'Deactivate License', 'gravity-forms-pdf-extended' ) .
-			         '</button>';
+					 esc_attr__( 'Deactivate License', 'gravity-forms-pdf-extended' ) .
+					 '</button>';
 		}
 
 		$html .= wp_kses_post( $args['desc2'] );
@@ -2242,8 +2242,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		$toggle_elm = '<label><input class="gfpdf-input-toggle" type="checkbox" value="1" ' . checked( $has_value, 1, false ) . ' /> ' . esc_attr( $toggle ) . '</label>';
 
 		$html = '<div class="gfpdf-toggle-wrapper" ' . $current_display . '>' .
-		        $html .
-		        '</div>';
+				$html .
+				'</div>';
 
 		$html = $toggle_elm . $html;
 
