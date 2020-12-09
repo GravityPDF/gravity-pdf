@@ -50,8 +50,9 @@ class TemplateButton extends React.Component {
         className='button gfpdf-button'
         onClick={this.handleClick}
         ref={node => (this.button = node)}
+        aria-label='Manage PDF Templates'
       >
-        {this.props.buttonText}
+       Manage
       </button>
     )
   }
