@@ -243,7 +243,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 */
 	public function column_notifications( $item ) {
 		if ( ! isset( $item['notification'] ) || count( $item['notification'] ) === 0 ) {
-			printf( '<span aria-label="None">%s</span>', esc_html( 'None', 'gravity-forms-pdf-extended' ) );
+			printf( '<span>%s</span>', esc_html( 'None', 'gravity-forms-pdf-extended' ) );
 
 			return;
 		}
@@ -256,7 +256,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			}
 		}
 
-		echo sprintf( '<span aria-label="%1$s" >%1$s</span>', implode( ', ', $notification_names ) );
+		echo sprintf( '<span>%1$s</span>', implode( ', ', $notification_names ) );
 
 	}
 
@@ -275,12 +275,16 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		 * We'll prevent this by removing them before hand
 		 */
 		$name = str_replace( '"', '', $item['name'] );
+		$pdf_id = $item['id'];
 
 		/* Prepare our shortcode sample */
 		$shortcode = '[gravitypdf name="' . esc_attr( $name ) . '" id="' . esc_attr( $item['id'] ) . '" text="' . esc_attr__( 'Download PDF', 'gravity-forms-pdf-extended' ) . '"]';
 
+		/* Set up hidden text for screen readers */
+		echo '<p id="' . $pdf_id . '" class="screen-reader-text" >Copy Download '.$item['name'] .' Shortcode</p>';
+
 		/* Display in a readonly field */
-		echo '<input type="text" class="gravitypdf_shortcode" value="' . esc_attr( $shortcode ) . '" readonly="readonly" onfocus="jQuery(this).select();" onclick="jQuery(this).select();" />';
+		echo '<input type="text" aria-labeledby="' . $pdf_id . '" class="gravitypdf_shortcode" value="' . esc_attr( $shortcode ) . '" readonly="readonly" onclick="jQuery(this).select();" />';
 
 		do_action( 'gfpdf_post_pdf_list_shortcode_column', $item, $this );
 	}

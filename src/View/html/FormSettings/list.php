@@ -34,7 +34,7 @@ $list_items = $args['list_items'];
 				<div class="tablenav top">
 					<div class="alignleft actions bulkactions"></div>
 					<div class="alignright">
-						<a class="button" href="<?= esc_url( $args['add_new_url'] ) ?>"><?php esc_html_e( 'Add New', 'gravityforms' ); ?></a>
+						<a class="button" href="<?= esc_url( $args['add_new_url'] ) ?>" aria-label="Add new PDF"><?php esc_html_e( 'Add New', 'gravityforms' ); ?></a>
 					</div>
 					<br class="clear">
 				</div>
