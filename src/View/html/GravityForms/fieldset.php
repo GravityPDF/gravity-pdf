@@ -33,7 +33,7 @@ if ( $collapsible ) {
 ?>
 
 <fieldset id="gfpdf-fieldset-<?= esc_attr( $args['id'] ) ?>" class="gform-settings-panel <?= esc_attr( $width_class ) ?> <?= $collapsible_class ?>">
-	<header class="gform-settings-panel__header">
+	<header class="gform-settings-panel__header" role="none">
 		<?php if ( $collapsible ): ?>
 			<legend class="gform-settings-panel__title">
 				<label class="gform-settings-panel__title" for="<?= esc_attr( $collapsible_name ) ?>"><?= esc_html( $args['title'] ) ?></label>
