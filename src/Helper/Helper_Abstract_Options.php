@@ -2067,12 +2067,12 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 			<span class="gform-settings-input__container">
 				<input type="checkbox" id="gfpdf_settings[<?= $args['id'] ?>]" name="gfpdf_settings[<?= $args['id'] ?>]" value="Yes" <?= checked( $value, 'Yes', false ) ?> />
-				<label class="gform-settings-field__toggle-container" for="gfpdf_settings[<?= $args['id'] ?>]">
+				<label class="gform-field__toggle-container" for="gfpdf_settings[<?= $args['id'] ?>]">
 					<?php if ( strlen( $name ) > 0 ): ?>
 						<span class="screen-reader-text"><?= $name ?></span>
 					<?php endif; ?>
 
-					<span class="gform-settings-field__toggle-switch"></span>
+					<span class="gform-field__toggle-switch"></span>
 				</label>
 			</span>
 
