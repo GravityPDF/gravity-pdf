@@ -105,6 +105,7 @@ export const UpdateFont = (
 
         <AddUpdateFontFooter
           id={id}
+          label={label}
           disabled={disableUpdateButton}
           onHandleCancelEditFont={onHandleCancelEditFont}
           onHandleCancelEditFontKeypress={onHandleCancelEditFontKeypress}

@@ -96,24 +96,6 @@ test('should display individual template details', async t => {
     .expect(templateDetails('theme-tags', 'Tags: Header, Footer, Background, Optional HTML Fields, Optional Page Fields, Combined Row, Alternate Colors').exists).ok()
 })
 
-test('should navigate to next and previous template', async t => {
-  // Actions & Assertions
-  await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')
-  await t
-    .click(run.defaultTemplateSelectBox)
-    .click(dropdownOption('Blank Slate'))
-    .click(templateManager.advancedButton)
-    .click(templateManager.focusGravityTemplateDetails)
-    .click(button('Show next template'))
-    .expect(templateManager.rubixTemplate.exists).ok()
-    .click(button('Show previous template'))
-    .expect(templateManager.focusGravityTemplate.exists).ok()
-    .pressKey('right')
-    .expect(templateManager.rubixTemplate.exists).ok()
-    .pressKey('left')
-    .expect(templateManager.focusGravityTemplate.exists).ok()
-})
-
 test('should display popup template manager that can be close', async t => {
   // Actions & Assertions
   await run.navigateSettingsTab('gf_settings&subview=PDF&tab=general#')

@@ -7,10 +7,11 @@ import { sprintf } from 'sprintf-js'
 import Spinner from '../Spinner'
 /* Redux actions */
 import { selectFont, deleteFont } from '../../actions/fontManager'
+import TemplateTooltip from './TemplateTooltip'
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2020, Blue Liquid Designs
+ * @copyright   Copyright (c) 2021, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       6.0
  */
@@ -216,6 +217,8 @@ export class AddUpdateFontFooter extends Component {
             }}
           />
         )}
+
+        {id && <TemplateTooltip id={id} />}
       </footer>
     )
   }

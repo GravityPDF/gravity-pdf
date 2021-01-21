@@ -64,6 +64,38 @@
             .msg {
               display: block;
 
+              &.template-usage-link {
+                margin-top: 1rem;
+
+                a {
+                  color: base.$link-color;
+                  cursor: pointer;
+                  text-decoration: underline;
+                }
+
+                .dashicons {
+                  border: 0px;
+                  font-size: 0.9rem;
+                  margin-top: 0.2rem;
+                  padding: 0;
+                }
+
+                div {
+                  margin-left: 1.6rem;
+                }
+
+                #template_usage_info_box {
+                  color: #000;
+                  font-family: "Courier New", Courier, monospace;
+                  font-size: 0.8rem;
+                  margin: 0.5rem 0 0 1.6rem;
+                  height: 170px;
+                  width: 80%;
+                  border: 3px solid #aaaaaa;
+                  border-radius: 5px;
+                }
+              }
+
               &.success {
                 color: base.$success-color;
               }

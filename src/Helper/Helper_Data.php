@@ -299,10 +299,10 @@ class Helper_Data {
 				'fontManagerFontFilesLabel'            => esc_html__( 'Font Files', 'gravity-forms-pdf-extended' ),
 				'fontManagerFontFilesDesc'             => esc_html__( 'Select or drag and drop your .ttf font file for the variants below. Only the Regular type is required.', 'gravity-forms-pdf-extended' ),
 				'fontManagerFontFileRequiredRegular'   => esc_html__( 'Add a .ttf font file.', 'gravity-forms-pdf-extended' ),
-				'fontManagerKashidaLabel'              => esc_html__( 'Kashida (Text Justification)', 'gravity-forms-pdf-extended' ),
-				'fontManagerKashidaDesc'               => esc_html__( 'Control how elongated to make characters in cursive scripts - like Arabic or Persian. Select a number between 0 and 100.', 'gravity-forms-pdf-extended' ),
+				'fontManagerTemplateTooltipLabel'      => esc_html__( 'View template usage', 'gravity-forms-pdf-extended' ),
 				'fontManagerCancelButtonText'          => esc_html__( '← Cancel', 'gravity-forms-pdf-extended' ),
 				'fontManagerDeleteFontConfirmation'    => esc_html__( 'Are you sure you want to delete this font?', 'gravity-forms-pdf-extended' ),
+				'fontManagerTemplateTooltipDesc'       => esc_html__( 'Add this snippet %1$sin a custom template%3$s to selectively set the font on blocks of text. If you want to apply the font to the entire PDF, %2$suse the Font setting%3$s when configuring the PDF on the form.', 'gravity-forms-pdf-extended' ),
 
 				/* Font Manager API response */
 				'fontListEmpty'                        => esc_html__( 'Font list empty.', 'gravity-forms-pdf-extended' ),
