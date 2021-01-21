@@ -11,7 +11,7 @@ export function handleSecurityConditionals () {
   const $pdfSecurity = $secTable.find('input[name="gfpdf_settings[security]"]')
   const $format = $secTable.find('input[name="gfpdf_settings[format]"]')
   const $securityQuestion = $secTable.find('#gfpdf-settings-field-wrapper-security')
-  const $securityFields = $secTable.find('#gfpdf-settings-field-wrapper-password,#gfpdf-settings-field-wrapper-privileges,gfpdf-settings-field-wrapper-master_password:not(.gfpdf-hidden)')
+  const $securityFields = $secTable.find('#gfpdf-settings-field-wrapper-password,#gfpdf-settings-field-wrapper-privileges,#gfpdf-settings-field-wrapper-master_password:not(.gfpdf-hidden)')
 
   /* Add change event to admin restrictions to show/hide dependant fields */
   $pdfSecurity.on('change', function () {
@@ -22,8 +22,12 @@ export function handleSecurityConditionals () {
       /* hide security password / privileges */
       $securityFields.hide()
     } else {
-      /* show security password / privileges */
-      $securityFields.show()
+      /* Show/hide security password / privileges fields under 'Enable PDF Security' */
+      if ($(this).is(':checked')) {
+        $securityFields.show()
+      } else {
+        $securityFields.hide()
+      }
     }
 
     if (format !== 'Standard') {
