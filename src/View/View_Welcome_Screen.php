@@ -51,7 +51,7 @@ class View_Welcome_Screen extends Helper_Abstract_View {
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $data_cache = [], Helper_Abstract_Form $gform ) {
+	public function __construct( $data_cache = [], Helper_Abstract_Form $gform = null ) {
 
 		/* Call our parent constructor */
 		parent::__construct( $data_cache );
