@@ -9,7 +9,7 @@ class Fonts {
     this.deleteIcon = Selector('.fa-trash-o')
     this.confirmDeletePopupBox = Selector('div').withAttribute('aria-describedby', 'delete-confirm')
     this.fontList = Selector('#font-list')
-    this.cancelButton = Selector('div').withAttribute('aria-describedby', 'delete-confirm').find('[class^="ui-button ui-widget ui-state-default ui-corner-all"]').find('span').withText('Cancel')
+    this.cancelButton = Selector('div').withAttribute('aria-describedby', 'delete-confirm').find('button').withText('Cancel')
     this.fontListEmpty = Selector('#font-empty').withText('Looks bare in here!\n' + 'Click "Add Font" below to get started.')
   }
 
