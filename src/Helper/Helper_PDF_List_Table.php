@@ -216,13 +216,13 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	public function column_cb( $item ) {
 
 		$is_active   = isset( $item['active'] ) ? $item['active'] : true;
-		$form_id     = rgget( 'id' );
+		$form_id     = (int) rgget( 'id' );
 		$state_nonce = wp_create_nonce( "gfpdf_state_nonce_{$form_id}_{$item['id']}" );
 		?>
 
-		<img data-id="<?php echo $item['id']; ?>" data-nonce="<?php echo $state_nonce; ?>"
-			 data-fid="<?php echo $form_id; ?>"
-			 src="<?php echo $this->gform->get_plugin_url(); ?>/images/active<?php echo intval( $is_active ); ?>.png"
+		<img data-id="<?php echo esc_attr( $item['id'] ); ?>" data-nonce="<?php echo esc_attr( $state_nonce ); ?>"
+			 data-fid="<?php echo esc_attr( $form_id ); ?>"
+			 src="<?php echo $this->gform->get_plugin_url(); ?>/images/active<?php echo (int) $is_active; ?>.png"
 			 style="cursor: pointer;margin:-1px 0 0 8px;"
 			 alt="<?php $is_active ? esc_attr__( 'Active', 'gravity-forms-pdf-extended' ) : esc_attr__( 'Inactive', 'gravity-forms-pdf-extended' ); ?>"
 			 title="<?php echo $is_active ? esc_attr__( 'Active', 'gravity-forms-pdf-extended' ) : esc_attr__( 'Inactive', 'gravity-forms-pdf-extended' ); ?>"/>
@@ -311,7 +311,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 */
 	public function column_name( $item ) {
 		$edit_url        = add_query_arg( [ 'pid' => $item['id'] ] );
-		$form_id         = rgget( 'id' );
+		$form_id         = (int) rgget( 'id' );
 		$duplicate_nonce = wp_create_nonce( "gfpdf_duplicate_nonce_{$form_id}_{$item['id']}" );
 		$delete_nonce    = wp_create_nonce( "gfpdf_delete_nonce_{$form_id}_{$item['id']}" );
 
