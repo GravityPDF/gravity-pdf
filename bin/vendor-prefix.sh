@@ -17,7 +17,7 @@ if [ -z "$PLUGIN_DIR" ]; then
 fi
 
 if [[ ! -f "${PLUGIN_DIR}php-scoper.phar" ]]; then
-  curl -L https://github.com/humbug/php-scoper/releases/download/0.13.2/php-scoper.phar -o  ${PLUGIN_DIR}php-scoper.phar
+  curl -L https://github.com/humbug/php-scoper/releases/download/0.14.0/php-scoper.phar -o  ${PLUGIN_DIR}php-scoper.phar
 fi
 
 # Monolog
@@ -31,15 +31,11 @@ PHP_DOCKER=""
 PHP="php"
 COMPOSER="composer"
 
-#if exists php && ! isCI; then
-#  PHP_DOCKER=""
-#  PHP="php"
-#  COMPOSER="composer"
-#else
-#  PHP_DOCKER="yarn wp-scripts env docker-run php "
-#  PHP="LOCAL_PHP=7.4-fpm ${PHP_DOCKER}php"
-#  COMPOSER="${PHP_DOCKER}composer"
-#fi
+if isCI; then
+  PHP_DOCKER="yarn wp-scripts env docker-run php "
+  PHP="LOCAL_PHP=7.4-fpm ${PHP_DOCKER}php"
+  COMPOSER="${PHP_DOCKER}composer"
+fi
 
 eval "$PHP ${PLUGIN_DIR}php-scoper.phar add-prefix --output-dir=${PLUGIN_DIR}src/Vendor/Monolog --config=${PLUGIN_DIR}.php-scoper/monolog.php --force --quiet"
 cp ${PLUGIN_DIR}vendor/monolog/monolog/* ${PLUGIN_DIR}src/Vendor/Monolog 2>/dev/null

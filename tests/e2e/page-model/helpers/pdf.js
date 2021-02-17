@@ -9,7 +9,7 @@ class Pdf {
     this.addPdfButton = Selector('div').find('[class^="button-primary"][value="Add PDF"]')
     this.template = Selector('.alternate')
     this.deletePDF = Selector('.submitdelete')
-    this.confirmDelete = Selector('button').find('[class^="ui-button-text"]').withText('Delete')
+    this.confirmDelete = Selector('button').withText('Delete')
   }
 
   async navigateAddPdf (text) {

@@ -26,7 +26,7 @@ test('should open Manage Fonts Popup Box', async t => {
 
 test('should open Manage Fonts Popup Box that can be close', async t => {
   // Get selectors
-  const closeButton = Selector('div').withText('Manage Fonts').nth(10).find('[class^="ui-button ui-widget ui-state-default ui-corner-all"][title="Close"]')
+  const closeButton = Selector('div').withText('Manage Fonts').nth(10).find('button[title="Close"]')
   const hidePopupBox = run.manageFontsPopupBox.filterHidden()
 
   // Actions & Assertions
