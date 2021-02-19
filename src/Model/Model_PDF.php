@@ -1873,8 +1873,8 @@ class Model_PDF extends Helper_Abstract_Model {
 			}
 		} catch ( Exception $e ) {
 
-			$this->log->error(
-				'Invalid Field Class.',
+			$this->log->notice(
+				'No supported PDF field class found. Using default loader.',
 				[
 					'exception' => $e->getMessage(),
 					'field'     => $field,
