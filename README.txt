@@ -4,8 +4,8 @@ Plugin URI: https://gravitypdf.com/
 Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.8
-Tested up to: 5.6
-Stable tag: 5.3.3
+Tested up to: 5.7
+Stable tag: 5.3.4
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -89,6 +89,19 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 18. Blank Slate provides a print-friendly template focusing solely on the user-submitted data.
 
 == Changelog ==
+
+= 5.3.4 =
+* Security: Resolve XSS issue on PDF List page
+* Security: Resolve authenticated arbitrary PHP file Deletion when using the PDF Template Manager (by default, this affects Administrator accounts only)
+* Housekeeping: Add gfpdf_container_class_map filter
+* Housekeeping: Update Monolog to v1.26
+* Housekeeping: Fix PHP8 deprecation notices
+* Housekeeping: Remove jQuery deprecation notices
+* Housekeeping: Downgrade error to a notice when a not-yet supported field is being processed by the PDF
+* Housekeeping: Bump WordPress Tested To value to 5.7
+* Bug: Fix Media Library inserter on PDF pages when Gravity Forms No Conflict Mode enabled
+* Bug: Fix PHP fatal error when logging is enable and the log file cannot be written to
+* Bug: Fix double spinner randomly showing up when installing and selecting a new PDF template
 
 = 5.3.3 =
 * Bug: Fix PHP notice when no valid form or entry passed when processing merge tags
