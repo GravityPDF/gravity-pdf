@@ -33,6 +33,5 @@
 
 	<!-- Code which doesn't go into production may have different requirements. -->
 	<exclude-pattern>/.php-scoper/*</exclude-pattern>
-	<exclude-pattern>/src/Vendor/*</exclude-pattern>
 	<exclude-pattern>/node_modules/*</exclude-pattern>
 </ruleset>
