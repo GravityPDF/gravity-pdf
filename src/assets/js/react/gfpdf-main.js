@@ -33,8 +33,8 @@ $(function () {
     }
 
     /* Check if we should show the Fancy Template Picker */
-    var templateId = '#gfpdf_settings\\[template\\], #gfpdf_settings\\[default_template\\]'
-    var $templateField = $(templateId)
+    const templateId = '#gfpdf_settings\\[template\\], #gfpdf_settings\\[default_template\\]'
+    const $templateField = $(templateId)
 
     /* Run this code if the element exists */
     if ($templateField.length > 0) {
