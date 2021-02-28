@@ -7,7 +7,7 @@ use GFPDF\Helper\Helper_Abstract_Form;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2020, Blue Liquid Designs
+ * @copyright   Copyright (c) 2021, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -51,7 +51,7 @@ class View_Welcome_Screen extends Helper_Abstract_View {
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $data_cache = [], Helper_Abstract_Form $gform ) {
+	public function __construct( $data_cache = [], Helper_Abstract_Form $gform = null ) {
 
 		/* Call our parent constructor */
 		parent::__construct( $data_cache );

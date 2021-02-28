@@ -12,7 +12,7 @@ const TemplateButton = lazy(() => import('../components/Template/TemplateButton'
  * Advanced Template Selector Bootstrap
  *
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2020, Blue Liquid Designs
+ * @copyright   Copyright (c) 2021, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       4.1
  */
@@ -95,15 +95,15 @@ export function activeTemplateStoreListener (store, $templateField) {
   $templateField.on('change', function () {
     /* Check store and DOM are different to prevent any update recursions */
     if (this.value !== store.getState().template.activeTemplate) {
-      store.dispatch(selectTemplate(this.value))
+      store.dispatch(selectTemplate(store.getState().template.activeTemplate))
     }
   })
 }
 
 /**
- * PHP builds the Select box DOM for the templates and when we add or delete a template we need to rebuild this.
- * Instead of duplicating the code on both server and client side we do an AJAX call to get the new Selex box HTML when
- * the template.list length changes and update the DOM accordingly.
+ * PHP builds the Select box DOM for the templates and when we add or delete a template we need to
+ * rebuild this. Instead of duplicating the code on both server and client side we do an AJAX call to
+ * get the new select box HTML when the template.list length changes and update the DOM accordingly.
  *
  * @param {Object} store The Redux store returned from createStore()
  * @param {Object} $templateField The jQuery select box we should attach the fancy template selector to
@@ -123,7 +123,6 @@ export function templateChangeStoreListener (store, $templateField) {
     if (listCount !== list.length) {
       /* update the list size so we don't run it twice */
       listCount = list.length
-      let currentActive = $templateField.val()
 
       /* Dispatch Redux Action for an AJAX call to get the new Select Box DOM */
       store.dispatch(updateSelectBox())
@@ -135,7 +134,7 @@ export function templateChangeStoreListener (store, $templateField) {
         /* Update $templateField */
         $templateField
           .html(updateSelectBoxText)
-          .val(currentActive)
+          .val(store.getState().template.activeTemplate)
           .trigger('chosen:updated')
       }))
     }

@@ -27,7 +27,7 @@ use WP_Error;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2020, Blue Liquid Designs
+ * @copyright   Copyright (c) 2021, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -1873,8 +1873,8 @@ class Model_PDF extends Helper_Abstract_Model {
 			}
 		} catch ( Exception $e ) {
 
-			$this->log->error(
-				'Invalid Field Class.',
+			$this->log->notice(
+				'No supported PDF field class found. Using default loader.',
 				[
 					'exception' => $e->getMessage(),
 					'field'     => $field,

@@ -17,7 +17,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2020, Blue Liquid Designs
+ * @copyright   Copyright (c) 2021, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -499,6 +499,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			'underscore',
 			'media-editor',
 			'media-models',
+			'media-audiovideo',
 			'media-views',
 			'plupload',
 			'plupload-flash',
@@ -509,6 +510,8 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			'gform_placeholder',
 			'jquery-ui-autocomplete',
 			'thickbox',
+			'mce-view',
+			'image-edit',
 		];
 
 		foreach ( $wp_scripts->queue as $object ) {
@@ -547,6 +550,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			'editor-buttons',
 			'wp-jquery-ui-dialog',
 			'media-views',
+			'imgareaselect',
 			'buttons',
 			'thickbox',
 			'gform_chosen',

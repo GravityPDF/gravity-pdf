@@ -16,7 +16,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2020, Blue Liquid Designs
+ * @copyright   Copyright (c) 2021, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -135,6 +135,8 @@ class Helper_Logger {
 			if ( count( $this->log->getHandlers() ) > 0 && substr( php_sapi_name(), 0, 3 ) !== 'cli' ) {
 				$this->log->pushProcessor( new IntrospectionProcessor );
 				$this->log->pushProcessor( new MemoryPeakUsageProcessor );
+
+				$this->log->notice( 'Log initialized' );
 
 				return;
 			}

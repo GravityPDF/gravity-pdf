@@ -6,7 +6,7 @@ use GF_Field;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2020, Blue Liquid Designs
+ * @copyright   Copyright (c) 2021, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -147,6 +147,7 @@ class Helper_Field_Container {
 		$this->skip_fields         = apply_filters( 'gfpdf_container_skip_fields', $this->skip_fields );
 		$this->row_stopper_classes = apply_filters( 'gfpdf_container_row_stopper_classes', $this->row_stopper_classes );
 		$this->faux_column         = apply_filters( 'gfpdf_container_disable_faux_columns', $this->faux_column );
+		$this->class_map           = apply_filters( 'gfpdf_container_class_map', $this->class_map );
 	}
 
 

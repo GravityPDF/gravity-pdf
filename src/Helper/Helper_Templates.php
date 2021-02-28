@@ -8,7 +8,7 @@ use stdClass;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2020, Blue Liquid Designs
+ * @copyright   Copyright (c) 2021, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -275,20 +275,20 @@ class Helper_Templates {
 	public function get_template_path_by_id( $template_id, $include_core = true ) {
 
 		/* Check if template found in multisite PDF working directory */
-		$path_to_test = ( is_multisite() ) ? $this->data->multisite_template_location . $template_id . '.php' : false;
-		if ( is_multisite() && is_file( $path_to_test ) ) {
+		$path_to_test = is_multisite() ? realpath( $this->data->multisite_template_location . $template_id . '.php' ) : false;
+		if ( $path_to_test !== false && strpos( $path_to_test, realpath( $this->data->multisite_template_location ) ) === 0 ) {
 			return $path_to_test;
 		}
 
 		/* Check if template found in PDF working directory */
-		$path_to_test = $this->data->template_location . $template_id . '.php';
-		if ( is_file( $path_to_test ) ) {
+		$path_to_test = realpath( $this->data->template_location . $template_id . '.php' );
+		if ( $path_to_test !== false && strpos( $path_to_test, realpath( $this->data->template_location ) ) === 0 ) {
 			return $path_to_test;
 		}
 
 		/* Check if template found in the core template files */
-		$path_to_test = PDF_PLUGIN_DIR . 'src/templates/' . $template_id . '.php';
-		if ( $include_core && is_file( $path_to_test ) ) {
+		$path_to_test = realpath( PDF_PLUGIN_DIR . 'src/templates/' . $template_id . '.php' );
+		if ( $include_core && $path_to_test !== false && strpos( $path_to_test, realpath( realpath( PDF_PLUGIN_DIR . 'src/templates/' ) ) ) === 0 ) {
 			return $path_to_test;
 		}
 
@@ -494,9 +494,8 @@ class Helper_Templates {
 		$config_paths = apply_filters( 'gfpdf_template_config_paths', $config_paths );
 
 		foreach ( $config_paths as $path ) {
-			$file = $path . $template_id . '.php';
-
-			if ( is_file( $file ) ) {
+			$file = realpath( $path . $template_id . '.php' );
+			if ( $file !== false && strpos( $file, realpath( $path ) ) === 0 ) {
 				return $file;
 			}
 		}
@@ -672,8 +671,9 @@ class Helper_Templates {
 		/* Check if our image exists in one of our directories and return the URL */
 		$template .= '.png';
 		foreach ( $image_paths as $url => $path ) {
-			if ( is_file( $path . $template ) ) {
-				return ( $type === 'url' ) ? $url . $template : $path . $template;
+			$file = realpath( $path . $template );
+			if ( $file !== false && strpos( $file, realpath( $path ) ) === 0 ) {
+				return ( $type === 'url' ) ? $url . $template : realpath( $path . $template );
 			}
 		}
 

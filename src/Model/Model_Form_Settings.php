@@ -16,7 +16,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2020, Blue Liquid Designs
+ * @copyright   Copyright (c) 2021, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -632,7 +632,7 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 	 *
 	 * @since 4.0
 	 */
-	public function setup_core_custom_appearance_settings( $settings = [], Helper_Interface_Config $class, $template_settings ) {
+	public function setup_core_custom_appearance_settings( $settings = [], Helper_Interface_Config $class = null, $template_settings = [] ) {
 
 		/* register our core fields */
 		$core_fields = [

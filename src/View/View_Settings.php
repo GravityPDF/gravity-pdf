@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @package     Gravity PDF
- * @copyright   Copyright (c) 2020, Blue Liquid Designs
+ * @copyright   Copyright (c) 2021, Blue Liquid Designs
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -111,7 +111,7 @@ class View_Settings extends Helper_Abstract_View {
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( $data_cache = [], Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Abstract_Options $options, Helper_Data $data, Helper_Misc $misc, Helper_Templates $templates ) {
+	public function __construct( $data_cache = [], Helper_Abstract_Form $gform = null, LoggerInterface $log = null, Helper_Abstract_Options $options = null, Helper_Data $data = null, Helper_Misc $misc = null, Helper_Templates $templates = null ) {
 
 		/* Call our parent constructor */
 		parent::__construct( $data_cache );
