@@ -50,8 +50,8 @@ describe('FontManager - UpdateFont.js', () => {
       expect(wrapper.find('FontVariant').length).toBe(1)
     })
 
-    test('render <AddFontFooter /> component', () => {
-      expect(wrapper.find('AddFontFooter').length).toBe(1)
+    test('render <AddUpdateFontFooter /> component', () => {
+      expect(wrapper.find('Connect(AddUpdateFontFooter)').length).toBe(1)
     })
   })
 })

@@ -28,6 +28,7 @@ window.GFPDF = {
   fontListRegularRequired: 'Regular',
   searchResultEmpty: 'No fonts matching your search found.',
   fontListEmpty: 'Font list empty.',
+  fontManagerFontFilesLabel: 'Font Files',
   addUpdateFontSuccess: 'Your font has been saved.',
   addFatalError: 'A problem occurred. Reload the page and try again.',
   fontFileInvalid: 'Font file(s) are malformed and cannot be used with Gravity PDF'

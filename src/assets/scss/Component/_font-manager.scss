@@ -62,7 +62,7 @@
             .font-list-header,
             .font-list-item {
               display: grid;
-              grid-template-columns: 0.75fr 4fr 1.5fr 1.5fr 1.5fr 2fr;
+              grid-template-columns: 4fr 1.5fr 1.5fr 1.5fr 2fr 0.75fr;
               gap: 1rem;
               padding: 0.325rem 0;
               text-align: center;
@@ -131,7 +131,7 @@
         }
 
         /* Add font */
-        .add-font-column {
+        .add-update-font-column {
           display: flex;
           position: relative;
           width: 100%;
@@ -285,38 +285,6 @@
                     margin-left: 3px;
                   }
                 }
-              }
-            }
-
-            .footer {
-              padding-bottom: 40px;
-
-              .gfpdf-spinner {
-                padding-left: 0;
-              }
-
-              &.cancel {
-                button {
-                  margin-bottom: 0;
-                }
-              }
-
-              .button {
-                height: 35px;
-                margin-right: 8px;
-              }
-
-              .msg {
-                display: block;
-
-                &.success {
-                  color: base.$success-color;
-                }
-
-                &.error {
-                  color: base.$error-color;
-                }
-
               }
             }
           }

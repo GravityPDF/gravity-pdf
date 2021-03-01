@@ -1,5 +1,5 @@
 import { Selector, t } from 'testcafe'
-import { baseURL } from '../../../auth'
+import { admin, baseURL } from '../../../auth'
 
 class General {
   constructor () {
@@ -10,7 +10,7 @@ class General {
     this.defaultTemplateSelectBox = Selector('#gfpdf-settings-field-wrapper-default_template').find('[id="gfpdf_settings[default_template]"]')
 
     // General Settings - Default Font field
-    this.defaultFontSelectBox = Selector('#gfpdf-settings-field-wrapper-default_font').find('[id="gfpdf_settings[default_font]"]')
+    this.defaultFontSelectBox = Selector('#gfpdf-settings-field-wrapper-default_font').find('select').withAttribute('name', 'gfpdf_settings[default_font]')
 
     // General Settings - Default Paper Size field
     this.defaultPaperSizeSelectBox = Selector('#gfpdf-settings-field-wrapper-default_pdf_size').find('[id="gfpdf_settings[default_pdf_size]"]')
@@ -25,7 +25,7 @@ class General {
     this.defaultFontSizeInputBox = Selector('#gfpdf-settings-field-wrapper-default_font_size').find('[id="gfpdf_settings[default_font_size]"]')
 
     // General Settings - Default Font Color field
-    this.defaultFontColorSelectButton = Selector('#gfpdf-settings-field-wrapper-default_font_colour').find('button').withText('Select Color')
+    this.defaultFontColorSelectButton = Selector('#gfpdf-settings-field-wrapper-default_font_colour').find('[class^="button wp-color-result ed_button"]').withText('Select Color')
     this.defaultFontColorInputBox = Selector('#gfpdf-settings-field-wrapper-default_font_colour').find('[id="gfpdf_settings[default_font_colour]"]')
 
     // General Settings - Entry View field
@@ -61,12 +61,9 @@ class General {
 
   async navigateSettingsTab (text) {
     await t
+      .useRole(admin)
       .setNativeDialogHandler(() => true)
       .navigateTo(`${baseURL}/wp-admin/admin.php?page=${text}`)
-      .typeText('#user_login', 'admin', { paste: true })
-      .typeText('#user_pass', 'password', { paste: true })
-      .click('#wp-submit')
-      .wait(500)
   }
 
   async navigatePdfEntries (text) {

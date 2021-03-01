@@ -45,6 +45,7 @@ test('should check that upload media manager exist', async t => {
 
 test('should save added header data', async t => {
   // Actions
+  await t.setTestSpeed(0.4)
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
   await t
     .click(run.templateCollapsiblePanel)
@@ -65,6 +66,7 @@ test('should save added header data', async t => {
 
 test('should delete/reset header field content', async t => {
   // Actions & Assertions
+  await t.setTestSpeed(0.4)
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
   await t
     .click(run.templateCollapsiblePanel)

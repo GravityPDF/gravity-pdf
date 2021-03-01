@@ -25,7 +25,7 @@ const FontListSkeleton = () => {
           </div>
           <span className='placeholder font-name' />
           <div>
-            <span className='placeholder dashicons dashicons-yes' />
+            <span className='placeholder dashicons dashicons-yes'></span>
           </div>
           <div>
             <span className='placeholder dashicons dashicons-no-alt' />

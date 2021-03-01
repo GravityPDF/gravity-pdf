@@ -134,7 +134,9 @@ test('should successfully search for template', async t => {
 test('should successfully upload new template', async t => {
   // Actions
   await templateManager.navigateTemplateManager('gf_edit_forms&view=settings&subview=pdf&id=4')
-  await t.setFilesToUpload(templateManager.addNewTemplateButton, templateManager.testTemplate)
+  await t
+    .setFilesToUpload(templateManager.addNewTemplateButton, templateManager.testTemplate)
+    .wait(500)
 
   // Assertions
   await t

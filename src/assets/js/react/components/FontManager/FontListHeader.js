@@ -15,12 +15,12 @@ import React from 'react'
  */
 const FontListHeader = () => (
   <div data-test='component-FontListHeader' className='font-list-header'>
-    <div />
     <div className='font-name'>{GFPDF.fontListInstalledFonts}</div>
     <div>{GFPDF.fontListRegular}</div>
     <div>{GFPDF.fontListItalics}</div>
     <div>{GFPDF.fontListBold}</div>
     <div>{GFPDF.fontListBoldItalics}</div>
+    <div />
   </div>
 )
 

@@ -184,6 +184,7 @@ test('should successfully delete font', async t => {
     .click(fontManager.advancedButton)
     .click(fontManager.fontListItem.nth(1).find('[class^="dashicons dashicons-trash"]'))
     .click(fontManager.fontListItem.nth(0).find('[class^="dashicons dashicons-trash"]'))
+    .wait(500)
 
   // Assertions
   await t

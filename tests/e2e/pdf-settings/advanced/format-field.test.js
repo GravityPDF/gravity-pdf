@@ -33,6 +33,7 @@ test('should display added fields if \'Standard\' option is checked', async t =>
   await t
     .click(run.advancedCollapsiblePanel)
     .click(run.formatStandardCheckbox)
+    .click(run.enablePdfSecurityCheckbox)
 
   // Assertions
   await t

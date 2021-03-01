@@ -48,16 +48,7 @@ export class FontListItems extends Component {
     ).isRequired,
     searchResult: PropTypes.oneOfType([
       PropTypes.oneOf([null]).isRequired,
-      PropTypes.arrayOf(
-        PropTypes.shape({
-          font_name: PropTypes.string.isRequired,
-          id: PropTypes.string.isRequired,
-          regular: PropTypes.string.isRequired,
-          italics: PropTypes.string.isRequired,
-          bold: PropTypes.string.isRequired,
-          bolditalics: PropTypes.string.isRequired
-        })
-      ).isRequired
+      PropTypes.arrayOf(PropTypes.object).isRequired
     ]),
     selectedFont: PropTypes.string.isRequired,
     loading: PropTypes.bool.isRequired
@@ -66,13 +57,14 @@ export class FontListItems extends Component {
   /**
    * Initialize component state
    *
-   * @type {{ disableSelectFontName: boolean, deleteId: string }}
+   * @type {{ disableSelectFontName: boolean, deleteId: string, moveSelectedFontToTop: boolean }}
    *
    * @since 6.0
    */
   state = {
     disableSelectFontName: false,
-    deleteId: ''
+    deleteId: '',
+    moveSelectedFontToTop: true
   }
 
   /**
@@ -100,7 +92,7 @@ export class FontListItems extends Component {
    * @since 6.0
    */
   componentDidUpdate (prevProps) {
-    const { history, loading, fontList } = this.props
+    const { history, loading, fontList, selectedFont, id } = this.props
     const updateFontVisible = document.querySelector('.update-font.show')
 
     /* Reset/Clear deleteId loading state */
@@ -111,6 +103,11 @@ export class FontListItems extends Component {
     /* Remove update font panel after font is successfully deleted */
     if (prevProps.loading !== loading && prevProps.fontList !== fontList && updateFontVisible) {
       toggleUpdateFont(history)
+    }
+
+    /* Move selected font at the top of the list */
+    if (prevProps.selectedFont === '' && selectedFont && !id && this.state.moveSelectedFontToTop) {
+      this.handleMoveSelectedFontAtTheTopOfTheList(selectedFont)
     }
   }
 
@@ -196,6 +193,8 @@ export class FontListItems extends Component {
    * @since 6.0
    */
   handleMoveSelectedFontAtTheTopOfTheList = selectedFont => {
+    this.setState({ moveSelectedFontToTop: false })
+
     this.props.moveSelectedFontToTop(selectedFont)
   }
 
@@ -231,8 +230,11 @@ export class FontListItems extends Component {
    * @since 6.0
    */
   handleFontClickKeypress = (e, fontId) => {
+    const enter = 13
+    const space = 32
+
     /* Check if a keyboard keypress is 'enter' (13) and call the method handleFontClick() */
-    if (e.keyCode === 13) {
+    if (e.keyCode === enter || e.keyCode === space) {
       this.handleFontClick(fontId)
     }
   }
@@ -247,6 +249,7 @@ export class FontListItems extends Component {
    */
   handleDeleteFont = (e, fontId) => {
     e.stopPropagation()
+
     this.setState({ deleteId: fontId })
 
     /* Fire a native window alert box to confirm deletion request */
@@ -265,8 +268,11 @@ export class FontListItems extends Component {
    * @since 6.0
    */
   handleDeleteFontKeypress = (e, fontId) => {
+    const enter = 13
+    const space = 32
+
     /* Check if a keyboard keypress is 'enter' (13) and call the method handleDeleteFont() */
-    if (e.keyCode === 13) {
+    if (e.keyCode === enter || e.keyCode === space) {
       this.handleDeleteFont(e, fontId)
     }
   }
@@ -275,25 +281,11 @@ export class FontListItems extends Component {
    * Handle the process of selecting and deselecting of font type/name (radio button)
    *
    * @param e: object
-   * @param click: string
    *
    * @since 6.0
    */
-  handleSelectFont = (e, click) => {
-    const { selectedFont, selectFont } = this.props
-
-    if (click) {
-      /* Call redux action selectFont */
-      return selectFont(e.target.value)
-    }
-
-    if (selectedFont === '') {
-      /* Call redux action selectFont */
-      return selectFont(e.target.value)
-    }
-
-    /* Call redux action selectFont */
-    selectFont('')
+  handleSelectFont = e => {
+    this.props.selectFont(e.target.value)
   }
 
   /**
@@ -324,9 +316,11 @@ export class FontListItems extends Component {
    * @since 6.0
    */
   render () {
+    const updateFontVisible = document.querySelector('.update-font.show')
     const { disableSelectFontName, deleteId } = this.state
     const { id, loading, fontList, searchResult, selectedFont } = this.props
     const list = !searchResult ? fontList : searchResult
+    const tabIndex = updateFontVisible ? '-1' : '144'
 
     return (
       <div data-test='component-FontListItems' className='font-list-items'>
@@ -337,18 +331,8 @@ export class FontListItems extends Component {
               className={'font-list-item' + (font.id === id ? ' active' : '')}
               onClick={() => this.handleFontClick(font.id)}
               onKeyDown={e => this.handleFontClickKeypress(e, font.id)}
-              tabIndex='144'
+              tabIndex={tabIndex}
             >
-
-              {loading && (deleteId === font.id) ? <Spinner style='delete-font' /> : (
-                <span
-                  className='dashicons dashicons-trash'
-                  onClick={e => this.handleDeleteFont(e, font.id)}
-                  onKeyDown={e => this.handleDeleteFontKeypress(e, font.id)}
-                  tabIndex='144'
-                />
-              )}
-
               <span className='font-name'>
                 {!disableSelectFontName && (
                   <input
@@ -356,11 +340,11 @@ export class FontListItems extends Component {
                     className='selectFontName'
                     name='selectFontName'
                     value={font.id}
-                    onChange={e => this.handleSelectFont(e, 'click')}
+                    onChange={e => this.handleSelectFont(e)}
                     onClick={e => e.stopPropagation()}
                     onKeyDown={e => this.handleSelectFontKeypress(e)}
                     checked={font.id === selectedFont}
-                    tabIndex='144'
+                    tabIndex={tabIndex}
                   />
                 )}
                 {font.font_name}
@@ -370,6 +354,15 @@ export class FontListItems extends Component {
               <FontListIcon font={font.italics} />
               <FontListIcon font={font.bold} />
               <FontListIcon font={font.bolditalics} />
+
+              {loading && (deleteId === font.id) ? <Spinner style='delete-font' /> : (
+                <span
+                  className='dashicons dashicons-trash'
+                  onClick={e => this.handleDeleteFont(e, font.id)}
+                  onKeyDown={e => this.handleDeleteFontKeypress(e, font.id)}
+                  tabIndex={tabIndex}
+                />
+              )}
             </div>
           )
         })}

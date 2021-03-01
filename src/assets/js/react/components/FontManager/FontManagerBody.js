@@ -557,7 +557,7 @@ export class FontManagerBody extends Component {
           <FontList id={id} history={history} />
         </div>
 
-        <div className='add-font-column container'>
+        <div className='add-update-font-column container'>
           <AddFont
             onHandleInputChange={this.handleInputChange}
             onHandleUpload={this.handleUpload}
@@ -565,9 +565,9 @@ export class FontManagerBody extends Component {
             onHandleSubmit={this.handleSubmit}
             msg={msg}
             loading={loading}
-            tabIndexFontName={!updateFontVisible ? '145' : '0'}
-            tabIndexFontFiles={!updateFontVisible ? '146' : '0'}
-            tabIndexFooterButtons={!updateFontVisible ? '148' : '0'}
+            tabIndexFontName={!updateFontVisible ? '145' : '-1'}
+            tabIndexFontFiles={!updateFontVisible ? '146' : '-1'}
+            tabIndexFooterButtons={!updateFontVisible ? '147' : '-1'}
             {...this.state.addFont}
           />
 
@@ -581,9 +581,9 @@ export class FontManagerBody extends Component {
             fontList={fontList}
             msg={msg}
             loading={loading}
-            tabIndexFontName={updateFontVisible ? '145' : '0'}
-            tabIndexFontFiles={updateFontVisible ? '146' : '0'}
-            tabIndexFooterButtons={updateFontVisible ? '147' : '0'}
+            tabIndexFontName={updateFontVisible ? '145' : '-1'}
+            tabIndexFontFiles={updateFontVisible ? '146' : '-1'}
+            tabIndexFooterButtons={updateFontVisible ? '147' : '-1'}
             {...this.state.updateFont}
           />
         </div>

@@ -68,7 +68,7 @@ describe('Help - HelpContainer.js', () => {
       setTimeout(() => {
         expect(getDataMock.mock.calls.length).toBe(1)
         done()
-      }, 400)
+      }, 500)
     })
 
     test('searchInputLength() - check for search input length that is > 3 and pass to redux action', done => {
@@ -80,7 +80,7 @@ describe('Help - HelpContainer.js', () => {
       setTimeout(() => {
         expect(getDataMock.mock.calls.length).toBe(1)
         done()
-      }, 400)
+      }, 500)
     })
 
     test('searchInputLength() - check for search input length < = 3 and pass to redux action', done => {
@@ -92,7 +92,7 @@ describe('Help - HelpContainer.js', () => {
       setTimeout(() => {
         expect(deleteResultMock.mock.calls.length).toBe(1)
         done()
-      }, 400)
+      }, 500)
     })
   })
 
@@ -119,7 +119,7 @@ describe('Help - HelpContainer.js', () => {
     setTimeout(() => {
       expect(getDataMock.mock.calls.length).toBe(1)
       done()
-    }, 400)
+    }, 500)
   })
 
   test('renders <DisplayResultContainer /> component', () => {

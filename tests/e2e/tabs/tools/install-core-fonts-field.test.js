@@ -27,7 +27,7 @@ test('should return download core fonts successful response ', async t => {
   await run.navigateSettingsTab('gf_settings&subview=PDF&tab=tools#')
   await t
     .click(run.downloadCoreFontsButton)
-    .wait(300)
+    .wait(400)
 
   // Assertions
   await t
@@ -48,7 +48,7 @@ test('should return download core fonts error/failed response', async t => {
   await run.navigateSettingsTab('gf_settings&subview=PDF&tab=tools#')
   await t
     .click(run.downloadCoreFontsButton)
-    .wait(300)
+    .wait(400)
 
   // Assertions
   await t
