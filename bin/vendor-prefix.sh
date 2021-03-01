@@ -12,12 +12,7 @@ if [[ ! -f "${PLUGIN_DIR}php-scoper.phar" ]]; then
   curl -L https://github.com/humbug/php-scoper/releases/download/0.14.0/php-scoper.phar -o  ${PLUGIN_DIR}php-scoper.phar
 fi
 
-# Monolog
-if exists sudo; then
-  sudo chmod -R 777 vendor
-else
-  chmod -R 777 vendor
-fi
+chmod -R 777 "${PLUGIN_DIR}vendor"
 
 PHP_DOCKER=""
 PHP="php"
