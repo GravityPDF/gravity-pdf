@@ -26,7 +26,7 @@ yarn --cwd ${PACKAGE_DIR} prebuild
 yarn --cwd ${PACKAGE_DIR} build:production
 composer install --no-dev  --prefer-dist --optimize-autoloader --working-dir ${PACKAGE_DIR}
 
-PLUGIN_DIR="$PACKAGE_DIR/" bash ./bin/vendor-prefix.sh
+BUILD=1 PLUGIN_DIR="$PACKAGE_DIR/" bash ./bin/vendor-prefix.sh
 
 # Cleanup Node JS
 rm -f -R ${PACKAGE_DIR}/node_modules

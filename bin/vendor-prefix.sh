@@ -2,10 +2,10 @@
 
 isCI() {
   if [ "$CI" = "true" ]; then
-    return 0
+    return 1
   fi
 
-  return 1
+  return 0
 }
 
 if [ -z "$PLUGIN_DIR" ]; then
@@ -22,7 +22,7 @@ PHP_DOCKER=""
 PHP="php"
 COMPOSER="composer"
 
-if isCI; then
+if [[ isCI && $BUILD -ne 1 ]]; then
   PHP_DOCKER="yarn wp-scripts env docker-run php "
   PHP="LOCAL_PHP=7.4-fpm ${PHP_DOCKER}php"
   COMPOSER="${PHP_DOCKER}composer"
