@@ -7,7 +7,7 @@ fixture`PDF advanced settings - Enable PDF security field test`
 
 test('should display \'Enable PDF Security\' field', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.advancedCollapsiblePanel)
     .click(run.formatStandardCheckbox)
@@ -21,7 +21,7 @@ test('should display \'Enable PDF Security\' field', async t => {
 
 test('should save toggled checkbox value', async t => {
   // Actions & Assertions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.advancedCollapsiblePanel)
     .click(run.formatStandardCheckbox)

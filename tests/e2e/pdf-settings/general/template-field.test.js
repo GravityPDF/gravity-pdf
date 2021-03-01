@@ -17,7 +17,7 @@ fixture`PDF general settings - Template field test`
 
 test('should display \'Template\' field', async t => {
   // Actions
-  await templateManager.navigateTemplateManager('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await templateManager.navigateTemplateManager('gf_edit_forms&view=settings&subview=PDF&id=4')
 
   // Assertions
   await t
@@ -29,7 +29,7 @@ test('should display \'Template\' field', async t => {
 
 test('should display the core templates dropdown option', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
 
   // Assertions
   await t
@@ -42,7 +42,7 @@ test('should display the core templates dropdown option', async t => {
 
 test('should save selected template', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.templateSelectBox)
     .click(dropdownOption('Rubix'))
@@ -55,7 +55,7 @@ test('should save selected template', async t => {
 
 test('should check that template manager popup exist', async t => {
   // Actions
-  await templateManager.navigateTemplateManager('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await templateManager.navigateTemplateManager('gf_edit_forms&view=settings&subview=PDF&id=4')
 
   // Assertions
   await t
@@ -78,7 +78,7 @@ test('should display individual template details', async t => {
   const imageScreenshot = Selector('.screenshot').find('img').getAttribute('src')
 
   // Actions
-  await templateManager.navigateTemplateManager('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await templateManager.navigateTemplateManager('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t.click(templateManager.focusGravityTemplateDetails)
 
   // Assertions
@@ -94,7 +94,7 @@ test('should display individual template details', async t => {
 
 test('should display popup template manager that can be close', async t => {
   // Actions & Assertions
-  await templateManager.navigateTemplateManager('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await templateManager.navigateTemplateManager('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(templateManager.closeDialog)
     .click(templateManager.advancedButton)
@@ -104,7 +104,7 @@ test('should display popup template manager that can be close', async t => {
 
 test('should successfully search for template', async t => {
   // Actions
-  await templateManager.navigateTemplateManager('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await templateManager.navigateTemplateManager('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t.typeText(templateManager.templateSearchbar, 'rubix', { paste: true })
 
   // Assertions
@@ -115,7 +115,7 @@ test('should successfully search for template', async t => {
 
 test('should successfully upload new template', async t => {
   // Actions
-  await templateManager.navigateTemplateManager('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await templateManager.navigateTemplateManager('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .setFilesToUpload(templateManager.addNewTemplateButton, templateManager.testTemplate)
     .wait(500)
@@ -131,7 +131,7 @@ test('should successfully upload new template', async t => {
 
 test('should successfully delete new added template', async t => {
   // Actions
-  await templateManager.navigateTemplateManager('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await templateManager.navigateTemplateManager('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(templateManager.testTemplateDetailsLink)
     .click(templateManager.deleteButton)

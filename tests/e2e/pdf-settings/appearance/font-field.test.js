@@ -14,7 +14,7 @@ fixture`PDF appearance settings - Font field test`
 
 test('should display \'Font\' field', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
 
   // Assertions
   await t
@@ -26,7 +26,7 @@ test('should display \'Font\' field', async t => {
 
 test('should display a dropdown of default fonts option', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.appearanceCollapsiblePanel)
     .click(run.fontSelectBox)
@@ -52,7 +52,7 @@ test('should display a dropdown of default fonts option', async t => {
 
 test('should save selected font', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.appearanceCollapsiblePanel)
     .click(run.fontSelectBox)
@@ -66,7 +66,7 @@ test('should save selected font', async t => {
 
 test('should check that font manager popup exist', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.appearanceCollapsiblePanel)
     .click(fontManager.advancedButton)
@@ -81,7 +81,7 @@ test('should check that font manager popup exist', async t => {
 
 test('should display font manager error validation', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.appearanceCollapsiblePanel)
     .click(fontManager.advancedButton)
@@ -98,7 +98,7 @@ test('should display font manager error validation', async t => {
 
 test('should successfully add new font', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.appearanceCollapsiblePanel)
     .click(fontManager.advancedButton)
@@ -118,7 +118,7 @@ test('should successfully add new font', async t => {
 
 test('should successfully check toggled state for disabled \'Update Font\' button', async t => {
   // Actions && Assertions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.appearanceCollapsiblePanel)
     .click(fontManager.advancedButton)
@@ -130,7 +130,7 @@ test('should successfully check toggled state for disabled \'Update Font\' butto
 
 test('should successfully close \'update font\' panel using cancel button', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.appearanceCollapsiblePanel)
     .click(fontManager.advancedButton)
@@ -143,7 +143,7 @@ test('should successfully close \'update font\' panel using cancel button', asyn
 
 test('should successfully perform font search', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.appearanceCollapsiblePanel)
     .click(fontManager.advancedButton)
@@ -155,7 +155,7 @@ test('should successfully perform font search', async t => {
 
 test('should successfully edit existing font', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.appearanceCollapsiblePanel)
     .click(fontManager.advancedButton)
@@ -178,7 +178,7 @@ test('should successfully edit existing font', async t => {
 
 test('should successfully delete font', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.appearanceCollapsiblePanel)
     .click(fontManager.advancedButton)
@@ -194,7 +194,7 @@ test('should successfully delete font', async t => {
 
 test('should be able to close font manager popup', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.appearanceCollapsiblePanel)
     .click(fontManager.advancedButton)

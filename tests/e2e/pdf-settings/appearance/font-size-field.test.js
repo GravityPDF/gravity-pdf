@@ -7,7 +7,7 @@ fixture`PDF appearance settings - Font size field test`
 
 test('should display \'Font Size\' field', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
 
   // Assertions
   await t
@@ -18,7 +18,7 @@ test('should display \'Font Size\' field', async t => {
 
 test('should save selected font size', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.appearanceCollapsiblePanel)
     .click(run.fontSizeInputBox)

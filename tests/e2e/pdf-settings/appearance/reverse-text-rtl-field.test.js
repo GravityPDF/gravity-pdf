@@ -7,7 +7,7 @@ fixture`PDF appearance settings - Reverse text (RTL) field test`
 
 test('should display \'Reverse Text (RTL)\' field', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
 
   // Assertions
   await t
@@ -18,7 +18,7 @@ test('should display \'Reverse Text (RTL)\' field', async t => {
 
 test('should save toggled checkbox value', async t => {
   // Actions & Assertions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.appearanceCollapsiblePanel)
     .click(run.rtlCheckbox)

@@ -7,7 +7,7 @@ fixture`PDF general settings - Filename field test`
 
 test('should display \'Filename\' field', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
 
   // Assertions
   await t
@@ -19,7 +19,7 @@ test('should display \'Filename\' field', async t => {
 
 test('should check that merge tags list option exist', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t.click(run.filenameMergeTagsOptionList)
 
   // Assertions
@@ -37,7 +37,7 @@ test('should check that merge tags list option exist', async t => {
 
 test('should save selected merge tags', async t => {
   // Actions & Assertions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.filenameInputBox)
     .pressKey('ctrl+a')

@@ -16,7 +16,7 @@ class Pages {
    * @since 4.0
    */
   isFormSettings () {
-    return $('#tab_pdf').length
+    return $('.gforms_edit_form').length
   }
 
   /**

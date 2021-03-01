@@ -11,7 +11,7 @@ test('should display \'Label\' field', async t => {
   const labelInputField = Selector('#gfpdf_settings\\[name\\]')
 
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
 
   // Assertions
   await t
@@ -25,7 +25,7 @@ test('should save new label', async t => {
   const labelInputField = Selector('#gfpdf_settings\\[name\\]')
 
   // Actions && Assertions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(labelInputField)
     .pressKey('ctrl+a')

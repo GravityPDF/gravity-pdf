@@ -7,7 +7,7 @@ fixture`PDF advanced settings - Image DPI field test`
 
 test('should display \'Image DPI\' field', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t.click(run.advancedCollapsiblePanel)
 
   // Assertions
@@ -19,7 +19,7 @@ test('should display \'Image DPI\' field', async t => {
 
 test('should save selected image DPI value', async t => {
   // Actions & Assertions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.advancedCollapsiblePanel)
     .click(run.imageDpiInputBox)

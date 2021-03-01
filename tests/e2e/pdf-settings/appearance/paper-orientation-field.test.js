@@ -7,7 +7,7 @@ fixture`PDF appearance settings - Paper orientation field test`
 
 test('should display \'Paper Orientation\' field', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
 
   // Assertions
   await t
@@ -17,7 +17,7 @@ test('should display \'Paper Orientation\' field', async t => {
 
 test('should save selected paper orientation value', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.appearanceCollapsiblePanel)
     .click(run.paperOrientationSelectBox)

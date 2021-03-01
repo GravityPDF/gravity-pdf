@@ -8,7 +8,7 @@ fixture`PDF appearance settings - Font color field test`
 
 test('should display \'Font Color\' field', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.appearanceCollapsiblePanel)
     .click(button('Select Color'))
@@ -25,7 +25,7 @@ test('should display \'Font Color\' field', async t => {
 
 test('should save selected font color', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.appearanceCollapsiblePanel)
     .click(run.fontColorSelectButton)

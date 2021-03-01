@@ -7,7 +7,7 @@ fixture`PDF template settings - Show section break description field test`
 
 test('should display \'Show Section Break Description\' field', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
 
   // Assertions
   await t
@@ -18,7 +18,7 @@ test('should display \'Show Section Break Description\' field', async t => {
 
 test('should save toggled checkbox value', async t => {
   // Actions & Assertions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.templateCollapsiblePanel)
     .click(run.showSectionBreakDescriptionCheckbox)

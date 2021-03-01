@@ -13,7 +13,7 @@ test('should display \'Format\' field', async t => {
   const pdfX1aLabel = Selector('#gfpdf-settings-field-wrapper-format').find('label').withAttribute('for', 'gfpdf_settings[format][PDFX1A]').withText('PDF/X-1a')
 
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
 
   // Assertions
   await t
@@ -29,7 +29,7 @@ test('should display \'Format\' field', async t => {
 
 test('should display added fields if \'Standard\' option is checked', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.advancedCollapsiblePanel)
     .click(run.formatStandardCheckbox)
@@ -44,7 +44,7 @@ test('should display added fields if \'Standard\' option is checked', async t =>
 
 test('should hide \'Standard\' added fields if \'PDF/A-1b\' option is checked', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.advancedCollapsiblePanel)
     .click(run.formatPdfA1bCheckbox)
@@ -58,7 +58,7 @@ test('should hide \'Standard\' added fields if \'PDF/A-1b\' option is checked', 
 
 test('should hide \'Standard\' added fields if \'PDF/X-1a\' option is checked', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.advancedCollapsiblePanel)
     .click(run.formatPdfX1aCheckbox)
@@ -72,7 +72,7 @@ test('should hide \'Standard\' added fields if \'PDF/X-1a\' option is checked', 
 
 test('should save toggled checkbox value', async t => {
   // Actions & Assertions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.advancedCollapsiblePanel)
     .click(run.formatStandardCheckbox)

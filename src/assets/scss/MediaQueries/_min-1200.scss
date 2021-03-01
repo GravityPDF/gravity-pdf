@@ -2,7 +2,7 @@
 
 /* 961px up to 1200px*/
 @media only screen and (min-width: 961px) and (max-width: 1200px) {
-  #tab_pdf, #tab_PDF {
+  #tab_PDF {
 
     /* Font manager modal */
     #font-manager-overlay {
@@ -35,7 +35,7 @@
 
 /* 1201px up */
 @media only screen and (min-width: 1201px) {
-  #tab_pdf, #tab_PDF {
+  #tab_PDF {
 
     #gfpdf-settings-field-wrapper-template-container,
     #gfpdf-settings-field-wrapper-font-container {

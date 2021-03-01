@@ -11,7 +11,7 @@ test('should display \'Conditional Logic\' field', async t => {
   const checkboxLabel = Selector('#gfpdf-settings-field-wrapper-conditional').find('label').withText('Enable conditional logic')
 
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
 
   // Assertions
   await t
@@ -23,7 +23,7 @@ test('should display \'Conditional Logic\' field', async t => {
 
 test('should save checkbox toggled value', async t => {
   // Actions && Assertions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.conditionalLogicCheckbox)
     .click(run.saveSettings)
@@ -38,7 +38,7 @@ test('should display conditional logic settings field if checkbox is checked', a
   const conditionalLogicSettingsField = Selector('#gfpdf-settings-field-wrapper-conditional').find('[class^="gform-settings-field__conditional-logic"][id="gfpdf_conditional_logic_container"]')
 
   // Actions & Assertions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.conditionalLogicCheckbox)
     .expect(conditionalLogicSettingsField.visible).ok()

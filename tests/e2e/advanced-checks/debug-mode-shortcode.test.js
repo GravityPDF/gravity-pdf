@@ -14,7 +14,7 @@ test('should enable debug mode and throw error when PDF is inactive', async t =>
   await t
     .click(advancedCheck.debugModeCheckbox)
     .click(general.saveSettings)
-  await advancedCheck.copyDownloadShortcode('gf_edit_forms&view=settings&subview=pdf&id=3')
+  await advancedCheck.copyDownloadShortcode('gf_edit_forms&view=settings&subview=PDF&id=3')
   shortcodeHolder = await advancedCheck.shortcodeInputBox.value
   await t.click(advancedCheck.toggleSwitch)
   await advancedCheck.navigateConfirmationSection('gf_edit_forms&view=settings&subview=confirmation&id=3')
@@ -34,7 +34,7 @@ test('should enable debug mode and throw error when PDF is inactive', async t =>
 
 test('should reset/clean PDF back to active and debug mode back to disabled for the next test', async t => {
   // Actions & Assertions
-  await advancedCheck.navigateSection('gf_edit_forms&view=settings&subview=pdf&id=3')
+  await advancedCheck.navigateSection('gf_edit_forms&view=settings&subview=PDF&id=3')
   await t
     .click(advancedCheck.toggleSwitch)
     .expect(advancedCheck.activePdfTemplate.exists).ok()
