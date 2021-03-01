@@ -19,7 +19,7 @@ mkdir -p ${PACKAGE_DIR}
 
 # Get an archive of our plugin
 git archive ${BRANCH} --output ${PACKAGE_DIR}/package.tar.gz
-tar -zxf ${PACKAGE_DIR}/package.tar.gz --directory ${PACKAGE_DIR} && rm --force ${PACKAGE_DIR}/package.tar.gz
+tar -zxf ${PACKAGE_DIR}/package.tar.gz --directory ${PACKAGE_DIR} && rm -f ${PACKAGE_DIR}/package.tar.gz
 
 # Run Composer
 yarn --cwd ${PACKAGE_DIR} prebuild
@@ -29,7 +29,7 @@ composer install --no-dev  --prefer-dist --optimize-autoloader --working-dir ${P
 PLUGIN_DIR="$PACKAGE_DIR/" bash ./bin/vendor-prefix.sh
 
 # Cleanup Node JS
-rm --force -R ${PACKAGE_DIR}/node_modules
+rm -f -R ${PACKAGE_DIR}/node_modules
 
 # Cleanup additional build files
 FILES=(
@@ -45,12 +45,12 @@ FILES=(
 
 for i in "${FILES[@]}"
 do
-    rm --force ${i}
+    rm -f ${i}
 done
 
-rm --force -R "${PACKAGE_DIR}/src/assets/css"
-rm --force -R "${PACKAGE_DIR}/src/assets/js"
-rm --force -R "${PACKAGE_DIR}/bin"
-rm --force -R "${PACKAGE_DIR}/.php-scoper"
-rm --force -R "${PACKAGE_DIR}/webpack-configs"
+rm -f -R "${PACKAGE_DIR}/src/assets/css"
+rm -f -R "${PACKAGE_DIR}/src/assets/js"
+rm -f -R "${PACKAGE_DIR}/bin"
+rm -f -R "${PACKAGE_DIR}/.php-scoper"
+rm -f -R "${PACKAGE_DIR}/webpack-configs"
 rm -R "${PACKAGE_DIR}/vendor/mpdf/mpdf/ttfonts"
