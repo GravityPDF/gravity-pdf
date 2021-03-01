@@ -353,8 +353,8 @@ export class FontListItems extends Component {
                 {!disableSelectFontName && (
                   <input
                     type='radio'
-                    id='selectFontName'
-                    name={font.id}
+                    className='selectFontName'
+                    name='selectFontName'
                     value={font.id}
                     onChange={e => this.handleSelectFont(e, 'click')}
                     onClick={e => e.stopPropagation()}

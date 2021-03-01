@@ -282,7 +282,7 @@ describe('FontManager - FontListItems.js', () => {
     test('render radio button for select font name', () => {
       const wrapper = shallow(<FontListItems {...props} />)
 
-      expect(wrapper.find('input#selectFontName').length).toBe(1)
+      expect(wrapper.find('input[name="selectFontName"]').length).toBe(1)
     })
 
     test('render font name', () => {
