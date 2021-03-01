@@ -72,7 +72,7 @@ If you would rather use your own development environment, you can build Gravity 
 1. Clone the repository using `git clone https://github.com/GravityPDF/gravity-pdf/`
 1. Run `yarn prebuild` and `yarn build:production`
 1. Run `composer install`
-1. Run `NO_DOCKER=true bash ./bin/vendor-prefix.sh`
+1. Run `bash ./bin/vendor-prefix.sh`
 
 ## Linting
 
@@ -104,7 +104,7 @@ yarn test:e2e:headless
 
 ## PHPUnit
 
-To succesfully run all PHPUnit tests you will need an Elite Gravity Forms license so the Survey, Poll, and Quiz plugins can be automatically installed and downloaded. To install these plugins, run `yarn env:install:phpunit`. 
+To successfully run all PHPUnit tests you will need an Elite Gravity Forms license so the Survey, Poll, and Quiz plugins can be automatically installed and downloaded. To install these plugins, run `yarn env:install:phpunit`. 
 
 You can then run full suite of tests using `yarn test:php` or `yarn test:php:multisite`
 

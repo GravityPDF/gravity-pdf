@@ -27,8 +27,6 @@ class Vendor_Aliasing {
 		}
 
 		if ( ! function_exists( 'qp' ) ) {
-			require_once( PDF_PLUGIN_DIR . 'vendor_prefixed/querypath/querypath/src/qp_functions.php' );
-
 			function qp() {
 				return \GFPDF_Vendor\qp( ...func_get_args() );
 			}

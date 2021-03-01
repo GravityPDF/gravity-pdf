@@ -76,6 +76,8 @@
     "test:e2e:file:watch": "cross-env NODE_ENV=test testcafe chrome tests/e2e -L",
 
     "test:php": "wp-scripts env test-php",
+    "test:php-composer": "npm run env docker-run -- phpunit php ./vendor/bin/phpunit",
+
     "test:php:multisite": "cross-env WP_MULTISITE=1 wp-scripts env test-php",
     "test:js": "jest --verbose",
     "test:js:coverage": "jest --coverage --verbose",

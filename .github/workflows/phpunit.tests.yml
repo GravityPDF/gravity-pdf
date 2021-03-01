@@ -41,7 +41,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        php: [ '7.4', '7.3', '7.2', '7.1', '7.0', '5.6.20' ]
+        php: [ '8.0', '7.4', '7.3' ]
         os: [ ubuntu-latest ]
         include:
           # Report the results of the PHP 7.4 without memcached job.
@@ -50,6 +50,7 @@ jobs:
             report: true
     env:
       LOCAL_PHP: ${{ matrix.php }}-fpm
+      PHPUNIT_SCRIPT: php
 
     steps:
       - name: Cancel previous runs of this workflow (pull requests only)
@@ -115,6 +116,10 @@ jobs:
           yarn env:install
           yarn env:install:phpunit
 
+          if [ ${{ env.LOCAL_PHP }} == '8.0-fpm' ]; then
+            echo "PHPUNIT_SCRIPT=php-composer" >> $GITHUB_ENV
+          fi
+
       - name: General debug information
         run: |
           npm --version
@@ -137,10 +142,10 @@ jobs:
           docker-compose -f $WP_DEVELOP_DIR/docker-compose.yml run --rm php locale -a
 
       - name: Run PHPUnit tests
-        run: yarn test:php --verbose
+        run: yarn test:${{ env.PHPUNIT_SCRIPT }} --verbose
 
       - name: Run AJAX tests
-        run: yarn test:php --verbose --group ajax
+        run: yarn test:${{ env.PHPUNIT_SCRIPT }} --verbose --group ajax
 
       - name: Run (xDebug) tests
         if: ${{ matrix.report }}
