@@ -1,15 +1,11 @@
 #!/usr/bin/env bash
 
-exists() {
-  command -v "$1" >/dev/null 2>&1
-}
-
 isCI() {
   if [ "$CI" = "true" ]; then
-    return 0
+    return 1
   fi
 
-  return 1
+  return 0
 }
 
 if [ -z "$PLUGIN_DIR" ]; then
@@ -20,18 +16,13 @@ if [[ ! -f "${PLUGIN_DIR}php-scoper.phar" ]]; then
   curl -L https://github.com/humbug/php-scoper/releases/download/0.14.0/php-scoper.phar -o  ${PLUGIN_DIR}php-scoper.phar
 fi
 
-# Monolog
-if exists sudo; then
-  sudo chmod -R 777 vendor
-else
-  chmod -R 777 vendor
-fi
+chmod -R 777 "${PLUGIN_DIR}vendor"
 
 PHP_DOCKER=""
 PHP="php"
 COMPOSER="composer"
 
-if isCI; then
+if [[ isCI && $BUILD -ne 1 ]]; then
   PHP_DOCKER="yarn wp-scripts env docker-run php "
   PHP="LOCAL_PHP=7.4-fpm ${PHP_DOCKER}php"
   COMPOSER="${PHP_DOCKER}composer"
