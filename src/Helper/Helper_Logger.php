@@ -119,6 +119,8 @@ class Helper_Logger {
 				$this->log->pushProcessor( new IntrospectionProcessor );
 				$this->log->pushProcessor( new MemoryPeakUsageProcessor );
 
+				$this->log->notice( 'Log initialized' );
+
 				return;
 			}
 		} catch ( Exception $e ) {
