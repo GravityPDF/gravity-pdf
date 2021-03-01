@@ -216,7 +216,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	public function column_cb( $item ) {
 
 		$is_active   = isset( $item['active'] ) ? $item['active'] : true;
-		$form_id     = rgget( 'id' );
+		$form_id     = (int) rgget( 'id' );
 		$state_nonce = wp_create_nonce( "gfpdf_state_nonce_{$form_id}_{$item['id']}" );
 
 		if ( $is_active ) {
@@ -228,7 +228,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		}
 		?>
 
-		<button type="button" class="gform-status-indicator <?php echo esc_attr( $class ); ?>" data-id="<?= $item['id'] ?>" data-nonce="<?= $state_nonce ?>" data-fid="<?= $form_id ?>" data-status="<?= $is_active ? 'active' : 'inactive' ?>">
+		<button type="button" class="gform-status-indicator <?php echo esc_attr( $class ); ?>" data-id="<?= esc_attr( $item['id'] ) ?>" data-nonce="<?= esc_attr( $state_nonce ) ?>" data-fid="<?= esc_attr( $form_id ) ?>" data-status="<?= $is_active ? 'active' : 'inactive' ?>">
 			<svg viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="2" r="1" stroke-width="2"/></svg>
 			<span class="gform-status-indicator-status"><?php echo esc_html( $text ); ?></span>
 		</button>
@@ -317,7 +317,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 	 */
 	public function column_name( $item ) {
 		$edit_url        = add_query_arg( [ 'pid' => $item['id'] ] );
-		$form_id         = rgget( 'id' );
+		$form_id         = (int) rgget( 'id' );
 		$duplicate_nonce = wp_create_nonce( "gfpdf_duplicate_nonce_{$form_id}_{$item['id']}" );
 		$delete_nonce    = wp_create_nonce( "gfpdf_delete_nonce_{$form_id}_{$item['id']}" );
 
