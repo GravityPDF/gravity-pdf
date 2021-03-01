@@ -23,7 +23,7 @@
     "wp-coding-standards/wpcs": "~2.1.0",
     "phpcompatibility/phpcompatibility-wp": "^2.1.0",
     "roave/security-advisories": "dev-master",
-    "phpunit/phpunit": "^9.2"
+    "phpunit/phpunit": "^7.5"
   },
   "autoload": {
     "psr-4": {
