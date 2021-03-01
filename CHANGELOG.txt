@@ -1,5 +1,34 @@
 This file contains the changelog history for previous major versions of Gravity PDF. See https://wordpress.org/plugins/gravity-forms-pdf-extended/#developers for the current major version changelog.
 
+= 5.3.4 =
+* Security: Resolve XSS issue on PDF List page
+* Security: Resolve authenticated arbitrary PHP file Deletion when using the PDF Template Manager (by default, this affects Administrator accounts only)
+* Housekeeping: Add gfpdf_container_class_map filter
+* Housekeeping: Update Monolog to v1.26
+* Housekeeping: Fix PHP8 deprecation notices
+* Housekeeping: Remove jQuery deprecation notices
+* Housekeeping: Downgrade error to a notice when a not-yet supported field is being processed by the PDF
+* Housekeeping: Bump WordPress Tested To value to 5.7
+* Bug: Fix Media Library inserter on PDF pages when Gravity Forms No Conflict Mode enabled
+* Bug: Fix PHP fatal error when logging is enable and the log file cannot be written to
+* Bug: Fix double spinner randomly showing up when installing and selecting a new PDF template
+
+= 5.3.3 =
+* Bug: Fix PHP notice when no valid form or entry passed when processing merge tags
+* Bug: Make PDF generation background processing task unrecoverable so rest of the queue isn't executed
+* Bug: always parse Core Font payload as JSON
+* Bug: fix a PHP 8 notice (note: the plugin is not guaranteed to be 100% PHP 8-compatible at this time)
+* Housekeeping: adjust log level to 'notice' for optional template configuration file not found
+* Housekeeping: replace most deprecated jQuery code with new recommendations
+* Housekeeping: update EDD licensing class to v1.8 for premium add-ons
+* Housekeeping: update composer-managed dependencies
+* Housekeeping: Make API error messages translatable
+
+= 5.3.2 =
+* Bug: Fix Media Manager so it shows all file types on Gravity PDF pages
+* Bug: Fix Security PDF settings JS toggle when using translated text
+* Dev: Update EDD software licensing class to 1.7.1
+
 = 5.3.1 =
 * Bug/Dev: Prevent composer package `Monolog` version conflict with other plugins by moving to namespace `GFPDF\Vendor\Monolog`
 
