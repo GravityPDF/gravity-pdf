@@ -3,6 +3,7 @@ import templateBootstrap from './bootstrap/templateBootstrap'
 import { fontManagerBootstrap } from './bootstrap/fontManagerBootstrap'
 import coreFontBootstrap from './bootstrap/coreFontBootstrap'
 import helpBootstrap from './bootstrap/helpBootstrap'
+import addEditButton from './utilities/PdfSettings/addEditButton'
 import '../../scss/gfpdf-styles.scss'
 
 /**
@@ -57,6 +58,8 @@ $(function () {
   const fmGeneralSettingsTab = document.querySelector('#gfpdf-settings-field-wrapper-default_font select')
   const fmToolsTab = document.querySelector('#gfpdf-settings-field-wrapper-manage_fonts')
   const fmPdfSettings = document.querySelector('#gfpdf-settings-field-wrapper-font select')
+  const pdfSettingsForm = document.querySelector('#gfpdf_pdf_form')
+  const pdfSettingFieldSets = document.querySelectorAll('fieldset.gform-settings-panel--full')
 
   /* Initialize font manager under general settings tab */
   if (fmGeneralSettingsTab !== null) {
@@ -71,5 +74,10 @@ $(function () {
   /* Initialize font manager under PDF settings */
   if (fmPdfSettings !== null) {
     fontManagerBootstrap(fmPdfSettings)
+  }
+
+  /* Initialize additional add/update buttons on PDF setting panels */
+  if (pdfSettingsForm && pdfSettingFieldSets.length === 4) {
+    addEditButton(pdfSettingFieldSets, pdfSettingsForm)
   }
 })
