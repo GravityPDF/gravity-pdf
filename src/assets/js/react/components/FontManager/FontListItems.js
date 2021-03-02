@@ -286,6 +286,19 @@ export class FontListItems extends Component {
    */
   handleSelectFont = e => {
     this.props.selectFont(e.target.value)
+
+    const installedFonts = document.querySelectorAll('.select-font-name')
+
+    /* Handle font list keyboard accessibility thing */
+    installedFonts.forEach(item => {
+      if (item.value === e.target.value) {
+        item.checked = true
+
+        return
+      }
+
+      item.checked = false
+    })
   }
 
   /**
@@ -337,8 +350,8 @@ export class FontListItems extends Component {
                 {!disableSelectFontName && (
                   <input
                     type='radio'
-                    className='selectFontName'
-                    name='selectFontName'
+                    className='select-font-name'
+                    name={'select-font-name-' + font.id}
                     value={font.id}
                     onChange={e => this.handleSelectFont(e)}
                     onClick={e => e.stopPropagation()}
