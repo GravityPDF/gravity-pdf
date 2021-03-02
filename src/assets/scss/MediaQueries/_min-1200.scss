@@ -14,6 +14,18 @@
             .update-font {
               left: -450px;
             }
+
+            form {
+              .footer {
+                .msg {
+                  &.template-usage-link {
+                    #template_usage_info_box {
+                      width: 90%;
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
