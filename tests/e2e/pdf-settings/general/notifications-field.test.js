@@ -12,7 +12,7 @@ test('should display \'Notifications\' field', async t => {
   const checkboxLabel = Selector('#gfpdf-settings-field-wrapper-notification').find('label').withText('Admin Notification')
 
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
 
   // Assertions
   await t
@@ -27,7 +27,7 @@ test('should save checkbox toggled value', async t => {
   const checkbox = Selector('#gfpdf-settings-field-wrapper-notification').find('[class^="gfpdf_settings_notification "]')
 
   // Actions && Assertions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(checkbox)
     .click(run.saveSettings)

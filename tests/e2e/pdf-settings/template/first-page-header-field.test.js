@@ -14,7 +14,7 @@ fixture`PDF template settings - First page header field test`
 
 test('should display \'First Page Header\' field', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.templateCollapsiblePanel)
     .click(run.firstPageHeaderCheckbox)
@@ -31,7 +31,7 @@ test('should display \'First Page Header\' field', async t => {
 
 test('should check that upload media manager exist', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.templateCollapsiblePanel)
     .click(run.firstPageHeaderCheckbox)
@@ -51,7 +51,7 @@ test('should check that upload media manager exist', async t => {
 
 test('should save checkbox toggled value', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.templateCollapsiblePanel)
     .click(run.firstPageHeaderCheckbox)
@@ -72,7 +72,7 @@ test('should save checkbox toggled value', async t => {
 
 test('should delete/reset \'First Page Header\' field content', async t => {
   // Actions & Assertions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.templateCollapsiblePanel)
     .click(addMediaButton('gfpdf-settings-field-wrapper-first_header', 'Add Media'))

@@ -9,7 +9,7 @@ fixture`PDF template settings - Background image field test`
 
 test('should display \'Background Image\' field', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
 
   // Assertions
   await t
@@ -21,7 +21,7 @@ test('should display \'Background Image\' field', async t => {
 
 test('should check that upload media manager exist', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.templateCollapsiblePanel)
     .click(run.backgroundImageUploadFileButton)
@@ -40,7 +40,7 @@ test('should check that upload media manager exist', async t => {
 
 test('should save uploaded file', async t => {
   // Actions & Assertions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.templateCollapsiblePanel)
     .click(run.backgroundImageUploadFileButton)
@@ -59,7 +59,7 @@ test('should save uploaded file', async t => {
 
 test('should delete uploaded media file', async t => {
   // Actions & Assertions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.templateCollapsiblePanel)
     .click(run.backgroundImageUploadFileButton)

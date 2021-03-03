@@ -8,7 +8,7 @@ fixture`PDF template settings - Background color field test`
 
 test('should display \'Background Color\' field', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.templateCollapsiblePanel)
     .click(run.backgroundColorSelectButton)
@@ -25,7 +25,7 @@ test('should display \'Background Color\' field', async t => {
 
 test('should save selected background color', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.templateCollapsiblePanel)
     .click(run.backgroundColorSelectButton)

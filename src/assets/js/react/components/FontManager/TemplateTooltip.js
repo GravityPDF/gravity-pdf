@@ -82,7 +82,7 @@ export class TemplateTooltip extends React.Component {
         </a>
 
         {tooltip && (
-          <div dangerouslySetInnerHTML={{__html: sprintf(GFPDF.fontManagerTemplateTooltipDesc, '<a href="https://docs.gravitypdf.com/v5/developer-first-custom-pdf">', '<a href="https://docs.gravitypdf.com/v5/user-setup-pdf#font">', '</a>')}} />
+          <div dangerouslySetInnerHTML={{ __html: sprintf(GFPDF.fontManagerTemplateTooltipDesc, '<a href="https://docs.gravitypdf.com/v5/developer-first-custom-pdf">', '<a href="https://docs.gravitypdf.com/v5/user-setup-pdf#font">', '</a>') }} />
         )}
 
         {tooltip && (

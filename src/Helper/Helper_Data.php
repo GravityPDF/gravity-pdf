@@ -153,7 +153,7 @@ class Helper_Data {
 	public function set_plugin_titles() {
 		$this->short_title = esc_html__( 'PDF', 'gravity-forms-pdf-extended' );
 		$this->title       = esc_html__( 'Gravity PDF', 'gravity-forms-pdf-extended' );
-		$this->slug        = 'pdf';
+		$this->slug        = 'PDF';
 	}
 
 	/**

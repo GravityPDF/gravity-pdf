@@ -13,7 +13,7 @@ fixture`PDF appearance settings - Paper size field test`
 
 test('should display \'Paper Size\' field', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
 
   // Assertions
   await t
@@ -24,7 +24,7 @@ test('should display \'Paper Size\' field', async t => {
 
 test('should display a dropdown of paper sizes option', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t.click(run.appearanceCollapsiblePanel)
 
   // Assertions
@@ -49,7 +49,7 @@ test('should display a dropdown of paper sizes option', async t => {
 
 test('should save selected paper size', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.appearanceCollapsiblePanel)
     .click(run.paperSizeSelectBox)
@@ -67,7 +67,7 @@ test('should save selected custom paper size', async t => {
   const measurementInputBox = selectBox('gfpdf_settings_custom_pdf_size ', 'gfpdf_settings[custom_pdf_size]_measurement')
 
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.appearanceCollapsiblePanel)
     .click(run.paperSizeSelectBox)

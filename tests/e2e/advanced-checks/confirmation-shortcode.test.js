@@ -14,7 +14,7 @@ fixture`PDF shortcode - Confirmation Type TEXT, PAGE and REDIRECT text`
 
 test('should check shortcode confirmation type TEXT is working correctly', async t => {
   // Actions
-  await run.copyDownloadShortcode('gf_edit_forms&view=settings&subview=pdf&id=3')
+  await run.copyDownloadShortcode('gf_edit_forms&view=settings&subview=PDF&id=3')
   shortcodeHolder = await run.shortcodeInputBox.value
   await run.navigateConfirmationSection('gf_edit_forms&view=settings&subview=confirmation&id=3')
   await t
@@ -44,7 +44,7 @@ test('should check shortcode confirmation type TEXT is working correctly', async
 
 test('should check if the shortcode confirmation type PAGE is working correctly', async t => {
   // Actions
-  await run.copyDownloadShortcode('gf_edit_forms&view=settings&subview=pdf&id=3')
+  await run.copyDownloadShortcode('gf_edit_forms&view=settings&subview=PDF&id=3')
   shortcodeHolder = await run.shortcodeInputBox.value
   await page.navigatePage()
   await page.addNewPage()
@@ -85,7 +85,7 @@ test('should check if the shortcode confirmation type PAGE is working correctly'
 
 test('should check if the shortcode confirmation type REDIRECT download is working correctly', async t => {
   // Actions
-  await run.copyDownloadShortcode('gf_edit_forms&view=settings&subview=pdf&id=3')
+  await run.copyDownloadShortcode('gf_edit_forms&view=settings&subview=PDF&id=3')
   shortcodeHolder = await run.shortcodeInputBox.value
   await run.navigateConfirmationSection('gf_edit_forms&view=settings&subview=confirmation&id=3')
   await t

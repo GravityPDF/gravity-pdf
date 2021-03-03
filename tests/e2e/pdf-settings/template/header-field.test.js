@@ -14,7 +14,7 @@ fixture`PDF template settings - Header field test`
 
 test('should display \'Header\' field', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
 
   // Assertions
   await t
@@ -26,7 +26,7 @@ test('should display \'Header\' field', async t => {
 
 test('should check that upload media manager exist', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.templateCollapsiblePanel)
     .click(addMediaButton('gfpdf-settings-field-wrapper-header', 'Add Media'))
@@ -46,7 +46,7 @@ test('should check that upload media manager exist', async t => {
 test('should save added header data', async t => {
   // Actions
   await t.setTestSpeed(0.4)
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.templateCollapsiblePanel)
     .click(addMediaButton('gfpdf-settings-field-wrapper-header', 'Add Media'))
@@ -67,7 +67,7 @@ test('should save added header data', async t => {
 test('should delete/reset header field content', async t => {
   // Actions & Assertions
   await t.setTestSpeed(0.4)
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.templateCollapsiblePanel)
     .click(addMediaButton('gfpdf-settings-field-wrapper-header', 'Add Media'))

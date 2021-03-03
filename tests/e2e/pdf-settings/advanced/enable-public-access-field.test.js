@@ -8,7 +8,7 @@ fixture`PDF advanced settings - Enable public access field test`
 
 test('should display \'Enable Public Access\' field', async t => {
   // Actions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
 
   // Assertions
   await t
@@ -19,7 +19,7 @@ test('should display \'Enable Public Access\' field', async t => {
 
 test('should save toggled checkbox value', async t => {
   // Actions & Assertions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.advancedCollapsiblePanel)
     .click(run.enablePublicAccessCheckbox)
@@ -35,7 +35,7 @@ test('should hide \'Restrict Owner\' field if \'Enable Public Access\' checkbox 
   const restrictOwnerField = Selector('#gfpdf-settings-field-wrapper-restrict_owner')
 
   // Actions & Assertions
-  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=pdf&id=4')
+  await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
     .click(run.advancedCollapsiblePanel)
     .click(run.enablePublicAccessCheckbox)
