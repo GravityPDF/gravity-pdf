@@ -2251,31 +2251,4 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 		return $html;
 	}
 
-	/**
-	 * A method that handles the default setting value.
-	 *
-	 * @param String $index Default index.
-	 *
-	 * @return String        Returns the index value or the whole default array.
-	 */
-	public function get_default( $index ) {
-		/* Load default values */
-		$defaults = $this->get_defaults();
-		/* Check if default index exists then return its value  */
-		if( isset( $index) && isset( $defaults[$index])){
-			return $defaults[$index];
-		}
-		return null;
-
-	}
-
-	/**
-	 * A method returns the form setting default values.
-	 *
-	 * @return Array        Returns defaults.
-	 */
-	public function get_defaults(){
-		return  [ 'default_action' => 'View', 'background_processing' => 'Off', 'debug_mode' => 'No', 'logged_out_timeout' => 20 ];
-
-	}
 }
