@@ -316,6 +316,11 @@ class Helper_Data {
 
 				'uninstallWarning'                     => esc_html__( "Warning! ALL Gravity PDF data, including templates, will be deleted. This cannot be undone. 'OK' to delete, 'Cancel' to stop.", 'gravity-forms-pdf-extended' ),
 				'pdfDeleteWarning'                     => esc_html__( "WARNING: You are about to delete this PDF. 'Cancel' to stop, 'OK' to delete.", 'gravity-forms-pdf-extended' ),
+
+				/* WCAG */
+				'fontManagerUpdateFontAriaLabel'       => esc_html__( 'Update font', 'gravity-forms-pdf-extended' ),
+				'fontManagerSelectFontAriaLabel'       => esc_html__( 'Select font', 'gravity-forms-pdf-extended' ),
+				'fontManagerDeleteFontAriaLabel'       => esc_html__( 'Delete font', 'gravity-forms-pdf-extended' ),
 			]
 		);
 	}
