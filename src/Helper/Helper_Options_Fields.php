@@ -19,7 +19,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 4.0
  */
 class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_Interface_Filters {
-
 	/**
 	 * Add our filters
 	 *
@@ -138,7 +137,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 							'View'     => esc_html__( 'View', 'gravity-forms-pdf-extended' ),
 							'Download' => esc_html__( 'Download', 'gravity-forms-pdf-extended' ),
 						],
-						'std'     => 'View',
+						'std'     => $this->get_default('default_action'),
 					],
 
 					'background_processing' => [
@@ -153,7 +152,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'id'   => 'debug_mode',
 						'name' => esc_html__( 'Debug Mode', 'gravity-forms-pdf-extended' ),
 						'type' => 'toggle',
-						'std'  => '0',
+						'std'  => $this->get_default('debug_mode'),
 						'desc' => esc_html__( 'When enabled, debug information will be displayed on-screen for core features.', 'gravity-forms-pdf-extended' ),
 					],
 				]
@@ -170,7 +169,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 						'desc2'   => esc_html__( 'minutes', 'gravity-forms-pdf-extended' ),
 						'type'    => 'number',
 						'size'    => 'small',
-						'std'     => 20,
+						'std'     =>  $this->get_defaults('logged_out_timeout'),
 						'tooltip' => '<h6>' . esc_html__( 'Logged Out Timeout', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Logged out users can view PDFs when their IP matches the one assigned to the Gravity Form entry. Because IP addresses can change, a time-based restriction also applies.', 'gravity-forms-pdf-extended' ),
 					],
 
@@ -801,4 +800,5 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 			]
 		);
 	}
+
 }

@@ -9,7 +9,6 @@ use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF_Major_Compatibility_Checks;
-use GPDFAPI;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -229,27 +228,31 @@ class Model_System_Report extends Helper_Abstract_Model {
 		];
 
 		/* Global Settings */
-		$items[2] = [
+		$pdf_entry_list_action = $this->options->get_option( 'default_action', $this->options->get_default( 'default_action' ) );
+		$background_processing = $this->options->get_option( 'background_processing', $this->options->get_default( 'background_processing' ) );
+		$debug_mode = $this->options->get_option( 'debug_mode', $this->options->get_default( 'debug_mode' ) );
+		$items[2]              = [
 			'pdf_entry_list_action'         => [
 				'label'        => esc_html__( 'PDF Entry List Action', 'gravity-forms-pdf-extended' ),
-				'value'        => $this->options->get_option( 'default_action' ) === 'View' ? esc_html__( 'View', 'gravity-forms-pdf-extended' ) : esc_html__( 'Download', 'gravity-forms-pdf-extended' ),
-				'value_export' => $this->options->get_option( 'default_action' ),
+				'value'        => $pdf_entry_list_action === 'View' ? esc_html__( 'View', 'gravity-forms-pdf-extended' ) : esc_html__( 'Download', 'gravity-forms-pdf-extended' ),
+				'value_export' => $pdf_entry_list_action,
 			],
 
 			'background_processing_enabled' => [
 				'label'        => esc_html__( 'Background Processing', 'gravity-forms-pdf-extended' ),
-				'value'        => $this->options->get_option( 'background_processing' ) === 'Yes' ? $this->getController()->view->get_icon( true ) : esc_html__( 'Off', 'gravity-forms-pdf-extended' ),
-				'value_export' => $this->options->get_option( 'background_processing' ),
+				'value'        => $background_processing === 'Yes' ? $this->getController()->view->get_icon( true ) : esc_html__( 'Off', 'gravity-forms-pdf-extended' ),
+				'value_export' => $background_processing,
 			],
 
 			'debug_mode_enabled'            => [
 				'label'        => esc_html__( 'Debug Mode', 'gravity-forms-pdf-extended' ),
-				'value'        => $this->options->get_option( 'debug_mode' ) === 'Yes' ? $this->getController()->view->get_icon( true ) : esc_html__( 'Off', 'gravity-forms-pdf-extended' ),
-				'value_export' => $this->options->get_option( 'debug_mode' ),
+				'value'        => $debug_mode === 'Yes' ? $this->getController()->view->get_icon( true ) : esc_html__( 'Off', 'gravity-forms-pdf-extended' ),
+				'value_export' => $debug_mode,
 			],
 		];
 
 		/* Security Settings */
+		$logged_out_timeout = $this->options->get_option( 'logged_out_timeout', $this->options->get_default( 'logged_out_timeout' ) );
 		$items[3] = [
 			'user_restrictions'  => [
 				'label' => esc_html__( 'User Restrictions', 'gravity-forms-pdf-extended' ),
@@ -258,8 +261,8 @@ class Model_System_Report extends Helper_Abstract_Model {
 
 			'logged_out_timeout' => [
 				'label'        => esc_html__( 'Logged Out Timeout', 'gravity-forms-pdf-extended' ),
-				'value'        => $this->options->get_option( 'logged_out_timeout' ) . ' ' . esc_html__( 'minute(s)', 'gravity-forms-pdf-extended' ),
-				'value_export' => $this->options->get_option( 'logged_out_timeout' ) . ' minutes(s)',
+				'value'        => $logged_out_timeout . ' ' . esc_html__( 'minute(s)', 'gravity-forms-pdf-extended' ),
+				'value_export' => $logged_out_timeout . ' minutes(s)',
 			],
 		];
 
