@@ -9,6 +9,35 @@
           .footer {
             padding-bottom: 40px;
 
+            .buttons-icons-container {
+              display: grid;
+              grid-template-columns: 3fr 1fr;
+
+              .cancel {
+                button {
+                  margin-bottom: 0;
+                }
+              }
+
+              .gfpdf-spinner {
+                padding-left: 0;
+              }
+
+              .button {
+                height: 35px;
+                margin-right: 8px;
+              }
+
+              .select-delete-icons-container {
+                justify-self: end;
+
+                .dashicons {
+                  width: auto;
+                  height: auto;
+                }
+              }
+            }
+
             .dashicons {
               border: 1px solid base.$lighter-highlight-color;
               border-radius: 3px;
@@ -44,21 +73,6 @@
                   color: white;
                 }
               }
-            }
-
-            .gfpdf-spinner {
-              padding-left: 0;
-            }
-
-            &.cancel {
-              button {
-                margin-bottom: 0;
-              }
-            }
-
-            .button {
-              height: 35px;
-              margin-right: 8px;
             }
 
             .msg {

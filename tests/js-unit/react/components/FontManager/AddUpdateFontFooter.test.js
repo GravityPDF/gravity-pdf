@@ -92,29 +92,29 @@ describe('FontManager - AddFontFooter.js', () => {
     test('render cancel button', () => {
       const wrapper = shallow(<AddUpdateFontFooter {...props} id='active' />)
 
-      expect(wrapper.find('div.cancel').length).toBe(1)
+      expect(wrapper.find('button.cancel').length).toBe(1)
     })
 
     test('render add font button', () => {
-      expect(wrapper.find('button').text()).toBe('Add Font →')
+      expect(wrapper.find('button').at(0).text()).toBe('Add Font →')
     })
 
     test('render update font button', () => {
       const wrapper = shallow(<AddUpdateFontFooter {...props} id='active' />)
 
-      expect(wrapper.find('button').text()).toBe('Update Font →')
+      expect(wrapper.find('button').at(1).text()).toBe('Update Font →')
     })
 
     test('render update panel select font checkbox', () => {
       const wrapper = shallow(<AddUpdateFontFooter {...props} id='roboto' />)
 
-      expect(wrapper.find('span.dashicons-yes').length).toBe(1)
+      expect(wrapper.find('button.dashicons-yes').length).toBe(1)
     })
 
     test('render update panel delete icon', () => {
       const wrapper = shallow(<AddUpdateFontFooter {...props} id='roboto' />)
 
-      expect(wrapper.find('span.dashicons-trash').length).toBe(1)
+      expect(wrapper.find('button.dashicons-trash').length).toBe(1)
     })
 
     test('render loading spinner', () => {
