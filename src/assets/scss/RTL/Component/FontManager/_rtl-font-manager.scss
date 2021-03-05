@@ -1,0 +1,40 @@
+html[dir="rtl"] {
+  #tab_PDF {
+
+    /* Font manager selector box */
+    #gfpdf_settings\[default_font\], #gfpdf_settings\[font\] {
+      margin: 0 0 0.2rem 0.2rem;
+    }
+
+    #font-manager-overlay {
+      .font-manager {
+        #gfpdf-font-manager-container {
+
+          /* Font list */
+          .font-list-column {
+            .font-list {
+              .font-list-header,
+              .font-list-item {
+
+                .font-name {
+                  text-align: right;
+                }
+              }
+            }
+          }
+
+          /* Add font */
+          .add-update-font-column {
+            .update-font {
+              right: -720px;
+
+              &.show {
+                right: 0;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

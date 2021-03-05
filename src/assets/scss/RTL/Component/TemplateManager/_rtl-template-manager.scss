@@ -1,0 +1,35 @@
+html[dir="rtl"] {
+  #tab_PDF {
+
+    /* Template manager selector box */
+    #gfpdf_settings\[template\], #gfpdf_settings\[default_template\] {
+      margin: 0 0 0.2rem 0.2rem;
+    }
+
+    .theme-wrap {
+
+      /* Header section */
+      .theme-header {
+        h1 {
+          float: right;
+          font-size: 23px;
+          font-weight: 400;
+          margin: 0;
+          padding: 9px 2% 4px 0;
+          line-height: 1.3;
+        }
+      }
+
+      /* Container section */
+      #gfpdf-template-container {
+        .theme {
+
+          .theme-actions {
+            left: 0;
+            right: inherit;
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+html[dir="rtl"] {
+
+  #tab_PDF {
+
+    .gform_settings_form {
+      .entry-view {
+        margin-right: 0;
+
+        label {
+          float: right;
+          margin-left: 1rem;
+          padding-top: .2rem;
+        }
+      }
+    }
+  }
+}

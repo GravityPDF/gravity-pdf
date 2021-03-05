@@ -1,0 +1,52 @@
+html[dir="rtl"] {
+  #tab_PDF {
+
+    /* Fieldsets (General, Appearance, Template, Advanced) */
+    .gform_settings_form {
+      .gform-settings-input__container--with-merge-tag, .gfpdf-settings-field-wrapper {
+        input[type=text] {
+          border-bottom-right-radius: 0;
+          border-top-right-radius: 0;
+        }
+
+        input[type=radio] {
+          float: right;
+          margin-top: 0;
+        }
+
+        .all-merge-tags {
+          margin: 0 0 0 .5rem;
+
+          a {
+            &.open-list {
+              border-radius: 3px 0 0 3px;
+            }
+          }
+        }
+      }
+
+      /* Conditional Logic */
+      button {
+        &.add_field_choice {
+          margin-right: .625rem;
+          margin-left: .25rem;
+        }
+
+        &.delete_field_choice {
+          margin-left: .25rem;
+        }
+      }
+
+      /* Select box dropdown */
+      span {
+        .select2-selection__rendered {
+          padding-right: 2rem;
+        }
+
+        .select2-container--open {
+          position: unset !important;
+        }
+      }
+    }
+  }
+}

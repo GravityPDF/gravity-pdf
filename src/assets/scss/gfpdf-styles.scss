@@ -24,14 +24,29 @@
 @use 'Component/hidden';
 
 /* Pages */
+@use 'Pages/general-settings';
 @use 'Pages/entry-details';
 @use 'Pages/entry-list';
 @use 'Pages/pdf-list';
+@use 'Pages/pdf-settings';
 @use 'Pages/help';
-
-/* RTL */
-@use 'rtl';
 
 /* Media queries */
 @use 'MediaQueries/min-961';
 @use 'MediaQueries/min-1200';
+
+/* RTL Components */
+@use 'RTL/Component/FontManager/rtl-font-manager';
+@use 'RTL/Component/TemplateManager/rtl-template-manager';
+@use 'RTL/Component/rtl-spinner';
+@use 'RTL/Component/rtl-upload';
+
+/* RTL Pages */
+@use 'RTL/rtl';
+@use 'RTL/Pages/rtl-general-settings';
+@use 'RTL/Pages/rtl-pdf-list';
+@use 'RTL/Pages/rtl-pdf-settings';
+
+/* RTL Media queries */
+@use 'RTL/MediaQueries/rtl-min-961';
+@use 'RTL/MediaQueries/rtl-min-1200';
