@@ -30,8 +30,12 @@
 @use 'Pages/help';
 
 /* RTL */
-@use 'rtl';
+@use 'RTL/rtl';
+@use 'RTL/FontManager/rtl-font-manager';
+@use 'RTL/TemplateManager/rtl-template-manager';
 
 /* Media queries */
 @use 'MediaQueries/min-961';
 @use 'MediaQueries/min-1200';
+@use 'RTL/MediaQueries/rtl-min-961';
+@use 'RTL/MediaQueries/rtl-min-1200';

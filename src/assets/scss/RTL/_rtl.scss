@@ -1,0 +1,19 @@
+html[dir="rtl"] {
+
+  #tab_PDF {
+
+    /* Gravity forms settings panel area */
+    .gform-settings-panel__content {
+      .tablenav {
+
+        .alignleft {
+          width: 0%;
+        }
+
+        .actions {
+          padding: 0;
+        }
+      }
+    }
+  }
+}
