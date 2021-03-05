@@ -805,8 +805,8 @@ class Helper_PDF {
 	 * @since  4.0
 	 */
 	protected function get_paper_size( $size ) {
-		$size[0] = ( $size[2] === 'inches' ) ? (int) $size[0] * 25.4 : (int) $size[0];
-		$size[1] = ( $size[2] === 'inches' ) ? (int) $size[1] * 25.4 : (int) $size[1];
+		$size[0] = ( $size[2] === 'inches' ) ? (float) $size[0] * 25.4 : (float) $size[0];
+		$size[1] = ( $size[2] === 'inches' ) ? (float) $size[1] * 25.4 : (float) $size[1];
 
 		/* tidy up custom paper size array */
 		unset( $size[2] );
