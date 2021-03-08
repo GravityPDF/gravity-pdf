@@ -88,10 +88,10 @@ export function activeTemplateStoreListener (store, $templateField) {
   }))
 
   /* Watch our DOM for changes */
-  $templateField.on('change', function () {
+  $templateField[0].addEventListener('change', () => {
     /* Check store and DOM are different to prevent any update recursions */
-    if (this.value !== store.getState().template.activeTemplate) {
-      store.dispatch(selectTemplate(store.getState().template.activeTemplate))
+    if ($templateField.val() !== store.getState().template.activeTemplate) {
+      store.dispatch(selectTemplate($templateField.val()))
     }
   })
 }
