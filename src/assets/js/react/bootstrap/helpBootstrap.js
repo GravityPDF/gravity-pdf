@@ -21,7 +21,7 @@ export default function helpBootstrap () {
   const store = getStore()
 
   render(
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div>{GFPDF.spinnerAlt}</div>}>
       <Provider store={store}>
         <HelpContainer />
       </Provider>

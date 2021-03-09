@@ -32,7 +32,7 @@ const TemplateSingle = lazy(() => import('../components/Template/TemplateSingle'
  * @since 4.1
  */
 export const Routes = () => (
-  <Suspense fallback={<div>Loading...</div>}>
+  <Suspense fallback={<div>{GFPDF.spinnerAlt}</div>}>
     <Router>
       <Switch>
         <Route
