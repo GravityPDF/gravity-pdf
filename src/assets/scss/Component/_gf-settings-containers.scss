@@ -22,9 +22,14 @@
 
     .gfpdf-settings-field-wrapper {
       margin-bottom: 1.25rem;
+
+      .gform-settings-panel__title {
+        color: #23282d;
+        font-size: .8125rem;
+      }
     }
 
-    .gform-settings-panel__title {
+    legend {
       font-size: .875rem;
       margin-bottom: 0.25rem;
     }
