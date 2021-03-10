@@ -70,11 +70,13 @@
     "lint:js:fix": "eslint src/assets/js/**/*.js --fix",
     "lint:php": "npm run env docker-run -- php composer lint:errors",
     "lint:php:format": "npm run env docker-run -- php composer format",
+
     "test:e2e": "cross-env NODE_ENV=test testcafe chrome tests/e2e -s takeOnFails=true,fullPage=true --disable-multiple-windows",
     "test:e2e:headless": "cross-env NODE_ENV=test testcafe chrome:headless tests/e2e -s takeOnFails=true,fullPage=true --disable-multiple-windows",
     "test:e2e:file": "cross-env NODE_ENV=test testcafe chrome tests/e2e -s takeOnFails=true,fullPage=true",
     "test:e2e:watch": "cross-env NODE_ENV=test testcafe chrome tests/e2e -L",
     "test:e2e:file:watch": "cross-env NODE_ENV=test testcafe chrome tests/e2e -L",
+
     "test:php": "wp-scripts env test-php",
     "test:php-composer": "npm run env docker-run -- phpunit php ./vendor/bin/phpunit",
 
@@ -82,11 +84,15 @@
     "test:js": "jest --verbose",
     "test:js:coverage": "jest --coverage --verbose",
     "test:js:watch": "jest --watchAll",
+
     "prebuild": "yarn && yarn prebuild:core-fonts",
     "prebuild:core-fonts": "bash bin/json-payload.sh https://api.github.com/repos/GravityPDF/mpdf-core-fonts/contents/ core-fonts.json",
+
     "build:dev": "cross-env NODE_ENV=development webpack --progress --colors --watch --mode development",
     "build:production": "cross-env NODE_ENV=production webpack --mode production",
+
     "check-licenses": "wp-scripts check-licenses --prod --gpl2",
+
     "env": "wp-scripts env",
     "env:install": "bash bin/install.sh",
     "env:install:gf": "bash bin/install-gravityforms.sh",
