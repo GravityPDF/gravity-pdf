@@ -33,15 +33,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Model_Install extends Helper_Abstract_Model {
 
 	/**
-	 * Holds the abstracted Gravity Forms API specific to Gravity PDF
-	 *
-	 * @var Helper_Form
-	 *
-	 * @since 4.0
-	 */
-	protected $gform;
-
-	/**
 	 * Holds our log class
 	 *
 	 * @var LoggerInterface
@@ -88,9 +79,15 @@ class Model_Install extends Helper_Abstract_Model {
 	protected $queue;
 
 	/**
+	 * @var Model_Uninstall
+	 *
+	 * @since 6.0
+	 */
+	protected $uninstall;
+
+	/**
 	 * Setup our class by injecting all our dependencies
 	 *
-	 * @param Helper_Abstract_Form $gform   Our abstracted Gravity Forms helper functions
 	 * @param LoggerInterface      $log     Our logger class
 	 * @param Helper_Data          $data    Our plugin data store
 	 * @param Helper_Misc          $misc    Our miscellaneous class
@@ -99,15 +96,15 @@ class Model_Install extends Helper_Abstract_Model {
 	 *
 	 * @since 4.0
 	 */
-	public function __construct( Helper_Abstract_Form $gform, LoggerInterface $log, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices, Helper_Pdf_Queue $queue ) {
+	public function __construct( LoggerInterface $log, Helper_Data $data, Helper_Misc $misc, Helper_Notices $notices, Helper_Pdf_Queue $queue, Model_Uninstall $uninstall ) {
 
 		/* Assign our internal variables */
-		$this->gform   = $gform;
-		$this->log     = $log;
-		$this->data    = $data;
-		$this->misc    = $misc;
-		$this->notices = $notices;
-		$this->queue   = $queue;
+		$this->log       = $log;
+		$this->data      = $data;
+		$this->misc      = $misc;
+		$this->notices   = $notices;
+		$this->queue     = $queue;
+		$this->uninstall = $uninstall;
 	}
 
 	/**
@@ -401,133 +398,57 @@ class Model_Install extends Helper_Abstract_Model {
 	/**
 	 * The Gravity PDF Uninstaller
 	 *
-	 * @return void
+	 * @deprecated 6.0
 	 *
 	 * @since 4.0
 	 */
 	public function uninstall_plugin() {
-		do_action( 'gfpdf_pre_uninstall_plugin' );
-
-		/* Clean up database */
-		if ( is_multisite() ) {
-			$sites = get_sites();
-
-			foreach ( $sites as $site ) {
-				$site = (array) $site; /* Back-compat: ensure the new site object introduced in 4.6 gets converted back to an array */
-				switch_to_blog( $site['blog_id'] );
-				$this->remove_plugin_options();
-				$this->remove_plugin_form_settings();
-			}
-			restore_current_blog();
-
-		} else {
-			$this->remove_plugin_options();
-			$this->remove_plugin_form_settings();
-		}
-
-		/* Removes background processes */
-		$this->queue->clear_scheduled_events();
-		$this->queue->clear_queue( true );
-		$this->queue->unlock_process();
-
-		/* Remove folder structure and deactivate */
-		$this->remove_folder_structure();
-
-		do_action( 'gfpdf_post_uninstall_plugin' );
-
-		$this->deactivate_plugin();
+		$this->uninstall->uninstall_plugin();
 	}
 
 	/**
 	 * Remove and options stored in the database
 	 *
-	 * @return void
+	 * @deprecated 6.0
 	 *
 	 * @since 4.0
 	 */
 	public function remove_plugin_options() {
-		delete_option( 'gfpdf_is_installed' );
-		delete_option( 'gfpdf_current_version' );
-		delete_option( 'gfpdf_settings' );
+		$this->uninstall->remove_plugin_options();
 	}
 
 	/**
 	 * Remove all form settings from each individual form.
 	 * Because we stored out PDF settings with each form and have no index we need to individually load and forms and check them for Gravity PDF settings
 	 *
-	 * @return void
+	 * @deprecated 6.0
 	 *
 	 * @since 4.0
 	 */
 	public function remove_plugin_form_settings() {
-
-		$forms = $this->gform->get_forms();
-
-		foreach ( $forms as $form ) {
-			/* only update forms which have a PDF configuration */
-			if ( isset( $form['gfpdf_form_settings'] ) ) {
-				unset( $form['gfpdf_form_settings'] );
-				if ( $this->gform->update_form( $form ) !== true ) {
-					$this->log->error(
-						'Cannot Remove PDF Settings from Form.',
-						[
-							'form_id' => $form['id'],
-						]
-					);
-
-					$this->notices->add_error( sprintf( esc_html__( 'There was a problem removing the Gravity Form "%s" PDF configuration. Try delete manually.', 'gravity-forms-pdf-extended' ), $form['id'] . ': ' . $form['title'] ) );
-				}
-			}
-		}
+		$this->uninstall->remove_plugin_form_settings();
 	}
 
 	/**
 	 * Remove our PDF directory structure
 	 *
-	 * @return void
+	 * @deprecated 6.0
 	 *
 	 * @since 4.0
 	 */
 	public function remove_folder_structure() {
-
-		$paths = apply_filters(
-			'gfpdf_uninstall_path',
-			[
-				$this->data->template_font_location,
-				$this->data->template_tmp_location,
-				$this->data->template_location,
-			]
-		);
-
-		foreach ( $paths as $dir ) {
-			if ( is_dir( $dir ) ) {
-				$results = $this->misc->rmdir( $dir );
-
-				if ( is_wp_error( $results ) || ! $results ) {
-					$this->log->error(
-						'Cannot Remove Folder Structure.',
-						[
-							'WP_Error_Message' => $results->get_error_message(),
-							'WP_Error_Code'    => $results->get_error_code(),
-							'dir'              => $dir,
-						]
-					);
-
-					$this->notices->add_error( sprintf( esc_html__( 'There was a problem removing the %s directory. Clean up manually via (S)FTP.', 'gravity-forms-pdf-extended' ), '<code>' . $this->misc->relative_path( $dir ) . '</code>' ) );
-				}
-			}
-		}
+		$this->uninstall->remove_folder_structure();
 	}
 
 	/**
 	 * Deactivate Gravity PDF
 	 *
-	 * @return void
+	 * @deprecated 6.0
 	 *
 	 * @since 4.0
 	 */
 	public function deactivate_plugin() {
-		deactivate_plugins( PDF_PLUGIN_BASENAME );
+		$this->uninstall->deactivate_plugin();
 	}
 
 	/**

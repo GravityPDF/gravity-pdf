@@ -11,6 +11,7 @@ use GFPDF\Helper\Helper_Interface_Actions;
 use GFPDF\Helper\Helper_Interface_Filters;
 use GFPDF\Helper\Helper_Misc;
 use GFPDF\Helper\Helper_Notices;
+use GFPDF\Helper\Controller_Uninstaller;
 use GFPDF\Model\Model_Install;
 use Psr\Log\LoggerInterface;
 
@@ -127,7 +128,6 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	 *
 	 */
 	public function add_actions() {
-		add_action( 'admin_init', [ $this, 'maybe_uninstall' ] );
 		add_action( 'wp_loaded', [ $this, 'check_install_status' ], 9999 );
 
 		/* rewrite endpoints */
@@ -201,48 +201,9 @@ class Controller_Install extends Helper_Abstract_Controller implements Helper_In
 	/**
 	 * Determine if we should be saving the PDF settings
 	 *
-	 * @return void
-	 *
 	 * @since 4.0
 	 */
 	public function maybe_uninstall() {
-
-		/* check if we should be uninstalling */
-		if ( rgpost( 'gfpdf_uninstall' ) ) {
-
-			/* Check Nonce is valid */
-			if ( ! wp_verify_nonce( rgpost( 'gfpdf-uninstall-plugin' ), 'gfpdf-uninstall-plugin' ) ) {
-				$this->notices->add_error( esc_html__( 'There was a problem uninstalling Gravity PDF. Please try again.', 'gravity-forms-pdf-extended' ) );
-				$this->log->warning( 'Nonce Verification Failed.' );
-
-				return null;
-			}
-
-			/**
-			 * Run the uninstaller if the user has the correct permissions
-			 *
-			 * If not a multisite any user with the GF uninstaller permission can remove it (usually just admins)
-			 *
-			 * If multisite only the super admin can uninstall the software. This is due to how the plugin shares similar directory structures across networked sites
-			 */
-			if ( ( ! is_multisite() && ! $this->gform->has_capability( 'gravityforms_uninstall' ) ) ||
-				 ( is_multisite() && ! is_super_admin() )
-			) {
-
-				$this->log->critical(
-					'Lack of User Capabilities.',
-					[
-						'user'      => wp_get_current_user(),
-						'user_meta' => get_user_meta( get_current_user_id() ),
-					]
-				);
-
-				wp_die( esc_html__( 'Access Denied', 'default' ), 403 );
-			}
-
-			$this->model->uninstall_plugin();
-			$this->model->redirect_to_plugins_page();
-		}
-
+		_doing_it_wrong( __METHOD__, 'This method has been moved to Controller_Uninstall::uninstall_addon()', '6.0' );
 	}
 }

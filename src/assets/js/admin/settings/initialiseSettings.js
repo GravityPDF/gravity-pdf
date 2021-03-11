@@ -2,7 +2,6 @@ import $ from 'jquery'
 import { initialiseCommonElements } from './common/initialiseCommonElements'
 import { cleanupGFNavigation } from './global/cleanupGFNavigation'
 import { generalSettings } from './global/generalSettings'
-import { toolsSettings } from './global/toolsSettings'
 import { doFormSettingsListPage } from './form/doFormSettingsListPage'
 import { doFormSettingsEditPage } from './pdf/doFormSettingsEditPage'
 import { pages } from './pages'
@@ -54,10 +53,6 @@ class InitialiseSettings {
     switch (this.getCurrentSettingsPage()) {
       case 'general':
         generalSettings()
-        break
-
-      case 'tools':
-        toolsSettings.runSetup()
         break
     }
   }
