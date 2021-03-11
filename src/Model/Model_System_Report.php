@@ -238,14 +238,14 @@ class Model_System_Report extends Helper_Abstract_Model {
 
 			'background_processing_enabled' => [
 				'label'        => esc_html__( 'Background Processing', 'gravity-forms-pdf-extended' ),
-				'value'        => $this->options->get_option( 'background_processing', 'Yes' ) === 'Yes' ? $this->getController()->view->get_icon( true ) : esc_html__( 'Off', 'gravity-forms-pdf-extended' ),
-				'value_export' => $this->options->get_option( 'background_processing', 'Yes' ),
+				'value'        => $this->options->get_option( 'background_processing', false ) === 'Yes' ? $this->getController()->view->get_icon( true ) : esc_html__( 'Off', 'gravity-forms-pdf-extended' ),
+				'value_export' => $this->options->get_option( 'background_processing', false ),
 			],
 
 			'debug_mode_enabled'            => [
 				'label'        => esc_html__( 'Debug Mode', 'gravity-forms-pdf-extended' ),
-				'value'        => $this->options->get_option( 'debug_mode', 'Yes' ) === 'Yes' ? $this->getController()->view->get_icon( true ) : esc_html__( 'Off', 'gravity-forms-pdf-extended' ),
-				'value_export' => $this->options->get_option( 'debug_mode', 'Yes' ),
+				'value'        => $this->options->get_option( 'debug_mode', false ) === 'Yes' ? $this->getController()->view->get_icon( true ) : esc_html__( 'Off', 'gravity-forms-pdf-extended' ),
+				'value_export' => $this->options->get_option( 'debug_mode', false ),
 			],
 		];
 
