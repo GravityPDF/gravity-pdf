@@ -32,7 +32,7 @@ export default function templateBootstrap ($templateField) {
 
   /* Render our React Component in the DOM */
   render(
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div>{GFPDF.spinnerAlt}</div>}>
       <Router>
         <Route render={(props) => <TemplateButton {...props} store={store} buttonText={GFPDF.advanced} />} />
       </Router>

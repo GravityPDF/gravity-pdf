@@ -25,7 +25,7 @@ export default function coreFontBootstrap () {
   const store = getStore()
 
   render(
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div>{GFPDF.spinnerAlt}</div>}>
       <Provider store={store}>
         <Routes button={button} />
       </Provider>
