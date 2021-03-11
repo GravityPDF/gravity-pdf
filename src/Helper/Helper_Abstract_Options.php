@@ -1652,7 +1652,7 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 
 		/* Show status info */
 		if ( ! empty( $value['msg'] ) ) {
-			$alert = $is_error ? '<div class="alert error">%s</div>' : '<div id="message" class="alert success">%s</div>';
+			$alert = $is_error ? '<div class="alert gforms_note_error">%s</div>' : '<div id="message" class="alert gforms_note_success">%s</div>';
 			$html .= sprintf( $alert, wp_kses_post( $value['msg'] ) );
 		}
 
