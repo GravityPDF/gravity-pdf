@@ -4,6 +4,7 @@ namespace GFPDF\Tests;
 
 use Exception;
 use GFPDF\Controller\Controller_Install;
+use GFPDF\Controller\Controller_Uninstaller;
 use GFPDF\Helper\Helper_Pdf_Queue;
 use GFPDF\Model\Model_Install;
 use WP_UnitTestCase;
@@ -53,8 +54,10 @@ class Test_Installer extends WP_UnitTestCase {
 		/* run parent method */
 		parent::setUp();
 
+		$uninstaller = Controller_Uninstaller::get_instance();
+
 		/* Setup our test classes */
-		$this->model = new Model_Install( $gfpdf->gform, $gfpdf->log, $gfpdf->data, $gfpdf->misc, $gfpdf->notices, new Helper_Pdf_Queue( $gfpdf->log ) );
+		$this->model = new Model_Install( $gfpdf->log, $gfpdf->data, $gfpdf->misc, $gfpdf->notices, new Helper_Pdf_Queue( $gfpdf->log ), $uninstaller->model );
 
 		$this->controller = new Controller_Install( $this->model, $gfpdf->gform, $gfpdf->log, $gfpdf->notices, $gfpdf->data, $gfpdf->misc );
 		$this->controller->init();
@@ -66,7 +69,6 @@ class Test_Installer extends WP_UnitTestCase {
 	 * @since 4.0
 	 */
 	public function test_actions() {
-		$this->assertEquals( 10, has_action( 'admin_init', [ $this->controller, 'maybe_uninstall' ] ) );
 		$this->assertEquals( 9999, has_action( 'wp_loaded', [ $this->controller, 'check_install_status' ] ) );
 
 		$this->assertEquals( 10, has_action( 'init', [ $this->model, 'register_rewrite_rules' ] ) );
@@ -114,29 +116,6 @@ class Test_Installer extends WP_UnitTestCase {
 		$this->assertEquals( PDF_EXTENDED_VERSION, get_option( 'gfpdf_current_version' ) );
 
 		wp_set_current_user( 0 );
-	}
-
-	/**
-	 * Check our uninstaller trigger permissions are correct
-	 *
-	 * @since 4.0
-	 */
-	public function test_maybe_uninstall() {
-		$_POST['gfpdf_uninstall'] = true;
-
-		/* Verify nonce checks work */
-		$this->assertNull( $this->controller->maybe_uninstall() );
-
-		/* Verify user checks work correctly */
-		$_POST['gfpdf-uninstall-plugin'] = wp_create_nonce( 'gfpdf-uninstall-plugin' );
-
-		try {
-			$this->controller->maybe_uninstall();
-		} catch ( Exception $e ) {
-			/* Expected */
-		}
-
-		$this->assertEquals( 'Access Denied', $e->getMessage() );
 	}
 
 	/**
@@ -271,118 +250,5 @@ class Test_Installer extends WP_UnitTestCase {
 
 		$this->assertEquals( 'index.php?gpdf=1&pid=$matches[1]&lid=$matches[2]&action=$matches[3]', $wp_rewrite->extra_rules_top[ '^' . $gfpdf->data->permalink ] );
 		$this->assertEquals( 'index.php?gpdf=1&pid=$matches[1]&lid=$matches[2]&action=$matches[3]', $wp_rewrite->extra_rules_top[ '^' . $wp_rewrite->root . $gfpdf->data->permalink ] );
-	}
-
-	/**
-	 * Check we are uninstalling correctly
-	 *
-	 * @since 4.0
-	 */
-	public function test_uninstall_plugin() {
-		global $gfpdf;
-
-		/* Set admin screen */
-		set_current_screen( 'edit.php' );
-
-		/* Set up authorized user */
-		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		$this->assertIsInt( $user_id );
-
-		if ( is_multisite() ) {
-			grant_super_admin( $user_id );
-		}
-
-		wp_set_current_user( $user_id );
-
-		$this->controller->check_install_status();
-
-		/* Verify the plugin is installed correctly before removing */
-		$this->assertTrue( is_dir( $gfpdf->data->template_location ) );
-		$this->assertNotFalse( get_option( 'gfpdf_current_version' ) );
-
-		/* Uninstall */
-		$this->model->uninstall_plugin();
-
-		/* Check software was uninstalled */
-		$this->assertFalse( is_dir( $gfpdf->data->template_location ) );
-		$this->assertFalse( get_option( 'gfpdf_current_version' ) );
-
-		/* Reinstall */
-		$this->controller->setup_defaults();
-
-		/* Verify the install works correctly */
-		$this->assertTrue( is_dir( $gfpdf->data->template_location ) );
-
-		wp_set_current_user( 0 );
-	}
-
-	/**
-	 * Check we are removing all traces of our gfpdf options
-	 *
-	 * @since 4.0
-	 */
-	public function test_remove_plugin_options() {
-
-		/* Set admin screen */
-		set_current_screen( 'edit.php' );
-
-		/* Set up authorized user */
-		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		$this->assertIsInt( $user_id );
-
-		if ( is_multisite() ) {
-			grant_super_admin( $user_id );
-		}
-
-		wp_set_current_user( $user_id );
-		update_option( 'gfpdf_settings', [] );
-
-		$this->controller->check_install_status();
-
-		$this->assertNotFalse( get_option( 'gfpdf_is_installed' ) );
-		$this->assertNotFalse( get_option( 'gfpdf_current_version' ) );
-		$this->assertNotFalse( get_option( 'gfpdf_settings' ) );
-
-		$this->model->remove_plugin_options();
-
-		$this->assertFalse( get_option( 'gfpdf_is_installed' ) );
-		$this->assertFalse( get_option( 'gfpdf_current_version' ) );
-		$this->assertFalse( get_option( 'gfpdf_settings' ) );
-
-		wp_set_current_user( 0 );
-	}
-
-	/**
-	 * Check we are successfully removing our GF PDF Settings
-	 *
-	 * @since 4.0
-	 */
-	public function test_remove_plugin_form_settings() {
-		global $gfpdf;
-
-		/* Verify the form data is there */
-		$forms = $gfpdf->gform->get_forms();
-		$found = false;
-		foreach ( $forms as $form ) {
-			if ( isset( $form['gfpdf_form_settings'] ) ) {
-				$found = true;
-				break;
-			}
-		}
-
-		$this->assertTrue( $found );
-
-		/* Verify the form data is removed */
-		$this->model->remove_plugin_form_settings();
-
-		$new_forms = $gfpdf->gform->get_forms();
-		foreach ( $new_forms as $form ) {
-			$this->assertFalse( isset( $form['gfpdf_form_settings'] ) );
-		}
-
-		/* Reset forms */
-		foreach ( $forms as $form ) {
-			$gfpdf->gform->update_form( $form );
-		}
 	}
 }

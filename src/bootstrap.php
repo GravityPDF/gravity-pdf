@@ -597,7 +597,11 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 	 *
 	 */
 	public function installer() {
-		$model = new Model\Model_Install( $this->gform, $this->log, $this->data, $this->misc, $this->notices, new Helper\Helper_Pdf_Queue( $this->log ) );
+		$uninstaller = Controller\Controller_Uninstaller::get_instance();
+		$uninstaller->init();
+		$this->singleton->add_class( $uninstaller );
+
+		$model = new Model\Model_Install( $this->log, $this->data, $this->misc, $this->notices, new Helper\Helper_Pdf_Queue( $this->log ), $uninstaller->model );
 		$class = new Controller\Controller_Install( $model, $this->gform, $this->log, $this->notices, $this->data, $this->misc );
 		$class->init();
 
