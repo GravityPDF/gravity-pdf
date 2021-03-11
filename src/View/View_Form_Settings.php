@@ -55,6 +55,7 @@ class View_Form_Settings extends Helper_Abstract_View {
 				'desc'        => '',
 				'content'     => $markup->do_settings_fields( 'gfpdf_settings_form_settings_appearance', $markup::ENABLE_PANEL_TITLE ),
 				'collapsible' => true,
+				'collapsible-open' => true,
 			],
 
 			[
@@ -64,6 +65,7 @@ class View_Form_Settings extends Helper_Abstract_View {
 				'desc'        => '',
 				'content'     => $markup->do_settings_fields( 'gfpdf_settings_form_settings_custom_appearance', $markup::ENABLE_PANEL_TITLE ),
 				'collapsible' => true,
+				'collapsible-open' => true,
 			],
 
 			[
@@ -73,6 +75,7 @@ class View_Form_Settings extends Helper_Abstract_View {
 				'desc'        => '',
 				'content'     => $markup->do_settings_fields( 'gfpdf_settings_form_settings_advanced', $markup::ENABLE_PANEL_TITLE ),
 				'collapsible' => true,
+				'collapsible-open' => true,
 			],
 		];
 
