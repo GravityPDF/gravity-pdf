@@ -205,30 +205,6 @@ class View_Settings extends Helper_Abstract_View {
 	}
 
 	/**
-	 * Pull the system status details and show
-	 *
-	 * @return void
-	 *
-	 * @since 4.0
-	 */
-	public function system_status() {
-		global $wp_version;
-
-		$status = new GFPDF_Major_Compatibility_Checks();
-
-		$vars = [
-			'memory'    => $status->get_ram( $this->data->memory_limit ),
-			'wp'        => $wp_version,
-			'php'       => phpversion(),
-			'gf'        => $this->gform->get_version(),
-			'allow_url' => $this->data->allow_url_fopen,
-		];
-
-		/* load the system status view */
-		$this->load( 'system_status', $vars );
-	}
-
-	/**
 	 * Pull the general details and display
 	 *
 	 * @return void
