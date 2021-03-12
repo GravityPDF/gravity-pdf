@@ -81,7 +81,8 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 	 */
 	public function test_update_form_meta() {
 		/* Get the form */
-		$backup = $form = GFFormsModel::get_form_meta( $this->form_id );
+		$form   = GFFormsModel::get_form_meta( $this->form_id );
+		$backup = $form;
 
 		/* make changes to the values */
 		$form['notifications']       = 'My Notifications';
