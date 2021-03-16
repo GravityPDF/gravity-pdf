@@ -15,9 +15,7 @@ fixture`PDF template settings - First page footer field test`
 test('should display \'First Page Footer\' field', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
-  await t
-    .click(run.templateCollapsiblePanel)
-    .click(run.firstPageFooterCheckbox)
+  await t.click(run.firstPageFooterCheckbox)
 
   // Assertions
   await t
@@ -33,7 +31,6 @@ test('should check that upload media manager exist', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.templateCollapsiblePanel)
     .click(run.firstPageFooterCheckbox)
     .click(addMediaButton('gfpdf-settings-field-wrapper-first_footer', 'Add Media'))
 
@@ -53,7 +50,6 @@ test('should save checkbox toggled value', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.templateCollapsiblePanel)
     .click(run.firstPageFooterCheckbox)
     .click(addMediaButton('gfpdf-settings-field-wrapper-first_footer', 'Add Media'))
     .click(mediaManager.uploadFilesPanelLink)
@@ -74,7 +70,6 @@ test('should delete/reset \'First Page Footer\' field content', async t => {
   // Actions & Assertions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.templateCollapsiblePanel)
     .click(addMediaButton('gfpdf-settings-field-wrapper-first_footer', 'Add Media'))
     .click(mediaManager.uploadedMediaFile)
     .click(mediaManager.deleteFile)

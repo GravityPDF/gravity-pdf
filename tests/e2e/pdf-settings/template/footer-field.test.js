@@ -27,9 +27,7 @@ test('should display \'Footer\' field', async t => {
 test('should check that upload media manager exist', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
-  await t
-    .click(run.templateCollapsiblePanel)
-    .click(addMediaButton('gfpdf-settings-field-wrapper-footer', 'Add Media'))
+  await t.click(addMediaButton('gfpdf-settings-field-wrapper-footer', 'Add Media'))
 
   // Assertions
   await t
@@ -47,7 +45,6 @@ test('should save added footer data', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.templateCollapsiblePanel)
     .click(addMediaButton('gfpdf-settings-field-wrapper-footer', 'Add Media'))
     .click(mediaManager.uploadFilesPanelLink)
     .click(mediaManager.selectFilesButton)
@@ -67,7 +64,6 @@ test('should delete/reset footer field content', async t => {
   // Actions & Assertions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.templateCollapsiblePanel)
     .click(addMediaButton('gfpdf-settings-field-wrapper-footer', 'Add Media'))
     .click(mediaManager.uploadedMediaFile)
     .click(mediaManager.deleteFile)

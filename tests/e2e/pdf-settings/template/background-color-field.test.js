@@ -9,9 +9,7 @@ fixture`PDF template settings - Background color field test`
 test('should display \'Background Color\' field', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
-  await t
-    .click(run.templateCollapsiblePanel)
-    .click(run.backgroundColorSelectButton)
+  await t.click(run.backgroundColorSelectButton)
 
   // Assertions
   await t
@@ -27,7 +25,6 @@ test('should save selected background color', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.templateCollapsiblePanel)
     .click(run.backgroundColorSelectButton)
     .click(Selector('#gfpdf-settings-field-wrapper-background_color').find('a').withAttribute('class', 'iris-palette').nth(6))
     .click(run.saveSettings)

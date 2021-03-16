@@ -20,7 +20,6 @@ test('should save toggled checkbox value', async t => {
   // Actions & Assertions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.advancedCollapsiblePanel)
     .click(run.alwaysSavePdfCheckbox)
     .click(run.saveSettings)
     .expect(run.alwaysSavePdfCheckbox.checked).ok()

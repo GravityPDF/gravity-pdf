@@ -31,7 +31,6 @@ test('should display added fields if \'Standard\' option is checked', async t =>
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.advancedCollapsiblePanel)
     .click(run.formatStandardCheckbox)
     .click(run.enablePdfSecurityCheckbox)
 
@@ -45,9 +44,7 @@ test('should display added fields if \'Standard\' option is checked', async t =>
 test('should hide \'Standard\' added fields if \'PDF/A-1b\' option is checked', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
-  await t
-    .click(run.advancedCollapsiblePanel)
-    .click(run.formatPdfA1bCheckbox)
+  await t.click(run.formatPdfA1bCheckbox)
 
   // Assertions
   await t
@@ -59,9 +56,7 @@ test('should hide \'Standard\' added fields if \'PDF/A-1b\' option is checked', 
 test('should hide \'Standard\' added fields if \'PDF/X-1a\' option is checked', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
-  await t
-    .click(run.advancedCollapsiblePanel)
-    .click(run.formatPdfX1aCheckbox)
+  await t.click(run.formatPdfX1aCheckbox)
 
   // Assertions
   await t
@@ -74,7 +69,6 @@ test('should save toggled checkbox value', async t => {
   // Actions & Assertions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.advancedCollapsiblePanel)
     .click(run.formatStandardCheckbox)
     .click(run.saveSettings)
     .expect(run.formatStandardCheckbox.checked).ok()

@@ -25,7 +25,6 @@ test('should display \'Paper Size\' field', async t => {
 test('should display a dropdown of paper sizes option', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
-  await t.click(run.appearanceCollapsiblePanel)
 
   // Assertions
   await t
@@ -51,10 +50,9 @@ test('should save selected paper size', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.appearanceCollapsiblePanel)
     .click(run.paperSizeSelectBox)
-  await t.click(dropdownOption('Letter (8.5 x 11in)'))
-  await t.click(run.saveSettings)
+    .click(dropdownOption('Letter (8.5 x 11in)'))
+    .click(run.saveSettings)
 
   // Assertions
   await t.expect(run.paperSizeSelectBox.value).eql('LETTER')
@@ -69,7 +67,6 @@ test('should save selected custom paper size', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.appearanceCollapsiblePanel)
     .click(run.paperSizeSelectBox)
     .click(dropdownOption('Custom Paper Size'))
     .click(widthInputBox)

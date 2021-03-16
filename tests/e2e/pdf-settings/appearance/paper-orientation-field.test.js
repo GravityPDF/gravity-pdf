@@ -19,7 +19,6 @@ test('should save selected paper orientation value', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.appearanceCollapsiblePanel)
     .click(run.paperOrientationSelectBox)
     .click(dropdownOption('Landscape'))
     .click(run.saveSettings)
