@@ -20,12 +20,9 @@ test('should save selected font size', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.appearanceCollapsiblePanel)
     .click(run.fontSizeInputBox)
-  await t
     .pressKey('ctrl+a')
     .pressKey('backspace')
-  await t
     .typeText(run.fontSizeInputBox, '15', { paste: true })
     .click(run.saveSettings)
 

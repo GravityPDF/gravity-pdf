@@ -8,9 +8,7 @@ fixture`PDF advanced settings - Privileges field test`
 test('should display \'Privileges\' field', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
-  await t
-    .click(run.advancedCollapsiblePanel)
-    .click(run.formatStandardCheckbox)
+  await t.click(run.formatStandardCheckbox)
 
   // Assertions
   await t
@@ -30,7 +28,6 @@ test('should save toggled checkboxes value', async t => {
   // Actions & Assertions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.advancedCollapsiblePanel)
     .click(run.formatStandardCheckbox)
     .click(run.enablePdfSecurityCheckbox)
     .click(run.copyCheckbox)
@@ -73,7 +70,6 @@ test('should disable/reset PDF security field and hide privileges field', async 
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.advancedCollapsiblePanel)
     .click(run.formatStandardCheckbox)
     .click(run.enablePdfSecurityCheckbox)
     .click(run.saveSettings)

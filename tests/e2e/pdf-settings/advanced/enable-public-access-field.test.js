@@ -21,7 +21,6 @@ test('should save toggled checkbox value', async t => {
   // Actions & Assertions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.advancedCollapsiblePanel)
     .click(run.enablePublicAccessCheckbox)
     .click(run.saveSettings)
     .expect(run.enablePublicAccessCheckbox.checked).ok()
@@ -37,7 +36,6 @@ test('should hide \'Restrict Owner\' field if \'Enable Public Access\' checkbox 
   // Actions & Assertions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.advancedCollapsiblePanel)
     .click(run.enablePublicAccessCheckbox)
     .click(run.saveSettings())
     .expect(restrictOwnerField.visible).notOk()

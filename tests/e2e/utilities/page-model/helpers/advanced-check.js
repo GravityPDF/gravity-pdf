@@ -134,7 +134,6 @@ class AdvancedCheck {
       .click('#wp-submit')
       .wait(500)
       .click(Selector('td.name').find('a').withText('Sample'))
-      .click(pdf.advancedCollapsiblePanel)
       .click(pdf.restrictOwnerCheckbox)
       .click(pdf.saveSettings)
   }

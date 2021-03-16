@@ -8,9 +8,7 @@ fixture`PDF advanced settings - Password field test`
 test('should display \'Password\' field', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
-  await t
-    .click(run.advancedCollapsiblePanel)
-    .click(run.formatStandardCheckbox)
+  await t.click(run.formatStandardCheckbox)
 
   // Assertions
   await t
@@ -24,7 +22,6 @@ test('should check that merge tags list option exist', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.advancedCollapsiblePanel)
     .click(run.formatStandardCheckbox)
     .click(run.enablePdfSecurityCheckbox)
     .click(run.passwordMergeTagsOptionList)
@@ -46,7 +43,6 @@ test('should save selected merge tags', async t => {
   // Actions & Assertions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.advancedCollapsiblePanel)
     .click(run.formatStandardCheckbox)
     .click(run.enablePdfSecurityCheckbox)
     .click(run.passwordMergeTagsOptionList)
@@ -72,7 +68,6 @@ test('should disable/reset PDF security field and hide password field', async t 
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.advancedCollapsiblePanel)
     .click(run.formatStandardCheckbox)
     .click(run.enablePdfSecurityCheckbox)
     .click(run.saveSettings)

@@ -8,7 +8,7 @@ class Page {
     this.closePopupButton = Selector('button').withAttribute('aria-label', 'Close dialog')
     this.titleField = Selector('.editor-post-title').find('textarea').withAttribute('placeholder', 'Add title')
     this.addBlockIcon = Selector('button').withAttribute('aria-label', 'Add block')
-    this.searchBlock = Selector('input').withAttribute('placeholder', 'Search for a block')
+    this.searchBlock = Selector('.block-editor-inserter__search').find('input').withAttribute('type', 'search')
     this.shortcodeLink = Selector('button.editor-block-list-item-shortcode')
     this.shortcodeTextarea = Selector('textarea').withAttribute('placeholder', 'Write shortcode here…')
     this.trashLink = Selector('a').withAttribute('aria-label', 'Move “Test page” to the Trash')

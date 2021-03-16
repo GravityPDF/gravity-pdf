@@ -27,9 +27,7 @@ test('should display \'Font\' field', async t => {
 test('should display a dropdown of default fonts option', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
-  await t
-    .click(run.appearanceCollapsiblePanel)
-    .click(run.fontSelectBox)
+  await t.click(run.fontSelectBox)
 
   // Assertions
   await t
@@ -54,7 +52,6 @@ test('should save selected font', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.appearanceCollapsiblePanel)
     .click(run.fontSelectBox)
     .click(dropdownOption('MPH 2B Damase'))
     .click(run.saveSettings)
@@ -67,9 +64,7 @@ test('should save selected font', async t => {
 test('should check that font manager popup exist', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
-  await t
-    .click(run.appearanceCollapsiblePanel)
-    .click(fontManager.advancedButton)
+  await t.click(fontManager.advancedButton)
 
   // Assertions
   await t
@@ -83,7 +78,6 @@ test('should display font manager error validation', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.appearanceCollapsiblePanel)
     .click(fontManager.advancedButton)
     .click(fontManager.addFontButton)
 
@@ -100,7 +94,6 @@ test('should successfully add new font', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.appearanceCollapsiblePanel)
     .click(fontManager.advancedButton)
     .typeText(fontManager.addFontNameInputField, 'Gotham', { paste: true })
     .setFilesToUpload(fontManager.addNewFontRegular, fontManager.gothamFontRegular)
@@ -120,7 +113,6 @@ test('should successfully check toggled state for disabled \'Update Font\' butto
   // Actions && Assertions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.appearanceCollapsiblePanel)
     .click(fontManager.advancedButton)
     .click(fontManager.fontListItem.nth(0))
     .expect(fontManager.updateFontButton.hasAttribute('disabled')).ok()
@@ -132,7 +124,6 @@ test('should successfully close \'update font\' panel using cancel button', asyn
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.appearanceCollapsiblePanel)
     .click(fontManager.advancedButton)
     .click(fontManager.fontListItem.nth(0))
     .click(fontManager.cancelButton)
@@ -145,9 +136,8 @@ test('should successfully perform font search', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.appearanceCollapsiblePanel)
     .click(fontManager.advancedButton)
-  await t.typeText(fontManager.searchBar, 'Roboto', { paste: true })
+    .typeText(fontManager.searchBar, 'Roboto', { paste: true })
 
   // Assertions
   await t.expect(fontManager.fontListItem.count).eql(1)
@@ -157,7 +147,6 @@ test('should successfully edit existing font', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.appearanceCollapsiblePanel)
     .click(fontManager.advancedButton)
     .click(fontManager.fontListItem.nth(0))
     .click(fontManager.updateFontNameInputField)
@@ -180,7 +169,6 @@ test('should successfully delete font', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.appearanceCollapsiblePanel)
     .click(fontManager.advancedButton)
     .click(fontManager.fontListItem.nth(1).find('[class^="dashicons dashicons-trash"]'))
     .click(fontManager.fontListItem.nth(0).find('[class^="dashicons dashicons-trash"]'))
@@ -196,7 +184,6 @@ test('should be able to close font manager popup', async t => {
   // Actions
   await run.navigatePdfSection('gf_edit_forms&view=settings&subview=PDF&id=4')
   await t
-    .click(run.appearanceCollapsiblePanel)
     .click(fontManager.advancedButton)
     .click(fontManager.closeDialog)
 

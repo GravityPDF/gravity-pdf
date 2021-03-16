@@ -4,15 +4,9 @@ import { selectBox } from './field'
 
 class Pdf {
   constructor () {
-    this.pdfname = Selector('#gfpdf_settings\\[name\\]')
     this.fileName = Selector('#gfpdf_settings\\[filename\\]')
     this.template = Selector('.alternate')
     this.saveSettings = Selector('#submit-and-promo-container').find('input')
-
-    // Fieldset collapsible link
-    this.appearanceCollapsiblePanel = Selector('#gfpdf-fieldset-gfpdf_form_settings_appearance').find('[class^="gform-settings-panel__collapsible-toggle-checkbox"]')
-    this.templateCollapsiblePanel = Selector('#gfpdf-fieldset-gfpdf_form_settings_template').find('[class^="gform-settings-panel__collapsible-toggle-checkbox"]')
-    this.advancedCollapsiblePanel = Selector('#gfpdf-fieldset-gfpdf_form_settings_advanced').find('[class^="gform-settings-panel__collapsible-toggle-checkbox"]')
 
     // General - Template field
     this.templateSelectBox = selectBox('gfpdf_settings_template large', 'gfpdf_settings[template]')
@@ -71,13 +65,6 @@ class Pdf {
     this.backgroundColorWpPickerContainerActive = Selector('#gfpdf-settings-field-wrapper-background_color').find('[class^="wp-picker-container wp-picker-active"]')
     this.backgroundColorWpColorPickerBox = Selector('#gfpdf-settings-field-wrapper-font_colour').find('[class^="iris-picker iris-border"]')
     this.backgroundColorSelectButton = Selector('#gfpdf-settings-field-wrapper-background_color').find('button').withText('Select Color')
-
-    // Template - Container Background Color field
-    this.rubixContainerBackgroundColorSelectButton = Selector('#gfpdf-settings-field-wrapper-rubix_container_background_colour').find('button').withText('Select Color')
-    this.rubixContainerBackgroundColorInputBox = selectBox('gfpdf-color-picker gfpdf_settings_rubix_container_background_colour wp-color-picker', 'gfpdf_settings[rubix_container_background_colour]')
-    this.rubixContainerBackgroundColorWpPickerContainerActive = Selector('#gfpdf-settings-field-wrapper-rubix_container_background_colour').find('[class^="wp-picker-container wp-picker-active"]')
-    this.rubixContainerBackgroundColorWpColorPickerBox = Selector('#gfpdf-settings-field-wrapper-rubix_container_background_colour').find('[class^="iris-picker iris-border"]')
-    this.rubixContainerBackgroundColorPicker = Selector('#gfpdf-settings-field-wrapper-rubix_container_background_colour').find('a').withAttribute('class', 'iris-palette')
 
     // Template - Background Image field
     this.backgroundImageUploadBox = selectBox('regular-text gfpdf_settings_background_image ', 'gfpdf_settings[background_image]')
