@@ -160,43 +160,57 @@ export class AddUpdateFontFooter extends Component {
         data-test='component-AddFontFooter'
         className={'footer' + (cancelButton ? ' cancel' : '')}
       >
-        {id && (
-          <div
-            className='button gfpdf-button primary cancel'
-            onClick={onHandleCancelEditFont}
-            onKeyDown={onHandleCancelEditFontKeypress}
-            tabIndex={tabIndex}
-          >
-            {GFPDF.fontManagerCancelButtonText}
+        <div className='buttons-icons-container'>
+          <div>
+            {id && (
+              <button
+                className='button gfpdf-button primary cancel'
+                onClick={onHandleCancelEditFont}
+                onKeyDown={onHandleCancelEditFontKeypress}
+                type='button'
+                tabIndex={tabIndex}
+                aria-label={GFPDF.cancel}
+              >
+                {GFPDF.fontManagerCancelButtonText}
+              </button>
+            )}
+
+            <button
+              className='button gfpdf-button primary'
+              tabIndex={tabIndex}
+              disabled={disabled}
+              aria-label={GFPDF.fontManagerUpdateFontAriaLabel}
+            >
+              {id ? GFPDF.fontManagerUpdateTitle + ' →' : GFPDF.fontManagerAddTitle + ' →'}
+            </button>
+
+            {loading && <Spinner style='add-update-font' />}
           </div>
-        )}
 
-        <button
-          className='button gfpdf-button primary'
-          tabIndex={tabIndex}
-          disabled={disabled}
-        >
-          {id ? GFPDF.fontManagerUpdateTitle + ' →' : GFPDF.fontManagerAddTitle + ' →'}
-        </button>
+          <div className='select-delete-icons-container'>
+            {id && (
+              <button
+                className={'dashicons dashicons-yes' + selectedBoxStyle}
+                onClick={() => this.handleSelectFont(id, selectedFont)}
+                onKeyDown={e => this.handleSelectFontKeypress(e, id, selectedFont)}
+                type='button'
+                tabIndex={tabIndex}
+                aria-label={GFPDF.fontManagerSelectFontAriaLabel}
+              />
+            )}
 
-        {id && (
-          <span
-            className={'dashicons dashicons-yes' + selectedBoxStyle}
-            onClick={() => this.handleSelectFont(id, selectedFont)}
-            onKeyDown={e => this.handleSelectFontKeypress(e, id, selectedFont)}
-            tabIndex={tabIndex}
-          />
-        )}
-        {id && (
-          <span
-            className='dashicons dashicons-trash'
-            onClick={() => this.handleDeleteFont(id)}
-            onKeyDown={e => this.handleDeleteFontKeypress(e, id)}
-            tabIndex={tabIndex}
-          />
-        )}
-
-        {loading && <Spinner style='add-update-font' />}
+            {id && (
+              <button
+                className='dashicons dashicons-trash'
+                onClick={() => this.handleDeleteFont(id)}
+                onKeyDown={e => this.handleDeleteFontKeypress(e, id)}
+                type='button'
+                tabIndex={tabIndex}
+                aria-label={GFPDF.fontManagerDeleteFontAriaLabel}
+              />
+            )}
+          </div>
+        </div>
 
         {showSuccessAddFont && (
           <span className='msg success' dangerouslySetInnerHTML={{ __html: success.addFont }} />

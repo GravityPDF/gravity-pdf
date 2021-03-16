@@ -17,6 +17,14 @@
 
             form {
               .footer {
+                .buttons-icons-container {
+                  display: block;
+
+                  .select-delete-icons-container {
+                    margin-top: 0.5rem;
+                  }
+                }
+
                 .msg {
                   &.template-usage-link {
                     #template_usage_info_box {
