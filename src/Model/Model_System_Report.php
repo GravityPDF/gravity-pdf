@@ -232,20 +232,20 @@ class Model_System_Report extends Helper_Abstract_Model {
 		$items[2] = [
 			'pdf_entry_list_action'         => [
 				'label'        => esc_html__( 'PDF Entry List Action', 'gravity-forms-pdf-extended' ),
-				'value'        => $this->options->get_option( 'default_action' ) === 'View' ? esc_html__( 'View', 'gravity-forms-pdf-extended' ) : esc_html__( 'Download', 'gravity-forms-pdf-extended' ),
-				'value_export' => $this->options->get_option( 'default_action' ),
+				'value'        => $this->options->get_option( 'default_action', 'View' ) === 'View' ? esc_html__( 'View', 'gravity-forms-pdf-extended' ) : esc_html__( 'Download', 'gravity-forms-pdf-extended' ),
+				'value_export' => $this->options->get_option( 'default_action', 'View' ),
 			],
 
 			'background_processing_enabled' => [
 				'label'        => esc_html__( 'Background Processing', 'gravity-forms-pdf-extended' ),
-				'value'        => $this->options->get_option( 'background_processing' ) === 'Yes' ? $this->getController()->view->get_icon( true ) : esc_html__( 'Off', 'gravity-forms-pdf-extended' ),
-				'value_export' => $this->options->get_option( 'background_processing' ),
+				'value'        => $this->options->get_option( 'background_processing', 'No' ) === 'Yes' ? $this->getController()->view->get_icon( true ) : esc_html__( 'Off', 'gravity-forms-pdf-extended' ),
+				'value_export' => $this->options->get_option( 'background_processing', 'No' ),
 			],
 
 			'debug_mode_enabled'            => [
 				'label'        => esc_html__( 'Debug Mode', 'gravity-forms-pdf-extended' ),
-				'value'        => $this->options->get_option( 'debug_mode' ) === 'Yes' ? $this->getController()->view->get_icon( true ) : esc_html__( 'Off', 'gravity-forms-pdf-extended' ),
-				'value_export' => $this->options->get_option( 'debug_mode' ),
+				'value'        => $this->options->get_option( 'debug_mode', 'No' ) === 'Yes' ? $this->getController()->view->get_icon( true ) : esc_html__( 'Off', 'gravity-forms-pdf-extended' ),
+				'value_export' => $this->options->get_option( 'debug_mode', 'No' ),
 			],
 		];
 
@@ -258,8 +258,8 @@ class Model_System_Report extends Helper_Abstract_Model {
 
 			'logged_out_timeout' => [
 				'label'        => esc_html__( 'Logged Out Timeout', 'gravity-forms-pdf-extended' ),
-				'value'        => $this->options->get_option( 'logged_out_timeout' ) . ' ' . esc_html__( 'minute(s)', 'gravity-forms-pdf-extended' ),
-				'value_export' => $this->options->get_option( 'logged_out_timeout' ) . ' minutes(s)',
+				'value'        => $this->options->get_option( 'logged_out_timeout', '20' ) . ' ' . esc_html__( 'minute(s)', 'gravity-forms-pdf-extended' ),
+				'value_export' => $this->options->get_option( 'logged_out_timeout', '20' ) . ' minutes(s)',
 			],
 		];
 
