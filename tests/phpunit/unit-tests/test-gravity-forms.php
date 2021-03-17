@@ -81,7 +81,8 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 	 */
 	public function test_update_form_meta() {
 		/* Get the form */
-		$form = GFFormsModel::get_form_meta( $this->form_id );
+		$form   = GFFormsModel::get_form_meta( $this->form_id );
+		$backup = $form;
 
 		/* make changes to the values */
 		$form['notifications']       = 'My Notifications';
@@ -96,6 +97,9 @@ class Test_Gravity_Forms extends WP_UnitTestCase {
 
 		$this->assertEquals( 'My Notifications', $form['notifications'] );
 		$this->assertEquals( 'My PDF settings', $form['gfpdf_form_settings'] );
+
+		/* Reset */
+		GFFormsModel::update_form_meta( $this->form_id, $backup );
 	}
 
 	/**
