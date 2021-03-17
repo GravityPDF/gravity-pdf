@@ -244,4 +244,102 @@ class Model_Mergetags extends Helper_Abstract_Model {
 
 		return $text;
 	}
+
+	/**
+	 * Add PDFs to the field map list
+	 *
+	 * @param array $fields
+	 * @param int   $form_id
+	 *
+	 * @return array
+	 *
+	 * @since 6.3
+	 */
+	public function add_field_map_choices( $fields, $form_id, $field_type, $exclude_field_types ) {
+
+		/* Only add PDFs to choices if $fields contains the Entry Properties information */
+		if ( ! in_array( esc_html__( 'Entry Properties', 'gravityforms' ), array_column( $fields, 'label' ) ) ) {
+			return $fields;
+		}
+
+		$combined_choices = [];
+		$pdfs             = $this->options->get_form_pdfs( $form_id );
+
+		if ( is_wp_error( $pdfs ) ) {
+			return $fields;
+		}
+
+		foreach ( $pdfs as $pdf ) {
+			/* Ignore inactive pdf template. */
+			if ( $pdf['active'] === false ) {
+				continue;
+			}
+
+			$combined_choices[] = [
+				'label' => $pdf['name'],
+				'value' => sprintf(
+					'{%s:pdf:%s}',
+					$pdf['name'],
+					$pdf['id']
+				),
+			];
+
+			$combined_choices[] = [
+				'label' => $pdf['name'] . ' ' . __( 'Signed (+1 week)', 'gravity-forms-pdf-extended' ),
+				'value' => sprintf(
+					'{%s:pdf:%s:signed,1 week}',
+					$pdf['name'],
+					$pdf['id']
+				),
+			];
+
+			$combined_choices[] = [
+				'label' => $pdf['name'] . ' ' . __( 'Signed (+1 month)', 'gravity-forms-pdf-extended' ),
+				'value' => sprintf(
+					'{%s:pdf:%s:signed,1 month}',
+					$pdf['name'],
+					$pdf['id']
+				),
+			];
+
+			$combined_choices[] = [
+				'label' => $pdf['name'] . ' ' . __( 'Signed (+1 year)', 'gravity-forms-pdf-extended' ),
+				'value' => sprintf(
+					'{%s:pdf:%s:signed,12 months}',
+					$pdf['name'],
+					$pdf['id']
+				),
+			];
+		}
+
+		if ( count( $combined_choices ) > 0 ) {
+			$fields[] = [
+				'label'   => __( 'PDF URLs', 'gravity-forms-pdf-extended' ),
+				'choices' => $combined_choices,
+			];
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * @param string $field_value
+	 * @param array  $form
+	 * @param array  $entry
+	 * @param int    $field_id
+	 *
+	 * @return string
+	 *
+	 * @since 6.3
+	 */
+	public function process_field_value( $field_value, $form, $entry, $field_id ) {
+
+		if ( ! empty( $field_value ) || strpos( $field_id, ':pdf:' ) === false ) {
+			return $field_value;
+		}
+
+		$gform = \GPDFAPI::get_form_class();
+		return $gform->process_tags( $field_id, $gform->get_form( $form['id'] ), $gform->get_entry( $entry['id'] ) );
+	}
+
 }
