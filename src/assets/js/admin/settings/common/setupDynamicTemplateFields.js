@@ -5,6 +5,7 @@ import { loadTinyMCEEditor } from './dynamicTemplateFields/loadTinyMCEEditor'
 import { initialiseCommonElements } from './initialiseCommonElements'
 import { doMergetags } from './dynamicTemplateFields/doMergetags'
 import { toggleFontAppearance } from '../pdf/toggleFontAppearance'
+import { insertAfter } from '../../../react/utilities/PdfSettings/addEditButton'
 
 /**
  * PDF Templates can assign their own custom settings which can enhance a template
@@ -30,6 +31,8 @@ export function setupDynamicTemplateFields () {
     }
 
     ajaxCall(data, function (response) {
+      const addEditButton = $('.submit-container-2')[0]
+
       /* Remove our UI loader */
       $spinner.remove()
 
@@ -51,6 +54,11 @@ export function setupDynamicTemplateFields () {
           }
         })
 
+        /* Add floating Add/Edit PDF button */
+        if (!addEditButton) {
+          insertAfter($('#gfpdf-fieldset-gfpdf_form_settings_template')[0], $('#gfpdf_pdf_form')[0], '2')
+        }
+
         /* Replace the custom appearance with the AJAX response fields */
         $('#gfpdf-fieldset-gfpdf_form_settings_template')
           .show()
@@ -65,6 +73,11 @@ export function setupDynamicTemplateFields () {
         doMergetags()
         gform_initialize_tooltips()
       } else {
+        /* Remove floating Add/Edit PDF button */
+        if (addEditButton) {
+          addEditButton.remove()
+        }
+
         /* Hide our template nav item as there are no fields and clear our the HTML */
         $('#gfpdf-fieldset-gfpdf_form_settings_template')
           .hide()

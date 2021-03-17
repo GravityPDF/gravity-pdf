@@ -20,6 +20,8 @@ export function insertAfter (fieldset, form, index, firstLoad) {
   if (!fieldset.classList.contains('gform-settings-panel--collapsed')) {
     const submitButton = form.querySelector('#submit')
     const submitButtonClone = submitButton.cloneNode(true)
+    submitButtonClone.setAttribute('id', ('submit_' + index))
+
     const wrapper = document.createElement('div')
     wrapper.setAttribute('class', wrapperClass)
     wrapper.innerHTML = submitButtonClone.outerHTML
