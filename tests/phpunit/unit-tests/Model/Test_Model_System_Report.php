@@ -3,8 +3,9 @@ declare( strict_types=1 );
 
 namespace GFPDF\Model;
 
-use WP_UnitTestCase;
+use GFPDF\Helper\Helper_Templates;
 use GFPDF_Major_Compatibility_Checks;
+use WP_UnitTestCase;
 
 /**
  * @package     Gravity PDF
@@ -36,7 +37,7 @@ class Test_Model_System_Report extends WP_UnitTestCase {
 		parent::setUp();
 
 		/* Setup our test classes */
-		$this->model = new Model_System_Report( $gfpdf->options, $gfpdf->data, $gfpdf->log, $gfpdf->misc, new GFPDF_Major_Compatibility_Checks );
+		$this->model = new Model_System_Report( $gfpdf->options, $gfpdf->data, $gfpdf->log, $gfpdf->misc, new GFPDF_Major_Compatibility_Checks, new Helper_Templates( $gfpdf->log, $gfpdf->data, $gfpdf->gform ) );
 	}
 
 	public function test_get_report_structure() {

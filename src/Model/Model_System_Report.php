@@ -8,8 +8,8 @@ use GFPDF\Helper\Helper_Abstract_Model;
 use GFPDF\Helper\Helper_Abstract_Options;
 use GFPDF\Helper\Helper_Data;
 use GFPDF\Helper\Helper_Misc;
+use GFPDF\Helper\Helper_Templates;
 use GFPDF_Major_Compatibility_Checks;
-use GPDFAPI;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -67,12 +67,20 @@ class Model_System_Report extends Helper_Abstract_Model {
 	 */
 	protected $status;
 
-	public function __construct( Helper_Abstract_Options $options, Helper_Data $data, LoggerInterface $log, Helper_Misc $misc, GFPDF_Major_Compatibility_Checks $status ) {
-		$this->options = $options;
-		$this->data    = $data;
-		$this->log     = $log;
-		$this->misc    = $misc;
-		$this->status  = $status;
+	/**
+	 * @var Helper_Templates
+	 *
+	 * @since 6.0
+	 */
+	protected $templates;
+
+	public function __construct( Helper_Abstract_Options $options, Helper_Data $data, LoggerInterface $log, Helper_Misc $misc, GFPDF_Major_Compatibility_Checks $status, Helper_Templates $templates ) {
+		$this->options   = $options;
+		$this->data      = $data;
+		$this->log       = $log;
+		$this->misc      = $misc;
+		$this->status    = $status;
+		$this->templates = $templates;
 	}
 
 	/**
@@ -192,12 +200,12 @@ class Model_System_Report extends Helper_Abstract_Model {
 		$items[1] = [
 			'pdf_working_directory'     => [
 				'label' => esc_html__( 'PDF Working Directory', 'gravity-forms-pdf-extended' ),
-				'value' => $this->data->template_location,
+				'value' => $this->templates->get_template_path(),
 			],
 
 			'pdf_working_directory_url' => [
 				'label' => esc_html__( 'PDF Working Directory URL', 'gravity-forms-pdf-extended' ),
-				'value' => $this->data->template_location_url,
+				'value' => $this->templates->get_template_url(),
 			],
 
 			'font_folder_location'      => [
