@@ -1,13 +1,36 @@
 #tab_PDF {
 
   /* Fieldsets (General, Appearance, Template, Advanced) */
-  #gfpdf-fieldset-gfpdf_form_settings_general, #gfpdf-fieldset-gfpdf_form_settings_advanced {
+  .gform_settings_form {
 
     /* Conditional Logic */
     button {
       &.add_field_choice, &.delete_field_choice {
         max-width: 18px;
         width: 100%;
+      }
+    }
+
+    /* Enable textarea merge tag box */
+    .all-merge-tags {
+      &.textarea {
+        .tooltip-merge-tag {
+          background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMiIgaGVpZ2h0PSIyMiIgdmlld0JveD0iMCAwIDIyIDIyIj48dGl0bGU+bWVyZ2UgaWNvbjwvdGl0bGU+PGcgY2xhc3M9Im5jLWljb24td3JhcHBlciIgZmlsbD0iIzNlN2RhNiI+PHBhdGggZmlsbD0iIzNlN2RhNiIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNOCAxMGgydjJIOHYtMnptNiAyaC0ydi0yaDJ2MnptMS42MzUtNi4yNUgxNHYtMS41aDEuNjM1Yy45MjYgMCAxLjYyNS40MyAyLjA1OCAxLjA5My40MDkuNjI1LjU1NyAxLjQxMi41NTcgMi4xNnYxLjA0M2MwIDEuMDU0LjY3MyAxLjY1NyAxLjI1IDEuNjU3bC43NS43NXYuMDMxbC0uNzUxLjc1Yy0uNTgtLjAwMS0xLjI0OS41OTMtMS4yNDkgMS42NDZ2MS42MDNjMCAuNzQzLS4xNDcgMS40NjctLjYyMyAyLjAwNS0uNDk0LjU1Ny0xLjIwNC43NjQtMS45OTIuNzY0SDE0di0xLjVoMS42MzVjLjU0IDAgLjc2Mi0uMTM4Ljg3LS4yNTkuMTIzLS4xNC4yNDUtLjQyNS4yNDUtMS4wMVYxMy4zOGMwLS45MTkuMzU3LTEuODE1Ljk3MS0yLjQxNC0uNjE1LS42MDMtLjk3MS0xLjUwNC0uOTcxLTIuNDJWNy41MDNjMC0uNTgtLjEyLTEuMDQ1LS4zMTItMS4zNC0uMTY3LS4yNTUtLjQwMS0uNDEzLS44MDMtLjQxM3ptLTkuMjcgMGMtLjg2IDAtMS42MTUuNzgyLTEuNjE1IDEuNzUzdjEuMDY0YzAgLjMxNyAwIC42NjgtLjAzNi45OTctLjAzNi4zMzgtLjExNi43MTMtLjMxNCAxLjA1N2ExLjk0NiAxLjk0NiAwIDAgMS0uMjUuMzQ1Yy4wOTMuMTAyLjE3Ny4yMTUuMjUuMzQxLjE5OC4zNDQuMjc4LjcxOC4zMTQgMS4wNTYuMDM2LjMyOC4wMzYuNjc4LjAzNi45OTV2MS42MjVjMCAuNDQ4LjE2NC43MzIuNDAxLjkyLjI1OS4yMDYuNjcuMzQ4IDEuMjE0LjM0OEg3LjV2MS41SDYuMzY1Yy0uNzg0IDAtMS41NTUtLjIwMy0yLjE0Ny0uNjc0LS42MTQtLjQ4OC0uOTY4LTEuMjEzLS45NjgtMi4wOTR2LTEuNjA0YzAtLjM0MiAwLS42MTUtLjAyNy0uODU0LS4wMjYtLjIzNi0uMDctLjM3OC0uMTIyLS40NjctLjA1Ni0uMDk2LS4yMi0uMzI1LTEuMTAxLS4zMjVsLS43NS0uNzV2LS4wM2wuNzUtLjc1Yy44NzkgMCAxLjA0My0uMjMgMS4xLS4zMjguMDUyLS4wOTIuMDk3LS4yMzYuMTIzLS40NzMuMDI2LS4yNC4wMjctLjUxNC4wMjctLjg1NlY3LjUwM2MwLTEuNjg3IDEuMzE5LTMuMjUzIDMuMTE1LTMuMjUzSDcuNXYxLjVINi4zNjV6IiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGNsYXNzPSJuYy1pY29uLXdyYXBwZXIiLz48L2c+PC9zdmc+);
+          border: 1px solid #3e7da6 !important;
+          border-radius: 3px;
+          height: 2rem;
+          width: 2.25rem;
+        }
+      }
+
+      #gf_merge_tag_list {
+        margin-right: .5rem;
+      }
+    }
+
+    .gfpdf-settings-field-wrapper {
+      .wp-editor-wrap {
+        margin-right: 4.125rem;
       }
     }
   }

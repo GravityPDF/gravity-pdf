@@ -47,6 +47,14 @@ html[dir="rtl"] {
           position: unset !important;
         }
       }
+
+      /* Enable textarea merge tag box */
+      .gfpdf-settings-field-wrapper {
+        .wp-editor-wrap {
+          margin-right: 0;
+          margin-left: 4.125rem;
+        }
+      }
     }
   }
 }
