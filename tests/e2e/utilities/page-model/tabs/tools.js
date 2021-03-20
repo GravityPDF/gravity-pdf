@@ -3,9 +3,6 @@ import { admin, baseURL } from '../../../auth'
 
 class Tools {
   constructor () {
-    // Fieldset collapsible link
-    this.uninstallGravityPdfCollapsiblePanel = Selector('#gfpdf-fieldset-uninstaller').find('[id="gform_settings_section_collapsed_uninstaller"]')
-
     // Install Core Fonts field
     this.downloadCoreFontsButton = Selector('#gfpdf-fieldset-install_core_fonts').find('button').withText('Download Core Fonts')
     this.pendingResult = Selector('.gfpdf-core-font-status-pending')
@@ -15,7 +12,9 @@ class Tools {
     this.retryDownload = Selector('a').withText('Retry Failed Downloads?')
 
     // Uninstall Gravity PDF field
-    this.uninstallGravityPdfButton = Selector('#gfpdf-fieldset-uninstaller').find('button').withText('Uninstall Gravity PDF')
+    this.uninstallPanelTitle = Selector('.addon-uninstall-text').find('h4').withText('Gravity PDF')
+    this.uninstallPanelDescription = Selector('.addon-uninstall-text').find('div').withText('This operation deletes ALL Gravity PDF settings.')
+    this.uninstallGravityPdfButton = Selector('.addon-uninstall-button').find('button').withText('Uninstall')
   }
 
   async navigateSettingsTab (address) {
