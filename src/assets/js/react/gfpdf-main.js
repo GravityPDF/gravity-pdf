@@ -5,6 +5,7 @@ import coreFontBootstrap from './bootstrap/coreFontBootstrap'
 import helpBootstrap from './bootstrap/helpBootstrap'
 import addEditButton from './utilities/PdfSettings/addEditButton'
 import autoSelectShortcode from './utilities/PdfList/autoSelectShortcode'
+import addTabIndex from './utilities/PdfSettings/addTabIndex'
 import '../../scss/gfpdf-styles.scss'
 
 /**
@@ -81,6 +82,13 @@ $(function () {
   /* Initialize additional add/update buttons on PDF setting panels */
   if (pdfSettingsForm && pdfSettingFieldSets.length === 4) {
     addEditButton(pdfSettingFieldSets, pdfSettingsForm)
+
+    const elemMergeTags = document.querySelectorAll('span.all-merge-tags')
+
+    /* Add tabIndex and event listener for merge tags tooltip */
+    if (elemMergeTags.length > 0) {
+      addTabIndex(elemMergeTags)
+    }
   }
 
   /* Enable shortcode field click and auto select feature */
