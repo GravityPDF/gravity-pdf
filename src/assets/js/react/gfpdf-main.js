@@ -4,6 +4,7 @@ import { fontManagerBootstrap } from './bootstrap/fontManagerBootstrap'
 import coreFontBootstrap from './bootstrap/coreFontBootstrap'
 import helpBootstrap from './bootstrap/helpBootstrap'
 import addEditButton from './utilities/PdfSettings/addEditButton'
+import autoSelectShortcode from './utilities/PdfList/autoSelectShortcode'
 import '../../scss/gfpdf-styles.scss'
 
 /**
@@ -60,6 +61,7 @@ $(function () {
   const fmPdfSettings = document.querySelector('#gfpdf-settings-field-wrapper-font select')
   const pdfSettingsForm = document.querySelector('#gfpdf_pdf_form')
   const pdfSettingFieldSets = document.querySelectorAll('fieldset.gform-settings-panel--full')
+  const gfPdfListForm = document.querySelector('form#gfpdf_list_form')
 
   /* Initialize font manager under general settings tab */
   if (fmGeneralSettingsTab !== null) {
@@ -79,5 +81,10 @@ $(function () {
   /* Initialize additional add/update buttons on PDF setting panels */
   if (pdfSettingsForm && pdfSettingFieldSets.length === 4) {
     addEditButton(pdfSettingFieldSets, pdfSettingsForm)
+  }
+
+  /* Enable shortcode field click and auto select feature */
+  if (gfPdfListForm !== null) {
+    autoSelectShortcode(gfPdfListForm)
   }
 })
