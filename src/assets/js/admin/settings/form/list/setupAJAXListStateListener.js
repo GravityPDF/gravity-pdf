@@ -31,11 +31,17 @@ export function setupAJAXListStateListener () {
         label.html(data.state)
 
         if (button.data('status') === 'active') {
+          /* Set button data-status to inactive */
+          button[0].setAttribute('data-status', 'inactive')
+
           button
             .data('status', 'inactive')
             .removeClass('gform_status--pending')
             .addClass('gform-status--inactive')
         } else {
+          /* Set button data-status to active */
+          button[0].setAttribute('data-status', 'active')
+
           button
             .data('status', 'active')
             .removeClass('gform_status--pending')
