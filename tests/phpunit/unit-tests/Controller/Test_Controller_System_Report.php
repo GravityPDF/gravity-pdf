@@ -55,4 +55,22 @@ class Test_Controller_System_Report extends WP_UnitTestCase {
 			[ 3, 'logged_out_timeout' ],
 		];
 	}
+
+	public function test_system_report_outdated_template() {
+		/* verify no outdated template info */
+		$system_report = apply_filters( 'gform_system_report', [] );
+		$this->assertArrayNotHasKey( 'outdated_templates', $system_report[0]['tables'][1]['items'] );
+
+		/* copy core template to override location and adjust version number, then verify outdated message is included */
+		$data          = \GPDFAPI::get_data_class();
+		$override_path = $data->template_location . 'zadani.php';
+
+		$template = file_get_contents( PDF_PLUGIN_DIR . 'src/templates/zadani.php' );
+		file_put_contents( $override_path, preg_replace( '/Version: (.+?)/', 'Version: 1.5.2', $template ) );
+
+		$system_report = apply_filters( 'gform_system_report', [] );
+		$this->assertArrayHasKey( 'outdated_templates', $system_report[0]['tables'][1]['items'] );
+
+		@unlink( $override_path );
+	}
 }
