@@ -2,6 +2,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { sprintf } from 'sprintf-js'
+/* Utilities */
+import { adjustFontListHeight } from '../../utilities/FontManager/adjustFontListHeight'
 
 /**
  * @package     Gravity PDF
@@ -38,6 +40,8 @@ export class TemplateTooltip extends React.Component {
    */
   handleDisplayInfo = () => {
     this.setState({ tooltip: !this.state.tooltip })
+
+    setTimeout(() => adjustFontListHeight(), 100)
   }
 
   /**
