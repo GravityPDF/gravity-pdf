@@ -70,6 +70,9 @@ export function setupAJAXListDuplicateListener () {
           $state.data('id', response.pid)
           $state.data('nonce', response.state_nonce)
 
+          /* Set button data-status to inactive by default */
+          $state[0].setAttribute('data-status', 'inactive')
+
           /* Update our shortcode ID */
           let shortcodeValue = $shortcode.val()
           shortcodeValue = shortcodeValue.replace(id, response.pid)
