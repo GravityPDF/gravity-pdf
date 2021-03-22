@@ -1,0 +1,17 @@
+html[dir="rtl"] {
+  #tab_PDF {
+
+    .gfpdf-upload-setting-container {
+      input:first-of-type {
+        border-bottom-left-radius: 0;
+        border-left: none;
+        border-right: 1px solid #9092b2;
+        border-top-left-radius: 0;
+      }
+
+      input:last-of-type {
+        border-radius: 5px 0 0 5px;
+      }
+    }
+  }
+}

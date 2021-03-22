@@ -1,0 +1,22 @@
+/* 960px and below */
+@media only screen and (max-width: 960px) {
+  html[dir="rtl"] {
+    #tab_PDF {
+
+      /* Font manager modal */
+      #font-manager-overlay {
+        .font-manager {
+          #gfpdf-font-manager-container {
+
+            /* Add font */
+            .add-update-font-column {
+              .update-font {
+                right: -800px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+#tab_PDF {
+
+  /* Fieldsets (General, Appearance, Template, Advanced) */
+  #gfpdf-fieldset-gfpdf_form_settings_general, #gfpdf-fieldset-gfpdf_form_settings_advanced {
+
+    /* Conditional Logic */
+    button {
+      &.add_field_choice, &.delete_field_choice {
+        max-width: 18px;
+        width: 100%;
+      }
+    }
+  }
+}
