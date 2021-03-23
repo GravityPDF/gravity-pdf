@@ -101,6 +101,15 @@ class GFPDF_Major_Compatibility_Checks {
 	public $required_php_version = '7.3';
 
 	/**
+	 * Whether to offer a downgrade notice or not
+	 *
+	 * @var bool
+	 *
+	 * @since 6.0
+	 */
+	protected $offer_downgrade = false;
+
+	/**
 	 * Set our required variables for a fallback and attempt to initialise
 	 *
 	 * @param string $basename Plugin basename
@@ -143,6 +152,23 @@ class GFPDF_Major_Compatibility_Checks {
 
 		/* Check if any errors were thrown, enqueue them and exit early */
 		if ( count( $this->notices ) > 0 ) {
+			if ( $this->offer_downgrade ) {
+				add_action( 'admin_menu', array( $this, 'admin_rollback_menu' ), 20 );
+
+				/* don't display the notice on the rollback page */
+				if ( is_admin() && rgget( 'page' ) === 'gpdf-downgrade' ) {
+					return;
+				}
+			}
+
+			if ( class_exists( 'GFForms' ) && GFForms::is_gravity_page() ) {
+				ob_start();
+				$this->notice_body_content();
+				GFCommon::add_error_message( ob_get_clean() );
+
+				return;
+			}
+
 			add_action( 'admin_notices', array( $this, 'display_notices' ) );
 
 			return;
@@ -163,7 +189,9 @@ class GFPDF_Major_Compatibility_Checks {
 
 		/* WordPress version not compatible */
 		if ( ! version_compare( $wp_version, $this->required_wp_version, '>=' ) ) {
-			$this->notices[] = sprintf( esc_html__( 'WordPress Version %1$s is required. %2$sGet more info%3$s.', 'gravity-forms-pdf-extended' ), $this->required_wp_version, '<a href="https://gravitypdf.com/documentation/v5/user-activation-errors/#wordpress-version">', '</a>' );
+			$this->notices[] = sprintf( esc_html__( 'WordPress version %1$s is required. %2$sGet more info%3$s.', 'gravity-forms-pdf-extended' ), $this->required_wp_version, '<a href="https://gravitypdf.com/documentation/v5/user-activation-errors/#wordpress-version">', '</a>' );
+
+			$this->offer_downgrade = true;
 
 			return false;
 		}
@@ -188,7 +216,9 @@ class GFPDF_Major_Compatibility_Checks {
 		}
 
 		if ( ! version_compare( GFCommon::$version, $this->required_gf_version, '>=' ) ) {
-			$this->notices[] = sprintf( esc_html__( '%1$sGravity Forms%2$s Version %3$s or higher is required. %4$sGet more info%5$s.', 'gravity-forms-pdf-extended' ), '<a href="https://rocketgenius.pxf.io/c/1211356/445235/7938">', '</a>', $this->required_gf_version, '<a href="https://gravitypdf.com/documentation/v5/user-activation-errors/#gravityforms-version">', '</a>' );
+			$this->notices[] = sprintf( esc_html__( '%1$sGravity Forms%2$s version %3$s or higher is required. %4$sGet more info%5$s.', 'gravity-forms-pdf-extended' ), '<a href="https://rocketgenius.pxf.io/c/1211356/445235/7938">', '</a>', $this->required_gf_version, '<a href="https://gravitypdf.com/documentation/v5/user-activation-errors/#gravityforms-version">', '</a>' );
+
+			$this->offer_downgrade = true;
 
 			return false;
 		}
@@ -208,6 +238,8 @@ class GFPDF_Major_Compatibility_Checks {
 		/* Check PHP version is compatible */
 		if ( ! version_compare( phpversion(), $this->required_php_version, '>=' ) ) {
 			$this->notices[] = sprintf( esc_html__( 'You are running an %1$soutdated version of PHP%2$s. Contact your web hosting provider to update. %3$sGet more info%4$s.', 'gravity-forms-pdf-extended' ), '<a href="http://www.wpupdatephp.com/update/">', '</a>', '<a href="https://gravitypdf.com/documentation/v5/user-activation-errors/#php-version">', '</a>' );
+
+			$this->offer_downgrade = true;
 
 			return false;
 		}
@@ -373,7 +405,6 @@ class GFPDF_Major_Compatibility_Checks {
 		return $memory;
 	}
 
-
 	/**
 	 * Helper function to easily display error messages
 	 *
@@ -382,16 +413,88 @@ class GFPDF_Major_Compatibility_Checks {
 	public function display_notices() {
 		?>
 		<div class="error">
-			<p><strong><?php esc_html_e( 'Gravity PDF Installation Problem', 'gravity-forms-pdf-extended' ); ?></strong></p>
-
-			<p><?php esc_html_e( 'The minimum requirements for Gravity PDF have not been met. Please fix the issue(s) below to continue:', 'gravity-forms-pdf-extended' ); ?></p>
-			<ul style="padding-bottom: 0.5em">
-				<?php foreach ( $this->notices as $notice ): ?>
-					<li style="padding-left: 20px;list-style: inside"><?php echo $notice; ?></li>
-				<?php endforeach; ?>
-			</ul>
+			<?php $this->notice_body_content(); ?>
 		</div>
 		<?php
+	}
+
+	/**
+	 * @since 6.0
+	 */
+	public function notice_body_content() {
+		?>
+		<p><strong><?php esc_html_e( 'Gravity PDF Installation Problem', 'gravity-forms-pdf-extended' ); ?></strong></p>
+
+		<p><?php esc_html_e( 'The minimum requirements for Gravity PDF have not been met. Please fix the issue(s) below to use the plugin:', 'gravity-forms-pdf-extended' ); ?></p>
+		<ul style="padding-bottom: 0">
+			<?php foreach ( $this->notices as $notice ): ?>
+				<li style="padding-left: 20px;list-style: inside"><?php echo $notice; ?></li>
+			<?php endforeach; ?>
+		</ul>
+
+		<?php if ( $this->offer_downgrade && PDF_PLUGIN_BASENAME === 'gravity-forms-pdf-extended/pdf.php' ): ?>
+			<form method="post" action="<?= admin_url( 'index.php?page=gpdf-downgrade' ) ?>">
+				<?php wp_nonce_field( 'gpdf-downgrade' ); ?>
+				<p>
+					<?php esc_html_e( 'Not ready to upgrade? Try an earlier version of Gravity PDF', 'gravity-forms-pdf-extended' ); ?>
+					<button class="button primary"><?php esc_html_e( 'Downgrade Now', 'gravity-forms-pdf-extended' ); ?></button>
+				</p>
+			</form>
+		<?php endif; ?>
+		<?php
+	}
+
+	/**
+	 * Adds a 'hidden' menu item that is activated when the user elects to rollback
+	 *
+	 * @since 6.0
+	 */
+	public function admin_rollback_menu() {
+		if ( rgget( 'page' ) !== 'gpdf-downgrade' ) {
+			return;
+		}
+
+		$title = esc_html__( 'Downgrade', 'gravity-forms-pdf-extended' );
+
+		add_dashboard_page( $title, $title, 'update_plugins', 'gpdf-downgrade', array( $this, 'rollback' ) );
+	}
+
+	/**
+	 * Roll Gravity PDF back to the latest v5 release
+	 *
+	 * @since 6.0
+	 */
+	public function rollback() {
+		if ( ! check_admin_referer( 'gpdf-downgrade' ) || ! current_user_can( 'update_plugins' ) ) {
+			die( __( 'The link you followed has expired.', 'default' ) );
+		}
+
+		$plugin   = 'gravity-forms-pdf-extended';
+		$response = wp_remote_get( 'https://api.wordpress.org/plugins/info/1.0/' . $plugin . '.json' );
+		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
+			die( __( 'Plugin downgrade failed.', 'default' ) );
+		}
+
+		$body = json_decode( wp_remote_retrieve_body( $response ), true );
+		if ( empty( $body['versions'] ) ) {
+			die( __( 'Plugin downgrade failed.', 'default' ) );
+		}
+
+		/* Get the first matching v5 tag and url (the latest) */
+		foreach ( array_reverse( $body['versions'] ) as $version => $download_url ) {
+			if ( $version[0] === '5' && $version[1] === '.' ) {
+				break;
+			}
+		}
+
+		require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+
+		$nonce     = 'gpdf-downgrade';
+		$url       = 'index.php?page=' . $nonce;
+		$overwrite = 'downgrade-plugin';
+
+		$upgrader = new Plugin_Upgrader( new Plugin_Installer_Skin( compact( 'nonce', 'url', 'plugin', 'version', 'overwrite' ) ) );
+		$upgrader->install( $download_url, [ 'overwrite_package' => true ] );
 	}
 }
 
