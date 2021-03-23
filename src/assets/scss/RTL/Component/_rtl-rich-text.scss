@@ -1,0 +1,11 @@
+html[dir="rtl"] {
+  #tab_PDF {
+
+    /* Rich Text field */
+    .gform-settings-input__container--with-merge-tag.gfpdf-merge-tag-container {
+      .mt-gfpdf-merge-tag-selector-container {
+        float: left;
+      }
+    }
+  }
+}

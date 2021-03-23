@@ -14,7 +14,7 @@
 @use 'Component/multicheck';
 @use 'Component/number';
 @use 'Component/popup';
-@use 'Component/rich_text';
+@use 'Component/rich-text';
 @use 'Component/search-bar';
 @use 'Component/spinner';
 @use 'Component/submit';
@@ -40,6 +40,7 @@
 @use 'RTL/Component/TemplateManager/rtl-template-manager';
 @use 'RTL/Component/rtl-spinner';
 @use 'RTL/Component/rtl-upload';
+@use 'RTL/Component/rtl-rich-text';
 
 /* RTL Pages */
 @use 'RTL/rtl';
