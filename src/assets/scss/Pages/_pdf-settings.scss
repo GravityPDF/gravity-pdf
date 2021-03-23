@@ -11,7 +11,7 @@
       }
     }
 
-    /* Enable textarea merge tag box */
+    /* Merge tag box */
     .all-merge-tags {
       &.textarea {
         .tooltip-merge-tag {
@@ -21,10 +21,16 @@
           height: 2rem;
           width: 2.25rem;
         }
+
+        #gf_merge_tag_list {
+          margin-right: .5rem;
+        }
       }
 
-      #gf_merge_tag_list {
-        margin-right: .5rem;
+      &.input {
+        #gf_merge_tag_list {
+          right: 0;
+        }
       }
     }
 
