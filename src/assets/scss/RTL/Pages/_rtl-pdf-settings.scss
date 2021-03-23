@@ -14,12 +14,28 @@ html[dir="rtl"] {
           margin-top: 0;
         }
 
+        /* Merge tag box */
         .all-merge-tags {
           margin: 0 0 0 .5rem;
 
           a {
             &.open-list {
               border-radius: 3px 0 0 3px;
+            }
+          }
+
+          &.textarea {
+            #gf_merge_tag_list {
+              margin-left: .5rem;
+              right: unset;
+              left: 0;
+            }
+          }
+
+          &.input {
+            #gf_merge_tag_list {
+              right: unset;
+              left: 0;
             }
           }
         }
