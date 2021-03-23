@@ -236,6 +236,16 @@ class Model_System_Report extends Helper_Abstract_Model {
 			],
 		];
 
+		/* Check if outdated core template overrides and display warning */
+		$template_status = $this->check_core_template_override_versions();
+		if ( ! empty( $template_status ) ) {
+			$items[1]['outdated_templates'] = [
+				'label'        => esc_html__( 'Outdated Templates', 'gravity-forms-pdf-extended' ),
+				'value'        => $template_status['value'],
+				'value_export' => $template_status['value_export'],
+			];
+		}
+
 		/* Global Settings */
 		$items[2] = [
 			'pdf_entry_list_action'         => [
@@ -386,6 +396,61 @@ class Model_System_Report extends Helper_Abstract_Model {
 			'value'        => $string . $icon,
 			'value_export' => $is_writable ? 'Writable' : 'Not writable',
 		];
+	}
+
+	/**
+	 * Display a warning if the Core template overrides are out of date
+	 *
+	 * @since 6.0
+	 */
+	protected function check_core_template_override_versions(): array {
+		$templates = $this->get_template_versions( $this->templates->get_core_pdf_templates() );
+
+		$value        = '';
+		$value_export = '';
+
+		/* Loop over the Core templates and check if there are any overrides */
+		foreach ( $templates as $path => $core_version ) {
+			$template = $this->templates->get_template_info_by_id( basename( $path, '.php' ) );
+			if ( version_compare( $core_version, $template['version'], '>' ) ) {
+				$relative_template_path = str_replace( ABSPATH, '/', $template['path'] );
+				$message                = $this->getController()->view->get_template_check_message( $relative_template_path, $template['version'], $core_version );
+
+				$value        .= $message['value'];
+				$value_export .= $message['value_export'];
+			}
+		}
+
+		/* Returns an empty string if all the core template is the latest version */
+		if ( empty( $value ) ) {
+			return [];
+		}
+
+		/* Add an upgrade message and link for more information. */
+		$value .= $this->getController()->view->get_template_upgrade_message();
+
+		return [
+			'value'        => $value,
+			'value_export' => $value_export,
+		];
+	}
+
+	/**
+	 * Get all the template version numbers
+	 *
+	 * @param array $templates List of template path.
+	 *
+	 * @return array
+	 *
+	 * @since 6.0
+	 */
+	protected function get_template_versions( array $templates ): array {
+		$versions = [];
+		foreach ( $templates as $path ) {
+			$versions[ $path ] = $this->templates->get_template_info_by_path( $path )['version'];
+		}
+
+		return $versions;
 	}
 
 	/**

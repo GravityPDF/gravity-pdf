@@ -113,4 +113,34 @@ class View_System_Report extends Helper_Abstract_View {
 
 		return $output;
 	}
+
+	/**
+	 * Prepare message for outdated template file(s)
+	 *
+	 * @param string $path The path to the outdated PDF template file
+	 * @param string $template_version The current version of the outdated PDF template file
+	 * @param string $core_version The latest Core template version
+	 *
+	 * @since 6.0
+	 */
+	public function get_template_check_message( string $path, string $template_version, string $core_version ): array {
+		$message = sprintf( esc_html__( '%1$s version %2$s is out of date. The core version is %3$s', 'gravity-forms-pdf-extended' ), $path, '<span style="color: #ff0000;font-weight:bold">' . $template_version . '</span>', $core_version );
+
+		return [
+			'value'        => $message . $this->get_icon( false ) . '<hr>',
+			'value_export' => wp_strip_all_tags( $message ) . "   &#10008;\n",
+		];
+	}
+
+	/**
+	 * Prepare message on how to update outdated template file(s)
+	 *
+	 * @since 6.0
+	 */
+	public function get_template_upgrade_message(): string {
+		$learn_more_url = 'https://docs.gravitypdf.com/@TODO';
+
+		return $this->markup_warning . ' <a href="' . $learn_more_url . '">' . esc_html__( 'Learn how to update', 'gravity-forms-pdf-extended' ) . '</a>';
+	}
+
 }
