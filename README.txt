@@ -4,8 +4,8 @@ Plugin URI: https://gravitypdf.com/
 Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 5.3
-Tested up to: 5.6
-Stable tag: 6.0.0-beta1
+Tested up to: 5.7
+Stable tag: 6.0.0-RC1
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -89,6 +89,53 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 18. Blank Slate provides a print-friendly template focusing solely on the user-submitted data.
 
 == Changelog ==
+
+= 6.0.0-RC1 =
+* BREAKING (USER): Removed Kashida setting from UI in Font Manager (first added to 6.0.0-beta1)
+
+* BREAKING (DEV): Change `\GFPDF\Model\Model_Install` __construct signature by removing `Helper_Abstract_Forms` dependancy from the start and adding `Model_Uninstall` at the end
+* BREAKING (DEV): Change `\GFPDF\Model\Model_System_Report` __construct signature by adding new `Helper_Templates` dependancy at the end
+* BREAKING (DEV): Removed `\GFPDF\View\View_Settings::system_status` method. Replaced by `Controller_|Model_|View_System_Report` classes for direct integration with Gravity Forms System Status page
+* BREAKING (DEV): Removed undocumented `gfpdf_entry_detail_pre_container_markup` and `gfpdf_entry_detail_post_container_markup` actions
+* BREAKING (DEV): Adjusted ID from `#tab_pdf` to `#tab_PDF` for container on Global PDF settings page. This ensures both the Global and Form PDF settings use a consistent ID.
+
+* Feature: Show plugin downgrade prompt when minimum WordPress, Gravity Forms, or PHP requirements aren't met so users can easily roll back to the latest supported v5.x version.
+* Feature: Move Gravity PDF uninstaller from Tools tab to Gravity Forms Uninstall settings page
+* Feature: Add support for WordPress' native Background Updates
+* Feature: Add accessibility improvements for keyboard users and screen readers on all Gravity PDF UIs
+* Feature: Display warning on System Status page when Core template overrides are out of date
+* Feature: Include Add/Update PDF button below each section on PDF creation page to make it easy to save
+* Feature: Open all sections by default on PDF creation page
+* Feature: Improve RTL support on admin pages
+* Feature: Added Select and Delete button/icons on the Font Manager Update screen
+* Feature: Add font custom template CSS usage example to Font Manager
+* Feature: Auto-select newly installed font in Font Manager
+* Feature: Move selected font to the top of the Font Manager list when opened
+
+* Bug: Adjust active/inactive toggle to match Gravity Forms RC1 style
+* Bug: Fix issue deleting custom font using new Font Manager
+* Bug: Fix issue validating custom fonts using the new Font Manager
+* Bug: Only include active PDFs in the entry export options list
+* Bug: Auto-process [gravitypdf] shortcode for Redirect Confirmation type
+* Bug: Correctly display PDF Working Directory path in System Status on multisite
+* Bug: Fix up Copy System Status output for some Gravity PDF settings
+* Bug: Made more JavaScript strings translatable
+* Bug: Add mergetag selector to Rich Text fields in PDF settings
+* Bug: Ensure mergetag selector doesn't open off the screen on smaller viewpoints
+* Bug: Fix up Font Manager column overlap issue when closing a font being updated
+* Bug: Ensure the sample shortcode on the PDF list page is auto-selectable
+* Bug: Fix header spacing on Gravity PDF settings pages to match Gravity Forms RC1 style
+* Bug: Fix header font weight on Gravity PDF settings pages to match Gravity Forms RC1 style
+* Bug: Fix template list order issue in Template Manager after changing templates in Dropdown
+* Bug: Fix License success and error messages so they show inline with add-on
+* Bug: Allow PDF custom paper size to include decimal point values
+* Bug: Fix security settings toggle issue on PDF creation page
+* Bug: Only allow custom font to be installed via a template if it isn't already installed (matched by name)
+* Bug: Prevent jumping in the browser when duplicating a PDF
+
+* Dev: Deprecate Helper_Abstract_Options::get_font_short_name(). No direct replacement as the font 'shortname' has been phased out (using unique ID now).
+* Dev: Updated field description markup to use DIVs instead of SPANs. Matches Gravity Forms RC1
+* Dev: Deprecate these methods from `\GFPDF\Model\Model_Install`: `uninstall_plugin`, `remove_plugin_options`, `remove_plugin_form_settings`, `remove_folder_structure`, `deactivate_plugin`. All moved to `Model_Uninstall`.
 
 = 6.0.0-beta1 =
 * BREAKING (USER): New minimum requirements PHP7.3+, WordPress 5.3+, Gravity Forms 2.5+ (upgrade to meet minimum requirements before using v6)
