@@ -4,7 +4,7 @@ import { button } from './field'
 
 class TemplateManager {
   constructor () {
-    this.advancedButton = Selector('#gpdf-advance-template-selector').find('button').withText('Advanced')
+    this.advancedButton = Selector('#gpdf-advance-template-selector').find('button').withText('Manage')
     this.templatePopupBox = Selector('div').find('[class^="container theme-wrap"]')
     this.closeDialog = button('Close dialog')
     this.popupHeaderText = Selector('h1').withText('Installed PDFs')

@@ -69,13 +69,13 @@ export const UpdateFont = (
 
         <label htmlFor='gfpdf-font-name-input' dangerouslySetInnerHTML={{ __html: fontNameLabel }} />
 
-        <p id='gfpdf-font-name-desc'>{GFPDF.fontManagerFontNameDesc}</p>
+        <p id='gfpdf-font-name-desc-update'>{GFPDF.fontManagerFontNameDesc}</p>
 
         <input
           type='text'
           id='gfpdf-update-font-name-input'
           className={!validateLabel ? 'input-label-validation-error' : ''}
-          aria-describedby='gfpdf-font-name-desc'
+          aria-describedby='gfpdf-font-name-desc-update'
           name='label'
           value={label}
           maxLength='60'
@@ -83,15 +83,17 @@ export const UpdateFont = (
           tabIndex={tabIndexFontName}
         />
 
-        {!validateLabel && (
-          <span className='required'>
-            <em>{GFPDF.fontManagerFontNameValidationError}</em>
-          </span>
-        )}
+        <div aria-live='polite'>
+          {!validateLabel && (
+            <span className='required' role='alert'>
+              <em>{GFPDF.fontManagerFontNameValidationError}</em>
+            </span>
+          )}
+        </div>
 
-        <label id='gfpdf-font-files-label'>{GFPDF.fontManagerFontFilesLabel}</label>
+        <label id='gfpdf-font-files-label-update' aria-labelledby='gfpdf-font-files-description-update'>{GFPDF.fontManagerFontFilesLabel}</label>
 
-        <p id='gfpdf-font-files-description'>{GFPDF.fontManagerFontFilesDesc}</p>
+        <p id='gfpdf-font-files-description-update'>{GFPDF.fontManagerFontFilesDesc}</p>
 
         <FontVariant
           state='updateFont'

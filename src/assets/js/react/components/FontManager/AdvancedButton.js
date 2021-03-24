@@ -50,7 +50,7 @@ export class AdvancedButton extends React.Component {
         className='button gfpdf-button'
         onClick={this.handleClick}
       >
-        Advanced
+        {GFPDF.manage}
       </button>
     )
   }

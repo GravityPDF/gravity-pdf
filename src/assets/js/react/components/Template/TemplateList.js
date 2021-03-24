@@ -61,7 +61,7 @@ export class TemplateList extends React.Component {
         closeRoute='/'
       >
         <TemplateSearch data-test='component-templateSearch' />
-        <div>
+        <div role='listbox'>
           {
             this.props.templates.map((value, index) => {
               return (

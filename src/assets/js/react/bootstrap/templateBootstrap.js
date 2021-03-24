@@ -34,7 +34,7 @@ export default function templateBootstrap ($templateField) {
   render(
     <Suspense fallback={<div>{GFPDF.spinnerAlt}</div>}>
       <Router>
-        <Route render={(props) => <TemplateButton {...props} store={store} buttonText={GFPDF.advanced} />} />
+        <Route render={(props) => <TemplateButton {...props} store={store} />} />
       </Router>
     </Suspense>,
     document.getElementById('gpdf-advance-template-selector')

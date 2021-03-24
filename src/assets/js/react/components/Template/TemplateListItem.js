@@ -86,6 +86,8 @@ export class TemplateListItem extends React.Component {
         className={activeTemplate}
         data-slug={item.id}
         tabIndex='150'
+        role='option'
+        aria-label={item.group + ' ' + item.template + ' ' + GFPDF.details}
       >
 
         <TemplateScreenshot

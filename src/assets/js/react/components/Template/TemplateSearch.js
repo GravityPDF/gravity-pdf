@@ -79,12 +79,12 @@ export class TemplateSearch extends React.Component {
    */
   render () {
     return (
-      <div data-test='component-templateSearch'>
+      <div data-test='component-templateSearch' role='form'>
         <input
           className='wp-filter-search'
           id='wp-filter-search-input'
           ref={node => (this.input = node)}
-          placeholder='Search Installed Templates'
+          placeholder={GFPDF.searchTemplatePlaceholder}
           type='search'
           aria-describedby='live-search-desc'
           tabIndex='145'
