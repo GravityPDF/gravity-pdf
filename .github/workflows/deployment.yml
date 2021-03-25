@@ -13,10 +13,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Tag name
-        id: tag_name
-        run: |
-          echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+      - name: Get tag
+        id: tag
+        uses: dawidd6/action-get-tag@v1
 
       - name: Install NodeJS
         uses: actions/setup-node@v1
@@ -57,13 +56,13 @@ jobs:
       - name: Build
         run: bash ./bin/package.sh $SOURCE_TAG
         env:
-          SOURCE_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
+          SOURCE_TAG: ${{steps.tag.outputs.tag}}
           GH_CREDENTIALS: ${{ secrets.GH_CREDENTIALS }}
 
       - name: Deploy
         run: bash ./bin/deploy.sh
         env:
           PLUGIN: "gravity-forms-pdf-extended"
-          SOURCE_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
+          SOURCE_TAG: ${{steps.tag.outputs.tag}}
           WP_ORG_USERNAME: ${{ secrets.WP_ORG_USERNAME }}
           WP_ORG_PASSWORD: ${{ secrets.WP_ORG_PASSWORD }}
