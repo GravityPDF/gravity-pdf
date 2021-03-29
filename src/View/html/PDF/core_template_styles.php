@@ -129,7 +129,7 @@ $include_product_styles = apply_filters( 'gfpdf_include_product_styles', true, $
 	table.entry-products th {
 		background-color: <?= $contrast_background_color; ?>;
 		border-bottom: 1px solid #000;
-		border-right: 1px solid #000 !important;
+		border-right: 1px solid #000;
 		border-bottom-color: <?= $contrast_border_color; ?>;
 		border-right-color: <?= $contrast_border_color; ?>;
 	}
@@ -151,13 +151,14 @@ $include_product_styles = apply_filters( 'gfpdf_include_product_styles', true, $
 	}
 
 	table.entry-products {
-		border: 1px solid<?= $contrast_border_color; ?>;
+		border: 1px solid #000;
+		border-color: <?= $contrast_border_color; ?>;
 		margin: 5px 0 3px;
 	}
 
 	table.entry-products td {
 		border-bottom: 1px solid #000;
-		border-right: 1px solid #000 !important;
+		border-right: 1px solid #000;
 		border-bottom-color: <?= $contrast_border_color; ?>;
 		border-right-color: <?= $contrast_border_color; ?>;
 		padding: 7px 7px 8px;
