@@ -184,15 +184,22 @@ class Model_Mergetags extends Helper_Abstract_Model {
 					 || $config['active'] !== true
 					 || ( isset( $config['conditionalLogic'] ) && ! $this->misc->evaluate_conditional_logic( $config['conditionalLogic'], $entry ) )
 				) {
+					$error = 'Conditional logic did not pass';
+					if ( is_wp_error( $config ) ) {
+						$error  = $config->get_error_message();
+						$config = [];
+					} elseif ( $config['active'] !== true ) {
+						$error = 'PDF is not currently active';
+					}
+
 					$this->log->error(
 						'PDF Mergetag is not valid',
 						[
+							'error'    => $error,
+							'tag'      => $tag,
 							'form_id'  => $form['id'],
 							'entry_id' => $entry['id'],
-							'tag'      => $tag,
-
-							/* include the error, or the actual config array */
-							'config'   => ( is_wp_error( $config ) ) ? $config->get_error_messages() : $config,
+							'config'   => $config,
 						]
 					);
 
