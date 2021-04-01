@@ -401,17 +401,22 @@ class Test_Model_Mergetags extends WP_UnitTestCase {
 	public function provider_signed_modifier_pdf_mergetags(): array {
 		return [
 			[ '{Label:pdf:556690c67856b:signed}' ],
-			[ '{Label:pdf:556690c67856b:signed:1 day}' ],
-			[ '{Label:pdf:556690c67856b:signed:3 weeks}' ],
-			[ '{Label:pdf:556690c67856b:signed:5 months}' ],
+			[ '{Label:pdf:556690c67856b:signed,1 day}' ],
+			[ '{Label:pdf:556690c67856b:signed,3 weeks}' ],
+			[ '{Label:pdf:556690c67856b:signed,5 months}' ],
 			[ '{Label:pdf:556690c67856b:download:signed}' ],
 			[ '{Label:pdf:556690c67856b:print:signed}' ],
 			[ '{Label:pdf:556690c67856b:download:print:signed}' ],
 			[ '{Label:pdf:556690c67856b:print:download:signed}' ],
-			[ '{Label:pdf:556690c67856b:download:signed:3 weeks}' ],
-			[ '{Label:pdf:556690c67856b:print:signed:1 day}' ],
-			[ '{Label:pdf:556690c67856b:download:print:signed:5 months}' ],
-			[ '{Label:pdf:556690c67856b:print:download:signed:1 year}' ],
+			[ '{Label:pdf:556690c67856b:download:signed,3 weeks}' ],
+			[ '{Label:pdf:556690c67856b:print:signed,1 day}' ],
+			[ '{Label:pdf:556690c67856b:download:print:signed,5 months}' ],
+			[ '{Label:pdf:556690c67856b:print:download:signed,1 year}' ],
+			[ '{Label:pdf:556690c67856b:signed:download}' ],
+			[ '{Label:pdf:556690c67856b:signed,1 day:download}' ],
+			[ '{Label:pdf:556690c67856b:signed,3 weeks:print}' ],
+			[ '{Label:pdf:556690c67856b:signed,5 months:print:download}' ],
+			[ '{Label:pdf:556690c67856b:signed,5 months:download:print}' ],
 		];
 	}
 }

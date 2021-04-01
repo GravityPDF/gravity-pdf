@@ -152,7 +152,7 @@ class Model_Mergetags extends Helper_Abstract_Model {
 		}
 
 		/* Match our PDF merge tags */
-		$results = preg_match_all( '/{.*?:pdf:([0-9A-Za-z]*)((:download|:print)+)?:?(.*?)?}/', $text, $matches, PREG_SET_ORDER );
+		$results = preg_match_all( '/{.*?:pdf:([0-9A-Za-z]*)?:?(.*?)?}/', $text, $matches, PREG_SET_ORDER );
 
 		/* Verify we have a match */
 		if ( $results ) {
@@ -202,24 +202,31 @@ class Model_Mergetags extends Helper_Abstract_Model {
 				}
 
 				/* Everything is valid so get the URL and display */
-				$url = $this->pdf->get_pdf_url( $tag[1], $entry['id'], (bool) strpos( $tag[2], 'download' ), (bool) strpos( $tag[2], 'print' ), $url_encode );
+				$modifiers = explode( ':', $tag[2] ?? '' );
+				$url       = $this->pdf->get_pdf_url( $tag[1], $entry['id'], (bool) in_array( 'download', $modifiers, true ), (bool) in_array( 'print', $modifiers, true ), $url_encode );
 
-				/* Handle any modifiers */
-				if ( ! empty( $tag[4] ) ) {
-					$modifiers = explode( ',', $tag[4] );
+				/*
+				 * A URL cannot be modified after signing (becomes invalid), so move the signing option to the bottom
+				 */
+				foreach ( $modifiers as $key => $modifier ) {
+					if ( strpos( $modifier, 'signed' ) === 0 ) {
+						unset( $modifiers[ $key ] );
+						$modifiers[] = $modifier;
+						break;
+					}
+				}
 
-					foreach ( $modifiers as $modifier ) {
-						$modifier = explode( ':', $modifier );
+				foreach ( $modifiers as $modifier ) {
+					$modifier = explode( ',', $modifier );
 
-						switch ( $modifier[0] ?? '' ) {
-							case 'signed':
-								$expires = $modifier[1] ?? '';
-								$url     = $this->url_signer->sign( $url, $expires );
-								break;
+					switch ( $modifier[0] ?? '' ) {
+						case 'signed':
+							$expires = trim( $modifier[1] ?? '' );
+							$url     = $this->url_signer->sign( $url, $expires );
+							break;
 
-							default:
-								$url = apply_filters( 'gfpdf_mergetag_modifiers_url', $url, $modifier, $tag, $form, $entry, $config );
-						}
+						default:
+							$url = apply_filters( 'gfpdf_mergetag_modifiers_url', $url, $modifier, $tag, $form, $entry, $config );
 					}
 				}
 
