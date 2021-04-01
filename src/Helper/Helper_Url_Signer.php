@@ -48,8 +48,9 @@ class Helper_Url_Signer implements Helper_Interface_Url_Signer {
 
 		$url_signer = new Helper_Sha256_Url_Signer( $secret_key );
 
-		if ( empty( $expiration ) ) {
-			$expiration = intval( GPDFAPI::get_plugin_option( 'logged_out_timeout', '20' ) ) . ' minutes';
+		/* Use default timeout if no expiration passed, or expiration is invalid */
+		if ( empty( $expiration ) || (bool) strtotime( $expiration ) === false ) {
+			$expiration =  ( (int) GPDFAPI::get_plugin_option( 'logged_out_timeout', '20' ) ) . ' minutes';
 		}
 
 		$date    = new DateTime();
