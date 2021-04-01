@@ -93,10 +93,10 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 		$columns = [
 			'cb'            => '',
-			'name'          => esc_html__( 'Name', 'gravity-forms-pdf-extended' ),
-			'shortcode'     => esc_html__( 'Download Shortcode', 'gravity-forms-pdf-extended' ),
+			'name'          => esc_html__( 'Label', 'gravity-forms-pdf-extended' ),
 			'template'      => esc_html__( 'Template', 'gravity-forms-pdf-extended' ),
 			'notifications' => esc_html__( 'Notifications', 'gravity-forms-pdf-extended' ),
+			'shortcode'     => esc_html__( 'Shortcode', 'gravity-forms-pdf-extended' ),
 		];
 
 		/* See https://gravitypdf.com/documentation/v5/gfpdf_pdf_list_columns/ for more details about this filter */
