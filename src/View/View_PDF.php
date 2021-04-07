@@ -380,7 +380,7 @@ class View_PDF extends Helper_Abstract_View {
 			$container = new Helper_Field_Container_Void();
 		}
 
-		$container = apply_filters( 'gfpdf_field_container_class', $container );
+		$container = apply_filters( 'gfpdf_field_container_class', $container, $form, $entry, $config );
 
 		/* Allow the config to be changed through a filter */
 		$config['meta'] = ( isset( $config['meta'] ) ) ? $config['meta'] : [];
