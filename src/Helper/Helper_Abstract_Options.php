@@ -1227,8 +1227,8 @@ abstract class Helper_Abstract_Options implements Helper_Interface_Filters {
 	 */
 	public function sanitize_paper_size( $input ) {
 		if ( is_array( $input ) && count( $input ) === 3 ) {
-			$input[0] = (float) $input[0];
-			$input[1] = (float) $input[1];
+			$input[0] = abs( (float) $input[0] );
+			$input[1] = abs( (float) $input[1] );
 		}
 
 		return $input;
