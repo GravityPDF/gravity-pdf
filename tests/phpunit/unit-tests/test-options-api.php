@@ -931,10 +931,12 @@ class Test_Options_API extends WP_UnitTestCase {
 	 */
 	public function dataprovider_sanitize_paper_size() {
 		return [
-			[ [ 200, 100, 'mm' ], [ 200, 100, 'mm' ] ],
-			[ [ 200, 100, 'mm' ], [ -200, -100, 'mm' ] ],
-			[ [ 72, 210, 'inches' ], [ 72, 210, 'inches' ] ],
-			[ [ 72, 210, 'inches' ], [ -72, -210, 'inches' ] ],
+			[ [ 200.0, 100.0, 'mm' ], [ 200, 100, 'mm' ] ],
+			[ [ 200.52, 100.71, 'mm' ], [ 200.52, 100.71, 'mm' ] ],
+			[ [ 200.0, 100.0, 'mm' ], [ -200, -100, 'mm' ] ],
+			[ [ 72.0, 210.0, 'inches' ], [ 72, 210, 'inches' ] ],
+			[ [ 5.25, 11.5, 'inches' ], [ 5.25, 11.5, 'inches' ] ],
+			[ [ 72.0, 210.0, 'inches' ], [ -72, -210, 'inches' ] ],
 			[ [ -20, -50 ], [ -20, -50 ] ],
 			[ '50', '50' ],
 		];
