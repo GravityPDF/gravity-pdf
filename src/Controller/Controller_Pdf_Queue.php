@@ -342,7 +342,7 @@ class Controller_Pdf_Queue extends Helper_Abstract_Controller implements Helper_
 
 		foreach ( $pdfs as $pdf ) {
 			foreach ( $notifications as $notification ) {
-				if ( $this->model_pdf->maybe_always_save_pdf( $pdf ) || $this->model_pdf->maybe_attach_to_notification( $notification, $pdf, $entry, $form ) ) {
+				if ( $this->model_pdf->maybe_always_save_pdf( $pdf, $form['id'] ) || $this->model_pdf->maybe_attach_to_notification( $notification, $pdf, $entry, $form ) ) {
 					$queue_data[] = [
 						'id'            => $this->get_queue_id( $form, $entry, $pdf ),
 						'func'          => '\GFPDF\Statics\Queue_Callbacks::create_pdf',

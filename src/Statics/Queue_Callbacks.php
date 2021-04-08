@@ -5,6 +5,7 @@ namespace GFPDF\Statics;
 use Exception;
 use GFCommon;
 use GFPDF\Helper\Helper_PDF;
+use GFPDF\Model\Model_PDF;
 use GPDFAPI;
 
 /**
@@ -108,6 +109,8 @@ class Queue_Callbacks {
 		$misc      = GPDFAPI::get_misc_class();
 		$templates = GPDFAPI::get_templates_class();
 		$log       = GPDFAPI::get_log_class();
+
+		/** @var Model_PDF $model_pdf */
 		$model_pdf = GPDFAPI::get_mvc_class( 'Model_PDF' );
 
 		$form  = $gform->get_form( $form_id );
@@ -135,7 +138,7 @@ class Queue_Callbacks {
 
 		foreach ( $pdfs as $pdf ) {
 			$notification = ( isset( $pdf['notification'] ) && is_array( $pdf['notification'] ) ) ? $pdf['notification'] : [];
-			if ( count( $notification ) > 0 || $pdf['save'] === 'Yes' ) {
+			if ( count( $notification ) > 0 || $model_pdf->maybe_always_save_pdf( $pdf ) ) {
 				$pdf_generator = new Helper_PDF( $entry, $pdf, $gform, $data, $misc, $templates, $log );
 				$misc->rmdir( $pdf_generator->get_path() );
 				break;
