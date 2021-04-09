@@ -7,6 +7,7 @@ use GF_Field;
 use GFPDF\Helper\Helper_Abstract_Fields;
 use GFPDF\Helper\Helper_Abstract_Form;
 use GFPDF\Helper\Helper_Field_Container;
+use GFPDF\Helper\Helper_Field_Container_Gf25;
 use GFPDF\Helper\Helper_Misc;
 use GP_Field_Nested_Form;
 use GPDFAPI;
@@ -101,7 +102,7 @@ class Field_Form extends Helper_Abstract_Fields {
 	public function get_repeater_html( $form, $entry ) {
 		ob_start();
 
-		$container = new Helper_Field_Container( [ 'class_map' => [] ] );
+		$container = ! \GFCommon::is_legacy_markup_enabled( $form['id'] ) ? new Helper_Field_Container_Gf25() : new Helper_Field_Container();
 		$container = apply_filters( 'gfpdf_field_container_class', $container );
 
 		$pdf_model = GPDFAPI::get_mvc_class( 'Model_PDF' );
@@ -112,12 +113,12 @@ class Field_Form extends Helper_Abstract_Fields {
 			/* Output a field using the standard method if not empty */
 			$class = $pdf_model->get_field_class( $field, $form, $entry, $products );
 			if ( ! $class->is_empty() && strpos( $field->cssClass, 'exclude' ) === false ) {
-				$field->cssClass = '';
 				$container->generate( $field );
 				echo $class->html();
-				$container->close( $field );
 			}
 		}
+
+		$container->close( $field );
 
 		return $this->gform->process_tags( ob_get_clean(), $form, $entry );
 	}
