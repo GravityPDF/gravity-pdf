@@ -238,7 +238,6 @@ export class TemplateUploader extends React.Component {
         <Dropzone
           data-test='component-dropzone'
           onDrop={this.handleOndrop}
-          maxSize={10240000}
         >
           {({ getRootProps, getInputProps, isDragActive }) => {
             return (
