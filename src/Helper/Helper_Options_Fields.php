@@ -567,6 +567,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 				'name' => esc_html__( 'Show Form Title', 'gravity-forms-pdf-extended' ),
 				'desc' => esc_html__( 'Display the form title at the beginning of the PDF.', 'gravity-forms-pdf-extended' ),
 				'type' => 'toggle',
+				'std'  => 'Yes',
 			]
 		);
 	}
