@@ -26,6 +26,13 @@
       }
     }
   }
+
+  /* General settings -> Custom Paper Size field */
+  .custom-paper-size-input-field-container {
+    input {
+      width: 70% !important;
+    }
+  }
 }
 
 /* 961px and up */
