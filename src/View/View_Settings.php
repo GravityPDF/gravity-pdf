@@ -168,10 +168,10 @@ class View_Settings extends Helper_Abstract_View {
 				'id'   => 'tools',
 			],
 
-			//          120 => [
-			//              'name' => esc_html__( 'Help', 'gravity-forms-pdf-extended' ),
-			//              'id'   => 'help',
-			//          ],
+			120 => [
+				'name' => esc_html__( 'Help', 'gravity-forms-pdf-extended' ),
+				'id'   => 'help',
+			],
 		];
 
 		/* Add License tab if necessary */
@@ -321,10 +321,28 @@ class View_Settings extends Helper_Abstract_View {
 	public function extensions() {
 		$vars = [
 			'edit_cap' => $this->gform->has_capability( 'gravityforms_edit_settings' ),
+			'menu'     => $this->tabs(),
 		];
 
 		/* load the system status view */
 		$this->load( 'extensions', $vars );
+	}
+
+	/**
+	 * Display the help settings page
+	 *
+	 * @return void
+	 *
+	 * @since 6.0
+	 */
+	public function help() {
+		$vars = [
+			'edit_cap' => $this->gform->has_capability( 'gravityforms_edit_settings' ),
+			'menu'     => $this->tabs(),
+		];
+
+		/* load the system status view */
+		$this->load( 'help', $vars );
 	}
 
 	/**
@@ -359,28 +377,7 @@ class View_Settings extends Helper_Abstract_View {
 		$this->load( 'tools', $vars );
 	}
 
-	/**
-	 * @since 6.0
-	 */
-	public function uninstaller() {
-		$markup = new View_GravityForm_Settings_Markup();
 
-		$sections = $markup->do_settings_fields_as_individual_fieldset(
-			'gfpdf_settings_tools_uninstaller',
-			[
-				'uninstaller' => [
-					'width'       => 'full',
-					'collapsible' => true,
-				],
-			]
-		);
-
-		$vars = [
-			'content' => $markup->do_settings_sections( $sections ),
-		];
-
-		$this->load( 'uninstaller', $vars );
-	}
 
 	/**
 	 * Add Gravity Forms Tooltips

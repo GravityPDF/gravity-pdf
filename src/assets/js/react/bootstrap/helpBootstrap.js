@@ -26,6 +26,6 @@ export default function helpBootstrap () {
         <HelpContainer />
       </Provider>
     </Suspense>,
-    document.getElementById('search-knowledgebase')
+    document.getElementById('gpdf-search')
   )
 }

@@ -12,7 +12,7 @@ test('should display \'Debug Mode\' field', async t => {
   // Assertions
   await t
     .expect(fieldHeaderTitle('Debug Mode').exists).ok()
-    .expect(fieldDescription('When enabled, debug information will be displayed on-screen for core features.', 'span').exists).ok()
+    .expect(fieldDescription('When enabled, debug information will be displayed on-screen for core features.').exists).ok()
     .expect(run.debugModeCheckbox.exists).ok()
 })
 

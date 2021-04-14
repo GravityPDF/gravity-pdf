@@ -2,7 +2,7 @@ import { Selector } from 'testcafe'
 
 // Field header title
 export function fieldHeaderTitle (text) {
-  return Selector('header').withText(text)
+  return Selector('legend').withText(text)
 }
 
 // Field label
@@ -11,7 +11,7 @@ export function fieldLabel (text, style = 'div') {
 }
 
 // Field description
-export function fieldDescription (text, style = 'span') {
+export function fieldDescription (text, style = 'div') {
   return Selector(style).withText(text)
 }
 

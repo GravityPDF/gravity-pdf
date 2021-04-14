@@ -1,5 +1,4 @@
 import { all } from 'redux-saga/effects'
-import { watchGetResults } from './help'
 import { watchUpdateSelectBox, watchTemplateProcessing, watchpostTemplateUploadProcessing } from './templates'
 import { watchGetFilesFromGitHub, watchDownloadFonts } from './coreFonts'
 import { watchGetCustomFontList, watchAddFont, watchEditFont, watchDeleteFont } from './fontManager'
@@ -18,7 +17,6 @@ import { watchGetCustomFontList, watchAddFont, watchEditFont, watchDeleteFont } 
  */
 export default function * rootSaga () {
   yield all([
-    watchGetResults(),
     watchUpdateSelectBox(),
     watchTemplateProcessing(),
     watchpostTemplateUploadProcessing(),

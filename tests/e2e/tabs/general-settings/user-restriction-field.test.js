@@ -12,7 +12,7 @@ test('should display \'User Restriction\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('User Restriction').exists).ok()
-    .expect(fieldDescription('Restrict PDF access to users with any of these capabilities. The Administrator Role always has full access.', 'span').exists).ok()
+    .expect(fieldDescription('Restrict PDF access to users with any of these capabilities. The Administrator Role always has full access.', 'label').exists).ok()
     .expect(userRestrictionOption('gravityforms_edit_forms').exists).ok()
     .expect(userRestrictionOption('gravityforms_delete_forms').exists).ok()
     .expect(userRestrictionOption('gravityforms_create_form').exists).ok()

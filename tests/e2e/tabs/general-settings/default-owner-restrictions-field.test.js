@@ -12,7 +12,7 @@ test('should display \'Default Owner Restrictions\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Default Owner Restrictions').exists).ok()
-    .expect(fieldDescription('Set the default PDF owner permissions. When enabled, the original entry owner will NOT be able to view the PDFs (unless they have a User Restriction capability).', 'span').exists).ok()
+    .expect(fieldDescription('Set the default PDF owner permissions. When enabled, the original entry owner will NOT be able to view the PDFs (unless they have a User Restriction capability).').exists).ok()
     .expect(run.defaultOwnerRestrictionsCheckbox.exists).ok()
 })
 

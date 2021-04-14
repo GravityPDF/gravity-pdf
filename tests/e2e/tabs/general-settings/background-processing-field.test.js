@@ -12,7 +12,7 @@ test('should display \'Background Processing\' field', async t => {
   // Assertions
   await t
     .expect(fieldHeaderTitle('Background Processing').exists).ok()
-    .expect(fieldDescription('When enable, form submission and resending notifications with PDFs are handled in a background task. Requires Background tasks to be enabled.', 'span').exists).ok()
+    .expect(fieldDescription('When enable, form submission and resending notifications with PDFs are handled in a background task. Requires Background tasks to be enabled.').exists).ok()
     .expect(run.backgroundProcessingCheckbox.exists).ok()
 })
 

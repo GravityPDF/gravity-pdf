@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
-import debounce from 'lodash.debounce'
-import { deleteResult, getData } from '../../actions/help'
+import algoliasearch from 'algoliasearch/lite'
+import { InstantSearch, SearchBox, Configure, connectHits } from 'react-instantsearch-dom'
 import DisplayResultContainer from './DisplayResultContainer'
 
 /**
@@ -19,112 +17,65 @@ import DisplayResultContainer from './DisplayResultContainer'
  */
 export class HelpContainer extends Component {
   /**
+   * Render and group search result and then call the <DisplayResultContainer /> component
+   *
+   * @param hierarchy (object)
    *
    * @since 5.2
    */
-  static propTypes = {
-    getData: PropTypes.func,
-    deleteResult: PropTypes.func,
-    loading: PropTypes.bool,
-    helpResult: PropTypes.array,
-    error: PropTypes.string
+  onHandleHit = ({ hits }) => {
+    /* Group into categories */
+    const groups = hits.reduce((groups, item) => ({
+      ...groups,
+      [item.hierarchy.lvl0]: [...(groups[item.hierarchy.lvl0] || []), [item.hierarchy, item.url, item.content]]
+    }), {})
+
+    return <DisplayResultContainer groups={groups} />
   }
 
   /**
-   * Initialize component state
-   *
-   * @type {{searchInput: string, loading: boolean}}
-   *
-   * @since 5.2
-   */
-  constructor (props) {
-    super(props)
-    this.state = {
-      searchInput: ''
-    }
-
-    this.searchInputLength = debounce(this.searchInputLength, 400)
-  }
-
-  /**
-   * Handle onChange Event for the Search Input
-   *
-   * @param event
-   *
-   * @since 5.2
-   */
-  handleChange = event => {
-    // Set loading to true
-    this.setState({ searchInput: event.target.value })
-    // Set searchInput state value
-    this.searchInputLength(event.target.value)
-  }
-
-  /**
-   * Check for Search Input length and pass to Redux Action
-   *
-   * @since 5.2
-   */
-  searchInputLength = data => {
-    if (data.length > 3) {
-      /* Request API call */
-      this.props.getData(data)
-    } else {
-      /* Call deleteResult into Redux Action */
-      this.props.deleteResult()
-    }
-  }
-
-  /**
-   * Renders Search Input and DisplayResultContainer Component UI
+   * Renders search box component UI
    *
    * @since 5.2
    */
   render () {
-    const { searchInput } = this.state
-    const { loading, helpResult, error } = this.props
+    const algoliaClient = algoliasearch('BH4D9OD16A', '3f8f81a078907e98ed8d3a5bedc3c61c')
+    /* Prevent search for initial load */
+    const searchClient = {
+      search (requests) {
+        /* Don't display any results if the query is empty */
+        if (requests[0].params.query === '') {
+          return
+        }
+        return algoliaClient.search(requests)
+      }
+    }
+    const CustomHits = connectHits(this.onHandleHit)
 
     return (
-      <div data-test='component-help-container'>
-        <input
-          data-test='component-input'
-          type='text'
-          placeholder={'  ' + GFPDF.searchPlaceholder}
-          id='search-help-input'
-          name='searchInput'
-          value={searchInput}
-          onChange={this.handleChange}
+      <InstantSearch searchClient={searchClient} indexName='gravitypdf'>
+        <Configure
+          facetFilters={['version:v5']}
+          highlightPreTag='<mark>'
+          highlightPostTag='</mark>'
+          attributesToRetrieve={['hierarchy.lvl0', 'hierarchy.lvl1', 'hierarchy.lvl2', 'hierarchy.lvl3', 'hierarchy.lvl4', 'hierarchy.lvl5', 'hierarchy.lvl6', 'content', 'type', 'url']}
+          attributesToSnippet={['hierarchy.lvl1:5', 'hierarchy.lvl2:5', 'hierarchy.lvl3:5', 'hierarchy.lvl4:5', 'hierarchy.lvl5:5', 'hierarchy.lvl6:5', 'content:5']}
+          snippetEllipsisText='…'
         />
-        <DisplayResultContainer
-          searchInput={this.state.searchInput}
-          loading={loading}
-          helpResult={helpResult}
-          error={error}
+
+        <SearchBox
+          translations={{
+            submitTitle: GFPDF.searchBoxSubmitTitle,
+            resetTitle: GFPDF.searchBoxResetTitle,
+            placeholder: GFPDF.searchBoxPlaceHolderText
+          }}
+          autofocus
         />
-      </div>
+
+        <CustomHits />
+      </InstantSearch>
     )
   }
 }
 
-/**
- * Map Redux state to props
- *
- * @param state
- * @returns {{loading: Boolean, helpResult: (object), error: String}}
- *
- * @since 5.2
- */
-const mapStateToProps = state => ({
-  loading: state.help.loading,
-  helpResult: state.help.results,
-  error: state.help.error
-})
-
-/**
- * Dispatch Redux actions as props
- *
- * @returns {{ getData, deleteResult }}
- *
- * @since 5.2
- */
-export default connect(mapStateToProps, { getData, deleteResult })(HelpContainer)
+export default HelpContainer
