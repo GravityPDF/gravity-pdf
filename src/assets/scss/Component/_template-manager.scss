@@ -78,6 +78,9 @@
 
         &.error {
           border-color: base.$error-color;
+          color: #000;
+          margin: 0;
+          padding: 1px 12px;
         }
       }
     }
