@@ -101,6 +101,31 @@ class Helper_Field_Container_Gf25 extends Helper_Field_Container {
 	}
 
 	/**
+	 * Close the current container if still open.
+	 * This is usually called publicly after the form loop
+	 *
+	 * @since 6.0
+	 */
+	public function close(): void {
+		if ( $this->currently_open ) {
+			$this->close_container();
+			$this->reset();
+
+			$row_html = ob_get_clean();
+
+			/* Set the last grid item inner container width to 100% (if exists) */
+			try {
+				$qp = new Helper_QueryPath();
+				echo $qp->html5( $row_html, '.grid:last-of-type .inner-container' )
+						->css( 'width', '100%' )
+						->top( 'html' )->innerHTML5();
+			} catch ( \Exception $e ) {
+				echo $row_html;
+			}
+		}
+	}
+
+	/**
 	 * Open the container
 	 *
 	 * @param GF_Field $field The Gravity Form field currently being processed
@@ -132,6 +157,16 @@ class Helper_Field_Container_Gf25 extends Helper_Field_Container {
 		}
 
 		$this->increment_width( $field );
+	}
+
+	/**
+	 * Mark our class as currently being open
+	 *
+	 * @since 6.0
+	 */
+	protected function start() {
+		$this->currently_open = true;
+		ob_start();
 	}
 
 	/**
