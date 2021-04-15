@@ -1725,7 +1725,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				$settings = $this->options->get_pdf( $entry['form_id'], $pdf['id'] );
 
 				/* Only generate if the PDF wasn't created during the notification process */
-				if ( ! is_wp_error( $settings ) && $this->maybe_always_save_pdf( $settings ) ) {
+				if ( ! is_wp_error( $settings ) && $this->maybe_always_save_pdf( $settings, $entry['form_id'] ) ) {
 					$this->generate_and_save_pdf( $entry, $settings );
 				}
 			}
@@ -1736,22 +1736,23 @@ class Model_PDF extends Helper_Abstract_Model {
 	 * Determine if the PDF should be saved to disk
 	 *
 	 * @param array $settings The current Gravity PDF Settings
-	 *
-	 * @return boolean
+	 * @param int   $form_id  The current Form ID
 	 *
 	 * @since 4.0
 	 */
-	public function maybe_always_save_pdf( $settings ) {
+	public function maybe_always_save_pdf( array $settings, int $form_id = 0 ): bool {
 
-		$save = false;
-		if ( isset( $settings['save'] ) && strtolower( $settings['save'] ) === 'yes' ) {
+		$save = has_filter( 'gfpdf_post_save_pdf' ) || has_filter( 'gfpdf_post_save_pdf_' . $form_id );
+
+		/* Legacy / Backwards compatible */
+		if ( strtolower( $settings['save'] ?? '' ) === 'yes' ) {
 			$save = true;
 		}
 
 		/**
 		 * @since 4.2
 		 */
-		return apply_filters( 'gfpdf_maybe_always_save_pdf', $save, $settings );
+		return apply_filters( 'gfpdf_maybe_always_save_pdf', $save, $settings, $form_id );
 	}
 
 	/**

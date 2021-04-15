@@ -459,10 +459,9 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					],
 
 					'save'            => [
-						'id'   => 'save',
-						'name' => esc_html__( 'Always Save PDF', 'gravity-forms-pdf-extended' ),
-						'type' => 'toggle',
-						'desc' => sprintf( esc_html__( 'Enable this option to force the PDF to be saved to disk during form submission (by default, this only occurs when PDFs are attached to notifications). This is useful when using the %1$sgfpdf_post_pdf_save%2$s hook to copy the PDF to an alternate location on the filesystem.', 'gravity-forms-pdf-extended' ), '<a href="https://gravitypdf.com/documentation/v5/gfpdf_post_save_pdf/"><code>', '</code></a>' ),
+						'id'    => 'save',
+						'type'  => 'hidden',
+						'class' => 'gfpdf-hidden',
 					],
 
 					'public_access'   => [
