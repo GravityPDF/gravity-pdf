@@ -90,6 +90,25 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 
 == Changelog ==
 
+= 6.0.0-RC2 =
+* BREAKING (USER): Change the PDF Merge tag modifier signature so they can be used in any order
+* BREAKING (USER): Remove the Always Save PDF setting from the UI.
+* Feature: Reorder PDF List Columns
+* Feature: Adjust when the downgrade prompt is shown, so that users can only downgrade if they meet the v5 requirements.
+* Feature: Add PDF column support for Gravity Perks Nested Forms
+* Feature: Re-add Help tab with new Algolia-based search
+* Bug: Adjust custom paper size sanitize logic to fix PHP error
+* Bug: Check for invalid relative date when using Signed PDF URLs and fallback to default timeout
+* Bug: Fix border display issue in Core Product table
+* Bug: Fix Template Manager error message styles
+* Bug: Show error message in Template Manager when maximum file size limit is reached
+* Bug: Fix missing loading icon in Template Manager
+* Bug: Enable Show Form Title and Enable Conditional Logic template settings by default
+* Bug: Fix up Custom Paper Size field widths
+* Bug: Provide more uniform column support in PDFs
+* Dev: Add better error log messages for PDF Merge tag processing
+* Dev: Pass additional information to the `gfpdf_field_container_class` filter
+
 = 6.0.0-RC1 =
 * BREAKING (USER): Removed Kashida setting from UI in Font Manager (first added to 6.0.0-beta1)
 
