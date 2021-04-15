@@ -41,18 +41,35 @@
           box-shadow: none;
         }
 
+        @-moz-keyframes gfpdfspin {
+          100% {
+            -moz-transform: rotate(-360deg);
+          }
+        }
+        @-webkit-keyframes gfpdfspin {
+          100% {
+            -webkit-transform: rotate(-360deg);
+          }
+        }
+        @keyframes gfpdfspin {
+          100% {
+            -webkit-transform: rotate(-360deg);
+            transform: rotate(-360deg);
+          }
+        }
+
         .doing-ajax span:after,
         .doing-ajax:hover span:after {
-          font-family: 'FontAwesome', 'Open Sans', sans-serif;
-          content: '\f1ce';
+          font-family: dashicons;
+          content: "\f531";
           font-size: 79px;
           background: none;
           width: auto;
           height: auto;
           left: 51.5%;
           text-indent: 0;
-          -webkit-animation: fa-spin 1.5s infinite linear;
-          animation: fa-spin 1.5s infinite linear;
+          -webkit-animation: gfpdfspin 1s infinite linear;
+          animation: gfpdfspin 1s infinite linear;
         }
 
         &.gfpdf-dropzone-active .doing-ajax span:after,
