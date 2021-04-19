@@ -1,5 +1,5 @@
 /* Dependencies */
-import React from 'react'
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
 /**
@@ -14,7 +14,7 @@ import PropTypes from 'prop-types'
  *
  * @since 6.0
  */
-export class AdvancedButton extends React.Component {
+export class AdvancedButton extends Component {
   /**
    * PropTypes
    *

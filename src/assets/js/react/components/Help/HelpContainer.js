@@ -1,6 +1,8 @@
+/* Dependencies */
 import React, { Component } from 'react'
 import algoliasearch from 'algoliasearch/lite'
 import { InstantSearch, SearchBox, Configure, connectHits } from 'react-instantsearch-dom'
+/* Components */
 import DisplayResultContainer from './DisplayResultContainer'
 
 /**

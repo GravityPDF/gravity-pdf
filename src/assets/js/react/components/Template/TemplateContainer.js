@@ -1,5 +1,7 @@
+/* Dependencies */
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import React from 'react'
+/* Components */
 import CloseDialog from '../Modal/CloseDialog'
 
 /**
@@ -16,7 +18,7 @@ import CloseDialog from '../Modal/CloseDialog'
  *
  * @since 4.1
  */
-export class TemplateContainer extends React.Component {
+export class TemplateContainer extends Component {
   /**
    * @since 4.1
    */

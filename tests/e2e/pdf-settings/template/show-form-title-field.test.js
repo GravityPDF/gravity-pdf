@@ -22,8 +22,8 @@ test('should save toggled checkbox value', async t => {
   await t
     .click(run.showFormTitleCheckbox)
     .click(run.saveSettings)
-    .expect(run.showFormTitleCheckbox.checked).ok()
+    .expect(run.showFormTitleCheckbox.checked).notOk()
     .click(run.showFormTitleCheckbox)
     .click(run.saveSettings)
-    .expect(run.showFormTitleCheckbox.checked).notOk()
+    .expect(run.showFormTitleCheckbox.checked).ok()
 })

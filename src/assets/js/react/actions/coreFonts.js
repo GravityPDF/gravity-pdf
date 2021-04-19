@@ -1,4 +1,4 @@
-/* Our Redux Action Type Constants */
+/* Redux Action Type Constants */
 export const ADD_TO_CONSOLE = 'ADD_TO_CONSOLE'
 export const ADD_TO_RETRY_LIST = 'ADD_TO_RETRY_LIST'
 export const CLEAR_CONSOLE = 'CLEAR_CONSOLE'

@@ -1,8 +1,10 @@
-import React from 'react'
+/* Dependencies */
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { selectTemplate } from '../../actions/templates'
 import { withRouter } from 'react-router-dom'
+/* Redux actions */
+import { selectTemplate } from '../../actions/templates'
 
 /**
  * Renders the button used to trigger the current active PDF template
@@ -19,7 +21,7 @@ import { withRouter } from 'react-router-dom'
  *
  * @since 4.1
  */
-export class TemplateActivateButton extends React.Component {
+export class TemplateActivateButton extends Component {
   /**
    * @since 4.1
    */

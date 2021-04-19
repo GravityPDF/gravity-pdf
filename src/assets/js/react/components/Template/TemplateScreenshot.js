@@ -1,5 +1,6 @@
-import PropTypes from 'prop-types'
+/* Dependencies */
 import React from 'react'
+import PropTypes from 'prop-types'
 
 /**
  * Display the Template Screenshot for the List Items

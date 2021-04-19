@@ -1,4 +1,6 @@
+/* Dependencies */
 import { all } from 'redux-saga/effects'
+/* Sagas */
 import { watchUpdateSelectBox, watchTemplateProcessing, watchpostTemplateUploadProcessing } from './templates'
 import { watchGetFilesFromGitHub, watchDownloadFonts } from './coreFonts'
 import { watchGetCustomFontList, watchAddFont, watchEditFont, watchDeleteFont } from './fontManager'

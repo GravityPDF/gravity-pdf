@@ -1,7 +1,8 @@
-import React from 'react'
+/* Dependencies */
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import getTemplates from '../../selectors/getTemplates'
+/* Components */
 import TemplateContainer from './TemplateContainer'
 import TemplateHeaderNavigation from './TemplateHeaderNavigation'
 import TemplateFooterActions from './TemplateFooterActions'
@@ -15,6 +16,8 @@ import {
   Description,
   Tags
 } from './TemplateSingleComponents'
+/* Selectors */
+import getTemplates from '../../selectors/getTemplates'
 
 /**
  * Renders a single PDF template, which get displayed on the /template/:id page.
@@ -30,7 +33,7 @@ import {
  *
  * @since 4.1
  */
-export class TemplateSingle extends React.Component {
+export class TemplateSingle extends Component {
   /**
    * @since 4.1
    */

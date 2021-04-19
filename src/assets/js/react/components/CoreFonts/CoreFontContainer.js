@@ -1,9 +1,12 @@
-import React from 'react'
+/* Dependencies */
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import CoreFontListResults from './CoreFontListResults'
+/* Components */
+import { CoreFontListResults } from './CoreFontListResults'
 import Counter from './CoreFontCounter'
 import Spinner from '../Spinner'
+/* Redux actions */
 import {
   clearButtonClickedAndRetryList,
   addToConsole,
@@ -25,7 +28,7 @@ import {
  *
  * @since 5.0
  */
-export class CoreFontContainer extends React.Component {
+export class CoreFontContainer extends Component {
   /**
    *
    * @since 5.0

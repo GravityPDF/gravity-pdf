@@ -1,4 +1,5 @@
-import React from 'react'
+/* Dependencies */
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
 /**
@@ -15,7 +16,7 @@ import PropTypes from 'prop-types'
  *
  * @since 4.1
  */
-class TemplateButton extends React.Component {
+class TemplateButton extends Component {
   /**
    * @since 4.1
    */

@@ -1,10 +1,14 @@
+/* Dependencies */
 import $ from 'jquery'
-import templateBootstrap from './bootstrap/templateBootstrap'
+/* Bootstrap */
+import { templateBootstrap } from './bootstrap/templateBootstrap'
 import { fontManagerBootstrap } from './bootstrap/fontManagerBootstrap'
 import coreFontBootstrap from './bootstrap/coreFontBootstrap'
 import helpBootstrap from './bootstrap/helpBootstrap'
-import addEditButton from './utilities/PdfSettings/addEditButton'
-import autoSelectShortcode from './utilities/PdfList/autoSelectShortcode'
+/* Utilities */
+import { addEditButton } from './utilities/PdfSettings/addEditButton'
+import { autoSelectShortcode } from './utilities/PdfList/autoSelectShortcode'
+/* Sass Styling */
 import '../../scss/gfpdf-styles.scss'
 
 /**

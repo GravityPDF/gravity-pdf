@@ -1,4 +1,4 @@
-export default function autoSelectShortcode (gfPdfListForm) {
+export function autoSelectShortcode (gfPdfListForm) {
   const shortcodeFields = Array.from(gfPdfListForm.querySelectorAll('td.column-shortcode'))
 
   if (shortcodeFields.length > 0) {

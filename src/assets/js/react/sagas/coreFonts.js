@@ -1,5 +1,7 @@
+/* Dependencies */
 import { channel } from 'redux-saga'
 import { call, fork, take, takeLatest, put } from 'redux-saga/effects'
+/* Redux action types & actions */
 import {
   getFilesFromGitHubSuccess,
   getFilesFromGitHubFailed,
@@ -9,6 +11,7 @@ import {
   GET_FILES_FROM_GITHUB,
   DOWNLOAD_FONTS_API_CALL
 } from '../actions/coreFonts'
+/* APIs */
 import { apiGetFilesFromGitHub, apiPostDownloadFonts } from '../api/coreFonts'
 
 /**

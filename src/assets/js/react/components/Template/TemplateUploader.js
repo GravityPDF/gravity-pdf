@@ -1,15 +1,18 @@
+/* Dependencies */
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import React from 'react'
 import { connect } from 'react-redux'
+import classNames from 'classnames'
+import Dropzone from 'react-dropzone'
+/* Components */
+import ShowMessage from '../ShowMessage'
+/* Redux actions */
 import {
   addTemplate,
   updateTemplateParam,
   postTemplateUploadProcessing,
   clearTemplateUploadProcessing
 } from '../../actions/templates'
-import classNames from 'classnames'
-import Dropzone from 'react-dropzone'
-import ShowMessage from '../ShowMessage'
 
 /**
  * Handles the uploading of new PDF templates to the server
@@ -25,7 +28,7 @@ import ShowMessage from '../ShowMessage'
  *
  * @since 4.1
  */
-export class TemplateUploader extends React.Component {
+export class TemplateUploader extends Component {
   /**
    * @since 4.1
    */

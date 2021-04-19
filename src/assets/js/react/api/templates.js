@@ -1,3 +1,4 @@
+/* Dependencies */
 import request from 'superagent'
 
 /**

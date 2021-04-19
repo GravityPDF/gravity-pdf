@@ -1,13 +1,16 @@
-import React from 'react'
+/* Dependencies */
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { updateTemplateParam } from '../../actions/templates'
+/* Components */
 import TemplateScreenshot from './TemplateScreenshot'
 import ShowMessage from '../ShowMessage'
 import { TemplateDetails, Group } from './TemplateListItemComponents'
 import { Name } from './TemplateSingleComponents'
 import TemplateActivateButton from './TemplateActivateButton'
+/* Redux actions */
+import { updateTemplateParam } from '../../actions/templates'
 
 /**
  * Display the individual template item for usage our template list
@@ -23,7 +26,7 @@ import TemplateActivateButton from './TemplateActivateButton'
  *
  * @since 4.1
  */
-export class TemplateListItem extends React.Component {
+export class TemplateListItem extends Component {
   /**
    * @since 4.1
    */

@@ -1,5 +1,7 @@
-import React from 'react'
+/* Dependencies */
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+/* Components */
 import ListSpacer from './CoreFontListSpacer'
 
 /**
@@ -14,7 +16,7 @@ import ListSpacer from './CoreFontListSpacer'
  *
  * @since 5.0
  */
-export default class CoreFontListResults extends React.Component {
+export class CoreFontListResults extends Component {
   /**
    *
    * @since 5.0
@@ -62,7 +64,7 @@ export default class CoreFontListResults extends React.Component {
 /**
  * @since 5.0
  */
-export class Retry extends React.Component {
+export class Retry extends Component {
   /**
    *
    * @since 5.0
