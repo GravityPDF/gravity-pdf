@@ -1,12 +1,15 @@
-import React from 'react'
+/* Dependencies */
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import getTemplates from '../../selectors/getTemplates'
+/* Components */
 import TemplateContainer from './TemplateContainer'
 import TemplateListItem from './TemplateListItem'
 import TemplateSearch from './TemplateSearch'
 import TemplateHeaderTitle from './TemplateHeaderTitle'
 import TemplateUploader from './TemplateUploader'
+/* Selectors */
+import getTemplates from '../../selectors/getTemplates'
 
 /**
  * The master component for rendering the all PDF templates as a list
@@ -22,7 +25,7 @@ import TemplateUploader from './TemplateUploader'
  *
  * @since 4.1
  */
-export class TemplateList extends React.Component {
+export class TemplateList extends Component {
   /**
    * @since 4.1
    */

@@ -1,13 +1,13 @@
 /* Dependencies */
-import React from 'react'
+import React, { lazy, Suspense } from 'react'
 import { render } from 'react-dom'
 import { HashRouter as Router, Route } from 'react-router-dom'
-/* Components */
-import AdvancedButton from '../components/FontManager/AdvancedButton'
 /* Routes */
-import fontManagerRouter from '../router/fontManagerRouter'
+import { fontManagerRouter } from '../router/fontManagerRouter'
 /* Redux store */
 import { getStore } from '../store'
+/* Components */
+const AdvancedButton = lazy(() => import('../components/FontManager/AdvancedButton'))
 
 /**
  * @package     Gravity PDF
@@ -32,9 +32,11 @@ export function fontManagerBootstrap (defaultFontField, buttonStyle) {
   createAdvancedButtonWrapper(defaultFontField, preventButtonReset)
 
   render(
-    <Router>
-      <Route render={props => <AdvancedButton {...props} store={store} />} />
-    </Router>,
+    <Suspense fallback={<div>{GFPDF.spinnerAlt}</div>}>
+      <Router>
+        <Route render={props => <AdvancedButton {...props} store={store} />} />
+      </Router>
+    </Suspense>,
     document.querySelector('#gpdf-advance-font-manager-selector' + preventButtonReset)
   )
 

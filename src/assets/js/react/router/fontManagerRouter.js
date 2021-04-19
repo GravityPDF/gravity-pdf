@@ -63,7 +63,7 @@ Routes.propTypes = {
  *
  * @since 6.0
  */
-export default function FontManagerRouter (store) {
+export function fontManagerRouter (store) {
   render((
     <Provider store={store}>
       <Routes />

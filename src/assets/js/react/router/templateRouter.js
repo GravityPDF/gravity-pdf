@@ -1,9 +1,10 @@
+/* Dependencies */
 import React, { lazy, Suspense } from 'react'
 import { render } from 'react-dom'
 import { Provider } from 'react-redux'
 import { HashRouter as Router, Route, Switch } from 'react-router-dom'
+/* Components */
 import Empty from '../components/Empty'
-
 const TemplateList = lazy(() => import('../components/Template/TemplateList'))
 const TemplateSingle = lazy(() => import('../components/Template/TemplateSingle'))
 

@@ -1,5 +1,5 @@
 /* Dependencies */
-import React from 'react'
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { sprintf } from 'sprintf-js'
 /* Utilities */
@@ -12,7 +12,7 @@ import { adjustFontListHeight } from '../../utilities/FontManager/adjustFontList
  * @since       6.0
  */
 
-export class TemplateTooltip extends React.Component {
+export class TemplateTooltip extends Component {
   /**
    * PropTypes
    *

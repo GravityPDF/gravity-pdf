@@ -59,7 +59,7 @@
     "sass-loader": "8.0.2",
     "standard": "^14.3.4",
     "terser-webpack-plugin": "2.3.5",
-    "testcafe": "^1.10.1",
+    "testcafe": "^1.14.0",
     "url-loader": "4.1.0",
     "webpack": "4.41.5",
     "webpack-cli": "3.3.10",
@@ -72,7 +72,7 @@
     "lint:php:format": "npm run env docker-run -- php composer format",
 
     "test:e2e": "cross-env NODE_ENV=test testcafe chrome tests/e2e -s takeOnFails=true,fullPage=true --disable-multiple-windows",
-    "test:e2e:headless": "cross-env NODE_ENV=test testcafe chrome:headless tests/e2e -s takeOnFails=true,fullPage=true --disable-multiple-windows",
+    "test:e2e:headless": "cross-env NODE_ENV=test testcafe chrome:headless tests/e2e -s takeOnFails=true,fullPage=true --disable-multiple-windows -e",
     "test:e2e:file": "cross-env NODE_ENV=test testcafe chrome tests/e2e -s takeOnFails=true,fullPage=true",
     "test:e2e:watch": "cross-env NODE_ENV=test testcafe chrome tests/e2e -L",
     "test:e2e:file:watch": "cross-env NODE_ENV=test testcafe chrome tests/e2e -L",

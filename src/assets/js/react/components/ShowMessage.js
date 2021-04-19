@@ -1,6 +1,7 @@
-import PropTypes from 'prop-types'
-import React from 'react'
+/* Dependencies */
 import $ from 'jquery'
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 
 /**
  * Renders a message or error, with the option to self-clear itself
@@ -16,7 +17,7 @@ import $ from 'jquery'
  *
  * @since 4.1
  */
-export class ShowMessage extends React.Component {
+export class ShowMessage extends Component {
   /**
    * Pass the "dismissable" prop to enable auto-clearing
    *

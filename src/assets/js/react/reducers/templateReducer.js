@@ -1,3 +1,4 @@
+/* Redux action types */
 import {
   SEARCH_TEMPLATES,
   SELECT_TEMPLATE,

@@ -1,8 +1,10 @@
-import React from 'react'
+/* Dependencies */
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { addTemplate, deleteTemplate, templateProcessing, clearTemplateProcessing } from '../../actions/templates'
 import { withRouter } from 'react-router-dom'
+/* Redux actions */
+import { addTemplate, deleteTemplate, templateProcessing, clearTemplateProcessing } from '../../actions/templates'
 
 /**
  * Renders a delete button which then queries our server and
@@ -19,7 +21,7 @@ import { withRouter } from 'react-router-dom'
  *
  * @since 4.1
  */
-export class TemplateDeleteButton extends React.Component {
+export class TemplateDeleteButton extends Component {
   /**
    * @since 4.1
    */

@@ -1,8 +1,10 @@
+/* Dependencies */
 import React, { lazy, Suspense } from 'react'
 import { render } from 'react-dom'
 import { Provider } from 'react-redux'
+/* Redux store */
 import { getStore } from '../store'
-
+/* Components */
 const HelpContainer = lazy(() => import('../components/Help/HelpContainer'))
 
 /**

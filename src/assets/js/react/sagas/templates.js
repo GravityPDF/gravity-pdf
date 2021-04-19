@@ -1,4 +1,6 @@
+/* Dependencies */
 import { takeLatest, call, put } from 'redux-saga/effects'
+/* Redux action types & actions */
 import {
   updateSelectBoxSuccess,
   updateSelectBoxFailed,
@@ -10,6 +12,7 @@ import {
   TEMPLATE_PROCESSING,
   POST_TEMPLATE_UPLOAD_PROCESSING
 } from '../actions/templates'
+/* APIs */
 import { apiPostUpdateSelectBox, apiPostTemplateProcessing, apiPostTemplateUploadProcessing } from '../api/templates'
 
 /**

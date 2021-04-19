@@ -22,8 +22,8 @@ test('should save toggled checkbox value', async t => {
   await t
     .click(run.enableConditionalLogicCheckbox)
     .click(run.saveSettings)
-    .expect(run.enableConditionalLogicCheckbox.checked).ok()
+    .expect(run.enableConditionalLogicCheckbox.checked).notOk()
     .click(run.enableConditionalLogicCheckbox)
     .click(run.saveSettings)
-    .expect(run.enableConditionalLogicCheckbox.checked).notOk()
+    .expect(run.enableConditionalLogicCheckbox.checked).ok()
 })

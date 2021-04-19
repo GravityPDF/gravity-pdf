@@ -1,5 +1,7 @@
+/* Dependencies */
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import React from 'react'
+/* Components */
 import TemplateActivateButton from './TemplateActivateButton'
 import TemplateDeleteButton from './TemplateDeleteButton'
 
@@ -18,7 +20,7 @@ import TemplateDeleteButton from './TemplateDeleteButton'
  *
  * @since 4.1
  */
-export class TemplateFooterActions extends React.Component {
+export class TemplateFooterActions extends Component {
   /**
    * @since 4.1
    */

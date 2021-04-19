@@ -1,4 +1,5 @@
-import React from 'react'
+/* Dependencies */
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -18,7 +19,7 @@ import { withRouter } from 'react-router-dom'
  *
  * @since 4.1
  */
-export class TemplateHeaderNavigation extends React.Component {
+export class TemplateHeaderNavigation extends Component {
   /**
    * @since 4.1
    */

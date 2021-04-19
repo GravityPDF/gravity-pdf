@@ -1,7 +1,7 @@
 import React from 'react'
 import { shallow } from 'enzyme'
 import { findByTestAttr } from '../../testUtils'
-import CoreFontListResults, { Retry } from '../../../../../src/assets/js/react/components/CoreFonts/CoreFontListResults'
+import { CoreFontListResults, Retry } from '../../../../../src/assets/js/react/components/CoreFonts/CoreFontListResults'
 
 describe('CoreFonts - CoreFontListResults.js', () => {
 

@@ -1,11 +1,15 @@
+/* Dependencies */
 import React, { lazy, Suspense } from 'react'
 import { render } from 'react-dom'
 import { HashRouter as Router, Route } from 'react-router-dom'
 import watch from 'redux-watch'
+/* Redux store */
 import { getStore } from '../store'
+/* Redux actions */
 import { selectTemplate, updateSelectBox } from '../actions/templates'
+/* Routes */
 import templateRouter from '../router/templateRouter'
-
+/* Components */
 const TemplateButton = lazy(() => import('../components/Template/TemplateButton'))
 
 /**
@@ -24,7 +28,7 @@ const TemplateButton = lazy(() => import('../components/Template/TemplateButton'
  *
  * @since 4.1
  */
-export default function templateBootstrap ($templateField) {
+export function templateBootstrap ($templateField) {
   const store = getStore()
 
   /* Create our button container and render our component in it */

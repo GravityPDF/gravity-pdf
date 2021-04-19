@@ -1,5 +1,5 @@
 /* Dependencies */
-import React from 'react'
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -21,7 +21,7 @@ import { toggleUpdateFont } from '../../utilities/FontManager/toggleUpdateFont'
  *
  * @since 6.0
  */
-export class CloseDialog extends React.Component {
+export class CloseDialog extends Component {
   /**
    * PropTypes
    *

@@ -46,10 +46,14 @@ test('should check if the shortcode confirmation type PAGE is working correctly'
   // Actions
   await run.copyDownloadShortcode('gf_edit_forms&view=settings&subview=PDF&id=3')
   shortcodeHolder = await run.shortcodeInputBox.value
-  await page.navigatePage()
+  await t
+    .setNativeDialogHandler(() => true)
+    .navigateTo(`${baseURL}/wp-admin/edit.php?post_type=page`)
   await page.addNewPage()
-  await page.navigatePage()
-  await t.click(link('#the-list', 'Test page'))
+  await t
+    .setNativeDialogHandler(() => true)
+    .navigateTo(`${baseURL}/wp-admin/edit.php?post_type=page`)
+    .click(link('#the-list', 'Test page'))
   await page.closePopupButton.exists && await t.click(page.closePopupButton)
   await t
     .click(page.addBlockIcon)

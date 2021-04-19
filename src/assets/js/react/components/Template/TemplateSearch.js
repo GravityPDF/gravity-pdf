@@ -1,7 +1,9 @@
+/* Dependencies */
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import React from 'react'
 import { connect } from 'react-redux'
 import debounce from 'lodash.debounce'
+/* Redux actions */
 import { searchTemplates } from '../../actions/templates'
 
 /**
@@ -18,7 +20,7 @@ import { searchTemplates } from '../../actions/templates'
  *
  * @since 4.1
  */
-export class TemplateSearch extends React.Component {
+export class TemplateSearch extends Component {
   /**
    * @since 4.1
    */

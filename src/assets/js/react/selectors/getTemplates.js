@@ -1,4 +1,6 @@
+/* Dependencies */
 import { createSelector } from 'reselect'
+/* Utilities */
 import versionCompare from '../utilities/versionCompare'
 
 /**

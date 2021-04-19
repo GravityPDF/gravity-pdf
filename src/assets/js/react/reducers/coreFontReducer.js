@@ -1,3 +1,4 @@
+/* Redux action types */
 import {
   ADD_TO_CONSOLE,
   ADD_TO_RETRY_LIST,

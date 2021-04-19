@@ -1,4 +1,4 @@
-/* Our Redux Action Type Constants */
+/* Redux Action Type Constants */
 export const SEARCH_TEMPLATES = 'SEARCH_TEMPLATES'
 export const SELECT_TEMPLATE = 'SELECT_TEMPLATE'
 export const ADD_TEMPLATE = 'ADD_TEMPLATE'

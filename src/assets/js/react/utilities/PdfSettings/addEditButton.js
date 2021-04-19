@@ -1,4 +1,4 @@
-export default function addEditButton (pdfSettingFieldSets, form) {
+export function addEditButton (pdfSettingFieldSets, form) {
   const items = Array.from(pdfSettingFieldSets)
   /* Remove last element of the array */
   items.pop()
