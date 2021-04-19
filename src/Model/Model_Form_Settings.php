@@ -424,6 +424,9 @@ class Model_Form_Settings extends Helper_Abstract_Model {
 						}
 						break;
 
+					case 'checkbox':
+						break;
+
 					default:
 						if ( ! isset( $input[ $key ] ) ) {
 							$input[ $key ] = '';
