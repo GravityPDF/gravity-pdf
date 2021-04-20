@@ -240,7 +240,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		/*
 		 * Trigger action to signify Gravity PDF is now loaded
 		 *
-		 * See https://gravitypdf.com/documentation/v5/gfpdf_fully_loaded/ for more details about this action
+		 * See https://docs.gravitypdf.com/v6/developers/actions/gfpdf_fully_loaded for more details about this action
 		 */
 		do_action( 'gfpdf_fully_loaded', $this );
 	}
@@ -325,10 +325,10 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 
 		if ( $file === PDF_PLUGIN_BASENAME ) {
 			$row_meta = [
-				'docs'           => '<a href="' . esc_url( 'https://gravitypdf.com/documentation/v5/five-minute-install/' ) . '" title="' . esc_attr__( 'View Gravity PDF Documentation', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Docs', 'gravity-forms-pdf-extended' ) . '</a>',
+				'docs'           => '<a href="' . esc_url( 'https://docs.gravitypdf.com/v6/users/five-minute-install/' ) . '" title="' . esc_attr__( 'View Gravity PDF Documentation', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Docs', 'gravity-forms-pdf-extended' ) . '</a>',
 				'support'        => '<a href="' . esc_url( $this->data->settings_url . '&tab=help' ) . '" title="' . esc_attr__( 'Get Help and Support', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Support', 'gravity-forms-pdf-extended' ) . '</a>',
-				'extension-shop' => '<a href="' . esc_url( 'https://gravitypdf.com/extension-shop/' ) . '" title="' . esc_attr__( 'View Gravity PDF Extensions Shop', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Extensions', 'gravity-forms-pdf-extended' ) . '</a>',
-				'template-shop'  => '<a href="' . esc_url( 'https://gravitypdf.com/template-shop/' ) . '" title="' . esc_attr__( 'View Gravity PDF Template Shop', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Templates', 'gravity-forms-pdf-extended' ) . '</a>',
+				'extension-shop' => '<a href="' . esc_url( 'https://gravitypdf.com/store/#extensions' ) . '" title="' . esc_attr__( 'View Gravity PDF Extensions Shop', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Extensions', 'gravity-forms-pdf-extended' ) . '</a>',
+				'template-shop'  => '<a href="' . esc_url( 'https://gravitypdf.com/store/#templates' ) . '" title="' . esc_attr__( 'View Gravity PDF Template Shop', 'gravity-forms-pdf-extended' ) . '">' . esc_html__( 'Templates', 'gravity-forms-pdf-extended' ) . '</a>',
 			];
 
 			return array_merge( $links, $row_meta );
@@ -511,7 +511,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$items = array_merge( $default_scripts, $items );
 		}
 
-		/* See https://gravitypdf.com/documentation/v5/gfpdf_gf_noconflict_scripts/ for more details about this filter */
+		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_gf_noconflict_scripts for more details about this filter */
 
 		return apply_filters( 'gfpdf_gf_noconflict_scripts', $items );
 	}
@@ -549,7 +549,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 			$items = array_merge( $default_styles, $items );
 		}
 
-		/* See https://gravitypdf.com/documentation/v5/gfpdf_gf_noconflict_styles/ for more details about this filter */
+		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_gf_noconflict_styles for more details about this filter */
 
 		return apply_filters( 'gfpdf_gf_noconflict_styles', $items );
 	}

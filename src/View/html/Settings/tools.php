@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</form>
 
 	<?php
-	/* See https://gravitypdf.com/documentation/v5/gfpdf_post_tools_settings_page/ for more details about this action */
+	/* See https://docs.gravitypdf.com/v6/developers/actions/gfpdf_post_tools_settings_page for more details about this action */
 	do_action( 'gfpdf_post_tools_settings_page' );
 	?>
 

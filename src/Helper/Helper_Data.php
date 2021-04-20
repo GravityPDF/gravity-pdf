@@ -208,7 +208,7 @@ class Helper_Data {
 		$user_capabilities = is_object( $user_data ) ? $user_data->allcaps : [];
 		$user_capabilities = is_super_admin() ? [ 'administrator' => true ] : $user_capabilities;
 
-		/* See https://gravitypdf.com/documentation/v5/gfpdf_localised_script_array/ for more details about this filter */
+		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_localised_script_array/ for more details about this filter */
 
 		return apply_filters(
 			'gfpdf_localised_script_array',

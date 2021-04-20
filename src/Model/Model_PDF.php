@@ -210,7 +210,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		 * Default middleware includes 'middle_public_access', 'middle_active', 'middle_conditional', 'middle_owner_restriction', 'middle_logged_out_timeout', 'middle_auth_logged_out_user', 'middle_user_capability'
 		 * If WP_Error is returned the PDF won't be parsed
 		 *
-		 * See https://gravitypdf.com/documentation/v5/gfpdf_pdf_middleware/ for more details about this filter
+		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_pdf_middleware/ for more details about this filter
 		 */
 		$middleware = apply_filters( 'gfpdf_pdf_middleware', false, $entry, $settings );
 
@@ -683,7 +683,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		/**
-		 * See https://gravitypdf.com/documentation/v5/gfpdf_get_pdf_display_list/ for usage
+		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_get_pdf_display_list/ for usage
 		 *
 		 * @since 4.2
 		 */
@@ -712,7 +712,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		/**
-		 * See https://gravitypdf.com/documentation/v5/gfpdf_get_active_pdfs/ for usage
+		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_get_active_pdfs/ for usage
 		 *
 		 * @since 4.2
 		 */
@@ -740,7 +740,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		/*
 		 * Add filter to modify PDF name
 		 *
-		 * See https://gravitypdf.com/documentation/v5/gfpdf_pdf_filename/ for more details about this filter
+		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_pdf_filename/ for more details about this filter
 		 */
 		$name = apply_filters( 'gfpdf_pdf_filename', $name, $form, $entry, $settings );
 
@@ -968,7 +968,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		/**
-		 * See https://gravitypdf.com/documentation/v5/gfpdf_maybe_attach_to_notification/ for usage
+		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_maybe_attach_to_notification/ for usage
 		 *
 		 * @since 4.2
 		 */
@@ -1016,7 +1016,7 @@ class Model_PDF extends Helper_Abstract_Model {
 	public function process_and_save_pdf( Helper_PDF $pdf ) {
 
 		/**
-		 * See https://gravitypdf.com/documentation/v5/gfpdf_override_pdf_bypass/ for usage
+		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_override_pdf_bypass/ for usage
 		 *
 		 * @since 4.2
 		 */
@@ -1238,7 +1238,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		}
 
 		/**
-		 * See https://gravitypdf.com/documentation/v5/gfpdf_form_data/ for usage
+		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_form_data/ for usage
 		 *
 		 * @since 4.2
 		 */
@@ -1517,7 +1517,7 @@ class Model_PDF extends Helper_Abstract_Model {
 				}
 
 				/*
-				 * See https://gravitypdf.com/documentation/v5/gfpdf_field_class/ for more details about these filters
+				 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_field_class/ for more details about these filters
 				 */
 				$class = apply_filters( 'gfpdf_field_class', $class, $field, $entry, $form );
 				$class = apply_filters( 'gfpdf_field_class_' . $field->type, $class, $field, $entry, $form );
@@ -1638,7 +1638,7 @@ class Model_PDF extends Helper_Abstract_Model {
 		/**
 		 * Disable aggregate addon data (speeds up PDF generation time)
 		 *
-		 * See https://gravitypdf.com/documentation/v5/gfpdf_disable_global_addon_data/
+		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_disable_global_addon_data/
 		 *
 		 * @since 5.1
 		 */
@@ -1775,7 +1775,7 @@ class Model_PDF extends Helper_Abstract_Model {
 
 			do_action( 'gfpdf_post_pdf_save', $form['id'], $entry['id'], $settings, $pdf_path ); /* Backwards compatibility */
 
-			/* See https://gravitypdf.com/documentation/v5/gfpdf_post_save_pdf/ for more details about these actions */
+			/* See https://docs.gravitypdf.com/v6/developers/actions/gfpdf_post_save_pdf for more details about these actions */
 			do_action( 'gfpdf_post_save_pdf', $pdf_path, $filename, $settings, $entry, $form );
 			do_action( 'gfpdf_post_save_pdf_' . $form['id'], $pdf_path, $filename, $settings, $entry, $form );
 		}

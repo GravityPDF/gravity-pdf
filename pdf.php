@@ -243,7 +243,7 @@ class GFPDF_Major_Compatibility_Checks {
 
 		/* Check PHP version is compatible */
 		if ( ! version_compare( phpversion(), $this->required_php_version, '>=' ) ) {
-			$this->notices[] = sprintf( esc_html__( 'You are running an %1$soutdated version of PHP%2$s. Contact your web hosting provider to update. %3$sGet more info%4$s.', 'gravity-forms-pdf-extended' ), '<a href="http://www.wpupdatephp.com/update/">', '</a>', '<a href="https://docs.gravitypdf.com/v6/users/activation-errors#you-are-running-an-outdated-version-of-php">', '</a>' );
+			$this->notices[] = sprintf( esc_html__( 'You are running an %1$soutdated version of PHP%2$s. Contact your web hosting provider to update. %3$sGet more info%4$s.', 'gravity-forms-pdf-extended' ), '<a href="https://wordpress.org/support/update-php/">', '</a>', '<a href="https://docs.gravitypdf.com/v6/users/activation-errors#you-are-running-an-outdated-version-of-php">', '</a>' );
 
 			/* Offer downgrade prompt if PHP version is compatible with v5 */
 			if ( version_compare( phpversion(), '5.6', '>=' ) ) {
