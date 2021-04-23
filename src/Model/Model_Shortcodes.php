@@ -87,7 +87,7 @@ class Model_Shortcodes extends Helper_Abstract_Pdf_Shortcode {
 			static::SHORTCODE
 		);
 
-		/* See https://gravitypdf.com/documentation/v5/gfpdf_gravityforms_shortcode_attributes/ for more information about this filter */
+		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_gravityforms_shortcode_attributes/ for more information about this filter */
 		$attributes = apply_filters( 'gfpdf_gravityforms_shortcode_attributes', $attributes );
 
 		try {

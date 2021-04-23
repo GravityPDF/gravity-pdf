@@ -224,7 +224,7 @@ class Helper_PDF {
 		/*
 		 * Allow $mpdf object class to be modified after it is fully initialised
 		 *
-		 * See https://gravitypdf.com/documentation/v5/gfpdf_mpdf_post_init_class/ for more details about this filter
+		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_mpdf_post_init_class/ for more details about this filter
 		 */
 		$this->mpdf = apply_filters( 'gfpdf_mpdf_post_init_class', $this->mpdf, $this->form, $this->entry, $this->settings, $this );
 	}
@@ -266,7 +266,7 @@ class Helper_PDF {
 		$html = apply_filters( 'gfpdfe_pdf_template', $html, $form['id'], $this->entry['id'], $args['settings'] ); /* Backwards compat */
 		$html = apply_filters( 'gfpdfe_pdf_template_' . $form['id'], $html, $this->entry['id'], $args['settings'] ); /* Backwards compat */
 
-		/* See https://gravitypdf.com/documentation/v5/gfpdf_pdf_html_output/ for more details about these filters */
+		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_pdf_html_output/ for more details about these filters */
 		$html = apply_filters( 'gfpdf_pdf_html_output', $html, $form, $this->entry, $args['settings'], $this );
 		$html = apply_filters( 'gfpdf_pdf_html_output_' . $form['id'], $html, $this->gform, $this->entry, $args['settings'], $this );
 
@@ -296,7 +296,7 @@ class Helper_PDF {
 		/*
 		 * Allow $mpdf object class to be modified
 		 *
-		 * See https://gravitypdf.com/documentation/v5/gfpdf_mpdf_class/ for more details about this filter
+		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_mpdf_class/ for more details about this filter
 		 */
 		$this->mpdf = apply_filters( 'gfpdf_mpdf_class', $this->mpdf, $form, $this->entry, $this->settings, $this );
 
@@ -668,7 +668,7 @@ class Helper_PDF {
 		 * Allow $mpdf object class to be modified
 		 * Note: in some circumstances using WriteHTML() during this filter will break headers/footers
 		 *
-		 * See https://gravitypdf.com/documentation/v5/gfpdf_mpdf_init_class/ for more details about this filter
+		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_mpdf_init_class/ for more details about this filter
 		 */
 		$this->mpdf = apply_filters( 'gfpdf_mpdf_init_class', $this->mpdf, $this->form, $this->entry, $this->settings, $this );
 	}

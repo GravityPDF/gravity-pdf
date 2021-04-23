@@ -99,7 +99,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			'shortcode'     => esc_html__( 'Shortcode', 'gravity-forms-pdf-extended' ),
 		];
 
-		/* See https://gravitypdf.com/documentation/v5/gfpdf_pdf_list_columns/ for more details about this filter */
+		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_pdf_list_columns/ for more details about this filter */
 		$columns = apply_filters( 'gfpdf_pdf_list_columns', $columns );
 
 		return $columns;
@@ -198,7 +198,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$action = 'gfpdf_pdf_list_column_' . $column;
 
 		if ( has_action( $action ) ) {
-			/* See https://gravitypdf.com/documentation/v5/gfpdf_pdf_list_column_id/ for more details about this action */
+			/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_pdf_list_column_id/ for more details about this action */
 			do_action( $action, $item );
 		} else {
 			echo rgar( $item, $column );
@@ -336,7 +336,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			'delete'    => '<a title="' . esc_attr__( 'Delete this PDF', 'gravity-forms-pdf-extended' ) . '" class="submitdelete" data-id="' . esc_attr( $item['id'] ) . '" data-nonce="' . $delete_nonce . '" data-fid="' . $form_id . '" href="#">' . esc_html__( 'Delete', 'gravity-forms-pdf-extended' ) . '</a>',
 		];
 
-		/* See https://gravitypdf.com/documentation/v5/gfpdf_pdf_actions/ for more details about this filter */
+		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_pdf_actions/ for more details about this filter */
 		$actions = apply_filters( 'gfpdf_pdf_actions', $actions, $item );
 
 		?>

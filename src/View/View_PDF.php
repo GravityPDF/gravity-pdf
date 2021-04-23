@@ -330,7 +330,7 @@ class View_PDF extends Helper_Abstract_View {
 		<div id="container">
 			<?php
 			/*
-			 * See https://gravitypdf.com/documentation/v5/gfpdf_pre_html_fields/ for more details about this action
+			 * See https://docs.gravitypdf.com/v6/developers/actions/gfpdf_pre_html_fields for more details about this action
 			 * @since 4.1
 			 */
 			do_action( 'gfpdf_pre_html_fields', $entry, $config );
@@ -340,7 +340,7 @@ class View_PDF extends Helper_Abstract_View {
 
 			<?php
 			/*
-			 * See https://gravitypdf.com/documentation/v5/gfpdf_post_html_fields/ for more details about this action
+			 * See https://docs.gravitypdf.com/v6/developers/actions/gfpdf_post_html_fields for more details about this action
 			 * @since 4.1
 			 */
 			do_action( 'gfpdf_post_html_fields', $entry, $config );
@@ -386,7 +386,7 @@ class View_PDF extends Helper_Abstract_View {
 		$config['meta'] = ( isset( $config['meta'] ) ) ? $config['meta'] : [];
 
 		/**
-		 * See https://gravitypdf.com/documentation/v5/gfpdf_current_pdf_configuration/ for usage
+		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_current_pdf_configuration/ for usage
 		 *
 		 * @since 4.2
 		 */
@@ -423,7 +423,7 @@ class View_PDF extends Helper_Abstract_View {
 			 *
 			 * If $middleware is true the field will not be displayed in the PDF
 			 *
-			 * See https://gravitypdf.com/documentation/v5/gfpdf_field_middleware/ for usage
+			 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_field_middleware/ for usage
 			 *
 			 * @since 4.2
 			 */
@@ -444,7 +444,7 @@ class View_PDF extends Helper_Abstract_View {
 		/*
 		 * Filter to prevent the product table showing
 		 *
-		 * See https://gravitypdf.com/documentation/v5/gfpdf_disable_product_table/
+		 * See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_disable_product_table/
 		 *
 		 * @since 5.1
 		 */

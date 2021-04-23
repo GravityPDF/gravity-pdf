@@ -707,7 +707,7 @@ class Helper_Templates {
 			$config->set_settings( $settings );
 		}
 
-		/* See https://gravitypdf.com/documentation/v5/gfpdf_template_args/ for more details about this filter */
+		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_template_args/ for more details about this filter */
 
 		return apply_filters(
 			'gfpdf_template_args',

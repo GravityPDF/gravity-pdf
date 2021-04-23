@@ -6,8 +6,8 @@ resources are available below, thanks for understanding.
 
 ### Documentation
 
-* [User Documentation](https://gravitypdf.com/documentation/v5/five-minute-install/)
-* [Developer Documentation](https://gravitypdf.com/documentation/v5/developer-start-customising/)
+* [User Documentation](https://docs.gravitypdf.com/v6/users/five-minute-install/)
+* [Developer Documentation](https://docs.gravitypdf.com/v6/developers/start-customising/)
 
 ### Open a Support Ticket
 

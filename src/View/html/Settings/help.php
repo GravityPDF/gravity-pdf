@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div id="gpdf-search"><!-- Placeholder --></div>
 
 	<div id="gpdf-action-links">
-		<a href="https://gravitypdf.com/documentation/v5/" class="button button-primary button-large"><?php esc_html_e( 'View Documentation', 'gravity-forms-pdf-extended' ); ?></a>
+		<a href="https://docs.gravitypdf.com/v6/users/five-minute-install/" class="button button-primary button-large"><?php esc_html_e( 'View Documentation', 'gravity-forms-pdf-extended' ); ?></a>
 		<a href="https://gravitypdf.com/support/#contact-support" class="button button-primary button-large"><?php esc_html_e( 'Contact Support', 'gravity-forms-pdf-extended' ); ?></a>
 
 		<p>
@@ -38,7 +38,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</div>
 
 	<?php
-	/* See https://gravitypdf.com/documentation/v5/gfpdf_post_help_settings_page/ for more details about this action */
+	/* See https://docs.gravitypdf.com/v6/developers/actions/gfpdf_post_help_settings_page for more details about this action */
 	do_action( 'gfpdf_post_help_settings_page' );
 	?>
 </div><!-- close #pdfextended-settings -->
