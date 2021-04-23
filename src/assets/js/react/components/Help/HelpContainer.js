@@ -55,7 +55,7 @@ export class HelpContainer extends Component {
     return (
       <InstantSearch searchClient={searchClient} indexName='gravitypdf'>
         <Configure
-          facetFilters={['version:v5']}
+          facetFilters={['version:v6']}
           highlightPreTag='<mark>'
           highlightPostTag='</mark>'
           attributesToRetrieve={['hierarchy.lvl0', 'hierarchy.lvl1', 'hierarchy.lvl2', 'hierarchy.lvl3', 'hierarchy.lvl4', 'hierarchy.lvl5', 'hierarchy.lvl6', 'content', 'type', 'url']}
