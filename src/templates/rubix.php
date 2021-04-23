@@ -257,7 +257,7 @@ $contrast = $misc->get_background_and_border_contrast( $container_background_col
 	}
 
 	.row-separator {
-		margin-bottom: 15px;
+		margin-bottom: 5px;
 	}
 
 	.gfpdf-page, .product-field-title {
