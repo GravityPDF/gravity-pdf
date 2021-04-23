@@ -2,7 +2,7 @@
 Contributors: blue-liquid-designs
 Plugin URI: https://gravitypdf.com/
 Donate link: https://gravitypdf.com/donate-to-plugin/
-Tags: gravity, forms, pdf, automation, attachment, email
+Tags: gravityforms, gravity, forms, pdf, automation, attachment, email
 Requires at least: 5.3
 Tested up to: 5.7
 Stable tag: 6.0.0-RC1
@@ -14,197 +14,178 @@ Automatically generate, email and download PDF documents with Gravity Forms and 
 
 == Description ==
 
-**Gravity PDF is the ultimate solution for generating digital PDF documents using Gravity Forms and WordPress.**
+**Gravity PDF is the ultimate self-hosted solution for dynamically creating digital PDF documents using Gravity Forms and WordPress.**
 
-https://www.youtube.com/watch?v=z8zKKrjmNjY
+= Highly Customisable PDFs =
 
-The plugin ships with four highly-customisable PDF templates perfectly suited for displaying your user’s data. Within seconds you can personalise the documents with your company logo, change the font, size, color and the paper size. If the templates don't suit, [have one tailor made just for you](https://gravitypdf.com/integration-services/) or [roll your own](https://gravitypdf.com/documentation/v5/developer-start-customising/).
+Out of the box you receive four highly-customisable PDF designs. Within seconds, you can personalise the look and feel by adding your company logo, header, footer, paper size / orientation, font, colour and size. If these designs don't suit, select a new one from the [Template Shop](https://gravitypdf.com/store/#templates), [go Bespoke](https://gravitypdf.com/bespoke/), or [build your own using HTML/CSS/PHP](https://gravitypdf.com/documentation/v5/developer-start-customising/).
 
-> Digital document management with WordPress and Gravity Forms just became a breeze!
+= Send as Email Attachment =
 
-= Feature =
+Gravity PDF can automatically email the PDF to both the admin and the user as soon as the form is completed. Try combining this feature with one of Gravity Forms payment add-ons (like [Stripe](https://www.gravityforms.com/add-ons/stripe/), [Square](https://www.gravityforms.com/add-ons/square/), or (PayPal)[https://www.gravityforms.com/add-ons/paypal-checkout/]) to delay the email until the payment is complete.
 
-* There’s no third-party APIs needed when generating your PDFs. That means no chance of third-party data breaches, no monthly fees or rate limits. You control the software and the documents it generates.
-* We support all languages, including complex symbol-based languages like Chinese and Japanese, as well as Right to Left (RTL) written languages such as Arabic and Hebrew.
-* Automatically email your PDF when a user completes a form. Have it emailed to people in your organisation, the user, or both. You can also conditionally generate and email the PDF.
-* Using Gravity Forms developer-licensed payment add-ons – like PayPal, Authorize.net or Stripe – you can restrict access to the PDF until after a payment is captured.
-* [Protecting your user’s sensitive information is at the heart of Gravity PDF](https://gravitypdf.com/documentation/v5/user-pdf-security/). The plugin’s security settings give you granular control over who has access to the PDFs generated.
-* Our [JavaScript-powered font manager](https://gravitypdf.com/documentation/v5/user-custom-fonts/) allows you to install and use your favorite fonts. Now you can keep in line with your corporate style guide, or create beautiful PDF typography.
-* [The documentation](https://gravitypdf.com/documentation/v5/user-installation/) has everything from basic install instructions to advanced developer how-to guides. Our friendly team is also on hand to [provide FREE general support](https://gravitypdf.com/support/).
-* PHP, HTML and CSS come easy? [You’ll find creating your own PDF templates a breeze](https://gravitypdf.com/documentation/v5/developer-start-customising/). If not, [we offer PDF design services](https://gravitypdf.com/integration-services/) tailored just for you. We can even auto-fill existing PDFs!
+= Privacy, Security, and GDPR =
+Gravity PDF generates PDFs on your web server, so no third-party service receives your data. [Robust security protects your documents](https://docs.gravitypdf.com/v6/users/pdf-security), and [the plugin is GDPR-compliant](https://docs.gravitypdf.com/v6/users/gdpr-and-gravity-pdf) for our European friends.
 
-= Premium Extensions and Templates =
+> Digital document management with WordPress and Gravity Forms just became simple with Gravity PDF!
 
-[Unlock more features for Gravity PDF with one of our premium extensions](https://gravitypdf.com/extension-shop/). If one of the free PDF templates aren't working for you, [try a premium template instead](https://gravitypdf.com/template-shop/). All purchases have a 7-day 100% money back guarantee.
+= Free Feature =
 
-= Requirements =
+* **Unlimited Use, No Restrictions** – There are zero hard limits to the number of PDFs you can configure across all your forms or generate on your entries. Gravity PDF does **NOT** stamp documents with our logo, limit the number of PDFs you can create per month, or purposefully restrict essential functionality to force you to upgrade to a paid plan.
+* **Privacy and Security** - your form data is never sent to a third party to generate the PDFs and the documents are generated directly on your web server. [Strong access control policies are put in place](https://docs.gravitypdf.com/v6/users/pdf-security#default-security) to prevent unauthenticated access to your PDFs.
+* **Multilingual** – a multitude of languages from across the globe can be displayed in PDFs, include complex scripts like Hebrew, Arabic, Thai, Japanese, Chinese, and Korean.
+* **Additional Fonts** – match your branding and enhance the overall look and feel of PDFs by install your own fonts.
+* **Columns** – use [Drag and Drop columns](https://docs.gravityforms.com/working-with-columns/) in Gravity Forms and [PDFs will automatically mimic that layout](https://docs.gravitypdf.com/v6/users/columns).
+* **Shortcode and Merge Tags** – You can generate a link or URL to PDFs [using both shortcodes and merge tags](https://docs.gravitypdf.com/v6/users/shortcodes-and-mergetags) so your users can download the PDF right after form submission.
+* **Export Entries** – include the direct link to any PDF(s) when [exporting your form entries](https://docs.gravitypdf.com/v6/users/include-pdfs-in-entry-export)
+* **Webhooks Add-on** – [send the direct PDF link with Webhook requests](https://docs.gravitypdf.com/v6/users/webhooks-support) when using Gravity Forms Webhooks add-on.
+* **Gravity Flow** – create complex workflows [using Gravity Flow](https://gravityflow.io) and automatically email Gravity PDF-generated documents at any step in the workflow.
+* **GravityView** – add links to PDFs when building a members area [using GravityView](https://gravityview.co) + [Advanced Filtering add-on](https://gravityview.co/extensions/advanced-filter/).
+* **Background Processing** – generating PDFs on form submission can be time consuming. [Offload it to a background process](https://docs.gravitypdf.com/v6/users/background-processing) will ensure form submissions are processed faster.
+* **Design PDFs** – developers can build their own PDF templates using HTML, CSS, and PHP [with the help of our developer documentation](https://docs.gravitypdf.com/v6/developers/start-customising).
+* **Documentation and Support** – there is [extensive documentation](https://docs.gravitypdf.com/v6/users/five-minute-install) covering every feature of Gravity PDF that you can comb through, plus we provide [free general support to all users](https://gravitypdf.com/support/).
 
-Gravity PDF can be run on most shared web hosting without any issues. It requires **PHP 5.6+** (PHP 7.0+ recommended) and at least 64MB of WP Memory (128MB+ recommended). You'll also need to be running WordPress 4.8+ and have [Gravity Forms 2.3.1+](https://rocketgenius.pxf.io/c/1211356/445235/7938) (affiliate link).
+= Unlock More Functionality =
 
-If you aren't sure Gravity PDF will meet your needs (and haven't got a Gravity Forms license yet) you can [try out the software via our demo site](https://demo.gravitypdf.com).
+Pay for additional PDF designs and functionality [from our online store](https://gravitypdf.com/store/).
+
+* **New Designs** – get access to 9 additional universal designs, 4 invoices, and 3 letter styles
+* **Additional customizations** – watermark PDFs with your own logo or text, control fields that should be displayed per PDF, add field descriptions, display all checkbox or radio field options, add notes, show field values instead of labels, and hide the product table
+* **On-screen Preview** – allow users to preview the PDF before form submission (and optionally payment) so they can see what the end result will be. This is a great feature for capturing e-signatures, selling PDF reports /  certificates / gift cards, or providing an on-screen proof before the PDF is sent to the printers (perfect for business cards).
+* **Bulk Download** - search, filter, and select entries and then zip up all your PDFs and download all together in a convenient zip file
+* **GFChart** - create PDF reports that display pie, bar, or column charts with aggregate Gravity Forms data [using GFChart](https://gfchart.com).
+* 30-day refund guarantee – Purchase with confidence knowing when you buy a product from our store that you can get a refund within 30 days, for any reason.
+
+= Hire the Experts =
+
+Need a tailor-made solution for Gravity PDF that solves complex business problems? Our team of experienced developers have helped thousands of businesses like yours to accomplish these goals. We can even automatically fill out existing PDFs like government forms! [Find out more](https://gravitypdf.com/bespoke/).
 
 = Documentation & Support =
 
-[We have extensive documentation on using Gravity PDF](https://gravitypdf.com/documentation/v5/five-minute-install/), and our friendly support team provides [FREE basic support via our website](https://gravitypdf.com/support/#contact-support) (we also check the WordPress.org forums but submitting a ticket via GravityPDF.com will get a faster response).
-
-= Custom PDF Integration =
-
-We offer **comprehensive PDF integration services** and do all the PDF development and integration into Gravity Forms for you. You tell us what you want and our friendly and experienced developers will design, develop and install custom PDF templates tailor specifically for you. We can even auto-fill your existing PDF documents. [Find out more at GravityPDF.com](https://gravitypdf.com/integration-services/).
+[We have extensive documentation on using Gravity PDF](https://docs.gravitypdf.com/v6/users/five-minute-install/), and our friendly support team provides [FREE basic support via GravityPDF.com](https://gravitypdf.com/support/#contact-support) (we do respond [to questions in forums](https://wordpress.org/support/plugin/gravity-forms-pdf-extended/), but give priority to our support portal).
 
 = Contribute =
 
-All development for Gravity PDF [is handled via GitHub](https://github.com/GravityPDF/gravity-pdf/). Opening new issues and submitting pull requests are welcome.
+All development for Gravity PDF [is handled via GitHub](https://github.com/GravityPDF/gravity-pdf/). Opening new issues or submitting a pull request is welcome.
 
-[Our public roadmap is available on Trello](https://trello.com/b/60YGv1J3/roadmap). We'd love it if you vote and comment on your favorite ideas.
+[The public roadmap is available on Trello](https://trello.com/b/60YGv1J3/roadmap). We'd love it if you vote and comment on your favorite ideas.
 
-You can also keep up to date with Gravity PDF by [subscribing to our newsletter](https://gravitypdf.com/#signup-top), [following us on Twitter](https://twitter.com/gravitypdf) or [liking us on Facebook](https://www.facebook.com/gravitypdf).
+Keep up to date with Gravity PDF by [subscribing to the newsletter](https://gravitypdf.com/signup/), [following us on Twitter](https://twitter.com/gravitypdf) and [liking us on Facebook](https://www.facebook.com/gravitypdf).
 
-Also, if you enjoy using the software [we'd love it if you could give us a review!](https://wordpress.org/support/view/plugin-reviews/gravity-forms-pdf-extended)
+If you enjoy using the software [we'd love it if you could give us a review!](https://wordpress.org/support/view/plugin-reviews/gravity-forms-pdf-extended)
 
-*Note: When Gravity Forms isn't installed and you activate Gravity PDF we display a notice that includes an affiliate link to their website.*
+_Note: When Gravity Forms isn't installed and you activate Gravity PDF we display a notice that includes an affiliate link to their website._
 
 == Installation ==
 
-[You'll find detailed installation instructions on GravityPDF.com](https://gravitypdf.com/documentation/v5/user-installation/).
+Gravity PDF can be run on most shared web hosting without any issues. It requires **PHP 7.3+** and at least 128MB of WP Memory. You'll also need to be running WordPress 5.3+ and have [Gravity Forms 2.5+](https://rocketgenius.pxf.io/c/1211356/445235/7938) (affiliate link).
+
+[You'll find detailed installation instructions at docs.gravitypdf.com](https://docs.gravitypdf.com/v6/users/five-minute-install).
+
+_If you aren't able to meet the v6 minimum requirements [you can download v5 which we still support](https://wordpress.org/plugins/gravity-forms-pdf-extended/advanced/#download-previous-link)._
 
 == Screenshots ==
 
-1. Our on-boarding experience will have you up and running in 5 minutes flat.
-2. Set up the global PDF settings then head straight to configuring your first PDF.
-3. Control the default paper size, PDF template and font/size/color.
-4. Advanced security options give you granular control of PDF access.
-5. Tools like the font manager and custom PDF installer are readily accessible.
-6. Our JavaScript-powered font manager will make using custom fonts a breeze.
-7. A snapshot of your form’s PDF setup.
-8. When adding a new PDF all the important settings are up front in the “General” tab.
-9. Override the default appearance settings on a per-PDF basis.
-10. Each template has its own PDF settings for greater control of the look and feel of your document.
-11. Header and Footer support is built-in.
-12. Advanced format and security settings can be applied to individual PDFs.
-13. PDFs can be accessed from the Gravity Forms entry list page.
-14. They also appear on the individual entry pages for easy access.
-15. Zadani is a minimalist business-style template that will generate a well-spaced document great for printing.
-16. Rubix uses stylish containers to create an aesthetically pleasing design.
-17. Focus Gravity providing a classic layout which epitomises Gravity Forms Print Preview. It’s the familiar layout you’ve come to love.
-18. Blank Slate provides a print-friendly template focusing solely on the user-submitted data.
+1. Select various PDF templates (designs), attach to Notification emails, give a unique filename using merge tags, and apply conditional logic to the PDF
+2. Control the paper size, orientation, font, size, and color, and whether to layout the document in RTL mode
+3. Each template (design) has unique settings that allow you to change the appearance. Common settings include: Header, Footer, Background Color and Image, display HTML Fields, the Form Title, and enable Conditional Logic for the fields.
+4. Password protect PDFs, format the PDF for long-term archiving (PDF/A-1b) or printing (PDFX-1a), and adjust the access control policies.
+5. Zadani is a minimalist business-style PDF design that will generate a well-spaced document great for printing.
+6. Rubix uses stylish containers to create an aesthetically pleasing PDF design.
+7. Focus Gravity providing a classic layout which epitomises Gravity Forms Print Preview. It’s the familiar layout you’ve come to love in PDF format.
+8. Blank Slate provides a print-friendly PDF design focused solely on the user-submitted data.
+9. View individual PDFs on Gravity Forms Entry List page.
+10. A flyout menu is shown when multiple PDFs are configured on a form when viewing on the Entry List page.
+11. View or Download PDFs on the Gravity Forms Entry Details page from the _PDFs_ metabox.
+12. The Font Manager allows you to add, update, search, select, and delete custom fonts for use with Gravity PDF.
+13. Design your own PDF templates and install via the PDF Template Manager. Or purchase a design from our online store.
+14. Get detailed info about the state of Gravity PDF on your site from Gravity Forms System Status page
+15. Easily uninstall and delete all Gravity PDF data from your website
+16. A bunch of paid PDF designs are available, as well as additional functionality.
 
 == Changelog ==
 
-= 6.0.0-RC2 =
-* BREAKING (USER): Change the PDF Merge tag modifier signature so they can be used in any order
-* BREAKING (USER): Remove the Always Save PDF setting from the UI.
-* Feature: Reorder PDF List Columns
-* Feature: Adjust when the downgrade prompt is shown, so that users can only downgrade if they meet the v5 requirements.
-* Feature: Add PDF column support for Gravity Perks Nested Forms
-* Feature: Re-add Help tab with new Algolia-based search
-* Bug: Adjust custom paper size sanitize logic to fix PHP error
-* Bug: Check for invalid relative date when using Signed PDF URLs and fallback to default timeout
-* Bug: Fix border display issue in Core Product table
-* Bug: Fix Template Manager error message styles
-* Bug: Show error message in Template Manager when maximum file size limit is reached
-* Bug: Fix missing loading icon in Template Manager
-* Bug: Enable Show Form Title and Enable Conditional Logic template settings by default
-* Bug: Fix up Custom Paper Size field widths
-* Bug: Provide more uniform column support in PDFs
-* Dev: Add better error log messages for PDF Merge tag processing
-* Dev: Pass additional information to the `gfpdf_field_container_class` filter
+= 6.0.0 =
 
-= 6.0.0-RC1 =
-* BREAKING (USER): Removed Kashida setting from UI in Font Manager (first added to 6.0.0-beta1)
+This major release is designed specifically for Gravity Forms 2.5+ and includes breaking pages that may affect you. You are strongly encouraged to [review the upgrade guide before attempting to update to v6](https://docs.gravitypdf.com/v6/users/v5-to-v6-migration).
 
-* BREAKING (DEV): Change `\GFPDF\Model\Model_Install` __construct signature by removing `Helper_Abstract_Forms` dependancy from the start and adding `Model_Uninstall` at the end
-* BREAKING (DEV): Change `\GFPDF\Model\Model_System_Report` __construct signature by adding new `Helper_Templates` dependancy at the end
-* BREAKING (DEV): Removed `\GFPDF\View\View_Settings::system_status` method. Replaced by `Controller_|Model_|View_System_Report` classes for direct integration with Gravity Forms System Status page
-* BREAKING (DEV): Removed undocumented `gfpdf_entry_detail_pre_container_markup` and `gfpdf_entry_detail_post_container_markup` actions
-* BREAKING (DEV): Adjusted ID from `#tab_pdf` to `#tab_PDF` for container on Global PDF settings page. This ensures both the Global and Form PDF settings use a consistent ID.
-
-* Feature: Show plugin downgrade prompt when minimum WordPress, Gravity Forms, or PHP requirements aren't met so users can easily roll back to the latest supported v5.x version.
-* Feature: Move Gravity PDF uninstaller from Tools tab to Gravity Forms Uninstall settings page
-* Feature: Add support for WordPress' native Background Updates
-* Feature: Add accessibility improvements for keyboard users and screen readers on all Gravity PDF UIs
-* Feature: Display warning on System Status page when Core template overrides are out of date
-* Feature: Include Add/Update PDF button below each section on PDF creation page to make it easy to save
-* Feature: Open all sections by default on PDF creation page
-* Feature: Improve RTL support on admin pages
-* Feature: Added Select and Delete button/icons on the Font Manager Update screen
-* Feature: Add font custom template CSS usage example to Font Manager
-* Feature: Auto-select newly installed font in Font Manager
-* Feature: Move selected font to the top of the Font Manager list when opened
-
-* Bug: Adjust active/inactive toggle to match Gravity Forms RC1 style
-* Bug: Fix issue deleting custom font using new Font Manager
-* Bug: Fix issue validating custom fonts using the new Font Manager
-* Bug: Only include active PDFs in the entry export options list
-* Bug: Auto-process [gravitypdf] shortcode for Redirect Confirmation type
-* Bug: Correctly display PDF Working Directory path in System Status on multisite
-* Bug: Fix up Copy System Status output for some Gravity PDF settings
-* Bug: Made more JavaScript strings translatable
-* Bug: Add mergetag selector to Rich Text fields in PDF settings
-* Bug: Ensure mergetag selector doesn't open off the screen on smaller viewpoints
-* Bug: Fix up Font Manager column overlap issue when closing a font being updated
-* Bug: Ensure the sample shortcode on the PDF list page is auto-selectable
-* Bug: Fix header spacing on Gravity PDF settings pages to match Gravity Forms RC1 style
-* Bug: Fix header font weight on Gravity PDF settings pages to match Gravity Forms RC1 style
-* Bug: Fix template list order issue in Template Manager after changing templates in Dropdown
-* Bug: Fix License success and error messages so they show inline with add-on
-* Bug: Allow PDF custom paper size to include decimal point values
-* Bug: Fix security settings toggle issue on PDF creation page
-* Bug: Only allow custom font to be installed via a template if it isn't already installed (matched by name)
-* Bug: Prevent jumping in the browser when duplicating a PDF
-
-* Dev: Deprecate Helper_Abstract_Options::get_font_short_name(). No direct replacement as the font 'shortname' has been phased out (using unique ID now).
-* Dev: Updated field description markup to use DIVs instead of SPANs. Matches Gravity Forms RC1
-* Dev: Deprecate these methods from `\GFPDF\Model\Model_Install`: `uninstall_plugin`, `remove_plugin_options`, `remove_plugin_form_settings`, `remove_folder_structure`, `deactivate_plugin`. All moved to `Model_Uninstall`.
-
-= 6.0.0-beta1 =
-* BREAKING (USER): New minimum requirements PHP7.3+, WordPress 5.3+, Gravity Forms 2.5+ (upgrade to meet minimum requirements before using v6)
-* BREAKING (USER): Removed Gravity PDF v3 template stylesheet (swap legacy PDF template to Focus Gravity template)
-* BREAKING (USER): Removed Gravity PDF v3 to v4 migration code (upgrade to v4/v5 before attempting v6 upgrade)
-
-* BREAKING (DEV): Moved all vendor (Packagist) packages to new `GFPDF_Vendor/` namespace (BC aliasing for common classes included). Prevents all vendor conflicts with other plugins.
-* BREAKING (DEV): Removed "Setup Custom Templates" tool (manually copy over template files to PDF Working Directory)
-* BREAKING (DEV): Removed `shortname` property from `custom_fonts` global PDF options, and removed the requirement for the `font_name` to be unique (use `id` instead of `shortname`).
-* BREAKING (DEV): Changed the first parameter $font_name in `GPDFAPI::delete_pdf_font()` to $font_id instead. You can no longer delete the font by
+**BREAKING CHANGES**
+* New minimum requirements PHP7.3+, WordPress 5.3+, Gravity Forms 2.5+
+* Removed Gravity PDF v3 template stylesheet (swap legacy PDF template to Focus Gravity template)
+* Removed Gravity PDF v3 to v4 migration code (upgrade to v4/v5 before attempting v6 upgrade)
+* (Dev) Moved all vendor (Packagist) packages to new `GFPDF_Vendor/` namespace (BC aliasing for common classes included). Prevents all vendor conflicts with other plugins.
+* (Dev) Removed "Setup Custom Templates" tool (manually copy over template files to PDF Working Directory)
+* (Dev) Removed `shortname` property from `custom_fonts` global PDF options, and removed the requirement for the `font_name` to be unique (use `id` instead of `shortname`).
+* (Dev) Changed the first parameter $font_name in `GPDFAPI::delete_pdf_font()` to $font_id instead. You can no longer delete the font by
  its name, as it is no longer a unique identifier.
-* BREAKING (DEV): Majority of admin user interface markup (UI) changed to suit new GF2.5 UI ()
-* BREAKING (DEV): Renamed `\GFPDF\Helper\Fields\Field_CreditCard` class to `Field_Creditcard`
+* (Dev) Majority of admin user interface markup (UI) changed to suit new GF2.5 UI ()
+* (Dev) Renamed `\GFPDF\Helper\Fields\Field_CreditCard` class to `Field_Creditcard`
+* (Dev) Change `\GFPDF\Model\Model_Install` __construct signature by removing `Helper_Abstract_Forms` dependancy from the start and adding `Model_Uninstall` at the end
+* (Dev) Change `\GFPDF\Model\Model_System_Report` __construct signature by adding new `Helper_Templates` dependancy at the end
+* (Dev) Removed `\GFPDF\View\View_Settings::system_status` method. Replaced by `Controller_|Model_|View_System_Report` classes for direct integration with Gravity Forms System Status page
+* (Dev) Removed undocumented `gfpdf_entry_detail_pre_container_markup` and `gfpdf_entry_detail_post_container_markup` actions
+* (Dev) Adjusted ID from `#tab_pdf` to `#tab_PDF` for container on Global PDF settings page. This ensures both the Global and Form PDF settings use a consistent ID.
+* (Dev) Change `\GFPDF\Model\Model_Install` __construct signature by removing `Helper_Abstract_Forms` dependancy from the start and adding `Model_Uninstall` at the end
+* (Dev) Change `\GFPDF\Model\Model_System_Report` __construct signature by adding new `Helper_Templates` dependancy at the end
+* (Dev) Removed `\GFPDF\View\View_Settings::system_status` method. Replaced by `Controller_|Model_|View_System_Report` classes for direct integration with Gravity Forms System Status page
+* (Dev) Removed undocumented `gfpdf_entry_detail_pre_container_markup` and `gfpdf_entry_detail_post_container_markup` actions
+* (Dev) Adjusted ID from `#tab_pdf` to `#tab_PDF` for container on Global PDF settings page. This ensures both the Global and Form PDF settings use a consistent ID.
+* (Dev) Deprecate Helper_Abstract_Options::get_font_short_name(). No direct replacement as the font 'shortname' has been phased out (using unique ID now).
+* (Dev) Updated field description markup to use DIVs instead of SPANs. Matches Gravity Forms RC1
+* (Dev) Deprecate these methods from `\GFPDF\Model\Model_Install`: `uninstall_plugin`, `remove_plugin_options`, `remove_plugin_form_settings`, `remove_folder_structure`, `deactivate_plugin`. All moved to `Model_Uninstall`.
 
-* Feature: Brand new admin user interface (UI) to seamlessly match the new GF2.5 UI.
-* Feature: Added support for new GF columns feature in Core PDFs
-* Feature: Added RTL support for new GF columns feature in Core PDFs
-* Feature: Revamped Font Manager with better validation, error handling, and automatic support for fonts that include Open Type Layout features. Also including CRUD REST API endpoints.
-* Feature: Added new PDF metabox on Entry Details page (moved PDF links from Entry metabox). Includes a better user experience for forms with a lot of PDFs configured.
-* Feature: Added new merge tag modifiers :download, :print, :signed, :signed:expiry to enhance existing PDF mergetag (modifiers can all be used in conjunction)
-* Feature: Add PDF URL to Webhook add-on "All Fields" request body
-* Feature: Add ability to include PDF URLs in Entry exports
-* Feature: Add Gravity PDF info to Gravity Forms System Status page
-* Feature: Removed rich Select functionality (using Chosen) in UI for greater accessibility
-* Feature: Remove WP Dialog prompts in UI for greater accessibility
+**NEW FEATURES**
+* Brand new admin user interface (UI) to seamlessly match the Gravity Forms (GF) 2.5 UI.
+* Added support for new GF columns feature in Core PDFs
+* Add PDF column support for Gravity Perks Nested Forms
+* Added RTL support for new GF columns feature in Core PDFs
+* Refreshed Font Manager with better validation, error handling, and automatic support for fonts that include Open Type Layout features.
+* Added new PDF metabox on Entry Details page. Includes a better user experience for forms with a lot of PDFs configured.
+* Added new merge tag modifiers :download, :print, :signed, :signed:expiry to enhance existing PDF mergetag (modifiers can all be used in conjunction)
+* Add PDF URL to Webhook add-on "All Fields" request body
+* Add ability to include PDF URLs in Entry exports
+* Add Gravity PDF info to Gravity Forms System Status page
+* Show plugin downgrade prompt when minimum WordPress, Gravity Forms, or PHP requirements aren't met so users can easily roll back to the latest supported v5.x version.
+* Add support for WordPress' native Background Updates
+* Add accessibility improvements for keyboard users and screen readers on all Gravity PDF UIs
+* Display warning on System Status page when Core template overrides are out of date
+* Include Add/Update PDF button below each section on PDF creation page to make it easy to save
+* Improve RTL support on admin pages
 
-* Bug: Ignore `content-type` header API response when running the Core Font installer
-* Bug: Make all `GFPDFAPI` API class error responses translatable
-* Bug: Fix PHP8 notice
-* Bug: Prevent background queue from continuing if retry limit reached on unrecoverable task (like generating the PDF)
+**UX IMPROVEMENTS**
+* Remove the Always Save PDF setting from the UI.
+* Switch all Radio PDF settings to new Toggle setting
+* Switch all Multiselect PDF settings to Checkbox field (better accessibility)
+* Rename PDF setting "Name" to "Label"
+* Replace asterisk `*` to text `(required)` to signify required fields (better accessibility)
+* Rename PDF setting "Orientation" to "Paper Orientation"
+* Refine PDF settings descriptions.
+* Removed Welcome Page
+* Move Paper Size global settings below the Template / Font settings
+* Removed rich Select functionality (using Chosen) in UI for greater accessibility
+* Remove WP Dialog prompts in UI for greater accessibility
+* Move Gravity PDF uninstaller from Tools tab to Gravity Forms Uninstall settings page
 
-* Dev: Rewritten all CSS in SASS
-* Dev: Add `GPDFAPI::get_entry_pdfs( $entry_id )` method to API. Acts like `GPDFAPI::get_form_pdfs( $form_id )` but filters out any PDFs that don't pass conditional logic checks for the current entry.
-* Dev: Added `Helper_Abstract_Config_Settings` class which template config files can extend to automatically have the current PDF settings injected into the class.
-* Dev: Added upgrade routine to ...
-* Dev: Adjusted some logged items to use less severe alerts (when template config file doesn't exist, and when native PDF support for a field doesn't exist)
-* Dev: Upgrade vendor packages to latest versions
-* Dev: Remove all backbone.js and underscore.js Font Manager code from Gravity PDF admin pages
-* Dev: Remove gulp as dependency (build is done using only webpack now)
+**BUG FIXES**
+* Ignore `content-type` header API response when running the Core Font installer
+* Make all `GFPDFAPI` API class error responses translatable
+* Fix PHP8 notice
+* Prevent background queue from continuing if retry limit reached on unrecoverable task (like generating the PDF)
+* Adjust custom paper size sanitize logic to fix PHP error
+* Check for invalid relative date when using Signed PDF URLs and fallback to default timeout
+* Fix border display issue in Core Product table
+* Show error message in Template Manager when maximum file size limit is reached
 
-* Misc: Switch all Radio PDF settings to new Toggle setting
-* Misc: Switch all Multiselect PDF settings to Checkbox field (better accessibility)
-* Misc: Rename PDF setting "Name" to "Label"
-* Misc: Replace asterisk `*` to text `(required)` to signify required fields (better accessibility)
-* Misc: Rename PDF setting "Orientation" to "Paper Orientation"
-* Misc: Refine PDF settings descriptions.
-* Misc: Removed Welcome Page
-* Misc: Temporarily disabled Help Page until v6 documentation is written
-* Misc: Reduce premium extension license checks when no license key saved
-* Misc: Move Paper Size global settings below the Template / Font settings
+**DEVELOPER IMPROVEMENTS**
+* Rewritten all CSS in SASS
+* Add `GPDFAPI::get_entry_pdfs( $entry_id )` method to API. Acts like `GPDFAPI::get_form_pdfs( $form_id )` but filters out any PDFs that don't pass conditional logic checks for the current entry.
+* Added `Helper_Abstract_Config_Settings` class which template config files can extend to automatically have the current PDF settings injected into the class.
+* Adjusted some logged items to use less severe alerts (when template config file doesn't exist, and when native PDF support for a field doesn't exist)
+* Upgrade vendor packages to latest versions
+* Remove all backbone.js and underscore.js Font Manager code from Gravity PDF admin pages
+* Remove gulp as dependency (build is done using only webpack now)
+* Add better error log messages for PDF Merge tag processing
+* Pass additional information to the `gfpdf_field_container_class` filter
 
 See [CHANGELOG.txt](https://github.com/GravityPDF/gravity-pdf/blob/master/CHANGELOG.txt) for version 5/4/3 changelog history.
 
