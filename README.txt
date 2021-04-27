@@ -18,11 +18,11 @@ Automatically generate, email and download PDF documents with Gravity Forms and 
 
 = Highly Customisable PDFs =
 
-Out of the box you receive four highly-customisable PDF designs. Within seconds, you can personalise the look and feel by adding your company logo, header, footer, paper size / orientation, font, colour and size. If these designs don't suit, select a new one from the [Template Shop](https://gravitypdf.com/store/#templates), [go Bespoke](https://gravitypdf.com/bespoke/), or [build your own using HTML/CSS/PHP](https://gravitypdf.com/documentation/v5/developer-start-customising/).
+Out of the box you receive four highly-customisable PDF designs. Within minutes, you can personalise the look and feel by adding your company logo, header, footer, paper size / orientation, font, color and size. If these designs don't suit, select a new one from the [Template Shop](https://gravitypdf.com/store/#templates), [go Bespoke](https://gravitypdf.com/bespoke/), or [build your own using HTML/CSS/PHP](https://docs.gravitypdf.com/v6/developers/start-customising).
 
 = Send as Email Attachment =
 
-Gravity PDF can automatically email the PDF to both the admin and the user as soon as the form is completed. Try combining this feature with one of Gravity Forms payment add-ons (like [Stripe](https://www.gravityforms.com/add-ons/stripe/), [Square](https://www.gravityforms.com/add-ons/square/), or (PayPal)[https://www.gravityforms.com/add-ons/paypal-checkout/]) to delay the email until the payment is complete.
+Gravity PDF can automatically email the PDF to both the admin and the user as soon as the form is completed. Try combining this feature with one of Gravity Forms payment add-ons (like [Stripe](https://www.gravityforms.com/add-ons/stripe/), [Square](https://www.gravityforms.com/add-ons/square/), or [PayPal](https://www.gravityforms.com/add-ons/paypal-checkout/)) to delay the email until the payment is complete.
 
 = Privacy, Security, and GDPR =
 Gravity PDF generates PDFs on your web server, so no third-party service receives your data. [Robust security protects your documents](https://docs.gravitypdf.com/v6/users/pdf-security), and [the plugin is GDPR-compliant](https://docs.gravitypdf.com/v6/users/gdpr-and-gravity-pdf) for our European friends.
