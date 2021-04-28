@@ -565,9 +565,9 @@ export class FontManagerBody extends Component {
             onHandleSubmit={this.handleSubmit}
             msg={msg}
             loading={loading}
-            tabIndexFontName={!updateFontVisible ? '145' : '-1'}
-            tabIndexFontFiles={!updateFontVisible ? '146' : '-1'}
-            tabIndexFooterButtons={!updateFontVisible ? '147' : '-1'}
+            tabIndexFontName={updateFontVisible && '-1'}
+            tabIndexFontFiles={!updateFontVisible ? '0' : '-1'}
+            tabIndexFooterButtons={updateFontVisible && '-1'}
             {...this.state.addFont}
           />
 
@@ -581,9 +581,9 @@ export class FontManagerBody extends Component {
             fontList={fontList}
             msg={msg}
             loading={loading}
-            tabIndexFontName={updateFontVisible ? '145' : '-1'}
-            tabIndexFontFiles={updateFontVisible ? '146' : '-1'}
-            tabIndexFooterButtons={updateFontVisible ? '147' : '-1'}
+            tabIndexFontName={!updateFontVisible && '-1'}
+            tabIndexFontFiles={updateFontVisible ? '0' : '-1'}
+            tabIndexFooterButtons={!updateFontVisible && '-1'}
             {...this.state.updateFont}
           />
         </div>

@@ -131,7 +131,6 @@ export class SearchBox extends Component {
           onChange={this.handleSearch}
           onKeyDown={e => e.keyCode === 13 && e.preventDefault()}
           ref={node => (this.input = node)}
-          tabIndex='143'
         />
       </div>
     )
