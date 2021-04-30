@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravityforms, gravity, forms, pdf, automation, attachment, email
 Requires at least: 5.3
 Tested up to: 5.7
-Stable tag: 6.0.0
+Stable tag: 6.0.1
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -105,6 +105,9 @@ _If you aren't able to meet the v6 minimum requirements [you can download v5 whi
 
 == Changelog ==
 
+= 6.0.1 =
+* Bug: When displaying the minimum Gravity Forms version not met error, remove `beta-1` as the minimum to prevent confusion.
+
 = 6.0.0 =
 
 This major release is designed specifically for Gravity Forms 2.5+ and includes breaking pages that may affect you. You are strongly encouraged to [review the upgrade guide before attempting to update to v6](https://docs.gravitypdf.com/v6/users/v5-to-v6-migration).
@@ -190,6 +193,9 @@ This major release is designed specifically for Gravity Forms 2.5+ and includes 
 See [CHANGELOG.txt](https://github.com/GravityPDF/gravity-pdf/blob/master/CHANGELOG.txt) for version 5/4/3 changelog history.
 
 == Upgrade Notice ==
+
+= 6.0.1 =
+WARNING: Breaking changes! New minimum versions: PHP7.3+, WordPress 5.3+, Gravity Forms 2.5+.
 
 = 6.0.0 =
 WARNING: Breaking changes! New minimum versions: PHP7.3+, WordPress 5.3+, Gravity Forms 2.5+.
