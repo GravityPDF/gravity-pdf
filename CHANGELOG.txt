@@ -1,5 +1,9 @@
 This file contains the changelog history for previous major versions of Gravity PDF. See https://wordpress.org/plugins/gravity-forms-pdf-extended/#developers for the current major version changelog.
 
+= 5.4.0 =
+* Feature: Prevent update to 6.0 if minimum requirements are not met (including when automatic updates enabled)
+* Feature: Show/allow any new updates for 5.x if minimum requirements are not met for 6.0
+
 = 5.3.4 =
 * Security: Resolve XSS issue on PDF List page
 * Security: Resolve authenticated arbitrary PHP file Deletion when using the PDF Template Manager (by default, this affects Administrator accounts only)
