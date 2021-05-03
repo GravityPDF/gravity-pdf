@@ -215,6 +215,7 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$this->load_core_font_handler();
 		$this->load_debug();
 		$this->check_system_status();
+		$this->update_dependency_manager();
 
 		/* Add localisation support */
 		$this->add_localization_support();
@@ -888,6 +889,19 @@ class Router implements Helper\Helper_Interface_Actions, Helper\Helper_Interface
 		$class = new Controller\Controller_System_Report( $this->data->allow_url_fopen );
 		$class->init();
 
+		$this->singleton->add_class( $class );
+	}
+
+	/**
+	 * @since 5.4
+	 *
+	 * @return void
+	 */
+	public function update_dependency_manager() {
+		$view  = new View\View_Update_Dependency_Manager( [] );
+		$class = new Controller\Controller_Update_Dependency_Manager( $view, PHP_VERSION, $GLOBALS['wp_version'], \GFForms::$version, PDF_EXTENDED_VERSION );
+
+		$class->init();
 		$this->singleton->add_class( $class );
 	}
 
