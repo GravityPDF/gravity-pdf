@@ -5,6 +5,8 @@ import coreFontBootstrap from './bootstrap/coreFontBootstrap'
 import helpBootstrap from './bootstrap/helpBootstrap'
 import addEditButton from './utilities/PdfSettings/addEditButton'
 import autoSelectShortcode from './utilities/PdfList/autoSelectShortcode'
+import checkFormUnsavedChanges from './utilities/PdfSettings/checkFormUnsavedChanges'
+import disableOnbeforeunload from './utilities/PdfSettings/disableOnbeforeunload'
 import '../../scss/gfpdf-styles.scss'
 
 /**
@@ -59,9 +61,11 @@ $(function () {
   const fmGeneralSettingsTab = document.querySelector('#gfpdf-settings-field-wrapper-default_font select')
   const fmToolsTab = document.querySelector('#gfpdf-settings-field-wrapper-manage_fonts')
   const fmPdfSettings = document.querySelector('#gfpdf-settings-field-wrapper-font select')
-  const pdfSettingsForm = document.querySelector('#gfpdf_pdf_form')
+  const pdfSettingsForm = document.querySelector('form#gfpdf_pdf_form')
   const pdfSettingFieldSets = document.querySelectorAll('fieldset.gform-settings-panel--full')
   const gfPdfListForm = document.querySelector('form#gfpdf_list_form')
+  const gPdfTabsForm = document.querySelector('form.gform_settings_form')
+  const currentUrl = window.location.href
 
   /* Initialize font manager under general settings tab */
   if (fmGeneralSettingsTab !== null) {
@@ -86,5 +90,23 @@ $(function () {
   /* Enable shortcode field click and auto select feature */
   if (gfPdfListForm !== null) {
     autoSelectShortcode(gfPdfListForm)
+  }
+
+  /* Initialize form unsaved changes checker on General settings tab */
+  if (currentUrl.includes('tab=general') || currentUrl.includes('subview=PDF#/')) {
+    checkFormUnsavedChanges(gPdfTabsForm)
+    disableOnbeforeunload(gPdfTabsForm)
+  }
+
+  /* Initialize form unsaved changes checker on License tab */
+  if (currentUrl.includes('tab=license')) {
+    checkFormUnsavedChanges(gPdfTabsForm)
+    disableOnbeforeunload(gPdfTabsForm)
+  }
+
+  /* Initialize form unsaved changes checker on New / Existing PDF settings */
+  if (currentUrl.includes('&pid=')) {
+    checkFormUnsavedChanges(pdfSettingsForm)
+    disableOnbeforeunload(pdfSettingsForm)
   }
 })
