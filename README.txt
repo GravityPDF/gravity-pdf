@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravity, forms, pdf, automation, attachment, email
 Requires at least: 4.8
 Tested up to: 5.7
-Stable tag: 5.3.4
+Stable tag: 5.4.0
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -89,6 +89,10 @@ Also, if you enjoy using the software [we'd love it if you could give us a revie
 18. Blank Slate provides a print-friendly template focusing solely on the user-submitted data.
 
 == Changelog ==
+
+= 5.4.0=
+* Feature: Prevent update to 6.0 if minimum requirements are not met (including when automatic updates enabled)
+* Feature: Show/allow any new updates for 5.x if minimum requirements are not met for 6.0
 
 = 5.3.4 =
 * Security: Resolve XSS issue on PDF List page
