@@ -86,7 +86,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 </script>
 
 <script type="text/template" id="GravityPDFFonts">
-	<a href="#" class="font-name"><i class="fa fa-angle-right"></i><span name="font_name">{{- model.get('font_name') }}</span></a>
+	<a href="#" class="font-name"><i class="dashicons dashicons-arrow-right-alt2"></i><span name="font_name">{{- model.get('font_name') }}</span></a>
 	<div class="font-settings" style="display: none">
 
 		<form method="post">
@@ -158,7 +158,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 	</div>
 
-	<a href="#" class="delete-font"><i class="fa fa-trash-o"></i></a>
+	<a href="#" class="delete-font"><i class="dashicons dashicons-trash"></i></a>
 </script>
 
 <div id="delete-confirm" title="<?php esc_attr_e( 'Delete Font?', 'gravity-forms-pdf-extended' ); ?>" style="display: none;">

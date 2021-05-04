@@ -24,6 +24,7 @@ export function showTooltips () {
     })
 
     $a.attr('title', html)
+      .attr('aria-label', html)
 
     return $a
   }

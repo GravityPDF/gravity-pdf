@@ -85,7 +85,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</div>
 		</div>
 
-		<div class="center">
+		<div id="help_footer" class="center">
 			<a href="https://gravitypdf.com/documentation/v5/" class="button button-primary button-large"><?php esc_html_e( 'View All Documentation', 'gravity-forms-pdf-extended' ); ?></a>
 			<a href="https://gravitypdf.com/support/#contact-support" class="button button-primary button-large"><?php esc_html_e( 'Contact Support', 'gravity-forms-pdf-extended' ); ?></a>
 

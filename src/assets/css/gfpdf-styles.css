@@ -172,6 +172,14 @@ div img.gfpdf-image {
  padding-right: 2px;
 }
 
+#pdfextended-settings h3 span {
+ font-size: 1.6rem;
+}
+
+#pdfextended-settings h3 span i[class*=" fa-"] {
+ color: #0074a2;
+}
+
 #pdfextended-settings #add-new-pdf {
  padding: 4px 8px;
 }
@@ -238,8 +246,62 @@ div img.gfpdf-image {
  border: 1px solid red;
 }
 
-#tab_pdf .wp-editor-wrap {
+.wp-editor-wrap {
  margin: 0 12px 0 0;
+}
+
+.gform-settings__content .wp-core-ui.wp-editor-wrap {
+ margin-right: 4rem;
+}
+
+a.gf_tooltip.tooltip {
+ font-size: 14px;
+ color: #424242;
+ opacity: .5;
+}
+
+a.tooltip::before {
+ content: none;
+}
+
+a.tooltip:hover {
+ text-decoration: none;
+ color: #0074a2;
+ opacity: 1;
+}
+
+#gpdf-advance-template-selector .button {
+ background: #f6f7f7;
+ box-shadow: unset;
+ line-height: 2.15384615;
+ padding: 0 10px;
+ height: unset;
+ font-size: 13px;
+}
+
+.gform-settings__wrapper .button {
+ height: unset !important;
+}
+
+#pdf-general .button:hover {
+ background: #f0f0f1;
+}
+
+.form-table input[type=radio] {
+ border: 1px solid;
+}
+
+#gfpdf_pdf_form input[type=checkbox] {
+ border: 1px solid #8c8f94;
+}
+
+input#submit {
+ background: #2271b1;
+ border-color: #2271b1;
+ margin: 10px 0 20px 0;
+ letter-spacing: .3pt;
+ font-size: 13px;
+ padding: 0 10px;
 }
 
 .rtl #pdfextended-settings label, .rtl #tab_pdf label {
@@ -261,7 +323,6 @@ div img.gfpdf-image {
 /*
  * Tools Settings Page
  */
-
 #pdfextended-settings table.gfpdf_table thead th {
  font-weight: bold;
 }
@@ -269,6 +330,21 @@ div img.gfpdf-image {
 #pdfextended-settings table.gfpdf_table tr:nth-child(2n) td,
 #pdfextended-settings table.gfpdf_table tr:nth-child(2n) th {
  background: none repeat scroll 0 0 #fcfcfc;
+}
+
+.ui-helper-clearfix {
+ display: block !important;
+}
+
+.font-name i.dashicons.dashicons-arrow-right-alt2 {
+ font-size: 11px;
+ line-height: 1.8em;
+}
+
+#font-add-list i.dashicons.dashicons-plus {
+ font-size: 4em;
+ width: unset;
+ vertical-align: unset;
 }
 
 #pdfextended-settings p.submit {
@@ -343,6 +419,10 @@ div img.gfpdf-image {
  color: #555;
 }
 
+.dashicons.dashicons-plus {
+ height: unset;
+}
+
 #manage-font-files #font-add-list span {
  display: block;
  text-transform: uppercase;
@@ -352,7 +432,7 @@ div img.gfpdf-image {
 #manage-font-files li a {
  display: block;
  background: #EEE;
- padding: 5px 7px;
+ padding: 5px 4px;
  text-decoration: none;
 }
 
@@ -444,6 +524,10 @@ div img.gfpdf-image {
 
 #pdfextended-settings .postbox h3.hndle {
  padding-bottom: 12px;
+}
+
+#search-results .hndle span {
+ font-size: 14px;
 }
 
 #pdfextended-settings .postbox .hndle, #pdfextended-settings .widget .widget-top {
@@ -562,6 +646,15 @@ div img.gfpdf-image {
  padding: 0 17px 9px;
 }
 
+#help_footer a.button {
+ background: #2271b1;
+ height: 35px !important;
+}
+
+#help_footer a.button:hover {
+ background: #135e96;
+}
+
 #pdfextended-settings li.resultExist {
  padding: 18px 14px 5px 14px;
  border-bottom: 1px dotted #ccc;
@@ -574,7 +667,6 @@ div img.gfpdf-image {
 #pdfextended-settings li.noResult, li.error {
  padding: 14px 14px 10px 14px;
 }
-
 
 /*
  * System status icons
@@ -598,11 +690,9 @@ div img.gfpdf-image {
  color: #d10b0b;
 }
 
-
 /*
  * License page
  */
-
 #pdf-system-status #license input[type="email"], #pdf-system-status #license input[type="number"], #pdf-system-status #license input[type="password"], #pdf-system-status #license input[type="search"], #pdf-system-status #license input[type="tel"], #pdf-system-status #license input[type="text"], #pdf-system-status #license input[type="url"], #pdf-system-status #license select, #pdf-system-status #license textarea {
  background-color: #FFFFFF;
  border: 1px solid #DDDDDD;
@@ -772,10 +862,34 @@ div img.gfpdf-image {
 
 .gfpdf_submenu {
  width: 200px;
+
+ background-color: #FFF;
+ box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+ display: none;
+ float: none;
+ margin: 0 0 0 -1px;
+ position: absolute;
+ padding: 0;
+ z-index: 99;
+ border-top: 1px solid #dfdfdf;
+ border-bottom: 4px solid #666;
 }
 
 .gfpdf_submenu li {
  border-bottom: 1px solid #eee;
+}
+
+.gfpdf_submenu li:last-of-type {
+ border-bottom: none;
+}
+
+.gfpdf_submenu a {
+ display: block;
+ padding: 6px 10px;
+}
+
+.gfpdf_submenu a:hover {
+ color: #333;
 }
 
 /*
@@ -802,7 +916,6 @@ div img.gfpdf-image {
  height: 38px;
  padding: 9px 10px 0;
  top: auto;
-
  -moz-box-sizing: content-box;
  -webkit-box-sizing: content-box;
  box-sizing: content-box;
@@ -856,6 +969,26 @@ div img.gfpdf-image {
  text-indent: 0;
  -webkit-animation: fa-spin 1.5s infinite linear;
  animation: fa-spin 1.5s infinite linear;
+}
+
+.theme-actions a.button {
+ background: #2271b1;
+ border-color: #2271b1;
+ color: #fff;
+ text-decoration: none;
+ text-shadow: none;
+ font-size: 13px;
+ padding: 0 10px;
+ line-height: 2.15384615;
+}
+
+.theme-actions a.button:hover {
+ background-color: #135e96 !important;
+ color: #fff;
+}
+
+.theme-actions a.delete-theme:hover {
+ background-color: #d63638 !important;
 }
 
 /*

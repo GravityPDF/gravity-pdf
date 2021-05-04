@@ -89,7 +89,7 @@ export class HelpContainer extends Component {
       <>
         <input
           type="text"
-          placeholder={'  ' + GFPDF.searchPlaceholder}
+          placeholder={GFPDF.searchPlaceholder}
           id="search-help-input"
           name="searchInput"
           value={searchInput}

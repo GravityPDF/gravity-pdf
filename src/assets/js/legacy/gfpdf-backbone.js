@@ -748,7 +748,7 @@
        * @since 4.0
        */
       render: function () {
-        this.$el.html('<i class="fa fa-plus fa-4x"></i><span>Add Font</span>')
+        this.$el.html('<i class="dashicons dashicons-plus"></i><span>Add Font</span>')
       },
 
       /**
