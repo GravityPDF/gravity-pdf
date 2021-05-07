@@ -62,5 +62,12 @@
         }
       }
     }
+
+    /* PDF list section */
+    #gfpdf_list_form {
+      .btn-shortcode.toggle + .gpdf-fallback-input {
+        width: 35vw;
+      }
+    }
   }
 }

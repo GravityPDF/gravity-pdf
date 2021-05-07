@@ -18,6 +18,7 @@
     "gfMergeTagsObj": false,
     "form": false,
     "gform_initialize_tooltips": false,
-    "_": false
+    "_": false,
+    "ClipboardJS": false
   }
 }

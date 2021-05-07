@@ -96,7 +96,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 			'name'          => esc_html__( 'Label', 'gravity-forms-pdf-extended' ),
 			'template'      => esc_html__( 'Template', 'gravity-forms-pdf-extended' ),
 			'notifications' => esc_html__( 'Notifications', 'gravity-forms-pdf-extended' ),
-			'shortcode'     => esc_html__( 'Shortcode', 'gravity-forms-pdf-extended' ),
+			'shortcode'     => esc_html__( 'Shortcode', 'gravity-forms-pdf-extended' ) . gform_tooltip( 'pdf_shortcode', 'gfpdf-tooltip', true ),
 		];
 
 		/* See https://docs.gravitypdf.com/v6/developers/filters/gfpdf_pdf_list_columns/ for more details about this filter */
@@ -281,13 +281,28 @@ class Helper_PDF_List_Table extends WP_List_Table {
 		$pdf_id = esc_attr( $item['id'] );
 
 		/* Prepare our shortcode sample */
-		$shortcode = '[gravitypdf name="' . esc_attr( $name ) . '" id="' . esc_attr( $item['id'] ) . '" text="' . esc_attr__( 'Download PDF', 'gravity-forms-pdf-extended' ) . '"]';
+		$shortcode = sprintf(
+			'[gravitypdf name="%1$s" id="%2$s" text="%3$s"]',
+			$name,
+			$pdf_id,
+			__( 'Download PDF', 'gravity-forms-pdf-extended' )
+		);
 
-		/* Set up hidden text for screen readers */
-		echo '<p id="' . $pdf_id . '" class="screen-reader-text">' . sprintf( esc_html__( 'Copy Download %s Shortcode', 'gravity-forms-pdf-extended' ), esc_html( $item['name'] ) ) . '</p>';
+		$aria_label = sprintf( __( 'Copy the %s PDF shortcode to the clipboard', 'gravity-forms-pdf-extended' ), $item['name'] );
 
-		/* Display in a readonly field */
-		echo '<input type="text" aria-labeledby="' . $pdf_id . '" class="gravitypdf_shortcode" value="' . esc_attr( $shortcode ) . '" readonly="readonly" onclick="jQuery(this).select();" />';
+		ob_start();
+		?>
+
+		<button data-selected-text="<?= esc_attr__( 'Shortcode copied!', 'gravity-forms-pdf-extended' ) ?>" type="button" class="gform-status-indicator btn-shortcode" data-clipboard-text="<?= esc_attr( $shortcode ) ?>" aria-label="<?= esc_attr( $aria_label ) ?>" role="status" aria-live="polite">
+			<?= esc_html__( 'Copy Shortcode', 'gravity-forms-pdf-extended' ) ?>
+		</button>
+
+		<div class="gpdf-fallback-input">
+			<input type="text" id="<?= $pdf_id ?>" value="<?= esc_attr( $shortcode ) ?>" aria-label="<?= esc_attr( $aria_label ) ?>" />
+		</div>
+
+		<?php
+		ob_end_flush();
 
 		do_action( 'gfpdf_post_pdf_list_shortcode_column', $item, $this );
 	}
@@ -341,7 +356,7 @@ class Helper_PDF_List_Table extends WP_List_Table {
 
 		?>
 
-		<a href="<?= $edit_url; ?>" aria-label="<?= esc_attr( $pdf_name ) . esc_attr__( 'PDF', 'gravity-forms-pdf-extended' ) ?>"><strong><?= esc_html( $pdf_name ) ?></strong></a>
+		<a href="<?= $edit_url; ?>" aria-label="<?= esc_attr( sprintf( __( '%s PDF', 'gravity-forms-pdf-extended' ), $pdf_name ) ) ?>"><strong><?= esc_html( $pdf_name ) ?></strong></a>
 		<div class="row-actions">
 
 			<?php

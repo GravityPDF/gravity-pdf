@@ -15,7 +15,7 @@ fixture`PDF shortcode - Confirmation Type TEXT, PAGE and REDIRECT text`
 test('should check shortcode confirmation type TEXT is working correctly', async t => {
   // Actions
   await run.copyDownloadShortcode('gf_edit_forms&view=settings&subview=PDF&id=3')
-  shortcodeHolder = await run.shortcodeInputBox.value
+  shortcodeHolder = await run.shortcodeBox.getAttribute('data-clipboard-text')
   await run.navigateConfirmationSection('gf_edit_forms&view=settings&subview=confirmation&id=3')
   await t
     .click(run.confirmationTextCheckbox)
@@ -45,7 +45,7 @@ test('should check shortcode confirmation type TEXT is working correctly', async
 test('should check if the shortcode confirmation type PAGE is working correctly', async t => {
   // Actions
   await run.copyDownloadShortcode('gf_edit_forms&view=settings&subview=PDF&id=3')
-  shortcodeHolder = await run.shortcodeInputBox.value
+  shortcodeHolder = await run.shortcodeBox.getAttribute('data-clipboard-text')
   await t
     .setNativeDialogHandler(() => true)
     .navigateTo(`${baseURL}/wp-admin/edit.php?post_type=page`)
@@ -90,7 +90,7 @@ test('should check if the shortcode confirmation type PAGE is working correctly'
 test('should check if the shortcode confirmation type REDIRECT download is working correctly', async t => {
   // Actions
   await run.copyDownloadShortcode('gf_edit_forms&view=settings&subview=PDF&id=3')
-  shortcodeHolder = await run.shortcodeInputBox.value
+  shortcodeHolder = await run.shortcodeBox.getAttribute('data-clipboard-text')
   await run.navigateConfirmationSection('gf_edit_forms&view=settings&subview=confirmation&id=3')
   await t
     .click(run.confirmationRedirectCheckbox)
