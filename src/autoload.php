@@ -16,4 +16,3 @@ require_once( PDF_PLUGIN_DIR . 'src/deprecated.php' );
 require_once( PDF_PLUGIN_DIR . 'api.php' );
 
 require_once( PDF_PLUGIN_DIR . 'vendor_prefixed/querypath/querypath/src/qp_functions.php' );
-add_action( 'init', '\GFPDF\Deprecated\Vendor_Aliasing::maybe_alias_vendor_packages', 9999 );
