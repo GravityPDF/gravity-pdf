@@ -5,7 +5,7 @@ Donate link: https://gravitypdf.com/donate-to-plugin/
 Tags: gravityforms, gravity, forms, pdf, automation, attachment, email
 Requires at least: 5.3
 Tested up to: 5.7
-Stable tag: 6.0.1
+Stable tag: 6.0.2
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl.txt
@@ -105,15 +105,17 @@ _If you aren't able to meet the v6 minimum requirements [you can download v5 whi
 
 == Changelog ==
 
+= 6.0.2 =
+* Bug: Fix up 404 link for Outdated Templates in System Status
+* Bug: Revert vendor aliasing for mPDF and querypath (back to the original namespace) as it caused more problems than is solved. Developers: see https://docs.gravitypdf.com/v6/users/v5-to-v6-migration#changed-namespace-for-composer-packages
+
 = 6.0.1 =
 * Bug: When displaying the minimum Gravity Forms version not met error, remove `beta-1` as the minimum to prevent confusion.
 
 = 6.0.0 =
-
 This major release is designed specifically for Gravity Forms 2.5+ and includes breaking pages that may affect you. You are strongly encouraged to [review the upgrade guide before attempting to update to v6](https://docs.gravitypdf.com/v6/users/v5-to-v6-migration).
 
-**BREAKING CHANGES**
-
+= BREAKING CHANGES =
 * New minimum requirements PHP7.3+, WordPress 5.3+, Gravity Forms 2.5+
 * Removed Gravity PDF v3 template stylesheet (swap legacy PDF template to Focus Gravity template)
 * Removed Gravity PDF v3 to v4 migration code (upgrade to v4/v5 before attempting v6 upgrade)
@@ -138,8 +140,7 @@ This major release is designed specifically for Gravity Forms 2.5+ and includes 
 * (Dev) Updated field description markup to use DIVs instead of SPANs. Matches Gravity Forms RC1
 * (Dev) Deprecate these methods from `\GFPDF\Model\Model_Install`: `uninstall_plugin`, `remove_plugin_options`, `remove_plugin_form_settings`, `remove_folder_structure`, `deactivate_plugin`. All moved to `Model_Uninstall`.
 
-**NEW FEATURES**
-
+= NEW FEATURES =
 * Brand new admin user interface (UI) to seamlessly match the Gravity Forms (GF) 2.5 UI.
 * Added support for new GF columns feature in Core PDFs
 * Add PDF column support for Gravity Perks Nested Forms
@@ -157,8 +158,7 @@ This major release is designed specifically for Gravity Forms 2.5+ and includes 
 * Include Add/Update PDF button below each section on PDF creation page to make it easy to save
 * Improve RTL support on admin pages
 
-**UX IMPROVEMENTS**
-
+= UX IMPROVEMENTS =
 * Remove the Always Save PDF setting from the UI.
 * Switch all Radio PDF settings to new Toggle setting
 * Switch all Multiselect PDF settings to Checkbox field (better accessibility)
@@ -172,8 +172,7 @@ This major release is designed specifically for Gravity Forms 2.5+ and includes 
 * Remove WP Dialog prompts in UI for greater accessibility
 * Move Gravity PDF uninstaller from Tools tab to Gravity Forms Uninstall settings page
 
-**BUG FIXES**
-
+= BUG FIXES =
 * Ignore `content-type` header API response when running the Core Font installer
 * Make all `GFPDFAPI` API class error responses translatable
 * Fix PHP8 notice
@@ -183,8 +182,7 @@ This major release is designed specifically for Gravity Forms 2.5+ and includes 
 * Fix border display issue in Core Product table
 * Show error message in Template Manager when maximum file size limit is reached
 
-**DEVELOPER IMPROVEMENTS**
-
+= DEVELOPER IMPROVEMENTS =
 * Rewritten all CSS in SASS
 * Add `GPDFAPI::get_entry_pdfs( $entry_id )` method to API. Acts like `GPDFAPI::get_form_pdfs( $form_id )` but filters out any PDFs that don't pass conditional logic checks for the current entry.
 * Added `Helper_Abstract_Config_Settings` class which template config files can extend to automatically have the current PDF settings injected into the class.
@@ -198,6 +196,9 @@ This major release is designed specifically for Gravity Forms 2.5+ and includes 
 See [CHANGELOG.txt](https://github.com/GravityPDF/gravity-pdf/blob/master/CHANGELOG.txt) for version 5/4/3 changelog history.
 
 == Upgrade Notice ==
+
+= 6.0.2 =
+WARNING: Breaking changes! New minimum versions: PHP7.3+, WordPress 5.3+, Gravity Forms 2.5+.
 
 = 6.0.1 =
 WARNING: Breaking changes! New minimum versions: PHP7.3+, WordPress 5.3+, Gravity Forms 2.5+.
