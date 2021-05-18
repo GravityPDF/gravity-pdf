@@ -138,7 +138,7 @@ class View_System_Report extends Helper_Abstract_View {
 	 * @since 6.0
 	 */
 	public function get_template_upgrade_message(): string {
-		$learn_more_url = 'https://docs.gravitypdf.com/@TODO';
+		$learn_more_url = 'https://docs.gravitypdf.com/v6/developers/template-hierarchy';
 
 		return $this->markup_warning . ' <a href="' . $learn_more_url . '">' . esc_html__( 'Learn how to update', 'gravity-forms-pdf-extended' ) . '</a>';
 	}
