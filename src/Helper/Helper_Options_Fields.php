@@ -73,7 +73,7 @@ class Helper_Options_Fields extends Helper_Abstract_Options implements Helper_In
 					'default_font'            => [
 						'id'      => 'default_font',
 						'name'    => esc_html__( 'Default Font', 'gravity-forms-pdf-extended' ),
-						'desc'    => esc_html__( 'Set the default font type used in PDFs. Choose an existing font or install your own', 'gravity-forms-pdf-extended' ),
+						'desc'    => esc_html__( 'Set the default font type used in PDFs. Choose an existing font or install your own.', 'gravity-forms-pdf-extended' ),
 						'type'    => 'select',
 						'options' => $this->get_installed_fonts(),
 						'tooltip' => '<h6>' . esc_html__( 'Fonts', 'gravity-forms-pdf-extended' ) . '</h6>' . esc_html__( 'Gravity PDF comes bundled with fonts for most languages world-wide. Want to use a specific font type? Use the font installer (found in the Tools tab).', 'gravity-forms-pdf-extended' ),
