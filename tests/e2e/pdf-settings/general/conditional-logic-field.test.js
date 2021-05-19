@@ -1,5 +1,5 @@
 import { Selector } from 'testcafe'
-import { fieldLabel, fieldDescription } from '../../utilities/page-model/helpers/field'
+import { fieldLabel } from '../../utilities/page-model/helpers/field'
 import Pdf from '../../utilities/page-model/helpers/pdf'
 
 const run = new Pdf()
@@ -16,7 +16,6 @@ test('should display \'Conditional Logic\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Conditional Logic').exists).ok()
-    .expect(fieldDescription('Add rules to dynamically enable or disable the PDF. When disabled, PDFs do not show up in the admin area, cannot be viewed, and will not be attached to notifications.', 'label').exists).ok()
     .expect(run.conditionalLogicCheckbox.exists).ok()
     .expect(checkboxLabel.exists).ok()
 })

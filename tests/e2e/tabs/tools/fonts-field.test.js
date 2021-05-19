@@ -1,4 +1,4 @@
-import { button, fieldHeaderTitle, fieldDescription } from '../../utilities/page-model/helpers/field'
+import { button, fieldHeaderTitle } from '../../utilities/page-model/helpers/field'
 import Tools from '../../utilities/page-model/tabs/tools'
 import FontManager from '../../utilities/page-model/helpers/font-manager'
 
@@ -14,7 +14,6 @@ test('should display \'Fonts\' field', async t => {
   // Assertions
   await t
     .expect(fieldHeaderTitle('Fonts').exists).ok()
-    .expect(fieldDescription('Install custom fonts for use in your PDF documents. Only .ttf font files are supported.').exists).ok()
     .expect(button('Manage').exists).ok()
 })
 

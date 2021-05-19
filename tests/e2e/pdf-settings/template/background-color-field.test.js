@@ -1,5 +1,5 @@
 import { Selector } from 'testcafe'
-import { fieldLabel, fieldDescription } from '../../utilities/page-model/helpers/field'
+import { fieldLabel } from '../../utilities/page-model/helpers/field'
 import Pdf from '../../utilities/page-model/helpers/pdf'
 
 const run = new Pdf()
@@ -14,7 +14,6 @@ test('should display \'Background Color\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Background Color').exists).ok()
-    .expect(fieldDescription('Set the background color for all pages.', 'label').exists).ok()
     .expect(run.backgroundColorSelectButton.exists).ok()
     .expect(run.backgroundColorInputBox.exists).ok()
     .expect(run.backgroundColorWpPickerContainerActive.exists).ok()

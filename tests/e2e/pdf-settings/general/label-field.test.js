@@ -1,5 +1,5 @@
 import { Selector } from 'testcafe'
-import { fieldLabel, fieldDescription } from '../../utilities/page-model/helpers/field'
+import { fieldLabel } from '../../utilities/page-model/helpers/field'
 import Pdf from '../../utilities/page-model/helpers/pdf'
 
 const run = new Pdf()
@@ -16,7 +16,6 @@ test('should display \'Label\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Label (required)').exists).ok()
-    .expect(fieldDescription('Add a descriptive label to help you differentiate between multiple PDF settings.', 'label').exists).ok()
     .expect(labelInputField.exists).ok()
 })
 

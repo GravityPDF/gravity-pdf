@@ -1,4 +1,4 @@
-import { fieldLabel, fieldDescription } from '../../utilities/page-model/helpers/field'
+import { fieldLabel } from '../../utilities/page-model/helpers/field'
 import Pdf from '../../utilities/page-model/helpers/pdf'
 
 const run = new Pdf()
@@ -12,7 +12,6 @@ test('should display \'Reverse Text (RTL)\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Reverse Text (RTL)').exists).ok()
-    .expect(fieldDescription('Script like Arabic, Hebrew, Syriac (and many others) are written right to left.').exists).ok()
     .expect(run.rtlCheckbox.exists).ok()
 })
 

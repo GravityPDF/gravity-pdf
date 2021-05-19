@@ -1,4 +1,4 @@
-import { fieldLabel, fieldDescription } from '../../utilities/page-model/helpers/field'
+import { fieldLabel } from '../../utilities/page-model/helpers/field'
 import Pdf from '../../utilities/page-model/helpers/pdf'
 
 const run = new Pdf()
@@ -12,7 +12,6 @@ test('should display \'Show Section Break Description\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Show Section Break Description').exists).ok()
-    .expect(fieldDescription('Display the Section Break field description in the PDF.').exists).ok()
     .expect(run.showSectionBreakDescriptionCheckbox.exists).ok()
 })
 

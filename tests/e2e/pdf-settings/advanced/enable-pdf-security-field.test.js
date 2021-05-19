@@ -1,4 +1,4 @@
-import { fieldLabel, fieldDescription } from '../../utilities/page-model/helpers/field'
+import { fieldLabel } from '../../utilities/page-model/helpers/field'
 import Pdf from '../../utilities/page-model/helpers/pdf'
 
 const run = new Pdf()
@@ -13,7 +13,6 @@ test('should display \'Enable PDF Security\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Enable PDF Security').exists).ok()
-    .expect(fieldDescription('Password protect generated PDFs, and/or restrict user capabilities.').exists).ok()
     .expect(run.enablePdfSecurityCheckbox.exists).ok()
 })
 

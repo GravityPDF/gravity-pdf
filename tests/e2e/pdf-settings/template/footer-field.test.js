@@ -1,5 +1,4 @@
 import {
-  fieldDescription,
   fieldLabel,
   mediaManagerTitle,
   addMediaButton
@@ -19,7 +18,6 @@ test('should display \'Footer\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Footer').exists).ok()
-    .expect(fieldDescription('The footer is included at the bottom of every page. For simple text footers use the left, center and right alignment buttons in the editor. For simple columns try this HTML table snippet. Use the special {PAGENO} and {nbpg} tags to display page numbering.', 'label').exists).ok()
     .expect(addMediaButton('gfpdf-settings-field-wrapper-footer', 'Add Media').exists).ok()
     .expect(run.footerWpEditorBox.exists).ok()
 })

@@ -1,4 +1,4 @@
-import { fieldHeaderTitle, fieldDescription } from '../../utilities/page-model/helpers/field'
+import { fieldHeaderTitle } from '../../utilities/page-model/helpers/field'
 import General from '../../utilities/page-model/tabs/general-settings'
 
 const run = new General()
@@ -12,7 +12,6 @@ test('should display \'Background Processing\' field', async t => {
   // Assertions
   await t
     .expect(fieldHeaderTitle('Background Processing').exists).ok()
-    .expect(fieldDescription('When enable, form submission and resending notifications with PDFs are handled in a background task. Requires Background tasks to be enabled.').exists).ok()
     .expect(run.backgroundProcessingCheckbox.exists).ok()
 })
 

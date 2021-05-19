@@ -1,7 +1,6 @@
 import { Selector } from 'testcafe'
 import {
   fieldLabel,
-  fieldDescription,
   button,
   dropdownOptionGroup,
   dropdownOption,
@@ -22,7 +21,6 @@ test('should display \'Default Template\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Default Template').exists).ok()
-    .expect(fieldDescription('Choose an existing template or purchased more from our template shop. You can also build your own or hire us to create a custom solution.').exists).ok()
     .expect(run.defaultTemplateSelectBox.exists).ok()
     .expect(templateManager.advancedButton.exists).ok()
 })

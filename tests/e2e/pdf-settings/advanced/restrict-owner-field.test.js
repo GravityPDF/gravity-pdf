@@ -1,4 +1,4 @@
-import { fieldLabel, fieldDescription } from '../../utilities/page-model/helpers/field'
+import { fieldLabel } from '../../utilities/page-model/helpers/field'
 import Pdf from '../../utilities/page-model/helpers/pdf'
 
 const run = new Pdf()
@@ -12,7 +12,6 @@ test('should display \'Restrict Owner\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Restrict Owner').exists).ok()
-    .expect(fieldDescription('When enabled, the original entry owner will NOT be able to view the PDFs. This setting is overridden when using signed PDF urls.').exists).ok()
     .expect(run.restrictOwnerCheckbox.exists).ok()
 })
 

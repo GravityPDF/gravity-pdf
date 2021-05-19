@@ -1,4 +1,4 @@
-import { fieldLabel, fieldDescription } from '../../utilities/page-model/helpers/field'
+import { fieldLabel } from '../../utilities/page-model/helpers/field'
 import Pdf from '../../utilities/page-model/helpers/pdf'
 
 const run = new Pdf()
@@ -12,7 +12,6 @@ test('should display \'Image DPI\' field', async t => {
   // Assertions
   await t
     .expect(fieldLabel('Image DPI').exists).ok()
-    .expect(fieldDescription('Control the image DPI (dots per inch) in PDFs. Set to 300 when professionally printing document.', 'label').exists).ok()
     .expect(run.imageDpiInputBox.exists).ok()
 })
 
